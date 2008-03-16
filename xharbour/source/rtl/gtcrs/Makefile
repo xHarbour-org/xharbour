@@ -1,12 +1,11 @@
 #
-# $Id: Makefile,v 1.6 2004/11/01 05:38:10 likewolf Exp $
+# $Id: Makefile,v 1.7 2006/01/12 13:16:08 druzus Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
     gtcrs.c \
-    chrmap.c \
 
 LIBNAME=gtcrs
 
@@ -33,8 +32,4 @@ ifeq ($(HB_GPM_MOUSE),yes)
 ifeq ($(HB_GPM_NOICE_DISABLE),yes)
   CFLAGS += -DHB_GPM_NOICE_DISABLE
 endif
-endif
-
-ifeq ($(HB_MULTI_GT),yes)
-  CFLAGS += -DHB_MULTI_GT
 endif

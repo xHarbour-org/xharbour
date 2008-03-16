@@ -1,12 +1,15 @@
 /*
- * $Id: mousestd.c,v 1.2 2003/05/16 19:52:12 druzus Exp $
+ * $Id: cursor.c 7929 2007-11-09 14:23:01Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * Mouse subsystem for plain ANSI C stream IO (stub)
+ *   CT3 video functions:
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * SAVECURSOR(), RESTCURSOR()
+ *
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,81 +53,33 @@
  *
  */
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	STD
-
 #include "hbapigt.h"
 
-/* NOTE: This file is a simple stub for those platforms which don't have
-         any kind of mouse support. [vszakats] */
-
-/* C callable low-level interface */
-
-void HB_GT_FUNC(mouse_Init( void ))
+HB_FUNC( SAVECURSOR )
 {
-   ;
+   SHORT sRow, sCol;
+   USHORT usCursor;
+
+   hb_gtGetPos( &sRow, &sCol );
+   hb_gtGetCursor( &usCursor );
+
+#ifdef HB_C52_STRICT 
+   usCursor = ( usCursor != 0 );
+#endif
+   hb_retnl( ( long ) sCol | ( sRow << 8 ) | ( usCursor << 16 ) );
 }
 
-void HB_GT_FUNC(mouse_Exit( void ))
-{
-   ;
-}
 
-BOOL HB_GT_FUNC(mouse_IsPresent( void ))
+HB_FUNC( RESTCURSOR )
 {
-   return FALSE;
-}
+   long lCursor = hb_parnl( 1 );
 
-void HB_GT_FUNC(mouse_Show( void ))
-{
-   ;
-}
+   hb_gtSetPos( ( SHORT ) ( ( lCursor >> 8 ) & 0xff ), ( SHORT ) ( lCursor & 0xff ) );
+#ifdef HB_C52_STRICT 
+   hb_gtSetCursor( ( USHORT ) ( ( lCursor >> 16 ) & 0x01 ) );
+#else
+   hb_gtSetCursor( ( USHORT ) ( ( lCursor >> 16 ) & 0xff ) );
+#endif
 
-void HB_GT_FUNC(mouse_Hide( void ))
-{
-   ;
-}
-
-int HB_GT_FUNC(mouse_Col( void ))
-{
-   return 0;
-}
-
-int HB_GT_FUNC(mouse_Row( void ))
-{
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
-{
-   HB_SYMBOL_UNUSED( iRow );
-   HB_SYMBOL_UNUSED( iCol );
-}
-
-BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
-{
-   HB_SYMBOL_UNUSED( iButton );
-
-   return FALSE;
-}
-
-int HB_GT_FUNC(mouse_CountButton( void ))
-{
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
-{
-   HB_SYMBOL_UNUSED( iTop );
-   HB_SYMBOL_UNUSED( iLeft );
-   HB_SYMBOL_UNUSED( iBottom );
-   HB_SYMBOL_UNUSED( iRight );
-}
-
-void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
-{
-   HB_SYMBOL_UNUSED( piTop );
-   HB_SYMBOL_UNUSED( piLeft );
-   HB_SYMBOL_UNUSED( piBottom );
-   HB_SYMBOL_UNUSED( piRight );
+   hb_retc( NULL );
 }

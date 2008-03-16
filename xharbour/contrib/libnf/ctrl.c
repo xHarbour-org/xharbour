@@ -1,5 +1,5 @@
 /*
- * $Id: ctrl.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: ctrl.c,v 1.3 2008/01/16 21:07:35 ptsarenko Exp $
  */
 
 /*
@@ -59,20 +59,16 @@
  *  $END$
  */
 
-#include <hbapi.h>
-#include <hbapigt.h>
+#include "hbapigt.h"
+#include "hbapiitm.h"
 
 HB_FUNC( FT_CTRL )
 {
-#if defined(HB_OS_DOS)
-   {
+   HB_GT_INFO gtInfo;
 
-      hb_retl( ( int ) ( ( *( char * ) 0x00400017 ) & 0x4 ) );
-      return;
-   }
-#else
-
-   hb_retl( hb_gt_info( GTI_KBDSHIFTS, FALSE, 0, NULL) & GTI_KBD_CTRL );
-
-#endif
+   gtInfo.pNewVal = gtInfo.pResult = NULL;
+   hb_gtInfo( GTI_KBDSHIFTS, &gtInfo );
+   hb_retl( ( hb_itemGetNI( gtInfo.pResult ) & GTI_KBD_CTRL ) != 0 );
+   if( gtInfo.pResult )
+      hb_itemRelease( gtInfo.pResult );
 }

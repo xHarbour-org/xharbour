@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2006/06/28 14:30:22 guerra000 Exp $
+# $Id: Makefile,v 1.3 2006/07/16 19:48:56 druzus Exp $
 #
 
 ROOT = ../../../
@@ -11,10 +11,6 @@ C_SOURCES=\
 LIBNAME=gtgui
 
 include $(TOP)$(ROOT)config/lib.cf
-
-ifeq ($(HB_MULTI_GT),yes)
-CFLAGS += -DHB_MULTI_GT
-endif
 
 ifneq ($(HB_GT_DEFAULT),)
 CFLAGS += -DHB_GT_DEFAULT=$(HB_GT_DEFAULT:gt%=%)

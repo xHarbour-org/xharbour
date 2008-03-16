@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.76 2006/11/11 03:48:20 druzus Exp $
+# $Id: hb-func.sh,v 1.77 2007/02/13 19:02:23 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,7 +21,8 @@ get_hbplatform()
     else
         # please add your distro suffix if it not belong to the one recognized below
         # and remember that order checking can be important
-
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandriva-release-One 2>/dev/null) && echo "mdk$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandriva-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' fedora-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
@@ -61,9 +62,16 @@ get_solibname()
 
 mk_hbgetlibs()
 {
+    local libs
+
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct cgi hbodbc debug profiler"
+        libs=""
+        if [ "$HB_COMPILER" != "cemgw" ]
+        then
+            libs="$libs gtwin"
+        fi
+        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
     else
         echo -n "$@"
     fi
@@ -71,9 +79,16 @@ mk_hbgetlibs()
 
 mk_hbgetlibsctb()
 {
+    local libs
+
     if [ -z "$@" ]
     then
-        echo -n "nf rddads"
+        libs=""
+        if [ "$HB_COMPILER" = "cemgw" ]
+        then
+            libs="$libs gtwin"
+        fi
+        echo -n "$libs rddads nf"
     else
         echo -n "$@"
     fi
@@ -122,15 +137,36 @@ mk_hbtools()
     elif [ "${HB_COMPILER}" = "djgpp" ]; then
         HB_SYS_LIBS="${HB_SYS_LIBS}"
     else
+        if [ "${HB_ARCHITECTURE}" = "linux" ]; then
+            HB_SYS_LIBS="${HB_SYS_LIBS} -ldl"
+        fi
         if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
             HB_SYS_LIBS="${HB_SYS_LIBS} -lrt"
             HB_CRS_LIB="curses"
+        elif [ -n "${HB_CURSES_VER}" ]; then
+            HB_CRS_LIB="${HB_CURSES_VER}"
         elif [ "${HB_NCURSES_194}" = "yes" ]; then
             HB_CRS_LIB="ncur194"
         else
             HB_CRS_LIB="ncurses"
         fi
         HB_SLN_LIB="slang"
+    fi
+    if [ "${C_USR//-mlp64/}" != "${C_USR}" ]; then
+        CC_C_USR="${CC_C_USR} -mlp64"
+        CC_L_USR="${CC_L_USR} -mlp64"
+    elif [ "${C_USR//-mlp32/}" != "${C_USR}" ]; then
+        CC_C_USR="${CC_C_USR} -mlp32"
+        CC_L_USR="${CC_L_USR} -mlp32"
+    elif [ "${C_USR//-m64/}" != "${C_USR}" ]; then
+        CC_C_USR="${CC_C_USR} -m64"
+        CC_L_USR="${CC_L_USR} -m64"
+    elif [ "${C_USR//-m32/}" != "${C_USR}" ]; then
+        CC_C_USR="${CC_C_USR} -m32"
+        CC_L_USR="${CC_L_USR} -m32"
+    fi
+    if [ "${C_USR//-fPIC/}" != "${C_USR}" ]; then
+        CC_C_USR="${CC_L_USR} -fPIC"
     fi
 
     echo "Generating ${hb_tool}... "
@@ -176,8 +212,10 @@ if [ \$# = 0 ]; then
                         # link with more GTs. The first one will be
                         #      the default at runtime
     -xbgtk              # link with xbgtk library (xBase GTK+ interface)
+    -xhgtk              # link with xHGtk library (GTK+ interface)
     -hwgui              # link with HWGUI library (GTK+ interface)
     -l<libname>         # link with <libname> library
+    -L<libpath>         # additional path to search for libraries
     -fmstat             # link with the memory statistics lib
     -nofmstat           # do not link with the memory statistics lib (default)
     -[no]strip          # strip (no strip) binaries
@@ -192,7 +230,7 @@ elif [ "\$*" = "mk-links" ]; then
     NAME="\${0##*/}"
     if [ "\${DIR}" != "\${NAME}" ]; then
         (cd "\${DIR}"
-        for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
+        for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk; do
             if [ "\${HB_ARCHITECTURE}" = "dos" ]; then
                 cp -f "\${NAME}" "\${n}"
             else
@@ -204,11 +242,19 @@ elif [ "\$*" = "mk-links" ]; then
     exit
 fi
 
+## check basename
+case "\${0##*/}" in
+    *cc)    HB=cc  ;;
+    *cmp)   HB=cmp ;;
+    *lnk)   HB=lnk ;;
+    *mk)    HB=mk  ;;
+    *)      exit 1 ;;
+esac
+
 ## default parameters
 HB_STATIC="${hb_static}"
 HB_MT=""
 HB_GT="${HB_GT_LIB#gt}"
-HB_MG="${HB_MULTI_GT}"
 
 HB_GPM_MOUSE="${HB_GPM_MOUSE}"
 
@@ -217,6 +263,7 @@ HB_FM_REQ=""
 HB_STRIP="yes"
 HB_MAIN_FUNC=""
 HB_XBGTK=""
+HB_XHGTK=""
 HB_HWGUI=""
 HB_USRLIBS=""
 HB_USRLPATH=""
@@ -236,14 +283,17 @@ while [ \$n -lt \${#P[@]} ]; do
             if [ -d "\${d}" ]; then
                 DIROUT="\${d%/}"
             elif [ -d "\${d%/*}" ]; then
-                DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
+                DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d}"
+                [ \${HB} = "cc" ] || p="-o\${d%.*}"
             elif [ -n "\${d}" ]; then
-                FILEOUT="\${d}"; p="-o\${d%.*}"
+                FILEOUT="\${d}"; p="-o\${d}"
+                [ \${HB} = "cc" ] || p="-o\${d%.*}"
             fi ;;
         -static)     HB_STATIC="yes" ;;
         -fullstatic) HB_STATIC="full" ;;
         -shared)     HB_STATIC="no" ;;
         -xbgtk)      HB_XBGTK="yes" ;;
+        -xhgtk)      HB_XHGTK="yes" ;;
         -hwgui)      HB_HWGUI="yes" ;;
         -mt)         HB_MT="MT" ;;
         -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
@@ -284,14 +334,7 @@ fi
 
 HB_GT_STAT=""
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
-if [ "\${HB_MG}" != "yes" ]; then
-    if [ "\${HB_STATIC}" = "yes" ] || [ "\${HB_STATIC}" = "full" ]; then
-        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr '[A-Z]' '[a-z]'\`
-    fi
-    HB_GT_REQ=""
-else
-    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr '[a-z]' '[A-Z]'\`
-fi
+HB_GT_REQ=\`echo \${HB_GT_REQ}|tr '[a-z]' '[A-Z]'\`
 HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
@@ -309,39 +352,40 @@ if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
     elif [ "\${HB_ARCHITECTURE}" = "bsd" ]; then
         SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/local/lib"
     fi
-    SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_SLN_LIB:-slang}"
+    SYSTEM_LIBS="-l${HB_SLN_LIB:-slang} \${SYSTEM_LIBS}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
 fi
 if [ -f "\${HB_LIB_INSTALL}/libgtcrs.a" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_CRS_LIB:-ncurses}"
+    SYSTEM_LIBS="-l${HB_CRS_LIB:-ncurses} \${SYSTEM_LIBS}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
 fi
 if [ "\${HB_WITHOUT_X11}" != "yes" ]; then
     if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ] || [ -f "\${HB_LIB_INSTALL}/libgtxwc.a" ]; then
         [ -d "/usr/X11R6/lib64" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib64"
-        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
+        SYSTEM_LIBS="-L/usr/X11R6/lib -lX11 \${SYSTEM_LIBS}"
     fi
 fi
-[ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -l\${HB_GPM_LIB}"
+[ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="-l\${HB_GPM_LIB} \${SYSTEM_LIBS}"
+
+if [ "\${HB_XBGTK}" = "yes" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
+elif [ "\${HB_XHGTK}" = "yes" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0 libglade-2.0\`"
+elif [ "\${HB_HWGUI}" = "yes" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0 --libs libgnomeprint-2.2\`"
+fi
 
 if [ "\${HB_STATIC}" = "full" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
     if [ "\${HB_ARCHITECTURE}" = "linux" ]; then
-        SYSTEM_LIBS="\${SYSTEM_LIBS} -lpthread"
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -lpthread -ldl"
     fi
     LN_OPT="\${LN_OPT} -static"
     HB_STATIC="yes"
 fi
 
-if [ "\${HB_XBGTK}" = "yes" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
-elif [ "\${HB_HWGUI}" = "yes" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0 --libs libgnomeprint-2.2\`"
-fi
-
 HB_LNK_REQ=""
 for gt in \${HB_GT_REQ}; do
-    if [ "\${HB_STATIC}" = "yes" ] || [ "\${gt}" = "ALLEG" ]; then
+#    if [ "\${HB_STATIC}" = "yes" ] || [ "\${gt}" = "ALLEG" ]; then
         HB_LNK_REQ="\${HB_LNK_REQ} HB_GT_\${gt}"
         if [ "\${gt}" = "ALLEG" ]; then
             if [ "\${HB_STATIC}" = "yes" ]; then
@@ -350,7 +394,7 @@ for gt in \${HB_GT_REQ}; do
                 SYSTEM_LIBS="\`allegro-config --libs 2>/dev/null\` \${SYSTEM_LIBS}"
             fi
         fi
-    fi
+#    fi
 done
 [ -n "\${HB_FM_REQ}" ] && HB_LNK_REQ="\${HB_LNK_REQ} HB_FM_\${HB_FM_REQ}"
 
@@ -368,6 +412,9 @@ else
         pref=""
         ext=".dll"
         HB_LNK_ATTR="__attribute__ ((dllimport))"
+    elif [ "\${HB_ARCHITECTURE}" = "hpux" ]; then
+        pref="lib"
+        ext=".sl"
     else
         pref="lib"
         ext=".so"
@@ -378,28 +425,38 @@ else
 fi
 for l in \${libs}
 do
-    if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" = "gt\${HB_GT_STAT}" ]; then
-        [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-        if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
-            HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-        fi
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+    if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
+        HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     fi
 done
 if [ "\${HB_XBGTK}" = "yes" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} -lxbgtk"
     HB_PATHS="\${HB_PATHS} -I\`PKG_CONFIG_PATH=/usr/local/lib/pkgconfig pkg-config --variable=xbgtkincludedir xbgtk\`"
 fi
+if [ "\${HB_XHGTK}" = "yes" ]; then
+    HARBOUR_LIBS="\${HARBOUR_LIBS} -lxhgtk"
+fi
 if [ "\${HB_HWGUI}" = "yes" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} -lhwgui -lprocmisc -lhbxml"
 fi
-if [ "\${HB_ARCHITECTURE}" = "darwin" ] || [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
+if [ "\${HB_ARCHITECTURE}" = "darwin" ] || \\
+   [ "\${HB_ARCHITECTURE}" = "sunos" ] || \\
+   [ "\${HB_ARCHITECTURE}" = "hpux" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
 else
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 fi
+
+l="mainwin"
+[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+
 l="fmstat"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
+if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && \\
+   ( [ -n "\${HB_FM_REQ}" ] || [ "\${HB_STATIC}" = "yes" ] ) && \\
+   ( [ "\${HB_COMPILER}" != "cemgw" ] || [ "\${HB_FM_REQ}" = "STAT" ] ); then
     if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
         HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
     else
@@ -505,24 +562,21 @@ hb_cleanup()
 
 trap hb_cleanup EXIT &>/dev/null
 
-## get basename
-HB="\${0##*/}"
-
 case "\${HB}" in
     *cc)
         hb_cc "\${P[@]}"
         ;;
-    *cmp|gharbour)
+    *cmp)
         hb_cmp "\${P[@]}"
         ;;
-    *lnk|harbour-link)
+    *lnk)
         hb_link "\${P[@]}" && \\
-        ( [ "\${HB_STRIP}" != "yes" ] || strip "\${FOUTE}" )
+        ( [ "\${HB_STRIP}" != "yes" ] || ${CCPREFIX}strip "\${FOUTE}" )
         ;;
     *mk)
         hb_cmp "\${P[@]}" && \\
         hb_link "\${FOUTO}" && \\
-        ( [ "\${HB_STRIP}" != "yes" ] || strip "\${FOUTE}" ) && \\
+        ( [ "\${HB_STRIP}" != "yes" ] || ${CCPREFIX}strip "\${FOUTE}" ) && \\
         rm -f "\${FOUTO}"
         ;;
 esac
@@ -538,7 +592,7 @@ mk_hblibso()
 
     name=`get_solibname`
     hb_rootdir="${1-.}"
-    
+
     hb_ver=`get_hbver "${hb_rootdir}"`
     hb_libs=`mk_hbgetlibs "$2"`
     [ -z "${HB_GT_LIB}" ] && HB_GT_LIB="gtstd"
@@ -558,25 +612,20 @@ mk_hblibso()
                 else
                     lm="${ls}"
                 fi
-                if [ "${HB_MULTI_GT}" = "yes" ] || \
-                   [ "${l#gt}" = "${l}" ] || \
-                   [ "${l}" = "${HB_GT_LIB}" ]
+                if [ -f $ls ]
                 then
-                    if [ -f $ls ]
-                    then
-                        LIBS="$LIBS $ls"
-                    fi
-                    if [ -f $lm ]
-                    then
-                        LIBSMT="$LIBSMT $lm"
-                    fi
-                    if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
-                        if [ "${l}" = gtcrs ]; then
-                            linker_options="$linker_options -lncurses"
-                        elif [ "${l}" = gtsln ]; then
-                            if [ "${HB_WITHOUT_GTSLN}" != "yes" ]; then
-                                linker_options="$linker_options -lslang"
-                            fi
+                    LIBS="$LIBS $ls"
+                fi
+                if [ -f $lm ]
+                then
+                    LIBSMT="$LIBSMT $lm"
+                fi
+                if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+                    if [ "${l}" = gtcrs ]; then
+                        linker_options="$linker_options -lncurses"
+                    elif [ "${l}" = gtsln ]; then
+                        if [ "${HB_WITHOUT_GTSLN}" != "yes" ]; then
+                            linker_options="$linker_options -lslang"
                         fi
                     fi
                 fi
@@ -584,32 +633,44 @@ mk_hblibso()
         esac
     done
     if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
-        full_lib_name="lib${name}.${hb_ver}.dylib"
-        full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
+        lib_ext=".dylib"
+        full_lib_name="lib${name}.${hb_ver}${lib_ext}"
+        full_lib_name_mt="lib${name}mt.${hb_ver}${lib_ext}"
         linker_options="-L/sw/lib -L/opt/local/lib $linker_options"
     elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
-        full_lib_name="${name}.dll"
-        full_lib_name_mt="${name}mt.dll"
+        lib_ext=".dll"
+        full_lib_name="${name}${lib_ext}"
+        full_lib_name_mt="${name}mt${lib_ext}"
+    elif [ "${HB_ARCHITECTURE}" = "hpux" ]; then
+        lib_ext=".sl"
+        full_lib_name="lib${name}-${hb_ver}${lib_ext}"
+        full_lib_name_mt="lib${name}mt-${hb_ver}${lib_ext}"
     else
-        full_lib_name="lib${name}-${hb_ver}.so"
-        full_lib_name_mt="lib${name}mt-${hb_ver}.so"
+        lib_ext=".so"
+        full_lib_name="lib${name}-${hb_ver}${lib_ext}"
+        full_lib_name_mt="lib${name}mt-${hb_ver}${lib_ext}"
+    fi
+    if [ -n "${HB_TOOLS_PREF}" ]; then
+        hb_mkslib="${HB_BIN_INSTALL}/${HB_TOOLS_PREF}-mkslib"
+    else
+        hb_mkslib="${HB_BIN_INSTALL}/hb-mkslib"
     fi
     echo "Making ${full_lib_name}..."
-    $HB_BIN_INSTALL/hb-mkslib ${full_lib_name} $LIBS ${linker_options}
+    ${hb_mkslib} ${full_lib_name} $LIBS ${linker_options}
     if [ "$HB_MT" = "MT" ]; then
         echo "Making ${full_lib_name_mt}..."
-        $HB_BIN_INSTALL/hb-mkslib ${full_lib_name_mt} $LIBSMT ${linker_options}
+        ${hb_mkslib} ${full_lib_name_mt} $LIBSMT ${linker_options}
     fi
     for l in ${full_lib_name} ${full_lib_name_mt}
     do
         if [ -f $l ]
         then
             if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
-                ll=${l%.${hb_ver}.dylib}.dylib
+                ll=${l%.${hb_ver}${lib_ext}}${lib_ext}
             elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
                 ll=""
             else
-                ll=${l%-${hb_ver}.so}.so
+                ll=${l%-${hb_ver}${lib_ext}}${lib_ext}
                 ln -sf $l $ll
             fi
             if [ -n "$ll" ]; then

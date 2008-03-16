@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.7 2004/07/09 11:52:09 likewolf Exp $
+ * $Id: mouseapi.c,v 1.8 2005/12/10 00:33:33 oh1 Exp $
  */
 
 /*
@@ -61,258 +61,209 @@
  *
  */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
-#include "hbfast.h"
-#include "hbapigt.h"
-
-static BOOL   s_bVisible = FALSE;
-static USHORT s_uiDoubleClickSpeed = 168; /* In milliseconds */
-static int    s_iLeftButton = 0;
-static int    s_iRightButton = 1;
+#include "hbgtcore.h"
 
 /* NOTE: Mouse initialization is called directly from low level GT driver
  * because it possible that mouse subsystem can depend on the terminal
  * (for example, mouse subsystem cannot be initialized before ncurses
  * driver is initialized).
-*/
+ */
 /* C callable interface */
 
-BOOL HB_EXPORT hb_mouseIsPresent( void )
+HB_EXPORT BOOL hb_mouseIsPresent( void )
 {
+   PHB_GT pGT;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseIsPresent()"));
 
-   return hb_mouse_IsPresent();
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEISPRESENT( pGT ) : FALSE;
 }
 
-BOOL HB_EXPORT hb_mouseGetCursor( void )
+HB_EXPORT BOOL hb_mouseGetCursor( void )
 {
+   PHB_GT pGT;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseGetCursor()"));
 
-   return s_bVisible;
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEGETCURSOR( pGT ) : FALSE;
 }
 
-void HB_EXPORT hb_mouseSetCursor( BOOL bVisible )
+HB_EXPORT void hb_mouseSetCursor( BOOL fVisible )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetCursor(%d)", (int) bVisible));
+   PHB_GT pGT;
 
-   if( bVisible )
-   {
-      hb_mouse_Show();
-      s_bVisible = TRUE;
-   }
-   else
-   {
-      hb_mouse_Hide();
-      s_bVisible = FALSE;
-   }
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetCursor(%d)", (int) fVisible));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSESETCURSOR( pGT, fVisible );
 }
 
-int HB_EXPORT hb_mouseCol( void )
+HB_EXPORT int hb_mouseCol( void )
 {
+   PHB_GT pGT;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseCol()"));
 
-   return hb_mouse_Col();
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSECOL( pGT ) : 0;
 }
 
-int HB_EXPORT hb_mouseRow( void )
+HB_EXPORT int hb_mouseRow( void )
 {
+   PHB_GT pGT;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseRow()"));
 
-   return hb_mouse_Row();
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEROW( pGT ) : 0;
 }
 
-void HB_EXPORT hb_mouseSetPos( int iRow, int iCol )
+HB_EXPORT void hb_mouseGetPos( int * piRow, int * piCol )
 {
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetPos(%p, %p)", piRow, piCol));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSEGETPOS( pGT, piRow, piCol );
+}
+
+HB_EXPORT void hb_mouseSetPos( int iRow, int iCol )
+{
+   PHB_GT pGT;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetPos(%d, %d)", iRow, iCol));
 
-   hb_mouse_SetPos( iRow, iCol );
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSESETPOS( pGT, iRow, iCol );
 }
 
-BOOL HB_EXPORT hb_mouseIsButtonPressed( int iButton )
+HB_EXPORT void hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouseIsButtonPressed(%d)", iButton));
+   PHB_GT pGT;
 
-   return hb_mouse_IsButtonPressed( iButton );
-}
-
-int HB_EXPORT hb_mouseCountButton( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouseCountButton()"));
-
-   return hb_mouse_CountButton();
-}
-
-void HB_EXPORT hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight )
-{
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetBounds(%d, %d, %d, %d)", iTop, iLeft, iBottom, iRight));
 
-   hb_mouse_SetBounds( iTop, iLeft, iBottom, iRight );
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSESETBOUNDS( pGT, iTop, iLeft, iBottom, iRight );
 }
 
-void HB_EXPORT hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+HB_EXPORT void hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouseGetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
+   PHB_GT pGT;
 
-   hb_mouse_GetBounds( piTop, piLeft, piBottom, piRight );
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSEGETBOUNDS( pGT, piTop, piLeft, piBottom, piRight );
 }
 
-/* HARBOUR callable interface */
-
-#ifdef HB_COMPAT_C53
-
-HB_FUNC( MPRESENT )
+HB_EXPORT int hb_mouseStorageSize( void )
 {
-   hb_retl( hb_mouseIsPresent() );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseStorageSize()"));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSESTORAGESIZE( pGT ) : 0;
 }
 
-HB_FUNC( MHIDE )
+HB_EXPORT void hb_mouseSaveState( BYTE * pBuffer )
 {
-   hb_mouseSetCursor( FALSE );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSaveState(%p)", pBuffer));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSESAVESTATE( pGT, pBuffer );
 }
 
-HB_FUNC( MSHOW )
+HB_EXPORT void hb_mouseRestoreState( BYTE * pBuffer )
 {
-   hb_mouseSetCursor( TRUE );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseRestoreState(%p)", pBuffer));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSERESTORESTATE( pGT, pBuffer );
 }
 
-HB_FUNC( MSETCURSOR )
+HB_EXPORT int hb_mouseGetDoubleClickSpeed( void )
 {
-   hb_retl( hb_mouseGetCursor() );
+   PHB_GT pGT;
 
-   if( ISLOG( 1 ) )
-      hb_mouseSetCursor( hb_parl( 1 ) );
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseGetDoubleClickSpeed()"));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEGETDOUBLECLICKSPEED( pGT ) : 0;
 }
-/****************************************************************************/
-/* Get the mouse row number for screen/window */
-HB_FUNC( MROW )
+
+HB_EXPORT void hb_mouseSetDoubleClickSpeed( int iSpeed )
 {
-   if( hb_parl( 1 ) )
-    hb_retni( hb_mouseRow() );
-   else
-    hb_retni( hb_ctMouseRow() );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetDoubleClickSpeed(%d)", iSpeed));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_MOUSESETDOUBLECLICKSPEED( pGT, iSpeed );
 }
-/****************************************************************************/
-/* Get the mouse column number for screen/window */
-HB_FUNC( MCOL )
+
+HB_EXPORT int hb_mouseCountButton( void )
 {
-   if( hb_parl( 1 ) )
-    hb_retni( hb_mouseCol() );
-   else
-    hb_retni( hb_ctMouseCol() );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseCountButton()"));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSECOUNTBUTTON( pGT ) : 0;
 }
-/****************************************************************************/
-HB_FUNC( MSETPOS )
+
+HB_EXPORT BOOL hb_mouseButtonState( int iButton )
 {
-   if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_mouseSetPos( hb_parni( 1 ), hb_parni( 2 ) );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseButtonState(%d)", iButton));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEBUTTONSTATE( pGT, iButton ) : FALSE;
 }
 
-HB_FUNC( MRIGHTDOWN )
+HB_EXPORT BOOL hb_mouseButtonPressed( int iButton, int * piRow, int * piCol )
 {
-   hb_retl( hb_mouseIsButtonPressed( s_iRightButton ) );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseButtonPressed(%d,%p,%p)", iButton, piRow, piCol));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEBUTTONPRESSED( pGT, iButton, piRow, piCol ) : FALSE;
 }
 
-HB_FUNC( MLEFTDOWN )
+HB_EXPORT BOOL hb_mouseButtonReleased( int iButton, int * piRow, int * piCol )
 {
-   hb_retl( hb_mouseIsButtonPressed( s_iLeftButton ) );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseButtonReleased(%d,%p,%p)", iButton, piRow, piCol));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEBUTTONRELEASED( pGT, iButton, piRow, piCol ) : FALSE;
 }
 
-HB_FUNC( MDBLCLK )
+HB_EXPORT int hb_mouseReadKey( int iEventMask )
 {
-   hb_retni( s_uiDoubleClickSpeed );
+   PHB_GT pGT;
 
-   if( ISNUM( 1 ) )
-   {
-      int uiDoubleClickSpeed = hb_parni( 1 );
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseReadKey(%d)", iEventMask));
 
-      if( uiDoubleClickSpeed > 0 )
-         s_uiDoubleClickSpeed = uiDoubleClickSpeed;
-   }
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_MOUSEREADKEY( pGT, iEventMask ) : 0;
 }
-
-HB_FUNC( MSAVESTATE )
-{
-   int iTop, iLeft, iBottom, iRight;
-
-   USHORT uiPos;
-   USHORT uiLen = sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( BOOL ) +
-                  sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( int );
-
-   BYTE * pBuffer = ( BYTE * ) hb_xgrab( uiLen + 1 );
-
-   hb_mouseGetBounds( &iTop, &iLeft, &iBottom, &iRight );
-
-   uiPos = 0;
-   *( pBuffer + uiPos ) = hb_mouseRow();
-   uiPos += sizeof( int );
-   *( pBuffer + uiPos ) = hb_mouseCol();
-   uiPos += sizeof( int );
-   *( pBuffer + uiPos ) = s_bVisible;
-   uiPos += sizeof( BOOL );
-   *( pBuffer + uiPos ) = iTop;
-   uiPos += sizeof( int );
-   *( pBuffer + uiPos ) = iLeft;
-   uiPos += sizeof( int );
-   *( pBuffer + uiPos ) = iBottom;
-   uiPos += sizeof( int );
-   *( pBuffer + uiPos ) = iRight;
-
-   hb_retclenAdopt( ( char * ) pBuffer, uiLen );
-}
-
-HB_FUNC( MRESTSTATE )
-{
-   USHORT uiLen = sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( BOOL ) +
-                  sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( int ) +
-                  sizeof( int );
-
-   if( ISCHAR( 1 ) && hb_parclen( 1 ) == ( ULONG ) uiLen )
-   {
-      int iRow, iCol;
-      int iTop, iLeft, iBottom, iRight;
-      BOOL bVisible;
-
-      USHORT uiPos;
-
-      BYTE * pBuffer = ( BYTE * ) hb_parcx( 1 );
-
-      uiPos = 0;
-      iRow = *( pBuffer + uiPos );
-      uiPos += sizeof( int );
-      iCol = *( pBuffer + uiPos );
-      uiPos += sizeof( int );
-      bVisible = *( pBuffer + uiPos );
-      uiPos += sizeof( BOOL );
-      iTop = *( pBuffer + uiPos );
-      uiPos += sizeof( int );
-      iLeft = *( pBuffer + uiPos );
-      uiPos += sizeof( int );
-      iBottom = *( pBuffer + uiPos );
-      uiPos += sizeof( int );
-      iRight = *( pBuffer + uiPos );
-
-      hb_mouseSetPos( iRow, iCol );
-      hb_mouseSetBounds( iTop, iLeft, iBottom, iRight );
-      hb_mouseSetCursor( bVisible );
-   }
-}
-
-HB_FUNC( MSETBOUNDS )
-{
-   hb_mouseSetBounds( hb_parni( 1 ), /* Defaults to zero on bad type */
-                      hb_parni( 2 ), /* Defaults to zero on bad type */
-                      ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow(),
-                      ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol() );
-}
-
-#endif

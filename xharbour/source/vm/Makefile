@@ -1,19 +1,25 @@
 #
-# $Id: Makefile,v 1.24 2006/06/06 11:36:14 mauriliolongo Exp $
+# $Id: Makefile,v 1.25 2007/04/12 03:17:17 andresreyesh Exp $
 #
 
 ROOT = ../../
 
 ifeq ($(HB_ARCHITECTURE),w32)
-    C_MAIN := mainstd.c mainwin.c
-    ifeq ($(HB_COMPILER),mingw32)
-        ifeq ($(HB_MULTI_GT),yes)
-            C_MAIN := mainwin.c
-        endif
-    endif
+	ifeq ($(HB_COMPILER),mingw32)
+		C_MAIN = mainwin.c
+		DIRS = mainstd
+	else
+		ifeq ($(HB_COMPILER),cemgw)
+			C_MAIN = mainwin.c
+			DIRS = mainstd mainwin
+		else
+			C_MAIN = mainstd.c mainwin.c
+		endif
+	endif
 else
       ifeq ($(HB_ARCHITECTURE),os2)
             C_MAIN := mainstd.c maindll.c
+	    DIRS = mainstd
       else
             C_MAIN := main.c
       endif
@@ -68,16 +74,8 @@ endif
 
 LIBNAME=vm
 
-DIRS=\
+DIRS+=\
 	fmstat \
-
-ifeq ($(HB_COMPILER),mingw32)
-   DIRS += mainstd
-endif
-
-ifeq ($(HB_ARCHITECTURE),os2)
-   DIRS += mainstd
-endif
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf

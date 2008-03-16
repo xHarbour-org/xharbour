@@ -1,12 +1,12 @@
 /*
- * $Id: mousecgi.c,v 1.2 2003/05/16 19:52:09 druzus Exp $
+ * $Id: inkeyapi.c 8152 2007-12-07 09:44:03Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * Mouse subsystem for plain ANSI C stream IO (stub)
+ * Inkey GT API
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,81 +50,100 @@
  *
  */
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	CGI
+#include "hbgtcore.h"
 
-#include "hbapigt.h"
-
-/* NOTE: This file is a simple stub for those platforms which don't have
-         any kind of mouse support. [vszakats] */
-
-/* C callable low-level interface */
-
-void HB_GT_FUNC(mouse_Init( void ))
+HB_EXPORT int  hb_inkey( BOOL fWait, double dSeconds, int iEventMask )
 {
-   ;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkey(%d, %f, %d)", (int) fWait, dSeconds, iEventMask));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_INKEYGET( pGT, fWait, dSeconds, iEventMask ) : 0;
 }
 
-void HB_GT_FUNC(mouse_Exit( void ))
+HB_EXPORT void hb_inkeyPut( int iKey )
 {
-   ;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPut(%d)", iKey));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_INKEYPUT( pGT, iKey );
 }
 
-BOOL HB_GT_FUNC(mouse_IsPresent( void ))
+HB_EXPORT int  hb_inkeyLast( int iEventMask )
 {
-   return FALSE;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyLast(%d)", iEventMask));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_INKEYLAST( pGT, iEventMask ) : 0;
 }
 
-void HB_GT_FUNC(mouse_Show( void ))
+HB_EXPORT int  hb_inkeyNext( int iEventMask )
 {
-   ;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyNext(%d)", iEventMask));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_INKEYNEXT( pGT, iEventMask ) : 0;
 }
 
-void HB_GT_FUNC(mouse_Hide( void ))
+HB_EXPORT void hb_inkeyPoll( void )
 {
-   ;
+   PHB_GT pGT;
+
+   HB_TRACE( HB_TR_DEBUG, ("hb_inkeyPoll()") );
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_INKEYPOLL( pGT );
 }
 
-int HB_GT_FUNC(mouse_Col( void ))
+HB_EXPORT int  hb_inkeySetLast( int iKey )
 {
-   return 0;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeySetLast(%d)", iKey));
+
+   pGT = hb_gt_Base();
+   return pGT ? HB_GTSELF_INKEYSETLAST( pGT, iKey ) : 0;
 }
 
-int HB_GT_FUNC(mouse_Row( void ))
+HB_EXPORT void hb_inkeySetText( const char * szText, ULONG ulLen )
 {
-   return 0;
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeySetText(%s,%lu)", szText, ulLen));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_INKEYSETTEXT( pGT, szText, ulLen );
 }
 
-void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
+HB_EXPORT void hb_inkeyReset( void )
 {
-   HB_SYMBOL_UNUSED( iRow );
-   HB_SYMBOL_UNUSED( iCol );
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyReset()"));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+      HB_GTSELF_INKEYRESET( pGT );
 }
 
-BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
+HB_EXPORT void hb_inkeySetCancelKeys( int iCancelKey, int iCancelKeyEx )
 {
-   HB_SYMBOL_UNUSED( iButton );
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeySetCancelKeys(%d,%d)", iCancelKey, iCancelKeyEx));
 
-   return FALSE;
-}
-
-int HB_GT_FUNC(mouse_CountButton( void ))
-{
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
-{
-   HB_SYMBOL_UNUSED( iTop );
-   HB_SYMBOL_UNUSED( iLeft );
-   HB_SYMBOL_UNUSED( iBottom );
-   HB_SYMBOL_UNUSED( iRight );
-}
-
-void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
-{
-   HB_SYMBOL_UNUSED( piTop );
-   HB_SYMBOL_UNUSED( piLeft );
-   HB_SYMBOL_UNUSED( piBottom );
-   HB_SYMBOL_UNUSED( piRight );
+/*
+   s_InkeyAltC = iCancelKey;
+   s_InkeyAltCEx = iCancelKeyEx;
+*/
+   HB_SYMBOL_UNUSED( iCancelKey );
+   HB_SYMBOL_UNUSED( iCancelKeyEx );
 }

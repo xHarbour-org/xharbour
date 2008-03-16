@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.95 2007/01/11 01:00:34 druzus Exp $
+# $Id: xharbour.spec,v 1.96 2007/10/31 02:27:36 patrickmast Exp $
 #
 
 # ---------------------------------------------------------------
@@ -15,13 +15,13 @@
 # --with static      - link all binaries with static libs
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
-# --with odbc        - build build odbc lib
+# --with odbc        - build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --without adsrdd   - do not build ADS RDD
-# --without gpl      - do not build code which needs GPL 3-rd party libs
 # --without nf       - do not build nanforum lib
-# --without x11      - do not build GTXVT and GTXWC
-# --without gpm      - build GTSLN and GTCRS without GPM support
+# --without gpl      - do not build libs which needs GPL 3-rd party code
+# --without x11      - do not build GTXWC
+# --without gpm      - build GTTRM, GTSLN and GTCRS without GPM support
 # --without gtsln    - do not build GTSLN
 ######################################################################
 
@@ -32,6 +32,8 @@
 # please add your distro suffix if it not belong to the one recognized below
 # and remember that order checking can be important
 
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' mandriva-release-common 2>/dev/null) && echo "mdv$release"|tr -d ".")
+%if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
 %if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
@@ -51,6 +53,8 @@
 %endif
 %endif
 %endif
+%endif
+
 
 %define name     xharbour
 %define dname    xHarbour
@@ -62,8 +66,8 @@
 %define hb_cflag export C_USR="-O3"
 %define hb_lflag export L_USR="${CC_L_USR} %{?_with_static:-static}"
 %define hb_mt    export HB_MT=MT
-%define hb_mgt   export HB_MULTI_GT=yes
-%define hb_gt    export HB_GT_LIB=gtcrs
+%define hb_gt    export HB_GT_LIB=gttrm
+%define hb_defgt export HB_GT_DEFAULT="${HB_GT_DEFAULT}"
 %define hb_gpm   export HB_GPM_MOUSE=%{!?_without_gpm:yes}
 %define hb_sln   export HB_WITHOUT_GTSLN=%{?_without_gtsln:yes}
 %define hb_x11   export HB_WITHOUT_X11=%{?_without_x11:yes}
@@ -72,8 +76,8 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
-%define hb_ctrb  %{!?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
-%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
+%define hb_ctrb  export HB_CONTRIBLIBS="%{?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}"
+%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -93,11 +97,13 @@ Group:          Development/Languages
 Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
-Packager:       PrzemysЁaw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+Packager:       Przemyslaw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
 BuildPrereq:    gcc binutils bison bash ncurses ncurses-devel %{!?_without_gpm: gpm-devel}
-Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
+Requires:       gcc binutils bash sh-utils %{name}-lib = %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
+
+%define         _noautoreq    'libxharbour.*'
 
 %description
 %{dname} is a CA-Clipper compatible compiler for multiple platforms. This
@@ -164,7 +170,7 @@ Summary:        Static runtime libaries for %{dname} compiler
 Summary(pl):    Statyczne bilioteki dla kompilatora %{dname}
 Summary(ru):    Статические библиотеки для компилятора %{dname}
 Group:          Development/Languages
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description static
 %{dname} is a Clipper compatible compiler.
@@ -193,7 +199,7 @@ Summary(pl):    Bilioteki z drzewa contrib dla kompilatora %{dname}
 Summary(pt_BR): Libs contrib para %{dname}
 Summary(ru):    Библиотеки из дерева contrib для компилятора %{dname}
 Group:          Development/Languages
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description contrib
 %{dname} is a Clipper compatible compiler.
@@ -288,7 +294,9 @@ rm -rf $RPM_BUILD_ROOT
 %build
 %{hb_env}
 case "`uname -m`" in
-    *[_@]64)    export C_USR="$C_USR -fPIC" ;;
+    *[_@]64)
+        export C_USR="$C_USR -fPIC"
+        ;;
 esac
 
 make -r
@@ -310,7 +318,9 @@ done
 
 %{hb_env}
 case "`uname -m`" in
-    *[_@]64)    export C_USR="$C_USR -fPIC" ;;
+    *[_@]64)
+        export C_USR="$C_USR -fPIC"
+        ;;
 esac
 
 export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
@@ -333,14 +343,17 @@ do
      make -r -i install)
 done
 
-[ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
 [ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
 [ "%{?_with_allegro:1}" ]  || rm -f $HB_LIB_INSTALL/libgtalleg.a
+[ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
 
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim.
 strip --strip-debug $HB_LIB_INSTALL/*
+
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+install -m644 doc/man/*.1* $RPM_BUILD_ROOT%{_mandir}/man1/
 
 mkdir -p $RPM_BUILD_ROOT/etc/harbour
 install -m644 source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
@@ -372,7 +385,7 @@ then
     unset HB_GTALLEG
     export L_USR="${CC_L_USR} -L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11}"
     #export L_USR="${CC_L_USR} -L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11} %{?_with_allegro:%(allegro-config --static)}"
-    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
+    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\" ${PRG_USR}"
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do
         (cd "utils/${utl}"
@@ -422,6 +435,7 @@ All these scripts accept command line switches:
 -xbgtk                  # link with xbgtk library (xBase GTK+ interface)
 -hwgui                  # link with HWGUI library (GTK+ interface)
 -l<libname>             # link with <libname> library
+-L<libpath>             # additional path to search for libraries
 -fmstat                 # link with the memory statistics lib
 -nofmstat               # do not link with the memory statistics lib (default)
 -[no]strip              # strip (no strip) binaries
@@ -433,8 +447,6 @@ All these scripts accept command line switches:
 Link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and have no effect
 in "%{hb_pref}cc" and "%{hb_pref}cmp".
 Other options are passed to %{dname}/C compiler/linker.
-To save compatibility with older rpm distributions, "gharbour" can be used
-as a synonym of "%{hb_pref}cmp", and "harbour-link" as synonym of "%{hb_pref}lnk"
 
 An example compile/link session looks like:
 ----------------------------------------------------------------------
@@ -527,7 +539,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,755)
-%doc ChangeLog
+%doc ChangeLog*
 %doc doc/*.txt
 %doc doc/%{readme}
 %doc doc/en/
@@ -545,17 +557,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{hb_pref}cmp
 %{_bindir}/%{hb_pref}lnk
 %{_bindir}/%{hb_pref}mk
-%{_bindir}/gharbour
-%{_bindir}/harbour-link
 #%{_bindir}/hbtest
 %{_bindir}/hbrun
 %{_bindir}/hbpp
 %{_bindir}/hbmake
+%{_mandir}/man1/*.1*
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
+%attr(644,root,root) %{_includedir}/%{name}/*
 
 %files static
-%defattr(-,root,root,755)
+%defattr(644,root,root,755)
 %dir %{_libdir}/%{name}
 %{_libdir}/%{name}/libcodepage.a
 %{_libdir}/%{name}/libcommon.a

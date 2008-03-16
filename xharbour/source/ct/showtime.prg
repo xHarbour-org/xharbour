@@ -1,17 +1,14 @@
 /*
- * $Id: screen2.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: showtime.prg 7637 2007-08-05 09:55:33Z druzus $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 video functions (screen-like functions):
+ *   CT3 time function: SHOWTIME()
  *
- * SCREENMIX()
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>:
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *
  * www - http://www.harbour-project.org
- *
- * SAYSCREEN()
- * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,48 +51,17 @@
  *
  */
 
-#include "color.ch"
-#include "common.ch"
+FUNCTION SHOWTIME( nRow, nCol, lNoSec, cColor, l12, lAmPm )
+   STATIC s_hTimer := NIL
 
-
-FUNCTION SCREENMIX( c, a, row, col )
-
-   DEFAULT row TO Row()
-   DEFAULT col TO Col()
-
-   RestScreen( row, col, row, col + Len( a ) - 1, CHARMIX( c, a ) )
-
-   RETURN ""
-
-
-
-FUNCTION SAYSCREEN( cStr, nRow, nCol )
-   LOCAL cBuf
-   LOCAL nRight
-   LOCAL i
-   LOCAL nCellSize := len( Savescreen ( 0,0,0,0))
-   
-   DEFAULT cStr TO ""
-   DEFAULT nRow TO Row()
-   DEFAULT nCol TO Col()
-#ifdef __PLATFORM__Windows   
-   IF Len( cStr ) > 0
-     nRight := Min( nCol + Len( cStr ) - 1, MaxCol() )
-     cBuf := SaveScreen( nRow, nCol, nRow, nRight )
-     FOR i := 1 TO nRight - nCol + 1
-       cBuf[ i * 2 - 1 ] := cStr[ i ]
-     NEXT
-     RestScreen( nRow, nCol, nRow, nRight, cBuf )
+   IF VALTYPE( nRow ) == "N" .AND. nRow >= 0 .AND. nRow <= MAXROW( .T. )
+      IF s_hTimer != NIL
+         HB_IDLEDEL( s_hTimer )
+      ENDIF
+      s_hTimer := HB_IDLEADD( {|| _HB_CTDSPTIME( nRow, nCol, lNoSec, cColor, ;
+                                                 l12, lAmPm ) } )
+   ELSEIF s_hTimer != NIL
+      HB_IDLEDEL( s_hTimer )
+      s_hTimer := NIL
    ENDIF
-#else
-   IF Len( cStr ) > 0
-     nRight := Min( nCol + Len( cStr ) - 1, MaxCol() )
-     cBuf := SaveScreen( nRow, nCol, nRow, nRight )
-     FOR i := 1 TO nRight - nCol + 1
-       cBuf[ i * nCellSize - nCellSize + 1 ] := cStr[ i ]
-     NEXT
-     RestScreen( nRow, nCol, nRow, nRight, cBuf )
-   ENDIF
-
-#endif
 RETURN ""

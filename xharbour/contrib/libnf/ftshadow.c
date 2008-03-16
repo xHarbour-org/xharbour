@@ -1,12 +1,13 @@
 /*
- * $Id: mousetpl.c,v 1.2 2003/05/16 19:52:08 druzus Exp $
+ * $Id: ftshadow.c 7645 2007-08-09 00:10:37Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * {Harbour Mouse Subsystem Template}
+ *   NF functions: FT_SHADOW(), FT_SETATTR()
  *
- * Copyright 1999 {list of individual authors and e-mail addresses}
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,94 +51,18 @@
  *
  */
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	TPL
-
+#include "hbapi.h"
 #include "hbapigt.h"
 
-/* C callable low-level interface */
+HB_FUNC_EXTERN( HB_SHADOW );
 
-void HB_GT_FUNC(mouse_Init( void ))
+HB_FUNC( FT_SHADOW )
 {
-   /* TODO: */
+   HB_FUNC_EXEC( HB_SHADOW );
 }
 
-void HB_GT_FUNC(mouse_Exit( void ))
+HB_FUNC( FT_SETATTR )
 {
-   /* TODO: */
-}
-
-BOOL HB_GT_FUNC(mouse_IsPresent( void ))
-{
-   /* TODO: */
-
-   return FALSE;
-}
-
-void HB_GT_FUNC(mouse_Show( void ))
-{
-   /* TODO: */
-}
-
-void HB_GT_FUNC(mouse_Hide( void ))
-{
-   /* TODO: */
-}
-
-int HB_GT_FUNC(mouse_Col( void ))
-{
-   /* TODO: */
-
-   return 0;
-}
-
-int HB_GT_FUNC(mouse_Row( void ))
-{
-   /* TODO: */
-
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
-{
-   /* TODO: */
-
-   HB_SYMBOL_UNUSED( iRow );
-   HB_SYMBOL_UNUSED( iCol );
-}
-
-BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
-{
-   /* TODO: */
-
-   HB_SYMBOL_UNUSED( iButton );
-
-   return FALSE;
-}
-
-int HB_GT_FUNC(mouse_CountButton( void ))
-{
-   /* TODO: */
-
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
-{
-   /* TODO: */
-
-   HB_SYMBOL_UNUSED( iTop );
-   HB_SYMBOL_UNUSED( iLeft );
-   HB_SYMBOL_UNUSED( iBottom );
-   HB_SYMBOL_UNUSED( iRight );
-}
-
-void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
-{
-   /* TODO: */
-
-   HB_SYMBOL_UNUSED( piTop );
-   HB_SYMBOL_UNUSED( piLeft );
-   HB_SYMBOL_UNUSED( piBottom );
-   HB_SYMBOL_UNUSED( piRight );
+   hb_gtSetAttribute( hb_parni( 1 ), hb_parni( 2 ),
+                      hb_parni( 3 ), hb_parni( 4 ), hb_parni( 5 ) );
 }

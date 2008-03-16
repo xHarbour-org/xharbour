@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5962 2008/03/16 03:24:19 lculik Exp $
+ * $Id: ChangeLog,v 1.5963 2008/03/16 18:59:20 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,306 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-16 22:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_gnu.sh
+  * make_rpm.sh
+  * make_tgz.sh
+  * xharbour.spec
+  * bin/hb-func.sh
+  * bin/hb-mkslib.sh
+  * bin/postinst.sh
+  * config/rules.cf
+  * config/darwin/gcc.cf
+  * config/darwin/global.cf
+  * config/dos/djgpp.cf
+  * config/dos/global.cf
+  * config/dos/install.cf
+  * config/hpux/gcc.cf
+  * config/hpux/global.cf
+  * config/linux/gcc.cf
+  * config/linux/global.cf
+  * config/sunos/gcc.cf
+  * config/sunos/global.cf
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+    * updated for new RPM which does not accept some old tags
+    * updated for new GT system and drivers
+  * doc/gtapi.txt
+  * source/rtl/accept.c
+  * source/rtl/alert.c
+  * source/rtl/console.c
+  * source/rtl/gx.c
+  * source/rtl/set.c
+  * source/rtl/xsavescr.c
+  * source/vm/hvm.c
+    * updated for new GT system and drivers
+  * include/Makefile
+  * include/hbextern.ch
+  + include/hbgtcore.h
+  * include/hbapigt.h
+  - include/gfx.ch
+  - include/gfxtrans.ch
+  + include/hbgfx.ch
+  + include/hbgfxdef.ch
+    * new GTAPI
+      hbgtcore.h file should not be included by user code
+      it's only for internal use in GT drivers
+    * HB_inkey_enum changed to int - this is bit field not enumerated type.
+      Many of C/C++ compilers forbid bit operations on enum types and
+      forcing it by casting which finally exceeds the enum range is defined
+      as bug because it may badly interacts with some compiler optimizations
+  * include/inkey.ch
+  * include/hbapi.h
+  * include/hbset.h
+  + include/hbwince.h
+  * include/hbdefs.h
+  * source/common/hbver.c
+  * source/ct/Makefile
+  + source/ct/ctwfunc.c
+  * source/ct/ctwin.c
+  + source/ct/ctwin.h
+  + source/ct/cursor.c
+  - source/ct/dattime3.prg
+  + source/ct/dattime3.c
+  - source/ct/invrtwin.prg
+  * source/ct/misc3.c
+  * source/ct/screen1.c
+  - source/ct/screen2.prg
+  + source/ct/screen2.c
+  * source/ct/screen3.prg
+  - source/ct/setclear.c
+  * source/ct/settime.c
+  + source/ct/showtime.c
+  * source/ct/strfile.c
+  - source/ct/untext.prg
+    * Rewritten for new GT API
+    * added CT3 like Window System - it's a GT driver which inherits
+      from the existing one and adds CTW functionality
+  * contrib/libnf/Makefile
+  * contrib/libnf/alt.c
+  * contrib/libnf/ctrl.c
+  * contrib/libnf/dispc.c
+  * contrib/libnf/dispmsg.prg
+  * contrib/libnf/ftattr.c
+  + contrib/libnf/ftshadow.c
+  * contrib/libnf/shift.c
+    * updated for GT API modifications, some of this code still depends
+      on EGA/VGA video buffer so will work only if user will force in GT
+      using it - it will be nice to rewrite them
+  * include/hbapifs.h
+  * source/rtl/Makefile
+  * source/rtl/filesys.c
+  + source/rtl/gtclip.c
+  + source/rtl/gtfunc.c
+  + source/rtl/mouse53.c
+  * source/rtl/gt.c
+  * source/rtl/gtapi.c
+  * source/rtl/gtapiu.c
+  + source/rtl/gtchrmap.c
+  + source/rtl/gtkbstat.c
+  + source/rtl/gtsys.c
+  + source/rtl/gttone.c
+  + source/rtl/hbgtcore.c
+  * source/rtl/inkey.c
+  + source/rtl/inkeyapi.c
+  * source/rtl/maxrow.c
+  * source/rtl/mouseapi.c
+  * source/rtl/mousex.c
+  * source/rtl/oldclear.c
+  * source/rtl/saverest.c
+  * source/rtl/setcolor.c
+  * source/rtl/setpos.c
+  * source/rtl/setposbs.c
+  * source/rtl/shadow.c
+    * new GT API code
+  * source/rtl/gtcgi/Makefile
+  - source/rtl/gtcgi/mousecgi.c
+  * source/rtl/gtcgi/gtcgi.c
+    * rewritten for new GT API
+      some detail behaviors has been changed but I think the current
+      implementation is better for CGI programs output - please check
+      and fix me if necessary
+  * source/rtl/gtcrs/Makefile
+  - source/rtl/gtcrs/chrmap.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtcrs/gtcrs.h
+  * source/rtl/gtcrs/hb-charmap.def
+    * rewritten for new GT API
+  * source/rtl/gtdos/Makefile
+  * source/rtl/gtdos/gtdos.c
+  - source/rtl/gtdos/mousedos.c
+    * rewritten for new GT API
+      Fixed some small problems, finished mouse code which for DJGPP
+      is fully Clipper compatible with real mouse SAVE/RESTORE code.
+      For other compilers it should be updated depending on memory
+      model and used DPMI driver (if any).
+  * source/rtl/gtos2/Makefile
+  * source/rtl/gtos2/gtos2.c
+  - source/rtl/gtos2/mouseos2.c
+    * rewritten for new GT API
+      Fixed some problems and finished the mouse code.
+  * source/rtl/gtwin/Makefile
+  * source/rtl/gtwin/gtwin.c
+  - source/rtl/gtwin/mousewin.c
+  * source/rtl/gtgui/Makefile
+  * source/rtl/gtgui/gtgui.c
+  * source/rtl/gtgui/gtdef.c
+    * updated for new GT API
+  * source/rtl/gtpca/Makefile
+  - source/rtl/gtpca/mousepca.c
+  * source/rtl/gtpca/gtpca.c
+    * rewritten for new GT API
+      and finished so now it's full functional GT driver
+      I'm interesting in keyboard sequences used by PC-ANSI drivers
+      in DOS so it will be possible to implement also support for
+      extended keys input.
+  * source/rtl/gtsln/Makefile
+  - source/rtl/gtsln/termtype.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/gtsln.h
+  * source/rtl/gtsln/kbsln.c
+  * source/rtl/gtsln/keytrans.c
+  * source/rtl/gtsln/mousesln.c
+  * source/rtl/gtxwc/Makefile
+  * source/rtl/gtxwc/gtxwc.c
+  * source/rtl/gtxwc/gtxwc.h
+  * source/rtl/gt_tpl/Makefile
+  * source/rtl/gt_tpl/gt_tpl.c
+  - source/rtl/gt_tpl/mousetpl.c
+    * rewritten for new GT API
+  * source/rtl/gtstd/Makefile
+  - source/rtl/gtstd/mousestd.c
+  * source/rtl/gtstd/gtstd.c
+    * rewritten for new GT API
+      Now it can work as full screen GT driver redrawing the previous
+      screen contents from internal GT core buffers. I run with this
+      GT some of my programs and they work quite well ;-) of course
+      without colors.
+  + source/rtl/gttrm
+  + source/rtl/gttrm/Makefile
+  + source/rtl/gttrm/gttrm.c
+    + added new GT driver - it's terminal driver like GTCRS and GTSLN
+      but it does not use any external library like [N]CURSES or SLANG
+      so it can be compiled in nearly all POSIX systems. It's not such
+      flexible like curses or slang base drivers because instead of
+      using termcap/terminfo databases to extract terminal capabilities
+      it uses some hard coded sequences for few terminals (now Linux, ANSI,
+      XTERM) but it should cover users requests in 95% of cases. Terminals
+      I tested are quite well supported (GTTRM works even better then GTCRS
+      or GTSLN and is much faster in full screen mode - 2-4 times).
+      I noticed that most terminal emulators works much better with GTTRM
+      then with GTCRS or GTSLN due to limited list of used escape sequences
+      so some minor differences in each terminal implementation are not
+      noticeable. GTTRM automatically detects ISO/UTF8 terminal mode and
+      chose valid output what should also help *nix users.
+      Now I would like to ask BSD and MacOSX users to test GTTRM in these
+      systems with pure text console and XWindow terminal emulators. I'm
+      interesting in any problems you may found.
+
+  Summary:
+      With this modifications I also create new GT model which is similar
+      to the one used by RDD with multi inheritance. It can be quite easy
+      extended to simultaneously load more then one GT subsystem (sth like
+      work areas in RDD) but I left it for the future when someone may
+      need it. hbapigt.h file now contains only information about public
+      functions and does not have any code which depends on current
+      internal implementation - it should be backword compatible as long
+      as somone did not try to use internal GT functions.
+      The internal GT system use hbgtcore.h file which should not be
+      included by 3-rd party code as long as someone will not make new
+      GT driver. The internal GT code is new so I expect that it will
+      be changed yet in the nearest future (I'm waiting for other developers
+      feedback) and in such case any 3-rd party GTs will have to be updated.
+      How it works:
+         The base GT driver (GTNUL) is fully functional GT driver which
+         makes all operations on memory buffer. After each screen write
+         Flush() method is called which check for dispcount() and if
+         it's 0 then call Refresh() method to update modified area by
+         Redraw() method. This method is dummy in GTNUL and external
+         output with this GT can be reached by outstd()/outerr() which
+         are now redirected to GT methods. A simple GT driver may overload
+         only Refresh() method to give full screen output.
+         Application can use only this GT driver and it seems to be very
+         good choice for GUI and background daemon/service programs.
+         This GT is loaded at startup then all other GTs can be loaded
+         later and inherit from the previously loaded GT drivers.
+         The new GT driver can overload as much method as wants/needs.
+         Now all GT operations are implemented as GT method so GT driver
+         can easy change their default behavior, f.e. it may fully overload
+         color parsing methods and use differ or extended to Clipper color
+         definitions.
+         I rewrote all existing GTs to work with new GT model.
+         OS2 users - please test GTOS2 which I was not able to test and
+         see the note in Redraw() method. If possible please make some
+         speed tests.
+         In fact now there is much more internal operations then it was
+         before but because they are done on memory only then current
+         code is much faster in this GT drivers which so far makes all
+         operations on real video area. I made some tests with GTNUL
+         and tests/vidtest.prg and the total overhead is minimal. Now
+         dipbegin()/dispend() in practice does not cost anything so it
+         gives additional speed improvement in application which extensively
+         use it.
+         More then one GT driver can be linked with final binaries and
+         chose on application startup by //GT<NAME> switch and/or environment
+         variable HB_GT=<name>
+         In the RTL is new GT function GTSYS() which works in similar way
+         to RDDSYS() in RDD subsystem and for linking default GT driver
+         for given platform. When RTL is compiled the default GT driver
+         is set to HB_GT_DEFAULT envvar and if not exist to HB_GT_LIB
+         envvar and if it also does not exist to hard coded platfom GTs
+         (see source/rtl/gtsys.c and source/rtl/Makefile for rules)
+         Adding to source code:
+            ANNOUNCE GTSYS
+         disable linking the default GT driver and:
+            REQUEST HB_GT_<name>
+         for linking given (<name>) GT driver, f.e.: REQUEST HB_GT_WIN
+         If you are working in SH environment (Linux and other *nixes users,
+         DJGPP bash, MinGW shell then it's possible to use -gt<name> switch
+         in hblnk / hbmk scripts to force linking GT drivers (it could be
+         repeated with different <name>) and the first one becomes the default
+         one. F.e.:
+            xhbmk -m -n -w -es2 -gtcrs -gtsln -gtstd -gtpca vidtest.prg
+         Usually the GT driver are loaded at HVM startup but it's possible
+         to load it later. I created new GT driver CTW which gives full
+         CT3 like Window system. The CT3 extended driver change the behavior
+         of some function in Clipper extended driver, f.e WRITECON() or
+         SETPOS() with parameters out of screen range. So I implemented it
+         CTW as RT GTs which is loaded when some of CTWIN function is used
+         (f.e. WOPEN()/WBOARD()) and inherits from any existing GT driver.
+         This is full CT3 WIN implementation with all detail behaviors I
+         found (with some CT3 bug fixes). It does not have any CT3 limitations
+         and can be used for any virtual screen/window size though I hardcoded
+         CT3 limitation for backword compatibility. If somone will want to
+         remove it then it will be enough to delete few lines from ctwin.c
+         file. I'm not CTWIN Clipper user so maybe I missed some side effects
+         in this driver and was not able to well test it so if you will find
+         any incompatibilities then please inform me.
+         THe default GT buffer uses 32bit character cell internally but
+         in savescreen/restscreen it uses VGA compatible two bytes character
+         cell. Some GT drivers may want to use differ character cell.
+         Now GTCRS and GTSLN use 32bit character cell by default. They
+         need additional information about character set (box/normal) to
+         properly display box characters. It is possible to force in this
+         GT drivers using Clipper compatible character cell by calling:
+            hb_gtInfo( GTI_COMPATBUFFER, <lCompat> ) -> <lPreviousSeting>
+         but in may cause that box drawing characters will be lost in
+         some countries after RESTSCREEN(). It will depend on used code
+         page.
+  (by Przemyslaw Czerpak, borrowed from Harbour, mostly synched)
+  + include/hbcompat.ch
+    + Added a header file with compatibility defines for Harbour and old
+      xHarbour GT APIs. (by Lorenzo Fiorini et al., borrowed from Harbour)
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwvt/gtwvt.h
+  * source/rtl/gtwvt/Makefile
+    Updated to the new GT API (by Przemyslaw Czerpak and Pritpal Bedi)
+  * utils/hbmake/hbmlang.c
+    ! Fixed invalid type assignment
+    % Changed to use hb_arraySet*() APIs
+    ! Updated for the new GT API
+
 2008-03-16 16:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/tip/ftpcln.prg
      ! fixed methos filesize, since was returning wrong info
@@ -27,7 +327,6 @@
      2008-03-09 13:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
      f.e. FWH 8.02 & 8.03, so that recompile is no longer required.
      Thanks to GPF report from Miguel.
-
 
 2008-03-13 10:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/rtl/tgetlist.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.83 2008/01/14 12:52:40 walito Exp $
+ * $Id: set.c,v 1.84 2008/03/10 11:24:05 likewolf Exp $
  */
 
 /*
@@ -842,7 +842,7 @@ HB_FUNC( SET )
 
       case HB_SET_EVENTMASK  :
          hb_retni( hb_set.HB_SET_EVENTMASK );
-         if( args > 1 ) hb_set.HB_SET_EVENTMASK = ( HB_inkey_enum ) set_number( pArg2, hb_set.HB_SET_EVENTMASK );
+         if( args > 1 ) hb_set.HB_SET_EVENTMASK = set_number( pArg2, hb_set.HB_SET_EVENTMASK );
          break;
 
       case HB_SET_EXACT      :
@@ -1969,7 +1969,7 @@ HB_EXPORT BOOL hb_setEscape( void )
    return hb_set.HB_SET_ESCAPE;
 }
 
-HB_EXPORT HB_inkey_enum hb_setEventMask( void )
+HB_EXPORT int hb_setEventMask( void )
 {
    return hb_set.HB_SET_EVENTMASK;
 }

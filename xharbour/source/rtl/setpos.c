@@ -1,5 +1,5 @@
 /*
- * $Id: setpos.c,v 1.2 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: setpos.c,v 1.2 2004/10/23 23:31:31 oh1 Exp $
  */
 
 /*
@@ -57,9 +57,6 @@
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    SETPOS()
  *
- * Copyright 2004 Henryk Olkowski <oh1@op.pl>
- *    SETPOS() - modify for CT3 Windows API
- *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -67,17 +64,13 @@
 #include "hbapi.h"
 #include "hbapigt.h"
 
-/****************************************************************************/
-/* Sets the screen/window position */
-HB_FUNC( SETPOS )
+HB_FUNC( SETPOS ) /* Sets the screen position */
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_ctSetPos( hb_parni( 1 ), hb_parni( 2 ) );
+      hb_gtSetPos( hb_parni( 1 ), hb_parni( 2 ) );
 }
 
-/****************************************************************************/
-/* Return the current screen/window row position (zero origin) */
-HB_FUNC( ROW )
+HB_FUNC( ROW ) /* Return the current screen row position (zero origin) */
 {
    SHORT iRow;
    SHORT iCol;
@@ -87,9 +80,7 @@ HB_FUNC( ROW )
    hb_retni( iRow );
 }
 
-/****************************************************************************/
-/* Return the current screen/window column position (zero origin) */
-HB_FUNC( COL )
+HB_FUNC( COL ) /* Return the current screen column position (zero origin) */
 {
    SHORT iRow;
    SHORT iCol;
@@ -98,4 +89,4 @@ HB_FUNC( COL )
 
    hb_retni( iCol );
 }
-/****************************************************************************/
+

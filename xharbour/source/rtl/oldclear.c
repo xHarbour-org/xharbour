@@ -1,5 +1,5 @@
 /*
- * $Id: oldclear.c,v 1.11 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: oldclear.c,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ HB_FUNC( __ATCLEAR )
 HB_FUNC( __CLEAR )
 {
    hb_gtScroll( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), 0, 0 );
-   hb_gtSetPosContext( 0, 0, HB_GT_SET_POS_AFTER );
+   hb_gtSetPos( 0, 0 );
 }
 
 #endif

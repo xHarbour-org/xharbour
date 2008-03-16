@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.97 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.98 2008/02/18 16:46:18 likewolf Exp $
  */
 
 /*
@@ -159,6 +159,10 @@
       #define HB_OS_DARWIN_5
    #endif
 
+#endif
+
+#if defined( HB_OS_WIN_32 )
+   #include "hbwince.h"
 #endif
 
 #if ! defined( HB_DONT_DEFINE_BASIC_TYPES )

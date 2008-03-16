@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.21 2006/01/14 18:38:24 paultucker Exp $
+ * $Id: gx.c,v 1.22 2006/01/14 19:06:14 paultucker Exp $
  */
 
 /*
@@ -83,24 +83,21 @@ HB_FUNC( NOSNOW )
 
 HB_FUNC( SETMODE )
 {
-   int nRow = -1, nCol = -1;
+   USHORT uiRows, uiCols;
 
-   if( ISNUM( 1 ) && ISNUM( 2 ) )
-   {
-      nRow = hb_parni( 1 );
-      nCol = hb_parni( 2 );
-   }
+   hb_gtScrDim( &uiRows, &uiCols );
+   if( ISNUM( 1 ) )
+      uiRows = ( USHORT ) hb_parni( 1 );
+   if( ISNUM( 2 ) )
+      uiCols = ( USHORT ) hb_parni( 2 );
 
-   if( nRow == -1 || nCol == -1 )
-   {
-      nRow = hb_gtMaxRow() + 1;
-      nCol = hb_gtMaxCol() + 1;
-   }
-
-   hb_retl( hb_gtSetMode( nRow, nCol ) == 0 );
-
+   hb_retl( hb_gtSetMode( uiRows, uiCols ) == SUCCESS );
 }
 
+#if 0
+/* This functionality is not directly supported by the new GT at the moment.
+ * If you want to disable window close, use SET CANCEL OFF and check that your
+ * GT checks this setting like gtwvt does. -- Ph. */
 HB_FUNC( SETGTCLOSEHANDLER )
 {
    if ( hb_gtSetCloseHandler( hb_param(1, HB_IT_ANY ) ) == FALSE )
@@ -156,132 +153,4 @@ HB_FUNC( SETGTRESIZEEVENT )
       hb_gtSetResizeEvent( hb_itemGetNL( pEvent ) );
    }
 }
-
-HB_FUNC( GTSETCLIPBOARD )
-{
-   PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
-   if ( pData == NULL )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTSETCLIPBOARD", 1, hb_paramError( 1 ) );
-   }
-   else
-   {
-      hb_gtSetClipboard( pData->item.asString.value, pData->item.asString.length );
-   }
-}
-
-HB_FUNC( GTGETCLIPBOARD )
-{
-   PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
-   ULONG ulMaxLen;
-   char *szData, cExtra = 0;
-   int pCount = hb_pcount();
-
-   if ( (pData == NULL && pCount == 1) || pCount > 1 )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTGETCLIPBOARD", 1, hb_paramError( 1 ) );
-      return;
-   }
-
-   if ( pCount == 1 )
-   {
-      ulMaxLen = pData->item.asString.length;
-      if ( ulMaxLen == 0 )
-      {
-         hb_retc("");
-         return;
-      }
-      szData = pData->item.asString.value;
-      if ( hb_gtGetClipboardSize() < ulMaxLen )
-      {
-         cExtra = szData[ hb_gtGetClipboardSize() ];
-      }
-   }
-   else
-   {
-      ulMaxLen = hb_gtGetClipboardSize();
-      if ( ulMaxLen == 0 )
-      {
-         hb_retc("");
-         return;
-      }
-      szData = (char *) hb_xgrab( ulMaxLen+1 );
-   }
-
-   hb_gtGetClipboard( szData , &ulMaxLen );
-
-   if ( cExtra != 0 )
-   {
-      szData[ ulMaxLen ] = cExtra;
-   }
-
-   if ( pCount == 0 )
-   {
-      hb_retclenAdoptRaw( szData , ulMaxLen );
-   }
-   else
-   {
-      hb_itemReturn( pData );
-   }
-}
-
-HB_FUNC( GTGETCLIPBOARDSIZE )
-{
-   hb_retnl(hb_gtGetClipboardSize());
-}
-
-HB_FUNC( GTPASTECLIPBOARD )
-{
-   hb_gtPasteFromClipboard( hb_parnl(1) );
-}
-
-HB_FUNC( GTPROCESSMESSAGES )
-{
-   hb_gtProcessMessages();
-   hb_ret();
-}
-
-/************************************************************************************/
-
-HB_FUNC( GTINFO )
-{
-   PHB_ITEM pInfo = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pSet  = hb_param( 2, HB_IT_NUMERIC );
-
-   /* Parameter error */
-   if ( pInfo == NULL )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTINFO", 3,
-         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
-      return;
-   }
-
-   hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ),
-                                  hb_pcount() > 1,
-                                  hb_itemGetNI( pSet ),
-                                  ISCHAR(2) ? hb_parc(2) : hb_parc(3) ) ) );
-}
-
-HB_FUNC( GFXPRIMITIVE )
-{
-   PHB_ITEM pType   = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pTop    = hb_param( 2, HB_IT_NUMERIC );
-   PHB_ITEM pLeft   = hb_param( 3, HB_IT_NUMERIC );
-   PHB_ITEM pBottom = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pRight  = hb_param( 5, HB_IT_NUMERIC );
-   PHB_ITEM pColor  = hb_param( 6, HB_IT_NUMERIC );
-
-   hb_retni( HB_GT_FUNC( gt_gfxPrimitive( hb_itemGetNI(pType), hb_itemGetNI(pTop), hb_itemGetNI(pLeft), hb_itemGetNI(pBottom), hb_itemGetNI(pRight), hb_itemGetNI(pColor) ) ) );
-}
-
-HB_FUNC( GFXTEXT )
-{
-   PHB_ITEM pTop    = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pLeft   = hb_param( 2, HB_IT_NUMERIC );
-   char *cText      = hb_parc(3);
-   PHB_ITEM pColor  = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pSize   = hb_param( 5, HB_IT_NUMERIC );
-   PHB_ITEM pWidth  = hb_param( 6, HB_IT_NUMERIC );
-
-   HB_GT_FUNC( gt_gfxText( hb_itemGetNI(pTop), hb_itemGetNI(pLeft), cText, hb_itemGetNI(pColor), hb_itemGetNI(pSize), hb_itemGetNI(pWidth) ) );
-}
+#endif

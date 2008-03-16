@@ -1,5 +1,5 @@
 /*
- * $Id: gtdef.c,v 1.2 2006/06/28 00:40:13 druzus Exp $
+ * $Id: gtdef.c,v 1.3 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
  * to the default GT REQUESTed by our RTL library, [druzus]
  */
 
-#if defined( HB_OS_WIN_32 ) && defined( HB_MULTI_GT )
+#if defined( HB_OS_WIN_32 ) && defined( HB_GTGUI_HACK )
 
 #if defined(HB_GT_DEFAULT)
 #  define HB_GT_NAME HB_GT_DEFAULT
@@ -82,7 +82,7 @@
 #undef GUI
 #undef gui
 
-#include "hbapigt.h"
+#include "hbgtcore.h"
 #include "hbinit.h"
 
 HB_GT_REQUEST( GUI )
@@ -108,4 +108,4 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_hack_ )
 
 #endif
 
-#endif /* HB_OS_WIN_32 && HB_MULTI_GT */
+#endif /* HB_OS_WIN_32 */

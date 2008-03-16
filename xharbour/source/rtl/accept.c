@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.4 2004/04/01 09:35:37 andijahja Exp $
+ * $Id: accept.c,v 1.5 2007/04/20 09:41:30 marchuet Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
  */
 
 #include "hbapi.h"
+#include "hbvm.h"
 #include "hbapigt.h"
 #include "inkey.ch"
 
@@ -83,9 +84,8 @@ HB_FUNC( __ACCEPTSTR )
 HB_FUNC( __ACCEPT )
 {
    char szAcceptResult[ ACCEPT_BUFFER_LEN ];
-
-   int input;
    ULONG ulLen;
+   int input;
 
    /* cPrompt(s) passed ? */
    if( hb_pcount() >= 1 )
@@ -96,17 +96,17 @@ HB_FUNC( __ACCEPT )
 
    szAcceptResult[ 0 ] = '\0';
 
-   while( input != K_ENTER && input != 3 )  // 3 == ALT_C cancelled
+   while( input != K_ENTER && hb_vmRequestQuery() == 0 )
    {
       /* Wait forever, for keyboard events only */
-      input = hb_inkey( TRUE, 0.0, ( HB_inkey_enum ) INKEY_KEYBOARD );
+      input = hb_inkey( TRUE, 0.0, INKEY_KEYBOARD );
       switch( input )
       {
          case K_BS:
          case K_LEFT:
             if( ulLen > 0 )
             {
-               hb_conOutAlt( "\x8 \x8", 3 ); /* Erase it from the screen. */
+               hb_conOutAlt( "\x8", sizeof( char ) ); /* Erase it from the screen. */
                ulLen--; /* Adjust input count to get rid of last character */
             }
             break;
@@ -124,7 +124,7 @@ HB_FUNC( __ACCEPT )
    szAcceptResult[ ulLen ] = '\0';
 
 #ifdef HB_C52_UNDOC
-   strcpy( s_szAcceptResult, szAcceptResult );
+   hb_strncpy( s_szAcceptResult, szAcceptResult, sizeof( s_szAcceptResult ) - 1 );
 #endif
 
    hb_retc( szAcceptResult );

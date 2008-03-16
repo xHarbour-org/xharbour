@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.54 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hbapifs.h,v 1.55 2008/03/09 17:55:13 likewolf Exp $
  */
 
 /*
@@ -146,6 +146,7 @@ extern HB_EXPORT void     hb_fsSetIOError ( BOOL fResult, USHORT uiOperation ); 
 extern HB_FORCE_EXPORT USHORT   hb_fsWrite      ( FHANDLE hFileHandle, const BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
 extern HB_EXPORT ULONG    hb_fsWriteLarge ( FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern HB_EXPORT FHANDLE  hb_fsPOpen      ( BYTE * pFilename, BYTE * pMode );
+extern HB_EXPORT FHANDLE  hb_fsGetOsHandle( FHANDLE hFileHandle );
 extern HB_EXPORT void     hb_fsDirectory( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 extern HB_EXPORT void     hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
 

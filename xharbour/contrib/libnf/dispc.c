@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.7 2005/11/11 21:13:34 marceloanelli Exp $
+ * $Id: dispc.c,v 1.8 2005/11/11 21:36:24 ronpinkas Exp $
  */
 
 /*
@@ -12,6 +12,12 @@
  *
  * Modification history:
  * ---------------------
+ *
+ *    Rev 1.10  22 Apr 2004 15:32:00   David G. Holm <dholm@jsd-llc.com>
+ * Corrected all hb_fsSeek calls to use FS_ defines instead of using
+ * redefined SEEK_ ones that conflict with the C-level SEEK_ defines.
+ *    Rev 1.9   ? ?
+ * An unknown number of changes were made between Rev 1.8 and Rev 1.10.
  *
  *    Rev 1.8   24 May 2002 19:25:00   David G. Holm <dholm@jsd-llc.com>
  * Fixed some problems that caused C++ compiles to fail.
@@ -46,6 +52,10 @@
  */
 
 
+/* NOTE: we need this to prevent base types redefinition */
+#define _CLIPDEFS_H
+
+
 #include "hbdefs.h"
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -65,10 +75,6 @@
 #define CR   ((char) 13)
 #define LF   ((char) 10)
 #define FEOF ((char) 26)
-
-// #define SEEK_END 2              /* file seek directions */
-// #define SEEK_CUR 1
-// #define SEEK_SET 0
 
 #define READONLY  0             /* open file modes */
 #define WRITEONLY 1
@@ -167,28 +173,28 @@ static long getblock(long offset)
           the beginning of the file.
       */
 
-    hb_fsSeek( infile, offset, SEEK_SET );
+    hb_fsSeek( infile, offset, FS_SET );
 
         /* read in the file and set the buffer bottom variable equal */
         /*  to the number of bytes actually read in.                 */
 
-    buffbot = hb_fsReadLarge( infile, (BYTE *) buffer, buffsize );
+    buffbot = hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
 
         /* if a full buffer's worth was not read in, make it full.   */
 
     if (( buffbot != buffsize ) && ( fsize > buffsize ))
     {
         if ( offset > 0 )
-            hb_fsSeek( infile, (long) -buffsize, SEEK_END );
+            hb_fsSeek( infile, (long) -buffsize, FS_END );
         else
-            hb_fsSeek( infile, (long) buffsize, SEEK_SET );
+            hb_fsSeek( infile, (long) buffsize, FS_SET );
 
-        buffbot = hb_fsReadLarge( infile, (BYTE *) buffer, buffsize );
+        buffbot = hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
     }
 
         /* return the actual file position */
 
-    return( hb_fsSeek( infile, 0L, SEEK_CUR ) - buffbot);
+    return( hb_fsSeek( infile, 0L, FS_RELATIVE ) - buffbot);
 }
 
 
@@ -543,7 +549,7 @@ static void filebot()
 HB_FUNC( _FT_DFINIT )
 {
     int rval, i, j;
-    UINT uiSize;
+    ULONG ulSize;
 
     rval = 0;
 
@@ -555,8 +561,8 @@ HB_FUNC( _FT_DFINIT )
     width  = ecol - scol;                 /* calc width of window  */
     height = eline - sline + 1;           /* calc height of window */
 
-    hb_gtRectSize( sline, scol, eline, ecol, &uiSize );
-    vseg = (char * ) hb_xalloc( uiSize );
+    hb_gtRectSize( sline, scol, eline, ecol, &ulSize );
+    vseg = (char * ) hb_xalloc( ulSize );
     if (vseg != NULL)
        hb_gtSave( sline, scol, eline, ecol, vseg );
 
@@ -569,7 +575,7 @@ HB_FUNC( _FT_DFINIT )
 
     isallocated = !(buffer == NULL || lbuff == NULL || vseg == NULL);
                                               /* memory allocated? */
-    if (isallocated == FALSE)
+    if (!isallocated)
     {
         rval = 8;                   /* return error code 8 (memory) */
         if (buffer != NULL) hb_xfree(buffer);
@@ -583,7 +589,7 @@ HB_FUNC( _FT_DFINIT )
         norm   = hb_parni(7);                 /* normal color attribute    */
         hlight = hb_parni(8);                 /* highlight color attribute */
 
-        if ((hb_parinfo(9) & 512) == 512)       /* if array */
+        if (hb_parinfo(9) & HB_IT_ARRAY)       /* if array */
         {
            keytype = K_LIST;
            kcount  = hb_parinfa( 9, 0 );
@@ -619,11 +625,11 @@ HB_FUNC( _FT_DFINIT )
 
             /* get file size */
 
-        fsize = hb_fsSeek( infile, 0L, SEEK_END ) - 1;
+        fsize = hb_fsSeek( infile, 0L, FS_END ) - 1;
 
             /* get the first block */
 
-        hb_fsSeek( infile, 0L, SEEK_SET );
+        hb_fsSeek( infile, 0L, FS_SET );
 
             /* if block less than buffsize */
 
@@ -729,6 +735,7 @@ HB_FUNC( FT_DISPFILE )
 
     int ch;
 
+
     /* make sure buffers were allocated and file was opened */
     if (isallocated && infile > 0)
       {
@@ -746,7 +753,7 @@ HB_FUNC( FT_DISPFILE )
 
         do
         {
-            if ( refresh )           /* redraw window contents? */
+            if ( refresh == YES )           /* redraw window contents? */
                 disp_update(wintop);
 
                 hb_gtRest( sline, scol, eline, ecol, vseg );
@@ -773,13 +780,13 @@ HB_FUNC( FT_DISPFILE )
 
             switch (ch)
             {
-               case K_DOWN :  if ( brows )                 /* if browse flag */
+               case K_DOWN :  if ( brows == YES )          /* if browse flag */
                                   winrow = eline;          /* is set, force  */
                                                            /* active line to */
                               linedown();                  /* be last line   */
                               break;
 
-               case K_UP   :  if ( brows )                 /* if browse flag */
+               case K_UP   :  if ( brows == YES )          /* if browse flag */
                                   winrow = sline;          /* is set, force  */
                                                            /* active line to */
                               lineup();                    /* be first line  */
@@ -903,9 +910,7 @@ HB_FUNC( FT_DISPFILE )
 
 static int keyin()
 {
-    int ch;
-    ch = hb_inkey( TRUE, 0.0, ( HB_inkey_enum ) INKEY_ALL );
-    return ( ch );
+    return hb_inkey( TRUE, 0.0, INKEY_ALL );
 }
 
 

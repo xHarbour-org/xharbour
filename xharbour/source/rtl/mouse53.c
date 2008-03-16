@@ -1,12 +1,12 @@
 /*
- * $Id: termtype.c,v 1.3 2002/04/16 16:12:18 map Exp $
+ * $Id: mouse53.c 8202 2008-01-09 14:04:12Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * Video subsystem based on Slang screen library.
+ * Mouse API
  *
- * Copyright 2000 Marek Paliwoda <paliwoda@inetia.pl>
+ * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,35 +50,121 @@
  *
  */
 
-/* NOTE: User programs should never call this layer directly! */
+#include "hbapigt.h"
 
-/* *********************************************************************** */
+/* HARBOUR callable interface */
 
-#include "gtsln.h"
+#ifdef HB_COMPAT_C53
 
-/* *********************************************************************** */
+#define M_BUTTON_LEFT   0
+#define M_BUTTON_RIGHT  1
+#define M_BUTTON_MIDDLE 2
 
-BOOL hb_gt_UnderLinuxConsole = FALSE;
-BOOL hb_gt_UnderXterm = FALSE;
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC(gt_Init_TermType())
+HB_FUNC( MPRESENT )
 {
-    char * Env;
-    
-    /* an uncertain way to check if we run under linux console */
-    Env = hb_getenv( "TERM" );
-    hb_gt_UnderLinuxConsole = Env && Env[ 0 ] != '\0' && ( strncmp( Env, "linux", 5 ) == 0 );
-    if( Env )
-        hb_xfree( ( void * ) Env );
-    
-    /* an uncertain way to check if we run under xterm */
-    Env = hb_getenv( "TERM" );
-    hb_gt_UnderXterm = Env && Env[ 0 ] != '\0' && 
-	( ( strstr( Env, "xterm" ) != NULL ) || ( strncmp( Env, "rxvt", 4 ) == 0 ) );
-    if( Env )
-        hb_xfree( ( void * ) Env );
+   hb_retl( hb_mouseIsPresent() );
 }
 
-/* *********************************************************************** */
+HB_FUNC( MHIDE )
+{
+   hb_mouseSetCursor( FALSE );
+}
+
+HB_FUNC( MSHOW )
+{
+   hb_mouseSetCursor( TRUE );
+}
+
+HB_FUNC( MSETCURSOR )
+{
+   hb_retl( hb_mouseGetCursor() );
+
+   if( ISLOG( 1 ) )
+      hb_mouseSetCursor( hb_parl( 1 ) );
+}
+
+HB_FUNC( MROW )
+{
+   if( ISLOG( 1 ) && hb_parl( 1 ) )
+   {
+      int iRow, iCol;
+
+      hb_mouseGetPos( &iRow, &iCol );
+      hb_retni( iRow );
+   }
+   else
+      hb_retni( hb_mouseRow() );
+}
+
+HB_FUNC( MCOL )
+{
+   if( ISLOG( 1 ) && hb_parl( 1 ) )
+   {
+      int iRow, iCol;
+
+      hb_mouseGetPos( &iRow, &iCol );
+      hb_retni( iCol );
+   }
+   else
+      hb_retni( hb_mouseCol() );
+}
+
+HB_FUNC( MSETPOS )
+{
+   if( ISNUM( 1 ) && ISNUM( 2 ) )
+      hb_mouseSetPos( hb_parni( 1 ), hb_parni( 2 ) );
+}
+
+HB_FUNC( MLEFTDOWN )
+{
+   hb_retl( hb_mouseButtonState( M_BUTTON_LEFT ) );
+}
+
+HB_FUNC( MRIGHTDOWN )
+{
+   hb_retl( hb_mouseButtonState( M_BUTTON_RIGHT ) );
+}
+
+HB_FUNC( MDBLCLK )
+{
+   hb_retni( hb_mouseGetDoubleClickSpeed() );
+
+   if( ISNUM( 1 ) )
+   {
+      hb_mouseSetDoubleClickSpeed( hb_parni( 1 ) );
+   }
+}
+
+HB_FUNC( MSAVESTATE )
+{
+   int iLen = hb_mouseStorageSize();
+
+   if( iLen > 0 )
+   {
+      BYTE * pBuffer = ( BYTE * ) hb_xgrab( iLen + 1 );
+
+      hb_mouseSaveState( pBuffer );
+      hb_retclen_buffer( ( char * ) pBuffer, iLen );
+   }
+   else
+      hb_retc( NULL );
+}
+
+HB_FUNC( MRESTSTATE )
+{
+   if( ISCHAR( 1 ) && hb_parclen( 1 ) == ( ULONG ) hb_mouseStorageSize() )
+   {
+      hb_mouseRestoreState( ( BYTE * ) hb_parc( 1 ) );
+   }
+}
+
+HB_FUNC( MSETBOUNDS )
+{
+   hb_mouseSetBounds( hb_parni( 1 ), /* Defaults to zero on bad type */
+                      hb_parni( 2 ), /* Defaults to zero on bad type */
+                      ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow(),
+                      ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol() );
+}
+
+#endif
+

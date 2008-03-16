@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.4 2005/06/13 02:02:50 peterrees Exp $
+ * $Id: hbmlang.c,v 1.5 2005/11/05 15:01:52 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -132,7 +132,7 @@ HB_FUNC(GETUSERLANG)
 }
 
 /*
- * $Id: gauge.c,v 1.1 2005/10/18 23:34:24 lculik Exp $
+ * $Id: hbmlang.c,v 1.5 2005/11/05 15:01:52 modalsist Exp $
  */
 
 /*
@@ -210,37 +210,34 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent );
 */
 HB_FUNC( GAUGENEW )
 {
-   HB_ITEM Return;
+   PHB_ITEM pReturn = hb_itemArrayNew( B_LEN );   /* Create array */
 
-   Return.type = HB_IT_NIL;
+   hb_arraySetNL( pReturn, B_TOP, ( ISNUM( B_TOP ) ? hb_parni( B_TOP ) : 0 ) );
+   hb_arraySetNL( pReturn, B_LEFT, ( ISNUM( B_LEFT ) ? hb_parni( B_LEFT ) : 0 ) );
 
-   hb_arrayNew( &Return, B_LEN );   /* Create array */
-
-   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_TOP ), ( ISNUM( B_TOP ) ? hb_parni( B_TOP ) : 0 ) );
-   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_LEFT ), ( ISNUM( B_LEFT ) ? hb_parni( B_LEFT ) : 0 ) );
-
-   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_BOTTOM ),
+   hb_arraySetNL( pReturn, B_BOTTOM,
       ( ISNUM( B_BOTTOM ) ?
       ( hb_parni( B_BOTTOM ) < hb_parni( B_TOP ) + 2 ?
       hb_parni( B_TOP ) + 2 : hb_parni( B_BOTTOM ) ) : 0 ) );
 
-   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_RIGHT ),
+   hb_arraySetNL( pReturn, B_RIGHT,
       ( ISNUM( B_RIGHT ) ?
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 4 ?
       hb_parni( B_LEFT ) + 4 : hb_parni( B_RIGHT ) ) : 0 ) );
 
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BACKCOLOR),( ISCHAR( B_BACKCOLOR ) ? hb_parcx( B_BACKCOLOR ) : "W/N" )) ;
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCOLOR), ( ISCHAR( B_BARCOLOR ) ? hb_parcx( B_BARCOLOR ) : "W+/N" ));
+   hb_arraySetC( pReturn, B_BACKCOLOR, ( ISCHAR( B_BACKCOLOR ) ? hb_parcx( B_BACKCOLOR ) : "W/N" )) ;
+   hb_arraySetC( pReturn, B_BARCOLOR, ( ISCHAR( B_BARCOLOR ) ? hb_parcx( B_BARCOLOR ) : "W+/N" ));
 
-   hb_itemPutL( hb_arrayGetItemPtr( &Return, B_DISPLAYNUM ),
+   hb_arraySetL( pReturn, B_DISPLAYNUM,
       !( ISNUM( B_RIGHT ) &&
       ISNUM( B_LEFT ) &&
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
 
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
+   hb_arraySetC( pReturn, B_BARCHAR, ( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
+   hb_arraySetNL( pReturn, B_PERCENT, 0 );
 
-   hb_itemReturn( &Return );
+   hb_itemReturn( pReturn );
+   hb_itemRelease( pReturn );
 }
 
 /* GaugeDisplay( aGauge ) --> aGauge
@@ -272,7 +269,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
          hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                       iCenter, ( BYTE * ) "[      ]", 8, TRUE );
+                       iCenter, ( BYTE * ) "[      ]", 8 );
 
       hb_gtSetColorStr( szOldColor );
 
@@ -315,21 +312,20 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
 
    if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
    {
-//    sprintf( szPct, "%3.0f\%", fPercent * 100 );
-      sprintf( szPct, "%3.0f%%", fPercent * 100 );
+      snprintf( szPct, sizeof( szPct ), "%3.0f%%", fPercent * 100 );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                    (USHORT) iCenter + 2, (BYTE *) szPct, 4, TRUE );
+                    (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
    }
 
-   hb_gtBox( hb_arrayGetNL( pArray, B_TOP ) + 1, hb_arrayGetNL( pArray, B_LEFT ) + 1,
-             hb_arrayGetNL( pArray, B_BOTTOM ) - 1, hb_arrayGetNL( pArray, B_RIGHT ) - 1,
+   hb_gtBox( (SHORT) ( hb_arrayGetNI( pArray, B_TOP ) + 1 ), (SHORT) ( hb_arrayGetNI( pArray, B_LEFT ) + 1 ),
+             (SHORT) ( hb_arrayGetNI( pArray, B_BOTTOM ) - 1 ), (SHORT) ( hb_arrayGetNI( pArray, B_RIGHT ) - 1 ),
              ( BYTE * ) szStr );
 
-   iMax = hb_arrayGetNL( pArray, B_BOTTOM ) - hb_arrayGetNL( pArray, B_TOP ) - 1;
+   iMax = hb_arrayGetNI( pArray, B_BOTTOM ) - hb_arrayGetNI( pArray, B_TOP ) - 1;
    for( iRow = 1; iRow <= iMax; iRow++ )
    {
-      hb_gtRepChar( (USHORT) (iRow + hb_arrayGetNL( pArray, B_TOP )),
-                    (USHORT) (hb_arrayGetNL( pArray, B_LEFT ) + 1),
+      hb_gtRepChar( (USHORT) (iRow + hb_arrayGetNI( pArray, B_TOP )),
+                    (USHORT) (hb_arrayGetNI( pArray, B_LEFT ) + 1),
                     ( BYTE ) * hb_arrayGetCPtr( pArray, B_BARCHAR ), iCols );
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.168 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: filesys.c,v 1.169 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -331,7 +331,7 @@ static BOOL s_fUseWaitLocks = TRUE;
       }
    #endif
 
-HANDLE DostoWinHandle( FHANDLE fHandle )
+static HANDLE DosToWinHandle( FHANDLE fHandle )
 {
    HANDLE hHandle = (HANDLE) LongToHandle( fHandle );
 
@@ -666,7 +666,18 @@ static int convert_seek_flags( USHORT uiFlags )
  * FILESYS.API FUNCTIONS --
  */
 
-FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
+HB_EXPORT FHANDLE hb_fsGetOsHandle( FHANDLE hFileHandle )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsGetOsHandle(%p)", hFileHandle));
+
+#if defined(HB_WIN32_IO)
+   return ( FHANDLE ) DosToWinHandle( hFileHandle );
+#else
+   return hFileHandle;
+#endif
+}
+
+HB_EXPORT FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
 #if defined(OS_UNIX_COMPATIBLE)
    HB_THREAD_STUB
@@ -1527,13 +1538,13 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 
    HB_STACK_UNLOCK
    HB_TEST_CANCEL_ENABLE_ASYN
-   dwResult = WaitForSingleObject( DostoWinHandle(fhProc), dwTime );
+   dwResult = WaitForSingleObject( DosToWinHandle(fhProc), dwTime );
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK;
 
    if ( dwResult == WAIT_OBJECT_0 )
    {
-      BOOL fResult = GetExitCodeProcess( DostoWinHandle(fhProc), &dwResult );
+      BOOL fResult = GetExitCodeProcess( DosToWinHandle(fhProc), &dwResult );
 
       hb_fsSetIOError( fResult, 0 );
       iRetStatus = fResult ? (int) dwResult : -2;
@@ -1582,7 +1593,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
       hb_fsSetError( ( USHORT ) FS_ERROR );
    }
 #elif defined( HB_WIN32_IO )
-   bRet = (TerminateProcess( DostoWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
+   bRet = (TerminateProcess( DosToWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
    hb_fsSetIOError( bRet, 0 );
 #elif defined( HB_OS_WIN_32 )
 {
@@ -1912,7 +1923,7 @@ HB_FORCE_EXPORT void hb_fsClose( FHANDLE hFileHandle )
    HB_TEST_CANCEL_ENABLE_ASYN
 
    #if defined(HB_WIN32_IO)
-      hb_fsSetIOError( CloseHandle( DostoWinHandle( hFileHandle ) ), 0 );
+      hb_fsSetIOError( CloseHandle( DosToWinHandle( hFileHandle ) ), 0 );
    #else
       hb_fsSetIOError( close( hFileHandle ) == 0, 0 );
    #endif
@@ -2011,7 +2022,7 @@ USHORT  HB_FORCE_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiC
          // allowing async cancelation here
          HB_TEST_CANCEL_ENABLE_ASYN
 
-         fResult = ReadFile( DostoWinHandle(hFileHandle), pBuff, (DWORD)uiCount, &dwRead, NULL );
+         fResult = ReadFile( DosToWinHandle(hFileHandle), pBuff, (DWORD)uiCount, &dwRead, NULL );
          hb_fsSetIOError( fResult, 0 );
 
          HB_DISABLE_ASYN_CANC
@@ -2060,12 +2071,12 @@ HB_FORCE_EXPORT USHORT hb_fsWrite( FHANDLE hFileHandle, const BYTE * pBuff, USHO
 
          if ( uiCount )
          {
-             fResult = WriteFile( DostoWinHandle(hFileHandle), pBuff, uiCount, &dwWritten, NULL );
+             fResult = WriteFile( DosToWinHandle(hFileHandle), pBuff, uiCount, &dwWritten, NULL );
          }
          else
          {
              dwWritten = 0;
-             fResult = SetEndOfFile( DostoWinHandle(hFileHandle) );
+             fResult = SetEndOfFile( DosToWinHandle(hFileHandle) );
          }
          hb_fsSetIOError( fResult, 0 );
 
@@ -2132,7 +2143,7 @@ ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCou
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      hb_fsSetIOError( ReadFile( DostoWinHandle(hFileHandle),
+      hb_fsSetIOError( ReadFile( DosToWinHandle(hFileHandle),
                                  pBuff, ulCount, &ulRead, NULL ), 0 );
 
       HB_DISABLE_ASYN_CANC
@@ -2221,11 +2232,11 @@ HB_EXPORT ULONG hb_fsWriteLarge( FHANDLE hFileHandle, const BYTE * pBuff, ULONG 
       ulWritten = 0;
       if( ulCount )
       {
-         hb_fsSetIOError( WriteFile( DostoWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL ), 0 );
+         hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL ), 0 );
       }
       else
       {
-         hb_fsSetIOError( SetEndOfFile( DostoWinHandle(hFileHandle) ), 0 );
+         hb_fsSetIOError( SetEndOfFile( DosToWinHandle(hFileHandle) ), 0 );
       }
 
       HB_STACK_LOCK
@@ -2328,7 +2339,7 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
       #if defined(HB_WIN32_IO)
-         hb_fsSetIOError( FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) ), 0 );
+         hb_fsSetIOError( FlushFileBuffers( ( HANDLE ) DosToWinHandle( hFileHandle ) ), 0 );
       #else
          #if defined(__WATCOMC__)
             hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
@@ -2435,11 +2446,11 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
               {
                  dwFlags |= LOCKFILE_FAIL_IMMEDIATELY ;
               }
-              bResult = LockFileEx( DostoWinHandle( hFileHandle ), dwFlags, 0, ulLength, 0, &sOlap );
+              bResult = LockFileEx( DosToWinHandle( hFileHandle ), dwFlags, 0, ulLength, 0, &sOlap );
            }
            else
            {
-               bResult = LockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+               bResult = LockFile( DosToWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
            }
            break;
         }
@@ -2450,11 +2461,11 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
               OVERLAPPED sOlap ;
               memset( &sOlap, 0, sizeof( OVERLAPPED ) ) ;
               sOlap.Offset = ( ULONG ) ulStart ;
-              bResult = UnlockFileEx( DostoWinHandle( hFileHandle ), 0, ulLength,0, &sOlap );
+              bResult = UnlockFileEx( DosToWinHandle( hFileHandle ), 0, ulLength,0, &sOlap );
            }
            else
            {
-              bResult = UnlockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+              bResult = UnlockFile( DosToWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
            }
            break;
 
@@ -2663,12 +2674,12 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                sOlap.Offset = dwOffsetLo;
                sOlap.OffsetHigh = dwOffsetHi;
 
-               bResult = LockFileEx( DostoWinHandle( hFileHandle ), dwFlags, 0,
+               bResult = LockFileEx( DosToWinHandle( hFileHandle ), dwFlags, 0,
                                      dwLengthLo, dwLengthHi, &sOlap );
             }
             else
             {
-               bResult = LockFile( DostoWinHandle( hFileHandle ),
+               bResult = LockFile( DosToWinHandle( hFileHandle ),
                                    dwOffsetLo, dwOffsetHi,
                                    dwLengthLo, dwLengthHi );
             }
@@ -2683,12 +2694,12 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                sOlap.Offset = dwOffsetLo;
                sOlap.OffsetHigh = dwOffsetHi;
 
-               bResult = UnlockFileEx( DostoWinHandle( hFileHandle ), 0,
+               bResult = UnlockFileEx( DosToWinHandle( hFileHandle ), 0,
                                        dwLengthLo, dwLengthHi, &sOlap );
             }
             else
             {
-               bResult = UnlockFile( DostoWinHandle( hFileHandle ),
+               bResult = UnlockFile( DosToWinHandle( hFileHandle ),
                                      dwOffsetLo, dwOffsetHi,
                                      dwLengthLo, dwLengthHi );
             }
@@ -2815,13 +2826,13 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
       }
       else
       {
-         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
+         ulPos = (DWORD) SetFilePointer( DosToWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
          hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
       }
 
       if ( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
       {
-         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
+         ulPos = (DWORD) SetFilePointer( DosToWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
       }
    #else
       /* This DOS hack creates 2GB file size limit, Druzus */
@@ -2881,7 +2892,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       }
       else
       {
-         ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
+         ulOffsetLow = SetFilePointer( DosToWinHandle( hFileHandle ),
                                        ulOffsetLow, (PLONG) &ulOffsetHigh,
                                        ( DWORD ) Flags );
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
@@ -2891,7 +2902,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       if ( llPos == ( HB_FOFFSET ) INVALID_SET_FILE_POINTER )
       {
          ulOffsetHigh = 0;
-         ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
+         ulOffsetLow = SetFilePointer( DosToWinHandle( hFileHandle ),
                                        0, (PLONG) &ulOffsetHigh, SEEK_CUR );
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
       }
@@ -2953,7 +2964,7 @@ ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
    #if defined(HB_WIN32_IO)
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
-      ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, FILE_CURRENT );
+      ulPos = (DWORD) SetFilePointer( DosToWinHandle(hFileHandle), 0, NULL, FILE_CURRENT );
       hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
       HB_DISABLE_ASYN_CANC
    #else

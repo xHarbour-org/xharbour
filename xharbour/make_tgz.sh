@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.50 2006/01/17 02:18:14 druzus Exp $
+# $Id: make_tgz.sh,v 1.51 2006/02/21 19:37:04 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,7 +16,8 @@ cd `dirname $0`
 name="xharbour"
 hb_ver=`get_hbver`
 hb_platform=`get_hbplatform`
-[ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
+[ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}${HB_BUILDSUF}"
+[ "${HB_XBUILD}" = "" ] || hb_platform="-${HB_XBUILD}"
 hb_archfile="${name}-${hb_ver}${hb_platform}.bin.tar.gz"
 hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
@@ -24,7 +25,7 @@ hb_pref="xhb"
 hb_contrib=""
 hb_sysdir="yes"
 hb_exesuf=""
-export C_USR="-O3"
+export C_USR="$C_USR -DHB_FM_STATISTICS_OFF -O3"
 
 [ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
 
@@ -37,7 +38,7 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     else
         hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
-            *windows*|*mingw32*)    hb_arch="w32" ;;
+            *windows*|*mingw32*|msys*)    hb_arch="w32" ;;
             *dos)   hb_arch="dos" ;;
             *bsd)   hb_arch="bsd" ;;
         esac
@@ -58,7 +59,8 @@ if [ -z "$HB_GT_LIB" ]; then
     case "$HB_ARCHITECTURE" in
         w32) HB_GT_LIB="gtwin" ;;
         dos) HB_GT_LIB="gtdos" ;;
-        *)   HB_GT_LIB="gtcrs" ;;
+        os2) HB_GT_LIB="gtos2" ;;
+        *)   HB_GT_LIB="gttrm" ;;
     esac
     export HB_GT_LIB
 fi
@@ -71,7 +73,6 @@ if [ -z "$HB_MT" ]; then
     export HB_MT
 fi
 
-if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 
 # default lib dir name
@@ -91,6 +92,9 @@ then
         *)
             ;;
     esac
+elif [ "$HB_ARCHITECTURE" = "hpux" ]
+then
+    export C_USR="$C_USR -fPIC"
 fi
 
 # Select the platform-specific installation prefix and ownership
@@ -100,7 +104,7 @@ case "$HB_ARCHITECTURE" in
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         HB_INSTALL_GROUP=wheel
         ETC="/private/etc"
-	;;
+        ;;
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && [ "${HB_ARCH64}" = yes ] && HB_LIBDIRNAME="lib64"
@@ -130,26 +134,20 @@ case "$HB_ARCHITECTURE" in
 esac
 
 # Select the platform-specific command names
-INSTALL=install
 MAKE=make
 TAR=tar
-case "$HB_ARCHITECTURE" in
-    darwin)
-        gtar --version >/dev/null 2>&1 && TAR=gtar
-        INSTALL="install -c"
-        ;;
-    bsd)
-        MAKE=gmake
-        ;;
-esac
-
-# Select the contribs to build
-case "$HB_ARCHITECTURE" in
-    linux)  hb_contrib="libnf rdd_ads" ;;
-    bsd)    hb_contrib="libnf" ;;
-    darwin) hb_contrib="libnf" ;;
-    dos)    hb_contrib="libnf" ;;
-esac
+hb_gnutar=yes
+if gtar --version >/dev/null 2>&1; then
+   TAR=gtar
+elif ! tar --version >/dev/null 2>&1; then
+   hb_gnutar=no
+   echo "Warning!!! Cannot find GNU TAR"
+fi
+if gmake --version >/dev/null 2>&1; then
+   MAKE=gmake
+elif ! make --version >/dev/null 2>&1; then
+   echo "Warning!!! Cannot find GNU MAKE"
+fi
 
 # Set other platform-specific build options
 if [ -z "$HB_GPM_MOUSE" ]; then
@@ -160,6 +158,22 @@ if [ -z "$HB_GPM_MOUSE" ]; then
         HB_GPM_MOUSE=no
     fi
     export HB_GPM_MOUSE
+fi
+
+if [ -z "${HB_WITHOUT_GTSLN}" ]; then
+    HB_WITHOUT_GTSLN=yes
+    case "$HB_ARCHITECTURE" in
+        linux|bsd|darwin|hpux|sunos)
+            for dir in /usr /usr/local /sw /opt/local
+            do
+                if [ -f ${dir}/include/slang.h ] || \
+                   [ -f ${dir}/include/slang/slang.h ]; then
+                    HB_WITHOUT_GTSLN=no
+                fi
+            done
+            ;;
+    esac
+    export HB_WITHOUT_GTSLN
 fi
 
 case "$HB_ARCHITECTURE" in
@@ -173,7 +187,6 @@ case "$HB_ARCHITECTURE" in
         [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
         ;;
     dos|w32)
-        [ -z "${HB_WITHOUT_GTSLN}" ] && export HB_WITHOUT_GTSLN=yes
         [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
         ;;
     *)
@@ -229,14 +242,19 @@ do
 done
 
 # Keep the size of the binaries to a minimim.
-strip $HB_BIN_INSTALL/harbour${hb_exesuf}
-# Keep the size of the libraries to a minimim, but don't try to strip symlinks.
-strip -S `find $HB_LIB_INSTALL -type f`
+if [ -f $HB_BIN_INSTALL/harbour${hb_exesuf} ]; then
+    ${CCPREFIX}strip $HB_BIN_INSTALL/harbour${hb_exesuf}
+fi
+if [ "$HB_ARCHITECTURE" != "hpux" ]; then
+    # Keep the size of the libraries to a minimim, but don't try to strip symlinks.
+    ${CCPREFIX}strip -S `find $HB_LIB_INSTALL -type f`
+fi
 
 if [ "${hb_sysdir}" = "yes" ]; then
 
 mkdir -p $HB_INST_PREF$ETC/harbour
-$INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF$ETC/harbour/hb-charmap.def
+cp -f source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF$ETC/harbour/hb-charmap.def
+chmod 644 $HB_INST_PREF$ETC/harbour/hb-charmap.def
 
 cat > $HB_INST_PREF$ETC/harbour.cfg <<EOF
 CC=${CCPREFIX}gcc
@@ -259,18 +277,19 @@ then
     [ "${HB_WITHOUT_GTSLN}" != yes ] && ADD_LIBS="$ADD_LIBS -lslang"
     [ "${HB_WITHOUT_X11}" != yes ] && ADD_LIBS="$ADD_LIBS -L/usr/X11R6/$HB_LIBDIRNAME -lX11"
 
-    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS}"
+    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS} ${L_USR}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\" ${PRG_USR}"
 
     for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
     do
         (cd "utils/${utl}"
-         rm -fR "./${HB_ARCHITECTURE}"
+         rm -fR "./${HB_ARCHITECTURE}/${HB_COMPILER}"
          $MAKE -r install
-         strip "${HB_BIN_INSTALL}/${utl}${hb_exesuf}")
+         ${CCPREFIX}strip "${HB_BIN_INSTALL}/${utl}${hb_exesuf}")
     done
 fi
 
+chmod 644 $HB_INC_INSTALL/*
 
 (cd ${HB_BIN_INSTALL}
     if [ "$HB_ARCHITECTURE" = "w32" ]; then
@@ -284,7 +303,13 @@ fi
 )
 
 CURDIR=$(pwd)
-(cd "${HB_INST_PREF}"; $TAR -czvf "${CURDIR}/${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} .)
+if [ $hb_gnutar = yes ]; then
+    (cd "${HB_INST_PREF}"; $TAR czvf "${CURDIR}/${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} .)
+    UNTAR_OPT=xvpf
+else
+    (cd "${HB_INST_PREF}"; $TAR covf - . | gzip > "${CURDIR}/${hb_archfile}")
+    UNTAR_OPT=xvf
+fi
 rm -fR "${HB_INST_PREF}"
 
 if [ -n "${hb_instfile}" ]; then
@@ -311,7 +336,7 @@ read ASK
 if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
     exit 1
 fi
-(sed -e '1,/^HB_INST_EOF\$/ d' "\$0" | gzip -cd | tar xvpf - -C /) ${DO_LDCONFIG}
+(sed -e '1,/^HB_INST_EOF\$/ d' "\$0" | gzip -cd | tar ${UNTAR_OPT} - -C /) ${DO_LDCONFIG}
 exit \$?
 HB_INST_EOF
 EOF

@@ -1,5 +1,5 @@
 /*
- * $Id: shadow.c,v 1.1.1.1 2001/12/21 10:42:04 ronpinkas Exp $
+ * $Id: shadow.c,v 1.2 2007/04/20 09:41:31 marchuet Exp $
  */
 
 /*
@@ -53,8 +53,6 @@
 #include "hbapi.h"
 #include "hbapigt.h"
 
-#ifdef HB_EXTENSION
-
 HB_FUNC( HB_SHADOW )
 {
    if( hb_pcount() >= 4 )
@@ -68,14 +66,12 @@ HB_FUNC( HB_SHADOW )
 HB_FUNC( HB_CLRAREA )
 {
    if( hb_pcount() > 4 )
-      hb_gt_SetAttribute( hb_parni( 1 ),
-                          hb_parni( 2 ),
-                          hb_parni( 3 ),
-                          hb_parni( 4 ),
-                          hb_parni( 5 ) );
+      hb_gtSetAttribute( hb_parni( 1 ),
+                         hb_parni( 2 ),
+                         hb_parni( 3 ),
+                         hb_parni( 4 ),
+                         hb_parni( 5 ) );
 }
-
-#endif
 
 #ifdef HB_C52_UNDOC
 

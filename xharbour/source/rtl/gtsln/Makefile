@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2005/12/11 12:37:50 druzus Exp $
+# $Id: Makefile,v 1.9 2006/01/12 13:16:10 druzus Exp $
 #
 
 ROOT = ../../../
@@ -7,7 +7,6 @@ ROOT = ../../../
 C_SOURCES=\
 	gtsln.c \
 	kbsln.c \
-	termtype.c \
 	mousesln.c \
 
 LIBNAME=gtsln
@@ -35,8 +34,4 @@ CFLAGS += -DHAVE_GPM_H
 ifeq ($(HB_GPM_NOICE_DISABLE),yes)
   CFLAGS += -DHB_GPM_NOICE_DISABLE
 endif
-endif
-
-ifeq ($(HB_MULTI_GT),yes)
-CFLAGS += -DHB_MULTI_GT
 endif

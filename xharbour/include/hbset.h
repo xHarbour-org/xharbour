@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.41 2008/01/14 12:44:29 walito Exp $
+ * $Id: hbset.h,v 1.42 2008/03/10 11:24:05 likewolf Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ typedef struct
    BOOL    HB_SET_EOF;
    int     HB_SET_EPOCH;
    BOOL    HB_SET_ESCAPE;
-   HB_inkey_enum  HB_SET_EVENTMASK;
+   int     HB_SET_EVENTMASK;
    BOOL    HB_SET_EXACT;
    BOOL    HB_SET_EXCLUSIVE;
    BOOL    HB_SET_EXIT;
@@ -287,7 +287,7 @@ extern HB_EXPORT char *  hb_setDevice( void );
 extern HB_EXPORT BOOL    hb_setEOF( void );
 extern HB_EXPORT int     hb_setEpoch( void );
 extern HB_EXPORT BOOL    hb_setEscape( void );
-extern HB_EXPORT HB_inkey_enum  hb_setEventMask( void );
+extern HB_EXPORT int     hb_setEventMask( void );
 extern HB_EXPORT BOOL    hb_setExact( void );
 extern HB_EXPORT BOOL    hb_setExclusive( void );
 extern HB_EXPORT BOOL    hb_setExit( void );

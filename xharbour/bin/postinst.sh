@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.17 2005/05/11 13:09:30 druzus Exp $
+# $Id: postinst.sh,v 1.18 2005/11/14 22:48:18 lf_sfnet Exp $
 #
 
 # ---------------------------------------------------------------
@@ -41,21 +41,50 @@ then
     RANLIB=""
     MAKE=make
     AR="${CCPREFIX}ar -cr"
-    if [ "${HB_ARCHITECTURE}" = "bsd" ] || [ `uname` = "FreeBSD" ]; then
+    if [ "${HB_ARCHITECTURE}" = "bsd" ] || \
+       [ "${HB_ARCHITECTURE}" = "hpux" ] || \
+       [ `uname` = "FreeBSD" ]; then
         MAKE=gmake
     elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         # We must build an archive index on Darwin
         AR="${CCPREFIX}ar -crs"
     fi
-    if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
-        install -m 755 -f "${HB_BIN_INSTALL}" "${hb_root}/bin/hb-mkslib.sh"
+
+    if [ -n "${HB_TOOLS_PREF}" ]; then
+        hb_mkslib="${HB_BIN_INSTALL}/${HB_TOOLS_PREF}-mkslib"
+        rm -f "${hb_mkslib}"
+        sed -e "s/^# HB_ARCHITECTURE=\"\"\$/HB_ARCHITECTURE=\"${HB_ARCHITECTURE}\"/g" \
+            -e "s/^# CCPREFIX=\"\"\$/[ -n \"\${CCPREFIX}\" ] || CCPREFIX=\"${CCPREFIX}\"/g" \
+            "${hb_root}/bin/hb-mkslib.sh" > "${hb_mkslib}" && \
+        chmod 755 "${hb_mkslib}"
+    elif [ "${HB_ARCHITECTURE}" = "sunos" ] || \
+         [ "${HB_ARCHITECTURE}" = "hpux" ] || \
+         ! which install &>/dev/null; then
+        rm -f "${HB_BIN_INSTALL}/hb-mkslib"
+        cp "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib" && \
+        chmod 755 "${HB_BIN_INSTALL}/hb-mkslib"
     elif [ "${HB_ARCHITECTURE}" != "dos" ]; then
         # Without -c some OSes _move_ the file instead of copying it!
         install -c -m 755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
     if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "gpp" ] || \
-       [ "$HB_COMPILER" = "mingw32" ]; then
+       [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "cemgw" ]; then
         mk_hblibso "${hb_root}"
     fi
+    # build fm lib with memory statistic
+    (cd ${hb_root}/source/vm
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    rm -f fm.o
+    ${MAKE} -r fm.o
+    ${AR} ${HB_LIB_INSTALL}/libfm.a fm.o
+    [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfm.a
+    rm -f fm.o
+    if [ "${HB_MT}" = "MT" ]; then
+        ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
+        ${AR} ${HB_LIB_INSTALL}/libfmmt.a fm.o
+        [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfmmt.a
+        rm -f fm.o
+    fi
+    )
 fi

@@ -1,5 +1,5 @@
 /*
- * $Id: xsavescr.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
+ * $Id: xsavescr.c,v 1.2 2002/10/22 02:08:33 paultucker Exp $
  */
 
 /*
@@ -81,17 +81,13 @@ void hb_conXSaveRestRelease( void )
 
 HB_FUNC( __XSAVESCREEN )
 {
-   if( s_pBuffer != NULL )
-      hb_xfree( s_pBuffer );
+   ULONG ulSize;
 
    hb_gtGetPos( &s_iRow, &s_iCol );
-
-   {
-      UINT uiSize;
-      hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &uiSize );
-      s_pBuffer = hb_xgrab( uiSize );
-   }
-
+   hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &ulSize );
+   if( s_pBuffer != NULL )
+      hb_xfree( s_pBuffer );
+   s_pBuffer = hb_xgrab( ulSize );
    hb_gtSave( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), s_pBuffer );
 }
 
@@ -108,7 +104,7 @@ HB_FUNC( __XRESTSCREEN )
       hb_xfree( s_pBuffer );
       s_pBuffer = NULL;
 
-      hb_gtSetPosContext( s_iRow, s_iCol, HB_GT_SET_POS_AFTER );
+      hb_gtSetPos( s_iRow, s_iCol );
    }
 }
 

@@ -1,26 +1,30 @@
 #
-# $Id: global.cf,v 1.18 2006/06/26 11:27:06 druzus Exp $
+# $Id: global.cf,v 1.19 2008/03/09 18:44:26 likewolf Exp $
 #
-
-ifndef MK
 
 all : first
 
-HB_GT_LIBS=\
-        gtcgi \
-        gtpca \
-        gtstd \
-        gtwin \
-        gtwvt \
-        gtgui \
-        gtnul \
-#       gtcrs \
-#       gtsln \
+HB_GT_LIST=\
+	gtcgi \
+	gtpca \
+	gtstd \
+	gtwin \
+	gtwvt \
+	gtgui \
+
+#	gtcrs \
+#	gtsln \
+
+ifeq ($(HB_GTALLEG),yes)
+   HB_GT_LIST += gtalleg
+endif
+
+# verify if GT drivers exist
+HB_GT_LIBS := $(foreach gt, $(HB_GT_LIST), $(if $(wildcard $(TOP)$(ROOT)source/rtl/$(gt)),$(gt),))
 
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtwin
 endif
-
 
 ifeq ($(SHLVL),) # COMMAND.COM
 
@@ -29,58 +33,53 @@ ifeq ($(SHLVL),) # COMMAND.COM
 # and some DOS commands require '\' (ARCH_DOS)
 ARCH_DIR = $(subst \,/,$(HB_ARCH))
 ARCH_DOS = $(subst /,\,$(HB_ARCH))
+LIB_DIR_DOS = $(subst /,\,$(LIB_DIR))
+LIB_PATH_DOS = $(subst /,\,$(LIB_PATH))
+LIB_ARCH_DOS = $(subst /,\,$(LIB_ARCH))
+DIRSEP = $(subst /,\,\)
+
 MK := $(subst \,/,$(subst \~,~,$(MAKE)))
 
 ifeq ($(COMSPEC),) #location of command.com
-  ifeq ($(OS),Windows_NT)
-    COMSPEC := cmd.exe
-  else
-    COMSPEC := command.com
-  endif
+	ifeq ($(OS),Windows_NT)
+		COMSPEC := cmd.exe
+	else
+		COMSPEC := command.com
+	endif
 endif
+
 ifeq ($(findstring cmd.exe,$(COMSPEC)),cmd.exe)
   CMD_EXE := yes
 else
-  COMMAND_COM := yes
+  CMD_EXE := no
 endif
 
-ifeq ($(CMD_EXE),yes)
-else
 RM = del
 RD = rmdir
 MD = md
-CP = copy
+CP = $(COMSPEC) /C copy
 MV = move
-endif
 
 ifeq ($(CMD_EXE),yes)
 
 RM = del /q /f
 RD = rmdir /q /s
-MD = md
-CP = copy
-MV = move
 
 dirbase::
 	-@$(COMSPEC) /c \
-	'for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %d\. $(MD) %d'
+	for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %d\. $(MD) %d
 
 dirbase_mt::
 	-@$(COMSPEC) /c \
-	'for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %d\. $(MD) %d'
+	for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %d\. $(MD) %d
 
 clean::
 	-@$(COMSPEC) /c \
-	'if exist $(ARCH_DOS) $(RD) $(ARCH_DOS) && \
-	if exist $(ARCH_DOS)_mt $(RD) $(ARCH_DOS)_mt'
+	if exist $(ARCH_DOS) $(RD) $(ARCH_DOS)
+	-@$(COMSPEC) /c \
+	if exist $(ARCH_DOS)_mt $(RD) $(ARCH_DOS)_mt
 
-else # COMMAND.COM
-
-RM = del
-RD = rmdir
-MD = md
-CP = copy
-MV = move
+else # command.com
 
 dirbase::
 	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\nul $(MD) %%d
@@ -103,25 +102,19 @@ RM = rm -f
 RD = rm -f -r
 CP = cp -f
 MV = mv -f
-MD = mkdir -p
-
-#this will be used only under MINGW
-RANLIB = $(CCPREFIX)ranlib
+MD = mkdir
+MDP = mkdir -p
 
 dirbase::
-	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	 [ -d $(ARCH_DIR) ] || $(MD) $(ARCH_DIR)
+	@[ -d $(HB_ARCHITECTURE) ] || $(MDP) $(HB_ARCHITECTURE); \
+	 [ -d $(ARCH_DIR) ] || $(MDP) $(ARCH_DIR)
 
 dirbase_mt::
-	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	 [ -d $(ARCH_DIR)_mt ] || $(MD) $(ARCH_DIR)_mt
+	@[ -d $(HB_ARCHITECTURE) ] || $(MDP) $(HB_ARCHITECTURE); \
+	 [ -d $(ARCH_DIR)_mt ] || $(MDP) $(ARCH_DIR)_mt
 
 clean::
 	-$(RD) $(ARCH_DIR)
 	-$(RD) $(ARCH_DIR)_mt
 
 endif
-endif
-
-#this will be used only under MINGW
-RANLIB = $(CCPREFIX)ranlib

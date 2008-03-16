@@ -1,17 +1,12 @@
 /*
- * $Id: gtcrs.c,v 1.60 2006/03/25 02:22:43 druzus Exp $
+ * $Id: gtcrs.c,v 1.61 2006/07/16 19:48:56 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
  * Video subsystem based on ncurses screen library.
  *
- * Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
- * www - http://www.harbour-project.org
- * Special thanks to Marek Paliwoda <paliwoda@inetia.pl>
- * author of gtsln from which I borrowed a lot of code and ideas.
- * and to Gonzalo Diethelm <gonzalo.diethelm@iname.com>
- * author of previous version of gtcrs.
+ * Copyright 2005 Przemyslaw Czerpak < druzus /at/ priv.onet.pl >
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,6 +55,11 @@
 
 #include "gtcrs.h"
 
+static int           s_GtId;
+static HB_GT_FUNCS   SuperTable;
+#define HB_GTSUPER   (&SuperTable)
+#define HB_GTID_PTR  (&s_GtId)
+
 /* this variable should be global and checked in main VM loop */
 static volatile BOOL s_BreakFlag = FALSE;
 static volatile BOOL s_InetrruptFlag = FALSE;
@@ -69,10 +69,6 @@ static volatile BOOL s_SignalFlag = FALSE;
 static volatile BOOL s_SignalTable[MAX_SIGNO];
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
-
-/* Clipboard management */
-static char *s_clipboard = NULL;
-static ULONG s_clipsize = 0;
 
 typedef struct evtFD {
    int fd;
@@ -84,7 +80,6 @@ typedef struct evtFD {
 
 typedef struct mouseEvent {
    int row, col;
-   int lrow, lcol;
    int buttonstate;
    int lbuttons;
    int lbup_row, lbup_col;
@@ -128,7 +123,7 @@ typedef struct InOutBase {
 
    char *acsc, *beep, *flash, *civis, *cnorm, *cvvis;
 
-   int is_mouse;
+   int mouse_type;
    int mButtons;
    int nTermMouseChars;
    unsigned char cTermMouseBuf[3];
@@ -167,10 +162,6 @@ typedef struct InOutBase {
 
 static InOutBase *s_ioBase = NULL;
 
-/* faster macro version for use inside this module */
-#define _GetScreenWidth()  ( s_ioBase->maxcol )
-#define _GetScreenHeight() ( s_ioBase->maxrow )
-
 static InOutBase **s_ioBaseTab = NULL;
 static int s_iSize_ioBaseTab = 0;
 static int s_iActive_ioBase = -1;
@@ -180,7 +171,7 @@ static int getMouseKey(mouseEvent *);
 static void destroy_ioBase(InOutBase *ioBase);
 static void sig_handler(int signo);
 
-static void curs_wrkaround();
+static void curs_wrkaround( void );
 
 typedef struct ClipKeyCode {
    int key;
@@ -387,12 +378,15 @@ static int getClipKey( int nKey )
 
 static void set_sig_handler( int iSig )
 {
+   /* SA_NOCLDSTOP in #if is a hack to detect POSIX compatible environment */
+#if defined( SA_NOCLDSTOP )
    struct sigaction act;
 
    sigaction( iSig, 0, &act );
    act.sa_handler = sig_handler;
    act.sa_flags = SA_RESTART | ( iSig == SIGCHLD ? SA_NOCLDSTOP : 0 );
    sigaction( iSig, &act, 0 );
+#endif
 }
 
 #if 1
@@ -758,6 +752,12 @@ static int wait_key( InOutBase * ioBase, int milisec )
    int nKey, esc, n, i, ch, counter;
    struct keyTab *ptr;
 
+   if ( s_WinSizeChangeFlag )
+   {
+      s_WinSizeChangeFlag = FALSE;
+      return K_RESIZE;
+   }
+
    counter = ++( ioBase->key_counter );
  restart:
    nKey = esc = n = i = 0;
@@ -977,82 +977,84 @@ static int getMouseKey( mouseEvent * mEvt )
 {
    int nKey = 0;
 
-   if ( mEvt->lrow != mEvt->row || mEvt->lcol != mEvt->col )
+   if ( mEvt->lbuttons != mEvt->buttonstate )
    {
-      nKey = K_MOUSEMOVE;
-      mEvt->lrow = mEvt->row;
-      mEvt->lcol = mEvt->col;
-   }
-   else if ( mEvt->buttonstate & M_BUTTON_WHEELUP )
-   {
-      nKey = K_MWFORWARD;
-      mEvt->buttonstate &= ~M_BUTTON_WHEELUP;
-   }
-   else if ( mEvt->buttonstate & M_BUTTON_WHEELDOWN )
-   {
-      nKey = K_MWBACKWARD;
-      mEvt->buttonstate &= ~M_BUTTON_WHEELDOWN;
-   }
-   else if ( mEvt->lbuttons != mEvt->buttonstate )
-   {
-      int butt = mEvt->lbuttons ^ mEvt->buttonstate;
-
-      if ( butt & M_BUTTON_LEFT )
+      if ( mEvt->buttonstate & M_CURSOR_MOVE )
       {
-         if ( mEvt->buttonstate & M_BUTTON_LEFT )
-         {
-            mEvt->lbdn_row = mEvt->row;
-            mEvt->lbdn_col = mEvt->col;
-         }
-         else
-         {
-            mEvt->lbup_row = mEvt->row;
-            mEvt->lbup_col = mEvt->col;
-         }
-         nKey = ( mEvt->buttonstate & M_BUTTON_LEFT ) ?
-            ( ( mEvt->buttonstate & M_BUTTON_LDBLCK ) ? K_LDBLCLK :
-              K_LBUTTONDOWN ) : K_LBUTTONUP;
-         mEvt->lbuttons ^= M_BUTTON_LEFT;
-         mEvt->buttonstate &= ~M_BUTTON_LDBLCK;
+         nKey = K_MOUSEMOVE;
+         mEvt->buttonstate &= ~M_CURSOR_MOVE;
       }
-      else if ( butt & M_BUTTON_RIGHT )
+      else if ( mEvt->buttonstate & M_BUTTON_WHEELUP )
       {
-         if ( mEvt->buttonstate & M_BUTTON_RIGHT )
-         {
-            mEvt->rbdn_row = mEvt->row;
-            mEvt->rbdn_col = mEvt->col;
-         }
-         else
-         {
-            mEvt->rbup_row = mEvt->row;
-            mEvt->rbup_col = mEvt->col;
-         }
-         nKey = ( mEvt->buttonstate & M_BUTTON_RIGHT ) ?
-            ( ( mEvt->buttonstate & M_BUTTON_RDBLCK ) ? K_RDBLCLK :
-              K_RBUTTONDOWN ) : K_RBUTTONUP;
-         mEvt->lbuttons ^= M_BUTTON_RIGHT;
-         mEvt->buttonstate &= ~M_BUTTON_RDBLCK;
+         nKey = K_MWFORWARD;
+         mEvt->buttonstate &= ~M_BUTTON_WHEELUP;
       }
-      else if ( butt & M_BUTTON_MIDDLE )
+      else if ( mEvt->buttonstate & M_BUTTON_WHEELDOWN )
       {
-         if ( mEvt->buttonstate & M_BUTTON_MIDDLE )
-         {
-            mEvt->mbdn_row = mEvt->row;
-            mEvt->mbdn_col = mEvt->col;
-         }
-         else
-         {
-            mEvt->mbup_row = mEvt->row;
-            mEvt->mbup_col = mEvt->col;
-         }
-         nKey = ( mEvt->buttonstate & M_BUTTON_MIDDLE ) ?
-            ( ( mEvt->buttonstate & M_BUTTON_MDBLCK ) ? K_MDBLCLK :
-              K_MBUTTONDOWN ) : K_MBUTTONUP;
-         mEvt->lbuttons ^= M_BUTTON_MIDDLE;
-         mEvt->buttonstate &= ~M_BUTTON_MDBLCK;
+         nKey = K_MWBACKWARD;
+         mEvt->buttonstate &= ~M_BUTTON_WHEELDOWN;
       }
       else
-         mEvt->lbuttons = mEvt->buttonstate;
+      {
+         int butt = mEvt->lbuttons ^ mEvt->buttonstate;
+
+         if ( butt & M_BUTTON_LEFT )
+         {
+            if ( mEvt->buttonstate & M_BUTTON_LEFT )
+            {
+               mEvt->lbdn_row = mEvt->row;
+               mEvt->lbdn_col = mEvt->col;
+            }
+            else
+            {
+               mEvt->lbup_row = mEvt->row;
+               mEvt->lbup_col = mEvt->col;
+            }
+            nKey = ( mEvt->buttonstate & M_BUTTON_LEFT ) ?
+               ( ( mEvt->buttonstate & M_BUTTON_LDBLCK ) ? K_LDBLCLK :
+                 K_LBUTTONDOWN ) : K_LBUTTONUP;
+            mEvt->lbuttons ^= M_BUTTON_LEFT;
+            mEvt->buttonstate &= ~M_BUTTON_LDBLCK;
+         }
+         else if ( butt & M_BUTTON_RIGHT )
+         {
+            if ( mEvt->buttonstate & M_BUTTON_RIGHT )
+            {
+               mEvt->rbdn_row = mEvt->row;
+               mEvt->rbdn_col = mEvt->col;
+            }
+            else
+            {
+               mEvt->rbup_row = mEvt->row;
+               mEvt->rbup_col = mEvt->col;
+            }
+            nKey = ( mEvt->buttonstate & M_BUTTON_RIGHT ) ?
+               ( ( mEvt->buttonstate & M_BUTTON_RDBLCK ) ? K_RDBLCLK :
+                 K_RBUTTONDOWN ) : K_RBUTTONUP;
+            mEvt->lbuttons ^= M_BUTTON_RIGHT;
+            mEvt->buttonstate &= ~M_BUTTON_RDBLCK;
+         }
+         else if ( butt & M_BUTTON_MIDDLE )
+         {
+            if ( mEvt->buttonstate & M_BUTTON_MIDDLE )
+            {
+               mEvt->mbdn_row = mEvt->row;
+               mEvt->mbdn_col = mEvt->col;
+            }
+            else
+            {
+               mEvt->mbup_row = mEvt->row;
+               mEvt->mbup_col = mEvt->col;
+            }
+            nKey = ( mEvt->buttonstate & M_BUTTON_MIDDLE ) ?
+               ( ( mEvt->buttonstate & M_BUTTON_MDBLCK ) ? K_MDBLCLK :
+                 K_MBUTTONDOWN ) : K_MBUTTONUP;
+            mEvt->lbuttons ^= M_BUTTON_MIDDLE;
+            mEvt->buttonstate &= ~M_BUTTON_MDBLCK;
+         }
+         else
+            mEvt->lbuttons = mEvt->buttonstate;
+      }
    }
 
    return nKey;
@@ -1060,29 +1062,26 @@ static int getMouseKey( mouseEvent * mEvt )
 
 static void chk_mevtdblck( mouseEvent * mEvt )
 {
-   if ( ( mEvt->lbuttons & M_BUTTON_KEYMASK ) !=
-        ( mEvt->buttonstate & M_BUTTON_KEYMASK ) )
+   int newbuttons = ( mEvt->buttonstate & ~mEvt->lbuttons ) & M_BUTTON_KEYMASK;
+
+   if ( newbuttons != 0 )
    {
       struct timeval tv;
 
       TIMEVAL_GET( tv );
-
-      if ( ( mEvt->buttonstate & M_BUTTON_LEFT ) &&
-          ~( mEvt->lbuttons & M_BUTTON_LEFT ) )
+      if ( newbuttons & M_BUTTON_LEFT )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BL_time ) )
             mEvt->buttonstate |= M_BUTTON_LDBLCK;
          TIMEVAL_ADD( mEvt->BL_time, tv, mEvt->click_delay );
       }
-      if ( ( mEvt->buttonstate & M_BUTTON_MIDDLE ) &&
-          ~( mEvt->lbuttons & M_BUTTON_MIDDLE ) )
+      if ( newbuttons & M_BUTTON_MIDDLE )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BM_time ) )
             mEvt->buttonstate |= M_BUTTON_MDBLCK;
          TIMEVAL_ADD( mEvt->BM_time, tv, mEvt->click_delay );
       }
-      if ( ( mEvt->buttonstate & M_BUTTON_RIGHT ) &&
-          ~( mEvt->lbuttons & M_BUTTON_RIGHT ) )
+      if ( newbuttons & M_BUTTON_RIGHT )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BR_time ) )
             mEvt->buttonstate |= M_BUTTON_RDBLCK;
@@ -1093,18 +1092,18 @@ static void chk_mevtdblck( mouseEvent * mEvt )
 
 static void set_tmevt( unsigned char *cMBuf, mouseEvent * mEvt )
 {
-   if ( ( cMBuf[0] & 0x60 ) == 0x60 )
+   int row, col;
+
+   col = cMBuf[1] - 33;
+   row = cMBuf[2] - 33;
+   if( mEvt->row != row || mEvt->col != col )
    {
-      if ( ( cMBuf[0] & 0x63 ) == 0x60 )
-      {
-         mEvt->buttonstate |= M_BUTTON_WHEELUP;
-      }
-      else if ( ( cMBuf[0] & 0x63 ) == 0x61 )
-      {
-         mEvt->buttonstate |= M_BUTTON_WHEELDOWN;
-      }
+      mEvt->buttonstate |= M_CURSOR_MOVE;
+      mEvt->row = row;
+      mEvt->col = col;
    }
-   else switch ( cMBuf[0] & 0x3 )
+
+   switch( cMBuf[0] & 0xC3 )
    {
       case 0x0:
          mEvt->buttonstate |= M_BUTTON_LEFT;
@@ -1118,9 +1117,15 @@ static void set_tmevt( unsigned char *cMBuf, mouseEvent * mEvt )
       case 0x3:
          mEvt->buttonstate &= ~(M_BUTTON_KEYMASK|M_BUTTON_DBLMASK);
          break;
+      case 0x40:
+         if( cMBuf[0] & 0x20 )
+            mEvt->buttonstate |= M_BUTTON_WHEELUP;
+         break;
+      case 0x41:
+         if( cMBuf[0] & 0x20 )
+            mEvt->buttonstate |= M_BUTTON_WHEELDOWN;
+         break;
    }
-   mEvt->col = cMBuf[1] - 33;
-   mEvt->row = cMBuf[2] - 33;
    chk_mevtdblck( mEvt );
    /* printf("\n\rmouse event: %02x, %02x, %02x\n\r", cMBuf[0], cMBuf[1], cMBuf[2]); */
    return;
@@ -1142,6 +1147,8 @@ static int set_gpmevt( int fd, int mode, void *data )
    {
       mEvt->row = gEvt.y;
       mEvt->col = gEvt.x;
+      if ( gEvt.type & GPM_MOVE )
+         mEvt->buttonstate |= M_CURSOR_MOVE;
       if ( gEvt.type & GPM_DOWN )
       {
          if ( gEvt.buttons & GPM_B_LEFT )
@@ -1186,13 +1193,26 @@ static void flush_gpmevt( mouseEvent * mEvt )
 }
 #endif
 
+static void disp_mousecursor( InOutBase * ioBase )
+{
+#ifdef HAVE_GPM_H
+   if ( ioBase->mouse_type == MOUSE_GPM && gpm_visiblepointer )
+   {
+      Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row,
+                       gpm_consolefd );
+   }
+#else
+   HB_SYMBOL_UNUSED( ioBase );
+#endif
+}
+
 static void mouse_init( InOutBase * ioBase )
 {
    if ( ioBase->terminal_type == TERM_XTERM )
    {
       /* save old hilit tracking & enable mouse tracking */
       write_ttyseq( ioBase, "\033[?1001s\033[?1002h" );
-      ioBase->is_mouse = 1;
+      ioBase->mouse_type = MOUSE_XTERM;
       memset( ( void * ) &ioBase->mLastEvt, 0, sizeof( ioBase->mLastEvt ) );
       ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
       /* curses mouse buttons check */
@@ -1218,7 +1238,7 @@ static void mouse_init( InOutBase * ioBase )
          if ( ( flags = fcntl( gpm_fd, F_GETFL, 0 ) ) != -1 )
             fcntl( gpm_fd, F_SETFL, flags | O_NONBLOCK );
 
-         ioBase->is_mouse = 1;
+         ioBase->mouse_type = MOUSE_GPM;
          memset( ( void * ) &ioBase->mLastEvt, 0, sizeof( ioBase->mLastEvt ) );
          ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
          flush_gpmevt( &ioBase->mLastEvt );
@@ -1241,19 +1261,16 @@ static void mouse_init( InOutBase * ioBase )
 
 static void mouse_exit( InOutBase * ioBase )
 {
-   if ( ioBase->terminal_type == TERM_XTERM )
+   if ( ioBase->mouse_type == MOUSE_XTERM )
    {
       /* disable mouse tracking & restore old hilit tracking */
       write_ttyseq( ioBase, "\033[?1002l\033[?1001r" );
    }
 #ifdef HAVE_GPM_H
-   else if ( ioBase->terminal_type == TERM_LINUX )
+   else if ( ioBase->mouse_type == MOUSE_GPM && gpm_fd >= 0 )
    {
-      if ( ioBase->is_mouse && gpm_fd >= 0 )
-      {
-         del_efds( ioBase, gpm_fd );
-         Gpm_Close();
-      }
+      del_efds( ioBase, gpm_fd );
+      Gpm_Close();
    }
 #endif
 }
@@ -1297,9 +1314,8 @@ static void disp_cursor( InOutBase * ioBase )
       {
          if ( ioBase->terminal_type == TERM_LINUX )
          {
-            snprintf( escseq, sizeof( escseq ) - 1, "\033[?25%c\033[?%hdc",
+            snprintf( escseq, sizeof( escseq ), "\033[?25%c\033[?%hdc",
                       ioBase->cursor == SC_NONE ? 'l' : 'h', lcurs );
-            escseq[sizeof( escseq ) - 1] = '\0';
             write_ttyseq( ioBase, escseq );
          }
          else if ( cv != NULL )
@@ -1342,12 +1358,7 @@ static void gt_refresh( InOutBase * ioBase )
       wmove( ioBase->stdscr, ioBase->row, ioBase->col );
       wrefresh( ioBase->stdscr );
       disp_cursor( ioBase );
-#ifdef HAVE_GPM_H
-      if ( ioBase->is_mouse && ioBase->terminal_type == TERM_LINUX )
-         if ( gpm_visiblepointer )
-            Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row,
-                             gpm_consolefd );
-#endif
+      disp_mousecursor( ioBase );
    }
 }
 
@@ -1664,10 +1675,9 @@ static void gt_tone( InOutBase * ioBase, double dFrequency, double dDuration )
 
    if ( ioBase->terminal_type == TERM_LINUX && ioBase->beep != NULL )
    {
-      snprintf( escseq, sizeof( escseq ) - 1, "\033[10;%hd]\033[11;%hd]%s",
+      snprintf( escseq, sizeof( escseq ), "\033[10;%hd]\033[11;%hd]%s",
                 ( int ) dFrequency,
                 ( int ) ( dDuration * 1000.0 / 18.2 ), ioBase->beep );
-      escseq[sizeof( escseq ) - 1] = '\0';
       write_ttyseq( ioBase, escseq );
    }
    else
@@ -1773,8 +1783,7 @@ static int gt_setsize( InOutBase * ioBase, int rows, int cols )
 
    if ( ioBase->terminal_type == TERM_XTERM )
    {
-      snprintf( escseq, sizeof( escseq ) - 1, "\033[8;%hd;%hdt", rows, cols );
-      escseq[sizeof( escseq ) - 1] = '\0';
+      snprintf( escseq, sizeof( escseq ), "\033[8;%hd;%hdt", rows, cols );
       write_ttyseq( ioBase, escseq );
       /* dirty hack - wait for SIGWINCH */
       if ( gt_getsize( ioBase, &r, &c ) > 0 )
@@ -1849,8 +1858,7 @@ static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
             ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_PROTECT;
             break;
          case 4:
-            ioBase->std_chmap[i] = ioBase->box_chmap[i] =
-               A_ALTCHARSET | A_PROTECT;
+            ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
             break;
          case 5:
             get_acsc( ioBase, ch & 0xff, &ch );
@@ -1866,7 +1874,7 @@ static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
       ioBase->std_chmap[i] |= ch;
       ioBase->box_chmap[i] |= ch;
 
-      if ( ( unsigned int ) i != ( ch & A_CHARTEXT ) &&
+      if ( i != ( int ) ( ch & A_CHARTEXT ) &&
            ( ioBase->std_chmap[i] & A_ALTCHARSET ) == 0 )
       {
          if ( ioBase->out_transtbl == NULL )
@@ -1879,15 +1887,15 @@ static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
    }
    if ( aSet )
    {
-      for ( i = 0; i < 256 && ( c = ( unsigned char ) src[i] ); i++ )
+      for( i = 0; i < 256 && ( c = ( unsigned char ) src[i] ); i++ )
       {
          d = ( unsigned char ) dst[i];
          ioBase->std_chmap[c] = d | A_NORMAL;
-         if ( box )
+         if( box )
             ioBase->box_chmap[c] = d | A_NORMAL;
-         if ( c != d )
+         if( c != d )
          {
-            if ( ioBase->out_transtbl == NULL )
+            if( ioBase->out_transtbl == NULL )
             {
                ioBase->out_transtbl = ( unsigned char * )hb_xgrab( 256 );
                memset( ioBase->out_transtbl, 0, 256 );
@@ -1895,7 +1903,6 @@ static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
             ioBase->out_transtbl[c] = d;
          }
       }
-
    }
 }
 
@@ -2009,7 +2016,7 @@ static InOutBase *create_ioBase( char *term, int infd, int outfd, int errfd,
    ioBase->acsc = tiGetS( "acsc" );
 
    ioBase->charmap = ( int * ) hb_xgrab( 256 * sizeof( int ) );
-   HB_GT_FUNC( gt_chrmapinit( ioBase->charmap, term ) );
+   hb_gt_chrmapinit( ioBase->charmap, term, ioBase->terminal_type == TERM_XTERM );
    setDispTrans( ioBase, NULL, NULL, 0 );
 
    ioBase->attr_mask = ( chtype ) -1;
@@ -2224,18 +2231,19 @@ static InOutBase *create_newXterm( void )
       else
          ptr = ptyname;
       snprintf( buf, sizeof( buf ), "-S%s/%d", ptr, masterfd );
-      buf[sizeof( buf ) - 1] = '\0';
 /*
-        close(0);
-        close(1);
-        close(2);
+      close(0);
+      close(1);
+      close(2);
 */
 /*
-   dup2(masterfd, 0);
-   dup2(masterfd, 1);
-   //fd = open("/tmp/hb-xterm.log", O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
-   fd = open("/dev/null", O_WRONLY);
-   dup2(fd, 2);
+      dup2(masterfd, 0);
+      dup2(masterfd, 1);
+#if 0
+      fd = open("/tmp/hb-xterm.log", O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
+#endif
+      fd = open("/dev/null", O_WRONLY);
+      dup2(fd, 2);
 */
       for ( fd = 3; fd < MAXFD; ++fd )
          if ( fd != masterfd )
@@ -2337,1198 +2345,20 @@ static void del_all_ioBase( void )
 }
 
 
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ) )
-{
-   InOutBase *ioBase;
-
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Init()" ) );
-
-   if ( !s_ioBase )
-   {
-      s_iStdIn = iFilenoStdin;
-      s_iStdOut = iFilenoStdout;
-      s_iStdErr = iFilenoStderr;
-#ifdef HB_GT_CRS_TTYHACK
-      {
-         int ittyfd;
-
-         if ( ( ittyfd = open( "/dev/tty", O_RDWR ) ) != -1 )
-            iFilenoStdin = iFilenoStdout = ittyfd;
-      }
-#endif
-      set_signals();
-      ioBase =
-         create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
-      if ( ioBase )
-         add_new_ioBase( ioBase );
-   }
-   if ( !s_ioBase )
-   {
-      char *errmsg =
-         "\r\nInternal error : screen driver initialization failure\r\n";
-      /* TODO: a standard Harbour error should be generated here ! */
-      write( iFilenoStderr, errmsg, strlen( errmsg ) );
-      exit( 20 );
-   }
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_Exit( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Exit()" ) );
-
-   if ( s_clipboard != NULL )
-   {
-      hb_xfree( s_clipboard );
-   }
-
-   del_all_ioBase();
-}
-
-/* *********************************************************************** */
-
-USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()" ) );
-
-   if ( s_WinSizeChangeFlag )
-   {
-      s_WinSizeChangeFlag = FALSE;
-      gt_resize( s_ioBase );
-   }
-
-   return _GetScreenHeight();
-}
-
-/* *********************************************************************** */
-
-USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()" ) );
-
-   if ( s_WinSizeChangeFlag )
-   {
-      s_WinSizeChangeFlag = FALSE;
-      gt_resize( s_ioBase );
-   }
-
-   return _GetScreenWidth();
-}
-
-
-/* *********************************************************************** */
-
-SHORT HB_GT_FUNC( gt_Col( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Col()" ) );
-
-   return s_ioBase->col;
-}
-
-/* *********************************************************************** */
-
-SHORT HB_GT_FUNC( gt_Row( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Row()" ) );
-
-   return s_ioBase->row;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ) )
-{
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod ) );
-
-   HB_SYMBOL_UNUSED( iMethod );
-
-   s_ioBase->row = iRow;
-   s_ioBase->col = iCol;
-
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_AdjustPos( BYTE * pStr, ULONG ulLen ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_AdjustPos(%s, %lu)", pStr, ulLen ) );
-
-   HB_SYMBOL_UNUSED( pStr );
-   HB_SYMBOL_UNUSED( ulLen );
-
-   return FALSE;
-}
-
-/* *********************************************************************** */
-
-USHORT HB_GT_FUNC( gt_GetCursorStyle( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetCursorStyle()" ) );
-
-   if ( s_ioBase->cursor == SC_UNDEF )
-      return SC_NORMAL;
-
-   return s_ioBase->cursor;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetCursorStyle( USHORT uiStyle ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetCursorStyle(%hu)", uiStyle ) );
-
-   set_cursor( s_ioBase, uiStyle );
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_IsColor( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_IsColor()" ) );
-
-   return s_ioBase->is_color;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_DispBegin( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispBegin()" ) );
-
-   s_ioBase->disp_count++;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_DispEnd( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispEnd()" ) );
-
-   if ( s_ioBase->disp_count )
-      s_ioBase->disp_count--;
-
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-USHORT HB_GT_FUNC( gt_DispCount( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispCount()" ) );
-
-   return s_ioBase->disp_count;
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_SetMode( USHORT uiRows, USHORT uiCols ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetMode(%hu, %hu)", uiRows, uiCols ) );
-
-   if ( gt_setsize( s_ioBase, uiRows, uiCols ) == 0 )
-      return TRUE;
-
-   return FALSE;
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_GetBlink( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetBlink()" ) );
-
-   /* TODO: current implementation disables blinking/intensity */
-   return ( s_ioBase->attr_mask & A_BLINK ) ? TRUE : FALSE;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetBlink( BOOL bBlink ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetBlink(%d)", ( int ) bBlink ) );
-
-   /* TODO: current implementation disables blinking/intensity */
-   if ( bBlink )
-      s_ioBase->attr_mask |= A_BLINK;
-   else
-      s_ioBase->attr_mask &= ~A_BLINK;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Tone(%lf, %lf)", dFrequency, dDuration ) );
-
-   gt_tone( s_ioBase, dFrequency, dDuration );
-
-   if ( s_ioBase->terminal_type == TERM_LINUX )
-   {
-      /* The conversion from Clipper (DOS) timer tick units to
-         milliseconds is * 1000.0 / 18.2. */
-      dDuration /= 18.2;
-      hb_idleSleep( dDuration );
-   }
-}
-
-/* *********************************************************************** */
-
-char * HB_GT_FUNC(gt_Version( int iType ))
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
-
-   if ( iType == 0 )
-      return HB_GT_DRVNAME( HB_GT_NAME );
-
-   return "Harbour Terminal: nCurses";
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_OutStd( BYTE * pbyStr, ULONG ulLen ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_OutStd(%s, %hu)", pbyStr, ulLen ) );
-
-   if ( s_ioBase )
-   {
-      if ( s_ioBase->stdoutfd == -1 )
-      {
-         HB_GT_FUNC( gt_DispBegin() );
-         hb_gtWriteCon( pbyStr, ulLen );
-         HB_GT_FUNC( gt_DispEnd() );
-      }
-      else
-         gt_outstd( s_ioBase, pbyStr, ulLen );
-   }
-   else
-      hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_OutErr( BYTE * pbyStr, ULONG ulLen ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_OutErr(%s, %hu)", pbyStr, ulLen ) );
-   if ( s_ioBase )
-   {
-      if ( s_ioBase->stderrfd == -1 )
-      {
-         HB_GT_FUNC( gt_DispBegin() );
-         hb_gtWriteCon( pbyStr, ulLen );
-         HB_GT_FUNC( gt_DispEnd() );
-      }
-      else
-         gt_outerr( s_ioBase, ( char * ) pbyStr, ulLen );
-   }
-   else
-      hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_Suspend( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Suspend()" ) );
-
-   gt_refresh( s_ioBase );
-   endwin();
-   gt_ttyrestore( s_ioBase );
-   return TRUE;
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_Resume( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Resume()" ) );
-
-   s_ioBase->lcursor = SC_UNDEF;
-   wrefresh( s_ioBase->stdscr );
-   gt_ttyset( s_ioBase );
-   /* redrawwin( s_ioBase->stdscr ); */
-   gt_refresh( s_ioBase );
-   return TRUE;
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_PreExt( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_PreExt()" ) );
-
-   gt_refresh( s_ioBase );
-   return TRUE;
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_PostExt( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_PostExt()" ) );
-
-   return TRUE;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_RectSize( USHORT rows, USHORT cols ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_RectSize(%hu, %hu)", rows, cols ) );
-
-   return rows * cols * sizeof( chtype );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_GetText
-            ( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight,
-              BYTE * pbyDst ) )
-{
-   int col;
-   chtype *pBuffer = ( chtype * ) pbyDst;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom,
-               uiRight, pbyDst ) );
-
-   while ( uiTop <= uiBottom )
-   {
-      for ( col = uiLeft; ( USHORT ) col <= uiRight; col++, pBuffer++ )
-         *pBuffer = mvwinch( s_ioBase->stdscr, uiTop, col );
-      ++uiTop;
-   }
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_PutText
-            ( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight,
-              BYTE * pbySrc ) )
-{
-   int cols;
-   USHORT maxcol;
-   chtype *pBuffer = ( chtype * ) pbySrc;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom,
-               uiRight, pbySrc ) );
-
-   cols = uiRight - uiLeft + 1;
-   maxcol = _GetScreenWidth() - uiLeft;
-   if ( maxcol > cols )
-      maxcol = cols;
-
-   while ( uiTop <= uiBottom )
-   {
-      mvwaddchnstr( s_ioBase->stdscr, uiTop, uiLeft, pBuffer, maxcol );
-      pBuffer += cols;
-      ++uiTop;
-   }
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_SetAttribute
-            ( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight,
-              BYTE byAttr ) )
-{
-   int newAttr = s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask;
-   int dx;
-   chtype c;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", uiTop, uiLeft,
-               uiBottom, uiRight, ( int ) byAttr ) );
-
-   dx = _GetScreenWidth();
-   if ( uiRight >= dx )
-      uiRight = dx - 1;
-
-   dx = _GetScreenHeight();
-   if ( uiBottom >= dx )
-      uiBottom = dx - 1;
-
-   while ( uiTop <= uiBottom )
-   {
-      for ( dx = uiLeft; dx <= uiRight; dx++ )
-      {
-         c = mvwinch( s_ioBase->stdscr, uiTop, dx );
-         /* extract character only (remember about alternate chars) */
-         c &= ( A_CHARTEXT | A_NORMAL | A_ALTCHARSET | A_PROTECT );
-         /* set new attribute */
-         c |= newAttr;
-         mvwaddch( s_ioBase->stdscr, uiTop, dx, c );
-      }
-      uiTop++;
-   }
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_Puts
-            ( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
-              ULONG ulLen ) )
-{
-   ULONG i;
-   int attr;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_Puts(%hu, %hu, %d, %p, %lu)", uiRow, uiCol,
-               ( int ) byAttr, pbyStr, ulLen ) );
-
-   attr = s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask;
-   wmove( s_ioBase->stdscr, uiRow, uiCol );
-
-   for ( i = 0; i < ulLen; ++i )
-      waddch( s_ioBase->stdscr, s_ioBase->std_chmap[pbyStr[i]] | attr );
-
-   /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_Replicate
-            ( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar,
-              ULONG ulLen ) )
-{
-   chtype ch;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr,
-               byChar, ulLen ) );
-
-   ch = s_ioBase->box_chmap[byChar] |
-      ( s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask );
-   wmove( s_ioBase->stdscr, uiRow, uiCol );
-
-   while ( ulLen-- )
-      waddch( s_ioBase->stdscr, ch );
-
-   /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-   gt_refresh( s_ioBase );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( gt_Scroll
-            ( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
-              BYTE byAttr, SHORT iRows, SHORT iCols ) )
-{
-   UINT uiSize;
-
-   int iLength = ( usRight - usLeft ) + 1;
-   int iCount, iColOld, iColNew, iColSize;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", usTop, usLeft,
-               usBottom, usRight, ( int ) byAttr, iRows, iCols ) );
-
-   if ( hb_gtRectSize( usTop, usLeft, usBottom, usRight, &uiSize ) == 0 )
-   {
-      unsigned char *fpBlank = ( unsigned char * ) hb_xgrab( iLength );
-      unsigned char *fpBuff =
-         ( unsigned char * ) hb_xgrab( iLength * sizeof( chtype ) );
-
-      memset( fpBlank, hb_ctGetClearB(), iLength );
-
-      iColOld = iColNew = usLeft;
-      if ( iCols >= 0 )
-      {
-         iColOld += iCols;
-         iColSize = ( int ) ( usRight - usLeft );
-         iColSize -= iCols;
-      }
-      else
-      {
-         iColNew -= iCols;
-         iColSize = ( int ) ( usRight - usLeft );
-         iColSize += iCols;
-      }
-
-      HB_GT_FUNC( gt_DispBegin() );
-
-      for ( iCount = ( iRows >= 0 ? usTop : usBottom );
-            ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
-            ( iRows >= 0 ? iCount++ : iCount-- ) )
-      {
-         int iRowPos = iCount + iRows;
-
-         /* Read the text to be scrolled into the current row */
-         if ( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
-            HB_GT_FUNC( gt_GetText
-                        ( iRowPos, iColOld, iRowPos, iColOld + iColSize,
-                          fpBuff ) );
-
-         /* Blank the scroll region in the current row */
-         HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
-
-         /* Write the scrolled text to the current row */
-         if ( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
-            HB_GT_FUNC( gt_PutText
-                        ( iCount, iColNew, iCount, iColNew + iColSize,
-                          fpBuff ) );
-      }
-
-      hb_xfree( fpBlank );
-      hb_xfree( fpBuff );
-
-      HB_GT_FUNC( gt_DispEnd() );
-   }
-}
-
 /* *********************************************************************** */
 
-USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
-                           BYTE * szBox, BYTE byAttr ) )
-{
-   int ret = 1;
-   chtype chAttr;
-   SHORT Row;
-   SHORT Col;
-   SHORT Height;
-   SHORT Width;
-   USHORT maxrow, maxcol;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_box(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right,
-               szBox, byAttr ) );
-
-   maxrow = _GetScreenHeight();
-   maxcol = _GetScreenWidth();
-
-   if ( ( Left >= 0 && Left < maxcol ) ||
-        ( Right >= 0 && Right < maxcol ) ||
-        ( Top >= 0 && Top < maxrow ) || ( Bottom >= 0 && Bottom < maxrow ) )
-   {
-      HB_GT_FUNC( gt_DispBegin() );
-
-      /* Ensure that box is drawn from top left to bottom right. */
-      if ( Top > Bottom )
-      {
-         SHORT tmp = Top;
-
-         Top = Bottom;
-         Bottom = tmp;
-      }
-      if ( Left > Right )
-      {
-         SHORT tmp = Left;
-
-         Left = Right;
-         Right = tmp;
-      }
-
-      /* get color attribute */
-      chAttr = s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask;
-
-      /* Draw the box or line as specified */
-      Height = Bottom - Top + 1;
-      Width = Right - Left + 1;
-
-      if ( Height > 1 && Width > 1 && Top >= 0 && Top < maxrow && Left >= 0
-           && Left < maxcol )
-         mvwaddch( s_ioBase->stdscr, Top, Left,
-                   s_ioBase->box_chmap[szBox[0]] | chAttr );
-
-      Col = ( Height > 1 ? Left + 1 : Left );
-      if ( Col < 0 )
-      {
-         Width += Col;
-         Col = 0;
-      }
-      if ( Right >= maxcol )
-      {
-         Width -= Right - maxcol;
-      }
-
-      if ( Col <= Right && Col < maxcol && Top >= 0 && Top < maxrow )
-         /* Top line */
-         HB_GT_FUNC( gt_Replicate
-                     ( Top, Col, byAttr, szBox[1],
-                       Width + ( ( Right - Left ) > 1 ? -2 : 0 ) ) );
-
-      if ( Height > 1 && ( Right - Left ) > 1 && Right < maxcol && Top >= 0
-           && Top < maxrow )
-         /* Upper right corner */
-         mvwaddch( s_ioBase->stdscr, Top, Right,
-                   s_ioBase->box_chmap[szBox[2]] | chAttr );
-
-      if ( szBox[8] && Height > 2 && Width > 2 )
-      {
-         for ( Row = Top + 1; Row < Bottom; Row++ )
-         {
-            if ( Row >= 0 && Row < maxrow )
-            {
-               Col = Left;
-               if ( Col < 0 )
-                  Col = 0;      /* The width was corrected earlier. */
-               else
-                  /* Left side */
-                  mvwaddch( s_ioBase->stdscr, Row, Col++,
-                            s_ioBase->box_chmap[szBox[7]] | chAttr );
-               /* Fill */
-               HB_GT_FUNC( gt_Replicate
-                           ( Row, Col, byAttr, szBox[8], Width - 2 ) );
-               if ( Right < maxcol )
-                  /* Right side */
-                  mvwaddch( s_ioBase->stdscr, Row, Right,
-                            s_ioBase->box_chmap[szBox[3]] | chAttr );
-            }
-         }
-      }
-      else
-      {
-         for ( Row = ( Width > 1 ? Top + 1 : Top );
-               Row < ( ( Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
-         {
-            if ( Row >= 0 && Row < maxrow )
-            {
-               if ( Left >= 0 && Left < maxcol )
-                  /* Left side */
-                  mvwaddch( s_ioBase->stdscr, Row, Left,
-                            s_ioBase->box_chmap[szBox[7]] | chAttr );
-               if ( ( Width > 1 || Left < 0 ) && Right < maxcol )
-                  /* Right side */
-                  mvwaddch( s_ioBase->stdscr, Row, Right,
-                            s_ioBase->box_chmap[szBox[3]] | chAttr );
-            }
-         }
-      }
-
-      if ( Height > 1 && Width > 1 )
-      {
-         if ( Left >= 0 && Bottom < maxrow )
-            /* Bottom left corner */
-            mvwaddch( s_ioBase->stdscr, Bottom, Left,
-                      s_ioBase->box_chmap[szBox[6]] | chAttr );
-
-         Col = Left + 1;
-         if ( Col < 0 )
-            Col = 0;            /* The width was corrected earlier. */
-
-         if ( Col <= Right && Bottom < maxrow )
-            /* Bottom line */
-            HB_GT_FUNC( gt_Replicate
-                        ( Bottom, Col, byAttr, szBox[5], Width - 2 ) );
-
-         if ( Right < maxcol && Bottom < maxrow )
-            /* Bottom right corner */
-            mvwaddch( s_ioBase->stdscr, Bottom, Right,
-                      s_ioBase->box_chmap[szBox[4]] | chAttr );
-      }
-
-      /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-      HB_GT_FUNC( gt_DispEnd() );
-      ret = 0;
-   }
-
-   return ret;
-}
-
-/* *********************************************************************** */
-
-USHORT
-HB_GT_FUNC( gt_BoxD
-            ( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame,
-              BYTE byAttr ) )
-{
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_boxD(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right,
-               pbyFrame, byAttr ) );
-
-   return HB_GT_FUNC( gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr ) );
-}
-
-/* *********************************************************************** */
-
-USHORT
-HB_GT_FUNC( gt_BoxS
-            ( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame,
-              BYTE byAttr ) )
-{
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_boxD(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right,
-               pbyFrame, byAttr ) );
-
-   return HB_GT_FUNC( gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr ) );
-}
-
-/* *********************************************************************** */
-
-USHORT
-HB_GT_FUNC( gt_HorizLine
-            ( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ) )
-{
-   int ret = 1;
-   USHORT uCols;
-   chtype ch;
-   USHORT maxrow, maxcol;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_HorizLine(%i, %i, %i, %hu, %hu)", Row, Left, Right,
-               byChar, byAttr ) );
-
-   maxrow = _GetScreenHeight();
-   maxcol = _GetScreenWidth();
-
-   if ( Row >= 0 && Row < maxrow )
-   {
-      if ( Left < 0 )
-         Left = 0;
-      else if ( Left >= maxcol )
-         Left = maxcol - 1;
-
-      if ( Right < 0 )
-         Right = 0;
-      else if ( Right >= maxcol )
-         Right = maxcol - 1;
-
-      if ( Left <= Right )
-      {
-         wmove( s_ioBase->stdscr, Row, Left );
-         uCols = Right - Left + 1;
-      }
-      else
-      {
-         wmove( s_ioBase->stdscr, Row, Right );
-         uCols = Left - Right + 1;
-      }
-
-      ch = s_ioBase->box_chmap[byChar] |
-         ( s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask );
-      while ( uCols-- )
-         waddch( s_ioBase->stdscr, ch );
-
-      /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-      gt_refresh( s_ioBase );
-      ret = 0;
-   }
-
-   return ret;
-}
-
-/* *********************************************************************** */
-
-USHORT
-HB_GT_FUNC( gt_VertLine
-            ( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ) )
-{
-   int ret = 1;
-   USHORT uRow;
-   chtype ch;
-   USHORT maxrow, maxcol;
-
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_gt_VertLine(%i, %i, %i, %hu, %hu)", Col, Top, Bottom, byChar,
-               byAttr ) );
-
-   maxrow = _GetScreenHeight();
-   maxcol = _GetScreenWidth();
-
-   if ( Col >= 0 && Col < maxcol )
-   {
-      if ( Top < 0 )
-         Top = 0;
-      else if ( Top >= maxrow )
-         Top = maxrow - 1;
-
-      if ( Bottom < 0 )
-         Bottom = 0;
-      else if ( Bottom >= maxrow )
-         Bottom = maxrow - 1;
-
-      if ( Top <= Bottom )
-         uRow = Top;
-      else
-      {
-         uRow = Bottom;
-         Bottom = Top;
-      }
-
-      ch = s_ioBase->box_chmap[byChar] |
-         ( s_ioBase->attr_map[byAttr] & s_ioBase->attr_mask );
-
-      while ( uRow <= Bottom )
-         mvwaddch( s_ioBase->stdscr, uRow++, Col, ch );
-
-      /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-      gt_refresh( s_ioBase );
-      ret = 0;
-   }
-
-   return ret;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( mouse_Init( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Init()" ) );
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( mouse_Exit( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Exit()" ) );
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( mouse_IsPresent( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_IsPresent()" ) );
-
-   return s_ioBase->is_mouse;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( mouse_Show( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Show()" ) );
-
-#ifdef HAVE_GPM_H
-   if ( s_ioBase->terminal_type == TERM_LINUX && s_ioBase->is_mouse )
-   {
-      gpm_visiblepointer = 1;
-      Gpm_DrawPointer( s_ioBase->mLastEvt.col, s_ioBase->mLastEvt.row,
-                       gpm_consolefd );
-   }
-#endif
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( mouse_Hide( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Hide()" ) );
-
-#ifdef HAVE_GPM_H
-   if ( s_ioBase->terminal_type == TERM_LINUX && s_ioBase->is_mouse )
-   {
-      gpm_visiblepointer = 0;
-   }
-#endif
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( mouse_Col( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Col()" ) );
-
-   return s_ioBase->mLastEvt.col;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( mouse_Row( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_Row()" ) );
-
-   return s_ioBase->mLastEvt.row;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( mouse_SetPos( int iRow, int iCol ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_SetPos(%i, %i)", iRow, iCol ) );
-
-   /* it does really nothing */
-   s_ioBase->mLastEvt.col = iCol;
-   s_ioBase->mLastEvt.row = iRow;
-#ifdef HAVE_GPM_H
-   if ( s_ioBase->terminal_type == TERM_LINUX && s_ioBase->is_mouse )
-      if ( gpm_visiblepointer )
-         Gpm_DrawPointer( iCol, iRow, gpm_consolefd );
-#endif
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( mouse_IsButtonPressed( int iButton ) )
-{
-   BOOL ret = FALSE;
-
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_IsButtonPressed(%i)", iButton ) );
-
-   if ( s_ioBase->is_mouse )
-   {
-      int mask;
-
-      mask = ( iButton == 1 ) ? M_BUTTON_LEFT : M_BUTTON_RIGHT;
-      ret = ( s_ioBase->mLastEvt.buttonstate & mask ) != 0;
-   }
-
-   return ret;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( mouse_CountButton( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_mouse_CountButton()" ) );
-
-   return ( s_ioBase->mButtons );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ) )
-{
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_mouse_SetBounds(%i, %i, %i, %i)", iTop, iLeft, iBottom,
-               iRight ) );
-
-   HB_SYMBOL_UNUSED( iTop );
-   HB_SYMBOL_UNUSED( iLeft );
-   HB_SYMBOL_UNUSED( iBottom );
-   HB_SYMBOL_UNUSED( iRight );
-}
-
-/* *********************************************************************** */
-
-void
-HB_GT_FUNC( mouse_GetBounds
-            ( int *piTop, int *piLeft, int *piBottom, int *piRight ) )
-{
-   HB_TRACE( HB_TR_DEBUG,
-             ( "hb_mouse_GetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom,
-               piRight ) );
-
-   *piTop = *piLeft = 0;
-   *piBottom = _GetScreenHeight() - 1;
-   *piRight = _GetScreenWidth() - 1;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_ExtendedKeySupport( void ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_ExtendedKeySupport()" ) );
-
-   return ( 0 );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_ReadKey(%d)", ( int ) eventmask ) );
-   HB_SYMBOL_UNUSED( eventmask );
-
-   return wait_key( s_ioBase, -1 );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_WaitKey( double dTimeOut ) )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_ReadKey(%f)", dTimeOut ) );
-
-   return wait_key( s_ioBase, ( int ) ( dTimeOut * 1000.0 ) );
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetKeyTrans( unsigned char *szSrc, unsigned char *szDst ) )
-{
-   setKeyTrans( s_ioBase, szSrc, szDst );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_AddKeyMap( int iKey, char *szSequence ) )
-{
-   return addKeyMap( s_ioBase, SET_CLIPKEY( iKey ), szSequence );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_RemoveKeyMap( char *szSequence ) )
-{
-   return removeKeyMap( s_ioBase, szSequence );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_ESCdelay( int iDelay ) )
-{
-   int iRet = s_ioBase->esc_delay;
-
-   s_ioBase->esc_delay = iDelay;
 
-   return iRet;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetInterruptKey( int iInterupt ) )
-{
-   set_sig_keys( s_ioBase, iInterupt, -1, -1 );
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetDebugKey( int iDebug ) )
-{
-   set_sig_keys( s_ioBase, -1, iDebug, -1 );
-}
-
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_GetSignalFlag( int iSig ) )
-{
-   BOOL bRetVal = FALSE;
-
-   if ( iSig > 0 && iSig < MAX_SIGNO && s_SignalTable[iSig] )
-   {
-      bRetVal = TRUE;
-      s_SignalTable[iSig] = FALSE;
-   }
-
-   return bRetVal;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_CatchSignal( int iSig ) )
-{
-   set_sig_handler( iSig );
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_Shft_Pressed( void ) )
-{
-   return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0 &&
-      ( s_ioBase->key_flag & KEY_ALTMASK ) != 0;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_Ctrl_Pressed( void ) )
-{
-   return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_Alt_Pressed( void ) )
-{
-   return ( s_ioBase->key_flag & KEY_ALTMASK ) != 0;
-}
-
-/* *********************************************************************** */
-
-int HB_GT_FUNC( gt_Kbd_State( void ) )
-{
-   return s_ioBase->key_flag;
-}
-
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
+BOOL HB_GT_FUNC( gt_AddEventHandle( int iFile, int iMode,
+                                    int ( *eventFunc ) ( int, int, void * ),
+                                    void *data ) )
 {
-#ifndef HB_CDP_SUPPORT_OFF
-   if ( !pszHostCDP || !*pszHostCDP )
-   {
-      pszHostCDP = hb_cdp_page->id;
-      if ( !pszHostCDP )
-         pszHostCDP = pszTermCDP;
-   }
-   if ( !pszTermCDP || !*pszTermCDP )
-      pszTermCDP = pszHostCDP;
-
-   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
-   {
-      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
-         cdpHost = hb_cdpFind( pszHostCDP );
-      if ( cdpTerm && cdpHost )
-      {
-         if ( cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
-         {
-            char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
-            char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
-
-            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
-            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
-            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
-            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
-
-            setDispTrans( s_ioBase, pszHostLetters, pszTermLetters, bBox ? 1 : 0 );
-
-            hb_xfree( pszHostLetters );
-            hb_xfree( pszTermLetters );
-         }
-         else
-            setDispTrans( s_ioBase, "", "", bBox ? 1 : 0 );
-      }
-   }
-#else
-   HB_SYMBOL_UNUSED( pszTermCDP );
-   HB_SYMBOL_UNUSED( pszHostCDP );
-#endif
+   return add_efds( s_ioBase, iFile, iMode, eventFunc, data ) == iFile;
 }
 
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
+void HB_GT_FUNC( gt_DelEventHandle( int iFileDes ) )
 {
-#ifndef HB_CDP_SUPPORT_OFF
-   if ( !pszHostCDP || !*pszHostCDP )
-   {
-      pszHostCDP = hb_cdp_page->id;
-   }
-
-   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
-   {
-      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
-         cdpHost = hb_cdpFind( pszHostCDP );
-      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
-           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
-      {
-         char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
-         char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
-
-         strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
-         strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
-         strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
-         strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
-
-         setKeyTrans( s_ioBase, ( unsigned char * ) pszTermLetters,
-                      ( unsigned char * ) pszHostLetters );
-
-         hb_xfree( pszHostLetters );
-         hb_xfree( pszTermLetters );
-      }
-   }
-#else
-   HB_SYMBOL_UNUSED( pszTermCDP );
-   HB_SYMBOL_UNUSED( pszHostCDP );
-#endif
+   del_efds( s_ioBase, iFileDes );
 }
-
-/* *********************************************************************** */
 
 int HB_GT_FUNC( gt_NewXTerm( void ) )
 {
@@ -3545,229 +2375,636 @@ int HB_GT_FUNC( gt_NewXTerm( void ) )
    return iHandle;
 }
 
-/* *********************************************************************** */
-
 int HB_GT_FUNC( gt_SetTerm( int iHandle ) )
 {
    return set_active_ioBase( iHandle );
 }
-
-/* *********************************************************************** */
 
 int HB_GT_FUNC( gt_CloseTerm( int iHandle ) )
 {
    return del_ioBase( iHandle );
 }
 
-/* *********************************************************************** */
-
-BOOL HB_GT_FUNC( gt_AddEventHandle( int iFile, int iMode,
-                                    int ( *eventFunc ) ( int, int, void * ),
-                                    void *data ) )
+int HB_GT_FUNC( gt_WaitKey( double dTimeOut ) )
 {
-   return add_efds( s_ioBase, iFile, iMode, eventFunc, data ) == iFile;
+   return wait_key( s_ioBase, ( int ) ( dTimeOut * 1000.0 ) );
 }
 
-/* *********************************************************************** */
-
-void HB_GT_FUNC( gt_DelEventHandle( int iFileDes ) )
+void HB_GT_FUNC( gt_SetKeyTrans( unsigned char *szSrc, unsigned char *szDst ) )
 {
-   del_efds( s_ioBase, iFileDes );
+   setKeyTrans( s_ioBase, szSrc, szDst );
 }
 
-/* ************************** Clipboard support ********************************** */
-
-void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG * pulMaxSize ) )
+int HB_GT_FUNC( gt_AddKeyMap( int iKey, char *szSequence ) )
 {
-   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
-   {
-      *pulMaxSize = s_clipsize;
-   }
-
-   if ( *pulMaxSize != 0 )
-   {
-      memcpy( szData, s_clipboard, *pulMaxSize );
-   }
-
+   return addKeyMap( s_ioBase, SET_CLIPKEY( iKey ), szSequence );
 }
 
-void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+int HB_GT_FUNC( gt_RemoveKeyMap( char *szSequence ) )
 {
-   if ( s_clipboard != NULL )
-   {
-      hb_xfree( s_clipboard );
-   }
-
-   s_clipboard = ( char * ) hb_xgrab( ulSize + 1 );
-   memcpy( s_clipboard, szData, ulSize );
-   s_clipboard[ulSize] = '\0';
-   s_clipsize = ulSize;
+   return removeKeyMap( s_ioBase, szSequence );
 }
 
-ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+int HB_GT_FUNC( gt_ESCdelay( int iDelay ) )
 {
-   return s_clipsize;
-}
+   int iRet = s_ioBase->esc_delay;
 
-void HB_GT_FUNC( gt_ProcessMessages( void ) )
-{
-   return;
-}
+   s_ioBase->esc_delay = iDelay;
 
-/* *********************************************************************** */
-
-int
-HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
-{
-   int iRet = -1;
-
-   HB_SYMBOL_UNUSED( vpParam );
-
-   switch ( iMsgType )
-   {
-      case GTI_ISGRAPHIC:
-         iRet = ( int ) FALSE;
-         break;
-
-      case GTI_INPUTFD:
-         iRet = s_ioBase->base_infd;
-         break;
-
-      case GTI_OUTPUTFD:
-         iRet = s_ioBase->base_outfd;
-         break;
-
-      case GTI_ERRORFD:
-         iRet = s_ioBase->stderrfd;
-         break;
-
-      case GTI_ESCDELAY:
-         iRet = s_ioBase->esc_delay;
-         if ( bUpdate )
-            s_ioBase->esc_delay = iParam;
-         break;
-
-      case GTI_VIEWMAXWIDTH:
-         return _GetScreenWidth();
-
-      case GTI_VIEWMAXHEIGHT:
-         return _GetScreenHeight();
-
-   }
    return iRet;
 }
 
+void HB_GT_FUNC( gt_SetInterruptKey( int iInterupt ) )
+{
+   set_sig_keys( s_ioBase, iInterupt, -1, -1 );
+}
+
+void HB_GT_FUNC( gt_SetDebugKey( int iDebug ) )
+{
+   set_sig_keys( s_ioBase, -1, iDebug, -1 );
+}
+
+BOOL HB_GT_FUNC( gt_GetSignalFlag( int iSig ) )
+{
+   BOOL bRetVal = FALSE;
+
+   if ( iSig > 0 && iSig < MAX_SIGNO && s_SignalTable[iSig] )
+   {
+      bRetVal = TRUE;
+      s_SignalTable[iSig] = FALSE;
+   }
+
+   return bRetVal;
+}
+
+void HB_GT_FUNC( gt_CatchSignal( int iSig ) )
+{
+   set_sig_handler( iSig );
+}
+
+
 
 /* *********************************************************************** */
 
-/* ********** Graphics API ********** */
-
-int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+static void hb_gt_crs_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
 {
-  HB_SYMBOL_UNUSED( iType );
-  HB_SYMBOL_UNUSED( iTop );
-  HB_SYMBOL_UNUSED( iLeft );
-  HB_SYMBOL_UNUSED( iBottom );
-  HB_SYMBOL_UNUSED( iRight );
-  HB_SYMBOL_UNUSED( iColor );
+   InOutBase *ioBase;
 
-  return 0;
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
+
+   if( !s_ioBase )
+   {
+      s_iStdIn  = hFilenoStdin;
+      s_iStdOut = hFilenoStdout;
+      s_iStdErr = hFilenoStderr;
+#ifdef HB_GT_CRS_TTYHACK
+      {
+         int ittyfd;
+
+         if( ( ittyfd = open( "/dev/tty", O_RDWR ) ) != -1 )
+            hFilenoStdin = hFilenoStdout = ittyfd;
+      }
+#endif
+      set_signals();
+      ioBase = create_ioBase( NULL, hFilenoStdin, hFilenoStdout, hFilenoStderr, -1 );
+      if( ioBase )
+      {
+         add_new_ioBase( ioBase );
+         HB_GTSUPER_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
+         HB_GTSELF_RESIZE( pGT, s_ioBase->maxrow, s_ioBase->maxcol );
+         HB_GTSELF_SETFLAG( pGT, HB_GTI_COMPATBUFFER, FALSE );
+         HB_GTSELF_SETBLINK( pGT, TRUE );
+      }
+   }
+
+   if( !s_ioBase )
+      hb_errInternal( 9997, "Internal error: screen driver initialization failure", "", "" );
 }
 
-void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+/* *********************************************************************** */
+
+static void hb_gt_crs_Exit( PHB_GT pGT )
 {
-  HB_SYMBOL_UNUSED( iTop );
-  HB_SYMBOL_UNUSED( iLeft );
-  HB_SYMBOL_UNUSED( cBuf );
-  HB_SYMBOL_UNUSED( iColor );
-  HB_SYMBOL_UNUSED( iSize );
-  HB_SYMBOL_UNUSED( iWidth );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Exit(%p)", pGT ) );
+
+   HB_GTSUPER_EXIT( pGT );
+
+   del_all_ioBase();
 }
 
-/* ******** Graphics API end ******** */
+/* *********************************************************************** */
 
-#ifdef HB_MULTI_GT
-
-static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
+static BOOL hb_gt_crs_IsColor( PHB_GT pGT )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_IsColor(%p)", pGT ) );
 
-    gt_funcs->Init                  = HB_GT_FUNC( gt_Init );
-    gt_funcs->Exit                  = HB_GT_FUNC( gt_Exit );
-    gt_funcs->GetScreenWidth        = HB_GT_FUNC( gt_GetScreenWidth );
-    gt_funcs->GetScreenHeight       = HB_GT_FUNC( gt_GetScreenHeight );
-    gt_funcs->Col                   = HB_GT_FUNC( gt_Col );
-    gt_funcs->Row                   = HB_GT_FUNC( gt_Row );
-    gt_funcs->SetPos                = HB_GT_FUNC( gt_SetPos );
-    gt_funcs->AdjustPos             = HB_GT_FUNC( gt_AdjustPos );
-    gt_funcs->IsColor               = HB_GT_FUNC( gt_IsColor );
-    gt_funcs->GetCursorStyle        = HB_GT_FUNC( gt_GetCursorStyle );
-    gt_funcs->SetCursorStyle        = HB_GT_FUNC( gt_SetCursorStyle );
-    gt_funcs->DispBegin             = HB_GT_FUNC( gt_DispBegin );
-    gt_funcs->DispEnd               = HB_GT_FUNC( gt_DispEnd );
-    gt_funcs->DispCount             = HB_GT_FUNC( gt_DispCount );
-    gt_funcs->Puts                  = HB_GT_FUNC( gt_Puts );
-    gt_funcs->Replicate             = HB_GT_FUNC( gt_Replicate );
-    gt_funcs->RectSize              = HB_GT_FUNC( gt_RectSize );
-    gt_funcs->GetText               = HB_GT_FUNC( gt_GetText );
-    gt_funcs->PutText               = HB_GT_FUNC( gt_PutText );
-    gt_funcs->SetAttribute          = HB_GT_FUNC( gt_SetAttribute );
-    gt_funcs->Scroll                = HB_GT_FUNC( gt_Scroll );
-    gt_funcs->SetMode               = HB_GT_FUNC( gt_SetMode );
-    gt_funcs->GetBlink              = HB_GT_FUNC( gt_GetBlink );
-    gt_funcs->SetBlink              = HB_GT_FUNC( gt_SetBlink );
-    gt_funcs->Version               = HB_GT_FUNC( gt_Version );
-    gt_funcs->Box                   = HB_GT_FUNC( gt_Box );
-    gt_funcs->BoxD                  = HB_GT_FUNC( gt_BoxD );
-    gt_funcs->BoxS                  = HB_GT_FUNC( gt_BoxS );
-    gt_funcs->HorizLine             = HB_GT_FUNC( gt_HorizLine );
-    gt_funcs->VertLine              = HB_GT_FUNC( gt_VertLine );
-    gt_funcs->Suspend               = HB_GT_FUNC( gt_Suspend );
-    gt_funcs->Resume                = HB_GT_FUNC( gt_Resume );
-    gt_funcs->PreExt                = HB_GT_FUNC( gt_PreExt );
-    gt_funcs->PostExt               = HB_GT_FUNC( gt_PostExt );
-    gt_funcs->OutStd                = HB_GT_FUNC( gt_OutStd );
-    gt_funcs->OutErr                = HB_GT_FUNC( gt_OutErr );
-    gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
-    gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
-    gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
-    /* extended GT functions */
-    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
-    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
-    gt_funcs->info                  = HB_GT_FUNC( gt_info );
-    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
-    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
-    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
-    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
-    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
-    gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
+   HB_SYMBOL_UNUSED( pGT );
+
+   return s_ioBase->is_color;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_SetMode( PHB_GT pGT, int iRows, int iCols )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetMode(%p,%d,%d)", pGT, iRows, iCols ) );
+
+   if( gt_setsize( s_ioBase, iRows, iCols ) == 0 )
+   {
+      HB_GTSELF_RESIZE( pGT, iRows, iCols );
+      return TRUE;
+   }
+   return FALSE;
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_SetBlink( PHB_GT pGT, BOOL fBlink )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetBlink(%p, %d)", pGT, ( int ) fBlink ) );
+
+   if( fBlink )
+      s_ioBase->attr_mask |= A_BLINK;
+   else
+      s_ioBase->attr_mask &= ~A_BLINK;
+
+   HB_GTSUPER_SETBLINK( pGT, fBlink );
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_Tone( PHB_GT pGT, double dFrequency, double dDuration )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Tone(%p,%lf,%lf)", pGT, dFrequency, dDuration ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   gt_tone( s_ioBase, dFrequency, dDuration );
+
+   if( s_ioBase->terminal_type == TERM_LINUX )
+   {
+      /* convert Clipper (DOS) timer tick units to seconds ( x / 18.2 ) */
+      hb_idleSleep( dDuration / 18.2 );
+   }
+}
+
+/* *********************************************************************** */
+
+static char * hb_gt_crs_Version( PHB_GT pGT, int iType )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Version(%p,%d)", pGT, iType ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   if( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
+   return "Harbour Terminal: nCurses";
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_OutStd( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_OutStd(%p,%s,%lu)", pGT, pbyStr, ulLen ) );
+
+   if( s_ioBase )
+   {
+      if( s_ioBase->stdoutfd == -1 )
+         HB_GTSELF_WRITECON( pGT, pbyStr, ulLen );
+      else
+         gt_outstd( s_ioBase, pbyStr, ulLen );
+   }
+   else
+      HB_GTSUPER_OUTSTD( pGT, pbyStr, ulLen );
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_OutErr( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_OutErr(%p,%s,%lu)", pGT, pbyStr, ulLen ) );
+   if( s_ioBase )
+   {
+      if( s_ioBase->stderrfd == -1 )
+         HB_GTSELF_WRITECON( pGT, pbyStr, ulLen );
+      else
+         gt_outerr( s_ioBase, ( char * ) pbyStr, ulLen );
+   }
+   else
+      HB_GTSUPER_OUTERR( pGT, pbyStr, ulLen );
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_Suspend( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Suspend(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   if( s_ioBase )
+   {
+      gt_refresh( s_ioBase );
+      endwin();
+      gt_ttyrestore( s_ioBase );
+   }
+   return TRUE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_Resume( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Resume(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   if( s_ioBase )
+   {
+      s_ioBase->lcursor = SC_UNDEF;
+      wrefresh( s_ioBase->stdscr );
+      gt_ttyset( s_ioBase );
+      /* redrawwin( s_ioBase->stdscr ); */
+      gt_refresh( s_ioBase );
+   }
+   return TRUE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_PreExt( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_PreExt(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   if( s_ioBase )
+   {
+      gt_refresh( s_ioBase );
+   }
+   return TRUE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_PostExt( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_PostExt(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   return TRUE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_mouse_IsPresent( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_IsPresent(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   return s_ioBase->mouse_type != MOUSE_NONE;
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_mouse_Show( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_Show(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+#ifdef HAVE_GPM_H
+   if( s_ioBase->mouse_type == MOUSE_GPM )
+      gpm_visiblepointer = 1;
+#endif
+   disp_mousecursor( s_ioBase );
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_mouse_Hide( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_Hide(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+#ifdef HAVE_GPM_H
+   if( s_ioBase->mouse_type == MOUSE_GPM )
+   {
+      gpm_visiblepointer = 0;
+   }
+#endif
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_mouse_GetPos( PHB_GT pGT, int * piRow, int * piCol )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_Col(%p,%p,%p)", pGT, piRow, piCol ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   *piRow = s_ioBase->mLastEvt.row;
+   *piCol = s_ioBase->mLastEvt.col;
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_mouse_SetPos( PHB_GT pGT, int iRow, int iCol )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_SetPos(%p,%i,%i)", pGT, iRow, iCol ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   /* it does really nothing */
+   s_ioBase->mLastEvt.col = iCol;
+   s_ioBase->mLastEvt.row = iRow;
+   disp_mousecursor( s_ioBase );
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_mouse_ButtonState( PHB_GT pGT, int iButton )
+{
+   BOOL ret = FALSE;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_ButtonState(%p,%i)", pGT, iButton ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   if( s_ioBase->mouse_type != 0 )
+   {
+      int mask;
+
+      if( iButton == 0 )
+         mask = M_BUTTON_LEFT;
+      else if( iButton == 1 )
+         mask = M_BUTTON_RIGHT;
+      else if( iButton == 2 )
+         mask = M_BUTTON_MIDDLE;
+      else
+         mask = 0;
+
+      ret = ( s_ioBase->mLastEvt.buttonstate & mask ) != 0;
+   }
+
+   return ret;
+}
+
+/* *********************************************************************** */
+
+static int hb_gt_crs_mouse_CountButton( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_CountButton(%p)", pGT ) );
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   return ( s_ioBase->mButtons );
+}
+
+static void hb_gt_crs_mouse_SetDoubleClickSpeed( PHB_GT pGT, int iSpeed )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_mouse_SetDoubleClickSpeed(%p,%d)", pGT, iSpeed ) );
+
+   HB_GTSUPER_MOUSESETDOUBLECLICKSPEED( pGT, iSpeed );
+   s_ioBase->mLastEvt.click_delay = iSpeed;
+}
+
+/* *********************************************************************** */
+
+static int hb_gt_crs_ReadKey( PHB_GT pGT, int iEventMask )
+{
+   int iKey;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_ReadKey(%p,%d)", pGT, iEventMask ) );
+
+   HB_SYMBOL_UNUSED( iEventMask );
+
+   iKey = wait_key( s_ioBase, -1 );
+
+   if( iKey == K_RESIZE )
+   {
+      gt_resize( s_ioBase );
+      HB_GTSELF_RESIZE( pGT, s_ioBase->maxrow, s_ioBase->maxcol );
+      iKey = 0;
+   }
+
+   return iKey;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP, BOOL fBox )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
+
+   HB_GTSUPER_SETDISPCP( pGT, pszTermCDP, pszHostCDP, fBox );
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = hb_cdp_page->id;
+      if ( !pszHostCDP )
+         pszHostCDP = pszTermCDP;
+   }
+   if( !pszTermCDP || !*pszTermCDP )
+      pszTermCDP = pszHostCDP;
+
+   if( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if( cdpTerm && cdpHost )
+      {
+         if( cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+         {
+            char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
+            char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
+
+            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
+            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
+            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
+            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+
+            setDispTrans( s_ioBase, pszHostLetters, pszTermLetters, fBox ? 1 : 0 );
+
+            hb_xfree( pszHostLetters );
+            hb_xfree( pszTermLetters );
+            return TRUE;
+         }
+         else
+            setDispTrans( s_ioBase, "", "", fBox ? 1 : 0 );
+      }
+   }
+#endif
+
+   return FALSE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
+
+   HB_GTSUPER_SETKEYCP( pGT, pszTermCDP, pszHostCDP );
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = hb_cdp_page->id;
+   }
+
+   if( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+         cdpHost = hb_cdpFind( pszHostCDP );
+      if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+          cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
+         char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
+
+         strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
+         strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
+         strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
+         strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+
+         setKeyTrans( s_ioBase, ( unsigned char * ) pszTermLetters,
+                      ( unsigned char * ) pszHostLetters );
+
+         hb_xfree( pszHostLetters );
+         hb_xfree( pszTermLetters );
+         return TRUE;
+      }
+   }
+#endif
+
+   return FALSE;
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_crs_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Info(%p,%d,%p)", pGT, iType, pInfo ) );
+
+   if( s_ioBase )
+   {
+      switch ( iType )
+      {
+         case HB_GTI_FULLSCREEN:
+         case HB_GTI_KBDSUPPORT:
+            pInfo->pResult = hb_itemPutL( pInfo->pResult, TRUE );
+            break;
+
+         case HB_GTI_ESCDELAY:
+            pInfo->pResult = hb_itemPutNI( pInfo->pResult, s_ioBase->esc_delay );
+            if( hb_itemType( pInfo->pNewVal ) & HB_IT_NUMERIC )
+               s_ioBase->esc_delay = hb_itemGetNI( pInfo->pNewVal );
+            break;
+
+         default:
+            return HB_GTSUPER_INFO( pGT, iType, pInfo );
+      }
+   }
+
+   return TRUE;
+}
+
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Redraw(%p,%d,%d,%d)", pGT, iRow, iCol, iSize ) );
+
+   if( s_ioBase )
+   {
+      BYTE bColor, bAttr;
+      USHORT usChar;
+      chtype ch;
+
+      wmove( s_ioBase->stdscr, iRow, iCol );
+      while( iSize-- > 0 )
+      {
+         if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol++, &bColor, &bAttr, &usChar ) )
+            break;
+         ch = ( s_ioBase->attr_map[ bColor ] & s_ioBase->attr_mask ) |
+              ( bAttr & HB_GT_ATTR_BOX ? s_ioBase->box_chmap[ usChar & 0xff ] :
+                                         s_ioBase->std_chmap[ usChar & 0xff ] );
+         waddch( s_ioBase->stdscr, ch );
+      }
+   }
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_crs_Refresh( PHB_GT pGT )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Refresh(%p)", pGT ) );
+
+   HB_GTSUPER_REFRESH( pGT );
+   if( s_ioBase )
+   {
+      int iRow, iCol, iShape;
+
+      HB_GTSELF_GETSCRCURSOR( pGT, &iRow, &iCol, &iShape );
+      s_ioBase->row = iRow;
+      s_ioBase->col = iCol;
+      set_cursor( s_ioBase, iShape );
+      gt_refresh( s_ioBase );
+   }
+}
+
+/* *********************************************************************** */
+
+static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+
+   pFuncTable->Init                       = hb_gt_crs_Init;
+   pFuncTable->Exit                       = hb_gt_crs_Exit;
+   pFuncTable->IsColor                    = hb_gt_crs_IsColor;
+   pFuncTable->SetMode                    = hb_gt_crs_SetMode;
+   pFuncTable->Redraw                     = hb_gt_crs_Redraw;
+   pFuncTable->Refresh                    = hb_gt_crs_Refresh;
+   pFuncTable->SetBlink                   = hb_gt_crs_SetBlink;
+   pFuncTable->Version                    = hb_gt_crs_Version;
+   pFuncTable->Suspend                    = hb_gt_crs_Suspend;
+   pFuncTable->Resume                     = hb_gt_crs_Resume;
+   pFuncTable->PreExt                     = hb_gt_crs_PreExt;
+   pFuncTable->PostExt                    = hb_gt_crs_PostExt;
+   pFuncTable->OutStd                     = hb_gt_crs_OutStd;
+   pFuncTable->OutErr                     = hb_gt_crs_OutErr;
+   pFuncTable->Tone                       = hb_gt_crs_Tone;
+   pFuncTable->Info                       = hb_gt_crs_Info;
+   pFuncTable->SetDispCP                  = hb_gt_crs_SetDispCP;
+   pFuncTable->SetKeyCP                   = hb_gt_crs_SetKeyCP;
+
+   pFuncTable->ReadKey                    = hb_gt_crs_ReadKey;
+
+   pFuncTable->MouseIsPresent             = hb_gt_crs_mouse_IsPresent;
+   pFuncTable->MouseShow                  = hb_gt_crs_mouse_Show;
+   pFuncTable->MouseHide                  = hb_gt_crs_mouse_Hide;
+   pFuncTable->MouseGetPos                = hb_gt_crs_mouse_GetPos;
+   pFuncTable->MouseSetPos                = hb_gt_crs_mouse_SetPos;
+   pFuncTable->MouseButtonState           = hb_gt_crs_mouse_ButtonState;
+   pFuncTable->MouseCountButton           = hb_gt_crs_mouse_CountButton;
+   pFuncTable->MouseSetDoubleClickSpeed   = hb_gt_crs_mouse_SetDoubleClickSpeed;
+
+   return TRUE;
 }
 
 /* ********************************************************************** */
 
-static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
-{
-    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
-
-    gt_funcs->mouse_Init            = HB_GT_FUNC( mouse_Init );
-    gt_funcs->mouse_Exit            = HB_GT_FUNC( mouse_Exit );
-    gt_funcs->mouse_IsPresent       = HB_GT_FUNC( mouse_IsPresent );
-    gt_funcs->mouse_Show            = HB_GT_FUNC( mouse_Show );
-    gt_funcs->mouse_Hide            = HB_GT_FUNC( mouse_Hide );
-    gt_funcs->mouse_Col             = HB_GT_FUNC( mouse_Col );
-    gt_funcs->mouse_Row             = HB_GT_FUNC( mouse_Row );
-    gt_funcs->mouse_SetPos          = HB_GT_FUNC( mouse_SetPos );
-    gt_funcs->mouse_IsButtonPressed = HB_GT_FUNC( mouse_IsButtonPressed );
-    gt_funcs->mouse_CountButton     = HB_GT_FUNC( mouse_CountButton );
-    gt_funcs->mouse_SetBounds       = HB_GT_FUNC( mouse_SetBounds );
-    gt_funcs->mouse_GetBounds       = HB_GT_FUNC( mouse_GetBounds );
-}
-
-
-/* ********************************************************************** */
-
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
-                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
+static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
+                                   hb_gt_FuncInit,
+                                   HB_GTSUPER,
+                                   HB_GTID_PTR };
 
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
@@ -3777,19 +3014,26 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
+   #pragma data_seg()
 #endif
-
-#endif  /* HB_MULTI_GT */
 
 /* *********************************************************************** */
 
 #if defined(HB_GT_CRS_BCEHACK) && defined(NCURSES_VERSION) && !defined(HB_NCURSES_194)
 #include <term.h>
-static void curs_wrkaround()
+static void curs_wrkaround( void )
 {
    back_color_erase = FALSE;
    /* cur_term->type.Booleans[28] = 0; */
 }
 #else
-static void curs_wrkaround() {;}
+static void curs_wrkaround( void ) {;}
 #endif

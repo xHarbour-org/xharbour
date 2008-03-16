@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.39 2007/12/28 02:11:02 likewolf Exp $
+ * $Id: hbver.c,v 1.40 2007/12/28 13:10:54 likewolf Exp $
  */
 
 /*
@@ -82,7 +82,7 @@
    #include <ctype.h>
    #include "hbwbase.h"
 
-#elif defined(HB_OS_UNIX)
+#elif defined(HB_OS_UNIX) && !defined(__CEGCC__)
 
    #include <sys/utsname.h>
 
@@ -407,10 +407,18 @@ HB_EXPORT BOOL hb_iswinnt( void )
    }
    return s_fWinNT;
 #else
-   return FALSE ;
+   return FALSE;
 #endif
 }
 
+HB_EXPORT BOOL hb_iswince( void )
+{
+#if defined(HB_WINCE)
+   return TRUE;
+#else
+   return FALSE;
+#endif
+}
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
 

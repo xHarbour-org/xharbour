@@ -1,12 +1,11 @@
 /*
- * $Id: settime.c,v 1.3 2005/01/30 21:58:03 druzus Exp $
+ * $Id: settime.c,v 1.4 2005/05/16 21:45:40 andijahja Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
  *
  *  SETNEWDATE() is supplementary of SetDate(), see dattime3.prg
  *  SETNEWTIME() is supplementary of SetTime(), see dattime3.prg
- *  WAITPERIOD() used directly by user.
  *
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * www - http://www.xharbour.org
@@ -164,24 +163,4 @@ HB_FUNC ( SETNEWTIME )
    hb_retl( FALSE );
 #endif   
 
-}
-
-
-static double dTimeSet = 0;
-static double dTimeCounter = 0;
-
-HB_FUNC ( WAITPERIOD )
-{
-   double d = hb_dateSeconds();
-
-   if ( hb_pcount() > 0 )
-   {
-      dTimeSet = d;
-      dTimeCounter = d + hb_parnd( 1 ) / 100.0;
-   }
-   if ( d < dTimeSet )
-   {
-      d += 86400.0;
-   }
-   hb_retl( d < dTimeCounter );
 }

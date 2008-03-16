@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.29 2005/06/02 00:43:37 druzus Exp $
+# $Id: make_rpm.sh,v 1.30 2006/01/12 13:15:58 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -15,13 +15,13 @@
 # --with static      - link all binaries with static libs
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
-# --with odbc        - build build odbc lib
+# --with odbc        - build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --with allegro     - build GTALLEG - Allegro based GT driver
 # --without adsrdd   - do not build ADS RDD
-# --without gpl      - do not build code which needs GPL 3-rd party libs
+# --without gpl      - do not build libs which needs GPL 3-rd party code
 # --without nf       - do not build nanforum lib
-# --without x11      - do not build GTXVT and GTXWC
+# --without x11      - do not build GTXWC
 # --without gpm      - build GTSLN and GTCRS without GPM support
 # --without gtsln    - do not build GTSLN
 ######################################################################
@@ -133,7 +133,6 @@ then
     INST_PARAM="${INST_PARAM} --without x11"
 fi
 
-
 TOINST_LST=""
 for i in ${NEED_RPM}
 do
@@ -167,16 +166,20 @@ then
         if [ "${BUGGY_RPM}" = "yes" ]
         then
             cp ${hb_filename} ${RPMDIR}/SOURCES
-            cp xharbour.spec ${RPMDIR}/SPECS	
+            cp xharbour.spec ${RPMDIR}/SPECS
         fi
+        if which rpmbuild &>/dev/null
+        then
+            RPMBLD="rpmbuild"
+        else
+            RPMBLD="rpm"
+        fi
+
         if [ "${BUGGY_RPM}" = "yes" ]
         then
-            rpm -ba xharbour.spec ${INST_PARAM}
-        elif which rpmbuild &>/dev/null	    
-        then
-            rpmbuild -ta ${hb_filename} --rmsource ${INST_PARAM}
+            ${RPMBLD} -ba harbour.spec ${INST_PARAM}
         else
-            rpm -ta ${hb_filename} --rmsource ${INST_PARAM}
+            ${RPMBLD} -ta ${hb_filename} --rmsource ${INST_PARAM}
         fi
     else
         echo "Cannot find archive file: ${hb_filename}"

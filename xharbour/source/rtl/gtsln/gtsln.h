@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.12 2005/12/11 12:37:50 druzus Exp $
+ * $Id: gtsln.h,v 1.13 2006/03/29 11:55:28 druzus Exp $
  */
 
 /*
@@ -54,26 +54,24 @@
 
 /* *********************************************************************** */
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	SLN
+#define HB_GT_NAME      SLN
 
-#include "hbapigt.h"
+#include "hbgtcore.h"
+#include "hbinit.h"
 #include "hbapifs.h"
+#include "hbapierr.h"
+#include "hbapiitm.h"
 #include "inkey.ch"
-
-#ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-#endif
 
 #if defined(HB_OS_DARWIN) || ( defined(HB_OS_LINUX) && defined(__WATCOMC__) )
 #define REAL_UNIX_SYSTEM /* this is for slang.h to include some defs */
 #endif
 #include <slang.h>
 
-#include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-
+#include <unistd.h>
 #include <signal.h>
 
 #ifndef HB_OS_DARWIN
@@ -85,10 +83,10 @@
  * need to modified it for your slang version because UTF-8 patches
  * are still unoficial
  */
-#if ( UTF8 && SLSMG_HLINE_CHAR_TERM )
-    #define HB_SLN_UNICODE
-#elif SLANG_VERSION >= 20000
+#if SLANG_VERSION >= 20000
     #define HB_SLN_UTF8
+#elif defined( UTF8 ) && defined( SLSMG_HLINE_CHAR_TERM )
+    #define HB_SLN_UNICODE
 #endif
 
 /* missing defines in previous versions of Slang - this may not work ok ! */
@@ -98,12 +96,14 @@
             do { \
                (slch).color |= SLSMG_ACS_MASK; \
             } while( 0 )
-#define HB_SLN_BUILD_CHAR( slch, ch, attr )     \
+#define HB_SLN_BUILD_CHAR( slch, ch, clr, attr )     \
             do { \
-                (slch).color = s_currOutTab[ (BYTE) (ch) ].color | \
-                               s_colorTab[ (BYTE) (attr) ]; \
-                (slch).nchars = 1; \
-                (slch).wchars[ 0 ] = s_currOutTab[ (BYTE) (ch) ].wchars[ 0 ]; \
+               SLsmg_Char_Type * outTab = (attr) & HB_GT_ATTR_BOX ? \
+                                          s_outboxTab : s_outputTab; \
+               (slch).color = outTab[ (BYTE) (ch) ].color | \
+                              s_colorTab[ (BYTE) (clr) ]; \
+               (slch).nchars = 1; \
+               (slch).wchars[ 0 ] = outTab[ (BYTE) (ch) ].wchars[ 0 ]; \
             } while( 0 )
 
 #define HB_SLN_BUILD_RAWCHAR( slch, ch, attr )  \
@@ -145,9 +145,11 @@
             do { \
                (slch) = SLSMG_BUILD_CHAR( (slch), 0x80 ); \
             } while( 0 )
-#define HB_SLN_BUILD_CHAR( slch, ch, attr )     \
+#define HB_SLN_BUILD_CHAR( slch, ch, clr, attr )     \
             do { \
-                (slch) = s_currOutTab[ (BYTE) (ch) ] | s_colorTab[ (BYTE) (attr) ]; \
+               (slch) = ( (attr) & HB_GT_ATTR_BOX ? \
+                        s_outboxTab : s_outputTab )[ (BYTE) (ch) ] | \
+                        s_colorTab[ (BYTE) (clr) ]; \
             } while( 0 )
 
 #define HB_SLN_BUILD_RAWCHAR( slch, ch, attr )  \
@@ -164,31 +166,86 @@
 /* if we can not manipulate cursor state */
 #define SC_UNAVAIL -1
 
+/* xHarbour compatible definitions */
+#if !defined( K_SH_LEFT )
+#define K_SH_LEFT           K_LEFT   /* Shift-Left  == Left  */
+#define K_SH_UP             K_UP     /* Shift-Up    == Up    */
+#define K_SH_RIGHT          K_RIGHT  /* Shift-Right == Right */
+#define K_SH_DOWN           K_DOWN   /* Shift-Down  == Down  */
+#define K_SH_INS            K_INS    /* Shift-Ins   == Ins   */
+#define K_SH_DEL            K_DEL    /* Shift-Del   == Del   */
+#define K_SH_HOME           K_HOME   /* Shift-Home  == Home  */
+#define K_SH_END            K_END    /* Shift-End   == End   */
+#define K_SH_PGUP           K_PGUP   /* Shift-PgUp  == PgUp  */
+#define K_SH_PGDN           K_PGDN   /* Shift-PgDn  == PgDn  */
+#define K_SH_RETURN         K_RETURN /* Shift-Enter == Enter */
+#define K_SH_ENTER          K_ENTER  /* Shift-Enter == Enter */
+#endif
+
+/* *********************************************************************** */
+
+#define M_BUTTON_LEFT      0x0001
+#define M_BUTTON_RIGHT     0x0002
+#define M_BUTTON_MIDDLE    0x0004
+#define M_BUTTON_LDBLCK    0x0010
+#define M_BUTTON_RDBLCK    0x0020
+#define M_BUTTON_MDBLCK    0x0040
+#define M_BUTTON_WHEELUP   0x0100
+#define M_BUTTON_WHEELDOWN 0x0200
+#define M_CURSOR_MOVE      0x0400
+#define M_BUTTON_KEYMASK   (M_BUTTON_LEFT | M_BUTTON_RIGHT | M_BUTTON_MIDDLE)
+#define M_BUTTON_DBLMASK   (M_BUTTON_LDBLCK | M_BUTTON_RDBLCK | M_BUTTON_MDBLCK)
+
+#define TIMEVAL_GET(tv)          gettimeofday(&(tv), NULL);
+#define TIMEVAL_LESS(tv1, tv2)   (((tv1).tv_sec == (tv2).tv_sec ) ?     \
+                                  ((tv1).tv_usec < (tv2).tv_usec) :     \
+                                  ((tv1).tv_sec  < (tv2).tv_sec ))
+#define TIMEVAL_ADD(dst, src, n) {                                      \
+      (dst).tv_sec = (src).tv_sec + n / 1000;                           \
+      if (((dst).tv_usec = (src).tv_usec+(n%1000)*1000)>=1000000) {     \
+         (dst).tv_usec -= 1000000; (dst).tv_sec++;                      \
+      } \
+   }
 
 /* *********************************************************************** */
 
 extern BOOL hb_sln_Is_Unicode;
-extern BOOL hb_gt_UnderLinuxConsole;
-extern BOOL hb_gt_UnderXterm;
-extern unsigned char s_inputTab[ 256 ];
+extern BOOL hb_sln_UnderLinuxConsole;
+extern BOOL hb_sln_UnderXterm;
+extern unsigned char hb_sln_inputTab[ 256 ];
 #ifndef HB_CDP_SUPPORT_OFF
-extern PHB_CODEPAGE s_gtSln_cdpIN;
+extern PHB_CODEPAGE hb_sln_cdpIN;
+#else
+#  define hb_cdp_page NULL
 #endif
 
 /* delay for waiting on characters after ESC key */
-extern int s_gtSLN_escDelay;
+extern int hb_sln_escDelay;
 
 /* *********************************************************************** */
 
 /* to convert DeadKey+letter to national character */
-extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
-extern unsigned char s_convKDeadKeys[];
+extern unsigned char hb_sln_convKDeadKeys[];
 
 /* indicates that screen size has changed */
-extern volatile BOOL hb_gt_sln_bScreen_Size_Changed;
+extern volatile BOOL hb_sln_bScreen_Size_Changed;
 
-extern void HB_GT_FUNC(gt_Init_TermType());
-extern int  HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ));
-extern void HB_GT_FUNC(mouse_FixTrash());
+extern int hb_sln_Init_Terminal( int phase );
+
+extern int hb_gt_sln_ReadKey( PHB_GT pGT, int iEventMask );
+
+extern void hb_gt_sln_mouse_Init( void );
+extern void hb_gt_sln_mouse_Exit( void );
+extern BOOL hb_gt_sln_mouse_IsPresent( PHB_GT pGT );
+extern void hb_gt_sln_mouse_Show( PHB_GT pGT );
+extern void hb_gt_sln_mouse_Hide( PHB_GT pGT );
+extern void hb_gt_sln_mouse_GetPos( PHB_GT pGT, int * piRow, int * piCol );
+extern void hb_gt_sln_mouse_SetPos( PHB_GT pGT, int iRow, int iCol );
+extern int  hb_gt_sln_mouse_CountButton( PHB_GT pGT );
+extern BOOL hb_gt_sln_mouse_ButtonState( PHB_GT pGT, int iButton );
+
+extern void hb_gt_sln_mouse_FixTrash( void );
+extern int  hb_gt_sln_mouse_Inkey( int iEventMask, BOOL fCheckNew );
+extern void hb_gt_sln_mouse_ProcessTerminalEvent( void );
 
 /* *********************************************************************** */

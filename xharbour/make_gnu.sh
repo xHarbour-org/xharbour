@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.24 2007/08/06 20:30:22 likewolf Exp $
+# $Id: make_gnu.sh,v 1.25 2007/12/04 22:52:49 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -45,7 +45,7 @@ if [ -z "$HB_GT_LIB" ]; then
         w32) HB_GT_LIB="gtwin" ;;
         dos) HB_GT_LIB="gtdos" ;;
         os2) HB_GT_LIB="gtos2" ;;
-        *)   HB_GT_LIB="gtstd" ;;
+        *)   HB_GT_LIB="gttrm" ;;
     esac
     export HB_GT_LIB
 fi
@@ -84,7 +84,6 @@ if [ -z "${HB_WITHOUT_GTSLN}" ]; then
     export HB_WITHOUT_GTSLN
 fi
 
-if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 
 if [ "$HB_COMMERCE" = yes ]
@@ -158,11 +157,11 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - dos    (HB_GT_LIB=gtdos by default)"
    echo "      - w32    (HB_GT_LIB=gtw32 by default)"
    echo "      - os2    (HB_GT_LIB=gtos2 by default)"
-   echo "      - linux  (HB_GT_LIB=gtstd by default)"
-   echo "      - bsd    (HB_GT_LIB=gtstd by default)"
-   echo "      - darwin (HB_GT_LIB=gtstd by default)"
-   echo "      - sunos  (HB_GT_LIB=gtstd by default)"
-   echo "      - hpux   (HB_GT_LIB=gtstd by default)"
+   echo "      - linux  (HB_GT_LIB=gttrm by default)"
+   echo "      - bsd    (HB_GT_LIB=gttrm by default)"
+   echo "      - darwin (HB_GT_LIB=gttrm by default)"
+   echo "      - sunos  (HB_GT_LIB=gttrm by default)"
+   echo "      - hpux   (HB_GT_LIB=gttrm by default)"
    echo
    read
    echo "    HB_COMPILER:"
@@ -195,8 +194,9 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - gtos2 (OS/2 console)       (for os2 architecture)"
    echo "      - gtcrs (Curses console)     (for *nixes, w32 architectures)"
    echo "      - gtsln (Slang console)      (for *nixes, w32 architectures)"
-   echo "      - gtxvt (XWindow console)    (for *nixes architecture)"
+   echo "      - gttrm (Terminal console)   (for *nixes architecture)"
    echo "      - gtxwc (XWindow console)    (for *nixes architecture)"
+   echo "      - gtalleg (Allegro console)  (for all architectures)"
    echo
    echo "  - Use these optional envvars to configure the make process"
    echo "    when using the 'all' target:"

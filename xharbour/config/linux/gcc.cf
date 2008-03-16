@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.38 2006/07/16 19:48:56 druzus Exp $
+# $Id: gcc.cf,v 1.39 2008/03/09 18:44:26 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -15,13 +15,14 @@ EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = $(CCACHE) $(HB_CMP)
+CC = $(HB_CCACHE) $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+
 # We are under linux
-#CFLAGS = -DHB_OS_LINUX -Wall -std=gnu99
-CFLAGS = -DHB_OS_LINUX -Wall -W -fsigned-char
+CFLAGS = -DHB_OS_LINUX -Wall -W
+
 # uncomment this if you want to force relocateable code for .so libs
 # it's necessary on some platforms but can reduce performance
 #CFLAGS += -fPIC
@@ -43,14 +44,8 @@ HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
 
-
-LD = $(HB_CMP)
+LD = $(HB_CCACHE) $(HB_CMP)
 LD_OUT = -o
-
-# Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
-LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
-
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
@@ -65,7 +60,15 @@ endif
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
+
+# our libs have a lot of cross references now and we have to group them
+# until we clean them
 LINKLIBS += -Wl,--start-group
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
+
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
@@ -86,9 +89,9 @@ ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
 LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH_DIR)
 LINKLIBS += -ldbfdbt
 endif
-ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH_DIR)
-LINKLIBS += -ldbfftp
+ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
+LINKLIBS += -ldbffpt
 endif
 
 else
@@ -101,50 +104,26 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
-LINKLIBS += -lpcrepos
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
 
-ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
-LINKLIBS += -lgtnul
+# screen driver libraries
+ifeq ($(HB_CRS_LIB),)
+HB_CRS_LIB=ncurses
 endif
-ifneq ($(HB_GT_DEFAULT),$(HB_GT_LIB))
-ifneq ($(HB_GT_DEFAULT),)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH_DIR)
-LINKLIBS += -l$(HB_GT_DEFAULT)
+ifneq ($(findstring gtcrs, $(HB_GT_LIBS)),)
+LINKLIBS += -l$(HB_CRS_LIB)
 endif
+ifneq ($(findstring gtsln, $(HB_GT_LIBS)),)
+LINKLIBS += -lslang
 endif
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
-LINKLIBS += -l$(HB_GT_LIB)
-
-# HB_SCREEN_LIB: empty, or one of ncurses, slang
-ifeq ($(HB_GT_LIB),gtcrs)
-HB_SCREEN_LIB:=ncurses
-else
-ifeq ($(HB_GT_LIB),gtsln)
-HB_SCREEN_LIB:=slang
-else
-ifeq ($(HB_GT_LIB),gtalleg)
-HB_GTALLEG:=yes
+ifneq ($(findstring gtalleg, $(HB_GT_LIBS)),)
 LINKLIBS += `allegro-config --static`
 endif
-endif
-endif
-
-ifneq ($(HB_SCREEN_LIB),)
-LINKLIBS += -l$(HB_SCREEN_LIB)
-endif
-
-ifeq ($(HB_GT_LIB),gtxvt)
+ifneq ($(findstring gtxwc, $(HB_GT_LIBS)),)
 LINKLIBS += -lX11
 #LINKPATHS += -L/usr/X11R6/lib64
 LINKPATHS += -L/usr/X11R6/lib
-else
-ifeq ($(HB_GT_LIB),gtxwc)
-LINKLIBS += -lX11
-#LINKPATHS += -L/usr/X11R6/lib64
-LINKPATHS += -L/usr/X11R6/lib
-endif
 endif
 
 # HB_GPM_MOUSE: use gpm mouse driver

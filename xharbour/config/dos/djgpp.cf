@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.13 2005/09/02 18:26:02 druzus Exp $
+# $Id: djgpp.cf,v 1.14 2008/03/09 18:44:26 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -13,29 +13,30 @@ CC = gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -Iinclude
-ifeq ($(HB_LIB_COMPILE),)
-    CPPFLAGS += -I$(HB_INC_COMPILE)
+ifneq ($(HB_INC_COMPILE),)
+   CPPFLAGS = -I. -I$(HB_INC_COMPILE)
 endif
 CFLAGS = -Wall -W
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS += -DSIMPLEX
+  CFLAGS += -DSIMPLEX
 endif
 
 LD = gcc
 LD_OUT = -o
 LDLIBS = -lm
 
-# Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
-LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+  LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+  LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
@@ -48,15 +49,10 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
-
-ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
-LINKLIBS += -lgtnul
-endif
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
-LINKLIBS += -l$(HB_GT_LIB)
 endif
 
 # NOTE: The empty line directly before 'endef' HAVE TO exist!

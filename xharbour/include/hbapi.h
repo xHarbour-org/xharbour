@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.234 2008/03/07 20:27:18 likewolf Exp $
+ * $Id: hbapi.h,v 1.235 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /*
@@ -946,7 +946,8 @@ extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer cont
 extern char * hb_verCompiler( void ); /* retrieves a newly allocated buffer containing compiler version */
 extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */
 extern char * hb_verBuildInfo( BOOL ); /* display harbour, compiler, and platform versions to standard console */
-extern HB_EXPORT BOOL   hb_iswinnt(void) ; /* return .T. if OS == WinNt, 2000, XP */
+extern HB_EXPORT BOOL   hb_iswinnt( void ); /* return .T. if OS == WinNt, 2000, XP */
+extern HB_EXPORT BOOL   hb_iswince( void ); /* return .T. if OS is Windows CE or Windows Mobile */
 extern char * hb_builddate( void ); /* return date and time of harbour.exe build */
 
 /* Executable array execution */

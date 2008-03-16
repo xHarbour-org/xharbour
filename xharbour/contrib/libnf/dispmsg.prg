@@ -1,4 +1,8 @@
 /*
+ * $Id: dispmsg.prg 7850 2007-10-23 11:32:22Z vszakats $
+ */
+
+/*
  * File......: DISPMSG.PRG
  * Author....: Paul Ferrara, ColumbuSoft
  * CIS ID....: 76702,556
@@ -205,9 +209,7 @@ FUNCTION FT_DispMsg( aInfo, cKey, nBoxTop, nBoxLeft, cnBoxString, lShadow )
          aPos := {},       ;
          nLeft,            ;
          nTop,             ;
-         aLeft,            ;
-         cLeftMarker,      ;
-         cRightMarker
+         aLeft
 
    FOR i := 1 TO LEN( aInfo[1] )
       AADD( aPos, {} )
@@ -271,7 +273,7 @@ FUNCTION FT_DispMsg( aInfo, cKey, nBoxTop, nBoxLeft, cnBoxString, lShadow )
    DISPBOX( nBoxTop, nBoxLeft, nBoxBottom, nBoxRight, cnBoxString, ;
             aInfo[ 2, LEN( aInfo[2] ) ] )
    IF lShadow
-      hb_shadow( nBoxTop, nBoxLeft, nBoxBottom, nBoxRight )
+      FT_Shadow( nBoxTop, nBoxLeft, nBoxBottom, nBoxRight )
    ENDIF
 
 
@@ -332,17 +334,3 @@ FUNCTION FT_DispMsg( aInfo, cKey, nBoxTop, nBoxLeft, cnBoxString, lShadow )
    SETCURSOR( cOldCursor )
    RETURN xRtnVal
 
-#PRAGMA BEGINDUMP
-#include "hbapigt.h"
-#include "hbset.h"
-#include "hb_io.h"
-#include "hbvm.h"
-#include "inkey.ch"
-/****************************************************************************/
-/* Set Color Attributes of a screen region */
-HB_FUNC( FT_SETATTR )
-{
-   hb_gt_SetAttribute( hb_parni(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5) );
-}
-/****************************************************************************/
-#PRAGMA ENDDUMP

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.18 2005/09/02 18:25:41 druzus Exp $
+# $Id: gcc.cf,v 1.19 2008/03/09 18:44:26 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -9,7 +9,9 @@ EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = $(CCACHE) gcc
+# intentionally used 'cc' instead of 'gcc' - I'm not an Darwin user
+# but the system where I was testing it has GCC 2.95 named 'cc'
+CC = $(CCACHE) cc
 CC_IN = -c
 CC_OUT = -o
 
@@ -17,7 +19,7 @@ CC_OUT = -o
 CPPFLAGS = -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
 # -fno-common enables building .dylib files
-CFLAGS = -fno-common -fsigned-char -Wall -W
+CFLAGS = -fno-common -Wall -W
 
 # It's to avoid warning message generated when 'long double' is used
 # remove it if you have newer compiler version
@@ -28,8 +30,8 @@ ifeq ($(HB_LEX),SIMPLEX)
 endif
 CFLAGS += -DHB_OS_DARWIN
 
-# The following is enabled automatically for old Darwin versions, e.g. 5.5
-# CFLAGS += -DHB_NO_RECURSIVE_MUTEXES
+LD = cc
+LD_OUT = -o
 
 ifeq ($(HB_LIBCOMP_MT),)
   # always add thread support if not compiling a lib and using vmmt
@@ -44,14 +46,6 @@ else
   endif
 endif
 
-
-LD = gcc
-LD_OUT = -o
-
-# Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
-LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
-
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
   LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
@@ -63,8 +57,12 @@ ifeq ($(HB_LIB_COMPILE),)
   endif
 
 else
-  LINKPATHS += -L$(HB_LIB_COMPILE)
+LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
@@ -101,53 +99,44 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
-  LINKLIBS += -lpcrepos
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
 
-  ifeq ($(HB_MULTI_GT),yes)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
-    LINKLIBS += -lgtnul
-  endif
+# screen driver libraries
+ifeq ($(HB_CRS_LIB),)
+HB_CRS_LIB=ncurses
+endif
 
-  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
-  LINKLIBS += -l$(HB_GT_LIB)
+ifneq ($(findstring gtcrs, $(HB_GT_LIBS)),)
+LINKLIBS += -l$(HB_CRS_LIB)
+endif
 
-  # HB_SCREEN_LIB: empty, or one of ncurses, slang
-  ifeq ($(HB_GT_LIB),gtcrs)
-    LINKPATHS += -L/sw/lib -L/opt/local/lib
-    HB_SCREEN_LIB:=ncurses
-  else
-    ifeq ($(HB_GT_LIB),gtsln)
-      LINKPATHS += -L/sw/lib -L/opt/local/lib
-      HB_SCREEN_LIB:=slang
-    endif
-  endif
+ifneq ($(findstring gtsln, $(HB_GT_LIBS)),)
+LINKLIBS += -lslang
+# In BSD, slang still needs curses :(
+ifeq ($(findstring gtcrs, $(HB_GT_LIBS)),)
+LINKLIBS += -l$(HB_CRS_LIB)
+endif
+endif
 
-  ifneq ($(HB_SCREEN_LIB),)
-    LINKLIBS += -l$(HB_SCREEN_LIB)
-  endif
+ifneq ($(findstring gtalleg, $(HB_GT_LIBS)),)
+LINKLIBS += `allegro-config --static`
+endif
 
-  # In BSD, slang still needs curses :(
-  ifeq ($(HB_GT_LIB),gtsln)
-    LINKLIBS += -lncurses
-  endif
+ifneq ($(findstring gtxwc, $(HB_GT_LIBS)),)
+LINKLIBS += -lX11
+#LINKPATHS += -L/usr/X11R6/lib64
+LINKPATHS += -L/usr/X11R6/lib
+endif
 
-  ifeq ($(HB_GT_LIB),gtxvt)
-    LINKLIBS += -lX11
-    LINKPATHS += -L/usr/X11R6/lib
-  else
-    ifeq ($(HB_GT_LIB),gtxwc)
-      LINKLIBS += -lX11
-      LINKPATHS +=-L/usr/X11R6/lib
-    endif
-  endif
+# HB_GPM_MOUSE: use gpm mouse driver
+# Actually, there is no gpm on BSD.
+ifeq ($(HB_GPM_MOUSE),yes)
+LINKLIBS += -lgpm
+endif
 
-  # HB_GPM_MOUSE: use gpm mouse driver
-  # Actually, there is no gpm on BSD.
-  ifeq ($(HB_GPM_MOUSE),yes)
-    LINKLIBS += -lgpm
-  endif
-
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
+LINKLIBS += -lpcrepos
 endif
 
 LINKLIBS += -lm
@@ -160,7 +149,7 @@ LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $(^F) $(LDFLAGS) $(L_USR) $(LINKLIBS) $(L
 #AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) || $(RM) $@
 LIBTOOL = libtool
 LIBTOOLFLAGS = $(LIBTOOL_USR)
-AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $(^F) || $(RM) $@
+AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $(^F) || ( $(RM) $@ && false )
 RANLIB = ranlib
 
 include $(TOP)$(ROOT)config/rules.cf

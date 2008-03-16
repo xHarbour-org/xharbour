@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: setcolor.c,v 1.4 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ char * hb_conSetColor( const char * szColor )
 
 HB_FUNC( SETCOLOR )
 {
-   hb_retc( hb_conSetColor( ISCHAR( 1 ) ? hb_parcx( 1 ) : NULL ) );
+   hb_retc( hb_conSetColor( hb_parc( 1 ) ) );
 }
 
 HB_FUNC( COLORSELECT )
@@ -83,22 +83,35 @@ HB_FUNC( SETBLINK )
 
    hb_gtGetBlink( &bPreviousBlink );
 
-   hb_retl( bPreviousBlink );
-
    if( ISLOG( 1 ) )
    {
       hb_gtSetBlink( hb_parl( 1 ) );
    }
-}
 
-#ifdef HB_EXTENSION
+   hb_retl( bPreviousBlink );
+}
 
 HB_FUNC( HB_COLORTON )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_gtColorToN( hb_parcx( 1 ) ) );
+      hb_retni( hb_gtColorToN( hb_parc( 1 ) ) );
    else
       hb_retni( 0 );
 }
 
-#endif
+HB_FUNC( HB_NTOCOLOR )
+{
+   if( ISNUM( 1 ) )
+   {
+      char szColorString[ 10 ];
+      int colors[ 1 ];
+
+      colors[ 0 ] = hb_parni( 1 );
+
+      hb_gtColorsToString( colors, 1, szColorString, 10 );
+
+      hb_retc( szColorString );
+   }
+   else
+      hb_retc( "N/N" );
+}

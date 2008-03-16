@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.18 2005/12/11 12:37:50 druzus Exp $
+ * $Id: kbsln.c,v 1.19 2007/01/09 22:05:23 druzus Exp $
  */
 
 /*
@@ -89,10 +89,10 @@
    #define ALT_PRESSED ALTL_PRESSED
 #endif
 #define HB_GT_KBD_MODIF_MASK \
-    ( ( SHIFT_PRESSED | CONTROL_PRESSED | ALTL_PRESSED ) << 16 )
+   ( ( SHIFT_PRESSED | CONTROL_PRESSED | ALTL_PRESSED ) << 16 )
 
 #define MOUSE_ALL_EVENTS_MASK \
-    ( INKEY_MOVE | INKEY_LDOWN | INKEY_LUP | INKEY_RDOWN | INKEY_RUP )
+   ( INKEY_MOVE | INKEY_LDOWN | INKEY_LUP | INKEY_RDOWN | INKEY_RUP )
     
 /* extra keysyms definitions */
 #define SL_KEY_NUM_5      SL_KEY_B2       /* this is checked explicitly */
@@ -103,7 +103,7 @@
 
 /* we choose Ctrl+\ as an abort key on Unixes where it is a SIGQUIT key by default */
 /* abort key is Ctrl+\ on Unix ( but Ctrl+@ on Linux console ) */
-static int s_hb_gt_Abort_key = 28;
+static int s_hb_sln_Abort_key = 28;
 
 /* *********************************************************************** */
 
@@ -113,410 +113,421 @@ static char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
 
 /* a table for Keys work with a Dead key. The first
    element contains a number of defined keys */
-unsigned char s_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xalloc() */
+unsigned char hb_sln_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xalloc() */
 
 /* contains an integer value of a DeadKey or -1 */
 int hb_DeadKey = -1;
 
 /* escape key delay */
 #ifdef HB_SLANG_ONE_ESC
-    int s_gtSLN_escDelay = 250;
+   int hb_sln_escDelay = 250;
 #else
-    int s_gtSLN_escDelay = 0;
+   int hb_sln_escDelay = 0;
 #endif
 
-static int HB_GT_FUNC(gt_try_get_Kbd_State());
+BOOL hb_sln_UnderLinuxConsole = FALSE;
+BOOL hb_sln_UnderXterm = FALSE;
+
+static int hb_sln_try_get_Kbd_State( void );
 
 /* key translations tables - notice problems with compilation after changes */
 #include "keytrans.c"
 
 /* *********************************************************************** */
 
-static void HB_GT_FUNC(gt_Init_KeyTranslations())
+static void hb_sln_Init_TermType()
 {
-    char ch, keyname[ SLANG_MAX_KEYMAP_KEY_SEQ + 1 ];
-    int  keynum, i;
-    char * keyseq;
- 
-    /* for defining ^[<Key> sequences - this simulates Alt+Keys */
-    char AltChars[][ 2 ] =
-    {
-        { '0',   '9' },
-        { 'A',   'Z' },
-        { 'a',   'z' }
-    };
- 
-    /* on Unix systems ESC is a special key so let
-       assume ESC is a doble pressed ESC key    */
-    SLkp_define_keysym( "^[^[", SL_KEY_ESC );
- 
-    /* try to define Shft-Fn and Ctrl-Fn keys.
-       Because we assume terminal has only 10 Fkeys
-       so F11-F30 is generated with Shift & Ctrl.
-       This is not guaranteed to work in all cases */
-    keynum = 11;
-    keyname[ 0 ] = 'F';
-    keyname[ 2 ] = 0;
- 
-    /* Shft & Ctrl FKeys definition takes place in two
-       phases : from '1' to '9' and from 'A' to 'K' */
-    for( i = 1; i <= 2; i++ )
-    {
-        for( ch = ( i == 1 ? '1' : 'A' ); ch <= ( i == 1 ? '9' : 'K' ); ch++ )
-        {
-            keyname[ 1 ] = ch;
-            keyseq = SLtt_tgetstr( keyname );
-            if( ( keyseq != NULL ) && ( keyseq[ 0 ] != 0 ) )
-                SLkp_define_keysym( keyseq, SL_KEY_F( keynum ) );
-            keynum++;
-        }
-    }
- 
-    /* We assume Esc key is a Meta key which is treated as an Alt key.
-       Also pressing Alt+Key on linux console and linux xterm gives the
-       same key sequences as with Meta key so we are happy */
- 
-    keyname[ 0 ] = 033;
-    keyname[ 2 ] = 0;
- 
-    /* Alt+Letter & Alt+digit definition takes place in three phases :
-       from '0' to '9', from 'A' to 'Z' and from 'a' to 'z' */
-    for( i = 0; i < 3; i++ )
-    {
-        for( ch = AltChars[ i ][ 0 ]; ch <= AltChars[ i ][ 1 ]; ch++ )
-        {
-            /* fprintf( stderr, "%d %c\n", i, ch ); */
-            keyname[ 1 ] = ch;
-   
-            /* QUESTION: why Slang reports error for defining Alt+O ???.
-                         Have I any hidden error in key definitiions ??? */
-            if( ch != 'O' )
-                SLkp_define_keysym( keyname, SL_KEY_ALT( ch ) );
-        }
-    }
- 
-    /* mouse events under xterm */
-    if( hb_gt_UnderXterm )
-    {
-        keyseq = SLtt_tgetstr( "Km" );
-        if( ( keyseq != NULL ) && ( keyseq[ 0 ] != 0 ) )
-        {
-            //fprintf( stderr, "%s\r\n", keyseq );
-            SLkp_define_keysym( keyseq, SL_KEY_MOU );
-        }
-    }
+   char * Env;
     
-    /* five on numeric console */
-    /* SLkp_define_keysym( "^[[G", SL_KEY_NUM_5 ); */
+   /* an uncertain way to check if we run under linux console */
+   Env = hb_getenv( "TERM" );
+   if( Env )
+   {
+      hb_sln_UnderLinuxConsole = *Env && ( strncmp( Env, "linux", 5 ) == 0 );
+      hb_xfree( ( void * ) Env );
+   } 
+   /* an uncertain way to check if we run under xterm */
+   Env = hb_getenv( "TERM" );
+   if( Env )
+   {
+      hb_sln_UnderXterm = *Env && ( strstr( Env, "xterm" ) != NULL ||
+                                    strncmp( Env, "rxvt", 4 ) == 0 );
+      hb_xfree( ( void * ) Env );
+   }
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_Init_Terminal( int phase ))
+static void hb_sln_Init_KeyTranslations()
 {
-    struct termios newTTY;
-    unsigned char * p;
-    int ret = 0;
+   char ch, keyname[ SLANG_MAX_KEYMAP_KEY_SEQ + 1 ];
+   int  keynum, i;
+   char * keyseq;
  
-    /* first time init phase - we don't want this after
-       return from system command ( see run.c )      */
-    if( phase == 0 )
-    {
-        /* check if we run under linux console or under xterm */
-        HB_GT_FUNC(gt_Init_TermType());
-       
-#ifdef __linux__
-        /* for Linux console */
-        if( hb_gt_UnderLinuxConsole )
-            s_hb_gt_Abort_key = 0;
+   /* for defining ^[<Key> sequences - this simulates Alt+Keys */
+   char AltChars[][ 2 ] =
+   {
+      { '0',   '9' },
+      { 'A',   'Z' },
+      { 'a',   'z' }
+   };
+ 
+   /* on Unix systems ESC is a special key so let
+      assume ESC is a doble pressed ESC key    */
+   SLkp_define_keysym( "^[^[", SL_KEY_ESC );
+ 
+   /* try to define Shft-Fn and Ctrl-Fn keys.
+      Because we assume terminal has only 10 Fkeys
+      so F11-F30 is generated with Shift & Ctrl.
+      This is not guaranteed to work in all cases */
+   keynum = 11;
+   keyname[ 0 ] = 'F';
+   keyname[ 2 ] = 0;
+ 
+   /* Shft & Ctrl FKeys definition takes place in two
+      phases : from '1' to '9' and from 'A' to 'K' */
+   for( i = 1; i <= 2; i++ )
+   {
+      for( ch = ( i == 1 ? '1' : 'A' ); ch <= ( i == 1 ? '9' : 'K' ); ch++ )
+      {
+         keyname[ 1 ] = ch;
+         keyseq = SLtt_tgetstr( keyname );
+         if( keyseq != NULL && keyseq[ 0 ] != 0 )
+            SLkp_define_keysym( keyseq, SL_KEY_F( keynum ) );
+         keynum++;
+      }
+   }
+ 
+   /* We assume Esc key is a Meta key which is treated as an Alt key.
+      Also pressing Alt+Key on linux console and linux xterm gives the
+      same key sequences as with Meta key so we are happy */
+ 
+   keyname[ 0 ] = 033;
+   keyname[ 2 ] = 0;
+ 
+   /* Alt+Letter & Alt+digit definition takes place in three phases :
+      from '0' to '9', from 'A' to 'Z' and from 'a' to 'z' */
+   for( i = 0; i < 3; i++ )
+   {
+      for( ch = AltChars[ i ][ 0 ]; ch <= AltChars[ i ][ 1 ]; ch++ )
+      {
+         /* fprintf( stderr, "%d %c\n", i, ch ); */
+         keyname[ 1 ] = ch;
+   
+         /* QUESTION: why Slang reports error for defining Alt+O ???.
+                      Have I any hidden error in key definitiions ??? */
+         if( ch != 'O' )
+            SLkp_define_keysym( keyname, SL_KEY_ALT( ch ) );
+      }
+   }
+ 
+   /* mouse events under xterm */
+   if( hb_sln_UnderXterm )
+   {
+      keyseq = SLtt_tgetstr( "Km" );
+      if( ( keyseq != NULL ) && ( keyseq[ 0 ] != 0 ) )
+      {
+         /* fprintf( stderr, "%s\r\n", keyseq ); */
+         SLkp_define_keysym( keyseq, SL_KEY_MOU );
+      }
+   }
+   
+   /* five on numeric console */
+   /* SLkp_define_keysym( "^[[G", SL_KEY_NUM_5 ); */
+}
+
+/* *********************************************************************** */
+
+int hb_sln_Init_Terminal( int phase )
+{
+   struct termios newTTY;
+   unsigned char * p;
+   int ret = 0;
+
+   /* first time init phase - we don't want this after
+      return from system command ( see run.c )      */
+   if( phase == 0 )
+   {
+      /* check if we run under linux console or under xterm */
+      hb_sln_Init_TermType();
+
+#ifdef HB_OS_LINUX
+      /* for Linux console */
+      if( hb_sln_UnderLinuxConsole )
+         s_hb_sln_Abort_key = 0;
 #endif
- 
-        /* get Dead key definition */
-        p = ( unsigned char * ) hb_getenv( hb_DeadKeyEnvName );
- 
-        if( p && p[ 0 ] != '\0' )
-        {
-            int len = strlen( ( char * ) p );
-            if( len > 0 )
-                hb_DeadKey = ( int ) *p;
-        }
-        if( p )
-            hb_xfree( ( void * ) p );
- 
-        /* number of keys dealing with a Dead key */
-        s_convKDeadKeys[ 0 ] = 0;
-    }
- 
-    /* Ctrl+\ to abort, no flow-control, no output processing */
-    if( SLang_init_tty( s_hb_gt_Abort_key, 0, 0 ) != -1 )
-    {
-        /* do missing disable of start/stop processing */
-        if( tcgetattr( SLang_TT_Read_FD, &newTTY ) == 0 )
-        {
-            newTTY.c_cc[ VSTOP ]  = 255;  /* disable ^S start/stop processing */
-            newTTY.c_cc[ VSTART ] = 255;  /* disable ^Q start/stop processing */
-            newTTY.c_cc[ VSUSP ]  = 255;  /* disable ^Z suspend processing */
-            /* already done in Slang library */
-            /* newTTY.c_cc[ VDSUSP ] = 255; */  /* disable ^Y delayed suspend processing */
 
-            if( tcsetattr( SLang_TT_Read_FD, TCSADRAIN, &newTTY ) == 0 )
-               /* everything looks ok so far */
-               ret = 1;
-        }
-    }
+      /* get Dead key definition */
+      p = ( unsigned char * ) hb_getenv( hb_DeadKeyEnvName );
+
+      if( p && p[ 0 ] != '\0' )
+      {
+         int len = strlen( ( char * ) p );
+         if( len > 0 )
+            hb_DeadKey = ( int ) *p;
+      }
+      if( p )
+         hb_xfree( ( void * ) p );
  
-    /* first time init phase - we don't want this after
-       return from system command ( see run.c )      */
-    if( ret && ( phase == 0 ) )
-    {
-        /* define keyboard translations */
-        HB_GT_FUNC(gt_Init_KeyTranslations());
-  
-        /* for binary search of key translations */
-        HB_GT_FUNC(gt_SortKeyTranslationTable());
-    }
- 
-    return( ret );
+      /* number of keys dealing with a Dead key */
+      hb_sln_convKDeadKeys[ 0 ] = 0;
+   }
+
+   /* Ctrl+\ to abort, no flow-control, no output processing */
+   if( SLang_init_tty( s_hb_sln_Abort_key, 0, 0 ) != -1 )
+   {
+      /* do missing disable of start/stop processing */
+      if( tcgetattr( SLang_TT_Read_FD, &newTTY ) == 0 )
+      {
+         newTTY.c_cc[ VSTOP ]  = 255;  /* disable ^S start/stop processing */
+         newTTY.c_cc[ VSTART ] = 255;  /* disable ^Q start/stop processing */
+         newTTY.c_cc[ VSUSP ]  = 255;  /* disable ^Z suspend processing */
+         /* already done in Slang library */
+         /* newTTY.c_cc[ VDSUSP ] = 255; */  /* disable ^Y delayed suspend processing */
+
+         if( tcsetattr( SLang_TT_Read_FD, TCSADRAIN, &newTTY ) == 0 )
+            /* everything looks ok so far */
+            ret = 1;
+      }
+   }
+
+   /* first time init phase - we don't want this after
+      return from system command ( see run.c )      */
+   if( ret && ( phase == 0 ) )
+   {
+      /* define keyboard translations */
+      hb_sln_Init_KeyTranslations();
+
+      /* for binary search of key translations */
+      hb_sln_SortKeyTranslationTable();
+   }
+
+   return( ret );
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_ExtendedKeySupport())
+int hb_gt_sln_ReadKey( PHB_GT pGT, int iEventMask )
 {
-    return( 0 );
-}
+   static int InDeadState = FALSE;
+   unsigned int ch, tmp, kbdflags;
+   BOOL fInput;
+   int iKey;
 
-/* *********************************************************************** */
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_sln_ReadKey(%p,%d)", pGT, (int) iEventMask));
 
-int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
-{
-    static int InDeadState = FALSE;
-    unsigned int ch, tmp, kbdflags;
+   /* user AbortKey break */
+   if( SLKeyBoard_Quit == 1 )
+      return HB_BREAK_FLAG;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
-
-    /* HB_SYMBOL_UNUSED( eventmask ); */
-
-    /* user AbortKey break */
-    if( SLKeyBoard_Quit == 1 )
-        return( HB_BREAK_FLAG );
-
-    /* has screen size changed ? */
-    if( hb_gt_sln_bScreen_Size_Changed )
-    {
-        hb_gt_sln_bScreen_Size_Changed = FALSE;
-        SLtt_get_screen_size();
+   /* has screen size changed ? */
+   if( hb_sln_bScreen_Size_Changed )
+   {
+      hb_sln_bScreen_Size_Changed = FALSE;
+      SLtt_get_screen_size();
 #if SLANG_VERSION > 10202
-        SLsmg_reinit_smg();
+      SLsmg_reinit_smg();
 #endif
-        /* TODO: we need here some kind of screen redrawing */
-        /*SLsmg_refresh();*/
-    }
 
-    /* if no pending chars */
-    if( 0 == SLang_input_pending( 0 ) )
-        return( HB_GT_FUNC(mouse_Inkey( eventmask )) );
+      /* TODO: we need here some kind of screen redrawing */
+      /*SLsmg_refresh();*/
+      HB_GTSELF_RESIZE( pGT, SLtt_Screen_Rows, SLtt_Screen_Cols );
+   }
+
+   fInput = SLang_input_pending( 0 ) != 0;
+   iKey = hb_gt_sln_mouse_Inkey( iEventMask, !fInput );
+   if( !fInput || iKey != 0 )
+      return iKey;
 
 #if HB_GT_KBD_MODIF_MASK
-    kbdflags = HB_GT_FUNC(gt_try_get_Kbd_State());
+   kbdflags = hb_sln_try_get_Kbd_State();
 #else
-    kbdflags = 0;
+   kbdflags = 0;
 #endif
 
 /* ------- one key ESC handling ----------------- */
-    /* NOTE: This will probably not work on slow terminals
-       or on very busy lines (i.e. modem lines ) */
-    ch = SLang_getkey();
-    if( ch == 033 )   /* escape char received, check for any pending chars */
-    {
-        if( s_gtSLN_escDelay == 0 )
-        {
-            /* standard acction, wait a 1 second for next char and if not then exit */
-            if( 0 == SLang_input_pending( 10 ) )
-                return( 0 );
-        }
-        else
-        {
-            /* wait s_gtSLN_escDelay milisec for next char and in not return ESC keycode */
-            if( 0 == SLang_input_pending( - HB_MAX( s_gtSLN_escDelay, 0 ) ) )
-                return( 033 );
-        }
-    }
+   /* NOTE: This will probably not work on slow terminals
+      or on very busy lines (i.e. modem lines ) */
+   ch = SLang_getkey();
+   if( ch == 033 )   /* escape char received, check for any pending chars */
+   {
+      if( hb_sln_escDelay == 0 )
+      {
+         /* standard acction, wait a 1 second for next char and if not then exit */
+         if( 0 == SLang_input_pending( 10 ) )
+            return( 0 );
+      }
+      else
+      {
+         /* wait hb_sln_escDelay milisec for next char and in not return ESC keycode */
+         if( 0 == SLang_input_pending( - HB_MAX( hb_sln_escDelay, 0 ) ) )
+            return( 033 );
+      }
+   }
 
-    /* user AbortKey break */
-    if( (int) ch == s_hb_gt_Abort_key )
-        return( HB_BREAK_FLAG );
+   /* user AbortKey break */
+   if( (int) ch == s_hb_sln_Abort_key )
+      return HB_BREAK_FLAG;
 
-    SLang_ungetkey( ch );
+   SLang_ungetkey( ch );
 /* ------------------------------------------------- */
 
-    ch = SLkp_getkey();
+   ch = SLkp_getkey();
 
-    /* unrecognized character */
-    if( ch == SL_KEY_ERR )
-        return( 0 );
+   /* unrecognized character */
+   if( ch == SL_KEY_ERR )
+      return( 0 );
 
-    /* Dead key handling */
-    if( InDeadState )
-    {
-        InDeadState = FALSE;
-        if( (int) ch == hb_DeadKey ) /* double press Dead key */
-            return( ch );
-        if( ch < 256 )  /* is this needed ??? */
-        {
-            int i;
-            for( i=0; i < ( int ) s_convKDeadKeys[ 0 ]; i++ )
-                if( ( int ) s_convKDeadKeys[ 2 * i + 1 ] == (int) ch )
-                    return( ( int ) s_convKDeadKeys[ 2 * i + 2 ] );
-        }
-        return( 0 );
-    }
-    else if( (int) ch == hb_DeadKey )
-    {
-        /* entering Dead key state */
-        InDeadState = TRUE;
-        return( 0 );
-    }
+   /* Dead key handling */
+   if( InDeadState )
+   {
+      InDeadState = FALSE;
+      if( (int) ch == hb_DeadKey ) /* double press Dead key */
+         return( ch );
+      if( ch < 256 )  /* is this needed ??? */
+      {
+         int i;
+         for( i=0; i < ( int ) hb_sln_convKDeadKeys[ 0 ]; i++ )
+            if( ( int ) hb_sln_convKDeadKeys[ 2 * i + 1 ] == (int) ch )
+               return( ( int ) hb_sln_convKDeadKeys[ 2 * i + 2 ] );
+      }
+      return( 0 );
+   }
+   else if( (int) ch == hb_DeadKey )
+   {
+      /* entering Dead key state */
+      InDeadState = TRUE;
+      return( 0 );
+   }
 
-    /* any special key ? */
-    if( ( tmp = ( ch | ( kbdflags << 16 ) ) ) > 256 )
-    {
-        if( ( tmp == SL_KEY_MOU ) )
-        {
-            if( ( eventmask & MOUSE_ALL_EVENTS_MASK ) != 0 )
-                return( HB_GT_FUNC(mouse_Inkey( eventmask )) );
-            else
-            {
-                /* mouse events are not requested so */
-                /* clear a reported mouse position */
-                /* NOTE : this will work only under Xterm */
-                SLang_getkey(); SLang_getkey(); SLang_getkey();
-                if( ( eventmask & INKEY_RAW ) == 0 )
-                    return( 0 );
-                else
-                    return( tmp );
-            }
-        }
+   /* any special key ? */
+   if( ( tmp = ( ch | ( kbdflags << 16 ) ) ) > 256 )
+   {
+      if( tmp == SL_KEY_MOU )
+      {
+         hb_gt_sln_mouse_ProcessTerminalEvent();
+         return hb_gt_sln_mouse_Inkey( iEventMask, FALSE );
+      }
 
-        if( ( eventmask & INKEY_RAW ) != 0 )
-            return tmp;
+      if( ( iEventMask & INKEY_RAW ) != 0 )
+         return tmp;
 
-        tmp = HB_GT_FUNC(gt_FindKeyTranslation( tmp ));
-        if( tmp != 0 )
-            return tmp;
+      tmp = hb_sln_FindKeyTranslation( tmp );
+      if( tmp != 0 )
+         return tmp;
 
-        /* TOFIX: this code is broken - needs a diffrent aproach */
-        tmp = HB_GT_FUNC(gt_FindKeyTranslation( ch ));
-        if( tmp != 0 || ch > 256 )
-            return tmp;
-    }
+      /* TOFIX: this code is broken - needs a diffrent aproach */
+      tmp = hb_sln_FindKeyTranslation( ch );
+      if( tmp != 0 || ch > 256 )
+         return tmp;
+   }
 
 #if !defined( HB_CDP_SUPPORT_OFF ) && ( defined( HB_SLN_UTF8 ) || defined( HB_SLN_UNICODE ) )
-    if ( hb_sln_Is_Unicode && ch < 256 )
-    {
-        int n = 0;
-        USHORT uc = 0;
+   if ( hb_sln_Is_Unicode && ch < 256 )
+   {
+      int n = 0;
+      USHORT uc = 0;
 
-        if ( hb_cdpGetFromUTF8( s_gtSln_cdpIN, FALSE, (BYTE) ch, &n, &uc ) )
-        {
-            unsigned int buf[ 10 ], i = 0;
+      if ( hb_cdpGetFromUTF8( hb_sln_cdpIN, FALSE, (BYTE) ch, &n, &uc ) )
+      {
+         unsigned int buf[ 10 ], i = 0;
 
-            while ( n > 0 )
-            {
-                if( SLang_input_pending( s_gtSLN_escDelay == 0 ? -100 :
-                                         - HB_MAX( s_gtSLN_escDelay, 0 ) ) == 0 )
-                    break;
-                buf[ i++ ] = SLang_getkey();
-                if ( !hb_cdpGetFromUTF8( s_gtSln_cdpIN, FALSE, (BYTE) buf[ i - 1 ], &n, &uc ) )
-                    break;
-            }
-            if ( n > 0 )
-            {
-                while ( i > 0 )
-                    SLang_ungetkey( buf[ --i ] );
-            }
-            else
-                ch = uc;
-        }
-    }
+         while ( n > 0 )
+         {
+            if( SLang_input_pending( hb_sln_escDelay == 0 ? -100 :
+                                         - HB_MAX( hb_sln_escDelay, 0 ) ) == 0 )
+               break;
+            buf[ i++ ] = SLang_getkey();
+            if ( !hb_cdpGetFromUTF8( hb_sln_cdpIN, FALSE, (BYTE) buf[ i - 1 ], &n, &uc ) )
+               break;
+         }
+         if ( n > 0 )
+         {
+            while ( i > 0 )
+               SLang_ungetkey( buf[ --i ] );
+         }
+         else
+            ch = uc;
+      }
+   }
 #endif
 
-    /* standard ASCII key */
-    return ch < 256 ? s_inputTab[ ch ] : ch;
+   /* standard ASCII key */
+   return ch < 256 ? hb_sln_inputTab[ ch ] : ch;
 }
 
 /* *********************************************************************** */
 
-static int HB_GT_FUNC(gt_try_get_Kbd_State())
+static int hb_sln_try_get_Kbd_State( void )
 {
 #if defined(__linux__)
-    unsigned char modifiers = 6;
+   unsigned char modifiers = 6;
 
-    if( ioctl( 0, TIOCLINUX, &modifiers ) < 0 )
-        return 0;
+   if( ioctl( 0, TIOCLINUX, &modifiers ) < 0 )
+      return 0;
  
-    return ( int ) modifiers;
+   return ( int ) modifiers;
  
 #elif defined(M_UNIX)
  
-    int modifiers = 0;
-    int IOcommand = 0;
+   int modifiers = 0;
+   int IOcommand = 0;
  
-    if( ioctl( 0, TCGETSC, &IOcommand ) >= 0 )
-    {
-        /* if keyboard is not in SCANCODE mode */
-        if( IOcommand == KB_XSCANCODE )
-        {
-            /* try to set it to SCANCODE mode */
-            IOcommand = KB_ISSCANCODE;
-            if( ioctl( 0, TCSETSC, &IOcommand ) >= 0 )
-            {
-                /* if SCANCODE mode is set corectly try get KBD state */
-                if( ioctl( 0, KDGKBSTATE, &modifiers ) < 0 )
-                    modifiers = 0;
+   if( ioctl( 0, TCGETSC, &IOcommand ) >= 0 )
+   {
+      /* if keyboard is not in SCANCODE mode */
+      if( IOcommand == KB_XSCANCODE )
+      {
+         /* try to set it to SCANCODE mode */
+         IOcommand = KB_ISSCANCODE;
+         if( ioctl( 0, TCSETSC, &IOcommand ) >= 0 )
+         {
+            /* if SCANCODE mode is set corectly try get KBD state */
+            if( ioctl( 0, KDGKBSTATE, &modifiers ) < 0 )
+               modifiers = 0;
     
-                /* turn a keyboard to a normal mode ( translation mode ) */
-                IOcommand = KB_XSCANCODE;
-                ( void ) ioctl( 0, TCSETSC, &IOcommand )
-            }
-        }
-        /* keyboard is already in SCANCODE mode */
-        else if( ioctl( 0, KDGKBSTATE, &modifiers ) < 0 )
-            modifiers = 0;
-  
-        return modifiers;
-    }
+            /* turn a keyboard to a normal mode ( translation mode ) */
+            IOcommand = KB_XSCANCODE;
+            ( void ) ioctl( 0, TCSETSC, &IOcommand )
+         }
+      }
+      /* keyboard is already in SCANCODE mode */
+      else if( ioctl( 0, KDGKBSTATE, &modifiers ) < 0 )
+         modifiers = 0;
+
+      return modifiers;
+   }
 #endif
 
-    return 0;
+   return 0;
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_Shft_Pressed())
+int hb_sln_Shft_Pressed()
 {
-    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & SHIFT_PRESSED ) != 0;
+   return ( hb_sln_try_get_Kbd_State() & SHIFT_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_Ctrl_Pressed())
+int hb_sln_Ctrl_Pressed()
 {
-    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & CONTROL_PRESSED ) != 0;
+   return ( hb_sln_try_get_Kbd_State() & CONTROL_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_Alt_Pressed())
+int hb_sln_Alt_Pressed()
 {
-    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & ALT_PRESSED ) != 0;
+   return ( hb_sln_try_get_Kbd_State() & ALT_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int HB_GT_FUNC(gt_Kbd_State())
+int hb_sln_Kbd_State()
 {
-    return HB_GT_FUNC(gt_try_get_Kbd_State());
+   return hb_sln_try_get_Kbd_State();
 }
 
 /* *********************************************************************** */

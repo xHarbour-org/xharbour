@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.662 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: hvm.c,v 1.663 2008/03/14 19:58:02 ronpinkas Exp $
  */
 
 /*
@@ -891,9 +891,6 @@ HB_EXPORT int hb_vmQuit( void )
    //printf("After Idle\n" );
 
    hb_backgroundShutDown();
-
-   hb_inkeyExit();
-   //printf("\nAfter inkey\n" );
 
    hb_i18nExit();
 

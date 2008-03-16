@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: Makefile,v 1.1 2004/09/08 00:17:17 druzus Exp $
 #
 
 ROOT = ../../../
@@ -10,7 +10,3 @@ C_SOURCES=\
 LIBNAME=gtxwc
 
 include $(TOP)$(ROOT)config/lib.cf
-
-ifeq ($(HB_MULTI_GT),yes)
-CFLAGS += -DHB_MULTI_GT
-endif

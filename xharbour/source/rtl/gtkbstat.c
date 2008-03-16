@@ -1,12 +1,12 @@
 /*
- * $Id: invrtwin.prg,v 1.2 2004/08/08 20:59:35 mauriliolongo Exp $
+ * $Id: gtkbstat.c 8236 2008-01-26 05:29:20Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 video function: - INVERTWIN()
+ *    Low level keyboard shift state functions common to some GT drivers
  *
- * Copyright 2002 Marek Horodyski <homar@altkom.com.pl>
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,50 +51,53 @@
  */
 
 
+/* NOTE: User programs should never call this layer directly! */
 
-#include "common.ch"
+#define HB_OS_WIN_32_USED
+#include "hbgtcore.h"
 
-Function INVERTWIN( t, l, b, r)
+#if defined( HB_OS_WIN_32 )
 
- Static to_Konv := { ;
-                     0, 31,112, 32, 95, 66, 40, 97,  0, 73,  3,  0,  2,  0,  0,   2,;
-                     61,  0, 21, 44,  0,  0,110,111,  0, 75, 40,  0,  4, 48,122, 52,;
-                     82,  0,162,  0, 32, 32, 44,  9, 83,  9,  0, 82,  3, 23, 14,  0,;
-                     98,  0,  0,  7,  0, 32, 67, 32, 39,114,  0, 32, 32, 58, 32, 32,;
-                     111, 32,  2,  0, 34, 98,  0, 41, 55, 48, 13, 52, 31,  0,  4, 0,;
-                     255, 32, 49,  9, 21,  9,  8, 82, 10, 23, 32,  0, 48,  0, 50, 7,;
-                     49, 32, 74,  0, 78, 52,114, 41, 32,  0, 32, 32,  2, 32,  9, 32,;
-                     52, 45, 40, 32, 55,  0, 32, 68, 51, 32, 32,  0, 10, 44,  0, 53,;
-                     54,110,233, 53,  0,  0, 32, 52, 53,  0,  0, 49,  0,  9, 45,  0,;
-                     82, 32, 34,  0, 48,  0, 32, 48, 32, 32, 53, 51,  7, 45, 32, 32,;
-                     32, 32,  2, 51, 98, 32, 32, 13, 52, 19, 32, 45, 32, 53, 32, 49,;
-                     82, 45, 32, 56, 32,  0, 31, 50, 66, 32, 10, 32, 13, 32, 32, 32,;
-                     53,112, 66, 32,  0,  0,  0,  0,  0,110, 73,  0, 48, 52, 48,  0,;
-                     32,  9,  9, 82, 51,  0, 48,  7, 10, 32, 32, 10, 32, 18, 32,  0,;
-                     28, 13, 32, 32, 32, 53,112, 66, 32,114,  0,  0,  0,  0,  0,110,;
-                     73,  0, 48, 52, 48,  0, 32,  9,  9, 10, 32, 18,  0, 28, 13, 32 }
+int hb_gt_w32_getKbdState( void )
+{
+   BYTE kbState[256];
+   int iKbdState = 0;
 
-  Local n AS NUMERIC, c AS CHARACTER, stop AS NUMERIC
+   GetKeyboardState( kbState );
 
-  #ifdef HARBOUR
-  Local os := ''
-  #endif
+   if( kbState[VK_SHIFT   ] & 0x80 ) iKbdState |= HB_GTI_KBD_SHIFT;
+   if( kbState[VK_CONTROL ] & 0x80 ) iKbdState |= HB_GTI_KBD_CTRL;
+   if( kbState[VK_MENU    ] & 0x80 ) iKbdState |= HB_GTI_KBD_ALT;
+   if( kbState[VK_LWIN    ] & 0x80 ) iKbdState |= HB_GTI_KBD_LWIN;
+   if( kbState[VK_RWIN    ] & 0x80 ) iKbdState |= HB_GTI_KBD_RWIN;
+   if( kbState[VK_APPS    ] & 0x80 ) iKbdState |= HB_GTI_KBD_MENU;
+   if( kbState[VK_SCROLL  ] & 0x01 ) iKbdState |= HB_GTI_KBD_SCROLOCK;
+   if( kbState[VK_NUMLOCK ] & 0x01 ) iKbdState |= HB_GTI_KBD_NUMLOCK;
+   if( kbState[VK_CAPITAL ] & 0x01 ) iKbdState |= HB_GTI_KBD_CAPSLOCK;
+   if( kbState[VK_INSERT  ] & 0x01 ) iKbdState |= HB_GTI_KBD_INSERT;
 
-  default t to Row(), l to Col(), b to MaxRow(), r to MaxCol()
+   return iKbdState;
+}
 
-  c := SaveScreen( t, l, b, r)
+void hb_gt_w32_setKbdState( int iKbdState )
+{
+   BYTE kbState[256];
 
-  stop := Len(c)
+   GetKeyboardState( kbState );
 
-  For n := 2 TO stop STEP 2
-  #ifdef HARBOUR
-      os += c[ n - 1] + Chr( TO_Konv[ Asc( c[ n]) + 1])
-  next
-  RestScreen( t, l, b, r, os)
-  #else  // in xHarbour
-      c[n] := Chr(TO_Konv[ Asc( c[n] ) + 1])
-  next
-  RestScreen( t, l, b, r, c)
-  #endif
+   kbState[VK_SHIFT  ] = ( iKbdState & HB_GTI_KBD_SHIFT    ) ? 0x80 : 0;
+   kbState[VK_CONTROL] = ( iKbdState & HB_GTI_KBD_CTRL     ) ? 0x80 : 0;
+   kbState[VK_MENU   ] = ( iKbdState & HB_GTI_KBD_ALT      ) ? 0x80 : 0;
+   kbState[VK_LWIN   ] = ( iKbdState & HB_GTI_KBD_LWIN     ) ? 0x80 : 0;
+   kbState[VK_RWIN   ] = ( iKbdState & HB_GTI_KBD_RWIN     ) ? 0x80 : 0;
+   kbState[VK_APPS   ] = ( iKbdState & HB_GTI_KBD_MENU     ) ? 0x80 : 0;
+   kbState[VK_SCROLL ] = ( iKbdState & HB_GTI_KBD_SCROLOCK ) ? 0x01 : 0;
+   kbState[VK_NUMLOCK] = ( iKbdState & HB_GTI_KBD_NUMLOCK  ) ? 0x01 : 0;
+   kbState[VK_CAPITAL] = ( iKbdState & HB_GTI_KBD_CAPSLOCK ) ? 0x01 : 0;
+   kbState[VK_INSERT ] = ( iKbdState & HB_GTI_KBD_INSERT   ) ? 0x01 : 0;
 
-Return ''
+   SetKeyboardState( kbState );
+}
+
+
+#endif /* HB_OS_WIN_32 */

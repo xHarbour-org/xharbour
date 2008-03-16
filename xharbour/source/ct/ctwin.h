@@ -1,12 +1,12 @@
 /*
- * $Id: mousepca.c,v 1.2 2003/05/16 19:52:10 druzus Exp $
+ * $Id: ctwin.h 8310 2008-02-21 23:20:35Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * Mouse subsystem for plain ANSI C stream IO (stub)
+ * Header file for Clipper Tools like window system
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,81 +50,31 @@
  *
  */
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	PCA
+#ifndef HB_CTWIN_H_
+#define HB_CTWIN_H_
 
-#include "hbapigt.h"
+HB_EXTERN_BEGIN
 
-/* NOTE: This file is a simple stub for those platforms which don't have
-         any kind of mouse support. [vszakats] */
+extern BOOL hb_ctwInit( void );
+extern int  hb_ctwSetShadowAttr( int iAttr );
+extern int  hb_ctwSetMoveMode( int iMode );
+extern int  hb_ctwSetMoveStep( int iVertical, int iHorizontal );
+extern int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight );
+extern int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight );
+extern int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor );
+extern int  hb_ctwCloseAllWindows( void );
+extern int  hb_ctwCloseWindow( int iWindow );
+extern int  hb_ctwCurrentWindow( void );
+extern int  hb_ctwSelectWindow( int iWindow );
+extern int  hb_ctwMaxWindow( void );
+extern int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight );
+extern int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight );
+extern int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight );
+extern int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol );
+extern int  hb_ctwCenterWindow( int iWindow, BOOL fCenter );
+extern int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor );
+extern int  hb_ctwLastKey( void );
 
-/* C callable low-level interface */
+HB_EXTERN_END
 
-void HB_GT_FUNC(mouse_Init( void ))
-{
-   ;
-}
-
-void HB_GT_FUNC(mouse_Exit( void ))
-{
-   ;
-}
-
-BOOL HB_GT_FUNC(mouse_IsPresent( void ))
-{
-   return FALSE;
-}
-
-void HB_GT_FUNC(mouse_Show( void ))
-{
-   ;
-}
-
-void HB_GT_FUNC(mouse_Hide( void ))
-{
-   ;
-}
-
-int HB_GT_FUNC(mouse_Col( void ))
-{
-   return 0;
-}
-
-int HB_GT_FUNC(mouse_Row( void ))
-{
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
-{
-   HB_SYMBOL_UNUSED( iRow );
-   HB_SYMBOL_UNUSED( iCol );
-}
-
-BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
-{
-   HB_SYMBOL_UNUSED( iButton );
-
-   return FALSE;
-}
-
-int HB_GT_FUNC(mouse_CountButton( void ))
-{
-   return 0;
-}
-
-void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
-{
-   HB_SYMBOL_UNUSED( iTop );
-   HB_SYMBOL_UNUSED( iLeft );
-   HB_SYMBOL_UNUSED( iBottom );
-   HB_SYMBOL_UNUSED( iRight );
-}
-
-void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
-{
-   HB_SYMBOL_UNUSED( piTop );
-   HB_SYMBOL_UNUSED( piLeft );
-   HB_SYMBOL_UNUSED( piBottom );
-   HB_SYMBOL_UNUSED( piRight );
-}
+#endif /* HB_CTWIN_H_ */

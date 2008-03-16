@@ -1,11 +1,10 @@
 /*
- * $Id: gfx.ch,v 1.6 2005/02/11 18:58:40 druzus Exp $
- *
+ * $Id: hbgfxdef.ch 6619 2006-03-01 13:49:07Z druzus $
  */
 
 /*
  * xHarbour Project source code:
- * Graphics API header file.
+ * GT Graphics definitions (GFX_*)
  *
  * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
  * www - http://www.xharbour.org
@@ -58,8 +57,8 @@
  *
  */
 
-#ifndef _GFX_CH_
-#define _GFX_CH_
+#ifndef _HBGFXDEF_CH_
+#define _HBGFXDEF_CH_
 
 /*
  * NOTE: ACQUIRE / RELEASE screen pair must work same way DispBegin()/DispEnd() pair does
@@ -76,17 +75,15 @@
  */
 
 /* Misc, internals */
-#define GFX_ACQUIRESCREEN   1  // Some GTs may require that you 'acquire' the screen before doing gfx things
-#define GFX_RELEASESCREEN   2  // Release a previously 'acquired' screen
-#define GFX_MAKECOLOR       3  // Calculate gfx color number based on RGBA values
+#define GFX_ACQUIRESCREEN   1  /* Some GTs may require that you 'acquire' the screen before doing gfx things */
+#define GFX_RELEASESCREEN   2  /* Release a previously 'acquired' screen */
+#define GFX_MAKECOLOR       3  /* Calculate gfx color number based on RGBA values */
 /* Functions that affect drawing area */
 #define GFX_CLIPTOP        10
 #define GFX_CLIPLEFT       11
 #define GFX_CLIPBOTTOM     12
 #define GFX_CLIPRIGHT      13
-#define GFX_SETCLIP        14  // NOTE: set to 0, 0, 0, 0 to disable ;)
-#define GFX_MOUSEX         15
-#define GFX_MOUSEY         16
+#define GFX_SETCLIP        14  /* NOTE: set to 0, 0, 0, 0 to disable ;) */
 /* Functions that affect drawing mode */
 #define GFX_DRAWINGMODE    20
 /* Drawing primitives */
@@ -102,19 +99,9 @@
 #define GFX_FLOODFILL      59
 
 /* Drawing mode constants */
-#define GFX_MODE_SOLID      1  // Solid mode, no translucency, no patterned primitives
-#define GFX_MODE_XOR        2  // XOR with current screen contents
-#define GFX_MODE_ALPHA      3  // Use alpha for transluced effect (SLOW)
+#define GFX_MODE_SOLID      1  /* Solid mode, no translucency, no patterned primitives */
+#define GFX_MODE_XOR        2  /* XOR with current screen contents */
+#define GFX_MODE_ALPHA      3  /* Use alpha for transluced effect (SLOW) */
 /* TODO: add patterned mode drawings */
 
-#ifndef _NO_GFX_TRANSLATES_
-
-#ifdef __XHARBOUR__
-
-#include "gfxtrans.ch"
-
-#endif /* __XHARBOUR__*/
-
-#endif /* _NO_GFX_TRANSLATES_ */
-
-#endif  /* _GFX_CH_ */
+#endif  /* _HBGFXDEF_CH_ */

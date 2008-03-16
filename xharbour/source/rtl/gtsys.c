@@ -1,14 +1,13 @@
 /*
- * $Id: untext.prg,v 1.2 2006/09/02 16:00:00 ptsarenko Exp $
+ * $Id: gtsys.c 6583 2006-02-04 16:16:48Z druzus $
  */
 
 /*
- * xHarbour Project source code:
- *   CT3 video functions (screen-like functions):
+ * Harbour Project source code:
+ * Null and multi_GT switch video subsystem.
  *
- * UNTEXTWIN()
- * Copyright 2004 Pavel Tsarenko <tpe2.mail.ru>
- * www - http://www.xharbour.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +16,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
+ * along with this software; see the file COPYING.   If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
@@ -41,7 +40,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.  To avoid misleading
+ * not apply to the code that you add in this way.   To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -51,39 +50,29 @@
  *
  */
 
-#include "common.ch"
+/* NOTE: User programs should never call this layer directly! */
 
-Function UnTextWin(nTop, nLeft, nBottom, nRight, xReplChar, xInitChar, xEndChar)
-Local cStr := SaveScreen(nTop, nLeft, nBottom, nRight)
-Local nCSize := Len(cStr) / ((nBottom-nTop+1) * (nRight-nLeft+1))
-Local cReplChar := iif(IsCharacter(xReplChar), xReplChar, Chr(xReplChar) )
-Local cInitChar, cEndChar, ser
+/* *********************************************************************** */
 
-if xInitChar == nil
-   cInitChar := Chr(176)
-elseif ValType(xInitChar) == 'N'
-   cInitChar := Chr(xInitChar)
-else
-   cInitChar := xInitChar
-endif
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_NAME      NUL
 
-if xEndChar == nil
-   cEndChar := Chr(223)
-elseif ValType(xEndChar) == 'N'
-   cEndChar := Chr(xEndChar)
-else
-   cEndChar := xEndChar
-endif
+#include "hbgtcore.h"
 
-for ser := 1 to len(cStr) step nCSize
-   if cInitChar == nil .or. cEndChar == nil .or. if(cInitChar <= cEndChar,;
-         cInitChar > cStr[ser] .or. cEndChar < cStr[ser],;
-         cInitChar < cStr[ser] .and. cEndChar > cStr[ser] )
+#if defined(HB_GT_DEFAULT)
+   HB_GT_REQUEST( HB_GT_DEFAULT )
+#elif defined(HB_GT_LIB)
+   HB_GT_REQUEST( HB_GT_LIB )
+#elif defined(HB_OS_LINUX)
+   HB_GT_REQUEST( CRS )
+#elif defined(HB_OS_WIN_32)
+   HB_GT_REQUEST( WIN )
+#elif defined(HB_OS_DOS)
+   HB_GT_REQUEST( DOS )
+#elif defined(HB_OS_OS2)
+   HB_GT_REQUEST( OS2 )
+#else
+   HB_GT_REQUEST( STD )
+#endif
 
-      cStr[ser] := cReplChar
-
-   endif
-next
-
-RestScreen(nTop, nLeft, nBottom, nRight, cStr)
-Return ''
+HB_FUNC( HB_GTSYS ) {}

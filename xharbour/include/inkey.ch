@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.15 2005/09/30 23:44:05 druzus Exp $
+ * $Id: inkey.ch,v 1.16 2006/02/25 17:32:15 lf_sfnet Exp $
  */
 
 /*
@@ -65,10 +65,13 @@
 #define INKEY_LUP               4
 #define INKEY_RDOWN             8
 #define INKEY_RUP               16
-#define INKEY_MMIDDLE           32  /* Mask for middle button events */
-#define INKEY_MWHEEL            64  /* Mask for mouse wheel events */
+#define INKEY_MMIDDLE           32  /* Harbour extension middle button mask */
+#define INKEY_MWHEEL            64  /* Harbour extension mouse wheel mask */
 #define INKEY_KEYBOARD          128
 #define INKEY_ALL               255
+
+#define HB_INKEY_RAW            256 /* Harbour extension */
+#define HB_INKEY_EXTENDED       512 /* Harbour extension */
 
 /* Mouse events */
 
@@ -79,18 +82,24 @@
 #define K_RBUTTONUP             1005
 #define K_LDBLCLK               1006
 #define K_RDBLCLK               1007
-#define K_MBUTTONDOWN           1008   // Middle Button Down
-#define K_MBUTTONUP             1009   // Middle Button Up
-#define K_MDBLCLK               1010   // Middle Button Double Click
-#define K_MMLEFTDOWN            1011   // Mouse Move Left Down
-#define K_MMRIGHTDOWN           1012   // Mouse Move Right Down
-#define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
-#define K_MWFORWARD             1014   // Mouse Wheel Forward
-#define K_MWBACKWARD            1015   // Mouse Wheel Backward
-#define K_NCMOUSEMOVE           1016   // Non-Client Area Mouse Movement
+#define K_MBUTTONDOWN           1008   /* Middle Button Down */
+#define K_MBUTTONUP             1009   /* Middle Button Up */
+#define K_MDBLCLK               1010   /* Middle Button Double Click */
+#define K_MMLEFTDOWN            1011   /* Mouse Move Left Down */
+#define K_MMRIGHTDOWN           1012   /* Mouse Move Right Down */
+#define K_MMMIDDLEDOWN          1013   /* Mouse Move Middle Down */
+#define K_MWFORWARD             1014   /* Mouse Wheel Forward */
+#define K_MWBACKWARD            1015   /* Mouse Wheel Backward */
+#define K_NCMOUSEMOVE           1016   /* Non-Client Area Mouse Movement */
 
 #define K_MINMOUSE              1001
 #define K_MAXMOUSE              1016
+
+
+/* Harbour extension - this marks that multi-characters keycode will be
+   returned - call INKEY() until ZERO will be returned
+*/
+#define HB_K_MULTICODE          4096
 
 /* Cursor movement keys */
 
@@ -326,7 +335,6 @@
 #define K_ALT_PERIOD            308
 #define K_ALT_SLASH             309   /*   Alt-Slash (fyi Ctrl-? doesn't
                                            work - maybe just under xp?)  */
-
 
 /* Function keys */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: maxrow.c,v 1.6 2004/10/30 15:10:38 paultucker Exp $
+ * $Id: maxrow.c,v 1.7 2005/02/13 17:42:04 paultucker Exp $
  */
 
 /*
@@ -54,50 +54,38 @@
 
 #include "hbapi.h"
 #include "hbapigt.h"
-#include "gtinfo.ch"
 
-/****************************************************************************/
-HB_FUNC( MAXROW ) /* Return the highest screen/window row number (zero origin) */
+HB_FUNC( MAXROW ) /* Return the maximum screen row number (zero origin) */
 {
-   int nMode;
-
-   switch( nMode = hb_parni(1) )
+   /*
+    * if called with logical .T. parameter then return real screen high - 1
+    * It gives exactly the same result in all standard GT drivers so we
+    * are still Clipper compatible. The difference can appear in some extended
+    * GT drivers which have additional functionality, f.e. CTW GT which
+    * is upper level GT and add CTIII Window support. When it's activated
+    * then MaxRow() will return current window max row and MaxRow(.t.) real
+    * screen (window 0) max row what is the exact behavior of MaxRow()
+    * in CT3, [druzus]
+    */
+   if( ISLOG( 1 ) && hb_parl( 1 ) )
    {
-      case GTI_MAX:
-         hb_retni( hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) );
-         break;
-
-      case GTI_CLIENT:
-         hb_retni( hb_gt_info(GTI_VIEWPORTHEIGHT,FALSE,0,NULL) );
-         break;
-
-      case GTI_WINDOW:
-      case GTI_SCREEN:
-      default:
-         hb_retni( hb_ctMaxRow( nMode == GTI_SCREEN ) );
+      USHORT uiRows, uiCols;
+      hb_gtScrDim( &uiRows, &uiCols );
+      hb_retni( uiRows - 1 );
    }
-
+   else
+      hb_retni( hb_gtMaxRow() );
 }
 
-/****************************************************************************/
-HB_FUNC( MAXCOL ) /* Return the highest screen/window column number (zero origin) */
+HB_FUNC( MAXCOL ) /* Return the maximum screen column number (zero origin) */
 {
-   int nMode;
-
-   switch( nMode = hb_parni(1) )
+   /* See the note about MaxRow(.t.) above */
+   if( ISLOG( 1 ) && hb_parl( 1 ) )
    {
-      case GTI_MAX:
-         hb_retni( hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) );
-         break;
-
-      case GTI_CLIENT:
-         hb_retni( hb_gt_info(GTI_VIEWPORTWIDTH,FALSE,0,NULL) );
-         break;
-
-      case GTI_WINDOW:
-      case GTI_SCREEN:
-      default:
-         hb_retni( hb_ctMaxCol( nMode == GTI_SCREEN ) );
+      USHORT uiRows, uiCols;
+      hb_gtScrDim( &uiRows, &uiCols );
+      hb_retni( uiCols - 1 );
    }
-
+   else
+      hb_retni( hb_gtMaxCol() );
 }

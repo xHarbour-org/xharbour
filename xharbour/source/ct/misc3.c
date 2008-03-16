@@ -1,5 +1,5 @@
 /*
- *  $Id: misc3.c,v 1.1 2005/12/19 19:13:51 ptsarenko Exp $
+ *  $Id: misc3.c,v 1.2 2007/09/22 05:41:01 andijahja Exp $
  */
 
 /*
@@ -50,29 +50,40 @@
  *
  */
 
-
 #include "hbapi.h"
 #include "hbapigt.h"
-#include "gtinfo.ch"
-#include "hbset.h"
-
+#include "hbapiitm.h"
 
 HB_FUNC( KBDSTAT )
 {
-   int iState = hb_gt_info(GTI_KBDSHIFTS, FALSE, 0, NULL);
    int iRet = 0;
+   HB_GT_INFO gtInfo;
 
-   if ( iState & GTI_KBD_SHIFT ) iRet += 1;
-   if ( iState & GTI_KBD_CTRL ) iRet += 4;
-   if ( iState & GTI_KBD_ALT ) iRet += 8;
-   if ( iState & GTI_KBD_SCROLOCK ) iRet += 0x10;
-   if ( iState & GTI_KBD_NUMLOCK ) iRet += 0x20;
-   if ( iState & GTI_KBD_CAPSLOCK ) iRet += 0x40;
-#ifndef __EXPORT__
-   if ( hb_set.HB_SET_INSERT ) iRet += 0x80;
-#else
-   if ( hb_setInsert() ) iRet += 0x80;
-#endif
+   gtInfo.pNewVal = NULL;
+   gtInfo.pResult = NULL;
+
+   hb_gtInfo( GTI_KBDSHIFTS, &gtInfo );
+
+   if( gtInfo.pResult )
+   {
+      int iState = hb_itemGetNI( gtInfo.pResult );
+
+      hb_itemRelease( gtInfo.pResult );
+      if( iState & GTI_KBD_SHIFT )
+         iRet |= 0x01;
+      if( iState & GTI_KBD_CTRL )
+         iRet |= 0x04;
+      if( iState & GTI_KBD_ALT )
+         iRet |= 0x08;
+      if( iState & GTI_KBD_SCROLOCK )
+         iRet |= 0x10;
+      if( iState & GTI_KBD_NUMLOCK )
+         iRet |= 0x20;
+      if( iState & GTI_KBD_CAPSLOCK )
+         iRet |= 0x40;
+      if( iState & GTI_KBD_INSERT )
+         iRet |= 0x80;
+   }
 
    hb_retni( iRet );
 }

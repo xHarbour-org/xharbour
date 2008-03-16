@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.31 2007/05/27 13:28:14 likewolf Exp $
+# $Id: Makefile,v 1.32 2007/08/06 20:30:22 likewolf Exp $
 #
 
 ROOT = ../
@@ -7,16 +7,15 @@ ROOT = ../
 C_HEADERS=\
 	clipdefs.h   \
 	extend.h     \
+	hashapi.h    \
 	hbapi.h      \
-	hbole.h      \
+	hbapicdp.h   \
 	hbapidbg.h   \
 	hbapierr.h   \
 	hbapifs.h    \
 	hbapigt.h    \
-	hbfast.h     \
 	hbapiitm.h   \
 	hbapilng.h   \
-	hbapicdp.h   \
 	hbapirdd.h   \
 	hbcomp.h     \
 	hbcomprs.h   \
@@ -27,9 +26,10 @@ C_HEADERS=\
 	hbdefs.h     \
 	hberrors.h   \
 	hbexprop.h   \
+	hbfast.h     \
 	hbfixdj.h    \
+	hbgtcore.h   \
 	hbhash.h     \
-	hashapi.h    \
 	hbi18n.h     \
 	hbinit.h     \
 	hbmacro.h    \
@@ -41,8 +41,8 @@ C_HEADERS=\
 	hbrddcdx.h   \
 	hbrdddbf.h   \
 	hbrdddbt.h   \
-	hbrdddel.h   \
 	hbrddfpt.h   \
+	hbrdddel.h   \
 	hbrddntx.h   \
 	hbrddsdf.h   \
 	hbset.h      \
@@ -56,6 +56,7 @@ C_HEADERS=\
 	hbvmopt.h    \
 	hbvmpub.h    \
 	hbxvm.h      \
+	hbwince.h    \
 	hbxml.h      \
 	hb_io.h      \
 	hrbdll.h     \
@@ -85,13 +86,13 @@ PRG_HEADERS=\
 	error.ch     \
 	fileio.ch    \
 	getexit.ch   \
-	gtinfo.ch    \
-	gfx.ch       \
-	gfxtrans.ch  \
 	hbclass.ch   \
 	hbcommon.ch  \
 	hbcomprs.ch  \
 	hbextern.ch  \
+	hbgfx.ch     \
+	hbgfxdef.ch  \
+	hbgtinfo.ch  \
 	hblang.ch    \
 	hblogdef.ch  \
 	hbmacro.ch   \

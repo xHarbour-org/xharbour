@@ -1,7 +1,6 @@
 /*
- * $Id: ftattr.c,v 1.2 2004/01/23 09:57:31 andijahja Exp $
+ * $Id: ftattr.c,v 1.3 2004/03/18 03:46:55 ronpinkas Exp $
  */
-
 
 /*
  * File......: SAVEATT.ASM
@@ -174,29 +173,43 @@ End
 
 HB_FUNC( FT_SAVEATT )
 {
-
    USHORT uiTop    = hb_parni( 1 ); /* Defaults to zero on bad type */
    USHORT uiLeft   = hb_parni( 2 ); /* Defaults to zero on bad type */
-   USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow();
-   USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol();
+   USHORT uiMaxRow = hb_gtMaxRow();
+   USHORT uiMaxCol = hb_gtMaxCol();
+   USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : uiMaxRow;
+   USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : uiMaxRow;
 
-   UINT   uiSize;
-   USHORT uiFor;
+   ULONG  ulSize;
    char * pBuffer;
    char * pAttrib;
 
-   hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
-   pBuffer = ( char * ) hb_xgrab( uiSize + 1 );
-   pAttrib = ( char * ) hb_xgrab( ( uiSize / 2 ) + 1 );
+   if( uiBottom > uiMaxRow )
+      uiBottom = uiMaxRow;
+   if( uiRight > uiMaxCol )
+      uiRight = uiMaxCol;
 
-   hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
-
-   for( uiFor = 1; uiFor < (USHORT) uiSize; uiFor += 2 )
-      *(pAttrib + ((uiFor - 1) / 2)) = *(pBuffer + uiFor);
-
-   hb_xfree( pBuffer );
-
-   hb_retclen_buffer( pAttrib, ( uiSize / 2 ) );
+   if( uiTop <= uiBottom && uiLeft <= uiRight )
+   {
+      ulSize = ( uiBottom - uiTop + 1 ) * ( uiRight - uiLeft + 1 );
+      pBuffer = pAttrib = ( char * ) hb_xgrab( ulSize + 1 );
+      while( uiTop <= uiBottom )
+      {
+         USHORT uiCol = uiLeft;
+         while( uiCol <= uiRight )
+         {
+            BYTE bColor, bAttr;
+            USHORT usChar;
+            hb_gtGetChar( uiTop, uiCol, &bColor, &bAttr, &usChar );
+            *pBuffer++ = ( char ) bColor;
+            ++uiCol;
+         }
+         ++uiTop;
+      }
+      hb_retclen_buffer( pAttrib, ulSize );
+   }
+   else
+      hb_retc( NULL );
 }
 
 /*
@@ -370,32 +383,39 @@ End
 
 HB_FUNC( FT_RESTATT )
 {
-
-   if( ISCHAR( 5 ) )
+   ULONG ulLen = hb_parclen( 5 );
+   if( ulLen )
    {
       USHORT uiTop    = hb_parni( 1 ); /* Defaults to zero on bad type */
       USHORT uiLeft   = hb_parni( 2 ); /* Defaults to zero on bad type */
+      USHORT uiMaxRow = hb_gtMaxRow();
+      USHORT uiMaxCol = hb_gtMaxCol();
       USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow();
       USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol();
+      char * pAttrib  = hb_parc( 5 );
 
-      UINT   uiSize;
-      USHORT uiFor;
-      char * pBuffer;
-      char * pAttrib;
+      if( uiBottom > uiMaxRow )
+         uiBottom = uiMaxRow;
+      if( uiRight > uiMaxCol )
+         uiRight = uiMaxCol;
 
-      hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
-      pBuffer = ( char * ) hb_xgrab( uiSize + 1 );
-
-      hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
-
-      pAttrib = hb_parcx( 5 );
-
-      for( uiFor = 1; uiFor < (USHORT) uiSize; uiFor += 2 )
-         *(pBuffer + uiFor) = *(pAttrib + ((uiFor - 1) / 2));
-
-      hb_gtRest( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
-
-      hb_xfree( pBuffer );
-
+      if( uiTop <= uiBottom && uiLeft <= uiRight )
+      {
+         while( ulLen && uiTop <= uiBottom)
+         {
+            USHORT uiCol = uiLeft;
+            while( ulLen && uiCol <= uiRight )
+            {
+               BYTE bColor, bAttr;
+               USHORT usChar;
+               hb_gtGetChar( uiTop, uiCol, &bColor, &bAttr, &usChar );
+               bColor = *pAttrib++;
+               hb_gtPutChar( uiTop, uiCol, bColor, bAttr, usChar );
+               ++uiCol;
+               --ulLen;
+            }
+            ++uiTop;
+         }
+      }
    }
 }

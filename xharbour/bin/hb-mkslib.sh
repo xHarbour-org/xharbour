@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.13 2005/08/12 02:44:26 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.14 2006/11/30 00:57:08 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,6 +12,9 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
+# HB_ARCHITECTURE=""
+# CCPREFIX=""
+
 if [ -n "${HB_ARCHITECTURE}" ]
 then
     hb_arch="${HB_ARCHITECTURE}"
@@ -20,7 +23,7 @@ else
 fi
 
 case "$hb_arch" in
-    *windows*|*mingw32*)    hb_arch="w32" ;;
+    *windows*|*mingw32*|msys*)  hb_arch="w32" ;;
     *dos)   hb_arch="dos" ;;
     *bsd)   hb_arch="bsd" ;;
 esac
@@ -28,6 +31,7 @@ esac
 case "$hb_arch" in
     darwin) SLIB_EXT=".dylib" ;;
     w32)    SLIB_EXT=".dll" ;;
+    hpux)   SLIB_EXT=".sl" ;;
     *)      SLIB_EXT=".so" ;;
 esac
 
@@ -77,30 +81,30 @@ cd "${OTMPDIR}"
 for f in $*
 do
     case "${f}" in
-	*.o)
+        *.o)
             if [ ! -r "${dir}/${f}" ]
-	    then
-	        echo "cannot read file: ${f}"
-	        exit 1
-	    fi
-	    cp "${dir}/${f}" "${OTMPDIR}" || exit 1
-	    ;;
-	*.a)
+            then
+                echo "cannot read file: ${f}"
+                exit 1
+            fi
+            cp "${dir}/${f}" "${OTMPDIR}" || exit 1
+            ;;
+        *.a)
             if [ ! -r "${dir}/${f}" ]
-	    then
-	        echo "cannot read file: ${f}"
-	        exit 1
-	    fi
-	    d="${f%.a}"
-	    d="${f##*/}"
-	    mkdir $d
-	    cd $d
-	    ${CCPREFIX}ar -x "${dir}/${f}" || exit 1
-	    cd ..
-	    ;;
-	*)
+            then
+                echo "cannot read file: ${f}"
+                exit 1
+            fi
+            d="${f%.a}"
+            d="${f##*/}"
+            mkdir $d
+            cd $d
+            ${CCPREFIX}ar -x "${dir}/${f}" || exit 1
+            cd ..
+            ;;
+        *)
             linker_options="${linker_options} ${f}"
-	    ;;
+            ;;
     esac
 done
 OBJLST=`find . -name \*.o`
@@ -119,8 +123,12 @@ if [ "${SLIB_EXT}" = ".dylib" ]; then
     ln -sf "${FULLNAME}" "${DSTDIR}${BASE}${SLIB_EXT}"
 elif [ "${SLIB_EXT}" = ".dll" ]; then
     FULLNAME="${LIB_NAME}${SLIB_EXT}"
-    SYSLIBS="-luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32"
-    SYSLIBS="${SYSLIBS} -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32"
+    if [ "$HB_COMPILER" = "cemgw" ]; then
+        SYSLIBS=" -lwininet -lws2"
+    else
+        SYSLIBS="-luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32"
+        SYSLIBS="${SYSLIBS} -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32"
+    fi
     ${CCPREFIX}gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} ${SYSLIBS} ${HB_DLLIBS} && \
         cd "${dir}" && \
         rm -f "${DSTDIR}${FULLNAME}" && \
@@ -129,7 +137,7 @@ else
     #FULLNAME="${BASE}-${VERSION}${SLIB_EXT}"
     #FULLNAME="${BASE}{SLIB_EXT}.${VERSION}"
     FULLNAME="${LIB_NAME}${SLIB_EXT}"
-    ${CCPREFIX}gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} && \
+    ${CCPREFIX}gcc -shared -fPIC -o "${FULLNAME}" $OBJLST ${linker_options} ${L_USR} && \
         cd "${dir}" && \
         mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}"
 fi

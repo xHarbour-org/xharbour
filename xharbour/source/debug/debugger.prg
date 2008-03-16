@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.86 2007/09/25 05:41:56 bdj Exp $
+ * $Id: debugger.prg,v 1.87 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -62,12 +62,9 @@
          the debugger output may interfere with the applications output
          redirection, and is also slower. [vszakats] */
 
-#pragma BEGINDUMP
-#include "hbapigt.h"
-#pragma ENDDUMP
-
 #include "hbclass.ch"
 #include "hbdebug.ch"   // for "nMode" of __dbgEntry
+#include "hbgtinfo.ch"
 #include "hbmemvar.ch"
 
 #include "box.ch"
@@ -180,8 +177,6 @@ CREATE CLASS HBDebugger
    VAR oBrwVars
    VAR aVars             INIT {}
 
-   VAR cImage
-   VAR cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor, nAppCTWindow
    VAR nAppDispCount
    VAR nAppLastKey
    VAR bAppInkeyAfter
@@ -196,10 +191,8 @@ CREATE CLASS HBDebugger
    VAR nMaxRow
    VAR nMaxCol
 
-   VAR nAppMaxRow, nAppMaxCol  //x new: app's maxrow/col
-   VAR nAppWindow
-
-   VAR nDebuggerWindow
+   VAR hUserWindow
+   VAR hDebuggerWindow
    VAR lDebuggerWindowIsOpen INIT .F.
 
    VAR aBreakPoints      INIT {}
@@ -244,8 +237,6 @@ CREATE CLASS HBDebugger
    VAR lPPO              INIT .F.
    VAR lRunAtStartup     INIT .T.   // Clipper compatible
    VAR lLineNumbers      INIT .T.
-
-   VAR cGTVersion INIT ' '
 
    METHOD New()
    METHOD Activate()
@@ -315,7 +306,7 @@ CREATE CLASS HBDebugger
    METHOD RestoreAppState()
    METHOD RestoreSettings()
    METHOD RunAtStartup() INLINE ::lRunAtStartup := ::oPullDown:GetItemByIdent( "ALTD" ):checked := !::lRunAtStartup
-   METHOD SaveAppScreen( lRestore )
+   METHOD SaveAppScreen()
    METHOD SaveAppState()
    METHOD SaveSettings()
    METHOD Show()
@@ -396,19 +387,8 @@ METHOD New() CLASS HBDebugger
    ::lGo := ::lRunAtStartup
 
    /* Store the initial screen dimensions for now */
-   IF hb_gt_Version() == 'WVW' .and. ;
-      !( type( 'WVW_NOPENWINDOW()' ) == 'U' .OR. Type( 'WVW_NSETCURWINDOW()' ) == 'U' )
-      ::cGTVersion := 'WVW'
-      ::nMaxRow := DEBUGGER_MAXROW
-      ::nMaxCol := DEBUGGER_MAXCOL
-   ELSE
-      ::nMaxRow := MaxRow()
-      ::nMaxCol := MaxCol()
-   ENDIF
-
-   /* Store the initial screen dimensions for now */
-   ::nAppMaxRow := MaxRow()
-   ::nAppMaxCol := MaxCol()
+   ::nMaxRow := MaxRow()
+   ::nMaxCol := MaxCol()
 
    ::oPullDown := __dbgBuildMenu( Self )
 
@@ -427,26 +407,23 @@ METHOD New() CLASS HBDebugger
 
    IF File( ::cSettingsFileName )
       ::LoadSettings()
-      ::lGo := ::lRunAtStartup
+      ::lGo := ::lRunAtStartup // Once again after settings file is loaded
    ENDIF
 
    RETURN Self
 
 METHOD OpenDebuggerWindow() CLASS HBDebugger
 
-   IF ::cGTVersion == 'WVW'
-      IF !::lDebuggerWindowIsOpen
-      ::nAppMaxRow := maxrow()
-      ::nAppMaxCol := maxcol()
-      ::nAppWindow := hb_ExecFromArray( 'WVW_NSETCURWINDOW' )
-      ::lDebuggerWindowIsOpen := .T.
-      ::nDebuggerWindow := hb_ExecFromArray( 'WVW_NOPENWINDOW', ;
-                      { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
-                        DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
+   IF !::lDebuggerWindowIsOpen
+      ::hUserWindow := hb_gtInfo( GTI_GETWIN )
+      IF ::hDebuggerWindow == NIL
+         ::hDebuggerWindow := hb_gtInfo( GTI_GETWIN, ;
+                                 { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
+                                   DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
+      ELSE
+         hb_gtInfo( GTI_SETWIN, ::hDebuggerWindow )
       ENDIF
-
-      hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nDebuggerWindow } )
-      RETURN NIL
+      ::lDebuggerWindowIsOpen := .T.
    ENDIF
 
    RETURN NIL
@@ -454,13 +431,10 @@ METHOD OpenDebuggerWindow() CLASS HBDebugger
 
 METHOD CloseDebuggerWindow() CLASS HBDebugger
 
-   IF ::cGTVersion == 'WVW'
-      hb_ExecFromArray( 'WVW_LCLOSEWINDOW' )
+   IF ::lDebuggerWindowIsOpen
+      ::hDebuggerWindow := hb_gtInfo( GTI_GETWIN )
+      hb_gtInfo( GTI_SETWIN, ::hUserWindow )
       ::lDebuggerWindowIsOpen := .F.
-      hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
-      IF !( Type( 'WVW_SHOWWINDOW()' ) == 'U' )
-         hb_ExecFromArray( 'WVW_SHOWWINDOW' )
-      ENDIF
    ENDIF
 
    RETURN NIL
@@ -1496,16 +1470,6 @@ METHOD HandleEvent() CLASS HBDebugger
 
 METHOD Hide() CLASS HBDebugger
    ::CloseDebuggerWindow()
-
-   IF !(::cGTVersion=='WVW') //#IFNDEF __GTWVW__
-      //x was: RestScreen( ,,,, ::cAppImage )
-      RestScreen( 0,0,::nAppMaxRow,::nAppMaxCol, ::cAppImage )
-   ENDIF //#ENDIF
-
-   ::cAppImage := nil
-   SetColor( ::cAppColors )
-   SetCursor( ::nAppCursor )
-
    RETURN NIL
 
 
@@ -2272,31 +2236,9 @@ METHOD ResizeWindows( oWindow ) CLASS HBDebugger
 METHOD RestoreAppScreen() CLASS HBDebugger
 
    LOCAL i
-   LOCAL lWindowed := ::lDebuggerWindowIsOpen
 
-   ::cImage := SaveScreen()
+   ::CloseDebuggerWindow()
 
-   IF !lWindowed //x
-      DispBegin()
-      RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
-      IF !Empty( ::nAppCTWindow )
-      /* Don't link libct automatically... */
-      HB_INLINE( ::nAppCTWindow ) ;
-      {
-         hb_ctWSelect( hb_parni( 1 ) );
-      }
-      ENDIF
-   ELSE //x
-      ::CloseDebuggerWindow()   //x
-   ENDIF
-
-   SetPos( ::nAppRow, ::nAppCol )
-   SetColor( ::cAppColors )
-   SetCursor( ::nAppCursor )
-
-   IF !lWindowed //x
-      DispEnd()
-   ENDIF
    FOR i := 1 TO ::nAppDispCount
       DispBegin()
    NEXT
@@ -2330,53 +2272,19 @@ METHOD RestoreSettings() CLASS HBDebugger
    RETURN NIL
 
 
-METHOD SaveAppScreen( lRestore ) CLASS HBDebugger
+METHOD SaveAppScreen() CLASS HBDebugger
 
    LOCAL nRight
    LOCAL nTop
    LOCAL i
-
-   IF lRestore == NIL
-      lRestore := .T.
-   ENDIF
-
+  
    ::nAppDispCount := DispCount()
    FOR i := 1 TO ::nAppDispCount
       DispEnd()
    NEXT
-
-   //x these two lines are moved to after SetCursor()
-   //x DispBegin()
-   //x ::cAppImage  := SaveScreen()
-
-   /* Get cursor coordinates INSIDE ct window */
-   ::nAppRow    := Row()
-   ::nAppCol    := Col()
-   ::cAppColors := SetColor()
-
-   /* We don't want to auto-link libct... */
-   ::nAppCTWindow := HB_INLINE() ;
-   {
-     hb_retni( hb_ctWSelect( -1 ) );
-     hb_ctWSelect( 0 );
-   }
-
-   ::nAppCursor := SetCursor( SC_NONE )
-
-   //x more...
-   ::nAppMaxRow := maxrow()
-   ::nAppMaxCol := maxcol()
-
-   IF !( ::cGTVersion == 'WVW' )
-      ::cAppImage  := SaveScreen()
-   ENDIF
-
+  
    ::OpenDebuggerWindow()
-
-   IF lRestore
-      //x was: RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
-      RestScreen( , , , , ::cImage )
-   ENDIF
+  
    IF ::nMaxRow != MaxRow() .OR. ::nMaxCol != MaxCol()
       DispBegin()
       ::nMaxRow := MaxRow()
@@ -2531,7 +2439,7 @@ METHOD SearchLine() CLASS HBDebugger
 
 METHOD Show() CLASS HBDebugger
 
-   ::SaveAppScreen( .F. )
+   ::SaveAppScreen()
    ::oPullDown:Display()
    ::oWndCode:Show( .T. )
    ::oWndCommand:Show()
@@ -2552,13 +2460,7 @@ METHOD ShowAllGlobals() CLASS HBDebugger
 
 METHOD ShowAppScreen() CLASS HBDebugger
 
-   ::cImage := SaveScreen()
-
    ::CloseDebuggerWindow()
-
-   IF !( ::cGTVersion == 'WVW' )
-     RestScreen( 0, 0, ::nAppMaxRow, ::nAppMaxCol, ::cAppImage )
-   ENDIF
 
    IF LastKey() == K_LBUTTONDOWN
       Inkey( 0, INKEY_ALL )
@@ -2567,9 +2469,6 @@ METHOD ShowAppScreen() CLASS HBDebugger
    ENDDO
 
    ::OpenDebuggerWindow()
-
-   //x was: RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
-   RestScreen( , , , , ::cImage )
 
    RETURN NIL
 
@@ -2783,7 +2682,7 @@ METHOD ShowVars() CLASS HBDebugger
       ENDIF
    ENDIF
 
-   IF ::oBrwVars == NIL
+   IF Len( ::aVars ) > 0 .AND. ::oBrwVars == NIL
       ::oBrwVars := HBDbBrowser():New( nTop + 1, 1, nBottom - 1, ;
                                        ::nMaxCol - iif( ::oWndStack != NIL, ::oWndStack:nWidth(), 0 ) - 1 )
 
@@ -3379,7 +3278,7 @@ STATIC PROCEDURE SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
    RefreshVarsS( oBrwSets )
 
-   oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[ 1 ] ) ) + ".." + AllTrim( Str( nSets ) ) + "]" )
+   oWnd:SetCaption( cCaption + "[" + RTrim( Str( oBrwSets:Cargo[ 1 ] ) ) + ".." + RTrim( Str( nSets ) ) + "]" )
 
    RETURN
 

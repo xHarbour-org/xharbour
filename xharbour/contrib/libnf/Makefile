@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2006/06/27 22:01:52 ptsarenko Exp $
+# $Id: Makefile,v 1.3 2006/06/27 19:23:23 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -13,6 +13,7 @@ C_SOURCES = \
 	descend.c \
 	dispc.c \
 	ftattr.c \
+	ftshadow.c \
 	fttext.c \
 	getenvrn.c \
 	getver.c \

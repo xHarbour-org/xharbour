@@ -1,11 +1,10 @@
 /*
- * $Id: gfxtrans.ch,v 1.1 2005/02/11 18:58:51 druzus Exp $
- *
+ * $Id: hbgfx.ch 6619 2006-03-01 13:49:07Z druzus $
  */
 
 /*
  * xHarbour Project source code:
- * Graphics API header file.
+ * GT Graphics functions
  *
  * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
  * www - http://www.xharbour.org
@@ -58,8 +57,10 @@
  *
  */
 
-#ifndef _GFXTRANS_CH_
-#define _GFXTRANS_CH_
+#ifndef _HBGFX_CH_
+#define _HBGFX_CH_
+
+#include "hbgfxdef.ch"
 
 /*
  * NOTE: ACQUIRE / RELEASE screen pair must work same way DispBegin()/DispEnd() pair does
@@ -74,24 +75,21 @@
  * Mauricio
  *
  */
+#xtranslate HB_GFXACQUIRESCREEN() => hb_gfxPrimitive(GFX_ACQUIRESCREEN)
+#xtranslate HB_GFXRELEASESCREEN() => hb_gfxPrimitive(GFX_RELEASESCREEN)
+#xtranslate HB_GFXMAKECOLOR(<nRed>, <nGreen>, <nBlue>[, <nAlpha>]) => hb_gfxPrimitive(GFX_MAKECOLOR, <nRed>, <nGreen>, <nBlue>[, <nAlpha>])
+#xtranslate HB_GFXGETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => <nTop> := hb_gfxPrimitive(GFX_CLIPTOP); <nLeft> := hb_gfxPrimitive(GFX_CLIPLEFT); <nBottom> := hb_gfxPrimitive(GFX_CLIPBOTTOM); <nRight> := hb_gfxPrimitive(GFX_CLIPRIGHT)
+#xtranslate HB_GFXSETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => hb_gfxPrimitive(GFX_SETCLIP, <nTop>, <nLeft>, <nBottom>, <nRight>)
+#xtranslate HB_GFXDRAWINGMODE([<nMode>]) => hb_gfxPrimitive(GFX_DRAWINGMODE[, <nMode>])
+#xtranslate HB_GFXGETPIXEL(<nY>, <nX>) => hb_gfxPrimitive(GFX_GETPIXEL, <nY>, <nX>)
+#xtranslate HB_GFXPUTPIXEL(<nY>, <nX>, <nColor>) => hb_gfxPrimitive(GFX_PUTPIXEL, <nY>, <nX>, <nColor>)
+#xtranslate HB_GFXLINE(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => hb_gfxPrimitive(GFX_LINE, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#xtranslate HB_GFXRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => hb_gfxPrimitive(GFX_RECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#xtranslate HB_GFXFILLEDRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => hb_gfxPrimitive(GFX_FILLEDRECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#xtranslate HB_GFXCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => hb_gfxPrimitive(GFX_CIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
+#xtranslate HB_GFXFILLEDCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => hb_gfxPrimitive(GFX_FILLEDCIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
+#xtranslate HB_GFXELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => hb_gfxPrimitive(GFX_ELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
+#xtranslate HB_GFXFILLEDELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => hb_gfxPrimitive(GFX_FILLEDELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
+#xtranslate HB_GFXFLOODFILL(<nY>, <nX>, <nColor>) => hb_gfxPrimitive(GFX_FLOODFILL, <nY>, <nX>, <nColor>)
 
-#translate GFXACQUIRESCREEN() => gfxPrimitive(GFX_ACQUIRESCREEN)
-#translate GFXRELEASESCREEN() => gfxPrimitive(GFX_RELEASESCREEN)
-#translate GFXMAKECOLOR(<nRed>, <nGreen>, <nBlue>[, <nAlpha>]) => gfxPrimitive(GFX_MAKECOLOR, <nRed>, <nGreen>, <nBlue>[, <nAlpha>])
-#translate GFXGETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => <nTop> := gfxPrimitive(GFX_CLIPTOP); <nLeft> := gfxPrimitive(GFX_CLIPLEFT); <nBottom> := gfxPrimitive(GFX_CLIPBOTTOM); <nRight> := gfxPrimitive(GFX_CLIPRIGHT)
-#translate GFXSETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => gfxPrimitive(GFX_SETCLIP, <nTop>, <nLeft>, <nBottom>, <nRight>)
-#translate GFXDRAWINGMODE([<nMode>]) => gfxPrimitive(GFX_DRAWINGMODE[, <nMode>])
-#translate GFXMOUSEX() => gfxPrimitive(GFX_MOUSEX)
-#translate GFXMOUSEY() => gfxPrimitive(GFX_MOUSEY)
-#translate GFXGETPIXEL(<nY>, <nX>) => gfxPrimitive(GFX_GETPIXEL, <nY>, <nX>)
-#translate GFXPUTPIXEL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_PUTPIXEL, <nY>, <nX>, <nColor>)
-#translate GFXLINE(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_LINE, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
-#translate GFXRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_RECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
-#translate GFXFILLEDRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_FILLEDRECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
-#translate GFXCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => gfxPrimitive(GFX_CIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
-#translate GFXFILLEDCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => gfxPrimitive(GFX_FILLEDCIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
-#translate GFXELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => gfxPrimitive(GFX_ELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
-#translate GFXFILLEDELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => gfxPrimitive(GFX_FILLEDELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
-#translate GFXFLOODFILL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_FLOODFILL, <nY>, <nX>, <nColor>)
-
-#endif  /* _GFXTRANS_CH_ */
+#endif  /* _HBGFX_CH_ */

@@ -1,15 +1,14 @@
 /*
- * $Id: gtxwc.h,v 1.4 2006/02/21 19:37:07 druzus Exp $
+ * $Id: gtxwc.h,v 1.5 2006/03/01 13:06:30 druzus Exp $
  */
 
 /*
- * Xharbour Project source code:
- * XWindow Terminal
+ * [x]Harbour Project source code:
+ *    XWindow Console
  * Copyright 2003 - Giancarlo Niccolai <antispam /at/ niccolai.ws>
- * Copyright 2004 - Przemys³aw Czerpak <druzus /at/ priv.onet.pl>
+ * Copyright 2004/2006 - Przemys³aw Czerpak <druzus /at/ priv.onet.pl>
  *
- * See doc/license.txt for licensing terms.
- *
+ * www - http://www.harbour-project.org
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,20 +57,18 @@
 #ifndef HB_GTXWC_H
 #define HB_GTXWC_H
 
-/* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	XWC
+#define HB_GT_NAME      XWC
 
+#include "hbgtcore.h"
+#include "hbinit.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "hbapi.h"
-#include "hbapigt.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 #include "inkey.ch"
-#include "error.ch"
-
-#ifndef HB_CDP_SUPPORT_OFF
+#include "hbgfxdef.ch"
 #include "hbapicdp.h"
-#endif
 
 #include <unistd.h>
 #include <signal.h>
@@ -87,89 +84,100 @@
 typedef unsigned long HB_GT_PIXELTYPE;
 typedef USHORT HB_GT_CELLTYPE;
 
-#define XVT_CHAR_QUEUE_SIZE         128
-#define XVT_CHAR_BUFFER            1024
-#define XVT_MIN_ROWS                  3
-#define XVT_MIN_COLS                  6
-#define XVT_MAX_ROWS                256
-#define XVT_MAX_COLS                256
-#define XVT_DEFAULT_ROWS             25
-#define XVT_DEFAULT_COLS             80
-#define XVT_DEFAULT_COLOR             7
-#define XVT_MAX_BUTTONS               8
-#define XVT_MAX_CHAR_POINTS        1024
-#define XVT_DBLCLK_DELAY            250
+#define XWC_CHAR_QUEUE_SIZE         128
+#define XWC_CHAR_BUFFER            1024
+#define XWC_MIN_ROWS                  3
+#define XWC_MIN_COLS                  6
+#define XWC_MAX_ROWS                256
+#define XWC_MAX_COLS                256
+#define XWC_DEFAULT_ROWS             25
+#define XWC_DEFAULT_COLS             80
+#define XWC_MAX_BUTTONS               8
+#define XWC_MAX_CHAR_POINTS        1024
 
 /* Font definition */
-#define XVT_DEFAULT_FONT_HEIGHT      18
-#define XVT_DEFAULT_FONT_WIDTH        9
-#define XVT_DEFAULT_FONT_WEIGHT    "medium"
-#define XVT_DEFAULT_FONT_NAME      "fixed"
-#define XVT_DEFAULT_FONT_ENCODING  "iso10646-1"
+#define XWC_DEFAULT_FONT_HEIGHT      18
+#define XWC_DEFAULT_FONT_WIDTH        9
+#define XWC_DEFAULT_FONT_WEIGHT     "medium"
+#define XWC_DEFAULT_FONT_NAME       "fixed"
+#define XWC_DEFAULT_FONT_ENCODING   "iso10646-1"
 
-//#define XVT_DEFAULT_FONT_WEIGHT    "*"
-//#define XVT_DEFAULT_FONT_ENCODING  "iso8859-1"
-//#define XVT_DEFAULT_FONT_NAME   "Lucida Console"
+/*
+#define XWC_DEFAULT_FONT_WEIGHT     "*"
+#define XWC_DEFAULT_FONT_ENCODING   "iso8859-1"
+#define XWC_DEFAULT_FONT_NAME       "Lucida Console"
 
-//#define XVT_DEFAULT_FONT_HEIGHT      20
-//#define XVT_DEFAULT_FONT_WIDTH        9
-//#define XVT_DEFAULT_FONT_WEIGHT    "medium"
-//#define XVT_DEFAULT_FONT_NAME      "rcsoft"
-//#define XVT_DEFAULT_FONT_ENCODING  "iso10646-1"
+#define XWC_DEFAULT_FONT_HEIGHT      20
+#define XWC_DEFAULT_FONT_WIDTH        9
+#define XWC_DEFAULT_FONT_WEIGHT     "medium"
+#define XWC_DEFAULT_FONT_NAME       "rcsoft"
+#define XWC_DEFAULT_FONT_ENCODING   "iso10646-1"
+*/
 
-#define XVT_DEFAULT_FONT_FIXMETRIC  FALSE
-#define XVT_DEFAULT_FONT_CLRBKG     FALSE
-#define XVT_DEFAULT_FONT_DRAWBOX    TRUE
+#define XWC_DEFAULT_FONT_FIXMETRIC  FALSE
+#define XWC_DEFAULT_FONT_CLRBKG     FALSE
+#define XWC_DEFAULT_FONT_DRAWBOX    TRUE
 
 
-#define XVT_SYNC_UPDATE         0
-#define XVT_ASYNC_UPDATE        1
-
-#define XVT_FULL_PIXMAP
-//#define XVT_CHAR_PIXMAP
+#define XWC_SYNC_UPDATE         0
+#define XWC_ASYNC_UPDATE        1
 
 #define CLIP_STDKEY_COUNT      96
 #define CLIP_EXTKEY_COUNT      30
 
-#define XVT_EXTKEYMASK        0x10000000
-#define XVT_KEYMASK           0xF0000000
-#define XVT_CLR_KEYMASK(x)    ((x) & ~XVT_KEYMASK)
-#define XVT_IS_EXTKEY(x)      (((x) & XVT_EXTKEYMASK) != 0)
+#define XWC_EXTKEYMASK        0x10000000
+#define XWC_KEYMASK           0xF0000000
+#define XWC_CLR_KEYMASK(x)    ((x) & ~XWC_KEYMASK)
+#define XWC_IS_EXTKEY(x)      (((x) & XWC_EXTKEYMASK) != 0)
 
-#define EXKEY_F1              ( 0 | XVT_EXTKEYMASK)
-#define EXKEY_F2              ( 1 | XVT_EXTKEYMASK)
-#define EXKEY_F3              ( 2 | XVT_EXTKEYMASK)
-#define EXKEY_F4              ( 3 | XVT_EXTKEYMASK)
-#define EXKEY_F5              ( 4 | XVT_EXTKEYMASK)
-#define EXKEY_F6              ( 5 | XVT_EXTKEYMASK)
-#define EXKEY_F7              ( 6 | XVT_EXTKEYMASK)
-#define EXKEY_F8              ( 7 | XVT_EXTKEYMASK)
-#define EXKEY_F9              ( 8 | XVT_EXTKEYMASK)
-#define EXKEY_F10             ( 9 | XVT_EXTKEYMASK)
-#define EXKEY_F11             (10 | XVT_EXTKEYMASK)
-#define EXKEY_F12             (11 | XVT_EXTKEYMASK)
-#define EXKEY_UP              (12 | XVT_EXTKEYMASK)
-#define EXKEY_DOWN            (13 | XVT_EXTKEYMASK)
-#define EXKEY_LEFT            (14 | XVT_EXTKEYMASK)
-#define EXKEY_RIGHT           (15 | XVT_EXTKEYMASK)
-#define EXKEY_INS             (16 | XVT_EXTKEYMASK)
-#define EXKEY_DEL             (17 | XVT_EXTKEYMASK)
-#define EXKEY_HOME            (18 | XVT_EXTKEYMASK)
-#define EXKEY_END             (19 | XVT_EXTKEYMASK)
-#define EXKEY_PGUP            (20 | XVT_EXTKEYMASK)
-#define EXKEY_PGDN            (21 | XVT_EXTKEYMASK)
-#define EXKEY_BS              (22 | XVT_EXTKEYMASK)
-#define EXKEY_TAB             (23 | XVT_EXTKEYMASK)
-#define EXKEY_ESC             (24 | XVT_EXTKEYMASK)
-#define EXKEY_ENTER           (25 | XVT_EXTKEYMASK)
-#define EXKEY_KPENTER         (26 | XVT_EXTKEYMASK)
-#define EXKEY_CENTER          (27 | XVT_EXTKEYMASK)
-#define EXKEY_PRTSCR          (28 | XVT_EXTKEYMASK)
-#define EXKEY_PAUSE           (29 | XVT_EXTKEYMASK)
+#define EXKEY_F1              ( 0 | XWC_EXTKEYMASK)
+#define EXKEY_F2              ( 1 | XWC_EXTKEYMASK)
+#define EXKEY_F3              ( 2 | XWC_EXTKEYMASK)
+#define EXKEY_F4              ( 3 | XWC_EXTKEYMASK)
+#define EXKEY_F5              ( 4 | XWC_EXTKEYMASK)
+#define EXKEY_F6              ( 5 | XWC_EXTKEYMASK)
+#define EXKEY_F7              ( 6 | XWC_EXTKEYMASK)
+#define EXKEY_F8              ( 7 | XWC_EXTKEYMASK)
+#define EXKEY_F9              ( 8 | XWC_EXTKEYMASK)
+#define EXKEY_F10             ( 9 | XWC_EXTKEYMASK)
+#define EXKEY_F11             (10 | XWC_EXTKEYMASK)
+#define EXKEY_F12             (11 | XWC_EXTKEYMASK)
+#define EXKEY_UP              (12 | XWC_EXTKEYMASK)
+#define EXKEY_DOWN            (13 | XWC_EXTKEYMASK)
+#define EXKEY_LEFT            (14 | XWC_EXTKEYMASK)
+#define EXKEY_RIGHT           (15 | XWC_EXTKEYMASK)
+#define EXKEY_INS             (16 | XWC_EXTKEYMASK)
+#define EXKEY_DEL             (17 | XWC_EXTKEYMASK)
+#define EXKEY_HOME            (18 | XWC_EXTKEYMASK)
+#define EXKEY_END             (19 | XWC_EXTKEYMASK)
+#define EXKEY_PGUP            (20 | XWC_EXTKEYMASK)
+#define EXKEY_PGDN            (21 | XWC_EXTKEYMASK)
+#define EXKEY_BS              (22 | XWC_EXTKEYMASK)
+#define EXKEY_TAB             (23 | XWC_EXTKEYMASK)
+#define EXKEY_ESC             (24 | XWC_EXTKEYMASK)
+#define EXKEY_ENTER           (25 | XWC_EXTKEYMASK)
+#define EXKEY_KPENTER         (26 | XWC_EXTKEYMASK)
+#define EXKEY_CENTER          (27 | XWC_EXTKEYMASK)
+#define EXKEY_PRTSCR          (28 | XWC_EXTKEYMASK)
+#define EXKEY_PAUSE           (29 | XWC_EXTKEYMASK)
 
+/* xHarbour compatible definitions */
+#if !defined( K_SH_LEFT )
+#define K_SH_LEFT           K_LEFT   /* Shift-Left  == Left  */
+#define K_SH_UP             K_UP     /* Shift-Up    == Up    */
+#define K_SH_RIGHT          K_RIGHT  /* Shift-Right == Right */
+#define K_SH_DOWN           K_DOWN   /* Shift-Down  == Down  */
+#define K_SH_INS            K_INS    /* Shift-Ins   == Ins   */
+#define K_SH_DEL            K_DEL    /* Shift-Del   == Del   */
+#define K_SH_HOME           K_HOME   /* Shift-Home  == Home  */
+#define K_SH_END            K_END    /* Shift-End   == End   */
+#define K_SH_PGUP           K_PGUP   /* Shift-PgUp  == PgUp  */
+#define K_SH_PGDN           K_PGDN   /* Shift-PgDn  == PgDn  */
+#define K_SH_RETURN         K_RETURN /* Shift-Enter == Enter */
+#define K_SH_ENTER          K_ENTER  /* Shift-Enter == Enter */
+#endif
 
-#define XVT_STD_MASK    ( ExposureMask | StructureNotifyMask | FocusChangeMask | \
-                          PropertyChangeMask | \
+#define XWC_STD_MASK    ( ExposureMask | StructureNotifyMask | FocusChangeMask | \
                           ButtonPressMask | ButtonReleaseMask | PointerMotionMask | \
                           KeyPressMask | KeyReleaseMask )
 
@@ -179,61 +187,61 @@ typedef USHORT HB_GT_CELLTYPE;
 #define HB_GTXVG_ARROW_U   0x001E
 #define HB_GTXVG_ARROW_D   0x001F
 
-#define HB_GTXVT_DBL_LT    0x2554 /* BOX DRAWINGS DOUBLE DOWN AND RIGHT (Double left top angle) */
-#define HB_GTXVT_DBL_TD    0x2566 /* BOX DRAWINGS DOUBLE DOWN AND HORIZONTAL (Double top with junction down) */
-#define HB_GTXVT_DBL_RT    0x2557 /* BOX DRAWINGS DOUBLE DOWN AND LEFT (Double right top angle) */
+#define HB_GTXWC_DBL_LT    0x2554 /* BOX DRAWINGS DOUBLE DOWN AND RIGHT (Double left top angle) */
+#define HB_GTXWC_DBL_TD    0x2566 /* BOX DRAWINGS DOUBLE DOWN AND HORIZONTAL (Double top with junction down) */
+#define HB_GTXWC_DBL_RT    0x2557 /* BOX DRAWINGS DOUBLE DOWN AND LEFT (Double right top angle) */
 
-#define HB_GTXVT_DBL_LB    0x255A /* BOX DRAWINGS DOUBLE UP AND RIGHT (Double left bottom angle) */
-#define HB_GTXVT_DBL_BU    0x2569 /* BOX DRAWINGS DOUBLE UP AND HORIZONTAL (Double bottom with junction up) */
-#define HB_GTXVT_DBL_RB    0x255D /* BOX DRAWINGS DOUBLE DOWN AND LEFT (Double right bottom angle) */
+#define HB_GTXWC_DBL_LB    0x255A /* BOX DRAWINGS DOUBLE UP AND RIGHT (Double left bottom angle) */
+#define HB_GTXWC_DBL_BU    0x2569 /* BOX DRAWINGS DOUBLE UP AND HORIZONTAL (Double bottom with junction up) */
+#define HB_GTXWC_DBL_RB    0x255D /* BOX DRAWINGS DOUBLE DOWN AND LEFT (Double right bottom angle) */
 
-#define HB_GTXVT_DBL_VL    0x2560 /* BOX DRAWINGS DOUBLE VERTICAL AND RIGHT (Double Vertical with left junction) */
-#define HB_GTXVT_DBL_VR    0x2563 /* BOX DRAWINGS DOUBLE VERTICAL AND LEFT (Double vertical with right junction) */
-#define HB_GTXVT_DBL_CRS   0x256C /* BOX DRAWINGS DOUBLE VERTICAL AND HORIZONTAL (Double cross) */
+#define HB_GTXWC_DBL_VL    0x2560 /* BOX DRAWINGS DOUBLE VERTICAL AND RIGHT (Double Vertical with left junction) */
+#define HB_GTXWC_DBL_VR    0x2563 /* BOX DRAWINGS DOUBLE VERTICAL AND LEFT (Double vertical with right junction) */
+#define HB_GTXWC_DBL_CRS   0x256C /* BOX DRAWINGS DOUBLE VERTICAL AND HORIZONTAL (Double cross) */
 
-#define HB_GTXVT_DBL_HOR   0x2550 /* BOX DRAWINGS DOUBLE HORIZONTAL (Double Horizontal bar) */
-#define HB_GTXVT_DBL_VRT   0x2551 /* BOX DRAWINGS DOUBLE VERTICAL (Double Vertical bar) */
+#define HB_GTXWC_DBL_HOR   0x2550 /* BOX DRAWINGS DOUBLE HORIZONTAL (Double Horizontal bar) */
+#define HB_GTXWC_DBL_VRT   0x2551 /* BOX DRAWINGS DOUBLE VERTICAL (Double Vertical bar) */
 
-#define HB_GTXVT_SNG_LT    0x250C /* BOX DRAWINGS LIGHT DOWN AND RIGHT (Single left top angle) */
-#define HB_GTXVT_SNG_TD    0x252C /* BOX DRAWINGS LIGHT DOWN AND HORIZONTAL (Single top with junction down) */
-#define HB_GTXVT_SNG_RT    0x2510 /* BOX DRAWINGS LIGHT DOWN AND LEFT (Single right top angle) */
+#define HB_GTXWC_SNG_LT    0x250C /* BOX DRAWINGS LIGHT DOWN AND RIGHT (Single left top angle) */
+#define HB_GTXWC_SNG_TD    0x252C /* BOX DRAWINGS LIGHT DOWN AND HORIZONTAL (Single top with junction down) */
+#define HB_GTXWC_SNG_RT    0x2510 /* BOX DRAWINGS LIGHT DOWN AND LEFT (Single right top angle) */
 
-#define HB_GTXVT_SNG_LB    0x2514 /* BOX DRAWINGS LIGHT UP AND RIGHT (Single left bottom angle) */
-#define HB_GTXVT_SNG_BU    0x2534 /* BOX DRAWINGS LIGHT UP AND HORIZONTAL (Single bottom with junction up) */
-#define HB_GTXVT_SNG_RB    0x2518 /* BOX DRAWINGS LIGHT UP AND LEFT (Single right bottom angle) */
+#define HB_GTXWC_SNG_LB    0x2514 /* BOX DRAWINGS LIGHT UP AND RIGHT (Single left bottom angle) */
+#define HB_GTXWC_SNG_BU    0x2534 /* BOX DRAWINGS LIGHT UP AND HORIZONTAL (Single bottom with junction up) */
+#define HB_GTXWC_SNG_RB    0x2518 /* BOX DRAWINGS LIGHT UP AND LEFT (Single right bottom angle) */
 
-#define HB_GTXVT_SNG_VL    0x251C /* BOX DRAWINGS LIGHT VERTICAL AND RIGHT (Single Vertical with left junction) */
-#define HB_GTXVT_SNG_VR    0x2524 /* BOX DRAWINGS LIGHT VERTICAL AND LEFT (Single vertical with right junction) */
-#define HB_GTXVT_SNG_CRS   0x253C /* BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL (Single cross) */
+#define HB_GTXWC_SNG_VL    0x251C /* BOX DRAWINGS LIGHT VERTICAL AND RIGHT (Single Vertical with left junction) */
+#define HB_GTXWC_SNG_VR    0x2524 /* BOX DRAWINGS LIGHT VERTICAL AND LEFT (Single vertical with right junction) */
+#define HB_GTXWC_SNG_CRS   0x253C /* BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL (Single cross) */
 
-#define HB_GTXVT_SNG_HOR   0x2500 /* BOX DRAWINGS LIGHT HORIZONTAL (Single Horizontal bar) */
-#define HB_GTXVT_SNG_VRT   0x2502 /* BOX DRAWINGS LIGHT VERTICAL (Single Vertical bar) */
-
-
-#define HB_GTXVT_SNG_L_DBL_T 0x2552 /* BOX DRAWINGS DOWN SINGLE AND RIGHT DOUBLE (Single left double top angle) */
-#define HB_GTXVT_SNG_T_DBL_D 0x2565 /* BOX DRAWINGS DOWN DOUBLE AND HORIZONTAL SINGLE (Single top with double junction down) */
-#define HB_GTXVT_SNG_R_DBL_T 0x2556 /* BOX DRAWINGS DOWN DOUBLE AND LEFT SINGLE (Single right double top angle) */
-
-#define HB_GTXVT_SNG_L_DBL_B 0x2558 /* BOX DRAWINGS UP SINGLE AND RIGHT DOUBLE (Single left double bottom angle) */
-#define HB_GTXVT_SNG_B_DBL_U 0x2568 /* BOX DRAWINGS UP DOUBLE AND HORIZONTAL SINGLE (Single bottom double with junction up) */
-#define HB_GTXVT_SNG_R_DBL_B 0x255C /* BOX DRAWINGS UP DOUBLE AND LEFT SINGLE (Single right double bottom angle) */
-
-#define HB_GTXVT_SNG_V_DBL_L 0x255E /* BOX DRAWINGS VERTICAL SINGLE AND RIGHT DOUBLE (Single Vertical double left junction) */
-#define HB_GTXVT_SNG_V_DBL_R 0x2561 /* BOX DRAWINGS VERTICAL SINGLE AND LEFT DOUBLE (Single vertical double right junction) */
-#define HB_GTXVT_SNG_DBL_CRS 0x256A /* BOX DRAWINGS VERTICAL SINGLE AND HORIZONTAL DOUBLE (Single cross (double horiz) */
+#define HB_GTXWC_SNG_HOR   0x2500 /* BOX DRAWINGS LIGHT HORIZONTAL (Single Horizontal bar) */
+#define HB_GTXWC_SNG_VRT   0x2502 /* BOX DRAWINGS LIGHT VERTICAL (Single Vertical bar) */
 
 
-#define HB_GTXVT_DBL_L_SNG_T 0x2553 /* BOX DRAWINGS DOWN DOUBLE AND RIGHT SINGLE (Double left single top angle) */
-#define HB_GTXVT_DBL_T_SNG_D 0x2564 /* BOX DRAWINGS DOWN SINGLE AND HORIZONTAL DOUBLE (Double top signle junction down) */
-#define HB_GTXVT_DBL_R_SNG_T 0x2555 /* BOX DRAWINGS DOWN SINGLE AND LEFT DOUBLE (Double right single top angle) */
+#define HB_GTXWC_SNG_L_DBL_T 0x2552 /* BOX DRAWINGS DOWN SINGLE AND RIGHT DOUBLE (Single left double top angle) */
+#define HB_GTXWC_SNG_T_DBL_D 0x2565 /* BOX DRAWINGS DOWN DOUBLE AND HORIZONTAL SINGLE (Single top with double junction down) */
+#define HB_GTXWC_SNG_R_DBL_T 0x2556 /* BOX DRAWINGS DOWN DOUBLE AND LEFT SINGLE (Single right double top angle) */
 
-#define HB_GTXVT_DBL_L_SNG_B 0x2559 /* BOX DRAWINGS UP DOUBLE AND RIGHT SINGLE (Double left single bottom angle) */
-#define HB_GTXVT_DBL_B_SNG_U 0x2567 /* BOX DRAWINGS UP SINGLE AND HORIZONTAL DOUBLE (Double bottom single junction up) */
-#define HB_GTXVT_DBL_R_SNG_B 0x255B /* BOX DRAWINGS UP SINGLE AND LEFT DOUBLE (Double right single bottom angle) */
+#define HB_GTXWC_SNG_L_DBL_B 0x2558 /* BOX DRAWINGS UP SINGLE AND RIGHT DOUBLE (Single left double bottom angle) */
+#define HB_GTXWC_SNG_B_DBL_U 0x2568 /* BOX DRAWINGS UP DOUBLE AND HORIZONTAL SINGLE (Single bottom double with junction up) */
+#define HB_GTXWC_SNG_R_DBL_B 0x255C /* BOX DRAWINGS UP DOUBLE AND LEFT SINGLE (Single right double bottom angle) */
 
-#define HB_GTXVT_DBL_V_SNG_R 0x2562 /* BOX DRAWINGS VERTICAL DOUBLE AND LEFT SINGLE (Double Vertical single left junction) */
-#define HB_GTXVT_DBL_V_SNG_L 0x255F /* BOX DRAWINGS VERTICAL DOUBLE AND RIGHT SINGLE (Double vertical single right junction) */
-#define HB_GTXVT_DBL_SNG_CRS 0x256B /* BOX DRAWINGS VERTICAL DOUBLE AND HORIZONTAL SINGLE (Double cross (single horiz) */
+#define HB_GTXWC_SNG_V_DBL_L 0x255E /* BOX DRAWINGS VERTICAL SINGLE AND RIGHT DOUBLE (Single Vertical double left junction) */
+#define HB_GTXWC_SNG_V_DBL_R 0x2561 /* BOX DRAWINGS VERTICAL SINGLE AND LEFT DOUBLE (Single vertical double right junction) */
+#define HB_GTXWC_SNG_DBL_CRS 0x256A /* BOX DRAWINGS VERTICAL SINGLE AND HORIZONTAL DOUBLE (Single cross (double horiz) */
+
+
+#define HB_GTXWC_DBL_L_SNG_T 0x2553 /* BOX DRAWINGS DOWN DOUBLE AND RIGHT SINGLE (Double left single top angle) */
+#define HB_GTXWC_DBL_T_SNG_D 0x2564 /* BOX DRAWINGS DOWN SINGLE AND HORIZONTAL DOUBLE (Double top signle junction down) */
+#define HB_GTXWC_DBL_R_SNG_T 0x2555 /* BOX DRAWINGS DOWN SINGLE AND LEFT DOUBLE (Double right single top angle) */
+
+#define HB_GTXWC_DBL_L_SNG_B 0x2559 /* BOX DRAWINGS UP DOUBLE AND RIGHT SINGLE (Double left single bottom angle) */
+#define HB_GTXWC_DBL_B_SNG_U 0x2567 /* BOX DRAWINGS UP SINGLE AND HORIZONTAL DOUBLE (Double bottom single junction up) */
+#define HB_GTXWC_DBL_R_SNG_B 0x255B /* BOX DRAWINGS UP SINGLE AND LEFT DOUBLE (Double right single bottom angle) */
+
+#define HB_GTXWC_DBL_V_SNG_R 0x2562 /* BOX DRAWINGS VERTICAL DOUBLE AND LEFT SINGLE (Double Vertical single left junction) */
+#define HB_GTXWC_DBL_V_SNG_L 0x255F /* BOX DRAWINGS VERTICAL DOUBLE AND RIGHT SINGLE (Double vertical single right junction) */
+#define HB_GTXWC_DBL_SNG_CRS 0x256B /* BOX DRAWINGS VERTICAL DOUBLE AND HORIZONTAL SINGLE (Double cross (single horiz) */
 
 #define HB_GTXVG_FULL      0x2588   /* FULL BLOCK */
 #define HB_GTXVG_FULL_B    0x2584   /* LOWER HALF BLOCK */
@@ -267,11 +275,11 @@ typedef enum
    CH_SEG,           /* character built from lines (segments) */
    CH_RECT,          /* character built from rectangles */
    CH_POLY           /* character built by polygon */
-} XVT_CharType;
+} XWC_CharType;
 
-typedef struct tag_XVT_CharTrans
+typedef struct tag_XWC_CharTrans
 {
-   XVT_CharType   type;
+   XWC_CharType   type;
    union
    {
       XImage      *img;
@@ -282,6 +290,6 @@ typedef struct tag_XVT_CharTrans
    } u;
    BYTE  size;
    BOOL  inverse;
-} XVT_CharTrans;
+} XWC_CharTrans;
 
 #endif

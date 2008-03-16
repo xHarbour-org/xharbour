@@ -1,5 +1,5 @@
 /*
- * $Id: saverest.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: saverest.c,v 1.8 2004/07/26 01:09:39 guerra000 Exp $
  */
 
 /*
@@ -51,59 +51,83 @@
  */
 
 #include "hbapi.h"
-#include "hbfast.h"
 #include "hbapigt.h"
 
-// This function validates parameters. They must be coordinates inside
-// the screen size, and the lower number must be first. The input
-// parameters from the user's function are signed, and the output
-// parameters (to the real work) are unsigned.
-void savescreen_coords( USHORT *uiSmall, USHORT *uiBig, int iMax, int iParamNum )
+static void hb_getScreenRange( USHORT * pusMin, USHORT * pusMax,
+                               BOOL fNoCheck, BOOL fVertical )
 {
-   int iParam1, iParam2, iSwap;
+   int iFrom, iTo, iMax;
 
-   iParam1 = ( ISNUM( iParamNum ) ? hb_parni( iParamNum ) : 0 );
-   iParam1 = ( ( iParam1 < 0 ) ? 0 : ( ( iParam1 > iMax ) ? iMax : iParam1 ) );
-
-   iParam2 = ( ISNUM( iParamNum + 2 ) ? hb_parni( iParamNum + 2 ) : iMax );
-   iParam2 = ( ( iParam2 < 0 ) ? 0 : ( ( iParam2 > iMax ) ? iMax : iParam2 ) );
-
-   if( iParam1 > iParam2 )
+   if( fVertical )
    {
-      iSwap = iParam1;
-      iParam1 = iParam2;
-      iParam2 = iSwap;
+      iMax  = hb_gtMaxRow();
+      iFrom = hb_parni( 1 );
+      iTo   = ISNUM( 3 ) ? hb_parni( 3 ) : iMax;
+   }
+   else
+   {
+      iMax = hb_gtMaxCol();
+      iFrom = hb_parni( 2 );
+      iTo   = ISNUM( 4 ) ? hb_parni( 4 ) : iMax;
    }
 
-   *uiSmall = ( USHORT ) iParam1;
-   *uiBig   = ( USHORT ) iParam2;
+   if( iFrom < 0 )
+      iFrom = 0;
+   else if( iFrom > iMax && !fNoCheck )
+      iFrom = iMax;
+
+   if( iTo < 0 )
+      iTo = 0;
+   else if( iTo > iMax && !fNoCheck )
+      iTo = iMax;
+
+   if( iFrom > iTo )
+   {
+      *pusMin = ( USHORT ) iTo;
+      *pusMax = ( USHORT ) iFrom;
+   }
+   else
+   {
+      *pusMin = ( USHORT ) iFrom;
+      *pusMax = ( USHORT ) iTo;
+   }
 }
 
 HB_FUNC( SAVESCREEN )
 {
    USHORT uiTop, uiLeft, uiBottom, uiRight;
-   UINT uiSize;
+   ULONG  ulSize;
    void * pBuffer;
+#if defined( HB_EXTENSION )
+   BOOL fNoCheck = hb_parl( 5 );
+#else
+   BOOL fNoCheck = FALSE;
+#endif
 
-   savescreen_coords( &uiTop,  &uiBottom, hb_gtMaxRow(), 1 );
-   savescreen_coords( &uiLeft, &uiRight,  hb_gtMaxCol(), 2 );
+   hb_getScreenRange( &uiTop, &uiBottom, fNoCheck, TRUE );
+   hb_getScreenRange( &uiLeft, &uiRight, fNoCheck, FALSE );
 
-   hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
-   pBuffer = hb_xgrab( uiSize + 1 );  /* why +1? */
+   hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &ulSize );
+   pBuffer = hb_xgrab( ulSize + 1 );
 
    hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
-   hb_retclenAdopt( ( char * ) pBuffer, uiSize );
+   hb_retclen_buffer( ( char * ) pBuffer, ulSize );
 }
 
 HB_FUNC( RESTSCREEN )
 {
-   USHORT uiTop, uiLeft, uiBottom, uiRight;
-
    if( ISCHAR( 5 ) )
    {
-      savescreen_coords( &uiTop,  &uiBottom, hb_gtMaxRow(), 1 );
-      savescreen_coords( &uiLeft, &uiRight,  hb_gtMaxCol(), 2 );
+      USHORT uiTop, uiLeft, uiBottom, uiRight;
+#if defined( HB_EXTENSION )
+      BOOL fNoCheck = hb_parl( 6 );
+#else
+      BOOL fNoCheck = FALSE;
+#endif
 
-      hb_gtRest( uiTop, uiLeft, uiBottom, uiRight, ( void * ) hb_parcx( 5 ) );
+      hb_getScreenRange( &uiTop, &uiBottom, fNoCheck, TRUE );
+      hb_getScreenRange( &uiLeft, &uiRight, fNoCheck, FALSE );
+
+      hb_gtRest( uiTop, uiLeft, uiBottom, uiRight, ( void * ) hb_parc( 5 ) );
    }
 }
