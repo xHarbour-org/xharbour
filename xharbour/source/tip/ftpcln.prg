@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.21 2007/09/06 15:40:35 lculik Exp $
+ * $Id: ftpcln.prg,v 1.22 2007/09/08 19:45:36 patrickmast Exp $
  */
 
 /*
@@ -798,7 +798,7 @@ RETURN ::GetReply()
 METHOD fileSize( cFileSpec ) CLASS tIPClientFTP
    LOCAL aFiles:=::ListFiles( cFileSpec ), nSize:=0, n
    FOR n =1 TO Len(aFiles)
-       nSize+=Val(aFiles[n][7]) // Should [7] not be [F_SIZE] ?
+       nSize+=Val(aFiles[n][F_SIZE]) // Should [7] not be [F_SIZE] ?
    NEXT
 RETURN nSize
 

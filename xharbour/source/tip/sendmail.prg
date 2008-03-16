@@ -1,7 +1,8 @@
+
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.4 2007/10/19 13:09:06 lculik Exp $
+ * $Id: sendmail.prg,v 1.5 2007/10/23 15:42:21 lculik Exp $
  */
 
 /*
@@ -58,8 +59,7 @@
 #include "common.ch"
 
 
-FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth)
-
+FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth, lnoauth, nTimeOut)
    /*
    cServer    -> Required. IP or domain name of the mail server
    nPort      -> Optional. Port used my email server
@@ -76,6 +76,8 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low 
    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
+   lnoauth    -> Optional. Disable Autentication methods
+   nTimeOut   -> Optional. Number os ms to wait default 20000 (20s)
    */
 
    LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cFname, cFext, cData, oUrl1
@@ -92,7 +94,8 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lAuthPlain    := .F.
    LOCAL lConnect      := .T.
    local oPop
-
+   local adata:={},nCount,nSize,nSent
+altd()
    DEFAULT cUser       TO ""
    DEFAULT cPass       TO ""
    DEFAULT nPort       TO 25
@@ -100,7 +103,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    DEFAULT nPriority   TO 3
    DEFAULT lRead       TO .F.
    DEFAULT lTrace      TO .F.
-   DEFAULT lPopAuth to .T.   
+   DEFAULT lPopAuth to .T.
+   Default lNoAuth  TO .f.
+   DEFAULT nTimeOut to 20000
 
    cUser := StrTran( cUser, "@", "&at;" )
    
@@ -160,7 +165,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       Try
          oUrl1 := tUrl():New( "pop://" + cUser + ":" + cPass + "@" + cPopServer + "/" )
          oUrl1:cUserid := Strtran( cUser, "&at;", "@" )      
-         opop:= tIPClientPOP():New( oUrl1, lTrace ) 
+         opop:= tIPClientpop():New( oUrl1, lTrace ) 
          IF oPop:Open()
             oPop:Close()
          ENDIF
@@ -185,7 +190,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    ENDIF   
    
    oUrl:nPort   := nPort
-   oUrl:cUserid := cUser
+   oUrl:cUserid := Strtran( cUser, "&at;", "@" )      
    
    oMail   := tipMail():new()
    oAttach := tipMail():new()
@@ -207,6 +212,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
    oMail:hHeaders[ "Date" ] := tip_Timestamp()
    oMail:hHeaders[ "From" ] := cFrom
+
    IF !Empty(cCC)
       oMail:hHeaders[ "Cc" ] := cCC
    ENDIF
@@ -215,7 +221,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    ENDIF
 
    TRY
-    oInmail := tIPClientSMTP():New( oUrl, lTrace)
+    oInmail := tIPClientsmtp():New( oUrl, lTrace)
    CATCH
     lReturn := .F.
    END
@@ -224,49 +230,64 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       RETURN .F.
    ENDIF   
 
-   oInmail:nConnTimeout:=20000
-   
-   IF oInMail:Opensecure()
+   oInmail:nConnTimeout:= nTimeOut
 
-      WHILE .T.
-         oInMail:GetOk()
-         IF oInMail:cReply == NIL
-            EXIT
-         ELSEIF "LOGIN" IN oInMail:cReply
-            lAuthLogin := .T.
-         ELSEIF "PLAIN" IN oInMail:cReply
-            lAuthPlain := .T.
+   if !lNoAuth
+
+      IF oInMail:Opensecure()
+
+         WHILE .T.
+            oInMail:GetOk()
+            IF oInMail:cReply == NIL
+               EXIT
+            ELSEIF "LOGIN" IN oInMail:cReply
+               lAuthLogin := .T.
+            ELSEIF "PLAIN" IN oInMail:cReply
+               lAuthPlain := .T.
+            ENDIF
+         ENDDO
+         
+         IF lAuthLogin
+            IF !oInMail:Auth( cUser, cPass )
+               lConnect := .F.
+            ELSE
+               lConnectPlain  := .T.
+            ENDIF
          ENDIF
-      ENDDO
-      
-      IF lAuthLogin
-         IF !oInMail:Auth( cUser, cPass )
-            lConnect := .F.
+         
+         IF lAuthPlain .AND. !lConnect
+            IF !oInMail:AuthPlain( cUser, cPass )
+               lConnect := .F.
+            ENDIF
          ELSE
-            lConnectPlain  := .T.
+            IF !lConnectPlain
+               oInmail:Getok()
+               lConnect := .F.
+            ENDIF
          ENDIF
-      ENDIF
-      
-      IF lAuthPlain .AND. !lConnect
-         IF !oInMail:AuthPlain( cUser, cPass )
-            lConnect := .F.
-         ENDIF
+
       ELSE
-         IF !lConnectPlain
-            oInmail:Getok()
-            lConnect := .F.
-         ENDIF
-      ENDIF
 
-   ELSE
-
-      lConnect := .F.
+         lConnect := .F.
       
-   ENDIF
+      ENDIF
+   else
+         lConnect := .F.
+   endif
 
    IF !lConnect
    
-      oInMail:Close()
+      if !lNoAuth   
+         oInMail:Close()
+      endif
+      TRY
+       oInmail := tIPClientsmtp():New( oUrl, lTrace)
+      CATCH
+       lReturn := .F.
+      END
+
+      oInmail:nConnTimeout:=nTimeOut
+      
       
       IF !oInMail:Open()
          lConnect := .F.
@@ -358,7 +379,16 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       oMail:hHeaders[ "X-Priority" ] := Str( nPriority, 1 )
    ENDIF
    
-   oInmail:Write( oMail:ToString() )
+//   oInmail:Write( oMail:ToString() )
+   cData := oMail:ToString()
+   nSize := Len(cData)
+   for nCount := 1 to len(cData) step 1024
+       aadd(aData, substr( cData,nCount,1024))
+   next
+   nSent :=0
+   for nCount :=1 to len(aData)
+      nSent += oInmail:Write( aData[nCount],len(aData[nCount]))
+   next
    oInMail:Commit()
    oInMail:Close()
    

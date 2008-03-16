@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5961 2008/03/14 19:57:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5962 2008/03/16 03:24:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-03-16 16:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+   * source/tip/ftpcln.prg
+     ! fixed methos filesize, since was returning wrong info
+   * source/tip/sendmail.prg
+     ! Sendmail should be faster now on sending large emails with attached
+       added ntimeout parameter to control timeout of sendmail functions
 
 2008-03-16 00:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/rtl/errorsys.prg
