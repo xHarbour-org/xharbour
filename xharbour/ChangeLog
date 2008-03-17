@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5963 2008/03/16 18:59:20 lculik Exp $
+ * $Id: ChangeLog,v 1.5964 2008/03/16 19:15:55 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-17 19:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  - source/rtl/gtnul/Makefile
+  - source/rtl/gtnul/gtext.c
+  - source/rtl/gtnul/gtnul.c
+  - source/rtl/gtnul/gtsys.c
+  - source/rtl/gtnul
+    - Removed old GTNUL (forgot to do it in the previous commit).
 
 2008-03-16 22:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
