@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.74 2007/09/03 18:04:27 paultucker Exp $
+# $Id: Makefile,v 1.75 2008/03/16 19:15:59 likewolf Exp $
 #
 
 ROOT = ../../
@@ -47,6 +47,7 @@ C_SOURCES=\
 	gtclip.c     \
 	gtfunc.c     \
 	gtkbstat.c   \
+	gtkeycod.c   \
 	gtsys.c      \
 	gttone.c     \
 	gx.c         \

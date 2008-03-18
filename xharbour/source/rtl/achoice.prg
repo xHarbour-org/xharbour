@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.38 2008/01/15 09:32:58 modalsist Exp $
+ * $Id: achoice.prg,v 1.39 2008/01/17 23:45:17 modalsist Exp $
  */
 
 /*
@@ -412,7 +412,7 @@ LOCAL nPage := ::nSize + 1
                IF nKey == K_LDBLCLK
                   IF ::lUserFunc
                      // EMULATE ENTER
-                     SetLastKey( K_ENTER )
+                     hb_SetLastKey( K_ENTER )
                   ELSE
                      nUserMode := AC_NO_USER_FUNCTION
                      nMode := AC_SELECT
