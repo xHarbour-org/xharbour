@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.21 2007/11/23 18:50:39 ptsarenko Exp $
+# $Id: Makefile,v 1.22 2008/03/16 19:15:59 likewolf Exp $
 #
 
 ROOT = ../../
@@ -71,6 +71,7 @@ C_SOURCES = \
 	replace.c \
 	screen1.c \
 	screen2.c \
+	setlast.c \
 	settime.c \
 	strdiff.c \
 	strfile.c \

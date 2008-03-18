@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5966 2008/03/18 01:03:27 likewolf Exp $
+ * $Id: ChangeLog,v 1.5967 2008/03/18 03:29:50 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-18 09:41 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/ct/Makefile
+    ! Added missing setlast.c.
+  * source/ct/setlast.c
+  * source/rtl/inkey.c
+    ! Fixed SETLASTKEY() double definition. Now the CT function is called
+      SETLASTKEY() and RTL function is called HB_SETLASTKEY
+  * source/debug/debugger.prg
+    ! Changed SETLASTKEY() to HB_SETLASTKEY().
 
 2008-03-18 00:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * dll_pc.bat

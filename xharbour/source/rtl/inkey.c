@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.55 2008/03/09 19:18:25 likewolf Exp $
+ * $Id: inkey.c,v 1.56 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
  *    hb_inkeySetLast()
  *
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
- *    SETLASTKEY()
+ *    HB_SETLASTKEY()
  *
  * Copyright 2004 Peter Rees <peter@rees.co.nz>
  *    SETINKEYBEFOREBLOCK()
@@ -237,14 +237,8 @@ HB_FUNC( LASTKEY )
    hb_retni( hb_inkeyLast( ISNUM( 1 ) ? hb_parni( 1 ) : INKEY_ALL ) );
 }
 
-HB_FUNC( SETLASTKEY )
+HB_FUNC( HB_SETLASTKEY )
 {
    if( ISNUM( 1 ) )
-   {
       hb_retni( hb_inkeySetLast( hb_parni( 1 ) ) );
-   }
-   else
-   {
-      hb_ret();
-   }
 }

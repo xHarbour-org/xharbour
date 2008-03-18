@@ -1,5 +1,5 @@
 /*
- * $Id: setlast.c,v 1.1 2003/09/08 12:56:52 druzus Exp $
+ * $Id: setlast.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -55,6 +55,6 @@
 
 HB_FUNC( SETLASTKEY )
 {
-    hb_setInkeyLast( hb_parni( 1 ) );
-    hb_retc( "" );
+    hb_inkeySetLast( hb_parni( 1 ) );
+    hb_retc( NULL );
 }

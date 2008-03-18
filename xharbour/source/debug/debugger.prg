@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.87 2007/12/04 22:52:49 likewolf Exp $
+ * $Id: debugger.prg,v 1.88 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -2250,7 +2250,7 @@ METHOD RestoreAppState() CLASS HBDebugger
    Set( _SET_DIRCASE, ::nAppDirCase )
    Set( _SET_FILECASE, ::nAppFileCase )
    Set( _SET_TYPEAHEAD, ::nAppTypeAhead )
-   SetLastKey( ::nAppLastKey )
+   hb_SetLastKey( ::nAppLastKey )
 #ifdef __XHARBOUR__
    SetInkeyAfterBlock( ::bAppInkeyAfter )
    SetInkeyBeforeBlock( ::bAppInkeyBefore )
