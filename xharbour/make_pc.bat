@@ -1,9 +1,9 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.18 2007/07/06 13:11:34 modalsist Exp $
+rem $Id: make_pc.bat,v 1.19 2007/11/10 04:38:32 guerra000 Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
-rem NOTE: Pelles C is a free C/C++ compliler for MS-Windows platform.
+rem Note: Pelles is freeware (not open source) C compliler for MS-Windows platform.
 rem       http://www.smorgasbordet.com/pellesc
 rem
 rem 
@@ -15,20 +15,22 @@ if "%1" == "-h" goto HELP
 if "%1" == "-H" goto HELP
 if "%1" == "/h" goto HELP
 if "%1" == "/H" goto HELP
+
 goto SETS
 
 :HELP
 cls
 echo.
-echo Make file for xHarbour with Pelles C compiler.
+echo Make file for xHarbour from CVS with Pelles C compiler.
 echo.
-echo Syntax: make_pc [ /mt /clean /dll /? ] 
+echo Syntax: make_pc [ mt | clean | dll | ? | contrib ] 
 echo.
-echo make_pc            - build binaries and libs for single thread (default).
-echo make_pc [/-]mt     - build binaries and libs for multi thread.
-echo make_pc [/-]clean  - delete binaries, lib and obj files for a new full build.
-echo make_pc [/-]dll    - build harbour.dll and harbour.lib
-echo make_pc [/-]?      - show this help.                      
+echo make_pc             - build binaries and libs for single thread (default).
+echo make_pc [/-]mt      - build binaries and libs for multi thread.
+echo make_pc [/-]contrib - build contribs.
+echo make_pc [/-]dll     - build harbour.dll and harbour.lib
+echo make_pc [/-]clean   - delete bin, lib and obj files for a clean build.
+echo make_pc [/-]?       - show this help.                      
 echo.
 goto EXIT2
 
@@ -37,6 +39,8 @@ goto EXIT2
 
 if "%1" == "/dll" goto DLL
 if "%1" == "/DLL" goto DLL
+if "%1" == "-dll" goto DLL
+if "%1" == "-DLL" goto DLL
 if "%1" == "dll"  goto DLL
 if "%1" == "DLL"  goto DLL
 
@@ -45,7 +49,7 @@ REM *****************************************
 REM *** If necessary, change only 3 next sets
 REM *****************************************
 
-IF %HB_DIR%.==. SET HB_DIR=.\
+IF %HB_DIR%.==. SET HB_DIR=C:\xHarbCVS
 IF %CC_DIR%.==. SET CC_DIR=C:\PellesC
 SET BISON_DIR=C:\Bison
 
@@ -62,69 +66,80 @@ SET INCLUDE=%CC_DIR%\include;%CC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
 SET PATH=%CC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
-SET OBJ_DIR=%HB_DIR%\obj\pocc
-SET LIB_DIR=%HB_DIR%\lib\pocc
-SET BIN_DIR=%HB_DIR%\bin\pocc
+SET OBJ_DIR=%HB_DIR%\obj\pc
+SET LIB_DIR=%HB_DIR%\lib\pc
+SET BIN_DIR=%HB_DIR%\bin\pc
 
 IF %BISON_SIMPLE%.==. SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 
 if "%1" == "clean"  goto CLEAN
 if "%1" == "CLEAN"  goto CLEAN
+if "%1" == "-clean" goto CLEAN
+if "%1" == "-CLEAN" goto CLEAN
 if "%1" == "/clean" goto CLEAN
 if "%1" == "/CLEAN" goto CLEAN
 
 
-  if not exist obj                       md obj
-  if not exist %LIB_DIR%                 md %LIB_DIR%
-  if not exist %BIN_DIR%                 md %BIN_DIR%
-  if not exist %OBJ_DIR%                 md %OBJ_DIR%
+if not exist obj                       md obj
+if not exist %LIB_DIR%                 md %LIB_DIR%
+if not exist %BIN_DIR%                 md %BIN_DIR%
+if not exist %OBJ_DIR%                 md %OBJ_DIR%
 
-  if not exist %OBJ_DIR%\ct              md %OBJ_DIR%\ct
-
-  if not exist %OBJ_DIR%\mt              md %OBJ_DIR%\mt
-  if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
-
-  if not exist %OBJ_DIR%\fmstat          md %OBJ_DIR%\fmstat
-  if not exist %OBJ_DIR%\mt\fmstat       md %OBJ_DIR%\mt\fmstat
+if not exist %OBJ_DIR%\ct              md %OBJ_DIR%\ct
+if not exist %OBJ_DIR%\dll             md %OBJ_DIR%\dll
+if not exist %OBJ_DIR%\fmstat          md %OBJ_DIR%\fmstat
 
 
-if "%1" == ""    goto ST
+if "%1" == "/contrib"  goto contrib
+if "%1" == "-contrib"  goto contrib
+if "%1" == "contrib"   goto contrib
 
 if "%1" == "/mt" goto MT
 if "%1" == "/MT" goto MT
+if "%1" == "-mt" goto MT
+if "%1" == "-MT" goto MT
 if "%1" == "mt"  goto MT
 if "%1" == "MT"  goto MT
 
-
-:ST
-
-  echo Compiling binaries and core libs.
-
-  SET HB_MT=
-  pomake /f makefile.pc > make_pc.log
-  if errorlevel 1 goto BUILD_ERR
-  goto BUILD_OK
+goto ST
 
 
 :MT
-  echo Compiling binaries and core libs (for multi thread).
+  rem echo Compiling binaries and core libs (Multi Thread).
+  rem pomake /f makefile.pc /p HB_MT=mt > make_pc.log
+  rem if errorlevel 1 goto BUILD_ERR
+  rem if errorlevel 1 goto BUILD_ERR
+  rem goto BUILD_OK
 
-  SET HB_MT=mt
-  pomake /f makefile.pc > make_pc.log
-  SET HB_MT=
+  echo.
+  echo.*** Warning ***
+  echo.
+  echo To build xharbour for multi thread, edit the makefile.pc file and uncoment
+  echo the HB_MT macro declaration, after call the make_pc.bat without mt parameter.
+  echo See notes in makefile.pc for more details.
+  echo.
+  goto exit
+
+:ST
+  echo.
+  echo Compiling binaries and core libs.
+  pomake /f makefile.pc /p > make_pc.log
   if errorlevel 1 goto BUILD_ERR
   goto BUILD_OK
 
 :BUILD_OK
-
-   copy %BIN_DIR%\*.exe bin\*.* > nul
-   copy %LIB_DIR%\*.lib lib\*.* > nul
-   if exist make_pc.log del make_pc.log
+   move /y %BIN_DIR%\*.exe bin > nul
+   move /y %LIB_DIR%\*.lib lib > nul
+   REM if exist make_pc.log del make_pc.log
+   echo.
+   echo Done !
    goto EXIT
 
 :BUILD_ERR
-
+   echo.
+   echo *** ERROR ! ***
+   pause
    edit make_pc.log
    goto EXIT
 
@@ -186,12 +201,7 @@ if "%1" == "MT"  goto MT
    if exist %HB_DIR%\lib\macro.lib            del %HB_DIR%\lib\macro.lib
    if exist %HB_DIR%\lib\macromt.lib          del %HB_DIR%\lib\macromt.lib
    if exist %HB_DIR%\lib\nulsys.lib           del %HB_DIR%\lib\nulsys.lib
-   if exist %HB_DIR%\lib\optcon.lib           del %HB_DIR%\lib\optcon.lib
-   if exist %HB_DIR%\lib\optconmt.lib         del %HB_DIR%\lib\optconmt.lib
-   if exist %HB_DIR%\lib\optgui.lib           del %HB_DIR%\lib\optgui.lib
-   if exist %HB_DIR%\lib\optguimt.lib         del %HB_DIR%\lib\optguimt.lib
    if exist %HB_DIR%\lib\pcrepos.lib          del %HB_DIR%\lib\pcrepos.lib
-   if exist %HB_DIR%\lib\pcreposmt.lib        del %HB_DIR%\lib\pcreposmt.lib
    if exist %HB_DIR%\lib\pp.lib               del %HB_DIR%\lib\pp.lib
    if exist %HB_DIR%\lib\ppmt.lib             del %HB_DIR%\lib\ppmt.lib
    if exist %HB_DIR%\lib\rdd.lib              del %HB_DIR%\lib\rdd.lib
@@ -270,6 +280,8 @@ if "%1" == "MT"  goto MT
    if exist %LIB_DIR%\dbfntxmt.lib         del %LIB_DIR%\dbfntxmt.lib
    if exist %LIB_DIR%\debug.lib            del %LIB_DIR%\debug.lib
    if exist %LIB_DIR%\dllmain.lib          del %LIB_DIR%\dllmain.lib
+   if exist %LIB_DIR%\fmstat.lib           del %LIB_DIR%\fmstat.lib
+   if exist %LIB_DIR%\fmstatmt.lib         del %LIB_DIR%\fmstatmt.lib
    if exist %LIB_DIR%\harbour.lib          del %LIB_DIR%\harbour.lib
    if exist %LIB_DIR%\hbodbc.lib           del %LIB_DIR%\hbodbc.lib
    if exist %LIB_DIR%\hbodbcmt.lib         del %LIB_DIR%\hbodbcmt.lib
@@ -289,12 +301,7 @@ if "%1" == "MT"  goto MT
    if exist %LIB_DIR%\macro.lib            del %LIB_DIR%\macro.lib
    if exist %LIB_DIR%\macromt.lib          del %LIB_DIR%\macromt.lib
    if exist %LIB_DIR%\nulsys.lib           del %LIB_DIR%\nulsys.lib
-   if exist %LIB_DIR%\optcon.lib           del %LIB_DIR%\optcon.lib
-   if exist %LIB_DIR%\optconmt.lib         del %LIB_DIR%\optconmt.lib
-   if exist %LIB_DIR%\optgui.lib           del %LIB_DIR%\optgui.lib
-   if exist %LIB_DIR%\optguimt.lib         del %LIB_DIR%\optguimt.lib
    if exist %LIB_DIR%\pcrepos.lib          del %LIB_DIR%\pcrepos.lib
-   if exist %LIB_DIR%\pcreposmt.lib        del %LIB_DIR%\pcreposmt.lib
    if exist %LIB_DIR%\pp.lib               del %LIB_DIR%\pp.lib
    if exist %LIB_DIR%\ppmt.lib             del %LIB_DIR%\ppmt.lib
    if exist %LIB_DIR%\rdd.lib              del %LIB_DIR%\rdd.lib
@@ -322,45 +329,8 @@ if "%1" == "MT"  goto MT
    if exist %OBJ_DIR%\ct\*.c               del %OBJ_DIR%\ct\*.c
    if exist %OBJ_DIR%\ct\*.obj             del %OBJ_DIR%\ct\*.obj
 
-   if exist %OBJ_DIR%\opt\*.c              del %OBJ_DIR%\opt\*.c
-   if exist %OBJ_DIR%\opt\*.obj            del %OBJ_DIR%\opt\*.obj
-
-   if exist %OBJ_DIR%\opt\console\*.c      del %OBJ_DIR%\opt\console\*.c
-   if exist %OBJ_DIR%\opt\console\*.obj    del %OBJ_DIR%\opt\console\*.obj
-
-   if exist %OBJ_DIR%\opt\gui\*.c          del %OBJ_DIR%\opt\gui\*.c
-   if exist %OBJ_DIR%\opt\gui\*.obj        del %OBJ_DIR%\opt\gui\*.obj
-
-   if exist %OBJ_DIR%\mt\*.c               del %OBJ_DIR%\mt\*.c
-   if exist %OBJ_DIR%\mt\*.h               del %OBJ_DIR%\mt\*.h
-   if exist %OBJ_DIR%\mt\*.obj             del %OBJ_DIR%\mt\*.obj
-
-   if exist %OBJ_DIR%\mt\opt\gui\*.c       del %OBJ_DIR%\mt\opt\gui\*.c
-   if exist %OBJ_DIR%\mt\opt\gui\*.obj     del %OBJ_DIR%\mt\opt\gui\*.obj
-
-   if exist %OBJ_DIR%\mt\opt\console\*.c   del %OBJ_DIR%\mt\opt\console\*.c
-   if exist %OBJ_DIR%\mt\opt\console\*.obj del %OBJ_DIR%\mt\opt\console\*.obj
-
-   if exist %OBJ_DIR%\mt\opt\gui\*.c       del %OBJ_DIR%\mt\opt\gui\*.c
-   if exist %OBJ_DIR%\mt\opt\gui\*.obj     del %OBJ_DIR%\mt\opt\gui\*.obj
-
-   if exist %OBJ_DIR%\mt\ct\*.c            del %OBJ_DIR%\mt\ct\*.c
-   if exist %OBJ_DIR%\mt\ct\*.obj          del %OBJ_DIR%\mt\ct\*.obj
-
+   if exist %OBJ_DIR%\fmstat\*.c           del %OBJ_DIR%\fmstat\*.c
    if exist %OBJ_DIR%\fmstat\*.obj         del %OBJ_DIR%\fmstat\*.obj
-   if exist %OBJ_DIR%\mt\fmstat\*.obj      del %OBJ_DIR%\mt\fmstat\*.obj
-
-   rem remove obsolete optgui and optcon directories
-   if exist %OBJ_DIR%\opt\console\*.obj    del %OBJ_DIR%\opt\console\*.obj
-   if exist %OBJ_DIR%\opt\gui\*.obj        del %OBJ_DIR%\opt\gui\*.obj
-   if exist %OBJ_DIR%\mt\opt\console\*.obj del %OBJ_DIR%\mt\opt\console\*.obj
-   if exist %OBJ_DIR%\mt\opt\gui\*.obj     del %OBJ_DIR%\mt\opt\gui\*.obj
-   if exist %OBJ_DIR%\opt\console\nul      rd %OBJ_DIR%\opt\console
-   if exist %OBJ_DIR%\opt\gui\nul          rd %OBJ_DIR%\opt\gui
-   if exist %OBJ_DIR%\opt\nul              rd %OBJ_DIR%\opt
-   if exist %OBJ_DIR%\mt\opt\console\nul   rd %OBJ_DIR%\mt\opt\console
-   if exist %OBJ_DIR%\mt\opt\gui\nul       rd %OBJ_DIR%\mt\opt\gui
-   if exist %OBJ_DIR%\mt\opt\nul           rd %OBJ_DIR%\mt\opt
 
    goto DLLCLEAN
 
@@ -374,6 +344,102 @@ if "%1" == "MT"  goto MT
 
  call dll_pc.bat clean
  goto EXIT2
+
+
+:CONTRIB
+
+ echo compiling contribs.
+
+:firebird
+rem Uncomment this section if you have Firebird installed
+rem cd contrib\firebird
+rem if exist make_pc.bat call make_pc %1
+rem cd ..\..
+rem if errorlevel 1 goto end
+
+:gd
+cd contrib\gd
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:gtwvw
+cd contrib\gtwvw
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:hbzlib
+cd contrib\hbzlib
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:libnf
+cd contrib\libnf
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:mysql
+rem Uncomment this section if you have mysql installed
+rem requires mysql.h to be installed
+rem cd contrib\mysql
+rem if exist make_pc.bat call make_pc %1
+rem cd ..\..
+rem if errorlevel 1 goto end
+
+:pdf
+cd contrib\pdflib
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:pgsql
+rem Uncomment this section if you have pgsql installed
+rem cd contrib\pgsql
+rem if exist make_pc.bat call make_pc %1
+rem cd ..\..
+rem if errorlevel 1 goto end
+
+:rdd_ads
+cd contrib\rdd_ads
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:tp
+cd contrib\tp_
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:unicode
+cd contrib\unicode
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:what32
+cd contrib\what32
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:wvtgui
+cd contrib\wvtgui
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+:xwt
+cd contrib\xwt
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
+goto EXIT
+
 
 :EXIT
 
@@ -393,7 +459,6 @@ SET INCLUDE=%_INCLUDE%
 SET _PATH=
 SET _LIB=
 SET _INCLUDE=
-
 
 :EXIT2
 

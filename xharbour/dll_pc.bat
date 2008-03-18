@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.9 2007/03/11 00:16:20 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.10 2007/11/10 04:38:32 guerra000 Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -28,9 +28,9 @@ SET INCLUDE=%CC_DIR%\include;%CC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
 SET PATH=%CC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
-SET OBJ_DIR=%HB_DIR%\obj\pocc\dll
-SET LIB_DIR=%HB_DIR%\lib\pocc
-SET BIN_DIR=%HB_DIR%\bin\pocc
+SET OBJ_DIR=%HB_DIR%\obj\pc\dll
+SET LIB_DIR=%HB_DIR%\lib\pc
+SET BIN_DIR=%HB_DIR%\bin\pc
 
 IF %BISON_SIMPLE%.==. SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 

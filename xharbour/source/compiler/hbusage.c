@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.38 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: hbusage.c,v 1.39 2008/01/03 05:43:00 andijahja Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 
 #include "hbcomp.h"
 
-extern char *hb_credits( void );
 /*
  * Prints available options
  */

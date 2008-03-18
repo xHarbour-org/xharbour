@@ -1,34 +1,81 @@
-# $Id: makefile.pc,v 1.62 2008/01/22 02:28:17 lculik Exp $
+# $Id: makefile.pc,v 1.63 2008/01/22 15:32:25 guerra000 Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
 
+# Don't indent definitions
+
 !ifndef ECHO
-# don't indent definitions
 ECHO = echo.
 !endif
 
 !ifndef DEL
-# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
 DEL = del
 !endif
+
+############
+#
+# NOTES
+#
+# 1) The pomake has a bug. The !ifdef preprocessor doesn't recognize macro created
+#    at command line as: pomake /f makefile.pc HB_MT=mt or in set command as: SET HB_MT=mt,
+#    so, by now and while this bug is not fixed, to build xharbour for multi-thread you must
+#    uncomment the HB_MT macro declaration.
+#
+#HB_MT = mt
+#
+# 2) By default the define HB_EXT_INKEY is enabled on this makefile.
+#    To access standard inkey codes declared on inkey.ch file you must remove
+#    the HB_EXT_INKEY flag from HARBOURFLAGS and CFLAGS macros.
+#
+# 3) If you want use Pelles C 5.00 or above, uncomment .PHONY target.
+#
+#.PHONY : ALL
+#
+############
+
 
 CC_EXE     = $(CC_DIR)\bin\pocc.exe
 LINK_EXE   = $(CC_DIR)\bin\polink.exe
 LIB_EXE    = $(CC_DIR)\bin\polib.exe
 CC_LIB_DIR = $(CC_DIR)\lib
 
-# To go back to access standard inkey codes declared in inkey.ch remove
-# HB_EXT_INKEY flags from HARBOURFLAGS and CUSERFLAGS.
-#
-HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -dHB_EXT_INKEY
-MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w -es2 -gc0
-CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__WIN32__" /D"NULL=0" $(CUSERFLAGS) /D"HB_EXT_INKEY"
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ Binaries Names ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßß
+
+HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
+HBTEST_EXE   = $(BIN_DIR)\hbtest.exe
+HBRUN_EXE    = $(BIN_DIR)\hbrun.exe
+HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
+HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
+HBPP_EXE     = $(BIN_DIR)\hbpp.exe
+XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
+PPGEN_EXE    = $(BIN_DIR)\ppgen.exe
+
+HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w2 -es2 -gc0 -dHB_EXT_INKEY
+MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w2 -es2 -gc0
+
+CC_FLAGS     = /Ze /Zx /Go /Tx86-coff /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN"
+CFLAGS       = $(CC_FLAGS) /I"$(HB_DIR)\INCLUDE" /D"__WIN32__" /D"NULL=0" $(CUSERFLAGS) /D"HB_EXT_INKEY"
+
 LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE 
 
 !ifdef HB_MT
-CFLAGS = $(CFLAGS) /D"HB_THREAD_SUPPORT" /MT
+CFLAGS       = $(CFLAGS) /MT /D"HB_THREAD_SUPPORT"
 !endif
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ Command lines macros ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßß
+
+HB_CMD       = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+CC_CMD       = $(CC_EXE) $(CFLAGS) /Fo$@ $**
+LIB_CMD      = $(LIB_EXE) /OUT:$@ $**
+CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /D"DLL_EXPORT" /Fo$@ $**
+
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ SOURCE Directories ³Û
@@ -38,6 +85,7 @@ CFLAGS = $(CFLAGS) /D"HB_THREAD_SUPPORT" /MT
 PP_DIR       = $(HB_DIR)\source\pp
 COMMON_DIR   = $(HB_DIR)\source\common
 VM_DIR       = $(HB_DIR)\source\vm
+FMSTAT_DIR   = $(VM_DIR)
 RTL_DIR      = $(HB_DIR)\source\rtl
 PCREPOS_DIR  = $(HB_DIR)\source\rtl\pcre
 LANG_DIR     = $(HB_DIR)\source\lang
@@ -63,32 +111,14 @@ XBSCRIPT_DIR = $(HB_DIR)\utils\xbscript
 TIP_DIR      = $(HB_DIR)\source\tip
 CT_DIR       = $(HB_DIR)\source\ct
 
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ OBJ Directories ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßß
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ Other OBJ Directories ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßß
 
-!ifdef HB_MT
-OBJ_DIR       = $(OBJ_DIR)\mt
-CT_OBJ_DIR    = $(OBJ_DIR)\ct\mt
-!else
-CT_OBJ_DIR    = $(OBJ_DIR)\ct
-!endif
+CT_OBJ_DIR = $(OBJ_DIR)\ct
+FMSTAT_OBJ_DIR = $(OBJ_DIR)\fmstat
 
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ Binaries Names ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßß
-
-HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
-HBTEST_EXE   = $(BIN_DIR)\hbtest$(HB_MT).exe
-HBRUN_EXE    = $(BIN_DIR)\hbrun$(HB_MT).exe
-HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
-HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
-HBPP_EXE     = $(BIN_DIR)\hbpp.exe
-XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
-PPGEN_EXE    = $(BIN_DIR)\ppgen.exe
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ Library Names ³Û
@@ -106,7 +136,7 @@ DBFNTX_LIB   = $(LIB_DIR)\dbfntx$(HB_MT).lib
 HBSIX_LIB    = $(LIB_DIR)\hbsix$(HB_MT).lib
 HSX_LIB      = $(LIB_DIR)\hsx$(HB_MT).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(HB_MT).lib
-PCREPOS_LIB  = $(LIB_DIR)\pcrepos$(HB_MT).lib
+PCREPOS_LIB  = $(LIB_DIR)\pcrepos.lib
 VM_LIB       = $(LIB_DIR)\vm$(HB_MT).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(HB_MT).lib
 CT_LIB       = $(LIB_DIR)\ct$(HB_MT).lib
@@ -121,14 +151,15 @@ NULSYS_LIB   = $(LIB_DIR)\nulsys.lib
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
 GTPCA_LIB    = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB    = $(LIB_DIR)\gtstd.lib
+GTTRM_LIB    = $(LIB_DIR)\gttrm.lib
 GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
-GTNUL_LIB    = $(LIB_DIR)\gtnul.lib
 GTWVT_LIB    = $(LIB_DIR)\gtwvt.lib
 GTGUI_LIB    = $(LIB_DIR)\gtgui.lib
 USRRDD_LIB   = $(LIB_DIR)\usrrdd$(HB_MT).lib
 RDDS_LIB     = $(LIB_DIR)\rdds$(HB_MT).lib
 MISC_LIB     = $(LIB_DIR)\libmisc.lib
 CGI_LIB      = $(LIB_DIR)\cgi$(HB_MT).lib
+FMSTAT_LIB   = $(LIB_DIR)\fmstat$(HB_MT).lib
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ POCC Lib Names ³Û
@@ -136,7 +167,7 @@ CGI_LIB      = $(LIB_DIR)\cgi$(HB_MT).lib
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßß
 
-POCC_LIBRARY = \
+PELLES_LIBRARY = \
    crt$(HB_MT).lib \
    kernel32.lib \
    winspool.lib \
@@ -174,17 +205,6 @@ HARBOUR_LIBRARY = \
    $(CT_LIB) \
    $(CODEPAGE_LIB)
 
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ Harbour and CC     ³Û
-# ³ command lines      ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßß
-
-HB_CMD       = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-CC_CMD       = $(CC_EXE) $(CFLAGS) /Fo$@ $**
-#CC_CMD_DLL  = $(CC_EXE) $(CFLAGS) /D"HB_EXEMEM_USED" /Fo$@ $**
-LIB_CMD      = $(LIB_EXE) /OUT:$@ $**
-CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /D"DLL_EXPORT" /Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ The Project ³Û
@@ -194,13 +214,8 @@ CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPP
 PROJECT = \
    $(COMMON_LIB) \
    $(PPGEN_EXE) \
-   $(PP_LIB)
-
-!ifndef HB_MT
-PROJECT = \
-   $(PROJECT) \
-   $(HARBOUR_EXE)
-!endif
+   $(PP_LIB) \
+   $(HARBOUR_EXE) 
 
 PROJECT = \
    $(PROJECT) \
@@ -213,43 +228,50 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
+   $(CT_LIB) \
+   $(DEBUG_LIB) \
+   $(LANG_LIB) \
+   $(NULSYS_LIB) \
+   $(CODEPAGE_LIB) \
+   $(GTWIN_LIB) \
+   $(GTGUI_LIB) 
+
+PROJECT = \
+   $(PROJECT) \
    $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(BMSIXCDX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
-   $(CT_LIB) \
    $(USRRDD_LIB) \
    $(RDDS_LIB) \
    $(MISC_LIB) \
-   $(CGI_LIB)
+   $(CGI_LIB) \
+   $(FMSTAT_LIB) \
+   $(DLL_MAIN_LIB) \
+   $(ODBC_LIB) 
 
-!ifndef HB_MT
 PROJECT = \
    $(PROJECT) \
-   $(DEBUG_LIB) \
-   $(LANG_LIB) \
-   $(NULSYS_LIB) \
-   $(CODEPAGE_LIB) \
-   $(DLL_MAIN_LIB) \
-   $(ODBC_LIB) \
    $(GTSTD_LIB) \
-   $(GTWIN_LIB) \
-   $(GTNUL_LIB) \
    $(GTCGI_LIB) \
    $(GTPCA_LIB) \
-   $(GTWVT_LIB) \
-   $(GTGUI_LIB) \
-!endif
+   $(GTWVT_LIB) 
+#   $(GTTRM_LIB) \
 
 PROJECT = \
    $(PROJECT) \
    $(HBDOC_EXE) \
-   $(HBMAKE_EXE) \
+   $(HBMAKE_EXE)\ 
    $(HBPP_EXE) \
-   $(HBRUN_EXE) \
-   $(HBTEST_EXE) \
    $(XBSCRIPT_EXE)
+
+!ifndef HB_MT
+PROJECT = \
+   $(PROJECT) \
+   $(HBRUN_EXE) \
+   $(HBTEST_EXE)
+!endif
 
 ALL: $(PROJECT)
 
@@ -259,21 +281,13 @@ ALL: $(PROJECT)
 # ÀÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßß
 
-GTNUL_LIB_OBJS = \
-   $(OBJ_DIR)\gtext.obj \
-   $(OBJ_DIR)\gtnul.obj \
-   $(OBJ_DIR)\gtsys.obj
-
 
 GTCGI_LIB_OBJS = \
    $(OBJ_DIR)\cgiread.obj \
-   $(OBJ_DIR)\gtcgi.obj \
-   $(OBJ_DIR)\mousecgi.obj
-
+   $(OBJ_DIR)\gtcgi.obj 
 
 GTPCA_LIB_OBJS = \
-   $(OBJ_DIR)\gtpca.obj \
-   $(OBJ_DIR)\mousepca.obj
+   $(OBJ_DIR)\gtpca.obj
 
 
 GTWVT_LIB_OBJS = \
@@ -308,7 +322,6 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
    $(OBJ_DIR)\gencobj.obj \
-   $(OBJ_DIR)\genobj32.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -440,16 +453,27 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\charrepl.obj \
    $(CT_OBJ_DIR)\charsort.obj \
    $(CT_OBJ_DIR)\charswap.obj \
+   $(CT_OBJ_DIR)\color.obj \
    $(CT_OBJ_DIR)\count.obj \
    $(CT_OBJ_DIR)\ctc.obj \
-   $(CT_OBJ_DIR)\ctmath.obj \
-   $(CT_OBJ_DIR)\ctmath2.obj \
-   $(CT_OBJ_DIR)\ctset.obj \
-   $(CT_OBJ_DIR)\ctstr.obj \
    $(CT_OBJ_DIR)\ctchksum.obj \
    $(CT_OBJ_DIR)\ctcrypt.obj \
+   $(CT_OBJ_DIR)\ctmath.obj \
+   $(CT_OBJ_DIR)\ctmath2.obj \
+   $(CT_OBJ_DIR)\ctnet.obj \
+   $(CT_OBJ_DIR)\ctpad.obj \
+   $(CT_OBJ_DIR)\ctset.obj \
+   $(CT_OBJ_DIR)\ctstr.obj \
+   $(CT_OBJ_DIR)\ctwfunc.obj \
    $(CT_OBJ_DIR)\ctwin.obj \
+   $(CT_OBJ_DIR)\ct.obj \
+   $(CT_OBJ_DIR)\ctmisc.obj \
+   $(CT_OBJ_DIR)\ctrand.obj \
+   $(CT_OBJ_DIR)\cursor.obj \
    $(CT_OBJ_DIR)\dbftools.obj \
+   $(CT_OBJ_DIR)\datetime.obj \
+   $(CT_OBJ_DIR)\dattime2.obj \
+   $(CT_OBJ_DIR)\dattime3.obj \
    $(CT_OBJ_DIR)\disk.obj \
    $(CT_OBJ_DIR)\diskutil.obj \
    $(CT_OBJ_DIR)\envparam.obj \
@@ -457,17 +481,17 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\files.obj \
    $(CT_OBJ_DIR)\finan.obj \
    $(CT_OBJ_DIR)\ftoc.obj \
+   $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\intneg.obj \
    $(CT_OBJ_DIR)\justify.obj \
    $(CT_OBJ_DIR)\keyset.obj \
    $(CT_OBJ_DIR)\misc1.obj \
    $(CT_OBJ_DIR)\misc2.obj \
    $(CT_OBJ_DIR)\misc3.obj \
-   $(CT_OBJ_DIR)\ctnet.obj \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
+   $(CT_OBJ_DIR)\numconv.obj \
    $(CT_OBJ_DIR)\numlohi.obj \
-   $(CT_OBJ_DIR)\ctpad.obj \
    $(CT_OBJ_DIR)\pos1.obj \
    $(CT_OBJ_DIR)\pos2.obj \
    $(CT_OBJ_DIR)\posdiff.obj \
@@ -477,6 +501,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\remove.obj \
    $(CT_OBJ_DIR)\replace.obj \
    $(CT_OBJ_DIR)\screen1.obj \
+   $(CT_OBJ_DIR)\screen2.obj \
    $(CT_OBJ_DIR)\setlast.obj \
    $(CT_OBJ_DIR)\strdiff.obj \
    $(CT_OBJ_DIR)\strswap.obj \
@@ -486,25 +511,11 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\trig.obj \
    $(CT_OBJ_DIR)\wordrepl.obj \
    $(CT_OBJ_DIR)\wordtoch.obj \
-   $(CT_OBJ_DIR)\color.obj \
-   $(CT_OBJ_DIR)\ct.obj \
-   $(CT_OBJ_DIR)\ctmisc.obj \
-   $(CT_OBJ_DIR)\ctrand.obj \
-   $(CT_OBJ_DIR)\getsecrt.obj \
-   $(CT_OBJ_DIR)\datetime.obj \
-   $(CT_OBJ_DIR)\dattime2.obj \
-   $(CT_OBJ_DIR)\dattime3.obj \
-   $(CT_OBJ_DIR)\invrtwin.obj \
-   $(CT_OBJ_DIR)\numconv.obj \
-   $(CT_OBJ_DIR)\screen2.obj \
+   \
    $(CT_OBJ_DIR)\blank.obj \
    $(CT_OBJ_DIR)\cttime.obj \
-   $(CT_OBJ_DIR)\getinfo.obj \
-   $(CT_OBJ_DIR)\setkeys.obj \
-   $(CT_OBJ_DIR)\strfile.obj \
    $(CT_OBJ_DIR)\fcopy.obj \
-   $(CT_OBJ_DIR)\pack.obj \
-   $(CT_OBJ_DIR)\settime.obj \
+   $(CT_OBJ_DIR)\getinfo.obj \
    $(CT_OBJ_DIR)\keysec.obj \
    $(CT_OBJ_DIR)\keytime.obj \
    $(CT_OBJ_DIR)\like.obj \
@@ -512,13 +523,16 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\maxline.obj \
    $(CT_OBJ_DIR)\numcount.obj \
    $(CT_OBJ_DIR)\numline.obj \
+   $(CT_OBJ_DIR)\pack.obj \
    $(CT_OBJ_DIR)\screen3.obj \
    $(CT_OBJ_DIR)\scrmark.obj \
+   $(CT_OBJ_DIR)\setkeys.obj \
+   $(CT_OBJ_DIR)\settime.obj \
+   $(CT_OBJ_DIR)\showtime.obj \
    $(CT_OBJ_DIR)\spread.obj \
-   $(CT_OBJ_DIR)\setclear.obj \
+   $(CT_OBJ_DIR)\strfile.obj \
    $(CT_OBJ_DIR)\trapkey.obj \
-   $(CT_OBJ_DIR)\util.obj \
-   $(CT_OBJ_DIR)\untext.obj
+   $(CT_OBJ_DIR)\util.obj
 
 
 NULSYS_LIB_OBJS = \
@@ -756,12 +770,13 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbdate.obj 
 
 GTSTD_LIB_OBJS = \
-   $(OBJ_DIR)\gtstd.obj \
-   $(OBJ_DIR)\mousestd.obj
+   $(OBJ_DIR)\gtstd.obj
+
+GTTRM_LIB_OBJS = \
+   $(OBJ_DIR)\gttrm.obj
 
 GTWIN_LIB_OBJS = \
-   $(OBJ_DIR)\gtwin.obj \
-   $(OBJ_DIR)\mousewin.obj
+   $(OBJ_DIR)\gtwin.obj
 
 GTGUI_LIB_OBJS = \
    $(OBJ_DIR)\gtgui.obj \
@@ -811,6 +826,10 @@ VM_LIB_OBJS = \
    \
    $(OBJ_DIR)\harbinit.obj
 
+
+FMSTAT_LIB_OBJS = \
+   $(FMSTAT_OBJ_DIR)\fm.obj
+
 RTL_LIB_OBJS = \
    $(OBJ_DIR)\abs.obj \
    $(OBJ_DIR)\accept.obj \
@@ -850,7 +869,12 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gt.obj \
    $(OBJ_DIR)\gtapi.obj \
    $(OBJ_DIR)\gtapiu.obj \
-   $(OBJ_DIR)\gtgraph.obj \
+   $(OBJ_DIR)\gtclip.obj \
+   $(OBJ_DIR)\gtfunc.obj \
+   $(OBJ_DIR)\gtchrmap.obj \
+   $(OBJ_DIR)\gtkbstat.obj \
+   $(OBJ_DIR)\gtsys.obj \
+   $(OBJ_DIR)\gttone.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\hbbitf.obj \
@@ -859,6 +883,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\hbcrc32.obj \
    $(OBJ_DIR)\hbcrypt.obj \
    $(OBJ_DIR)\hbffind.obj \
+   $(OBJ_DIR)\hbgtcore.obj \
    $(OBJ_DIR)\hbhex2n.obj \
    $(OBJ_DIR)\hbmd5.obj \
    $(OBJ_DIR)\hboutdbg.obj \
@@ -870,6 +895,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\hbxml.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
+   $(OBJ_DIR)\inkeyapi.obj \
    $(OBJ_DIR)\is.obj \
    $(OBJ_DIR)\isprint.obj \
    $(OBJ_DIR)\langapi.obj \
@@ -885,6 +911,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\mod.obj \
    $(OBJ_DIR)\mouseapi.obj \
    $(OBJ_DIR)\mousex.obj \
+   $(OBJ_DIR)\mouse53.obj \
    $(OBJ_DIR)\mtran.obj \
    $(OBJ_DIR)\natmsg.obj \
    $(OBJ_DIR)\net.obj \
@@ -1089,7 +1116,6 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbfix.obj     >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj      >> make.tmp
    $(ECHO) $(OBJ_DIR)\gencobj.obj   >> make.tmp
-   $(ECHO) $(OBJ_DIR)\genobj32.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj    >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj  >> make.tmp
@@ -1102,7 +1128,7 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\ppcomp.obj    >> make.tmp
    $(ECHO) $(PP_LIB)                >> make.tmp
    $(ECHO) $(COMMON_LIB)            >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)          >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)        >> make.tmp
    $(LINK_EXE) /OUT:$(HARBOUR_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -1110,13 +1136,13 @@ $(OBJ_DIR)\harbour.obj : $(COMPILER_DIR)\harbour.c
    $(CC_CMD)
 
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
-   bison -l -d $** -o$@
+   bison -v -d $** -o$@
 
 $(OBJ_DIR)\harboury.obj : $(OBJ_DIR)\harboury.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
-   $(CC_EXE) $(CFLAGS) /D"NEED_DUMMY_RETURN" /I"$(OBJ_DIR)" /Fo$@ $**
+   $(CC_EXE) $(CC_FLAGS) /D"NEED_DUMMY_RETURN" /I"$(OBJ_DIR)" /Fo$@ $**
 
 $(OBJ_DIR)\cmdcheck.obj : $(COMPILER_DIR)\cmdcheck.c
    $(CC_CMD)
@@ -1157,9 +1183,6 @@ $(OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
 $(OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c
    $(CC_CMD)
 
-$(OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\expropta.obj : $(COMPILER_DIR)\expropta.c
    $(CC_CMD)
 
@@ -1182,15 +1205,15 @@ $(OBJ_DIR)\ppcomp.obj : $(COMPILER_DIR)\ppcomp.c
    $(CC_CMD)
 
 
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ LIB Creation ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßß
-
-$(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-   $(LIB_CMD)
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ LIB Target ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßß
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
+   $(LIB_CMD)
+
+$(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
    $(LIB_CMD)
 
 $(PP_LIB) : $(PP_LIB_OBJS)
@@ -1199,7 +1222,7 @@ $(PP_LIB) : $(PP_LIB_OBJS)
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
    $(LIB_CMD)
 
-$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
+$(GTTRM_LIB) : $(GTTRM_LIB_OBJS)
    $(LIB_CMD)
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
@@ -1233,6 +1256,9 @@ $(TIP_LIB) : $(HBTIP_LIB_OBJS)
    $(LIB_CMD)
 
 $(VM_LIB) : $(VM_LIB_OBJS)
+   $(LIB_CMD)
+
+$(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
    $(LIB_CMD)
 
 $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
@@ -1287,219 +1313,7 @@ $(CGI_LIB) : $(CGI_LIB_OBJS)
    $(LIB_CMD)
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-   $(ECHO) $(OBJ_DIR)\abs.obj       > poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\accept.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\ampm.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\at.obj       >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\bkgtsks.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\binnum.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\binnumx.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\box.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\cdpapi.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\chrasc.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\colorind.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\console.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\copyfile.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\datec.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dateshb.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dbf2txt.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\defpath.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\descend.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dirdrive.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\direct.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\diskspac.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\disksphb.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dllcall.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\empty.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\file.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\filehb.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\filestat.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\filesys.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fserror.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fkmax.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fnsplit.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fparse.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fssize.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fstemp.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gete.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gt.obj       >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gtapi.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gtapiu.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gtgraph.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\gx.obj       >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hardcr.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbbitf.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbchksum.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbcomprs.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbcrc32.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbcrypt.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbffind.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbhex2n.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbmd5.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hboutdbg.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbrandom.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbserv.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbsrlraw.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbsyslog.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbtoken.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbxml.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\idle.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\inkey.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\is.obj       >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\isprint.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\langapi.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\left.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\len.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\lennum.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\math.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\maxrow.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\memofile.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\minmax.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mlctopos.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mpostolc.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mod.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mouseapi.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mousex.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mtran.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\natmsg.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\net.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\oemansi.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\oldbox.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\oldclear.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\pad.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\padc.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\padl.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\padr.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\philes.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\philes53.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\philesx.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\rat.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\readline.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\regex.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\replic.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\right.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\round.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\run.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\samples.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\saverest.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\scroll.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\seconds.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\set.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\readexit.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\readins.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setcolor.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setcurs.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setkey.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setpos.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setposbs.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\shadow.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\soundex.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\space.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\spfiles.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\str.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\str2ptr.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strcase.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strdel.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strings.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strmatch.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strpeek.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strtran.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\strzero.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\stuff.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\substr.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tone.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tprinter.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\trace.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\transfrm.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\trim.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\txtline.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\type.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\val.obj      >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\valtostr.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\valtype.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\version.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\word.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\xhelp.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\xsavescr.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\achoice.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\adir.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\alert.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\arrayblk.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\browdb.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\browdbx.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\browse.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\checkbox.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\clpclass.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\color53.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\cstr.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\cstruct.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dbedit.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\decode.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\devoutp.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dircmd.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dummy.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\dumpvar.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\error.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\errorsys.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\fieldbl.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\getlist.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\getsys.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbini.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hblog.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hblognet.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\hbserial.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\input.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\listbox.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\memoedit.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\memvarbl.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\menuto.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\mssgline.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\objfunc.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\perfuncs.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\persist.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\profiler.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\pushbtn.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\radiobtn.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\radiogrp.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\readkey.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\readvar.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\regexrpl.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\scrollbr.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setfunc.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\setta.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\sprintf.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\stream.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tbcolumn.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tbrowse.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tclass.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\teditor.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\terror.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\text.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tget.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tgetint.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tgetlist.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tlabel.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tmenuitm.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tobject.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tpopup.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\traceprg.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\treport.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\trpc.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\trpccli.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\tscalar.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\ttable.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\ttextlin.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\ttopbar.obj  >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\txml.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\typefile.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\wait.obj     >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\win32ole.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\win32prn.obj >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\winos.obj    >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\winreg.obj   >> poccrtl.rsp
-   $(LIB_EXE) /OUT:$(RTL_LIB) @poccrtl.rsp
-   @IF EXIST poccrtl.rsp $(DEL) poccrtl.rsp
-
+   $(LIB_CMD)
 
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -2297,7 +2111,22 @@ $(OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
 $(OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
    $(CC_CMD)
 
-$(OBJ_DIR)\gtgraph.obj : $(RTL_DIR)\gtgraph.c
+$(OBJ_DIR)\gtchrmap.obj : $(RTL_DIR)\gtchrmap.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtclip.obj : $(RTL_DIR)\gtclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtfunc.obj : $(RTL_DIR)\gtfunc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtkbstat.obj : $(RTL_DIR)\gtkbstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtsys.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gttone.obj : $(RTL_DIR)\gttone.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
@@ -2322,6 +2151,9 @@ $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbgtcore.obj : $(RTL_DIR)\hbgtcore.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbhex2n.obj : $(RTL_DIR)\hbhex2n.c
@@ -2355,6 +2187,9 @@ $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
 $(OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inkeyapi.obj : $(RTL_DIR)\inkeyapi.c
    $(CC_CMD)
 
 $(OBJ_DIR)\is.obj : $(RTL_DIR)\is.c
@@ -2400,6 +2235,9 @@ $(OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mouse53.obj : $(RTL_DIR)\mouse53.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mtran.obj : $(RTL_DIR)\mtran.c
@@ -3254,6 +3092,14 @@ $(OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ FMSTAT.LIB dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(FMSTAT_OBJ_DIR)\fm.obj : $(FMSTAT_DIR)\fm.c
+   $(CC_EXE) $(CFLAGS) -DHB_FM_STATISTICS /Fo$@ $**
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ COMMON.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -3302,9 +3148,6 @@ $(OBJ_DIR)\hbdate.obj : $(COMMON_DIR)\hbdate.c
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
-   $(CC_CMD)
-
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ GTGUI.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
@@ -3314,20 +3157,6 @@ $(OBJ_DIR)\gtgui.obj : $(RTL_DIR)\gtgui\gtgui.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gtdef.obj : $(RTL_DIR)\gtgui\gtdef.c
-   $(CC_CMD)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ GTNUL.LIB dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -3341,18 +3170,12 @@ $(OBJ_DIR)\gtcgi.obj : $(RTL_DIR)\gtcgi\gtcgi.c
 $(OBJ_DIR)\cgiread.obj : $(RTL_DIR)\gtcgi\cgiread.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousecgi.obj : $(RTL_DIR)\gtcgi\mousecgi.c
-   $(CC_CMD)
-
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ GTPCA.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(OBJ_DIR)\gtpca.obj : $(RTL_DIR)\gtpca\gtpca.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\mousepca.obj : $(RTL_DIR)\gtpca\mousepca.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -3428,6 +3251,10 @@ $(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
 # ³ CT.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßß
+
+#
+# CT C files dependencies
+#
 
 $(CT_OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
    $(CC_CMD)
@@ -3633,6 +3460,12 @@ $(CT_OBJ_DIR)\ct.c : $(CT_DIR)\ct.prg
 $(CT_OBJ_DIR)\ct.obj : $(CT_OBJ_DIR)\ct.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\ctwfunc.obj : $(CT_DIR)\ctwfunc.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\ctmisc.c : $(CT_DIR)\ctmisc.prg
    $(HB_CMD)
 
@@ -3645,10 +3478,16 @@ $(CT_OBJ_DIR)\ctrand.c : $(CT_DIR)\ctrand.prg
 $(CT_OBJ_DIR)\ctrand.obj : $(CT_OBJ_DIR)\ctrand.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\cursor.obj : $(CT_DIR)\cursor.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\dattime3.obj : $(CT_DIR)\dattime3.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
@@ -3657,32 +3496,24 @@ $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
 $(CT_OBJ_DIR)\getsecrt.obj : $(CT_OBJ_DIR)\getsecrt.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\dattime3.obj : $(CT_OBJ_DIR)\dattime3.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\setlast.obj : $(CT_DIR)\setlast.c
-   $(CC_CMD)
-
 $(CT_OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
    $(HB_CMD)
 
 $(CT_OBJ_DIR)\numconv.obj : $(CT_OBJ_DIR)\numconv.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\screen2.obj : $(CT_OBJ_DIR)\screen2.c
+$(CT_OBJ_DIR)\screen2.obj : $(CT_DIR)\screen2.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\invrtwin.obj : $(CT_OBJ_DIR)\invrtwin.c
+$(CT_OBJ_DIR)\setlast.obj : $(CT_DIR)\setlast.c
    $(CC_CMD)
+
+$(CT_OBJ_DIR)\strfile.obj : $(CT_DIR)\strfile.c
+   $(CC_CMD)
+
+#
+# CT Prg dependencies
+#
 
 $(CT_OBJ_DIR)\blank.c : $(CT_DIR)\blank.prg
    $(HB_CMD)
@@ -3714,9 +3545,6 @@ $(CT_OBJ_DIR)\setkeys.c : $(CT_DIR)\setkeys.prg
 $(CT_OBJ_DIR)\setkeys.obj : $(CT_OBJ_DIR)\setkeys.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\strfile.obj : $(CT_DIR)\strfile.c
-   $(CC_CMD)
-
 $(CT_OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
    $(HB_CMD)
 
@@ -3727,6 +3555,12 @@ $(CT_OBJ_DIR)\pack.obj : $(CT_DIR)\pack.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\showtime.c : $(CT_DIR)\showtime.prg
+   $(HB_CMD)
+
+$(CT_OBJ_DIR)\showtime.obj : $(CT_OBJ_DIR)\showtime.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\lton.obj : $(CT_DIR)\lton.c
@@ -3777,19 +3611,10 @@ $(CT_OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
 $(CT_OBJ_DIR)\spread.obj : $(CT_OBJ_DIR)\spread.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
-   $(CC_CMD)
-
 $(CT_OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
    $(HB_CMD)
 
 $(CT_OBJ_DIR)\trapkey.obj : $(CT_OBJ_DIR)\trapkey.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\untext.obj : $(CT_OBJ_DIR)\untext.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\util.c : $(CT_DIR)\util.prg
@@ -3903,9 +3728,21 @@ $(OBJ_DIR)\url.obj : $(OBJ_DIR)\url.c
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ GTTRM.LIB dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(OBJ_DIR)\gttrm.obj : $(RTL_DIR)\gttrm\gttrm.c
    $(CC_CMD)
 
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ GTSTD.LIB dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
+   $(CC_CMD)
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBODBC.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
@@ -4090,7 +3927,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\rt_misc.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_ccall.obj >> make.tmp
    $(ECHO) $(HARBOUR_LIBRARY)      >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)         >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)       >> make.tmp
    $(LINK_EXE) /OUT:$(HBTEST_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -4166,6 +4003,7 @@ $(OBJ_DIR)\rt_ccall.c : $(HBTEST_DIR)\rt_ccall.prg
 $(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
    $(CC_CMD)
 
+
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBRUN.EXE dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
@@ -4175,7 +4013,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbrun.obj      > make.tmp
    $(ECHO) $(OBJ_DIR)\external.obj  >> make.tmp
    $(ECHO) $(HARBOUR_LIBRARY)       >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)          >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)        >> make.tmp
    $(LINK_EXE) /OUT:$(HBRUN_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -4216,7 +4054,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\ffile1.obj   >> make.tmp
    $(ECHO) $(OBJ_DIR)\ft_funcs.obj >> make.tmp
    $(ECHO) $(HARBOUR_LIBRARY)      >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)         >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)       >> make.tmp
    $(LINK_EXE) /OUT:$(HBDOC_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -4347,7 +4185,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\prb_stak.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbmlang.obj  >> make.tmp
    $(ECHO) $(HARBOUR_LIBRARY)      >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)         >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)       >> make.tmp
    $(LINK_EXE) /OUT:$(HBMAKE_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -4426,9 +4264,9 @@ $(OBJ_DIR)\ft_funcs.obj : $(OBJ_DIR)\ft_funcs.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
-   $(ECHO) $(OBJ_DIR)\xbscript.obj    > make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY)        >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)           >> make.tmp
+   $(ECHO) $(OBJ_DIR)\xbscript.obj    >  make.tmp
+   $(ECHO) $(HARBOUR_LIBRARY)         >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)          >> make.tmp
    $(LINK_EXE) /OUT:$(XBSCRIPT_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -4458,7 +4296,7 @@ $(HBPP_EXE) : \
    $(ECHO) $(OBJ_DIR)\hbpptbl.obj     >> make.tmp
    $(ECHO) $(OBJ_DIR)\pragma.obj      >> make.tmp
    $(ECHO) $(COMMON_LIB)              >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)            >> make.tmp
+   $(ECHO) $(PELLES_LIBRARY)          >> make.tmp
    $(LINK_EXE) /OUT:$(HBPP_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 

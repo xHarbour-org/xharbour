@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.235 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.236 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -949,6 +949,7 @@ extern char * hb_verBuildInfo( BOOL ); /* display harbour, compiler, and platfor
 extern HB_EXPORT BOOL   hb_iswinnt( void ); /* return .T. if OS == WinNt, 2000, XP */
 extern HB_EXPORT BOOL   hb_iswince( void ); /* return .T. if OS is Windows CE or Windows Mobile */
 extern char * hb_builddate( void ); /* return date and time of harbour.exe build */
+extern char * hb_credits( void ); /* return credits of harbour.exe build */
 
 /* Executable array execution */
 extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );

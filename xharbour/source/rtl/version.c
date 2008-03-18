@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.13 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: version.c,v 1.14 2007/11/09 21:11:28 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,6 @@
 
 extern char * hb_verPCode( void );
 extern void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord );
-extern char *hb_credits( void );
 extern int hb_arrayMode( void );
 
 HB_FUNC( OS )

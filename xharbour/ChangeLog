@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5965 2008/03/17 16:49:19 likewolf Exp $
+ * $Id: ChangeLog,v 1.5966 2008/03/18 01:03:27 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-18 00:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * dll_pc.bat
+    * changed pocc temp folder to pc.
+  * make_pc.bat
+    * changed pocc temp folder to pc.
+    * changed :build_OK to move files pc temp folder to bin and lib folder,
+      instead copy.
+    * cleaned the :Clean session.
+    + added notes for multi thread build.
+
+  * hrbdll.pc
+    + updated with new RTL/GT and CT files.
+  * makefile.pc
+    - removed unused gen32obj.c
+    ! fixed multi thread compiling. See notes.
+    + updated with new RTL/GT and CT files.
+
+  * include\hbapi.h
+    + added external hb_credits() declaration.
+
+  * source/compile/hbusage.c
+  * source/rtl/version.c
+    - removed external hb_credits() declaration.
 
 2008-03-18 04:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/teditor.prg
