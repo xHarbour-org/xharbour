@@ -29,7 +29,7 @@ lBoxChar := !empty( lBoxChar )
 HB_SETTERMCP( cTermCP, cHostCP, lBoxChar )
 
 ? "Host codpage: " + cHostCP + ", terminal codepage: " + cTermCP
-? HB_GT_VERSION()
+? hb_gtVersion()
 ?
 for i := 0 to 15
     for j := 0 to 15

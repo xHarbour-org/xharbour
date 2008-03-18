@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.85 2008/03/02 19:35:57 peterrees Exp $
+/* $Id: teditor.prg,v 1.86 2008/03/13 10:49:42 likewolf Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.85 2008/03/02 19:35:57 peterrees Exp $
+/* $Id: teditor.prg,v 1.86 2008/03/13 10:49:42 likewolf Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -96,6 +96,7 @@
 #include "inkey.ch"
 #include "setcurs.ch"
 #include "color.ch"
+#include "hbgtinfo.ch"
 
 //-------------------------------------------------------------------//
 
@@ -776,13 +777,13 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_CTRL_C      // Copy
-               GTSETCLIPBOARD( ::GetTextSelection() )
+               hb_gtInfo( GTI_CLIPBOARDDATA, ::GetTextSelection() )
                //::ClrTextSelection()
                exit
 
             case K_CTRL_X      // Cut
             case K_SH_DEL      // Cut
-               GTSETCLIPBOARD( ::GetTextSelection() )
+               hb_gtInfo( GTI_CLIPBOARDDATA, ::GetTextSelection() )
                if ::lEditAllow
                   ::DelTextSelection()
                endif
@@ -791,7 +792,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             case K_CTRL_V      // Paste
             case K_SH_INS      // Paste
                if ::lEditAllow
-                  ::AddText( strtran( GTGETCLIPBOARD(), chr(0), chr(32) ), .T. )
+                  ::AddText( strtran( hb_gtInfo( GTI_CLIPBOARDDATA ), chr(0), chr(32) ), .T. )
                   ::ClrTextSelection()
                endif
                exit

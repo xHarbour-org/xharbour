@@ -1,11 +1,11 @@
 *************************************************************************************
 * Clipboard test
 *
-* $Id$
+* $Id: clipbrd.prg,v 1.2 2004/02/06 18:13:01 jonnymind Exp $
 *
 * Test for clipboard functions:
-* GTSetClipboard - set the clipboard value
-* GTGetClipboard - get the current clipboard value
+* hb_gtInfo( GTI_CLIPBOARDDATA, <x> ) - set the clipboard value
+* hb_gtInfo( GTI_CLIPBOARDDATA ) - get the current clipboard value
 * GTPasteClipboard - paste contents of the clipboard into the inkey buffer.
 *
 * This functions are available in ALL the gts; where it is possible, the
@@ -15,6 +15,7 @@
 *
 
 #include "inkey.ch"
+#include "hbgtinfo.ch"
 
 PROCEDURE Main()
    LOCAL GetList := {}
@@ -51,22 +52,21 @@ PROCEDURE Main()
 RETURN
 
 PROCEDURE DoCopy(cProc, nLine, cData, cValue)
-   GTSetClipboard( Alltrim( cValue ) )
-   @20,5 SAY "Clipboard: " + GTGetClipboard() + Space(50)
+   hb_gtInfo( GTI_CLIPBOARDDATA, Alltrim( cValue ) )
+   @20,5 SAY "Clipboard: " + hb_gtInfo( GTI_CLIPBOARDDATA ) + Space(50)
 RETURN
 
 PROCEDURE DoCut(cProc, nLine, cData, cValue)
-   GTSetClipboard( Alltrim( cValue ) )
+   hb_gtInfo( GTI_CLIPBOARDDATA, Alltrim( cValue ) )
    // Cdata is a public memvar, so it should work
    &cData := Space( Len( cValue ) )
-   @20,5 SAY "Clipboard: " + GTGetClipboard()+ Space(50)
+   @20,5 SAY "Clipboard: " + hb_gtInfo( GTI_CLIPBOARDDATA ) + Space(50)
 RETURN
 
 PROCEDURE DoPaste(cProc, nLine, cData, cValue)
-   &cData := Space( Len( cValue ) )
-   GTGetClipboard(&cData)
+   &cData := PadR( hb_gtInfo( GTI_CLIPBOARDDATA ), Len( cValue ) )
 RETURN
 
 PROCEDURE DoFill()
-   GTPasteClipboard()
+   hb_gtInfo( GTI_CLIPBOARDPAST )
 RETURN

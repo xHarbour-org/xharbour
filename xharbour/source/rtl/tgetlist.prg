@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.45 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: tgetlist.prg,v 1.46 2008/03/13 13:31:19 lculik Exp $
  */
 
 /*
@@ -69,6 +69,7 @@
 #include "setcurs.ch"
 #include "button.ch"
 #include "tbrowse.ch"
+#include "hbgtinfo.ch"
 
 #define SCORE_ROW       0
 #define SCORE_COL       60
@@ -512,17 +513,17 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 
       case K_CTRL_C
          oGet:Assign()
-         GTSETCLIPBOARD( CStr( oGet:VarGet() ) )
+         hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
          exit
 
       case K_CTRL_X
          oGet:Assign()
-         GTSETCLIPBOARD( CStr( oGet:VarGet() ) )
+         hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
          oGet:DelEnd()
          exit
 
       case K_CTRL_V
-         cToPaste := GTGETCLIPBOARD()
+         cToPaste := hb_gtInfo( GTI_CLIPBOARDDATA )
          nLen := len( cToPaste )
          for nI := 1 to nLen
             oGet:Insert( cToPaste[ nI ] )

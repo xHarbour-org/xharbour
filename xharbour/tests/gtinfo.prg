@@ -2,20 +2,21 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id: gtinfo.prg,v 1.7 2004/10/21 13:03:02 jonnymind Exp $
+ * $Id: gtinfo.prg,v 1.8 2004/10/21 14:26:42 jonnymind Exp $
  */
-#include "gtinfo.ch"
+
+#include "hbgtinfo.ch"
 
 Function Main
    Local nOp
 
    // try to set anyhow the name of the console
-   GTInfo( GTI_WINTITLE, "GT - Info functionality test" )
+   hb_gtInfo( GTI_WINTITLE, "GT - Info functionality test" )
 
-   If GTInfo(GTI_ISGRAPHIC) == 0
+   If hb_gtInfo(GTI_ISGRAPHIC) == 0
      ?
      ? "You are using a non graphics capable gt:"
-     ? hb_gt_Version()
+     ? hb_gtVersion()
      ? "Press a key to end."
      ?
      Inkey(0)
@@ -27,16 +28,16 @@ Function Main
 
    While .T.
       CLEAR SCREEN
-//      gtInfo(GTI_WINTITLE, "gtInfo() api demonstration program")
+//      hb_gtInfo(GTI_WINTITLE, "hb_gtInfo() api demonstration program")
       updKeys(.T.)
       @ 3, 5 Say "Desktop Resolution: " + ;
-               AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
-            AllTrim(Str(GTInfo(GTI_DESKTOPHEIGHT))) + "x" + ;
-            AllTrim(Str(GTInfo(GTI_DESKTOPDEPTH))) + "bpp   "
+               AllTrim(Str(hb_gtInfo(GTI_DESKTOPWIDTH))) + "x" + ;
+            AllTrim(Str(hb_gtInfo(GTI_DESKTOPHEIGHT))) + "x" + ;
+            AllTrim(Str(hb_gtInfo(GTI_DESKTOPDEPTH))) + "bpp   "
       @ 2, 5 Say "Current GT Resolution: " + ;
-                 AllTrim(Str(GTInfo(GTI_SCREENWIDTH))) + "x" + ;
-		 AllTrim(Str(GTInfo(GTI_SCREENHEIGHT))) + "x" + ;
-		 AllTrim(Str(GTInfo(GTI_SCREENDEPTH))) + "bpp   "
+                 AllTrim(Str(hb_gtInfo(GTI_SCREENWIDTH))) + "x" + ;
+		 AllTrim(Str(hb_gtInfo(GTI_SCREENHEIGHT))) + "x" + ;
+		 AllTrim(Str(hb_gtInfo(GTI_SCREENDEPTH))) + "bpp   "
       @ 5, ( MaxCol() / 2 ) - 9 Prompt " Change Resolution "
       @ 6, ( MaxCol() / 2 ) - 9 Prompt " Change Depth      "
       @ 7, ( MaxCol() / 2 ) - 9 Prompt " Change Font Size  "
@@ -51,60 +52,60 @@ Function Main
 	                {"320x200", "640x400", "640x480", "800x600", "1024x768"})
 	    Do Case
 	       Case nOp == 1
-	          GTInfo(GTI_SCREENWIDTH, 320)
-		       GTInfo(GTI_SCREENHEIGHT, 200)
+	          hb_gtInfo(GTI_SCREENWIDTH, 320)
+		       hb_gtInfo(GTI_SCREENHEIGHT, 200)
 	       Case nOp == 2
-	          GTInfo(GTI_SCREENWIDTH, 640)
-		       GTInfo(GTI_SCREENHEIGHT, 400)
+	          hb_gtInfo(GTI_SCREENWIDTH, 640)
+		       hb_gtInfo(GTI_SCREENHEIGHT, 400)
 	       Case nOp == 3
-	          GTInfo(GTI_SCREENWIDTH, 640)
-		       GTInfo(GTI_SCREENHEIGHT, 480)
+	          hb_gtInfo(GTI_SCREENWIDTH, 640)
+		       hb_gtInfo(GTI_SCREENHEIGHT, 480)
 	       Case nOp == 4
-	          GTInfo(GTI_SCREENWIDTH, 800)
-		       GTInfo(GTI_SCREENHEIGHT, 600)
+	          hb_gtInfo(GTI_SCREENWIDTH, 800)
+		       hb_gtInfo(GTI_SCREENHEIGHT, 600)
 	       Case nOp == 5
-	          GTInfo(GTI_SCREENWIDTH, 1024)
-		       GTInfo(GTI_SCREENHEIGHT, 768)
+	          hb_gtInfo(GTI_SCREENWIDTH, 1024)
+		       hb_gtInfo(GTI_SCREENHEIGHT, 768)
 	    End
          Case nOp == 2
 	    nOp := Alert("Select desired depth", {"  8 ", " 15 ", " 16 ", " 24 ", " 32 "})
 	    Do Case
 	       Case nOp == 1
-	          GTInfo(GTI_SCREENDEPTH, 8)
+	          hb_gtInfo(GTI_SCREENDEPTH, 8)
 	       Case nOp == 2
-	          GTInfo(GTI_SCREENDEPTH, 15)
+	          hb_gtInfo(GTI_SCREENDEPTH, 15)
 	       Case nOp == 3
-	          GTInfo(GTI_SCREENDEPTH, 16)
+	          hb_gtInfo(GTI_SCREENDEPTH, 16)
 	       Case nOp == 4
-	          GTInfo(GTI_SCREENDEPTH, 24)
+	          hb_gtInfo(GTI_SCREENDEPTH, 24)
 	       Case nOp == 5
-	          GTInfo(GTI_SCREENDEPTH, 32)
+	          hb_gtInfo(GTI_SCREENDEPTH, 32)
 	    End
          Case nOp == 3
 	    nOp := Alert("Select desired font size", {"  8 ", " 16 ", " 24 "})
 	    Do Case
 	       Case nOp == 1
-	          GTInfo(GTI_FONTSIZE, 8)
+	          hb_gtInfo(GTI_FONTSIZE, 8)
 	       Case nOp == 2
-	          GTInfo(GTI_FONTSIZE, 16)
+	          hb_gtInfo(GTI_FONTSIZE, 16)
 	       Case nOp == 3
-	          GTInfo(GTI_FONTSIZE, 24)
+	          hb_gtInfo(GTI_FONTSIZE, 24)
 	    End
          Case nOp == 4
 	    nOp := Alert("Select desired font width", {"  4 ", " 8 ", " 16 "})
 	    Do Case
 	       Case nOp == 1
-	          GTInfo(GTI_FONTWIDTH, 4)
+	          hb_gtInfo(GTI_FONTWIDTH, 4)
 	       Case nOp == 2
-	          GTInfo(GTI_FONTWIDTH, 8)
+	          hb_gtInfo(GTI_FONTWIDTH, 8)
 	       Case nOp == 3
-	          GTInfo(GTI_FONTWIDTH, 16)
+	          hb_gtInfo(GTI_FONTWIDTH, 16)
 	    End
       End
    End
 Return Nil
 
-#define WINTIT "gtInfo() API demonstration program"
+#define WINTIT "hb_gtInfo() API demonstration program"
 
 Function updKeys(lPar)
 Static aKeys := Nil, lInit := .F.
@@ -120,7 +121,7 @@ Local i, aNewKeys, nY := Row(), nX := Col()
     nSec := Seconds()
   End
 
-  i := gtInfo(GTI_KBDSHIFTS)
+  i := hb_gtInfo(GTI_KBDSHIFTS)
   aNewKeys := {i & GTI_KBD_SHIFT,;
                i & GTI_KBD_CTRL,;
 	       i & GTI_KBD_ALT,;
@@ -153,6 +154,6 @@ Local i, aNewKeys, nY := Row(), nX := Col()
       End
     End
 
-    gtInfo(GTI_WINTITLE, cStr)
+    hb_gtInfo(GTI_WINTITLE, cStr)
   End
 Return Nil

@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.3 2004/02/02 10:10:24 andijahja Exp $
+ * $Id: videotst.prg,v 1.4 2006/06/16 07:16:17 fsgiudice Exp $
  */
 * VIDEOTST.PRG
 *
@@ -12,7 +12,7 @@
 #define HB_VCOL   2
 #define HB_PROMPT 3
 
-#include "gtinfo.ch"
+#include "hbgtinfo.ch"
 
 FUNCTION MAIN()
  LOCAL nMode:= 1, nRow, lSuccess
@@ -30,7 +30,7 @@ FUNCTION MAIN()
 
  SET GTMODE TO INLINE
 
- GTInfo(GTI_FONTSIZE, 18)
+ hb_gtInfo(GTI_FONTSIZE, 18)
  setmode( 37, 102 )
 
  DO WHILE (nMode != 0)

@@ -1,10 +1,10 @@
 /*
- * $Id: gfx.prg,v 1.1 2004/08/02 01:46:17 maurifull Exp $
+ * $Id: gfx.prg,v 1.2 2004/08/06 02:25:56 maurifull Exp $
  *
  */
 
-#include "gtinfo.ch"
-#include "gfx.ch"
+#include "hbgtinfo.ch"
+#include "hbgfx.ch"
 
 #define WELCOME "Welcome to the World of xHarbour multiplatform Graphics!"
 
@@ -12,28 +12,28 @@ Function Main
 Local nScreenWidth, nFontHeight, nFontWidth
 Local nTop, nLeft, nHeight, nWidth, nColor, nSec := Seconds()
 
-  If gtInfo(GTI_ISGRAPHIC) == 0
+  If hb_gtInfo(GTI_ISGRAPHIC) == 0
      ?
      ? "You are using a non graphics capable gt:"
-     ? hb_gt_Version()
+     ? hb_gtVersion()
      ?
      Quit
   End
 
-  If gtInfo(GTI_DESKTOPWIDTH) > 1000
-    gtInfo(GTI_FONTSIZE, 24)
+  If hb_gtInfo(GTI_DESKTOPWIDTH) > 1000
+    hb_gtInfo(GTI_FONTSIZE, 24)
   End
 
-  nScreenWidth := gtInfo(GTI_SCREENWIDTH)
-  nFontHeight := gtInfo(GTI_FONTSIZE)
-  nFontWidth := gtInfo(GTI_FONTWIDTH)
+  nScreenWidth := hb_gtInfo(GTI_SCREENWIDTH)
+  nFontHeight := hb_gtInfo(GTI_FONTSIZE)
+  nFontWidth := hb_gtInfo(GTI_FONTWIDTH)
 
   SetColor("n/w")
   @ 0, 0 Say Space(MaxCol() + 1)
   @ 1, 0 Say PadC(WELCOME, MaxCol() + 1)
   @ 2, 0 Say Space(MaxCol() + 1)
 
-  gtInfo(GTI_WINTITLE, "Cross-GT, multiplatform graphics demo")
+  hb_gtInfo(GTI_WINTITLE, "Cross-GT, multiplatform graphics demo")
 
   PutFrame(nFontHeight / 2,;
            MaxCol() / 2 * nFontWidth - Len(WELCOME) / 2 * nFontWidth - nFontWidth,;
@@ -42,8 +42,8 @@ Local nTop, nLeft, nHeight, nWidth, nColor, nSec := Seconds()
            gfxMakeColor(0, 0, 0), gfxMakeColor(255, 255, 255))
   
   While Inkey() == 0
-    nTop := Int(hb_Random(3.1 * nFontHeight, gtInfo(GTI_SCREENHEIGHT)))
-    nLeft := Int(hb_Random(gtInfo(GTI_SCREENWIDTH)))
+    nTop := Int(hb_Random(3.1 * nFontHeight, hb_gtInfo(GTI_SCREENHEIGHT)))
+    nLeft := Int(hb_Random(hb_gtInfo(GTI_SCREENWIDTH)))
     nHeight := Int(hb_Random(251))
     nWidth := Int(hb_Random(251))
     nColor := gfxMakeColor(Int(hb_Random(32, 256)), Int(hb_Random(32, 256)), Int(hb_Random(32, 256)))
@@ -79,7 +79,7 @@ Local nTop, nLeft, nHeight, nWidth, nColor, nSec := Seconds()
         If nHeight % 2 == 1
           nHeight++
         End
-        gfxText(nTop, nLeft, "Hello", nColor, nHeight)
+        hb_gfxText(nTop, nLeft, "Hello", nColor, nHeight)
         Exit
     End
     If Seconds() - nSec > 3
