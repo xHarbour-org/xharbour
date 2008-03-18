@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5970 2008/03/18 14:02:10 modalsist Exp $
+ * $Id: ChangeLog,v 1.5971 2008/03/18 15:51:31 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-18 22:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * utils/hbrun/hbrun.prg
+    * Change STATIC PROCEDURE Main() into FUNCTION _APPMAIN() to avoid:
+      1) problems with locating start procedure on some platforms
+      2) collision with user function in HRB file with that name.
+      3) loss of return value.
+    + Added a NOTE about this by Chen Kedem.
 
 2008-03-18 18:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/setcurs.ch

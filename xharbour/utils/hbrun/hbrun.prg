@@ -1,5 +1,5 @@
 /*
- * $Id: hbrun.prg,v 1.2 2005/02/17 12:22:31 andijahja Exp $
+ * $Id: hbrun.prg,v 1.3 2008/03/04 17:37:03 ronpinkas Exp $
  */
 
 /*
@@ -52,18 +52,22 @@
 
 #include "hbextern.ch"
 
-STATIC PROCEDURE Main( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
+/* NOTE: Undocumented CA-Clipper _APPMAIN is used instead of Main to avoid
+         collision with user function in HRB file with that name. [ckedem]
+*/
+FUNCTION _APPMAIN( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
+   LOCAL xRetVal
 
    IF Empty( cHRBFile )
       OutStd( "xHarbour Runner" + HB_OSNewLine() +;
-              "Copyright 1999-2005, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              "Copyright 1999-2008, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
-              "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() +;
+              "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() + ;
               HB_OSNewLine() +;
               "Note:  Linked with " + Version() + HB_OSNewLine() )
+      ERRORLEVEL( 1 )
    ELSE
-      __hrbRun( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
+      xRetVal := __hrbRun( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
    ENDIF
 
-RETURN
-
+   RETURN xRetVal
