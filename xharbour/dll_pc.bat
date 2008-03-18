@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.10 2007/11/10 04:38:32 guerra000 Exp $
+rem $Id: dll_pc.bat,v 1.11 2008/03/18 03:29:50 modalsist Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -48,30 +48,21 @@ if "%1" == "/CLEAN" goto CLEAN
    if not exist %LIB_DIR%  md %LIB_DIR%
    if not exist %OBJ_DIR%  md %OBJ_DIR%
 
-   pomake /f hrbdll.pc > dll_pc.log
+   pomake /f hrbdll.pc /p > dll_pc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
 
-   copy %LIB_DIR%\harbour.dll %HB_DIR%\bin > null
-   copy %LIB_DIR%\harbour.lib %HB_DIR%\lib > null
-   del  %LIB_DIR%\harbour.dll > null
-   del  %LIB_DIR%\harbour.lib > null
-   del  %LIB_DIR%\*.exp  > null
+   move /y %LIB_DIR%\harbour.dll %HB_DIR%\bin > null
+   move /y %LIB_DIR%\harbour.lib %HB_DIR%\lib > null
 
-   copy %BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > null
-   copy %BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > null
-   copy %BIN_DIR%\hbrundll.exe %HB_DIR%\bin > null
-   copy %BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > null
-   copy %BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > null
-   del  %BIN_DIR%\hbdocdll.exe > null
-   del  %BIN_DIR%\hbmakedll.exe > null
-   del  %BIN_DIR%\hbrundll.exe > null
-   del  %BIN_DIR%\hbtestdll.exe > null
-   del  %BIN_DIR%\xbscriptdll.exe > null
-   del  %BIN_DIR%\*.exp  > null
+   move /y %BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > null
+   move /y  %BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > null
+   move /y  %BIN_DIR%\hbrundll.exe %HB_DIR%\bin > null
+   move /y  %BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > null
+   move /y  %BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > null
 
-   del dll_pc.log >null
+   rem del dll_pc.log >null
    goto EXIT
 
 :BUILD_ERR

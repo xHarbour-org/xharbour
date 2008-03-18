@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.63 2008/01/22 15:32:25 guerra000 Exp $
+# $Id: makefile.pc,v 1.64 2008/03/18 03:29:50 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -873,6 +873,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gtfunc.obj \
    $(OBJ_DIR)\gtchrmap.obj \
    $(OBJ_DIR)\gtkbstat.obj \
+   $(OBJ_DIR)\gtkeycod.obj \
    $(OBJ_DIR)\gtsys.obj \
    $(OBJ_DIR)\gttone.obj \
    $(OBJ_DIR)\gx.obj \
@@ -2121,6 +2122,9 @@ $(OBJ_DIR)\gtfunc.obj : $(RTL_DIR)\gtfunc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gtkbstat.obj : $(RTL_DIR)\gtkbstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtkeycod.obj : $(RTL_DIR)\gtkeycod.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtsys.c

@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.44 2007/11/23 18:50:38 ptsarenko Exp $
+# $Id: hrbdll.pc,v 1.45 2007/12/29 16:34:27 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -8,13 +8,13 @@
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
+# Don't indent definitions
+
 !ifndef ECHO
-# don't indent definitions
 ECHO = echo.
 !endif
 
 !ifndef DEL
-# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
 DEL = del
 !endif
 
@@ -25,10 +25,11 @@ LIB_EXE      = $(CC_DIR)\bin\polib.exe
 CC_LIB_DIR   = $(CC_DIR)\lib
 
 # To go back to access standard inkey codes declared in inkey.ch remove
-# HB_EXT_INKEY flags from HARBOURFLAGS and CUSERFLAGS.
+# HB_EXT_INKEY flags from HARBOURFLAGS and CFLAGS.
 #
-HARBOURFLAGS = -i$(HB_DIR)\include -n1 -q0 -w -es2 -gc0 -D__EXPORT__ -DHB_EXT_INKEY
-MAINFLAGS    = -i$(HB_DIR)\include -n -q0 -w -es2 -gc0
+
+HARBOURFLAGS = -i$(HB_DIR)\include -n1 -q0 -w2 -es2 -gc0 -D__EXPORT__ -DHB_EXT_INKEY
+MAINFLAGS    = -i$(HB_DIR)\include -n -q0 -w2 -es2 -gc0
 CFLAGS       = /Ze /Go /Tx86-coff /I"$(HB_DIR)\include" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__EXPORT__" /D"__WIN32__"  /D"WIN32" /D"__WINDOWS__" /D"HB_EXT_INKEY"
 DLLFLAGS     = /DLL /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:WINDOWS
 EXEFLAGS     = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
@@ -199,13 +200,21 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\gete.obj \
    $(OBJ_DIR)\gt.obj \
    $(OBJ_DIR)\gtapi.obj \
-   $(OBJ_DIR)\gtgraph.obj \
    $(OBJ_DIR)\gtapiu.obj \
+   $(OBJ_DIR)\gtchrmap.obj \
+   $(OBJ_DIR)\gtclip.obj \
+   $(OBJ_DIR)\gtfunc.obj \
+   $(OBJ_DIR)\gtkeycod.obj \
+   $(OBJ_DIR)\gtkbstat.obj \
+   $(OBJ_DIR)\gttone.obj \
+   $(OBJ_DIR)\gtsys.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
+   $(OBJ_DIR)\hbdate.obj \
    $(OBJ_DIR)\hbtoken.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
+   $(OBJ_DIR)\inkeyapi.obj \
    $(OBJ_DIR)\is.obj \
    $(OBJ_DIR)\isprint.obj \
    $(OBJ_DIR)\langapi.obj \
@@ -220,6 +229,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\mlctopos.obj \
    $(OBJ_DIR)\mpostolc.obj \
    $(OBJ_DIR)\mod.obj \
+   $(OBJ_DIR)\mouse53.obj \
    $(OBJ_DIR)\mouseapi.obj \
    $(OBJ_DIR)\mousex.obj \
    $(OBJ_DIR)\mtran.obj \
@@ -281,7 +291,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\word.obj \
    $(OBJ_DIR)\xhelp.obj \
    $(OBJ_DIR)\xsavescr.obj \
-   $(OBJ_DIR)\hbdate.obj \
    \
    $(OBJ_DIR)\achoice.obj \
    $(OBJ_DIR)\adir.obj \
@@ -296,6 +305,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\dbedit.obj \
    $(OBJ_DIR)\dbjoin.obj \
    $(OBJ_DIR)\dbsdf.obj \
+   $(OBJ_DIR)\decode.obj \
    $(OBJ_DIR)\devoutp.obj \
    $(OBJ_DIR)\dircmd.obj \
    $(OBJ_DIR)\dummy.obj \
@@ -354,6 +364,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\arrayblk.obj \
    $(OBJ_DIR)\color53.obj \
    $(OBJ_DIR)\mssgline.obj \
+#   $(OBJ_DIR)\namespaces.obj \
    $(OBJ_DIR)\hbrandom.obj \
    $(OBJ_DIR)\hbcomprs.obj \
    $(OBJ_DIR)\hbchksum.obj \
@@ -366,6 +377,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\trpc.obj \
    $(OBJ_DIR)\trpccli.obj \
    $(OBJ_DIR)\hbffind.obj \
+   $(OBJ_DIR)\hbgtcore.obj \
    $(OBJ_DIR)\hbbitf.obj \
    $(OBJ_DIR)\hblog.obj \
    $(OBJ_DIR)\hblognet.obj \
@@ -467,13 +479,9 @@ HRBDLL_OBJS = \
    \
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
-   $(OBJ_DIR)\cpesdos.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
-   $(OBJ_DIR)\cpgedos.obj \
-   $(OBJ_DIR)\cpgewin.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
@@ -491,6 +499,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cppt850.obj \
    $(OBJ_DIR)\cpptiso.obj \
    $(OBJ_DIR)\cpru866.obj \
+   $(OBJ_DIR)\cpruiso.obj \
    $(OBJ_DIR)\cprukoi.obj \
    $(OBJ_DIR)\cpruwin.obj \
    $(OBJ_DIR)\cpsl852.obj \
@@ -580,7 +589,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cpcsiso.obj \
    $(OBJ_DIR)\cpcskam.obj \
    $(OBJ_DIR)\cpcswin.obj \
-   $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
    $(OBJ_DIR)\cphuiso.obj  \
    $(OBJ_DIR)\cphuisos.obj \
@@ -593,7 +601,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cpsl852.obj  \
    $(OBJ_DIR)\cpsliso.obj  \
    $(OBJ_DIR)\cpslwin.obj  \
-   $(OBJ_DIR)\cptrdos.obj  \
+   $(OBJ_DIR)\cptr857.obj  \
    $(OBJ_DIR)\cptrwin.obj  \
    $(OBJ_DIR)\uc1253.obj   \
    $(OBJ_DIR)\uc1254.obj   \
@@ -611,7 +619,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\dbfntx1.obj \
    \
    $(OBJ_DIR)\gtwin.obj \
-   $(OBJ_DIR)\mousewin.obj \
    \
    $(OBJ_DIR)\base64x.obj \
    $(OBJ_DIR)\utils.obj \
@@ -657,7 +664,9 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\ctstr.obj \
    $(OBJ_DIR)\ctchksum.obj \
    $(OBJ_DIR)\ctcrypt.obj \
+   $(OBJ_DIR)\ctwfunc.obj \
    $(OBJ_DIR)\ctwin.obj \
+   $(OBJ_DIR)\cursor.obj \
    $(OBJ_DIR)\dbftools.obj \
    $(OBJ_DIR)\disk.obj \
    $(OBJ_DIR)\diskutil.obj \
@@ -686,12 +695,14 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\remove.obj \
    $(OBJ_DIR)\replace.obj \
    $(OBJ_DIR)\screen1.obj \
+   $(OBJ_DIR)\setlast.obj \
    $(OBJ_DIR)\strdiff.obj \
    $(OBJ_DIR)\strswap.obj \
    $(OBJ_DIR)\tab.obj \
    $(OBJ_DIR)\token1.obj \
    $(OBJ_DIR)\token2.obj \
    $(OBJ_DIR)\trig.obj \
+   $(OBJ_DIR)\video.obj \
    $(OBJ_DIR)\wordrepl.obj \
    $(OBJ_DIR)\wordtoch.obj \
    $(OBJ_DIR)\color.obj \
@@ -702,13 +713,13 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
    $(OBJ_DIR)\dattime3.obj \
-   $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
    $(OBJ_DIR)\blank.obj \
    $(OBJ_DIR)\cttime.obj \
    $(OBJ_DIR)\getinfo.obj \
    $(OBJ_DIR)\setkeys.obj \
+   $(OBJ_DIR)\showtime.obj \
    $(OBJ_DIR)\strfile.obj \
    $(OBJ_DIR)\fcopy.obj \
    $(OBJ_DIR)\pack.obj \
@@ -723,10 +734,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\screen3.obj \
    $(OBJ_DIR)\scrmark.obj \
    $(OBJ_DIR)\spread.obj \
-   $(OBJ_DIR)\setclear.obj \
    $(OBJ_DIR)\trapkey.obj \
    $(OBJ_DIR)\util.obj \
-   $(OBJ_DIR)\untext.obj \
    \
    $(OBJ_DIR)\pcre_chartables.obj \
    $(OBJ_DIR)\pcreposix.obj \
@@ -766,6 +775,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj \
    \
+   $(OBJ_DIR)\dbgaltd.obj  \
    $(OBJ_DIR)\dbgmenu.obj  \
    $(OBJ_DIR)\dbghelp.obj  \
    $(OBJ_DIR)\dbgtmenu.obj \
@@ -786,657 +796,666 @@ HRBDLL_OBJS = \
 
 $(HARBOUR_DLL) : $(HRBDLL_OBJS)
 #
-# RTL
+# RTL C files
 #
-   $(ECHO) $(OBJ_DIR)\abs.obj         > make_tmp
-   $(ECHO) $(OBJ_DIR)\accept.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ampm.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\at.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\binnum.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\binnumx.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\bkgtsks.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\box.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cdpapi.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\chrasc.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\colorind.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\console.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\copyfile.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\datec.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dateshb.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbf2txt.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\defpath.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\descend.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dirdrive.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\direct.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\diskspac.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\disksphb.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dllcall.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\empty.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\file.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\filehb.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\filestat.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\filesys.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fserror.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fkmax.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fnsplit.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fparse.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fssize.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fstemp.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gete.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gt.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gtapi.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gtapiu.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gtgraph.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\gx.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hardcr.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbbitf.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbchksum.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbcomprs.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbcrc32.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbcrypt.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbffind.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbhex2n.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hboutdbg.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbrandom.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbserv.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbsrlraw.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbsyslog.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbtoken.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbxml.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\idle.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\inkey.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\is.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\isprint.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\langapi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\left.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\len.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\lennum.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\math.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\maxrow.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\memofile.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\txtline.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\minmax.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mlctopos.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mpostolc.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mod.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mouseapi.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mousex.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mtran.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\natmsg.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\net.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\oemansi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\oldbox.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\oldclear.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pad.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\padc.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\padl.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\padr.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\philes.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\philes53.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\philesx.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\rat.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\readline.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\regex.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\replic.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\right.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\round.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\run.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\samples.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\saverest.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\scroll.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\seconds.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\set.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\readexit.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\readins.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setcolor.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setcurs.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setkey.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setpos.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setposbs.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\shadow.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\soundex.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\space.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\spfiles.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\str.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\str2ptr.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strcase.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strdel.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strings.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strmatch.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strpeek.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strtran.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strzero.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\stuff.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\substr.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tone.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tprinter.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trace.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\transfrm.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trim.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\type.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\val.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\valtostr.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\valtype.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\version.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\word.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\xhelp.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\xsavescr.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbdate.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\abs.obj          >  make.tmp
+   $(ECHO) $(OBJ_DIR)\accept.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ampm.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\at.obj           >> make.tmp
+   $(ECHO) $(OBJ_DIR)\binnum.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\binnumx.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\bkgtsks.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\box.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cdpapi.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\chrasc.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\colorind.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\console.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\copyfile.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\datec.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dateshb.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbf2txt.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\defpath.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\descend.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dirdrive.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\direct.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\diskspac.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\disksphb.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dllcall.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\empty.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\error.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\file.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\filehb.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\filestat.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\filesys.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fkmax.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fnsplit.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fparse.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fserror.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fssize.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fstemp.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gete.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gt.obj           >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtapi.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtapiu.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtchrmap.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtclip.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtfunc.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtkeycod.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtkbstat.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gttone.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gtsys.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gx.obj           >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hardcr.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbbitf.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbchksum.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbcomprs.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbcrc32.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbcrypt.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbffind.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbgtcore.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbhex2n.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbmd5.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hboutdbg.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbrandom.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbserv.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbsrlraw.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbsyslog.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbtoken.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbxml.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\idle.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\inkey.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\inkeyapi.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\is.obj           >> make.tmp
+   $(ECHO) $(OBJ_DIR)\isprint.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\langapi.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\left.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\len.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\lennum.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\math.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\maxrow.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\memofile.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\minmax.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mlctopos.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mod.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mouse53.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mouseapi.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mousex.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mpostolc.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mtran.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\natmsg.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\net.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\oemansi.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\oldbox.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\oldclear.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pad.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\padc.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\padl.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\padr.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\philes.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\philes53.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\philesx.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rat.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\readexit.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\readins.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\readline.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\regex.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\replic.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\right.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\round.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\run.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\samples.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\saverest.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\scroll.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\seconds.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\set.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setcolor.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setcurs.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setkey.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setpos.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setposbs.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\shadow.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\soundex.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\space.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\spfiles.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\str.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\str2ptr.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strcase.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strdel.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strings.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strmatch.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strpeek.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strtran.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strzero.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\stuff.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\substr.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tone.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tprinter.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trace.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\transfrm.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trim.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\txtline.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\type.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\val.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\valtostr.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\valtype.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\version.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\word.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\xhelp.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\xsavescr.obj     >> make.tmp
 #
-# RTL
+# RTL prg files
 #
-   $(ECHO) $(OBJ_DIR)\achoice.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\adir.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\alert.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\arrayblk.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\browdb.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\browdbx.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\browse.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\checkbox.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\clpclass.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\color53.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cstr.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cstruct.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbdelim.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbedit.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbjoin.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbsdf.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\devoutp.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dircmd.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dummy.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dumpvar.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\error.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\errorsys.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fieldbl.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\getlist.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\getsys.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hblog.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hblognet.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbmd5.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbini.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbserial.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\input.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\listbox.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\memoedit.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\memvarbl.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\menuto.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mssgline.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\objfunc.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\perfuncs.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\persist.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\profiler.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pushbtn.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\radiobtn.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\radiogrp.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\readkey.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\readvar.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\regexrpl.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\scrollbr.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setfunc.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setta.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sprintf.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\stream.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tbcolumn.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tbrowse.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tclass.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\teditor.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\terror.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\text.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tget.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tgetint.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tgetlist.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tlabel.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tmenuitm.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tobject.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tpopup.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\traceprg.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\treport.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trpc.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trpccli.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tscalar.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ttable.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ttextlin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ttopbar.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\txml.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\typefile.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\wait.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\win32ole.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\win32prn.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\winos.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\winreg.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\achoice.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\adir.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\alert.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\arrayblk.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\browdb.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\browdbx.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\browse.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\checkbox.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\clpclass.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\color53.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cstr.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cstruct.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbdelim.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbedit.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbjoin.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbsdf.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\decode.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\devoutp.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dircmd.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dummy.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dumpvar.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\error.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\errorsys.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fieldbl.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\getlist.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\getsys.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hblog.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbini.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hblognet.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbserial.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\input.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\listbox.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\memoedit.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\memvarbl.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\menuto.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mssgline.obj   >> make.tmp
+#   $(ECHO) $(OBJ_DIR)\namespaces.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\objfunc.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\perfuncs.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\persist.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\profiler.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pushbtn.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\radiobtn.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\radiogrp.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\readkey.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\readvar.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\regexrpl.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\scrollbr.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setfunc.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setta.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sprintf.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\stream.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tbcolumn.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tbrowse.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tclass.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\teditor.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\terror.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\text.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tget.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tgetint.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tgetlist.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tlabel.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tmenuitm.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tobject.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tpopup.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\traceprg.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\treport.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trpc.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trpccli.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tscalar.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ttable.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ttextlin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ttopbar.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\txml.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\typefile.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\wait.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\win32ole.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\win32prn.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\winos.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\winreg.obj     >> make.tmp
 #
 # PCRE
 #
-   $(ECHO) $(OBJ_DIR)\pcre_chartables.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcreposix.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_compile.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_config.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_dfa_exec.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_exec.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_fullinfo.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_get.obj          >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_globals.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_info.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_maketables.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_ord2utf8.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_refcount.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_study.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_tables.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_try_flipped.obj  >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_valid_utf8.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_version.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_xclass.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_newline.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcre_ucp_searchfuncs.obj >> make_tmp
+   $(ECHO) $(OBJ_DIR)\pcre_chartables.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcreposix.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_compile.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_config.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_dfa_exec.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_exec.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_fullinfo.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_get.obj          >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_globals.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_info.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_maketables.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_ord2utf8.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_refcount.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_study.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_tables.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_try_flipped.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_valid_utf8.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_version.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_xclass.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_newline.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcre_ucp_searchfuncs.obj >> make.tmp
 #
 # VM
 #
-   $(ECHO) $(OBJ_DIR)\arrays.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\arrayshb.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\asort.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\break.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\classes.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\classesc.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cmdarg.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\codebloc.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgentry.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\debug.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\do.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dynlibhb.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dynsym.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\errorapi.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\estack.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\eval.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\evalhb.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\extend.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fastitem.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fm.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\garbage.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hash.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbi18n.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hvm.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\inet.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\initexit.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\initsymb.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\itemapi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\macro.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\maindllh.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\memvars.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\memvclip.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pcount.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\proc.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pvalue.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\runner.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\thread.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\throw.obj      >> make_tmp
+   $(ECHO) $(OBJ_DIR)\arrays.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\arrayshb.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\asort.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\break.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\classes.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\classesc.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cmdarg.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\codebloc.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgentry.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\debug.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\do.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dynlibhb.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dynsym.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\errorapi.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\estack.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\eval.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\evalhb.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\extend.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fastitem.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fm.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\garbage.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hash.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbi18n.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hvm.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\inet.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\initexit.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\initsymb.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\itemapi.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\macro.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\maindllh.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\memvars.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\memvclip.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pcount.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\proc.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pvalue.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\runner.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\thread.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\throw.obj      >> make.tmp
 #
 # VM
 #
-   $(ECHO) $(OBJ_DIR)\harbinit.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\harbinit.obj   >> make.tmp
 #
 # MACRO
 #
-   $(ECHO) $(OBJ_DIR)\macroy.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\macroa.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\macrob.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\macroc.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\macroslx.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\macroy.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\macroa.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\macrob.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\macroc.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\macroslx.obj   >> make.tmp
 #
 # RDD
 #
-   $(ECHO) $(OBJ_DIR)\dbcmd.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbf1.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbnubs.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\delim1.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sdf1.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\workarea.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\wacore.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\wafunc.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbfuncs.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dblist.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbsort.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbdbsort.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbstrux.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbtotal.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbupdat.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\rddord.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\rddsys.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dbcmd.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbf1.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbnubs.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\delim1.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sdf1.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\workarea.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\wacore.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\wafunc.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbfuncs.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dblist.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbsort.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdbsort.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbstrux.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbtotal.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbupdat.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rddord.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rddsys.obj     >> make.tmp
 #
 # DBF
 #
-   $(ECHO) $(OBJ_DIR)\dbfcdx1.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\bmdbfcdx1.obj  >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sixcdx1.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbffpt1.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbfntx1.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dbfcdx1.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\bmdbfcdx1.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sixcdx1.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbffpt1.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbfntx1.obj    >> make.tmp
 #
 # COMMON
 #
-   $(ECHO) $(OBJ_DIR)\hbfhnd.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbfopen.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbfsapi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbgete.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbhash.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbstr.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbtrace.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\hbver.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\expropt1.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\expropt2.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\reserved.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\hbdate.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbfhnd.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbfopen.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbfsapi.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbgete.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbhash.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbstr.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbtrace.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbver.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\expropt1.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\expropt2.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\reserved.obj   >> make.tmp
 #
 # HBSIX
 #
-   $(ECHO) $(OBJ_DIR)\sxcompr.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxcrypt.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxdate.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxsem.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxfname.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxtable.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxord.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxutil.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxredir.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxcompat.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxini.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sxtrig.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\sxcompr.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxcrypt.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxdate.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxsem.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxfname.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxtable.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxord.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxutil.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxredir.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxcompat.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxini.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sxtrig.obj     >> make.tmp
 #
 # HSX
 #
-   $(ECHO) $(OBJ_DIR)\hsx.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cftsfunc.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\hsx.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cftsfunc.obj   >> make.tmp
 #
 # LANG
 #
-   $(ECHO) $(OBJ_DIR)\msgbgmik.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgbgwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgby866.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgbywin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgca.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgcs852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgcsiso.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgcskam.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgcswin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgde.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgdewin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgen.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgeo.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msges.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgeswin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgeu.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgfr.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msggl.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghe862.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghewin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghr1250.obj  >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghr437.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghr852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghriso.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghu852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghucwi.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msghuwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgid.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgis850.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgit.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgko.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgltwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgpl852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgpliso.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgplmaz.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgplwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgpt.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgro.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgru866.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgrukoi.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgruwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsl852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsliso.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgslwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsr852.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsriso.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsrwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsv.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgsvwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgua866.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msguakoi.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msguawin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgzhb5.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\msgzhgb.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\msgbgmik.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgbgwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgby866.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgbywin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgca.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgcs852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgcsiso.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgcskam.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgcswin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgde.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgdewin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgen.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgeo.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msges.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgeswin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgeu.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgfr.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msggl.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghe862.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghewin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghr1250.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghr437.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghr852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghriso.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghu852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghucwi.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msghuwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgid.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgis850.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgit.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgko.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgltwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgpl852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgpliso.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgplmaz.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgplwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgpt.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgro.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgru866.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgrukoi.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgruwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsl852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsliso.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgslwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsr852.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsriso.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsrwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsv.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgsvwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgua866.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msguakoi.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msguawin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgzhb5.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\msgzhgb.obj    >> make.tmp
 #
-# GT
+# GTWIN
 #
-   $(ECHO) $(OBJ_DIR)\gtwin.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mousewin.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\gtwin.obj      >> make.tmp
 #
 # DEBUG
 #
-   $(ECHO) $(OBJ_DIR)\dbgmenu.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbghelp.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgtmenu.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgtmitm.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgtwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\debugger.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgtarr.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgthsh.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgtobj.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tbrwtext.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgwa.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbgbrwsr.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dbgaltd.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgmenu.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbghelp.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgtmenu.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgtmitm.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgtwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\debugger.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgtarr.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgthsh.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgtobj.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tbrwtext.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgwa.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbgbrwsr.obj   >> make.tmp
 #
 # CODEPAGE
 #
-   $(ECHO) $(OBJ_DIR)\cpbgmik.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpbgwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpeldos.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpelwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpesdos.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpesmwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpeswin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpgedos.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpgewin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphr1250.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphr437.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphr852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphu852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphuwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpit437.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpit850.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpitisb.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpitiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpltwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cppl852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cppliso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpplmaz.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpplwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cppt850.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpptiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpru866.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cprukoi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpruwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsl852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsliso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpslwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsrwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsv850.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsvclip.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsvwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpua866.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpuakoi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpuawin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc1250.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc1251.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc1253.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc1254.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc1257.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc737.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc850.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc852.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc866.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc8859_1.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc8859_2.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc88591b.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uckoi8.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uckoi8u.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ucmaz.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ucmik.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpbg866.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpbgiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpcs852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpcsiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpcskam.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpcswin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpfrdos.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphu852s.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphuiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphuisos.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cphuwins.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsk852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpskiso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpskkam.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpskwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsl437.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsl852.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpsliso.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cpslwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cptrdos.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cptrwin.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc857.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uc8859_5.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\uckam.obj      >> make_tmp
+   $(ECHO) $(OBJ_DIR)\cpbgmik.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpbgwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpelwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpesmwin.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpeswin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphr1250.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphr437.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphr852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphu852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphuwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpit437.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpit850.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpitisb.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpitiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpltwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cppl852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cppliso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpplmaz.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpplwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cppt850.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpptiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpru866.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpruiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cprukoi.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpruwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsl852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsliso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpslwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsrwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsv850.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsvclip.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsvwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpua866.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpuakoi.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpuawin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc1250.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc1251.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc1253.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc1254.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc1257.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc737.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc850.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc852.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc866.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc8859_1.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc8859_2.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc88591b.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uckoi8.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uckoi8u.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ucmaz.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ucmik.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpbg866.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpbgiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpcs852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpcsiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpcskam.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpcswin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphu852s.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphuiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphuisos.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cphuwins.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsk852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpskiso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpskkam.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpskwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsl437.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsl852.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpsliso.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cpslwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cptr857.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cptrwin.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc857.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uc8859_5.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\uckam.obj      >> make.tmp
 #
 # HBTIP
 #
-   $(ECHO) $(OBJ_DIR)\base64x.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\client.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\credent.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\encb64.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\sendmail.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\encoder.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\encqp.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\encurl.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ftpcln.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\httpcln.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\mail.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\popcln.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\smtpcln.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\url.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\utils.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\thtml.obj      >> make_tmp
+   $(ECHO) $(OBJ_DIR)\base64x.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\client.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\credent.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\encb64.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\sendmail.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\encoder.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\encqp.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\encurl.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ftpcln.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\httpcln.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\mail.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\popcln.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\smtpcln.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\url.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\utils.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\thtml.obj      >> make.tmp
 #
-# CT c
+# CT C files
 #
-   $(ECHO) $(OBJ_DIR)\addascii.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\asciisum.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ascpos.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\atadjust.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\atnum.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\atrepl.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\bit1.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\bit2.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\bit3.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charevod.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charlist.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charmirr.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charmix.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charone.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charonly.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charop.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charrepl.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charsort.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\charswap.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\count.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctc.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctchksum.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctcrypt.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctmath.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctmath2.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctnet.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctpad.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctset.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctstr.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\datetime.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dattime2.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dbftools.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\disk.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\envparam.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\exponent.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\files.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\finan.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ftoc.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\intneg.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\justify.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\keyset.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\lton.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\maxline.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\misc1.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\misc2.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\misc3.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\num1.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\numat.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\numcount.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\numline.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\numlohi.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pack.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pos1.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pos2.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\posdiff.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\print.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\range.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\relation.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\remove.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\replace.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\screen1.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setclear.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\settime.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strdiff.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strfile.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\strswap.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\tab.obj        >> make_tmp
-   $(ECHO) $(OBJ_DIR)\token1.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\token2.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trig.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\wordrepl.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\wordtoch.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\addascii.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\asciisum.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ascpos.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\atadjust.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\atnum.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\atrepl.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\bit1.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\bit2.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\bit3.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charevod.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charlist.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charmirr.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charmix.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charone.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charonly.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charop.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charrepl.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charsort.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\charswap.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\count.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctc.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctchksum.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctcrypt.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctwfunc.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctmath.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctmath2.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctnet.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctpad.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctset.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctstr.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctwin.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cursor.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\datetime.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dattime2.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dattime3.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\dbftools.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\disk.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\envparam.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\exponent.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\files.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\finan.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ftoc.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\intneg.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\justify.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\keyset.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\lton.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\maxline.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\misc1.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\misc2.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\misc3.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\num1.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\numat.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\numcount.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\numline.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\numlohi.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pack.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pos1.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pos2.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\posdiff.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\print.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\range.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\relation.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\remove.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\replace.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\screen1.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\screen2.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\settime.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strdiff.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strfile.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\strswap.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tab.obj        >> make.tmp
+   $(ECHO) $(OBJ_DIR)\token1.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\token2.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trig.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\video.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\wordrepl.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\wordtoch.obj   >> make.tmp
 #
-# CT
+# CT Prg files
 #
-   $(ECHO) $(OBJ_DIR)\blank.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\color.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ct.obj         >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctmisc.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctrand.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\cttime.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\ctwin.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dattime3.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\diskutil.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\fcopy.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\getinfo.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\getsecrt.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\invrtwin.obj   >> make_tmp
-   $(ECHO) $(OBJ_DIR)\keysec.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\keytime.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\like.obj       >> make_tmp
-   $(ECHO) $(OBJ_DIR)\numconv.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\screen2.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\screen3.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\setkeys.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\scrmark.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\spread.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\trapkey.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\untext.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\util.obj       >> make_tmp
+   $(ECHO) $(OBJ_DIR)\blank.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\color.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ct.obj         >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctmisc.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ctrand.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\cttime.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\diskutil.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fcopy.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\getinfo.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\getsecrt.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\keysec.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\keytime.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\like.obj       >> make.tmp
+   $(ECHO) $(OBJ_DIR)\numconv.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\screen3.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\scrmark.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\setkeys.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\showtime.obj   >> make.tmp
+   $(ECHO) $(OBJ_DIR)\spread.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\trapkey.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\util.obj       >> make.tmp
 #
 # PP
 #
-   $(ECHO) $(OBJ_DIR)\ppcore.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pptable.obj    >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pplib.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pplib2.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\pplib3.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\ppcore.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pptable.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pplib.obj      >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pplib2.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pplib3.obj     >> make.tmp
 #
 #  LINK
 #
-   $(ECHO) $(POCC_LIBRARY)                  >> make_tmp
-   $(LINK_EXE) /OUT:$(HARBOUR_DLL) $(DLLFLAGS) @make_tmp
-   @if exist make_tmp $(DEL) make_tmp
+   $(ECHO) $(POCC_LIBRARY)                  >> make.tmp
+   $(LINK_EXE) /OUT:$(HARBOUR_DLL) $(DLLFLAGS) @make.tmp
+   @if exist make.tmp $(DEL) make.tmp > NUL
 
 
 #
@@ -1540,6 +1559,12 @@ $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\dbedit.obj : $(OBJ_DIR)\dbedit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\decode.obj : $(OBJ_DIR)\decode.c
    $(CC_CMD)
 
 $(OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c
@@ -1705,10 +1730,28 @@ $(OBJ_DIR)\gt.obj : $(RTL_DIR)\gt.c
 $(OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
    $(CC_CMD)
 
-$(OBJ_DIR)\gtgraph.obj : $(RTL_DIR)\gtgraph.c
+$(OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
    $(CC_CMD)
 
-$(OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
+$(OBJ_DIR)\gtchrmap.obj : $(RTL_DIR)\gtchrmap.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtclip.obj : $(RTL_DIR)\gtclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtfunc.obj : $(RTL_DIR)\gtfunc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtkbstat.obj : $(RTL_DIR)\gtkbstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtkeycod.obj : $(RTL_DIR)\gtkeycod.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gttone.obj : $(RTL_DIR)\gttone.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtsys.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
@@ -1724,6 +1767,9 @@ $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
 $(OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inkeyapi.obj : $(RTL_DIR)\inkeyapi.c
    $(CC_CMD)
 
 $(OBJ_DIR)\input.c : $(RTL_DIR)\input.prg
@@ -1799,6 +1845,9 @@ $(OBJ_DIR)\mod.obj : $(RTL_DIR)\mod.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mouse53.obj : $(RTL_DIR)\mouse53.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
@@ -2248,7 +2297,16 @@ $(OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
 $(OBJ_DIR)\mssgline.obj : $(OBJ_DIR)\mssgline.c
    $(CC_CMD)
 
+#$(OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
+#   $(HB_CMD)
+#
+#$(OBJ_DIR)\namespaces.obj : $(OBJ_DIR)\namespaces.c
+#   $(CC_CMD)
+
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbgtcore.obj : $(RTL_DIR)\hbgtcore.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
@@ -2605,25 +2663,13 @@ $(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
 $(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpeswin.obj : $(CODEPAGE_DIR)\cpeswin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
@@ -2675,6 +2721,9 @@ $(OBJ_DIR)\cpptiso.obj : $(CODEPAGE_DIR)\cpptiso.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpru866.obj : $(CODEPAGE_DIR)\cpru866.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpruiso.obj : $(CODEPAGE_DIR)\cpruiso.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cprukoi.obj : $(CODEPAGE_DIR)\cprukoi.c
@@ -2779,9 +2828,6 @@ $(OBJ_DIR)\cpcskam.obj : $(CODEPAGE_DIR)\cpcskam.c
 $(OBJ_DIR)\cpcswin.obj : $(CODEPAGE_DIR)\cpcswin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpfrdos.obj : $(CODEPAGE_DIR)\cpfrdos.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\cphu852s.obj : $(CODEPAGE_DIR)\cphu852s.c
    $(CC_CMD)
 
@@ -2818,7 +2864,7 @@ $(OBJ_DIR)\cpsliso.obj : $(CODEPAGE_DIR)\cpsliso.c
 $(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cptrdos.obj : $(CODEPAGE_DIR)\cptrdos.c
+$(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c
@@ -3037,8 +3083,6 @@ $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
-   $(CC_CMD)
 
 #
 # TIP DEPENDENCIES
@@ -3225,7 +3269,13 @@ $(OBJ_DIR)\ctcolton.obj : $(CT_DIR)\ctcolton.c
 $(OBJ_DIR)\ctcrypt.obj : $(CT_DIR)\ctcrypt.c
    $(CC_CMD)
 
+$(OBJ_DIR)\ctwfunc.obj : $(CT_DIR)\ctwfunc.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cursor.obj : $(CT_DIR)\cursor.c
    $(CC_CMD)
 
 $(OBJ_DIR)\disk.obj : $(CT_DIR)\disk.c
@@ -3294,6 +3344,9 @@ $(OBJ_DIR)\replace.obj : $(CT_DIR)\replace.c
 $(OBJ_DIR)\screen1.obj : $(CT_DIR)\screen1.c
    $(CC_CMD)
 
+$(OBJ_DIR)\setlast.obj : $(CT_DIR)\setlast.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\strdiff.obj : $(CT_DIR)\strdiff.c
    $(CC_CMD)
 
@@ -3307,6 +3360,9 @@ $(OBJ_DIR)\token2.obj : $(CT_DIR)\token2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\trig.obj : $(CT_DIR)\trig.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\video.obj : $(CT_DIR)\video.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
@@ -3366,10 +3422,7 @@ $(OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
 $(OBJ_DIR)\getsecrt.obj : $(OBJ_DIR)\getsecrt.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\dattime3.obj : $(OBJ_DIR)\dattime3.c
+$(OBJ_DIR)\dattime3.obj : $(CT_DIR)\dattime3.c
    $(CC_CMD)
 
 $(OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
@@ -3378,16 +3431,7 @@ $(OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
 $(OBJ_DIR)\numconv.obj : $(OBJ_DIR)\numconv.c
    $(CC_CMD)
 
-$(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\invrtwin.obj : $(OBJ_DIR)\invrtwin.c
+$(OBJ_DIR)\screen2.obj : $(CT_DIR)\screen2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\blank.c : $(CT_DIR)\blank.prg
@@ -3416,6 +3460,12 @@ $(OBJ_DIR)\getinfo.obj : $(OBJ_DIR)\getinfo.c
 
 $(OBJ_DIR)\setkeys.c : $(CT_DIR)\setkeys.prg
    $(HB_CMD)
+
+$(OBJ_DIR)\showtime.c : $(CT_DIR)\showtime.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\showtime.obj : $(OBJ_DIR)\showtime.c
+   $(CC_CMD)
 
 $(OBJ_DIR)\setkeys.obj : $(OBJ_DIR)\setkeys.c
    $(CC_CMD)
@@ -3487,15 +3537,6 @@ $(OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\trapkey.obj : $(OBJ_DIR)\trapkey.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\untext.obj : $(OBJ_DIR)\untext.c
    $(CC_CMD)
 
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
@@ -3628,8 +3669,9 @@ $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
 
 $(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
         $(CC_CMD)
-
+#
 # DEBUG
+#
 $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg
         $(HB_CMD)
 
