@@ -1,5 +1,5 @@
 /*
- * $Id: setcurs.ch,v 1.7 2001/04/27 19:03:46 dholm Exp $
+ * $Id: setcurs.ch,v 1.1.1.1 2001/12/21 10:47:27 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #ifndef _SETCURS_CH
 #define _SETCURS_CH
 
+#define SC_UNDEF        -1 /* NOTE: This is a Harbour extension. */
 #define SC_NONE         0
 #define SC_NORMAL       1
 #define SC_INSERT       2

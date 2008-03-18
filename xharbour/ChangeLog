@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5969 2008/03/18 11:05:31 likewolf Exp $
+ * $Id: ChangeLog,v 1.5970 2008/03/18 14:02:10 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-18 18:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/setcurs.ch
+  * source/rtl/gtalleg/Makefile
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtalleg/ssf.c
+  * source/rtl/gtalleg/ssf.h
+  * source/rtl/gtalleg/fixedth.sfc
+    ! Updated GTALLEG for the new GT API (by Przemyslaw Czerpak, borrowed from
+      Harbour).
+  * source/rtl/console.c
+    * Silenced a warning.
+  * include/hbcompat.ch
+  - source/rtl/gtgraph.c
+  * tests/gtgraph.prg
+    ! Moved gtgraph.c functions to hbcompat.ch #xtranslate's reimplemented
+      through the new API.
+  * include/Makefile
+    + Added hbcompat.ch installation.
 
 2008-03-18 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc

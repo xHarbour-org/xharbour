@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.67 2007/12/21 17:12:41 likewolf Exp $
+ * $Id: console.c,v 1.68 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -676,7 +676,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB_API
-   char * pszString;
+   char * pszString = NULL;
    ULONG ulLen;
    BOOL bFreeReq = FALSE;
 

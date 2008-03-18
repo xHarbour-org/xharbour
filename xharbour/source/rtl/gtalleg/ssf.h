@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.12 2005/07/13 19:12:45 maurifull Exp $
+ * $Id: ssf.h,v 1.13 2006/02/16 21:31:00 maurifull Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #include <allegro.h>
 
-// Hack to use old Allegro branches
+/* Hack to use old Allegro branches */
 #ifndef AL_GFX_NONE
 #define AL_GFX_NONE GFX_NONE
 #define AL_GFX_SAFE GFX_SAFE
@@ -212,10 +212,10 @@ typedef enum {
 #define SSF_MAXFRAMES 128
 #endif
 
-#define THICK_LEFT	0
-#define THICK_UP	1
-#define THICK_RIGHT	2
-#define THICK_DOWN	3
+#define THICK_LEFT      0
+#define THICK_UP        1
+#define THICK_RIGHT     2
+#define THICK_DOWN      3
 
 typedef struct _ssfFrame {
     char ftype;
@@ -230,13 +230,12 @@ typedef struct _ssfGlyph {
 
 typedef struct _ssfFont {
     unsigned short fsize;
-    ssfGlyph **chars;
+    const ssfGlyph **chars;
 } ssfFont;
 
-extern ssfFont *ssfDefaultFont;
+extern void ssfCreateThinFont(ssfFont *sfont);
+extern void ssfSetFontSize(ssfFont *sfont, unsigned short fsize);
+extern unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color);
+extern int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color);
 
-void ssfSetFontSize(ssfFont *sfont, unsigned short fsize);
-unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color);
-int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color);
-
-#endif  // _SSF_H_
+#endif  /* _SSF_H_ */

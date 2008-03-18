@@ -1,11 +1,12 @@
 **************************************************
 * gtgraph.prg
-* $Id: gtgraph.prg,v 1.3 2004/01/25 19:15:53 jonnymind Exp $
+* $Id: gtgraph.prg,v 1.4 2004/02/14 22:57:16 druzus Exp $
 * Test for GT based graphical functions.
 *
 * Giancarlo Niccolai
 *
 
+#include "hbcompat.ch"
 
 PROCEDURE Main()
 

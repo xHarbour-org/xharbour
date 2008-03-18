@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch 8256 2008-01-31 15:46:59Z vszakats $
+ * $Id: hbcompat.ch,v 1.1 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -251,6 +251,15 @@
    #xtranslate gtProcessMessages()     => NextKey()
    #xtranslate gfxPrimitive([<x,...>]) => hb_gfxPrimitive(<x>)
    #xtranslate gfxText([<x,...>])      => hb_gfxText(<x>)
+
+   #xtranslate gtRGB(<r>,<g>,<b>[,<a>])           => hb_gfxMakeColor( <r>, <g>, <b>[, <a>] )
+   #xtranslate gtPoint(<x>,<y>,<c>)               => hb_gfxPutPixel( <y>, <x>, <c> )
+   #xtranslate gtLine(<x1>,<y1>,<x2>,<y2>[,<c>])  => hb_gfxLine( <y1>, <x1>, <y2>, <x2>[, <c>] )
+   #xtranslate gtSquare(<x>,<y>,<w>,<h>[,<c>])    => hb_gfxFilledRect( <y>, <x>, ( <y> ) + ( <h> ), ( <x> ) + ( <w> )[, <c>] )
+   #xtranslate gtRectangle(<x>,<y>,<w>,<h>[,<c>]) => hb_gfxRect( <y>, <x>, ( <y> ) + ( <h> ), ( <x> ) + ( <w> )[, <c>] )
+   #xtranslate gtCircle(<x>,<y>,<w>,<h>[,<c>])    => hb_gfxEllipse( <y>, <x>, ( <h> ) / 2, ( <w> ) / 2[, <c>] )
+   #xtranslate gtDisk(<x>,<y>,<w>,<h>[,<c>])      => hb_gfxFilledEllipse( <y>, <x>, ( <h> ) / 2, ( <w> ) / 2[, <c>] )
+   #xtranslate gtText([<x,...>])                  => hb_gfxText(<x>)
 
 #endif /* __HARBOUR__ */
 

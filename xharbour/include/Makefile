@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.32 2007/08/06 20:30:22 likewolf Exp $
+# $Id: Makefile,v 1.33 2008/03/16 19:15:58 likewolf Exp $
 #
 
 ROOT = ../
@@ -88,6 +88,7 @@ PRG_HEADERS=\
 	getexit.ch   \
 	hbclass.ch   \
 	hbcommon.ch  \
+	hbcompat.ch  \
 	hbcomprs.ch  \
 	hbextern.ch  \
 	hbgfx.ch     \
