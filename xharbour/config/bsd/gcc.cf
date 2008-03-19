@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.13 2005/09/02 18:25:22 druzus Exp $
+# $Id: gcc.cf,v 1.14 2008/03/09 18:44:26 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -9,11 +9,11 @@ EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = gcc
+CC = $(HB_CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
-CFLAGS = -fsigned-char -Wall -W -DHB_OS_BSD
+CFLAGS = -W -Wall -DHB_OS_BSD
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
@@ -31,12 +31,8 @@ HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
 
-LD = gcc
+LD = $(HB_CCACHE) gcc
 LD_OUT = -o
-
-# Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
-LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
@@ -52,8 +48,16 @@ endif
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
+
+# our libs have a lot of cross references now and we have to group them
+# until we clean them
 LINKLIBS += -Wl,--start-group
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
+
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
@@ -73,9 +77,9 @@ ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
 LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH_DIR)
 LINKLIBS += -ldbfdbt
 endif
-ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH_DIR)
-LINKLIBS += -ldbfftp
+ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
+LINKLIBS += -ldbffpt
 endif
 
 else
@@ -88,51 +92,45 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
-LINKLIBS += -lpcrepos
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
 
-ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
-LINKLIBS += -lgtnul
+# screen driver libraries
+ifeq ($(HB_CRS_LIB),)
+HB_CRS_LIB=ncurses
 endif
-
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
-LINKLIBS += -l$(HB_GT_LIB)
-
-# HB_SCREEN_LIB: empty, or one of ncurses, slang
-ifeq ($(HB_GT_LIB),gtcrs)
-HB_SCREEN_LIB:=ncurses
-else
-ifeq ($(HB_GT_LIB),gtsln)
-HB_SCREEN_LIB:=slang
+ifneq ($(findstring gtcrs, $(HB_GT_LIBS)),)
+LINKLIBS += -l$(HB_CRS_LIB)
 endif
-endif
-
-ifneq ($(HB_SCREEN_LIB),)
+ifneq ($(findstring gtsln, $(HB_GT_LIBS)),)
 LINKPATHS += -L/usr/local/lib
-LINKLIBS += -l$(HB_SCREEN_LIB)
+LINKLIBS += -lslang
+endif
+ifneq ($(findstring gtalleg, $(HB_GT_LIBS)),)
+LINKLIBS += `allegro-config --static`
+endif
+ifneq ($(findstring gtxwc, $(HB_GT_LIBS)),)
+LINKLIBS += -lX11
+#LINKPATHS += -L/usr/X11R6/lib64
+LINKPATHS += -L/usr/X11R6/lib
 endif
 
 # In BSD, slang still needs curses :(
-ifeq ($(HB_GT_LIB),gtsln)
+ifneq ($(findstring gtsln, $(HB_GT_LIBS)),)
 LINKLIBS += -lncurses
 endif
 
-ifeq ($(HB_GT_LIB),gtxvt)
-LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
-else
-ifeq ($(HB_GT_LIB),gtxwc)
-LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
-endif
 endif
 
+# New pcrepos library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
+LINKLIBS += -lpcrepos
 endif
 
 LINKLIBS += -lm -Wl,--end-group
 
-LDFLAGS +=  $(LINKPATHS)
+LDFLAGS =  $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
