@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5972 2008/03/18 19:34:10 likewolf Exp $
+ * $Id: ChangeLog,v 1.5973 2008/03/19 00:17:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -30,6 +30,7 @@
 
   * source/compiler/harbour.c
   * source/vm/hvm.c
+    * - Unused vars
 
   * tests/misc/gauge.c
   * tests/misc/status.c
