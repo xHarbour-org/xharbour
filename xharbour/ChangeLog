@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5974 2008/03/19 00:30:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5975 2008/03/19 00:32:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-19 14:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * make_pc.bat
+  * dll_pc.bat
+    * setted hb_dir to .\
+    * restored copy files instead move.
+    * added /p switch to pomake command. 
+    * do not delete log file after build.
+  * makefile.pc
+  * hrbdll.pc
+    + added namespaces.prg file (commented for while).
+
+  * makefile.bc
+  * hrbdll.bc
+    * updated with new rtl/gt/ct files.
 
 2008-03-18 19:38 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * makallvc.bat

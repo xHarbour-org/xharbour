@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.19 2007/11/10 04:38:32 guerra000 Exp $
+rem $Id: make_pc.bat,v 1.20 2008/03/18 03:29:50 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -49,7 +49,7 @@ REM *****************************************
 REM *** If necessary, change only 3 next sets
 REM *****************************************
 
-IF %HB_DIR%.==. SET HB_DIR=C:\xHarbCVS
+IF %HB_DIR%.==. SET HB_DIR=.\
 IF %CC_DIR%.==. SET CC_DIR=C:\PellesC
 SET BISON_DIR=C:\Bison
 
@@ -66,9 +66,9 @@ SET INCLUDE=%CC_DIR%\include;%CC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
 SET PATH=%CC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
-SET OBJ_DIR=%HB_DIR%\obj\pc
-SET LIB_DIR=%HB_DIR%\lib\pc
 SET BIN_DIR=%HB_DIR%\bin\pc
+SET LIB_DIR=%HB_DIR%\lib\pc
+SET OBJ_DIR=%HB_DIR%\obj\pc
 
 IF %BISON_SIMPLE%.==. SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
@@ -122,15 +122,15 @@ goto ST
   goto exit
 
 :ST
-  echo.
-  echo Compiling binaries and core libs.
-  pomake /f makefile.pc /p > make_pc.log
-  if errorlevel 1 goto BUILD_ERR
-  goto BUILD_OK
+   echo.
+   echo Compiling binaries and core libs.
+   pomake /f makefile.pc /p > make_pc.log
+   if errorlevel 1 goto BUILD_ERR
+   goto BUILD_OK
 
 :BUILD_OK
-   move /y %BIN_DIR%\*.exe bin > nul
-   move /y %LIB_DIR%\*.lib lib > nul
+   copy %BIN_DIR%\*.exe bin > nul
+   copy %LIB_DIR%\*.lib lib > nul
    REM if exist make_pc.log del make_pc.log
    echo.
    echo Done !

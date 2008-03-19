@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.11 2008/03/18 03:29:50 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.12 2008/03/18 14:02:11 modalsist Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -53,14 +53,14 @@ if "%1" == "/CLEAN" goto CLEAN
 
 :BUILD_OK
 
-   move /y %LIB_DIR%\harbour.dll %HB_DIR%\bin > null
-   move /y %LIB_DIR%\harbour.lib %HB_DIR%\lib > null
+   copy %LIB_DIR%\harbour.dll %HB_DIR%\bin > nul
+   copy %LIB_DIR%\harbour.lib %HB_DIR%\lib > nul
 
-   move /y %BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > null
-   move /y  %BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > null
-   move /y  %BIN_DIR%\hbrundll.exe %HB_DIR%\bin > null
-   move /y  %BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > null
-   move /y  %BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > null
+   copy %BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > nul
+   copy %BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > nul
+   copy %BIN_DIR%\hbrundll.exe %HB_DIR%\bin > nul
+   copy %BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > nul
+   copy %BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > nul
 
    rem del dll_pc.log >null
    goto EXIT

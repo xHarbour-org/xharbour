@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.153 2008/01/23 16:06:39 lculik Exp $
+# $Id: hrbdll.bc,v 1.154 2008/01/23 17:18:38 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -88,8 +88,8 @@ CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
 !if $d(HB_MULTI_GT)
 CLIBFLAGS      = $(CLIBFLAGS) -DHB_MULTI_GT
 !endif
-HARBOURFLAGS   = /D__EXPORT__ /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
-MAINFLAGS      = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
+HARBOURFLAGS   = /D__EXPORT__ /i$(INCLUDE_DIR) -n1 -q0 -w2 -es2 -gc0
+MAINFLAGS      = -i$(INCLUDE_DIR) -n -q0 -w2 -es2 -gc0
 
 # ÚÄÄÄÄÄÄÄÄ¿
 # ³ output ³Û
@@ -221,7 +221,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\gt.obj \
   $(OBJ_DIR)\gtapi.obj \
   $(OBJ_DIR)\gtapiu.obj \
-  $(OBJ_DIR)\gtgraph.obj \
+  $(OBJ_DIR)\gtchrmap.obj \
+  $(OBJ_DIR)\gtclip.obj \
+  $(OBJ_DIR)\gtfunc.obj \
+  $(OBJ_DIR)\gtkbstat.obj \
+  $(OBJ_DIR)\gttone.obj \
+  $(OBJ_DIR)\gtsys.obj \
   $(OBJ_DIR)\gx.obj \
   $(OBJ_DIR)\hardcr.obj \
   $(OBJ_DIR)\hash.obj \
@@ -231,6 +236,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbcrc32.obj \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hbffind.obj \
+  $(OBJ_DIR)\hbgtcore.obj \
   $(OBJ_DIR)\hbhex2n.obj \
   $(OBJ_DIR)\hbi18n.obj \
   $(OBJ_DIR)\hblog.obj \
@@ -246,6 +252,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbxml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
+  $(OBJ_DIR)\inkeyapi.obj \
   $(OBJ_DIR)\is.obj \
   $(OBJ_DIR)\isprint.obj \
   $(OBJ_DIR)\langapi.obj \
@@ -264,6 +271,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\mod.obj \
   $(OBJ_DIR)\mouseapi.obj \
   $(OBJ_DIR)\mousex.obj \
+  $(OBJ_DIR)\mouse53.obj \
   $(OBJ_DIR)\mtran.obj \
   $(OBJ_DIR)\natmsg.obj \
   $(OBJ_DIR)\net.obj \
@@ -355,6 +363,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\memoedit.obj \
   $(OBJ_DIR)\memvarbl.obj \
   $(OBJ_DIR)\mssgline.obj \
+#  $(OBJ_DIR)\namespaces.obj \
   $(OBJ_DIR)\objfunc.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readline.obj \
@@ -729,8 +738,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\remove.obj \
   $(OBJ_DIR)\replace.obj \
   $(OBJ_DIR)\screen1.obj \
-  $(OBJ_DIR)\setclear.obj \
   $(OBJ_DIR)\settime.obj \
+  $(OBJ_DIR)\showtime.obj \
   $(OBJ_DIR)\strdiff.obj \
   $(OBJ_DIR)\strfile.obj \
   $(OBJ_DIR)\strswap.obj \
@@ -747,11 +756,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctrand.obj \
   $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
+  $(OBJ_DIR)\ctwfunc.obj \
+  $(OBJ_DIR)\cursor.obj \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
   $(OBJ_DIR)\getinfo.obj \
-  $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\keysec.obj \
   $(OBJ_DIR)\keytime.obj \
   $(OBJ_DIR)\like.obj \
@@ -762,7 +772,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrmark.obj \
   $(OBJ_DIR)\spread.obj \
   $(OBJ_DIR)\trapkey.obj \
-  $(OBJ_DIR)\untext.obj \
   $(OBJ_DIR)\util.obj \
 #
 #  Pp
@@ -816,10 +825,7 @@ HARBOUR_DLL_OBJS = \
 !if $d(HB_MULTI_GT)
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwin.obj \
-  $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\gtwvt.obj \
-  $(OBJ_DIR)\gtnul.obj \
-  $(OBJ_DIR)\gtext.obj \
   $(OBJ_DIR)\gtsys.obj
 !else
 !if $(HB_GT_LIB) == gtwvt
@@ -831,8 +837,7 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwvw.obj
 !else
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
-  $(OBJ_DIR)\gtwin.obj \
-  $(OBJ_DIR)\mousewin.obj
+  $(OBJ_DIR)\gtwin.obj 
 !endif
 !endif
 !endif
@@ -1025,7 +1030,12 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\gt.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\gtapi.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\gtapiu.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\gtgraph.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtchrmap.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtclip.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtfunc.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtkbstat.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\gttone.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtsys.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\gx.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hash.obj              + >> hdll.tmp
@@ -1035,6 +1045,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hbcrc32.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbgtcore.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hbhex2n.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbi18n.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hblog.obj             + >> hdll.tmp
@@ -1050,6 +1061,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hbxml.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\idle.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\inkey.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\inkeyapi.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\is.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\isprint.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\langapi.obj           + >> hdll.tmp
@@ -1068,6 +1080,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\mod.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\mouseapi.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\mousex.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\mouse53.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\mtran.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\natmsg.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\net.obj               + >> hdll.tmp
@@ -1165,6 +1178,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\memoedit.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\memvarbl.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\mssgline.obj          + >> hdll.tmp
+#  echo. $(OBJ_DIR)\namespaces.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\objfunc.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readkey.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readline.obj          + >> hdll.tmp
@@ -1317,10 +1331,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
 !if $d(HB_MULTI_GT)
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\gtnul.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\gtext.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\gtsys.obj             + >> hdll.tmp
 !else
 !if $(HB_GT_LIB) == gtwvt
@@ -1330,7 +1341,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\gtwvw.obj             + >> hdll.tmp
 !else
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
 !endif
 !endif
 !endif
@@ -1435,8 +1445,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\remove.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\replace.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\screen1.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\setclear.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\settime.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\showtime.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\strdiff.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strfile.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strswap.obj           + >> hdll.tmp
@@ -1453,11 +1463,12 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ctrand.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cttime.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ctwin.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\ctwfunc.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cursor.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dattime3.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\diskutil.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\fcopy.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\getinfo.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\invrtwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\keysec.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\keytime.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\like.obj              + >> hdll.tmp
@@ -1468,7 +1479,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\scrmark.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\spread.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\trapkey.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\untext.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\util.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_chartables.obj   + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_compile.obj      + >> hdll.tmp
@@ -2025,7 +2035,22 @@ $(OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
 $(OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
    $(CC_CMD)
 
-$(OBJ_DIR)\gtgraph.obj : $(RTL_DIR)\gtgraph.c
+$(OBJ_DIR)\gtchrmap.obj : $(RTL_DIR)\gtchrmap.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtclip.obj : $(RTL_DIR)\gtclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtfunc.obj : $(RTL_DIR)\gtfunc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtkbstat.obj : $(RTL_DIR)\gtkbstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gttone.obj : $(RTL_DIR)\gttone.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtsys.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
@@ -2038,6 +2063,9 @@ $(OBJ_DIR)\hbbitf.obj : $(RTL_DIR)\hbbitf.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbgtcore.obj : $(RTL_DIR)\hbgtcore.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hash.obj : $(VM_DIR)\hash.c
@@ -2107,6 +2135,9 @@ $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
 $(OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inkeyapi.obj : $(RTL_DIR)\inkeyapi.c
    $(CC_CMD)
 
 $(OBJ_DIR)\input.c : $(RTL_DIR)\input.prg
@@ -2187,10 +2218,19 @@ $(OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
 $(OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
    $(CC_CMD)
 
+$(OBJ_DIR)\mouse53.obj : $(RTL_DIR)\mouse53.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\mssgline.obj : $(OBJ_DIR)\mssgline.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
+   $(HB_CMD)
+
+$(RTL_OBJ_DIR)\namespaces.obj : $(RTL_OBJ_DIR)\namespaces.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mtran.obj : $(RTL_DIR)\mtran.c
@@ -2882,18 +2922,6 @@ $(OBJ_DIR)\gtwvw.obj : $(CONTRIB_DIR)\gtwvw\gtwvw.c
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
-   $(CC_CMD)
-
 !else
 
 !if $(HB_GT_LIB) == gtwvt
@@ -2911,9 +2939,6 @@ $(OBJ_DIR)\gtwvw.obj : $(CONTRIB_DIR)\gtwvw\gtwvw.c
 !else
 
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC_CMD)
 
 !endif
@@ -3504,10 +3529,13 @@ $(OBJ_DIR)\replace.obj : $(CT_DIR)\replace.c
 $(OBJ_DIR)\screen1.obj : $(CT_DIR)\screen1.c
   $(CC_CMD)
 
-$(OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
+$(OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
   $(CC_CMD)
 
-$(OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
+$(OBJ_DIR)\showtime.c : $(CT_DIR)\showtime.prg
+  $(HRB_CMD)
+
+$(OBJ_DIR)\showtime.obj : $(OBJ_DIR)\showtime.c
   $(CC_CMD)
 
 $(OBJ_DIR)\strdiff.obj : $(CT_DIR)\strdiff.c
@@ -3576,10 +3604,13 @@ $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
-   $(HRB_CMD)
+$(OBJ_DIR)\ctwfunc.obj : $(CT_DIR)\ctwfunc.c
+   $(CC_CMD)
 
-$(OBJ_DIR)\dattime3.obj : $(OBJ_DIR)\dattime3.c
+$(OBJ_DIR)\cursor.obj : $(CT_DIR)\cursor.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dattime3.obj : $(CT_DIR)\dattime3.c
    $(CC_CMD)
 
 $(OBJ_DIR)\diskutil.c : $(CT_DIR)\diskutil.prg
@@ -3600,9 +3631,6 @@ $(OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
 $(OBJ_DIR)\getinfo.obj : $(OBJ_DIR)\getinfo.c
    $(CC_CMD)
 
-$(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
-   $(HRB_CMD)
-
 $(OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
    $(HRB_CMD)
 
@@ -3621,19 +3649,13 @@ $(OBJ_DIR)\like.c : $(CT_DIR)\like.prg
 $(OBJ_DIR)\like.obj : $(OBJ_DIR)\like.c
    $(CC_CMD)
 
-$(OBJ_DIR)\invrtwin.obj : $(OBJ_DIR)\invrtwin.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\numconv.obj : $(OBJ_DIR)\numconv.c
    $(CC_CMD)
 
-$(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
+$(OBJ_DIR)\screen2.obj : $(CT_DIR)\screen2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
@@ -3664,12 +3686,6 @@ $(OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\trapkey.obj : $(OBJ_DIR)\trapkey.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\untext.obj : $(OBJ_DIR)\untext.c
    $(CC_CMD)
 
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg

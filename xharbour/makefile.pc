@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.64 2008/03/18 03:29:50 modalsist Exp $
+# $Id: makefile.pc,v 1.65 2008/03/18 14:02:11 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -151,7 +151,6 @@ NULSYS_LIB   = $(LIB_DIR)\nulsys.lib
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
 GTPCA_LIB    = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB    = $(LIB_DIR)\gtstd.lib
-GTTRM_LIB    = $(LIB_DIR)\gttrm.lib
 GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
 GTWVT_LIB    = $(LIB_DIR)\gtwvt.lib
 GTGUI_LIB    = $(LIB_DIR)\gtgui.lib
@@ -211,12 +210,18 @@ HARBOUR_LIBRARY = \
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßß
 
+#
+# Main project
+#
 PROJECT = \
    $(COMMON_LIB) \
    $(PPGEN_EXE) \
    $(PP_LIB) \
    $(HARBOUR_EXE) 
 
+#
+# Core libs
+#
 PROJECT = \
    $(PROJECT) \
    $(VM_LIB) \
@@ -235,7 +240,9 @@ PROJECT = \
    $(CODEPAGE_LIB) \
    $(GTWIN_LIB) \
    $(GTGUI_LIB) 
-
+#
+# More libs
+#
 PROJECT = \
    $(PROJECT) \
    $(BMDBFCDX_LIB) \
@@ -251,14 +258,19 @@ PROJECT = \
    $(DLL_MAIN_LIB) \
    $(ODBC_LIB) 
 
+#
+# More Gts
+#
 PROJECT = \
    $(PROJECT) \
-   $(GTSTD_LIB) \
    $(GTCGI_LIB) \
    $(GTPCA_LIB) \
+   $(GTSTD_LIB) \
    $(GTWVT_LIB) 
-#   $(GTTRM_LIB) \
 
+#
+# Utils
+#
 PROJECT = \
    $(PROJECT) \
    $(HBDOC_EXE) \
@@ -772,9 +784,6 @@ COMMON_LIB_OBJS = \
 GTSTD_LIB_OBJS = \
    $(OBJ_DIR)\gtstd.obj
 
-GTTRM_LIB_OBJS = \
-   $(OBJ_DIR)\gttrm.obj
-
 GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\gtwin.obj
 
@@ -831,6 +840,9 @@ FMSTAT_LIB_OBJS = \
    $(FMSTAT_OBJ_DIR)\fm.obj
 
 RTL_LIB_OBJS = \
+#
+#  C Files
+#
    $(OBJ_DIR)\abs.obj \
    $(OBJ_DIR)\accept.obj \
    $(OBJ_DIR)\ampm.obj \
@@ -855,6 +867,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\disksphb.obj \
    $(OBJ_DIR)\dllcall.obj \
    $(OBJ_DIR)\empty.obj \
+   $(OBJ_DIR)\error.obj \
    $(OBJ_DIR)\file.obj \
    $(OBJ_DIR)\filehb.obj \
    $(OBJ_DIR)\filestat.obj \
@@ -927,6 +940,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\philes53.obj \
    $(OBJ_DIR)\philesx.obj \
    $(OBJ_DIR)\rat.obj \
+   $(OBJ_DIR)\readexit.obj \
+   $(OBJ_DIR)\readins.obj \
    $(OBJ_DIR)\readline.obj \
    $(OBJ_DIR)\regex.obj \
    $(OBJ_DIR)\replic.obj \
@@ -938,8 +953,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\scroll.obj \
    $(OBJ_DIR)\seconds.obj \
    $(OBJ_DIR)\set.obj \
-   $(OBJ_DIR)\readexit.obj \
-   $(OBJ_DIR)\readins.obj \
    $(OBJ_DIR)\setcolor.obj \
    $(OBJ_DIR)\setcurs.obj \
    $(OBJ_DIR)\setkey.obj \
@@ -975,6 +988,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\xhelp.obj \
    $(OBJ_DIR)\xsavescr.obj \
    \
+#
+#  Prg Files
+#
    $(OBJ_DIR)\achoice.obj \
    $(OBJ_DIR)\adir.obj \
    $(OBJ_DIR)\alert.obj \
@@ -993,7 +1009,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\dircmd.obj \
    $(OBJ_DIR)\dummy.obj \
    $(OBJ_DIR)\dumpvar.obj \
-   $(OBJ_DIR)\error.obj \
    $(OBJ_DIR)\errorsys.obj \
    $(OBJ_DIR)\fieldbl.obj \
    $(OBJ_DIR)\getlist.obj \
@@ -1008,6 +1023,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\memvarbl.obj \
    $(OBJ_DIR)\menuto.obj \
    $(OBJ_DIR)\mssgline.obj \
+#   $(OBJ_DIR)\namespaces.obj \
    $(OBJ_DIR)\objfunc.obj \
    $(OBJ_DIR)\perfuncs.obj \
    $(OBJ_DIR)\persist.obj \
@@ -1221,9 +1237,6 @@ $(PP_LIB) : $(PP_LIB_OBJS)
    $(LIB_CMD)
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-   $(LIB_CMD)
-
-$(GTTRM_LIB) : $(GTTRM_LIB_OBJS)
    $(LIB_CMD)
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
@@ -2623,6 +2636,12 @@ $(OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
 $(OBJ_DIR)\mssgline.obj : $(OBJ_DIR)\mssgline.c
    $(CC_CMD)
 
+$(OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\namespaces.obj : $(OBJ_DIR)\namespaces.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\objfunc.c : $(RTL_DIR)\objfunc.prg
    $(HB_CMD)
 
@@ -3732,13 +3751,6 @@ $(OBJ_DIR)\url.obj : $(OBJ_DIR)\url.c
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC_CMD)
 
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ GTTRM.LIB dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(OBJ_DIR)\gttrm.obj : $(RTL_DIR)\gttrm\gttrm.c
-   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ GTSTD.LIB dependencies ³Û
@@ -3747,6 +3759,8 @@ $(OBJ_DIR)\gttrm.obj : $(RTL_DIR)\gttrm\gttrm.c
 
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC_CMD)
+
+
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBODBC.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ

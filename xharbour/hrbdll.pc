@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.45 2007/12/29 16:34:27 modalsist Exp $
+# $Id: hrbdll.pc,v 1.46 2008/03/18 14:02:11 modalsist Exp $
 #
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
 # � PELLES C DLL MAKEFILE 넴
@@ -2297,11 +2297,11 @@ $(OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
 $(OBJ_DIR)\mssgline.obj : $(OBJ_DIR)\mssgline.c
    $(CC_CMD)
 
-#$(OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
-#   $(HB_CMD)
-#
-#$(OBJ_DIR)\namespaces.obj : $(OBJ_DIR)\namespaces.c
-#   $(CC_CMD)
+$(OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\namespaces.obj : $(OBJ_DIR)\namespaces.c
+   $(CC_CMD)
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC_CMD)

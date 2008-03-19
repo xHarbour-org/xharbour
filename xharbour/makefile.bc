@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.215 2008/01/22 02:28:16 lculik Exp $
+# $Id: makefile.bc,v 1.216 2008/03/09 18:13:44 ronpinkas Exp $
 #
 
 #
@@ -161,7 +161,7 @@ CFLAGS               = $(CFLAGS) -DHB_MULTI_GT
 
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
-HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w2 -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS              = $(LDFLAGS)
 
 HVM_OBJ_FLAGS        = $(CLIBFLAGS)
@@ -225,7 +225,6 @@ GTWIN_LIB      = $(LIB_DIR)\gtwin.lib
 GTGUI_LIB      = $(LIB_DIR)\gtgui.lib
 GTWVT_LIB      = $(LIB_DIR)\gtwvt.lib
 GTALLEG_LIB    = $(LIB_DIR)\gtalleg.lib
-GTNUL_LIB      = $(LIB_DIR)\gtnul.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 HBPP_EXE     = $(BIN_DIR)\hbpp.exe
@@ -275,8 +274,7 @@ HB_GT_LIBS = \
    $(GTWIN_LIB) \
    $(GTWVT_LIB) \
    $(GTGUI_LIB) \
-   $(GTALLEG_LIB) \
-   $(GTNUL_LIB)
+   $(GTALLEG_LIB)
 !else
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
@@ -284,8 +282,7 @@ HB_GT_LIBS = \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
    $(GTWVT_LIB) \
-   $(GTGUI_LIB) \
-   $(GTNUL_LIB)
+   $(GTGUI_LIB)
 !endif
 
 !if !$d(HB_GT_LIB)
@@ -343,7 +340,13 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\gt.obj \
    $(RTL_OBJ_DIR)\gtapi.obj \
    $(RTL_OBJ_DIR)\gtapiu.obj \
-   $(RTL_OBJ_DIR)\gtgraph.obj \
+   $(RTL_OBJ_DIR)\gtchrmap.obj \
+   $(RTL_OBJ_DIR)\gtclip.obj \
+   $(RTL_OBJ_DIR)\gtfunc.obj \
+   $(RTL_OBJ_DIR)\gtkeycod.obj \
+   $(RTL_OBJ_DIR)\gtkbstat.obj \
+   $(RTL_OBJ_DIR)\gttone.obj \
+   $(RTL_OBJ_DIR)\gtsys.obj \
    $(RTL_OBJ_DIR)\gx.obj \
    $(RTL_OBJ_DIR)\hardcr.obj \
    $(RTL_OBJ_DIR)\hbbitf.obj \
@@ -352,6 +355,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
+   $(RTL_OBJ_DIR)\hbgtcore.obj \
    $(RTL_OBJ_DIR)\hbhex2n.obj \
    $(RTL_OBJ_DIR)\hbmd5.obj \
    $(RTL_OBJ_DIR)\hboutdbg.obj \
@@ -363,6 +367,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
+   $(RTL_OBJ_DIR)\inkeyapi.obj \
    $(RTL_OBJ_DIR)\is.obj \
    $(RTL_OBJ_DIR)\isprint.obj \
    $(RTL_OBJ_DIR)\langapi.obj \
@@ -378,6 +383,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\mod.obj \
    $(RTL_OBJ_DIR)\mouseapi.obj \
    $(RTL_OBJ_DIR)\mousex.obj \
+   $(RTL_OBJ_DIR)\mouse53.obj \
    $(RTL_OBJ_DIR)\mtran.obj \
    $(RTL_OBJ_DIR)\natmsg.obj \
    $(RTL_OBJ_DIR)\net.obj \
@@ -473,6 +479,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\memvarbl.obj \
    $(RTL_OBJ_DIR)\menuto.obj \
    $(RTL_OBJ_DIR)\mssgline.obj \
+#   $(RTL_OBJ_DIR)\namespaces.obj \
    $(RTL_OBJ_DIR)\objfunc.obj \
    $(RTL_OBJ_DIR)\perfuncs.obj \
    $(RTL_OBJ_DIR)\persist.obj \
@@ -806,40 +813,35 @@ FMSTAT_LIB_OBJS = \
 #
 
 GTCGI_LIB_OBJS = \
-   $(OBJ_DIR)\gtcgi.obj \
-   $(OBJ_DIR)\mousecgi.obj
+   $(OBJ_DIR)\gtcgi.obj
 
 #
 # GTDOS.LIB rules
 #
 
 GTDOS_LIB_OBJS = \
-   $(OBJ_DIR)\gtdos.obj \
-   $(OBJ_DIR)\mousedos.obj
+   $(OBJ_DIR)\gtdos.obj
 
 #
 # GTPCA.LIB rules
 #
 
 GTPCA_LIB_OBJS = \
-   $(OBJ_DIR)\gtpca.obj \
-   $(OBJ_DIR)\mousepca.obj
+   $(OBJ_DIR)\gtpca.obj
 
 #
 # GTSTD.LIB rules
 #
 
 GTSTD_LIB_OBJS = \
-   $(OBJ_DIR)\gtstd.obj \
-   $(OBJ_DIR)\mousestd.obj
+   $(OBJ_DIR)\gtstd.obj
 
 #
 # GTWIN.LIB rules
 #
 
 GTWIN_LIB_OBJS = \
-   $(OBJ_DIR)\gtwin.obj \
-   $(OBJ_DIR)\mousewin.obj
+   $(OBJ_DIR)\gtwin.obj
 
 #
 # GTWVT.LIB rules
@@ -863,18 +865,6 @@ GTGUI_LIB_OBJS = \
 GTALLEG_LIB_OBJS = \
    $(OBJ_DIR)\gtalleg.obj \
    $(OBJ_DIR)\ssf.obj
-
-#
-# GTNUL.LIB rules
-#
-
-GTNUL_LIB_OBJS = \
-   $(OBJ_DIR)\gtnul.obj \
-   $(OBJ_DIR)\gtext.obj
-!if $d(HB_MULTI_GT)
-GTNUL_LIB_OBJS = $(GTNUL_LIB_OBJS) \
-   $(OBJ_DIR)\gtsys.obj
-!endif
 
 #
 # TIP.LIB rules
@@ -1020,7 +1010,9 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\ctpad.obj \
    $(CT_OBJ_DIR)\ctset.obj \
    $(CT_OBJ_DIR)\ctstr.obj \
+   $(CT_OBJ_DIR)\ctwfunc.obj \
    $(CT_OBJ_DIR)\ctwin.obj \
+   $(CT_OBJ_DIR)\cursor.obj \
    $(CT_OBJ_DIR)\datetime.obj \
    $(CT_OBJ_DIR)\dattime2.obj \
    $(CT_OBJ_DIR)\dbftools.obj \
@@ -1053,7 +1045,6 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\remove.obj \
    $(CT_OBJ_DIR)\replace.obj \
    $(CT_OBJ_DIR)\screen1.obj \
-   $(CT_OBJ_DIR)\setclear.obj \
    $(CT_OBJ_DIR)\settime.obj \
    $(CT_OBJ_DIR)\strdiff.obj \
    $(CT_OBJ_DIR)\strfile.obj \
@@ -1075,7 +1066,6 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\fcopy.obj \
    $(CT_OBJ_DIR)\getinfo.obj \
    $(CT_OBJ_DIR)\getsecrt.obj \
-   $(CT_OBJ_DIR)\invrtwin.obj \
    $(CT_OBJ_DIR)\keysec.obj \
    $(CT_OBJ_DIR)\keytime.obj \
    $(CT_OBJ_DIR)\like.obj \
@@ -1084,9 +1074,9 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\screen3.obj \
    $(CT_OBJ_DIR)\setkeys.obj \
    $(CT_OBJ_DIR)\scrmark.obj \
+   $(CT_OBJ_DIR)\showtime.obj \
    $(CT_OBJ_DIR)\spread.obj \
    $(CT_OBJ_DIR)\trapkey.obj \
-   $(CT_OBJ_DIR)\untext.obj \
    $(CT_OBJ_DIR)\cttime.obj \
    $(CT_OBJ_DIR)\util.obj
 
@@ -1518,14 +1508,6 @@ $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
 $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
     IF EXIST "$(GTALLEG_LIB)" $(DEL) "$(GTALLEG_LIB)" > NUL
     $(LINKER) "$(GTALLEG_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
-
-$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
-    IF EXIST "$(GTNUL_LIB)" $(DEL) "$(GTNUL_LIB)" > NUL
-    $(LINKER) "$(GTNUL_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2229,7 +2211,25 @@ $(RTL_OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
 $(RTL_OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\gtgraph.obj : $(RTL_DIR)\gtgraph.c
+$(RTL_OBJ_DIR)\gtchrmap.obj : $(RTL_DIR)\gtchrmap.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gtclip.obj : $(RTL_DIR)\gtclip.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gtfunc.obj : $(RTL_DIR)\gtfunc.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gtkbstat.obj : $(RTL_DIR)\gtkbstat.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gtkeycod.obj : $(RTL_DIR)\gtkeycod.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gttone.obj : $(RTL_DIR)\gttone.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtsys.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
@@ -2254,6 +2254,9 @@ $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\hbgtcore.obj : $(RTL_DIR)\hbgtcore.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\hboutdbg.obj : $(RTL_DIR)\hboutdbg.c
@@ -2311,6 +2314,9 @@ $(RTL_OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\inkeyapi.obj : $(RTL_DIR)\inkeyapi.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\input.c : $(RTL_DIR)\input.prg
@@ -2388,10 +2394,19 @@ $(RTL_OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
 $(RTL_OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
    $(CC_CMD)
 
+$(RTL_OBJ_DIR)\mouse53.obj : $(RTL_DIR)\mouse53.c
+   $(CC_CMD)
+
 $(RTL_OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\mssgline.obj : $(RTL_OBJ_DIR)\mssgline.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\namespaces.c : $(RTL_DIR)\namespaces.prg
+   $(HB_CMD)
+
+$(RTL_OBJ_DIR)\namespaces.obj : $(RTL_OBJ_DIR)\namespaces.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\mtran.obj : $(RTL_DIR)\mtran.c
@@ -3216,17 +3231,11 @@ $(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
 $(OBJ_DIR)\gtcgi.obj : $(RTL_DIR)\gtcgi\gtcgi.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousecgi.obj : $(RTL_DIR)\gtcgi\mousecgi.c
-   $(CC_CMD)
-
 #
 # GTDOS.LIB dependencies
 #
 
 $(OBJ_DIR)\gtdos.obj : $(RTL_DIR)\gtdos\gtdos.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\mousedos.obj : $(RTL_DIR)\gtdos\mousedos.c
    $(CC_CMD)
 
 #
@@ -3236,9 +3245,6 @@ $(OBJ_DIR)\mousedos.obj : $(RTL_DIR)\gtdos\mousedos.c
 $(OBJ_DIR)\gtpca.obj : $(RTL_DIR)\gtpca\gtpca.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousepca.obj : $(RTL_DIR)\gtpca\mousepca.c
-   $(CC_CMD)
-
 #
 # GTSTD.LIB dependencies
 #
@@ -3246,17 +3252,11 @@ $(OBJ_DIR)\mousepca.obj : $(RTL_DIR)\gtpca\mousepca.c
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
-   $(CC_CMD)
-
 #
 # GTWIN.LIB dependencies
 #
 
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC_CMD)
 
 #
@@ -3285,20 +3285,6 @@ $(OBJ_DIR)\gtalleg.obj : $(RTL_DIR)\gtalleg\gtalleg.c
 $(OBJ_DIR)\ssf.obj : $(RTL_DIR)\gtalleg\ssf.c
    $(CC_CMD)
 
-#
-# GTNUL.LIB dependencies
-#
-
-$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
-   $(CC_CMD)
-
-!if $d(HB_MULTI_GT)
-$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
-   $(CC_CMD)
-!endif
 
 #
 # CODEPAGE.LIB dependencies
@@ -3609,9 +3595,6 @@ $(CT_OBJ_DIR)\replace.obj : $(CT_DIR)\replace.c
 $(CT_OBJ_DIR)\screen1.obj : $(CT_DIR)\screen1.c
   $(CC_CMD)
 
-$(CT_OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
-  $(CC_CMD)
-
 $(CT_OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
   $(CC_CMD)
 
@@ -3678,13 +3661,16 @@ $(CT_OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
 $(CT_OBJ_DIR)\cttime.obj : $(CT_OBJ_DIR)\cttime.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\ctwfunc.obj : $(CT_DIR)\ctwfunc.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
-   $(HB_CMD)
+$(CT_OBJ_DIR)\cursor.obj : $(CT_DIR)\cursor.c
+   $(CC_CMD)
 
-$(CT_OBJ_DIR)\dattime3.obj : $(CT_OBJ_DIR)\dattime3.c
+$(CT_OBJ_DIR)\dattime3.obj : $(CT_DIR)\dattime3.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\diskutil.c : $(CT_DIR)\diskutil.prg
@@ -3711,12 +3697,6 @@ $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
 $(CT_OBJ_DIR)\getsecrt.obj : $(CT_OBJ_DIR)\getsecrt.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\invrtwin.obj : $(CT_OBJ_DIR)\invrtwin.c
-   $(CC_CMD)
-
 $(CT_OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
    $(HB_CMD)
 
@@ -3741,10 +3721,7 @@ $(CT_OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
 $(CT_OBJ_DIR)\numconv.obj : $(CT_OBJ_DIR)\numconv.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\screen2.obj : $(CT_OBJ_DIR)\screen2.c
+$(CT_OBJ_DIR)\screen2.obj : $(CT_DIR)\screen2.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
@@ -3765,6 +3742,12 @@ $(CT_OBJ_DIR)\scrmark.c : $(CT_DIR)\scrmark.prg
 $(CT_OBJ_DIR)\scrmark.obj : $(CT_OBJ_DIR)\scrmark.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\showtime.c : $(CT_DIR)\showtime.prg
+   $(HB_CMD)
+
+$(CT_OBJ_DIR)\showtime.obj : $(CT_OBJ_DIR)\showtime.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
    $(HB_CMD)
 
@@ -3775,12 +3758,6 @@ $(CT_OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
    $(HB_CMD)
 
 $(CT_OBJ_DIR)\trapkey.obj : $(CT_OBJ_DIR)\trapkey.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\untext.obj : $(CT_OBJ_DIR)\untext.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\util.c : $(CT_DIR)\util.prg
@@ -3837,9 +3814,6 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
-!if $d(HB_MULTI_GT)
-   $(ECHO) $(GTNUL_LIB) >> make.tmp
-!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
@@ -3897,9 +3871,6 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
-!if $d(HB_MULTI_GT)
-   $(ECHO) $(GTNUL_LIB) >> make.tmp
-!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
@@ -4024,9 +3995,6 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
-!if $d(HB_MULTI_GT)
-   $(ECHO) $(GTNUL_LIB) >> make.tmp
-!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
@@ -4190,9 +4158,6 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
-!if $d(HB_MULTI_GT)
-   $(ECHO) $(GTNUL_LIB) >> make.tmp
-!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
@@ -4271,9 +4236,6 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
-!if $d(HB_MULTI_GT)
-   $(ECHO) $(GTNUL_LIB) >> make.tmp
-!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
