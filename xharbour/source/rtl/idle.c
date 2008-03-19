@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.23 2007/12/08 12:47:53 lculik Exp $
+ * $Id: idle.c,v 1.24 2008/03/09 19:18:25 likewolf Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ static void hb_releaseCPU( BOOL bIndefinite )
 }
 
 /* performs all tasks defined for idle state */
-void hb_idleState( BOOL bIndefinite )
+HB_EXPORT void hb_idleState( BOOL bIndefinite )
 {
    if( ! s_bIamIdle )
    {
@@ -223,7 +223,7 @@ void hb_idleState( BOOL bIndefinite )
    }
 }
 
-void hb_idleReset( void )
+HB_EXPORT void hb_idleReset( void )
 {
    if( s_uiIdleTask == s_uiIdleMaxTask )
    {
@@ -233,7 +233,7 @@ void hb_idleReset( void )
 }
 
 /* close all active background task on program exit */
-void hb_idleShutDown( void )
+HB_EXPORT void hb_idleShutDown( void )
 {
    if( s_pIdleTasks )
    {
@@ -247,7 +247,7 @@ void hb_idleShutDown( void )
    }
 }
 
-void hb_idleSleep( double dSeconds )
+HB_EXPORT void hb_idleSleep( double dSeconds )
 {
    if( dSeconds >= 0 )
    {
@@ -280,7 +280,7 @@ HB_FUNC( HB_IDLESLEEP )
 }
 
 
-void * hb_idleAddFunc( PHB_ITEM pBlock )
+HB_EXPORT void * hb_idleAddFunc( PHB_ITEM pBlock )
 {
    if( !HB_IS_BLOCK( pBlock ) && !HB_IS_ARRAY( pBlock ) )
    {

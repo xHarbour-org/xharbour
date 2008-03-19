@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.236 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbapi.h,v 1.237 2008/03/18 03:29:50 modalsist Exp $
  */
 
 /*
@@ -905,13 +905,13 @@ extern HB_EXPORT char *       hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* 
 extern HB_EXPORT char *       hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
 /* idle states */
-extern void   hb_idleState( BOOL bIndefinite ); /* services a single idle state */
-extern void   hb_idleReset( void ); /* reset idle state routine count*/
-extern void   hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */
+extern HB_EXPORT void   hb_idleState( BOOL bIndefinite ); /* services a single idle state */
+extern HB_EXPORT void   hb_idleReset( void ); /* reset idle state routine count*/
+extern HB_EXPORT void   hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */
 
-extern void   hb_idleShutDown( void ); /* closes all idle state tasks */
-extern void * hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
-extern PHB_ITEM hb_idleDelFunc( void * pID ); /* Deletes a prevuiously added codeblock */
+extern HB_EXPORT void   hb_idleShutDown( void ); /* closes all idle state tasks */
+extern HB_EXPORT void * hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
+extern HB_EXPORT PHB_ITEM hb_idleDelFunc( void * pID ); /* Deletes a prevuiously added codeblock */
 
 /* Background functions */
 

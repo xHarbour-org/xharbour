@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h 8193 2007-12-22 10:28:28Z druzus $
+ * $Id: hbgtcore.h,v 1.1 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -51,8 +51,8 @@
  */
 
 /* NOTE: The declaration of hb_gtSetPos(), hb_gtGetPos(), hb_gtWrite(),
-         hb_gtWriteAt(), hb_gtRepChar(), hb_gtBox(), hb_gtBoxS(), hb_gtBoxD() 
-         hb_gtInit() differs in parameter types from the original CA-Cl*pper 
+         hb_gtWriteAt(), hb_gtRepChar(), hb_gtBox(), hb_gtBoxS(), hb_gtBoxD()
+         hb_gtInit() differs in parameter types from the original CA-Cl*pper
          versions. [vszakats] */
 
 #ifndef HB_GTCORE_H_
@@ -349,7 +349,7 @@ typedef struct _HB_GT_BASE
 
 } HB_GT_BASE, * PHB_GT_BASE, * PHB_GT;
 
-extern PHB_GT hb_gt_Base( void );
+extern HB_EXPORT PHB_GT hb_gt_Base( void );
 
 #define HB_GTLOCAL(g)   (g)->pGTData[*HB_GTID_PTR]
 

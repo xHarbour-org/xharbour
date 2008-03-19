@@ -2,7 +2,7 @@
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.5 2007/10/23 15:42:21 lculik Exp $
+ * $Id: sendmail.prg,v 1.6 2008/03/16 18:59:21 lculik Exp $
  */
 
 /*
@@ -72,8 +72,8 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    aFiles     -> Optional. Array of attachments to the email to send
    cUser      -> Required. User name for the POP3 server
    cPass      -> Required. Password for cUser
-   cPopServer -> Required. Pop3 server name or address   
-   nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low 
+   cPopServer -> Required. Pop3 server name or address
+   nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
    lnoauth    -> Optional. Disable Autentication methods
@@ -95,7 +95,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lConnect      := .T.
    local oPop
    local adata:={},nCount,nSize,nSent
-altd()
+
    DEFAULT cUser       TO ""
    DEFAULT cPass       TO ""
    DEFAULT nPort       TO 25
@@ -108,13 +108,13 @@ altd()
    DEFAULT nTimeOut to 20000
 
    cUser := StrTran( cUser, "@", "&at;" )
-   
+
    IF !( (".htm" IN Lower( cBody ) .OR. ".html" IN Lower( cBody ) ) .AND. File(cBody) )
-   
+
       IF Right(cBody,2) != HB_OSNewLine()
          cBody += HB_OsNewLine()
       ENDIF
-      
+
    ENDIF
 
    // cTo
@@ -135,7 +135,7 @@ altd()
       cTo := Alltrim( aTo )
    ENDIF
 
-   
+
    // CC (Carbon Copy)
    IF Valtype(aCC) =="A"
       IF Len(aCC) >0
@@ -147,8 +147,8 @@ altd()
    ELSEIF Valtype(aCC) =="C"
       cCC := Alltrim( aCC )
    ENDIF
-   
-   
+
+
    // BCC (Blind Carbon Copy)
    IF Valtype(aBCC) =="A"
       IF Len(aBCC)>0
@@ -160,42 +160,42 @@ altd()
    ELSEIF Valtype(aBCC) =="C"
       cBCC := Alltrim( aBCC )
    ENDIF
-   
+
    IF cPopServer != NIL .AND. lPopAuth
       Try
          oUrl1 := tUrl():New( "pop://" + cUser + ":" + cPass + "@" + cPopServer + "/" )
-         oUrl1:cUserid := Strtran( cUser, "&at;", "@" )      
-         opop:= tIPClientpop():New( oUrl1, lTrace ) 
+         oUrl1:cUserid := Strtran( cUser, "&at;", "@" )
+         opop:= tIPClientpop():New( oUrl1, lTrace )
          IF oPop:Open()
             oPop:Close()
          ENDIF
-      Catch    
+      Catch
          lReturn := .F.
-      END      
+      END
 
    ENDIF
-   
+
    IF !lReturn
       RETURN .F.
-   ENDIF      
-   
+   ENDIF
+
    TRY
     oUrl := tUrl():New( "smtp://" + cUser + "@" + cServer + '/' + cTo )
    CATCH
     lReturn := .F.
    END
-   
+
    IF !lReturn
       RETURN .F.
-   ENDIF   
-   
+   ENDIF
+
    oUrl:nPort   := nPort
-   oUrl:cUserid := Strtran( cUser, "&at;", "@" )      
-   
+   oUrl:cUserid := Strtran( cUser, "&at;", "@" )
+
    oMail   := tipMail():new()
    oAttach := tipMail():new()
    oAttach:SetEncoder( "7-bit" )
-   
+
    IF (".htm" IN Lower( cBody ) .OR. ".html" IN Lower( cBody ) ) .AND. File(cBody)
       cMimeText := "text/html ; charset=ISO-8859-1"
       oAttach:hHeaders[ "Content-Type" ] := cMimeText
@@ -225,10 +225,10 @@ altd()
    CATCH
     lReturn := .F.
    END
-   
+
    IF !lReturn
       RETURN .F.
-   ENDIF   
+   ENDIF
 
    oInmail:nConnTimeout:= nTimeOut
 
@@ -246,7 +246,7 @@ altd()
                lAuthPlain := .T.
             ENDIF
          ENDDO
-         
+
          IF lAuthLogin
             IF !oInMail:Auth( cUser, cPass )
                lConnect := .F.
@@ -254,7 +254,7 @@ altd()
                lConnectPlain  := .T.
             ENDIF
          ENDIF
-         
+
          IF lAuthPlain .AND. !lConnect
             IF !oInMail:AuthPlain( cUser, cPass )
                lConnect := .F.
@@ -269,15 +269,15 @@ altd()
       ELSE
 
          lConnect := .F.
-      
+
       ENDIF
    else
          lConnect := .F.
    endif
 
    IF !lConnect
-   
-      if !lNoAuth   
+
+      if !lNoAuth
          oInMail:Close()
       endif
       TRY
@@ -287,8 +287,8 @@ altd()
       END
 
       oInmail:nConnTimeout:=nTimeOut
-      
-      
+
+
       IF !oInMail:Open()
          lConnect := .F.
          oInmail:Close()
@@ -301,15 +301,15 @@ altd()
             EXIT
          ENDIF
       ENDDO
-      
+
    ENDIF
-   
+
    oInMail:oUrl:cUserid := cFrom
    oMail:hHeaders[ "To" ]      := cTo
    oMail:hHeaders[ "Subject" ] := cSubject
-   
+
    FOR EACH aThisFile IN AFiles
-   
+
       IF Valtype( aThisFile ) == "C"
          cFile := aThisFile
          cData := Memoread( cFile ) + chr( 13 ) + chr( 10 )
@@ -368,7 +368,7 @@ altd()
       oAttach:hHeaders[ "Content-Disposition" ] := "attachment; filename=" + cFname + cFext
       oAttach:SetBody( cData )
       oMail:Attach( oAttach )
-      
+
    NEXT
 
    IF lRead
@@ -378,7 +378,7 @@ altd()
    IF nPriority != 3
       oMail:hHeaders[ "X-Priority" ] := Str( nPriority, 1 )
    ENDIF
-   
+
 //   oInmail:Write( oMail:ToString() )
    cData := oMail:ToString()
    nSize := Len(cData)
@@ -391,7 +391,7 @@ altd()
    next
    oInMail:Commit()
    oInMail:Close()
-   
+
 RETURN lReturn
 
 
@@ -401,7 +401,7 @@ RETURN lReturn
 FUNCTION HB_SetMimeType( cFile, cFname, cFext )
 
 cFile := Lower( cFile )
-   
+
 IF     cFile LIKE ".+\.vbd"                         ; RETURN "application/activexdocument="+cFname + cFext
 ELSEIF cFile LIKE ".+\.(asn|asz|asd)"               ; RETURN "application/astound="+cFname + cFext
 ELSEIF cFile LIKE ".+\.pqi"                         ; RETURN "application/cprplayer=" + cFname + cFext

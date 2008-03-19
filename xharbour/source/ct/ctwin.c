@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c 8310 2008-02-21 23:20:35Z druzus $
+ * $Id: ctwin.c,v 1.9 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ static void hb_ctw_WindowMap( PHB_GT pGT, int iWindow, BOOL fExpose )
       int iLastRow = pWnd->iFirstRow + pWnd->iHeight - 1,
           iLastCol = pWnd->iFirstCol + pWnd->iWidth - 1;
 
-      hb_ctw_SetMap( pGT, s_pWindowMap, iWindow, 
+      hb_ctw_SetMap( pGT, s_pWindowMap, iWindow,
                      pWnd->iFirstRow, pWnd->iFirstCol,
                      iLastRow, iLastCol );
       hb_ctw_SetMap( pGT, s_pShadowMap, 0,
@@ -1659,8 +1659,9 @@ static int hb_ctw_gt_ReadKey( PHB_GT pGT, int iEventMask )
 }
 
 /* PUBLIC FUNCTIONS */
+HB_EXTERN_BEGIN
 
-BOOL hb_ctwInit( void )
+HB_EXPORT BOOL hb_ctwInit( void )
 {
    PHB_GT pGT = hb_gt_Base();
    BOOL fResult = FALSE;
@@ -1669,7 +1670,7 @@ BOOL hb_ctwInit( void )
    return fResult;
 }
 
-int  hb_ctwSetShadowAttr( int iAttr )
+HB_EXPORT int  hb_ctwSetShadowAttr( int iAttr )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1678,7 +1679,7 @@ int  hb_ctwSetShadowAttr( int iAttr )
    return iResult;
 }
 
-int  hb_ctwSetMoveMode( int iMode )
+HB_EXPORT int  hb_ctwSetMoveMode( int iMode )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1687,7 +1688,7 @@ int  hb_ctwSetMoveMode( int iMode )
    return iResult;
 }
 
-int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
+HB_EXPORT int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1696,7 +1697,7 @@ int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
    return iResult;
 }
 
-int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
+HB_EXPORT int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1708,7 +1709,7 @@ int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
    return iResult;
 }
 
-int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
+HB_EXPORT int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1717,7 +1718,7 @@ int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
    return iResult;
 }
 
-int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
+HB_EXPORT int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1729,7 +1730,7 @@ int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fCle
    return iResult;
 }
 
-int  hb_ctwCloseAllWindows( void )
+HB_EXPORT int  hb_ctwCloseAllWindows( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1741,7 +1742,7 @@ int  hb_ctwCloseAllWindows( void )
    return iResult;
 }
 
-int  hb_ctwCloseWindow( int iWindow )
+HB_EXPORT int  hb_ctwCloseWindow( int iWindow )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1753,7 +1754,7 @@ int  hb_ctwCloseWindow( int iWindow )
    return iResult;
 }
 
-int  hb_ctwCurrentWindow( void )
+HB_EXPORT int  hb_ctwCurrentWindow( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1762,7 +1763,7 @@ int  hb_ctwCurrentWindow( void )
    return iResult;
 }
 
-int  hb_ctwSelectWindow( int iWindow )
+HB_EXPORT int  hb_ctwSelectWindow( int iWindow )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1774,7 +1775,7 @@ int  hb_ctwSelectWindow( int iWindow )
    return iResult;
 }
 
-int  hb_ctwMaxWindow( void )
+HB_EXPORT int  hb_ctwMaxWindow( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1783,7 +1784,7 @@ int  hb_ctwMaxWindow( void )
    return iResult;
 }
 
-int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight )
+HB_EXPORT int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1792,7 +1793,7 @@ int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRi
    return iResult;
 }
 
-int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
+HB_EXPORT int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1801,7 +1802,7 @@ int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft,
    return iResult;
 }
 
-int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
+HB_EXPORT int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1810,7 +1811,7 @@ int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLef
    return iResult;
 }
 
-int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
+HB_EXPORT int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1819,7 +1820,7 @@ int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
    return iResult;
 }
 
-int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
+HB_EXPORT int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1828,7 +1829,7 @@ int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
    return iResult;
 }
 
-int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
+HB_EXPORT int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1840,7 +1841,7 @@ int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
    return iResult;
 }
 
-int  hb_ctwLastKey( void )
+HB_EXPORT int  hb_ctwLastKey( void )
 {
    /* keyread() in CT3 uses 64512 bytes length buffer
     * when it reach this limit and new key is added the
@@ -1855,6 +1856,8 @@ int  hb_ctwLastKey( void )
    }
    return s_iLastKey;
 }
+
+HB_EXTERN_END
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {

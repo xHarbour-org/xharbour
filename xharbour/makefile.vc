@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.206 2008/01/23 16:37:01 lculik Exp $
+# $Id: makefile.vc,v 1.207 2008/03/09 18:13:44 ronpinkas Exp $
 #
 
 #
@@ -148,17 +148,13 @@ XBSCRIPT_DIR =utils\xbscript
 HBPDF_DIR    =contrib\pdflib
 !endif
 
-!ifdef HB_MULTI_GT
-HB_MULTI_GT =-DHB_MULTI_GT
-!endif
-
 #
 # C compiler definition and C flags. These should never have to change.
 #
 
 AS           =ML
 C_FLAGSNMT   =$(_CFL)
-C_FLAGS      =$(HB_MT) $(HB_MULTI_GT) $(C_FLAGSNMT)
+C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -177,10 +173,6 @@ HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
 
 !ifdef HB_MT
 HARBOURFLAGS =$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
-!endif
-
-!ifdef HB_MULTI_GT
-C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 !endif
 
 #
@@ -235,7 +227,6 @@ DLL_MAIN_LIB     =$(LIB_DIR)\dllmain.lib
 GTCGI_LIB        =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB        =$(LIB_DIR)\gtdos.lib
 GTGUI_LIB        =$(LIB_DIR)\gtgui.lib
-GTNUL_LIB        =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB        =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB        =$(LIB_DIR)\gtstd.lib
 GTWIN_LIB        =$(LIB_DIR)\gtwin.lib
@@ -265,7 +256,6 @@ PPGEN_EXE        =$(BIN_DIR)\ppgen.exe
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
    $(GTGUI_LIB) \
-   $(GTNUL_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
@@ -382,11 +372,6 @@ LIBSMT2 = \
    advapi32.lib \
    mpr.lib
 
-!ifdef HB_MULTI_GT
-   LIBSMT2 = $(LIBSMT2) \
-   $(GTNUL_LIB)
-!endif
-
 #
 # RTL.LIB rules
 #
@@ -459,8 +444,17 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gt.obj \
    $(OBJ_DIR)$(MT)\gtapi.obj \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
-   $(OBJ_DIR)$(MT)\gtgraph.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
+   $(OBJ_DIR)$(MT)\gtclip.obj \
+   $(OBJ_DIR)$(MT)\gtfunc.obj \
+   $(OBJ_DIR)$(MT)\mouse53.obj \
+   $(OBJ_DIR)$(MT)\gtchrmap.obj \
+   $(OBJ_DIR)$(MT)\gtkbstat.obj \
+   $(OBJ_DIR)$(MT)\gtsys.obj \
+   $(OBJ_DIR)$(MT)\gttone.obj \
+   $(OBJ_DIR)$(MT)\gtkeycod.obj \
+   $(OBJ_DIR)$(MT)\hbgtcore.obj \
+   $(OBJ_DIR)$(MT)\inkeyapi.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
    $(OBJ_DIR)$(MT)\hbbitf.obj \
    $(OBJ_DIR)$(MT)\hbchksum.obj \
@@ -1191,8 +1185,7 @@ MISC_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTCGI_LIB_OBJS = \
-   $(OBJ_DIR)\gtcgi.obj \
-   $(OBJ_DIR)\mousecgi.obj
+   $(OBJ_DIR)\gtcgi.obj
 
 #
 # GTDOS.LIB rules
@@ -1224,8 +1217,7 @@ GTALLEG_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTPCA_LIB_OBJS = \
-   $(OBJ_DIR)\gtpca.obj \
-   $(OBJ_DIR)\mousepca.obj
+   $(OBJ_DIR)\gtpca.obj
 
 #
 # GTSTD.LIB rules
@@ -1235,8 +1227,7 @@ GTPCA_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTSTD_LIB_OBJS = \
-   $(OBJ_DIR)\gtstd.obj \
-   $(OBJ_DIR)\mousestd.obj
+   $(OBJ_DIR)\gtstd.obj
 
 #
 # GTWIN.LIB rules
@@ -1246,8 +1237,7 @@ GTSTD_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTWIN_LIB_OBJS = \
-   $(OBJ_DIR)\gtwin.obj \
-   $(OBJ_DIR)\mousewin.obj
+   $(OBJ_DIR)\gtwin.obj
 
 #
 # GTGUI.LIB rules
@@ -1259,22 +1249,6 @@ GTWIN_LIB_OBJS = \
 GTGUI_LIB_OBJS = \
    $(OBJ_DIR)\gtgui.obj \
    $(OBJ_DIR)\gtdef.obj
-
-#
-# GTNUL.LIB rules
-#
-
-{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-GTNUL_LIB_OBJS = \
-   $(OBJ_DIR)\gtnul.obj \
-   $(OBJ_DIR)\gtext.obj
-
-!ifdef HB_MULTI_GT
-GTNUL_LIB_OBJS =  \
-   $(OBJ_DIR)\gtsys.obj
-!endif
 
 #
 # GTWVT.LIB rules
@@ -1440,7 +1414,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\remove.obj \
    $(OBJ_DIR)$(MT)\replace.obj \
    $(OBJ_DIR)$(MT)\screen1.obj \
-   $(OBJ_DIR)$(MT)\setclear.obj \
    $(OBJ_DIR)$(MT)\settime.obj \
    $(OBJ_DIR)$(MT)\strdiff.obj \
    $(OBJ_DIR)$(MT)\strfile.obj \
@@ -1463,7 +1436,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fcopy.obj \
    $(OBJ_DIR)$(MT)\getinfo.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
-   $(OBJ_DIR)$(MT)\invrtwin.obj \
    $(OBJ_DIR)$(MT)\keysec.obj \
    $(OBJ_DIR)$(MT)\keytime.obj \
    $(OBJ_DIR)$(MT)\like.obj \
@@ -1474,8 +1446,11 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\setkeys.obj \
    $(OBJ_DIR)$(MT)\spread.obj \
    $(OBJ_DIR)$(MT)\trapkey.obj \
-   $(OBJ_DIR)$(MT)\untext.obj \
-   $(OBJ_DIR)$(MT)\util.obj
+   $(OBJ_DIR)$(MT)\util.obj \
+   \
+   $(OBJ_DIR)$(MT)\ctwfunc.obj \
+   $(OBJ_DIR)$(MT)\cursor.obj \
+   $(OBJ_DIR)$(MT)\showtime.obj
 
 #
 # ODBC.LIB rules
@@ -1910,9 +1885,6 @@ $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
 $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
    $(LIB_CMD)
 
-$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
-   $(LIB_CMD)
-
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
    $(LIB_CMD)
 
@@ -1991,7 +1963,6 @@ $(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
 $(VM_LIB)2     : $(VM_LIB_OBJS)
 $(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
 $(GTGUI_LIB)2  : $(GTGUI_LIB_OBJS)
-$(GTNUL_LIB)2  : $(GTNUL_LIB_OBJS)
 $(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)2  : $(GTWIN_LIB_OBJS)

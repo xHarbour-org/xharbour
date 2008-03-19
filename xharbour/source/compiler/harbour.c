@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.194 2008/03/10 17:37:31 ronpinkas Exp $
+ * $Id: harbour.c,v 1.195 2008/03/13 04:26:10 ronpinkas Exp $
  */
 
 /*
@@ -1239,7 +1239,6 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    if( hb_comp_iVarScope & VS_MEMVAR )
    {
-      PCOMSYMBOL pSym;
       USHORT wPos;
 
       /*printf( "\nAdding: %s in Function: %s\n", pVar->szName, pFunc->szName );*/
@@ -1285,9 +1284,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                   hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
                }
 
-               pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
-
-               /* printf( "\nAdded Symbol: %s Pos: %i\n", pSym->szName, wPos ); */
+               hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
 
                hb_compGenPCode4( HB_P_PARAMETER, HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), HB_LOBYTE( hb_comp_functions.pLast->wParamNum ), ( BOOL ) 0 );
             }
@@ -1336,8 +1333,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             break;
 
          case VS_PRIVATE:
-            pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
-            /*printf( "\nAdded Symbol: %s Pos: %i\n", pSym->szName, wPos );*/
+            hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
 
             if ( hb_comp_iWarnings >= 3 )
             {
@@ -1383,7 +1379,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             break;
 
          case VS_PUBLIC:
-            pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
+            hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
 
             break;
       }
@@ -3757,9 +3753,8 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
 static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 {
    USHORT wVar;
-   PCOMSYMBOL pSym;
 
-   pSym = hb_compSymbolAdd( szVarName, &wVar, NULL, SYMF_PUBLIC );
+   hb_compSymbolAdd( szVarName, &wVar, NULL, SYMF_PUBLIC );
 
    if( bPCode == HB_P_PUSHALIASEDFIELD && wVar <= 255 )
    {
@@ -3778,9 +3773,8 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
 {
    USHORT wSym;
-   PCOMSYMBOL pSym;
 
-   pSym = hb_compSymbolAdd( szMsgName, &wSym, NULL, SYMF_PUBLIC );
+   hb_compSymbolAdd( szMsgName, &wSym, NULL, SYMF_PUBLIC );
 
    hb_compGenPCode3( HB_P_MESSAGE, HB_LOBYTE( wSym ), HB_HIBYTE( wSym ), ( BOOL ) 1 );
 }
@@ -4630,10 +4624,9 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
 /* generates the pcode to push a symbol on the virtual machine stack */
 void hb_compGenPushSymbol( char * szSymbolName, void *Namespace, int iFlags )
 {
-   PCOMSYMBOL pSym;
    USHORT wSym;
 
-   pSym = hb_compSymbolAdd( szSymbolName, &wSym, Namespace, iFlags );
+   hb_compSymbolAdd( szSymbolName, &wSym, Namespace, iFlags );
 
    if( wSym > 255 )
    {

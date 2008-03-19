@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c 8314 2008-03-05 18:10:52Z druzus $
+ * $Id: hbgtcore.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ static FHANDLE s_hStdIn = 0, s_hStdOut = 1, s_hStdErr = 2;
 /* base GT strucure */
 static PHB_GT_BASE   s_curGT = NULL;
 
-PHB_GT hb_gt_Base( void )
+HB_EXPORT PHB_GT hb_gt_Base( void )
 {
    return s_curGT;
 }

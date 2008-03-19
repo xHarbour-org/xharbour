@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5971 2008/03/18 15:51:31 likewolf Exp $
+ * $Id: ChangeLog,v 1.5972 2008/03/18 19:34:10 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-18 19:38 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * makallvc.bat
+    - Commented gtwvw which is not yet modified to use new GT
+      /* Is it even needed with new ctwin? */
+
+  * hrbdll.vc
+  * makefile.vc
+    * Updated for new GT
+
+  * include/hbapi.h
+  * include/hbgtcore.h
+  * source/ct/ctwin.c
+  * source/ct/ctwin.h
+  * source/rtl/hbgtcore.c
+  * source/rtl/idle.c
+    + Added few missing HB_EXPORTs
+
+  * include/hbextern.ch
+    - Commented HB_CODEPAGE_CS852 and HB_CODEPAGE_CSISO due to missing external errors [???]
+
+  * source/compiler/harbour.c
+  * source/vm/hvm.c
+
+  * tests/misc/gauge.c
+  * tests/misc/status.c
+    * Updated for new GT
+
+  * source/tip/sendmail.prg
+    - Removed left over call AltD()
 
 2008-03-18 22:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * utils/hbrun/hbrun.prg

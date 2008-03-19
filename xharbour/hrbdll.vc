@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.117 2008/01/23 16:06:39 lculik Exp $
+# $Id: hrbdll.vc,v 1.118 2008/02/02 07:32:54 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -214,8 +214,17 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\gt.obj \
   $(OBJ_DIR)\gtapi.obj \
   $(OBJ_DIR)\gtapiu.obj \
-  $(OBJ_DIR)\gtgraph.obj \
   $(OBJ_DIR)\gx.obj \
+  $(OBJ_DIR)\gtclip.obj \
+  $(OBJ_DIR)\gtfunc.obj \
+  $(OBJ_DIR)\mouse53.obj \
+  $(OBJ_DIR)\gtchrmap.obj \
+  $(OBJ_DIR)\gtkbstat.obj \
+  $(OBJ_DIR)\gtsys.obj \
+  $(OBJ_DIR)\gttone.obj \
+  $(OBJ_DIR)\gtkeycod.obj \
+  $(OBJ_DIR)\hbgtcore.obj \
+  $(OBJ_DIR)\inkeyapi.obj \
   $(OBJ_DIR)\hardcr.obj \
   $(OBJ_DIR)\hbbitf.obj \
   $(OBJ_DIR)\hbchksum.obj \
@@ -626,13 +635,6 @@ HARBOUR_DLL_OBJS = \
 # gtwin
 #
   $(OBJ_DIR)\gtwin.obj \
-  $(OBJ_DIR)\mousewin.obj \
-#
-# gtnul
-#
-  $(OBJ_DIR)\gtnul.obj \
-  $(OBJ_DIR)\gtext.obj \
-  $(OBJ_DIR)\gtsys.obj \
 #
 # gtgui
 #
@@ -646,11 +648,11 @@ HARBOUR_DLL_OBJS = \
 # gtstd
 #
   $(OBJ_DIR)\gtstd.obj \
-  $(OBJ_DIR)\mousestd.obj \
 #
 # debug
 #
   $(OBJ_DIR)\dbgmenu.obj \
+  $(OBJ_DIR)\dbgaltd.obj \
   $(OBJ_DIR)\dbghelp.obj \
   $(OBJ_DIR)\dbgtmenu.obj \
   $(OBJ_DIR)\dbgtmitm.obj \
@@ -722,9 +724,6 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\ucmaz.obj \
    $(OBJ_DIR)\cpbg866.obj \
    $(OBJ_DIR)\cpbgiso.obj \
-   $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpcs852.obj \
-   $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
    $(OBJ_DIR)\cpcswin.obj \
    $(OBJ_DIR)\cpfr850.obj \
@@ -737,14 +736,9 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\cpskkam.obj \
    $(OBJ_DIR)\cpskwin.obj \
    $(OBJ_DIR)\cpsl437.obj \
-   $(OBJ_DIR)\cpsl852.obj \
    $(OBJ_DIR)\cpsliso.obj \
-   $(OBJ_DIR)\cpslwin.obj \
    $(OBJ_DIR)\cptr857.obj \
    $(OBJ_DIR)\cptrwin.obj \
-   $(OBJ_DIR)\uc1253.obj \
-   $(OBJ_DIR)\uc1257.obj \
-   $(OBJ_DIR)\uc737.obj \
    $(OBJ_DIR)\uc857.obj \
    $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uckam.obj \
@@ -831,7 +825,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\remove.obj \
   $(OBJ_DIR)\replace.obj \
   $(OBJ_DIR)\screen1.obj \
-  $(OBJ_DIR)\setclear.obj \
   $(OBJ_DIR)\settime.obj \
   $(OBJ_DIR)\strdiff.obj \
   $(OBJ_DIR)\strfile.obj \
@@ -853,7 +846,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
   $(OBJ_DIR)\getinfo.obj \
-  $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\keysec.obj \
   $(OBJ_DIR)\keytime.obj \
   $(OBJ_DIR)\like.obj \
@@ -864,7 +856,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrmark.obj \
   $(OBJ_DIR)\spread.obj \
   $(OBJ_DIR)\trapkey.obj \
-  $(OBJ_DIR)\untext.obj \
   $(OBJ_DIR)\util.obj \
 #
 # pplib
@@ -1122,6 +1113,12 @@ $(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
 $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
    $(CC_CMD)
 
+$(OBJ_DIR)\dbgaltd.c : $(DEBUG_DIR)\dbgaltd.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
    $(HARBOUR_CMD)
 
@@ -1197,22 +1194,10 @@ $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gtgui.obj : $(RTL_DIR)\gtgui\gtgui.c
@@ -1819,10 +1804,7 @@ $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dattime3.obj : $(OBJ_DIR)\dattime3.c
+$(OBJ_DIR)\dattime3.obj : $(CT_DIR)\dattime3.c
    $(CC_CMD)
 
 $(OBJ_DIR)\diskutil.c : $(CT_DIR)\diskutil.prg
@@ -1847,12 +1829,6 @@ $(OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\getsecrt.obj : $(OBJ_DIR)\getsecrt.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\invrtwin.obj : $(OBJ_DIR)\invrtwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
@@ -1882,10 +1858,7 @@ $(OBJ_DIR)\numconv.obj : $(OBJ_DIR)\numconv.c
 $(OBJ_DIR)\pack.obj : $(CT_DIR)\pack.c
    $(CC_CMD)
 
-$(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
+$(OBJ_DIR)\screen2.obj : $(CT_DIR)\screen2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
@@ -1918,16 +1891,22 @@ $(OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
 $(OBJ_DIR)\trapkey.obj : $(OBJ_DIR)\trapkey.c
    $(CC_CMD)
 
-$(OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\untext.obj : $(OBJ_DIR)\untext.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ctwfunc.obj : $(CT_DIR)\ctwfunc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cursor.obj : $(CT_DIR)\cursor.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\showtime.c : $(CT_DIR)\showtime.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\showtime.obj : $(CT_DIR)\showtime.c
    $(CC_CMD)
 
 #

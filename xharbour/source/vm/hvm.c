@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.663 2008/03/14 19:58:02 ronpinkas Exp $
+ * $Id: hvm.c,v 1.664 2008/03/16 19:15:56 likewolf Exp $
  */
 
 /*
@@ -9573,7 +9573,6 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
 
    if( pSymbols->fActive )
    {
-      HB_SYMBOLSCOPE scope;
       register UINT ui;
 
       for( ui = 0; ui < pSymbols->uiModuleSymbols; ++ui )
@@ -9624,8 +9623,6 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
 
             if( pLastSymbols->fInitStatics && pLastSymbols->fActive )
             {
-               HB_SYMBOLSCOPE scope;
-
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                {
                   if( HB_ISINITEXIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
@@ -9655,8 +9652,6 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
             {
                if( pLastSymbols->fActive && ( pLastSymbols->hScope & HB_FS_INIT ) != 0 )
                {
-                  HB_SYMBOLSCOPE scope;
-
                   for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                   {
                      if( HB_ISINIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
@@ -9700,7 +9695,6 @@ void hb_vmExitSymbolGroup( void * hDynLib )
 
             if( pLastSymbols->fActive && ( pLastSymbols->hScope & HB_FS_EXIT ) != 0 )
             {
-               HB_SYMBOLSCOPE scope;
                register UINT ui;
 
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
@@ -10146,7 +10140,6 @@ static void hb_vmDoInitStatics( void )
    {
       if( pLastSymbols->fInitStatics )
       {
-         HB_SYMBOLSCOPE scope;
          register UINT ui;
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
@@ -10180,7 +10173,6 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
       /* only if module contains some EXIT functions */
       if( pLastSymbols->fActive && pLastSymbols->hScope & HB_FS_EXIT )
       {
-         HB_SYMBOLSCOPE scope;
          register UINT ui;
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
@@ -10215,7 +10207,6 @@ static void hb_vmDoInitFunctions( void )
       /* only if module contains some INIT functions */
       if( pLastSymbols->fActive && pLastSymbols->hScope & HB_FS_INIT )
       {
-         HB_SYMBOLSCOPE scope;
          register UINT ui;
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
@@ -10239,6 +10230,7 @@ static void hb_vmDoInitFunctions( void )
                      iArgCount++;
                   }
                }
+
                hb_vmDo( (USHORT) iArgCount );
             }
          }
