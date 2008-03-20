@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5985 2008/03/20 15:35:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5986 2008/03/20 16:59:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-03-20 14:17 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/genhrb.c
+    * Corrected geeneration of SYM_FUNC attribute
+
 2008-03-20 12:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexprb.c
     ! Fixed GPF trap
-    
+
 2008-03-20 18:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapi.h
     ! Guarded hb_arraySetNLL() declaration with #ifndef HB_LONG_LONG_OFF.

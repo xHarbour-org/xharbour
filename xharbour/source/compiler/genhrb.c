@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.11 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.12 2008/03/10 17:19:03 ronpinkas Exp $
  */
 
 /*
@@ -223,9 +223,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputc( ( BYTE ) ( ( hSymScope >> 16 ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( hSymScope >> 24 ) & 255 ), yyc );
 
-      /* specify the function address if it is a defined function or a
-         external called function */
-      if( pFunc ) /* is it a defined function ? */
+      if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
       {
          fputc( SYM_FUNC, yyc );
       }
@@ -267,8 +265,11 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    /* Generate functions data
     */
    pFunc = hb_comp_functions.pFirst;
+
    if( ! hb_comp_bStartProc )
+   {
       pFunc = pFunc->pNext; /* No implicit starting procedure */
+   }
 
    while( pFunc )
    {
@@ -289,6 +290,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       {
          fputs( pFunc->szName, yyc );
       }
+
       fputc( 0, yyc );
 
       ulCodeLength = pFunc->lPCodePos;
@@ -298,8 +300,11 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputc( ( BYTE ) ( ( ulCodeLength >> 24 ) & 255 ), yyc );
 
       lPCodePos = 0;
+
       while( lPCodePos < pFunc->lPCodePos )
+      {
          fputc( pFunc->pCode[ lPCodePos++ ], yyc );
+      }
 
       pFunc = pFunc->pNext;
    }
@@ -307,6 +312,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    fclose( yyc );
 
    if( ! hb_comp_bQuiet )
+   {
       printf( "Done.\n" );
+   }
 }
 
