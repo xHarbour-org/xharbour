@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5981 2008/03/20 08:58:20 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5982 2008/03/20 13:07:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,16 @@
 2008-03-20 08:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/mainwin.c
     - Removed link request and setting default of GUI
+
+2008-03-20 1:50 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/adsmgmnt.c
+    * ADSMGGetOpenTables()
+         added args for User, Connection
+         /* nMaxNumberOfFilesToReturn, cUserName, nConnection */
+
+    * ADSMGGetOpenIndexes()
+         added args for TableName, User, Connection
+         /* nMaxNumberOfFilesToReturn, cTableName, cUserName, nConnection */
 
 2008-03-20 09:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/vm/dynlibhb.c
