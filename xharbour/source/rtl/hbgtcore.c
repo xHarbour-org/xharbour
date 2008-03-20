@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.2 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: hbgtcore.c,v 1.3 2008/03/20 00:01:05 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,9 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbvm.h"
+
+extern int hb_MaxRow( BOOL bVisible );
+extern int hb_MaxCol( BOOL bVisible );
 
 /* these variables are used for stdout/stderr output when GT subsystem
  * is not initialized
@@ -1576,8 +1579,6 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
       }
 
       //HB_GTSELF_GETSIZE( pGT, &iRows, &iCols );
-      extern int hb_MaxRow( BOOL bVisible );
-      extern int hb_MaxCol( BOOL bVisible );
       iRows = hb_MaxRow( TRUE );
       iCols = hb_MaxCol( TRUE );
 
