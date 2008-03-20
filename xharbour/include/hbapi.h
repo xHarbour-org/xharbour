@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.237 2008/03/18 03:29:50 modalsist Exp $
+ * $Id: hbapi.h,v 1.238 2008/03/19 00:17:32 ronpinkas Exp $
  */
 
 /*
@@ -619,7 +619,9 @@ extern HB_EXPORT BOOL      hb_arraySetDL( PHB_ITEM pArray, ULONG ulIndex, LONG l
 extern HB_EXPORT BOOL      hb_arraySetL( PHB_ITEM pArray, ULONG ulIndex, BOOL fValue );
 extern HB_EXPORT BOOL      hb_arraySetNI( PHB_ITEM pArray, ULONG ulIndex, int iNumber );
 extern HB_EXPORT BOOL      hb_arraySetNL( PHB_ITEM pArray, ULONG ulIndex, LONG lNumber );
+#ifndef HB_LONG_LONG_OFF
 extern HB_EXPORT BOOL      hb_arraySetNLL( PHB_ITEM pArray, ULONG ulIndex, LONGLONG llNumber );
+#endif
 extern HB_EXPORT BOOL      hb_arraySetNInt( PHB_ITEM pArray, ULONG ulIndex, HB_LONG lNumber );
 extern HB_EXPORT BOOL      hb_arraySetND( PHB_ITEM pArray, ULONG ulIndex, double dNumber );
 extern HB_EXPORT BOOL      hb_arraySetC( PHB_ITEM pArray, ULONG ulIndex, const char * szText );

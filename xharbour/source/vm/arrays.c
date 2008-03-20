@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.153 2008/02/10 06:34:33 walito Exp $
+ * $Id: arrays.c,v 1.154 2008/03/07 20:27:18 likewolf Exp $
  */
 
 /*
@@ -919,7 +919,7 @@ HB_EXPORT BOOL hb_arraySetNLL( PHB_ITEM pArray, ULONG ulIndex, LONGLONG llNumber
 
 HB_EXPORT BOOL hb_arraySetNInt( PHB_ITEM pArray, ULONG ulIndex, HB_LONG lNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arraySetNLL(%p, %lu, %" PFHL "d)", pArray, ulIndex, lNumber));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arraySetNInt(%p, %lu, %" PFHL "d)", pArray, ulIndex, lNumber));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
