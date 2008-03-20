@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.22 2006/03/10 15:32:20 druzus Exp $
+ * $Id: mainwin.c,v 1.23 2008/03/20 00:01:05 ronpinkas Exp $
  */
 
 /*
@@ -57,20 +57,6 @@
 
 #if defined(HB_OS_WIN_32)
 
-#include "hbgtcore.h"
-
-// Save
-#define __PRESET_GUI GUI
-
-// Reset
-#undef GUI
-
-HB_GT_REQUEST( GUI )
-
-// Restore
-#define GUI __PRESET_GUI
-#undef __PRESET_GUI
-
 #define MAX_ARGS 128
 
 static int    s_argc = 0;
@@ -94,8 +80,6 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
    HB_SYMBOL_UNUSED( iCmdShow );
-
-   hb_gtSetDefault( "gui" );
 
    GetModuleFileName( hInstance, s_szAppName, sizeof( s_szAppName ) - 1 );
    s_argv[ s_argc++ ] = s_szAppName;
