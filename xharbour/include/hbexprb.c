@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.124 2008/02/09 02:53:17 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.125 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -1758,6 +1758,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                            if( ( pArg->value.asNum.lVal % 256 ) == 0 && pArg->value.asNum.lVal != 0 )
                            {
                               sCopy = ( char * ) HB_XGRAB( 1 );
+                              sCopy[ 0 ] = '\0';
                               pReduced = hb_compExprNewString( sCopy, 0, TRUE );
                            }
                            else
