@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.2 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: hbgtcore.h,v 1.3 2008/03/20 00:01:04 ronpinkas Exp $
  */
 
 /*
@@ -583,11 +583,12 @@ extern HB_EXPORT PHB_GT hb_gt_Base( void );
 
 HB_EXTERN_BEGIN
 
-extern HB_EXPORT void hb_gtSetDefault( const char * szGtName );
-extern HB_EXPORT BOOL hb_gtRegister( const HB_GT_INIT * gtInit );
-extern HB_EXPORT BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable );
-extern HB_EXPORT BOOL hb_gtUnLoad( void );
-extern HB_EXPORT void hb_gtStartupInit( void );
+extern HB_EXPORT char * hb_gt_FindDefault( void );
+extern HB_EXPORT void   hb_gtSetDefault( const char * szGtName );
+extern HB_EXPORT BOOL   hb_gtRegister( const HB_GT_INIT * gtInit );
+extern HB_EXPORT BOOL   hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable );
+extern HB_EXPORT BOOL   hb_gtUnLoad( void );
+extern HB_EXPORT void   hb_gtStartupInit( void );
 
 HB_EXTERN_END
 

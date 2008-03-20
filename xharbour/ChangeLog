@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5983 2008/03/20 15:01:46 kaddath Exp $
+ * $Id: ChangeLog,v 1.5984 2008/03/20 15:25:50 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,6 +13,17 @@
     ! Guarded hb_arraySetNLL() declaration with #ifndef HB_LONG_LONG_OFF.
   * source/vm/arrays.c
     ! Fixed trace in hb_arraySetNInt().
+
+2008-03-20 10:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/rdd_ads/adsmgmnt.c
+    * Missing type casts
+
+  * include/hbgtcore.h
+  * source/rtl/hbgtcore.c
+    * Reinstated default of "win" to s_defaultGT, as it doesn't conflict with additional deafult setting options
+    * Made hb_gt_FindDefault() public, so that it's possible to find if default has been explicly set
+  * source/vm/mainstd.c
+    - Removed unneeded call to hb_gtSetDefault()
 
 2008-03-20 08:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/mainwin.c

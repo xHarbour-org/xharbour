@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.3 2008/03/20 00:01:05 ronpinkas Exp $
+ * $Id: hbgtcore.c,v 1.4 2008/03/20 02:51:04 ronpinkas Exp $
  */
 
 /*
@@ -3112,8 +3112,7 @@ static char s_gtNameBuf[ HB_GT_NAME_MAX_ + 1 ];
 #elif defined(HB_OS_LINUX)
    const char * s_defaultGT = "crs";
 #elif defined(HB_OS_WIN_32)
-   //Moved to mainwin, and mainstd so that we request GUI or WIN based on app type
-   const char * s_defaultGT = NULL;
+   const char * s_defaultGT = "win";
 #elif defined(HB_OS_DOS)
    const char * s_defaultGT = "dos";
 #elif defined(HB_OS_OS2)
@@ -3129,7 +3128,24 @@ static int s_iGtCount = 0;
 
 HB_FUNC_EXTERN( HB_GTSYS );
 
-static char * hb_gt_FindDefault( void )
+static int hb_gt_FindEntry( const char * pszID )
+{
+   int iPos;
+
+   for( iPos = 0; iPos < s_iGtCount; iPos++ )
+   {
+      if( hb_stricmp( s_gtInit[ iPos ]->id, pszID ) == 0 ||
+          ( hb_strnicmp( pszID, "gt", 2 ) == 0 &&
+            hb_stricmp( s_gtInit[ iPos ]->id, pszID + 2 ) == 0 ) )
+         return iPos;
+   }
+
+   return -1;
+}
+
+HB_EXTERN_BEGIN
+
+HB_EXPORT char * hb_gt_FindDefault( void )
 {
    char szFuncName[ 15 + HB_GT_NAME_MAX_ ];
    int iPos;
@@ -3151,23 +3167,6 @@ static char * hb_gt_FindDefault( void )
 
    return NULL;
 }
-
-static int hb_gt_FindEntry( const char * pszID )
-{
-   int iPos;
-
-   for( iPos = 0; iPos < s_iGtCount; iPos++ )
-   {
-      if( hb_stricmp( s_gtInit[ iPos ]->id, pszID ) == 0 ||
-          ( hb_strnicmp( pszID, "gt", 2 ) == 0 &&
-            hb_stricmp( s_gtInit[ iPos ]->id, pszID + 2 ) == 0 ) )
-         return iPos;
-   }
-
-   return -1;
-}
-
-HB_EXTERN_BEGIN
 
 HB_EXPORT void hb_gtSetDefault( const char * szGtName )
 {

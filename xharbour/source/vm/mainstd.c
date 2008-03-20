@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.6 2005/01/10 18:45:42 druzus Exp $
+ * $Id: mainstd.c,v 1.7 2008/03/20 00:01:05 ronpinkas Exp $
  */
 
 /*
@@ -77,10 +77,6 @@ int _CRT_glob = 0;
 int main( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
-
-   #if defined(HB_OS_WIN_32)
-      hb_gtSetDefault( "win" );
-   #endif
 
    hb_cmdargInit( argc, argv );
    hb_vmInit( TRUE );

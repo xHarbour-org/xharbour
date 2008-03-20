@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.16 2008/03/13 11:54:16 toninhofwi Exp $
+ * $Id: adsmgmnt.c,v 1.17 2008/03/20 08:53:06 brianhays Exp $
  */
 
 /*
@@ -555,7 +555,7 @@ UNSIGNED32 AdsMgGetOpenTables( hMgmtHandle : ADSHANDLE;
 */
 
    ulRetVal = AdsMgGetOpenTables( hMgmtHandle,
-                                  pucUserName,
+                                  (UNSIGNED8 *) pucUserName,
                                   usConnNumber,
                                   astOpenTableInfo,
                                   &pusArrayLen,
@@ -628,8 +628,8 @@ UNSIGNED32 AdsMgGetOpenIndexes( hMgmtHandle : ADSHANDLE;
  */
 
    ulRetVal = AdsMgGetOpenIndexes( hMgmtHandle,
-                                   pucTableName,
-                                   pucUserName,
+                                   (UNSIGNED8 *) pucTableName,
+                                   (UNSIGNED8 *) pucUserName,
                                    usConnNumber,
                                    astOpenIndexInfo,
                                    &pusArrayLen,
