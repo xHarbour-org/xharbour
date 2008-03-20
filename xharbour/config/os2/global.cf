@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.6 2007/12/27 16:39:05 mauriliolongo Exp $
+# $Id: global.cf,v 1.7 2008/03/09 18:44:26 likewolf Exp $
 #
 
 ifndef MK
@@ -11,7 +11,6 @@ HB_GT_LIBS=\
         gtos2 \
         gtpca \
         gtstd \
-        gtnul \
 
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtos2
