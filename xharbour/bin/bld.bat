@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.69 2007/11/08 02:55:47 lculik Exp $
+rem $Id: bld.bat,v 1.70 2007/11/20 21:47:18 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -54,7 +54,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    echo.
    echo     HB_ARCHITECTURE:
    echo       - dos   (HB_GT_LIB=gtdos by default)
-   echo       - w32   (HB_GT_LIB=gtwin by default or gtwinmt if hb_mt=MT)
+   echo       - w32   (gtwin for console or gtgui for windows applications)
    echo       - linux (HB_GT_LIB=gtstd by default)
    echo       - os2   (HB_GT_LIB=gtos2 by default)
    echo.
@@ -84,6 +84,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    echo       - gtstd (Standard streaming) (for all architectures)
    echo       - gtcgi (Cgi streaming)      (for all architectures)
    echo       - gtdos (DOS console)        (for dos architecture)
+   echo       - gtgui (Win32 NON console)  (for w32 architecture)
    echo       - gtwin (Win32 console)      (for w32 architecture)
    echo       - gtwvt (Win32 win console)  (for w32 architecture)
    echo       - gtos2 (OS/2 console)       (for os2 architecture)
@@ -194,7 +195,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
 :A_DOS_RSX32_NOT
 
    if not "%HB_COMPILER%" == "watcom" goto END
-      
+
       wpp386 -j -w2 -d1 -zq -bt=DOS -5 -fp5 -onaehtzr -oi+ -ei -zp8 -s -zt0 %1.c -fo=%1.obj
       echo debug all OP osn=DOS OP stack=65536 OP CASEEXACT OP stub=cwstub.exe NAME %1.exe > build.tmp
       echo FILE %1.obj >> build.tmp
@@ -202,7 +203,6 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
       echo LIB vm.lib >> build.tmp
       echo LIB rtl.lib >> build.tmp
       echo LIB pcrepos.lib >> build.tmp
-      if "%HB_MULTI_GT%" == "yes" echo LIB gtnul.lib >> build.tmp
       echo LIB %_HB_GT_LIB%.lib >> build.tmp
       echo LIB codepage.lib >> build.tmp
       echo LIB lang.lib >> build.tmp
@@ -230,11 +230,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
 
    if "%_HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib hsx%HB_MT%.lib hbsix%HB_MT%.lib ct%HB_MT%.lib tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB% gtnul.lib
+   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib hsx%HB_MT%.lib hbsix%HB_MT%.lib ct%HB_MT%.lib tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% harbour.lib %_HB_GT_LIB%.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
 
 rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
-   
+
    if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM
    if "%HB_MT%" == "" SET BC_MT_FLAG=
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
@@ -246,11 +246,11 @@ rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
 
    if "%HB_COMPILER%" == "rsxnt"   gcc %1.c -Zwin32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lcommon
    goto end
-   
-:C_MINGW32   
+
+:C_MINGW32
    if not "%HB_COMPILER%" == "mingw32" goto C_MSVC
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
-   if "%HB_MULTI_GT%" == "yes" set _HB_GT_LIB=gtnul -l%_HB_GT_LIB% -lgtwvt
+   set _HB_GT_LIB= -l%_HB_GT_LIB% -lgtwvt
    gcc %1.c -o%1.exe %HB_TMP_OBJ% %CFLAGS% -mno-cygwin %HB_TMP_INCLUDE% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %HB_TMP_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl%HB_MT% -l%_HB_GT_LIB% -llang -lcodepage -lrdd%HB_MT% -lmacro -lpp%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lhsx -lhbsix -lcommon -lct%HB_MT% -lhbodbc -ltip%HB_MT% -lpcrepos %HB_TMP_LIB% -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32
    goto end
 
@@ -266,7 +266,7 @@ rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
 rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if not "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP
 
-   if not "%HB_DLL%" == "" if "%HB_MT%" == "" set LDFLAGS=%LDFLAGS% /NODEFAULTLIB:LIBC 
+   if not "%HB_DLL%" == "" if "%HB_MT%" == "" set LDFLAGS=%LDFLAGS% /NODEFAULTLIB:LIBC
 
    set _cons=CONSOLE
    set _main=std
@@ -299,9 +299,8 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    echo LIB vm%HB_MT%.lib >> build.tmp
    echo LIB rtl%HB_MT%.lib >> build.tmp
    echo LIB pcrepos.lib >> build.tmp
-   if "%HB_MULTI_GT%" == "yes" echo LIB gtnul.lib >> build.tmp
    echo LIB %_HB_GT_LIB%.lib >> build.tmp
-   if "%HB_MULTI_GT%" == "yes" echo LIB gtwvt.lib >> build.tmp
+   echo LIB gtwvt.lib >> build.tmp
    echo LIB codepage.lib >> build.tmp
    echo LIB lang.lib >> build.tmp
    echo LIB macro.lib >> build.tmp
@@ -315,7 +314,7 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    echo LIB common.lib >> build.tmp
    echo LIB hbodbc.lib >> build.tmp
    echo LIB ct%HB_MT%.lib >> build.tmp
-   echo LIB tip%HB_MT%.lib >> build.tmp 
+   echo LIB tip%HB_MT%.lib >> build.tmp
    echo LIB kernel32.lib >> build.tmp
    echo LIB user32.lib >> build.tmp
    echo LIB winspool.lib >> build.tmp

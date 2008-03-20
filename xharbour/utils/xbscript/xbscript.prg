@@ -12702,6 +12702,12 @@ RETURN oError
 
            &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
            //SetMode( 25, 80 )
+        ELSE
+           #include "hbgtinfo.ch"
+
+           IF MaxRow() != HB_GtInfo( HB_GTI_VIEWPORTHEIGHT ) .OR. MaxCol() != HB_GtInfo( HB_GTI_VIEWPORTWIDTH )
+              SetMode( HB_GtInfo( HB_GTI_VIEWPORTHEIGHT ) + 1, HB_GtInfo( HB_GTI_VIEWPORTWIDTH ) + 1 )
+           ENDIF
         ENDIF
       #endif
 

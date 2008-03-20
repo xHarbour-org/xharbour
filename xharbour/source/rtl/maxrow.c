@@ -1,5 +1,5 @@
 /*
- * $Id: maxrow.c,v 1.7 2005/02/13 17:42:04 paultucker Exp $
+ * $Id: maxrow.c,v 1.8 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -53,9 +53,11 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapigt.h"
+#include "hbgtcore.h"
 
-HB_FUNC( MAXROW ) /* Return the maximum screen row number (zero origin) */
+int hb_MaxRow( BOOL bVisible )
 {
    /*
     * if called with logical .T. parameter then return real screen high - 1
@@ -67,25 +69,73 @@ HB_FUNC( MAXROW ) /* Return the maximum screen row number (zero origin) */
     * screen (window 0) max row what is the exact behavior of MaxRow()
     * in CT3, [druzus]
     */
-   if( ISLOG( 1 ) && hb_parl( 1 ) )
+   if( bVisible )
    {
-      USHORT uiRows, uiCols;
-      hb_gtScrDim( &uiRows, &uiCols );
-      hb_retni( uiRows - 1 );
+      PHB_GT pGT = hb_gt_Base();
+      HB_GT_INFO gtInfo;
+
+      gtInfo.pNewVal = gtInfo.pResult = NULL;
+
+      assert( pGT );
+
+      HB_GTSELF_INFO( pGT, HB_GTI_VIEWPORTHEIGHT, &gtInfo );
+
+      if( gtInfo.pResult )
+      {
+         int iMaxRow = hb_itemGetNI( gtInfo.pResult );
+
+         hb_itemRelease( gtInfo.pResult );
+         return iMaxRow;
+      }
+      else
+      {
+         return hb_gtMaxRow();
+      }
    }
    else
-      hb_retni( hb_gtMaxRow() );
+   {
+      return hb_gtMaxRow();
+   }
+}
+
+int hb_MaxCol( BOOL bVisible )
+{
+   /* See the note about MaxRow(.t.) above */
+   if( bVisible )
+   {
+      PHB_GT pGT = hb_gt_Base();
+      HB_GT_INFO gtInfo;
+
+      gtInfo.pNewVal = gtInfo.pResult = NULL;
+
+      assert( pGT );
+
+      HB_GTSELF_INFO( pGT, HB_GTI_VIEWPORTWIDTH, &gtInfo );
+
+      if( gtInfo.pResult )
+      {
+         int iMaxCol = hb_itemGetNI( gtInfo.pResult );
+
+         hb_itemRelease( gtInfo.pResult );
+         return iMaxCol;
+      }
+      else
+      {
+         return hb_gtMaxCol();
+      }
+   }
+   else
+   {
+      return hb_gtMaxCol();
+   }
+}
+
+HB_FUNC( MAXROW ) /* Return the maximum screen row number (zero origin) */
+{
+   hb_retni( hb_MaxRow( ISLOG( 1 ) && hb_parl( 1 ) ) );
 }
 
 HB_FUNC( MAXCOL ) /* Return the maximum screen column number (zero origin) */
 {
-   /* See the note about MaxRow(.t.) above */
-   if( ISLOG( 1 ) && hb_parl( 1 ) )
-   {
-      USHORT uiRows, uiCols;
-      hb_gtScrDim( &uiRows, &uiCols );
-      hb_retni( uiCols - 1 );
-   }
-   else
-      hb_retni( hb_gtMaxCol() );
+   hb_retni( hb_MaxCol( ISLOG( 1 ) && hb_parl( 1 ) ) );
 }

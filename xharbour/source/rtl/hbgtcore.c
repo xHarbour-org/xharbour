@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: hbgtcore.c,v 1.2 2008/03/19 00:17:33 ronpinkas Exp $
  */
 
 /*
@@ -1446,10 +1446,12 @@ static BOOL hb_gt_def_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
             pGT->fVgaCell = hb_itemGetL( pInfo->pNewVal );
          break;
 
+      case HB_GTI_VIEWPORTWIDTH:
       case HB_GTI_VIEWMAXWIDTH:
          pInfo->pResult = hb_itemPutNInt( pInfo->pResult, HB_GTSELF_MAXCOL( pGT ) );
          break;
 
+      case HB_GTI_VIEWPORTHEIGHT:
       case HB_GTI_VIEWMAXHEIGHT:
          pInfo->pResult = hb_itemPutNInt( pInfo->pResult, HB_GTSELF_MAXROW( pGT ) );
          break;
@@ -1559,19 +1561,30 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
       gtInfo.pNewVal = gtInfo.pResult = NULL;
 
       HB_GTSELF_INFO( pGT, HB_GTI_FULLSCREEN, &gtInfo );
+
       if( gtInfo.pResult )
       {
          fScreen = hb_itemGetL( gtInfo.pResult );
       }
+
       HB_GTSELF_INFO( pGT, HB_GTI_KBDSUPPORT, &gtInfo );
+
       if( gtInfo.pResult )
       {
          fKeyBoard = hb_itemGetL( gtInfo.pResult );
          hb_itemRelease( gtInfo.pResult );
       }
-      HB_GTSELF_GETSIZE( pGT, &iRows, &iCols );
+
+      //HB_GTSELF_GETSIZE( pGT, &iRows, &iCols );
+      extern int hb_MaxRow( BOOL bVisible );
+      extern int hb_MaxCol( BOOL bVisible );
+      iRows = hb_MaxRow( TRUE );
+      iCols = hb_MaxCol( TRUE );
+
       if( iCols <= 4 || iRows <= 4 )
+      {
          fScreen = FALSE;
+      }
 
       if( fScreen )
       {
@@ -1581,8 +1594,12 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
 
          ulMaxWidth = iCols - 4;
          ulDefWidth = ( ulMaxWidth * 3 ) >> 2;
+
          if( ulDefWidth == 0 )
+         {
             ulDefWidth = 1;
+         }
+
          szMsgDsp = ( char * ) hb_xgrab( ulLen + ( ulLen / ulDefWidth ) + 1 );
 
          while( ul < ulLen )
@@ -1596,8 +1613,12 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                else
                {
                   ++ulLines;
+
                   if( ulCurrWidth > ulWidth )
+                  {
                      ulWidth = ulCurrWidth;
+                  }
+
                   ulCurrWidth = ulSpace1 = ulSpace2 = 0;
                   szMsgDsp[ ulDst++ ] = '\n';
                   ulLast = ulDst;
@@ -1608,20 +1629,30 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                if( szMessage[ ul ] == ' ' )
                {
                   if( ulCurrWidth <= ulDefWidth )
+                  {
                      ulSpace1 = ul;
+                  }
                   else if( ulCurrWidth <= ulMaxWidth && !ulSpace2 )
+                  {
                      ulSpace2 = ul;
+                  }
                }
+
                szMsgDsp[ ulDst++ ] = szMessage[ ul ];
                ++ulCurrWidth;
+
                if( ulCurrWidth > ulDefWidth && ulSpace1 )
                {
                   ulCurrWidth -= ul - ulSpace1 + 1;
                   ulDst -= ul - ulSpace1 + 1;
                   ul = ulSpace1;
                   ++ulLines;
+
                   if( ulCurrWidth > ulWidth )
+                  {
                      ulWidth = ulCurrWidth;
+                  }
+
                   ulCurrWidth = ulSpace1 = ulSpace2 = 0;
                   szMsgDsp[ ulDst++ ] = '\n';
                   ulLast = ulDst;
@@ -1634,8 +1665,12 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                      ulDst -= ul - ulSpace2 + 1;
                      ul = ulSpace2;
                      ++ulLines;
+
                      if( ulCurrWidth > ulWidth )
+                     {
                         ulWidth = ulCurrWidth;
+                     }
+
                      ulCurrWidth = ulSpace1 = ulSpace2 = 0;
                      szMsgDsp[ ulDst++ ] = '\n';
                      ulLast = ulDst;
@@ -1649,57 +1684,93 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                      szMsgDsp[ ulDst++ ] = '\n';
                      ulLast = ulDst;
                      ++ulLines;
+
                      if( ulCurrWidth > ulWidth )
+                     {
                         ulWidth = ulCurrWidth;
+                     }
+
                      ulCurrWidth = ulSpace1 = ulSpace2 = 0;
                   }
 #endif
                }
             }
+
             ++ul;
          }
+
          ulLines++;
+
          if( ulCurrWidth > ulWidth )
+         {
             ulWidth = ulCurrWidth;
+         }
+
          if( ulLines == 1 && ulWidth < ulDefWidth )
+         {
             ulWidth += HB_MIN( 4, ulDefWidth - ulWidth );
+         }
 
          ulCurrWidth = 0;
+
          for( i = 1; i <= iOptions; ++i )
          {
             ulCurrWidth += hb_arrayGetCLen( pOptions, i ) + 4;
          }
+
          if( ulCurrWidth > ulMaxWidth )
+         {
             ulCurrWidth = ulMaxWidth;
+         }
+
          if( ulCurrWidth > ulWidth )
+         {
             ulWidth = ulCurrWidth;
+         }
+
          if( ( ULONG ) iRows < ulLines + 4 )
+         {
             ulLines = iRows - 4;
+         }
+
          iTop = ( iRows - ulLines - 4 ) >> 1;
          iLeft = ( iCols - ulWidth - 4 ) >> 1;
          iBottom = iTop + ulLines + 3;
          iRight = iLeft + ulWidth + 3;
 
          if( iClrNorm == 0 )
+         {
             iClrNorm = 79;
+         }
+
          if( iClrHigh == 0 )
+         {
             iClrHigh = 31;
+         }
+
          iDspCount = HB_GTSELF_DISPCOUNT( pGT );
+
          if( iDspCount == 0 )
+         {
             HB_GTSELF_DISPBEGIN( pGT );
+         }
+
          HB_GTSELF_GETPOS( pGT, &iRow, &iCol );
          iStyle = HB_GTSELF_GETCURSORSTYLE( pGT );
          HB_GTSELF_SETCURSORSTYLE( pGT, SC_NONE );
          ulLen = HB_GTSELF_RECTSIZE( pGT, iTop, iLeft, iBottom, iRight );
+
          if( ulLen )
          {
             pBuffer = ( BYTE * ) hb_xgrab( ulLen );
             HB_GTSELF_SAVE( pGT, iTop, iLeft, iBottom, iRight, pBuffer );
          }
+
          HB_GTSELF_BOXS( pGT, iTop, iLeft, iBottom, iRight, NULL, iClrNorm );
          HB_GTSELF_BOXS( pGT, iTop + 1, iLeft + 1, iBottom - 1, iRight - 1, ( BYTE * ) "         ", iClrNorm );
          ulLast = 0;
          i = iTop + 1;
+
          for( ul = 0; ul < ulDst; ++ul )
          {
             if( szMsgDsp[ ul ] == '\n' )
@@ -1707,30 +1778,45 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                if( ul > ulLast )
                {
                   ulLen = ul - ulLast;
+
                   if( ulLen > ulWidth )
+                  {
                      ulLen = ulWidth;
+                  }
+
                   HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ulWidth - ulLen + 1 ) >> 1 ) + 2,
                                      iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
                }
+
                ulLast = ul + 1;
+
                if( ++i >= iBottom - 1 )
+               {
                   break;
+               }
             }
          }
+
          if( ul > ulLast && i < iBottom - 1 )
          {
             ulLen = ul - ulLast;
+
             if( ulLen > ulWidth )
+            {
                ulLen = ulWidth;
+            }
+
             HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ulWidth - ulLen + 1 ) >> 1 ) + 2,
                                iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
          }
 
          iPos = 1;
+
          while( iRet == 0 )
          {
             HB_GTSELF_DISPBEGIN( pGT );
             iMnuCol = iLeft + ( ( ulWidth - ulCurrWidth ) >> 1 ) + 3;
+
             for( i = 1; i <= iOptions; ++i )
             {
                iClr = i == iPos ? iClrHigh : iClrNorm;
@@ -1741,14 +1827,20 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1 + ulLen, iClr, ( BYTE * ) " ", 1 );
                iMnuCol += ulLen + 4;
             }
+
             while( HB_GTSELF_DISPCOUNT( pGT ) )
+            {
                HB_GTSELF_DISPEND( pGT );
+            }
+
             HB_GTSELF_REFRESH( pGT );
 
             iKey = fKeyBoard ? HB_GTSELF_INKEYGET( pGT, TRUE, dDelay, INKEY_ALL ) : 0;
 
             if( iKey == K_ESC )
+            {
                break;
+            }
             else if( iKey == K_ENTER || iKey == K_SPACE || iKey == 0 )
             {
                iRet = iPos;
@@ -1756,13 +1848,19 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             else if( iKey == K_LEFT || iKey == K_SH_TAB )
             {
                if( --iPos == 0 )
+               {
                   iPos = iOptions;
+               }
+
                dDelay = 0.0;
             }
             else if( iKey == K_RIGHT || iKey == K_TAB )
             {
                if( ++iPos > iOptions )
+               {
                   iPos = 1;
+               }
+
                dDelay = 0.0;
             }
 #ifdef HB_COMPAT_C53
@@ -1770,17 +1868,21 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             {
                int iMRow, iMCol;
                HB_GTSELF_MOUSEGETPOS( pGT, &iMRow, &iMCol );
+
                if( iMRow == iBottom - 1 )
                {
                   iMnuCol = iLeft + ( ( ulWidth - ulCurrWidth ) >> 1 ) + 4;
+
                   for( i = 1; i <= iOptions; ++i )
                   {
                      ulLen = hb_arrayGetCLen( pOptions, i );
+
                      if( iMCol >= iMnuCol && iMCol < iMnuCol + ( int ) ulLen )
                      {
                         iRet = i;
                         break;
                      }
+
                      iMnuCol += ulLen + 4;
                   }
                }
@@ -1789,9 +1891,11 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             else if( iKey >= 32 && iKey <= 255 )
             {
                int iUp = hb_charUpper( iKey );
+
                for( i = 1; i <= iOptions; ++i )
                {
                   char *szValue = hb_arrayGetCPtr( pOptions, i );
+
                   if( szValue && iUp == hb_charUpper( *szValue ) )
                   {
                      iRet = i;
@@ -1802,16 +1906,21 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
          }
 
          hb_xfree( szMsgDsp );
+
          if( pBuffer )
          {
             HB_GTSELF_REST( pGT, iTop, iLeft, iBottom, iRight, pBuffer );
             hb_xfree( pBuffer );
          }
+
          HB_GTSELF_SETPOS( pGT, iRow, iCol );
          HB_GTSELF_SETCURSORSTYLE( pGT, iStyle );
          HB_GTSELF_REFRESH( pGT );
+
          while( HB_GTSELF_DISPCOUNT( pGT ) < iDspCount )
+         {
             HB_GTSELF_DISPBEGIN( pGT );
+         }
       }
       else
       {
@@ -1823,35 +1932,55 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             if( szMessage[ ul ] == '\n' )
             {
                if( ul > ulStart )
+               {
                   HB_GTSELF_WRITECON( pGT, ( BYTE * ) szMessage + ulStart, ul - ulStart );
+               }
+
                HB_GTSELF_WRITECON( pGT, ( BYTE * ) szEol, strlen( szEol ) );
                ulStart = ul + 1;
             }
          }
+
          if( ul > ulStart )
+         {
             HB_GTSELF_WRITECON( pGT, ( BYTE * ) szMessage + ulStart, ul - ulStart );
+         }
+
          HB_GTSELF_WRITECON( pGT, ( BYTE * ) " (", 2 );
+
          for( i = 1; i <= iOptions; ++i )
          {
             if( i > 1 )
+            {
                HB_GTSELF_WRITECON( pGT, ( BYTE * ) ", ", 2 );
+            }
+
             HB_GTSELF_WRITECON( pGT, ( BYTE * ) hb_arrayGetCPtr( pOptions, i ),
                                 hb_arrayGetCLen( pOptions, i ) );
          }
+
          HB_GTSELF_WRITECON( pGT, ( BYTE * ) ") ", 2 );
+
          while( iRet == 0 )
          {
             iKey = fKeyBoard ? HB_GTSELF_INKEYGET( pGT, TRUE, dDelay, INKEY_ALL ) : 0;
+
             if( iKey == 0 )
+            {
                iRet = 1;
+            }
             else if( iKey == K_ESC )
+            {
                break;
+            }
             else if( iKey >= 32 && iKey <= 255 )
             {
                int iUp = hb_charUpper( iKey );
+
                for( i = 1; i <= iOptions; ++i )
                {
                   char *szValue = hb_arrayGetCPtr( pOptions, i );
+
                   if( szValue && iUp == hb_charUpper( *szValue ) )
                   {
                      iRet = i;
@@ -1860,9 +1989,11 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                }
             }
          }
+
          if( iKey >= 32 && iKey <= 255 )
          {
-            char szVal[2]; 
+            char szVal[2];
+
             szVal[ 0 ] = ( char ) iKey;
             szVal[ 1 ] = '\0';
             HB_GTSELF_WRITECON( pGT, ( BYTE * ) szVal, 1 );
@@ -1993,7 +2124,7 @@ static void hb_gt_def_ColdArea( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
    if( iLeft > iRight )
    {
       i = iLeft;
-      iLeft = iRight; 
+      iLeft = iRight;
       iRight = i;
    }
    while( iTop <= iBottom )
@@ -2026,7 +2157,7 @@ static void hb_gt_def_ExposeArea( PHB_GT pGT, int iTop, int iLeft, int iBottom, 
    if( iLeft > iRight )
    {
       i = iLeft;
-      iLeft = iRight; 
+      iLeft = iRight;
       iRight = i;
    }
    while( iTop <= iBottom )
@@ -2980,7 +3111,8 @@ static char s_gtNameBuf[ HB_GT_NAME_MAX_ + 1 ];
 #elif defined(HB_OS_LINUX)
    const char * s_defaultGT = "crs";
 #elif defined(HB_OS_WIN_32)
-   const char * s_defaultGT = "win";
+   //Moved to mainwin, and mainstd so that we request GUI or WIN based on app type
+   const char * s_defaultGT = NULL;
 #elif defined(HB_OS_DOS)
    const char * s_defaultGT = "dos";
 #elif defined(HB_OS_OS2)
@@ -3003,16 +3135,20 @@ static char * hb_gt_FindDefault( void )
 
    for( iPos = 0; iPos < s_iGtCount; iPos++ )
    {
-      snprintf( szFuncName, sizeof( szFuncName ),
-                "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
+      snprintf( szFuncName, sizeof( szFuncName ), "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
+
       if( hb_dynsymFind( szFuncName ) )
+      {
          return s_gtInit[ iPos ]->id;
+      }
    }
 
    if( hb_dynsymFind( "HB_GT_NUL_DEFAULT" ) )
+   {
       return "NUL";
-   else
-      return NULL;
+   }
+
+   return NULL;
 }
 
 static int hb_gt_FindEntry( const char * pszID )
@@ -3029,6 +3165,8 @@ static int hb_gt_FindEntry( const char * pszID )
 
    return -1;
 }
+
+HB_EXTERN_BEGIN
 
 HB_EXPORT void hb_gtSetDefault( const char * szGtName )
 {
@@ -3112,30 +3250,69 @@ HB_EXPORT void hb_gtStartupInit( void )
    BOOL fInit;
 
    szGtName = hb_cmdargString( "GT" );
+
    if( szGtName )
    {
       fInit = hb_gtLoad( szGtName, &s_gtCoreFunc );
       hb_xfree( szGtName );
+
       if( fInit )
+      {
          return;
+      }
    }
+
    szGtName = hb_getenv( "HB_GT" );
+
    if( szGtName )
    {
       fInit = hb_gtLoad( szGtName, &s_gtCoreFunc );
       hb_xfree( szGtName );
+
       if( fInit )
+      {
          return;
+      }
    }
+
    if( hb_gtLoad( hb_gt_FindDefault(), &s_gtCoreFunc ) )
+   {
       return;
+   }
+
    if( hb_gtLoad( s_defaultGT, &s_gtCoreFunc ) )
+   {
       return;
+   }
 
    if( hb_dynsymFind( "HB_GT_NUL" ) ) /* GTNUL was explicitly requsted */
    {
       if( hb_gtLoad( "NUL", &s_gtCoreFunc ) )
+      {
          return;
+      }
+   }
+
+   if( s_iGtCount > 0 )
+   {
+      #ifdef HB_STARTUP_REVERSED_LINK_ORDER
+        if( hb_gtLoad( s_gtInit[ s_iGtCount - 1 ]->id, &s_gtCoreFunc ) )
+        {
+           return;
+        }
+      #else
+        if( hb_gtLoad( s_gtInit[ 0 ]->id, &s_gtCoreFunc ) )
+        {
+           return;
+        }
+      #endif
+   }
+   else
+   {
+      if( hb_gtLoad( "NUL", &s_gtCoreFunc ) )
+      {
+         return;
+      }
    }
 
    hb_errInternal( 9998, "Internal error: screen driver initialization failure", NULL, NULL );
@@ -3143,5 +3320,7 @@ HB_EXPORT void hb_gtStartupInit( void )
    /* force linking HB_GTSYS() */
    HB_FUNC_EXEC( HB_GTSYS );
 }
+
+HB_EXTERN_END
 
 HB_GT_ANNOUNCE( HB_GT_NAME )

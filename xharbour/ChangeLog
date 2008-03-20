@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5976 2008/03/19 17:57:21 modalsist Exp $
+ * $Id: ChangeLog,v 1.5977 2008/03/19 21:35:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-19 19:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.vc
+    - Removed no longer used HB_MULTI_GT
+  * makefile.vc
+    - Removed no longer used -DSIMPLE and HB_LEX
+    + Added /MAP to lflags
+  * bin/bld.bat
+    - Removed no longer used gtnul.lib, and HB_MULTI_GT
+
+  * include/hbgtcore.h
+    + Added missing HB_EXTERN_BEGIN/END
+
+  * source/rtl/gtsys.c
+    - Removed setting of default GT for #if defined(HB_OS_WIN_32)
+  * source/vm/mainstd.c
+    + Added setting of default GT to "WIN" for #if defined(HB_OS_WIN_32)
+  * source/vm/mainwin.c
+    + Added setting of default GT to "GUI"
+
+  * source/rtl/hbgtcore.c
+    - Removed setting of default GT for #if defined(HB_OS_WIN_32)
+    + Added default support for HB_GTI_VIEWPORTWIDTH and HB_GTI_VIEWPORTHEIGHT
+    * Modified hb_gt_def_Alert()/Alert() to center based on visible screen
+    + Added additional logic to hb_gtStartupInit() to default to first/last registered GT if no default found earlier
+    + Added additional logic to hb_gtStartupInit() to default to "NUL" if no default found earlier
+    + Added missing HB_EXTERN_BEGIN/END
+
+  * source/rtl/gtwin/gtwin.c
+    * Formatting
+
+  * source/rtl/maxrow.c
+    ! Fixed broken MaxRow( .T. )
+
+  * utils/xbscript/xbscript.prg
+    + Added SetMode() to visible screen area
 
 2008-03-20 00:32 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/bsd/gcc.cf
@@ -18,7 +54,7 @@
   * dll_pc.bat
     * setted hb_dir to .\
     * restored copy files instead move.
-    * added /p switch to pomake command. 
+    * added /p switch to pomake command.
     * do not delete log file after build.
   * makefile.pc
   * hrbdll.pc

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c 8236 2008-01-26 05:29:20Z vszakats $
+ * $Id: gtwin.c,v 1.117 2008/03/16 19:16:03 likewolf Exp $
  */
 
 /*
@@ -641,7 +641,9 @@ static void hb_gt_win_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_win_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr));
 
    s_osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+
    GetVersionEx( &s_osv );
+
    if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
    {
       s_dwAltGrBits = RIGHT_ALT_PRESSED;
@@ -683,10 +685,14 @@ static void hb_gt_win_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
       char * pszOsType;
 
       pszOsType = hb_getenv( "OSTYPE" );
+
       if( pszOsType )
       {
          if( strcmp( pszOsType, "msys" ) == 0 )
+         {
             FreeConsole();
+         }
+
          hb_xfree( pszOsType );
       }
    }
@@ -721,7 +727,9 @@ static void hb_gt_win_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
                      0, 0 );
 
    if( s_HOutput == INVALID_HANDLE_VALUE )
+   {
       hb_errInternal( 10001, "Can't allocate console (output)", "", "" );
+   }
 
    s_HInput = CreateFile( TEXT( "CONIN$" ),                 /* filename    */
                      GENERIC_READ    | GENERIC_WRITE,       /* Access flag */
@@ -731,7 +739,9 @@ static void hb_gt_win_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
                      0, 0 );
 
    if( s_HInput == INVALID_HANDLE_VALUE )
+   {
       hb_errInternal( 10001, "Can't allocate console (input)", "", "" );
+   }
 
    GetConsoleScreenBufferInfo( s_HOutput, &s_csbi );
 

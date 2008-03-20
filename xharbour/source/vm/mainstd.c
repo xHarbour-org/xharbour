@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.5 2004/04/02 22:38:32 andijahja Exp $
+ * $Id: mainstd.c,v 1.6 2005/01/10 18:45:42 druzus Exp $
  */
 
 /*
@@ -58,9 +58,29 @@ HB_EXTERN_BEGIN
 int _CRT_glob = 0;
 #endif
 
+#if defined(HB_OS_WIN_32)
+   #include "hbgtcore.h"
+
+   // Save
+   #define __PRESET_WIN WIN
+
+   // Reset
+   #undef WIN
+
+   HB_GT_REQUEST( WIN )
+
+   // Restore
+   #define WIN __PRESET_WIN
+   #undef __PRESET_WIN
+#endif
+
 int main( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
+
+   #if defined(HB_OS_WIN_32)
+      hb_gtSetDefault( "win" );
+   #endif
 
    hb_cmdargInit( argc, argv );
    hb_vmInit( TRUE );

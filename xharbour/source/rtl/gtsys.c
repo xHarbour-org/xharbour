@@ -1,5 +1,5 @@
 /*
- * $Id: gtsys.c 6583 2006-02-04 16:16:48Z druzus $
+ * $Id: gtsys.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,10 @@
 #elif defined(HB_OS_LINUX)
    HB_GT_REQUEST( CRS )
 #elif defined(HB_OS_WIN_32)
-   HB_GT_REQUEST( WIN )
+   /*
+    Moved to mainwin, and mainstd so that we request GUI or WIN based on app type
+    HB_GT_REQUEST( WIN )
+   */
 #elif defined(HB_OS_DOS)
    HB_GT_REQUEST( DOS )
 #elif defined(HB_OS_OS2)
