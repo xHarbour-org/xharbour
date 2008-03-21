@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5986 2008/03/20 16:59:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5987 2008/03/20 18:49:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2008-03-21 09:30 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+ * source/rtl/math.c
+    ! added workaround for SIGFPE platforms which generate it instead of
+      setting errno during execution of math functions.
+      Code from harbour, thanks Przemyslaw.
 
 2008-03-20 14:17 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/genhrb.c

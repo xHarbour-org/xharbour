@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.21 2006/07/20 20:15:34 map Exp $
+ * $Id: math.c,v 1.22 2007/12/01 22:33:23 andijahja Exp $
  */
 
 /*
@@ -713,44 +713,49 @@ HB_FUNC (LOG)
       HB_MATH_EXCEPTION hb_exc;
       double dResult;
 
-#if defined(HB_MATH_ERRNO)
-      errno = 0;
-      dResult = log( hb_parnd( 1 ) );
-      if ( hb_mathErrSet( dResult, hb_parnd (1), 0.0, "LOG", errno ) )
-#else
-      hb_mathResetError();
-      dResult = log( hb_parnd( 1 ) );
-      if ( hb_mathIsMathErr() )
-#endif
+      if( hb_parnd( 1 ) <= 0 )
+         hb_retndlen( -HUGE_VAL, -1, -1 );  /* return -infinity */
+      else
       {
-         /* the C-RTL provides a kind of matherr() mechanism */
-         int iLastError = hb_mathGetLastError( &hb_exc );
-         if( iLastError != HB_MATH_ERR_NONE )
+      #if defined(HB_MATH_ERRNO)
+         errno = 0;
+         dResult = log( hb_parnd( 1 ) );
+         if ( hb_mathErrSet( dResult, hb_parnd (1), 0.0, "LOG", errno ) )
+      #else
+         hb_mathResetError();
+         dResult = log( hb_parnd( 1 ) );
+         if ( hb_mathIsMathErr() )
+      #endif
          {
-            if( hb_exc.handled )
+            /* the C-RTL provides a kind of matherr() mechanism */
+            int iLastError = hb_mathGetLastError( &hb_exc );
+            if( iLastError != HB_MATH_ERR_NONE )
             {
-               hb_retndlen( hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec );
-            }
-            else
-            {
-               /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
-               switch( iLastError )
+               if( hb_exc.handled )
                {
-                  case HB_MATH_ERR_SING:     /* argument to log was 0.0 */
-                  case HB_MATH_ERR_DOMAIN:   /* argument to log was < 0.0 */
+                  hb_retndlen( hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec );
+               }
+               else
+               {
+                  /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
+                  switch( iLastError )
                   {
-                     hb_retndlen( -HUGE_VAL, -1, -1 ); /* return -infinity */
-                  }; break;
-                  default:
-                  {
-                     hb_retnd( 0.0 );
+                     case HB_MATH_ERR_SING:     /* argument to log was 0.0 */
+                     case HB_MATH_ERR_DOMAIN:   /* argument to log was < 0.0 */
+                     {
+                        hb_retndlen( -HUGE_VAL, -1, -1 ); /* return -infinity */
+                     }; break;
+                     default:
+                     {
+                        hb_retnd( 0.0 );
+                     }
                   }
                }
+               return;
             }
-            return;
          }
+         hb_retnd( dResult );
       }
-      hb_retnd( dResult );
    }
    else
    {
@@ -765,33 +770,38 @@ HB_FUNC( SQRT )
       HB_MATH_EXCEPTION hb_exc;
       double dResult;
 
-#if defined(HB_MATH_ERRNO)
-      errno = 0;
-      dResult = sqrt( hb_parnd( 1 ) );
-      if ( hb_mathErrSet( dResult, hb_parnd( 1 ), 0.0, "SQRT", errno ) )
-#else
-      hb_mathResetError();
-      dResult = sqrt( hb_parnd( 1 ) );
-      if ( hb_mathIsMathErr() )
-#endif
+      if( hb_parnd( 1 ) <= 0 )
+         hb_retnd( 0.0 );
+      else
       {
-         /* the C-RTL provides a kind of matherr() mechanism */
-         int iLastError = hb_mathGetLastError( &hb_exc );
-         if( iLastError != HB_MATH_ERR_NONE )
+      #if defined(HB_MATH_ERRNO)
+         errno = 0;
+         dResult = sqrt( hb_parnd( 1 ) );
+         if ( hb_mathErrSet( dResult, hb_parnd( 1 ), 0.0, "SQRT", errno ) )
+      #else
+         hb_mathResetError();
+         dResult = sqrt( hb_parnd( 1 ) );
+         if ( hb_mathIsMathErr() )
+      #endif
          {
-            if( hb_exc.handled )
+            /* the C-RTL provides a kind of matherr() mechanism */
+            int iLastError = hb_mathGetLastError( &hb_exc );
+            if( iLastError != HB_MATH_ERR_NONE )
             {
-               hb_retndlen( hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec );
+               if( hb_exc.handled )
+               {
+                  hb_retndlen( hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec );
+               }
+               else
+               {
+                  /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
+                  hb_retnd( 0.0 );  /* return 0.0 on all errors (all (?) of type DOMAIN) */
+               }
+               return;
             }
-            else
-            {
-               /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
-               hb_retnd( 0.0 );  /* return 0.0 on all errors (all (?) of type DOMAIN) */
-            }
-            return;
          }
+         hb_retnd( dResult );
       }
-      hb_retnd( dResult );
    }
    else
    {
