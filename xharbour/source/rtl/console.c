@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.68 2008/03/16 19:15:59 likewolf Exp $
+ * $Id: console.c,v 1.69 2008/03/18 15:51:40 likewolf Exp $
  */
 
 /*
@@ -712,16 +712,19 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
 HB_FUNC( HB_GETSTDIN ) /* Return Handel for STDIN */
 {
+   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStdin );
 }
 
 HB_FUNC( HB_GETSTDOUT ) /* Return Handel for STDOUT */
 {
+   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStdout );
 }
 
 HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 {
+   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStderr );
 }
 

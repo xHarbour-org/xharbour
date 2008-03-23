@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5988 2008/03/21 08:34:41 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5989 2008/03/21 16:14:52 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-23 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   * include/hbdefs.h
+     ! kill warnings under BCC 5.82
+     /* This may fail for BCC newer than 5.51 and older than 5.82. In such case, please
+     	modify hbdefs.h for correct version number (line 65). I cannot check it
+     	because I only have v5.51 and v5.82 */
+     ! define HB_IMPORT only when __IMPORT__ is explicitely defined during
+       compile time.
+   * source/rtl/console.c
+     ! fix compilation on MT mode
 
 2008-03-21 19:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/runner.c

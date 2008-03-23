@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.98 2008/02/18 16:46:18 likewolf Exp $
+ * $Id: hbdefs.h,v 1.99 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 
 #include "hbsetup.h"
 
-#if defined( __XCC__ ) || defined( __MINGW32__ ) || \
+#if defined( __XCC__ ) || (defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || defined( __MINGW32__ ) || \
     ( defined( __GNUC__ ) && \
       ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
 #  include <stdint.h>
@@ -1208,6 +1208,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXPORT
 #endif
 
+#if defined( __IMPORT__ )
 #if defined( __RSXNT__ )
    /* RSXNT does not support any type of export keyword.
       Exported (i.e., public) names can be obtained via
@@ -1234,6 +1235,9 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #else
    #define HB_IMPORT
 
+#endif
+#else
+   #define HB_IMPORT
 #endif
 
 /* Function declaration macros */
