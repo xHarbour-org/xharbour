@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.23 2008/03/20 00:01:05 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.24 2008/03/20 13:07:51 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 
 #include "hbapi.h"
 #include "hbvm.h"
+#include "hbgtcore.h"
 
 #if defined(HB_OS_WIN_32)
 
@@ -80,6 +81,8 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
    HB_SYMBOL_UNUSED( iCmdShow );
+
+   hb_gtSetDefault( "gui" );
 
    GetModuleFileName( hInstance, s_szAppName, sizeof( s_szAppName ) - 1 );
    s_argv[ s_argc++ ] = s_szAppName;

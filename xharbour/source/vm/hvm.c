@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.664 2008/03/16 19:15:56 likewolf Exp $
+ * $Id: hvm.c,v 1.665 2008/03/19 00:17:33 ronpinkas Exp $
  */
 
 /*
@@ -10029,6 +10029,13 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                      pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
                      pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
                      //hSymScope = pSymbol->scope.value; // End of loop - no longer used!
+                  }
+               }
+               else
+               {
+                  if( pDynSym->pSymbol->value.pFunPtr == NULL && pSymbol->value.pFunPtr )
+                  {
+                     pDynSym->pSymbol = pSymbol;
                   }
                }
 
