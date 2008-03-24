@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.54 2008/03/08 00:36:39 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.55 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /*
@@ -373,7 +373,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCaseWithNamespaces( const char * szName, const ch
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGetWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+PHB_DYNS HB_EXPORT hb_dynsymGetWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE INSENSITIVE! */
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
