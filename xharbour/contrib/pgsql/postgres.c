@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.24 2005/10/08 15:37:52 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.25 2005/10/24 17:13:30 druzus Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -100,20 +100,20 @@
  * Connection handling functions 
  */
 
-HB_FUNC(PQCONNECT)
+HB_FUNC( PQCONNECT )
 {
-    char        conninfo[128];
-    PGconn      *conn;
+   char     conninfo[128];
+   PGconn   *conn;
 
-    if (hb_pcount() == 5)
-        sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
-                                           hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), (int) hb_parni(5) );
+   if( hb_pcount() == 5 )
+      sprintf( conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
+               hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), (int) hb_parni(5) );
 
-    conn = PQconnectdb(conninfo);
-    hb_retptr( conn );
+   conn = PQconnectdb( conninfo );
+   hb_retptr( conn );
 }
 
-HB_FUNC(PQSETDBLOGIN)
+HB_FUNC( PQSETDBLOGIN )
 {
     const char *pghost;
     const char *pgport;
@@ -326,155 +326,151 @@ HB_FUNC(PQGETLENGTH)
     hb_retni(result);
 }
 
-HB_FUNC(PQMETADATA)
+HB_FUNC( PQMETADATA )
 {
-    PGresult   *res;
-    int         nFields, i;
-    
-    HB_ITEM aTemp;
-    HB_ITEM aNew;
-    HB_ITEM temp;
+   PGresult *res;
+   if( hb_parinfo( 1 ) )
+   {
+      res = ( PGresult * ) hb_parptr( 1 );
+      if( PQresultStatus( res ) == PGRES_TUPLES_OK )
+      {
+         int nFields = PQnfields( res ), i;
+         PHB_ITEM pResult = hb_itemArrayNew( nFields ), pField;
 
-    aTemp.type = HB_IT_NIL;
-    aNew.type = HB_IT_NIL;
-    temp.type = HB_IT_NIL;
+         for( i = 0; i < nFields; i++ )
+         {
+            char  buf[256];
+            Oid   type_oid = PQftype( res, i );
+            int   typemod = PQfmod( res, i );
+            int   length = 0;
+            int   decimal = 0;
 
-    if (hb_parinfo(1))
-    {
-        res = ( PGresult * ) hb_parptr(1);
-
-        if (PQresultStatus(res) == PGRES_TUPLES_OK)
-        {
-            nFields = PQnfields(res);
-
-            hb_arrayNew( &aNew, 0 );
-
-            for (i=0; i < nFields; i++ )
+            switch( type_oid )
             {
-                char    buf[256];
-                Oid     type_oid = PQftype( res, i );
-                int     typemod = PQfmod( res, i );
-                int     length = 0;
-                int     decimal = 0;
+               case BITOID:
+                  if( typemod >= 0 )
+                     length = ( int ) typemod;
+                  strcpy( buf, "bit" );
+                  break;
 
-                switch (type_oid)
-                {
-                        case BITOID:
-                                if (typemod >= 0)
-                                    length = (int) typemod;
-                                    
-                                strcpy(buf, "bit");
-                                break;
-        
-                        case BOOLOID:
-                                length = 1;
-                                strcpy(buf, "boolean");                                
-                                break;
-        
-                        case BPCHAROID:
-                                if (typemod >= 0)
-                                    length = (int) (typemod - VARHDRSZ);
-                                    
-                                strcpy(buf, "character");
-                                break;
-        
-                        case FLOAT4OID:
-                                strcpy(buf, "real");
-                                break;
-        
-                        case FLOAT8OID:
-                                strcpy(buf, "double precision");
-                                break;
-        
-                        case INT2OID:
-                                strcpy(buf, "smallint");
-                                break;
-        
-                        case INT4OID:
-                                strcpy(buf, "integer");
-                                break;
+               case BOOLOID:
+                  length = 1;
+                  strcpy( buf, "boolean" );
+                  break;
 
-                        case OIDOID:
-                                strcpy(buf, "bigint");
-                                break;
-        
-                        case INT8OID:
-                                strcpy(buf, "bigint");
-                                break;
-        
-                        case NUMERICOID:
-                                length = ((typemod - VARHDRSZ) >> 16) & 0xffff;
-                                decimal = (typemod - VARHDRSZ) & 0xffff;
-                                strcpy(buf, "numeric");
-                                break;
-                
-                        case DATEOID:
-                                strcpy(buf, "date");
-                                break;
-        
-                        case TIMEOID:
-                        case TIMETZOID:
-                                strcpy(buf, "timezone");
-                                break;
-                                        
-                        case TIMESTAMPOID:
-                        case TIMESTAMPTZOID:
-                                strcpy(buf, "timestamp");
-                                break;
-        
-                        case VARBITOID:
-                                if (typemod >= 0)
-                                        length = (int) typemod;
-                                        
-                                strcpy(buf, "bit varying");
-                                break;
-        
-                        case VARCHAROID:
-                                if (typemod >= 0)
-                                        length = (int) (typemod - VARHDRSZ);
-                                
-                                strcpy(buf, "character varying");
-                                break;
+               case BPCHAROID:
+                  if( typemod >= 0 )
+                     length = ( int ) ( typemod - VARHDRSZ );
+                  strcpy( buf, "character" );
+                  break;
 
-                        case TEXTOID:
-                                strcpy(buf, "text");
-                                break;
+               case FLOAT4OID:
+                  strcpy( buf, "real" );
+                  break;
 
-                        case CASHOID:
-                                strcpy(buf, "money");
-                                break;
-                                            
-                        default:
-                                strcpy(buf, "not supported");
-                                break;                                
-                }
-                
-                hb_arrayNew( &aTemp, 6 );
-                
-                hb_itemPutC( &temp, PQfname( res, i ) );
-                hb_arraySetForward( &aTemp, 1, &temp );
-                
-                hb_itemPutC( &temp, buf );
-                hb_arraySetForward( &aTemp, 2, &temp);
+               case FLOAT8OID:
+                  strcpy( buf, "double precision" );
+                  break;
 
-                hb_itemPutNI( &temp, length );
-                hb_arraySetForward( &aTemp, 3, &temp);
+               case INT2OID:
+                  strcpy( buf, "smallint" );
+                  break;
 
-                hb_itemPutNI( &temp, decimal );
-                hb_arraySetForward( &aTemp, 4, &temp);
+               case INT4OID:
+                  strcpy( buf, "integer" );
+                  break;
 
-                hb_itemPutNL( &temp, PQftable( res, i ) );
-                hb_arraySetForward( &aTemp, 5, &temp);
+               case OIDOID:
+                  strcpy( buf, "bigint" );
+                  break;
 
-                hb_itemPutNI( &temp, PQftablecol( res, i ) );
-                hb_arraySetForward( &aTemp, 6, &temp);
+               case INT8OID:
+                  strcpy( buf, "bigint" );
+                  break;
 
-                hb_arrayAddForward(&aNew, &aTemp);
+               case NUMERICOID:
+                  length = ( ( typemod - VARHDRSZ ) >> 16 ) & 0xffff;
+                  decimal = ( typemod - VARHDRSZ ) & 0xffff;
+                  strcpy( buf, "numeric" );
+                  break;
+
+               case DATEOID:
+                  strcpy( buf, "date" );
+                  break;
+
+               case TIMEOID:
+               case TIMETZOID:
+                  strcpy( buf, "timezone" );
+                  break;
+
+               case TIMESTAMPOID:
+               case TIMESTAMPTZOID:
+                  strcpy( buf, "timestamp" );
+                  break;
+
+               case VARBITOID:
+                  if( typemod >= 0 )
+                     length = (int) typemod;
+                  strcpy( buf, "bit varying" );
+                  break;
+
+               case VARCHAROID:
+                  if( typemod >= 0 )
+                     length = ( int ) ( typemod - VARHDRSZ );
+                  strcpy( buf, "character varying" );
+                  break;
+
+               case TEXTOID:
+                  strcpy(buf, "text");
+                  break;
+
+               case CASHOID:
+                  strcpy( buf, "money" );
+                  break;
+
+               default:
+                 strcpy( buf, "not supported" );
+                 break;
             }
 
-            hb_itemForwardValue( hb_stackReturnItem(), &aNew);
-        }
-    }
+            pField = hb_arrayGetItemPtr( pResult, i + 1 );
+            hb_arrayNew ( pField, 6 );
+            hb_itemPutC ( hb_arrayGetItemPtr( pField, 1 ), PQfname( res, i ) );
+            hb_itemPutC ( hb_arrayGetItemPtr( pField, 2 ), buf );
+            hb_itemPutNI( hb_arrayGetItemPtr( pField, 3 ), length );
+            hb_itemPutNI( hb_arrayGetItemPtr( pField, 4 ), decimal );
+            hb_itemPutNL( hb_arrayGetItemPtr( pField, 5 ), PQftable( res, i ) );
+            hb_itemPutNI( hb_arrayGetItemPtr( pField, 6 ), PQftablecol( res, i ) );
+         }
+         hb_itemRelease( hb_itemReturnForward( pResult ) );
+      }
+   }
+}
+
+HB_FUNC( PQRESULT2ARRAY )
+{
+   PGresult *res;
+   if( hb_parinfo( 1 ) )
+   {
+      res = ( PGresult * ) hb_parptr( 1 );
+      if( PQresultStatus( res ) == PGRES_TUPLES_OK )
+      {
+         int nRows = PQntuples(res), nRow;
+         int nCols = PQnfields( res ), nCol;
+         PHB_ITEM pResult = hb_itemArrayNew( nRows ), pRow;
+
+         for( nRow = 0; nRow < nRows ; nRow++ )
+         {  
+            pRow = hb_arrayGetItemPtr( pResult, nRow + 1 );
+            hb_arrayNew ( pRow, nCols );
+            for( nCol = 0; nCol < nCols ; nCol++ )
+            {
+               hb_arraySetC( pRow, nCol + 1, PQgetvalue(res, nRow, nCol) );
+            }
+         }
+         hb_itemRelease( hb_itemReturnForward( pResult ) );
+      }
+   }
 }
 
 HB_FUNC(PQTRANSACTIONSTATUS)
@@ -539,30 +535,30 @@ HB_FUNC(PQESCAPESTRING)
 }
 
 
-HB_FUNC(PQESCAPEBYTEA)
+HB_FUNC(PQESCAPEBYTEA) /* deprecated */
 {
-    char *from;
-    char *to;
+    unsigned const char *from;
+    unsigned char *to;
     size_t from_length;
     size_t to_length;
         
-    from = hb_parcx(1);
-    from_length = strlen(from);
-    to_length = strlen(from) * 5 + 1;
+    from = ( BYTE * ) hb_parc(1);
+    from_length = hb_parclen(1);
+    to_length = from_length * 5 + 1;
     
     to = PQescapeBytea(from, from_length, &to_length);
-    hb_retc(to);
+    hb_retc( ( char * ) to );
     PQfreemem(to);
 }
 
 
 HB_FUNC(PQUNESCAPEBYTEA)
 {
-    char *from;
+    unsigned char *from;
     size_t to_length;        
     
-    from = PQunescapeBytea(hb_parcx(1), &to_length);
-    hb_retclen(from, to_length);
+    from = PQunescapeBytea(( BYTE * ) hb_parcx(1), &to_length);
+    hb_retclen( ( char * ) from, to_length);
     PQfreemem(from);
 }
 
@@ -843,6 +839,22 @@ HB_FUNC(PQFREECANCEL)
     if (hb_parinfo(1))
         PQfreeCancel( ( PGcancel * ) hb_parptr(1) ) ;
 }        
+
+HB_FUNC(PQESCAPEBYTEACONN) 
+{
+    unsigned const char *from;
+    unsigned char *to;
+    size_t from_length;
+    size_t to_length;
+        
+    from = ( BYTE * ) hb_parc(2);
+    from_length = hb_parclen(2);
+    to_length = from_length * 5 + 1;
+    
+    to = PQescapeByteaConn(( PGconn * ) hb_parptr(1), from, from_length, &to_length);
+    hb_retc( ( char * ) to );
+    PQfreemem(to);
+}
 
 #endif
 

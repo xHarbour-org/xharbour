@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5994 2008/03/26 14:04:45 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5995 2008/03/26 14:11:50 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-26 20:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * contrib\pgsql\TPostgres.prg
+    * synched with harbour.
+      changed SetSchema() method to set ::lError if schema does not exist.
+
+  * contrib\pgsql\postgres.c
+    * synched with harbour. 
+
+  * contrib\pgsql\make_pc.bat
+  * contrib\pgsql\makefile.pc
+    * revision to PG 8.3.x release.
+
+  - contrib\pgsql\pocc.mak
+  - contrib\pgsql\readmepc.txt
+  + contrib\pgsql\pellesc\pocc825.mak
+  + contrib\pgsql\pellesc\pocc831.mak
+  + contrib\pgsql\pellesc\readme.txt
+
+  * source\rtl\tbrowse.prg
+    ! fixed footers draw bug.
+
+  * utils\hbmake\hbmake.prg
+    + added schannel.lib on the pelles lib list to build applications that
+      use libhbpg.lib and Posgresql 8.3.x.
 
 2008-03-26 17:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/hbgtcore.c

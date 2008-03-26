@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.192 2008/03/04 00:45:43 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.193 2008/03/13 10:49:42 likewolf Exp $
  */
 
 /*
@@ -928,12 +928,8 @@ METHOD Configure( nMode ) CLASS TBrowse
 
 
    if nMode < 2 .or. ::lNeverDisplayed
-      // 2006/OCT/27 - E.F. Assigned new values to ::lHeaders and ::lFooters
-      //                    baded in Tbrwose:HeadSep and TBrowse:FootSep, if any.
-      //::lHeaders     := .F.
-      //::lFooters     := .F.
-      ::lHeaders     := ! EmptyStr( ::cHeadSep )
-      ::lFooters     := ! EmptyStr( ::cFootSep )
+      ::lHeaders     := .F.
+      ::lFooters     := .F.
       ::lColHeadSep  := .F.
       ::lColFootSep  := .F.
       ::lRedrawFrame := .T.
@@ -1567,7 +1563,6 @@ METHOD PageUp() CLASS TBrowse
 
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
-
 Return Self
 
 //-------------------------------------------------------------------//
@@ -2091,8 +2086,6 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    LOCAL lDrawFootSep := ( ::lFootSep .OR. ::lColFootSep )
    LOCAL lDrawFooters := ::lFooters
 
-   DispBegin()
-
    nSpacePre := INT( ( nWidth - ::nColsWidth ) / 2 )
    nSpaceLast := nWidth - nSpacePre - ::nColsWidth
 
@@ -2119,6 +2112,8 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          nCol += nSpacePre
       endif
    next
+
+   DispBegin()
 
    if lDrawHeaders          // Drawing headers
       // Clear area of screen occupied by headers
@@ -2288,6 +2283,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    if lDrawFooters                // Drawing footers
       // Clear area of screen occupied by footers
       //
+
       DispBox( ::nwBottom - ::nFooterHeight + 1, ::nwLeft, ::nwBottom, ::nwRight, cBlankBox, ::cColorSpec )
 
       for n := iif( ::nFrozenCols > 0, 1, ::leftVisible ) to ::rightVisible
@@ -2300,6 +2296,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
                            ::aColsInfo[ n, TBCI_WIDTH ], .F., ;
                            hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,::aColsInfo[ n, TBCI_OBJ ]:DefColor)[ TBC_CLR_FOOTING ] - 1 ) ) )
       next
+
    endif
 
    DispEnd()
@@ -2619,16 +2616,16 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
          /* 2007/DEC/14 - E.F. Assign rows skipped here. */
          //::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
          nSkipped := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) )
+
       endif
 
       /* 2007/DEC/31 - EF - Store rows to go back after goBottom movement */
       if nSkipped > 0 .and. nSkipped >= ( ::RowCount - 1 ) .and.;
-         ::nRecsToSkip >= (::RowCount-1 )
+         ::nRecsToSkip >= (::RowCount-1 ) .and. ::nRowPos = 1
 
          nToSkip := -(nSkipped)
 
       endif
-
       nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip + nToSkip )
 
       // I've tried to move past top or bottom margin

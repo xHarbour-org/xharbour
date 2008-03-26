@@ -6,14 +6,14 @@ HB_INCLUDE = $(HB_DIR)\include
 PG_INCLUDE = $(PG_DIR)\src
 
 BIN_DIR = $(HB_DIR)\bin
-OBJ_DIR = $(HB_DIR)\obj\pocc
-LIB_DIR = $(HB_DIR)\lib\pocc
+OBJ_DIR = obj\pc
+LIB_DIR = $(HB_DIR)\lib\pc
 
 INCLUDE_FLAGS = /I"$(HB_INCLUDE)" /I"$(PG_INCLUDE)\include" /I"$(PG_INCLUDE)\interfaces\libpq"
 DEFINE_FLAGS  = /D"HB_OS_WIN_32_USED"
 C_FLAGS       = /Ze /Zx /Go /Ot /Tx86-coff
 C_CMD         = $(CC_DIR)\bin\pocc.exe $(C_FLAGS) $(INCLUDE_FLAGS) $(DEFINE_FLAGS) 
-H_FLAGS       = -i$(HB_INCLUDE) -q0 -a -w -es2 -gc0 -n 
+H_FLAGS       = -i$(HB_INCLUDE) -q0 -a -w2 -es2 -gc0 -n 
 H_CMD         = $(BIN_DIR)\harbour.exe
 
 OBJ_LIST = \
@@ -23,7 +23,6 @@ OBJ_LIST = \
 PG_LIB = $(LIB_DIR)\libhbpg.lib
 
 PROJECT : $(OBJ_LIST) \
-          $(HBPG_LIB) \
           $(PG_LIB)
 
 $(OBJ_DIR)\TPostgres.c    : TPostgres.prg

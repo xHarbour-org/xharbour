@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.187 2007/11/01 12:33:32 lculik Exp $
+ * $Id: hbmake.prg,v 1.188 2008/03/13 10:49:44 likewolf Exp $
  */
 
 /*
@@ -54,10 +54,12 @@
   * added suport to OS Unix
   *
   */
+
 #include "fileio.ch"
 #include "common.ch"
 #include "radios.ch"
 #include "inkey.ch"
+
 
 //#include "wvtgui.ch"
 
@@ -3092,7 +3094,7 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib" + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib schannel.lib" + CRLF )
 
    ELSEIF s_lGcc
 

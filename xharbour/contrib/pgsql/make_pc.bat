@@ -3,37 +3,45 @@
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
-rem Change paths below in accordance with your need.
+rem Change paths below in accordance with your needs.
 
-if %HB_DIR%.==. set HB_DIR=C:\xHarbCVS
-if %CC_DIR%.==. set CC_DIR=C:\PellesC
-if %PG_DIR%.==. set PG_DIR=C:\PostgreSQL-8.2.5
 
 :BUILD
 
-   pomake /f makefile.pc %1 %2 %3 > make_pc.log
+   if not exist obj md obj
+   if not exist obj\pc md obj\pc
+   if not exist %HB_DIR%\lib\pc md %HB_DIR%\lib\pc
+
+   if %HB_DIR%.==. SET HB_DIR=.\..\..
+   if %CC_DIR%.==. SET CC_DIR=C:\PellesC
+   if %PG_DIR%.==. SET PG_DIR=C:\postgresql-8.3.1
+
+   pomake /f makefile.pc /p > make_pc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
 
-   copy ..\..\lib\pocc\libhbpg.lib ..\..\lib\*.* > nul
+   copy %HB_DIR%\lib\pc\libhbpg.lib %HB_DIR%\lib\*.* > nul
    goto EXIT
 
 :BUILD_ERR
 
-   notepad make_pc.log
+   edit make_pc.log
    goto EXIT
 
 :CLEAN
 
-   if exist ..\..\lib\libhbpg.lib         del ..\..\lib\libhbpg.lib
-   if exist ..\..\lib\pocc\libhbpg.lib    del ..\..\lib\pocc\libhbpg.lib
-   if exist ..\..\obj\pocc\postgres.obj   del ..\..\obj\pocc\postgres.obj
-   if exist ..\..\obj\pocc\TPostgres.c    del ..\..\obj\pocc\TPostgres.c
-   if exist ..\..\obj\pocc\TPostgres.obj  del ..\..\obj\pocc\TPostgres.obj
-   goto EXIT
+   if exist %HB_DIR%\lib\libhbpg.lib      del %HB_DIR%\lib\libhbpg.lib
+   if exist %HB_DIR%\lib\pc\libhbpg.lib   del %HB_DIR%\lib\pc\libhbpg.lib
+   if exist obj\pc\*.c                    del obj\pc\*.c
+   if exist obj\pc\*.obj                  del obj\pc\*.obj
+   goto EXIT2
 
 :EXIT
 
-set PG_DIR=
+SET HB_DIR=
+SET CC_DIR=
+SET PG_DIR=
+
+:EXIT2
 
