@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c 8236 2008-01-26 05:29:20Z vszakats $
+ * $Id: gtos2.c,v 1.27 2008/03/20 08:46:05 mauriliolongo Exp $
  */
 
 /*
@@ -136,13 +136,14 @@ static int  s_iCursorStyle;
 
 /* buffer for single screen line */
 static int     s_iLineBufSize = 0;
-static USHORT * s_sLineBuf;
+static USHORT * s_sLineBuf = NULL;
 
-/* pointer to offscreen video buffer */
+/* 21/03/2008 - not needed anymore
+// pointer to offscreen video buffer
 static ULONG s_ulLVBptr;
-/* length of video buffer */
+// length of video buffer
 static USHORT s_usLVBlength;
-
+*/
 
 /* Code page ID of active codepage at the time harbour program was start */
 static USHORT s_usOldCodePage;
@@ -496,7 +497,7 @@ static void hb_gt_os2_SetCursorStyle( int iStyle )
 
 static void hb_gt_os2_GetScreenContents( PHB_GT pGT )
 {
-   BYTE Cell[2];
+   USHORT Cell;
    int iRow, iCol;
    USHORT usSize;
 
@@ -504,11 +505,13 @@ static void hb_gt_os2_GetScreenContents( PHB_GT pGT )
 
    for( iRow = 0; iRow < s_vi.row; ++iRow )
    {
+      usSize = s_vi.col << 1;
+      VioReadCellStr( ( PCH ) s_sLineBuf, &usSize, iRow, 0, 0 );
+
       for( iCol = 0; iCol < s_vi.col; ++iCol )
       {
-         usSize = 2;
-         VioReadCellStr( ( PBYTE ) Cell, &usSize, iRow, iCol, 0 );
-         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, Cell[ 1 ], 0, Cell[ 0 ] );
+         Cell = s_sLineBuf[ iCol ];
+         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( Cell & 0xFF00 ) >> 8, 0, Cell & 0x00FF );
       }
    }
    HB_GTSELF_COLDAREA( pGT, 0, 0, s_vi.row, s_vi.col );
@@ -530,9 +533,11 @@ static void hb_gt_os2_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_os2_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
 
-   s_vi.cb = sizeof( VIOMODEINFO );
-   VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
 
+   s_vi.cb = sizeof( VIOMODEINFO );
+   VioGetMode( &s_vi, 0 );        // fill structure with current video mode settings
+
+   /* 21/03/2008 - not needed anymore
    if( VioGetBuf( &s_ulLVBptr, &s_usLVBlength, 0 ) == NO_ERROR )
    {
       s_ulLVBptr = ( ULONG ) SELTOFLAT( s_ulLVBptr );
@@ -542,6 +547,7 @@ static void hb_gt_os2_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    {
       s_ulLVBptr = ( ULONG ) NULL;
    }
+   */
 
    /* Alloc tileable memory for calling a 16 subsystem */
    s_hk = ( PHKBD ) hb_gt_os2_allocMem( sizeof( HKBD ) );
@@ -923,3 +929,4 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
    static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
    #pragma data_seg()
 #endif
+
