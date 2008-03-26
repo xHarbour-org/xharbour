@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.665 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: hvm.c,v 1.666 2008/03/24 23:23:15 ronpinkas Exp $
  */
 
 /*
@@ -1089,7 +1089,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
    BOOL bDynCode = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
 
 #ifndef HB_GUI
-   static UINT uiPolls = 1;
+   static USHORT uiPolls = 1;
 #endif
 
 #ifndef HB_NO_PROFILER

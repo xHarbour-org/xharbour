@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5992 2008/03/24 23:23:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5993 2008/03/26 09:39:49 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-26 14:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/vm/hvm.c
+     ! fixed a long-standing bug in Alt-C handling, thanks Przemyslaw for
+       your help, uiPolls has to be a USHORT not a UINT or else hvm
+       tests for pressed keys every 4 billion opcodes.
 
 2008-03-26 10:40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/gtos2/gtos2.c
