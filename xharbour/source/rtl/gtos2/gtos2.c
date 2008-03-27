@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.27 2008/03/20 08:46:05 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.28 2008/03/26 09:39:50 mauriliolongo Exp $
  */
 
 /*
@@ -139,9 +139,9 @@ static int     s_iLineBufSize = 0;
 static USHORT * s_sLineBuf = NULL;
 
 /* 21/03/2008 - not needed anymore
-// pointer to offscreen video buffer
+   pointer to offscreen video buffer
 static ULONG s_ulLVBptr;
-// length of video buffer
+   length of video buffer
 static USHORT s_usLVBlength;
 */
 
@@ -535,7 +535,7 @@ static void hb_gt_os2_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 
 
    s_vi.cb = sizeof( VIOMODEINFO );
-   VioGetMode( &s_vi, 0 );        // fill structure with current video mode settings
+   VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
 
    /* 21/03/2008 - not needed anymore
    if( VioGetBuf( &s_ulLVBptr, &s_usLVBlength, 0 ) == NO_ERROR )

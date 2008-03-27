@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5995 2008/03/26 14:11:50 likewolf Exp $
+ * $Id: ChangeLog,v 1.5996 2008/03/26 23:33:20 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2008-03-27 10:11 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/gtos2/gtos2.c
+     * removed comments prefixed with //
+
 2008-03-26 20:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * contrib\pgsql\TPostgres.prg
     * synched with harbour.
       changed SetSchema() method to set ::lError if schema does not exist.
 
   * contrib\pgsql\postgres.c
-    * synched with harbour. 
+    * synched with harbour.
 
   * contrib\pgsql\make_pc.bat
   * contrib\pgsql\makefile.pc
