@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.667 2008/03/26 14:04:47 mauriliolongo Exp $
+ * $Id: hvm.c,v 1.668 2008/03/27 10:26:44 likewolf Exp $
  */
 
 /*
@@ -139,7 +139,7 @@
 
 PHB_FUNC pHVMFuncService = NULL;
 
-static void hb_vmClassError( const UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf );
+static void hb_vmClassError( UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf );
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -182,10 +182,10 @@ static void    hb_vmBitShiftRight( void );    /* performs the bit right shift on
 
 /* Array */
 static void    hb_vmArrayPush( void );       /* pushes an array element to the stack, removing the array and the index from the stack */
-static void    hb_vmArrayPushRef( void );
+static void    hb_vmArrayPushRef( void );    /* pushes a reference to an array element to the stack, removing the array and the index from the stack */
 static void    hb_vmArrayPop( HB_PCODE pcode );      /* pops a value from the stack */
 static void    hb_vmArrayDim( USHORT uiDimensions ); /* generates an uiDimensions Array and initialize those dimensions from the stack values */
-static void    hb_vmArrayGen( const ULONG ulElements ); /* generates an ulElements Array and fills it from the stack values */
+static void    hb_vmArrayGen( ULONG ulElements ); /* generates an ulElements Array and fills it from the stack values */
 static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
 
 /* Object */
@@ -197,7 +197,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workare
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
 
 /* Hash */
-static void    hb_vmHashGen( const ULONG ulPairs ); /* generates an ulElements Hash and fills it from the stack values */
+static void    hb_vmHashGen( ULONG ulPairs ); /* generates an ulElements Hash and fills it from the stack values */
 
 /* Execution */
 static HARBOUR hb_vmDoBlock( void );             /* executes a codeblock */
@@ -226,7 +226,7 @@ static void    hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode 
 static void    hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode ); /* creates a codeblock */
 static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* Pushes a double constant (pcode) */
 static void    hb_vmPushMacroBlock( BYTE * pCode );   /* creates a macro-compiled codeblock */
-static void    hb_vmPushLocal( const SHORT iLocal );  /* pushes the containts of a local onto the stack */
+static void    hb_vmPushLocal( SHORT iLocal );     /* pushes the content of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );   /* pushes a local by refrence onto the stack */
 static void    hb_vmPushHBLong( HB_LONG lNumber ); /* pushes a HB_LONG number onto the stack */
 #if !defined( HB_LONG_LONG_OFF )
@@ -342,7 +342,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
   static int s_iBackground = 0;
 #endif
 
-HB_EXPORT void hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
+HB_EXPORT void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -352,7 +352,7 @@ HB_EXPORT void hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
    s_InitFunctions = pLst;
 }
 
-HB_EXPORT void hb_vmAtExit( const HB_INIT_FUNC pFunc, void * cargo )
+HB_EXPORT void hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -391,7 +391,7 @@ static void hb_vmDoModuleFunctions( PHB_FUNC_LIST pFunctions )
    }
 }
 
-static BYTE * hb_vmUnhideString( const BYTE uiType, ULONG ulSize, const BYTE * pSource, const ULONG ulBufferSize )
+static BYTE * hb_vmUnhideString( BYTE uiType, ULONG ulSize, const BYTE * pSource, ULONG ulBufferSize )
 {
    BYTE * pBuffer = ( BYTE * ) hb_xgrab( HB_MAX( ulSize, 1 ) );
 
@@ -576,13 +576,6 @@ HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
    HB_VM_STACK.iExtraElementsIndex = 0;
    HB_VM_STACK.iExtraElements = 0;
    HB_VM_STACK.iExtraIndex = 0;
-#endif
-
-#if defined(HB_OS_WIN_32)
-   if( hb_dynsymFind( "HB_NOMOUSE" ) )
-   {
-      b_MouseEnable = FALSE;
-   }
 #endif
 
    s_aGlobals.type = HB_IT_NIL;
@@ -6552,7 +6545,7 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    hb_itemForwardValue( hb_stackAllocItem(), &itArray );
 }
 
-static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
+static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -6589,7 +6582,7 @@ static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements A
    }
 }
 
-static void hb_vmHashGen( const ULONG ulPairs ) /* generates an ulPairs Hash and fills it from the stack values */
+static void hb_vmHashGen( ULONG ulPairs ) /* generates an ulPairs Hash and fills it from the stack values */
 {
    HB_THREAD_STUB
 
@@ -7037,7 +7030,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 /* JC1: I need this error display routine to be used also by hash pseudo class
    operators, so I put it here
 */
-static void hb_vmClassError( const UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf )
+static void hb_vmClassError( UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf )
 {
    char sDesc[128] = { '\0' };
    PHB_ITEM pArgsArray;
@@ -8070,7 +8063,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
       // VARPARAMS(...) - UNSWAP to restore original stack.
       if( params == HB_VAR_PARAM_FLAG && locals && arguments )
       {
-         const int iLocals = locals, iArguments = arguments;
+         int iLocals = locals, iArguments = arguments;
          PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
 
          #ifdef DEBUG_DIVERT
@@ -8244,7 +8237,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
          {
             if( locals && arguments )
             {
-               const int iLocals = locals, iArguments = arguments;
+               int iLocals = locals, iArguments = arguments;
                PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
 
                #ifdef DEBUG_DIVERT
@@ -8279,7 +8272,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
          {
             if( pBase->item.asSymbol.locals && pBase->item.asSymbol.arguments )
             {
-               const int iLocals = pBase->item.asSymbol.locals, iArguments = pBase->item.asSymbol.arguments;
+               int iLocals = pBase->item.asSymbol.locals, iArguments = pBase->item.asSymbol.arguments;
                PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
 
                #ifdef DEBUG_DIVERT
@@ -9042,7 +9035,7 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
    hb_vmPushAliasedField( pSym );
 }
 
-static void hb_vmPushLocal( const SHORT iLocal )
+static void hb_vmPushLocal( SHORT iLocal )
 {
    HB_THREAD_STUB
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.117 2008/03/16 19:16:03 likewolf Exp $
+ * $Id: gtwin.c,v 1.118 2008/03/20 00:01:05 ronpinkas Exp $
  */
 
 /*
@@ -672,6 +672,11 @@ static void hb_gt_win_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 
    /* Add Ctrl+Break handler [vszakats] */
    SetConsoleCtrlHandler( hb_gt_win_CtrlHandler, TRUE );
+
+   if( hb_dynsymFind( "HB_NOMOUSE" ) )
+   {
+      b_MouseEnable = FALSE;
+   }
 
 #ifndef HB_NO_ALLOC_CONSOLE
    /*
