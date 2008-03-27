@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.33 2007/05/25 07:18:34 enricomaria Exp $
+ * $Id: eval.c,v 1.34 2007/06/04 20:55:02 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@
 #include "hbvm.h"
 #include "classes.h"
 
-BOOL HB_EXPORT hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalNew(%p, %p)", pEvalInfo, pItem));
 
@@ -108,7 +108,7 @@ BOOL HB_EXPORT hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
          all, don't release the eval parameter Items explicitly to make both
          Harbour and CA-Clipper happy. [vszakats] */
 
-BOOL HB_EXPORT hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalPutParam(%p, %p)", pEvalInfo, pItem));
 
@@ -122,7 +122,7 @@ BOOL HB_EXPORT hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
    return FALSE;
 }
 
-PHB_ITEM HB_EXPORT hb_evalLaunch( PEVALINFO pEvalInfo )
+HB_EXPORT PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 {
    HB_THREAD_STUB
 
@@ -176,7 +176,7 @@ PHB_ITEM HB_EXPORT hb_evalLaunch( PEVALINFO pEvalInfo )
          once and only once before calling hb_evalRelease(). Harbour doesn't
          have these requirements. [vszakats] */
 
-BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
+HB_EXPORT BOOL hb_evalRelease( PEVALINFO pEvalInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalRelease(%p)", pEvalInfo));
 
@@ -206,7 +206,7 @@ BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
          [vszakats]
 */
 
-PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
+HB_EXPORT PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -308,7 +308,7 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
 */
-PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
+HB_EXPORT PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -357,7 +357,7 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDoC(), but has additional second parameter
          which set the reference mask for 1-st 32/64 parametes [druzus]
 */
-PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+HB_EXPORT PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 

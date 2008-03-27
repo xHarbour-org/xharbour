@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.11 2005/10/24 01:04:35 druzus Exp $
+ * $Id: trim.c,v 1.12 2007/04/20 09:41:31 marchuet Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ HB_EXPORT char * hb_strLTrim( const char * szText, ULONG * ulLen )
 }
 
 /* return length of szText ignoring trailing white space (or true spaces) */
-ULONG HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace )
+HB_EXPORT ULONG hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strRTrimLen(%s, %lu. %d)", szText, ulLen, (int) bAnySpace));
 

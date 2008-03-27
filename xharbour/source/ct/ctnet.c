@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.8 2007/03/26 21:40:59 modalsist Exp $
+ * $Id: ctnet.c,v 1.9 2007/09/22 05:41:01 andijahja Exp $
  *
  * xHarbour Project source code:
  * NET..() functions to PC-LAN/MS-NET.
@@ -131,17 +131,6 @@ BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction)
             return FALSE; 
         } 
  
-/*
-extern PHB_ITEM HB_EXPORT hb_errRT_New(
-   USHORT uiSeverity,
-   char * szSubSystem,
-   ULONG  ulGenCode,
-   ULONG  ulSubCode,
-   char * szDescription,
-   char * szOperation,
-   USHORT uiOsCode,
-   USHORT uiFlags );
-*/
         pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, szDescription, szProvider, (USHORT) dwLastError, EF_NONE ); 
         hb_errLaunch( pError );
         hb_itemRelease( pError );

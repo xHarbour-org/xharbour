@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.52 2007/04/08 07:20:57 ronpinkas Exp $
+ * $Id: hash.c,v 1.53 2008/01/20 23:21:36 likewolf Exp $
  */
 
 /*
@@ -346,7 +346,7 @@ static void hb_calcTotalLenght( PHB_BASEHASH pBase )
 * CORE api
 ******************************************************/
 
-PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
+HB_EXPORT PHB_ITEM hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
 {
    PHB_BASEHASH pBaseHash;
    ULONG ulPosLoop;
@@ -394,7 +394,7 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
    return pItem;
 }
 
-BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+HB_EXPORT BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 {
    ULONG ulLen, ulPosLoop;
    PHB_ITEM pPos, pPos1;
@@ -754,7 +754,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
 
 //WARNING: DOES NOT WORK WITH PAGED HASHES
 
-BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+HB_EXPORT BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 {
    ULONG ulLen, ulPosLoop;
    PHB_ITEM pPos, pPos1;
@@ -938,7 +938,7 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
+HB_EXPORT BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
 {
    ULONG ulPos, ulTotal, ulElem;
    PHB_BASEHASH pBase;
@@ -986,7 +986,7 @@ BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
    return bRet;
 }
 
-BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
+HB_EXPORT BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 {
    ULONG ulLen, ulPosLoop;
 
@@ -1190,7 +1190,7 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 }
 
 
-BOOL HB_EXPORT hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1237,7 +1237,7 @@ BOOL HB_EXPORT hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1285,7 +1285,7 @@ BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem 
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1334,7 +1334,7 @@ BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
+HB_EXPORT BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1384,7 +1384,7 @@ BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem
    return FALSE;
 }
 
-void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
+HB_EXPORT void hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
 {
    ULONG ulLen, ulAlloc, ulPosLoop;
    PHB_BASEHASH pBaseHash;
@@ -1473,7 +1473,7 @@ void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
    }
 }
 
-PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
+HB_EXPORT PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
 {
    PHB_BASEHASH pSrcBase, pDestBase;
    PHB_ITEM pKey, pVal;
@@ -1536,7 +1536,7 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
 }
 
 
-void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
+HB_EXPORT void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
 {
    int mode = 0;
    ULONG ulElem;
@@ -1729,7 +1729,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
    }
 }
 
-BOOL HB_EXPORT hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent )
+HB_EXPORT BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent )
 {
    if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->uiLevel == 0 && hb_hashLen( pHash ) == 0 )
    {
@@ -1832,7 +1832,7 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 }
 
 
-BOOL HB_EXPORT hb_hashRelease( PHB_ITEM pHash )
+HB_EXPORT BOOL hb_hashRelease( PHB_ITEM pHash )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_hashRelease(%p) %p", pHash, pHash->item.asHash.value ) );
 
@@ -1913,7 +1913,7 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
    hb_gcFree( ( void * ) pBaseHash );
 }
 
-PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
+HB_EXPORT PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
 {
    PHB_ITEM pK, pArr;
    ULONG ulPosLoop, ulLen;
@@ -1959,7 +1959,7 @@ PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
    return pKeys;
 }
 
-PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
+HB_EXPORT PHB_ITEM hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
 {
    PHB_ITEM pV, pArr;
    ULONG ulPosLoop, ulLen;
@@ -2005,7 +2005,7 @@ PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
    return pVals;
 }
 
-PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
+HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
 {
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
    PHB_ITEM pElement;
@@ -2044,7 +2044,7 @@ PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
 }
 
 
-PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
+HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
 {
 
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
@@ -2780,7 +2780,7 @@ HB_FUNC( HMERGE )
 /**********************************************************
 * Setup and set options
 ***********************************************************/
-void HB_EXPORT hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
+HB_EXPORT void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
 {
    PHB_BASEHASH pBase = pHash->item.asHash.value;
 
@@ -3044,7 +3044,7 @@ HB_FUNC( HAAGETREALPOS )
 HB_EXTERN_BEGIN
 
 #undef hb_hashAAGetRealPos
-ULONG HB_EXPORT hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
+HB_EXPORT ULONG hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
 {
    if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->pAccessAA &&
        ulPos && ulPos <= hb_hashLen( pHash ) )
@@ -3055,7 +3055,7 @@ ULONG HB_EXPORT hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
 }
 
 #undef hb_hashLen
-ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash )
+HB_EXPORT ULONG hb_hashLen( PHB_ITEM pHash )
 {
    ULONG ulLen = 0;
    HB_TRACE(HB_TR_DEBUG, ("hb_hashLen(%p)", pHash));
@@ -3069,7 +3069,7 @@ ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash )
 }
 
 #undef hb_hashGetCompatibility
-BOOL HB_EXPORT hb_hashGetCompatibility( PHB_ITEM pHash )
+HB_EXPORT BOOL hb_hashGetCompatibility( PHB_ITEM pHash )
 {
    if( pHash && HB_IS_HASH( pHash ) )
    {

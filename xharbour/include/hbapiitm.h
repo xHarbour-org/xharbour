@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.49 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbapiitm.h,v 1.50 2008/01/20 23:21:36 likewolf Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ extern HB_EXPORT BOOL       hb_evalRelease  ( PEVALINFO pEvalInfo );
 
 extern HB_EXPORT PHB_ITEM   hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
 extern HB_EXPORT PHB_ITEM   hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
-extern PHB_ITEM  HB_EXPORT  hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... );
+extern HB_EXPORT PHB_ITEM   hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... );
 
 extern HB_EXPORT PHB_ITEM   hb_itemArrayGet ( PHB_ITEM pArray, ULONG ulIndex );
 extern HB_EXPORT PHB_ITEM   hb_itemArrayNew ( ULONG ulLen );
@@ -111,8 +111,8 @@ extern HB_EXPORT PHB_ITEM   hb_itemParam    ( USHORT uiParam );
    extern HB_EXPORT HB_ITEM hb_itemParamStack   ( USHORT uiParam ) ;
 #endif
 
-extern PHB_ITEM  HB_EXPORT  hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime );
-extern PHB_ITEM  HB_EXPORT  hb_itemPutDate( PHB_ITEM pItem, LONG lDate );
+extern HB_EXPORT PHB_ITEM   hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime );
+extern HB_EXPORT PHB_ITEM   hb_itemPutDate( PHB_ITEM pItem, LONG lDate );
 extern HB_EXPORT PHB_ITEM   hb_itemPutC       ( PHB_ITEM pItem, const char * szText );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRaw    ( PHB_ITEM pItem, char * szText, ULONG ulLen );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5996 2008/03/26 23:33:20 modalsist Exp $
+ * $Id: ChangeLog,v 1.5997 2008/03/27 09:14:17 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-03-27 13:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * source/common/hbarch.c
+  * source/common/hbdate.c
+  * source/common/hbgete.c
+  * source/ct/ctnet.c
+  * source/rtl/at.c
+  * source/rtl/datec.c
+  * source/rtl/direct.c
+  * source/rtl/filesys.c
+  * source/rtl/fserror.c
+  * source/rtl/fstemp.c
+  * source/rtl/hbchksum.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/hbcrc32.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbserv.c
+  * source/rtl/langapi.c
+  * source/rtl/math.c
+  * source/rtl/trim.c
+  * source/vm/cmdarg.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/eval.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hash.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/macro.c
+  * source/vm/maindll.c
+  * source/vm/maindllh.c
+  * source/vm/maindllp.c
+  * source/vm/mainstd.c
+    * HB_EXPORT usage standardization.
+  * source/ct/bit1.c
+  * source/ct/bit2.c
+  * source/ct/bit3.c
+  * source/ct/intneg.c
+    * Removed extraneous declarations.
 
 2008-03-27 10:11 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/gtos2/gtos2.c

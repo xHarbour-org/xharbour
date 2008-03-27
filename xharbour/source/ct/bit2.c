@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.3 2006/09/23 18:32:16 ptsarenko Exp $
+ * $Id: bit2.c,v 1.4 2006/11/20 19:00:49 ptsarenko Exp $
  */
 
 /*
@@ -54,8 +54,6 @@
 
 
 #include "ct.h"
-
-extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
 static LONG __getparam( int iParam );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.80 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.81 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ extern PHB_ITEM hb_vm_BreakBlock;
 
 HB_FUNC_EXTERN( ERRORNEW );
 
-PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName );
+HB_EXPORT PHB_ITEM hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName );
 
 /* NOTE: This is called via its symbol name, so we should make sure
          that it gets linked. WARNING ! DON'T make this function static.
@@ -182,7 +182,7 @@ PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
 /* set new low-level error launcher (C function) and return
  * handler currently active
  */
-HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
+HB_EXPORT HB_ERROR_INFO_PTR hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
 {
    HB_THREAD_STUB
 
@@ -210,7 +210,7 @@ HB_FUNC( DOSERROR )
          s_uiErrorDOS = ( USHORT ) hb_parni( 1 );
 }
 
-void HB_EXPORT hb_errInit( void )
+HB_EXPORT void hb_errInit( void )
 {
    HB_THREAD_STUB
 
@@ -232,7 +232,7 @@ void HB_EXPORT hb_errInit( void )
    #endif
 }
 
-void HB_EXPORT hb_errExit( void )
+HB_EXPORT void hb_errExit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errExit()"));
 
@@ -244,7 +244,7 @@ void HB_EXPORT hb_errExit( void )
    #endif
 }
 
-PHB_ITEM HB_EXPORT hb_errNew( void )
+HB_EXPORT PHB_ITEM hb_errNew( void )
 {
    HB_THREAD_STUB
 
@@ -283,7 +283,7 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    return pError;
 }
 
-USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errLaunch( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -480,7 +480,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 /* NOTE: The item pointer returned should be hb_itemRelease()-d by the
          caller if it was not NULL. [vszakats] */
 
-PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
+HB_EXPORT PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -626,7 +626,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    return pResult;
 }
 
-char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
+HB_EXPORT char * hb_errGetDescription( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -639,7 +639,7 @@ char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
    return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, const char * szDescription )
+HB_EXPORT PHB_ITEM hb_errPutDescription( PHB_ITEM pError, const char * szDescription )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutDescription(%p, %s)", pError, szDescription));
 
@@ -655,7 +655,7 @@ PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, const char * szDescrip
    return pError;
 }
 
-char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
+HB_EXPORT char * hb_errGetFileName( PHB_ITEM pError )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetFileName(%p)", pError));
@@ -667,7 +667,7 @@ char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
    return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, const char * szFileName )
+HB_EXPORT PHB_ITEM hb_errPutFileName( PHB_ITEM pError, const char * szFileName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutFileName(%p, %s)", pError, szFileName));
 
@@ -688,7 +688,7 @@ PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, const char * szFileName )
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetGenCode( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetGenCode( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -701,7 +701,7 @@ USHORT HB_EXPORT hb_errGetGenCode( PHB_ITEM pError )
    return hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutGenCode( PHB_ITEM pError, USHORT uiGenCode )
+HB_EXPORT PHB_ITEM hb_errPutGenCode( PHB_ITEM pError, USHORT uiGenCode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutGenCode(%p, %hu)", pError, uiGenCode));
 
@@ -713,7 +713,7 @@ PHB_ITEM HB_EXPORT hb_errPutGenCode( PHB_ITEM pError, USHORT uiGenCode )
    return pError;
 }
 
-char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
+HB_EXPORT char * hb_errGetOperation( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -726,7 +726,7 @@ char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
    return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, const char * szOperation )
+HB_EXPORT PHB_ITEM hb_errPutOperation( PHB_ITEM pError, const char * szOperation )
 {
    HB_THREAD_STUB
 
@@ -746,7 +746,7 @@ PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, const char * szOperation
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetOsCode( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetOsCode( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -759,7 +759,7 @@ USHORT HB_EXPORT hb_errGetOsCode( PHB_ITEM pError )
    return hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutOsCode( PHB_ITEM pError, USHORT uiOsCode )
+HB_EXPORT PHB_ITEM hb_errPutOsCode( PHB_ITEM pError, USHORT uiOsCode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutOsCode(%p, %hu)", pError, uiOsCode));
 
@@ -771,7 +771,7 @@ PHB_ITEM HB_EXPORT hb_errPutOsCode( PHB_ITEM pError, USHORT uiOsCode )
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetSeverity( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetSeverity( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -784,7 +784,7 @@ USHORT HB_EXPORT hb_errGetSeverity( PHB_ITEM pError )
    return hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutSeverity( PHB_ITEM pError, USHORT uiSeverity )
+HB_EXPORT PHB_ITEM hb_errPutSeverity( PHB_ITEM pError, USHORT uiSeverity )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutSeverity(%p, %hu)", pError, uiSeverity));
 
@@ -796,7 +796,7 @@ PHB_ITEM HB_EXPORT hb_errPutSeverity( PHB_ITEM pError, USHORT uiSeverity )
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetSubCode( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetSubCode( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -809,7 +809,7 @@ USHORT HB_EXPORT hb_errGetSubCode( PHB_ITEM pError )
    return hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutSubCode( PHB_ITEM pError, USHORT uiSubCode )
+HB_EXPORT PHB_ITEM hb_errPutSubCode( PHB_ITEM pError, USHORT uiSubCode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutSubCode(%p, %hu)", pError, uiSubCode));
 
@@ -821,7 +821,7 @@ PHB_ITEM HB_EXPORT hb_errPutSubCode( PHB_ITEM pError, USHORT uiSubCode )
    return pError;
 }
 
-char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
+HB_EXPORT char * hb_errGetSubSystem( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -834,7 +834,7 @@ char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
    return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, const char * szSubSystem )
+HB_EXPORT PHB_ITEM hb_errPutSubSystem( PHB_ITEM pError, const char * szSubSystem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutSubSytem(%p, %s)", pError, szSubSystem));
 
@@ -846,7 +846,7 @@ PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, const char * szSubSystem
    return pError;
 }
 
-char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
+HB_EXPORT char * hb_errGetProcName( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -859,7 +859,7 @@ char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
    return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutProcName( PHB_ITEM pError, const char * szProcName )
+HB_EXPORT PHB_ITEM hb_errPutProcName( PHB_ITEM pError, const char * szProcName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutProcName(%p, %s)", pError, szProcName));
 
@@ -885,7 +885,7 @@ USHORT hb_errGetProcLine( PHB_ITEM pError )
    return (USHORT) hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutProcLine( PHB_ITEM pError, USHORT uiLine )
+HB_EXPORT PHB_ITEM hb_errPutProcLine( PHB_ITEM pError, USHORT uiLine )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutProcLINE(%p, %d)", pError, uiLine));
 
@@ -912,7 +912,7 @@ HB_THREAD_T hb_errGetThreadId( PHB_ITEM pError )
    return (HB_THREAD_T) hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutThreadId( PHB_ITEM pError, HB_THREAD_T thId)
+HB_EXPORT PHB_ITEM hb_errPutThreadId( PHB_ITEM pError, HB_THREAD_T thId)
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutThreadId(%p, %X)", pError, (int)thId));
 
@@ -938,7 +938,7 @@ UINT hb_errGetRunningThreads( PHB_ITEM pError )
    return (UINT) hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutRunningThreads( PHB_ITEM pError, UINT uiCount )
+HB_EXPORT PHB_ITEM hb_errPutRunningThreads( PHB_ITEM pError, UINT uiCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutRunningThreads(%p, %d)", pError, uiCount));
 
@@ -963,7 +963,7 @@ UINT hb_errGetVmThreadId( PHB_ITEM pError )
    return (UINT) hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutVmThreadId( PHB_ITEM pError, UINT uiThid )
+HB_EXPORT PHB_ITEM hb_errPutVmThreadId( PHB_ITEM pError, UINT uiThid )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutVmThreadId(%p, %d)", pError, uiThid));
 
@@ -977,7 +977,7 @@ PHB_ITEM HB_EXPORT hb_errPutVmThreadId( PHB_ITEM pError, UINT uiThid )
 
 #endif
 
-PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName )
+HB_EXPORT PHB_ITEM hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutModuleName(%p, %s)", pError, szModuleName));
 
@@ -989,7 +989,7 @@ PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, const char * szModuleNa
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetTries( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetTries( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -1002,7 +1002,7 @@ USHORT HB_EXPORT hb_errGetTries( PHB_ITEM pError )
    return hb_itemGetNI( &(HB_VM_STACK.Return) );
 }
 
-PHB_ITEM HB_EXPORT hb_errPutTries( PHB_ITEM pError, USHORT uiTries )
+HB_EXPORT PHB_ITEM hb_errPutTries( PHB_ITEM pError, USHORT uiTries )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutTries(%p, %hu)", pError, uiTries));
 
@@ -1014,7 +1014,7 @@ PHB_ITEM HB_EXPORT hb_errPutTries( PHB_ITEM pError, USHORT uiTries )
    return pError;
 }
 
-USHORT HB_EXPORT hb_errGetFlags( PHB_ITEM pError )
+HB_EXPORT USHORT hb_errGetFlags( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
@@ -1052,7 +1052,7 @@ USHORT HB_EXPORT hb_errGetFlags( PHB_ITEM pError )
    return uiFlags;
 }
 
-PHB_ITEM HB_EXPORT hb_errPutFlags( PHB_ITEM pError, USHORT uiFlags )
+HB_EXPORT PHB_ITEM hb_errPutFlags( PHB_ITEM pError, USHORT uiFlags )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutFlags(%p, %hu)", pError, uiFlags));
 
@@ -1074,7 +1074,7 @@ PHB_ITEM HB_EXPORT hb_errPutFlags( PHB_ITEM pError, USHORT uiFlags )
    return pError;
 }
 
-PHB_ITEM HB_EXPORT hb_errPutArgs( PHB_ITEM pError, ULONG ulArgCount, ... )
+HB_EXPORT PHB_ITEM hb_errPutArgs( PHB_ITEM pError, ULONG ulArgCount, ... )
 {
    PHB_ITEM pArray;
    ULONG ulArgPos;
@@ -1113,7 +1113,7 @@ PHB_ITEM HB_EXPORT hb_errPutArgs( PHB_ITEM pError, ULONG ulArgCount, ... )
 
 /* Wrappers for hb_errLaunch() */
 
-PHB_ITEM HB_EXPORT hb_errRT_New(
+HB_EXPORT PHB_ITEM hb_errRT_New(
    USHORT uiSeverity,
    const char * szSubSystem,
    ULONG  ulGenCode,
@@ -1159,7 +1159,7 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    return pError;
 }
 
-PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
+HB_EXPORT PHB_ITEM hb_errRT_New_Subst(
    USHORT uiSeverity,
    const char * szSubSystem,
    ULONG  ulGenCode,
@@ -1232,7 +1232,7 @@ HB_FUNC( __ERRRT_SBASE )
                          hb_param( 6, HB_IT_ANY ) );
 }
 
-USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
+HB_EXPORT USHORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
 
@@ -1301,7 +1301,7 @@ USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * s
    return uiAction;
 }
 
-USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... )
+HB_EXPORT USHORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
 
@@ -1369,7 +1369,7 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const cha
    return uiAction;
 }
 
-PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
+HB_EXPORT PHB_ITEM hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
 
@@ -1440,7 +1440,7 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const 
    return pRetVal;
 }
 
-PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
+HB_EXPORT PHB_ITEM hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
 {
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
@@ -1469,7 +1469,7 @@ PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCod
    return pRetVal;
 }
 
-void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
+HB_EXPORT void hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
 
@@ -1540,7 +1540,7 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const cha
    }
 }
 
-USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOSCode, USHORT uiFlags )
+HB_EXPORT USHORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOSCode, USHORT uiFlags )
 {
    USHORT uiAction;
    PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TERMINAL, ulGenCode, ulSubCode, szDescription, szOperation, uiOSCode, uiFlags );
@@ -1552,7 +1552,7 @@ USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, const char * s
    return uiAction;
 }
 
-USHORT HB_EXPORT hb_errRT_DBCMD_Ext( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags )
+HB_EXPORT USHORT hb_errRT_DBCMD_Ext( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags )
 {
    USHORT uiAction;
    PHB_ITEM pError;
@@ -1566,7 +1566,7 @@ USHORT HB_EXPORT hb_errRT_DBCMD_Ext( ULONG ulGenCode, ULONG ulSubCode, const cha
    return uiAction;
 }
 
-USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
+HB_EXPORT USHORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
 {
    USHORT uiAction;
    USHORT uiFlags;
@@ -1586,7 +1586,7 @@ USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, const char * 
    return uiAction;
 }
 
-USHORT HB_EXPORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
+HB_EXPORT USHORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
 {
    USHORT uiAction;
    PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
@@ -1602,7 +1602,7 @@ USHORT HB_EXPORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, const char * 
 /* NOTE: Use as minimal calls from here, as possible.
          Don't allocate memory from this function. [vszakats] */
 
-void HB_EXPORT hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
+HB_EXPORT void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
 {
    char title[64], buffer[ 1024 ];
    FILE *fpError;
@@ -1670,7 +1670,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, const char * szText, const char 
    exit( EXIT_FAILURE );
 }
 
-void HB_EXPORT hb_errRelease( PHB_ITEM pError )
+HB_EXPORT void hb_errRelease( PHB_ITEM pError )
 {
    hb_itemRelease( pError );
 }

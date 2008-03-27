@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbcrc32.c,v 1.7 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: hbcrc32.c,v 1.8 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ const ULONG * get_crc_table()
 #define DO8(buf)  DO4(buf); DO4(buf);
 
 /* ========================================================================= */
-ULONG HB_EXPORT crc32( ULONG crc, const BYTE *buf, UINT len){
+HB_EXPORT ULONG crc32( ULONG crc, const BYTE *buf, UINT len){
     if (buf == Z_NULL) return 0L;
 #ifdef DYNAMIC_CRC_TABLE
     if (crc_table_empty)

@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.7 2005/02/26 20:42:01 andijahja Exp $
+ * $Id: maindll.c,v 1.8 2005/02/27 21:28:25 andijahja Exp $
  */
 
 /*
@@ -62,12 +62,12 @@
 
 #if defined(HB_OS_WIN_32)
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
-BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
 #else
-BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
@@ -91,7 +91,7 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
    return TRUE;
 }
 
-LONG HB_EXPORT PASCAL HBDLLENTRY( char * cProcName )
+HB_EXPORT LONG PASCAL HBDLLENTRY( char * cProcName )
 {
    hb_itemDoC( cProcName, 0, 0 );
 

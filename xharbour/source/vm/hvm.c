@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.666 2008/03/24 23:23:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.667 2008/03/26 14:04:47 mauriliolongo Exp $
  */
 
 /*
@@ -342,7 +342,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
   static int s_iBackground = 0;
 #endif
 
-void HB_EXPORT hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
+HB_EXPORT void hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -352,7 +352,7 @@ void HB_EXPORT hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
    s_InitFunctions = pLst;
 }
 
-void HB_EXPORT hb_vmAtExit( const HB_INIT_FUNC pFunc, void * cargo )
+HB_EXPORT void hb_vmAtExit( const HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -524,7 +524,7 @@ void hb_vmSymbolResolveDeferred( void )
 }
 
 /* application entry point */
-void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
+HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
 {
 #ifndef HB_THREAD_SUPPORT
    register UINT uiCounter;
@@ -1073,7 +1073,7 @@ HB_EXPORT int hb_vmQuit( void )
    return s_iErrorLevel;
 }
 
-void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
+HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 {
    HB_THREAD_STUB
 
@@ -10334,7 +10334,7 @@ HB_FUNC( ERRORLEVEL )
    }
 }
 
-void HB_EXPORT hb_vmRequestQuit( void )
+HB_EXPORT void hb_vmRequestQuit( void )
 {
    HB_THREAD_STUB
 
@@ -10343,7 +10343,7 @@ void HB_EXPORT hb_vmRequestQuit( void )
    hb_stackSetActionRequest( HB_QUIT_REQUESTED );
 }
 
-void HB_EXPORT hb_vmRequestEndProc( void )
+HB_EXPORT void hb_vmRequestEndProc( void )
 {
    HB_THREAD_STUB
 
@@ -10352,7 +10352,7 @@ void HB_EXPORT hb_vmRequestEndProc( void )
    hb_stackSetActionRequest( HB_ENDPROC_REQUESTED );
 }
 
-void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
+HB_EXPORT void hb_vmRequestBreak( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
@@ -10393,7 +10393,7 @@ void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
    hb_stackSetActionRequest( HB_BREAK_REQUESTED );
 }
 
-void HB_EXPORT hb_vmRequestCancel( void )
+HB_EXPORT void hb_vmRequestCancel( void )
 {
    HB_THREAD_STUB
 
@@ -10431,7 +10431,7 @@ void HB_EXPORT hb_vmRequestCancel( void )
    }
 }
 
-USHORT HB_EXPORT hb_vmRequestQuery( void )
+HB_EXPORT USHORT hb_vmRequestQuery( void )
 {
    HB_THREAD_STUB
 
@@ -10475,7 +10475,7 @@ void hb_vmRequestRestore( void )
    hb_stackPopReturn();
 }
 
-void HB_EXPORT hb_vmRequestReset( void )
+HB_EXPORT void hb_vmRequestReset( void )
 {
    HB_THREAD_STUB
 
@@ -10484,7 +10484,7 @@ void HB_EXPORT hb_vmRequestReset( void )
    hb_stackSetActionRequest( 0 );
 }
 
-void HB_EXPORT hb_vmRequest( USHORT uiRequest )
+HB_EXPORT void hb_vmRequest( USHORT uiRequest )
 {
    HB_THREAD_STUB
 
@@ -10564,7 +10564,7 @@ void hb_vmIsStaticRef( void )
    hb_gcItemRef( &s_aStatics );
 }
 
-void HB_EXPORT hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
+HB_EXPORT void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
 {
    HB_THREAD_STUB
 
@@ -10974,7 +10974,7 @@ HB_FUNC( HB_VMMODE )
 
 #ifdef HB_FORCE_LINK_MAIN
 HB_EXTERN_BEGIN
-extern void HB_EXPORT HB_FORCE_LINK_MAIN( void );
+extern HB_EXPORT void HB_FORCE_LINK_MAIN( void );
 HB_EXTERN_END
 void _hb_forceLinkMain()
 {

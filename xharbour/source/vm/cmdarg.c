@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.24 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.25 2007/09/22 05:41:01 andijahja Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, i
 
 #endif
 
-void HB_EXPORT hb_cmdargInit( int argc, char * argv[] )
+HB_EXPORT void hb_cmdargInit( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_cmdargInit(%d, %p)", argc, argv));
 

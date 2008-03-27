@@ -1,5 +1,5 @@
 /*
- * $Id: bit3.c,v 1.2 2006/09/23 21:02:59 ptsarenko Exp $
+ * $Id: bit3.c,v 1.2 2006/09/23 18:32:16 ptsarenko Exp $
  */
 
 /*
@@ -62,8 +62,6 @@
 typedef BOOL * BOOLP;
 typedef LONG * LONGP;
 typedef USHORT * USHORTP;
-
-extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
 static LONG __getparam( int iParam );
 static LONG __numand( LONG wNum1, LONG wNum2 );

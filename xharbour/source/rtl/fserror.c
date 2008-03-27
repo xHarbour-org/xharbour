@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.10 2004/08/13 11:11:58 alexstrickland Exp $
+ * $Id: fserror.c,v 1.11 2005/03/30 21:30:50 andijahja Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static int hb_WinToDosError( ULONG ulError )
 #endif
 
 /* return DOS error code of last operation */
-USHORT HB_EXPORT hb_fsError( void )
+HB_EXPORT USHORT hb_fsError( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));

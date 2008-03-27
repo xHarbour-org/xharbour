@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.169 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: filesys.c,v 1.170 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -882,7 +882,7 @@ On success, a valid FHandle is returned, and FError returns
 zero. On error, -1 is returned and FError() returns nonzero.
 */
 
-FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
+HB_EXPORT FHANDLE hb_fsOpenProcess( char *pFilename,
       FHANDLE *fhStdin,
       FHANDLE *fhStdout,
       FHANDLE *fhStderr,
@@ -1445,7 +1445,7 @@ ret_close_1:
    this does not apply to Windows.
 */
 
-int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
+HB_EXPORT int hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 {
    HB_THREAD_STUB
    int iRetStatus;
@@ -1575,7 +1575,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
    Retiurn
 */
 
-BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
+HB_EXPORT BOOL hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
 {
    BOOL bRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
@@ -2327,7 +2327,7 @@ HB_EXPORT ULONG hb_fsWriteLarge( FHANDLE hFileHandle, const BYTE * pBuff, ULONG 
    return ulWritten;
 }
 
-void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
+HB_EXPORT void    hb_fsCommit( FHANDLE hFileHandle )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", hFileHandle));
@@ -2409,7 +2409,7 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
    HB_STACK_LOCK
 }
 
-BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
+HB_EXPORT BOOL    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
                                 ULONG ulLength, USHORT uiMode )
 {
    HB_THREAD_STUB
@@ -2629,7 +2629,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    return bResult;
 }
 
-BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
+HB_EXPORT BOOL hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                                HB_FOFFSET ulLength, USHORT uiMode )
 {
    BOOL bResult;
@@ -2867,7 +2867,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    return ulPos;
 }
 
-HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT uiFlags )
+HB_EXPORT HB_FOFFSET hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT uiFlags )
 {
    HB_FOFFSET llPos;
 
@@ -2988,7 +2988,7 @@ ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
    return ulPos;
 }
 
-BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
+HB_EXPORT BOOL hb_fsDelete( BYTE * pFilename )
 {
    HB_THREAD_STUB
    BOOL bResult;
@@ -3208,7 +3208,7 @@ HB_EXPORT BOOL hb_fsRmDir( BYTE * pDirname )
 /* NOTE: This is not thread safe function, it's there for compatibility. */
 /* NOTE: 0 = A, 1 = B, 2 = C, etc. */
 
-BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
+HB_EXPORT BYTE * hb_fsCurDir( USHORT uiDrive )
 {
    static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
 
@@ -3222,7 +3222,7 @@ BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
 /* NOTE: Thread safe version of hb_fsCurDir() */
 /* NOTE: 0 = A, 1 = B, 2 = C, etc. */
 
-USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+HB_EXPORT USHORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
    HB_THREAD_STUB
    BOOL fResult;
@@ -3311,7 +3311,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 /* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
 
-USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
+HB_EXPORT USHORT  hb_fsChDrv( BYTE nDrive )
 {
 #if defined(OS_HAS_DRIVE_LETTER)
    HB_THREAD_STUB
@@ -3369,7 +3369,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
           the drive before checking. hb_fsIsDrv only returns TRUE
           if there is a disk in the drive. */
 
-USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
+HB_EXPORT USHORT  hb_fsIsDrv( BYTE nDrive )
 {
 #if defined(OS_HAS_DRIVE_LETTER)
    HB_THREAD_STUB
@@ -3638,7 +3638,7 @@ HB_EXPORT FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    return hFile;
 }
 
-BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
+HB_EXPORT BOOL hb_fsEof( FHANDLE hFileHandle )
 {
 #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(OS_UNIX_COMPATIBLE)
    HB_THREAD_STUB
@@ -3676,7 +3676,7 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 #endif
 }
 
-BYTE HB_EXPORT * hb_fsCurDirEx( USHORT uiDrive )
+HB_EXPORT BYTE * hb_fsCurDirEx( USHORT uiDrive )
 {
    static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
 
@@ -3687,7 +3687,7 @@ BYTE HB_EXPORT * hb_fsCurDirEx( USHORT uiDrive )
    return ( BYTE * ) s_byDirBuffer;
 }
 
-USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+HB_EXPORT USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
 #if defined(HB_OS_WIN_32)
    HB_THREAD_STUB
@@ -3883,7 +3883,7 @@ HB_EXPORT BYTE * hb_fileNameConv( char * szFileName )
    return ( BYTE * ) szFileName;
 }
 
-BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet )
+HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet )
 {
    BOOL fRetVal = s_fUseWaitLocks;
 

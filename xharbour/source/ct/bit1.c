@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.2 2006/09/23 18:32:16 ptsarenko Exp $
+ * $Id: bit1.c,v 1.3 2006/10/18 16:39:49 ptsarenko Exp $
  */
 
 /*
@@ -60,8 +60,6 @@
 #include "ct.h"
 
 typedef BOOL * BOOLP;
-
-extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
 static LONG __getparam( int iParam );
 static LONG __numand( LONG wNum1, LONG wNum2 );

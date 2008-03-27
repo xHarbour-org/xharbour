@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.11 2005/03/17 08:41:53 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.12 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -254,7 +254,7 @@ static void * hb_xgrabz( ULONG ulSize )
 #define Len  dl.len
 
 /* ========================================================================= */
-int HB_EXPORT deflateInit2_( z_streamp strm, int level, int method, int windowBits, int memLevel, int strategy,
+HB_EXPORT int deflateInit2_( z_streamp strm, int level, int method, int windowBits, int memLevel, int strategy,
 		  const char * version, int stream_size)
 {
     deflate_state *s;
@@ -329,7 +329,7 @@ int HB_EXPORT deflateInit2_( z_streamp strm, int level, int method, int windowBi
     return deflateReset(strm);
 }
 
-int HB_EXPORT deflateInit_( z_streamp strm, int level, const char *version, int stream_size)
+HB_EXPORT int deflateInit_( z_streamp strm, int level, const char *version, int stream_size)
 {
     return deflateInit2_(strm, level, Z_DEFLATED, MAX_WBITS, DEF_MEM_LEVEL,
 			 Z_DEFAULT_STRATEGY, version, stream_size);
@@ -348,7 +348,7 @@ int HB_EXPORT deflateInit_( z_streamp strm, int level, const char *version, int 
    memory, Z_BUF_ERROR if there was not enough room in the output buffer,
    Z_STREAM_ERROR if the level parameter is invalid.
 */
-int HB_EXPORT compress ( Bytef * dest, uLongf *destLen, const Bytef * source, uLong sourceLen, int level)
+HB_EXPORT int compress ( Bytef * dest, uLongf *destLen, const Bytef * source, uLong sourceLen, int level)
 {
     z_stream stream;
     int err;
@@ -507,7 +507,7 @@ local const config configuration_table[10] = {
 /* ========================================================================= */
 
 /* ========================================================================= */
-int HB_EXPORT deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary,  UINT dictLength)
+HB_EXPORT int deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary,  UINT dictLength)
 {
     deflate_state *s;
     uInt length = dictLength;
@@ -544,7 +544,7 @@ int HB_EXPORT deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary, 
 }
 
 /* ========================================================================= */
-int HB_EXPORT deflateReset ( z_streamp strm)
+HB_EXPORT int deflateReset ( z_streamp strm)
 {
    deflate_state *s;
 
@@ -576,7 +576,7 @@ int HB_EXPORT deflateReset ( z_streamp strm)
 }
 
 /* ========================================================================= */
-int HB_EXPORT deflateParams( z_streamp strm, int level, int strategy)
+HB_EXPORT int deflateParams( z_streamp strm, int level, int strategy)
 {
    deflate_state *s;
    compress_func func;
@@ -654,7 +654,7 @@ local void flush_pending( z_streamp strm)
 }
 
 /* ========================================================================= */
-int HB_EXPORT deflate ( z_streamp strm, int flush)
+HB_EXPORT int deflate ( z_streamp strm, int flush)
 {
     int old_flush; /* value of flush param for previous deflate call */
     deflate_state *s;
@@ -785,7 +785,7 @@ int HB_EXPORT deflate ( z_streamp strm, int flush)
 }
 
 /* ========================================================================= */
-int HB_EXPORT deflateEnd ( z_streamp strm )
+HB_EXPORT int deflateEnd ( z_streamp strm )
 {
     int status;
 
@@ -817,7 +817,7 @@ int HB_EXPORT deflateEnd ( z_streamp strm )
  * To simplify the source, this is not supported for 16-bit MSDOS (which
  * doesn't have enough memory anyway to duplicate compression states).
  */
-int HB_EXPORT deflateCopy (z_streamp dest, z_streamp source )
+HB_EXPORT int deflateCopy (z_streamp dest, z_streamp source )
 {
 #ifdef MAXSEG_64K
     return Z_STREAM_ERROR;
@@ -2355,7 +2355,7 @@ local void copy_block(
 }
 
 
-int HB_EXPORT inflateInit2_(
+HB_EXPORT int inflateInit2_(
 z_streamp z,
 int w,
 const char *version,
@@ -2405,7 +2405,7 @@ int stream_size)
 }
 
 
-int HB_EXPORT inflateInit_(
+HB_EXPORT int inflateInit_(
 z_streamp z,
 const char *version,
 int stream_size)
@@ -2428,7 +2428,7 @@ int stream_size)
    enough memory, Z_BUF_ERROR if there was not enough room in the output
    buffer, or Z_DATA_ERROR if the input data was corrupted.
 */
-int HB_EXPORT uncompress (
+HB_EXPORT int uncompress (
     Bytef *dest,
     uLongf *destLen,
     const Bytef *source,
@@ -2466,7 +2466,7 @@ int HB_EXPORT uncompress (
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-int HB_EXPORT inflateReset( z_streamp z )
+HB_EXPORT int inflateReset( z_streamp z )
 {
   if (z == NULL || z->inf_state == NULL)
     return Z_STREAM_ERROR;
@@ -2478,7 +2478,7 @@ int HB_EXPORT inflateReset( z_streamp z )
 }
 
 
-int HB_EXPORT inflateEnd( z_streamp z )
+HB_EXPORT int inflateEnd( z_streamp z )
 {
   if (z == NULL || z->inf_state == NULL )
     return Z_STREAM_ERROR;
@@ -2490,7 +2490,7 @@ int HB_EXPORT inflateEnd( z_streamp z )
 }
 
 
-int HB_EXPORT inflate(
+HB_EXPORT int inflate(
 z_streamp z,
 int f)
 {
@@ -2616,7 +2616,7 @@ int f)
 }
 
 
-int HB_EXPORT inflateSetDictionary(
+HB_EXPORT int inflateSetDictionary(
 z_streamp z,
 const Bytef *dictionary,
 uInt  dictLength)

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.55 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.56 2008/03/24 12:43:42 likewolf Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ HB_SYM_HOLDER, * PHB_SYM_HOLDER;
 
 static PHB_SYM_HOLDER s_pAllocSyms = NULL;
 
-void HB_EXPORT hb_dynsymLog( void )
+HB_EXPORT void hb_dynsymLog( void )
 {
    // HB_THREAD_STUB
    register UINT uiPos;
@@ -110,7 +110,7 @@ void HB_EXPORT hb_dynsymLog( void )
    hb_dynsymUnlock();
 }
 
-PHB_SYMB HB_EXPORT hb_symbolNew( const char * szName )      /* Create a new symbol */
+HB_EXPORT PHB_SYMB hb_symbolNew( const char * szName )      /* Create a new symbol */
 {
    PHB_SYM_HOLDER pHolder;
    UINT iLen;
@@ -131,7 +131,7 @@ PHB_SYMB HB_EXPORT hb_symbolNew( const char * szName )      /* Create a new symb
    return &pHolder->symbol;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates a new dynamic symbol */
+HB_EXPORT PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates a new dynamic symbol */
 {
    HB_THREAD_STUB
    PHB_DYNS pDynSym;
@@ -317,7 +317,7 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a s
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGetCase( const char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+HB_EXPORT PHB_DYNS hb_dynsymGetCase( const char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
@@ -345,7 +345,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( const char * szName )  /* finds and creates
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGetCaseWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+HB_EXPORT PHB_DYNS hb_dynsymGetCaseWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE SENSITIVE! */
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
@@ -373,7 +373,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCaseWithNamespaces( const char * szName, const ch
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGetWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE INSENSITIVE! */
+HB_EXPORT PHB_DYNS hb_dynsymGetWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE INSENSITIVE! */
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
@@ -401,7 +401,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetWithNamespaces( const char * szName, const char *
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol */
+HB_EXPORT PHB_DYNS hb_dynsymFindName( const char * szName )  /* finds a symbol */
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
 
@@ -429,7 +429,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol *
 }
 
 
-PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
+HB_EXPORT PHB_DYNS hb_dynsymFind( const char * szName )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
@@ -694,7 +694,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
    return NULL;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymFindWithNamespaces( const char * szName, const char *pNamespaces )
+HB_EXPORT PHB_DYNS hb_dynsymFindWithNamespaces( const char * szName, const char *pNamespaces )
 {
    if( pNamespaces )
    {
@@ -726,7 +726,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindWithNamespaces( const char * szName, const char 
 
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymFindNameWithNamespaces( const char * szName, const char *pNamespaces )
+HB_EXPORT PHB_DYNS hb_dynsymFindNameWithNamespaces( const char * szName, const char *pNamespaces )
 {
    if( pNamespaces )
    {
@@ -820,28 +820,28 @@ HB_EXPORT BOOL hb_dynsymIsFunction( PHB_DYNS pDynSym )
    return pDynSym->pSymbol->value.pFunPtr != NULL;
 }
 
-HB_HANDLE HB_EXPORT hb_dynsymMemvarHandle( PHB_DYNS pDynSym )
+HB_EXPORT HB_HANDLE hb_dynsymMemvarHandle( PHB_DYNS pDynSym )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymMemvarHandle(%p)", pDynSym));
 
    return pDynSym->hMemvar;
 }
 
-HB_HANDLE HB_EXPORT hb_dynsymAreaHandle( PHB_DYNS pDynSym )
+HB_EXPORT HB_HANDLE hb_dynsymAreaHandle( PHB_DYNS pDynSym )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymAreaHandle(%p)", pDynSym));
 
    return pDynSym->hArea;
 }
 
-void HB_EXPORT hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, const int iArea )
+HB_EXPORT void hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, const int iArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymSetAreaHandle(%p,%d)", pDynSym, iArea));
 
    pDynSym->hArea = (HB_HANDLE) iArea;
 }
 
-UINT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
+HB_EXPORT UINT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
    register UINT uiPos;
    BOOL bCont = TRUE;
@@ -861,7 +861,7 @@ UINT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 }
 
 /* JC1: this is called at VM termination, no need to lock */
-void HB_EXPORT hb_dynsymRelease( void )
+HB_EXPORT void hb_dynsymRelease( void )
 {
    register UINT uiPos;
    PHB_SYM_HOLDER pHolder;
@@ -886,7 +886,7 @@ void HB_EXPORT hb_dynsymRelease( void )
 
 
 // NOT TESTED YET!!!
-PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
+HB_EXPORT PHB_DYNS hb_dynsymPos( USHORT uiPos )
 {
    PHB_DYNS ret = NULL;
 
@@ -1010,7 +1010,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 /* JC1: Reentrant functions */
 #ifdef HB_THREAD_SUPPORT
 
-PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PHB_DYNS pDest )
+HB_EXPORT PHB_DYNS hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PHB_DYNS pDest )
 {
    PHB_DYNS pRet;
 
@@ -1031,7 +1031,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PH
 }
 
 
-PHB_DYNS HB_EXPORT hb_dynsymGet_r( const char * szName, PHB_DYNS pDest )
+HB_EXPORT PHB_DYNS hb_dynsymGet_r( const char * szName, PHB_DYNS pDest )
 {
    PHB_DYNS pRet;
 
@@ -1051,7 +1051,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGet_r( const char * szName, PHB_DYNS pDest )
    return NULL;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( const char * szName, PHB_DYNS pDest )
+HB_EXPORT PHB_DYNS hb_dynsymGetCase_r( const char * szName, PHB_DYNS pDest )
 {
    PHB_DYNS pRet;
 
@@ -1071,7 +1071,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( const char * szName, PHB_DYNS pDest )
    return NULL;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymFind_r( const char * szName, PHB_DYNS pDest )
+HB_EXPORT PHB_DYNS hb_dynsymFind_r( const char * szName, PHB_DYNS pDest )
 {
 PHB_DYNS pRet;
 
@@ -1091,7 +1091,7 @@ PHB_DYNS pRet;
    return NULL;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymFindName_r( const char * szName, PHB_DYNS pDest )
+HB_EXPORT PHB_DYNS hb_dynsymFindName_r( const char * szName, PHB_DYNS pDest )
 {
    PHB_DYNS pRet;
 

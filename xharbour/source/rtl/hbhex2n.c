@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.16 2006/10/30 18:48:36 ptsarenko Exp $
+ * $Id: hbhex2n.c,v 1.17 2007/11/20 08:53:28 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 
-HB_ULONG HB_EXPORT hb_hextonum(char *cHex)
+HB_EXPORT HB_ULONG hb_hextonum(char *cHex)
 {
    HB_ULONG   ulNum = 0;
    char       c;

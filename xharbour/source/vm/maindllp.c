@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.22 2007/12/31 14:36:45 andijahja Exp $
+ * $Id: maindllp.c,v 1.23 2008/01/03 05:43:01 andijahja Exp $
  */
 
 /*
@@ -68,12 +68,12 @@ static FARPROC pExtIsArray = NULL;
 static FARPROC hb_GetProcAddress( char* szFuncName );
 
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
-BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllMain( %p, %p, %d )", hInstance, fdwReason,
              pvReserved ) );
 #else
-BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint( %p, %p, %d )", hInstance, fdwReason,
              pvReserved ) );
@@ -256,7 +256,7 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
 }
 
 #undef hb_pcount
-int HB_EXPORT  hb_pcount( void )          /* returns the number of suplied parameters */
+HB_EXPORT int  hb_pcount( void )          /* returns the number of suplied parameters */
 {
    int iReturn;
    static FARPROC pCounts = NULL;

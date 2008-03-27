@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.78 2008/03/04 17:37:03 ronpinkas Exp $
+ * $Id: macro.c,v 1.79 2008/03/08 04:54:23 ronpinkas Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, int iLen )
  *    the 'pMacro' pointer is not released - it can be a pointer
  *    to a memory allocated on the stack.
  */
-void HB_EXPORT hb_macroDelete( HB_MACRO_PTR pMacro )
+HB_EXPORT void hb_macroDelete( HB_MACRO_PTR pMacro )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroDelete(%p)", pMacro));
 
@@ -208,7 +208,7 @@ static HB_ERROR_HANDLE( hb_macroErrorType )
  * pMacro is a pointer to HB_MACRO structure created by macro compiler
  *
  */
-void HB_EXPORT hb_macroRun( HB_MACRO_PTR pMacro )
+HB_EXPORT void hb_macroRun( HB_MACRO_PTR pMacro )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroRun(%p)", pMacro));
 
@@ -263,7 +263,7 @@ static void hb_macroSyntaxError( HB_MACRO_PTR pMacro, const char *sSource )
 
 /* Check if passed string is a valid function or variable name
  */
-BOOL HB_EXPORT hb_macroIsIdent( char * szString )
+HB_EXPORT BOOL hb_macroIsIdent( char * szString )
 {
    char * pTmp = szString;
    BOOL bIsIdent = FALSE;
@@ -322,7 +322,7 @@ BOOL HB_EXPORT hb_macroIsIdent( char * szString )
  *    PRIVATE &a&b   //this will cause syntax error '&'
  *
  */
-char HB_EXPORT * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
+HB_EXPORT char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 {
    char * szResult;
    ULONG ulResStrLen;
@@ -517,7 +517,7 @@ char HB_EXPORT * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
  * EVAL( {|| &macro} )
  *
  */
-void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
+HB_EXPORT void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroGetValue(%p)", pItem));
 
@@ -663,7 +663,7 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
  * placed on the left side of the assignment
  * POP operation
  */
-void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
+HB_EXPORT void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroSetValue(%p)", pItem));
 
@@ -711,7 +711,7 @@ void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
  *    &alias->var := any
  *    alias->&var := any
  */
-void HB_EXPORT hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+HB_EXPORT void hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroPopAliasedValue(%p, %p)", pAlias, pVar));
 
@@ -723,7 +723,7 @@ void HB_EXPORT hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BY
  *    any := &alias->var
  *    any := alias->&var
  */
-void HB_EXPORT hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+HB_EXPORT void hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroPushAliasedValue(%p, %p)", pAlias, pVar));
 
@@ -823,7 +823,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
  * new string if a valid macro text substitution was found (and sets
  * pbNewString to TRUE)
 */
-char HB_EXPORT * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString )
+HB_EXPORT char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString )
 {
    char *szResultString;
    HB_TRACE(HB_TR_DEBUG, ("hb_macroExpandString(%s)", szString));
@@ -846,7 +846,7 @@ char HB_EXPORT * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbN
  * NOTE: it can be called to implement an index key evaluation
  * use hb_macroRun() to evaluate a compiled pcode
  */
-HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
+HB_EXPORT HB_MACRO_PTR hb_macroCompile( char * szString )
 {
    HB_MACRO_PTR pMacro;
    int iStatus;
@@ -940,7 +940,7 @@ HB_FUNC( HB_MACROCOMPILE )
  * 'pItem' points to a ITEM that contains a string value which after
  *    text substitution will return a function name
  */
-void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
+HB_EXPORT void hb_macroPushSymbol( HB_ITEM_PTR pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroPushSymbol(%p)", pItem));
 
@@ -996,7 +996,7 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
  * 'pItem' points to a ITEM that contains a string value which after
  *    text substitution will be returned
  */
-void HB_EXPORT hb_macroTextValue( HB_ITEM_PTR pItem )
+HB_EXPORT void hb_macroTextValue( HB_ITEM_PTR pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroTextValue(%p)", pItem));
 
@@ -1021,7 +1021,7 @@ void HB_EXPORT hb_macroTextValue( HB_ITEM_PTR pItem )
    }
 }
 
-char HB_EXPORT * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
+HB_EXPORT char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
 {
    char * szType;
 

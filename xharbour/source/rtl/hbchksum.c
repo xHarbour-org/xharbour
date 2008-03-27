@@ -1,5 +1,5 @@
 /*
- * $Id: hbchksum.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbchksum.c,v 1.2 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -81,7 +81,7 @@
 #define DO8(buf,i)  DO4(buf,i); DO4(buf,i+4);
 #define DO16(buf)   DO8(buf,0); DO8(buf,8);
 
-ULONG HB_EXPORT adler32( ULONG adler, const BYTE *buf, UINT len)
+HB_EXPORT ULONG adler32( ULONG adler, const BYTE *buf, UINT len)
 {
    ULONG s1 = adler & 0xffff;
    ULONG s2 = (adler >> 16) & 0xffff;

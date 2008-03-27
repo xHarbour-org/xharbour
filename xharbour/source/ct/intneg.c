@@ -1,5 +1,5 @@
 /*
- * $Id: intneg.c,v 1.1 2006/11/29 22:11:31 ptsarenko Exp $
+ * $Id: intneg.c,v 1.1 2007/11/23 18:50:39 ptsarenko Exp $
  */
 
 /*
@@ -53,8 +53,6 @@
 
 #include "hbapi.h"
 #include "ct.h"
-
-extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
 HB_FUNC( INTNEG )
 {
