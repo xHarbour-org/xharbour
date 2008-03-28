@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.ch,v 1.2 2007/05/11 10:22:07 marchuet Exp $
+ * $Id: adordd.ch,v 1.3 2007/05/16 10:36:51 marchuet Exp $
  */
 
 /*
@@ -172,7 +172,20 @@
 #define adSchemaCommands 42
 #define adSchemaSets 43
 
-
+// Constant Group: Supports
+#define adAddNew         0x1000400 // Supports the AddNew method to add new records.
+#define adApproxPosition 0x4000    // Supports the AbsolutePosition and AbsolutePage properties.
+#define adBookmark       0x2000    // Supports the Bookmark property to gain access to specific records.
+#define adDelete         0x1000800 // Supports the Delete method to delete records.
+#define adFind           0x80000   // Supports the Find method to locate a row in a Recordset.
+#define adHoldRecords    0x100     // Retrieves more records or changes the next position without committing all pending changes.
+#define adIndex          0x100000  // Supports the Index property to name an index.
+#define adMovePrevious   0x200     // Supports the MoveFirst and MovePrevious methods, and Move or GetRows methods to move the current record position backward without requiring bookmarks.
+#define adNotify         0x40000   // Indicates that the underlying data provider supports notifications (which determines whether Recordset events are supported).
+#define adResync         0x20000   // Supports the Resync method to update the cursor with the data that is visible in the underlying database.
+#define adSeek           0x200000  // Supports the Seek method to locate a row in a Recordset.
+#define adUpdate         0x1008000 // Supports the Update method to modify existing data.
+#define adUpdateBatch    0x10000
 
 #command USE <(db)> [VIA <rdd>] [ALIAS <a>] [<nw: NEW>] ;
             [<ex: EXCLUSIVE>] [<sh: SHARED>] [<ro: READONLY>] ;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5998 2008/03/27 10:26:42 likewolf Exp $
+ * $Id: ChangeLog,v 1.5999 2008/03/27 15:11:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-28 11:19 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\adordd.ch
+    + Added Constant Group: Supports
+  * source\rtl\tprinter.c
+    + added SetDefaultPrinter( cPrinter ) under windows environment it works
+      at windows 95 or higher.
 
 2008-03-27 18:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbvm.h
