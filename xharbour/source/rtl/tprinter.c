@@ -339,7 +339,7 @@ BOOL hb_SetDefaultPrinter(LPTSTR pPrinterName)
       hWinSpool = LoadLibrary("winspool.drv");
       if (!hWinSpool)
         return FALSE;
-      fnSetDefaultPrinter = GetProcAddress(hWinSpool, SETDEFAULTPRINTER );
+      fnSetDefaultPrinter = ( DEFPRINTER ) GetProcAddress(hWinSpool, SETDEFAULTPRINTER );
       if (!fnSetDefaultPrinter)
       {
         FreeLibrary(hWinSpool);
