@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.13 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: files.c,v 1.14 2008/02/10 13:14:08 lculik Exp $
  */
 
 /*
@@ -992,8 +992,13 @@ HB_FUNC( SETFDATI )
          }
          if ( szDate )
          {
+#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+            new_value.tm_year = year;
+            new_value.tm_mon = month;
+#else
             new_value.tm_year = year - 1900;
             new_value.tm_mon = month - 1;
+#endif
             new_value.tm_mday = day;
          }
          if ( szTime )

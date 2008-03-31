@@ -1,10 +1,10 @@
 /*
- * $Id: fcopy.prg,v 1.2 2004/10/22 20:37:13 likewolf Exp $
+ * $Id: fcopy.prg,v 1.3 2005/12/12 14:27:58 modalsist Exp $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 FileCopy(), FileCOpen(), FileCClose(), FileAppend() functions
+ *   CT3 FileCopy(), FileCCount(), FileCOpen(), FileCClose(), FileAppend() functions
  *
  *    Program..: fcopy.prg
  *    Author...: Frederic J. Bell
@@ -16,6 +16,10 @@
  *    Compile..: /n /m /w /[/p /b /l] /es2
  *    Notes....:
  *    No copyright - released into the public domain NSA.
+ *
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *
+ *    added FILECDATI()
  *
  * www - http://www.harbour-project.org
  *
@@ -67,6 +71,7 @@
 
 Static nSrchand
 Static lStillOpen := .F.
+Static s_lSetDati := .t.
 
 /*
 * FileCopy()
@@ -110,8 +115,13 @@ Function FileCopy(cSource, cDest, lMode)
    //    endif
          fClose(nDestHand)
 
-         // Set date and time to target file as the same as source file. 
-         Setfdati( cDest, filedate(cSource) , filetime(cSource) )
+         if s_lSetDati
+           /* Set target date/time same as source date/time (default).
+              If you want change to system date/time, call filecdati(.f.)
+              before filecopy
+            */
+           Setfdati( cDest, filedate(cSource) , filetime(cSource) )
+         endif
 
     ELSE
       fClose(nSrcHand)
@@ -182,5 +192,13 @@ Enddo
 fClose(nSrcHand)
 fClose(nDesthand)
 Return(nTotBytes)
+
+/****/
+Function FileCDati( lNewMode )
+Local lOldMode := s_lSetDati
+if hb_IsLogical( lNewMode )
+   s_lSetDati := lNewMode
+endif
+Return lOldMode
 
 // eof: fcopy.prg

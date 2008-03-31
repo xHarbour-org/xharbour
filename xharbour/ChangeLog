@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6000 2008/03/28 10:23:07 marchuet Exp $
+ * $Id: ChangeLog,v 1.6001 2008/03/31 07:45:54 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-03-31 09:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\ct\fcopy.prg
+    + added FileCDati(). Borrowed from harbour.
+  * source\ct\files.c
+    ! fixed SetFDati() for Win32 platform.
 
 2008-03-31 09:46 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rtl\tprinter.c
