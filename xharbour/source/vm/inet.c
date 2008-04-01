@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.69 2007/05/21 03:35:07 ronpinkas Exp $
+* $Id: inet.c,v 1.70 2007/05/30 11:47:48 marchuet Exp $
 */
 
 /*
@@ -344,6 +344,48 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
          /* Timed out */
          else {
             HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
+         }
+
+         /* Set internal socket send buffer to 64k,
+         * this should fix the speed problems some users have reported
+         */
+         {
+            int value;
+            int len = sizeof(value);
+            if ( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len ) != SOCKET_ERROR )
+            {
+                if (value < 65536)
+                {
+                    value = 65536;
+                    if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+                    {
+                        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+                    }
+                }
+                Socket->iSndBufSize = value;
+
+                if (getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len ) != SOCKET_ERROR )
+                {
+                    if (value < 65536)
+                    {
+                        value = 65536;
+                        if ( setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+                        {
+                            getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+                        }
+                    }
+                    Socket->iRcvBufSize = value;
+                }
+                else
+                {
+                    Socket->iRcvBufSize = 1400;
+                }
+            }
+            else
+            {
+                Socket->iSndBufSize = 1400;
+                Socket->iRcvBufSize = 1400;
+            }
          }
       }
    }
@@ -753,6 +795,71 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
    }
 }
 
+HB_FUNC( INETGETSNDBUFSIZE )
+{
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
+   int value;
+   int len = sizeof( value );
+
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETSNDBUFSIZE", 1,
+         hb_paramError(1) );
+   }
+
+   getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+   hb_retni( value );
+}
+
+HB_FUNC( INETGETRCVBUFSIZE )
+{
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
+   int value;
+   int len = sizeof( value );
+
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETRCVBUFSIZE", 1,
+         hb_paramError(1) );
+   }
+
+   getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+   hb_retni( value );
+}
+
+HB_FUNC( INETSETSNDBUFSIZE )
+{
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
+   int value;
+
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETSNDBUFSIZE", 1, hb_paramError(1) );
+   }
+
+   value = hb_parni( 2 );
+   setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) );
+   hb_retni( value );
+}
+
+HB_FUNC( INETSETRCVBUFSIZE )
+{
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
+   int value;
+
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETRCVBUFSIZE", 1, hb_paramError(1) );
+   }
+
+   value = hb_parni( 2 );
+   setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) );
+   hb_retni( value );
+}
+
+
+
+
 /********************************************************************
 * TCP receive and send functions
 ***/
@@ -762,7 +869,8 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
-   int iLen, iMaxLen, iReceived, iBufferLen;
+   DWORD iMaxLen, iReceived;
+   int iLen, iBufferLen;
    int iTimeElapsed;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL || !ISBYREF( 2 ) )
@@ -793,6 +901,23 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
       }
    }
 
+   // Nedded for port mode
+   if ( Socket->iRcvBufSize == 0 )
+   {
+        int value;
+        int len = sizeof(value);
+        getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+        if (value < 65536)
+        {
+            value = 65536;
+            if (setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+            {
+                getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+            }
+        }
+        Socket->iRcvBufSize = value;
+   }
+
    Buffer = pBuffer->item.asString.value;
    iReceived = 0;
    iTimeElapsed = 0;
@@ -802,7 +927,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
       if( iMode == 1 )
       {
-         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMaxLen - iReceived ? iMaxLen - iReceived : HB_SENDRECV_BUFFER_SIZE;
+         iBufferLen = Socket->iRcvBufSize > iMaxLen - iReceived ? iMaxLen - iReceived : Socket->iRcvBufSize;
       }
       else
       {
@@ -1371,12 +1496,30 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
 
+   // Nedded for port mode
+   if ( Socket->iSndBufSize == 0 )
+   {
+        int value;
+        int len = sizeof(value);
+        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+        if (value < 65536)
+        {
+            value = 65536;
+            if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+            {
+                getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+            }
+        }
+        Socket->iSndBufSize = value;
+   }
+
+
    iLen = 0;
    while( iSent < iSend )
    {
       if ( iMode == 1 )
       {
-         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ? iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
+         iBufferLen = Socket->iSndBufSize > iSend - iSent ? iSend - iSent : Socket->iSndBufSize;
       }
       else
       {

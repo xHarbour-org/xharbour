@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6002 2008/03/31 12:09:51 modalsist Exp $
+ * $Id: ChangeLog,v 1.6003 2008/04/01 05:15:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-01 12:42 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\inet.h
+  * source\tip\client.prg
+  * source\tip\ftpcln.prg
+  * source\vm\inet.c
+    * Modified STOR method to execute GetReply at Port mode to sincronize ftp responses and
+      not STOP connection.
+    + Added dynamic buffer rcv and snd increasing by default 1400 to 64k to increase speed transfer.
+    + Added high level functions to manage buffers
+	InetGetSNDBufSize( pSocket )
+	InetGetRCVBufSize( pSocket )
+	InetSetSNDBufSize( pSocket, nBufSize )
+	InetSetRCVBufSize( pSocket, nBufSize )
+    * Corrected ftpclient to use increased buffers on transfers.
+    * With these changes the transfer speed to be increased more than 10 times. I hope that can be 
+      exploited in LETO RDD and FTP transfers, and others. It is not tested on Linux machines, perhaps 
+      requires some modification.
 
 2008-04-01 00:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * hrbdll.vc

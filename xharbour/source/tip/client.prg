@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.15 2007/06/01 19:39:05 toninhofwi Exp $
+ * $Id: client.prg,v 1.16 2007/07/13 08:53:31 marchuet Exp $
  */
 
 /*
@@ -76,10 +76,13 @@
 #include "fileio.ch"
 #include "tip.ch"
 #include "common.ch"
+
+#DEFINE RCV_BUF_SIZE Int( InetGetRcvBufSize( ::SocketCon ) / 2 )
+#DEFINE SND_BUF_SIZE Int( InetGetSndBufSize( ::SocketCon ) / 2 )
+
 /**
 * Inet Client class
 */
-
 CLASS tIPClient
 
    CLASSDATA   bInitSocks  INIT .F.
@@ -138,7 +141,7 @@ CLASS tIPClient
    METHOD InetRecvLine( SocketCon, nLen, size )
    METHOD InetRecvAll( SocketCon, cStr1, len )
    METHOD InetCount( SocketCon )
-   METHOD InetSendAll( SocketCon,  cData, nLen )
+   METHOD InetSendAll( SocketCon, cData, nLen )
    METHOD InetErrorCode(SocketCon)
    METHOD InetErrorDesc(SocketCon)
    METHOD InetConnect( cServer, nPort, SocketCon )
@@ -262,20 +265,20 @@ METHOD Read( nLen ) CLASS tIPClient
 
    IF Empty( nLen ) .or. nLen < 0
       // read till end of stream
-      cStr1 := Space( 1024 )
+      cStr1 := Space( RCV_BUF_SIZE )
       cStr0 := ""
-      ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, 1024 )
+      ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, RCV_BUF_SIZE )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
          cStr0 += Substr( cStr1, 1, ::nLastRead )
-         ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, 1024 )
+         ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, RCV_BUF_SIZE )
       ENDDO
       ::bEof := .T.
    ELSE
       // read an amount of data
       cStr0 := Space( nLen )
 
-      // S.R. if len of file is less than 1024 InetRecvAll return 0
+      // S.R. if len of file is less than RCV_BUF_SIZE InetRecvAll return 0
       //      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
 
       ::InetRecvAll( ::SocketCon, @cStr0, nLen )
@@ -316,7 +319,7 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    ::nStatus := 1
 
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
-      cData := ::Read( 1024 )
+      cData := ::Read( RCV_BUF_SIZE )
       IF cData == NIL
          IF nFout != NIL
             Fclose( nFout )
@@ -361,7 +364,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    LOCAL nFin
    LOCAL cData
    LOCAL nLen
-   LOCAL nSize, nSent
+   LOCAL nSize, nSent, nBufSize
 
    ::nWrite  := 0
    ::nStatus := 0
@@ -372,6 +375,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    nSize := FSeek( nFin, 0, 2 )
    FSeek( nFin, 0 )
 
+   nBufSize := SND_BUF_SIZE
 
    // allow initialization of the gauge
    nSent := 0
@@ -380,9 +384,8 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    ENDIF
 
    ::nStatus := 1
-   cData := Space( 1024 )
-   nLen := Fread( nFin, @cData, 1024 )
-
+   cData := Space( nBufSize )
+   nLen := Fread( nFin, @cData, nBufSize )
    DO WHILE nLen > 0
       IF ::Write( @cData, nLen ) != nLen
          Fclose( nFin )
@@ -392,7 +395,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
       IF ! Empty( ::exGauge )
          HB_ExecFromArray( ::exGauge, {nSent, nSize, Self} )
       ENDIF
-      nLen := Fread( nFin, @cData, 1024 )
+      nLen := Fread( nFin, @cData, nBufSize )
    ENDDO
 
    // it may happen that the file has lenght 0
@@ -449,9 +452,7 @@ METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
    nRet := InetSendAll( SocketCon, cData, nLen )
 
    if ::lTrace
-
       ::Log( SocketCon, nlen, cData, nRet )
-
    endif
 
 Return nRet
@@ -465,9 +466,7 @@ METHOD InetCount( SocketCon ) CLASS tIPClient
    nRet := InetCount( SocketCon )
 
    if ::lTrace
-
       ::Log( SocketCon, nRet )
-
    endif
 
 Return nRet

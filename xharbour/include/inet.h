@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.23 2004/12/20 16:48:42 mlombardo Exp $
+* $Id: inet.h,v 1.24 2006/08/21 15:16:46 walito Exp $
 */
 
 /*
@@ -94,8 +94,6 @@
          #include <errno.h>
       #endif
 
-      #define HB_SENDRECV_BUFFER_SIZE         1400
-
       typedef struct tag_HB_SOCKET_STRUCT
       {
           ULONG sign;
@@ -107,6 +105,8 @@
           int timeout;
           int timelimit;
           PHB_ITEM caPeriodic;
+          int iSndBufSize;
+          int iRcvBufSize;
       } HB_SOCKET_STRUCT;
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""

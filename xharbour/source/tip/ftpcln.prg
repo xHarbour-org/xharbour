@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.22 2007/09/08 19:45:36 patrickmast Exp $
+ * $Id: ftpcln.prg,v 1.23 2008/03/16 18:59:21 lculik Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD listFiles( cList )
    METHOD MPut
    METHOD StartCleanLogFile()
-   METHOD fileSize( cFileSpec ) 
+   METHOD fileSize( cFileSpec )
 ENDCLASS
 
 
@@ -238,15 +238,16 @@ METHOD GetReply() CLASS tIPClientFTP
    ENDIF
 
    // now, if the reply has a '-' as fourth character, we need to proceed...
-   DO WHILE .not. Empty(cRep) .and. cRep[4] == '-'
+   WHILE ! Empty( cRep ) .and. cRep[4] == '-'
       ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
-      cRep := IIf(ValType(::cReply) == "C", ::cReply, "")
+      cRep := If( ValType( ::cReply ) == "C", ::cReply, "" )
    ENDDO
 
    // 4 and 5 are error codes
    IF ::InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] >= '4'
       RETURN .F.
    ENDIF
+
 RETURN .T.
 
 METHOD Pasv() CLASS tIPClientFTP
@@ -348,6 +349,11 @@ METHOD TransferStart() CLASS tIPClientFTP
          ENDIF
 
          InetSetTimeout( skt, ::nConnTimeout )
+         /* Set internal socket send buffer to 64k,
+         * this should fix the speed problems some users have reported
+         */
+         InetSetRcvBufSize( skt, 65536 )
+         InetSetSndBufSize( skt, 65536 )
          ::SocketCon := skt
       ENDIF
    ELSE
@@ -358,6 +364,8 @@ METHOD TransferStart() CLASS tIPClientFTP
          ::GetReply()
          RETURN .F.
       ENDIF
+      InetSetRcvBufSize( ::SocketCon, 65536 )
+      InetSetSndBufSize( ::SocketCon, 65536 )
    ENDIF
 
 RETURN .T.
@@ -471,11 +479,12 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
    ENDIF
 
    ::InetSendall( ::SocketCon, "STOR " + cFile + ::cCRLF )
-   //PM:08-31-2007 Remmed out 'IF ! ::GetReply()' because it always makes Stor() returning .F.
-   //              Causing the uploaded file to be sized ZERO.
-   //IF ! ::GetReply()
-   //   RETURN .F.
-   //ENDIF
+
+   // It is important not to delete these lines in order not to disrupt the timing of
+   // the responses, which can lead to failures in transfers.
+   IF ! ::bUsePasv
+      ::GetReply()
+   ENDIF
 
 RETURN ::TransferStart()
 
@@ -623,7 +632,7 @@ METHOD MGET( cSpec,cLocalPath ) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "NLST "+cSpec + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "NLST " + cSpec + ::cCRLF )
    cStr := ::ReadAuxPort()
 
    IF !empty(cStr)
@@ -631,7 +640,7 @@ METHOD MGET( cSpec,cLocalPath ) CLASS tIPClientFTP
       FOR each cFile in aFiles
          IF !Empty(cFile) //PM:09-08-2007 Needed because of the new HB_aTokens()
             ::downloadfile( cLocalPath+trim(cFile), trim(cFile) )
-         ENDIF   
+         ENDIF
       NEXT
 
    ENDIF
@@ -733,11 +742,11 @@ RETURN cStr
 METHOD Rename( cFrom, cTo ) CLASS tIPClientFTP
     Local lResult  := .F.
 
-    ::InetSendAll( ::SocketCon, "RNFR "+ cFrom + ::cCRLF )
+    ::InetSendAll( ::SocketCon, "RNFR " + cFrom + ::cCRLF )
 
     IF ::GetReply()
 
-       ::InetSendAll( ::SocketCon, "RNTO "+ cTo + ::cCRLF )
+       ::InetSendAll( ::SocketCon, "RNTO " + cTo + ::cCRLF )
        lResult := ::GetReply()
 
     ENDIF
@@ -810,21 +819,21 @@ METHOD listFiles( cFileSpec ) CLASS tIPClientFTP
    LOCAL cYear, cMonth, cDay, cTime
 
    cList := ::list( cFileSpec )
-   
+
    IF Empty( cList )
       RETURN {}
    ENDIF
 
    aList := HB_ATokens( StrTran( cList, Chr(13),''), Chr(10) )
-   
+
    FOR EACH cEntry IN aList
-   
+
       IF Empty( cEntry ) //PM:09-08-2007 Needed because of the new HB_aTokens()
-      
+
         ADel(aList, HB_EnumIndex(), .T.)
-      
+
       ELSE
-   
+
          aFile         := Array( F_LEN+3 )
          nStart        := 1
          nEnd          := At( Chr(32), cEntry, nStart )
@@ -869,13 +878,13 @@ METHOD listFiles( cFileSpec ) CLASS tIPClientFTP
          nEnd          := At( Chr(32), cEntry, nStart )
          cDay          := SubStr( cEntry, nStart, nEnd-nStart )
          nStart        := nEnd
-         
+
          // year
          DO WHILE cEntry[++nStart] == " " ; ENDDO
          nEnd          := At( Chr(32), cEntry, nStart )
          cYear         := SubStr( cEntry, nStart, nEnd-nStart )
          nStart        := nEnd
-         
+
          IF ":" $ cYear
             cTime := cYear
             cYear := Str( Year(Date()), 4, 0 )
@@ -885,15 +894,15 @@ METHOD listFiles( cFileSpec ) CLASS tIPClientFTP
 
          // file name
          DO WHILE cEntry[++nStart] == " " ; ENDDO
-         
+
          aFile[F_NAME] := SubStr( cEntry, nStart )
          aFile[F_DATE] := StoD( cYear+cMonth+cDay )
          aFile[F_TIME] := cTime
 
          aList[ HB_EnumIndex() ] := aFile
-      
+
       ENDIF
-      
+
    NEXT
 
 RETURN aList
