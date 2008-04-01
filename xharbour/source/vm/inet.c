@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.71 2008/04/01 11:03:49 marchuet Exp $
+* $Id: inet.c,v 1.72 2008/04/01 12:38:08 mlombardo Exp $
 */
 
 /*
@@ -104,6 +104,11 @@ void hb_inetLinuxSigusrHandle( int sig )
    // nothing to do
    HB_SYMBOL_UNUSED( sig );
 }
+#endif
+
+// some compilers has missing this define
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR            (-1)
 #endif
 
 #ifndef HB_NO_DEFAULT_INET
