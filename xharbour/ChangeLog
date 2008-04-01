@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6001 2008/03/31 07:45:54 marchuet Exp $
+ * $Id: ChangeLog,v 1.6002 2008/03/31 12:09:51 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-01 00:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.vc
+    - Removed duplicate object
+
+  * include/hbvm.h
+    + Added MSVC check for HB_DLL_REQUIRED_DLLMAIN
+
+  * source/compiler/genc.c
+    * Corrected hb_vmExplicitStartup() to use symbols_table, because symbols may not be resolved yet
+
+  * source/vm/hvm.c
+    + Added minor logic to allow default detection of Dynamic modules in hb_vmProcessSymbols()
 
 2008-03-31 09:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\ct\fcopy.prg

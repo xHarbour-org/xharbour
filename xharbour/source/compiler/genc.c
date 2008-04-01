@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.166 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: genc.c,v 1.167 2008/03/10 17:19:03 ronpinkas Exp $
  */
 
 /*
@@ -1240,7 +1240,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );\n" );
          fprintf( yyc, "void hb_InitExplicitStartup( void )\n" );
          fprintf( yyc, "{\n" );
-         fprintf( yyc, "   hb_vmExplicitStartup( symbols + %i );\n", iStartupOffset );
+         fprintf( yyc, "   hb_vmExplicitStartup( symbols_table + %i );\n", iStartupOffset );
          fprintf( yyc, "}\n" );
 
          fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );

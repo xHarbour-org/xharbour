@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.668 2008/03/27 10:26:44 likewolf Exp $
+ * $Id: hvm.c,v 1.669 2008/03/27 15:11:08 likewolf Exp $
  */
 
 /*
@@ -327,6 +327,8 @@ static HB_ITEM  s_aGlobals;         /* Harbour array to hold all application glo
 static PHB_FUNC_LIST s_InitFunctions = NULL;
 static PHB_FUNC_LIST s_ExitFunctions = NULL;
 
+static BOOL s_bDynamicSymbols = FALSE;
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -606,6 +608,8 @@ HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("SymbolInit_RT") );
    hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
    hb_vmSymbolResolveDeferred();
+
+   s_bDynamicSymbols = TRUE;
 
    /* Set the language to the default */
    hb_langSelectID( HB_MACRO2STRING( HB_LANG_DEFAULT ) );
@@ -10070,7 +10074,7 @@ HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModule
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_fCloneSym, s_fCloneSym, pGlobals );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
 
 /* hvm support for pcode DLLs */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.60 2008/01/06 21:35:47 andijahja Exp $
+ * $Id: hbvm.h,v 1.61 2008/03/27 15:11:08 likewolf Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );
 extern HB_EXPORT void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
 
-#if ( defined(__DMC__) || defined(__POCC__) )
+#if defined(__DMC__) || defined(_MSC_VER) || defined(__POCC__)
    #if !defined(HB_DLL_REQUIRED_DLLMAIN)
       #define HB_DLL_REQUIRED_DLLMAIN
    #endif
