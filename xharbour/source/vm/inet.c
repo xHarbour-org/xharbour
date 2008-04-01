@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.70 2007/05/30 11:47:48 marchuet Exp $
+* $Id: inet.c,v 1.71 2008/04/01 11:03:49 marchuet Exp $
 */
 
 /*
@@ -352,26 +352,26 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
          {
             int value;
             int len = sizeof(value);
-            if ( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len ) != SOCKET_ERROR )
+            if ( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len ) != SOCKET_ERROR )
             {
                 if (value < 65536)
                 {
                     value = 65536;
-                    if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+                    if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
                     {
-                        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+                        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
                     }
                 }
                 Socket->iSndBufSize = value;
 
-                if (getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len ) != SOCKET_ERROR )
+                if (getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len ) != SOCKET_ERROR )
                 {
                     if (value < 65536)
                     {
                         value = 65536;
-                        if ( setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+                        if ( setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
                         {
-                            getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+                            getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
                         }
                     }
                     Socket->iRcvBufSize = value;
@@ -807,7 +807,7 @@ HB_FUNC( INETGETSNDBUFSIZE )
          hb_paramError(1) );
    }
 
-   getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+   getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
    hb_retni( value );
 }
 
@@ -823,7 +823,7 @@ HB_FUNC( INETGETRCVBUFSIZE )
          hb_paramError(1) );
    }
 
-   getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+   getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
    hb_retni( value );
 }
 
@@ -838,7 +838,7 @@ HB_FUNC( INETSETSNDBUFSIZE )
    }
 
    value = hb_parni( 2 );
-   setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) );
+   setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) );
    hb_retni( value );
 }
 
@@ -853,7 +853,7 @@ HB_FUNC( INETSETRCVBUFSIZE )
    }
 
    value = hb_parni( 2 );
-   setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) );
+   setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) );
    hb_retni( value );
 }
 
@@ -906,13 +906,13 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
         int value;
         int len = sizeof(value);
-        getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+        getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
         if (value < 65536)
         {
             value = 65536;
-            if (setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+            if (setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
             {
-                getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (void *) &value, &len );
+                getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
             }
         }
         Socket->iRcvBufSize = value;
@@ -927,7 +927,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
       if( iMode == 1 )
       {
-         iBufferLen = Socket->iRcvBufSize > iMaxLen - iReceived ? iMaxLen - iReceived : Socket->iRcvBufSize;
+         iBufferLen = ((DWORD) Socket->iRcvBufSize) > iMaxLen - iReceived ? iMaxLen - iReceived : Socket->iRcvBufSize;
       }
       else
       {
@@ -1501,13 +1501,13 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
    {
         int value;
         int len = sizeof(value);
-        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
         if (value < 65536)
         {
             value = 65536;
-            if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, sizeof( value ) ) == SOCKET_ERROR )
+            if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
             {
-                getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (void *) &value, &len );
+                getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
             }
         }
         Socket->iSndBufSize = value;
