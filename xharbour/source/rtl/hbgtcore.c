@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.5 2008/03/20 15:35:16 ronpinkas Exp $
+ * $Id: hbgtcore.c,v 1.6 2008/03/26 14:11:52 likewolf Exp $
  */
 
 /*
@@ -2507,24 +2507,70 @@ static int hb_gt_def_InkeySetLast( PHB_GT pGT, int iKey )
    return iLast;
 }
 
+/* internal fuction to set __Keyboard() buffer size */
+static ULONG hb_gt_def_SetStrBuffer( PHB_GT pGT, ULONG ulLen )
+{
+   ULONG ulCopyToPos;  /* return location to copy new keys to */
+#ifdef HB_C52_STRICT
+   if ( pGT->StrBuffer )
+   {
+      hb_xfree( pGT->StrBuffer );
+      pGT->StrBuffer = NULL;
+   }
+#endif
+   if ( !pGT->StrBuffer )
+   {
+      pGT->StrBuffer = ( int * ) hb_xgrab( ulLen * sizeof( int ) );
+      pGT->StrBufferSize = ulLen;
+      pGT->StrBufferPos = 0;
+      ulCopyToPos = 0 ;
+   }
+   else
+   {
+      ulCopyToPos = pGT->StrBufferSize;
+      pGT->StrBufferSize += ulLen;
+      pGT->StrBuffer = ( int * ) hb_xrealloc( pGT->StrBuffer, pGT->StrBufferSize * sizeof( int ) );
+   }
+   return( ulCopyToPos );
+}
+
 /* Set text into inkey buffer */
 static void hb_gt_def_InkeySetText( PHB_GT pGT, const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_def_InkeySetText(%p,%s,%lu)", pGT, szText, ulLen));
 
-   if( pGT->StrBuffer )
-   {
-      hb_xfree( pGT->StrBuffer );
-      pGT->StrBuffer = NULL;
-   }
+   /* Do not clear the buffer as per Harbour */
 
    if( szText && ulLen )
    {
-      pGT->StrBuffer = ( BYTE * ) hb_xgrab( ulLen );
-      memcpy( pGT->StrBuffer, szText, ulLen );
-      pGT->StrBufferSize = ulLen;
-      pGT->StrBufferPos = 0;
+      ULONG ulCopyFromPos, ulCopyToPos ;
+
+      ulCopyToPos = hb_gt_def_SetStrBuffer( pGT, ulLen );
+      if ( pGT->StrBuffer )
+      {
+         for ( ulCopyFromPos=0 ; ulCopyFromPos < ulLen ; ++ulCopyFromPos)
+         {
+            BYTE Chr =szText[ ulCopyFromPos ];
+            pGT->StrBuffer[ ulCopyToPos++ ] =  ( int ) Chr == ';' ? K_ENTER : Chr;
+         }
+      }
    }
+#ifndef HB_C52_STRICT
+   /* Peter Rees: (03Apr08) This is a hack to allow
+       hb_gt_def_InkeySetText( pGT, NULL, iKey )
+      to be called so a single integer key value can be
+      put in pGT->StrBuffer without creating a separate
+      ...gt_def... function
+   */
+   else if ( ulLen )
+   {
+      ULONG ulCopyToPos = hb_gt_def_SetStrBuffer( pGT, 1 );
+      if ( pGT->StrBuffer )
+      {
+         pGT->StrBuffer[ ulCopyToPos ] = (int ) ulLen ;
+      }
+   }
+#endif
 }
 
 /* Reset the keyboard buffer */

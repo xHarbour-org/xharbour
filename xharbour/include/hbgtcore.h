@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.3 2008/03/20 00:01:04 ronpinkas Exp $
+ * $Id: hbgtcore.h,v 1.4 2008/03/20 15:35:16 ronpinkas Exp $
  */
 
 /*
@@ -341,7 +341,7 @@ typedef struct _HB_GT_BASE
    int            inkeyTail;
    int            iLastPut;
    int            inkeyLast;
-   BYTE *         StrBuffer;
+   int *          StrBuffer;     /* Change from BYTE of Harbour by Peter Rees 3APR2008 */
    ULONG          StrBufferSize;
    ULONG          StrBufferPos;
 

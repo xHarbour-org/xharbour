@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.56 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: inkey.c,v 1.57 2008/03/18 06:41:39 likewolf Exp $
  */
 
 /*
@@ -195,10 +195,41 @@ HB_FUNC( SETINKEYAFTERBLOCK )
 HB_FUNC( __KEYBOARD )
 {
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
-   hb_inkeyReset();
+#ifndef HB_C52_STRICT
+   if ( !hb_parl( 2 ) )
+#endif
+   {
+     hb_inkeyReset();
+   }
 
    if( ISCHAR( 1 ) )
+   {
       hb_inkeySetText( hb_parc( 1 ), hb_parclen( 1 ) );
+   }
+#ifndef HB_C52_STRICT
+   else if( ISNUM( 1 ) )
+   {
+      hb_inkeySetText( NULL, ( ULONG) hb_parnl( 1 ) );
+   }
+   else if ( ISARRAY( 1 ) )
+   {
+      PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY ) ;
+      ULONG ulIndex ;
+      ULONG ulElements = hb_arrayLen( pArray ) ;
+      for ( ulIndex = 1 ; ulIndex <= ulElements ; ulIndex++ )
+      {
+         PHB_ITEM pItem = hb_arrayGetItemPtr( pArray, ulIndex ) ;
+         if ( HB_IS_NUMBER( pItem ) )
+         {
+            hb_inkeySetText( NULL,  (  ULONG ) HB_ITEM_GET_NUMINTRAW( pItem ) ) ;
+         }
+         else if ( HB_IS_STRING( pItem ) )
+         {
+           hb_inkeySetText( (BYTE *) hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
+         }
+      }
+   }
+#endif
 }
 
 HB_FUNC( HB_KEYPUT )
