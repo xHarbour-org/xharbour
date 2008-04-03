@@ -1,5 +1,5 @@
 /*
- * $Id: ads.ch,v 1.7 2005/10/26 08:34:18 brianhays Exp $
+ * $Id: ads.ch,v 1.8 2007/11/27 23:47:06 ronpinkas Exp $
  */
 
 /*
@@ -64,6 +64,7 @@ REQUEST ADS
 #define ADS_NTX                  1
 #define ADS_CDX                  2
 #define ADS_ADT                  3
+#define ADS_VFP                  4
 
 /* Advantage Optimized Filter (AOF) optimization levels */
 #define ADS_OPTIMIZED_FULL       1

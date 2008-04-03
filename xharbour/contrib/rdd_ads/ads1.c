@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.127 2007/11/27 23:47:06 ronpinkas Exp $
+ * $Id: ads1.c,v 1.128 2008/03/13 11:12:02 marchuet Exp $
  */
 
 /*
@@ -89,6 +89,8 @@ static USHORT s_uiRddIdADS = ( USHORT ) -1;
 static USHORT s_uiRddIdADT = ( USHORT ) -1;
 static USHORT s_uiRddIdADSNTX = ( USHORT ) -1;
 static USHORT s_uiRddIdADSCDX = ( USHORT ) -1;
+static USHORT s_uiRddIdADSVFP = ( USHORT ) -1;
+
 
 static RDDFUNCS adsSuper;
 
@@ -276,9 +278,12 @@ static BOOL adsIndexKeyCmp( ADSHANDLE hIndex, UNSIGNED8 * pszKey, UNSIGNED16 u16
 
 static int adsGetFileType( USHORT uiRddID )
 {
+
    return ( uiRddID == s_uiRddIdADSCDX ? ADS_CDX :
           ( uiRddID == s_uiRddIdADSNTX ? ADS_NTX :
-          ( uiRddID == s_uiRddIdADT    ? ADS_ADT : adsFileType ) ) );
+          ( uiRddID == s_uiRddIdADT    ? ADS_ADT :
+          ( uiRddID == s_uiRddIdADSVFP ? ADS_VFP : adsFileType ) ) ) );
+
 }
 
 static const char * adsTableExt( int iFileType )
@@ -289,13 +294,15 @@ static const char * adsTableExt( int iFileType )
 static const char * adsMemoExt( int iFileType )
 {
    return iFileType == ADS_ADT ? ".adm" :
-        ( iFileType == ADS_CDX ? ".fpt" : ".dbt" );
+        ( iFileType == ADS_CDX ? ".fpt" :
+        ( iFileType == ADS_VFP ? ".fpt" : ".dbt" ));
 }
 
 static const char * adsIndexExt( int iFileType )
 {
    return iFileType == ADS_ADT ? ".adi" :
-        ( iFileType == ADS_CDX ? ".cdx" : ".ntx" );
+        ( iFileType == ADS_CDX ? ".cdx" :
+        ( iFileType == ADS_VFP ? ".cdx" : ".ntx" ));
 }
 
 static ADSHANDLE hb_adsFindBag( ADSAREAP pArea, char * szBagName )
@@ -1454,7 +1461,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
 
          case 'A':
          case '+':
-            if( pArea->iFileType == ADS_ADT )
+            if( pArea->iFileType == ADS_ADT || pArea->iFileType == ADS_VFP)
             {
                dbFieldInfo.uiType = HB_FT_AUTOINC;
                dbFieldInfo.uiTypeExtended = ADS_AUTOINC;
@@ -1475,7 +1482,8 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             {
                dbFieldInfo.uiType = HB_FT_BLOB;
                dbFieldInfo.uiTypeExtended = ADS_BINARY;
-               dbFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 10;
+               dbFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 
+                                   ( pArea->iFileType == ADS_VFP ) ? 4 : 10 ;
                dbFieldInfo.uiFlags = HB_FF_BINARY;
             }
             else
@@ -1524,7 +1532,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             break;
 
          case '@':
-            if( pArea->iFileType == ADS_ADT )
+            if( pArea->iFileType == ADS_ADT || pArea->iFileType == ADS_VFP  )
             {
                dbFieldInfo.uiType = HB_FT_TIMESTAMP;
                dbFieldInfo.uiTypeExtended = ADS_TIMESTAMP;
@@ -1574,6 +1582,19 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                   dbFieldInfo.uiLen = 4;
                }
             }
+
+            else if( pArea->iFileType == ADS_VFP &&
+                (  iNameLen >= 4 &&
+                  hb_strnicmp( szFieldType, "timestamp", iNameLen ) == 0 ) ) 
+            {
+               if(  iNameLen > 4 )
+               {
+                  dbFieldInfo.uiType = HB_FT_TIMESTAMP;
+                  dbFieldInfo.uiTypeExtended = ADS_TIMESTAMP;
+                  dbFieldInfo.uiLen = 8;
+               }
+            }
+
             else
                return FAILURE;
             break;
@@ -1597,6 +1618,19 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                dbFieldInfo.uiTypeExtended = ADS_IMAGE;
                dbFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 10;
                dbFieldInfo.uiFlags = HB_FF_BINARY;
+            }
+            else
+               return FAILURE;
+            break;
+         case 'Y':
+
+            if( pArea->iFileType == ADS_VFP)
+            {
+               dbFieldInfo.uiType = HB_FT_CURRENCY;
+               dbFieldInfo.uiTypeExtended = ADS_MONEY;
+               dbFieldInfo.uiLen = 8;
+               dbFieldInfo.uiDec = 4;
+
             }
             else
                return FAILURE;
@@ -1776,6 +1810,11 @@ static ERRCODE adsFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITE
       case HB_FT_CURDOUBLE:
          hb_itemPutC( pItem, "CURDOUBLE" );
          break;
+      case HB_FT_CURRENCY:
+         hb_itemPutC( pItem, "Y" );
+         break;
+
+
 
       default:
          hb_itemPutC( pItem, "U" );
@@ -1975,6 +2014,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_LONG:
       case HB_FT_DOUBLE:
       case HB_FT_CURDOUBLE:
+      case HB_FT_CURRENCY:
       {
          DOUBLE   dVal = 0;
 
@@ -1985,7 +2025,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             pArea->fEof = TRUE;
          }
          if( pField->uiTypeExtended == ADS_CURDOUBLE ||
-             pField->uiTypeExtended == ADS_DOUBLE )
+             pField->uiTypeExtended == ADS_DOUBLE ||  pField->uiTypeExtended == ADS_MONEY)
          {
             hb_itemPutNDLen( pItem, dVal,
                              20 - ( pField->uiDec > 0 ? ( pField->uiDec + 1 ) : 0 ),
@@ -2251,6 +2291,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_TIMESTAMP:
       case HB_FT_AUTOINC:
       case HB_FT_CURDOUBLE:
+      case HB_FT_CURRENCY:
          if( HB_IS_NUMERIC( pItem ) )
          {
             bTypeError = FALSE;
@@ -2593,6 +2634,10 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
          case HB_FT_CURDOUBLE: /* "Z" */
             cType = "CurD";
             break;
+         case HB_FT_CURRENCY: /* "Z" */
+            cType = "money";
+            break;
+
       }
 
       if( cType == NULL )
@@ -2854,6 +2899,13 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
          pArea->iFileType = ADS_CDX;
          pArea->uiMaxFieldNameLength = ADS_MAX_DBF_FIELD_NAME;
       }
+      else if( pArea->rddID == s_uiRddIdADSVFP )
+      {
+         pArea->iFileType = ADS_VFP;
+         pArea->uiMaxFieldNameLength = ADS_MAX_DBF_FIELD_NAME;
+      }
+
+
       else /* if( pArea->rddID == s_uiRddIdADS ) */
       {
          pArea->iFileType = adsFileType;
@@ -2905,7 +2957,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       {
          char * szSQL = hb_adsOemToAnsi( szFile, strlen( szFile ) );
 
-         if( pArea->iFileType == ADS_CDX )
+         if( pArea->iFileType == ADS_CDX || pArea->iFileType == ADS_VFP )
          {
             AdsStmtSetTableType( hStatement, pArea->iFileType );
          }
@@ -3034,6 +3086,12 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
             AdsGetFieldDecimals( pArea->hTable, szName, &pusDecimals );
             dbFieldInfo.uiDec = ( USHORT ) pusDecimals;
             break;
+         case ADS_MONEY:
+            dbFieldInfo.uiType = HB_FT_CURRENCY;
+            AdsGetFieldDecimals( pArea->hTable, szName, &pusDecimals );
+            dbFieldInfo.uiDec = ( USHORT ) pusDecimals;
+            break;
+
 
          case ADS_INTEGER:
          case ADS_SHORTINT:
@@ -3164,6 +3222,10 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
       case ADS_CDX:
          hb_strncpy( ( char * ) pBuffer, "ADSCDX", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
          break;
+      case ADS_VFP:
+         hb_strncpy( ( char * ) pBuffer, "ADSVFP", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+         break;
+
       case ADS_ADT:
          hb_strncpy( ( char * ) pBuffer, "ADSADT", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
          break;

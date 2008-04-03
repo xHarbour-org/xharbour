@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6006 2008/04/01 16:50:35 marchuet Exp $
+ * $Id: ChangeLog,v 1.6007 2008/04/03 12:04:52 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-04-03 12:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/rdd_ads/ads.ch
+  * contrib/rdd_ads/ace.h
+  * contrib/rdd_ads/rddads.h
+    ! Added support for ADS9 VFP file type and fields
 
 2008-04-03 14:05 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * tip\client.prg

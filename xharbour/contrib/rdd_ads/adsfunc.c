@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.84 2007/01/11 01:00:34 druzus Exp $
+ * $Id: adsfunc.c,v 1.85 2007/01/18 11:32:32 lculik Exp $
  */
 
 /*
@@ -1374,6 +1374,11 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
          {
             AdsStmtSetTableType( adsStatementHandle, ADS_CDX );
          }
+         if( hb_parni( 2 ) == ADS_VFP )
+         {
+            AdsStmtSetTableType( adsStatementHandle, ADS_VFP );
+         }
+
 
          if( !hb_rddInsertAreaNode( "ADS" ) )
          {
@@ -2399,7 +2404,7 @@ HB_FUNC( ADSRESTRUCTURETABLE )
    //   UNSIGNED16 usLockType,UNSIGNED16 usCheckRights,UNSIGNED8
    //   *pucAddFields,UNSIGNED8 *pucDeleteFields,UNSIGNED8 *pucChangeFields );
    //adsFileType ADS_DEFAULT, ADS_ADT, ADS_NTX and ADS_CDX
-
+                                                        
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pTableName      = (UNSIGNED8 *) hb_parcx( 1 );
    UNSIGNED8 *pucAddFields    = (UNSIGNED8 *) hb_parcx( 2 );
