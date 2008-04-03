@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.72 2008/04/01 12:38:08 mlombardo Exp $
+* $Id: inet.c,v 1.73 2008/04/01 16:50:47 marchuet Exp $
 */
 
 /*
@@ -351,34 +351,17 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
             HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
          }
 
-         /* Set internal socket send buffer to 64k,
-         * this should fix the speed problems some users have reported
+         /* 
+         * Read real buffer sizes from socket
          */
          {
             int value;
             int len = sizeof(value);
             if ( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len ) != SOCKET_ERROR )
             {
-                if (value < 65536)
-                {
-                    value = 65536;
-                    if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
-                    {
-                        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
-                    }
-                }
                 Socket->iSndBufSize = value;
-
                 if (getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len ) != SOCKET_ERROR )
                 {
-                    if (value < 65536)
-                    {
-                        value = 65536;
-                        if ( setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
-                        {
-                            getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
-                        }
-                    }
                     Socket->iRcvBufSize = value;
                 }
                 else
@@ -813,6 +796,7 @@ HB_FUNC( INETGETSNDBUFSIZE )
    }
 
    getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
+   Socket->iSndBufSize = value;
    hb_retni( value );
 }
 
@@ -829,6 +813,7 @@ HB_FUNC( INETGETRCVBUFSIZE )
    }
 
    getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
+   Socket->iRcvBufSize = value;
    hb_retni( value );
 }
 
@@ -844,6 +829,7 @@ HB_FUNC( INETSETSNDBUFSIZE )
 
    value = hb_parni( 2 );
    setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) );
+   Socket->iSndBufSize = value;
    hb_retni( value );
 }
 
@@ -859,6 +845,7 @@ HB_FUNC( INETSETRCVBUFSIZE )
 
    value = hb_parni( 2 );
    setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) );
+   Socket->iRcvBufSize = value;
    hb_retni( value );
 }
 
@@ -904,23 +891,6 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          HB_STRING_ALLOC( pBuffer, iMaxLen );
 #endif
       }
-   }
-
-   // Nedded for port mode
-   if ( Socket->iRcvBufSize == 0 )
-   {
-        int value;
-        int len = sizeof(value);
-        getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
-        if (value < 65536)
-        {
-            value = 65536;
-            if (setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
-            {
-                getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
-            }
-        }
-        Socket->iRcvBufSize = value;
    }
 
    Buffer = pBuffer->item.asString.value;
@@ -1500,24 +1470,6 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
 
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
-
-   // Nedded for port mode
-   if ( Socket->iSndBufSize == 0 )
-   {
-        int value;
-        int len = sizeof(value);
-        getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
-        if (value < 65536)
-        {
-            value = 65536;
-            if (setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) ) == SOCKET_ERROR )
-            {
-                getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
-            }
-        }
-        Socket->iSndBufSize = value;
-   }
-
 
    iLen = 0;
    while( iSent < iSend )

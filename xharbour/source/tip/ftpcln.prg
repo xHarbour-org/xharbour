@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.23 2008/03/16 18:59:21 lculik Exp $
+ * $Id: ftpcln.prg,v 1.24 2008/04/01 11:03:48 marchuet Exp $
  */
 
 /*
@@ -172,6 +172,8 @@ METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientFTP
    ::nConnTimeout := 3000
    ::bUsePasv     := .T.
    ::nAccessMode  := TIP_RW  // a read-write protocol
+   ::nDefaultSndBuffSize := 65536
+   ::nDefaultRcvBuffSize := 65536
 
    if ::ltrace
       if !file("ftp.log")
@@ -352,8 +354,14 @@ METHOD TransferStart() CLASS tIPClientFTP
          /* Set internal socket send buffer to 64k,
          * this should fix the speed problems some users have reported
          */
-         InetSetRcvBufSize( skt, 65536 )
-         InetSetSndBufSize( skt, 65536 )
+         IF ! Empty( ::nDefaultSndBuffSize )
+            ::InetSndBufSize( skt, ::nDefaultSndBuffSize )
+         ENDIF
+   
+         IF ! Empty( ::nDefaultRcvBuffSize )
+            ::InetRcvBufSize( skt, ::nDefaultRcvBuffSize )
+         ENDIF
+
          ::SocketCon := skt
       ENDIF
    ELSE

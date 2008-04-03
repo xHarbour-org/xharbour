@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.16 2007/07/13 08:53:31 marchuet Exp $
+ * $Id: client.prg,v 1.17 2008/04/01 11:03:48 marchuet Exp $
  */
 
 /*
@@ -77,8 +77,8 @@
 #include "tip.ch"
 #include "common.ch"
 
-#DEFINE RCV_BUF_SIZE Int( InetGetRcvBufSize( ::SocketCon ) / 2 )
-#DEFINE SND_BUF_SIZE Int( InetGetSndBufSize( ::SocketCon ) / 2 )
+#DEFINE RCV_BUF_SIZE Int( ::InetRcvBufSize( ::SocketCon ) / 2 )
+#DEFINE SND_BUF_SIZE Int( ::InetSndBufSize( ::SocketCon ) / 2 )
 
 /**
 * Inet Client class
@@ -93,6 +93,9 @@ CLASS tIPClient
    DATA SocketCon
    Data lTrace
    Data nHandle
+   
+   DATA nDefaultRcvBuffSize
+   DATA nDefaultSndBuffSize
 
    /* Input stream length */
    DATA nLength
@@ -133,6 +136,9 @@ CLASS tIPClient
    METHOD lastErrorCode() INLINE ::nLastError
    METHOD lastErrorMessage(SocketCon) INLINE ::INetErrorDesc(SocketCon)
 
+   METHOD InetRcvBufSize( SocketCon, nSizeBuff ) 
+   METHOD InetSndBufSize( SocketCon, nSizeBuff ) 
+
    PROTECTED:
    DATA nLastError INIT 0
 
@@ -145,7 +151,7 @@ CLASS tIPClient
    METHOD InetErrorCode(SocketCon)
    METHOD InetErrorDesc(SocketCon)
    METHOD InetConnect( cServer, nPort, SocketCon )
-
+   
    METHOD Log()
 
 ENDCLASS
@@ -553,6 +559,14 @@ RETURN cMsg
 METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
    InetConnect( cServer, nPort, SocketCon )
+   
+   IF ! Empty( ::nDefaultSndBuffSize )
+      ::InetSndBufSize( SocketCon, ::nDefaultSndBuffSize )
+   ENDIF
+   
+   IF ! Empty( ::nDefaultRcvBuffSize )
+      ::InetRcvBufSize( SocketCon, ::nDefaultRcvBuffSize )
+   ENDIF
 
    if ::lTrace
 
@@ -562,6 +576,18 @@ METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
 Return Nil
 
+/* Methods to manage buffers */
+METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+   IF ! Empty( nSizeBuff )
+      InetSetRcvBufSize( SocketCon, nSizeBuff )
+   ENDIF
+RETURN InetGetRcvBufSize( SocketCon )
+
+METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+   IF ! Empty( nSizeBuff )
+      InetSetSndBufSize( SocketCon, nSizeBuff )
+   ENDIF
+RETURN InetGetSndBufSize( SocketCon )
 
 /* Called from another method with list of parameters and, as last parameter, return code
    of function being logged.

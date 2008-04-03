@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6005 2008/04/01 12:37:56 mlombardo Exp $
+ * $Id: ChangeLog,v 1.6006 2008/04/01 16:50:35 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-03 14:05 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * tip\client.prg
+    + Added methods setget to interrogate buffer size send/recive
+	   METHOD InetRcvBufSize( SocketCon, nSizeBuff ) 
+	   METHOD InetSndBufSize( SocketCon, nSizeBuff ) 
+    + Added data members to assign default buffer sizes
+	   DATA nDefaultRcvBuffSize
+	   DATA nDefaultSndBuffSize
+  * tip\ftpcln.prg
+    + Asigned default buffer size to 64kb only for FTP transfer, previous to open sockets
+           ::nDefaultSndBuffSize := 65536
+           ::nDefaultRcvBuffSize := 65536
+  * vm\inet.c
+    * now works with default system buffer, for example 8kb at W2000.
 
 2008-04-01 18:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\vm\inet.c
