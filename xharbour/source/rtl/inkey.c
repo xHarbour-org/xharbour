@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.57 2008/03/18 06:41:39 likewolf Exp $
+ * $Id: inkey.c,v 1.58 2008/04/03 19:35:38 peterrees Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ HB_FUNC( __KEYBOARD )
          }
          else if ( HB_IS_STRING( pItem ) )
          {
-           hb_inkeySetText( (BYTE *) hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
+           hb_inkeySetText( (const char *) hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
          }
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.12 2007/07/02 13:21:16 alexstrickland Exp $
+ * $Id: dllcall.c,v 1.13 2007/09/25 02:55:30 ronpinkas Exp $
  */
 
 /*
@@ -393,6 +393,7 @@ typedef struct DYNAPARM {
             BYTE    bArg;          // 1-byte argument
             SHORT   usArg;         // 2-byte argument
             DWORD   dwArg;         // 4-byte argument
+            double  dArg;
           };
     void   *pArg;           // Pointer to argument
 } DYNAPARM;
@@ -411,7 +412,6 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
    int iCnt = 0;
 //   int iCmode;
    int i;
-   double DblParms[15];
    DYNAPARM   Parm[15];
    RESULT     rc;
 
@@ -433,7 +433,6 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
    }
 
    memset( Parm, 0, sizeof( Parm ) );
-   memset( DblParms, 0, sizeof( DblParms ) );
 
    if( iArgCnt > 0)
    {
@@ -449,6 +448,12 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
             case HB_IT_POINTER           :
                Parm[iCnt].nWidth = sizeof( void * );
                Parm[iCnt].dwArg = (DWORD) hb_parptr ( i );
+
+               if( hb_parinfo( i ) & HB_IT_BYREF )
+               {
+                  Parm[iCnt].pArg   = &( Parm[iCnt].dwArg );
+                  Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
+               }
                break;
 
             case HB_IT_INTEGER           :
@@ -467,15 +472,22 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
 
             case HB_IT_DOUBLE            :
                Parm[iCnt].nWidth = sizeof( double );
-               DblParms[iCnt] = (double) hb_parnd( i );
-               Parm[iCnt].pArg   = &( DblParms[iCnt] );
-               Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
+               Parm[iCnt].dArg = hb_parnd( i );
+
+               if( hb_parinfo( i ) & HB_IT_BYREF )
+               {
+                  Parm[iCnt].nWidth = sizeof( void * );
+                  Parm[iCnt].pArg   = &( Parm[iCnt].dArg );
+                  Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
+               }
+
                iFlags |= DC_RETVAL_MATH8;
                break;
 
             case HB_IT_STRING            :
             case HB_IT_MEMO              :
                Parm[iCnt].nWidth = sizeof( void * );
+
                if ( hb_parinfo( i ) & HB_IT_BYREF )
                {
                   Parm[iCnt].pArg = malloc( hb_parclen( i ) );
@@ -485,6 +497,7 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
                {
                   Parm[iCnt].pArg = (void *) hb_parc( i );
                }
+
                Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
                break;
 
@@ -495,13 +508,6 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
                   Parm[iCnt].dwArg = (DWORD) hb_parcstruct( i );
                   break;
                }
-
-            case HB_IT_HASH              :
-            case HB_IT_SYMBOL            :
-            case HB_IT_ALIAS             :
-            case HB_IT_MEMOFLAG          :
-            case HB_IT_BLOCK             :
-            case HB_IT_MEMVAR            :
 
             default:
                MessageBox( GetActiveWindow(), "UNKNOWN Parameter Type!", "DLLCall Parameter Error!", MB_OK | MB_ICONERROR );
@@ -547,17 +553,18 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
                   break;
 
                case HB_IT_POINTER           :
+                  hb_storptr( (void *) Parm[iCnt].dwArg, i );
                   break;
 
                case HB_IT_INTEGER           :
                case HB_IT_LONG              :
                case HB_IT_DATE              :
                case HB_IT_LOGICAL           :
-                  hb_stornl( *(LONG *) ( Parm[iCnt].pArg ), i );
+                  hb_stornl( Parm[iCnt].dwArg, i );
                   break;
 
                case HB_IT_DOUBLE            :
-                  hb_stornd( DblParms[iCnt], i );
+                  hb_stornd( Parm[iCnt].dArg, i );
                   break;
 
                case HB_IT_STRING            :
@@ -803,7 +810,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    // Call the specified function with the given parameters. Build a
    // proper stack and take care of correct return value processing.
    RESULT  Res = { 0 };
-   int    i, nInd, nSize;
+   int    i, nInd, nSize, nLoops;
    DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
    BYTE   *pArg;
 
@@ -834,12 +841,15 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
       nInd  = (nArgs - 1) - i;
       // Start at the back of the arg ptr, aligned on a DWORD
       nSize = (Parm[nInd].nWidth + 3) / 4 * 4;
-      pArg  = (BYTE *)Parm[nInd].pArg + nSize - 4;
-      dwStSize += (DWORD)nSize; // Count no of bytes on stack
-      while (nSize > 0)
+      pArg  = (BYTE *) Parm[nInd].pArg + nSize - 4;
+      dwStSize += (DWORD) nSize; // Count no of bytes on stack
+
+      nLoops = ( nSize / 4 ) - 1;
+
+      while( nSize > 0 )
       {
          // Copy argument to the stack
-         if (Parm[nInd].dwFlags & DC_FLAG_ARGPTR)
+         if( Parm[nInd].dwFlags & DC_FLAG_ARGPTR )
          {
             // Arg has a ptr to a variable that has the arg
             dwVal = (DWORD) pArg; // Get first four bytes
@@ -848,12 +858,14 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
          else
          {
             // Arg has the real arg
-            dwVal = Parm[nInd].dwArg;
+            dwVal = *( (DWORD *)( (BYTE *) ( &( Parm[nInd].dwArg ) ) + ( nLoops * 4 ) ) );
          }
+
          // Do push dwVal
          pStack--;         // ESP = ESP - 4
          *pStack = dwVal;   // SS:[ESP] = dwVal
          nSize -= 4;
+         nLoops--;
       }
    }
 
