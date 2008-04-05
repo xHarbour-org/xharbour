@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.73 2008/04/01 16:50:47 marchuet Exp $
+* $Id: inet.c,v 1.74 2008/04/03 12:04:54 marchuet Exp $
 */
 
 /*
@@ -67,6 +67,9 @@
    #include <sys/socket.h>
    #include <sys/select.h>
    #include <sys/ioctl.h>
+#endif
+
+#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN_32 )
    /* NET_SIZE_T exists because of shortsightedness on the POSIX committee.  BSD
     * systems used "int *" as the parameter to accept(), getsockname(),
     * getpeername() et al.  Consequently many unixes took an int * for that
@@ -356,7 +359,8 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
          */
          {
             int value;
-            int len = sizeof(value);
+            socklen_t len = sizeof(value);
+
             if ( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len ) != SOCKET_ERROR )
             {
                 Socket->iSndBufSize = value;
@@ -787,7 +791,7 @@ HB_FUNC( INETGETSNDBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    int value;
-   int len = sizeof( value );
+   socklen_t len = sizeof( value );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -804,7 +808,7 @@ HB_FUNC( INETGETRCVBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    int value;
-   int len = sizeof( value );
+   socklen_t len = sizeof( value );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -861,8 +865,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
-   DWORD iMaxLen, iReceived;
-   int iLen, iBufferLen;
+   int iLen, iMaxLen, iReceived, iBufferLen;
    int iTimeElapsed;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL || !ISBYREF( 2 ) )
@@ -881,9 +884,9 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
       iMaxLen = hb_parni( 3 );
 
-      if( ( int ) pBuffer->item.asString.length < iMaxLen )
+      if( pBuffer->item.asString.length < ( UINT ) iMaxLen )
       {
-         iMaxLen = ( int ) pBuffer->item.asString.length;
+         iMaxLen = pBuffer->item.asString.length;
 #if 0
          /* Should we issue a runtime error? */
 
@@ -902,7 +905,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
       if( iMode == 1 )
       {
-         iBufferLen = ((DWORD) Socket->iRcvBufSize) > iMaxLen - iReceived ? iMaxLen - iReceived : Socket->iRcvBufSize;
+         iBufferLen = ( Socket->iRcvBufSize > iMaxLen - iReceived ) ? iMaxLen - iReceived : Socket->iRcvBufSize;
       }
       else
       {

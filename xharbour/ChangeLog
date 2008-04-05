@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6009 2008/04/03 19:35:35 peterrees Exp $
+ * $Id: ChangeLog,v 1.6010 2008/04/04 15:20:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-05 17:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/cdpapi.c
+    ! fixed unicode values for control codes in default CP437 unicode table
+    ! fixed CP string translation for CPs with accented equal characters
+  (by Przemyslaw Czerpak, borrowed from Harbour)
+  * source/vm/inet.c
+    ! Fixed errors and warnings under Linux.
+  * source/debug/dbgtobj.prg
+    ! Fixed unused variables warnings.
 
 2008-04-04 10:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/inkey.c
@@ -24,8 +34,8 @@
       extended behaviour that was removed with recent GT sync
       with Harbour. Change to struct _HB_GT_BASE in hbgtcore.h
       makes xHarbour GT incompatible with Harbour
-2008-04-03 12:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
 
+2008-04-03 12:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * contrib/rdd_ads/ads1.c
   * contrib/rdd_ads/adsfunc.c
   * contrib/rdd_ads/ads.ch
