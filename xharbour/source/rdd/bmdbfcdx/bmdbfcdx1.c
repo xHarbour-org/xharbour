@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.39 2008/03/13 11:12:06 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.40 2008/03/13 11:31:14 marchuet Exp $
  */
 
 /*
@@ -4883,7 +4883,7 @@ static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName, BOOL * fProd,
          szBaseName[ 0 ] = '\0';
    }
 
-   if( !pFileName->szExtension || !fName )
+   if( ( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension ) || !fName )
    {
       DBORDERINFO pExtInfo;
       memset( &pExtInfo, 0, sizeof( pExtInfo ) );

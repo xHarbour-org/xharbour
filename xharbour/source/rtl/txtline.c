@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.9 2006/10/25 16:19:20 ronpinkas Exp $
+ * $Id: txtline.c,v 1.10 2006/12/10 12:33:36 ptsarenko Exp $
  */
 
 /*
@@ -271,10 +271,10 @@ HB_FUNC( HB_READLINE )
    {
       if( ! hb_set.HB_SET_EOL )
       {
-         hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
+         hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
       }
 
-      pTerm1 = hb_set.HB_SET_EOL;
+      pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
    }
    else
    {
@@ -355,10 +355,10 @@ HB_FUNC( MLCOUNT )
    {
       if( !hb_set.HB_SET_EOL )
       {
-         hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
+         hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
       }
 
-      pTerm1 = hb_set.HB_SET_EOL;
+      pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
    }
    else
    {
@@ -453,10 +453,10 @@ HB_FUNC( MEMOLINE )
    {
       if( hb_set.HB_SET_EOL == NULL )
       {
-         hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
+         hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
       }
 
-      pTerm1 = hb_set.HB_SET_EOL;
+      pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
    }
    else
    {
@@ -566,9 +566,9 @@ HB_FUNC( MLPOS )
    {
       if( !hb_set.HB_SET_EOL )
       {
-         hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
+         hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
       }
-      pTerm1 = hb_set.HB_SET_EOL;
+      pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: vidtest.prg,v 1.1 2002/10/22 02:24:05 paultucker Exp $
+ * $Id: vidtest.prg,v 1.2 2004/01/28 16:42:19 jonnymind Exp $
  */
 
 /*
@@ -38,7 +38,7 @@ function main()
     local aResult := {}
 
     SET MBLOCKSIZE TO 1000
-    SET GTMODE TO INLINE
+    //SET GTMODE TO INLINE
     Set cursor off
     Initialise()   // Initialise Screen Display
 

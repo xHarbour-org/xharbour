@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6010 2008/04/04 15:20:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6011 2008/04/05 13:28:54 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,71 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-06 00:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/set.ch
+  * include/hbset.h
+  * include/std.ch
+  * source/rdd/dbf1.c
+  * source/rdd/dblist.prg
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/errorsys.prg
+  * source/rtl/set.c
+  * source/rtl/tlabel.prg
+  * source/rtl/treport.prg
+  * source/rtl/txtline.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+  * tests/mousetst.prg
+  * tests/regextest.prg
+  * tests/videotst.prg
+  * tests/vidtest.prg
+     + Added Set( _SET_DEFEXTENSIONS, <logical: .T./.F.> )
+       Default value is .T. (CA-Cl*pper compatible). If set to .F.,
+       Harbour runtime/RDD code will never attempt to add a
+       default extension to the filename arguments. Commands/functions
+       where this setting makes a difference are:
+       - SET ALTERNATE TO / Set( _SET_ALTFILE_, ... )
+       - SET PRINTER TO / Set( _SET_PRINTFILE_, ... )
+       - Set( _SET_EXTRAFILE, ... )
+       - SAVE TO / __mvSave()
+       - RESTORE FROM / __mvRestore()
+       - LABEL FORM
+       - REPORT FORM
+       - COPY TO ... DELIMITED
+       - COPY TO ... SDF
+       - LIST / __dbList()
+       - USE / dbUseArea()
+       - dbCreate()
+       - SET INDEX TO / ordListAdd() (not yet implemented)
+       - __HRBLOAD(), __HRBRUN()
+     ; Notes:
+       - From now on, it possible to create/load files using the
+         above functions/commands which have no extension. This
+         might be desirable in a few platforms and/or situations.
+         For example on Win32, it's possible to directly print
+         to a shared Windows printer queue, using these commands:
+             lOldValue := Set( _SET_DEFEXTENSIONS, .F. )
+             SET PRINTER TO \\myserver\myprinter
+             Set( _SET_DEFEXTENSIONS, lOldValue )
+         Or, it is possible to open a dbf file which have no extension:
+             dbUseArea(.T., NIL, "dbf_filename_with_no_extension", "w_DATA", .F., .F.)
+       - Compiler is (of course) not affected by this setting.
+       - Preprocessor (PP) lib flavour is not affected by this setting.
+    (by Viktor Szakats, borrowed from Harbour)
+    - Removed _SET_GTMODE as it was gtxvt-only functionality, and if somebody
+      decides to update gtxvt, this should be better implemented via
+      HB_GTINFO().
+    * Synched extended SET() #define values with Harbour.
+    * xHarbour-only SET() extensions start from HB_SET_XHB_BASE (200).
+    * Synched hb_setGet*() function names with Harbour.
+    * Changed _SET_EOL to hold a char * like other string Sets instead of
+      PHB_ITEM.
 
 2008-04-05 17:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/cdpapi.c

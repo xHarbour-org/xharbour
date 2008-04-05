@@ -1,5 +1,5 @@
 //
-// $Id: mousetst.prg,v 1.2 2003/12/29 23:38:58 jonnymind Exp $
+// $Id: mousetst.prg,v 1.3 2004/01/28 16:42:19 jonnymind Exp $
 //
 /*
  * Copyright 2000 Alejandro de Garate <alex_degarate@hotmail.com>
@@ -14,7 +14,7 @@
 
 PROCEDURE main()
 LOCAL nR := 5, nC := 38
-SET GTMODE TO INLINE
+//SET GTMODE TO INLINE
 SET CURSOR OFF
 
    CLS

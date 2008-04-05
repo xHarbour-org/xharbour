@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.669 2008/03/27 15:11:08 likewolf Exp $
+ * $Id: hvm.c,v 1.670 2008/04/01 05:15:10 ronpinkas Exp $
  */
 
 /*
@@ -895,11 +895,6 @@ HB_EXPORT int hb_vmQuit( void )
    if( pHVMFuncService )
       pHVMFuncService();
 #endif
-
-   if( hb_set.HB_SET_EOL )
-   {
-      hb_itemRelease( hb_set.HB_SET_EOL );
-   }
 
    // FOR EACH Enumerations.
    uiCounter = HB_VM_STACK.wEnumCollectionCounter;

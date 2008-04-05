@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.175 2007/11/20 16:57:12 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.176 2008/03/13 11:12:11 marchuet Exp $
  */
 
 /*
@@ -3492,7 +3492,7 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
          szTagName[ 0 ] = '\0';
    }
 
-   if( !pFileName->szExtension || !fName )
+   if( ( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension ) || !fName )
    {
       DBORDERINFO pExtInfo;
       memset( &pExtInfo, 0, sizeof( pExtInfo ) );

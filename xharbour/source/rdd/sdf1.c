@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.26 2007/09/25 07:32:35 marchuet Exp $
+ * $Id: sdf1.c,v 1.27 2007/10/31 08:34:53 marchuet Exp $
  */
 
 /*
@@ -72,14 +72,11 @@ static void hb_sdfInitArea( SDFAREAP pArea, char * szFileName )
    /* Allocate only after succesfully open file */
    pArea->szFileName = hb_strdup( szFileName );
 
-#ifdef __XHARBOUR__
-   if( hb_itemGetCLen( hb_set.HB_SET_EOL ) == 0 )
-      pArea->szEol = hb_strdup( hb_conNewLine() );
+   /* set line separator: EOL */
+   if( hb_set.HB_SET_EOL && hb_set.HB_SET_EOL[ 0 ] )
+      pArea->szEol = hb_strdup( hb_set.HB_SET_EOL );
    else
-      pArea->szEol = hb_strdup( hb_itemGetCPtr( hb_set.HB_SET_EOL ) );
-#else
-   pArea->szEol = hb_strdup( hb_conNewLine() );
-#endif
+      pArea->szEol = hb_strdup( hb_conNewLine() );
    pArea->uiEolLen = strlen( pArea->szEol );
 
    /* Alloc buffer */
@@ -993,7 +990,7 @@ static ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
 #endif
 
    pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
-   if( ! pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
    {
       PHB_ITEM pItem = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem );
@@ -1085,7 +1082,7 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
    /* Add default file name extension if necessary */
-   if( ! pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
    {
       PHB_ITEM pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pFileExt );

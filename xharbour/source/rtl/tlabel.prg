@@ -1,5 +1,5 @@
 /*
- * $Id: tlabel.prg,v 1.3 2002/11/29 20:15:17 walito Exp $
+ * $Id: tlabel.prg,v 1.4 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
    LOCAL xBreakVal, lBroke := .F.
    LOCAL err
    LOCAL OldMargin
+   LOCAL cExt
 
    ::aBandToPrint:={} // ARRAY(5)
    ::nCurrentCol := 1
@@ -133,8 +134,13 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
       Eval(ErrorBlock(), err)
 
    ELSE
-      IF AT( ".", cLBLName ) == 0
-         cLBLName := TRIM( cLBLName ) + ".lbl"
+      /* NOTE: CA-Cl*pper does an RTrim() on the filename here, 
+               but in Harbour we're using _SET_TRIMFILENAME. [vszakats] */
+      IF Set( _SET_DEFEXTENSIONS )
+         hb_FNameSplit( cLBLName, NIL, NIL, @cExt )
+         IF Empty( cExt )
+            cLBLName += ".lbl"
+         ENDIF
       ENDIF
 
    ENDIF

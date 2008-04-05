@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.42 2008/03/10 11:24:05 likewolf Exp $
+ * $Id: hbset.h,v 1.43 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -123,28 +123,29 @@ typedef enum
    /* Harbour SET extensions start at 100 */
    HB_SET_LANGUAGE      = 100,
    HB_SET_IDLEREPEAT    = 101,
-   HB_SET_TRACE           = 102,
-   HB_SET_TRACEFILE       = 103,
-   HB_SET_TRACESTACK      = 104,
-   HB_SET_FILECASE        = 105,
-   HB_SET_DIRCASE         = 106,
-   HB_SET_DIRSEPARATOR    = 107,
-   HB_SET_ERRORLOOP       = 108,
-   HB_SET_OUTPUTSAFETY    = 109,
-   HB_SET_DBFLOCKSCHEME   = 110,
-   HB_SET_BACKGROUNDTASKS = 111,
-   HB_SET_TRIMFILENAME    = 112,
-   HB_SET_GTMODE          = 113,
-   HB_SET_BACKGROUNDTICK  = 114,
-   HB_SET_PRINTERJOB      = 115,
-   HB_SET_HARDCOMMIT      = 116,
-   HB_SET_FORCEOPT        = 117,
-   HB_SET_EOL             = 118,
-   HB_SET_ERRORLOG        = 119,
-   HB_SET_TIMEFORMAT      = 120,
-   HB_SET_MACROBLOCKVARS  = 121,
-   HB_SET_EOF             = 122
+   HB_SET_FILECASE      = 102,
+   HB_SET_DIRCASE       = 103,
+   HB_SET_DIRSEPARATOR  = 104,
+   HB_SET_EOF           = 105,
+   HB_SET_HARDCOMMIT    = 106,
+   HB_SET_FORCEOPT      = 107,
+   HB_SET_DBFLOCKSCHEME = 108,
+   HB_SET_DEFEXTENSIONS = 109,
+   HB_SET_EOL           = 110,
+   HB_SET_TRIMFILENAME  = 111,
 
+   /* xHarbour-only SET extensions start at 200 */
+   HB_SET_BACKGROUNDTASKS = 200,
+   HB_SET_BACKGROUNDTICK  = 201,
+   HB_SET_ERRORLOG        = 202,
+   HB_SET_ERRORLOOP       = 203,
+   HB_SET_MACROBLOCKVARS  = 204,
+   HB_SET_OUTPUTSAFETY    = 205,
+   HB_SET_PRINTERJOB      = 206,
+   HB_SET_TIMEFORMAT      = 207,
+   HB_SET_TRACE           = 208,
+   HB_SET_TRACEFILE       = 209,
+   HB_SET_TRACESTACK      = 210
 } HB_set_enum;
 
 typedef struct
@@ -204,7 +205,7 @@ typedef struct
    BOOL    HB_SET_UNIQUE;
    int     HB_SET_FILECASE;
    int     HB_SET_DIRCASE;
-   char    HB_SET_DIRSEPARATOR;
+   int     HB_SET_DIRSEPARATOR;
    int     HB_SET_VIDEOMODE;
    BOOL    HB_SET_WRAP;
 
@@ -217,16 +218,16 @@ typedef struct
    int     HB_SET_ERRORLOOP;
    BOOL    HB_SET_OUTPUTSAFETY;
    BOOL    HB_SET_BACKGROUNDTASKS;
-   BOOL    HB_SET_TRIMFILENAME ;
 
    BOOL    hb_set_winprinter;
    FHANDLE hb_set_winhan;
    char *  hb_set_printerjob;
-   int     HB_SET_GTMODE;
    int     HB_SET_BACKGROUNDTICK;
    BOOL    HB_SET_HARDCOMMIT;
    BOOL    HB_SET_FORCEOPT;
-   PHB_ITEM HB_SET_EOL;
+   BOOL    HB_SET_DEFEXTENSIONS;
+   char *  HB_SET_EOL;
+   BOOL    HB_SET_TRIMFILENAME;
    BOOL    HB_SET_APPENDERROR;
    char    HB_SET_ERRORLOG[_POSIX_PATH_MAX];
    char *  HB_SET_TIMEFORMAT;
@@ -262,80 +263,80 @@ extern HB_EXPORT int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern HB_EXPORT void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern HB_EXPORT int hb_setListenerRemove( int );
 
-extern HB_EXPORT FHANDLE hb_setAltHan( void );
-extern HB_EXPORT BOOL    hb_setCentury( void );
-extern HB_EXPORT FHANDLE hb_setExtraHan( void );
-extern HB_EXPORT FHANDLE hb_setPrintHan( void );
-extern HB_EXPORT BOOL    hb_setAlternate( void );
-extern HB_EXPORT char *  hb_setAltFile( void );
-extern HB_EXPORT BOOL    hb_setAutOpen( void );
-extern HB_EXPORT int     hb_setAutOrder( void );
-extern HB_EXPORT int     hb_setAutoShare( void );
-extern HB_EXPORT BOOL    hb_setBell( void );
-extern HB_EXPORT BOOL    hb_setCancel( void );
-extern HB_EXPORT char *  hb_setColor( void );
-extern HB_EXPORT BOOL    hb_setConfirm( void );
-extern HB_EXPORT BOOL    hb_setConsole( void );
-extern HB_EXPORT char *  hb_setDateFormat( void );
-extern HB_EXPORT BOOL    hb_setDebug( void );
-extern HB_EXPORT int     hb_setDecimals( void );
-extern HB_EXPORT char *  hb_setDefault( void );
-extern HB_EXPORT BOOL    hb_setDeleted( void );
-extern HB_EXPORT char *  hb_setDelimChars( void );
-extern HB_EXPORT BOOL    hb_setDelimiters( void );
-extern HB_EXPORT char *  hb_setDevice( void );
-extern HB_EXPORT BOOL    hb_setEOF( void );
-extern HB_EXPORT int     hb_setEpoch( void );
-extern HB_EXPORT BOOL    hb_setEscape( void );
-extern HB_EXPORT int     hb_setEventMask( void );
-extern HB_EXPORT BOOL    hb_setExact( void );
-extern HB_EXPORT BOOL    hb_setExclusive( void );
-extern HB_EXPORT BOOL    hb_setExit( void );
-extern HB_EXPORT BOOL    hb_setExtra( void );
-extern HB_EXPORT char *  hb_setExtraFile( void );
-extern HB_EXPORT BOOL    hb_setFixed( void );
-extern HB_EXPORT BOOL    hb_setIdleRepeat( void );
-extern HB_EXPORT BOOL    hb_setInsert( void );
-extern HB_EXPORT BOOL    hb_setIntensity( void );
-extern HB_EXPORT char *  hb_setPath( void );
-extern HB_EXPORT int     hb_setMargin( void );
-extern HB_EXPORT int     hb_setMBlockSize( void );
-extern HB_EXPORT BOOL    hb_setMCenter( void );
-extern HB_EXPORT int     hb_setMessage( void );
-extern HB_EXPORT char *  hb_setMFileExt( void );
-extern HB_EXPORT BOOL    hb_setOptimize( void );
-extern HB_EXPORT BOOL    hb_setPrinter( void );
-extern HB_EXPORT char *  hb_setPrintFile( void );
-extern HB_EXPORT BOOL    hb_setScoreBoard( void );
-extern HB_EXPORT BOOL    hb_setScrollBreak( void );
-extern HB_EXPORT BOOL    hb_setSoftSeek( void );
-extern HB_EXPORT BOOL    hb_setStrictRead( void );
-extern HB_EXPORT int     hb_setTypeAhead( void );
-extern HB_EXPORT BOOL    hb_setUnique( void );
-extern HB_EXPORT int     hb_setFileCase( void );
-extern HB_EXPORT int     hb_setDirCase( void );
-extern HB_EXPORT char    hb_setDirSeparator( void );
-extern HB_EXPORT int     hb_setVideoMode( void );
-extern HB_EXPORT BOOL    hb_setWrap( void );
-extern HB_EXPORT int     hb_setDBFLockScheme( void );
-extern HB_EXPORT BOOL    hb_setTrace( void );
-extern HB_EXPORT char *  hb_setTraceFile( void );
-extern HB_EXPORT char    hb_setTraceStack( void );
-extern HB_EXPORT int     hb_setErrorLoop( void );
-extern HB_EXPORT BOOL    hb_setOutputSafety( void );
-extern HB_EXPORT BOOL    hb_setBackgroundTasks( void );
-extern HB_EXPORT BOOL    hb_setTrimFileName( void );
-extern HB_EXPORT BOOL    hb_setWinPrinter( void );
-extern HB_EXPORT FHANDLE hb_setWinHan( void );
-extern HB_EXPORT char *  hb_setPrinterJob( void );
-extern HB_EXPORT int     hb_setGTMode( void );
-extern HB_EXPORT int     hb_setBackGroundTick( void );
-extern HB_EXPORT BOOL    hb_setHardCommit( void );
-extern HB_EXPORT BOOL    hb_setForceOpt( void );
-extern HB_EXPORT PHB_ITEM hb_setEOL( void );
-extern HB_EXPORT BOOL    hb_setAppendError( void );
-extern HB_EXPORT char *  hb_setErrorLog( void );
-extern HB_EXPORT char *  hb_setTimeFormat( void );
+extern HB_EXPORT FHANDLE hb_setGetAltHan( void );
+extern HB_EXPORT BOOL    hb_setGetCentury( void );
+extern HB_EXPORT FHANDLE hb_setGetExtraHan( void );
+extern HB_EXPORT FHANDLE hb_setGetPrintHan( void );
+extern HB_EXPORT BOOL    hb_setGetAlternate( void );
+extern HB_EXPORT char *  hb_setGetAltFile( void );
+extern HB_EXPORT BOOL    hb_setGetAutOpen( void );
+extern HB_EXPORT int     hb_setGetAutOrder( void );
+extern HB_EXPORT int     hb_setGetAutoShare( void );
+extern HB_EXPORT BOOL    hb_setGetBell( void );
+extern HB_EXPORT BOOL    hb_setGetCancel( void );
+extern HB_EXPORT char *  hb_setGetColor( void );
+extern HB_EXPORT BOOL    hb_setGetConfirm( void );
+extern HB_EXPORT BOOL    hb_setGetConsole( void );
+extern HB_EXPORT char *  hb_setGetDateFormat( void );
+extern HB_EXPORT BOOL    hb_setGetDebug( void );
+extern HB_EXPORT int     hb_setGetDecimals( void );
+extern HB_EXPORT char *  hb_setGetDefault( void );
+extern HB_EXPORT BOOL    hb_setGetDeleted( void );
+extern HB_EXPORT char *  hb_setGetDelimChars( void );
+extern HB_EXPORT BOOL    hb_setGetDelimiters( void );
+extern HB_EXPORT char *  hb_setGetDevice( void );
+extern HB_EXPORT BOOL    hb_setGetEOF( void );
+extern HB_EXPORT int     hb_setGetEpoch( void );
+extern HB_EXPORT BOOL    hb_setGetEscape( void );
+extern HB_EXPORT int     hb_setGetEventMask( void );
+extern HB_EXPORT BOOL    hb_setGetExact( void );
+extern HB_EXPORT BOOL    hb_setGetExclusive( void );
+extern HB_EXPORT BOOL    hb_setGetExit( void );
+extern HB_EXPORT BOOL    hb_setGetExtra( void );
+extern HB_EXPORT char *  hb_setGetExtraFile( void );
+extern HB_EXPORT BOOL    hb_setGetFixed( void );
+extern HB_EXPORT BOOL    hb_setGetIdleRepeat( void );
+extern HB_EXPORT BOOL    hb_setGetInsert( void );
+extern HB_EXPORT BOOL    hb_setGetIntensity( void );
+extern HB_EXPORT char *  hb_setGetPath( void );
+extern HB_EXPORT int     hb_setGetMargin( void );
+extern HB_EXPORT int     hb_setGetMBlockSize( void );
+extern HB_EXPORT BOOL    hb_setGetMCenter( void );
+extern HB_EXPORT int     hb_setGetMessage( void );
+extern HB_EXPORT char *  hb_setGetMFileExt( void );
+extern HB_EXPORT BOOL    hb_setGetOptimize( void );
+extern HB_EXPORT BOOL    hb_setGetPrinter( void );
+extern HB_EXPORT char *  hb_setGetPrintFile( void );
+extern HB_EXPORT BOOL    hb_setGetScoreBoard( void );
+extern HB_EXPORT BOOL    hb_setGetScrollBreak( void );
+extern HB_EXPORT BOOL    hb_setGetSoftSeek( void );
+extern HB_EXPORT BOOL    hb_setGetStrictRead( void );
+extern HB_EXPORT int     hb_setGetTypeAhead( void );
+extern HB_EXPORT BOOL    hb_setGetUnique( void );
+extern HB_EXPORT int     hb_setGetFileCase( void );
+extern HB_EXPORT int     hb_setGetDirCase( void );
+extern HB_EXPORT int     hb_setGetDirSeparator( void );
+extern HB_EXPORT int     hb_setGetVideoMode( void );
+extern HB_EXPORT BOOL    hb_setGetWrap( void );
+extern HB_EXPORT int     hb_setGetDBFLockScheme( void );
+extern HB_EXPORT BOOL    hb_setGetHardCommit( void );
+extern HB_EXPORT BOOL    hb_setGetForceOpt( void );
+extern HB_EXPORT BOOL    hb_setGetDefExtension( void );
+extern HB_EXPORT char *  hb_setGetEOL( void );
+extern HB_EXPORT BOOL    hb_setGetTrimFileName( void );
+extern HB_EXPORT BOOL    hb_setGetTrace( void );
+extern HB_EXPORT char *  hb_setGetTraceFile( void );
+extern HB_EXPORT char    hb_setGetTraceStack( void );
+extern HB_EXPORT int     hb_setGetErrorLoop( void );
+extern HB_EXPORT BOOL    hb_setGetOutputSafety( void );
+extern HB_EXPORT BOOL    hb_setGetBackgroundTasks( void );
+extern HB_EXPORT BOOL    hb_setGetWinPrinter( void );
+extern HB_EXPORT FHANDLE hb_setGetWinHan( void );
+extern HB_EXPORT char *  hb_setGetPrinterJob( void );
+extern HB_EXPORT int     hb_setGetBackGroundTick( void );
+extern HB_EXPORT BOOL    hb_setGetAppendError( void );
+extern HB_EXPORT char *  hb_setGetErrorLog( void );
+extern HB_EXPORT char *  hb_setGetTimeFormat( void );
 
 #ifndef HB_SET_STACK
    #define HB_SET_STACK (*hb_GetSetStructPtr())

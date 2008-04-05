@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.57 2007/10/24 12:09:46 lculik Exp $
+ * $Id: errorsys.prg,v 1.58 2008/03/16 03:24:20 lculik Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 #include "common.ch"
 #include "error.ch"
 #include "fileio.ch"
+#include "set.ch"
 
 REQUEST Select,Alias,RecNo,DbFilter,DbRelation,IndexOrd,IndexKey
 
@@ -325,94 +326,93 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, Padc( ' Environmental Information ', 79, '-' ) )
         FWriteLine( nHandle, '' )
 
-        FWriteLine( nHandle, "SET ALTERNATE......: " + strvalue( Set( 18  ), .T. ) )
-        FWriteLine( nHandle, "SET ALTFILE........: " + strvalue( Set( 19  )      ) )
-        FWriteLine( nHandle, "SET AUTOPEN........: " + strvalue( Set( 45  ), .T. ) )
-        FWriteLine( nHandle, "SET AUTORDER.......: " + strvalue( Set( 46  )      ) )
-        FWriteLine( nHandle, "SET AUTOSHARE......: " + strvalue( Set( 47  )      ) )
+        FWriteLine( nHandle, "SET ALTERNATE......: " + strvalue( Set( _SET_ALTERNATE  ), .T. ) )
+        FWriteLine( nHandle, "SET ALTFILE........: " + strvalue( Set( _SET_ALTFILE  )      ) )
+        FWriteLine( nHandle, "SET AUTOPEN........: " + strvalue( Set( _SET_AUTOPEN  ), .T. ) )
+        FWriteLine( nHandle, "SET AUTORDER.......: " + strvalue( Set( _SET_AUTORDER )      ) )
+        FWriteLine( nHandle, "SET AUTOSHARE......: " + strvalue( Set( _SET_AUTOSHARE )      ) )
 
-        FWriteLine( nHandle, "SET BACKGROUNDTASKS: " + strvalue( Set( 111 ), .T. ) )
-        FWriteLine( nHandle, "SET BACKGROUNDTICK.: " + strvalue( Set( 114 ), .T. ) )
-        FWriteLine( nHandle, "SET BELL...........: " + strvalue( Set( 26  ), .T. ) )
+        FWriteLine( nHandle, "SET BACKGROUNDTASKS: " + strvalue( Set( _SET_BACKGROUNDTASKS ), .T. ) )
+        FWriteLine( nHandle, "SET BACKGROUNDTICK.: " + strvalue( Set( _SET_BACKGROUNDTICK ), .T. ) )
+        FWriteLine( nHandle, "SET BELL...........: " + strvalue( Set( _SET_BELL  ), .T. ) )
         FWriteLine( nHandle, "SET BLINK..........: " + strvalue( SetBlink()      ) )
 
-        FWriteLine( nHandle, "SET CANCEL.........: " + strvalue( Set( 12  ), .T. ) )
+        FWriteLine( nHandle, "SET CANCEL.........: " + strvalue( Set( _SET_CANCEL  ), .T. ) )
         FWriteLine( nHandle, "SET CENTURY........: " + strvalue( __SetCentury(), .T. ) )
-        FWriteLine( nHandle, "SET COLOR..........: " + strvalue( Set( 15  )      ) )
-        FWriteLine( nHandle, "SET CONFIRM........: " + strvalue( Set( 27  ), .T. ) )
-        FWriteLine( nHandle, "SET CONSOLE........: " + strvalue( Set( 17  ), .T. ) )
-        FWriteLine( nHandle, "SET COUNT..........: " + strvalue( Set( 47  )      ) )
-        FWriteLine( nHandle, "SET CURSOR.........: " + strvalue( Set( 16  )      ) )
+        FWriteLine( nHandle, "SET COLOR..........: " + strvalue( Set( _SET_COLOR  )      ) )
+        FWriteLine( nHandle, "SET CONFIRM........: " + strvalue( Set( _SET_CONFIRM  ), .T. ) )
+        FWriteLine( nHandle, "SET CONSOLE........: " + strvalue( Set( _SET_CONSOLE  ), .T. ) )
+        FWriteLine( nHandle, "SET COUNT..........: " + strvalue( Set( _SET_COUNT  )      ) )
+        FWriteLine( nHandle, "SET CURSOR.........: " + strvalue( Set( _SET_CURSOR  )      ) )
 
-        FWriteLine( nHandle, "SET DATE FORMAT....: " + strvalue( Set( 4   )      ) )
-        FWriteLine( nHandle, "SET DBFLOCKSCHEME..: " + strvalue( Set( 110 )      ) )
-        FWriteLine( nHandle, "SET DEBUG..........: " + strvalue( Set( 13  ), .T. ) )
-        FWriteLine( nHandle, "SET DECIMALS.......: " + strvalue( Set( 3   )      ) )
-        FWriteLine( nHandle, "SET DEFAULT........: " + strvalue( Set( 7   )      ) )
-        FWriteLine( nHandle, "SET DELETED........: " + strvalue( Set( 11  ), .T. ) )
-        FWriteLine( nHandle, "SET DELIMCHARS.....: " + strvalue( Set( 34  )      ) )
-        FWriteLine( nHandle, "SET DELIMETERS.....: " + strvalue( Set( 33  ), .T. ) )
-        FWriteLine( nHandle, "SET DEVICE.........: " + strvalue( Set( 20  )      ) )
-        FWriteLine( nHandle, "SET DIRCASE........: " + strvalue( Set( 106 )      ) )
-        FWriteLine( nHandle, "SET DIRSEPARATOR...: " + strvalue( Set( 107 )      ) )
+        FWriteLine( nHandle, "SET DATE FORMAT....: " + strvalue( Set( _SET_DATEFORMAT )      ) )
+        FWriteLine( nHandle, "SET DBFLOCKSCHEME..: " + strvalue( Set( _SET_DBFLOCKSCHEME )      ) )
+        FWriteLine( nHandle, "SET DEBUG..........: " + strvalue( Set( _SET_DEBUG ), .T. ) )
+        FWriteLine( nHandle, "SET DECIMALS.......: " + strvalue( Set( _SET_DECIMALS )      ) )
+        FWriteLine( nHandle, "SET DEFAULT........: " + strvalue( Set( _SET_DEFAULT )      ) )
+        FWriteLine( nHandle, "SET DEFEXTENSIONS..: " + strvalue( Set( _SET_DEFEXTENSIONS ), .T. ) )
+        FWriteLine( nHandle, "SET DELETED........: " + strvalue( Set( _SET_DELETED ), .T. ) )
+        FWriteLine( nHandle, "SET DELIMCHARS.....: " + strvalue( Set( _SET_DELIMCHARS )      ) )
+        FWriteLine( nHandle, "SET DELIMETERS.....: " + strvalue( Set( _SET_DELIMITERS ), .T. ) )
+        FWriteLine( nHandle, "SET DEVICE.........: " + strvalue( Set( _SET_DEVICE )      ) )
+        FWriteLine( nHandle, "SET DIRCASE........: " + strvalue( Set( _SET_DIRCASE )      ) )
+        FWriteLine( nHandle, "SET DIRSEPARATOR...: " + strvalue( Set( _SET_DIRSEPARATOR )      ) )
 
-        FWriteLine( nHandle, "SET EOL............: " + strvalue( Asc( Set( 118 ) ) )  )
-        FWriteLine( nHandle, "SET EPOCH..........: " + strvalue( Set( 5   )      ) )
+        FWriteLine( nHandle, "SET EOL............: " + strvalue( Asc( Set( _SET_EOL ) ) )  )
+        FWriteLine( nHandle, "SET EPOCH..........: " + strvalue( Set( _SET_EPOCH )      ) )
         FWriteLine( nHandle, "SET ERRORLOG.......: " + if(!Empty(aLogFile), strvalue( aLogFile[1] )+","+strvalue( aLogFile[2] ), "") )
-        FWriteLine( nHandle, "SET ERRORLOOP......: " + strvalue( Set( 108 )      ) )
-        FWriteLine( nHandle, "SET ESCAPE.........: " + strvalue( Set( 28  ), .T. ) )
-        FWriteLine( nHandle, "SET EVENTMASK......: " + strvalue( Set( 39  )      ) )
-        FWriteLine( nHandle, "SET EXACT..........: " + strvalue( Set( 1   ), .T. ) )
-        FWriteLine( nHandle, "SET EXCLUSIVE......: " + strvalue( Set( 8   ), .T. ) )
-        FWriteLine( nHandle, "SET EXIT...........: " + strvalue( Set( 30  ), .T. ) )
-        FWriteLine( nHandle, "SET EXTRA..........: " + strvalue( Set( 21  ), .T. ) )
-        FWriteLine( nHandle, "SET EXTRAFILE......: " + strvalue( Set( 22  )      ) )
+        FWriteLine( nHandle, "SET ERRORLOOP......: " + strvalue( Set( _SET_ERRORLOOP )      ) )
+        FWriteLine( nHandle, "SET ESCAPE.........: " + strvalue( Set( _SET_ESCAPE ), .T. ) )
+        FWriteLine( nHandle, "SET EVENTMASK......: " + strvalue( Set( _SET_EVENTMASK )      ) )
+        FWriteLine( nHandle, "SET EXACT..........: " + strvalue( Set( _SET_EXACT ), .T. ) )
+        FWriteLine( nHandle, "SET EXCLUSIVE......: " + strvalue( Set( _SET_EXCLUSIVE ), .T. ) )
+        FWriteLine( nHandle, "SET EXIT...........: " + strvalue( Set( _SET_EXIT ), .T. ) )
+        FWriteLine( nHandle, "SET EXTRA..........: " + strvalue( Set( _SET_EXTRA ), .T. ) )
+        FWriteLine( nHandle, "SET EXTRAFILE......: " + strvalue( Set( _SET_EXTRAFILE )      ) )
 
-        FWriteLine( nHandle, "SET FILECASE.......: " + strvalue( Set( 105 )      ) )
-        FWriteLine( nHandle, "SET FIXED..........: " + strvalue( Set( 2   ), .T. ) )
-        FWriteLine( nHandle, "SET FORCEOPT.......: " + strvalue( Set( 117 ), .T. ) )
+        FWriteLine( nHandle, "SET FILECASE.......: " + strvalue( Set( _SET_FILECASE )      ) )
+        FWriteLine( nHandle, "SET FIXED..........: " + strvalue( Set( _SET_FIXED ), .T. ) )
+        FWriteLine( nHandle, "SET FORCEOPT.......: " + strvalue( Set( _SET_FORCEOPT ), .T. ) )
 
-        FWriteLine( nHandle, "SET GTMODE.........: " + strvalue( Set( 113 )      ) )
+        FWriteLine( nHandle, "SET HARDCOMMIT.....: " + strvalue( Set( _SET_HARDCOMMIT ), .T. ) )
 
-        FWriteLine( nHandle, "SET HARDCOMMIT.....: " + strvalue( Set( 116 ), .T. ) )
-
-        FWriteLine( nHandle, "SET IDLEREPEAT.....: " + strvalue( Set( 101 ), .T. ) )
-        FWriteLine( nHandle, "SET INSERT.........: " + strvalue( Set( 29  ), .T. ) )
-        FWriteLine( nHandle, "SET INTENSITY......: " + strvalue( Set( 31  ), .T. ) )
+        FWriteLine( nHandle, "SET IDLEREPEAT.....: " + strvalue( Set( _SET_IDLEREPEAT ), .T. ) )
+        FWriteLine( nHandle, "SET INSERT.........: " + strvalue( Set( _SET_INSERT ), .T. ) )
+        FWriteLine( nHandle, "SET INTENSITY......: " + strvalue( Set( _SET_INTENSITY ), .T. ) )
                                                                           
-        FWriteLine( nHandle, "SET LANGUAGE.......: " + strvalue( Set( 100 )      ) )
+        FWriteLine( nHandle, "SET LANGUAGE.......: " + strvalue( Set( _SET_LANGUAGE )      ) )
 
-        FWriteLine( nHandle, "SET MARGIN.........: " + strvalue( Set( 25  )      ) )
-        FWriteLine( nHandle, "SET MBLOCKSIZE.....: " + strvalue( Set( 41  )      ) )
-        FWriteLine( nHandle, "SET MCENTER........: " + strvalue( Set( 37  ), .T. ) )
-        FWriteLine( nHandle, "SET MESSAGE........: " + strvalue( Set( 36  )      ) )
-        FWriteLine( nHandle, "SET MFILEEXT.......: " + strvalue( Set( 42  )      ) )
+        FWriteLine( nHandle, "SET MARGIN.........: " + strvalue( Set( _SET_MARGIN )      ) )
+        FWriteLine( nHandle, "SET MBLOCKSIZE.....: " + strvalue( Set( _SET_MBLOCKSIZE )      ) )
+        FWriteLine( nHandle, "SET MCENTER........: " + strvalue( Set( _SET_MCENTER ), .T. ) )
+        FWriteLine( nHandle, "SET MESSAGE........: " + strvalue( Set( _SET_MESSAGE )      ) )
+        FWriteLine( nHandle, "SET MFILEEXT.......: " + strvalue( Set( _SET_MFILEEXT )      ) )
 
-        FWriteLine( nHandle, "SET OPTIMIZE.......: " + strvalue( Set( 44  ), .T. ) )
-        FWriteLine( nHandle, "SET OUTPUTSAFETY...: " + strvalue( Set( 109 ), .T. ) )
+        FWriteLine( nHandle, "SET OPTIMIZE.......: " + strvalue( Set( _SET_OPTIMIZE ), .T. ) )
+        FWriteLine( nHandle, "SET OUTPUTSAFETY...: " + strvalue( Set( _SET_OUTPUTSAFETY ), .T. ) )
 
-        FWriteLine( nHandle, "SET PATH...........: " + strvalue( Set( 6   )      ) )
-        FWriteLine( nHandle, "SET PRINTER........: " + strvalue( Set( 23  ), .T. ) )
-        FWriteLine( nHandle, "SET PRINTERJOB.....: " + strvalue( Set( 115 )      ) )
-        FWriteLine( nHandle, "SET PRINTFILE......: " + strvalue( Set( 24  )      ) )
+        FWriteLine( nHandle, "SET PATH...........: " + strvalue( Set( _SET_PATH )      ) )
+        FWriteLine( nHandle, "SET PRINTER........: " + strvalue( Set( _SET_PRINTER ), .T. ) )
+        FWriteLine( nHandle, "SET PRINTERJOB.....: " + strvalue( Set( _SET_PRINTERJOB )      ) )
+        FWriteLine( nHandle, "SET PRINTFILE......: " + strvalue( Set( _SET_PRINTFILE )      ) )
 
-        FWriteLine( nHandle, "SET SCOREBOARD.....: " + strvalue( Set( 32  ), .T. ) )
-        FWriteLine( nHandle, "SET SCROLLBREAK....: " + strvalue( Set( 38  ), .T. ) )
-        FWriteLine( nHandle, "SET SOFTSEEK.......: " + strvalue( Set( 9   ), .T. ) )
-        FWriteLine( nHandle, "SET STRICTREAD.....: " + strvalue( Set( 43  ), .T. ) )
+        FWriteLine( nHandle, "SET SCOREBOARD.....: " + strvalue( Set( _SET_SCOREBOARD ), .T. ) )
+        FWriteLine( nHandle, "SET SCROLLBREAK....: " + strvalue( Set( _SET_SCROLLBREAK ), .T. ) )
+        FWriteLine( nHandle, "SET SOFTSEEK.......: " + strvalue( Set( _SET_SOFTSEEK ), .T. ) )
+        FWriteLine( nHandle, "SET STRICTREAD.....: " + strvalue( Set( _SET_STRICTREAD ), .T. ) )
 
-        FWriteLine( nHandle, "SET TRACE..........: " + strvalue( Set( 102 ), .T. ) )
-        FWriteLine( nHandle, "SET TRACEFILE......: " + strvalue( Set( 103 )      ) )
-        FWriteLine( nHandle, "SET TRACESTACK.....: " + strvalue( Set( 104 )      ) )
-        FWriteLine( nHandle, "SET TRIMFILENAME...: " + strvalue( Set( 112 )      ) )
+        FWriteLine( nHandle, "SET TRACE..........: " + strvalue( Set( _SET_TRACE ), .T. ) )
+        FWriteLine( nHandle, "SET TRACEFILE......: " + strvalue( Set( _SET_TRACEFILE )      ) )
+        FWriteLine( nHandle, "SET TRACESTACK.....: " + strvalue( Set( _SET_TRACESTACK )      ) )
+        FWriteLine( nHandle, "SET TRIMFILENAME...: " + strvalue( Set( _SET_TRIMFILENAME )      ) )
 
-        FWriteLine( nHandle, "SET TYPEAHEAD......: " + strvalue( Set( 14  )      ) )
+        FWriteLine( nHandle, "SET TYPEAHEAD......: " + strvalue( Set( _SET_TYPEAHEAD )      ) )
 
-        FWriteLine( nHandle, "SET UNIQUE.........: " + strvalue( Set( 10  ), .T. ) )
+        FWriteLine( nHandle, "SET UNIQUE.........: " + strvalue( Set( _SET_UNIQUE ), .T. ) )
 
-        FWriteLine( nHandle, "SET VIDEOMODE......: " + strvalue( Set( 40  )      ) )
+        FWriteLine( nHandle, "SET VIDEOMODE......: " + strvalue( Set( _SET_VIDEOMODE )      ) )
 
-        FWriteLine( nHandle, "SET WRAP...........: " + strvalue( Set( 35  ), .T. ) )
+        FWriteLine( nHandle, "SET WRAP...........: " + strvalue( Set( _SET_WRAP ), .T. ) )
 
 
         FWriteLine( nHandle, "" )

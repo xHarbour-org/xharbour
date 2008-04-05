@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.55 2008/03/09 18:13:45 ronpinkas Exp $
+ * $Id: runner.c,v 1.56 2008/03/21 16:14:52 likewolf Exp $
  */
 
 /*
@@ -68,6 +68,7 @@
 #include "hbapifs.h"
 #include "hbvm.h"
 #include "hbpcode.h"
+#include "hbset.h"
 #include "hb_io.h"
 #include "classes.h"
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
@@ -566,7 +567,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
    /* Create full filename */
 
    pFileName = hb_fsFNameSplit( szHrb );
-   if( ! pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
    {
       pFileName->szExtension = ".hrb";
    }

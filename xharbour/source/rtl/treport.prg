@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.6 2005/11/04 14:09:31 lculik Exp $
+ * $Id: treport.prg,v 1.7 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -183,6 +183,7 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
    LOCAL nGroup
    LOCAL xBreakVal, lBroke := .F.
    LOCAL err
+   LOCAL cExt
    LOCAL aReport, aTotal
 
    LOCAL lAnyTotals
@@ -196,8 +197,13 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
       err:subSystem := "FRMLBL"
       Eval(ErrorBlock(), err)
    ELSE
-      IF AT( ".", cFRMName ) == 0
-         cFRMName := TRIM( cFRMName ) + ".frm"
+      /* NOTE: CA-Cl*pper does an RTrim() on the filename here, 
+               but in Harbour we're using _SET_TRIMFILENAME. [vszakats] */
+      IF Set( _SET_DEFEXTENSIONS )
+         hb_FNameSplit( cFRMName, NIL, NIL, @cExt )
+         IF Empty( cExt )
+            cFRMName += ".frm"
+         ENDIF
       ENDIF
    ENDIF
 

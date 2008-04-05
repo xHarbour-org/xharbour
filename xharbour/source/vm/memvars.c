@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.128 2007/10/31 08:35:13 marchuet Exp $
+ * $Id: memvars.c,v 1.129 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -2001,21 +2001,20 @@ HB_FUNC( __MVSAVE )
 
       /* Generate filename */
 
-      pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+
+      if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
+         pFileName->szExtension = ".mem";
 
       if( pFileName->szPath == NULL )
       {
          pFileName->szPath = hb_set.HB_SET_DEFAULT;
       }
-      if( pFileName->szExtension == NULL )
-      {
-         pFileName->szExtension = ".mem";
-      }
 
       hb_fsFNameMerge( szFileName, pFileName );
       hb_xfree( pFileName );
 
-      /* Create .MEM file */
+      /* Create .mem file */
 
       while( ( fhnd = hb_fsCreate( ( BYTE * ) szFileName, FC_NORMAL ) ) == FS_ERROR )
       {
@@ -2080,7 +2079,8 @@ HB_FUNC( __MVRESTORE )
    */
    if( ISCHAR( 1 ) && ISLOG( 2 ) )
    {
-      char * szFileName;
+      PHB_FNAME pFileName;
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
       FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );
@@ -2108,9 +2108,20 @@ HB_FUNC( __MVRESTORE )
          */
       }
 
-      /* Open .MEM file */
+      /* Generate filename */
 
-      szFileName = hb_parc( 1 );
+      pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+
+      if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
+         pFileName->szExtension = ".mem";
+
+      if( pFileName->szPath == NULL )
+         pFileName->szPath = hb_set.HB_SET_DEFAULT;
+
+      hb_fsFNameMerge( szFileName, pFileName );
+      hb_xfree( pFileName );
+
+      /* Open .mem file */
 
       while( ( fhnd = hb_fsExtOpen( ( BYTE * ) szFileName, (BYTE *) ".mem", FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
       {

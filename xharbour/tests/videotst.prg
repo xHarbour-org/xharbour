@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.4 2006/06/16 07:16:17 fsgiudice Exp $
+ * $Id: videotst.prg,v 1.5 2008/03/18 01:03:28 likewolf Exp $
  */
 * VIDEOTST.PRG
 *
@@ -28,7 +28,7 @@ FUNCTION MAIN()
              { 50, 80, " 50 x 80 " },;
              { 60, 80, " 60 x 80 " } }
 
- SET GTMODE TO INLINE
+ //SET GTMODE TO INLINE
 
  hb_gtInfo(GTI_FONTSIZE, 18)
  setmode( 37, 102 )

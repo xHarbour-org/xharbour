@@ -1,5 +1,5 @@
 /*
- * $Id: dblist.prg,v 1.2 2006/07/17 12:56:18 druzus Exp $
+ * $Id: dblist.prg,v 1.3 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    ENDIF
    IF !Empty( cToFileName )
       hb_FNameSplit( cToFileName, @cPath, @cName, @cExt )
-      IF Empty( cExt )
+      IF Set( _SET_DEFEXTENSIONS ) .AND. Empty( cExt )
          cExt := ".txt"
       ENDIF
       lOldExtra := Set( _SET_EXTRA, .T. )

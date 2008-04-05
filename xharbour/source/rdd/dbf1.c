@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.184 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: dbf1.c,v 1.185 2008/03/13 11:12:08 marchuet Exp $
  */
 
 /*
@@ -2781,7 +2781,8 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    pArea->lpdbOpenInfo = pCreateInfo;
 
    pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
-   if( ! pFileName->szExtension )
+
+   if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
    {
       pItem = hb_itemPutC( pItem, "" );
       if( SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem ) != SUCCESS )
@@ -3777,7 +3778,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    pFileName = hb_fsFNameSplit( ( char * ) szFileName );
    /* Add default file name extension if necessary */
-   if( ! pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
    {
       hb_itemClear( pItem );
       if( SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem ) != SUCCESS )
@@ -5328,7 +5329,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
 
    pFileName = hb_fsFNameSplit( szFile );
 
-   if( !pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension )
    {
       /* Add default extension if missing */
       pFileExt = hb_itemPutC( NULL, "" );
@@ -5409,7 +5410,7 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
 
    pFileName = hb_fsFNameSplit( szFile );
 
-   if( !pFileName->szExtension )
+   if( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
       if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, 0, pFileExt ) == SUCCESS )
