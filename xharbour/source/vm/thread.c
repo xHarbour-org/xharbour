@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.207 2008/01/14 23:39:04 likewolf Exp $
+* $Id: thread.c,v 1.208 2008/01/15 01:00:29 likewolf Exp $
 */
 
 /*
@@ -1048,7 +1048,7 @@ void hb_threadTerminator( void *pData )
 
    IT is meant to be called from the main thread.
 */
-void HB_EXPORT hb_threadWaitAll()
+HB_EXPORT void hb_threadWaitAll()
 {
    HB_THREAD_STUB
 
@@ -1080,7 +1080,7 @@ void HB_EXPORT hb_threadWaitAll()
    Kill all the threads except the main one. Must be called
    from the main thread.
 */
-void HB_EXPORT hb_threadKillAll()
+HB_EXPORT void hb_threadKillAll()
 {
    HB_STACK *pStack;
 
