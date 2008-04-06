@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.43 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbset.h,v 1.44 2008/04/05 20:31:19 likewolf Exp $
  */
 
 /*
@@ -262,6 +262,12 @@ typedef void HB_SET_LISTENER_CALLBACK( HB_set_enum, HB_set_listener_enum );
 extern HB_EXPORT int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern HB_EXPORT void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern HB_EXPORT int hb_setListenerRemove( int );
+
+extern HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier );
+extern HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier );
+extern HB_EXPORT int     hb_setGetNI( HB_set_enum set_specifier );
+extern HB_EXPORT long    hb_setGetNL( HB_set_enum set_specifier );
+
 
 extern HB_EXPORT FHANDLE hb_setGetAltHan( void );
 extern HB_EXPORT BOOL    hb_setGetCentury( void );

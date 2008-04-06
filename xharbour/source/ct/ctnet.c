@@ -1,45 +1,12 @@
 /*
- * $Id: ctnet.c,v 1.9 2007/09/22 05:41:01 andijahja Exp $
+ * $Id: ctnet.c,v 1.10 2008/03/27 10:26:45 likewolf Exp $
  *
  * xHarbour Project source code:
- * NET..() functions to PC-LAN/MS-NET.
+ * CT3 NET functions to PC-LAN/MS-NET.
  *
  * Copyright 2004-2007 Eduardo Fernandes <modalsist@yahoo.com.br>
  * www - http://www.xharbour.org
  *
- *******
- *
- * CT3 NET Functions Comments:
- *
- * NETCANCEL( <cLocalDevice> ) -> lReleased
- * Return true if <cLocalDevice> was disconnected.
- *
- * NETDISK( cDrive ) -> lSuccess
- * Return true if <cDrive> is a network drive, otherwise return false if is a local drive.
- *
- * NETLOCNAME( cSahredDevice ) -> cLocalDevice
- * Not implemented yet.
- *
- * NETPRINTER() -> lSuccess
- * Return true if a current local printer seted by SET PRINTER TO is redirected
- * to a network printer.
- *
- * NETREDIR( cLocalDevice, cSharedDevice, [ cPassword ], [ lShowError] ) -> lSuccess
- * Return true if <cLocalDevice> was connected to <cSharedDevice> with <cPassword>, if any.
- *
- * NETRMTNAME( cLocalDevice ) -> cSharedName
- * Return the shared resource name connected to a <cLocalDevice>.
- * The original parameter <nDevice> in CA-Clipper Tools was changed to <cLocalName> in
- * xHarbour because in Windows Network I didn´t find a number table like in MS-DOS. See
- * CA-Tools help for more details.
- *
- * NETWORK() -> lSuccess
- * Return true if a PC-LAN/MS-NET or Netware type is active.
- *
- * NNETWORK() -> lSuccess
- * Return true if a Netware type is active.
- *
- ******
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
@@ -84,6 +51,39 @@
  *
  */
 
+/*
+ * CT3 NET Functions Comments:
+ *
+ * NETCANCEL( <cLocalDevice> ) -> lReleased
+ * Return true if <cLocalDevice> was disconnected.
+ *
+ * NETDISK( cDrive ) -> lSuccess
+ * Return true if <cDrive> is a network drive, otherwise return false if is a local drive.
+ *
+ * NETLOCNAME( cSahredDevice ) -> cLocalDevice
+ * Not implemented yet.
+ *
+ * NETPRINTER() -> lSuccess
+ * Return true if a current local printer seted by SET PRINTER TO is redirected
+ * to a network printer.
+ *
+ * NETREDIR( cLocalDevice, cSharedDevice, [ cPassword ], [ lShowError] ) -> lSuccess
+ * Return true if <cLocalDevice> was connected to <cSharedDevice> with <cPassword>, if any.
+ *
+ * NETRMTNAME( cLocalDevice ) -> cSharedName
+ * Return the shared resource name connected to a <cLocalDevice>.
+ * The original parameter <nDevice> in CA-Clipper Tools was changed to <cLocalName> in
+ * xHarbour because in Windows Network I didn´t find a number table like in MS-DOS. See
+ * CA-Tools help for more details.
+ *
+ * NETWORK() -> lSuccess
+ * Return true if a PC-LAN/MS-NET or Netware type is active.
+ *
+ * NNETWORK() -> lSuccess
+ * Return true if a Netware type is active.
+ *
+ */
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbset.h"
@@ -91,113 +91,113 @@
 
 #if defined(HB_OS_WIN_32)
 
-#include <windows.h>
-#include <winnetwk.h>
+#   include <windows.h>
+#   include <winnetwk.h>
 
-#define HB_OS_WIN_32_USED
+#   define HB_OS_WIN_32_USED
 
-BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction) 
-{ 
-    DWORD dwWNetResult, dwLastError; 
-    CHAR szDescription[256]; 
-    CHAR szProvider[256];
-
-    HB_ITEM_PTR pError; 
- 
-    if (dwErrorCode != ERROR_EXTENDED_ERROR) 
-    { 
-        pError = hb_errRT_New(
-             ES_ERROR, 
-             HB_ERR_SS_TOOLS, 
-             9999, 
-             9999, 
-             "Windows Network operation failed",
-             lpszFunction,
-             (USHORT) dwErrorCode,
-             EF_NONE ); 
-        hb_errLaunch( pError );
-        hb_itemRelease( pError );
-    } 
-    else 
-    { 
-        dwWNetResult = WNetGetLastError(&dwLastError, (LPSTR) szDescription, sizeof(szDescription), 
-                           (LPSTR) szProvider,   
-                           sizeof(szProvider)); 
- 
-        if(dwWNetResult != NO_ERROR) { 
-            pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "WNetGetLastError failed", "see OS error", (USHORT) dwWNetResult, EF_NONE ); 
-            hb_errLaunch( pError );
-            hb_itemRelease( pError );
-            return FALSE; 
-        } 
- 
-        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, szDescription, szProvider, (USHORT) dwLastError, EF_NONE ); 
-        hb_errLaunch( pError );
-        hb_itemRelease( pError );
-    } 
-
-    return TRUE; 
-}
-
-static BOOL hb_IsNetShared(LPSTR szLocalDevice )
+BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
 {
-   char szRemoteDevice[80] ;
-   DWORD dwResult;
-   DWORD cchBuff = sizeof(szRemoteDevice) ;
+   HB_ITEM_PTR pError;
 
-   dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff) ;
-
-   if ( dwResult == NO_ERROR )
+   if( dwErrorCode != ERROR_EXTENDED_ERROR )
    {
-      return TRUE;
+      pError = hb_errRT_New( ES_ERROR,
+                             HB_ERR_SS_TOOLS, 
+                             9999, 
+                             9999, 
+                             "Windows Network operation failed",
+                             lpszFunction, ( USHORT ) dwErrorCode, EF_NONE );
+      hb_errLaunch( pError );
+      hb_itemRelease( pError );
+   }
+   else
+   {
+      DWORD dwLastError, dwWNetResult;
+      TCHAR lpDescription[256], lpProvider[256];
+      char * szDescription, * szProvider;
+
+      dwWNetResult = WNetGetLastError( &dwLastError, lpDescription, 256,
+                                       lpProvider, 256 );
+
+      if( dwWNetResult != NO_ERROR )
+      {
+         pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999,
+                                "WNetGetLastError failed", "see OS error",
+                                ( USHORT ) dwWNetResult, EF_NONE );
+         hb_errLaunch( pError );
+         hb_itemRelease( pError );
+         return FALSE;
+      }
+
+      szDescription = HB_TCHAR_CONVFROM( lpDescription );
+      szProvider = HB_TCHAR_CONVFROM( lpProvider );
+      pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999,
+                             szDescription, szProvider,
+                             ( USHORT ) dwLastError, EF_NONE );
+      HB_TCHAR_FREE( szDescription );
+      HB_TCHAR_FREE( szProvider );
+
+      hb_errLaunch( pError );
+      hb_itemRelease( pError );
    }
 
-   return FALSE;
+   return TRUE;
 }
 
-HB_FUNC ( NETCANCEL )
+static BOOL hb_IsNetShared( LPSTR szLocalDevice )
+{
+   TCHAR lpRemoteDevice[80];
+   LPTSTR lpLocalDevice;
+   DWORD cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
+   DWORD dwResult;
+
+   lpLocalDevice = HB_TCHAR_CONVTO( szLocalDevice );
+   dwResult = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
+                                 ( LPTSTR ) lpRemoteDevice, &cchBuff );
+   HB_TCHAR_FREE( lpLocalDevice );
+
+   return dwResult == NO_ERROR;
+}
+
+HB_FUNC( NETCANCEL )
 {
    DWORD dwResult;
-   char *cDevice = (char *)hb_parc (1);
+   LPTSTR lpDevice = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
 
-   dwResult = WNetCancelConnection( cDevice , TRUE ) ; // FALSE = fail if exist open files or print jobs.
-                                                       // TRUE = force cancel connection even if exist														
-                                                       //         open files or print jobs.
-   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
+   dwResult = WNetCancelConnection( lpDevice, TRUE ); /* FALSE = fail if exist open files or print jobs. */
+
+   HB_TCHAR_FREE( lpDevice );
+   /* TRUE = force cancel connection even if exist                                                                                                          
+    *        open files or print jobs.
+    */
+   hb_retl( dwResult == NO_ERROR );
 }
 
 
-HB_FUNC ( NETPRINTER )
+HB_FUNC( NETPRINTER )
 {
+   char * cPrn = hb_setGetCPtr( HB_SET_PRINTFILE );   /* query default local printer port. */
 
-/*
-  2007/MAR/26 - E.F.
-  In xHarbour the default printer port is "PRN". Because "PRN" can't be
-  redirected to a network printer, NetPrinter() always will return false,
-  so I need treat PRN as LPT1.
-*/
-
-   // Query default printer port setted by user.
-#ifndef __EXPORT__
-   char *cPrn = hb_set.HB_SET_PRINTFILE;
-#else
-   char *cPrn = hb_setPrintFile();
-#endif
-
-   if ( strlen( cPrn ) == 0 || strstr( cPrn, "PRN" ) != NULL )
+   /* 2007/MAR/26 - E.F.
+    * In xHarbour the default printer port is "PRN". Because "PRN" can't be
+    * redirected to a network printer, NetPrinter() always will return false,
+    * so I need treat PRN as LPT1.
+    */
+   if( !cPrn || !*cPrn || hb_stricmp( cPrn, "PRN" ) == 0 )
    {
-      strcpy( cPrn, "LPT1" );
+      cPrn = "LPT1";
    }
 
    hb_retl( hb_IsNetShared( cPrn ) );
 }
 
 
-HB_FUNC ( NETDISK )
+HB_FUNC( NETDISK )
 {
    char cDrive[3];
 
-   strncpy( cDrive, hb_parcx( 1 ), 1 );
+   cDrive[0] = hb_parcx( 1 )[0];
    cDrive[1] = ':';
    cDrive[2] = '\0';
 
@@ -205,22 +205,21 @@ HB_FUNC ( NETDISK )
 }
 
 
-HB_FUNC ( NETREDIR )
+HB_FUNC( NETREDIR )
 {
    DWORD dwResult;
-   char *cLocalDev  = hb_parcx( 1 );
-   char *cSharedRes = hb_parcx( 2 );
-   char *cPassword  = hb_parcx( 3 );
-   BOOL  bShowError = ( ISLOG(4) ? hb_parl(4) : FALSE );
-   char szCommand[80];
+   LPTSTR lpLocalDev  = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
+   LPTSTR lpSharedRes = HB_TCHAR_CONVTO( hb_parcx( 2 ) );
+   LPTSTR lpPassword  = HB_TCHAR_CONVTO( hb_parcx( 3 ) );
+   BOOL bShowError = ( ISLOG( 4 ) ? hb_parl( 4 ) : FALSE );
 
-   if ( hb_pcount() >= 3 && ISCHAR( 3 ) )
+   if( hb_pcount() >= 3 && ISCHAR( 3 ) )
    {
-      dwResult = WNetAddConnection( cSharedRes, cPassword, cLocalDev ) ;
+      dwResult = WNetAddConnection( lpSharedRes, lpPassword, lpLocalDev );
    }
    else
    {
-      dwResult = WNetAddConnection( cSharedRes, NULL, cLocalDev ) ;
+      dwResult = WNetAddConnection( lpSharedRes, NULL, lpLocalDev );
    }
 
    if( dwResult == NO_ERROR )
@@ -229,60 +228,66 @@ HB_FUNC ( NETREDIR )
    }
    else
    {
-      if ( bShowError )
-        {
-        snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )", cLocalDev, cSharedRes, cPassword ); 
-        WNetErrorHandler( dwResult, szCommand );
-        }
+      if( bShowError )
+      {
+         char szCommand[80];
+         snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )",
+                   hb_parcx( 1 ), hb_parcx( 2 ), hb_parcx( 3 ) );
+         WNetErrorHandler( dwResult, szCommand );
+      }
       hb_retl( FALSE );
    }
-
 }
 
-HB_FUNC ( NETRMTNAME )
+HB_FUNC( NETRMTNAME )
 {
-   char szRemoteDevice[ 80 ];
-   char *szLocalDevice = ( char * )hb_parc ( 1 ) ;
+   TCHAR lpRemoteDevice[80];
+   LPTSTR lpLocalDevice;
+   DWORD cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
    DWORD dwResult;
-   DWORD cchBuff = sizeof( szRemoteDevice );
+   char *szRemoteDevice;
 
-   dwResult = WNetGetConnection( (LPSTR) szLocalDevice, (LPSTR) szRemoteDevice, &cchBuff);
-
-   hb_retc( dwResult == NO_ERROR ? szRemoteDevice : "" ) ;
+   lpLocalDevice = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
+   dwResult = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
+                                 ( LPTSTR ) lpRemoteDevice, &cchBuff );
+   HB_TCHAR_FREE( lpLocalDevice );
+   szRemoteDevice = HB_TCHAR_CONVFROM( lpRemoteDevice );
+   hb_retc( dwResult == NO_ERROR ? szRemoteDevice : "" );
+   HB_TCHAR_FREE( szRemoteDevice );
 }
 
 
-HB_FUNC ( NETWORK )
+HB_FUNC( NETWORK )
 {
    DWORD dwResult;
-   char szProviderName[80];
-   DWORD cchBuff = sizeof(szProviderName);
+   TCHAR lpProviderName[80];
+   DWORD cchBuff = sizeof( lpProviderName ) / sizeof( TCHAR );
 
-   dwResult = WNetGetProviderName( WNNC_NET_MSNET, (LPSTR) szProviderName, &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_MSNET, lpProviderName, &cchBuff );
 
-   if ( dwResult != NO_ERROR )
+   if( dwResult != NO_ERROR )
    {
-      dwResult = WNetGetProviderName( WNNC_NET_LANMAN, (LPSTR) szProviderName, &cchBuff);
+      dwResult = WNetGetProviderName( WNNC_NET_LANMAN, lpProviderName, &cchBuff );
 
-      if ( dwResult != NO_ERROR )
+      if( dwResult != NO_ERROR )
       {
-         dwResult = WNetGetProviderName( WNNC_NET_NETWARE, (LPSTR) szProviderName, &cchBuff);
+         dwResult = WNetGetProviderName( WNNC_NET_NETWARE, lpProviderName, &cchBuff );
       }
    }
 
-   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
+   hb_retl( dwResult == NO_ERROR );
 }
 
 
-HB_FUNC ( NNETWORK )
+HB_FUNC( NNETWORK )
 {
    DWORD dwResult;
-   char szProviderName[80];
-   DWORD cchBuff = sizeof(szProviderName);
+   TCHAR lpProviderName[80];
+   DWORD cchBuff = sizeof( lpProviderName ) / sizeof( TCHAR );
 
-   dwResult = WNetGetProviderName( WNNC_NET_NETWARE, (LPSTR) szProviderName, &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_NETWARE, lpProviderName, &cchBuff );
 
-   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
+   hb_retl( dwResult == NO_ERROR );
 }
 
 #endif

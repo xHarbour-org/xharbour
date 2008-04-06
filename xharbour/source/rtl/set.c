@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.85 2008/03/16 19:16:01 likewolf Exp $
+ * $Id: set.c,v 1.86 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -1798,6 +1798,352 @@ HB_EXPORT int hb_setListenerRemove( int listener )
       }
    }
    return listener;
+}
+
+HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier )
+{
+   switch( set_specifier )
+   {
+      case HB_SET_ALTERNATE:
+         return hb_set.HB_SET_ALTERNATE;
+      case HB_SET_AUTOPEN:
+         return hb_set.HB_SET_AUTOPEN;
+      case HB_SET_BACKGROUNDTASKS:
+         return hb_set.HB_SET_BACKGROUNDTASKS;
+      case HB_SET_BELL:
+         return hb_set.HB_SET_BELL;
+      case HB_SET_CANCEL:
+         return hb_set.HB_SET_CANCEL;
+      case HB_SET_CONFIRM:
+         return hb_set.HB_SET_CONFIRM;
+      case HB_SET_CONSOLE:
+         return hb_set.HB_SET_CONSOLE;
+      case HB_SET_DEBUG:
+         return hb_set.HB_SET_DEBUG;
+      case HB_SET_DELETED:
+         return hb_set.HB_SET_DELETED;
+      case HB_SET_DELIMITERS:
+         return hb_set.HB_SET_DELIMITERS;
+      case HB_SET_EOF:
+         return hb_set.HB_SET_EOF;
+      case HB_SET_ESCAPE:
+         return hb_set.HB_SET_ESCAPE;
+      case HB_SET_EXACT:
+         return hb_set.HB_SET_EXACT;
+      case HB_SET_EXCLUSIVE:
+         return hb_set.HB_SET_EXCLUSIVE;
+      case HB_SET_EXIT:
+         return hb_set.HB_SET_EXIT;
+      case HB_SET_EXTRA:
+         return hb_set.HB_SET_EXTRA;
+      case HB_SET_FIXED:
+         return hb_set.HB_SET_FIXED;
+      case HB_SET_IDLEREPEAT:
+         return hb_set.HB_SET_IDLEREPEAT;
+      case HB_SET_INSERT:
+         return hb_set.HB_SET_INSERT;
+      case HB_SET_INTENSITY:
+         return hb_set.HB_SET_INTENSITY;
+      case HB_SET_MACROBLOCKVARS:
+         return hb_set.HB_SET_MACROBLOCKVARS;
+      case HB_SET_MCENTER:
+         return hb_set.HB_SET_MCENTER;
+      case HB_SET_OPTIMIZE:
+         return hb_set.HB_SET_OPTIMIZE;
+      case HB_SET_OUTPUTSAFETY:
+         return hb_set.HB_SET_OUTPUTSAFETY;
+      case HB_SET_FORCEOPT:
+         return hb_set.HB_SET_FORCEOPT;
+      case HB_SET_PRINTER:
+         return hb_set.HB_SET_PRINTER;
+      case HB_SET_SCOREBOARD:
+         return hb_set.HB_SET_SCOREBOARD;
+      case HB_SET_SCROLLBREAK:
+         return hb_set.HB_SET_SCROLLBREAK;
+      case HB_SET_SOFTSEEK:
+         return hb_set.HB_SET_SOFTSEEK;
+      case HB_SET_STRICTREAD:
+         return hb_set.HB_SET_STRICTREAD;
+      case HB_SET_TRACE:
+         return hb_set.HB_SET_TRACE;
+      case HB_SET_UNIQUE:
+         return hb_set.HB_SET_UNIQUE;
+      case HB_SET_WRAP:
+         return hb_set.HB_SET_WRAP;
+      case HB_SET_HARDCOMMIT:
+         return hb_set.HB_SET_HARDCOMMIT;
+      case HB_SET_DEFEXTENSIONS:
+         return hb_set.HB_SET_DEFEXTENSIONS;
+      case HB_SET_TRIMFILENAME:
+         return hb_set.HB_SET_TRIMFILENAME;
+
+      case HB_SET_ALTFILE:
+      case HB_SET_AUTORDER:
+      case HB_SET_AUTOSHARE:
+      case HB_SET_BACKGROUNDTICK:
+      case HB_SET_COLOR:
+      case HB_SET_CURSOR:
+      case HB_SET_DATEFORMAT:
+      case HB_SET_DECIMALS:
+      case HB_SET_DEFAULT:
+      case HB_SET_DELIMCHARS:
+      case HB_SET_DEVICE:
+      case HB_SET_EPOCH:
+      case HB_SET_ERRORLOG:
+      case HB_SET_ERRORLOOP: 
+      case HB_SET_EVENTMASK:
+      case HB_SET_EXTRAFILE:
+      case HB_SET_MARGIN:
+      case HB_SET_MBLOCKSIZE:
+      case HB_SET_MESSAGE:
+      case HB_SET_MFILEEXT:
+      case HB_SET_PATH:
+      case HB_SET_PRINTERJOB:
+      case HB_SET_PRINTFILE:
+      case HB_SET_TIMEFORMAT:
+      case HB_SET_TRACEFILE:
+      case HB_SET_TRACESTACK:
+      case HB_SET_TYPEAHEAD:
+      case HB_SET_VIDEOMODE:
+      case HB_SET_LANGUAGE:
+      case HB_SET_FILECASE:
+      case HB_SET_DIRCASE:
+      case HB_SET_DIRSEPARATOR:
+      case HB_SET_DBFLOCKSCHEME:
+      case HB_SET_EOL:
+      case HB_SET_INVALID_:
+         break;
+#if 0 
+      /*
+       * intentionally removed default: clause to enable C compiler warning
+       * when not all HB_SET_* cases are implemented. [druzus]
+       */
+      default:
+         break;
+#endif
+   }
+
+   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   return FALSE;
+}
+
+HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier )
+{
+   switch( set_specifier )
+   {
+      case HB_SET_ALTFILE:
+         return hb_set.HB_SET_ALTFILE;
+      case HB_SET_COLOR:
+         return hb_set.HB_SET_COLOR;
+      case HB_SET_DATEFORMAT:
+         return hb_set.HB_SET_DATEFORMAT;
+      case HB_SET_DEFAULT:
+         return hb_set.HB_SET_DEFAULT;
+      case HB_SET_DELIMCHARS:
+         return hb_set.HB_SET_DELIMCHARS;
+      case HB_SET_DEVICE:
+         return hb_set.HB_SET_DEVICE;
+      case HB_SET_ERRORLOG:
+         return hb_set.HB_SET_ERRORLOG;
+      case HB_SET_EXTRAFILE:
+         return hb_set.HB_SET_EXTRAFILE;
+      case HB_SET_PATH:
+         return hb_set.HB_SET_PATH;
+      case HB_SET_MFILEEXT:
+         return hb_set.HB_SET_MFILEEXT;
+      case HB_SET_PRINTERJOB:
+         return hb_set.hb_set_printerjob;
+      case HB_SET_PRINTFILE:
+         return hb_set.HB_SET_PRINTFILE;
+      case HB_SET_TIMEFORMAT:
+         return hb_set.HB_SET_TIMEFORMAT;
+      case HB_SET_TRACEFILE:
+         return hb_set.HB_SET_TRACEFILE;
+      case HB_SET_EOL:
+         return hb_set.HB_SET_EOL;
+
+      case HB_SET_ALTERNATE:
+      case HB_SET_AUTOPEN:
+      case HB_SET_AUTORDER:
+      case HB_SET_AUTOSHARE:
+      case HB_SET_BACKGROUNDTASKS:
+      case HB_SET_BACKGROUNDTICK:
+      case HB_SET_BELL:
+      case HB_SET_CANCEL:
+      case HB_SET_CONFIRM:
+      case HB_SET_CONSOLE:
+      case HB_SET_CURSOR:
+      case HB_SET_DEBUG:
+      case HB_SET_DECIMALS:
+      case HB_SET_DELETED:
+      case HB_SET_DELIMITERS:
+      case HB_SET_EOF:
+      case HB_SET_EPOCH:
+      case HB_SET_ERRORLOOP: 
+      case HB_SET_ESCAPE:
+      case HB_SET_EVENTMASK:
+      case HB_SET_EXACT:
+      case HB_SET_EXCLUSIVE:
+      case HB_SET_EXIT:
+      case HB_SET_EXTRA:
+      case HB_SET_FIXED:
+      case HB_SET_INSERT:
+      case HB_SET_INTENSITY:
+      case HB_SET_MACROBLOCKVARS:
+      case HB_SET_MARGIN:
+      case HB_SET_MBLOCKSIZE:
+      case HB_SET_MCENTER:
+      case HB_SET_MESSAGE:
+      case HB_SET_OPTIMIZE:
+      case HB_SET_OUTPUTSAFETY:
+      case HB_SET_FORCEOPT:
+      case HB_SET_STRICTREAD:
+      case HB_SET_HARDCOMMIT:
+      case HB_SET_PRINTER:
+      case HB_SET_SCOREBOARD:
+      case HB_SET_SCROLLBREAK:
+      case HB_SET_SOFTSEEK:
+      case HB_SET_TRACE:
+      case HB_SET_TRACESTACK:
+      case HB_SET_TYPEAHEAD:
+      case HB_SET_UNIQUE:
+      case HB_SET_VIDEOMODE:
+      case HB_SET_WRAP:
+      case HB_SET_LANGUAGE:
+      case HB_SET_IDLEREPEAT:
+      case HB_SET_FILECASE:
+      case HB_SET_DIRCASE:
+      case HB_SET_DIRSEPARATOR:
+      case HB_SET_DBFLOCKSCHEME:
+      case HB_SET_DEFEXTENSIONS:
+      case HB_SET_TRIMFILENAME:
+      case HB_SET_INVALID_:
+         break;
+#if 0 
+      /*
+       * intentionally removed default: clause to enable C compiler warning
+       * when not all HB_SET_* cases are implemented. [druzus]
+       */
+      default:
+         break;
+#endif
+   }
+
+   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   return FALSE;
+}
+
+HB_EXPORT int     hb_setGetNI( HB_set_enum set_specifier )
+{
+   switch( set_specifier )
+   {
+      case HB_SET_AUTORDER:
+         return hb_set.HB_SET_AUTORDER;
+      case HB_SET_AUTOSHARE:
+         return hb_set.HB_SET_AUTOSHARE;
+      case HB_SET_BACKGROUNDTICK:
+         return hb_set.HB_SET_BACKGROUNDTICK;
+      case HB_SET_DECIMALS:
+         return hb_set.HB_SET_DECIMALS;
+      case HB_SET_EPOCH:
+         return hb_set.HB_SET_EPOCH;
+      case HB_SET_ERRORLOOP:
+         return hb_set.HB_SET_ERRORLOOP;
+      case HB_SET_EVENTMASK:
+         return hb_set.HB_SET_EVENTMASK;
+      case HB_SET_MARGIN:
+         return hb_set.HB_SET_MARGIN;
+      case HB_SET_MBLOCKSIZE:
+         return hb_set.HB_SET_MBLOCKSIZE;
+      case HB_SET_MESSAGE:
+         return hb_set.HB_SET_MESSAGE;
+      case HB_SET_TRACESTACK:
+         return hb_set.HB_SET_TRACESTACK;
+      case HB_SET_TYPEAHEAD:
+         return hb_set.HB_SET_TYPEAHEAD;
+      case HB_SET_FILECASE:
+         return hb_set.HB_SET_FILECASE;
+      case HB_SET_DIRCASE:
+         return hb_set.HB_SET_DIRCASE;
+      case HB_SET_DIRSEPARATOR:
+         return hb_set.HB_SET_DIRSEPARATOR;
+      case HB_SET_VIDEOMODE:
+         return hb_set.HB_SET_VIDEOMODE;
+      case HB_SET_DBFLOCKSCHEME:
+         return hb_set.HB_SET_DBFLOCKSCHEME;
+
+      case HB_SET_ALTERNATE:
+      case HB_SET_ALTFILE:
+      case HB_SET_AUTOPEN:
+      case HB_SET_BACKGROUNDTASKS:
+      case HB_SET_BELL:
+      case HB_SET_CANCEL:
+      case HB_SET_COLOR:
+      case HB_SET_CONFIRM:
+      case HB_SET_CONSOLE:
+      case HB_SET_CURSOR:
+      case HB_SET_DATEFORMAT:
+      case HB_SET_DEBUG:
+      case HB_SET_DEFAULT:
+      case HB_SET_DELETED:
+      case HB_SET_DELIMCHARS:
+      case HB_SET_DELIMITERS:
+      case HB_SET_DEVICE:
+      case HB_SET_EOF:
+      case HB_SET_ERRORLOG:
+      case HB_SET_ESCAPE:
+      case HB_SET_EXACT:
+      case HB_SET_EXCLUSIVE:
+      case HB_SET_EXIT:
+      case HB_SET_EXTRA:
+      case HB_SET_EXTRAFILE:
+      case HB_SET_FIXED:
+      case HB_SET_INSERT:
+      case HB_SET_INTENSITY:
+      case HB_SET_MACROBLOCKVARS:
+      case HB_SET_MCENTER:
+      case HB_SET_MFILEEXT:
+      case HB_SET_OPTIMIZE:
+      case HB_SET_FORCEOPT:
+      case HB_SET_STRICTREAD:
+      case HB_SET_HARDCOMMIT:
+      case HB_SET_OUTPUTSAFETY:
+      case HB_SET_PATH:
+      case HB_SET_PRINTER:
+      case HB_SET_PRINTERJOB:
+      case HB_SET_PRINTFILE:
+      case HB_SET_SCOREBOARD:
+      case HB_SET_SCROLLBREAK:
+      case HB_SET_SOFTSEEK:
+      case HB_SET_TIMEFORMAT:
+      case HB_SET_TRACE:
+      case HB_SET_TRACEFILE:
+      case HB_SET_UNIQUE:
+      case HB_SET_WRAP:
+      case HB_SET_LANGUAGE:
+      case HB_SET_IDLEREPEAT:
+      case HB_SET_EOL:
+      case HB_SET_DEFEXTENSIONS:
+      case HB_SET_TRIMFILENAME:
+      case HB_SET_INVALID_:
+         break;
+#if 0 
+      /*
+       * intentionally removed default: clause to enable C compiler warning
+       * when not all HB_SET_* cases are implemented. [druzus]
+       */
+      default:
+         break;
+#endif
+   }
+
+   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   return FALSE;
+}
+
+HB_EXPORT long    hb_setGetNL( HB_set_enum set_specifier )
+{
+   return hb_setGetNI( set_specifier );
 }
 
 HB_EXPORT HB_PATHNAMES * hb_setGetFirstSetPath( void )

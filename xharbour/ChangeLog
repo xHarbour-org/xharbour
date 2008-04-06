@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6011 2008/04/05 13:28:54 likewolf Exp $
+ * $Id: ChangeLog,v 1.6012 2008/04/05 20:31:18 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-06 15:32 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbset.h
+  * source/rtl/set.c
+    + Added hb_setGetL(), hb_setGetCPtr(), hb_setGetNI(), hb_setGetNL() (by
+      Przemyslaw Czertpak, borrowed from Harbour).
+  * source/ct/ctnet.c
+  * source/ct/dattime2.c
+    ! Synched with miscellaneous Harbour small fixes by Viktor Szakats and
+      Przemyslaw Czerpak.
 
 2008-04-06 00:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/set.ch
