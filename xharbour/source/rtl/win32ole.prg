@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.155 2007/11/27 05:32:20 andijahja Exp $
+ * $Id: win32ole.prg,v 1.156 2007/12/23 06:23:37 andijahja Exp $
  */
 
 /*
@@ -61,6 +61,10 @@
 
 #include "hbclass.ch"
 #include "error.ch"
+#include "vt.ch"
+#include "oleerr.ch"
+
+#define OLE_DEFAULT_ARG OleDefaultArg()
 
 //----------------------------------------------------------------------------//
 
@@ -72,6 +76,11 @@ RETURN TOleAuto():New( cString )
 FUNCTION GetActiveObject( cString )
 
 RETURN TOleAuto():GetActiveObject( cString )
+
+//----------------------------------------------------------------------------//
+FUNCTION OleDefaultArg()
+
+RETURN VTWrapper( VT_ERROR, DISP_E_PARAMNOTFOUND )
 
 //----------------------------------------------------------------------------//
 #pragma BEGINDUMP
@@ -1116,6 +1125,10 @@ RETURN Self
                        // Hack!!! Using high 4 bytes of the union (llVal)
                        *( (IUnknown **) ( &pVariant->n1.n2.n3.lVal ) + 1 ) = (IUnknown *) hb_parptr( -1 );
                        pVariant->n1.n2.n3.ppunkVal = (IUnknown **) (&pVariant->n1.n2.n3.lVal ) + 1;
+                       break;
+
+                    case VT_ERROR:
+                       pVariant->n1.n2.n3.scode = hb_parni(1);
                        break;
 
                     default:

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6013 2008/04/06 11:33:15 likewolf Exp $
+ * $Id: ChangeLog,v 1.6014 2008/04/06 22:02:46 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-07 18:47 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/namespaces.prg
+    * Typo
+
+  * source/rtl/win32ole.prg
+    + Added support for VT_ERROR type, by means of VTWrapper() class
+    + Added support for default arguments by means of OLE_DEFAULT_ARG macro or OleDefaultArg()
 
 2008-04-07 02:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c
