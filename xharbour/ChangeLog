@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6014 2008/04/06 22:02:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.6015 2008/04/07 23:20:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,6 +12,8 @@
   * source/rtl/namespaces.prg
     * Typo
 
+  + include/oleerr.ch
+    + New header with ole error constants
   * source/rtl/win32ole.prg
     + Added support for VT_ERROR type, by means of VTWrapper() class
     + Added support for default arguments by means of OLE_DEFAULT_ARG macro or OleDefaultArg()
