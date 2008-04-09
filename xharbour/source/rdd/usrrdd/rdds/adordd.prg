@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.13 2008/01/15 10:13:45 marchuet Exp $
+ * $Id: adordd.prg,v 1.14 2008/03/13 11:12:11 marchuet Exp $
  */
 
 /*
@@ -10,7 +10,7 @@
  * Antonio Linares <alinares@fivetechsoft.com>
  * www - http://www.harbour-project.org
  *
- * Copyright 2007 Miguel Angel Marchuet <miguelangel@marchuet.net>
+ * Copyright 2007-2008 Miguel Angel Marchuet <miguelangel@marchuet.net>
  *  ADO_GOTOID( nWA, nRecord )
  *  ADO_GOTO( nWA, nRecord )
  *  ADO_OPEN( nWA, aOpenInfo ) some modifications
@@ -28,6 +28,7 @@
  *  ADO_RELEVAL( nWA, aRelInfo )
  *  ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
  *  ADO_DROP(  nRdd, cTable, cIndex, ulConnect ) 
+ *  ADO_LOCATE( nWA, lContinue )
  *
  * www - http://www.xharbour.org
  *
@@ -108,8 +109,9 @@
 #define WA_SQLSTRUCT  14
 #define WA_CONNOPEN   15
 #define WA_PENDINGREL 16
+#define WA_FOUND      17
 
-#define WA_SIZE       16
+#define WA_SIZE       17
 
 #define RDD_CONNECTION 1
 #define RDD_CATALOG    2
@@ -976,6 +978,8 @@ STATIC FUNCTION ADO_LOCATE( nWA, lContinue )
    LOCAL oRecordSet := aWAData[ WA_RECORDSET ]
 
    oRecordSet:Find( aWAData[ WA_SCOPEINFO ][ UR_SI_CFOR ], If( lContinue, 1, 0 ) )
+   aWAData[ WA_FOUND ] = ! oRecordSet:EOF
+   aWAData[ WA_EOF ] = oRecordSet:EOF   
 
 RETURN SUCCESS
 
@@ -1302,6 +1306,14 @@ STATIC FUNCTION ADO_SEEK( nWA, lSoftSeek, cKey, lFindLast )
 */
 RETURN FAILURE
 
+static function ADO_FOUND( nWA, lFound )
+
+   local aWAData := USRRDD_AREADATA( nWA )
+
+   lFound = aWAData[ WA_FOUND ]
+
+return SUCCESS
+
 FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
    LOCAL cSuperRDD   /* NO SUPER RDD */
@@ -1343,6 +1355,7 @@ FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aADOFunc[ UR_ZAP ]          := ( @ADO_ZAP() )
    aADOFunc[ UR_SETLOCATE ]    := ( @ADO_SETLOCATE() )
    aADOFunc[ UR_LOCATE ]       := ( @ADO_LOCATE() )
+   aAdoFunc[ UR_FOUND ]        := ( @ADO_FOUND() )   
    aADOFunc[ UR_FORCEREL ]     := ( @ADO_FORCEREL() )
    aADOFunc[ UR_RELEVAL ]      := ( @ADO_RELEVAL() )
    aADOFunc[ UR_CLEARREL ]     := ( @ADO_CLEARREL() )
