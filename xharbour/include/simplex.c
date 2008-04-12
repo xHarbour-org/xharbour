@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.32 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: simplex.c,v 1.33 2008/04/12 18:57:36 ronpinkas Exp $
  */
 
 /*
@@ -920,7 +920,7 @@ int SimpLex_GetNextToken( void )
         }
         else
         {
-            YY_INPUT( (char*) szLexBuffer, iSize, YY_BUF_SIZE );
+            YY_INPUT( szLexBuffer, iSize, YY_BUF_SIZE );
 
             if( iSize )
             {
