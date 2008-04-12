@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.16 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.17 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /* harbour.slx version: 1.96 */
@@ -16,7 +16,7 @@
 
 #define TOKEN_SIZE             ( 65 > HB_SYMBOL_NAME_LEN + 1 ? 65 : HB_SYMBOL_NAME_LEN + 1 )
 
-#define YY_BUF_SIZE 16384
+#define YY_BUF_SIZE 0 /* Use PP allocated buffer. */
 
 #if ( defined(__XCC__) || defined(__LCC__) )
    #define SLX_RULES "source/compiler/harbour.slx"

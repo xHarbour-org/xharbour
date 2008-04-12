@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.31 2008/02/04 17:06:25 ronpinkas Exp $
+ * $Id: simplex.c,v 1.32 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@
 #endif
 
 static char sToken[ TOKEN_SIZE + 1 ];
-static char szLexBuffer[ YY_BUF_SIZE ];
+static char *szLexBuffer = NULL;
 
 static char * sPair = NULL;
 static char * sStart, * sTerm;
@@ -181,7 +181,23 @@ static BOOL bNewLine = TRUE, bStart = TRUE;
 char * yytext = (char *) sToken;
 int yyleng;
 
-#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; iLastToken = 0; if( sPair ){ free( sPair ); sPair = NULL; } }
+#define RESET_LEX() { \
+                      iLen = 0; iHold = 0; iReturn = 0; \
+                      bNewLine = TRUE; bIgnoreWords = FALSE; \
+                      iPairToken = 0; iLastToken = 0; \
+                      \
+                      if( sPair ) \
+                      { \
+                        free( (void *) sPair ); \
+                        sPair = NULL; \
+                      } \
+                      \
+                      if( YY_BUF_SIZE > 0 && szLexBuffer ) \
+                      { \
+                        free( (void *) szLexBuffer ); \
+                        szLexBuffer = NULL; \
+                      } \
+                    }
 
 /* Above are NOT overidable !!! Need to precede the Language Definitions. */
 
@@ -527,12 +543,18 @@ static int rulecmp( const void * pLeft, const void * pRight );
 YY_DECL
 {
     if( sPair == NULL )
-	{
-       sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
-       LEX_USER_SETUP();
-	}
+	 {
+        sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
+        LEX_USER_SETUP();
+	 }
+
+    if( YY_BUF_SIZE > 0 && szLexBuffer == NULL )
+    {
+       szLexBuffer = (char *) malloc( YY_BUF_SIZE );
+    }
 
  Start :
+
     IF_TOKEN_READY()
     {
        RETURN_READY_TOKEN();
@@ -552,11 +574,11 @@ YY_DECL
           INIT_ACTION();
        }
 
-       YY_INPUT( (char*) szLexBuffer, iSize, YY_BUF_SIZE );
+       YY_INPUT( szLexBuffer, iSize, YY_BUF_SIZE );
 
        if( iSize )
        {
-          s_szBuffer = (char*) szLexBuffer;
+          s_szBuffer = szLexBuffer;
 
           DEBUG_INFO( printf(  "New Buffer: >%s<\n", szLexBuffer ) );
        }

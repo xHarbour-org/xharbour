@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.96 2008/02/11 02:20:14 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.97 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -623,8 +623,8 @@ LANGUAGE_RULES_ARE {
   #define ELEMENT_TOKEN(x,y) hb_comp_SLX_ElementToken(x,y)
 
 #undef YY_INPUT      /* to implement our own YY_INPUT function to manage PRGs without \n at the end */
-   int yy_lex_input( char *, int );
-   #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( buf, max_size );
+   int yy_lex_input( char ** );
+   #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( &buf );
 
 #undef CUSTOM_ACTION
    #define CUSTOM_ACTION(x) hb_comp_SLX_CustomAction( x )
@@ -1423,251 +1423,6 @@ static int hb_comp_SLX_CustomAction( int x )
          iIdentifier++;
          DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s - Increased to: %i\n", sIdOnHold, iIdentifier ) );
          return IDENTIFIER;
-#if 0
-      case HB_INLINE :
-
-         /* NOTE: hb_compiLineINLINE is being RESET in ppcomp.c - hb_pp_Internal() */
-
-         if( hb_comp_iLineINLINE )
-         {
-            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, "on the same line", NULL );
-            iIdentifier++;
-            return IDENTIFIER + DONT_REDUCE;
-         }
-         else
-         {
-            #define INLINE_NORMAL 0
-            #define INLINE_SINGLE_QUOT 1
-            #define INLINE_DOUBLE_QUOT 2
-            #define INLINE_COMMENT 3
-
-            char sBuffer[ YY_BUF_SIZE ], *pBuffer, cMode = INLINE_NORMAL;
-            char *sInlineSym = (char *) hb_xgrab(16);
-            int iSize, iBraces = 0;
-	    char szID[6];
-            PINLINE pInline;
-
-            hb_comp_iLineINLINE = hb_comp_iLine;
-            hb_pp_bInline = TRUE;
-
-	    hb_xmemset( sInlineSym, '\0', 16 );
-            hb_comp_cInlineID++;
-	    sprintf( szID, "%03d", hb_comp_cInlineID );
-	    hb_xstrcat( sInlineSym, "HB_INLINE_", szID, NULL );
-
-	    if( hb_comp_cInlineID > HB_INLINE_MAX )
-	    {
-               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, NULL, NULL );
-               break;
-	    }
-
-            pInline = hb_compInlineAdd( hb_compIdentifierNew( sInlineSym, TRUE ) );
-
-          DigestInline :
-
-            YY_INPUT( (char*) sBuffer, iSize, YY_BUF_SIZE );
-            if( iSize == 0 )
-            {
-               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_INVALID_INLINE, hb_comp_functions.pLast->szName, NULL );
-               hb_pp_bInline = FALSE;
-               return '\n' + DONT_REDUCE;
-            }
-            pBuffer = (char*) sBuffer;
-
-            while( *pBuffer )
-            {
-               switch( cMode )
-               {
-                  case INLINE_NORMAL :
-                     if( *pBuffer == '{' )
-                     {
-                        iBraces++;
-                     }
-                     else if( *pBuffer == '}' && iBraces > 1 )
-                     {
-                        iBraces--;
-                     }
-                     else if( *pBuffer == '}' )
-                     {
-                        hb_pp_bInline = FALSE;
-                        break;
-                     }
-                     else if( *pBuffer == '\'' )
-                     {
-                        cMode = INLINE_SINGLE_QUOT;
-                     }
-                     else if( *pBuffer == '"' )
-                     {
-                        cMode = INLINE_DOUBLE_QUOT;
-                     }
-                     else if( *pBuffer == '/' && *(pBuffer+1) == '/' )
-                     {
-                        goto SaveInline;
-                     }
-                     else if( *pBuffer == '/' && *(pBuffer+1) == '*' )
-                     {
-                        pBuffer++;
-                        cMode = INLINE_COMMENT;
-                     }
-                     break;
-
-                  case INLINE_SINGLE_QUOT :
-                     if( *pBuffer == '\\' )
-                     {
-                        pBuffer++;
-                     }
-                     else if( *pBuffer == '\'' )
-                     {
-                        cMode = INLINE_NORMAL;
-                     }
-                     break;
-
-                  case INLINE_DOUBLE_QUOT :
-                     if( *pBuffer == '\\' )
-                     {
-                        pBuffer++;
-                     }
-                     else if( *pBuffer == '"' )
-                     {
-                        cMode = INLINE_NORMAL;
-                     }
-                     break;
-
-                  case INLINE_COMMENT :
-                     if( *pBuffer == '*' && *(pBuffer+1) == '/' )
-                     {
-                        pBuffer++;
-                        cMode = INLINE_NORMAL;
-                     }
-                     break;
-               }
-
-               pBuffer++;
-            }
-
-          SaveInline :
-
-            if( pInline->pCode == NULL )
-            {
-               pInline->pCode = (unsigned char *) hb_xgrab( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
-               strcpy( (char *) pInline->pCode, (char*) sBuffer );
-            }
-            else
-            {
-               pInline->pCode = (unsigned char *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
-               strcpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer );
-            }
-            pInline->lPCodeSize += iSize;
-
-            if( hb_pp_bInline )
-            {
-               goto DigestInline;
-            }
-            else
-            {
-               if( hb_comp_iLanguage != LANG_C && hb_comp_iLanguage != LANG_OBJ_MODULE )
-               {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_REQUIRES_C, NULL, NULL );
-                  hb_xfree( ( void * ) pInline->pCode );
-                  hb_xfree( ( void * ) pInline->szFileName );
-                  hb_xfree( ( void * ) pInline );  /* NOTE: szName will be released by hb_compSymbolKill() */
-               }
-
-               hb_comp_iLinePRG = hb_comp_iLine;
-               hb_comp_iLine = hb_comp_iLineINLINE;
-
-               yylval.string = hb_compIdentifierNew( sInlineSym, TRUE );
-               hb_xfree( sInlineSym ) ;
-               iIdentifier++;
-               DEBUG_INFO( printf( "INLINE, Primary Identifier %s Increased to: %i\n", "INLINE", iIdentifier ) );
-               return IDENTIFIER + DONT_REDUCE;
-            }
-         }
-
-      case HB_TEXT_LINE :
-         aiHold[ 0 ] = HB_NEXT_LINE;
-         aiHold[ 1 ] = '\n' + DONT_REDUCE;
-         aiHold[ 2 ] = ')' + DONT_REDUCE;
-         iHold = 3;
-
-         yylval.string = (char *) sPair;
-         return LITERAL + DONT_REDUCE;
-
-      case HB_TEXT_BLOCK :
-         sTextFunction = hb_compIdentifierNew( yylval.string, TRUE );
-         sTextReset    = hb_compIdentifierNew( sIdOnHold, TRUE );
-         iIdentifier   = 1;
-         //printf( "TextFun: %s Reset %s\n", sTextFunction, sTextReset );
-
-         // Intentionaly fall through to HB_NEXT_LINE below.
-
-      case HB_NEXT_LINE :
-      {
-         int iSize;
-
-         hb_pp_bInline = TRUE;
-
-         YY_INPUT( (char*) sPair, iSize, YY_BUF_SIZE );
-
-         hb_pp_bInline = FALSE;
-
-         if( iSize == 0 )
-         {
-            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MISSING_ENDTEXT, hb_comp_functions.pLast->szName, NULL );
-            return '\n' + DONT_REDUCE;
-         }
-         else
-         {
-            char *pTmp = (char *) sPair;
-
-            while( *pTmp == ' ' || *pTmp == '\t' )
-            {
-               pTmp++;
-            }
-
-            if( toupper( pTmp[0] ) == 'E' &&
-                toupper( pTmp[1] ) == 'N' &&
-                toupper( pTmp[2] ) == 'D' &&
-                toupper( pTmp[3] ) == 'T' &&
-                toupper( pTmp[4] ) == 'E' &&
-                toupper( pTmp[5] ) == 'X' &&
-                toupper( pTmp[6] ) == 'T' )
-            {
-               pTmp += 7;
-
-               while( *pTmp == ' ' || *pTmp == '\t' )
-               {
-                  pTmp++;
-               }
-
-               if( *pTmp == '\n' || *pTmp == ';' )
-               {
-                  aiHold[ 0 ] = '\n';
-                  aiHold[ 1 ] = ')' + DONT_REDUCE;
-                  aiHold[ 2 ] = '(' + DONT_REDUCE;
-                  iHold = 3;
-
-                  yylval.string = sTextReset;
-                  return IDENTIFIER + DONT_REDUCE;
-               }
-            }
-         }
-
-         // Remove the CR.
-         sPair[ iSize - 1 ] = '\0';
-
-         aiHold[ 0 ] = HB_TEXT_LINE;
-         aiHold[ 1 ] = '(' + DONT_REDUCE;
-         iHold = 2;
-
-         yylval.string = sTextFunction;
-         return IDENTIFIER + DONT_REDUCE;
-      }
-
-      case HB_TEXT_ID :
-         yylval.string = hb_compIdentifierNew( "TEXT", TRUE );
-         return IDENTIFIER + DONT_REDUCE;
-#endif
 
       case HB_QSELF :
          bIgnoreWords = FALSE;
@@ -1689,7 +1444,7 @@ static int hb_comp_SLX_CustomAction( int x )
    return x;
 }
 
-int yy_lex_input( char *buffer, int iBufferSize )
+int yy_lex_input( char **buffer )
 {
    ULONG ulLen;
    char * szLine;
@@ -1699,18 +1454,12 @@ int yy_lex_input( char *buffer, int iBufferSize )
 
    if( szLine && ulLen )
    {
-      if( ulLen > ( ULONG ) iBufferSize )
-      {
-         ulLen = iBufferSize;
-      }
+      *buffer = szLine;
    }
    else
    {
-      ulLen = 0;
+      *buffer = NULL;
    }
-
-   memcpy( buffer, szLine, ulLen );
-   buffer[ ulLen ] = '\0';
 
    //printf( ">%s<]\n", buffer );
 

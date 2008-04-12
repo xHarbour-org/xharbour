@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.91 2006/02/22 03:30:17 ronpinkas Exp $
+ * $Id: macroslx.c,v 1.10 2008/02/04 17:06:28 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,8 @@
 #define MAX_STREAM_EXCLUSIONS                       2
 
 #define TOKEN_SIZE             HB_SYMBOL_NAME_LEN + 1
+
+#define YY_BUF_SIZE 16384
 
 /* NOTE: 02/08/2000 - maurilio.longo@libero.it, under OS/2 GCC I need to use relative paths in include command */
 /* this is relative to position of simplex.c in harbour source tree */
