@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6019 2008/04/12 18:57:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6020 2008/04/12 23:31:58 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-04-13 13:50 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+  * contrib/rdd_ads/ace.h
+    ! added some functions for Ads9 protected by ADS_REQUIRE_VERSION >=9
+  * contrib/rdd_ads/adsfuncs.c
+    ! Added ADSDDCREATELINK(),ADSDDMODIFYLINK() and ADSDDDROPLINK() functions protected by ADS_REQUIRE_VERSION >=9
+  * source/rtl/tprinter.c 
+    ! Cleaned up direct access to xxxxx->item.asxxxxx.xxxx and now using direct api
+      Getrprinter Enhaced to Return an 5th element on array, that is the printer real share name    
 
 2008-04-13 06:30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/simplex.c

@@ -4188,6 +4188,43 @@ typedef UNSIGNED32 (WINAPI *ADSDDSETINDEXPROPERTY_PTR)( ADSHANDLE  hAdminConn,
                                                         VOID       *pvProperty,
                                                         UNSIGNED16 usPropertyLen );
 
+//
+#if ADS_REQUIRE_VERSION >= 9
+UNSIGNED32 ENTRYPOINT AdsDDCreateLink( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
+typedef UNSIGNED32 (WINAPI *ADSDDCREATELINK_PTR)( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
+
+UNSIGNED32 ENTRYPOINT AdsDDModifyLink( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
+typedef UNSIGNED32 (WINAPI *ADSDDMODIFYLINK_PTR)( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
+
+UNSIGNED32 ENTRYPOINT AdsDDDropLink( ADSHANDLE  hDBConn,
+                                     UNSIGNED8  *pucLinkedDD,
+                                     UNSIGNED16 usDropGlobal );
+typedef UNSIGNED32 (WINAPI *ADSDDDROPLINK_PTR)( ADSHANDLE  hDBConn,
+                                     UNSIGNED8  *pucLinkedDD,
+                                     UNSIGNED16 usDropGlobal );
+//                                                        
+#endif                                                        
+                                                        
 #ifdef __cplusplus
    }  /* extern "C" */
 #endif

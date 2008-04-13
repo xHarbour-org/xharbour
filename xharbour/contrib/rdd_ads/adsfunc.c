@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.85 2007/01/18 11:32:32 lculik Exp $
+ * $Id: adsfunc.c,v 1.86 2008/04/03 15:02:29 lculik Exp $
  */
 
 /*
@@ -2003,6 +2003,7 @@ HB_FUNC( ADSCACHEOPENCURSORS )
 
 #if ADS_REQUIRE_VERSION >= 6
 
+
 HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 ! Only valid for a DataDict
 {
    UNSIGNED16 pusNumLinks = 0;
@@ -2571,4 +2572,89 @@ HB_FUNC( ADSCLOSECACHEDTABLES )
 
 #endif   /* ADS_REQUIRE_VERSION >= 7  */
 
+#if ADS_REQUIRE_VERSION >= 9
+HB_FUNC( ADSDDCREATELINK )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 ); 
+   UNSIGNED8  *pucServerPath = (UNSIGNED8 *) hb_parcx( 3 );
+   UNSIGNED8  *pucUserName   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 5 ) ? (UNSIGNED8 *) hb_parcx( 5 ) : NULL ;
+   UNSIGNED32 ulOptions      = ISNUM( 6 ) ? hb_parnl( 6 ) : ADS_DEFAULT ;
+   
+
+   ulRetVal = AdsDDCreateLink(  hConnect  ,    
+                            pucLinkAlias  ,
+                            pucServerPath ,
+                            pucUserName   ,
+                            pucPassword   ,
+                            ulOptions     
+                            );
+
+   if( ulRetVal == AE_SUCCESS )
+   {
+
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+
+
+HB_FUNC( ADSDDMODIFYLINK )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 ); 
+   UNSIGNED8  *pucServerPath = (UNSIGNED8 *) hb_parcx( 3 );
+   UNSIGNED8  *pucUserName   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 5 ) ? (UNSIGNED8 *) hb_parcx( 5 ) : NULL ;
+   UNSIGNED32 ulOptions      = ISNUM( 6 ) ? hb_parnl( 6 ) : ADS_DEFAULT ;
+   
+
+   ulRetVal = AdsDDModifyLink(  hConnect  ,    
+                            pucLinkAlias  ,
+                            pucServerPath ,
+                            pucUserName   ,
+                            pucPassword   ,
+                            ulOptions     
+                            );
+
+   if( ulRetVal == AE_SUCCESS )
+   {
+
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+HB_FUNC( ADSDDDROPLINK )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 );  
+   UNSIGNED16 ulOptions      = ISLOG( 3 ) ? hb_parl( 3 ) : FALSE ;
+  
+   ulRetVal = AdsDDDropLink(  hConnect     ,
+                            pucLinkAlias,
+                            ulOptions );
+
+   if( ulRetVal == AE_SUCCESS )
+   {
+
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+
+
+#endif
 /*  Please add all-version functions above this block */
