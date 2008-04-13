@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.39 2008/01/17 23:45:17 modalsist Exp $
+ * $Id: achoice.prg,v 1.40 2008/03/18 11:05:37 likewolf Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ FUNCTION AChoice( nTop,;
                   nFirstRow )
 LOCAL oAChoice
 LOCAL xItem
+LOCAL acItems2
 
 /* Clipper compliant. */
 DEFAULT nTop    TO 0
@@ -99,21 +100,22 @@ DEFAULT nRight  TO 0
 
   If Hb_IsNil(acItems) .OR. !Hb_IsArray( acItems ) .OR. Empty( acItems ) // This is Clipper compatible
     RETURN( 0 )
-/*
-  If !Hb_IsNil(acItems)
-     If !Hb_IsArray( acItems )
-        Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <acMenuItems>", "Argument type error"  ) )
-     Elseif Empty( acItems )
-        Throw( ErrorNew( "BASE", 0, 1127, Procname()+":<acMenuItems>", "Argument error. Empty Array" ) )
-*/
    Else
+      acItems2 := {}
       For Each xItem In acItems
-          If !Hb_IsString( xItem )
-             Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
-          Endif
+          if hb_isstring(xItem) .and. Len( xItem ) > 0 
+             aadd(acItems2, xItem )
+          else
+             exit
+          endif
       Next
+      if Empty( acItems2 )
+//         Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
+         Return 0
+      Endif
+      acItems := AClone( acItems2 )
+      acItems2 := nil
    Endif
-//  Endif
 
   IF !Hb_IsNil( uSelect )
      If !Hb_IsArray( uSelect ) .AND. !Hb_IsLogical( uSelect )
