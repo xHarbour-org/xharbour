@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.154 2008/01/23 17:18:38 lculik Exp $
+# $Id: hrbdll.bc,v 1.155 2008/03/19 17:57:22 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -41,6 +41,7 @@ PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
+ZLIB_DIR          = source\rtl\zlib
 MISC_DIR          = source\misc
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
@@ -567,6 +568,21 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pcre_version.obj \
   $(OBJ_DIR)\pcre_xclass.obj \
   $(OBJ_DIR)\pcreposix.obj \
+#
+# zlib
+#
+  $(OBJ_DIR)\adler32.obj \
+  $(OBJ_DIR)\compress.obj \
+  $(OBJ_DIR)\crc32.obj \
+  $(OBJ_DIR)\deflate.obj \
+  $(OBJ_DIR)\gzio.obj \
+  $(OBJ_DIR)\infback.obj \
+  $(OBJ_DIR)\inffast.obj \
+  $(OBJ_DIR)\inflate.obj \
+  $(OBJ_DIR)\inftrees.obj \
+  $(OBJ_DIR)\trees.obj \
+  $(OBJ_DIR)\uncompr.obj \
+  $(OBJ_DIR)\zutil.obj\
 #
 # Codepage
 #
@@ -1501,6 +1517,18 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\pcre_version.obj      + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_xclass.obj       + >> hdll.tmp
   echo. $(OBJ_DIR)\pcreposix.obj         + >> hdll.tmp
+  echo. $(OBJ_DIR)\adler32.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\compress.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\crc32.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\deflate.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\gzio.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\infback.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\inffast.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\inflate.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\inftrees.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\trees.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uncompr.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\zutil.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcompr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxdate.obj            + >> hdll.tmp
@@ -3757,6 +3785,41 @@ $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
 $(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\adler32.obj : $(ZLIB_DIR)\adler32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\compress.obj : $(ZLIB_DIR)\compress.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\crc32.obj : $(ZLIB_DIR)\crc32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\deflate.obj : $(ZLIB_DIR)\deflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gzio.obj : $(ZLIB_DIR)\gzio.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\infback.obj : $(ZLIB_DIR)\infback.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inffast.obj : $(ZLIB_DIR)\inffast.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inflate.obj : $(ZLIB_DIR)\inflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inftrees.obj : $(ZLIB_DIR)\inftrees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\trees.obj : $(ZLIB_DIR)\trees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uncompr.obj : $(ZLIB_DIR)\uncompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\zutil.obj : $(ZLIB_DIR)\zutil.c
+   $(CC_CMD)
 
 #
 # HBSIX.LIB dependencies

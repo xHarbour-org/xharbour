@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.208 2008/03/19 00:17:32 ronpinkas Exp $
+# $Id: makefile.vc,v 1.209 2008/03/20 00:01:04 ronpinkas Exp $
 #
 
 #
@@ -131,6 +131,7 @@ PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
 PCREPOS_DIR  =source\rtl\pcre
+ZLIB_DIR     =source\rtl\zlib
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
 HBRUN_DIR    =utils\hbrun
@@ -215,6 +216,7 @@ RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB          =$(LIB_DIR)\rtl.lib
 RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
 PCREPOS_LIB      =$(LIB_DIR)\pcrepos.lib
+ZLIB_LIB         =$(LIB_DIR)\zlib.lib
 TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
 VM_LIB           =$(LIB_DIR)\vm.lib
@@ -291,6 +293,7 @@ LIB_CMD =lib /out:$@ $**
 # For linking MT as in LibsMT2 below
 LIBSNONMT = \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(COMMON_LIB) \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
@@ -653,6 +656,27 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)\pcre_version.obj \
    $(OBJ_DIR)\pcre_xclass.obj \
    $(OBJ_DIR)\pcreposix.obj
+
+#
+# ZLIB.LIB rules
+#
+
+{$(ZLIB_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) -I$(ZLIB_DIR) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+ZLIB_LIB_OBJS=\
+   $(OBJ_DIR)\adler32.obj \
+   $(OBJ_DIR)\compress.obj \
+   $(OBJ_DIR)\crc32.obj \
+   $(OBJ_DIR)\deflate.obj \
+   $(OBJ_DIR)\gzio.obj \
+   $(OBJ_DIR)\infback.obj \
+   $(OBJ_DIR)\inffast.obj \
+   $(OBJ_DIR)\inflate.obj \
+   $(OBJ_DIR)\inftrees.obj \
+   $(OBJ_DIR)\trees.obj \
+   $(OBJ_DIR)\uncompr.obj \
+   $(OBJ_DIR)\zutil.obj
 
 #
 # LANG.LIB rules
@@ -1811,6 +1835,9 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(LIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
+   $(LIB_CMD)
+
+$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
    $(LIB_CMD)
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)

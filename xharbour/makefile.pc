@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.65 2008/03/18 14:02:11 modalsist Exp $
+# $Id: makefile.pc,v 1.66 2008/03/19 17:57:22 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -88,6 +88,7 @@ VM_DIR       = $(HB_DIR)\source\vm
 FMSTAT_DIR   = $(VM_DIR)
 RTL_DIR      = $(HB_DIR)\source\rtl
 PCREPOS_DIR  = $(HB_DIR)\source\rtl\pcre
+ZLIB_DIR     = $(HB_DIR)\source\rtl\zlib
 LANG_DIR     = $(HB_DIR)\source\lang
 DEBUG_DIR    = $(HB_DIR)\source\debug
 COMPILER_DIR = $(HB_DIR)\source\compiler
@@ -137,6 +138,7 @@ HBSIX_LIB    = $(LIB_DIR)\hbsix$(HB_MT).lib
 HSX_LIB      = $(LIB_DIR)\hsx$(HB_MT).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(HB_MT).lib
 PCREPOS_LIB  = $(LIB_DIR)\pcrepos.lib
+ZLIB_LIB     = $(LIB_DIR)\zlib.lib
 VM_LIB       = $(LIB_DIR)\vm$(HB_MT).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(HB_MT).lib
 CT_LIB       = $(LIB_DIR)\ct$(HB_MT).lib
@@ -201,6 +203,7 @@ HARBOUR_LIBRARY = \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(CT_LIB) \
    $(CODEPAGE_LIB)
 
@@ -227,6 +230,7 @@ PROJECT = \
    $(VM_LIB) \
    $(RTL_LIB) \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(MACRO_LIB) \
    $(RDD_LIB) \
    $(TIP_LIB) \
@@ -1091,6 +1095,19 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)\pcre_newline.obj \
    $(OBJ_DIR)\pcre_ucp_searchfuncs.obj
 
+ZLIB_LIB_OBJS=\
+   $(OBJ_DIR)\adler32.obj \
+   $(OBJ_DIR)\compress.obj \
+   $(OBJ_DIR)\crc32.obj \
+   $(OBJ_DIR)\deflate.obj \
+   $(OBJ_DIR)\gzio.obj \
+   $(OBJ_DIR)\infback.obj \
+   $(OBJ_DIR)\inffast.obj \
+   $(OBJ_DIR)\inflate.obj \
+   $(OBJ_DIR)\inftrees.obj \
+   $(OBJ_DIR)\trees.obj \
+   $(OBJ_DIR)\uncompr.obj \
+   $(OBJ_DIR)\zutil.obj
 CGI_LIB_OBJS = \
     $(OBJ_DIR)\thtm.obj \
     $(OBJ_DIR)\tedit.obj \
@@ -1321,6 +1338,9 @@ $(LANG_LIB) : $(LANG_LIB_OBJS)
    $(LIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
+   $(LIB_CMD)
+
+$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
    $(LIB_CMD)
 
 $(CGI_LIB) : $(CGI_LIB_OBJS)
@@ -2972,6 +2992,47 @@ $(OBJ_DIR)\pcre_newline.obj : $(PCREPOS_DIR)\pcre_newline.c
 
 $(OBJ_DIR)\pcre_ucp_searchfuncs.obj : $(PCREPOS_DIR)\pcre_ucp_searchfuncs.c
    $(CC_PCREPOS_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ ZLIB.LIB dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(OBJ_DIR)\adler32.obj : $(ZLIB_DIR)\adler32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\compress.obj : $(ZLIB_DIR)\compress.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\crc32.obj : $(ZLIB_DIR)\crc32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\deflate.obj : $(ZLIB_DIR)\deflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gzio.obj : $(ZLIB_DIR)\gzio.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\infback.obj : $(ZLIB_DIR)\infback.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inffast.obj : $(ZLIB_DIR)\inffast.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inflate.obj : $(ZLIB_DIR)\inflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inftrees.obj : $(ZLIB_DIR)\inftrees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\trees.obj : $(ZLIB_DIR)\trees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uncompr.obj : $(ZLIB_DIR)\uncompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\zutil.obj : $(ZLIB_DIR)\zutil.c
+   $(CC_CMD)
 
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿

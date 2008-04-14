@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.36 2007/12/26 14:53:39 modalsist Exp $
+# $Id: makefile.gc,v 1.37 2007/12/29 16:34:27 modalsist Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -23,13 +23,13 @@ HBPP_EXE     = $(BIN_DIR)/hbpp.exe
 XBSCRIPT_EXE = $(BIN_DIR)/xbscript.exe
 
 ODBC_DIR     = $(HARBOUR_DIR)/source/odbc
-DESIGN_DIR   = $(HARBOUR_DIR)/contrib/design
 HTML_DIR     = $(HARBOUR_DIR)/contrib/htmllib
 UNICODE_DIR  = $(HARBOUR_DIR)/contrib/unicode
 COMPILER_DIR = $(HARBOUR_DIR)/source/compiler
 DEBUG_DIR    = $(HARBOUR_DIR)/source/debug
 RTL_DIR      = $(HARBOUR_DIR)/source/rtl
 PCREPOS_DIR  = $(HARBOUR_DIR)/source/rtl/pcre
+ZLIB_DIR     = $(HARBOUR_DIR)/source/rtl/zlib
 TIP_DIR      = $(HARBOUR_DIR)/source/tip
 VM_DIR       = $(HARBOUR_DIR)/source/vm
 CODEPAGE_DIR = $(HARBOUR_DIR)/source/codepage
@@ -55,11 +55,10 @@ RDDADS_DIR   = $(HARBOUR_DIR)/contrib/rdd_ads
 HARBOURFLAGS = -i$(INC_DIR) -n -q0 -w -es2 -gc0
 CFLAGS       = -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INC_DIR)
 
-DESIGN_OBJ_DIR  = $(OBJ_DIR)/design
 HTML_OBJ_DIR = $(OBJ_DIR)/html
-AR_CMD	     = $(RM) $@ && \
-               $(AR) cru $@ $^ && \
-               $(RANLIB) $@ && \
+AR_CMD=\
+               $(AR) cru $@ $^ &&\
+               $(RANLIB) $@ &&\
                $(STRIP) $@
 
 ifeq ($(THREAD_MODE),mt)
@@ -124,8 +123,8 @@ HBSIX_LIB    = $(LIB_DIR)/libhbsix$(THREAD_MODE).a
 HSX_LIB      = $(LIB_DIR)/libhsx$(THREAD_MODE).a
 RTL_LIB      = $(LIB_DIR)/librtl$(THREAD_MODE).a
 PCREPOS_LIB  = $(LIB_DIR)/libpcrepos$(THREAD_MODE).a
+ZLIB_LIB     = $(LIB_DIR)/libzlib$(THREAD_MODE).a
 VM_LIB       = $(LIB_DIR)/libvm$(THREAD_MODE).a
-SAMPLES_LIB  = $(LIB_DIR)/libsamples$(THREAD_MODE).a
 RDD_LIB      = $(LIB_DIR)/librdd$(THREAD_MODE).a
 CT_LIB       = $(LIB_DIR)/libct$(THREAD_MODE).a
 TIP_LIB      = $(LIB_DIR)/libtip$(THREAD_MODE).a
@@ -133,7 +132,6 @@ UNICODE_LIB  = $(LIB_DIR)/libunicode$(THREAD_MODE).a
 NF_LIB       = $(LIB_DIR)/libnf$(THREAD_MODE).a
 RDDADS_LIB   = $(LIB_DIR)/librddads$(THREAD_MODE).a
 MISC_LIB     = $(LIB_DIR)/libmisc$(THREAD_MODE).a
-GTWVW_LIB    = $(LIB_DIR)/libgtwvw$(THREAD_MODE).a
 GTWVT_LIB    = $(LIB_DIR)/libgtwvt$(THREAD_MODE).a
 
 COMMON_LIB   = $(LIB_DIR)/libcommon.a
@@ -143,14 +141,14 @@ DEBUG_LIB    = $(LIB_DIR)/libdebug.a
 NULSYS_LIB   = $(LIB_DIR)/libnulsys.a
 GTSTD_LIB    = $(LIB_DIR)/libgtstd.a
 GTWIN_LIB    = $(LIB_DIR)/libgtwin.a
-GTNUL_LIB    = $(LIB_DIR)/libgtnul.a
-DESIGN_LIB   = $(LIB_DIR)/libdesign.a
-HTML_LIB     = $(LIB_DIR)/libhtml.a
 
 LIB_TO_LINK = \
    $(COMMON_LIB) \
+   $(CODEPAGE_LIB) \
    $(PP_LIB) \
+   $(CT_LIB) \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(LANG_LIB) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
@@ -171,10 +169,15 @@ MINGW_LIBRARY = \
    -L$(MINGWDIR)/lib -L$(LIB_DIR) \
    -lvm$(THREAD_MODE) \
    -lrtl$(THREAD_MODE) \
+   -lpcrepos$(THREAD_MODE) \
    -lrdd$(THREAD_MODE) \
+   -lhbsix$(THREAD_MODE) \
    -lvm$(THREAD_MODE) \
    -lrtl$(THREAD_MODE) \
    -lgtwin \
+   -lct \
+   -lrtl$(THREAD_MODE) \
+   -lzlib$(THREAD_MODE) \
    -lmacro$(THREAD_MODE) \
    -ldbfcdx$(THREAD_MODE) \
    -lbmdbfcdx$(THREAD_MODE) \
@@ -183,12 +186,14 @@ MINGW_LIBRARY = \
    -ldbffpt$(THREAD_MODE) \
    -lcommon \
    -lpp$(THREAD_MODE) \
+   -lcodepage \
    -llang \
-   -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 \
-   -lole32 -luuid -loleaut32
+   -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
+   -lole32 -luuid -loleaut32 -lws2_32
 
 PROJECT = \
    $(COMMON_LIB) \
+   $(CODEPAGE_LIB) \
    $(PP_LIB)
 
 ifeq ($(THREAD_MODE),)
@@ -209,18 +214,16 @@ PROJECT += \
    $(DBFNTX_LIB) \
    $(RTL_LIB) \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(VM_LIB) \
-   $(SAMPLES_LIB) \
    $(RDD_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
-   $(GTWVW_LIB) \
    $(GTWVT_LIB) \
    $(UNICODE_LIB) \
    $(CT_LIB) \
    $(NF_LIB) \
    $(RDDADS_LIB) \
-   $(MISC_LIB) \
    $(TIP_LIB) \
    $(ODBC_LIB)
 
@@ -230,11 +233,7 @@ ifeq ($(THREAD_MODE),)
       $(NULSYS_LIB) \
       $(GTSTD_LIB) \
       $(GTWIN_LIB) \
-      $(GTWVW_LIB) \
       $(GTWVT_LIB) \
-      $(GTNUL_LIB) \
-      $(DESIGN_LIB) \
-      $(HTML_LIB) \
       $(HBTEST_EXE) \
       $(HBRUN_EXE) \
       $(HBDOC_EXE) \
@@ -263,146 +262,6 @@ $(OBJ_DIR)/todbc$(THREAD_MODE).c : $(ODBC_DIR)/todbc.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/todbc$(THREAD_MODE).o : $(OBJ_DIR)/todbc$(THREAD_MODE).c
-	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
-# libhtml.a
-#-------------------------------------------------------------------------------
-
-$(HTML_LIB) : \
-   $(HTML_OBJ_DIR)/counter.o \
-   $(HTML_OBJ_DIR)/hterrsys.o \
-   $(HTML_OBJ_DIR)/htmbrows.o \
-   $(HTML_OBJ_DIR)/htmutil.o \
-   $(HTML_OBJ_DIR)/jlist.o \
-   $(HTML_OBJ_DIR)/jwindow.o \
-   $(HTML_OBJ_DIR)/ocgi.o \
-   $(HTML_OBJ_DIR)/oedit.o \
-   $(HTML_OBJ_DIR)/ofile.o \
-   $(HTML_OBJ_DIR)/oframe.o \
-   $(HTML_OBJ_DIR)/ohtm.o \
-   $(HTML_OBJ_DIR)/oini.o
-	$(AR_CMD)
-
-$(HTML_OBJ_DIR)/counter.c : $(HTML_DIR)/counter.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/counter.o : $(HTML_OBJ_DIR)/counter.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/hterrsys.c : $(HTML_DIR)/hterrsys.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/hterrsys.o : $(HTML_OBJ_DIR)/hterrsys.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/htmbrows.c : $(HTML_DIR)/htmbrows.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/htmbrows.o : $(HTML_OBJ_DIR)/htmbrows.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/htmutil.c : $(HTML_DIR)/htmutil.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/htmutil.o : $(HTML_OBJ_DIR)/htmutil.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/jlist.c : $(HTML_DIR)/jlist.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/jlist.o : $(HTML_OBJ_DIR)/jlist.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/jwindow.c : $(HTML_DIR)/jwindow.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/jwindow.o : $(HTML_OBJ_DIR)/jwindow.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/ocgi.c : $(HTML_DIR)/ocgi.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/ocgi.o : $(HTML_OBJ_DIR)/ocgi.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/oedit.c : $(HTML_DIR)/oedit.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/oedit.o : $(HTML_OBJ_DIR)/oedit.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/ofile.c : $(HTML_DIR)/ofile.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/ofile.o : $(HTML_OBJ_DIR)/ofile.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/oframe.c : $(HTML_DIR)/oframe.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/oframe.o : $(HTML_OBJ_DIR)/oframe.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/ohtm.c : $(HTML_DIR)/ohtm.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/ohtm.o : $(HTML_OBJ_DIR)/ohtm.c
-	$(CC_CMD)
-
-$(HTML_OBJ_DIR)/oini.c : $(HTML_DIR)/oini.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
-
-$(HTML_OBJ_DIR)/oini.o : $(HTML_OBJ_DIR)/oini.c
-	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
-# libdesign.a
-#-------------------------------------------------------------------------------
-
-$(DESIGN_LIB) : \
-   $(DESIGN_OBJ_DIR)/general.o \
-   $(DESIGN_OBJ_DIR)/tbox.o \
-   $(DESIGN_OBJ_DIR)/tcheck.o \
-   $(DESIGN_OBJ_DIR)/tmenu.o \
-   $(DESIGN_OBJ_DIR)/tradio.o \
-   $(DESIGN_OBJ_DIR)/twindow.o
-	$(AR_CMD)
-
-$(DESIGN_OBJ_DIR)/general.c : $(DESIGN_DIR)/general.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/general.o : $(DESIGN_OBJ_DIR)/general.c
-	$(CC_CMD)
-
-$(DESIGN_OBJ_DIR)/tbox.c : $(DESIGN_DIR)/tbox.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/tbox.o : $(DESIGN_OBJ_DIR)/tbox.c
-	$(CC_CMD)
-
-$(DESIGN_OBJ_DIR)/tcheck.c : $(DESIGN_DIR)/tcheck.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/tcheck.o : $(DESIGN_OBJ_DIR)/tcheck.c
-	$(CC_CMD)
-
-$(DESIGN_OBJ_DIR)/tmenu.c : $(DESIGN_DIR)/tmenu.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/tmenu.o : $(DESIGN_OBJ_DIR)/tmenu.c
-	$(CC_CMD)
-
-$(DESIGN_OBJ_DIR)/tradio.c : $(DESIGN_DIR)/tradio.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/tradio.o : $(DESIGN_OBJ_DIR)/tradio.c
-	$(CC_CMD)
-
-$(DESIGN_OBJ_DIR)/twindow.c : $(DESIGN_DIR)/twindow.prg
-	$(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)/twindow.o : $(DESIGN_OBJ_DIR)/twindow.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -513,12 +372,65 @@ $(OBJ_DIR)/url.o : $(OBJ_DIR)/url.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
+# libzlib.a
+#-------------------------------------------------------------------------------
+$(ZLIB_LIB) :\
+   $(OBJ_DIR)/adler32.o \
+   $(OBJ_DIR)/compress.o \
+   $(OBJ_DIR)/crc32.o \
+   $(OBJ_DIR)/deflate.o \
+   $(OBJ_DIR)/gzio.o \
+   $(OBJ_DIR)/infback.o \
+   $(OBJ_DIR)/inffast.o \
+   $(OBJ_DIR)/inflate.o \
+   $(OBJ_DIR)/inftrees.o \
+   $(OBJ_DIR)/trees.o \
+   $(OBJ_DIR)/uncompr.o \
+   $(OBJ_DIR)/zutil.o
+	$(AR_CMD)
+
+$(OBJ_DIR)/adler32.o : $(ZLIB_DIR)/adler32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/compress.o : $(ZLIB_DIR)/compress.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/crc32.o : $(ZLIB_DIR)/crc32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/deflate.o : $(ZLIB_DIR)/deflate.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/gzio.o : $(ZLIB_DIR)/gzio.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/infback.o : $(ZLIB_DIR)/infback.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/inffast.o : $(ZLIB_DIR)/inffast.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/inflate.o : $(ZLIB_DIR)/inflate.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/inftrees.o : $(ZLIB_DIR)/inftrees.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/trees.o : $(ZLIB_DIR)/trees.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uncompr.o : $(ZLIB_DIR)/uncompr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/zutil.o : $(ZLIB_DIR)/zutil.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
 # libpcrepos.a
 #-------------------------------------------------------------------------------
 
-PCREPOS_LIB_OBJS = \
-   $(OBJ_DIR)/chartables.o \
-   $(OBJ_DIR)/pcreposix.o \
+$(PCREPOS_LIB) :\
+   $(OBJ_DIR)/pcre_chartables.o \
    $(OBJ_DIR)/pcre_compile.o \
    $(OBJ_DIR)/pcre_config.o \
    $(OBJ_DIR)/pcre_dfa_exec.o \
@@ -528,87 +440,93 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)/pcre_globals.o \
    $(OBJ_DIR)/pcre_info.o \
    $(OBJ_DIR)/pcre_maketables.o \
+   $(OBJ_DIR)/pcre_newline.o \
    $(OBJ_DIR)/pcre_ord2utf8.o \
-   $(OBJ_DIR)/pcre_printint.o \
    $(OBJ_DIR)/pcre_refcount.o \
    $(OBJ_DIR)/pcre_study.o \
    $(OBJ_DIR)/pcre_tables.o \
    $(OBJ_DIR)/pcre_try_flipped.o \
-   $(OBJ_DIR)/pcre_ucp_findchar.o \
+   $(OBJ_DIR)/pcre_ucp_searchfuncs.o \
    $(OBJ_DIR)/pcre_valid_utf8.o \
    $(OBJ_DIR)/pcre_version.o \
    $(OBJ_DIR)/pcre_xclass.o \
-   $(OBJ_DIR)/ucp_findchar.o
+   $(OBJ_DIR)/pcreposix.o
 	$(AR_CMD)
 
-$(OBJ_DIR)/chartables.o : $(PCREPOS_DIR)/chartables.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+$(OBJ_DIR)/pcre_chartables.o : $(PCREPOS_DIR)/pcre_chartables.c
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_newline.o : $(PCREPOS_DIR)/pcre_newline.c
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_ucp_searchfuncs.o : $(PCREPOS_DIR)/pcre_ucp_searchfuncs.c
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/dftables.o : $(PCREPOS_DIR)/dftables.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcreposix.o : $(PCREPOS_DIR)/pcreposix.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_compile.o : $(PCREPOS_DIR)/pcre_compile.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_config.o : $(PCREPOS_DIR)/pcre_config.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_dfa_exec.o : $(PCREPOS_DIR)/pcre_dfa_exec.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_exec.o : $(PCREPOS_DIR)/pcre_exec.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_fullinfo.o : $(PCREPOS_DIR)/pcre_fullinfo.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_get.o : $(PCREPOS_DIR)/pcre_get.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_globals.o : $(PCREPOS_DIR)/pcre_globals.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_info.o : $(PCREPOS_DIR)/pcre_info.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_maketables.o : $(PCREPOS_DIR)/pcre_maketables.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_ord2utf8.o : $(PCREPOS_DIR)/pcre_ord2utf8.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_printint.o : $(PCREPOS_DIR)/pcre_printint.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_refcount.o : $(PCREPOS_DIR)/pcre_refcount.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_study.o : $(PCREPOS_DIR)/pcre_study.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_tables.o : $(PCREPOS_DIR)/pcre_tables.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_try_flipped.o : $(PCREPOS_DIR)/pcre_try_flipped.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_ucp_findchar.o : $(PCREPOS_DIR)/pcre_ucp_findchar.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_valid_utf8.o : $(PCREPOS_DIR)/pcre_valid_utf8.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_version.o : $(PCREPOS_DIR)/pcre_version.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/pcre_xclass.o : $(PCREPOS_DIR)/pcre_xclass.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 $(OBJ_DIR)/ucp_findchar.o : $(PCREPOS_DIR)/ucp_findchar.c
-   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+	$(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
 
 
 #-------------------------------------------------------------------------------
@@ -1483,12 +1401,19 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/charswap.o \
    $(CT_OBJ_DIR)/count.o \
    $(CT_OBJ_DIR)/ctc.o \
-   $(CT_OBJ_DIR)/ctmath.o \
-   $(CT_OBJ_DIR)/ctmath2.o \
-   $(CT_OBJ_DIR)/ctset.o \
-   $(CT_OBJ_DIR)/ctstr.o \
    $(CT_OBJ_DIR)/ctchksum.o \
    $(CT_OBJ_DIR)/ctcrypt.o \
+   $(CT_OBJ_DIR)/ctmath.o \
+   $(CT_OBJ_DIR)/ctmath2.o \
+   $(CT_OBJ_DIR)/ctnet.o \
+   $(CT_OBJ_DIR)/ctpad.o \
+   $(CT_OBJ_DIR)/ctset.o \
+   $(CT_OBJ_DIR)/ctstr.o \
+   $(CT_OBJ_DIR)/ctwfunc.o \
+   $(CT_OBJ_DIR)/ctwin.o \
+   $(CT_OBJ_DIR)/cursor.o \
+   $(CT_OBJ_DIR)/datetime.o \
+   $(CT_OBJ_DIR)/dattime2.o \
    $(CT_OBJ_DIR)/dbftools.o \
    $(CT_OBJ_DIR)/disk.o \
    $(CT_OBJ_DIR)/envparam.o \
@@ -1499,14 +1424,17 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/intneg.o \
    $(CT_OBJ_DIR)/justify.o \
    $(CT_OBJ_DIR)/keyset.o \
+   $(CT_OBJ_DIR)/lton.o \
+   $(CT_OBJ_DIR)/maxline.o \
    $(CT_OBJ_DIR)/misc1.o \
    $(CT_OBJ_DIR)/misc2.o \
    $(CT_OBJ_DIR)/misc3.o \
-   $(CT_OBJ_DIR)/ctnet.o \
    $(CT_OBJ_DIR)/num1.o \
    $(CT_OBJ_DIR)/numat.o \
+   $(CT_OBJ_DIR)/numcount.o \
+   $(CT_OBJ_DIR)/numline.o \
    $(CT_OBJ_DIR)/numlohi.o \
-   $(CT_OBJ_DIR)/ctpad.o \
+   $(CT_OBJ_DIR)/pack.o \
    $(CT_OBJ_DIR)/pos1.o \
    $(CT_OBJ_DIR)/pos2.o \
    $(CT_OBJ_DIR)/posdiff.o \
@@ -1516,8 +1444,9 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/remove.o \
    $(CT_OBJ_DIR)/replace.o \
    $(CT_OBJ_DIR)/screen1.o \
-   $(CT_OBJ_DIR)/setlast.o \
+   $(CT_OBJ_DIR)/settime.o \
    $(CT_OBJ_DIR)/strdiff.o \
+   $(CT_OBJ_DIR)/strfile.o \
    $(CT_OBJ_DIR)/strswap.o \
    $(CT_OBJ_DIR)/tab.o \
    $(CT_OBJ_DIR)/token1.o \
@@ -1525,40 +1454,29 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/trig.o \
    $(CT_OBJ_DIR)/wordrepl.o \
    $(CT_OBJ_DIR)/wordtoch.o \
+   \
+   $(CT_OBJ_DIR)/blank.o \
    $(CT_OBJ_DIR)/color.o \
    $(CT_OBJ_DIR)/ct.o \
    $(CT_OBJ_DIR)/ctmisc.o \
    $(CT_OBJ_DIR)/ctrand.o \
-   $(CT_OBJ_DIR)/getsecrt.o \
-   $(CT_OBJ_DIR)/ctwin.o \
-   $(CT_OBJ_DIR)/datetime.o \
-   $(CT_OBJ_DIR)/dattime2.o \
    $(CT_OBJ_DIR)/dattime3.o \
-   $(CT_OBJ_DIR)/invrtwin.o \
-   $(CT_OBJ_DIR)/numconv.o \
-   $(CT_OBJ_DIR)/screen2.o \
-   $(CT_OBJ_DIR)/blank.o \
-   $(CT_OBJ_DIR)/cttime.o \
-   $(CT_OBJ_DIR)/getinfo.o \
-   $(CT_OBJ_DIR)/strfile.o \
+   $(CT_OBJ_DIR)/diskutil.o \
    $(CT_OBJ_DIR)/fcopy.o \
-   $(CT_OBJ_DIR)/pack.o \
-   $(CT_OBJ_DIR)/settime.o \
+   $(CT_OBJ_DIR)/getinfo.o \
+   $(CT_OBJ_DIR)/getsecrt.o \
    $(CT_OBJ_DIR)/keysec.o \
    $(CT_OBJ_DIR)/keytime.o \
    $(CT_OBJ_DIR)/like.o \
-   $(CT_OBJ_DIR)/lton.o \
-   $(CT_OBJ_DIR)/maxline.o \
-   $(CT_OBJ_DIR)/numcount.o \
-   $(CT_OBJ_DIR)/numline.o \
+   $(CT_OBJ_DIR)/numconv.o \
+   $(CT_OBJ_DIR)/screen2.o \
    $(CT_OBJ_DIR)/screen3.o \
-   $(CT_OBJ_DIR)/scrmark.o \
    $(CT_OBJ_DIR)/setkeys.o \
-   $(CT_OBJ_DIR)/setclear.o \
+   $(CT_OBJ_DIR)/scrmark.o \
+   $(CT_OBJ_DIR)/showtime.o \
    $(CT_OBJ_DIR)/spread.o \
    $(CT_OBJ_DIR)/trapkey.o \
-   $(CT_OBJ_DIR)/untext.o \
-   $(CT_OBJ_DIR)/diskutil.o \
+   $(CT_OBJ_DIR)/cttime.o \
    $(CT_OBJ_DIR)/util.o
 	$(AR_CMD)
 
@@ -1566,6 +1484,12 @@ $(CT_OBJ_DIR)/dbftools.o : $(LIBCT_DIR)/dbftools.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/addascii.o : $(LIBCT_DIR)/addascii.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/ctwfunc.o : $(LIBCT_DIR)/ctwfunc.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/cursor.o : $(LIBCT_DIR)/cursor.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/asciisum.o : $(LIBCT_DIR)/asciisum.c
@@ -1757,6 +1681,12 @@ $(CT_OBJ_DIR)/ct.c : $(LIBCT_DIR)/ct.prg
 $(CT_OBJ_DIR)/ct.o : $(CT_OBJ_DIR)/ct.c
 	$(CC_CMD)
 
+$(CT_OBJ_DIR)/showtime.c : $(LIBCT_DIR)/showtime.prg
+	$(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)/showtime.o : $(CT_OBJ_DIR)/showtime.c
+	$(CC_CMD)
+
 $(CT_OBJ_DIR)/color.c : $(LIBCT_DIR)/color.prg
 	$(HARBOUR_CMD)
 
@@ -1790,10 +1720,7 @@ $(CT_OBJ_DIR)/getsecrt.c : $(LIBCT_DIR)/getsecrt.prg
 $(CT_OBJ_DIR)/getsecrt.o : $(CT_OBJ_DIR)/getsecrt.c
 	$(CC_CMD)
 
-$(CT_OBJ_DIR)/dattime3.c : $(LIBCT_DIR)/dattime3.prg
-	$(HARBOUR_CMD)
-
-$(CT_OBJ_DIR)/dattime3.o : $(CT_OBJ_DIR)/dattime3.c
+$(CT_OBJ_DIR)/dattime3.o : $(LIBCT_DIR)/dattime3.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/setlast.o : $(LIBCT_DIR)/setlast.c
@@ -1805,16 +1732,7 @@ $(CT_OBJ_DIR)/numconv.c : $(LIBCT_DIR)/numconv.prg
 $(CT_OBJ_DIR)/numconv.o : $(CT_OBJ_DIR)/numconv.c
 	$(CC_CMD)
 
-$(CT_OBJ_DIR)/screen2.c : $(LIBCT_DIR)/screen2.prg
-	$(HARBOUR_CMD)
-
-$(CT_OBJ_DIR)/screen2.o : $(CT_OBJ_DIR)/screen2.c
-	$(CC_CMD)
-
-$(CT_OBJ_DIR)/invrtwin.c : $(LIBCT_DIR)/invrtwin.prg
-	$(HARBOUR_CMD)
-
-$(CT_OBJ_DIR)/invrtwin.o : $(CT_OBJ_DIR)/invrtwin.c
+$(CT_OBJ_DIR)/screen2.o : $(LIBCT_DIR)/screen2.c
 	$(CC_CMD)
 
 # $(CT_OBJ_DIR)/ctwin.c : $(LIBCT_DIR)/ctwin.prg
@@ -1866,9 +1784,6 @@ $(CT_OBJ_DIR)/pack.o : $(LIBCT_DIR)/pack.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/settime.o : $(LIBCT_DIR)/settime.c
-	$(CC_CMD)
-
-$(CT_OBJ_DIR)/setclear.o : $(LIBCT_DIR)/setclear.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/lton.o : $(LIBCT_DIR)/lton.c
@@ -1923,12 +1838,6 @@ $(CT_OBJ_DIR)/trapkey.c : $(LIBCT_DIR)/trapkey.prg
 	$(HARBOUR_CMD)
 
 $(CT_OBJ_DIR)/trapkey.o : $(CT_OBJ_DIR)/trapkey.c
-	$(CC_CMD)
-
-$(CT_OBJ_DIR)/untext.c : $(LIBCT_DIR)/untext.prg
-	$(HARBOUR_CMD)
-
-$(CT_OBJ_DIR)/untext.o : $(CT_OBJ_DIR)/untext.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/util.c : $(LIBCT_DIR)/util.prg
@@ -2032,33 +1941,14 @@ $(GTWVT_OBJ_DIR)/wvtpaint.o : $(GTWVT_OBJ_DIR)/wvtpaint.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
-# libgtnul.a
-#-------------------------------------------------------------------------------
-
-$(GTNUL_LIB) : \
-   $(OBJ_DIR)/gtnul.o \
-   $(OBJ_DIR)/gtext.o
-	$(AR_CMD)
-
-$(OBJ_DIR)/gtnul.o : $(RTL_DIR)/gtnul/gtnul.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/gtext.o : $(RTL_DIR)/gtnul/gtext.c
-	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
 # libgtstd.a
 #-------------------------------------------------------------------------------
 
 $(GTSTD_LIB) : \
-   $(OBJ_DIR)/gtstd.o \
-   $(OBJ_DIR)/mousestd.o
+   $(OBJ_DIR)/gtstd.o
 	$(AR_CMD)
 
 $(OBJ_DIR)/gtstd.o : $(RTL_DIR)/gtstd/gtstd.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/mousestd.o : $(RTL_DIR)/gtstd/mousestd.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -2066,14 +1956,10 @@ $(OBJ_DIR)/mousestd.o : $(RTL_DIR)/gtstd/mousestd.c
 #-------------------------------------------------------------------------------
 
 $(GTWIN_LIB) : \
-   $(OBJ_DIR)/gtwin.o \
-   $(OBJ_DIR)/mousewin.o
+   $(OBJ_DIR)/gtwin.o
 	$(AR_CMD)
 
 $(OBJ_DIR)/gtwin.o : $(RTL_DIR)/gtwin/gtwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/mousewin.o : $(RTL_DIR)/gtwin/mousewin.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -2102,10 +1988,14 @@ $(COMMON_LIB) : \
    $(OBJ_DIR)/hbver.o \
    $(OBJ_DIR)/expropt1.o \
    $(OBJ_DIR)/expropt2.o \
-   $(OBJ_DIR)/reserved.o
+   $(OBJ_DIR)/reserved.o \
+   $(OBJ_DIR)/hbdate.o
 	$(AR_CMD)
 
 $(OBJ_DIR)/hbfhnd.o : $(COMMON_DIR)/hbfhnd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbdate.o : $(COMMON_DIR)/hbdate.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/hbfopen.o : $(COMMON_DIR)/hbfopen.c
@@ -2143,106 +2033,146 @@ $(OBJ_DIR)/reserved.o : $(COMMON_DIR)/reserved.c
 #-------------------------------------------------------------------------------
 
 $(CODEPAGE_LIB) : \
-   $(OBJ_DIR)/cpesdos.o \
+   $(OBJ_DIR)/cpbgmik.o \
+   $(OBJ_DIR)/cpbgwin.o \
+   $(OBJ_DIR)/cpelwin.o \
+   $(OBJ_DIR)/cpes850.o \
    $(OBJ_DIR)/cpesmwin.o \
    $(OBJ_DIR)/cpeswin.o \
-   $(OBJ_DIR)/cpgedos.o \
-   $(OBJ_DIR)/cpgewin.o \
+   $(OBJ_DIR)/cphr1250.o \
+   $(OBJ_DIR)/cphr437.o \
+   $(OBJ_DIR)/cphr852.o \
+   $(OBJ_DIR)/cphu852.o \
+   $(OBJ_DIR)/cphuwin.o \
    $(OBJ_DIR)/cpit437.o \
    $(OBJ_DIR)/cpit850.o \
    $(OBJ_DIR)/cpitisb.o \
    $(OBJ_DIR)/cpitiso.o \
    $(OBJ_DIR)/cpltwin.o \
-   $(OBJ_DIR)/cppt850.o \
-   $(OBJ_DIR)/cpptiso.o \
    $(OBJ_DIR)/cppl852.o \
    $(OBJ_DIR)/cppliso.o \
    $(OBJ_DIR)/cpplmaz.o \
    $(OBJ_DIR)/cpplwin.o \
+   $(OBJ_DIR)/cppt850.o \
+   $(OBJ_DIR)/cpptiso.o \
    $(OBJ_DIR)/cpru866.o \
+   $(OBJ_DIR)/cprukoi.o \
    $(OBJ_DIR)/cpruwin.o \
+   $(OBJ_DIR)/cpsl852.o \
+   $(OBJ_DIR)/cpsliso.o \
+   $(OBJ_DIR)/cpslwin.o \
    $(OBJ_DIR)/cpsrwin.o \
    $(OBJ_DIR)/cpsv850.o \
    $(OBJ_DIR)/cpsvclip.o \
    $(OBJ_DIR)/cpsvwin.o \
-   $(OBJ_DIR)/cprukoi.o \
-   $(OBJ_DIR)/cphr437.o \
-   $(OBJ_DIR)/cphr852.o \
-   $(OBJ_DIR)/cphr1250.o \
    $(OBJ_DIR)/cpua866.o \
    $(OBJ_DIR)/cpuawin.o \
    $(OBJ_DIR)/cpuakoi.o \
-   $(OBJ_DIR)/uc1250.o   \
-   $(OBJ_DIR)/uc1251.o   \
-   $(OBJ_DIR)/uc1257.o   \
-   $(OBJ_DIR)/uc850.o    \
-   $(OBJ_DIR)/uc852.o    \
-   $(OBJ_DIR)/uc866.o    \
+   $(OBJ_DIR)/uc1250.o \
+   $(OBJ_DIR)/uc1251.o \
+   $(OBJ_DIR)/uc1253.o \
+   $(OBJ_DIR)/uc1254.o \
+   $(OBJ_DIR)/uc1257.o \
+   $(OBJ_DIR)/uc737.o \
+   $(OBJ_DIR)/uc850.o \
+   $(OBJ_DIR)/uc852.o \
+   $(OBJ_DIR)/uc866.o \
    $(OBJ_DIR)/uc8859_1.o \
    $(OBJ_DIR)/uc8859_2.o \
    $(OBJ_DIR)/uc88591b.o \
-   $(OBJ_DIR)/uckoi8.o   \
-   $(OBJ_DIR)/uckoi8u.o  \
+   $(OBJ_DIR)/uckoi8.o \
+   $(OBJ_DIR)/uckoi8u.o \
    $(OBJ_DIR)/ucmaz.o \
-   $(OBJ_DIR)/cphu852.o \
-   $(OBJ_DIR)/cphuwin.o
+   $(OBJ_DIR)/cpbg866.o \
+   $(OBJ_DIR)/cpbgiso.o \
+   $(OBJ_DIR)/cpbgwin.o \
+   $(OBJ_DIR)/cpcs852.o \
+   $(OBJ_DIR)/cpcsiso.o  \
+   $(OBJ_DIR)/cpcskam.o \
+   $(OBJ_DIR)/cpcswin.o \
+   $(OBJ_DIR)/cphu852s.o \
+   $(OBJ_DIR)/cphuiso.o \
+   $(OBJ_DIR)/cphuisos.o \
+   $(OBJ_DIR)/cphuwins.o \
+   $(OBJ_DIR)/cpsk852.o \
+   $(OBJ_DIR)/cpskiso.o \
+   $(OBJ_DIR)/cpskkam.o \
+   $(OBJ_DIR)/cpskwin.o \
+   $(OBJ_DIR)/cpsl437.o \
+   $(OBJ_DIR)/cpsl852.o \
+   $(OBJ_DIR)/cpsliso.o \
+   $(OBJ_DIR)/cpslwin.o \
+   $(OBJ_DIR)/cptrwin.o \
+   $(OBJ_DIR)/cpde850.o \
+   $(OBJ_DIR)/cpdeiso.o \
+   $(OBJ_DIR)/cpel737.o \
+   $(OBJ_DIR)/cpfr850.o \
+   $(OBJ_DIR)/cptr857.o \
+   $(OBJ_DIR)/cpruiso.o \
+   $(OBJ_DIR)/cpdewin.o \
+   $(OBJ_DIR)/uc1252.o \
+   $(OBJ_DIR)/uc1253.o \
+   $(OBJ_DIR)/uc1257.o \
+   $(OBJ_DIR)/uc737.o \
+   $(OBJ_DIR)/uc857.o \
+   $(OBJ_DIR)/uc8859_5.o \
+   $(OBJ_DIR)/uckam.o \
+   $(OBJ_DIR)/ucmik.o
 	$(AR_CMD)
 
-$(OBJ_DIR)/cpesdos.o : $(CODEPAGE_DIR)/cpesdos.c
+
+$(OBJ_DIR)/cpbg866.o : $(CODEPAGE_DIR)/cpbg866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpbgiso.o : $(CODEPAGE_DIR)/cpbgiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpbgmik.o : $(CODEPAGE_DIR)/cpbgmik.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpbgwin.o : $(CODEPAGE_DIR)/cpbgwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpcs852.o : $(CODEPAGE_DIR)/cpcs852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpcsiso.o : $(CODEPAGE_DIR)/cpcsiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpcskam.o : $(CODEPAGE_DIR)/cpcskam.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpcswin.o : $(CODEPAGE_DIR)/cpcswin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpde850.o : $(CODEPAGE_DIR)/cpde850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpdeiso.o : $(CODEPAGE_DIR)/cpdeiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpdewin.o : $(CODEPAGE_DIR)/cpdewin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpel737.o : $(CODEPAGE_DIR)/cpel737.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpelwin.o : $(CODEPAGE_DIR)/cpelwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpes850.o : $(CODEPAGE_DIR)/cpes850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpesmwin.o: $(CODEPAGE_DIR)/cpesmwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/cpeswin.o : $(CODEPAGE_DIR)/cpeswin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/cpesmwin.o : $(CODEPAGE_DIR)/cpesmwin.c
+$(OBJ_DIR)/cpfr850.o : $(CODEPAGE_DIR)/cpfr850.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/cpgedos.o : $(CODEPAGE_DIR)/cpgedos.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpgewin.o : $(CODEPAGE_DIR)/cpgewin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpltwin.o : $(CODEPAGE_DIR)/cpltwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cppt850.o : $(CODEPAGE_DIR)/cppt850.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpptiso.o : $(CODEPAGE_DIR)/cpptiso.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cppl852.o : $(CODEPAGE_DIR)/cppl852.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cppliso.o : $(CODEPAGE_DIR)/cppliso.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpplmaz.o : $(CODEPAGE_DIR)/cpplmaz.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpplwin.o : $(CODEPAGE_DIR)/cpplwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpru866.o : $(CODEPAGE_DIR)/cpru866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpruwin.o : $(CODEPAGE_DIR)/cpruwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpsrwin.o : $(CODEPAGE_DIR)/cpsrwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpsv850.o : $(CODEPAGE_DIR)/cpsv850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)/cpsvclip.o : $(CODEPAGE_DIR)/cpsvclip.c
-   $(CC_CMD)
-
-$(OBJ_DIR)/cpsvwin.o : $(CODEPAGE_DIR)/cpsvwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)/cprukoi.o : $(CODEPAGE_DIR)/cprukoi.c
+$(OBJ_DIR)/cphr1250.o: $(CODEPAGE_DIR)/cphr1250.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/cphr437.o : $(CODEPAGE_DIR)/cphr437.c
@@ -2251,55 +2181,22 @@ $(OBJ_DIR)/cphr437.o : $(CODEPAGE_DIR)/cphr437.c
 $(OBJ_DIR)/cphr852.o : $(CODEPAGE_DIR)/cphr852.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/cphr1250.o : $(CODEPAGE_DIR)/cphr1250.c
+$(OBJ_DIR)/cphu852.o : $(CODEPAGE_DIR)/cphu852.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/uc1250.o : $(CODEPAGE_DIR)/uc1250.c
+$(OBJ_DIR)/cphu852s.o: $(CODEPAGE_DIR)/cphu852s.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/uc1251.o : $(CODEPAGE_DIR)/uc1251.c
+$(OBJ_DIR)/cphuiso.o : $(CODEPAGE_DIR)/cphuiso.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/uc1257.o : $(CODEPAGE_DIR)/uc1257.c
+$(OBJ_DIR)/cphuisos.o: $(CODEPAGE_DIR)/cphuisos.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/uc437.o : $(CODEPAGE_DIR)/uc437.c
+$(OBJ_DIR)/cphuwin.o : $(CODEPAGE_DIR)/cphuwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/uc850.o : $(CODEPAGE_DIR)/uc850.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uc852.o : $(CODEPAGE_DIR)/uc852.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uc866.o : $(CODEPAGE_DIR)/uc866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uc8859_1.o : $(CODEPAGE_DIR)/uc8859_1.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uc88591b.o : $(CODEPAGE_DIR)/uc88591b.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uc8859_2.o : $(CODEPAGE_DIR)/uc8859_2.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uckoi8.o : $(CODEPAGE_DIR)/uckoi8.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/ucmaz.o : $(CODEPAGE_DIR)/ucmaz.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpua866.o : $(CODEPAGE_DIR)/cpua866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpuawin.o : $(CODEPAGE_DIR)/cpuawin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/cpuakoi.o : $(CODEPAGE_DIR)/cpuakoi.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/uckoi8u.o : $(CODEPAGE_DIR)/uckoi8u.c
+$(OBJ_DIR)/cphuwins.o: $(CODEPAGE_DIR)/cphuwins.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/cpit437.o : $(CODEPAGE_DIR)/cpit437.c
@@ -2314,10 +2211,151 @@ $(OBJ_DIR)/cpitisb.o : $(CODEPAGE_DIR)/cpitisb.c
 $(OBJ_DIR)/cpitiso.o : $(CODEPAGE_DIR)/cpitiso.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/cphu852.o : $(CODEPAGE_DIR)/cphu852.c
+$(OBJ_DIR)/cpltwin.o : $(CODEPAGE_DIR)/cpltwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/cphuwin.o : $(CODEPAGE_DIR)/cphuwin.c
+$(OBJ_DIR)/cppl852.o : $(CODEPAGE_DIR)/cppl852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cppliso.o : $(CODEPAGE_DIR)/cppliso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpplmaz.o : $(CODEPAGE_DIR)/cpplmaz.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpplwin.o : $(CODEPAGE_DIR)/cpplwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cppt850.o : $(CODEPAGE_DIR)/cppt850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpptiso.o : $(CODEPAGE_DIR)/cpptiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpru866.o : $(CODEPAGE_DIR)/cpru866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpruiso.o : $(CODEPAGE_DIR)/cpruiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cprukoi.o : $(CODEPAGE_DIR)/cprukoi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpruwin.o : $(CODEPAGE_DIR)/cpruwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsk852.o : $(CODEPAGE_DIR)/cpsk852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpskiso.o : $(CODEPAGE_DIR)/cpskiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpskkam.o : $(CODEPAGE_DIR)/cpskkam.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpskwin.o : $(CODEPAGE_DIR)/cpskwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsl437.o : $(CODEPAGE_DIR)/cpsl437.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsl852.o : $(CODEPAGE_DIR)/cpsl852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsliso.o : $(CODEPAGE_DIR)/cpsliso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpslwin.o : $(CODEPAGE_DIR)/cpslwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsrwin.o : $(CODEPAGE_DIR)/cpsrwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsv850.o : $(CODEPAGE_DIR)/cpsv850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsvclip.o: $(CODEPAGE_DIR)/cpsvclip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpsvwin.o : $(CODEPAGE_DIR)/cpsvwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cptr857.o : $(CODEPAGE_DIR)/cptr857.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cptrwin.o : $(CODEPAGE_DIR)/cptrwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpua866.o : $(CODEPAGE_DIR)/cpua866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpuakoi.o : $(CODEPAGE_DIR)/cpuakoi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cpuawin.o : $(CODEPAGE_DIR)/cpuawin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cp_tpl.o : $(CODEPAGE_DIR)/cp_tpl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1250.o : $(CODEPAGE_DIR)/uc1250.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1251.o : $(CODEPAGE_DIR)/uc1251.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1252.o : $(CODEPAGE_DIR)/uc1252.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1253.o : $(CODEPAGE_DIR)/uc1253.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1254.o : $(CODEPAGE_DIR)/uc1254.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc1257.o : $(CODEPAGE_DIR)/uc1257.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc737.o : $(CODEPAGE_DIR)/uc737.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc850.o : $(CODEPAGE_DIR)/uc850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc852.o : $(CODEPAGE_DIR)/uc852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc857.o : $(CODEPAGE_DIR)/uc857.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc866.o : $(CODEPAGE_DIR)/uc866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc88591b.o: $(CODEPAGE_DIR)/uc88591b.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc8859_1.o: $(CODEPAGE_DIR)/uc8859_1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc8859_2.o: $(CODEPAGE_DIR)/uc8859_2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uc8859_5.o: $(CODEPAGE_DIR)/uc8859_5.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uckam.o : $(CODEPAGE_DIR)/uckam.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uckoi8.o : $(CODEPAGE_DIR)/uckoi8.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/uckoi8u.o : $(CODEPAGE_DIR)/uckoi8u.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ucmaz.o : $(CODEPAGE_DIR)/ucmaz.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ucmik.o : $(CODEPAGE_DIR)/ucmik.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -2600,14 +2638,15 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/copyfile.o \
    $(RTL_OBJ_DIR)/datec.o \
    $(RTL_OBJ_DIR)/dateshb.o \
+   $(RTL_OBJ_DIR)/dbf2txt.o \
    $(RTL_OBJ_DIR)/defpath.o \
    $(RTL_OBJ_DIR)/descend.o \
    $(RTL_OBJ_DIR)/dirdrive.o \
    $(RTL_OBJ_DIR)/direct.o \
    $(RTL_OBJ_DIR)/diskspac.o \
    $(RTL_OBJ_DIR)/disksphb.o \
+   $(RTL_OBJ_DIR)/dllcall.o \
    $(RTL_OBJ_DIR)/empty.o \
-   $(RTL_OBJ_DIR)/error.o \
    $(RTL_OBJ_DIR)/file.o \
    $(RTL_OBJ_DIR)/filehb.o \
    $(RTL_OBJ_DIR)/filestat.o \
@@ -2622,7 +2661,13 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/gt.o \
    $(RTL_OBJ_DIR)/gtapi.o \
    $(RTL_OBJ_DIR)/gtapiu.o \
-   $(RTL_OBJ_DIR)/gtgraph.o \
+   $(RTL_OBJ_DIR)/gtchrmap.o \
+   $(RTL_OBJ_DIR)/gtclip.o \
+   $(RTL_OBJ_DIR)/gtfunc.o \
+   $(RTL_OBJ_DIR)/gtkeycod.o \
+   $(RTL_OBJ_DIR)/gtkbstat.o \
+   $(RTL_OBJ_DIR)/gttone.o \
+   $(RTL_OBJ_DIR)/gtsys.o \
    $(RTL_OBJ_DIR)/gx.o \
    $(RTL_OBJ_DIR)/hardcr.o \
    $(RTL_OBJ_DIR)/hbbitf.o \
@@ -2631,7 +2676,9 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/hbcrc32.o \
    $(RTL_OBJ_DIR)/hbcrypt.o \
    $(RTL_OBJ_DIR)/hbffind.o \
+   $(RTL_OBJ_DIR)/hbgtcore.o \
    $(RTL_OBJ_DIR)/hbhex2n.o \
+   $(RTL_OBJ_DIR)/hbmd5.o \
    $(RTL_OBJ_DIR)/hboutdbg.o \
    $(RTL_OBJ_DIR)/hbrandom.o \
    $(RTL_OBJ_DIR)/hbserv.o \
@@ -2641,6 +2688,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/hbxml.o \
    $(RTL_OBJ_DIR)/idle.o \
    $(RTL_OBJ_DIR)/inkey.o \
+   $(RTL_OBJ_DIR)/inkeyapi.o \
    $(RTL_OBJ_DIR)/is.o \
    $(RTL_OBJ_DIR)/isprint.o \
    $(RTL_OBJ_DIR)/langapi.o \
@@ -2650,13 +2698,13 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/math.o \
    $(RTL_OBJ_DIR)/maxrow.o \
    $(RTL_OBJ_DIR)/memofile.o \
-   $(RTL_OBJ_DIR)/txtline.o \
    $(RTL_OBJ_DIR)/minmax.o \
    $(RTL_OBJ_DIR)/mlctopos.o \
    $(RTL_OBJ_DIR)/mpostolc.o \
    $(RTL_OBJ_DIR)/mod.o \
    $(RTL_OBJ_DIR)/mouseapi.o \
    $(RTL_OBJ_DIR)/mousex.o \
+   $(RTL_OBJ_DIR)/mouse53.o \
    $(RTL_OBJ_DIR)/mtran.o \
    $(RTL_OBJ_DIR)/natmsg.o \
    $(RTL_OBJ_DIR)/net.o \
@@ -2694,8 +2742,8 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/space.o \
    $(RTL_OBJ_DIR)/spfiles.o \
    $(RTL_OBJ_DIR)/str.o \
-   $(RTL_OBJ_DIR)/strcase.o \
    $(RTL_OBJ_DIR)/str2ptr.o \
+   $(RTL_OBJ_DIR)/strcase.o \
    $(RTL_OBJ_DIR)/strdel.o \
    $(RTL_OBJ_DIR)/strings.o \
    $(RTL_OBJ_DIR)/strmatch.o \
@@ -2709,6 +2757,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/trace.o \
    $(RTL_OBJ_DIR)/transfrm.o \
    $(RTL_OBJ_DIR)/trim.o \
+   $(RTL_OBJ_DIR)/txtline.o \
    $(RTL_OBJ_DIR)/type.o \
    $(RTL_OBJ_DIR)/val.o \
    $(RTL_OBJ_DIR)/valtostr.o \
@@ -2717,6 +2766,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/word.o \
    $(RTL_OBJ_DIR)/xhelp.o \
    $(RTL_OBJ_DIR)/xsavescr.o \
+   \
    $(RTL_OBJ_DIR)/achoice.o \
    $(RTL_OBJ_DIR)/adir.o \
    $(RTL_OBJ_DIR)/alert.o \
@@ -2725,18 +2775,17 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/browdbx.o \
    $(RTL_OBJ_DIR)/browse.o \
    $(RTL_OBJ_DIR)/checkbox.o \
+   $(RTL_OBJ_DIR)/clpclass.o \
    $(RTL_OBJ_DIR)/color53.o \
    $(RTL_OBJ_DIR)/cstr.o \
    $(RTL_OBJ_DIR)/cstruct.o \
-   $(RTL_OBJ_DIR)/dbdelim.o \
    $(RTL_OBJ_DIR)/dbedit.o \
-   $(RTL_OBJ_DIR)/dbjoin.o \
-   $(RTL_OBJ_DIR)/dbsdf.o \
    $(RTL_OBJ_DIR)/decode.o \
    $(RTL_OBJ_DIR)/devoutp.o \
    $(RTL_OBJ_DIR)/dircmd.o \
    $(RTL_OBJ_DIR)/dummy.o \
    $(RTL_OBJ_DIR)/dumpvar.o \
+   $(RTL_OBJ_DIR)/error.o \
    $(RTL_OBJ_DIR)/errorsys.o \
    $(RTL_OBJ_DIR)/fieldbl.o \
    $(RTL_OBJ_DIR)/getlist.o \
@@ -2744,7 +2793,6 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/hbini.o \
    $(RTL_OBJ_DIR)/hblog.o \
    $(RTL_OBJ_DIR)/hblognet.o \
-   $(RTL_OBJ_DIR)/hbmd5.o \
    $(RTL_OBJ_DIR)/hbserial.o \
    $(RTL_OBJ_DIR)/input.o \
    $(RTL_OBJ_DIR)/listbox.o \
@@ -2755,7 +2803,6 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/objfunc.o \
    $(RTL_OBJ_DIR)/perfuncs.o \
    $(RTL_OBJ_DIR)/persist.o \
-   $(RTL_OBJ_DIR)/pplib.o \
    $(RTL_OBJ_DIR)/profiler.o \
    $(RTL_OBJ_DIR)/pushbtn.o \
    $(RTL_OBJ_DIR)/radiobtn.o \
@@ -2766,6 +2813,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/scrollbr.o \
    $(RTL_OBJ_DIR)/setfunc.o \
    $(RTL_OBJ_DIR)/setta.o \
+   $(RTL_OBJ_DIR)/sprintf.o \
    $(RTL_OBJ_DIR)/stream.o \
    $(RTL_OBJ_DIR)/tbcolumn.o \
    $(RTL_OBJ_DIR)/tbrowse.o \
@@ -2784,6 +2832,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/treport.o \
    $(RTL_OBJ_DIR)/trpc.o \
    $(RTL_OBJ_DIR)/trpccli.o \
+   $(RTL_OBJ_DIR)/tscalar.o \
    $(RTL_OBJ_DIR)/ttable.o \
    $(RTL_OBJ_DIR)/ttextlin.o \
    $(RTL_OBJ_DIR)/ttopbar.o \
@@ -2806,6 +2855,57 @@ $(RTL_OBJ_DIR)/achoice.c : $(RTL_DIR)/achoice.prg
 	$(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)/achoice.o : $(RTL_OBJ_DIR)/achoice.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/sprintf.c : $(RTL_DIR)/sprintf.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/sprintf.o : $(RTL_OBJ_DIR)/sprintf.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/tscalar.c : $(RTL_DIR)/tscalar.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/tscalar.o : $(RTL_OBJ_DIR)/tscalar.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/clpclass.c : $(RTL_DIR)/clpclass.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/clpclass.o : $(RTL_OBJ_DIR)/clpclass.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/dbf2txt.o : $(RTL_DIR)/dbf2txt.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/dllcall.o : $(RTL_DIR)/dllcall.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtchrmap.o : $(RTL_DIR)/gtchrmap.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtsys.o : $(RTL_DIR)/gtsys.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtkeycod.o : $(RTL_DIR)/gtkeycod.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gttone.o : $(RTL_DIR)/gttone.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtkbstat.o : $(RTL_DIR)/gtkbstat.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/hbgtcore.o : $(RTL_DIR)/hbgtcore.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/inkeyapi.o : $(RTL_DIR)/inkeyapi.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtfunc.o : $(RTL_DIR)/gtfunc.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/gtclip.o : $(RTL_DIR)/gtclip.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/adir.c : $(RTL_DIR)/adir.prg
@@ -2910,28 +3010,10 @@ $(RTL_OBJ_DIR)/datehb.o : $(RTL_DIR)/datehb.c
 $(RTL_OBJ_DIR)/dateshb.o : $(RTL_DIR)/dateshb.c
 	$(CC_CMD)
 
-$(RTL_OBJ_DIR)/dbdelim.c : $(RTL_DIR)/dbdelim.prg
-	$(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)/dbdelim.o : $(RTL_OBJ_DIR)/dbdelim.c
-	$(CC_CMD)
-
 $(RTL_OBJ_DIR)/dbedit.c : $(RTL_DIR)/dbedit.prg
 	$(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)/dbedit.o : $(RTL_OBJ_DIR)/dbedit.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/dbjoin.c : $(RTL_DIR)/dbjoin.prg
-	$(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)/dbjoin.o : $(RTL_OBJ_DIR)/dbjoin.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/dbsdf.c : $(RTL_DIR)/dbsdf.prg
-	$(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)/dbsdf.o : $(RTL_OBJ_DIR)/dbsdf.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/decode.c : $(RTL_DIR)/decode.prg
@@ -3183,9 +3265,6 @@ $(RTL_OBJ_DIR)/minmax.o : $(RTL_DIR)/minmax.c
 $(RTL_OBJ_DIR)/memofile.o : $(RTL_DIR)/memofile.c
 	$(CC_CMD)
 
-$(RTL_OBJ_DIR)/pplib.o : $(RTL_DIR)/pplib.c
-	$(CC_CMD)
-
 $(RTL_OBJ_DIR)/txtline.o : $(RTL_DIR)/txtline.c
 	$(CC_CMD)
 
@@ -3220,6 +3299,9 @@ $(RTL_OBJ_DIR)/mouseapi.o : $(RTL_DIR)/mouseapi.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/mousex.o : $(RTL_DIR)/mousex.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/mouse53.o : $(RTL_DIR)/mouse53.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/mssgline.c : $(RTL_DIR)/mssgline.prg
@@ -3661,6 +3743,7 @@ $(VM_LIB) : \
    $(VM_OBJ_DIR)/asort.o \
    $(VM_OBJ_DIR)/break.o \
    $(VM_OBJ_DIR)/classes.o \
+   $(VM_OBJ_DIR)/classesc.o \
    $(VM_OBJ_DIR)/cmdarg.o \
    $(VM_OBJ_DIR)/codebloc.o \
    $(VM_OBJ_DIR)/dbgentry.o \
@@ -3694,11 +3777,15 @@ $(VM_LIB) : \
    $(VM_OBJ_DIR)/pvalue.o \
    $(VM_OBJ_DIR)/runner.o \
    $(VM_OBJ_DIR)/thread.o \
+   $(VM_OBJ_DIR)/throw.o \
    \
    $(VM_OBJ_DIR)/harbinit.o
 	$(AR_CMD)
 
 $(VM_OBJ_DIR)/arrays.o : $(VM_DIR)/arrays.c
+	$(CC_CMD)
+
+$(VM_OBJ_DIR)/throw.o : $(VM_DIR)/throw.c
 	$(CC_CMD)
 
 $(VM_OBJ_DIR)/arrayshb.o : $(VM_DIR)/arrayshb.c
@@ -3711,6 +3798,9 @@ $(VM_OBJ_DIR)/break.o : $(VM_DIR)/break.c
 	$(CC_CMD)
 
 $(VM_OBJ_DIR)/classes.o : $(VM_DIR)/classes.c
+	$(CC_CMD)
+
+$(VM_OBJ_DIR)/classesc.o : $(VM_DIR)/classesc.c
 	$(CC_CMD)
 
 $(VM_OBJ_DIR)/cmdarg.o : $(VM_DIR)/cmdarg.c
@@ -3819,65 +3909,30 @@ $(VM_OBJ_DIR)/thread.o : $(VM_DIR)/thread.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
-# libsamples.a
-#-------------------------------------------------------------------------------
-
-$(SAMPLES_LIB) : \
-   $(SAM_OBJ_DIR)/environ.o \
-   $(SAM_OBJ_DIR)/date.o   \
-   $(SAM_OBJ_DIR)/dbf.o    \
-   $(SAM_OBJ_DIR)/gauge.o  \
-   $(SAM_OBJ_DIR)/num.o    \
-   $(SAM_OBJ_DIR)/stack.o   \
-   $(SAM_OBJ_DIR)/status.o \
-   $(SAM_OBJ_DIR)/time.o
-	$(AR_CMD)
-
-$(SAM_OBJ_DIR)/environ.o : $(MISC_DIR)/environ.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/date.o : $(MISC_DIR)/date.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/dbf.o : $(MISC_DIR)/dbf.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/gauge.o : $(MISC_DIR)/gauge.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/num.o : $(MISC_DIR)/num.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/stack.o : $(MISC_DIR)/stack.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/status.o : $(MISC_DIR)/status.c
-	$(CC_CMD)
-
-$(SAM_OBJ_DIR)/time.o : $(MISC_DIR)/time.c
-	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
 # libpp.a
 #-------------------------------------------------------------------------------
 
 $(PP_LIB) : \
    $(PP_OBJ_DIR)/ppcore.o \
-   $(PP_OBJ_DIR)/ppcomp.o \
    $(PP_OBJ_DIR)/pptable.o \
-   $(PP_OBJ_DIR)/pragma.o
+   $(PP_OBJ_DIR)/pplib.o \
+   $(PP_OBJ_DIR)/pplib2.o \
+   $(PP_OBJ_DIR)/pplib3.o
 	$(AR_CMD)
 
 $(PP_OBJ_DIR)/ppcore.o : $(PP_DIR)/ppcore.c
 	$(CC_CMD)
 
-$(PP_OBJ_DIR)/ppcomp.o : $(PP_DIR)/ppcomp.c
-	$(CC_CMD)
-
 $(PP_OBJ_DIR)/pptable.o : $(PP_DIR)/pptable.c
 	$(CC_CMD)
 
-$(PP_OBJ_DIR)/pragma.o : $(PP_DIR)/pragma.c
+$(PP_OBJ_DIR)/pplib.o : $(PP_DIR)/pplib.c
+	$(CC_CMD)
+
+$(PP_OBJ_DIR)/pplib2.o : $(PP_DIR)/pplib2.c
+	$(CC_CMD)
+
+$(PP_OBJ_DIR)/pplib3.o : $(PP_DIR)/pplib3.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -3887,12 +3942,17 @@ $(PP_OBJ_DIR)/pragma.o : $(PP_DIR)/pragma.c
 $(RDD_LIB) : \
    $(RDD_OBJ_DIR)/dbcmd.o \
    $(RDD_OBJ_DIR)/workarea.o \
+   $(RDD_OBJ_DIR)/wacore.o \
+   $(RDD_OBJ_DIR)/wafunc.o \
    $(RDD_OBJ_DIR)/dbf1.o \
    $(RDD_OBJ_DIR)/dbnubs.o \
    $(RDD_OBJ_DIR)/delim1.o \
    $(RDD_OBJ_DIR)/sdf1.o \
    \
+   $(RDD_OBJ_DIR)/dbdelim.o \
    $(RDD_OBJ_DIR)/dbfuncs.o \
+   $(RDD_OBJ_DIR)/dbjoin.o \
+   $(RDD_OBJ_DIR)/dbsdf.o \
    $(RDD_OBJ_DIR)/dbtotal.o \
    $(RDD_OBJ_DIR)/dblist.o \
    $(RDD_OBJ_DIR)/dbsort.o \
@@ -3903,7 +3963,31 @@ $(RDD_LIB) : \
    $(RDD_OBJ_DIR)/rddsys.o
 	$(AR_CMD)
 
+$(RDD_OBJ_DIR)/dbsdf.c : $(RDD_DIR)/dbsdf.prg
+	$(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)/dbsdf.o : $(RDD_OBJ_DIR)/dbsdf.c
+	$(CC_CMD)
+
+$(RDD_OBJ_DIR)/dbjoin.c : $(RDD_DIR)/dbjoin.prg
+	$(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)/dbjoin.o : $(RDD_OBJ_DIR)/dbjoin.c
+	$(CC_CMD)
+
+$(RDD_OBJ_DIR)/dbdelim.c : $(RDD_DIR)/dbdelim.prg
+	$(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)/dbdelim.o : $(RDD_OBJ_DIR)/dbdelim.c
+	$(CC_CMD)
+
 $(RDD_OBJ_DIR)/dbcmd.o : $(RDD_DIR)/dbcmd.c
+	$(CC_CMD)
+
+$(RDD_OBJ_DIR)/wacore.o : $(RDD_DIR)/wacore.c
+	$(CC_CMD)
+
+$(RDD_OBJ_DIR)/wafunc.o : $(RDD_DIR)/wafunc.c
 	$(CC_CMD)
 
 $(RDD_OBJ_DIR)/workarea.o : $(RDD_DIR)/workarea.c
@@ -3976,7 +4060,7 @@ $(RDD_OBJ_DIR)/rddsys.o : $(RDD_OBJ_DIR)/rddsys.c
 # libhbsix.a
 #-------------------------------------------------------------------------------
 
-HBSIX_LIB_OBJS = \
+$(HBSIX_LIB) :\
    $(OBJ_DIR)/sxcompr.o \
    $(OBJ_DIR)/sxcrypt.o \
    $(OBJ_DIR)/sxdate.o \
@@ -3986,6 +4070,7 @@ HBSIX_LIB_OBJS = \
    $(OBJ_DIR)/sxord.o \
    $(OBJ_DIR)/sxutil.o \
    $(OBJ_DIR)/sxredir.o \
+   \
    $(OBJ_DIR)/sxcompat.o \
    $(OBJ_DIR)/sxini.o \
    $(OBJ_DIR)/sxtrig.o
@@ -4000,47 +4085,47 @@ $(HBSIX_OBJ_DIR)/sxcrypt.o : $(HBSIX_DIR)/sxcrypt.c
 $(HBSIX_OBJ_DIR)/sxdate.o : $(HBSIX_DIR)/sxdate.c
 	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxsem.o : $(HBSIX_DIR)\sxsem.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxsem.o : $(HBSIX_DIR)/sxsem.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxfname.o : $(HBSIX_DIR)\sxfname.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxfname.o : $(HBSIX_DIR)/sxfname.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxtable.o : $(HBSIX_DIR)\sxtable.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxtable.o : $(HBSIX_DIR)/sxtable.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxord.o : $(HBSIX_DIR)\sxord.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxord.o : $(HBSIX_DIR)/sxord.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxutil.o : $(HBSIX_DIR)\sxutil.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxutil.o : $(HBSIX_DIR)/sxutil.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxredir.o : $(HBSIX_DIR)\sxredir.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxredir.o : $(HBSIX_DIR)/sxredir.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxcompat.c : $(HBSIX_DIR)\sxcompat.prg
-   $(HB_CMD)
+$(HBSIX_OBJ_DIR)/sxcompat.c : $(HBSIX_DIR)/sxcompat.prg
+	$(HARBOUR_CMD)
 
-$(HBSIX_OBJ_DIR)\sxcompat.o : $(HBSIX_OBJ_DIR)\sxcompat.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxcompat.o : $(HBSIX_OBJ_DIR)/sxcompat.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxini.c : $(HBSIX_DIR)\sxini.prg
-   $(HB_CMD)
+$(HBSIX_OBJ_DIR)/sxini.c : $(HBSIX_DIR)/sxini.prg
+	$(HARBOUR_CMD)
 
-$(HBSIX_OBJ_DIR)\sxini.o : $(HBSIX_OBJ_DIR)\sxini.c
-   $(CC_CMD)
+$(HBSIX_OBJ_DIR)/sxini.o : $(HBSIX_OBJ_DIR)/sxini.c
+	$(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxtrig.c : $(HBSIX_DIR)\sxtrig.prg
-   $(HB_CMD)
+$(HBSIX_OBJ_DIR)/sxtrig.c : $(HBSIX_DIR)/sxtrig.prg
+	$(HARBOUR_CMD)
 
-$(HBSIX_OBJ_DIR)\sxtrig.o : $(HBSIX_OBJ_DIR)\sxtrig.c
-   $(CC_CMD)
-   
+$(HBSIX_OBJ_DIR)/sxtrig.o : $(HBSIX_OBJ_DIR)/sxtrig.c
+	$(CC_CMD)
+
 #-------------------------------------------------------------------------------
 # libhsx.a
 #-------------------------------------------------------------------------------
 
-HSX_LIB_OBJS = \
+$(HSX_LIB): \
    $(OBJ_DIR)/hsx.o \
    $(OBJ_DIR)/cftsfunc.o
 
@@ -4157,10 +4242,7 @@ $(NULSYS_LIB) : \
    $(OBJ_DIR)/nulsys.o
 	$(AR_CMD)
 
-$(OBJ_DIR)/nulsys.c : $(RDD_DIR)/nulsys\nulsys.prg
-	$(HARBOUR_CMD)
-
-$(OBJ_DIR)/nulsys.o : $(OBJ_DIR)/nulsys.c
+$(OBJ_DIR)/nulsys.o : $(RDD_DIR)/nulsys/nulsys.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
@@ -4175,24 +4257,40 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)/hbident.o \
    $(OBJ_DIR)/hbgenerr.o \
    $(OBJ_DIR)/hbpcode.o \
+   $(OBJ_DIR)/hbdead.o \
+   $(OBJ_DIR)/hbstripl.o \
    $(OBJ_DIR)/hbfix.o \
    $(OBJ_DIR)/genc.o \
    $(OBJ_DIR)/gencobj.o \
-   $(OBJ_DIR)/genobj32.o \
    $(OBJ_DIR)/genhrb.o \
    $(OBJ_DIR)/expropta.o \
    $(OBJ_DIR)/exproptb.o \
    $(OBJ_DIR)/exproptc.o \
    $(OBJ_DIR)/hbfunchk.o \
-   $(OBJ_DIR)/calconst.o \
+   $(OBJ_DIR)/gencc.o \
+   $(OBJ_DIR)/hbpcstat.o \
+   $(OBJ_DIR)/hbdbginf.o \
+   $(OBJ_DIR)/hblbl.o \
    $(PP_LIB) \
-   $(COMMON_LIB) \
+   $(OBJ_DIR)/ppcomp.o \
    $(OBJ_DIR)/hbslex.o
 
 $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
 	$(CC) -Wall -o$(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) -L$(LIB_DIR) -mno-cygwin -lpp -lcommon -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32
 
 $(OBJ_DIR)/harbour.o : $(COMPILER_DIR)/harbour.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbdead.o : $(COMPILER_DIR)/hbdead.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ppcomp.o : $(COMPILER_DIR)/ppcomp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hblbl.o : $(COMPILER_DIR)/hblbl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbstripl.o : $(COMPILER_DIR)/hbstripl.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/harboury.c : $(COMPILER_DIR)/harbour.sly
@@ -4222,10 +4320,16 @@ $(OBJ_DIR)/hbfix.o : $(COMPILER_DIR)/hbfix.c
 $(OBJ_DIR)/genc.o : $(COMPILER_DIR)/genc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/gencobj.o : $(COMPILER_DIR)/gencobj.c
+$(OBJ_DIR)/gencc.o : $(COMPILER_DIR)/gencc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/genobj32.o : $(COMPILER_DIR)/genobj32.c
+$(OBJ_DIR)/hbpcstat.o : $(COMPILER_DIR)/hbpcstat.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbdbginf.o : $(COMPILER_DIR)/hbdbginf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/gencobj.o : $(COMPILER_DIR)/gencobj.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/genhrb.o : $(COMPILER_DIR)/genhrb.c
@@ -4245,9 +4349,6 @@ $(OBJ_DIR)/hbfunchk.o : $(COMPILER_DIR)/hbfunchk.c
 
 $(OBJ_DIR)/hbslex.o : $(COMPILER_DIR)/hbslex.c
 	$(CC) $(CFLAGS) -I$(OBJ_DIR) -o $@ $^
-
-$(OBJ_DIR)/calconst.o : $(COMPILER_DIR)/calconst.c
-	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
 # hbtest.exe
@@ -4576,12 +4677,31 @@ $(OBJ_DIR)/hbmlang.o : $(HBMAKE_DIR)/hbmlang.c
 
 HBPP_EXE_OBJS = \
    $(OBJ_DIR)/hbpp.o \
-   $(OBJ_DIR)/calconst.o
+   $(OBJ_DIR)/hbppcalc.o \
+   $(OBJ_DIR)/hbppcomp.o \
+   $(OBJ_DIR)/hbppcore.o \
+   $(OBJ_DIR)/hbpptbl.o \
+   $(OBJ_DIR)/pragma.o
 
 $(HBPP_EXE) : $(HBPP_EXE_OBJS) $(COMMON_LIB) $(PP_LIB)
 	$(CC) -WAll -o$(HBPP_EXE) $(HBPP_EXE_OBJS) -mno-cygwin -L$(MINGWDIR)/lib -L$(LIB_DIR) -lcommon -lpp -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lole32 -luuid -loleaut32
 
 $(OBJ_DIR)/hbpp.o : $(HBPP_DIR)/hbpp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbppcalc.o : $(HBPP_DIR)/hbppcalc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbppcomp.o : $(HBPP_DIR)/hbppcomp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbppcore.o : $(HBPP_DIR)/hbppcore.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbpptbl.o : $(HBPP_DIR)/hbpptbl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/pragma.o : $(HBPP_DIR)/pragma.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------

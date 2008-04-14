@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.120 2008/03/20 00:01:03 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.121 2008/04/01 05:15:08 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -36,6 +36,7 @@ PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
+ZLIB_DIR          = source\rtl\zlib
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
 SAMPLES_DIR       = source\clipsamp
@@ -422,6 +423,21 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pcre_version.obj \
   $(OBJ_DIR)\pcre_xclass.obj \
   $(OBJ_DIR)\pcreposix.obj \
+#
+# zlib
+#
+  $(OBJ_DIR)\adler32.obj \
+  $(OBJ_DIR)\compress.obj \
+  $(OBJ_DIR)\crc32.obj \
+  $(OBJ_DIR)\deflate.obj \
+  $(OBJ_DIR)\gzio.obj \
+  $(OBJ_DIR)\infback.obj \
+  $(OBJ_DIR)\inffast.obj \
+  $(OBJ_DIR)\inflate.obj \
+  $(OBJ_DIR)\inftrees.obj \
+  $(OBJ_DIR)\trees.obj \
+  $(OBJ_DIR)\uncompr.obj \
+  $(OBJ_DIR)\zutil.obj\
 #
 # Vm c
 #
@@ -952,6 +968,8 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 {$(VM_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC_BATCH_CMD)
 
+{$(ZLIB_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC_BATCH_CMD)
 
 #
 # For vm,ct,misc,common,lang,rtl and codepage dirs,

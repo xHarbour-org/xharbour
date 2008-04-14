@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.216 2008/03/09 18:13:44 ronpinkas Exp $
+# $Id: makefile.bc,v 1.217 2008/03/19 17:57:22 modalsist Exp $
 #
 
 #
@@ -131,6 +131,7 @@ PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
 PCREPOS_DIR  = source\rtl\pcre
+ZLIB_DIR     = source\rtl\zlib
 MISC_DIR     = source\misc
 TIP_DIR      = source\tip
 VM_DIR       = source\vm
@@ -211,6 +212,7 @@ PP_LIB         = $(LIB_DIR)\pp$(HB_MT).lib
 RDD_LIB        = $(LIB_DIR)\rdd$(HB_MT).lib
 RTL_LIB        = $(LIB_DIR)\rtl$(HB_MT).lib
 PCREPOS_LIB    = $(LIB_DIR)\pcrepos.lib
+ZLIB_LIB       = $(LIB_DIR)\zlib.lib
 TIP_LIB        = $(LIB_DIR)\tip$(HB_MT).lib
 VM_LIB         = $(LIB_DIR)\vm$(HB_MT).lib
 FMSTAT_LIB     = $(LIB_DIR)\fmstat$(HB_MT).lib
@@ -551,6 +553,24 @@ PCREPOS_LIB_OBJS = \
    $(RTL_OBJ_DIR)\pcre_version.obj \
    $(RTL_OBJ_DIR)\pcre_xclass.obj \
    $(RTL_OBJ_DIR)\pcreposix.obj
+
+#
+# ZLIB.LIB rules
+#
+
+ZLIB_LIB_OBJS=\
+   $(RTL_OBJ_DIR)\adler32.obj \
+   $(RTL_OBJ_DIR)\compress.obj \
+   $(RTL_OBJ_DIR)\crc32.obj \
+   $(RTL_OBJ_DIR)\deflate.obj \
+   $(RTL_OBJ_DIR)\gzio.obj \
+   $(RTL_OBJ_DIR)\infback.obj \
+   $(RTL_OBJ_DIR)\inffast.obj \
+   $(RTL_OBJ_DIR)\inflate.obj \
+   $(RTL_OBJ_DIR)\inftrees.obj \
+   $(RTL_OBJ_DIR)\trees.obj \
+   $(RTL_OBJ_DIR)\uncompr.obj \
+   $(RTL_OBJ_DIR)\zutil.obj
 
 #
 # LANG.LIB rules
@@ -1209,6 +1229,7 @@ DLL_MAIN_LIB_OBJS = \
       $(COMMON_LIB) \
       $(PPGEN_EXE) \
       $(PP_LIB) \
+      $(ZLIB_LIB) \
       $(HARBOUR_EXE)
 !else
    PROJECT = \
@@ -1263,6 +1284,14 @@ ALL: $(PROJECT)
 #
 # Library dependencies and build rules
 #
+
+$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
+    IF EXIST "$(ZLIB_LIB)" $(DEL) "$(ZLIB_LIB)" > NUL
+    $(LINKER) "$(ZLIB_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
     IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
@@ -2846,6 +2875,46 @@ $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
 
 
 #
+# ZLIB.LIB dependencies
+#
+
+$(OBJ_DIR)\adler32.obj : $(ZLIB_DIR)\adler32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\compress.obj : $(ZLIB_DIR)\compress.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\crc32.obj : $(ZLIB_DIR)\crc32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\deflate.obj : $(ZLIB_DIR)\deflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gzio.obj : $(ZLIB_DIR)\gzio.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\infback.obj : $(ZLIB_DIR)\infback.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inffast.obj : $(ZLIB_DIR)\inffast.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inflate.obj : $(ZLIB_DIR)\inflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inftrees.obj : $(ZLIB_DIR)\inftrees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\trees.obj : $(ZLIB_DIR)\trees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uncompr.obj : $(ZLIB_DIR)\uncompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\zutil.obj : $(ZLIB_DIR)\zutil.c
+   $(CC_CMD)
+
+#
 # PCREPOS.LIB dependencies
 #
 
@@ -3828,9 +3897,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
-
-
-   $(ECHO) $(CODEPAGE_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 
@@ -4251,6 +4318,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(RDDS_LIB) >> make.tmp
    $(ECHO) $(CT_LIB) >> make.tmp
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
 
    $(CC) @make.tmp
    $(DEL) make.tmp

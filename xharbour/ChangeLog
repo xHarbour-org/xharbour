@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6021 2008/04/13 16:45:36 lculik Exp $
+ * $Id: ChangeLog,v 1.6022 2008/04/13 17:45:19 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,64 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-14 13:10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   + source/rtl/zlib/adler32.c
+   + source/rtl/zlib/compress.c
+   + source/rtl/zlib/crc32.c
+   + source/rtl/zlib/uncompr.c
+   + source/rtl/zlib/deflate.c
+   + source/rtl/zlib/trees.c
+   + source/rtl/zlib/gzio.c
+   + source/rtl/zlib/infback.c
+   + source/rtl/zlib/inffast.c
+   + source/rtl/zlib/inftrees.c
+   + source/rtl/zlib/zutil.c
+   + source/rtl/zlib/inflate.c
+   + source/rtl/zlib/inflate.h
+   + source/rtl/zlib/inffast.h
+   + source/rtl/zlib/inftrees.h
+   + source/rtl/zlib/deflate.h
+   + source/rtl/zlib/trees.h
+   + source/rtl/zlib/crc32.h
+   + source/rtl/zlib/zconf.h
+   + source/rtl/zlib/zconf.in.h
+   + source/rtl/zlib/zlib.h
+   + source/rtl/zlib/inffixed.h
+   + source/rtl/zlib/zutil.h
+     ! inclusion of Zlib v.1.2.3
+
+   + include/hbzlib.h
+   * source/rtl/hbcomprs.c
+   * source/rtl/hbcrypt.c
+   * source/rtl/hbcrc32.c
+   * source/rtl/hbchksum.c
+   * hrbdll.bc
+   * hrbdll.vc
+   * makefile.bc
+   * makefile.dc
+   * makefile.gc
+   * makefile.pc
+   * makefile.vc
+   * makefile.wc
+     - dettaching ZLIB components from xHarbour RTL
+     /*
+      Note:
+      These changes were tested under Windows Platform and it should work for:
+      BCC 5.82, MSVC 6, XCC 2.70, PellesC 5.0b3, MinGW 3.4.5-2, OpenWatcom 1.7a
+      and DigitalMars 8.51.
+
+      ZLIB sources were taken AS-IS with minor changes on function interface
+      to enable compilation with all of the above mentioned compilers.
+
+      Developers of other platform are kindly requested to incorporate necessary
+      modification if so required, as I was not able do it.
+
+      No force-linking has been introduced yet until a situation proves that it
+      is really required.
+
+      GNU makefiles should be modified.
+     */
 
 2008-04-13 14:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\achoice.prg

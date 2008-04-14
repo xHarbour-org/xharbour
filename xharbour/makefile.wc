@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.76 2007/12/26 14:53:40 modalsist Exp $
+# $Id: makefile.wc,v 1.77 2007/12/29 16:34:28 modalsist Exp $
 #
 
 #
@@ -100,6 +100,7 @@ PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
 PCREPOS_DIR  =source\rtl\pcre
+ZLIB_DIR     =source\rtl\zlib
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
 HBRUN_DIR    =utils\hbrun
@@ -188,6 +189,7 @@ RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB          =$(LIB_DIR)\rtl.lib
 RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
 PCREPOS_LIB      =$(LIB_DIR)\pcrepos.lib
+ZLIB_LIB         =$(LIB_DIR)\zlib.lib
 TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
 VM_LIB           =$(LIB_DIR)\vm.lib
@@ -197,7 +199,6 @@ DLL_MAIN_LIB     =$(LIB_DIR)\dllmain.lib
 GTCGI_LIB        =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB        =$(LIB_DIR)\gtdos.lib
 GTGUI_LIB        =$(LIB_DIR)\gtgui.lib
-GTNUL_LIB        =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB        =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB        =$(LIB_DIR)\gtstd.lib
 GTWIN_LIB        =$(LIB_DIR)\gtwin.lib
@@ -244,7 +245,6 @@ HB_GT_LIBS = \
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
    $(GTGUI_LIB) \
-   $(GTNUL_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
@@ -276,6 +276,7 @@ LIB_CMD     = LIB386 /nologo /out:$@ $**
 # For linking MT as in LibsMT2 below
 LIBSNONMT = \
    $(PCREPOS_LIB) \
+   $(ZLIB_LIB) \
    $(COMMON_LIB) \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
@@ -347,9 +348,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\accept.obj \
    $(OBJ_DIR)$(MT)\ampm.obj \
    $(OBJ_DIR)$(MT)\at.obj \
+   $(OBJ_DIR)$(MT)\bkgtsks.obj \
    $(OBJ_DIR)$(MT)\binnum.obj \
    $(OBJ_DIR)$(MT)\binnumx.obj \
-   $(OBJ_DIR)$(MT)\bkgtsks.obj \
    $(OBJ_DIR)$(MT)\box.obj \
    $(OBJ_DIR)$(MT)\cdpapi.obj \
    $(OBJ_DIR)$(MT)\chrasc.obj \
@@ -381,7 +382,13 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gt.obj \
    $(OBJ_DIR)$(MT)\gtapi.obj \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
-   $(OBJ_DIR)$(MT)\gtgraph.obj \
+   $(OBJ_DIR)$(MT)\gtchrmap.obj \
+   $(OBJ_DIR)$(MT)\gtclip.obj \
+   $(OBJ_DIR)$(MT)\gtfunc.obj \
+   $(OBJ_DIR)$(MT)\gtkeycod.obj \
+   $(OBJ_DIR)$(MT)\gtkbstat.obj \
+   $(OBJ_DIR)$(MT)\gttone.obj \
+   $(OBJ_DIR)$(MT)\gtsys.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
    $(OBJ_DIR)$(MT)\hbbitf.obj \
@@ -390,6 +397,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
+   $(OBJ_DIR)$(MT)\hbgtcore.obj \
    $(OBJ_DIR)$(MT)\hbhex2n.obj \
    $(OBJ_DIR)$(MT)\hbmd5.obj \
    $(OBJ_DIR)$(MT)\hboutdbg.obj \
@@ -401,6 +409,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
    $(OBJ_DIR)$(MT)\inkey.obj \
+   $(OBJ_DIR)$(MT)\inkeyapi.obj \
    $(OBJ_DIR)$(MT)\is.obj \
    $(OBJ_DIR)$(MT)\isprint.obj \
    $(OBJ_DIR)$(MT)\langapi.obj \
@@ -412,10 +421,11 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\memofile.obj \
    $(OBJ_DIR)$(MT)\minmax.obj \
    $(OBJ_DIR)$(MT)\mlctopos.obj \
+   $(OBJ_DIR)$(MT)\mpostolc.obj \
    $(OBJ_DIR)$(MT)\mod.obj \
    $(OBJ_DIR)$(MT)\mouseapi.obj \
    $(OBJ_DIR)$(MT)\mousex.obj \
-   $(OBJ_DIR)$(MT)\mpostolc.obj \
+   $(OBJ_DIR)$(MT)\mouse53.obj \
    $(OBJ_DIR)$(MT)\mtran.obj \
    $(OBJ_DIR)$(MT)\natmsg.obj \
    $(OBJ_DIR)$(MT)\net.obj \
@@ -430,8 +440,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\philes53.obj \
    $(OBJ_DIR)$(MT)\philesx.obj \
    $(OBJ_DIR)$(MT)\rat.obj \
-   $(OBJ_DIR)$(MT)\readexit.obj \
-   $(OBJ_DIR)$(MT)\readins.obj \
    $(OBJ_DIR)$(MT)\readline.obj \
    $(OBJ_DIR)$(MT)\regex.obj \
    $(OBJ_DIR)$(MT)\replic.obj \
@@ -443,6 +451,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\scroll.obj \
    $(OBJ_DIR)$(MT)\seconds.obj \
    $(OBJ_DIR)$(MT)\set.obj \
+   $(OBJ_DIR)$(MT)\readexit.obj \
+   $(OBJ_DIR)$(MT)\readins.obj \
    $(OBJ_DIR)$(MT)\setcolor.obj \
    $(OBJ_DIR)$(MT)\setcurs.obj \
    $(OBJ_DIR)$(MT)\setkey.obj \
@@ -556,6 +566,27 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\winreg.obj
 
 #
+# ZLIB.LIB rules
+#
+
+{$(ZLIB_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+ZLIB_LIB_OBJS=\
+   $(OBJ_DIR)\adler32.obj \
+   $(OBJ_DIR)\compress.obj \
+   $(OBJ_DIR)\crc32.obj \
+   $(OBJ_DIR)\deflate.obj \
+   $(OBJ_DIR)\gzio.obj \
+   $(OBJ_DIR)\infback.obj \
+   $(OBJ_DIR)\inffast.obj \
+   $(OBJ_DIR)\inflate.obj \
+   $(OBJ_DIR)\inftrees.obj \
+   $(OBJ_DIR)\trees.obj \
+   $(OBJ_DIR)\uncompr.obj \
+   $(OBJ_DIR)\zutil.obj
+
+#
 # PCREPOS.LIB rules
 #
 
@@ -657,13 +688,10 @@ LANG_LIB_OBJS = \
 CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
-   $(OBJ_DIR)\cpesdos.obj \
+   $(OBJ_DIR)\cpes850.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
-   $(OBJ_DIR)\cpgedos.obj \
-   $(OBJ_DIR)\cpgewin.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
@@ -715,7 +743,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
    $(OBJ_DIR)\cpcswin.obj \
-   $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
    $(OBJ_DIR)\cphuiso.obj \
    $(OBJ_DIR)\cphuisos.obj \
@@ -728,8 +755,15 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpsl852.obj \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
-   $(OBJ_DIR)\cptrdos.obj \
    $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\cpde850.obj \
+   $(OBJ_DIR)\cpdeiso.obj \
+   $(OBJ_DIR)\cpel737.obj \
+   $(OBJ_DIR)\cpfr850.obj \
+   $(OBJ_DIR)\cptr857.obj \
+   $(OBJ_DIR)\cpruiso.obj \
+   $(OBJ_DIR)\cpdewin.obj \
+   $(OBJ_DIR)\uc1252.obj \
    $(OBJ_DIR)\uc1253.obj \
    $(OBJ_DIR)\uc1257.obj \
    $(OBJ_DIR)\uc737.obj \
@@ -737,6 +771,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uckam.obj \
    $(OBJ_DIR)\ucmik.obj
+
 #
 # MACRO.LIB rules
 #
@@ -1051,8 +1086,7 @@ MISC_LIB_OBJS = \
    $(CC_CMD)
 
 GTCGI_LIB_OBJS = \
-   $(OBJ_DIR)\gtcgi.obj \
-   $(OBJ_DIR)\mousecgi.obj
+   $(OBJ_DIR)\gtcgi.obj
 
 #
 # GTDOS.LIB rules
@@ -1084,8 +1118,7 @@ GTALLEG_LIB_OBJS = \
    $(CC_CMD)
 
 GTPCA_LIB_OBJS = \
-   $(OBJ_DIR)\gtpca.obj \
-   $(OBJ_DIR)\mousepca.obj
+   $(OBJ_DIR)\gtpca.obj
 
 #
 # GTSTD.LIB rules
@@ -1095,8 +1128,7 @@ GTPCA_LIB_OBJS = \
    $(CC_CMD)
 
 GTSTD_LIB_OBJS = \
-   $(OBJ_DIR)\gtstd.obj \
-   $(OBJ_DIR)\mousestd.obj
+   $(OBJ_DIR)\gtstd.obj
 
 #
 # GTWIN.LIB rules
@@ -1106,8 +1138,7 @@ GTSTD_LIB_OBJS = \
    $(CC_CMD)
 
 GTWIN_LIB_OBJS = \
-   $(OBJ_DIR)\gtwin.obj \
-   $(OBJ_DIR)\mousewin.obj
+   $(OBJ_DIR)\gtwin.obj
 
 #
 # GTGUI.LIB rules
@@ -1119,22 +1150,6 @@ GTWIN_LIB_OBJS = \
 GTGUI_LIB_OBJS = \
    $(OBJ_DIR)\gtgui.obj \
    $(OBJ_DIR)\gtdef.obj
-
-#
-# GTNUL.LIB rules
-#
-
-{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
-   $(CC_CMD)
-
-GTNUL_LIB_OBJS = \
-   $(OBJ_DIR)\gtnul.obj \
-   $(OBJ_DIR)\gtext.obj
-
-!ifdef HB_MULTI_GT
-GTNUL_LIB_OBJS =  \
-   $(OBJ_DIR)\gtsys.obj
-!endif
 
 #
 # GTWVT.LIB rules
@@ -1241,7 +1256,9 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ctpad.obj \
    $(OBJ_DIR)$(MT)\ctset.obj \
    $(OBJ_DIR)$(MT)\ctstr.obj \
+   $(OBJ_DIR)$(MT)\ctwfunc.obj \
    $(OBJ_DIR)$(MT)\ctwin.obj \
+   $(OBJ_DIR)$(MT)\cursor.obj \
    $(OBJ_DIR)$(MT)\datetime.obj \
    $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dbftools.obj \
@@ -1274,7 +1291,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\remove.obj \
    $(OBJ_DIR)$(MT)\replace.obj \
    $(OBJ_DIR)$(MT)\screen1.obj \
-   $(OBJ_DIR)$(MT)\setclear.obj \
    $(OBJ_DIR)$(MT)\settime.obj \
    $(OBJ_DIR)$(MT)\strdiff.obj \
    $(OBJ_DIR)$(MT)\strfile.obj \
@@ -1291,24 +1307,23 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ct.obj \
    $(OBJ_DIR)$(MT)\ctmisc.obj \
    $(OBJ_DIR)$(MT)\ctrand.obj \
-   $(OBJ_DIR)$(MT)\cttime.obj \
    $(OBJ_DIR)$(MT)\dattime3.obj \
    $(OBJ_DIR)$(MT)\diskutil.obj \
    $(OBJ_DIR)$(MT)\fcopy.obj \
    $(OBJ_DIR)$(MT)\getinfo.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
-   $(OBJ_DIR)$(MT)\invrtwin.obj \
    $(OBJ_DIR)$(MT)\keysec.obj \
    $(OBJ_DIR)$(MT)\keytime.obj \
    $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \
    $(OBJ_DIR)$(MT)\screen3.obj \
-   $(OBJ_DIR)$(MT)\scrmark.obj \
    $(OBJ_DIR)$(MT)\setkeys.obj \
+   $(OBJ_DIR)$(MT)\scrmark.obj \
+   $(OBJ_DIR)$(MT)\showtime.obj \
    $(OBJ_DIR)$(MT)\spread.obj \
    $(OBJ_DIR)$(MT)\trapkey.obj \
-   $(OBJ_DIR)$(MT)\untext.obj \
+   $(OBJ_DIR)$(MT)\cttime.obj \
    $(OBJ_DIR)$(MT)\util.obj
 
 #
@@ -1389,6 +1404,7 @@ $(HBRUN_EXE) : \
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
@@ -1451,6 +1467,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
@@ -1569,6 +1586,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
@@ -1629,6 +1647,7 @@ $(HBMAKE_EXE) : \
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
@@ -1666,6 +1685,7 @@ $(XBSCRIPT_EXE) : \
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(PCREPOS_LIB) >> make.tmp
+   $(ECHO) $(ZLIB_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
@@ -1676,7 +1696,10 @@ $(XBSCRIPT_EXE) : \
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(PP_LIB) >> make.tmp
    $(ECHO) $(CT_LIB) >> make.tmp
+   $(ECHO) ws2_32.lib >> make.tmp
+   $(ECHO) mpr.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(XBSCRIPT_EXE) /subsystem:console
    $(DEL) make.tmp
 
@@ -1701,7 +1724,6 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
    $(OBJ_DIR)\gencobj.obj \
-   $(OBJ_DIR)\genobj32.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -1729,7 +1751,6 @@ $(HARBOUR_EXE) : \
    $(ECHO) $(OBJ_DIR)\hbfix.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\gencobj.obj >> make.tmp
-   $(ECHO) $(OBJ_DIR)\genobj32.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
@@ -1831,6 +1852,9 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
    $(LIB_CMD)
 
+$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
+   $(LIB_CMD)
+
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
    $(LIB_CMD)
 
@@ -1898,9 +1922,6 @@ $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
    $(LIB_CMD)
 
 $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
-   $(LIB_CMD)
-
-$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
    $(LIB_CMD)
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
