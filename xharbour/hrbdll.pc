@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.46 2008/03/18 14:02:11 modalsist Exp $
+# $Id: hrbdll.pc,v 1.47 2008/03/19 17:57:22 modalsist Exp $
 #
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
 # � PELLES C DLL MAKEFILE 넴
@@ -84,6 +84,7 @@ TIP_DIR      = $(HB_DIR)\source\tip
 VM_DIR       = $(HB_DIR)\source\vm
 HBSIX_DIR    = $(HB_DIR)\source\rdd\hbsix
 HSX_DIR      = $(HB_DIR)\source\rdd\hsx
+ZLIB_DIR     = $(RTL_DIR)\zlib
 
 
 CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /Fo$@ $**
@@ -787,7 +788,20 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\dbgtobj.obj  \
    $(OBJ_DIR)\tbrwtext.obj \
    $(OBJ_DIR)\dbgwa.obj    \
-   $(OBJ_DIR)\dbgbrwsr.obj
+   $(OBJ_DIR)\dbgbrwsr.obj \
+   \
+   $(OBJ_DIR)\adler32.obj \
+   $(OBJ_DIR)\compress.obj \
+   $(OBJ_DIR)\crc32.obj \
+   $(OBJ_DIR)\deflate.obj \
+   $(OBJ_DIR)\gzio.obj \
+   $(OBJ_DIR)\infback.obj \
+   $(OBJ_DIR)\inffast.obj \
+   $(OBJ_DIR)\inflate.obj \
+   $(OBJ_DIR)\inftrees.obj \
+   $(OBJ_DIR)\trees.obj \
+   $(OBJ_DIR)\uncompr.obj \
+   $(OBJ_DIR)\zutil.obj 
 
 
 #
@@ -1450,6 +1464,21 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\pplib.obj      >> make.tmp
    $(ECHO) $(OBJ_DIR)\pplib2.obj     >> make.tmp
    $(ECHO) $(OBJ_DIR)\pplib3.obj     >> make.tmp
+#
+# ZLIB
+#
+  $(ECHO) $(OBJ_DIR)\adler32.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\compress.obj    >> make.tmp
+  $(ECHO) $(OBJ_DIR)\crc32.obj       >> make.tmp
+  $(ECHO) $(OBJ_DIR)\deflate.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\gzio.obj        >> make.tmp
+  $(ECHO) $(OBJ_DIR)\infback.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\inffast.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\inflate.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\inftrees.obj    >> make.tmp
+  $(ECHO) $(OBJ_DIR)\trees.obj       >> make.tmp
+  $(ECHO) $(OBJ_DIR)\uncompr.obj     >> make.tmp
+  $(ECHO) $(OBJ_DIR)\zutil.obj       >> make.tmp
 #
 #  LINK
 #
@@ -3749,6 +3778,46 @@ $(OBJ_DIR)\dbgaltd.c : $(DEBUG_DIR)\dbgaltd.prg
 
 $(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
         $(CC_CMD)
+
+#
+# ZLIB
+#
+
+$(OBJ_DIR)\adler32.obj : $(ZLIB_DIR)\adler32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\compress.obj : $(ZLIB_DIR)\compress.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\crc32.obj : $(ZLIB_DIR)\crc32.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\deflate.obj : $(ZLIB_DIR)\deflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gzio.obj : $(ZLIB_DIR)\gzio.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\infback.obj : $(ZLIB_DIR)\infback.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inffast.obj : $(ZLIB_DIR)\inffast.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inflate.obj : $(ZLIB_DIR)\inflate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\inftrees.obj : $(ZLIB_DIR)\inftrees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\trees.obj : $(ZLIB_DIR)\trees.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uncompr.obj : $(ZLIB_DIR)\uncompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\zutil.obj : $(ZLIB_DIR)\zutil.c
+   $(CC_CMD)
 
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴컴컴커
