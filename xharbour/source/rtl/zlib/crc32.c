@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: crc32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /* crc32.c -- compute the CRC-32 of a data stream
@@ -13,7 +13,7 @@
  * factor of two increase in speed on a Power PC G4 (PPC7455) using gcc -O3.
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: crc32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $ */
 
 /*
   Note on the use of DYNAMIC_CRC_TABLE: there is no mutex or semaphore
@@ -225,6 +225,7 @@ unsigned long ZEXPORT crc32(
     const unsigned char FAR *buf,
     unsigned len )
 {
+    int i = sizeof(void *);
     if (buf == Z_NULL) return 0UL;
 
 #ifdef DYNAMIC_CRC_TABLE
@@ -233,7 +234,7 @@ unsigned long ZEXPORT crc32(
 #endif /* DYNAMIC_CRC_TABLE */
 
 #ifdef BYFOUR
-    if (sizeof(void *) == sizeof(ptrdiff_t)) {
+    if ( i == sizeof(ptrdiff_t)) {
         u4 endian;
 
         endian = 1;

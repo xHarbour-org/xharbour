@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: deflate.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /* deflate.c -- compress data using the deflation algorithm
@@ -51,12 +51,13 @@
  *
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: deflate.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $ */
 
 #include "deflate.h"
-
+#if 0
 const char deflate_copyright[] =
    " deflate 1.2.3 Copyright 1995-2005 Jean-loup Gailly ";
+#endif
 /*
   If you use the zlib library in a product, an acknowledgment is welcome
   in the documentation of your product. If for some reason you cannot
@@ -352,7 +353,7 @@ int ZEXPORT deflateSetDictionary (
     for (n = 0; n <= length - MIN_MATCH; n++) {
         INSERT_STRING(s, n, hash_head);
     }
-    if (hash_head) hash_head = 0;  /* to make compiler happy */
+    if (hash_head) (void)hash_head;  /* to make compiler happy */
     return Z_OK;
 }
 
@@ -1273,12 +1274,12 @@ local void fill_window(
     register Posf *p;
     unsigned more;    /* Amount of free space at the end of the window. */
     uInt wsize = s->w_size;
-
+    int i = sizeof(int);
     do {
         more = (unsigned)(s->window_size -(ulg)s->lookahead -(ulg)s->strstart);
 
         /* Deal with !@#$% 64K limit: */
-        if (sizeof(int) <= 2) {
+        if ( i <= 2) {
             if (more == 0 && s->strstart == 0 && s->lookahead == 0) {
                 more = wsize;
 
@@ -1671,6 +1672,7 @@ local block_state deflate_slow(
         Tracevv((stderr,"%c", s->window[s->strstart-1]));
         _tr_tally_lit(s, s->window[s->strstart-1], bflush);
         s->match_available = 0;
+	if(bflush) (void)bflush; /* to make compiler happy */
     }
     FLUSH_BLOCK(s, flush == Z_FINISH);
     return flush == Z_FINISH ? finish_done : block_done;

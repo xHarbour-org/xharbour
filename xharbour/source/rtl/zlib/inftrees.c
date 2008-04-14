@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: inftrees.c,v 1.1 2008/04/14 06:06:23 andijahja Exp $
  */
 
 /* inftrees.c -- generate Huffman trees for efficient decoding
@@ -11,9 +11,10 @@
 #include "inftrees.h"
 
 #define MAXBITS 15
-
+#if 0
 const char inflate_copyright[] =
    " inflate 1.2.3 Copyright 1995-2005 Mark Adler ";
+#endif
 /*
   If you use the zlib library in a product, an acknowledgment is welcome
   in the documentation of your product. If for some reason you cannot
