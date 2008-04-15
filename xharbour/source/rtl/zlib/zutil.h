@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: zutil.h,v 1.1 2008/04/14 06:06:23 andijahja Exp $
  */
 
 /* zutil.h -- internal interface and configuration of the compression library
@@ -12,7 +12,7 @@
    subject to change. Applications should only use zlib.h.
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: zutil.h,v 1.1 2008/04/14 06:06:23 andijahja Exp $ */
 
 #ifndef ZUTIL_H
 #define ZUTIL_H
@@ -163,7 +163,11 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #      define _PTRDIFF_T_DEFINED
 #    endif
 #  else
-#    define fdopen(fd,type)  _fdopen(fd,type)
+#    if defined(__XCC__)
+#      define fdopen(fd,mode) NULL /* No fdopen() */
+#    else
+#      define fdopen(fd,type)  _fdopen(fd,type)
+#    endif
 #  endif
 #endif
 
