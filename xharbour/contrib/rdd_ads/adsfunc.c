@@ -2658,21 +2658,21 @@ HB_FUNC( ADSDDDROPLINK )
 #endif
 
 #if ADS_REQUIRE_VERSION >= 8
-HB_FUNC (ADSCREATESAVEPOINT)
+HB_FUNC( ADSCREATESAVEPOINT )
 {
    ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
-   char*   pucSavepoint=hb_parc(2);
+   char*   pucSavepoint = hb_parc( 2 );
    UNSIGNED32  ulOptions = ADS_DEFAULT;
 
-   hb_retnl (AdsCreateSavepoint (hConnect,pucSavepoint,ulOptions));
+   hb_retnl( AdsCreateSavepoint( hConnect, pucSavepoint, ulOptions ) );
 }
 
-HB_FUNC (ADSROLLBACKSAVEPOINT)
+HB_FUNC( ADSROLLBACKSAVEPOINT )
 {
    ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
-   char*     pucSavepoint=hb_parc(2);
+   char*     pucSavepoint = hb_parc( 2 );
    UNSIGNED32  ulOptions = ADS_DEFAULT;
-   hb_retnl(AdsRollbackTransaction80 (hConnect,pucSavepoint,ulOptions));
+   hb_retnl( AdsRollbackTransaction80( hConnect, pucSavepoint, ulOptions ) );
 }
 
 
