@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.86 2008/04/03 15:02:29 lculik Exp $
+ * $Id: adsfunc.c,v 1.87 2008/04/13 16:45:38 lculik Exp $
  */
 
 /*
@@ -2654,6 +2654,27 @@ HB_FUNC( ADSDDDROPLINK )
       hb_retl( 0 );
    }
 }
+
+#endif
+
+#if ADS_REQUIRE_VERSION >= 8
+HB_FUNC (ADSCREATESAVEPOINT)
+{
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   char*   pucSavepoint=hb_parc(2);
+   UNSIGNED32  ulOptions = ADS_DEFAULT;
+
+   hb_retnl (AdsCreateSavepoint (hConnect,pucSavepoint,ulOptions));
+}
+
+HB_FUNC (ADSROLLBACKSAVEPOINT)
+{
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   char*     pucSavepoint=hb_parc(2);
+   UNSIGNED32  ulOptions = ADS_DEFAULT;
+   hb_retnl(AdsRollbackTransaction80 (hConnect,pucSavepoint,ulOptions));
+}
+
 
 
 #endif
