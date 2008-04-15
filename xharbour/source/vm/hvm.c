@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.670 2008/04/01 05:15:10 ronpinkas Exp $
+ * $Id: hvm.c,v 1.671 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -986,31 +986,10 @@ HB_EXPORT int hb_vmQuit( void )
    }
    //printf("\nAfter Statics\n" );
 
-   hb_errExit();
-   //printf("After Err\n" );
-
-   hb_clsReleaseAll();
-   //printf("After Class\n" );
-
-   hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
-   //printf("After Symbols\n" );
-
-   hb_dynsymRelease();          /* releases the dynamic symbol table */
-   //printf("After Dyn\n" );
-
-   hb_conRelease();             /* releases Console */
-   //printf("After Con\n" );
-
-   hb_setRelease();             /* releases Sets */
-   //printf("After Set\n" );
-
-#ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpReleaseAll();          /* releases codepages */
-   //printf("After Cdp\n" );
-#endif
-
-   hb_gcCollectAll( TRUE );
-   //printf("After GC before Memvar\n" );
+   #if 0
+      hb_gcCollectAll( TRUE );
+      //printf("After GC before Memvar\n" );
+   #endif
 
 #ifndef HB_THREAD_SUPPORT
    hb_memvarsRelease();         /* clear all PUBLIC variables */
@@ -1034,6 +1013,29 @@ HB_EXPORT int hb_vmQuit( void )
       hb_gcReleaseAll();
    }
    //printf("After GC\n" );
+
+   hb_errExit();
+   //printf("After Err\n" );
+
+   hb_clsReleaseAll();
+   //printf("After Class\n" );
+
+   hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
+   //printf("After Symbols\n" );
+
+   hb_dynsymRelease();          /* releases the dynamic symbol table */
+   //printf("After Dyn\n" );
+
+   hb_conRelease();             /* releases Console */
+   //printf("After Con\n" );
+
+   hb_setRelease();             /* releases Sets */
+   //printf("After Set\n" );
+
+#ifndef HB_CDP_SUPPORT_OFF
+   hb_cdpReleaseAll();          /* releases codepages */
+   //printf("After Cdp\n" );
+#endif
 
    while( HB_VM_STACK.pSequence )
    {

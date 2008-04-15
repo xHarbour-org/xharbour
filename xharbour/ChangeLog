@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-04-15 15:273 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    * Corrected GPF trap by delaying:
+        hb_errExit();
+        hb_clsReleaseAll();
+        hb_vmReleaseLocalSymbols();
+        hb_dynsymRelease();
+        hb_conRelease();
+        hb_setRelease();
+        hb_cdpReleaseAll();
+     until after last GC activation, incase PRG DESTRUCTORs will be executed.
+
 2008-04-15 13:43 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/hbgtcore.c
     * Reverted hack in hb_gt_def_Alert()/Alert() to center based on visible screen,
@@ -22,7 +34,7 @@
        */
 
   * source/rtl/zlib/zutil.h
-    * xCC does not fdopen()
+    * xCC does not have fdopen()
 
 2008-04-14 20:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * hrbdll.pc
