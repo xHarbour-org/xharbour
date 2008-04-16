@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.8 2005/02/16 00:36:15 guerra000 Exp $
+ * $Id: setkey.c,v 1.9 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -85,10 +85,12 @@ void hb_setkeyExit( void )
       PHB_SETKEY sk_list_tmp;
 
       hb_itemRelease( s_sk_list->pAction );
+
       if( s_sk_list->pIsActive )
       {
          hb_itemRelease( s_sk_list->pIsActive );
       }
+
       sk_list_tmp = s_sk_list->next;
       hb_xfree( ( void * ) s_sk_list );
       s_sk_list = sk_list_tmp;
@@ -102,10 +104,11 @@ static PHB_SETKEY sk_findkey( SHORT iKeyCode, PHB_SETKEY * sk_list_end )
    PHB_SETKEY sk_list_tmp;
 
    *sk_list_end = NULL;
-   for( sk_list_tmp = s_sk_list;
-        sk_list_tmp && sk_list_tmp->iKeyCode != iKeyCode;
-        sk_list_tmp = sk_list_tmp->next )
+
+   for( sk_list_tmp = s_sk_list; sk_list_tmp && sk_list_tmp->iKeyCode != iKeyCode; sk_list_tmp = sk_list_tmp->next )
+   {
       *sk_list_end = sk_list_tmp;
+   }
 
    return sk_list_tmp;
 }
@@ -131,9 +134,13 @@ static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIs
             sk_list_tmp->pIsActive = pIsActive ? hb_itemNew( pIsActive ) : NULL;
 
             if( sk_list_end == NULL )
+            {
                s_sk_list = sk_list_tmp;
+            }
             else
+            {
                sk_list_end->next = sk_list_tmp;
+            }
          }
       }
       else

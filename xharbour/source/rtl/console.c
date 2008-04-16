@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.69 2008/03/18 15:51:40 likewolf Exp $
+ * $Id: console.c,v 1.70 2008/03/23 05:25:23 andijahja Exp $
  */
 
 /*
@@ -194,7 +194,6 @@ void hb_conRelease( void )
     * user and not Harbour application (some terminal modes), [Druzus]
     */
 
-   hb_setkeyExit();  /* April White, May 6, 2000 */
    hb_conXSaveRestRelease();
 
    hb_gtExit();

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.672 2008/04/15 20:03:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.673 2008/04/16 20:05:51 ronpinkas Exp $
  */
 
 /*
@@ -1006,6 +1006,9 @@ HB_EXPORT int hb_vmQuit( void )
       hb_clsDisableDestructors();
       //printf("After DisableDestructors\n" );
    #endif
+
+   hb_setkeyExit();
+   //printf("After setkeyn" );
 
    hb_clsClearAll();
    //printf("After clsClear\n" );
