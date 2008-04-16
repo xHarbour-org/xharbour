@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.87 2008/04/13 16:45:38 lculik Exp $
+ * $Id: adsfunc.c,v 1.89 2008/04/15 23:46:05 lculik Exp $
  */
 
 /*
@@ -2405,7 +2405,7 @@ HB_FUNC( ADSRESTRUCTURETABLE )
    //   UNSIGNED16 usLockType,UNSIGNED16 usCheckRights,UNSIGNED8
    //   *pucAddFields,UNSIGNED8 *pucDeleteFields,UNSIGNED8 *pucChangeFields );
    //adsFileType ADS_DEFAULT, ADS_ADT, ADS_NTX and ADS_CDX
-                                                        
+
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pTableName      = (UNSIGNED8 *) hb_parcx( 1 );
    UNSIGNED8 *pucAddFields    = (UNSIGNED8 *) hb_parcx( 2 );
@@ -2576,20 +2576,20 @@ HB_FUNC( ADSCLOSECACHEDTABLES )
 HB_FUNC( ADSDDCREATELINK )
 {
    UNSIGNED32 ulRetVal ;
-   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
-   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 ); 
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED8  *pucServerPath = (UNSIGNED8 *) hb_parcx( 3 );
    UNSIGNED8  *pucUserName   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL ;
    UNSIGNED8  *pucPassword   = ISCHAR( 5 ) ? (UNSIGNED8 *) hb_parcx( 5 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 6 ) ? hb_parnl( 6 ) : ADS_DEFAULT ;
-   
 
-   ulRetVal = AdsDDCreateLink(  hConnect  ,    
+
+   ulRetVal = AdsDDCreateLink(  hConnect  ,
                             pucLinkAlias  ,
                             pucServerPath ,
                             pucUserName   ,
                             pucPassword   ,
-                            ulOptions     
+                            ulOptions
                             );
 
    if( ulRetVal == AE_SUCCESS )
@@ -2607,20 +2607,20 @@ HB_FUNC( ADSDDCREATELINK )
 HB_FUNC( ADSDDMODIFYLINK )
 {
    UNSIGNED32 ulRetVal ;
-   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
-   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 ); 
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED8  *pucServerPath = (UNSIGNED8 *) hb_parcx( 3 );
    UNSIGNED8  *pucUserName   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL ;
    UNSIGNED8  *pucPassword   = ISCHAR( 5 ) ? (UNSIGNED8 *) hb_parcx( 5 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 6 ) ? hb_parnl( 6 ) : ADS_DEFAULT ;
-   
 
-   ulRetVal = AdsDDModifyLink(  hConnect  ,    
+
+   ulRetVal = AdsDDModifyLink(  hConnect  ,
                             pucLinkAlias  ,
                             pucServerPath ,
                             pucUserName   ,
                             pucPassword   ,
-                            ulOptions     
+                            ulOptions
                             );
 
    if( ulRetVal == AE_SUCCESS )
@@ -2636,10 +2636,10 @@ HB_FUNC( ADSDDMODIFYLINK )
 HB_FUNC( ADSDDDROPLINK )
 {
    UNSIGNED32 ulRetVal ;
-   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
-   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 );  
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );
+   UNSIGNED8  *pucLinkAlias  =  (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED16 ulOptions      = ISLOG( 3 ) ? hb_parl( 3 ) : FALSE ;
-  
+
    ulRetVal = AdsDDDropLink(  hConnect     ,
                             pucLinkAlias,
                             ulOptions );
@@ -2660,19 +2660,19 @@ HB_FUNC( ADSDDDROPLINK )
 #if ADS_REQUIRE_VERSION >= 8
 HB_FUNC( ADSCREATESAVEPOINT )
 {
-   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );
    char*   pucSavepoint = hb_parc( 2 );
    UNSIGNED32  ulOptions = ADS_DEFAULT;
 
-   hb_retnl( AdsCreateSavepoint( hConnect, pucSavepoint, ulOptions ) );
+   hb_retnl( AdsCreateSavepoint( hConnect, (UNSIGNED8 *) pucSavepoint, ulOptions ) );
 }
 
 HB_FUNC( ADSROLLBACKSAVEPOINT )
 {
-   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );   
+   ADSHANDLE  hConnect       = HB_ADS_PARCONNECTION( 1 );
    char*     pucSavepoint = hb_parc( 2 );
    UNSIGNED32  ulOptions = ADS_DEFAULT;
-   hb_retnl( AdsRollbackTransaction80( hConnect, pucSavepoint, ulOptions ) );
+   hb_retnl( AdsRollbackTransaction80( hConnect, (UNSIGNED8 *) pucSavepoint, ulOptions ) );
 }
 
 
