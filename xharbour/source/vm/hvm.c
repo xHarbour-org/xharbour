@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.671 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: hvm.c,v 1.672 2008/04/15 20:03:07 ronpinkas Exp $
  */
 
 /*
@@ -868,28 +868,34 @@ HB_EXPORT int hb_vmQuit( void )
    //printf("After PP\n" );
 #endif
 
-   hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
+   hb_idleShutDown();
+   //printf("After Idle\n" );
 
+   hb_backgroundShutDown();
+   //printf("After Background\n" );
+
+   hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    //printf("After ExitFunctions\n" );
 
    /* process AtExit registered functions */
    hb_vmDoModuleFunctions( s_ExitFunctions );
+   //printf("After ModuleFunctions\n" );
+
    hb_vmCleanModuleFunctions();
+   //printf("After CleanModuleFunctions\n" );
 
    /* deactivate debugger */
    hb_vmDebuggerExit();
+   //printf("After Debugger\n" );
 
    /* release all known items stored in subsystems */
+   hb_stackSetActionRequest( 0 );
    hb_rddShutDown();
    //printf("After RDD\n" );
 
-   hb_idleShutDown();
-   //printf("After Idle\n" );
-
-   hb_backgroundShutDown();
-
    hb_i18nExit();
+   //printf("After i18n\n" );
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    if( pHVMFuncService )
@@ -905,6 +911,7 @@ HB_EXPORT int hb_vmQuit( void )
          hb_itemClear( &( HB_VM_STACK.aEnumCollection[ i ] ) );
       }
    }
+   //printf("After FOREACH\n" );
 
    // WITH OBJECT
    uiCounter = HB_VM_STACK.wWithObjectCounter;
@@ -915,13 +922,12 @@ HB_EXPORT int hb_vmQuit( void )
          hb_itemClear( &( HB_VM_STACK.aWithObject[ i ] ) );
       }
    }
+   //printf("After WITHOBJECT\n" );
 
-   /* release all remaining items */
    /*
-    * NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
-    * This also avoids GPF trap related to Destructor using ProcName() etc.
-   hb_stackRemove( 0 );
-   */
+    NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
+    hb_stackRemove( 0 );
+    */
    while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
    {
       if( HB_IS_STRING( *( HB_VM_STACK.pPos - 1 ) ) )
@@ -935,10 +941,7 @@ HB_EXPORT int hb_vmQuit( void )
    }
    //printf("After Stack\n" );
 
-   if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-   {
-      hb_itemClear( &(HB_VM_STACK.Return) );
-   }
+   HB_VM_STACK.Return.type = HB_IT_NIL;
    //printf("After Return\n" );
 
    if( s_aGlobals.type == HB_IT_ARRAY )
@@ -952,56 +955,71 @@ HB_EXPORT int hb_vmQuit( void )
    }
    //printf("\nAfter Globals\n" );
 
-   // To allow Class Destructors after all other cleanup, but before it's TOO late. - Don't MOVE!!!
-   hb_gcCollectAll( TRUE );
+   hb_memvarsClear();
+   //printf("After memvarsClear\n" );
 
-   // Static can NOT be released prior to hb_gcCollectAll() above because Destrcutor might trigger DBG code that uses them.
+   #ifdef DISABLE_STATIC_DESTRUCTORS
+      // To allow Class Destructors after all other cleanup, but before STATICs are released. - Don't MOVE!!!
+      hb_gcCollectAll( TRUE );
+      //printf("After CollectAll\n" );
+
+      hb_clsDisableDestructors();
+      //printf("After DisableDestructors\n" );
+   #endif
+
    if( s_aStatics.type == HB_IT_ARRAY )
    {
       HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
 
-     //#define DEBUG_STATICS
-     #ifdef DEBUG_STATICS
-     {
-       ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
-       ULONG ulIndex;
-       char sBuffer[128];
+      //#define DEBUG_STATICS
+      #ifdef DEBUG_STATICS
+      {
+         ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
+         ULONG ulIndex;
+         char sBuffer[128];
 
-       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
-       {
-         sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
+         for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
+         {
+            sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
 
-         #if defined(HB_OS_WIN_32)
-            OutputDebugString( sBuffer );
-         #else
-            printf( sBuffer );
-         #endif
-       }
-     }
-     #endif
+            #if defined(HB_OS_WIN_32)
+               OutputDebugString( sBuffer );
+            #else
+               printf( sBuffer );
+            #endif
+         }
+      }
+      #endif
 
       hb_arrayRelease( &s_aStatics );
       s_aStatics.type = HB_IT_NIL;
+
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
 
-   #if 0
+   #ifdef DISABLE_DATA_DESTRUCTORS
+      // To allow Class Destructors after all other cleanup, but before hb_clsClearAll(). - Don't MOVE!!!
       hb_gcCollectAll( TRUE );
-      //printf("After GC before Memvar\n" );
+      //printf("After CollectAll\n" );
+
+      hb_clsDisableDestructors();
+      //printf("After DisableDestructors\n" );
    #endif
 
-#ifndef HB_THREAD_SUPPORT
-   hb_memvarsRelease();         /* clear all PUBLIC variables */
-   //printf("After Memvar\n" );
-#endif
+   hb_clsClearAll();
+   //printf("After clsClear\n" );
 
-   hb_stackFree();
-   //printf("After hbStackFree\n" );
+   hb_gcCollectAll( TRUE );
+
+   // Absolutley NO PRG code beyond this point!
+   hb_clsDisableDestructors();
 
    hb_itemRelease( hb_vm_BreakBlock );
+   //printf("After BreakBlock\n" );
 
-   /* hb_dynsymLog(); */
+   hb_errExit();
+   //printf("After Err\n" );
 
    /* release all known garbage */
    if ( hb_xquery( HB_MEM_USEDMAX ) ) /* check if fmstat is ON */
@@ -1014,8 +1032,14 @@ HB_EXPORT int hb_vmQuit( void )
    }
    //printf("After GC\n" );
 
-   hb_errExit();
-   //printf("After Err\n" );
+   #ifndef HB_THREAD_SUPPORT
+      // MUST be *after* release of all known item, as they may indirectly refer to memvars
+      hb_memvarsRelease();         /* clear all PUBLIC variables */
+      //printf("After Memvar\n" );
+   #endif
+
+   hb_stackFree();
+   //printf("After hbStackFree\n" );
 
    hb_clsReleaseAll();
    //printf("After Class\n" );
@@ -1023,6 +1047,7 @@ HB_EXPORT int hb_vmQuit( void )
    hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
    //printf("After Symbols\n" );
 
+   /* hb_dynsymLog(); */
    hb_dynsymRelease();          /* releases the dynamic symbol table */
    //printf("After Dyn\n" );
 

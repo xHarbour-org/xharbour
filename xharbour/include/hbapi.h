@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.239 2008/03/20 15:25:51 likewolf Exp $
+ * $Id: hbapi.h,v 1.240 2008/03/27 10:26:43 likewolf Exp $
  */
 
 /*
@@ -816,10 +816,12 @@ extern PHB_ITEM         hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM p
 extern HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar ); /* create a new global value */
 extern HB_VALUE_PTR * hb_memvarValueBaseAddress( void ); /* retrieve the base address of the values table */
 
+extern void       hb_memvarsClear( void ); /* clear all PUBLIC and PRIVATE variables */
+
 /* JC1: thread version is a little different */
 #ifndef HB_THREAD_SUPPORT
 extern void       hb_memvarsInit( void ); /* initialize the memvar API system */
-extern void       hb_memvarsRelease( void ); /* clear all PUBLIC and PRIVATE variables */
+extern void       hb_memvarsRelease( void ); /* Release all memory of Memvars sub-system */
 #endif
 
 extern void       hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the reference count of a global value */

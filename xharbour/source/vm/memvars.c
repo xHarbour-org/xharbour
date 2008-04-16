@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.129 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: memvars.c,v 1.130 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -162,6 +162,33 @@ void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
 extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
 
+/* Fake Clear all variable - the value will be cleared by subsequent GC scan
+ * Should be called at application exit only
+*/
+void hb_memvarsClear( void )
+{
+   HB_THREAD_STUB
+   ULONG ulCnt = s_globalLastFree;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
+
+   if( s_globalTable )
+   {
+      while( --ulCnt )
+      {
+         if( s_globalTable[ ulCnt ].counter > 0 )
+         {
+            if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
+            {
+               hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
+            }
+
+            s_globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
+         }
+      }
+   }
+}
+
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
 {
@@ -185,7 +212,7 @@ void hb_memvarsRelease( void )
    HB_THREAD_STUB
    ULONG ulCnt = s_globalLastFree;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsRelease()"));
 
    if( s_globalTable )
    {
@@ -193,11 +220,6 @@ void hb_memvarsRelease( void )
       {
          if( s_globalTable[ ulCnt ].counter > 0 )
          {
-            if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
-            {
-               hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
-            }
-
             hb_xfree( s_globalTable[ ulCnt ].pVarItem );
             //s_globalTable[ ulCnt ].pVarItem = NULL;
             //s_globalTable[ ulCnt ].counter = 0;
@@ -219,7 +241,7 @@ void hb_memvarsRelease( void )
 
 void hb_memvarsInit( HB_STACK *pStack )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear(%p)", pStack));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsInit(%p)", pStack));
 
    pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
@@ -248,11 +270,6 @@ void hb_memvarsRelease( HB_STACK *pStack )
       {
          if( pStack->globalTable[ ulCnt ].counter > 0 )
          {
-            if( HB_IS_STRING( pStack->globalTable[ ulCnt ].pVarItem ) )
-            {
-               hb_itemReleaseString( pStack->globalTable[ ulCnt ].pVarItem );
-            }
-
             hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
             //pStack->globalTable[ ulCnt ].pVarItem = NULL;
             pStack->globalTable[ ulCnt ].counter = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.215 2008/03/07 03:53:46 walito Exp $
+ * $Id: classes.c,v 1.216 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -199,13 +199,16 @@ static PCLASS   s_pClasses     = NULL;
 static USHORT   s_uiClasses    = 0;
 static PHB_DYNS s_msgClassName = NULL;
 
-static PHB_DYNS s_msgClassH    = NULL;
-static PHB_DYNS s_msgEval      = NULL;
-static PHB_DYNS s_msgClassSel  = NULL;
-static PHB_DYNS s_msgClassFullSel  = NULL;
-static PHB_DYNS s_msgClsParent = NULL;
-static BOOL     s_bClsScope    = TRUE;
-static BOOL     s_bClsAutoInit = TRUE;
+static PHB_DYNS s_msgClassH       = NULL;
+static PHB_DYNS s_msgEval         = NULL;
+static PHB_DYNS s_msgClassSel     = NULL;
+static PHB_DYNS s_msgClassFullSel = NULL;
+static PHB_DYNS s_msgClsParent    = NULL;
+
+static BOOL     s_bClsScope        = TRUE;
+static BOOL     s_bClsAutoInit     = TRUE;
+static BOOL     s_AllowDestructors = TRUE;
+
 /* static PHB_DYNS s_msgClass     = NULL; */
 
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
@@ -226,6 +229,7 @@ static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *pp
 
 BOOL            hb_clsIsParent( USHORT uiClass, char * szParentName );
 
+static void     hb_clsClear( PCLASS );
 static void     hb_clsRelease( PCLASS );
 
 static HARBOUR  hb___msgClsH( void );
@@ -257,33 +261,26 @@ HARBOUR  hb___msgSetData( void );
  */
 static void hb_clsRelease( PCLASS pClass )
 {
-   USHORT uiAt;
-   PMETHOD pMeth = pClass->pMethods;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_clsRelease(%p)", pClass));
-
-   for( uiAt = pClass->uiMethods + 1; --uiAt; pMeth++ )
-   {
-      if( pMeth->pInitValue )
-      {
-         hb_itemRelease( pMeth->pInitValue );
-      }
-   }
 
    if( pClass->pInitValues )
    {
       hb_xfree( pClass->pInitValues );
+      pClass->pInitValues = NULL;
    }
 
    if( pClass->pFriends )
    {
       hb_xfree( pClass->pFriends );
+      pClass->pFriends = NULL;
    }
 
    if( pClass->pMtxSync )
    {
       hb_itemRelease( pClass->pMtxSync );
+      pClass->pMtxSync = NULL;
    }
+
 /*
    if( pClass->pFunError )
    {
@@ -296,14 +293,70 @@ static void hb_clsRelease( PCLASS pClass )
       }
    }
 */
-   hb_itemRelease( pClass->pClassDatas );
-   hb_itemRelease( pClass->pInlines );
-
    hb_xfree( pClass->szName );
+   pClass->szName = NULL;
+
    hb_xfree( pClass->pMethods );
+   pClass->pMethods = NULL;
+
    hb_xfree( pClass->pMethDyn );
+   pClass->pMethDyn = NULL;
 }
 
+/*
+ * hb_clsClear( <pClass> )
+ *
+ * Release all data held by class definition
+ */
+static void hb_clsClear( PCLASS pClass )
+{
+   USHORT uiAt;
+   PMETHOD pMeth = pClass->pMethods;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsClear(%p)", pClass));
+
+   for( uiAt = pClass->uiMethods + 1; --uiAt; pMeth++ )
+   {
+      if( pMeth->pInitValue )
+      {
+         hb_itemRelease( pMeth->pInitValue );
+         pMeth->pInitValue = NULL;
+      }
+   }
+
+   /*
+   if( pClass->pMtxSync )
+   {
+      hb_itemRelease( pClass->pMtxSync );
+      pClass->pMtxSync = NULL;
+   }
+   */
+
+   hb_itemRelease( pClass->pClassDatas );
+   pClass->pClassDatas = NULL;
+
+   #ifndef CLS_DONT_CLEAR_INLINES
+      hb_itemRelease( pClass->pInlines );
+      pClass->pInlines = NULL;
+   #endif
+}
+
+void hb_clsDisableDestructors( void )
+{
+   s_AllowDestructors = FALSE;
+}
+
+void hb_clsClearAll( void )
+{
+   SHORT uiClass;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsClearAll()"));
+
+   for( uiClass = 0 ; uiClass < s_uiClasses ; uiClass++ )
+   {
+      hb_clsClear( s_pClasses + uiClass );
+   }
+}
 
 /*
  * hb_clsReleaseAll()
@@ -318,7 +371,7 @@ void hb_clsReleaseAll( void )
 
    for( uiClass = 0 ; uiClass < s_uiClasses ; uiClass++ )
    {
-      hb_clsRelease( s_pClasses + uiClass  );
+      hb_clsRelease( s_pClasses + uiClass );
    }
 
    if( s_pClasses )
@@ -4290,40 +4343,47 @@ void hb_clsFinalize( PHB_ITEM pObject )
       {
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
-            // To DISABLE GC here where no refernce to this object will cause GPF for double release!
-            BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
-            PHB_SYMB pDestructor = pClass->pDestructor->pMessage->pSymbol;
-
-            // Save the existing Return Value and Top Item if any.
-            if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+            if( s_AllowDestructors && hb_stack_ready )
             {
-               // Don't process HB_VM_STACK.Return!
-               bPop = FALSE;
+               // To DISABLE GC here where no refernce to this object will cause GPF for double release!
+               BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
+               PHB_SYMB pDestructor = pClass->pDestructor->pMessage->pSymbol;
 
-               /* Save top item which can be processed at this moment */
-               hb_stackPush();
+               // Save the existing Return Value and Top Item if any.
+               if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+               {
+                  // Don't process HB_VM_STACK.Return!
+                  bPop = FALSE;
+
+                  /* Save top item which can be processed at this moment */
+                  hb_stackPush();
+               }
+               else
+               {
+                  hb_vmPushState();
+               }
+
+               hb_vmPushSymbol( pDestructor );
+               hb_vmPush( pObject ); // Do NOT Forward!!!
+               hb_vmSend( 0 );
+
+               // Restore the existing Return Value and Top Item if any.
+               if( bPop )
+               {
+                  hb_vmPopState();
+               }
+               else
+               {
+                  /* Restore top item */
+                  hb_stackDec();
+               }
+
+               hb_gcSetCollecting( bCollecting );
             }
             else
             {
-               hb_vmPushState();
+               hb_errInternal( HB_EI_ERRUNRECOV, "Destructors disabled! Destructor of class: '%s' can't be executed.", pClass->szName, NULL );
             }
-
-            hb_vmPushSymbol( pDestructor );
-            hb_vmPush( pObject ); // Do NOT Forward!!!
-            hb_vmSend( 0 );
-
-            // Restore the existing Return Value and Top Item if any.
-            if( bPop )
-            {
-               hb_vmPopState();
-            }
-            else
-            {
-               /* Restore top item */
-               hb_stackDec();
-            }
-
-            hb_gcSetCollecting( bCollecting );
          }
       }
    }

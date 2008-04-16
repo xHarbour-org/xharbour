@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6027 2008/04/15 20:03:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6028 2008/04/15 23:38:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-04-16 15:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/classes.h
+  * source/vm/classes.c
+    + Added hb_clsDisableDestructors() and hb_clsClearAll()
+    + Added logic to raise internal error if Destructor encountered after Destructors can no longer be executed
+
+  * include/hbapi.h
+  * source/vm/memvars.c
+    + Added hb_memvarsClear()
+
+  * source/vm/hvm.c
+    * Cleaned hb_vmQuit() shutdown order, and use new: hb_clsDisableDestructors(), hb_clsClearAll(), and hb_memvarsClear()
+      to guarntee that all prg data is cleared before any C subsystem is released.
+
+  /*
+     I'm not sure why we had a comment stating that Destructors should not run after STATICs have been released
+     it suggested possibility of Destructor activating DBG code which may use STATICs, but the Debugger is already
+     deactivated at that point.
+
+     I added 2 #ifdefs to allow disable of Destructors before release of STATICS
+     as well as before release of prg data in class definitions (f.e INIT values).
+
+
+        #ifdef DISABLE_STATIC_DESTRUCTORS
+        #ifdef DISABLE_DATA_DESTRUCTORS
+
+     Otherwise xHarbour now gurantees execution of all Destructors.
+   */
+
 2008-04-15 20:50 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * contrib/rdd_ads/adsfuncs.c
     ! Added ADSCREATESAVEPOINT(),ADSROLLBACKSAVEPOINT() functions protected by ADS_REQUIRE_VERSION >=8
 
-2008-04-15 15:273 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-04-15 15:27 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/hvm.c
     * Corrected GPF trap by delaying:
         hb_errExit();
