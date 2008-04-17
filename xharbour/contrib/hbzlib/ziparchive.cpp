@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2003/09/15 02:38:37 $ $Author: paultucker $
+// $Date: 2003/11/26 00:05:24 $ $Author: fsgiudice $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#include "hbcomprs.h"
+#include "hbzlib.h"
 #include "stdafx.h"
 #include "ziparchive.h"
 // #include "ZipPathComponent.h"

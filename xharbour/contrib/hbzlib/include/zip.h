@@ -47,7 +47,7 @@
 
 
 #ifndef _HBCOMPRESS_H
-#include "hbcomprs.h"
+#include "hbzlib.h"
 #endif
 
 #ifdef __cplusplus
