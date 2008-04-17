@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6032 2008/04/17 00:05:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6033 2008/04/17 12:56:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-04-17 16:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+  * contrib\hbzlib\zip.c
+    contrib\hbzlib\ziparchive.cpp
+    contrib\hbzlib\zipcomp.cpp
+    contrib\hbzlib\include\ziparchive.h
+    ! updated to work with new zlib
+   * contrib\hbzlib\makefile.bc
+    ! updated to reflect new zlib headers
+   - contrib\hbzlib\include\zconf.h
+     contrib\hbzlib\include\zutil.h
+     ! Removed
 
 2008-04-17 09:50 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * contrib\hbzlib\include\unzip.h
@@ -1664,3 +1675,4 @@
   * source/vm/hvm.c
     * Speed improvement and GPF trap using MT in calls to Super methods.
       Now two threads can call Super methods using the same object without problem.
+

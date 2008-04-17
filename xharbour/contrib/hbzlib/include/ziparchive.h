@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.h $
 // $Archive: /ZipArchive/ZipArchive.h $
-// $Date: 2003/11/26 00:05:24 $ $Author: fsgiudice $
+// $Date: 2008/04/17 12:56:41 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -1285,7 +1285,7 @@ public:
 	\see m_bDetectZlibMemoryLeaks
 
 */
-/*
+
 	void SetDetectZlibMemoryLeaks(bool bDetect)
 	{
 		if (m_iFileOpened != nothing)
@@ -1296,7 +1296,7 @@ public:
 		m_bDetectZlibMemoryLeaks = bDetect;
 
 	}
-*/
+
 /**
 	Set CZipCentralDir::m_bConvertAfterOpen value.
 	The default value is \c true.
@@ -1957,7 +1957,8 @@ protected:
 		\see SetDetectZlibMemoryLeaks
 
 	*/
-//	bool m_bDetectZlibMemoryLeaks;
+
+      bool m_bDetectZlibMemoryLeaks;
 
 
 	/**

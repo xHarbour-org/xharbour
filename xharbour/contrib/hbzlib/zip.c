@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.45 2007/06/05 18:21:31 enricomaria Exp $
+ * $Id: zip.c,v 1.46 2008/04/10 13:01:15 lculik Exp $
  */
 
 /*
@@ -417,7 +417,7 @@ HB_FUNC( HB_ZIPFILE )
       if ( pParam )
       {
          char szFile[ _POSIX_PATH_MAX ];
-         PHB_ITEM pProgress = ISBLOCK( 9 ) ? hb_itemNew( hb_param( 9 , HB_IT_BLOCK )) : NULL;
+         //PHB_ITEM pProgress = ISBLOCK( 9 ) ? hb_itemNew( hb_param( 9 , HB_IT_BLOCK )) : NULL;
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
 //         PHB_ITEM iProgress;
          BYTE *pCurDir;
@@ -445,11 +445,11 @@ HB_FUNC( HB_ZIPFILE )
          hb_fsChDir( pCurDir ) ;
 
 
-         if( pProgress )
-         {
+//         if( pProgress )
+//         {
            //hb_itemCopy( &iProgress, pProgress );
 //            iProgress = hb_itemNew(pProgress );
-         }
+//         }
 // add current dir to file name if not specified
 
          if ( ! strchr( hb_parc( 1 ), OS_PATH_DELIMITER ) )
@@ -475,7 +475,7 @@ HB_FUNC( HB_ZIPFILE )
                                     ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                    pProgress );
+                                    ISBLOCK( 9 ) ? hb_itemNew( hb_param( 9 , HB_IT_BLOCK )) : hb_itemNew(NULL) );
 
             ResetAttribs();
          }
@@ -592,7 +592,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                                 ISBLOCK( 10 ) ? hb_itemNew( hb_param( 10 , HB_IT_BLOCK )) : NULL);
+                                 ISBLOCK( 10 ) ? hb_itemNew( hb_param( 10 , HB_IT_BLOCK )) : hb_itemNew(NULL));
 
             ResetAttribs();
          }
@@ -652,7 +652,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 ISBLOCK( 9 ) ? hb_itemNew( hb_param( 9 , HB_IT_BLOCK )) : NULL );
+                                 ISBLOCK( 9 ) ? hb_itemNew( hb_param( 9 , HB_IT_BLOCK )) : hb_itemNew(NULL) );
             ResetAttribs();
          }
 
@@ -741,7 +741,7 @@ HB_FUNC( HB_UNZIPFILE )
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              UnzipFiles,
-                             ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : NULL);
+                             ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : hb_itemNew(NULL));
       }
    
       hb_xfree( szZipFileName );
@@ -956,7 +956,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
                                      ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                                      hb_parc( 5 ),
                                      DelZip,
-                                     ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : NULL );
+                                     ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : hb_itemNew(NULL) );
          }
 
          hb_itemRelease( DelZip );
@@ -1012,7 +1012,7 @@ HB_FUNC(HB_UNZIPALLFILE)
         char *szZipFile;
         strcpy(szFile, hb_parc(1));
         szZipFile = hb___CheckFile(szFile);
-        hb_retl(hb_UnzipAll(szZipFile, hb_param( 2, HB_IT_BLOCK),ISLOG(3) ? hb_parl(3) : 0 ,hb_parc(4),ISCHAR(5) ? hb_parc(5) : NULL,hb_param( 6, HB_IT_BLOCK),ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : NULL));
+        hb_retl(hb_UnzipAll(szZipFile, hb_param( 2, HB_IT_BLOCK),ISLOG(3) ? hb_parl(3) : 0 ,hb_parc(4),ISCHAR(5) ? hb_parc(5) : NULL,hb_param( 6, HB_IT_BLOCK),ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK )) : hb_itemNew(NULL)));
         hb_xfree( szZipFile );
     }
 }

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.11 2003/09/25 12:59:15 paultucker Exp $
+# $Id: makefile.bc,v 1.12 2003/09/25 13:07:27 paultucker Exp $
 #
 
 #
@@ -34,10 +34,10 @@ TASM32  = Tasm32
 # Options
 #
 IDE_LinkFLAGS32 =  -L$(BCB)\LIB\b32
-LinkerLocalOptsAtC32_ziparddll =  -L$(BCB)\LIB\b32 -Tpe -ap -c
+LinkerLocalOptsAtC32_ziparddll =  -L$(BCB)\LIB\b32 -Tpe -ap -c -v
 ResLocalOptsAtC32_ziparddll = 
 BLocalOptsAtC32_ziparddll = 
-CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I..\..\include;. -DZLIB_DLL;WIN32;ASSERT -u 
+CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I..\..\include;.;..\..\source\rtl\zlib -DZLIB_DLL;WIN32;ASSERT;ZLIB_EXPORTS;_WINDOWS;_USRDLL -u  -v -y
 LinkerInheritOptsAt_ziparddll = -x
 LinkerOptsAt_ziparddll = $(LinkerLocalOptsAtC32_ziparddll)
 ResOptsAt_ziparddll = $(ResLocalOptsAtC32_ziparddll)
@@ -191,12 +191,11 @@ BccW32.cfg :
    Copy &&|
 -vi
 -Ve
--6
 -R-
+-v -y
 -H-
--5
 -OS
 -w-
--O2  -X- -a8 -b -k-  
+-O2  -X- -b -k-  
 | $@
 

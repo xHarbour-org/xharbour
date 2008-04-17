@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2003/11/26 00:05:24 $ $Author: fsgiudice $
+// $Date: 2008/04/17 12:56:41 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -57,9 +57,9 @@ CZipArchive::CZipArchive()
 	m_bIgnoreCRC =
 	m_bAutoFlush = false;
 	m_centralDir.m_pStorage= &m_storage;
-//	m_info.m_stream.zalloc = (alloc_func)_zliballoc;
-//	m_info.m_stream.zfree = (free_func)_zlibfree;
-//	m_bDetectZlibMemoryLeaks = true;
+        m_info.m_stream.zalloc = (alloc_func)_zliballoc;
+        m_info.m_stream.zfree = (free_func)_zlibfree;
+        m_bDetectZlibMemoryLeaks = true;
 	m_iFileOpened = nothing;
 	SetCaseSensitivity(ZipPlatform::GetSystemCaseSensitivity());
 }
@@ -228,7 +228,7 @@ bool CZipArchive::OpenFile(WORD uIndex)
 
 	if (uMethod == Z_DEFLATED)
 	{
-//		m_info.m_stream.opaque =  m_bDetectZlibMemoryLeaks ? &m_list : 0;
+              m_info.m_stream.opaque =  m_bDetectZlibMemoryLeaks ? &m_list : 0;
 		int err = inflateInit2(&m_info.m_stream, -MAX_WBITS);
 		//			* windowBits is passed < 0 to tell that there is no zlib header.
 		//          * Note that in this case inflate *requires* an extra "dummy" byte
@@ -274,7 +274,7 @@ int CZipArchive::GetLocalExtraField(char *pBuf, int iSize)const
 	return size;
 }
 
-/*
+
 void* CZipArchive::_zliballoc(void* opaque, UINT items, UINT size)
 {
 	void* p = new char[size * items];
@@ -297,7 +297,7 @@ void CZipArchive::_zlibfree(void* opaque, void* address)
 	}
 	delete[] (char*) address;
 }
-*/
+
 
 void CZipArchive::CheckForError(int iErr)
 {
@@ -666,7 +666,7 @@ bool CZipArchive::OpenNewFile(CZipFileHeader & header,
 
 	if (CurrentFile()->m_uMethod == Z_DEFLATED)
     {
-//        m_info.m_stream.opaque = m_bDetectZlibMemoryLeaks ? &m_list : 0;
+        m_info.m_stream.opaque = m_bDetectZlibMemoryLeaks ? &m_list : 0;
 
         int err = deflateInit2(&m_info.m_stream, iLevel,
 			Z_DEFLATED, -MAX_WBITS, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY);

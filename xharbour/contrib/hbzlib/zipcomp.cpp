@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.17 2005/03/18 22:35:30 andijahja Exp $
+ * $Id: zipcomp.cpp,v 1.18 2006/04/22 13:46:12 lculik Exp $
  */
 
 /*
@@ -590,6 +590,10 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
    }
 
    catch( ... ){}
+   if (pProgressInfo )
+   {
+      hb_itemRelease(pProgressInfo);
+   }
 
    return ( int ) bReturn;
 }
