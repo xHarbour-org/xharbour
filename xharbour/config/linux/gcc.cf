@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.39 2008/03/09 18:44:26 likewolf Exp $
+# $Id: gcc.cf,v 1.40 2008/03/16 19:15:57 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -143,6 +143,8 @@ endif
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
+LINKLIBS += -lzlib
 endif
 
 LINKLIBS += -lm -ldl -Wl,--end-group
