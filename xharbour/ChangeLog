@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6034 2008/04/17 19:14:47 lculik Exp $
+ * $Id: ChangeLog,v 1.6035 2008/04/19 12:49:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-20 14:10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/vm/maindllp.c
+    ! non-voiding parameter fdwReason because it is used.
+
+  * contrib/hbzlib/zip.c
+    ! fixed memory leaks
+
+  * contrib/hbzlib/zipnew.cpp
+    ! commented unused variables
+
+
 2008-04-19 09:40 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * config/linux/gcc.cf
     ! added zlib to link

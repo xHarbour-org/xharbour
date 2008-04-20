@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.27 2006/10/13 16:41:24 ptsarenko Exp $
+ * $Id: zipnew.cpp,v 1.28 2007/06/05 18:21:31 enricomaria Exp $
  */
 
 /*
@@ -210,7 +210,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 {
    int iNumberOfFiles;
    ULONG ulCount;
-   int iOMode ;
+   // int iOMode ;
    bool iReturn = true;
 
    CZipArchive szZip;
@@ -258,7 +258,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
       {
          CZipFileHeader fh;
          PHB_ITEM Item;
-        
+
          szZip.GetFileInfo( fh, ( WORD )ulCount );
 
          if ( iMode )
@@ -563,7 +563,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    bool iReturn = true;
    ULONG ulCount;
    int iCause;
-   int iMode ;
+   // int iMode ;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
    BOOL bFreePath = TRUE;
 
@@ -681,7 +681,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                }
             }
 
-            catch ( CZipException&  e )
+            catch ( CZipException&  /* e */  )
             {
                   szZip.CloseFile( NULL, true);
 /*            szZip.CloseNewFile(true);*/
@@ -793,7 +793,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    bool iReturn = true;
    ULONG ulCount;
    int iCause;
-   int iMode ;
+   // int iMode ;
 
    CZipArchive szZip;
    SpanCallback span;
@@ -872,7 +872,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
                }
             }
 
-            catch ( CZipException&  e )
+            catch ( CZipException&  /* e */ )
             {
                   szZip.CloseFile( NULL, true);
             }
@@ -999,7 +999,7 @@ DWORD GetCurrentFileSize( LPCTSTR szFile )
 #endif
 
 
-int hb_UnzipAll(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress)
+int hb_UnzipAll(char *szFile,PHB_ITEM pBlock, BOOL bWithPath,char *szPassWord,char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress)
 {
 bool iReturn=true;
 uLong uiCount=0;

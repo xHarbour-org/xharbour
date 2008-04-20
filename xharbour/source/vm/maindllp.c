@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.23 2008/01/03 05:43:01 andijahja Exp $
+ * $Id: maindllp.c,v 1.24 2008/03/27 10:26:45 likewolf Exp $
  */
 
 /*
@@ -80,7 +80,6 @@ HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 #endif
 
    HB_SYMBOL_UNUSED( hInstance );
-   HB_SYMBOL_UNUSED( fdwReason );
    HB_SYMBOL_UNUSED( pvReserved );
 
    switch( fdwReason )
