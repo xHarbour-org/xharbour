@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.74 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.75 2008/03/14 19:58:01 ronpinkas Exp $
  */
 
 /*
@@ -265,15 +265,20 @@
       HB_COUNTER    * pulHolders; /* number of holders of this string */
    };
 
-   struct hb_struSymbol
+   typedef struct _HB_SYMBCARGO
    {
       LONG        stackbase;
       USHORT      lineno;
       USHORT      arguments;
       USHORT      locals;
       USHORT      params;
-      PHB_SYMB    value;
       UINT        uiSuperClass;
+   } HB_SYMBCARGO, * PHB_SYMBCARGO;
+
+   struct hb_struSymbol
+   {
+      PHB_SYMB      value;
+      PHB_SYMBCARGO pCargo;
    };
 
    /* items hold at the virtual machine stack */
@@ -345,6 +350,10 @@
       HB_COUNTER  ulHolders;      /* number of holders of this hash */
    } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
+   #define CBF_DYNAMIC        0x0001
+   #define CBF_DYNAMIC_BUFFER 0x0002
+   #define CBF_PRIVATE_VARS   0x0004
+
    /* internal structure for codeblocks */
    typedef struct _HB_CODEBLOCK
    {
@@ -353,12 +362,10 @@
       USHORT     uiLocals;       /* number of referenced local variables */
       PHB_ITEM   pLocals;        /* table with referenced local variables */
       BYTE       *pCode;         /* codeblock pcode */
-      HB_COUNTER ulCounter;      /* numer of references to this codeblock */
-      BOOL       dynBuffer;      /* is pcode buffer allocated dynamically */
+      USHORT     uiCounter;      /* numer of references to this codeblock */
       USHORT     uLen;
       USHORT     uiClass;
-      BOOL       bPrivVars;      /* Share PRIVATE vars with caller */
-      BOOL       bDynamic;       /* the block is macro-compiled */
+      USHORT     uiFlags;
    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 

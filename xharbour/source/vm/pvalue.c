@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.11 2007/12/08 03:05:19 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.12 2007/12/17 13:55:31 ronpinkas Exp $
  */
 
 /*
@@ -58,18 +58,18 @@
 HB_FUNC( PVALUE )
 {
    USHORT uiParam = hb_parni( 1 ), uiParams;
-   PHB_ITEM *pBase = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.stackbase; /* Skip function + self */
+   PHB_ITEM *pBase = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase; /* Skip function + self */
 
-   uiParams = ( *pBase )->item.asSymbol.arguments;
+   uiParams = ( *pBase )->item.asSymbol.pCargo->arguments;
 
    if( uiParam && uiParam <= uiParams ) /* Valid number */
    {
       USHORT uiOffset;
       PHB_ITEM pItem;
 
-      if( ( *pBase )->item.asSymbol.params == HB_VAR_PARAM_FLAG )
+      if( ( *pBase )->item.asSymbol.pCargo->params == HB_VAR_PARAM_FLAG )
       {
-         uiOffset = ( *pBase )->item.asSymbol.locals;
+         uiOffset = ( *pBase )->item.asSymbol.pCargo->locals;
       }
       else
       {

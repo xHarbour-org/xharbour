@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.26 2007/08/06 20:30:26 likewolf Exp $
+ * $Id: debug.c,v 1.27 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -146,8 +146,8 @@ static LONG hb_stackLen( int iLevel )
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      uiCount = pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase ) - 2;
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      uiCount = pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase ) - 2;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
    return uiCount;
@@ -173,7 +173,7 @@ HB_FUNC( HB_DBG_VMSTKLLIST )
 {
    HB_ITEM Return;
    PHB_ITEM * pItem;
-   PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.stackbase;
+   PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.pCargo->stackbase;
 
    USHORT uiLen = hb_stackLen( 1 );
    USHORT uiPos = 1;
@@ -206,10 +206,10 @@ HB_FUNC( HB_DBG_VMPARLLIST )
 
    while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
    {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
-   uiLen = ( * pBase )->item.asSymbol.arguments;
+   uiLen = ( * pBase )->item.asSymbol.pCargo->arguments;
 
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
@@ -233,7 +233,7 @@ HB_EXPORT PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
    if( iLocal > SHRT_MAX )
@@ -280,7 +280,7 @@ HB_FUNC( HB_DBG_VMVARLSET )
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
    if( iLocal > SHRT_MAX )

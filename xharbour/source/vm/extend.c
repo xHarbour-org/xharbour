@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.63 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: extend.c,v 1.64 2008/03/27 10:26:44 likewolf Exp $
  */
 
 /*
@@ -1048,7 +1048,7 @@ HB_EXPORT int  hb_pcount( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
-   return (int)( hb_stackBaseItem()->item.asSymbol.arguments );
+   return (int)( hb_stackBaseItem()->item.asSymbol.pCargo->arguments );
 }
 
 #undef hb_ret

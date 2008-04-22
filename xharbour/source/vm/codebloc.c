@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.56 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.57 2008/01/14 12:44:30 walito Exp $
  */
 
 /*
@@ -172,14 +172,16 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
     * there is no need to duplicate its pcode - just store the pointer to it
     */
    pCBlock->pCode     = ( BYTE * ) pBuffer;
-   pCBlock->dynBuffer = FALSE;
 
    pCBlock->symbol  = pSymbol;
-   pCBlock->ulCounter = 1;
-   pCBlock->bPrivVars = FALSE;
-   pCBlock->bDynamic = FALSE;
+   pCBlock->uiCounter = 1;
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
+   //pCBlock->dynBuffer = FALSE;
+   //pCBlock->bPrivVars = FALSE;
+   //pCBlock->bDynamic = FALSE;
+   pCBlock->uiFlags = 0;
+
+   HB_TRACE(HB_TR_INFO, ("codeblock created (%i) %lx", pCBlock->uiCounter, pCBlock));
 
    return pCBlock;
 }
@@ -203,14 +205,16 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
     */
    pCBlock->pCode = ( BYTE * ) hb_xgrab( usLen );
    memcpy( pCBlock->pCode, pBuffer, usLen );
-   pCBlock->dynBuffer = TRUE;
 
-   pCBlock->symbol  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
-   pCBlock->ulCounter = 1;
-   pCBlock->bPrivVars = FALSE;
-   pCBlock->bDynamic = TRUE;
+   //pCBlock->dynBuffer = TRUE;
+   //pCBlock->bPrivVars = FALSE;
+   //pCBlock->bDynamic = TRUE;
+   pCBlock->uiFlags = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
+   pCBlock->symbol = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
+   pCBlock->uiCounter = 1;
+
+   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->uiCounter, pCBlock));
 
    return pCBlock;
 }
@@ -223,7 +227,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockDelete(%p)", pItem));
 
-   if( pCBlock && (--pCBlock->ulCounter == 0) )
+   if( pCBlock && (--pCBlock->uiCounter == 0) )
    {
       if( pCBlock->pLocals )
       {
@@ -251,7 +255,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
       /* free space allocated for pcodes - if it was a macro-compiled codeblock
        */
-      if( pCBlock->pCode && pCBlock->dynBuffer )
+      if( pCBlock->pCode && ( pCBlock->uiFlags & CBF_DYNAMIC_BUFFER ) )
       {
          HB_TRACE( HB_TR_DEBUG, ( "Free pCode, %p", pCBlock->pCode ) );
          hb_xfree( pCBlock->pCode );
@@ -297,7 +301,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
    /* free space allocated for pcodes - if it was a macro-compiled codeblock
     */
-   if( pCBlock->pCode && pCBlock->dynBuffer )
+   if( pCBlock->pCode && ( pCBlock->uiFlags & CBF_DYNAMIC_BUFFER ) )
    {
       hb_xfree( pCBlock->pCode );
       pCBlock->pCode = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.87 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: fm.c,v 1.88 2008/03/27 10:26:44 likewolf Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ HB_EXPORT void * hb_xalloc( ULONG ulSize )
       if( hb_stack_ready && HB_VM_STACK.pBase != HB_VM_STACK.pItems )
       {
           /* PRG line number */
-         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
+         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.pCargo->lineno;
           /* PRG ProcName */
          strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
       }
@@ -379,7 +379,7 @@ HB_FORCE_EXPORT void * hb_xgrab( ULONG ulSize )
       if( hb_stack_ready && HB_VM_STACK.pBase != HB_VM_STACK.pItems )
       {
          /* PRG line number */
-         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
+         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.pCargo->lineno;
          /* PRG ProcName */
          strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
       }

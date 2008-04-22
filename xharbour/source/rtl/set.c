@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.86 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: set.c,v 1.87 2008/04/06 11:33:17 likewolf Exp $
  */
 
 /*
@@ -1548,18 +1548,23 @@ HB_FUNC( SET )
       case HB_SET_MACROBLOCKVARS:
          if( pArg3 && HB_IS_BLOCK( pArg3 ) )
          {
-            if( !pArg3->item.asBlock.value->bDynamic )
+            if( ! ( pArg3->item.asBlock.value->uiFlags & CBF_DYNAMIC ) )
             {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                break;
             }
 
-            hb_retl( pArg3->item.asBlock.value->bPrivVars );
-            pArg3->item.asBlock.value->bPrivVars = set_logical( pArg2, pArg3->item.asBlock.value->bPrivVars );
+            hb_retl( ( pArg3->item.asBlock.value->uiFlags & CBF_PRIVATE_VARS ) );
+
+            if( set_logical( pArg2, ( pArg3->item.asBlock.value->uiFlags & CBF_PRIVATE_VARS ) ) )
+            {
+               pArg3->item.asBlock.value->uiFlags |= CBF_PRIVATE_VARS;
+            }
          }
          else
          {
             hb_retl( hb_set.HB_SET_MACROBLOCKVARS );
+
             if( args > 1 )
             {
                hb_set.HB_SET_MACROBLOCKVARS = set_logical( pArg2, hb_set.HB_SET_MACROBLOCKVARS );
@@ -1890,7 +1895,7 @@ HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier )
       case HB_SET_DEVICE:
       case HB_SET_EPOCH:
       case HB_SET_ERRORLOG:
-      case HB_SET_ERRORLOOP: 
+      case HB_SET_ERRORLOOP:
       case HB_SET_EVENTMASK:
       case HB_SET_EXTRAFILE:
       case HB_SET_MARGIN:
@@ -1913,7 +1918,7 @@ HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier )
       case HB_SET_EOL:
       case HB_SET_INVALID_:
          break;
-#if 0 
+#if 0
       /*
        * intentionally removed default: clause to enable C compiler warning
        * when not all HB_SET_* cases are implemented. [druzus]
@@ -1979,7 +1984,7 @@ HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier )
       case HB_SET_DELIMITERS:
       case HB_SET_EOF:
       case HB_SET_EPOCH:
-      case HB_SET_ERRORLOOP: 
+      case HB_SET_ERRORLOOP:
       case HB_SET_ESCAPE:
       case HB_SET_EVENTMASK:
       case HB_SET_EXACT:
@@ -2019,7 +2024,7 @@ HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier )
       case HB_SET_TRIMFILENAME:
       case HB_SET_INVALID_:
          break;
-#if 0 
+#if 0
       /*
        * intentionally removed default: clause to enable C compiler warning
        * when not all HB_SET_* cases are implemented. [druzus]
@@ -2127,7 +2132,7 @@ HB_EXPORT int     hb_setGetNI( HB_set_enum set_specifier )
       case HB_SET_TRIMFILENAME:
       case HB_SET_INVALID_:
          break;
-#if 0 
+#if 0
       /*
        * intentionally removed default: clause to enable C compiler warning
        * when not all HB_SET_* cases are implemented. [druzus]

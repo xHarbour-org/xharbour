@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.216 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: classes.c,v 1.217 2008/04/16 20:05:51 ronpinkas Exp $
  */
 
 /*
@@ -335,10 +335,8 @@ static void hb_clsClear( PCLASS pClass )
    hb_itemRelease( pClass->pClassDatas );
    pClass->pClassDatas = NULL;
 
-   #ifndef CLS_DONT_CLEAR_INLINES
-      hb_itemRelease( pClass->pInlines );
-      pClass->pInlines = NULL;
-   #endif
+   hb_itemRelease( pClass->pInlines );
+   pClass->pInlines = NULL;
 }
 
 void hb_clsDisableDestructors( void )
@@ -467,14 +465,14 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          if( iOptimizedSend == 0 )
          {
             // Outer function level.
-            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
          }
 
          if( strcmp( ( *pBase )->item.asSymbol.value->szName, "__OBJSENDMSG" ) == 0 ||
              strcmp( ( *pBase )->item.asSymbol.value->szName, "ASCAN" ) == 0 )
          {
             // Backtrack 1 level.
-            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
          }
 
          // ----------------- Get the Caller Self -----------------
@@ -585,7 +583,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
             // Outer while in Inline, Eval() or aEval().
             while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) )
             {
-               pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+               pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
             }
          #else
             if( HB_IS_BLOCK( pCaller ) )
@@ -631,7 +629,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                   do
                   {
                      // Backtrack 1 level incase it's INLINE Method.
-                     pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+                     pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
                   }
                   while( ( HB_IS_BLOCK( *( pBase + 1 ) ) && pBase != HB_VM_STACK.pItems ) );
 
@@ -944,7 +942,7 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
       return 0;
    }
 
-   uiCurCls = pBase->item.asSymbol.uiSuperClass;
+   uiCurCls = pBase->item.asSymbol.pCargo->uiSuperClass;
    if( uiCurCls == 0 )
    {
       uiCurCls = hb_objClassH( pObject );
@@ -1734,7 +1732,22 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                {
                   if( HB_IS_ARRAY( pInit ) )
                   {
-                     pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                     if( pInit->item.asArray.value->uiClass )
+                     {
+                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass;
+
+                        if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        {
+                           hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", "hb_clsAddMsg", 1, pInit );
+                           return;
+                        }
+
+                        pNewMeth->pInitValue = hb_objClone( pInit );
+                     }
+                     else
+                     {
+                        pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                     }
                   }
                   else if( HB_IS_HASH( pInit ) )
                   {
@@ -1761,6 +1774,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                      }
                      /* else wihtout realloc. Allocated in __clsnew or __incdata */
                   }
+
                   pClass->pInitValues[ pClass->uiDataInitiated - 1 ].uiData = uiID;
                   pClass->pInitValues[ pClass->uiDataInitiated - 1 ].uiAt   = uiAt;
                   pClass->pInitValues[ pClass->uiDataInitiated - 1 ].pInitValue = pNewMeth->pInitValue;
@@ -1787,7 +1801,22 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                {
                   if( HB_IS_ARRAY( pInit ) )
                   {
-                     pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                     if( pInit->item.asArray.value->uiClass )
+                     {
+                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass;
+
+                        if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        {
+                           hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", "hb_clsAddMsg", 1, pInit );
+                           return;
+                        }
+
+                        pNewMeth->pInitValue = hb_objClone( pInit );
+                     }
+                     else
+                     {
+                        pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                     }
                   }
                   else if( HB_IS_HASH( pInit ) )
                   {
@@ -1814,6 +1843,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                      {
                         pData = hb_itemNew( pInit );
                      }
+
                      hb_arraySetForward( pClass->pClassDatas, pNewMeth->uiData, pData );
                      hb_itemRelease( pData );
                   }
@@ -3493,7 +3523,7 @@ HB_FUNC( __CLASSSEL )
 HB_FUNC( __GETMESSAGE )
 {
    HB_THREAD_STUB_STACK
-   PHB_ITEM pBase = hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.stackbase );
+   PHB_ITEM pBase = hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase );
    hb_retcStatic( pBase->item.asSymbol.value->szName );
 }
 
@@ -3512,7 +3542,7 @@ HB_FUNC( __SENDER )
 
    while( iLevel > 0 && pBase != HB_VM_STACK.pItems )
    {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
       oSender = *( pBase + 1 );
 
       if( ( iLevel-- == 2 && oSender->type != HB_IT_BLOCK ) || oSender->type == HB_IT_NIL )
@@ -3866,7 +3896,7 @@ static HARBOUR hb___msgEvalInline( void )
    uiClass = hb_objClassH( pSelf );
 
    hb_vmPushSymbol( &hb_symEval );
-   hb_stackItemFromTop(-1)->item.asSymbol.uiSuperClass = hb_stackBaseItem()->item.asSymbol.uiSuperClass;
+   hb_stackItemFromTop(-1)->item.asSymbol.pCargo->uiSuperClass = hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass;
    hb_vmPush( hb_arrayGetItemPtr( s_pClasses[ uiClass - 1 ].pInlines, (HB_VM_STACK.pMethod)->uiData ) );
    hb_vmPush( pSelf );            /* Push self                */
 
@@ -3899,8 +3929,11 @@ static HARBOUR hb___msgEval( void )
 
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pSelf );                     /* Push block               */
+
       for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+      {
          hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+      }
 
       hb_vmSend( ( USHORT ) uiPCount );                       /* Self is also an argument */
    }
@@ -4339,7 +4372,7 @@ void hb_clsFinalize( PHB_ITEM pObject )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
+      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {

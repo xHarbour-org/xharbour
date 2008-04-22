@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.208 2008/01/15 01:00:29 likewolf Exp $
+* $Id: thread.c,v 1.209 2008/04/06 22:02:49 likewolf Exp $
 */
 
 /*
@@ -430,8 +430,8 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    {
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = pPointer->item.asSymbol.value;
-      (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
-      (*pPos)->item.asSymbol.uiSuperClass = pPointer->item.asSymbol.uiSuperClass;
+      (*pPos)->item.asSymbol.pCargo->stackbase = pPos - pStack->pItems;
+      (*pPos)->item.asSymbol.pCargo->uiSuperClass = pPointer->item.asSymbol.pCargo->uiSuperClass;
       pPos++;
       (*pPos)->type = HB_IT_NIL;
 
@@ -453,8 +453,8 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    {
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = &hb_symEval;
-      (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
-      (*pPos)->item.asSymbol.uiSuperClass = 0;
+      (*pPos)->item.asSymbol.pCargo->stackbase = pPos - pStack->pItems;
+      (*pPos)->item.asSymbol.pCargo->uiSuperClass = 0;
       pPos++;
       (*pPos)->type = HB_IT_NIL;
       hb_itemCopy( (*pPos), pPointer );
@@ -1614,7 +1614,7 @@ HB_FUNC( STARTTHREAD )
       // Converting it to its Symbol.
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pSymbol;
-      pPointer->item.asSymbol.uiSuperClass = 0;
+      pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
@@ -1649,7 +1649,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pSymbol;
-      pPointer->item.asSymbol.uiSuperClass = 0;
+      pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
@@ -1665,7 +1665,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
-      pPointer->item.asSymbol.uiSuperClass = 0;
+      pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )

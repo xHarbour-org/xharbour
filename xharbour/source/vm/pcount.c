@@ -1,5 +1,5 @@
 /*
- * $Id: pcount.c,v 1.5 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: pcount.c,v 1.6 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -57,5 +57,5 @@
 HB_FUNC( PCOUNT )
 {
    /* Skip current function */
-   hb_retni( hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.stackbase )->item.asSymbol.arguments );
+   hb_retni( hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase )->item.asSymbol.pCargo->arguments );
 }

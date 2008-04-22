@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.94 2008/01/20 23:21:36 likewolf Exp $
+ * $Id: estack.c,v 1.95 2008/03/13 11:12:16 marchuet Exp $
  */
 
 /*
@@ -90,12 +90,18 @@ HB_EXPORT void hb_stackPop( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
    if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) )
+   {
       hb_itemClear( *( HB_VM_STACK.pPos - 1 ) );
+   }
    else
+   {
       ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL;
+   }
 
    if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 }
 
 #undef hb_stackPopReturn
@@ -249,12 +255,14 @@ void hb_stackInit( void )
 
    {
       LONG i;
+
       for( i = 0; i < hb_stackST.wItems; ++i )
       {
          hb_stackST.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
          hb_stackST.pItems[ i ]->type = HB_IT_NIL;
       }
    }
+
    hb_stackST.Return.type = HB_IT_NIL;
 
 #else
@@ -323,12 +331,7 @@ HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams
 
    pStack->lStatics = HB_VM_STACK.lStatics;
 
-   pItem->item.asSymbol.stackbase    = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-   pItem->item.asSymbol.lineno       = 0;
-   pItem->item.asSymbol.uiSuperClass = 0;
-   pItem->item.asSymbol.params       = 0;
-   pItem->item.asSymbol.locals       = 0;
-   pItem->item.asSymbol.arguments    = uiParams;
+   pItem->item.asSymbol.pCargo->arguments = uiParams;
 
    HB_VM_STACK.pBase = pBase;
 
@@ -341,7 +344,8 @@ HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
    int iLocal;
    PHB_ITEM pDetached;
    USHORT uiRequest;
-   LONG stackbase = (*HB_VM_STACK.pBase)->item.asSymbol.stackbase;
+   LONG stackbase = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->stackbase;
+   int iArgs = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->arguments;
 
    uiRequest = hb_vmRequestQuery();
    hb_vmRequestReset();
@@ -352,13 +356,13 @@ HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
 
       iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2;
 
-      if( iLocal >= 0 && iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.arguments && HB_IS_MEMVAR( pItem ) )
+      if( iLocal >= 0 && iLocal <= iArgs && HB_IS_MEMVAR( pItem ) )
       {
-         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.arguments, iLocal, pItem->type );
+         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->arguments, iLocal, pItem->type );
 
          pDetached = hb_itemUnRefOnce( pItem );
 
-         //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.arguments, iLocal, pDetached->type );
+         //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->arguments, iLocal, pDetached->type );
 
          if( HB_IS_BYREF( pDetached ) )
          {
@@ -450,7 +454,7 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
    }
 
-   //printf( "Local %i Params: %i\n", nFromBase, hb_stackBaseItem()->item.asSymbol.arguments );
+   //printf( "Local %i Params: %i\n", nFromBase, hb_stackBaseItem()->item.asSymbol.pCargo->arguments );
 
    return ( * ( HB_VM_STACK.pBase + nFromBase + 1 ) );
 }
@@ -462,19 +466,10 @@ HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase )
 
 
    if( *piFromBase <= 0 )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 
-   //if( pBase->item.asSymbol.paramcnt > pBase->item.asSymbol.paramdeclcnt )
-   //{
-      /* function with variable number of parameters:
-       * FUNCTION foo( a,b,c,...)
-       * LOCAL x,y,z
-       * number of passed parameters is bigger then number of declared
-       * parameters - skip additional parameters only for local variables
-       */
-   //   if( *piFromBase > pBase->item.asSymbol.paramdeclcnt )
-   //      *piFromBase += pBase->item.asSymbol.paramcnt - pBase->item.asSymbol.paramdeclcnt;
-   //}
    return * ( HB_VM_STACK.pBase + *piFromBase + 1 );
 }
 
@@ -518,11 +513,11 @@ HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel )
 {
    if( iLevel > 0 )
    {
-      LONG lBase = (* HB_VM_STACK.pBase )->item.asSymbol.stackbase;
+      LONG lBase = (* HB_VM_STACK.pBase )->item.asSymbol.pCargo->stackbase;
 
       while( ( --iLevel > 0 ) && ( lBase > 0 ) && HB_IS_SYMBOL( *( HB_VM_STACK.pItems + lBase ) ) )
       {
-         lBase = ( *( HB_VM_STACK.pItems + lBase ) )->item.asSymbol.stackbase;
+         lBase = ( *( HB_VM_STACK.pItems + lBase ) )->item.asSymbol.pCargo->stackbase;
       }
 
       if( iLevel == 0 && lBase >= 0 && HB_IS_SYMBOL( *( HB_VM_STACK.pItems + lBase ) ) )
@@ -562,7 +557,7 @@ void hb_stackDispLocal( void )
    printf( hb_conNewLine() );
    printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"),
            ( *(HB_VM_STACK.pBase) )->item.asSymbol.value->szName,
-           ( *(HB_VM_STACK.pBase) )->item.asSymbol.lineno );
+           ( *(HB_VM_STACK.pBase) )->item.asSymbol.pCargo->lineno );
    printf( hb_conNewLine() );
    printf( "--------------------------" );
 
@@ -662,17 +657,17 @@ void hb_stackDispCall( void )
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
       {
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
       else
       {
-         sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
 
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
    while( pBase > HB_VM_STACK.pItems );
 }
@@ -697,16 +692,16 @@ LONG WINAPI hb_UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionI
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
       {
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         sprintf( buffer, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
       else
       {
-         sprintf( buffer, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         sprintf( buffer, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
 
       strcat( msg, buffer );
 
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
    while( pBase != HB_VM_STACK.pItems );
 
@@ -743,14 +738,14 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
       {
          if( HB_IS_ARRAY( *( pBase + 1 ) ) )
          {
-            fprintf( stderr, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+            fprintf( stderr, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
          }
          else
          {
-            fprintf( stderr, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+            fprintf( stderr, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
          }
 
-         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
       }
       while( pBase != HB_VM_STACK.pItems );
    }

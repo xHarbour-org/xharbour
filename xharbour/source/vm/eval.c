@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.34 2007/06/04 20:55:02 ronpinkas Exp $
+ * $Id: eval.c,v 1.35 2008/03/27 10:26:43 likewolf Exp $
  */
 
 /*
@@ -796,8 +796,11 @@ HB_FUNC( HB_EXEC )
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pSymbol;
-      pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
-      pPointer->item.asSymbol.uiSuperClass = 0;
+
+      pPointer->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
+      memcpy( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
+      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+      pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
 
       if( bSend )
       {

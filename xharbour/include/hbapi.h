@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.240 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: hbapi.h,v 1.241 2008/04/16 20:05:51 ronpinkas Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
 #define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFFFFFF )
-#define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_POINTER | HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
+#define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_POINTER | HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF | HB_IT_SYMBOL ) )
 #define HB_IT_GCITEM    ( ( HB_TYPE ) ( HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_HASH | HB_IT_POINTER | HB_IT_BYREF ) )
 
 #define HB_ITEM_TYPERAW( p )   ( ( p )->type )
@@ -437,7 +437,7 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
       #include "hbstack.h"
    #endif
 
-   #define hb_pcount()                          ( ( int ) ( ( * HB_VM_STACK.pBase )->item.asSymbol.arguments ) )
+    #define hb_pcount()                          ( ( int ) ( ( * HB_VM_STACK.pBase )->item.asSymbol.pCargo->arguments ) )
 
     #define hb_ret()                             hb_itemClear( hb_stackReturnItem() )
     #define hb_reta( ulLen )                     hb_arrayNew( hb_stackReturnItem(), (ulLen) )

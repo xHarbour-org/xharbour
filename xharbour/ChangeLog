@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6035 2008/04/19 12:49:15 lculik Exp $
+ * $Id: ChangeLog,v 1.6036 2008/04/20 07:08:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-22 00:06 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * include/hbvmpub.h
+  * source/rtl/set.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/eval.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/vm/pcount.c
+  * source/vm/proc.c
+  * source/vm/pvalue.c
+  * source/vm/thread.c
+    % Optimized memory consumption by reducing size of HB_ITEM and HB_CODEBLOCK
+  * source/vm/classes.c
+    * Raise RTE if INIT Value or CLASSDATA value is an instance of a class utilizing a Destructor
+  * source/vm/hvm.c
+    * Further refinment and GPF traps of shutdown sequence in hb_vmQuit()
+      /* TODO: There are some guidelines still to be documented. */
+
+  * source/pp/ppcore.c
+    * Improved HB_PP_ERR_BAD_MATCH_MARKER text description to include marker name
 
 2008-04-20 14:10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/vm/maindllp.c
@@ -23,10 +52,10 @@
   * config/linux/gcc.cf
     ! added zlib to link
   * source/rtl/Makefile
-    ! added zlib to compile 
+    ! added zlib to compile
   + source/rtl/zlib/Makefile
     ! added makefile to build zlib
-    
+
 2008-04-17 16:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * contrib\hbzlib\zip.c
     contrib\hbzlib\ziparchive.cpp

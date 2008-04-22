@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.113 2008/01/14 13:07:30 walito Exp $
+ * $Id: fastitem.c,v 1.114 2008/03/27 10:26:44 likewolf Exp $
  */
 
 /*
@@ -263,6 +263,13 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
          hb_gcDecRef( (void *) pItem->item.asPointer.value );
       }
    }
+   else if( HB_IS_SYMBOL( pItem ) )
+   {
+      assert( pItem->item.asSymbol.pCargo );
+      hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+      pItem->item.asSymbol.pCargo = NULL;
+   }
+
    pItem->type = HB_IT_NIL;
 }
 
@@ -342,6 +349,12 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
       {
          hb_gcDecRef( (void *) pItem->item.asPointer.value );
       }
+   }
+   else if( HB_IS_SYMBOL( pItem ) )
+   {
+      assert( pItem->item.asSymbol.pCargo );
+      hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+      pItem->item.asSymbol.pCargo = NULL;
    }
 
    pItem->type = HB_IT_NIL;
@@ -447,7 +460,7 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       }
       else if( HB_IS_BLOCK( pSource ) )
       {
-         pSource->item.asBlock.value->ulCounter++;
+         pSource->item.asBlock.value->uiCounter++;
       }
       else if( HB_IS_HASH( pSource ) )
       {
@@ -459,6 +472,10 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          {
              hb_gcIncRef( (void *) pSource->item.asPointer.value );
          }
+      }
+      else
+      {
+         assert( 0 );
       }
    }
 }
@@ -1058,7 +1075,7 @@ HB_EXPORT BYTE hb_itemParamId( PHB_ITEM pItem )
    PHB_ITEM *pTop;
    BYTE iId = 1;
 
-   pTop = pBase + hb_stackBaseItem()->item.asSymbol.arguments + 1;
+   pTop = pBase + hb_stackBaseItem()->item.asSymbol.pCargo->arguments + 1;
    while( pBase < pTop )
    {
      if( *pBase == pItem )

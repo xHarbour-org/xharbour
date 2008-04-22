@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.32 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: proc.c,v 1.33 2008/02/09 02:53:19 ronpinkas Exp $
  */
 
 /*
@@ -157,11 +157,11 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
       {
          if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
+            uiSuperClass = ( *pBase )->item.asSymbol.pCargo->uiSuperClass;
 
             if( uiSuperClass && uiSuperClass <= hb_clsMaxClasses() )
             {
-               strcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.uiSuperClass - 1 )->szName );
+               strcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.pCargo->uiSuperClass - 1 )->szName );
             }
             else
             {
@@ -219,7 +219,7 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
          }
          else
          {
-            *uLine = ( *pBase )->item.asSymbol.lineno;
+            *uLine = ( *pBase )->item.asSymbol.pCargo->lineno;
          }
       }
 
@@ -229,7 +229,7 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
             if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
             {
                // Find the real module where the Method is defined.
-               if( ( *pBase )->item.asSymbol.uiSuperClass )
+               if( ( *pBase )->item.asSymbol.pCargo->uiSuperClass )
                {
                   uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
                }

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.268 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.269 2008/02/16 15:01:13 ronpinkas Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ static const char * hb_pp_szErrors[] =
    "Missing => in #translate/#command",                                 /* C2059 */
    "Unknown result marker in #translate/#command: '%s'",                /* C2060 */
    "Label error in #translate/#command: '%s'",                          /* C2061 */
-   "Bad match marker in #translate/#command",                           /* C2062 */
+   "Bad match marker '%s' in #translate/#command",                      /* C2062 */
    "Empty optional clause in #translate/#command",                      /* C2065 */
    "Unclosed optional clause in #translate/#command",                   /* C2066 */
    "Error in #ifdef",                                                   /* C2068 */
@@ -2962,7 +2962,7 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
          {
             if( !hb_pp_matchMarkerNew( pTokenPtr, pMarkerListPtr ) )
             {
-               hb_pp_error( pState, 'E', HB_PP_ERR_BAD_MATCH_MARKER, NULL );
+               hb_pp_error( pState, 'E', HB_PP_ERR_BAD_MATCH_MARKER, ( * pTokenPtr )->value );
                return FALSE;
             }
             /* now pTokenPtr points to marker keyword, all other tokens

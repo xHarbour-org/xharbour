@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.154 2008/03/07 20:27:18 likewolf Exp $
+ * $Id: arrays.c,v 1.155 2008/03/20 15:25:51 likewolf Exp $
  */
 
 /*
@@ -548,6 +548,10 @@ HB_EXPORT BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    {
       hb_itemClear( pItem );
    }
+   else
+   {
+      pItem->type = HB_IT_NIL;
+   }
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -574,8 +578,6 @@ HB_EXPORT BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       hb_itemPutCLStatic( pItem, hb_szAscii[ (UCHAR) ( pArray->item.asString.value[ ulIndex - 1 ] ) ], 1 );
       return TRUE;
    }
-
-   pItem->type = HB_IT_NIL;
 
    return FALSE;
 }
@@ -1777,11 +1779,11 @@ HB_EXPORT PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase )
 
       HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
-      uiPCount = pBaseItem->item.asSymbol.arguments;
+      uiPCount = pBaseItem->item.asSymbol.pCargo->arguments;
 
-      if( pBaseItem->item.asSymbol.params == HB_VAR_PARAM_FLAG )
+      if( pBaseItem->item.asSymbol.pCargo->params == HB_VAR_PARAM_FLAG )
       {
-         uiOffset = pBaseItem->item.asSymbol.locals;
+         uiOffset = pBaseItem->item.asSymbol.pCargo->locals;
       }
       else
       {
@@ -1818,7 +1820,7 @@ HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySelfParams()"));
 
    pArray = hb_itemNew( NULL );
-   uiPCount = hb_stackBaseItem()->item.asSymbol.arguments;
+   uiPCount = hb_stackBaseItem()->item.asSymbol.pCargo->arguments;
 
    hb_arrayNew( pArray, uiPCount + 1 );
 

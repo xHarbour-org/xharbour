@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.71 2007/09/03 18:08:56 paultucker Exp $
+ * $Id: arrayshb.c,v 1.72 2008/03/13 04:26:10 ronpinkas Exp $
  */
 
 /*
@@ -589,7 +589,6 @@ HB_FUNC( HB_AEXPRESSIONS )
       return;
    }
 
-   HB_VM_STACK.Return.type = HB_IT_NIL;
    hb_arrayNew( hb_stackReturnItem(), 0 );
 
    for( i = 0; i < pLine->item.asString.length; i++ )
