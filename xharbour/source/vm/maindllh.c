@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.6 2005/02/27 21:28:25 andijahja Exp $
+ * $Id: maindllh.c,v 1.7 2008/03/27 10:26:45 likewolf Exp $
  */
 
 /*
@@ -63,19 +63,18 @@
 #if defined(HB_OS_WIN_32)
 HB_EXTERN_BEGIN
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
-HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
 #else
-HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
 #endif
 
    HB_SYMBOL_UNUSED( hInstance );
-   HB_SYMBOL_UNUSED( fdwReason );
    HB_SYMBOL_UNUSED( pvReserved );
 
    switch( fdwReason )

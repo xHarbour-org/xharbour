@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.24 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: maindllp.c,v 1.25 2008/04/20 07:08:45 andijahja Exp $
  */
 
 /*
@@ -68,12 +68,12 @@ static FARPROC pExtIsArray = NULL;
 static FARPROC hb_GetProcAddress( char* szFuncName );
 
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
-HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllMain( %p, %p, %d )", hInstance, fdwReason,
              pvReserved ) );
 #else
-HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint( %p, %p, %d )", hInstance, fdwReason,
              pvReserved ) );
