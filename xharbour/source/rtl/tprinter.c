@@ -830,7 +830,8 @@ HB_FUNC( GETPRINTERS )
          }
       }
    }
-   hb_itemReturnForward( ArrayPrinter );
+
+   hb_itemReturnRelease( ArrayPrinter );
 }
 
 #endif
