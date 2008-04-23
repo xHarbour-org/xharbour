@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.17 2008/03/20 08:53:06 brianhays Exp $
+ * $Id: adsmgmnt.c,v 1.18 2008/03/20 15:35:16 ronpinkas Exp $
  */
 
 /*
@@ -426,13 +426,25 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
       for ( ulCount = 1; ulCount <= ulMaxUsers; ulCount++ )
       {
          pArrayItm = hb_arrayGetItemPtr( pArray, ulCount );
+#if ADS_REQUIRE_VERSION >= 8
+         hb_arrayNew( pArrayItm, 6 );
+#else
          hb_arrayNew( pArrayItm, 3 );
+#endif
          hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 1 ),
                       ( char * ) pastUserInfo[ulCount].aucUserName );
          hb_itemPutNL( hb_arrayGetItemPtr( pArrayItm, 2 ),
                        pastUserInfo[ulCount].usConnNumber );
          hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 3 ),
                       ( char * ) pastUserInfo[ulCount].aucAddress );
+#if ADS_REQUIRE_VERSION >= 8
+         hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 4 ),
+                      ( char * ) pastUserInfo[ulCount].aucAuthUserName );
+         hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 5 ),
+                      ( char * ) pastUserInfo[ulCount].aucOSUserLoginName );
+         hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 6 ),
+                      ( char * ) pastUserInfo[ulCount].aucTSAddress );
+#endif
       }
       hb_itemRelease( hb_itemReturn( pArray ) );
    }
