@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.10 2006/12/10 12:33:36 ptsarenko Exp $
+ * $Id: txtline.c,v 1.11 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -432,6 +432,8 @@ HB_FUNC( MEMOLINE )
    HB_ITEM Opt;
    PHB_ITEM pTerm1;
    char * szRet;
+   BOOL bAlloc_EOL = FALSE;
+   BOOL bAlloc_Term1 = FALSE;
 
    if ( ulStartOffset > 0 )
    {
@@ -453,10 +455,12 @@ HB_FUNC( MEMOLINE )
    {
       if( hb_set.HB_SET_EOL == NULL )
       {
+         bAlloc_EOL = TRUE;
          hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
       }
 
       pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
+      bAlloc_Term1 = TRUE;
    }
    else
    {
@@ -523,6 +527,16 @@ HB_FUNC( MEMOLINE )
    {
       ulStartOffset = ulTextLen;
       hb_retclenAdopt( szRet, ulLineSize );
+   }
+
+   if ( bAlloc_EOL )
+   {
+      hb_xfree( hb_set.HB_SET_EOL );
+   }
+
+   if ( bAlloc_Term1 )
+   {
+      hb_itemRelease( pTerm1 );
    }
 
    hb_stornl(  ulStartOffset + 1 , 7 ) ;  // add 1 to change from "C" array pos to xHarbour string pos
