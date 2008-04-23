@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.12 2008/04/23 11:17:18 andijahja Exp $
+ * $Id: txtline.c,v 1.13 2008/04/23 12:40:24 andijahja Exp $
  */
 
 /*
@@ -248,6 +248,8 @@ HB_FUNC( HB_READLINE )
    ULONG ulEndOffset, ulTextLen;
    LONG lEnd;
    HB_ITEM Opt;
+   BOOL bAlloc_EOL = FALSE;
+   BOOL bAlloc_Term1 = FALSE;
 
    if( !ISCHAR( 1 ) )
    {
@@ -272,9 +274,11 @@ HB_FUNC( HB_READLINE )
       if( ! hb_set.HB_SET_EOL )
       {
          hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
+         bAlloc_EOL = TRUE;
       }
 
       pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
+      bAlloc_Term1 = TRUE;
    }
    else
    {
@@ -313,6 +317,16 @@ HB_FUNC( HB_READLINE )
    hb_storl( bEOF, 8 );
    hb_stornl( lEnd + ulStartOffset + 1, 9 );
    hb_stornl( ulEndOffset + ulStartOffset + 1, 10 );
+
+   if( bAlloc_EOL )
+   {
+      hb_xfree( hb_set.HB_SET_EOL );
+   }
+
+   if( bAlloc_Term1 )
+   {
+      hb_itemRelease( pTerm1 );
+   }
 
    hb_xfree( Term );
    hb_xfree( iTermSizes );
@@ -577,6 +591,8 @@ HB_FUNC( MLPOS )
    int * iTermSizes;
    HB_ITEM Opt;
    PHB_ITEM pTerm1;
+   BOOL bAlloc_EOL = FALSE;
+   BOOL bAlloc_Term1 = FALSE;
 
    if( ulLineSize < 4 || (bLongLines ? 0 : ulLineSize > 254) )
    {
@@ -595,8 +611,10 @@ HB_FUNC( MLPOS )
       if( !hb_set.HB_SET_EOL )
       {
          hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
+         bAlloc_EOL = TRUE;
       }
       pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
+      bAlloc_Term1 = TRUE;
    }
    else
    {
@@ -649,6 +667,16 @@ HB_FUNC( MLPOS )
    if( !bLineFound)
    {
       hb_retni( ulTextLen );
+   }
+
+   if ( bAlloc_EOL )
+   {
+      hb_xfree( hb_set.HB_SET_EOL );
+   }
+
+   if ( bAlloc_Term1 )
+   {
+      hb_itemRelease( pTerm1 );
    }
 
    hb_xfree( Term );
