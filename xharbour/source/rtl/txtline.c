@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.11 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: txtline.c,v 1.12 2008/04/23 11:17:18 andijahja Exp $
  */
 
 /*
@@ -338,6 +338,8 @@ HB_FUNC( MLCOUNT )
    int * iTermSizes;
    HB_ITEM Opt;
    PHB_ITEM pTerm1;
+   BOOL bAlloc_EOL = FALSE;
+   BOOL bAlloc_Term1 = FALSE;
 
    if( ulLineSize < 4 || (bLongLines ? 0 : ulLineSize > 254) )
    {
@@ -356,9 +358,11 @@ HB_FUNC( MLCOUNT )
       if( !hb_set.HB_SET_EOL )
       {
          hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
+	 bAlloc_EOL = TRUE;
       }
 
       pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
+      bAlloc_Term1 = TRUE;
    }
    else
    {
@@ -404,6 +408,16 @@ HB_FUNC( MLCOUNT )
    if( ulCurLength > 0 )
    {
       ulLines++;
+   }
+
+   if( bAlloc_EOL )
+   {
+      hb_xfree( hb_set.HB_SET_EOL );
+   }
+
+   if( bAlloc_Term1 )
+   {
+      hb_itemRelease( pTerm1 );
    }
 
    hb_xfree( Term );
