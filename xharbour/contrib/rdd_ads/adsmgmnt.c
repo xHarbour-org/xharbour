@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.18 2008/03/20 15:35:16 ronpinkas Exp $
+ * $Id: adsmgmnt.c,v 1.19 2008/04/23 00:52:55 kaddath Exp $
  */
 
 /*
@@ -624,7 +624,7 @@ HB_FUNC( ADSMGGETOPENINDEXES )      /* nMaxNumberOfFilesToReturn, cTableName, cU
 
    if( ISNUM( 4 ) )
    {
-       usConnNumber = (UNSIGNED16) hb_parnl( 3 );
+       usConnNumber = (UNSIGNED16) hb_parnl( 4 );
    }
 
    astOpenIndexInfo = ( ADS_MGMT_INDEX_INFO * ) hb_xgrab( sizeof( ADS_MGMT_INDEX_INFO ) * pusArrayLen );
