@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.89 2008/04/15 23:46:05 lculik Exp $
+ * $Id: adsfunc.c,v 1.90 2008/04/16 20:29:47 ronpinkas Exp $
  */
 
 /*
@@ -1999,6 +1999,35 @@ HB_FUNC( ADSCACHEOPENCURSORS )
    UNSIGNED32 ulRetVal = AdsCacheOpenCursors( usOpen );
 
    hb_retnl( ulRetVal );
+}
+
+// Use AdsIsEmpty() to determine if the indicated field is NULL for ADTs or empty for DBFs
+HB_FUNC( ADSISEMPTY )
+{
+   UNSIGNED32 ulRetVal = ~AE_SUCCESS;
+   UNSIGNED16 pbEmpty = FALSE;
+   ADSAREAP   pArea;
+   UNSIGNED8* pucFldName;
+
+   pArea = hb_rddGetADSWorkAreaPointer();
+   if( ! ISCHAR( 1 ) && ! ISNUM( 1 ) )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSISEMPTY" );
+      return;
+   }
+   else if( pArea )
+   {
+      pucFldName = (UNSIGNED8 *) ( ISCHAR( 1 ) ? hb_parcx( 1 ) : ADSFIELD( hb_parni( 1 ) ) );
+      ulRetVal = AdsIsEmpty( pArea->hTable, pucFldName, &pbEmpty );
+   }
+
+   if ( ! pArea || ulRetVal != AE_SUCCESS )
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISEMPTY" );
+      return;
+   }
+
+   hb_retl( pbEmpty );
 }
 
 #if ADS_REQUIRE_VERSION >= 6
