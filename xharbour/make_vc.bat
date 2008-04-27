@@ -37,13 +37,11 @@ if "%1" == "CLEAN" goto CLEAN
 :BUILD
    SET HB_MT=
    SET HB_MT_DIR=
-   REM nmake USE_MSVCRT=1 /f makefile.vc %1 %2 %3
    nmake /NOLOGO /f makefile.vc %1 %2 %3 >make_vc.log
    if errorlevel 1 goto BUILD_ERR
 
-   SET HB_MT=MT
+   SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   REM nmake USE_MSVCRT=1 HB_THREAD_SUPPORT=1 /f makefile.vc %1 %2 %3
    nmake /NOLOGO HB_THREAD_SUPPORT=1 /f makefile.vc %1 %2 %3 >>make_vc.log
    if errorlevel 1 goto BUILD_ERR
 

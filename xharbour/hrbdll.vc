@@ -9,6 +9,12 @@
 #
 #===============================================================================
 
+# Comment this line if use of LIBC* is preferred
+# USE_MSVCRT=1
+
+# Comment this line if use of C-Mode is preferred
+CPLUSPLUS=1
+
 # Comment this line if ST mode is preferred
 DLL_MT=mt
 
@@ -67,39 +73,44 @@ CLIBFLAGS   =
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!if ("$(CPLUSPLUS)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -TP
+!endif
 !if ("$(DLL_MT)"=="mt")
-HARBOURFLAGS  =$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
-CLIBFLAGS     =$(CLIBFLAGS) -MT -DHB_THREAD_SUPPORT
-NO_MT	      =
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
+CLIBFLAGS=$(CLIBFLAGS) -DHB_THREAD_SUPPORT
+!if ("$(USE_MSVCRT)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -MD
 !else
-NO_MT	      =mt
+CLIBFLAGS=$(CLIBFLAGS) -MT
+!endif
 !endif
 
-INCLUDE_DIR   =include;$(OBJ_DIR)
+INCLUDE_DIR=include
 
 DLLFLAGS=\
 	/OUT:$(HARBOUR_DLL)\
 	/DLL\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/NOLOGO\
-	/NODEFAULTLIB:LIBC$(NO_MT).LIB /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR)\
+	/LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:WINDOWS\
 	/OPT:WIN98\
 	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
 
 EXEFLAGS=\
 	/NOLOGO /LIBPATH:$(CC_DIR)\LIB\
-	/NODEFAULTLIB:LIBC$(NO_MT).LIB /LIBPATH:$(LIB_DIR)\
+	/LIBPATH:$(LIB_DIR)\
 	/OPT:WIN98 /SUBSYSTEM:CONSOLE
 
-CLIBFLAGS     =$(CLIBFLAGS) -c -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo
-HARBOURFLAGS  =$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+CLIBFLAGS   =$(CLIBFLAGS) -c -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 
-CC_CMD        =CL $(CLIBFLAGS) -Fo$@ $**
-HB_CMD        =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN   =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
-BISON_CMD1    =bison -v -d $** -o$@
-BISON_CMD2    =bison -v -p hb_comp -d $** -o$@
+CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+BISON_CMD1  =bison -v -d $** -o$@
+BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 
 #===============================================================================
 # The Project

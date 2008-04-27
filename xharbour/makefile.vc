@@ -9,6 +9,12 @@
 #
 #===============================================================================
 
+# Comment this line if use of LIBC* is preferred
+USE_MSVCRT=1
+
+# Comment this line if use of C-Mode is preferred
+CPLUSPLUS=1
+
 #===============================================================================
 # Macro Definitions
 #===============================================================================
@@ -43,42 +49,34 @@ CLIBFLAGS   =
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
-!ifdef USE_MSVCRT
-_CFL=-MD
-!endif
-
 INCLUDE_DIR  =include
 INCLUDE_DIR2 =include
 INCLUDE_DIR  =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -Isource\compiler -Isource\macro -I$(CC_DIR)\include
-_CFL         =$(_CFL) -Ogt2yb1p -FD -GB -GA -Gs -TP -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE $(C_USR) $(CFLAGS)
-HARBOURFLAGS =-i$(INCLUDE_DIR2) -q0 -w2 -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+!if ("$(USE_MSVCRT)"=="1")
+_CFL=-MD
+!endif
+!if ("$(CPLUSPLUS)"=="1")
+_CFL=$(_CFL) -TP
+!endif
+_CFL        =$(_CFL) -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -D_CRT_SECURE_NO_DEPRECATE
+HARBOURFLAGS=-iinclude -q0 -w2 -es2 -gc0 $(HARBOURFLAGS)
 
-!ifdef HB_THREAD_SUPPORT
-HB_MT	     =MT
-NO_DEFAULT   =
-HARBOURFLAGS =$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
-!ifdef USE_MSVCRT
-CLIBFLAGS    =-c -DHB_THREAD_SUPPORT -D_MT $(_CFL) $(CLIBFLAGS)
+!if ("$(HB_THREAD_SUPPORT)"=="1")
+HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+!if ("$(USE_MSVCRT)"=="1")
+CLIBFLAGS=-c -DHB_THREAD_SUPPORT $(_CFL) $(CLIBFLAGS)
 !else
-CLIBFLAGS    =-c -MT -DHB_THREAD_SUPPORT -D_MT $(_CFL) $(CLIBFLAGS)
+CLIBFLAGS=-c -MT -DHB_THREAD_SUPPORT -D_MT $(_CFL) $(CLIBFLAGS)
 !endif
 !else
-HB_MT	     =
-NO_DEFAULT   =MT
-CLIBFLAGS    =-c $(_CFL) $(CLIBFLAGS)
+CLIBFLAGS=-c $(_CFL) $(CLIBFLAGS)
 !endif
 
-!ifdef USE_MSVCRT
 LINKERFLAGS=\
-	/NOLOGO /LIBPATH:$(CC_DIR)\LIB\
-	/NODEFAULTLIB:LIBC$(NO_DEFAULT).LIB /LIBPATH:$(LIB_DIR)\
-	/SUBSYSTEM:CONSOLE
-!else
-LINKERFLAGS=\
-	/NOLOGO /LIBPATH:$(CC_DIR)\LIB\
-	/DEFAULTLIB:LIBC$(HB_MT).LIB\
-	/NODEFAULTLIB:LIBC$(NO_DEFAULT).LIB /LIBPATH:$(LIB_DIR)\
-	/SUBSYSTEM:CONSOLE
+	/NOLOGO /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR) /SUBSYSTEM:CONSOLE
+
+!if ("$(USE_MSVCRT)"=="")
+LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
 !endif
 
 #-------------------------------------------------------------------------------
