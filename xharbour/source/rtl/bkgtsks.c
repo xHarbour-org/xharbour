@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.21 2008/01/27 23:14:43 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.22 2008/02/02 16:09:30 ronpinkas Exp $
  */
 
 /*
@@ -401,7 +401,7 @@ HB_FUNC( HB_BACKGROUNDRUN )
 /* forces to run Background functions */
 HB_FUNC( HB_BACKGROUNDRUNFORCED )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    if ( hb_parinfo( 1 ) & HB_IT_NUMERIC )
    {
       ULONG ulID = hb_parnl( 1 );

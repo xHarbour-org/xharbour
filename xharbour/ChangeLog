@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6044 2008/04/24 11:47:20 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.6045 2008/04/26 00:44:12 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,53 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-27 21:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * make_b32.bat
+  * make_vc.bat
+  * make_w32.bat
+  * make_pc.bat
+  * make_gc.bat
+  * make_dc.bat
+  * dll_b32.bat
+  * dll_w32.bat
+  * dll_vc.bat
+  * dll_pc.bat
+  * dll_gc.bat
+  * dll_dc.bat
+  * makefile.bc
+  * makefile.vc
+  * makefile.wc
+  * makefile.pc
+  * makefile.gc
+  * makefile.dc
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+  * hrbdll.pc
+  * hrbdll.gc
+  * hrbdll.dc
+  + mdir.bat
+  + compile.mak
+  + common.mak
+  + target.mak
+  + compile.mak
+  - make_b16.bat
+    /*
+    NOTE:
+      A total overhaul has been implemented in Windows (non_GNU) makefiles:
+      * remove 16-bit build
+      * use shared files
+      * macro simplification for plain readability and easy maintenance
+      * where possible, the default DLL build is in MT mode. DLL compiled
+        in MT mode should be usable in ST-mode applications.
+    */
+
+  * source/vm/hvm.c
+    ! casting on initialization of ModuleFakeDyn (NULL->0)
+
+  * source/rtl/bkgtsks.c
+    - remove unused variable (MT)
 
 2008-04-25 17:38 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/adsfunc.c

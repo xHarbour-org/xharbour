@@ -1,80 +1,71 @@
 @echo off
+rem ============================================================================
 rem
-rem $Id: dll_gc.bat,v 1.2 2005/03/03 14:16:44 andijahja Exp $
+rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
 rem
-rem Batch File For Building xHarbour DLL with MinGW32 under Windows
+rem FILE: dll_gc.bat
+rem BATCH FILE FOR MINGW (DLL)
 rem
-rem What we have to do is to set the following 3 envars, ONE, TWO and THREE
+rem This is Generic File, do not change it. If you should require your own build
+rem version, changes should only be made on your local copy.(AJ:2008-04-26)
+rem
+rem ============================================================================
 
-rem ENVAR ONE
-rem Our MinGW32 Root Directory
-@set MINGWDIR=F:/MinGW
+SET CC_DIR=C:/MinGW
+SET BISON_DIR=C:/MSYS/1.0/bin
+SET SUB_DIR=gc
+SET HB_GT_LIB=$(GTWIN_LIB)
 
-rem ENVAR TWO
-rem Our BISON BIN Directory
-@set BISONDIR=F:/Bison/bin
+SET _PATH=%PATH%
+SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
-rem ENVAR THREE
-rem SET xHarbour Working Root Directory Here
-@set HARBOUR_DIR=C:/xharbour
-
-rem Set up our environment for output files here
-rem Let them be like that
-
-rem Set up our BIN paths
-@set _PATH=%PATH%
-@set PATH=%MINGWDIR%\bin;%BISONDIR%
-
-@set BIN_DIR=bin\gcc
-@set LIB_DIR=lib\gcc
-@set OBJ_DIR=obj\gcc\dll
+rem ============================================================================
+rem The followings should never change
+rem Do not hard-code in makefile because there are needed for clean build
+rem ============================================================================
+SET LIBEXT=.a
+SET OBJEXT=.o
+SET DIR_SEP=/
+SET LIBPREFIX=lib
+rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
+if "%1" == "/clean" goto CLEAN
+if "%1" == "/CLEAN" goto CLEAN
+
+   @CALL mdir.bat dllcreate
 
 :BUILD
-
-if not exist lib                       md lib
-if not exist obj                       md obj
-if not exist %LIB_DIR%                 md %LIB_DIR%
-if not exist %OBJ_DIR%                 md %OBJ_DIR%
-
-   mingw32-make.exe -f hrbdll.gc
+   rem==========================================================================
+   rem We use HB_MT_DIR envar for DLL object folder here
+   rem==========================================================================
+   SET HB_MT_DIR=/dll
+   mingw32-make.exe -fhrbdll.gc %1 %2 %3 1>dll_gc0.log 2>dll_gc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-
+   @CALL mdir.bat dllcopy
    goto EXIT
 
 :BUILD_ERR
-
+   notepad dll_gc.log
    goto EXIT
 
 :CLEAN
-
-if exist %LIB_DIR%\libharbour.a       del %LIB_DIR%\libharbour.a
-if exist %LIB_DIR%\harbour.dll        del %LIB_DIR%\harbour.dll
-if exist %BIN_DIR%\harbour.dll        del %BIN_DIR%\harbour.dll
-if exist %LIB_DIR%\harbour.def        del %LIB_DIR%\harbour.def
-if exist %BIN_DIR%\xharbourdll.exe    del %BIN_DIR%\xharbourdll.exe
-if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
-if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
-if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
-if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
-if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
-if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
-if exist %OBJ_DIR%\*.o                del %OBJ_DIR%\*.o
-if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h
-if exist %OBJ_DIR%\*.output           del %OBJ_DIR%\*.output
-   goto EXIT
+   @CALL mdir.bat dllclean
+   if exist dll_gc.log del dll_gc.log
+   if exist dll_gc0.log del dll_gc0.log
 
 :EXIT
-rem Clean up and restore environment
-@set PATH=%_PATH%
-@set _PATH=
-@set BIN_DIR=
-@set OBJ_DIR=
-@set LIB_DIR=
-@set MINGWDIR=
-@set BISONDIR=
-@set HARBOUR_DIR=
+   SET CC_DIR=
+   SET BISON_DIR=
+   SET SUB_DIR=
+   SET HB_GT_LIB=
+   SET PATH=%_PATH%
+   SET _PATH=
+   SET LIBEXT=
+   SET OBJEXT=
+   SET DIR_SEP=
+   SET LIBPREFIX=
+   SET HB_MT_DIR=

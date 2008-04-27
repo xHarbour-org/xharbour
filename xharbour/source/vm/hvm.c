@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.674 2008/04/16 21:36:27 ronpinkas Exp $
+ * $Id: hvm.c,v 1.675 2008/04/22 04:40:42 ronpinkas Exp $
  */
 
 /*
@@ -344,7 +344,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
   static int s_iBackground = 0;
 #endif
 
-static HB_DYNS ModuleFakeDyn = { NULL };
+static HB_DYNS ModuleFakeDyn = { 0 };
 
 HB_EXPORT void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {

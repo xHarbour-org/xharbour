@@ -1,93 +1,95 @@
 @echo off
-rem 
-rem $Id: make_vc.bat,v 1.13 2005/12/14 05:25:19 paultucker Exp $
-rem 
-
-rem ---------------------------------------------------------------
-rem This is a generic template file, if it doesn't fit your own needs 
-rem please DON'T MODIFY IT.
+rem ============================================================================
 rem
-rem Instead, make a local copy and modify that one, or make a call to 
-rem this batch file from your customized one. [vszakats]
-rem ---------------------------------------------------------------
+rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem
+rem FILE: nake_vc.bat
+rem BATCH FILE FOR MSVC
+rem
+rem This is Generic File, do not change it. If you should require your own build
+rem version, changes should only be made on your local copy.(AJ:2008-04-26)
+rem
+rem ============================================================================
 
-set rem=rem
-if "%1"=="/?" set rem=echo.
-%rem% ---------------------------------------------------------------
-%rem% Usage: make_vc [/y] [/a or CLEAN or other specific target]
-%rem% Call with nothing, /Y, /A, or CLEAN
-%rem% nothing - compiles what needs it.  If hb_mt is set, then multi-threaded
-%rem% versions of the harbour programs will be placed into the bin directory.
-%rem% CLEAN, delete targets.
-%rem% /A clean, then compile all - In addition, this will compile standard
-%rem%    libs as well as Multi-Threaded libs.  If you set HB_MT=MT
-%rem%    prior to executing this batch file, then the Multi-Threaded versions
-%rem%    of the programs will be active in the bin dir - otherwise, it will
-%rem%    be the standard versions.
-%rem% /Y non batch mode (for Win_98 build env for instance)
-%rem% ---------------------------------------------------------------
-set rem=
-if "%1"=="/?" goto exit
+SET CC_DIR=C:\VC
+SET BISON_DIR=C:\BISON\BIN
+SET SUB_DIR=vc
+SET HB_GT_LIB=$(GTWIN_LIB)
 
-if not exist obj md obj
-if not exist obj\vc md obj\vc
-if not exist obj\vcmt md obj\vcmt
-if not exist lib md lib
-if not exist lib\vc md lib\vc
-if not exist bin md bin
-if not exist bin\vc md bin\vc
+SET _PATH=%PATH%
+SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
-rem added subdir for optimized library
-rem start in build 81
+rem ============================================================================
+rem The followings should never change
+rem Do not hard-code in makefile because there are needed for clean build
+rem ============================================================================
+SET LIBEXT=.lib
+SET OBJEXT=.obj
+SET DIR_SEP=\
+SET LIBPREFIX=
+rem ============================================================================
 
-if not exist obj\vc\opt md obj\vc\opt
-if not exist obj\vc\opt\console md obj\vc\opt\console
-if not exist obj\vc\opt\gui md obj\vc\opt\gui
-
-if not exist obj\vcmt\opt md obj\vcmt\opt
-if not exist obj\vcmt\opt\console md obj\vcmt\opt\console
-if not exist obj\vcmt\opt\gui md obj\vcmt\opt\gui
-
-SET _HBMT=%HB_MT%
-SET HB_FL=
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
-if "%1" == "/y" set HB_FL=/y
-if "%1" == "/Y" set HB_FL=/y
-if "%HB_FL%" == "/y" shift
-:BUILD
 
+   @CALL MDIR.BAT
+
+:BUILD
    SET HB_MT=
-echo.
-   nmake /f makefile.vc %HB_FL% %1 %2 %3 > make_vc.log
+   SET HB_MT_DIR=
+   REM nmake USE_MSVCRT=1 /f makefile.vc %1 %2 %3
+   nmake /NOLOGO /f makefile.vc %1 %2 %3 >make_vc.log
    if errorlevel 1 goto BUILD_ERR
+
    SET HB_MT=MT
-rem do not pass /a (if used) the second time!
-   nmake /f makefile.vc %HB_FL% %2 %3 >> make_vc.log
+   SET HB_MT_DIR=\mt
+   REM nmake USE_MSVCRT=1 HB_THREAD_SUPPORT=1 /f makefile.vc %1 %2 %3
+   nmake /NOLOGO HB_THREAD_SUPPORT=1 /f makefile.vc %1 %2 %3 >>make_vc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-
-   copy bin\vc\*.exe bin > nul
-   copy lib\vc\*.lib lib > nul
+   copy bin\%SUB_DIR%\*.exe bin > nul
+   copy lib\%SUB_DIR%\*.lib lib > nul
    goto EXIT
 
 :BUILD_ERR
-
    notepad make_vc.log
    goto EXIT
 
 :CLEAN
-
-   SET HB_MT=
-   nmake /f makefile.vc %1
-   SET HB_MT=MT
-   nmake /f makefile.vc %1
-   rem in this case, the makefile handles most cleanup. Add what you need here
-   if exist make_vc.log del make_vc.log
-   rem etc.
+   @CALL MDIR.BAT CLEAN
+   IF EXIST make_vc.log DEL make_vc.log
 
 :EXIT
-SET HB_FL=
-SET HB_MT=%_HBMT%
-SET _HBMT=
+   IF EXIST BIN\%SUB_DIR%\harbour.lib  DEL BIN\%SUB_DIR%\harbour.lib
+   IF EXIST BIN\%SUB_DIR%\ppgen.lib    DEL BIN\%SUB_DIR%\ppgen.lib
+   IF EXIST BIN\%SUB_DIR%\hbpp.lib     DEL BIN\%SUB_DIR%\hbpp.lib
+   IF EXIST BIN\%SUB_DIR%\hbdoc.lib    DEL BIN\%SUB_DIR%\hbdoc.lib
+   IF EXIST BIN\%SUB_DIR%\hbmake.lib   DEL BIN\%SUB_DIR%\hbmake.lib
+   IF EXIST BIN\%SUB_DIR%\hbrun.lib    DEL BIN\%SUB_DIR%\hbrun.lib
+   IF EXIST BIN\%SUB_DIR%\hbrunMT.lib  DEL BIN\%SUB_DIR%\hbrunMT.lib
+   IF EXIST BIN\%SUB_DIR%\hbtest.lib   DEL BIN\%SUB_DIR%\hbtest.lib
+   IF EXIST BIN\%SUB_DIR%\hbtestMT.lib DEL BIN\%SUB_DIR%\hbtestMT.lib
+   IF EXIST BIN\%SUB_DIR%\xbscript.lib DEL BIN\%SUB_DIR%\xbscript.lib
+   IF EXIST BIN\%SUB_DIR%\harbour.exp  DEL BIN\%SUB_DIR%\harbour.exp
+   IF EXIST BIN\%SUB_DIR%\ppgen.exp    DEL BIN\%SUB_DIR%\ppgen.exp
+   IF EXIST BIN\%SUB_DIR%\hbpp.exp     DEL BIN\%SUB_DIR%\hbpp.exp
+   IF EXIST BIN\%SUB_DIR%\hbdoc.exp    DEL BIN\%SUB_DIR%\hbdoc.exp
+   IF EXIST BIN\%SUB_DIR%\hbmake.exp   DEL BIN\%SUB_DIR%\hbmake.exp
+   IF EXIST BIN\%SUB_DIR%\hbrun.exp    DEL BIN\%SUB_DIR%\hbrun.exp
+   IF EXIST BIN\%SUB_DIR%\hbrunMT.exp  DEL BIN\%SUB_DIR%\hbrunMT.exp
+   IF EXIST BIN\%SUB_DIR%\hbtest.exp   DEL BIN\%SUB_DIR%\hbtest.exp
+   IF EXIST BIN\%SUB_DIR%\hbtestMT.exp DEL BIN\%SUB_DIR%\hbtestMT.exp
+   IF EXIST BIN\%SUB_DIR%\xbscript.exp DEL BIN\%SUB_DIR%\xbscript.exp
+   SET CC_DIR=
+   SET BISON_DIR=
+   SET SUB_DIR=
+   SET HB_GT_LIB=
+   SET LIBEXT=
+   SET OBJEXT=
+   SET DIR_SEP=
+   SET LIBPREFIX=
+   SET PATH=%_PATH%
+   SET _PATH=
+   SET HB_MT=
+   SET HB_MT_DIR=
