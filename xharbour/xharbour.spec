@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.96 2007/10/31 02:27:36 patrickmast Exp $
+# $Id: xharbour.spec,v 1.97 2008/03/16 19:15:55 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -58,7 +58,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  1.00.00
+%define version  1.1.0
 %define releasen 0
 %define hb_pref  xhb
 %define hb_arch  export HB_ARCHITECTURE=linux
@@ -587,6 +587,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libhsx*.a
 %{_libdir}/%{name}/libhbsix*.a
 %{_libdir}/%{name}/librtl*.a
+%{_libdir}/%{name}/libzlib*.a
 %{_libdir}/%{name}/libpcre*.a
 %{_libdir}/%{name}/libvm*.a
 %{_libdir}/%{name}/libcgi*.a

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.30 2006/01/12 13:15:58 druzus Exp $
+# $Id: make_rpm.sh,v 1.31 2008/03/16 19:15:55 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -177,7 +177,7 @@ then
 
         if [ "${BUGGY_RPM}" = "yes" ]
         then
-            ${RPMBLD} -ba harbour.spec ${INST_PARAM}
+            ${RPMBLD} -ba xharbour.spec ${INST_PARAM}
         else
             ${RPMBLD} -ta ${hb_filename} --rmsource ${INST_PARAM}
         fi

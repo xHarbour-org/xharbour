@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.25 2007/10/02 16:21:04 lculik Exp $
+# $Id: pack_src.sh,v 1.26 2008/04/28 01:42:46 lculik Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -193,6 +193,11 @@ $hb_collect source/rtl/gtcgi/*.[ch]
 $hb_collect source/rtl/gtcrs/Makefile
 $hb_collect source/rtl/gtcrs/*.[ch]
 $hb_collect source/rtl/gtcrs/*.def
+
+# SOURCE\RTL\GTTRM
+$hb_collect source/rtl/gttrm/Makefile
+$hb_collect source/rtl/gttrm/*.[ch]
+$hb_collect source/rtl/gttrm/*.def
 
 # SOURCE\RTL\GTDOS
 $hb_collect source/rtl/gtdos/Makefile
