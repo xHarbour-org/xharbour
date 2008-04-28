@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.98 2008/04/28 01:48:54 lculik Exp $
+# $Id: xharbour.spec,v 1.99 2008/04/28 01:57:36 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -76,8 +76,8 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
-%define hb_ctrb  export HB_CONTRIBLIBS="%{?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}"
-%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
+%define hb_ctrb  "%{?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}"
+%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln}  ;%{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} 
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
