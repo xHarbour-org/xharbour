@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: hrbdll.bc,v 1.157 2008/04/27 14:00:38 andijahja Exp $
 #
 # DLL MAKEFILE FOR BORLAND C++
 #
@@ -13,7 +13,7 @@
 DLL_MT=mt
 
 # Uncomment this line when including RDDADS
-HB_RDDADS=1
+# HB_RDDADS=1
 
 # Uncomment this line when including WVTGUI
 # HB_WVTGUI=1
@@ -44,30 +44,32 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 !if $d(DLL_MT)
-HARBOURFLAGS  =$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
-CLIBFLAGS     =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 !else
-CLIBFLAGS     =$(CLIBFLAGS) -tWD
+CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !endif
-INCLUDE_DIR   =include;$(OBJ_DIR)
-DLLFLAGS      =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
-EXEFLAGS      =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS     =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
-HARBOURFLAGS  =$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CC_CMD        =BCC32 $(CLIBFLAGS) -o$@ $**
-HB_CMD        =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN   =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
-BISON_CMD1    =bison -v -d $** -o$@
-BISON_CMD2    =bison -v -p hb_comp -d $** -o$@
+INCLUDE_DIR =include;$(OBJ_DIR)
+DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
+EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -po$(OBJ_DIR)\ -q0 -w2 -es2 -gc2
+CC_CMD      =BCC32 $(CLIBFLAGS) -o$@ $**
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+BISON_CMD1  =bison -v -d $** -o$@
+BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
+DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) c0d32.obj $**,$@,,$(COMPILERLIBS)
+EXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -100,40 +102,30 @@ c0d32.obj $**, $@,, $(COMPILERLIBS)
 # HBDOCDLL.EXE rules
 #===============================================================================
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	ILINK32 $(EXEFLAGS) @&&!
-c0x32.obj $**, $@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-!
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBRUNDLL.EXE rules
 #===============================================================================
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	ILINK32 $(EXEFLAGS) @&&!
-c0x32.obj $**, $@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-!
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBTESTDLL.EXE rules
 #===============================================================================
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	ILINK32 $(EXEFLAGS) @&&!
-c0x32.obj $**, $@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-!
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBMAKEDLL.EXE rules
 #===============================================================================
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	ILINK32 $(EXEFLAGS) @&&!
-c0x32.obj $**, $@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-!
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # XBSCRIPTDLL.EXE rules
 #===============================================================================
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	ILINK32 $(EXEFLAGS) @&&!
-c0x32.obj $**, $@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-!
+	$(EXE_LINK_CMD)
 
 !include compile.mak

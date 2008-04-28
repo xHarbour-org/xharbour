@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.pc,v 1.68 2008/04/27 14:00:44 andijahja Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -18,17 +18,17 @@
 !include common.mak
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR2 =include
-INCLUDE_DIR  =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"SOURCE\COMPILER" /I"SOURCE\MACRO" /I"$(OBJ_DIR)"
-HARBOURFLAGS =$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+INCLUDE_DIR2=include
+INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(OBJ_DIR)"
+HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:
@@ -39,11 +39,11 @@ HARBOURFLAGS =$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #  execute upon running the executable.
 #-------------------------------------------------------------------------------
 HB_CMD       =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) /n $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(HARBOURFLAGS) $** -o$@
 
-CFLAGS       =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HB_EXT_INKEY"
-CC_CMD       =POCC $(__MT__) $(CFLAGS) /Fo$@ $**
-CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CFLAGS) /Fo$@ $**
+CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HB_EXT_INKEY"
+CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
+CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
 LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
 LIB_CMD      =POLIB /OUT:$@ $**

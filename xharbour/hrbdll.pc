@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: hrbdll.pc,v 1.49 2008/04/27 14:00:38 andijahja Exp $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -36,17 +36,17 @@ COMPILERLIBS=\
 	mpr.lib
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-HARBOURFLAGS  =$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
-CLIBFLAGS     =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
-INCLUDE_DIR  =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"SOURCE\COMPILER" /I"SOURCE\MACRO" /I"$(OBJ_DIR)"
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
+INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(OBJ_DIR)"
 
 DLLFLAGS=\
 	/OUT:$(HARBOUR_DLL)\
@@ -63,13 +63,15 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR) /LIBPATH:$(CC_DIR)\LIB\WIN\
 	/OPT:WIN98 /SUBSYSTEM:CONSOLE
 
-CLIBFLAGS     =$(CLIBFLAGS) /c /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HB_EXT_INKEY" /D"__EXPORT__"
-HARBOURFLAGS  =$(HARBOURFLAGS) -d__EXPORT__ -iINCLUDE -q0 -w2 -es2 -gc0
-CC_CMD        =POCC $(CLIBFLAGS) /Fo$@ $**
-HB_CMD        =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN   =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
-BISON_CMD1    =bison -v -d $** -o$@
-BISON_CMD2    =bison -v -p hb_comp -d $** -o$@
+CLIBFLAGS   =$(CLIBFLAGS) /c /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HB_EXT_INKEY" /D"__EXPORT__"
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iINCLUDE -q0 -w2 -po$(OBJ_DIR)\ -es2 -gc2
+CC_CMD      =POCC $(CLIBFLAGS) /Fo$@ $**
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+BISON_CMD1  =bison -v -d $** -o$@
+BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
+DLL_LINK_CMD=POLINK $(DLLFLAGS)
+EXE_LINK_CMD=POLINK $(EXEFLAGS)	/OUT:$@ $** $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
@@ -86,41 +88,36 @@ ALL:\
 # HARBOUR.DLL rules
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	POLINK $(DLLFLAGS)
+	$(DLL_LINK_CMD)
 
 #===============================================================================
 # HBDOCDLL.EXE rules
 #===============================================================================
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	POLINK $(EXEFLAGS)\
-	/OUT:$(HBDOCDLL_EXE) $(HBDOCDLL_EXE_OBJS) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBRUNDLL.EXE rules
 #===============================================================================
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	POLINK $(EXEFLAGS)\
-	/OUT:$(HBRUNDLL_EXE) $(HBRUNDLL_EXE_OBJS) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBTESTDLL.EXE rules
 #===============================================================================
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	POLINK $(EXEFLAGS)\
-	/OUT:$(HBTESTDLL_EXE) $(HBTESTDLL_EXE_OBJS) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBMAKEDLL.EXE rules
 #===============================================================================
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	POLINK $(EXEFLAGS)\
-	/OUT:$(HBMAKEDLL_EXE) $(HBMAKEDLL_EXE_OBJS) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # XBSCRIPTDLL.EXE rules
 #===============================================================================
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	POLINK $(EXEFLAGS)\
-	/OUT:$(XBSCRIPTDLL_EXE) $(XBSCRIPTDLL_EXE_OBJS) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 !include compile.mak

@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_pc.bat,v 1.22 2008/04/27 14:00:42 andijahja Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -10,7 +10,7 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
-
+SET TARGET=targetst.mak
 SET CC_DIR=C:\PELLESC
 SET BISON_DIR=C:\BISON\BIN
 SET SUB_DIR=pc
@@ -46,7 +46,7 @@ rem ============================================================================
     SET __MT__=
     SET HB_MT_FLAGS=
     SET PROJECT=$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(GTGUI_LIB) $(COMMON_LIB) $(PPGEN_EXE) $(PP_LIB) $(ZLIB_LIB) $(HARBOUR_EXE) $(VM_LIB) $(FMSTAT_LIB) $(RTL_LIB) $(MACRO_LIB) $(RDD_LIB) $(TIP_LIB) $(DBFFPT_LIB) $(DBFNTX_LIB) $(DBFCDX_LIB) $(BMDBFCDX_LIB) $(SIXCDX_LIB) $(BMSIXCDX_LIB) $(HBSIX_LIB) $(HSX_LIB) $(USRRDD_LIB) $(RDDS_LIB) $(CT_LIB) $(PCREPOS_LIB) $(HB_GT_LIBS) $(DEBUG_LIB) $(LANG_LIB) $(NULSYS_LIB) $(CODEPAGE_LIB) $(DLL_MAIN_LIB) $(ODBC_LIB) $(MISC_LIB) $(HBPP_EXE) $(HBDOC_EXE) $(HBMAKE_EXE) $(XBSCRIPT_EXE) $(HBTEST_EXE) $(HBRUN_EXE)
-    POMAKE /F makefile.pc %1 %2 %3 >make_pc.log
+    POMAKE /F makefile.pc %1 %2 %3
     if errorlevel 1 goto BUILD_ERR
 
     SET HB_MT=mt
@@ -54,8 +54,14 @@ rem ============================================================================
     SET __MT__=-MT -DHB_THREAD_SUPPORT
     SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
     SET PROJECT=$(PP_LIB) $(VM_LIB) $(FMSTAT_LIB) $(RTL_LIB) $(MACRO_LIB) $(RDD_LIB) $(TIP_LIB) $(DBFFPT_LIB) $(DBFNTX_LIB) $(DBFCDX_LIB) $(BMDBFCDX_LIB) $(SIXCDX_LIB) $(BMSIXCDX_LIB) $(HBSIX_LIB) $(HSX_LIB) $(USRRDD_LIB) $(RDDS_LIB) $(CT_LIB) $(HBTEST_EXE) $(HBRUN_EXE)
-    POMAKE /F makefile.pc %1 %2 %3 >>make_pc.log
+    POMAKE /F makefile.pc %1 %2 %3
     if errorlevel 1 goto BUILD_ERR
+
+:BUILD_OK
+    copy bin\%SUB_DIR%\*.exe bin\*.* > nul
+    copy lib\%SUB_DIR%\*.lib lib\*.* > nul
+    if exist lib\%SUB_DIR%\*.bak del lib\%SUB_DIR%\*.bak
+    goto EXIT
 
 :BUILD_ERR
    notepad make_pc.log

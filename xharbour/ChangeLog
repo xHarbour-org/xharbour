@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6048 2008/04/28 01:48:54 lculik Exp $
+ * $Id: ChangeLog,v 1.6049 2008/04/28 02:28:07 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-28 13:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * makefile.bc
+  * makefile.vc
+  * makefile.pc
+  * makefile.dc
+  * makefile.wc
+  * makefile.gc
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.pc
+  * hrbdll.dc
+  * hrbdll.wc
+  * hrbdll.gc
+    ! replace literal compiler flags with available macros
+    ! more clean-ups of unwanted macros/directives
+    ! make -gc2 and -po as default flag for quick debugging
+    ! use only 2 common macro for compiler flags, CLIBFLAGS and HARBOURFLAGS
+    ! allow non-standard (additional/own) CLIBFLAGS/HARBOURFLAGS to be defined
+      via SET *FLAGS=xx via BAT file
+    ! formatting
+  * make_dc.bat
+    ! use DMC's own LIB.EXE
+  * make_pc.bat
+    ! missing goto exit upon completion
+  * make_gc.bat
+    ! notepad does not execute on error, fixed.
+
 2008-04-27 23:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * bin/pack_src.sh
     ! added zlib sources

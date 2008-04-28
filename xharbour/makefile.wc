@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.wc,v 1.79 2008/04/27 14:00:45 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -35,31 +35,23 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
-# Option to use MSVCRT rather than LIBC*.LIB
+# C compiler definition and C flags. These should never have to change.
 #===============================================================================
-!ifdef USE_MSVCRT
-_CFL=-MD
-!endif
-
-INCLUDE_DIR  =include
-INCLUDE_DIR2 =include
-INCLUDE_DIR  =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=source\compiler -i=source\macro -i=$(CC_DIR)\H -i=$(CC_DIR)\H\NT
-_CFL         =$(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -d__WINDOWS__ -dWIN32
-HARBOURFLAGS =-i$(INCLUDE_DIR2) -q0 -w2 -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+INCLUDE_DIR =include
+INCLUDE_DIR2=include
+INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
+CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32
+HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR2) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !ifdef HB_THREAD_SUPPORT
-HB_MT	     =MT
-HARBOURFLAGS =$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
-CLIBFLAGS    =-bm -DHB_THREAD_SUPPORT $(_CFL) $(CLIBFLAGS)
-!else
-HB_MT	     =
-CLIBFLAGS    =$(_CFL) $(CLIBFLAGS)
+HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
 !endif
 
 #-------------------------------------------------------------------------------
@@ -72,7 +64,7 @@ CLIBFLAGS    =$(_CFL) $(CLIBFLAGS)
 #  execute upon running the executable.
 #-------------------------------------------------------------------------------
 HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN  =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 
 LINKERFLAGS  =/nologo /subsystem:console
 CC_CMD       =WPP386 $(CLIBFLAGS) -fo$@ $**

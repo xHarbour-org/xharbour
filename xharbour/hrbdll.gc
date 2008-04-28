@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: hrbdll.gc,v 1.32 2008/04/27 14:00:38 andijahja Exp $
 #
 # DLL MAKEFILE FOR MINGW32
 #
@@ -57,33 +57,35 @@ HARBOUR_DLL_OBJS+=\
 endif
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS+=
+CLIBFLAGS   +=
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 ifeq ($(DLL_MT),mt)
 HARBOURFLAGS+=-dHB_THREAD_SUPPORT
-CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
+CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
 endif
 
-INCLUDE_DIR   =include
-CLIBFLAGS     +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -I$(INCLUDE_DIR) -I$(OBJ_DIR) -I$(COMPILER_DIR)
-HARBOURFLAGS  +=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CC_CMD        =GCC $(CLIBFLAGS) -o $@ $^
-HB_CMD        =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN   =$(HARBOUR_EXE) -n -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
-BISON_CMD1    =bison -v -p yy -d -o $@ $^
-BISON_CMD2    =bison -v -p hb_comp -d -o $@ $^
-HRBDLL_DEF    =$(LIB_DIR)/harbour.def
+INCLUDE_DIR =include
+CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
+BISON_CMD1  =bison -v -p yy -d -o $@ $^
+BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
+DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+EXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(COMPILERLIBS)
+HRBDLL_DEF  =$(LIB_DIR)/harbour.def
 
 #===============================================================================
 # The Project
 #===============================================================================
-ALL:\
+DLL_PROJECT:\
 	$(HARBOUR_DLL)\
 	$(HBDOCDLL_EXE)\
 	$(HBRUNDLL_EXE)\
@@ -95,39 +97,36 @@ ALL:\
 # HARBOUR.DLL rules
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	RM -f $@
-	GCC -s -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB),--output-def,$(HRBDLL_DEF) -o $(HARBOUR_DLL) --warn-duplicate-exports\
-	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS1)
-
+	$(DLL_LINK_CMD)
 
 #===============================================================================
 # HBDOCDLL.EXE rules
 #===============================================================================
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	GCC -WAll -o$(HBDOCDLL_EXE) $(HBDOCDLL_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBRUNDLL.EXE rules
 #===============================================================================
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	GCC -WAll -o$(HBRUNDLL_EXE) $(HBRUNDLL_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBTESTDLL.EXE rules
 #===============================================================================
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	GCC -WAll -o$(HBTESTDLL_EXE) $(HBTESTDLL_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # HBMAKEDLL.EXE rules
 #===============================================================================
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	GCC -WAll -o$(HBMAKEDLL_EXE) $(HBMAKEDLL_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # XBSCRIPTDLL.EXE rules
 #===============================================================================
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	GCC -WAll -o$(XBSCRIPTDLL_EXE) $(XBSCRIPTDLL_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
+	$(EXE_LINK_CMD)
 
 include compile.mak

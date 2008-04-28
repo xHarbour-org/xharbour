@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.bc,v 1.219 2008/04/27 14:00:43 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -48,23 +48,22 @@ HARBOUR_LIBS=\
 !endif
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =include
 INCLUDE_DIR2 =include
-INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR);source\compiler;source\macro
-CFLAGS       =-I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -a8 $(CFLAGS) -D__WIN32__
-CLIBFLAGS    =-c $(CFLAGS) $(CLIBFLAGS)
-HARBOURFLAGS =-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
+CLIBFLAGS    =$(CLIBFLAGS) -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__
+HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 LINKERFLAGS  =-ap -Tpe -x -Gn -C
 !if $d(HB_THREAD_SUPPORT)
-CLIBFLAGS    =-tWM -DHB_THREAD_SUPPORT $(CLIBFLAGS)
+CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
 HARBOURFLAGS =$(HARBOURFLAGS) $(HB_MT_FLAGS)
 !endif
@@ -81,9 +80,9 @@ HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
 
 CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
+CC_CMD_FMSTAT=BCC32 $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
-CC_CMD_FMSTAT=BCC32 $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 
 CC_LIBS=\
 	cw32$(HB_MT).lib\

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.dc,v 1.37 2008/04/27 14:00:43 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -8,8 +8,6 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
-
-DEL=@DEL
 
 #===============================================================================
 # Macro Definitions
@@ -21,344 +19,169 @@ DEL=@DEL
 #===============================================================================
 !include target.mak
 
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
 ARFLAGS=/0
-DMCLIB_DIR=$(CC_DIR)\LIB
 INCLUDE_DIR=INCLUDE;$(CC_DIR)\INCLUDE\WIN32;$(CC_DIR)\INCLUDE
 INCLUDE_DIR2=INCLUDE
-CFLAGS=-Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
-HB_CMD=$(HARBOUR_EXE) -iINCLUDE -n1 -q0 -w2 -es2 -gc0 $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -iINCLUDE -n -q0 -w -es2 -gc0 $** -o$@
-CC_CMD=SCPPN $(CFLAGS) -o$@ $**
-CC_CMD_FMSTAT=SCPPN $(CFLAGS) -DHB_FM_STATISTICS -o$@ $**
+CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
+HB_CMD=$(HARBOUR_EXE) -iINCLUDE -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -iINCLUDE -n -q0 -po$(OBJ_DIR)\ -w -es2 -gc2 $** -o$@
+CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
+CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
 BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
-HARBOUR_LIBS=$(PP_LIB)+$(COMMON_LIB)+$(VM_LIB)+$(RTL_LIB)+$(PCREPOS_LIB)+$(HB_GT_LIB)+$(LANG_LIB)+$(RDD_LIB)+$(MACRO_LIB)+$(DBFFPT_LIB)+$(DBFNTX_LIB)+$(DBFCDX_LIB)+$(BMDBFCDX_LIB)+$(SIXCDX_LIB)+$(BMSIXCDX_LIB)+$(HBSIX_LIB)+$(HSX_LIB)+$(USRRDD_LIB)+$(RDDS_LIB)+$(CODEPAGE_LIB)+$(ZLIB_LIB)
-COMPILERLIBS=$(DMCLIB_DIR)\snn.lib+$(DMCLIB_DIR)\kernel32.lib+$(DMCLIB_DIR)\winspool.lib+$(DMCLIB_DIR)\user32.lib+$(DMCLIB_DIR)\advapi32.lib+$(DMCLIB_DIR)\ole32.lib+$(DMCLIB_DIR)\uuid.lib+$(DMCLIB_DIR)\mpr.lib+$(DMCLIB_DIR)\winmm.lib+$(DMCLIB_DIR)\oleaut32.lib
+COMPILERLIBS=$(CC_DIR)\LIB\snn.lib+$(CC_DIR)\LIB\kernel32.lib+$(CC_DIR)\LIB\winspool.lib+$(CC_DIR)\LIB\user32.lib+$(CC_DIR)\LIB\advapi32.lib+$(CC_DIR)\LIB\ole32.lib+$(CC_DIR)\LIB\uuid.lib+$(CC_DIR)\LIB\mpr.lib+$(CC_DIR)\LIB\winmm.lib+$(CC_DIR)\LIB\oleaut32.lib
+EXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
-	IF EXIST "$(ZLIB_LIB)" $(DEL) "$(ZLIB_LIB)" > NUL
-	$(TLIB_EXE) "$(ZLIB_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-	IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
-	$(TLIB_EXE) "$(COMMON_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
-	IF EXIST "$(DBFFPT_LIB)" $(DEL) "$(DBFFPT_LIB)" > NUL
-	$(TLIB_EXE) "$(DBFFPT_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-	IF EXIST "$(DBFCDX_LIB)" $(DEL) "$(DBFCDX_LIB)" > NUL
-	$(TLIB_EXE) "$(DBFCDX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
-	IF EXIST "$(BMDBFCDX_LIB)" $(DEL) "$(BMDBFCDX_LIB)" > NUL
-	$(TLIB_EXE) "$(BMDBFCDX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
-	IF EXIST "$(SIXCDX_LIB)" $(DEL) "$(SIXCDX_LIB)" > NUL
-	$(TLIB_EXE) "$(SIXCDX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
-	IF EXIST "$(BMSIXCDX_LIB)" $(DEL) "$(BMSIXCDX_LIB)" > NUL
-	$(TLIB_EXE) "$(BMSIXCDX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
-	IF EXIST "$(HBSIX_LIB)" $(DEL) "$(HBSIX_LIB)" > NUL
-	$(TLIB_EXE) "$(HBSIX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
-	IF EXIST "$(HSX_LIB)" $(DEL) "$(HSX_LIB)" > NUL
-	$(TLIB_EXE) "$(HSX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
-	IF EXIST "$(USRRDD_LIB)" $(DEL) "$(USRRDD_LIB)" > NUL
-	$(TLIB_EXE) "$(USRRDD_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(RDDS_LIB) : $(RDDS_LIB_OBJS)
-	IF EXIST "$(RDDS_LIB)" $(DEL) "$(RDDS_LIB)" > NUL
-	$(TLIB_EXE) "$(RDDS_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-	IF EXIST "$(DBFNTX_LIB)" $(DEL) "$(DBFNTX_LIB)" > NUL
-	$(TLIB_EXE) "$(DBFNTX_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-	IF EXIST "$(DEBUG_LIB)" $(DEL) "$(DEBUG_LIB)" > NUL
-	$(TLIB_EXE) "$(DEBUG_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
-	IF EXIST "$(LANG_LIB)" $(DEL) "$(LANG_LIB)" > NUL
-	$(TLIB_EXE) "$(LANG_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
-	IF EXIST "$(MACRO_LIB)" $(DEL) "$(MACRO_LIB)" > NUL
-	$(TLIB_EXE) "$(MACRO_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-	IF EXIST "$(NULSYS_LIB)" $(DEL) "$(NULSYS_LIB)" > NUL
-	$(TLIB_EXE) "$(NULSYS_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(PP_LIB) : $(PP_LIB_OBJS)
-	IF EXIST "$(PP_LIB)" $(DEL) "$(PP_LIB)" > NUL
-	$(TLIB_EXE) "$(PP_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(CT_LIB) : $(CT_LIB_OBJS)
-	IF EXIST "$(CT_LIB)" $(DEL) "$(CT_LIB)" > NUL
-	$(TLIB_EXE) "$(CT_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
+	LIB -c -n $@ @&&!
+$**
 !
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-	IF EXIST "$(RDD_LIB)" $(DEL) "$(RDD_LIB)" > NUL
-	$(TLIB_EXE) "$(RDD_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-	IF EXIST "$(RTL_LIB)" $(DEL) "$(RTL_LIB)" > NUL
-	$(TLIB_EXE) "$(RTL_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
+	LIB -c -n $@ @&&!
+$**
 !
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
-	IF EXIST "$(PCREPOS_LIB)" $(DEL) "$(PCREPOS_LIB)" > NUL
-	$(TLIB_EXE) "$(PCREPOS_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
-	IF EXIST "$(TIP_LIB)" $(DEL) "$(TIP_LIB)" > NUL
-	$(TLIB_EXE) "$(TIP_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
-	IF EXIST "$(VM_LIB)" $(DEL) "$(VM_LIB)" > NUL
-	$(TLIB_EXE) "$(VM_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
-	IF EXIST "$(FMSTAT_LIB)" $(DEL) "$(FMSTAT_LIB)" > NUL
-	$(TLIB_EXE) "$(FMSTAT_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-	IF EXIST "$(GTCGI_LIB)" $(DEL) "$(GTCGI_LIB)" > NUL
-	$(TLIB_EXE) "$(GTCGI_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
-
-$(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
-	IF EXIST "$(GTDOS_LIB)" $(DEL) "$(GTDOS_LIB)" > NUL
-	$(TLIB_EXE) "$(GTDOS_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-	IF EXIST "$(GTPCA_LIB)" $(DEL) "$(GTPCA_LIB)" > NUL
-	$(TLIB_EXE) "$(GTPCA_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-	IF EXIST "$(GTSTD_LIB)" $(DEL) "$(GTSTD_LIB)" > NUL
-	$(TLIB_EXE) "$(GTSTD_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-	IF EXIST "$(GTWIN_LIB)" $(DEL) "$(GTWIN_LIB)" > NUL
-	$(TLIB_EXE) "$(GTWIN_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
-	IF EXIST "$(GTWVT_LIB)" $(DEL) "$(GTWVT_LIB)" > NUL
-	$(TLIB_EXE) "$(GTWVT_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
-	IF EXIST "$(GTGUI_LIB)" $(DEL) "$(GTGUI_LIB)" > NUL
-	$(TLIB_EXE) "$(GTGUI_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
-	IF EXIST "$(GTALLEG_LIB)" $(DEL) "$(GTALLEG_LIB)" > NUL
-	$(TLIB_EXE) "$(GTALLEG_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-	IF EXIST "$(CODEPAGE_LIB)" $(DEL) "$(CODEPAGE_LIB)" > NUL
-	$(TLIB_EXE) "$(CODEPAGE_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
-	IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
-	$(TLIB_EXE) "$(ODBC_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(MISC_LIB) : $(MISC_LIB_OBJS)
-	IF EXIST "$(MISC_LIB)" $(DEL) "$(MISC_LIB)" > NUL
-	$(TLIB_EXE) "$(MISC_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
-	IF EXIST "$(DLL_MAIN_LIB)" $(DEL) "$(DLL_MAIN_LIB)" > NUL
-	$(TLIB_EXE) "$(DLL_MAIN_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+	$(LIB_CMD)
 
 #===============================================================================
 # Executable dependencies and build rules
 #===============================================================================
 $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
-        LINK $(OBJ_DIR)\harbour+$(OBJ_DIR)\harboury+$(OBJ_DIR)\hbslex+$(OBJ_DIR)\cmdcheck+$(OBJ_DIR)\hbusage+$(OBJ_DIR)\hbident+$(OBJ_DIR)\hbgenerr+$(OBJ_DIR)\hbpcode+$(OBJ_DIR)\hbdead+$(OBJ_DIR)\hbstripl+$(OBJ_DIR)\hbfix+$(OBJ_DIR)\genc+$(OBJ_DIR)\gencobj+$(OBJ_DIR)\genhrb+$(OBJ_DIR)\expropta+$(OBJ_DIR)\exproptb+$(OBJ_DIR)\exproptc+$(OBJ_DIR)\hbfunchk+$(OBJ_DIR)\gencc+$(OBJ_DIR)\hbpcstat+$(OBJ_DIR)\hbdbginf+$(OBJ_DIR)\hblbl+$(OBJ_DIR)\ppcomp,$(HARBOUR_EXE),,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
+        LINK $**,$@,,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
 
 $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
-        LINK $(HBMAKE_EXE_OBJS),$(HBMAKE_EXE),,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
+	$(EXE_LINK_CMD)
 
 $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
-        LINK $(HBDOC_EXE_OBJS),$(HBDOC_EXE),,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
+	$(EXE_LINK_CMD)
 
 $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
-        LINK $(OBJ_DIR)\hbrun+$(OBJ_DIR)\external,$(HBRUN_EXE),,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
+	$(EXE_LINK_CMD)
 
 $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
-        LINK $(OBJ_DIR)\xbscript,$(XBSCRIPT_EXE),,$(HARBOUR_LIBS)+$(CT_LIB)+$(COMPILERLIBS)/noi;
+	$(EXE_LINK_CMD)
 
 $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
-        LINK $(HBTEST_EXE_OBJS),$(HBTEST_EXE),,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
+	$(EXE_LINK_CMD)
 
 $(HBPP_EXE) : $(HBPP_EXE_OBJS)
-        LINK $(OBJ_DIR)\hbpp+$(OBJ_DIR)\hbppcalc+$(OBJ_DIR)\hbppcomp+$(OBJ_DIR)\hbppcore+$(OBJ_DIR)\hbpptbl+$(OBJ_DIR)\pragma,$(HBPP_EXE),,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
+        LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
 
-$(PPGEN_EXE) :\
-	$(PPGEN_EXE_OBJS)\
-	$(INCLUDE_DIR2)\hbstdgen.ch\
-	$(INCLUDE_DIR2)\std.ch\
-	$(INCLUDE_DIR2)\set.ch
-        LINK $(OBJ_DIR)\ppgen,$(PPGEN_EXE),,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
+$(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
+        LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
 
 !include compile.mak

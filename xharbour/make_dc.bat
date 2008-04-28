@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_dc.bat,v 1.4 2008/04/27 14:00:41 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -26,7 +26,6 @@ rem If you have found a way to make DMC's (s)make.exe works, please modify this
 rem file accordingly.(AJ:2008-04-26)
 rem ============================================================================
 SET MAKE_EXE=C:\BORLAND\BCC551\BIN\MAKE.EXE
-SET TLIB_EXE=C:\BORLAND\BCC551\BIN\TLIB.EXE
 
 rem ============================================================================
 rem The followings should never change
@@ -50,14 +49,14 @@ rem If you have found how to build MT mode with DMC please modify this file
 rem and the corresponding makefile.dc accordingly.
 rem ============================================================================
    SET HB_MT=
-   %MAKE_EXE% -fmakefile.dc >make_dc.log
+   %MAKE_EXE% -fmakefile.dc
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
    goto EXIT
 
 :BUILD_ERR
-   notepad make_dc.log
+   REM notepad make_dc.log
    goto EXIT
 
 :CLEAN
@@ -76,4 +75,3 @@ rem ============================================================================
    SET DIR_SEP=
    SET LIBPREFIX=
    SET MAKE_EXE=
-   SET TLIB_EXE=

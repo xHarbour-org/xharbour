@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_gc.bat,v 1.8 2008/04/27 14:00:42 andijahja Exp $
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR PELLESC
@@ -17,7 +17,7 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 SET BISON_DIR=C:/MSYS/1.0/bin
 
 SET _PATH=%PATH%
-SET PATH=%CC_DIR%\bin;%BISON_DIR%
+SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
 
 rem ============================================================================
 rem The followings should never change
@@ -37,13 +37,13 @@ if "%1" == "CLEAN" goto CLEAN
    SET HB_THREAD_SUPPORT=0
    SET HB_MT=
    SET HB_MT_DIR=
-   mingw32-make.exe -fmakefile.gc %1 %2 %3 1>make_gc0.log 2>make_gc.log
+   mingw32-make.exe -fmakefile.gc %1 %2 %3
    if errorlevel 1 goto BUILD_ERR
 
    SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=/mt
-   mingw32-make.exe -f makefile.gc %1 %2 %3 1>>make_gc0.log 2>>make_gc.log
+   mingw32-make.exe -f makefile.gc %1 %2 %3
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK

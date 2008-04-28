@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.vc,v 1.212 2008/04/27 21:38:57 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -41,35 +41,32 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
 
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
-INCLUDE_DIR  =include
-INCLUDE_DIR2 =include
-INCLUDE_DIR  =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -Isource\compiler -Isource\macro -I$(CC_DIR)\include
+INCLUDE_DIR =include
+INCLUDE_DIR2=include
+INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I$(CC_DIR)\include
 !if ("$(USE_MSVCRT)"=="1")
-_CFL=-MD
+CLIBFLAGS=$(CLIBFLAGS) -MD
 !endif
 !if ("$(CPLUSPLUS)"=="1")
-_CFL=$(_CFL) -TP
+CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-_CFL        =$(_CFL) -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -D_CRT_SECURE_NO_DEPRECATE
-HARBOURFLAGS=-iinclude -q0 -w2 -es2 -gc0 $(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -D_CRT_SECURE_NO_DEPRECATE
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
-!if ("$(USE_MSVCRT)"=="1")
-CLIBFLAGS=-c -DHB_THREAD_SUPPORT $(_CFL) $(CLIBFLAGS)
-!else
-CLIBFLAGS=-c -MT -DHB_THREAD_SUPPORT -D_MT $(_CFL) $(CLIBFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
+!if !("$(USE_MSVCRT)"=="1")
+CLIBFLAGS   =$(CLIBFLAGS) -MT
 !endif
-!else
-CLIBFLAGS=-c $(_CFL) $(CLIBFLAGS)
 !endif
 
 LINKERFLAGS=\
@@ -93,9 +90,8 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
 
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
-LIB_CMD      =LIB /out:$@ $**
+LIB_CMD      =LIB /OUT:$@ $**
 LINK_CMD     =LINK /OUT:$@ $** $(LINKERFLAGS)
-
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 

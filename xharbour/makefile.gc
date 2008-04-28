@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: makefile.gc,v 1.39 2008/04/27 14:00:44 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -15,19 +15,22 @@
 include common.mak
 
 #===============================================================================
-# Put your own build flags here
+# Append your own build flags here
 #===============================================================================
-HARBOURFLAGS=
-CLIBFLAGS   =
+HARBOURFLAGS+=
+CLIBFLAGS   +=
 
-INCLUDE_DIR=include
-INCLUDE_DIR2=include
-HARBOURFLAGS=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CFLAGS=$(CLIBFLAGS) -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INCLUDE_DIR) -I$(OBJ_DIR) -I$(COMPILER_DIR)
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+INCLUDE_DIR  =include
+INCLUDE_DIR2 =include
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
-	CFLAGS+=-DHB_THREAD_SUPPORT -mthreads
+	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
 endif
 
 #===============================================================================
@@ -38,17 +41,17 @@ endif
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.(AJ: 2008-04-26)
 #===============================================================================
-HB_CMD=$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN=$(HARBOUR_EXE) -n -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
+HB_CMD     =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN=$(HARBOUR_EXE) -n0 -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-CC_CMD=GCC $(CFLAGS) -o $@ $^
-CC_CMD_FMSTAT=GCC $(CFLAGS) -DHB_FM_STATISTICS -o $@ $^
-BISON_CMD1=bison -v -p yy -d -o $@ $^
-BISON_CMD2=bison -v -p hb_comp -d -o $@ $^
-LIB_CMD=\
+CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
+CC_CMD_FMSTAT=GCC $(CLIBFLAGS) -DHB_FM_STATISTICS -o $@ $^
+BISON_CMD1   =bison -v -p yy -d -o $@ $^
+BISON_CMD2   =bison -v -p hb_comp -d -o $@ $^
+LIB_CMD      =\
 		RM -f $@ &&\
 		AR cru $@ $^ &&\
 		RANLIB $@ &&\
