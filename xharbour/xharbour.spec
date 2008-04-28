@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.97 2008/03/16 19:15:55 likewolf Exp $
+# $Id: xharbour.spec,v 1.98 2008/04/28 01:48:54 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -353,7 +353,7 @@ strip $HB_BIN_INSTALL/harbour
 strip --strip-debug $HB_LIB_INSTALL/*
 
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-install -m644 doc/man/*.1* $RPM_BUILD_ROOT%{_mandir}/man1/
+#install -m644 doc/man/*.1* $RPM_BUILD_ROOT%{_mandir}/man1/
 
 mkdir -p $RPM_BUILD_ROOT/etc/harbour
 install -m644 source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
