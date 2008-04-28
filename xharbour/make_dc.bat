@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.4 2008/04/27 14:00:41 andijahja Exp $
+rem $Id: make_dc.bat,v 1.5 2008/04/28 06:14:25 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -49,14 +49,14 @@ rem If you have found how to build MT mode with DMC please modify this file
 rem and the corresponding makefile.dc accordingly.
 rem ============================================================================
    SET HB_MT=
-   %MAKE_EXE% -fmakefile.dc
+   %MAKE_EXE% -fmakefile.dc >make_dc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
    goto EXIT
 
 :BUILD_ERR
-   REM notepad make_dc.log
+   notepad make_dc.log
    goto EXIT
 
 :CLEAN

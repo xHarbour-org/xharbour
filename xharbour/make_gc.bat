@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_gc.bat,v 1.8 2008/04/27 14:00:42 andijahja Exp $
+rem $Id: make_gc.bat,v 1.9 2008/04/28 06:14:25 andijahja Exp $
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR PELLESC
@@ -37,13 +37,13 @@ if "%1" == "CLEAN" goto CLEAN
    SET HB_THREAD_SUPPORT=0
    SET HB_MT=
    SET HB_MT_DIR=
-   mingw32-make.exe -fmakefile.gc %1 %2 %3
+   mingw32-make.exe -fmakefile.gc %1 %2 %3 1>make_gc0.log 2>make_gc.log
    if errorlevel 1 goto BUILD_ERR
 
    SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=/mt
-   mingw32-make.exe -f makefile.gc %1 %2 %3
+   mingw32-make.exe -f makefile.gc %1 %2 %3 1>>make_gc0.log 2>>make_gc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -56,6 +56,7 @@ if "%1" == "CLEAN" goto CLEAN
 :CLEAN
    @CALL MDIR.BAT CLEAN
    IF EXIST make_gc.log DEL make_gc.log
+   IF EXIST make_gc0.log DEL make_gc0.log
 
 :EXIT
    SET CC_DIR=
