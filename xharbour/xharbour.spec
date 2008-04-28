@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.100 2008/04/28 02:14:06 lculik Exp $
+# $Id: xharbour.spec,v 1.101 2008/04/28 02:28:07 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -352,7 +352,7 @@ strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim.
 strip --strip-debug $HB_LIB_INSTALL/*
 
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+#mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 #install -m644 doc/man/*.1* $RPM_BUILD_ROOT%{_mandir}/man1/
 
 mkdir -p $RPM_BUILD_ROOT/etc/harbour
@@ -561,7 +561,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/hbrun
 %{_bindir}/hbpp
 %{_bindir}/hbmake
-%{_mandir}/man1/*.1*
+#%{_mandir}/man1/*.1*
 %dir %{_includedir}/%{name}
 %attr(644,root,root) %{_includedir}/%{name}/*
 
