@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.90 2008/04/16 20:29:47 ronpinkas Exp $
+ * $Id: adsfunc.c,v 1.91 2008/04/26 00:44:13 kaddath Exp $
  */
 
 /*
@@ -2017,7 +2017,7 @@ HB_FUNC( ADSISEMPTY )
    }
    else if( pArea )
    {
-      pucFldName = (UNSIGNED8 *) ( ISCHAR( 1 ) ? hb_parcx( 1 ) : ADSFIELD( hb_parni( 1 ) ) );
+      pucFldName = ( ISCHAR( 1 ) ? (UNSIGNED8 *) hb_parcx( 1 ) : ADSFIELD( hb_parni( 1 ) ) );
       ulRetVal = AdsIsEmpty( pArea->hTable, pucFldName, &pbEmpty );
    }
 
