@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_vc.bat,v 1.17 2008/04/27 21:38:57 andijahja Exp $
 rem
 rem FILE: nake_vc.bat
 rem BATCH FILE FOR MSVC
@@ -26,7 +26,7 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -46,8 +46,8 @@ if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   copy bin\%SUB_DIR%\*.exe bin > nul
-   copy lib\%SUB_DIR%\*.lib lib > nul
+   xcopy bin\%SUB_DIR%\*.exe bin /d> nul
+   xcopy lib\%SUB_DIR%\*.lib lib /d> nul
    goto EXIT
 
 :BUILD_ERR
@@ -59,26 +59,26 @@ if "%1" == "CLEAN" goto CLEAN
    IF EXIST make_vc.log DEL make_vc.log
 
 :EXIT
-   IF EXIST BIN\%SUB_DIR%\harbour.lib  DEL BIN\%SUB_DIR%\harbour.lib
-   IF EXIST BIN\%SUB_DIR%\ppgen.lib    DEL BIN\%SUB_DIR%\ppgen.lib
-   IF EXIST BIN\%SUB_DIR%\hbpp.lib     DEL BIN\%SUB_DIR%\hbpp.lib
-   IF EXIST BIN\%SUB_DIR%\hbdoc.lib    DEL BIN\%SUB_DIR%\hbdoc.lib
-   IF EXIST BIN\%SUB_DIR%\hbmake.lib   DEL BIN\%SUB_DIR%\hbmake.lib
-   IF EXIST BIN\%SUB_DIR%\hbrun.lib    DEL BIN\%SUB_DIR%\hbrun.lib
-   IF EXIST BIN\%SUB_DIR%\hbrunMT.lib  DEL BIN\%SUB_DIR%\hbrunMT.lib
-   IF EXIST BIN\%SUB_DIR%\hbtest.lib   DEL BIN\%SUB_DIR%\hbtest.lib
-   IF EXIST BIN\%SUB_DIR%\hbtestMT.lib DEL BIN\%SUB_DIR%\hbtestMT.lib
-   IF EXIST BIN\%SUB_DIR%\xbscript.lib DEL BIN\%SUB_DIR%\xbscript.lib
-   IF EXIST BIN\%SUB_DIR%\harbour.exp  DEL BIN\%SUB_DIR%\harbour.exp
-   IF EXIST BIN\%SUB_DIR%\ppgen.exp    DEL BIN\%SUB_DIR%\ppgen.exp
-   IF EXIST BIN\%SUB_DIR%\hbpp.exp     DEL BIN\%SUB_DIR%\hbpp.exp
-   IF EXIST BIN\%SUB_DIR%\hbdoc.exp    DEL BIN\%SUB_DIR%\hbdoc.exp
-   IF EXIST BIN\%SUB_DIR%\hbmake.exp   DEL BIN\%SUB_DIR%\hbmake.exp
-   IF EXIST BIN\%SUB_DIR%\hbrun.exp    DEL BIN\%SUB_DIR%\hbrun.exp
-   IF EXIST BIN\%SUB_DIR%\hbrunMT.exp  DEL BIN\%SUB_DIR%\hbrunMT.exp
-   IF EXIST BIN\%SUB_DIR%\hbtest.exp   DEL BIN\%SUB_DIR%\hbtest.exp
-   IF EXIST BIN\%SUB_DIR%\hbtestMT.exp DEL BIN\%SUB_DIR%\hbtestMT.exp
-   IF EXIST BIN\%SUB_DIR%\xbscript.exp DEL BIN\%SUB_DIR%\xbscript.exp
+   REM IF EXIST BIN\%SUB_DIR%\harbour.lib  DEL BIN\%SUB_DIR%\harbour.lib
+   REM IF EXIST BIN\%SUB_DIR%\ppgen.lib    DEL BIN\%SUB_DIR%\ppgen.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbpp.lib     DEL BIN\%SUB_DIR%\hbpp.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbdoc.lib    DEL BIN\%SUB_DIR%\hbdoc.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbmake.lib   DEL BIN\%SUB_DIR%\hbmake.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbrun.lib    DEL BIN\%SUB_DIR%\hbrun.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbrunMT.lib  DEL BIN\%SUB_DIR%\hbrunMT.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbtest.lib   DEL BIN\%SUB_DIR%\hbtest.lib
+   REM IF EXIST BIN\%SUB_DIR%\hbtestMT.lib DEL BIN\%SUB_DIR%\hbtestMT.lib
+   REM IF EXIST BIN\%SUB_DIR%\xbscript.lib DEL BIN\%SUB_DIR%\xbscript.lib
+   REM IF EXIST BIN\%SUB_DIR%\harbour.exp  DEL BIN\%SUB_DIR%\harbour.exp
+   REM IF EXIST BIN\%SUB_DIR%\ppgen.exp    DEL BIN\%SUB_DIR%\ppgen.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbpp.exp     DEL BIN\%SUB_DIR%\hbpp.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbdoc.exp    DEL BIN\%SUB_DIR%\hbdoc.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbmake.exp   DEL BIN\%SUB_DIR%\hbmake.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbrun.exp    DEL BIN\%SUB_DIR%\hbrun.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbrunMT.exp  DEL BIN\%SUB_DIR%\hbrunMT.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbtest.exp   DEL BIN\%SUB_DIR%\hbtest.exp
+   REM IF EXIST BIN\%SUB_DIR%\hbtestMT.exp DEL BIN\%SUB_DIR%\hbtestMT.exp
+   REM IF EXIST BIN\%SUB_DIR%\xbscript.exp DEL BIN\%SUB_DIR%\xbscript.exp
    SET CC_DIR=
    SET BISON_DIR=
    SET SUB_DIR=
@@ -86,7 +86,7 @@ if "%1" == "CLEAN" goto CLEAN
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
+   REM SET LIBPREFIX=
    SET PATH=%_PATH%
    SET _PATH=
    SET HB_MT=
