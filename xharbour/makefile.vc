@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.215 2008/04/29 03:32:39 ronpinkas Exp $
+# $Id: makefile.vc,v 1.216 2008/04/29 07:20:34 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -40,8 +40,6 @@ HB_GT_LIBS=\
 #===============================================================================
 # The Project
 #===============================================================================
-!include target.mak
-
 !if !("$(HB_THREAD_SUPPORT)"=="1")
 PROJECT=$(ST_PROJECT)
 !else
@@ -49,7 +47,6 @@ PROJECT=$(MT_PROJECT)
 !endif
 
 ALL: $(PROJECT)
-
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.

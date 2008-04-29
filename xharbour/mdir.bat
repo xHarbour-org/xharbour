@@ -1,6 +1,6 @@
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.15 2006/07/27 16:47:37 map Exp $
+rem $Id: mdir.bat,v 1.1 2008/04/27 14:00:45 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -248,6 +248,7 @@ if exist obj\%SUB_DIR%\*.bak                         del obj\%SUB_DIR%\*.bak
 if exist obj\%SUB_DIR%\*%OBJEXT%                     del obj\%SUB_DIR%\*%OBJEXT%
 if exist obj\%SUB_DIR%\*.output                      del obj\%SUB_DIR%\*.output
 if exist obj\%SUB_DIR%\*.c                           del obj\%SUB_DIR%\*.c
+if exist obj\%SUB_DIR%\*.ppo                         del obj\%SUB_DIR%\*.ppo
 if exist obj\%SUB_DIR%\*.h                           del obj\%SUB_DIR%\*.h
 
 if exist obj\%SUB_DIR%\bin\*.bak                     del obj\%SUB_DIR%\bin\*.bak
@@ -292,6 +293,7 @@ rem=============================================================================
 rem=============================================================================
 if exist obj\%SUB_DIR%\dll\*%OBJEXT%                 del obj\%SUB_DIR%\dll\*%OBJEXT%
 if exist obj\%SUB_DIR%\dll\*.c                       del obj\%SUB_DIR%\dll\*.c
+if exist obj\%SUB_DIR%\dll\*.ppo                     del obj\%SUB_DIR%\dll\*.ppo
 if exist obj\%SUB_DIR%\dll\*.h                       del obj\%SUB_DIR%\dll\*.h
 if exist obj\%SUB_DIR%\dll\*.output                  del obj\%SUB_DIR%\dll\*.output
 
