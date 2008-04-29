@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6050 2008/04/28 06:14:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.6051 2008/04/29 00:43:57 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-28 23:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * makefile.vc
+    + Added -D_HB_OS_WIN_32
+    + Added support for %CFLAGS% and %LFLAGS% Environment Variables
+
+  * source/vm/hvm.c
+    * Clipper compatability for symbol names at Init/Exit prcedures.
+    * Minor refinment for additional possible GPF trap at hb_vmQuit()
 
 2008-04-29 07:50 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * makefile.bc
@@ -55,10 +64,10 @@
 2008-04-27 23:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * bin/pack_src.sh
     ! added zlib sources
-  ! make_rpm.sh    
+  ! make_rpm.sh
     ! minor typo
       harbour.spec to xharbour.spec
-  * xharbour.spec    
+  * xharbour.spec
     ! added zlib lib
 
 2008-04-28 04:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
@@ -120,7 +129,7 @@
 2008-04-25 17:38 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/adsfunc.c
     + Added AdsIsEmpty().  Pass as it's only param either a string with
-      the field name or the numeric with the field position. 
+      the field name or the numeric with the field position.
       With .adt tables will return TRUE if value of the field is a NULL.
       With .dbf there are no null values so it just equivalent to empty().
 

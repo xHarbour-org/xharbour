@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.213 2008/04/28 06:14:30 andijahja Exp $
+# $Id: makefile.vc,v 1.214 2008/04/29 00:44:00 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -57,7 +57,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -D_CRT_SECURE_NO_DEPRECATE
+CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
@@ -74,6 +74,10 @@ LINKERFLAGS=\
 !if ("$(USE_MSVCRT)"=="")
 LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
 !endif
+
+# User flags should be able to override everything!
+CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
+LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26

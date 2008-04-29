@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.675 2008/04/22 04:40:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.676 2008/04/27 14:00:45 andijahja Exp $
  */
 
 /*
@@ -530,7 +530,7 @@ void hb_vmSymbolResolveDeferred( void )
 /* application entry point */
 HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
 {
-   HB_SYMB FakeInitSymbol = { "hb_vmInit", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
+   HB_SYMB FakeInitSymbol = { "", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
 
 #ifndef HB_THREAD_SUPPORT
    register UINT uiCounter;
@@ -835,7 +835,7 @@ void hb_vmReleaseLocalSymbols( void )
 
 HB_EXPORT int hb_vmQuit( void )
 {
-   HB_SYMB FakeQuitSymbol = { "hb_vmQuit", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
+   HB_SYMB FakeQuitSymbol = { "", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
 
    static BOOL bQuitting = FALSE;
    register UINT i;
@@ -907,6 +907,12 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After Background\n" );
    #endif
 
+   // No base symbol!
+   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+   {
+      hb_vmPushSymbol( &FakeQuitSymbol );
+   }
+
    hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    #ifdef TRACE_QUIT
@@ -934,12 +940,6 @@ HB_EXPORT int hb_vmQuit( void )
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Debugger\n" );
    #endif
-
-   // No base symbol!
-   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
-   {
-      hb_vmPushSymbol( &FakeQuitSymbol );
-   }
 
    /* release all known items stored in subsystems */
    hb_stackSetActionRequest( 0 );
@@ -988,6 +988,9 @@ HB_EXPORT int hb_vmQuit( void )
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After WITHOBJECT\n" );
    #endif
+
+   // HB_VM_STACK.pBase will be cleared, but we need a base symbol!
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems;
 
    /*
     NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
@@ -1044,13 +1047,14 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After CollectAll\n" );
    #endif
 
+   hb_stackRemove( 0 ); // Base Symbol!
+
    // Absolutley NO PRG code beyond this point!
    hb_clsDisableDestructors();
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After DisableDestructors\n" );
    #endif
 
-   hb_stackRemove( 0 ); // Base Symbol!
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After stackRemove\n" );
    #endif
