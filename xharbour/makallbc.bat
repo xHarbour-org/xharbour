@@ -1,10 +1,11 @@
 @echo off
 rem
-rem $Id: makallbc.bat,v 1.19 2006/01/21 00:55:19 fsgiudice Exp $
+rem $Id: makallbc.bat,v 1.21 2006/07/27 16:53:16 map Exp $
 rem
 
 echo create system files
 call make_b32 %1
+if errorlevel 1 goto end
 
 echo harbour.dll
 call dll_b32 %1

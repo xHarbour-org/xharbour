@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_b32.bat,v 1.33 2008/04/27 14:00:41 andijahja Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -26,7 +26,7 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -70,6 +70,6 @@ if "%1" == "CLEAN" goto CLEAN
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
-   SET HB_MT=
-   SET HB_MT_DIR=
+   REM SET LIBPREFIX=
+   IF NOT "%HB_MT%"=="" SET HB_MT=
+   IF NOT "%HB_MT_DIR%"=="" SET HB_MT_DIR=

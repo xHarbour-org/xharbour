@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6055 2008/04/29 07:20:30 andijahja Exp $
+ * $Id: ChangeLog,v 1.6056 2008/04/29 08:55:49 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-29 14:34 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * dll_b32.bat
+    * Avoid always forcing errorlevel to 1 due to reset of probably non existent %LIBPREFIX%
+      and %HB_MT_DIR%
+  * make_b32.bat
+    * Avoid always forcing errorlevel to 1 due to reset of probably non existent %LIBPREFIX%,
+      %HB_MT% and %HB_MT_DIR%
+  * makallbc.bat
+    * Minor revision to error checking
 
 2008-04-29 15:50 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   - target.mak
