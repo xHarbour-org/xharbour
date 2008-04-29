@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.bc,v 1.161 2008/04/29 08:55:50 andijahja Exp $
+# $Id: hrbdll.bc,v 1.162 2008/04/29 22:05:09 ronpinkas Exp $
 #
 # DLL MAKEFILE FOR BORLAND C++
 #
@@ -86,12 +86,12 @@ EXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_DLL_LIB) $(COMPI
 COMPILERLIBS=\
 	$(COMPILERLIBS)\
 	cg32.lib\
-	cw32$(HB_MT).lib\
+	cw32mt.lib\
 	import32.lib
 !else
 COMPILERLIBS=\
 	$(COMPILERLIBS)\
-	cw32$(HB_MT).lib\
+	cw32mt.lib\
 	import32.lib
 !endif
 
