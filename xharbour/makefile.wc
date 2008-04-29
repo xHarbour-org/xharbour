@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.81 2008/04/29 00:44:02 andijahja Exp $
+# $Id: makefile.wc,v 1.82 2008/04/29 07:20:35 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -94,9 +94,9 @@ HB_GT_LIBS=\
 # The Project
 #===============================================================================
 !ifndef HB_THREAD_SUPPORT
-!include targetst.mak
+PROJECT=$(ST_PROJECT)
 !else
-!include targetmt.mak
+PROJECT=$(MT_PROJECT)
 !endif
 
 ALL: $(PROJECT)
