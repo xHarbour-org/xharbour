@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.220 2008/04/28 06:14:25 andijahja Exp $
+# $Id: makefile.bc,v 1.221 2008/04/29 00:43:57 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -10,28 +10,7 @@
 #===============================================================================
 
 !if !$d(DEL)
-	DEL=del
-!endif
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include common.mak
-
-#===============================================================================
-# The Project
-#===============================================================================
-!include target.mak
-
-!ifdef HB_DOC_PDF
-HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-HARBOUR_LIBS=\
-	$(HARBOUR_LIBS)\
-	$(LIB_DIR)\pdflib.lib
+DEL=del
 !endif
 
 #===============================================================================
@@ -40,11 +19,7 @@ HARBOUR_LIBS=\
 # if debug info is requested, set ARFLAGS to /P64 in your environment
 #===============================================================================
 !if !$d(ARFLAGS)
-	ARFLAGS=/0
-!endif
-
-!if !$d(BCC_NOOPTIM)
-	CFLAGS=-O2 $(CFLAGS)
+ARFLAGS=/0
 !endif
 
 #===============================================================================
@@ -90,6 +65,41 @@ COMPILERLIBS=\
 HRB_LINK_CMD=ILINK32 $(LINKERFLAGS) c0w32.obj $**,$@,,$(PP_LIB) $(COMMON_LIB) $(COMPILERLIBS)
 EXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_LIBS) $(COMPILERLIBS)
 CMN_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(COMMON_LIB) $(COMPILERLIBS)
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+!if $d(HB_DOC_PDF)
+HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+HARBOUR_LIBS=\
+	$(HARBOUR_LIBS)\
+	$(LIB_DIR)\pdflib.lib
+!endif
+
+!ifdef HB_GTALLEG
+HB_GT_LIBS=\
+	$(HB_GT_LIBS)\
+	$(GTALLEG_LIB)
+!endif
+
+#===============================================================================
+# The Project
+#===============================================================================
+!include target.mak
+
+!if !$d(HB_THREAD_SUPPORT)
+PROJECT=$(ST_PROJECT)
+!else
+PROJECT=$(MT_PROJECT)
+!endif
+
+ALL: $(PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules

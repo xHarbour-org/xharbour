@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.38 2008/04/28 06:14:27 andijahja Exp $
+# $Id: makefile.dc,v 1.39 2008/04/29 00:43:57 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -8,16 +8,6 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include common.mak
-
-#===============================================================================
-# The Project
-#===============================================================================
-!include target.mak
 
 #===============================================================================
 # Append your own build flags here
@@ -28,7 +18,6 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-ARFLAGS=/0
 INCLUDE_DIR=INCLUDE;$(CC_DIR)\INCLUDE\WIN32;$(CC_DIR)\INCLUDE
 CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
 HB_CMD=$(HARBOUR_EXE) -iINCLUDE -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
@@ -42,6 +31,35 @@ COMPILERLIBS=$(CC_DIR)\LIB\snn.lib+$(CC_DIR)\LIB\kernel32.lib+$(CC_DIR)\LIB\wins
 EXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
 CMN_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
 HRB_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+!if $d(HB_DOC_PDF)
+HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+HARBOUR_LIBS=\
+	$(HARBOUR_LIBS)\
+	$(LIB_DIR)\pdflib.lib
+!endif
+
+!ifdef HB_GTALLEG
+HB_GT_LIBS=\
+	$(HB_GT_LIBS)\
+	$(GTALLEG_LIB)
+!endif
+
+#===============================================================================
+# The Project
+#===============================================================================
+!include target.mak
+
+ALL: $(ST_PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.214 2008/04/29 00:44:00 andijahja Exp $
+# $Id: makefile.vc,v 1.215 2008/04/29 03:32:39 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -20,11 +20,6 @@ CPLUSPLUS=1
 #===============================================================================
 !include common.mak
 
-#===============================================================================
-# The Project
-#===============================================================================
-!include target.mak
-
 !ifdef HB_DOC_PDF
 HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
 HBDOC_EXE_OBJS=\
@@ -35,6 +30,26 @@ HARBOUR_LIBS=\
 	$(HARBOUR_LIBS)\
 	$(LIB_DIR)\pdflib.lib
 !endif
+
+!ifdef HB_GTALLEG
+HB_GT_LIBS=\
+	$(HB_GT_LIBS)\
+	$(GTALLEG_LIB)
+!endif
+
+#===============================================================================
+# The Project
+#===============================================================================
+!include target.mak
+
+!if !("$(HB_THREAD_SUPPORT)"=="1")
+PROJECT=$(ST_PROJECT)
+!else
+PROJECT=$(MT_PROJECT)
+!endif
+
+ALL: $(PROJECT)
+
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.

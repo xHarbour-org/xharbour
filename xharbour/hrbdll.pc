@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.pc,v 1.50 2008/04/28 06:14:24 andijahja Exp $
+# $Id: hrbdll.pc,v 1.51 2008/04/29 00:43:57 andijahja Exp $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -76,13 +76,9 @@ EXE_LINK_CMD=POLINK $(EXEFLAGS)	/OUT:$@ $** $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 #===============================================================================
 # The Project
 #===============================================================================
-ALL:\
-	$(HARBOUR_DLL)\
-	$(HBDOCDLL_EXE)\
-	$(HBRUNDLL_EXE)\
-	$(HBTESTDLL_EXE)\
-	$(HBMAKEDLL_EXE)\
-	$(XBSCRIPTDLL_EXE)
+!include target.mak
+
+ALL: $(DLL_PROJECT)
 
 #===============================================================================
 # HARBOUR.DLL rules

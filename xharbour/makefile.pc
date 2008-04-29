@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.69 2008/04/28 06:14:29 andijahja Exp $
+# $Id: makefile.pc,v 1.70 2008/04/29 00:43:57 andijahja Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -11,11 +11,6 @@
 
 # Comment the following line when using version lower then 5.00
 .PHONY : ALL
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include common.mak
 
 #===============================================================================
 # Append your own build flags here
@@ -64,6 +59,16 @@ COMPILERLIBS=\
 HRB_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(PP_LIB)
 CMN_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(COMPILERLIBS)
 EXE_LINK_CMD=$(LINK_CMD) $(HARBOUR_LIBS) $(COMPILERLIBS)
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+#===============================================================================
+# The Project
+#===============================================================================
+# NOTE: We cannot include target.mak (read: make_pc.bat)
 
 ALL: $(PROJECT)
 

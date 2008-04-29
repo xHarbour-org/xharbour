@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.gc,v 1.33 2008/04/28 06:14:23 andijahja Exp $
+# $Id: hrbdll.gc,v 1.34 2008/04/29 00:43:57 andijahja Exp $
 #
 # DLL MAKEFILE FOR MINGW32
 #
@@ -84,13 +84,9 @@ EXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(COMPILERLIBS)
 #===============================================================================
 # The Project
 #===============================================================================
-ALL:\
-	$(HARBOUR_DLL)\
-	$(HBDOCDLL_EXE)\
-	$(HBRUNDLL_EXE)\
-	$(HBTESTDLL_EXE)\
-	$(HBMAKEDLL_EXE)\
-	$(XBSCRIPTDLL_EXE)
+include target.mak
+
+ALL: $(DLL_PROJECT)
 
 #===============================================================================
 # HARBOUR.DLL rules
