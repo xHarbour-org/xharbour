@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: dll_w32.bat,v 1.5 2008/04/27 14:00:38 andijahja Exp $
 rem
 rem FILE: dll_w32.bat
 rem BATCH FILE FOR OPENWATCOM (DLL)
@@ -30,7 +30,7 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -50,10 +50,11 @@ if "%1" == "/CLEAN" goto CLEAN
 
 :BUILD_OK
    @CALL mdir.bat dllcopy
+   if exist *.err del *.err > nul
    goto EXIT
 
 :BUILD_ERR
-   notepad dll_w32.log
+   if exist dll_w32.log notepad dll_w32.log
    goto EXIT
 
 :CLEAN
@@ -68,7 +69,7 @@ if "%1" == "/CLEAN" goto CLEAN
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
+   REM SET LIBPREFIX=
    SET HB_MT_DIR=
    SET LIB=%_LIB%
    SET PATH=%_PATH%
@@ -77,4 +78,3 @@ if "%1" == "/CLEAN" goto CLEAN
    SET WATCOM=
    SET EDPATH=
    SET LIB=
-   IF EXIST *.ERR DEL *.ERR > NUL

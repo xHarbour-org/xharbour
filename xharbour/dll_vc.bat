@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: dll_vc.bat,v 1.11 2008/04/27 14:00:38 andijahja Exp $
+rem $Id: dll_vc.bat,v 1.12 2008/04/29 04:41:23 ronpinkas Exp $
 rem
 rem FILE: dll_vc.bat
 rem BATCH FILE FOR MSVC (DLL)
@@ -49,7 +49,7 @@ if "%1" == "/CLEAN" goto CLEAN
    goto EXIT
 
 :BUILD_ERR
-   notepad dll_vc.log
+   if exist dll_vc.log notepad dll_vc.log
    goto EXIT
 
 :CLEAN

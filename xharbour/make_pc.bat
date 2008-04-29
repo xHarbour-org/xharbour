@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.23 2008/04/28 06:14:25 andijahja Exp $
+rem $Id: make_pc.bat,v 1.24 2008/04/28 07:13:39 andijahja Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -10,7 +10,6 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
-SET TARGET=targetst.mak
 SET CC_DIR=C:\PELLESC
 SET BISON_DIR=C:\BISON\BIN
 SET SUB_DIR=pc
@@ -26,13 +25,13 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
-   @CALL MDIR.BAT
+   @CALL mdir.bat
 
 :BUILD
 rem ============================================================================
@@ -58,17 +57,15 @@ rem ============================================================================
     if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-    copy bin\%SUB_DIR%\*.exe bin\*.* > nul
-    copy lib\%SUB_DIR%\*.lib lib\*.* > nul
-    if exist lib\%SUB_DIR%\*.bak del lib\%SUB_DIR%\*.bak
+    @CALL mdir.bat copytobin
     goto EXIT
 
 :BUILD_ERR
-   notepad make_pc.log
+   if exist make_pc.log notepad make_pc.log
    goto EXIT
 
 :CLEAN
-   @CALL MDIR.BAT CLEAN
+   @CALL mdir.bat CLEAN
    IF EXIST make_pc.log DEL make_pc.log
 
 :EXIT

@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: make_w32.bat,v 1.6 2008/04/27 14:00:43 andijahja Exp $
 rem
 rem FILE: make_w32.bat
 rem BATCH FILE FOR OPENWATCOM
@@ -30,13 +30,13 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
-    @CALL MDIR.BAT
+    @CALL mdir.bat
 
 :BUILD
    SET HB_MT=
@@ -50,17 +50,16 @@ if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   copy bin\w32\*.exe bin\*.* > nul
-   copy lib\w32\*.lib lib\*.* > nul
-   if exist lib\w32\*.bak del lib\w32\*.bak
+   @CALL mdir.bat copytobin
+   if exist *.err del *.err
    goto EXIT
 
 :BUILD_ERR
-   notepad make_w32.log
+   if exist make_w32.log notepad make_w32.log
    goto EXIT
 
 :CLEAN
-   @CALL MDIR.BAT CLEAN
+   @CALL mdir.bat clean
    if exist make_w32.log del make_w32.log
 
 :EXIT
@@ -75,7 +74,7 @@ if "%1" == "CLEAN" goto CLEAN
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
+   REM SET LIBPREFIX=
    SET HB_MT=
    SET HB_MT_DIR=
    SET WATCOM=

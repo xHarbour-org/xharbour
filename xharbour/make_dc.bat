@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.5 2008/04/28 06:14:25 andijahja Exp $
+rem $Id: make_dc.bat,v 1.6 2008/04/28 07:13:39 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -34,7 +34,7 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -53,10 +53,19 @@ rem ============================================================================
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
+   @CALL mdir.bat copytobin
+   if exist harbour.map  del harbour.map
+   if exist hbdoc.map    del hbdoc.map
+   if exist hbmake.map   del hbmake.map
+   if exist hbpp.map     del hbpp.map
+   if exist hbrun.map    del hbrun.map
+   if exist hbtest.map   del hbtest.map
+   if exist ppgen.map    del ppgen.map
+   if exist xbscript.map del xbscript.map
    goto EXIT
 
 :BUILD_ERR
-   notepad make_dc.log
+   if exist make_dc.log notepad make_dc.log
    goto EXIT
 
 :CLEAN
@@ -73,5 +82,5 @@ rem ============================================================================
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
+   REM SET LIBPREFIX=
    SET MAKE_EXE=

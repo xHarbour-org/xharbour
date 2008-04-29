@@ -48,14 +48,11 @@ if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   xcopy bin\%SUB_DIR%\*.exe bin\*.* /D /Y > nul
-   REM xcopy bin\%SUB_DIR%\*.tds bin\*.* /D /Y > nul
-   xcopy lib\%SUB_DIR%\*.lib lib\*.* /D /Y > nul
-   if exist lib\%SUB_DIR%\*.bak del lib\%SUB_DIR%\*.bak
+   @CALL mdir.bat copytobin
    goto EXIT
 
 :BUILD_ERR
-   notepad make_b32.log
+   IF EXIST make_b32.log notepad make_b32.log
    goto EXIT
 
 :CLEAN

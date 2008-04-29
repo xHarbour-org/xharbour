@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: dll_gc.bat,v 1.4 2008/04/27 14:00:38 andijahja Exp $
 rem
 rem FILE: dll_gc.bat
 rem BATCH FILE FOR MINGW (DLL)
@@ -49,7 +49,7 @@ if "%1" == "/CLEAN" goto CLEAN
    goto EXIT
 
 :BUILD_ERR
-   notepad dll_gc.log
+   if exist dll_gc.log notepad dll_gc.log
    goto EXIT
 
 :CLEAN

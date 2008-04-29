@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+rem $Id: dll_dc.bat,v 1.4 2008/04/27 14:00:38 andijahja Exp $
 rem
 rem FILE: dll_dc.bat
 rem BATCH FILE FOR DIGITALMARS (DLL)
@@ -43,7 +43,7 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-SET LIBPREFIX=
+REM SET LIBPREFIX=
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -63,10 +63,16 @@ rem ============================================================================
 
 :BUILD_OK
    @CALL mdir.bat dllcopy
+   if exist harbour.map     del harbour.map
+   if exist hbdocdll.map    del hbdocdll.map
+   if exist hbmakedll.map   del hbmakedll.map
+   if exist hbrundll.map    del hbrundll.map
+   if exist hbtestdll.map   del hbtestdll.map
+   if exist xbscriptdll.map del xbscriptdll.map
    goto EXIT
 
 :BUILD_ERR
-   NOTEPAD dll_dc.log
+   if exist dll_dc.log notepad dll_dc.log
    goto EXIT
 
 :CLEAN
@@ -83,7 +89,7 @@ rem ============================================================================
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   SET LIBPREFIX=
+   REM SET LIBPREFIX=
    SET MAKE_EXE=
    SET HB_MT_DIR=
    if exist dmcdll.def del dmcdll.def

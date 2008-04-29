@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: dll_b32.bat,v 1.15 2008/04/27 14:00:38 andijahja Exp $
+rem $Id: dll_b32.bat,v 1.16 2008/04/29 12:34:54 enricomaria Exp $
 rem
 rem FILE: dll_b32.bat
 rem BATCH FILE FOR BORLAND C++ (DLL)
@@ -49,7 +49,7 @@ rem
    goto EXIT
 
 :BUILD_ERR
-   notepad dll_b32.log
+   if exist dll_b32.log notepad dll_b32.log
    goto EXIT
 
 :CLEAN

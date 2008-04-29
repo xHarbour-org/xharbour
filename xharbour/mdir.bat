@@ -1,6 +1,6 @@
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.1 2008/04/27 14:00:45 andijahja Exp $
+rem $Id: mdir.bat,v 1.2 2008/04/29 08:55:52 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -8,14 +8,16 @@ rem WARNING : Do Not Call This Batch File Directly.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-if "%1" == "CLEAN"     goto REMOVE
-if "%1" == "clean"     goto REMOVE
-if "%1" == "DLLCLEAN"  goto REMOVEDLL
-if "%1" == "dllclean"  goto REMOVEDLL
-if "%1" == "DLLCREATE" goto CREATEDLL
-if "%1" == "dllcreate" goto CREATEDLL
-if "%1" == "DLLCOPY"   goto COPYDLL
-if "%1" == "dllcopy"   goto COPYDLL
+if "%1" == "CLEAN"      goto REMOVE
+if "%1" == "clean"      goto REMOVE
+if "%1" == "DLLCLEAN"   goto REMOVEDLL
+if "%1" == "dllclean"   goto REMOVEDLL
+if "%1" == "DLLCREATE"  goto CREATEDLL
+if "%1" == "dllcreate"  goto CREATEDLL
+if "%1" == "DLLCOPY"    goto COPYDLL
+if "%1" == "dllcopy"    goto COPYDLL
+if "%1" == "COPYTOBIN"  goto COPYBIN
+if "%1" == "copytobin"  goto COPYBIN
 
 rem=============================================================================
 :CREATE
@@ -40,6 +42,15 @@ if not exist obj               md obj
 if not exist obj\%SUB_DIR%     md obj\%SUB_DIR%
 if not exist obj\%SUB_DIR%\dll md obj\%SUB_DIR%\dll
 if not exist lib\%SUB_DIR%     md lib\%SUB_DIR%
+goto EXIT
+
+rem=============================================================================
+:COPYBIN
+rem=============================================================================
+if exist bin\%SUB_DIR%\*.exe xcopy     bin\%SUB_DIR%\*.exe bin /D /Y > nul
+if exist lib\%SUB_DIR%\*%LIBEXT% xcopy lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
+if exist bin\%SUB_DIR%\*.tds xcopy     bin\%SUB_DIR%\*.tds bin /D /Y > nul
+if exist lib\%SUB_DIR%\*.bak del       lib\%SUB_DIR%\*.bak
 goto EXIT
 
 rem=============================================================================
@@ -260,6 +271,7 @@ if exist obj\%SUB_DIR%\bin\*.h                       del obj\%SUB_DIR%\bin\*.h
 if exist obj\%SUB_DIR%\mt\*%OBJEXT%                  del obj\%SUB_DIR%\mt\*%OBJEXT%
 if exist obj\%SUB_DIR%\mt\*.output                   del obj\%SUB_DIR%\mt\*.output
 if exist obj\%SUB_DIR%\mt\*.c                        del obj\%SUB_DIR%\mt\*.c
+if exist obj\%SUB_DIR%\mt\*.ppo                      del obj\%SUB_DIR%\mt\*.ppo
 if exist obj\%SUB_DIR%\mt\*.h                        del obj\%SUB_DIR%\mt\*.h
 
 if exist obj\%SUB_DIR%\fmstat\*%OBJEXT%              del obj\%SUB_DIR%\fmstat\*%OBJEXT%
@@ -317,6 +329,7 @@ if exist bin\%SUB_DIR%\xbscriptdll.exe               del bin\%SUB_DIR%\xbscriptd
 if exist bin\%SUB_DIR%\xbscriptdll.map               del bin\%SUB_DIR%\xbscriptdll.map
 if exist bin\%SUB_DIR%\xbscriptdll.tds               del bin\%SUB_DIR%\xbscriptdll.tds
 
+if exist lib\%LIBPREFIX%harbour%LIBEXT%              del lib\%LIBPREFIX%harbour%LIBEXT%
 if exist bin\%SUB_DIR%\hbdocdll.exp                  del bin\%SUB_DIR%\hbdocdll.exp
 if exist bin\%SUB_DIR%\hbdocdll.lib                  del bin\%SUB_DIR%\hbdocdll.lib
 if exist bin\%SUB_DIR%\hbrundll.exp                  del bin\%SUB_DIR%\hbrundll.exp
@@ -327,6 +340,27 @@ if exist bin\%SUB_DIR%\hbmakedll.exp                 del bin\%SUB_DIR%\hbmakedll
 if exist bin\%SUB_DIR%\hbmakedll.lib                 del bin\%SUB_DIR%\hbmakedll.lib
 if exist bin\%SUB_DIR%\xbscriptdll.exp               del bin\%SUB_DIR%\xbscriptdll.exp
 if exist bin\%SUB_DIR%\xbscriptdll.lib               del bin\%SUB_DIR%\xbscriptdll.lib
+
+if exist bin\%SUB_DIR%\hbdocdll.ilc                  del bin\%SUB_DIR%\hbdocdll.ilc
+if exist bin\%SUB_DIR%\hbdocdll.ild                  del bin\%SUB_DIR%\hbdocdll.ild
+if exist bin\%SUB_DIR%\hbdocdll.ilf                  del bin\%SUB_DIR%\hbdocdll.ilf
+if exist bin\%SUB_DIR%\hbdocdll.ils                  del bin\%SUB_DIR%\hbdocdll.ils
+if exist bin\%SUB_DIR%\hbmakedll.ilc                 del bin\%SUB_DIR%\hbmakedll.ilc
+if exist bin\%SUB_DIR%\hbmakedll.ild                 del bin\%SUB_DIR%\hbmakedll.ild
+if exist bin\%SUB_DIR%\hbmakedll.ilf                 del bin\%SUB_DIR%\hbmakedll.ilf
+if exist bin\%SUB_DIR%\hbmakedll.ils                 del bin\%SUB_DIR%\hbmakedll.ils
+if exist bin\%SUB_DIR%\hbrundll.ilc                  del bin\%SUB_DIR%\hbrundll.ilc
+if exist bin\%SUB_DIR%\hbrundll.ild                  del bin\%SUB_DIR%\hbrundll.ild
+if exist bin\%SUB_DIR%\hbrundll.ilf                  del bin\%SUB_DIR%\hbrundll.ilf
+if exist bin\%SUB_DIR%\hbrundll.ils                  del bin\%SUB_DIR%\hbrundll.ils
+if exist bin\%SUB_DIR%\hbtestdll.ilc                 del bin\%SUB_DIR%\hbtestdll.ilc
+if exist bin\%SUB_DIR%\hbtestdll.ild                 del bin\%SUB_DIR%\hbtestdll.ild
+if exist bin\%SUB_DIR%\hbtestdll.ilf                 del bin\%SUB_DIR%\hbtestdll.ilf
+if exist bin\%SUB_DIR%\hbtestdll.ils                 del bin\%SUB_DIR%\hbtestdll.ils
+if exist bin\%SUB_DIR%\xbscriptdll.ilc               del bin\%SUB_DIR%\xbscriptdll.ilc
+if exist bin\%SUB_DIR%\xbscriptdll.ild               del bin\%SUB_DIR%\xbscriptdll.ild
+if exist bin\%SUB_DIR%\xbscriptdll.ilf               del bin\%SUB_DIR%\xbscriptdll.ilf
+if exist bin\%SUB_DIR%\xbscriptdll.ils               del bin\%SUB_DIR%\xbscriptdll.ils
 
 if exist bin\harbour.dll                             del bin\harbour.dll
 if exist bin\hbdocdll.exe                            del bin\hbdocdll.exe
