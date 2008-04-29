@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6059 2008/04/29 22:05:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6060 2008/04/29 22:14:08 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -19,8 +19,13 @@
   * makefile.wc
     + nologo on lib386 and link386
 
-2008-04-29 16:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
-
+2008-04-29 17:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.bc
+  * make_b32.bat
+  * makefile.bc
+    + Support for CFLAGS, LFLAGS, HB_CG32, BCCDIR
+    * Minor refinments
+    
   * source\rtl\strtran.c
     * GPF trap
     
