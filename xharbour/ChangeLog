@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6056 2008/04/29 08:55:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.6057 2008/04/29 12:34:53 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-29 08:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * make_vc.bat
+    + Added needed /Y to xcopy or xcopy will HANG because of > NUL
 
 2008-04-29 14:34 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * dll_b32.bat

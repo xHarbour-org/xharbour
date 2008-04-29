@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.17 2008/04/27 21:38:57 andijahja Exp $
+rem $Id: make_vc.bat,v 1.18 2008/04/29 04:41:23 ronpinkas Exp $
 rem
 rem FILE: nake_vc.bat
 rem BATCH FILE FOR MSVC
@@ -46,8 +46,8 @@ if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   xcopy bin\%SUB_DIR%\*.exe bin /d> nul
-   xcopy lib\%SUB_DIR%\*.lib lib /d> nul
+   xcopy bin\%SUB_DIR%\*.exe bin /D /Y > nul
+   xcopy lib\%SUB_DIR%\*.lib lib /D /Y > nul
    goto EXIT
 
 :BUILD_ERR
