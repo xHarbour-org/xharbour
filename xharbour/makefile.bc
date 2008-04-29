@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.222 2008/04/29 07:20:33 andijahja Exp $
+# $Id: makefile.bc,v 1.223 2008/04/29 08:55:52 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -41,6 +41,11 @@ CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
 HARBOURFLAGS =$(HARBOURFLAGS) $(HB_MT_FLAGS)
 !endif
+
+# User flags should be able to override everything!
+CLIBFLAGS    =$(CLIBFLAGS)  $(CFLAGS)
+LINKERFLAGS  =$(LINKERFLAGS) $(LFLAGS)
+
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:
@@ -58,9 +63,16 @@ CC_CMD_FMSTAT=BCC32 $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
+!if $d(HB_CG32)
+COMPILERLIBS=\
+	cg32.lib\
+	cw32$(HB_MT).lib\
+	import32.lib
+!else
 COMPILERLIBS=\
 	cw32$(HB_MT).lib\
 	import32.lib
+!endif
 
 HRB_LINK_CMD=ILINK32 $(LINKERFLAGS) c0w32.obj $**,$@,,$(PP_LIB) $(COMMON_LIB) $(COMPILERLIBS)
 EXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_LIBS) $(COMPILERLIBS)

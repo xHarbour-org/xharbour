@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.33 2008/04/27 14:00:41 andijahja Exp $
+rem $Id: make_b32.bat,v 1.34 2008/04/29 12:34:56 enricomaria Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -10,6 +10,8 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
+
+if "%BCCDIR%" == "" SET BCCDIR=C:\BORLAND\BCC58
 
 SET CC_DIR=C:\BORLAND\BCC58
 SET BISON_DIR=C:\BISON\BIN
@@ -46,9 +48,9 @@ if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   copy bin\%SUB_DIR%\*.exe bin\*.* > nul
-   copy bin\%SUB_DIR%\*.tds bin\*.* > nul
-   copy lib\%SUB_DIR%\*.lib lib\*.* > nul
+   xcopy bin\%SUB_DIR%\*.exe bin\*.* /D /Y > nul
+   REM xcopy bin\%SUB_DIR%\*.tds bin\*.* /D /Y > nul
+   xcopy lib\%SUB_DIR%\*.lib lib\*.* /D /Y > nul
    if exist lib\%SUB_DIR%\*.bak del lib\%SUB_DIR%\*.bak
    goto EXIT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.6 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: strtran.c,v 1.7 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ HB_FUNC( STRTRAN )
                   ULONG i = 0;
                   ULONG ulLength = ulText;
 
-                  while( i < ulText )
+                  while( i < ulText - ulSeek + 1 )
                   {
                      if( ( bAll || lReplaced < ( LONG ) ulCount ) && ! memcmp( szText + i, szSeek, ulSeek ) )
                      {
@@ -149,7 +149,7 @@ HB_FUNC( STRTRAN )
 
                      ulFound = 0;
                      i = 0;
-                     while( i < ulText )
+                     while( i < ulText - ulSeek + 1 )
                      {
                         if( lReplaced && ! memcmp( szText + i, szSeek, ulSeek ) )
                         {
