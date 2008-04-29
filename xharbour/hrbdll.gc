@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.gc,v 1.32 2008/04/27 14:00:38 andijahja Exp $
+# $Id: hrbdll.gc,v 1.33 2008/04/28 06:14:23 andijahja Exp $
 #
 # DLL MAKEFILE FOR MINGW32
 #
@@ -80,12 +80,11 @@ BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
 DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
 EXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(COMPILERLIBS)
-HRBDLL_DEF  =$(LIB_DIR)/harbour.def
 
 #===============================================================================
 # The Project
 #===============================================================================
-DLL_PROJECT:\
+ALL:\
 	$(HARBOUR_DLL)\
 	$(HBDOCDLL_EXE)\
 	$(HBRUNDLL_EXE)\
@@ -98,35 +97,5 @@ DLL_PROJECT:\
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
-
-#===============================================================================
-# HBDOCDLL.EXE rules
-#===============================================================================
-$(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBRUNDLL.EXE rules
-#===============================================================================
-$(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBTESTDLL.EXE rules
-#===============================================================================
-$(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBMAKEDLL.EXE rules
-#===============================================================================
-$(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# XBSCRIPTDLL.EXE rules
-#===============================================================================
-$(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
 
 include compile.mak

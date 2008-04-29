@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: common.mak,v 1.4 2008/04/27 14:00:37 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -50,6 +50,8 @@ HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
+
+INCLUDE_DIR2  =include
 
 #===============================================================================
 # Macros For Standard Libraries

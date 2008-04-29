@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.39 2008/04/27 14:00:44 andijahja Exp $
+# $Id: makefile.gc,v 1.40 2008/04/28 06:14:27 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -24,7 +24,6 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =include
-INCLUDE_DIR2 =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
@@ -89,13 +88,17 @@ COMPILERLIBS=\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
 
+HRB_LINK_CMD=GCC -Wall -o $@ $^ -L$(LIB_DIR) -mno-cygwin -lpp -lcommon -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32
+EXE_LINK_CMD=GCC -WAll -o $@ $^ -mno-cygwin $(COMPILERLIBS)
+CMN_LINK_CMD=GCC -WAll -o $@ $^ -mno-cygwin -L$(CC_DIR)/lib -L$(LIB_DIR) -lcommon
+
 ifeq ($(HB_GTALLEG),yes)
 HB_GT_LIBS+=\
 	$(GTALLEG_LIB)
 endif
 
 ifeq ($(HB_THREAD_SUPPORT),0)
-PROJECT=\
+PROJECT:=\
 	$(COMMON_LIB)\
 	$(PPGEN_EXE)\
 	$(PP_LIB)\
@@ -110,12 +113,9 @@ PROJECT=\
 	$(DLL_MAIN_LIB)\
 	$(ODBC_LIB)\
 	$(MISC_LIB)\
-	$(HBPP_EXE)\
-	$(HBDOC_EXE)\
-	$(HBMAKE_EXE)\
-	$(XBSCRIPT_EXE)
+	$(HBPP_EXE)
 else
-PROJECT=\
+PROJECT:=\
 	$(PP_LIB)
 endif
 
@@ -136,7 +136,16 @@ PROJECT+=\
 	$(HSX_LIB)\
 	$(USRRDD_LIB)\
 	$(RDDS_LIB)\
-	$(CT_LIB)\
+	$(CT_LIB)
+
+ifeq ($(HB_THREAD_SUPPORT),0)
+PROJECT+=\
+	$(HBDOC_EXE)\
+	$(HBMAKE_EXE)\
+	$(XBSCRIPT_EXE)
+endif
+
+PROJECT+=\
 	$(HBTEST_EXE)\
 	$(HBRUN_EXE)
 
@@ -145,15 +154,21 @@ ALL: $(PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST & MT )
 #===============================================================================
-# A check should be made here whether the project is MT. If this clause ignored,
-# then GNU make will unnecessarily recompile ST libraries although they are not
-# included in the PROJECT. I do not know whether this is a GNU make bug or my
-# own bug/ignorance. This results in non-ability to include the PROJECT items in
-# common.mak (AJ: 2008-04-26)
-ifeq ($(HB_THREAD_SUPPORT),0)
+
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(CT_LIB) : $(CT_LIB_OBJS)
+	$(LIB_CMD)
+
+VM_LIB_OBJS+=\
+	$(VM_MAIN_OBJS)
+$(VM_LIB) : $(VM_LIB_OBJS)
+	$(LIB_CMD)
+
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -193,35 +208,10 @@ $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PPGEN_EXE) : $(PPGEN_EXE_OBJS) $(COMMON_LIB)
-	GCC -WAll -o$(PPGEN_EXE) $(PPGEN_EXE_OBJS) -mno-cygwin -L$(CC_DIR)/lib -L$(LIB_DIR) -lcommon 
-
-$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
-	GCC -Wall -o$(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) -L$(LIB_DIR) -mno-cygwin -lpp -lcommon -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32
-
-$(HBDOC_EXE) : $(HBDOC_EXE_OBJS) $(HARBOUR_LIBS)
-	GCC -WAll -o$(HBDOC_EXE) $(HBDOC_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
-
-$(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS) $(HARBOUR_LIBS)
-	GCC -WAll -o$(HBMAKE_EXE) $(HBMAKE_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
-
-$(HBPP_EXE) : $(HBPP_EXE_OBJS) $(COMMON_LIB) $(PP_LIB)
-	GCC -WAll -o$(HBPP_EXE) $(HBPP_EXE_OBJS) -mno-cygwin -L$(CC_DIR)/lib -L$(LIB_DIR) -lcommon -lpp -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lole32 -luuid -loleaut32
-
-$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS) $(HARBOUR_LIBS)
-	GCC -WAll -o$(XBSCRIPT_EXE) $(XBSCRIPT_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
-endif
-
-#===============================================================================
-# The rest of PROJECT items have both MT and ST version
-#===============================================================================
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
 	$(LIB_CMD)
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(MISC_LIB) : $(MISC_LIB_OBJS)
@@ -257,14 +247,6 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
 	$(LIB_CMD)
 
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
-
-VM_LIB_OBJS+=\
-	$(VM_MAIN_OBJS)
-$(VM_LIB) : $(VM_LIB_OBJS)
-	$(LIB_CMD)
-
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -279,15 +261,6 @@ $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
 	$(LIB_CMD)
-
-#===============================================================================
-# Executable dependencies and build rules (ST and MT)
-#===============================================================================
-$(HBRUN_EXE) : $(HBRUN_EXE_OBJS) $(HARBOUR_LIBS)
-	GCC -WAll -o$(HBRUN_EXE) $(HBRUN_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
-
-$(HBTEST_EXE) : $(HBTEST_EXE_OBJS) $(HARBOUR_LIBS)
-	GCC -WAll -o$(HBTEST_EXE) $(HBTEST_EXE_OBJS) -mno-cygwin $(COMPILERLIBS)
 
 #===============================================================================
 # Building rules of Object files

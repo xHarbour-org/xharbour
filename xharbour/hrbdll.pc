@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.pc,v 1.49 2008/04/27 14:00:38 andijahja Exp $
+# $Id: hrbdll.pc,v 1.50 2008/04/28 06:14:24 andijahja Exp $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -46,7 +46,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
-INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(OBJ_DIR)"
+INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
 
 DLLFLAGS=\
 	/OUT:$(HARBOUR_DLL)\
@@ -89,35 +89,5 @@ ALL:\
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
-
-#===============================================================================
-# HBDOCDLL.EXE rules
-#===============================================================================
-$(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBRUNDLL.EXE rules
-#===============================================================================
-$(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBTESTDLL.EXE rules
-#===============================================================================
-$(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBMAKEDLL.EXE rules
-#===============================================================================
-$(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# XBSCRIPTDLL.EXE rules
-#===============================================================================
-$(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
 
 !include compile.mak

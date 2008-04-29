@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.79 2008/04/27 14:00:45 andijahja Exp $
+# $Id: makefile.wc,v 1.80 2008/04/28 06:14:30 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -44,10 +44,9 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR =include
-INCLUDE_DIR2=include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32
-HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR2) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -i$include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !ifdef HB_THREAD_SUPPORT
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
@@ -75,7 +74,7 @@ LINK_CMD     =LINK386 /out:$@ $** $(LINKERFLAGS)
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
-CC_LIBS=\
+COMPILERLIBS=\
 	user32.lib\
 	ws2_32.lib\
 	winspool.lib\
@@ -86,9 +85,25 @@ CC_LIBS=\
 	uuid.lib\
 	mpr.lib
 
+HRB_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
+CMN_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(COMPILERLIBS)
+EXE_LINK_CMD=$(LINK_CMD) $(HARBOUR_LIBS) $(COMPILERLIBS)
+
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(CT_LIB) : $(CT_LIB_OBJS)
+	$(LIB_CMD)
+
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_MAIN_OBJS)
+$(VM_LIB) : $(VM_LIB_OBJS)
+	$(LIB_CMD)
+
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -140,13 +155,7 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 $(PP_LIB) : $(PP_LIB_OBJS)
 	$(LIB_CMD)
 
-$(CT_LIB) : $(CT_LIB_OBJS)
-	$(LIB_CMD)
-
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
 	$(LIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
@@ -155,19 +164,10 @@ $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
 $(TIP_LIB) : $(TIP_LIB_OBJS)
 	$(LIB_CMD)
 
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
-$(VM_LIB) : $(VM_LIB_OBJS)
-	$(LIB_CMD)
-
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
@@ -199,38 +199,6 @@ $(MISC_LIB) : $(MISC_LIB_OBJS)
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
-
-#===============================================================================
-# Executable dependencies and build rules
-#===============================================================================
-$(PPGEN_EXE) : \
-	$(PPGEN_EXE_OBJS)\
-	$(INCLUDE_DIR2)\hbstdgen.ch\
-	$(INCLUDE_DIR2)\std.ch\
-	$(INCLUDE_DIR2)\set.ch\
-	$(COMMON_LIB_OBJS)
-	LINK386 /out:$(PPGEN_EXE) $(PPGEN_EXE_OBJS) $(LINKERFLAGS) $(COMMON_LIB) $(CC_LIBS)
-
-$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
-	$(LINK_CMD) $(COMMON_LIB) $(PP_LIB) $(CC_LIBS)
-
-$(HBPP_EXE) : $(HBPP_EXE_OBJS)
-	$(LINK_CMD) $(COMMON_LIB) $(CC_LIBS)
-
-$(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
-	$(LINK_CMD) $(HARBOUR_LIBS) $(CC_LIBS)
-
-$(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
-	$(LINK_CMD) $(HARBOUR_LIBS) $(CC_LIBS)
-
-$(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
-	$(LINK_CMD) $(HARBOUR_LIBS) $(CC_LIBS)
-
-$(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
-	$(LINK_CMD) $(HARBOUR_LIBS) $(CC_LIBS)
-
-$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
-	$(LINK_CMD) $(HARBOUR_LIBS) $(CC_LIBS)
 
 #===============================================================================
 # Building rules of Object files

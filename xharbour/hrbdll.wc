@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.wc,v 1.64 2008/04/27 14:00:39 andijahja Exp $
+# $Id: hrbdll.wc,v 1.65 2008/04/28 06:14:25 andijahja Exp $
 #
 # DLL MAKEFILE FOR OPENWATCOM
 #
@@ -85,9 +85,9 @@ EXEFLAGS=\
 	/nologo\
 	/subsystem:console
 
-INCLUDE_DIR =-i=INCLUDE -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
+INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d__EXPORT__
-HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iINCLUDE -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
@@ -112,35 +112,5 @@ ALL:\
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
-
-#===============================================================================
-# HBDOCDLL.EXE rules
-#===============================================================================
-$(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBRUNDLL.EXE rules
-#===============================================================================
-$(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBTESTDLL.EXE rules
-#===============================================================================
-$(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# HBMAKEDLL.EXE rules
-#===============================================================================
-$(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-#===============================================================================
-# XBSCRIPTDLL.EXE rules
-#===============================================================================
-$(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
 
 !include compile.mak

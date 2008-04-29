@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.218 2008/04/14 06:06:20 andijahja Exp $
+# $Id: compile.mak,v 1.1 2008/04/27 14:00:37 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -8,6 +8,48 @@
 #         (pay attention to TAB before CMDs)
 #
 #===============================================================================
+
+#===============================================================================
+# Executable dependencies and build rules
+#===============================================================================
+$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
+	$(HRB_LINK_CMD)
+
+$(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
+	$(CMN_LINK_CMD)
+
+$(HBPP_EXE) : $(HBPP_EXE_OBJS)
+	$(CMN_LINK_CMD)
+
+$(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
+	$(EXE_LINK_CMD)
+
+$(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
+	$(EXE_LINK_CMD)
 
 #===============================================================================
 # COMMON.LIB rules
@@ -66,11 +108,11 @@ $(OBJ_DIR)$(DIR_SEP)pplib3$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib3.c
 $(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT) : $(PP_DIR)$(DIR_SEP)ppcore.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
+$(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
-$(PP_DIR)$(DIR_SEP)pptable.c : $(PPGEN_EXE)
-	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -q
+$(OBJ_DIR)$(DIR_SEP)pptable.c :
+	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(OBJ_DIR)$(DIR_SEP)pptable.c -q
 
 #===============================================================================
 # HARBOUR.EXE rules
@@ -1576,7 +1618,7 @@ $(OBJ_DIR)$(DIR_SEP)nulsys$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)nulsys$(DIR_SEP)nulsys
 #===============================================================================
 # DBFFPT.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)dbffpt1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfFPT$(DIR_SEP)dbffpt1.c
+$(OBJ_DIR)$(DIR_SEP)dbffpt1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbffpt$(DIR_SEP)dbffpt1.c
 	$(CC_CMD)
 
 #===============================================================================

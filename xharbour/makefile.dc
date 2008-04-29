@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.37 2008/04/27 14:00:43 andijahja Exp $
+# $Id: makefile.dc,v 1.38 2008/04/28 06:14:27 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -30,7 +30,6 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 ARFLAGS=/0
 INCLUDE_DIR=INCLUDE;$(CC_DIR)\INCLUDE\WIN32;$(CC_DIR)\INCLUDE
-INCLUDE_DIR2=INCLUDE
 CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
 HB_CMD=$(HARBOUR_EXE) -iINCLUDE -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
 HB_CMD_MAIN=$(HARBOUR_EXE) -iINCLUDE -n -q0 -po$(OBJ_DIR)\ -w -es2 -gc2 $** -o$@
@@ -41,10 +40,28 @@ BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
 COMPILERLIBS=$(CC_DIR)\LIB\snn.lib+$(CC_DIR)\LIB\kernel32.lib+$(CC_DIR)\LIB\winspool.lib+$(CC_DIR)\LIB\user32.lib+$(CC_DIR)\LIB\advapi32.lib+$(CC_DIR)\LIB\ole32.lib+$(CC_DIR)\LIB\uuid.lib+$(CC_DIR)\LIB\mpr.lib+$(CC_DIR)\LIB\winmm.lib+$(CC_DIR)\LIB\oleaut32.lib
 EXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
+CMN_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
+HRB_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	LIB -c -n $@ @&&!
+$**
+!
+
+$(CT_LIB) : $(CT_LIB_OBJS)
+	LIB -c -n $@ @&&!
+$**
+!
+
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_MAIN_OBJS)
+$(VM_LIB) : $(VM_LIB_OBJS)
+	$(LIB_CMD)
+
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -96,29 +113,13 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 $(PP_LIB) : $(PP_LIB_OBJS)
 	$(LIB_CMD)
 
-$(CT_LIB) : $(CT_LIB_OBJS)
-	LIB -c -n $@ @&&!
-$**
-!
-
 $(RDD_LIB) : $(RDD_LIB_OBJS)
 	$(LIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	LIB -c -n $@ @&&!
-$**
-!
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
 	$(LIB_CMD)
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
-	$(LIB_CMD)
-
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
-$(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
 
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
@@ -158,30 +159,6 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
 
 #===============================================================================
-# Executable dependencies and build rules
+# Building rules of Object files
 #===============================================================================
-$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
-        LINK $**,$@,,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
-
-$(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-$(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-$(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-$(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
-	$(EXE_LINK_CMD)
-
-$(HBPP_EXE) : $(HBPP_EXE_OBJS)
-        LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
-
-$(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
-        LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
-
 !include compile.mak
