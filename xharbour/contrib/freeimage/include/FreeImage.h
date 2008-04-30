@@ -135,7 +135,9 @@ FI_STRUCT (FIMULTIBITMAP) { void *data; };
 
 #ifndef __MINGW32__     // prevents a bug in mingw32
 
+#ifndef __POCC__
 typedef long BOOL;
+#endif
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
@@ -146,7 +148,7 @@ typedef long LONG;
 #else
 #pragma pack(1)
 #endif // WIN32
-#if !defined(__XCC__)
+#if ( !defined(__XCC__) && !defined(__POCC__) )
 typedef struct tagRGBQUAD {
 #ifdef FREEIMAGE_BIGENDIAN
   BYTE rgbRed;
@@ -657,8 +659,11 @@ DLL_API const char *DLL_CALLCONV FreeImage_GetVersion(void);
 DLL_API const char *DLL_CALLCONV FreeImage_GetCopyrightMessage(void);
 
 // Message output functions -------------------------------------------------
-
+#ifndef __POCC__
 DLL_API void DLL_CALLCONV FreeImage_OutputMessageProc(int fif, const char *fmt, ...);
+#else
+DLL_API void __cdecl FreeImage_OutputMessageProc(int fif, const char *fmt, ...);
+#endif
 
 typedef void (*FreeImage_OutputMessageFunction)(FREE_IMAGE_FORMAT fif, const char *msg);
 DLL_API void DLL_CALLCONV FreeImage_SetOutputMessage(FreeImage_OutputMessageFunction omf);
