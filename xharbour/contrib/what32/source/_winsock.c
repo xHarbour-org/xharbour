@@ -21,6 +21,10 @@
 #include <time.h>
 #include <winsock2.h>
 
+#ifndef DWORD_PTR
+#define DWORD_PTR DWORD
+#endif
+
 //-----------------------------------------------------------------------------
 //  SOCKET  accept( IN SOCKET s, OUT struct sockaddr * addr, IN OUT int * addrlen );
 

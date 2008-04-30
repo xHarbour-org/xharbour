@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6065 2008/04/30 21:18:09 andijahja Exp $
+ * $Id: ChangeLog,v 1.6066 2008/04/30 22:11:16 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-01 06:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * contrib/what32/source/_winhead.c
+    + missing defines for MSVC6
+  * contrib/what32/source/_winINet.c
+  * contrib/what32/source/_winsock.c
+    + define DWORD_PTR -> DWORD for MSVC6
+  * contrib/what32/source/_winmisc.c
+    + define LONG_PTR -> LONG for MSVC6
+  * contrib/what32/source/_winrgn.c
+    + define GetRandomRgn() for MSVC6
+  * contrib/what32/source/_winsys.c
+    ! MSVC6 does not have htmlhelp.h
+  * contrib/what32/source/_winwnd.c
+    + define GetWindowLongPtr,SetWindowLongPtr,GetClassLongPtr, SetClassLongPtr
+      LONG_PTR,ULONG_PTR for MSVC6
+  * contrib/what32/source/WinCore.prg
+    ! casting
+  * file rename:
+    WinRBar.prg -> winrbar.prg
+    WinTabs.Prg -> wintabs.prg
+    WinTBar.Prg -> wintbar.prg
+    _WinTBar.c  -> _wintbar.c
+    _WinTree.c  -> _wintree.c
 
 2008-05-01 05:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/xwt/src/xwt_win/xwt_win_menu.c

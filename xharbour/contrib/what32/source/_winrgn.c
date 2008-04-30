@@ -16,6 +16,9 @@ extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+WINGDIAPI int WINAPI GetRandomRgn (IN HDC, IN HRGN, IN INT);
+#endif
 //-----------------------------------------------------------------------------
 // WINGDIAPI HRGN WINAPI CreateEllipticRgn( IN int, IN int, IN int, IN int);
 

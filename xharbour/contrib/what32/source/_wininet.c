@@ -31,6 +31,23 @@
 #include   "hbapiitm.h"
 #include   "winreg.h"
 
+#ifndef DWORD_PTR
+#define DWORD_PTR DWORD
+#endif
+
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#define FtpCommand FtpCommandA
+BOOLAPI
+FtpCommandA(
+    HINTERNET hConnect,
+    BOOL fExpectResponse,
+    DWORD dwFlags,
+    LPCSTR lpszCommand,
+    DWORD dwContext,
+    HINTERNET *phFtpCommand
+    );
+#endif
+
 //---------------------------------------------------------------------//
 /*
    DWORD InternetDial(

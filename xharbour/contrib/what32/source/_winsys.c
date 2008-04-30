@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.27 2004/08/29 11:03:18 lf_sfnet Exp $
+ * $Id: _winsys.c,v 1.28 2006/04/12 05:58:40 paultucker Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -36,7 +36,10 @@
 #include <shlobj.h>
 #include <windows.h>
 #if !defined(__MINGW32__) && !defined(__WATCOMC__)
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#else
 #include <htmlhelp.h>
+#endif
 #endif
 
 #include "hbapi.h"

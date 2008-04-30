@@ -822,7 +822,7 @@ HB_FUNC( _CREATEMDIWINDOW )
    HANDLE hInstance  = (ISNIL(9)  ? GetModuleHandle( NULL ) : (HANDLE) hb_parnl(9));
    LPARAM lParam     = (ISNIL(10) ? 0 : (LPARAM) hb_parnl(10));
 
-   HWND hWnd = CreateMDIWindow( cClass, cTitle,nStyle,
+   HWND hWnd = CreateMDIWindow( (char*) cClass, (char*) cTitle,nStyle,
                                 x, y, nWidth, nHeight,
                                 hWndParent, (HINSTANCE) hInstance, lParam ) ;
    hb_retnl( (LONG) hWnd );

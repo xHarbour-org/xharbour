@@ -15,6 +15,15 @@ extern void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint);
 extern void Rect2ArrayEx( RECT *pt  , PHB_ITEM aRect);
 extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#define GetWindowLongPtr  GetWindowLong
+#define SetWindowLongPtr  SetWindowLong
+#define GetClassLongPtr   GetClassLong
+#define SetClassLongPtr   SetClassLong
+#define LONG_PTR          LONG
+#define ULONG_PTR         ULONG
+#endif
+
 //-----------------------------------------------------------------------------
 
 HB_FUNC( ISICONIC )

@@ -18,6 +18,26 @@ extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#define HDM_SETBITMAPMARGIN          (HDM_FIRST + 20)
+#define Header_SetBitmapMargin(hwnd, iWidth) \
+        (int)SNDMSG((hwnd), HDM_SETBITMAPMARGIN, (WPARAM)(iWidth), 0)
+#define HDM_GETBITMAPMARGIN          (HDM_FIRST + 21)
+#define Header_GetBitmapMargin(hwnd) \
+        (int)SNDMSG((hwnd), HDM_GETBITMAPMARGIN, 0, 0)
+#define HDM_SETFILTERCHANGETIMEOUT  (HDM_FIRST+22)
+#define Header_SetFilterChangeTimeout(hwnd, i) \
+        (int)SNDMSG((hwnd), HDM_SETFILTERCHANGETIMEOUT, 0, (LPARAM)(i))
+#define HDM_EDITFILTER          (HDM_FIRST+23)
+#define Header_EditFilter(hwnd, i, fDiscardChanges) \
+        (int)SNDMSG((hwnd), HDM_EDITFILTER, (WPARAM)(i), MAKELPARAM(fDiscardChanges, 0))
+#define HDM_CLEARFILTER         (HDM_FIRST+24)
+#define Header_ClearFilter(hwnd, i) \
+        (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)(i), 0)
+#define Header_ClearAllFilters(hwnd) \
+        (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)-1, 0)
+#endif
+
 #ifndef __WATCOMC__
 
 //-----------------------------------------------------------------------------

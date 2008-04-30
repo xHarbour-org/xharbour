@@ -17,6 +17,9 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
+#ifndef LONG_PTR
+#define LONG_PTR LONG
+#endif
 
 //-----------------------------------------------------------------------------
 
