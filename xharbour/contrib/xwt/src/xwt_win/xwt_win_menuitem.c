@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menu.c,v 1.2 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_win_menuitem.c,v 1.1 2003/10/14 23:12:13 jonnymind Exp $
 
    Menu management
 */
@@ -15,8 +15,8 @@
 BOOL xwt_win_createMenuItem( PXWT_WIDGET xwtData )
 {
    PXWT_WIN_MENUDATA data;
-   
-   data = hb_xgrab( sizeof( XWT_WIN_MENUDATA ) );
+
+   data = (PXWT_WIN_MENUDATA) hb_xgrab( sizeof( XWT_WIN_MENUDATA ) );
    data->hBitmap = NULL;
    data->szLabel = NULL;
    

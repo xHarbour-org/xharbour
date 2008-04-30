@@ -3,10 +3,24 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_msgbox.c,v 1.2 2003/10/13 11:54:08 jonnymind Exp $
+   $Id: xwt_win_msgbox.c,v 1.3 2004/03/18 04:14:01 ronpinkas Exp $
 
    Message box implementation
 */
+
+#ifndef WINVER
+#define WINVER 0x0500
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
+#if(WINVER >= 0x0500)
+#ifndef IDCONTINUE
+#define IDCONTINUE      11
+#endif
+#endif
 
 #include <hbapi.h>
 #include <xwt_win.h>

@@ -3,10 +3,22 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.5 2004/11/30 04:55:16 paultucker Exp $
+   $Id: xwt_win_framewnd.c,v 1.6 2005/10/24 02:22:07 ronpinkas Exp $
 
    MS-Windows interface - Frame window
 */
+
+#ifndef WINVER
+#define WINVER 0x0500
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
+#ifndef ULONG_PTR
+#define ULONG_PTR ULONG
+#endif
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -14,7 +26,6 @@
 
 #include <xwt_api.h>
 #include <xwt_win.h>
-
 
 /* Destroy given frame window */
 
@@ -38,9 +49,10 @@ void xwt_win_free_wnd( void *wnd )
    if ( self->pMenu != NULL )
    {
       PHB_BASEARRAY pBar = self->pMenu;
+      /*
       ULONG ulPos;
 
-      /*
+
       for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
       {
          PHB_ITEM pMenuItem = pBar->pItems + ulPos;
