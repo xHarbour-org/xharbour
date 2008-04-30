@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.676 2008/04/27 14:00:45 andijahja Exp $
+ * $Id: hvm.c,v 1.677 2008/04/29 03:32:39 ronpinkas Exp $
  */
 
 /*
@@ -562,8 +562,9 @@ HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
 #ifndef HB_THREAD_SUPPORT
    /* In MT mode this is a part of stack initialization code */
    HB_VM_STACK.pSequence = NULL;
-   hb_stackSetActionRequest( 0 );
 
+   HB_VM_STACK.uiVMFlags = 0;
+   
    for( uiCounter = 0; uiCounter < HB_MAX_WITH_OBJECTS; uiCounter++ )
    {
       HB_VM_STACK.aWithObject[ uiCounter ].type = HB_IT_NIL;
@@ -907,12 +908,39 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After Background\n" );
    #endif
 
-   // No base symbol!
-   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
-   {
-      hb_vmPushSymbol( &FakeQuitSymbol );
-   }
+   // HB_VM_STACK.pBase will be cleared, but we need a base symbol!
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems;
 
+   /*
+    NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
+    hb_stackRemove( 0 );
+    */
+   while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
+   {
+      PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
+
+      if( HB_IS_STRING( pItem ) )
+      {
+         hb_itemReleaseString( pItem );
+      }
+      else if( HB_IS_SYMBOL( pItem ) )
+      {
+         assert( pItem->item.asSymbol.pCargo );
+         hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+         pItem->item.asSymbol.pCargo = NULL;
+      }
+
+      pItem->type = HB_IT_NIL;
+
+      --HB_VM_STACK.pPos;
+   }
+   
+   hb_vmPushSymbol( &FakeQuitSymbol );
+
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After Stack\n" );
+   #endif
+    
    hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    #ifdef TRACE_QUIT
@@ -987,36 +1015,6 @@ HB_EXPORT int hb_vmQuit( void )
    }
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After WITHOBJECT\n" );
-   #endif
-
-   // HB_VM_STACK.pBase will be cleared, but we need a base symbol!
-   HB_VM_STACK.pBase = HB_VM_STACK.pItems;
-
-   /*
-    NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
-    hb_stackRemove( 1 ); // Keep Base Symbol!
-    */
-   while( HB_VM_STACK.pPos > HB_VM_STACK.pItems + 1 )
-   {
-      PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
-
-      if( HB_IS_STRING( pItem ) )
-      {
-         hb_itemReleaseString( pItem );
-      }
-      else if( HB_IS_SYMBOL( pItem ) )
-      {
-         assert( pItem->item.asSymbol.pCargo );
-         hb_xfree( (void *) pItem->item.asSymbol.pCargo );
-         pItem->item.asSymbol.pCargo = NULL;
-      }
-
-      pItem->type = HB_IT_NIL;
-
-      --HB_VM_STACK.pPos;
-   }
-   #ifdef TRACE_QUIT
-      TraceLog( NULL, "After Stack\n" );
    #endif
 
    hb_itemSetNil( &HB_VM_STACK.Return );
@@ -3962,7 +3960,10 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                hb_vm_bQuitRequest = TRUE;
             #endif
 
-            exit( hb_vmQuit() );
+            if( ! ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) );
+            {    
+               exit( hb_vmQuit() );
+            }
             break;
          }
       }

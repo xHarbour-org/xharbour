@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.47 2007/12/21 12:12:22 likewolf Exp $
+ * $Id: hbstack.h,v 1.48 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ typedef struct
    LONG       lStatics;       /* statics base for the current function call */
    LONG       lWithObject;    /* stack offset to base current WITH OBJECT item */
    LONG       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
-   USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
+   //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */
@@ -119,6 +119,7 @@ typedef struct
    /* BEGIN SEQUENCE [RECOVER] END*/
    struct _HB_SEQUENCE *pSequence;
 
+   unsigned int uiVMFlags;
 } HB_STACK;
 
 extern HB_STACK hb_stackST;
@@ -146,8 +147,8 @@ typedef struct
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
    #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
    #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
-   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiActionRequest )
-   #define hb_stackSetActionRequest( n )     do { HB_VM_STACK.uiActionRequest = ( n ); } while( 0 )
+   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )
+   #define hb_stackSetActionRequest( n )     do { HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK; HB_VM_STACK.uiVMFlags |= (n); } while( 0 )
 
    #define hb_stackDec( )              do { \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6062 2008/04/30 01:25:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6063 2008/04/30 13:20:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-04-30 12:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * include/hbstack.h
+   * include/hbvm.h
+   * include/thread.h
+   * source/vm/estack.c
+   * source/vm/thread.c
+     * Added member uiVMFlags to HB_VM_STACK and removed uiAction member
+     * Modified hb_stackSetActionRequest()/hb_stackGetActionRequest() to utilize [right 3 bits] of uiVMFlags
+     
+   * source/vm/errorapi.c
+   * source/vm/hvm.c
+     + Added support for HB_SUSPEND_QUIT to resolve memory leak when error system issues a QUIT
+     
 2008-04-30 20:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/freeimage/source/fi_winfu.c
   * contrib/freeimage/source/fi_wrp.c

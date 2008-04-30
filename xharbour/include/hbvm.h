@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.61 2008/03/27 15:11:08 likewolf Exp $
+ * $Id: hbvm.h,v 1.62 2008/04/01 05:15:09 ronpinkas Exp $
  */
 
 /*
@@ -112,9 +112,11 @@ extern HB_EXPORT void    hb_vmRequestReset( void );
 extern HB_EXPORT void    hb_vmRequest( USHORT );
 
 /* Return values of hb_vmRequestQuery() */
-#define HB_QUIT_REQUESTED       1   /* immediately quit the application */
-#define HB_BREAK_REQUESTED      2   /* break to nearest RECOVER/END sequence */
-#define HB_ENDPROC_REQUESTED    4   /* immediately return from procedure (error handler in macro evaluation) */
+#define HB_QUIT_REQUESTED       0x0001   /* immediately quit the application */
+#define HB_BREAK_REQUESTED      0x0002   /* break to nearest RECOVER/END sequence */
+#define HB_ENDPROC_REQUESTED    0x0004   /* immediately return from procedure (error handler in macro evaluation) */
+#define HB_REQUEST_MASK ( HB_QUIT_REQUESTED | HB_BREAK_REQUESTED | HB_ENDPROC_REQUESTED )
+#define HB_SUSPEND_QUIT         0x0100   
 
 /* Public PCode functions */
 

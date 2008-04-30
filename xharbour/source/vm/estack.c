@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.95 2008/03/13 11:12:16 marchuet Exp $
+ * $Id: estack.c,v 1.96 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -538,13 +538,14 @@ HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel )
 #undef hb_stackGetActionRequest
 HB_EXPORT USHORT hb_stackGetActionRequest( void )
 {
-   return HB_VM_STACK.uiActionRequest;
+   return (USHORT) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK );
 }
 
 #undef hb_stackSetActionRequest
 HB_EXPORT void hb_stackSetActionRequest( USHORT uiAction )
 {
-   HB_VM_STACK.uiActionRequest = uiAction;
+   HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK;
+   HB_VM_STACK.uiVMFlags |= uiAction;
 }
 
 /* NOTE: DEBUG function */

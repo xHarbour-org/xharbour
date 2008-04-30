@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallbc.bat,v 1.21 2006/07/27 16:53:16 map Exp $
+rem $Id: makallbc.bat,v 1.22 2008/04/29 12:34:56 enricomaria Exp $
 rem
 
 echo create system files
@@ -95,7 +95,7 @@ if errorlevel 1 goto end
 :gtwvw
 echo gtwvw
 cd contrib\gtwvw
-call make_b32.bat %1
+REM call make_b32.bat %1
 cd ..\..
 
 :wvtgui

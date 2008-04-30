@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.81 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: errorapi.c,v 1.82 2008/03/27 10:26:43 likewolf Exp $
  */
 
 /*
@@ -85,6 +85,7 @@
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbset.h"
+#include "hbvm.h"
 
 #ifdef HB_OS_WIN_32
    #define HB_OS_WIN_32_USED
@@ -372,7 +373,9 @@ HB_EXPORT USHORT hb_errLaunch( PHB_ITEM pError )
       }
       else
       {
+         HB_VM_STACK.uiVMFlags |= HB_SUSPEND_QUIT;
          pResult = hb_itemDo( s_errorBlock, 1, pError );
+         HB_VM_STACK.uiVMFlags &= ~HB_SUSPEND_QUIT;
       }
 
       s_iLaunchCount--;
@@ -559,7 +562,9 @@ HB_EXPORT PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
       }
       else
       {
+         HB_VM_STACK.uiVMFlags |= HB_SUSPEND_QUIT;
          pResult = hb_itemDo( s_errorBlock, 1, pError );
+         HB_VM_STACK.uiVMFlags &= ~HB_SUSPEND_QUIT;         
       }
 
       s_iLaunchCount--;

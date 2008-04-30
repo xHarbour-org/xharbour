@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.118 2007/12/21 12:12:22 likewolf Exp $
+* $Id: thread.h,v 1.119 2008/01/10 11:18:00 marchuet Exp $
 */
 
 /*
@@ -436,7 +436,7 @@ typedef struct tag_HB_STACK
    LONG       lStatics;         /* statics base for the current function call */
    LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
    ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
-   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
+   //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */
@@ -495,6 +495,8 @@ typedef struct tag_HB_STACK
 
    struct _HB_FINALLY *pFinally;
 
+   unsigned int uiVMFlags;
+   
    /* FS api error system */
    USHORT uiErrorLast;
    USHORT uiOsErrorLast;
