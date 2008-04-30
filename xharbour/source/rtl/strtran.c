@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.7 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: strtran.c,v 1.8 2008/04/29 22:05:13 ronpinkas Exp $
  */
 
 /*
@@ -126,22 +126,22 @@ HB_FUNC( STRTRAN )
 
                   while( i < ulText - ulSeek + 1 )
                   {
-                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && ! memcmp( szText + i, szSeek, ulSeek ) )
+                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && memcmp( szText + i, szSeek, ulSeek ) == 0 )
                      {
                         ulFound++;
+                        
                         if( ulFound >= ulStart )
                         {
                            lReplaced++;
                            ulLength = ulLength - ulSeek + ulReplace;
                            i += ulSeek;
+                           continue;
                         }
-                        else
-                           i++;
                      }
-                     else
-                        i++;
+                     
+                     i++;
                   }
-
+                  
                   if( ulFound )
                   {
                      char * szResult = ( char * ) hb_xgrab( ulLength + 1 );
@@ -149,33 +149,35 @@ HB_FUNC( STRTRAN )
 
                      ulFound = 0;
                      i = 0;
+                     
                      while( i < ulText - ulSeek + 1 )
                      {
-                        if( lReplaced && ! memcmp( szText + i, szSeek, ulSeek ) )
+                        if( lReplaced && memcmp( szText + i, szSeek, ulSeek ) == 0 )
                         {
                            ulFound++;
+                           
                            if( ulFound >= ulStart )
                            {
                               lReplaced--;
                               memcpy( szPtr, szReplace, ulReplace );
                               szPtr += ulReplace;
                               i += ulSeek;
-                           }
-                           else
-                           {
-                              *szPtr = szText[ i ];
-                              szPtr++;
-                              i++;
+                              continue;
                            }
                         }
-                        else
-                        {
-                           *szPtr = szText[ i ];
-                           szPtr++;
-                           i++;
-                        }
+                        
+                        *szPtr = szText[ i ];
+                        szPtr++;
+                        i++;
                      }
 
+                     while( i < ulText )
+                     {
+                        *szPtr = szText[ i ];
+                        szPtr++;
+                        i++;
+                     }
+                     
                      hb_retclenAdopt( szResult, ulLength );
                   }
                   else
