@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.677 2008/04/29 03:32:39 ronpinkas Exp $
+ * $Id: hvm.c,v 1.678 2008/04/30 16:47:34 ronpinkas Exp $
  */
 
 /*
@@ -3960,8 +3960,8 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                hb_vm_bQuitRequest = TRUE;
             #endif
 
-            if( ! ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) );
-            {    
+            if( ! ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) )
+            {
                exit( hb_vmQuit() );
             }
             break;
