@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.5 2008/04/29 00:43:57 andijahja Exp $
+# $Id: common.mak,v 1.6 2008/04/29 10:47:11 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -39,8 +39,6 @@ TIP_DIR       =source$(DIR_SEP)tip
 VM_DIR        =source$(DIR_SEP)vm
 ODBC_DIR      =source$(DIR_SEP)odbc
 CODEPAGE_DIR  =source$(DIR_SEP)codepage
-RDDADS_DIR    =contrib$(DIR_SEP)rdd_ads
-WVTGUI_DIR    =contrib$(DIR_SEP)wvtgui
 
 HBRUN_DIR     =utils$(DIR_SEP)hbrun
 HBTEST_DIR    =utils$(DIR_SEP)hbtest
@@ -50,6 +48,22 @@ HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
+FIREBIRD_DIR  =contrib$(DIR_SEP)firebird
+FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
+GDLIB_DIR     =contrib$(DIR_SEP)gd
+GTWVW_DIR     =contrib$(DIR_SEP)gtwvw
+HBZIP_DIR     =contrib$(DIR_SEP)hbzlib
+LIBNF_DIR     =contrib$(DIR_SEP)libnf
+MYSQL_DIR     =contrib$(DIR_SEP)mysql
+PDFLIB_DIR    =contrib$(DIR_SEP)pdflib
+PGSQL_DIR     =contrib$(DIR_SEP)pgsql
+RDDADS_DIR    =contrib$(DIR_SEP)rdd_ads
+TELEPATH_DIR  =contrib$(DIR_SEP)tp_
+HBCC_DIR      =contrib$(DIR_SEP)unicode
+WHAT32_DIR    =contrib$(DIR_SEP)what32
+WVTGUI_DIR    =contrib$(DIR_SEP)wvtgui
+XWT_DIR       =contrib$(DIR_SEP)xwt
+XWT2_DIR      =contrib$(DIR_SEP)xwt2
 
 INCLUDE_DIR2  =include
 
@@ -92,13 +106,27 @@ GTWIN_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwin$(LIBEXT)
 GTGUI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtgui$(LIBEXT)
 GTWVT_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvt$(LIBEXT)
 GTALLEG_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtalleg$(LIBEXT)
-HB_GT_LIBS  =\
-	$(GTCGI_LIB)\
-	$(GTPCA_LIB)\
-	$(GTSTD_LIB)\
-	$(GTWIN_LIB)\
-	$(GTWVT_LIB)\
-	$(GTGUI_LIB)
+HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(GTGUI_LIB)
+
+#===============================================================================
+# Contrib Library Names
+#===============================================================================
+FIREBIRD_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)firebird$(LIBEXT)
+FREEIMAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fi_lib$(LIBEXT)
+GDLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gdlib$(LIBEXT)
+GTWVW_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvw$(LIBEXT)
+HBZIP_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzip$(LIBEXT)
+LIBNF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libnf$(LIBEXT)
+MYSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)mysql$(LIBEXT)
+PDFLIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pdflib$(LIBEXT)
+PGSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libhbpg$(LIBEXT)
+RDDADS_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rddads$(LIBEXT)
+TELEPATH_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)telepath$(LIBEXT)
+HBCC_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcc$(LIBEXT)
+WHAT32_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)what32$(LIBEXT)
+WVTGUI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)wvtgui$(LIBEXT)
+XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
+XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 
 #===============================================================================
 # Macros For DLL Build
@@ -1192,6 +1220,337 @@ HBTESTDLL_EXE_OBJS=\
 	$(HBTEST_EXE_OBJS)
 
 #===============================================================================
+# CONTRIB DEPENDENCIES
+#===============================================================================
+
+#===============================================================================
+# GTWVW.LIB dependencies
+#===============================================================================
+GTWVW_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT)
+
+#===============================================================================
+# FIREBIRD.LIB dependencies
+#===============================================================================
+FIREBIRD_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)TFirebird$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)firebird$(OBJEXT)
+
+#===============================================================================
+# FI_LIB.LIB dependencies
+#===============================================================================
+FREEIMAGE_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)fi_winfu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fi_wrp$(OBJEXT)
+
+#===============================================================================
+# GDLIB.LIB dependencies
+#===============================================================================
+GDLIB_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)gd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gdbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gdbarcode$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gdchart$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gdimage$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gdwrp$(OBJEXT)
+
+#===============================================================================
+# HBZIP.LIB dependencies
+#===============================================================================
+HBZIP_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)ziparchive$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zip$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipplatform$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipstorage$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipstring$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipplatformcomm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zippathcomponent$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipmemfile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipfileheader$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipfile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipnew$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipcomp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipexception$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipcompatibility$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipcentraldir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)zipautobuffer$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stdafx$(OBJEXT)
+
+#===============================================================================
+# LIBNF.LIB dependencies
+#===============================================================================
+LIBNF_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)aading$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)aavg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)acctadj$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)acctmnth$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)acctqtr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)acctweek$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)acctyear$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)adessort$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)aemaxlen$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)aeminlen$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)amedian$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)anomatch$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)any2any$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)aredit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)asum$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)at2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bitclr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bitset$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)blink$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)byt2bit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)byt2hex$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)byteand$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)byteneg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bytenot$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)byteor$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bytexor$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)calendar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)clrsel$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cntryset$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)d2e$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)datecnfg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dayofyr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)daytobow$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dectobin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)diskfunc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dispmsg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dosver$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)e2d$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)easter$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)elapmil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)elapsed$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)eltime$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)findith$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)firstday$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gcd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hex2dec$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)invclr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)isbit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)isbiton$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)isshare$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)lastday$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)linked$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)madd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)menu1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)menutoNF$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)metaph$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)miltime$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)min2dhm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)month$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mouse1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)netpv$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)nooccur$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ntow$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)nwlstat$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pchr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pegs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pending$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pickday$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)popadder$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)prtesc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pvid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)qtr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)rand1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)restsets$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)roundNF$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)savearr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)savesets$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)scregion$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sinkey$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sleep$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sqzn$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tbwhile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)vertmenu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wda$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)week$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)workdays$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)woy$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xbox$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)year$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)vidmode$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)page$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tempfile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)caplock$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)color2n$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)descendNF$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numlock$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)proper$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)shift$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)getvid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)chdir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)rmdir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)alt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ctrl$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)getenvrn$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)n2color$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)origin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)prtscr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stod$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)kspeed$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mkdir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)getver$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dispc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fttext$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ftattr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dfile$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)mouse$(OBJEXT)
+
+#===============================================================================
+# MYSQL.LIB dependencies
+#===============================================================================
+MYQSL_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)mysqlrdd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tmysql$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tsqlbrw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mysql$(OBJEXT)
+
+#===============================================================================
+# PDFLIB.LIB dependencies
+#===============================================================================
+PDFLIB_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT)
+
+#===============================================================================
+# PQSQL.LIB dependencies
+#===============================================================================
+PGSQL_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)TPostgres$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)postgres$(OBJEXT)
+
+#===============================================================================
+# HBCC.LIB dependencies
+#===============================================================================
+HBCC_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbcc$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)hbc7$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcy$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbhex$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcrc16$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcrc32HBCC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcrpt32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbdecode$(OBJEXT)
+
+#===============================================================================
+# WHAT32.LIB dependencies
+#===============================================================================
+WHAT32_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)_winbmp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winbrsh$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wincall$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wincdlg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winclpb$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wincomm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wincret$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windlg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windll$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_windraw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winfont$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wingdi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winhead$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winicon$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winilst$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winINet$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winini$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winkbrd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winlv$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmain$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmapi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmenu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmeta$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmisc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmmcap$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmous$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winmsg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winpen$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winprn$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winrect$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winreg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winrgn$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winscrlb$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winshell$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winsock$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winsys$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wintab$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wintbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wintext$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winTree$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winview$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winwnd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_winserial$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)DebugWHAT32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WhatUtil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinCDlg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinComm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinCore$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinIni$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinRBar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinTBar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)WinTabs$(OBJEXT)
+
+#===============================================================================
+# TELEPATH.LIB dependencies
+#===============================================================================
+TELEPATH_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)win32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)telepath$(OBJEXT)
+
+#===============================================================================
+# XWTLIB.LIB dependencies
+#===============================================================================
+XWT_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)xwt_api$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)button$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bcolumn$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)browseXWT$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)checkboxXWT$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)container$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)event$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filesel$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fontsel$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)framewindow$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)grid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hex$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)image$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)inputmask$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)label$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)laycontainer$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)layout$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)menu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)menuitem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)msgbox$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pane$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)radiobutton$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)splitter$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)textbox$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)togglebutton$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)treeitem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)treelist$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)viewport$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)widget$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)window$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)xwt_win$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xwt_win_menu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xwt_win_menuitem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xwt_win_framewnd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xwt_win_msgbox$(OBJEXT)
+#===============================================================================
 # Build Target
 #===============================================================================
 ST_PROJECT=\
@@ -1262,3 +1621,12 @@ DLL_PROJECT=\
 	$(HBTESTDLL_EXE)\
 	$(HBMAKEDLL_EXE)\
 	$(XBSCRIPTDLL_EXE)
+
+CONTRIB_PROJECT=\
+	$(GDLIB_LIB)\
+	$(LIBNF_LIB)\
+	$(PDFLIB_LIB)\
+	$(RDDADS_LIB)\
+	$(TELEPATH_LIB)\
+	$(HBCC_LIB)\
+	$(WVTGUI_LIB)

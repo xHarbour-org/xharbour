@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: fi_wrp.c,v 1.1 2005/11/07 01:13:06 fsgiudice Exp $
  */
 
 /*
@@ -266,7 +266,7 @@ HB_FUNC( FI_ALLOCATET )
       UINT red_mask, green_mask, blue_mask;
 
       /* Retrieve parameters */
-      type       = hb_parni( 1 );
+      type       = (FREE_IMAGE_TYPE) hb_parni( 1 );
       width      = hb_parni( 2 );
       height     = hb_parni( 3 );
       bpp        = ( hb_parinfo( 3 ) & HB_IT_NUMERIC ? hb_parni( 3 ) : 8 );
@@ -304,7 +304,7 @@ HB_FUNC( FI_CLONE )
       FIBITMAP *fiClonePtr;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP *) hb_parptr( 1 );
 
       /* run function */
       fiClonePtr = FreeImage_Clone( dib );
@@ -340,7 +340,7 @@ HB_FUNC( FI_UNLOAD )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP *) hb_parptr( 1 );
 
       /* run function */
       FreeImage_Unload( dib );
@@ -379,7 +379,7 @@ HB_FUNC( FI_LOAD )
       int flags;
 
       /* Retrieve parameters */
-      fif      = hb_parni( 1 );
+      fif      = (FREE_IMAGE_FORMAT) hb_parni( 1 );
       filename = hb_parcx( 2 );
       flags    = hb_parni( 3 );
 
@@ -428,8 +428,8 @@ HB_FUNC( FI_SAVE )
       int flags;
 
       /* Retrieve parameters */
-      fif        = hb_parni( 1 );
-      dib        = hb_parptr( 2 );
+      fif        = (FREE_IMAGE_FORMAT) hb_parni( 1 );
+      dib        = (FIBITMAP *) hb_parptr( 2 );
       filename   = hb_parcx( 3 );
       flags      = hb_parni( 4 );
 
@@ -513,7 +513,7 @@ HB_FUNC( FI_OPENMULTIBITMAP )
       int flags;
 
       /* Retrieve parameters */
-      fif        = hb_parni( 1 );
+      fif        = (FREE_IMAGE_FORMAT) hb_parni( 1 );
       filename   = hb_parcx( 2 );
       create_new = hb_parl( 3 );
       read_only  = hb_parl( 4 );
@@ -555,7 +555,7 @@ HB_FUNC( FI_CLOSEMULTIBITMAP )
       int flags;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
+      bitmap = (FIMULTIBITMAP*) hb_parptr( 1 );
       flags  = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ? hb_parni( 2 ) : 0 );
 
       /* run function & return value */
@@ -586,7 +586,7 @@ HB_FUNC( FI_GETPAGECOUNT )
       FIMULTIBITMAP *bitmap;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
+      bitmap = (FIMULTIBITMAP *) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetPageCount(bitmap) );
@@ -618,8 +618,8 @@ HB_FUNC( FI_APPENDPAGE )
       FIBITMAP *data;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
-      data   = hb_parptr( 2 );
+      bitmap = (FIMULTIBITMAP *) hb_parptr( 1 );
+      data   = (FIBITMAP *) hb_parptr( 2 );
 
       /* run function & return value */
       FreeImage_AppendPage(bitmap, data);
@@ -653,9 +653,9 @@ HB_FUNC( FI_INSERTPAGE )
       FIBITMAP *data;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
+      bitmap = (FIMULTIBITMAP *) hb_parptr( 1 );
       page   = hb_parni( 2 ) - 1; // 0-based index
-      data   = hb_parptr( 3 );
+      data   = (FIBITMAP*) hb_parptr( 3 );
 
       /* run function & return value */
       FreeImage_InsertPage(bitmap, page, data);
@@ -687,7 +687,7 @@ HB_FUNC( FI_DELETEPAGE )
       int page;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
+      bitmap = (FIMULTIBITMAP *) hb_parptr( 1 );
       page   = hb_parni( 2 ) - 1; // 0-based index
 
       /* run function & return value */
@@ -720,7 +720,7 @@ HB_FUNC( FI_LOCKPAGE )
       int page;
 
       /* Retrieve parameters */
-      bitmap = hb_parptr( 1 );
+      bitmap = (FIMULTIBITMAP *) hb_parptr( 1 );
       page   = hb_parni( 2 ) - 1; // 0-based index
 
       /* run function & return value */
@@ -755,8 +755,8 @@ HB_FUNC( FI_UNLOCKPAGE )
       BOOL changed;
 
       /* Retrieve parameters */
-      bitmap  = hb_parptr( 1 );
-      page    = hb_parptr( 2 );
+      bitmap  = (FIMULTIBITMAP *) hb_parptr( 1 );
+      page    = (FIBITMAP*) hb_parptr( 2 );
       changed = hb_parl( 3 );
 
       /* run function & return value */
@@ -790,7 +790,7 @@ HB_FUNC( FI_MOVEPAGE )
       int target, source;
 
       /* Retrieve parameters */
-      bitmap  = hb_parptr( 1 );
+      bitmap  = (FIMULTIBITMAP *) hb_parptr( 1 );
       target  = hb_parni( 2 );
       source  = hb_parni( 3 );
 
@@ -870,7 +870,7 @@ HB_FUNC( FI_GETIMAGETYPE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetImageType(dib) );
@@ -919,7 +919,7 @@ HB_FUNC( FI_GETBITS )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_GetBits(dib) );
@@ -951,7 +951,7 @@ HB_FUNC( FI_GETSCANLINE )
       int scanline;
 
       /* Retrieve parameters */
-      dib      = hb_parptr( 1 );
+      dib      = (FIBITMAP*) hb_parptr( 1 );
       scanline = hb_parni( 2 );
 
       /* run function & return value */
@@ -992,7 +992,7 @@ HB_FUNC( FI_GETCOLORSUSED )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetColorsUsed(dib) );
@@ -1022,7 +1022,7 @@ HB_FUNC( FI_GETBPP )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value*/
       hb_retnl( FreeImage_GetBPP(dib) );
@@ -1052,7 +1052,7 @@ HB_FUNC( FI_GETWIDTH )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetWidth(dib) );
@@ -1082,7 +1082,7 @@ HB_FUNC( FI_GETHEIGHT )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetHeight(dib) );
@@ -1112,7 +1112,7 @@ HB_FUNC( FI_GETLINE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetLine(dib) );
@@ -1142,7 +1142,7 @@ HB_FUNC( FI_GETPITCH )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetPitch(dib) );
@@ -1172,7 +1172,7 @@ HB_FUNC( FI_GETDIBSIZE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetDIBSize(dib) );
@@ -1202,7 +1202,7 @@ HB_FUNC( FI_GETPALETTE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_GetPalette(dib) );
@@ -1232,7 +1232,7 @@ HB_FUNC( FI_GETDOTSPERMETERX )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetDotsPerMeterX(dib) );
@@ -1262,7 +1262,7 @@ HB_FUNC( FI_GETDOTSPERMETERY )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retnl( FreeImage_GetDotsPerMeterY(dib) );
@@ -1294,7 +1294,7 @@ HB_FUNC( FI_SETDOTSPERMETERX )
       UINT res;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
       res = hb_parni( 2 );
 
       /* run function & return value */
@@ -1327,7 +1327,7 @@ HB_FUNC( FI_SETDOTSPERMETERY )
       UINT res;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
       res = hb_parni( 2 );
 
       /* run function & return value */
@@ -1363,7 +1363,7 @@ HB_FUNC( FI_GETINFOHEADER )
       BITMAPINFOHEADER *bmpinfoheader;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       bmpinfoheader = FreeImage_GetInfoHeader(dib);
@@ -1398,7 +1398,7 @@ HB_FUNC( FI_GETINFO )
       BITMAPINFO *bmpinfo;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       bmpinfo = FreeImage_GetInfo(dib);
@@ -1430,7 +1430,7 @@ HB_FUNC( FI_GETCOLORTYPE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetColorType(dib) );
@@ -1461,7 +1461,7 @@ HB_FUNC( FI_GETREDMASK )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetRedMask(dib) );
@@ -1491,7 +1491,7 @@ HB_FUNC( FI_GETGREENMASK )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetGreenMask(dib) );
@@ -1521,7 +1521,7 @@ HB_FUNC( FI_GETBLUEMASK )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetBlueMask(dib) );
@@ -1552,7 +1552,7 @@ HB_FUNC( FI_GETTRANSPARENCYCOUNT )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retni( FreeImage_GetTransparencyCount(dib) );
@@ -1582,7 +1582,7 @@ HB_FUNC( FI_GETTRANSPARENCYTABLE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_GetTransparencyTable(dib) );
@@ -1614,7 +1614,7 @@ HB_FUNC( FI_SETTRANSPARENT )
       BOOL enabled;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
       enabled = hb_parl( 2 );
 
       /* run function & return value */
@@ -1649,8 +1649,8 @@ HB_FUNC( FI_SETTRANSPARENCYTABLE )
       int count;
 
       /* Retrieve parameters */
-      dib   = hb_parptr( 1 );
-      table = hb_parptr( 2 );
+      dib   = (FIBITMAP*) hb_parptr( 1 );
+      table = (BYTE*) hb_parptr( 2 );
       count = hb_parni( 3 );
 
       /* run function & return value */
@@ -1681,7 +1681,7 @@ HB_FUNC( FI_ISTRANSPARENT )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retl( FreeImage_IsTransparent(dib) );
@@ -1712,7 +1712,7 @@ HB_FUNC( FI_HASBACKGROUNDCOLOR )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retl( FreeImage_HasBackgroundColor(dib) );
@@ -1745,7 +1745,7 @@ HB_FUNC( FI_GETBACKGROUNDCOLOR )
       RGBQUAD *bkcolor;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
       //bkcolor = (RGBQUAD * ) hb_param( 2, HB_IT_STRING )->item.asString.value;
       //bkcolor = hb_parptr( 2 );
 
@@ -1784,7 +1784,7 @@ HB_FUNC( FI_SETBACKGROUNDCOLOR )
       RGBQUAD *bkcolor;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
       bkcolor = (RGBQUAD * ) hb_param( 2, HB_IT_STRING )->item.asString.value;
       //bkcolor = hb_parptr( 2 );
 
@@ -1823,10 +1823,10 @@ HB_FUNC( FI_GETICCPROFILE )
       )
    {
       FIBITMAP *dib;
-      FIICCPROFILE *iccprofile;
+      /* FIICCPROFILE *iccprofile; */
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_GetICCProfile(dib) );
@@ -1861,7 +1861,7 @@ HB_FUNC( FI_CREATEICCPROFILE )
       long size;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
       data    = hb_parptr( 2 );
       size    = hb_parnl( 3 );
 
@@ -1895,7 +1895,7 @@ HB_FUNC( FI_DESTROYICCPROFILE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
+      dib     = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       FreeImage_DestroyICCProfile(dib);
@@ -1968,7 +1968,7 @@ HB_FUNC( FI_CONVERTTO4BITS )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo4Bits(dib) );
@@ -1999,7 +1999,7 @@ HB_FUNC( FI_CONVERTTO8BITS )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo8Bits(dib) );
@@ -2030,7 +2030,7 @@ HB_FUNC( FI_CONVERTTOGREYSCALE )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertToGreyscale(dib) );
@@ -2061,7 +2061,7 @@ HB_FUNC( FI_CONVERTTO16BITS555 )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo16Bits555(dib) );
@@ -2092,7 +2092,7 @@ HB_FUNC( FI_CONVERTTO16BITS565 )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo16Bits565(dib) );
@@ -2123,7 +2123,7 @@ HB_FUNC( FI_CONVERTTO24BITS )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo24Bits(dib) );
@@ -2154,7 +2154,7 @@ HB_FUNC( FI_CONVERTTO32BITS )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertTo32Bits(dib) );
@@ -2187,8 +2187,8 @@ HB_FUNC( FI_COLORQUANTIZE )
       FREE_IMAGE_QUANTIZE quantize;
 
       /* Retrieve parameters */
-      dib      = hb_parptr( 1 );
-      quantize = hb_parni( 2 );
+      dib      = (FIBITMAP*) hb_parptr( 1 );
+      quantize = (FREE_IMAGE_QUANTIZE) hb_parni( 2 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ColorQuantize(dib, quantize) );
@@ -2226,8 +2226,8 @@ HB_FUNC( FI_DITHER )
       FREE_IMAGE_DITHER algorithm;
 
       /* Retrieve parameters */
-      dib       = hb_parptr( 1 );
-      algorithm = hb_parni( 2 );
+      dib       = (FIBITMAP*) hb_parptr( 1 );
+      algorithm = (FREE_IMAGE_DITHER) hb_parni( 2 );
 
       /* run function & return value */
       hb_retptr( FreeImage_Dither(dib, algorithm) );
@@ -2264,7 +2264,7 @@ HB_FUNC( FI_CONVERTTORGBF )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retptr( FreeImage_ConvertToRGBF(dib) );
@@ -2297,7 +2297,7 @@ HB_FUNC( FI_CONVERTTOSTANDARDTYPE )
       BOOL scale_linear;
 
       /* Retrieve parameters */
-      dib          = hb_parptr( 1 );
+      dib          = (FIBITMAP*) hb_parptr( 1 );
       scale_linear = ( hb_parinfo( 2 ) & HB_IT_LOGICAL ) ? hb_parl( 2 ) : TRUE;
 
       /* run function & return value */
@@ -2332,8 +2332,8 @@ HB_FUNC( FI_CONVERTTOTYPE )
       BOOL scale_linear;
 
       /* Retrieve parameters */
-      dib          = hb_parptr( 1 );
-      dst_type     = hb_parni( 2 );
+      dib          = (FIBITMAP *) hb_parptr( 1 );
+      dst_type     = (FREE_IMAGE_TYPE) hb_parni( 2 );
       scale_linear = ( hb_parinfo( 3 ) & HB_IT_LOGICAL ) ? hb_parl( 3 ) : TRUE;
 
       /* run function & return value */
@@ -2432,7 +2432,7 @@ HB_FUNC( FI_ROTATECLASSIC )
       double angle;
 
       /* Retrieve parameters */
-      dib   = hb_parptr( 1 );
+      dib   = (FIBITMAP*) hb_parptr( 1 );
       angle = hb_parnd( 2 );
 
       /* run function & return value */
@@ -2471,7 +2471,7 @@ HB_FUNC( FI_ROTATEEX )
       BOOL use_mask;
 
       /* Retrieve parameters */
-      dib      = hb_parptr( 1 );
+      dib      = (FIBITMAP*) hb_parptr( 1 );
       angle    = hb_parnd( 2 );
       x_shift  = hb_parnd( 3 );
       y_shift  = hb_parnd( 4 );
@@ -2509,7 +2509,7 @@ HB_FUNC( FI_FLIPHORIZONTAL )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP*) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retl( FreeImage_FlipHorizontal(dib) );
@@ -2539,7 +2539,7 @@ HB_FUNC( FI_FLIPVERTICAL )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP *) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retl( FreeImage_FlipVertical(dib) );
@@ -2582,10 +2582,10 @@ HB_FUNC( FI_RESCALE )
       FREE_IMAGE_FILTER filter;
 
       /* Retrieve parameters */
-      dib        = hb_parptr( 1 );
+      dib        = (FIBITMAP *) hb_parptr( 1 );
       dst_width  = hb_parni( 2 );
       dst_height = hb_parni( 3 );
-      filter     = hb_parni( 4 );
+      filter     = (FREE_IMAGE_FILTER) hb_parni( 4 );
 
       /* run function & return value */
       hb_retptr( FreeImage_Rescale(dib, dst_width, dst_height, filter) );
@@ -2626,7 +2626,7 @@ HB_FUNC( FI_ADJUSTGAMMA )
       double gamma;
 
       /* Retrieve parameters */
-      dib   = hb_parptr( 1 );
+      dib   = (FIBITMAP *) hb_parptr( 1 );
       gamma = hb_parnd( 2 );
 
       /* run function & return value */
@@ -2660,7 +2660,7 @@ HB_FUNC( FI_ADJUSTBRIGHTNESS )
       double percentage;
 
       /* Retrieve parameters */
-      dib        = hb_parptr( 1 );
+      dib        = (FIBITMAP *) hb_parptr( 1 );
       percentage = hb_parnd( 2 );
 
       /* run function & return value */
@@ -2694,7 +2694,7 @@ HB_FUNC( FI_ADJUSTCONTRAST )
       double percentage;
 
       /* Retrieve parameters */
-      dib        = hb_parptr( 1 );
+      dib        = (FIBITMAP *) hb_parptr( 1 );
       percentage = hb_parnd( 2 );
 
       /* run function & return value */
@@ -2726,7 +2726,7 @@ HB_FUNC( FI_INVERT )
       FIBITMAP *dib;
 
       /* Retrieve parameters */
-      dib = hb_parptr( 1 );
+      dib = (FIBITMAP *) hb_parptr( 1 );
 
       /* run function & return value */
       hb_retl( FreeImage_Invert(dib) );
@@ -2767,8 +2767,8 @@ HB_FUNC( FI_GETCHANNEL )
       FREE_IMAGE_COLOR_CHANNEL channel;
 
       /* Retrieve parameters */
-      dib     = hb_parptr( 1 );
-      channel = hb_parni( 2 );
+      dib     = (FIBITMAP *) hb_parptr( 1 );
+      channel = (FREE_IMAGE_COLOR_CHANNEL) hb_parni( 2 );
 
       /* run function & return value */
       hb_retptr( FreeImage_GetChannel(dib, channel) );
@@ -2814,7 +2814,7 @@ HB_FUNC( FI_COPY )
       int left, top, right, bottom;
 
       /* Retrieve parameters */
-      dib    = hb_parptr( 1 );
+      dib    = (FIBITMAP *) hb_parptr( 1 );
       left   = hb_parni( 2 );
       top    = hb_parni( 3 );
       right  = hb_parni( 4 );
@@ -2856,8 +2856,8 @@ HB_FUNC( FI_PASTE )
       int left, top, alpha;
 
       /* Retrieve parameters */
-      dst   = hb_parptr( 1 );
-      src   = hb_parptr( 2 );
+      dst   = (FIBITMAP *) hb_parptr( 1 );
+      src   = (FIBITMAP *) hb_parptr( 2 );
       left  = hb_parni( 3 );
       top   = hb_parni( 4 );
       alpha = hb_parni( 5 );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6061 2008/04/29 22:24:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6062 2008/04/30 01:25:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-04-30 20:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * contrib/freeimage/source/fi_winfu.c
+  * contrib/freeimage/source/fi_wrp.c
+  * contrib/pdflib/pdfhbdocs.prg
+    ! castings
+
+  * mdir.bat
+  + contrib.bc
+  + contrib.vc
+  + contrib.pc
+  + common.mak
+  + compile.mak
+  + cont_b32.bat
+  + cont_vc.bat
+  + cont_pc.bat
+    ! contrib items now using shared files
+    /*
+    NOTE:
+      These are supposed to replace makall*.bat.
+      Please test. If this is OK, I propose to remove the old make files from
+      related folders.
+      Contrib MT Creation temporarily disabled.
+    */
 
 2008-04-29 20:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source\rtl\strtran.c

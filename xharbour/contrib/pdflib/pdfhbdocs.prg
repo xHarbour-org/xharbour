@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.3 2004/07/29 01:53:09 lculik Exp $
+ * $Id: pdfhbdocs.prg,v 1.4 2005/11/20 20:44:23 lculik Exp $
  */
 
 /*
@@ -926,7 +926,7 @@ RETURN NIL
    int Bin2i( BYTE * pszString )
    {
 
-   ULONG ulLen = strlen( pszString ) ;
+   ULONG ulLen = strlen( (char*) pszString ) ;
                          int i = HB_MKSHORT( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ]:0,
    ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] :0 ) ;
      //int i;

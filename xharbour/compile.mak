@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.1 2008/04/27 14:00:37 andijahja Exp $
+# $Id: compile.mak,v 1.2 2008/04/29 00:43:57 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2949,3 +2949,1263 @@ $(OBJ_DIR)$(DIR_SEP)xbscript.c : $(XBSCRIPT_DIR)$(DIR_SEP)xbscript.prg
 
 $(OBJ_DIR)$(DIR_SEP)xbscript$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)xbscript.c
 	$(CC_CMD)
+
+#
+# CONTRIB FILES
+#
+#===============================================================================
+# FIREBIRD.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)TFirebird$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)TFirebird.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)TFirebird.c : $(FIREBIRD_DIR)$(DIR_SEP)TFirebird.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)firebird$(OBJEXT) : $(FIREBIRD_DIR)$(DIR_SEP)firebird.c
+	$(CC_CMD)
+
+#===============================================================================
+# FI_LIB.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)fi_winfu$(OBJEXT) : $(FREEIMAGE_DIR)$(DIR_SEP)source$(DIR_SEP)fi_winfu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fi_wrp$(OBJEXT) : $(FREEIMAGE_DIR)$(DIR_SEP)source$(DIR_SEP)fi_wrp.c
+	$(CC_CMD)
+
+#===============================================================================
+# GDLIB.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)gd$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdbar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gdbar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdbarcode$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gdbarcode.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdchart$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gdchart.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdimage$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gdimage.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdwrp$(OBJEXT) : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdwrp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gd.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gd.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdbar.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdbar.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdbarcode.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdbarcode.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdchart.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdchart.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gdimage.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdimage.prg
+	$(HB_CMD)
+
+#===============================================================================
+# GTWVW.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)gtwvw.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBZIP.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)zip$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zip.c
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipstorage$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipstorage.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipstring$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipstring.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipplatformcomm$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipplatformcomm.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipplatform$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipplatform.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zippathcomponent$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zippathcomponent.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipmemfile$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipmemfile.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipnew$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipnew.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipcomp$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipcomp.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipfileheader$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipfileheader.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipfile$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipfile.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipexception$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipexception.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipcompatibility$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipcompatibility.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipcentraldir$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipcentraldir.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)zipautobuffer$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)zipautobuffer.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)ziparchive$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)ziparchive.cpp
+	$(CC_CMD_ZIP)
+
+$(OBJ_DIR)$(DIR_SEP)stdafx$(OBJEXT) : $(HBZIP_DIR)$(DIR_SEP)stdafx.cpp
+	$(CC_CMD_ZIP)
+
+#===============================================================================
+# LIBNF.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)isbiton.c : $(LIBNF_DIR)$(DIR_SEP)isbiton.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isbiton$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)isbiton.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mouse1.c : $(LIBNF_DIR)$(DIR_SEP)mouse1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctadj.c : $(LIBNF_DIR)$(DIR_SEP)acctadj.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aeminlen.c : $(LIBNF_DIR)$(DIR_SEP)aeminlen.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)lastday.c : $(LIBNF_DIR)$(DIR_SEP)lastday.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)restsets.c : $(LIBNF_DIR)$(DIR_SEP)restsets.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctyear.c : $(LIBNF_DIR)$(DIR_SEP)acctyear.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)datecnfg.c : $(LIBNF_DIR)$(DIR_SEP)datecnfg.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)adessort.c : $(LIBNF_DIR)$(DIR_SEP)adessort.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)anomatch.c : $(LIBNF_DIR)$(DIR_SEP)anomatch.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)any2any.c : $(LIBNF_DIR)$(DIR_SEP)any2any.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)asum.c : $(LIBNF_DIR)$(DIR_SEP)asum.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bitclr.c : $(LIBNF_DIR)$(DIR_SEP)bitclr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bitset.c : $(LIBNF_DIR)$(DIR_SEP)bitset.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tbwhile.c : $(LIBNF_DIR)$(DIR_SEP)tbwhile.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)blink.c : $(LIBNF_DIR)$(DIR_SEP)blink.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byt2bit.c : $(LIBNF_DIR)$(DIR_SEP)byt2bit.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byt2hex.c : $(LIBNF_DIR)$(DIR_SEP)byt2hex.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteand.c : $(LIBNF_DIR)$(DIR_SEP)byteand.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteneg.c : $(LIBNF_DIR)$(DIR_SEP)byteneg.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteor.c : $(LIBNF_DIR)$(DIR_SEP)byteor.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)daytobow.c : $(LIBNF_DIR)$(DIR_SEP)daytobow.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)clrsel.c : $(LIBNF_DIR)$(DIR_SEP)clrsel.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cntryset.c : $(LIBNF_DIR)$(DIR_SEP)cntryset.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)elapsed.c : $(LIBNF_DIR)$(DIR_SEP)elapsed.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)woy.c : $(LIBNF_DIR)$(DIR_SEP)woy.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dectobin.c : $(LIBNF_DIR)$(DIR_SEP)dectobin.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hex2dec.c : $(LIBNF_DIR)$(DIR_SEP)hex2dec.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)e2d.c : $(LIBNF_DIR)$(DIR_SEP)e2d.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)vidcur.c : $(LIBNF_DIR)$(DIR_SEP)vidcur.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)elapmil.c : $(LIBNF_DIR)$(DIR_SEP)elapmil.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dosver.c : $(LIBNF_DIR)$(DIR_SEP)dosver.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)findith.c : $(LIBNF_DIR)$(DIR_SEP)findith.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)firstday.c : $(LIBNF_DIR)$(DIR_SEP)firstday.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gcd.c : $(LIBNF_DIR)$(DIR_SEP)gcd.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)min2dhm.c : $(LIBNF_DIR)$(DIR_SEP)min2dhm.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)invclr.c : $(LIBNF_DIR)$(DIR_SEP)invclr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isbit.c : $(LIBNF_DIR)$(DIR_SEP)isbit.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isshare.c : $(LIBNF_DIR)$(DIR_SEP)isshare.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)popadder.c : $(LIBNF_DIR)$(DIR_SEP)popadder.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menutoNF.c : $(LIBNF_DIR)$(DIR_SEP)menuto.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)month.c : $(LIBNF_DIR)$(DIR_SEP)month.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)metaph.c : $(LIBNF_DIR)$(DIR_SEP)metaph.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)miltime.c : $(LIBNF_DIR)$(DIR_SEP)miltime.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)netpv.c : $(LIBNF_DIR)$(DIR_SEP)netpv.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nooccur.c : $(LIBNF_DIR)$(DIR_SEP)nooccur.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pickday.c : $(LIBNF_DIR)$(DIR_SEP)pickday.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)prtesc.c : $(LIBNF_DIR)$(DIR_SEP)prtesc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)week.c : $(LIBNF_DIR)$(DIR_SEP)week.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rand1.c : $(LIBNF_DIR)$(DIR_SEP)rand1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wda.c : $(LIBNF_DIR)$(DIR_SEP)wda.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sqzn.c : $(LIBNF_DIR)$(DIR_SEP)sqzn.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menu1.c : $(LIBNF_DIR)$(DIR_SEP)menu1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)vertmenu.c : $(LIBNF_DIR)$(DIR_SEP)vertmenu.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aavg.c : $(LIBNF_DIR)$(DIR_SEP)aavg.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctweek.c : $(LIBNF_DIR)$(DIR_SEP)acctweek.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bytenot.c : $(LIBNF_DIR)$(DIR_SEP)bytenot.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pchr.c : $(LIBNF_DIR)$(DIR_SEP)pchr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)d2e.c : $(LIBNF_DIR)$(DIR_SEP)d2e.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xbox.c : $(LIBNF_DIR)$(DIR_SEP)xbox.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctqtr.c : $(LIBNF_DIR)$(DIR_SEP)acctqtr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)savesets.c : $(LIBNF_DIR)$(DIR_SEP)savesets.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dayofyr.c : $(LIBNF_DIR)$(DIR_SEP)dayofyr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dispmsg.c : $(LIBNF_DIR)$(DIR_SEP)dispmsg.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)page.c : $(LIBNF_DIR)$(DIR_SEP)page.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pending.c : $(LIBNF_DIR)$(DIR_SEP)pending.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)amedian.c : $(LIBNF_DIR)$(DIR_SEP)amedian.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)calendar.c : $(LIBNF_DIR)$(DIR_SEP)calendar.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dfile.c : $(LIBNF_DIR)$(DIR_SEP)dfile.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)year.c : $(LIBNF_DIR)$(DIR_SEP)year.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)easter.c : $(LIBNF_DIR)$(DIR_SEP)easter.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)roundNF.c : $(LIBNF_DIR)$(DIR_SEP)round.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aemaxlen.c : $(LIBNF_DIR)$(DIR_SEP)aemaxlen.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aading.c : $(LIBNF_DIR)$(DIR_SEP)aading.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)qtr.c : $(LIBNF_DIR)$(DIR_SEP)qtr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)madd.c : $(LIBNF_DIR)$(DIR_SEP)madd.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)scregion.c : $(LIBNF_DIR)$(DIR_SEP)scregion.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)linked.c : $(LIBNF_DIR)$(DIR_SEP)linked.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sleep.c : $(LIBNF_DIR)$(DIR_SEP)sleep.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ntow.c : $(LIBNF_DIR)$(DIR_SEP)ntow.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aredit.c : $(LIBNF_DIR)$(DIR_SEP)aredit.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)at2.c : $(LIBNF_DIR)$(DIR_SEP)at2.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nwlstat.c : $(LIBNF_DIR)$(DIR_SEP)nwlstat.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tempfile.c : $(LIBNF_DIR)$(DIR_SEP)tempfile.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sinkey.c : $(LIBNF_DIR)$(DIR_SEP)sinkey.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)vidmode.c : $(LIBNF_DIR)$(DIR_SEP)vidmode.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)eltime.c : $(LIBNF_DIR)$(DIR_SEP)eltime.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)diskfunc.c : $(LIBNF_DIR)$(DIR_SEP)diskfunc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pvid.c : $(LIBNF_DIR)$(DIR_SEP)pvid.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bytexor.c : $(LIBNF_DIR)$(DIR_SEP)bytexor.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctmnth.c : $(LIBNF_DIR)$(DIR_SEP)acctmnth.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pegs.c : $(LIBNF_DIR)$(DIR_SEP)pegs.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)workdays.c : $(LIBNF_DIR)$(DIR_SEP)workdays.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)savearr.c : $(LIBNF_DIR)$(DIR_SEP)savearr.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mouse1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)mouse1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctadj$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)acctadj.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aeminlen$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)aeminlen.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)lastday$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)lastday.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)restsets$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)restsets.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctyear$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)acctyear.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)datecnfg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)datecnfg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)adessort$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)adessort.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)anomatch$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)anomatch.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)any2any$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)any2any.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)asum$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)asum.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bitclr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)bitclr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bitset$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)bitset.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tbwhile$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tbwhile.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)blink$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)blink.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byt2bit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)byt2bit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byt2hex$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)byt2hex.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteand$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)byteand.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteneg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)byteneg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)byteor$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)byteor.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)daytobow$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)daytobow.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)clrsel$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)clrsel.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cntryset$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cntryset.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)elapsed$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)elapsed.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)woy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)woy.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dectobin$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dectobin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hex2dec$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hex2dec.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)e2d$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)e2d.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)elapmil$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)elapmil.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dosver$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dosver.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)findith$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)findith.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)firstday$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)firstday.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gcd$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)gcd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)min2dhm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)min2dhm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)invclr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)invclr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isbit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)isbit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isshare$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)isshare.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)popadder$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)popadder.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menutoNF$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menuto.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)month$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)month.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)metaph$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)metaph.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)miltime$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)miltime.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)netpv$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)netpv.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nooccur$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)nooccur.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pickday$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pickday.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)prtesc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)prtesc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)week$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)week.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rand1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rand1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wda$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wda.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sqzn$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sqzn.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menu1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menu1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)vertmenu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)vertmenu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aavg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)aavg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctweek$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)acctweek.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bytenot$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)bytenot.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pchr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pchr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)d2e$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)d2e.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xbox$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)xbox.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctqtr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)acctqtr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)savesets$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)savesets.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dayofyr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dayofyr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dispmsg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dispmsg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)page$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)page.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pending$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pending.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)amedian$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)amedian.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)calendar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)calendar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)year$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)year.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)easter$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)easter.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)roundNF$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)roundNF.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aemaxlen$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)aemaxlen.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aading$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)aading.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)qtr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)qtr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)madd$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)madd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)scregion$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)scregion.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)linked$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)linked.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sleep$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sleep.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ntow$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ntow.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aredit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)aredit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)at2$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)at2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nwlstat$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)nwlstat.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tempfile$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tempfile.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sinkey$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sinkey.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)vidmode$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)vidmode.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)eltime$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)eltime.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)diskfunc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)diskfunc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pvid$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pvid.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bytexor$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)bytexor.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dfile$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dfile.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)acctmnth$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)acctmnth.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pegs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pegs.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)workdays$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)workdays.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)savearr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)savearr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)caplock$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)caplock.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)shift$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)shift.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)color2n$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)color2n.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)descendNF$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)descend.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numlock$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)numlock.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)proper$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)proper.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mouse$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)mouse.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)getvid$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)getvid.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)chdir$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)chdir.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rmdir$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)rmdir.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)alt$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)alt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ctrl$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)ctrl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)getenvrn$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)getenvrn.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)n2color$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)n2color.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)origin$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)origin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)prtscr$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)prtscr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)stod$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)stod.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)kspeed$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)kspeed.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mkdir$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)mkdir.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)getver$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)getver.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ftattr$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)ftattr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dispc$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)dispc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fttext$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)fttext.c
+	$(CC_CMD)
+
+#===============================================================================
+# MYSQL.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)mysqlrdd$(OBJEXT): $(OBJ_DIR)$(DIR_SEP)mysqlrdd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tmysql$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tmysql.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tsqlbrw$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tsqlbrw.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mysql$(OBJEXT) : $(MYSQL_DIR)$(DIR_SEP)mysql.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mysqlrdd.c : $(MYSQL_DIR)$(DIR_SEP)mysqlrdd.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tmysql.c : $(MYSQL_DIR)$(DIR_SEP)tmysql.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tsqlbrw.c : $(MYSQL_DIR)$(DIR_SEP)tsqlbrw.prg
+	$(HB_CMD)
+
+#===============================================================================
+# PDFLIB.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdf1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdf1.c : $(PDFLIB_DIR)$(DIR_SEP)pdf1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdocs.prg
+	$(HB_CMD)
+
+#===============================================================================
+# PQSQL.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)postgres$(OBJEXT) : $(PGSQL_DIR)$(DIR_SEP)postgres.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)TPostgres$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)TPostgres.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)TPostgres.c : $(PGSQL_DIR)$(DIR_SEP)TPostgres.prg
+	$(HB_CMD)
+
+#===============================================================================
+# TELEPATH.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)win32$(OBJEXT) : $(TELEPATH_DIR)$(DIR_SEP)win32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)telepath$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)telepath.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)telepath.C : $(TELEPATH_DIR)$(DIR_SEP)telepath.PRG
+	$(HB_CMD)
+
+#===============================================================================
+# HBCC.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbcc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbcc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcc.c : $(HBCC_DIR)$(DIR_SEP)hbcc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbc7$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbc7.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcu$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcx$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcy$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcy.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbhex$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbhex.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcrc16$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcrc16.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcrc32HBCC$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcrc32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcrpt32$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcrpt32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcrpt128.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbencode.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbdecode$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbdecode.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbdecode.c : $(HBCC_DIR)$(DIR_SEP)hbdecode.prg
+	$(HB_CMD)
+
+#===============================================================================
+# WHAT32.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)_winbmp$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winbmp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winbrsh$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winbrsh.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wincall$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wincall.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wincdlg$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wincdlg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winclpb$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winclpb.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wincomm$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wincomm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wincret$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wincret.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windate$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windate.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windc$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windir$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windir.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windlg$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windlg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windll$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windll.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_windraw$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_windraw.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winfont$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winfont.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wingdi$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wingdi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winhead$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winhead.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winicon$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winicon.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winilst$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winilst.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winINet$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winINet.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winini$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winini.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winkbrd$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winkbrd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winlv$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winlv.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmain$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmain.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmapi$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmapi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmem$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmem.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmenu$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmenu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmeta$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmeta.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmisc$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmisc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmmcap$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmmcap.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmous$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmous.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winmsg$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winmsg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winpen$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winpen.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winprn$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winprn.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winrect$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winrect.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winreg$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winreg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winrgn$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winrgn.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winscrlb$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winscrlb.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winshell$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winshell.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winsock$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winsock.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winsys$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winsys.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wintab$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wintab.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wintbar$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wintbar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_wintext$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wintext.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winTree$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winTree.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winview$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winview.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winwnd$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winwnd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)_winserial$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winserial.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)DebugWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)DebugWHAT32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WhatUtil$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WhatUtil.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinCDlg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinCDlg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinComm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinComm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinCore$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinCore.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinIni$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinIni.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinRBar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinRBar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinTBar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinTBar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinTabs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinTabs.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)DebugWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)Debug.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)ErrorSys.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WhatUtil.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WhatUtil.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinCDlg.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinCDlg.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinComm.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinComm.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinCore.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinCore.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinIni.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinIni.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinRBar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinRBar.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinTBar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinTBar.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)WinTabs.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinTabs.prg
+	$(HB_CMD)
+
+#===============================================================================
+# XWT.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)xwt_api$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_api.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xwt_win$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win$(DIR_SEP)xwt_win.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xwt_win_menu$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win$(DIR_SEP)xwt_win_menu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xwt_win_menuitem$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win$(DIR_SEP)xwt_win_menuitem.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xwt_win_framewnd$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win$(DIR_SEP)xwt_win_framewnd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xwt_win_msgbox$(OBJEXT) : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win$(DIR_SEP)xwt_win_msgbox.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)button$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)button.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bcolumn$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)bcolumn.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browseXWT$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)browseXWT.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)checkboxXWT$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)checkboxXWT.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)container$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)container.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)event$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)event.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filesel$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)filesel.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fontsel$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)fontsel.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)framewindow$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)framewindow.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)grid$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)grid.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hex$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hex.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)image$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)image.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)inputmask$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)inputmask.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)label$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)label.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)laycontainer$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)laycontainer.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)layout$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)layout.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menuitem$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menuitem.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)msgbox$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)msgbox.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pane$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pane.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)radiobutton$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)radiobutton.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)splitter$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)splitter.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)textbox$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)textbox.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)togglebutton$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)togglebutton.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)treeitem$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)treeitem.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)treelist$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)treelist.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)viewport$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)viewport.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)widget$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)widget.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)window$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)window.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)button.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)button.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bcolumn.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)bcolumn.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browseXWT.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)browse.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)checkboxXWT.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)checkbox.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)container.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)container.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)event.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)event.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filesel.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)filesel.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fontsel.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)fontsel.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)framewindow.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)framewindow.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)grid.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)grid.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hex.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)hex.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)image.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)image.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)inputmask.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)inputmask.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)label.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)label.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)laycontainer.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)laycontainer.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)layout.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)layout.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menu.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)menu.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)menuitem.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)menuitem.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)msgbox.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)msgbox.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pane.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)pane.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)radiobutton.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)radiobutton.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)splitter.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)splitter.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)textbox.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)textbox.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)togglebutton.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)togglebutton.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)treeitem.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)treeitem.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)treelist.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)treelist.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)viewport.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)viewport.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)widget.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)widget.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)window.c : $(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)window.prg
+	$(HB_CMD)
