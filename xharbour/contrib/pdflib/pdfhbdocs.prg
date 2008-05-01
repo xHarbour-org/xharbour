@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.4 2005/11/20 20:44:23 lculik Exp $
+ * $Id: pdfhbdocs.prg,v 1.5 2008/04/30 13:20:31 andijahja Exp $
  */
 
 /*
@@ -1278,7 +1278,7 @@ RETURN NIL
    int rowsperstrip = hb_parnd( 1 ) ;
                                 float y = hb_parnd( 2 ) ;
                                 float h = hb_parnd( 3 ) ;
-                                int row, res ;
+                                int row, res = 0;
                                 int p ;
                                 for ( row = 0 ;   row < h ;   row += rowsperstrip )
    {

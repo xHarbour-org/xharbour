@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.43 2008/04/29 08:55:52 andijahja Exp $
+# $Id: contrib.gc,v 1.1 2008/05/01 03:36:58 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32 (CONTRIBS)
 #
@@ -14,7 +14,8 @@
 # HB_FIREBIRD=1
 # HB_MYSQL=1
 # HB_PGSQL=1
-# HB_ZIP=1
+
+HB_ZIP=1
 
 HB_FREEIMAGE=1
 HB_WHAT32=1
@@ -40,6 +41,7 @@ endif
 
 HB_CMD =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
+CC_CMD_ZIP=G++ $(CLIBFLAGS) -I$(HBZIP_DIR)\include -DWIN32 -D_WIN32 -DNDEBUG -o $@ $^
 LIB_CMD=\
 	RM -f $@ &&\
 	AR cru $@ $^ &&\

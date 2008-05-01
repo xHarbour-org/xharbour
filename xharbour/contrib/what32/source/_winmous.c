@@ -168,7 +168,7 @@ HB_FUNC( CLIPCURSOR )
 HB_FUNC( GETCLIPCURSOR )
 {
    RECT rc ;
-   PHB_ITEM aRect;
+   PHB_ITEM aRect = NULL;
 
    if ( GetClipCursor( &rc ) )
 

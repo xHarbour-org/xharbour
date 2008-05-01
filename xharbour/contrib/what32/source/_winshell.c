@@ -12,6 +12,9 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
+#ifdef __GNUC__
+DWORD WINAPI DoEnvironmentSubst(LPSTR szString, UINT cchString);
+#endif
 
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(UINT) DragQueryFileA(HDROP,UINT,LPSTR,UINT);

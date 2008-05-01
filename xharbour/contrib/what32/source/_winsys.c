@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.28 2006/04/12 05:58:40 paultucker Exp $
+ * $Id: _winsys.c,v 1.29 2008/04/30 23:17:11 andijahja Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -934,7 +934,7 @@ HB_FUNC( HTMLHELP )
 HB_FUNC( CREATEFILE )
 {
 
-   SECURITY_ATTRIBUTES *sa ;
+   SECURITY_ATTRIBUTES *sa = NULL;
 
    if( ISCHAR( 4 ) )
       sa = ( SECURITY_ATTRIBUTES *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
@@ -975,7 +975,7 @@ HB_FUNC( READFILE )
    char * Buffer = ( char * ) hb_xgrab( hb_parnl( 3 ) ) ;
    DWORD nRead   = 0      ;
    BOOL  bRet             ;
-   OVERLAPPED *Overlapped ;
+   OVERLAPPED *Overlapped = NULL;
 
    if( ISCHAR( 5 ) )
       Overlapped = ( OVERLAPPED *) hb_param( 5, HB_IT_STRING )->item.asString.value ;
@@ -1010,7 +1010,7 @@ HB_FUNC( WRITEFILE )
 {
 
    DWORD nWritten = 0     ;
-   OVERLAPPED *Overlapped ;
+   OVERLAPPED *Overlapped = NULL;
 
    if( ISCHAR( 4 ))
      Overlapped = ( OVERLAPPED *) hb_param( 4, HB_IT_STRING )->item.asString.value ;

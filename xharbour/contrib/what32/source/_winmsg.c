@@ -63,7 +63,7 @@ HB_FUNC( POSTQUITMESSAGE )
 HB_FUNC( POSTMESSAGE )
 {
 
-   char *cText ;
+   char *cText = NULL;
 
    if (ISBYREF(4))
    {
@@ -91,7 +91,7 @@ HB_FUNC( POSTMESSAGE )
 HB_FUNC( SENDMESSAGE )
 {
 
-   char *cText ;
+   char *cText = NULL;
 
 
    if( ISBYREF(4) )

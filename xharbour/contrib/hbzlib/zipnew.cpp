@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.28 2007/06/05 18:21:31 enricomaria Exp $
+ * $Id: zipnew.cpp,v 1.29 2008/04/20 07:08:45 andijahja Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ class SpanActionCallback : public CZipActionCallback
 
 int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
-   ULONG ulCount;
+   ULONG ulCount = 0;
 
    const char *szDummy;
 
@@ -268,7 +268,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             PHB_ITEM TempArray;
             char szAttr[ 5 ];
             char szTime[ 9 ];
-            char *szMethod;
+            char *szMethod = NULL;
             char szCRC[ 8 ];
             int iRatio;
             int iMeth = fh.m_uMethod;
@@ -461,7 +461,7 @@ BOOL hb_IsPassWord( char *szFile )
 
 int hb___GetNumberofFilestoUnzip( char *szFile )
 {
-   int iNumberOfFiles;
+   int iNumberOfFiles = 0;
 
    CZipArchive szZip;
    SpanCallback span;
@@ -562,13 +562,13 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
    ULONG ulCount;
-   int iCause;
+   int iCause = 0;
    // int iMode ;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
    BOOL bFreePath = TRUE;
 
    BOOL bChange = FALSE;
-   LPCTSTR lpFiletoExtract;
+   LPCTSTR lpFiletoExtract = NULL;
 
    CZipArchive szZip;
    SpanCallback span;
@@ -739,7 +739,7 @@ void hb_SetZipReadOnly(int iRead )
 
 const char * hb_GetZipComment( char *szFile )
 {
-   const char *szReturn;
+   const char *szReturn = "";
    char *szTempR;
    bool iReturn = true;
    CZipString szTemp;
@@ -792,7 +792,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
    ULONG ulCount;
-   int iCause;
+   int iCause = 0;
    // int iMode ;
 
    CZipArchive szZip;

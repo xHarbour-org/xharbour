@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2008/04/17 12:56:41 $ $Author: lculik $
+// $Date: 2008/04/17 19:14:30 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -23,13 +23,6 @@
 #include "zipcompatibility.h"
 #include <time.h>
 
-#ifndef DEF_MEM_LEVEL
-#if MAX_MEM_LEVEL >= 8
-#  define DEF_MEM_LEVEL 8
-#else
-#  define DEF_MEM_LEVEL  MAX_MEM_LEVEL
-#endif
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -39,7 +32,6 @@
 #define ZIP_COMPR_REPL_SIGN 0x0100 // first 8 bits should be 00 (reserved for compression level), next 8 should be different from ff (to distinguish from -1)
 
 const TCHAR CZipArchive::m_gszCopyright[] = {_T("ZipArchive library Copyright 2000 - 2003 Tadeusz Dracz")};
-
 
 void CZipAddNewFileInfo::Defaults()
 {
@@ -78,7 +70,7 @@ void CZipArchive::Open(LPCTSTR szPathName, int iMode, int iVolumeSize)
 {
 	if (!IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive already opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive already opened.\n"));
 		return;
 	}
 	m_storage.Open(szPathName, iMode, iVolumeSize);
@@ -89,12 +81,12 @@ void CZipArchive::Open(CZipMemFile& mf,int iMode)
 {
 	if (!IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive already opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive already opened.\n"));
 		return;
 	}
 	if (iMode != zipOpen && iMode != zipOpenReadOnly && iMode != zipCreate)
 	{
-		TRACE(_T("%s(%i) : Mode not supported.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Mode not supported.\n"));
 		return;
 	}
 	m_storage.Open(mf, iMode);
@@ -143,7 +135,7 @@ bool CZipArchive::GetFileInfo(CZipFileHeader & fhInfo, WORD uIndex) const
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 
@@ -159,7 +151,7 @@ int CZipArchive::FindFile(LPCTSTR lpszFileName, int iCaseSensitive, bool bFileNa
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return (int)-1;
 	}
 	bool bCS;
@@ -190,14 +182,14 @@ bool CZipArchive::OpenFile(WORD uIndex)
 	}
 	if (m_storage.IsSpanMode() == 1)
 	{
-		TRACE(_T("%s(%i) : You cannot extract from the span in creation.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot extract from the span in creation.\n"));
 		return false;
 	}
 
 
 	if (m_iFileOpened)
 	{
-		TRACE(_T("%s(%i) : A file already opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A file already opened.\n"));
 		return false;
 	}
 
@@ -208,7 +200,7 @@ bool CZipArchive::OpenFile(WORD uIndex)
 
 		if (m_pszPassword.GetSize() == 0)
 		{
-			TRACE(_T("%s(%i) : Password not set for the encrypted file.\n"),__FILE__,__LINE__);
+			TRACE(_T("%s(%i) : Password not set for the encrypted file.\n"));
 				ThrowError(CZipException::badPassword);
 		}
 		CryptInitKeys();
@@ -218,7 +210,7 @@ bool CZipArchive::OpenFile(WORD uIndex)
 	}
 	else if (m_pszPassword.GetSize() != 0)
 	{
-		TRACE(_T("%s(%i) : Password set for a not encrypted file. Ignoring password.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Password set for a not encrypted file. Ignoring password.\n"));
 	}
 
 	WORD uMethod = CurrentFile()->m_uMethod;
@@ -253,13 +245,13 @@ int CZipArchive::GetLocalExtraField(char *pBuf, int iSize)const
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return -1;
 	}
 
 	if (m_iFileOpened != extract)
 	{
-		TRACE(_T("%s(%i) : A file must be opened to get the local extra field.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A file must be opened to get the local extra field.\n"));
 		return -1;
 	}
 
@@ -318,7 +310,7 @@ DWORD CZipArchive::ReadFile(void *pBuf,
 {
 	if (m_iFileOpened != extract)
 	{
-		TRACE(_T("%s(%i) : Current file must be opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Current file must be opened.\n"));
 		return 0;
 	}
 
@@ -403,7 +395,7 @@ void CZipArchive::Close(int iAfterException, bool bUpdateTimeStamp)
 	// if after an exception - the archive may be closed, but the file may be opened
 	if (IsClosed() && (!iAfterException || IsClosed(false)))
 	{
-		TRACE(_T("%s(%i) : ZipArchive is already closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is already closed.\n"));
 		return;
 	}
 
@@ -457,7 +449,7 @@ void CZipArchive::SetAdvanced(int iWriteBuffer, int iGeneralBuffer, int iSearchB
 {
 	if (!IsClosed())
 	{
-		TRACE(_T("%s(%i) : Set this options before opening the archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set this options before opening the archive.\n"));
 		return;
 	}
 
@@ -477,7 +469,7 @@ int CZipArchive::CloseFile(LPCTSTR lpszFilePath, bool bAfterException)
 {
 	if (m_iFileOpened != extract)
 	{
-		TRACE(_T("%s(%i) : No opened file.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : No opened file.\n"));
 		return false;
 	}
 
@@ -521,25 +513,25 @@ bool CZipArchive::OpenNewFile(CZipFileHeader & header,
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 
 	if (m_iFileOpened)
 	{
-		TRACE(_T("%s(%i) : A file already opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A file already opened.\n"));
 		return false;
 	}
 
 	if (m_storage.IsSpanMode() == -1)
 	{
-		TRACE(_T("%s(%i) : You cannot add files to the existing disk spannig archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot add files to the existing disk spannig archive.\n"));
 		return false;
 	}
 
 	if (GetCount() ==(WORD)USHRT_MAX)
 	{
-		TRACE(_T("%s(%i) : Maximum file count inside archive reached.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Maximum file count inside archive reached.\n"));
 		return false;
 	}
 
@@ -599,7 +591,7 @@ bool CZipArchive::OpenNewFile(CZipFileHeader & header,
 #ifdef _DEBUG
 	if (bIsDirectory && bEncrypted)
 	TRACE(_T("%s(%i) : Encrypting a directory. It's pointless.\n\
-	Clear the password before adding a directory.\n"),__FILE__,__LINE__);
+	Clear the password before adding a directory.\n"));
 #endif
 
 
@@ -818,7 +810,7 @@ void CZipArchive::SetExtraField(const char *pBuf, WORD iSize)
 {
 	if (m_iFileOpened != compress)
 	{
-		TRACE(_T("%s(%i) : A new file must be opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A new file must be opened.\n"));
 		return;
 	}
 	if (!pBuf || !iSize)
@@ -832,7 +824,7 @@ bool CZipArchive::WriteNewFile(const void *pBuf, DWORD iSize)
 {
 	if (m_iFileOpened != compress)
 	{
-		TRACE(_T("%s(%i) : A new file must be opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A new file must be opened.\n"));
 		return false;
 	}
 
@@ -884,7 +876,7 @@ bool CZipArchive::CloseNewFile(bool bAfterException)
 {
 	if (m_iFileOpened != compress)
 	{
-		TRACE(_T("%s(%i) : A new file must be opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : A new file must be opened.\n"));
 		return false;
 	}
 
@@ -955,7 +947,7 @@ void CZipArchive::GetIndexes(const CZipStringArray &aNames, CZipWordArray& aInde
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return;
 	}
 	int iSize = aNames.GetSize();
@@ -979,19 +971,19 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return;
 	}
 
 	if (m_storage.IsSpanMode())
 	{
-		TRACE(_T("%s(%i) : You cannot delete files from the disk spannig archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot delete files from the disk spannig archive.\n"));
 		return;
 	}
 
 	if (m_iFileOpened)
 	{
-		TRACE(_T("%s(%i) : You cannot delete files if there is a file opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot delete files if there is a file opened.\n"));
 		return;
 	}
 
@@ -1002,7 +994,7 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 	int uSize = aIndexes.GetSize();
 	if (!uSize)
 	{
-		TRACE(_T("%s(%i) : The indekses array is empty.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : The indekses array is empty.\n"));
 		return;
 	}
 
@@ -1302,7 +1294,11 @@ bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
             info.m_iComprLevel = 0;
       }
    }
-   bool bEffInMem = bEff && (info.m_iSmartLevel & zipsmMemoryFlag);
+   // bool bEffInMem = bEff && (info.m_iSmartLevel & zipsmMemoryFlag);
+   // bool bEffInMem = bEff && (info.m_iSmartLevel & zipsmMemoryFlag);
+   bool bEffInMem = false;
+   if( bEff && (info.m_iSmartLevel & zipsmMemoryFlag) )
+      bEffInMem = true;
    CZipString szTempFileName;
    if (bNeedTempArchive && (bEffInMem ||
       !(szTempFileName = ZipPlatform::GetTmpFileName(
@@ -1598,7 +1594,9 @@ bool CZipArchive::AddNewFile(CZipAddNewFileInfo& info)
 				info.m_iComprLevel = 0;
 		}
 	}
-	bool bEffInMem = bEff && (info.m_iSmartLevel & zipsmMemoryFlag);
+	bool bEffInMem = false;
+	if (bEff && (info.m_iSmartLevel & zipsmMemoryFlag))
+	   bEffInMem = true;
 	CZipString szTempFileName;
 	if (bNeedTempArchive && (bEffInMem ||
 		!(szTempFileName = ZipPlatform::GetTmpFileName(
@@ -1805,7 +1803,7 @@ CZipString CZipArchive::GetArchivePath() const
 {
 	if (IsClosed(false))
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return _T("");
 	}
 	return m_storage.m_pFile->GetFilePath();
@@ -1815,7 +1813,7 @@ CZipString CZipArchive::GetGlobalComment() const
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return _T("");
 	}
 	CZipString temp;
@@ -1826,12 +1824,12 @@ bool CZipArchive::SetGlobalComment(LPCTSTR lpszComment)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 	if (m_storage.IsSpanMode() == -1)
 	{
-		TRACE(_T("%s(%i) : You cannot modify the global comment of the existing disk spanning archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot modify the global comment of the existing disk spanning archive.\n"));
 		return false;
 	}
 
@@ -1854,12 +1852,12 @@ bool CZipArchive::SetFileComment(WORD uIndex, LPCTSTR lpszComment)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 	if (m_storage.IsSpanMode() == -1)
 	{
-		TRACE(_T("%s(%i) : You cannot modify the file comment in the existing disk spanning archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot modify the file comment in the existing disk spanning archive.\n"));
 		return false;
 	}
 
@@ -1927,12 +1925,12 @@ bool CZipArchive::SetPassword(LPCTSTR lpszPassword)
 {
 	if (m_iFileOpened != nothing)
 	{
-		TRACE(_T("%s(%i) : You cannot change the password when the file is opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot change the password when the file is opened.\n"));
 		return false; // it's important not to change the password when the file inside archive is opened
 	}
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : Setting the password for a closed archive has no effect.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Setting the password for a closed archive has no effect.\n"));
 	}
 	if (lpszPassword)
 	{
@@ -1943,7 +1941,7 @@ bool CZipArchive::SetPassword(LPCTSTR lpszPassword)
 			if (m_pszPassword[i] <= 0)
 			{
 				m_pszPassword.Release();
-				TRACE(_T("%s(%i) : The password contains forbidden characters. Password cleared.\n"),__FILE__,__LINE__);
+				TRACE(_T("%s(%i) : The password contains forbidden characters. Password cleared.\n"));
 				return false;
 			}
 	}
@@ -2007,7 +2005,7 @@ void CZipArchive::CloseFileAfterTestFailed()
 {
 	if (m_iFileOpened != extract)
 	{
-		TRACE(_T("%s(%i) : No file opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : No file opened.\n"));
 		return;
 	}
 	m_info.ReleaseBuf();
@@ -2019,7 +2017,7 @@ bool CZipArchive::TestFile(WORD uIndex, DWORD uBufSize)
 {
 	if (m_storage.IsSpanMode() == 1)
 	{
-		TRACE(_T("%s(%i) : You cannot test the spanning archive in creation.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot test the spanning archive in creation.\n"));
 		return false;
 	}
 	if (!uBufSize)
@@ -2161,7 +2159,7 @@ void CZipArchive::EnableFindFast(bool bEnable)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : Set it after opening the archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set it after opening the archive.\n"));
 		return;
 	}
 	m_centralDir.EnableFindFast(bEnable, m_bCaseSensitive);
@@ -2172,13 +2170,13 @@ bool CZipArchive::SetSystemCompatibility(int iSystemComp)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : Set it after opening the archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set it after opening the archive.\n"));
 		return false;
 	}
 
 	if (m_iFileOpened == compress)
 	{
-		TRACE(_T("%s(%i) : Set it before opening a file inside archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set it before opening a file inside archive.\n"));
 		return false;
 	}
 
@@ -2192,13 +2190,13 @@ void CZipArchive::SetRootPath(LPCTSTR szPath)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : Set it after opening the archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set it after opening the archive.\n"));
 		return;
 	}
 
 	if (m_iFileOpened != nothing)
 	{
-		TRACE(_T("%s(%i) : Set it before opening a file inside archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Set it before opening a file inside archive.\n"));
 		return;
 	}
 
@@ -2326,12 +2324,12 @@ void CZipArchive::SetAutoFlush(bool bAutoFlush)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"));
 		return;
 	}
 	if (m_storage.IsSpanMode() != 0)
 	{
-		TRACE(_T("%s(%i) : Cannot set auto-flush for the disk spanning archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Cannot set auto-flush for the disk spanning archive.\n"));
 		return;
 	}
 	m_bAutoFlush = bAutoFlush;
@@ -2341,13 +2339,13 @@ void CZipArchive::Flush()
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"));
 		return;
 	}
 
 	if (m_storage.IsSpanMode() < 0)
 	{
-		TRACE(_T("%s(%i) : Cannot flush an existing disk spanning archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Cannot flush an existing disk spanning archive.\n"));
 		return;
 	}
 	WriteCentralDirectory();
@@ -2361,7 +2359,7 @@ void CZipArchive::GetCentralDirInfo(CZipCentralDir::Info& info)const
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive not yet opened.\n"));
 		return;
 
 	}
@@ -2753,7 +2751,7 @@ void CZipArchive::FindMatches(LPCTSTR lpszPattern, CZipWordArray &ar, bool bFull
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return;
 	}
 
@@ -2796,25 +2794,25 @@ bool CZipArchive::GetFromArchive(CZipArchive& zip, WORD uIndex, int iReplaceInde
 
 	if (IsClosed() || zip.IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 
 	if (m_iFileOpened || zip.m_iFileOpened)
 	{
-		TRACE(_T("%s(%i) : You cannot get files from another archive if there is a file opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot get files from another archive if there is a file opened.\n"));
 		return false;
 	}
 
 	if (zip.m_storage.IsSpanMode())
 	{
-		TRACE(_T("%s(%i) : You cannot get files from the disk spannig archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot get files from the disk spannig archive.\n"));
 		return false;
 	}
 
 	if (m_storage.IsSpanMode() == -1)
 	{
-		TRACE(_T("%s(%i) : You cannot add files to the existing disk spannig archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot add files to the existing disk spannig archive.\n"));
 		return false;
 	}
 
@@ -3025,19 +3023,19 @@ bool CZipArchive::RenameFile(WORD uIndex, LPCTSTR lpszNewName)
 {
 	if (IsClosed())
 	{
-		TRACE(_T("%s(%i) : ZipArchive is closed.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : ZipArchive is closed.\n"));
 		return false;
 	}
 
 	if (m_storage.IsSpanMode())
 	{
-		TRACE(_T("%s(%i) : You cannot rename files in the disk spannig archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot rename files in the disk spannig archive.\n"));
 		return false;
 	}
 
 	if (m_iFileOpened)
 	{
-		TRACE(_T("%s(%i) : You cannot rename a file if there is a file opened.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot rename a file if there is a file opened.\n"));
 		return false;
 	}
 	CZipFileHeader fh, fhNew;
@@ -3125,13 +3123,13 @@ bool CZipArchive::UpdateReplaceIndex(int& iReplaceIndex, LPCTSTR lpszNewFileName
 
 	if (GetSpanMode()!=0)
 	{
-		TRACE(_T("%s(%i) : You cannot replace files in a disk-spanning archive.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : You cannot replace files in a disk-spanning archive.\n"));
 		return false;
 	}
 
 	if (!m_centralDir.IsValidIndex(iReplaceIndex))
 	{
-		TRACE(_T("%s(%i) : Not valid replace index.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Not valid replace index.\n"));
 		return false;
 	}
 	if (iReplaceIndex == GetCount() - 1) // replacing last file in the archive

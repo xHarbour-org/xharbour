@@ -1,5 +1,5 @@
 /*
- * $Id: fi_wrp.c,v 1.1 2005/11/07 01:13:06 fsgiudice Exp $
+ * $Id: fi_wrp.c,v 1.2 2008/04/30 13:20:31 andijahja Exp $
  */
 
 /*
@@ -1742,7 +1742,7 @@ HB_FUNC( FI_GETBACKGROUNDCOLOR )
       )
    {
       FIBITMAP *dib;
-      RGBQUAD *bkcolor;
+      RGBQUAD *bkcolor = 0;
 
       /* Retrieve parameters */
       dib     = (FIBITMAP*) hb_parptr( 1 );

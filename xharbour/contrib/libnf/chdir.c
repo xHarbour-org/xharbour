@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.1 2006/12/14 15:46:03 sirep Exp $
+ * $Id: chdir.c,v 1.8 2007/01/08 20:13:09 marceloanelli Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -131,7 +131,7 @@ HB_FUNC( FT_CHDIR )
       if ( !bResult )
       {
          dError = GetLastError();
-         printf("dError=%i\n", dError);
+         printf("dError=%lu\n", dError);
          iRet = ( dError == ERROR_PATH_NOT_FOUND ) ? 3 : 99;
       }
    }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipStorage.h $
 // $Archive: /ZipArchive/ZipStorage.h $
-// $Date: 2003/08/20 19:33:40 $ $Author: lculik $.
+// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $.
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -27,7 +27,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "zipfile.h"	
+#include "zipfile.h"
 #include "zipautobuffer.h"
 #include "zipstring.h"
 #include "zipmemfile.h"
@@ -38,19 +38,19 @@
 /**
 	A base class for functional objects (functors) that are used as a callbacks during various actions.
 	You need to derive your own class and overload \c Callback method to use it.
-	Do not derive from CZipCallback directly but from CZipSpanCallback (as a callback when there is a need 
+	Do not derive from CZipCallback directly but from CZipSpanCallback (as a callback when there is a need
 	for a disk change in a disk-spanning archive) or from CZipActionCallback for other actions.
 */
 struct ZIP_API CZipCallback
 {
 	/**
-		Method called as a callback. 
+		Method called as a callback.
 		Return \c false from inside the method to abort the current operation. If it is a span callback functor,
 		a CZipException with CZipException::aborted code will be thrown, otherwise the code will be CZipException::abortedAction or CZipException::abortedSafely.
 		The following actions can be safely aborted (without having the archive corrupted):
 		- counting bytes before deleting files
 		- testing
-		- saving central directory on non-disk-spanning archive 
+		- saving central directory on non-disk-spanning archive
 		(saved data is removed in case of break	and you can save it again);
 		it the archive is disk-spanning and if saving is aborted, the archive
 		will not be damaged, but saved part of the central directory will be not removed
@@ -61,8 +61,9 @@ struct ZIP_API CZipCallback
 	*/
 	virtual bool Callback(int iProgress) = 0;
 
+        virtual	~CZipCallback();
 
-	CZipString m_szExternalFile;	///< if the action (adding, extracting or disk-spanning) uses an external file, its filename is stored here	
+	CZipString m_szExternalFile;	///< if the action (adding, extracting or disk-spanning) uses an external file, its filename is stored here
 };
 
 /**

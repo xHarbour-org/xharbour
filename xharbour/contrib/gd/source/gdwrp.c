@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.12 2006/01/14 17:46:16 paultucker Exp $
+ * $Id: gdwrp.c,v 1.13 2006/03/20 23:39:34 fsgiudice Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ static void AddImageToFile( char *szFile, void *iptr, int sz )
 
 static void GDImageCreateFrom( int nType )
 {
-   gdImagePtr im;
+   gdImagePtr im = NULL;
    char *szFile;
    int sz;
    void *iptr;
@@ -298,9 +298,9 @@ static void GDImageSaveTo( int nType )
       gdImagePtr im;
       char *szFile;
       int sz;
-      void *iptr;
+      void *iptr = NULL;
       FHANDLE fhandle;
-      int level, fg;
+      int level = 0, fg = 0;
 
       /* Retrieve image pointer */
        im = (gdImagePtr)hb_parptr(1);

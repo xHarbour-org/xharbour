@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipCentralDir.cpp $
 // $Archive: /ZipArchive/ZipCentralDir.cpp $
-// $Date: 2003/08/20 15:03:52 $ $Author: lculik $
+// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -717,7 +717,7 @@ int CZipCentralDir::FindFile(LPCTSTR lpszFileName, bool bCaseSensitive, bool bSp
 	// this is required for fast finding and is done only once
 	if (!m_bConvertAfterOpen)
 	{
-		TRACE(_T("%s(%i) : Converting all the filenames.\n"),__FILE__,__LINE__);
+		TRACE(_T("%s(%i) : Converting all the filenames.\n"));
 		ConvertAll();
 	}
 	if (!m_bFindFastEnabled)

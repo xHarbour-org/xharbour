@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipAutoBuffer.h $
 // $Archive: /ZipArchive/ZipAutoBuffer.h $
-// $Date: 2003/08/20 15:03:52 $ $Author: lculik $
+// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -76,4 +76,3 @@ protected:
 };
 
 #endif // !defined(AFX_ZIPAUTOBUFFER_H__DEC28C20_83FE_11D3_B7C3_EDEC47A8A86C__INCLUDED_)
-	

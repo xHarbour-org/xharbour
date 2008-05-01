@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// $RCSfile: ZipString.h,v $
-// $Revision: 1.1.2.3 $ $Name:  $
-// $Date: 2005/04/11 18:14:32 $ $Author: Tadeusz Dracz $
+// $RCSfile: zipstring.h,v $
+// $Revision: 1.4 $ $Name:  $
+// $Date: 2005/10/06 18:24:47 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -40,7 +40,7 @@
 #include "ZipExport.h"
 
 #ifndef __GNUC__
-    #ifndef _vsntprintf 
+    #ifndef _vsntprintf
 	#ifdef  _UNICODE
 		#define _vsntprintf _vsnwprintf
 	#else
@@ -49,7 +49,9 @@
     #endif
 #include <locale>
 #else
-       #define _vsntprintf vsnprintf
+       #ifndef _vsntprintf
+          #define _vsntprintf vsnprintf
+       #endif
 #endif
 
 

@@ -116,7 +116,7 @@ HB_FUNC( GETWINDOWDC )
 
 HB_FUNC( CREATEDC )
 {
-   DEVMODE *lpInitData ;
+   DEVMODE *lpInitData = NULL;
 
    if ( ! ISNIL( 4 ) )
         lpInitData = (DEVMODE *) hb_param( 4, HB_IT_STRING)->item.asString.value ;
@@ -137,7 +137,7 @@ HB_FUNC( CREATEDC )
 HB_FUNC( RESETDC )
 {
 
-   DEVMODE *lpInitData ;
+   DEVMODE *lpInitData = NULL;
 
    if ( ! ISNIL( 2 ) )
         lpInitData = (DEVMODE *) hb_param( 2, HB_IT_STRING)->item.asString.value ;

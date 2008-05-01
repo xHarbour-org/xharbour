@@ -1,5 +1,5 @@
 /*
- * $Id: _winmmcap.c,v 1.0 2004/12/11 23:38:00 marcosgambeta Exp $
+ * $Id: _winmmcap.c,v 1.1 2004/12/12 02:22:08 marcosgambeta Exp $
  */
 
 /*
@@ -15,6 +15,98 @@
 #include <hbapi.h>
 #include <windows.h>
 #include <vfw.h>
+
+#ifdef __GNUC__
+#define WM_CAP_START                    WM_USER
+#define WM_CAP_ABORT                    (WM_CAP_START+  69)
+#define WM_CAP_SEQUENCE                 (WM_CAP_START+  62)
+#define WM_CAP_SEQUENCE_NOFILE          (WM_CAP_START+  63)
+#define WM_CAP_STOP                     (WM_CAP_START+  68)
+#define WM_CAP_SINGLE_FRAME_OPEN        (WM_CAP_START+  70)
+#define WM_CAP_SINGLE_FRAME_CLOSE       (WM_CAP_START+  71)
+#define WM_CAP_SINGLE_FRAME             (WM_CAP_START+  72)
+#define WM_CAP_DLG_VIDEOFORMAT          (WM_CAP_START+  41)
+#define WM_CAP_DLG_VIDEOSOURCE          (WM_CAP_START+  42)
+#define WM_CAP_DLG_VIDEODISPLAY         (WM_CAP_START+  43)
+#define WM_CAP_GET_VIDEOFORMAT          (WM_CAP_START+  44)
+#define WM_CAP_SET_VIDEOFORMAT          (WM_CAP_START+  45)
+#define WM_CAP_DLG_VIDEOCOMPRESSION     (WM_CAP_START+  46)
+#define WM_CAP_DRIVER_CONNECT           (WM_CAP_START+  10)
+#define WM_CAP_DRIVER_DISCONNECT        (WM_CAP_START+  11)
+#define WM_CAP_FILE_SET_CAPTURE_FILEA  (WM_CAP_START+  20)
+#define WM_CAP_FILE_GET_CAPTURE_FILEA  (WM_CAP_START+  21)
+#define WM_CAP_FILE_SAVEASA            (WM_CAP_START+  23)
+#define WM_CAP_FILE_SAVEDIBA           (WM_CAP_START+  25)
+#define WM_CAP_FILE_SET_CAPTURE_FILE    WM_CAP_FILE_SET_CAPTURE_FILEA
+#define WM_CAP_FILE_GET_CAPTURE_FILE    WM_CAP_FILE_GET_CAPTURE_FILEA
+#define WM_CAP_FILE_SAVEAS              WM_CAP_FILE_SAVEASA
+#define WM_CAP_FILE_SAVEDIB             WM_CAP_FILE_SAVEDIBA
+#define WM_CAP_FILE_ALLOCATE            (WM_CAP_START+  22)
+#define WM_CAP_PAL_OPENA               (WM_CAP_START+  80)
+#define WM_CAP_PAL_SAVEA               (WM_CAP_START+  81)
+#define WM_CAP_PAL_OPENW               (WM_CAP_UNICODE_START+  80)
+#define WM_CAP_PAL_SAVEW               (WM_CAP_UNICODE_START+  81)
+#define WM_CAP_PAL_OPEN                 WM_CAP_PAL_OPENA
+#define WM_CAP_PAL_SAVE                 WM_CAP_PAL_SAVEA
+#define WM_CAP_PAL_PASTE                (WM_CAP_START+  82)
+#define WM_CAP_PAL_AUTOCREATE           (WM_CAP_START+  83)
+#define WM_CAP_PAL_MANUALCREATE         (WM_CAP_START+  84)
+#define WM_CAP_GET_USER_DATA		(WM_CAP_START+  8)
+#define WM_CAP_SET_USER_DATA		(WM_CAP_START+  9)
+#define WM_CAP_EDIT_COPY                (WM_CAP_START+  30)
+#define WM_CAP_SET_AUDIOFORMAT          (WM_CAP_START+  35)
+#define WM_CAP_GET_AUDIOFORMAT          (WM_CAP_START+  36)
+#define WM_CAP_GET_VIDEOFORMAT          (WM_CAP_START+  44)
+#define WM_CAP_SET_VIDEOFORMAT          (WM_CAP_START+  45)
+#define WM_CAP_SET_PREVIEW              (WM_CAP_START+  50)
+#define WM_CAP_SET_OVERLAY              (WM_CAP_START+  51)
+#define WM_CAP_SET_PREVIEWRATE          (WM_CAP_START+  52)
+#define WM_CAP_SET_SCALE                (WM_CAP_START+  53)
+#define WM_CAP_GRAB_FRAME               (WM_CAP_START+  60)
+#define WM_CAP_GRAB_FRAME_NOSTOP        (WM_CAP_START+  61)
+#define WM_CAP_SET_MCI_DEVICE           (WM_CAP_START+  66)
+#define WM_CAP_SET_USER_DATA		(WM_CAP_START+  9)
+#define AVICapSM(hwnd,m,w,l) ( (IsWindow(hwnd)) ?   SendMessage(hwnd,m,w,l) : 0)
+#define capCaptureAbort(hwnd)                      ((BOOL)AVICapSM(hwnd, WM_CAP_ABORT, (WPARAM)0, (LPARAM)0L))
+#define capCaptureSequence(hwnd)                   ((BOOL)AVICapSM(hwnd, WM_CAP_SEQUENCE, (WPARAM)0, (LPARAM)0L))
+#define capCaptureSequenceNoFile(hwnd)             ((BOOL)AVICapSM(hwnd, WM_CAP_SEQUENCE_NOFILE, (WPARAM)0, (LPARAM)0L))
+#define capCaptureStop(hwnd)                       ((BOOL)AVICapSM(hwnd, WM_CAP_STOP, (WPARAM)0, (LPARAM)0L))
+#define capCaptureAbort(hwnd)                      ((BOOL)AVICapSM(hwnd, WM_CAP_ABORT, (WPARAM)0, (LPARAM)0L))
+#define capCaptureSingleFrameOpen(hwnd)            ((BOOL)AVICapSM(hwnd, WM_CAP_SINGLE_FRAME_OPEN, (WPARAM)0, (LPARAM)0L))
+#define capCaptureSingleFrameClose(hwnd)           ((BOOL)AVICapSM(hwnd, WM_CAP_SINGLE_FRAME_CLOSE, (WPARAM)0, (LPARAM)0L))
+#define capCaptureSingleFrame(hwnd)                ((BOOL)AVICapSM(hwnd, WM_CAP_SINGLE_FRAME, (WPARAM)0, (LPARAM)0L))
+#define capDlgVideoFormat(hwnd)                    ((BOOL)AVICapSM(hwnd, WM_CAP_DLG_VIDEOFORMAT, 0, 0L))
+#define capDlgVideoSource(hwnd)                    ((BOOL)AVICapSM(hwnd, WM_CAP_DLG_VIDEOSOURCE, 0, 0L))
+#define capDlgVideoDisplay(hwnd)                   ((BOOL)AVICapSM(hwnd, WM_CAP_DLG_VIDEODISPLAY, 0, 0L))
+#define capDlgVideoCompression(hwnd)               ((BOOL)AVICapSM(hwnd, WM_CAP_DLG_VIDEOCOMPRESSION, 0, 0L))
+#define capDriverConnect(hwnd, i)                  ((BOOL)AVICapSM(hwnd, WM_CAP_DRIVER_CONNECT, (WPARAM)(i), 0L))
+#define capDriverDisconnect(hwnd)                  ((BOOL)AVICapSM(hwnd, WM_CAP_DRIVER_DISCONNECT, (WPARAM)0, 0L))
+#define capFileSetCaptureFile(hwnd, szName)        ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_SET_CAPTURE_FILE, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileGetCaptureFile(hwnd, szName, wSize) ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_GET_CAPTURE_FILE, (WPARAM)(wSize), (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileAlloc(hwnd, dwSize)                 ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_ALLOCATE, 0, (LPARAM)(DWORD)(dwSize)))
+#define capFileSaveAs(hwnd, szName)                ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_SAVEAS, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileSetInfoChunk(hwnd, lpInfoChunk)     ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_SET_INFOCHUNK, (WPARAM)0, (LPARAM)(LPCAPINFOCHUNK)(lpInfoChunk)))
+#define capFileSaveDIB(hwnd, szName)               ((BOOL)AVICapSM(hwnd, WM_CAP_FILE_SAVEDIB, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capPaletteOpen(hwnd, szName)               ((BOOL)AVICapSM(hwnd, WM_CAP_PAL_OPEN, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capPaletteSave(hwnd, szName)               ((BOOL)AVICapSM(hwnd, WM_CAP_PAL_SAVE, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capPalettePaste(hwnd)                      ((BOOL)AVICapSM(hwnd, WM_CAP_PAL_PASTE, (WPARAM) 0, (LPARAM)0L))
+#define capPaletteAuto(hwnd, iFrames, iColors)     ((BOOL)AVICapSM(hwnd, WM_CAP_PAL_AUTOCREATE, (WPARAM)(iFrames), (LPARAM)(DWORD)(iColors)))
+#define capPaletteManual(hwnd, fGrab, iColors)     ((BOOL)AVICapSM(hwnd, WM_CAP_PAL_MANUALCREATE, (WPARAM)(fGrab), (LPARAM)(DWORD)(iColors)))
+#define capGetUserData(hwnd)               (AVICapSM(hwnd, WM_CAP_GET_USER_DATA, 0, 0))
+#define capEditCopy(hwnd)                          ((BOOL)AVICapSM(hwnd, WM_CAP_EDIT_COPY, 0, 0L))
+#define capSetAudioFormat(hwnd, s, wSize)          ((BOOL)AVICapSM(hwnd, WM_CAP_SET_AUDIOFORMAT, (WPARAM)(wSize), (LPARAM)(LPVOID)(LPWAVEFORMATEX)(s)))
+#define capGetAudioFormat(hwnd, s, wSize)          ((DWORD)AVICapSM(hwnd, WM_CAP_GET_AUDIOFORMAT, (WPARAM)(wSize), (LPARAM)(LPVOID)(LPWAVEFORMATEX)(s)))
+#define capGetAudioFormatSize(hwnd)                ((DWORD)AVICapSM(hwnd, WM_CAP_GET_AUDIOFORMAT, (WPARAM)0, (LPARAM)0L))
+#define capGetVideoFormatSize(hwnd)            ((DWORD)AVICapSM(hwnd, WM_CAP_GET_VIDEOFORMAT, 0, 0L))
+#define capPreview(hwnd, f)                        ((BOOL)AVICapSM(hwnd, WM_CAP_SET_PREVIEW, (WPARAM)(BOOL)(f), 0L))
+#define capPreviewRate(hwnd, wMS)                  ((BOOL)AVICapSM(hwnd, WM_CAP_SET_PREVIEWRATE, (WPARAM)(wMS), 0))
+#define capOverlay(hwnd, f)                        ((BOOL)AVICapSM(hwnd, WM_CAP_SET_OVERLAY, (WPARAM)(BOOL)(f), 0L))
+#define capPreviewScale(hwnd, f)                   ((BOOL)AVICapSM(hwnd, WM_CAP_SET_SCALE, (WPARAM)(BOOL)f, 0L))
+#define capGrabFrame(hwnd)                         ((BOOL)AVICapSM(hwnd, WM_CAP_GRAB_FRAME, (WPARAM)0, (LPARAM)0L))
+#define capGrabFrameNoStop(hwnd)                   ((BOOL)AVICapSM(hwnd, WM_CAP_GRAB_FRAME_NOSTOP, (WPARAM)0, (LPARAM)0L))
+#define capSetMCIDeviceName(hwnd, szName)          ((BOOL)AVICapSM(hwnd, WM_CAP_SET_MCI_DEVICE, 0, (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capSetUserData(hwnd, lUser)        ((BOOL)AVICapSM(hwnd, WM_CAP_SET_USER_DATA, 0, (LPARAM)lUser))
+#endif
 
 /* ======================================================================== */
 /* Video Capture Functions                                                  */

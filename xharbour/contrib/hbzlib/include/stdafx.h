@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: stdafx.h $
 // $Archive: /ZipArchive_STL/stdafx.h $
-// $Date: 2003/09/13 04:06:39 $ $Author: paultucker $
+// $Date: 2004/10/22 20:37:12 $ $Author: likewolf $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -109,7 +109,7 @@
 
 
 #ifndef TRACE
-	#define TRACE
+	#define TRACE(m)  ((void)0)
 #endif
 
 #if _MSC_VER >= 1300

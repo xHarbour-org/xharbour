@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.47 2008/04/17 19:14:30 lculik Exp $
+ * $Id: zip.c,v 1.48 2008/04/20 07:08:45 andijahja Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include <hbzip2.h>
 #include "hbapifs.h"
 #include "hbapierr.h"
+#include "hbinit.h"
 #if defined(HB_OS_LINUX)
    #include <sys/types.h>
    #include <sys/stat.h>
@@ -174,7 +175,7 @@ static BOOL ZipTestExclude ( char *szEntry )
    for ( uiEx = 0; uiEx < uiExLen; uiEx ++ )
    {
       char *szExclude = hb_arrayGetC( ExcludeFile, uiEx + 1 );
-      if ( strcmp ( szExclude, hb_strupr( szEntry ) ) == NULL )
+      if ( strcmp ( szExclude, hb_strupr( szEntry ) ) == 0 )
       {
          hb_xfree( szExclude );
          bNotFound = FALSE;
@@ -1016,4 +1017,33 @@ void SetFileAttributes( char * szEntry,ULONG ulAttr)
 {
    chmod(szEntry,ulAttr);
 }
+#endif
+
+#ifdef __XHARBOUR__
+#define __PRG_SOURCE__ __FILE__
+#ifdef HB_PCODE_VER
+#  undef HB_PRG_PCODE_VER
+#  define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
+#endif
+
+HB_INIT_SYMBOLS_BEGIN( hbzip_CLEANUP )
+#ifdef __XHARBOUR__
+{ "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, &ModuleFakeDyn }
+#else
+{ "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, NULL }
+#endif
+HB_INIT_SYMBOLS_END( hbzip_CLEANUP )
+
+#if defined(HB_PRAGMA_STARTUP)
+   #pragma startup hbzip_CLEANUP
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_SymbolInit_INIT = hbzip_CLEANUP;
+   #pragma data_seg()
 #endif

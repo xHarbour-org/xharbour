@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.4 2006/04/07 00:53:20 lculik Exp $
+ * $Id: caplock.c,v 1.5 2006/04/07 09:47:19 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
    BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL bParam )
    {
       BYTE kbBuffer[ 256 ];
-      BOOL bRetval;
+      BOOL bRetval = FALSE;
 
       GetKeyboardState( kbBuffer );
 

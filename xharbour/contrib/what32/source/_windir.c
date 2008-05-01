@@ -6,7 +6,7 @@
 #define HB_OS_WIN_32_USED
 //#define _WIN32_WINNT   0x0500
 
-#ifdef __WATCOMC__
+#if(defined(__WATCOMC__)||defined(__GNUC__))
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
 #endif
@@ -178,7 +178,7 @@ HB_FUNC( SETVOLUMELABEL )
 
 HB_FUNC( CREATEDIRECTORY )
 {
-   SECURITY_ATTRIBUTES *sa ;
+   SECURITY_ATTRIBUTES *sa = NULL;
 
    if (ISCHAR(2))
        sa = (SECURITY_ATTRIBUTES *) hb_param(2, HB_IT_STRING)->item.asString.value;

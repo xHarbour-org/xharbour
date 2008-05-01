@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6068 2008/04/30 23:48:58 andijahja Exp $
+ * $Id: ChangeLog,v 1.6069 2008/05/01 03:36:57 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-01 17:50 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * contrib.gc
+    ! missng hbzip creation
+
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/ziparchive.cpp
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/hbzlib/zipcomp.cpp
+  * contrib/hbzlib/zipcentraldir.cpp
+  * contrib/hbzlib/include/zipautobuffer.h
+  * contrib/hbzlib/include/zipstring.h
+  * contrib/hbzlib/include/zipstorage.h
+  * contrib/hbzlib/include/stdafx.h
+  * contrib/gd/source/gdwrp.c
+  * contrib/libnf/caplock.c
+  * contrib/libnf/chdir.c
+  * contrib/pdflib/pdfhbdocs.prg
+  * contrib/tp_/win32.c
+  * contrib/freeimage/source/fi_wrp.c
+  * contrib/what32/source/_windc.c
+  * contrib/what32/source/_windir.c
+  * contrib/what32/source/_winfont.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winkbrd.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winmmcap.c
+  * contrib/what32/source/_winmous.c
+  * contrib/what32/source/_winmsg.c
+  * contrib/what32/source/_winreg.c
+  * contrib/what32/source/_winshell.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintext.c
+    ! fixed some GCC warnings
 
 2008-05-01 10:35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/what32/source/_winhead.c
