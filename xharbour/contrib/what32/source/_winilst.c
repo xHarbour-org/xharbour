@@ -12,6 +12,31 @@
 
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
+#if defined(__DMC__)
+WINCOMMCTRLAPI BOOL        WINAPI ImageList_SetImageCount(HIMAGELIST himl, UINT uNewCount);
+#if (_WIN32_IE >= 0x0300)
+typedef struct _IMAGELISTDRAWPARAMS {
+    DWORD       cbSize;
+    HIMAGELIST  himl;
+    int         i;
+    HDC         hdcDst;
+    int         x;
+    int         y;
+    int         cx;
+    int         cy;
+    int         xBitmap;        // x offest from the upperleft of bitmap
+    int         yBitmap;        // y offset from the upperleft of bitmap
+    COLORREF    rgbBk;
+    COLORREF    rgbFg;
+    UINT        fStyle;
+    DWORD       dwRop;
+} IMAGELISTDRAWPARAMS, FAR * LPIMAGELISTDRAWPARAMS;
+#endif
+WINCOMMCTRLAPI BOOL        WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS* pimldp);
+WINCOMMCTRLAPI BOOL        WINAPI ImageList_Copy(HIMAGELIST himlDst, int iDst, HIMAGELIST himlSrc, int iSrc, UINT uFlags);
+WINCOMMCTRLAPI HIMAGELIST  WINAPI ImageList_Duplicate(HIMAGELIST himl);
+#endif
+
 //-----------------------------------------------------------------------------
 //WINCOMMCTRLAPI HIMAGELIST  WINAPI ImageList_Create(int cx, int cy, UINT flags, int cInitial, int cGrow);
 

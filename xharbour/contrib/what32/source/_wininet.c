@@ -48,6 +48,27 @@ FtpCommandA(
     );
 #endif
 
+#if defined(__DMC__)
+#define INTERNET_AUTODIAL_FORCE_ONLINE          1
+#define INTERNET_FLAG_NEED_FILE         0x00000010  // need a file for this request
+INTERNETAPI
+DWORD
+WINAPI
+InternetDial(
+    IN HWND     hwndParent,
+    IN LPSTR   lpszConnectoid,
+    IN DWORD    dwFlags,
+    OUT DWORD_PTR *lpdwConnection,
+    IN DWORD    dwReserved
+    );
+INTERNETAPI
+BOOL
+WINAPI
+InternetGetConnectedState(
+    OUT LPDWORD  lpdwFlags,
+    IN DWORD    dwReserved);
+#endif
+
 //---------------------------------------------------------------------//
 /*
    DWORD InternetDial(

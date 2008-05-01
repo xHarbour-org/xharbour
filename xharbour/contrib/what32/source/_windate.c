@@ -16,6 +16,31 @@
 #include "winreg.h"
 #include "tchar.h"
 
+#ifdef __DMC__
+#define GDT_VALID           0
+#define DTM_FIRST           0x1000
+#define DTM_GETMONTHCAL     (DTM_FIRST + 8)
+#define DTM_GETMCCOLOR      (DTM_FIRST + 7)
+#define DTM_SETMCFONT       (DTM_FIRST + 9)
+#define DTM_GETRANGE        (DTM_FIRST + 3)
+#define DTM_SETSYSTEMTIME   (DTM_FIRST + 2)
+#define DTM_GETSYSTEMTIME   (DTM_FIRST + 1)
+#define DTM_GETMCFONT       (DTM_FIRST + 10)
+#define DTM_SETFORMAT       (DTM_FIRST + 5)
+#define DTM_SETMCCOLOR      (DTM_FIRST + 6)
+#define DateTime_GetMonthCalColor(hdp, iColor) SNDMSG(hdp, DTM_GETMCCOLOR, iColor, 0)
+#define DateTime_GetMonthCal(hdp) (HWND)SNDMSG(hdp, DTM_GETMONTHCAL, 0, 0)
+#define DateTime_SetMonthCalFont(hdp, hfont, fRedraw) SNDMSG(hdp, DTM_SETMCFONT, (WPARAM)(hfont), (LPARAM)(fRedraw))
+#define DateTime_GetRange(hdp, rgst)  (DWORD)SNDMSG(hdp, DTM_GETRANGE, 0, (LPARAM)(rgst))
+#define DateTime_SetSystemtime(hdp, gd, pst)    (BOOL)SNDMSG(hdp, DTM_SETSYSTEMTIME, (WPARAM)(gd), (LPARAM)(pst))
+#define DateTime_GetSystemtime(hdp, pst)    (DWORD)SNDMSG(hdp, DTM_GETSYSTEMTIME, 0, (LPARAM)(pst))
+#define DateTime_SetMonthCalFont(hdp, hfont, fRedraw) SNDMSG(hdp, DTM_SETMCFONT, (WPARAM)(hfont), (LPARAM)(fRedraw))
+#define DateTime_GetMonthCalFont(hdp) SNDMSG(hdp, DTM_GETMCFONT, 0, 0)
+#define DateTime_SetSystemtime(hdp, gd, pst)    (BOOL)SNDMSG(hdp, DTM_SETSYSTEMTIME, (WPARAM)(gd), (LPARAM)(pst))
+#define DateTime_SetFormat(hdp, sz)  (BOOL)SNDMSG(hdp, DTM_SETFORMAT, 0, (LPARAM)(sz))
+#define DateTime_SetMonthCalColor(hdp, iColor, clr) SNDMSG(hdp, DTM_SETMCCOLOR, iColor, clr)
+#endif
+
 //-----------------------------------------------------------------------------
 
 // SYNTAX:

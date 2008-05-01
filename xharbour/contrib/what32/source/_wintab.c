@@ -13,6 +13,40 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
+#if defined(__DMC__)
+#define CCM_FIRST               0x2000
+#define TC_HITTESTINFO          TCHITTESTINFO
+typedef struct tagTCHITTESTINFO
+{
+    POINT pt;
+    UINT flags;
+} TCHITTESTINFO, FAR * LPTCHITTESTINFO;
+#define TCM_SETMINTABWIDTH      (TCM_FIRST + 49)
+#define TabCtrl_SetMinTabWidth(hwnd, x) \
+        (int)SNDMSG((hwnd), TCM_SETMINTABWIDTH, 0, x)
+#define TCM_FIRST               0x1300      // Tab control messages
+#define TCM_DESELECTALL         (TCM_FIRST + 50)
+#define TabCtrl_DeselectAll(hwnd, fExcludeFocus)\
+        (void)SNDMSG((hwnd), TCM_DESELECTALL, fExcludeFocus, 0)
+#define TCM_HIGHLIGHTITEM       (TCM_FIRST + 51)
+#define TabCtrl_HighlightItem(hwnd, i, fHighlight) \
+    (BOOL)SNDMSG((hwnd), TCM_HIGHLIGHTITEM, (WPARAM)(i), (LPARAM)MAKELONG (fHighlight, 0))
+#define TCM_SETEXTENDEDSTYLE    (TCM_FIRST + 52)  // optional wParam == mask
+#define TabCtrl_SetExtendedStyle(hwnd, dw)\
+        (DWORD)SNDMSG((hwnd), TCM_SETEXTENDEDSTYLE, 0, dw)
+#define TCM_GETEXTENDEDSTYLE    (TCM_FIRST + 53)
+#define TabCtrl_GetExtendedStyle(hwnd)\
+        (DWORD)SNDMSG((hwnd), TCM_GETEXTENDEDSTYLE, 0, 0)
+#define CCM_SETUNICODEFORMAT     (CCM_FIRST + 5)
+#define CCM_GETUNICODEFORMAT     (CCM_FIRST + 6)
+#define TCM_SETUNICODEFORMAT     CCM_SETUNICODEFORMAT
+#define TabCtrl_SetUnicodeFormat(hwnd, fUnicode)  \
+    (BOOL)SNDMSG((hwnd), TCM_SETUNICODEFORMAT, (WPARAM)(fUnicode), 0)
+#define TCM_GETUNICODEFORMAT     CCM_GETUNICODEFORMAT
+#define TabCtrl_GetUnicodeFormat(hwnd)  \
+    (BOOL)SNDMSG((hwnd), TCM_GETUNICODEFORMAT, 0, 0)
+#endif
+
 //---------------------------------------------------------------------------//
 
 HB_FUNC( TABCTRL_CREATE )

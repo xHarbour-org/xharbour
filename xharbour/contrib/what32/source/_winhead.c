@@ -20,7 +20,7 @@ extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
-#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#if ( (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__)) || (defined(__GNUC__) || defined(__WATCOMC__)) || defined(__DMC__))
 #define HDM_SETBITMAPMARGIN          (HDM_FIRST + 20)
 #define Header_SetBitmapMargin(hwnd, iWidth) \
         (int)SNDMSG((hwnd), HDM_SETBITMAPMARGIN, (WPARAM)(iWidth), 0)
@@ -38,31 +38,66 @@ extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
         (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)(i), 0)
 #define Header_ClearAllFilters(hwnd) \
         (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)-1, 0)
+#if (defined(__GNUC__) || defined(__WATCOMC__) || defined(__DMC__) )
+#if defined(__DMC__)
+#define HDM_SETHOTDIVIDER          (HDM_FIRST + 19)
 #endif
-
-#ifdef __GNUC__
-#define HDM_SETFILTERCHANGETIMEOUT  (HDM_FIRST+22)
-#define HDM_EDITFILTER          (HDM_FIRST+23)
-#define HDM_CLEARFILTER         (HDM_FIRST+24)
-#define HDM_SETBITMAPMARGIN          (HDM_FIRST + 20)
-#define HDM_GETBITMAPMARGIN          (HDM_FIRST + 21)
 #define Header_SetHotDivider(hwnd, fPos, dw) \
         (int)SNDMSG((hwnd), HDM_SETHOTDIVIDER, (WPARAM)(fPos), (LPARAM)(dw))
-#define Header_SetBitmapMargin(hwnd, iWidth) \
-        (int)SNDMSG((hwnd), HDM_SETBITMAPMARGIN, (WPARAM)(iWidth), 0)
-#define Header_GetBitmapMargin(hwnd) \
-        (int)SNDMSG((hwnd), HDM_GETBITMAPMARGIN, 0, 0)
-#define Header_SetFilterChangeTimeout(hwnd, i) \
-        (int)SNDMSG((hwnd), HDM_SETFILTERCHANGETIMEOUT, 0, (LPARAM)(i))
-#define Header_EditFilter(hwnd, i, fDiscardChanges) \
-        (int)SNDMSG((hwnd), HDM_EDITFILTER, (WPARAM)(i), MAKELPARAM(fDiscardChanges, 0))
-#define Header_ClearFilter(hwnd, i) \
-        (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)(i), 0)
-#define Header_ClearAllFilters(hwnd) \
-        (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)-1, 0)
 #endif
-
-#ifndef __WATCOMC__
+#if defined(__DMC__)
+typedef struct _HD_ITEM
+{
+    UINT    mask;
+    int     cxy;
+    LPSTR   pszText;
+    HBITMAP hbm;
+    int     cchTextMax;
+    int     fmt;
+    LPARAM  lParam;
+#if (_WIN32_IE >= 0x0300)
+    int     iImage;
+    int     iOrder;
+#endif
+#if (_WIN32_IE >= 0x0500)
+    UINT    type;
+    LPVOID  pvFilter;
+#endif
+} HDITEM, FAR * LPHDITEM;
+#define HDM_CREATEDRAGIMAGE     (HDM_FIRST + 16)
+#define Header_CreateDragImage(hwnd, i) \
+        (HIMAGELIST)SNDMSG((hwnd), HDM_CREATEDRAGIMAGE, (WPARAM)(i), 0)
+#define HDM_GETORDERARRAY       (HDM_FIRST + 17)
+#define Header_GetOrderArray(hwnd, iCount, lpi) \
+        (BOOL)SNDMSG((hwnd), HDM_GETORDERARRAY, (WPARAM)(iCount), (LPARAM)(lpi))
+#define HDM_SETORDERARRAY       (HDM_FIRST + 18)
+#define Header_SetOrderArray(hwnd, iCount, lpi) \
+        (BOOL)SNDMSG((hwnd), HDM_SETORDERARRAY, (WPARAM)(iCount), (LPARAM)(lpi))
+#define HDM_GETITEMRECT         (HDM_FIRST + 7)
+#define Header_GetItemRect(hwnd, iItem, lprc) \
+        (BOOL)SNDMSG((hwnd), HDM_GETITEMRECT, (WPARAM)(iItem), (LPARAM)(lprc))
+#define Header_GetImageList(hwnd) \
+        (HIMAGELIST)SNDMSG((hwnd), HDM_GETIMAGELIST, 0, 0)
+#define HDM_SETIMAGELIST        (HDM_FIRST + 8)
+#define Header_SetImageList(hwnd, himl) \
+        (HIMAGELIST)SNDMSG((hwnd), HDM_SETIMAGELIST, 0, (LPARAM)(himl))
+#define HDM_GETIMAGELIST        (HDM_FIRST + 9)
+#define Header_GetImageList(hwnd) \
+        (HIMAGELIST)SNDMSG((hwnd), HDM_GETIMAGELIST, 0, 0)
+#define HDM_ORDERTOINDEX        (HDM_FIRST + 15)
+#define Header_OrderToIndex(hwnd, i) \
+        (int)SNDMSG((hwnd), HDM_ORDERTOINDEX, (WPARAM)(i), 0)
+#define CCM_FIRST               0x2000
+#define HDM_SETUNICODEFORMAT    CCM_SETUNICODEFORMAT
+#define CCM_SETUNICODEFORMAT    (CCM_FIRST + 5)
+#define CCM_GETUNICODEFORMAT    (CCM_FIRST + 6)
+#define Header_SetUnicodeFormat(hwnd, fUnicode)  \
+    (BOOL)SNDMSG((hwnd), HDM_SETUNICODEFORMAT, (WPARAM)(fUnicode), 0)
+#define HDM_GETUNICODEFORMAT   CCM_GETUNICODEFORMAT
+#define Header_GetUnicodeFormat(hwnd)  \
+    (BOOL)SNDMSG((hwnd), HDM_GETUNICODEFORMAT, 0, 0)
+#endif
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -398,4 +433,3 @@ HB_FUNC( HEADER_LAYOUT )
 //--------- eof.
 //
 
-#endif

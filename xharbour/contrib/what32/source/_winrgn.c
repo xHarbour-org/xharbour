@@ -16,7 +16,7 @@ extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
-#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__)||defined(__DMC__))
 WINGDIAPI int WINAPI GetRandomRgn (IN HDC, IN HRGN, IN INT);
 #endif
 //-----------------------------------------------------------------------------

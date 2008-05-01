@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6070 2008/05/01 10:49:37 andijahja Exp $
+ * $Id: ChangeLog,v 1.6071 2008/05/01 11:15:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-02 05:30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * contrib/what32/source/_winmmcap.c
+  * contrib/what32/source/_winhead.c
+    ! fix compilation for OpenWatcom
+
+  * contrib/xwt/src/xwt_win/xwt_win_framewnd.c
+  * contrib/what32/source/_wincomm.c
+  * contrib/what32/source/_windate.c
+  * contrib/what32/source/_windir.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winicon.c
+  * contrib/what32/source/_winilst.c
+  * contrib/what32/source/_wininet.c
+  * contrib/what32/source/_winmem.c
+  * contrib/what32/source/_winreg.c
+  * contrib/what32/source/_winrgn.c
+  * contrib/what32/source/_winshell.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintab.c
+  * contrib/what32/source/_winwnd.c
+  * contrib/freeimage/include/FreeImage.h
+    ! fix compilation for DigitalMars
 
 2008-05-01 18:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/hbzlib/ziparchive.cpp

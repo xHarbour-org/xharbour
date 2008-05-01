@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.29 2008/04/30 23:17:11 andijahja Exp $
+ * $Id: _winsys.c,v 1.30 2008/05/01 10:49:39 andijahja Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -36,10 +36,26 @@
 #include <shlobj.h>
 #include <windows.h>
 #if !defined(__MINGW32__) && !defined(__WATCOMC__)
-#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#if ((defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))||defined(__DMC__))
 #else
 #include <htmlhelp.h>
 #endif
+#endif
+
+#if defined(__DMC__)
+typedef struct _OSVERSIONINFOEX {
+    DWORD dwOSVersionInfoSize;
+    DWORD dwMajorVersion;
+    DWORD dwMinorVersion;
+    DWORD dwBuildNumber;
+    DWORD dwPlatformId;
+    CHAR   szCSDVersion[ 128 ];
+    WORD   wServicePackMajor;
+    WORD   wServicePackMinor;
+    WORD   wSuiteMask;
+    BYTE  wProductType;
+    BYTE  wReserved;
+} OSVERSIONINFOEX, *POSVERSIONINFOEX, *LPOSVERSIONINFOEX;
 #endif
 
 #include "hbapi.h"

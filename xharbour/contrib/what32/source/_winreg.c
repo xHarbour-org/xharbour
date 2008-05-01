@@ -14,6 +14,17 @@
 #include "winreg.h"
 #include "tchar.h"
 
+#if defined(__DMC__)
+__inline
+long
+PtrToLong(
+    const void  *p
+    )
+{
+    return((long) p );
+}
+#endif
+
 /*
  * Harbour Project source code:
  * Registry functions for Harbour

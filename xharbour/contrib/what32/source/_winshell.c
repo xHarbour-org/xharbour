@@ -12,7 +12,7 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
-#ifdef __GNUC__
+#if (defined(__GNUC__) || defined(__DMC__))
 DWORD WINAPI DoEnvironmentSubst(LPSTR szString, UINT cchString);
 #endif
 

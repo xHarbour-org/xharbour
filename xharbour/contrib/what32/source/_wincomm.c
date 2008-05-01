@@ -24,6 +24,19 @@
 
 extern PHB_ITEM Rect2Array( RECT *rc  );
 
+#ifdef __DMC__
+typedef struct tagINITCOMMONCONTROLSEX {
+	DWORD dwSize;
+	DWORD dwICC;
+}	INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
+WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+#define LVM_SETEXTENDEDLISTVIEWSTYLE (LVM_FIRST + 54)
+#define LVS_EX_GRIDLINES             0x00000001
+#define LVS_EX_FULLROWSELECT         0x00000020
+#define LVS_EX_HEADERDRAGDROP        0x00000010
+#define ICC_DATE_CLASSES             0x00000100
+#endif
+
 //-----------------------------------------------------------------------------
 
 HB_FUNC( INITCOMMONCONTROLS )

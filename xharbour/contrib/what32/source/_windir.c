@@ -14,6 +14,16 @@
 #include <windows.h>
 #include "hbapi.h"
 
+#if defined(__DMC__)
+WINBASEAPI
+DWORD
+WINAPI
+GetLongPathName(
+    LPCSTR lpszLongPath,
+    LPSTR  lpszShortPath,
+    DWORD    cchBuffer
+    );
+#endif
 //-----------------------------------------------------------------------------
 // WINBASEAPI DWORD WINAPI GetLogicalDrives( VOID );
 

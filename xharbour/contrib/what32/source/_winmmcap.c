@@ -1,5 +1,5 @@
 /*
- * $Id: _winmmcap.c,v 1.1 2004/12/12 02:22:08 marcosgambeta Exp $
+ * $Id: _winmmcap.c,v 1.2 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -16,7 +16,7 @@
 #include <windows.h>
 #include <vfw.h>
 
-#ifdef __GNUC__
+#if (defined( __GNUC__ ) || defined( __WATCOMC__ ))
 #define WM_CAP_START                    WM_USER
 #define WM_CAP_ABORT                    (WM_CAP_START+  69)
 #define WM_CAP_SEQUENCE                 (WM_CAP_START+  62)

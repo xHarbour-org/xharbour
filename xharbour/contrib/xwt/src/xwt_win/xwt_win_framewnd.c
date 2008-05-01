@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.7 2008/04/30 22:11:17 andijahja Exp $
+   $Id: xwt_win_framewnd.c,v 1.8 2008/05/01 03:36:58 andijahja Exp $
 
    MS-Windows interface - Frame window
 */
@@ -26,6 +26,29 @@
 
 #include <xwt_api.h>
 #include <xwt_win.h>
+
+#ifdef __DMC__
+#define MIM_STYLE           0x00000010
+#define MNS_CHECKORBMP      0x04000000
+#define MNS_MODELESS        0x40000000
+typedef struct tagMENUINFO
+{
+    DWORD   cbSize;
+    DWORD   fMask;
+    DWORD   dwStyle;
+    UINT    cyMax;
+    HBRUSH  hbrBack;
+    DWORD   dwContextHelpID;
+    ULONG_PTR dwMenuData;
+}   MENUINFO, FAR *LPMENUINFO;
+typedef MENUINFO CONST FAR *LPCMENUINFO;
+WINUSERAPI
+BOOL
+WINAPI
+SetMenuInfo(
+    IN HMENU,
+    IN LPCMENUINFO);
+#endif
 
 /* Destroy given frame window */
 

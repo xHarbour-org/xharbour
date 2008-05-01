@@ -14,8 +14,10 @@
 //#include "hbvm.h"
 //#include "hbstack.h"
 
-
-
+#if defined(__DMC__)
+// SHSTDAPI_(HICON) DuplicateIcon(HINSTANCE hInst, HICON hIcon);
+WINSHELLAPI HICON DuplicateIcon(HINSTANCE hInst, HICON hIcon);
+#endif
 
 //-----------------------------------------------------------------------------
 

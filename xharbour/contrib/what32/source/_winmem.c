@@ -14,6 +14,9 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
+#if defined(__DMC__)
+#define SIZE_T size_t
+#endif
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI HGLOBAL WINAPI GlobalAlloc( IN UINT uFlags, IN SIZE_T dwBytes );

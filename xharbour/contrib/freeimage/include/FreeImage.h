@@ -67,9 +67,12 @@
 #include <windows.h>
 #endif // __XCC__
 
+#ifdef __DMC__      // prevents a bug in digitalmars
+#include <windows.h>
+#endif // __DMC__
 
 #define DLL_CALLCONV __stdcall
-// The following ifdef block is the standard way of creating macros which make exporting 
+// The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the FREEIMAGE_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see 
@@ -135,7 +138,7 @@ FI_STRUCT (FIMULTIBITMAP) { void *data; };
 
 #ifndef __MINGW32__     // prevents a bug in mingw32
 
-#if (!defined(__POCC__) && !defined(__WATCOMC__))
+#if (!defined(__POCC__) && !defined(__WATCOMC__) && !defined(__DMC__))
 typedef long BOOL;
 #endif
 typedef unsigned char BYTE;
