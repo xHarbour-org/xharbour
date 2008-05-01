@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2008/04/17 19:14:30 $ $Author: lculik $
+// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -23,6 +23,13 @@
 #include "zipcompatibility.h"
 #include <time.h>
 
+#ifndef DEF_MEM_LEVEL
+#if MAX_MEM_LEVEL >= 8
+#  define DEF_MEM_LEVEL 8
+#else
+#  define DEF_MEM_LEVEL  MAX_MEM_LEVEL
+#endif
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
