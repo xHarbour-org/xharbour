@@ -6,6 +6,11 @@
 #define HB_OS_WIN_32_USED
 //#define _WIN32_WINNT   0x0500
 
+#ifdef __WATCOMC__
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
 #include <windows.h>
 #include "hbapi.h"
 

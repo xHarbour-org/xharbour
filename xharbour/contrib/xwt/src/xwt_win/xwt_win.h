@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.h,v 1.3 2003/10/14 23:12:12 jonnymind Exp $
+   $Id: xwt_win.h,v 1.4 2004/06/28 18:10:17 paultucker Exp $
 
    GTK interface
 */
@@ -59,7 +59,11 @@ typedef struct tag_xwt_win_base_data
 
 typedef struct tag_xwt_win_data
 {
+#ifndef __GNUC__
    XWT_WIN_BASE_DATA;
+#else
+   XWT_WIN_BASE_DATA pBase;
+#endif
    PHB_BASEARRAY pMenu;
    HWND  hMainWidget;
    HWND  hStatusBar;

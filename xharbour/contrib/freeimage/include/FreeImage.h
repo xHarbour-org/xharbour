@@ -135,7 +135,7 @@ FI_STRUCT (FIMULTIBITMAP) { void *data; };
 
 #ifndef __MINGW32__     // prevents a bug in mingw32
 
-#ifndef __POCC__
+#if (!defined(__POCC__) && !defined(__WATCOMC__))
 typedef long BOOL;
 #endif
 typedef unsigned char BYTE;
@@ -148,7 +148,7 @@ typedef long LONG;
 #else
 #pragma pack(1)
 #endif // WIN32
-#if ( !defined(__XCC__) && !defined(__POCC__) )
+#if ( !defined(__XCC__) && !defined(__POCC__) && !defined(__WATCOMC__) )
 typedef struct tagRGBQUAD {
 #ifdef FREEIMAGE_BIGENDIAN
   BYTE rgbRed;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_msgbox.c,v 1.3 2004/03/18 04:14:01 ronpinkas Exp $
+   $Id: xwt_win_msgbox.c,v 1.4 2008/04/30 22:11:18 andijahja Exp $
 
    Message box implementation
 */
@@ -29,7 +29,7 @@
 HB_FUNC( XWT_DRV_MSGBOX )
 {
 
-   HWND hbox;
+   /* HWND hbox; */
    HWND hParent = NULL;
    PHB_ITEM pParent = hb_param( 1, HB_IT_POINTER );
    char *caption = hb_parcx(5);
@@ -39,7 +39,7 @@ HB_FUNC( XWT_DRV_MSGBOX )
    int iBoxtype = hb_parni( 4 );
    int iResponse;
 
-   UINT uType;
+   UINT uType = 0;
 
    if( pParent != NULL )
    {

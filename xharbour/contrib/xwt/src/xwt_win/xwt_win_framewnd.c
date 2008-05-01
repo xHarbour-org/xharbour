@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.6 2005/10/24 02:22:07 ronpinkas Exp $
+   $Id: xwt_win_framewnd.c,v 1.7 2008/04/30 22:11:17 andijahja Exp $
 
    MS-Windows interface - Frame window
 */
@@ -32,7 +32,11 @@
 void xwt_win_free_wnd( void *wnd )
 {
    PXWT_WIN_DATA self = (PXWT_WIN_DATA) wnd;
+#ifndef __GNUC__
    CloseHandle( self->hMain );
+#else
+   CloseHandle( self->pBase.hMain );
+#endif
 
    if ( self->hMainWidget != NULL )
    {
@@ -48,8 +52,8 @@ void xwt_win_free_wnd( void *wnd )
 
    if ( self->pMenu != NULL )
    {
-      PHB_BASEARRAY pBar = self->pMenu;
       /*
+      PHB_BASEARRAY pBar = self->pMenu;
       ULONG ulPos;
 
 
@@ -146,16 +150,23 @@ void xwt_win_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    frame = (PXWT_WIN_DATA) xwtData->widget_data;
 
    hMenu = xwt_win_createMenuFromArray( pMenuArray );
-
+#ifndef __GNUC__
    hOldMenu = GetMenu( frame->hMain );
    SetMenu( frame->hMain, hMenu );
+#else
+   hOldMenu = GetMenu( frame->pBase.hMain );
+   SetMenu( frame->pBase.hMain, hMenu );
+#endif
    if ( hOldMenu != NULL && hOldMenu != NULL)
    {
       DestroyMenu( hOldMenu );
    }
    frame->pMenu = pMenuArray->item.asArray.value;
-
+#ifndef __GNUC__
    DrawMenuBar( wnd->hMain );
+#else
+   DrawMenuBar( wnd->pBase.hMain );
+#endif
 }
 
 void xwt_win_resetMenuBar( PXWT_WIDGET xwtData )
@@ -281,8 +292,13 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
       return FALSE;
 
    data = (PXWT_WIN_DATA) hb_xgrab( sizeof( XWT_WIN_DATA ) );
+#ifndef __GNUC__
    data->xwt_widget = xwtData;
    data->hMain = hWnd;
+#else
+   data->pBase.xwt_widget = xwtData;
+   data->pBase.hMain = hWnd;
+#endif
    data->pMenu = NULL;
    data->hMainWidget = NULL;
    data->hStatusBar = NULL;

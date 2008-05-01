@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.4 2003/10/14 23:12:12 jonnymind Exp $
+   $Id: xwt_win.c,v 1.5 2004/06/28 18:10:17 paultucker Exp $
 
    Global declarations, common functions
 
@@ -44,7 +44,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       
       case XWT_PROP_SIZE:
          // todo: check widget
-         SetWindowPos( 
+         SetWindowPos(
             hWnd,
             NULL,  
             0, 0,
@@ -159,7 +159,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          prop->value.size.height = rc.bottom - rc.top;
       }
       return TRUE;
-      
+
       case XWT_PROP_POSITION:
       {
          RECT rc;
@@ -251,7 +251,7 @@ BOOL xwt_drv_init( int argc, char **argv )
         wc.lpfnWndProc = (WNDPROC) xwt_gtk_framewndproc; 
         wc.cbClsExtra = 0; 
         wc.cbWndExtra = 0; 
-        wc.hInstance = (HINSTANCE) hb_hInstance; 
+        wc.hInstance = (HINSTANCE) hb_hInstance;
         /* TODO: manage XWT application icons */
         wc.hIcon = LoadIcon((HINSTANCE) NULL, IDI_APPLICATION); 
         
@@ -274,7 +274,7 @@ BOOL xwt_drv_process_events()
    
    while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0 )
    {
-      if ( bRet > 0 ) 
+      if ( bRet > 0 )
       {
          TranslateMessage(&msg); 
          DispatchMessage(&msg); 
@@ -298,7 +298,11 @@ BOOL xwt_drv_quit()
 void *xwt_win_get_topwidget_neuter( void *data )
 {
    PXWT_WIN_DATA win = (PXWT_WIN_DATA) data;
+#ifdef __GNUC__
+   return win->pBase.hMain;
+#else
    return win->hMain;
+#endif
 }
 
 void * xwt_win_get_neuter( void *data )
@@ -320,6 +324,7 @@ void xwt_win_delete_menu( void *data )
       CloseHandle( self->hBitmap );
       self->hBitmap = NULL;
    }
-   
+
    hb_xfree( self );
 }
+
