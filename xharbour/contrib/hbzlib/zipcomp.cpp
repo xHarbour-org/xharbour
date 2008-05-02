@@ -1,7 +1,7 @@
 /*
- * $Id: zipcomp.cpp,v 1.19 2008/04/17 19:14:30 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.20 2008/05/01 10:49:39 andijahja Exp $
  */
-
+ 
 /*
  * Harbour Project source code:
  * Zlib low level interface for Harbour
