@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipStorage.h $
 // $Archive: /ZipArchive/ZipStorage.h $
-// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $.
+// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $.
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -61,7 +61,7 @@ struct ZIP_API CZipCallback
 	*/
 	virtual bool Callback(int iProgress) = 0;
 
-        virtual	~CZipCallback();
+        virtual	~CZipCallback() {;};
 
 	CZipString m_szExternalFile;	///< if the action (adding, extracting or disk-spanning) uses an external file, its filename is stored here
 };
