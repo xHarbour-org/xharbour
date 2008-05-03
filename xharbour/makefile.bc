@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.223 2008/04/29 08:55:52 andijahja Exp $
+# $Id: makefile.bc,v 1.224 2008/04/29 22:05:13 ronpinkas Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -74,7 +74,7 @@ COMPILERLIBS=\
 	import32.lib
 !endif
 
-HRB_LINK_CMD=ILINK32 $(LINKERFLAGS) c0w32.obj $**,$@,,$(PP_LIB) $(COMMON_LIB) $(COMPILERLIBS)
+HRB_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(PP_LIB) $(COMMON_LIB) $(COMPILERLIBS)
 EXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_LIBS) $(COMPILERLIBS)
 CMN_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(COMMON_LIB) $(COMPILERLIBS)
 

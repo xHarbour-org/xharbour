@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6072 2008/05/01 22:28:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.6073 2008/05/02 05:25:23 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-04 06:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/compiler/harbour.c
+  * makefile.bc
+    - remove unnecessary WinMain(), thus making harbour.exe fully console-mode
 
 2008-05-02 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/hbzlib/zipcomp.cpp

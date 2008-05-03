@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.195 2008/03/13 04:26:10 ronpinkas Exp $
+ * $Id: harbour.c,v 1.196 2008/03/19 00:17:33 ronpinkas Exp $
  */
 
 /*
@@ -246,12 +246,7 @@ char **ArgV;
 
 extern HB_COMP_IDS hb_compExpr_IDs;
 
-/* ************************************************************************* */
-#if ( defined(__WATCOMC__) && (__WATCOMC__ >= 1270) )
-int _main( int argc, char * argv[] )
-#else
 int main( int argc, char * argv[] )
-#endif
 {
    int iStatus = EXIT_SUCCESS;
    int i;
@@ -390,115 +385,6 @@ int main( int argc, char * argv[] )
 
    return iStatus;
 }
-
-#if defined(HB_OS_WIN_32)
-#if ( defined(__WATCOMC__) && (__WATCOMC__ < 1270) )
-#else
-#include <windows.h>
-
-#define MAX_ARGS 20
-
-int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
-                    HINSTANCE hPrevInstance,  /* handle to previous instance */
-                    LPSTR lpCmdLine,          /* pointer to command line */
-                    int iCmdShow )            /* show state of window */
-{
-   int argc = 0;
-   char *argv[ MAX_ARGS ];
-   LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
-   char szAppName[ _POSIX_PATH_MAX + 1 ];
-   int iResult;
-   LPSTR pStart;
-   BOOL bInQuotedParam;
-
-   strcpy( pArgs, lpCmdLine );
-
-   HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
-
-   HB_SYMBOL_UNUSED( hPrevInstance );
-   HB_SYMBOL_UNUSED( iCmdShow );
-
-   GetModuleFileName( hInstance, szAppName, _POSIX_PATH_MAX );
-   argv[ 0 ] = szAppName;
-
-   while ( *pArgs && argc < MAX_ARGS )
-   {
-      while (*pArgs== ' ')
-      {
-         pArgs++ ;
-      }
-      if (*pArgs)
-      {
-         pStart= NULL ;
-         bInQuotedParam= FALSE;
-         while (*pArgs)
-         {
-            if (*pArgs == '"')
-            {
-               pArgs++;
-               if ( bInQuotedParam )
-               {
-                  if (pStart == NULL)
-                  {
-                     pStart = pArg;
-                  }
-                  break ;
-               }
-               else
-               {
-                  bInQuotedParam = TRUE ;
-               }
-            }
-            else if (*pArgs== ' ')
-            {
-               if ( bInQuotedParam )
-               {
-                  *pArg = *pArgs++ ;
-                  if (pStart == NULL)
-                  {
-                     pStart = pArg;
-                  }
-                  pArg++;
-               }
-               else
-               {
-                  pArgs++ ;
-                  break ;
-               }
-            }
-            else
-            {
-               *pArg = *pArgs++ ;
-               if (pStart == NULL)
-               {
-                  pStart = pArg;
-               }
-               pArg++;
-            }
-         }
-
-         if (pStart)
-         {
-            *pArg++ = '\0';
-            argv[ ++argc ] = pStart ;
-         }
-      }
-   }
-
-   argc ++;
-
-#if defined(__WATCOMC__)
-   iResult = _main( argc, argv );
-#else
-   iResult =  main( argc, argv );
-#endif
-
-   LocalFree( pArgs );
-
-   return iResult;
-}
-#endif
-#endif
 
 /*
 #if defined(__IBMCPP__) || defined(_MSC_VER) || (defined(__BORLANDC__) && defined(__cplusplus))
