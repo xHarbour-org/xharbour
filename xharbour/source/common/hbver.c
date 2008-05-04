@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.40 2007/12/28 13:10:54 likewolf Exp $
+ * $Id: hbver.c,v 1.41 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 #include "hbcomp.h"
 #include "hbmemory.ch"
 #include "hbexemem.h"
+#include "hbverbld.h"
 
 #if defined(HB_OS_WIN_32)
 
@@ -636,13 +637,13 @@ char * hb_verHarbour( void )
 
    pszVersion = ( char * ) hb_xgrab( 80 );
 
-   /* NOTE: 
+   /* NOTE:
       CA-Clipper 5.2e returns: "Clipper (R) 5.2e Intl. (x216)  (1995.02.07)"
       CA-Clipper 5.3b returns: "Clipper (R) 5.3b Intl. (Rev. 338) (1997.04.25)"
    */
 
-   snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s)",
-             HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s) (Rev. %d)",
+             HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, HB_VER_CVSID );
 
    return pszVersion;
 }
