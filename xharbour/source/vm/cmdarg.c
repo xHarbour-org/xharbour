@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.26 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: cmdarg.c,v 1.27 2008/03/27 15:11:08 likewolf Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 #include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbmemory.ch"
+#include "hbverbld.h"
 
 /* Command line argument management */
 static char *argv = "";
@@ -390,6 +391,55 @@ void hb_cmdargProcessVM( void )
 
    hb_traceInit();
 }
+
+/* ChangeLog CVS revision number */
+int hb_verCvsID( void )
+{
+   return HB_VER_CVSID;
+}
+
+/* ChangeLog ID string */
+const char * hb_verCvsChangeLogID( void )
+{
+   return HB_VER_CHLCVS;
+}
+
+/* ChangeLog last entry string */
+const char * hb_verCvsLastEntry( void )
+{
+   return HB_VER_LENTRY;
+}
+
+/* build time C compiler flags in C_USR envvar */
+const char * hb_verFlagsC( void )
+{
+#ifdef HB_VER_C_USR
+   return HB_VER_C_USR;
+#else
+   return "";
+#endif
+}
+
+/* build time linker flags in L_USR envvar */
+const char * hb_verFlagsL( void )
+{
+#ifdef HB_VER_L_USR
+   return HB_VER_L_USR;
+#else
+   return "";
+#endif
+}
+
+/* build time Harbour compiler flags in PRG_USR envvar */
+const char * hb_verFlagsPRG( void )
+{
+#ifdef HB_VER_PRG_USR
+   return HB_VER_PRG_USR;
+#else
+   return "";
+#endif
+}
+
 
 HB_FUNC( HB_CMDARGARGV )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6073 2008/05/02 05:25:23 andijahja Exp $
+ * $Id: ChangeLog,v 1.6074 2008/05/03 23:37:38 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-04 21:20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbapi.h
+  * include/hbapifs.h
+  * source/common/hbfsapi.c
+  * source/compiler/hbusage.c
+  * source/pp/ppgen.c
+  * source/vm/cmdarg.c
+    + Display Revision as CVS Id when printing logo (borrowed from Harbour)
+
+  * source/pp/ppcore.c
+  * compile.mak
+    /*
+    __XHARBOUR__ constant is now an integer, equals the last four digit of
+    CVS Id of ChangeLog. Sample of use:
+
+    PROCEDURE MAIN()
+
+    if	__XHARBOUR__ < 6075
+       ? "xHarbour is out of date ..."
+    endif
+    */
 
 2008-05-04 06:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/harbour.c

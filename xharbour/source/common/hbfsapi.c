@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.13 2007/12/29 22:19:57 andijahja Exp $
+ * $Id: hbfsapi.c,v 1.14 2007/12/30 17:49:06 likewolf Exp $
  */
 
 /*
@@ -68,6 +68,10 @@
 /* NOTE: Not really belongs here, but until we can't find a better place 
          it will do it. [vszakats] */
 extern void hb_fhnd_ForceLink( void );
+
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
 
 /*
  * Function that adds zero or more paths to a list of pathnames to search
@@ -275,6 +279,125 @@ HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
    HB_TRACE(HB_TR_INFO, ("hb_fsFNameMerge: Filename: |%s|\n", pszFileName));
 
    return pszFileName;
+}
+
+HB_EXPORT BOOL hb_fsFileExists( const char * pszFileName )
+{
+   BOOL fExist;
+   BOOL fFree;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsFileExists(%p)", pszFileName));
+
+   if( pszFileName == NULL )
+      return FALSE;
+
+   pszFileName = ( char * ) hb_fsNameConv( ( BYTE * ) pszFileName, &fFree );
+
+#if defined( HB_OS_DOS )
+   {
+#if defined( __DJGPP__ ) || defined(__BORLANDC__)
+      int iAttr = _chmod( pszFileName, 0, 0 );
+      fExist = iAttr != -1 && ( iAttr & 0x10 ) == 0;
+#else
+      unsigned int iAttr = 0;
+      fExist = _dos_getfileattr( pszFileName, &iAttr ) == 0 &&
+               ( iAttr & 0x10 ) == 0;
+#endif
+   }
+#elif defined( HB_OS_WIN_32 )
+   {
+      DWORD   dwAttr;
+
+      dwAttr = GetFileAttributesA( pszFileName );
+      fExist = ( dwAttr != INVALID_FILE_ATTRIBUTES ) &&
+               ( dwAttr & ( FILE_ATTRIBUTE_DIRECTORY |
+                            FILE_ATTRIBUTE_DEVICE ) ) == 0;
+   }
+#elif defined( HB_OS_OS2 )
+   {
+      FILESTATUS3 fs3;
+      fExist = DosQueryPathInfo( pszFileName, FIL_STANDARD,
+                                 &fs3, sizeof( fs3 ) ) == NO_ERROR &&
+               ( fs3.attrFile & FILE_DIRECTORY ) == 0;
+   }
+#elif defined( HB_OS_UNIX )
+   {
+      struct stat statbuf;
+
+      fExist = stat( pszFileName, &statbuf ) == 0 &&
+               S_ISREG( statbuf.st_mode );
+   }
+#else
+   {
+      int TODO; /* To force warning */
+
+      fExist = FALSE;
+   }
+#endif
+
+   if( fFree )
+      hb_xfree( ( void * ) pszFileName );
+
+   return fExist;
+}
+
+HB_EXPORT BOOL hb_fsDirExists( const char * pszDirName )
+{
+   BOOL fExist;
+   BOOL fFree;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsDirExists(%p)", pszDirName));
+
+   if( pszDirName == NULL )
+      return FALSE;
+
+   pszDirName = ( char * ) hb_fsNameConv( ( BYTE * ) pszDirName, &fFree );
+
+#if defined( HB_OS_DOS )
+   {
+#if defined( __DJGPP__ ) || defined(__BORLANDC__)
+      int iAttr = _chmod( pszDirName, 0, 0 );
+      fExist = iAttr != -1 && ( iAttr & 0x10 ) != 0;
+#else
+      unsigned int iAttr = 0;
+      fExist = _dos_getfileattr( pszDirName, &iAttr ) == 0 &&
+               ( iAttr & 0x10 ) != 0;
+#endif
+   }
+#elif defined( HB_OS_WIN_32 )
+   {
+      DWORD   dwAttr;
+
+      dwAttr = GetFileAttributesA( pszDirName );
+      fExist = ( dwAttr != INVALID_FILE_ATTRIBUTES ) &&
+               ( dwAttr & FILE_ATTRIBUTE_DIRECTORY );
+   }
+#elif defined( HB_OS_OS2 )
+   {
+      FILESTATUS3 fs3;
+      fExist = DosQueryPathInfo( pszDirName, FIL_STANDARD,
+                                 &fs3, sizeof( fs3 ) ) == NO_ERROR &&
+               ( fs3.attrFile & FILE_DIRECTORY ) != 0;
+   }
+#elif defined( HB_OS_UNIX )
+   {
+      struct stat statbuf;
+
+      fExist = stat( pszDirName, &statbuf ) == 0 &&
+               S_ISDIR( statbuf.st_mode );
+   }
+#else
+   {
+      int TODO; /* To force warning */
+
+      fExist = FALSE;
+   }
+#endif
+
+   if( fFree )
+      hb_xfree( ( void * ) pszDirName );
+
+   return fExist;
 }
 
 HB_EXPORT BOOL hb_fsMaxFilesError( void )

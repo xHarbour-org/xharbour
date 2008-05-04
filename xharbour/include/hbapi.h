@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.241 2008/04/16 20:05:51 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.242 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -950,6 +950,12 @@ extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer cont
 extern char * hb_verCompiler( void ); /* retrieves a newly allocated buffer containing compiler version */
 extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */
 extern char * hb_verBuildInfo( BOOL ); /* display harbour, compiler, and platform versions to standard console */
+extern int hb_verCvsID( void ); /* ChangeLog CVS revision number */
+extern const char * hb_verCvsChangeLogID( void ); /* ChangeLog ID string */
+extern const char * hb_verCvsLastEntry( void ); /* ChangeLog last entry string */
+extern const char * hb_verFlagsC( void ); /* build time C compiler flags in C_USR envvar */
+extern const char * hb_verFlagsL( void ); /* build time linker flags in L_USR envvar */
+extern const char * hb_verFlagsPRG( void ); /* build time Harbour compiler flags in PRG_USR envvar */
 extern HB_EXPORT BOOL   hb_iswinnt( void ); /* return .T. if OS == WinNt, 2000, XP */
 extern HB_EXPORT BOOL   hb_iswince( void ); /* return .T. if OS is Windows CE or Windows Mobile */
 extern char * hb_builddate( void ); /* return date and time of harbour.exe build */

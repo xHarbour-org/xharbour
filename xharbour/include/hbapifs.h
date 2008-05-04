@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.55 2008/03/09 17:55:13 likewolf Exp $
+ * $Id: hbapifs.h,v 1.56 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -149,6 +149,8 @@ extern HB_EXPORT FHANDLE  hb_fsPOpen      ( BYTE * pFilename, BYTE * pMode );
 extern HB_EXPORT FHANDLE  hb_fsGetOsHandle( FHANDLE hFileHandle );
 extern HB_EXPORT void     hb_fsDirectory( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 extern HB_EXPORT void     hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
+extern HB_EXPORT BOOL     hb_fsFileExists ( const char * pszFileName ); /* check if a file exists (wildcard chars not accepted). */
+extern HB_EXPORT BOOL     hb_fsDirExists  ( const char * pszDirName ); /* check if a directory exists (wildcard chars not accepted). */
 
 /* Open a child process */
 extern HB_EXPORT FHANDLE hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground, ULONG *ProcID );

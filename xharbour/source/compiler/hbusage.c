@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.39 2008/01/03 05:43:00 andijahja Exp $
+ * $Id: hbusage.c,v 1.40 2008/03/18 03:29:50 modalsist Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbcomp.h"
+#include "hbverbld.h"
 
 /*
  * Prints available options
@@ -158,6 +159,6 @@ void hb_compPrintCredits( void )
  */
 void hb_compPrintLogo( void )
 {
-   printf( "xHarbour Compiler build %d.%d.%d (%s)\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   printf( "xHarbour Compiler build %d.%d.%d (%s) (Rev. %d)\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, HB_VER_CVSID );
    printf( "Copyright 1999-2008, http://www.xharbour.org http://www.harbour-project.org/\n" );
 }

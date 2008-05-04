@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.269 2008/02/16 15:01:13 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.270 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,9 @@
 
 #include "hbpp.h"
 #include "hbdate.h"
+#ifndef  __PPGEN__
+#include "hbverbld.h"
+#endif
 
 #define HB_PP_WARN_DEFINE_REDEF                 1     /* C1005 */
 #ifndef HB_C52_STRICT
@@ -5393,7 +5396,11 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 #endif
 
 #if defined( __HARBOUR__ ) || defined( __XHARBOUR__ )
+#if defined( __PPGEN__ )
    snprintf( szResult, sizeof( szResult ), "%05d", HB_MAX( ( HB_VER_MAJOR << 8 ) | HB_VER_MINOR, 1 ) );
+#else
+   snprintf( szResult, sizeof( szResult ), "%05d", HB_VER_CVSID );
+#endif
 #ifdef __HARBOUR__
    /* __HARBOUR__ */
    hb_pp_addDefine( pState, "__HARBOUR__", szResult );
