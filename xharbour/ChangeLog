@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6074 2008/05/03 23:37:38 andijahja Exp $
+ * $Id: ChangeLog,v 1.6075 2008/05/04 14:20:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-05 03:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbver.h
+    * auto-synced with hbverbld.h, hence we no longer need to touch this file
+      in order to have updated info upon: harbour /build
 
 2008-05-04 21:20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/hbapi.h

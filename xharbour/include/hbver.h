@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.75 2007/10/31 10:44:11 likewolf Exp $
+ * $Id: hbver.h,v 1.76 2007/11/01 07:12:51 likewolf Exp $
  */
 
 /*
@@ -60,14 +60,19 @@
 
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
+/* Automatic update implemented upon clean build. [AJ:2008-05-05] */
 
+/* The following constants are no longer significant as they are now overridden
+   in hbverbld.h [AJ:2008-05-05] */
 #define HB_VER_LENTRY   "2007-10-31 17:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>"
 #define HB_VER_CHLCVS   "ChangeLog,v 1.5756"
+
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""
 
 #include "hbver.ch"
+#include "hbverbld.h"
 /* #include "hb_ver_.h" */
 
 #endif /* HB_VER_H_ */
