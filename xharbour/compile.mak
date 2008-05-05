@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.3 2008/04/30 13:20:29 andijahja Exp $
+# $Id: compile.mak,v 1.4 2008/05/04 14:20:50 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -112,7 +112,7 @@ $(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pptable.c : $(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
-	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(OBJ_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
+	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(OBJ_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(OBJ_DIR)$(DIR_SEP)hbverbld.h
 
 #===============================================================================
 # HARBOUR.EXE rules

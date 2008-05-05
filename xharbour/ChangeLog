@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6076 2008/05/04 20:42:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.6077 2008/05/04 20:56:37 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-05 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/compiler/harbour.c
+  * source/common/hbver.c
+  * include/hbver.h
+  * source/pp/ppgen.c
+    ! more stuffs borrowed from Harbour
+    ! use function instead of manifest constant for Rev. No.
+
+  * common.mak
+  * compile.mak
+    ! revise object order creation of pp.lib
+    ! hbverbld.h now created in OBJ_DIR instead of INCLUDE_DIR.
 
 2008-05-05 03:51 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/common/hbver.c

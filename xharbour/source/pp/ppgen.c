@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.5 2007/12/29 22:19:57 andijahja Exp $
+ * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $
  */
 
 /*
@@ -74,7 +74,12 @@ char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
 ULONG hb_xquery( USHORT uiMode ) { HB_SYMBOL_UNUSED( uiMode ); return 0; }
 BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
-
+int hb_verCvsID( void ){ return 0; }
+const char * hb_verCvsChangeLogID( void ) { return NULL; }
+const char * hb_verCvsLastEntry( void ) { return NULL; }
+const char * hb_verFlagsC( void ) { return NULL; }
+const char * hb_verFlagsL( void ) { return NULL; }
+const char * hb_verFlagsPRG( void ) { return NULL; }
 
 /*
  * functions to create .c files with rules defined in given PP context
@@ -213,7 +218,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.5 2007/12/29 22:19:57 andijahja Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -317,7 +322,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: hbppgen.c 8331 2008-04-09 18:44:03Z druzus $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"

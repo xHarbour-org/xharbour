@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.41 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbver.c,v 1.42 2008/05/04 20:56:37 andijahja Exp $
  */
 
 /*
@@ -76,7 +76,6 @@
 #include "hbcomp.h"
 #include "hbmemory.ch"
 #include "hbexemem.h"
-#include "hbverbld.h"
 
 #if defined(HB_OS_WIN_32)
 
@@ -643,7 +642,7 @@ char * hb_verHarbour( void )
    */
 
    snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s) (Rev. %d)",
-             HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, HB_VER_CVSID );
+             HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, hb_verCvsID()  );
 
    return pszVersion;
 }
@@ -739,38 +738,38 @@ char *hb_verBuildInfo( BOOL bOut )
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    hb_conOutErr_( "Last ChangeLog entry: ", 0, bOut );
-   hb_conOutErr_( HB_VER_LENTRY, 0, bOut );
-   hb_xstrcat( szBuildInfo, HB_VER_LENTRY, "\t", NULL );
+   hb_conOutErr_( hb_verCvsLastEntry(), 0, bOut );
+   hb_xstrcat( szBuildInfo, hb_verCvsLastEntry(), "\t", NULL );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    hb_conOutErr_( "ChangeLog CVS version: ", 0, bOut );
-   hb_conOutErr_( HB_VER_CHLCVS, 0, bOut );
-   hb_xstrcat( szBuildInfo, HB_VER_CHLCVS, "\t", NULL );
+   hb_conOutErr_( hb_verCvsChangeLogID(), 0, bOut );
+   hb_xstrcat( szBuildInfo, hb_verCvsChangeLogID(), "\t", NULL );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   if( strlen( HB_VER_C_USR ) )
+   if( strlen( hb_verFlagsC() ) )
    {
       hb_conOutErr_( "Harbour compiler switches: ", 0, bOut );
-      hb_conOutErr_( HB_VER_C_USR, 0, bOut );
+      hb_conOutErr_( hb_verFlagsC(), 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
-   hb_xstrcat( szBuildInfo, HB_VER_C_USR, "\t", NULL );
+   hb_xstrcat( szBuildInfo, hb_verFlagsC(), "\t", NULL );
 
-   if( strlen( HB_VER_L_USR ) )
+   if( strlen( hb_verFlagsL() ) )
    {
       hb_conOutErr_( "C compiler switches: ", 0, bOut );
-      hb_conOutErr_( HB_VER_L_USR, 0, bOut );
+      hb_conOutErr_( hb_verFlagsL(), 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
-   hb_xstrcat( szBuildInfo, HB_VER_L_USR, "\t", NULL );
+   hb_xstrcat( szBuildInfo, hb_verFlagsL(), "\t", NULL );
 
-   if( strlen( HB_VER_PRG_USR ) )
+   if( strlen( hb_verFlagsPRG() ) )
    {
       hb_conOutErr_( "Linker switches: ", 0, bOut );
-      hb_conOutErr_( HB_VER_PRG_USR, 0, bOut );
+      hb_conOutErr_( hb_verFlagsPRG(), 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
-   hb_xstrcat( szBuildInfo, HB_VER_PRG_USR, "\t", NULL );
+   hb_xstrcat( szBuildInfo, hb_verFlagsPRG(), "\t", NULL );
 
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 

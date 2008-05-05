@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.196 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: harbour.c,v 1.197 2008/05/03 23:37:40 andijahja Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
 #include "hbmemory.ch"
 #include "hbset.h"
 #include "hbdate.h"
+#include "hbverbld.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
@@ -7037,3 +7038,52 @@ static int hb_compProcessRSPFile( char* szRspName )
 
    return iStatus;
 }
+
+/* ChangeLog CVS revision number */
+int hb_verCvsID( void )
+{
+   return HB_VER_CVSID;
+}
+
+/* ChangeLog ID string */
+const char * hb_verCvsChangeLogID( void )
+{
+   return HB_VER_CHLCVS;
+}
+
+/* ChangeLog last entry string */
+const char * hb_verCvsLastEntry( void )
+{
+   return HB_VER_LENTRY;
+}
+
+/* build time C compiler flags in C_USR envvar */
+const char * hb_verFlagsC( void )
+{
+#ifdef HB_VER_C_USR
+   return HB_VER_C_USR;
+#else
+   return "";
+#endif
+}
+
+/* build time linker flags in L_USR envvar */
+const char * hb_verFlagsL( void )
+{
+#ifdef HB_VER_L_USR
+   return HB_VER_L_USR;
+#else
+   return "";
+#endif
+}
+
+/* build time Harbour compiler flags in PRG_USR envvar */
+const char * hb_verFlagsPRG( void )
+{
+#ifdef HB_VER_PRG_USR
+   return HB_VER_PRG_USR;
+#else
+   return "";
+#endif
+}
+

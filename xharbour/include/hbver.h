@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.76 2007/11/01 07:12:51 likewolf Exp $
+ * $Id: hbver.h,v 1.77 2008/05/04 20:42:39 andijahja Exp $
  */
 
 /*
@@ -72,7 +72,6 @@
 #define HB_VER_PRG_USR  ""
 
 #include "hbver.ch"
-#include "hbverbld.h"
 /* #include "hb_ver_.h" */
 
 #endif /* HB_VER_H_ */

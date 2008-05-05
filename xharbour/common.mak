@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.6 2008/04/29 10:47:11 andijahja Exp $
+# $Id: common.mak,v 1.7 2008/04/30 13:20:29 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -647,8 +647,8 @@ RDDS_LIB_OBJS=\
 # PP.LIB rules
 #===============================================================================
 PP_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pplib$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pplib2$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pplib3$(OBJEXT)
