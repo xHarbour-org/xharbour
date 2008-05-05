@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.14 2007/12/30 17:49:06 likewolf Exp $
+ * $Id: hbfsapi.c,v 1.15 2008/05/04 14:20:51 andijahja Exp $
  */
 
 /*
@@ -62,6 +62,12 @@
 #include "hb_io.h"
 #include "hbexemem.h"
 #if !defined( HB_WIN32_IO )
+   #include <errno.h>
+#endif
+#if defined(__GNUC__) || defined(HB_OS_UNIX)
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
    #include <errno.h>
 #endif
 
