@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: dll_vc.bat,v 1.12 2008/04/29 04:41:23 ronpinkas Exp $
+rem $Id: dll_vc.bat,v 1.13 2008/04/29 22:14:09 andijahja Exp $
 rem
 rem FILE: dll_vc.bat
 rem BATCH FILE FOR MSVC (DLL)
@@ -62,9 +62,11 @@ if "%1" == "/CLEAN" goto CLEAN
    SET SUB_DIR=
    SET HB_GT_LIB=
    SET PATH=%_PATH%
-   SET _PATH=
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   REM SET LIBPREFIX=
-   SET HB_MT_DIR=
+
+   IF NOT "%LIBPREFIX%" == "" SET LIBPREFIX=
+   IF NOT "%_PATH%"     == "" SET _PATH=
+   IF NOT "%HB_MT_DIR%" == "" SET HB_MT_DIR=
+

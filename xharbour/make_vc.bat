@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.19 2008/04/29 12:48:45 ronpinkas Exp $
+rem $Id: make_vc.bat,v 1.20 2008/04/29 22:14:09 andijahja Exp $
 rem
 rem FILE: nake_vc.bat
 rem BATCH FILE FOR MSVC
@@ -16,17 +16,19 @@ SET BISON_DIR=C:\BISON\BIN
 SET SUB_DIR=vc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
-SET _PATH=%PATH%
+IF NOT "%PATH%" == "" SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
+
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
-REM SET LIBPREFIX=
+IF NOT "%LIBPREFIX%" == "" SET LIBPREFIX=
+
 rem ============================================================================
 
 if "%1" == "clean" goto CLEAN
@@ -79,6 +81,7 @@ if "%1" == "CLEAN" goto CLEAN
    REM IF EXIST BIN\%SUB_DIR%\hbtest.exp   DEL BIN\%SUB_DIR%\hbtest.exp
    REM IF EXIST BIN\%SUB_DIR%\hbtestMT.exp DEL BIN\%SUB_DIR%\hbtestMT.exp
    REM IF EXIST BIN\%SUB_DIR%\xbscript.exp DEL BIN\%SUB_DIR%\xbscript.exp
+
    SET CC_DIR=
    SET BISON_DIR=
    SET SUB_DIR=
@@ -86,8 +89,10 @@ if "%1" == "CLEAN" goto CLEAN
    SET LIBEXT=
    SET OBJEXT=
    SET DIR_SEP=
-   REM SET LIBPREFIX=
+
    SET PATH=%_PATH%
-   SET _PATH=
-   SET HB_MT=
-   SET HB_MT_DIR=
+
+   IF NOT "%LIBPREFIX%" == "" SET LIBPREFIX=
+   IF NOT "%_PATH%"     == "" SET _PATH=
+   IF NOT "%HB_MT%"     == "" SET HB_MT=
+   IF NOT "%HB_MT_DIR%" == "" SET HB_MT_DIR=

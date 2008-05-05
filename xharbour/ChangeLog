@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6079 2008/05/05 12:16:13 andijahja Exp $
+ * $Id: ChangeLog,v 1.6080 2008/05/05 14:08:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-30 15:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * dll_vc.bat
+  * make_vc.bat
+    * Additional refinments related to EnvVars
+      /* Should be synched with other batch files */
+
 2008-05-05 11:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * source/common/hbfsapi.c
     ! added missing included to compile in *nix
-    
+
 2008-05-05 19:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * make_pc.bat
     ! change the way PROJECT is defined (using ST(MT)_PROJECT macros)
@@ -202,11 +209,11 @@
    * source/vm/thread.c
      * Added member uiVMFlags to HB_VM_STACK and removed uiAction member
      * Modified hb_stackSetActionRequest()/hb_stackGetActionRequest() to utilize [right 3 bits] of uiVMFlags
-     
+
    * source/vm/errorapi.c
    * source/vm/hvm.c
      + Added support for HB_SUSPEND_QUIT to resolve memory leak when error system issues a QUIT
-     
+
 2008-04-30 20:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * contrib/freeimage/source/fi_winfu.c
   * contrib/freeimage/source/fi_wrp.c
@@ -252,10 +259,10 @@
   * makefile.bc
     + Support for CFLAGS, LFLAGS, HB_CG32, BCCDIR
     * Minor refinments
-    
+
   * source\rtl\strtran.c
     * GPF trap
-    
+
 2008-04-29 08:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * make_vc.bat
     + Added needed /Y to xcopy or xcopy will HANG because of > NUL
