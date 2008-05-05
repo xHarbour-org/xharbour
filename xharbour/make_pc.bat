@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.24 2008/04/28 07:13:39 andijahja Exp $
+rem $Id: make_pc.bat,v 1.25 2008/04/29 22:14:09 andijahja Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -44,7 +44,7 @@ rem ============================================================================
     SET HB_MT_DIR=
     SET __MT__=
     SET HB_MT_FLAGS=
-    SET PROJECT=$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(GTGUI_LIB) $(COMMON_LIB) $(PPGEN_EXE) $(PP_LIB) $(ZLIB_LIB) $(HARBOUR_EXE) $(VM_LIB) $(FMSTAT_LIB) $(RTL_LIB) $(MACRO_LIB) $(RDD_LIB) $(TIP_LIB) $(DBFFPT_LIB) $(DBFNTX_LIB) $(DBFCDX_LIB) $(BMDBFCDX_LIB) $(SIXCDX_LIB) $(BMSIXCDX_LIB) $(HBSIX_LIB) $(HSX_LIB) $(USRRDD_LIB) $(RDDS_LIB) $(CT_LIB) $(PCREPOS_LIB) $(HB_GT_LIBS) $(DEBUG_LIB) $(LANG_LIB) $(NULSYS_LIB) $(CODEPAGE_LIB) $(DLL_MAIN_LIB) $(ODBC_LIB) $(MISC_LIB) $(HBPP_EXE) $(HBDOC_EXE) $(HBMAKE_EXE) $(XBSCRIPT_EXE) $(HBTEST_EXE) $(HBRUN_EXE)
+    SET PROJECT=$(ST_PROJECT)
     POMAKE /F makefile.pc %1 %2 %3 >make_pc.log
     if errorlevel 1 goto BUILD_ERR
 
@@ -52,7 +52,7 @@ rem ============================================================================
     SET HB_MT_DIR=\mt
     SET __MT__=-MT -DHB_THREAD_SUPPORT
     SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
-    SET PROJECT=$(PP_LIB) $(VM_LIB) $(FMSTAT_LIB) $(RTL_LIB) $(MACRO_LIB) $(RDD_LIB) $(TIP_LIB) $(DBFFPT_LIB) $(DBFNTX_LIB) $(DBFCDX_LIB) $(BMDBFCDX_LIB) $(SIXCDX_LIB) $(BMSIXCDX_LIB) $(HBSIX_LIB) $(HSX_LIB) $(USRRDD_LIB) $(RDDS_LIB) $(CT_LIB) $(HBTEST_EXE) $(HBRUN_EXE)
+    SET PROJECT=$(MT_PROJECT)
     POMAKE /F makefile.pc %1 %2 %3 >>make_pc.log
     if errorlevel 1 goto BUILD_ERR
 

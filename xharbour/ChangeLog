@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6077 2008/05/04 20:56:37 andijahja Exp $
+ * $Id: ChangeLog,v 1.6078 2008/05/05 05:05:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-05 19:15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * make_pc.bat
+    ! change the way PROJECT is defined (using ST(MT)_PROJECT macros)
 
 2008-05-05 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/harbour.c
