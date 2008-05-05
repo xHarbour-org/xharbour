@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2007/06/03 13:01:01 likewolf Exp $
+# $Id: Makefile,v 1.7 2007/08/06 20:30:23 likewolf Exp $
 #
 
 ROOT = ../../
@@ -23,4 +23,4 @@ endif
 include $(TOP)$(ROOT)config/lib.cf
 
 pptable.c : ppgen$(EXE_EXT)
-	$(HB_PPGEN_PATH)/ppgen$(EXE_EXT) $(TOP)$(ROOT)include/hbstdgen.ch -opptable.c -q
+	$(HB_PPGEN_PATH)/ppgen$(EXE_EXT) $(TOP)$(ROOT)include/hbstdgen.ch -opptable.c -q -c$(TOP)$(ROOT)ChangeLog -v$(TOP)$(ROOT)include/hbverbld.h
