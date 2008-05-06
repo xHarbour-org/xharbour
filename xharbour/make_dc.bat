@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.6 2008/04/28 07:13:39 andijahja Exp $
+rem $Id: make_dc.bat,v 1.7 2008/04/29 22:14:09 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -17,8 +17,7 @@ SET SUB_DIR=dc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
-SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%_PATH%
-
+SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 rem ============================================================================
 rem The bundled (s)make.exe of DigitalMars is found to be unable to properly
 rem process the make script. For a solution, the free Borland make.exe is used.
@@ -37,50 +36,119 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
+if "%1" == ""        goto SYNTAX
+if "%1" == "clean"   goto CLEAN
+if "%1" == "CLEAN"   goto CLEAN
+if "%1" == "CORE"    goto BUILD
+if "%1" == "core"    goto BUILD
+if "%1" == "DLL"     goto DLL
+if "%1" == "dll"     goto DLL
+if "%1" == "CONTRIB" goto CONTRIBS
+if "%1" == "contrib" goto CONTRIBS
+if "%1" == "ALL"     goto BUILD_ALL
+if "%1" == "all"     goto BUILD_ALL
+goto SYNTAX
 
-   @CALL MDIR.BAT
-
+rem=============================================================================
 :BUILD
-rem ============================================================================
-rem It is not known if DMC support MT, so no MT-build is not introduced here.
-rem If you have found how to build MT mode with DMC please modify this file
-rem and the corresponding makefile.dc accordingly.
-rem ============================================================================
+rem=============================================================================
+   @CALL MDIR.BAT
+   SET __BLD__=CORE_BLD
    SET HB_MT=
-   %MAKE_EXE% -fmakefile.dc >make_dc.log
+   SET HB_MT_DIR=
+   %MAKE_EXE% -s -l -fmakefile.dc %2 %3 >make_dc.log
    if errorlevel 1 goto BUILD_ERR
+   goto BUILD_OK
 
 :BUILD_OK
    @CALL mdir.bat copytobin
-   if exist harbour.map  del harbour.map
-   if exist hbdoc.map    del hbdoc.map
-   if exist hbmake.map   del hbmake.map
-   if exist hbpp.map     del hbpp.map
-   if exist hbrun.map    del hbrun.map
-   if exist hbtest.map   del hbtest.map
-   if exist ppgen.map    del ppgen.map
-   if exist xbscript.map del xbscript.map
-   goto EXIT
+   if "MAKEALL" == ""    goto EXIT
+   if "%1" == "CORE" goto EXIT
+   if "%1" == "core" goto EXIT
+   goto DLL
 
 :BUILD_ERR
-   if exist make_dc.log notepad make_dc.log
+   IF EXIST make_dc.log notepad make_dc.log
    goto EXIT
 
-:CLEAN
-   @CALL MDIR.BAT CLEAN
-   IF EXIST make_dc.log DEL make_dc.log
+rem=============================================================================
+:DLL
+rem=============================================================================
+rem
+rem We use HB_MT_DIR envar for DLL object folder here
+rem
+   ECHO LIBRARY "harbour.dll" > dmcdll.def
+   ECHO EXETYPE NT >> dmcdll.def
+   ECHO SUBSYSTEM CONSOLE >> dmcdll.def
+   ECHO CODE SHARED EXECUTE >> dmcdll.def
+   ECHO DATA WRITE >> dmcdll.def
+   @CALL mdir.bat dllcreate
+   SET __BLD__=DLL_BLD
+   SET HB_MT=
+   SET HB_MT_DIR=\dll
+   %MAKE_EXE% -s -fmakefile.dc %2 %3 >dll_dc.log
+   if errorlevel 1 goto DLL_ERR
+   goto DLL_OK
 
+:DLL_OK
+   @CALL mdir.bat dllcopy
+   IF "MAKEALL" == ""   goto EXIT
+   IF "%1" == "DLL" goto EXIT
+   IF "%1" == "dll" goto EXIT
+   goto CONTRIBS
+
+:DLL_ERR
+   if exist dll_dc.log notepad dll_dc.log
+   goto EXIT
+
+rem=============================================================================
+:CONTRIBS
+rem=============================================================================
+   @CALL MDIR.BAT
+   SET __BLD__=CONTRIB_BLD
+   SET HB_MT_DIR=
+   SET HB_MT=
+   %MAKE_EXE% -s -l -fmakefile.dc %2 %3 >cont_dc.log
+   if errorlevel 1 goto CONTRIBS_ERR
+
+:CONTRIBS_OK
+   @CALL mdir.bat copycontrib
+   goto EXIT
+
+:CONTRIBS_ERR
+   IF EXIST cont_dc.log notepad cont_dc.log
+   goto EXIT
+
+rem=============================================================================
+:BUILD_ALL
+rem=============================================================================
+   SET MAKEALL=yes
+   goto BUILD
+
+rem=============================================================================
+:SYNTAX
+rem=============================================================================
+   ECHO.Syntax:
+   ECHO. make_dc core    : Build xHarbour CORE files
+   ECHO. make_dc dll     : Build xHarbour DLL
+   ECHO. make_dc contrib : Build CONTRIB Libraries
+   ECHO. make_dc all     : Build CORE, DLL and CONTRIB
+   ECHO. make_dc clean   : Erase all files once built
+   goto EXIT
+
+rem=============================================================================
+:CLEAN
+rem=============================================================================
+   @CALL mdir.bat clean
+   IF EXIST make_dc.log DEL make_dc.log
+   @CALL mdir.bat dllclean
+   if exist dll_dc.log del dll_dc.log
+   @CALL mdir.bat cleancontrib
+   IF EXIST cont_dc.log DEL cont_dc.log
+
+rem=============================================================================
 :EXIT
-   SET CC_DIR=
-   SET BISON_DIR=
-   SET SUB_DIR=
-   SET HB_GT_LIB=
-   SET PATH=%_PATH%
-   SET _PATH=
-   SET LIBEXT=
-   SET OBJEXT=
-   SET DIR_SEP=
-   REM SET LIBPREFIX=
-   SET MAKE_EXE=
+rem=============================================================================
+   @CALL mdir.bat resetenvar
+   if exist *.map del *.map > NUL
+   if exist dmcdll.def del dmcdll.def >NUL

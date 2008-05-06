@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.40 2008/04/29 07:20:33 andijahja Exp $
+# $Id: makefile.dc,v 1.41 2008/04/29 08:55:52 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -9,6 +9,9 @@
 #
 #===============================================================================
 
+#*******************************************************************************
+!if ("$(__BLD__)"=="CORE_BLD")
+#*******************************************************************************
 #===============================================================================
 # Append your own build flags here
 #===============================================================================
@@ -18,19 +21,30 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=INCLUDE;$(CC_DIR)\INCLUDE\WIN32;$(CC_DIR)\INCLUDE
+INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
 CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
-HB_CMD=$(HARBOUR_EXE) -iINCLUDE -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -iINCLUDE -n -q0 -po$(OBJ_DIR)\ -w -es2 -gc2 $** -o$@
+HB_CMD=$(HARBOUR_EXE) -iinclude -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -iinclude -n -q0 -po$(OBJ_DIR)\ -w -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
 BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
-COMPILERLIBS=$(CC_DIR)\LIB\snn.lib+$(CC_DIR)\LIB\kernel32.lib+$(CC_DIR)\LIB\winspool.lib+$(CC_DIR)\LIB\user32.lib+$(CC_DIR)\LIB\advapi32.lib+$(CC_DIR)\LIB\ole32.lib+$(CC_DIR)\LIB\uuid.lib+$(CC_DIR)\LIB\mpr.lib+$(CC_DIR)\LIB\winmm.lib+$(CC_DIR)\LIB\oleaut32.lib
-EXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_LIBS)+$(COMPILERLIBS)/noi;
-CMN_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(COMPILERLIBS)/noi;
-HRB_LINK_CMD=LINK $**,$@,,$(COMMON_LIB)+$(PP_LIB)+$(COMPILERLIBS)/noi;
+COMPILERLIBS=\
+	$(CC_DIR)\LIB\snn.lib\
+	$(CC_DIR)\LIB\kernel32.lib\
+	$(CC_DIR)\LIB\winspool.lib\
+	$(CC_DIR)\LIB\user32.lib\
+	$(CC_DIR)\LIB\advapi32.lib\
+	$(CC_DIR)\LIB\ole32.lib\
+	$(CC_DIR)\LIB\uuid.lib\
+	$(CC_DIR)\LIB\mpr.lib\
+	$(CC_DIR)\LIB\winmm.lib\
+	$(CC_DIR)\LIB\oleaut32.lib
+LINK_CMD=LINK $**,$@,,
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
+EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
+CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Macro Definitions
@@ -173,6 +187,221 @@ $(MISC_LIB) : $(MISC_LIB_OBJS)
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
+
+#*******************************************************************************
+!elif ("$(__BLD__)"=="DLL_BLD")
+#*******************************************************************************
+# Uncomment this line when including RDDADS
+# HB_RDDADS=1
+
+# Uncomment this line when including WVTGUI
+# HB_WVTGUI=1
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+#===============================================================================
+# RDDADS
+#===============================================================================
+!ifdef HB_RDDADS
+COMPILERLIBS=\
+	$(LIB_DIR)\ace32.lib
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(RDDADS_LIB_OBJS)
+!endif
+
+#===============================================================================
+# WVTGUI
+#===============================================================================
+!ifdef HB_WVTGUI
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(WVTGUI_LIB_OBJS)
+!endif
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
+DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
+EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -Jm -cpp -mn -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+BISON_CMD1  =bison -v -d $** -o$@
+BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
+DLLEXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_DLL_LIB)+$(COMPILERLIBS)/noi;
+
+#===============================================================================
+# Compiler and 3rd Party libraries need to be linked
+#===============================================================================
+COMPILERLIBS=\
+	$(COMPILERLIBS)\
+	snn.lib + \
+	kernel32.lib + \
+	ws2_32.lib + \
+	winspool.lib + \
+	user32.lib + \
+	advapi32.lib + \
+	ole32.lib + \
+	gdi32.lib + \
+	uuid.lib + \
+	wsock32.lib + \
+	oleaut32.lib + \
+	mpr.lib
+
+#===============================================================================
+# The Project
+#===============================================================================
+ALL: $(DLL_PROJECT)
+
+#===============================================================================
+# HARBOUR.DLL rules
+#===============================================================================
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	LINK /IMPLIB:$(HARBOUR_DLL_LIB) @&&!
+$**,$@,,$(COMPILERLIBS),"DMCDLL.DEF"
+!
+
+#*******************************************************************************
+!elif ("$(__BLD__)"=="CONTRIB_BLD")
+#*******************************************************************************
+# Uncomment this section if you have want to build the libraries.
+# HB_GTWVW=1
+# HB_FIREBIRD=1
+# HB_MYSQL=1
+# HB_PGSQL=1
+# HB_ZIP=1
+# HB_FREEIMAGE=1
+# HB_WHAT32=1
+# HB_XWT=1
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win
+CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT"
+HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
+CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
+LIB_CMD=LIB -c -n $@ $**
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+!ifdef HB_FREEIMAGE
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
+!endif
+
+!ifdef HB_ZIP
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBZIP_LIB)
+!endif
+
+!ifdef HB_XWT
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
+!endif
+
+!ifdef HB_WHAT32
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
+!endif
+
+!ifdef HB_GTWVW
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVW_LIB)
+!endif
+
+!ifdef HB_FIREBIRD
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB)
+!endif
+
+!ifdef HB_MYSQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB)
+!endif
+
+!ifdef HB_PGSQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
+!endif
+
+ALL: $(CONTRIB_PROJECT)
+
+#===============================================================================
+# Library dependencies and build rules
+#===============================================================================
+#ifdef ___X___
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	LIB -c -n $@ @&&!
+$**
+!
+
+$(CT_LIB) : $(CT_LIB_OBJS)
+	LIB -c -n $@ @&&!
+$**
+!
+#endif
+
+$(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
+	$(LIB_CMD)
+
+$(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(XWT_LIB) : $(XWT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
+	$(LIB_CMD)
+
+$(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCC_LIB) : $(HBCC_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+!endif
 
 #===============================================================================
 # Building rules of Object files

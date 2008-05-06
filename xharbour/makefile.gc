@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.42 2008/04/29 07:20:33 andijahja Exp $
+# $Id: makefile.gc,v 1.43 2008/04/29 08:55:52 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -8,6 +8,28 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
+
+#*******************************************************************************
+ifeq ($(__BLD__),CORE_BLD)
+#*******************************************************************************
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+include common.mak
+
+ifeq ($(HB_DOC_PDF),yes)
+HARBOURFLAGS+=-dPDF
+HBDOC_EXE_OBJS+=\
+	$(OBJ_DIR)/genpdf1.o\
+	$(OBJ_DIR)/pdfhbdoc.o
+COMPILERLIBS=+\
+	-lpdflib
+endif
+
+ifeq ($(HB_GTALLEG),yes)
+HB_GT_LIBS+=\
+	$(GTALLEG_LIB)
+endif
 
 #===============================================================================
 # Append your own build flags here
@@ -50,10 +72,8 @@ LIB_CMD      =\
 		AR cru $@ $^ &&\
 		RANLIB $@ &&\
 		STRIP -g $@
-
-COMPILERLIBS=\
-	-L$(CC_DIR)/lib -L$(LIB_DIR)\
-	--start-group\
+HARBOUR_LIBS=\
+	-L$(LIB_DIR)\
 	-lvm$(HB_MT)\
 	-lrtl$(HB_MT)\
 	-lvm$(HB_MT)\
@@ -78,38 +98,20 @@ COMPILERLIBS=\
 	-lpcrepos\
 	-lcommon\
 	-lpp$(HB_MT)\
-	-llang\
-	--end-group\
+	-llang
+COMPILERLIBS=\
+	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
-
-HRB_LINK_CMD=GCC -Wall -o $@ $^ -L$(LIB_DIR) -mno-cygwin -lpp -lcommon -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32
-EXE_LINK_CMD=GCC -WAll -o $@ $^ -mno-cygwin $(COMPILERLIBS)
-CMN_LINK_CMD=GCC -WAll -o $@ $^ -mno-cygwin -L$(CC_DIR)/lib -L$(LIB_DIR) -lcommon
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-include common.mak
-
-ifeq ($(HB_DOC_PDF),yes)
-HARBOURFLAGS+=-dPDF
-HBDOC_EXE_OBJS+=\
-	$(OBJ_DIR)/genpdf1.o\
-	$(OBJ_DIR)/pdfhbdoc.o
-COMPILERLIBS=+\
-	-lpdflib
-endif
-
-ifeq ($(HB_GTALLEG),yes)
-HB_GT_LIBS+=\
-	$(GTALLEG_LIB)
-endif
+EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
+HRB_LIBS=-L$(LIB_DIR) -lpp -lcommon $(COMPILERLIBS)
+CMN_LIBS=-L$(LIB_DIR) -lcommon $(COMPILERLIBS)
+LINK_CMD=GCC -Wall -o $@ $^ -mno-cygwin
 
 #===============================================================================
 # The Project
 #===============================================================================
-ifeq ($(HB_THREAD_SUPPORT),0)
+ifeq ($(HB_THREAD_SUPPORT),)
 PROJECT=$(ST_PROJECT)
 else
 PROJECT=$(MT_PROJECT)
@@ -227,6 +229,227 @@ $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
 	$(LIB_CMD)
+
+#*******************************************************************************
+else ifeq ($(__BLD__),DLL_BLD)
+#*******************************************************************************
+# Comment this line if ST mode is preferred
+DLL_MT=mt
+
+# Uncomment this line when including RDDADS
+# HB_RDDADS=1
+
+# Uncomment this line when including WVTGUI
+# HB_WVTGUI=1
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+include common.mak
+
+#===============================================================================
+# Compiler and 3rd Party libraries need to be linked
+#===============================================================================
+COMPILERLIBS=\
+	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
+	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
+	-lole32 -luuid -loleaut32 -lws2_32 -lharbour
+
+COMPILERLIBS1=\
+	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
+	-lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool\
+	-loleaut32 -luuid -lmpr
+
+#===============================================================================
+# RDDADS
+#===============================================================================
+ifeq ($(HB_RDDADS),1)
+COMPILERLIBS+=\
+	-lace32
+COMPILERLIBS1+=\
+	-lace32
+HARBOUR_DLL_OBJS+=\
+	$(RDDADS_LIB_OBJS)
+endif
+
+#===============================================================================
+# WVTGUI
+#===============================================================================
+ifeq ($(HB_WVTGUI),1)
+HARBOUR_DLL_OBJS+=\
+	$(WVTGUI_LIB_OBJS)
+endif
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS+=
+CLIBFLAGS   +=
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+ifeq ($(DLL_MT),mt)
+HARBOURFLAGS+=-dHB_THREAD_SUPPORT
+CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
+endif
+
+INCLUDE_DIR =include
+CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
+BISON_CMD1  =bison -v -p yy -d -o $@ $^
+BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
+DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+DLLEXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(COMPILERLIBS)
+
+#===============================================================================
+# The Project
+#===============================================================================
+ALL: $(DLL_PROJECT)
+
+#===============================================================================
+# HARBOUR.DLL rules
+#===============================================================================
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	$(DLL_LINK_CMD)
+
+#*******************************************************************************
+else ifeq ($(__BLD__),CONTRIB_BLD)
+#*******************************************************************************
+# Uncomment this section if you have want to build the libraries.
+# HB_GTWVW=1
+# HB_FIREBIRD=1
+# HB_MYSQL=1
+# HB_PGSQL=1
+
+HB_ZIP=1
+
+HB_FREEIMAGE=1
+HB_WHAT32=1
+HB_XWT=1
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS+=
+CLIBFLAGS   +=
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c
+CLIBFLAGS   +=-Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win
+
+ifeq ($(HB_THREAD_SUPPORT),1)
+	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
+	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
+endif
+
+HB_CMD =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
+CC_CMD_ZIP=G++ $(CLIBFLAGS) -I$(HBZIP_DIR)\include -DWIN32 -D_WIN32 -DNDEBUG -o $@ $^
+LIB_CMD=\
+	RM -f $@ &&\
+	AR cru $@ $^ &&\
+	RANLIB $@ &&\
+	STRIP -g $@
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+include common.mak
+
+ifeq ($(HB_FREEIMAGE), 1)
+CONTRIB_PROJECT+=$(FREEIMAGE_LIB)
+endif
+
+ifeq ($(HB_ZIP), 1)
+CONTRIB_PROJECT+=$(HBZIP_LIB)
+endif
+
+ifeq ($(HB_XWT), 1)
+CONTRIB_PROJECT+=$(XWT_LIB)
+endif
+
+ifeq ($(HB_WHAT32), 1)
+CONTRIB_PROJECT+=$(WHAT32_LIB)
+endif
+
+ifeq ($(HB_GTWVW), 1)
+CONTRIB_PROJECT+=$(GTWVW_LIB)
+endif
+
+ifeq ($(HB_FIREBIRD), 1)
+CONTRIB_PROJECT+=$(FIREBIRD_LIB)
+endif
+
+ifeq ($(HB_MYSQL), 1)
+CONTRIB_PROJECT+=$(MYSQL_LIB)
+endif
+
+ifeq ($(HB_PGSQL), 1)
+CONTRIB_PROJECT+=$(PGSQL_LIB)
+endif
+
+ALL: $(CONTRIB_PROJECT)
+
+#===============================================================================
+# Libraries dependencies and build rules (ST & MT )
+#===============================================================================
+
+#===============================================================================
+# Libraries dependencies and build rules (ST)
+#===============================================================================
+$(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
+	$(LIB_CMD)
+
+$(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(XWT_LIB) : $(XWT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
+	$(LIB_CMD)
+
+$(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCC_LIB) : $(HBCC_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+endif
 
 #===============================================================================
 # Building rules of Object files

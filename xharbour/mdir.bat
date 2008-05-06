@@ -1,6 +1,6 @@
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.3 2008/04/29 22:14:09 andijahja Exp $
+rem $Id: mdir.bat,v 1.4 2008/04/30 13:20:31 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -22,6 +22,8 @@ if "%1" == "COPYCONTRIB"  goto COPYCONTRIBLIBS
 if "%1" == "copycontrib"  goto COPYCONTRIBLIBS
 if "%1" == "CLEANCONTRIB" goto REMOVECONTRIB
 if "%1" == "cleancontrib" goto REMOVECONTRIB
+if "%1" == "resetenvar"   goto RESET_ENVAR
+if "%1" == "RESETENVAR"   goto RESET_ENVAR
 
 rem=============================================================================
 :CREATE
@@ -29,8 +31,6 @@ rem=============================================================================
 if not exist obj                     md obj
 if not exist obj\%SUB_DIR%           md obj\%SUB_DIR%
 if not exist obj\%SUB_DIR%\mt        md obj\%SUB_DIR%\mt
-if not exist obj\%SUB_DIR%\fmstat    md obj\%SUB_DIR%\fmstat
-if not exist obj\%SUB_DIR%\mt\fmstat md obj\%SUB_DIR%\mt\fmstat
 
 if not exist lib                     md lib
 if not exist lib\%SUB_DIR%           md lib\%SUB_DIR%
@@ -296,9 +296,6 @@ if exist obj\%SUB_DIR%\mt\*.c                        del obj\%SUB_DIR%\mt\*.c
 if exist obj\%SUB_DIR%\mt\*.ppo                      del obj\%SUB_DIR%\mt\*.ppo
 if exist obj\%SUB_DIR%\mt\*.h                        del obj\%SUB_DIR%\mt\*.h
 
-if exist obj\%SUB_DIR%\fmstat\*%OBJEXT%              del obj\%SUB_DIR%\fmstat\*%OBJEXT%
-if exist obj\%SUB_DIR%\mt\fmstat\*%OBJEXT%           del obj\%SUB_DIR%\mt\fmstat\*%OBJEXT%
-
 if exist bin\%SUB_DIR%\harbour.exp                   del bin\%SUB_DIR%\harbour.exp
 if exist bin\%SUB_DIR%\hbdoc.exp                     del bin\%SUB_DIR%\hbdoc.exp
 if exist bin\%SUB_DIR%\hbmake.exp                    del bin\%SUB_DIR%\hbmake.exp
@@ -395,12 +392,14 @@ goto EXIT
 rem=============================================================================
 :REMOVECONTRIB
 rem=============================================================================
-if exist obj\%SUB_DIR%\contrib\*%OBJEXT%            del obj\%SUB_DIR%\contrib\*%OBJEXT%
-if exist obj\%SUB_DIR%\contrib\mt\*%OBJEXT%         del obj\%SUB_DIR%\contrib\mt\*%OBJEXT%
-if exist obj\%SUB_DIR%\contrib\*.ppo                del obj\%SUB_DIR%\contrib\*.ppo
-if exist obj\%SUB_DIR%\contrib\mt\*.ppo             del obj\%SUB_DIR%\contrib\mt\*.ppo
-if exist obj\%SUB_DIR%\contrib\*.c                  del obj\%SUB_DIR%\contrib\*.c
-if exist obj\%SUB_DIR%\contrib\mt\*.c               del obj\%SUB_DIR%\contrib\mt\*.c
+if exist obj\%SUB_DIR%\*%OBJEXT%                    del obj\%SUB_DIR%\*%OBJEXT%
+if exist obj\%SUB_DIR%\mt\*%OBJEXT%                 del obj\%SUB_DIR%\mt\*%OBJEXT%
+if exist obj\%SUB_DIR%\*.ppo                        del obj\%SUB_DIR%\*.ppo
+if exist obj\%SUB_DIR%\*.idb                        del obj\%SUB_DIR%\*.idb
+if exist obj\%SUB_DIR%\*.pch                        del obj\%SUB_DIR%\*.pch
+if exist obj\%SUB_DIR%\mt\*.ppo                     del obj\%SUB_DIR%\mt\*.ppo
+if exist obj\%SUB_DIR%\*.c                          del obj\%SUB_DIR%\*.c
+if exist obj\%SUB_DIR%\mt\*.c                       del obj\%SUB_DIR%\mt\*.c
 
 if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%
@@ -413,6 +412,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%rddads%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%wvtgui%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%wvtgui%LIBEXT%
 
 if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIBEXT%
@@ -426,7 +426,28 @@ if exist lib\%LIBPREFIX%rddads%LIBEXT%              del lib\%LIBPREFIX%rddads%LI
 if exist lib\%LIBPREFIX%telepath%LIBEXT%            del lib\%LIBPREFIX%telepath%LIBEXT%
 if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBEXT%
 if exist lib\%LIBPREFIX%what32%LIBEXT%              del lib\%LIBPREFIX%what32%LIBEXT%
+if exist lib\%LIBPREFIX%xwt%LIBEXT%                 del lib\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%LIBPREFIX%wvtgui%LIBEXT%              del lib\%LIBPREFIX%wvtgui%LIBEXT%
+goto EXIT
+
+rem=============================================================================
+:RESET_ENVAR
+rem=============================================================================
+SET CC_DIR=
+SET BISON_DIR=
+SET SUB_DIR=
+SET HB_GT_LIB=
+SET LIBEXT=
+SET OBJEXT=
+SET DIR_SEP=
+SET PATH=%_PATH%
+
+IF NOT "%LIBPREFIX%" == "" SET LIBPREFIX=
+IF NOT "%_PATH%"     == "" SET _PATH=
+IF NOT "%HB_MT%"     == "" SET HB_MT=
+IF NOT "%HB_MT_DIR%" == "" SET HB_MT_DIR=
+IF NOT "%MAKEALL%"   == "" SET MAKEALL=
+IF NOT "%__BLD__%"   == "" SET MAKE_EXE=
 
 rem=============================================================================
 :EXIT

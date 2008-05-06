@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.7 2008/04/30 13:20:29 andijahja Exp $
+# $Id: common.mak,v 1.8 2008/05/05 05:05:41 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -20,8 +20,6 @@
 BIN_DIR       =bin$(DIR_SEP)$(SUB_DIR)
 LIB_DIR       =lib$(DIR_SEP)$(SUB_DIR)
 OBJ_DIR       =obj$(DIR_SEP)$(SUB_DIR)$(HB_MT_DIR)
-
-FMSTAT_OBJ_DIR=$(OBJ_DIR)$(DIR_SEP)fmstat
 
 COMMON_DIR    =source$(DIR_SEP)common
 COMPILER_DIR  =source$(DIR_SEP)compiler
@@ -744,7 +742,7 @@ VM_MAIN_OBJS=\
 # FMSTAT.LIB rules
 #===============================================================================
 FMSTAT_LIB_OBJS=\
-	$(FMSTAT_OBJ_DIR)$(DIR_SEP)fm$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)fmSTAT$(OBJEXT)
 
 #===============================================================================
 # GTCGI.LIB rules

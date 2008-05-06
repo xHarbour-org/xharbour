@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.4 2008/05/04 14:20:50 andijahja Exp $
+# $Id: compile.mak,v 1.5 2008/05/05 05:05:41 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -8,6 +8,13 @@
 #         (pay attention to TAB before CMDs)
 #
 #===============================================================================
+
+#===============================================================================
+# LINK COMMANDS
+#===============================================================================
+HRB_LINK_CMD=$(LINK_CMD) $(HRB_LIBS)
+EXE_LINK_CMD=$(LINK_CMD) $(EXE_LIBS)
+CMN_LINK_CMD=$(LINK_CMD) $(CMN_LIBS)
 
 #===============================================================================
 # Executable dependencies and build rules
@@ -37,19 +44,19 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
 	$(EXE_LINK_CMD)
 
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(DLLEXE_LINK_CMD)
 
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(DLLEXE_LINK_CMD)
 
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(DLLEXE_LINK_CMD)
 
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(DLLEXE_LINK_CMD)
 
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(DLLEXE_LINK_CMD)
 
 #===============================================================================
 # COMMON.LIB rules
@@ -111,7 +118,7 @@ $(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT) : $(PP_DIR)$(DIR_SEP)ppcore.c
 $(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pptable.c : $(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
+$(OBJ_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
 	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(OBJ_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(OBJ_DIR)$(DIR_SEP)hbverbld.h
 
 #===============================================================================
@@ -414,7 +421,7 @@ $(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
 #===============================================================================
 # FMSTAT.LIB rules
 #===============================================================================
-$(FMSTAT_OBJ_DIR)$(DIR_SEP)fm$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
+$(OBJ_DIR)$(DIR_SEP)fmSTAT$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 	$(CC_CMD_FMSTAT)
 
 #===============================================================================

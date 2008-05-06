@@ -28,78 +28,129 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
+if "%1" == ""        goto SYNTAX
+if "%1" == "clean"   goto CLEAN
+if "%1" == "CLEAN"   goto CLEAN
+if "%1" == "CORE"    goto BUILD
+if "%1" == "core"    goto BUILD
+if "%1" == "DLL"     goto DLL
+if "%1" == "dll"     goto DLL
+if "%1" == "CONTRIB" goto CONTRIBS
+if "%1" == "contrib" goto CONTRIBS
+if "%1" == "ALL"     goto BUILD_ALL
+if "%1" == "all"     goto BUILD_ALL
+goto SYNTAX
 
-   @CALL mdir.bat
-
+rem=============================================================================
 :BUILD
-rem ============================================================================
-rem The curent POMAKE is buggy that it does not recognize macro defined, making
-rem ifdef clause not working. The following envars help overcome the bug and
-rem in order to build ST and MT version in one run. They will be reverted once
-rem the bugs are fixed (AJ:2008-04-26)
-rem ============================================================================
-    SET HB_MT=
-    SET HB_MT_DIR=
-    SET __MT__=
-    SET HB_MT_FLAGS=
-    SET PROJECT=$(ST_PROJECT)
-    POMAKE /F makefile.pc %1 %2 %3 >make_pc.log
-    if errorlevel 1 goto BUILD_ERR
-
-    SET HB_MT=mt
-    SET HB_MT_DIR=\mt
-    SET __MT__=-MT -DHB_THREAD_SUPPORT
-    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
-    SET PROJECT=$(MT_PROJECT)
-    POMAKE /F makefile.pc %1 %2 %3 >>make_pc.log
-    if errorlevel 1 goto BUILD_ERR
-
-:BUILD_OK
-    @CALL mdir.bat copytobin
-    goto EXIT
-
-:BUILD_ERR
-   if exist make_pc.log notepad make_pc.log
-   goto EXIT
-
-:CLEAN
-   @CALL mdir.bat CLEAN
-   IF EXIST make_pc.log DEL make_pc.log
-
-:EXIT
-   IF EXIST BIN\%SUB_DIR%\harbour.lib  DEL BIN\%SUB_DIR%\harbour.lib
-   IF EXIST BIN\%SUB_DIR%\ppgen.lib    DEL BIN\%SUB_DIR%\ppgen.lib
-   IF EXIST BIN\%SUB_DIR%\hbpp.lib     DEL BIN\%SUB_DIR%\hbpp.lib
-   IF EXIST BIN\%SUB_DIR%\hbdoc.lib    DEL BIN\%SUB_DIR%\hbdoc.lib
-   IF EXIST BIN\%SUB_DIR%\hbmake.lib   DEL BIN\%SUB_DIR%\hbmake.lib
-   IF EXIST BIN\%SUB_DIR%\hbrun.lib    DEL BIN\%SUB_DIR%\hbrun.lib
-   IF EXIST BIN\%SUB_DIR%\hbrunMT.lib  DEL BIN\%SUB_DIR%\hbrunMT.lib
-   IF EXIST BIN\%SUB_DIR%\hbtest.lib   DEL BIN\%SUB_DIR%\hbtest.lib
-   IF EXIST BIN\%SUB_DIR%\hbtestMT.lib DEL BIN\%SUB_DIR%\hbtestMT.lib
-   IF EXIST BIN\%SUB_DIR%\xbscript.lib DEL BIN\%SUB_DIR%\xbscript.lib
-   IF EXIST BIN\%SUB_DIR%\harbour.exp  DEL BIN\%SUB_DIR%\harbour.exp
-   IF EXIST BIN\%SUB_DIR%\ppgen.exp    DEL BIN\%SUB_DIR%\ppgen.exp
-   IF EXIST BIN\%SUB_DIR%\hbpp.exp     DEL BIN\%SUB_DIR%\hbpp.exp
-   IF EXIST BIN\%SUB_DIR%\hbdoc.exp    DEL BIN\%SUB_DIR%\hbdoc.exp
-   IF EXIST BIN\%SUB_DIR%\hbmake.exp   DEL BIN\%SUB_DIR%\hbmake.exp
-   IF EXIST BIN\%SUB_DIR%\hbrun.exp    DEL BIN\%SUB_DIR%\hbrun.exp
-   IF EXIST BIN\%SUB_DIR%\hbrunMT.exp  DEL BIN\%SUB_DIR%\hbrunMT.exp
-   IF EXIST BIN\%SUB_DIR%\hbtest.exp   DEL BIN\%SUB_DIR%\hbtest.exp
-   IF EXIST BIN\%SUB_DIR%\hbtestMT.exp DEL BIN\%SUB_DIR%\hbtestMT.exp
-   IF EXIST BIN\%SUB_DIR%\xbscript.exp DEL BIN\%SUB_DIR%\xbscript.exp
-   SET CC_DIR=
-   SET BISON_DIR=
-   SET SUB_DIR=
-   SET HB_GT_LIB=
-   SET PATH=%_PATH%
-   SET _PATH=
-   SET LIBEXT=
-   SET OBJEXT=
+rem=============================================================================
+   @CALL MDIR.BAT
    SET HB_MT=
-   SET DIR_SEP=
    SET HB_MT_DIR=
    SET __MT__=
    SET HB_MT_FLAGS=
+   SET PROJECT=$(ST_PROJECT)
+   POMAKE /F makefile.pc %2 %3 >make_pc.log
+   if errorlevel 1 goto BUILD_ERR
+
+   SET HB_MT=mt
+   SET HB_MT_DIR=\mt
+   SET __MT__=-MT -DHB_THREAD_SUPPORT
+   SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
+   SET PROJECT=$(MT_PROJECT)
+   POMAKE /F makefile.pc %2 %3 >>make_pc.log
+   if errorlevel 1 goto BUILD_ERR
+   goto BUILD_OK
+
+:BUILD_OK
+   @CALL mdir.bat copytobin
+   if "MAKEALL" == "" goto EXIT
+   if "%1" == "CORE" goto EXIT
+   if "%1" == "core" goto EXIT
+   goto DLL
+
+:BUILD_ERR
+   IF EXIST make_pc.log notepad make_pc.log
+   goto EXIT
+
+rem=============================================================================
+:DLL
+rem=============================================================================
+rem
+rem We use HB_MT_DIR envar for DLL object folder here
+rem
+   @CALL mdir.bat dllcreate
+   SET HB_MT=
+   SET __MT__=
+   SET HB_MT_FLAGS=
+   SET HB_MT_DIR=\dll
+   pomake /F hrbdll.pc %2 %3 >dll_pc.log
+   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto DLL_ERR
+   goto DLL_OK
+
+:DLL_OK
+   @CALL mdir.bat dllcopy
+   IF "MAKEALL" == ""   goto EXIT
+   IF "%1" == "DLL" goto EXIT
+   IF "%1" == "dll" goto EXIT
+   goto CONTRIBS
+
+:DLL_ERR
+   if exist dll_pc.log notepad dll_pc.log
+   goto EXIT
+
+rem=============================================================================
+:CONTRIBS
+rem=============================================================================
+   @CALL MDIR.BAT
+   SET HB_MT=
+   SET __MT__=
+   SET HB_MT_FLAGS=
+   SET HB_MT_DIR=
+   POMAKE /F contrib.pc %2 %3 >cont_pc.log
+   if errorlevel 1 goto BUILD_ERR
+
+:CONTRIBS_OK
+   @CALL mdir.bat copycontrib
+   goto EXIT
+
+:CONTRIBS_ERR
+   IF EXIST cont_pc.log notepad cont_pc.log
+   goto EXIT
+
+rem=============================================================================
+:BUILD_ALL
+rem=============================================================================
+   SET MAKEALL=yes
+   goto BUILD
+
+rem=============================================================================
+:SYNTAX
+rem=============================================================================
+   ECHO.Syntax:
+   ECHO. make_pc core    : Build xHarbour CORE files
+   ECHO. make_pc dll     : Build xHarbour DLL
+   ECHO. make_pc contrib : Build CONTRIB Libraries
+   ECHO. make_pc all     : Build CORE, DLL and CONTRIB
+   ECHO. make_pc clean   : Erase all files once built
+   goto EXIT
+
+rem=============================================================================
+:CLEAN
+rem=============================================================================
+   @CALL mdir.bat clean
+   IF EXIST make_pc.log DEL make_pc.log
+   @CALL mdir.bat dllclean
+   if exist dll_pc.log del dll_pc.log
+   @CALL mdir.bat cleancontrib
+   IF EXIST cont_pc.log DEL cont_pc.log
+
+rem=============================================================================
+:EXIT
+rem=============================================================================
+   SET HB_MT_FLAGS=
    SET PROJECT=
+   SET HB_MT=
+   SET __MT__=
+   @CALL mdir.bat resetenvar

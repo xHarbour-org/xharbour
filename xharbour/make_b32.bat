@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.34 2008/04/29 12:34:56 enricomaria Exp $
+rem $Id: make_b32.bat,v 1.36 2008/04/29 22:14:09 andijahja Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -31,44 +31,122 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
+if "%1" == ""        goto SYNTAX
+if "%1" == "clean"   goto CLEAN
+if "%1" == "CLEAN"   goto CLEAN
+if "%1" == "CORE"    goto BUILD
+if "%1" == "core"    goto BUILD
+if "%1" == "DLL"     goto DLL
+if "%1" == "dll"     goto DLL
+if "%1" == "CONTRIB" goto CONTRIBS
+if "%1" == "contrib" goto CONTRIBS
+if "%1" == "ALL"     goto BUILD_ALL
+if "%1" == "all"     goto BUILD_ALL
+goto SYNTAX
 
-   @CALL MDIR.BAT
-
+rem=============================================================================
 :BUILD
+rem=============================================================================
+   @CALL MDIR.BAT
+   SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   make -l -fmakefile.bc %1 %2 %3 >make_b32.log
+   make -s -l -fmakefile.bc %2 %3 >make_b32.log
    if errorlevel 1 goto BUILD_ERR
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   make -l -DHB_THREAD_SUPPORT -fmakefile.bc %1 %2 %3 >>make_b32.log
+   make -s -l -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 >>make_b32.log
    if errorlevel 1 goto BUILD_ERR
+   goto BUILD_OK
 
 :BUILD_OK
    @CALL mdir.bat copytobin
-   goto EXIT
+   if "MAKEALL" == ""    goto EXIT
+   if "%1" == "CORE" goto EXIT
+   if "%1" == "core" goto EXIT
+   goto DLL
 
 :BUILD_ERR
    IF EXIST make_b32.log notepad make_b32.log
    goto EXIT
 
+rem=============================================================================
+:DLL
+rem=============================================================================
+rem
+rem We use HB_MT_DIR envar for DLL object folder here
+rem
+   @CALL mdir.bat dllcreate
+   SET HB_MT=
+   SET HB_MT_DIR=\dll
+   make -fmakefile.bc %2 %3 >dll_b32.log
+   if errorlevel 1 goto DLL_ERR
+   goto DLL_OK
+
+:DLL_OK
+   @CALL mdir.bat dllcopy
+   SET __BLD__=DLL_BLD
+   IF "MAKEALL" == ""   goto EXIT
+   IF "%1" == "DLL" goto EXIT
+   IF "%1" == "dll" goto EXIT
+   goto CONTRIBS
+
+:DLL_ERR
+   if exist dll_b32.log notepad dll_b32.log
+   goto EXIT
+
+rem=============================================================================
+:CONTRIBS
+rem=============================================================================
+   @CALL MDIR.BAT
+   SET __BLD__=CONTRIB_BLD
+   SET HB_MT=
+   SET HB_MT_DIR=
+   make -s -l -fmakefile.bc %2 %3 >cont_b32.log
+   if errorlevel 1 goto CONTRIBS_ERR
+
+   REM SET HB_MT=mt
+   REM SET HB_MT_DIR=\mt
+   REM make -s -l -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 >>cont_b32.log
+   REM if errorlevel 1 goto CONTRIBS_ERR
+
+:CONTRIBS_OK
+   @CALL mdir.bat copycontrib
+   goto EXIT
+
+:CONTRIBS_ERR
+   IF EXIST cont_b32.log notepad cont_b32.log
+   goto EXIT
+
+rem=============================================================================
+:BUILD_ALL
+rem=============================================================================
+   SET MAKEALL=yes
+   goto BUILD
+
+rem=============================================================================
+:SYNTAX
+rem=============================================================================
+   ECHO.Syntax:
+   ECHO. make_b32 core    : Build xHarbour CORE files
+   ECHO. make_b32 dll     : Build xHarbour DLL
+   ECHO. make_b32 contrib : Build CONTRIB Libraries
+   ECHO. make_b32 all     : Build CORE, DLL and CONTRIB
+   ECHO. make_b32 clean   : Erase all files once built
+   goto EXIT
+
+rem=============================================================================
 :CLEAN
+rem=============================================================================
    @CALL mdir.bat clean
    IF EXIST make_b32.log DEL make_b32.log
+   @CALL mdir.bat dllclean
+   if exist dll_b32.log del dll_b32.log
+   @CALL mdir.bat cleancontrib
+   IF EXIST cont_b32.log DEL cont_b32.log
 
+rem=============================================================================
 :EXIT
-   SET CC_DIR=
-   SET BISON_DIR=
-   SET SUB_DIR=
-   SET HB_GT_LIB=
-   SET PATH=%_PATH%
-   SET _PATH=
-   SET LIBEXT=
-   SET OBJEXT=
-   SET DIR_SEP=
-   REM SET LIBPREFIX=
-   IF NOT "%HB_MT%"=="" SET HB_MT=
-   IF NOT "%HB_MT_DIR%"=="" SET HB_MT_DIR=
+rem=============================================================================
+   @CALL mdir.bat resetenvar

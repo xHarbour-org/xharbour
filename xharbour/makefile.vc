@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.216 2008/04/29 07:20:34 andijahja Exp $
+# $Id: makefile.vc,v 1.217 2008/04/29 08:55:52 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -8,6 +8,10 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
+
+#*******************************************************************************
+!if ("$(__BLD__)"=="CORE_BLD")
+#*******************************************************************************
 
 # Comment this line if use of LIBC* is preferred
 # USE_MSVCRT=1
@@ -105,8 +109,8 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
 
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
-LIB_CMD      =LIB /OUT:$@ $**
-LINK_CMD     =LINK /OUT:$@ $** $(LINKERFLAGS)
+LIB_CMD      =LIB /NOLOGO /OUT:$@ $**
+LINK_CMD     =LINK /NOLOGO /OUT:$@ $** $(LINKERFLAGS)
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
@@ -119,10 +123,9 @@ COMPILERLIBS=\
 	advapi32.lib\
 	winmm.lib\
 	mpr.lib
-
-EXE_LINK_CMD=$(LINK_CMD) $(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
-CMN_LINK_CMD=LINK /OUT:$@ $** $(LINKERFLAGS) $(COMMON_LIB) $(COMPILERLIBS)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
+EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
+CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Library dependencies and build rules
@@ -235,6 +238,277 @@ $(MISC_LIB) : $(MISC_LIB_OBJS)
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
 
+#*******************************************************************************
+!elseif ("$(__BLD__)"=="DLL_BLD")
+#*******************************************************************************
+
+# Comment this line if use of LIBC* is preferred
+# USE_MSVCRT=1
+
+# Comment this line if use of C-Mode is preferred
+CPLUSPLUS=1
+
+# Comment this line if ST mode is preferred
+DLL_MT=mt
+
+# Uncomment this line when including RDDADS
+# HB_RDDADS=1
+
+# Uncomment this line when including WVTGUI
+# HB_WVTGUI=1
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+#===============================================================================
+# RDDADS
+#===============================================================================
+!ifdef HB_RDDADS
+COMPILERLIBS=\
+	ace32.lib
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(RDDADS_LIB_OBJS)
+!endif
+
+#===============================================================================
+# WVTGUI
+#===============================================================================
+!ifdef HB_WVTGUI
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(WVTGUI_LIB_OBJS)
+!endif
+
+#===============================================================================
+# Compiler and 3rd Party libraries need to be linked
+#===============================================================================
+COMPILERLIBS=\
+	$(COMPILERLIBS)\
+	user32.lib\
+	advapi32.lib\
+	gdi32.lib\
+	winspool.lib\
+	ole32.lib\
+	oleaut32.lib\
+	ws2_32.lib\
+	mpr.lib\
+	winmm.lib
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+!if ("$(CPLUSPLUS)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -TP
+!endif
+!if ("$(DLL_MT)"=="mt")
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
+!if ("$(USE_MSVCRT)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -MD
+!else
+CLIBFLAGS=$(CLIBFLAGS) -MT
+!endif
+!endif
+
+INCLUDE_DIR =include
+
+DLLFLAGS=\
+	/OUT:$(HARBOUR_DLL)\
+	/DLL\
+	/IMPLIB:$(HARBOUR_DLL_LIB)\
+	/NOLOGO\
+	/LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR)\
+	/SUBSYSTEM:WINDOWS\
+	/OPT:WIN98\
+	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
+
+EXEFLAGS=\
+	/NOLOGO /LIBPATH:$(CC_DIR)\LIB\
+	/LIBPATH:$(LIB_DIR)\
+	/OPT:WIN98 /SUBSYSTEM:CONSOLE
+
+CLIBFLAGS   =$(CLIBFLAGS) -c -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+
+CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
+HB_CMD     =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+BISON_CMD1 =bison -v -d $** -o$@
+BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
+DLL_LINK_CMD=LINK $(DLLFLAGS)
+DLLEXE_LINK_CMD=LINK $(EXEFLAGS) /OUT:$@ $** $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+
+#===============================================================================
+# The Project
+#===============================================================================
+ALL: $(DLL_PROJECT)
+
+#===============================================================================
+# HARBOUR.DLL rules
+#===============================================================================
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	$(DLL_LINK_CMD)
+
+#*******************************************************************************
+!elseif ("$(__BLD__)"=="CONTRIB_BLD")
+#*******************************************************************************
+# Comment this line if use of LIBC* is preferred
+# USE_MSVCRT=1
+
+# Comment this line if use of C-Mode is preferred
+CPLUSPLUS=1
+
+# Uncomment this section if you have want to build the libraries.
+# HB_GTWVW=1
+# HB_FIREBIRD=1
+# HB_MYSQL=1
+# HB_PGSQL=1
+# HB_FREEIMAGE=1
+# HB_WHAT32=1
+HB_XWT=1
+
+HB_ZIP=1
+
+#===============================================================================
+# Macro Definitions
+#===============================================================================
+!include common.mak
+
+!ifdef HB_FREEIMAGE
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
+!endif
+
+!ifdef HB_ZIP
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBZIP_LIB)
+!endif
+
+!ifdef HB_XWT
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
+!endif
+
+!ifdef HB_WHAT32
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
+!endif
+
+!ifdef HB_GTWVW
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVW_LIB)
+!endif
+
+!ifdef HB_FIREBIRD
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB)
+!endif
+
+!ifdef HB_MYSQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB)
+!endif
+
+!ifdef HB_PGSQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
+!endif
+
+ALL: $(CONTRIB_PROJECT)
+
+#===============================================================================
+# C compiler definition and C flags. These should never have to change.
+#===============================================================================
+
+#===============================================================================
+# Append your own build flags here
+#===============================================================================
+HARBOURFLAGS=$(HARBOURFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS)
+
+#===============================================================================
+# Option to use MSVCRT rather than LIBC*.LIB
+#===============================================================================
+INCLUDE_DIR =include
+INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(CC_DIR)\include
+!if ("$(USE_MSVCRT)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -MD
+!endif
+!if ("$(CPLUSPLUS)"=="1")
+CLIBFLAGS=$(CLIBFLAGS) -TP
+!endif
+CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
+CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+
+!if ("$(HB_THREAD_SUPPORT)"=="1")
+HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
+!if !("$(USE_MSVCRT)"=="1")
+CLIBFLAGS   =$(CLIBFLAGS) -MT
+!endif
+!endif
+
+CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
+HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
+CC_CMD_ZIP  =CL\
+	/Ogt2yb1p /GA /GB /Gs /W3 /nologo /GX /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
+	/DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
+	/Fp"$(OBJ_DIR)\hbzip.pch" /YX /Fd"$(OBJ_DIR)\\"\
+	/FD /c /Fo$@ $**
+LIB_CMD     =LIB /NOLOGO /OUT:$@ $**
+
+#===============================================================================
+# Library dependencies and build rules
+#===============================================================================
+$(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
+	$(LIB_CMD)
+
+$(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(XWT_LIB) : $(XWT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
+	$(LIB_CMD)
+
+$(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCC_LIB) : $(HBCC_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
+	$(LIB_CMD)
+
+$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+!endif
 #===============================================================================
 # Building rules of Object files
 #===============================================================================

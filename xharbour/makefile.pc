@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.70 2008/04/29 00:43:57 andijahja Exp $
+# $Id: makefile.pc,v 1.71 2008/04/29 07:20:33 andijahja Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -55,10 +55,9 @@ COMPILERLIBS=\
 	oleaut32.lib\
 	winmm.lib\
 	mpr.lib
-
-HRB_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(PP_LIB)
-CMN_LINK_CMD=$(LINK_CMD) $(COMMON_LIB) $(COMPILERLIBS)
-EXE_LINK_CMD=$(LINK_CMD) $(HARBOUR_LIBS) $(COMPILERLIBS)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
+EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
+CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Macro Definitions
