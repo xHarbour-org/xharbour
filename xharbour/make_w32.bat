@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_w32.bat,v 1.7 2008/04/29 22:14:09 andijahja Exp $
+rem $Id: make_w32.bat,v 1.8 2008/05/06 05:47:52 andijahja Exp $
 rem
 rem FILE: make_w32.bat
 rem BATCH FILE FOR OPENWATCOM
@@ -54,7 +54,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
 
-   wmake -h -ms -fmakefile.wc %2 %3 >make_w32.log
+   wmake -h -ms -f makefile.wc %2 %3 >make_w32.log
    if errorlevel 1 goto BUILD_ERR
 
    SET HB_MT=mt
