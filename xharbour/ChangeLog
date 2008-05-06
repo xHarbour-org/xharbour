@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6082 2008/05/06 05:47:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.6083 2008/05/06 11:10:36 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-06 18:20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  - makallbc.bat
+  - makallpc.bat
+  - makallvc.bat
+    ! removed, the functions have been replaced by the following commands:
+      make_b32 all (makallbc)
+      make_vc  all (makallpc)
+      make_pc  all (makallvc)
 
 2008-05-06 12:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbstack.h
