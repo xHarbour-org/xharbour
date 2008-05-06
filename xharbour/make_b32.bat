@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.36 2008/04/29 22:14:09 andijahja Exp $
+rem $Id: make_b32.bat,v 1.37 2008/05/06 05:47:52 andijahja Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -78,6 +78,7 @@ rem
 rem We use HB_MT_DIR envar for DLL object folder here
 rem
    @CALL mdir.bat dllcreate
+   SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
    make -fmakefile.bc %2 %3 >dll_b32.log
@@ -86,7 +87,6 @@ rem
 
 :DLL_OK
    @CALL mdir.bat dllcopy
-   SET __BLD__=DLL_BLD
    IF "MAKEALL" == ""   goto EXIT
    IF "%1" == "DLL" goto EXIT
    IF "%1" == "dll" goto EXIT
