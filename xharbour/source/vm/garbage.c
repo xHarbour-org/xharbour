@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.94 2008/01/10 11:27:17 marchuet Exp $
+ * $Id: garbage.c,v 1.95 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,7 @@ BOOL hb_gc_bReleaseAll = FALSE;
 static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
 static ULONG s_uAllocated = 0;
+static ULONG s_uAllocatedCnt = 0;
 
 #ifdef GC_RECYCLE
    #define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
@@ -184,6 +185,7 @@ HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       s_uAllocated++;
+      s_uAllocatedCnt++;
       hb_gcLink( &s_pCurrBlock, pAlloc );
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
@@ -268,6 +270,7 @@ HB_EXPORT void hb_gcFree( void *pBlock )
          if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
             s_uAllocated--;
+            s_uAllocatedCnt--;
             hb_gcUnlink( &s_pCurrBlock, pAlloc );
             HB_GARBAGE_FREE( pAlloc );
          }
@@ -938,5 +941,11 @@ HB_FUNC( HB_GCSTEP )
 HB_FUNC( HB_GCALL )
 {
    hb_gcCollectAll( hb_parl( 1 ) );
+}
+
+HB_FUNC( HB_GCALLOCATED )
+{
+   HB_THREAD_STUB
+   hb_retnl( s_uAllocatedCnt );
 }
 

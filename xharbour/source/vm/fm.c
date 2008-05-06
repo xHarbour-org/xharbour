@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.88 2008/03/27 10:26:44 likewolf Exp $
+ * $Id: fm.c,v 1.89 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -140,8 +140,8 @@ typedef struct _HB_MEMINFO
 
 static LONG s_lMemoryBlocks = 0;      /* memory blocks used */
 static LONG s_lMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
-static LONG s_lMemoryMaxConsumed = 0; /* memory size consumed */
-static LONG s_lMemoryConsumed = 0;    /* memory max size consumed */
+static LONG s_lMemoryMaxConsumed = 0; /* memory max size consumed */
+static LONG s_lMemoryConsumed = 0;    /* memory size consumed */
 static LONG s_lAllocations = 0;
 static LONG s_lReAllocations = 0;
 static LONG s_lFreed = 0;
@@ -1272,11 +1272,11 @@ ULONG hb_xquery( USHORT uiMode )
       break;
 
    case HB_MEM_STACKITEMS: /* Harbour extension (Total items allocated for the stack)      */
-      ulResult = hb_stack_ready ? HB_VM_STACK.wItems : 0;
+      ulResult = hb_stack_ready ?  hb_stackTotalItems() : 0;
       break;
 
    case HB_MEM_STACK:      /* Harbour extension (Total memory size used by the stack [bytes]) */
-      ulResult = hb_stack_ready ? HB_VM_STACK.wItems * sizeof( HB_ITEM ) : 0;
+      ulResult = hb_stack_ready ?  hb_stackTotalItems() * sizeof( HB_ITEM ) : 0;
       break;
 
    case HB_MEM_STACK_TOP : /* Harbour extension (Total items currently on the stack)      */

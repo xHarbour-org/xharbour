@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6081 2008/05/05 20:10:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6082 2008/05/06 05:47:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-06 12:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbstack.h
+  * source\vm\estack.c
+  * source\vm\fm.c
+    * fixed comments
+    + Added hb_stackTotalItems() instead of use directly HB_VM_STACK.wItems
+
+  * source\vm\classes.c
+    + Added __Getmembers( oObject, nMsgList, nScope, nType ) to obtain an array of members object no duplicated.
+
+  * source\vm\extend.c
+  * source\vm\hvm.c
+    * Trace corrections.
+
+  * source\vm\garbage.c
+    + Added HB_GCALLOCATED() that returns, the number items allocated at GC.
+
 
 2008-05-06 12:50 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   - hrbdll.bc

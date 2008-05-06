@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.678 2008/04/30 16:47:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.679 2008/04/30 21:18:10 andijahja Exp $
  */
 
 /*
@@ -607,7 +607,7 @@ HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
    hb_memvarsInit();
 #endif
 
-   HB_TRACE( HB_TR_INFO, ("il18Init") );
+   HB_TRACE( HB_TR_INFO, ("il8nInit") );
    hb_i18nInit( NULL, NULL );  // try to open default language.
 
    HB_TRACE( HB_TR_INFO, ("SymbolInit_RT") );

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.64 2008/03/27 10:26:44 likewolf Exp $
+ * $Id: extend.c,v 1.65 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -1323,7 +1323,7 @@ HB_EXPORT void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
 
 HB_EXPORT void hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_storclenAdopt(%s, %lu, %d, ...)", szText, ulLen, iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.48 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbstack.h,v 1.49 2008/04/30 16:47:32 ronpinkas Exp $
  */
 
 /*
@@ -140,6 +140,7 @@ typedef struct
    #define hb_stackItemFromBase( n )   ( *( HB_VM_STACK.pBase + (int)(n) + 1 ) )
    #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
    #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 )
+   #define hb_stackTotalItems( )       ( HB_VM_STACK.wItems )   
    #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
    #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
@@ -202,6 +203,7 @@ typedef struct
    extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
    extern HB_EXPORT LONG        hb_stackTopOffset( void );
    extern HB_EXPORT LONG        hb_stackBaseOffset( void );
+   extern HB_EXPORT LONG        hb_stackTotalItems( void );   
    extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
    extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
    extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );

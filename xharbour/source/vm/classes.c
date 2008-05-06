@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.217 2008/04/16 20:05:51 ronpinkas Exp $
+ * $Id: classes.c,v 1.218 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -3517,6 +3517,68 @@ HB_FUNC( __CLASSSEL )
    }
 
    hb_itemReturnForward( &Return );
+}
+
+HB_FUNC( __GETMEMBERS )
+{
+   PHB_ITEM pReturn = hb_itemArrayNew( 0 );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
+   USHORT nParam = hb_parni( 2 );
+   USHORT uiScope = hb_parni( 3 );
+   USHORT uiType = hb_parni( 4 );
+   USHORT uiClass = hb_objClassH( pObject );
+
+   if( ( ! uiClass ) && HB_IS_BYREF( pObject ) )
+   {
+      PHB_ITEM pItemRef = hb_itemUnRef( pObject );
+
+      if( HB_IS_ARRAY( pItemRef ) )
+      {
+         uiClass = pItemRef->item.asArray.value->uiClass;
+      }
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      USHORT uiPos = 0;
+      USHORT uiAt = pClass->uiMethods;
+      PMETHOD pMeth = pClass->pMethods;
+      PHB_ITEM pItem = hb_itemNew( NULL );
+
+      hb_arraySize( pReturn, uiAt );
+
+      for( uiAt++; --uiAt; pMeth++ )
+      {
+         if( ( ( nParam == HB_MSGLISTALL ) ||
+               ( ( nParam == HB_MSGLISTCLASS ) &&
+                 ( ( pMeth->pFunction == hb___msgSetClsData ) ||
+                   ( pMeth->pFunction == hb___msgGetClsData ) ||
+                   ( pMeth->pFunction == hb___msgSetShrData ) ||
+                   ( pMeth->pFunction == hb___msgGetShrData ) )
+               ) ||
+               ( ( nParam == HB_MSGLISTPURE ) &&
+                 ( ( ! ( pMeth->pFunction == hb___msgSetClsData ) ) &&
+                   ( ! ( pMeth->pFunction == hb___msgGetClsData ) ) &&
+                   ( ! ( pMeth->pFunction == hb___msgSetShrData ) ) &&
+                   ( ! ( pMeth->pFunction == hb___msgGetShrData ) ) )
+               )
+             ) &&
+             ( uiScope == 0 || pMeth->uiScope & uiScope ) &&
+             ( uiType == 0 || pMeth->uiType == uiType ) &&
+             pMeth->pMessage->pSymbol->szName[0] != '_'
+           )
+         {
+            hb_arraySetForward( pReturn, ++uiPos, hb_itemPutC( pItem, pMeth->pMessage->pSymbol->szName ) );
+         }
+      }
+
+      hb_itemRelease( pItem );
+
+      hb_arraySize( pReturn, uiPos );
+   }
+
+   hb_itemRelease( hb_itemReturnForward( pReturn ) );
 }
 
 /* to be used from Classes ERROR HANDLER method */

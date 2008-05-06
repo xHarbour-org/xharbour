@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.96 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: estack.c,v 1.97 2008/04/30 16:47:34 ronpinkas Exp $
  */
 
 /*
@@ -402,6 +402,13 @@ HB_EXPORT LONG hb_stackBaseOffset( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
+}
+
+#undef hb_stackTotalItems
+LONG hb_stackTotalItems( void )
+{
+   HB_THREAD_STUB
+   return HB_VM_STACK.wItems;
 }
 
 #undef hb_stackItemBasePtr
