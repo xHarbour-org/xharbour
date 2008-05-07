@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: pcre_internal.h,v 1.10 2008/05/07 21:59:19 andijahja Exp $
  */
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
@@ -559,7 +559,10 @@ typedef int BOOL;
 #endif
 
 #define FALSE   0
+
+#ifndef TRUE
 #define TRUE    1
+#endif
 
 /* Escape items that are just an encoding of a particular data value. */
 

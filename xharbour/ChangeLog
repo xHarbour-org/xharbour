@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6086 2008/05/07 14:01:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6087 2008/05/07 21:59:19 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-08 05:25 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rtl/pcre/pcre_internal.h
+    ! missing condition on TRUE definition
 
 2008-05-08 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/pcre/config.h
