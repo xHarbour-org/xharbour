@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: pcre_valid_utf8.c,v 1.7 2008/05/07 21:59:19 andijahja Exp $
  */
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
@@ -155,6 +155,9 @@ for (p = string; length-- > 0; p++)
     if ((*(++p) & 0xc0) != 0x80) return p - string;
     }
   }
+#else
+(void)string;
+(void)length;
 #endif
 
 return -1;

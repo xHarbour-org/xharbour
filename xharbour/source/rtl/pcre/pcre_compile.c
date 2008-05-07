@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: pcre_compile.c,v 1.7 2008/05/07 21:59:19 andijahja Exp $
  */
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
@@ -1377,6 +1377,9 @@ find_bracket(const uschar *code, BOOL utf8, int number)
 for (;;)
   {
   register int c = *code;
+  #ifndef SUPPORT_UTF8
+  (void)utf8;
+  #endif
   if (c == OP_END) return NULL;
 
   /* XCLASS is used for classes that cannot be represented just by a bit
@@ -1475,6 +1478,9 @@ Returns:      pointer to the opcode for OP_RECURSE, or NULL if not found
 static const uschar *
 find_recurse(const uschar *code, BOOL utf8)
 {
+#ifndef SUPPORT_UTF8
+(void)utf8;
+#endif
 for (;;)
   {
   register int c = *code;
@@ -2064,6 +2070,9 @@ check_auto_possessive(int op_code, int item, BOOL utf8, uschar *utf8_char,
 {
 int next;
 
+#ifndef SUPPORT_UTF8
+(void)utf8_char;
+#endif
 /* Skip whitespace and comments in extended mode */
 
 if ((options & PCRE_EXTENDED) != 0)

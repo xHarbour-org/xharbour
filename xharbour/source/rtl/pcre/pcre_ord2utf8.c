@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: pcre_ord2utf8.c,v 1.7 2008/05/07 21:59:19 andijahja Exp $
  */
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
@@ -79,6 +79,8 @@ for (j = i; j > 0; j--)
 *buffer = _pcre_utf8_table2[i] | cvalue;
 return i + 1;
 #else
+(void)cvalue;
+(void)buffer;
 return 0;   /* Keep compiler happy; this function won't ever be */
 #endif      /* called when SUPPORT_UTF8 is not defined. */
 }
