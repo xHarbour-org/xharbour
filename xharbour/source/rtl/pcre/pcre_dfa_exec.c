@@ -1,7 +1,6 @@
 /*
- * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
+ * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -86,11 +85,11 @@ centralize the loading of these characters. In the case of Type * etc, the
 small value. ***NOTE*** If the start of this table is modified, the two tables
 that follow must also be modified. */
 
-static uschar coptable[] = {
+static const uschar coptable[] = {
   0,                             /* End                                    */
   0, 0, 0, 0, 0,                 /* \A, \G, \K, \B, \b                     */
   0, 0, 0, 0, 0, 0,              /* \D, \d, \S, \s, \W, \w                 */
-  0, 0,                          /* Any, Anybyte                           */
+  0, 0, 0,                       /* Any, AllAny, Anybyte                   */
   0, 0, 0,                       /* NOTPROP, PROP, EXTUNI                  */
   0, 0, 0, 0, 0,                 /* \R, \H, \h, \V, \v                     */
   0, 0, 0, 0, 0,                 /* \Z, \z, Opt, ^, $                      */
@@ -134,26 +133,26 @@ static uschar coptable[] = {
   0,                             /* DEF                                    */
   0, 0,                          /* BRAZERO, BRAMINZERO                    */
   0, 0, 0, 0,                    /* PRUNE, SKIP, THEN, COMMIT              */
-  0, 0                           /* FAIL, ACCEPT                           */
+  0, 0, 0                        /* FAIL, ACCEPT, SKIPZERO                 */
 };
 
 /* These 2 tables allow for compact code for testing for \D, \d, \S, \s, \W,
 and \w */
 
-static uschar toptable1[] = {
+static const uschar toptable1[] = {
   0, 0, 0, 0, 0, 0,
   ctype_digit, ctype_digit,
   ctype_space, ctype_space,
   ctype_word,  ctype_word,
-  0                               /* OP_ANY */
+  0, 0                            /* OP_ANY, OP_ALLANY */
 };
 
-static uschar toptable2[] = {
+static const uschar toptable2[] = {
   0, 0, 0, 0, 0, 0,
   ctype_digit, 0,
   ctype_space, 0,
   ctype_word,  0,
-  1                               /* OP_ANY */
+  1, 1                            /* OP_ANY, OP_ALLANY */
 };
 
 
@@ -225,8 +224,8 @@ Arguments:
   rlevel            function call recursion level
   recursing         regex recursive call level
 
-Returns:            > 0 =>
-                    = 0 =>
+Returns:            > 0 => number of match offset pairs placed in offsets
+                    = 0 => offsets overflowed; longest matches are present
                      -1 => failed to match
                    < -1 => some kind of unexpected problem
 
@@ -696,6 +695,13 @@ for (;;)
       break;
 
       /*-----------------------------------------------------------------*/
+      case OP_SKIPZERO:
+      code += 1 + GET(code, 2);
+      while (*code == OP_ALT) code += GET(code, 1);
+      ADD_ACTIVE(code - start_code + 1 + LINK_SIZE, 0);
+      break;
+
+      /*-----------------------------------------------------------------*/
       case OP_CIRC:
       if ((ptr == start_subject && (md->moptions & PCRE_NOTBOL) == 0) ||
           ((ims & PCRE_MULTILINE) != 0 &&
@@ -734,7 +740,13 @@ for (;;)
 
       /*-----------------------------------------------------------------*/
       case OP_ANY:
-      if (clen > 0 && ((ims & PCRE_DOTALL) != 0 || !IS_NEWLINE(ptr)))
+      if (clen > 0 && !IS_NEWLINE(ptr))
+        { ADD_NEW(state_offset + 1, 0); }
+      break;
+
+      /*-----------------------------------------------------------------*/
+      case OP_ALLANY:
+      if (clen > 0)
         { ADD_NEW(state_offset + 1, 0); }
       break;
 
@@ -854,8 +866,8 @@ for (;;)
 /* ========================================================================== */
       /* These opcodes likewise inspect the subject character, but have an
       argument that is not a data character. It is one of these opcodes:
-      OP_ANY, OP_DIGIT, OP_NOT_DIGIT, OP_WHITESPACE, OP_NOT_SPACE, OP_WORDCHAR,
-      OP_NOT_WORDCHAR. The value is loaded into d. */
+      OP_ANY, OP_ALLANY, OP_DIGIT, OP_NOT_DIGIT, OP_WHITESPACE, OP_NOT_SPACE,
+      OP_WORDCHAR, OP_NOT_WORDCHAR. The value is loaded into d. */
 
       case OP_TYPEPLUS:
       case OP_TYPEMINPLUS:
@@ -866,10 +878,7 @@ for (;;)
         {
         if ((c >= 256 && d != OP_DIGIT && d != OP_WHITESPACE && d != OP_WORDCHAR) ||
             (c < 256 &&
-              (d != OP_ANY ||
-               (ims & PCRE_DOTALL) != 0 ||
-               !IS_NEWLINE(ptr)
-              ) &&
+              (d != OP_ANY || !IS_NEWLINE(ptr)) &&
               ((ctypes[c] & toptable1[d]) ^ toptable2[d]) != 0))
           {
           if (count > 0 && codevalue == OP_TYPEPOSPLUS)
@@ -892,10 +901,7 @@ for (;;)
         {
         if ((c >= 256 && d != OP_DIGIT && d != OP_WHITESPACE && d != OP_WORDCHAR) ||
             (c < 256 &&
-              (d != OP_ANY ||
-               (ims & PCRE_DOTALL) != 0 ||
-               !IS_NEWLINE(ptr)
-              ) &&
+              (d != OP_ANY || !IS_NEWLINE(ptr)) &&
               ((ctypes[c] & toptable1[d]) ^ toptable2[d]) != 0))
           {
           if (codevalue == OP_TYPEPOSQUERY)
@@ -917,10 +923,7 @@ for (;;)
         {
         if ((c >= 256 && d != OP_DIGIT && d != OP_WHITESPACE && d != OP_WORDCHAR) ||
             (c < 256 &&
-              (d != OP_ANY ||
-               (ims & PCRE_DOTALL) != 0 ||
-               !IS_NEWLINE(ptr)
-              ) &&
+              (d != OP_ANY || !IS_NEWLINE(ptr)) &&
               ((ctypes[c] & toptable1[d]) ^ toptable2[d]) != 0))
           {
           if (codevalue == OP_TYPEPOSSTAR)
@@ -940,10 +943,7 @@ for (;;)
         {
         if ((c >= 256 && d != OP_DIGIT && d != OP_WHITESPACE && d != OP_WORDCHAR) ||
             (c < 256 &&
-              (d != OP_ANY ||
-               (ims & PCRE_DOTALL) != 0 ||
-               !IS_NEWLINE(ptr)
-              ) &&
+              (d != OP_ANY || !IS_NEWLINE(ptr)) &&
               ((ctypes[c] & toptable1[d]) ^ toptable2[d]) != 0))
           {
           if (++count >= GET2(code, 1))
@@ -964,10 +964,7 @@ for (;;)
         {
         if ((c >= 256 && d != OP_DIGIT && d != OP_WHITESPACE && d != OP_WORDCHAR) ||
             (c < 256 &&
-              (d != OP_ANY ||
-               (ims & PCRE_DOTALL) != 0 ||
-               !IS_NEWLINE(ptr)
-              ) &&
+              (d != OP_ANY || !IS_NEWLINE(ptr)) &&
               ((ctypes[c] & toptable1[d]) ^ toptable2[d]) != 0))
           {
           if (codevalue == OP_TYPEPOSUPTO)
@@ -2164,7 +2161,12 @@ for (;;)
 
 /* ========================================================================== */
       /* These are the opcodes for fancy brackets of various kinds. We have
-      to use recursion in order to handle them. */
+      to use recursion in order to handle them. The "always failing" assersion
+      (?!) is optimised when compiling to OP_FAIL, so we have to support that,
+      though the other "backtracking verbs" are not supported. */
+
+      case OP_FAIL:
+      break;
 
       case OP_ASSERT:
       case OP_ASSERT_NOT:

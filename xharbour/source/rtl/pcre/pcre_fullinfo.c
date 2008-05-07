@@ -1,7 +1,6 @@
 /*
- * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
+ * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/

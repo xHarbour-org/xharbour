@@ -1,7 +1,6 @@
 /*
- * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
+ * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
  */
-
 /* This source module is automatically generated from the Unicode
 property table. See ucpinternal.h for a description of the layout.
 This version was made from the Unicode 5.0.0 tables. */

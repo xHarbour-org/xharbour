@@ -1,7 +1,6 @@
 /*
- * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
+ * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
  */
-
 /*************************************************
 *       Perl-Compatible Regular Expressions      *
 *************************************************/
@@ -61,9 +60,12 @@ extern "C" {
 #define REG_NOTBOL    0x0004
 #define REG_NOTEOL    0x0008
 #define REG_DOTALL    0x0010   /* NOT defined by POSIX. */
+#if 0
 #define REG_STARTEND  0x0010   /* Added by Ron Pinkas used only in matcher */
+#endif
 #define REG_NOSUB     0x0020
 #define REG_UTF8      0x0040   /* NOT defined by POSIX. */
+#define REG_STARTEND  0x0080   /* BSD feature: pass subject string by so,eo */
 
 /* This is not used by PCRE, but by defining it we make it easier
 to slot PCRE into existing programs that make POSIX calls. */

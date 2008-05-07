@@ -1,7 +1,6 @@
 /*
- * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
+ * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -128,7 +127,8 @@ static const int eint[] = {
   REG_BADPAT,  /* (?+ or (?- must be followed by a non-zero number */
   REG_BADPAT,  /* number is too big */
   REG_BADPAT,  /* subpattern name expected */
-  REG_BADPAT   /* digit expected after (?+ */
+  REG_BADPAT,  /* digit expected after (?+ */
+  REG_BADPAT   /* ] is an invalid data character in JavaScript compatibility mode */
 };
 
 /* Table of texts corresponding to POSIX error codes */
@@ -265,7 +265,7 @@ PCREPOSIX_EXP_DEFN int
 regexec(const regex_t *preg, const char *string, size_t nmatch,
   regmatch_t pmatch[], int eflags)
 {
-int rc;
+int rc, so, eo;
 int options = 0;
 int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
@@ -297,6 +297,22 @@ else if (nmatch > 0)
     if (ovector == NULL) return REG_ESPACE;
     allocated_ovector = TRUE;
     }
+  }
+
+/* REG_STARTEND is a BSD extension, to allow for non-NUL-terminated strings.
+The man page from OS X says "REG_STARTEND affects only the location of the
+string, not how it is matched". That is why the "so" value is used to bump the
+start location rather than being passed as a PCRE "starting offset". */
+
+if ((eflags & REG_STARTEND) != 0)
+  {
+  so = pmatch[0].rm_so;
+  eo = pmatch[0].rm_eo;
+  }
+else
+  {
+  so = 0;
+  eo = strlen(string);
   }
 
 /* Ron Pinkas added POSIX REG_STARTEND support.

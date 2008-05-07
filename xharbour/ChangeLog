@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6085 2008/05/07 04:58:31 andijahja Exp $
+ * $Id: ChangeLog,v 1.6086 2008/05/07 14:01:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-08 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rtl/pcre/config.h
+  * source/rtl/pcre/config.h.generic
+  * source/rtl/pcre/pcre.h
+  * source/rtl/pcre/pcre.h.generic
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/pcre_chartables.c
+  * source/rtl/pcre/pcre_chartables.c.dist
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_newline.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcre_printint.src
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_ucp_searchfuncs.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_xclass.c
+  * source/rtl/pcre/ucp.h
+  * source/rtl/pcre/ucpinternal.h
+  * source/rtl/pcre/ucptable.h
+    ! updated to version 7.7
 
 2008-05-07 09:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/fastitem.c
