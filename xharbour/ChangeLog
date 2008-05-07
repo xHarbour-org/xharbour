@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6084 2008/05/06 11:24:42 andijahja Exp $
+ * $Id: ChangeLog,v 1.6085 2008/05/07 04:58:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-07 09:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/fastitem.c
+    + Added HB_IT_SYMBOL support to hb_itemCopy()
 
 2008-05-07 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * make_b32.bat
@@ -92,7 +96,7 @@
     ! merge makefiles per compiler except PellesC
     ! some refinements
 
-2008-05-30 15:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-05-05 15:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * dll_vc.bat
   * make_vc.bat
     * Additional refinments related to EnvVars

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.114 2008/03/27 10:26:44 likewolf Exp $
+ * $Id: fastitem.c,v 1.115 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -472,6 +472,15 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          {
              hb_gcIncRef( (void *) pSource->item.asPointer.value );
          }
+      }
+      else if( HB_IS_SYMBOL( pSource ) )
+      {
+         PHB_SYMBCARGO pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
+
+         assert( pSource->item.asSymbol.pCargo );
+         memcpy( pSymCargo, (void *) pSource->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
+
+         pDest->item.asSymbol.pCargo = pSymCargo;
       }
       else
       {
