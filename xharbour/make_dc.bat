@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.7 2008/04/29 22:14:09 andijahja Exp $
+rem $Id: make_dc.bat,v 1.8 2008/05/06 05:47:52 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -36,87 +36,111 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == ""        goto SYNTAX
-if "%1" == "clean"   goto CLEAN
-if "%1" == "CLEAN"   goto CLEAN
-if "%1" == "CORE"    goto BUILD
-if "%1" == "core"    goto BUILD
-if "%1" == "DLL"     goto DLL
-if "%1" == "dll"     goto DLL
-if "%1" == "CONTRIB" goto CONTRIBS
-if "%1" == "contrib" goto CONTRIBS
-if "%1" == "ALL"     goto BUILD_ALL
-if "%1" == "all"     goto BUILD_ALL
+if "%1"=="/?"      goto SYNTAX
+if "%1"=="-?"      goto SYNTAX
+if "%1"=="?"       goto SYNTAX
+if "%1"==""        goto BUILD
+if "%1"=="NOMT"    goto BUILD
+if "%1"=="nomt"    goto BUILD
+if "%1"=="clean"   goto CLEAN
+if "%1"=="CLEAN"   goto CLEAN
+if "%1"=="CORE"    goto BUILD
+if "%1"=="core"    goto BUILD
+if "%1"=="DLL"     goto DLL
+if "%1"=="dll"     goto DLL
+if "%1"=="CONTRIB" goto CONTRIBS
+if "%1"=="contrib" goto CONTRIBS
+if "%1"=="ALL"     goto BUILD_ALL
+if "%1"=="all"     goto BUILD_ALL
 goto SYNTAX
 
 rem=============================================================================
 :BUILD
 rem=============================================================================
-   @CALL MDIR.BAT
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   %MAKE_EXE% -s -l -fmakefile.dc %2 %3 >make_dc.log
+   @CALL MDIR.BAT
+   %MAKE_EXE% -s -l -fmakefile.dc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
+rem=============================================================================
 :BUILD_OK
+rem=============================================================================
    @CALL mdir.bat copytobin
-   if "MAKEALL" == ""    goto EXIT
-   if "%1" == "CORE" goto EXIT
-   if "%1" == "core" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   if "%MAKEALL%"=="" goto EXIT
+   if "%1"=="CORE" @ECHO ****** End of Job *****
+   if "%1"=="core" @ECHO ****** End of Job *****
+   if "%1"=="CORE" goto EXIT
+   if "%1"=="core" goto EXIT
    goto DLL
 
+rem=============================================================================
 :BUILD_ERR
-   IF EXIST make_dc.log notepad make_dc.log
+rem=============================================================================
+   IF EXIST make_%SUB_DIR%.log notepad make_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :DLL
 rem=============================================================================
-rem
-rem We use HB_MT_DIR envar for DLL object folder here
-rem
+   rem
+   rem We use HB_MT_DIR envar for DLL object folder here
+   rem
    ECHO LIBRARY "harbour.dll" > dmcdll.def
    ECHO EXETYPE NT >> dmcdll.def
    ECHO SUBSYSTEM CONSOLE >> dmcdll.def
    ECHO CODE SHARED EXECUTE >> dmcdll.def
    ECHO DATA WRITE >> dmcdll.def
-   @CALL mdir.bat dllcreate
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
-   %MAKE_EXE% -s -fmakefile.dc %2 %3 >dll_dc.log
+   @CALL mdir.bat dllcreate
+   %MAKE_EXE% -s -fmakefile.dc  >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
+rem=============================================================================
 :DLL_OK
+rem=============================================================================
    @CALL mdir.bat dllcopy
-   IF "MAKEALL" == ""   goto EXIT
-   IF "%1" == "DLL" goto EXIT
-   IF "%1" == "dll" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   IF "%MAKEALL%"=="" goto EXIT
+   IF "%1"=="DLL" @ECHO ****** End of Job *****
+   IF "%1"=="dll" @ECHO ****** End of Job *****
+   IF "%1"=="DLL" goto EXIT
+   IF "%1"=="dll" goto EXIT
    goto CONTRIBS
 
+rem=============================================================================
 :DLL_ERR
-   if exist dll_dc.log notepad dll_dc.log
+rem=============================================================================
+   if exist dll_%SUB_DIR%.log notepad dll_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :CONTRIBS
 rem=============================================================================
-   @CALL MDIR.BAT
    SET __BLD__=CONTRIB_BLD
    SET HB_MT_DIR=
    SET HB_MT=
-   %MAKE_EXE% -s -l -fmakefile.dc %2 %3 >cont_dc.log
+   @CALL MDIR.BAT
+   %MAKE_EXE% -s -l -fmakefile.dc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
+rem=============================================================================
 :CONTRIBS_OK
+rem=============================================================================
    @CALL mdir.bat copycontrib
+   @ECHO ****** End of Job *****
    goto EXIT
 
+rem=============================================================================
 :CONTRIBS_ERR
-   IF EXIST cont_dc.log notepad cont_dc.log
+rem=============================================================================
+   IF EXIST cont_%SUB_DIR%.log notepad cont_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
@@ -128,23 +152,22 @@ rem=============================================================================
 rem=============================================================================
 :SYNTAX
 rem=============================================================================
-   ECHO.Syntax:
-   ECHO. make_dc core    : Build xHarbour CORE files
-   ECHO. make_dc dll     : Build xHarbour DLL
-   ECHO. make_dc contrib : Build CONTRIB Libraries
-   ECHO. make_dc all     : Build CORE, DLL and CONTRIB
-   ECHO. make_dc clean   : Erase all files once built
+   ECHO.
+   ECHO. ----------------------------------
+   ECHO. Make Utility for DigitalMars C/C++
+   ECHO. ----------------------------------
+   @CALL mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
-   IF EXIST make_dc.log DEL make_dc.log
-   @CALL mdir.bat dllclean
-   if exist dll_dc.log del dll_dc.log
-   @CALL mdir.bat cleancontrib
-   IF EXIST cont_dc.log DEL cont_dc.log
+   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
+   IF "%2"=="nobuild" @ECHO ****** End of Job *****
+   IF "%2"=="NOBUILD" goto EXIT
+   IF "%2"=="nobuild" goto EXIT
+   goto BUILD_ALL
 
 rem=============================================================================
 :EXIT

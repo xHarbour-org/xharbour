@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6083 2008/05/06 11:10:36 marchuet Exp $
+ * $Id: ChangeLog,v 1.6084 2008/05/06 11:24:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-07 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * make_b32.bat
+  * make_dc.bat
+  * make_gc.bat
+  * make_pc.bat
+  * make_vc.bat
+  * make_w32.bat
+  * make.bat
+    ! missing delimiters: "MAKEALL" -> "%MAKEALL%"
+    ! default build directed to Core mode
+    ! add switch "/?" for syntax info
 
 2008-05-06 18:20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   - makallbc.bat

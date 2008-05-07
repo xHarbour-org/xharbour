@@ -1,9 +1,9 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.21 2008/05/05 20:10:01 ronpinkas Exp $
+rem $Id: make_vc.bat,v 1.22 2008/05/06 05:47:52 andijahja Exp $
 rem
-rem FILE: nake_vc.bat
+rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
 rem
 rem This is Generic File, do not change it. If you should require your own build
@@ -29,94 +29,121 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == ""        goto SYNTAX
-if "%1" == "clean"   goto CLEAN
-if "%1" == "CLEAN"   goto CLEAN
-if "%1" == "CORE"    goto BUILD
-if "%1" == "core"    goto BUILD
-if "%1" == "DLL"     goto DLL
-if "%1" == "dll"     goto DLL
-if "%1" == "CONTRIB" goto CONTRIBS
-if "%1" == "contrib" goto CONTRIBS
-if "%1" == "ALL"     goto BUILD_ALL
-if "%1" == "all"     goto BUILD_ALL
+if "%1"=="/?"      goto SYNTAX
+if "%1"=="-?"      goto SYNTAX
+if "%1"=="?"       goto SYNTAX
+if "%1"==""        goto BUILD
+if "%1"=="NOMT"    goto BUILD
+if "%1"=="nomt"    goto BUILD
+if "%1"=="clean"   goto CLEAN
+if "%1"=="CLEAN"   goto CLEAN
+if "%1"=="CORE"    goto BUILD
+if "%1"=="core"    goto BUILD
+if "%1"=="DLL"     goto DLL
+if "%1"=="dll"     goto DLL
+if "%1"=="CONTRIB" goto CONTRIBS
+if "%1"=="contrib" goto CONTRIBS
+if "%1"=="ALL"     goto BUILD_ALL
+if "%1"=="all"     goto BUILD_ALL
 goto SYNTAX
 
 rem=============================================================================
 :BUILD
 rem=============================================================================
-   @CALL MDIR.BAT
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   nmake  /NOLOGO -fmakefile.vc %2 %3 >make_vc.log
+   @CALL MDIR.BAT
+   nmake /NOLOGO -fmakefile.vc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
+   if "%1"=="NOMT" goto BUILD_OK
+   if "%1"=="nomt" goto BUILD_OK
+   if "%2"=="NOMT" goto BUILD_OK
+   if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   nmake /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc %2 %3 >>make_vc.log
+   @CALL MDIR.BAT
+   nmake /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
+rem=============================================================================
 :BUILD_OK
+rem=============================================================================
    @CALL mdir.bat copytobin
-   if "MAKEALL" == ""    goto EXIT
-   if "%1" == "CORE" goto EXIT
-   if "%1" == "core" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   if "%MAKEALL%"=="" goto EXIT
+   if "%1"=="CORE" @ECHO ****** End of Job *****
+   if "%1"=="core" @ECHO ****** End of Job *****
+   if "%1"=="CORE" goto EXIT
+   if "%1"=="core" goto EXIT
    goto DLL
 
+rem=============================================================================
 :BUILD_ERR
-   IF EXIST make_vc.log notepad make_vc.log
+rem=============================================================================
+   IF EXIST make_%SUB_DIR%.log notepad make_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :DLL
 rem=============================================================================
-rem
-rem We use HB_MT_DIR envar for DLL object folder here
-rem
-   @CALL mdir.bat dllcreate
+   rem
+   rem We use HB_MT_DIR envar for DLL object folder here
+   rem
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
-   nmake /NOLOGO -f makefile.vc %2 %3 >dll_vc.log
+   @CALL mdir.bat dllcreate
+   nmake /NOLOGO -f makefile.vc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
+rem=============================================================================
 :DLL_OK
+rem=============================================================================
    @CALL mdir.bat dllcopy
-   IF "MAKEALL" == ""   goto EXIT
-   IF "%1" == "DLL" goto EXIT
-   IF "%1" == "dll" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   IF "%MAKEALL%"=="" goto EXIT
+   IF "%1"=="DLL" @ECHO ****** End of Job *****
+   IF "%1"=="dll" @ECHO ****** End of Job *****
+   IF "%1"=="DLL" goto EXIT
+   IF "%1"=="dll" goto EXIT
    goto CONTRIBS
 
+rem=============================================================================
 :DLL_ERR
-   if exist dll_vc.log notepad dll_vc.log
+rem=============================================================================
+   if exist dll_%SUB_DIR%.log notepad dll_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :CONTRIBS
 rem=============================================================================
-   @CALL MDIR.BAT
    SET __BLD__=CONTRIB_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   REM SET HB_MT=
-   REM SET HB_MT_DIR=
-   nmake /NOLOGO -f makefile.vc %2 %3 >cont_vc.log
+   @CALL MDIR.BAT
+   nmake /NOLOGO -f makefile.vc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=\mt
-   REM nmake  /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc %2 %3 >>cont_vc.log
+   REM nmake  /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc >>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto CONTRIBS_ERR
 
+rem=============================================================================
 :CONTRIBS_OK
+rem=============================================================================
    @CALL mdir.bat copycontrib
+   @ECHO ****** End of Job *****
    goto EXIT
 
+rem=============================================================================
 :CONTRIBS_ERR
-   IF EXIST cont_vc.log notepad cont_vc.log
+rem=============================================================================
+   IF EXIST cont_%SUB_DIR%.log notepad cont_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
@@ -128,23 +155,22 @@ rem=============================================================================
 rem=============================================================================
 :SYNTAX
 rem=============================================================================
-   ECHO.Syntax:
-   ECHO. make_vc core    : Build xHarbour CORE files
-   ECHO. make_vc dll     : Build xHarbour DLL
-   ECHO. make_vc contrib : Build CONTRIB Libraries
-   ECHO. make_vc all     : Build CORE, DLL and CONTRIB
-   ECHO. make_vc clean   : Erase all files once built
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. ---------------------------------------
+   @CALL mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
-   IF EXIST make_vc.log DEL make_vc.log
-   @CALL mdir.bat dllclean
-   if exist dll_vc.log del dll_vc.log
-   @CALL mdir.bat cleancontrib
-   IF EXIST cont_vc.log DEL cont_vc.log
+   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
+   IF "%2"=="nobuild" @ECHO ****** End of Job *****
+   IF "%2"=="NOBUILD" goto EXIT
+   IF "%2"=="nobuild" goto EXIT
+   goto BUILD_ALL
 
 rem=============================================================================
 :EXIT

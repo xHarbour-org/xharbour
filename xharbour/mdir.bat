@@ -1,6 +1,7 @@
+@ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.4 2008/04/30 13:20:31 andijahja Exp $
+rem $Id: mdir.bat,v 1.5 2008/05/06 05:47:58 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -8,40 +9,46 @@ rem WARNING : Do Not Call This Batch File Directly.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-if "%1" == "CLEAN"        goto REMOVE
-if "%1" == "clean"        goto REMOVE
-if "%1" == "DLLCLEAN"     goto REMOVEDLL
-if "%1" == "dllclean"     goto REMOVEDLL
-if "%1" == "DLLCREATE"    goto CREATEDLL
-if "%1" == "dllcreate"    goto CREATEDLL
-if "%1" == "DLLCOPY"      goto COPYDLL
-if "%1" == "dllcopy"      goto COPYDLL
-if "%1" == "COPYTOBIN"    goto COPYBIN
-if "%1" == "copytobin"    goto COPYBIN
-if "%1" == "COPYCONTRIB"  goto COPYCONTRIBLIBS
-if "%1" == "copycontrib"  goto COPYCONTRIBLIBS
-if "%1" == "CLEANCONTRIB" goto REMOVECONTRIB
-if "%1" == "cleancontrib" goto REMOVECONTRIB
-if "%1" == "resetenvar"   goto RESET_ENVAR
-if "%1" == "RESETENVAR"   goto RESET_ENVAR
+if "%1"=="CLEAN"       goto REMOVE
+if "%1"=="clean"       goto REMOVE
+if "%1"=="DLLCREATE"   goto CREATEDLL
+if "%1"=="dllcreate"   goto CREATEDLL
+if "%1"=="DLLCOPY"     goto COPYDLL
+if "%1"=="dllcopy"     goto COPYDLL
+if "%1"=="COPYTOBIN"   goto COPYBIN
+if "%1"=="copytobin"   goto COPYBIN
+if "%1"=="COPYCONTRIB" goto COPYCONTRIBLIBS
+if "%1"=="copycontrib" goto COPYCONTRIBLIBS
+if "%1"=="resetenvar"  goto RESET_ENVAR
+if "%1"=="RESETENVAR"  goto RESET_ENVAR
+if "%1"=="howto"       goto _SYNTAX
+if "%1"=="HOWTO"       goto _SYNTAX
 
 rem=============================================================================
 :CREATE
 rem=============================================================================
-if not exist obj                     md obj
-if not exist obj\%SUB_DIR%           md obj\%SUB_DIR%
-if not exist obj\%SUB_DIR%\mt        md obj\%SUB_DIR%\mt
+IF "%__BLD__%"=="CONTRIB_BLD" ECHO Creating Contrib Libraries ...
+IF "%__BLD__%"=="CONTRIB_BLD" goto _CORE
+IF "%HB_MT%"=="" ECHO Creating System Files (ST) ...
+IF "%HB_MT%"=="" goto _CORE
+ECHO Creating System Files (MT) ...
 
-if not exist lib                     md lib
-if not exist lib\%SUB_DIR%           md lib\%SUB_DIR%
+:_CORE
+if not exist obj               md obj
+if not exist obj\%SUB_DIR%     md obj\%SUB_DIR%
+if not exist obj\%SUB_DIR%\mt  md obj\%SUB_DIR%\mt
 
-if not exist bin                     md bin
-if not exist bin\%SUB_DIR%           md bin\%SUB_DIR%
+if not exist lib               md lib
+if not exist lib\%SUB_DIR%     md lib\%SUB_DIR%
+
+if not exist bin               md bin
+if not exist bin\%SUB_DIR%     md bin\%SUB_DIR%
 goto EXIT
 
 rem=============================================================================
 :CREATEDLL
 rem=============================================================================
+ECHO Creating DLL Files ...
 if not exist obj               md obj
 if not exist obj\%SUB_DIR%     md obj\%SUB_DIR%
 if not exist obj\%SUB_DIR%\dll md obj\%SUB_DIR%\dll
@@ -51,15 +58,21 @@ goto EXIT
 rem=============================================================================
 :COPYBIN
 rem=============================================================================
+ECHO System Files Succesfully Built ...
+ECHO Copying System Files to BIN and LIB Folders ...
 if exist bin\%SUB_DIR%\*.exe xcopy     bin\%SUB_DIR%\*.exe bin /D /Y > nul
 if exist lib\%SUB_DIR%\*%LIBEXT% xcopy lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
 if exist bin\%SUB_DIR%\*.tds xcopy     bin\%SUB_DIR%\*.tds bin /D /Y > nul
 if exist lib\%SUB_DIR%\*.bak del       lib\%SUB_DIR%\*.bak
+ECHO Done ...
+ECHO.
 goto EXIT
 
 rem=============================================================================
 :COPYDLL
 rem=============================================================================
+ECHO DLL Files Succesfully Built ...
+ECHO Copying DLL Files to BIN Folder ...
 if exist hdll.tmp del hdll.tmp
 if exist bin\%SUB_DIR%\harbour.lib     copy bin\%SUB_DIR%\harbour.lib     lib > nul
 if exist bin\%SUB_DIR%\harbour.dll     copy bin\%SUB_DIR%\harbour.dll     bin > nul
@@ -68,12 +81,15 @@ if exist bin\%SUB_DIR%\hbmakedll.exe   copy bin\%SUB_DIR%\hbmakedll.exe   bin > 
 if exist bin\%SUB_DIR%\hbrundll.exe    copy bin\%SUB_DIR%\hbrundll.exe    bin > nul
 if exist bin\%SUB_DIR%\hbtestdll.exe   copy bin\%SUB_DIR%\hbtestdll.exe   bin > nul
 if exist bin\%SUB_DIR%\xbscriptdll.exe copy bin\%SUB_DIR%\xbscriptdll.exe bin > nul
+ECHO Done ...
+ECHO.
 goto EXIT
 
 rem=============================================================================
 :COPYCONTRIBLIBS
 rem=============================================================================
-rem @CALL mdir.bat copycontrib
+ECHO Contrib Libraries Succesfully Built ...
+ECHO Copying Contrib Libraries to LIB Folder ...
 if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   lib >NUL
@@ -86,11 +102,14 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%     copy lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%     lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%wvtgui%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%wvtgui%LIBEXT%   lib >NUL
+ECHO Done ...
+ECHO.
 goto EXIT
 
 rem=============================================================================
 :REMOVE
 rem=============================================================================
+ECHO Removing System and Object Files ...
 if exist bin\harbour.exe    del bin\harbour.exe
 if exist bin\harbour.tds    del bin\harbour.tds
 if exist bin\harbour.map    del bin\harbour.map
@@ -317,11 +336,8 @@ if exist bin\%SUB_DIR%\hbtest%LIBEXT%                del bin\%SUB_DIR%\hbtest%LI
 if exist bin\%SUB_DIR%\hbtestMT%LIBEXT%              del bin\%SUB_DIR%\hbtestMT%LIBEXT%
 if exist bin\%SUB_DIR%\ppgen%LIBEXT%                 del bin\%SUB_DIR%\ppgen%LIBEXT%
 if exist bin\%SUB_DIR%\xbscript%LIBEXT%              del bin\%SUB_DIR%\xbscript%LIBEXT%
-goto EXIT
 
-rem=============================================================================
-:REMOVEDLL
-rem=============================================================================
+ECHO Removing DLL and Object Files ...
 if exist obj\%SUB_DIR%\dll\*%OBJEXT%                 del obj\%SUB_DIR%\dll\*%OBJEXT%
 if exist obj\%SUB_DIR%\dll\*.c                       del obj\%SUB_DIR%\dll\*.c
 if exist obj\%SUB_DIR%\dll\*.ppo                     del obj\%SUB_DIR%\dll\*.ppo
@@ -387,11 +403,8 @@ if exist bin\hbmakedll.exe                           del bin\hbmakedll.exe
 if exist bin\hbrundll.exe                            del bin\hbrundll.exe
 if exist bin\hbtestdll.exe                           del bin\hbtestdll.exe
 if exist bin\xbscriptdll.exe                         del bin\xbscriptdll.exe
-goto EXIT
 
-rem=============================================================================
-:REMOVECONTRIB
-rem=============================================================================
+ECHO Removing Contrib Libraries and Object Files ...
 if exist obj\%SUB_DIR%\*%OBJEXT%                    del obj\%SUB_DIR%\*%OBJEXT%
 if exist obj\%SUB_DIR%\mt\*%OBJEXT%                 del obj\%SUB_DIR%\mt\*%OBJEXT%
 if exist obj\%SUB_DIR%\*.ppo                        del obj\%SUB_DIR%\*.ppo
@@ -428,6 +441,33 @@ if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBE
 if exist lib\%LIBPREFIX%what32%LIBEXT%              del lib\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%LIBPREFIX%xwt%LIBEXT%                 del lib\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%LIBPREFIX%wvtgui%LIBEXT%              del lib\%LIBPREFIX%wvtgui%LIBEXT%
+
+IF EXIST make_%SUB_DIR%.log                         del make_%SUB_DIR%.log
+IF EXIST dll_%SUB_DIR%.log                          del dll_%SUB_DIR%.log
+IF EXIST cont_%SUB_DIR%.log                         del cont_%SUB_DIR%.log
+ECHO Done ...
+ECHO.
+goto EXIT
+
+rem=============================================================================
+:_SYNTAX
+rem=============================================================================
+ECHO. Syntax:    make_%SUB_DIR% [all, core, dll, contrib, clean] [nomt] [nobuild]
+ECHO.
+ECHO. Argument:
+ECHO.  default : build xHarbour CORE files
+ECHO.  core    : build xHarbour CORE files
+ECHO.  all     : build CORE, DLL and CONTRIB
+ECHO.  dll     : build xHarbour DLL
+ECHO.  contrib : build CONTRIB Libraries
+ECHO.  clean   : erase files once built and rebuild ALL
+ECHO.
+ECHO. Examples:
+ECHO.  make_%SUB_DIR%               : build ST and MT system files
+ECHO.  make_%SUB_DIR% nomt          : ST core only, don't build MT system files
+ECHO.  make_%SUB_DIR% clean nomt    : clean build, don't build MT system files
+ECHO.  make_%SUB_DIR% clean nobuild : clean only, don't build
+ECHO.
 goto EXIT
 
 rem=============================================================================
@@ -442,12 +482,13 @@ SET OBJEXT=
 SET DIR_SEP=
 SET PATH=%_PATH%
 
-IF NOT "%LIBPREFIX%" == "" SET LIBPREFIX=
-IF NOT "%_PATH%"     == "" SET _PATH=
-IF NOT "%HB_MT%"     == "" SET HB_MT=
-IF NOT "%HB_MT_DIR%" == "" SET HB_MT_DIR=
-IF NOT "%MAKEALL%"   == "" SET MAKEALL=
-IF NOT "%__BLD__%"   == "" SET MAKE_EXE=
+IF NOT "%LIBPREFIX%"=="" SET LIBPREFIX=
+IF NOT "%_PATH%"    =="" SET _PATH=
+IF NOT "%HB_MT%"    =="" SET HB_MT=
+IF NOT "%HB_MT_DIR%"=="" SET HB_MT_DIR=
+IF NOT "%MAKEALL%"  =="" SET MAKEALL=
+IF NOT "%MAKE_EXE%" =="" SET MAKE_EXE=
+IF NOT "%__BLD__%"  =="" SET __BLD__=
 
 rem=============================================================================
 :EXIT

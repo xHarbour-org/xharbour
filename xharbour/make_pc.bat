@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.25 2008/04/29 22:14:09 andijahja Exp $
+rem $Id: make_pc.bat,v 1.27 2008/05/06 05:47:52 andijahja Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -28,95 +28,127 @@ SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
 
-if "%1" == ""        goto SYNTAX
-if "%1" == "clean"   goto CLEAN
-if "%1" == "CLEAN"   goto CLEAN
-if "%1" == "CORE"    goto BUILD
-if "%1" == "core"    goto BUILD
-if "%1" == "DLL"     goto DLL
-if "%1" == "dll"     goto DLL
-if "%1" == "CONTRIB" goto CONTRIBS
-if "%1" == "contrib" goto CONTRIBS
-if "%1" == "ALL"     goto BUILD_ALL
-if "%1" == "all"     goto BUILD_ALL
+if "%1"=="/?"      goto SYNTAX
+if "%1"=="-?"      goto SYNTAX
+if "%1"=="?"       goto SYNTAX
+if "%1"==""        goto BUILD
+if "%1"=="NOMT"    goto BUILD
+if "%1"=="nomt"    goto BUILD
+if "%1"=="clean"   goto CLEAN
+if "%1"=="CLEAN"   goto CLEAN
+if "%1"=="CORE"    goto BUILD
+if "%1"=="core"    goto BUILD
+if "%1"=="DLL"     goto DLL
+if "%1"=="dll"     goto DLL
+if "%1"=="CONTRIB" goto CONTRIBS
+if "%1"=="contrib" goto CONTRIBS
+if "%1"=="ALL"     goto BUILD_ALL
+if "%1"=="all"     goto BUILD_ALL
 goto SYNTAX
 
 rem=============================================================================
 :BUILD
 rem=============================================================================
-   @CALL MDIR.BAT
+   SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
    SET __MT__=
    SET HB_MT_FLAGS=
    SET PROJECT=$(ST_PROJECT)
-   POMAKE /F makefile.pc %2 %3 >make_pc.log
+   @CALL MDIR.BAT
+   POMAKE /F makefile.pc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
+   if "%1"=="NOMT" goto BUILD_OK
+   if "%1"=="nomt" goto BUILD_OK
+   if "%2"=="NOMT" goto BUILD_OK
+   if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
    SET __MT__=-MT -DHB_THREAD_SUPPORT
    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
    SET PROJECT=$(MT_PROJECT)
-   POMAKE /F makefile.pc %2 %3 >>make_pc.log
+   @CALL MDIR.BAT
+   POMAKE /F makefile.pc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
+rem=============================================================================
 :BUILD_OK
+rem=============================================================================
    @CALL mdir.bat copytobin
-   if "MAKEALL" == "" goto EXIT
-   if "%1" == "CORE" goto EXIT
-   if "%1" == "core" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   if "%MAKEALL%"=="" goto EXIT
+   if "%1"=="CORE" @ECHO ****** End of Job *****
+   if "%1"=="core" @ECHO ****** End of Job *****
+   if "%1"=="CORE" goto EXIT
+   if "%1"=="core" goto EXIT
    goto DLL
 
+rem=============================================================================
 :BUILD_ERR
-   IF EXIST make_pc.log notepad make_pc.log
+rem=============================================================================
+   IF EXIST make_%SUB_DIR%.log notepad make_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :DLL
 rem=============================================================================
-rem
-rem We use HB_MT_DIR envar for DLL object folder here
-rem
-   @CALL mdir.bat dllcreate
+   rem
+   rem We use HB_MT_DIR envar for DLL object folder here
+   rem
+   SET __BLD__=DLL_BLD
    SET HB_MT=
    SET __MT__=
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
-   pomake /F hrbdll.pc %2 %3 >dll_pc.log
+   @CALL mdir.bat dllcreate
+   pomake /F hrbdll.pc  >dll_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
+rem=============================================================================
 :DLL_OK
+rem=============================================================================
    @CALL mdir.bat dllcopy
-   IF "MAKEALL" == ""   goto EXIT
-   IF "%1" == "DLL" goto EXIT
-   IF "%1" == "dll" goto EXIT
+   if "%MAKEALL%"=="" @ECHO ****** End of Job *****
+   IF "%MAKEALL%"=="" goto EXIT
+   IF "%1"=="DLL" @ECHO ****** End of Job *****
+   IF "%1"=="dll" @ECHO ****** End of Job *****
+   IF "%1"=="DLL" goto EXIT
+   IF "%1"=="dll" goto EXIT
    goto CONTRIBS
 
+rem=============================================================================
 :DLL_ERR
-   if exist dll_pc.log notepad dll_pc.log
+rem=============================================================================
+   if exist dll_%SUB_DIR%.log notepad dll_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
 :CONTRIBS
 rem=============================================================================
-   @CALL MDIR.BAT
+   SET __BLD__=CONTRIB_BLD
    SET HB_MT=
    SET __MT__=
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=
-   POMAKE /F contrib.pc %2 %3 >cont_pc.log
+   @CALL MDIR.BAT
+   POMAKE /F contrib.pc  >cont_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
 
+rem=============================================================================
 :CONTRIBS_OK
+rem=============================================================================
    @CALL mdir.bat copycontrib
+   @ECHO ****** End of Job *****
    goto EXIT
 
+rem=============================================================================
 :CONTRIBS_ERR
-   IF EXIST cont_pc.log notepad cont_pc.log
+rem=============================================================================
+   IF EXIST cont_%SUB_DIR%.log notepad cont_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
@@ -128,23 +160,22 @@ rem=============================================================================
 rem=============================================================================
 :SYNTAX
 rem=============================================================================
-   ECHO.Syntax:
-   ECHO. make_pc core    : Build xHarbour CORE files
-   ECHO. make_pc dll     : Build xHarbour DLL
-   ECHO. make_pc contrib : Build CONTRIB Libraries
-   ECHO. make_pc all     : Build CORE, DLL and CONTRIB
-   ECHO. make_pc clean   : Erase all files once built
+   ECHO.
+   ECHO. ------------------------
+   ECHO. Make Utility for PellesC
+   ECHO. ------------------------
+   @CALL mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
-   IF EXIST make_pc.log DEL make_pc.log
-   @CALL mdir.bat dllclean
-   if exist dll_pc.log del dll_pc.log
-   @CALL mdir.bat cleancontrib
-   IF EXIST cont_pc.log DEL cont_pc.log
+   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
+   IF "%2"=="nobuild" @ECHO ****** End of Job *****
+   IF "%2"=="NOBUILD" goto EXIT
+   IF "%2"=="nobuild" goto EXIT
+   goto BUILD_ALL
 
 rem=============================================================================
 :EXIT
