@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6089 2008/05/07 22:57:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.6090 2008/05/08 08:47:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-05-08 12:07 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * hbzlib\zip.c
+    ! fixed needed initialization of ExcludeFile.
+    + Added the capabilities to use relative paths.
+    ( coded by Juan Galvez ) seems that now works properly.
 
 2008-05-08 10:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * hbzlib\zipnew.cpp

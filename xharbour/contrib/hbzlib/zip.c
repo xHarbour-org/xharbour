@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.48 2008/04/20 07:08:45 andijahja Exp $
+ * $Id: zip.c,v 1.49 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -191,9 +191,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 {
    PHB_ITEM ExTmp;
 
-   ExcludeFile= hb_itemNew(NULL);
-
-   hb_arrayNew( ExcludeFile, 0 );
+   ExcludeFile = hb_itemArrayNew(0);
 
    if( pExclude == NULL )
    {
@@ -297,7 +295,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
    }
 }
 
-static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
+static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    /* bFullPath by JGS */
 {
    PHB_ITEM pDirEntry;
    PHB_ITEM Temp;
@@ -332,6 +330,22 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
          if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
 // if don't gave path add current dir !
+         /* by JGS, also if there is a relative path */
+         #if defined(HB_WIN32_IO)
+            PHB_FNAME fDirSpec = hb_fsFNameSplit( (char*) szArrEntry );
+
+            if ( ( pCurDir ) && ( fDirSpec != NULL ) &&
+                 ! ( fDirSpec->szDrive ) && ( fDirSpec->szPath ) && ( fDirSpec->szPath[0] != OS_PATH_DELIMITER ) )
+         #else
+            if ( ( pCurDir ) && ( ! strchr( szArrEntry, OS_PATH_DELIMITER ) ) )
+         #endif
+            {
+               char * szTemp = szArrEntry ;
+               szArrEntry = hb_xstrcpy( NULL, (char *) pCurDir, OS_PATH_DELIMITER_STRING, szTemp, NULL );
+               hb_xfree( szTemp );
+            }
+
+            /*
             if ( ( pCurDir ) && ( ! strchr( szArrEntry, OS_PATH_DELIMITER ) ) )
             {
                char * szTemp = szArrEntry ;
@@ -339,8 +353,10 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                hb_xstrcpy( szArrEntry, (char *) pCurDir,
                               OS_PATH_DELIMITER_STRING, szTemp, NULL );
             }
+            */
+         /* by JGS */
 
-            hb_fsDirectory(WildFile,szArrEntry,NULL,0,TRUE);
+            hb_fsDirectory(WildFile,szArrEntry,NULL,0,bFullPath ); /* bFullPath by JGS */
             ulLen = hb_arrayLen(WildFile);
 
             for ( ul = 0; ul < ulLen ; ul ++ )
@@ -348,6 +364,17 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                char * szEntry;
                pDirEntry = hb_arrayGetItemPtr( WildFile, ul + 1 );
                szEntry = hb_arrayGetC( pDirEntry, 1 );
+
+               /* by JGS */
+               #if defined(HB_WIN32_IO)
+                  if (! ( bFullPath ) && ( fDirSpec != NULL ) && ( fDirSpec->szPath ) )
+                  {
+                     char * szFile = szEntry;
+                     szEntry = hb_xstrcpy( NULL, fDirSpec->szPath, szFile, NULL );
+                     hb_xfree( szFile );
+                  }
+               #endif
+               /* by JGS */
 
                if ( ZipTestExclude ( szEntry ) )
                {
@@ -370,6 +397,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                }
             }
 
+            hb_itemClear( WildFile );	// by JGS
          }
          else
          {
@@ -410,6 +438,14 @@ HB_FUNC( HB_ZIPFILE )
          BYTE *pCurDir;
          char *szZipFileName;
 
+         /* by JGS */
+         BOOL bFullPath = TRUE;
+         #if defined(HB_WIN32_IO)
+            if ( ISLOG( 11 ) )
+               bFullPath = hb_parl( 11 );
+         #endif
+         /* by JGS */
+
          if ( ! ISNIL( 4 ) && ! ISBLOCK( 4 ) )
          {
             hb_errRT_BASE_SubstR( EG_ARG, 2017, "Invalid Codeblock ","hb_zipfile",
@@ -422,10 +458,10 @@ HB_FUNC( HB_ZIPFILE )
 
          pCurDir = ( BYTE * ) hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
-         if( pExclude )
-            ZipCreateExclude( pExclude );
+         /* Always needs to create an array */
+         ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam, pCurDir );
+         ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
          hb_fsChDir( pCurDir ) ;
 
@@ -531,15 +567,24 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
          char *szZipFileName;
          BYTE *pCurDir;
 
+         /* by JGS */
+         BOOL bFullPath = TRUE;
+         #if defined(HB_WIN32_IO)
+            if ( ISLOG( 12 ) )
+               bFullPath = hb_parl( 12 );
+         #endif
+         /* by JGS */
 
          pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam, pCurDir );
+         ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
          hb_fsChDir( pCurDir );
+         /* by JGS, wait until adding the directory to the file name if not specified
          hb_xfree( pCurDir );
+         */
 
 //         if( pProgress )
 //         {
@@ -558,7 +603,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
          {
             strcpy( szFile, hb_parc( 1 ) );
          }
-
+         hb_xfree( pCurDir ) ;	/* by JGS */
          szZipFileName = hb___CheckFile( szFile );
 
          if ( hb_arrayLen(FileToZip) > 0 )
@@ -603,15 +648,24 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
          char *szZipFileName;
          BYTE * pCurDir ;
 
+         /* by JGS */
+         BOOL bFullPath = TRUE;
+         #if defined(HB_WIN32_IO)
+            if ( ISLOG( 11 ) )
+               bFullPath = hb_parl( 11 );
+         #endif
+         /* by JGS */
 
          pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam, pCurDir );
+         ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
          hb_fsChDir( pCurDir ) ;
+         /* by JGS, wait until adding the directory to the file name if not specified
          hb_xfree( pCurDir ) ;
+         */
 
   //       if( pProgress )
 //         {
@@ -619,7 +673,22 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 //           iProgress=hb_itemNew( pProgress );
 //         }
 
+		 /* by JGS */
+         if ( ! strchr( szFile, OS_PATH_DELIMITER ) )
+         {
+            strcpy( szFile, (char *) pCurDir );
+            strcat( szFile, OS_PATH_DELIMITER_STRING) ;
+            strcat( szFile, hb_parc( 1 ) ) ;
+         }
+         else
+         {
+            strcpy( szFile, hb_parc( 1 ) );
+         }
+         hb_xfree( pCurDir );
+         /*
          strcpy( szFile, hb_parc( 1 ) );
+         */
+         /* by JGS */
          szZipFileName = hb___CheckFile( szFile );
 
          if ( hb_arrayLen(FileToZip) > 0 )
