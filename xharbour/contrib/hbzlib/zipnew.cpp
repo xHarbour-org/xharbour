@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.29 2008/04/20 07:08:45 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.30 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -683,6 +683,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
             catch ( CZipException&  /* e */  )
             {
+                  iReturn = false;
                   szZip.CloseFile( NULL, true);
 /*            szZip.CloseNewFile(true);*/
             }
@@ -874,6 +875,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
 
             catch ( CZipException&  /* e */ )
             {
+                  iReturn = false;
                   szZip.CloseFile( NULL, true);
             }
          }
