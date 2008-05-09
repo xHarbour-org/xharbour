@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.95 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: garbage.c,v 1.96 2008/05/06 11:10:43 marchuet Exp $
  */
 
 /*
@@ -62,6 +62,8 @@
 #include "hbvm.h"
 #include "error.ch"
 #include "hashapi.h"
+
+extern HB_ITEM hb_vm_BreakBlock;
 
 #define HB_GC_COLLECTION_JUSTIFIED 64
 
@@ -642,7 +644,9 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
 
    HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
 
-   //printf( "Sweep Scan\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "Sweep Scan\n" );
+   #endif
 
    /* Step 1 - MARK */
    /* check all known places for blocks they are referring */
@@ -652,22 +656,40 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
       hb_vmIsLocalRef();
    #endif
 
-   //printf( "After LocalRef\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After LocalRef\n" );
+   #endif
 
    hb_vmIsStaticRef();
-   //printf( "After StaticRef\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After StaticRef\n" );
+   #endif
 
    hb_vmIsGlobalRef();
-   //printf( "After Globals\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After Globals\n" );
+   #endif
 
    #ifndef HB_THREAD_SUPPORT
    /* JC1: under MT, each threadIsLocalRef does its memvar reffing */
    hb_memvarsIsMemvarRef();
    #endif
-   //printf( "After MemvarRef\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After MemvarRef\n" );
+   #endif
 
    hb_clsIsClassRef();
-   //printf( "After ClassRef\n" );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After ClassRef\n" );
+   #endif
+
+   if( HB_IS_GCITEM( &hb_vm_BreakBlock ) )
+   {
+      hb_gcItemRef( &hb_vm_BreakBlock );
+   }
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After BreakBlock\n" );
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
@@ -718,6 +740,9 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
       }
       while ( s_pLockedBlock != pAlloc );
    }
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After Lock scan\n" );
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
 
@@ -742,6 +767,9 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
       s_pCurrBlock = s_pCurrBlock->pNext;
    }
    while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After Cleanup scan\n" );
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
 
@@ -789,6 +817,9 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
       }
    }
    while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
+   #ifdef TRACE_COLLECT
+      TraceLog( NULL,  "After Release scan\n" );
+   #endif
 
    s_pCurrBlock = pAlloc;
 
@@ -827,6 +858,8 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pLockedBlock;
       do
       {
+         s_pCurrBlock->used |= HB_GC_DELETE;
+
          /* call the cleanup function now for NON Blocks! */
          if( s_pLockedBlock->pFunc )
          {
@@ -837,6 +870,9 @@ void hb_gcReleaseAll( void )
          s_pLockedBlock = s_pLockedBlock->pNext;
 
       } while ( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "After Cleanup scan\n" );
+      #endif
 
       do
       {
@@ -847,13 +883,26 @@ void hb_gcReleaseAll( void )
          hb_xfree( (void *) ( pDelete ) );
       }
       while ( s_pLockedBlock );
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "After Release scan\n" );
+      #endif
    }
 
    if( s_pCurrBlock )
    {
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "Before 2. Cleanup scan %p\n", s_pCurrBlock );
+      #endif
+
       pAlloc = s_pCurrBlock;
       do
       {
+         #ifdef TRACE_RELEASE
+            TraceLog( NULL, "Clean: %p %p %p %p %p %p\n", s_pCurrBlock, s_pCurrBlock->pFunc, hb_gcGripRelease, hb_arrayReleaseGarbage, hb_hashReleaseGarbage, hb_codeblockDeleteGarbage );
+         #endif
+
+         s_pCurrBlock->used |= HB_GC_DELETE;
+
          /* call the cleanup function now for NON Blocks! */
          if( s_pCurrBlock->pFunc )
          {
@@ -861,10 +910,16 @@ void hb_gcReleaseAll( void )
             ( s_pCurrBlock->pFunc )( ( void *)( s_pCurrBlock + 1 ) );
             HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
          }
+         #ifdef TRACE_RELEASE
+            TraceLog( NULL, "  Cleaned: %p, Next: %p\n", s_pCurrBlock, s_pCurrBlock->pNext );
+         #endif
 
          s_pCurrBlock = s_pCurrBlock->pNext;
 
       } while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "2. After Cleanup scan\n" );
+      #endif
 
       do
       {
@@ -875,6 +930,9 @@ void hb_gcReleaseAll( void )
          hb_xfree( (void *) ( pDelete ) );
       }
       while( s_pCurrBlock );
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "2. After Release scan\n" );
+      #endif
    }
 
    #ifdef GC_RECYCLE
@@ -886,6 +944,9 @@ void hb_gcReleaseAll( void )
          //HB_GARBAGE_FREE( pDelete );
          hb_xfree( (void *) ( pDelete ) );
       }
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "3. After Release scan\n" );
+      #endif
 
       while( s_pAvailableBaseArrays )
       {
@@ -895,6 +956,9 @@ void hb_gcReleaseAll( void )
          //HB_GARBAGE_FREE( pDelete );
          hb_xfree( (void *) ( pDelete ) );
       }
+      #ifdef TRACE_RELEASE
+         TraceLog( NULL,  "4. After Release scan\n" );
+      #endif
    #endif
 
    s_bCollecting = FALSE;

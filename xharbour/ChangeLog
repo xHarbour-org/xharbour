@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6090 2008/05/08 08:47:24 marchuet Exp $
+ * $Id: ChangeLog,v 1.6091 2008/05/08 10:08:25 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+
+2008-05-09 13:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+    * Changed hb_vm_BreakBlock from PHB_ITEM to HB_ITEM
+
+  * source/vm/hvm.c
+    * Additional refinments in shutdown sequence of hb_vmQuit()
+    + Debug assertion
+
+  * source/vm/garbage.c
+    + Added hb_gcItemRef() for hb_vm_BreakBlock
+    + Added optional trace protected by #ifdef TRACE_COLLECT and #ifdef TRACE_RELEASE
+
+  * source/vm/memvars.c
+    * Safety reset assignments
+
+  * include/classes.h
+  * source/vm/classes.c
+    + BOOL hb_clsDestructorsAllowed( void )
+    * Corrected 2 typos in recently added error detection
+    ! GPF trap in hb_clsFinalize()
+
+  * source/vm/fastitem.c
+    + Debug assertion
 
 2008-05-08 12:07 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * hbzlib\zip.c

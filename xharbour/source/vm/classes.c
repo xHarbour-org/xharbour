@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.218 2008/04/22 04:40:34 ronpinkas Exp $
+ * $Id: classes.c,v 1.219 2008/05/06 11:10:42 marchuet Exp $
  */
 
 /*
@@ -342,6 +342,11 @@ static void hb_clsClear( PCLASS pClass )
 void hb_clsDisableDestructors( void )
 {
    s_AllowDestructors = FALSE;
+}
+
+BOOL hb_clsDestructorsAllowed( void )
+{
+   return s_AllowDestructors;
 }
 
 void hb_clsClearAll( void )
@@ -1734,11 +1739,11 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                   {
                      if( pInit->item.asArray.value->uiClass )
                      {
-                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass;
+                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
 
-                        if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB)
                         {
-                           hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", "hb_clsAddMsg", 1, pInit );
+                           hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", szMessage, 1, pInit );
                            return;
                         }
 
@@ -1803,11 +1808,11 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                   {
                      if( pInit->item.asArray.value->uiClass )
                      {
-                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass;
+                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
 
-                        if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
                         {
-                           hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", "hb_clsAddMsg", 1, pInit );
+                           hb_errRT_BASE( EG_ARG, 3009, "Class Var's init value can not contain an object with a destructor", szMessage, 1, pInit );
                            return;
                         }
 
@@ -4434,46 +4439,49 @@ void hb_clsFinalize( PHB_ITEM pObject )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
+      if( pClass->pDestructor )
       {
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
             if( s_AllowDestructors && hb_stack_ready )
             {
-               // To DISABLE GC here where no refernce to this object will cause GPF for double release!
-               BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
-               PHB_SYMB pDestructor = pClass->pDestructor->pMessage->pSymbol;
-
-               // Save the existing Return Value and Top Item if any.
-               if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+               if( hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
                {
-                  // Don't process HB_VM_STACK.Return!
-                  bPop = FALSE;
+                  // To DISABLE GC here where no refernce to this object will cause GPF for double release!
+                  BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
+                  PHB_SYMB pDestructor = pClass->pDestructor->pMessage->pSymbol;
 
-                  /* Save top item which can be processed at this moment */
-                  hb_stackPush();
-               }
-               else
-               {
-                  hb_vmPushState();
-               }
+                  // Save the existing Return Value and Top Item if any.
+                  if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+                  {
+                     // Don't process HB_VM_STACK.Return!
+                     bPop = FALSE;
 
-               hb_vmPushSymbol( pDestructor );
-               hb_vmPush( pObject ); // Do NOT Forward!!!
-               hb_vmSend( 0 );
+                     /* Save top item which can be processed at this moment */
+                     hb_stackPush();
+                  }
+                  else
+                  {
+                     hb_vmPushState();
+                  }
 
-               // Restore the existing Return Value and Top Item if any.
-               if( bPop )
-               {
-                  hb_vmPopState();
-               }
-               else
-               {
-                  /* Restore top item */
-                  hb_stackDec();
-               }
+                  hb_vmPushSymbol( pDestructor );
+                  hb_vmPush( pObject ); // Do NOT Forward!!!
+                  hb_vmSend( 0 );
 
-               hb_gcSetCollecting( bCollecting );
+                  // Restore the existing Return Value and Top Item if any.
+                  if( bPop )
+                  {
+                     hb_vmPopState();
+                  }
+                  else
+                  {
+                     /* Restore top item */
+                     hb_stackDec();
+                  }
+
+                  hb_gcSetCollecting( bCollecting );
+               }
             }
             else
             {

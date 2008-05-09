@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.130 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: memvars.c,v 1.131 2008/04/16 20:05:51 ronpinkas Exp $
  */
 
 /*
@@ -221,8 +221,8 @@ void hb_memvarsRelease( void )
          if( s_globalTable[ ulCnt ].counter > 0 )
          {
             hb_xfree( s_globalTable[ ulCnt ].pVarItem );
-            //s_globalTable[ ulCnt ].pVarItem = NULL;
-            //s_globalTable[ ulCnt ].counter = 0;
+            s_globalTable[ ulCnt ].pVarItem = NULL;
+            s_globalTable[ ulCnt ].counter = 0;
          }
       }
 
@@ -271,7 +271,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
          if( pStack->globalTable[ ulCnt ].counter > 0 )
          {
             hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
-            //pStack->globalTable[ ulCnt ].pVarItem = NULL;
+            pStack->globalTable[ ulCnt ].pVarItem = NULL;
             pStack->globalTable[ ulCnt ].counter = 0;
          }
       }
@@ -601,7 +601,7 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
          }
 
          hb_xfree( pValue->pVarItem );
-         //pValue->pVarItem = NULL;
+         pValue->pVarItem = NULL;
 
          #ifndef HB_THREAD_SUPPORT
             hb_memvarRecycle( hValue );
@@ -635,7 +635,7 @@ void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack )
          }
 
          hb_xfree( pValue->pVarItem );
-         //pValue->pVarItem = NULL;
+         pValue->pVarItem = NULL;
 
          hb_memvarRecycleMT( hValue, pStack );
 
@@ -690,7 +690,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
          }
 
          hb_xfree( pValue->pVarItem );
-         //pValue->pVarItem = NULL;
+         pValue->pVarItem = NULL;
 
    	   #ifndef HB_THREAD_SUPPORT
    	      hb_memvarRecycle( hValue );

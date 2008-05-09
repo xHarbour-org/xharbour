@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.679 2008/04/30 21:18:10 andijahja Exp $
+ * $Id: hvm.c,v 1.680 2008/05/06 11:10:43 marchuet Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ BOOL hb_vm_bQuitRequest = FALSE;
 
 int hb_vm_iTry = 0;
 
-PHB_ITEM hb_vm_BreakBlock = NULL;
+HB_ITEM hb_vm_BreakBlock = {NULL};
 
 static int s_iBaseLine = 0;
 
@@ -445,8 +445,7 @@ static void hb_vmDoInitError( void )
 
    if( hb_vmDoInitFunc( "__BREAKBLOCK" ) )
    {
-      hb_vm_BreakBlock = hb_itemNew( NULL );
-      hb_itemForwardValue( hb_vm_BreakBlock, hb_stackReturnItem() );
+      hb_itemForwardValue( &hb_vm_BreakBlock, hb_stackReturnItem() );
    }
    else
    {
@@ -564,7 +563,7 @@ HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
    HB_VM_STACK.pSequence = NULL;
 
    HB_VM_STACK.uiVMFlags = 0;
-   
+
    for( uiCounter = 0; uiCounter < HB_MAX_WITH_OBJECTS; uiCounter++ )
    {
       HB_VM_STACK.aWithObject[ uiCounter ].type = HB_IT_NIL;
@@ -846,6 +845,8 @@ HB_EXPORT int hb_vmQuit( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)"));
 
+   //#define TRACE_QUIT
+
    #ifdef TRACE_QUIT
       TraceLog( NULL, "vmQuit()\n" );
    #endif
@@ -934,13 +935,13 @@ HB_EXPORT int hb_vmQuit( void )
 
       --HB_VM_STACK.pPos;
    }
-   
+
    hb_vmPushSymbol( &FakeQuitSymbol );
 
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Stack\n" );
    #endif
-    
+
    hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    #ifdef TRACE_QUIT
@@ -1017,11 +1018,6 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After WITHOBJECT\n" );
    #endif
 
-   hb_itemSetNil( &HB_VM_STACK.Return );
-   #ifdef TRACE_QUIT
-      TraceLog( NULL, "After Return\n" );
-   #endif
-
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
       // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
@@ -1040,18 +1036,24 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After memvarsClear\n" );
    #endif
 
+   hb_itemSetNil( &HB_VM_STACK.Return );
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After Return\n" );
+   #endif
+
    hb_gcCollectAll( TRUE );
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After CollectAll\n" );
    #endif
-
-   hb_stackRemove( 0 ); // Base Symbol!
 
    // Absolutley NO PRG code beyond this point!
    hb_clsDisableDestructors();
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After DisableDestructors\n" );
    #endif
+
+   hb_stackRemove( 0 ); // Base Symbol!
+   //#define DEBUG_DESTRUCTORS
 
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After stackRemove\n" );
@@ -1103,7 +1105,7 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "CollectAll after Statics\n" );
    #endif
 
-   hb_itemRelease( hb_vm_BreakBlock );
+   hb_itemClear( &hb_vm_BreakBlock );
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After BreakBlock\n" );
    #endif
@@ -1122,7 +1124,7 @@ HB_EXPORT int hb_vmQuit( void )
    #endif
 
    /* release all known garbage */
-   if ( hb_xquery( HB_MEM_USEDMAX ) ) /* check if fmstat is ON */
+   if( hb_xquery( HB_MEM_USEDMAX ) ) /* check if fmstat is ON */
    {
       hb_gcCollectAll( TRUE );
       #ifdef TRACE_QUIT
@@ -1247,6 +1249,8 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols));
+
+   assert( hb_stack_ready );
 
    //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols );
 
@@ -2367,7 +2371,7 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( pCode[ w ] == HB_P_TRYBEGIN )
             {
-               HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
+               HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( &hb_vm_BreakBlock );
 
                bCanFinalize = (BOOL) lFinallySection;
 
@@ -4888,7 +4892,7 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
 
       pItem->item.asPointer.value = (void *) pItem->item.asSymbol.value;
       pItem->item.asPointer.collect = FALSE;
-            
+
       pItem->type = HB_IT_POINTER;
    }
    else
@@ -11310,7 +11314,7 @@ HB_EXPORT void hb_xvmTryBegin( void )
 
    hb_vm_iTry++;
    hb_xvmSeqBegin();
-   HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
+   HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( &hb_vm_BreakBlock );
 }
 
 HB_EXPORT BOOL hb_xvmTryEnd( void )

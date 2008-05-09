@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.115 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.116 2008/05/07 14:01:12 ronpinkas Exp $
  */
 
 /*
@@ -64,6 +64,9 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hashapi.h"
+
+#include "classes.h"
+#include "hboo.ch"
 
 extern char *hb_vm_sNull;
 
@@ -236,6 +239,8 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
         {
            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
         }
+
+        assert( hb_clsDestrcutorsAllowed() || pItem->item.asArray.value->uiClass == 0 || ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->pDestructor == NULL || ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->uiScope & HB_OO_CLS_DESTRUC_SYMB == 0 ) ;
 
         if( --( pItem->item.asArray.value->ulHolders ) == 0 )
         {

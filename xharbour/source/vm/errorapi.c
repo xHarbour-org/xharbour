@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.82 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: errorapi.c,v 1.83 2008/04/30 16:47:34 ronpinkas Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ extern HB_SET_STRUCT hb_set;
 #endif
 
 extern int hb_vm_iTry;
-extern PHB_ITEM hb_vm_BreakBlock;
+extern HB_ITEM hb_vm_BreakBlock;
 
 HB_FUNC_EXTERN( ERRORNEW );
 
@@ -360,7 +360,7 @@ HB_EXPORT USHORT hb_errLaunch( PHB_ITEM pError )
          pResult = (s_errorHandler->Func)( s_errorHandler );
          s_errorHandler->Error = NULL;
       }
-      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
+      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock.item.asBlock.value )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
@@ -549,7 +549,7 @@ HB_EXPORT PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
          pResult = ( s_errorHandler->Func )( s_errorHandler );
          s_errorHandler->Error = NULL;
       }
-      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
+      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock.item.asBlock.value )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
@@ -564,7 +564,7 @@ HB_EXPORT PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
       {
          HB_VM_STACK.uiVMFlags |= HB_SUSPEND_QUIT;
          pResult = hb_itemDo( s_errorBlock, 1, pError );
-         HB_VM_STACK.uiVMFlags &= ~HB_SUSPEND_QUIT;         
+         HB_VM_STACK.uiVMFlags &= ~HB_SUSPEND_QUIT;
       }
 
       s_iLaunchCount--;
