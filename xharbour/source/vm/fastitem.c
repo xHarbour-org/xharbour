@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.117 2008/05/09 18:23:24 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.118 2008/05/09 18:26:51 ronpinkas Exp $
  */
 
 /*
@@ -240,7 +240,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
         }
 
-        assert( hb_clsDestrcutorsAllowed() || pItem->item.asArray.value->uiClass == 0 || ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->pDestructor == NULL || ( ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->uiScope & HB_OO_CLS_DESTRUC_SYMB ) == 0 ) ;
+        assert( hb_clsDestructorsAllowed() || pItem->item.asArray.value->uiClass == 0 || ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->pDestructor == NULL || ( ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->uiScope & HB_OO_CLS_DESTRUC_SYMB ) == 0 ) ;
 
         if( --( pItem->item.asArray.value->ulHolders ) == 0 )
         {
