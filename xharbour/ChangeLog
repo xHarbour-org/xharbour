@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6091 2008/05/08 10:08:25 marchuet Exp $
+ * $Id: ChangeLog,v 1.6092 2008/05/09 18:23:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-
+2008-05-14 00:03 UTC+0100 Ath <Ath1 at sourceforge.net>
+  * compile.mak
+    * finetune compilation of menuto.prg from contrib/libnf
 
 2008-05-09 13:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/errorapi.c

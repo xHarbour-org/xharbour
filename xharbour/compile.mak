@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.5 2008/05/05 05:05:41 andijahja Exp $
+# $Id: compile.mak,v 1.6 2008/05/06 05:47:49 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -3479,7 +3479,7 @@ $(OBJ_DIR)$(DIR_SEP)isshare$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)isshare.c
 $(OBJ_DIR)$(DIR_SEP)popadder$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)popadder.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)menutoNF$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menuto.c
+$(OBJ_DIR)$(DIR_SEP)menutoNF$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menutoNF.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)month$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)month.c
