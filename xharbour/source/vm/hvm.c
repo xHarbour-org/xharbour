@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.680 2008/05/06 11:10:43 marchuet Exp $
+ * $Id: hvm.c,v 1.681 2008/05/09 18:23:24 ronpinkas Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ BOOL hb_vm_bQuitRequest = FALSE;
 
 int hb_vm_iTry = 0;
 
-HB_ITEM hb_vm_BreakBlock = {NULL};
+HB_ITEM hb_vm_BreakBlock = {0};
 
 static int s_iBaseLine = 0;
 

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.43 2008/04/29 08:55:52 andijahja Exp $
+# $Id: makefile.gc,v 1.44 2008/05/06 05:47:54 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -42,7 +42,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
@@ -295,7 +295,7 @@ CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
 endif
 
 INCLUDE_DIR =include
-CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
@@ -341,7 +341,7 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=-Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win
 
 ifeq ($(HB_THREAD_SUPPORT),1)

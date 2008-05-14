@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFile.cpp $
 // $Archive: /ZipArchive_STL/ZipFile.cpp $
-// $Date: 2003/08/20 15:03:53 $ $Author: lculik $
+// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -84,10 +84,12 @@ bool CZipFile::Open(LPCTSTR lpszFileName, UINT openFlags, bool bThrow)
 
 	m_hFile = ZipPlatform::OpenFile(lpszFileName, iNewFlags, openFlags & 0x1C);
 	if (m_hFile == -1)
+	{
 		if (bThrow)
 			ThrowError();
 		else
 			return false;
+	}
 	m_szFileName = lpszFileName;
 	return true;
 }

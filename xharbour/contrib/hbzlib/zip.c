@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.50 2008/05/08 10:08:25 marchuet Exp $
+ * $Id: zip.c,v 1.51 2008/05/14 09:43:24 marchuet Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
          if( pFileName->szName )
          {
             char *szFile = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
-            pFileName->szPath = "";
+            pFileName->szPath = (char*) "";
             hb_fsFNameMerge( szFile, pFileName );
             bOkAdd =  ( hb_stricmp(szSkleton,szFile) ==0  ? 1 : 0 );
             hb_xfree(szFile);
@@ -740,7 +740,7 @@ HB_FUNC( HB_UNZIPFILE )
       else
       {
 //s.r. change "*.*" to "*" because file without extension were ignored
-         UnzipCreateArray( szZipFileName, "*", 1 );
+         UnzipCreateArray( szZipFileName, (char*) "*", 1 );
       }
       if ( hb_arrayLen(UnzipFiles) > 0 )
       {
@@ -1041,20 +1041,14 @@ void SetFileAttributes( char * szEntry,ULONG ulAttr)
 }
 #endif
 
-#ifdef __XHARBOUR__
-#define __PRG_SOURCE__ __FILE__
+#define __PRG_SOURCE__ (char*) "zip.c"
 #ifdef HB_PCODE_VER
 #  undef HB_PRG_PCODE_VER
 #  define HB_PRG_PCODE_VER HB_PCODE_VER
 #endif
-#endif
 
 HB_INIT_SYMBOLS_BEGIN( hbzip_CLEANUP )
-#ifdef __XHARBOUR__
-{ "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, &ModuleFakeDyn }
-#else
-{ "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, NULL }
-#endif
+{ (char*) "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, &ModuleFakeDyn }
 HB_INIT_SYMBOLS_END( hbzip_CLEANUP )
 
 #if defined(HB_PRAGMA_STARTUP)

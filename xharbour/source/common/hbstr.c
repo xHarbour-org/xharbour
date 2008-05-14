@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.27 2007/08/28 19:04:55 ronpinkas Exp $
+ * $Id: hbstr.c,v 1.28 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -375,7 +375,7 @@ static double hb_numPow10( int nPrecision )
       }
       else if ( nPrecision > -16 )
       {
-         return 1.0 / s_dPow10[ -nPrecision ];
+         return 1.0 / s_dPow10[ (unsigned int) -nPrecision ];
       }
    }
 

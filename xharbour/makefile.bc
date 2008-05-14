@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.225 2008/05/03 23:37:38 andijahja Exp $
+# $Id: makefile.bc,v 1.226 2008/05/06 05:47:52 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -19,7 +19,7 @@ DEL=del
 # if debug info is requested, set ARFLAGS to /P64 in your environment
 #===============================================================================
 !if !$d(ARFLAGS)
-ARFLAGS=/0
+ARFLAGS=/0 /C
 !endif
 
 #*******************************************************************************

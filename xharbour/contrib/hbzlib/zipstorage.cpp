@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipStorage.cpp $
 // $Archive: /ZipArchive/ZipStorage.cpp $
-// $Date: 2003/08/20 15:03:53 $ $Author: lculik $
+// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -52,10 +52,12 @@ DWORD CZipStorage::Read(void *pBuf, DWORD iSize, bool bAtOnce)
 	{
 		iRead = m_pFile->Read(pBuf, iSize);
 		if (!iRead)
+		{
 			if (IsSpanMode())
 				ChangeDisk(m_iCurrentDisk + 1);
 			else
 				ThrowError(CZipException::badZipFile);
+		}
 	}
 
 	if (iRead == iSize)

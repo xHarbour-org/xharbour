@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6094 2008/05/14 06:40:48 likewolf Exp $
+ * $Id: ChangeLog,v 1.6095 2008/05/14 09:43:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-14 20:20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * makefile.gc
+    + compiler flag -fno-strict-aliasing to fix compiling
+      when a pointer is passed-by-reference
+
+  * makefile.bc
+    + /C flag to ARFLAGS (don't ignore symbol case)
+
+  * source/common/hbstr.c
+  * contrib/libnf/getenvrn.c
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/hbzlib/zipfile.cpp
+  * contrib/hbzlib/zipstorage.cpp
+  * contrib/wvtgui/wvtcore.c
+  * contrib/what32/source/_winsock.c
+    ! fixed warnings under GCC 4.3
+
+  * source/vm/hvm.c
+    ! casting on initialization of hb_vm_BreakBlock (NULL->0)
+
+  * source/compiler/hbusage.c
+    ! do not harcode HB_VER_CVSID, use function instead
 
 2008-05-14 11:45 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * hbzlib\zip.c

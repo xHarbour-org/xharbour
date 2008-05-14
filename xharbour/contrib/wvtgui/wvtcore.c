@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.11 2007/06/28 18:33:27 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.12 2007/11/27 05:32:20 andijahja Exp $
  */
 
 /*
@@ -1242,7 +1242,7 @@ HB_FUNC( WVT_DRAWBUTTON )
 
    if ( bText )
    {
-      ( HFONT ) SelectObject( _s->hdc, GetStockObject( DEFAULT_GUI_FONT ) );
+      SelectObject( _s->hdc, GetStockObject( DEFAULT_GUI_FONT ) );
 
       GetTextExtentPoint32( _s->hdc, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), &sz );
       // iTextWidth   = sz.cx;
@@ -1419,7 +1419,7 @@ HB_FUNC( WVT_DRAWLABELEX )
       SetBkColor( _s->hdc, ISNIL( 6 ) ? _s->background : ( COLORREF ) hb_parnl( 6 ) );
       SetTextColor( _s->hdc, ISNIL( 5 ) ? _s->foreground : ( COLORREF ) hb_parnl( 5 ) );
       SetTextAlign( _s->hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-      ( HFONT ) SelectObject( _s->hdc, _s->hUserFonts[ iSlot ] );
+      SelectObject( _s->hdc, _s->hUserFonts[ iSlot ] );
 
       ExtTextOut( _s->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
       if ( _s->bGui )
@@ -1427,7 +1427,7 @@ HB_FUNC( WVT_DRAWLABELEX )
          SetBkColor( _s->hGuiDC, ISNIL( 6 ) ? _s->background : ( COLORREF ) hb_parnl( 6 ) );
          SetTextColor( _s->hGuiDC, ISNIL( 5 ) ? _s->foreground : ( COLORREF ) hb_parnl( 5 ) );
          SetTextAlign( _s->hGuiDC, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-         ( HFONT ) SelectObject( _s->hGuiDC, _s->hUserFonts[ iSlot ] );
+         SelectObject( _s->hGuiDC, _s->hUserFonts[ iSlot ] );
 
          ExtTextOut( _s->hGuiDC, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
       }
@@ -1955,7 +1955,7 @@ HB_FUNC( WVT_DRAWLABELOBJ )
 
    SetTextColor( _s->hdc, ISNIL( 8 ) ? _s->foreground : ( COLORREF ) hb_parnl( 8 ) );
    SetBkColor( _s->hdc, ISNIL( 9 ) ? _s->background : ( COLORREF ) hb_parnl( 9 ) );
-   ( HFONT ) SelectObject( _s->hdc, ( HFONT ) hb_parnl( 10 ) );
+   SelectObject( _s->hdc, ( HFONT ) hb_parnl( 10 ) );
 
    GetTextExtentPoint32( _s->hdc, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), &sz );
 
@@ -2015,7 +2015,7 @@ HB_FUNC( WVT_DRAWLABELOBJ )
    {
       SetTextColor( _s->hGuiDC, ISNIL( 8 ) ? _s->foreground : ( COLORREF ) hb_parnl( 8 ) );
       SetBkColor( _s->hGuiDC, ISNIL( 9 ) ? _s->background : ( COLORREF ) hb_parnl( 9 ) );
-      ( HFONT ) SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 10 ) );
+      SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 10 ) );
       SetTextAlign( _s->hGuiDC, iAlignH | iAlignV );
 
       ExtTextOut( _s->hGuiDC, x, y, uiOptions, &rect, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), NULL );
@@ -2370,7 +2370,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    SetTextColor( _s->hdc, ISNIL( 9 ) ? _s->foreground : ( COLORREF ) hb_parnl( 9 ) );
    SetBkColor( _s->hdc, ISNIL( 10 ) ? _s->background : ( COLORREF ) hb_parnl( 10 ) );
    SetBkMode( _s->hdc, ISNIL( 11 ) ? OPAQUE : hb_parni( 11 ) );
-   ( HFONT ) SelectObject( _s->hdc, ( HFONT ) hb_parnl( 12 ) );
+   SelectObject( _s->hdc, ( HFONT ) hb_parnl( 12 ) );
 
    DrawText( _s->hdc, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
    if ( _s->bGui )
@@ -2379,7 +2379,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
       SetTextColor( _s->hGuiDC, ISNIL( 9 ) ? _s->foreground : ( COLORREF ) hb_parnl( 9 ) );
       SetBkColor( _s->hGuiDC, ISNIL( 10 ) ? _s->background : ( COLORREF ) hb_parnl( 10 ) );
       SetBkMode( _s->hGuiDC, ISNIL( 11 ) ? OPAQUE : hb_parni( 11 ) );
-      ( HFONT ) SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 12 ) );
+      SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 12 ) );
 
       DrawText( _s->hGuiDC, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
    }

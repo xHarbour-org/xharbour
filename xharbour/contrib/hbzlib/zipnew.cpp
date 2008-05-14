@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.30 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.31 2008/05/08 08:47:24 marchuet Exp $
  */
 
 /*
@@ -327,7 +327,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             #if defined( __WIN32__ )
                if ( iMeth == 0  || uAttr & FILE_ATTRIBUTE_DIRECTORY )
                {
-                  szMethod = "Stored";
+                  szMethod = (char*) "Stored";
                }
             #endif
 
@@ -338,20 +338,20 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
                switch( iLevel )
                {
                   case 0:
-                     szMethod = "DeflatN";
+                     szMethod = (char*) "DeflatN";
                      break;
 
                   case 1:
-                     szMethod = "DeflatX";
+                     szMethod = (char*) "DeflatX";
                      break;
 
                   case 2:
                   case 3:
-                     szMethod = "DeflatF";
+                     szMethod = (char*) "DeflatF";
                      break;
 
                   default:
-                     szMethod = "Unknow";
+                     szMethod = (char*) "Unknow";
                }
             }
 
@@ -408,7 +408,7 @@ char *hb___CheckFile( char * szFile )
 
    if ( ! pFileName->szExtension )
    {
-      pFileName->szExtension = ".zip";
+      pFileName->szExtension = (char*) ".zip";
    }
 
    hb_fsFNameMerge( szZipName, pFileName );
@@ -647,7 +647,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
             if ( szPath == NULL )
             {
                szPath = ( char* )pOut->szDrive;
-               pOut->szDrive = "";
+               pOut->szDrive = (char*) "";
                hb_fsFNameMerge( ( char* )szFileNameInZip, pOut );
                bChange = TRUE;
                bFreePath = FALSE;
@@ -691,7 +691,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
             if ( bChange )
             {
                bChange = FALSE;
-               szPath = "";
+               szPath = (char*) "";
             }
          }
 
@@ -1079,7 +1079,7 @@ BOOL bChange=FALSE;
             if ( szPath == NULL )
             {
                szPath = ( char* )pOut->szDrive;
-               pOut->szDrive = "";
+               pOut->szDrive = (char*) "";
                hb_fsFNameMerge( ( char* )szFileNameInZip, pOut );
                bChange = TRUE;
                bFreePath = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.2 2006/03/18 23:31:28 lculik Exp $
+ * $Id: getenvrn.c,v 1.3 2006/03/19 00:21:47 ronpinkas Exp $
  */
 
 /*
@@ -217,8 +217,11 @@ HB_FUNC(FT_GETE)
         //  now allocate that much memory and make sure 1st byte is a nul
         buffer = ( char * ) hb_xalloc(buffsize);
         strcpy(buffer,"\0");
-           while (*sCurEnv) 
+#if (defined(__GNUC__)&&__GNUC__>3)
+#else
+           while (*sCurEnv)
               *sCurEnv++;
+#endif
         }
      }
       x = 0;
@@ -243,8 +246,11 @@ HB_FUNC(FT_GETE)
             // store string to next array element
             hb_storc((char*)sCurEnv,1,x + 1);
         x++;
-           while (*sCurEnv) 
+#if (defined(__GNUC__)&&__GNUC__>3)
+#else
+           while (*sCurEnv)
               *sCurEnv++;
+#endif
         }
 
     if (rettype == CHARTYPE)
