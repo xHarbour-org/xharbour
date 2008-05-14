@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.210 2008/04/22 04:40:43 ronpinkas Exp $
+* $Id: thread.c,v 1.211 2008/04/30 16:47:34 ronpinkas Exp $
 */
 
 /*
@@ -429,6 +429,7 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    {
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = pPointer->item.asSymbol.value;
+      (*pPos)->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
       (*pPos)->item.asSymbol.pCargo->stackbase = pPos - pStack->pItems;
       (*pPos)->item.asSymbol.pCargo->uiSuperClass = pPointer->item.asSymbol.pCargo->uiSuperClass;
       pPos++;
@@ -452,6 +453,7 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    {
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = &hb_symEval;
+      (*pPos)->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
       (*pPos)->item.asSymbol.pCargo->stackbase = pPos - pStack->pItems;
       (*pPos)->item.asSymbol.pCargo->uiSuperClass = 0;
       pPos++;
@@ -1613,6 +1615,7 @@ HB_FUNC( STARTTHREAD )
       // Converting it to its Symbol.
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pSymbol;
+      pPointer->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it an object? */
@@ -1648,6 +1651,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pSymbol;
+      pPointer->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it a function name? */
@@ -1664,6 +1668,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
    }
    /* Is it a code block? */

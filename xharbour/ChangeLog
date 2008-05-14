@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6092 2008/05/09 18:23:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6093 2008/05/13 22:10:47 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-14 10:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/thread.c
+    ! Fixed segfault on thread creation after changes to struct hb_struSymbol.
+  * utils/hbrun/Makefile
+    ! Fixed hbrun compilation via GNU Makefiles (added zlib).
 
 2008-05-14 00:03 UTC+0100 Ath <Ath1 at sourceforge.net>
   * compile.mak
