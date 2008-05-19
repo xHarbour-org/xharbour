@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6098 2008/05/19 15:42:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6099 2008/05/19 23:17:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2008-05-19 18:43 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbvmpub.h
-    * Changed member uiDestroyed to uiFlags in struct HB_BASERRY
+    * Changed member uiDestroyed to uiFlags in struct HB_BASEARRAY
   * source/vm/arrays.c
     ! Clipper compatability and GPF trap in aEval() - Clipper defers all aSize() shrinking operations when in aEval()
 
