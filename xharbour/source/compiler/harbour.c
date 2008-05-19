@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.197 2008/05/03 23:37:40 andijahja Exp $
+ * $Id: harbour.c,v 1.198 2008/05/05 05:05:41 andijahja Exp $
  */
 
 /*
@@ -1703,7 +1703,7 @@ static void hb_compDeclaredInit( void )
 
    /*              Name        Ret  # of Prams  Param Types                                                   Ret Class  Param Classes  Next
                    ----------  ---  ----------  ------------------------------                                ---------  -------------  ------ */
-   _DECL s_001 = { "AADD"            , ' ', 2 , (BYTE*)"A "                                                   , {NULL}     , NULL , NULL  };
+   _DECL s_001 = { "AADD"            , ' ', 2 , (BYTE*)"A "                                                   , {NULL}   , NULL , NULL  };
    _DECL s_002 = { "ABS"             , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_001};
    _DECL s_003 = { "ACHOICE"         , 'N', 9 , (BYTE*)"NNNNA\x7a\x9d\xa8\xa8"                                , {NULL}   , NULL , &s_002};
    _DECL s_004 = { "ACLONE"          , 'A', 1 , (BYTE*)"A"                                                    , {NULL}   , NULL , &s_003};
@@ -2151,11 +2151,11 @@ static void hb_compDeclaredInit( void )
 
    hb_comp_pFirstDeclared   = &s_265; /* Change to BOTTOM Function. */
    hb_comp_pLastDeclared    = &s_001;
-   hb_comp_pReleaseDeclared = &s_001;
+   hb_comp_pReleaseDeclared = s_001.pNext;
 
    hb_comp_pFirstClass      = &s_TBROWSE;
    hb_comp_pLastClass       = &s_ERROR;
-   hb_comp_pReleaseClass    = &s_ERROR;
+   hb_comp_pReleaseClass    = s_ERROR.pNext;
 }
 
 PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
