@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.156 2007/12/23 06:23:37 andijahja Exp $
+ * $Id: win32ole.prg,v 1.157 2008/04/07 23:20:08 ronpinkas Exp $
  */
 
 /*
@@ -1128,7 +1128,7 @@ RETURN Self
                        break;
 
                     case VT_ERROR:
-                       pVariant->n1.n2.n3.scode = hb_parni(1);
+                       pVariant->n1.n2.n3.scode = hb_parni(-1);
                        break;
 
                     default:

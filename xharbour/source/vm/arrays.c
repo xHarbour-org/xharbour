@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.155 2008/03/20 15:25:51 likewolf Exp $
+ * $Id: arrays.c,v 1.156 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -136,7 +136,7 @@ HB_FORCE_EXPORT BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new
    pBaseArray->uiClass     = 0;
    pBaseArray->uiPrevCls   = 0;
    pBaseArray->ulBlock     = 0;
-   pBaseArray->uiDestroyed = 0;
+   pBaseArray->uiFlags     = 0;
 
    if( ulLen )
    {
@@ -251,24 +251,49 @@ HB_FORCE_EXPORT BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 
       if( ulLen != pBaseArray->ulLen )
       {
-         ULONG ulAllocated;
+         ULONG ulAllocated = pBaseArray->ulAllocated;
          ULONG ulPos;
          PHB_ITEM pItems;
 
          // release old items
          if( pBaseArray->ulLen > ulLen )
          {
+            // Clipper defers all aSize() shrinking operations when in aEval()!
+            if( ( pBaseArray->uiFlags & 0xF000 ) != 0 )
+            {
+               pBaseArray->ulLen = ulLen;
+               return TRUE;
+            }
+
             pItems = pBaseArray->pItems + ulLen;
             ulPos = pBaseArray->ulLen - ulLen;
+
             do
             {
-               hb_itemSetNil( pItems );
+               hb_itemSetNil( pItems ); //don't use ++ here
+               pItems++;
+            } while( --ulPos );
+         }
+         else if( ( pBaseArray->uiFlags & 0xF000 ) != 0 && ulLen > pBaseArray->ulLen && ulAllocated > pBaseArray->ulLen )
+         {
+            pItems = pBaseArray->pItems + pBaseArray->ulLen;
+
+            if( ulLen <= ulAllocated )
+            {
+               ulPos = ulLen - pBaseArray->ulLen;
+            }
+            else
+            {
+               ulPos = ulAllocated - pBaseArray->ulLen;
+            }
+
+            do
+            {
+               hb_itemSetNil( pItems ); //don't use ++ here
                pItems++;
             } while( --ulPos );
          }
 
-         // New allocated size:
-         ulAllocated = pBaseArray->ulAllocated;
          if( pBaseArray->ulBlock != 0 )
          {
             // Uses specified allocation size pBaseArray->ulBlock
@@ -296,7 +321,7 @@ HB_FORCE_EXPORT BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             else
             {
                // At least 10 percent more allocated items
-               ulAllocated = ulLen * 1.1;
+               ulAllocated = (ULONG) ( ulLen * 1.1 );
             }
          }
          else if( ulLen < ulAllocated )
@@ -347,6 +372,7 @@ HB_FORCE_EXPORT BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                      if( pBaseArray->pItems != pOldItems )
                      {
                         pItems = pBaseArray->pItems;
+
                         for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                         {
                            if( pItems->type == HB_IT_ARRAY && pItems->item.asArray.value )
@@ -367,7 +393,6 @@ HB_FORCE_EXPORT BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   // New buffer
                   pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulAllocated * sizeof( HB_ITEM ) );
                }
-
             }
 
             // Clears new allocated items
@@ -375,6 +400,7 @@ HB_FORCE_EXPORT BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             {
                pItems = pBaseArray->pItems + pBaseArray->ulAllocated;
                ulPos = ulAllocated - pBaseArray->ulAllocated;
+
                do
                {
                   ( pItems++ )->type = HB_IT_NIL;
@@ -1309,19 +1335,16 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       ULONG ulLen;
       ULONG ulCount;
       ULONG ulStart = 1;
-      ULONG ulParams = 2;  // HB_IT_ARRAY
-      PHB_ITEM pItems;
-	  PHB_ITEM pKeys = NULL;
+      ULONG ulParams;
 
       if( pArray->type == HB_IT_ARRAY )
       {
-         pItems = pArray->item.asArray.value->pItems;
          ulLen = pArray->item.asArray.value->ulLen;
+         pArray->item.asArray.value->uiFlags |= 0xF000;
+         ulParams = 2;
       }
       else
       {
-         pKeys = pArray->item.asHash.value->pKeys;
-         pItems = pArray->item.asHash.value->pValues;
          ulLen = pArray->item.asHash.value->ulTotalLen;
          ulParams = 3;
       }
@@ -1334,6 +1357,7 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       if( ulStart <= ulLen )
       {
          ulCount = ulLen - ulStart + 1;
+
          if( pulCount && ( *pulCount <= ulLen - ulStart ) )
          {
             ulCount = *pulCount;
@@ -1344,43 +1368,68 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
             ulCount = ulLen - ulStart + 1;
          }
 
-         /* work with subhashes */
-         if( pArray->type == HB_IT_HASH && pArray->item.asHash.value->uiLevel > 0 )
+         if( ulParams == 2 )
          {
-            register ULONG ulTotal = 0;
-
-            // skip first items
-            while( ulTotal + pItems->item.asHash.value->ulTotalLen < ulStart )
+            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               ulTotal += pItems->item.asHash.value->ulTotalLen;
-               ++pItems;
+               hb_vmPushSymbol( &hb_symEval );
+               hb_vmPush( bBlock );
+
+               hb_vmPush( pArray->item.asArray.value->pItems + ulStart );
+               hb_vmPushLong( ulStart + 1 );
+               hb_vmSend( (USHORT) ulParams );
             }
 
-            ulStart -= ulTotal;
-
-            while( ulCount > pItems->item.asHash.value->ulTotalLen )
+            if( pArray->item.asArray.value->ulLen != ulLen )
             {
-               hb_arrayEval( pItems, bBlock, &ulStart, &ulCount );
-               ulCount -= pItems->item.asHash.value->ulTotalLen;
-               ulStart = 1;
-               ++pItems;
-            }
+               ULONG ulNew = pArray->item.asArray.value->ulLen;
 
-            hb_arrayEval( pItems, bBlock, NULL, &ulCount );
-            return TRUE;
+               pArray->item.asArray.value->ulLen = ulLen;
+               pArray->item.asArray.value->uiFlags &= ~0xF000;
+               hb_arraySize( pArray, ulNew );
+            }
          }
-
-         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+         else
          {
-            hb_vmPushSymbol( &hb_symEval );
-            hb_vmPush( bBlock );
-            if( ulParams == 3 )
+            /* work with subhashes */
+            if( pArray->item.asHash.value->uiLevel > 0 )
             {
-               hb_vmPush( pKeys + ulStart );
+               register ULONG ulTotal = 0;
+               PHB_ITEM pItems = pArray->item.asHash.value->pValues;
+
+               // skip first items
+               while( ulTotal + pItems->item.asHash.value->ulTotalLen < ulStart )
+               {
+                  ulTotal += pItems->item.asHash.value->ulTotalLen;
+                  ++pItems;
+               }
+
+               ulStart -= ulTotal;
+
+               while( ulCount > pItems->item.asHash.value->ulTotalLen )
+               {
+                  hb_arrayEval( pItems, bBlock, &ulStart, &ulCount );
+                  ulCount -= pItems->item.asHash.value->ulTotalLen;
+                  ulStart = 1;
+                  ++pItems;
+               }
+
+               hb_arrayEval( pItems, bBlock, NULL, &ulCount );
+               return TRUE;
             }
-            hb_vmPush( pItems + ulStart );
-            hb_vmPushLong( ulStart + 1 );
-            hb_vmSend( (USHORT) ulParams );
+            else
+            {
+               for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+               {
+                  hb_vmPushSymbol( &hb_symEval );
+                  hb_vmPush( bBlock );
+
+                  hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
+                  hb_vmPush( pArray->item.asArray.value->pItems + ulStart );
+                  hb_vmPushLong( ulStart + 1 );
+                  hb_vmSend( (USHORT) ulParams );
+               }
+            }
          }
       }
 
@@ -1397,11 +1446,12 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
    //TraceLog( NULL, "Releasing Basearray %p\n", pBaseArray );
 
    // Called recursively from hb_arrayReleaseGarbage!
-   if( pBaseArray->uiDestroyed )
+   if( ( pBaseArray->uiFlags & ( 1 | 2 ) ) != 0 )
    {
       return;
    }
-   pBaseArray->uiDestroyed = 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseGarbage()
+
+   pBaseArray->uiFlags |= 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseGarbage()
 
    if( pBaseArray->uiClass )
    {
@@ -1429,7 +1479,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       #endif
    }
 
-   pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
+   pBaseArray->uiFlags |= 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
 
    if( pBaseArray->pItems )
    {
@@ -1844,11 +1894,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
 
    // Can be called from GC post hb_arrayReleaseBase() execution.
-   if( pBaseArray->uiDestroyed )
+   if( ( pBaseArray->uiFlags & ( 1 | 2 ) ) != 0 )
    {
       return;
    }
-   pBaseArray->uiDestroyed = 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseBase()
+
+   pBaseArray->uiFlags |= 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseBase()
 
    if( pBaseArray->uiClass )
    {
@@ -1860,7 +1911,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       hb_clsFinalize( &FakedObject );
    }
 
-   pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
+   pBaseArray->uiFlags |= 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
 
    //TraceLog( NULL, "hb_arrayReleaseGarbage( %p )\n", pBaseArray );
 

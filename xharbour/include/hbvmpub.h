@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.75 2008/03/14 19:58:01 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.76 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -322,7 +322,7 @@
       USHORT *   puiClsTree;   /* without use  */
       ULONG      ulAllocated;
       ULONG      ulBlock;
-      UINT       uiDestroyed;
+      UINT       uiFlags;
 #ifndef HB_ARRAY_USE_COUNTER
       PHB_ARRAY_HOLDER pOwners;
 #endif
