@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6099 2008/05/19 23:17:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6100 2008/05/19 23:33:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-19 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * source\rtl\tbrowse.prg
+     ! fixed bug in a filtered table. Bug reported from comp.lang.xharbour news.
+     * starting process of clean-up code:
+       - removed any old commented and unused code.
+     * changes in TDataCache:
+       - GetCellColor(), PerformInvalidation() and Invalidate() methods was
+         moved to default form, instead uses INLINE statement.
+       - moved ::nLastRow, ::nCurRow and ::nMaxRow vars to HIDDEN.
+       - created CurRow and LastRow ACCESS/ASSIGN.
 
 2008-05-19 18:43 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbvmpub.h

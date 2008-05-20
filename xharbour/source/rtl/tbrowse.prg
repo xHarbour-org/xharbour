@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.193 2008/03/13 10:49:42 likewolf Exp $
+ * $Id: tbrowse.prg,v 1.194 2008/03/26 23:33:20 modalsist Exp $
  */
 
 /*
@@ -92,47 +92,9 @@
 #include "tbrowse.ch"
 #include "error.ch"
 
-//-------------------------------------------------------------------//
-//
-//                         Pritpal Bedi
-//                 Constants to access ::aColsInfo
-//
-//#define o_Obj             1   // Object Column
-//#define o_Type            2   // Type of Data in Column
-//#define o_Width           3   // Column Width
-//#define o_Heading         4   // Column Headings
-//#define o_Footing         5   // Column Footings
-//#define o_Pict            6   // Column Picture
-//#define o_WidthCell       7   // Width of the Cell
-//#define o_ColSep          8   // Column Seperator
-//#define o_SepWidth        9   // Width of the Separator
-//#define o_DefColor       10   // Array with index of color
-//#define o_SetWidth       11   // If True, only SetFrozen can change o_Width
-/* 02/july/2005 - <maurilio.longo@libero.it>
-                  removed, not really needed, but still present inside ::aColsInfo,
-                  as a NIL value
-#define o_Blank          12   // Spaces corresponding to o_Width
-*/
-//#define o_lColSep        13   // Should column separator be drawn
-//#define o_ScrColPos      14   // Temporary column position on screen
-
-
-/* 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
-   25/11/2004 - <maurilio.longo@libero.it> Since there are only two colors, this makes every day less sense to me...
-*/
-//#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2 }[ nColor ] )
-
-/* 2006/SEP/25- E.F. Renamed column info constants to access ::aColinfo array.
- * These was "o_" old ones created by Pritbal Bedi.
- * Removed o_Blank constant and 12nd element of ::aColInfo array.
- * Removed ColorToDisp() function. This is not necessary anymore.
- * Assign new values to column color constants to allow set heading and
- * footing color indexes from defcolor.
- * Created DefColorOK() function to avoid access to unknowable index of
- * tbrowse colorspec.
- */
 
 /* TBColumn info constants. */
+
 #define TBCI_OBJ             1   // Object TBColumn
 #define TBCI_TYPE            2   // Type of Data in Column
 #define TBCI_WIDTH           3   // Column Width
@@ -147,15 +109,6 @@
 #define TBCI_LCOLSEP        12   // Should column separator be drawn
 #define TBCI_SCRCOLPOS      13   // Temporary column position on screen
 
-/* 25/11/2004 - <maurilio.longo@libero.it>
-   TBC_ are CLR_ constants increased by one to be used as indexes inside columns color arrays
-   HEADING and FOOTING have to be colored like STANDARD colors, clipper does it, and could simply
-   be removed
-*/
-//#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
-//#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
-
-/* TBColumn color constants  */
 #define TBC_CLR_STANDARD  1  // first index value to set unselected data color.
 #define TBC_CLR_ENHANCED  2  // second index value to set selected data color.
 #ifdef HB_COMPAT_C53
@@ -171,7 +124,7 @@
 /* 11/11/2005 - <maurilio.longo@libero.it>
                 Every cell inside tbrowse cache
 */
-CLASS TDataCell
+CLASS TDataCell                           
    DATA  xData                         // Cell value
    DATA  aColor                        // Cell colorBlock result
    DATA  aColorRect  INIT NIL          // Cell color if it is inside a color rect
@@ -183,48 +136,32 @@ END CLASS
                 TBrowse Data Cache class
    17/10/2005   Passes all tests I've done, including DBU
 */
-CLASS TDataCache
+CLASS TDataCache 
+
+   METHOD   New( oBrowse )              // Which tbrowse this cache is bound to
+
+   METHOD   dbSkip( nRecsToSkip )       // like dbSkip()
+   METHOD   dbGoTop()                    
+   METHOD   dbGoBottom()                 
+
+   METHOD   GetCell( nRow, nCol )        // Retrieves the content of column n of current row
+   METHOD   GetCellColor( nRow, nCol )
+
+   METHOD   Invalidate()                 
+   METHOD   SetColorRect( aRect )        // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
+   METHOD   PerformInvalidation()
+
+   ACCESS   CurRow       INLINE ::nCurRow
+   ASSIGN   CurRow(nRow) INLINE ::nCurRow := Max(1,Min(nRow,::nMaxRow))
+
+   ACCESS   LastRow       INLINE ::nLastRow
+
+
+HIDDEN:
                    // FSG - 14/06/2006 - Removed READONLY attribute to permit direct access for forced repositioning
-   DATA  nCurRow   //READONLY            // Current Row inside cache
-   DATA  nLastRow  //READONLY            // Last Row inside cache which has data ( it can be < Len( ::aCache ) )
-   DATA  nMaxRow
-
-   METHOD   New( oBrowse )             // Which tbrowse this cache is bound to
-
-   METHOD   dbSkip( nRecsToSkip )      // like dbSkip()
-   METHOD   dbGoTop()
-   METHOD   dbGoBottom()
-
-   METHOD   GetCell( nRow, nCol )      // Retrieves the content of column n of current row
-
-   // Retrieves the color (if any) of column n of current row, it can
-   // be called ONLY after GetCell() for the same row,col has been called
-   METHOD   GetCellColor( nRow, nCol ) INLINE IIF( CacheOK(::aCache,nRow,nCol), IIF( Empty( ::aCache[ nRow ][ nCol ]:aColorRect ),;
-                                                   ::aCache[ nRow ][ nCol ]:aColor,;
-                                                   ::aCache[ nRow ][ nCol ]:aColorRect), {} )
-
-   // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
-   METHOD   SetColorRect( aRect )
-
-   /* Please note that here Invalidate() means discard all data and force a reload from
-      datasource as need to show a certain row arises. On the other hand, inside a TBrowse ::Invalidate()
-      means only that all data will be re-painted onto screen but _not_ reloaded from
-      datasource. To reload data a call to RefreshCurrent()/RefreshAll() needs to be done.
-   */
-   METHOD   Invalidate( nRow )         INLINE  iif( nRow == NIL,;
-                                                    (::lInvalid := .T., ::aRectClone := {} ),;
-                                                    iif( CacheOK(::aCache,nRow ), ::aCache[ nRow ] := NIL, NIL ) ),;
-                                               Self
-
-   /* Needed for clipper compatibility, invalidation of cache must happen just before
-      stabilization of tbrowse. Note, this handles only full invalidation, not row invalidation
-   */
-
-   METHOD   PerformInvalidation()      INLINE  iif( ::lInvalid ,;
-                                                    ( AFill( ::aCache, NIL ), ::InitCache(), ::lInvalid := .F. , ::SetColorRect(::aRectClone), Self ),;
-                                                    Self )
-
-   HIDDEN:
+   DATA  nCurRow   // READONLY           // Current Row inside cache
+   DATA  nLastRow  // READONLY           // Last Row inside cache which has data ( it can be < Len( ::aCache ) )
+   DATA  nMaxRow                         // Max Row allowed inside cache.
 
    DATA  aCache                        // Array with cached data
    DATA  oCachedBrowse                 // TBrowse object I'm caching
@@ -241,19 +178,16 @@ END CLASS
 
 METHOD New( oBrowse ) CLASS TDataCache
 
-   local nRows
-
-   default nRows TO oBrowse:rowCount
+Local nRows := oBrowse:RowCount
 
    ::aCache := Array( nRows )
    ::oCachedBrowse := oBrowse
 
    ::nCurRow  := 1
-   ::nLastRow := nRows 
-   ::nMaxRow  := 1
-
+   ::nLastRow := 1 // nRows
    ::aRect    := {}
    ::lInvalid := .F.
+   ::nMaxRow  := nRows
 
 RETURN Self
 
@@ -287,32 +221,23 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
       if Empty( nRecsSkipped ) // PM:08-30-2007 Was nRecsSkipped == 0
                                // Note: For empty databases, nRecsSkipped was NIL here
 
-         if nRecsToSkip > 0
-            if nRecsToSkip <= ::nCurRow
-               ::nLastRow := ::nCurRow
-            else
-               ::nLastRow := Len( ::aCache )
-            endif
-         endif
-
       elseif nRecsSkipped == nRecsToSkip
          // If after movement I'm still inside present TBrowse
          //
-         if ( ::nCurRow + nRecsSkipped >= 1 ) .AND. ( ::nCurRow + nRecsSkipped <= Len( ::aCache ) )
+         if ( ::nCurRow + nRecsSkipped >= 1 ) .AND. ( ::nCurRow + nRecsSkipped <= ::nMaxRow )
             ::nCurRow += nRecsSkipped
-
+            ::nLastRow := Min( Max(::nCurRow,::nLastRow) , ::nMaxRow )
          else
             // It was K_PGDN or K_PGUP or K_UP or K_DN
             //
-            if Abs( nRecsSkipped ) >= Len( ::aCache )
+            if Abs( nRecsSkipped ) >= ::nMaxRow
                // K_PGDN
                //
                if nRecsSkipped > 0
-                  ::nCurRow := Len( ::aCache )
+                  ::nCurRow := ::nMaxRow
 
                else // K_PGUP
                   ::nCurRow := 1
-                  ::nLastRow := Len( ::aCache )
 
                endif
 
@@ -323,12 +248,12 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
                // I'm at top or bottom of TBrowse so I can scroll
                //
-               if ::nCurRow == Len( ::aCache )
+               if ::nCurRow == ::nMaxRow
                   ADel( ::aCache, 1 )
                else
                   AIns( ::aCache, 1 )
-                  if ::nLastRow < Len( ::aCache )
-                     ::nLastRow += 1
+                  if ::nLastRow < ::nMaxRow
+                     ::nLastRow ++
                   endif
                endif
 
@@ -339,14 +264,15 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
          // I couldn't move as far as requested
          // I need to refresh all rows if I go past current top or bottom row
          //
-         if ( ::nCurRow + nRecsSkipped < 1 ) .OR. ( ::nCurRow + nRecsSkipped > Len( ::aCache ) )
+         if ( ::nCurRow + nRecsSkipped < 1 ) .OR. ( ::nCurRow + nRecsSkipped > ::nMaxRow )
             // don't go past boundaries
             //
-            ::nCurRow := iif( nRecsSkipped > 0, Len( ::aCache ), 1 )
+            ::nCurRow := Max(1, iif( nRecsSkipped > 0, ::nMaxRow, 1 ) )
             AFill( ::aCache, NIL )
 
          else
             ::nCurRow += nRecsSkipped
+            ::nCurRow := Min( Max(1,::nCurRow), ::nMaxRow )
             IF CacheOK(::aCache,::nCurRow)
                ::aCache[ ::nCurRow ] := NIL
             ENDIF
@@ -371,7 +297,6 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 RETURN nRecsSkipped
 
 
-
 METHOD dbGoTop() CLASS TDataCache
 
    if ! HB_IsBlock( ::oCachedBrowse:GoTopBlock )
@@ -381,7 +306,7 @@ METHOD dbGoTop() CLASS TDataCache
    Eval( ::oCachedBrowse:GoTopBlock )
 
    ::nCurRow := 1
-   ::nLastRow := Len( ::aCache )
+// ::nLastRow := ::nMaxRow
 
 RETURN NIL
 
@@ -399,7 +324,7 @@ METHOD dbGoBottom() CLASS TDataCache
    // How many rows are available to top of datasource
    //PM:09-01-2007 If browsing an empty database, Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
    //              becomes NIL. So, first need to test if it's empty before trying to do a Abs() on it 
-   nToTop := Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
+   nToTop := Eval( ::oCachedBrowse:SkipBlock, - ( ::nMaxRow  - 1 ) )
 
    IF Empty( nToTop )
       nToTop := 0
@@ -408,7 +333,8 @@ METHOD dbGoBottom() CLASS TDataCache
    ENDIF
 
    ::nCurRow := 1
-   ::nLastRow := nToTop + 1
+   ::nLastRow := Max(1,Min( nToTop + 1, ::nMaxRow ))
+
 RETURN nToTop
 
 
@@ -419,7 +345,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
    local nRectPos, nCol 
    local nVideoRow,nVideoCol
 
-   IF nRow > Len( ::aCache )
+   IF nRow > ::nMaxRow
       RETURN Self
    ENDIF
 
@@ -432,27 +358,27 @@ METHOD FillRow( nRow ) CLASS TDataCache
 
    for each aCol in ::oCachedBrowse:aColsInfo
 
-      oCell := TDataCell():New()
+       oCell := TDataCell():New()
 
-      nCol := hb_EnumIndex()
+       nCol := hb_EnumIndex()
 
-      with object oCell
-         :xData := Eval( aCol[ TBCI_OBJ ]:block )
-         :aColor := IIF( Empty( aCol[ TBCI_OBJ ]:colorBlock ),;
+       with object oCell
+          :xData := Eval( aCol[ TBCI_OBJ ]:block )
+          :aColor := IIF( Empty( aCol[ TBCI_OBJ ]:colorBlock ),;
                          NIL,;
                          DefColorOK(::oCachedBrowse:ColorSpec, Eval( aCol[ TBCI_OBJ ]:colorBlock,:xData ) ) )
 
-         if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
-            if nCol >= ::aRect[ nRectPos ][ 2 ] .AND. nCol <= ::aRect[ nRectPos ][ 3 ]
-               :aColorRect := ::aRect[ nRectPos ][ 4 ]
-            endif
-         endif
+          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
+             if nCol >= ::aRect[ nRectPos ][ 2 ] .AND. nCol <= ::aRect[ nRectPos ][ 3 ]
+                :aColorRect := ::aRect[ nRectPos ][ 4 ]
+             endif
+          endif
 
-      end
+       end
 
-      if CacheOK(::aCache,nRow,nCol) 
-         ::aCache[ nRow ][ nCol ] := oCell
-      endif
+       if CacheOK(::aCache,nRow,nCol) 
+          ::aCache[ nRow ][ nCol ] := oCell
+       endif
 
    next
 
@@ -468,21 +394,22 @@ METHOD FillRow( nRow ) CLASS TDataCache
 Return Self
 
 
-
 METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    local nSkipped
 
-   IF empty(nRow) .or. empty(nCol)
-      return(nil)
+
+   if empty(nRow) .or. empty(nCol) .or. nRow > ::nMaxRow
+      return nil
+
    elseif Empty( ::aCache[ nRow ] )
 
       // No more rows contain data
-      if nRow > Max( ::nLastRow, ::nMaxRow )
+      if nRow > ::nLastRow
          return NIL
       elseif ( nSkipped := ::dbSkip( nRow - ::nCurRow ) ) <> 0 .OR. nRow - ::nCurRow == 0
-         // dbSkip( 0 ) already refills current row
-         if nSkipped <> 0 
+         // Skip( 0 ) already refills current row
+         if nSkipped <> 0
             ::FillRow( nRow )
          endif
 
@@ -495,6 +422,23 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
 RETURN IF( CacheOK(::aCache,nRow,nCol), ::aCache[ nRow ][ nCol ]:xData, NIL)
 
+/* Retrieves the color (if any) of column n of current row, it can
+ * be called ONLY after GetCell() for the same row,col has been called
+ */
+METHOD GetCellColor( nRow, nCol ) CLASS TDataCache
+Local aRet := {}
+
+   if CacheOK( ::aCache, nRow, nCol )
+
+      if Empty( ::aCache[ nRow ][ nCol ]:aColorRect )
+         aRet := ::aCache[ nRow ][ nCol ]:aColor
+      else
+         aRet := ::aCache[ nRow ][ nCol ]:aColorRect
+      endif
+
+   endif
+
+RETURN aRet
 
 METHOD SetColorRect( aRect ) CLASS TDataCache
 
@@ -530,19 +474,18 @@ METHOD SetColorRect( aRect ) CLASS TDataCache
 return Self
 
 
+/* This is needed when number of shown rows decreases due to a phantom record
+ * being removed; for example, using DBU, dbGoBottom(), Down(), Up()
+ * Clipper does this as well! :)
+ */
 METHOD InitCache() CLASS TDataCache
-Local nSkipped
-
-   /* This is needed when number of shown rows decreases due to a phantom record
-      being removed; for example, using DBU, dbGoBottom(), Down(), Up()
-      Clipper does this as well! :) */
 
    if ::nCurRow > 1
       ::dbSkip( -( ::nCurRow - 1 ) )
       ::nCurRow := 1
    else
 
-      /* This will force a dbSkip( 0 ), when row gets requested by TBrowse, which,
+      /* This will force a Skip( 0 ), when row gets requested by TBrowse, which,
         in turn, forces a reload of row from datasource, this cannot be done now
         since data has to be fetched from datasource only during stabilization
         phase */
@@ -553,19 +496,52 @@ Local nSkipped
 
    endif
 
-   if HB_IsBlock( ::oCachedBrowse:SkipBlock )  
-      nSkipped := Eval( ::oCachedBrowse:SkipBlock, Len(::aCache) )
-      Eval( ::oCachedBrowse:SkipBlock, -nSkipped )
-      ::nMaxRow := Max( ::nMaxRow, nSkipped ) 
+   if ::oCachedBrowse:DataSource = 0 // database
+      ::nLastRow := if( LastRec() >= ::nMaxRow , ::nMaxRow , Min( LastRec(),::nMaxRow) )
+   else
+      if ::nLastRow < ::nMaxRow
+         ::dbGoBottom() // to certify if ::nLastRow is ok. 
+         ::dbGoTop()
+      endif
+   endif
+  
+RETURN Self
+
+
+/* Please note that here Invalidate() means discard all data and force a
+ * reload from datasource as need to show a certain row arises.
+ * On the other hand, inside a TBrowse ::Invalidate() means only that all
+ * data will be re-painted onto screen but _not_ reloaded from datasource.
+ * To reload data a call to RefreshCurrent()/RefreshAll() needs to be done.
+ */
+METHOD Invalidate( nRow ) CLASS TDataCache
+
+   if nRow == NIL
+      ::lInvalid := .T.
+      ::aRectClone := {}
+   elseif nRow >= 1 .and. nRow <= Len( ::aCache )
+      ::aCache[ nRow ] := NIL
    endif
 
-   if ::oCachedBrowse:DataSource == 1  // array datasource.
-      ::nLastRow := Len( ::aCache )
+RETURN  Self
+
+/* Needed for clipper compatibility, invalidation of cache must happen just
+ * before stabilization of tbrowse.
+ * Note, this handles only full invalidation, not row invalidation
+ */
+METHOD PerformInvalidation() CLASS TDataCache
+
+   if ::lInvalid
+      AFill( ::aCache, NIL )
+      ::InitCache()
+      ::lInvalid := .F.
+      ::SetColorRect(::aRectClone)
    endif
 
 RETURN Self
 
-// ==============================================================================================
+
+//=========================================================================//
 
 
 CLASS TBrowse
@@ -573,19 +549,18 @@ CLASS TBrowse
    DATA autoLite               // Logical value to control highlighting
    DATA cargo                  // User-definable variable
    ACCESS ColCount      INLINE ::nColumns    // Number of TBrowse columns
-   DATA goBottomBlock         // Code block executed by TBrowse:goBottom()
-   DATA goTopBlock            // Code block executed by TBrowse:goTop()
    DATA leftVisible           // Indicates position of leftmost unfrozen column in display
    DATA rightVisible          // Indicates position of rightmost unfrozen column in display
    DATA rowCount              // Number of visible data rows in the TBrowse display
-   DATA skipBlock             // Code block used to reposition data source
+
+
    DATA stable                // Indicates if the TBrowse object is stable
 
    #ifdef HB_COMPAT_C53
    DATA nRow                  // Row number for the actual cell
    DATA nCol                  // Col number for the actual cell
    DATA aKeys
-   DATA mColpos,mrowPos,message
+   DATA mColPos,mRowPos,Message
    #endif
 
    #ifdef HB_EXTENSION
@@ -638,6 +613,15 @@ CLASS TBrowse
    ACCESS freeze INLINE ::nFrozenCols     // Number of columns to freeze/frozen
    ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols
 
+   ACCESS GoBottomBlock    INLINE ::bGoBottomBlock        // Code block executed by TBrowse:goBottom()
+   ASSIGN GoBottomBlock(b) INLINE if( hb_IsBlock(b), ::bGoBottomBlock := b, {||0} )
+
+   ACCESS GoTopBlock    INLINE ::bGoTopBlock        // Code block executed by TBrowse:goTop()
+   ASSIGN GoTopBlock(b) INLINE if( hb_IsBlock(b), ::bGoTopBlock := b, {||0} )
+
+   ACCESS SkipBlock    INLINE ::bSkipBlock        // Code block executed by TBrowse:SkipBlock()
+   ASSIGN SkipBlock(b) INLINE if( hb_IsBlock(b), ::bSkipBlock := b, {|i|0,0} )
+
    METHOD New( nTop, nLeft, nBottom, nRight )  // Constructor
    METHOD Down()                          // Moves the cursor down one row
    METHOD End()                           // Moves the cursor to the rightmost visible data column
@@ -687,6 +671,11 @@ CLASS TBrowse
 
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
                                           // _M_GotoXY because this method will mostly be called to handle mouse requests
+
+   DATA bGoBottomBlock         // Code block executed by TBrowse:goBottom()
+   DATA bGoTopBlock            // Code block executed by TBrowse:goTop()
+   DATA bSkipBlock             // Code block used to reposition data source
+
 
    HIDDEN:        /* H I D D E N */
 
@@ -766,9 +755,9 @@ CLASS TBrowse
    DATA cSpaceWidth                       // Spaces of browse width
    DATA lRectPainting                     // .T. when ::ColorRect() calls ::ForceStable() to paint a colored region
 
-   DATA oDataCache
+   DATA oCache
    DATA lPaintBottomUp                    // .T. after a PG_DN, paints browser from bottom to top, optimizing
-                                          // dbSkip()s calls. ( Clipper works this way )
+                                          // Skip()s calls. ( Clipper works this way )
 #ifdef HB_COMPAT_C53
    DATA rect
    DATA aVisibleCols
@@ -842,7 +831,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::mRowPos         := 0
    ::rect            := { nTop, nLeft, nBottom, nRight }
    ::aVisibleCols    := {}
-   ::message         := ''
+   ::Message         := ''
    ::nRow            := 0
    ::nCol            := 0
    ::aStyle          := Array( TBR_CUSTOM ) 
@@ -855,7 +844,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpaceWidth     := ''
    ::lRectPainting   := .f.
 
-   ::oDataCache := TDataCache():New( Self )
+   ::oCache := TDataCache():New( Self )
    ::lPaintBottomUp  := .F.
 
    ::nPrevDelColPos   := 0
@@ -896,7 +885,7 @@ Return Self
 METHOD RefreshAll() CLASS TBrowse
 
    AFill( ::aRedraw, .T. )
-   ::oDataCache:Invalidate()
+   ::oCache:Invalidate()
    ::Stable := .F.
 
 Return Self
@@ -910,10 +899,11 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    default nMode to 0
 
-   if nMode == 3
+   if nMode > 2
       nMode := 0
-      lInitializing := .t.
    endif
+
+   lInitializing := ( nMode == 0 )
 
    // 2006/NOV/14 - E.F. - I need know if datasource is a database or not,
    //                      to allow reset row position below.
@@ -1118,6 +1108,7 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    enddo
 
+
    // 2006/OCT/27 - E.F. Moved this part of code (if-endif) from before "do while .t."
    //                    to after "do while .t." to allow calls to ::configure(1) calculate
    //                    ::RowCount value considering hearders and footers, if any.
@@ -1129,18 +1120,18 @@ METHOD Configure( nMode ) CLASS TBrowse
    //
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
                            iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
-   
-   if Len( ::aRedraw ) <> ::RowCount .AND. ::RowCount > 0
+
+   if Len( ::aRedraw ) <> ::RowCount .and. ::RowCount > 0 
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
-      ::oDataCache := TDataCache():New( Self )
+      ::oCache := TDataCache():New( Self )
       // here 'n' is an array
       for each n in ::aRect
-         ::oDataCache:SetColorRect( n )
+          ::oCache:SetColorRect( n )
       next
       ::aRect := {}
    else
-      ::oDataCache:Invalidate()
+      ::oCache:Invalidate()
    endif
 
    ::Invalidate()
@@ -1152,7 +1143,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    endif
    ::SetFrozenCols( nFreeze, .t. )
 
-   #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    ::Rect := { ::nwTop + ::nHeaderHeight + if( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ), ::nwLeft, ::nwBottom - ::nFooterHeight - if( ::lFootSep .OR. ::lColFootSep, 1, 0 ), ::nwRight }
 
    ASize( ::aVisibleCols, ::nwRight - ::nwLeft + 1 )
@@ -1160,7 +1151,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    for each xVal in ::aVisibleCols
       xVal := HB_EnumIndex() + n
    next
-   #endif
+#endif
 
 
    // FSG - 14/06/2006 - added resetting of data positioning that I can get 
@@ -1169,8 +1160,8 @@ METHOD Configure( nMode ) CLASS TBrowse
    //
    IF nMode == 0 .AND. ::DataSource == 1 
       IF ::nRecsToSkip <> 0
-         ::nNewRowPos := ::nRowPos + ::nRecsToSkip
-         ::oDataCache:nCurRow := ::nNewRowPos
+         ::nNewRowPos := Max(1,::nRowPos + ::nRecsToSkip)
+         ::oCache:CurRow := ::nNewRowPos
          ::nRecsToSkip := 0
       ENDIF
       ::RefreshAll()
@@ -1225,7 +1216,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
    //                      the browse at first column addition. At this way
    //                      we avoid ::RowCount wrong value, that is used to
    //                      calculate datasource movements. 
-   if !::lNeverDisplayed .or. ::nColumns == 1
+   if ! ::lNeverDisplayed .or. ::nColumns == 1
       ::Configure( 1 )
    endif
  
@@ -1250,7 +1241,7 @@ METHOD InsColumn( nPos, oCol ) CLASS TBrowse
 
       ::nColumns++
 
-      if !( ::lNeverDisplayed )
+      if ! ::lNeverDisplayed
          ::Configure( 1 )
       endif
       ::lConfigured := .f.
@@ -1273,7 +1264,7 @@ METHOD SetColumn( nColumn, oCol ) CLASS TBrowse
 
       ::aColsInfo[ nColumn ] := ::AColInfo( oCol )
 
-      if !( ::lNeverDisplayed )
+      if ! ::lNeverDisplayed
          ::Configure( 1 )
       endif
       ::lConfigured := .f.
@@ -1341,7 +1332,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
       ::aRedraw := {}
    endif
 
-   if !::lNeverDisplayed
+   if ! ::lNeverDisplayed
       ::Configure( 1 )
    endif
    ::lConfigured := .f.
@@ -1563,6 +1554,7 @@ METHOD PageUp() CLASS TBrowse
 
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
+
 Return Self
 
 //-------------------------------------------------------------------//
@@ -1574,7 +1566,7 @@ METHOD GoBottom() CLASS TBrowse
    ::Moved(, .t.)
 
    // Skips back from last record as many records as TBrowse can hold
-   nToTop := ::oDataCache:dbGoBottom()
+   nToTop := ::oCache:dbGoBottom()
 
    ::nRecsToSkip := ::RowCount - 1
 
@@ -1582,7 +1574,6 @@ METHOD GoBottom() CLASS TBrowse
    //::nNewRowPos := nToTop + 1
    /* 2007/DEC/25 - E.F. - Suggested by P.Tasarenko */
    ::nNewRowPos := Max(::RowCount - 1, nToTop ) + 1
-
    ::nRowPos := 1
    ::RefreshAll()
 
@@ -1591,11 +1582,13 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD GoTop() CLASS TBrowse
+Local nTop
 
    ::Moved(, .t.)
-   ::oDataCache:dbGoTop()
+   nTop := ::oCache:dbGoTop()
+
    // required for compatibility
-   ::oDataCache:dbSkip( 0 )
+   ::oCache:dbSkip( 0 )
 
    ::nNewRowPos := 1
    ::RefreshAll()
@@ -2312,7 +2305,7 @@ METHOD ColorRect( aRect, aColors ) CLASS TBrowse
 
    if ::lConfigured
 
-      ::oDataCache:SetColorRect( { Max( aRect[ 1 ], 1 ),;
+      ::oCache:SetColorRect( { Max( aRect[ 1 ], 1 ),;
                                    Max( aRect[ 2 ], 1 ),;
                                    Min( aRect[ 3 ], ::rowCount ),;
                                    Min( aRect[ 4 ], ::colCount ),;
@@ -2456,7 +2449,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    endif
 
    // Execute a pending invalidation of cache
-   ::oDataCache:PerformInvalidation()
+   ::oCache:PerformInvalidation()
 
    // I need to set columns width If TBrowse was never displayed before
    //
@@ -2553,18 +2546,18 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // last record (note ::lHitBottom is set only during a movement)
       //
 
-      // Here I use :nLastRow because I'm testing if cache has fewer records than
+      // Here I use LastRow because I'm testing if cache has fewer records than
       // tbrowse displayable area
 
-      if ::oDataCache:nLastRow < ::nNewRowPos
-         ::nNewRowPos := ::oDataCache:nCurRow
+      if ::oCache:LastRow < ::nNewRowPos
+         ::nNewRowPos := ::oCache:CurRow
       endif
 
       // If I'm not already under cursor I have to set data source to cursor position
       //
 
-      if ::oDataCache:nCurRow <> ::nNewRowPos
-         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
+      if ::oCache:CurRow <> ::nNewRowPos
+         ::EvalSkipBlock( ::nNewRowPos - ::oCache:CurRow )
       endif
 
       // new cursor position
@@ -2612,11 +2605,10 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // maybe I've interrupted an ongoing stabilization
       // I have to set data source to cursor position
       //
-      if ::oDataCache:nCurRow <> ::nNewRowPos
+      if ::oCache:CurRow <> ::nNewRowPos
          /* 2007/DEC/14 - E.F. Assign rows skipped here. */
-         //::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
-         nSkipped := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) )
-
+         //::EvalSkipBlock( ::nNewRowPos - ::oCache:CurRow )
+         nSkipped := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oCache:CurRow ) )
       endif
 
       /* 2007/DEC/31 - EF - Store rows to go back after goBottom movement */
@@ -2660,7 +2652,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
                //
                ::RefreshAll()
 
-            else  
+            else
                // K_DN or K_UP
                // Where does really start first TBrowse row?
                //
@@ -2691,7 +2683,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
                if Abs( nRecsSkipped ) > 1
                   For nRow := 1 TO ::RowCount
                      ::aRedraw[ nRow ] := .T.
-                     ::oDataCache:Invalidate( nRow )
+                     ::oCache:Invalidate( nRow )
                   Next
                else
 
@@ -2748,14 +2740,13 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    LOCAL nColFrom
    LOCAL lDisplay
    LOCAL nCol, nRow2Fill, nLeftColPos
-//   LOCAL nRowsToSkip, nSkipped
    LOCAL cColBlanks                 // Enough Space()s to fill a column
 
    colorSpec  := ::aColorSpec[ 1 ]
 
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
-   lDisplay := ! ::oDataCache:GetCell( nRow, iif( ::nFrozenCols > 0, 1, ::leftVisible ) ) == NIL
+   lDisplay := ! ( ::oCache:GetCell( nRow, iif( ::nFrozenCols > 0, 1, ::leftVisible ) ) == NIL )
 
    if lDisplay
 
@@ -2763,7 +2754,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
          DispOutAt( nRow + ::nRowData, ::nwLeft, ::cSpacePre, ColorSpec )
 
          for nCol:= nColFrom to ::rightVisible
-            ::DispCell( nRow, nCol, ::oDataCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
+            ::DispCell( nRow, nCol, ::oCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
 
             if nCol < ::rightVisible .and. ::aColsInfo[ nCol, TBCI_LCOLSEP ]
                DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
@@ -2779,7 +2770,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                DispOut( ::cSpacePre, ColorSpec )
             endif
 
-            ::DispCell( nRow, nCol, ::oDataCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
+            ::DispCell( nRow, nCol, ::oCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
 
             if nCol < ::rightVisible .and. ::aColsInfo[ nCol,TBCI_LCOLSEP ]
                DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
@@ -2948,7 +2939,7 @@ METHOD DeHilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      xValue := ::oDataCache:GetCell( ::nRowPos, ::nColPos )
+      xValue := ::oCache:GetCell( ::nRowPos, ::nColPos )
 
       /* 02/11/2005 - <maurilio.longo@libero.it>
                       Happens when browse is not ::stable, clipper does the same thing,
@@ -2981,7 +2972,7 @@ METHOD Hilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      xValue := ::oDataCache:GetCell( ::nRowPos, ::nColPos )
+      xValue := ::oCache:GetCell( ::nRowPos, ::nColPos )
 
       /* 02/11/2005 - <maurilio.longo@libero.it>
                       Happens when browse is not ::stable, clipper does the same thing,
@@ -3024,7 +3015,7 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    cColorBKG := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ TBC_CLR_STANDARD ] - 1 ) )
 
-   aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
+   aCellColor := ::oCache:GetCellColor( nRow, nColumn )
 
 
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
@@ -3091,7 +3082,7 @@ METHOD RefreshCurrent() CLASS TBrowse
    if ! Empty( ::aRedraw ) .and. ::nRowPos>0
 
       ::aRedraw[ ::nRowPos ] := .T.
-      ::oDataCache:Invalidate( ::nRowPos )
+      ::oCache:Invalidate( ::nRowPos )
 
    endif
 
@@ -3249,7 +3240,7 @@ METHOD SetBorder( cBorder ) CLASS TBrowse
             ::nwBottom++
          endif
       endif
-      ::Configure()
+      ::Configure( 0 )
    endif
 
 Return self
@@ -3281,8 +3272,10 @@ Return uValue
 //---------------------------------------------------------------------//
 
 METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
-   LOCAL lSign   := nSkip >= 0
-   LOCAL nSkipped := ::oDataCache:dbSkip( nSkip )
+   LOCAL lSign, nSkipped
+
+   lSign   := ( nSkip >= 0 )
+   nSkipped := ::oCache:dbSkip( nSkip )
 
    /* 19/10/2005 - <maurilio.longo@libero.it>
                    Why do we do this?
@@ -3299,8 +3292,8 @@ Return nSkipped
 //                      Clipper 5.3b Compatibility
 //
 //---------------------------------------------------------------------//
+
 #ifdef HB_COMPAT_C53
-//---------------------------------------------------------------------//
 
 METHOD ApplyKey( nKey )  CLASS TBrowse
 
@@ -3375,60 +3368,8 @@ METHOD TApplyKey( nKey, oBrowse ) CLASS TBrowse
 
 Return nReturn
 
-//-------------------------------------------------------------------//
-/*
-*METHOD HitTest( mrow,mcol ) CLASS TBrowse
-*   LOCAL i, nVisCol, lHitHeader := .f.
-*   LOCAL nColPos
-*
-*   ::mRowPos := ::nRowPos
-*   ::mColPos := ::colPos
-*
-*   if mRow < ::nTop .or. mRow > ::rect[ 3 ]
-*      return HTNOWHERE
-*   endif
-*
-*   if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
-*      return HTNOWHERE
-*   endif
-*
-*   ::mRowPos := mRow - ::rect[ 1 ] + 1
-*   // Is the header separator part of the "header" when click?
-*   if ::mRowPos < 1 - if( ::lHeadSep .OR. ::lColHeadSep , 1, 0 )
-*      lHitHeader := .t.
-*   endif
-*
-*   nVisCol := len( ::aColumnsSep )
-*
-*   if nVisCol == 0
-*      nColPos := 1
-*
-*   elseif mcol >= ::aColumnsSep[ nVisCol ]
-*      nColPos := nVisCol + 1
-*
-*   else
-*      for i := 1 to nVisCol
-*         if mcol < ::aColumnsSep[ i ]
-*            nColPos := i
-*            exit
-*         endif
-*      next
-*   endif
-*
-*   if ::nFrozenCols > 0 .and. nColPos <= ::nFrozenCols
-*      // Do Nothing
-*   elseif ::nFrozenCols > 0 .and. nColPos > ::nFrozenCols
-*      nColPos := ::LeftVisible + nColPos - ::nFrozenCols - 1
-*   else
-*      nColPos := ::LeftVisible + nColPos - 1
-*   endif
-*
-*   ::mColPos := nColPos
-*
-*Return if( lHitHeader, HTHEADING, HTCELL )
-*/
-
 // FSG - 14/06/2006 - expanded HitTest()
+
 METHOD HitTest( mrow,mcol ) CLASS TBrowse
    Local i, nVisCol
    LOCAL nRet
@@ -3604,10 +3545,13 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 return 1
 
 //---------------------------------------------------------------------//
-#endif
+//
+//                    End of Clipper 5.3b Compatibility
+//
 //---------------------------------------------------------------------//
+#endif
 
-static function LenVal( xVal, cType, cPict )
+STATIC FUNCTION LenVal( xVal, cType, cPict )
    LOCAL nLen
 
    if !ISCHARACTER( cType )
@@ -3651,21 +3595,7 @@ Return nLen
 
 //-------------------------------------------------------------------//
 
-static Function ArrayToList( aArray )
-
-   LOCAL cList := "", a
-
-   for each a in aArray
-      cList += AllTrim( str( a ) ) + ", "
-   next
-
-   cList := SubStr( cList, 1, Len( cList ) - 2 )
-
-Return cList
-
-//-------------------------------------------------------------------//
-
-static function Color2Array( cColorSpec )
+STATIC FUNCTION Color2Array( cColorSpec )
 
    LOCAL n
    LOCAL a_ := {}
@@ -3690,7 +3620,7 @@ Return a_
 
 //-------------------------------------------------------------------//
 
-static function BlankValue( aColInfo )
+STATIC FUNCTION BlankValue( aColInfo )
 local xValue
 
 switch aColInfo[ TBCI_TYPE ]
@@ -3708,9 +3638,9 @@ switch aColInfo[ TBCI_TYPE ]
 end
 Return xValue
 
-*----------------------------------
-Static Function CacheOK( a, n, n2 )
-*----------------------------------
+*------------------------------------
+STATIC FUNCTION CacheOK( a, n, n2 )
+*------------------------------------
 * 2006/MAR/13 - E.F.
 * Test the validity of the cache array before assess/assign value for it.
 * This test avoid error if array is empty or element is out of bound or nil.
@@ -3729,9 +3659,9 @@ Endif
 
 Return lRet
 
-*--------------------------------------------------
-Static Function DefColorOK( cColorSpec, aDefColor )
-*--------------------------------------------------
+*----------------------------------------------------
+STATIC FUNCTION DefColorOK( cColorSpec, aDefColor )
+*----------------------------------------------------
 * Check validity of defcolor index array. If any value is
 * invalid return default index array.
 *--------------------------------------------------
@@ -3753,9 +3683,9 @@ DEFAULT aDefColor TO  {1,2,1,1}
 
 Return iif( lOK, aDefColor, {1,2,1,1} )
 
-*------------------------
-Static Function IsDb(oTb)
-*------------------------
+*--------------------------
+STATIC FUNCTION IsDb(oTb)
+*--------------------------
 * Check if datasource used by Tbrowse is a database or not.
 *-------------------------------
 LOCAL lIsDb, aWA, nArea, aArea, lBottom, nSkip, nSkipped, oCol
@@ -3796,6 +3726,7 @@ IF Used()
 
       nSkip := if(lBottom,-1,1)
       nSkipped := Eval( oTb:SkipBlock, nSkip )
+      DEFAULT nSkipped TO 0
 
       FOR EACH aArea IN aWA
           IF &(aArea[1])->( recno() ) != aArea[2]
@@ -3827,7 +3758,7 @@ ENDIF
 RETURN ( iif(lIsDB,0,1) )
 
 *-------------------------
-Static Function IsBottom()
+STATIC FUNCTION IsBottom()
 *-------------------------
 * Check if database is positioned at last record, not eof().
 * Don't use OrdKeyNo() == OrdKeyCount() because decrease performance.
@@ -3847,9 +3778,9 @@ ENDIF
 
 RETURN ( lBottom )
 
-*-------------------------------
-Static Function EmptyStr( cStr )
-*-------------------------------
+*---------------------------------
+STATIC FUNCTION EmptyStr( cStr )
+*---------------------------------
 * Check if a string is valid.
 *-------------------------------
 Return !( Hb_IsString( cStr ) .and. Len( cStr ) > 0 )
