@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.242 2008/04/22 04:40:34 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.243 2008/05/04 14:20:50 andijahja Exp $
  */
 
 /*
@@ -149,7 +149,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_GCITEM( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_GCITEM ) != 0 )
 #define HB_IS_STRINGWR( p )   ( HB_ITEM_TYPE( p ) & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
 
-#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && (( p )->item.asArray.value->uiDestroyed & 2) != 0 )
+#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && ( ( p )->item.asArray.value->uiFlags & 2 ) == 2 )
 
 #define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) ) != 0 )
 #define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
@@ -188,7 +188,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_STRINGWR( p )   ( ( HB_ITEM_TYPERAW( p ) & HB_IT_STRING ) != 0 && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
 #define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPERAW( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPERAW( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG | HB_IT_DEFAULT ) ) != 0 )
 #define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
-#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && (( p )->item.asArray.value->uiDestroyed & 2) != 0 )
+#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && ( ( p )->item.asArray.value->uiFlags & 2 ) == 2 )
 
 #endif
 
