@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.6 2008/05/06 05:47:49 andijahja Exp $
+# $Id: compile.mak,v 1.7 2008/05/13 22:10:47 ath1 Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2490,6 +2490,9 @@ $(OBJ_DIR)$(DIR_SEP)replace$(OBJEXT) : $(CT_DIR)$(DIR_SEP)replace.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)screen1$(OBJEXT) : $(CT_DIR)$(DIR_SEP)screen1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)setlast$(OBJEXT) : $(CT_DIR)$(DIR_SEP)setlast.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)settime$(OBJEXT) : $(CT_DIR)$(DIR_SEP)settime.c

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.8 2008/05/05 05:05:41 andijahja Exp $
+# $Id: common.mak,v 1.9 2008/05/06 05:47:49 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -976,6 +976,7 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)remove$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)replace$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)screen1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)setlast$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)settime$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strdiff$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strfile$(OBJEXT)\
