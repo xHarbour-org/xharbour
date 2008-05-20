@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.44 2008/05/06 05:47:54 andijahja Exp $
+# $Id: makefile.gc,v 1.45 2008/05/14 13:28:40 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -342,7 +342,7 @@ CLIBFLAGS   +=
 #===============================================================================
 HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing
-CLIBFLAGS   +=-Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win
+CLIBFLAGS   +=-Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
@@ -447,6 +447,12 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
 $(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	$(LIB_CMD)
 
 endif

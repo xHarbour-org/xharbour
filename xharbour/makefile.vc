@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.217 2008/04/29 08:55:52 andijahja Exp $
+# $Id: makefile.vc,v 1.218 2008/05/06 05:47:54 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -439,7 +439,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
-CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win
+CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
@@ -506,6 +506,12 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
 $(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	$(LIB_CMD)
 
 !endif

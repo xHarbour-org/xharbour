@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.71 2008/04/29 07:20:33 andijahja Exp $
+# $Id: contrib.pc,v 1.1 2008/04/30 13:20:30 andijahja Exp $
 #
 # MAKEFILE FOR PELLESC (CONTRIBS)
 #
@@ -29,7 +29,7 @@ HB_XWT=1
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 
-INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(FREEIMAGE_DIR)\include" /I"$(GDLIB_DIR)\include" /I"$(XWT_DIR)\include" /I"$(XWT_DIR)\src\xwt_win"
+INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(FREEIMAGE_DIR)\include" /I"$(GDLIB_DIR)\include" /I"$(XWT_DIR)\include" /I"$(XWT_DIR)\src\xwt_win" /I"$(ZLIB_DIR)" /I"$(PNG_DIR)"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 HB_CMD      =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
 CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HB_EXT_INKEY" /D"HB_OS_WIN_32_USED"
@@ -121,6 +121,12 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
 $(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	$(LIB_CMD)
 
 #===============================================================================

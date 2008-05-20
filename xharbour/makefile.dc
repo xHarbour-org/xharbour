@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.41 2008/04/29 08:55:52 andijahja Exp $
+# $Id: makefile.dc,v 1.42 2008/05/06 05:47:54 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -296,8 +296,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win
-CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT"
+INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win;$(ZLIB_DIR);$(PNG_DIR)
+CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
 HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
@@ -399,6 +399,12 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
 $(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	$(LIB_CMD)
 
 !endif

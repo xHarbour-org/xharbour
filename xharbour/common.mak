@@ -45,6 +45,8 @@ HBPP_DIR      =utils$(DIR_SEP)hbpp
 HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 
+HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
+PNG_DIR       =contrib$(DIR_SEP)png
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
 FIREBIRD_DIR  =contrib$(DIR_SEP)firebird
 FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
@@ -125,6 +127,8 @@ WHAT32_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)what32$(LIBEXT)
 WVTGUI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)wvtgui$(LIBEXT)
 XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
 XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
+PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
+HBHPDF_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbhpdf$(LIBEXT)
 
 #===============================================================================
 # Macros For DLL Build
@@ -976,8 +980,8 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)remove$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)replace$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)screen1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)setlast$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)settime$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)setlast$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strdiff$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strfile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strswap$(OBJEXT)\
@@ -1549,6 +1553,83 @@ XWT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)xwt_win_menuitem$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)xwt_win_framewnd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)xwt_win_msgbox$(OBJEXT)
+
+#===============================================================================
+# PNG.LIB dependencies
+#===============================================================================
+PNG_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)png$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngerror$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngget$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngmem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngpread$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngread$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngrio$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngrtran$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngrutil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngset$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngtrans$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngwio$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngwrite$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngwtran$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngwutil$(OBJEXT)
+
+#===============================================================================
+# HBHPDF.LIB dependencies
+#===============================================================================
+HBHPDF_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)harupdf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_utils$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_error$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_mmgr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_list$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_streams$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_objects$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_null$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_boolean$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_number$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_real$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_name$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_array$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_dict$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_xref$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_string$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_binary$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encrypt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encryptdict$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_tt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_type1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_base14$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_font$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_font_type1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_font_tt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_font_cid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_doc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_info$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_catalog$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_page_label$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_gstate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_pages$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_page_operator$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_destination$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_annotation$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_outline$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_image$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_jp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_kr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_cns$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_cnt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_jp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_kr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cns$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cnt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_image_png$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT)
+
 #===============================================================================
 # Build Target
 #===============================================================================
@@ -1628,4 +1709,6 @@ CONTRIB_PROJECT=\
 	$(RDDADS_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
-	$(WVTGUI_LIB)
+	$(WVTGUI_LIB)\
+	$(PNG_LIB)\
+	$(HBHPDF_LIB)
