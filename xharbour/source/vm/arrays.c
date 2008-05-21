@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.157 2008/05/19 23:17:00 ronpinkas Exp $
+ * $Id: arrays.c,v 1.158 2008/05/21 03:33:14 ronpinkas Exp $
  */
 
 /*
@@ -1330,72 +1330,89 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayEval(%p, %p, %p, %p)", pArray, bBlock, pulStart, pulCount));
 
-   if( ( pArray->type == HB_IT_ARRAY || pArray->type == HB_IT_HASH ) && HB_IS_BLOCK( bBlock ) )
+   if( HB_IS_BLOCK( bBlock ) )
    {
       ULONG ulLen;
       ULONG ulCount;
       ULONG ulStart = 1;
-      ULONG ulParams;
 
       if( pArray->type == HB_IT_ARRAY )
       {
-         ulLen = pArray->item.asArray.value->ulLen;
-         pArray->item.asArray.value->uiFlags |= 0xF000;
-         ulParams = 2;
-      }
-      else
-      {
-         ulLen = pArray->item.asHash.value->ulTotalLen;
-         ulParams = 3;
-      }
+         PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
 
-      if( pulStart && ( *pulStart >= 1 ) )
-      {
-         ulStart = *pulStart;
-      }
+         ulLen = pBaseArray->ulLen;
+         pBaseArray->uiFlags |= 0xF000;
 
-      if( ulStart <= ulLen )
-      {
-         ulCount = ulLen - ulStart + 1;
-
-         if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+         if( pulStart && ( *pulStart >= 1 ) )
          {
-            ulCount = *pulCount;
+            ulStart = *pulStart;
          }
 
-         if( ulStart + ulCount > ulLen )             /* check range */
+         if( ulStart <= ulLen )
          {
             ulCount = ulLen - ulStart + 1;
-         }
 
-         if( ulParams == 2 )
-         {
+            if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+            {
+               ulCount = *pulCount;
+            }
+
+            if( ulStart + ulCount > ulLen )             /* check range */
+            {
+               ulCount = ulLen - ulStart + 1;
+            }
+
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( bBlock );
 
-               hb_vmPush( pArray->item.asArray.value->pItems + ulStart );
+               hb_vmPush( pBaseArray->pItems + ulStart );
                hb_vmPushLong( ulStart + 1 );
-               hb_vmSend( (USHORT) ulParams );
+
+               hb_vmSend( 2 );
             }
 
-            if( pArray->item.asArray.value->ulLen != ulLen )
+            if( pBaseArray->ulLen != ulLen )
             {
-               ULONG ulNew = pArray->item.asArray.value->ulLen;
+               ULONG ulNew = pBaseArray->ulLen;
 
-               pArray->item.asArray.value->ulLen = ulLen;
-               pArray->item.asArray.value->uiFlags &= ~0xF000;
+               pBaseArray->ulLen = ulLen;
+               pBaseArray->uiFlags &= ~0xF000;
                hb_arraySize( pArray, ulNew );
             }
          }
-         else
+      }
+      else if( pArray->type == HB_IT_HASH )
+      {
+         PHB_BASEHASH pBaseHash = pArray->item.asHash.value;
+
+         ulLen = pBaseHash->ulTotalLen;
+
+         if( pulStart && ( *pulStart >= 1 ) )
          {
+            ulStart = *pulStart;
+         }
+
+         if( ulStart <= ulLen )
+         {
+            ulCount = ulLen - ulStart + 1;
+
+            if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+            {
+               ulCount = *pulCount;
+            }
+
+            if( ulStart + ulCount > ulLen )             /* check range */
+            {
+               ulCount = ulLen - ulStart + 1;
+            }
+
             /* work with subhashes */
-            if( pArray->item.asHash.value->uiLevel > 0 )
+            if( pBaseHash->uiLevel > 0 )
             {
                register ULONG ulTotal = 0;
-               PHB_ITEM pItems = pArray->item.asHash.value->pValues;
+               PHB_ITEM pItems = pBaseHash->pValues;
 
                // skip first items
                while( ulTotal + pItems->item.asHash.value->ulTotalLen < ulStart )
@@ -1424,13 +1441,18 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
                   hb_vmPushSymbol( &hb_symEval );
                   hb_vmPush( bBlock );
 
-                  hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
-                  hb_vmPush( pArray->item.asHash.value->pValues + ulStart );
+                  hb_vmPush( pBaseHash->pKeys + ulStart );
+                  hb_vmPush( pBaseHash->pValues + ulStart );
                   hb_vmPushLong( ulStart + 1 );
-                  hb_vmSend( (USHORT) ulParams );
+
+                  hb_vmSend( 3 );
                }
             }
          }
+      }
+      else
+      {
+         return FALSE;
       }
 
       return TRUE;
