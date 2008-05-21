@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.9 2008/05/06 05:47:49 andijahja Exp $
+# $Id: common.mak,v 1.11 2008/05/20 18:35:00 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1398,6 +1398,7 @@ LIBNF_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)fttext$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ftattr$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dfile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)putkey$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)mouse$(OBJEXT)
 

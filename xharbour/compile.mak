@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.7 2008/05/13 22:10:47 ath1 Exp $
+# $Id: compile.mak,v 1.9 2008/05/20 18:35:00 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -3711,6 +3711,9 @@ $(OBJ_DIR)$(DIR_SEP)dispc$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)dispc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)fttext$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)fttext.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)putkey$(OBJEXT) : $(LIBNF_DIR)$(DIR_SEP)putkey.c
 	$(CC_CMD)
 
 #===============================================================================
