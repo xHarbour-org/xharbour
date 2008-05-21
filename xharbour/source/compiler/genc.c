@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.167 2008/03/10 17:19:03 ronpinkas Exp $
+ * $Id: genc.c,v 1.168 2008/04/01 05:15:09 ronpinkas Exp $
  */
 
 /*
@@ -1665,7 +1665,7 @@ static void hb_compGenCAddProtos( FILE *yyc )
          {
             fprintf( yyc, "HB_FUNC_INIT( %s );\n",pTemp->szName);
          }
-         else if ( pTemp->Type == HB_PROTO_FUNC_STATIC && !hb_compSymbFound( pTemp->szName ) )
+         else if ( pTemp->Type == HB_PROTO_FUNC_STATIC && hb_compSymbFound( pTemp->szName ) )
          {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pTemp->szName );
          }

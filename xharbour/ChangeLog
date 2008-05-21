@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6104 2008/05/20 19:15:05 andijahja Exp $
+ * $Id: ChangeLog,v 1.6105 2008/05/21 03:33:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-21 13:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  - include/hbcomprs.h
+    * file is no longer required, hence removed.
+
+  * source/compiler/harbour.c
+    ! in generated C files, __PRG_SOURCE__ now include path when available
+
+  * source/compiler/gen.c
+    ! minor fix on hb_compGenCAddProtos() to only declare static function
+      prototype when it is called within the module.
 
 2008-05-2 23:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/arrays.c

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.198 2008/05/05 05:05:41 andijahja Exp $
+ * $Id: harbour.c,v 1.199 2008/05/19 15:41:45 ronpinkas Exp $
  */
 
 /*
@@ -6155,6 +6155,8 @@ static int hb_compCompile( char * szPrg )
    int iStatus = EXIT_SUCCESS;
    PHB_FNAME pFileName;
    BOOL bFunc, bKillGlobalsFunc = FALSE;
+   char *szTempName;
+   ULONG i, u = 0;
 
    hb_comp_pFileName = hb_fsFNameSplit( szPrg );
 
@@ -6181,8 +6183,23 @@ static int hb_compCompile( char * szPrg )
          hb_comp_pFileName->szExtension = ".prg";
       }
 
+      szTempName = (char*) hb_xgrab(_POSIX_PATH_MAX);
       hb_comp_PrgFileName = (char*) hb_xgrab(_POSIX_PATH_MAX);
-      sprintf(hb_comp_PrgFileName, "%s%s",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
+      sprintf(szTempName, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
+
+      for( i = 0; i < strlen( szTempName ); i++ )
+      {
+	 if ( szTempName[i] == '\\' )
+	 {
+	    hb_comp_PrgFileName[u++] = '\\';
+	    hb_comp_PrgFileName[u++] = '\\';
+	 }
+	 else
+	    hb_comp_PrgFileName[u++] = szTempName[i];
+      }
+      hb_comp_PrgFileName[u] = 0;
+      hb_xfree( szTempName );
+
       szSourceExtension = hb_comp_pFileName->szExtension;
       /* szSourcePath = hb_comp_pFileName->szPath; */
 
