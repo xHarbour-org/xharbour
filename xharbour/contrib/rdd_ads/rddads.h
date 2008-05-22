@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.17 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: rddads.h,v 1.18 2008/01/10 11:17:59 marchuet Exp $
  */
 
 /*
@@ -178,6 +178,19 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
    extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
    void hb_adsOemAnsiFree( char * pcString );
 
+   typedef UNSIGNED32 (WINAPI *ADSSETFIELDRAW_PTR)( ADSHANDLE hObj,
+                                                    UNSIGNED8 *pucFldName,
+                                                    UNSIGNED8 *pucBuf,
+                                                    UNSIGNED32 ulLen );
+
+   typedef UNSIGNED32 (WINAPI *ADSGETFIELDRAW_PTR)( ADSHANDLE hTbl,
+                                                    UNSIGNED8 *pucFldName,
+                                                    UNSIGNED8 *pucBuf,
+                                                    UNSIGNED32 *pulLen );
+
+   typedef UNSIGNED32 (WINAPI *ADSDELETEFILE_PTR)( ADSHANDLE hConnection,
+                                                   UNSIGNED8* pucFileName );
+
    UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
                                          UNSIGNED8  *pucFldName,
                                          UNSIGNED8  *pucBuf,
@@ -187,6 +200,9 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
                                          UNSIGNED8  *pucFldName,
                                          UNSIGNED8  *pucBuf,
                                          UNSIGNED32 *pulLen );
+
+   UNSIGNED32 ENTRYPOINT AdsDeleteFile(  ADSHANDLE hConnection,
+                                         UNSIGNED8* pucFileName );
 
 #else
 #  define hb_adsOemToAnsi( s, l )     ( s )

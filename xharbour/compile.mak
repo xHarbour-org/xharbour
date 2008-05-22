@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.9 2008/05/20 18:35:00 andijahja Exp $
+# $Id: compile.mak,v 1.10 2008/05/21 15:49:15 ptsarenko Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -206,6 +206,9 @@ $(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsfunc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsmgmnt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)ace32.c
 	$(CC_CMD)
 
 #===============================================================================

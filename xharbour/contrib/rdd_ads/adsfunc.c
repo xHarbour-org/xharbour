@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.91 2008/04/26 00:44:13 kaddath Exp $
+ * $Id: adsfunc.c,v 1.92 2008/04/29 03:56:07 ronpinkas Exp $
  */
 
 /*
@@ -2537,7 +2537,6 @@ HB_FUNC( ADSCHECKEXISTENCE )
 #ifdef __cplusplus
    extern "C"
 #endif
-UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileName );
 
 HB_FUNC( ADSDELETEFILE )
 {

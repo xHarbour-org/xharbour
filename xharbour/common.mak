@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.11 2008/05/20 18:35:00 andijahja Exp $
+# $Id: common.mak,v 1.12 2008/05/21 15:49:15 ptsarenko Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -628,7 +628,8 @@ USRRDD_LIB_OBJS=\
 RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)ads1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT)
 
 #===============================================================================
 # RDD.LIB rules

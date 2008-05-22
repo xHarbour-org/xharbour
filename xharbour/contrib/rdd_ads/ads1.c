@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.128 2008/03/13 11:12:02 marchuet Exp $
+ * $Id: ads1.c,v 1.129 2008/04/03 15:02:28 lculik Exp $
  */
 
 /*
@@ -2935,7 +2935,11 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( u32RetVal == AE_SUCCESS )
    {
       fDictionary = ( pusType == ADS_DATABASE_CONNECTION
+#if ADS_REQUIRE_VERSION >= 9
+                   );
+#else
                    || pusType == ADS_SYS_ADMIN_CONNECTION );
+#endif
    }
    szFile = ( char * ) pOpenInfo->abName;
 
