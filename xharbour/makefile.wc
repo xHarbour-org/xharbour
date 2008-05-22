@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.85 2008/05/06 05:47:55 andijahja Exp $
+# $Id: makefile.wc,v 1.86 2008/05/20 18:35:01 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -236,8 +236,6 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !ifdef HB_RDDADS
-COMPILERLIBS=\
-	ace32.lib
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)

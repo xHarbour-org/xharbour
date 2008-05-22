@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.42 2008/05/06 05:47:54 andijahja Exp $
+# $Id: makefile.dc,v 1.43 2008/05/20 18:35:00 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -206,8 +206,6 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 # RDDADS
 #===============================================================================
 !ifdef HB_RDDADS
-COMPILERLIBS=\
-	$(LIB_DIR)\ace32.lib
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)

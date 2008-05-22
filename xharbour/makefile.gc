@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.45 2008/05/14 13:28:40 andijahja Exp $
+# $Id: makefile.gc,v 1.46 2008/05/20 18:35:00 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -264,10 +264,6 @@ COMPILERLIBS1=\
 # RDDADS
 #===============================================================================
 ifeq ($(HB_RDDADS),1)
-COMPILERLIBS+=\
-	-lace32
-COMPILERLIBS1+=\
-	-lace32
 HARBOUR_DLL_OBJS+=\
 	$(RDDADS_LIB_OBJS)
 endif

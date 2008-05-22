@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.228 2008/05/19 15:41:45 ronpinkas Exp $
+# $Id: makefile.bc,v 1.229 2008/05/20 18:35:00 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -386,9 +386,6 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !if $d(HB_RDDADS)
-COMPILERLIBS=\
-	ace32.lib
-   
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)

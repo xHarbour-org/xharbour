@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.218 2008/05/06 05:47:54 andijahja Exp $
+# $Id: makefile.vc,v 1.219 2008/05/20 18:35:00 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -266,8 +266,6 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !ifdef HB_RDDADS
-COMPILERLIBS=\
-	ace32.lib
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)

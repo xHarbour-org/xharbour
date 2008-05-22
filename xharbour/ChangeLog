@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6108 2008/05/21 15:49:13 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6109 2008/05/22 22:07:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-05-22 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+2008-05-23 06:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.vc
+  * makefile.wc
+    - remove dependency to ace32.lib when creating DLL with RDDADS included
+
+2008-05-23 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * common.mak
   * compile.mak
     + new module ace32.c added.
