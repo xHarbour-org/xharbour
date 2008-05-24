@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.8 2005/03/17 08:41:52 andijahja Exp $
+ * $Id: hbcx.c,v 1.9 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ HB_FUNC( XXDECODE_FILE )
 {
    PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile=NULL, *outFile=NULL;
+   FILE *inFile, *outFile=NULL;
    char *string, *szFileName;
    ULONG srclen, dstlen, nBytesWritten = 0;
    BYTE *dststr;

@@ -1,5 +1,5 @@
 /*
- * $Id: fi_winfu.c,v 1.1 2005/11/07 01:13:06 fsgiudice Exp $
+ * $Id: fi_winfu.c,v 1.2 2008/04/30 13:20:31 andijahja Exp $
  */
 
 /*
@@ -150,13 +150,12 @@ HB_FUNC( FI_BITMAPTOFI )
       if( bitmap ) {
         BITMAP bm;
         HDC hDC;
-        int Success;
 
         GetObject( bitmap, sizeof(BITMAP), (LPSTR) &bm );
         dib = FreeImage_Allocate(bm.bmWidth, bm.bmHeight, bm.bmBitsPixel, 0, 0, 0);
         hDC = GetDC( NULL );
-        Success = GetDIBits( hDC, bitmap, 0, FreeImage_GetHeight(dib),
-                             FreeImage_GetBits(dib), FreeImage_GetInfo(dib), DIB_RGB_COLORS);
+        GetDIBits( hDC, bitmap, 0, FreeImage_GetHeight(dib),
+                   FreeImage_GetBits(dib), FreeImage_GetInfo(dib), DIB_RGB_COLORS);
         ReleaseDC( NULL, hDC );
       }
 

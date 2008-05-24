@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.194 2008/03/26 23:33:20 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.195 2008/05/20 00:57:59 modalsist Exp $
  */
 
 /*
@@ -620,7 +620,7 @@ CLASS TBrowse
    ASSIGN GoTopBlock(b) INLINE if( hb_IsBlock(b), ::bGoTopBlock := b, {||0} )
 
    ACCESS SkipBlock    INLINE ::bSkipBlock        // Code block executed by TBrowse:SkipBlock()
-   ASSIGN SkipBlock(b) INLINE if( hb_IsBlock(b), ::bSkipBlock := b, {|i|0,0} )
+   ASSIGN SkipBlock(b) INLINE if( hb_IsBlock(b), ::bSkipBlock := b, {|i|0} )
 
    METHOD New( nTop, nLeft, nBottom, nRight )  // Constructor
    METHOD Down()                          // Moves the cursor down one row

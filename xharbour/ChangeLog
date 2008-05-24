@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6111 2008/05/24 20:44:16 kaddath Exp $
+ * $Id: ChangeLog,v 1.6112 2008/05/24 20:46:42 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-24 23:25 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\tbrowse.prg
+    - removed unused value in method SkipBlock
+
+  * source\rdd\dbf1.c
+    + Added HB_SYMBOL_UNUSED( ulConnection ) to remove a compiler warning in
+      function hb_dbfDrop
+    + Added HB_SYMBOL_UNUSED( ulConnect ) to remove a compiler warning in
+      function hb_dbfExists
+
+  * source/ct/envparam.c
+    - Removed unuseful * operator in two occurrencies of expression *sCurEnv++
+      in function FT_GETE
+
+  * contrib\pdflib\pdfhbdocs.prg
+    + Added RETURN NIL statement in function PDFHR
+
+  * contrib\unicode\hbcc.prg
+    - Removed unused initialization of srcstr in function HB_CSTOCS
+    - Removed unused initialization of inFile in function B64DECODE_FILE
+
+  * contrib\unicode\hbcu.c
+    - Removed unused initialization of inFile in function UUDECODE_FILE
+
+  * contrib\unicode\hbcx.c
+    - Removed unused initialization of inFile in function XXDECODE_FILE
+
+  * contrib\unicode\hbcy.c
+    - Removed unused initialization of inFile in function YYDECODE_FILE
+
+  * contrib\freeimage\source\fi_winfu.c
+    - Removed unused variable Success in function FI_BITMAPTOFI
 
 2008-05-24 13:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/makefile.bc

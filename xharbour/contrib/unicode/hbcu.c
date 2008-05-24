@@ -1,5 +1,5 @@
 /*
- * $Id: hbcu.c,v 1.8 2005/02/19 10:08:40 andijahja Exp $
+ * $Id: hbcu.c,v 1.9 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ HB_FUNC( UUDECODE_FILE )
 {
    PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile=NULL, *outFile=NULL;
+   FILE *inFile, *outFile=NULL;
    char *string, *szFileName;
    ULONG srclen, dstlen, nBytesWritten = 0;
    BYTE *dststr;

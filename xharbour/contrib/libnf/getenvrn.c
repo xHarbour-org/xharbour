@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.3 2006/03/19 00:21:47 ronpinkas Exp $
+ * $Id: getenvrn.c,v 1.4 2008/05/14 13:28:41 andijahja Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ HB_FUNC(FT_GETE)
 #if (defined(__GNUC__)&&__GNUC__>3)
 #else
            while (*sCurEnv)
-              *sCurEnv++;
+              sCurEnv++;
 #endif
         }
      }
@@ -249,7 +249,7 @@ HB_FUNC(FT_GETE)
 #if (defined(__GNUC__)&&__GNUC__>3)
 #else
            while (*sCurEnv)
-              *sCurEnv++;
+              sCurEnv++;
 #endif
         }
 

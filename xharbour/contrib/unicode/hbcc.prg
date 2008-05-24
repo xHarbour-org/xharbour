@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.11 2005/02/19 10:08:40 andijahja Exp $
+ * $Id: hbcc.prg,v 1.12 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -617,7 +617,7 @@ HB_FUNC( HB_CSLIST )
 HB_FUNC( HB_CSTOCS )
 {
    ULONG h1,h2,srclen,dstlen=0,intlen=0,x=0;
-   BYTE *srcstr=0, *dststr=0, *intstr=0;
+   BYTE *srcstr, *dststr=0, *intstr=0;
    PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
 
    if (hb_pcount()<3)
@@ -1460,7 +1460,7 @@ HB_FUNC( B64DECODE_FILE )
 {
    PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile = NULL, *outFile = NULL;
+   FILE *inFile, *outFile = NULL;
    char *string, *szFileName;
    ULONG nBytesWritten = 0;
    HB_ITEM Struct, Item;

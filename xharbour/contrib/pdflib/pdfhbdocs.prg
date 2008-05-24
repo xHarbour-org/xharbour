@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.5 2008/04/30 13:20:31 andijahja Exp $
+ * $Id: pdfhbdocs.prg,v 1.6 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -870,6 +870,7 @@ FUNCTION PDFHR( fPos, fStart )
    opdf:PDFlineto( fPos * fontSizePoints, iRow - LEAD / 2 )
    iRow -= LEAD
    opdf:PDF_stroke( )
+   RETURN NIL
 
    /*
 FUNCAO PDFPAGENUMBER()

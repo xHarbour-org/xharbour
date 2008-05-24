@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.185 2008/03/13 11:12:08 marchuet Exp $
+ * $Id: dbf1.c,v 1.186 2008/04/05 20:31:20 likewolf Exp $
  */
 
 /*
@@ -5317,6 +5317,8 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnection));
 
+   HB_SYMBOL_UNUSED( ulConnection );
+
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )
    {
@@ -5398,6 +5400,8 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
    BOOL fTable = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnect));
+
+   HB_SYMBOL_UNUSED( ulConnect );
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )
