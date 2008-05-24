@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2005/10/04 15:52:39 kaddath Exp $
+# $Id: makefile.vc,v 1.5 2007/02/13 19:02:23 druzus Exp $
 #
 
 #
@@ -33,6 +33,7 @@ HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
 #
 
 ADS_LIB_OBJS = \
+    $(OBJ_DIR)\ace32.obj   \
     $(OBJ_DIR)\ads1.obj    \
     $(OBJ_DIR)\adsfunc.obj \
     $(OBJ_DIR)\adsmgmnt.obj
@@ -44,6 +45,7 @@ ADS_LIB_OBJS = \
 all: $(ADS_LIB)
 
 CLEAN:
+   -@if exist $(OBJ_DIR)\ace32.obj del $(OBJ_DIR)\ace32.obj
    -@if exist $(OBJ_DIR)\ads1.obj del $(OBJ_DIR)\ads1.obj
    -@if exist $(OBJ_DIR)\adsfunc.obj del $(OBJ_DIR)\adsfunc.obj
    -@if exist $(OBJ_DIR)\adsmgmnt.obj del $(OBJ_DIR)\adsmgmnt.obj
@@ -69,3 +71,5 @@ $(OBJ_DIR)\adsfunc.obj : adsfunc.c
 $(OBJ_DIR)\ads1.obj : ads1.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
 
+$(OBJ_DIR)\ace32.obj : ace32.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**

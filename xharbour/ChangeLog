@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6109 2008/05/22 22:07:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.6110 2008/05/22 23:12:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-05-25 13:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * contrib/rdd_ads/makefile.bc
+  * contrib/rdd_ads/makefile.vc
+    + added missing ace32.c (missing from Andi's changes).
+
+  * source/vm/hvm.c
+    ! Guarded hb_vmRegisterSymbols with TRACE_DUPLICATE_FUNCTIONS
+      to hide calls to TraceLog().
 
 2008-05-23 06:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * makefile.bc
@@ -765,7 +774,7 @@
   * source/rtl/bkgtsks.c
     - remove unused variable (MT)
 
-2008-04-25 17:38 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2008-04-25 17:38 UTC-0800 Luis hse Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/adsfunc.c
     + Added AdsIsEmpty().  Pass as it's only param either a string with
       the field name or the numeric with the field position.
