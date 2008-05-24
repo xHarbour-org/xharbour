@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6110 2008/05/22 23:12:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.6111 2008/05/24 20:44:16 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-05-25 13:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2008-05-24 13:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/makefile.bc
   * contrib/rdd_ads/makefile.vc
     + added missing ace32.c (missing from Andi's changes).
