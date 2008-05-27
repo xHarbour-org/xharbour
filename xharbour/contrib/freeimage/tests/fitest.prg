@@ -1,5 +1,5 @@
 /*
- * $Id: fitest.prg,v 1.2 2005/11/07 01:20:54 fsgiudice Exp $
+ * $Id: fitest.prg,v 1.3 2006/05/12 22:55:51 lculik Exp $
  */
 
 /*
@@ -14,7 +14,7 @@
 #define IMAGES_IN  "images_in/"
 #define IMAGES_OUT "images_out/"
 
-PROCEDURE Main()
+PROCEDURE Main(IsMemory)
 
    LOCAL im, clone, rotated, rotatedEx, rescale, im2, im3
    LOCAL centerX, centerY, width, height, appo
@@ -22,6 +22,7 @@ PROCEDURE Main()
    LOCAL bmpinfo       IS BITMAPINFO
    LOCAL bkcolor       IS RGBQUAD
    LOCAL iccprofile    IS FIICCPROFILE
+   LOCAL nH, cStr, nLen
 
    //? "Press Alt-D + Enter to activate debug"
    //AltD( .T. )
@@ -43,7 +44,19 @@ PROCEDURE Main()
    ? "Copyright        :", fi_GetCopyrightMessage()
    ? "File type        :", fi_GetFileType( IMAGES_IN + "xharbour.jpg" )
    ? "Load JPEG"
-   im := fi_Load( FIF_JPEG, IMAGES_IN + "xharbour.jpg", JPEG_DEFAULT )
+
+   if IsMemory <> nil .and. (nH := FOpen(IMAGES_IN + "xharbour.jpg")) # -1
+
+      nLen := FSeek(nH, 0, 2)
+      FSeek(nH, 0, 0)
+      cStr := space(nLen)
+      fRead(nH, @cStr, nLen)
+      FClose(nH)
+      im := fi_LoadFromMem( FIF_JPEG, cStr, JPEG_DEFAULT )
+
+   else
+      im := fi_Load( FIF_JPEG, IMAGES_IN + "xharbour.jpg", JPEG_DEFAULT )
+   endif
 
    ? "Clone image"
    clone := fi_Clone( im )
