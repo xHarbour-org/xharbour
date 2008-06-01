@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6113 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6114 2008/05/27 16:04:30 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-01 14:36 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/odbc/odbc.c
+    * Do not compile almost odbc.c functions when sql*.h are not found.
 
 2008-05-27 19:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * contrib/freeimage/source/fi_wrp.c

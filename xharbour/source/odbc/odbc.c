@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.33 2006/08/05 11:58:26 druzus Exp $
+ * $Id: odbc.c,v 1.34 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -128,6 +128,8 @@ HB_FUNC( SQLALLOCEN ) /* HB_SQLALLOCENV( @hEnv ) --> nRetCode */
    hb_stornl( ( LONG ) hEnv, 1 );
    hb_retni( ret );
 }
+
+#ifdef HSTMT
 
 HB_FUNC( SQLALLOCCO ) /* HB_SQLALLOCCONNECT( hEnv, @ hDbc ) --> nRetCode */
 {
@@ -536,4 +538,6 @@ HB_FUNC( SQLBINDOUTPARAM ) /* SqlBindOutParam( nStatementHandle, nParameterNumbe
 }
 #endif
 
-#endif
+#endif     /* HSTMT */
+
+#endif     /* !defined(HB_OS_DOS) && !defined(HB_OS_OS2) */
