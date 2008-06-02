@@ -19,7 +19,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.11 2004/03/06 13:20:32 jonnymind Exp $
+* $Id: service.prg,v 1.12 2005/12/01 13:41:14 snaiperis Exp $
 *
 
 #include "hbserv.ch"
@@ -147,7 +147,7 @@ FUNCTION SignalFault(nSignal, aParams )
               ")  in Module: "+ ProcFile( n ) + HB_OsNewLine()
       n++
    END
-   cRet += "Internal address: 0x"+AllTrim( Num?ToHex( aParams[4] ) )+ HB_OSNewLine()
+   cRet += "Internal address: 0x"+AllTrim( NumToHex( aParams[4] ) )+ HB_OSNewLine()
    cRet += "Low-level code: " + AllTrim( str( aParams[1] ) ) +"/"+;
       AllTrim( NumToHex(aParams[2])) + ": " + ;
       HB_SignalDesc( aParams[1], aParams[2] ) + HB_OSNewLine()
