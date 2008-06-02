@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg,v 1.3 2005/03/10 23:41:17 andijahja Exp $
+ * $Id: winreg.prg,v 1.4 2006/11/25 16:17:40 ptsarenko Exp $
  */
 
 /*
@@ -184,6 +184,8 @@ FUNCTION SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
 static HKEY regkeykey(ULONG nKey)
 {
   HKEY Result ;
+  if (nKey >= (ULONG) HKEY_CLASSES_ROOT && nKey <= (ULONG) HKEY_DYN_DATA )
+     return (HKEY) nKey;
   switch ( nKey )
   {
   case  0 :
@@ -207,7 +209,7 @@ static HKEY regkeykey(ULONG nKey)
   default :
     Result = (HKEY) nKey ;
   }
-  return( Result ) ;
+  return  (HKEY) Result  ;
 }
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
@@ -305,3 +307,4 @@ HB_FUNC_STATIC( WINREGCLOSEKEY )
 }
 
 #pragma ENDDUMP
+#endif

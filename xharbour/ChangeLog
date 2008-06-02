@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6114 2008/05/27 16:04:30 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6115 2008/06/01 19:42:48 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-02 11:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+  * source/rtl/winreg.prg
+    ! fixed the regkeykey(ULONG nKey) when passed true HKEY constants like HKEY_LOCAL_MACHINE.
 
 2008-06-01 14:36 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/odbc/odbc.c
