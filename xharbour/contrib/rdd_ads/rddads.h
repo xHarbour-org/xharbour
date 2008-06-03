@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.18 2008/01/10 11:17:59 marchuet Exp $
+ * $Id: rddads.h 8467 2008-05-21 11:45:42Z vszakats $
  */
 
 /*
@@ -50,24 +50,93 @@
  *
  */
 
-#ifndef ADS_REQUIRE_VERSION
-   #define ADS_REQUIRE_VERSION 8
-#endif
-
 #include "hbapirdd.h"
+
 #if defined( HB_OS_WIN_32 ) && !defined( WIN32 )
    #define WIN32
 #endif
+#if !defined( unix ) && ( defined( __LINUX__ ) || defined( HB_OS_LINUX ) )
+   #define unix
+#endif
+
+#if defined( __WATCOMC__ ) || defined( __LCC__ )
+   #define _declspec( dllexport ) __declspec( dllexport )
+#endif
+
 #include "ace.h"
 
+/* Autodetect ACE version. */
+#if   defined(ADS_NOTIFICATION_CONNECTION)
+   #define _ADS_LIB_VERSION 900 /* or upper */
+#elif defined(ADS_UDP_IP_CONNECTION)
+   #define _ADS_LIB_VERSION 810 /* or upper */
+#elif defined(ADS_REPLICATION_CONNECTION)
+   #define _ADS_LIB_VERSION 800 /* or upper */
+#elif defined(ADS_NOT_AUTO_OPEN)
+   #define _ADS_LIB_VERSION 710 /* or upper */
+#elif defined(ADS_FTS_INDEX_ORDER)
+   #define _ADS_LIB_VERSION 700 /* or upper */
+#elif defined(ADS_COMPRESS_ALWAYS)
+   #define _ADS_LIB_VERSION 620 /* or upper */
+#elif defined(ADS_USER_DEFINED)
+   #define _ADS_LIB_VERSION 611 /* or upper */
+#else
+   #define _ADS_LIB_VERSION 500
+#endif
+
+#if 0
+/* Compatibility ACE version override.
+   Usage is discouraged and unnecessary unless we want to
+   override autodetection. For the latter, ADS_LIB_VERSION
+   is recommended. If ADS_LIB_VERSION is #defined,
+   ADS_REQUIRE_VERSION will be ignored. [vszakats] */
+#if !defined( ADS_LIB_VERSION )
+   #if   ADS_REQUIRE_VERSION == 5
+      #define ADS_LIB_VERSION 500
+   #elif ADS_REQUIRE_VERSION == 6
+      #define ADS_LIB_VERSION 600
+   #elif ADS_REQUIRE_VERSION == 7
+      #define ADS_LIB_VERSION 700
+   #elif ADS_REQUIRE_VERSION == 8
+      #define ADS_LIB_VERSION 810
+   #elif ADS_REQUIRE_VERSION == 9
+      #define ADS_LIB_VERSION 900
+   #endif
+#endif
+#endif
+
+/* Make sure to not allow a manual override requesting
+   a higher version than the one of ACE. [vszakats] */
+#if !defined( ADS_LIB_VERSION )
+   #define ADS_LIB_VERSION _ADS_LIB_VERSION
+#elif ADS_LIB_VERSION > _ADS_LIB_VERSION
+   #undef ADS_LIB_VERSION
+   #define ADS_LIB_VERSION _ADS_LIB_VERSION
+#endif
+
+/* QUESTION: Why do we redefine this? Normally it is 4082 in 7.10 or upper and 256 in lower versions. [vszakats] */
 #undef ADS_MAX_KEY_LENGTH
-#if ADS_REQUIRE_VERSION >= 8
+#if ADS_LIB_VERSION >= 800
    #define ADS_MAX_KEY_LENGTH   4082   /* maximum key value length.  This is the max key length */
 #else                                  /* of ADI indexes.  Max CDX key length is 240.  Max */
    #define ADS_MAX_KEY_LENGTH    256   /* NTX key length is 256 */
 #endif
 
+/* TOFIX: These should rather be guarded with ADS_LIB_VERSION than being defined here. [vszakats] */
+#ifndef ADS_CISTRING
+   #define ADS_CISTRING             20    /* CaSe INSensiTIVE character data (>= 7.10) */
+#endif
+#ifndef ADS_ROWVERSION
+   #define ADS_ROWVERSION           21    /* 8 byte integer, incremented for every update, unique to entire table (>= 8.00) */
+#endif
+#ifndef ADS_MODTIME
+   #define ADS_MODTIME              22    /* 8 byte timestamp, updated when record is updated (>= 8.00) */
+#endif
+
 HB_EXTERN_BEGIN
+
+
+
 
 
 
@@ -77,7 +146,6 @@ HB_EXTERN_BEGIN
  *  The Workarea Structure of Advantage Database Server RDD
  *
  */
-
 
 typedef struct _ADSAREA_
 {
@@ -150,30 +218,31 @@ typedef ADSAREA * ADSAREAP;
 
 #define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
 
-#if ADS_REQUIRE_VERSION >= 6 && defined( HB_OS_WIN_32 )
+#if ADS_LIB_VERSION >= 600 && defined( HB_OS_WIN_32 )
 #  define ADS_USE_OEM_TRANSLATION
 #else
 #  undef ADS_USE_OEM_TRANSLATION
 #endif
 
-#define HB_ADS_PARCONNECTION( n )      ( ISNUM( n ) ?  ( ADSHANDLE ) hb_parnl( n ) : adsConnectHandle )
+#define HB_ADS_PARCONNECTION( n )      ( ISNUM( n ) ? ( ADSHANDLE ) hb_parnl( n ) : hb_ads_hConnect )
 #define HB_ADS_RETCONNECTION( h )      hb_retnl( h )
-#define HB_ADS_GETCONNECTION( p )      ( ( hb_itemType( p ) & HB_IT_NUMERIC ) ? ( ADSHANDLE ) hb_itemGetNL( p ) : adsConnectHandle )
+#define HB_ADS_GETCONNECTION( p )      ( ( hb_itemType( p ) & HB_IT_NUMERIC ) ? ( ADSHANDLE ) hb_itemGetNL( p ) : hb_ads_hConnect )
 #define HB_ADS_PUTCONNECTION( p, h )   hb_itemPutNL( ( p ), ( LONG ) ( h ) )
-#define HB_ADS_DEFCONNECTION( v )      ( ( v ) ? ( ADSHANDLE ) ( v ) : adsConnectHandle )
+#define HB_ADS_DEFCONNECTION( v )      ( ( v ) ? ( ADSHANDLE ) ( v ) : hb_ads_hConnect )
 
 
-extern int adsFileType;                 /* current global setting */
-extern int adsLockType;
-extern int adsRights;
-extern int adsCharType;
-extern BOOL bTestRecLocks;
-extern ADSHANDLE adsConnectHandle;
-extern ERRCODE adsCloseCursor( ADSAREAP pArea );
-extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
+extern int hb_ads_iFileType;                 /* current global setting */
+extern int hb_ads_iLockType;
+extern int hb_ads_iCheckRights;
+extern int hb_ads_iCharType;
+extern BOOL hb_ads_bTestRecLocks;
+extern ADSHANDLE hb_ads_hConnect;
+
+extern ERRCODE hb_adsCloseCursor( ADSAREAP pArea );
+extern ADSAREAP hb_adsGetWorkAreaPointer( void );
 
 #ifdef ADS_USE_OEM_TRANSLATION
-   extern BOOL adsOEM;
+   extern BOOL hb_ads_bOEM;
    extern char * hb_adsOemToAnsi( char * pcString, ULONG ulLen );
    extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
    void hb_adsOemAnsiFree( char * pcString );
@@ -209,6 +278,5 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
 #  define hb_adsAnsiToOem( s, l )     ( s )
 #  define hb_adsOemAnsiFree( s )
 #endif
-
 
 HB_EXTERN_END

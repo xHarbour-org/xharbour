@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.92 2008/04/29 03:56:07 ronpinkas Exp $
+ * $Id: ace32.c,v 1.1 2008/05/22 22:10:41 andijahja Exp $
  */
 
 /*
@@ -138,7 +138,10 @@ UNSIGNED32 ENTRYPOINT AdsAppendRecord( ADSHANDLE hTable )
    return ( pFunc ? pFunc( hTable ) : 0 );
 }
 
-UNSIGNED32 ENTRYPOINT AdsApplicationExit( void )
+#ifdef __BORLANDC__
+   #pragma option push -w-pro
+#endif
+UNSIGNED32 ENTRYPOINT AdsApplicationExit()
 {
    static ADSAPPLICATIONEXIT_PTR pFunc = NULL;
 
@@ -147,6 +150,9 @@ UNSIGNED32 ENTRYPOINT AdsApplicationExit( void )
 
    return ( pFunc ? pFunc() : 0 );
 }
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif
 
 UNSIGNED32 ENTRYPOINT AdsAtBOF( ADSHANDLE hTable, UNSIGNED16 *pbBof )
 {
@@ -227,7 +233,6 @@ UNSIGNED32 ENTRYPOINT AdsCancelUpdate( ADSHANDLE hTable )
 
    return ( pFunc ? pFunc( hTable ) : 0 );
 }
-
 
 UNSIGNED32 ENTRYPOINT AdsCheckExistence( ADSHANDLE hConnect, UNSIGNED8 *pucFileName, UNSIGNED16 *pusOnDisk )
 {
@@ -469,7 +474,6 @@ UNSIGNED32 ENTRYPOINT AdsCreateIndex61( ADSHANDLE hObj, UNSIGNED8 *pucFileName, 
    return ( pFunc ? pFunc( hObj, pucFileName, pucTag, pucExpr, pucCondition, pucWhile, ulOptions, ulPageSize, phIndex ) : 0 );
 }
 
-
 UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE hTable, UNSIGNED8 *pucFileName, UNSIGNED8 *pucTag, UNSIGNED8 *pucField, UNSIGNED32 ulPageSize, UNSIGNED32 ulMinWordLen, UNSIGNED32 ulMaxWordLen, UNSIGNED16 usUseDefaultDelim, UNSIGNED8 *pucDelimiters, UNSIGNED16 usUseDefaultNoise, UNSIGNED8 *pucNoiseWords, UNSIGNED16 usUseDefaultDrop, UNSIGNED8 *pucDropChars, UNSIGNED16 usUseDefaultConditionals, UNSIGNED8 *pucConditionalChars, UNSIGNED8 *pucCollation, UNSIGNED8 *pucReserved1, UNSIGNED32 ulOptions )
 {
    static ADSCREATEFTSINDEX_PTR pFunc = NULL;
@@ -499,7 +503,6 @@ UNSIGNED32 ENTRYPOINT AdsCreateTable71( ADSHANDLE hConnection, UNSIGNED8 *pucNam
 
    return ( pFunc ? pFunc( hConnection, pucName, pucDBObjName, usTableType, usCharType, usLockType, usCheckRights, usMemoSize, pucFields, ulOptions, phTable ) : 0 );
 }
-
 
 UNSIGNED32 ENTRYPOINT AdsDDCreate( UNSIGNED8 *pucDictionaryPath, UNSIGNED16 usEncrypt, UNSIGNED8 *pucDescription, ADSHANDLE *phDictionary )
 {
@@ -790,7 +793,6 @@ UNSIGNED32 ENTRYPOINT AdsDDAddTable( ADSHANDLE hDictionary, UNSIGNED8 *pucTableN
 
    return ( pFunc ? pFunc( hDictionary, pucTableName, pucTablePath, usTableType, usCharType, pucIndexFiles, pucComments ) : 0 );
 }
-
 
 UNSIGNED32 ENTRYPOINT AdsDDAddView( ADSHANDLE hDictionary, UNSIGNED8 *pucName, UNSIGNED8 *pucComments, UNSIGNED8 *pucSQL )
 {
@@ -1352,7 +1354,11 @@ UNSIGNED32 ENTRYPOINT AdsFindConnection25( UNSIGNED8 *pucFullPath, ADSHANDLE *ph
    return ( pFunc ? pFunc( pucFullPath, phConnect ) : 0 );
 }
 
+#if ADS_LIB_VERSION >= 900
+UNSIGNED32 ENTRYPOINT AdsFindClose( ADSHANDLE hConnect, ADSHANDLE lHandle )
+#else
 UNSIGNED32 ENTRYPOINT AdsFindClose( ADSHANDLE hConnect, SIGNED32 lHandle )
+#endif
 {
    static ADSFINDCLOSE_PTR pFunc = NULL;
 
@@ -1362,7 +1368,11 @@ UNSIGNED32 ENTRYPOINT AdsFindClose( ADSHANDLE hConnect, SIGNED32 lHandle )
    return ( pFunc ? pFunc( hConnect, lHandle ) : 0 );
 }
 
+#if ADS_LIB_VERSION >= 900
+UNSIGNED32 ENTRYPOINT AdsFindFirstTable( ADSHANDLE hConnect, UNSIGNED8  *pucFileMask, UNSIGNED8  *pucFirstFile, UNSIGNED16 *pusFileLen, ADSHANDLE *plHandle )
+#else
 UNSIGNED32 ENTRYPOINT AdsFindFirstTable( ADSHANDLE hConnect, UNSIGNED8  *pucFileMask, UNSIGNED8  *pucFirstFile, UNSIGNED16 *pusFileLen, SIGNED32 *plHandle )
+#endif
 {
    static ADSFINDFIRSTTABLE_PTR pFunc = NULL;
 
@@ -1372,7 +1382,11 @@ UNSIGNED32 ENTRYPOINT AdsFindFirstTable( ADSHANDLE hConnect, UNSIGNED8  *pucFile
    return ( pFunc ? pFunc( hConnect, pucFileMask, pucFirstFile, pusFileLen, plHandle ) : 0 );
 }
 
+#if ADS_LIB_VERSION >= 900
+UNSIGNED32 ENTRYPOINT AdsFindNextTable( ADSHANDLE hConnect, ADSHANDLE lHandle, UNSIGNED8 *pucFileName, UNSIGNED16 *pusFileLen )
+#else
 UNSIGNED32 ENTRYPOINT AdsFindNextTable( ADSHANDLE hConnect, SIGNED32 lHandle, UNSIGNED8 *pucFileName, UNSIGNED16 *pusFileLen )
+#endif
 {
    static ADSFINDNEXTTABLE_PTR pFunc = NULL;
 
@@ -1382,7 +1396,11 @@ UNSIGNED32 ENTRYPOINT AdsFindNextTable( ADSHANDLE hConnect, SIGNED32 lHandle, UN
    return ( pFunc ? pFunc( hConnect, lHandle, pucFileName, pusFileLen ) : 0 );
 }
 
+#if ADS_LIB_VERSION >= 900
+UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE hConnect, UNSIGNED8 *pucFileMask, UNSIGNED8 *pucFirstDD, UNSIGNED16 *pusDDLen, UNSIGNED8 *pucFirstFile, UNSIGNED16 *pusFileLen, ADSHANDLE *plHandle )
+#else
 UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE hConnect, UNSIGNED8 *pucFileMask, UNSIGNED8 *pucFirstDD, UNSIGNED16 *pusDDLen, UNSIGNED8 *pucFirstFile, UNSIGNED16 *pusFileLen, SIGNED32 *plHandle )
+#endif
 {
    static ADSFINDFIRSTTABLE62_PTR pFunc = NULL;
 
@@ -1392,7 +1410,11 @@ UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE hConnect, UNSIGNED8 *pucFil
    return ( pFunc ? pFunc( hConnect, pucFileMask, pucFirstDD, pusDDLen, pucFirstFile, pusFileLen, plHandle ) : 0 );
 }
 
+#if ADS_LIB_VERSION >= 900
+UNSIGNED32 ENTRYPOINT AdsFindNextTable62( ADSHANDLE hConnect, ADSHANDLE lHandle, UNSIGNED8 *pucDDName, UNSIGNED16 *pusDDLen, UNSIGNED8 *pucFileName, UNSIGNED16 *pusFileLen )
+#else
 UNSIGNED32 ENTRYPOINT AdsFindNextTable62( ADSHANDLE hConnect, SIGNED32 lHandle, UNSIGNED8 *pucDDName, UNSIGNED16 *pusDDLen, UNSIGNED8 *pucFileName, UNSIGNED16 *pusFileLen )
+#endif
 {
    static ADSFINDNEXTTABLE62_PTR pFunc = NULL;
 
@@ -3542,7 +3564,6 @@ UNSIGNED32 ENTRYPOINT AdsStmtSetTableType( ADSHANDLE hStatement, UNSIGNED16 usTa
    return ( pFunc ? pFunc( hStatement, usTableType ) : 0 );
 }
 
-
 UNSIGNED32 ENTRYPOINT AdsStmtConstrainUpdates( ADSHANDLE hStatement, UNSIGNED16 usConstrain )
 {
    static ADSSTMTCONSTRAINUPDATES_PTR pFunc = NULL;
@@ -3834,7 +3855,7 @@ UNSIGNED32 ENTRYPOINT AdsDDSetIndexProperty( ADSHANDLE hAdminConn, UNSIGNED8 *pu
 }
 
 
-#if ADS_REQUIRE_VERSION >= 9
+#if ADS_LIB_VERSION >= 900
 
 UNSIGNED32 ENTRYPOINT AdsSetIndexDirection( ADSHANDLE hIndex, UNSIGNED16 usReverseDirection )
 {

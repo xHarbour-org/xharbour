@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6119 2008/06/03 11:18:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6120 2008/06/03 17:41:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,85 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-06-03 16:10 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.vc
+  * makefile.wc
+    ! Dependency to ace32.lib when creating DLL with RDDADS conditioned
+    to setting of HB_ADS_IMPLIB (see explanation below).
+    I was only able to test the BC build; users of other compilers
+    please test the other ones and fix if appropiate.
+
+  - xharbour/contrib/rdd_ads/ace.h
+  * xharbour/contrib/rdd_ads/rddads.h
+  * xharbour/contrib/rdd_ads/ace32.c
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/adsmgmnt.c
+  * xharbour/contrib/rdd_ads/ads.ch
+  * xharbour/contrib/rdd_ads/adsexternal.ch
+  * xharbour/contrib/rdd_ads/make_b32.bat
+  * xharbour/contrib/rdd_ads/makefile.bc
+  * xharbour/contrib/rdd_ads/makefile.vc
+  * xharbour/contrib/rdd_ads/readme.txt
+
+    ! Code synchronized with Harbour.  Thanks to Viktor Szakats!
+    ! Linux and Watcom hacks moved from ace.h to rddads.h.
+    - ace.h removed from cvs; use HB_DIR_ADS setting to specify location
+      of acesdk where ace.h and ace32.dll reside.  This file had way too
+      many hacks that make it very difficult to sync with new versions of
+      ADS.  We should avoid having 3rd party source in xharbour as much
+      as possible and only use the original source files from the
+      developers SDK.
+    ! ADS_REQUIRE_VERSION is now deprecated.  Please remove this setting
+      from your build environment.  The new system will autodetect the
+      ADS version used from the HB_DIR_ADS setting.  The new setting is
+      now called ADS_LIB_VERSION and uses a 3 digit syntax in order to
+      identify minor versions (i.e. 720 or 810 instead of just 7 or 8).
+      ADS_LIB_VERSION doesn't need to be set since it will be autodetected,
+      but you could still do so if you so desire.
+    ! Andi's ace32.c left as an experimental option for now.  To build
+      rddads.lib using ace32.c instead of ace32.lib (import library)
+      set HB_ADS_IMPLIB=no; the default is yes or not defined at all for
+      this envvar.  Once the issues with this approach are fixed we can
+      completely stop relying in ace32.lib.
+      
+      In summary if HB_ADS_IMPLIB is not set or set to "yes":
+      for Borland builds, lib/ace32.lib will be created automatically.
+      For other builds, it uses the ace32.lib as supplied in the acesdk 
+      folder.  If HB_ADS_IMPLIB is set to "no", then ace32.lib won't be 
+      used at all and Andi's contrib/rdd_ads/ace32.c dynamic wrappers 
+      will be placed in lib/rddads.lib.
+    
+      
+      NOTE: VC users please adjust make_vc.bat & makefile.vc to 
+            conditionally compile and link ace32.c like I did in 
+            make_b32.bat & makefile.bc.
+      NOTE: GNU makefile will remain using the import library approach
+            unless some GNU guru can make ace32.c work in Linux/Unix.
+
+      How to build rddads with BCC 5.5.1:
+
+      set HB_DIR_ADS=C:\Program Files\Extended Systems\Advantage 8.1\acesdk
+      make_b32 clean
+      make_b32
+  
+      How to build rddads with BCC 5.5.1 using the experimental ace32.c:
+  
+      set HB_DIR_ADS=C:\Program Files\Extended Systems\Advantage 8.1\acesdk
+      set HB_ADS_IMPLIB=no
+      make_b32 clean
+      make_b32
+
+      rddads.lib and ace32.lib will be created in xharbour\lib in the
+      first case; only rddads.lib in the second one.
+
+  
+      Note that for a normal build, NEITHER the deprecated 
+      ADS_REQUIRE_VERSION nor the new ADS_LIB_VERSION should
+      be set at all.
 
 2008-06-03 13:07 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.c

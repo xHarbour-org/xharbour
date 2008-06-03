@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2007/02/13 19:02:23 druzus Exp $
+# $Id: makefile.vc,v 1.6 2008/05/24 20:44:16 kaddath Exp $
 #
 
 #
@@ -33,10 +33,10 @@ HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
 #
 
 ADS_LIB_OBJS = \
-    $(OBJ_DIR)\ace32.obj   \
     $(OBJ_DIR)\ads1.obj    \
     $(OBJ_DIR)\adsfunc.obj \
     $(OBJ_DIR)\adsmgmnt.obj
+#    $(OBJ_DIR)\ace32.obj   \
 
 #
 # Our default target
@@ -71,5 +71,5 @@ $(OBJ_DIR)\adsfunc.obj : adsfunc.c
 $(OBJ_DIR)\ads1.obj : ads1.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
 
-$(OBJ_DIR)\ace32.obj : ace32.c
-    $(CC) $(CLIBFLAGS) -Fo$@ $**
+#$(OBJ_DIR)\ace32.obj : ace32.c
+#    $(CC) $(CLIBFLAGS) -Fo$@ $**

@@ -1,30 +1,47 @@
 #
-# $Id: makefile.bc,v 1.7 2008/04/13 16:45:38 lculik Exp $
+# $Id: makefile.bc,v 1.8 2008/05/24 20:44:16 kaddath Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
 # Building of rddads.lib - RDD for Advantage Database Server
 
 INCLUDE_DIR = ..\..\include
+BIN_DIR     = ..\..\bin\b32
+OBJ_DIR     = ..\..\obj\b32
+LIB_DIR     = ..\..\lib\b32
+ADS_LIB     = $(LIB_DIR)\rddads.lib
 
-BIN_DIR = ..\..\bin\b32
-OBJ_DIR = ..\..\obj\b32
-LIB_DIR = ..\..\lib\b32
+SRC_LIST = \
+   ads1.c  \
+   adsfunc.c \
+   adsmgmnt.c
 
-$(LIB_DIR)\rddads.lib :   \
-   $(OBJ_DIR)\ace32.obj   \
-   $(OBJ_DIR)\ads1.obj    \
-   $(OBJ_DIR)\adsfunc.obj \
-   $(OBJ_DIR)\adsmgmnt.obj
+!if $(HB_ADS_IMPLIB) == no
+SRC_ACE32 = \
+   ace32.c
+!endif
 
-$(OBJ_DIR)\ace32.obj    : ace32.c
-$(OBJ_DIR)\ads1.obj     : ads1.c
-$(OBJ_DIR)\adsfunc.obj  : adsfunc.c
-$(OBJ_DIR)\adsmgmnt.obj : adsmgmnt.c
+# File dependencies
+
+.path.obj = $(OBJ_DIR)
+
+OBJ_LIST = $(SRC_LIST:.c=.obj) $(SRC_ACE32:.c=.obj)
+
+# Dependencies
+
+all: $(OBJ_LIST) $(ADS_LIB)
+
+# Implicit Rules
 
 .c.obj:
-  bcc32 $(CLIBFLAGS) $(C_USR) $(CFLAGS) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
-  tlib $(LIB_DIR)\rddads.lib -+$@,,
+   bcc32 $(CLIBFLAGS) $(C_USR) $(CFLAGS) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $**
 
-.prg.c:
-  $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@
+# Explicit Rules
+
+$(ADS_LIB) :: $(OBJ_LIST)
+   @if exist $(ADS_LIB) del $(ADS_LIB) > nul
+   tlib @&&|
+   $(ADS_LIB) &
+   &+$(**: = &^
+   +)
+|

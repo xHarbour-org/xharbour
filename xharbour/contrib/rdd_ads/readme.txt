@@ -1,3 +1,7 @@
+/*
+ * $Id: readme.txt 8446 2008-05-18 22:55:03Z vszakats $
+ */
+
  RDD for Advantage Database Server
  Alexander Kresin <alex@belacy.belgorod.su>
  
@@ -17,7 +21,7 @@
 
    You need also to include to your prg file following lines:
 
-      REQUEST _ADS
+      REQUEST ADS
       rddRegister( "ADS", 1 )
       rddsetdefault( "ADS" )
 
@@ -25,6 +29,6 @@
    change this you may use commands, defined in ads.ch:
 
      SET SERVER LOCAL
-     SET FILETYPE TO NTX ( SET FILETYPE TO ADT )
+     SET FILETYPE TO NTX / SET FILETYPE TO ADT
 
    or functions AdsSetServerType(), AdsSetFileType().
