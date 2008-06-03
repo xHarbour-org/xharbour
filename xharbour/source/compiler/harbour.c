@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.199 2008/05/19 15:41:45 ronpinkas Exp $
+ * $Id: harbour.c,v 1.200 2008/05/21 06:04:11 andijahja Exp $
  */
 
 /*
@@ -952,7 +952,7 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
 void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
 {
    /* Nothing to do since no warnings requested.*/
-   if ( hb_comp_iWarnings < 3 )
+   if( hb_comp_iWarnings < 3 )
    {
       HB_SYMBOL_UNUSED( szVarName );
       return;
@@ -1533,7 +1533,7 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
 
    /*printf( "Declaring Class: %s\n", szClassName );*/
 
-   if ( hb_comp_iWarnings < 3 )
+   if( hb_comp_iWarnings < 3 )
    {
       return NULL;
    }
@@ -1573,7 +1573,7 @@ PCOMCLASS hb_compClassFind( char * szClassName )
 {
    PCOMCLASS pClass = hb_comp_pFirstClass;
 
-   if ( hb_comp_iWarnings < 3 )
+   if( hb_comp_iWarnings < 3 )
    {
       return NULL;
    }
@@ -1605,8 +1605,10 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
 
    /*printf( "\nDeclaring Method: %s of Class: %s Pointer: %li\n", szMethodName, pClass->szName, pClass );*/
 
-   if ( hb_comp_iWarnings < 3 )
+   if( hb_comp_iWarnings < 3 )
+   {
       return NULL;
+   }
 
    if ( ( pMethod = hb_compMethodFind( pClass, szMethodName ) ) != NULL )
    {
@@ -2162,7 +2164,7 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
 {
    PCOMDECLARED pDeclared;
 
-   if ( hb_comp_iWarnings < 3 )
+   if( hb_comp_iWarnings < 3 )
    {
       return NULL;
    }
@@ -2857,7 +2859,7 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
    {
       if( pVars->szName == szVarName )
       {
-         if ( hb_comp_iWarnings < 3 )
+         //if ( hb_comp_iWarnings < 3 )
          {
             pVars->iUsed |= VU_USED;
          }
@@ -5684,7 +5686,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    pVar = pCodeblock->pLocals;
    while( pVar )
    {
-      if( hb_comp_iWarnings > 3 && pFunc->szName && pVar->szName && ! ( pVar->iUsed & VU_USED ) )
+      if( hb_comp_iWarnings && pFunc->szName && pVar->szName && ! ( pVar->iUsed & VU_USED ) )
       {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_BLOCKVAR_NOT_USED, pVar->szName, pFunc->szName );
       }

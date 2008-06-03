@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6116 2008/06/02 14:06:03 lculik Exp $
+ * $Id: ChangeLog,v 1.6117 2008/06/03 04:59:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-03 06:12 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.c
+    * Fixed hb_compVariableGetPos() was setting VV_USED only for warning level lower than 3
+    * Block unused variable was reported for only warning level greater than 4, reset to greater than 0
 
 2008-06-03 00:17 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c
