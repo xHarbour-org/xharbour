@@ -1,5 +1,5 @@
 /*
- * $Id: throw.c,v 1.1 2005/10/13 22:22:58 druzus Exp $
+ * $Id: throw.c,v 1.2 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
@@ -40,7 +40,7 @@ HB_FUNC( THROW )
 {
    PHB_ITEM pError = hb_param( 1, HB_IT_ANY ), pResult;
 
-   if( HB_IS_OBJECT( pError ) )
+   if( pError && HB_IS_OBJECT( pError ) )
    {
       pError = hb_itemNew( pError );
 

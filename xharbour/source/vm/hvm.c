@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.682 2008/05/14 13:28:41 andijahja Exp $
+ * $Id: hvm.c,v 1.683 2008/05/24 20:44:16 kaddath Exp $
  */
 
 /*
@@ -909,39 +909,6 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After Background\n" );
    #endif
 
-   // HB_VM_STACK.pBase will be cleared, but we need a base symbol!
-   HB_VM_STACK.pBase = HB_VM_STACK.pItems;
-
-   /*
-    NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
-    hb_stackRemove( 0 );
-    */
-   while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
-   {
-      PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
-
-      if( HB_IS_STRING( pItem ) )
-      {
-         hb_itemReleaseString( pItem );
-      }
-      else if( HB_IS_SYMBOL( pItem ) )
-      {
-         assert( pItem->item.asSymbol.pCargo );
-         hb_xfree( (void *) pItem->item.asSymbol.pCargo );
-         pItem->item.asSymbol.pCargo = NULL;
-      }
-
-      pItem->type = HB_IT_NIL;
-
-      --HB_VM_STACK.pPos;
-   }
-
-   hb_vmPushSymbol( &FakeQuitSymbol );
-
-   #ifdef TRACE_QUIT
-      TraceLog( NULL, "After Stack\n" );
-   #endif
-
    hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    #ifdef TRACE_QUIT
@@ -952,11 +919,6 @@ HB_EXPORT int hb_vmQuit( void )
    hb_vmDoModuleFunctions( s_ExitFunctions );
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After ModuleFunctions\n" );
-   #endif
-
-   hb_vmCleanModuleFunctions();
-   #ifdef TRACE_QUIT
-      TraceLog( NULL, "After CleanModuleFunctions\n" );
    #endif
 
    hb_setkeyExit();
@@ -991,6 +953,39 @@ HB_EXPORT int hb_vmQuit( void )
       #endif
    }
 #endif
+
+   // HB_VM_STACK.pBase will be cleared, but we need a base symbol!
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems;
+   hb_vmPushSymbol( &FakeQuitSymbol );
+   (* HB_VM_STACK.pBase )->item.asSymbol.pCargo->stackbase = 0;
+
+   /*
+    NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
+    hb_stackRemove( 0 );
+    */
+   while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
+   {
+      PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
+
+      if( HB_IS_STRING( pItem ) )
+      {
+         hb_itemReleaseString( pItem );
+      }
+      else if( HB_IS_SYMBOL( pItem ) )
+      {
+         assert( pItem->item.asSymbol.pCargo );
+         hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+         pItem->item.asSymbol.pCargo = NULL;
+      }
+
+      pItem->type = HB_IT_NIL;
+
+      --HB_VM_STACK.pPos;
+   }
+
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After Stack\n" );
+   #endif
 
    // FOR EACH Enumerations.
    uiCounter = HB_VM_STACK.wEnumCollectionCounter;
@@ -1036,6 +1031,12 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After memvarsClear\n" );
    #endif
 
+   // Destructors may still access memory, we avoid GPF by not releasing the array yet.
+   hb_arrayFill( &s_aStatics, ( *HB_VM_STACK.pPos ), 1, s_aStatics.item.asArray.value->ulLen );
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After reset Statics\n" );
+   #endif
+
    hb_itemSetNil( &HB_VM_STACK.Return );
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Return\n" );
@@ -1052,9 +1053,9 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After DisableDestructors\n" );
    #endif
 
-   hb_stackRemove( 0 ); // Base Symbol!
    //#define DEBUG_DESTRUCTORS
 
+   hb_stackRemove( 0 ); // Base Symbol!
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After stackRemove\n" );
    #endif
@@ -1134,6 +1135,13 @@ HB_EXPORT int hb_vmQuit( void )
    else
    {
       hb_gcReleaseAll();
+
+      #ifdef HB_THREAD_SUPPORT
+         // Released by hb_gcReleaseAll()!
+         hb_stackMT.errorBlock = NULL;
+         hb_stackMT.aTryCatchHandlerStack = NULL;
+      #endif
+
       #ifdef TRACE_QUIT
          TraceLog( NULL, "After ReleaseAll\n" );
       #endif
@@ -1145,6 +1153,11 @@ HB_EXPORT int hb_vmQuit( void )
       #ifdef TRACE_QUIT
          TraceLog( NULL, "After Memvar\n" );
       #endif
+   #endif
+
+   hb_vmCleanModuleFunctions();
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After CleanModuleFunctions\n" );
    #endif
 
    hb_stackFree();
@@ -7186,7 +7199,10 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       hb_vmDebuggerEndProc();
    }
 
-   hb_stackOldFrame( &sStackState );
+   if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 || ( hb_stackGetActionRequest() & HB_QUIT_REQUESTED ) == 0 )
+   {
+      hb_stackOldFrame( &sStackState );
+   }
 
    HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
 
@@ -7577,7 +7593,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    s_ulProcLevel--;
 
 
-   hb_stackOldFrame( &sStackState );
+   if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 || ( hb_stackGetActionRequest() & HB_QUIT_REQUESTED ) == 0 )
+   {
+      hb_stackOldFrame( &sStackState );
+   }
 
    HB_TRACE(HB_TR_DEBUG, ("Restored Stack hb_vmSend()"));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6115 2008/06/01 19:42:48 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6116 2008/06/02 14:06:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-03 00:17 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/classes.c
+    * Minor optimization in hb_clsFinalize()
+
+  * source/vm/throw.c
+    ! Fixed GPF trap in Throw() when no argument passed
+
+  * source/vm/hvm.c
+    ! Clipper comptability and possible GPF trap in hb_vmQuit() shutdown order.
+    ! Fixed double release GPF trap in hb_vmQuit() under MT mode.
+    * Revised shutdown order to allow Destructors in STATICs
+      /*
+          NOTE: If reference[s] to object with Destructors are found in STATICs, and such Destructor[s]
+          are coded to access other STATICs, such STATICs might have been cleared by the the Destructor
+          is executed. It's Programmer responsability to avoid such catch-22 dependancy!
+       */
+
+  * source/vm/initexit.c
+  * source/vm/hvm.c
+    * Clipper comptability in __QUIT()
+
+  * source/vm/thread.c
+    ! Fixed GPF traps related to introduction of pCargo member of item.asSymbol
 
 2008-06-02 11:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * source/rtl/winreg.prg

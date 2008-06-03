@@ -1,5 +1,5 @@
 /*
- * $Id: initexit.c,v 1.4 2001/04/12 18:56:30 dholm Exp $
+ * $Id: initexit.c,v 1.1.1.1 2001/12/21 10:40:56 ronpinkas Exp $
  */
 
 /*
@@ -57,8 +57,19 @@
 
 #include "hbapi.h"
 #include "hbvm.h"
+#include "hbstack.h"
 
 HB_FUNC( __QUIT )
 {
+   HB_STACK_STATE sStackState;
+
+   if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 )
+   {
+      // Fake a new frame so that __QUIT frame will remain on stack - Clipper compatability ProcName(1).
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPushNil();
+      hb_stackNewFrame( &sStackState, 0 );
+   }
+
    hb_vmRequestQuit();
 }

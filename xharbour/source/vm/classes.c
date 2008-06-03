@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.219 2008/05/06 11:10:42 marchuet Exp $
+ * $Id: classes.c,v 1.220 2008/05/09 18:23:23 ronpinkas Exp $
  */
 
 /*
@@ -4443,7 +4443,7 @@ void hb_clsFinalize( PHB_ITEM pObject )
       {
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
-            if( s_AllowDestructors && hb_stack_ready )
+            if( s_AllowDestructors /* && hb_stack_ready */ )
             {
                if( hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
                {
