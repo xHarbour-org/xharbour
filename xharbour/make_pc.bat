@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.27 2008/05/06 05:47:52 andijahja Exp $
+rem $Id: make_pc.bat,v 1.28 2008/05/07 04:58:33 andijahja Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -10,10 +10,10 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
-SET CC_DIR=C:\PELLESC
-SET BISON_DIR=C:\BISON\BIN
-SET SUB_DIR=pc
-SET HB_GT_LIB=$(GTWIN_LIB)
+IF "%CC_DIR%"=="" SET CC_DIR=C:\PELLESC
+IF "%BISON_DIR%"=="" SET BISON_DIR=C:\BISON\BIN
+IF "%SUB_DIR%"=="" SET SUB_DIR=pc
+IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
