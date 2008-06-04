@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.8 2008/05/24 20:44:16 kaddath Exp $
+# $Id: makefile.bc,v 1.9 2008/06/03 23:12:56 kaddath Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -17,7 +17,8 @@ SRC_LIST = \
    adsmgmnt.c
 
 !if $(HB_ADS_IMPLIB) == no
-SRC_ACE32 = \
+SRC_LIST = \
+   $(SRC_LIST)\
    ace32.c
 !endif
 
@@ -25,7 +26,7 @@ SRC_ACE32 = \
 
 .path.obj = $(OBJ_DIR)
 
-OBJ_LIST = $(SRC_LIST:.c=.obj) $(SRC_ACE32:.c=.obj)
+OBJ_LIST = $(SRC_LIST:.c=.obj)
 
 # Dependencies
 

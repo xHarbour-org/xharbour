@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6123 2008/06/04 14:41:06 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6124 2008/06/04 14:48:52 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-04 12:18 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/contrib/rdd_ads/makefile.bc
+    * simplified rules to include/exclude ace32.c
+
+  * xharbour/contrib/rdd_ads/makefile.vc
+    ! added rules to include/exclude ace32.c (via the HB_ADS_IMPLIB envvar).
+      MSVC users please test.
 
 2008-06-04 16:47 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rdd\dbf1.c
