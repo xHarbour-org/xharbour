@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id: dbcmdx.c,v 1.2 2008/03/13 11:12:08 marchuet Exp $
  */
 
 /*
@@ -57,6 +57,20 @@
 #include "hbapiitm.h"
 
 #ifdef HB_COMPAT_XPP
+
+HB_FUNC_EXTERN( HB_DBPACK );
+
+HB_FUNC( DBPACK )
+{
+   HB_FUNC_EXEC( HB_DBPACK );
+}
+
+HB_FUNC_EXTERN( HB_DBZAP );
+
+HB_FUNC( DBZAP )
+{
+   HB_FUNC_EXEC( HB_DBZAP );
+}
 
 HB_FUNC( ORDWILDSEEK )
 {

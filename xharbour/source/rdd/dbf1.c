@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.186 2008/04/05 20:31:20 likewolf Exp $
+ * $Id: dbf1.c,v 1.187 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -5308,16 +5308,14 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    return errCode;
 }
 
-static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnection )
+static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile, * szExt;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE, fResult = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnection));
-
-   HB_SYMBOL_UNUSED( ulConnection );
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p,%p,%p,%lu)", pRDD, pItemTable, pItemIndex, ulConnect));
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )
@@ -5335,7 +5333,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
    {
       /* Add default extension if missing */
       pFileExt = hb_itemPutC( NULL, "" );
-      if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, 0, pFileExt ) == SUCCESS )
+      if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, ulConnect, pFileExt ) == SUCCESS )
          pFileName->szExtension = hb_itemGetCPtr( pFileExt );
    }
    hb_fsFNameMerge( szFileName, pFileName );
@@ -5356,7 +5354,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
           */
          pFileName = hb_fsFNameSplit( szFileName );
          pFileExt = hb_itemPutC( pFileExt, "" );
-         if( SELF_RDDINFO( pRDD, RDDI_MEMOEXT, 0, pFileExt ) == SUCCESS )
+         if( SELF_RDDINFO( pRDD, RDDI_MEMOEXT, ulConnect, pFileExt ) == SUCCESS )
          {
             szExt = hb_itemGetCPtr( pFileExt );
             if( szExt[ 0 ] )
@@ -5371,7 +5369,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
           * in the same directory as table file
           */
          pFileExt = hb_itemPutC( pFileExt, "" );
-         if( SELF_RDDINFO( pRDD, RDDI_ORDSTRUCTEXT, 0, pFileExt ) == SUCCESS )
+         if( SELF_RDDINFO( pRDD, RDDI_ORDSTRUCTEXT, ulConnect, pFileExt ) == SUCCESS )
          {
             szExt = hb_itemGetCPtr( pFileExt );
             if( szExt[ 0 ] )
@@ -5399,9 +5397,7 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
    PHB_FNAME pFileName;
    BOOL fTable = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnect));
-
-   HB_SYMBOL_UNUSED( ulConnect );
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p,%lu)", pRDD, pItemTable, pItemIndex, ulConnect));
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )
@@ -5417,7 +5413,7 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
    if( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
-      if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, 0, pFileExt ) == SUCCESS )
+      if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, ulConnect, pFileExt ) == SUCCESS )
          pFileName->szExtension = hb_itemGetCPtr( pFileExt );
    }
    hb_fsFNameMerge( szFileName, pFileName );

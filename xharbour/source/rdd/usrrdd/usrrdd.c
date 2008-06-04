@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.13 2008/01/15 16:20:40 marchuet Exp $
+ * $Id: usrrdd.c,v 1.14 2008/03/13 11:12:16 marchuet Exp $
  */
 
 /*
@@ -2541,7 +2541,7 @@ static ERRCODE hb_usrWriteDBHeader( AREAP pArea )
 
 static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULONG ulConnect )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrDrop(%p,%p,%p,%ul)", pRDD, pTable, pIndex, ulConnect));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrDrop(%p,%p,%p,%lu)", pRDD, pTable, pIndex, ulConnect));
 
    if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_DROP ) )
       return SUPER_DROP( pRDD, pTable, pIndex, ulConnect );
@@ -2549,7 +2549,7 @@ static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULO
    hb_vmPushInteger( pRDD->rddID );
    hb_vmPush( pTable );
    hb_vmPush( pIndex );
-   hb_vmPushLong( ulConnect );   
+   hb_vmPushLong( ulConnect );
    hb_vmDo( 4 );
 
    return hb_usrReturn();
@@ -2557,7 +2557,7 @@ static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULO
 
 static ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULONG ulConnect )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p,%ul)", pRDD, pTable, pIndex, ULONG ulConnect));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p,%lu)", pRDD, pTable, pIndex, ULONG ulConnect));
 
    if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_EXISTS ) )
       return SUPER_EXISTS( pRDD, pTable, pIndex, ulConnect );
@@ -2565,7 +2565,7 @@ static ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, U
    hb_vmPushInteger( pRDD->rddID );
    hb_vmPush( pTable );
    hb_vmPush( pIndex );
-   hb_vmPushLong( ulConnect );      
+   hb_vmPushLong( ulConnect );
    hb_vmDo( 4 );
 
    return hb_usrReturn();
@@ -4256,7 +4256,8 @@ HB_FUNC_UR_SUPER( DROP )
 
    if( pRDD )
       hb_retni( SUPER_DROP( pRDD, hb_param( 2, HB_IT_ANY ),
-                                  hb_param( 3, HB_IT_ANY ), hb_parnl( 4 ) ) );
+                                  hb_param( 3, HB_IT_ANY ),
+                                  hb_parnl( 4 ) ) );
 }
 
 HB_FUNC_UR_SUPER( EXISTS )
@@ -4265,7 +4266,8 @@ HB_FUNC_UR_SUPER( EXISTS )
 
    if( pRDD )
       hb_retni( SUPER_EXISTS( pRDD, hb_param( 2, HB_IT_ANY ),
-                                    hb_param( 3, HB_IT_ANY ), hb_parnl( 4 ) ) );
+                                    hb_param( 3, HB_IT_ANY ),
+                                    hb_parnl( 4 ) ) );
 }
 
 HB_FUNC_UR_SUPER( RDDINFO )
