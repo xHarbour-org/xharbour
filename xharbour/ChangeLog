@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6126 2008/06/05 04:16:17 kaddath Exp $
+ * $Id: ChangeLog,v 1.6127 2008/06/05 04:47:44 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-05 12:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\compiler\harbour.c  
+    * Warning W0004 Codeblock parameter will be showed at -w3 or higher.
 
 2008-06-04 21:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * makefile.dc
