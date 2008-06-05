@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.47 2008/05/22 23:12:27 andijahja Exp $
+# $Id: makefile.gc,v 1.48 2008/06/03 23:12:55 kaddath Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -298,8 +298,11 @@ HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
 endif
 
+ifdef HB_DIR_ADS
+ACEH_DIR    =-I"$(HB_DIR_ADS)"
+endif
 INCLUDE_DIR =include
-CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
@@ -344,9 +347,12 @@ CLIBFLAGS   +=
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+ifdef HB_DIR_ADS
+ACEH_DIR    =-I"$(HB_DIR_ADS)"
+endif
 HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing
-CLIBFLAGS   +=-Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
+CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT

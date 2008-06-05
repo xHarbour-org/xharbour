@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.87 2008/05/22 23:12:27 andijahja Exp $
+# $Id: makefile.wc,v 1.88 2008/06/03 23:12:55 kaddath Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -235,7 +235,7 @@ DLL_MT=mt
 #===============================================================================
 # RDDADS
 #===============================================================================
-!ifdef HB_RDDADS
+!ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
 !if $(HB_ADS_IMPLIB) == no
 !else
 COMPILERLIBS=\
@@ -298,8 +298,11 @@ EXEFLAGS=\
 	/nologo\
 	/subsystem:console
 
+!ifdef HB_DIR_ADS
+ACEH_DIR    =-i="$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d__EXPORT__
+CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d__EXPORT__
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
@@ -343,8 +346,11 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!ifdef HB_DIR_ADS
+ACEH_DIR    =-i=$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR =include
-INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR)
+INCLUDE_DIR =$(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -DHB_OS_WIN_32_USED
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 !ifdef HB_THREAD_SUPPORT

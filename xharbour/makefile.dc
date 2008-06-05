@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.44 2008/05/22 23:12:27 andijahja Exp $
+# $Id: makefile.dc,v 1.45 2008/06/03 23:12:54 kaddath Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -205,7 +205,7 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 #===============================================================================
 # RDDADS
 #===============================================================================
-!ifdef HB_RDDADS
+!ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
 !if $(HB_ADS_IMPLIB) == no
 !else
 COMPILERLIBS=\
@@ -235,10 +235,13 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!ifdef HB_DIR_ADS
+ACEH_DIR    =-I"$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -Jm -cpp -mn -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
+CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
@@ -300,8 +303,11 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!ifdef HB_DIR_ADS
+ACEH_DIR     =-I"$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win;$(ZLIB_DIR);$(PNG_DIR)
-CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
+CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
 HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
