@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.230 2008/05/22 23:12:27 andijahja Exp $
+# $Id: makefile.bc,v 1.231 2008/06/03 23:12:54 kaddath Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -385,7 +385,7 @@ DLL_MT=mt
 #===============================================================================
 # RDDADS
 #===============================================================================
-!if $d(HB_RDDADS)
+!ifdef HB_DIR_ADS  ##!if $d(HB_RDDADS)
 !if $(HB_ADS_IMPLIB) == no
 !else
 COMPILERLIBS=\
@@ -421,10 +421,13 @@ CLIBFLAGS   =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 !else
 CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !endif
+!ifdef HB_DIR_ADS
+ACEH_DIR    =-I"$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR =include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
+CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) -I$(INCLUDE_DIR) -d -w3
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -po$(OBJ_DIR)\ -q0 -w2 -es2 -gc2
 
 # User flags should be able to override everything!
@@ -494,9 +497,12 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!ifdef HB_DIR_ADS
+ACEH_DIR     =-I"$(HB_DIR_ADS)"
+!endif
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -c -q -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DHB_OS_WIN_32_USED
+CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DHB_OS_WIN_32_USED
 HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
@@ -616,6 +622,8 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 !
 
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" ECHO Creating $(ACE32_LIB) import library
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"
 	IF EXIST "$(RDDADS_LIB)" $(DEL) "$(RDDADS_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^

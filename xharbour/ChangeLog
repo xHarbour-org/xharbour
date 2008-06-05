@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6124 2008/06/04 14:48:52 marchuet Exp $
+ * $Id: ChangeLog,v 1.6125 2008/06/04 19:18:48 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-04 21:12 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * makefile_bc
+  * mdir.bat
+  * common.mak
+  * compile.mak
+    ! Fixed rddads compilation when using either the import library approach
+      or the integrated ace32.c approach.  Will skip rddads compilation if
+      HB_DIR_ADS isn't defined.
+      Fixes for the other compiler will follow, but they will be blind fixes
+      so I kindly ask users of the other compiler to test and fix please.
 
 2008-06-04 12:18 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/contrib/rdd_ads/makefile.bc

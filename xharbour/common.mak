@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.12 2008/05/21 15:49:15 ptsarenko Exp $
+# $Id: common.mak,v 1.13 2008/05/22 22:07:52 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -121,6 +121,7 @@ MYSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)mysql$(LIBEXT)
 PDFLIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pdflib$(LIBEXT)
 PGSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libhbpg$(LIBEXT)
 RDDADS_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rddads$(LIBEXT)
+ACE32_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ace32$(LIBEXT)
 TELEPATH_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)telepath$(LIBEXT)
 HBCC_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcc$(LIBEXT)
 WHAT32_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)what32$(LIBEXT)
@@ -628,8 +629,12 @@ USRRDD_LIB_OBJS=\
 RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)ads1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)
+!if $(HB_ADS_IMPLIB) == no
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
 	$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT)
+!endif
 
 #===============================================================================
 # RDD.LIB rules
@@ -1704,11 +1709,16 @@ DLL_PROJECT=\
 	$(HBMAKEDLL_EXE)\
 	$(XBSCRIPTDLL_EXE)
 
+!ifdef HB_DIR_ADS
 CONTRIB_PROJECT=\
+	$(RDDADS_LIB)
+!endif
+
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
 	$(GDLIB_LIB)\
 	$(LIBNF_LIB)\
 	$(PDFLIB_LIB)\
-	$(RDDADS_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
 	$(WVTGUI_LIB)\

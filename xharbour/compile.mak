@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.10 2008/05/21 15:49:15 ptsarenko Exp $
+# $Id: compile.mak,v 1.11 2008/05/22 22:07:52 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -208,8 +208,10 @@ $(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsfunc.c
 $(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsmgmnt.c
 	$(CC_CMD)
 
+!if $(HB_ADS_IMPLIB) == no
 $(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)ace32.c
 	$(CC_CMD)
+!endif
 
 #===============================================================================
 # RDD.LIB rules
