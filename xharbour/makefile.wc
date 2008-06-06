@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.88 2008/06/03 23:12:55 kaddath Exp $
+# $Id: makefile.wc,v 1.89 2008/06/05 04:47:46 kaddath Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -236,7 +236,7 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
-!if $(HB_ADS_IMPLIB) == no
+!if "$(HB_ADS_IMPLIB)" == "no"
 !else
 COMPILERLIBS=\
 	ace32.lib

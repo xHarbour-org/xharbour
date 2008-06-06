@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.221 2008/06/03 23:12:55 kaddath Exp $
+# $Id: makefile.vc,v 1.222 2008/06/05 04:47:46 kaddath Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -266,7 +266,7 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
-!if $(HB_ADS_IMPLIB) == no
+!if "$(HB_ADS_IMPLIB)" == "no"
 !else
 COMPILERLIBS=\
 	ace32.lib

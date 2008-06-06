@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.14 2008/06/05 04:16:18 kaddath Exp $
+# $Id: common.mak,v 1.15 2008/06/06 03:30:25 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -631,10 +631,12 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)
 
-!ifdef HB_DIR_ADS
+!ifdef HB_ADS_IMPLIB
+!if "$(HB_ADS_IMPLIB)" == "no"
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
 	$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT)
+!endif
 !endif
 
 #===============================================================================

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.45 2008/06/03 23:12:54 kaddath Exp $
+# $Id: makefile.dc,v 1.46 2008/06/05 04:47:45 kaddath Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -206,7 +206,7 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 # RDDADS
 #===============================================================================
 !ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
-!if $(HB_ADS_IMPLIB) == no
+!if "$(HB_ADS_IMPLIB)" == "no"
 !else
 COMPILERLIBS=\
 	$(LIB_DIR)\ace32.lib

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.231 2008/06/03 23:12:54 kaddath Exp $
+# $Id: makefile.bc,v 1.232 2008/06/05 04:16:19 kaddath Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -386,7 +386,7 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !ifdef HB_DIR_ADS  ##!if $d(HB_RDDADS)
-!if $(HB_ADS_IMPLIB) == no
+!if "$(HB_ADS_IMPLIB)" == "no"
 !else
 COMPILERLIBS=\
 	ace32.lib
