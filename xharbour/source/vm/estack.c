@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.97 2008/04/30 16:47:34 ronpinkas Exp $
+ * $Id: estack.c,v 1.98 2008/05/06 11:10:43 marchuet Exp $
  */
 
 /*
@@ -187,13 +187,13 @@ void hb_stackIncrease( void )
    LONG CurrIndex;   /* index of current top item */
    LONG EndIndex;    /* index of current top item */
 
-   HB_THREAD_STUB
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
-
    #ifndef HB_ARRAY_USE_COUNTER
       PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
    #endif
+
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
 
    BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
