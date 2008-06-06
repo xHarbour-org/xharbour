@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6130 2008/06/06 03:31:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6131 2008/06/06 03:54:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -28,7 +28,7 @@
        -WB[locks][-]
 
      NOTES:
-        1. -W2 is eqivalent to -WL -WS -WG -WM -WF
+        1. -W2 is eqivalent to -WL -WS -WG -WM -WF -WB
            (I didn't use -WAll because it might be used in the future to enable all warnings of all kind)
 
         2. As with all compiler switches, the last specified switch override previous settings - example:
