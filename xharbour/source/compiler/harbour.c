@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.202 2008/06/03 17:41:29 ronpinkas Exp $
+ * $Id: harbour.c,v 1.203 2008/06/05 10:47:42 marchuet Exp $
  */
 
 /*
@@ -236,8 +236,15 @@ FILE *hb_comp_VariableList = NULL;
 /* PreProcessor Tracing support. */
 BOOL hb_comp_bTracePP = FALSE;
 
-/* auto conert external function to dynamic ones */
+/* Auto declare external function as dynamic */
 BOOL hb_comp_autoDeferred = FALSE;
+
+BOOL hb_comp_bWarnUnUsedLocals      = FALSE;
+BOOL hb_comp_bWarnUnUsedStatics     = FALSE;
+BOOL hb_comp_bWarnUnUsedGlobals     = FALSE;
+BOOL hb_comp_bWarnUnUsedMemvars     = FALSE;
+BOOL hb_comp_bWarnUnUsedFields      = FALSE;
+BOOL hb_comp_bWarnUnUsedBlockParams = FALSE;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
@@ -3774,49 +3781,43 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    if( ! hb_comp_bStartProc )
    {
       iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
-   if( iVar )
-   {
-      /* Global static variable
-       */
-      hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+      if( iVar )
+      {
+         /* Global static variable
+          */
+         hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+         hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
 
-      return;
-   }
+         return;
+      }
 
-   if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
-   if( iVar )
-   {
-      /* Global field declaration
-       */
-      hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pFirst );
+      if( iVar )
+      {
+         /* Global field declaration
+          */
+         hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pFirst );
 
-      return;
-   }
+         return;
+      }
 
-   if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
+
+      if( iVar )
+      {
+         /* Global Memvar variable declaration
+          */
+         hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
+
+         return;
+      }
    }
 
-   if( iVar )
-   {
-      /* Global Memvar variable declaration
-       */
-      hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
-   }
-   else
-   {
-      /* undeclared variable
-       */
-      hb_compGenVariablePCode( HB_P_POPVARIABLE, szVarName );
-   }
+   /* undeclared variable
+    */
+   hb_compGenVariablePCode( HB_P_POPVARIABLE, szVarName );
 }
 
 /* generates the pcode to pop a value from the virtual machine stack onto
@@ -4587,35 +4588,86 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
       if( hb_comp_iWarnings )
       {
-         PVAR pVar;
+         /*
+          REVIEW: based on VU_INITIALIZED - but NIL is a default VALID value!!!
+         hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NOT_INITIALIZED, pVar->szName, NULL );
+         */
 
-         pVar = pFunc->pLocals;
-         while( pVar )
+         if( pFunc->szName && pFunc->szName[0] )
          {
-            if( pVar->szName && pFunc->szName && pFunc->szName[0] && (! ( pVar->iUsed & VU_USED )) )
-            {
-               char szFun[ 256 ];
+            PVAR pVar;
 
-               sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
-               hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+            if( hb_comp_bWarnUnUsedLocals )
+            {
+               pVar = pFunc->pLocals;
+
+               while( pVar )
+               {
+                  if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                  {
+                     char szFun[ 256 ];
+
+                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                  }
+
+                  pVar = pVar->pNext;
+               }
             }
 
-            pVar = pVar->pNext;
-         }
-
-         pVar = pFunc->pStatics;
-
-         while( pVar )
-         {
-            if( pVar->szName && pFunc->szName && pFunc->szName[0] && ! ( pVar->iUsed & VU_USED ) )
+            if( hb_comp_bWarnUnUsedStatics )
             {
-               char szFun[ 256 ];
+               pVar = pFunc->pStatics;
 
-               sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
-               hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+               while( pVar )
+               {
+                  if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                  {
+                     char szFun[ 256 ];
+
+                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                  }
+
+                  pVar = pVar->pNext;
+               }
             }
 
-            pVar = pVar->pNext;
+            if( hb_comp_bWarnUnUsedMemvars )
+            {
+               pVar = pFunc->pMemvars;
+
+               while( pVar )
+               {
+                  if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                  {
+                     char szFun[ 256 ];
+
+                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                  }
+
+                  pVar = pVar->pNext;
+               }
+            }
+
+            if( hb_comp_bWarnUnUsedFields )
+            {
+               pVar = pFunc->pFields;
+
+               while( pVar )
+               {
+                  if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                  {
+                     char szFun[ 256 ];
+
+                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                  }
+
+                  pVar = pVar->pNext;
+               }
+            }
          }
 
          /* Check if the function returned some value
@@ -4670,26 +4722,6 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          {
             pFunc->lPCodePos -= 3;
             memmove( pFunc->pCode + 5, pFunc->pCode + 8, pFunc->lPCodePos - 5 );
-         }
-         else
-            /* Check Global Statics. */
-         {
-            /* PVAR pVar = pFunc->pStatics; */
-            PVAR pVar = hb_comp_functions.pFirst->pStatics;
-
-            while( pVar )
-            {
-               /*printf( "\nChecking: %s Used: %i\n", pVar->szName, pVar->iUsed );*/
-
-               if ( ! ( pVar->iUsed & VU_USED ) && (pVar->iUsed & VU_INITIALIZED) )
-                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAL_NOT_USED, pVar->szName, NULL );
-
-               /* May have been initialized in previous execution of the function.
-                  else if ( ( pVar->iUsed & VU_USED ) && ! ( pVar->iUsed & VU_INITIALIZED ) )
-                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NOT_INITIALIZED, pVar->szName, NULL );
-               */
-               pVar = pVar->pNext;
-            }
          }
       }
    }
@@ -5686,7 +5718,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    pVar = pCodeblock->pLocals;
    while( pVar )
    {
-      if( hb_comp_iWarnings > 2 && pFunc->szName && pVar->szName && ! ( pVar->iUsed & VU_USED ) )
+      if( hb_comp_bWarnUnUsedBlockParams && pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
       {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_BLOCKVAR_NOT_USED, pVar->szName, pFunc->szName );
       }
@@ -6388,7 +6420,6 @@ static int hb_compCompile( char * szPrg )
                pSyn*/
             }
 
-
             if( hb_comp_pInitFunc )
             {
                char szNewName[ 32 ];
@@ -6414,6 +6445,7 @@ static int hb_compCompile( char * szPrg )
                   int iModules = 0;
 
                   hb_compLineNumberDefStart();
+
                   do
                   {
                      ULONG ulSkip = pInfo->ulFirstLine >> 3;
@@ -6517,6 +6549,83 @@ static int hb_compCompile( char * szPrg )
                }
 
                pFunc = hb_comp_functions.pFirst;
+
+               if( hb_comp_iWarnings >= 2 && hb_comp_bStartProc == FALSE )
+               {
+                  PVAR pVar;
+
+                  if( hb_comp_bWarnUnUsedStatics )
+                  {
+                     pVar = pFunc->pStatics;
+
+                     while( pVar )
+                     {
+                        if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                        {
+                           char szFun[ 256 ];
+
+                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                        }
+
+                        pVar = pVar->pNext;
+                     }
+                  }
+
+                  if( hb_comp_bWarnUnUsedGlobals )
+                  {
+                     pVar = hb_comp_pGlobals;
+
+                     while( pVar )
+                     {
+                        if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                        {
+                           char szFun[ 256 ];
+
+                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                        }
+
+                        pVar = pVar->pNext;
+                     }
+                  }
+
+                  if( hb_comp_bWarnUnUsedMemvars )
+                  {
+                     pVar = pFunc->pMemvars;
+
+                     while( pVar )
+                     {
+                        if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                        {
+                           char szFun[ 256 ];
+
+                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                        }
+
+                        pVar = pVar->pNext;
+                     }
+                  }
+
+                  if( hb_comp_bWarnUnUsedFields )
+                  {
+                     pVar = pFunc->pFields;
+
+                     while( pVar )
+                     {
+                        if( pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
+                        {
+                           char szFun[ 256 ];
+
+                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
+                        }
+
+                        pVar = pVar->pNext;
+                     }
+                  }
+               }
 
                while( pFunc )
                {

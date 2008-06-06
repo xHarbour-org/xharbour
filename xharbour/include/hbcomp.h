@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.70 2008/03/05 14:16:52 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.71 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -767,6 +767,13 @@ extern FILE           *hb_comp_errFile;
 extern BOOL           hb_comp_autoDeferred;
 
 extern char *         hb_comp_szNamespace;
+
+extern BOOL hb_comp_bWarnUnUsedLocals     ;
+extern BOOL hb_comp_bWarnUnUsedStatics    ;
+extern BOOL hb_comp_bWarnUnUsedGlobals    ;
+extern BOOL hb_comp_bWarnUnUsedMemvars    ;
+extern BOOL hb_comp_bWarnUnUsedFields     ;
+extern BOOL hb_comp_bWarnUnUsedBlockParams;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6127 2008/06/05 04:47:44 kaddath Exp $
+ * $Id: ChangeLog,v 1.6128 2008/06/05 10:47:42 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,37 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-06-05 22:57 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * common.mak
+  * compile.mak
+    * Corrected in consistent and invalid use of !if to !ifdef
+
+  * source/vm/fastitem.c
+    * Added few debug asserts
+
+  * include/hbcomp.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+    + Added support for:
+       -WL[ocals][-]
+       -WS[tatics][-]
+       -WG[lobals][-]
+       -WM[emvars][-]
+       -WF[ields][-]
+
+     NOTES:
+        1. -W2 is eqivalent to -WL -WS -WG -WM -WF
+           (I didn't use -WAll because it might be used in the future to enable all warnings of all kind)
+
+        2. As with all compiler switches, the last specified switch override previous settings - example:
+
+              -W2 -B-
+
+           The above will enable all unused variables warnings EXCEPT for Blocks.
+
+
 2008-06-05 12:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * source\compiler\harbour.c  
+  * source\compiler\harbour.c
     * Warning W0004 Codeblock parameter will be showed at -w3 or higher.
 
 2008-06-04 21:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
@@ -104,17 +133,17 @@
       set HB_ADS_IMPLIB=no; the default is yes or not defined at all for
       this envvar.  Once the issues with this approach are fixed we can
       completely stop relying in ace32.lib.
-      
+
       In summary if HB_ADS_IMPLIB is not set or set to "yes":
       for Borland builds, lib/ace32.lib will be created automatically.
-      For other builds, it uses the ace32.lib as supplied in the acesdk 
-      folder.  If HB_ADS_IMPLIB is set to "no", then ace32.lib won't be 
-      used at all and Andi's contrib/rdd_ads/ace32.c dynamic wrappers 
+      For other builds, it uses the ace32.lib as supplied in the acesdk
+      folder.  If HB_ADS_IMPLIB is set to "no", then ace32.lib won't be
+      used at all and Andi's contrib/rdd_ads/ace32.c dynamic wrappers
       will be placed in lib/rddads.lib.
-    
-      
-      NOTE: VC users please adjust make_vc.bat & makefile.vc to 
-            conditionally compile and link ace32.c like I did in 
+
+
+      NOTE: VC users please adjust make_vc.bat & makefile.vc to
+            conditionally compile and link ace32.c like I did in
             make_b32.bat & makefile.bc.
       NOTE: GNU makefile will remain using the import library approach
             unless some GNU guru can make ace32.c work in Linux/Unix.
@@ -124,9 +153,9 @@
       set HB_DIR_ADS=C:\Program Files\Extended Systems\Advantage 8.1\acesdk
       make_b32 clean
       make_b32
-  
+
       How to build rddads with BCC 5.5.1 using the experimental ace32.c:
-  
+
       set HB_DIR_ADS=C:\Program Files\Extended Systems\Advantage 8.1\acesdk
       set HB_ADS_IMPLIB=no
       make_b32 clean
@@ -135,8 +164,8 @@
       rddads.lib and ace32.lib will be created in xharbour\lib in the
       first case; only rddads.lib in the second one.
 
-  
-      Note that for a normal build, NEITHER the deprecated 
+
+      Note that for a normal build, NEITHER the deprecated
       ADS_REQUIRE_VERSION nor the new ADS_LIB_VERSION should
       be set at all.
 

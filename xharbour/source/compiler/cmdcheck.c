@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.37 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: cmdcheck.c,v 1.38 2008/01/03 05:43:00 andijahja Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
       */
       for( i = 0; i < iArg; i++ )
       {
-	 hb_xstrcat( hb_Command_Line, Args[ i ], " ", NULL );
+         hb_xstrcat( hb_Command_Line, Args[ i ], " ", NULL );
 
          if( ! HB_ISOPTSEP( Args[ i ][0] ) )
          {
@@ -190,9 +190,11 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                           if( Args[i][j] && toupper( Args[i][j] ) == 'I' )
                           {
                              j++;
+
                              if( Args[i][j] && toupper( Args[i][j] ) == 'T' )
                              {
                                 j++;
+
                                 if( Args[i][j] && toupper( Args[i][j] ) == 'S' )
                                 {
                                    j++;
@@ -373,23 +375,9 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'w' :
                      case 'W' :
-                       if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
-                       {
-                          Switch[2] = Args[i][j + 1];
-                          Switch[3] = '\0';
-
-                          hb_compChkEnvironVar( (char*) Switch );
-
-                          j += 2;
-                          continue;
-                       }
-                       else
-                       {
-                          Switch[2] = '\0';
-                          hb_compChkEnvironVar( (char*) Switch );
-                       }
-
-                       break;
+                       hb_compChkEnvironVar( (char*) Args[i] );
+                       j = strlen( Args[i] );
+                       continue;
 
                      case 'x' :
                      case 'X' :
@@ -447,7 +435,9 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
       if( !szStrEnv || szStrEnv[ 0 ] == '\0' )
       {
          if( szStrEnv )
+         {
             hb_xfree( ( void * ) szStrEnv );
+         }
 
          szStrEnv = hb_getenv( "CLIPPERCMD" );
       }
@@ -483,17 +473,16 @@ void hb_compChkEnvironVar( char * szSwitch )
          show an error
       */
 
-      /*
-      printf( "Switch: %s\n", s );
-      */
+      //printf( "Switch: %s\n", s );
 
-      if( !HB_ISOPTSEP( *s ) )
+      if( ! HB_ISOPTSEP( *s ) )
       {
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
       }
       else
       {
          s++;
+
          switch( *s )
          {
              case 'a':
@@ -513,10 +502,12 @@ void hb_compChkEnvironVar( char * szSwitch )
                 {
                    unsigned int i = 0;
                    char * szOption = hb_strupr( hb_strdup( s ) );
+
                    while( i < strlen( szOption ) && !HB_ISOPTSEP( szOption[ i ] ) )
                    {
                       i++;
                    }
+
                    szOption[ i ] = '\0';
 
                    if( strcmp( szOption, "BUILD" ) == 0 )
@@ -862,41 +853,42 @@ void hb_compChkEnvironVar( char * szSwitch )
                 if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
                 {
                    if( *( s + 2 ) == '-' )
-		   {
+                   {
                       hb_comp_bPPO     = 0;
                       hb_comp_bTracePP = 0;
-		   }
-		   else
-		   {
-                      hb_comp_bTracePP = 1;
+                   }
+                else
+                {
+                   hb_comp_bTracePP = 1;
 
-                      if( *( s + 2 ) == 'o' || *( s + 2 ) == 'O' )
-	              {
-                         if( *( s + 3 ) == '-' )
-   		         {
-                            hb_comp_bPPO     = 0;
-                            hb_comp_bTracePP = 0;
-		         }
-		         else
-		         {
-                            char * szPath = hb_strdup( s + 3 );
+                   if( *( s + 2 ) == 'o' || *( s + 2 ) == 'O' )
+                   {
+                      if( *( s + 3 ) == '-' )
+                       {
+                         hb_comp_bPPO     = 0;
+                         hb_comp_bTracePP = 0;
+                       }
+                       else
+                       {
+                         char * szPath = hb_strdup( s + 3 );
 
-                            hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
-                            hb_xfree( szPath );
-		         }
-		      }
-		   }
+                         hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
+                         hb_xfree( szPath );
+                       }
+                     }
+                   }
                 }
                 else if( *( s + 1 ) == 'o' || *( s + 1 ) == 'O' )
-		{
+                {
                    char * szPath = hb_strdup( s + 2 );
 
                    hb_comp_bTracePP = 0;
 
                    hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
                    hb_xfree( szPath );
-		}
-		break;
+                }
+
+                break;
 #if 0
                 if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
                 {
@@ -969,13 +961,17 @@ void hb_compChkEnvironVar( char * szSwitch )
                    /* NOTE: Ignore these -undef: switches will be processed separately */
                    break;
                 }
+
                 if ( s[1] == '+' )
-	        {
-		    hb_pp_STD_CH_ADDITIVE = 1 ;
-                    hb_pp_STD_CH = hb_strdup( s + 2 );
-		}
-		else
+                {
+                   hb_pp_STD_CH_ADDITIVE = 1 ;
+                   hb_pp_STD_CH = hb_strdup( s + 2 );
+                }
+                else
+                {
                    hb_pp_STD_CH = hb_strdup( s + 1 );
+                }
+
                 break;
 
              case 'v':
@@ -996,13 +992,121 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'w':
              case 'W':
-                  hb_comp_iWarnings = 1;
-                  if( s[ 1 ] )
-                  {  /*there is -w<0,1,2,3> probably */
-                     hb_comp_iWarnings = s[ 1 ] - '0';
-                     if( hb_comp_iWarnings < 0 || hb_comp_iWarnings > 4 )
-                        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
-                  }
+
+                //printf( "Warning Switch: '%s'\n", s );
+
+                if( s[ 1 ] == '\0' )
+                {
+                   hb_comp_iWarnings = 1;
+                }
+                else if( isdigit( s[ 1 ] ) && s[ 2 ] == '\0' )
+                {
+                   /*there is -w<0,1,2,3> probably */
+
+                   if( s[ 1 ] - '0' == 2 )
+                   {
+                      hb_comp_bWarnUnUsedLocals      = TRUE;
+                      hb_comp_bWarnUnUsedStatics     = TRUE;
+                      hb_comp_bWarnUnUsedGlobals     = TRUE;
+                      hb_comp_bWarnUnUsedMemvars     = TRUE;
+                      hb_comp_bWarnUnUsedFields      = TRUE;
+                      hb_comp_bWarnUnUsedBlockParams = TRUE;
+                   }
+                   else
+                   {
+                      hb_comp_iWarnings = s[ 1 ] - '0';
+                   }
+                }
+                else if( isalpha( s[ 1 ] ) )
+                {
+                   unsigned int i = 0;
+                   char * szOption = hb_strupr( hb_strdup( s + 1 ) );
+                   BOOL bDisable = FALSE;
+
+                   while( i < strlen( szOption ) && ! HB_ISOPTSEP( szOption[ i ] ) )
+                   {
+                      i++;
+                   }
+
+                   if( szOption[ i ] == '-' )
+                   {
+                      bDisable = TRUE;
+                   }
+
+                   szOption[ i ] = '\0';
+
+                   if( strcmp( szOption, "L" ) == 0 || strcmp( szOption, "LOCALS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedLocals      = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "S" ) == 0 || strcmp( szOption, "STATICS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedStatics     = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "G" ) == 0 || strcmp( szOption, "GLOBALS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedGlobals     = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "M" ) == 0 || strcmp( szOption, "MEMVARS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedMemvars     = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "F" ) == 0 || strcmp( szOption, "FIELDS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedFields      = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "B" ) == 0 || strcmp( szOption, "BLOCKS" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedBlockParams = ! bDisable;
+                   }
+                   else if( strcmp( szOption, "S" ) == 0 || strcmp( szOption, "ALL" ) == 0 )
+                   {
+                      hb_comp_bWarnUnUsedLocals      = ! bDisable;
+                      hb_comp_bWarnUnUsedStatics     = ! bDisable;
+                      hb_comp_bWarnUnUsedGlobals     = ! bDisable;
+                      hb_comp_bWarnUnUsedMemvars     = ! bDisable;
+                      hb_comp_bWarnUnUsedFields      = ! bDisable;
+                      hb_comp_bWarnUnUsedBlockParams = ! bDisable;
+                   }
+                   else
+                   {
+                      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, szOption, NULL );
+                   }
+
+                   hb_xfree( szOption );
+                }
+                else
+                {
+                   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                }
+
+                if( hb_comp_iWarnings < 0 || hb_comp_iWarnings > 4 )
+                {
+                   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                }
+                else
+                {
+                   if( hb_comp_bWarnUnUsedLocals      ||
+                       hb_comp_bWarnUnUsedStatics     ||
+                       hb_comp_bWarnUnUsedGlobals     ||
+                       hb_comp_bWarnUnUsedMemvars     ||
+                       hb_comp_bWarnUnUsedFields      ||
+                       hb_comp_bWarnUnUsedBlockParams )
+                   {
+                      if( hb_comp_iWarnings < 2 )
+                      {
+                         hb_comp_iWarnings = 2;
+                      }
+                   }
+                   else
+                   {
+                      if( hb_comp_iWarnings >= 2 )
+                      {
+                         hb_comp_iWarnings = 1;
+                      }
+                   }
+                }
+
                 break;
 
              case 'x':

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.118 2008/05/09 18:26:51 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.119 2008/05/09 18:29:00 ronpinkas Exp $
  */
 
 /*
@@ -166,6 +166,7 @@ HB_EXPORT void hb_itemReleaseString( PHB_ITEM pItem )
    {
       if( *( pItem->item.asString.pulHolders ) == 0 )
       {
+         assert(0);
          hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature String Release detected: '%s'", pItem->item.asString.value, NULL );
       }
 
@@ -219,6 +220,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
          #ifdef HB_ARRAY_USE_COUNTER
             if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
             {
+               assert(0);
                hb_errInternal( HB_EI_PREMATURE_RELEASE, "BYREF Premature Array/Object Release detected", NULL, NULL );
             }
 
@@ -237,6 +239,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
       #ifdef HB_ARRAY_USE_COUNTER
         if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
         {
+           assert(0);
            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
         }
 
@@ -308,6 +311,7 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
          #ifdef HB_ARRAY_USE_COUNTER
             if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
             {
+               assert(0);
                hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
             }
 
@@ -326,6 +330,7 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
       #ifdef HB_ARRAY_USE_COUNTER
         if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
         {
+           assert(0);
            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
         }
 
