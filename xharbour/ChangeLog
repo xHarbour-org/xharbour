@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6128 2008/06/05 10:47:42 marchuet Exp $
+ * $Id: ChangeLog,v 1.6129 2008/06/06 03:30:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -32,7 +32,7 @@
 
         2. As with all compiler switches, the last specified switch override previous settings - example:
 
-              -W2 -B-
+              -W2 -WB-
 
            The above will enable all unused variables warnings EXCEPT for Blocks.
 
