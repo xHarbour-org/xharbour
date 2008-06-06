@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6129 2008/06/06 03:30:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6130 2008/06/06 03:31:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -25,6 +25,7 @@
        -WG[lobals][-]
        -WM[emvars][-]
        -WF[ields][-]
+       -WB[locks][-]
 
      NOTES:
         1. -W2 is eqivalent to -WL -WS -WG -WM -WF
