@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.204 2008/06/06 03:30:25 ronpinkas Exp $
+ * $Id: harbour.c,v 1.205 2008/06/09 14:13:07 ronpinkas Exp $
  */
 
 /*
@@ -1091,7 +1091,14 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       /*NOTE: Clipper warns if PARAMETER variable duplicates the MEMVAR
        * declaration
       */
-      if( !( hb_comp_iVarScope == VS_PRIVATE || hb_comp_iVarScope == VS_PUBLIC ) )
+      if( hb_comp_iVarScope == VS_PRIVATE || hb_comp_iVarScope == VS_PUBLIC )
+      {
+        if( hb_comp_bAutoMemvarAssume )
+        {
+           hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
+        }
+      }
+      else
       {
          hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
       }

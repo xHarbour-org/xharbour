@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6134 2008/06/06 20:11:38 kaddath Exp $
+ * $Id: ChangeLog,v 1.6135 2008/06/09 14:13:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-09 17:53 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.c
+    * Clipper compatability - generate warning for duplicate MEMVAR declaration
+      implied by PRIVATE/PUBLIC when -a switch is used.
 
 2008-06-09 09:38 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * makefile.vc
