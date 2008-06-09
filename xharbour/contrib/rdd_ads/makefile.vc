@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.7 2008/06/03 23:12:56 kaddath Exp $
+# $Id: makefile.vc,v 1.8 2008/06/04 19:18:50 kaddath Exp $
 #
 
 #
@@ -37,10 +37,12 @@ ADS_LIB_OBJS = \
     $(OBJ_DIR)\adsfunc.obj \
     $(OBJ_DIR)\adsmgmnt.obj
 
-!if $(HB_ADS_IMPLIB) == no
+!ifdef HB_DIR_ADS
+!if ("$(HB_ADS_IMPLIB)"=="no")
 ADS_LIB_OBJS = \
     $(ADS_LIB_OBJS)\
     $(OBJ_DIR)\ace32.obj
+!endif
 !endif
 
 #
@@ -76,7 +78,9 @@ $(OBJ_DIR)\adsfunc.obj : adsfunc.c
 $(OBJ_DIR)\ads1.obj : ads1.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
 
-!if $(HB_ADS_IMPLIB) == no
+!ifdef HB_DIR_ADS
+!if ("$(HB_ADS_IMPLIB)"=="no")
 $(OBJ_DIR)\ace32.obj : ace32.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
+!endif
 !endif
