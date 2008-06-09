@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c 8551 2008-05-31 13:43:44Z vszakats $
+ * $Id: adsfunc.c,v 1.94 2008/06/03 23:12:56 kaddath Exp $
  */
 
 /*
@@ -2172,22 +2172,22 @@ HB_FUNC( ADSCLOSECACHEDTABLES )
 HB_FUNC( ADSCREATEFTSINDEX )
 {
    UNSIGNED32 ulRetVal ;
-   UNSIGNED8  *pucFileName             = hb_parc( 1 );
-   UNSIGNED8  *pucTag                  = hb_parc( 2 );
-   UNSIGNED8  *pucField                = hb_parc( 3 );
+   UNSIGNED8  *pucFileName             = (UNSIGNED8 *) hb_parc( 1 );
+   UNSIGNED8  *pucTag                  = (UNSIGNED8 *) hb_parc( 2 );
+   UNSIGNED8  *pucField                = (UNSIGNED8 *) hb_parc( 3 );
    UNSIGNED32 ulPageSize               = ISNUM( 4 ) ? hb_parnl( 4 ) : ADS_DEFAULT;
    UNSIGNED32 ulMinWordLen             = ISNUM( 5 ) ? hb_parnl( 5 ) : 3;
    UNSIGNED32 ulMaxWordLen             = ISNUM( 6 ) ? hb_parnl( 6 ) : 30;
    UNSIGNED16 usUseDefaultDelim        = ISLOG( 7 ) ? hb_parl( 7 ) : TRUE;
-   UNSIGNED8  *pucDelimiters           = hb_parc( 8 );
+   UNSIGNED8  *pucDelimiters           = (UNSIGNED8 *) hb_parc( 8 );
    UNSIGNED16 usUseDefaultNoise        = ISLOG( 9 ) ? hb_parl( 9 ) : TRUE;
-   UNSIGNED8  *pucNoiseWords           = hb_parc( 10 );
+   UNSIGNED8  *pucNoiseWords           = (UNSIGNED8 *) hb_parc( 10 );
    UNSIGNED16 usUseDefaultDrop         = ISLOG( 11 ) ? hb_parl( 11 ) : TRUE;
-   UNSIGNED8  *pucDropChars            = hb_parc( 12 );
+   UNSIGNED8  *pucDropChars            = (UNSIGNED8 *) hb_parc( 12 );
    UNSIGNED16 usUseDefaultConditionals = ISLOG( 13 ) ? hb_parl( 13 ) : TRUE;
-   UNSIGNED8  *pucConditionalChars     = hb_parc( 14 );
-   UNSIGNED8  *pucReserved1            = hb_parc( 15 );
-   UNSIGNED8  *pucReserved2            = hb_parc( 16 );
+   UNSIGNED8  *pucConditionalChars     = (UNSIGNED8 *) hb_parc( 14 );
+   UNSIGNED8  *pucReserved1            = (UNSIGNED8 *) hb_parc( 15 );
+   UNSIGNED8  *pucReserved2            = (UNSIGNED8 *) hb_parc( 16 );
    UNSIGNED32 ulOptions                = ISNUM( 17 ) ? hb_parnl( 17 ) : ADS_DEFAULT;
    ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 

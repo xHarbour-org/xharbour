@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.38 2008/01/03 05:43:00 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.39 2008/06/06 03:30:25 ronpinkas Exp $
  */
 
 /*
@@ -1003,7 +1003,9 @@ void hb_compChkEnvironVar( char * szSwitch )
                 {
                    /*there is -w<0,1,2,3> probably */
 
-                   if( s[ 1 ] - '0' == 2 )
+                   hb_comp_iWarnings = s[ 1 ] - '0';
+
+                   if( hb_comp_iWarnings >= 2 )
                    {
                       hb_comp_bWarnUnUsedLocals      = TRUE;
                       hb_comp_bWarnUnUsedStatics     = TRUE;
@@ -1011,10 +1013,6 @@ void hb_compChkEnvironVar( char * szSwitch )
                       hb_comp_bWarnUnUsedMemvars     = TRUE;
                       hb_comp_bWarnUnUsedFields      = TRUE;
                       hb_comp_bWarnUnUsedBlockParams = TRUE;
-                   }
-                   else
-                   {
-                      hb_comp_iWarnings = s[ 1 ] - '0';
                    }
                 }
                 else if( isalpha( s[ 1 ] ) )

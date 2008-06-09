@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.203 2008/06/05 10:47:42 marchuet Exp $
+ * $Id: harbour.c,v 1.204 2008/06/06 03:30:25 ronpinkas Exp $
  */
 
 /*
@@ -3654,14 +3654,41 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 
    if( bPCode == HB_P_PUSHALIASEDFIELD && wVar <= 255 )
    {
+      // Set VU_USED flag if declared MEMVAR
+      if( hb_compFieldGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
+      {
+         if( ! hb_comp_bStartProc )
+         {
+            hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
+         }
+      }
+
       hb_compGenPCode2( HB_P_PUSHALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
    }
    else if( bPCode == HB_P_POPALIASEDFIELD && wVar <= 255 )
    {
+      // Set VU_USED flag if declared MEMVAR
+      if( hb_compFieldGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
+      {
+         if( ! hb_comp_bStartProc )
+         {
+            hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
+         }
+      }
+
       hb_compGenPCode2( HB_P_POPALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
    }
    else
    {
+      // Set VU_USED flag if declared MEMVAR
+      if( hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
+      {
+         if( ! hb_comp_bStartProc )
+         {
+            hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
+         }
+      }
+
       hb_compGenPCode3( bPCode, HB_LOBYTE( wVar ), HB_HIBYTE( wVar ), ( BOOL ) 1 );
    }
 }
