@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.205 2008/06/09 14:13:07 ronpinkas Exp $
+ * $Id: harbour.c,v 1.206 2008/06/09 22:27:56 ronpinkas Exp $
  */
 
 /*
@@ -1158,6 +1158,12 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
             while( pLastVar->pNext )
             {
+               if( pLastVar->szName == szVarName )
+               {
+                  // The duplicate var will never be marked as used - avoid redundant warning!
+                  pVar->iUsed |= VU_USED;
+               }
+
                pLastVar = pLastVar->pNext;
             }
 
