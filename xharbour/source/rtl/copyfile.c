@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.3 2005/08/30 16:30:22 lculik Exp $
+ * $Id: copyfile.c,v 1.4 2007/11/26 18:33:52 ptsarenko Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
+#include "hbapiitm.h"
 
 #if defined(OS_UNIX_COMPATIBLE)
    #include <sys/stat.h>
@@ -63,10 +64,13 @@
 
 #define BUFFER_SIZE 8192
 
-static BOOL hb_fsCopy( char * szSource, char * szDest )
+void blockeval( EVALINFO, PHB_ITEM, ULONG );
+
+static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 {
    BOOL bRetVal = FALSE;
    FHANDLE fhndSource;
+   EVALINFO info;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCopy(%s, %s)", szSource, szDest));
 
@@ -106,6 +110,8 @@ static BOOL hb_fsCopy( char * szSource, char * szDest )
 
          bRetVal = TRUE;
 
+         hb_evalNew( &info, block );
+
          while( ( usRead = hb_fsRead( fhndSource, buffer, BUFFER_SIZE ) ) != 0 )
          {
             while( hb_fsWrite( fhndDest, buffer, usRead ) != usRead )
@@ -118,9 +124,12 @@ static BOOL hb_fsCopy( char * szSource, char * szDest )
                   break;
                }
             }
+            blockeval( info, block, usRead );
          }
 
          hb_xfree( buffer );
+
+         hb_evalRelease( &info );
 
 #if defined(OS_UNIX_COMPATIBLE)
          if( iSuccess == 0 )
@@ -148,15 +157,35 @@ static BOOL hb_fsCopy( char * szSource, char * szDest )
    return bRetVal;
 }
 
+static void blockeval( EVALINFO info, PHB_ITEM block, ULONG count )
+{
+   if( hb_itemType( block ) == HB_IT_BLOCK )
+   {
+     HB_ITEM_NEW( Count );
+
+     hb_evalPutParam( &info, hb_itemPutNL( &Count, count ) );
+
+     hb_itemRelease( hb_evalLaunch( &info ) );
+   }
+
+   return;
+}
+
 /* Clipper returns .F. on failure and NIL on success */
 
 HB_FUNC( __COPYFILE )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ) ) )
+      PHB_ITEM block = hb_itemParam( 3 );
+      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ), block ) )
+      {
          hb_retl( FALSE );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 2010, NULL, "__COPYFILE", 2, hb_paramError( 1 ), hb_paramError( 2 ) ); /* NOTE: Undocumented but existing Clipper Run-time error */
+   }
 }
+
