@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6139 2008/06/18 12:02:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6140 2008/06/18 18:42:22 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-06-18 17:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/garbage.c
+    * Sorry, copy/paste typo in my latest commit
+    
 2008-06-18 15:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * source/rtl/copyfile.c
    + tests/testfcpy.prg

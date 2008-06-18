@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.96 2008/05/06 11:10:43 marchuet Exp $
+ * $Id: garbage.c,v 1.97 2008/05/09 18:23:24 ronpinkas Exp $
  */
 
 /*
@@ -858,7 +858,7 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pLockedBlock;
       do
       {
-         s_pCurrBlock->used |= HB_GC_DELETE;
+         s_pLockedBlock->used |= HB_GC_DELETE;
 
          /* call the cleanup function now for NON Blocks! */
          if( s_pLockedBlock->pFunc )
