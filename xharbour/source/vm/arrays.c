@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.158 2008/05/21 03:33:14 ronpinkas Exp $
+ * $Id: arrays.c,v 1.159 2008/05/21 13:41:01 ronpinkas Exp $
  */
 
 /*
@@ -1373,12 +1373,13 @@ HB_EXPORT BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
                hb_vmSend( 2 );
             }
 
+            pBaseArray->uiFlags &= ~0xF000;
+
             if( pBaseArray->ulLen != ulLen )
             {
                ULONG ulNew = pBaseArray->ulLen;
 
                pBaseArray->ulLen = ulLen;
-               pBaseArray->uiFlags &= ~0xF000;
                hb_arraySize( pArray, ulNew );
             }
          }
