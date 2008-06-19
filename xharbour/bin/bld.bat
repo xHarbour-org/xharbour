@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.70 2007/11/20 21:47:18 ronpinkas Exp $
+rem $Id: bld.bat,v 1.71 2008/03/20 00:01:04 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -141,6 +141,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
       echo debug.lib >> build.tmp
       echo vm.lib >> build.tmp
       echo rtl.lib >> build.tmp
+      echo zlib.lib >> build.tmp
       echo pcrepos.lib >> build.tmp
       echo %_HB_GT_LIB%.lib >> build.tmp
       echo lang.lib >> build.tmp
@@ -166,6 +167,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
       echo -ldebug >> build.tmp
       echo -lvm >> build.tmp
       echo -lrtl >> build.tmp
+      echo -lzlib >> build.tmp
       echo -lpcrepos >> build.tmp
       echo -l%_HB_GT_LIB% >> build.tmp
       echo -llang >> build.tmp
@@ -202,6 +204,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
       echo LIB debug.lib >> build.tmp
       echo LIB vm.lib >> build.tmp
       echo LIB rtl.lib >> build.tmp
+      echo LIB zlib.lib >> build.tmp
       echo LIB pcrepos.lib >> build.tmp
       echo LIB %_HB_GT_LIB%.lib >> build.tmp
       echo LIB codepage.lib >> build.tmp
@@ -230,7 +233,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
 
    if "%_HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib hsx%HB_MT%.lib hbsix%HB_MT%.lib ct%HB_MT%.lib tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
+   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib zlib.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib hsx%HB_MT%.lib hbsix%HB_MT%.lib ct%HB_MT%.lib tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% harbour.lib %_HB_GT_LIB%.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
 
 rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
@@ -251,14 +254,14 @@ rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
    if not "%HB_COMPILER%" == "mingw32" goto C_MSVC
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
    set _HB_GT_LIB= -l%_HB_GT_LIB% -lgtwvt
-   gcc %1.c -o%1.exe %HB_TMP_OBJ% %CFLAGS% -mno-cygwin %HB_TMP_INCLUDE% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %HB_TMP_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl%HB_MT% -l%_HB_GT_LIB% -llang -lcodepage -lrdd%HB_MT% -lmacro -lpp%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lhsx -lhbsix -lcommon -lct%HB_MT% -lhbodbc -ltip%HB_MT% -lpcrepos %HB_TMP_LIB% -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32
+   gcc %1.c -o%1.exe %HB_TMP_OBJ% %CFLAGS% -mno-cygwin %HB_TMP_INCLUDE% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %HB_TMP_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl%HB_MT% -l%_HB_GT_LIB% -llang -lcodepage -lrdd%HB_MT% -lmacro -lpp%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lhsx -lhbsix -lcommon -lct%HB_MT% -lhbodbc -ltip%HB_MT% -lzlib -lpcrepos %HB_TMP_LIB% -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32
    goto end
 
 :C_MSVC
    if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
-   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\hsx%HB_MT%.lib %HB_LIB_INSTALL%\hbsix%HB_MT%.lib %HB_LIB_INSTALL%\sixcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct%HB_MT%.lib %HB_LIB_INSTALL%\tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
+   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\zlib.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\hsx%HB_MT%.lib %HB_LIB_INSTALL%\hbsix%HB_MT%.lib %HB_LIB_INSTALL%\sixcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct%HB_MT%.lib %HB_LIB_INSTALL%\tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
 
    if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% %HB_LIB_INSTALL%\hbzip.lib
@@ -298,6 +301,7 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    echo LIB debug.lib >> build.tmp
    echo LIB vm%HB_MT%.lib >> build.tmp
    echo LIB rtl%HB_MT%.lib >> build.tmp
+   echo LIB zlib.lib >> build.tmp
    echo LIB pcrepos.lib >> build.tmp
    echo LIB %_HB_GT_LIB%.lib >> build.tmp
    echo LIB gtwvt.lib >> build.tmp
