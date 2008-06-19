@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6141 2008/06/18 22:16:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6142 2008/06/19 00:44:19 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-06-19 09:31 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/arrays.c
+    * Minor refinment to correct recursive functionality of pBaseArray->uiFlags
+
 2008-06-18 17:44 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * bin/bld_bat
     * added zlib.lib
 
   * utils/xbscript/bld_ads.bat
-    * fixed logic to include/exclude ace32.lib based on 
+    * fixed logic to include/exclude ace32.lib based on
       HB_ADS_IMPLIB setting.
     * copy xbscript.exe as xbscriptADS.exe to bin folder
     * cleanup compile time files.
@@ -21,7 +25,7 @@
 2008-06-18 17:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/garbage.c
     * Sorry, copy/paste typo in my latest commit
-    
+
 2008-06-18 15:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * source/rtl/copyfile.c
    + tests/testfcpy.prg
