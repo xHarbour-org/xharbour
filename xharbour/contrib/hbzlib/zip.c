@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.51 2008/05/14 09:43:24 marchuet Exp $
+ * $Id: zip.c,v 1.52 2008/05/14 13:28:40 andijahja Exp $
  */
 
 /*
@@ -79,13 +79,12 @@ extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 extern void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 
 #if defined(HB_OS_LINUX)
-
 extern int GetFileAttributes( char *szEntry );
-extern void SetFileAttributes( char * szEntry,ULONG ulAttr);
+extern void SetFileAttributes( char * szEntry, ULONG ulAttr );
 #endif
 
 
-static void ResetAttribs()
+static void ResetAttribs( void )
 {
    ULONG ulAtt, ulZipLen = hb_arrayLen(FileToZip);
 
@@ -297,10 +296,8 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
 static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    /* bFullPath by JGS */
 {
-   PHB_ITEM pDirEntry;
-   PHB_ITEM Temp;
-   PHB_ITEM WildFile= hb_itemNew(NULL);
-   PHB_ITEM TempArray=hb_itemArrayNew(0);
+   PHB_ITEM pDirEntry, Temp, TempArray;
+   PHB_ITEM WildFile = hb_itemNew( NULL );
    int ul, ulLen, ulArr, ulLenArr;
 
    FileToZip = hb_itemArrayNew(0);
@@ -308,18 +305,17 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
 
    if( pParam->type == HB_IT_STRING )
    {
+      TempArray = hb_itemArrayNew( 0 );
       Temp = hb_itemPutC( NULL, hb_itemGetCPtr( pParam ) );
       hb_arrayAddForward( TempArray, Temp );
       hb_itemRelease( Temp );
    }
    else
    {
-      PHB_ITEM pClone = hb_arrayClone( pParam, NULL );
-      hb_itemCopy( TempArray, pClone );
-      hb_itemRelease( pClone );
+      TempArray = hb_arrayClone( pParam, NULL );
    }
 
-   ulLenArr = hb_arrayLen(TempArray);
+   ulLenArr = hb_arrayLen( TempArray );
 
    for ( ulArr = 0; ulArr < ulLenArr ; ulArr ++ )
    {
@@ -329,14 +325,14 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
       {
          if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
-// if don't gave path add current dir !
-         /* by JGS, also if there is a relative path */
          #if defined(HB_WIN32_IO)
+            /* by JGS if don't gave path or there is a relative path add current dir ! */
             PHB_FNAME fDirSpec = hb_fsFNameSplit( (char*) szArrEntry );
 
             if ( ( pCurDir ) && ( fDirSpec != NULL ) &&
                  ! ( fDirSpec->szDrive ) && ( fDirSpec->szPath ) && ( fDirSpec->szPath[0] != OS_PATH_DELIMITER ) )
          #else
+            /* if don't gave path add current dir ! */
             if ( ( pCurDir ) && ( ! strchr( szArrEntry, OS_PATH_DELIMITER ) ) )
          #endif
             {
@@ -344,17 +340,6 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
                szArrEntry = hb_xstrcpy( NULL, (char *) pCurDir, OS_PATH_DELIMITER_STRING, szTemp, NULL );
                hb_xfree( szTemp );
             }
-
-            /*
-            if ( ( pCurDir ) && ( ! strchr( szArrEntry, OS_PATH_DELIMITER ) ) )
-            {
-               char * szTemp = szArrEntry ;
-               szArrEntry = ( char * ) hb_xrealloc( szArrEntry, _POSIX_PATH_MAX );
-               hb_xstrcpy( szArrEntry, (char *) pCurDir,
-                              OS_PATH_DELIMITER_STRING, szTemp, NULL );
-            }
-            */
-         /* by JGS */
 
             hb_fsDirectory(WildFile,szArrEntry,NULL,0,bFullPath ); /* bFullPath by JGS */
             ulLen = hb_arrayLen(WildFile);
@@ -397,7 +382,16 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
                }
             }
 
-            hb_itemClear( WildFile );	// by JGS
+            /* by JGS */
+            #if defined(HB_WIN32_IO)
+               if ( fDirSpec )
+               {
+                  hb_xfree( fDirSpec );
+               }
+            #endif
+
+            hb_itemClear( WildFile );
+            /* by JGS */
          }
          else
          {
@@ -442,7 +436,9 @@ HB_FUNC( HB_ZIPFILE )
          BOOL bFullPath = TRUE;
          #if defined(HB_WIN32_IO)
             if ( ISLOG( 11 ) )
+            {
                bFullPath = hb_parl( 11 );
+            }
          #endif
          /* by JGS */
 
@@ -567,7 +563,9 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
          BOOL bFullPath = TRUE;
          #if defined(HB_WIN32_IO)
             if ( ISLOG( 12 ) )
+            {
                bFullPath = hb_parl( 12 );
+            }
          #endif
          /* by JGS */
 
@@ -638,7 +636,9 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
          BOOL bFullPath = TRUE;
          #if defined(HB_WIN32_IO)
             if ( ISLOG( 11 ) )
+            {
                bFullPath = hb_parl( 11 );
+            }
          #endif
          /* by JGS */
 

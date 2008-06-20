@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.31 2008/05/08 08:47:24 marchuet Exp $
+ * $Id: zipnew.cpp,v 1.32 2008/05/14 13:28:40 andijahja Exp $
  */
 
 /*
@@ -210,7 +210,6 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 {
    int iNumberOfFiles;
    ULONG ulCount;
-   // int iOMode ;
    bool iReturn = true;
 
    CZipArchive szZip;
@@ -794,7 +793,6 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    bool iReturn = true;
    ULONG ulCount;
    int iCause = 0;
-   // int iMode ;
 
    CZipArchive szZip;
    SpanCallback span;
@@ -1290,4 +1288,3 @@ int hb_CheckSpanMode( char * szFile )
 
    return iReturn;
 }
-
