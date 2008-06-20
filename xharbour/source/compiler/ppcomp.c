@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.5 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: ppcomp.c,v 1.6 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -33,12 +33,16 @@ static void hb_pp_ErrorGen( void * cargo,
                             const char * szMsgTable[], char cPrefix, int iErrorCode,
                             const char * szParam1, const char * szParam2 )
 {
+   int iLine = hb_comp_iLine;
+
    HB_SYMBOL_UNUSED( cargo );
    hb_comp_iLine = hb_pp_line( hb_comp_PP ) + 1;
    if( cPrefix == 'W' )
       hb_compGenWarning( szMsgTable, cPrefix, iErrorCode, szParam1, szParam2 );
    else
       hb_compGenError( szMsgTable, cPrefix, iErrorCode, szParam1, szParam2 );
+
+   hb_comp_iLine = iLine;
 }
 
 static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,

@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.4 2007/11/26 18:33:52 ptsarenko Exp $
+ * $Id: copyfile.c,v 1.5 2008/06/18 18:42:26 toninhofwi Exp $
  */
 
 /*
@@ -110,7 +110,10 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 
          bRetVal = TRUE;
 
-         hb_evalNew( &info, block );
+         if( block )
+         {
+            hb_evalNew( &info, block );
+         }
 
          while( ( usRead = hb_fsRead( fhndSource, buffer, BUFFER_SIZE ) ) != 0 )
          {
@@ -124,12 +127,19 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
                   break;
                }
             }
-            blockeval( info, block, usRead );
+
+            if( block )
+            {
+               blockeval( info, block, usRead );
+            }
          }
 
          hb_xfree( buffer );
 
-         hb_evalRelease( &info );
+         if( block )
+         {
+            hb_evalRelease( &info );
+         }
 
 #if defined(OS_UNIX_COMPATIBLE)
          if( iSuccess == 0 )
@@ -177,8 +187,7 @@ HB_FUNC( __COPYFILE )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      PHB_ITEM block = hb_itemParam( 3 );
-      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ), block ) )
+      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ), hb_param( 3, HB_IT_BLOCK ) ) )
       {
          hb_retl( FALSE );
       }

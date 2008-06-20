@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.154 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.155 2008/03/13 04:26:10 ronpinkas Exp $
  */
 
 /*
@@ -390,8 +390,8 @@ Source     : Crlf
            | Source WithNamespace
            ;
 
-Line       : LINE NUM_INTEGER LITERAL Crlf
-           | LINE NUM_INTEGER LITERAL '@' LITERAL Crlf   /* Xbase++ style */
+Line       : LINE NUM_INTEGER LITERAL Crlf { hb_comp_iLine =  $<iNumber>2; }
+           | LINE NUM_INTEGER LITERAL '@' LITERAL Crlf { hb_comp_iLine =  $<iNumber>2; }  /* Xbase++ style */
            ;
 
 ProcReq    : PROCREQ CompTimeStr ')' Crlf {}
@@ -2781,7 +2781,18 @@ SwitchBegin : SWITCH Expression {
                                    }
                                 }
                      Crlf
+               WhiteSpace
             ;
+
+WhiteSpace : /* Empty */
+           | EmptyLines
+           ;
+
+EmptyLines : Crlf
+           | Line
+           | EmptyLines Crlf
+           | EmptyLines Line
+           ;
 
 SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
                {

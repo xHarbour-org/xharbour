@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6142 2008/06/19 00:44:19 kaddath Exp $
+ * $Id: ChangeLog,v 1.6143 2008/06/19 14:10:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-19 23:11 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbpp.h
+  * source/pp/ppcore.c
+    * Partial Sync with Harbour
+    * Started #ifdef guards to allow sharing of same source file with Harbour
+      /* Przemek I'll greatly appreciate your cooperation */
+
+    ! Fixed wrong line number related to Extended Blocks
+      /* Przemek this should be fixed at Harbour too */
+
+  * source/compiler/ppcomp.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    ! Fixed wrong line number related to Extended Blocks
+
+  * source/compiler/harbour.sly
+    ! Fixed to support White Space between SWITCH and first CASE
+
+  * source/rtl/copyfile.c
+    ! Fixed memory leak related to new optional codeblock argument
 
 2008-06-19 09:31 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/arrays.c

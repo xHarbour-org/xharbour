@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.22 2007/12/29 13:42:47 likewolf Exp $
+ * $Id: hbpp.h,v 1.23 2007/12/30 19:52:43 likewolf Exp $
  */
 
 /*
@@ -165,7 +165,17 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 #define HB_PP_TOKEN_LEFT_SB      52
 #define HB_PP_TOKEN_RIGHT_SB     53
 #define HB_PP_TOKEN_LEFT_CB      54
+   #ifdef __XHARBOUR__
+      #define HB_PP_TOKEN_LEFT_ECB     HB_PP_TOKEN_LT
+   #else
+      #define HB_PP_TOKEN_LEFT_ECB     HB_PP_TOKEN_LEFT_CB
+   #endif
 #define HB_PP_TOKEN_RIGHT_CB     55
+   #ifdef __XHARBOUR__
+      #define HB_PP_TOKEN_RIGHT_ECB     HB_PP_TOKEN_GT
+   #else
+      #define HB_PP_TOKEN_RIGHT_ECB     HB_PP_TOKEN_RIGHT_CB
+   #endif
 #define HB_PP_TOKEN_REFERENCE    56
 #define HB_PP_TOKEN_AMPERSAND    57
 #define HB_PP_TOKEN_SEND         58
@@ -208,6 +218,7 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 /* #define HB_PP_TOKEN_UNARY        0x0100 */
 /* #define HB_PP_TOKEN_BINARY       0x0200 */
 /* #define HB_PP_TOKEN_JOINABLE     0x0400 */
+#define HB_PP_TOKEN_LINECOUNTER  0x1000
 #define HB_PP_TOKEN_MATCHMARKER  0x2000
 #define HB_PP_TOKEN_STATIC       0x4000
 #define HB_PP_TOKEN_PREDEFINED   0x8000
@@ -583,9 +594,10 @@ typedef struct
    char *   szTraceFileName;     /* trace output file name */
    FILE *   file_trace;          /* trace output file handle */
 
-   BOOL     fError;              /* error during preprocessing */
    BOOL     fQuiet;              /* do not show standard information */
    BOOL     fEscStr;             /* use \ in strings as escape character */
+   BOOL     fError;              /* indicates error in last operation */
+   int      iErrors;             /* number of error during preprocessing */
    int      iCondCompile;        /* current conditional compilation flag, when not 0 disable preprocessing and output */
    int      iCondCount;          /* number of nested #if[n]def directive */
    int      iCondStackSize;      /* size of conditional compilation stack */
@@ -654,6 +666,7 @@ extern void   hb_pp_setStdRules( PHB_PP_STATE pState );
 extern void   hb_pp_setStdBase( PHB_PP_STATE pState );
 extern void   hb_pp_setStream( PHB_PP_STATE pState, int iMode );
 extern void   hb_pp_addSearchPath( PHB_PP_STATE pState, const char * szPath, BOOL fReplace );
+extern BOOL   hb_pp_inBuffer( PHB_PP_STATE pState, const char * pBuffer, ULONG ulLen );
 extern BOOL   hb_pp_inFile( PHB_PP_STATE pState, const char * szFileName, BOOL fSearchPath, FILE * file_in, BOOL fError );
 extern BOOL   hb_pp_outFile( PHB_PP_STATE pState, const char * szOutFileName, FILE * file_out );
 extern BOOL   hb_pp_traceFile( PHB_PP_STATE pState, const char * szTraceFileName, FILE * file_trace );
@@ -668,6 +681,7 @@ extern char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, ULONG * 
 extern void   hb_pp_addDefine( PHB_PP_STATE pState, const char * szDefName, const char * szDefValue );
 extern void   hb_pp_delDefine( PHB_PP_STATE pState, const char * szDefName );
 extern BOOL   hb_pp_lasterror( PHB_PP_STATE pState );
+extern int    hb_pp_errorCount( PHB_PP_STATE pState );
 extern BOOL   hb_pp_eof( PHB_PP_STATE pState );
 
 extern void   hb_pp_tokenUpper( PHB_PP_TOKEN pToken );
