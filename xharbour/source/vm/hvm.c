@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.684 2008/06/03 04:59:56 ronpinkas Exp $
+ * $Id: hvm.c,v 1.685 2008/06/03 11:18:30 ronpinkas Exp $
  */
 
 /*
@@ -9275,7 +9275,8 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    {
 
       PHB_ITEM pLocal = hb_stackLocalVariable( &iLocal );
-      if( HB_IS_BYREF( pLocal ) && !HB_IS_ENUM( pLocal ) )
+
+      if( HB_IS_BYREF( pLocal ) && ( ! HB_IS_ENUM( pLocal ) ) && ( ! HB_IS_EXTREF( pLocal ) ) )
       {
          hb_itemCopy( pTop, pLocal );
          return;

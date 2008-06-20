@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6144 2008/06/20 03:46:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6145 2008/06/20 11:59:48 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-20 10:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    * Revised hb_vmPushLocalByRef() to not use hb_itemCopy() for ExtRef
 
 2008-06-20 14:02 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * contrib\hbzlib\zip.c
