@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.5 2008/06/18 18:42:26 toninhofwi Exp $
+ * $Id: copyfile.c,v 1.6 2008/06/20 03:46:27 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,9 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2012, NULL, szSource, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
       if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+      {
          break;
+      }
    }
 
    if( fhndSource != FS_ERROR )
@@ -91,7 +93,9 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_CREATE, 2012, NULL, szDest, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
          if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+         {
             break;
+         }
       }
 
       if( fhndDest != FS_ERROR )
@@ -187,7 +191,7 @@ HB_FUNC( __COPYFILE )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ), hb_param( 3, HB_IT_BLOCK ) ) )
+      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ), ISBLOCK( 3 ) ? hb_itemNew( hb_param( 3, HB_IT_BLOCK ) ) : NULL ) )
       {
          hb_retl( FALSE );
       }
