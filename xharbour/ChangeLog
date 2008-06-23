@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6147 2008/06/20 15:37:13 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.6148 2008/06/21 00:16:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-23 12:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/pp/ppcore.c
+    * Corrected hb_pp_nextLine() to only break at true EOL
 
 2008-06-20 19:31 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/copyfile.c

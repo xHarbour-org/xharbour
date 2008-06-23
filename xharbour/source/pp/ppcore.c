@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.271 2008/05/04 14:20:51 andijahja Exp $
+ * $Id: ppcore.c,v 1.272 2008/06/20 03:46:27 ronpinkas Exp $
  */
 
 /*
@@ -5916,9 +5916,11 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
             break;
          }
 
-         /* only single command in one call */
-         if( !pState->pTokenOut->pNext )
-            break;
+         #ifndef __XHARBOUR__
+            /* only single command in one call */
+            if( !pState->pTokenOut->pNext )
+               break;
+         #endif
 
          ltype = HB_PP_TOKEN_TYPE( pToken->type );
       }
