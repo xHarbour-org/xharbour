@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.131 2008/04/16 20:05:51 ronpinkas Exp $
+ * $Id: memvars.c,v 1.132 2008/05/09 18:23:25 ronpinkas Exp $
  */
 
 /*
@@ -123,24 +123,32 @@ static HB_VALUE_PTR s_globalTable = NULL;
 
 PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
 {
-   if ( strncmp( szName, ":TH:", 4 ) )
+   // Can NOT use HB_VM_STACK here!!!
+   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+   {
+      return hb_dynsymGet( szName );
+   }
+   else
    {
       char szNewName[270];
       sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymGet( szNewName );
    }
-   return hb_dynsymGet( szName );
 }
 
 PHB_DYNS s_memvarThFindName( char * szName, HB_STACK *pstack )
 {
-   if ( strncmp( szName, ":TH:", 4 ) )
+   // Can NOT use HB_VM_STACK here!!!
+   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+   {
+      return hb_dynsymFindName( szName );
+   }
+   else
    {
       char szNewName[270];
       sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymFindName( szNewName );
    }
-   return hb_dynsymFindName( szName );
 }
 
 #endif
@@ -2397,12 +2405,22 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
 
    #ifdef HB_THREAD_SUPPORT
       HB_THREAD_STUB
-      char szNewName[270];
 
-      sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
+      if( &( HB_VM_STACK ) == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+      {
+         pDyn = hb_dynsymFindName( szName );
+      }
+      else
+      {
+         char szNewName[270];
+
+         sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
+
+         pDyn = hb_dynsymFindName( szNewName );
+      }
+   #else
+      pDyn = hb_dynsymFindName( szName );
    #endif
-
-   pDyn = hb_dynsymFindName( szName );
 
    if( pDyn != NULL )
    {
