@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.143 2008/03/05 00:09:07 modalsist Exp $
+ * $Id: tget.prg,v 1.144 2008/03/13 10:49:42 likewolf Exp $
  */
 
 /*
@@ -510,6 +510,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          if ::decpos == 0
             ::decpos := iif( ::buffer == NIL, NIL, Len( ::buffer ) + 1 )
          endif
+
       else
          ::decpos := NIL
 
@@ -965,7 +966,7 @@ return xValue
 METHOD VarGet() CLASS Get
 
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
-   LOCAL cVarGet, nDecPos, nLen, nDec, cMask
+   LOCAL cVarGet, nDecPos, nLen, nDec, cMask, nRat
 
    IF ! HB_IsBlock( ::Block )
       ::xVarGet := NIL
@@ -999,7 +1000,17 @@ METHOD VarGet() CLASS Get
 
       IF ! Empty( ::cPicMask )
          /* 2008/MAR/04 - E.F. Discard any no number char after last digit of the mask. */
-         cMask :=  SubStr( ::cPicMask, 1, Rat("9",::cPicMask) )
+
+         nRat := Rat("9",::cPicMask)
+
+         if nRat=0
+            nRat := Rat("N",::cPicMask)
+            if nRat=0
+               nRat := Rat("#",::cPicMask)
+            endif
+         endif
+
+         cMask :=  SubStr( ::cPicMask, 1, nRat )
          nLen := HowMuchNumeric( cMask ) + 1 + iif(::minus,1,0)
          nLen := Min(nLen,Len( cMask) )
          nDec := Len( cMask) - Rat(".", cMask)
@@ -1008,7 +1019,17 @@ METHOD VarGet() CLASS Get
          ENDIF
       ELSEIF ! Empty( ::cPicture )
          /* 2008/MAR/04 - E.F. Discard any no number char after last digit of the pict. */
-         cMask :=  SubStr( ::cPicture, 1, Rat("9",::cPicture) )
+
+         nRat := Rat("9",::cPicture)
+
+         if nRat=0
+            nRat := Rat("N",::cPicture)
+            if nRat=0
+               nRat := Rat("#",::cPicture)
+            endif
+         endif
+
+         cMask :=  SubStr( ::cPicture, 1, nRat )
          nLen := HowMuchNumeric( cMask ) + 1 + iif(::minus,1,0)
          nLen := Min(nLen, Len(cMask) )
          nDec := Len( cMask) - Rat(".",cMask)

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.170 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: filesys.c,v 1.171 2008/03/27 10:26:46 likewolf Exp $
  */
 
 /*
@@ -135,7 +135,9 @@
 #if ( defined(__DMC__) || defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || \
       defined(__MINGW32__) || defined(__WATCOMC__) ) && !defined( HB_OS_UNIX )
    #include <sys/stat.h>
+   #if !defined(__POCC__)
    #include <share.h>
+   #endif
    #include <fcntl.h>
    #include <errno.h>
    #include <direct.h>
