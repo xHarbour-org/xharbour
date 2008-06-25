@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtinfo.ch 8314 2008-03-05 18:10:52Z druzus $
+ * $Id: hbgtinfo.ch,v 1.1 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 #define HB_GTI_ISGRAPHIC        0   /* 1 if GT has graphic support / pixel oriented */
 #define HB_GTI_SCREENWIDTH      1   /* Get/set width of application window in pixels */
-#define HB_GTI_SCREENHEIGHT     2   /* Get/set height of appl. window in pixels */
+#define HB_GTI_SCREENHEIGHT     2   /* Get/set height of application window in pixels */
 #define HB_GTI_SCREENDEPTH      3   /* Amount of bits used for colors in the application */
 #define HB_GTI_FONTSIZE         4   /* Get/set height of application font in pixels */
 #define HB_GTI_FONTWIDTH        5   /* Get/set width of application font characters */
@@ -118,12 +118,21 @@
 
 #define HB_GTI_ISUNICODE        47  /* is Unicode input/output enabled? */
 
-/* Font weights */              
+#define HB_GTI_SELECTCOPY       48  /* toggles screen content selection and copy to clipboard (supported by: GTWVT) */
+#define HB_GTI_RESIZABLE        49  /* toggles ability to resize window (supported by: GTWVT) */
+#define HB_GTI_CLOSABLE         50  /* toggles ability to close window (supported by: GTWVT) */
+
+/* Additional constants to enhance GT */
+#define HB_GTI_NOTIFIERBLOCK    51  /* This optional codeblock gets called whenever certain events occur. See HB_GTE_* */
+#define HB_GTI_SCREENSIZE       52  /* Get/Set height/width of application window in pixels */
+#define HB_GTI_PALETTE          53  /* Get/Set console colors 1 - 16 given an array of 16 elements containing RGB colors */
+
+/* Font weights */
 #define HB_GTI_FONTW_THIN       1
 #define HB_GTI_FONTW_NORMAL     2
 #define HB_GTI_FONTW_BOLD       3
 
-/* Font sizes */
+/* Font qualities */
 #define HB_GTI_FONTQ_DRAFT      1
 #define HB_GTI_FONTQ_NORMAL     2
 #define HB_GTI_FONTQ_HIGH       3
@@ -145,7 +154,16 @@
 #define HB_GTI_KBD_ACCENT3      16384
 #define HB_GTI_KBD_ACCENT4      32768
 
-/* Compatibility #defines */
+/* Harbour GT callback events - WORK IN PROGRESS */
+#define HB_GTE_ACTIVATE         1
+#define HB_GTE_SETFOCUS         2
+#define HB_GTE_KILLFOCUS        3
+#define HB_GTE_CLOSE            4
+#define HB_GTE_RESIZED          5
+
+/* Compatibility #defines.
+   These codes are deprecated, _don't use them_. Please upgrade to the above versions.
+   For developers: Don't add any more new codes to this section. */
 
 #ifndef HB_GT_NO_XHB
 

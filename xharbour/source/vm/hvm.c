@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.685 2008/06/03 11:18:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.686 2008/06/20 15:06:16 ronpinkas Exp $
  */
 
 /*
@@ -237,7 +237,7 @@ static void    hb_vmPushIntegerConst( int iNumber );  /* Pushes a int constant (
 #else
 static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a LONG constant (pcode) */
 #endif
-static void    hb_vmPushNumInt( HB_LONG lNumber );     /* pushes a number on to the stack and decides if it is integer or HB_LONG */
+//static void    hb_vmPushNumInt( HB_LONG lNumber );     /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 static void    hb_vmPushStatic( USHORT uiStatic );     /* pushes the containts of a static onto the stack */
 static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by refrence onto the stack */
 static void    hb_vmPushVariable( PHB_SYMB pVarSymb ); /* pushes undeclared variable */
@@ -8727,7 +8727,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    }
 }
 
-static void hb_vmPushNumInt( HB_LONG lNumber )
+HB_EXPORT void hb_vmPushNumInt( HB_LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumInt(%Ld, %i, %i)", lNumber ));
 
@@ -13499,5 +13499,4 @@ HB_FUNC( __VMVARSSET )
 {
    HB_FUNC_EXEC( HB_DBG_VMVARSSET );
 }
-
 

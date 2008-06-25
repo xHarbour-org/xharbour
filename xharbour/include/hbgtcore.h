@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.4 2008/03/20 15:35:16 ronpinkas Exp $
+ * $Id: hbgtcore.h,v 1.5 2008/04/03 19:35:38 peterrees Exp $
  */
 
 /*
@@ -344,6 +344,9 @@ typedef struct _HB_GT_BASE
    int *          StrBuffer;     /* Change from BYTE of Harbour by Peter Rees 3APR2008 */
    ULONG          StrBufferSize;
    ULONG          StrBufferPos;
+
+   PHB_ITEM       pNotifierBlock;
+   int            iLocalGTHandle;
 
    void *         pGTData[HB_GT_MAX_];    /* local GT data */
 

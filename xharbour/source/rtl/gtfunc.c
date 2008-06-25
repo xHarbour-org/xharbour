@@ -1,5 +1,5 @@
 /*
- * $Id: gtfunc.c 8202 2008-01-09 14:04:12Z druzus $
+ * $Id: gtfunc.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -103,6 +103,7 @@ HB_FUNC( HB_GTINFO )
       HB_GT_INFO gtInfo;
 
       gtInfo.pNewVal = hb_param( 2, HB_IT_ANY );
+      gtInfo.pNewVal2 = hb_param( 3, HB_IT_ANY ); 
       gtInfo.pResult = NULL;
 
       hb_gtInfo( hb_parni( 1 ), &gtInfo );

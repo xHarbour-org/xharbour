@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6150 2008/06/24 12:50:34 modalsist Exp $
+ * $Id: ChangeLog,v 1.6151 2008/06/24 18:07:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-25 13:01 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * include/hbapigt.h
+  * include/hbapiitm.h
+  * include/hbgtcore.h
+  * include/hbvm.h
+  * include/hbgtinfo.ch
+    + Added more HB_GTI_* constants to work with new features.
+  * source/rtl/gtwvt/gtwvt.c
+    ! Synchronized with latest Harbour. Implements:
+      1) "Mark and Copy"
+      2) Resizing, Maximizing of Console.
+  * source/rtl/gtwvt/gtwvt.h
+    + Few more members for resizing etc.
+  * source/rtl/gtfunc.c
+    ! HB_GTINFO() - Updated for new member in PHB_INFO structure. 
+  * source/vm/hvm.c
+    - static void    hb_vmPushNumInt( HB_LONG lNumber ); 
+    + extern HB_EXPORT hb_vmPushNumInt( HB_LONG lNumber ); 
+  * source/vm/itemapi.c
+    + HB_EXPORT PHB_ITEM hb_itemPutCPtr2( PHB_ITEM pItem, char * szText )
+    + HB_EXPORT PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+      I am not sure if this is the right file to post. Please correct.
+
+  + tests/wvtext.prg 
+    ! Demonstrates various features of new WVT Console.
+
+    /*
+      I have tested with wvtext.prg and everything works ok.
+      But I have no idea if these changes affect other GT's in any way.
+      Please test.
+    */
+
+    ; TODO: Port of Harbour GTWVG which is a combined library for
+      GTWVT + WVTGUI. GTWVG implements previous functionality as is.
+      Almost done. A little bug is giving me the nightmares.
 
 2008-06-24 13:32 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/memvars.c

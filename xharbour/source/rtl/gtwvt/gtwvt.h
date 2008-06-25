@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.h 8158 2007-12-11 15:06:07Z druzus $
+ * $Id: gtwvt.h,v 1.14 2008/03/16 19:16:04 likewolf Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ typedef struct
    USHORT   ROWS;                         /* number of displayable rows in window */
    USHORT   COLS;                         /* number of displayable columns in window */
 
-   COLORREF COLORS[16];                   /* colors */
+   COLORREF COLORS[ 16 ];                 /* colors */
 
    BOOL     CaretExist;                   /* TRUE if a caret has been created */
    BOOL     CaretHidden;                  /* TRUE if a caret has been hiden */
@@ -154,6 +154,15 @@ typedef struct
 
    BOOL     IgnoreWM_SYSCHAR;
 
+   BOOL     bMaximized;                   /* Flag is set when window has been maximized */
+   BOOL     bBeingMarked;                 /* Flag to control DOS window like copy operation */
+   BOOL     bBeginMarked;
+
+   BOOL     bResizable;
+   BOOL     bSelectCopy;
+   char *   pszSelectCopy;
+   BOOL     bClosable;
+
 } HB_GTWVT, * PHB_GTWVT;
 
 /* xHarbour compatible definitions */
@@ -176,5 +185,6 @@ typedef struct
 #  define WM_MOUSEWHEEL 0x020A
 #endif
 
-#endif /* HB_WVT_H_ */
+#define SYS_EV_MARK  1000
 
+#endif /* HB_WVT_H_ */

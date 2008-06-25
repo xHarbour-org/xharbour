@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.62 2008/04/01 05:15:09 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.63 2008/04/30 16:47:32 ronpinkas Exp $
  */
 
 /*
@@ -150,6 +150,7 @@ extern HB_EXPORT void     hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray );
 extern HB_EXPORT void     hb_vmPushState( void ); /* push current VM state on stack */
 extern HB_EXPORT void     hb_vmPopState( void ); /* pop current VM state from stack */
 extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item reference */
+extern HB_EXPORT void     hb_vmPushNumInt( HB_LONG lNumber ); /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
