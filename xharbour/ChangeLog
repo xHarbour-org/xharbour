@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6154 2008/06/27 06:21:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6155 2008/06/27 16:00:03 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-27 15:15 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/macro/macro.slx
+    * Fixed support for "IF" as an identifier.
 
 2008-06-27 17:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\inet.h
@@ -37,7 +41,7 @@
     + Added security to select.
     % optimized return expresions.
     - removed goto at code.
-    * minor sintax corrections.    
+    * minor sintax corrections.
 
 2008-06-27 01:39 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/cstruct.ch
