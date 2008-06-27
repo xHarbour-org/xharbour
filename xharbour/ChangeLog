@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6153 2008/06/25 22:19:17 vouchcac Exp $
+ * $Id: ChangeLog,v 1.6154 2008/06/27 06:21:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-27 17:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\inet.h
+    + Added macro HB_PARSOCKET( n ).
+
+  * include\thtml.ch
+    + Added cvs Id.
+
+  * source\tip\base64x.c
+  * source\tip\client.prg
+  * source\tip\ftpcln.prg
+  * source\tip\httpcln.prg
+  * source\tip\mail.prg
+    * minor sintax corrections.
+
+  * source\tip\cgi.prg
+    * removed double line coded.
+    * minor sintax corrections.
+
+  * source\tip\sendmail.prg
+    + Added optional parameter cReplyTo
+
+  * source\tip\utils.c
+    * corrected mime image/jpeg and added image/x-icon.
+    * some minor corrections to be happy some compilers (no warnnings)
+
+  * source\vm\inet.c
+    + Added security to select.
+    % optimized return expresions.
+    - removed goto at code.
+    * minor sintax corrections.    
 
 2008-06-27 01:39 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/cstruct.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.24 2008/04/01 11:03:48 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.25 2008/04/03 12:04:54 marchuet Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ METHOD ScanLength() CLASS tIPClientFTP
    LOCAL aBytes
    aBytes := HB_Regex( ::RegBytes, ::cReply )
    IF .not. Empty(aBytes)
-      ::nLength = Val( aBytes[2] )
+      ::nLength := Val( aBytes[2] )
    ENDIF
 RETURN .T.
 
@@ -436,11 +436,11 @@ METHOD UserCommand( cCommand, lPasv, lReadPort, lGetReply ) CLASS tIPClientFTP
    ::InetSendAll( ::SocketCon, cCommand )
 
    if lReadPort
-      lReadPort = ::ReadAuxPort()
+      lReadPort := ::ReadAuxPort()
    endif
 
    if lGetReply
-      lGetReply = ::GetReply()
+      lGetReply := ::GetReply()
    endif
 
 RETURN .t.
@@ -534,7 +534,7 @@ METHOD Read( nLen ) CLASS tIPClientFTP
 
          IF .not. ::CWD( ::oUrl:cPath )
 
-            ::bEof = .T.  // no data for this transaction
+            ::bEof := .T.  // no data for this transaction
             RETURN .F.
 
          ENDIF
@@ -549,7 +549,7 @@ METHOD Read( nLen ) CLASS tIPClientFTP
 
       IF .not. ::Retr( ::oUrl:cFile )
 
-         ::bEof = .T.  // no data for this transaction
+         ::bEof := .T.  // no data for this transaction
          RETURN .F.
 
       ENDIF
@@ -778,7 +778,7 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    IF ! ::bInitialized
 
       IF ! Empty( ::oUrl:cPath ) .AND. ! ::CWD( ::oUrl:cPath )
-         ::bEof = .T.  // no data for this transaction
+         ::bEof := .T.  // no data for this transaction
          RETURN .F.
       ENDIF
 
@@ -787,7 +787,7 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
       ENDIF
 
       IF ! ::Retr( ::oUrl:cFile )
-         ::bEof = .T.  // no data for this transaction
+         ::bEof := .T.  // no data for this transaction
          RETURN .F.
       ENDIF
 

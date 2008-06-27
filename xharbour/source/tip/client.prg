@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.17 2008/04/01 11:03:48 marchuet Exp $
+ * $Id: client.prg,v 1.18 2008/04/03 12:04:53 marchuet Exp $
  */
 
 /*
@@ -559,7 +559,7 @@ RETURN cMsg
 METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
    InetConnect( cServer, nPort, SocketCon )
-   
+
    IF ! Empty( ::nDefaultSndBuffSize )
       ::InetSndBufSize( SocketCon, ::nDefaultSndBuffSize )
    ENDIF

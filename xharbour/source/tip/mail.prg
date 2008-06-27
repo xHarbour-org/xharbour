@@ -1,5 +1,5 @@
- /*
- * $Id: mail.prg,v 1.4 2008/01/08 11:44:50 lculik Exp $
+/*
+ * $Id: mail.prg,v 1.5 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -250,7 +250,7 @@ METHOD Attach( oSubPart ) CLASS TipMail
    IF HB_IsObject( oSubPart ) .and. oSubPart:ClassName == "TIPMAIL"
       // reset wrong content-type
       IF At( "multipart/", Lower( ::GetFieldPart("Content-Type")) ) == 0
-         ::hHeaders["Content-Type"] := "multipart/mixed"
+         ::hHeaders[ "Content-Type" ] := "multipart/mixed"
       ENDIF
 
       AAdd( ::aAttachments, oSubPart )
@@ -287,13 +287,13 @@ METHOD ToString() CLASS TipMail
    LOCAL cRet := ""
    // this is a multipart message; we need a boundary
     IF Len( ::aAttachments ) > 0
-      ::hHeaders["Mime-Version"] :="1.0"
+      ::hHeaders[ "Mime-Version" ] :="1.0"
     endif
 
    IF Len( ::aAttachments ) > 0
       //Reset failing content type
       IF At( "multipart/", Lower( ::GetFieldPart("Content-Type")) ) == 0
-         ::hHeaders["Content-Type"] := "multipart/mixed"
+         ::hHeaders[ "Content-Type" ] := "multipart/mixed"
       ENDIF
 
       // have we got it already?
@@ -310,37 +310,41 @@ METHOD ToString() CLASS TipMail
    // Begin output the fields
    // Presenting them in a "well-known" order
    IF "Return-Path" IN ::hHeaders
-      cRet+= "Return-Path: "+::hHeaders[ "Return-Path"] + e"\r\n"
+      cRet += "Return-Path: "+::hHeaders[ "Return-Path" ] + e"\r\n"
    ENDIF
    IF "Delivered-To" IN ::hHeaders
-      cRet+= "Delivered-To: "+::hHeaders[ "Delivered-To"] + e"\r\n"
+      cRet += "Delivered-To: "+::hHeaders[ "Delivered-To" ] + e"\r\n"
    ENDIF
    FOR EACH cElem IN ::aReceived
-      cRet+= "Received: "+ cElem+ e"\r\n"
+      cRet += "Received: "+ cElem+ e"\r\n"
    NEXT
    IF "Date" IN ::hHeaders
-      cRet+= "Date: "+::hHeaders[ "Date"] + e"\r\n"
+      cRet += "Date: "+::hHeaders[ "Date" ] + e"\r\n"
    ENDIF
    IF "From" IN ::hHeaders
-      cRet+= "From: "+::hHeaders[ "From"] + e"\r\n"
+      cRet += "From: "+::hHeaders[ "From" ] + e"\r\n"
    ENDIF
    IF "To" IN ::hHeaders
-      cRet+= "To: "+::hHeaders[ "To"] + e"\r\n"
+      cRet += "To: "+::hHeaders[ "To" ] + e"\r\n"
    ENDIF
    IF "Subject" IN ::hHeaders
-      cRet+= "Subject: "+ ::hHeaders[ "Subject"] + e"\r\n"
+      cRet += "Subject: "+ ::hHeaders[ "Subject" ] + e"\r\n"
    ENDIF
-    IF Len( ::aAttachments ) > 0
-      cRet+= "Mime-Version:" + ::hHeaders["Mime-Version"] + e"\r\n"
-    endif
+   IF Len( ::aAttachments ) > 0
+      cRet += "Mime-Version:" + ::hHeaders[ "Mime-Version" ] + e"\r\n"
+   ENDIF
 
    FOR i := 1 TO Len( ::hHeaders )
       cElem := Lower(HGetKeyAt( ::hHeaders, i ))
-      IF cElem != "return-path" .and. cElem != "delivered-to" .and.;
-            cElem != "date" .and. cElem != "from" .and.;
-            cElem != "to" .and. cElem != "subject" .and. cElem !="mime-version"
+      IF !( cElem == "return-path" ) .and.;
+         !( cElem == "delivered-to" ) .and.;
+         !( cElem == "date" ) .and.;
+         !( cElem == "from" ) .and.;
+         !( cElem == "to" ) .and.;
+         !( cElem == "subject" ) .and.;
+         !( cElem == "mime-version" )
          cRet += HGetKeyAt( ::hHeaders, i ) + ": " +;
-                HGetValueAt( ::hHeaders, i ) + e"\r\n"
+                 HGetValueAt( ::hHeaders, i ) + e"\r\n"
       ENDIF
    NEXT
 
@@ -359,15 +363,15 @@ METHOD ToString() CLASS TipMail
          cRet+= "Content-Transfer-Encoding: 7bit"+ e"\r\n"
          cRet+= "Content-Disposition: inline"+ e"\r\n"+ e"\r\n"
          cRet += ::cBody+ e"\r\n"
-      ENDIF 
-      
+      ENDIF
+
    ENDIF
 
    IF .not. Empty( ::aAttachments )
       //Eventually go with mime multipart
       FOR i := 1 TO Len(::aAttachments )
          cRet += "--" + cBoundary + e"\r\n"
-         cRet += ::aAttachments[i]:ToString()   
+         cRet += ::aAttachments[i]:ToString()
       NEXT
       cRet += "--" + cBoundary + "--" + e"\r\n"
    ENDIF
@@ -578,7 +582,7 @@ METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) CLASS TipMail
       RETURN .F.
    ENDIF
 
-   IF aCC <> NIL
+   IF aCC != NIL
       cCC  := aCC[1]
       imax := Len( aCC )
       FOR i:=2 TO imax
@@ -590,7 +594,7 @@ METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) CLASS TipMail
       ENDIF
    ENDIF
 
-   IF aBCC <> NIL
+   IF aBCC != NIL
       cBCC  := aBCC[1]
       imax := Len( aBCC )
       FOR i:=2 TO imax
@@ -634,8 +638,8 @@ METHOD detachFile( cPath ) CLASS TipMail
    LOCAL cDelim    := HB_OsPathSeparator()
    LOCAL nFileHandle
 
-   IF EMpty( cFileName )
-      RETURN .F. 
+   IF Empty( cFileName )
+      RETURN .F.
    ENDIF
 
    IF Valtype( cPath ) == "C"
@@ -643,14 +647,14 @@ METHOD detachFile( cPath ) CLASS TipMail
    ENDIF
 
    nFileHandle := FCreate( cFileName )
-   IF FError() <> 0
+   IF FError() != 0
       RETURN .F.
    ENDIF
 
    FWrite( nFileHandle, cContent )
 
    FClose( nFileHandle )
-RETURN ( FError() == 0 )
+RETURN FError() == 0
 
 
 METHOD getFileName() CLASS TipMail
@@ -658,7 +662,7 @@ RETURN StrTran( ::getFieldOption( "Content-Type", "name" ), '"', '' )
 
 
 METHOD isMultiPart CLASS TipMail
-RETURN ( "multipart/" $ Lower( ::GetFieldPart("Content-Type")) )
+RETURN "multipart/" $ Lower( ::GetFieldPart("Content-Type") )
 
 
 METHOD getMultiParts( aParts ) CLASS TipMail
@@ -670,7 +674,7 @@ METHOD getMultiParts( aParts ) CLASS TipMail
       aParts := {}
    ENDIF
 
-   DO WHILE ( oSubPart := ::nextAttachment() ) <> NIL
+   DO WHILE ( oSubPart := ::nextAttachment() ) != NIL
       lReset := .T.
       AAdd( aParts, oSubPart )
       IF oSubPart:countAttachments() > 0

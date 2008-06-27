@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.8 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: httpcln.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -495,7 +495,7 @@ METHOD Boundary(nType) CLASS tIPClientHTTP
    LOCAL i
    IF nType=nil
       nType=0
-   ENDIF 
+   ENDIF
    IF empty(cBound)
       cBound:=replicate('-',27)+space(11)
       FOR i := 28 TO 38
@@ -564,7 +564,7 @@ METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
       cTmp:=substr(cFile,Len(cFilePath)+1)
       IF empty(cType)
          cType:='text/html'
-      ENDIF 
+      ENDIF
       cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cName +'"; filename="'+cTmp+'"'+cCrlf+'Content-Type: '+cType+cCrLf+cCrLf
       //hope this is not a big file....
       nFile:=fopen(cFile)
@@ -577,13 +577,13 @@ METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
          nRead:=len(cBuf)
 /*         IF nRead<nBuf
             cBuf:=pad(cBuf,nRead)
-         ENDIF 
+         ENDIF
 */
          cData+=cBuf
       end
       fClose(nFile)
       cData+=cCrlf
-   NEXT 
+   NEXT
    cData+=cBound+'--'+cCrlf
    IF .not. HB_IsString( cQuery )
       cQuery := ::oUrl:BuildQuery()

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.7 2005/10/24 01:04:36 druzus Exp $
+ * $Id: utils.c,v 1.8 2006/10/01 11:24:47 enricomaria Exp $
  */
 
 /*
@@ -224,7 +224,7 @@ typedef struct tag_mime
 #define MIME_FLAG_TRIMTABS      0x0002
 #define MIME_FLAG_CASEINSENS    0x0004
 #define MIME_FLAG_CONTINUE      0x0008
-#define MIME_TABLE_SIZE         67
+#define MIME_TABLE_SIZE         68
 
 static MIME_ENTRY s_mimeTable[ MIME_TABLE_SIZE ] =
 {
@@ -331,7 +331,11 @@ static MIME_ENTRY s_mimeTable[ MIME_TABLE_SIZE ] =
    /* 65*/ { 0, "GIF", "image/gif", 0, 0, 0 },
 
    /* JPEG image */
-   /* 66*/ { 0, "\xff\xd8", "image/x-compressed-gif", 0, 0, 0 }
+   /* 66*/ { 0, "\xff\xd8", "image/jpeg", 0, 0, 0 },
+
+   /* ICO image */
+   /* 67*/ { 2, "\x01\x00", "image/x-icon", 0, 0, 0 }
+
 };
 
 /* Find mime by extension */
@@ -379,7 +383,7 @@ static EXT_MIME_ENTRY s_extMimeTable[EXT_MIME_TABLE_SIZE] =
    /* 13*/ { "hxx", "text/x-c++-header", MIME_FLAG_CASEINSENS },
 
    /* Java */
-   /* 14*/ { "class", "application/java", 0 }, // case sensitive!
+   /* 14*/ { "class", "application/java", 0 }, /* case sensitive! */
    /* 15*/ { "java", "text/java", 0 }
 };
 
@@ -417,13 +421,13 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
    int iPos = elem->pos;
    int iDataLen = strlen(  elem->pattern );
 
-   // allow \0 to be used for matches
+   /* allow \0 to be used for matches */
    if ( iDataLen == 0 )
    {
       iDataLen = 1;
    }
 
-   // trim spaces if required
+   /* trim spaces if required */
    while ( iPos < iLen &&
       ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && (
          cData[iPos] == ' ' || cData[iPos] == '\r' || cData[iPos] == '\n') ) ||
@@ -438,7 +442,7 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
       {
          if ( (*elem->pattern == 0 && cData[iPos] == 0) || hb_strnicmp( cData + iPos, elem->pattern, iDataLen ) == 0)
          {
-            // is this the begin of a match tree?
+            /* is this the begin of a match tree? */
             if ( elem->next != 0 )
             {
                return s_findMimeStringInTree( cData, iLen, iElem + elem->next );
@@ -465,13 +469,13 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
       }
    }
 
-   // match failed!
+   /* match failed! */
    if ( elem->alternate != 0 )
    {
       return s_findMimeStringInTree( cData, iLen, iElem + elem->alternate );
    }
 
-   // total giveup
+   /* total giveup */
    return NULL;
 }
 
@@ -492,7 +496,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
          continue;
       }
 
-      // trim spaces if required
+      /* trim spaces if required */
       while ( iPos < iLen &&
          ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && (
              cData[iPos] == ' ' || cData[iPos] == '\r' || cData[iPos] == '\n') ) ||
@@ -515,7 +519,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
       {
          if ( (*elem->pattern == 0 && cData[iPos] == 0) || hb_strnicmp( cData + iPos, elem->pattern, iDataLen ) == 0)
          {
-            // is this the begin of a match tree?
+            /* is this the begin of a match tree? */
             if ( elem->next != 0 )
             {
                return s_findMimeStringInTree( cData, iLen, iCount + elem->next );
@@ -542,17 +546,17 @@ static char *s_findStringMimeType( char *cData, int iLen )
       }
    }
 
-   // Failure; let's see if it's a text/plain.
+   /* Failure; let's see if it's a text/plain. */
    bFormFeed = FALSE;
    iCount = 0;
    while ( iCount < iLen )
    {
-      // form feed?
+      /* form feed? */
       if ( cData[ iCount ] == '\x0C' )
       {
          bFormFeed = TRUE;
       }
-      // esc sequence?
+      /* esc sequence? */
       else if ( cData[iCount] == '\x1B' )
       {
          bFormFeed = TRUE;
@@ -570,7 +574,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
          (cData[iCount] < 27 && cData[iCount] != '\t' && cData[iCount] != '\n' && cData[iCount] == '\r') ||
             cData[iCount] == '\xFF')
       {
-         // not an ASCII file, we surrender
+         /* not an ASCII file, we surrender */
          return NULL;
       }
 
@@ -579,7 +583,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
 
    if ( bFormFeed )
    {
-      // we have escape sequences, seems a PRN/terminal file
+      /* we have escape sequences, seems a PRN/terminal file */
       return "application/remote-printing";
    }
 
@@ -625,7 +629,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
 
    if ( HB_IS_STRING( pFile ) )
    {
-      // decode the extension
+      /* decode the extension */
       char *fname = hb_itemGetCPtr( pFile );
       int iPos = strlen( fname )-1;
 
@@ -660,7 +664,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
       }
       else
       {
-         hb_retc( "unknown" ); // it's a valid MIME type
+         hb_retc( "unknown" ); /* it's a valid MIME type */
       }
    }
    else

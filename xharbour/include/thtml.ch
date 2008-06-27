@@ -1,4 +1,8 @@
 /*
+ * $Id: thtml.ch 8628 2008-06-05 08:19:49Z vszakats $
+ */
+
+/*
  * Harbour Project source code:
  * Directives for HTML Classes
  *
@@ -292,5 +296,4 @@
 
 #define  HTML_ATTR_TYPE_COUNT               37
 
-#endif // _HB_THTML
-
+#endif /* _HB_THTML */

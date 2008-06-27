@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.24 2006/08/21 15:16:46 walito Exp $
+* $Id: inet.h,v 1.25 2008/04/01 11:03:48 marchuet Exp $
 */
 
 /*
@@ -108,6 +108,8 @@
           int iSndBufSize;
           int iRcvBufSize;
       } HB_SOCKET_STRUCT;
+
+      #define HB_PARSOCKET( n )     ( ( HB_SOCKET_STRUCT * ) hb_parptrGC( hb_inetSocketFinalize, n ) )
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 

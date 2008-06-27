@@ -1,5 +1,5 @@
 /*
- * $Id: base64x.c,v 1.3 2004/10/18 10:22:27 likewolf Exp $
+ * $Id: base64x.c,v 1.4 2004/11/21 21:44:23 druzus Exp $
  */
 
 /*
@@ -63,28 +63,28 @@
  * string should be freed when not used anymore.
  */
 
-char *base64enc(char *s, size_t s_len)
+static char * base64enc( char *s, size_t s_len )
 {
    char b64chars[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-   char *t;
-   char *p;
+   char * t;
+   char * p;
    int x, y;
    int len;
 
-   if (s_len > (size_t)INT_MAX)
+   if( s_len > ( size_t ) INT_MAX )
    {
-      return NULL ; //die("data too long in base64enc()");
+      return NULL ; /* die("data too long in base64enc()"); */
    }
-   len = (int)s_len;
-   t = (char*) hb_xgrab((4 * ((len + 2) / 3) + 1) * sizeof(char));
+   len = ( int ) s_len;
+   t = ( char * ) hb_xgrab( ( 4 * ( ( len + 2 ) / 3 ) + 1 ) * sizeof( char ) );
    p = t;
 
-   while (len-- > 0)
+   while( len-- > 0 )
    {
       x = *s++;
       *p++ = b64chars[(x >> 2) & 63];
-      if (len-- <= 0)
+      if( len-- <= 0 )
       {
          *p++ = b64chars[(x << 4) & 63];
          *p++ = '=';
@@ -93,7 +93,7 @@ char *base64enc(char *s, size_t s_len)
       }
       y = *s++;
       *p++ = b64chars[((x << 4) | ((y >> 4) & 15)) & 63];
-      if (len-- <= 0)
+      if( len-- <= 0 )
       {
          *p++ = b64chars[(y << 2) & 63];
          *p++ = '=';
@@ -108,29 +108,29 @@ char *base64enc(char *s, size_t s_len)
    return t;
 }
 
-HB_FUNC(BUILDUSERPASSSTRING)
+HB_FUNC( BUILDUSERPASSSTRING )
 {
    char * s;
-   char * szUser = hb_parcx(1);
-   char * szPass = hb_parcx(2);
-   size_t p_len= strlen(szPass);
-   size_t u_len= strlen(szUser);
+   char * szUser = hb_parcx( 1 );
+   char * szPass = hb_parcx( 2 );
+   size_t p_len = strlen( szPass );
+   size_t u_len = strlen( szUser );
 
-   s = (char * ) hb_xgrab((u_len + p_len + 3) * sizeof(char));
+   s = ( char * ) hb_xgrab( ( u_len + p_len + 3 ) * sizeof( char ) );
    s[0] = '\0';
-   strcpy(s + 1, szUser);
-   strcpy(s + u_len + 2, szPass);
+   strcpy( s + 1, szUser );
+   strcpy( s + u_len + 2, szPass );
 
-   hb_retcAdopt( s);
+   hb_retcAdopt( s );
 }
 
-HB_FUNC( HB_BASE64)
+HB_FUNC( HB_BASE64 )
 {
-   char * szItem = hb_parcx(1);
-   int nLen= hb_parni(2);
-   char * szRet =  base64enc ( szItem,nLen);
+   char * szItem = hb_parcx( 1 );
+   int nLen = hb_parni( 2 );
+   char * szRet = base64enc( szItem, nLen );
 
-   hb_retcAdopt( szRet);
+   hb_retcAdopt( szRet );
 
    // hb_xfree( szRet) ;
 
