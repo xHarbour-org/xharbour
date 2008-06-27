@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.72 2008/03/13 04:26:10 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.73 2008/04/22 04:40:34 ronpinkas Exp $
  */
 
 /*
@@ -313,6 +313,11 @@ HB_FUNC( AINS )
          hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
+}
+
+HB_FUNC( HB_AINS )
+{
+   HB_FUNC_EXEC( AINS )
 }
 
 HB_FUNC( ADEL )

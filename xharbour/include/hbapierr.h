@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.14 2007/02/13 19:02:24 druzus Exp $
+ * $Id: hbapierr.h,v 1.15 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -96,8 +96,11 @@ HB_EXTERN_BEGIN
 #define HB_ERR_ARGS_BASEPARAMS          0xFFFFFFFF
 #define HB_ERR_ARGS_SELFPARAMS          0xFFFFFFFE
 
-/* pseudo function name in operation description */
-extern char hb_errFuncName;
+/* pseudo function name in operation description
+   (deprecated, kept for compatibility, use HB_ERR_FUNCNAME instead) */
+extern const char hb_errFuncName;
+
+#define HB_ERR_FUNCNAME ( ( char * ) 1 )
 
 /* Standard API */
 
@@ -172,7 +175,7 @@ extern HB_EXPORT PHB_ITEM  hb_errRT_New_Subst( USHORT uiSeverity,
                                          USHORT uiFlags );
 
 extern HB_EXPORT PHB_ITEM  hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
-       
+
 extern HB_EXPORT USHORT    hb_errRT_BASE        ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
 extern HB_EXPORT USHORT    hb_errRT_BASE_Ext1   ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... );
 extern HB_EXPORT PHB_ITEM  hb_errRT_BASE_Subst  ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
@@ -181,7 +184,7 @@ extern HB_EXPORT USHORT    hb_errRT_TERM        ( ULONG ulGenCode, ULONG ulSubCo
 extern HB_EXPORT USHORT    hb_errRT_DBCMD       ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
 extern HB_EXPORT USHORT    hb_errRT_DBCMD_Ext   ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags );
 extern HB_EXPORT USHORT    hb_errRT_TOOLS       ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
-       
+
 extern HB_EXPORT void      hb_errInternal       ( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 );
 
 /* Low-level error handling */

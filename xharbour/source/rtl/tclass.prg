@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.27 2007/12/09 06:22:13 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.28 2008/03/07 03:53:46 walito Exp $
  */
 
 /*
@@ -83,29 +83,31 @@ FUNCTION HBClass()
    STATIC s_hClass /* NOTE: Automatically default to NIL */
 
    IF s_hClass == NIL
-      s_hClass := __clsNew( "HBCLASS", 13, 22 )
+      s_hClass := __clsNew( "HBCLASS", 14, 23 )
       __ClsSetModule( s_hClass )
 
-      __clsAddMsg( s_hClass, "New"            , @New()            , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "Create"         , @Create()         , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddData"        , @AddData()        , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddMultiData"   , @AddMultiData()   , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddClassData"   , @AddClassData()   , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddMultiClsData", @AddMultiClsData(), HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddInline"      , @AddInline()      , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddMethod"      , @AddMethod()      , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddClsMethod"   , @AddClsMethod()   , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddVirtual"     , @AddVirtual()     , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "AddDelegate"    , @AddDelegate()    , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "ModInline"      , @ModInline()      , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "ModMethod"      , @ModMethod()      , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "ModClsMethod"   , @ModClsMethod()   , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "Instance"       , @Instance()       , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "SetDestructor"  , @SetDestructor()  , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "New"                  , @New()                  , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "Create"               , @Create()               , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddData"              , @AddData()              , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddMultiData"         , @AddMultiData()         , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddClassData"         , @AddClassData()         , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddMultiClsData"      , @AddMultiClsData()      , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddInline"            , @AddInline()            , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddMethod"            , @AddMethod()            , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddClsMethod"         , @AddClsMethod()         , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddVirtual"           , @AddVirtual()           , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddDelegate"          , @AddDelegate()          , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModInline"            , @ModInline()            , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModMethod"            , @ModMethod()            , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModClsMethod"         , @ModClsMethod()         , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "Instance"             , @Instance()             , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "SetOnError"           , @SetOnError()           , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "SetDestructor"        , @SetDestructor()        , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ConstructorCall"      , @ConstructorCall()      , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "DivertConstructorCall", @DivertConstructorCall(), HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "Refresh"        , @Refresh()        , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "Refresh"              , @Refresh()              , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "AddFriends"           , @AddFriends()           , HB_OO_MSG_METHOD )
+
       __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
 
@@ -122,6 +124,7 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "nOnError"       , 11, HB_OO_MSG_PROPERTY )
       __clsAddMsg( s_hClass, "nDestructor"    , 12, HB_OO_MSG_PROPERTY )
       __clsAddMsg( s_hClass, "lFirst"         , 13, HB_OO_MSG_PROPERTY )
+      __clsAddMsg( s_hClass, "aFriends"       , 14, HB_OO_MSG_PROPERTY )
 
    ENDIF
 
@@ -155,6 +158,7 @@ STATIC FUNCTION New( cClassName, xSuper )
    ::aVirtuals   := {}
    ::aDelegates  := {}
    ::lFirst      := .T.
+   ::aFriends    := {}
 
    FOR EACH cSuper IN ::acSuper
       IF ! HB_ISSTRING( cSuper ) .And. ! HB_ISNUMERIC( cSuper )
@@ -166,7 +170,7 @@ STATIC FUNCTION New( cClassName, xSuper )
 RETURN Self
 
 //----------------------------------------------------------------------------//
-STATIC PROCEDURE Create( MetaClass )
+STATIC PROCEDURE Create()
 
    LOCAL Self := QSelf()
    LOCAL n
@@ -180,6 +184,7 @@ STATIC PROCEDURE Create( MetaClass )
    LOCAL cDato
    LOCAL hSuper
    LOCAL nClassModule := 1
+   LOCAl xFriend
 
    // This code allows HBClass itself to be inherited
    WHILE Self == HB_QSelf( nClassModule )
@@ -268,6 +273,10 @@ STATIC PROCEDURE Create( MetaClass )
    FOR EACH cDato IN ::aDelegates
       __clsAddMsg( ::hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_DELEGNAME ], HB_OO_MSG_DELEGATE, cDato[ HB_OO_MTHD_DELEGOBJ ], cDato[ HB_OO_MTHD_SCOPE ],;
                    cDato[ HB_OO_MTHD_PERSISTENT ] )
+   NEXT
+
+   FOR EACH xFriend IN ::aFriends
+      __clsAddFriend( ::hClass, xFriend )
    NEXT
 
    IF ::nOnError != NIL
@@ -445,6 +454,15 @@ STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
    AAdd( ::aDelegates, { cMethod, cDelegate, nScope, lPersistent, cObject } )
 
 RETURN
+
+//----------------------------------------------------------------------------//
+STATIC PROCEDURE AddFriends( ... )
+
+   LOCAL Self := QSelf()
+
+   aMerge( ::aFriends, hb_aParams() )
+RETURN
+
 
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE ModInline( cMethod, bCode, nScope, lPersistent )

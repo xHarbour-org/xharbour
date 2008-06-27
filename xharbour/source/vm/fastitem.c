@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.119 2008/05/09 18:29:00 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.120 2008/06/06 03:30:25 ronpinkas Exp $
  */
 
 /*
@@ -438,7 +438,6 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       }
       else if( pSource->type & HB_IT_BYREF )
       {
-
          if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
          {
             hb_memvarValueIncRef( (HB_HANDLE) pSource->item.asMemvar.value );
@@ -458,6 +457,13 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
             #else
                hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
             #endif
+         }
+
+         if( hb_itemUnRef( pSource ) == pDest )
+         {
+            assert(0);
+            //hb_errRT_BASE( EG_ARG, 9000, NULL, "Cyclic Reference assignment", 2, pSource, pDest );
+            hb_errInternal( HB_EI_ERRUNRECOV, "Cyclic Reference assignment.", NULL, NULL );
          }
       }
       else if( HB_IS_ARRAY( pSource ) )

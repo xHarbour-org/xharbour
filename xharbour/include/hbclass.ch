@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.61 2008/03/07 03:53:46 walito Exp $
+ * $Id: hbclass.ch,v 1.62 2008/03/12 11:46:40 walito Exp $
  */
 
 /*
@@ -100,6 +100,9 @@
 /* #define HB_CLS_ALLOWCLASS */ /* Work in progress, don't define it now */
 /* #define HB_CLS_ENFORCERO FLAG to disable Write access to RO VAR outside */
 /*         of Constructors /!\ Could be related to some incompatibility */
+
+// Harbour
+#xtranslate AS INTEGER => AS NUMERIC
 
 #ifndef HB_CONSTRUCTOR_NO_DIVERT
   #define HB_CONSTRUCTOR_USE_DIVERT
@@ -813,6 +816,12 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 
 #xcommand DELEGATE <*x*> => MESSAGE <x>
 
+#xcommand ACCESS <MessageName> [ AS <type> ] <mth: METHOD, IS> <MethodName> [<export: EXPORTED, VISIBLE>] [<protect: PROTECTED>] [<hidde: HIDDEN>] [<persistent: PERSISTENT, PROPERTY>] => ;
+   MESSAGE <MessageName> [ AS <type> ] <mth> <MethodName> <export> <protect> <hidde> <persistent>
+
+#xcommand ASSIGN <MessageName> [ AS <type> ] <mth: METHOD, IS> <MethodName> [<export: EXPORTED, VISIBLE>] [<protect: PROTECTED>] [<hidde: HIDDEN>] [<persistent: PERSISTENT, PROPERTY>] => ;
+   MESSAGE _<MessageName> [ AS <type> ] <mth> <MethodName> <export> <protect> <hidde> <persistent>
+
 #ifdef STRICT_OO
   #xcommand METHOD <MethodName> [ AS <type> ]  [<persistent: PERSISTENT, PROPERTY>] SETGET => ;
     _HB_MEMBER _AsFunc_( <MethodName> ) [ AS <type> ];;
@@ -1080,6 +1089,13 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 #endif /* HB_SHORTNAMES */
 
 #xcommand METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
+
+/* Friend function/class definitions */
+#xcommand FRIEND CLASS <ClassName1> [, <ClassNameN> ] => ;
+   s_oClass:AddFriends( <ClassName1> [, <ClassNameN> ] )
+
+#xcommand FRIEND FUNCTION <FuncName1> [, <FuncNameN> ] => ;
+   s_oClass:AddFriends( @<FuncName1>() [, @<FuncNameN>() ] )
 
 
 #ifdef HB_CLS_CSY

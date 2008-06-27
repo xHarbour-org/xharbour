@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.686 2008/06/20 15:06:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.687 2008/06/25 20:20:53 vouchcac Exp $
  */
 
 /*
@@ -1684,7 +1684,7 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                hb_errRT_BASE( EG_ARG, 1602, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pEnumeration, hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
             }
 
-            HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
+            HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter ] = hb_itemUnRefOnce( hb_stackItemFromTop( -1 ) );
             hb_stackPop();
             HB_VM_STACK.wEnumCollectionCounter++;
 
@@ -9273,14 +9273,34 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    /* we store its stack offset instead of a pointer to support a dynamic stack */
    if( iLocal >= 0 )
    {
-
       PHB_ITEM pLocal = hb_stackLocalVariable( &iLocal );
 
-      if( HB_IS_BYREF( pLocal ) && ( ! HB_IS_ENUM( pLocal ) ) && ( ! HB_IS_EXTREF( pLocal ) ) )
-      {
-         hb_itemCopy( pTop, pLocal );
-         return;
-      }
+      #if 0
+         /*
+            R.P. assuming this was only an optimization, thus it was disabled
+            to allow detection of:
+
+               SomeLocal := ( @SomeLocal )
+
+            so that such syntax can be used to express an explicit request
+            to reset "sticky" BYREF, f.e.:
+
+               SomeLocal := ( @SomeArray[1] )
+
+            every subsequent assignment to SomeLocal will be forwarded to
+            SomeArray[1] which is indeed the intent, but then HOW do you
+            request to BREAK the BYREF?
+
+            See condition in hb_vmPopLocal()
+         */
+
+         if( HB_IS_BYREF( pLocal ) && ( ! HB_IS_ENUM( pLocal ) ) && ( ! HB_IS_EXTREF( pLocal ) ) )
+         {
+            hb_itemCopy( pTop, pLocal );
+            return;
+         }
+      #endif
+
       /*
       #ifdef HB_UNSHARE_REFERENCES
         hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
@@ -9664,10 +9684,28 @@ static void hb_vmPopLocal( SHORT iLocal )
 
    if( HB_IS_BYREF( pVal ) )
    {
-      if( hb_itemUnRef( pVal ) == pLocal )
+      /*
+          R.P. explicit request to unreference:
+
+             SomeLocal := @SomeLocal
+       */
+      if( hb_itemUnRefOnce( pVal ) == hb_stackItemFromBase( iLocal ) )
+      {
+         if( hb_stackItemFromBase( iLocal ) != pLocal )
+         {
+            // Keep the ultimate value!
+            hb_itemCopy( hb_stackItemFromBase( iLocal ), pLocal );
+         }
+
+         hb_stackDec();
+
+         return;
+      }
+      else if( hb_itemUnRef( pVal ) == pLocal )
       {
          hb_errRT_BASE( EG_ARG, 9104, NULL, "Cyclic-Reference assignment!", 0 );
          hb_stackDec();
+
          return;
       }
    }

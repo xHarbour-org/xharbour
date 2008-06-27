@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.14 2004/07/14 06:54:47 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.15 2007/04/14 21:47:21 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,7 @@
    #ifdef _SET_CH
       #xcommand C STRUCTURE <!stru!> [ALIGN <align> ] => ;
                INIT PROCEDURE __INIT_<stru>; ;
-                  __ActiveStructure( #<stru>, <align> ) ; ;
+                  __ActiveStructure( #<stru>, IIF( <.align.>, <align>, __PACK ) ) ; ;
                #xtranslate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
                #xtranslate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 

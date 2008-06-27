@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.83 2008/04/30 16:47:34 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.84 2008/05/09 18:23:24 ronpinkas Exp $
  */
 
 /*
@@ -98,7 +98,9 @@
    better shows what is really the problem. [vszakats] */
 #define HB_ERROR_LAUNCH_MAX hb_set.HB_SET_ERRORLOOP
 
-char hb_errFuncName = 0;
+/* pseudo function name in operation description
+   (deprecated, kept for compatibility, use HB_ERR_FUNCNAME instead) */
+const char hb_errFuncName = 1;
 
 static PHB_DYNS s_pDynErrorNew;
 
@@ -737,7 +739,7 @@ HB_EXPORT PHB_ITEM hb_errPutOperation( PHB_ITEM pError, const char * szOperation
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutOperation(%p, %s)", pError, szOperation));
 
-   if( szOperation == &hb_errFuncName )
+   if( szOperation == HB_ERR_FUNCNAME )
    {
       PHB_SYMB pSym = hb_itemGetSymbol( hb_stackBaseItem() );
       if( pSym )

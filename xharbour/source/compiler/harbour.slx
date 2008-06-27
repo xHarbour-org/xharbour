@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.98 2008/04/12 18:57:36 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.99 2008/06/20 03:46:26 ronpinkas Exp $
  */
 
 /*
@@ -400,6 +400,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}ARRAY"                      ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ANYTYPE"     ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ARRAY"       ) AS_TOKEN( AS_ARRAY_ARRAY     + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}BLOCK"       ) AS_TOKEN( AS_BLOCK_ARRAY     + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CHARACTER"   ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CLASS"       ) AS_TOKEN( AS_CLASS_ARRAY     + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CODEBLOCK"   ) AS_TOKEN( AS_BLOCK_ARRAY     + DONT_REDUCE ),
@@ -410,6 +411,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}OBJECT"      ) AS_TOKEN( AS_OBJECT_ARRAY    + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}STRING"      ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}USUAL"       ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}BLOCK"                      ) AS_TOKEN( AS_BLOCK           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}CHARACTER"                  ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}CLASS"                      ) AS_TOKEN( AS_CLASS           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}CODEBLOCK"                  ) AS_TOKEN( AS_BLOCK           + DONT_REDUCE ),

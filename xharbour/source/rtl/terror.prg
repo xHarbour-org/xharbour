@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.17 2005/04/20 23:29:54 ronpinkas Exp $
+ * $Id: terror.prg,v 1.18 2006/01/31 21:47:56 ronpinkas Exp $
  */
 
 /*
@@ -163,3 +163,30 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
    lInErr := .F.
 
 RETURN oErr
+
+FUNCTION __eInstVar53( oVar, cMethod, xValue, cType, nSubCode, bValid )
+
+   LOCAL oError
+
+   IF !( VALTYPE( xValue ) == cType ) .OR. ;
+      ( bValid != NIL .AND. !EVAL( bValid, oVar, xValue ) )
+      oError := ErrorNew()
+      oError:description := HB_LANGERRMSG( 1 )
+      oError:gencode := 1
+      oError:severity := 2
+      oError:cansubstitute := .T.
+      oError:subsystem := oVar:className
+#ifdef HB_C52_STRICT
+      HB_SYMBOL_UNUSED( cMethod )
+#else
+      oError:operation := cMethod
+#endif
+      oError:subcode := nSubCode
+      oError:args := { xValue }
+      xValue := EVAL( ERRORBLOCK(), oError )
+      IF !( VALTYPE( xValue ) == cType )
+         __errInHandler()
+      ENDIF
+   ENDIF
+
+   RETURN xValue

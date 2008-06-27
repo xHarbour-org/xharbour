@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.272 2008/06/20 03:46:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.273 2008/06/23 17:52:30 ronpinkas Exp $
  */
 
 /*
@@ -2826,7 +2826,8 @@ static BOOL hb_pp_tokenUnQuotedGet( PHB_PP_TOKEN ** pTokenPtr, BOOL * pfQuoted,
          if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_BACKSLASH )
          {
             * pfQuoted = TRUE;
-            pToken->pNext->spaces = pToken->spaces;
+            if( pToken->pNext )
+               pToken->pNext->spaces = pToken->spaces;
             ** pTokenPtr = pToken->pNext;
             hb_pp_tokenFree( pToken );
             pToken = ** pTokenPtr;

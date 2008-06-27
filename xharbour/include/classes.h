@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.30 2008/04/16 20:05:51 ronpinkas Exp $
+ * $Id: classes.h,v 1.31 2008/05/09 18:23:22 ronpinkas Exp $
  */
 
 /*
@@ -141,9 +141,11 @@ typedef struct
    ULONG    fOpOver;        /* Flags for Operators overload */
    USHORT   uiDataInitiated;
    USHORT   uiFriends;
+   USHORT   uiFriendFuncs;
    PCLSDINIT pInitValues;
    PMETHDYN pMethDyn;
    USHORT * pFriends;
+   PHB_SYMB * pFriendFuncs;
    PHB_ITEM pMtxSync;
    BOOL     bActive;
 

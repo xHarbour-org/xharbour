@@ -1,10 +1,10 @@
 /*
- * $Id: hbtoken.c,v 1.5 2007/09/15 06:41:49 paultucker Exp $
+ * $Id: hbtoken.c,v 1.6 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * 
+ *
  *
  * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
@@ -58,7 +58,6 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-#if 0
 /* This functionality will be activated on the next release */
 
 static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
@@ -84,7 +83,8 @@ static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
          ++ulTokens;
          if( ulDelim == 1 && *szDelim == ' ' )
          {
-            while( ++ul < ulLen && szLine[ ul ] == ' ' );
+            while( ul + 1 < ulLen && szLine[ ul + 1 ] == ' ' )
+               ++ul;
          }
          ul += ulDelim - 1;
       }
@@ -101,7 +101,7 @@ static char * hb_tokenGet( char * szLine, ULONG ulLen,
 {
    ULONG ul, ulStart;
    char cQuote = 0;
-   
+
    for( ul = ulStart = 0; ul < ulLen; ++ul )
    {
       if( cQuote )
@@ -122,7 +122,7 @@ static char * hb_tokenGet( char * szLine, ULONG ulLen,
          }
          if( ulDelim == 1 && *szDelim == ' ' )
          {
-            while( ul < ulLen && szLine[ ul + 1 ] == ' ' )
+            while( ul + 1 < ulLen && szLine[ ul + 1 ] == ' ' )
                ++ul;
          }
          ulStart = ul + ulDelim;
@@ -149,7 +149,7 @@ static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
    {
       ULONG ul, ulStart, ulToken;
       char cQuote = 0;
-      
+
       for( ul = ulStart = ulToken = 0; ul < ulLen; ++ul )
       {
          if( cQuote )
@@ -166,7 +166,7 @@ static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
             hb_arraySetCL( pArray, ++ulToken, szLine + ulStart, ul - ulStart );
             if( ulDelim == 1 && *szDelim == ' ' )
             {
-               while( ul < ulLen && szLine[ ul + 1 ] == ' ' )
+               while( ul + 1 < ulLen && szLine[ ul + 1 ] == ' ' )
                   ++ul;
             }
             ulStart = ul + ulDelim;
@@ -285,7 +285,7 @@ HB_FUNC( HB_TOKENPTR )
       hb_retc( NULL );
 }
 
-HB_FUNC( HB_ATOKENS )
+HB_FUNC( HB_ATOKENS2 )
 {
    char * szLine, * szDelim;
    ULONG ulLen, ulDelim;
@@ -293,14 +293,12 @@ HB_FUNC( HB_ATOKENS )
    hb_tokenParam( 2, 0, &szLine, &ulLen, &szDelim, &ulDelim );
 
    if( szLine )
-      hb_itemRelease( hb_itemReturnForward(
-                         hb_tokenArray( szLine, ulLen, szDelim, ulDelim,
-                                        hb_parl( 3 ), hb_parl( 4 ) ) ) );
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_itemReturnRelease( hb_tokenArray( szLine, ulLen, szDelim, ulDelim,
+                                           hb_parl( 3 ), hb_parl( 4 ) ) );
+  else
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-#endif
 static char * hb_strToken( char * szText, ULONG ulText,
                            ULONG ulIndex,
                            char cDelimiter,
@@ -507,7 +505,6 @@ HB_FUNC( HB_ATOKENS )
       return;
    }
 }
-
 
 //PM:09-04-2007 Temp to test difference between new and old HB_aTokens()
 #if 0

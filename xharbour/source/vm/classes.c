@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.220 2008/05/09 18:23:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.221 2008/06/03 04:59:56 ronpinkas Exp $
  */
 
 /*
@@ -273,6 +273,12 @@ static void hb_clsRelease( PCLASS pClass )
    {
       hb_xfree( pClass->pFriends );
       pClass->pFriends = NULL;
+   }
+
+   if( pClass->pFriendFuncs )
+   {
+      hb_xfree( pClass->pFriendFuncs );
+      pClass->pFriendFuncs = NULL;
    }
 
    if( pClass->pMtxSync )
@@ -576,6 +582,24 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
             {
                //TraceLog( NULL, "Oops! NO Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
             }
+
+            {
+               PHB_SYMB * pFriendFuncs = pClass->pFriendFuncs;
+               USHORT uiAt;
+               PHB_SYMB pFunc = (*pBase)->item.asSymbol.value;
+
+               #ifdef DEBUG_SCOPE
+                  printf( "Testing if %s() is friend to %s\n", (*pBase)->item.asSymbol.value->szName, pClass->szName );
+               #endif
+
+               for( uiAt = pClass->uiFriendFuncs + 1; --uiAt; pFriendFuncs++ )
+               {
+                  if( *pFriendFuncs == pFunc )
+                  {
+                     return TRUE;
+                  }
+               }
+            }
          }
 
          // ----------------- Validate Scope -----------------
@@ -765,6 +789,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                }
                // This is NOT an Inherted Method, and Caller is Different Class - No restricted scope could be valid (excpet READONLY addressed above)!
             }
+
             ScopeErrorObject:
             {
                USHORT * pFriends = pClass->pFriends;
@@ -2190,11 +2215,8 @@ HB_FUNC( __CLSNEW )
    }
 
    pNewCls = s_pClasses + uiClass - 1;
-   memset( pNewCls, 0, sizeof( CLASS ) );
-   pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
-   memcpy( pNewCls->szName, hb_parcx( 1 ), hb_parclen( 1 ) + 1 );
-   pNewCls->bActive = TRUE;
 
+   memset( pNewCls, 0, sizeof( CLASS ) );
 /*
    pNewCls->uiDataFirst = 0;
    pNewCls->uiDatas = 0;
@@ -2205,12 +2227,18 @@ HB_FUNC( __CLSNEW )
    pNewCls->uiScope = 0;
    pNewCls->uiDataInitiated = 0;
    pNewCls->uiFriends = 0;
+   pNewCls->uiFriendFuncs = 0;
    pNewCls->pInitValues = NULL;
    pNewCls->pFriends = NULL;
+   pNewCls->pFriendFuncs = NULL;
    pNewCls->pFunError = NULL;
    pNewCls->pDestructor = NULL;
    pNewCls->pMtxSync = NULL
 */
+
+   pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
+   memcpy( pNewCls->szName, hb_parcx( 1 ), hb_parclen( 1 ) + 1 );
+   pNewCls->bActive = TRUE;
 
    //TraceLog( NULL, "-------------------- Class %s (%i)\n", pNewCls->szName, s_uiClasses + 1 );
 
@@ -4803,55 +4831,115 @@ HB_FUNC( __SETCLASSAUTOINIT )
    hb_retl( bOldClsAutoInit );
 }
 
-HB_FUNC( __CLSFRIENDLY )   // __ClsFriend( oObj, oFriend )
+BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
 {
-   HB_THREAD_STUB_API
-   PHB_ITEM pObj    = hb_param( 1, HB_IT_OBJECT );
-   PHB_ITEM pFriend = hb_param( 2, HB_IT_OBJECT );
-
-   if( HB_IS_OBJECT( pObj ) && HB_IS_OBJECT( pFriend ) )
+   if( uiClass <= s_uiClasses && pFriend )
    {
-      USHORT uiClsObj    = pObj->item.asArray.value->uiClass;
-      USHORT uiClsFriend = pFriend->item.asArray.value->uiClass;
+      PCLASS pClass = s_pClasses + uiClass - 1;
 
-      if( uiClsObj <= s_uiClasses && uiClsFriend <= s_uiClasses )
+      if( HB_IS_OBJECT( pFriend ) )
       {
-         PCLASS pClsObj = s_pClasses + uiClsObj - 1;
+         USHORT uiFriendClass = pFriend->item.asArray.value->uiClass;
 
-         if( pClsObj->pFriends )
+         if( uiFriendClass <= s_uiClasses )
          {
-            pClsObj->pFriends = (USHORT *) hb_xrealloc( pClsObj->pFriends, sizeof(USHORT) * (pClsObj->uiFriends + 1) );
+
+            if( pClass->pFriends )
+            {
+               pClass->pFriends = (USHORT *) hb_xrealloc( pClass->pFriends, sizeof( USHORT ) * ( pClass->uiFriends + 1 ) );
+            }
+            else
+            {
+               pClass->pFriends = (USHORT *) hb_xgrab( sizeof( USHORT ) );
+            }
+
+            pClass->pFriends[ pClass->uiFriends ] = uiFriendClass;
+            pClass->uiFriends++;
+
+            return TRUE;
+         }
+      }
+      else if( HB_IS_STRING( pFriend ) )
+      {
+         char *szFriendClass = hb_strUpperCopy( hb_itemGetCPtr( pFriend ), hb_itemGetCLen( pFriend ) );
+         USHORT uiFriendClass = hb_clsGetHandleFromName( szFriendClass );
+
+         hb_xfree( szFriendClass );
+
+         if( uiFriendClass <= s_uiClasses )
+         {
+
+            if( pClass->pFriends )
+            {
+               pClass->pFriends = (USHORT *) hb_xrealloc( pClass->pFriends, sizeof( USHORT ) * ( pClass->uiFriends + 1 ) );
+            }
+            else
+            {
+               pClass->pFriends = (USHORT *) hb_xgrab( sizeof( USHORT ) );
+            }
+
+            pClass->pFriends[ pClass->uiFriends ] = uiFriendClass;
+            pClass->uiFriends++;
+
+            return TRUE;
+         }
+      }
+      else if( HB_IS_POINTER( pFriend ) )
+      {
+         if( pClass->pFriendFuncs )
+         {
+            pClass->pFriendFuncs = (PHB_SYMB *) hb_xrealloc( pClass->pFriendFuncs, sizeof(PHB_SYMB) * (pClass->uiFriendFuncs + 1) );
          }
          else
          {
-            pClsObj->pFriends = (USHORT *) hb_xgrab( sizeof(USHORT) );
+            pClass->pFriendFuncs = (PHB_SYMB *) hb_xgrab( sizeof(PHB_SYMB) );
          }
-         pClsObj->pFriends[ pClsObj->uiFriends ] = uiClsFriend;
-         pClsObj->uiFriends++;
+
+         pClass->pFriendFuncs[ pClass->uiFriendFuncs ] = (PHB_SYMB) ( pFriend->item.asPointer.value );
+         pClass->uiFriendFuncs++;
+
+         return TRUE;
       }
    }
 
-   if( HB_IS_OBJECT( pObj ) )
+   return FALSE;
+}
+
+HB_FUNC( __CLSADDFRIEND )
+{
+   __clsAddFriend( hb_parni( 1 ), hb_param( 2, HB_IT_OBJECT | HB_IT_POINTER | HB_IT_STRING ) );
+}
+
+HB_FUNC( __CLSFRIENDLY )   // __ClsFriendly( oObj, oFriend | @FriendFunc() )
+{
+   HB_THREAD_STUB_API
+
+   PHB_ITEM pObj    = hb_param( 1, HB_IT_OBJECT );
+   PHB_ITEM pFriend = hb_param( 2, HB_IT_OBJECT | HB_IT_POINTER );
+
+   if( pObj && HB_IS_OBJECT( pObj ) )
    {
-      USHORT uiClsObj = pObj->item.asArray.value->uiClass;
+      USHORT uiClass = pObj->item.asArray.value->uiClass;
+      PCLASS pClass = s_pClasses + uiClass - 1;
 
-      if( uiClsObj <= s_uiClasses )
+      __clsAddFriend( uiClass, pFriend );
+
+      if( uiClass <= s_uiClasses )
       {
-         PCLASS pClsObj = s_pClasses + uiClsObj - 1;
+         hb_reta( pClass->uiFriends );
 
-         hb_reta( pClsObj->uiFriends );
-
-         if( pClsObj->uiFriends )
+         if( pClass->uiFriends )
          {
             PHB_ITEM pArray = hb_param( -1, HB_IT_ANY );
             PHB_ITEM pHClass = hb_itemPutNI( NULL, 0);
             USHORT ui;
 
-            for( ui = 1; ui <= pClsObj->uiFriends; ui++ )
+            for( ui = 1; ui <= pClass->uiFriends; ui++ )
             {
-               hb_itemPutNI( pHClass, pClsObj->pFriends[ ui-1 ] );
+               hb_itemPutNI( pHClass, pClass->pFriends[ ui-1 ] );
                hb_arraySet( pArray, ui, pHClass );
             }
+
             hb_itemRelease( pHClass );
          }
       }

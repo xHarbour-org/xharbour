@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.20 2008/01/30 18:19:34 modalsist Exp $
+ * $Id: tbcolumn.prg,v 1.21 2008/03/13 10:49:42 likewolf Exp $
  */
 
 /*
@@ -129,12 +129,12 @@ CLASS TBColumn
 
    DATA   bBlock                         // Code block to retrieve data for the column
    DATA   xCargo                         // User-definable variable
-   DATA   bColorBlock                    // Code block that determines color of data items
+   DATA   bColorBlock   INIT {|| NIL }   // Code block that determines color of data items
    DATA   cColSep                        // Column separator character
    #ifdef HB_COMPAT_C53
    DATA   aDefColor     INIT {1,2,1,1}   // Array of numeric indexes into the color table
    #else
-   DATA   aDefColor     INIT {1,2} 
+   DATA   aDefColor     INIT {1,2}
    #endif
    DATA   cFooting                       // Column footing character
    DATA   cFootSep                       // Footing separator character
@@ -144,8 +144,8 @@ CLASS TBColumn
    DATA   nWidth                         // Column diplay width
 
    #ifdef HB_COMPAT_C53
-   DATA   bPreBlock  
-   DATA   bPostBlock 
+   DATA   bPreBlock
+   DATA   bPostBlock
    #endif
 
    HIDDEN:     /* H I D D E N */

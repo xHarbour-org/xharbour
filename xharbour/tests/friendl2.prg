@@ -1,5 +1,5 @@
 //
-// $Id: friendl2.prg,v 1.1 2005/07/12 04:19:31 walito Exp $
+// $Id: friendl2.prg,v 1.2 2005/07/17 17:34:24 walito Exp $
 //
 
 ***********
@@ -23,7 +23,7 @@ METHOD New( oCall ) CLASS Two
    __ClsFriendly( One(), Self )
 RETURN Self
 
-METHOD Testing() CLASS Two
+PROCEDURE Testing() CLASS Two
    ::oCall:Test( ::Classname() )
 RETURN
 
@@ -39,8 +39,14 @@ METHOD New( oCall ) CLASS Three
    ::oCall := oCall
 RETURN Self
 
-METHOD Testing() CLASS Three
-   ::oCall:Test( ::Classname() )
+PROCEDURE Testing() CLASS Three
+   ::oCall:Test( "Class: " + ::Classname() )
 RETURN
 
+PROCEDURE TestFriend( o )
+   o:Test( "Function: " + ProcName() )
+RETURN 
 
+PROCEDURE Trusted( o )
+   o:Test( "Function: " + ProcName() )
+RETURN 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.160 2008/06/18 12:02:10 ronpinkas Exp $
+ * $Id: arrays.c,v 1.161 2008/06/19 14:10:42 ronpinkas Exp $
  */
 
 /*
@@ -584,6 +584,20 @@ HB_EXPORT BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 #ifdef HB_UNSHARE_REFERENCES
       hb_itemUnShare( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
 #endif
+
+      if( pItem == pArray->item.asArray.value->pItems + ( ulIndex - 1 ) )
+      {
+         assert(0);
+         #if 0
+            HB_ITEM_NEW( Index );
+            hb_itemPutNL( &Index, ulIndex );
+            hb_errRT_BASE( EG_ARG, 9000, NULL, "Cyclic Reference assignment", 3, pArray, pItem, &Index );
+         #else
+            hb_errInternal( HB_EI_ERRUNRECOV, "Cyclic Reference assignment.", NULL, NULL );
+         #endif
+ 
+         return FALSE;
+      }
 
       pItem->type = HB_IT_BYREF;
 

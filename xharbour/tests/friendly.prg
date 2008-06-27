@@ -1,5 +1,5 @@
 //
-// $Id: friendly.prg,v 1.0 2004/03/06 13:20:32 jonnymind Exp $
+// $Id: friendly.prg,v 1.1 2005/07/12 04:19:31 walito Exp $
 //
 
 ***********
@@ -12,35 +12,46 @@
 #include "hbclass.ch"
 
 
-Function Main()
-Local oOne, oTwo, oThree, e
+PROCEDURE Main()
+   LOCAL oOne, oTwo, oThree, e
+   
    oOne   := One()
    oTwo   := Two():New(oOne)
    oThree := Three():New(oOne)
 
    oTwo:Testing()
 
-TRY
+   TRY
+      oThree:Testing()
+   CATCH e
+      ? "Class: THREE is NOT friend of class: ONE"
+   END
+
+   // Now, the class Three is friend of class One
+   __ClsFriendly( oOne, oThree )
+
    oThree:Testing()
-CATCH e
-   ? "Class THREE is NOT friends with ONE"
-END
+   
+   TRY
+       TestFriend( oOne )
+   CATCH
+      ? "Function: TESTFRIEND is NOT friend of Class: ONE"
+   END   
 
-  // Now, the class Three is friends with One
-  __ClsFriendly( oOne, oThree )
+   // Now, the class Three is friends with One
+   __ClsFriendly( oOne, @TestFriend() )
 
-   oThree:Testing()
+   TestFriend( oOne )
 
+    Trusted( oOne )
 Return
 
 
 CLASS One
    METHOD Test() HIDDEN
+   FRIEND FUNCTION Trusted   
 ENDCLASS
 
-METHOD Test( cName ) Class One
-   ? "Class "+cName+" is friends with "+::Classname()
+PROCEDURE Test( cName ) Class One
+   ? cName + " is friend of class: " + ::Classname()
 RETURN
-
-
-

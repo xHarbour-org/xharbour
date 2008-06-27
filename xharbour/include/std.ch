@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.29 2008/02/11 23:58:13 lculik Exp $
+ * $Id: std.ch,v 1.30 2008/04/05 20:31:20 likewolf Exp $
  */
 
 /*
@@ -726,6 +726,58 @@
                                                               ; #xuntranslate \. \<Part>
 
    #xcommand WITH NAMESPACE Global                         => WITH NAMESPACE PATH Global
+
+   #xcommand FOR EACH <e1>, <e2> [, <eN>] IN <c1>, <c2> [,<cN>] => FOR EACH <e1> IN <c1>;
+                                                                   ;  <e2> := ( @<e2> ); // UnRef!
+                                                                   ;[ <eN> := ( @<eN> ); ]; // UnRef!
+                                                                   ;  WHILE .T.;
+                                                                   ;     IF HB_EnumIndex() <= Len( <c2> );
+                                                                   ;        <e2> := ( @<c2>\[ HB_EnumIndex() \] );
+                                                                   ;     ELSE;
+                                                                   ;        EXIT;
+                                                                   ;     ENDIF;
+                                                                   ;[;
+                                                                   ;     IF HB_EnumIndex() <= Len( <cN> );
+                                                                   ;        <eN> := ( @<cN>\[ HB_EnumIndex() \] );
+                                                                   ;     ELSE;
+                                                                   ;        EXIT;
+                                                                   ;     ENDIF;
+                                                                   ;];
+                                                                   ;     EXIT;
+                                                                   ;  END;
+                                                                   ; #xtranslate <e1>:__EnumIndex() => HB_EnumIndex();
+                                                                   ; #xtranslate <e2>:__EnumIndex() => HB_EnumIndex();
+                                                                   ;[#xtranslate <eN>:__EnumIndex() => HB_EnumIndex()]
+
+   #xcommand FOR EACH <e1> [, <eN>] IN <c1> [,<cN>] DESCEND =>      HB_SetWith( { -1, .F. } );
+                                                                   ;FOR HB_QWith()\[1\] := -1 TO ( - 0xFFFFFFF ) STEP -1 ;
+                                                                   ;  <e1> := ( @<e1> ); // UnRef!
+                                                                   ;[ <eN> := ( @<eN> ); ]; // UnRef!
+                                                                   ;  WHILE .T.;
+                                                                   ;     IF ( - HB_QWith()\[1\] ) <= Len( <c1> );
+                                                                   ;        <e1> := ( @<c1>\[ HB_QWith()\[1\] \] );
+                                                                   ;     ELSE;
+                                                                   ;        HB_QWith()\[2\] := .T.;
+                                                                   ;        EXIT;
+                                                                   ;     ENDIF;
+                                                                   ;[;
+                                                                   ;     IF ( - HB_QWith()\[1\] ) <= Len( <cN> );
+                                                                   ;        <eN> := ( @<cN>\[ HB_QWith()\[1\] \] );
+                                                                   ;     ELSE;
+                                                                   ;        HB_QWith()\[2\] := .T.;
+                                                                   ;        EXIT;
+                                                                   ;     ENDIF;
+                                                                   ;];
+                                                                   ;     EXIT;
+                                                                   ;  END;
+                                                                   ;  IF HB_QWith()\[2\];
+                                                                   ;     <e1> := ( @<e1> ); // UnRef!
+                                                                   ;[    <eN> := ( @<eN> ); ]; // UnRef!
+                                                                   ;     HB_SetWith();
+                                                                   ;     EXIT;
+                                                                   ;  ENDIF;
+                                                                   ; #xtranslate <e1>:__EnumIndex() => HB_QWith()\\\[1\\\];
+                                                                   ;[#xtranslate <eN>:__EnumIndex() => HB_QWith()\\\[1\\\]]
 
 #endif
 

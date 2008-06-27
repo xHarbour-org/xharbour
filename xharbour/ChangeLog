@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6152 2008/06/25 20:20:35 vouchcac Exp $
+ * $Id: ChangeLog,v 1.6153 2008/06/25 22:19:17 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,85 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-27 01:39 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/cstruct.ch
+    + Added support of the C style "pragma pack" for PRG style definitions
+
+  * source/compiler/harbour.slx
+    + Added support for AS BLOCK and AS ARRAY OF BLOCK alias for CODEBLOCK
+
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+    * HB_ERR_FUNCNAME/hb_errFuncName Harbour comptability
+
+  * include/std.ch
+    * Limited simulation of Harbour's FOR EACH syntax
+      /*
+         Undocumenetd temporary hack, to allow testing of Harbour's tbrowse.prg
+         There are number of known differences/limitations, principally Harbour
+         does not use BYREF for the enumerator while xHarbour does. As a
+         consequence of the PP nature of the simulation, the BYREF enumrator[s]
+         are not being UNREFed as with the native xHarbour FOR EACH. The DESCEND
+         simulation uses negative index instead of counting from high to low.
+         xHarbour's HB_EnumIndex() is not supported in DESCEND simulation, but
+         Harbour's native <enum>:__EnumIndex() is simulated. All messages
+         except :__EnumIndex() are not supported. Initial testing suggests that
+         this limited simulation supports compilation and execution of Harbour's
+         tbrowse.prg
+       */
+
+  * include/classes.h
+  * source/vm/classes.c
+    + Added support for Function Pointer as the friend argument of __ClsFriendly()
+
+  * include/hbclass.ch
+  * source/rtl/tclass.prg
+    + Added support for ACCESS <name> METHOD ...
+    + Added support for ASSIGN <name> METHOD ...
+    + Added support for FRIEND CLASS and FRIEND FUNCTION in class definitions
+      /* Harbour compatability */
+
+  * source/vm/arrayshb.c
+    + Added HB_aIns() as synonym of aIns()
+      /* Harbour compatability */
+
+  * source/vm/arrays.c
+    + Added protection against cyclic reference to hb_arrayGetByRef()
+  * source/vm/fastitem.c
+    + Added protection against cyclic reference to hb_itemCopy()
+
+  * source/vm/hvm.c
+    * Revised HB_VM_STACK.apEnumVar to use hb_itemUnRefOnce() instead of hb_itemUnRef()
+    * Disabled optimization in hb_vmPushLocalByRef() to allow detection of:
+        LocalVar := ( @LocalVar )
+    + Added support for explicit UNREFing of a given Local, by means of:
+        LocalVar := ( @LocalVar )
+
+  * source/pp/ppcore.c
+    * GPF trap in hb_pp_tokenUnQuotedGet()
+
+  * source/pp/ppgen.c
+    ! Fixed generation of "\" token to "\\"
+
+  * source/rtl/hbtoken.c
+    * The sources for Harbour's version HB_aTokens() was disabled by #if 0 - now enabled,
+      (renamed as HB_aTokens2) and synched with Harbour.
+
+  * source/rtl/tbcolumn.prg
+    + Added INIT {|| NIL } to :bColorBlock
+
+  * source/rtl/terror.prg
+    + Added __eInstVar53() borrowed from Harbour
+      /* Harbour's compatability */
+
+  * tests/tbrowse.prg
+    * Replaced with Harbour's new tbrowse.prg along with Harbour's tbcolumn.prg appended
+      /* To allow testing of Harbour's rewritten tbrowse */
+
+  * tests/friendl2.prg
+  * tests/friendly.prg
+    + Added tests for extended FRIEND funationaity
 
 2008-06-25 15:01 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   + contrib/gtwvg
@@ -23,14 +102,14 @@
     + contrib/gtwvg/tests/*.*  Supporting Files
 
     Implemented GTWVT+WVTGUI combined together in GTWVG.
-    This retains the exact same compatibility which has been 
+    This retains the exact same compatibility which has been
     achieved previously with rtl/GTWVT and contrib/WVTGUI.
 
-    NOTE: GTWVG can be used in place og GTWVT for 
+    NOTE: GTWVG can be used in place og GTWVT for
           pure console applications too but with added
           advantage of exploiting GUI elements plus much more
-    
-    ;TODO: On exit application GPF's. Please check.          
+
+    ;TODO: On exit application GPF's. Please check.
 
 2008-06-25 13:01 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * include/hbapigt.h
@@ -46,16 +125,16 @@
   * source/rtl/gtwvt/gtwvt.h
     + Few more members for resizing etc.
   * source/rtl/gtfunc.c
-    ! HB_GTINFO() - Updated for new member in PHB_INFO structure. 
+    ! HB_GTINFO() - Updated for new member in PHB_INFO structure.
   * source/vm/hvm.c
-    - static void    hb_vmPushNumInt( HB_LONG lNumber ); 
-    + extern HB_EXPORT hb_vmPushNumInt( HB_LONG lNumber ); 
+    - static void    hb_vmPushNumInt( HB_LONG lNumber );
+    + extern HB_EXPORT hb_vmPushNumInt( HB_LONG lNumber );
   * source/vm/itemapi.c
     + HB_EXPORT PHB_ITEM hb_itemPutCPtr2( PHB_ITEM pItem, char * szText )
     + HB_EXPORT PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
       I am not sure if this is the right file to post. Please correct.
 
-  + tests/wvtext.prg 
+  + tests/wvtext.prg
     ! Demonstrates various features of new WVT Console.
 
     /*

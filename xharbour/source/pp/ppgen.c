@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $
+ * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $
  */
 
 /*
@@ -107,13 +107,15 @@ static void hb_pp_writeToken( FILE * fout, PHB_PP_TOKEN pToken,
          fprintf( fout, "   { %s +%2d", szName, iToken + iOptional + 1 );
       else
          fprintf( fout, "   { NULL%*s", i, "" );
+
       if( iOptional )
          fprintf( fout, ", %s +%2d", szName, iToken + 1 );
       else
          fprintf( fout, ", NULL%*s", i, "" );
 
       i = 16 - strlen( pToken->value );
-      fprintf( fout, ", \"%s\", %*s %2d,%2d, 0x%04x, %d }%s\n",
+      fprintf( fout, ", \"%s%s\", %*s %2d,%2d, 0x%04x, %d }%s\n",
+               pToken->value[0] == '\\' && pToken->value[1] == '\0' ? "\\" : "",
                pToken->value,
                i < 0 ? 0 : i, "",
                pToken->len, pToken->spaces,
@@ -218,7 +220,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -322,7 +324,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.6 2008/05/04 14:20:52 andijahja Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"
