@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.76 2008/04/22 04:40:34 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.77 2008/05/19 23:17:00 ronpinkas Exp $
  */
 
 /*
@@ -362,7 +362,7 @@
       USHORT     uiLocals;       /* number of referenced local variables */
       PHB_ITEM   pLocals;        /* table with referenced local variables */
       BYTE       *pCode;         /* codeblock pcode */
-      USHORT     uiCounter;      /* numer of references to this codeblock */
+      HB_COUNTER ulCounter;      /* numer of references to this codeblock */
       USHORT     uLen;
       USHORT     uiClass;
       USHORT     uiFlags;

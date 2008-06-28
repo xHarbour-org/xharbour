@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.120 2008/06/06 03:30:25 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.121 2008/06/27 06:21:52 ronpinkas Exp $
  */
 
 /*
@@ -170,10 +170,10 @@ HB_EXPORT void hb_itemReleaseString( PHB_ITEM pItem )
          hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature String Release detected: '%s'", pItem->item.asString.value, NULL );
       }
 
-      if( --*( pItem->item.asString.pulHolders ) == 0  )
+      if( HB_ATOMIC_DEC( *( pItem->item.asString.pulHolders ) ) == 0 )
       {
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.pulHolders ) );
-         hb_xfree( pItem->item.asString.pulHolders );
+         hb_xfree( (void *) pItem->item.asString.pulHolders );
          //pItem->item.asString.pulHolders = NULL;
 
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
@@ -224,7 +224,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
                hb_errInternal( HB_EI_PREMATURE_RELEASE, "BYREF Premature Array/Object Release detected", NULL, NULL );
             }
 
-            if( --( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
+            if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
             {
                hb_arrayRelease( &FakeArray );
             }
@@ -245,7 +245,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
 
         assert( hb_clsDestructorsAllowed() || pItem->item.asArray.value->uiClass == 0 || ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->pDestructor == NULL || ( ( hb_clsClassesArray() + pItem->item.asArray.value->uiClass - 1 )->uiScope & HB_OO_CLS_DESTRUC_SYMB ) == 0 ) ;
 
-        if( --( pItem->item.asArray.value->ulHolders ) == 0 )
+        if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
         {
            hb_arrayRelease( pItem );
         }
@@ -259,7 +259,7 @@ HB_EXPORT void hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_HASH( pItem ) )
    {
-      if( --( pItem->item.asHash.value->ulHolders ) == 0 )
+      if( HB_ATOMIC_DEC( pItem->item.asHash.value->ulHolders ) == 0 )
       {
          hb_hashRelease( pItem );
       }
@@ -315,7 +315,7 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
                hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
             }
 
-            if( --( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
+            if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
             {
                hb_arrayRelease( &FakeArray );
             }
@@ -334,7 +334,7 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
         }
 
-        if( --( pItem->item.asArray.value->ulHolders ) == 0 )
+        if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
         {
            hb_arrayRelease( pItem );
         }
@@ -348,7 +348,7 @@ HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
    }
    else if( HB_IS_HASH( pItem ) )
    {
-      if( --( pItem->item.asHash.value->ulHolders ) == 0 )
+      if( HB_ATOMIC_DEC( pItem->item.asHash.value->ulHolders ) == 0 )
       {
          hb_hashRelease( pItem );
       }
@@ -433,7 +433,7 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       {
          if( pSource->item.asString.allocated )
          {
-            ++*( pSource->item.asString.pulHolders );
+            HB_ATOMIC_INC( *( pSource->item.asString.pulHolders ) );
          }
       }
       else if( pSource->type & HB_IT_BYREF )
@@ -453,7 +453,7 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          else if( pSource->item.asRefer.offset == 0 /* && pSource->item.asRefer.value >= 0 */ )
          {
             #ifdef HB_ARRAY_USE_COUNTER
-               pSource->item.asRefer.BasePtr.pBaseArray->ulHolders++;
+               HB_ATOMIC_INC( pSource->item.asRefer.BasePtr.pBaseArray->ulHolders );
             #else
                hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
             #endif
@@ -469,18 +469,18 @@ HB_EXPORT void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       else if( HB_IS_ARRAY( pSource ) )
       {
          #ifdef HB_ARRAY_USE_COUNTER
-            pSource->item.asArray.value->ulHolders++;
+            HB_ATOMIC_INC( pSource->item.asArray.value->ulHolders );
          #else
              hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
          #endif
       }
       else if( HB_IS_BLOCK( pSource ) )
       {
-         pSource->item.asBlock.value->uiCounter++;
+         HB_ATOMIC_INC( pSource->item.asBlock.value->ulCounter );
       }
       else if( HB_IS_HASH( pSource ) )
       {
-         pSource->item.asHash.value->ulHolders++;
+         HB_ATOMIC_INC( pSource->item.asHash.value->ulHolders );
       }
       else if( HB_IS_POINTER( pSource ) )
       {

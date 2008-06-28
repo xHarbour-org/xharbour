@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.119 2008/01/10 11:18:00 marchuet Exp $
+* $Id: thread.h,v 1.120 2008/04/30 16:47:32 ronpinkas Exp $
 */
 
 /*
@@ -106,6 +106,9 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
    #define HB_THREAD_T                 unsigned
 
+   #define HB_ATOMIC_INC( x )     InterlockedIncrement( (long *) &(x) )
+   #define HB_ATOMIC_DEC( x )     InterlockedDecrement( (long *) &(x) )
+
    #define HB_CRITICAL_T               CRITICAL_SECTION
    #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
    #define HB_CRITICAL_DESTROY( x )    DeleteCriticalSection( &(x) )
@@ -190,6 +193,9 @@ extern DWORD hb_dwCurrentStack;
 
    #define HB_COND_T                   HMUX
    #define PHB_COND_T                  PHMUX
+
+   #define HB_ATOMIC_INC( x )     ( ++(x) )
+   #define HB_ATOMIC_DEC( x )     ( --(x) )
 
    #define DWORD                       ULONG
    #define HB_THREAD_T                 TID
@@ -377,6 +383,9 @@ extern PPVOID hb_dwCurrentStack;
 
 #endif
 
+   #define HB_ATOMIC_INC( x )     ( ++(x) )
+   #define HB_ATOMIC_DEC( x )     ( --(x) )
+
    #define HB_MUTEX_T                  HB_CRITICAL_T
    #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
    #define HB_MUTEX_DESTROY( x )       HB_CRITICAL_DESTROY( x )
@@ -455,6 +464,7 @@ typedef struct tag_HB_STACK
    UINT uiParams;
    /* Flag to signal that the context is in use */
    BOOL bInUse; /* this must be used with the guard of a global resource */
+   BOOL bActive;
    /* Mark current thread as idle inspector  */
    USHORT uiIdleInspect;
 
@@ -539,13 +549,14 @@ typedef struct tag_HB_STACK
    HANDLE th_h;
 #endif
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
-   BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
-   BOOL bCanCancel;
+   volatile BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
+   volatile BOOL bCanCancel;
    /* Windows cleanup functions */
    HB_CLEANUP_FUNC *pCleanUp;
    void **pCleanUpParam;
    int iCleanCount;
 #endif
+   struct tag_HB_THREAD_READY *pThreadReady;
 
    struct tag_HB_THREAD_ID *pThreadID;
    struct tag_HB_STACK *next;
@@ -581,12 +592,20 @@ typedef struct tag_HB_THREAD_ID
    /* 0, NULL, -1 etc are not valid flags for unused ids. */
    BOOL bReady;
    /* Pointer to the thread stack. I can see a lot of uses for it */
-   HB_STACK *pStack;
+   volatile HB_STACK *pStack;
+
+   struct tag_HB_THREAD_READY *pThreadReady;
+
    /* Next thread id */
    struct tag_HB_THREAD_ID *next;
 }
 HB_THREAD_ID, *PHB_THREAD_ID;
 
+typedef struct tag_HB_THREAD_READY
+{
+   volatile BOOL        bActive;
+   HB_COUNTER           ulCounter;
+} HB_THREAD_READY, *PHB_THREAD_READY;
 
 /*********************************************************************/
 /* Shared resource is a set of a resource, a mutex and a condition. */
@@ -838,6 +857,9 @@ void hb_threadCancelInternal( void );
 /* Definitions when threading is turned off */
 
 #else
+
+   #define HB_ATOMIC_INC( x )     ( ++(x) )
+   #define HB_ATOMIC_DEC( x )     ( --(x) )
 
    #define HB_CRITICAL_LOCK( x )
    #define HB_CRITICAL_TRYLOCK( x )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6155 2008/06/27 16:00:03 marchuet Exp $
+ * $Id: ChangeLog,v 1.6156 2008/06/27 19:47:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-28 15:25 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
+  * include\hbdefs.h
+  * include\hbvmpub.h
+  * include\thread.h
+  * source\rtl\hbxml.c
+  * source\vm\arrays.c
+  * source\vm\arrayshb.c
+  * source\vm\codebloc.c
+  * source\vm\fastitem.c
+  * source\vm\fm.c
+  * source\vm\garbage.c
+  * source\vm\hvm.c
+  * source\vm\itemapi.c
+  * source\vm\thread.c
+  * tests\mtcomplexshare.prg
+    * Added atomic or volatile increment and decrement of counters of complex types and structures.
+      Now is safe to share complex data type in diferent threads if C compiler or OS support
+      function or create ASM thread-safe to inc/dec.
+      NOTE: Atomic increment and decrement need counter memory aligned and 32 bits of lenght.
 
 2008-06-27 15:15 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/macro/macro.slx

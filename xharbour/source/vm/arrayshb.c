@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.73 2008/04/22 04:40:34 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.74 2008/06/27 06:21:52 ronpinkas Exp $
  */
 
 /*
@@ -197,7 +197,7 @@ HB_FUNC( HB_THISARRAY )
       }
 
       #ifdef HB_ARRAY_USE_COUNTER
-         pArray->item.asArray.value->ulHolders++;
+         HB_ATOMIC_INC( pArray->item.asArray.value->ulHolders );
       #else
          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pArray );
       #endif

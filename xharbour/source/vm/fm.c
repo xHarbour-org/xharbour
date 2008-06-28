@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.89 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: fm.c,v 1.90 2008/05/06 11:10:43 marchuet Exp $
  */
 
 /*
@@ -669,14 +669,14 @@ HB_FORCE_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 #undef hb_xRefInc
 void hb_xRefInc( void * pMem )
 {
-   ++( * HB_COUNTER_PTR( pMem ) );
+   HB_ATOMIC_INC( * HB_COUNTER_PTR( pMem ) );
 }
 
 /* decrement reference counter, return TRUE when 0 reached */
 #undef hb_xRefDec
 BOOL hb_xRefDec( void * pMem )
 {
-   return --( * HB_COUNTER_PTR( pMem ) ) == 0;
+   return HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) ) == 0;
 }
 
 /* decrement reference counter and free the block when 0 reached */
@@ -688,13 +688,13 @@ void hb_xRefFree( void * pMem )
    if( HB_FM_PTR( pMem )->ulSignature != HB_MEMINFO_SIGNATURE )
       hb_errInternal( HB_EI_XFREEINV, NULL, NULL, NULL );
 
-   if( --( * HB_COUNTER_PTR( pMem ) ) == 0 )
-      hb_xfree( pMem );
+   if( HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) ) == 0 )
+      hb_xfree( (void *) pMem );
 
 #else
 
-   if( --( * HB_COUNTER_PTR( pMem ) ) == 0 )
-      free( HB_FM_PTR( pMem ) );
+   if( HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) ) == 0 )
+      free( (void *) HB_FM_PTR( pMem ) );
 
 #endif
 }
@@ -716,7 +716,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
    {
       void * pMemNew = hb_xgrab( ulSize );
 
-      --( * HB_COUNTER_PTR( pMem ) );
+      HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) );
       memcpy( pMemNew, pMem, HB_MIN( ulSave, ulSize ) );
       return pMemNew;
    }
@@ -731,7 +731,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
 
       if( pMemNew )
       {
-         --( * HB_COUNTER_PTR( pMem ) );
+         HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) );
          * HB_COUNTER_PTR( HB_MEM_PTR( pMemNew ) ) = 1;
          memcpy( HB_MEM_PTR( pMemNew ), pMem, HB_MIN( ulSave, ulSize ) );
          return HB_MEM_PTR( pMemNew );
@@ -739,7 +739,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
    }
    else
    {
-      pMem = realloc( HB_FM_PTR( pMem ), HB_ALLOC_SIZE ( ulSize ) );
+      pMem = realloc( (void *) HB_FM_PTR( pMem ), HB_ALLOC_SIZE ( ulSize ) );
       if( pMem )
          return HB_MEM_PTR( pMem );
    }

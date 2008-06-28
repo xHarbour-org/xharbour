@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.161 2008/06/19 14:10:42 ronpinkas Exp $
+ * $Id: arrays.c,v 1.162 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -606,7 +606,7 @@ HB_EXPORT BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       pItem->item.asRefer.BasePtr.pBaseArray = pArray->item.asArray.value;
 
       #ifdef HB_ARRAY_USE_COUNTER
-         pArray->item.asArray.value->ulHolders++;
+         HB_ATOMIC_INC( pArray->item.asArray.value->ulHolders );
       #else
          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pItem );
       #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.97 2008/05/09 18:23:24 ronpinkas Exp $
+ * $Id: garbage.c,v 1.98 2008/06/18 22:16:10 ronpinkas Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ HB_EXPORT ULONG hb_gcIncRef( void *pBlock )
 
 	--pAlloc;
 
-	return ++pAlloc->ulHolders;
+   return HB_ATOMIC_INC( pAlloc->ulHolders );
 }
 
 HB_EXPORT ULONG hb_gcDecRef( void *pBlock )
@@ -221,7 +221,7 @@ HB_EXPORT ULONG hb_gcDecRef( void *pBlock )
       hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Pointer Release detected: '%p'", (char *) pBlock, NULL );
    }
 
-   if( --( pAlloc->ulHolders ) == 0 && !pAlloc->locked )
+   if( HB_ATOMIC_DEC( pAlloc->ulHolders ) == 0 && !pAlloc->locked )
    {
       //OutputDebugString("Calling GC Cleanup function...");
       if( pAlloc->pFunc )

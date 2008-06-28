@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.212 2008/05/14 06:40:48 likewolf Exp $
+* $Id: thread.c,v 1.213 2008/06/03 04:59:57 ronpinkas Exp $
 */
 
 /*
@@ -326,6 +326,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->pSyncId = NULL;
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
+   tc->bActive = FALSE;
    tc->iPcodeCount = HB_VM_UNLOCK_PERIOD;
 
    tc->errorHandler = NULL;
@@ -406,6 +407,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->hMemvars[0]= 0;*/
 
    tc->pThreadID = NULL;
+   tc->pThreadReady = NULL;
 }
 
 /*
@@ -530,6 +532,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_threadDestroyStack(%p)", pStack));
 
+   pStack->bActive = FALSE;
+
    /* Free each element of the stack, but not for main stack; main stack
       is freed by hb_stackFree as in ST */
 //   if( pStack != &hb_stackMT )
@@ -585,12 +589,23 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       hb_xfree( pStack->pCleanUp );
       hb_xfree( pStack->pCleanUpParam );
+      pStack->iCleanCount = -1;
    #endif
 
    // Free Sync method table
    if( pStack->pSyncId )
    {
       hb_xfree( pStack->pSyncId );
+   }
+
+   // Decrement counter reference and free ThreadReady structure
+   if( pStack->pThreadReady )
+   {
+      pStack->pThreadReady->bActive = FALSE;
+      if( HB_ATOMIC_DEC( pStack->pThreadReady->ulCounter ) == 0 )
+      {
+         hb_xfree( pStack->pThreadReady );
+      }
    }
 
    // Free only if we are not destroying the main stack
@@ -1563,28 +1578,36 @@ HB_GARBAGE_FUNC( hb_threadThreadIdFinalize )
    }
 
    HB_SHARED_LOCK( hb_runningStacks );
-   if( ThreadID->pStack )
+   if( ThreadID->pThreadReady->bActive )
    {
-      if( ThreadID == ThreadID->pStack->pThreadID )
+      if( ThreadID->pStack )
       {
-         ThreadID->pStack->pThreadID = ThreadID->next;
-      }
-      else
-      {
-         PHB_THREAD_ID pThread = ThreadID->pStack->pThreadID;
-
-         while( pThread && pThread->next != ThreadID )
+         if( ThreadID == ThreadID->pStack->pThreadID )
          {
-            pThread = pThread->next;
+            ThreadID->pStack->pThreadID = ThreadID->next;
          }
-
-         if( pThread )
+         else
          {
-            pThread->next = ThreadID->next;
+            PHB_THREAD_ID pThread = ThreadID->pStack->pThreadID;
+
+            while( pThread && pThread->next != ThreadID )
+            {
+               pThread = pThread->next;
+            }
+
+            if( pThread )
+            {
+               pThread->next = ThreadID->next;
+            }
          }
       }
    }
    HB_SHARED_UNLOCK( hb_runningStacks );
+
+   if( HB_ATOMIC_DEC( ThreadID->pThreadReady->ulCounter ) == 0 )
+   {
+      hb_xfree( ThreadID->pThreadReady );
+   }
 
    /* hb_gcFree( ThreadID ); */
 }
@@ -1604,6 +1627,7 @@ HB_FUNC( STARTTHREAD )
    HB_STACK *pStack;
    PHB_THREAD_ID pThread;
    PHB_SYMBCARGO pSymCargo;
+   PHB_THREAD_READY pThreadReady;
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
@@ -1724,15 +1748,21 @@ HB_FUNC( STARTTHREAD )
       return;
    }
 
+   pThreadReady = (PHB_THREAD_READY) hb_xgrab( sizeof( HB_THREAD_READY ) );
+   pThreadReady->bActive = FALSE;
+   pThreadReady->ulCounter = 2;  // pStack and pThread
+
    // Create the thread ID object; for now it is a flat pointer
    pThread = (PHB_THREAD_ID) hb_gcAlloc( sizeof( HB_THREAD_ID ), hb_threadThreadIdFinalize );
    pThread->sign = HB_THREAD_ID_SIGN;
+   pThread->pThreadReady = pThreadReady;
 
    // Create the stack here to avoid cross locking of alloc mutex
    pStack = hb_threadCreateStack( 0 );
 
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
+   pStack->pThreadReady = pThreadReady;
 
    /* Forbid usage of stack before that new thread's VM takes care of it */
    hb_threadFillStack( pStack, pArgs );
@@ -1743,6 +1773,7 @@ HB_FUNC( STARTTHREAD )
 
    hb_runningStacks.content.asLong++;
    pStack->bInUse = TRUE;
+   pStack->bActive = TRUE;
    pStack->th_vm_id = hb_threadUniqueId();
    hb_threadLinkStack( pStack );
 
@@ -1772,10 +1803,12 @@ HB_FUNC( STARTTHREAD )
       pThread->pStack = pStack;
       pThread->next   = NULL;
       pStack->pThreadID = pThread;
+      pThreadReady->bActive = TRUE;
       hb_retptrGC( pThread );
    }
    else
    {
+      hb_threadUnlinkStack( pStack );
       hb_threadDestroyStack( pStack );
       pThread->bReady = FALSE;
       hb_retptrGC( pThread );
@@ -1807,7 +1840,7 @@ HB_FUNC( STOPTHREAD )
       return;
    }
 
-   if( pThread->pStack )
+   if( pThread->pThreadReady->bActive && pThread->pStack )
    {
       HB_STACK_UNLOCK;
 
@@ -1854,7 +1887,7 @@ HB_FUNC( KILLTHREAD )
       return;
    }
 
-   if ( ! pThread->bReady )
+   if ( !pThread->pThreadReady->bActive || ! pThread->bReady )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Given thread is not valid",
          "KILLTHREAD", 1, hb_paramError(1) );
@@ -1900,7 +1933,7 @@ HB_FUNC( JOINTHREAD )
       return;
    }
 
-   if ( ! pThread->bReady )
+   if ( pThread == NULL || ! pThread->pThreadReady->bActive || ! pThread->bReady )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Given thread is not valid",
          "JOINTHREAD", 1, hb_paramError(1) );
@@ -1967,6 +2000,8 @@ HB_FUNC( GETCURRENTTHREAD )
    pThread->pStack = &HB_VM_STACK;
    pThread->bReady = TRUE;
    pThread->next   = NULL;
+   pThread->pThreadReady = pThread->pStack->pThreadReady;
+   HB_ATOMIC_INC( pThread->pThreadReady->ulCounter );
 
    hb_retptrGC( pThread );
 
@@ -2006,7 +2041,7 @@ HB_FUNC( GETTHREADID )
             hb_paramError(1) );
          return;
       }
-      else if ( ! pThread->bReady )
+      else if ( ! pThread->pThreadReady->bActive || ! pThread->bReady )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 3012, "Given thread is not valid",
             "GETTHREADID", 1, hb_paramError(1) );
@@ -2045,7 +2080,7 @@ HB_FUNC( GETSYSTEMTHREADID )
             hb_paramError(1) );
          return;
       }
-      else if ( ! pThread->bReady )
+      else if ( ! pThread->pThreadReady->bActive || ! pThread->bReady )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 3012, "Given thread is not valid",
             "GETSYSTEMTHREADID", 1, hb_paramError(1) );
@@ -2081,7 +2116,7 @@ HB_FUNC( ISSAMETHREAD )
       return;
    }
 
-   if ( ! pThread1->bReady )
+   if ( ! pThread1->pThreadReady->bActive || ! pThread1->bReady )
    {
       hb_retl( FALSE );
    }
@@ -2090,7 +2125,7 @@ HB_FUNC( ISSAMETHREAD )
       {
          hb_retl( HB_SAME_THREAD( pThread1->threadId, HB_CURRENT_THREAD() ) );
       }
-      else if ( ! pThread2->bReady )
+      else if ( ! pThread2->pThreadReady->bActive || ! pThread2->bReady )
       {
          hb_retl( FALSE );
       }
@@ -2110,7 +2145,7 @@ HB_FUNC( ISVALIDTHREAD )
    HB_THREAD_STUB_API
    PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
-   if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN || pThread->pStack == NULL )
+   if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN || pThread->pStack == NULL || ! pThread->pThreadReady->bActive )
    {
       hb_retl( FALSE );
    }
@@ -2637,8 +2672,9 @@ static void s_subscribeInternal( int mode )
    {
       if ( pStatus )
       {
-         pStatus->type = HB_IT_LOGICAL;
-         pStatus->item.asLogical.value = 1;
+         hb_itemPutL( pStatus, TRUE );
+         //pStatus->type = HB_IT_LOGICAL;
+         //pStatus->item.asLogical.value = 1;
       }
       hb_itemReturnForward( hb_arrayGetItemPtr( Mutex->aEventObjects, 1 ) );
       hb_arrayDel( Mutex->aEventObjects, 1 );
@@ -2648,8 +2684,9 @@ static void s_subscribeInternal( int mode )
    {
       if ( pStatus )
       {
-         pStatus->type = HB_IT_LOGICAL;
-         pStatus->item.asLogical.value = 0;
+         hb_itemPutL( pStatus, FALSE );
+         //pStatus->type = HB_IT_LOGICAL;
+         //pStatus->item.asLogical.value = 0;
       }
       hb_ret();
    }

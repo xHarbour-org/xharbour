@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.99 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbdefs.h,v 1.100 2008/03/23 05:25:23 andijahja Exp $
  */
 
 /*
@@ -481,7 +481,7 @@
 typedef UINT32 HB_TYPE;
 
 /* type of reference counter */
-typedef unsigned long HB_COUNTER;
+typedef volatile unsigned long HB_COUNTER;
 #if ULONG_MAX <= UINT32_MAX
 #  define HB_COUNTER_SIZE     4
 #else

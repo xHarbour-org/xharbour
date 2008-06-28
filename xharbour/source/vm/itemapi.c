@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.149 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: itemapi.c,v 1.150 2008/06/25 20:20:54 vouchcac Exp $
  */
 
 /*
@@ -1474,7 +1474,7 @@ HB_EXPORT PHB_ITEM hb_itemUnRefOnce( PHB_ITEM pItem )
                   Array.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
                   #ifdef HB_ARRAY_USE_COUNTER
-                     Array.item.asArray.value->ulHolders++;
+                     HB_ATOMIC_INC( Array.item.asArray.value->ulHolders );
                   #else
                       hb_arrayRegisterHolder( Array.item.asArray.value, (void *) &Array );
                   #endif

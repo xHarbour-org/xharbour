@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.57 2008/01/14 12:44:30 walito Exp $
+ * $Id: codebloc.c,v 1.58 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -174,14 +174,14 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
    pCBlock->pCode     = ( BYTE * ) pBuffer;
 
    pCBlock->symbol  = pSymbol;
-   pCBlock->uiCounter = 1;
+   pCBlock->ulCounter = 1;
 
    //pCBlock->dynBuffer = FALSE;
    //pCBlock->bPrivVars = FALSE;
    //pCBlock->bDynamic = FALSE;
    pCBlock->uiFlags = 0;
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%i) %lx", pCBlock->uiCounter, pCBlock));
+   HB_TRACE(HB_TR_INFO, ("codeblock created (%i) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
 }
@@ -212,9 +212,9 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    pCBlock->uiFlags = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
 
    pCBlock->symbol = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
-   pCBlock->uiCounter = 1;
+   pCBlock->ulCounter = 1;
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->uiCounter, pCBlock));
+   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
 }
@@ -227,7 +227,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockDelete(%p)", pItem));
 
-   if( pCBlock && (--pCBlock->uiCounter == 0) )
+   if( pCBlock && HB_ATOMIC_DEC( pCBlock->ulCounter ) == 0 )
    {
       if( pCBlock->pLocals )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.30 2005/09/22 10:51:57 jonnymind Exp $
+ * $Id: hbxml.c,v 1.31 2007/05/25 11:10:05 toninhofwi Exp $
  */
 
 /*
@@ -877,7 +877,8 @@ static void mxml_node_read_data( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, 
 
    hb_itemPutCRaw( &hbtemp, buf, iPos );
    hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
-   --*( hbtemp.item.asString.pulHolders );
+   //--*( hbtemp.item.asString.pulHolders );
+   hb_itemClear( &hbtemp );
 }
 
 static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
@@ -963,7 +964,8 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
    }
    hb_itemPutCRaw( &hbtemp, buf, iPos );
    hb_objSendMsg( pNode,"_CNAME", 1, &hbtemp );
-   --*( hbtemp.item.asString.pulHolders );
+   //--*( hbtemp.item.asString.pulHolders );
+   hb_itemClear( &hbtemp );
 
    return MXML_STATUS_OK;
 }
@@ -1043,7 +1045,8 @@ static void mxml_node_read_directive( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM 
          }
          hb_itemPutCRaw( &hbtemp, buf, iPos );
          hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
-         --*( hbtemp.item.asString.pulHolders );
+         //--*( hbtemp.item.asString.pulHolders );
+         hb_itemClear( &hbtemp );
       }
       else {
          MXML_DELETOR( buf );
@@ -1126,7 +1129,8 @@ static void mxml_node_read_pi( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
       }
       hb_itemPutCRaw( &hbtemp, buf, iPos );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
-      --*( hbtemp.item.asString.pulHolders );
+      //--*( hbtemp.item.asString.pulHolders );
+      hb_itemClear( &hbtemp );
    }
    else {
       MXML_DELETOR( buf );
@@ -1244,7 +1248,8 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
       }
       hb_itemPutCRaw( &hbtemp, buf, iPos );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
-      --*( hbtemp.item.asString.pulHolders );
+      //--*( hbtemp.item.asString.pulHolders );
+      hb_itemClear( &hbtemp );
    }
    else {
       MXML_DELETOR( buf );
@@ -1418,7 +1423,8 @@ static void mxml_node_read_cdata( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc
       }
       hb_itemPutCRaw( &hbtemp, buf, iPos );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
-      --*( hbtemp.item.asString.pulHolders );
+      //--*( hbtemp.item.asString.pulHolders );
+      hb_itemClear( &hbtemp );
    }
    else {
       MXML_DELETOR( buf );

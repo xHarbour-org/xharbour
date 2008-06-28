@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.687 2008/06/25 20:20:53 vouchcac Exp $
+ * $Id: hvm.c,v 1.688 2008/06/27 06:21:52 ronpinkas Exp $
  */
 
 /*
@@ -9352,7 +9352,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    pTop->item.asRefer.BasePtr.pBaseArray = s_aStatics.item.asArray.value;
 
    #ifdef HB_ARRAY_USE_COUNTER
-      s_aStatics.item.asArray.value->ulHolders++;
+      HB_ATOMIC_INC( s_aStatics.item.asArray.value->ulHolders );
    #else
       hb_arrayRegisterHolder( s_aStatics.item.asArray.value, (void *) pTop );
    #endif
@@ -10921,7 +10921,7 @@ HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
    pItem->item.asArray.value = pBaseArray;
 
    #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->ulHolders++;
+      HB_ATOMIC_INC( pBaseArray->ulHolders );
    #else
        hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
    #endif
