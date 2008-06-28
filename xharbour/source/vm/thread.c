@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.213 2008/06/03 04:59:57 ronpinkas Exp $
+* $Id: thread.c,v 1.214 2008/06/28 18:51:50 walito Exp $
 */
 
 /*
@@ -1910,7 +1910,7 @@ HB_FUNC( KILLTHREAD )
          }
          else
          {
-            hb_threadCancel( pThread->pStack ); //also unlocks the mutex
+            hb_threadCancel( (HB_STACK *) pThread->pStack ); //also unlocks the mutex
          }
 
          HB_STACK_LOCK;
