@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c 8735 2008-06-15 22:28:36Z vouchcac $
+ * $Id: wvtcore.c,v 1.1 2008/06/25 22:19:18 vouchcac Exp $
  */
 
 /*
@@ -74,7 +74,9 @@
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-#define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_32_USED
+   #define HB_OS_WIN_32_USED
+#endif
 
 //-------------------------------------------------------------------//
 
@@ -173,7 +175,7 @@ HB_EXPORT IPicture * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 
       CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
 
-      OleLoadPicture( iStream, nFileSize, TRUE, HB_ID_REF( REFIID, IID_IPicture ), &iPicture );
+      OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, &iPicture );
 
       FreeResource( mem );
    }
@@ -210,7 +212,7 @@ HB_EXPORT IPicture * hb_wvt_gtLoadPicture( char * cImage )
             if( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
             {
                CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-               OleLoadPicture( iStream, nFileSize, TRUE, HB_ID_REF( REFIID, IID_IPicture ), &iPicture );
+               OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, &iPicture );
             }
             GlobalFree( hGlobal );
          }
@@ -614,7 +616,7 @@ HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char *
           IPicture ** iPictureRef = &iPicture;
 
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, HB_ID_REF( REFIID, IID_IPicture ), ( LPVOID * ) iPictureRef );
+          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID * ) iPictureRef );
 
           if ( iPicture )
           {

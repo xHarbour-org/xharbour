@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6158 2008/06/28 19:37:20 walito Exp $
+ * $Id: ChangeLog,v 1.6159 2008/06/30 21:24:38 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,56 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-06-30 22:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * common.mak
+  * compile.mak
+  * makefile.vc
+  * mdir.bat
+    - Removed contrib/wvtgui
+    + Added contrib/gtwvg
+
+  * contrib/gtwvg/gtwvg.c
+  * contrib/gtwvg/wvtcore.c
+    ! Multiple GPF traps and memory leaks
+    [Pritpal please review]
+
+  - contrib/wvtgui/ChangeLog
+  - contrib/wvtgui/Makefile
+  - contrib/wvtgui/hbgtwvt.h
+  - contrib/wvtgui/make_b32.bat
+  - contrib/wvtgui/make_pc.bat
+  - contrib/wvtgui/makefile.bc
+  - contrib/wvtgui/makefile.pc
+  - contrib/wvtgui/wvtclass.prg
+  - contrib/wvtgui/wvtcore.c
+  - contrib/wvtgui/wvtgui.ch
+  - contrib/wvtgui/wvtpaint.prg
+  - contrib/wvtgui/wvtutils.c
+  - contrib/wvtgui/wvtwin.ch
+  - contrib/wvtgui/samples/bldwvt.bat
+  - contrib/wvtgui/samples/dia_excl.ico
+  - contrib/wvtgui/samples/test.dbf
+  - contrib/wvtgui/samples/v_browse.ico
+  - contrib/wvtgui/samples/v_calcltr.ico
+  - contrib/wvtgui/samples/v_calend.bmp
+  - contrib/wvtgui/samples/v_clclt.bmp
+  - contrib/wvtgui/samples/v_filter.ico
+  - contrib/wvtgui/samples/v_help.ico
+  - contrib/wvtgui/samples/v_index.bmp
+  - contrib/wvtgui/samples/v_lock.bmp
+  - contrib/wvtgui/samples/v_new.bmp
+  - contrib/wvtgui/samples/v_notes.ico
+  - contrib/wvtgui/samples/v_notes1.bmp
+  - contrib/wvtgui/samples/v_selct1.bmp
+  - contrib/wvtgui/samples/v_tools.ico
+  - contrib/wvtgui/samples/vouch1.bmp
+  - contrib/wvtgui/samples/vr_1.ico
+  - contrib/wvtgui/samples/wvt.prg
+  - contrib/wvtgui/samples/wvtgui.prg
+  - contrib/wvtgui/samples/wvtguie.prg
+  - contrib/wvtgui/samples/wvtmenu.prg
+    - Removed no longer needed
 
 2008-06-30 14:25 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/contrib/rdd_ads/adsexternal.ch

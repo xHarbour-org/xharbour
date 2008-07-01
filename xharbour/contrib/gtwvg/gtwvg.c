@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c 8735 2008-06-15 22:28:36Z vouchcac $
+ * $Id: gtwvg.c,v 1.1 2008/06/25 22:19:17 vouchcac Exp $
  */
 
 /*
@@ -83,7 +83,9 @@
  */
 //----------------------------------------------------------------------//
 
-#define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_32_USED
+   #define HB_OS_WIN_32_USED
+#endif
 
 #include "gtwvg.h"
 
@@ -171,11 +173,40 @@ static BOOL hb_gt_wvt_Alloc( PHB_GTWVT pWVT )
 
 static void hb_gt_wvt_Free( PHB_GTWVT pWVT )
 {
+   int iIndex;
+
    --s_wvtCount;
    s_wvtWindows[pWVT->iHandle] = NULL;
 
    if( pWVT->pszSelectCopy )
       hb_xfree( pWVT->pszSelectCopy );
+
+   // Detach PRG callback
+   pWVT->pSymWVT_PAINT      = NULL;
+   pWVT->pSymWVT_SETFOCUS   = NULL;
+   pWVT->pSymWVT_KILLFOCUS  = NULL;
+   pWVT->pSymWVT_MOUSE      = NULL;
+   pWVT->pSymWVT_TIMER      = NULL;
+   pWVT->pSymWVT_KEY        = NULL;
+   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+   {
+      if ( pWVT->pFunc[ iIndex ] != NULL && pWVT->iType[ iIndex ] == 2 )
+      {
+         hb_itemRelease( ( PHB_ITEM ) pWVT->pFunc[ iIndex ] );
+         pWVT->pFunc[ iIndex ] = NULL;
+      }
+      if ( pWVT->pcbFunc[ iIndex ] != NULL )
+      {
+         hb_itemRelease( ( PHB_ITEM ) pWVT->pcbFunc[ iIndex ] );
+         pWVT->pcbFunc[ iIndex ] = NULL;
+      }
+   }
+
+   if( pWVT->hWnd )
+   {
+      DestroyWindow( pWVT->hWnd );
+      pWVT->hWnd = NULL;
+   }
 
    hb_xfree( pWVT );
 }
@@ -184,19 +215,14 @@ static void hb_gt_wvt_FreeAll( void )
 {
    if( s_wvtCount > 0 )
    {
-      int iPos;
+      int iPos, iIndex;
+
       for ( iPos = 1; iPos < WVT_MAX_WINDOWS; iPos++ )
       {
          if( !s_wvtWindows[ iPos ] == NULL )
          {
-            PHB_GTWVT pWVT;
-
-            pWVT = s_wvtWindows[ iPos ];
-
-            DestroyWindow( pWVT->hWnd );
-            pWVT->hWnd = NULL;
-            hb_gt_wvt_Free( pWVT );
-            HB_GTSUPER_EXIT( pWVT->pGT );
+            hb_gt_wvt_Free( s_wvtWindows[ iPos ] );
+            HB_GTSUPER_EXIT( s_wvtWindows[ iPos ]->pGT );
          }
       }
    }
@@ -1916,12 +1942,7 @@ static void hb_gt_wvt_Exit( PHB_GT pGT )
       if( pWVT->hWnd )
       {
          hb_wvt_gtExitGui( pWVT );
-         DestroyWindow( pWVT->hWnd );
-         pWVT->hWnd = NULL;
       }
-      if( pWVT->pszSelectCopy )
-         hb_xfree( pWVT->pszSelectCopy );
-
       UnregisterClass( s_szClassName, ( HINSTANCE ) s_hInstance );
       hb_gt_wvt_Free( pWVT );
    }

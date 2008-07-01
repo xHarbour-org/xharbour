@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.13 2008/06/06 03:30:25 ronpinkas Exp $
+# $Id: compile.mak,v 1.14 2008/06/06 15:44:25 kaddath Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1927,24 +1927,27 @@ $(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
 	$(CC_CMD)
 
 #===============================================================================
-# WVTGUI.LIB rules
+# GTWVG.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)gtwvg.c
+        $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtcore.c
+        $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtutils.c
+        $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wvtclass.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)wvtclass.c : $(WVTGUI_DIR)$(DIR_SEP)wvtclass.prg
+$(OBJ_DIR)$(DIR_SEP)wvtclass.c : $(GTWVG_DIR)$(DIR_SEP)wvtclass.prg
 	$(HB_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(WVTGUI_DIR)$(DIR_SEP)wvtcore.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT) : $(WVTGUI_DIR)$(DIR_SEP)wvtutils.c
-	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtpaint$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wvtpaint.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)wvtpaint.c : $(WVTGUI_DIR)$(DIR_SEP)wvtpaint.prg
+$(OBJ_DIR)$(DIR_SEP)wvtpaint.c : $(GTWVG_DIR)$(DIR_SEP)wvtpaint.prg
 	$(HB_CMD)
 
 #===============================================================================

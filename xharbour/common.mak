@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.15 2008/06/06 03:30:25 ronpinkas Exp $
+# $Id: common.mak,v 1.16 2008/06/06 15:44:25 kaddath Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -51,6 +51,7 @@ HBPDF_DIR     =contrib$(DIR_SEP)pdflib
 FIREBIRD_DIR  =contrib$(DIR_SEP)firebird
 FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
 GDLIB_DIR     =contrib$(DIR_SEP)gd
+GTWVG_DIR     =contrib$(DIR_SEP)gtwvg
 GTWVW_DIR     =contrib$(DIR_SEP)gtwvw
 HBZIP_DIR     =contrib$(DIR_SEP)hbzlib
 LIBNF_DIR     =contrib$(DIR_SEP)libnf
@@ -61,7 +62,6 @@ RDDADS_DIR    =contrib$(DIR_SEP)rdd_ads
 TELEPATH_DIR  =contrib$(DIR_SEP)tp_
 HBCC_DIR      =contrib$(DIR_SEP)unicode
 WHAT32_DIR    =contrib$(DIR_SEP)what32
-WVTGUI_DIR    =contrib$(DIR_SEP)wvtgui
 XWT_DIR       =contrib$(DIR_SEP)xwt
 XWT2_DIR      =contrib$(DIR_SEP)xwt2
 
@@ -114,6 +114,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 FIREBIRD_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)firebird$(LIBEXT)
 FREEIMAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fi_lib$(LIBEXT)
 GDLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gdlib$(LIBEXT)
+GTWVG_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvg$(LIBEXT)
 GTWVW_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvw$(LIBEXT)
 HBZIP_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzip$(LIBEXT)
 LIBNF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libnf$(LIBEXT)
@@ -125,7 +126,6 @@ ACE32_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ace32$(LIBEXT)
 TELEPATH_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)telepath$(LIBEXT)
 HBCC_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcc$(LIBEXT)
 WHAT32_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)what32$(LIBEXT)
-WVTGUI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)wvtgui$(LIBEXT)
 XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
 XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
@@ -794,15 +794,6 @@ GTWVT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT)
 
 #===============================================================================
-# WVTGUI.LIB rules
-#===============================================================================
-WVTGUI_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wvtpaint$(OBJEXT)
-
-#===============================================================================
 # GTGUI.LIB rules
 #===============================================================================
 GTGUI_LIB_OBJS=\
@@ -1234,6 +1225,16 @@ HBTESTDLL_EXE_OBJS=\
 #===============================================================================
 # CONTRIB DEPENDENCIES
 #===============================================================================
+
+#===============================================================================
+# GTWVG.LIB dependencies
+#===============================================================================
+GTWVG_LIB_OBJS=\
+        $(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)wvtpaint$(OBJEXT)
 
 #===============================================================================
 # GTWVW.LIB dependencies
@@ -1720,10 +1721,10 @@ CONTRIB_PROJECT=\
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GDLIB_LIB)\
+        $(GTWVG_LIB)\
 	$(LIBNF_LIB)\
 	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
-	$(WVTGUI_LIB)\
 	$(PNG_LIB)\
 	$(HBHPDF_LIB)
