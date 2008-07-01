@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6159 2008/06/30 21:24:38 kaddath Exp $
+ * $Id: ChangeLog,v 1.6160 2008/07/01 03:30:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-01 18:11 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * harbour/source/vm/hbinet.c
+    ! fixed GPF HB_INET[GS]ET{SND,RCV}BUFSIZE() when wrong
+      socket parameter is passed. Please remember that after
+      RT error the control is returned to application.
+      Thank's to Przemyslaw Czerpak
 
 2008-06-30 22:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * common.mak
