@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6160 2008/07/01 03:30:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6161 2008/07/01 16:08:53 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2008-07-01 18:11 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * harbour/source/vm/hbinet.c
+  * source/vm/hbinet.c
     ! fixed GPF HB_INET[GS]ET{SND,RCV}BUFSIZE() when wrong
       socket parameter is passed. Please remember that after
       RT error the control is returned to application.

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.75 2008/04/05 13:28:59 likewolf Exp $
+* $Id: inet.c,v 1.76 2008/06/27 15:59:35 marchuet Exp $
 */
 
 /*
@@ -779,67 +779,73 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
 HB_FUNC( INETGETSNDBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 1 );
-   int value;
-   socklen_t len = sizeof( value );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETSNDBUFSIZE", 1,
          hb_paramError(1) );
    }
-
-   getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
-   Socket->iSndBufSize = value;
-   hb_retni( value );
+   else
+   {
+      int value;
+      socklen_t len = sizeof( value );
+      getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, &len );
+      Socket->iSndBufSize = value;
+      hb_retni( value );
+   }
 }
 
 HB_FUNC( INETGETRCVBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 1 );
-   int value;
-   socklen_t len = sizeof( value );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETRCVBUFSIZE", 1,
          hb_paramError(1) );
    }
-
-   getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
-   Socket->iRcvBufSize = value;
-   hb_retni( value );
+   else
+   {
+      int value;
+      socklen_t len = sizeof( value );
+      getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, &len );
+      Socket->iRcvBufSize = value;
+      hb_retni( value );
+   }
 }
 
 HB_FUNC( INETSETSNDBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 1 );
-   int value;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETSNDBUFSIZE", 1, hb_paramError(1) );
    }
-
-   value = hb_parni( 2 );
-   setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) );
-   Socket->iSndBufSize = value;
-   hb_retni( value );
+   else
+   {
+      int value = hb_parni( 2 );
+      setsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, (char *) &value, sizeof( value ) );
+      Socket->iSndBufSize = value;
+      hb_retni( value );
+   }
 }
 
 HB_FUNC( INETSETRCVBUFSIZE )
 {
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 1 );
-   int value;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETRCVBUFSIZE", 1, hb_paramError(1) );
    }
-
-   value = hb_parni( 2 );
-   setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) );
-   Socket->iRcvBufSize = value;
-   hb_retni( value );
+   else
+   {
+      int value = hb_parni( 2 );
+      setsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, (char *) &value, sizeof( value ) );
+      Socket->iRcvBufSize = value;
+      hb_retni( value );
+   }
 }
 
 
@@ -1102,7 +1108,8 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
       {
          HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
       }
-      else if( iLen == -2 ) {
+      else if( iLen == -2 )
+      {
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
       }
       else
