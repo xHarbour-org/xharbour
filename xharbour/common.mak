@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.16 2008/06/06 15:44:25 kaddath Exp $
+# $Id: common.mak,v 1.17 2008/07/01 03:30:45 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1058,6 +1058,7 @@ HARBOUR_EXE_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbdbginf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ppcomp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT)
 
 #===============================================================================

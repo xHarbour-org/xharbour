@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.6 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: ppcomp.c,v 1.7 2008/06/20 03:46:27 ronpinkas Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,
    PINLINE pInline;
 
    HB_SYMBOL_UNUSED( cargo );
-   hb_comp_iLine = iLine + 1;
+   hb_comp_iLine = iLine;
    pInline = hb_compInlineAdd( NULL );
    pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
    memcpy( pInline->pCode, pBuffer, ulSize );

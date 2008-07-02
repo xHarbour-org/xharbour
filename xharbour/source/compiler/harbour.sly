@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.155 2008/03/13 04:26:10 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.156 2008/06/20 03:46:27 ronpinkas Exp $
  */
 
 /*
@@ -738,7 +738,7 @@ DivertFlags: /* No Flags */ { $$ = hb_compExprNewLong(0); }
 CrlfStmnt  : { hb_compLinePushIfInside(); } Crlf
            ;
 
-LineStat   : Crlf          { $<lNumber>$ = 0; hb_comp_bDontGenLineNum = TRUE; }
+LineStat   : Crlf          { $<lNumber>$ = 0; }
            | Line          { $<lNumber>$ = 0; }
            | Statement     { $<lNumber>$ = 1; }
            | Declaration   { $<lNumber>$ = 1; }
@@ -2552,12 +2552,8 @@ IfEndif    : IfBegin EndIf                    { hb_compGenJumpHere( $1 ); s_iCon
            | IfBegin IfElseIf IfElse EndIf    { hb_compGenJumpHere( $1 ); hb_compElseIfFix( $2 ); s_iControlLevel--; }
            ;
 
-EmptyStatements : LineStat             { $<lNumber>$ = $<lNumber>1; }
-           | EmptyStatements LineStat  { $<lNumber>$ += $<lNumber>2; }
-           ;
-
 EmptyStats : /* empty */           { $<lNumber>$ = 0; }
-           | EmptyStatements       { $<lNumber>$ = $<lNumber>1; }
+           | Statements       { $<lNumber>$ = $<lNumber>1; }
            ;
 
 IfBegin    : IF Expression {
@@ -2658,7 +2654,7 @@ DoCaseBegin : DoCaseStart            { }
                      }
            ;
 
-Cases      : CASE { hb_compLinePush(); } Expression Crlf
+Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expression Crlf
                {
                   hb_compExprDelete( hb_compExprGenPush( $3 ) );
                   $<iNumber>$ = hb_compGenJumpFalse( 0 );
@@ -2670,7 +2666,7 @@ Cases      : CASE { hb_compLinePush(); } Expression Crlf
                   hb_compGenJumpHere( $<iNumber>5 );
                }
 
-           | Cases CASE { hb_compLinePush(); } Expression Crlf
+           | Cases CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expression Crlf
                {
                   hb_compExprDelete( hb_compExprGenPush( $4 ) );
                   $<iNumber>$ = hb_compGenJumpFalse( 0 );
@@ -2686,6 +2682,7 @@ Cases      : CASE { hb_compLinePush(); } Expression Crlf
 Otherwise  : OTHERWISE { hb_compLinePushIfDebugger(); } Crlf
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_bDontGenLineNum = FALSE;
                }
 
                 EmptyStats

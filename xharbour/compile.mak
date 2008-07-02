@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.14 2008/06/06 15:44:25 kaddath Exp $
+# $Id: compile.mak,v 1.15 2008/07/01 03:30:45 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -115,11 +115,11 @@ $(OBJ_DIR)$(DIR_SEP)pplib3$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib3.c
 $(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT) : $(PP_DIR)$(DIR_SEP)ppcore.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pptable.c
+$(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
-	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(OBJ_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(OBJ_DIR)$(DIR_SEP)hbverbld.h
+$(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
+        $(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
 
 #===============================================================================
 # HARBOUR.EXE rules

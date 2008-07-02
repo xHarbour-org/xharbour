@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.273 2008/06/23 17:52:30 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.274 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -864,9 +864,11 @@ static void hb_pp_dumpEnd( PHB_PP_STATE pState )
          }
          else if( pState->pFile->iLastLine < pState->iDumpLine )
          {
+            int i = pState->pFile->iLastLine;
+
             do
                fputc( '\n', pState->file_out );
-            while( ++pState->pFile->iLastLine < pState->iDumpLine );
+            while( ++i < pState->iDumpLine );
          }
          pBuffer = hb_membufPtr( pState->pDumpBuffer );
          ulLen = hb_membufLen( pState->pDumpBuffer );
@@ -879,7 +881,7 @@ static void hb_pp_dumpEnd( PHB_PP_STATE pState )
             if( *pBuffer++ == '\n' )
                ++iLines;
          }
-         pState->pFile->iLastLine = pState->iDumpLine + iLines + 2;
+         //pState->pFile->iLastLine = pState->iDumpLine + iLines + 2;
       }
       hb_membufFlush( pState->pDumpBuffer );
    }
@@ -5378,11 +5380,13 @@ PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState )
       }
       else if( pState->pFile->iLastLine < pState->pFile->iCurrentLine )
       {
+         int i = pState->pFile->iLastLine;
+
          do
             fputc( '\n', pState->file_out );
-         while( ++pState->pFile->iLastLine < pState->pFile->iCurrentLine );
+         while( ++i < pState->pFile->iCurrentLine );
       }
-      pState->pFile->iLastLine = pState->pFile->iCurrentLine +
+      /*pState->pFile->iLastLine = pState->pFile->iCurrentLine +*/
                hb_pp_tokenStr( pState->pTokenOut, pState->pBuffer, TRUE, TRUE,
                                pState->iLastType );
 #else

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6161 2008/07/01 16:08:53 marchuet Exp $
+ * $Id: ChangeLog,v 1.6162 2008/07/01 16:10:11 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-02 23:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * common.mak
+    + Added missing ppcore to HARBOUR_EXE_OBJS
+  * compile.mak
+    * Moved generation of pptable.c and hbverbld.h to source/pp and /include respectively
+
+  * source/compiler/harbour.sly
+    - Removed unused EmptyStatements
+    * Corrected missing line number generation after any empty line
+    * Corrected missing line number generation for CASE ... and OTHERWISE of DO CASE
+
+  * source/compiler/ppcomp.c
+  * source/pp/ppcore.c
+    * Corrected line number for #pragma BEGINDUMP...ENDDUMP
+    * Corrected line number when -P switch used
 
 2008-07-01 18:11 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source/vm/hbinet.c
