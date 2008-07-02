@@ -1,5 +1,5 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: hpdf_conf.h,v 1.1 2008/05/20 18:58:42 andijahja Exp $
  */
 
 /*
@@ -30,8 +30,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern void *hb_xgrab( unsigned long ulSize );
-extern void  hb_xfree( void * pMem );
+//extern void *hb_xgrab( unsigned long ulSize );
+//extern void  hb_xfree( void * pMem );
 #ifdef __cplusplus
 }
 #endif

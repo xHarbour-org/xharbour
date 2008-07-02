@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.232 2008/06/05 04:16:19 kaddath Exp $
+# $Id: makefile.bc,v 1.233 2008/06/06 15:44:25 kaddath Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -38,7 +38,7 @@ INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__
 HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
-LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C $(LFLAGS) c0x32.obj $**,$@,,
+LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -Llib\b32 $(LFLAGS) c0x32.obj $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
@@ -374,8 +374,8 @@ DLL_MT=mt
 # Uncomment this line when including RDDADS
 # HB_RDDADS=1
 
-# Uncomment this line when including WVTGUI
-# HB_WVTGUI=1
+# Uncomment this line when including WVG
+# HB_WVG=1
 
 #===============================================================================
 # Macro Definitions
@@ -398,12 +398,12 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# WVTGUI
+# WVG
 #===============================================================================
-!if $d(HB_WVTGUI)
+!if $d(HB_WVG)
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
-	$(WVTGUI_LIB_OBJS)
+	$(GTWVG_LIB_OBJS)
 !endif
 
 #===============================================================================
@@ -658,8 +658,8 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 +)
 !
 
-$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
-	IF EXIST "$(WVTGUI_LIB)" $(DEL) "$(WVTGUI_LIB)" > NUL
+$(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
+	IF EXIST "$(GTWVG_LIB)" $(DEL) "$(GTWVG_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
