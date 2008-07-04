@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.177 2008/03/16 19:16:03 likewolf Exp $
+ * $Id: gtwvt.c,v 1.178 2008/06/25 20:20:53 vouchcac Exp $
  */
 
 /*
@@ -1557,7 +1557,7 @@ static HWND hb_gt_wvt_CreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance
          NULL,                                                /* menu */
          hInstance,                                           /* instance */
          NULL );                                              /* lpParam */
-      
+
       if( hWnd )
       {
          ShowWindow( hWnd, iCmdShow );
@@ -2104,13 +2104,13 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
                                         CF_OEMTEXT : CF_TEXT,
                                         &szClipboardData, &ulLen ) )
             {
-               pInfo->pResult = hb_itemPutCLPtr( pInfo->pResult,
+               pInfo->pResult = hb_itemPutCPtr( pInfo->pResult,
                                                  szClipboardData,
                                                  ulLen );
             }
             else
             {
-               pInfo->pResult = hb_itemPutC( pInfo->pResult, NULL );
+               pInfo->pResult = hb_itemPutC( pInfo->pResult, "" );
             }
          }
          break;
@@ -2183,13 +2183,13 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
             {
                HMENU hSysMenu = GetSystemMenu( pWVT->hWnd, FALSE );
                LPTSTR buffer;
-               
+
                if( pWVT->pszSelectCopy )
                   hb_xfree( pWVT->pszSelectCopy );
-               
+
                pWVT->pszSelectCopy = hb_strdup( hb_itemGetCPtr( pInfo->pNewVal ) );
                pWVT->bSelectCopy = TRUE;
-               
+
                buffer = HB_TCHAR_CONVTO( pWVT->pszSelectCopy );
                ModifyMenu( hSysMenu, SYS_EV_MARK, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SYS_EV_MARK, buffer );
                HB_TCHAR_FREE( buffer );
