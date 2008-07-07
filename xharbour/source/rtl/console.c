@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.70 2008/03/23 05:25:23 andijahja Exp $
+ * $Id: console.c,v 1.71 2008/04/16 21:36:27 ronpinkas Exp $
  */
 
 /*
@@ -349,6 +349,14 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 
    if( pOutFunc == hb_conOutDev )
       pszString = hb_itemStringCon( pItem, &ulLen, &bFreeReq );
+   else
+
+   if( HB_IS_LOGICAL( pItem ) )
+      {
+      ulLen = 3;
+      bFreeReq = FALSE;
+      pszString = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
+      }
    else
       pszString = hb_itemString( pItem, &ulLen, &bFreeReq );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6164 2008/07/02 23:45:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6165 2008/07/04 04:16:29 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-07 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\console.c
+    ! fix on hb_ConOut() to show ".T."|".F." instead "T"|"F" at logical
+      items for console/print/alt devices. This was introduced on the
+      console.c v1.68 revision.
+
 2008-07-04 16:08 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt\gtwvt.c
     ! in HB_GTI_CLIPBOARDDATA
