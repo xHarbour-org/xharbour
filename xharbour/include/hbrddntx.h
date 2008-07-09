@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.40 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbrddntx.h,v 1.41 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -212,12 +212,12 @@ typedef struct _TAGINFO
    HB_NTXSCOPE top;
    HB_NTXSCOPE bottom;
 
-   BOOL        fTagName;      /* remove */
+   USHORT      Signature;
+
+   BOOL        fTagName;
    BOOL        fUsrDescend;
    BOOL        AscendKey;
    BOOL        UniqueKey;
-
-   BOOL        Signature;
 
    BOOL        Custom;
    BOOL        ChgOnly;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.56 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbrddcdx.h,v 1.57 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -259,8 +259,8 @@ typedef struct _CDXPAGE
    ULONG    Right;
 
    BYTE     PageType;
-   SHORT    iKeys;
-   SHORT    iCurKey;
+   int      iKeys;
+   int      iCurKey;
 
    BOOL     fChanged;
    BYTE     bUsed;
@@ -297,7 +297,7 @@ typedef CDXPAGE * LPCDXPAGE;
 typedef struct _CDXSTACK
 {
    LPCDXPAGE Page;
-   SHORT     iKey;
+   int       iKey;
 } CDXSTACK;
 typedef CDXSTACK * LPCDXSTACK;
 

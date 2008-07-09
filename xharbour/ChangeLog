@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6166 2008/07/07 13:10:57 modalsist Exp $
+ * $Id: ChangeLog,v 1.6167 2008/07/08 19:37:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-09 18:14 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * include\hbrddntx.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+    ! fixed casting for indexes with key length greater then 196 bytes
+      created on tables with record number smaller then 256. In such
+      case if keys have equal value then after decoding they may need
+      more then 32767 bytes and casting to SHORT gives negative indexes.
+      Thanks to Saulius Zrelskis for example.
+    % changed some SHORT to INT to reduce runtime overhead
+    synced with harbour
 
 2008-07-08 16:40 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * utils/hbmake/hbmake.prg

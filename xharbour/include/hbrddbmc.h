@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmc.h,v 1.3 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbrddbmc.h,v 1.4 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -262,8 +262,8 @@ typedef struct _CDXPAGE
    ULONG    Right;
 
    BYTE     PageType;
-   SHORT    iKeys;
-   SHORT    iCurKey;
+   int      iKeys;
+   int      iCurKey;
 
    BOOL     fChanged;
    BYTE     bUsed;
@@ -300,7 +300,7 @@ typedef CDXPAGE * LPCDXPAGE;
 typedef struct _CDXSTACK
 {
    LPCDXPAGE Page;
-   SHORT     iKey;
+   int       iKey;
 } CDXSTACK;
 typedef CDXSTACK * LPCDXSTACK;
 
@@ -531,6 +531,7 @@ typedef struct _CDXAREA
    ULONG    ulNumLocksPos;          /* Number of records locked */
    BYTE *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
+   USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */
 
    /*
    *  CDX's additions to the workarea structure
