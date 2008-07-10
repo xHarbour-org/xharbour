@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.42 2007/03/01 15:33:15 modalsist Exp $
+ * $Id: dbedit.prg,v 1.43 2008/03/13 10:49:41 likewolf Exp $
  */
 
 /*
@@ -86,6 +86,7 @@
 #include "setcurs.ch"
 #include "hbsetup.ch"
 #include "common.ch"
+#include "tbrowse.ch"
 
 /* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
  * I have used tbrowse "cargo" to assign true/false for that.
@@ -95,7 +96,8 @@
 #define DE_APPEND  3
 #endif
 
-STATIC dbe_nNextKey := 0
+STATIC s_udfkey := 0
+STATIC s_skipblock
 
 FUNCTION DBEdit(nTop,;                //  1§
                 nLeft,;               //  2§
@@ -120,8 +122,8 @@ LOCAL oTBR,;
       bFun,;
       nCursor,;
       cHdr,;
-      nIndex
-      
+      nIndex,;
+      lAppend := .f.
 
   // If no database in use we must call Errorsys() with error 2001
   //
@@ -245,6 +247,9 @@ LOCAL oTBR,;
 
   iif(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
+  // Save previous cursor format.
+  nCursor := SetCursor(SC_NONE)
+
   /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
   DispBegin()
 
@@ -255,7 +260,8 @@ LOCAL oTBR,;
   oTBR:Cargo := .F.
 
   /* E.F. 2006/04/22 - Use a custom 'skipper' to handle append mode */
-  oTBR:SkipBlock := { |x| dbe_Skipper( x, oTBR ) }
+  s_skipblock := { |x| dbe_Skipper( x, oTBR ) }
+  oTBR:SkipBlock := s_skipblock
 
 
   IF HB_ISSTRING(acHeadingSep)
@@ -270,7 +276,6 @@ LOCAL oTBR,;
      oTBR:colSep := acColumnSep
   END
 
-  nCursor := SetCursor(SC_NONE)
 
 #ifdef HB_COMPAT_C53
   // EXTENSION: Move columns inside dbedit :)
@@ -364,228 +369,163 @@ LOCAL oTBR,;
 
  NEXT
 
- IF Len(axColumns) == 1
+ IF Len(axColumns) = 1
     oTBR:setKey(K_LEFT, Nil)
     oTBR:setKey(K_RIGHT, Nil)
  END
 
- IF Empty(xUserFunc)
-   bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
+ If Empty(xUserFunc)
+    bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
  ElseIf !HB_IsLogical(xUserFunc)
-   bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
-   oTBR:setKey( K_ESC, nil )
+    bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
+    oTBR:setKey( K_ESC, nil )
  END
 
  // xHarbour extension: Initialization call
  //
- nRet := _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
+ nRet := dbe_CallUDF(bFun, DE_INIT, oTBR:colPos, oTBR)
 
- If Hb_IsLogical( xUserFunc ) .AND. !xUserFunc
-    nRet := DE_ABORT
- Endif
-
- oTBR:refreshAll()
+ oTBR:RefreshAll()
  oTBR:invalidate()
- oTBR:forceStable()
+ oTBR:ForceStable()
 
- oTBR:deHilite()
+ oTBR:DeHilite()
 
- If nRet != DE_ABORT
+ if Hb_IsLogical( xUserFunc ) .AND. ! xUserFunc
+    nRet := DE_ABORT
+ endif
 
-    i := RecNo()
-    dbGoTop()
-
-    IF dbe_Empty()
-       nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
-    END
-
-    dbGoto(i)
-
- Endif
+ if nRet != DE_ABORT
+    if dbe_emptydb()
+       nRet := dbe_CallUDF(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+    endif
+ endif
 
  dispend()
 
- /* --------------------------- */
- /* Go into the processing loop */
- /* --------------------------- */
+ lAppend := oTBR:Cargo
+
+ /////////////////////
+ // PROCESSING LOOP //
+ /////////////////////
 
  WHILE nRet != DE_ABORT
 
-    /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
-    dispbegin()
 
-    SWITCH nRet
-      CASE DE_REFRESH
-        oTBR:invalidate()
-        oTBR:refreshAll()
-        EXIT
-      CASE DE_CONT
-        oTBR:refreshCurrent()
-        EXIT
-    END
+    if nRet = DE_CONT
+       oTBR:RefreshCurrent()
 
-    oTBR:forceStable()
+    elseif nRet = DE_REFRESH
+       oTBR:RefreshAll()
+       oTBR:Invalidate()
 
-    oTBR:deHilite()
+    endif
 
-    dispend()
+    oTBR:ForceStable()
+    oTBR:Hilite()
 
-    /* 2006/JUL/10 - E.F. Don't run this code if nRet is DE_APPEND or
-     *               DE_ABORT.
-     */
-    If nRet == DE_REFRESH .OR. nRet == DE_CONT
-       If oTBR:hitTop .AND. nKey != K_CTRL_PGUP
-          nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
-       ElseIf oTBR:hitBottom .AND. nKey != K_CTRL_PGDN
-          nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
-       EndIf
-    Endif
 
-    If nRet == DE_ABORT
-       Exit
-    EndIf
+    if nRet = DE_REFRESH .and. s_udfkey = 0
+       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    else
+       nRet := DE_CONT
+    endif
 
-    IF nRet == DE_CONT .OR. nRet == DE_REFRESH
-       nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
-    ENDIF
-
-    If nRet == DE_ABORT
-       Exit
-    End 
-
-    oTBR:hilite()
-
-    IF nRet == DE_APPEND .AND. !oTBR:Cargo
-       oTBR:Cargo := .T.
-       nKey := K_DOWN
-       dbe_Setcolor( oTBR, .T. )
-    ELSE
-       IF dbe_nNextKey != 0
-          nKey := dbe_nNextkey
-          dbe_nNextKey := 0
-       ELSE 
-          /* 2007/JAN/30 - EF - Reset keyboard buffer to avoid keystrokes repetition into loop. */
-          if nextkey() != 0
-             Keyboard chr(0)
-             inkey()
-          endif
-          nKey := Inkey(0)
-       ENDIF
-    ENDIF
-
-#ifdef HB_COMPAT_C53
-    // xHarbour with 5.3 extensions code
-    IF ValType(oTBR:SetKey(nKey)) == 'B'
-       iif(oTBR:applyKey(nKey) == -1, nRet := 0, .T.)
-       LOOP
-    END
-#endif
-
-    If ValType(SetKey(nKey)) == 'B'
-       Eval(SetKey(nKey), ProcName(1), ProcLine(1), "")
-       Loop
-    End
-
-#ifdef HB_COMPAT_C53
-
-    // got a key exception
-    //
-    oTBR:refreshCurrent()
-    oTBR:stabilize()
-    oTBR:hilite()
-
-    nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
-#else
-    // xHarbour without 5.3 extensions code
-    Switch nKey
-      Case K_DOWN
-        oTBR:down()
-        Exit
-      Case K_UP
-        oTBR:up()
-        Exit
-      Case K_LEFT
-        oTBR:left()
-        Exit
-      Case K_RIGHT
-        oTBR:right()
-        Exit
-      Case K_PGDN
-        oTBR:pageDown()
-        Exit
-      Case K_PGUP
-        oTBR:pageUp()
-        Exit
-      Case K_CTRL_PGUP
-        oTBR:goTop()
-        Exit
-      Case K_CTRL_PGDN
-        oTBR:goBottom()
-        Exit
-      Case K_HOME
-        oTBR:home()
-        Exit
-      Case K_END
-        oTBR:end()
-        Exit
-      Case K_CTRL_HOME
-        oTBR:panHome()
-        Exit
-      Case K_CTRL_END
-        oTBR:panEnd()
-        Exit
-      Case K_CTRL_LEFT
-        oTBR:panLeft()
-        Exit
-      Case K_CTRL_RIGHT
-        oTBR:panRight()
-        Exit
-      #ifdef HB_COMPAT_C53
-      // EXTENSION: Move columns inside dbedit :)
-      Case K_CTRL_UP
-      Case K_CTRL_DOWN
-        _MoveCol(oTBR, nKey)
-        Exit
-      #endif
-      Default
-       // got a key exception
-       oTBR:refreshCurrent()
-       oTBR:stabilize()
-       oTBR:hilite()
-       nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
-    End
-
-#endif
-
-    IF oTBR:Cargo
-       oTBR:Cargo := .F.
-       dbe_Setcolor( oTBR,.F.)
-    ENDIF
-
-    /* E.F. 2006/04/27 - Clean the keyboard buffer after each loop to
-     * reset lastkey() value.
-     */
-    IF nRet == DE_CONT
-       Keyboard chr(0)
-       Inkey()
-    ENDIF
-
-    IF nRet == DE_ABORT
+    if nRet = DE_ABORT
        EXIT
-    ENDIF
+    endif
+
+    if nRet = DE_CONT
+
+       if oTBR:HitTop
+          nRet := dbe_CallUDF(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+       elseif oTBR:HitBottom
+          nRet := dbe_CallUDF(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+       endif
+
+    endif
+
+    if nRet = DE_CONT .and. ! oTBR:Cargo .and. nKey = 0 .and. s_udfkey = 0
+
+       if dbe_emptydb()
+          nRet := dbe_CallUDF(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+       endif
+
+    endif
 
 
-    // userfunc could delete recs...
-    i := RecNo()
+    if nRet = DE_ABORT
+       Exit
 
-    dbGoTop()
+    elseif nRet = DE_REFRESH
+       LOOP
 
-    If dbe_Empty()
-       nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
-    End
+    elseif nRet = DE_APPEND .and. ! oTBR:Cargo
 
-    dbGoto(i)
+       oTBR:Cargo := .T.
+       lAppend := .T.
 
+       if ! eof() .or. !dbe_emptydb()
+          oTBR:Down()
+       endif
+
+       oTBR:ForceStable()
+       oTBR:Cargo := .F.
+       nRet := DE_CONT
+
+    endif
+
+    if ! empty( s_udfkey ) .and. empty(nKey)
+       nKey := s_udfkey
+       s_udfkey := 0
+       keyboard chr(nKey)
+       inkey()
+
+    else
+
+       /* 2007/JAN/30 - EF - Reset keyboard buffer to avoid keystrokes repetition into loop. */
+       if Nextkey() != 0
+          dbe_ClearKB()
+       endif
+       nKey := Inkey(0)
+
+    endif
+
+    if dbe_ProcessKey(nKey, oTBR) = DE_ABORT
+       EXIT
+    endif
+
+    oTBR:ForceStable()
+
+    if ValType( SetKey(nKey) ) == 'B'
+       Eval( SetKey(nKey), ProcName(1), ProcLine(1), "")
+    endif
+
+    if nKey != 0
+       nRet := dbe_CallUDF(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+
+       nKey := 0
+
+       if lAppend .and. nRet != DE_ABORT
+          lAppend := .F.
+          oTBR:GoBottom()
+       endif
+
+       if nRet = DE_ABORT
+          EXIT
+
+       elseif nRet = DE_REFRESH
+          LOOP
+
+       endif
+
+    endif
+
+    oTBR:ForceStable()
+
+    if nRet = DE_CONT .and. s_udfkey = 0 .and. NextKey() = 0 
+       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    endif
 
  ENDDO
 
@@ -594,107 +534,124 @@ LOCAL oTBR,;
 
 RETURN .T.
 
-#ifdef HB_COMPAT_C53
-Static Function _MoveCol(oTBR, nKey)
-Local oTBR1, oTBR2
+*------------------------------------------------------*
+STATIC FUNCTION dbe_CallUDF(bFun, nMode, nColPos, oTBR)
+*------------------------------------------------------*
+LOCAL nRet, nRec, nKey, i, j
 
-  If nKey == K_CTRL_DOWN .And. oTBR:colPos < oTBR:colCount
-    oTBR1 := oTBR:getColumn(oTBR:colPos)
-    oTBR2 := oTBR:getColumn(oTBR:colPos + 1)
-    oTBR:setColumn(oTBR:colPos, oTBR2)
-    oTBR:SetColumn(oTBR:colPos + 1, oTBR1)
-    oTBR:colPos++
-    oTBR:invalidate()
-  ElseIf nKey == K_CTRL_UP .And. oTBR:colPos > 1
-    oTBR1 := oTBR:getColumn(oTBR:colPos)
-    oTBR2 := oTBR:getColumn(oTBR:colPos - 1)
-    oTBR:setColumn(oTBR:colPos, oTBR2)
-    oTBR:SetColumn(oTBR:colPos - 1, oTBR1)
-    oTBR:colPos--
-    oTBR:invalidate()
-  End
-Return Nil
-#endif
+  nRet := DE_CONT
 
-*------------------------------------------------------
-STATIC FUNCTION _DoUserFunc(bFun, nMode, nColPos, oTBR)
-LOCAL nRet, nRec, nKey
+  if nMode = DE_INIT
 
-  IF nMode == DE_EXCEPT
-     oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{2,1})
-  ELSEIF nMode == DE_INIT
      nKey := NextKey()
+
      if nKey == K_ENTER .or. nKey == K_ESC
         inkey()
         Return DE_ABORT
      endif
-     oTBR:ForceStable()
+
      while nKey != 0
-        oTbr:ApplyKey( nKey )
         inkey()
+        dbe_ProcessKey( nKey, oTBR )
+        nRet := dbe_return( Eval(bFun, DE_EXCEPT, nColPos, oTBR) )
+        if nRet = DE_ABORT
+           EXIT
+        elseif nRet = DE_REFRESH
+           oTBR:RefreshAll()
+           oTBR:ForceStable()
+        elseif nRet = DE_CONT
+           oTBR:RefreshCurrent()
+           oTBR:ForceStable()
+        endif
         nKey := NextKey()
      enddo
-  ENDIF
+
+     if nRet != DE_ABORT
+        nRet := dbe_return( Eval(bFun, DE_INIT, nColPos, oTBR) )
+     endif
+
+     Return nRet
+
+  elseif nMode = DE_EXCEPT
+
+     oTBR:DeHilite()
+     oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{1,2})
+
+  endif
 
   nRec := RecNo()
 
-  nRet := Eval(bFun, nMode, nColPos, oTBR)
+  // Call UDF
+  nRet := dbe_return( Eval(bFun, nMode, nColPos, oTBR) )
 
-  IF HB_ISNUMERIC(nRet) .AND. ( nRet == DE_ABORT .OR. nRet == DE_APPEND )
+  if nRet != DE_ABORT
+     s_udfkey := NextKey()
+     dbe_ClearKB()
+  endif
+
+  if nRet = DE_ABORT .OR. nRet = DE_APPEND
      Return nRet
-  ENDIF
+  endif
 
-  IF RecNo() != nRec .And. nRet != DE_ABORT
+  // The UDF has updated, appended or deleted record, dbedit need refresh.
+  if RecNo() != nRec
      nRet := DE_REFRESH
-  ENDIF
-
-  IF !HB_ISNUMERIC(nRet) .Or. nRet < DE_ABORT .Or. nRet > DE_APPEND
-     nRet := DE_CONT
-  ENDIF
+  endif
 
 
   /*****************************************************************/
   /* This part of code was borrowed from old dbedit code (harbour) */
   /*****************************************************************/
 
+  if Eof() .and. nMode != DE_EMPTY
+     dbSkip(-1)
+  endif
 
-  IF Eof() .AND. nMode != DE_EMPTY
-     dbSkip( -1 )
-  ENDIF
+  if ( nRet = DE_REFRESH .or. nRec != RecNo() )
 
-  IF nRet == DE_REFRESH .OR. nRec != RecNo()
+     if nRet != DE_ABORT
 
-     IF nRet != DE_ABORT
+        // if UDF has deleted record, dbedit need repos record.
+        //
+        if ( Set( _SET_DELETED ) .AND. Deleted() ) .OR. (!Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
 
-        IF ( Set( _SET_DELETED ) .AND. Deleted() ) .OR. (!Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
-           dbSkip( 1 )
-        END
+           if ! eof()
+              dbSkip(1)
+           endif
+        
+           nRet := DE_REFRESH
 
-        IF Eof()
-           dbGoBottom()
-        END
+        endif
 
         nRec := RecNo()
 
-        oTBR:RefreshAll():forcestable()
+        if nRet = DE_REFRESH
+           oTBR:RefreshAll()
+           oTBR:Invalidate()
+           oTBR:ForceStable()
+        endif
 
-        WHILE nRec != RecNo()
-           oTBR:Up():forcestable()
-        END
-     END
+        if nRec != Recno()
 
-  ELSE
-    oTBR:RefreshCurrent()
-  END
+           j := recno()
 
-  /******************************************/
+           if nRec > j
+              for i := 1 to nRec - j
+                  dbskip(-1)
+              next
+           else
+              for i := 1 to j - nRec
+                  dbSkip(1)
+              next
+           endif
 
-  /* E.F. 2006/04/27 - Userfunc can put keystrokes, so we need
-   * get the pending keys, after DE_EXCEPT event.
-   */ 
-  IF nMode == DE_EXCEPT .AND. nRet == DE_CONT
-     dbe_nNextKey := Nextkey()
-  ENDIF
+           nRet := DE_REFRESH
+
+        endif
+
+     endif
+
+  endif
 
 RETURN nRet
 
@@ -712,13 +669,16 @@ RETURN nRet
 *  append mode is turned on. This function was based from:
 *  clipper\source\samples\tbdemo.prg
 */
+
+*-----------------------------------------*
 STATIC FUNCTION dbe_Skipper( nSkip, oTb )
+*-----------------------------------------*
 
    LOCAL lAppend := oTb:Cargo
    LOCAL i       := 0
 
    do case
-   case ( nSkip == 0 .or. lastrec() == 0 )
+   case ( nSkip = 0 .or. lastrec() = 0 )
       // Skip 0 (significant on a network)
       dbSkip( 0 )
 
@@ -726,17 +686,16 @@ STATIC FUNCTION dbe_Skipper( nSkip, oTb )
       while ( i < nSkip )           // Skip Foward
 
          dbskip( 1 )
-
-         if eof()
-            iif( lAppend, i++, dbskip( -1 ) )
-            exit
-
-         endif
-
          i++
 
+         if eof() .and. ! lAppend
+            dbskip( -1 )
+            i--
+            exit
+         endif
+
       enddo
-      
+
    case ( nSkip < 0 )
       while ( i > nSkip )           // Skip backward
 
@@ -752,46 +711,143 @@ STATIC FUNCTION dbe_Skipper( nSkip, oTb )
       enddo
 
    endcase
-   
+
 RETURN i
 
+
+#ifdef HB_COMPAT_C53
+Static Function _MoveCol(oTBR, nKey)
+Local oTBR1, oTBR2
+
+  If nKey = K_CTRL_DOWN .And. oTBR:colPos < oTBR:colCount
+    oTBR1 := oTBR:getColumn(oTBR:colPos)
+    oTBR2 := oTBR:getColumn(oTBR:colPos + 1)
+    oTBR:setColumn(oTBR:colPos, oTBR2)
+    oTBR:SetColumn(oTBR:colPos + 1, oTBR1)
+    oTBR:colPos++
+    oTBR:invalidate()
+  ElseIf nKey = K_CTRL_UP .And. oTBR:colPos > 1
+    oTBR1 := oTBR:getColumn(oTBR:colPos)
+    oTBR2 := oTBR:getColumn(oTBR:colPos - 1)
+    oTBR:setColumn(oTBR:colPos, oTBR2)
+    oTBR:SetColumn(oTBR:colPos - 1, oTBR1)
+    oTBR:colPos--
+    oTBR:invalidate()
+  End
+Return Nil
+#endif
+
+
 /****
  *
- *  dbe_Setcolor()
- *
- *  Configure columns color for edit in append mode or not.
- */
-STATIC FUNCTION dbe_Setcolor( oTb, lEdit )
-LOCAL i,oCol,aDefColor,aRect,aColor
-
-aRect    := {oTb:rowpos,oTb:leftvisible,oTb:rowpos,oTb:rightvisible}
-aColor   := iif(lEdit,{1,2},{2,1})
-aDefColor:= iif(lEdit,{2,1},{1,2})
-
-FOR i := 1 TO oTb:ColCount
-    oCol := oTb:GetColumn(i)
-    oCol:DefColor := aDefColor
-NEXT
-
-oTb:ColorRect(aRect,aColor)
-
-RETURN NIL
-
-/****
- *
- *  dbe_Empty()
+ *  dbe_emptydb()
  *
  *  Verify if the dbf in the current workarea is empty.
  */
-STATIC FUNCTION dbe_Empty()
+
+*-------------------------------------*
+STATIC FUNCTION dbe_emptydb()
+*-------------------------------------*
 Local lEmpty
 
  IF !Empty( dbFilter() )
     lEmpty := eof()
- ELSEIF IndexOrd() == 0
-    lEmpty := ( ( Eof() .OR. RecNo() == LastRec() + 1) .AND. Bof() )
+ ELSEIF IndexOrd() = 0
+    lEmpty := ( ( Eof() .OR. RecNo() = LastRec() + 1) .AND. Bof() )
  ELSE
-    lEmpty := ( OrdKeyCount() == 0  )
+    lEmpty := ( OrdKeyCount() = 0  )
  ENDIF
 
 RETURN lEmpty
+
+*------------------------------------------*
+STATIC FUNCTION dbe_processKey( nKey, oTb )
+*------------------------------------------*
+Local nRet := DE_CONT
+
+#ifdef HB_COMPAT_C53
+
+    if oTb:ApplyKey( nKey ) = TBR_EXIT
+       nRet := DE_ABORT
+    endif
+
+#else
+
+    // xHarbour without 5.3 extensions code
+    Switch nKey
+      Case K_DOWN
+        oTb:down()
+        Exit
+      Case K_UP
+        oTb:up()
+        Exit
+      Case K_LEFT
+        oTb:left()
+        Exit
+      Case K_RIGHT
+        oTb:right()
+        Exit
+      Case K_PGDN
+        oTb:pageDown()
+        Exit
+      Case K_PGUP
+        oTb:pageUp()
+        Exit
+      Case K_CTRL_PGUP
+        oTb:goTop()
+        Exit
+      Case K_CTRL_PGDN
+        oTb:goBottom()
+        Exit
+      Case K_HOME
+        oTb:home()
+        Exit
+      Case K_END
+        oTb:end()
+        Exit
+      Case K_CTRL_HOME
+        oTb:panHome()
+        Exit
+      Case K_CTRL_END
+        oTb:panEnd()
+        Exit
+      Case K_CTRL_LEFT
+        oTb:panLeft()
+        Exit
+      Case K_CTRL_RIGHT
+        oTb:panRight()
+        Exit
+    End
+
+#endif
+
+Return nRet
+
+*------------------------------------*
+STATIC PROCEDURE dbe_ClearKB()
+*------------------------------------*
+
+keyboard chr(0)
+inkey()
+
+RETURN
+
+STATIC PROCEDURE dbe_SkipOff(o)
+ o:SkipBlock := NIL
+RETURN
+
+STATIC PROCEDURE dbe_SkipOn(o)
+ o:SkipBlock := s_SkipBlock
+RETURN
+
+*----------------------------------*
+STATIC FUNCTION dbe_Return( n )
+*----------------------------------*
+
+if ! hb_isnumeric( n )
+   n := DE_CONT
+elseif n < DE_ABORT .or. n > DE_APPEND
+   n := DE_CONT
+endif
+
+Return n

@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.9 2006/10/30 13:45:53 modalsist Exp $
+ * $Id: browdb.prg,v 1.10 2007/08/20 19:32:38 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
 
-   LOCAL oBrowse := TBrowse():New( nTop, nLeft, nBottom, nRight )
+LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
 
 #ifdef HB_COMPAT_XPP
    oBrowse:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
@@ -64,7 +64,7 @@ FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
    oBrowse:GoTopBlock    := { || dbGoTop() }
    oBrowse:GoBottomBlock := { || dbGoBottom() }
 
-   RETURN oBrowse
+RETURN oBrowse
 
 #ifndef HB_COMPAT_XPP
 STATIC FUNCTION Skipped( nRecs )
@@ -96,3 +96,4 @@ STATIC FUNCTION Skipped( nRecs )
 
    RETURN nSkipped
 #endif
+

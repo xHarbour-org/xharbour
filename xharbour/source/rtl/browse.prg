@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.13 2008/01/30 00:20:05 modalsist Exp $
+ * $Id: browse.prg,v 1.14 2008/03/13 10:49:41 likewolf Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "inkey.ch"
 #include "setcurs.ch"
 #include "dbinfo.ch"
+#include "common.ch"
 
 static bBlock := { || setcursor( iif( readinsert(!readinsert()), SC_NORMAL, SC_INSERT )) }
 static s_ldbEmpty
@@ -175,20 +176,26 @@ function Browse( nTop, nLeft, nBottom, nRight )
       switch nKey
 
          case K_DOWN
-            s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
-            oBrw:Down()
-            exit
-
-         case K_UP
-            if eof()
-               lRefresh := .t.
-            else
-               oBrw:Up()
+            if !eof()
+               s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
+               oBrw:Down()
             endif
             exit
 
-         case K_PGUP
+         case K_UP
+
             if eof()
+               oBrw:RefreshCurrent()
+               lRefresh := .t.
+            endif
+            oBrw:Up()
+            exit
+
+         case K_PGUP
+
+            if eof()
+               oBrw:RefreshCurrent()
+               oBrw:Up()
                lRefresh := .t.
             else
                oBrw:PageUp()
@@ -197,16 +204,21 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
          case K_PGDN
 
-            s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
-            if s_ldbAppend
-               oBrw:Down()
-            else
-               oBrw:PageDown()
+            if !eof()
+               s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
+               if s_ldbAppend
+                  oBrw:Down()
+               else
+                  oBrw:PageDown()
+               endif
             endif
             exit
 
          case K_CTRL_PGUP
+
             if eof()
+               oBrw:RefreshCurrent()
+               oBrw:Up()
                lRefresh := .t.
             else
                oBrw:GoTop()
@@ -214,6 +226,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
          case K_CTRL_PGDN
+
             if eof()
                lRefresh := .t.
             endif
@@ -281,10 +294,10 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
       end
 
-      if ( lRefresh )
-         lRefresh := .f.
+      if lRefresh
          s_ldbAppend := .f.
-         freshorder(oBrw)
+         freshorder(oBrw, lRefresh)
+         lRefresh := .f.
          CursorOff()
       endif
 
@@ -484,21 +497,25 @@ static function EXITKEY( lExit, oBrw )
 
 return nReturn
 
-*------------------------------------
-static function FRESHORDER( oBrowse )
+*-----------------------------------------------*
+static function FRESHORDER( oBrowse, lRefresh )
 
 local nRec := RecNo()
 
-   oBrowse:refreshall()
+default lRefresh to .f.
 
-   do while ( !oBrowse:stabilize() )
-   enddo
+   if lRefresh
+      oBrowse:RefreshAll()
+   endif
+
+   if ! oBrowse:Stable
+      oBrowse:ForceStable()
+   endif
 
    if eof()
-      do while ( RecNo() != nRec .AND. !BOF() )
+      while ( RecNo() != nRec .AND. !BOF() )
          oBrowse:up()
-         do while ( !oBrowse:stabilize() )
-         enddo
+         oBrowse:forcestable()
       enddo
    endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6167 2008/07/08 19:37:31 lculik Exp $
+ * $Id: ChangeLog,v 1.6168 2008/07/09 16:10:28 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-09 23:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbrowse.prg
+    * This new TBrowse code was strongly modified to fix pending bugs,
+      to speed-up navigation under files with more than 64 columns and
+      general optimizations. 
+    * From today, don't use TBrowse():New() syntax. This is not Clipper
+      compliant. Use TBrowseNew() or TBrowseDB() functions instead. If you
+      use TBrowse():New() syntax an error will be generated.
+
+  * source\rtl\browdb.prg
+    * changed TBrowse():New() syntax to TBrowseNew().
+
+  * source\rtl\browse.prg
+  * source\rtl\dbedit.prg
+    * synched with TBrowse changes.
 
 2008-07-09 18:14 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbrddbmc.h
