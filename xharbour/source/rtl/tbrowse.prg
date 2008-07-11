@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.195 2008/05/20 00:57:59 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.197 2008/07/10 02:56:16 modalsist Exp $
  */
 
 /*
@@ -705,7 +705,11 @@ Local nColIndex
 RETURN nColIndex
 
 *------------------------------------------------------*
+#ifdef HB_EXTENSION
+CLASS TBrowse
+#else
 CLASS TBrowse STATIC
+#endif
 *------------------------------------------------------*
                                                 
    ACCESS AutoLite         INLINE ::lAutoLite     // Logical value to control highlighting
@@ -3612,10 +3616,11 @@ STATIC FUNCTION EmptyStr( cStr )
 Return !( Hb_IsString( cStr ) .and. Len( cStr ) > 0 )
 
 
-************************************************************************
-** To USE TBrowse call TBrowseNew() or TBrwoseDB() functions ONLY.    **
-** Don't use TBrowse():New() way. This will return an error.          **
-************************************************************************
+*******************************************************************
+** if you don't use HB_EXTENSION as compile flag, you must call  **
+** TBrowseNew() or TBrwoseDB() functions to activate TBrowse.    **
+** To use TBrowse():New() syntax you must set HB_EXTENSION       **
+*******************************************************************
 
 *---------------------------------------------------*
 FUNCTION TBrowseNew( nTop, nLeft, nBottom, nRight )

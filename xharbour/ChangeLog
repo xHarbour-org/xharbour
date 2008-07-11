@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6168 2008/07/09 16:10:28 marchuet Exp $
+ * $Id: ChangeLog,v 1.6169 2008/07/10 02:56:15 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-11 12:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbrowse.prg
+    * changed Tbrowse class declaration for Clipper compatibility.
+      #ifdef HB_EXTENSION
+      CLASS TBrowse
+      #else
+      CLASS TBrowse STATIC
+      #endif
+
+  * source\rtl\dbedit.prg
+    ! fix on refresh method after append or delete record.
 
 2008-07-09 23:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.43 2008/03/13 10:49:41 likewolf Exp $
+ * $Id: dbedit.prg,v 1.44 2008/07/10 02:56:16 modalsist Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
 #include "hbsetup.ch"
 #include "common.ch"
 #include "tbrowse.ch"
+#include "dbinfo.ch"
 
 /* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
  * I have used tbrowse "cargo" to assign true/false for that.
@@ -98,6 +99,8 @@
 
 STATIC s_udfkey := 0
 STATIC s_skipblock
+STATIC s_lFileChanged := .f.
+
 
 FUNCTION DBEdit(nTop,;                //  1§
                 nLeft,;               //  2§
@@ -117,13 +120,17 @@ FUNCTION DBEdit(nTop,;                //  1§
 LOCAL oTBR,;
       oTBC,;
       i,;
-      nRet := DE_REFRESH,;
-      nKey := Nil,;
+      nRet,;
+      nKey,;
       bFun,;
       nCursor,;
       cHdr,;
       nIndex,;
-      lAppend := .f.
+      lAppend
+
+
+  nRet := DE_REFRESH
+  lAppend := .f.
 
   // If no database in use we must call Errorsys() with error 2001
   //
@@ -409,8 +416,8 @@ LOCAL oTBR,;
  // PROCESSING LOOP //
  /////////////////////
 
- WHILE nRet != DE_ABORT
 
+ WHILE nRet != DE_ABORT
 
     if nRet = DE_CONT
        oTBR:RefreshCurrent()
@@ -419,11 +426,23 @@ LOCAL oTBR,;
        oTBR:RefreshAll()
        oTBR:Invalidate()
 
+       if s_udfkey != 0
+          oTBR:GoTop()
+       else
+          if s_lFileChanged
+             oTBR:GoTop()
+          endif
+          oTBR:ForceStable()
+          if lAppend 
+             lAppend := .F.
+             oTBR:GoBottom()
+          endif
+          s_lFileChanged := .F.
+       endif
     endif
 
     oTBR:ForceStable()
     oTBR:Hilite()
-
 
     if nRet = DE_REFRESH .and. s_udfkey = 0
        nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
@@ -506,11 +525,6 @@ LOCAL oTBR,;
 
        nKey := 0
 
-       if lAppend .and. nRet != DE_ABORT
-          lAppend := .F.
-          oTBR:GoBottom()
-       endif
-
        if nRet = DE_ABORT
           EXIT
 
@@ -537,7 +551,7 @@ RETURN .T.
 *------------------------------------------------------*
 STATIC FUNCTION dbe_CallUDF(bFun, nMode, nColPos, oTBR)
 *------------------------------------------------------*
-LOCAL nRet, nRec, nKey, i, j
+LOCAL nRet, nRec, nKey, i, j, nLastRec
 
   nRet := DE_CONT
 
@@ -580,9 +594,13 @@ LOCAL nRet, nRec, nKey, i, j
   endif
 
   nRec := RecNo()
+  nLastRec := LastRec()
 
   // Call UDF
   nRet := dbe_return( Eval(bFun, nMode, nColPos, oTBR) )
+
+  // if file was changed under UDF.
+  s_lFileChanged := ( LastRec() != nLastRec )
 
   if nRet != DE_ABORT
      s_udfkey := NextKey()
@@ -594,7 +612,7 @@ LOCAL nRet, nRec, nKey, i, j
   endif
 
   // The UDF has updated, appended or deleted record, dbedit need refresh.
-  if RecNo() != nRec
+  if s_lFileChanged .or. nRec != Recno()
      nRet := DE_REFRESH
   endif
 
