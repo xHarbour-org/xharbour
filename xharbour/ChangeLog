@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6169 2008/07/10 02:56:15 modalsist Exp $
+ * $Id: ChangeLog,v 1.6170 2008/07/11 15:42:39 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-12 11:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * include\hbsetup.ch
+    + added:
+      #ifdef HB_EXTENSION
+         #define HB_EXT_INKEY 
+      #endif
+
+  * mdir.bat
+    + added "gtwvt.lib" on "REMOVE" session.
+
+  * contrib.pc
+    - wvtgui.lib.
+    + gtwvg.lib.
+
+  * contrib.pc
+  * hrbdll.pc
+  * makefile.pc
+    - removed /D"HB_EXT_INKEY" from CLIBFLAGS since is on hbsetup.ch
+
+  * make_pc.bat
+    ! fix :contribs session.
 
 2008-07-11 12:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.4 2006/10/12 17:25:28 ronpinkas Exp $
+ * $Id: hbsetup.ch,v 1.5 2007/09/16 00:43:49 paultucker Exp $
  */
 
 /*
@@ -82,7 +82,11 @@
 /* #define HB_FILE_VER_STATIC */  /* Enable inclusion of file version strings */
 
 /*#define HB_CLS_ENFORCERO */     /* Activate the RO checking on OO DATA    */
+
                                   /* when not called from a constructor     */
+#ifdef HB_EXTENSION              
+   #define HB_EXT_INKEY           /* Enable Extended Inkey codes */
+#endif
 
 #endif /* HB_SETUP_CH_ */
 

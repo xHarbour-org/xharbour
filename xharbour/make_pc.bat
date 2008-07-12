@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.28 2008/05/07 04:58:33 andijahja Exp $
+rem $Id: make_pc.bat,v 1.29 2008/06/04 14:41:10 guerra000 Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -136,7 +136,8 @@ rem=============================================================================
    SET HB_MT_DIR=
    @CALL MDIR.BAT
    POMAKE /F contrib.pc  >cont_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto CONTRIBS_ERR
+   goto CONTRIBS_OK
 
 rem=============================================================================
 :CONTRIBS_OK
