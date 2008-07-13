@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6170 2008/07/11 15:42:39 modalsist Exp $
+ * $Id: ChangeLog,v 1.6171 2008/07/12 14:10:18 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-07-12 21:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * compile.mak
+    * Hack to force recompile of hbslex.c if harbour.slx is newer
+    * Hack to force recompile of macroslx.c if macro.slx is newer
+      /*
+         Sorry I don't know how to use depndancy rules to avoid the hack
+         Please revise if possible.
+
+         Same should be done for all include\*.c
+       */
+
+  * source/compiler/ppcomp.c
+    * Fixed wrong line number when begindump and/or C inline sections preceded by empty line[s]
+
 2008-07-12 11:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * include\hbsetup.ch
     + added:
       #ifdef HB_EXTENSION
-         #define HB_EXT_INKEY 
+         #define HB_EXT_INKEY
       #endif
 
   * mdir.bat
@@ -46,7 +60,7 @@
   * source\rtl\tbrowse.prg
     * This new TBrowse code was strongly modified to fix pending bugs,
       to speed-up navigation under files with more than 64 columns and
-      general optimizations. 
+      general optimizations.
     * From today, don't use TBrowse():New() syntax. This is not Clipper
       compliant. Use TBrowseNew() or TBrowseDB() functions instead. If you
       use TBrowse():New() syntax an error will be generated.

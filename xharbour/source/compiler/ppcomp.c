@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.7 2008/06/20 03:46:27 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.8 2008/07/02 18:26:04 ronpinkas Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,
    PINLINE pInline;
 
    HB_SYMBOL_UNUSED( cargo );
-   hb_comp_iLine = iLine;
+   //hb_comp_iLine = iLine + 1;
    pInline = hb_compInlineAdd( NULL );
    pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
    memcpy( pInline->pCode, pBuffer, ulSize );
@@ -64,7 +64,7 @@ static void hb_pp_hb_inLine( void * cargo, char * szFunc,
                              char * pBuffer, ULONG ulSize, int iLine )
 {
    HB_SYMBOL_UNUSED( cargo );
-   hb_comp_iLine = iLine + 1;
+   //hb_comp_iLine = iLine + 1;
    if( hb_comp_iLanguage != LANG_C && hb_comp_iLanguage != LANG_OBJ_MODULE )
    {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_REQUIRES_C, NULL, NULL );

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.15 2008/07/01 03:30:45 ronpinkas Exp $
+# $Id: compile.mak,v 1.16 2008/07/02 18:26:04 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -132,6 +132,11 @@ $(OBJ_DIR)$(DIR_SEP)harboury.c : $(COMPILER_DIR)$(DIR_SEP)harbour.sly
 
 $(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
 	$(CC_CMD)
+
+$(COMPILER_DIR)$(DIR_SEP)hbslex.c : $(COMPILER_DIR)$(DIR_SEP)harbour.slx
+        TYPE $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp
+        DEL $(COMPILER_DIR)$(DIR_SEP)hbslex.c
+        REN $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp hbslex.c
 
 $(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbslex.c
 	$(CC_CMD)
@@ -1610,6 +1615,11 @@ $(OBJ_DIR)$(DIR_SEP)macroy.c : $(MACRO_DIR)$(DIR_SEP)macro.y
 
 $(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
 	$(CC_CMD)
+
+$(MACRO_DIR)$(DIR_SEP)macroslx.c : $(MACRO_DIR)$(DIR_SEP)macro.slx
+        TYPE $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp
+        DEL $(MACRO_DIR)$(DIR_SEP)macroslx.c
+        REN $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp macroslx.c
 
 $(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroslx.c
 	$(CC_CMD)
