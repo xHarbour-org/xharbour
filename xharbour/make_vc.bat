@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.22 2008/05/06 05:47:52 andijahja Exp $
+rem $Id: make_vc.bat,v 1.23 2008/05/07 04:58:33 andijahja Exp $
 rem
 rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
@@ -166,11 +166,10 @@ rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
-   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
-   IF "%2"=="nobuild" @ECHO ****** End of Job *****
-   IF "%2"=="NOBUILD" goto EXIT
-   IF "%2"=="nobuild" goto EXIT
-   goto BUILD_ALL
+   IF "%2"=="BUILD" goto BUILD_ALL
+   IF "%2"=="build" goto BUILD_ALL
+   @ECHO ****** End of Job *****
+   goto EXIT
 
 rem=============================================================================
 :EXIT

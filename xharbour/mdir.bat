@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.9 2008/07/01 03:30:45 ronpinkas Exp $
+rem $Id: mdir.bat,v 1.10 2008/07/12 14:10:25 modalsist Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -462,7 +462,7 @@ goto EXIT
 rem=============================================================================
 :_SYNTAX
 rem=============================================================================
-ECHO. Syntax:    make_%SUB_DIR% [all, core, dll, contrib, clean] [nomt] [nobuild]
+ECHO. Syntax:    make_%SUB_DIR% [all, core, dll, contrib, clean] [nomt] [build]
 ECHO.
 ECHO. Argument:
 ECHO.  default : build xHarbour CORE files
@@ -470,13 +470,14 @@ ECHO.  core    : build xHarbour CORE files
 ECHO.  all     : build CORE, DLL and CONTRIB
 ECHO.  dll     : build xHarbour DLL
 ECHO.  contrib : build CONTRIB Libraries
-ECHO.  clean   : erase files once built and rebuild ALL
+ECHO.  clean   : erase files once built and don't rebuild
 ECHO.
 ECHO. Examples:
 ECHO.  make_%SUB_DIR%               : build ST and MT system files
 ECHO.  make_%SUB_DIR% nomt          : ST core only, don't build MT system files
 ECHO.  make_%SUB_DIR% clean nomt    : clean build, don't build MT system files
-ECHO.  make_%SUB_DIR% clean nobuild : clean only, don't build
+ECHO.  make_%SUB_DIR% clean         : clean only, don't build
+ECHO.  make_%SUB_DIR% clean build   : clean only, then rebuild ALL
 ECHO.
 goto EXIT
 

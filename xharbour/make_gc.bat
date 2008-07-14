@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_gc.bat,v 1.12 2008/05/06 05:47:52 andijahja Exp $
+rem $Id: make_gc.bat,v 1.13 2008/05/07 04:58:33 andijahja Exp $
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR MINGW32
@@ -173,11 +173,10 @@ rem=============================================================================
    IF EXIST make0_%SUB_DIR%.log	DEL make0_%SUB_DIR%.log
    IF EXIST cont0_%SUB_DIR%.log	DEL cont0_%SUB_DIR%.log
    IF EXIST dll0_%SUB_DIR%.log	DEL dll0_%SUB_DIR%.log
-   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
-   IF "%2"=="nobuild" @ECHO ****** End of Job *****
-   IF "%2"=="NOBUILD" goto EXIT
-   IF "%2"=="nobuild" goto EXIT
-   goto BUILD_ALL
+   IF "%2"=="BUILD" goto BUILD_ALL
+   IF "%2"=="build" goto BUILD_ALL
+   @ECHO ****** End of Job *****
+   goto EXIT
 
 rem=============================================================================
 :EXIT

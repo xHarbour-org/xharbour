@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6171 2008/07/12 14:10:18 modalsist Exp $
+ * $Id: ChangeLog,v 1.6172 2008/07/13 01:45:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-13 19:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * mdir.bat
+  * make_b32.bat
+  * make_dc.bat
+  * make_gc.bat
+  * make_pc.bat
+  * make_vc.bat
+  * make_w32.bat
+    ! CLEAN param now only cleans like original make system. If you want
+      to build after cleanup pass BUILD as the 2nd param.  Only tested
+      with Borland.  Please test with other compilers.
+   
+      make_???.bat clean
+      make_???.bat clean build
 
 2008-07-12 21:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * compile.mak

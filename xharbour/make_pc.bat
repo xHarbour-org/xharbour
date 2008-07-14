@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.29 2008/06/04 14:41:10 guerra000 Exp $
+rem $Id: make_pc.bat,v 1.30 2008/07/12 14:10:25 modalsist Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -172,11 +172,10 @@ rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
-   IF "%2"=="NOBUILD" @ECHO ****** End of Job *****
-   IF "%2"=="nobuild" @ECHO ****** End of Job *****
-   IF "%2"=="NOBUILD" goto EXIT
-   IF "%2"=="nobuild" goto EXIT
-   goto BUILD_ALL
+   IF "%2"=="BUILD" goto BUILD_ALL
+   IF "%2"=="build" goto BUILD_ALL
+   @ECHO ****** End of Job *****
+   goto EXIT
 
 rem=============================================================================
 :EXIT
