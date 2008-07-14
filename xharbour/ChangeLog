@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6173 2008/07/14 02:50:56 kaddath Exp $
+ * $Id: ChangeLog,v 1.6174 2008/07/14 15:24:07 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-14 14:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source\vm\hvm.c
+    ! GPF trap if hb_rddShutDown() calls PRG code when no symbol at base of stack.
 
 2008-07-14 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat
@@ -29,7 +33,7 @@
       #endif
 
   * source\rtl\dbedit.prg
-    ! fixed to call UFD with DE_IDLE or DE_EXCEPT mode after DE_INIT call. 
+    ! fixed to call UFD with DE_IDLE or DE_EXCEPT mode after DE_INIT call.
 
 2008-07-13 19:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * mdir.bat
@@ -42,7 +46,7 @@
     ! CLEAN param now only cleans like original make system. If you want
       to build after cleanup pass BUILD as the 2nd param.  Only tested
       with Borland.  Please test with other compilers.
-   
+
       make_???.bat clean
       make_???.bat clean build
 

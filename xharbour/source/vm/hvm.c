@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.688 2008/06/27 06:21:52 ronpinkas Exp $
+ * $Id: hvm.c,v 1.689 2008/06/28 18:51:49 walito Exp $
  */
 
 /*
@@ -908,6 +908,11 @@ HB_EXPORT int hb_vmQuit( void )
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Background\n" );
    #endif
+
+   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+   {
+      hb_vmPushSymbol( &FakeQuitSymbol );
+   }
 
    hb_stackSetActionRequest( 0 );         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
