@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.5 2007/09/16 00:43:49 paultucker Exp $
+ * $Id: hbsetup.ch,v 1.6 2008/07/12 14:10:25 modalsist Exp $
  */
 
 /*
@@ -84,8 +84,11 @@
 /*#define HB_CLS_ENFORCERO */     /* Activate the RO checking on OO DATA    */
 
                                   /* when not called from a constructor     */
-#ifdef HB_EXTENSION              
+
+#ifdef HB_EXTENSION
+#ifndef HB_EXT_INKEY
    #define HB_EXT_INKEY           /* Enable Extended Inkey codes */
+#endif
 #endif
 
 #endif /* HB_SETUP_CH_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.44 2008/07/10 02:56:16 modalsist Exp $
+ * $Id: dbedit.prg,v 1.45 2008/07/11 15:42:39 modalsist Exp $
  */
 
 /*
@@ -388,14 +388,18 @@ LOCAL oTBR,;
     oTBR:setKey( K_ESC, nil )
  END
 
+ DispEnd()
+
  // xHarbour extension: Initialization call
  //
  nRet := dbe_CallUDF(bFun, DE_INIT, oTBR:colPos, oTBR)
 
- oTBR:RefreshAll()
- oTBR:invalidate()
- oTBR:ForceStable()
+ if nRet == DE_REFRESH
+    oTBR:RefreshAll()
+    oTBR:Invalidate()
+ endif
 
+ oTBR:ForceStable()
  oTBR:DeHilite()
 
  if Hb_IsLogical( xUserFunc ) .AND. ! xUserFunc
@@ -406,16 +410,19 @@ LOCAL oTBR,;
     if dbe_emptydb()
        nRet := dbe_CallUDF(bFun, DE_EMPTY, oTBR:colPos, oTBR)
     endif
+    if nextkey()==0
+       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    else
+       inkey()
+       nRet := dbe_CallUDF(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+    endif
  endif
-
- dispend()
 
  lAppend := oTBR:Cargo
 
  /////////////////////
  // PROCESSING LOOP //
  /////////////////////
-
 
  WHILE nRet != DE_ABORT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6172 2008/07/13 01:45:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6173 2008/07/14 02:50:56 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-14 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * mdir.bat
+    * changed to remove pptable.c and pptable.obj files when "clean" is used.
+
+  * contrib/hbhpdf/hpdf_conf.h
+    * uncommented hb_xgrab/hb_xfree declarations under Pelles C.
+
+  * include\hbsetup.ch
+    ! fixed to avoid compiler warnings:
+      changed:
+      #ifdef HB_EXTENSION
+         #define HB_EXT_INKEY
+      #endif
+      to:
+      #ifdef HB_EXTENSION
+      #ifndef HB_EXT_INKEY
+         #define HB_EXT_INKEY
+      #endif
+      #endif
+
+  * source\rtl\dbedit.prg
+    ! fixed to call UFD with DE_IDLE or DE_EXCEPT mode after DE_INIT call. 
 
 2008-07-13 19:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * mdir.bat
