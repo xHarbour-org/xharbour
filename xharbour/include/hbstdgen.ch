@@ -1,5 +1,5 @@
 /*
- * $Id: hbstdgen.ch,v 1.1 2006/11/08 12:06:15 druzus Exp $
+ * $Id: hbstdgen.ch,v 1.1 2007/02/27 19:40:17 druzus Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #undef HB_SETUP_CH_
 
 #undef HB_EXTENSION
+#undef HB_EXT_INKEY
 
 #undef HB_C52_UNDOC
 #undef HB_C52_STRICT

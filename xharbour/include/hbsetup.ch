@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.6 2008/07/12 14:10:25 modalsist Exp $
+ * $Id: hbsetup.ch,v 1.7 2008/07/14 15:24:14 modalsist Exp $
  */
 
 /*
@@ -86,9 +86,7 @@
                                   /* when not called from a constructor     */
 
 #ifdef HB_EXTENSION
-#ifndef HB_EXT_INKEY
    #define HB_EXT_INKEY           /* Enable Extended Inkey codes */
-#endif
 #endif
 
 #endif /* HB_SETUP_CH_ */

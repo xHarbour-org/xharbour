@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.197 2008/07/10 02:56:16 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.198 2008/07/11 15:42:39 modalsist Exp $
  */
 
 /*
@@ -573,7 +573,11 @@ LOCAL nRow, nCol, nColIndex
 
      next
 
+     ::Invalidate( nRow )
+
  next
+
+ ::PerformInvalidation()
 
 RETURN Self
 
@@ -2288,11 +2292,17 @@ Local nRow, aColorRect
 
    endif
 
-   aColorRect := { Max( aRect[ TBCRECT_TOP    ], 1 ),;
-                   Max( aRect[ TBCRECT_LEFT   ], 1 ),;
-                   Min( aRect[ TBCRECT_BOTTOM ], ::nRowCount ),;
-                   Min( aRect[ TBCRECT_RIGHT  ], ::nColCount ),;
-                   aColors } 
+   aRect [TBCRECT_TOP]    := Min(::nRowCount,Max( aRect[ TBCRECT_TOP    ], 1 ))
+   aRect [TBCRECT_LEFT]   := Min(::nColCount,Max( aRect[ TBCRECT_LEFT   ], 1 ))
+   aRect [TBCRECT_BOTTOM] := Max(1,Min( aRect[ TBCRECT_BOTTOM ], ::nRowCount ))
+   aRect [TBCRECT_RIGHT]  := Max(1,Min( aRect[ TBCRECT_RIGHT  ], ::nColCount ))
+
+   aColorRect := { aRect[TBCRECT_TOP],;
+                   aRect[TBCRECT_LEFT],; 
+                   aRect[TBCRECT_BOTTOM],;
+                   aRect[TBCRECT_RIGHT],;
+                   aColors }
+
 
    if ::lConfigured
 
@@ -3123,7 +3133,7 @@ Return Self
 METHOD SetColorSpec( cColor ) CLASS TBrowse
 *---------------------------------------------------*
 
- if ! Empty( cColor )
+ if ! Empty( cColor ) 
     ::lConfigured := .f.
     ::aColorSpec := Color2Array( cColor )
     ::cColorSpec := cColor
