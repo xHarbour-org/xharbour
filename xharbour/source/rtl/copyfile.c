@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.6 2008/06/20 03:46:27 ronpinkas Exp $
+ * $Id: copyfile.c,v 1.7 2008/06/21 00:16:03 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #define BUFFER_SIZE 8192
 
-void blockeval( EVALINFO, PHB_ITEM, ULONG );
+static void blockeval( EVALINFO, PHB_ITEM, ULONG );
 
 static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 {

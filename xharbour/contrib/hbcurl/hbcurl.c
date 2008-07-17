@@ -48,11 +48,15 @@
  *
  */
 
-
+#include "windows.h"
 #include <curl/curl.h>
 #include <curl/types.h>
 #include <curl/easy.h>
 #include <hbapi.h>
+#include <hbapiitm.h>
+#include <hbvmpub.h>
+#include <hbvm.h>
+
 #include <sys/stat.h>
 #include <hbcurl.ch>
 typedef struct _FTPFILE
@@ -100,13 +104,13 @@ int my_progress_func(void *Bar,
                      double ultotal,
                      double ulnow)
 {  
-   HB_ITEM p;
-   HB_ITEM p1;
-   p.type = HB_IT_NIL;
-   p1.type = HB_IT_NIL;
-   hb_itemPutND( &p, (ulnow > 0 ? ulnow : d ) );
-   hb_itemPutND( &p1, (ultotal > 0  ?ultotal : t ) );
-   hb_vmEvalBlockV( ( PHB_ITEM ) Bar, 2, &p, &p1 );  
+   PHB_ITEM p =hb_itemPutND( NULL, (ulnow > 0 ? ulnow : d ) );
+   PHB_ITEM p1=hb_itemPutND( NULL, (ultotal > 0  ?ultotal : t ) );
+  
+
+   hb_vmEvalBlockV( ( PHB_ITEM ) Bar, 2, p, p1 );
+   hb_itemRelease( p );
+   hb_itemRelease( p1 );
 
    return 0;
 }
@@ -583,15 +587,15 @@ HB_FUNC(CURL_EASY_SETOPT)
       break;   
   
    case HB_CURLOPT_SOURCE_USERPWD:
-      res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_USERPWD , hb_parcx( 3 ) ); 
+      res = curl_easy_setopt(pConn->curl, CURLOPT_USERPWD , hb_parcx( 3 ) ); 
       break;     
   
    case HB_CURLOPT_SOURCE_PREQUOTE:
-      res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_PREQUOTE , hb_parcx( 3 ) ); //usa pointer
+      res = curl_easy_setopt(pConn->curl, CURLOPT_PREQUOTE , hb_parcx( 3 ) ); //usa pointer
       break;   
   
    case HB_CURLOPT_SOURCE_POSTQUOTE:
-      res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_POSTQUOTE , hb_parcx( 3 ) );  //usa pointer
+      res = curl_easy_setopt(pConn->curl, CURLOPT_POSTQUOTE , hb_parcx( 3 ) );  //usa pointer
       break;     
       
    case HB_CURLOPT_IOCTLDATA:
@@ -599,11 +603,11 @@ HB_FUNC(CURL_EASY_SETOPT)
       break;       
 
    case HB_CURLOPT_SOURCE_URL:
-      res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_URL , hb_parcx( 3 ) ); 
+      res = curl_easy_setopt(pConn->curl, CURLOPT_URL , hb_parcx( 3 ) ); 
       break;     
   
    case HB_CURLOPT_SOURCE_QUOTE:
-      res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_QUOTE , hb_parcx( 3 ) ); 
+      res = curl_easy_setopt(pConn->curl, CURLOPT_QUOTE , hb_parcx( 3 ) ); 
       break;     
   
    case HB_CURLOPT_FTP_ACCOUNT:
