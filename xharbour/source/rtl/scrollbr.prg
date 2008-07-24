@@ -1,5 +1,5 @@
 /*
- * $Id: scrollbr.prg,v 1.6 2004/11/23 22:25:00 guerra000 Exp $
+ * $Id: scrollbr.prg,v 1.7 2008/03/13 10:49:42 likewolf Exp $
  */
 
 /*
@@ -58,7 +58,6 @@
 #ifdef HB_COMPAT_C53
 
 CLASS HBScrollBar
-
    DATA BarLength
    DATA Cargo
    DATA sBlock
@@ -384,7 +383,7 @@ RETURN ::nTotal
 
 STATIC FUNCTION ThumbPos( oScroll )
 
-   LOCAL nSize
+   LOCAL nPos
    LOCAL nCurrent
    LOCAL nBarLength
    LOCAL nTotal
@@ -406,19 +405,16 @@ STATIC FUNCTION ThumbPos( oScroll )
    nCurrent   := oScroll:Current
    nBarLength := oScroll:BarLength
    nTotal     := oScroll:Total
-   nSize      := ( ( nBarLength - 1 ) * nCurrent + nTotal - 2 * nBarLength + 1 ) / ;
-                   ( nTotal - nBarLength )
-   nSize := Round( nSize, 0 )
+/*
+   nPos      := ( ( nBarLength - 1 ) * nCurrent + nTotal - 2 * nBarLength + 1 ) / ;
+*/              ( nTotal - nBarLength )
+   if nCurrent > 1 
+      nPos := Max(1, Min(nBarLength, Round( (nCurrent/nTotal) * nBarLength,0) ) )
+   else
+      nPos := 1
+   endif
 
-   IF nSize < 1
-      nSize := 1
-   ENDIF
-
-   IF nSize > nBarLength
-      nSize := nBarLength
-   ENDIF
-
-   oScroll:ThumbPos := nSize
+   oScroll:ThumbPos := nPos
 
 RETURN .T.
 

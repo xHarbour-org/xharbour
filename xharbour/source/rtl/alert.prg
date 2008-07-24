@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.26 2008/03/13 10:49:40 likewolf Exp $
+ * $Id: alert.prg,v 1.27 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -45,11 +45,13 @@
 STATIC s_lNoAlert
 #endif
 
-FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
+FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
    LOCAL cMessage
-   LOCAL cColorHigh
+   LOCAL cColorBox
+   LOCAL cColorButton
    LOCAL aOptionsOK
    LOCAL nEval
+   LOCAL nAt
 #ifdef HB_EXTENSION
    LOCAL lFirst
    LOCAL cLine
@@ -108,16 +110,35 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
 #endif
 
-   IF !ISARRAY( aOptions )
+   IF ! ISARRAY( aOptions )
       aOptions := {}
    ENDIF
 
-   IF !ISCHARACTER( cColorNorm ) .or. EMPTY( cColorNorm )
-      cColorNorm := "W+/R" // first pair color (Box line and Text)
-      cColorHigh := "W+/B" // second pair color (Options buttons)
+
+   IF ! ISCHARACTER( cColor ) .or. EMPTY( cColor )
+      cColorBox    := "W+/R"  // first color pair:  (Box)
+      cColorButton := "W+/B"  // second color pair: (Buttons)
    ELSE
-      cColorHigh := StrTran( StrTran( iif( At( "/", cColorNorm ) == 0, "N", SubStr( cColorNorm, At( "/", cColorNorm ) + 1 ) ) + "/" +;
-                                      iif( At( "/", cColorNorm ) == 0, cColorNorm, Left( cColorNorm, At( "/", cColorNorm ) - 1 ) ), "+", "" ), "*", "" )
+/*
+      cColorButton := StrTran( StrTran( iif( At( "/", cColor ) == 0, "N", SubStr( cColor, At( "/", cColor ) + 1 ) ) + "/" +;
+                                        iif( At( "/", cColor ) == 0, cColor, Left( cColor, At( "/", cColor ) - 1 ) ), "+", "" ), "*", "" )
+*/  
+      nAt := At(",",cColor)
+      if nAt == 0
+         cColorBox := cColor
+         nAt := At("/",cColor)
+         if nAt != 0
+            cColorButton := SubStr( cColor, nAt+1 )+"/"+ SubStr( cColor, 1, nAt - 1 ) 
+            cColorButton := StrTran( cColorButton, "+","") 
+            cColorButton := StrTran( cColorButton, "*","") 
+         else
+            cColorButton := "W+/B" 
+         endif
+      else
+         cColorBox    := Left( cColor, nAt - 1 )
+         cColorButton := SubStr( cColor, nAt + 1 )
+      endif
+
    ENDIF
 
    IF nDelay == NIL
@@ -140,7 +161,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 #endif
    ENDIF
 
-   RETURN hb_gtAlert( cMessage, aOptionsOK, cColorNorm, cColorHigh, nDelay );
+   RETURN hb_gtAlert( cMessage, aOptionsOK, cColorBox, cColorButton, nDelay );
 
 #ifdef HB_C52_UNDOC
 

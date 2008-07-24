@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.198 2008/07/11 15:42:39 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.199 2008/07/14 20:17:11 modalsist Exp $
  */
 
 /*
@@ -183,10 +183,11 @@ CLASS TDataCache STATIC
    METHOD   Invalidate(nRow)             // Invalidate the data cache.                
    METHOD   PerformInvalidation()        // Executes invalidation.
 
-   METHOD   ClearColorRect()             // Restore all column colorrect to nil.
-   METHOD   DeleteColorRect()            // Delete all/one row/col colored.
-   METHOD   SetColorRect( aRect )        // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
-   METHOD   ResetColorRect()             // Reset colorrect area.
+   METHOD   ClearColRect()               // Restore all column colorrect to nil.
+   METHOD   DelColRect()                 // Delete all/one row/col colored.
+   METHOD   SetColRect( aRect )          // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
+   METHOD   ResetColRectArea()           // Reset colorrect area.
+   METHOD   ResetColRect()               // Reset colorrect array.
 
 HIDDEN:
 
@@ -203,7 +204,7 @@ HIDDEN:
    DATA  aRect                           // Array with pending color-rects
 
    DATA  lInvalid                        // if true all rows will be invalidated. 
-   DATA  lNewRow                         // if true indicate that new row is active (append mode).
+   DATA  lNewRow                         // if true indicate that browse is in append mode.
 
    METHOD  InitCache()                   // Init DataCache vars.
    METHOD  FillRow( nRow )               // Fills a row of aCache with data from datasource
@@ -244,16 +245,11 @@ RETURN NIL
 *--------------------------------------------*
 METHOD Skip( nRowsToSkip ) CLASS TDataCache
 *--------------------------------------------*
-LOCAL nSkipped, nNewRow, lEof, lOffSet
-
+LOCAL nSkipped, nNewRow, lEof 
 
    if ! hb_IsBlock( ::oBrowse:SkipBlock )
       ::lNewRow := .f.
       Return 0
-   endif
-
-   if nRowsToSkip <= 0
-      ::lNewRow := .f.
    endif
 
    if nRowsToSkip == 0 
@@ -262,14 +258,15 @@ LOCAL nSkipped, nNewRow, lEof, lOffSet
       Return 0
    endif
 
-   lOffSet := .f.
-   lEof    := eof()
+   lEof := eof()
 
-   if ! ::lNewRow
+   if ! ::lNewRow .or. nRowsToSkip < 0 
       nSkipped := Eval( ::oBrowse:SkipBlock, nRowsToSkip )
-      ::lNewRow := ( !lEof .and. eof() ) 
+      ::lNewRow := ( !lEof .and. eof() )
+      if ::oBrowse:GoBottomBlock == NIL
+         ::lNewRow := .F.
+      endif
    else
-      lOffSet  := .t.
       nSkipped := 0
    endif
 
@@ -370,22 +367,24 @@ RETURN NIL
 *--------------------------------------------*
 METHOD GoBottom() CLASS TDataCache
 *--------------------------------------------*
-Local nToTop, lGoBottom
+Local nToTop, lBottomBlock
 
    ::lNewRow := .f.
 
-   lGoBottom := hb_IsBlock( ::oBrowse:GoBottomBlock )
+   lBottomBlock := hb_IsBlock( ::oBrowse:GoBottomBlock )
 
-   if lGoBottom
+   if lBottomBlock
       Eval( ::oBrowse:GoBottomBlock )
    endif
 
    // How many rows are available from top upto bottom.
-   nToTop := Eval( ::oBrowse:SkipBlock, - ( ::nMaxRow  - 1 ) )
+   nToTop := Eval( ::oBrowse:SkipBlock, - ( ::nMaxRow - 1 ) )
 
-   if lGoBottom
+   if lBottomBlock
        // Repos cursor to bottom row again.
        Eval( ::oBrowse:GoBottomBlock )
+   elseif ! empty( nToTop )
+       Eval( ::oBrowse:SkipBlock, Abs(nToTop) )
    endif
 
    if Empty( nToTop )
@@ -402,7 +401,7 @@ RETURN nToTop
 *----------------------------------------------*
 METHOD SyncData( nRow, nCol ) CLASS TDataCache
 *----------------------------------------------*
-Local nSkip, nCurRow 
+Local nSkip, nCurRow
 
    if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow 
       Return .f.
@@ -410,7 +409,7 @@ Local nSkip, nCurRow
   
    nCurRow := ::nCurRow
 
-   if nRow != nCurRow 
+   if nRow != nCurRow
       // Sync data cache cursor with browse row.
       nSkip := ( nCurRow - nRow )
       ::Skip( -nSkip )
@@ -516,13 +515,13 @@ Local aColor, nColIndex
 RETURN aColor
 
 *--------------------------------------------------*
-METHOD SetColorRect( aRect ) CLASS TDataCache
+METHOD SetColRect( aRect ) CLASS TDataCache
 *--------------------------------------------------*
-Local nRow, nCol, nColIndex, i
+Local nRow, nPos
 
  if ! empty( aRect )
 
-    ::ClearColorRect()
+    ::ClearColRect()
 
     // Assign new colorrect from TBrowse. Caution: this array haves 5 items
     // instead 4 of datacache's colorrect array 
@@ -531,33 +530,29 @@ Local nRow, nCol, nColIndex, i
         // A five elements array shrinks to a four one
         // { top, left, bottom, right, aColors } =>
         // { nRow, left, right, aColors }
-        AAdd( ::aRect, { nRow, aRect[TBCRECT_LEFT], aRect[TBCRECT_RIGHT], aRect[TBCRECT_COLOR] } )
+        // AAdd( ::aRect, { nRow, aRect[TBCRECT_LEFT], aRect[TBCRECT_RIGHT], aRect[TBCRECT_COLOR] } )
+
+        nPos := AScan( ::aRect, { |x| x[1] = aRect[TBCRECT_TOP] .and.;
+                                      x[1] = aRect[TBCRECT_BOTTOM] .and.;
+                                      x[2] = aRect[TBCRECT_LEFT] .and.;
+                                      x[3] = aRect[TBCRECT_RIGHT] } )
+
+        if nPos = 0
+           AAdd( ::aRect, { nRow, aRect[TBCRECT_LEFT], aRect[TBCRECT_RIGHT], aRect[TBCRECT_COLOR] } )
+        else
+           ::aRect[ nPos, 4 ] := aRect[TBCRECT_COLOR] 
+        endif
 
     next
 
-    // Reset colorrect to all cached columns
-    for i := 1 to LEN(::aRect)
-
-        aRect := ::aRect[i]
-        nRow := aRect[1]
-
-        for nCol := aRect[2] to aRect[3]
-
-            nColIndex := ::ColIndex(nCol)
-
-            if CacheOK( ::aCache, nRow, nColIndex )
-               ::aCache[ nRow ][ nColIndex ]:ColorRect := aRect[4]
-            endif
-
-        next
-    next
+    ::ResetColRect()
 
  endif
 
 Return Self
 
 *--------------------------------------------------*
-METHOD ClearColorRect() CLASS TDataCache
+METHOD ClearColRect() CLASS TDataCache
 *--------------------------------------------------*
 LOCAL nRow, nCol, nColIndex
 
@@ -573,16 +568,12 @@ LOCAL nRow, nCol, nColIndex
 
      next
 
-     ::Invalidate( nRow )
-
  next
-
- ::PerformInvalidation()
 
 RETURN Self
 
 *--------------------------------------------------*
-METHOD DeleteColorRect( nRow ) CLASS TDataCache
+METHOD DelColRect( nRow ) CLASS TDataCache
 *--------------------------------------------------*
 LOCAL i
 
@@ -605,12 +596,12 @@ LOCAL i
 Return Self
 
 *---------------------------------------------------------------*
-METHOD ResetColorRect( lResetRect, nSkipped ) CLASS TDataCache
+METHOD ResetColRectArea( lResetRect, nSkipped ) CLASS TDataCache
 *---------------------------------------------------------------*
-LOCAL aRect, nRow, nCol, nColIndex, i
+LOCAL aRect, i
 
    if lResetRect 
-      ::ClearColorRect()
+      ::ClearColRect()
       ::aRect := {}
       Return Self
    endif
@@ -620,7 +611,7 @@ LOCAL aRect, nRow, nCol, nColIndex, i
    // The cursor was moved.
    if ! empty( aRect ) .and. nSkipped != 0  
 
-      ::ClearColorRect()
+      ::ClearColRect()
 
       for i := 1 to Len( aRect )
           if nSkipped > 0  // Down/PageDn
@@ -638,26 +629,32 @@ LOCAL aRect, nRow, nCol, nColIndex, i
           endif
       next
 
-      aRect := NIL
+      ::ResetColRect()
 
-      // Reset colorrect to all cached columns
+   endif
+
+Return Self
+
+*------------------------------------------------------*
+METHOD ResetColRect() CLASS TDataCache
+*------------------------------------------------------*
+Local i, nColIndex, nCol, nRow, aRect
+
       for i := 1 to Len( ::aRect )
 
-          aRect := ::aRect[ i ]
+          aRect := ::aRect[i]
           nRow  := aRect[1]
 
-          for nCol := aRect[ 2 ] to aRect[ 3 ]
+          for nCol := aRect[2] to aRect[3]
 
               nColIndex := ::ColIndex(nCol)
 
               if CacheOK( ::aCache, nRow, nColIndex )
-                 ::aCache[ nRow ][ nColIndex ]:ColorRect := aRect[ 4 ]
+                 ::aCache[ nRow ][ nColIndex ]:ColorRect := aRect[4]
               endif
 
           next
       next
-
-   endif
 
 Return Self
 
@@ -875,7 +872,7 @@ HIDDEN:
    METHOD DrawRow()                               // Draw one or all rows in stabilization (early DrawARow() method).
    METHOD SetColorSpec( cColor )
 
-   METHOD Moved(lResetHits, lForceHitsFalse)      // Every time a movement key is issued I need to reset certain properties
+   METHOD Moved()                                 // Every time a movement key is issued I need to reset certain properties
                                                   // of TBrowse, I do these settings inside this method
    METHOD EvalSkipBlock( nSkip )                  // Eval skip block
    METHOD MoveTo( nMove )                         // Method called by Tbrowse cursor movement methods.
@@ -903,6 +900,7 @@ HIDDEN:
 
    METHOD Refresh()                               // Causes refresh all/or one data row to be refreshed during the next stabilization.
    METHOD SetHilite(lHilite)                      // Hilights/Dehighlights the current cell
+   METHOD ResetHitState()
 
    DATA lAutolite
    DATA uCargo                                    // User-definable variable
@@ -1082,14 +1080,13 @@ METHOD Refresh( lAll ) CLASS TBrowse
 Default lAll to .f.
 
    if lAll
+      ::ResetHitState()
       AFill( ::aRedraw, .T. )
       ::oCache:Invalidate( NIL , .T. )
-
    elseif ! Empty( ::aRedraw ) .and. ::nRowPos > 0
       ::aRedraw[ ::nRowPos ] := .T.
       ::oCache:Invalidate( ::nRowPos, .F. )
-      ::oCache:DeleteColorRect( ::nRowPos )
-
+      ::oCache:DelColRect( ::nRowPos )
    endif
 
    ::lStable := .F.
@@ -1264,7 +1261,7 @@ Default nMode to 0    // first configuration
       // I need a cache of different size
       ::oCache:InitCache()
       for each aRect in ::aRect
-          ::oCache:SetColorRect( aRect )
+          ::oCache:SetColRect( aRect )
       next
       ::aRect := {}
    endif
@@ -1609,7 +1606,7 @@ Return nWidth
 *------------------------------------------------------*
 METHOD MoveTo( nMove ) CLASS Tbrowse
 *------------------------------------------------------*
-Local nTop, leftVis, lForceResetHits, nSkipped
+Local nTop, leftVis, nSkipped
 
  if ::lStable
     // reset movements only after stabilize.
@@ -1626,8 +1623,9 @@ Local nTop, leftVis, lForceResetHits, nSkipped
  endif
 
  nSkipped := ::nRowsSkipped
- lForceResetHits := ( nMove = TBM_TOP .or. nMove = TBM_BOTTOM )
- ::Moved(,lForceResetHits )
+ ::lForceHitsFalse := ( nMove = TBM_TOP .or. nMove = TBM_BOTTOM )
+ ::Moved()
+
 
  SWITCH nMove 
 
@@ -1672,7 +1670,6 @@ Local nTop, leftVis, lForceResetHits, nSkipped
          else
             ::nColPos++
          endif
-
       endif
       EXIT
 
@@ -1751,12 +1748,9 @@ Local nTop, leftVis, lForceResetHits, nSkipped
          leftVis := ::nLeftVisible
 
          While leftVis == ::nLeftVisible
-         
            ::nRightVisible++
            ::nLeftVisible  := ::LeftDetermine()
-
          Enddo
-
          ::nColPos := Max( ::nColPos, ::nLeftVisible )
          ::Invalidate()
       endif
@@ -1771,10 +1765,8 @@ Local nTop, leftVis, lForceResetHits, nSkipped
          // While space left available by columns exiting to the right side of tbrowse
          // is not enough to contain a new column to the left (::nLeftVisible doesn't change)
          While leftVis == ::nLeftVisible
-
            ::nRightVisible--
            ::nLeftVisible := ::LeftDetermine()
-
          Enddo
 
          // Since panel "shifts" to the right, ::ncolPos could end up "out of" the
@@ -1818,19 +1810,10 @@ METHOD SkipRows() CLASS Tbrowse
 RETURN SELF
 
 *------------------------------------------------------*
-METHOD Moved(lResetHits, lForceHitsFalse) CLASS TBrowse
+METHOD Moved() CLASS TBrowse
 *------------------------------------------------------*
 
-// Forcing Reset of ::HitTop/Bottom flags!  Clipper Compatible
-Default lResetHits      to .t.
-Default lForceHitsFalse to .f.
-
-   // Internal flags used to set ::HitTop/Bottom during next stabilization
-   If lResetHits
-      ::lHitTop    := .F.
-      ::lHitBottom := .F.
-      ::lForceHitsFalse := lForceHitsFalse
-   EndIf
+   ::ResetHitState()
 
    // No need to Dehilite() current cell more than once
    if ::lStable
@@ -1843,6 +1826,16 @@ Default lForceHitsFalse to .f.
    endif
 
 RETURN Self
+
+*------------------------------------------------------*
+METHOD ResetHitState() CLASS TBrowse
+*------------------------------------------------------*
+
+   // Internal flags used to set ::HitTop/Bottom during next stabilization
+   ::lHitTop    := .F.
+   ::lHitBottom := .F.
+
+RETURN nil
 
 *------------------------------------------------------*
 METHOD ResetMove() CLASS TBrowse
@@ -2292,6 +2285,13 @@ Local nRow, aColorRect
 
    endif
 
+   if ::nFrozenCols > 0 .and. ::nLeftVisible > ::nColCount
+      if aRect[ TBCRECT_LEFT ] > ::nColCount
+         aRect[ TBCRECT_LEFT ]  := ::nColPos
+         aRect[ TBCRECT_RIGHT ] := ::nColPos
+      endif
+   endif
+
    aRect [TBCRECT_TOP]    := Min(::nRowCount,Max( aRect[ TBCRECT_TOP    ], 1 ))
    aRect [TBCRECT_LEFT]   := Min(::nColCount,Max( aRect[ TBCRECT_LEFT   ], 1 ))
    aRect [TBCRECT_BOTTOM] := Max(1,Min( aRect[ TBCRECT_BOTTOM ], ::nRowCount ))
@@ -2306,12 +2306,12 @@ Local nRow, aColorRect
 
    if ::lConfigured
 
-      ::oCache:SetColorRect( aColorRect )
+      ::oCache:SetColRect( aColorRect )
 
       // and now let's refresh new aRect covered area
       if ! Empty( ::aRedraw )
          for nRow := aRect[ TBCRECT_TOP ] to aRect[ TBCRECT_BOTTOM ]
-            ::aRedraw[ nRow ] := .T.
+             ::aRedraw[ nRow ] := .T.
          next
       endif
 
@@ -2332,6 +2332,7 @@ Return Self
 METHOD Stabilize( lForceStable ) CLASS TBrowse
 *------------------------------------------------------*
 LOCAL nOldCursor, colorSpec, nRowToDraw, cCurColor, lDispBegin
+Local nMoveTo := ::nMoveTo
 
    if ::nColCount == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
@@ -2346,6 +2347,7 @@ Default lForceStable TO .F.
       ::nColPos := Min(::nPrevDelColPos,::nColCount)
       ::nPrevDelColPos := 0
    ENDIF
+
 
    // Configure the browse if not configured yet.
    ::PerformConfiguration()
@@ -2376,10 +2378,12 @@ Default lForceStable TO .F.
    nOldCursor := SetCursor( SC_NONE )
 
    if ::lRedrawFrame  // Draw border
+
       if ! lDispBegin
          DispBegin()
          lDispBegin := .t.
       endif
+
       if Len( ::cBorder ) == 8
          DispBox(::nTop,::nLeft,::nBottom,::nRight,::cBorder,::colorSpec)
       endif
@@ -2405,7 +2409,10 @@ Default lForceStable TO .F.
          DispBegin()
       endif
 
-      ::SyncRows()
+      if ::nMoveTo != 0
+         ::SyncRows()
+      endif
+      ::ResetMove()
 
       While ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
 
@@ -2422,8 +2429,12 @@ Default lForceStable TO .F.
 
       Enddo
 
+      if nMoveTo == 0 .and. ::nRowPos > ::oCache:CurRow
+         ::nRowPos := ::oCache:CurRow
+      endif
+
       ::lStable := .T.
-      ::lForceHitsFalse := .f.
+      ::lForceHitsFalse := .F.
       ::lPaintBottomUp := .F.
 
       DispEnd()
@@ -2438,7 +2449,6 @@ Default lForceStable TO .F.
    endif
 
    ::lRectPainting := .F.
-
    SetCursor( nOldCursor )
 
 Return .T.
@@ -2464,16 +2474,15 @@ METHOD SyncRows() CLASS TBrowse
 Local lRefreshAll, lRefreshCurrent, lResetRect, nOldRowPos, nNewRowPos
 Local nSkipped
 
-   if  ::nMoveTo != TBM_TOP .and. ::nMoveTo != TBM_BOTTOM .and.;
-       ::nRowsToSkip = 0 .and. ::nRowsSkipped = 0
+   if ::nMoveTo != TBM_TOP .and. ::nMoveTo != TBM_BOTTOM .and.;
+      ::nRowsToSkip = 0 .and. ::nRowsSkipped = 0
 
-        if ::nRowPos > ::oCache:LastRow
-           ::nNewRowPos := ::oCache:LastRow 
-           ::nRowPos := ::nNewRowPos
-        endif
+      if ::nRowPos > ::oCache:LastRow
+         ::nNewRowPos := ::oCache:LastRow 
+         ::nRowPos := ::nNewRowPos
+      endif
 
-        ::ResetMove()
-        Return NIL
+      Return NIL
 
    endif
 
@@ -2494,7 +2503,7 @@ Local nSkipped
 
    else
 
-      nNewRowPos := ::nRowPos + ::nRowsSkipped 
+      nNewRowPos := nOldRowPos + ::nRowsSkipped
 
       if ::nRowsSkipped = 0
 
@@ -2505,7 +2514,7 @@ Local nSkipped
             ::lHitTop := .T. .and. !::lForceHitsFalse
          endif
 
-         ::nNewRowPos := nNewRowPos 
+         ::nNewRowPos := nOldRowPos
 
       elseif ::nRowsSkipped = ::nRowsToSkip 
 
@@ -2542,16 +2551,13 @@ Local nSkipped
          // I couldn't move as far as requested
          // I need to refresh all rows if I go past current top or bottom row
          if ( nNewRowPos < 1 .or. nNewRowPos > ::nRowCount )
-            // don't go past boundaries
-            ::nNewRowPos := Max(1, Min( nNewRowPos, ::oCache:LastRow ) )
             lRefreshAll := .t.
             lResetRect := .t.
-
          else
-            ::nNewRowPos := Max(1, Min( nNewRowPos, ::oCache:LastRow ) )
             lRefreshCurrent := .t.
-
          endif
+
+         ::nNewRowPos := Max(1, Min( nNewRowPos, ::oCache:LastRow ) )
 
       endif
 
@@ -2575,7 +2581,7 @@ Local nSkipped
          nSkipped := ::nRowsSkipped 
       endif
 
-      ::oCache:ResetColorRect( lResetRect, nSkipped )
+      ::oCache:ResetColRectArea( lResetRect, nSkipped )
 
       if ::nMoveTo != TBM_PGUP .and. ::nMoveTo != TBM_PGDN
          ::oCache:PerformInvalidation()
@@ -2587,8 +2593,6 @@ Local nSkipped
       ::oCache:Invalidate( ::nRowPos )
 
    endif
-
-   ::ResetMove()
 
 RETURN NIL
 
@@ -2614,7 +2618,7 @@ Local nTop, nBottom, nFirstRow
   endif
 
   ScrollFixed( nTop, ::nwLeft, nBottom, ::nwRight, ::nRowsSkipped )
-  ::oCache:ResetColorRect(.F., ::nRowsSkipped)
+  ::oCache:ResetColRectArea(.F., ::nRowsSkipped)
 
 RETURN SELF
 
@@ -2770,7 +2774,7 @@ LOCAL cColor, cColorBKG, aCellColor, nCursor, nColorIndex
    oCol       := aColsInfo[ TBCI_OBJ ]
    nWidth     := aColsInfo[ TBCI_WIDTH ]
    nLen       := aColsInfo[ TBCI_WIDTHCELL ]
-   nScrColPos := aColsInfo[ TBCI_SCRCOLPOS ]
+   nScrColPos := Max( ::nwLeft, aColsInfo[ TBCI_SCRCOLPOS ] )
 
    // Fix the column screen cursor when it's out of range.
    if Col() != nScrColPos
@@ -3108,13 +3112,13 @@ Return b
 *---------------------------------------------------*
 METHOD SetRowPos( nRow ) CLASS TBrowse
 *---------------------------------------------------*
+Local i
 
    if hb_IsNumeric(nRow) .and.;
-      nRow >= 1 .and. nRow <= ::nRowCount .and. nRow != ::nRowPos 
+      nRow != ::nRowPos .and. nRow >= 1 .and. nRow <= ::nRowCount  
 
       ::ResetMove()
       ::Moved()
-      ::nRowPos  := nRow
 
       if nRow > ::nRowPos
          ::nMoveTo := TBM_DOWN
@@ -3122,6 +3126,11 @@ METHOD SetRowPos( nRow ) CLASS TBrowse
          ::nMoveTo := TBM_UP
       endif
 
+      for i := nRow to ::nRowPos
+          ::MoveTo( ::nMoveTo )
+      next
+
+      ::nRowPos := nRow
       ::ForceStable()
       ::oCache:CurRow := nRow
 
