@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.157 2008/04/07 23:20:08 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.158 2008/05/19 23:17:00 ronpinkas Exp $
  */
 
 /*
@@ -334,6 +334,17 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
 
       ::cClassName := uObj
    ELSEIF ValType( uObj ) = 'N'
+      OleAddRef( uObj )
+      ::hObj := uObj
+
+      IF ValType( cClass ) == 'C'
+         ::cClassName := cClass
+      ELSE
+         ::cClassName := LTrim( Str( uObj ) )
+      ENDIF
+
+   ELSEIF ValType( uObj ) = 'P'
+      uObj := Ptr2Int( uObj )
       OleAddRef( uObj )
       ::hObj := uObj
 
@@ -1417,10 +1428,12 @@ RETURN Self
 
                  case VT_BYREF | VT_DATE:
                    hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
+                   pItem->item.asDate.time++;
                    break;
 
                  case VT_DATE:
                    hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
+                   pItem->item.asDate.time++;
                    break;
 
                  case VT_BYREF | VT_EMPTY:
@@ -1833,10 +1846,12 @@ RETURN Self
 
         case VT_DATE | VT_BYREF:
            hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
+           pItem->item.asDate.time++;
            break;
 
         case VT_DATE:
            hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
+           pItem->item.asDate.time++;
            break;
 
         case VT_EMPTY | VT_BYREF:
@@ -2718,6 +2733,13 @@ RETURN Self
         pDisp->lpVtbl->Release( pDisp );
      }
   }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC_STATIC( PTR2INT )  // Ptr2Int( <pPointer> ) -> <nInteger>
+  {
+     hb_retni( (int) hb_parptr( 1 ) );
+  }
+
 #pragma ENDDUMP
 
 #endif
