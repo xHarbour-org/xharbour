@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6177 2008/07/17 20:11:06 lculik Exp $
+ * $Id: ChangeLog,v 1.6178 2008/07/24 14:41:53 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-25 13:15 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source/rtl/dateshb.c
+    + function TTOD( <datetime> ) -> <dateonly>
+  * source/rtl/win32ole.prg
+    % Allow a pointer passed to TOleAuto():New(), treating it as a pointer to idispatch,
+      just like in case of numeric
+    % Avoid precision faults in reading datetime values from ole
 
 2008-07-24 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/alert.prg
