@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.18 2007/05/27 13:23:05 likewolf Exp $
+ * $Id: dateshb.c,v 1.19 2007/06/30 03:06:55 peterrees Exp $
  */
 
 /*
@@ -550,6 +550,17 @@ HB_FUNC( DOW )
    }
 }
 
+HB_FUNC( TTOD )
+{
+   if( ISDATE( 1 ) )
+   {
+      hb_retdl( hb_pardl( 1 ) );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOD", 1, hb_paramError( 1 ) );
+   }
+}
 
 HB_FUNC( TTOS )
 {
