@@ -1,5 +1,5 @@
 #
-# $Id: common.mak 8509 2008-05-28 12:39:33Z vszakats $
+# $Id: common.mak,v 1.1 2008/07/30 10:15:56 marchuet Exp $
 #
 
 LIBNAME = $(LIBPREF)hbmzip
@@ -10,10 +10,10 @@ PRG_HEADERS = \
     hbmzip.ch \
 
 LIB_OBJS = \
-    $(OBJ_DIR)ioapi$(OBJEXT) \
-    $(OBJ_DIR)zip$(OBJEXT) \
-    $(OBJ_DIR)unzip$(OBJEXT) \
-    $(OBJ_DIR)hbmzip$(OBJEXT) \
+    $(OBJ_DIR)$(DIR_SEP)ioapi$(OBJEXT) \
+    $(OBJ_DIR)$(DIR_SEP)mzip$(OBJEXT) \
+    $(OBJ_DIR)$(DIR_SEP)unzip$(OBJEXT) \
+    $(OBJ_DIR)$(DIR_SEP)hbmzip$(OBJEXT) \
 
 all: \
     $(LIB_PATH) \

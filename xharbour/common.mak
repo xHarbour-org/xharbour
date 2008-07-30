@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.17 2008/07/01 03:30:45 ronpinkas Exp $
+# $Id: common.mak,v 1.18 2008/07/02 18:26:04 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -53,6 +53,7 @@ FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
 GDLIB_DIR     =contrib$(DIR_SEP)gd
 GTWVG_DIR     =contrib$(DIR_SEP)gtwvg
 GTWVW_DIR     =contrib$(DIR_SEP)gtwvw
+HBMZIP_DIR    =contrib$(DIR_SEP)hbmzip
 HBZIP_DIR     =contrib$(DIR_SEP)hbzlib
 LIBNF_DIR     =contrib$(DIR_SEP)libnf
 MYSQL_DIR     =contrib$(DIR_SEP)mysql
@@ -116,6 +117,7 @@ FREEIMAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fi_lib$(LIBEXT)
 GDLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gdlib$(LIBEXT)
 GTWVG_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvg$(LIBEXT)
 GTWVW_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtwvw$(LIBEXT)
+HBMZIP_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmzip$(LIBEXT)
 HBZIP_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzip$(LIBEXT)
 LIBNF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libnf$(LIBEXT)
 MYSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)mysql$(LIBEXT)
@@ -1267,6 +1269,15 @@ GDLIB_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)gdchart$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gdimage$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gdwrp$(OBJEXT)
+
+#===============================================================================
+# HBMZIP.LIB dependencies
+#===============================================================================
+HBMZIP_LIB_OBJS=\
+        $(OBJ_DIR)$(DIR_SEP)ioapi$(OBJEXT) \
+        $(OBJ_DIR)$(DIR_SEP)mzip$(OBJEXT) \
+        $(OBJ_DIR)$(DIR_SEP)unzip$(OBJEXT) \
+        $(OBJ_DIR)$(DIR_SEP)hbmzip$(OBJEXT)
 
 #===============================================================================
 # HBZIP.LIB dependencies

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.16 2008/07/02 18:26:04 ronpinkas Exp $
+# $Id: compile.mak,v 1.17 2008/07/13 01:45:22 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -3045,6 +3045,23 @@ $(OBJ_DIR)$(DIR_SEP)gdimage.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdimage.pr
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)gtwvw.c
 	$(CC_CMD)
+
+
+#===============================================================================
+# HBMLIB_LIB.LIB dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)ioapi$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)ioapi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)zip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)unzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)unzip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbmzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)hbmzip.c
+	$(CC_CMD)
+
 
 #===============================================================================
 # HBZIP.LIB dependencies

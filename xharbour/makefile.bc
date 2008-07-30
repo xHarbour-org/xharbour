@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.233 2008/06/06 15:44:25 kaddath Exp $
+# $Id: makefile.bc,v 1.234 2008/07/02 23:45:16 ronpinkas Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -485,6 +485,7 @@ c0d32.obj $**, $@,, $(COMPILERLIBS)
 
 HB_FREEIMAGE=1
 HB_WHAT32=1
+HB_MZIP=1
 HB_ZIP=1
 HB_XWT=1
 
@@ -523,6 +524,10 @@ CC_CMD_ZIP   =BCC32 -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
+!endif
+
+!ifdef HB_MZIP
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMZIP_LIB)
 !endif
 
 !ifdef HB_ZIP
@@ -574,6 +579,13 @@ $(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
 
 $(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
 	IF EXIST "$(GDLIB_LIB)" $(DEL) "$(GDLIB_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
+	IF EXIST "$(HBMZIP_LIB)" $(DEL) "$(HBMZIP_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)

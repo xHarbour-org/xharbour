@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.89 2008/06/05 04:47:46 kaddath Exp $
+# $Id: makefile.wc,v 1.90 2008/06/06 15:44:30 kaddath Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -335,6 +335,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 # HB_ZIP=1
 
 HB_FREEIMAGE=1
+HB_MZIP=1
 HB_XWT=1
 
 #===============================================================================
@@ -369,6 +370,10 @@ LIB_CMD     =LIB386 /nologo /out:$@ $**
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
+!endif
+
+!ifdef HB_MZIP
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMZIP_LIB)
 !endif
 
 !ifdef HB_ZIP
@@ -411,6 +416,9 @@ $(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)

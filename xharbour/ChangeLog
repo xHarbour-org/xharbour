@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6179 2008/07/25 11:15:49 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6180 2008/07/27 19:47:55 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-07-30 13:33 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * common.mak
+  * compile.mak
+  * contrib\hbmzip\common.mak
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.vc
+  * makefile.wc
+  * mdir.bat
+    + Added mzip contrib library low size and hight speed than hbzip. many thank's to Mindaugas Kavaliauskas
+      and others contributors of harbour.
+
+  * include\hbapi.h
+  * source\rtl\strmatch.c
+  * source\vm\itemapi.c
+  * source\vm\extend.c
+    * changed return value of hb_storclenAdopt, 0 when fails.
+    + Added hb_strMatchFile( const char * pszString, const char * szPattern ); 
+      that compare two strings using platform dependent rules for file matching 
+    + Added hb_strMatchCaseWildExact( const char *szString, const char *szPattern ); 
+      that compare two strings using pattern with wildcard (?*) ignoring the case of the characters - pattern have to cover whole string 
+    + Added high level function HB_FILEMATCH. similar to WILDMATCH, but work with filenames.
+
+  * include\hbdate.h
+  * source\common\hbdate.c
+    + Added hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
+  synced with harbour as possible	
+
 
 2008-07-27 21:50 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * contrib\hbzlib\makefile.bc

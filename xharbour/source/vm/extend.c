@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.65 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: extend.c,v 1.66 2008/05/06 11:10:43 marchuet Exp $
  */
 
 /*
@@ -1321,7 +1321,7 @@ HB_EXPORT void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
    }
 }
 
-HB_EXPORT void hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
+HB_EXPORT int hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storclenAdopt(%s, %lu, %d, ...)", szText, ulLen, iParam));
 
@@ -1346,12 +1346,16 @@ HB_EXPORT void hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
             hb_itemPutCPtr( pDstItem, szText, ulLen );
          }
          va_end( va );
+         return pDstItem ? 1 : 0;
       }
       else if( bByRef || iParam == -1 )
       {
          hb_itemPutCPtr( pItem, szText, ulLen );
+         return 1;
       }
    }
+
+   return 0;
 }
 
 /* szDate must have YYYYMMDD format */

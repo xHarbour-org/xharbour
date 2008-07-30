@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.11 2008/07/14 02:50:56 kaddath Exp $
+rem $Id: mdir.bat,v 1.12 2008/07/14 15:24:14 modalsist Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -94,6 +94,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%    lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmzip%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbmzip%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzip%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hbzip%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%libnf%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%libnf%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%pdflib%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%pdflib%LIBEXT%   lib >NUL
@@ -431,6 +432,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmzip%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbmzip%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzip%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbzip%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%libnf%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%libnf%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%pdflib%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%pdflib%LIBEXT%
@@ -446,6 +448,7 @@ if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIB
 if exist lib\%LIBPREFIX%firebird%LIBEXT%            del lib\%LIBPREFIX%firebird%LIBEXT%
 if exist lib\%LIBPREFIX%fi_lib%LIBEXT%              del lib\%LIBPREFIX%fi_lib%LIBEXT%
 if exist lib\%LIBPREFIX%gdlib%LIBEXT%               del lib\%LIBPREFIX%gdlib%LIBEXT%
+if exist lib\%LIBPREFIX%hbmzip%LIBEXT%              del lib\%LIBPREFIX%hbmzip%LIBEXT%
 if exist lib\%LIBPREFIX%hbzip%LIBEXT%               del lib\%LIBPREFIX%hbzip%LIBEXT%
 if exist lib\%LIBPREFIX%libnf%LIBEXT%               del lib\%LIBPREFIX%libnf%LIBEXT%
 if exist lib\%LIBPREFIX%pdflib%LIBEXT%              del lib\%LIBPREFIX%pdflib%LIBEXT%

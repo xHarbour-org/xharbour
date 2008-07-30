@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.243 2008/05/04 14:20:50 andijahja Exp $
+ * $Id: hbapi.h,v 1.244 2008/05/20 01:41:35 ronpinkas Exp $
  */
 
 /*
@@ -520,7 +520,7 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
 
 extern HB_FORCE_EXPORT void    hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
-extern HB_EXPORT void    hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
+extern HB_EXPORT int      hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stordts( char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stord( int iYear, int iMonth, int iDay, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
@@ -683,9 +683,11 @@ extern HB_EXPORT BOOL      hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_L
 extern HB_EXPORT BOOL      hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
 extern HB_EXPORT BOOL      hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
 
+extern HB_EXPORT BOOL      hb_strMatchFile( const char * pszString, const char * szPattern ); /* compare two strings using platform dependent rules for file matching */
 extern HB_EXPORT BOOL      hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
 extern HB_EXPORT BOOL      hb_strMatchWild(const char *szString, const char *szPattern ); /* compare two strings using pattern with wildcard (?*) - patern have to be prefix of given string */
 extern HB_EXPORT BOOL      hb_strMatchWildExact( const char *szString, const char *szPattern ); /* compare two strings using pattern with wildcard (?*) - patern have to cover whole string */
+extern HB_EXPORT BOOL      hb_strMatchCaseWildExact( const char *szString, const char *szPattern ); /* compare two strings using pattern with wildcard (?*) ignoring the case of the characters - patern have to cover whole string */
 extern HB_EXPORT BOOL      hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
 extern HB_EXPORT void      hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
 extern HB_EXPORT ULONG     hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */

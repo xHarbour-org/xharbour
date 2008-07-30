@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.11 2007/12/21 12:12:21 likewolf Exp $
+ * $Id: hbdate.h,v 1.12 2008/03/09 19:18:25 likewolf Exp $
  */
 
 /*
@@ -91,6 +91,7 @@ extern HB_EXPORT LONG     hb_timeEncode( int iHour, int iMinute, double dSeconds
 extern HB_EXPORT void     hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 extern HB_EXPORT double   hb_timeEncodeSec( int iHour, int iMinute, double dSeconds );  /* Hecho */
 extern HB_EXPORT void     hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
 
 extern HB_EXPORT void     hb_datetimeEncode( LONG * plDate, LONG * plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * iOk );  /* Hecho */
 extern HB_EXPORT void     hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */

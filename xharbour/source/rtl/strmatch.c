@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.9 2005/09/02 18:30:41 druzus Exp $
+ * $Id: strmatch.c,v 1.10 2006/03/10 15:32:20 druzus Exp $
  */
 
 /*
@@ -272,15 +272,112 @@ HB_EXPORT BOOL hb_strMatchWildExact( const char *szString, const char *szPattern
    return fMatch;
 }
 
+HB_EXPORT BOOL hb_strMatchCaseWildExact( const char *szString, const char *szPattern )
+{
+   BOOL fMatch = TRUE, fAny = FALSE;
+   ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
+         ulBufSize = HB_MAX_WILDPATTERN;
+   ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
+         ulSize, ulLen, ulAny, i, j;
+
+   i = j = ulAny = 0;
+   ulLen = strlen( szString );
+   ulSize = strlen( szPattern );
+   while ( i < ulSize || ( j < ulLen && !fAny ) )
+   {
+      if( i < ulSize && szPattern[i] == '*' )
+      {
+         fAny = TRUE;
+         i++;
+      }
+      else if( j < ulLen && i < ulSize &&
+               ( szPattern[i] == '?' ||
+                 hb_charUpper( szPattern[i] ) == hb_charUpper( szString[j] ) ) )
+      {
+         if( fAny )
+         {
+            if( ulAny >= ulBufSize )
+            {
+               if( ( ulBufSize <<= 1 ) == ( HB_MAX_WILDPATTERN << 1 ) )
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+               }
+               else
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xrealloc( ulAnyPosP, ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xrealloc( ulAnyPosV, ulBufSize * sizeof( ULONG ) );
+               }
+            }
+            ulAnyPosP[ulAny] = i;
+            ulAnyPosV[ulAny] = j;
+            ulAny++;
+            fAny = FALSE;
+         }
+         j++;
+         i++;
+      }
+      else if( fAny && j < ulLen )
+      {
+         j++;
+      }
+      else if( ulAny > 0 )
+      {
+         ulAny--;
+         i = ulAnyPosP[ulAny];
+         j = ulAnyPosV[ulAny] + 1;
+         fAny = TRUE;
+      }
+      else
+      {
+         fMatch = FALSE;
+         break;
+      }
+   }
+   if( ulBufSize > HB_MAX_WILDPATTERN )
+   {
+      hb_xfree( ulAnyPosP );
+      hb_xfree( ulAnyPosV );
+   }
+   return fMatch;
+}
+
+
+HB_EXPORT BOOL hb_strMatchFile( const char * szString, const char * szPattern )
+{
+#if defined( HB_OS_UNIX )
+#  if defined( __WATCOMC__ )
+   return hb_strMatchWildExact( szString, szPattern );
+#  else
+   return fnmatch( szPattern, szString, FNM_PERIOD | FNM_PATHNAME ) == 0;
+#  endif
+#else
+   return hb_strMatchCaseWildExact( szString, szPattern );
+#endif
+}
+
 /*
  * WildMatch( cPattern, cValue [, lExact] ) compares
  * cValue with cPattern, cPattern * may contain wildcard characters (?*)
  * When lExact is TRUE then it will check if whole cValue is covered by
  * cPattern else if will check if cPatern is a prefix of cValue
  */
+
+/* NOTE: This function is compatible with sx_WildMatch(), except when
+         the pattern is an empty string where hb_WildMatch() returns
+         .T., while sx_WildMatch() returns .F. [vszakats] */
+
 HB_FUNC( WILDMATCH )
 {
    hb_retl( ( ! ISCHAR( 1 ) || ! ISCHAR( 2 ) ) ? FALSE :
             hb_parl( 3 ) ? hb_strMatchWildExact( hb_parc( 2 ), hb_parc( 1 ) ) :
                            hb_strMatchWild( hb_parc( 2 ), hb_parc( 1 ) ) );
+}
+
+HB_FUNC( HB_FILEMATCH )
+{
+   hb_retl( ( ! ISCHAR( 1 ) || ! ISCHAR( 2 ) ) ? FALSE :
+            hb_strMatchFile( hb_parc( 1 ), hb_parc( 2 ) ) );
 }

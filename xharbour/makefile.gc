@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.48 2008/06/03 23:12:55 kaddath Exp $
+# $Id: makefile.gc,v 1.49 2008/06/05 04:47:46 kaddath Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -332,6 +332,7 @@ else ifeq ($(__BLD__),CONTRIB_BLD)
 # HB_MYSQL=1
 # HB_PGSQL=1
 
+HB_MZIP=1
 HB_ZIP=1
 
 HB_FREEIMAGE=1
@@ -375,6 +376,10 @@ include common.mak
 
 ifeq ($(HB_FREEIMAGE), 1)
 CONTRIB_PROJECT+=$(FREEIMAGE_LIB)
+endif
+
+ifeq ($(HB_MZIP), 1)
+CONTRIB_PROJECT+=$(HBMZIP_LIB)
 endif
 
 ifeq ($(HB_ZIP), 1)
@@ -421,6 +426,9 @@ $(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
