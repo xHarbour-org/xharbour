@@ -1,0 +1,55 @@
+#
+# $Id: Makefile.bc,v 1.1 2004/07/26 01:32:09 lculik Exp $
+#
+
+INCLUDE_DIR = ..\..\include
+BIN_DIR     = ..\..\bin\b32
+OBJ_DIR     = ..\..\obj\b32
+LIB_DIR     = ..\..\lib\b32
+LIBNAME     = $(LIB_DIR)\hbmzip.lib
+
+
+SRC_LIST = \
+   ioapi.c  \
+   zip.c \
+   unzip.c \
+   hbmzip.c 
+
+#
+# File dependencies
+#
+
+.path.obj = $(OBJ_DIR)
+
+OBJ_LIST = $(SRC_LIST:.c=.obj)
+
+#
+# Dependencies
+#
+
+all: $(OBJ_LIST) $(LIBNAME)
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c   del $(OBJ_DIR)\*.c >nul
+   -@if exist $(LIBNAME) del $(LIBNAME) >nul
+
+
+#
+# Implicit Rules
+#
+
+.c.obj:
+   bcc32 $(CLIBFLAGS) $(C_USR) $(CFLAGS) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $**
+
+#
+# Explicit Rules
+#
+
+$(LIBNAME) :: $(OBJ_LIST)
+   @if exist $(LIBNAME) del $(LIBNAME) > nul
+   tlib @&&|
+   $(LIBNAME) &
+   &+$(**: = &^
+   +)
+|
