@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.100 2008/03/23 05:25:23 andijahja Exp $
+ * $Id: hbdefs.h,v 1.101 2008/06/28 18:51:48 walito Exp $
  */
 
 /*
@@ -66,6 +66,11 @@
     ( defined( __GNUC__ ) && \
       ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
 #  include <stdint.h>
+    /* workaround for BCC 5.8 bug */
+#   if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
+#         undef INT32_MIN
+#         define INT32_MIN ((int32_t) (-INT32_MAX-1))
+#   endif
 #endif
 
 /*
@@ -215,8 +220,7 @@
 
 #ifndef HB_LONG_LONG_OFF
 
-   #if ! defined( HB_DONT_DEFINE_BASIC_TYPES )
-      #if ! defined(_WINNT_H)
+   #if ! defined(HB_DONT_DEFINE_BASIC_TYPES) && ! defined(_WINNT_H)
          #if !defined(LONGLONG)
             #if defined(__GNUC__)
                typedef long long LONGLONG;
@@ -232,7 +236,6 @@
             #endif
          #endif
       #endif
-   #endif
 
    #if !defined(ULONGLONG_MAX)
       #if defined(_UI64_MAX)

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.bc,v 1.1 2004/07/26 01:32:09 lculik Exp $
+# $Id: makefile.bc,v 1.1 2008/07/30 10:15:56 marchuet Exp $
 #
 
 INCLUDE_DIR = ..\..\include
@@ -10,7 +10,7 @@ LIBNAME     = $(LIB_DIR)\hbmzip.lib
 
 
 SRC_LIST = \
-   ioapi.c  \
+   ioapi.c \
    zip.c \
    unzip.c \
    hbmzip.c 

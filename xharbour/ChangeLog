@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6180 2008/07/27 19:47:55 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6181 2008/07/30 11:31:02 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-01 09:21 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/rdd/hbsix/sxcompr.c
+    * pacified warnings
+  * harbour/contrib/hbmzip/zip.c
+    ! set valid ZIP signature in header file (2.0)
+  * contrib/hbmzip/hbmzip.c
+  * contrib/hbmzip/readme.txt
+    * changed parameters of HB_UnzipFileInfo()
+      Now in 10-th parameter is @lCrypted and 11-th is @cComment
+    ! added "b" to fopen() flags to force binary mode in all systems 
+      during CRC32 calculation
+  * harbour/contrib/hbmzip/tests/myunzip.prg
+    + show archive and file comment
+    + show encrypted files ('*' after file name)
+
+    synced with harbour
 
 2008-07-30 13:33 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * common.mak

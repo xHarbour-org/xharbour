@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt 9010 2008-07-26 14:26:11Z druzus $
+ * $Id: readme.txt,v 1.1 2008/07/30 10:15:56 marchuet Exp $
  */
 
 
@@ -50,11 +50,12 @@ HB_ZipFileCreate( hZip, cZipName, dDate, cTime,
                   nInternalAttr, nExternalAttr,
                   [ nMethod = HB_ZLIB_METHOD_DEFLATE ], 
                   [ nLevel = HB_ZLIB_COMPRESSION_DEFAULT ], 
-                  [ cPassword ], [ cComment ] ) --> nError
+                  [ cPassword, ulFileCRC32 ], [ cComment ] ) --> nError
 HB_ZipFileWrite( hZip, cData [, nLen ] ) --> nError
 HB_ZipFileClose( hZip ) --> nError
 HB_ZipStoreFile( hZip, cFileName, [ cZipName ], ;
                  [ cPassword ], [ cComment ] ) --> nError
+HB_zipFileCRC32( cFileName ) --> nError
 
 
 HB_UnzipOpen( cFileName ) --> hUnzip
@@ -67,7 +68,7 @@ HB_UnzipFileGoto( hUnzip, nPosition ) --> nError
 HB_UnzipFileInfo( hUnzip, @cZipName, @dDate, @cTime,
                   @nInternalAttr, @nExternalAttr,
                   @nMethod, @nSize, @nCompressedSize,
-                  @cComment ) --> nError
+                  @lCrypted, @cComment ) --> nError
 HB_UnzipFileOpen( hUnzip, [ cPassword ] ) --> nError
 HB_UnzipFileRead( hUnzip, @cBuf [, nLen ] ) --> nRead
 HB_UnzipFileClose( hUnzip ) --> nError

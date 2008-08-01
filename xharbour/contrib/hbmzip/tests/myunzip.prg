@@ -1,5 +1,5 @@
 /*
- * $Id: myunzip.prg 9013 2008-07-28 00:48:11Z druzus $
+ * $Id: myunzip.prg,v 1.1 2008/07/30 10:15:56 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,8 @@
 
 PROC MyUnzip( ... )
    LOCAL hUnzip, aWild, cFileName, cExt, cPath, cFile, ;
-         dDate, cTime, nSize, nCompSize, nErr, cPassword, tmp
+         dDate, cTime, nSize, nCompSize, nErr, ;
+         lCrypted, cPassword, cComment, tmp
 
    aWild := { ... }
    IF LEN( aWild ) < 1
@@ -85,13 +86,21 @@ PROC MyUnzip( ... )
 
    IF ! EMPTY( hUnzip )
       ? "Archive file:", cFileName
+      HB_UnzipGlobalInfo( hUnzip, @nSize, @cComment )
+      ? "Number of entires:", nSize
+      IF !EMPTY( cComment )
+        ? "global comment:", cComment
+      ENDIF
       ? ""
       ? "Filename                         Date     Time          Size Compressed  Action"
       ? "---------------------------------------------------------------------------------"
       nErr := HB_UNZIPFILEFIRST( hUnzip )
       DO WHILE nErr == 0
-        HB_UnzipFileInfo( hUnzip, @cFile, @dDate, @cTime,,,, @nSize, @nCompSize )
-        ? PADR( cFile, 30 ), dDate, cTime, nSize, nCompSize
+         HB_UnzipFileInfo( hUnzip, @cFile, @dDate, @cTime,,,, @nSize, @nCompSize, @lCrypted, @cComment )
+         ? PADR( cFile + iif( lCrypted, "*", ""), 30 ), dDate, cTime, nSize, nCompSize
+         IF !empty( cComment )
+            ? "comment:", cComment
+         ENDIF
 
         IF ASCAN( aWild, {|cPattern| HB_WILDMATCH( cPattern, cFile, .T. ) } ) > 0
            ?? " Extracting"

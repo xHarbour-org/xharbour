@@ -1,10 +1,11 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.1 2008/07/30 10:15:56 marchuet Exp $
+rem $Id: make_b32.bat,v 1.2 2008/07/30 16:35:30 marchuet Exp $
 rem
 
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
+
 :BUILD
 
 make -fmakefile.bc %1 %2 %3 > make_b32.log
@@ -13,6 +14,7 @@ if "%1" == "CLEAN" goto CLEAN
 if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
+
    copy ..\..\lib\b32\hbmzip.lib ..\..\lib > nul
    goto EXIT
 
