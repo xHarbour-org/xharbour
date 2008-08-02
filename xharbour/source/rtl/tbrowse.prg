@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.199 2008/07/14 20:17:11 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.200 2008/07/24 14:41:59 modalsist Exp $
  */
 
 /*
@@ -1082,10 +1082,10 @@ Default lAll to .f.
    if lAll
       ::ResetHitState()
       AFill( ::aRedraw, .T. )
-      ::oCache:Invalidate( NIL , .T. )
+      ::oCache:Invalidate( NIL )
    elseif ! Empty( ::aRedraw ) .and. ::nRowPos > 0
       ::aRedraw[ ::nRowPos ] := .T.
-      ::oCache:Invalidate( ::nRowPos, .F. )
+      ::oCache:Invalidate( ::nRowPos )
       ::oCache:DelColRect( ::nRowPos )
    endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6181 2008/07/30 11:31:02 marchuet Exp $
+ * $Id: ChangeLog,v 1.6182 2008/08/01 09:41:14 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-02 14:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * mdir.bat
+    * changed ::COPYBIN session to delete ppgen.exe prior to copy.
+  
+  * source/rtl/dbedit.prg
+    ! Fix on key exception management and general optimization.
+
+  * source/rtl/browse.prg
+    ! Fix to update cell content after changed on indexed area.
+
+  * source/rtl/tbrowse.prg
+    ! Minor syntax correction on ::oCache:Invalidate() calls.
+
+  * source/vm/errorapi.c
+    * changed hb_fopen( "error.log", "w") to hb_fopen( "error.log", "a")
+      to preserve an existent "error.log" file, instead create a new one.
 
 2008-08-01 09:21 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source/rdd/hbsix/sxcompr.c

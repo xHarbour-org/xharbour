@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.14 2008/03/13 10:49:41 likewolf Exp $
+ * $Id: browse.prg,v 1.15 2008/07/10 02:56:16 modalsist Exp $
  */
 
 /*
@@ -72,6 +72,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
    Local bAction
    Local lKeyPressed
    Local aRect, cField, lShared
+   Local nKeyNo
 
    if ! Used()
       return .f.
@@ -286,7 +287,9 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
         case K_ENTER
+            nKeyNo := OrdKeyNo()
             nKey := doget( oBrw, lShared )
+            lRefresh := ( nKeyNo != OrdKeyNo() )
             lKeyPressed := (nKey != 0)
             exit
         default

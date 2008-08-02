@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.45 2008/07/11 15:42:39 modalsist Exp $
+ * $Id: dbedit.prg,v 1.46 2008/07/14 15:24:14 modalsist Exp $
  */
 
 /*
@@ -97,11 +97,6 @@
 #define DE_APPEND  3
 #endif
 
-STATIC s_udfkey := 0
-STATIC s_skipblock
-STATIC s_lFileChanged := .f.
-
-
 FUNCTION DBEdit(nTop,;                //  1§
                 nLeft,;               //  2§
                 nBottom,;             //  3§
@@ -122,21 +117,22 @@ LOCAL oTBR,;
       i,;
       nRet,;
       nKey,;
-      bFun,;
+      bFunc,;
       nCursor,;
       cHdr,;
       nIndex,;
-      lAppend
+      lAppend,;
+      lExcept
 
 
-  nRet := DE_REFRESH
+  nRet := DE_CONT
   lAppend := .f.
 
   // If no database in use we must call Errorsys() with error 2001
   //
-  IF !Used()
+  if ! Used()
      Throw( ErrorNew( "DBCMD", 0, 2001, ProcName(), "Workarea not in use" ) )
-  END
+  endif
 
 
   DEFAULT nTop TO 0
@@ -257,6 +253,7 @@ LOCAL oTBR,;
   // Save previous cursor format.
   nCursor := SetCursor(SC_NONE)
 
+
   /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
   DispBegin()
 
@@ -267,8 +264,7 @@ LOCAL oTBR,;
   oTBR:Cargo := .F.
 
   /* E.F. 2006/04/22 - Use a custom 'skipper' to handle append mode */
-  s_skipblock := { |x| dbe_Skipper( x, oTBR ) }
-  oTBR:SkipBlock := s_skipblock
+  oTBR:SkipBlock := { |x| dbe_Skipper( x, oTBR ) }
 
 
   IF HB_ISSTRING(acHeadingSep)
@@ -299,13 +295,13 @@ LOCAL oTBR,;
        nIndex := HB_EnumIndex()
 
        If HB_ISARRAY(i)
-          bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
+          bFunc := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
        Else
-          bFun := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
+          bFunc := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
        End
 
-       If ValType(Eval(bFun)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
-          bFun := {|| "  <Memo>  "}
+       If ValType(Eval(bFunc)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
+          bFunc := {|| "  <Memo>  "}
        End
 
        cHdr := i
@@ -320,7 +316,7 @@ LOCAL oTBR,;
           cHdr := "<block>"
        End
 
-       oTBC := TBColumnNew( cHdr, bFun )
+       oTBC := TBColumnNew( cHdr, bFunc )
 
        If HB_ISARRAY( i )
           oTBC:colorBlock := i[2]
@@ -376,49 +372,40 @@ LOCAL oTBR,;
 
  NEXT
 
- IF Len(axColumns) = 1
-    oTBR:setKey(K_LEFT, Nil)
-    oTBR:setKey(K_RIGHT, Nil)
- END
-
- If Empty(xUserFunc)
-    bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
- ElseIf !HB_IsLogical(xUserFunc)
-    bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
-    oTBR:setKey( K_ESC, nil )
- END
-
  DispEnd()
 
- // xHarbour extension: Initialization call
- //
- nRet := dbe_CallUDF(bFun, DE_INIT, oTBR:colPos, oTBR)
-
- if nRet == DE_REFRESH
-    oTBR:RefreshAll()
-    oTBR:Invalidate()
+ if Len(axColumns) = 1
+    oTBR:setKey(K_LEFT, Nil)
+    oTBR:setKey(K_RIGHT, Nil)
  endif
+
+ If Empty(xUserFunc)
+    bFunc := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
+ ElseIf !HB_IsLogical(xUserFunc)
+    bFunc := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
+    oTBR:setKey( K_ESC, nil )
+ Endif
+
+
+#ifdef HB_EXTENSION
+  // xHarbour extension: call UDF with DE_INIT mode.
+  nRet := dbe_CallUDF(bFunc, DE_INIT, oTBR:colPos, oTBR)
+#endif
 
  oTBR:ForceStable()
  oTBR:DeHilite()
 
- if Hb_IsLogical( xUserFunc ) .AND. ! xUserFunc
+ if hb_IsLogical(xUserFunc) .and. xUserFunc = .F.
     nRet := DE_ABORT
  endif
 
- if nRet != DE_ABORT
-    if dbe_emptydb()
-       nRet := dbe_CallUDF(bFun, DE_EMPTY, oTBR:colPos, oTBR)
-    endif
-    if nextkey()==0
-       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
-    else
-       inkey()
-       nRet := dbe_CallUDF(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
-    endif
+ if nRet != DE_ABORT .and. Nextkey() = 0
+    nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
  endif
 
+ nKey := 0
  lAppend := oTBR:Cargo
+ lExcept := .f.
 
  /////////////////////
  // PROCESSING LOOP //
@@ -427,61 +414,52 @@ LOCAL oTBR,;
  WHILE nRet != DE_ABORT
 
     if nRet = DE_CONT
+
        oTBR:RefreshCurrent()
 
     elseif nRet = DE_REFRESH
-       oTBR:RefreshAll()
-       oTBR:Invalidate()
 
-       if s_udfkey != 0
-          oTBR:GoTop()
-       else
-          if s_lFileChanged
-             oTBR:GoTop()
-          endif
-          oTBR:ForceStable()
-          if lAppend 
-             lAppend := .F.
-             oTBR:GoBottom()
-          endif
-          s_lFileChanged := .F.
+       oTBR:RefreshAll()
+
+       if lAppend
+          lAppend := .F.
+          oTBR:Cargo := .F.
+          oTBR:GoBottom()
        endif
+
+       nRet := DE_CONT
+
     endif
 
     oTBR:ForceStable()
-    oTBR:Hilite()
 
-    if nRet = DE_REFRESH .and. s_udfkey = 0
-       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
-    else
-       nRet := DE_CONT
+    if nRet = DE_CONT 
+
+       if oTBR:HitTop
+          nRet := dbe_CallUDF(bFunc, DE_HITTOP, oTBR:colPos, oTBR)
+
+       elseif oTBR:HitBottom
+          nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, oTBR)
+
+       elseif ! oTBR:Cargo .and. dbe_emptydb()
+          nRet := dbe_CallUDF(bFunc, DE_EMPTY, oTBR:colPos, oTBR)
+
+       endif
+
+       if nRet == DE_CONT .and. lExcept
+          nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
+          lExcept := .f.
+
+          if nRet = DE_CONT .and. NextKey() = 0
+             oTBR:RefreshCurrent()
+             nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
+          endif
+       endif
+
     endif
 
     if nRet = DE_ABORT
        EXIT
-    endif
-
-    if nRet = DE_CONT
-
-       if oTBR:HitTop
-          nRet := dbe_CallUDF(bFun, DE_HITTOP, oTBR:colPos, oTBR)
-       elseif oTBR:HitBottom
-          nRet := dbe_CallUDF(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
-       endif
-
-    endif
-
-    if nRet = DE_CONT .and. ! oTBR:Cargo .and. nKey = 0 .and. s_udfkey = 0
-
-       if dbe_emptydb()
-          nRet := dbe_CallUDF(bFun, DE_EMPTY, oTBR:colPos, oTBR)
-       endif
-
-    endif
-
-
-    if nRet = DE_ABORT
-       Exit
 
     elseif nRet = DE_REFRESH
        LOOP
@@ -491,61 +469,36 @@ LOCAL oTBR,;
        oTBR:Cargo := .T.
        lAppend := .T.
 
-       if ! eof() .or. !dbe_emptydb()
+       if ! eof() .or. ! dbe_emptydb()
           oTBR:Down()
        endif
 
+       oTBR:RefreshCurrent()
        oTBR:ForceStable()
-       oTBR:Cargo := .F.
        nRet := DE_CONT
 
     endif
+ 
+    oTBR:Hilite()
 
-    if ! empty( s_udfkey ) .and. empty(nKey)
-       nKey := s_udfkey
-       s_udfkey := 0
-       keyboard chr(nKey)
-       inkey()
-
+    if Nextkey() != 0
+       nKey := Inkey()
     else
-
-       /* 2007/JAN/30 - EF - Reset keyboard buffer to avoid keystrokes repetition into loop. */
-       if Nextkey() != 0
-          dbe_ClearKB()
-       endif
        nKey := Inkey(0)
-
-    endif
-
-    if dbe_ProcessKey(nKey, oTBR) = DE_ABORT
-       EXIT
-    endif
-
-    oTBR:ForceStable()
-
-    if ValType( SetKey(nKey) ) == 'B'
-       Eval( SetKey(nKey), ProcName(1), ProcLine(1), "")
     endif
 
     if nKey != 0
-       nRet := dbe_CallUDF(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
 
-       nKey := 0
-
-       if nRet = DE_ABORT
+       if dbe_ProcessKey( nKey, oTBR) = DE_ABORT
           EXIT
-
-       elseif nRet = DE_REFRESH
-          LOOP
-
        endif
 
-    endif
+       if ValType( SetKey(nKey) ) == 'B'
+          Eval( SetKey(nKey), ProcName(1), ProcLine(1), "")
+       endif
 
-    oTBR:ForceStable()
+       lExcept := .t.
 
-    if nRet = DE_CONT .and. s_udfkey = 0 .and. NextKey() = 0 
-       nRet := dbe_CallUDF(bFun, DE_IDLE, oTBR:colPos, oTBR)
     endif
 
  ENDDO
@@ -555,10 +508,12 @@ LOCAL oTBR,;
 
 RETURN .T.
 
+
+
 *------------------------------------------------------*
-STATIC FUNCTION dbe_CallUDF(bFun, nMode, nColPos, oTBR)
+STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, oTBR)
 *------------------------------------------------------*
-LOCAL nRet, nRec, nKey, i, j, nLastRec
+LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged
 
   nRet := DE_CONT
 
@@ -574,7 +529,7 @@ LOCAL nRet, nRec, nKey, i, j, nLastRec
      while nKey != 0
         inkey()
         dbe_ProcessKey( nKey, oTBR )
-        nRet := dbe_return( Eval(bFun, DE_EXCEPT, nColPos, oTBR) )
+        nRet := dbe_return( Eval(bFunc, DE_EXCEPT, nColPos, oTBR) )
         if nRet = DE_ABORT
            EXIT
         elseif nRet = DE_REFRESH
@@ -588,7 +543,7 @@ LOCAL nRet, nRec, nKey, i, j, nLastRec
      enddo
 
      if nRet != DE_ABORT
-        nRet := dbe_return( Eval(bFun, DE_INIT, nColPos, oTBR) )
+        nRet := dbe_return( Eval(bFunc, DE_INIT, nColPos, oTBR) )
      endif
 
      Return nRet
@@ -600,82 +555,33 @@ LOCAL nRet, nRec, nKey, i, j, nLastRec
 
   endif
 
-  nRec := RecNo()
+  lDeleted := Deleted()
+  nRec     := RecNo()
   nLastRec := LastRec()
 
   // Call UDF
-  nRet := dbe_return( Eval(bFun, nMode, nColPos, oTBR) )
+  nRet := dbe_return( Eval(bFunc, nMode, nColPos, oTBR) )
 
-  // if file was changed under UDF.
-  s_lFileChanged := ( LastRec() != nLastRec )
+  // A change was occurred on UDF (append, delete or skip).
+  lChanged := ( nLastRec != LastRec() .or.;
+                Deleted() != lDeleted .or.;
+                nRec != Recno() )
 
-  if nRet != DE_ABORT
-     s_udfkey := NextKey()
-     dbe_ClearKB()
-  endif
 
-  if nRet = DE_ABORT .OR. nRet = DE_APPEND
+  if nRet = DE_ABORT .or. nRet = DE_APPEND
      Return nRet
   endif
 
-  // The UDF has updated, appended or deleted record, dbedit need refresh.
-  if s_lFileChanged .or. nRec != Recno()
-     nRet := DE_REFRESH
-  endif
-
-
-  /*****************************************************************/
-  /* This part of code was borrowed from old dbedit code (harbour) */
-  /*****************************************************************/
-
-  if Eof() .and. nMode != DE_EMPTY
-     dbSkip(-1)
-  endif
-
-  if ( nRet = DE_REFRESH .or. nRec != RecNo() )
-
-     if nRet != DE_ABORT
-
-        // if UDF has deleted record, dbedit need repos record.
-        //
-        if ( Set( _SET_DELETED ) .AND. Deleted() ) .OR. (!Empty( dbFilter() ) .AND. ! &( dbFilter() ) )
-
-           if ! eof()
-              dbSkip(1)
-           endif
-        
-           nRet := DE_REFRESH
-
+  // The UDF has changed file, so dbedit need to be refreshed.
+  if lChanged 
+     if LastRec() > nLastRec  // append blank
+        oTBR:RowPos := 1
+     elseif Deleted() .and. Lastrec() != 0
+        if SET(_SET_DELETED)
+           dbSkip()
         endif
-
-        nRec := RecNo()
-
-        if nRet = DE_REFRESH
-           oTBR:RefreshAll()
-           oTBR:Invalidate()
-           oTBR:ForceStable()
-        endif
-
-        if nRec != Recno()
-
-           j := recno()
-
-           if nRec > j
-              for i := 1 to nRec - j
-                  dbskip(-1)
-              next
-           else
-              for i := 1 to j - nRec
-                  dbSkip(1)
-              next
-           endif
-
-           nRet := DE_REFRESH
-
-        endif
-
      endif
-
+     nRet := DE_REFRESH
   endif
 
 RETURN nRet
@@ -848,27 +754,9 @@ Local nRet := DE_CONT
 
 Return nRet
 
-*------------------------------------*
-STATIC PROCEDURE dbe_ClearKB()
-*------------------------------------*
-
-keyboard chr(0)
-inkey()
-
-RETURN
-
-STATIC PROCEDURE dbe_SkipOff(o)
- o:SkipBlock := NIL
-RETURN
-
-STATIC PROCEDURE dbe_SkipOn(o)
- o:SkipBlock := s_SkipBlock
-RETURN
-
 *----------------------------------*
 STATIC FUNCTION dbe_Return( n )
 *----------------------------------*
-
 if ! hb_isnumeric( n )
    n := DE_CONT
 elseif n < DE_ABORT .or. n > DE_APPEND
@@ -876,3 +764,5 @@ elseif n < DE_ABORT .or. n > DE_APPEND
 endif
 
 Return n
+
+
