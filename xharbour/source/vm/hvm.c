@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.690 2008/07/14 19:05:11 ronpinkas Exp $
+ * $Id: hvm.c,v 1.691 2008/08/03 00:58:32 walito Exp $
  */
 
 /*
@@ -9278,9 +9278,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    /* we store its stack offset instead of a pointer to support a dynamic stack */
    if( iLocal >= 0 )
    {
-      PHB_ITEM pLocal = hb_stackLocalVariable( &iLocal );
-
       #if 0
+         PHB_ITEM pLocal = hb_stackLocalVariable( &iLocal );
+
          /*
             R.P. assuming this was only an optimization, thus it was disabled
             to allow detection of:

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.274 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.275 2008/07/02 18:26:04 ronpinkas Exp $
  */
 
 /*
@@ -848,7 +848,7 @@ static void hb_pp_dumpEnd( PHB_PP_STATE pState )
          PP itself */
       if( pState->fWritePreprocesed )
       {
-         int iLines = 0;
+         //int iLines = 0;
          char * pBuffer;
          ULONG ulLen;
 
@@ -879,7 +879,7 @@ static void hb_pp_dumpEnd( PHB_PP_STATE pState )
          while( ulLen-- )
          {
             if( *pBuffer++ == '\n' )
-               ++iLines;
+               /* ++iLines */;
          }
          //pState->pFile->iLastLine = pState->iDumpLine + iLines + 2;
       }
