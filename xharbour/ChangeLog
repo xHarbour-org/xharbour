@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6184 2008/08/03 00:58:30 walito Exp $
+ * $Id: ChangeLog,v 1.6185 2008/08/03 10:09:54 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,36 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-08-03 13:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\gtwvg\gtwvg.c
+    - Removed unused variable iIndex in function hb_gt_wvt_FreeAll
+
+  * contrib\freeimage\source\fi_wrp.c
+    * Type cast in the assignment to variable szImage in function HB_FUN_FI_LOADFROMMEM
+    * Type cast in the assignment to variable szImage in function HB_FUN_FI_GETFILETYPEFROMMEM
+
+  * contrib\xwt\src\xwt_win\xwt_win.c
+    + Added HB_SYMBOL_UNUSED( widget ) to remove a compiler warning in
+      function xwt_drv_modal
+    + Added HB_SYMBOL_UNUSED( wWSelf ) to remove a compiler warning in
+      function xwt_drv_add
+    + Added HB_SYMBOL_UNUSED( wWChild ) to remove a compiler warning in
+      function xwt_drv_add
+    + Added HB_SYMBOL_UNUSED( wWSelf ) to remove a compiler warning in
+      function xwt_drv_remove
+    + Added HB_SYMBOL_UNUSED( wWChild ) to remove a compiler warning in
+      function xwt_drv_remove
+    + Added HB_SYMBOL_UNUSED( argc ) to remove a compiler warning in
+      function xwt_drv_init
+    + Added HB_SYMBOL_UNUSED( argv ) to remove a compiler warning in
+      function xwt_drv_init
+
 2008-08-03 12:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\pp\ppcore.c
     - Commented out unused variable iLines in function hb_pp_dumpEnd
 
   * source\vm\hvm.c
-    - Moved definition of variable pLocal inside #if 0 in function hb_vmPushLocalByRef
+    * Moved definition of variable pLocal inside #if 0 in function hb_vmPushLocalByRef
 
 2008-08-02 21:50 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * include\hbclass.ch

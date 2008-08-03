@@ -1,5 +1,5 @@
 /*
- * $Id: fi_wrp.c,v 1.3 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: fi_wrp.c,v 1.4 2008/05/27 16:04:31 ptsarenko Exp $
  */
 
 /*
@@ -382,7 +382,7 @@ HB_FUNC( FI_LOADFROMMEM )
 
       /* Retrieve parameters */
       fif      = (FREE_IMAGE_FORMAT) hb_parni( 1 );
-      szImage  = hb_parcx( 2 );
+      szImage  = ( BYTE * ) hb_parcx( 2 );
       flags    = hb_parni( 3 );
 
       /* run function */
@@ -912,7 +912,7 @@ HB_FUNC( FI_GETFILETYPEFROMMEM )
       int size;
 
       /* Retrieve parameters */
-      szImage = hb_parcx( 1 );
+      szImage = ( BYTE * ) hb_parcx( 1 );
       stream  = FreeImage_OpenMemory( szImage, hb_parclen(1) );
       size    = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ? hb_parni( 1 ) : 0 );
 

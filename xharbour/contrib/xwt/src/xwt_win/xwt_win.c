@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.5 2004/06/28 18:10:17 paultucker Exp $
+   $Id: xwt_win.c,v 1.6 2008/05/01 03:36:58 andijahja Exp $
 
    Global declarations, common functions
 
@@ -217,7 +217,7 @@ BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
 
 void xwt_drv_modal( PXWT_WIDGET widget )
 {
-
+   HB_SYMBOL_UNUSED( widget );
 }
 
 /******************************************************
@@ -226,12 +226,16 @@ void xwt_drv_modal( PXWT_WIDGET widget )
 
 BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
 {
+   HB_SYMBOL_UNUSED( wWSelf );
+   HB_SYMBOL_UNUSED( wWChild );
   
    return FALSE;
 }
 
 BOOL xwt_drv_remove( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
 {
+   HB_SYMBOL_UNUSED( wWSelf );
+   HB_SYMBOL_UNUSED( wWChild );
 
    return FALSE;
 }
@@ -245,6 +249,9 @@ BOOL xwt_drv_init( int argc, char **argv )
 { 
    WNDCLASS wc;
    
+   HB_SYMBOL_UNUSED( argc );
+   HB_SYMBOL_UNUSED( argv );
+
    if (!hb_hPrevInstance) 
     { 
         wc.style = 0; 

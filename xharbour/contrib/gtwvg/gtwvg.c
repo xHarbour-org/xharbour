@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.1 2008/06/25 22:19:17 vouchcac Exp $
+ * $Id: gtwvg.c,v 1.2 2008/07/01 03:30:45 ronpinkas Exp $
  */
 
 /*
@@ -215,7 +215,7 @@ static void hb_gt_wvt_FreeAll( void )
 {
    if( s_wvtCount > 0 )
    {
-      int iPos, iIndex;
+      int iPos;
 
       for ( iPos = 1; iPos < WVT_MAX_WINDOWS; iPos++ )
       {
