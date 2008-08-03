@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6182 2008/08/01 09:41:14 marchuet Exp $
+ * $Id: ChangeLog,v 1.6183 2008/08/02 17:17:52 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-02 21:50 UTC-0300 Walter Negro <anegro at overnet.com.ar>
+  * include\hbclass.ch
+  * source\rtl\tclass.prg
+  * source\vm\classes.c
+  * source\vm\hvm.c
+    ! Fix GPF in hb_vmReleaseLocalSymbols() when use PCODE in DLL
+    ! Fix hb_clsDeactiveClass() function for modules with more than one class declared.
+    * Add call to hb_clsDeactiveClass() function when unload DLL (LibFree()) similar to unload .hrb
 
 2008-08-02 14:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat

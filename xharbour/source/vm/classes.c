@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.221 2008/06/03 04:59:56 ronpinkas Exp $
+ * $Id: classes.c,v 1.222 2008/06/27 06:21:52 ronpinkas Exp $
  */
 
 /*
@@ -2582,21 +2582,27 @@ HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
 {
    PCLASS pClass = s_pClasses;
    UINT uiPos = s_uiClasses;
+   BOOL bFound = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_clsDeactiveClass(%p)", pModule));
 
-   while ( uiPos && HB_SYM_GETMODULESYM( pClass->pClsSymbol ) != pModule )
+   while ( uiPos )
    {
-      uiPos--;
-      pClass++;
-   }
+	   while ( uiPos && HB_SYM_GETMODULESYM( pClass->pClsSymbol ) != pModule )
+	   {
+		  uiPos--;
+		  pClass++;
+	   }
 
-   if( uiPos )
-   {
-      pClass->bActive = FALSE;
-      return TRUE;
+	   if( uiPos )
+	   {
+		  pClass->bActive = FALSE;
+		  bFound = TRUE;
+		  uiPos--;
+		  pClass++;
+	   }
    }
-   return FALSE;
+   return bFound;
 }
 
 HB_FUNC( __CLSISACTIVE )

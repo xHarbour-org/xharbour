@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.62 2008/03/12 11:46:40 walito Exp $
+ * $Id: hbclass.ch,v 1.63 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -345,19 +345,19 @@ DECLARE HBClass ;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
       local __lInactive := s_oClass != NIL .and. !__clsIsActive(s_oClass:hClass) ;;
    #else ;;
       #undef __lInactive ;;
       #define __lInactive .F. ;;
    #endif ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
       if s_oClass == NIL .or. __lInactive ;;
    #endif ;;
          if s_oClass == NIL ;;
             s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsNameFrom_( <SuperClass1> )():classh ] [ , _AsNameFrom_( <SuperClassN> )():classh ] ) ) ) ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
          endif ;;
    #endif ;;
      #undef  _CLASS_NAME_ ;;
@@ -379,19 +379,19 @@ DECLARE HBClass ;
       static s_oClass  ;;
       local oClassInstance ;;
       local nScope ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
       local __lInactive := s_oClass != NIL .and. !__clsIsActive(s_oClass:hClass) ;;
    #else ;;
       #undef __lInactive ;;
       #define __lInactive .F. ;;
    #endif ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
       if s_oClass == NIL .or. __lInactive ;;
    #endif ;;
          if s_oClass == NIL ;;
             s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsNameFrom_( <SuperClass1> )():classh ] [ , _AsNameFrom_( <SuperClassN> )():classh ] ) ) ) ;;
-   #ifdef __HRB__ ;;
+   #if defined( __HRB__ ) || defined( __EXPORT__ ) ;;
          endif
    #endif ;;
      #undef  _CLASS_NAME_ ;;

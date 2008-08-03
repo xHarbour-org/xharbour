@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.28 2008/03/07 03:53:46 walito Exp $
+ * $Id: tclass.prg,v 1.29 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -77,6 +77,8 @@
 #include "divert.ch"
 
 REQUEST HBObject
+REQUEST __CLSISACTIVE
+REQUEST __CLSACTIVE
 
 FUNCTION HBClass()
 

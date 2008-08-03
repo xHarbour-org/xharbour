@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.689 2008/06/28 18:51:49 walito Exp $
+ * $Id: hvm.c,v 1.690 2008/07/14 19:05:11 ronpinkas Exp $
  */
 
 /*
@@ -811,7 +811,7 @@ void hb_vmReleaseLocalSymbols( void )
          {
             pSymbol = pDestroy->pSymbolTable + ui;
 
-            if( ! HB_ISINITEXIT( pSymbol->scope.value ) )
+            if( ! HB_ISINITEXIT( pSymbol->scope.value ) && ! pSymbol->scope.value & HB_FS_STATIC )
             {
                pDynSym = HB_SYM_GETDYNSYM( pSymbol );
 
@@ -9991,7 +9991,8 @@ void hb_vmExitSymbolGroup( void * hDynLib )
          {
             if( pLastSymbols->hDynLib == hDynLib )
             {
-              hb_vmFreeSymbols( pLastSymbols );
+               hb_clsDeactiveClass( pLastSymbols );
+               hb_vmFreeSymbols( pLastSymbols );
             }
 
             pLastSymbols = pLastSymbols->pNext;
