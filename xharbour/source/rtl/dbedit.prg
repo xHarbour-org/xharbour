@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.46 2008/07/14 15:24:14 modalsist Exp $
+ * $Id: dbedit.prg,v 1.47 2008/08/02 17:18:00 modalsist Exp $
  */
 
 /*
@@ -386,7 +386,6 @@ LOCAL oTBR,;
     oTBR:setKey( K_ESC, nil )
  Endif
 
-
 #ifdef HB_EXTENSION
   // xHarbour extension: call UDF with DE_INIT mode.
   nRet := dbe_CallUDF(bFunc, DE_INIT, oTBR:colPos, oTBR)
@@ -399,17 +398,15 @@ LOCAL oTBR,;
     nRet := DE_ABORT
  endif
 
- if nRet != DE_ABORT .and. Nextkey() = 0
-    nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
- endif
-
  nKey := 0
  lAppend := oTBR:Cargo
  lExcept := .f.
 
+
  /////////////////////
  // PROCESSING LOOP //
  /////////////////////
+
 
  WHILE nRet != DE_ABORT
 
@@ -435,28 +432,36 @@ LOCAL oTBR,;
 
     if nRet = DE_CONT 
 
-       if oTBR:HitTop
-          nRet := dbe_CallUDF(bFunc, DE_HITTOP, oTBR:colPos, oTBR)
+       if ! lExcept
 
-       elseif oTBR:HitBottom
-          nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, oTBR)
+          if dbe_emptydb()
+             nRet := dbe_CallUDF(bFunc, DE_EMPTY, oTBR:colPos, oTBR)
 
-       elseif ! oTBR:Cargo .and. dbe_emptydb()
-          nRet := dbe_CallUDF(bFunc, DE_EMPTY, oTBR:colPos, oTBR)
+          elseif oTBR:HitTop
+             oTBR:HitTop := .f.
+             nRet := dbe_CallUDF(bFunc, DE_HITTOP, oTBR:colPos, oTBR)
 
-       endif
+          elseif oTBR:HitBottom
+             oTBR:HitBottom := .f.
+             nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, oTBR)
 
-       if nRet == DE_CONT .and. lExcept
+          elseif NextKey() = 0
+             nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
+             if nRet != DE_CONT
+                nRet := DE_CONT /* force dbedit to continue after Idle state. */
+             endif
+          endif
+
+       else
+
           nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
           lExcept := .f.
+          oTBR:RefreshCurrent()
 
-          if nRet = DE_CONT .and. NextKey() = 0
-             oTBR:RefreshCurrent()
-             nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
-          endif
        endif
 
     endif
+
 
     if nRet = DE_ABORT
        EXIT
@@ -497,7 +502,7 @@ LOCAL oTBR,;
           Eval( SetKey(nKey), ProcName(1), ProcLine(1), "")
        endif
 
-       lExcept := .t.
+       lExcept := ! dbe_cursorkey( nKey )
 
     endif
 
@@ -669,15 +674,11 @@ Return Nil
 #endif
 
 
-/****
- *
- *  dbe_emptydb()
- *
- *  Verify if the dbf in the current workarea is empty.
- */
 
 *-------------------------------------*
 STATIC FUNCTION dbe_emptydb()
+*-------------------------------------*
+* Verify if the current dbf is empty.
 *-------------------------------------*
 Local lEmpty
 
@@ -765,4 +766,22 @@ endif
 
 Return n
 
+*------------------------------------*
+STATIC FUNCTION dbe_cursorkey( nKey )
+*------------------------------------*
+Local aKeys := { K_LEFT,;
+                 K_RIGHT,;
+                 K_CTRL_LEFT,;
+                 K_CTRL_RIGHT,;
+                 K_DOWN,;
+                 K_UP,;
+                 K_END,;
+                 K_CTRL_END,;
+                 K_CTRL_HOME,;
+                 K_HOME,;
+                 K_PGDN,;
+                 K_PGUP,;
+                 K_CTRL_PGUP,;
+                 K_CTRL_PGDN }
 
+Return ( nKey IN aKeys )
