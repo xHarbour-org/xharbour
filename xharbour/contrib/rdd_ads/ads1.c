@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c 8551 2008-05-31 13:43:44Z vszakats $
+ * $Id: ads1.c,v 1.131 2008/06/03 23:12:56 kaddath Exp $
  */
 
 /*
@@ -3443,7 +3443,7 @@ static ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
                    ( char * ) hb_itemGetCPtr( pOrderInfo->atomBagName ), EF_CANDEFAULT );
       return FAILURE;
    }
-   if( !pArea->hOrdCurrent )
+   if( !pArea->hOrdCurrent && u16ArrayLen > 0 )
    {
       pArea->hOrdCurrent = ahIndex[ 0 ];
       return SELF_GOTOP( ( AREAP ) pArea );
@@ -3544,6 +3544,11 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
          }
          u32RetVal = AdsGetIndexHandleByOrder( pArea->hTable, u16Order, &hIndex );
       }
+      else
+      {
+         hIndex = pArea->hOrdCurrent;
+      }
+
       if( u32RetVal != AE_SUCCESS )
       {
          /* ntx compatibilty: keep current order if failed */
@@ -3713,7 +3718,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          SELF_ORDSETCOND( ( AREAP ) pArea, NULL );
          return FAILURE;
       }
-      pArea->hOrdCurrent = ahIndex[ 0 ];
+      pArea->hOrdCurrent = pusArrayLen ? ahIndex[ 0 ] : 0;
    }
 
    return SELF_GOTOP( ( AREAP ) pArea );

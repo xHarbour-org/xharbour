@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6186 2008/08/03 11:08:23 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6187 2008/08/04 15:44:17 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-05 14:05 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * \contrib\rddads/ads1.c
+    * minor cleanup and protection against possible strange results
+      caused by indexes without tags. Synched with Harbour.
+      Thanks to Przemyslaw Czerpak
 
 2008-08-04 12:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg
