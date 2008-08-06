@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6187 2008/08/04 15:44:17 modalsist Exp $
+ * $Id: ChangeLog,v 1.6188 2008/08/05 18:00:42 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-06 10:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/dbedit.prg
+    ! fixed DE_HITTOP, DE_HITBOTTOM and DE_EMPTY mode.
+    ! fixed to call dbgobottom() if database is on eof at init.
 
 2008-08-05 14:05 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * \contrib\rddads/ads1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.47 2008/08/02 17:18:00 modalsist Exp $
+ * $Id: dbedit.prg,v 1.48 2008/08/04 15:44:18 modalsist Exp $
  */
 
 /*
@@ -82,35 +82,34 @@
 
 #include "dbedit.ch"
 #include "inkey.ch"
-#include "button.ch"
 #include "setcurs.ch"
 #include "hbsetup.ch"
 #include "common.ch"
 #include "tbrowse.ch"
-#include "dbinfo.ch"
 
 /* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
  * I have used tbrowse "cargo" to assign true/false for that.
  * (Append mode is undocumented Clipper's dbEdit feature)
  */
+
 #ifndef DE_APPEND
 #define DE_APPEND  3
 #endif
 
-FUNCTION DBEdit(nTop,;                //  1§
-                nLeft,;               //  2§
-                nBottom,;             //  3§
-                nRight,;              //  4§
-                axColumns,;           //  5§
-                xUserFunc,;           //  6§
-                acColumnSayPictures,; //  7§
-                acColumnHeaders,;     //  8§
-                acHeadingSep,;        //  9§
-                acColumnSep,;         // 10§
-                acFootingSep,;        // 11§
-                acColumnFootings,;    // 12§
-                bPreBlock,;           // 13§ - xHarbour extension
-                bPostBlock)           // 14§ - idem
+FUNCTION DBEdit( nTop,;
+                 nLeft,;               
+                 nBottom,;             
+                 nRight,;              
+                 axColumns,;           
+                 xUserFunc,;           
+                 acColumnSayPictures,; 
+                 acColumnHeaders,;     
+                 acHeadingSep,;        
+                 acColumnSep,;         
+                 acFootingSep,;        
+                 acColumnFootings,;    
+                 bPreBlock,;           
+                 bPostBlock )          
 
 LOCAL oTBR,;
       oTBC,;
@@ -124,22 +123,25 @@ LOCAL oTBR,;
       lAppend,;
       lExcept
 
-
   nRet := DE_CONT
   lAppend := .f.
 
-  // If no database in use we must call Errorsys() with error 2001
-  //
   if ! Used()
-     Throw( ErrorNew( "DBCMD", 0, 2001, ProcName(), "Workarea not in use" ) )
+#ifdef HB_C52_STRICT
+     dbgobottom() /* Clipper compliance: call dbgobotom() to forces error message. */
+#else
+     /* Call Errorsys() with error 2001 if not database in use. */
+     Throw( ErrorNew( "DBCMD", 0, 2001, procname(), "Workarea not in use" ) )
+#endif
+  elseif eof() .and. Lastrec() > 0
+     /* DbEdit() moves cursor to the bottom record if eof() is reached at init. */
+     dbGoBottom()
   endif
-
 
   DEFAULT nTop TO 0
   DEFAULT nLeft TO 0
   DEFAULT nRight TO MaxCol()
   DEFAULT nBottom TO MaxRow()
-
 
   // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
   //       this is because most codepages (unicode too) don't have DOUBLE line chars
@@ -150,7 +152,7 @@ LOCAL oTBR,;
   DEFAULT acColumnFootings TO ""
 
 
-  IF Empty(axColumns) .OR. !HB_ISARRAY( axColumns )
+  IF Empty(axColumns) .OR. ! HB_ISARRAY( axColumns )
 
     axColumns := Array( FCount() )
 
@@ -235,7 +237,6 @@ LOCAL oTBR,;
      Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(bPostBlock)+">", Procname()+" <bPostBlockBlock>" ) )
   ENDIF
 
-
   IF HB_ISBLOCK( bPreBlock )
      i := bPreBlock
      bPreBlock := Array( Len(axColumns) )
@@ -248,11 +249,10 @@ LOCAL oTBR,;
      aFill(bPostBlock, i)
   END
 
-  iif(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
-
-  // Save previous cursor format.
+  // Save previous cursor shape and position.
   nCursor := SetCursor(SC_NONE)
 
+  iif(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
   /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
   DispBegin()
@@ -448,7 +448,7 @@ LOCAL oTBR,;
           elseif NextKey() = 0
              nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
              if nRet != DE_CONT
-                nRet := DE_CONT /* force dbedit to continue after Idle state. */
+                nRet := DE_CONT /* force dbedit DE_CONT state after idle mode. */
              endif
           endif
 
@@ -509,8 +509,9 @@ LOCAL oTBR,;
  ENDDO
 
  SetCursor( nCursor )
- SetPos(Row(),0)
+ SetPos( row(),0 )
 
+/* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
 RETURN .T.
 
 
@@ -617,35 +618,24 @@ STATIC FUNCTION dbe_Skipper( nSkip, oTb )
    case ( nSkip = 0 .or. lastrec() = 0 )
       // Skip 0 (significant on a network)
       dbSkip( 0 )
-
    case ( nSkip > 0 .and. !eof() )
       while ( i < nSkip )           // Skip Foward
-
          dbskip( 1 )
          i++
-
          if eof() .and. ! lAppend
             dbskip( -1 )
             i--
             exit
          endif
-
       enddo
-
    case ( nSkip < 0 )
       while ( i > nSkip )           // Skip backward
-
          dbskip( -1 )
-
          if bof()
             exit
-
          endif
-
          i--
-
       enddo
-
    endcase
 
 RETURN i
@@ -673,8 +663,6 @@ Local oTBR1, oTBR2
 Return Nil
 #endif
 
-
-
 *-------------------------------------*
 STATIC FUNCTION dbe_emptydb()
 *-------------------------------------*
@@ -682,13 +670,13 @@ STATIC FUNCTION dbe_emptydb()
 *-------------------------------------*
 Local lEmpty
 
- IF !Empty( dbFilter() )
-    lEmpty := eof()
- ELSEIF IndexOrd() = 0
-    lEmpty := ( ( Eof() .OR. RecNo() = LastRec() + 1) .AND. Bof() )
- ELSE
+ if ! Empty( dbFilter() )
+    lEmpty := ( eof() .or. recno() > Lastrec() )
+ elseif IndexOrd() = 0
+    lEmpty := ( ( eof() .or. recNo() > LastRec() ) .and. bof() )
+ else
     lEmpty := ( OrdKeyCount() = 0  )
- ENDIF
+ endif
 
 RETURN lEmpty
 
@@ -698,59 +686,27 @@ STATIC FUNCTION dbe_processKey( nKey, oTb )
 Local nRet := DE_CONT
 
 #ifdef HB_COMPAT_C53
-
     if oTb:ApplyKey( nKey ) = TBR_EXIT
        nRet := DE_ABORT
     endif
-
 #else
-
     // xHarbour without 5.3 extensions code
     Switch nKey
-      Case K_DOWN
-        oTb:down()
-        Exit
-      Case K_UP
-        oTb:up()
-        Exit
-      Case K_LEFT
-        oTb:left()
-        Exit
-      Case K_RIGHT
-        oTb:right()
-        Exit
-      Case K_PGDN
-        oTb:pageDown()
-        Exit
-      Case K_PGUP
-        oTb:pageUp()
-        Exit
-      Case K_CTRL_PGUP
-        oTb:goTop()
-        Exit
-      Case K_CTRL_PGDN
-        oTb:goBottom()
-        Exit
-      Case K_HOME
-        oTb:home()
-        Exit
-      Case K_END
-        oTb:end()
-        Exit
-      Case K_CTRL_HOME
-        oTb:panHome()
-        Exit
-      Case K_CTRL_END
-        oTb:panEnd()
-        Exit
-      Case K_CTRL_LEFT
-        oTb:panLeft()
-        Exit
-      Case K_CTRL_RIGHT
-        oTb:panRight()
-        Exit
+      Case K_DOWN;oTb:down();Exit
+      Case K_UP;oTb:up();Exit
+      Case K_LEFT;oTb:left();Exit
+      Case K_RIGHT;oTb:right();Exit
+      Case K_PGDN;oTb:pageDown();Exit
+      Case K_PGUP;oTb:pageUp();Exit
+      Case K_CTRL_PGUP;oTb:goTop();Exit
+      Case K_CTRL_PGDN;oTb:goBottom();Exit
+      Case K_HOME;oTb:home();Exit
+      Case K_END;oTb:end();Exit
+      Case K_CTRL_HOME;oTb:panHome();Exit
+      Case K_CTRL_END;oTb:panEnd();Exit
+      Case K_CTRL_LEFT;oTb:panLeft();Exit
+      Case K_CTRL_RIGHT;oTb:panRight();Exit
     End
-
 #endif
 
 Return nRet
@@ -773,15 +729,15 @@ Local aKeys := { K_LEFT,;
                  K_RIGHT,;
                  K_CTRL_LEFT,;
                  K_CTRL_RIGHT,;
-                 K_DOWN,;
                  K_UP,;
-                 K_END,;
-                 K_CTRL_END,;
-                 K_CTRL_HOME,;
+                 K_DOWN,;
                  K_HOME,;
-                 K_PGDN,;
+                 K_END,;
+                 K_CTRL_HOME,;
+                 K_CTRL_END,;
                  K_PGUP,;
+                 K_PGDN,;
                  K_CTRL_PGUP,;
                  K_CTRL_PGDN }
 
-Return ( nKey IN aKeys )
+Return ( AScan( aKeys, nKey ) != 0 )
