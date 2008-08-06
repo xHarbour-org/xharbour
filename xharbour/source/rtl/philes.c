@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.30 2005/09/11 19:41:01 druzus Exp $
+ * $Id: philes.c,v 1.31 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -264,13 +264,14 @@ HB_FUNC( CURDIR )
    PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
    BYTE cCurDrv = hb_fsCurDrv();
    BYTE cDrv;
+   USHORT uiResult = 0;
 
    if( pDrv && hb_parclen( 1 ) > 0 )
    {
       cDrv = (BYTE) ( toupper( pDrv->item.asString.value[0] ) - 'A');
       if( cDrv != cCurDrv )
       {
-         hb_fsChDrv( cDrv );
+         uiResult = hb_fsChDrv( cDrv );
       }
    }
    else
@@ -278,11 +279,18 @@ HB_FUNC( CURDIR )
       cDrv = cCurDrv;
    }
 
-   hb_fsCurDirBuff( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
+   if ( uiResult == 0 )
+   {
+      hb_fsCurDirBuff( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
 
-   hb_retcAdopt( ( char * ) pbyBuffer );
+      hb_retcAdopt( ( char * ) pbyBuffer );
 
-   hb_fsChDrv( cCurDrv );
+      hb_fsChDrv( cCurDrv );
+   }
+   else
+   {
+      hb_retc( "" );
+   }
 
    hb_fsSetError( uiErrorOld );
 }
