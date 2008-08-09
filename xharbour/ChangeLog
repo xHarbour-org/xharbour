@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6189 2008/08/06 13:25:57 modalsist Exp $
+ * $Id: ChangeLog,v 1.6190 2008/08/06 20:28:37 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2008-08-09 18:01 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
+  * source\rdd\dbfcdx\dbfcdx1.c
+    ! fixed to not respect bitmap filters when structural order
+      is scanned, f.e. in OrdListAdd() with active bitmap filter.
+      Synched with Harbour. Thanks to Przemyslaw Czerpak
 
 2008-08-06 22:27 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\philes.c
