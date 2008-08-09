@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.275 2008/04/05 20:31:20 likewolf Exp $
+ * $Id: dbfcdx1.c,v 1.276 2008/07/09 16:10:33 marchuet Exp $
  */
 
 /*
@@ -3968,7 +3968,8 @@ static BOOL hb_cdxPageReadPrevKey( LPCDXPAGE pPage )
             break;
       }
    }
-   while( !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
+   while( ( pPage->TagParent->OptFlags & CDX_TYPE_STRUCTURE ) == 0 &&
+          !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
                                    hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ) ) );
    if( pPage->iCurKey != 0 )
       hb_cdxSetCurKey( pPage );
@@ -4011,7 +4012,8 @@ static BOOL hb_cdxPageReadNextKey( LPCDXPAGE pPage )
             break;
       }
    }
-   while( !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
+   while( ( pPage->TagParent->OptFlags & CDX_TYPE_STRUCTURE ) == 0 &&
+          !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
                                    hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ) ) );
    if( pPage->iCurKey != 0 )
       hb_cdxSetCurKey( pPage );
