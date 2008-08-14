@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.27 2008/03/27 15:11:08 likewolf Exp $
+ * $Id: cmdarg.c,v 1.28 2008/05/04 14:20:52 andijahja Exp $
  */
 
 /*
@@ -464,7 +464,6 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

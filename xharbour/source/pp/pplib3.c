@@ -1,5 +1,5 @@
 /*
- * $Id: pplib3.c,v 1.2 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: pplib3.c,v 1.3 2007/04/25 01:37:10 ronpinkas Exp $
  */
 
 /*
@@ -78,7 +78,6 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_PPLIB3 )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

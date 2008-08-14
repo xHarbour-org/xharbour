@@ -1,5 +1,5 @@
 /*
- * $Id: cpbgwin.c,v 1.2 2005/11/21 22:25:34 kaddath Exp $
+ * $Id: cpbgwin.c,v 1.3 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
@@ -96,7 +96,6 @@ HB_CODEPAGE_INIT( BGWIN )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

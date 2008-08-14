@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6190 2008/08/06 20:28:37 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6191 2008/08/09 16:06:16 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,165 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-08-14 15:30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
 
+  * source/rtl/version.c
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtgui/gtdef.c
+  * source/rtl/gtgui/gtgui.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gttrm/gttrm.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxwc/gtxwc.c
+  * source/rtl/gt_tpl/gt_tpl.c
+
+  * source/vm/cmdarg.c
+
+  * source/compiler/genc.c
+
+  * source/lang/msgbgmik.c
+  * source/lang/msgbgwin.c
+  * source/lang/msgby866.c
+  * source/lang/msgbywin.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr1250.c
+  * source/lang/msghr437.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgltwin.c
+  * source/lang/msgnl.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgsv.c
+  * source/lang/msgsvwin.c
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/lang/msg_tpl.c
+
+  * source/codepage/cpbg866.c
+  * source/codepage/uc1251.c
+  * source/codepage/cp_tpl.c
+  * source/codepage/cpuawin.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpua866.c
+  * source/codepage/cptrwin.c
+  * source/codepage/cptr857.c
+  * source/codepage/cpsvwin.c
+  * source/codepage/cpsvclip.c
+  * source/codepage/cpsv850.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsl437.c
+  * source/codepage/cpskwin.c
+  * source/codepage/cpskkam.c
+  * source/codepage/cpskiso.c
+  * source/codepage/cpsk852.c
+  * source/codepage/cpruwin.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruiso.c
+  * source/codepage/cpru866.c
+  * source/codepage/cpptiso.c
+  * source/codepage/cppt850.c
+  * source/codepage/cpplwin.c
+  * source/codepage/cpplmaz.c
+  * source/codepage/cppliso.c
+  * source/codepage/cppl852.c
+  * source/codepage/cpltwin.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpit437.c
+  * source/codepage/cphuwins.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cphuisos.c
+  * source/codepage/cphuiso.c
+  * source/codepage/cphu852s.c
+  * source/codepage/cphu852.c
+  * source/codepage/cphr852.c
+  * source/codepage/cphr437.c
+  * source/codepage/cphr1250.c
+  * source/codepage/cpfr850.c
+  * source/codepage/cpeswin.c
+  * source/codepage/cpesmwin.c
+  * source/codepage/cpes850.c
+  * source/codepage/cpelwin.c
+  * source/codepage/cpel737.c
+  * source/codepage/cpdewin.c
+  * source/codepage/cpdeiso.c
+  * source/codepage/cpde850.c
+  * source/codepage/cpcswin.c
+  * source/codepage/cpcskam.c
+  * source/codepage/cpcsiso.c
+  * source/codepage/cpcs852.c
+  * source/codepage/cpbgwin.c
+  * source/codepage/cpbgmik.c
+  * source/codepage/cpbgiso.c
+
+  * source/pp/pplib3.c
+
+    - removed: #pragma comment( linker, "/Merge:.CRT=.data" ), to pacify
+      warnings upon linking with MSVC 8 or greater.
+
+  * source/rtl/win32ole.prg
+    ! fix for OpenWatcom (long overdue)
+
+  * source/pp/ppcore.c
+    ! minor fix on EMG's last correction in function hb_pp_dumpEnd
 
 2008-08-09 18:01 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source\rdd\dbfcdx\dbfcdx1.c

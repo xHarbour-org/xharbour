@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.178 2008/06/25 20:20:53 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.179 2008/07/04 04:14:22 peterrees Exp $
  */
 
 /*
@@ -2583,7 +2583,6 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

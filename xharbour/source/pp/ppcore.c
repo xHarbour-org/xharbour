@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.275 2008/07/02 18:26:04 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.276 2008/08/03 10:09:54 enricomaria Exp $
  */
 
 /*
@@ -876,11 +876,11 @@ static void hb_pp_dumpEnd( PHB_PP_STATE pState )
          fwrite( pBuffer, sizeof( char ), ulLen, pState->file_out );
          fputs( "#pragma ENDDUMP\n", pState->file_out );
 
-         while( ulLen-- )
-         {
-            if( *pBuffer++ == '\n' )
-               /* ++iLines */;
-         }
+         //while( ulLen-- )
+         //{
+         //   if( *pBuffer++ == '\n' )
+         //       ++iLines ;
+         //}
          //pState->pFile->iLastLine = pState->iDumpLine + iLines + 2;
       }
       hb_membufFlush( pState->pDumpBuffer );

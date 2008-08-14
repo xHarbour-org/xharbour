@@ -1,5 +1,5 @@
 /*
- * $Id: cphu852s.c 7249 2007-04-18 08:45:07Z vszakats $
+ * $Id: cphu852s.c,v 1.1 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
@@ -102,7 +102,6 @@ HB_CODEPAGE_INIT( HU852S )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

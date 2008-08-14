@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.30 2007/10/31 08:34:53 marchuet Exp $
+ * $Id: delim1.c,v 1.31 2008/04/05 20:31:20 likewolf Exp $
  */
 
 /*
@@ -1602,7 +1602,6 @@ HB_CALL_ON_STARTUP_END( _hb_delim_rdd_init_ )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

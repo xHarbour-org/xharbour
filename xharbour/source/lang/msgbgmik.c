@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: msgbgmik.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "º«£ °±ª¨",              /* Name (in native language) */
       "BG",                        /* RFC ID */
       "MIK",                       /* Codepage */
-      "$Revision$ $Date$",         /* Version */
+      "$Revision: 1.1 $ $Date: 2005/11/19 15:52:04 $",         /* Version */
 
       /* Month names */
 
@@ -211,7 +211,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_BGMIK )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

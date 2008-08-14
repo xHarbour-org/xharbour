@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.12 2006/07/16 19:48:56 druzus Exp $
+ * $Id: gt_tpl.c,v 1.13 2008/03/16 19:16:01 likewolf Exp $
  */
 
 /*
@@ -182,7 +182,6 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

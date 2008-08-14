@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgwin.c,v 1.4 2005/06/10 22:51:36 ronpinkas Exp $
+ * $Id: msgbgwin.c,v 1.5 2005/11/19 15:52:04 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Български",                 /* Name (in native language) */
       "BG",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.4 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2005/11/19 15:52:04 $",         /* Version */
 
       /* Month names */
 
@@ -212,7 +212,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_BGWIN )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.14 2007/11/09 21:11:28 likewolf Exp $
+ * $Id: version.c,v 1.15 2008/03/18 03:29:50 modalsist Exp $
  */
 
 /*
@@ -220,7 +220,6 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.158 2008/05/19 23:17:00 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.159 2008/07/25 11:15:09 jfgimenez Exp $
  */
 
 /*
@@ -145,9 +145,13 @@ RETURN VTWrapper( VT_ERROR, DISP_E_PARAMNOTFOUND )
 
 
    #ifdef __WATCOMC__
-   const GUID GUID_NULL = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
-   const IID IID_IEnumVARIANT = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } } ;
-   const IID IID_IDispatch = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } } ;
+      HB_EXTERN_BEGIN
+      const GUID GUID_NULL = { 0x00, 0x00, 0x00, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+      const IID  IID_IDispatch =
+          { 0x00020400, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
+      const IID  IID_IEnumVARIANT =
+          { 0x00020404, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
+      HB_EXTERN_END
    #endif
 
 #pragma ENDDUMP

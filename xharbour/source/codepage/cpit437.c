@@ -1,5 +1,5 @@
 /*
- * $Id: cpit437.c,v 1.5 2006/01/12 13:15:59 druzus Exp $
+ * $Id: cpit437.c,v 1.6 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
@@ -95,7 +95,6 @@ HB_CODEPAGE_INIT( IT437 )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

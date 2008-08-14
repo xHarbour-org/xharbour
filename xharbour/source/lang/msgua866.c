@@ -1,5 +1,5 @@
 /*
- * $Id: msgua866.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: msgua866.c,v 1.4 2005/06/10 22:51:37 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Український",               /* Name (in native language) */
       "UA",                        /* RFC ID */
       "866",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2005/06/10 22:51:37 $",         /* Version */
 
       /* Month names */
 
@@ -213,7 +213,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_UA866 )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: msgnl.c,v 1.5 2007/11/12 22:36:18 lculik Exp $
+ * $Id: msgnl.c,v 1.6 2007/11/13 03:46:18 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Dutch",                   /* Name (in native language) */
       "NL",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2007/11/12 22:36:18 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2007/11/13 03:46:18 $",         /* Version */
 
       /* Month names */
 
@@ -212,7 +212,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_NL )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

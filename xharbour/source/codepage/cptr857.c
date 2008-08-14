@@ -1,5 +1,5 @@
 /*
- * $Id: cptrdos.c,v 1.2 2007/11/07 23:34:27 likewolf Exp $
+ * $Id: cptr857.c,v 1.1 2008/01/20 21:23:06 likewolf Exp $
  */
 
 /*
@@ -96,7 +96,6 @@ HB_CODEPAGE_INIT( TR857 )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

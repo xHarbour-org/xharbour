@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.28 2008/03/26 09:39:50 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.29 2008/03/27 09:14:30 mauriliolongo Exp $
  */
 
 /*
@@ -922,7 +922,6 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

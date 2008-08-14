@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.168 2008/04/01 05:15:09 ronpinkas Exp $
+ * $Id: genc.c,v 1.169 2008/05/21 06:04:11 andijahja Exp $
  */
 
 /*
@@ -1248,7 +1248,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
                        "   #if _MSC_VER >= 1010\n"
                        "      #pragma data_seg( \".CRT$XIY\" )\n"
-                       "      #pragma comment( linker, \"/Merge:.CRT=.data\" )\n"
                        "   #else\n"
                        "      #pragma data_seg( \"XIY\" )\n"
                        "   #endif\n"
@@ -1264,7 +1263,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
                        "   #if _MSC_VER >= 1010\n"
                        "      #pragma data_seg( \".CRT$XIY\" )\n"
-                       "      #pragma comment( linker, \"/Merge:.CRT=.data\" )\n"
                        "   #else\n"
                        "      #pragma data_seg( \"XIY\" )\n"
                        "   #endif\n"
@@ -1694,7 +1692,6 @@ static void hb_writeEndInit( FILE* yyc )
                  /* [pt] First version of MSC I have that supports this */
                  /* is msvc4.1 (which is msc 10.10) */
                  "      #pragma data_seg( \".CRT$XIY\" )\n"
-                 "      #pragma comment( linker, \"/Merge:.CRT=.data\" )\n"
                  "   #else\n"
                  "      #pragma data_seg( \"XIY\" )\n"
                  "   #endif\n"

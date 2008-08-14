@@ -1,5 +1,5 @@
 /*
- * $Id: msgcskam.c,v 1.6 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: msgcskam.c,v 1.7 2005/06/10 22:51:36 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "?esky",                     /* Name (in native language) */
       "CS",                        /* RFC ID */
       "KAM",                       /* Codepage */
-      "$Revision: 1.6 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
 
       /* Month names */
 
@@ -213,7 +213,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_CSKAM )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

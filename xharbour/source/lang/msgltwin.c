@@ -1,5 +1,5 @@
 /*
- * $Id: msgltwin.c,v 1.6 2008/01/20 21:23:04 likewolf Exp $
+ * $Id: msgltwin.c,v 1.7 2008/01/23 05:39:03 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Lietuviø",                  /* Name (in native language) */
       "LT",                        /* RFC ID */
       "Windows-1257",              /* Codepage */
-      "$Revision: 1.6 $ $Date: 2008/01/20 21:23:04 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2008/01/23 05:39:03 $",         /* Version */
 
       /* Month names */
 
@@ -212,7 +212,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_LTWIN )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.11 2005/06/10 22:51:36 ronpinkas Exp $
+ * $Id: msges.c,v 1.12 2005/11/13 21:01:01 marceloanelli Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.11 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
+      "$Revision: 1.12 $ $Date: 2005/11/13 21:01:01 $",         /* Version */
 
       /* Month names */
 
@@ -212,7 +212,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_ES )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

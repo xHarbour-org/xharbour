@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.187 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id: dbf1.c,v 1.188 2008/06/04 14:48:52 marchuet Exp $
  */
 
 /*
@@ -5702,7 +5702,6 @@ HB_CALL_ON_STARTUP_END( _hb_dbf_rdd_init_ )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

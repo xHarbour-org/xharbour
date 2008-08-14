@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.41 2008/04/05 20:31:20 likewolf Exp $
+ * $Id: bmdbfcdx1.c,v 1.42 2008/07/09 16:10:33 marchuet Exp $
  */
 
 /*
@@ -10319,7 +10319,6 @@ HB_CALL_ON_STARTUP_END( _hb_bmdbfcdx_rdd_init_ )
 #elif defined(HB_MSC_STARTUP)
 #  if _MSC_VER >= 1010
 #     pragma data_seg( ".CRT$XIY" )
-#     pragma comment( linker, "/Merge:.CRT=.data" )
 #  else
 #     pragma data_seg( "XIY" )
 #  endif

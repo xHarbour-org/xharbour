@@ -1,5 +1,5 @@
 /*
- * $Id: cpesmwin.c,v 1.5 2007/11/07 23:34:25 likewolf Exp $
+ * $Id: cpesmwin.c,v 1.6 2007/11/13 21:34:11 likewolf Exp $
  */
 
 /*
@@ -97,7 +97,6 @@ HB_CODEPAGE_INIT( ESMWIN )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif

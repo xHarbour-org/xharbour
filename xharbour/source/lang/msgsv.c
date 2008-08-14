@@ -64,7 +64,7 @@ static HB_LANG s_lang =
       "svenska",                   /* Name (in native language) */
       "SV",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.0 $ $Date: 2006/11/05 00:00:00 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2006/11/09 16:13:57 $",         /* Version */
 
       /* Month names */
 
@@ -210,7 +210,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_SV )
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
    #else
       #pragma data_seg( "XIY" )
    #endif
