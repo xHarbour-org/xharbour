@@ -1,12 +1,13 @@
 /*
- * $Id: dbjoinx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id: dbdrop.c 8473 2008-05-22 06:09:35Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * XPP compatible dbJoin() function
+ * DBDROP() Harbour extension.
  *
- * Copyright 1999-2007 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 1999 Bruno Cantero <bruno@issnet.net>
+ * Copyright 2004-2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,11 +51,15 @@
  *
  */
 
-#include "hbsetup.ch"
+#include "hbapi.h"
 
-#ifdef HB_COMPAT_XPP
+/* NOTE: This function is a new Harbour function implemented in the 
+         original CA-Cl*pper namespace. This should have been 
+         marked as HB_EXTENSION, but it's not. */
 
-FUNCTION dbJoin( cAlias, cFile, aFields, bFor )
-   RETURN __dbJoin( cAlias, cFile, aFields, bFor )
+HB_FUNC_EXTERN( HB_DBDROP );
 
-#endif
+HB_FUNC( DBDROP )
+{
+   HB_FUNC_EXEC( HB_DBDROP );
+}

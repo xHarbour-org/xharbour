@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.28 2008/04/05 20:31:20 likewolf Exp $
+ * $Id: sdf1.c,v 1.29 2008/08/14 09:04:20 andijahja Exp $
  */
 
 /*
@@ -1060,7 +1060,7 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    USHORT uiFlags;
    BOOL fRetry;
    BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+   char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfOpen(%p,%p)", pArea, pOpenInfo));
 
@@ -1098,7 +1098,7 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;
    }
    hb_xfree( pFileName );

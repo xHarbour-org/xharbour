@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.85 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: workarea.c,v 1.86 2008/03/13 11:12:08 marchuet Exp $
  */
 
 /*
@@ -267,7 +267,7 @@ static ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
    pField->uiFlags = pFieldInfo->uiFlags;
    pField->uiStep = pFieldInfo->uiStep;
    pField->uiArea = pArea->uiArea;
-   
+
    if( pField->uiFlags & HB_FF_NULLABLE )
       pField->bNullPos = (pArea->bFlagCount ++);
    if( pField->uiType == HB_FT_VARLENGTH )
@@ -610,7 +610,7 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
       case DBS_STEP:
          hb_itemPutNL( pItem, pField->uiStep );
          break;
-         
+
       default:
          return FAILURE;
 
@@ -665,7 +665,7 @@ static ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
    hb_strncpy( ( char * ) szAlias,
       pArea->atomAlias && hb_dynsymAreaHandle( ( PHB_DYNS ) pArea->atomAlias )
       ? hb_dynsymName( ( PHB_DYNS ) pArea->atomAlias ) : "",
-      HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      HB_RDD_MAX_ALIAS_LEN );
 
    return SUCCESS;
 }
@@ -817,7 +817,7 @@ static ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_ALIAS:
       {
-         char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+         char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
          if( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) != SUCCESS )
          {
             return FAILURE;
@@ -1013,7 +1013,7 @@ static ERRCODE hb_waSysName( AREAP pArea, BYTE * pBuffer )
    HB_TRACE(HB_TR_DEBUG, ("hb_waSysName(%p, %p)", pArea, pBuffer));
 
    hb_strncpy( ( char * ) pBuffer, SELF_RDDNODE( pArea )->szName,
-               HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+               HB_RDD_MAX_DRIVERNAME_LEN );
 
    return SUCCESS;
 }
@@ -1738,11 +1738,11 @@ static ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waError(%p, %p)", pArea, pError));
 
-   szRddName = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 );
+   szRddName = ( char * ) hb_xgrab( HB_RDD_MAX_DRIVERNAME_LEN + 1 );
    if( pArea && pArea->lprfsHost->sysName )
       SELF_SYSNAME( pArea, ( BYTE * ) szRddName );
    else
-      hb_strncpy( szRddName, "???DRIVER", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      hb_strncpy( szRddName, "???DRIVER", HB_RDD_MAX_DRIVERNAME_LEN );
    hb_errPutSeverity( pError, ES_ERROR );
    hb_errPutSubSystem( pError, szRddName );
    hb_xfree( szRddName );
@@ -2175,7 +2175,7 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
 {
    LPRDDNODE pRddNewNode;
    PHB_DYNS pGetFuncTable;
-   char szGetFuncTable[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 14 ];
+   char szGetFuncTable[ HB_RDD_MAX_DRIVERNAME_LEN + 14 ];
    USHORT uiFunctions;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddRegister(%s, %hu)", szDriver, uiType));
@@ -2198,7 +2198,7 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
    memset( pRddNewNode, 0, sizeof( RDDNODE ) );
 
    /* Fill the new RDD node */
-   hb_strncpy( pRddNewNode->szName, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+   hb_strncpy( pRddNewNode->szName, szDriver, HB_RDD_MAX_DRIVERNAME_LEN );
    pRddNewNode->uiType = uiType;
    pRddNewNode->rddID = s_uiRddMax;
 
@@ -2259,8 +2259,8 @@ HB_EXPORT ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, 
    }
    else
    {
-      char szSuperName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-      hb_strncpyUpper( szSuperName, szDrvName, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      char szSuperName[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
+      hb_strncpyUpper( szSuperName, szDrvName, HB_RDD_MAX_DRIVERNAME_LEN );
       pRddNode = hb_rddFindNode( szSuperName, NULL );
 
       if( !pRddNode )

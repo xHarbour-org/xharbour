@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.48 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.49 2008/03/13 11:12:06 marchuet Exp $
  */
 
 /*
@@ -66,14 +66,14 @@ HB_EXTERN_BEGIN
    typedef void * PHB_CODEPAGE
 #endif
 
-#define HARBOUR_MAX_RDD_DRIVERNAME_LENGTH          32
+#define HB_RDD_MAX_DRIVERNAME_LEN          32
 
-#ifndef HARBOUR_MAX_RDD_ALIAS_LENGTH
-   #define HARBOUR_MAX_RDD_ALIAS_LENGTH            32
+#ifndef HB_RDD_MAX_ALIAS_LEN
+   #define HB_RDD_MAX_ALIAS_LEN            32
 #endif
 
 /* #define HARBOUR_MAX_RDD_FIELDNAME_LENGTH        32 */
-#define HARBOUR_MAX_RDD_AREA_NUM                65535
+#define HB_RDD_MAX_AREA_NUM                65535
 
 /* DBCMD errors */
 
@@ -591,7 +591,7 @@ typedef struct _AREA
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */   
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 } AREA;
 
 typedef AREA * LPAREA;
@@ -805,7 +805,7 @@ typedef RDDFUNCS * PRDDFUNCS;
 /* RDD Node structure              */
 typedef struct _RDDNODE
 {
-   char szName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ]; /* Name of RDD */
+   char szName[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ]; /* Name of RDD */
    USHORT   uiType;           /* Type of RDD */
    USHORT   rddID;            /* Type of RDD */
    RDDFUNCS pTable;           /* Table of functions */
@@ -1193,7 +1193,7 @@ extern HB_EXPORT void      hb_rddUnLockAll( void );
 extern HB_EXPORT BOOL      hb_rddGetNetErr( void );
 extern HB_EXPORT void      hb_rddSetNetErr( BOOL fNetErr );
 
-extern HB_EXPORT ERRCODE   hb_rddOpenTable( 
+extern HB_EXPORT ERRCODE   hb_rddOpenTable(
                               const char * szFileName, const char * szDriver,
                               USHORT uiArea, const char *szAlias,
                               BOOL fShared, BOOL fReadonly,

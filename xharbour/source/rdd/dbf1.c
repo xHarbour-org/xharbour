@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.188 2008/06/04 14:48:52 marchuet Exp $
+ * $Id: dbf1.c,v 1.189 2008/08/14 09:04:19 andijahja Exp $
  */
 
 /*
@@ -2150,7 +2150,7 @@ static ERRCODE hb_dbfGoCold( DBFAREAP pArea )
 
       if( pArea->fModStamp )
          hb_dbfUpdateStampFields( pArea );
-   
+
       /* Write current record */
       if( ! hb_dbfWriteRecord( pArea ) )
          return FAILURE;
@@ -2927,7 +2927,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    /* Size for deleted flag */
    pArea->uiRecordLen = 1;
-   
+
    /* initialize flag count */
    pArea->bFlagCount = 0;
 
@@ -2940,7 +2940,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       /* field offset */
       if( pArea->bTableType == DB_DBF_VFP )
          HB_PUT_LE_UINT16( pThisField->bReserved1, pArea->uiRecordLen );
-      /* field flags */   
+      /* field flags */
       pThisField->bFieldFlags = pField->uiFlags;
 
       switch( pField->uiType )
@@ -2988,7 +2988,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             break;
 
          case HB_FT_OLE:
-            pThisField->bType = 'G'; 
+            pThisField->bType = 'G';
             if( pField->uiLen != 4 || pArea->bMemoType == DB_MEMO_SMT )
                pField->uiLen = 10;
             pThisField->bLen = ( BYTE ) pField->uiLen;
@@ -3113,18 +3113,18 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->uiRecordLen += pField->uiLen;
             pArea->fAutoInc = TRUE;
             break;
-            
+
          case HB_FT_VARLENGTH:
             pThisField->bType = 'Q';
             pThisField->bLen = ( BYTE ) pField->uiLen;
             pThisField->bDec = ( BYTE ) ( pField->uiLen >> 8 );
             pArea->uiRecordLen += pField->uiLen;
-            break;            
+            break;
 
          default:
             fError = TRUE;
       }
-      
+
       if( pThisField->bFieldFlags & HB_FF_AUTOINC )
       {
          pArea->fAutoInc = TRUE;
@@ -3132,7 +3132,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       }
       else if( pThisField->bFieldFlags & HB_FF_HIDDEN )
          pArea->uiFieldHidden++;
-         
+
       if( pArea->bTableType == DB_DBF_VFP )
       {
          if( pThisField->bFieldFlags & HB_FF_NULLABLE )
@@ -3140,7 +3140,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          if( pField->uiType == HB_FT_VARLENGTH )
             pField->bVarPos = ( pArea->bFlagCount ++ );
       }
-         
+
       if( fError )
       {
          hb_xfree( pBuffer );
@@ -3158,13 +3158,13 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       }
       pThisField++;
    }
-   
+
    // Adding field _NullFlags automatically
    if( pArea->bFlagCount )
    {
       DBFIELDINFO pFieldInfo;
       USHORT uiLen = pArea->bFlagCount;
-      
+
       pFieldInfo.uiLen = 0;
       while( uiLen > 8 )
       {
@@ -3179,7 +3179,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       pFieldInfo.uiDec = 0;
       pFieldInfo.uiFlags = HB_FF_HIDDEN;
       pFieldInfo.uiType = HB_FT_NONE;
-      
+
       if( SELF_ADDFIELD( ( AREAP ) pArea, &pFieldInfo ) != SUCCESS )
          return FAILURE;
       else
@@ -3191,7 +3191,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          /* field offset */
          if( pArea->bTableType == DB_DBF_VFP )
             HB_PUT_LE_UINT16( pThisField->bReserved1, pArea->uiRecordLen );
-         /* field flags */   
+         /* field flags */
          pThisField->bFieldFlags = pField->uiFlags;
 
          pThisField->bType = '0';
@@ -3200,7 +3200,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          pArea->uiRecordLen += pField->uiLen;
       }
    }
-   
+
    pArea->fShared = FALSE;    /* pCreateInfo->fShared; */
    pArea->fReadonly = FALSE;  /* pCreateInfo->fReadonly */
    pArea->ulRecCount = 0;
@@ -3701,14 +3701,14 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    LPDBFFIELD pField;
    DBFIELDINFO dbFieldInfo;
    BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+   char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
    pArea->lpdbOpenInfo = pOpenInfo;
 
    pItem = hb_itemNew( NULL );
-   
+
    if( SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_PENDINGTRIGGER,
                      pOpenInfo->ulConnection, pItem ) == SUCCESS )
    {
@@ -3795,7 +3795,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;
    }
    hb_xfree( pFileName );
@@ -3945,7 +3945,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    /* Initializing number of hidden fields*/
    pArea->uiFieldHidden = 0;
-   
+
    /* Clear dbFieldInfo structure */
    memset( &dbFieldInfo, 0, sizeof( dbFieldInfo ) );
 
@@ -4114,13 +4114,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             break;
 
          case '0':
-             /* NULLABLE and VARLENGTH support 
+             /* NULLABLE and VARLENGTH support
                if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
-               For each Varchar and Varbinary field, one bit, or "varlength" bit, is allocated 
-               in the last system field, which is a hidden field and stores the null status for 
-               all fields that can be null. If the Varchar or Varbinary field can be null, the 
-               null bit follows the "varlength" bit. If the "varlength" bit is set to 1, the length 
-               of the actual field value length is stored in the last byte of the field. Otherwise, 
+               For each Varchar and Varbinary field, one bit, or "varlength" bit, is allocated
+               in the last system field, which is a hidden field and stores the null status for
+               all fields that can be null. If the Varchar or Varbinary field can be null, the
+               null bit follows the "varlength" bit. If the "varlength" bit is set to 1, the length
+               of the actual field value length is stored in the last byte of the field. Otherwise,
                if the bit is set to 0, length of the value is equal to the field size.
             */
             if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
@@ -4143,7 +4143,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       /* Exit if error */
       if( errCode != SUCCESS )
          break;
-         
+
       if( dbFieldInfo.uiFlags & HB_FF_AUTOINC )
       {
          pArea->fAutoInc = TRUE;
@@ -4578,7 +4578,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
 
    pArea->fUpdateHeader = TRUE;
    pArea->ulRecCount = 0;
-   
+
    if( pArea->fAutoInc )
    {
       USHORT uiField;
@@ -4589,7 +4589,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
             hb_dbfSetNextValue( pArea, uiField, 0 );
       }
    }
-   
+
    if( SELF_WRITEDBHEADER( ( AREAP ) pArea ) != SUCCESS )
       return FAILURE;
    if( SELF_GOTO( ( AREAP ) pArea, 0 ) != SUCCESS )

@@ -1,12 +1,12 @@
 /*
- * $Id: dbjoinx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id: rddordu.prg 8386 2008-04-29 11:08:12Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * XPP compatible dbJoin() function
+ * Old style order management functions
  *
- * Copyright 1999-2007 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 1999 {list of individual authors and e-mail addresses}
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,9 +52,16 @@
 
 #include "hbsetup.ch"
 
-#ifdef HB_COMPAT_XPP
+#include "common.ch"
 
-FUNCTION dbJoin( cAlias, cFile, aFields, bFor )
-   RETURN __dbJoin( cAlias, cFile, aFields, bFor )
+/* NOTE: Undocumented Clipper function */
+
+#ifdef HB_C52_UNDOC
+
+FUNCTION _dtxCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, xDummy, nRecNo, nNext, nRecord, lRest )
+
+   HB_SYMBOL_UNUSED( xDummy )
+
+   RETURN ordCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest )
 
 #endif

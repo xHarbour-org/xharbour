@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.17 2008/07/13 01:45:22 ronpinkas Exp $
+# $Id: compile.mak,v 1.18 2008/07/30 11:29:08 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -226,6 +226,27 @@ $(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)ace32.c
 $(OBJ_DIR)$(DIR_SEP)dbcmd$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmd.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)dbcmd53$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmd53.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbcmdx$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmdx.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbcmdhb$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmdhb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbdrop$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbdrop.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbexists$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbexists.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)fieldhb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)rddinfo.c
+   $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)workarea.c
 	$(CC_CMD)
 
@@ -244,11 +265,23 @@ $(OBJ_DIR)$(DIR_SEP)dbtotal.c : $(RDD_DIR)$(DIR_SEP)dbtotal.prg
 $(OBJ_DIR)$(DIR_SEP)dbtotal$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbtotal.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)dbtotalx.c : $(RDD_DIR)$(DIR_SEP)dbtotalx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbtotalx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbtotalx.c
+   $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)dblist.c : $(RDD_DIR)$(DIR_SEP)dblist.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dblist$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dblist.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dblistx.c : $(RDD_DIR)$(DIR_SEP)dblistx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dblistx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dblistx.c
+   $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbfuncs.c : $(RDD_DIR)$(DIR_SEP)dbfuncs.prg
 	$(HB_CMD)
@@ -256,11 +289,23 @@ $(OBJ_DIR)$(DIR_SEP)dbfuncs.c : $(RDD_DIR)$(DIR_SEP)dbfuncs.prg
 $(OBJ_DIR)$(DIR_SEP)dbfuncs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbfuncs.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)dbfuncsx.c : $(RDD_DIR)$(DIR_SEP)dbfuncsx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbfuncsx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbfuncsx.c
+   $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)dbsort.c : $(RDD_DIR)$(DIR_SEP)dbsort.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsort$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbsort.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbsortx.c : $(RDD_DIR)$(DIR_SEP)dbsortx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbsortx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbsortx.c
+   $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbdbsort$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hbdbsort.c
 	$(CC_CMD)
@@ -274,11 +319,29 @@ $(OBJ_DIR)$(DIR_SEP)dbstrux.c : $(RDD_DIR)$(DIR_SEP)dbstrux.prg
 $(OBJ_DIR)$(DIR_SEP)dbstrux$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstrux.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)dbstruxx.c : $(RDD_DIR)$(DIR_SEP)dbstruxx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbstruxx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstruxx.c
+   $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbstruxu.c : $(RDD_DIR)$(DIR_SEP)dbstruxu.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbstruxu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstruxu.c
+   $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)dbupdat.c : $(RDD_DIR)$(DIR_SEP)dbupdat.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbupdat$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbupdat.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbupdatx.c : $(RDD_DIR)$(DIR_SEP)dbupdatx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbupdatx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbupdatx.c
+   $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)sdf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)sdf1.c
 	$(CC_CMD)
@@ -291,6 +354,12 @@ $(OBJ_DIR)$(DIR_SEP)rddord.c : $(RDD_DIR)$(DIR_SEP)rddord.prg
 
 $(OBJ_DIR)$(DIR_SEP)rddord$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddord.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rddordu.c : $(RDD_DIR)$(DIR_SEP)rddordu.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rddordu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddordu.c
+   $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)rddsys.c : $(RDD_DIR)$(DIR_SEP)rddsys.prg
 	$(HB_CMD)
@@ -1758,6 +1827,12 @@ $(OBJ_DIR)$(DIR_SEP)dbjoin.c : $(RDD_DIR)$(DIR_SEP)dbjoin.prg
 
 $(OBJ_DIR)$(DIR_SEP)dbjoin$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbjoin.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbjoinx.c : $(RDD_DIR)$(DIR_SEP)dbjoinx.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbjoinx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbjoinx.c
+   $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsdf.c : $(RDD_DIR)$(DIR_SEP)dbsdf.prg
 	$(HB_CMD)

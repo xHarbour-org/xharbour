@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c,v 1.2 2008/03/13 11:12:08 marchuet Exp $
+ * $Id: dbcmdx.c,v 1.3 2008/06/04 14:48:52 marchuet Exp $
  */
 
 /*
@@ -50,6 +50,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#include "hbsetup.ch"
 
 #include "hbapi.h"
 #include "hbapirdd.h"

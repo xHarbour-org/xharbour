@@ -1,5 +1,5 @@
 /*
- * $Id: dbsort.prg,v 1.6 2006/07/17 12:56:18 druzus Exp $
+ * $Id: dbsort.prg,v 1.7 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -93,10 +93,3 @@ FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
    ENDIF
 
    RETURN .T.
-
-#ifdef HB_COMPAT_XPP
-
-FUNCTION dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest )
-   RETURN __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest )
-
-#endif

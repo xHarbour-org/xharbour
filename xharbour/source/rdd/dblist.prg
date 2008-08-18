@@ -1,5 +1,5 @@
 /*
- * $Id: dblist.prg,v 1.3 2006/07/21 00:56:40 druzus Exp $
+ * $Id: dblist.prg,v 1.4 2008/04/05 20:31:20 likewolf Exp $
  */
 
 /*
@@ -157,10 +157,3 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    ENDIF
 
    RETURN
-
-#ifdef HB_COMPAT_XPP
-
-FUNCTION dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
-   RETURN __dbList( abEval, lOff, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
-
-#endif

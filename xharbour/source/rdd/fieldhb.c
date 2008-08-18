@@ -1,12 +1,13 @@
 /*
- * $Id: dbjoinx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id: fieldhb.c 8473 2008-05-22 06:09:35Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * XPP compatible dbJoin() function
+ * FIELDLEN(), FIELDDEC(), FIELDTYPE() Harbour extensions.
  *
- * Copyright 1999-2007 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 1999 Bruno Cantero <bruno@issnet.net>
+ * Copyright 2004-2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,11 +51,43 @@
  *
  */
 
-#include "hbsetup.ch"
+#include "hbapi.h"
 
-#ifdef HB_COMPAT_XPP
+/* NOTE: These functions are a new Harbour functions implemented in the 
+         original CA-Cl*pper namespace. These should have been marked as 
+         HB_EXTENSION, but they're not. */
 
-FUNCTION dbJoin( cAlias, cFile, aFields, bFor )
-   RETURN __dbJoin( cAlias, cFile, aFields, bFor )
+HB_FUNC_EXTERN( HB_FIELDLEN );
 
-#endif
+HB_FUNC( FIELDLEN )
+{
+   HB_FUNC_EXEC( HB_FIELDLEN );
+}
+
+HB_FUNC_EXTERN( HB_FIELDDEC );
+
+HB_FUNC( FIELDDEC )
+{
+   HB_FUNC_EXEC( HB_FIELDDEC );
+}
+
+HB_FUNC_EXTERN( HB_FIELDTYPE );
+
+HB_FUNC( FIELDTYPE )
+{
+   HB_FUNC_EXEC( HB_FIELDTYPE );
+}
+
+HB_FUNC_EXTERN( HB_FIELDFLAG );
+
+HB_FUNC( FIELDFLAG )
+{
+   HB_FUNC_EXEC( HB_FIELDFLAG )
+}
+
+HB_FUNC_EXTERN( HB_FIELDSTEP );
+
+HB_FUNC( FIELDSTEP )
+{
+   HB_FUNC_EXEC( HB_FIELDSTEP )
+}

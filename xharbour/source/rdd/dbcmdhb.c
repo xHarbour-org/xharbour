@@ -1,12 +1,12 @@
 /*
- * $Id: dbjoinx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id: dbcmdhb.c 8379 2008-04-26 06:39:37Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * XPP compatible dbJoin() function
+ * Harbour extension RDD APIs
  *
- * Copyright 1999-2007 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2008 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,9 +52,18 @@
 
 #include "hbsetup.ch"
 
-#ifdef HB_COMPAT_XPP
+#include "hbapi.h"
 
-FUNCTION dbJoin( cAlias, cFile, aFields, bFor )
-   RETURN __dbJoin( cAlias, cFile, aFields, bFor )
+HB_FUNC_EXTERN( __DBPACK );
 
-#endif
+HB_FUNC( HB_DBPACK )
+{
+   HB_FUNC_EXEC( __DBPACK );
+}
+
+HB_FUNC_EXTERN( __DBZAP );
+
+HB_FUNC( HB_DBZAP )
+{
+   HB_FUNC_EXEC( __DBZAP );
+}

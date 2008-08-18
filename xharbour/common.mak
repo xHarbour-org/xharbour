@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.18 2008/07/02 18:26:04 ronpinkas Exp $
+# $Id: common.mak,v 1.19 2008/07/30 11:29:08 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -531,6 +531,13 @@ MACRO_LIB_OBJS=\
 #===============================================================================
 RDD_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dbcmd$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbcmd53$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbcmdx$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbcmdhb$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbdrop$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbexists$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wacore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wafunc$(OBJEXT)\
@@ -541,15 +548,24 @@ RDD_LIB_OBJS=\
 	\
 	$(OBJ_DIR)$(DIR_SEP)dbdelim$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbfuncs$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbfuncsx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbjoin$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbjoinx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbsdf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbtotal$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbtotalx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dblist$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dblistx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbsort$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbsortx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbdbsort$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbstrux$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbstruxx$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbstruxu$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbupdat$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)dbupdatx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)rddord$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)rddordu$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)rddsys$(OBJEXT)
 
 #===============================================================================

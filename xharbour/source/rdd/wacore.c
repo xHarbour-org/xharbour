@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.7 2008/01/14 18:28:01 likewolf Exp $
+ * $Id: wacore.c,v 1.8 2008/01/16 00:54:29 likewolf Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
  */
 
 #ifdef __XHARBOUR__
-/* JC1: optimizing stack access under MT */ 	 
+/* JC1: optimizing stack access under MT */
 #define HB_THREAD_OPTIMIZE_STACK
 #endif
 
@@ -80,19 +80,19 @@ static BOOL   s_fNetError = FALSE;     /* Error on Networked environments */
    #define LOCK_AREA_INIT
    #define LOCK_AREA_DESTROY
 #else
-   #define s_uiCurrArea    HB_VM_STACK.uiCurrArea 	 
+   #define s_uiCurrArea    HB_VM_STACK.uiCurrArea
    #define s_pCurrArea     HB_VM_STACK.pCurrArea
    #define s_fNetError     HB_VM_STACK.fNetError
-   HB_CRITICAL_T  s_mtxWorkArea; 	 
-   #if defined (HB_OS_WIN_32) || defined(HB_OS_OS2) 	 
-      static BOOL s_fMtLockInit = FALSE; 	 
-      #define LOCK_AREA          if ( s_fMtLockInit ) HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
-      #define UNLOCK_AREA        if ( s_fMtLockInit ) HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
-      #define LOCK_AREA_INIT     if ( !s_fMtLockInit ) { HB_CRITICAL_INIT( s_mtxWorkArea ); s_fMtLockInit = TRUE; } 	 
-      #define LOCK_AREA_DESTROY  if ( s_fMtLockInit ) { HB_CRITICAL_DESTROY( s_mtxWorkArea ); s_fMtLockInit = FALSE; } 	 
-   #else 	 
-      #define LOCK_AREA          HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
-      #define UNLOCK_AREA        HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
+   HB_CRITICAL_T  s_mtxWorkArea;
+   #if defined (HB_OS_WIN_32) || defined(HB_OS_OS2)
+      static BOOL s_fMtLockInit = FALSE;
+      #define LOCK_AREA          if ( s_fMtLockInit ) HB_CRITICAL_LOCK( s_mtxWorkArea );
+      #define UNLOCK_AREA        if ( s_fMtLockInit ) HB_CRITICAL_UNLOCK( s_mtxWorkArea );
+      #define LOCK_AREA_INIT     if ( !s_fMtLockInit ) { HB_CRITICAL_INIT( s_mtxWorkArea ); s_fMtLockInit = TRUE; }
+      #define LOCK_AREA_DESTROY  if ( s_fMtLockInit ) { HB_CRITICAL_DESTROY( s_mtxWorkArea ); s_fMtLockInit = FALSE; }
+   #else
+      #define LOCK_AREA          HB_CRITICAL_LOCK( s_mtxWorkArea );
+      #define UNLOCK_AREA        HB_CRITICAL_UNLOCK( s_mtxWorkArea );
       #define LOCK_AREA_INIT 	 HB_CRITICAL_INIT( s_mtxWorkArea );
       #define LOCK_AREA_DESTROY  HB_CRITICAL_DESTROY( s_mtxWorkArea);
    #endif
@@ -128,7 +128,7 @@ HB_EXPORT ERRCODE hb_rddSelectFirstAvailable( void )
          break;
       uiArea++;
    }
-   if( uiArea >= HARBOUR_MAX_RDD_AREA_NUM )
+   if( uiArea >= HB_RDD_MAX_AREA_NUM )
       return FAILURE;
    HB_SET_WA( uiArea );
 
@@ -178,8 +178,8 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
    {
       int iSize = ( ( ( int ) s_uiCurrArea + 256 ) >> 8 ) << 8;
 
-      if( iSize > HARBOUR_MAX_RDD_AREA_NUM )
-         iSize = HARBOUR_MAX_RDD_AREA_NUM;
+      if( iSize > HB_RDD_MAX_AREA_NUM )
+         iSize = HB_RDD_MAX_AREA_NUM;
 
       if( s_uiWaNumMax == 0 )
       {
@@ -399,7 +399,7 @@ HB_EXPORT ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p,%p)", pCallBack, cargo));
 
    LOCK_AREA
-   
+
    for( uiIndex = 1; uiIndex < s_uiWaMax; uiIndex++ )
    {
       errCode = pCallBack( s_WaList[ uiIndex ], cargo );
@@ -427,17 +427,17 @@ HB_EXPORT void hb_rddSetNetErr( BOOL fNetErr )
  */
 HB_EXPORT const char * hb_rddDefaultDrv( const char * szDriver )
 {
-   static char s_szDefDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ] = "";
+   static char s_szDefDriver[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ] = "";
    static BOOL s_fInit = FALSE;
 
    if( szDriver && *szDriver )
    {
-      char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+      char szNewDriver[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
 
-      hb_strncpyUpper( szNewDriver, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      hb_strncpyUpper( szNewDriver, szDriver, HB_RDD_MAX_DRIVERNAME_LEN );
       if( !hb_rddFindNode( szNewDriver, NULL ) )
          return NULL;
-      hb_strncpy( s_szDefDriver, szNewDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      hb_strncpy( s_szDefDriver, szNewDriver, HB_RDD_MAX_DRIVERNAME_LEN );
    }
    else if( !s_fInit && !s_szDefDriver[ 0 ] && hb_rddGetNode( 0 ) )
    {
@@ -448,7 +448,7 @@ HB_EXPORT const char * hb_rddDefaultDrv( const char * szDriver )
       {
          if( hb_rddFindNode( szDrvTable[ i ], NULL ) )
          {
-            hb_strncpy( s_szDefDriver, szDrvTable[ i ], HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+            hb_strncpy( s_szDefDriver, szDrvTable[ i ], HB_RDD_MAX_DRIVERNAME_LEN );
             break;
          }
       }
@@ -504,7 +504,7 @@ HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 
    LOCK_AREA
 
-   if( iArea < 1 || iArea > HARBOUR_MAX_RDD_AREA_NUM )
+   if( iArea < 1 || iArea > HB_RDD_MAX_AREA_NUM )
       HB_SET_WA( 0 );
    else
       HB_SET_WA( iArea );

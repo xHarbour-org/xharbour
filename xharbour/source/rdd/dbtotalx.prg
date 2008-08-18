@@ -1,5 +1,5 @@
 /*
- * $Id: dbtotalx.prg 7832 2007-10-17 09:57:59Z vszakats $
+ * $Id: dbtotalx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#include "hbsetup.ch"
 
 #ifdef HB_COMPAT_XPP
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbjoin.prg,v 1.3 2006/07/16 19:48:56 druzus Exp $
+ * $Id: dbjoin.prg,v 1.1 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -171,10 +171,3 @@ STATIC PROCEDURE __doJoinList( aList )
    ENDIF
 
    RETURN
-
-#ifdef HB_COMPAT_XPP
-
-FUNCTION dbJoin( cAlias, cFile, aFields, bFor )
-   RETURN __dbJoin( cAlias, cFile, aFields, bFor )
-
-#endif

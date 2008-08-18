@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6191 2008/08/09 16:06:16 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6192 2008/08/14 09:04:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,65 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-18 11:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * TODO
+  * common.mak
+  * compile.mak
+  * contrib\hbmzip\make_b32.bat
+  * contrib\rdd_ads\ads1.c
+  * contrib\rdd_ads\adsfunc.c
+  * include\hbapirdd.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbcmd.c
+  * source\rdd\dbf1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfuncs.prg
+  * source\rdd\dbfuncsx.prg
+  * source\rdd\dbjoin.prg
+  * source\rdd\dblist.prg
+  + source\rdd\dblistx.prg
+  * source\rdd\dbsort.prg
+  * source\rdd\dbstrux.prg
+  * source\rdd\dbtotal.prg
+  * source\rdd\dbupdat.prg
+  + source\rdd\dbupdatx.prg
+  * source\rdd\delim1.c
+  * source\rdd\rddord.prg
+  * source\rdd\sdf1.c
+  * source\rdd\usrrdd\usrrdd.c
+  * source\rdd\wacore.c
+  * source\rdd\wafunc.c
+  * source\rdd\workarea.c
+  + source\rdd\dbcmdx.c
+  + source\rdd\dbjoinx.prg
+  + source\rdd\dbsortx.prg
+  + source\rdd\dbstruxx.prg
+  + source\rdd\dbtotalx.prg
+     * Changed some macros to be in the HB_ namespace, to be 
+       possibly shorter, more unified and clearer.
+       HARBOUR_MAX_RDD_DRIVERNAME_LENGTH -> HB_RDD_MAX_DRIVERNAME_LEN
+       HARBOUR_MAX_RDD_ALIAS_LENGTH      -> HB_RDD_MAX_ALIAS_LEN
+       HARBOUR_MAX_RDD_AREA_NUM          -> HB_RDD_MAX_AREA_NUM
+     ; INCOMPATIBLE change, please update your sources, a simple 
+       case-sensitive search and replace on .c/.cpp/.h/.hpp files 
+       will be enough for most sources.
+     + Moved XPP compatible functions into separated source files.
+     + Added dbPack() and dbZap() XBase++
+       compatibility functions.
+     + Added HB_ prefixed versions of DBDROP(),
+       DBEXISTS(), FIELDDEC(), FIELDLEN(), FIELDTYPE(),
+       FIELDSTEP(), FIELDFLAG()
+     + Added non-internal versions of __dbPack() and __dbZap(),
+       named: hb_dbPack() and hb_dbZap(). If group needs it I
+       can add dbPack() and dbZap() too in separate files to
+       lessen the problem of name collision with app code.
+     ! fixed DBRELATION() called without numeric parameters or with 0 to
+       return first relation expression (Clipper compatible)
+     ! fixed to not respect bitmap filters when structural order
+       is scanned, f.e. in OrdListAdd() with active bitmap filter.
+       Synched with Harbour. Thanks to Przemyslaw Czerpak
+
 2008-08-14 15:30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rdd/dbf1.c
   * source/rdd/delim1.c

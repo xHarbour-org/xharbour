@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.10 2006/07/21 00:56:40 druzus Exp $
+ * $Id: dbstrux.prg,v 1.11 2007/03/30 16:10:27 marchuet Exp $
  */
 
 /*
@@ -160,15 +160,6 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDD, lNew, cAlias, cCodePage, nConne
 
    RETURN Used()
 
-/* NOTE: Undocumented, internal Clipper function */
-
-#ifdef HB_C52_UNDOC
-
-FUNCTION __FLEDIT( aStruct, aFieldList )
-   RETURN __dbStructFilter( aStruct, aFieldList )
-
-#endif
-
 /* NOTE: Internal helper function, CA-Cl*pper name is: __FLEDIT() */
 
 FUNCTION __dbStructFilter( aStruct, aFieldList )
@@ -191,15 +182,3 @@ FUNCTION __dbStructFilter( aStruct, aFieldList )
          iif( nIndex == 0, NIL, AAdd( aStructFiltered, aStruct[ nIndex] ) ) } )
 
    RETURN aStructFiltered
-
-#ifdef HB_COMPAT_XPP
-
-/* Identical to __dbCopyStruct() */
-
-FUNCTION dbCopyStruct( cFileName, aFieldList )
-   RETURN dbCreate( cFileName, __dbStructFilter( dbStruct(), aFieldList ) )
-
-FUNCTION dbCopyExtStruct( cFileName )
-   RETURN __dbCopyXStruct( cFileName )
-
-#endif

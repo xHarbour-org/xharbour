@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.8 2005/12/23 10:47:53 druzus Exp $
+ * $Id: rddord.prg,v 1.9 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -96,17 +96,3 @@ FUNCTION IndexKey( nOrder )
 
 FUNCTION ordSetRelation( xArea, bRelation, cRelation )
    RETURN dbSetRelation( xArea, bRelation, cRelation, .T. )
-
-/* NOTE: Undocumented Clipper function */
-
-#ifdef HB_C52_UNDOC
-#ifdef HB_C52_STRICT
-
-FUNCTION _dtxCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, xDummy, nRecNo, nNext, nRecord, lRest )
-
-   HB_SYMBOL_UNUSED( xDummy )
-
-   RETURN ordCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest )
-
-#endif
-#endif

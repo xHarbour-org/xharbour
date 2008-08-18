@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.94 2008/06/03 23:12:56 kaddath Exp $
+ * $Id: adsfunc.c,v 1.95 2008/06/09 14:13:07 ronpinkas Exp $
  */
 
 /*
@@ -755,8 +755,8 @@ HB_FUNC( ADSGETTABLEALIAS )
 
    if( pArea )
    {
-      UNSIGNED8  pucAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-      UNSIGNED16 pusLen = HARBOUR_MAX_RDD_ALIAS_LENGTH + 1;
+      UNSIGNED8  pucAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
+      UNSIGNED16 pusLen = HB_RDD_MAX_ALIAS_LEN + 1;
 
       if( AdsGetTableAlias( pArea->hTable,
                             pucAlias,
@@ -1169,10 +1169,10 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
 
             if( pArea )
             {
-               char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+               char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
                hb_strncpy( szAlias, ISCHAR( 1 ) ? hb_parc( 1 ) : "ADSSQL",
-                           HARBOUR_MAX_RDD_ALIAS_LENGTH );
+                           HB_RDD_MAX_ALIAS_LEN );
                pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAlias,
                                                             pArea->uiArea );
                if( pArea->atomAlias )

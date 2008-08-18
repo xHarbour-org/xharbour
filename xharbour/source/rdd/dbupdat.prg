@@ -1,5 +1,5 @@
 /*
- * $Id: dbupdat.prg,v 1.2 2006/06/26 11:27:06 druzus Exp $
+ * $Id: dbupdat.prg,v 1.3 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -103,10 +103,3 @@ FUNCTION __dbUpdate( cAlias, bKey, lRandom, bAssign )
    ENDIF
 
    RETURN .T.
-
-#ifdef HB_COMPAT_XPP
-
-FUNCTION dbUpdate( cAlias, bAssign, bKey, lRandom )
-   RETURN __dbUpdate( cAlias, bKey, lRandom, bAssign )
-
-#endif
