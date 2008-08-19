@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.15 2008/07/10 02:56:16 modalsist Exp $
+ * $Id: browse.prg,v 1.16 2008/08/02 17:18:00 modalsist Exp $
  */
 
 /*
@@ -72,7 +72,6 @@ function Browse( nTop, nLeft, nBottom, nRight )
    Local bAction
    Local lKeyPressed
    Local aRect, cField, lShared
-   Local nKeyNo
 
    if ! Used()
       return .f.
@@ -287,9 +286,8 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
         case K_ENTER
-            nKeyNo := OrdKeyNo()
             nKey := doget( oBrw, lShared )
-            lRefresh := ( nKeyNo != OrdKeyNo() )
+            lRefresh    := .t.
             lKeyPressed := (nKey != 0)
             exit
         default
@@ -343,7 +341,10 @@ static function DOGET( oBrowse, lShared )
    local bIns, lScore, lExit, oCol, oGet, nExitState, nIndexKey, ;
       xKeyValue, lSuccess, nCursor, xData, cForExp, lSave, ;
       cMemoColor, nTop, nLeft, nBottom, nRight, cMemoScreen, ;
-      cMemoField, lMemo, lOK, cPict
+      cMemoField, lMemo, lOK, cPict, nRow, nCol
+
+   nRow := Row()
+   nCol := Col()
 
    oBrowse:hittop := .F.
    oBrowse:hitbottom := .F.
@@ -410,7 +411,8 @@ static function DOGET( oBrowse, lShared )
       else
          cPict := NIL
       endif
-      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
+//      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
+      oGet  := getnew(nRow, nCol, { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
       lSave := ReadModal({oGet})
    ENDIF
 

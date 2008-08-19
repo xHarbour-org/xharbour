@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.200 2008/07/24 14:41:59 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.201 2008/08/02 17:18:00 modalsist Exp $
  */
 
 /*
@@ -835,7 +835,7 @@ CLASS TBrowse STATIC
    METHOD PerformConfiguration()                  // Call ::Configure() in any circunstancies.
                                                   // nMode is an undocumented parameter in CA-Cl*pper
 
-   METHOD ForceStable()        INLINE ::Stabilize(.T.)  // Performs forced stabilization
+   METHOD ForceStable()                                 // Performs forced stabilization
    METHOD Stabilize()                                   // Performs incremental stabilization
 
    METHOD Invalidate()                                  // Forces resdraw during the next stabilization.
@@ -907,6 +907,7 @@ HIDDEN:
    DATA nLeftVisible                              // Indicates position of leftmost unfrozen column in display
    DATA nRightVisible                             // Indicates position of rightmost unfrozen column in display
    DATA lStable                                   // Indicates if Tbrowse is stable.
+   DATA lForceStable
 
    DATA aRect                                     // One or more rectangles and colors associated specified with ColorRect()
    DATA lRectPainting                             // When .T. ::ColorRect() calls ::ForceStable() to repaint a colored region
@@ -1010,6 +1011,7 @@ DEFAULT  nRight  TO MaxCol()
    ::lHitBottom      := .F.
    ::lForceHitsFalse := .F.
    ::lStable         := .F.
+   ::lForceStable    := .F.
    ::lHeaders        := .F.
    ::lFooters        := .F.
    ::lHeadSep        := .F.
@@ -1609,17 +1611,19 @@ METHOD MoveTo( nMove ) CLASS Tbrowse
 Local nTop, leftVis, nSkipped
 
  if ::lStable
+  
     // reset movements only after stabilize.
     ::ResetMove()
  else
 
-    if ::nMoveTo != 0 .and. ::nMoveTo != nMove
+    if ::nMoveTo != 0 .and. ( ::nMoveTo != nMove .or.;
+                              abs(::nRowsToSkip) >= ::nRowCount - 1 )
        ::forceStable()
     endif
 
     // configure on any attempt to move before stabilize.
     ::PerformConfiguration()
-
+    
  endif
 
  nSkipped := ::nRowsSkipped
@@ -2329,17 +2333,25 @@ Local nRow, aColorRect
 Return Self
 
 *------------------------------------------------------*
-METHOD Stabilize( lForceStable ) CLASS TBrowse
+METHOD ForceStable() CLASS TBrowse
+*------------------------------------------------------*
+
+ ::lForceStable := .T.
+ ::Stabilize()
+ ::lForceStable := .F.
+
+RETURN Self
+
+*------------------------------------------------------*
+METHOD Stabilize() CLASS TBrowse
 *------------------------------------------------------*
 LOCAL nOldCursor, colorSpec, nRowToDraw, cCurColor, lDispBegin
 Local nMoveTo := ::nMoveTo
 
-   if ::nColCount == 0
+   if ::nColCount == 0 .or. ( ::lStable .and. ! ::lForceStable )
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
-      return .t.
+      Return .T.
    endif
-
-Default lForceStable TO .F.
 
    lDispBegin := .f.
 
@@ -2347,7 +2359,6 @@ Default lForceStable TO .F.
       ::nColPos := Min(::nPrevDelColPos,::nColCount)
       ::nPrevDelColPos := 0
    ENDIF
-
 
    // Configure the browse if not configured yet.
    ::PerformConfiguration()
@@ -2418,7 +2429,7 @@ Default lForceStable TO .F.
 
          ::DrawRow( nRowToDraw )
           
-         if ! lForceStable
+         if ! ::lForceStable
             if ::lPaintBottomUp .and. nRowToDraw != ::nRowPos
                ::DrawRow( ::nRowPos )
             endif

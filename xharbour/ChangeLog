@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6192 2008/08/14 09:04:00 andijahja Exp $
+ * $Id: ChangeLog,v 1.6193 2008/08/18 09:42:50 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-18 23:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browse.prg
+    * fixed to repos row/col cursor properly within doget() function and
+      force refresh after that.
+
+  * source/rtl/dbedit.prg
+    ! fix to repos on right row after append blank or delete command from
+      an udf.
+
+  * source/rtl/tbrowse.prg
+    ! fixed moveto() method to repos rowpos by calling forcestable() after
+      many down() calls before of stabilize call.
+    * created ::lForceStable variable to avoid infinite loop called by
+      "do while !stabilize();end"
 
 2008-08-18 11:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * TODO

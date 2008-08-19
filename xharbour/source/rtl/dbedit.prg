@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.48 2008/08/04 15:44:18 modalsist Exp $
+ * $Id: dbedit.prg,v 1.49 2008/08/06 13:26:02 modalsist Exp $
  */
 
 /*
@@ -456,8 +456,9 @@ LOCAL oTBR,;
 
           nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
           lExcept := .f.
-          oTBR:RefreshCurrent()
-
+          if lastkey() == K_ENTER
+             oTBR:RefreshCurrent()
+          endif
        endif
 
     endif
@@ -581,11 +582,15 @@ LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged
   // The UDF has changed file, so dbedit need to be refreshed.
   if lChanged 
      if LastRec() > nLastRec  // append blank
-        oTBR:RowPos := 1
+        if Indexord() != 0
+           oTBR:RowPos := 1
+        endif
      elseif Deleted() .and. Lastrec() != 0
         if SET(_SET_DELETED)
            dbSkip()
         endif
+     else
+        oTBR:RowPos := 1
      endif
      nRet := DE_REFRESH
   endif
