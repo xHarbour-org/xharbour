@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd53.c 8681 2008-06-10 09:13:33Z vszakats $
+ * $Id: dbcmd53.c,v 1.1 2008/08/18 09:36:48 marchuet Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ HB_FUNC( ORDKEYCOUNT )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYCOUNT" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 
 }
 
@@ -114,7 +114,7 @@ HB_FUNC( ORDKEYNO )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYNO" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( ORDKEYGOTO )
@@ -131,7 +131,7 @@ HB_FUNC( ORDKEYGOTO )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYGOTO" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( ORDKEYRELPOS )
@@ -148,7 +148,7 @@ HB_FUNC( ORDKEYRELPOS )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYRELPOS" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( ORDFINDREC )
@@ -166,7 +166,7 @@ HB_FUNC( ORDFINDREC )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYGOTO" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( ORDSKIPRAW )
@@ -175,7 +175,7 @@ HB_FUNC( ORDSKIPRAW )
    if( pArea )
       SELF_SKIPRAW( pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSKIPRAW" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 
@@ -193,7 +193,7 @@ HB_FUNC( ORDSKIPUNIQUE )
       hb_itemReturnRelease( pOrderInfo.itmResult );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSKIPUNIQUE" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( ORDKEYVAL )

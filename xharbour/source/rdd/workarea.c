@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.86 2008/03/13 11:12:08 marchuet Exp $
+ * $Id: workarea.c,v 1.87 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -265,15 +265,18 @@ static ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
    pField->uiLen = pFieldInfo->uiLen;
    pField->uiDec = pFieldInfo->uiDec;
    pField->uiFlags = pFieldInfo->uiFlags;
-   pField->uiStep = pFieldInfo->uiStep;
    pField->uiArea = pArea->uiArea;
 
+#ifdef HB_COMPAT_FOXPRO
+   pField->uiStep = pFieldInfo->uiStep;
+   
    if( pField->uiFlags & HB_FF_NULLABLE )
       pField->bNullPos = (pArea->bFlagCount ++);
    if( pField->uiType == HB_FT_VARLENGTH )
       pField->bVarPos = (pArea->bFlagCount ++);
    if( pField->uiFlags & HB_FF_HIDDEN )
       pArea->uiFieldHidden ++;
+#endif      
 
    pArea->uiFieldCount ++;
    return SUCCESS;
@@ -464,7 +467,7 @@ static ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
       if( errCode != SUCCESS )
       {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, &hb_errFuncName );
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, HB_ERR_FUNCNAME );
          return errCode;
       }
       /* Add field */
@@ -481,7 +484,11 @@ static ERRCODE hb_waFieldCount( AREAP pArea, USHORT * uiFields )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waFieldCount(%p, %p)", pArea, uiFields));
 
+#ifdef HB_COMPAT_FOXPRO
    * uiFields = pArea->uiFieldCount - pArea->uiFieldHidden;
+#else   
+   * uiFields = pArea->uiFieldCount;
+#endif   
    return SUCCESS;
 }
 
@@ -601,7 +608,7 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
       case DBS_DEC:
          hb_itemPutNL( pItem, pField->uiDec );
          break;
-
+#ifdef HB_COMPAT_FOXPRO
 #ifdef DBS_FLAG
       case DBS_FLAG:
          hb_itemPutNL( pItem, pField->uiFlags );
@@ -610,7 +617,7 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
       case DBS_STEP:
          hb_itemPutNL( pItem, pField->uiStep );
          break;
-
+#endif
       default:
          return FAILURE;
 
@@ -885,7 +892,6 @@ static ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
  * Retrieve information about the current order that SELF could not.
  * Called by SELF_ORDINFO if uiIndex is not supported.
  */
-#ifdef HB_COMPAT_C53
 static ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO pInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waOrderInfo(%p, %hu, %p)", pArea, index, pInfo));
@@ -899,11 +905,10 @@ static ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO pInfo )
    /* CA-Cl*pper does not generate RT error when default ORDERINFO() method
     * is called
     */
-   /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBORDERINFO" ); */
+   /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, HB_ERR_FUNCNAME ); */
 
    return FAILURE;
 }
-#endif
 
 /*
  * Clear the WorkArea for use.

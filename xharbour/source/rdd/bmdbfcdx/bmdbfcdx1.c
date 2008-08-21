@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.43 2008/08/14 09:04:20 andijahja Exp $
+ * $Id: bmdbfcdx1.c,v 1.44 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -759,7 +759,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else 
+   else
    {
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
@@ -10018,8 +10018,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fsSeekLarge( pArea->hDataFile,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
+                               ( HB_FOFFSET ) pArea->uiHeaderLen +
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                                ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
@@ -10316,15 +10316,11 @@ HB_CALL_ON_STARTUP_BEGIN( _hb_bmdbfcdx_rdd_init_ )
 HB_CALL_ON_STARTUP_END( _hb_bmdbfcdx_rdd_init_ )
 
 #if defined(HB_PRAGMA_STARTUP)
-#  pragma startup bmdbfcdx1__InitSymbols
-#  pragma startup _hb_bmdbfcdx_rdd_init_
+   #pragma startup bmdbfcdx1__InitSymbols
+   #pragma startup _hb_bmdbfcdx_rdd_init_
 #elif defined(HB_MSC_STARTUP)
-#  if _MSC_VER >= 1010
-#     pragma data_seg( ".CRT$XIY" )
-#  else
-#     pragma data_seg( "XIY" )
-#  endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_bmdbfcdx1__InitSymbols = bmdbfcdx1__InitSymbols;
    static HB_$INITSYM hb_vm_auto_bmdbfcdx_rdd_init = _hb_bmdbfcdx_rdd_init_;
-#  pragma data_seg()
+   #pragma data_seg()
 #endif

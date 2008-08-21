@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.189 2008/08/14 09:04:19 andijahja Exp $
+ * $Id: dbf1.c,v 1.190 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -241,6 +241,7 @@ static HB_LONG hb_dbfGetNextValue( DBFAREAP pArea, USHORT uiField )
    return nValue;
 }
 
+#ifdef HB_COMPAT_FOXPRO
 static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNextValue )
 {
    HB_LONG nPreviousValue = 0;
@@ -260,6 +261,7 @@ static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNext
 
    return nPreviousValue;
 }
+#endif
 
 static void hb_dbfUpdateStampFields( DBFAREAP pArea )
 {
@@ -434,25 +436,6 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
    ulSize = pArea->pRecord - pPtr - ulSize;
    if( ulSize < ( ULONG ) pArea->uiRecordLen )
       memset( pPtr, '\0', ( ULONG ) pArea->uiRecordLen - ulSize );
-
-   // Default values
-   /*
-   for( uiCount = 0, pField = pArea->lpFields; uiCount < pArea->uiFieldCount; uiCount++, pField++ )
-   {
-      if ( pField->uiType == HB_FT_TIMESTAMP )
-      {
-         int iYear, iMonth, iDay, iHour, iMinute;
-         double dSeconds;
-         PHB_ITEM pItem;
-
-         hb_dateToday( &iYear, &iMonth, &iDay );
-         hb_dateTime( &iHour, &iMinute, &dSeconds );
-         pItem = hb_itemPutDT( NULL, iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
-         HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiCount ], hb_itemGetDL( pItem ) );
-         HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiCount ] + 4, hb_itemGetT( pItem ) );
-         hb_itemRelease( pItem );
-      }
-   }*/
 }
 
 /*
@@ -2100,10 +2083,12 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_itemRelease( pError );
       return FAILURE;
    }
-
+   
+#ifdef HB_COMPAT_FOXPRO
    uiIndex = pArea->uNullFlagField;
    if( uiIndex && pField->bNullPos && ( pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] & pField->bNullPos ) )
       hb_itemPutNull( pItem );
+#endif      
 
    if( pArea->fTrigger )
    {
@@ -2150,7 +2135,7 @@ static ERRCODE hb_dbfGoCold( DBFAREAP pArea )
 
       if( pArea->fModStamp )
          hb_dbfUpdateStampFields( pArea );
-
+   
       /* Write current record */
       if( ! hb_dbfWriteRecord( pArea ) )
          return FAILURE;
@@ -2928,8 +2913,10 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    /* Size for deleted flag */
    pArea->uiRecordLen = 1;
 
+#ifdef HB_COMPAT_FOXPRO
    /* initialize flag count */
    pArea->bFlagCount = 0;
+#endif   
 
    for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
    {
@@ -2940,8 +2927,11 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       /* field offset */
       if( pArea->bTableType == DB_DBF_VFP )
          HB_PUT_LE_UINT16( pThisField->bReserved1, pArea->uiRecordLen );
+
+#ifdef HB_COMPAT_FOXPRO         
       /* field flags */
       pThisField->bFieldFlags = pField->uiFlags;
+#endif      
 
       switch( pField->uiType )
       {
@@ -3113,18 +3103,19 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->uiRecordLen += pField->uiLen;
             pArea->fAutoInc = TRUE;
             break;
-
+#ifdef HB_COMPAT_FOXPRO
          case HB_FT_VARLENGTH:
             pThisField->bType = 'Q';
             pThisField->bLen = ( BYTE ) pField->uiLen;
             pThisField->bDec = ( BYTE ) ( pField->uiLen >> 8 );
             pArea->uiRecordLen += pField->uiLen;
             break;
-
+#endif
          default:
             fError = TRUE;
       }
-
+      
+#ifdef HB_COMPAT_FOXPRO
       if( pThisField->bFieldFlags & HB_FF_AUTOINC )
       {
          pArea->fAutoInc = TRUE;
@@ -3140,6 +3131,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          if( pField->uiType == HB_FT_VARLENGTH )
             pField->bVarPos = ( pArea->bFlagCount ++ );
       }
+#endif
 
       if( fError )
       {
@@ -3159,6 +3151,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       pThisField++;
    }
 
+#ifdef HB_COMPAT_FOXPRO
    // Adding field _NullFlags automatically
    if( pArea->bFlagCount )
    {
@@ -3200,6 +3193,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          pArea->uiRecordLen += pField->uiLen;
       }
    }
+#endif
 
    pArea->fShared = FALSE;    /* pCreateInfo->fShared; */
    pArea->fReadonly = FALSE;  /* pCreateInfo->fReadonly */
@@ -3708,7 +3702,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    pArea->lpdbOpenInfo = pOpenInfo;
 
    pItem = hb_itemNew( NULL );
-
+   
    if( SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_PENDINGTRIGGER,
                      pOpenInfo->ulConnection, pItem ) == SUCCESS )
    {
@@ -3921,6 +3915,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             uiFields = uiCount;
             break;
          }
+#ifndef HB_COMPAT_FOXPRO
+         else if( pArea->bTableType == DB_DBF_VFP &&
+                  pField->bFieldFlags & 0x01 )
+         {
+            uiSkip++;
+         }
+#endif         
       }
       uiFields -= uiSkip;
    }
@@ -3943,8 +3944,10 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       }
    }
 
+#ifdef HB_COMPAT_FOXPRO
    /* Initializing number of hidden fields*/
    pArea->uiFieldHidden = 0;
+#endif
 
    /* Clear dbFieldInfo structure */
    memset( &dbFieldInfo, 0, sizeof( dbFieldInfo ) );
@@ -4114,6 +4117,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             break;
 
          case '0':
+#ifdef HB_COMPAT_FOXPRO         
              /* NULLABLE and VARLENGTH support
                if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
                For each Varchar and Varbinary field, one bit, or "varlength" bit, is allocated
@@ -4130,6 +4134,17 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pArea->uNullFlagField = uiCount;
                break;
             }
+#else
+            if( pArea->bTableType == DB_DBF_VFP && pField->bFieldFlags & 0x01 )
+            {
+               if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
+               {
+                  /* TODO: NULLABLE and VARLENGTH support */
+               }
+               pArea->uiRecordLen += dbFieldInfo.uiLen;
+               continue;
+            }
+#endif            
 
          default:
             errCode = FAILURE;
@@ -4143,13 +4158,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       /* Exit if error */
       if( errCode != SUCCESS )
          break;
-
+#ifdef HB_COMPAT_FOXPRO
       if( dbFieldInfo.uiFlags & HB_FF_AUTOINC )
       {
          pArea->fAutoInc = TRUE;
          dbFieldInfo.uiStep = pField->bStep;
       }
-
+#endif      
    }
    if( pBuffer )
       hb_xfree( pBuffer );
@@ -4578,7 +4593,8 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
 
    pArea->fUpdateHeader = TRUE;
    pArea->ulRecCount = 0;
-
+   
+#ifdef HB_COMPAT_FOXPRO
    if( pArea->fAutoInc )
    {
       USHORT uiField;
@@ -4589,6 +4605,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
             hb_dbfSetNextValue( pArea, uiField, 0 );
       }
    }
+#endif
 
    if( SELF_WRITEDBHEADER( ( AREAP ) pArea ) != SUCCESS )
       return FAILURE;
@@ -5700,11 +5717,7 @@ HB_CALL_ON_STARTUP_END( _hb_dbf_rdd_init_ )
    #pragma startup dbf1__InitSymbols
    #pragma startup _hb_dbf_rdd_init_
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_dbf1__InitSymbols = dbf1__InitSymbols;
    static HB_$INITSYM hb_vm_auto_dbf_rdd_init = _hb_dbf_rdd_init_;
    #pragma data_seg()

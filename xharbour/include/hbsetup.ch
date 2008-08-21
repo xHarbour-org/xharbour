@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.7 2008/07/14 15:24:14 modalsist Exp $
+ * $Id: hbsetup.ch,v 1.8 2008/07/14 20:17:09 modalsist Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 #define HB_COMPAT_XPP             /* Enable Alaska Xbase++ extensions */
 /* #define HB_COMPAT_VO */        /* Enable CA-VO extensions */
 #define HB_COMPAT_FLAGSHIP        /* Enable Flagship extensions */
-/* #define HB_COMPAT_FOXPRO */    /* Enable FoxPro extensions */
+#define HB_COMPAT_FOXPRO          /* Enable FoxPro extensions */
 /* #define HB_COMPAT_DBASE */     /* Enable dBase extensions */
 
 /* NOTE: HB_SHORTNAMES must be defined manually if the symbol name length is

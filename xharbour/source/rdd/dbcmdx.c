@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c,v 1.3 2008/06/04 14:48:52 marchuet Exp $
+ * $Id: dbcmdx.c,v 1.4 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -121,10 +121,10 @@ HB_FUNC( ORDWILDSEEK )
          hb_retl( fFound );
       }
       else
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEPUTBADPARAMETER, NULL, "ORDWILDSEEK" );
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEPUTBADPARAMETER, NULL, HB_ERR_FUNCNAME );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDWILDSEEK" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( DBSKIPPER )
@@ -181,7 +181,7 @@ HB_FUNC( DBSKIPPER )
       hb_retnl( lSkipped );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPPER" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 #endif

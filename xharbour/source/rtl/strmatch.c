@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.10 2006/03/10 15:32:20 druzus Exp $
+ * $Id: strmatch.c,v 1.11 2008/07/30 11:29:10 marchuet Exp $
  */
 
 /*
@@ -54,6 +54,10 @@
 
 #include "hbapi.h"
 #include "hbregex.h"
+
+#if defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+#  include <fnmatch.h>
+#endif
 
 #if 0  /* disabled to eliminate warnings */
 static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )

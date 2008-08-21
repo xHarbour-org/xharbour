@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.29 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hbinit.h,v 1.30 2008/03/04 17:37:01 ronpinkas Exp $
  */
 
 /*
@@ -144,6 +144,12 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
 #elif defined(HB_MSC_STARTUP)
 
    typedef int (* HB_$INITSYM)( void );
+
+   #if _MSC_VER >= 1010
+      #define HB_MSC_START_SEGMENT ".CRT$XIY"
+   #else
+      #define HB_MSC_START_SEGMENT "XIY"
+   #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
