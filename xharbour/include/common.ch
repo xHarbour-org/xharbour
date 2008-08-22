@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.7 2007/04/08 07:20:55 ronpinkas Exp $
+ * $Id: common.ch,v 1.8 2007/08/28 19:36:15 ronpinkas Exp $
  */
 
 /*
@@ -119,5 +119,12 @@
 
 #command UPDATE <v1> IF <exp> TO <v2> => ;
                                 IF <exp> ; <v1> := <v2> ; END
+
+/* To suppress unused variable -w2 warnings. The code snippet will be
+   optimized out by the compiler, so it won't cause any overhead.
+   It can be used in codeblocks, too. */
+/* Please keep it synced with the similar #define in hbclass.ch */
+#define HB_SYMBOL_UNUSED( symbol )  ( symbol := ( symbol ) )
+
 
 #endif /* HB_COMMON_CH_ */

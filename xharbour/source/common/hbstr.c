@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.28 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: hbstr.c,v 1.29 2008/05/14 13:28:41 andijahja Exp $
  */
 
 /*
@@ -351,22 +351,22 @@ HB_EXPORT char * hb_xstrcpy( char * szDest, const char * szSrc, ... )
 
 static double hb_numPow10( int nPrecision )
 {
-   static double s_dPow10[16] = {                1.0,   /*  0 */
-                                                10.0,   /*  1 */
-                                               100.0,   /*  2 */
-                                              1000.0,   /*  3 */
-                                             10000.0,   /*  4 */
-                                            100000.0,   /*  5 */
-                                           1000000.0,   /*  6 */
-                                          10000000.0,   /*  7 */
-                                         100000000.0,   /*  8 */
-                                        1000000000.0,   /*  9 */
-                                       10000000000.0,   /* 10 */
-                                      100000000000.0,   /* 11 */
-                                     1000000000000.0,   /* 12 */
-                                    10000000000000.0,   /* 13 */
-                                   100000000000000.0,   /* 14 */
-                                  1000000000000000.0 }; /* 15 */
+   static const double s_dPow10[16] = {                1.0,   /*  0 */
+                                                      10.0,   /*  1 */
+                                                     100.0,   /*  2 */
+                                                    1000.0,   /*  3 */
+                                                   10000.0,   /*  4 */
+                                                  100000.0,   /*  5 */
+                                                 1000000.0,   /*  6 */
+                                                10000000.0,   /*  7 */
+                                               100000000.0,   /*  8 */
+                                              1000000000.0,   /*  9 */
+                                             10000000000.0,   /* 10 */
+                                            100000000000.0,   /* 11 */
+                                           1000000000000.0,   /* 12 */
+                                          10000000000000.0,   /* 13 */
+                                         100000000000000.0,   /* 14 */
+                                        1000000000000000.0 }; /* 15 */
    if ( nPrecision < 16 )
    {
       if ( nPrecision >= 0 )
@@ -375,11 +375,11 @@ static double hb_numPow10( int nPrecision )
       }
       else if ( nPrecision > -16 )
       {
-         return 1.0 / s_dPow10[ (unsigned int) -nPrecision ];
+         return 1.0 / s_dPow10[ ( unsigned int ) -nPrecision ];
       }
    }
 
-   return pow(10.0, (double) nPrecision);
+   return pow( 10.0, ( double ) nPrecision );
 }
 
 HB_EXPORT double hb_numRound( double dNum, int iDec )
@@ -592,7 +592,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       int iLimC;
 
       lLimV = HB_LONG_MAX / 10;
-      iLimC = HB_LONG_MAX % 10;
+      iLimC = ( int ) ( HB_LONG_MAX % 10 );
 
       iWidth = ulPos;
 
@@ -605,7 +605,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
             {
                *dVal = *dVal * 10.0 + ( c - '0' );
             }
-            else if ( *lVal < lLimV || ( *lVal <= lLimV && ( c - '0' ) <= iLimC ) )
+            else if ( *lVal < lLimV || ( *lVal <= lLimV && ( ( int ) ( c - '0' ) ) <= iLimC ) )
             {
                *lVal = *lVal * 10 + ( c - '0' );
             }
