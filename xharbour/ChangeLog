@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6196 2008/08/21 12:47:42 marchuet Exp $
+ * $Id: ChangeLog,v 1.6197 2008/08/22 07:37:11 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-25 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browse.prg
+    * reverted to prior last commit.
+
+  * source/rtl/dbedit.prg
+    ! fixed dbe_CallUDF() function to repos row properly when seek/delete
+      or append blank command is performed from UDF.
+
+  * source/rtl/tbrowse.prg
+    ! fixed setrowpos(), stabilize() and syncdata() methods to work properly
+      after append blank and/or many up/down movements before stabilize.
 
 2008-08-22 09:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\common.ch

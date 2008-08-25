@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.49 2008/08/06 13:26:02 modalsist Exp $
+ * $Id: dbedit.prg,v 1.50 2008/08/19 02:24:02 modalsist Exp $
  */
 
 /*
@@ -520,7 +520,8 @@ RETURN .T.
 *------------------------------------------------------*
 STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, oTBR)
 *------------------------------------------------------*
-LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged
+LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged,;
+      nKeyNo
 
   nRet := DE_CONT
 
@@ -581,18 +582,34 @@ LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged
 
   // The UDF has changed file, so dbedit need to be refreshed.
   if lChanged 
+
      if LastRec() > nLastRec  // append blank
-        if Indexord() != 0
-           oTBR:RowPos := 1
+        nKey := nextkey()
+        if ( nKey != 0 .and. ! dbe_CursorKey(nKey) ) .or.;
+           ordkeyno() < oTBR:RowPos
+           oTBR:Gotop()
         endif
+     elseif LastRec() < nLastRec  // Pack
+        oTBR:RowPos := 1
      elseif Deleted() .and. Lastrec() != 0
         if SET(_SET_DELETED)
            dbSkip()
         endif
-     else
-        oTBR:RowPos := 1
+     elseif nRec != Recno()
+        if indexord() != 0
+           nKeyNo := ordkeyno()
+        else
+           nKeyNo := recno()
+        endif
+        oTBR:RowPos := nKeyNo
      endif
+
+     if eof() .and. Lastrec() > 0 
+        dbgobottom()
+     endif
+
      nRet := DE_REFRESH
+
   endif
 
 RETURN nRet

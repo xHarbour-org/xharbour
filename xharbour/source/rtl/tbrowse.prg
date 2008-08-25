@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.201 2008/08/02 17:18:00 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.202 2008/08/19 02:24:02 modalsist Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ HIDDEN:
    METHOD  ColIndex()                    // Determine the relative column index into ::aCache array.
 
    METHOD  SetCachedCols()               // Calculate what columns will be cached.
-   METHOD  SyncData(nRow,nCol)           // Syncronize data cache cursor with Browse row.
+   METHOD  SyncData(nRow)                // Syncronize data cache cursor with Browse row.
 
 END CLASS
 
@@ -398,28 +398,51 @@ Local nToTop, lBottomBlock
 
 RETURN nToTop
 
+*--------------------------------------------------*
+METHOD GetCellValue( nRow, nCol ) CLASS TDataCache
+*--------------------------------------------------*
+Local nColIndex, xValue
+
+  if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow 
+     Return NIL
+  endif
+ 
+  ::SyncData( nRow )
+
+  nColIndex := ::ColIndex( nCol )
+
+  if CacheOK( ::aCache, nRow, nColIndex )
+     xValue := ::aCache[ nRow ][ nColIndex ]:Value
+  endif
+
+Return xValue
+
 *----------------------------------------------*
-METHOD SyncData( nRow, nCol ) CLASS TDataCache
+METHOD SyncData( nRow ) CLASS TDataCache
 *----------------------------------------------*
-Local nSkip, nCurRow
+Local nSkip, nCurRow, nSkipped
 
-   if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow 
-      Return .f.
-   endif
-  
-   nCurRow := ::nCurRow
+  // if cursor is on an new row, I need sync it.
+  if ::nCurRow > ::nLastRow
+     ::nCurRow := ::nLastRow 
+  endif
 
-   if nRow != nCurRow
-      // Sync data cache cursor with browse row.
-      nSkip := ( nCurRow - nRow )
-      ::Skip( -nSkip )
-   endif
+  nCurRow := ::nCurRow
 
-   if empty( ::aCache[ nRow ] ) .and. nRow == ::nCurRow
-      ::FillRow( nRow )
-   endif
+  if nRow != nCurRow
+     // Sync data cache cursor with browse row.
+     nSkip := ( nCurRow - nRow )
+     nSkipped := ::Skip( -nSkip )
+     if nSkipped != 0 .and. ::nCurRow != nRow
+        ::nCurRow := nRow
+     endif
+  endif
 
-RETURN .t.
+  if empty( ::aCache[ nRow ] ) .and. nRow == ::nCurRow
+     ::FillRow( nRow )
+  endif
+
+RETURN Self
 
 *----------------------------------------------*
 METHOD FillRow( nRow ) CLASS TDataCache
@@ -472,28 +495,6 @@ Local aCol, oCell, nRectPos, nCol, nColIndex, xValue
    next
 
 Return Self
-
-*--------------------------------------------------*
-METHOD GetCellValue( nRow, nCol ) CLASS TDataCache
-*--------------------------------------------------*
-Local nColIndex, xValue
-
-  // if cursor is on an new row, I need sync it.
-  if ::nCurRow > ::nLastRow
-     ::nCurRow := ::nLastRow 
-  endif
-
-  if ::SyncData( nRow, nCol )
-
-     nColIndex := ::ColIndex( nCol )
-
-     if CacheOK( ::aCache, nRow, nColIndex )
-        xValue := ::aCache[ nRow ][ nColIndex ]:Value
-     endif
-
-  endif
-
-Return xValue
 
 *--------------------------------------------------*
 METHOD GetCellColor( nRow, nCol ) CLASS TDataCache
@@ -907,7 +908,6 @@ HIDDEN:
    DATA nLeftVisible                              // Indicates position of leftmost unfrozen column in display
    DATA nRightVisible                             // Indicates position of rightmost unfrozen column in display
    DATA lStable                                   // Indicates if Tbrowse is stable.
-   DATA lForceStable
 
    DATA aRect                                     // One or more rectangles and colors associated specified with ColorRect()
    DATA lRectPainting                             // When .T. ::ColorRect() calls ::ForceStable() to repaint a colored region
@@ -1011,7 +1011,6 @@ DEFAULT  nRight  TO MaxCol()
    ::lHitBottom      := .F.
    ::lForceHitsFalse := .F.
    ::lStable         := .F.
-   ::lForceStable    := .F.
    ::lHeaders        := .F.
    ::lFooters        := .F.
    ::lHeadSep        := .F.
@@ -1796,15 +1795,13 @@ METHOD SkipRows() CLASS Tbrowse
 
  if ::nMoveTo != TBM_TOP .and. ::nMoveTo != TBM_BOTTOM 
 
-    if ::nMoveTo == TBM_UP .and. ::nRowPos = 1
+    if ( ::nMoveTo == TBM_UP .and. ::nRowPos = 1 ) .OR.;
+       ( ::nMoveTo == TBM_DOWN .and. ::nRowPos = Min(::nRowCount, ::oCache:LastRow) )
+
        ::aRedraw[ ::nRowPos ] := .T.
        ::oCache:Invalidate(::nRowPos)
        ::DrawRow( ::nRowPos )
 
-    elseif ::nMoveTo == TBM_DOWN .and. ::nRowPos = Min(::nRowCount, ::oCache:LastRow)
-       ::aRedraw[ ::nRowPos ] := .T.
-       ::oCache:Invalidate(::nRowPos)
-       ::DrawRow( ::nRowPos )
     endif
 
     ::nRowsSkipped := ::EvalSkipBlock( ::nRowsToSkip )
@@ -1820,13 +1817,9 @@ METHOD Moved() CLASS TBrowse
    ::ResetHitState()
 
    // No need to Dehilite() current cell more than once
-   if ::lStable
-      if ::lAutoLite
-         ::DeHilite()
-      else
-         ::PosCursor()
-      endif
-      ::lStable := .F.
+   if ::Stable
+      ::DeHilite()
+      ::Stable := .F.
    endif
 
 RETURN Self
@@ -2336,9 +2329,8 @@ Return Self
 METHOD ForceStable() CLASS TBrowse
 *------------------------------------------------------*
 
- ::lForceStable := .T.
+ ::lStable := .F.
  ::Stabilize()
- ::lForceStable := .F.
 
 RETURN Self
 
@@ -2348,8 +2340,11 @@ METHOD Stabilize() CLASS TBrowse
 LOCAL nOldCursor, colorSpec, nRowToDraw, cCurColor, lDispBegin
 Local nMoveTo := ::nMoveTo
 
-   if ::nColCount == 0 .or. ( ::lStable .and. ! ::lForceStable )
+   if ::nColCount == 0 .or. ::lStable
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
+      if ::nColCount > 0
+         ::PosCursor()
+      endif
       Return .T.
    endif
 
@@ -2426,18 +2421,7 @@ Local nMoveTo := ::nMoveTo
       ::ResetMove()
 
       While ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
-
          ::DrawRow( nRowToDraw )
-          
-         if ! ::lForceStable
-            if ::lPaintBottomUp .and. nRowToDraw != ::nRowPos
-               ::DrawRow( ::nRowPos )
-            endif
-            DispEnd()
-            SetCursor( nOldCursor )
-            Return .F.
-         endif
-
       Enddo
 
       if nMoveTo == 0 .and. ::nRowPos > ::oCache:CurRow
@@ -2453,7 +2437,7 @@ Local nMoveTo := ::nMoveTo
    endif
 
 
-   if ! ::lRectPainting .AND. ::lAutoLite
+   if ! ::lRectPainting .and. ::lAutoLite
       ::Hilite()
    else
       ::PosCursor()
@@ -2913,7 +2897,7 @@ Local nCursor, nColor
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
 
-      nCurSor := SetColor( SC_NONE )
+      nCurSor := SetCursor( SC_NONE )
 
       nScrRow := ::nRowPos + ::nRowData 
       nScrCol := ::aColsInfo[ ::nColPos, TBCI_SCRCOLPOS ]
@@ -2935,7 +2919,7 @@ Local nCursor, nColor
       ::nCol := iif( nNotLeftCol <> NIL, nNotLeftCol, nScrCol )
 #endif
 
-      SetColor( nCursor )
+      SetCursor( nCursor )
 
    endif
 
@@ -3123,27 +3107,30 @@ Return b
 *---------------------------------------------------*
 METHOD SetRowPos( nRow ) CLASS TBrowse
 *---------------------------------------------------*
-Local i
 
    if hb_IsNumeric(nRow) .and.;
-      nRow != ::nRowPos .and. nRow >= 1 .and. nRow <= ::nRowCount  
+      nRow >= 1 .and. nRow <= ::nRowCount .and.;
+      nRow != ::nRowPos 
 
       ::ResetMove()
-      ::Moved()
 
-      if nRow > ::nRowPos
-         ::nMoveTo := TBM_DOWN
+      if ::lStable
+         if nRow = 1
+            ::Gotop()
+         else
+            ::nRowPos := nRow
+            ::oCache:CurRow := nRow
+         endif
       else
-         ::nMoveTo := TBM_UP
+         if nRow > ::nRowPos
+            ::nMoveTo := TBM_DOWN
+         else
+            ::nMoveTo := TBM_UP
+         endif
+         ::nRowsToSkip := nRow - ::nRowPos
       endif
 
-      for i := nRow to ::nRowPos
-          ::MoveTo( ::nMoveTo )
-      next
-
-      ::nRowPos := nRow
-      ::ForceStable()
-      ::oCache:CurRow := nRow
+      ::Moved()
 
    endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.16 2008/08/02 17:18:00 modalsist Exp $
+ * $Id: browse.prg,v 1.17 2008/08/19 02:24:01 modalsist Exp $
  */
 
 /*
@@ -341,10 +341,7 @@ static function DOGET( oBrowse, lShared )
    local bIns, lScore, lExit, oCol, oGet, nExitState, nIndexKey, ;
       xKeyValue, lSuccess, nCursor, xData, cForExp, lSave, ;
       cMemoColor, nTop, nLeft, nBottom, nRight, cMemoScreen, ;
-      cMemoField, lMemo, lOK, cPict, nRow, nCol
-
-   nRow := Row()
-   nCol := Col()
+      cMemoField, lMemo, lOK, cPict
 
    oBrowse:hittop := .F.
    oBrowse:hitbottom := .F.
@@ -411,8 +408,7 @@ static function DOGET( oBrowse, lShared )
       else
          cPict := NIL
       endif
-//      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
-      oGet  := getnew(nRow, nCol, { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
+      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
       lSave := ReadModal({oGet})
    ENDIF
 
