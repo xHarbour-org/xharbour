@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.14 2008/03/13 11:12:11 marchuet Exp $
+ * $Id: adordd.prg,v 1.15 2008/04/09 21:38:40 marchuet Exp $
  */
 
 /*
@@ -676,6 +676,8 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_APPEND( nWA, lUnLockAll )
 
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
+   
+   HB_SYMBOL_UNUSED( lUnLockAll )
 
    oRecordSet:AddNew()
 
@@ -876,7 +878,10 @@ STATIC FUNCTION ADO_FIELDINFO( nWA, nField, nInfoType, uInfo )
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_ORDLSTFOCUS( nWA, aOrderInfo )
-/*
+
+   HB_SYMBOL_UNUSED( nWA )
+   HB_SYMBOL_UNUSED( aOrderInfo )
+/* TODO
    LOCAL nRecNo
    LOCAL aWAData    := USRRDD_AREADATA( nWA )
    LOCAL oRecordSet := aWAData[ WA_RECORDSET ]
@@ -907,7 +912,12 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_RAWLOCK( nWA, nAction, nRecNo )
 
+/* TODO
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
+*/   
+   HB_SYMBOL_UNUSED( nRecNo )
+   HB_SYMBOL_UNUSED( nWA )
+   HB_SYMBOL_UNUSED( nAction )
 
 RETURN SUCCESS
 
@@ -923,8 +933,12 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_UNLOCK( nWA, xRecID )
 
+/* TODO
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
-
+*/   
+   HB_SYMBOL_UNUSED( xRecId )
+   HB_SYMBOL_UNUSED( nWA )
+   
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_SETFILTER( nWA, aFilterInfo )
@@ -1233,8 +1247,13 @@ RETURN lRet
 
 STATIC FUNCTION ADO_SEEK( nWA, lSoftSeek, cKey, lFindLast )
 
+   HB_SYMBOL_UNUSED( nWA )
+   HB_SYMBOL_UNUSED( lSoftSeek )
+   HB_SYMBOL_UNUSED( cKey )
+   HB_SYMBOL_UNUSED( lFindLast )
+/* TODO
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
-/*
+   
    LPCDXTAG pTag;
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )

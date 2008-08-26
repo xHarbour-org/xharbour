@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.8 2007/08/28 19:36:15 ronpinkas Exp $
+ * $Id: common.ch,v 1.9 2008/08/22 07:37:12 marchuet Exp $
  */
 
 /*
@@ -124,7 +124,7 @@
    optimized out by the compiler, so it won't cause any overhead.
    It can be used in codeblocks, too. */
 /* Please keep it synced with the similar #define in hbclass.ch */
-#define HB_SYMBOL_UNUSED( symbol )  ( symbol := ( symbol ) )
+#xcommand HB_SYMBOL_UNUSED( <symbol> ) => ( <symbol> )
 
 
 #endif /* HB_COMMON_CH_ */

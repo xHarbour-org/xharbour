@@ -1,5 +1,5 @@
 /*
- * $Id: dbstruct.ch,v 1.2 2002/12/28 12:11:13 horacioroldan Exp $
+ * $Id: dbstruct.ch,v 1.3 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -59,10 +59,14 @@
 #define DBS_LEN         3
 #define DBS_DEC         4
 #define DBS_FLAG        5
+#define DBS_STEP        6
 
+#ifdef HB_COMPAT_FOXPRO
 /* Length of the field structure array */
 #define DBS_ALEN        5
-
-#define DBS_STEP        6
+#else
+/* Length of the field structure array */
+#define DBS_ALEN        4
+#endif
 
 #endif /* _DBSTRUCT_CH */

@@ -1,5 +1,5 @@
 /*
- * $Id: sxtrig.prg,v 1.1 2007/10/31 08:30:33 marchuet Exp $
+ * $Id: sxtrig.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -53,7 +53,6 @@
 
 #include "common.ch"
 #include "hbsxdef.ch"
-#define HB_SYMBOL_UNUSED( symbol )  symbol = symbol
 
 function Sx_DefTrigger( nEvent, nArea, nFieldPos, xTrigVal )
 

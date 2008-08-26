@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6197 2008/08/22 07:37:11 marchuet Exp $
+ * $Id: ChangeLog,v 1.6198 2008/08/25 15:47:35 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-26 09:31 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\common.ch
+  * source\rdd\hbsix\sxtrig.prg
+    % optimized the use of HB_SYMBOL_UNUSED
+
+  * include\dbstruct.ch
+  * source\rdd\dbcmd.c
+  * source\rdd\dbf1.c
+  * source\rdd\usrrdd\rdds\Makefile
+  * source\rdd\usrrdd\rdds\adordd.prg
+  * source\rdd\workarea.c
+    + Adding HB_COMPAT_FOXPRO as necessary to separate in different RDD non
+      compatible features. And create in the future a new dbfvfp.lib and
+      adsdbf.lib
 
 2008-08-25 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg

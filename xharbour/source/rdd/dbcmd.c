@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.223 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: dbcmd.c,v 1.224 2008/08/21 12:47:44 marchuet Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ HB_FUNC( AFIELDS )
    PHB_ITEM pType = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pLen = hb_param( 3, HB_IT_ARRAY );
    PHB_ITEM pDec = hb_param( 4, HB_IT_ARRAY );
-#ifdef DBS_FLAG
+#ifdef HB_COMPAT_FOXPRO
    PHB_ITEM pFlags = hb_param( 5, HB_IT_ARRAY );
 #else
    PHB_ITEM pFlags = NULL;
@@ -120,14 +120,14 @@ HB_FUNC( AFIELDS )
       if( uiArrayLen < uiFields )
          uiFields = uiArrayLen;
    }
-
+#ifdef HB_COMPAT_FOXPRO
    if( pFlags )
    {
       USHORT uiArrayLen = ( USHORT ) hb_arrayLen( pFlags );
       if( uiArrayLen < uiFields )
          uiFields = uiArrayLen;
    }
-
+#endif
    if( pName )
    {
       for( uiCount = 1; uiCount <= uiFields; ++uiCount )
@@ -160,7 +160,7 @@ HB_FUNC( AFIELDS )
             return;
       }
    }
-#ifdef DBS_FLAG
+#ifdef HB_COMPAT_FOXPRO
    if( pFlags )
    {
       for( uiCount = 1; uiCount <= uiFields; ++uiCount )
@@ -2208,6 +2208,8 @@ HB_FUNC( HB_FIELDTYPE )
    hb_retc( NULL );
 }
 
+#ifdef HB_COMPAT_FOXPRO
+
 HB_FUNC( HB_FIELDFLAG )
 {
    HB_THREAD_STUB
@@ -2255,3 +2257,5 @@ HB_FUNC( HB_FIELDSTEP )
 
    hb_retni(0);
 }
+
+#endif

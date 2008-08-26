@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.190 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: dbf1.c,v 1.191 2008/08/21 12:47:44 marchuet Exp $
  */
 
 /*
@@ -221,6 +221,7 @@ static HB_LONG hb_dbfGetRowVer( DBFAREAP pArea, USHORT uiField, HB_LONG * pValue
    return SUCCESS;
 }
 
+#ifdef HB_COMPAT_FOXPRO
 static HB_LONG hb_dbfGetNextValue( DBFAREAP pArea, USHORT uiField )
 {
    HB_LONG nValue = 0;
@@ -241,7 +242,6 @@ static HB_LONG hb_dbfGetNextValue( DBFAREAP pArea, USHORT uiField )
    return nValue;
 }
 
-#ifdef HB_COMPAT_FOXPRO
 static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNextValue )
 {
    HB_LONG nPreviousValue = 0;
@@ -2966,7 +2966,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->uiRecordLen += pField->uiLen;
             pArea->fHasMemo = TRUE;
             break;
-
+#ifdef HB_COMPAT_FOXPRO
          case HB_FT_PICTURE:
             pThisField->bType = 'P';
             if( pField->uiLen != 4 || pArea->bMemoType == DB_MEMO_SMT )
@@ -2986,7 +2986,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->uiRecordLen += pField->uiLen;
             pArea->fHasMemo = TRUE;
             break;
-
+#endif
          case HB_FT_ANY:
             pThisField->bType = 'V';
             if( pField->uiLen < 3 || pField->uiLen == 5 )
@@ -4097,25 +4097,25 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             dbFieldInfo.uiType = HB_FT_MEMO;
             pArea->fHasMemo = TRUE;
             break;
-
+#ifdef HB_COMPAT_FOXPRO
          case 'P':
             dbFieldInfo.uiType = HB_FT_PICTURE;
             dbFieldInfo.uiFlags |= HB_FF_BINARY;
             pArea->fHasMemo = TRUE;
             break;
-
+#endif
          case 'W':
             dbFieldInfo.uiType = HB_FT_BLOB;
             dbFieldInfo.uiFlags |= HB_FF_BINARY;
             pArea->fHasMemo = TRUE;
             break;
-
+#ifdef HB_COMPAT_FOXPRO
          case 'G':
             dbFieldInfo.uiType = HB_FT_OLE;
             dbFieldInfo.uiFlags |= HB_FF_BINARY;
             pArea->fHasMemo = TRUE;
             break;
-
+#endif
          case '0':
 #ifdef HB_COMPAT_FOXPRO         
              /* NULLABLE and VARLENGTH support

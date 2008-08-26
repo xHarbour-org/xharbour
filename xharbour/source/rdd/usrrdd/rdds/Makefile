@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: Makefile,v 1.3 2007/05/18 10:08:36 marchuet Exp $
 #
 
 ROOT = ../../../../
@@ -12,7 +12,6 @@ PRG_SOURCES=\
 	dbtcdx.prg \
 	fptcdx.prg \
 	smtcdx.prg \
-        adordd.prg \
         ansirdd.prg
 
 

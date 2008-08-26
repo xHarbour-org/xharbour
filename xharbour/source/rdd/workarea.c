@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.87 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: workarea.c,v 1.88 2008/08/21 12:47:44 marchuet Exp $
  */
 
 /*
@@ -313,7 +313,7 @@ static ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
          iData = 0;
       uiDec = ( USHORT ) iData;
       pFieldInfo.uiDec = 0;
-#ifdef DBS_FLAG
+#ifdef HB_COMPAT_FOXPRO
       pFieldInfo.uiFlags = hb_arrayGetNI( pFieldDesc, DBS_FLAG );
 #else
       pFieldInfo.uiFlags = 0;
@@ -609,11 +609,9 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
          hb_itemPutNL( pItem, pField->uiDec );
          break;
 #ifdef HB_COMPAT_FOXPRO
-#ifdef DBS_FLAG
       case DBS_FLAG:
          hb_itemPutNL( pItem, pField->uiFlags );
          break;
-#endif
       case DBS_STEP:
          hb_itemPutNL( pItem, pField->uiStep );
          break;
