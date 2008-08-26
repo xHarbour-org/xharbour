@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.50 2008/08/19 02:24:02 modalsist Exp $
+ * $Id: dbedit.prg,v 1.51 2008/08/25 15:47:40 modalsist Exp $
  */
 
 /*

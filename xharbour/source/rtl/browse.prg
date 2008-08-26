@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.17 2008/08/19 02:24:01 modalsist Exp $
+ * $Id: browse.prg,v 1.18 2008/08/25 15:47:40 modalsist Exp $
  */
 
 /*
