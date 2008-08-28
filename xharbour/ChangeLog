@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6199 2008/08/26 07:44:43 marchuet Exp $
+ * $Id: ChangeLog,v 1.6200 2008/08/26 20:18:20 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-08-28 15:38 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/teditor.prg
+    ! GetParagraph()
+      * fixed "bound error - array access"
+      * added error checking on nRow
+
 2008-08-27 03:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/browse.prg
   * source/rtl/dbedit.prg
@@ -121,13 +127,13 @@
   + source\rdd\dbsortx.prg
   + source\rdd\dbstruxx.prg
   + source\rdd\dbtotalx.prg
-     * Changed some macros to be in the HB_ namespace, to be 
+     * Changed some macros to be in the HB_ namespace, to be
        possibly shorter, more unified and clearer.
        HARBOUR_MAX_RDD_DRIVERNAME_LENGTH -> HB_RDD_MAX_DRIVERNAME_LEN
        HARBOUR_MAX_RDD_ALIAS_LENGTH      -> HB_RDD_MAX_ALIAS_LEN
        HARBOUR_MAX_RDD_AREA_NUM          -> HB_RDD_MAX_AREA_NUM
-     ; INCOMPATIBLE change, please update your sources, a simple 
-       case-sensitive search and replace on .c/.cpp/.h/.hpp files 
+     ; INCOMPATIBLE change, please update your sources, a simple
+       case-sensitive search and replace on .c/.cpp/.h/.hpp files
        will be enough for most sources.
      + Moved XPP compatible functions into separated source files.
      + Added dbPack() and dbZap() XBase++
@@ -373,7 +379,7 @@
 2008-08-02 14:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat
     * changed ::COPYBIN session to delete ppgen.exe prior to copy.
-  
+
   * source/rtl/dbedit.prg
     ! Fix on key exception management and general optimization.
 
@@ -396,7 +402,7 @@
   * contrib/hbmzip/readme.txt
     * changed parameters of HB_UnzipFileInfo()
       Now in 10-th parameter is @lCrypted and 11-th is @cComment
-    ! added "b" to fopen() flags to force binary mode in all systems 
+    ! added "b" to fopen() flags to force binary mode in all systems
       during CRC32 calculation
   * harbour/contrib/hbmzip/tests/myunzip.prg
     + show archive and file comment
@@ -422,16 +428,16 @@
   * source\vm\itemapi.c
   * source\vm\extend.c
     * changed return value of hb_storclenAdopt, 0 when fails.
-    + Added hb_strMatchFile( const char * pszString, const char * szPattern ); 
-      that compare two strings using platform dependent rules for file matching 
-    + Added hb_strMatchCaseWildExact( const char *szString, const char *szPattern ); 
-      that compare two strings using pattern with wildcard (?*) ignoring the case of the characters - pattern have to cover whole string 
+    + Added hb_strMatchFile( const char * pszString, const char * szPattern );
+      that compare two strings using platform dependent rules for file matching
+    + Added hb_strMatchCaseWildExact( const char *szString, const char *szPattern );
+      that compare two strings using pattern with wildcard (?*) ignoring the case of the characters - pattern have to cover whole string
     + Added high level function HB_FILEMATCH. similar to WILDMATCH, but work with filenames.
 
   * include\hbdate.h
   * source\common\hbdate.c
     + Added hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
-  synced with harbour as possible	
+  synced with harbour as possible
 
 
 2008-07-27 21:50 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>

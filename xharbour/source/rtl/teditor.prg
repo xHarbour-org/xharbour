@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.86 2008/03/13 10:49:42 likewolf Exp $
+/* $Id: teditor.prg,v 1.87 2008/03/18 01:03:27 likewolf Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.86 2008/03/13 10:49:42 likewolf Exp $
+/* $Id: teditor.prg,v 1.87 2008/03/18 01:03:27 likewolf Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -2077,7 +2077,7 @@ STATIC function GetParagraph( oSelf, nRow )
 
    LOCAL cLine := ""
    // V@
-   while ValType( oSelf:aText[ nRow ]:lSoftCR ) == 'L' .and. oSelf:aText[ nRow ]:lSoftCR
+   while nRow <= oSelf:LastRow() .AND.  ValType( oSelf:aText[ nRow ]:lSoftCR ) == 'L' .and. oSelf:aText[ nRow ]:lSoftCR
       cLine += oSelf:aText[ nRow ]:cText
       oSelf:RemoveLine( nRow )
       if oSelf:LastRow() <= 0 // V@
@@ -2092,7 +2092,7 @@ STATIC function GetParagraph( oSelf, nRow )
 
    // Last line, or only one line
    //
-   if oSelf:LastRow() > 0 // V@
+   if nRow <= oSelf:LastRow() .AND. oSelf:LastRow() > 0 // V@
       cLine += oSelf:aText[ nRow ]:cText
       oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
    endif
