@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.42 2008/05/04 20:56:37 andijahja Exp $
+ * $Id: hbver.c,v 1.43 2008/05/05 05:05:41 andijahja Exp $
  */
 
 /*
@@ -504,7 +504,6 @@ char * hb_verCompiler( void )
 
 #elif defined(__BORLANDC__)
 
-   pszName = "Borland C++";
    #if (__BORLANDC__ == 1040) /* Version 3.1 */
       iVerMajor = 3;
       iVerMinor = 1;
@@ -517,6 +516,12 @@ char * hb_verCompiler( void )
       iVerMajor = __BORLANDC__ >> 8;
       iVerMinor = ( __BORLANDC__ - 1 & 0xFF ) >> 4;
       iVerPatch = 0;
+   #endif
+
+   #if (__BORLANDC__ >= 1424) /* Version 5.9 */
+      pszName = "CodeGear C++";
+   #else
+      pszName = "Borland C++";
    #endif
 
 #elif defined(__TURBOC__)
