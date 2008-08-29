@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.18 2008/07/30 11:29:08 marchuet Exp $
+# $Id: compile.mak,v 1.19 2008/08/18 09:42:51 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -934,10 +934,7 @@ $(OBJ_DIR)$(DIR_SEP)menuto.c : $(RTL_DIR)$(DIR_SEP)menuto.prg
 $(OBJ_DIR)$(DIR_SEP)menuto$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)menuto.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)mpostolc$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)mpostolc.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)mlctopos$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)mlctopos.c
+$(OBJ_DIR)$(DIR_SEP)mlcfunc$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)mlcfunc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)mod$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)mod.c

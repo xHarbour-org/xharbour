@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6203 2008/08/29 03:00:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6204 2008/08/29 03:54:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-29 09:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * common.mak
+  * compile.mak
+    - mlctopos.c
+    - mpostolc.c
+    + mlcfunc.c
+
+  * source\rtl\memofile.c
+  * source\rtl\mtran.c
+    * updated, borrowed from harbour.
+
+  + source\rtl\mlcfunc.c
+    * borrowed from harbour.
+      this file has mlctopos(), mpostolc(), memoline(), mlcount() and mlpos()
+      functions into.
+
+  - source\rtl\mlctopos.c
+  - source\rtl\mpostolc.c
+    * removed, no longer needed. 
+
+  * source\rtl\txtline.c
+    - removed memoline(), mlcount() and mlpos() functions.
 
 2008-08-28 23:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c

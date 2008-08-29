@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.7 2004/02/20 17:17:42 ronpinkas Exp $
+ * $Id$
  */
 
 /*
@@ -53,9 +53,8 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
-#include "hbstack.h"
 
-/* NOTE: CA-Clipper has 64K (65516 bytes exactly) limit on read, in Harbour
+/* NOTE: CA-Cl*pper has 64K (65516 bytes exactly) limit on read, in Harbour
          this limit is extended, so we are not *strictly* compatible here.
          [vszakats] */
 
@@ -65,19 +64,19 @@ HB_FUNC( MEMOREAD )
 
    if( pFileName )
    {
-      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) pFileName->item.asString.value, FO_READ | FO_SHARED | FO_PRIVATE );
+      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) hb_itemGetCPtr( pFileName ), FO_READ | FO_SHARED | FO_PRIVATE );
 
       if( fhnd != FS_ERROR )
       {
          ULONG ulSize = hb_fsSeek( fhnd, 0, FS_END );
 
-         if( ulSize )
+         if( ulSize != 0 )
          {
             BYTE * pbyBuffer;
 
             /* Don't read the file terminating EOF character */
 
-            #if ! defined(OS_UNIX_COMPATIBLE)
+            #if ! defined(HB_OS_UNIX_COMPATIBLE)
             {
                BYTE byEOF = HB_CHAR_NUL;
 
@@ -85,9 +84,7 @@ HB_FUNC( MEMOREAD )
                hb_fsRead( fhnd, &byEOF, sizeof( BYTE ) );
 
                if( byEOF == HB_CHAR_EOF )
-               {
                   ulSize--;
-               }
             }
             #endif
 
@@ -96,55 +93,65 @@ HB_FUNC( MEMOREAD )
             hb_fsSeek( fhnd, 0, FS_SET );
             hb_fsReadLarge( fhnd, pbyBuffer, ulSize );
 
-            hb_retclenAdopt( ( char * ) pbyBuffer, ulSize );
+            hb_retclen_buffer( ( char * ) pbyBuffer, ulSize );
          }
          else
-         {
-            hb_retc( "" );
-         }
+            hb_retc( NULL );
 
          hb_fsClose( fhnd );
       }
       else
-      {
-         hb_retc( "" );
-      }
+         hb_retc( NULL );
    }
    else
-   {
-      hb_retc( "" );
-   }
+      hb_retc( NULL );
 }
 
-HB_FUNC( MEMOWRIT )
+static BOOL hb_memowrit( BOOL bWriteEOF )
 {
    PHB_ITEM pFileName = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
-   BOOL bRetVal = FALSE;
+   PHB_ITEM pString   = hb_param( 2, HB_IT_STRING );
+   BOOL bRetVal       = FALSE;
 
    if( pFileName && pString )
    {
-      FHANDLE fhnd = hb_fsCreate( ( BYTE * ) pFileName->item.asString.value, FC_NORMAL );
+      FHANDLE fhnd = hb_fsCreate( ( BYTE * ) hb_itemGetCPtr( pFileName ), FC_NORMAL );
 
       if( fhnd != FS_ERROR )
       {
-         ULONG ulSize = pString->item.asString.length;
+         ULONG ulSize = hb_itemGetCLen( pString );
 
-         bRetVal = ( hb_fsWriteLarge( fhnd, ( BYTE * ) pString->item.asString.value, ulSize ) == ulSize );
+         bRetVal = ( hb_fsWriteLarge( fhnd, ( BYTE * ) hb_itemGetCPtr( pString ), ulSize ) == ulSize );
 
-         /* NOTE: CA-Clipper will add the EOF even if the write failed. [vszakats] */
-         /* NOTE: CA-Clipper will not return .F. when the EOF could not be written. [vszakats] */
-         #if ! defined(OS_UNIX_COMPATIBLE)
+         /* NOTE: CA-Cl*pper will add the EOF even if the write failed. [vszakats] */
+         /* NOTE: CA-Cl*pper will not return .F. when the EOF could not be written. [vszakats] */
+#if ! defined(HB_OS_UNIX_COMPATIBLE)
+         if( bWriteEOF )  /* if true, then write EOF */
          {
             BYTE byEOF = HB_CHAR_EOF;
-
             hb_fsWrite( fhnd, &byEOF, sizeof( BYTE ) );
          }
-         #endif
+#else
+         HB_SYMBOL_UNUSED( bWriteEOF );
+#endif
 
          hb_fsClose( fhnd );
       }
    }
 
-   hb_retl( bRetVal );
+   return bRetVal;
+}
+
+HB_FUNC( HB_MEMOWRIT )
+{
+   hb_retl( hb_memowrit( FALSE ) );
+}
+
+HB_FUNC( MEMOWRIT )
+{
+#ifdef HB_EXTENSION
+   hb_retl( hb_memowrit( hb_parinfo(0) == 3 && ISLOG( 3 ) ? hb_parl( 3 ) : TRUE ) );
+#else
+   hb_retl( hb_memowrit( TRUE ) );
+#endif
 }

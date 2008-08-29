@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.19 2008/07/30 11:29:08 marchuet Exp $
+# $Id: common.mak,v 1.20 2008/08/18 09:42:51 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -267,8 +267,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)maxrow$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)memofile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)minmax$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)mlctopos$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)mpostolc$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)mlcfunc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mod$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mouseapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mousex$(OBJEXT)\

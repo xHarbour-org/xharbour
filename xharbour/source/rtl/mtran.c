@@ -1,5 +1,5 @@
 /*
- * $Id: mtran.c,v 1.4 2004/02/23 10:01:42 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -52,11 +52,10 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
 
 /* NOTE: pszResult must have an allocated buffer of at least ulStringLen */
 
-char * hb_strMemotran( char * pszResult, ULONG * ulResultLen, const char * pszString, ULONG ulStringLen, char cHardcr, char cSoftcr )
+static char * hb_strMemotran( char * pszResult, ULONG * ulResultLen, const char * pszString, ULONG ulStringLen, char cHardcr, char cSoftcr )
 {
    ULONG ulStringPos = 0;
    ULONG ulResultPos = 0;
@@ -94,17 +93,15 @@ HB_FUNC( MEMOTRAN )
 
    if( pString )
    {
-      char * pszResult = ( char * ) hb_xgrab( pString->item.asString.length + 1 );
-      char cHardcr = ISCHAR( 2 ) ? *hb_parcx( 2 ) : ';';
-      char cSoftcr = ISCHAR( 3 ) ? *hb_parcx( 3 ) : ' ';
+      char * pszResult = ( char * ) hb_xgrab( hb_itemGetCLen( pString ) + 1 );
+      char cHardcr = ISCHAR( 2 ) ? *hb_parc( 2 ) : ';';
+      char cSoftcr = ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ';
       ULONG ulResultLen;
 
-      hb_strMemotran( pszResult, &ulResultLen, pString->item.asString.value, pString->item.asString.length, cHardcr, cSoftcr );
-      hb_retclenAdopt( pszResult, ulResultLen );
+      hb_strMemotran( pszResult, &ulResultLen, hb_itemGetCPtr( pString ), hb_itemGetCLen( pString ), cHardcr, cSoftcr );
+      hb_retclen_buffer( pszResult, ulResultLen );
    }
    else
-   {
-      hb_retc( "" );
-   }
+      hb_retc( NULL );
 }
 
