@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6201 2008/08/28 03:39:17 peterrees Exp $
+ * $Id: ChangeLog,v 1.6202 2008/08/28 11:19:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-08-28 22:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/hbhpdf/hpdf_conf.h
+    * MSVC compilation
+
+  * include/classes.h
+  * source/vm/classes.c
+    + Added hb_clsClearAllClassDatas()
+  * source/vm/hvm.c
+    + Add call to clear class datas before disabling Destructors
+      /*
+         This change dismisses the restriction on storing a destructable object
+         into a classdata, but by the time such Destructor are activated
+         classdatas might have been cleaned, which means that Destructors should
+         not rely on any classdata value.
+       */
+
 2008-08-28 18:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c
     ! Change Borland to CodeGear for BCC 5.9

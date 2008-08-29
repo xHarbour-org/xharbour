@@ -1,5 +1,5 @@
 /*
- * $Id: hpdf_conf.h,v 1.2 2008/07/02 23:45:16 ronpinkas Exp $
+ * $Id: hpdf_conf.h,v 1.3 2008/07/14 15:24:14 modalsist Exp $
  */
 
 /*
@@ -30,7 +30,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef __POCC__
+#if defined( __POCC__) || defined(_MSC_VER)
 extern void *hb_xgrab( unsigned long ulSize );
 extern void  hb_xfree( void * pMem );
 #endif

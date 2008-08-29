@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.691 2008/08/03 00:58:32 walito Exp $
+ * $Id: hvm.c,v 1.692 2008/08/03 10:09:55 enricomaria Exp $
  */
 
 /*
@@ -1038,15 +1038,20 @@ HB_EXPORT int hb_vmQuit( void )
       TraceLog( NULL, "After memvarsClear\n" );
    #endif
 
-   // Destructors may still access memory, we avoid GPF by not releasing the array yet.
+   hb_itemSetNil( &HB_VM_STACK.Return );
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After Return\n" );
+   #endif
+
+   // Beyond this point all STATICs will be empty, Destructors will have access to the NIL values, we avoid GPF by not releasing the array yet.
    hb_arrayFill( &s_aStatics, ( *HB_VM_STACK.pPos ), 1, s_aStatics.item.asArray.value->ulLen );
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After reset Statics\n" );
    #endif
 
-   hb_itemSetNil( &HB_VM_STACK.Return );
+   hb_clsClearAllClassDatas();
    #ifdef TRACE_QUIT
-      TraceLog( NULL, "After Return\n" );
+      TraceLog( NULL, "After reset Class Datas\n" );
    #endif
 
    hb_gcCollectAll( TRUE );
@@ -13514,8 +13519,11 @@ HB_FUNC( HB_DBG_VMVARGGET )
 HB_FUNC( HB_DBG_VMVARGSET )
 {
    PHB_ITEM pItem = hb_param( 3, HB_IT_ANY );
+
    if( pItem )
+   {
       hb_arraySet( &s_aGlobals, hb_parni( 1 ) + hb_parni( 2 ), pItem );
+   }
 }
 
 

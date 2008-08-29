@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.222 2008/06/27 06:21:52 ronpinkas Exp $
+ * $Id: classes.c,v 1.223 2008/08/03 00:58:30 walito Exp $
  */
 
 /*
@@ -310,6 +310,20 @@ static void hb_clsRelease( PCLASS pClass )
 }
 
 /*
+ * hb_clsClearClassDatas( <pClass> )
+ *
+ * Reset all classdata held by class definition
+ */
+static void hb_clsClearClassDatas( PCLASS pClass )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsClearClassDatas(%p)", pClass));
+
+   hb_arrayFill( pClass->pClassDatas, ( *HB_VM_STACK.pPos ), 1, pClass->pClassDatas->item.asArray.value->ulLen );
+}
+
+/*
  * hb_clsClear( <pClass> )
  *
  * Release all data held by class definition
@@ -353,6 +367,23 @@ void hb_clsDisableDestructors( void )
 BOOL hb_clsDestructorsAllowed( void )
 {
    return s_AllowDestructors;
+}
+
+/*
+ * hb_clsClearAllClassDatas( <pClass> )
+ *
+ * Reset all classdata held by ALL class definition
+ */
+void hb_clsClearAllClassDatas( void )
+{
+   SHORT uiClass;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsClearAll()"));
+
+   for( uiClass = 0 ; uiClass < s_uiClasses ; uiClass++ )
+   {
+      hb_clsClearClassDatas( s_pClasses + uiClass );
+   }
 }
 
 void hb_clsClearAll( void )
@@ -427,6 +458,7 @@ void hb_clsIsClassRef( void )
       }
 
       pMeth = pClass->pMethods;
+
       for( uiAt = pClass->uiMethods + 1; --uiAt; pMeth++ )
       {
          if( pMeth->pInitValue )
@@ -3428,7 +3460,10 @@ HB_FUNC( __CLS_CNTCLSDATA )
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
       hb_retni( pClass->pClassDatas->item.asArray.value->ulLen );
    }
-   else hb_retni( 0 );
+   else
+   {
+      hb_retni( 0 );
+   }
 }
 
 
