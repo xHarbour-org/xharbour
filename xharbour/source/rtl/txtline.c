@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.14 2008/04/23 12:58:10 andijahja Exp $
+ * $Id: txtline.c,v 1.15 2008/08/29 12:58:46 modalsist Exp $
  */
 
 /*

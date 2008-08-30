@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.20 2008/08/18 09:42:51 marchuet Exp $
+# $Id: common.mak,v 1.21 2008/08/29 12:58:45 modalsist Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose

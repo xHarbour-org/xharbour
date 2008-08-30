@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6204 2008/08/29 03:54:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6205 2008/08/29 12:58:38 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-08-29 09:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+2008-08-29 22:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * common.mak
   * compile.mak
     - mlctopos.c
