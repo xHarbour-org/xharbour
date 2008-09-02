@@ -1,5 +1,5 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
  */
 
 /* pngwtran.c - transforms the data in a row for PNG writers
@@ -28,7 +28,7 @@ png_do_write_transformations(png_structp png_ptr)
 
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
-      if(png_ptr->write_user_transform_fn != NULL)
+      if (png_ptr->write_user_transform_fn != NULL)
         (*(png_ptr->write_user_transform_fn)) /* user write transform function */
           (png_ptr,                    /* png_ptr */
            &(png_ptr->row_info),       /* row_info:     */
@@ -561,8 +561,8 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s0   = (*(rp  ) << 8) | *(rp+1);
             png_uint_32 s1   = (*(rp+2) << 8) | *(rp+3);
             png_uint_32 s2   = (*(rp+4) << 8) | *(rp+5);
-            png_uint_32 red  = (png_uint_32)((s0-s1) & 0xffffL);
-            png_uint_32 blue = (png_uint_32)((s2-s1) & 0xffffL);
+            png_uint_32 red  = (png_uint_32)((s0 - s1) & 0xffffL);
+            png_uint_32 blue = (png_uint_32)((s2 - s1) & 0xffffL);
             *(rp  ) = (png_byte)((red >> 8) & 0xff);
             *(rp+1) = (png_byte)(red & 0xff);
             *(rp+4) = (png_byte)((blue >> 8) & 0xff);
