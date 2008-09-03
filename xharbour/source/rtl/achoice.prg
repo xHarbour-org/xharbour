@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.40 2008/03/18 11:05:37 likewolf Exp $
+ * $Id: achoice.prg,v 1.41 2008/04/13 17:45:19 modalsist Exp $
  */
 
 /*
@@ -68,7 +68,6 @@ FUNCTION AChoice( nTop,;
                   nFirstRow )
 LOCAL oAChoice
 LOCAL xItem
-LOCAL acItems2
 
 /* Clipper compliant. */
 DEFAULT nTop    TO 0
@@ -100,21 +99,6 @@ DEFAULT nRight  TO 0
 
   If Hb_IsNil(acItems) .OR. !Hb_IsArray( acItems ) .OR. Empty( acItems ) // This is Clipper compatible
     RETURN( 0 )
-   Else
-      acItems2 := {}
-      For Each xItem In acItems
-          if hb_isstring(xItem) .and. Len( xItem ) > 0 
-             aadd(acItems2, xItem )
-          else
-             exit
-          endif
-      Next
-      if Empty( acItems2 )
-//         Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
-         Return 0
-      Endif
-      acItems := AClone( acItems2 )
-      acItems2 := nil
    Endif
 
   IF !Hb_IsNil( uSelect )
@@ -185,6 +169,7 @@ CLASS TAChoice
    METHOD MoveCursor                     // Changes selected option, and validates if it's selectable
    METHOD DrawRows                       // "Paints" items on screen
    METHOD HitTest                        // Checks if the mouse is over the screen's area
+   METHOD Refresh()                      // Refresh achoice content.
 
 ENDCLASS
 
@@ -208,12 +193,21 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
    ::acItems := acItems
    ::uSelect := uSelect
    ::nItems  := 0
+/*
+   Else
+      acItems2 := {}
+      For Each xItem In acItems
+          if hb_isstring(xItem) .and. Len( xItem ) > 0 
+             aadd(acItems2, xItem )
+          else
+             exit
+          endif
+      Next
+      acItems := AClone( acItems2 )
+      acItems2 := nil
+*/
 
-   IF HB_ISARRAY( acItems )
-      DO WHILE ::nItems < LEN( acItems ) .AND. HB_ISSTRING( acItems[ ::nItems + 1 ] ) .AND. ! acItems[ ::nItems + 1 ] == ""
-         ::nItems++
-      ENDDO
-   ENDIF
+   ::Refresh(.f.)
 
    ::nOption   := IF( HB_ISNUMERIC( nOption ), nOption, 1 )
    ::nOption   := Min( Max( ::nOption, 1 ), ::nItems )
@@ -225,13 +219,30 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
    ::lUserFunc := ( VALTYPE( ::uUserFunc ) IN "CBM" .AND. ! EMPTY( ::uUserFunc ) )
 
    IF ::nItems != 0
-      DispBegin()
       ::nArraySize := 0
       ::ValidateArray()
-      ::DrawRows( 0, ::nBottom - ::nTop, .F. )
-      DispEnd()
+      ::DrawRows( 0, ::nSize, .F. )
    ENDIF
 
+RETURN Self
+
+METHOD Refresh(lRedraw) CLASS TAchoice
+
+ ::nItems := 0
+
+ default lRedraw to .t.
+
+ if HB_ISARRAY( ::acItems )
+
+    while ::nItems < LEN( ::acItems ) .AND. HB_ISSTRING( ::acItems[ ::nItems + 1 ] ) .AND. ! ::acItems[ ::nItems + 1 ] == ""
+       ::nItems++
+    enddo
+
+    if lRedraw .and. ::nItems > 0
+       ::DrawRows( 0, ::nSize, .F. )
+    endif
+
+ endif
 
 RETURN Self
 
@@ -240,7 +251,6 @@ METHOD Loop( nMode ) CLASS TAChoice
 LOCAL nRet, nUserMode, lNoItems
 LOCAL nKey, bAction, nAux
 LOCAL nSaveCsr := SetCursor( SC_NONE )
-LOCAL lFirstTime := .t.
 LOCAL nGotoItem
 LOCAL nPage := ::nSize + 1
 
@@ -250,7 +260,7 @@ LOCAL nPage := ::nSize + 1
    nUserMode := AC_NOITEM     // Something different to AC_IDLE
 
    // Main loop
-//   DO WHILE nMode > AC_SELECT   
+   
    DO WHILE nMode > AC_ABORT   
 
       // Refresh?
@@ -269,6 +279,7 @@ LOCAL nPage := ::nSize + 1
 
       // What will do?
       nKey := 0
+
       IF lNoItems
          // There aren't selectable items
          nUserMode := AC_NOITEM
@@ -283,12 +294,13 @@ LOCAL nPage := ::nSize + 1
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
          nKey := INKEY( 0 )
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
-         nUserMode := AC_EXCEPT
+          nUserMode := AC_EXCEPT
          nMode := AC_GOTO
       ELSE
          // Send AC_IDLE to user's function
          nUserMode := AC_IDLE
          nMode := AC_CONT
+         LOOP
       ENDIF
 
       IF ( bAction := SetKey( nKey ) ) != NIL
@@ -311,23 +323,23 @@ LOCAL nPage := ::nSize + 1
          CASE K_UP             // Moves up
             nAux := ::nOption
             ::MoveCursor( -1, -1, 0 )
-            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+            nUserMode := IF( nAux > ::nOption, AC_IDLE, AC_HITTOP )
             EXIT
 
          CASE K_DOWN           // Moves down
             nAux := ::nOption
             ::MoveCursor( 1, 1, 0 )
-            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+            nUserMode := IF( nAux < ::nOption, AC_IDLE, AC_HITBOTTOM )
             EXIT
 
          CASE K_CTRL_HOME      // Top of the window
             ::MoveCursor( - ( ::nOption - ::nFirstRow ), 1, 0 )
-            nUserMode := AC_NO_USER_FUNCTION
+            nUserMode := AC_IDLE
             EXIT
 
          CASE K_CTRL_END       // Bottom of the window
             ::MoveCursor( ::nSize - ( ::nOption - ::nFirstRow ), -1, 0 )
-            nUserMode := AC_NO_USER_FUNCTION
+            nUserMode := AC_IDLE
             EXIT
 
          CASE K_MWFORWARD
@@ -342,7 +354,7 @@ LOCAL nPage := ::nSize + 1
                endif
             endif
             ::MoveCursor( - MAX( nGotoItem, 1 ), -1, - MAX( nGotoItem, 1 ) )
-            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+            nUserMode := IF( nAux > ::nOption, AC_IDLE, AC_HITTOP )
             EXIT
 
          CASE K_MWBACKWARD
@@ -357,52 +369,61 @@ LOCAL nPage := ::nSize + 1
                endif
             endif
             ::MoveCursor( MAX( nGotoItem, 1 ), 1, MAX( nGotoItem, 1 ) )
-            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+            nUserMode := IF( nAux < ::nOption, AC_IDLE, AC_HITBOTTOM )
             EXIT
 
          CASE K_HOME
             IF ::lUserFunc
-               EXIT
+               nUserMode := AC_EXCEPT
+            ELSE
+               ::MoveCursor(1, -1, 1)
+               nUserMode := AC_NO_USER_FUNCTION
             ENDIF
-            // 2006/NOV/10 - E.F. Added the 3 next lines of code below as
-            //               suggested by Ken Wants
-            nAux := ::nOption
-            ::MoveCursor(1, -1, 1)
-            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+            EXIT
 
          CASE K_CTRL_PGUP      // First item
             ::MoveCursor( - ( ::nOption - 1 ), -1, ::nFirstRow - 1 )
-            nUserMode := AC_NO_USER_FUNCTION
+            nUserMode := AC_IDLE
             EXIT
 
          CASE K_END
             IF ::lUserFunc
-               EXIT
+               nUserMode := AC_EXCEPT
+            ELSE
+               ::MoveCursor(::nItems - ::nOption, 1, ::nItems - ::nOption)
+               nUserMode := AC_NO_USER_FUNCTION
             ENDIF
-            // 2006/NOV/10 - E.F. Added the 3 next lines of code below as
-            //               suggested by Ken Wants
-            nAux := ::nOption
-            ::MoveCursor(::nItems - ::nOption, 1, ::nItems - ::nOption)
-            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+            EXIT
 
          CASE K_CTRL_PGDN      // Last item
             ::MoveCursor( ::nItems - ::nOption, 1, Max( ::nItems - ::nSize - ::nFirstRow, 0 ) )
-            nUserMode := AC_NO_USER_FUNCTION
+            nUserMode := AC_IDLE
             EXIT
 
          CASE K_ENTER          // Select item
             IF ! ::lUserFunc
                nUserMode := AC_NO_USER_FUNCTION
                nMode := AC_SELECT
+            ELSE
+               nUserMode := AC_EXCEPT
             ENDIF
             EXIT
 
          CASE K_LEFT
          CASE K_RIGHT
+         CASE K_CTRL_LEFT
+         CASE K_CTRL_RIGHT
+         CASE K_CTRL_UP
+         CASE K_CTRL_DOWN
+            nUserMode := AC_EXCEPT
+            EXIT
+
          CASE K_ESC            // Exits ACHOICE
             IF ! ::lUserFunc
                nUserMode := AC_NO_USER_FUNCTION
                nMode := AC_ABORT
+            ELSE
+               nUserMode := AC_EXCEPT
             ENDIF
             EXIT
 
@@ -424,22 +445,12 @@ LOCAL nPage := ::nSize + 1
                ENDIF
             ENDIF
             EXIT
-
       END
 
 
       IF ::lUserFunc .AND. nUserMode != AC_NO_USER_FUNCTION
-         If lFirstTime
-            lFirstTime := .f.
-            If nUserMode == AC_IDLE
-               nMode := AC_CONT
-            Else
-               nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
-            Endif
 
-         Else
-            nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
-         Endif
+         nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
 
          /* 2007/FEB/12 - E.F. Abort when UDF returns NIL. Clipper compliance. */
          DEFAULT nMode TO 0   // AC_ABORT
@@ -447,6 +458,11 @@ LOCAL nPage := ::nSize + 1
          IF nMode < 0 .OR. nMode > AC_MAXVALUE
             nMode := AC_CONT
          ENDIF
+
+         IF nMode != AC_ABORT .and. ::nArraySize != Len( ::acItems )
+            ::Refresh()
+         ENDIF
+
          IF ! ::ValidateArray()
             nMode := AC_ABORT
          ENDIF
@@ -487,12 +503,9 @@ METHOD ValidateArray() CLASS TAChoice
 LOCAL lValid
    lValid := .T.
    IF ::nArraySize != LEN( ::acItems ) .OR. ! IsAvailableItem( ::nOption )
-      ::nArraySize := LEN( ::acItems )
-      ::nItems := 0
-      DO WHILE ::nItems < LEN( ::acItems ) .AND. HB_ISSTRING( ::acItems[ ::nItems + 1 ] ) .AND. ! ::acItems[ ::nItems + 1 ] == ""
-         ::nItems++
-      ENDDO
 
+      ::Refresh(.f.)
+      ::nArraySize := Len( ::acItems)
       ::alSelect := ARRAY( ::nItems )
       AEVAL( ::alSelect, { |x,i| ::alSelect[ i ] := IsItemSelectable( i, ::nItems, ::uSelect, ::acItems ) } )
 
@@ -552,6 +565,7 @@ RETURN ( nBounce != 2 )
 
 METHOD DrawRows( nFrom, nTo, lHilite, lOut ) CLASS TAChoice
 LOCAL nCurOption
+
    IF VALTYPE( lOut ) != "L" .OR. lOut
       DispBegin()
       DO WHILE nFrom <= nTo
@@ -583,6 +597,7 @@ LOCAL nRet
       nRet := 0
    ENDIF
 RETURN nRet
+
 
 #pragma BEGINDUMP
 #include "hbapi.h"

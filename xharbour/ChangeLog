@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6206 2008/08/30 01:24:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.6207 2008/09/02 05:19:35 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-03 12:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/achoice.prg
+    ! fixed to refresh achoice's contents after add item from an udf.
+    ! fixed some achoice's mode values passed to UDF.
+    ! fixed to call udf only one time by each loop.
+
 2008-09-02 12:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
   * contrib/png/png.h
