@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.41 2008/04/13 17:45:19 modalsist Exp $
+ * $Id: achoice.prg,v 1.42 2008/09/03 15:49:37 modalsist Exp $
  */
 
 /*
@@ -193,19 +193,6 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
    ::acItems := acItems
    ::uSelect := uSelect
    ::nItems  := 0
-/*
-   Else
-      acItems2 := {}
-      For Each xItem In acItems
-          if hb_isstring(xItem) .and. Len( xItem ) > 0 
-             aadd(acItems2, xItem )
-          else
-             exit
-          endif
-      Next
-      acItems := AClone( acItems2 )
-      acItems2 := nil
-*/
 
    ::Refresh(.f.)
 
