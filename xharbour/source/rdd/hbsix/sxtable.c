@@ -1,5 +1,5 @@
 /*
- * $Id: sxtable.c,v 1.1 2007/10/31 08:30:32 marchuet Exp $
+ * $Id: sxtable.c,v 1.2 2008/01/15 10:13:45 marchuet Exp $
  */
 
 /*
@@ -440,7 +440,7 @@ HB_FUNC( SX_SETTURBO )
 
    pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  /* find the RDDNODE */
    if( !pRDDNode )
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName,
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME,
                             HB_ERR_ARGS_BASEPARAMS );
    else
    {

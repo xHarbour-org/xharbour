@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.11 2008/03/13 11:12:08 marchuet Exp $
+ * $Id: wafunc.c,v 1.12 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -107,30 +107,37 @@ HB_EXPORT void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddNewAreaNode(%p,%hu)", pRddNode, uiRddID));
 
-   assert( pRddNode != NULL );
-
    if( pRddNode->uiAreaSize == 0 ) /* Calculate the size of WorkArea */
    {
-      AREA Area;
       USHORT uiSize;
 
-	  Area.lprfsHost = &pRddNode->pTable;
-      Area.rddID = uiRddID;
-      if( SELF_STRUCTSIZE( &Area, &uiSize ) != SUCCESS )
-	  {
+      pArea = ( AREAP ) hb_xgrab( sizeof( AREA ) );
+      memset( pArea, 0, sizeof( AREA ) );
+      pArea->lprfsHost = &pRddNode->pTable;
+      pArea->rddID = uiRddID;
+
+      if( SELF_STRUCTSIZE( pArea, &uiSize ) != SUCCESS )
          return NULL;
-	  }
-	  assert( uiSize > 0 ); /* Size of WorkArea valid? */
+
+      /* Need more space? */
+      if( uiSize > sizeof( AREA ) )   /* Size of Area changed */
+      {
+         pArea = ( AREAP ) hb_xrealloc( pArea, uiSize );
+         memset( pArea, 0, uiSize );
+         pArea->lprfsHost = &pRddNode->pTable;
+         pArea->rddID = uiRddID;
+      }
 
       pRddNode->uiAreaSize = uiSize;  /* Update the size of WorkArea */
    }
-   pArea = ( AREAP ) hb_xgrab( pRddNode->uiAreaSize );
-#ifndef DEBUG
-   /* Prevent bug of field not initialized */
-   memset( pArea, 0, pRddNode->uiAreaSize );
-#endif
-   pArea->lprfsHost = &pRddNode->pTable;
-   pArea->rddID = uiRddID;
+   else
+   {
+      pArea = ( AREAP ) hb_xgrab( pRddNode->uiAreaSize );
+      memset( pArea, 0, pRddNode->uiAreaSize );
+      pArea->lprfsHost = &pRddNode->pTable;
+      pArea->rddID = uiRddID;
+   }
+
    if( SELF_NEW( pArea ) != SUCCESS )
    {
       SELF_RELEASE( pArea );
@@ -213,7 +220,7 @@ HB_EXPORT USHORT hb_rddFieldIndex( AREAP pArea, const char * szName )
    if( *szName )
    {
       char szSym[ HB_SYMBOL_NAME_LEN + 1 ];
-      hb_strncpyUpperTrim( szSym, szName, HB_SYMBOL_NAME_LEN );
+      hb_strncpyUpperTrim( szSym, szName, sizeof( szSym ) - 1 );
 
       pField = pArea->lpFields;
       while( pField )
@@ -612,7 +619,7 @@ ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
     */
    if( szDriver && szDriver[ 0 ] )
    {
-      hb_strncpyUpper( szDriverBuffer, szDriver, HB_RDD_MAX_DRIVERNAME_LEN );
+      hb_strncpyUpper( szDriverBuffer, szDriver, sizeof( szDriverBuffer ) - 1 );
       szDriver = szDriverBuffer;
    }
    else
@@ -621,7 +628,7 @@ ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
    /* First try to create new are node and validate RDD name */
    if( ! hb_rddInsertAreaNode( szDriver ) )
    {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
       return FAILURE;
    }
 
@@ -631,7 +638,7 @@ ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
    if( !szFileName )
    {
       hb_rddReleaseCurrentArea();
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
       return FAILURE;
    }
 
@@ -677,13 +684,13 @@ ERRCODE hb_rddCreateTable( const char * szFileName, const char * szDriver,
 
    if( !szFileName )
    {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, HB_ERR_FUNCNAME );
       return FAILURE;
    }
 
    if( szDriver && szDriver[ 0 ] )
    {
-      hb_strncpyUpper( szDriverBuffer, szDriver, HB_RDD_MAX_DRIVERNAME_LEN );
+      hb_strncpyUpper( szDriverBuffer, szDriver, sizeof( szDriverBuffer ) - 1 );
       szDriver = szDriverBuffer;
    }
    else
@@ -705,7 +712,7 @@ ERRCODE hb_rddCreateTable( const char * szFileName, const char * szDriver,
    if( ! hb_rddInsertAreaNode( szDriver ) )
    {
       hb_rddSelectWorkAreaNumber( uiPrevArea );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
       return FAILURE;
    }
    pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -1048,7 +1055,7 @@ ERRCODE hb_rddTransRecords( AREAP pArea,
 
       if( !pRddNode )
       {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
          return FAILURE;
       }
 

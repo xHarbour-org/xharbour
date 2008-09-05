@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.132 2008/08/05 18:00:56 toninhofwi Exp $
+ * $Id: ads1.c,v 1.133 2008/08/18 09:42:51 marchuet Exp $
  */
 
 /*
@@ -5013,19 +5013,17 @@ HB_CALL_ON_STARTUP_BEGIN( _hb_ads_rdd_init_ )
    hb_vmAtInit( hb_adsRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_ads_rdd_init_ )
 
-#if defined(HB_PRAGMA_STARTUP)
-#  pragma startup ads1__InitSymbols
-#  pragma startup _hb_ads_rdd_init_
-#elif defined(HB_MSC_STARTUP)
-#  if _MSC_VER >= 1010
-#     pragma data_seg( ".CRT$XIY" )
-#     pragma comment( linker, "/Merge:.CRT=.data" )
-#  else
-#     pragma data_seg( "XIY" )
-#  endif
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup ads1__InitSymbols
+   #pragma startup _hb_ads_rdd_init_
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols;
    static HB_$INITSYM hb_vm_auto_ads_rdd_init = _hb_ads_rdd_init_;
-#  pragma data_seg()
+   #pragma data_seg()
 #endif
 
 ADSAREAP hb_adsGetWorkAreaPointer( void )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.191 2008/08/21 12:47:44 marchuet Exp $
+ * $Id: dbf1.c,v 1.192 2008/08/26 07:44:43 marchuet Exp $
  */
 
 /*
@@ -2769,7 +2769,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
    {
-      pItem = hb_itemPutC( pItem, "" );
+      pItem = hb_itemPutC( pItem, NULL );
       if( SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem ) != SUCCESS )
       {
          hb_itemRelease( pItem );
@@ -2782,7 +2782,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
    }
    hb_xfree( pFileName );
 
@@ -2921,8 +2921,8 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
    {
       LPFIELD pField = pArea->lpFields + uiCount;
-      strncpy( ( char * ) pThisField->bName,
-               hb_dynsymName( ( PHB_DYNS ) pField->sym ), 10 );
+      hb_strncpy( ( char * ) pThisField->bName,
+                  hb_dynsymName( ( PHB_DYNS ) pField->sym ), sizeof( pThisField->bName ) - 1 );
       pArea->pFieldOffset[ uiCount ] = pArea->uiRecordLen;
       /* field offset */
       if( pArea->bTableType == DB_DBF_VFP )
@@ -3729,10 +3729,10 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          pArea->lpdbOpenInfo = NULL;
          return FAILURE;
       }
-      hb_strncpy( ( char * ) szFileName, hb_itemGetCPtr( pItem ), _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, hb_itemGetCPtr( pItem ), sizeof( szFileName ) - 1 );
    }
    else
-      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, sizeof( szFileName ) - 1 );
 
    if( !pArea->bLockType )
    {
@@ -3789,7 +3789,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, sizeof( szAlias ) - 1 );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;
    }
    hb_xfree( pFileName );
@@ -5349,7 +5349,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
    if( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension )
    {
       /* Add default extension if missing */
-      pFileExt = hb_itemPutC( NULL, "" );
+      pFileExt = hb_itemPutC( NULL, NULL );
       if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, ulConnect, pFileExt ) == SUCCESS )
          pFileName->szExtension = hb_itemGetCPtr( pFileExt );
    }
@@ -5370,7 +5370,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
           * the path set by hb_spFile()
           */
          pFileName = hb_fsFNameSplit( szFileName );
-         pFileExt = hb_itemPutC( pFileExt, "" );
+         pFileExt = hb_itemPutC( pFileExt, NULL );
          if( SELF_RDDINFO( pRDD, RDDI_MEMOEXT, ulConnect, pFileExt ) == SUCCESS )
          {
             szExt = hb_itemGetCPtr( pFileExt );
@@ -5385,7 +5385,7 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
           * and try to delete production index also if it exists
           * in the same directory as table file
           */
-         pFileExt = hb_itemPutC( pFileExt, "" );
+         pFileExt = hb_itemPutC( pFileExt, NULL );
          if( SELF_RDDINFO( pRDD, RDDI_ORDSTRUCTEXT, ulConnect, pFileExt ) == SUCCESS )
          {
             szExt = hb_itemGetCPtr( pFileExt );
@@ -5429,7 +5429,7 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
 
    if( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension )
    {
-      pFileExt = hb_itemPutC( NULL, "" );
+      pFileExt = hb_itemPutC( NULL, NULL );
       if( SELF_RDDINFO( pRDD, fTable ? RDDI_TABLEEXT : RDDI_ORDBAGEXT, ulConnect, pFileExt ) == SUCCESS )
          pFileName->szExtension = hb_itemGetCPtr( pFileExt );
    }
@@ -5510,7 +5510,7 @@ static ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
          hb_itemPutC( pItem, pData->szTableExt[ 0 ] ? pData->szTableExt : DBF_TABLEEXT );
          if( szNew )
          {
-            hb_strncpy( pData->szTableExt, szNew, HB_MAX_FILE_EXT );
+            hb_strncpy( pData->szTableExt, szNew, sizeof( pData->szTableExt ) - 1 );
             hb_xfree( szNew );
          }
          break;
@@ -5713,10 +5713,13 @@ HB_CALL_ON_STARTUP_BEGIN( _hb_dbf_rdd_init_ )
    hb_vmAtInit( hb_dbfRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_dbf_rdd_init_ )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup dbf1__InitSymbols
    #pragma startup _hb_dbf_rdd_init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #endif
    #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_dbf1__InitSymbols = dbf1__InitSymbols;
    static HB_$INITSYM hb_vm_auto_dbf_rdd_init = _hb_dbf_rdd_init_;

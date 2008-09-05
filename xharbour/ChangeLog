@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6207 2008/09/02 05:19:35 andijahja Exp $
+ * $Id: ChangeLog,v 1.6208 2008/09/03 15:49:36 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-05 10:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfcdx/bmdbfcdx1.c
+    ! fixed dirty index reading
+
+  * source/rdd/workarea.c
+    ! Fixed DBI_POSITIONED value returned.
+
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * contrib/rddads/ads1.c
+    ! Fix for MSVC 64-bit C mode startup procedure.
+
+  * source/rdd/dbfntx/dbfntx1.c
+    ! use memcpy() instead of hb_strncpy() to avoid problems when
+      there is no place for tailing 0
+
+    Synched with Harbour. Thanks to Przemyslaw Czerpak and Vicktor Szakáts
+
 
 2008-09-03 12:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.93 2008/08/14 09:04:21 andijahja Exp $
+ * $Id: dbffpt1.c,v 1.94 2008/08/21 12:47:45 marchuet Exp $
  */
 
 /*
@@ -2486,7 +2486,7 @@ static ERRCODE hb_fptReadBlobBlock( FPTAREAP pArea, PHB_ITEM pItem,
       return hb_fptCopyToFile( pArea->hMemoFile, hFile, ulSize );
 
    if( ulSize == 0 )
-      hb_itemPutC( pItem, "" );
+      hb_itemPutC( pItem, NULL );
    else
    {
       BYTE * bBuffer = ( BYTE * ) hb_xalloc( ulSize + 1 );
@@ -2779,7 +2779,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
    }
    else
    {
-      hb_itemPutC( pItem, "" );
+      hb_itemPutC( pItem, NULL );
       hb_itemSetCMemo( pItem );
    }
    return errCode;
@@ -3866,14 +3866,14 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
       pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
       if( ! pFileName->szExtension )
       {
-         pItem = hb_itemPutC( pItem, "" );
+         pItem = hb_itemPutC( pItem, NULL );
          SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pItem );
          pFileName->szExtension = hb_itemGetCPtr( pItem );
          hb_fsFNameMerge( ( char * ) szFileName, pFileName );
       }
       else
       {
-         hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, _POSIX_PATH_MAX );
+         hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
       }
       hb_xfree( pFileName );
 
@@ -4055,7 +4055,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
    if( ! pFileName->szExtension )
    {
-      PHB_ITEM pItem = hb_itemPutC( NULL, "" );
+      PHB_ITEM pItem = hb_itemPutC( NULL, NULL );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pItem );
       pFileName->szExtension = hb_itemGetCPtr( pItem );
       hb_fsFNameMerge( ( char * ) szFileName, pFileName );
@@ -4063,7 +4063,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, sizeof( szFileName ) - 1 );
    }
    hb_xfree( pFileName );
 
@@ -4987,7 +4987,7 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
 
          if( szNew )
          {
-            hb_strncpy( pData->szMemoExt, szNew, HB_MAX_FILE_EXT );
+            hb_strncpy( pData->szMemoExt, szNew, sizeof( pData->szMemoExt ) - 1 );
             hb_xfree( szNew );
          }
          break;
@@ -5153,10 +5153,13 @@ HB_CALL_ON_STARTUP_BEGIN( _hb_dbffpt_rdd_init_ )
    hb_vmAtInit( hb_dbffptRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_dbffpt_rdd_init_ )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup dbffpt1__InitSymbols
    #pragma startup _hb_dbffpt_rdd_init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #endif
    #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols;
    static HB_$INITSYM hb_vm_auto_dbffpt_rdd_init = _hb_dbffpt_rdd_init_;

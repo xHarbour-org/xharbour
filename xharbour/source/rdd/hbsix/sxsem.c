@@ -1,5 +1,5 @@
 /*
- * $Id: sxsem.c 7771 2007-09-25 01:21:03Z druzus $
+ * $Id: sxsem.c,v 1.1 2007/10/31 08:30:32 marchuet Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ static BOOL hb_sxSemName( char * szFileName )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
          if( pOrderInfo.itmOrder && hb_itemGetNI( pOrderInfo.itmOrder ) == 0 )
             pOrderInfo.itmOrder = NULL;
-         pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
+         pOrderInfo.itmResult = hb_itemPutC( NULL, NULL );
          SELF_ORDINFO( pArea, DBOI_NAME, &pOrderInfo );
          szName = hb_itemGetCPtr( pOrderInfo.itmResult );
          if( szName && szName[0] )
