@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -69,7 +70,7 @@ Returns:        the (possibly updated) count value (a non-negative number), or
                 a negative error number
 */
 
-PCRE_EXP_DEFN int
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
 pcre_refcount(pcre *argument_re, int adjust)
 {
 real_pcre *re = (real_pcre *)argument_re;

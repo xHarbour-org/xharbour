@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -66,7 +67,7 @@ Arguments:
 Returns:           0 if data returned, negative on error
 */
 
-PCRE_EXP_DEFN int
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
 pcre_fullinfo(const pcre *argument_re, const pcre_extra *extra_data, int what,
   void *where)
 {

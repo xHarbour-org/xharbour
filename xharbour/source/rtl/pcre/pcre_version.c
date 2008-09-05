@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -80,7 +81,7 @@ I could find no way of detecting that a macro is defined as an empty string at
 pre-processor time. This hack uses a standard trick for avoiding calling
 the STRING macro with an empty argument when doing the test. */
 
-PCRE_EXP_DEFN const char *
+PCRE_EXP_DEFN const char * PCRE_CALL_CONVENTION
 pcre_version(void)
 {
 return (XSTRING(Z PCRE_PRERELEASE)[1] == 0)?

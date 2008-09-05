@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -73,7 +74,7 @@ Returns:        number of capturing subpatterns
                 or negative values on error
 */
 
-PCRE_EXP_DEFN int
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
 pcre_info(const pcre *argument_re, int *optptr, int *first_byte)
 {
 real_pcre internal_re;

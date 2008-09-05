@@ -1,5 +1,9 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ */
+
+/*
+ * $Id: ucptable.h,v 1.4 2008/05/07 21:59:19 andijahja Exp $
  */
 /* This source module is automatically generated from the Unicode
 property table. See ucpinternal.h for a description of the layout.

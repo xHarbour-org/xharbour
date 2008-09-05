@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -105,8 +106,7 @@ while ((t = *data++) != XCL_END)
 #ifdef SUPPORT_UCP
   else  /* XCL_PROP & XCL_NOTPROP */
     {
-    int chartype, script;
-    int category = _pcre_ucp_findprop(c, &chartype, &script);
+    const ucd_record * prop = GET_UCD(c);
 
     switch(*data)
       {
@@ -115,20 +115,20 @@ while ((t = *data++) != XCL_END)
       break;
 
       case PT_LAMP:
-      if ((chartype == ucp_Lu || chartype == ucp_Ll || chartype == ucp_Lt) ==
+      if ((prop->chartype == ucp_Lu || prop->chartype == ucp_Ll || prop->chartype == ucp_Lt) ==
           (t == XCL_PROP)) return !negated;
       break;
 
       case PT_GC:
-      if ((data[1] == category) == (t == XCL_PROP)) return !negated;
+      if ((data[1] == _pcre_ucp_gentype[prop->chartype]) == (t == XCL_PROP)) return !negated;
       break;
 
       case PT_PC:
-      if ((data[1] == chartype) == (t == XCL_PROP)) return !negated;
+      if ((data[1] == prop->chartype) == (t == XCL_PROP)) return !negated;
       break;
 
       case PT_SC:
-      if ((data[1] == script) == (t == XCL_PROP)) return !negated;
+      if ((data[1] == prop->script) == (t == XCL_PROP)) return !negated;
       break;
 
       /* This should never occur, but compilers may mutter if there is no

@@ -1,6 +1,7 @@
 /*
- * $Id: pcre_valid_utf8.c,v 1.7 2008/05/07 21:59:19 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -156,8 +157,8 @@ for (p = string; length-- > 0; p++)
     }
   }
 #else
-(void)string;
-(void)length;
+(void)(string);  /* Keep picky compilers happy */
+(void)(length);
 #endif
 
 return -1;

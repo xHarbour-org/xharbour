@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -159,13 +160,39 @@ printf("\n");
 
 if (length > md->end_subject - eptr) return FALSE;
 
-/* Separate the caselesss case for speed */
+/* Separate the caseless case for speed. In UTF-8 mode we can only do this
+properly if Unicode properties are supported. Otherwise, we can check only
+ASCII characters. */
 
 if ((ims & PCRE_CASELESS) != 0)
   {
+#ifdef SUPPORT_UTF8
+#ifdef SUPPORT_UCP
+  if (md->utf8)
+    {
+    USPTR endptr = eptr + length;
+    while (eptr < endptr)
+      {
+      int c, d;
+      GETCHARINC(c, eptr);
+      GETCHARINC(d, p);
+      if (c != d && c != UCD_OTHERCASE(d)) return FALSE;
+      }
+    }
+  else
+#endif
+#endif
+
+  /* The same code works when not in UTF-8 mode and in UTF-8 mode when there
+  is no UCP support. */
+
   while (length-- > 0)
-    if (md->lcc[*p++] != md->lcc[*eptr++]) return FALSE;
+    { if (md->lcc[*p++] != md->lcc[*eptr++]) return FALSE; }
   }
+
+/* In the caseful case, we can just compare the bytes, whether or not we
+are in UTF-8 mode. */
+
 else
   { while (length-- > 0) if (*p++ != *eptr++) return FALSE; }
 
@@ -1654,8 +1681,7 @@ for (;;)
     if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
     GETCHARINCTEST(c, eptr);
       {
-      int chartype, script;
-      int category = _pcre_ucp_findprop(c, &chartype, &script);
+      const ucd_record * prop = GET_UCD(c);
 
       switch(ecode[1])
         {
@@ -1664,24 +1690,24 @@ for (;;)
         break;
 
         case PT_LAMP:
-        if ((chartype == ucp_Lu ||
-             chartype == ucp_Ll ||
-             chartype == ucp_Lt) == (op == OP_NOTPROP))
+        if ((prop->chartype == ucp_Lu ||
+             prop->chartype == ucp_Ll ||
+             prop->chartype == ucp_Lt) == (op == OP_NOTPROP))
           RRETURN(MATCH_NOMATCH);
          break;
 
         case PT_GC:
-        if ((ecode[2] != category) == (op == OP_PROP))
+        if ((ecode[2] != _pcre_ucp_gentype[prop->chartype]) == (op == OP_PROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_PC:
-        if ((ecode[2] != chartype) == (op == OP_PROP))
+        if ((ecode[2] != prop->chartype) == (op == OP_PROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
         case PT_SC:
-        if ((ecode[2] != script) == (op == OP_PROP))
+        if ((ecode[2] != prop->script) == (op == OP_PROP))
           RRETURN(MATCH_NOMATCH);
         break;
 
@@ -1700,8 +1726,7 @@ for (;;)
     if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
     GETCHARINCTEST(c, eptr);
       {
-      int chartype, script;
-      int category = _pcre_ucp_findprop(c, &chartype, &script);
+      int category = UCD_CATEGORY(c);
       if (category == ucp_M) RRETURN(MATCH_NOMATCH);
       while (eptr < md->end_subject)
         {
@@ -1710,7 +1735,7 @@ for (;;)
           {
           GETCHARLEN(c, eptr, len);
           }
-        category = _pcre_ucp_findprop(c, &chartype, &script);
+        category = UCD_CATEGORY(c);
         if (category != ucp_M) break;
         eptr += len;
         }
@@ -2175,7 +2200,7 @@ for (;;)
         if (fc != dc)
           {
 #ifdef SUPPORT_UCP
-          if (dc != _pcre_ucp_othercase(fc))
+          if (dc != UCD_OTHERCASE(fc))
 #endif
             RRETURN(MATCH_NOMATCH);
           }
@@ -2266,7 +2291,7 @@ for (;;)
 #ifdef SUPPORT_UCP
         unsigned int othercase;
         if ((ims & PCRE_CASELESS) != 0 &&
-            (othercase = _pcre_ucp_othercase(fc)) != NOTACHAR)
+            (othercase = UCD_OTHERCASE(fc)) != fc)
           oclength = _pcre_ord2utf8(othercase, occhars);
         else oclength = 0;
 #endif  /* SUPPORT_UCP */
@@ -2586,10 +2611,11 @@ for (;;)
             {
             RMATCH(eptr, ecode, offset_top, md, ims, eptrb, 0, RM28);
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
+            if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(d, eptr);
             if (d < 256) d = md->lcc[d];
-            if (fi >= max || eptr >= md->end_subject || fc == d)
-              RRETURN(MATCH_NOMATCH);
+            if (fc == d) RRETURN(MATCH_NOMATCH);
+
             }
           }
         else
@@ -2695,9 +2721,9 @@ for (;;)
             {
             RMATCH(eptr, ecode, offset_top, md, ims, eptrb, 0, RM32);
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
+            if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(d, eptr);
-            if (fi >= max || eptr >= md->end_subject || fc == d)
-              RRETURN(MATCH_NOMATCH);
+            if (fc == d) RRETURN(MATCH_NOMATCH);
             }
           }
         else
@@ -2871,7 +2897,7 @@ for (;;)
             {
             if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINCTEST(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == ucp_Lu ||
                  prop_chartype == ucp_Ll ||
                  prop_chartype == ucp_Lt) == prop_fail_result)
@@ -2884,7 +2910,7 @@ for (;;)
             {
             if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINCTEST(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if ((prop_category == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -2895,7 +2921,7 @@ for (;;)
             {
             if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINCTEST(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -2906,7 +2932,7 @@ for (;;)
             {
             if (eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINCTEST(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_script = UCD_SCRIPT(c);
             if ((prop_script == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -2925,7 +2951,7 @@ for (;;)
         for (i = 1; i <= min; i++)
           {
           GETCHARINCTEST(c, eptr);
-          prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+          prop_category = UCD_CATEGORY(c);
           if (prop_category == ucp_M) RRETURN(MATCH_NOMATCH);
           while (eptr < md->end_subject)
             {
@@ -2934,7 +2960,7 @@ for (;;)
               {
               GETCHARLEN(c, eptr, len);
               }
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if (prop_category != ucp_M) break;
             eptr += len;
             }
@@ -3350,7 +3376,7 @@ for (;;)
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == ucp_Lu ||
                  prop_chartype == ucp_Ll ||
                  prop_chartype == ucp_Lt) == prop_fail_result)
@@ -3365,7 +3391,7 @@ for (;;)
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if ((prop_category == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -3378,7 +3404,7 @@ for (;;)
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -3391,7 +3417,7 @@ for (;;)
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
             GETCHARINC(c, eptr);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_script = UCD_SCRIPT(c);
             if ((prop_script == prop_value) == prop_fail_result)
               RRETURN(MATCH_NOMATCH);
             }
@@ -3413,7 +3439,7 @@ for (;;)
           if (rrc != MATCH_NOMATCH) RRETURN(rrc);
           if (fi >= max || eptr >= md->end_subject) RRETURN(MATCH_NOMATCH);
           GETCHARINCTEST(c, eptr);
-          prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+          prop_category = UCD_CATEGORY(c);
           if (prop_category == ucp_M) RRETURN(MATCH_NOMATCH);
           while (eptr < md->end_subject)
             {
@@ -3422,7 +3448,7 @@ for (;;)
               {
               GETCHARLEN(c, eptr, len);
               }
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if (prop_category != ucp_M) break;
             eptr += len;
             }
@@ -3740,7 +3766,7 @@ for (;;)
             int len = 1;
             if (eptr >= md->end_subject) break;
             GETCHARLEN(c, eptr, len);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == ucp_Lu ||
                  prop_chartype == ucp_Ll ||
                  prop_chartype == ucp_Lt) == prop_fail_result)
@@ -3755,7 +3781,7 @@ for (;;)
             int len = 1;
             if (eptr >= md->end_subject) break;
             GETCHARLEN(c, eptr, len);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if ((prop_category == prop_value) == prop_fail_result)
               break;
             eptr+= len;
@@ -3768,7 +3794,7 @@ for (;;)
             int len = 1;
             if (eptr >= md->end_subject) break;
             GETCHARLEN(c, eptr, len);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_chartype = UCD_CHARTYPE(c);
             if ((prop_chartype == prop_value) == prop_fail_result)
               break;
             eptr+= len;
@@ -3781,7 +3807,7 @@ for (;;)
             int len = 1;
             if (eptr >= md->end_subject) break;
             GETCHARLEN(c, eptr, len);
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_script = UCD_SCRIPT(c);
             if ((prop_script == prop_value) == prop_fail_result)
               break;
             eptr+= len;
@@ -3810,7 +3836,7 @@ for (;;)
           {
           if (eptr >= md->end_subject) break;
           GETCHARINCTEST(c, eptr);
-          prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+          prop_category = UCD_CATEGORY(c);
           if (prop_category == ucp_M) break;
           while (eptr < md->end_subject)
             {
@@ -3819,7 +3845,7 @@ for (;;)
               {
               GETCHARLEN(c, eptr, len);
               }
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if (prop_category != ucp_M) break;
             eptr += len;
             }
@@ -3841,7 +3867,7 @@ for (;;)
               BACKCHAR(eptr);
               GETCHARLEN(c, eptr, len);
               }
-            prop_category = _pcre_ucp_findprop(c, &prop_chartype, &prop_script);
+            prop_category = UCD_CATEGORY(c);
             if (prop_category != ucp_M) break;
             eptr--;
             }
@@ -4361,7 +4387,7 @@ Returns:          > 0 => success; value is the number of elements filled in
                  < -1 => some kind of unexpected problem
 */
 
-PCRE_EXP_DEFN int
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
 pcre_exec(const pcre *argument_re, const pcre_extra *extra_data,
   PCRE_SPTR subject, int length, int start_offset, int options, int *offsets,
   int offsetcount)
@@ -4673,31 +4699,53 @@ for(;;)
   if (firstline)
     {
     USPTR t = start_match;
+#ifdef SUPPORT_UTF8
+    if (utf8)
+      {
+      while (t < md->end_subject && !IS_NEWLINE(t))
+        {
+        t++;
+        while (t < end_subject && (*t & 0xc0) == 0x80) t++;
+        }
+      }
+    else
+#endif
     while (t < md->end_subject && !IS_NEWLINE(t)) t++;
     end_subject = t;
     }
 
-  /* Now test for a unique first byte */
+  /* Now advance to a unique first byte if there is one. */
 
   if (first_byte >= 0)
     {
     if (first_byte_caseless)
-      while (start_match < end_subject &&
-             md->lcc[*start_match] != first_byte)
-        { NEXTCHAR(start_match); }
+      while (start_match < end_subject && md->lcc[*start_match] != first_byte)
+        start_match++;
     else
       while (start_match < end_subject && *start_match != first_byte)
-        { NEXTCHAR(start_match); }
+        start_match++;
     }
 
-  /* Or to just after a linebreak for a multiline match if possible */
+  /* Or to just after a linebreak for a multiline match */
 
   else if (startline)
     {
     if (start_match > md->start_subject + start_offset)
       {
-      while (start_match <= end_subject && !WAS_NEWLINE(start_match))
-        { NEXTCHAR(start_match); }
+#ifdef SUPPORT_UTF8
+      if (utf8)
+        {
+        while (start_match < end_subject && !WAS_NEWLINE(start_match))
+          {
+          start_match++;
+          while(start_match < end_subject && (*start_match & 0xc0) == 0x80)
+            start_match++;
+          }
+        }
+      else
+#endif
+      while (start_match < end_subject && !WAS_NEWLINE(start_match))
+        start_match++;
 
       /* If we have just passed a CR and the newline option is ANY or ANYCRLF,
       and we are now at a LF, advance the match position by one more character.
@@ -4711,16 +4759,15 @@ for(;;)
       }
     }
 
-  /* Or to a non-unique first char after study */
+  /* Or to a non-unique first byte after study */
 
   else if (start_bits != NULL)
     {
     while (start_match < end_subject)
       {
       register unsigned int c = *start_match;
-      if ((start_bits[c/8] & (1 << (c&7))) == 0)
-        { NEXTCHAR(start_match); }
-      else break;
+      if ((start_bits[c/8] & (1 << (c&7))) == 0) start_match++;
+        else break;
       }
     }
 

@@ -1,6 +1,7 @@
 /*
- * $Id: pcre_ord2utf8.c,v 1.7 2008/05/07 21:59:19 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -79,10 +80,10 @@ for (j = i; j > 0; j--)
 *buffer = _pcre_utf8_table2[i] | cvalue;
 return i + 1;
 #else
-(void)cvalue;
-(void)buffer;
-return 0;   /* Keep compiler happy; this function won't ever be */
-#endif      /* called when SUPPORT_UTF8 is not defined. */
+(void)(cvalue);  /* Keep compiler happy; this function won't ever be */
+(void)(buffer);  /* called when SUPPORT_UTF8 is not defined. */
+return 0;
+#endif
 }
 
 /* End of pcre_ord2utf8.c */

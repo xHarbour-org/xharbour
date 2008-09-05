@@ -1,5 +1,9 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ */
+
+/*
+ * $Id: ucpinternal.h,v 1.5 2008/05/07 21:59:19 andijahja Exp $
  */
 /*************************************************
 *           Unicode Property Table handler       *

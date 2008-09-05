@@ -1,6 +1,7 @@
 /*
- * $Id: config.h,v 1.9 2008/02/01 04:57:37 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -513,9 +514,6 @@ for (;;)
     const uschar *code;
     int state_offset = current_state->offset;
     int count, codevalue;
-#ifdef SUPPORT_UCP
-    int chartype, script;
-#endif
 
 #ifdef DEBUG
     printf ("%.*sProcessing state %d c=", rlevel*2-2, SP, state_offset);
@@ -826,7 +824,7 @@ for (;;)
       if (clen > 0)
         {
         BOOL OK;
-        int category = _pcre_ucp_findprop(c, &chartype, &script);
+        const ucd_record * prop = GET_UCD(c);
         switch(code[1])
           {
           case PT_ANY:
@@ -834,19 +832,19 @@ for (;;)
           break;
 
           case PT_LAMP:
-          OK = chartype == ucp_Lu || chartype == ucp_Ll || chartype == ucp_Lt;
+          OK = prop->chartype == ucp_Lu || prop->chartype == ucp_Ll || prop->chartype == ucp_Lt;
           break;
 
           case PT_GC:
-          OK = category == code[2];
+          OK = _pcre_ucp_gentype[prop->chartype] == code[2];
           break;
 
           case PT_PC:
-          OK = chartype == code[2];
+          OK = prop->chartype == code[2];
           break;
 
           case PT_SC:
-          OK = script == code[2];
+          OK = prop->script == code[2];
           break;
 
           /* Should never occur, but keep compilers from grumbling. */
@@ -995,7 +993,7 @@ for (;;)
       if (clen > 0)
         {
         BOOL OK;
-        int category = _pcre_ucp_findprop(c, &chartype, &script);
+        const ucd_record * prop = GET_UCD(c);
         switch(code[2])
           {
           case PT_ANY:
@@ -1003,19 +1001,19 @@ for (;;)
           break;
 
           case PT_LAMP:
-          OK = chartype == ucp_Lu || chartype == ucp_Ll || chartype == ucp_Lt;
+          OK = prop->chartype == ucp_Lu || prop->chartype == ucp_Ll || prop->chartype == ucp_Lt;
           break;
 
           case PT_GC:
-          OK = category == code[3];
+          OK = _pcre_ucp_gentype[prop->chartype] == code[3];
           break;
 
           case PT_PC:
-          OK = chartype == code[3];
+          OK = prop->chartype == code[3];
           break;
 
           case PT_SC:
-          OK = script == code[3];
+          OK = prop->script == code[3];
           break;
 
           /* Should never occur, but keep compilers from grumbling. */
@@ -1044,7 +1042,7 @@ for (;;)
       case OP_EXTUNI_EXTRA + OP_TYPEPOSPLUS:
       count = current_state->count;  /* Already matched */
       if (count > 0) { ADD_ACTIVE(state_offset + 2, 0); }
-      if (clen > 0 && _pcre_ucp_findprop(c, &chartype, &script) != ucp_M)
+      if (clen > 0 && UCD_CATEGORY(c) != ucp_M)
         {
         const uschar *nptr = ptr + clen;
         int ncount = 0;
@@ -1058,7 +1056,7 @@ for (;;)
           int nd;
           int ndlen = 1;
           GETCHARLEN(nd, nptr, ndlen);
-          if (_pcre_ucp_findprop(nd, &chartype, &script) != ucp_M) break;
+          if (UCD_CATEGORY(nd) != ucp_M) break;
           ncount++;
           nptr += ndlen;
           }
@@ -1217,7 +1215,7 @@ for (;;)
       if (clen > 0)
         {
         BOOL OK;
-        int category = _pcre_ucp_findprop(c, &chartype, &script);
+        const ucd_record * prop = GET_UCD(c);
         switch(code[2])
           {
           case PT_ANY:
@@ -1225,19 +1223,19 @@ for (;;)
           break;
 
           case PT_LAMP:
-          OK = chartype == ucp_Lu || chartype == ucp_Ll || chartype == ucp_Lt;
+          OK = prop->chartype == ucp_Lu || prop->chartype == ucp_Ll || prop->chartype == ucp_Lt;
           break;
 
           case PT_GC:
-          OK = category == code[3];
+          OK = _pcre_ucp_gentype[prop->chartype] == code[3];
           break;
 
           case PT_PC:
-          OK = chartype == code[3];
+          OK = prop->chartype == code[3];
           break;
 
           case PT_SC:
-          OK = script == code[3];
+          OK = prop->script == code[3];
           break;
 
           /* Should never occur, but keep compilers from grumbling. */
@@ -1275,7 +1273,7 @@ for (;;)
       QS2:
 
       ADD_ACTIVE(state_offset + 2, 0);
-      if (clen > 0 && _pcre_ucp_findprop(c, &chartype, &script) != ucp_M)
+      if (clen > 0 && UCD_CATEGORY(c) != ucp_M)
         {
         const uschar *nptr = ptr + clen;
         int ncount = 0;
@@ -1290,7 +1288,7 @@ for (;;)
           int nd;
           int ndlen = 1;
           GETCHARLEN(nd, nptr, ndlen);
-          if (_pcre_ucp_findprop(nd, &chartype, &script) != ucp_M) break;
+          if (UCD_CATEGORY(nd) != ucp_M) break;
           ncount++;
           nptr += ndlen;
           }
@@ -1464,7 +1462,7 @@ for (;;)
       if (clen > 0)
         {
         BOOL OK;
-        int category = _pcre_ucp_findprop(c, &chartype, &script);
+        const ucd_record * prop = GET_UCD(c);
         switch(code[4])
           {
           case PT_ANY:
@@ -1472,19 +1470,19 @@ for (;;)
           break;
 
           case PT_LAMP:
-          OK = chartype == ucp_Lu || chartype == ucp_Ll || chartype == ucp_Lt;
+          OK = prop->chartype == ucp_Lu || prop->chartype == ucp_Ll || prop->chartype == ucp_Lt;
           break;
 
           case PT_GC:
-          OK = category == code[5];
+          OK = _pcre_ucp_gentype[prop->chartype] == code[5];
           break;
 
           case PT_PC:
-          OK = chartype == code[5];
+          OK = prop->chartype == code[5];
           break;
 
           case PT_SC:
-          OK = script == code[5];
+          OK = prop->script == code[5];
           break;
 
           /* Should never occur, but keep compilers from grumbling. */
@@ -1517,7 +1515,7 @@ for (;;)
       if (codevalue != OP_EXTUNI_EXTRA + OP_TYPEEXACT)
         { ADD_ACTIVE(state_offset + 4, 0); }
       count = current_state->count;  /* Number already matched */
-      if (clen > 0 && _pcre_ucp_findprop(c, &chartype, &script) != ucp_M)
+      if (clen > 0 && UCD_CATEGORY(c) != ucp_M)
         {
         const uschar *nptr = ptr + clen;
         int ncount = 0;
@@ -1531,7 +1529,7 @@ for (;;)
           int nd;
           int ndlen = 1;
           GETCHARLEN(nd, nptr, ndlen);
-          if (_pcre_ucp_findprop(nd, &chartype, &script) != ucp_M) break;
+          if (UCD_CATEGORY(nd) != ucp_M) break;
           ncount++;
           nptr += ndlen;
           }
@@ -1711,7 +1709,7 @@ for (;;)
           other case of the character. */
 
 #ifdef SUPPORT_UCP
-          othercase = _pcre_ucp_othercase(c);
+          othercase = UCD_OTHERCASE(c);
 #else
           othercase = NOTACHAR;
 #endif
@@ -1736,7 +1734,7 @@ for (;;)
       to wait for them to pass before continuing. */
 
       case OP_EXTUNI:
-      if (clen > 0 && _pcre_ucp_findprop(c, &chartype, &script) != ucp_M)
+      if (clen > 0 && UCD_CATEGORY(c) != ucp_M)
         {
         const uschar *nptr = ptr + clen;
         int ncount = 0;
@@ -1744,7 +1742,7 @@ for (;;)
           {
           int nclen = 1;
           GETCHARLEN(c, nptr, nclen);
-          if (_pcre_ucp_findprop(c, &chartype, &script) != ucp_M) break;
+          if (UCD_CATEGORY(c) != ucp_M) break;
           ncount++;
           nptr += nclen;
           }
@@ -1912,7 +1910,7 @@ for (;;)
           if (utf8 && d >= 128)
             {
 #ifdef SUPPORT_UCP
-            otherd = _pcre_ucp_othercase(d);
+            otherd = UCD_OTHERCASE(d);
 #endif  /* SUPPORT_UCP */
             }
           else
@@ -1950,7 +1948,7 @@ for (;;)
           if (utf8 && d >= 128)
             {
 #ifdef SUPPORT_UCP
-            otherd = _pcre_ucp_othercase(d);
+            otherd = UCD_OTHERCASE(d);
 #endif  /* SUPPORT_UCP */
             }
           else
@@ -1986,7 +1984,7 @@ for (;;)
           if (utf8 && d >= 128)
             {
 #ifdef SUPPORT_UCP
-            otherd = _pcre_ucp_othercase(d);
+            otherd = UCD_OTHERCASE(d);
 #endif  /* SUPPORT_UCP */
             }
           else
@@ -2018,7 +2016,7 @@ for (;;)
           if (utf8 && d >= 128)
             {
 #ifdef SUPPORT_UCP
-            otherd = _pcre_ucp_othercase(d);
+            otherd = UCD_OTHERCASE(d);
 #endif  /* SUPPORT_UCP */
             }
           else
@@ -2053,7 +2051,7 @@ for (;;)
           if (utf8 && d >= 128)
             {
 #ifdef SUPPORT_UCP
-            otherd = _pcre_ucp_othercase(d);
+            otherd = UCD_OTHERCASE(d);
 #endif  /* SUPPORT_UCP */
             }
           else
@@ -2509,7 +2507,7 @@ Returns:          > 0 => number of match offset pairs placed in offsets
                  < -1 => some kind of unexpected problem
 */
 
-PCRE_EXP_DEFN int
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
 pcre_dfa_exec(const pcre *argument_re, const pcre_extra *extra_data,
   const char *subject, int length, int start_offset, int options, int *offsets,
   int offsetcount, int *workspace, int wscount)
@@ -2737,7 +2735,18 @@ for (;;)
 
     if (firstline)
       {
-      const uschar *t = current_subject;
+      USPTR t = current_subject;
+#ifdef SUPPORT_UTF8
+      if (utf8)
+        {
+        while (t < md->end_subject && !IS_NEWLINE(t))
+          {
+          t++;
+          while (t < end_subject && (*t & 0xc0) == 0x80) t++;
+          }
+        }
+      else
+#endif
       while (t < md->end_subject && !IS_NEWLINE(t)) t++;
       end_subject = t;
       }
@@ -2759,7 +2768,20 @@ for (;;)
       {
       if (current_subject > md->start_subject + start_offset)
         {
-        while (current_subject <= end_subject && !WAS_NEWLINE(current_subject))
+#ifdef SUPPORT_UTF8
+        if (utf8)
+          {
+          while (current_subject < end_subject && !WAS_NEWLINE(current_subject))
+            {
+            current_subject++;
+            while(current_subject < end_subject &&
+                  (*current_subject & 0xc0) == 0x80)
+              current_subject++;
+            }
+          }
+        else
+#endif
+        while (current_subject < end_subject && !WAS_NEWLINE(current_subject))
           current_subject++;
 
         /* If we have just passed a CR and the newline option is ANY or
