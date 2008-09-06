@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.22 2008/08/30 01:24:29 modalsist Exp $
+# $Id: common.mak,v 1.23 2008/09/06 06:20:55 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1666,7 +1666,7 @@ HBHPDF_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_image_png$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbpdf_u3d(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hpdf_u3d(OBJEXT)
 
 #===============================================================================
 # Build Target

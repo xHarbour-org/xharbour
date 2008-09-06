@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6210 2008/09/05 19:41:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.6211 2008/09/06 06:20:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-06 18:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * common.mak
+  * compile.mak
+    ! typo on my last commit on hbpdf_u3d -> hpdf_u3d, thanks EMG
+
 2008-09-06 13:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_types.h
   * contrib/hbhpdf/hpdf_utils.h

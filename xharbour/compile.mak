@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.21 2008/08/30 01:24:29 modalsist Exp $
+# $Id: compile.mak,v 1.22 2008/09/06 06:20:55 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -4533,6 +4533,6 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc_png.
 $(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_ext_gstate.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hbpdf_u3d.c
+$(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_u3d.c
 	$(CC_CMD)
 
