@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_encoder_kr.c
+ * << Haru Free PDF Library >> -- hpdf_encoder_kr.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -27643,7 +27646,6 @@ static HPDF_BOOL
 KSCms_UHC_IsLeadByte  (HPDF_Encoder    encoder,
                   HPDF_BYTE       b)
 {
-	  (void) encoder;
     return (b >= 0x81 && b <= 0xFE);
 }
 
@@ -27652,7 +27654,6 @@ static HPDF_BOOL
 KSCms_UHC_IsTrialByte  (HPDF_Encoder    encoder,
                    HPDF_BYTE       b)
 {
-	  (void) encoder;
     return (b >= 0x41 && b <= 0xfe);
 }
 
@@ -27810,7 +27811,6 @@ static HPDF_BOOL
 KSC_EUC_IsLeadByte  (HPDF_Encoder    encoder,
                    HPDF_BYTE       b)
 {
-	  (void) encoder;
     return (b >= 0xa1 && b <= 0xfe);
 }
 
@@ -27819,7 +27819,6 @@ static HPDF_BOOL
 KSC_EUC_IsTrialByte  (HPDF_Encoder    encoder,
                     HPDF_BYTE       b)
 {
-	  (void) encoder;
     return (b >= 0xa0 && b <= 0xfe);
 }
 

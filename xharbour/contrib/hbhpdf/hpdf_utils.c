@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- HPDF_utils.c
+ * << Haru Free PDF Library >> -- hpdf_utils.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -123,10 +126,8 @@ HPDF_IToA  (char        *s,
             val = HPDF_LIMIT_MIN_INT;
         *s++ = '-';
         val = -val;
-#ifndef __BORLANDC__
     } else if (val > HPDF_LIMIT_MAX_INT) {
         val = HPDF_LIMIT_MAX_INT;
-#endif
     } else if (val == 0) {
         *s++ = '0';
     }
@@ -272,7 +273,7 @@ HPDF_StrCpy  (char          *out,
 
     *out = 0;
 
-    return (HPDF_BYTE*) out;
+    return (HPDF_BYTE *)out;
 }
 
 
@@ -376,7 +377,7 @@ HPDF_StrStr  (const char   *s1,
     maxlen++;
 
     while (maxlen > 0) {
-        if (HPDF_MemCmp ((const HPDF_BYTE*)s1, (const HPDF_BYTE*)s2, len) == 0)
+        if (HPDF_MemCmp ((HPDF_BYTE *)s1, (HPDF_BYTE *)s2, len) == 0)
             return s1;
 
         s1++;
@@ -438,7 +439,7 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value)
 {
     HPDF_BYTE u[2];
 
-    HPDF_MemCpy (u, (const HPDF_BYTE*)value, 2);
+    HPDF_MemCpy (u, (HPDF_BYTE*)value, 2);
     *value = (HPDF_UINT16)((HPDF_UINT16)u[0] << 8 | (HPDF_UINT16)u[1]);
 }
 

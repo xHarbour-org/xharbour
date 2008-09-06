@@ -1,13 +1,14 @@
 /*
- * $Id: hpdf_conf.h,v 1.3 2008/07/14 15:24:14 modalsist Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.7 >> -- hpdf_conf.h
+ * << Haru Free PDF Library >> -- hpdf_conf.h
  *
- * URL http://libharu.sourceforge.net/
+ * URL: http://libharu.org
  *
- * Copyright (c) 1999-2006 Takeshi Kanno
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -27,16 +28,6 @@
 
 /*----------------------------------------------------------------------------*/
 /*----- standard C library functions -----------------------------------------*/
-#ifdef __cplusplus
-extern "C" {
-#endif
-#if defined( __POCC__) || defined(_MSC_VER)
-extern void *hb_xgrab( unsigned long ulSize );
-extern void  hb_xfree( void * pMem );
-#endif
-#ifdef __cplusplus
-}
-#endif
 
 #define HPDF_FOPEN                  fopen
 #define HPDF_FCLOSE                 fclose
@@ -47,12 +38,8 @@ extern void  hb_xfree( void * pMem );
 #define HPDF_FTELL                  ftell
 #define HPDF_FEOF                   feof
 #define HPDF_FERROR                 ferror
-#if 0
 #define HPDF_MALLOC                 malloc
 #define HPDF_FREE                   free
-#endif
-#define HPDF_MALLOC                 hb_xgrab
-#define HPDF_FREE                   hb_xfree
 #define HPDF_FILEP                  FILE*
 #define HPDF_TIME                   time
 #define HPDF_PRINTF                 printf

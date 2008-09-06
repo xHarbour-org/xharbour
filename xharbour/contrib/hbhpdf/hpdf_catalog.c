@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.5 >> -- hpdf_catalog.c
+ * << Haru Free PDF Library >> -- hpdf_catalog.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -14,8 +17,6 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.08.07 modified.
- * 2006.09.01 added ViewerPreference functions.
  */
 
 #include "hpdf_conf.h"
@@ -78,7 +79,7 @@ HPDF_Catalog_GetRoot  (HPDF_Catalog  catalog)
     if (!catalog)
         return NULL;
 
-    pages = (HPDF_Dict)HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
+    pages = (HPDF_Dict) HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
     if (!pages || pages->header.obj_class != (HPDF_OSUBCLASS_PAGES |
                 HPDF_OCLASS_DICT))
         HPDF_SetError (catalog->error, HPDF_PAGE_CANNOT_GET_ROOT_PAGES, 0);
@@ -184,7 +185,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
 {
     HPDF_STATUS ret;
     HPDF_Array nums;
-    HPDF_Dict labels = (HPDF_Dict)HPDF_Dict_GetItem (catalog, "PageLabels",
+    HPDF_Dict labels = (HPDF_Dict) HPDF_Dict_GetItem (catalog, "PageLabels",
         HPDF_OCLASS_DICT);
 
     HPDF_PTRACE ((" HPDF_Catalog_AddPageLabel\n"));
@@ -199,7 +200,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
             return ret;
     }
 
-    nums = (HPDF_Array)HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
+    nums = (HPDF_Array) HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
 
     if (!nums) {
         nums = HPDF_Array_New (catalog->mmgr);

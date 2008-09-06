@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_pages.c
+ * << Haru Free PDF Library >> -- hpdf_pages.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -44,11 +47,11 @@ static HPDF_PageSizeValue HPDF_PREDEFINED_PAGE_SIZES[] = {
     {297, 684}      /* HPDF_PAGE_SIZE_COMM10 */
 };
 
-#if 0
+
 static const HPDF_RGBColor DEF_RGB_COLOR = {0, 0, 0};
 
 static const HPDF_CMYKColor DEF_CMYK_COLOR = {0, 0, 0, 0};
-#endif
+
 
 static HPDF_STATUS
 Pages_BeforeWrite  (HPDF_Dict    obj);
@@ -186,7 +189,7 @@ HPDF_Page_InsertBefore  (HPDF_Page   page,
 }
 
 
-static HPDF_STATUS
+HPDF_STATUS
 Pages_BeforeWrite  (HPDF_Dict    obj)
 {
     HPDF_Array kids = (HPDF_Array )HPDF_Dict_GetItem (obj, "Kids",
@@ -313,7 +316,7 @@ HPDF_Page_New  (HPDF_MMgr   mmgr,
     page->free_fn = Page_OnFree;
     page->before_write_fn = Page_BeforeWrite;
 
-    attr = (HPDF_PageAttr)HPDF_GetMem (page->mmgr, sizeof(HPDF_PageAttr_Rec));
+    attr = (HPDF_PageAttr) HPDF_GetMem (page->mmgr, sizeof(HPDF_PageAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (page);
         return NULL;
@@ -420,14 +423,14 @@ HPDF_Page_GetInheritableItem  (HPDF_Page          page,
      * pages recursivly
      */
     if (!obj) {
-        HPDF_Pages pages = (HPDF_Pages)HPDF_Dict_GetItem (page, "Parent", HPDF_OCLASS_DICT);
+        HPDF_Pages pages = (HPDF_Pages) HPDF_Dict_GetItem (page, "Parent", HPDF_OCLASS_DICT);
         while (pages) {
             obj = HPDF_Dict_GetItem (page, key, obj_class);
 
             if (obj)
                 break;
 
-            pages = (HPDF_Pages)HPDF_Dict_GetItem (pages, "Parent", HPDF_OCLASS_DICT);
+            pages = (HPDF_Pages) HPDF_Dict_GetItem (pages, "Parent", HPDF_OCLASS_DICT);
         }
     }
 
@@ -435,7 +438,7 @@ HPDF_Page_GetInheritableItem  (HPDF_Page          page,
 }
 
 
-static HPDF_STATUS
+HPDF_STATUS
 AddResource  (HPDF_Page  page)
 {
     HPDF_STATUS ret = HPDF_OK;
@@ -486,7 +489,7 @@ HPDF_Page_GetLocalFontName  (HPDF_Page  page,
         HPDF_Dict resources;
         HPDF_Dict fonts;
 
-        resources = (HPDF_Dict)HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = (HPDF_Dict) HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -511,7 +514,7 @@ HPDF_Page_GetLocalFontName  (HPDF_Page  page,
         char *ptr;
         char *end_ptr = fontName + HPDF_LIMIT_MAX_NAME_LEN;
 
-        ptr = (char*)HPDF_StrCpy (fontName, "F", end_ptr);
+        ptr = (char *)HPDF_StrCpy (fontName, "F", end_ptr);
         HPDF_IToA (ptr, attr->fonts->list->count + 1, end_ptr);
 
         if (HPDF_Dict_Add (attr->fonts, fontName, font) != HPDF_OK)
@@ -532,25 +535,25 @@ HPDF_Page_GetMediaBox  (HPDF_Page   page)
     HPDF_PTRACE((" HPDF_Page_GetMediaBox\n"));
 
     if (HPDF_Page_Validate (page)) {
-        HPDF_Array array = (HPDF_Array)HPDF_Page_GetInheritableItem (page, "MediaBox",
+        HPDF_Array array = (HPDF_Array) HPDF_Page_GetInheritableItem (page, "MediaBox",
                         HPDF_OCLASS_ARRAY);
 
         if (array) {
             HPDF_Real r;
 
-            r = (HPDF_Real)HPDF_Array_GetItem (array, 0, HPDF_OCLASS_REAL);
+            r = (HPDF_Real) HPDF_Array_GetItem (array, 0, HPDF_OCLASS_REAL);
             if (r)
                 media_box.left = r->value;
 
-            r = (HPDF_Real)HPDF_Array_GetItem (array, 1, HPDF_OCLASS_REAL);
+            r = (HPDF_Real) HPDF_Array_GetItem (array, 1, HPDF_OCLASS_REAL);
             if (r)
                 media_box.bottom = r->value;
 
-            r = (HPDF_Real)HPDF_Array_GetItem (array, 2, HPDF_OCLASS_REAL);
+            r = (HPDF_Real) HPDF_Array_GetItem (array, 2, HPDF_OCLASS_REAL);
             if (r)
                 media_box.right = r->value;
 
-            r = (HPDF_Real)HPDF_Array_GetItem (array, 3, HPDF_OCLASS_REAL);
+            r = (HPDF_Real) HPDF_Array_GetItem (array, 3, HPDF_OCLASS_REAL);
             if (r)
                 media_box.top = r->value;
 
@@ -575,7 +578,7 @@ HPDF_Page_GetXObjectName  (HPDF_Page     page,
         HPDF_Dict resources;
         HPDF_Dict xobjects;
 
-        resources = (HPDF_Dict)HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = (HPDF_Dict) HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -600,7 +603,7 @@ HPDF_Page_GetXObjectName  (HPDF_Page     page,
         char *ptr;
         char *end_ptr = xobj_name + HPDF_LIMIT_MAX_NAME_LEN;
 
-        ptr = (char*)HPDF_StrCpy (xobj_name, "X", end_ptr);
+        ptr = (char *)HPDF_StrCpy (xobj_name, "X", end_ptr);
         HPDF_IToA (ptr, attr->xobjects->list->count + 1, end_ptr);
 
         if (HPDF_Dict_Add (attr->xobjects, xobj_name, xobj) != HPDF_OK)
@@ -626,7 +629,7 @@ HPDF_Page_GetExtGStateName  (HPDF_Page       page,
         HPDF_Dict resources;
         HPDF_Dict ext_gstates;
 
-        resources = (HPDF_Dict)HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = (HPDF_Dict) HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -651,7 +654,7 @@ HPDF_Page_GetExtGStateName  (HPDF_Page       page,
         char *ptr;
         char *end_ptr = ext_gstate_name + HPDF_LIMIT_MAX_NAME_LEN;
 
-        ptr = (char*)HPDF_StrCpy (ext_gstate_name, "E", end_ptr);
+        ptr = (char *)HPDF_StrCpy (ext_gstate_name, "E", end_ptr);
         HPDF_IToA (ptr, attr->ext_gstates->list->count + 1, end_ptr);
 
         if (HPDF_Dict_Add (attr->ext_gstates, ext_gstate_name, state) != HPDF_OK)
@@ -674,7 +677,7 @@ AddAnnotation  (HPDF_Page        page,
     HPDF_PTRACE((" HPDF_Pages\n"));
 
     /* find "Annots" entry */
-    array = (HPDF_Array)HPDF_Dict_GetItem (page, "Annots", HPDF_OCLASS_ARRAY);
+    array = (HPDF_Array) HPDF_Dict_GetItem (page, "Annots", HPDF_OCLASS_ARRAY);
 
     if (!array) {
         array = HPDF_Array_New (page->mmgr);
@@ -712,7 +715,7 @@ HPDF_Page_TextWidth  (HPDF_Page        page,
         return 0;
     }
 
-    tw = HPDF_Font_TextWidth (attr->gstate->font, (const unsigned char*)text, len);
+    tw = HPDF_Font_TextWidth (attr->gstate->font, (HPDF_BYTE *)text, len);
 
     ret += attr->gstate->word_space * tw.numspace;
     ret += tw.width * attr->gstate->font_size  / 1000;
@@ -748,7 +751,7 @@ HPDF_Page_MeasureText  (HPDF_Page          page,
         return 0;
     }
 
-    ret = (HPDF_UINT)HPDF_Font_MeasureText (attr->gstate->font, (const unsigned char*)text, len, width,
+    ret = HPDF_Font_MeasureText (attr->gstate->font, (HPDF_BYTE *)text, len, width,
         attr->gstate->font_size, attr->gstate->char_space,
         attr->gstate->word_space, wordwrap, real_width);
 
@@ -1250,11 +1253,11 @@ HPDF_Page_SetBoxValue (HPDF_Page          page,
     if (!HPDF_Page_Validate (page))
         return HPDF_INVALID_PAGE;
 
-    array = (HPDF_Array)HPDF_Page_GetInheritableItem (page, name, HPDF_OCLASS_ARRAY);
+    array = (HPDF_Array) HPDF_Page_GetInheritableItem (page, name, HPDF_OCLASS_ARRAY);
     if (!array)
         return HPDF_SetError (page->error, HPDF_PAGE_CANNOT_FIND_OBJECT, 0);
 
-    r = (HPDF_Real)HPDF_Array_GetItem (array, index, HPDF_OCLASS_REAL);
+    r = (HPDF_Real) HPDF_Array_GetItem (array, index, HPDF_OCLASS_REAL);
     if (!r)
         return HPDF_SetError (page->error, HPDF_PAGE_INVALID_INDEX, 0);
 
@@ -1280,7 +1283,7 @@ HPDF_Page_SetRotate (HPDF_Page      page,
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_ROTATE_VALUE,
                 (HPDF_STATUS)angle);
 
-    n = (HPDF_Number)HPDF_Page_GetInheritableItem (page, "Rotate", HPDF_OCLASS_NUMBER);
+    n = (HPDF_Number) HPDF_Page_GetInheritableItem (page, "Rotate", HPDF_OCLASS_NUMBER);
 
     if (!n)
         ret = HPDF_Dict_AddNumber (page, "Rotate", angle);
@@ -1399,6 +1402,33 @@ HPDF_Page_CreateDestination  (HPDF_Page   page)
 
 
 HPDF_EXPORT(HPDF_Annotation)
+HPDF_Page_Create3DAnnot    (HPDF_Page       page,
+							HPDF_Rect       rect,
+							HPDF_U3D u3d)
+{
+	HPDF_PageAttr attr;
+	HPDF_Annotation annot;
+
+	HPDF_PTRACE((" HPDF_Page_Create3DAnnot\n"));
+
+	if (!HPDF_Page_Validate (page))
+		return NULL;
+
+	attr = (HPDF_PageAttr)page->attr;
+
+	annot = HPDF_3DAnnot_New (page->mmgr, attr->xref, rect, u3d);
+	if (annot) {
+		if (AddAnnotation (page, annot) != HPDF_OK) {
+			HPDF_CheckError (page->error);
+			annot = NULL;
+		}
+	} else
+		HPDF_CheckError (page->error);
+
+	return annot;
+}
+
+HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_CreateTextAnnot  (HPDF_Page          page,
                             HPDF_Rect          rect,
                             const char   *text,
@@ -1509,3 +1539,4 @@ HPDF_Page_SetFilter  (HPDF_Page    page,
     attr = (HPDF_PageAttr)page->attr;
     attr->contents->filter = filter;
 }
+

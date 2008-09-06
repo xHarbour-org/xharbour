@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_string.h
+ * << Haru Free PDF Library >> -- hpdf_string.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -74,11 +77,11 @@ HPDF_String_SetValue  (HPDF_String      obj,
     if (len > HPDF_LIMIT_MAX_STRING_LEN)
         return HPDF_SetError (obj->error, HPDF_STRING_OUT_OF_RANGE, 0);
 
-    obj->value = (unsigned char *)HPDF_GetMem (obj->mmgr, len + 1);
+    obj->value = (HPDF_BYTE *) HPDF_GetMem (obj->mmgr, len + 1);
     if (!obj->value)
         return HPDF_Error_GetCode (obj->error);
 
-    HPDF_StrCpy ((char*)obj->value, value, (char*)(obj->value + len));
+    HPDF_StrCpy ((char *)obj->value, value, (char *)obj->value + len);
     obj->len = len;
 
     return ret;
@@ -120,12 +123,12 @@ HPDF_String_Write  (HPDF_String   obj,
                 return ret;
 
             if ((ret = HPDF_Stream_WriteBinary (stream, obj->value,
-                    HPDF_StrLen ((const char*)obj->value, -1), e)) != HPDF_OK)
+                    HPDF_StrLen ((char *)obj->value, -1), e)) != HPDF_OK)
                 return ret;
 
             return HPDF_Stream_WriteChar (stream, '>');
         } else {
-            return HPDF_Stream_WriteEscapeText (stream, (const char *)obj->value);
+            return HPDF_Stream_WriteEscapeText (stream, (char *)obj->value);
         }
     } else {
         HPDF_BYTE* src = obj->value;
@@ -134,7 +137,7 @@ HPDF_String_Write  (HPDF_String   obj,
         HPDF_BYTE* pbuf = buf;
         HPDF_INT32 len = obj->len;
         HPDF_ParseText_Rec  parse_state;
-        HPDF_INT32 i;
+        HPDF_UINT i;
 
         if ((ret = HPDF_Stream_WriteChar (stream, '<')) != HPDF_OK)
            return ret;
@@ -172,7 +175,7 @@ HPDF_String_Write  (HPDF_String   obj,
                 }
 
                 HPDF_UInt16Swap (&tmp_unicode);
-                HPDF_MemCpy (pbuf, (const HPDF_BYTE*)&tmp_unicode, 2);
+                HPDF_MemCpy (pbuf, (HPDF_BYTE*)&tmp_unicode, 2);
                 pbuf += 2;
                 tmp_len++;
             }

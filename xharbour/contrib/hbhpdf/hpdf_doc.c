@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.5 >> -- hpdf_doc.c
+ * << Haru Free PDF Library >> -- hpdf_doc.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -25,12 +28,14 @@
 #include "hpdf_page_label.h"
 #include "hpdf.h"
 
-static const char *HPDF_VERSION_STR[5] = {
+
+static const char *HPDF_VERSION_STR[6] = {
                 "%PDF-1.2\012%\267\276\255\252\012",
                 "%PDF-1.3\012%\267\276\255\252\012",
                 "%PDF-1.4\012%\267\276\255\252\012",
                 "%PDF-1.5\012%\267\276\255\252\012",
-                "%PDF-1.6\012%\267\276\255\252\012"
+                "%PDF-1.6\012%\267\276\255\252\012",
+                "%PDF-1.7\012%\267\276\255\252\012"
 };
 
 
@@ -155,7 +160,7 @@ HPDF_NewEx  (HPDF_Error_Handler    user_error_fn,
     }
 
     /* now create pdf_doc object */
-    pdf = (HPDF_Doc)HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
+    pdf = (HPDF_Doc) HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
     if (!pdf) {
         HPDF_MMgr_Free (mmgr);
         HPDF_CheckError (&tmp_error);
@@ -258,7 +263,7 @@ HPDF_NewDoc  (HPDF_Doc  pdf)
 
     pdf->cur_pages = pdf->root_pages;
 
-    ptr = (char*)HPDF_StrCpy (ptr, "Haru Free PDF Library ", eptr);
+    ptr = (char *)HPDF_StrCpy (ptr, (const char *)"Haru Free PDF Library ", eptr);
     version = HPDF_GetVersion ();
     HPDF_StrCpy (ptr, version, eptr);
 
@@ -575,7 +580,7 @@ HPDF_Doc_PrepareEncryption  (HPDF_Doc   pdf)
         return pdf->error.error_no;
 
     /* reset 'ID' to trailer-dictionary */
-    id = (HPDF_Array)HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
+    id = (HPDF_Array) HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
     if (!id) {
         id = HPDF_Array_New (pdf->mmgr);
 
@@ -753,7 +758,7 @@ HPDF_GetPageByIndex  (HPDF_Doc    pdf,
     if (!HPDF_HasDoc (pdf))
         return NULL;
 
-    ret = (HPDF_Page)HPDF_List_ItemAt (pdf->page_list, index);
+    ret = (HPDF_Page) HPDF_List_ItemAt (pdf->page_list, index);
     if (!ret) {
         HPDF_RaiseError (&pdf->error, HPDF_INVALID_PAGE_INDEX, 0);
         return NULL;
@@ -1415,10 +1420,33 @@ LoadType1FontFromStream  (HPDF_Doc      pdf,
             HPDF_FontDef_Free (def);
             return NULL;
         }
+        return def->base_font;
     }
-    return def->base_font;
+    return NULL;
 }
 
+HPDF_EXPORT(HPDF_FontDef)
+HPDF_GetTTFontDefFromFile (HPDF_Doc      pdf,
+                           const char   *file_name,
+                           HPDF_BOOL     embedding)
+{
+	HPDF_Stream font_data;
+	HPDF_FontDef def;
+
+	HPDF_PTRACE ((" HPDF_GetTTFontDefFromFile\n"));
+
+	/* create file stream */
+	font_data = HPDF_FileReader_New (pdf->mmgr, file_name);
+
+	if (HPDF_Stream_Validate (font_data)) {
+		def = HPDF_TTFontDef_Load (pdf->mmgr, font_data, embedding);
+	} else {
+		HPDF_CheckError (&pdf->error);
+		return NULL;
+	}
+
+	return def;
+}
 
 HPDF_EXPORT(const char*)
 HPDF_LoadTTFontFromFile (HPDF_Doc         pdf,
@@ -1455,7 +1483,6 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
                       const char      *file_name)
 {
     HPDF_FontDef def;
-    (void) file_name;
 
     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream\n"));
 
@@ -1477,7 +1504,7 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
 
     if (embedding) {
         if (pdf->ttfont_tag[0] == 0) {
-            HPDF_MemCpy (pdf->ttfont_tag, (const HPDF_BYTE*)"HPDFAA", 6);
+            HPDF_MemCpy (pdf->ttfont_tag, (HPDF_BYTE *)"HPDFAA", 6);
         } else {
             HPDF_INT i;
 
@@ -1490,7 +1517,7 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
             }
         }
 
-        HPDF_TTFontDef_SetTagName (def, (char*)pdf->ttfont_tag);
+        HPDF_TTFontDef_SetTagName (def, (char *)pdf->ttfont_tag);
     }
 
     return def->base_font;
@@ -1534,7 +1561,6 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
                        const char      *file_name)
 {
     HPDF_FontDef def;
-    (void) file_name;
 
     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream2\n"));
 
@@ -1556,7 +1582,7 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
 
     if (embedding) {
         if (pdf->ttfont_tag[0] == 0) {
-            HPDF_MemCpy (pdf->ttfont_tag, (const HPDF_BYTE*)"HPDFAA", 6);
+            HPDF_MemCpy (pdf->ttfont_tag, (HPDF_BYTE *)"HPDFAA", 6);
         } else {
             HPDF_INT i;
 
@@ -1569,7 +1595,7 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
             }
         }
 
-        HPDF_TTFontDef_SetTagName (def, (char*)pdf->ttfont_tag);
+        HPDF_TTFontDef_SetTagName (def, (char *)pdf->ttfont_tag);
     }
 
     return def->base_font;
@@ -2022,3 +2048,4 @@ HPDF_ResetError  (HPDF_Doc   pdf)
 
     HPDF_Error_Reset (&pdf->error);
 }
+

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_info.c
+ * << Haru Free PDF Library >> -- hpdf_info.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -78,12 +81,12 @@ HPDF_Info_GetInfoAttr (HPDF_Dict      info,
     if (!info)
         return NULL;
 
-    s = (HPDF_String)HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
+    s = (HPDF_String) HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
 
     if (!s)
         return NULL;
     else
-        return (const char*)s->value;
+        return (const char *)(s->value);
 }
 
 
@@ -145,7 +148,7 @@ HPDF_Info_SetInfoDateAttr (HPDF_Dict      info,
             return HPDF_SetError (info->error, HPDF_INVALID_DATE_TIME, 0);
     }
 
-    ptmp = (char*)HPDF_MemCpy ((HPDF_BYTE*)tmp, (const HPDF_BYTE*)"D:", 2);
+    ptmp = (char *)HPDF_MemCpy ((HPDF_BYTE *)tmp, (HPDF_BYTE *)"D:", 2);
     ptmp = HPDF_IToA2 (ptmp, value.year, 5);
     ptmp = HPDF_IToA2 (ptmp, value.month, 3);
     ptmp = HPDF_IToA2 (ptmp, value.day, 3);

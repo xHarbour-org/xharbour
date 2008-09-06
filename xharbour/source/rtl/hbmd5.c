@@ -1,12 +1,17 @@
 /*
- * $Id: hbmd5.c,v 1.2 2004/08/13 11:11:58 alexstrickland Exp $
+ * $Id: hbmd5.c 9014 2008-07-28 10:37:57Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * Harbour MD5 Support
+ *    Harbour MD5 Support
  *
  * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
+ *
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *    updated for current Harbour code, other then x86@32 machines,
+ *    files and buffers longer then 2^32 and some fixes
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,48 +58,52 @@
 /*
 MD5 digest (based on RFC 1321 only). [x]Harbour implementation
 
-Functions list:
+PRG functions:
 
----
-HB_MD5(string) -> MD5 digest of a string
-      Calculates RFC 1321 MD5 digest (128-bit checksum)
-   Parameters:
-      string  - string variable to calculate MD5
-   Returns:
-      ASCII hex MD5 digest as 32-byte string
-      empty string on error
+   HB_MD5( <cString> ) -> <cMD5>
+         Calculates RFC 1321 MD5 digest (128-bit checksum)
+      Parameters:
+         <cString>   - string variable to calculate MD5
+      Returns:
+         ASCII hex MD5 digest as 32-byte string
+         empty string on error
 
----
-HB_MD5FILE(fname) -> MD5 digest of a file contents
-      Calculates RFC 1321 MD5 digest (128-bit checksum) of a file contents
-      (file size is limited by OS limits only)
-   Parameters:
-      fname  - file name
-   Returns:
-      ASCII hex MD5 digest as 32-byte string
-      empty string on error
+   HB_MD5FILE( <cFileName> ) -> <cMD5>
+         Calculates RFC 1321 MD5 digest (128-bit checksum) of a file contents
+         (file size is limited by OS limits only)
+      Parameters:
+         <cFileName> - file name
+      Returns:
+         ASCII hex MD5 digest as 32-byte string
+         empty string on error
 
-See md5test.prg for examples.
+C functions:
 
-(C level)
-===
-void hbcc_md5(BYTE *data,ULONG datalen,BYTE* digest)
-   Parameters:
-      data    - input byte stream
-      datalen - input stream length
-      digest  - raw (unformatted) MD5 digest buffer (at least 16 bytes long)
+   void hb_md5( BYTE * data, ULONG datalen, BYTE * digest )
+      Parameters:
+         data     - input byte stream
+         datalen  - input stream length
+         digest   - raw (unformatted) MD5 digest buffer
+                    (at least 16 bytes long)
+
+   void hb_md5file( FHANDLE hFile, BYTE * digest )
+      Parameters:
+         hFile    - file handle
+         digest   - raw (unformatted) MD5 digest buffer
+                    (at least 16 bytes long)
+
 */
 
-#include <string.h>
 #include "hbapi.h"
 #include "hbapifs.h"
-#include "hbapiitm.h"
+#include "hbzlib.h"
 
 /* MD5 buffer */
-typedef struct s_md5_buf {
-      ULONG accum[4];
-      BYTE buf[64];
-   } MD5_BUF;
+typedef struct
+{
+   UINT32   accum[ 4 ];
+   BYTE     buf[ 64 ];
+} MD5_BUF;
 
 /*
    Pseudofunctions;
@@ -120,7 +129,7 @@ typedef struct s_md5_buf {
 #define MAX_FBUF 0x20000 /* file read buffer size, MUST be 64*n */
 
 /* Static data */
-static ULONG T[64] = {
+static const UINT32 T[ 64 ] = {
    0xD76AA478, 0xE8C7B756, 0x242070DB, 0xC1BDCEEE,
    0xF57C0FAF, 0x4787C62A, 0xA8304613, 0xFD469501,
    0x698098D8, 0x8B44F7AF, 0xFFFF5BB1, 0x895CD7BE,
@@ -139,246 +148,263 @@ static ULONG T[64] = {
    0xF7537E82, 0xBD3AF235, 0x2AD7D2BB, 0xEB86D391
 };
 
-static BYTE pad[64] = {
+static const BYTE pad[ 64 ] = {
    0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static void hb_md5go(MD5_BUF *md5)
+static void hb_md5go( MD5_BUF * md5 )
 {
-   ULONG X[16],A[4],t,n;
+   UINT32 X[ 16 ], A[ 4 ];
+   BYTE * ptr;
+   int i;
+
    /* copy accumulators first */
-   memcpy((void *)A,(void *)(md5->accum),sizeof(ULONG)<<2);
+   memcpy( A, md5->accum, sizeof( A ) );
+
    /* fill buffer */
-   for (t=0;t<16;t++)
-   {
-      n=t<<2;
-      X[t] = (((ULONG) md5->buf[n+3])<<24) + (((ULONG) md5->buf[n+2])<<16) + (((ULONG) md5->buf[n+1])<< 8) + md5->buf[n];
-   }
+   for( i = 0, ptr = md5->buf; i < 16; i++, ptr += 4 )
+      X[ i ] = HB_GET_LE_UINT32( ptr );
+
    /* process buffer */
-   PF1(0, 1, 2, 3,  0,  7,  0);
-   PF1(3, 0, 1, 2,  1, 12,  1);
-   PF1(2, 3, 0, 1,  2, 17,  2);
-   PF1(1, 2, 3, 0,  3, 22,  3);
-   PF1(0, 1, 2, 3,  4,  7,  4);
-   PF1(3, 0, 1, 2,  5, 12,  5);
-   PF1(2, 3, 0, 1,  6, 17,  6);
-   PF1(1, 2, 3, 0,  7, 22,  7);
-   PF1(0, 1, 2, 3,  8,  7,  8);
-   PF1(3, 0, 1, 2,  9, 12,  9);
-   PF1(2, 3, 0, 1, 10, 17, 10);
-   PF1(1, 2, 3, 0, 11, 22, 11);
-   PF1(0, 1, 2, 3, 12,  7, 12);
-   PF1(3, 0, 1, 2, 13, 12, 13);
-   PF1(2, 3, 0, 1, 14, 17, 14);
-   PF1(1, 2, 3, 0, 15, 22, 15);
-   PF2(0, 1, 2, 3,  1,  5, 16);
-   PF2(3, 0, 1, 2,  6,  9, 17);
-   PF2(2, 3, 0, 1, 11, 14, 18);
-   PF2(1, 2, 3, 0,  0, 20, 19);
-   PF2(0, 1, 2, 3,  5,  5, 20);
-   PF2(3, 0, 1, 2, 10,  9, 21);
-   PF2(2, 3, 0, 1, 15, 14, 22);
-   PF2(1, 2, 3, 0,  4, 20, 23);
-   PF2(0, 1, 2, 3,  9,  5, 24);
-   PF2(3, 0, 1, 2, 14,  9, 25);
-   PF2(2, 3, 0, 1,  3, 14, 26);
-   PF2(1, 2, 3, 0,  8, 20, 27);
-   PF2(0, 1, 2, 3, 13,  5, 28);
-   PF2(3, 0, 1, 2,  2,  9, 29);
-   PF2(2, 3, 0, 1,  7, 14, 30);
-   PF2(1, 2, 3, 0, 12, 20, 31);
-   PF3(0, 1, 2, 3,  5,  4, 32);
-   PF3(3, 0, 1, 2,  8, 11, 33);
-   PF3(2, 3, 0, 1, 11, 16, 34);
-   PF3(1, 2, 3, 0, 14, 23, 35);
-   PF3(0, 1, 2, 3,  1,  4, 36);
-   PF3(3, 0, 1, 2,  4, 11, 37);
-   PF3(2, 3, 0, 1,  7, 16, 38);
-   PF3(1, 2, 3, 0, 10, 23, 39);
-   PF3(0, 1, 2, 3, 13,  4, 40);
-   PF3(3, 0, 1, 2,  0, 11, 41);
-   PF3(2, 3, 0, 1,  3, 16, 42);
-   PF3(1, 2, 3, 0,  6, 23, 43);
-   PF3(0, 1, 2, 3,  9,  4, 44);
-   PF3(3, 0, 1, 2, 12, 11, 45);
-   PF3(2, 3, 0, 1, 15, 16, 46);
-   PF3(1, 2, 3, 0,  2, 23, 47);
-   PF4(0, 1, 2, 3,  0,  6, 48);
-   PF4(3, 0, 1, 2,  7, 10, 49);
-   PF4(2, 3, 0, 1, 14, 15, 50);
-   PF4(1, 2, 3, 0,  5, 21, 51);
-   PF4(0, 1, 2, 3, 12,  6, 52);
-   PF4(3, 0, 1, 2,  3, 10, 53);
-   PF4(2, 3, 0, 1, 10, 15, 54);
-   PF4(1, 2, 3, 0,  1, 21, 55);
-   PF4(0, 1, 2, 3,  8,  6, 56);
-   PF4(3, 0, 1, 2, 15, 10, 57);
-   PF4(2, 3, 0, 1,  6, 15, 58);
-   PF4(1, 2, 3, 0, 13, 21, 59);
-   PF4(0, 1, 2, 3,  4,  6, 60);
-   PF4(3, 0, 1, 2, 11, 10, 61);
-   PF4(2, 3, 0, 1,  2, 15, 62);
-   PF4(1, 2, 3, 0,  9, 21, 63);
+   PF1( 0, 1, 2, 3,  0,  7,  0 );
+   PF1( 3, 0, 1, 2,  1, 12,  1 );
+   PF1( 2, 3, 0, 1,  2, 17,  2 );
+   PF1( 1, 2, 3, 0,  3, 22,  3 );
+   PF1( 0, 1, 2, 3,  4,  7,  4 );
+   PF1( 3, 0, 1, 2,  5, 12,  5 );
+   PF1( 2, 3, 0, 1,  6, 17,  6 );
+   PF1( 1, 2, 3, 0,  7, 22,  7 );
+   PF1( 0, 1, 2, 3,  8,  7,  8 );
+   PF1( 3, 0, 1, 2,  9, 12,  9 );
+   PF1( 2, 3, 0, 1, 10, 17, 10 );
+   PF1( 1, 2, 3, 0, 11, 22, 11 );
+   PF1( 0, 1, 2, 3, 12,  7, 12 );
+   PF1( 3, 0, 1, 2, 13, 12, 13 );
+   PF1( 2, 3, 0, 1, 14, 17, 14 );
+   PF1( 1, 2, 3, 0, 15, 22, 15 );
+   PF2( 0, 1, 2, 3,  1,  5, 16 );
+   PF2( 3, 0, 1, 2,  6,  9, 17 );
+   PF2( 2, 3, 0, 1, 11, 14, 18 );
+   PF2( 1, 2, 3, 0,  0, 20, 19 );
+   PF2( 0, 1, 2, 3,  5,  5, 20 );
+   PF2( 3, 0, 1, 2, 10,  9, 21 );
+   PF2( 2, 3, 0, 1, 15, 14, 22 );
+   PF2( 1, 2, 3, 0,  4, 20, 23 );
+   PF2( 0, 1, 2, 3,  9,  5, 24 );
+   PF2( 3, 0, 1, 2, 14,  9, 25 );
+   PF2( 2, 3, 0, 1,  3, 14, 26 );
+   PF2( 1, 2, 3, 0,  8, 20, 27 );
+   PF2( 0, 1, 2, 3, 13,  5, 28 );
+   PF2( 3, 0, 1, 2,  2,  9, 29 );
+   PF2( 2, 3, 0, 1,  7, 14, 30 );
+   PF2( 1, 2, 3, 0, 12, 20, 31 );
+   PF3( 0, 1, 2, 3,  5,  4, 32 );
+   PF3( 3, 0, 1, 2,  8, 11, 33 );
+   PF3( 2, 3, 0, 1, 11, 16, 34 );
+   PF3( 1, 2, 3, 0, 14, 23, 35 );
+   PF3( 0, 1, 2, 3,  1,  4, 36 );
+   PF3( 3, 0, 1, 2,  4, 11, 37 );
+   PF3( 2, 3, 0, 1,  7, 16, 38 );
+   PF3( 1, 2, 3, 0, 10, 23, 39 );
+   PF3( 0, 1, 2, 3, 13,  4, 40 );
+   PF3( 3, 0, 1, 2,  0, 11, 41 );
+   PF3( 2, 3, 0, 1,  3, 16, 42 );
+   PF3( 1, 2, 3, 0,  6, 23, 43 );
+   PF3( 0, 1, 2, 3,  9,  4, 44 );
+   PF3( 3, 0, 1, 2, 12, 11, 45 );
+   PF3( 2, 3, 0, 1, 15, 16, 46 );
+   PF3( 1, 2, 3, 0,  2, 23, 47 );
+   PF4( 0, 1, 2, 3,  0,  6, 48 );
+   PF4( 3, 0, 1, 2,  7, 10, 49 );
+   PF4( 2, 3, 0, 1, 14, 15, 50 );
+   PF4( 1, 2, 3, 0,  5, 21, 51 );
+   PF4( 0, 1, 2, 3, 12,  6, 52 );
+   PF4( 3, 0, 1, 2,  3, 10, 53 );
+   PF4( 2, 3, 0, 1, 10, 15, 54 );
+   PF4( 1, 2, 3, 0,  1, 21, 55 );
+   PF4( 0, 1, 2, 3,  8,  6, 56 );
+   PF4( 3, 0, 1, 2, 15, 10, 57 );
+   PF4( 2, 3, 0, 1,  6, 15, 58 );
+   PF4( 1, 2, 3, 0, 13, 21, 59 );
+   PF4( 0, 1, 2, 3,  4,  6, 60 );
+   PF4( 3, 0, 1, 2, 11, 10, 61 );
+   PF4( 2, 3, 0, 1,  2, 15, 62 );
+   PF4( 1, 2, 3, 0,  9, 21, 63 );
+
    /* Update accumulators */
-   md5->accum[0] += A[0];
-   md5->accum[1] += A[1];
-   md5->accum[2] += A[2];
-   md5->accum[3] += A[3];
+   md5->accum[ 0 ] += A[ 0 ];
+   md5->accum[ 1 ] += A[ 1 ];
+   md5->accum[ 2 ] += A[ 2 ];
+   md5->accum[ 3 ] += A[ 3 ];
 }
 
-void hbcc_md5(BYTE *ucData,ULONG ulLen, BYTE *ucDigest)
+static void hb_md5accinit( UINT32 accum[] )
 {
-   ULONG i,n,p,l1,l2,off;
-   BYTE buf[128];
-   MD5_BUF md5;
-   /* perform startup procedures */
    /* fill initial accumulator state */
-   md5.accum[0] = 0x67452301;
-   md5.accum[1] = 0xEFCDAB89;
-   md5.accum[2] = 0x98BADCFE;
-   md5.accum[3] = 0x10325476;
-   /* count full 512bit blocks in data*/
-   n=ulLen>>6;
-   /* process full blocks */
-   for (i=0;i<n;i++)
+   accum[ 0 ] = 0x67452301;
+   accum[ 1 ] = 0xEFCDAB89;
+   accum[ 2 ] = 0x98BADCFE;
+   accum[ 3 ] = 0x10325476;
+}
+
+static void hb_md5val( UINT32 accum[], BYTE * md5val )
+{
+   int i, n;
+
+   for( i = 0; i < 4; i++ )
    {
-      memcpy(md5.buf,ucData+(i<<6),64);
-      hb_md5go(&md5);
+      for( n = 0; n < 4; n++ )
+         *md5val++ = ( BYTE ) ( accum[ i ] >> ( n << 3 ) ) & 0xFF;
+   }
+}
+
+static void hb_md5digest( BYTE * md5val, char * digest )
+{
+   int i, b;
+
+   for( i = 0; i < 16; i++ )
+   {
+      b = ( md5val[ i ] >> 4 ) & 0x0F;
+      *digest++ = b + ( b > 9 ? 'a' - 10 : '0' );
+      b = md5val[ i ] & 0x0F;
+      *digest++ = b + ( b > 9 ? 'a' - 10 : '0' );
+   }
+}
+
+HB_EXPORT void hb_md5( BYTE * ucData, ULONG ulLen, BYTE * ucDigest )
+{
+   UCHAR buf[ 128 ];
+   MD5_BUF md5;
+   int i, n;
+
+   /* perform startup procedures */
+   hb_md5accinit( md5.accum );
+   /* count full 512bit blocks in data*/
+   n = ulLen >> 6;
+   /* process full blocks */
+   for( i = 0; i < n; i++, ucData += 64 )
+   {
+      memcpy( md5.buf, ucData, 64 );
+      hb_md5go( &md5 );
    }
    /* prepare additional block(s) */
-   p=ulLen&63;
-   if (p)
-   {
-      memcpy(buf,ucData+(n<<6),p);
-   }
+   n = ulLen & 63;
+   if( n )
+      memcpy( buf, ucData, n );
+   memcpy( buf + n, pad, 64 );
    /* count bits length */
-   l1=(ulLen>>29)&7;
-   l2=(ulLen<<3)&0xFFFFFFF8;
-   off=(p>56 ? 120 : 56);
-   memcpy(buf+p,pad,64);
-   /* process additional block(s) */
-   for (i=0;i<4;i++)
+   i = 56;
+   if( n >= 56 )
    {
-      buf[off+i]=(BYTE) (0xFF&(l2>>(i<<3)));
-      buf[off+i+4]=(BYTE) (0xFF&(l1>>(i<<3)));
+      i += 64;
+      memcpy( md5.buf, buf, 64 );
+      hb_md5go( &md5 );
    }
-   memcpy(md5.buf,buf,64);
-   hb_md5go(&md5);
-   if (p>56)
+   buf[ i++ ] = ( BYTE ) ( ulLen << 3 ) & 0xF8;
+   ulLen >>= 5;
+   for( n = 7; n; --n )
    {
-      memcpy(md5.buf,buf+64,64);
-      hb_md5go(&md5);
+      buf[ i++ ] = ( BYTE ) ulLen & 0xFF;
+      ulLen >>= 8;
    }
+   memcpy( md5.buf, buf + i - 64, 64 );
+   hb_md5go( &md5 );
    /* write digest */
-   for (i=0;i<4;i++)
-   {
-      for (n=0;n<4;n++)
-      {
-         ucDigest[(i<<2)+n]=(BYTE) (0xFF&(md5.accum[i]>>(n<<3)));
-      }
-   }
-   return;
+   hb_md5val( md5.accum, ucDigest );
 }
 
-HB_FUNC(HB_MD5)
+HB_EXPORT void hb_md5file( FHANDLE hFile, BYTE * ucDigest )
 {
-   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-   ULONG srclen,i;
-   BYTE *srcstr, dststr[16];
-   char digest[33];
-
-   if (phbstr)
-   {
-      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
-      hbcc_md5(srcstr,srclen,dststr);
-      for (i=0;i<16;i++)
-      {
-         sprintf(digest+(i<<1),"%02x",dststr[i]);
-      }
-      hb_retclen(digest,32);
-   }
-   else
-   {
-      hb_retc(""); //return empty string on wrong call
-   }
-}
-
-
-HB_FUNC(HB_MD5FILE)
-{
-   PHB_ITEM phbstr = hb_param(1,HB_IT_STRING);
    MD5_BUF md5;
-   FHANDLE hFile;
-   int len,n,i;
-   ULONG flen=0;
-   char digest[33];
-   BYTE buf[128], readbuf[MAX_FBUF];
+   ULONG n;
+   int i;
+   HB_FOFFSET flen = 0;
+   UCHAR buf[ 128 ], * readbuf = ( UCHAR * ) hb_xgrab( MAX_FBUF );
 
-   if (phbstr)
+   hb_md5accinit( md5.accum );
+   n = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
+   flen += n;
+   while( n == MAX_FBUF )
    {
-      hFile=hb_fsOpen((BYTE *) hb_itemGetCPtr(phbstr),0); // 0 = FO_READ
-      if (hFile>0)
+      for( i = 0; i < ( MAX_FBUF >> 6 ); i++ )
       {
-         md5.accum[0] = 0x67452301;
-         md5.accum[1] = 0xEFCDAB89;
-         md5.accum[2] = 0x98BADCFE;
-         md5.accum[3] = 0x10325476;
+         memcpy( md5.buf, readbuf + ( i << 6 ), 64 );
+         hb_md5go( &md5 );
+      }
+      n = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
+      flen += n;
+   }
+   hb_fsClose( hFile );
+   i = 0;
+   while( n > 64 )
+   {
+      memcpy( md5.buf, readbuf + i, 64 );
+      hb_md5go( &md5 );
+      i += 64;
+      n -= 64;
+   }
+   if( n )
+      memcpy( buf, readbuf + i, n );
+   memcpy( buf + n, pad, 64 );
+   i = 56;
+   if( n >= 56 )
+   {
+      i += 64;
+      memcpy( md5.buf, buf, 64 );
+      hb_md5go( &md5 );
+   }
+   buf[ i++ ] = ( BYTE ) ( flen << 3 ) & 0xF8;
+   flen >>= 5;
+   for( n = 7; n; --n )
+   {
+      buf[ i++ ] = ( BYTE ) flen & 0xFF;
+      flen >>= 8;
+   }
+   memcpy( md5.buf, buf + i - 64, 64 );
+   hb_md5go( &md5 );
+   hb_md5val( md5.accum, ucDigest );
+   hb_xfree( readbuf );
+}
 
-         len = hb_fsReadLarge(hFile,readbuf,MAX_FBUF);
-         flen+=len;
-         while (len==MAX_FBUF)
-         {
-            n=len/64;
-            for (i=0;i<n;i++)
-            {
-               memcpy(md5.buf,readbuf+(i*64),64);
-               hb_md5go(&md5);
-            }
-            len = hb_fsReadLarge(hFile,readbuf,MAX_FBUF);
-            flen+=len;
-         }
-         hb_fsClose(hFile);
-         i=0;
-         while (len>64)
-         {
-            memcpy(md5.buf,readbuf+i,64);
-            hb_md5go(&md5);
-            i+=64;
-            len-=64;
-         }
-         memcpy(buf,readbuf+i,len);
-         memcpy(buf+len,pad,64);
-         i=56;
-         if (len>56)
-         {
-            i+=64;
-            memcpy(md5.buf,buf,64);
-            hb_md5go(&md5);
-         }
-         buf[i++]=(BYTE) (flen<< 3)&0xF8;
-         buf[i++]=(BYTE) (flen>> 5)&0xFF;
-         buf[i++]=(BYTE) (flen>>13)&0xFF;
-         buf[i++]=(BYTE) (flen>>21)&0xFF;
-         buf[i]=(BYTE) (flen>>29)&0x7;
-         memcpy(md5.buf,buf+i-60,64);
-         hb_md5go(&md5);
-         for (i=0;i<16;i++)
-         {
-            sprintf(digest+(i<<1),"%02x",(int)(md5.accum[i>>2]>>((i&3)<<3)&0xFF));
-         }
-         hb_retclen(digest,32);
-      }
-      else
-      {
-         hb_retc(""); //return empty string if file !opened
-      }
+HB_FUNC( HB_MD5 )
+{
+   char * pszStr = hb_parc( 1 );
+
+   if( pszStr )
+   {
+      ULONG ulLen = hb_parclen( 1 );
+      BYTE dststr[ 16 ];
+      char digest[ 33 ];
+
+      hb_md5( ( BYTE * ) pszStr, ulLen, dststr );
+      hb_md5digest( dststr, digest );
+      hb_retclen( digest, 32 );
    }
    else
+      hb_retc( NULL ); /* return empty string on wrong call */
+}
+
+HB_FUNC( HB_MD5FILE )
+{
+   char * pszFile = hb_parc( 1 );
+
+   if( pszFile )
    {
-      hb_retc(""); //return empty string on wrong call
+      FHANDLE hFile = hb_fsOpen( ( BYTE * ) pszFile, FO_READ );
+
+      if( hFile != FS_ERROR )
+      {
+         BYTE dststr[ 16 ];
+         char digest[ 33 ];
+
+         hb_md5file( hFile, dststr );
+         hb_md5digest( dststr, digest );
+         hb_retclen( digest, 32 );
+         return;
+      }
    }
+   hb_retc( NULL ); /* return empty string on wrong call */
 }

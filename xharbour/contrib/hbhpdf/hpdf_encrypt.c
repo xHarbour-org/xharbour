@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_encryor.c
+ * << Haru Free PDF Library >> -- hpdf_encryor.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -168,7 +171,7 @@ HPDF_MD5Final  (HPDF_BYTE              digest[16],
 
     MD5Transform (ctx->buf, (HPDF_UINT32 *) ctx->in);
     MD5ByteReverse ((HPDF_BYTE *) ctx->buf, 4);
-    HPDF_MemCpy ((HPDF_BYTE *)digest, (const HPDF_BYTE *)ctx->buf, 16);
+    HPDF_MemCpy ((HPDF_BYTE *)digest, (HPDF_BYTE *)ctx->buf, 16);
     HPDF_MemSet ((HPDF_BYTE *)ctx, 0, sizeof (ctx));   /* In case it's sensitive */
 }
 
@@ -318,13 +321,13 @@ HPDF_PadOrTrancatePasswd  (const char  *pwd,
 
     HPDF_MemSet (new_pwd, 0x00, HPDF_PASSWD_LEN);
 
-    if (len >= HPDF_PASSWD_LEN)
-        HPDF_MemCpy (new_pwd, (const unsigned char*)pwd, HPDF_PASSWD_LEN);
-    else {
-        if (len > 0)
-            HPDF_MemCpy (new_pwd, (const unsigned char*)pwd, len);
-        HPDF_MemCpy (new_pwd + len, HPDF_PADDING_STRING,
-                    HPDF_PASSWD_LEN - len);
+    if (len >= HPDF_PASSWD_LEN) {
+        HPDF_MemCpy (new_pwd, (HPDF_BYTE *)pwd, HPDF_PASSWD_LEN);
+    } else {
+        if (len > 0) {
+            HPDF_MemCpy (new_pwd, (HPDF_BYTE *)pwd, len);
+        }
+        HPDF_MemCpy (new_pwd + len, HPDF_PADDING_STRING, HPDF_PASSWD_LEN - len);
     }
 }
 
@@ -518,7 +521,7 @@ HPDF_Encrypt_CreateUserKey  (HPDF_Encrypt  attr)
 }
 
 
-static void
+void
 ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
                         const HPDF_BYTE    *key,
                         HPDF_UINT          key_len)
@@ -550,7 +553,7 @@ ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
 }
 
 
-static void
+void
 ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
                            const HPDF_BYTE    *in,
                            HPDF_BYTE          *out,
@@ -593,7 +596,7 @@ HPDF_Encrypt_InitKey  (HPDF_Encrypt  attr,
     attr->encryption_key[attr->key_len] = object_id;
     attr->encryption_key[attr->key_len + 1] = (object_id >> 8);
     attr->encryption_key[attr->key_len + 2] = (object_id >> 16);
-    attr->encryption_key[attr->key_len + 3] = (unsigned char)gen_no;
+    attr->encryption_key[attr->key_len + 3] = gen_no;
     attr->encryption_key[attr->key_len + 4] = (gen_no >> 8);
 
     HPDF_PTRACE(("@@@ OID=%u, gen_no=%u\n", (HPDF_INT)object_id, gen_no));

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_list.c
+ * << Haru Free PDF Library >> -- hpdf_list.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -276,7 +279,7 @@ HPDF_List_Clear  (HPDF_List  list)
  *
  */
 
-static HPDF_STATUS
+HPDF_STATUS
 Resize  (HPDF_List   list,
          HPDF_UINT   count)
 {
@@ -297,7 +300,7 @@ Resize  (HPDF_List   list,
         return HPDF_Error_GetCode (list->error);
 
     if (list->obj)
-        HPDF_MemCpy ((HPDF_BYTE *)new_obj, (const HPDF_BYTE *)list->obj,
+        HPDF_MemCpy ((HPDF_BYTE *)new_obj, (HPDF_BYTE *)list->obj,
                 list->block_siz * sizeof(void *));
 
     list->block_siz = count;

@@ -1,13 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_error.h
+ * << Haru Free PDF Library >> -- hpdf_error.h
  *
- * URL http://libharu.sourceforge.net/
+ * URL: http://libharu.org
  *
- * Copyright (c) 1999-2006 Takeshi Kanno
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -145,6 +146,7 @@ extern "C" {
 #define HPDF_EXT_GSTATE_OUT_OF_RANGE              0x1080
 #define HPDF_INVALID_EXT_GSTATE                   0x1081
 #define HPDF_EXT_GSTATE_READ_ONLY                 0x1082
+#define HPDF_INVALID_U3D_DATA                     0x1083
 
 /*---------------------------------------------------------------------------*/
 /*----- HPDF_Error ----------------------------------------------------------*/

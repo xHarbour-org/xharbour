@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.171 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: filesys.c,v 1.172 2008/06/24 12:50:35 modalsist Exp $
  */
 
 /*
@@ -136,7 +136,9 @@
       defined(__MINGW32__) || defined(__WATCOMC__) ) && !defined( HB_OS_UNIX )
    #include <sys/stat.h>
    #if !defined(__POCC__)
+   #if 0
    #include <share.h>
+   #endif
    #endif
    #include <fcntl.h>
    #include <errno.h>

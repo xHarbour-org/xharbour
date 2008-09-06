@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_null.c
+ * << Haru Free PDF Library >> -- hpdf_null.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -23,7 +26,7 @@
 HPDF_Null
 HPDF_Null_New  (HPDF_MMgr  mmgr)
 {
-    HPDF_Null obj = (HPDF_Null)HPDF_GetMem (mmgr, sizeof(HPDF_Null_Rec));
+    HPDF_Null obj = (HPDF_Null) HPDF_GetMem (mmgr, sizeof(HPDF_Null_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_font_cid.c
+ * << Haru Free PDF Library >> -- hpdf_font_cid.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -14,7 +17,6 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.08.04 modified MeasureText().
  */
 
 #include "hpdf_conf.h"
@@ -102,7 +104,7 @@ HPDF_Type0Font_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = (HPDF_FontAttr) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -760,10 +762,10 @@ UINT16ToHex  (char     *s,
         return s;
 
     /* align byte-order */
-    HPDF_MemCpy (b, (const HPDF_BYTE*)&val, 2);
+    HPDF_MemCpy (b, (HPDF_BYTE *)&val, 2);
     val2 = (HPDF_UINT16)((HPDF_UINT16)b[0] << 8 | (HPDF_UINT16)b[1]);
 
-    HPDF_MemCpy (b, (const HPDF_BYTE *)&val2, 2);
+    HPDF_MemCpy (b, (HPDF_BYTE *)&val2, 2);
 
     *s++ = '<';
 
@@ -847,17 +849,17 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream,
                 "%%IncludeResource: ProcSet (CIDInit)\r\n");
 
-    pbuf = (char*) HPDF_StrCpy (buf, "%%BeginResource: CMap (", eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "%%BeginResource: CMap (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     HPDF_StrCpy (pbuf, ")\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = (char*) HPDF_StrCpy (buf, "%%Title: (", eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "%%Title: (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     *pbuf++ = ' ';
-    pbuf = (char*) HPDF_StrCpy (pbuf, attr->registry, eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->registry, eptr);
     *pbuf++ = ' ';
-    pbuf = (char*) HPDF_StrCpy (pbuf, attr->ordering, eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->ordering, eptr);
     *pbuf++ = ' ';
     pbuf = HPDF_IToA (pbuf, attr->suppliment, eptr);
     HPDF_StrCpy (pbuf, ")\r\n", eptr);
@@ -878,24 +880,24 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream,
                 "/CIDSystemInfo 3 dict dup begin\r\n");
 
-    pbuf = (char*) HPDF_StrCpy (buf, "  /Registry (", eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, attr->registry, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Registry (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->registry, eptr);
     HPDF_StrCpy (pbuf, ") def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = (char*) HPDF_StrCpy (buf, "  /Ordering (", eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, attr->ordering, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Ordering (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->ordering, eptr);
     HPDF_StrCpy (pbuf, ") def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = (char*) HPDF_StrCpy (buf, "  /Supplement ", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Supplement ", eptr);
     pbuf = HPDF_IToA (pbuf, attr->suppliment, eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, " def\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, " def\r\n", eptr);
     HPDF_StrCpy (pbuf, "end def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = (char*) HPDF_StrCpy (buf, "/CMapName /", eptr);
-    pbuf = (char*) HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/CMapName /", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     HPDF_StrCpy (pbuf, " def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
@@ -903,13 +905,13 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, "/CMapType 1 def\r\n\r\n");
 
     if (attr->uid_offset >= 0) {
-        pbuf = (char*) HPDF_StrCpy (buf, "/UIDOffset ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/UIDOffset ", eptr);
         pbuf = HPDF_IToA (pbuf, attr->uid_offset, eptr);
         HPDF_StrCpy (pbuf, " def\r\n\r\n", eptr);
         ret += HPDF_Stream_WriteStr (cmap->stream, buf);
     }
 
-    pbuf = (char*) HPDF_StrCpy (buf, "/XUID [", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/XUID [", eptr);
     pbuf = HPDF_IToA (pbuf, attr->xuid[0], eptr);
     *pbuf++ = ' ';
     pbuf = HPDF_IToA (pbuf, attr->xuid[1], eptr);
@@ -918,7 +920,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     HPDF_StrCpy (pbuf, "] def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = (char*) HPDF_StrCpy (buf, "/WMode ", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/WMode ", eptr);
     pbuf = HPDF_IToA (pbuf, (HPDF_UINT32)attr->writing_mode, eptr);
     HPDF_StrCpy (pbuf, " def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
@@ -929,7 +931,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->code_space_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->code_space_range,
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->code_space_range,
                         i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
@@ -954,7 +956,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->notdef_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->notdef_range, i);
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->notdef_range, i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
         *pbuf++ = ' ';
@@ -985,7 +987,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->cmap_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->cmap_range, i);
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->cmap_range, i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
         *pbuf++ = ' ';
@@ -998,7 +1000,7 @@ CreateCMap  (HPDF_Encoder   encoder,
 
         if ((i + 1) %100 == 0) {
             phase--;
-            pbuf = (char*)HPDF_StrCpy (buf, "endcidrange\r\n\r\n", eptr);
+            pbuf = (char *)HPDF_StrCpy (buf, "endcidrange\r\n\r\n", eptr);
 
             if (phase > 0)
                 pbuf = HPDF_IToA (pbuf, 100, eptr);
@@ -1015,14 +1017,14 @@ CreateCMap  (HPDF_Encoder   encoder,
     }
 
     if (odd > 0)
-        pbuf = (char*)HPDF_StrCpy (buf, "endcidrange\r\n", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "endcidrange\r\n", eptr);
 
-    pbuf = (char*)HPDF_StrCpy (pbuf, "endcmap\r\n", eptr);
-    pbuf = (char*)HPDF_StrCpy (pbuf, "CMapName currentdict /CMap "
+    pbuf = (char *)HPDF_StrCpy (pbuf, "endcmap\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "CMapName currentdict /CMap "
             "defineresource pop\r\n", eptr);
-    pbuf = (char*)HPDF_StrCpy (pbuf, "end\r\n", eptr);
-    pbuf = (char*)HPDF_StrCpy (pbuf, "end\r\n\r\n", eptr);
-    pbuf = (char*)HPDF_StrCpy (pbuf, "%%EndResource\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "end\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "end\r\n\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "%%EndResource\r\n", eptr);
     HPDF_StrCpy (pbuf, "%%EOF\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 

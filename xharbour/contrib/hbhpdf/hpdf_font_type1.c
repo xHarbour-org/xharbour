@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_font_type1.c
+ * << Haru Free PDF Library >> -- hpdf_font_type1.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -85,7 +88,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
 
     font->header.obj_class |= HPDF_OSUBCLASS_FONT;
 
-    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = (HPDF_FontAttr) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -109,7 +112,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
     /* singlebyte-font has a widths-array which is an array of 256 signed
      * short integer.
      */
-    attr->widths = (HPDF_INT16*)HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
+    attr->widths = (HPDF_INT16 *) HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
     if (!attr->widths) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -334,13 +337,13 @@ Type1Font_OnWrite  (HPDF_Dict    obj,
     if (!fontdef_attr->is_base14font || encoder_attr->has_differences) {
         char *pbuf;
 
-        pbuf = (char*)HPDF_StrCpy (buf, "/FirstChar ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/FirstChar ", eptr);
         pbuf = HPDF_IToA (pbuf, encoder_attr->first_char, eptr);
         HPDF_StrCpy (pbuf, "\012", eptr);
         if ((ret = HPDF_Stream_WriteStr (stream, buf)) != HPDF_OK)
             return ret;
 
-        pbuf = (char*)HPDF_StrCpy (buf, "/LastChar ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/LastChar ", eptr);
         pbuf = HPDF_IToA (pbuf, encoder_attr->last_char, eptr);
         HPDF_StrCpy (pbuf, "\012", eptr);
         if ((ret = HPDF_Stream_WriteStr (stream, buf)) != HPDF_OK)

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_outline.c
+ * << Haru Free PDF Library >> -- hpdf_outline.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -20,7 +23,6 @@
 #include "hpdf_utils.h"
 #include "hpdf_destination.h"
 #include "hpdf.h"
-
 
 #define HPDF_OUTLINE_CLOSED     0
 #define HPDF_OUTLINE_OPENED     1
@@ -330,3 +332,5 @@ HPDF_Outline_SetOpened  (HPDF_Outline  outline,
 
     return HPDF_OK;
 }
+
+

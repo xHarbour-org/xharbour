@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_fontdef_type1.c
+ * << Haru Free PDF Library >> -- hpdf_fontdef_type1.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -69,7 +72,7 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     if (!mmgr)
         return NULL;
 
-    fontdef = (HPDF_FontDef)HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
+    fontdef = (HPDF_FontDef) HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
     if (!fontdef)
         return NULL;
 
@@ -83,7 +86,7 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     fontdef->descriptor = NULL;
     fontdef->valid = HPDF_FALSE;
 
-    fontdef_attr = (HPDF_Type1FontDefAttr)HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
+    fontdef_attr = (HPDF_Type1FontDefAttr) HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
     if (!fontdef_attr) {
         HPDF_FreeMem (fontdef->mmgr, fontdef);
         return NULL;
@@ -188,7 +191,7 @@ LoadAfm (HPDF_FontDef  fontdef,
             HPDF_UINT len = HPDF_StrLen (s, HPDF_LIMIT_MAX_STRING_LEN);
 
             if (len > 0) {
-                attr->char_set = (char*)HPDF_GetMem (fontdef->mmgr, len + 1);
+                attr->char_set = (char *) HPDF_GetMem (fontdef->mmgr, len + 1);
                 if (!attr->char_set)
                     return HPDF_Error_GetCode (fontdef->error);
 
@@ -320,14 +323,14 @@ LoadFontData (HPDF_FontDef  fontdef,
         return HPDF_Error_GetCode (fontdef->error);
 
     len = 11;
-    ret = (HPDF_STATUS)HPDF_Stream_Read (stream, (unsigned char*)pbuf, &len);
+    ret = HPDF_Stream_Read (stream, (HPDF_BYTE *)pbuf, &len);
     if (ret != HPDF_OK)
         return ret;
     pbuf += 11;
 
     for (;;) {
         len = HPDF_STREAM_BUF_SIZ - 11;
-        ret = (HPDF_STATUS)HPDF_Stream_Read (stream, (unsigned char*)pbuf, &len);
+        ret = HPDF_Stream_Read (stream, (HPDF_BYTE *)pbuf, &len);
         if (ret == HPDF_STREAM_EOF) {
             end_flg = HPDF_TRUE;
         } else if (ret != HPDF_OK)
@@ -358,16 +361,16 @@ LoadFontData (HPDF_FontDef  fontdef,
         }
 
         if (end_flg) {
-            if ((ret = (HPDF_STATUS)HPDF_Stream_Write (attr->font_data, (unsigned char*)buf, len + 11)) !=
+            if ((ret = HPDF_Stream_Write (attr->font_data, (HPDF_BYTE *)buf, len + 11)) !=
                         HPDF_OK)
                 return ret;
 
             break;
         } else {
-            if ((ret = (HPDF_STATUS)HPDF_Stream_Write (attr->font_data, (unsigned char *)buf, len)) !=
+            if ((ret = HPDF_Stream_Write (attr->font_data, (HPDF_BYTE *)buf, len)) !=
                         HPDF_OK)
                 return ret;
-            HPDF_MemCpy ((HPDF_BYTE*)buf, (const HPDF_BYTE*)(buf + len), 11);
+            HPDF_MemCpy ((HPDF_BYTE *)buf, (HPDF_BYTE *)buf + len, 11);
             pbuf = buf + 11;
         }
     }

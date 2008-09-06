@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_annotation.c
+ * << Haru Free PDF Library >> -- hpdf_annotation.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -34,7 +37,8 @@ const static char  *HPDF_ANNOT_TYPE_NAMES[] = {
                                         "Underline",
                                         "Ink",
                                         "FileAttachment",
-                                        "Popup"
+                                        "Popup",
+                                        "3D"
                                         };
 
 const static char  *HPDF_ANNOT_ICON_NAMES_NAMES[] = {
@@ -313,6 +317,87 @@ HPDF_LinkAnnot_SetHighlightMode  (HPDF_Annotation           annot,
     return ret;
 }
 
+
+HPDF_Annotation
+HPDF_3DAnnot_New    (HPDF_MMgr        mmgr,
+					 HPDF_Xref        xref,
+					 HPDF_Rect        rect,
+					 HPDF_U3D u3d)
+{
+	HPDF_Annotation annot;
+	HPDF_Dict action, appearance, stream;
+	HPDF_STATUS ret;
+
+	HPDF_PTRACE((" HPDF_3DAnnot_New\n"));
+
+	annot = HPDF_Annotation_New (mmgr, xref, HPDF_ANNOT_3D, rect);
+	if (!annot) {
+		return NULL;
+	}
+	
+	HPDF_Dict_AddName (annot, "Contents", "3D Model");
+
+	action = HPDF_Dict_New (mmgr);
+	if (!action) {
+		return NULL;
+	}
+
+	ret = HPDF_Dict_Add (annot, "3DA", action);
+	if (ret != HPDF_OK) {
+		return NULL;
+	}
+
+	ret += HPDF_Dict_AddName (action, "A", "PV");
+
+	ret += HPDF_Dict_AddBoolean(action, "TB", HPDF_FALSE);
+
+	if (ret != HPDF_OK) {
+		return NULL;
+	}
+
+	if (HPDF_Dict_Add (annot, "3DD", u3d) != HPDF_OK) {
+		return NULL;
+	}
+
+	appearance = HPDF_Dict_New (mmgr);
+	if (!appearance) {
+		return NULL;
+	}
+
+	ret = HPDF_Dict_Add (annot, "AP", appearance);
+	if (ret != HPDF_OK) {
+		return NULL;
+	}
+
+	stream = HPDF_Dict_New (mmgr);
+	if (!stream) {
+		return NULL;
+	}
+	ret = HPDF_Dict_Add (appearance, "N", stream);
+	if (ret != HPDF_OK) {
+		return NULL;
+	}
+
+	return annot;
+}
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_3DAnnot_Set3DView    (HPDF_Annotation  annot)
+{
+	HPDF_Boolean b;
+
+	HPDF_PTRACE((" HPDF_3DAnnot_Set3DView\n"));
+
+	if (!CheckSubType (annot, HPDF_ANNOT_3D))
+		return HPDF_INVALID_ANNOTATION;
+
+	b = HPDF_Boolean_New (annot->mmgr, 0);
+	if (!b)
+		return HPDF_CheckError (annot->error);
+
+	return  HPDF_Dict_Add (annot, "3DD", b);
+}
+
 HPDF_Annotation
 HPDF_TextAnnot_New  (HPDF_MMgr       mmgr,
                      HPDF_Xref       xref,
@@ -406,7 +491,7 @@ CheckSubType (HPDF_Annotation  annot,
     if (!HPDF_Annotation_Validate (annot))
         return HPDF_FALSE;
 
-    subtype = (HPDF_Name)HPDF_Dict_GetItem (annot, "Subtype", HPDF_OCLASS_NAME);
+    subtype = (HPDF_Name) HPDF_Dict_GetItem (annot, "Subtype", HPDF_OCLASS_NAME);
 
     if (!subtype || HPDF_StrCmp (subtype->value,
                 HPDF_ANNOT_TYPE_NAMES[(HPDF_INT)type]) != 0) {

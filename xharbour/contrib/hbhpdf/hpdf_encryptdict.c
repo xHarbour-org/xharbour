@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.5 >> -- hpdf_encryptdict.c
+ * << Haru Free PDF Library >> -- hpdf_encryptdict.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -14,8 +17,7 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.09.04 modified.
- *---------------------------------------------------------------------------*/
+ */
 
 #include <time.h>
 #include "hpdf_conf.h"
@@ -23,10 +25,6 @@
 #include "hpdf_objects.h"
 #include "hpdf_encryptdict.h"
 #include "hpdf_info.h"
-
-/*---------------------------------------------------------------------------*/
-/*------ HPDF_EncryptDict ---------------------------------------------------*/
-
 
 HPDF_EncryptDict
 HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
@@ -44,7 +42,7 @@ HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
     dict->header.obj_class |= HPDF_OSUBCLASS_ENCRYPT;
     dict->free_fn = HPDF_EncryptDict_OnFree;
 
-    attr = (HPDF_Encrypt)HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
+    attr = (HPDF_Encrypt) HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
     if (!attr) {
         HPDF_Dict_Free (dict);
         return NULL;

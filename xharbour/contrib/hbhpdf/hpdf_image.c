@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_image.c
+ * << Haru Free PDF Library >> -- hpdf_image.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -14,7 +17,6 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.08.12 modified.
  */
 
 #include "hpdf_conf.h"
@@ -372,7 +374,7 @@ HPDF_Image_Validate (HPDF_Image  image)
         return HPDF_FALSE;
     }
 
-    subtype = (HPDF_Name)HPDF_Dict_GetItem (image, "Subtype", HPDF_OCLASS_NAME);
+    subtype = (HPDF_Name) HPDF_Dict_GetItem (image, "Subtype", HPDF_OCLASS_NAME);
     if (!subtype || HPDF_StrCmp (subtype->value, "Image") != 0) {
         HPDF_RaiseError (image->error, HPDF_INVALID_IMAGE, 0);
         return HPDF_FALSE;
@@ -394,8 +396,8 @@ HPDF_Image_GetSize (HPDF_Image  image)
     if (!HPDF_Image_Validate (image))
         return ret;
 
-    width = (HPDF_Number)HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
-    height = (HPDF_Number)HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+    width = (HPDF_Number) HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
+    height = (HPDF_Number) HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
       ret.x = width->value;
@@ -418,8 +420,8 @@ HPDF_Image_GetSize2 (HPDF_Image  image, HPDF_Point *size)
     if (!HPDF_Image_Validate (image))
         return HPDF_INVALID_IMAGE;
 
-    width = (HPDF_Number)HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
-    height = (HPDF_Number)HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+    width = (HPDF_Number) HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
+    height = (HPDF_Number) HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
       size->x = width->value;
@@ -439,7 +441,7 @@ HPDF_Image_GetBitsPerComponent (HPDF_Image  image)
     if (!HPDF_Image_Validate (image))
         return 0;
 
-    n = (HPDF_Number)HPDF_Dict_GetItem (image, "BitsPerComponent", HPDF_OCLASS_NUMBER);
+    n = (HPDF_Number) HPDF_Dict_GetItem (image, "BitsPerComponent", HPDF_OCLASS_NUMBER);
 
     if (!n)
         return 0;
@@ -450,18 +452,30 @@ HPDF_Image_GetBitsPerComponent (HPDF_Image  image)
 HPDF_EXPORT(const char*)
 HPDF_Image_GetColorSpace (HPDF_Image  image)
 {
-    HPDF_Name n;
+	HPDF_Name n;
 
-    HPDF_PTRACE ((" HPDF_Image_GetColorSpace\n"));
+	HPDF_PTRACE ((" HPDF_Image_GetColorSpace\n"));
 
-    n = (HPDF_Name)HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
+	n = (HPDF_Name) HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
 
-    if (!n) {
-        HPDF_CheckError (image->error);
-        return NULL;
-    }
+	if (!n) {
+		HPDF_Array a;
 
-    return n->value;
+		HPDF_Error_Reset(image->error);
+
+		a = (HPDF_Array) HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_ARRAY);
+
+		if (a) {
+			n = (HPDF_Name) HPDF_Array_GetItem (a, 0, HPDF_OCLASS_NAME);
+		}
+	}
+
+	if (!n) {
+		HPDF_CheckError (image->error);
+		return NULL;
+	}
+
+	return n->value;
 }
 
 HPDF_EXPORT(HPDF_UINT)
@@ -489,7 +503,7 @@ HPDF_Image_SetMask (HPDF_Image   image,
         return HPDF_SetError (image->error, HPDF_INVALID_BIT_PER_COMPONENT,
                 0);
 
-    image_mask = (HPDF_Boolean)HPDF_Dict_GetItem (image, "ImageMask", HPDF_OCLASS_BOOLEAN);
+    image_mask = (HPDF_Boolean) HPDF_Dict_GetItem (image, "ImageMask", HPDF_OCLASS_BOOLEAN);
     if (!image_mask) {
         HPDF_STATUS ret;
         image_mask = HPDF_Boolean_New (image->mmgr, HPDF_FALSE);

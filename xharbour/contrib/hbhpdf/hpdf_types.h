@@ -1,13 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_types.h
+ * << Haru Free PDF Library >> -- hpdf_types.h
  *
- * URL http://libharu.sourceforge.net/
+ * URL: http://libharu.org
  *
- * Copyright (c) 1999-2006 Takeshi Kanno
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -150,6 +151,7 @@ typedef enum _HPDF_PdfVer {
     HPDF_VER_14,
     HPDF_VER_15,
     HPDF_VER_16,
+    HPDF_VER_17,
     HPDF_VER_EOF
 } HPDF_PDFVer;
 
@@ -346,7 +348,8 @@ typedef enum _HPDF_AnnotType {
     HPDF_ANNOT_UNDERLINE,
     HPDF_ANNOT_INK,
     HPDF_ANNOT_FILE_ATTACHMENT,
-    HPDF_ANNOT_POPUP
+    HPDF_ANNOT_POPUP,
+    HPDF_ANNOT_3D
 } HPDF_AnnotType;
 
 

@@ -1,13 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.8 >> -- hpdf_consts.h
+ * << Haru Free PDF Library >> -- hpdf_consts.h
  *
- * URL http://libharu.sourceforge.net/
+ * URL: http://libharu.org
  *
- * Copyright (c) 1999-2006 Takeshi Kanno
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -70,8 +71,6 @@
 /* defalt page-size */
 #define HPDF_DEF_PAGE_WIDTH         595.276F
 #define HPDF_DEF_PAGE_HEIGHT        841.89F
-
-#define HPDF_VERSION_TEXT       "2.0.8"
 
 /*---------------------------------------------------------------------------*/
 /*----- compression mode ----------------------------------------------------*/

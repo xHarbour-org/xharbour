@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6209 2008/09/05 08:38:29 marchuet Exp $
+ * $Id: ChangeLog,v 1.6210 2008/09/05 19:41:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,104 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-09-06 13:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_types.h
+  * contrib/hbhpdf/hpdf_utils.h
+  * contrib/hbhpdf/hpdf_page_label.h
+  * contrib/hbhpdf/hpdf_pages.h
+  * contrib/hbhpdf/hpdf.h
+  * contrib/hbhpdf/hpdf_outline.h
+  * contrib/hbhpdf/hpdf_annotation.h
+  * contrib/hbhpdf/hpdf_objects.h
+  * contrib/hbhpdf/hpdf_mmgr.h
+  * contrib/hbhpdf/hpdf_list.h
+  * contrib/hbhpdf/hpdf_info.h
+  * contrib/hbhpdf/hpdf_catalog.h
+  * contrib/hbhpdf/hpdf_conf.h
+  * contrib/hbhpdf/hpdf_consts.h
+  * contrib/hbhpdf/hpdf_image.h
+  * contrib/hbhpdf/hpdf_destination.h
+  * contrib/hbhpdf/hpdf_gstate.h
+  * contrib/hbhpdf/hpdf_fontdef.h
+  * contrib/hbhpdf/hpdf_doc.h
+  * contrib/hbhpdf/hpdf_font.h
+  * contrib/hbhpdf/hpdf_ext_gstate.h
+  * contrib/hbhpdf/hpdf_encoder.h
+  * contrib/hbhpdf/hpdf_error.h
+  * contrib/hbhpdf/hpdf_encryptdict.h
+  * contrib/hbhpdf/hpdf_encrypt.h
+  * contrib/hbhpdf/hpdf_streams.h
+  * contrib/hbhpdf/hpdf_encrypt.c
+  * contrib/hbhpdf/hpdf_encoder_jp.c
+  * contrib/hbhpdf/hpdf_encryptdict.c
+  * contrib/hbhpdf/hpdf_encoder_cnt.c
+  * contrib/hbhpdf/hpdf_error.c
+  * contrib/hbhpdf/hpdf_encoder_cns.c
+  * contrib/hbhpdf/hpdf_ext_gstate.c
+  * contrib/hbhpdf/hpdf_encoder.c
+  * contrib/hbhpdf/hpdf_font.c
+  * contrib/hbhpdf/hpdf_doc_png.c
+  * contrib/hbhpdf/hpdf_fontdef.c
+  * contrib/hbhpdf/hpdf_doc.c
+  * contrib/hbhpdf/hpdf_fontdef_base14.c
+  * contrib/hbhpdf/hpdf_fontdef_cid.c
+  * contrib/hbhpdf/hpdf_xref.c
+  * contrib/hbhpdf/hpdf_fontdef_cnt.c
+  * contrib/hbhpdf/hpdf_fontdef_jp.c
+  * contrib/hbhpdf/hpdf_fontdef_kr.c
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+  * contrib/hbhpdf/hpdf_fontdef_type1.c
+  * contrib/hbhpdf/hpdf_font_cid.c
+  * contrib/hbhpdf/hpdf_font_tt.c
+  * contrib/hbhpdf/hpdf_font_type1.c
+  * contrib/hbhpdf/hpdf_gstate.c
+  * contrib/hbhpdf/hpdf_dict.c
+  * contrib/hbhpdf/hpdf_image.c
+  * contrib/hbhpdf/hpdf_destination.c
+  * contrib/hbhpdf/hpdf_image_png.c
+  * contrib/hbhpdf/hpdf_info.c
+  * contrib/hbhpdf/hpdf_catalog.c
+  * contrib/hbhpdf/hpdf_list.c
+  * contrib/hbhpdf/hpdf_boolean.c
+  * contrib/hbhpdf/hpdf_mmgr.c
+  * contrib/hbhpdf/hpdf_binary.c
+  * contrib/hbhpdf/hpdf_name.c
+  * contrib/hbhpdf/hpdf_null.c
+  * contrib/hbhpdf/hpdf_number.c
+  * contrib/hbhpdf/hpdf_objects.c
+  * contrib/hbhpdf/hpdf_array.c
+  * contrib/hbhpdf/hpdf_outline.c
+  * contrib/hbhpdf/hpdf_annotation.c
+  * contrib/hbhpdf/hpdf_pages.c
+  * contrib/hbhpdf/hpdf_page_label.c
+  * contrib/hbhpdf/hpdf_utils.c
+  * contrib/hbhpdf/hpdf_page_operator.c
+  * contrib/hbhpdf/hpdf_real.c
+  * contrib/hbhpdf/hpdf_streams.c
+  * contrib/hbhpdf/hpdf_encoder_kr.c
+  * contrib/hbhpdf/hpdf_string.c
+  * contrib/hbhpdf/hpdf_fontdef_cns.c
+  + contrib/hbhpdf/hpdf_config.h
+  + contrib/hbhpdf/hpdf_u3d.c
+  + contrib/hbhpdf/hpdf_u3d.h
+  + contrib/hbhpdf/hpdf_version.h
+    ! updated to version 2.10
+
+  * contrib/hbhpdf/harupdf.c
+  * source/rtl/hbmd5.c
+    ! synced with Harbour
+
+  * source/rtl/filesys.c
+    - share.h is no longer needed, hence commented
+
+  - source/common/hbfhnd.c
+    ! no longer required, hence removed
+
+  * common.mak
+  * compile.mak
+    + add hpdf_u3d.obj dependency
+    - remove hbfhnd.obj dependency
+
 2008-09-06 02:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/pcre/config.h
   * source/rtl/pcre/config.h.generic

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_xref.h
+ * << Haru Free PDF Library >> -- hpdf_xref.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -280,7 +283,7 @@ HPDF_Xref_WriteToStream  (HPDF_Xref    xref,
         tmp_xref->addr = stream->size;
 
         pbuf = buf;
-        pbuf = (char*)HPDF_StrCpy (pbuf, "xref\012", eptr);
+        pbuf = (char *)HPDF_StrCpy (pbuf, "xref\012", eptr);
         pbuf = HPDF_IToA (pbuf, tmp_xref->start_offset, eptr);
         *pbuf++ = ' ';
         pbuf = HPDF_IToA (pbuf, tmp_xref->entries->count, eptr);

@@ -1,5 +1,5 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
@@ -20,6 +20,9 @@
 
 #ifndef _HPDF_H
 #define _HPDF_H
+
+#include "hpdf_config.h"
+#include "hpdf_version.h"
 
 #ifdef HPDF_DLL_MAKE
 #    define HPDF_EXPORT(A)  __declspec(dllexport) A  __stdcall
@@ -253,6 +256,11 @@ HPDF_LoadType1FontFromFile  (HPDF_Doc     pdf,
                              const char  *data_file_name);
 
 
+HPDF_EXPORT(HPDF_FontDef)
+HPDF_GetTTFontDefFromFile (HPDF_Doc     pdf,
+                           const char  *file_name,
+                           HPDF_BOOL    embedding);
+
 HPDF_EXPORT(const char*)
 HPDF_LoadTTFontFromFile (HPDF_Doc     pdf,
                          const char  *file_name,
@@ -419,6 +427,11 @@ HPDF_UseCNTEncodings   (HPDF_Doc   pdf);
 /*----- annotation ---------------------------------------------------------*/
 
 HPDF_EXPORT(HPDF_Annotation)
+HPDF_Page_Create3DAnnot    (HPDF_Page       page,
+							HPDF_Rect       rect,
+							HPDF_U3D        u3d);
+
+HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_CreateTextAnnot  (HPDF_Page       page,
                             HPDF_Rect       rect,
                             const char     *text,
@@ -477,6 +490,9 @@ HPDF_EXPORT(HPDF_Image)
 HPDF_LoadJpegImageFromFile (HPDF_Doc      pdf,
                             const char    *filename);
 
+HPDF_EXPORT(HPDF_Image)
+HPDF_LoadU3DFromFile (HPDF_Doc      pdf,
+                            const char    *filename);
 
 HPDF_EXPORT(HPDF_Image)
 HPDF_LoadRawImageFromFile  (HPDF_Doc           pdf,

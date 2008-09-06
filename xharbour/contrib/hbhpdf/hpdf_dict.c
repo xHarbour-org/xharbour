@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.5 >> -- HPDF_Dict.c
+ * << Haru Free PDF Library >> -- hpdf_dict.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -144,7 +147,7 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
         if (dict->filter == HPDF_STREAM_FILTER_NONE)
             HPDF_Dict_RemoveElement (dict, "Filter");
         else {
-            HPDF_Array array = (HPDF_Array)HPDF_Dict_GetItem (dict, "Filter",
+            HPDF_Array array = (HPDF_Array) HPDF_Dict_GetItem (dict, "Filter",
                         HPDF_OCLASS_ARRAY);
 
             if (!array) {
@@ -402,7 +405,7 @@ HPDF_Dict_GetItem  (HPDF_Dict        dict,
         HPDF_Obj_Header *header = (HPDF_Obj_Header *)element->value;
 
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = (HPDF_Proxy)element->value;
+            HPDF_Proxy p = (HPDF_Proxy) element->value;
             header = (HPDF_Obj_Header *)p->obj;
             obj = p->obj;
         } else
@@ -477,7 +480,7 @@ HPDF_Dict_GetKeyByObj (HPDF_Dict  dict,
 
         header = (HPDF_Obj_Header *)(element->value);
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = (HPDF_Proxy)element->value;
+            HPDF_Proxy p = (HPDF_Proxy) element->value;
 
             if (p->obj == obj)
                 return element->key;

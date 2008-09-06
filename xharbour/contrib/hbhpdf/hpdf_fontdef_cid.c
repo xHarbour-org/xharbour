@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_fontdef_cid.c
+ * << Haru Free PDF Library >> -- hpdf_fontdef_cid.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -66,7 +69,7 @@ HPDF_CIDFontDef_New  (HPDF_MMgr               mmgr,
     if (!mmgr)
         return NULL;
 
-    fontdef = (HPDF_FontDef)HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
+    fontdef = (HPDF_FontDef) HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
     if (!fontdef)
         return NULL;
 
@@ -80,7 +83,7 @@ HPDF_CIDFontDef_New  (HPDF_MMgr               mmgr,
     fontdef->free_fn = HPDF_CIDFontDef_FreeFunc;
     fontdef->init_fn = init_fn;
     fontdef->valid = HPDF_FALSE;
-    fontdef_attr = (HPDF_CIDFontDefAttr)HPDF_GetMem (mmgr, sizeof(HPDF_CIDFontDefAttr_Rec));
+    fontdef_attr = (HPDF_CIDFontDefAttr) HPDF_GetMem (mmgr, sizeof(HPDF_CIDFontDefAttr_Rec));
     if (!fontdef_attr) {
         HPDF_FreeMem (fontdef->mmgr, fontdef);
         return NULL;
@@ -148,7 +151,7 @@ HPDF_CIDFontDef_AddWidth  (HPDF_FontDef            fontdef,
     HPDF_PTRACE ((" HPDF_CIDFontDef_AddWidth\n"));
 
     while (widths->cid != 0xFFFF) {
-        HPDF_CID_Width *w = (HPDF_CID_Width *)HPDF_GetMem (fontdef->mmgr,
+        HPDF_CID_Width *w = (HPDF_CID_Width *) HPDF_GetMem (fontdef->mmgr,
                 sizeof (HPDF_CID_Width));
         HPDF_STATUS ret;
 

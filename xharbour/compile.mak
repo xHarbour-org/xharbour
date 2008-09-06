@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.20 2008/08/29 12:58:45 modalsist Exp $
+# $Id: compile.mak,v 1.21 2008/08/30 01:24:29 modalsist Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -61,9 +61,6 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 #===============================================================================
 # COMMON.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)hbfhnd$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfhnd.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)hbfopen$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfopen.c
 	$(CC_CMD)
 
@@ -4534,5 +4531,8 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc_png.
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_ext_gstate.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hbpdf_u3d.c
 	$(CC_CMD)
 

@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_binary.c
+ * << Haru Free PDF Library >> -- hpdf_binary.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -28,7 +31,7 @@ HPDF_Binary_New  (HPDF_MMgr  mmgr,
 {
     HPDF_Binary obj;
 
-    obj  = (HPDF_Binary)HPDF_GetMem (mmgr, sizeof(HPDF_Binary_Rec));
+    obj  = (HPDF_Binary) HPDF_GetMem (mmgr, sizeof(HPDF_Binary_Rec));
 
     if (obj) {
         HPDF_MemSet(&obj->header, 0, sizeof(HPDF_Obj_Header));
@@ -84,7 +87,7 @@ HPDF_Binary_SetValue  (HPDF_Binary  obj,
         obj->len = 0;
     }
 
-    obj->value = (unsigned char*)HPDF_GetMem (obj->mmgr, len);
+    obj->value = (HPDF_BYTE *) HPDF_GetMem (obj->mmgr, len);
     if (!obj->value)
         return HPDF_Error_GetCode (obj->error);
 

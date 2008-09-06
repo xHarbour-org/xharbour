@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.3 >> -- HPDF_objects.c
+ * << Haru Free PDF Library >> -- hpdf_objects.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -58,16 +61,16 @@ HPDF_Obj_ForceFree  (HPDF_MMgr    mmgr,
 
     switch (header->obj_class & HPDF_OCLASS_ANY) {
         case HPDF_OCLASS_STRING:
-            HPDF_String_Free ((HPDF_String)obj);
+            HPDF_String_Free ((HPDF_String) obj);
             break;
         case HPDF_OCLASS_BINARY:
-            HPDF_Binary_Free ((HPDF_Binary)obj);
+            HPDF_Binary_Free ((HPDF_Binary) obj);
             break;
         case HPDF_OCLASS_ARRAY:
-            HPDF_Array_Free ((HPDF_Array)obj);
+            HPDF_Array_Free ((HPDF_Array) obj);
             break;
         case HPDF_OCLASS_DICT:
-            HPDF_Dict_Free ((HPDF_Dict)obj);
+            HPDF_Dict_Free ((HPDF_Dict) obj);
             break;
         default:
             HPDF_FreeMem (mmgr, obj);
@@ -92,7 +95,7 @@ HPDF_Obj_Write  (void          *obj,
         char buf[HPDF_SHORT_BUF_SIZ];
         char *pbuf = buf;
         char *eptr = buf + HPDF_SHORT_BUF_SIZ - 1;
-        HPDF_Proxy p = (HPDF_Proxy)obj;
+        HPDF_Proxy p = (HPDF_Proxy) obj;
 
         header = (HPDF_Obj_Header*)p->obj;
 
@@ -124,28 +127,28 @@ HPDF_Obj_WriteValue  (void          *obj,
 
     switch (header->obj_class & HPDF_OCLASS_ANY) {
         case HPDF_OCLASS_NAME:
-            ret = HPDF_Name_Write ((HPDF_Name)obj, stream);
+            ret = HPDF_Name_Write ((HPDF_Name) obj, stream);
             break;
         case HPDF_OCLASS_NUMBER:
-            ret = HPDF_Number_Write ((HPDF_Number)obj, stream);
+            ret = HPDF_Number_Write ((HPDF_Number) obj, stream);
             break;
         case HPDF_OCLASS_REAL:
-            ret = HPDF_Real_Write ((HPDF_Real)obj, stream);
+            ret = HPDF_Real_Write ((HPDF_Real) obj, stream);
             break;
         case HPDF_OCLASS_STRING:
-            ret = HPDF_String_Write ((HPDF_String)obj, stream, e);
+            ret = HPDF_String_Write ((HPDF_String) obj, stream, e);
             break;
         case HPDF_OCLASS_BINARY:
-            ret = HPDF_Binary_Write ((HPDF_Binary)obj, stream, e);
+            ret = HPDF_Binary_Write ((HPDF_Binary) obj, stream, e);
             break;
         case HPDF_OCLASS_ARRAY:
-            ret = HPDF_Array_Write ((HPDF_Array)obj, stream, e);
+            ret = HPDF_Array_Write ((HPDF_Array) obj, stream, e);
             break;
         case HPDF_OCLASS_DICT:
-            ret = HPDF_Dict_Write ((HPDF_Dict)obj, stream, e);
+            ret = HPDF_Dict_Write ((HPDF_Dict) obj, stream, e);
             break;
         case HPDF_OCLASS_BOOLEAN:
-            ret = HPDF_Boolean_Write ((HPDF_Boolean)obj, stream);
+            ret = HPDF_Boolean_Write ((HPDF_Boolean) obj, stream);
             break;
         case HPDF_OCLASS_NULL:
             ret = HPDF_Stream_WriteStr (stream, "null");

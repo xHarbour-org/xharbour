@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_encoder.c
+ * << Haru Free PDF Library >> -- hpdf_encoder.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -2223,7 +2226,7 @@ HPDF_BasicEncoder_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    encoder = (HPDF_Encoder)HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
+    encoder = (HPDF_Encoder) HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
     if (!encoder)
         return NULL;
 
@@ -2239,7 +2242,7 @@ HPDF_BasicEncoder_New  (HPDF_MMgr        mmgr,
     encoder->write_fn = HPDF_BasicEncoder_Write;
     encoder->free_fn = HPDF_BasicEncoder_Free;
 
-    encoder_attr = (HPDF_BasicEncoderAttr)HPDF_GetMem(mmgr, sizeof(HPDF_BasicEncoderAttr_Rec));
+    encoder_attr = (HPDF_BasicEncoderAttr) HPDF_GetMem(mmgr, sizeof(HPDF_BasicEncoderAttr_Rec));
     if (!encoder_attr) {
         HPDF_FreeMem (encoder->mmgr, encoder);
         return NULL;
@@ -2485,7 +2488,7 @@ HPDF_BasicEncoder_Write  (HPDF_Encoder  encoder,
                 ptmp = HPDF_IToA (ptmp, i, tmp + HPDF_TMP_BUF_SIZ - 1);
                 *ptmp++ = ' ';
                 *ptmp++ = '/';
-                ptmp = (char*)HPDF_StrCpy (ptmp, char_name, tmp +
+                ptmp = (char *)HPDF_StrCpy (ptmp, char_name, tmp +
                         HPDF_TMP_BUF_SIZ - 1);
                 *ptmp++ = ' ';
                 *ptmp = 0;
@@ -2531,7 +2534,7 @@ HPDF_CMapEncoder_New  (HPDF_MMgr                mmgr,
     if (mmgr == NULL)
         return NULL;
 
-    encoder = (HPDF_Encoder)HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
+    encoder = (HPDF_Encoder) HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
     if (!encoder)
         return NULL;
 
@@ -2564,7 +2567,7 @@ HPDF_CMapEncoder_InitAttr  (HPDF_Encoder  encoder)
     if (encoder->attr)
         return HPDF_INVALID_ENCODER;
 
-    encoder_attr = (HPDF_CMapEncoderAttr)HPDF_GetMem(encoder->mmgr,
+    encoder_attr = (HPDF_CMapEncoderAttr) HPDF_GetMem(encoder->mmgr,
             sizeof(HPDF_CMapEncoderAttr_Rec));
 
     if (!encoder_attr)
@@ -2606,7 +2609,7 @@ HPDF_UNICODE
 HPDF_CMapEncoder_ToUnicode  (HPDF_Encoder  encoder,
                              HPDF_UINT16   code)
 {
-    HPDF_BYTE l = (HPDF_BYTE)code;
+    HPDF_BYTE l = code;
     HPDF_BYTE h = code >> 8;
     HPDF_CMapEncoderAttr attr = (HPDF_CMapEncoderAttr)encoder->attr;
 
@@ -2618,7 +2621,7 @@ HPDF_UINT16
 HPDF_CMapEncoder_ToCID  (HPDF_Encoder  encoder,
                          HPDF_UINT16   code)
 {
-    HPDF_BYTE l = (HPDF_BYTE)code;
+    HPDF_BYTE l = code;
     HPDF_BYTE h = code >> 8;
 
     HPDF_CMapEncoderAttr attr = (HPDF_CMapEncoderAttr)encoder->attr;
@@ -2640,7 +2643,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->cmap_range) {
         for (i = 0; i < attr->cmap_range->count; i++) {
-            data = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->cmap_range, i);
+            data = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->cmap_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2650,7 +2653,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->notdef_range) {
         for (i = 0; i < attr->notdef_range->count; i++) {
-            data = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->notdef_range, i);
+            data = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->notdef_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2660,7 +2663,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->code_space_range) {
         for (i = 0; i < attr->code_space_range->count; i++) {
-            data = (HPDF_CidRange_Rec *)HPDF_List_ItemAt (attr->code_space_range, i);
+            data = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->code_space_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2678,7 +2681,7 @@ HPDF_CMapEncoder_Write  (HPDF_Encoder  encoder,
                          HPDF_Stream   out)
 {
     HPDF_STATUS ret = HPDF_OK;
-    (void) encoder;
+
     return ret;
 }
 
@@ -2690,7 +2693,7 @@ HPDF_Encoder_SetParseText  (HPDF_Encoder        encoder,
                             HPDF_UINT           len)
 {
     HPDF_PTRACE ((" HPDF_CMapEncoder_SetParseText\n"));
-    (void) encoder;
+
     state->text = text;
     state->index = 0;
     state->len = len;
@@ -2756,7 +2759,7 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
         HPDF_STATUS ret;
 
         while (code <= range->to) {
-            HPDF_BYTE l = (HPDF_BYTE)code;
+            HPDF_BYTE l = code;
             HPDF_BYTE h = code >> 8;
 
             attr->cid_map[l][h] = cid;
@@ -2764,7 +2767,7 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
             cid++;
         }
 
-        prange = (HPDF_CidRange_Rec *)HPDF_GetMem (encoder->mmgr, sizeof(HPDF_CidRange_Rec));
+        prange = (HPDF_CidRange_Rec *) HPDF_GetMem (encoder->mmgr, sizeof(HPDF_CidRange_Rec));
         if (!prange)
             return encoder->error->error_no;
 
@@ -2792,7 +2795,7 @@ AddCidRainge  (HPDF_MMgr            mmgr,
     HPDF_CidRange_Rec *prange;
     HPDF_STATUS ret;
 
-    prange = (HPDF_CidRange_Rec *)HPDF_GetMem (mmgr, sizeof(HPDF_CidRange_Rec));
+    prange = (HPDF_CidRange_Rec *) HPDF_GetMem (mmgr, sizeof(HPDF_CidRange_Rec));
     if (!prange)
         return mmgr->error->error_no;
 
@@ -2844,7 +2847,7 @@ HPDF_CMapEncoder_SetUnicodeArray  (HPDF_Encoder                 encoder,
 
     if (array != NULL)
         while (array->unicode != 0xffff) {
-            HPDF_BYTE l = (HPDF_BYTE)array->code;
+            HPDF_BYTE l = array->code;
             HPDF_BYTE h = array->code >> 8;
             attr->unicode_map[l][h] = array->unicode;
             array++;
@@ -2947,7 +2950,7 @@ HPDF_Encoder_GetByteType  (HPDF_Encoder       encoder,
     if (encoder->type != HPDF_ENCODER_TYPE_DOUBLE_BYTE)
         return HPDF_BYTE_TYPE_SINGLE;
 
-    HPDF_Encoder_SetParseText (encoder, &parse_state, (const HPDF_BYTE*)text, index + 1);
+    HPDF_Encoder_SetParseText (encoder, &parse_state, (HPDF_BYTE *)text, index + 1);
 
     for (;;) {
         btype = HPDF_CMapEncoder_ByteType (encoder, &parse_state);

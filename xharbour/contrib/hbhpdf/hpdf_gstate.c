@@ -1,11 +1,14 @@
 /*
- * $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_gstate.c
+ * << Haru Free PDF Library >> -- hpdf_gstate.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -32,7 +35,7 @@ HPDF_GState_New  (HPDF_MMgr    mmgr,
         return NULL;
     }
 
-    gstate = (HPDF_GState)HPDF_GetMem (mmgr, sizeof(HPDF_GState_Rec));
+    gstate = (HPDF_GState) HPDF_GetMem (mmgr, sizeof(HPDF_GState_Rec));
     if (!gstate)
         return NULL;
 
