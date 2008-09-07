@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6211 2008/09/06 06:20:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.6212 2008/09/06 11:46:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-09-07 17:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/mlcfunc.c
+    * HB_FUNC( MEMOLINE ) added BACK (after update from Harbour)
+       optional 7th parameter which is
+       the start position in the string to search from. If
+       passed by reference the next starting position is stored
+       in the variable. This change allows _much_ faster memo
+       field extraction than the tradition mlcount()/for/next
+       loop - particularly with large memo's.
+
+        MEMOLINE( <cString>,[<nLineLen>],[<nLine>],[<nTabSize>],;
+            [<lWrap>],[<xEndOfLineCharacters>],[<@nStartOffset>]) --> cLine
 
 2008-09-06 18:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * common.mak
@@ -218,7 +230,7 @@
 
   - source\rtl\mlctopos.c
   - source\rtl\mpostolc.c
-    * removed, no longer needed. 
+    * removed, no longer needed.
 
   * source\rtl\txtline.c
     - removed memoline(), mlcount() and mlpos() functions.

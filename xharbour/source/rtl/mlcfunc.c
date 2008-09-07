@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: mlcfunc.c,v 1.1 2008/08/29 12:58:46 modalsist Exp $
  */
 
 /*
@@ -257,55 +257,82 @@ HB_FUNC( MEMOLINE )
                                       &ulTabSize, &fWordWrap, &pEOLs, &iEOLs );
    char * szLine;
    ULONG  ulLine   = hb_parnl( 3 );
-   ULONG  ulOffset = 0;
+   ULONG  ulEnd, ulOffset = ISNUM(7) ? hb_parnl( 7 ) - 1 : 0;
    ULONG  ulCols   = 0;
 
-   if( !pszString )
+   if ( ulOffset < 0 )
+   {
+      ulOffset = 0 ;
+   }
+
+   if ( !pszString )
    {
       hb_retc( NULL );
       return;
    }
 
    if( ulLine == 0 )
+   {
       ulLine = 1;
-
+   }
    while( --ulLine && ulOffset < ulLen )
    {
       ulOffset = hb_mlGetLine( pszString, ulLen, ulOffset,
                                ulLineLength, ulTabSize, 0, fWordWrap,
                                pEOLs, iEOLs, &ulCols, NULL );
    }
+
+   ulEnd = ulOffset ;
+
    if( ulOffset < ulLen )
    {
       ULONG ulCol = 0;
-      hb_mlGetLine( pszString, ulLen, ulOffset,
+      ulEnd = hb_mlGetLine( pszString, ulLen, ulOffset,
                     ulLineLength, ulTabSize, 0, fWordWrap,
                     pEOLs, iEOLs, &ulCols, NULL );
       szLine = ( char * ) hb_xgrab( ulLineLength + 1 );
+
       while( ulCol < ulCols )
       {
          if( pszString[ ulOffset ] == HB_CHAR_HT )
          {
             ULONG ul = ulTabSize - ( ulCol % ulTabSize );
             do
+            {
                szLine[ ulCol++ ] = ' ';
+            }
             while( --ul && ulCol < ulCols );
          }
          else if( pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
                   pszString[ ulOffset + 1 ] == HB_CHAR_SOFT2 )
+         {
             ulOffset++;
+         }
          else
+         {
             szLine[ ulCol++ ] = pszString[ ulOffset ];
+         }
          ulOffset++;
       }
       if( ulCols < ulLineLength )
+      {
          memset( szLine + ulCols, ' ', ulLineLength - ulCols );
+      }
       szLine[ ulLineLength ] = 0;
+
       hb_retclen_buffer( szLine, ulLineLength );
    }
    else
+   {
       hb_retc( NULL );
+   }
    hb_xfree( pEOLs );
+
+   if ( ISBYREF( 7 ) )
+   {
+      hb_stornl( ulEnd + 1, 7 ) ;
+   }
+
 }
 
 HB_FUNC( MLCOUNT )
