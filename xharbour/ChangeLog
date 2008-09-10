@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6212 2008/09/06 11:46:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.6213 2008/09/07 05:24:39 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-10 11:00 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/hbgtcore.c
+    + Added missing lines as below in hb_gt_def_info()
+
+      case HB_GTI_NOTIFIERBLOCK:
+         if( pGT->pNotifierBlock )
+         {
+            hb_itemRelease( pGT->pNotifierBlock );
+            pGT->pNotifierBlock = NULL;
+         }
+         if( hb_itemType( pInfo->pNewVal ) & HB_IT_BLOCK )
+            pGT->pNotifierBlock = hb_itemNew( pInfo->pNewVal );
+         break;
+
+     Please test. I could not compile due to some conflicts with 
+     source tree dated back to last year.
+
 2008-09-07 17:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/mlcfunc.c
     * HB_FUNC( MEMOLINE ) added BACK (after update from Harbour)

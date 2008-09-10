@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.7 2008/04/03 19:35:38 peterrees Exp $
+ * $Id: hbgtcore.c,v 1.8 2008/04/15 19:56:51 ronpinkas Exp $
  */
 
 /*
@@ -1533,6 +1533,16 @@ static BOOL hb_gt_def_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
             else
                pInfo->pResult = hb_itemPutC( pInfo->pResult, NULL );
          }
+         break;
+
+      case HB_GTI_NOTIFIERBLOCK:
+         if( pGT->pNotifierBlock )
+         {
+            hb_itemRelease( pGT->pNotifierBlock );
+            pGT->pNotifierBlock = NULL;
+         }
+         if( hb_itemType( pInfo->pNewVal ) & HB_IT_BLOCK )
+            pGT->pNotifierBlock = hb_itemNew( pInfo->pNewVal );
          break;
 
       default:
