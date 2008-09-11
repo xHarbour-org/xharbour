@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.76 2008/03/18 11:05:37 likewolf Exp $
+# $Id: Makefile,v 1.77 2008/04/19 12:49:15 lculik Exp $
 #
 
 ROOT = ../../
@@ -82,12 +82,11 @@ C_SOURCES=\
 	memofile.c   \
 	txtline.c    \
 	minmax.c     \
-	mlctopos.c   \
 	mod.c        \
 	mouseapi.c   \
 	mouse53.c    \
 	mousex.c     \
-	mpostolc.c   \
+	mlcfunc.c    \
 	mtran.c      \
 	natmsg.c     \
 	net.c        \

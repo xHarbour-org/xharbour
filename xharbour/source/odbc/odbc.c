@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.34 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id: odbc.c,v 1.35 2008/06/01 19:43:01 guerra000 Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ HB_FUNC( SQLALLOCEN ) /* HB_SQLALLOCENV( @hEnv ) --> nRetCode */
    hb_retni( ret );
 }
 
-#ifdef HSTMT
+#ifdef SQL_SUCCESS
 
 HB_FUNC( SQLALLOCCO ) /* HB_SQLALLOCCONNECT( hEnv, @ hDbc ) --> nRetCode */
 {

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2006/07/17 12:56:18 druzus Exp $
+# $Id: Makefile,v 1.10 2007/05/04 11:29:01 marchuet Exp $
 #
 
 ROOT = ../../
@@ -14,6 +14,11 @@ C_SOURCES=\
 	delim1.c \
 	sdf1.c \
 	hbdbsort.c \
+	dbcmdx.c \
+	fieldhb.c \
+	dbcmdhb.c \
+	dbcmd53.c \
+	rddinfo.c \
 
 PRG_SOURCES=\
 	dbdelim.prg \
@@ -27,6 +32,13 @@ PRG_SOURCES=\
 	dbupdat.prg \
 	rddord.prg \
 	rddsys.prg \
+	dblistx.prg \
+	dbupdatx.prg \
+	dbjoinx.prg \
+	dbsortx.prg \
+	dbstruxx.prg \
+	dbtotalx.prg \
+	dbstruxu.prg \
  
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=rddmt

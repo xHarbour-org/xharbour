@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6213 2008/09/07 05:24:39 peterrees Exp $
+ * $Id: ChangeLog,v 1.6214 2008/09/10 17:56:48 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-11 00:06 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/common/Makefile
+    - Removed hbfhnd.c .
+  * source/rtl/Makefile
+    - Removed mlctopos.c and mpostolc.c .
+    + Added mlcfunc.c .
+  * source/rdd/Makefile
+    + Added dbcmdx.c, fieldhb.c, dbcmdhb.c, dbcmd53.c, dblistx.prg,
+      rddinfo.c, dbupdatx.prg, dbjoinx.prg, dbsortx.prg,
+      dbstruxx.prg, dbtotalx.prg and dbstruxu.prg .
+  * source/odbc/odbc.c
+    * Changed HSTMT to SQL_SUCCESS for detect SQL header.
 
 2008-09-10 11:00 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/hbgtcore.c
