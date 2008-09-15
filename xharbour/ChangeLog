@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6214 2008/09/10 17:56:48 vouchcac Exp $
+ * $Id: ChangeLog,v 1.6215 2008/09/11 05:32:36 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-15 17:38 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * rdd\bmdbfcdx\bmdbfcdx1.c
+    * implemented DBOI_TEMPLATE and DBOI_MULTIKEY	
+  * rdd\workarea.c
+    ! fixed return value of DBI_POSITIONED over ulrecno = 0 as FALSE
+  * rtl\hbcomprs.c
+    * using item api instead of hardcode references.
 
 2008-09-11 00:06 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/common/Makefile

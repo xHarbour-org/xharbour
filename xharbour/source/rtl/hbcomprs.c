@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.13 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: hbcomprs.c,v 1.14 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /*
@@ -112,18 +112,18 @@ HB_FUNC( HB_COMPRESS )
 
    if( pSource == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_COMPRESS", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, 1, hb_paramError(1) );
       return;
    }
 
-   cSource = pSource->item.asString.value;
+   cSource = hb_itemGetCPtr( pSource ); 
    if (hb_pcount() > iFirst + 1 )
    {
       ulSrclen = (ULONG) hb_parnl( iFirst + 2 );
    }
    else
    {
-      ulSrclen = pSource->item.asString.length;
+      ulSrclen = hb_itemGetCLen( pSource ); 
    }
 
    /* Allocation mode: user provided or allocated here */
@@ -145,7 +145,7 @@ HB_FUNC( HB_COMPRESS )
       }
       if( cDest == NULL || ulBufLen < ulDstlen )
       {
-         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_COMPRESS", 1, hb_paramError(1) );
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, 1, hb_paramError(1) );
          return;
       }
    }
@@ -202,11 +202,11 @@ HB_FUNC( HB_UNCOMPRESS )
 
    if( ! ISNUM(1) || pSource == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_UNCOMPRESS", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, 1, hb_paramError(1) );
       return;
    }
 
-   cSource = pSource->item.asString.value;
+   cSource = hb_itemGetCPtr( pSource ); 
    ulDstlen = (ULONG) hb_parnl( 1 );
    if (hb_pcount() > 2 )
    {
@@ -214,7 +214,7 @@ HB_FUNC( HB_UNCOMPRESS )
    }
    else
    {
-      ulSrclen = pSource->item.asString.length;
+      ulSrclen = hb_itemGetCLen( pSource ); 
    }
 
    /* Allocation mode: user provided or allocated here */
@@ -234,7 +234,7 @@ HB_FUNC( HB_UNCOMPRESS )
       }
       if( cDest == NULL || ulBufLen < ulDstlen )
       {
-         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_UNCOMPRESS", 1, hb_paramError(1) );
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, 1, hb_paramError(1) );
          return;
       }
    }

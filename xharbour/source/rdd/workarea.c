@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.89 2008/08/26 07:44:44 marchuet Exp $
+ * $Id: workarea.c,v 1.90 2008/09/05 08:38:36 marchuet Exp $
  */
 
 /*
@@ -862,7 +862,7 @@ static ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( SELF_RECNO( pArea, &ulRecNo ) != SUCCESS )
             return FAILURE;
          if( ulRecNo == 0 )
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, FALSE );
          else if( SELF_RECCOUNT( pArea, &ulRecCount ) != SUCCESS )
             return FAILURE;
          else
@@ -1864,6 +1864,7 @@ static ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection,
          hb_itemPutNI( pItem, iResult );
          break;
       case RDDI_MEMOEXT:
+      {
          if( hb_itemType( pItem ) & HB_IT_STRING )
          {
             if( hb_set.HB_SET_MFILEEXT )
@@ -1884,6 +1885,7 @@ static ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection,
             break;
          }
          /* no break - return FAILURE */
+      }
       case RDDI_TABLEEXT:
       case RDDI_ORDBAGEXT:
       case RDDI_ORDEREXT:
