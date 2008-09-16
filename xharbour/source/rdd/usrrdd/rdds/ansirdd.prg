@@ -1,5 +1,5 @@
 /*
- * $Id: ansirdd.prg,v 1.2 2007/08/24 11:14:56 marchuet Exp $
+ * $Id: ansirdd.prg,v 1.3 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -74,8 +74,6 @@ STATIC FUNCTION ANSI_GETVALUE( nWA, nField, xValue )
 RETURN nResult
 
 STATIC FUNCTION ANSI_PUTVALUE( nWA, nField, xValue )
-
-   LOCAL nResult
 
    IF ValType( xValue ) == 'C'
       xValue := hb_AnsiToOem( xValue )

@@ -1,5 +1,5 @@
 /*
- * $Id: fieldhb.c 8473 2008-05-22 06:09:35Z vszakats $
+ * $Id: fieldhb.c,v 1.1 2008/08/18 09:36:49 marchuet Exp $
  */
 
 /*
@@ -80,6 +80,7 @@ HB_FUNC( FIELDTYPE )
 
 HB_FUNC_EXTERN( HB_FIELDFLAG );
 
+#ifdef HB_COMPAT_FOXPRO
 HB_FUNC( FIELDFLAG )
 {
    HB_FUNC_EXEC( HB_FIELDFLAG )
@@ -91,3 +92,4 @@ HB_FUNC( FIELDSTEP )
 {
    HB_FUNC_EXEC( HB_FIELDSTEP )
 }
+#endif

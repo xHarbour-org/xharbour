@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.15 2008/04/09 21:38:40 marchuet Exp $
+ * $Id: adordd.prg,v 1.16 2008/08/26 07:44:44 marchuet Exp $
  */
 
 /*
@@ -120,7 +120,11 @@
 
 ANNOUNCE ADORDD
 
-static bError, s_cTableName, s_cEngine, s_cServer, s_cUserName, s_cPassword, s_cQuery := ""
+static s_cTableName, s_cEngine, s_cServer, s_cUserName, s_cPassword, s_cQuery := ""
+
+#ifndef __XHARBOUR__
+static bError
+#endif
 
 #ifdef __XHARBOUR__
 
@@ -1205,6 +1209,8 @@ STATIC FUNCTION ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
    LOCAL n
    LOCAL lRet := FAILURE
    LOCAL aRData := USRRDD_RDDDATA( nRDD )
+   
+   HB_SYMBOL_UNUSED( ulConnect )
 
    IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
       TRY
@@ -1227,6 +1233,8 @@ STATIC FUNCTION ADO_DROP( nRdd, cTable, cIndex, ulConnect )
    LOCAL n
    LOCAL lRet := FAILURE
    LOCAL aRData := USRRDD_RDDDATA( nRDD )
+   
+   HB_SYMBOL_UNUSED( ulConnect )
 
    IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
       TRY

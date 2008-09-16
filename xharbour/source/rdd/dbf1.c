@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.192 2008/08/26 07:44:43 marchuet Exp $
+ * $Id: dbf1.c,v 1.193 2008/09/05 08:38:35 marchuet Exp $
  */
 
 /*
@@ -221,7 +221,6 @@ static HB_LONG hb_dbfGetRowVer( DBFAREAP pArea, USHORT uiField, HB_LONG * pValue
    return SUCCESS;
 }
 
-#ifdef HB_COMPAT_FOXPRO
 static HB_LONG hb_dbfGetNextValue( DBFAREAP pArea, USHORT uiField )
 {
    HB_LONG nValue = 0;
@@ -261,7 +260,6 @@ static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNext
 
    return nPreviousValue;
 }
-#endif
 
 static void hb_dbfUpdateStampFields( DBFAREAP pArea )
 {

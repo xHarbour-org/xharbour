@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $
+ * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -324,7 +324,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.7 2008/05/05 05:05:41 andijahja Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"
@@ -360,6 +360,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
       pszEnv = hb_getenv( "C_USR" );
       if( pszEnv )
       {
+         fprintf( fout, "\n#undef  HB_VER_C_USR" );
          fprintf( fout, "\n#define HB_VER_C_USR\t\"%s\"\n", pszEnv );
          hb_xfree( pszEnv );
       }
@@ -374,6 +375,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
       pszEnv = hb_getenv( "PRG_USR" );
       if( pszEnv )
       {
+         fprintf( fout, "\n#undef  HB_VER_PRG_USR" );
          fprintf( fout, "\n#define HB_VER_PRG_USR\t\"%s\"\n", pszEnv );
          hb_xfree( pszEnv );
       }

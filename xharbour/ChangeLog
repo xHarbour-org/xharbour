@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6216 2008/09/15 15:46:43 marchuet Exp $
+ * $Id: ChangeLog,v 1.6217 2008/09/16 07:40:00 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-09-16 12:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\dbf1.c
+    * now can be able to disable FOXPRO compatibility rdd at hbsetup.ch
+      I'm planning to do the same for other features.
+  * source\pp\ppgen.c
+  * source\rdd\fieldhb.c
+  * source\rdd\usrrdd\rdds\adordd.prg
+  * source\rdd\usrrdd\rdds\ansirdd.prg
+    * cleanning warnnings
+
 2008-09-16 09:38 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * rdd\bmdbfcdx\bmdbfcdx1.c
     * removed some warnnings
-
 
 2008-09-15 17:38 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * rdd\bmdbfcdx\bmdbfcdx1.c
