@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.46 2008/09/05 08:38:35 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.47 2008/09/15 15:46:47 marchuet Exp $
  */
 
 /*
@@ -8880,11 +8880,11 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
         if( hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL &&
             hb_itemGetL( pInfo->itmNewVal ) )
         {
-           if( hb_cdxIndexLockWrite( pTag ) )
+           if( hb_cdxIndexLockWrite( pTag->pIndex ) )
            {
               if( pTag->Custom && !pTag->Template )
                  pTag->Template = TRUE;
-              hb_cdxIndexUnLockWrite( pTag );
+              hb_cdxIndexUnLockWrite( pTag->pIndex );
            }
         }
         hb_itemPutL( pInfo->itmResult, pTag->Template );
@@ -8893,11 +8893,11 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
       case DBOI_MULTIKEY:
         if( hb_itemGetL( pInfo->itmNewVal ) )
         {
-           if( hb_cdxIndexLockWrite( pTag ) )
+           if( hb_cdxIndexLockWrite( pTag->pIndex ) )
            {
               if( pTag->Custom && !pTag->MultiKey )
                  pTag->MultiKey = TRUE;
-              hb_cdxIndexUnLockWrite( pTag );
+              hb_cdxIndexUnLockWrite( pTag->pIndex );
            }
         }
         hb_itemPutL( pInfo->itmResult, pTag->MultiKey );
