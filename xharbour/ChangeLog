@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6217 2008/09/16 07:40:00 marchuet Exp $
+ * $Id: ChangeLog,v 1.6218 2008/09/16 10:10:03 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-09-18 10:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+    ! fixed generacion error when legth of key is greater than 256 as Clipper.
+      instead of wait for internal error.
 
 2008-09-16 12:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rdd\dbf1.c
