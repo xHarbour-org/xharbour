@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.159 2008/07/25 11:15:09 jfgimenez Exp $
+ * $Id: win32ole.prg,v 1.160 2008/08/14 09:04:21 andijahja Exp $
  */
 
 /*
@@ -68,9 +68,9 @@
 
 //----------------------------------------------------------------------------//
 
-FUNCTION CreateObject( cString )
+FUNCTION CreateObject( cString, cLicense )
 
-RETURN TOleAuto():New( cString )
+RETURN TOleAuto():New( cString, , cLicense )
 
 //----------------------------------------------------------------------------//
 FUNCTION GetActiveObject( cString )
@@ -292,7 +292,7 @@ CLASS TOleAuto
 ENDCLASS
 
 //--------------------------------------------------------------------
-METHOD New( uObj, cClass ) CLASS TOleAuto
+METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
 
    LOCAL oErr
 
@@ -302,7 +302,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
    ENDIF
 
    IF ValType( uObj ) = 'C'
-      ::hObj := CreateOleObject( uObj )
+      ::hObj := CreateOleObject( uObj, ,cLicense )
 
       IF OleError() != 0
          IF Ole2TxtError() == "DISP_E_EXCEPTION"
@@ -2079,7 +2079,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+  HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] [, cLicense] )
   {
      BSTR bstrClassID;
      IID ClassID, iid;
@@ -2104,11 +2104,11 @@ RETURN Self
 
      //TraceLog( NULL, "Result: %p\n", s_nOleError );
 
-     if( hb_pcount() == 2 )
+     if( ISCHAR(2) )
      {
         if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           bstrClassID = hb_oleAnsiToSysString( hb_parcx( 2 ) );
+           bstrClassID = hb_oleAnsiToSysString( hb_parc( 2 ) );
            s_nOleError = CLSIDFromString( bstrClassID, &iid );
            SysFreeString( bstrClassID );
         }
@@ -2122,9 +2122,28 @@ RETURN Self
 
      if( SUCCEEDED( s_nOleError ) )
      {
-        //TraceLog( NULL, "Class: %i\n", ClassID );
-        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
-        //TraceLog( NULL, "Result: %p\n", s_nOleError );
+        if( ISCHAR(3) )
+        {
+           IClassFactory2 *pCF;
+
+           s_nOleError = CoGetClassObject( (REFCLSID) &ClassID, CLSCTX_SERVER, NULL, (LPIID) &IID_IClassFactory2, (LPVOID *) &pCF );
+
+           if( SUCCEEDED( s_nOleError ) )
+           {
+              BSTR bstrLic = hb_oleAnsiToSysString( hb_parc(3) );
+
+              s_nOleError = pCF->lpVtbl->CreateInstanceLic( pCF, NULL, NULL, riid, bstrLic, &pDisp );
+
+              SysFreeString( bstrLic );
+              pCF->lpVtbl->Release( pCF );
+           }
+        }
+        else
+        {
+           //TraceLog( NULL, "Class: %i\n", ClassID );
+           s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
+           //TraceLog( NULL, "Result: %p\n", s_nOleError );
+        }
      }
 
      hb_retnl( ( LONG ) pDisp );

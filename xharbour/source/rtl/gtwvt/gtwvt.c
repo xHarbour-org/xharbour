@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.179 2008/07/04 04:14:22 peterrees Exp $
+ * $Id: gtwvt.c,v 1.180 2008/08/14 09:04:23 andijahja Exp $
  */
 
 /*
@@ -84,6 +84,7 @@
 
 #define HB_OS_WIN_32_USED
 
+#include "hbstack.h"
 #include "gtwvt.h"
 
 static int           s_GtId;
@@ -241,7 +242,7 @@ static int hb_gt_wvt_FireEvent( PHB_GTWVT pWVT, int nEvent )
 {
    int nResult = 0; /* Unhandled */
 
-   if( pWVT->pGT->pNotifierBlock )
+   if( hb_stack_ready && pWVT->pGT->pNotifierBlock )
    {
       if( hb_vmRequestReenter() )
       {

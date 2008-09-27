@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.224 2008/08/29 03:00:59 ronpinkas Exp $
+ * $Id: classes.c,v 1.225 2008/08/29 03:54:50 ronpinkas Exp $
  */
 
 /*
@@ -4516,7 +4516,7 @@ void hb_clsFinalize( PHB_ITEM pObject )
 
             if( s_AllowDestructors /* && hb_stack_ready */ )
             {
-               if( hb_stackBaseItem()->type != HB_IT_SYMBOL || ( hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) ) )
+               if( HB_IS_SYMBOL( hb_stackBaseItem() ) && hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
                {
                   // To DISABLE GC here where no refernce to this object will cause GPF for double release!
                   BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
