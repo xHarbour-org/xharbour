@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.160 2008/08/14 09:04:21 andijahja Exp $
+ * $Id: win32ole.prg,v 1.161 2008/09/27 04:10:57 ronpinkas Exp $
  */
 
 /*
@@ -1432,12 +1432,14 @@ RETURN Self
 
                  case VT_BYREF | VT_DATE:
                    hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
-                   pItem->item.asDate.time++;
+                   if( pItem->item.asDate.time )
+                      pItem->item.asDate.time++;
                    break;
 
                  case VT_DATE:
                    hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
-                   pItem->item.asDate.time++;
+                   if( pItem->item.asDate.time )
+                      pItem->item.asDate.time++;
                    break;
 
                  case VT_BYREF | VT_EMPTY:
@@ -1850,12 +1852,14 @@ RETURN Self
 
         case VT_DATE | VT_BYREF:
            hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
-           pItem->item.asDate.time++;
+           if( pItem->item.asDate.time )
+              pItem->item.asDate.time++;
            break;
 
         case VT_DATE:
            hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
-           pItem->item.asDate.time++;
+           if( pItem->item.asDate.time )
+              pItem->item.asDate.time++;
            break;
 
         case VT_EMPTY | VT_BYREF:
