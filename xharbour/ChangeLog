@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6220 2008/09/27 04:10:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6221 2008/10/02 18:02:10 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-02 15:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+   * contrib/rddads/adsmgmnt.c
+     ! ADSMGGETWORKERTHREADACTIVITY() and ADSMGGETUSERNAMES() 
+       that was skipping first user. Borrowed from harbour.
+
 
 2008-10-02 20:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg

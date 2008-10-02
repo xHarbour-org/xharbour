@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c 8551 2008-05-31 13:43:44Z vszakats $
+ * $Id: adsmgmnt.c,v 1.21 2008/06/03 23:12:56 kaddath Exp $
  */
 
 /*
@@ -385,22 +385,22 @@ HB_FUNC( ADSMGGETUSERNAMES )
          PHB_ITEM pArrayItm = hb_arrayGetItemPtr( pArray, ulCount );
          hb_arrayNew( pArrayItm, 6 );
 
-         hb_arraySetC(  pArrayItm, 1, ( char * ) pastUserInfo[ ulCount ].aucUserName );
-         hb_arraySetNL( pArrayItm, 2,            pastUserInfo[ ulCount ].usConnNumber );
+         hb_arraySetC(  pArrayItm, 1, ( char * ) pastUserInfo[ ulCount - 1 ].aucUserName );
+         hb_arraySetNL( pArrayItm, 2,            pastUserInfo[ ulCount - 1 ].usConnNumber );
 #if ADS_LIB_VERSION >= 600
-         hb_arraySetC(  pArrayItm, 3, ( char * ) pastUserInfo[ ulCount ].aucAddress );
+         hb_arraySetC(  pArrayItm, 3, ( char * ) pastUserInfo[ ulCount - 1 ].aucAddress );
 #else
          hb_arraySetC(  pArrayItm, 3, NULL );
 #endif
 #if ADS_LIB_VERSION >= 800
-         hb_arraySetC(  pArrayItm, 4, ( char * ) pastUserInfo[ ulCount ].aucAuthUserName );
-         hb_arraySetC(  pArrayItm, 5, ( char * ) pastUserInfo[ ulCount ].aucOSUserLoginName );
+         hb_arraySetC(  pArrayItm, 4, ( char * ) pastUserInfo[ ulCount - 1 ].aucAuthUserName );
+         hb_arraySetC(  pArrayItm, 5, ( char * ) pastUserInfo[ ulCount - 1 ].aucOSUserLoginName );
 #else
          hb_arraySetC(  pArrayItm, 4, NULL );
          hb_arraySetC(  pArrayItm, 5, NULL );
 #endif
 #if ADS_LIB_VERSION >= 810
-         hb_arraySetC(  pArrayItm, 6, ( char * ) pastUserInfo[ ulCount ].aucTSAddress );
+         hb_arraySetC(  pArrayItm, 6, ( char * ) pastUserInfo[ ulCount - 1 ].aucTSAddress );
 #else
          hb_arraySetC(  pArrayItm, 6, NULL );
 #endif
@@ -634,13 +634,13 @@ HB_FUNC( ADSMGGETWORKERTHREADACTIVITY )
          PHB_ITEM pArrayItm = hb_arrayGetItemPtr( pArray, ulCount );
          hb_arrayNew( pArrayItm, 6 );
 
-         hb_arraySetNL( pArrayItm, 1,            astWorkerThreadActivity[ ulCount ].ulThreadNumber );
-         hb_arraySetNI( pArrayItm, 2,            astWorkerThreadActivity[ ulCount ].usOpCode );
-         hb_arraySetC(  pArrayItm, 3, ( char * ) astWorkerThreadActivity[ ulCount ].aucUserName );
-         hb_arraySetNI( pArrayItm, 4,            astWorkerThreadActivity[ ulCount ].usConnNumber );
-         hb_arraySetNI( pArrayItm, 5,            astWorkerThreadActivity[ ulCount ].usReserved1 );
+         hb_arraySetNL( pArrayItm, 1,            astWorkerThreadActivity[ ulCount - 1 ].ulThreadNumber );
+         hb_arraySetNI( pArrayItm, 2,            astWorkerThreadActivity[ ulCount - 1 ].usOpCode );
+         hb_arraySetC(  pArrayItm, 3, ( char * ) astWorkerThreadActivity[ ulCount - 1 ].aucUserName );
+         hb_arraySetNI( pArrayItm, 4,            astWorkerThreadActivity[ ulCount - 1 ].usConnNumber );
+         hb_arraySetNI( pArrayItm, 5,            astWorkerThreadActivity[ ulCount - 1 ].usReserved1 );
 #if ADS_LIB_VERSION >= 800
-         hb_arraySetC(  pArrayItm, 6, ( char * ) astWorkerThreadActivity[ ulCount ].aucOSUserLoginName );
+         hb_arraySetC(  pArrayItm, 6, ( char * ) astWorkerThreadActivity[ ulCount - 1 ].aucOSUserLoginName );
 #else
          hb_arraySetC(  pArrayItm, 6, NULL );
 #endif
