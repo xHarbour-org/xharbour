@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6221 2008/10/02 18:02:10 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6222 2008/10/02 18:30:03 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-10-26 23:51 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * makefile.vc
+    + Restored %LFLAGS% support to DLLFLAGS
+
+  * source\compiler\genc.c
+    * Fixed support for GLOBALs in dlls.
+
 2008-10-02 15:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * contrib/rddads/adsmgmnt.c
-     ! ADSMGGETWORKERTHREADACTIVITY() and ADSMGGETUSERNAMES() 
+     ! ADSMGGETWORKERTHREADACTIVITY() and ADSMGGETUSERNAMES()
        that was skipping first user. Borrowed from harbour.
-
 
 2008-10-02 20:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.169 2008/05/21 06:04:11 andijahja Exp $
+ * $Id: genc.c,v 1.170 2008/08/14 09:04:14 andijahja Exp $
  */
 
 /*
@@ -1587,11 +1587,11 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
       {
          if( pGlobal->szAlias == NULL )
          {
-            fprintf( yyc, "HB_ITEM_NEW( %s );\n", pGlobal->szName );
+            fprintf( yyc, "HB_EXPORT HB_ITEM_NEW( %s );\n", pGlobal->szName );
          }
          else
          {
-            fprintf( yyc, "extern HB_ITEM %s;\n", pGlobal->szName );
+            fprintf( yyc, "extern HB_IMPORT HB_ITEM %s;\n", pGlobal->szName );
          }
 
          pGlobal = pGlobal->pNext;

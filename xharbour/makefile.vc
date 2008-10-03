@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.225 2008/07/01 03:30:45 ronpinkas Exp $
+# $Id: makefile.vc,v 1.226 2008/07/30 11:29:08 marchuet Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -324,6 +324,7 @@ DLLFLAGS=\
 	/LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:WINDOWS\
 	/OPT:WIN98\
+	$(LFLAGS)\
 	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
 
 EXEFLAGS=\
