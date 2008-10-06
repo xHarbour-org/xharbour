@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h 8467 2008-05-21 11:45:42Z vszakats $
+ * $Id: rddads.h,v 1.20 2008/06/03 23:12:56 kaddath Exp $
  */
 
 /*
@@ -218,7 +218,7 @@ typedef ADSAREA * ADSAREAP;
 
 #define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
 
-#if ADS_LIB_VERSION >= 600 && defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN_32 )
 #  define ADS_USE_OEM_TRANSLATION
 #else
 #  undef ADS_USE_OEM_TRANSLATION
