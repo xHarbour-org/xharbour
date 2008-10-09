@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.35 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: eval.c,v 1.36 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -429,24 +429,24 @@ HB_EXPORT PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
  */
 
 /* undocumented Clipper _cEval0() */
-void hb_evalBlock0( PHB_ITEM pCodeBlock )
+HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock )
 {
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pCodeBlock );
-   hb_vmFunction( 0 );
+   hb_vmSend( 0 );
 }
 
 /* undocumented Clipper _cEval1() */
-void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
+HB_EXPORT void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
 {
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pCodeBlock );
    hb_vmPush( pParam );
-   hb_vmFunction( 1 );
+   hb_vmSend( 1 );
 }
 
 /* same functionality but with a NULL terminated list of parameters */
-void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
+HB_EXPORT void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 {
    va_list args;
    UINT uiParams = 0;
@@ -463,7 +463,7 @@ void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
    }
    va_end( args );
 
-   hb_vmFunction( ( USHORT ) uiParams );
+   hb_vmSend( ( USHORT ) uiParams );
 }
 
 /**********************************************************

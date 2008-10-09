@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.22 2008/09/06 06:20:55 andijahja Exp $
+# $Id: compile.mak,v 1.23 2008/09/06 11:46:46 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -469,8 +469,11 @@ $(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainstd.c
 $(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainwin.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)maindlle$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindlle.c
+        $(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
-	$(CC_CMD)
+        $(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)memvars$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
 	$(CC_CMD)

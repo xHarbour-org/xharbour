@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.42 2008/09/03 15:49:37 modalsist Exp $
+ * $Id: achoice.prg,v 1.43 2008/09/03 16:04:24 modalsist Exp $
  */
 
 /*
@@ -247,8 +247,8 @@ LOCAL nPage := ::nSize + 1
    nUserMode := AC_NOITEM     // Something different to AC_IDLE
 
    // Main loop
-   
-   DO WHILE nMode > AC_ABORT   
+
+   DO WHILE nMode > AC_ABORT
 
       // Refresh?
       IF nMode == AC_REDRAW
@@ -295,7 +295,7 @@ LOCAL nPage := ::nSize + 1
 
          // Key was processed
          nUserMode := AC_NO_USER_FUNCTION
-          
+
          nMode := AC_GOTO
          nKey := 0
 
@@ -627,30 +627,31 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
          HB_MACRO_PTR pMacro;
 
          pMacro = hb_macroCompile( pSelect->item.asString.value );
+
          if( pMacro )
          {
             hb_macroRun( pMacro );
             hb_macroDelete( pMacro );
             pSelect = hb_stackItemFromTop( -1 );
+
             if( pSelect && HB_IS_LOGICAL( pSelect ) )
             {
                bResult = pSelect->item.asLogical.value;
             }
+
             hb_stackPop();
          }
       }
       else if( HB_IS_BLOCK( pSelect ) )
       {
-         PHB_ITEM pDataItem;
+         PHB_ITEM pData = hb_arrayGetItemPtr( pData, uiItem );
+         PHB_ITEM pIndex = hb_itemPutNI( NULL, uiItem );
 
-         hb_vmPushSymbol( &hb_symEval );
-         hb_vmPush( pSelect );
-         pDataItem = hb_itemArrayGet( pData, uiItem );
-         hb_vmPush( pDataItem );
-         hb_itemRelease( pDataItem );
-         hb_vmPushInteger( uiItem );
-         hb_vmDo( 2 );
+         hb_evalBlock( pSelect, pData, pIndex, NULL );
          pSelect = hb_param( -1, HB_IT_ANY );
+
+         hb_itemRelease( pIndex );
+
          if( pSelect && HB_IS_LOGICAL( pSelect ) )
          {
             bResult = pSelect->item.asLogical.value;

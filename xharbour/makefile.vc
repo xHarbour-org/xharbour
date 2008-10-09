@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.226 2008/07/30 11:29:08 marchuet Exp $
+# $Id: makefile.vc,v 1.227 2008/10/03 03:21:56 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -317,6 +317,8 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 INCLUDE_DIR =include
 
 DLLFLAGS=\
+ 	/MAP\
+	/FORCE:MULTIPLE\
 	/OUT:$(HARBOUR_DLL)\
 	/DLL\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
@@ -332,7 +334,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/OPT:WIN98 /SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo
+CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**

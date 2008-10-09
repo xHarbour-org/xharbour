@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.25 2008/04/20 07:08:45 andijahja Exp $
+ * $Id: maindllp.c,v 1.26 2008/04/22 09:17:59 andijahja Exp $
  */
 
 /*
@@ -85,14 +85,14 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
-	   hModule = GetModuleHandle( NULL );
-           pExtIsArray = hb_GetProcAddress( "_hb_extIsArray" );
-           break;
+         hModule = GetModuleHandle( NULL );
+         pExtIsArray = hb_GetProcAddress( "_hb_extIsArray" );
+         break;
 
       case DLL_PROCESS_DETACH:
-	   hModule = NULL;
-           pExtIsArray = NULL;
-           break;
+         hModule = NULL;
+         pExtIsArray = NULL;
+         break;
    }
 
    return TRUE;
@@ -157,7 +157,7 @@ HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 
    if( pProcessSymbols )
    {
-      return ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pSymbols, uiModuleSymbols, szModule, iPCodeVer );
+      return ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
    }
    /* else
     *    may we issue an error ? */

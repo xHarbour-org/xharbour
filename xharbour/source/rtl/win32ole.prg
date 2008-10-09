@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.161 2008/09/27 04:10:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.162 2008/10/02 18:00:51 jfgimenez Exp $
  */
 
 /*
@@ -1376,7 +1376,7 @@ RETURN Self
                       hb_vmPushNil();
                       hb_vmDo( 0 );
 
-                      hb_itemForwardValue( &OleAuto, &(HB_VM_STACK.Return) );
+                      hb_itemForwardValue( &OleAuto, hb_stackReturnItem() );
                    }
 
                    if( s_pSym_New && OleAuto.type )
@@ -1390,7 +1390,7 @@ RETURN Self
                       hb_vmPushLong( ( LONG ) pDisp );
                       hb_vmSend( 1 );
 
-                      hb_itemForwardValue( pItem, &(HB_VM_STACK.Return) );
+                      hb_itemForwardValue( pItem, hb_stackReturnItem() );
                    }
                    break;
 
@@ -2365,7 +2365,7 @@ RETURN Self
 
      //TraceLog( NULL, "Desc: '%s'\n", sDescription );
 
-     pReturn = hb_errRT_SubstParams( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+     pReturn = hb_errRT_SubstParams( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, hb_stackBaseItem()->item.asSymbol.value->szName );
 
      if( s_nOleError == DISP_E_EXCEPTION )
      {
@@ -2520,7 +2520,7 @@ RETURN Self
         bstrMessage = hb_oleAnsiToSysString( szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, pDispID );
         SysFreeString( bstrMessage );
-        //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %p\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
+        //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %p\n", hb_stackBaseItem()->item.asSymbol.value->szName + 1, DispID, s_nOleError );
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -2635,7 +2635,7 @@ RETURN Self
      BOOL bSetFirst = FALSE, bTryDefault = TRUE;
      PHB_ITEM *aPrgParams = GetParams( &DispParams, 0 );
 
-     //TraceLog( NULL, "Class: '%s' Message: '%s', Params: %i Arg1: %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount(), hb_parinfo(1) );
+     //TraceLog( NULL, "Class: '%s' Message: '%s', Params: %i Arg1: %i\n", hb_objGetClsName( hb_stackSelfItem() ), hb_stackBaseItem()->item.asSymbol.value->szName, hb_pcount(), hb_parinfo(1) );
 
      hb_vmPushSymbol( s_pSym_hObj->pSymbol );
      hb_vmPush( hb_stackSelfItem() );
@@ -2644,7 +2644,7 @@ RETURN Self
 
     OleGetID :
 
-     if( SUCCEEDED( OleGetID( pDisp, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, &DispID, &bSetFirst ) ) )
+     if( SUCCEEDED( OleGetID( pDisp, hb_stackBaseItem()->item.asSymbol.value->szName, &DispID, &bSetFirst ) ) )
      {
         VariantClear( &RetVal );
 
@@ -2703,20 +2703,20 @@ RETURN Self
            char *sOleClassName;
            int iClassNameLen, iMsgNameLen;
 
-           hb_itemForwardValue( pReturn, &HB_VM_STACK.Return );
+           hb_itemForwardValue( pReturn, hb_stackReturnItem() );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
            hb_vmPush( hb_stackSelfItem() );
            hb_vmSend( 0 );
 
            iClassNameLen = hb_parclen( -1 );
-           iMsgNameLen = strlen( (*HB_VM_STACK.pBase)->item.asSymbol.value->szName );
+           iMsgNameLen = strlen( hb_stackBaseItem()->item.asSymbol.value->szName );
 
            sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
 
            strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );
            sOleClassName[ iClassNameLen ] = ':';
-           strcpy( sOleClassName + iClassNameLen + 1, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+           strcpy( sOleClassName + iClassNameLen + 1, hb_stackBaseItem()->item.asSymbol.value->szName );
 
            //TraceLog( NULL, "Class: '%s'\n", sOleClassName );
 

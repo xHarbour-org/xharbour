@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6223 2008/10/03 03:21:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6224 2008/10/06 17:04:57 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,94 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-10-06 20:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
-  * contrib/rdd_ads/ads1.c
-  * contrib/rdd_ads/rddads.h
-    + added support for ADS_USE_OEM_TRANSLATION for old ads versions     
+2008-10-09 18:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/maindllh.c
+    + Added version of hb_vmProcessSymbols() which redirects to hb_vmProcessDllSymbols()
+      /*
+         The maindllh module is linked into harbour.dll and will therfore be used to
+         process the self contained RTL symbols as dynamic.
 
-2008-10-26 23:51 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+         Any PCODE Dll must also be linked against Harbour.dll (Harbour.lib)
+         and will therefore link to hb_vmProcessSymbols() of harbour.lib:maindllh.obj
+         thus processing the Dll's PCODE symbols as dynamic.
+       */
+
+  + source/vm/maindlle.c
+     + Added maindlle.c which uses a version of hb_vmProcessSymbols() which redirects to hb_vmProcessExeSymbols()
+       /*
+         The maindlle module is is now linked into dllmain.lib instead of maindllh.c
+
+         DllMain.lib should be linked into EXE applications which are staticly
+         linked to harbour.dll by means of harbour.lib.
+
+         The prg modulues of such EXE should use the native version of hb_vmProcessSymbols() in hvm.c
+         but that version is masked by the maindllh module.
+
+         Linking DllMain.lib (before Harbour.lib) resolves that problem, by linking to
+         hb_vmProcessSymbols() in the maindlle module, which then redirects to the native
+         hb_vmProcessSymbols(). This in turn processes the modules of the EXE as static symbols.
+
+         Please note that in such sample, staticly linked application, UseDll.exe, the dynamic
+         symbols (harbour.dll and optionally PrgPCode.dll) will be processed as dynmaic symbols,
+         while the application defined symbols will be processed as static, and are allowed to
+         OVERRIDE any dynamic symbol loaded from dll (symbols from staticly linked dlls are
+         loaded first).
+       */
+
+  * include/hbvm.h
+    * Updated declaration of hb_vmProcessDllSymbols()
+    + Added declaration of hb_vmProcessExeSymbols()
+  * source/vm/maindllp.c
+    * Updated call to hb_vmProcessDllSymbols()
+
+  * common.mak
+    * Link maindlle.c (instead of maindllh.c) into dllmain.lib
+
+  * compile.mak
+    + Added maindlle.c
+
   * makefile.vc
-    + Restored %LFLAGS% support to DLLFLAGS
+    + Restored %CFLAGS% support to CLIBFLAGS
+    + Added /MAP and /FORCE:MULTIPLE to DLLFLAGS
 
   * source\compiler\genc.c
     * Fixed support for GLOBALs in dlls.
+
+  * source/vm/hvm.c
+    + Added hb_vmProcessExeSymbols()
+    * Refined static and synamic symbol processing in hb_vmRegisterSymbols()
+
+  * source/vm/eval.c
+    * Exported and corrected:
+        hb_evalBlock0()
+        hb_evalBlock1()
+        hb_evalBlock()
+      to use hb_vmsend() instead of hb_vmFunction()
+      /*
+         These functions were not exported, and were not used anywhere in our sources.
+         I don't believe they should push the result on the stack, please advise otherwise.
+       */
+  * include/hbapiitm.h
+    + Added declaration:
+        extern HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock );
+        extern HB_EXPORT void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam );
+        extern HB_EXPORT void hb_evalBlock( PHB_ITEM pCodeBlock, ... );
+
+  * source/rtl/trace.c
+    * MT initialization correction
+
+  * source/rtl/achoice.prg
+  * source/rtl/win32ole.prg
+    * Corrected to not use VM internals.
+
+2008-10-06 20:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/rddads.h
+    + added support for ADS_USE_OEM_TRANSLATION for old ads versions
+
+2008-10-02 23:51 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * makefile.vc
+    + Restored %LFLAGS% support to DLLFLAGS
 
 2008-10-02 15:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * contrib/rddads/adsmgmnt.c

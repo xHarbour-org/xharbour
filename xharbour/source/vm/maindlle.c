@@ -91,7 +91,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
 
 HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   return hb_vmProcessDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
+   return hb_vmProcessExeSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
 HB_EXTERN_END
 #endif

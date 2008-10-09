@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.170 2008/08/14 09:04:14 andijahja Exp $
+ * $Id: genc.c,v 1.171 2008/10/03 03:21:56 ronpinkas Exp $
  */
 
 /*
@@ -1372,7 +1372,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          fprintf( yyc, "HB_FUNC_REGISTERGLOBAL()\n"
                        "{\n"
-                       "   hb_vmRegisterGlobals( &pGlobals, %i );\n", iGlobals );
+                       "   static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n"
+                       "\n"
+                       "   hb_vmRegisterGlobals( &ppGlobals, %i );\n", iGlobals );
          fprintf( yyc, "}\n\n" );
       }
 
@@ -1582,9 +1584,12 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
    if( hb_comp_pGlobals )
    {
       PVAR pGlobal = hb_comp_pGlobals;
+      int iGlobals = 0;
 
       while( pGlobal )
       {
+         iGlobals++;
+
          if( pGlobal->szAlias == NULL )
          {
             fprintf( yyc, "HB_EXPORT HB_ITEM_NEW( %s );\n", pGlobal->szName );
@@ -1597,20 +1602,24 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
          pGlobal = pGlobal->pNext;
       }
 
-      fprintf( yyc, "\nstatic const PHB_ITEM pConstantGlobals[] = {\n" );
-
+      fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
       pGlobal = hb_comp_pGlobals;
 
+
+      fprintf( yyc, "\nstatic void module_InitGlobalsArray( void )\n{\n" );
+
+      iGlobals = 0;
       while( pGlobal )
       {
-         fprintf( yyc, "                                             &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
+         fprintf( yyc, "   pGlobals[%i] = &%s;\n", iGlobals, pGlobal->szName );
          pGlobal = pGlobal->pNext;
+         iGlobals++;
       }
 
-      fprintf( yyc, "                                           };\n"
-                    "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n"
-                    "#undef HB_MODULE_GLOBALS\n"
-                    "#define HB_MODULE_GLOBALS pGlobals\n" );
+      fprintf( yyc, "}\n" );
+
+      fprintf( yyc, "#undef HB_MODULE_GLOBALS\n"
+                    "#define HB_MODULE_GLOBALS ( module_InitGlobalsArray(), (PHB_ITEM *) pGlobals )\n" );
    }
 }
 

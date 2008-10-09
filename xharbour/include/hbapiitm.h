@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.51 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: hbapiitm.h,v 1.52 2008/06/25 20:20:44 vouchcac Exp $
  */
 
 /*
@@ -73,6 +73,11 @@ extern HB_EXPORT BOOL       hb_evalRelease  ( PEVALINFO pEvalInfo );
 extern HB_EXPORT PHB_ITEM   hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
 extern HB_EXPORT PHB_ITEM   hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
 extern HB_EXPORT PHB_ITEM   hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... );
+
+extern HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock );
+extern HB_EXPORT void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam );
+extern HB_EXPORT void hb_evalBlock( PHB_ITEM pCodeBlock, ... );
+
 
 extern HB_EXPORT PHB_ITEM   hb_itemArrayGet ( PHB_ITEM pArray, ULONG ulIndex );
 extern HB_EXPORT PHB_ITEM   hb_itemArrayNew ( ULONG ulLen );

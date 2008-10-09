@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.63 2008/04/30 16:47:32 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.64 2008/06/25 20:20:51 vouchcac Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ extern HB_EXPORT void    hb_vmRequest( USHORT );
 #define HB_BREAK_REQUESTED      0x0002   /* break to nearest RECOVER/END sequence */
 #define HB_ENDPROC_REQUESTED    0x0004   /* immediately return from procedure (error handler in macro evaluation) */
 #define HB_REQUEST_MASK ( HB_QUIT_REQUESTED | HB_BREAK_REQUESTED | HB_ENDPROC_REQUESTED )
-#define HB_SUSPEND_QUIT         0x0100   
+#define HB_SUSPEND_QUIT         0x0100
 
 /* Public PCode functions */
 
@@ -154,7 +154,8 @@ extern HB_EXPORT void     hb_vmPushNumInt( HB_LONG lNumber ); /* pushes a number
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
 extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );
 extern HB_EXPORT void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
