@@ -1,8 +1,8 @@
 Source: xharbour
 Section: devel
 Priority: optional
-Maintainer: Luiz Rafael Culik Guimaraes <culikr at brturbo.com.br>
-Build-Depends: debhelper (>= 4.0.0), gcc-3.3, bison, libncurses5-dev, libgpmg1-dev, slang1-dev
+Maintainer: Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+Build-Depends: debhelper (>= 4.0.0),  bison, libncurses5-dev, libgpmg1-dev, libslang1-dev, gcc
 Standards-Version: 3.6.1
 
 Package: xharbour
