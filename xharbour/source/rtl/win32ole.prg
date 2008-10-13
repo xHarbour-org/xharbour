@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.162 2008/10/02 18:00:51 jfgimenez Exp $
+ * $Id: win32ole.prg,v 1.163 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -501,7 +501,7 @@ METHOD OleValueMinus( xArg ) CLASS TOleAuto
       oErr:CanSubstitute := .T.
       oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
-      oErr:Operation     := '+'
+      oErr:Operation     := '-'
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 1082
       oErr:SubSystem     := "BASE"

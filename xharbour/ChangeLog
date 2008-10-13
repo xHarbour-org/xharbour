@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6225 2008/10/09 22:53:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6226 2008/10/12 15:22:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-13 09:52 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/rtl/win32ole.prg
+    ! Fixed assignment to oErr:Operation from "+" to "-" in
+      OleValueMinus() method.
+
 2008-10-17 12:20 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
  * make_deb.sh
   debian/*
