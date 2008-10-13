@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6226 2008/10/12 15:22:42 lculik Exp $
+ * $Id: ChangeLog,v 1.6227 2008/10/13 16:53:00 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-13 13:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/include/hbtypes.ch
+    ! Added missing param to VM_PROCESS_DLL_SYMBOLS.  
+      Thanks to Przemyslaw Czerpak in helping find this bug for pcode dlls.
 
 2008-10-13 09:52 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/win32ole.prg

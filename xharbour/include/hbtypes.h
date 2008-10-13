@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.7 2007/06/18 12:25:31 ronpinkas Exp $
+ * $Id: hbtypes.h,v 1.8 2007/12/28 08:53:46 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbapiitm.h"
 
 //typedef PHB_SYMB ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pModuleSymbols, ... );
-typedef PSYMBOLS ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
+typedef PSYMBOLS ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
 typedef void ( * VM_DLL_EXECUTE ) ( const BYTE * pCode, PHB_SYMB pSymbols );
 
 typedef BOOL     ( * EXT_IS_ARRAY ) ( int iParam );
