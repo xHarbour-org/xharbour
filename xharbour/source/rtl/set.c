@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.88 2008/04/22 04:40:34 ronpinkas Exp $
+ * $Id: set.c,v 1.89 2008/10/16 09:47:04 patrickmast Exp $
  */
 
 /*
@@ -2365,11 +2365,6 @@ HB_EXPORT char *  hb_setGetMFileExt( void )
 HB_EXPORT BOOL    hb_setGetOptimize( void )
 {
    return hb_set.HB_SET_OPTIMIZE;
-}
-
-HB_EXPORT BOOL    hb_setGeForceOpt( void )
-{
-  return hb_set.HB_SET_FORCEOPT;
 }
 
 HB_EXPORT BOOL    hb_setGetPrinter( void )
