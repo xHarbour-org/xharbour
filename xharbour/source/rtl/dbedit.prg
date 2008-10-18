@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.51 2008/08/25 15:47:40 modalsist Exp $
+ * $Id: dbedit.prg,v 1.52 2008/08/26 20:18:20 andijahja Exp $
  */
 
 /*
@@ -520,7 +520,7 @@ RETURN .T.
 *------------------------------------------------------*
 STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, oTBR)
 *------------------------------------------------------*
-LOCAL nRet, nRec, nKey, i, j, nLastRec, lDeleted, lChanged,;
+LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,;
       nKeyNo
 
   nRet := DE_CONT

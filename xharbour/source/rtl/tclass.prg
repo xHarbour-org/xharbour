@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.29 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.30 2008/08/03 00:58:30 walito Exp $
  */
 
 /*
@@ -583,6 +583,8 @@ STATIC PROCEDURE DivertConstructorCall( ... )
    LOCAL aConstrMethods
    LOCAL lOldScope, nPos
 
+   (nScope)
+   
    IF __SetClassAutoInit() //.AND. PCount() > 0
       // Set class scoping off
       lOldScope := __SetClassScope( .F. )

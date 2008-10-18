@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.87 2008/03/18 01:03:27 likewolf Exp $
+/* $Id: teditor.prg,v 1.88 2008/08/28 03:39:17 peterrees Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.87 2008/03/18 01:03:27 likewolf Exp $
+/* $Id: teditor.prg,v 1.88 2008/08/28 03:39:17 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -158,8 +158,8 @@ CLASS HBEditor
    // Class DATA can be faster, but since the user can change directly
    // READINSERT(), ::lInsert must check in it.
    // DATA  lInsert        INIT .F.              // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
-   METHOD lInsert()              BLOCK { | Self | Set( _SET_INSERT ) }
-   METHOD _lInsert( lInsert )    BLOCK { | Self, lInsert | IF( ISLOGICAL( lInsert ), Set( _SET_INSERT, lInsert ), Set( _SET_INSERT ) ) }
+   METHOD lInsert()              BLOCK { | | Set( _SET_INSERT ) }
+   METHOD _lInsert( lInsert )    BLOCK { | /*Self*/, lInsert | IF( ISLOGICAL( lInsert ), Set( _SET_INSERT, lInsert ), Set( _SET_INSERT ) ) }
 
    METHOD  New( cString, nTop, nLeft, nBottom,;             // Converts a string to an array of strings splitting input string at EOL boundaries
                nRight, lEditMode, nLineLength, nTabSize, nTextRow, nTextCol, nWndRow, nWndCol )
@@ -2249,7 +2249,7 @@ RETURN Self
 //
 //-------------------------------------------------------------------//
 
-METHOD KeyboardHook( nKey )  CLASS HBEditor
+METHOD KeyboardHook( /*nKey*/ )  CLASS HBEditor
 
 return Self
 

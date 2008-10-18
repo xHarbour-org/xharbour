@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6229 2008/10/16 09:50:15 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6230 2008/10/18 06:35:07 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2008-10-18 12:36 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * make_vc.bat
+    + Added auto detection of Visual Studio and Bison, so that in most cases
+      one could use make_vc withOUT having to set any Env Var.
+      If you use one of the free Express Editions, please ADD the respective
+      auto detection sections. 
+
+  * makefile.vc
+    - Removed all unsupported flags
+    + Added support for C Compiler Folder with spaces
+ 
+  * contrib/gtwvg/wvtcore.c
+    * MSVC compilation
+
+  * source/rtl/achoice.prg
+    * Corrected careless typo I introduced in last commit
+ 
+  * source/rdd/usrrdd/rdds/arrayrdd.prg
+  * source/rdd/usrrdd/rdds/fcomma.prg
+  * source/rtl/dbedit.prg
+  * source/rtl/getsys.prg
+  * source/rtl/hblog.prg
+  * source/rtl/hblognet.prg
+  * source/rtl/pushbtn.prg
+  * source/rtl/tbrowse.prg
+  * source/rtl/tclass.prg
+  * source/rtl/teditor.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/tobject.prg
+  * source/rtl/tscalar.prg
+  * source/rtl/ttable.prg
+  * source/rtl/txml.prg
+  * source/rtl/win32ole.prg
+  * source/tip/thtml.prg
+  * source/vm/debug.c
+    * Corrected compilation warnings
 
 2008-10-18 08:33 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source\rtl\set.c

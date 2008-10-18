@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.203 2008/08/25 15:47:40 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.204 2008/08/26 20:18:20 andijahja Exp $
  */
 
 /*
@@ -3097,7 +3097,7 @@ METHOD SetMoveBlock( nType, bBlock ) CLASS TBrowse
 Local b := bBlock
 
   if ! hb_IsBlock(bBlock) .and. nType=2  // Skipblock
-     b := {|i|0}
+     b := {|| 0}
   else
      b := bBlock  // GoTopBlock or GoBottomBlock
   endif
@@ -3250,24 +3250,24 @@ METHOD InitKeys( o ) CLASS TBrowse
 *---------------------------------------------------*
 
    Default o:aKeys to {;
-              { K_DOWN,        {| oB, nKey | oB:Down()    , 0 } } ,;
-              { K_END,         {| oB, nKey | oB:End()     , 0 } } ,;
-              { K_CTRL_PGDN,   {| oB, nKey | oB:GoBottom(), 0 } } ,;
-              { K_CTRL_PGUP,   {| oB, nKey | oB:GoTop()   , 0 } } ,;
-              { K_HOME,        {| oB, nKey | oB:Home()    , 0 } } ,;
-              { K_LEFT,        {| oB, nKey | oB:Left()    , 0 } } ,;
-              { K_PGDN,        {| oB, nKey | oB:PageDown(), 0 } } ,;
-              { K_PGUP,        {| oB, nKey | oB:PageUp()  , 0 } } ,;
-              { K_CTRL_END,    {| oB, nKey | oB:PanEnd()  , 0 } } ,;
-              { K_CTRL_HOME,   {| oB, nKey | oB:PanHome() , 0 } } ,;
-              { K_CTRL_LEFT,   {| oB, nKey | oB:PanLeft() , 0 } } ,;
-              { K_CTRL_RIGHT,  {| oB, nKey | oB:PanRight(), 0 } } ,;
-              { K_RIGHT,       {| oB, nKey | oB:Right()   , 0 } } ,;
-              { K_UP,          {| oB, nKey | oB:Up()      , 0 } } ,;
-              { K_ESC,         {| oB, nKey | -1               } } ,;
-              { K_MWFORWARD,   {| oB, nKey | oB:Up()      , 0 } } ,;
-              { K_MWBACKWARD,  {| oB, nKey | oB:Down()    , 0 } } ,;
-              { K_LBUTTONDOWN, {| oB, nKey | tbmouse( ob, MRow(), MCol() ) } } }
+              { K_DOWN,        {| oB | oB:Down()    , 0 } } ,;
+              { K_END,         {| oB | oB:End()     , 0 } } ,;
+              { K_CTRL_PGDN,   {| oB | oB:GoBottom(), 0 } } ,;
+              { K_CTRL_PGUP,   {| oB | oB:GoTop()   , 0 } } ,;
+              { K_HOME,        {| oB | oB:Home()    , 0 } } ,;
+              { K_LEFT,        {| oB | oB:Left()    , 0 } } ,;
+              { K_PGDN,        {| oB | oB:PageDown(), 0 } } ,;
+              { K_PGUP,        {| oB | oB:PageUp()  , 0 } } ,;
+              { K_CTRL_END,    {| oB | oB:PanEnd()  , 0 } } ,;
+              { K_CTRL_HOME,   {| oB | oB:PanHome() , 0 } } ,;
+              { K_CTRL_LEFT,   {| oB | oB:PanLeft() , 0 } } ,;
+              { K_CTRL_RIGHT,  {| oB | oB:PanRight(), 0 } } ,;
+              { K_RIGHT,       {| oB | oB:Right()   , 0 } } ,;
+              { K_UP,          {| oB | oB:Up()      , 0 } } ,;
+              { K_ESC,         {|    | -1               } } ,;
+              { K_MWFORWARD,   {| oB | oB:Up()      , 0 } } ,;
+              { K_MWBACKWARD,  {| oB | oB:Down()    , 0 } } ,;
+              { K_LBUTTONDOWN, {| oB       | tbmouse( ob, MRow(), MCol() ) } } }
 Return o
 
 *---------------------------------------------------*

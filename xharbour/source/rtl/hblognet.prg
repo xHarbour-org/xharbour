@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.5 2003/12/11 14:44:52 jonnymind Exp $
+* $Id: hblognet.prg,v 1.6 2008/03/16 03:24:20 lculik Exp $
 */
 
 /*
@@ -239,7 +239,7 @@ METHOD New( nLevel, nPort ) CLASS HB_LogInetPort
 RETURN Self
 
 
-METHOD Open( cName ) CLASS HB_LogInetPort
+METHOD Open() CLASS HB_LogInetPort
    InetInit()
 
    ::skIn := InetServer( ::nPort )

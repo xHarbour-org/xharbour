@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.23 2008/05/07 04:58:33 andijahja Exp $
+rem $Id: make_vc.bat,v 1.24 2008/07/14 02:50:56 kaddath Exp $
 rem
 rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
@@ -11,13 +11,50 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET CC_DIR=C:\VC
-SET BISON_DIR=C:\BISON\BIN
+IF NOT '%CC_DIR%'=='' GOTO FIND_BISON
+ 
+:FIND_VC
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
+
+:SET_VC2008
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   GOTO FIND_BISON
+
+:SET_VC2005
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   GOTO FIND_BISON
+
+:SET_VC2003
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
+   GOTO FIND_BISON
+
+:SET_VC6
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\VC98
+   GOTO FIND_BISON
+
+:FIND_BISON
+   IF NOT '%BISON_DIR%'=='' GOTO READY
+   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
+   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
+
+:SET_BISON1
+   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
+   GOTO READY
+
+:SET_BISON2
+   SET BISON_DIR=\GnuWin32\Bin
+   GOTO READY 
+
+:READY
 SET SUB_DIR=vc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
-SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
+IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
+SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%PATH%
 
 rem ============================================================================
 rem The followings should never change

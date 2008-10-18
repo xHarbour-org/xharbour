@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: fcomma.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
  */
 
 /*
@@ -282,6 +282,7 @@ STATIC FUNCTION FCM_EOF( nWA, lEof )
 RETURN SUCCESS
 
 STATIC FUNCTION FCM_DELETED( nWA, lDeleted )
+   (nWA)
    lDeleted := .F.
 RETURN SUCCESS
 

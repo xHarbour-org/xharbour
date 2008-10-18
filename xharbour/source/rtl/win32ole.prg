@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.163 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.164 2008/10/13 16:53:00 kaddath Exp $
  */
 
 /*
@@ -224,8 +224,8 @@ RETURN IIF( PCount() == 1, ::Value[nIndex], ::Value[nIndex] := xValue )
 //----------------------------------------------------------------------------//
 METHOD Enumerate( nEnumOp, nIndex ) CLASS VTarrayWrapper
 
-   LOCAL oErr
-
+   (nIndex)
+   
    SWITCH nEnumOp
       CASE FOREACH_BEGIN
          RETURN ::Value
@@ -741,6 +741,8 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
    LOCAL xRet
 
+   (nIndex)
+   
    SWITCH nEnumOp
       CASE FOREACH_BEGIN
          ::pOleEnumerator := ::OleNewEnumerator()

@@ -420,7 +420,7 @@ METHOD Next() CLASS THtmlIterator
 RETURN oFound
 
 
-METHOD MatchCriteria( oNode ) CLASS THtmlIterator
+METHOD MatchCriteria( /*oNode*/ ) CLASS THtmlIterator
 RETURN .T.
 
 
@@ -451,7 +451,7 @@ METHOD MatchCriteria( oFound ) CLASS THtmlIteratorScan
 
    IF ::cValue != NIL
       xData := oFound:getAttributes()
-      IF HScan( xData, {| xKey,cValue| Lower(::cValue) == Lower(cValue) }) == 0
+      IF HScan( xData, {| /*xKey*/, cValue| Lower(::cValue) == Lower(cValue) }) == 0
          RETURN .F.
       ENDIF
    ENDIF
@@ -494,7 +494,7 @@ METHOD MatchCriteria( oFound ) CLASS THtmlIteratorRegex
    ENDIF
 
    IF ::cValue != NIL .and.;
-       hScan( oFound:getAttributes(), {| xKey ,cValue| cValue LIKE ::cValue } ) == 0
+       hScan( oFound:getAttributes(), {| /*xKey*/ ,cValue| cValue LIKE ::cValue } ) == 0
       RETURN .F.
    ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayrdd.prg,v 1.1 2006/06/13 10:31:57 fsgiudice Exp $
+ * $Id: arrayrdd.prg,v 1.2 2006/07/16 21:12:41 enricomaria Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ RETURN SUCCESS
 STATIC FUNCTION AR_CREATEFIELDS( nWA, aStruct )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL nResult   := SUCCESS
-   LOCAL oError, aFieldStruct, aField
+   LOCAL aFieldStruct, aField
 
    // Setting WA number to current WorkArea
    aWAData[ WADATA_WORKAREA ] := nWA
@@ -198,7 +198,7 @@ RETURN nResult
 STATIC FUNCTION AR_CREATE( nWA, aOpenInfo )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL hRDDData  := USRRDD_RDDDATA( USRRDD_ID( nWA ) )
-   LOCAL aField, oError, cName
+   LOCAL oError, cName
    LOCAL cFullName, aDBFData
 
    /* getting database infos from current workarea */
@@ -252,7 +252,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
    LOCAL cFullName, cName, hRDDData, aWAData, aDBFData
-   LOCAL aStruct, oError, aFieldStruct, aField, nResult, aRecInfo
+   LOCAL aStruct, oError, aFieldStruct, aField, nResult
 
    cFullName := Upper( aOpenInfo[ UR_OI_NAME ] )
 
@@ -519,7 +519,7 @@ STATIC FUNCTION AR_SKIPFILTER( nWA, nRecords )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
    LOCAL aRecInfo  := aDBFData[ DATABASE_RECINFO ]
-   LOCAL lBof, lEof, nToSkip
+   LOCAL lBof, nToSkip
    LOCAL nResult   := SUCCESS
 
    nToSkip := IIF( nRecords > 0, 1, IIF( nRecords < 0, -1, 0 ) )
@@ -655,7 +655,7 @@ STATIC FUNCTION AR_DELETED( nWA, lDeleted )
    ENDIF
 RETURN SUCCESS
 
-STATIC FUNCTION AR_APPEND( nWA, nRecords )
+STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -757,7 +757,6 @@ STATIC FUNCTION AR_ORDINFO( nWA, xMsg, xValue )
    Tracelog( "nWA, xMsg, xValue", nWA, xMsg, xValue )
 
    IF aOpenInfo[ UR_OI_READONLY ]
-
       oError := ErrorNew()
       oError:GenCode     := EG_READONLY
       oError:SubCode     := 1025 // EDBF_READONLY
@@ -765,11 +764,9 @@ STATIC FUNCTION AR_ORDINFO( nWA, xMsg, xValue )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
-
    ENDIF
 
    IF aOpenInfo[ UR_OI_SHARED ]
-
       oError := ErrorNew()
       oError:GenCode     := EG_SHARED
       oError:SubCode     := 1023 // EDBF_SHARED
@@ -777,13 +774,17 @@ STATIC FUNCTION AR_ORDINFO( nWA, xMsg, xValue )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
-
    ENDIF
 
    aWAData[ ARRAY_RECORDS ] := {}
    aWAData[ ARRAY_RECINFO ] := {}
    AR_GOTO( nWA, 0 )
    */
+   
+   (nWA)
+   (xMsg)
+   (xValue)
+   
 RETURN SUCCESS
 
 /*

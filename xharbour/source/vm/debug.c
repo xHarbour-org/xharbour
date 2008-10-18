@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.27 2007/12/08 02:31:21 ronpinkas Exp $
+ * $Id: debug.c,v 1.28 2008/04/22 04:40:41 ronpinkas Exp $
  */
 
 /*
@@ -175,7 +175,7 @@ HB_FUNC( HB_DBG_VMSTKLLIST )
    PHB_ITEM * pItem;
    PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.pCargo->stackbase;
 
-   USHORT uiLen = hb_stackLen( 1 );
+   USHORT uiLen = (USHORT) hb_stackLen( 1 );
    USHORT uiPos = 1;
 
    Return.type = HB_IT_NIL;

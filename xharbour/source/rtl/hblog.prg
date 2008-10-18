@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.22 2005/10/29 18:53:39 likewolf Exp $
+* $Id: hblog.prg,v 1.23 2008/03/13 10:49:41 likewolf Exp $
 */
 
 /*
@@ -418,7 +418,7 @@ CLASS HB_LogConsole FROM HB_LogChannel
    METHOD Open( cName )
    METHOD Close( cName )
 
-   METHOD LogOnVt( BOOL ldo )    INLINE ::lRealConsole := ldo
+   METHOD LogOnVt( ldo )    INLINE ::lRealConsole := ldo
 
 PROTECTED:
    METHOD Send( nStyle, cMessage, nPriority )
@@ -631,6 +631,7 @@ RETURN .F.
 
 METHOD Send( nType, cMessage, cName, nPrio ) CLASS HB_LogSyslog
    // Syslog does not need timestamp, nor priority
+   (nType)
 RETURN HB_SyslogMessage( ::Format( HB_LOG_ST_LEVEL, cMessage, cName, nPrio ), nPrio, ::nId )
 
 
@@ -642,8 +643,8 @@ CLASS HB_LogDebug FROM HB_LogChannel
 
    METHOD New( nLevel, nMaxLevel )
    // Nothing to do in this version
-   METHOD Open( cName )    INLINE .T.
-   METHOD Close( cName )   INLINE .T.
+   METHOD Open()    INLINE (Self), .T.
+   METHOD Close()   INLINE (Self), .T.
 PROTECTED:
    METHOD Send( nStyle, cMessage, nPriority )
 

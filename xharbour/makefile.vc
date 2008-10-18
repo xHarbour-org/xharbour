@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.227 2008/10/03 03:21:56 ronpinkas Exp $
+# $Id: makefile.vc,v 1.228 2008/10/09 22:53:43 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -66,14 +66,14 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
 INCLUDE_DIR =include
-INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I$(CC_DIR)\include
+INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 !endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
@@ -85,7 +85,7 @@ CLIBFLAGS   =$(CLIBFLAGS) -MT
 !endif
 
 LINKERFLAGS=\
-	/NOLOGO /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR) /SUBSYSTEM:CONSOLE
+	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) /SUBSYSTEM:CONSOLE
 
 !if ("$(USE_MSVCRT)"=="")
 LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
@@ -323,18 +323,18 @@ DLLFLAGS=\
 	/DLL\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/NOLOGO\
-	/LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(LIB_DIR)\
+	/LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:WINDOWS\
 	/OPT:WIN98\
 	$(LFLAGS)\
 	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
 
 EXEFLAGS=\
-	/NOLOGO /LIBPATH:$(CC_DIR)\LIB\
+	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB"\
 	/LIBPATH:$(LIB_DIR)\
 	/OPT:WIN98 /SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) -Iinclude -I$(CC_DIR)\include -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Ogt2yb1p -FD -GB -GD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -FD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
@@ -442,14 +442,14 @@ CLIBFLAGS   =$(CLIBFLAGS)
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =include
-INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(CC_DIR)\include
+INCLUDE_DIR =-I$(INCLUDE_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 !endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Ogt2yb1p -FD -GB -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
@@ -465,9 +465,9 @@ CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
 CC_CMD_ZIP  =CL\
-	/Ogt2yb1p /GA /GB /Gs /W3 /nologo /GX /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
+	/Otyb1 /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
 	/DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
-	/Fp"$(OBJ_DIR)\hbzip.pch" /YX /Fd"$(OBJ_DIR)\\"\
+	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
 	/FD /c /Fo$@ $**
 LIB_CMD     =LIB /NOLOGO /OUT:$@ $**
 

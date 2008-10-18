@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.8 2004/07/13 19:35:57 paultucker Exp $
+ * $Id: pushbtn.prg,v 1.9 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -376,7 +376,7 @@ FUNCTION _GETNUMCOL( Arg1 )
       Arg1 := ""
    ENDIF
  
-   nReturn := Ascan( aColors, { | a, b | a[ 1 ] == arg1 } )
+   nReturn := Ascan( aColors, { | a| a[ 1 ] == arg1 } )
 
    IF nReturn > 0
       RETURN aColors[ nReturn, 2 ]

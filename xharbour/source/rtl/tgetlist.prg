@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.46 2008/03/13 13:31:19 lculik Exp $
+ * $Id: tgetlist.prg,v 1.47 2008/03/18 01:03:27 likewolf Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ CLASS HBGetList
    METHOD ShowScoreBoard()
    METHOD ReadUpdated( lUpdated )
    METHOD ReadVar( cNewVarName )
-   METHOD ReadExit( lNew ) INLINE IF( ISLOGICAL(lNew), Set( _SET_EXIT, lNew ), Set( _SET_EXIT ) )
+   METHOD ReadExit( lNew ) INLINE (Self), IF( ISLOGICAL(lNew), Set( _SET_EXIT, lNew ), Set( _SET_EXIT ) )
    METHOD SetFocus()
    METHOD Updated() INLINE ::lUpdated
 

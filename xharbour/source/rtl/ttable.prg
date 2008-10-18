@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.10 2008/03/13 13:31:19 lculik Exp $
+ * $Id: ttable.prg,v 1.11 2008/03/16 03:24:20 lculik Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
       bOperation  := { | x | DBRLOCK( x ) }
       exit
    CASE NET_FILELOCK                       // 2 = File Lock...
-      bOperation := { | x | FLOCK() }
+      bOperation := { || FLOCK() }
       exit
    CASE NET_APPEND                         // 3 = Append Blank...
       xIdentifier := lReleaseLocks
@@ -1044,7 +1044,7 @@ METHOD Write( lKeepBuffer ) CLASS HBTable
    ( ::Alias )->( ORDSETFOCUS( 0 ) )
 
    FOR i := 1 TO ( ::Alias )->( FCOUNT() )
-      n := ASCAN( adata, { | a, b | a[ 1 ] == ( ::Alias )->( FIELDNAME( i ) ) } )
+      n := ASCAN( adata, { | a | a[ 1 ] == ( ::Alias )->( FIELDNAME( i ) ) } )
       ( ::Alias )->( FIELDPUT( i, adata[ n, 2 ] ) )
    NEXT
 

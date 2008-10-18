@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.1 2008/06/25 22:19:18 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.2 2008/07/01 03:30:45 ronpinkas Exp $
  */
 
 /*
@@ -80,6 +80,7 @@
 
 //-------------------------------------------------------------------//
 
+#include "hbole.h"
 #include "gtwvg.h"
 
 static void hb_wvt_DrawBoxRaised      ( HDC hdc, int iTop, int iLeft, int iBottom, int iRight );

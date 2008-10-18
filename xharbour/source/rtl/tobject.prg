@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.26 2007/04/22 22:50:38 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.27 2007/05/08 13:36:40 andresreyesh Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ CLASS HBObject
    METHOD isKindOf
 
    // ScalarObject class overrides this
-   METHOD isScalar      INLINE .F.
+   METHOD isScalar      INLINE (Self), .F.
 
    METHOD Eval          VIRTUAL
    METHOD Exec          VIRTUAL

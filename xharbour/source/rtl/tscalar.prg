@@ -1,5 +1,5 @@
 /*
- * $Id: tscalar.prg,v 1.2 2007/04/15 19:58:28 ronpinkas Exp $
+ * $Id: tscalar.prg,v 1.3 2007/05/08 13:36:40 andresreyesh Exp $
  */
 
 /*
@@ -59,7 +59,7 @@ CLASS ScalarObject
    METHOD  Copy
    MESSAGE DeepCopy     METHOD Copy
 
-   METHOD  IsScalar     INLINE .T.
+   METHOD  IsScalar     INLINE (Self), .T.
 
    METHOD  asString
    METHOD  asExpStr
@@ -116,7 +116,7 @@ CLASS Array FROM ScalarObject FUNCTION _Array
    MESSAGE Add             METHOD Append
    METHOD  AddAll
    METHOD  Append
-   METHOD  asString        INLINE ValtoPrg( HB_QSelf() )
+   METHOD  asString        INLINE (Self), ValtoPrg( HB_QSelf() )
    METHOD  At( n )         INLINE Self[ n ]
    METHOD  AtIndex( n )    INLINE Self[ n ]
    METHOD  AtPut( n, x )   INLINE Self[ n ] := x
@@ -222,7 +222,7 @@ CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
    METHOD AtIndex( nPos )          INLINE HGetValueAt( Self, nPos )
    METHOD AtPut( nPos, xValue )    INLINE HSetValueAt( Self, nPos, xValue )
    METHOD Append( xKey, xValue )   INLINE Self[ xKey ] := xValue, Self
-   METHOD AsString()               INLINE ValToPrg( HB_QSelf() )
+   METHOD AsString()               INLINE (Self), ValToPrg( HB_QSelf() )
    METHOD Collect( bCollect )
    METHOD Copy()                   INLINE hCopy( Self, Hash() )
    METHOD DeleteAt( nPos )         INLINE hDelat( Self, nPos )
@@ -294,44 +294,44 @@ RETURN nLen
 //----------------------------------------------------------------------------//
 
 CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
-   METHOD AsString() INLINE "{||...}"
+   METHOD AsString() INLINE (Self), "{||...}"
    //METHOD Exec  // Implemented at hbvm.c
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS CHARACTER FROM SCALAROBJECT FUNCTION _CHARACTER
-   METHOD AsString INLINE HB_QSelf()
+   METHOD AsString INLINE (Self), HB_QSelf()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS DATE FROM SCALAROBJECT FUNCTION _DATE
-   METHOD AsString INLINE DToc( HB_QSelf() )
+   METHOD AsString INLINE (Self), DToc( HB_QSelf() )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
-   METHOD AsString INLINE IIF( HB_QSelf(), ".T.", ".F." )
+   METHOD AsString INLINE (Self), IIF( HB_QSelf(), ".T.", ".F." )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS NIL FROM SCALAROBJECT FUNCTION _NIL
-   METHOD AsString INLINE "NIL"
+   METHOD AsString INLINE (Self), "NIL"
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS NUMERIC FROM SCALAROBJECT FUNCTION _NUMERIC
-   METHOD AsString INLINE LTrim( Str( ( HB_QSelf() ) ) )
+   METHOD AsString INLINE (Self), LTrim( Str( ( HB_QSelf() ) ) )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
-   METHOD AsString INLINE "0x" + NumToHex( HB_QSelf() )
+   METHOD AsString INLINE (Self), "0x" + NumToHex( HB_QSelf() )
    METHOD FuncName
 ENDCLASS
 

@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.12 2005/01/15 17:39:54 bdj Exp $
+ * $Id: getsys.prg,v 1.13 2005/02/11 20:54:16 guerra000 Exp $
  */
 
 /*
@@ -335,6 +335,8 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
       RETURN .T.
    ENDIF
 
+   (xDummy)
+   
    xValue := oGet:varGet()
 
    IF xValue >= xLow .AND. xValue <= xHigh
@@ -422,6 +424,8 @@ PROCEDURE TBReader( oGet, oGetList, oMenu, oGetMsg )
 PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  oGetMsg )
    LOCAL oGetList := __GetListActive()
 
+   (GetList)
+   
    IF oGetList != NIL
       IF oGet != NIL
          oGetList:oGet := oGet
@@ -436,6 +440,8 @@ PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  oGetMsg )
 FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    LOCAL oGetList := __GetListActive()
 
+   (aGetList)
+   
    IF oGetList != NIL
       RETURN oGetlist:Hittest( MouseRow, MouseCol, aMsg ) // Removed STATIC
    ENDIF

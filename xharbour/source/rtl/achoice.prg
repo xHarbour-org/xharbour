@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.43 2008/09/03 16:04:24 modalsist Exp $
+ * $Id: achoice.prg,v 1.44 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -494,7 +494,7 @@ LOCAL lValid
       ::Refresh(.f.)
       ::nArraySize := Len( ::acItems)
       ::alSelect := ARRAY( ::nItems )
-      AEVAL( ::alSelect, { |x,i| ::alSelect[ i ] := IsItemSelectable( i, ::nItems, ::uSelect, ::acItems ) } )
+      AEVAL( ::alSelect, { |/*x*/,i| ::alSelect[ i ] := IsItemSelectable( i, ::nItems, ::uSelect, ::acItems ) } )
 
       lValid := ::MoveCursor( 0, 1, 0 )
    ENDIF
@@ -644,10 +644,10 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
       }
       else if( HB_IS_BLOCK( pSelect ) )
       {
-         PHB_ITEM pData = hb_arrayGetItemPtr( pData, uiItem );
+         PHB_ITEM pItem = hb_arrayGetItemPtr( pData, uiItem );
          PHB_ITEM pIndex = hb_itemPutNI( NULL, uiItem );
 
-         hb_evalBlock( pSelect, pData, pIndex, NULL );
+         hb_evalBlock( pSelect, pItem, pIndex, NULL );
          pSelect = hb_param( -1, HB_IT_ANY );
 
          hb_itemRelease( pIndex );

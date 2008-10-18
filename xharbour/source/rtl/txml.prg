@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.10 2004/03/23 18:09:29 jonnymind Exp $
+ * $Id: txml.prg,v 1.11 2004/07/15 10:24:13 jonnymind Exp $
  */
 
 /*
@@ -242,7 +242,7 @@ METHOD Next() CLASS TXmlIterator
 
 RETURN NIL
 
-METHOD MatchCriteria( oNode ) CLASS TXmlIterator
+METHOD MatchCriteria( /*oNode*/ ) CLASS TXmlIterator
 RETURN .T.
 
 
@@ -271,7 +271,7 @@ METHOD MatchCriteria( oFound ) CLASS TXmlIteratorScan
    ENDIF
 
    IF ::cValue != NIL .and. ;
-         HScan( oFound:aAttributes, {| xKey,cValue| ::cValue == cValue}) == 0
+         HScan( oFound:aAttributes, {| /*xKey*/, cValue| ::cValue == cValue}) == 0
       RETURN .F.
    ENDIF
 
@@ -309,7 +309,7 @@ METHOD MatchCriteria( oFound ) CLASS TXmlIteratorRegex
    ENDIF
 
    IF ::cValue != NIL .and.;
-         hScan( oFound:aAttributes, {| xKey ,cValue| cValue LIKE ::cValue } ) == 0
+         hScan( oFound:aAttributes, {| /*xKey*/ ,cValue| cValue LIKE ::cValue } ) == 0
       RETURN .F.
    ENDIF
 
