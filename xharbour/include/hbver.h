@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.77 2008/05/04 20:42:39 andijahja Exp $
+ * $Id: hbver.h,v 1.78 2008/05/05 05:05:41 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 #define HB_VER_LEX "SimpLex"
 #define HB_VER_MAJOR    1       /* Major version number */
-#define HB_VER_MINOR    1       /* Minor version number */
+#define HB_VER_MINOR    2       /* Minor version number */
 #define HB_VER_REVISION 0       /* Revision number */
 
 /* TOFIX: Ideally these should be generated dynamically, until
