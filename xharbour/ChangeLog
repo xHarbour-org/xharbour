@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6230 2008/10/18 06:35:07 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6231 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2008-10-21 18:11 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
+  * include/hbver.h
+    * Changed CVS HEAD version number to 1.2.0.
 
 2008-10-18 12:36 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * make_vc.bat
