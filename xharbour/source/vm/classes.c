@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.225 2008/08/29 03:54:50 ronpinkas Exp $
+ * $Id: classes.c,v 1.226 2008/09/27 04:10:57 ronpinkas Exp $
  */
 
 /*
@@ -1719,9 +1719,11 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 
       pNewMeth->uiSprClass = uiClass  ; /* now used !! */
       pNewMeth->bClsDataInitiated = 0 ; /* reset state */
+#ifndef HB_NO_PROFILER
       pNewMeth->ulCalls = 0;
       pNewMeth->ulTime = 0;
       pNewMeth->ulRecurse = 0;
+#endif
       pNewMeth->bIsPersistent = bPersistent;
       pNewMeth->uiType = wType;
 

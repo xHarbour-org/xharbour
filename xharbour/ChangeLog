@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6232 2008/10/21 16:16:35 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6233 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-22 13:52 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\classes.h
+  * source\vm\classes.c
+  * source\vm\dynsym.c
+    - ulCalls and others are removed #ifndef HB_NO_PROFILER
+      thks to Enrico Maria Giordano
 
 2008-10-22 10:30 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\thread.h

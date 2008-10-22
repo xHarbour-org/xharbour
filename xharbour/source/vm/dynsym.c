@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.57 2008/03/27 10:26:43 likewolf Exp $
+ * $Id: dynsym.c,v 1.58 2008/10/22 08:33:09 marchuet Exp $
  */
 
 /*
@@ -214,9 +214,11 @@ HB_EXPORT PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    pDynSym->hMemvar        = 0;
    pDynSym->hArea          = 0;
+#ifndef HB_NO_PROFILER
    pDynSym->ulCalls        = 0; /* profiler support */
    pDynSym->ulTime         = 0; /* profiler support */
    pDynSym->ulRecurse      = 0;
+#endif
 
 #if 0
    /* now the compiler creates separate symbols for functions and
@@ -988,7 +990,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
    hb_reta( 2 );
    hb_stornl( 0, -1, 1 );
    hb_stornl( 0, -1, 2 );
-
+#ifndef HB_NO_PROFILER
    hb_dynsymLock();
 
    if( lIndex >= 1 && lIndex <= (LONG) s_uiDynSymbols )
@@ -1001,7 +1003,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
    }
 
    hb_dynsymUnlock();
-
+#endif
 }
 
 #endif

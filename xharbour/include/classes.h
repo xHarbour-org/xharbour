@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.32 2008/06/27 06:21:48 ronpinkas Exp $
+ * $Id: classes.h,v 1.33 2008/08/29 03:00:59 ronpinkas Exp $
  */
 
 /*
@@ -96,9 +96,11 @@ typedef struct hb_class_method
    PHB_SYMB pMsgIs;
    PHB_SYMB pMsgTo;
    BYTE     bClsDataInitiated;   /* There is one value assigned at init time */
+#ifndef HB_NO_PROFILER
    ULONG    ulCalls;             /* profiler support */
    ULONG    ulTime;              /* profiler support */
    ULONG    ulRecurse;           /* profiler support */
+#endif
    BOOL     bIsPersistent;       /* persistence support */
    USHORT   uiType;              /* Type value */
    PSYMBOLS pModuleSymbols;      /* Container of the symbol table where the method was defined */
