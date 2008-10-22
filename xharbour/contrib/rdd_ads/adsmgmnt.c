@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.21 2008/06/03 23:12:56 kaddath Exp $
+ * $Id: adsmgmnt.c,v 1.22 2008/10/02 18:30:03 toninhofwi Exp $
  */
 
 /*
@@ -77,6 +77,12 @@ HB_FUNC( ADSMGDISCONNECT )
 HB_FUNC( ADSMGGETHANDLE )
 {
    hb_retnl( ( long ) s_hMgmtHandle );
+}
+
+HB_FUNC( ADSMGSETHANDLE )
+{
+   s_hMgmtHandle = hb_parnl( 1 );
+   hb_retl( TRUE );
 }
 
 HB_FUNC( ADSMGKILLUSER )
@@ -367,9 +373,7 @@ HB_FUNC( ADSMGGETUSERNAMES )
 {
    UNSIGNED16 usArrayLen = ISNUM( 2 ) ? ( UNSIGNED16 ) hb_parni( 2 ) : 2000; /* needed for array memory allocation; caller can set with 2nd arg */
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_USER_INFO );
-   ADS_MGMT_USER_INFO * pastUserInfo;
-
-   pastUserInfo = ( ADS_MGMT_USER_INFO * ) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) * usArrayLen );
+   ADS_MGMT_USER_INFO * pastUserInfo = ( ADS_MGMT_USER_INFO * ) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) * usArrayLen );
 
    if( AdsMgGetUserNames( s_hMgmtHandle,
                           ( UNSIGNED8 * ) hb_parc( 1 ) /* pucFileName */,
@@ -433,9 +437,7 @@ HB_FUNC( ADSMGGETLOCKOWNER )
 {
    UNSIGNED16 pusLockType = 0;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_USER_INFO );
-   ADS_MGMT_USER_INFO * pstUserInfo;
-
-   pstUserInfo = ( ADS_MGMT_USER_INFO * ) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) );
+   ADS_MGMT_USER_INFO * pstUserInfo = ( ADS_MGMT_USER_INFO * ) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) );
 
    if( AdsMgGetLockOwner( s_hMgmtHandle,
                           ( UNSIGNED8 * ) hb_parcx( 1 ) /* pucTableName */,
@@ -473,9 +475,7 @@ HB_FUNC( ADSMGGETOPENTABLES ) /* nMaxNumberOfFilesToReturn, cUserName, nConnecti
 {
    UNSIGNED16 usArrayLen = ISNUM( 1 ) ? ( UNSIGNED16 ) hb_parni( 1 ) : 300;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_TABLE_INFO );
-   ADS_MGMT_TABLE_INFO * astOpenTableInfo;
-
-   astOpenTableInfo = ( ADS_MGMT_TABLE_INFO * ) hb_xgrab( sizeof( ADS_MGMT_TABLE_INFO ) * usArrayLen );
+   ADS_MGMT_TABLE_INFO * astOpenTableInfo = ( ADS_MGMT_TABLE_INFO * ) hb_xgrab( sizeof( ADS_MGMT_TABLE_INFO ) * usArrayLen );
 
    if( AdsMgGetOpenTables( s_hMgmtHandle,
                            ( UNSIGNED8 * ) ( hb_parclen( 2 ) > 0 ? hb_parc( 2 ) : NULL ) /* pucUserName */,
@@ -507,9 +507,7 @@ HB_FUNC( ADSMGGETOPENTABLES2 ) /* nMaxNumberOfFilesToReturn, cUserName, nConnect
 {
    UNSIGNED16 usArrayLen = ISNUM( 1 ) ? ( UNSIGNED16 ) hb_parni( 1 ) : 300;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_TABLE_INFO );
-   ADS_MGMT_TABLE_INFO * astOpenTableInfo;
-
-   astOpenTableInfo = ( ADS_MGMT_TABLE_INFO * ) hb_xgrab( sizeof( ADS_MGMT_TABLE_INFO ) * usArrayLen );
+   ADS_MGMT_TABLE_INFO * astOpenTableInfo = ( ADS_MGMT_TABLE_INFO * ) hb_xgrab( sizeof( ADS_MGMT_TABLE_INFO ) * usArrayLen );
 
    if( AdsMgGetOpenTables( s_hMgmtHandle,
                            ( UNSIGNED8 * ) ( hb_parclen( 2 ) > 0 ? hb_parc( 2 ) : NULL ) /* pucUserName */,
@@ -547,9 +545,7 @@ HB_FUNC( ADSMGGETOPENINDEXES ) /* nMaxNumberOfFilesToReturn, cTableName, cUserNa
 {
    UNSIGNED16 usArrayLen = ISNUM( 1 ) ? ( UNSIGNED16 ) hb_parni( 1 ) : 300;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_INDEX_INFO );
-   ADS_MGMT_INDEX_INFO * astOpenIndexInfo;
-
-   astOpenIndexInfo = ( ADS_MGMT_INDEX_INFO * ) hb_xgrab( sizeof( ADS_MGMT_INDEX_INFO ) * usArrayLen );
+   ADS_MGMT_INDEX_INFO * astOpenIndexInfo = ( ADS_MGMT_INDEX_INFO * ) hb_xgrab( sizeof( ADS_MGMT_INDEX_INFO ) * usArrayLen );
 
    if( AdsMgGetOpenIndexes( s_hMgmtHandle,
                             ( UNSIGNED8 * ) ( hb_parclen( 2 ) > 0 ? hb_parc( 2 ) : NULL ) /* pucTableName */, /* fully qualified path to that table */
@@ -582,9 +578,7 @@ HB_FUNC( ADSMGGETLOCKS )
 {
    UNSIGNED16 usArrayLen = ISNUM( 1 ) ? ( UNSIGNED16 ) hb_parni( 1 ) : 2000;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_RECORD_INFO );
-   ADS_MGMT_RECORD_INFO * astRecordInfo;
-
-   astRecordInfo = ( ADS_MGMT_RECORD_INFO * ) hb_xgrab( sizeof( ADS_MGMT_RECORD_INFO ) * usArrayLen );
+   ADS_MGMT_RECORD_INFO * astRecordInfo = ( ADS_MGMT_RECORD_INFO * ) hb_xgrab( sizeof( ADS_MGMT_RECORD_INFO ) * usArrayLen );
 
    if( AdsMgGetLocks( s_hMgmtHandle,
                       ( UNSIGNED8 * ) ( hb_parclen( 2 ) > 0 ? hb_parc( 2 ) : NULL ) /* pucTableName */, /* fully qualified path to that table */
@@ -617,9 +611,7 @@ HB_FUNC( ADSMGGETWORKERTHREADACTIVITY )
 {
    UNSIGNED16 usArrayLen = ISNUM( 1 ) ? ( UNSIGNED16 ) hb_parni( 1 ) : 2000;
    UNSIGNED16 usStructSize = sizeof( ADS_MGMT_THREAD_ACTIVITY );
-   ADS_MGMT_THREAD_ACTIVITY * astWorkerThreadActivity;
-
-   astWorkerThreadActivity = ( ADS_MGMT_THREAD_ACTIVITY * ) hb_xgrab( sizeof( ADS_MGMT_THREAD_ACTIVITY ) * usArrayLen );
+   ADS_MGMT_THREAD_ACTIVITY * astWorkerThreadActivity = ( ADS_MGMT_THREAD_ACTIVITY * ) hb_xgrab( sizeof( ADS_MGMT_THREAD_ACTIVITY ) * usArrayLen );
 
    if( AdsMgGetWorkerThreadActivity( s_hMgmtHandle,
                                      astWorkerThreadActivity,

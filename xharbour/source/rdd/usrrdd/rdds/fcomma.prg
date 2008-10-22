@@ -1,5 +1,5 @@
 /*
- * $Id: fcomma.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
+ * $Id: fcomma.prg,v 1.2 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -49,8 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-
 
 /*
  * A simple RDD which uses HB_F*() functions from MISC library
@@ -329,6 +327,6 @@ FUNCTION FCOMMA_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
                             cSuperRDD, aMyFunc )
 
-INIT PROC FCOMMA_INIT()
+INIT PROCEDURE FCOMMA_INIT()
    rddRegister( "FCOMMA", RDT_FULL )
 RETURN

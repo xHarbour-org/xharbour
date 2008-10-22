@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.23 2008/09/06 11:46:46 andijahja Exp $
+# $Id: compile.mak,v 1.24 2008/10/09 22:53:43 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -719,6 +719,9 @@ $(OBJ_DIR)$(DIR_SEP)getsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)getsys.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)file$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)file.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filebuf.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filehb.c

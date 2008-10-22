@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.20 2008/06/03 23:12:56 kaddath Exp $
+ * $Id: rddads.h,v 1.21 2008/10/06 17:04:57 ptsarenko Exp $
  */
 
 /*
@@ -135,17 +135,13 @@
 
 HB_EXTERN_BEGIN
 
-
-
-
-
-
 /*
  *  ADS WORKAREA
  *  --------
  *  The Workarea Structure of Advantage Database Server RDD
  *
  */
+
 
 typedef struct _ADSAREA_
 {

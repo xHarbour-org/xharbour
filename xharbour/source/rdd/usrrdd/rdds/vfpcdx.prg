@@ -1,5 +1,5 @@
 /*
- * $Id: vfpcdx.prg,v 1.3 2007/10/31 16:20:52 marchuet Exp $
+ * $Id: vfpcdx.prg,v 1.4 2008/01/10 11:18:03 marchuet Exp $
  */
 
 /*
@@ -49,6 +49,7 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
 #include "rddsys.ch"
 #include "dbinfo.ch"
 #include "usrrdd.ch"
@@ -60,13 +61,16 @@ REQUEST DBFFPT
 ANNOUNCE VFPCDX
 
 FUNCTION VFPCDX_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
-                            "DBFCDX", {} ) /* We are inheriting from DBFCDX */
+   /* We are inheriting from DBFCDX */
+RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, "DBFCDX", {} ) 
 
-INIT PROC VFPCDX_INIT()
+INIT PROCEDURE VFPCDX_INIT()
+
    rddRegister( "VFPCDX", RDT_FULL )
+
    rddInfo( RDDI_TABLETYPE, DB_DBF_VFP, "VFPCDX" )
    rddInfo( RDDI_MEMOTYPE, DB_MEMO_FPT, "VFPCDX" )
    rddInfo( RDDI_MEMOVERSION, DB_MEMOVER_STD, "VFPCDX" )
    rddInfo( RDDI_LOCKSCHEME, DB_DBFLOCK_VFP, "VFPCDX" )
+
 RETURN

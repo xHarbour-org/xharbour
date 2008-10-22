@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.8 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbrddsdf.h,v 1.9 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ typedef struct _SDFAREA
    *  example.
    */
 
-   FHANDLE  hFile;                  /* Data file handle */
+   PHB_FILE pFile;                  /* Data file handle */
    char *   szFileName;             /* Name of data file */
    char *   szEol;                  /* EOL marker */
    USHORT   uiEolLen;               /* Size of EOL marker */

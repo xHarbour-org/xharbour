@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.29 2008/05/14 13:28:41 andijahja Exp $
+ * $Id: hbstr.c,v 1.30 2008/08/22 07:37:12 marchuet Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ HB_EXPORT char * hb_strupr( char * pszText )
    HB_TRACE(HB_TR_DEBUG, ("hb_strupr(%s)", pszText));
 
    for( pszPos = pszText; *pszPos; pszPos++ )
-      *pszPos = toupper( ( UCHAR ) *pszPos );
+      *pszPos = ( char ) toupper( ( UCHAR ) *pszPos );
 
    return pszText;
 }
@@ -137,7 +137,7 @@ HB_EXPORT char * hb_strlow( char * pszText )
    HB_TRACE(HB_TR_DEBUG, ("hb_strlow(%s)", pszText));
 
    for( pszPos = pszText; *pszPos; pszPos++ )
-      *pszPos = tolower( ( UCHAR ) *pszPos );
+      *pszPos = ( char ) tolower( ( UCHAR ) *pszPos );
 
    return pszText;
 }
@@ -189,6 +189,51 @@ HB_EXPORT ULONG hb_strnlen( const char * pszText, ULONG ulLen )
    return ul;
 }
 
+HB_EXPORT char * hb_strduptrim( const char * pszText )
+{
+   char * pszDup;
+   ULONG ulLen;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strduptrim(%s)", pszText));
+
+   while( pszText[ 0 ] == ' ' )
+   {
+      ++pszText;
+   }
+   ulLen = strlen( pszText );
+   while( ulLen && pszText[ ulLen - 1 ] == ' ' )
+   {
+      --ulLen;
+   }
+
+   pszDup = ( char * ) hb_xgrab( ulLen + 1 );
+   memcpy( pszDup, pszText, ulLen );
+   pszDup[ ulLen ] = '\0';
+
+   return pszDup;
+}
+
+HB_EXPORT ULONG hb_strlentrim( const char * pszText )
+{
+   ULONG ul = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strlentrim(%s)", pszText));
+
+   while( pszText[ 0 ] == ' ' )
+   {
+      ++pszText;
+   }
+   while( pszText[ ul] )
+   {
+      ++ul;
+   }
+   while( ul && pszText[ ul - 1 ] == ' ' )
+   {
+      --ul;
+   }
+   return ul;
+}
+
 HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
 {
    int rc = 0, c1, c2;
@@ -197,8 +242,8 @@ HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
 
    do
    {
-      c1 = toupper( (unsigned char) *s1 );
-      c2 = toupper( (unsigned char) *s2 );
+      c1 = toupper( ( unsigned char ) *s1 );
+      c2 = toupper( ( unsigned char ) *s2 );
 
       if( c1 != c2 )
       {
@@ -209,7 +254,7 @@ HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
       s1++;
       s2++;
    }
-   while ( c1 );
+   while( c1 );
 
    return rc;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.49 2008/03/13 11:12:06 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.50 2008/08/18 09:42:52 marchuet Exp $
  */
 
 /*
@@ -1157,7 +1157,6 @@ typedef RDDNODE * LPRDDNODE;
  *  ----------
  */
 /* RDD virtual machine integration functions */
-
 extern HB_EXPORT void    hb_rddShutDown( void );
 extern HB_EXPORT ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
 extern HB_EXPORT ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
@@ -1221,6 +1220,7 @@ extern HB_EXPORT ERRCODE   hb_rddTransRecords(
                               const char *szCpId,
                               PHB_ITEM pDelim );
 extern HB_EXPORT void      hb_tblStructure( AREAP pArea, PHB_ITEM pStruct, USHORT uiSize );
+extern HB_EXPORT ERRCODE   hb_rddCloseAllParentRelations( AREAP pArea );
 
 #if 0
 extern HB_EXPORT ERRCODE   hb_rddDisinherit( const char * drvName );

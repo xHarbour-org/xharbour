@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.101 2008/06/28 18:51:48 walito Exp $
+ * $Id: hbdefs.h,v 1.102 2008/08/01 09:41:14 marchuet Exp $
  */
 
 /*
@@ -62,7 +62,8 @@
 
 #include "hbsetup.h"
 
-#if defined( __XCC__ ) || (defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || defined( __MINGW32__ ) || \
+#if defined( __XCC__ ) || defined( __MINGW32__ ) || \
+    ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
     ( defined( __GNUC__ ) && \
       ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
 #  include <stdint.h>
@@ -70,6 +71,10 @@
 #   if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
 #         undef INT32_MIN
 #         define INT32_MIN ((int32_t) (-INT32_MAX-1))
+      #undef INT64_MIN
+      #define INT64_MIN (9223372036854775807i64-1)
+      #undef INT64_MAX
+      #define INT64_MAX 9223372036854775807i64
 #   endif
 #endif
 
@@ -212,6 +217,8 @@
                  require the use of HB_DONT_DEFINE_BASIC_TYPES in the first place.
                  Here SCHAR is needed using GCC on OS/2
    */
+
+   /* SCHAR is needed using GCC on OS/2 */
    #if ! defined( SCHAR )
       typedef signed char SCHAR;          /* 1 byte signed */
    #endif
@@ -270,6 +277,7 @@
          #define LONGLONG_MIN       (-LONGLONG_MAX - 1LL)
       #endif
    #endif
+
 #endif /* HB_LONG_LONG_OFF */
 
 /*
@@ -304,7 +312,7 @@
 #  endif
 #endif
 
-#if UINT_MAX == 0xffffffff
+#if UINT_MAX == 0xFFFFFFFF
 #  if !defined( UINT32 )
       typedef UINT         UINT32;
 #  endif
@@ -320,7 +328,7 @@
 #  if !defined( INT32_MIN )
 #     define INT32_MIN     INT_MIN
 #  endif
-#elif ULONG_MAX == 0xffffffff
+#elif ULONG_MAX == 0xFFFFFFFF
 #  if !defined( UINT32 )
       typedef ULONG        UINT32;
 #  endif
@@ -507,11 +515,16 @@ typedef volatile unsigned long HB_COUNTER;
 #endif
 
 #if defined( HB_WIN32_IO )
-   typedef long   FHANDLE;
+   typedef HB_PTRDIFF HB_FHANDLE;
+   typedef HB_PTRDIFF HB_NHANDLE;
+#  define hb_numToHandle( h )   ( ( HB_FHANDLE ) ( HB_NHANDLE ) ( h ) )
 #else
-   typedef int    FHANDLE;
+   typedef int HB_FHANDLE;
+   typedef int HB_NHANDLE;
+#  define hb_numToHandle( h )   ( ( int ) ( h ) )
 #endif
 
+#define FHANDLE                 HB_FHANDLE
 
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */
@@ -608,7 +621,7 @@ typedef volatile unsigned long HB_COUNTER;
 
 
 #ifndef PFLL
-#  if defined( __BORLANDC__ ) || defined( _MSC_VER )
+#  if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __MINGW32__ )
 #     define PFLL    "I64"
 #  elif defined( __LCC__ )
 #     define PFLL    "ll"
@@ -639,8 +652,8 @@ typedef volatile unsigned long HB_COUNTER;
  * IMHO need HB_ARCH_<arch> macro yet - the same OS can be used with
  * different architectures - SPARC + LINUX, ALPHA + LINUX
  */
-#if defined( HB_OS_SUNOS ) || defined( HB_OS_HPUX )
-#  if !defined( HB_STRICT_ALIGNMENT )
+#if !defined( HB_STRICT_ALIGNMENT )
+#  if defined( HB_OS_SUNOS ) || defined( HB_OS_HPUX ) || defined( _M_ARM )
 #     define HB_STRICT_ALIGNMENT
 #  endif
 #endif
@@ -738,7 +751,7 @@ typedef volatile unsigned long HB_COUNTER;
                double dbl; \
                BYTE buffer[ 8 ]; \
             } u; \
-            u.dbl = ( d ); \
+            u.dbl = ( double ) ( d ); \
             (( BYTE * )( p ))[ 7 ] = u.buffer[ 0 ]; \
             (( BYTE * )( p ))[ 6 ] = u.buffer[ 1 ]; \
             (( BYTE * )( p ))[ 5 ] = u.buffer[ 2 ]; \
@@ -754,7 +767,7 @@ typedef volatile unsigned long HB_COUNTER;
                double dbl; \
                BYTE buffer[ 8 ]; \
             } u; \
-            u.dbl = ( d ); \
+            u.dbl = ( double ) ( d ); \
             (( BYTE * )( p ))[ 0 ] = u.buffer[ 0 ]; \
             (( BYTE * )( p ))[ 1 ] = u.buffer[ 1 ]; \
             (( BYTE * )( p ))[ 2 ] = u.buffer[ 2 ]; \
@@ -1095,7 +1108,11 @@ typedef volatile unsigned long HB_COUNTER;
 #define HB_MACRO2STRING( macro )    HB_MACRO2STRING_( macro )
 #define HB_MACRO2STRING_( macro )   #macro
 
-#define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
+#if defined( __POCC__ ) || defined( __XCC__ )
+   #define HB_SYMBOL_UNUSED( symbol )  do if( symbol ) {;} while( 0 )
+#else
+   #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
+#endif
 
 /* ***********************************************************************
  * The name of starting procedure
@@ -1284,8 +1301,8 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_FUNC_STATIC( funcname )                        static HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_INIT( funcname )                          static HARBOUR HB_FUN_init_##funcname ( void )
 #define HB_FUNC_EXIT( funcname )                          static HARBOUR HB_FUN_exit_##funcname ( void )
-#define HB_FUNC_INITLINES( )                              static HARBOUR hb_INITLINES( void )
 #define HB_FUNC_INITSTATICS( )                            static HARBOUR hb_INITSTATICS( void )
+#define HB_FUNC_INITLINES( )                              static HARBOUR hb_INITLINES( void )
 #define HB_FUNC_INITGLOBALS( )                            static HARBOUR hb_INITGLOBALS( void )
 #define HB_FUNC_REGISTERGLOBAL( )                         static HARBOUR hb_REGISTERGLOBALS( void )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.98 2008/05/06 11:10:43 marchuet Exp $
+ * $Id: estack.c,v 1.99 2008/06/06 20:11:40 kaddath Exp $
  */
 
 /*
@@ -451,6 +451,12 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
    }
 
    return ( *( HB_VM_STACK.pPos + nFromTop ) );
+}
+
+#undef hb_stackRDD
+PHB_STACKRDD hb_stackRDD( void )
+{
+   return &HB_VM_STACK.rdd;
 }
 
 #undef hb_stackItemFromBase

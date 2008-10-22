@@ -1,5 +1,5 @@
 /*
- * $Id: sxsem.c,v 1.1 2007/10/31 08:30:32 marchuet Exp $
+ * $Id: sxsem.c,v 1.2 2008/09/05 08:38:36 marchuet Exp $
  */
 
 /*
@@ -97,9 +97,9 @@ static BOOL hb_sxSemName( char * szFileName )
    return fResult;
 }
 
-static FHANDLE hb_sxSemOpen( BYTE * szFileName, BOOL * pfNewFile )
+static HB_FHANDLE hb_sxSemOpen( BYTE * szFileName, BOOL * pfNewFile )
 {
-   FHANDLE hFile;
+   HB_FHANDLE hFile;
    int i = 0;
 
    do
@@ -144,7 +144,7 @@ HB_FUNC( SX_MAKESEM )
 
    if( hb_sxSemName( ( char * ) szFileName ) )
    {
-      FHANDLE hFile = hb_sxSemOpen( szFileName, &fNewFile );
+      HB_FHANDLE hFile = hb_sxSemOpen( szFileName, &fNewFile );
       if( hFile != FS_ERROR )
       {
          if( fNewFile )
@@ -180,7 +180,7 @@ HB_FUNC( SX_KILLSEM )
 
    if( hb_sxSemName( ( char * ) szFileName ) )
    {
-      FHANDLE hFile = hb_sxSemOpen( szFileName, NULL );
+      HB_FHANDLE hFile = hb_sxSemOpen( szFileName, NULL );
       if( hFile != FS_ERROR )
       {
          if( hb_fsRead( hFile, buffer, 2 ) == 2 )
@@ -202,7 +202,7 @@ HB_FUNC( SX_KILLSEM )
 HB_FUNC( SX_ISSEM )
 {
    BYTE szFileName[_POSIX_PATH_MAX + 1];
-   FHANDLE hFile = FS_ERROR;
+   HB_FHANDLE hFile = FS_ERROR;
 
    if( hb_sxSemName( ( char * ) szFileName ) )
    {

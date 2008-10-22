@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.90 2008/05/06 11:10:43 marchuet Exp $
+ * $Id: fm.c,v 1.91 2008/06/28 18:51:49 walito Exp $
  */
 
 /*
@@ -443,130 +443,122 @@ HB_FORCE_EXPORT void * hb_xgrab( ULONG ulSize )
 #else
 HB_EXPORT void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
+
+#if 0
+   /* disabled to make hb_xrealloc() ANSI-C realloc() compatible */
+   if( ! pMem )
+      hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
+
+   if( ulSize == 0 )
+      hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
+#endif
+
 #ifdef HB_FM_STATISTICS
-   PHB_MEMINFO pMemBlock;
-   ULONG ulMemSize;
 
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
-   HB_MEM_THLOCK();
-   s_lReAllocations++;
-
-   if( ! pMem )
+   if( pMem == NULL )
    {
-      HB_MEM_THUNLOCK();
-      hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
+      if( ulSize == 0 )
+         hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
+      return hb_xgrab( ulSize );
    }
-
-   if( ulSize == 0 )
+   else if( ulSize == 0 )
    {
-      HB_MEM_THUNLOCK();
-      hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
+      hb_xfree( pMem );
+      return NULL;
    }
-
-   pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
-
-   if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
+   else
    {
-      HB_MEM_THUNLOCK();
-      hb_errInternal( HB_EI_XREALLOCINV, NULL, NULL, NULL );
-   }
+      PHB_MEMINFO pMemBlock;
+      ULONG ulMemSize;
 
-   ulMemSize = pMemBlock->ulSize;
+      pMemBlock = HB_FM_PTR( pMem );
+   
+      if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
+         hb_errInternal( HB_EI_XREALLOCINV, NULL, NULL, NULL );
+   
+      ulMemSize = pMemBlock->ulSize;
+   
+      if ( HB_GET_LONG( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
+         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
 
-   if ( HB_GET_LONG( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
-   {
-      HB_MEM_THUNLOCK();
-      hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
-   }
-   HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
+      s_lReAllocations++;
+      HB_MEM_THLOCK();
 
+      HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
+   
 #ifdef HB_PARANOID_MEM_CHECK
-   pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-   if ( pMem )
-   {
-      if ( ulSize > ulMemSize )
+      pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+      if ( pMem )
       {
-         memcpy( pMem, pMemBlock, ulMemSize + HB_MEMINFO_SIZE );
-         memset( ( char * ) pMem + HB_MEMINFO_SIZE + ulMemSize, HB_MEMFILER, ulSize - ulMemSize );
+         if ( ulSize > ulMemSize )
+         {
+            memcpy( pMem, pMemBlock, ulMemSize + HB_MEMINFO_SIZE );
+            memset( ( char * ) pMem + HB_MEMINFO_SIZE + ulMemSize, HB_MEMFILER, ulSize - ulMemSize );
+         }
+         else
+            memcpy( pMem, pMemBlock, ulSize + HB_MEMINFO_SIZE );
       }
-      else
-         memcpy( pMem, pMemBlock, ulSize + HB_MEMINFO_SIZE );
-   }
-   memset( pMemBlock, HB_MEMFILER_FREED, ulMemSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-   free( pMemBlock );
+      memset( pMemBlock, HB_MEMFILER_FREED, ulMemSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+      free( pMemBlock );
 #else
-   pMem = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+      pMem = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
 #endif
+   
+      s_lMemoryConsumed += ( ulSize - ulMemSize );
+      if( s_lMemoryMaxConsumed < s_lMemoryConsumed )
+         s_lMemoryMaxConsumed = s_lMemoryConsumed;
+   
+      if( pMem )
+      {
+         ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
+         HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
+      
+         if( ( ( PHB_MEMINFO ) pMem )->pPrevBlock )
+            ( ( PHB_MEMINFO ) pMem )->pPrevBlock->pNextBlock = ( PHB_MEMINFO ) pMem;
+         if( ( ( PHB_MEMINFO ) pMem )->pNextBlock )
+            ( ( PHB_MEMINFO ) pMem )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pMem;
+      
+         if( s_pFirstBlock == pMemBlock )
+            s_pFirstBlock = ( PHB_MEMINFO ) pMem;
+         if( s_pLastBlock == pMemBlock )
+            s_pLastBlock = ( PHB_MEMINFO ) pMem;
+      }
 
-   s_lMemoryConsumed += ( ulSize - ulMemSize );
-
-   if( s_lMemoryMaxConsumed < s_lMemoryConsumed )
-   {
-      s_lMemoryMaxConsumed = s_lMemoryConsumed;
-   }
-
-   if( ! pMem )
-   {
       HB_MEM_THUNLOCK();
-      hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
+
+      if( ! pMem )
+         hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
    }
-
-   ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
-   HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
-
-   if( ( ( PHB_MEMINFO ) pMem )->pPrevBlock )
-   {
-      ( ( PHB_MEMINFO ) pMem )->pPrevBlock->pNextBlock = ( PHB_MEMINFO ) pMem;
-   }
-
-   if( ( ( PHB_MEMINFO ) pMem )->pNextBlock )
-   {
-      ( ( PHB_MEMINFO ) pMem )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pMem;
-   }
-
-   if( s_pFirstBlock == pMemBlock )
-   {
-      s_pFirstBlock = ( PHB_MEMINFO ) pMem;
-   }
-
-   if( s_pLastBlock == pMemBlock )
-   {
-      s_pLastBlock = ( PHB_MEMINFO ) pMem;
-   }
-
-   HB_MEM_THUNLOCK();
-
-   return ( char * ) pMem + HB_MEMINFO_SIZE;
-
 #else
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
-   if( ! pMem )
+   if( pMem == NULL )
    {
-      hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
+      if( ulSize == 0 )
+         hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
+      pMem = malloc( HB_ALLOC_SIZE( ulSize ) );
+   }
+   else if( ulSize == 0 )
+   {
+      free( HB_FM_PTR( pMem ) );
+      return NULL;
+   }
+   else
+   {
+      HB_MEM_THLOCK();
+      pMem = realloc( pMem, ulSize );
+      HB_MEM_THUNLOCK();
    }
 
-   if( ulSize == 0 )
-   {
-      hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
-   }
-
-   HB_MEM_THLOCK();
-
-   pMem = realloc( pMem, ulSize );
-
-   HB_MEM_THUNLOCK();
-
    if( ! pMem )
-   {
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
-   }
-
-   return pMem;
 
 #endif
+
+   return HB_MEM_PTR( pMem );
 }
 #endif
 
@@ -797,9 +789,7 @@ HB_EXPORT ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memo
 HB_EXPORT void hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
-
 }
-
 
 /* Returns pointer to string containing printable version
    of pMem memory block */
@@ -1255,7 +1245,7 @@ ULONG hb_xquery( USHORT uiMode )
 #endif
       break;
 
-   case HB_MEM_BLOCKS:       /* Harbour extension (Memory blocks used)           */
+   case HB_MEM_BLOCKS:     /* Harbour extension (Memory blocks used)            */
 #ifdef HB_FM_STATISTICS
       ulResult = s_lMemoryBlocks;
 #else

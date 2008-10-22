@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.25 2008/09/06 12:05:40 andijahja Exp $
+# $Id: common.mak,v 1.26 2008/10/09 22:53:43 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -216,6 +216,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dllcall$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)empty$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)file$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filestat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filesys$(OBJEXT)\

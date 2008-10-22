@@ -1,5 +1,5 @@
 /*
- * $Id: cphu852s.c,v 1.1 2007/11/07 23:34:26 likewolf Exp $
+ * $Id: cphu852s.c,v 1.2 2008/08/14 09:04:07 andijahja Exp $
  */
 
 /*
@@ -97,14 +97,13 @@ static HB_CODEPAGE s_codepage = { "HU852S",
 
 HB_CODEPAGE_INIT( HU852S )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_HU852S
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HU852S = hb_codepage_Init_HU852S;
    #pragma data_seg()
 #endif

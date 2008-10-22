@@ -1,5 +1,5 @@
 /*
- * $Id: cphr1250.c,v 1.6 2007/11/07 23:34:25 likewolf Exp $
+ * $Id: cphr1250.c,v 1.7 2008/08/14 09:04:06 andijahja Exp $
  */
 
 /*
@@ -94,14 +94,13 @@ static HB_CODEPAGE s_codepage = { "HR1250",
 
 HB_CODEPAGE_INIT( HR1250 )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_HR1250
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HR1250 = hb_codepage_Init_HR1250;
    #pragma data_seg()
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.41 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbrddntx.h,v 1.42 2008/07/09 16:10:33 marchuet Exp $
  */
 
 /*
@@ -257,7 +257,7 @@ typedef struct _NTXINDEX
    ULONG       NextAvail;
    ULONG       TagBlock;      /* Index attr, next free page */
    struct     _NTXAREA * Owner;
-   FHANDLE     DiskFile;
+   PHB_FILE    DiskFile;
    BOOL        fDelete;       /* delete on close flag */
    BOOL        fReadonly;
    BOOL        fShared;
@@ -302,7 +302,7 @@ typedef NTXSWAPPAGE * LPNTXSWAPPAGE;
 typedef struct
 {
    LPTAGINFO pTag;             /* current Tag */
-   FHANDLE  hTempFile;        /* handle to temporary file */
+   HB_FHANDLE hTempFile;      /* handle to temporary file */
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */
    BOOL     fUnique;          /* TRUE if index is unique */
@@ -375,9 +375,9 @@ typedef struct _NTXAREA
    *  example.
    */
 
-   FHANDLE  hDataFile;              /* Data file handle */
-   FHANDLE  hMemoFile;              /* Memo file handle */
-   FHANDLE  hMemoTmpFile;           /* Memo temporary file handle */
+   PHB_FILE pDataFile;              /* Data file handle */
+   PHB_FILE pMemoFile;              /* Memo file handle */
+   PHB_FILE pMemoTmpFile;           /* Memo temporary file handle */
    char *   szDataFileName;         /* Name of data file */
    char *   szMemoFileName;         /* Name of memo file */
    USHORT   uiHeaderLen;            /* Size of header */

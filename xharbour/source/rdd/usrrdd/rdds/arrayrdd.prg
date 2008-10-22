@@ -1,5 +1,5 @@
 /*
- * $Id: arrayrdd.prg,v 1.2 2006/07/16 21:12:41 enricomaria Exp $
+ * $Id: arrayrdd.prg,v 1.3 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -699,13 +699,16 @@ STATIC FUNCTION AR_RECID( nWA, nRecNo )
    ELSE
       nRecNo := aWAData[ WADATA_RECNO ]
    ENDIF
+
 RETURN SUCCESS
 
 STATIC FUNCTION AR_RECCOUNT( nWA, nRecords )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
+
    nRecords := Len( aRecords )
+
 RETURN SUCCESS
 
 STATIC FUNCTION AR_ZAP( nWA )
@@ -822,7 +825,7 @@ FUNCTION ARRAYRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
                             cSuperRDD, aMyFunc )
 
-INIT PROC ARRAYRDD_INIT()
+INIT PROCEDURE ARRAYRDD_INIT()
    rddRegister( "ARRAYRDD", RDT_FULL )
 RETURN
 
@@ -918,6 +921,7 @@ FUNCTION EraseArrayRdd( cFullName )
       nReturn := FAILURE
 
    ENDIF
+
 RETURN nReturn
 
 STATIC FUNCTION BlankRecord( aStruct )
@@ -928,6 +932,7 @@ STATIC FUNCTION BlankRecord( aStruct )
    FOR nField := 1 TO nLenStruct
        aRecord[ nField ] := EmptyValue( aStruct[ nField ][ DBS_TYPE ], aStruct[ nField ][ DBS_LEN ], aStruct[ nField ][ DBS_DEC ] )
    NEXT
+
 RETURN aRecord
 
 STATIC FUNCTION PutValue( xValue, cType, nLen, nDec )

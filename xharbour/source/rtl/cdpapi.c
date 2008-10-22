@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.37 2008/01/20 13:33:11 paultucker Exp $
+ * $Id: cdpapi.c,v 1.38 2008/04/05 13:28:58 likewolf Exp $
  */
 
 /*
@@ -60,6 +60,15 @@
 #   include "hbapiitm.h"
 #   include "hbapicdp.h"
 #   include "hbapierr.h"
+
+    /* Now we are using only 16bit Unicode values so the maximum size
+     * of single character encoded in UTF8 is 3 though ISO 10646 Universal
+     * Character Set (UCS) occupies even a 31-bit code space and to encode
+     * all UCS values we will need 6 bytes. Now in practice no one uses
+     * Unicode character over 0xFFFF but it may change in the future so
+     * it's safer to use macro for maximum UTF8 character size. [druzus]
+     */
+#   define HB_MAX_UTF8        3
 
 #   define NUMBER_OF_CHARS    256
 
@@ -304,8 +313,8 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
             if( !s_cdpList[iPos] )
             {
                int i, ia, iu, il, iumax = 0, ilmax = 0;
-               char *ptrUpper = cdpage->CharsUpper;
-               char *ptrLower = cdpage->CharsLower;
+               char *ptrUpper = ( char * ) cdpage->CharsUpper;
+               char *ptrLower = ( char * ) cdpage->CharsLower;
                char *ptr;
                HB_MULTICHAR multi[12];
                int nMulti = 0;
@@ -332,13 +341,13 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
 
                   for( i = 0; i < 256; i++ )
                   {
-                     cdpage->s_upper[i] = toupper( ( UCHAR ) i );
-                     cdpage->s_lower[i] = tolower( ( UCHAR ) i );
+                     cdpage->s_upper[i] = ( char ) toupper( ( UCHAR ) i );
+                     cdpage->s_lower[i] = ( char ) tolower( ( UCHAR ) i );
                   }
                   if( strpbrk( cdpage->CharsUpper, "~." ) != NULL )
                   {
-                     ptrUpper = cdpage->CharsUpper = hb_strdup( cdpage->CharsUpper );
-                     ptrLower = cdpage->CharsLower = hb_strdup( cdpage->CharsLower );
+                     cdpage->CharsUpper = ptrUpper = hb_strdup( cdpage->CharsUpper );
+                     cdpage->CharsLower = ptrLower = hb_strdup( cdpage->CharsLower );
                      cdpage->lChClone = TRUE;
                   }
                   for( i = ia = 1; *ptrUpper; i++, ia++, ptrUpper++, ptrLower++ )
@@ -385,12 +394,12 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                      iumax = iu;
                      ilmax = il;
 
-                     cdpage->s_chars[iu] = i;
-                     cdpage->s_chars[il] = i + nAddLower;
+                     cdpage->s_chars[iu] = ( char ) i;
+                     cdpage->s_chars[il] = ( char ) ( i + nAddLower );
                      if( cdpage->lAccInterleave )
                      {
-                        cdpage->s_accent[iu] = ia;
-                        cdpage->s_accent[il] = ia + nAddLower;
+                        cdpage->s_accent[iu] = ( char ) ia;
+                        cdpage->s_accent[il] = ( char ) ( ia + nAddLower );
                      }
                      cdpage->s_upper[il] = *ptrUpper;
                      cdpage->s_lower[iu] = *ptrLower;
@@ -400,12 +409,12 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                      for( i = 91; i <= 96; i++ )
                      {
                         if( !cdpage->s_chars[i] )
-                           cdpage->s_chars[i] = cdpage->nChars + ( i - 90 );
+                           cdpage->s_chars[i] = ( char ) ( cdpage->nChars + ( i - 90 ) );
                      }
                      for( i = 123; i < 256; i++ )
                      {
                         if( !cdpage->s_chars[i] )
-                           cdpage->s_chars[i] = cdpage->nChars + nAddLower + ( i - 122 );
+                           cdpage->s_chars[i] = ( char ) ( cdpage->nChars + nAddLower + ( i - 122 ) );
                      }
                   }
                   /*
@@ -488,12 +497,12 @@ HB_EXPORT void hb_cdpTranslate( char *psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
          {
             char * ptr;
 
-            ptr = strchr( cdpIn->CharsUpper, *psz );
+            ptr = strchr( ( char * ) cdpIn->CharsUpper, *psz );
             if( ptr )
                *psz = cdpOut->CharsUpper[ ptr - cdpIn->CharsUpper ];
             else
             {
-               ptr = strchr( cdpIn->CharsLower, *psz );
+               ptr = strchr( ( char * ) cdpIn->CharsLower, *psz );
                if( ptr )
                   *psz = cdpOut->CharsLower[ ptr - cdpIn->CharsLower ];
             }
@@ -530,12 +539,12 @@ HB_EXPORT void hb_cdpnTranslate( char *psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
          {
             char * ptr;
 
-            ptr = strchr( cdpIn->CharsUpper, *psz );
+            ptr = strchr( ( char * ) cdpIn->CharsUpper, *psz );
             if( ptr )
                *psz = cdpOut->CharsUpper[ ptr - cdpIn->CharsUpper ];
             else
             {
-               ptr = strchr( cdpIn->CharsLower, *psz );
+               ptr = strchr( ( char * ) cdpIn->CharsLower, *psz );
                if( ptr )
                   *psz = cdpOut->CharsLower[ ptr - cdpIn->CharsLower ];
             }
@@ -797,7 +806,7 @@ HB_EXPORT ULONG hb_cdpStrnToUTF8( PHB_CODEPAGE cdp, BOOL fCtrl,
       else
       {
          uniCodes = cdp->uniTable->uniCodes;
-         nChars = cdp->uniTable->nChars;
+         nChars = ( USHORT ) cdp->uniTable->nChars;
       }
    }
    else
@@ -841,7 +850,7 @@ HB_EXPORT ULONG hb_cdpStrnToU16( PHB_CODEPAGE cdp, BOOL fCtrl,
       else
       {
          uniCodes = cdp->uniTable->uniCodes;
-         nChars = cdp->uniTable->nChars;
+         nChars = ( USHORT ) cdp->uniTable->nChars;
       }
    }
    else
@@ -1161,8 +1170,8 @@ HB_EXPORT void hb_cdpReleaseAll( void )
          hb_xfree( s_cdpList[iPos]->multi );
       if( s_cdpList[iPos]->lChClone )
       {
-         hb_xfree( s_cdpList[iPos]->CharsUpper );
-         hb_xfree( s_cdpList[iPos]->CharsLower );
+         hb_xfree( ( void * ) s_cdpList[iPos]->CharsUpper );
+         hb_xfree( ( void * ) s_cdpList[iPos]->CharsLower );
       }
       iPos++;
    }
@@ -1179,11 +1188,11 @@ HB_FUNC( HB_SETCODEPAGE )
 HB_FUNC( HB_TRANSLATE )
 {
    ULONG ulLen = hb_parclen( 1 );
+   char *szIdIn = hb_parc( 2 );
+   char *szIdOut = hb_parc( 3 );
 
-   if( ulLen )
+   if( ulLen && ( szIdIn || szIdOut ) )
    {
-      char *szIdIn = hb_parc( 2 );
-      char *szIdOut = hb_parc( 3 );
       PHB_CODEPAGE cdpIn = szIdIn ? hb_cdpFind( szIdIn ) : hb_cdp_page;
       PHB_CODEPAGE cdpOut = szIdOut ? hb_cdpFind( szIdOut ) : hb_cdp_page;
 
@@ -1244,18 +1253,17 @@ HB_FUNC( HB_STRTOUTF8 )
 
 HB_FUNC( HB_UTF8CHR )
 {
-   if ( ISNUM( 1 ) )
+   if( ISNUM( 1 ) )
    {
-      UINT uc = hb_parnl( 1 );
-      int len = utf8Size( uc );
-      char *szResult = (char *) hb_xgrab( len + 1 );
+      char utf8Char[ HB_MAX_UTF8 ];
+      int iLen;
 
-      u16toutf8( ( BYTE * ) szResult, uc );
-      hb_retclen_buffer( szResult, len );
+      iLen = u16toutf8( ( BYTE * ) utf8Char, ( USHORT ) hb_parni( 1 ) );
+      hb_retclen( utf8Char, iLen );
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
    }
 }
 
@@ -1287,7 +1295,7 @@ HB_FUNC( HB_UTF8TOSTR )
          hb_retc( NULL );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8SUBSTR )
@@ -1320,7 +1328,7 @@ HB_FUNC( HB_UTF8SUBSTR )
          hb_retc( NULL );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8LEFT )
@@ -1343,7 +1351,7 @@ HB_FUNC( HB_UTF8LEFT )
          hb_retc( NULL );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8RIGHT )
@@ -1371,7 +1379,7 @@ HB_FUNC( HB_UTF8RIGHT )
          hb_retc( NULL );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8PEEK )
@@ -1389,7 +1397,7 @@ HB_FUNC( HB_UTF8PEEK )
          hb_retni( 0 );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8POKE )
@@ -1435,7 +1443,7 @@ HB_FUNC( HB_UTF8POKE )
          hb_itemReturn( pText );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8STUFF )
@@ -1486,7 +1494,7 @@ HB_FUNC( HB_UTF8STUFF )
          hb_retc( NULL );
    }
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_UTF8LEN )
@@ -1496,7 +1504,7 @@ HB_FUNC( HB_UTF8LEN )
    if( szString )
       hb_retnint( hb_cdpUTF8StringLength( ( BYTE * ) szString, hb_parclen( 1 ) ) );
    else
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
 /* non of numeric parameters in STRTRAN() (4-th and 5-th) refers to

@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.24 2008/03/09 19:18:25 likewolf Exp $
+ * $Id: idle.c,v 1.25 2008/03/19 00:17:33 ronpinkas Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ static int s_iIdleWaitNoCpu = 0;
 /* flag to indicate GarbageCollection should be done in idle state. */
 BOOL hb_vm_bCollectGarbage = TRUE;
 
-static void hb_releaseCPU( BOOL bIndefinite )
+void hb_releaseCPU( BOOL bIndefinite )
 {
 #if defined(HB_THREAD_SUPPORT) || defined(HB_OS_WIN_32) || defined(__CYGWIN__)
    BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */

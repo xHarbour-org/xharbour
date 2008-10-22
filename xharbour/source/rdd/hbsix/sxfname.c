@@ -1,5 +1,5 @@
 /*
- * $Id: sxfname.c 7771 2007-09-25 01:21:03Z druzus $
+ * $Id: sxfname.c,v 1.1 2007/10/31 08:30:32 marchuet Exp $
  */
 
 /*
@@ -82,14 +82,14 @@ HB_FUNC( SX_FNAMEPARSER )
             ulLen = strlen( pFileName->szName );
             ulLen = hb_strRTrimLen( pFileName->szName, ulLen, FALSE );
             pFileName->szName = hb_strLTrim( pFileName->szName, &ulLen );
-            pFileName->szName[ulLen] = '\0';
+            ( ( char * ) pFileName->szName )[ulLen] = '\0';
          }
          if( pFileName->szExtension )
          {
             ulLen = strlen( pFileName->szExtension );
             ulLen = hb_strRTrimLen( pFileName->szExtension, ulLen, FALSE );
             pFileName->szExtension = hb_strLTrim( pFileName->szExtension, &ulLen );
-            pFileName->szExtension[ulLen] = '\0';
+            ( ( char * ) pFileName->szExtension )[ulLen] = '\0';
          }
       }
 

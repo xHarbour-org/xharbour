@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.56 2008/03/24 12:43:42 likewolf Exp $
+ * $Id: dynsym.c,v 1.57 2008/03/27 10:26:43 likewolf Exp $
  */
 
 /*
@@ -57,7 +57,6 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
-#include "thread.h"
 
 //JC1: the search of an intem could depend on the current thread stack
 #ifndef HB_THREAD_SUPPORT

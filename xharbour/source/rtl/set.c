@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.89 2008/10/16 09:47:04 patrickmast Exp $
+ * $Id: set.c,v 1.90 2008/10/18 06:34:48 patrickmast Exp $
  */
 
 /*
@@ -118,6 +118,10 @@ static char set_char( PHB_ITEM pItem, char oldChar )
    return newChar;
 }
 
+/*
+ * Change the setting if the parameter is a logical value, or is
+ * either "ON" or "OFF" (regardless of case)
+ */
 static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
 {
    BOOL bLogical = bDefault;
@@ -149,14 +153,7 @@ static int set_number( PHB_ITEM pItem, int iOldValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("set_number(%p, %d)", pItem, iOldValue));
 
-   if( HB_IS_NUMERIC( pItem ) )
-   {
-      return hb_itemGetNI( pItem );
-   }
-   else
-   {
-      return iOldValue;
-   }
+   return HB_IS_NUMERIC( pItem ) ? hb_itemGetNI( pItem ) : iOldValue;
 }
 
 static char * set_string( PHB_ITEM pItem, char * szOldString )
@@ -208,7 +205,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
    return szString;
 }
 
-static void close_binary( FHANDLE handle )
+static void close_binary( HB_FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_binary(%p)", handle));
 
@@ -233,7 +230,7 @@ static void close_binary( FHANDLE handle )
    }
 }
 
-static void close_text( FHANDLE handle )
+static void close_text( HB_FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_text(%p)", handle));
 
@@ -251,10 +248,10 @@ static void close_text( FHANDLE handle )
    }
 }
 
-static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_set_enum set_specifier )
+static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_set_enum set_specifier )
 {
    USHORT user_ferror;
-   FHANDLE handle;
+   HB_FHANDLE handle;
    PHB_FNAME pFilename;
    char path[ _POSIX_PATH_MAX + 1 ], *szPrnFile ;
    BOOL bPipe = FALSE, bTemp = FALSE;
@@ -613,7 +610,6 @@ HB_FUNC( SET )
             }
          }
          break;
-
       case HB_SET_AUTOPEN    :
          hb_retl( hb_set.HB_SET_AUTOPEN );
          if( args > 1 )
@@ -621,7 +617,6 @@ HB_FUNC( SET )
             hb_set.HB_SET_AUTOPEN = set_logical( pArg2, hb_set.HB_SET_AUTOPEN );
          }
          break;
-
       case HB_SET_AUTORDER   :
          hb_retni( hb_set.HB_SET_AUTORDER );
          if( args > 1 )
@@ -636,7 +631,6 @@ HB_FUNC( SET )
             }
          }
          break;
-
       case HB_SET_AUTOSHARE  :
          hb_retni( hb_set.HB_SET_AUTOSHARE );
          if( args > 1 )
@@ -651,7 +645,6 @@ HB_FUNC( SET )
             }
          }
          break;
-
       case HB_SET_BELL       :
          hb_retl( hb_set.HB_SET_BELL );
          if( args > 1 )
@@ -671,7 +664,6 @@ HB_FUNC( SET )
       case HB_SET_COLOR      :
          hb_retc( hb_conSetColor( args >= 2 && HB_IS_STRING( pArg2 ) ? hb_itemGetCPtr( pArg2 ) : ( char * ) NULL ) );
          break;
-
       case HB_SET_CONFIRM    :
          hb_retl( hb_set.HB_SET_CONFIRM );
          if( args > 1 )
@@ -679,7 +671,6 @@ HB_FUNC( SET )
             hb_set.HB_SET_CONFIRM = set_logical( pArg2, hb_set.HB_SET_CONFIRM );
          }
          break;
-
       case HB_SET_CONSOLE    :
          hb_retl( hb_set.HB_SET_CONSOLE );
          if( args > 1 )
@@ -687,14 +678,12 @@ HB_FUNC( SET )
             hb_set.HB_SET_CONSOLE = set_logical( pArg2, hb_set.HB_SET_CONSOLE );
          }
          break;
-
       case HB_SET_CURSOR     :
          if( args >= 2 && HB_IS_NUMERIC( pArg2 ) )
             hb_retni( hb_conSetCursor( TRUE, hb_itemGetNI( pArg2 ) ) );
          else
             hb_retni( hb_conSetCursor( FALSE, 0 ) );
          break;
-
       case HB_SET_DATEFORMAT :
          if( hb_set.HB_SET_DATEFORMAT )
          {
@@ -737,7 +726,6 @@ HB_FUNC( SET )
             }
          }
          break;
-
       case HB_SET_DEBUG      :
          hb_retl( hb_set.HB_SET_DEBUG );
          if( args > 1 )
@@ -745,7 +733,6 @@ HB_FUNC( SET )
             hb_set.HB_SET_DEBUG = set_logical( pArg2, hb_set.HB_SET_DEBUG );
          }
          break;
-
       case HB_SET_DECIMALS   :
          hb_retni( hb_set.HB_SET_DECIMALS );
          if( args > 1 )
@@ -1928,7 +1915,7 @@ HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier )
 #endif
    }
 
-   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   hb_errRT_BASE( EG_ARG, 2020, NULL, HB_ERR_FUNCNAME, 0 );
    return FALSE;
 }
 
@@ -2034,7 +2021,7 @@ HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier )
 #endif
    }
 
-   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   hb_errRT_BASE( EG_ARG, 2020, NULL, HB_ERR_FUNCNAME, 0 );
    return FALSE;
 }
 
@@ -2142,7 +2129,7 @@ HB_EXPORT int     hb_setGetNI( HB_set_enum set_specifier )
 #endif
    }
 
-   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 0 );
+   hb_errRT_BASE( EG_ARG, 2020, NULL, HB_ERR_FUNCNAME, 0 );
    return FALSE;
 }
 
@@ -2157,7 +2144,7 @@ HB_EXPORT HB_PATHNAMES * hb_setGetFirstSetPath( void )
 }
 
 
-HB_EXPORT FHANDLE hb_setGetAltHan( void )
+HB_EXPORT HB_FHANDLE hb_setGetAltHan( void )
 {
    return hb_set.hb_set_althan;
 }
@@ -2167,12 +2154,12 @@ HB_EXPORT BOOL    hb_setGetCentury( void )
    return hb_set.hb_set_century;
 }
 
-HB_EXPORT FHANDLE hb_setGetExtraHan( void )
+HB_EXPORT HB_FHANDLE hb_setGetExtraHan( void )
 {
    return hb_set.hb_set_extrahan;
 }
 
-HB_EXPORT FHANDLE hb_setGetPrintHan( void )
+HB_EXPORT HB_FHANDLE hb_setGetPrintHan( void )
 {
    return hb_set.hb_set_printhan;
 }
@@ -2511,7 +2498,7 @@ HB_EXPORT BOOL hb_setGetWinPrinter( void )
    return hb_set.hb_set_winprinter;
 }
 
-HB_EXPORT FHANDLE hb_setGetWinHan( void )
+HB_EXPORT HB_FHANDLE hb_setGetWinHan( void )
 {
    return hb_set.hb_set_winhan;
 }

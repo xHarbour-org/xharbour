@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.57 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbrddcdx.h,v 1.58 2008/07/09 16:10:29 marchuet Exp $
  */
 
 /*
@@ -371,7 +371,7 @@ typedef struct _CDXINDEX
 {
    char *      szFileName;    /* Name of index file */
    char *      szRealName;    /* Real name of index file */
-   FHANDLE     hFile;         /* Index file handle */
+   PHB_FILE    pFile;         /* Index file handle */
    struct _CDXAREA  * pArea;  /* Parent WorkArea */
    struct _CDXINDEX * pNext;  /* The next index in the list */
    LPCDXTAG    pCompound;     /* Compound tag */
@@ -409,7 +409,7 @@ typedef CDXSWAPPAGE * LPCDXSWAPPAGE;
 typedef struct
 {
    LPCDXTAG pTag;             /* current Tag */
-   FHANDLE  hTempFile;        /* handle to temporary file */
+   HB_FHANDLE  hTempFile;        /* handle to temporary file */
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */
    BYTE     bTrl;             /* filler char for shorter keys */
@@ -482,9 +482,9 @@ typedef struct _CDXAREA
    *  example.
    */
 
-   FHANDLE  hDataFile;              /* Data file handle */
-   FHANDLE  hMemoFile;              /* Memo file handle */
-   FHANDLE  hMemoTmpFile;           /* Memo temporary file handle */
+   PHB_FILE pDataFile;              /* Data file handle */
+   PHB_FILE pMemoFile;              /* Memo file handle */
+   PHB_FILE pMemoTmpFile;           /* Memo temporary file handle */
    char *   szDataFileName;         /* Name of data file */
    char *   szMemoFileName;         /* Name of memo file */
    USHORT   uiHeaderLen;            /* Size of header */
@@ -621,7 +621,7 @@ static ERRCODE hb_cdxZap ( CDXAREAP pArea );
 #define hb_cdxSetRel                               NULL
 static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListClear( CDXAREAP pArea );
-#define hb_cdxOrderListDelete                      NULL
+static ERRCODE hb_cdxOrderListDelete( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea );
 #define hb_cdxOrderCondition                       NULL

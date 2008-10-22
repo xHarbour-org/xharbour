@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.31 2005/10/24 01:04:35 druzus Exp $
+ * $Id: philes.c,v 1.32 2008/08/06 20:28:37 enricomaria Exp $
  */
 
 /*
@@ -550,11 +550,6 @@ HB_FUNC( HB_PROCESSVALUE )
 HB_FUNC( HB_FCOMMIT )
 {
    hb_fsCommit( hb_parni(1) );
-}
-
-HB_FUNC( DISABLEWAITLOCKS )
-{
-   hb_retl( hb_fsDisableWaitLocks( ISLOG( 1 ) ? ( hb_parl( 1 ) ? 1 : 0 ) : -1 ) );
 }
 
 #endif

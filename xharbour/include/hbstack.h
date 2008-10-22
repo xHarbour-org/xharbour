@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.49 2008/04/30 16:47:32 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.50 2008/05/06 11:10:37 marchuet Exp $
  */
 
 /*
@@ -73,6 +73,23 @@
    #define STACK_EXPANDHB_ITEMS    20
 #endif
 
+typedef struct
+{
+   const char *   szDefaultRDD;     /* default RDD */
+   BOOL           fNetError;        /* current NETERR() flag */
+
+   void **        waList;           /* Allocated WorkAreas */
+   USHORT         uiWaMax;          /* Number of allocated WA */
+   USHORT         uiWaSpace;        /* Number of allocated WA */
+
+   USHORT *       waNums;           /* Allocated WorkAreas */
+   USHORT         uiWaNumMax;       /* Number of allocated WA */
+
+   USHORT         uiCurrArea;       /* Current WokrArea number */
+   void *         pCurrArea;        /* Current WorkArea pointer */
+}
+HB_STACKRDD, * PHB_STACKRDD;
+
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
@@ -96,6 +113,7 @@ typedef struct
    LONG       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
    //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
+   HB_STACKRDD rdd;           /* RDD related data */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -135,59 +153,65 @@ typedef struct
    LONG lStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
-#ifdef HB_STACK_MACROS
-   #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (int)(n) ) )
-   #define hb_stackItemFromBase( n )   ( *( HB_VM_STACK.pBase + (int)(n) + 1 ) )
-   #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
-   #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 )
-   #define hb_stackTotalItems( )       ( HB_VM_STACK.wItems )   
-   #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
-   #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
-   #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
-   #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) ( iItemPos ) ) )
-   #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
-   #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
-   #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
-   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )
-   #define hb_stackSetActionRequest( n )     do { HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK; HB_VM_STACK.uiVMFlags |= (n); } while( 0 )
+#if defined( HB_STACK_MACROS )
 
-   #define hb_stackDec( )              do { \
-                                          if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                       } while( 0 )
+#define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (int)(n) ) )
+#define hb_stackItemFromBase( n )   ( *( HB_VM_STACK.pBase + (int)(n) + 1 ) )
+#define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
+#define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 )
+#define hb_stackTotalItems( )       ( HB_VM_STACK.wItems )   
+#define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
+#define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
+#define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
+#define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) ( iItemPos ) ) )
+#define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
+#define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
 
-   #define hb_stackPop( )              do { \
-                                          if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
-                                             hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
-                                          else \
-                                             ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL; \
-                                          if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                       } while( 0 )
+#define hb_stackRDD( )              ( &(HB_VM_STACK.rdd) )
 
-   #define hb_stackPush( )             do { \
-                                          if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
-                                             hb_stackIncrease(); \
-                                       } while ( 0 )
+#define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
+#define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )
+#define hb_stackSetActionRequest( n )   do { \
+                                           HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK; HB_VM_STACK.uiVMFlags |= (n); \
+                                        } while ( 0 )
 
-   #define hb_stackPopReturn( )        do { \
-                                          if( HB_IS_COMPLEX( &HB_VM_STACK.Return ) ) \
-                                             hb_itemClear( &HB_VM_STACK.Return ); \
-                                          if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                          hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos ); \
-                                       } while ( 0 )
+#define hb_stackDec( )              do { \
+                                       if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                          hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                    } while ( 0 )
 
-   #define hb_stackPushReturn( )       do { \
-                                          hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return ); \
-                                          if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
-                                             hb_stackIncrease(); \
-                                       } while ( 0 )
+#define hb_stackPop( )              do { \
+                                       if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
+                                          hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
+                                       else \
+                                          ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL; \
+                                       if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                          hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                    } while ( 0 )
+
+#define hb_stackPush( )             do { \
+                                       if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
+                                          hb_stackIncrease(); \
+                                    } while ( 0 )
+
+#define hb_stackPopReturn( )        do { \
+                                       if( HB_IS_COMPLEX( &HB_VM_STACK.Return ) ) \
+                                          hb_itemClear( &HB_VM_STACK.Return ); \
+                                       if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                          hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                       hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos ); \
+                                    } while ( 0 )
+
+#define hb_stackPushReturn( )       do { \
+                                       hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return ); \
+                                       if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
+                                          hb_stackIncrease(); \
+                                    } while ( 0 )
 
 
-   #define hb_stackAllocItem( )        ( ( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ? \
-                                           hb_stackIncrease() : (void) 0 ), \
-                                         * ( HB_VM_STACK.pPos - 1 ) )
+#define hb_stackAllocItem( )        ( ( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ? \
+                                        hb_stackIncrease() : (void) 0 ), \
+                                      * ( HB_VM_STACK.pPos - 1 ) )
 /*
    #define hb_stackLocalVariable( p )  ( ( ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt > \
                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramdeclcnt ) && \
@@ -197,32 +221,37 @@ typedef struct
                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramdeclcnt ) + 1 ) ) : \
                                          ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) ) )
 */
-   #define hb_stackLocalVariable( p )  ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) )
+#define hb_stackLocalVariable( p )  ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) )
+
 #else
-   extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
-   extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
-   extern HB_EXPORT LONG        hb_stackTopOffset( void );
-   extern HB_EXPORT LONG        hb_stackBaseOffset( void );
-   extern HB_EXPORT LONG        hb_stackTotalItems( void );   
-   extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
-   extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
-   extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
-   extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
-   extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
-   extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
-   extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
-   extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
-   extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
-   extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
-   extern HB_EXPORT void        hb_stackPushReturn( void );
-   extern HB_EXPORT void        hb_stackPopReturn( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
+extern HB_EXPORT LONG        hb_stackTopOffset( void );
+extern HB_EXPORT LONG        hb_stackBaseOffset( void );
+extern HB_EXPORT LONG        hb_stackTotalItems( void );   
+extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
+extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
+extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
-   extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
-   extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
+extern PHB_STACKRDD hb_stackRDD( void );
 
-   extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
-   extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
+extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
+extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
+extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
+extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
+extern HB_EXPORT void        hb_stackPushReturn( void );
+extern HB_EXPORT void        hb_stackPopReturn( void );
+
+extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
+extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
+
+extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
+extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
+
 #endif
 
 /* stack management functions */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.1 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbcompat.ch,v 1.2 2008/03/18 15:51:39 likewolf Exp $
  */
 
 /*
@@ -54,17 +54,40 @@
 
 #ifdef __XHARBOUR__
 
+   #include "gtinfo.ch"
+   #include "gfx.ch"
+
+   #if defined(__PLATFORM__Windows) && !defined(__PLATFORM__WINDOWS)
+      #define __PLATFORM__WINDOWS
+   #endif
+   #if defined(__PLATFORM__Linux) && !defined(__PLATFORM__LINUX)
+      #define __PLATFORM__LINUX
+   #endif
+
+   #xtranslate hb_dbPack()             => __dbPack()
+   #xtranslate hb_dbZap()              => __dbZap()
+   #xtranslate hb_dbDrop([<x,...>])    => dbDrop(<x>)
+   #xtranslate hb_dbExists([<x,...>])  => dbExists(<x>)
+   #xtranslate hb_FieldLen([<x>])      => FieldLen(<x>)
+   #xtranslate hb_FieldDec([<x>])      => FieldDec(<x>)
+   #xtranslate hb_FieldType([<x>])     => FieldType(<x>)
+
    #xtranslate hb_isregex([<x>])       => hb_isregexstring(<x>)
    #xtranslate hb_pvalue([<x,...>])    => pvalue(<x>)
    #xtranslate hb_methodName([<x,...>])=> methodName(<x>)
    #xtranslate hb_libLoad([<x,...>])   => libLoad(<x>)
    #xtranslate hb_libFree([<x,...>])   => libFree(<x>)
    #xtranslate hb_adler32([<x,...>])   => hb_checksum(<x>)
+   #xtranslate hb_setLastKey([<x,...>])=> setLastKey(<x>)
    #xtranslate hb_CStr([<x,...>])      => CStr(<x>)
    #xtranslate hb_DirExists(<x>)       => IsDirectory(<x>)
    #xtranslate hb_rddInfo([<x,...>])   => rddInfo(<x>)
    #xtranslate hb_idleSleep([<x,...>]) => SecondsSleep(<x>)
    #xtranslate hb_UserName()           => NetName(1)
+   #xtranslate hb_FSize(<x>)           => FileSize(<x>)
+   #xtranslate hb_WildMatch([<x,...>]) => WildMatch(<x>)
+   #xtranslate hb_Deserialize(<x>)     => hb_DeserialNext(<x>)
+   #xtranslate hb_Adler32([<x,...>])   => hb_Checksum(<x>)
 
    #xtranslate hb_HexToNum([<c,...>])  => HexToNum(<c>)
    #xtranslate hb_NumToHex([<n,...>])  => NumToHex(<n>)
@@ -93,6 +116,15 @@
 
 #else
 
+   #include "hbgtinfo.ch"
+   #include "hbgfx.ch"
+
+   #if defined(__PLATFORM__WINDOWS) && !defined(__PLATFORM__Windows)
+      #define __PLATFORM__Windows
+   #endif
+   #if defined(__PLATFORM__LINUX) && !defined(__PLATFORM__Linux)
+      #define __PLATFORM__Linux
+   #endif
    #xtranslate hb_isregexstring([<x>]) => hb_isregex(<x>)
    #xtranslate pvalue([<x,...>])       => hb_pvalue(<x>)
    #xtranslate methodName([<x,...>])   => hb_methodName(<x>)
@@ -104,6 +136,10 @@
    #xtranslate IsDirectory(<x>)        => hb_DirExists(<x>)
    #xtranslate SecondsSleep([<x,...>]) => hb_idleSleep(<x>)
    #xtranslate NetName(<n>)            => iif( ValType( <n> ) == "N" .AND. <n> == 1, hb_UserName(), NetName() )
+   #xtranslate FileSize(<x>)           => hb_FSize(<x>)
+   #xtranslate WildMatch([<x,...>])    => hb_WildMatch(<x>)
+   #xtranslate hb_DeserialNext(<x>)    => hb_Deserialize(<x>)
+   #xtranslate hb_Checksum([<x,...>])  => hb_Adler32(<x>)
 
    #xtranslate HexToNum([<c,...>])     => hb_HexToNum(<c>)
    #xtranslate NumToHex([<n,...>])     => hb_NumToHex(<n>)

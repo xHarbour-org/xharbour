@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.244 2008/05/20 01:41:35 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.245 2008/07/30 11:29:09 marchuet Exp $
  */
 
 /*
@@ -474,8 +474,11 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( hb_stackReturnItem(), (llNumber), (iWidth) )
 
 #else
-   /* JC1: including thread anyways, because it defines some void macros when not in MT */
-   #include "thread.h"
+   /* JC1: including thread anyways, because it defines some void macros when not in MT
+      hbstack.h includes thread.h */
+   #ifndef HB_COMP_H_
+      #include "hbstack.h"
+   #endif
     extern HB_FORCE_EXPORT int    hb_pcount( void );          /* returns the number of suplied parameters */
 
     extern HB_FORCE_EXPORT void   hb_ret( void );             /* post a NIL return value */
@@ -675,6 +678,8 @@ extern HB_EXPORT char *    hb_strupr( char * pszText ); /* convert a string in-p
 extern HB_EXPORT char *    hb_strlow( char * pszText ); /* convert a string in-place to lower-case */
 extern HB_EXPORT char *    hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
 extern HB_EXPORT char *    hb_strndup( const char * pszText, ULONG ulLen ); /* returns a pointer to a newly allocated copy of the source string not longer then ulLen */
+extern HB_EXPORT char *    hb_strduptrim( const char * pszText ); /* returns a pointer to a newly allocated copy of the trimmed source string */
+extern HB_EXPORT ULONG     hb_strlentrim( const char * pszText ); /* like strlen() but result is the length of trimmed text */
 extern HB_EXPORT ULONG     hb_strnlen( const char * pszText, ULONG ulLen ); /* like strlen() but result is limited to ulLen */
 extern HB_EXPORT char *    hb_xstrcat( char *dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
 extern HB_EXPORT char *    hb_xstrcpy( char *szDest, const char *szSrc, ...); /* Concatenates multiple strings into a single result */
@@ -911,6 +916,7 @@ extern HB_EXPORT char *       hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* 
 extern HB_EXPORT char *       hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
 /* idle states */
+extern HB_EXPORT void   hb_releaseCPU( BOOL );
 extern HB_EXPORT void   hb_idleState( BOOL bIndefinite ); /* services a single idle state */
 extern HB_EXPORT void   hb_idleReset( void ); /* reset idle state routine count*/
 extern HB_EXPORT void   hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */

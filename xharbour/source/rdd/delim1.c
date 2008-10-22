@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.33 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: delim1.c,v 1.34 2008/09/05 08:38:35 marchuet Exp $
  */
 
 /*
@@ -70,14 +70,16 @@ static const USHORT s_uiNumLength[ 9 ] = { 0, 4, 6, 8, 11, 13, 16, 18, 20 };
 
 static void hb_delimInitArea( DELIMAREAP pArea, char * szFileName )
 {
+   char * szEol;
+
    /* Allocate only after succesfully open file */
    pArea->szFileName = hb_strdup( szFileName );
 
    /* set line separator: EOL */
-   if( hb_set.HB_SET_EOL && hb_set.HB_SET_EOL[ 0 ] )
-      pArea->szEol = hb_strdup( hb_set.HB_SET_EOL );
-   else
-      pArea->szEol = hb_strdup( hb_conNewLine() );
+   szEol = hb_setGetEOL();
+   if( !szEol || !szEol[ 0 ] )
+      szEol = hb_conNewLine();
+   pArea->szEol = hb_strdup( szEol );
    pArea->uiEolLen = strlen( pArea->szEol );
 
    /* allocate record buffer, one additional byte is for deleted flag */
@@ -204,10 +206,10 @@ static int hb_delimNextChar( DELIMAREAP pArea )
                  pArea->pBuffer + pArea->ulBufferIndex, ulLeft );
       pArea->ulBufferStart += pArea->ulBufferIndex;
       pArea->ulBufferIndex = 0;
-      hb_fsSeekLarge( pArea->hFile, pArea->ulBufferStart + ulLeft, FS_SET );
-      pArea->ulBufferRead = hb_fsReadLarge( pArea->hFile,
+      pArea->ulBufferRead = hb_fileReadAt( pArea->pFile,
                                             pArea->pBuffer + ulLeft,
-                                            pArea->ulBufferSize - ulLeft );
+                                           pArea->ulBufferSize - ulLeft,
+                                           pArea->ulBufferStart + ulLeft );
       if( pArea->ulBufferRead > 0 &&
           pArea->pBuffer[ pArea->ulBufferRead + ulLeft - 1 ] == '\032' )
          pArea->ulBufferRead--;
@@ -812,8 +814,8 @@ static ERRCODE hb_delimGoCold( DELIMAREAP pArea )
    {
       ULONG ulSize = hb_delimEncodeBuffer( pArea );
 
-      hb_fsSeekLarge( pArea->hFile, pArea->ulRecordOffset, FS_SET );
-      if( hb_fsWriteLarge( pArea->hFile, pArea->pBuffer, ulSize ) != ulSize )
+      if( hb_fileWriteAt( pArea->pFile, pArea->pBuffer, ulSize,
+                          pArea->ulRecordOffset ) != ulSize )
       {
          PHB_ITEM pError = hb_errNew();
 
@@ -870,11 +872,10 @@ static ERRCODE hb_delimFlush( DELIMAREAP pArea )
 
    if( pArea->fFlush )
    {
-      hb_fsSeekLarge( pArea->hFile, pArea->ulFileSize, FS_SET );
-      hb_fsWrite( pArea->hFile, ( BYTE * ) "\032", 1 );
+      hb_fileWriteAt( pArea->pFile, ( BYTE * ) "\032", 1, pArea->ulFileSize );
       if( hb_set.HB_SET_HARDCOMMIT )
       {
-         hb_fsCommit( pArea->hFile );
+         hb_fileCommit( pArea->pFile );
          pArea->fFlush = FALSE;
       }
    }
@@ -945,18 +946,14 @@ static ERRCODE hb_delimInfo( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #ifndef HB_C52_STRICT
          else if( hb_itemType( pItem ) & HB_IT_ARRAY )
          {
-            PHB_ITEM pDelim, pSeparator;
+            char cSeparator;
 
-            pDelim = hb_arrayGetItemPtr( pItem, 1 );
-            pSeparator = hb_arrayGetItemPtr( pItem, 2 );
-            if( hb_itemType( pDelim ) & HB_IT_STRING )
-               pArea->cDelim = *hb_itemGetCPtr( pDelim );
-            if( hb_itemType( pSeparator ) & HB_IT_STRING )
-            {
-               char * szSeparator = hb_itemGetCPtr( pSeparator );
-               if( *szSeparator )
-                  pArea->cSeparator = *szSeparator;
-            }
+            if( hb_arrayGetType( pItem, 1 ) & HB_IT_STRING )
+               pArea->cDelim = *hb_arrayGetCPtr( pItem, 1 );
+
+            cSeparator = *hb_arrayGetCPtr( pItem, 2 );
+            if( cSeparator )
+               pArea->cSeparator = cSeparator;
          }
 #endif
          break;
@@ -977,7 +974,7 @@ static ERRCODE hb_delimInfo( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_FILEHANDLE:
-         hb_itemPutNInt( pItem, ( HB_LONG ) pArea->hFile );
+         hb_itemPutNInt( pItem, ( HB_NHANDLE ) hb_fileHandle( pArea->pFile ) );
          break;
 
       case DBI_SHARED:
@@ -1157,7 +1154,7 @@ static ERRCODE hb_delimNewArea( DELIMAREAP pArea )
    if( SUPER_NEW( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->hFile = FS_ERROR;
+   pArea->pFile = NULL;
    pArea->fTransRec = TRUE;
    pArea->uiRecordLen = 0;
    pArea->ulBufferSize = 0;
@@ -1193,11 +1190,11 @@ static ERRCODE hb_delimClose( DELIMAREAP pArea )
    SUPER_CLOSE( ( AREAP ) pArea );
 
    /* Update record and unlock records */
-   if( pArea->hFile != FS_ERROR )
+   if( pArea->pFile )
    {
       SELF_FLUSH( ( AREAP ) pArea );
-      hb_fsClose( pArea->hFile );
-      pArea->hFile = FS_ERROR;
+      hb_fileClose( pArea->pFile );
+      pArea->pFile = NULL;
    }
 
    if( pArea->pFieldOffset )
@@ -1266,18 +1263,18 @@ static ERRCODE hb_delimCreate( DELIMAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
    }
    hb_xfree( pFileName );
 
    /* Try create */
    do
    {
-      pArea->hFile = hb_fsExtOpen( szFileName, NULL,
+      pArea->pFile = hb_fileExtOpen( szFileName, NULL,
                                    FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
                                    FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
                                    NULL, pError );
-      if( pArea->hFile == FS_ERROR )
+      if( !pArea->pFile )
       {
          if( !pError )
          {
@@ -1299,7 +1296,7 @@ static ERRCODE hb_delimCreate( DELIMAREAP pArea, LPDBOPENINFO pCreateInfo )
    if( pError )
       hb_itemRelease( pError );
 
-   if( pArea->hFile == FS_ERROR )
+   if( !pArea->pFile )
       return FAILURE;
 
    errCode = SUPER_CREATE( ( AREAP ) pArea, pCreateInfo );
@@ -1358,13 +1355,13 @@ static ERRCODE hb_delimOpen( DELIMAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, sizeof( szFileName ) - 1 );
    }
 
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, sizeof( szAlias ) - 1 );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;
    }
    hb_xfree( pFileName );
@@ -1372,10 +1369,10 @@ static ERRCODE hb_delimOpen( DELIMAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Try open */
    do
    {
-      pArea->hFile = hb_fsExtOpen( szFileName, NULL, uiFlags |
+      pArea->pFile = hb_fileExtOpen( szFileName, NULL, uiFlags |
                                    FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
                                    NULL, pError );
-      if( pArea->hFile == FS_ERROR )
+      if( !pArea->pFile )
       {
          if( !pError )
          {
@@ -1397,7 +1394,7 @@ static ERRCODE hb_delimOpen( DELIMAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( pError )
       hb_itemRelease( pError );
 
-   if( pArea->hFile == FS_ERROR )
+   if( !pArea->pFile )
       return FAILURE;
 
    errCode = SUPER_OPEN( ( AREAP ) pArea, pOpenInfo );

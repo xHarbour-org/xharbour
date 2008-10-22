@@ -1,5 +1,5 @@
 /*
- * $Id: cpltwin.c,v 1.6 2008/01/20 21:23:06 likewolf Exp $
+ * $Id: cpltwin.c,v 1.7 2008/08/14 09:04:13 andijahja Exp $
  */
 
 /*
@@ -93,14 +93,13 @@ static HB_CODEPAGE s_codepage = { "LTWIN",
 
 HB_CODEPAGE_INIT( LTWIN )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_LTWIN
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_LTWIN = hb_codepage_Init_LTWIN;
    #pragma data_seg()
 #endif

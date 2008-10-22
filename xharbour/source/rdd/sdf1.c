@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.30 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: sdf1.c,v 1.31 2008/09/05 08:38:36 marchuet Exp $
  */
 
 /*
@@ -102,8 +102,8 @@ static ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfReadRecord(%p)", pArea));
 
    uiToRead = pArea->uiRecordLen + pArea->uiEolLen + 2;
-   hb_fsSeekLarge( pArea->hFile, pArea->ulRecordOffset, FS_SET );
-   uiRead = hb_fsRead( pArea->hFile, pArea->pRecord, uiToRead );
+   uiRead = hb_fileReadAt( pArea->pFile, pArea->pRecord, uiToRead,
+                           pArea->ulRecordOffset );
 
    if( uiRead > 0 && uiRead < uiToRead && pArea->pRecord[ uiRead - 1 ] == '\032' )
       --uiRead;
@@ -161,15 +161,14 @@ static ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
       if( pArea->ulNextOffset == 0 )
       {
          USHORT uiRead, uiToRead, uiEolPos, uiRest = 0;
-         HB_FOFFSET ulOffset = 0;
+         HB_FOFFSET ulOffset = pArea->ulRecordOffset;
 
          uiToRead = pArea->uiRecordLen + pArea->uiEolLen + 2;
-         hb_fsSeekLarge( pArea->hFile, pArea->ulRecordOffset, FS_SET );
 
          do
          {
-            uiRead = hb_fsRead( pArea->hFile, pArea->pRecord + uiRest,
-                                uiToRead - uiRest ) + uiRest;
+            uiRead = hb_fileReadAt( pArea->pFile, pArea->pRecord + uiRest,
+                                    uiToRead - uiRest, ulOffset + uiRest ) + uiRest;
             if( uiRead > 0 && uiRead < uiToRead &&
                 pArea->pRecord[ uiRead - 1 ] == '\032' )
                --uiRead;
@@ -182,8 +181,7 @@ static ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
                if( uiRead == pArea->uiRecordLen + pArea->uiEolLen )
                   pArea->ulNextOffset = ( HB_FOFFSET ) -1;
                else
-                  pArea->ulNextOffset = pArea->ulRecordOffset + ulOffset +
-                                        uiEolPos + pArea->uiEolLen;
+                  pArea->ulNextOffset = ulOffset + uiEolPos + pArea->uiEolLen;
             }
             else if( uiRead < uiToRead )
             {
@@ -635,10 +633,10 @@ static ERRCODE hb_sdfGoCold( SDFAREAP pArea )
 
    if( pArea->fRecordChanged )
    {
-      USHORT uiWrite = pArea->uiRecordLen + pArea->uiEolLen;
+      ULONG ulWrite = pArea->uiRecordLen + pArea->uiEolLen;
 
-      hb_fsSeekLarge( pArea->hFile, pArea->ulRecordOffset, FS_SET );
-      if( hb_fsWrite( pArea->hFile, pArea->pRecord, uiWrite ) != uiWrite )
+      if( hb_fileWriteAt( pArea->pFile, pArea->pRecord, ulWrite,
+                          pArea->ulRecordOffset ) != ulWrite )
       {
          PHB_ITEM pError = hb_errNew();
 
@@ -651,7 +649,7 @@ static ERRCODE hb_sdfGoCold( SDFAREAP pArea )
          hb_itemRelease( pError );
          return FAILURE;
       }
-      pArea->ulFileSize += uiWrite;
+      pArea->ulFileSize += ulWrite;
       pArea->ulNextOffset = pArea->ulFileSize;
       pArea->fRecordChanged = FALSE;
       pArea->fFlush = TRUE;
@@ -695,11 +693,10 @@ static ERRCODE hb_sdfFlush( SDFAREAP pArea )
 
    if( pArea->fFlush )
    {
-      hb_fsSeekLarge( pArea->hFile, pArea->ulFileSize, FS_SET );
-      hb_fsWrite( pArea->hFile, ( BYTE * ) "\032", 1 );
+      hb_fileWriteAt( pArea->pFile, ( BYTE * ) "\032", 1, pArea->ulFileSize );
       if( hb_set.HB_SET_HARDCOMMIT )
       {
-         hb_fsCommit( pArea->hFile );
+         hb_fileCommit( pArea->pFile );
          pArea->fFlush = FALSE;
       }
    }
@@ -729,7 +726,7 @@ static ERRCODE hb_sdfInfo( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_FILEHANDLE:
-         hb_itemPutNInt( pItem, ( HB_LONG ) pArea->hFile );
+         hb_itemPutNInt( pItem, ( HB_NHANDLE ) hb_fileHandle( pArea->pFile ) );
          break;
 
       case DBI_SHARED:
@@ -903,7 +900,7 @@ static ERRCODE hb_sdfNewArea( SDFAREAP pArea )
    if( SUPER_NEW( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->hFile = FS_ERROR;
+   pArea->pFile = NULL;
    pArea->fTransRec = TRUE;
    pArea->uiRecordLen = 0;
 
@@ -932,11 +929,11 @@ static ERRCODE hb_sdfClose( SDFAREAP pArea )
    SUPER_CLOSE( ( AREAP ) pArea );
 
    /* Update record and unlock records */
-   if( pArea->hFile != FS_ERROR )
+   if( pArea->pFile )
    {
       SELF_FLUSH( ( AREAP ) pArea );
-      hb_fsClose( pArea->hFile );
-      pArea->hFile = FS_ERROR;
+      hb_fileClose( pArea->pFile );
+      pArea->pFile = NULL;
    }
 
    if( pArea->pFieldOffset )
@@ -1000,18 +997,18 @@ static ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
    }
    hb_xfree( pFileName );
 
    /* Try create */
    do
    {
-      pArea->hFile = hb_fsExtOpen( szFileName, NULL,
-                                   FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
-                                   FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                   NULL, pError );
-      if( pArea->hFile == FS_ERROR )
+      pArea->pFile = hb_fileExtOpen( szFileName, NULL,
+                                     FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
+                                     FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                     NULL, pError );
+      if( !pArea->pFile )
       {
          if( !pError )
          {
@@ -1033,7 +1030,7 @@ static ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
    if( pError )
       hb_itemRelease( pError );
 
-   if( pArea->hFile == FS_ERROR )
+   if( !pArea->pFile )
       return FAILURE;
 
    errCode = SUPER_CREATE( ( AREAP ) pArea, pCreateInfo );
@@ -1092,13 +1089,13 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, sizeof( szFileName ) - 1 );
    }
 
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, sizeof( szAlias ) - 1 );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;
    }
    hb_xfree( pFileName );
@@ -1106,10 +1103,10 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Try open */
    do
    {
-      pArea->hFile = hb_fsExtOpen( szFileName, NULL, uiFlags |
-                                   FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                   NULL, pError );
-      if( pArea->hFile == FS_ERROR )
+      pArea->pFile = hb_fileExtOpen( szFileName, NULL, uiFlags |
+                                     FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                     NULL, pError );
+      if( !pArea->pFile )
       {
          if( !pError )
          {
@@ -1131,7 +1128,7 @@ static ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( pError )
       hb_itemRelease( pError );
 
-   if( pArea->hFile == FS_ERROR )
+   if( !pArea->pFile )
       return FAILURE;
 
    errCode = SUPER_OPEN( ( AREAP ) pArea, pOpenInfo );

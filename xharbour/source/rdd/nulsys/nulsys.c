@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.6 2007/10/24 13:36:47 lculik Exp $
+ * $Id: nulsys.c,v 1.7 2008/01/15 10:13:45 marchuet Exp $
  */
 
 /*
@@ -120,6 +120,8 @@ HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
    return FAILURE;
 }
 
+HB_EXPORT void hb_rddCloseAll( void ) {}
+
 HB_EXPORT void hb_rddShutDown( void ) {}
 
 
@@ -145,6 +147,10 @@ HB_FUNC( DBCREATE ) {}
 HB_FUNC( DBUSEAREA ) {}
 
 HB_FUNC( DBCLOSEAREA ) {}
+
+HB_FUNC( DBSELECTAREA ) {}
+
+HB_FUNC( DBSTRUCT ) {}
 
 HB_FUNC( DBGOTO ) { hb_retni( 0 ); }
 
@@ -208,8 +214,14 @@ HB_FUNC( LASTREC ) { hb_retni( 0 ); }
 
 HB_FUNC( FCOUNT ) { hb_parni( 0 ); }
 
+HB_FUNC( RECSIZE ) { hb_retni( 0 ); }
 
-HB_FUNC( INDEXORD ) { hb_parni(1); }
+HB_FUNC( HEADER ) { hb_retni( 0 ); }
+
+HB_FUNC( LUPDATE ) { hb_retds( NULL ); }
+
+
+HB_FUNC( INDEXORD ) { hb_parni( 1 ); }
 
 HB_FUNC( INDEXKEY ) { hb_retc( NULL ); }
 

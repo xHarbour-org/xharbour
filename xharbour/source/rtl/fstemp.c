@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.25 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: fstemp.c,v 1.26 2008/03/27 10:26:46 likewolf Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 #include <unistd.h>  /* We need for mkstemp() on BSD */
 #endif
 
-/* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
+/* NOTE: The buffer must be at least _POSIX_PATH_MAX + 1 chars long */
 #if !defined( HB_OS_UNIX )
 
 static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * pszPrefix )
@@ -75,13 +75,11 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
 
    char cTempDir[ _POSIX_PATH_MAX + 1 ];
 
-   if ( pszDir != NULL && pszDir[0] != '\0' )
-   {
-      strncpy( (char *) cTempDir, (const char *) pszDir, _POSIX_PATH_MAX );
-   }
+   if( pszDir && pszDir[0] != '\0' )
+      strncpy( ( char * ) cTempDir, ( const char * ) pszDir, sizeof( cTempDir ) - 1 );
    else
    {
-      if ( ! GetTempPath( ( DWORD ) _POSIX_PATH_MAX, cTempDir ) )
+      if( ! GetTempPathA( ( DWORD ) _POSIX_PATH_MAX + 1, cTempDir ) )
       {
          hb_fsSetIOError( FALSE, 0 );
          return FALSE;
@@ -89,12 +87,7 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
    }
    cTempDir[ _POSIX_PATH_MAX ] = '\0';
 
-   if( pszPrefix == NULL )
-   {
-       pszPrefix = (const BYTE *) "xht";
-   }
-
-   fResult = GetTempFileName( cTempDir, (const LPCSTR) pszPrefix, 0, (char *) pszBuffer );
+   fResult = GetTempFileNameA( ( LPCSTR ) cTempDir, pszPrefix ? ( LPCSTR ) pszPrefix : ( LPCSTR ) "xht", 0, ( LPSTR ) pszBuffer );
 
 #else
 
@@ -115,9 +108,9 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
    return fResult;
 }
 
-/* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
+/* NOTE: The buffer must be at least _POSIX_PATH_MAX + 1 chars long */
 
-HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
+HB_EXPORT HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
 {
    USHORT nAttemptLeft = 999;
 
@@ -125,15 +118,13 @@ HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
    {
       if( hb_fsTempName( pszName, pszDir, pszPrefix ) )
       {
-          FHANDLE fhnd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
+          HB_FHANDLE fhnd = hb_fsCreateEx( pszName, ulAttr, FO_EXCLUSIVE | FO_EXCL );
 
           /* This function may fail, if the generated filename got
              used between generation and the file creation. */
 
           if( fhnd != FS_ERROR )
-          {
              return fhnd;
-          }
       }
       else
       {
@@ -152,75 +143,90 @@ HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 
 static BOOL fsGetTempDirByCase( BYTE *pszName, const char *pszTempDir )
 {
-   BOOL bOk= FALSE;
-   if ( pszTempDir!= NULL && *pszTempDir!= '\0' )
+   BOOL fOK = FALSE;
+
+   if( pszTempDir && *pszTempDir!= '\0' )
    {
-      bOk= TRUE;
-      strcpy( ( char * ) pszName, ( char * ) pszTempDir );
-      if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER || hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      strncpy( ( char * ) pszName, ( char * ) pszTempDir, _POSIX_PATH_MAX );
+      switch( hb_set.HB_SET_DIRCASE )
       {
-         // check to see if temp directory already upper or lower. If not use current directory ( "." )
-         char *psZ = ( char * ) pszName ;
-         int iChar ;
-         BOOL bLower =  hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER  ;
-         while ( *psZ )
-         {
-            iChar = ( int ) *psZ;
-            if ( isalpha( iChar ) && !( bLower ? islower( iChar ) : isupper( iChar ) ) )
-            {
-               bOk = FALSE;
+         case HB_SET_CASE_LOWER:
+            hb_strLower( ( char * ) pszName, strlen( ( char * ) pszName ) );
+            fOK = strcmp( ( char * ) pszName, pszTempDir ) == 0;
+            break;
+         case HB_SET_CASE_UPPER:
+            hb_strUpper( ( char * ) pszName, strlen( ( char * ) pszName ) );
+            fOK = strcmp( ( char * ) pszName, pszTempDir ) == 0;
+            break;
+         default:
+            fOK = TRUE;
                break;
             }
-            psZ++ ;
-         }
       }
-   }
-   return( bOk ) ;
+   
+   return fOK ;
 }
 
-HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
+HB_EXPORT HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
 {
    /* less attemps */
    int iAttemptLeft = 99, iLen;
-   FHANDLE fd;
+   HB_FHANDLE fd;
 
-   HB_SYMBOL_UNUSED( uiAttr );
+   HB_SYMBOL_UNUSED( ulAttr );
 
    do
    {
       pszName[0] = '\0';
 
-      if ( pszDir != NULL && pszDir[0] != '\0' )
+      if( pszDir && pszDir[ 0 ] != '\0' )
       {
-         strcpy( ( char * ) pszName, ( char * ) pszDir );
+         strncpy( ( char * ) pszName, ( char * ) pszDir, _POSIX_PATH_MAX );
       }
-      else if ( !fsGetTempDirByCase( pszName, getenv( "TMPDIR" ) ) &&
-                !fsGetTempDirByCase( pszName, P_tmpdir ) )
+      else 
       {
-         strcpy( ( char * ) pszName, "." );
+        char * pszTmpDir = hb_getenv( "TMPDIR" );
+
+         if( !fsGetTempDirByCase( pszName, pszTmpDir ) )
+         {
+#ifdef P_tmpdir
+            if( !fsGetTempDirByCase( pszName, P_tmpdir ) )
+#endif
+        {
+               pszName[ 0 ] = '.';
+               pszName[ 1 ] = '\0';
+            }
+        }
+         if( pszTmpDir )
+            hb_xfree( pszTmpDir );
       }
+
       if ( pszName[0] != '\0' )
       {
          int len;
          len = strlen( ( char * ) pszName );
-         pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
+         pszName[ len ] = ( BYTE ) hb_set.HB_SET_DIRSEPARATOR;
          pszName[ len + 1 ] = '\0';
       }
 
-      if ( pszPrefix != NULL )
-      {
-         strcat( ( char * ) pszName, ( char * ) pszPrefix );
-      }
+      if( pszPrefix )
+         strncat( ( char * ) pszName, ( char * ) pszPrefix, _POSIX_PATH_MAX );
 
-      iLen = strlen( ( char * ) pszName );
+      iLen = ( int ) strlen( ( char * ) pszName );
       if ( iLen > _POSIX_PATH_MAX - 6 )
          return FS_ERROR;
 
 #if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )
-      if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER ||
-          hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER ||
-          hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER ||
-          hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      if( hb_set.HB_SET_FILECASE != HB_SET_CASE_LOWER &&
+          hb_set.HB_SET_FILECASE != HB_SET_CASE_UPPER &&
+          hb_set.HB_SET_DIRCASE != HB_SET_CASE_LOWER &&
+          hb_set.HB_SET_DIRCASE != HB_SET_CASE_UPPER )
+      {
+         strncat( ( char * ) pszName, "XXXXXX", _POSIX_PATH_MAX );
+         fd = (HB_FHANDLE) mkstemp( ( char * ) pszName );
+         hb_fsSetIOError( fd != (HB_FHANDLE) -1, 0 );
+      }
+      else
 #endif
       {
          int i, n;
@@ -235,20 +241,11 @@ HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
          }
          pszName[iLen++] = '\0';
          hb_fsNameConv( pszName, NULL );
-         fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
+         fd = hb_fsCreateEx( pszName, ulAttr, FO_EXCLUSIVE | FO_EXCL );
       }
-#if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )
-      else
-      {
-         strcat( ( char * ) pszName, "XXXXXX" );
-         fd = (FHANDLE) mkstemp( ( char * ) pszName );
-         hb_fsSetIOError( fd != (FHANDLE) -1, 0 );
-      }
-#endif
-      if ( fd != (FHANDLE) -1 )
-      {
+
+      if ( fd != (HB_FHANDLE) FS_ERROR )
          return fd;
-      }
    }
    while( --iAttemptLeft );
 
@@ -259,15 +256,14 @@ HB_EXPORT FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 
 #ifdef HB_EXTENSION
 
-
 HB_FUNC( HB_FTEMPCREATE )
 {
    BYTE szName[ _POSIX_PATH_MAX + 1 ];
 
-   hb_retni( hb_fsCreateTemp( ( BYTE * ) hb_parc( 1 ),
-                              ( BYTE * ) hb_parc( 2 ),
-                              ISNUM( 3 ) ? hb_parni( 3 ) : FC_NORMAL,
-                              szName ) );
+   hb_retnint( (HB_NHANDLE) hb_fsCreateTemp( ( BYTE * ) hb_parc( 1 ),
+               ( BYTE * ) hb_parc( 2 ),
+               ( ULONG ) ( ISNUM( 3 ) ? ( ULONG ) hb_parnl( 3 ) : FC_NORMAL ),
+               szName ) );
 
    hb_storc( ( char *) szName, 4 );
 }

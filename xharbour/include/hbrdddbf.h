@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.35 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.36 2008/03/13 11:12:06 marchuet Exp $
  */
 
 /*
@@ -195,9 +195,9 @@ typedef struct _DBFAREA
    *  example.
    */
 
-   FHANDLE  hDataFile;              /* Data file handle */
-   FHANDLE  hMemoFile;              /* Memo file handle */
-   FHANDLE  hMemoTmpFile;           /* Memo temporary file handle */
+   PHB_FILE pDataFile;              /* Data file handle */
+   PHB_FILE pMemoFile;              /* Memo file handle */
+   PHB_FILE pMemoTmpFile;           /* Memo temporary file handle */
    char *   szDataFileName;         /* Name of data file */
    char *   szMemoFileName;         /* Name of memo file */
    USHORT   uiHeaderLen;            /* Size of header */
@@ -372,7 +372,7 @@ extern HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                             ULONG ulBlock, ULONG ulSize,
                                             ULONG ulType );
 extern HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
-extern HB_EXPORT BOOL    hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+extern HB_EXPORT BOOL    hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
 extern HB_EXPORT BOOL    hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
 
 #ifndef HB_CDP_SUPPORT_OFF

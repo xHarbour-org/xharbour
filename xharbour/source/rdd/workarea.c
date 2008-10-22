@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.90 2008/09/05 08:38:36 marchuet Exp $
+ * $Id: workarea.c,v 1.91 2008/09/15 15:46:47 marchuet Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ static ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", pArea, lUpDown));
 
-   if( !hb_set.HB_SET_DELETED && pArea->dbfi.itmCobExpr == NULL )
+   if( pArea->dbfi.itmCobExpr == NULL && !hb_set.HB_SET_DELETED )
       return SUCCESS;
 
    /* Since lToSkip is passed to SkipRaw, it should never request more than
@@ -608,6 +608,7 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
       case DBS_DEC:
          hb_itemPutNL( pItem, pField->uiDec );
          break;
+
 #ifdef HB_COMPAT_FOXPRO
       case DBS_FLAG:
          hb_itemPutNL( pItem, pField->uiFlags );
@@ -616,6 +617,7 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
          hb_itemPutNL( pItem, pField->uiStep );
          break;
 #endif
+
       default:
          return FAILURE;
 
@@ -676,52 +678,6 @@ static ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
 }
 
 /*
- * Close the table in the WorkArea - helper function
- */
-static ERRCODE hb_waCloseAux( AREAP pArea, void * pChildArea )
-{
-   USHORT uiPrevArea, uiArea;
-   LPDBRELINFO lpdbRelation, lpdbRelPrev, lpdbRelTmp;
-
-   uiArea = ( ( AREAP ) pChildArea )->uiArea;
-   if( pArea->lpdbRelations )
-   {
-      uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
-      lpdbRelation = pArea->lpdbRelations;
-      lpdbRelPrev = NULL;
-      while( lpdbRelation )
-      {
-         if( lpdbRelation->lpaChild->uiArea == uiArea )
-         {
-            /* Clear this relation */
-            hb_rddSelectWorkAreaNumber( lpdbRelation->lpaChild->uiArea );
-            SELF_CHILDEND( lpdbRelation->lpaChild, lpdbRelation );
-            hb_rddSelectWorkAreaNumber( uiPrevArea );
-            if( lpdbRelation->itmCobExpr )
-            {
-               hb_itemRelease( lpdbRelation->itmCobExpr );
-            }
-            if( lpdbRelation->abKey )
-               hb_itemRelease( lpdbRelation->abKey );
-            lpdbRelTmp = lpdbRelation;
-            if( lpdbRelPrev )
-               lpdbRelPrev->lpdbriNext = lpdbRelation->lpdbriNext;
-            else
-               pArea->lpdbRelations = lpdbRelation->lpdbriNext;
-            lpdbRelation = lpdbRelation->lpdbriNext;
-            hb_xfree( lpdbRelTmp );
-         }
-         else
-         {
-            lpdbRelPrev  = lpdbRelation;
-            lpdbRelation = lpdbRelation->lpdbriNext;
-         }
-      }
-   }
-   return SUCCESS;
-}
-
-/*
  * Close the table in the WorkArea.
  */
 static ERRCODE hb_waClose( AREAP pArea )
@@ -733,11 +689,8 @@ static ERRCODE hb_waClose( AREAP pArea )
    SELF_CLEARREL( pArea );
    SELF_CLEARLOCATE( pArea );
 
-   if( pArea->uiParents > 0 )
-   {
-      /* Clear relations that has this area as a child */
-      hb_rddIterateWorkAreas( hb_waCloseAux, pArea );
-   }
+   /* Clear relations that has this area as a child */
+   hb_rddCloseAllParentRelations( pArea );
 
    if( pArea->atomAlias )
       hb_dynsymSetAreaHandle( ( PHB_DYNS ) pArea->atomAlias, 0 );
@@ -1052,7 +1005,7 @@ static ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 
    if( !pEvalInfo->dbsci.lNext || lNext > 0 )
    {
-      while( TRUE )
+      for( ;; )
       {
          if( SELF_EOF( pArea, &fEof ) != SUCCESS )
             return FAILURE;
@@ -1134,7 +1087,7 @@ static ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
 
    if( !pArea->dbsi.lNext || lNext > 0 )
    {
-      while( TRUE )
+      for( ;; )
       {
          if( SELF_EOF( pArea, &fEof ) != SUCCESS )
             return FAILURE;
@@ -1209,7 +1162,7 @@ static ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
 
    if( !pTransInfo->dbsci.lNext || lNext > 0 )
    {
-      while( TRUE )
+      for( ;; )
       {
          if( SELF_EOF( pArea, &fEof ) != SUCCESS )
             return FAILURE;
@@ -2086,9 +2039,11 @@ static const RDDFUNCS waTable =
    ( DBENTRYP_SVP )   hb_waUnsupported          /* WhoCares */
 };
 
+#define HB_RDD_POOL_ALLOCSIZE       128
 /* common for all threads list of registered RDDs */
-static LPRDDNODE * s_RddList = NULL;   /* Registered RDDs */
-static USHORT s_uiRddMax = 0;          /* Number of registered RDD */
+static LPRDDNODE * s_RddList    = NULL;   /* Registered RDDs pool */
+static USHORT      s_uiRddMax   = 0;      /* Size of RDD pool */
+static USHORT      s_uiRddCount = 0;      /* Number of registered RDD */
 
 /*
  * Get RDD node poionter
@@ -2097,7 +2052,7 @@ HB_EXPORT LPRDDNODE hb_rddGetNode( USHORT uiNode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetNode(%hu)", uiNode));
 
-   return uiNode < s_uiRddMax ? s_RddList[ uiNode ] : NULL;
+   return uiNode < s_uiRddCount ? s_RddList[ uiNode ] : NULL;
 }
 
 HB_EXPORT PHB_ITEM hb_rddList( USHORT uiType )
@@ -2108,13 +2063,13 @@ HB_EXPORT PHB_ITEM hb_rddList( USHORT uiType )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddList(%hu)", uiType));
 
-   for( uiCount = uiRdds = 0; uiCount < s_uiRddMax; ++uiCount )
+   for( uiCount = uiRdds = 0; uiCount < s_uiRddCount; ++uiCount )
    {
       if( uiType == 0 || s_RddList[ uiCount ]->uiType == uiType )
          ++uiRdds;
    }
    pRddArray = hb_itemArrayNew( uiRdds );
-   for( uiCount = uiIndex = 0; uiCount < s_uiRddMax && uiIndex < uiRdds; ++uiCount )
+   for( uiCount = uiIndex = 0; uiCount < s_uiRddCount && uiIndex < uiRdds; ++uiCount )
    {
       pNode = s_RddList[ uiCount ];
       if( uiType == 0 || pNode->uiType == uiType )
@@ -2132,7 +2087,7 @@ HB_EXPORT LPRDDNODE hb_rddFindNode( const char * szDriver, USHORT * uiIndex )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddFindNode(%s, %p)", szDriver, uiIndex));
 
-   for( uiCount = 0; uiCount < s_uiRddMax; uiCount++ )
+   for( uiCount = 0; uiCount < s_uiRddCount; uiCount++ )
    {
       LPRDDNODE pNode = s_RddList[ uiCount ];
       if( strcmp( pNode->szName, szDriver ) == 0 ) /* Matched RDD */
@@ -2156,10 +2111,10 @@ HB_EXPORT void hb_rddShutDown( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddShutDown()"));
 
-   if( s_uiRddMax > 0 )
+   if( s_uiRddCount > 0 )
    {
       hb_rddCloseAll();
-      for( uiCount = 0; uiCount < s_uiRddMax; uiCount++ )
+      for( uiCount = 0; uiCount < s_uiRddCount; uiCount++ )
       {
          if( s_RddList[ uiCount ]->pTable.exit != NULL )
          {
@@ -2169,7 +2124,7 @@ HB_EXPORT void hb_rddShutDown( void )
       }
       hb_xfree( s_RddList );
       s_RddList = NULL;
-      s_uiRddMax = 0;
+      s_uiRddMax = s_uiRddCount = 0;
    }
    hb_rddWaShutDown();
 }
@@ -2183,21 +2138,18 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
    PHB_DYNS pGetFuncTable;
    char szGetFuncTable[ HB_RDD_MAX_DRIVERNAME_LEN + 14 ];
    USHORT uiFunctions;
+   int iResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddRegister(%s, %hu)", szDriver, uiType));
 
    if( hb_rddFindNode( szDriver, NULL ) )    /* Duplicated RDD */
-   {
       return 1;
-   }
 
    snprintf( szGetFuncTable, sizeof( szGetFuncTable ), "%s_GETFUNCTABLE",
              szDriver );
    pGetFuncTable = hb_dynsymFindName( szGetFuncTable );
    if( !pGetFuncTable )
-   {
       return 2;              /* Not valid RDD */
-   }
 
    /* Create a new RDD node */
    pRddNewNode = ( LPRDDNODE ) hb_xgrab( sizeof( RDDNODE ) );
@@ -2206,35 +2158,45 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
    /* Fill the new RDD node */
    hb_strncpy( pRddNewNode->szName, szDriver, sizeof( pRddNewNode->szName ) - 1 );
    pRddNewNode->uiType = uiType;
-   pRddNewNode->rddID = s_uiRddMax;
+   pRddNewNode->rddID = s_uiRddCount;
 
    /* Call <szDriver>_GETFUNCTABLE() */
-   hb_vmPushSymbol( hb_dynsymSymbol( pGetFuncTable ) );
+   hb_vmPushDynSym( pGetFuncTable );
    hb_vmPushNil();
    hb_vmPushPointer( ( void * ) &uiFunctions );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pTable );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pSuperTable );
-   hb_vmPushInteger( s_uiRddMax );
+   hb_vmPushInteger( s_uiRddCount );
    hb_vmDo( 4 );
    if( hb_parni( -1 ) != SUCCESS )
-   {
-      hb_xfree( pRddNewNode );         /* Delete de new RDD node */
-      return 3;                        /* Invalid FUNCTABLE */
-   }
-
-   if( s_uiRddMax == 0 )                /* First RDD node */
-      s_RddList = (LPRDDNODE *) hb_xgrab( sizeof(LPRDDNODE) );
+      iResult = 3;                        /* Invalid FUNCTABLE */
    else
-      s_RddList = (LPRDDNODE *) hb_xrealloc( s_RddList, sizeof(LPRDDNODE) * ( s_uiRddMax + 1 ) );
-
-   s_RddList[ s_uiRddMax++ ] = pRddNewNode;   /* Add the new RDD node */
-
-   if( pRddNewNode->pTable.init != NULL )
    {
-      SELF_INIT( pRddNewNode );
+      /* repeat the test to protect against possible registering RDD by
+       *  <szDriver>_GETFUNCTABLE()
+       */
+      if( ! hb_rddFindNode( szDriver, NULL ) )    /* Duplicated RDD */
+      {
+         if( s_uiRddCount == s_uiRddMax )
+         {
+            s_uiRddMax += HB_RDD_POOL_ALLOCSIZE;
+            s_RddList = ( LPRDDNODE * )
+                  hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
+         }
+         s_RddList[ s_uiRddCount ] = pRddNewNode;   /* Add the new RDD node */
+         s_uiRddCount++;
+         iResult = 0;
+      }
+      else
+         iResult = 1;
    }
 
-   return 0;                           /* Ok */
+   if( iResult != 0 )
+      hb_xfree( pRddNewNode );
+   else if( pRddNewNode->pTable.init != NULL )
+      SELF_INIT( pRddNewNode );
+
+   return iResult;
 }
 
 /*
@@ -2289,6 +2251,27 @@ HB_EXPORT ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, 
       pSubFunction ++;
    }
    return SUCCESS;
+}
+
+/* extend the size of RDD nodes buffer to given value to avoid later
+ * RT reallocations. It may be useful in some very seldom cases
+ * for MT programs which will register dynamically at runtime
+ * more then 128 RDDs.
+ */
+HB_FUNC( __RDDPREALLOCATE )
+{
+   LONG lNewSize = hb_parnl( 1 );
+
+   if( lNewSize > ( LONG ) USHRT_MAX )
+      lNewSize = USHRT_MAX;
+   if( lNewSize > ( LONG ) s_uiRddMax )
+   {
+      s_uiRddMax += HB_RDD_POOL_ALLOCSIZE;
+      s_RddList = ( LPRDDNODE * )
+                  hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
+   }
+
+   hb_retnl( s_uiRddMax );
 }
 
 HB_FUNC_EXTERN( RDDSYS );

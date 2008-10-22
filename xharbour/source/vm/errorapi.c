@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.85 2008/06/27 06:21:52 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.86 2008/08/02 17:18:01 modalsist Exp $
  */
 
 /*
@@ -393,17 +393,17 @@ HB_EXPORT USHORT hb_errLaunch( PHB_ITEM pError )
              hb_itemRelease( pResult );
          }
 
-         hb_itemRelease( pError );
-
          /* Allow other threads to go */
          #if defined( HB_THREAD_SUPPORT )
+            hb_itemRelease( pError );
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
             hb_set.HB_SET_OUTPUTSAFETY = FALSE;
             hb_threadIdleEnd();
+            exit( hb_vmQuit() );
          #endif
 
-         exit( hb_vmQuit() );
+         uiAction = E_BREAK;
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {

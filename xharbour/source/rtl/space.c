@@ -1,5 +1,5 @@
 /*
- * $Id: space.c,v 1.5 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: space.c,v 1.6 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ HB_FUNC( SPACE )
    if ( hb_param( 1, HB_IT_NUMERIC ) )
    {
       LONG lLen = hb_parnl( 1 );
+
       if( lLen > 0 )
       {
          char * szResult = ( char * ) hb_xgrab( lLen + 1 );
@@ -69,7 +70,7 @@ HB_FUNC( SPACE )
          /* NOTE: String overflow could never occure since a string can
                   be as large as ULONG_MAX, and the maximum length that
                   can be specified is LONG_MAX here. [vszakats] */
-         /* hb_errRT_BASE( EG_STROVERFLOW, 1233, NULL, "SPACE" ); */
+         /* hb_errRT_BASE( EG_STROVERFLOW, 1233, NULL, HB_ERR_FUNCNAME ); */
 
          hb_xmemset( szResult, ' ', lLen );
          hb_retclenAdopt( szResult, lLen );

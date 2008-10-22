@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.120 2008/04/30 16:47:32 ronpinkas Exp $
+* $Id: thread.h,v 1.121 2008/06/28 18:51:49 walito Exp $
 */
 
 /*
@@ -447,6 +447,7 @@ typedef struct tag_HB_STACK
    ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
    //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
+   HB_STACKRDD rdd;             /* RDD related data */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
