@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.204 2008/08/26 20:18:20 andijahja Exp $
+ * $Id: tbrowse.prg,v 1.205 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -721,10 +721,7 @@ CLASS TBrowse STATIC
    ASSIGN Cargo(u)         INLINE ::uCargo := u
 
    ACCESS LeftVisible      INLINE ::nLeftVisible  // Indicates position of leftmost unfrozen column in display
-   ASSIGN LeftVisible(n)   INLINE ::nLeftVisible := if(hb_isnumeric(n),n,::nLeftVisible)
-
    ACCESS RightVisible     INLINE ::nRightVisible // Indicates position of rightmost unfrozen column in display
-   ASSIGN RightVisible(n)  INLINE ::nRightVisible := if(hb_isnumeric(n),n,::nRightVisible)
 
    ACCESS ColCount         INLINE ::nColCount     // Number of TBrowse columns
    ACCESS RowCount         INLINE ::nRowCount     // Number of visible data rows in the TBrowse display
@@ -1908,7 +1905,7 @@ Return ::nColPos
 METHOD LeftDetermine() CLASS TBrowse
 *------------------------------------------------------*
 LOCAL nWidth := ::nFrozenWidth
-LOCAL nCol   := ::nRightVisible
+LOCAL nCol   := Min(::nRightVisible,::nColCount)
 
    // If ::nFrozenCols > 0 I don't need to test nCol > 0, if 0 it is the same test
    while nCol > ::nFrozenCols .AND.;
@@ -1917,12 +1914,15 @@ LOCAL nCol   := ::nRightVisible
    enddo
 
    // Clipper compatible: do not let nCol stop at empty column 
-   nCol++
+   if nCol < ::nColCount
+      nCol++
+   endif
+
    while nCol <= ::nRightVisible .and. ::aColsInfo[ nCol, TBCI_WIDTH ] == 0
       nCol++
    enddo
 
-Return Min(nCol, ::nRightVisible)
+Return Min( Min(nCol, ::nRightVisible), ::nColCount )
 
 *------------------------------------------------------*
 METHOD HowManyCol() CLASS TBrowse
