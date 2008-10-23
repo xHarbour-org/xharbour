@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.14 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbcrypt.c,v 1.15 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /***************************************************************
 * NXS aglorithm is FREE SOFTWARE. It can be reused for any
-* purpose, provided that this copiright notice is still present
+* purpose, provided that this copyright notice is still present
 * in the software.
 *
 * This program is distributed WITHOUT ANY WARRANTY that it can
@@ -65,6 +65,8 @@
 **************************************************************/
 
 
+#include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbzlib.h"
 #include "hbnxs.h"
 
@@ -84,14 +86,14 @@ void nxs_crypt(
    BYTE *cipher )
 {
 
-   if(keylen > NXS_MAX_KEYLEN )
+   if( keylen > NXS_MAX_KEYLEN )
    {
       keylen = NXS_MAX_KEYLEN;
    }
 
-   // debug
-   //memcpy( cipher, source, srclen );
-   // end debug
+#ifdef DEBUG_0
+   memcpy( cipher, source, srclen );
+#endif
 
    /* pass one: scramble the source using the key */
    nxs_scramble( source, srclen, key, keylen, cipher );
@@ -111,7 +113,7 @@ void nxs_decrypt(
    const unsigned char *key, ULONG keylen,
    BYTE *result )
 {
-   if(keylen > NXS_MAX_KEYLEN )
+   if( keylen > NXS_MAX_KEYLEN )
    {
       keylen = NXS_MAX_KEYLEN;
    }
@@ -153,11 +155,8 @@ void nxs_scramble(
    nxs_make_scramble( scramble, key, keylen );
 
    /* Leave alone the last block */
-   len = (srclen / keylen) * keylen;
+   len = keylen > 0 ? (srclen / keylen) * keylen : 0;
    nxs_partial_scramble( source, cipher, scramble, len, keylen );
-
-   // last pos was not done.
-   //memcpy( cipher +len , source + len , srclen - len );
 
    keylen = srclen - len;
    nxs_make_scramble( scramble, key, keylen );
@@ -209,8 +208,8 @@ void nxs_unscramble(
    nxs_make_scramble( scramble, key, keylen );
 
    /* Leave alone the last block */
-   len = (cipherlen / keylen) * keylen;
-   nxs_partial_unscramble( cipher, scramble, len , keylen );
+   len = keylen > 0 ? (cipherlen / keylen) * keylen : 0;
+   nxs_partial_unscramble( cipher, scramble, len, keylen );
 
    keylen = cipherlen - len;
    nxs_make_scramble( scramble, key, keylen );
@@ -287,7 +286,7 @@ void nxs_xordecode(
    USHORT keypos = 0;
    BYTE c_bitrest, c_bitleft;
 
-   // A very short block?
+   /* A very short block? */
    if ( keylen > cipherlen - pos )
    {
       keylen = ( USHORT ) ( cipherlen - pos);
@@ -309,7 +308,7 @@ void nxs_xordecode(
       if (keypos == (USHORT) keylen )
       {
          keypos = 0;
-         // last block
+         /* last block */
          if ( keylen > cipherlen - pos )
          {
             keylen = ( USHORT ) (cipherlen - pos);
@@ -419,26 +418,17 @@ void nxs_make_scramble( int *scramble, const unsigned char *key, ULONG keylen )
 
 HB_FUNC( HB_CRYPT )
 {
-   PHB_ITEM pSource = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
-   BYTE *cRes;
+   PHB_ITEM pSource = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pKey = hb_param( 2, HB_IT_ANY );
 
-   if ( pSource == NULL || pSource->item.asString.length == 0 ||
-        pKey == NULL || pKey->item.asString.length == 0 )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_CRYPT", 2,
-            hb_param(1,HB_IT_ANY), hb_param(2,HB_IT_ANY) );
-      return;
-   }
-
-   cRes = (BYTE *) hb_xgrab( pSource->item.asString.length + 8);
+   BYTE * cRes = ( BYTE * ) hb_xgrab( hb_itemGetCLen( pSource ) + 8 );
 
    nxs_crypt(
-      (BYTE *) (pSource->item.asString.value), pSource->item.asString.length,
-      (BYTE *) (pKey->item.asString.value), pKey->item.asString.length,
-      cRes);
+      ( BYTE * ) hb_itemGetCPtr( pSource ), hb_itemGetCLen( pSource ),
+      ( BYTE * ) hb_itemGetCPtr( pKey ), hb_itemGetCLen( pKey ),
+      cRes );
 
-   hb_retclenAdopt( (char *)cRes, pSource->item.asString.length );
+   hb_retclenAdopt( ( char * ) cRes, hb_itemGetCLen( pSource ) );
 }
 
 /*****
@@ -449,24 +439,15 @@ HB_FUNC( HB_CRYPT )
 
 HB_FUNC( HB_DECRYPT )
 {
-   PHB_ITEM pSource = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
-   BYTE *cRes;
+   PHB_ITEM pSource = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pKey = hb_param( 2, HB_IT_ANY );
 
-   if ( pSource == NULL || pSource->item.asString.length == 0 ||
-        pKey == NULL || pKey->item.asString.length == 0 )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_DECRYPT", 2,
-            hb_param(1,HB_IT_ANY), hb_param(2,HB_IT_ANY) );
-      return;
-   }
-
-   cRes = ( BYTE * ) hb_xgrab( pSource->item.asString.length + 8 );
+   BYTE * cRes = ( BYTE * ) hb_xgrab( hb_itemGetCLen( pSource ) + 8 );
 
    nxs_decrypt(
-      (BYTE *) (pSource->item.asString.value), pSource->item.asString.length,
-      (BYTE *) (pKey->item.asString.value), pKey->item.asString.length,
-      cRes);
+      ( BYTE * ) hb_itemGetCPtr( pSource ), hb_itemGetCLen( pSource ),
+      ( BYTE * ) hb_itemGetCPtr( pKey ), hb_itemGetCLen( pKey ),
+      cRes );
 
-   hb_retclenAdopt( (char *)cRes, pSource->item.asString.length );
+   hb_retclenAdopt( ( char * ) cRes, hb_itemGetCLen( pSource ) );
 }
