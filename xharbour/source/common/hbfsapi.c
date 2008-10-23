@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.15 2008/05/04 14:20:51 andijahja Exp $
+ * $Id: hbfsapi.c,v 1.16 2008/05/05 14:08:53 lculik Exp $
  */
 
 /*
@@ -79,6 +79,9 @@ extern void hb_fhnd_ForceLink( void );
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
 
+#ifndef FILE_ATTRIBUTE_DEVICE
+#define FILE_ATTRIBUTE_DEVICE               0x00000040
+#endif
 /*
  * Function that adds zero or more paths to a list of pathnames to search
  */
