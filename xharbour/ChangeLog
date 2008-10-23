@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6233 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: ChangeLog,v 1.6234 2008/10/22 11:51:15 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-23 09:46 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\wacore.c
+  * source\vm\dynsym.c
+    - removed unused variables.
 
 2008-10-22 13:52 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\classes.h

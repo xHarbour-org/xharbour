@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.58 2008/10/22 08:33:09 marchuet Exp $
+ * $Id: dynsym.c,v 1.59 2008/10/22 11:51:15 marchuet Exp $
  */
 
 /*
@@ -984,12 +984,16 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
                                      , given the dynamic symbol index */
 {
    HB_THREAD_STUB_API
+
+#ifndef HB_NO_PROFILER
    /* NOTE: This will return zero if the parameter is not numeric */
    LONG lIndex = hb_parnl( 1 );
+#endif
 
    hb_reta( 2 );
    hb_stornl( 0, -1, 1 );
    hb_stornl( 0, -1, 2 );
+
 #ifndef HB_NO_PROFILER
    hb_dynsymLock();
 
