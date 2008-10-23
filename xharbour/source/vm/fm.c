@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.92 2008/10/22 08:33:09 marchuet Exp $
+ * $Id: fm.c,v 1.93 2008/10/23 10:32:14 marchuet Exp $
  */
 
 /*
@@ -69,7 +69,11 @@
  *
  */
 
+/* NOTE: This definitions must be ahead of any and all #include statements */
+
+/* For MS-Win builds */
 #define HB_OS_WIN_32_USED
+
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbvmopt.h"
@@ -81,27 +85,69 @@
 #include "hbapierr.h"
 #include "hbmemory.ch"
 
+
+
+#if defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
+   #define HB_FM_WIN32_ALLOC
+#endif
+
+#if defined( HB_FM_STD_ALLOC )
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#elif !defined( HB_FM_DL_ALLOC ) && !defined( HB_FM_WIN32_ALLOC )
+   #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32__ )
+      #define HB_FM_DL_ALLOC
+   #else
+      /* #define HB_FM_DL_ALLOC */
+   #endif
+#endif
+
+#if defined( HB_FM_DL_ALLOC )
+/* #  define NO_MALLINFO 1 */
+/* #  define INSECURE */
+/* #  define USE_DL_PREFIX */
+#  define REALLOC_ZERO_BYTES_FREES
+#  if defined( HB_MT_VM )
+#     define USE_LOCKS  1
+#  endif
+#  if defined( __BORLANDC__ )
+#     pragma warn -aus
+#     pragma warn -ccc
+#     pragma warn -eff
+#     pragma warn -ngu
+#     pragma warn -prc
+#     pragma warn -rch
+#  elif defined( _MSC_VER )
+#     define USE_DL_PREFIX
+#  endif
+#  include "dlmalloc.c"
+#  if defined( __BORLANDC__ )
+#     pragma warn +aus
+#     pragma warn +ccc
+#     pragma warn +eff
+#     pragma warn +ngu
+#     pragma warn +prc
+#     pragma warn +rch
+#  endif
+#  if defined( USE_DL_PREFIX )
+#     define malloc( n )         dlmalloc( ( n ) )
+#     define realloc( p, n )     dlrealloc( ( p ), ( n ) )
+#     define free( p )           dlfree( ( p ) )
+#  endif
+#elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
+#  define malloc( n )         ( void * ) LocalAlloc( LMEM_FIXED, ( n ) )
+#  define realloc( p, n )     ( void * ) LocalReAlloc( ( HLOCAL ) ( p ), ( n ), LMEM_MOVEABLE )
+#  define free( p )           LocalFree( ( HLOCAL ) ( p ) )
+#endif
+
 #ifndef HB_FM_STATISTICS
 #  undef HB_PARANOID_MEM_CHECK
 #endif
 
-#if defined(__EXPORT__) && !defined(HB_FM_WIN32_ALLOC)
-   #define HB_FM_WIN32_ALLOC
+#if defined( HB_FM_STATISTICS ) && !defined( HB_TR_LEVEL )
+#  define HB_TR_LEVEL HB_TR_ERROR
 #endif
 
-#ifndef HB_OS_WIN_32
-#  undef HB_FM_WIN32_ALLOC
-#endif
-
-#ifdef HB_FM_WIN32_ALLOC
-#  define malloc( n )         (void *) LocalAlloc( LMEM_FIXED, ( n ) )
-#  define realloc( p, n )     (void *) LocalReAlloc( (HLOCAL) ( p ), ( n ), LMEM_MOVEABLE )
-#  define free( p )           LocalFree( (HLOCAL) ( p ) )
-#endif
-
-#if defined(HB_FM_STATISTICS) && !defined(HB_TR_LEVEL)
-   #define HB_TR_LEVEL HB_TR_ERROR
-#endif
 
 #ifdef HB_FM_STATISTICS
 
@@ -112,11 +158,11 @@
 
 typedef struct _HB_MEMINFO
 {
-   ULONG  ulSignature;
-   ULONG  ulSize;
-   USHORT uiProcLine;
-   USHORT uiAutoRelease;
-   char   szProcName[ HB_SYMBOL_NAME_LEN + 1 ];
+   ULONG       ulSignature;
+   ULONG       ulSize;
+   USHORT      uiProcLine;
+   char        szProcName[ HB_SYMBOL_NAME_LEN + 1 ];
+   USHORT      uiAutoRelease;
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
 } HB_MEMINFO, * PHB_MEMINFO;
@@ -284,7 +330,7 @@ HB_EXPORT void * hb_xalloc( ULONG ulSize )         /* allocates fixed memory, re
    #undef hb_xgrab
    HB_FORCE_EXPORT void * hb_xgrab( ULONG ulSize )
    {
-      return malloc( ulSize);
+      return malloc( ulSize );
    }
 #else
 /* allocates fixed memory, exits on failure */
@@ -481,13 +527,13 @@ HB_EXPORT void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    }
    else if( ulSize == 0 )
    {
-      free( HB_FM_PTR( pMem ) );
+      free( ( void * ) HB_FM_PTR( pMem ) );
       return NULL;
    }
    else
    {
       HB_MEM_THLOCK();
-      pMem = realloc( HB_FM_PTR( pMem ), HB_ALLOC_SIZE( ulSize ) );
+      pMem = realloc( ( void * ) HB_FM_PTR( pMem ), HB_ALLOC_SIZE( ulSize ) );
       HB_MEM_THUNLOCK();
    }
 
@@ -595,7 +641,7 @@ void hb_xRefFree( void * pMem )
 #else
 
    if( HB_ATOMIC_DEC( * HB_COUNTER_PTR( pMem ) ) == 0 )
-      free( HB_FM_PTR( pMem ) );
+      free( ( void * ) HB_FM_PTR( pMem ) );
 
 #endif
 }
@@ -640,7 +686,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
    }
    else
    {
-      pMem = realloc( HB_FM_PTR( pMem ), HB_ALLOC_SIZE ( ulSize ) );
+      pMem = realloc( ( void * ) HB_FM_PTR( pMem ), HB_ALLOC_SIZE ( ulSize ) );
       if( pMem )
          return HB_MEM_PTR( pMem );
    }
@@ -703,6 +749,7 @@ HB_EXPORT void hb_xinit( void ) /* Initialize fixed memory subsystem */
 /* Returns pointer to string containing printable version
    of pMem memory block */
 
+#ifdef HB_FM_STATISTICS
 static char * hb_mem2str( char * membuffer, void * pMem, UINT uiSize )
 {
    BYTE *cMem = ( BYTE * ) pMem;
@@ -746,8 +793,6 @@ static char * hb_mem2str( char * membuffer, void * pMem, UINT uiSize )
 HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xexit()"));
-
-#ifdef HB_FM_STATISTICS
 
 //JC1: The problem with threads here is that the stack has already been
 // destroyed, but hb_conOut and other functions may allocate memory with xgrab, using the
@@ -844,7 +889,7 @@ HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
             (char *) pMemBlock + HB_MEMINFO_SIZE,
             pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
             hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                        pMemBlock->ulSize ) ) );
+                        HB_MIN( pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) ) );
 
          if( hLog )
          {
@@ -852,7 +897,7 @@ HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
                ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                           pMemBlock->ulSize ) );
+                           HB_MIN( pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) );
          }
       }
 
@@ -866,9 +911,16 @@ HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    else
       OutputDebugString( "HB_XEXIT(): No Memory Leak Detected" );
 #endif
+}
+
+#else
+
+HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_xexit()"));
+}
 
 #endif
-}
 
 /* hb_xmemcpy and hb_xmemset are only needed when
    unsigned int and unsigned long differ in length */

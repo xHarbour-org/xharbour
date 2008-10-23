@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6237 2008/10/23 11:32:04 marchuet Exp $
+ * $Id: ChangeLog,v 1.6238 2008/10/23 13:23:57 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-23 17:52 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\vm\fm.c
+    ! fixed warnings when are not defined HB_FM_WIN32_ALLOC
+  + source\vm\dlmalloc.c
+    + added alternative memory manager written by Doug Lea
+      It can be activated by recompiling Harbour with HB_FM_DL_ALLOC macro.
+      Please make test on different platforms with different C compilers.
+      Linux users will not benefit from it because the default GLIBC MM
+      is derived from a version of code.
+      NOTE: the results may strongly depend on total memory allocation
+      and will be different then in simple memory tests.
 
 2008-10-23 10:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
