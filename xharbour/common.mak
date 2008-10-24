@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.26 2008/10/09 22:53:43 ronpinkas Exp $
+# $Id: common.mak,v 1.27 2008/10/22 08:32:32 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -268,7 +268,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)maxrow$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)memofile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)minmax$(OBJEXT)\
-        $(OBJ_DIR)$(DIR_SEP)mlcfunc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mlcfunc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mod$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mouseapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mousex$(OBJEXT)\
@@ -1174,7 +1174,7 @@ DLL_MAIN_LIB_OBJS=\
 # HARBOUR.DLL Rules
 #===============================================================================
 HARBOUR_DLL_OBJS=\
-        $(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT)\
 	\
 	$(RTL_LIB_OBJS)\
 	$(PCREPOS_LIB_OBJS)\
@@ -1248,11 +1248,11 @@ HBTESTDLL_EXE_OBJS=\
 # GTWVG.LIB dependencies
 #===============================================================================
 GTWVG_LIB_OBJS=\
-        $(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT)\
-        $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT)\
-        $(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT)\
-        $(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT)\
-        $(OBJ_DIR)$(DIR_SEP)wvtpaint$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvtpaint$(OBJEXT)
 
 #===============================================================================
 # GTWVW.LIB dependencies
