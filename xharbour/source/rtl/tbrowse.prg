@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.205 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: tbrowse.prg,v 1.206 2008/10/23 13:23:57 modalsist Exp $
  */
 
 /*
@@ -188,7 +188,8 @@ CLASS TDataCache STATIC
    METHOD   SetColRect( aRect )          // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
    METHOD   ResetColRectArea()           // Reset colorrect area.
    METHOD   ResetColRect()               // Reset colorrect array.
-
+PROTECTED:
+   METHOD  InitCache()                   // Init DataCache vars.
 HIDDEN:
 
    DATA  nCurRow                         // Current Row inside cache
@@ -206,7 +207,7 @@ HIDDEN:
    DATA  lInvalid                        // if true all rows will be invalidated. 
    DATA  lNewRow                         // if true indicate that browse is in append mode.
 
-   METHOD  InitCache()                   // Init DataCache vars.
+
    METHOD  FillRow( nRow )               // Fills a row of aCache with data from datasource
    METHOD  ColIndex()                    // Determine the relative column index into ::aCache array.
 

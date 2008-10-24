@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2006/01/31 21:38:19 druzus Exp $
+# $Id: Makefile,v 1.3 2007/05/20 03:26:22 ronpinkas Exp $
 #
 
 ROOT = ../../../
@@ -25,6 +25,7 @@ C_SOURCES=\
 	pcre_valid_utf8.c \
 	pcre_version.c \
 	pcre_xclass.c \
+   pcre_ucd.c \
 	pcreposix.c 
 
 LIBNAME=pcrepos
