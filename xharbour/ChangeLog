@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6239 2008/10/23 15:53:35 marchuet Exp $
+ * $Id: ChangeLog,v 1.6240 2008/10/23 19:06:58 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-24 09:41 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\vm\fm.c
+    * restored the use of memory, now to test DL_ALLOC will be explicit with macro -DHB_FM_DL_ALLOC
+	#if defined( HB_FM_DL_ALLOC ) && ( defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32__ ) )
+	   #undef HB_FM_STD_ALLOC
+	   #undef HB_FM_WIN32_ALLOC
+	#elif defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
+	   #define HB_FM_WIN32_ALLOC
+	   #undef HB_FM_DL_ALLOC
+	   #undef HB_FM_STD_ALLOC   
+	#elif defined( HB_FM_WIN32_ALLOC )
+	   #undef HB_FM_DL_ALLOC
+	   #undef HB_FM_STD_ALLOC   
+	#elif defined( HB_FM_STD_ALLOC )
+	   #undef HB_FM_DL_ALLOC
+	   #undef HB_FM_WIN32_ALLOC
+	#else
+	   #define HB_FM_STD_ALLOC 
+	   #undef HB_FM_DL_ALLOC
+	   #undef HB_FM_WIN32_ALLOC
+	#endif   
 
 2008-10-23 21:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\common\hbfsapi.c

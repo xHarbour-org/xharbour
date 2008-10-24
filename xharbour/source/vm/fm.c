@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.93 2008/10/23 10:32:14 marchuet Exp $
+ * $Id: fm.c,v 1.94 2008/10/23 15:53:36 marchuet Exp $
  */
 
 /*
@@ -85,23 +85,25 @@
 #include "hbapierr.h"
 #include "hbmemory.ch"
 
-
-
-#if defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
+#if defined( HB_FM_DL_ALLOC ) && ( defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32__ ) )
+   #undef HB_FM_STD_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#elif defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
    #define HB_FM_WIN32_ALLOC
-#endif
-
-#if defined( HB_FM_STD_ALLOC )
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_STD_ALLOC   
+#elif defined( HB_FM_WIN32_ALLOC )
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_STD_ALLOC   
+#elif defined( HB_FM_STD_ALLOC )
    #undef HB_FM_DL_ALLOC
    #undef HB_FM_WIN32_ALLOC
-#elif !defined( HB_FM_DL_ALLOC ) && !defined( HB_FM_WIN32_ALLOC )
-   #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32__ )
-      #define HB_FM_DL_ALLOC
-   #else
-      /* #define HB_FM_DL_ALLOC */
-   #endif
-#endif
-
+#else
+   #define HB_FM_STD_ALLOC 
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#endif   
+   
 #if defined( HB_FM_DL_ALLOC )
 /* #  define NO_MALLINFO 1 */
 /* #  define INSECURE */
