@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.95 2008/10/24 07:40:07 marchuet Exp $
+ * $Id: fm.c,v 1.96 2008/10/24 11:40:13 marchuet Exp $
  */
 
 /*
@@ -221,7 +221,11 @@ typedef void * PHB_MEMINFO;
 #  undef HB_ATOMIC_SET
 #  define HB_ATOMIC_INC( p )    ( ++(*(p)) )
 #  define HB_ATOMIC_DEC( p )    ( --(*(p)) )
-
+#else
+#  undef HB_ATOMIC_DEC
+#  undef HB_ATOMIC_INC
+#  define HB_ATOMIC_INC( p )     InterlockedIncrement( ( long * ) (p) )
+#  define HB_ATOMIC_DEC( p )     InterlockedDecrement( ( long * ) (p) )
 #endif
 
 #ifndef HB_ATOMIC_GET
@@ -627,7 +631,7 @@ HB_FORCE_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 
       HB_MEM_THLOCK();
 
-      free( HB_FM_PTR( pMem ) );
+      free( ( void * ) HB_FM_PTR( pMem ) );
 
       HB_MEM_THUNLOCK();
 
@@ -939,9 +943,9 @@ HB_EXPORT void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    else
    {
       OutputDebugString( "HB_XEXIT(): No Memory Leak Detected." );
-#if defined( HB_FM_STD_ALLOC )
+#if defined( HB_FM_STD_ALLOC ) || ( defined( HB_FM_WIN32_ALLOC ) && !defined( HB_OS_WIN_32 ) )
       OutputDebugString( "ussing HB_FM_STD_ALLOC." );
-#elif defined( HB_FM_WIN32_ALLOC )
+#elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
       OutputDebugString( "ussing HB_FM_WIN32_ALLOC." );
 #elif defined( HB_FM_DL_ALLOC )
       OutputDebugString( "ussing HB_FM_DL_ALLOC." );
