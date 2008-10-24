@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.24 2008/10/09 22:53:43 ronpinkas Exp $
+# $Id: compile.mak,v 1.25 2008/10/22 08:32:32 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1442,6 +1442,9 @@ $(OBJ_DIR)$(DIR_SEP)zutil$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)zutil.c
 # PCREPOS.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)pcre_chartables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_chartables.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_ucd.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_compile$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_compile.c

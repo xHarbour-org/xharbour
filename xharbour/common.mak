@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.27 2008/10/22 08:32:32 marchuet Exp $
+# $Id: common.mak,v 1.28 2008/10/24 11:40:13 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -435,6 +435,7 @@ PCREPOS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pcre_ucp_searchfuncs$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_version$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_xclass$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcreposix$(OBJEXT)
 
