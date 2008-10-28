@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6245 2008/10/26 05:38:28 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6246 2008/10/28 12:19:35 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -419,7 +419,7 @@
          DllMain.lib should be linked into EXE applications which are staticly
          linked to harbour.dll by means of harbour.lib.
 
-         The prg modulues of such EXE should use the native version of hb_vmProcessSymbols() in hvm.c
+         The prg modules of such EXE should use the native version of hb_vmProcessSymbols() in hvm.c
          but that version is masked by the maindllh module.
 
          Linking DllMain.lib (before Harbour.lib) resolves that problem, by linking to
@@ -427,7 +427,7 @@
          hb_vmProcessSymbols(). This in turn processes the modules of the EXE as static symbols.
 
          Please note that in such sample, staticly linked application, UseDll.exe, the dynamic
-         symbols (harbour.dll and optionally PrgPCode.dll) will be processed as dynmaic symbols,
+         symbols (harbour.dll and optionally PrgPCode.dll) will be processed as dynamic symbols,
          while the application defined symbols will be processed as static, and are allowed to
          OVERRIDE any dynamic symbol loaded from dll (symbols from staticly linked dlls are
          loaded first).
@@ -454,7 +454,7 @@
 
   * source/vm/hvm.c
     + Added hb_vmProcessExeSymbols()
-    * Refined static and synamic symbol processing in hb_vmRegisterSymbols()
+    * Refined static and dynamic symbol processing in hb_vmRegisterSymbols()
 
   * source/vm/eval.c
     * Exported and corrected:
