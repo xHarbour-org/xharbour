@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.74 2008/06/27 06:21:52 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.75 2008/06/28 18:51:49 walito Exp $
  */
 
 /*
@@ -503,15 +503,7 @@ HB_FUNC( AEVAL )
                     ISNUM( 3 ) ? &ulStart : NULL,
                     ISNUM( 4 ) ? &ulCount : NULL );
 
-      /* AEval() returns the array itself */
-      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
-      {
-         hb_itemCopy( hb_stackReturnItem(), pArray );
-      }
-      else
-      {
-         hb_itemForwardValue( hb_stackReturnItem(), pArray );
-      }
+      hb_itemReturn( hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
    }
    else
    {
