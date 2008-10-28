@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.102 2008/08/01 09:41:14 marchuet Exp $
+ * $Id: hbdefs.h,v 1.103 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -66,16 +66,16 @@
     ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
     ( defined( __GNUC__ ) && \
       ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
-#  include <stdint.h>
-    /* workaround for BCC 5.8 bug */
-#   if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
-#         undef INT32_MIN
-#         define INT32_MIN ((int32_t) (-INT32_MAX-1))
+   #include <stdint.h>
+   /* workaround for BCC 5.8 bug */
+   #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
+      #undef INT32_MIN
+      #define INT32_MIN ((int32_t) (-INT32_MAX-1))
       #undef INT64_MIN
       #define INT64_MIN (9223372036854775807i64-1)
       #undef INT64_MAX
       #define INT64_MAX 9223372036854775807i64
-#   endif
+   #endif
 #endif
 
 /*
@@ -228,21 +228,21 @@
 #ifndef HB_LONG_LONG_OFF
 
    #if ! defined(HB_DONT_DEFINE_BASIC_TYPES) && ! defined(_WINNT_H)
-         #if !defined(LONGLONG)
-            #if defined(__GNUC__)
-               typedef long long LONGLONG;
-            #else
-               typedef __int64 LONGLONG;
-            #endif
-         #endif
-         #if !defined(ULONGLONG)
-            #if defined(__GNUC__)
-               typedef unsigned long long ULONGLONG;
-            #else
-               typedef unsigned __int64 ULONGLONG;
-            #endif
+      #if !defined(LONGLONG)
+         #if defined(__GNUC__)
+            typedef long long LONGLONG;
+         #else
+            typedef __int64 LONGLONG;
          #endif
       #endif
+      #if !defined(ULONGLONG)
+         #if defined(__GNUC__)
+            typedef unsigned long long ULONGLONG;
+         #else
+            typedef unsigned __int64 ULONGLONG;
+         #endif
+      #endif
+   #endif
 
    #if !defined(ULONGLONG_MAX)
       #if defined(_UI64_MAX)
@@ -360,37 +360,37 @@
 #endif
 
 #if defined( HB_ARCH_64BIT ) && !defined( _WIN64 )
-#   if !defined( UINT64 )
-      typedef ULONG        UINT64;
-#   endif
-#   if !defined( INT64 )
-      typedef LONG         INT64;
-#   endif
-#   if !defined( UINT64_MAX )
-#     define UINT64_MAX    ULONG_MAX
-#   endif
-#   if !defined( INT64_MAX )
-#     define INT64_MAX     LONG_MAX
-#   endif
-#   if !defined( INT64_MIN )
-#     define INT64_MIN     LONG_MIN
-#   endif
+#  if !defined( UINT64 )
+     typedef ULONG        UINT64;
+#  endif
+#  if !defined( INT64 )
+     typedef LONG         INT64;
+#  endif
+#  if !defined( UINT64_MAX )
+#    define UINT64_MAX    ULONG_MAX
+#  endif
+#  if !defined( INT64_MAX )
+#    define INT64_MAX     LONG_MAX
+#  endif
+#  if !defined( INT64_MIN )
+#    define INT64_MIN     LONG_MIN
+#  endif
 #elif !defined( HB_LONG_LONG_OFF )
-#   if !defined( UINT64 )
-      typedef ULONGLONG    UINT64;
-#   endif
-#   if !defined( INT64 )
-      typedef LONGLONG     INT64;
-#   endif
-#   if !defined( UINT64_MAX )
-#     define UINT64_MAX    ULONGLONG_MAX
-#   endif
-#   if !defined( INT64_MAX )
-#     define INT64_MAX     LONGLONG_MAX
-#   endif
-#   if !defined( INT64_MIN )
-#     define INT64_MIN     LONGLONG_MIN
-#   endif
+#  if !defined( UINT64 )
+     typedef ULONGLONG    UINT64;
+#  endif
+#  if !defined( INT64 )
+     typedef LONGLONG     INT64;
+#  endif
+#  if !defined( UINT64_MAX )
+#    define UINT64_MAX    ULONGLONG_MAX
+#  endif
+#  if !defined( INT64_MAX )
+#    define INT64_MAX     LONGLONG_MAX
+#  endif
+#  if !defined( INT64_MIN )
+#    define INT64_MIN     LONGLONG_MIN
+#  endif
 #endif
 
 #ifndef HB_LONG_DOUBLE_OFF
@@ -463,7 +463,7 @@
 #if HB_INT_MIN <= -1000000000
 #  define HB_INT_LENGTH( i )  ( ( (i) <= -1000000000 ) ? 20 : 10 )
 #else
-#  define HB_INT_LENGTH( i )  10
+#  define HB_INT_LENGTH( i )        10
 #endif
 
 #if !defined( HB_LONG_LONG_OFF )
@@ -472,8 +472,8 @@
 #  endif
 #endif
 
-#if !defined HB_LONG_LENGTH
-#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
+#if !defined( HB_LONG_LENGTH )
+#  define HB_LONG_LENGTH( l )       ( ( (l) <= -1000000000 ) ? 20 : 10 )
 #endif
 
 /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
