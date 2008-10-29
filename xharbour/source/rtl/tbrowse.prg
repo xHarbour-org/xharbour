@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.206 2008/10/23 13:23:57 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.207 2008/10/24 19:36:34 lculik Exp $
  */
 
 /*
@@ -783,7 +783,7 @@ CLASS TBrowse STATIC
    ASSIGN HeadSep( cSep )      INLINE ::SetSeparator( 2, cSep )
 
    ACCESS Freeze               INLINE ::nFrozenCols     // Number of columns to freeze/frozen
-   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols
+   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ) 
 
    ACCESS GoTopBlock           INLINE ::bGoTopBlock        // Code block executed by TBrowse:goTop()
    ASSIGN GoTopBlock(b)        INLINE ::bGoTopBlock := ::SetMoveBlock(0,b)
@@ -883,7 +883,7 @@ HIDDEN:
 
    METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) // Writes a multi-line text where ";" is a line break, lHeader
                                                            // is .T. if it is a header and not a footer
-   METHOD SetFrozenCols( nHowMany )               // Handles freezing of columns
+   METHOD SetFrozenCols( nHowMany, lLeft )        // Handles freezing of columns
    METHOD SetColumnWidth( oCol )                  // Calcs width of given column
    METHOD SetBorder( cBorder )                    // Draw Tbrowse border
    METHOD SetSeparator( nType, cSep )             // Set char separator for colsep, headsep, footsep.
@@ -1454,6 +1454,10 @@ LOCAL nCol, aCol, nOldFreeze, nOldFrozenWidth
 
    Default lLeft to .f.
 
+   if nHowMany = ::nFrozenCols
+      Return nHowMany
+   endif
+
    nOldFreeze      := ::nFrozenCols
    nOldFrozenWidth := ::nFrozenWidth
 
@@ -1561,7 +1565,7 @@ LOCAL nCol, aCol, nOldFreeze, nOldFrozenWidth
          endif
       endif
    endif
-
+   ::lConfigured := .f.
 Return nHowMany
 
 *------------------------------------------------------*
@@ -1799,7 +1803,6 @@ METHOD SkipRows() CLASS Tbrowse
        ::aRedraw[ ::nRowPos ] := .T.
        ::oCache:Invalidate(::nRowPos)
        ::DrawRow( ::nRowPos )
-
     endif
 
     ::nRowsSkipped := ::EvalSkipBlock( ::nRowsToSkip )
@@ -2638,41 +2641,30 @@ LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, nCursor, xCellValue, nGap
 
       if ::nFrozenCols == 0
          DispOutAt( nRow + ::nRowData, ::nwLeft, space(::nSpacePre) , ColorSpec )
-
-         for nCol := nColFrom to ::nRightVisible
-             if nCol > nColFrom // avoid call getcellvalue twice.
-                xCellValue := ::oCache:GetCellValue( nRow, nCol )
-             endif
-             ::DispCell( nRow, nCol, xCellValue, TBC_CLR_STANDARD )
-
-             if nCol < ::nRightVisible .and. ::aColsInfo[ nCol, TBCI_LCOLSEP ]
-                DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
-             endif
-         next
-
-      else 
+      else
          nCursor := SetCursor(SC_NONE)
          SetPos( nRow + ::nRowData, ::nwLeft )
          SetCursor(nCursor)
-
-         for nCol := nColFrom to ::nRightVisible
-            if nCol == ::nFrozenCols + 1
-               nCol := ::nLeftVisible
-               DispOut( space(::nSpacePre), ColorSpec )
-            endif
-
-            if nCol > nColFrom // avoid call getcellvalue twice.
-               xCellValue := ::oCache:GetCellValue( nRow, nCol )
-            endif
-
-            ::DispCell( nRow, nCol, xCellValue, TBC_CLR_STANDARD )
-
-            if nCol < ::nRightVisible .and. ::aColsInfo[ nCol,TBCI_LCOLSEP ]
-               DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
-            endif
-         next
-
       endif
+
+      for nCol := nColFrom to ::nRightVisible
+
+          if ::nFrozenCols > 0 .and. nCol == ::nFrozenCols + 1
+             nCol := ::nLeftVisible
+             DispOut( space(::nSpacePre), ColorSpec )
+          endif
+
+          if nCol > nColFrom // avoid call getcellvalue twice.
+             xCellValue := ::oCache:GetCellValue( nRow, nCol )
+          endif
+
+          ::DispCell( nRow, nCol, xCellValue, TBC_CLR_STANDARD )
+
+          if nCol < ::nRightVisible .and. ::aColsInfo[ nCol, TBCI_LCOLSEP ]
+             DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
+          endif
+
+      next
 
       if ::nColsVisible = 1 .and. ::aColsInfo[1,TBCI_SCRCOLPOS] = ::nwLeft
          nGap := Max(0, ::nVisWidth - ::nColsWidth - ::nSpaceLast )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6247 2008/10/28 21:43:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6248 2008/10/29 12:10:51 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-29 11:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * fixed freeze assign to call setfrozencols() method only.
+    * fixed Setfrozencols() method to avoid display blank row at first/last
+      row after up/down movements when freeze is > 0.
+    * removed duplicated code on drawrow() method. 
 
 2008-10-29 13:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbdefs.h
