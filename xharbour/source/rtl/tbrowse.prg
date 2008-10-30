@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.207 2008/10/24 19:36:34 lculik Exp $
+ * $Id: tbrowse.prg,v 1.208 2008/10/29 13:36:18 modalsist Exp $
  */
 
 /*
@@ -1454,10 +1454,6 @@ LOCAL nCol, aCol, nOldFreeze, nOldFrozenWidth
 
    Default lLeft to .f.
 
-   if nHowMany = ::nFrozenCols
-      Return nHowMany
-   endif
-
    nOldFreeze      := ::nFrozenCols
    nOldFrozenWidth := ::nFrozenWidth
 
@@ -1800,9 +1796,12 @@ METHOD SkipRows() CLASS Tbrowse
     if ( ::nMoveTo == TBM_UP .and. ::nRowPos = 1 ) .OR.;
        ( ::nMoveTo == TBM_DOWN .and. ::nRowPos = Min(::nRowCount, ::oCache:LastRow) )
 
+       // When colorrect is active, we need repaint the top/bottom row with
+       // standard color before skiprow.
        ::aRedraw[ ::nRowPos ] := .T.
        ::oCache:Invalidate(::nRowPos)
        ::DrawRow( ::nRowPos )
+
     endif
 
     ::nRowsSkipped := ::EvalSkipBlock( ::nRowsToSkip )
@@ -2515,6 +2514,10 @@ Local nSkipped
 
          ::nNewRowPos := nOldRowPos
 
+         if ::nFrozenCols > 0 .and. ::lHitTop .or. ::lHitBottom
+            lRefreshCurrent := .t.
+         endif
+
       elseif ::nRowsSkipped = ::nRowsToSkip 
 
          // If after movement I'm still inside present TBrowse
@@ -2586,7 +2589,7 @@ Local nSkipped
          ::oCache:PerformInvalidation()
       endif
 
-   elseif lRefreshCurrent
+   elseif lRefreshCurrent 
 
       ::aRedraw[ ::nRowPos ] := .T.
       ::oCache:Invalidate( ::nRowPos )
@@ -2627,15 +2630,11 @@ METHOD DrawRow( nRow ) CLASS TBrowse
 LOCAL colorSpec, cColor, nColFrom, lDisplay
 LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, nCursor, xCellValue, nGap
 
-   nGap := 0
-
-   ColorSpec := ::aColorSpec[ 1 ]   // first pair of color into array
-
-   nColFrom := if( ::nFrozenCols > 0, 1, ::nLeftVisible )
-
+   nGap       := 0
+   ColorSpec  := ::aColorSpec[ 1 ]   // first pair of color into array
+   nColFrom   := if( ::nFrozenCols > 0, 1, ::nLeftVisible )
    xCellValue := ::oCache:GetCellValue( nRow, nColFrom )
-
-   lDisplay := ! ( xCellValue == NIL )
+   lDisplay   := ! ( xCellValue == NIL )
 
    if lDisplay
 
