@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.208 2008/10/29 13:36:18 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.209 2008/10/30 13:33:09 modalsist Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
 #include "tbrowse.ch"
 
 /* TBrowse movement constants. */
+#define TBM_NONE      0
 #define TBM_UP        1
 #define TBM_DOWN      2
 #define TBM_PGUP      3
@@ -350,18 +351,15 @@ RETURN nSkipped
 *--------------------------------------------*
 METHOD GoTop() CLASS TDataCache
 *--------------------------------------------*
-Local lGoTop
 
    ::lNewRow := .f.
 
-   lGoTop := hb_IsBlock( ::oBrowse:GoTopBlock )
-
-   if lGoTop
+   if hb_IsBlock( ::oBrowse:GoTopBlock )
       Eval( ::oBrowse:GoTopBlock )
    endif
 
    ::nCurRow := 1
-   ::FillRow( ::nCurRow)
+   ::FillRow( 1 )
 
 RETURN NIL
 
@@ -783,7 +781,7 @@ CLASS TBrowse STATIC
    ASSIGN HeadSep( cSep )      INLINE ::SetSeparator( 2, cSep )
 
    ACCESS Freeze               INLINE ::nFrozenCols     // Number of columns to freeze/frozen
-   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ) 
+   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .F. 
 
    ACCESS GoTopBlock           INLINE ::bGoTopBlock        // Code block executed by TBrowse:goTop()
    ASSIGN GoTopBlock(b)        INLINE ::bGoTopBlock := ::SetMoveBlock(0,b)
@@ -868,7 +866,7 @@ HIDDEN:
    METHOD DispCell( nRow, nCol, xValue, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
    METHOD HowManyCol()                            // Counts how many cols can be displayed
    METHOD RedrawHeaders()                         // Repaints TBrowse Headers
-   METHOD DrawRow()                               // Draw one or all rows in stabilization (early DrawARow() method).
+   METHOD DrawRow(nRow)                           // Draw one or all rows in stabilization (early DrawARow() method).
    METHOD SetColorSpec( cColor )
 
    METHOD Moved()                                 // Every time a movement key is issued I need to reset certain properties
@@ -1042,7 +1040,7 @@ DEFAULT  nRight  TO MaxCol()
 
    ::cColorSpec      := SetColor()
    ::cBorder         := ""
-   ::cColSep         := " "
+   ::cColSep         := " " 
    ::cFootSep        := ""
    ::cHeadSep        := ""
 
@@ -1133,7 +1131,7 @@ Default nMode to 0    // first configuration
                 aCol[ TBCI_WIDTH  ] := ::SetColumnWidth( aCol[ TBCI_OBJ ] )
              endif
              aCol[ TBCI_WIDTHCELL ] := Min( aCol[ TBCI_WIDTH ], LenVal( xVal, aCol[ TBCI_TYPE ], aCol[ TBCI_PICT ] ) )
-             aCol[ TBCI_COLSEP    ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::ColSep )
+             aCol[ TBCI_COLSEP    ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::cColSep )
              aCol[ TBCI_SEPWIDTH  ] := len( aCol[ TBCI_COLSEP ] )
              aCol[ TBCI_DEFCOLOR  ] := DefColorOK( ::cColorSpec, aCol[ TBCI_OBJ ]:DefColor )
 
@@ -1153,7 +1151,7 @@ Default nMode to 0    // first configuration
           endif
 
           if nMode = 0 .or. nMode = 2 
-             aCol[ TBCI_COLSEP ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::ColSep )
+             aCol[ TBCI_COLSEP ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::cColSep )
           endif
 
           if nMode < 2 .or. ::lNeverDisplayed
@@ -1284,8 +1282,8 @@ Default nMode to 0    // first configuration
    next
 #endif
 
- // Flag that browser has been configured properly
- ::lConfigured := .t.
+   // Flag that browser has been configured properly
+   ::lConfigured := .t.
 
 Return Self
 
@@ -1561,7 +1559,7 @@ LOCAL nCol, aCol, nOldFreeze, nOldFrozenWidth
          endif
       endif
    endif
-   ::lConfigured := .f.
+
 Return nHowMany
 
 *------------------------------------------------------*
@@ -1613,8 +1611,8 @@ Local nTop, leftVis, nSkipped
     ::ResetMove()
  else
 
-    if ::nMoveTo != 0 .and. ( ::nMoveTo != nMove .or.;
-                              abs(::nRowsToSkip) >= ::nRowCount - 1 )
+    if ::nMoveTo != TBM_NONE .and. ( ::nMoveTo != nMove .or.;
+       abs(::nRowsToSkip) >= ::nRowCount - 1 )
        ::forceStable()
     endif
 
@@ -1798,6 +1796,7 @@ METHOD SkipRows() CLASS Tbrowse
 
        // When colorrect is active, we need repaint the top/bottom row with
        // standard color before skiprow.
+
        ::aRedraw[ ::nRowPos ] := .T.
        ::oCache:Invalidate(::nRowPos)
        ::DrawRow( ::nRowPos )
@@ -1805,6 +1804,9 @@ METHOD SkipRows() CLASS Tbrowse
     endif
 
     ::nRowsSkipped := ::EvalSkipBlock( ::nRowsToSkip )
+
+ else
+    ::EvalSkipBlock(0)
 
  endif
 
@@ -1840,7 +1842,7 @@ METHOD ResetMove() CLASS TBrowse
 
   ::nRowsToSkip := 0
   ::nRowsSkipped := 0
-  ::nMoveTo := 0
+  ::nMoveTo := TBM_NONE
 
 Return Self
 
@@ -1944,7 +1946,7 @@ LOCAL nLeftCol, tryLeftVisible, saveColsWidth
 
          nToAdd := ::aColsInfo[ nColsVisible + 1, TBCI_WIDTH ]
 
-         if nColsVisible >= 1 .and. nColsVisible < ::nColCount .and.;
+         if nColsVisible > 0 .and. nColsVisible < ::nColCount .and.;
             ::aColsInfo[ nColsVisible,TBCI_WIDTH ] > 0
             nToAdd += ::aColsInfo[ nColsVisible + 1, TBCI_SEPWIDTH ]
          endif
@@ -1957,17 +1959,17 @@ LOCAL nLeftCol, tryLeftVisible, saveColsWidth
          nColsVisible++
 
       Enddo
-
+      
       if nColsWidth + nToAdd > ::nVisWidth .and. nColsVisible < ::nFrozenCols
          // NOTE: Why do I change frozen columns here?
-         ::Freeze        := 0
+         ::nFrozenCols   := 0
          ::nColsWidth    := 0
          ::nRightVisible := nColsVisible
          ::nColsVisible  := nColsVisible
          return Self
 
       endif
-
+      
       if ::nLeftVisible <= ::nFrozenCols
          ::nLeftVisible := ::nFrozenCols + 1
       endif
@@ -2029,8 +2031,8 @@ LOCAL nLeftCol, tryLeftVisible, saveColsWidth
    ::nRightVisible := Max( 1, nColsVisible )
    ::nColsVisible  := Max( 1, nColsVisible )
    ::nColsWidth    := nColsWidth
-   ::nSpacePre     := Int( ( ::nVisWidth - ::nColsWidth ) / 2 ) 
-   ::nSpaceLast    := ::nVisWidth - ::nSpacePre - ::nColsWidth 
+   ::nSpacePre     := Int( ( ::nVisWidth - ::nColsWidth ) / 2 )
+   ::nSpaceLast    := ::nVisWidth - ::nSpacePre - ::nColsWidth
 
 Return Self
 
@@ -2107,7 +2109,7 @@ LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters, nCursor
    for n := iif( ::nFrozenCols > 0, 1, ::nLeftVisible ) to ::nRightVisible
 
       // colsep's width will be needed later
-      ccSep := if( ::aColsInfo[ n,TBCI_OBJ ]:ColSep == nil, ::ColSep, ;
+      ccSep := if( ::aColsInfo[ n,TBCI_OBJ ]:ColSep == nil, ::cColSep, ;
                               ::aColsInfo[ n,TBCI_OBJ ]:ColSep )
 
       ncSepWidth := if( ccSep == nil, 0, len(ccSep) )
@@ -2362,7 +2364,7 @@ Local nMoveTo := ::nMoveTo
    ::PerformConfiguration()
 
    // Skip rows, if any pending rows to skip.
-   if ::nMoveTo != 0
+   if ::nMoveTo != TBM_NONE
       ::SkipRows()
    endif
 
@@ -2377,8 +2379,8 @@ Local nMoveTo := ::nMoveTo
       endif
 
       ::lNeverDisplayed := .F.
-      if ::freeze > 0
-         ::SetFrozenCols( ::freeze )
+      if ::nFrozenCols > 0
+         ::SetFrozenCols( ::nFrozenCols )
       endif
 
    endif
@@ -2406,9 +2408,14 @@ Local nMoveTo := ::nMoveTo
       ::HowManyCol()
       ::RedrawHeaders()
 
+      if ::nMoveTo == TBM_NONE
+         ::EvalSkipBlock(0)
+      endif
+
       // Now that browser frame has been redrawn we don't need to redraw
       // it unless displayed columns change
       ::lRedrawFrame := .F.
+
    endif
 
 
@@ -2418,7 +2425,7 @@ Local nMoveTo := ::nMoveTo
          DispBegin()
       endif
 
-      if ::nMoveTo != 0
+      if ::nMoveTo != TBM_NONE
          ::SyncRows()
       endif
       ::ResetMove()
@@ -2427,7 +2434,7 @@ Local nMoveTo := ::nMoveTo
          ::DrawRow( nRowToDraw )
       Enddo
 
-      if nMoveTo == 0 .and. ::nRowPos > ::oCache:CurRow
+      if nMoveTo == TBM_NONE .and. ::nRowPos > ::oCache:CurRow
          ::nRowPos := ::oCache:CurRow
       endif
 
@@ -2638,13 +2645,7 @@ LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, nCursor, xCellValue, nGap
 
    if lDisplay
 
-      if ::nFrozenCols == 0
-         DispOutAt( nRow + ::nRowData, ::nwLeft, space(::nSpacePre) , ColorSpec )
-      else
-         nCursor := SetCursor(SC_NONE)
-         SetPos( nRow + ::nRowData, ::nwLeft )
-         SetCursor(nCursor)
-      endif
+      DispOutAt( nRow + ::nRowData, ::nwLeft, space(::nSpacePre) , ColorSpec )
 
       for nCol := nColFrom to ::nRightVisible
 
@@ -2664,7 +2665,7 @@ LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, nCursor, xCellValue, nGap
           endif
 
       next
-
+   
       if ::nColsVisible = 1 .and. ::aColsInfo[1,TBCI_SCRCOLPOS] = ::nwLeft
          nGap := Max(0, ::nVisWidth - ::nColsWidth - ::nSpaceLast )
       endif
@@ -2786,7 +2787,7 @@ LOCAL cColor, cColorBKG, aCellColor, nCursor, nColorIndex
    endif
 
    cColor := hb_ColorIndex( ::cColorSpec, nColorIndex  )
-
+  
    Switch aColsInfo[ TBCI_TYPE ]
    case "C"
    case "M"
@@ -3072,13 +3073,13 @@ METHOD SetSeparator( nType, cSep ) CLASS TBrowse
    ::lConfigured := .f.
 
    if nType == 0 
-      ::cColSep  := if( ! EmptyStr( cSep ), cSep, ::cColSep )
+      ::cColSep  := if( hb_IsString( cSep ), cSep, ::cColSep )
    elseif nType == 1
-      ::cFootSep := if( ! EmptyStr( cSep ), cSep, ::cFootSep )
-      ::lFootSep := ! EmptyStr( ::cFootSep ) 
+      ::cFootSep := if( hb_IsString( cSep ), cSep, ::cFootSep )
+      ::lFootSep := Len( ::cFootSep ) > 0 
    elseif nType == 2
-      ::cHeadSep := if( ! EmptyStr( cSep ), cSep, ::cHeadSep )
-      ::lHeadSep := ! EmptyStr( ::cHeadSep ) 
+      ::cHeadSep := if( hb_IsString( cSep ), cSep, ::cHeadSep )
+      ::lHeadSep := Len( ::cHeadSep ) > 0
    endif
 
 RETURN SELF
@@ -3616,13 +3617,6 @@ Local nIndex := 0
  NEXT
 
 Return iif( lOK, aDefColor, {1,2,1,1} )
-
-*---------------------------------------------------*
-STATIC FUNCTION EmptyStr( cStr )
-*---------------------------------------------------*
-* Check if a string is valid.
-*---------------------------------------------------*
-Return !( Hb_IsString( cStr ) .and. Len( cStr ) > 0 )
 
 
 *******************************************************************

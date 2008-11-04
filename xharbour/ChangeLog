@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6249 2008/10/29 13:36:18 modalsist Exp $
+ * $Id: ChangeLog,v 1.6250 2008/10/30 13:33:09 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-04 19:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * fixed colsep empty string bug. Reported from comp.lang.xharbour news.
+    * clean code in any methods.
 
 2008-10-30 11:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
