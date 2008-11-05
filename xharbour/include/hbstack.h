@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.50 2008/05/06 11:10:37 marchuet Exp $
+ * $Id: hbstack.h,v 1.51 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -73,27 +73,33 @@
    #define STACK_EXPANDHB_ITEMS    20
 #endif
 
-typedef struct
-{
-   const char *   szDefaultRDD;     /* default RDD */
-   BOOL           fNetError;        /* current NETERR() flag */
-
-   void **        waList;           /* Allocated WorkAreas */
-   USHORT         uiWaMax;          /* Number of allocated WA */
-   USHORT         uiWaSpace;        /* Number of allocated WA */
-
-   USHORT *       waNums;           /* Allocated WorkAreas */
-   USHORT         uiWaNumMax;       /* Number of allocated WA */
-
-   USHORT         uiCurrArea;       /* Current WokrArea number */
-   void *         pCurrArea;        /* Current WorkArea pointer */
-}
-HB_STACKRDD, * PHB_STACKRDD;
-
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
 HB_EXTERN_BEGIN
+
+
+typedef struct _HB_STACKRDD
+{
+   const char *   szDefaultRDD;     /* default RDD */
+   void **        waList;           /* Allocated WorkAreas */
+   USHORT *       waNums;           /* Allocated WorkAreas */
+   void *         pCurrArea;        /* Current WorkArea pointer */
+
+   BOOL           fNetError;        /* current NETERR() flag */
+
+   USHORT         uiWaMax;          /* Number of allocated WA */
+   USHORT         uiWaSpace;        /* Number of allocated WA */
+   USHORT         uiWaNumMax;       /* Number of allocated WA */
+   USHORT         uiCurrArea;       /* Current WokrArea number */
+
+#ifdef HB_THREAD_SUPPORT
+   HB_CRITICAL_T  mtxWorkArea;      /* Mutex */
+   BOOL           fMtLockInit;      /* Lock initialized */
+   HB_COUNTER     ulCounter;
+#endif
+}
+HB_STACKRDD, * PHB_STACKRDD;
 
 struct hb_class_method;
 
@@ -113,7 +119,7 @@ typedef struct
    LONG       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
    //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
-   HB_STACKRDD rdd;           /* RDD related data */
+   PHB_STACKRDD rdd;          /* RDD related data */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */

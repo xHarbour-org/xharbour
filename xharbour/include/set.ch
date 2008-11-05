@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.21 2008/03/10 11:24:05 likewolf Exp $
+ * $Id: set.ch,v 1.22 2008/04/05 20:31:20 likewolf Exp $
  */
 
 /*
@@ -141,8 +141,9 @@
 #define _SET_TRACE            208 /* xHarbour extension */
 #define _SET_TRACEFILE        209 /* xHarbour extension */
 #define _SET_TRACESTACK       210 /* xHarbour extension */
+#define _SET_WORKAREAS_SHARED 211
 
 #define HB_SET_XHB_BASE       200
-#define HB_SET_XHB_COUNT      11
+#define HB_SET_XHB_COUNT      12
 
 #endif /* _SET_CH */

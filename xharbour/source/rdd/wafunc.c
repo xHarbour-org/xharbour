@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.13 2008/09/05 08:38:36 marchuet Exp $
+ * $Id: wafunc.c,v 1.14 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -57,6 +57,40 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "rddsys.ch"
+
+#ifdef HB_THREAD_SUPPORT
+
+PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK *pstack )
+{
+   // Can NOT use HB_VM_STACK here!!!
+   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+   {
+      return hb_dynsymGet( szName );
+   }
+   else
+   {
+      char szNewName[270];
+      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      return hb_dynsymGet( szNewName );
+   }
+}
+
+PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK *pstack )
+{
+   // Can NOT use HB_VM_STACK here!!!
+   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+   {
+      return hb_dynsymFindName( szName );
+   }
+   else
+   {
+      char szNewName[270];
+      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      return hb_dynsymFindName( szNewName );
+   }
+}
+
+#endif
 
 /*
  * check if a given name can be used as alias expression
@@ -161,11 +195,25 @@ HB_EXPORT ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
    return FAILURE;
 }
 
+HB_EXPORT const char * hb_rddGetAliasName( PHB_DYNS pSymAlias )
+{
+   const char * szName = hb_dynsymName( pSymAlias );
+#ifdef HB_THREAD_SUPPORT
+   if( strncmp( szName, ":TH:", 4 ) == 0 )
+   {
+      szName += 4;
+      while( *szName++ != ':' ) {;}
+   }
+#endif
+   return szName;
+}
+
 /*
  * allocate and return atomAlias for new workarea or NULL if alias already exist
  */
 HB_EXPORT void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
 {
+   HB_THREAD_STUB
    PHB_DYNS pSymAlias;
    int iDummyArea;
 
@@ -184,7 +232,11 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
       return NULL;
    }
 
+#ifdef HB_THREAD_SUPPORT
+   pSymAlias = s_rddAliasThGet( szAlias, &HB_VM_STACK );
+#else
    pSymAlias = hb_dynsymGet( szAlias );
+#endif
    if( hb_dynsymAreaHandle( pSymAlias ) != 0 )
    {
       pSymAlias = NULL;
@@ -307,6 +359,7 @@ HB_EXPORT USHORT hb_rddFieldExpIndex( AREAP pArea, const char * szField )
  */
 HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
 {
+   HB_THREAD_STUB
    BOOL fOneLetter;
    char c;
 
@@ -338,7 +391,11 @@ HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
    }
    else
    {
+#ifdef HB_THREAD_SUPPORT
+      PHB_DYNS pSymAlias = s_rddAliasThFind( szAlias, &HB_VM_STACK );
+#else
       PHB_DYNS pSymAlias = hb_dynsymFindName( szAlias );
+#endif
 
       *iArea = pSymAlias ? ( int ) hb_dynsymAreaHandle( pSymAlias ) : 0;
       if( *iArea == 0 )
@@ -355,21 +412,31 @@ HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
  */
 HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
+   HB_THREAD_STUB
    HB_ITEM_PTR pError;
    ERRCODE errCode;
    const char * szName;
    int iArea;
+#ifdef HB_THREAD_SUPPORT
+   PHB_DYNS pDyn;
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
+#ifdef HB_THREAD_SUPPORT
+   pDyn  = s_rddAliasThFind( pSymAlias->szName, &HB_VM_STACK );
+   iArea = ( int ) hb_dynsymAreaHandle( pDyn );
+#else
    iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
+#endif
    if( iArea )
    {
       hb_rddSelectWorkAreaNumber( iArea );
       return SUCCESS;
    }
 
-   szName = hb_dynsymName( pSymAlias->pDynSym );
+//   szName = hb_dynsymName( pSymAlias->pDynSym );
+   szName = pSymAlias->szName;
 
    if( szName[ 0 ] && ! szName[ 1 ] )
    {
@@ -395,14 +462,18 @@ HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
     * (user created error handler can open a missing database)
     */
 
-   pError = hb_errRT_New( ES_ERROR, NULL, EG_NOALIAS, EDBCMD_NOALIAS, NULL, pSymAlias->szName, 0, EF_CANRETRY );
+   pError = hb_errRT_New( ES_ERROR, NULL, EG_NOALIAS, EDBCMD_NOALIAS, NULL, szName, 0, EF_CANRETRY );
    errCode = FAILURE;
 
    do
    {
       if( hb_errLaunch( pError ) != E_RETRY )
          break;
+#ifdef HB_THREAD_SUPPORT
+      iArea = ( int ) hb_dynsymAreaHandle( pDyn );
+#else
       iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
+#endif
       if( iArea )
       {
          hb_rddSelectWorkAreaNumber( iArea );

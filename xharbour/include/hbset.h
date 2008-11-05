@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.44 2008/04/05 20:31:19 likewolf Exp $
+ * $Id: hbset.h,v 1.45 2008/04/06 11:33:16 likewolf Exp $
  */
 
 /*
@@ -145,7 +145,8 @@ typedef enum
    HB_SET_TIMEFORMAT      = 207,
    HB_SET_TRACE           = 208,
    HB_SET_TRACEFILE       = 209,
-   HB_SET_TRACESTACK      = 210
+   HB_SET_TRACESTACK      = 210,
+   HB_SET_WORKAREAS_SHARED = 211
 } HB_set_enum;
 
 typedef struct
@@ -232,6 +233,7 @@ typedef struct
    char    HB_SET_ERRORLOG[_POSIX_PATH_MAX];
    char *  HB_SET_TIMEFORMAT;
    BOOL    HB_SET_MACROBLOCKVARS;
+   BOOL    HB_SET_WORKAREAS_SHARED;
 
 } HB_SET_STRUCT;
 
@@ -343,6 +345,7 @@ extern HB_EXPORT int     hb_setGetBackGroundTick( void );
 extern HB_EXPORT BOOL    hb_setGetAppendError( void );
 extern HB_EXPORT char *  hb_setGetErrorLog( void );
 extern HB_EXPORT char *  hb_setGetTimeFormat( void );
+extern HB_EXPORT BOOL    hb_setGetWorkareasShared( void );
 
 #ifndef HB_SET_STACK
    #define HB_SET_STACK (*hb_GetSetStructPtr())

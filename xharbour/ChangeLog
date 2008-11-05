@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6250 2008/10/30 13:33:09 modalsist Exp $
+ * $Id: ChangeLog,v 1.6251 2008/11/04 22:42:57 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-05 00:20 UTC-0200 Walter Negro <anegro at overnet.com.ar>
+  * include/classes.h
+    ! fixed problem in FWH if change size of method structure.
+  * source/vm/fm.c
+    * Fix redefine with Windows only support.
+      Instead of refedine HB_ATOMIC_INC/DEC, define HB_ATOMIC_INCP/DECP
+    % Optimize size and access to structure.
+  * include/hbapirdd.h
+  * include/hbset.h
+  * include/hbstack.h
+  * include/set.ch
+  * include/std.ch
+  * include/thread.h
+  * source/rdd/wacore.c
+  * source/rdd/wafunc.c
+  * source/rdd/workarea.c
+  * source/rtl/filebuf.c
+  * source/rtl/set.c
+  * source/vm/estack.c
+  * source/vm/thread.c
+    * Implementation of Private Workareas in MT
+      SET WORKAREAS SHARED
+      SET WORKAREAS PRIVATE
+      SET WORKAREAS SHARED ON|OFF
+      Set( _SET_WORKAREAS_SHARED, .T. )
+    Default value is SET WORKAREAS SHARED, workareas are shared for all threads
+    SET WORKAREAS PRIVATE or SET WORKAREAS SHARED OFF permit open same area and/or same alias.
+    SET WORKAREAS SHARED generate run time error when change from PRIVATE to SHARED and have
+    workareas open in some thread (except main thread)
 
 2008-11-04 19:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

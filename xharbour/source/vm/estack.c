@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.99 2008/06/06 20:11:40 kaddath Exp $
+ * $Id: estack.c,v 1.100 2008/10/22 08:33:09 marchuet Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #include "hbfast.h"
 #include "hbapierr.h"
 #include "hbvm.h"
+#include "hbapirdd.h"
 
 HB_EXTERN_BEGIN
 
@@ -265,6 +266,7 @@ void hb_stackInit( void )
 
    hb_stackST.Return.type = HB_IT_NIL;
 
+   hb_stackST.rdd = hb_rddWaInit();
 #else
 
    hb_threadSetupStack( &hb_stackMT, HB_CURRENT_THREAD() );
@@ -296,6 +298,8 @@ void hb_stackFree( void )
    hb_stackST.pPos   = NULL;
    hb_stackST.pEnd   = NULL;
    hb_stackST.wItems = 0;
+
+   hb_rddWaShutDown( hb_stackST.rdd );
 
 #else
 
@@ -456,7 +460,7 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 #undef hb_stackRDD
 PHB_STACKRDD hb_stackRDD( void )
 {
-   return &HB_VM_STACK.rdd;
+   return HB_VM_STACK.rdd;
 }
 
 #undef hb_stackItemFromBase

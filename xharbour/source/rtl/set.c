@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.90 2008/10/18 06:34:48 patrickmast Exp $
+ * $Id: set.c,v 1.91 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
 #include "hbapifs.h"
 #include "hbapigt.h"
 #include "hbapilng.h"
+#include "hbapirdd.h"
 #include "hbset.h"
 
 HB_SET_STRUCT hb_set;
@@ -1559,6 +1560,25 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_WORKAREAS_SHARED:
+         hb_retl( hb_set.HB_SET_WORKAREAS_SHARED );
+#ifdef HB_THREAD_SUPPORT
+         if( args > 1 )
+         {
+            BOOL bNewVal = set_logical( pArg2, hb_set.HB_SET_WORKAREAS_SHARED );
+
+            if( hb_rddChangeSetWorkareasShared( hb_set.HB_SET_WORKAREAS_SHARED, bNewVal ) )
+            {
+               hb_set.HB_SET_WORKAREAS_SHARED = bNewVal;
+            }
+            else
+            {
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            }
+         }
+#endif
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1694,6 +1714,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.cc" );
 
    hb_set.HB_SET_MACROBLOCKVARS = FALSE;
+   hb_set.HB_SET_WORKAREAS_SHARED = TRUE;
 
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
@@ -1868,6 +1889,8 @@ HB_EXPORT BOOL    hb_setGetL( HB_set_enum set_specifier )
          return hb_set.HB_SET_DEFEXTENSIONS;
       case HB_SET_TRIMFILENAME:
          return hb_set.HB_SET_TRIMFILENAME;
+      case HB_SET_WORKAREAS_SHARED:
+         return hb_set.HB_SET_WORKAREAS_SHARED;
 
       case HB_SET_ALTFILE:
       case HB_SET_AUTORDER:
@@ -2009,6 +2032,7 @@ HB_EXPORT char *  hb_setGetCPtr( HB_set_enum set_specifier )
       case HB_SET_DBFLOCKSCHEME:
       case HB_SET_DEFEXTENSIONS:
       case HB_SET_TRIMFILENAME:
+      case HB_SET_WORKAREAS_SHARED:
       case HB_SET_INVALID_:
          break;
 #if 0
@@ -2117,6 +2141,7 @@ HB_EXPORT int     hb_setGetNI( HB_set_enum set_specifier )
       case HB_SET_EOL:
       case HB_SET_DEFEXTENSIONS:
       case HB_SET_TRIMFILENAME:
+      case HB_SET_WORKAREAS_SHARED:
       case HB_SET_INVALID_:
          break;
 #if 0
@@ -2513,3 +2538,7 @@ HB_EXPORT int hb_setGetBackGroundTick( void )
    return hb_set.HB_SET_BACKGROUNDTICK;
 }
 
+HB_EXPORT int hb_setGetWorkareasShared( void )
+{
+   return hb_set.HB_SET_WORKAREAS_SHARED;
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.30 2008/04/05 20:31:20 likewolf Exp $
+ * $Id: std.ch,v 1.31 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -706,6 +706,10 @@
    #command SET MACRO BLOCK VARS XHARBOUR => Set( _SET_MACROBLOCKVARS, .T. )
    #command SET MACRO BLOCK VARS CLIPPER  => Set( _SET_MACROBLOCKVARS, .F. )
    #command SET MACRO BLOCK VARS (<x>)    => Set( _SET_MACROBLOCKVARS, <x> )
+   #command SET WORKAREAS SHARED <x:ON,OFF,&> => Set( _SET_WORKAREAS_SHARED, <(x)> )
+   #command SET WORKAREAS SHARED          => Set( _SET_WORKAREAS_SHARED, .T. )
+   #command SET WORKAREAS PRIVATE         => Set( _SET_WORKAREAS_SHARED, .F. )
+   #command SET WORKAREAS (<x>)           => Set( _SET_WORKAREAS_SHARED, <x> )
 
    // Using xtranslate because we need EARLY expansion!
    #xtranslate __OPEN_XNS <NSX> => #include #<NSX>

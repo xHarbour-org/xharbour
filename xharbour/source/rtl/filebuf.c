@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c 9530 2008-10-02 12:34:36Z druzus $
+ * $Id: filebuf.c,v 1.1 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -58,6 +58,7 @@ typedef struct _HB_FILE * PHB_FILE;
 
 
 #include "hbapi.h"
+#include "hbinit.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbstack.h"
@@ -503,3 +504,28 @@ PHB_FILE hb_fileCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix,
 
    return pFile;
 }
+
+#ifdef HB_THREAD_SUPPORT
+
+static void hb_filebuf_init( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+   HB_CRITICAL_INIT( s_fileMtx );
+}
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_filebuf_init_ )
+   hb_vmAtInit( hb_filebuf_init, NULL );
+HB_CALL_ON_STARTUP_END( _hb_filebuf_init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_filebuf_init_
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
+   static HB_$INITSYM hb_vm_auto_hb_filebuf_init = _hb_filebuf_init_;
+   #pragma data_seg()
+#endif
+
+#endif

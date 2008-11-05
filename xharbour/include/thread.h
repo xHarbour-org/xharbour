@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.121 2008/06/28 18:51:49 walito Exp $
+* $Id: thread.h,v 1.122 2008/10/22 08:32:32 marchuet Exp $
 */
 
 /*
@@ -106,8 +106,8 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
    #define HB_THREAD_T                 unsigned
 
-   #define HB_ATOMIC_INC( x )     InterlockedIncrement( (long *) &(x) )
-   #define HB_ATOMIC_DEC( x )     InterlockedDecrement( (long *) &(x) )
+   #define HB_ATOMIC_INC( x )          InterlockedIncrement( (long *) &(x) )
+   #define HB_ATOMIC_DEC( x )          InterlockedDecrement( (long *) &(x) )
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
    #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
@@ -194,8 +194,8 @@ extern DWORD hb_dwCurrentStack;
    #define HB_COND_T                   HMUX
    #define PHB_COND_T                  PHMUX
 
-   #define HB_ATOMIC_INC( x )     ( ++(x) )
-   #define HB_ATOMIC_DEC( x )     ( --(x) )
+   #define HB_ATOMIC_INC( x )          ( ++(x) )
+   #define HB_ATOMIC_DEC( x )          ( --(x) )
 
    #define DWORD                       ULONG
    #define HB_THREAD_T                 TID
@@ -383,8 +383,8 @@ extern PPVOID hb_dwCurrentStack;
 
 #endif
 
-   #define HB_ATOMIC_INC( x )     ( ++(x) )
-   #define HB_ATOMIC_DEC( x )     ( --(x) )
+   #define HB_ATOMIC_INC( x )          ( ++(x) )
+   #define HB_ATOMIC_DEC( x )          ( --(x) )
 
    #define HB_MUTEX_T                  HB_CRITICAL_T
    #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
@@ -432,6 +432,7 @@ struct HB_ERROR_INFO_;
 struct _AREA;
 struct _HB_SEQUENCE;
 struct tag_HB_THREAD_ID;
+struct _HB_STACKRDD;
 
 typedef struct tag_HB_STACK
 {
@@ -447,7 +448,7 @@ typedef struct tag_HB_STACK
    ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
    //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
-   HB_STACKRDD rdd;             /* RDD related data */
+   struct _HB_STACKRDD * rdd;   /* RDD related data */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -859,8 +860,8 @@ void hb_threadCancelInternal( void );
 
 #else
 
-   #define HB_ATOMIC_INC( x )     ( ++(x) )
-   #define HB_ATOMIC_DEC( x )     ( --(x) )
+   #define HB_ATOMIC_INC( x )          ( ++(x) )
+   #define HB_ATOMIC_DEC( x )          ( --(x) )
 
    #define HB_CRITICAL_LOCK( x )
    #define HB_CRITICAL_TRYLOCK( x )

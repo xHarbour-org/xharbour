@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.50 2008/08/18 09:42:52 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.51 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -1167,6 +1167,7 @@ extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea );
 extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( const char * szAlias );
 extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
 extern HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea );
+extern HB_EXPORT const char * hb_rddGetAliasName( PHB_DYNS pSymAlias );
 
 /* other functions */
 extern HB_EXPORT void *  hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea );
@@ -1229,10 +1230,13 @@ extern HB_EXPORT USHORT    hb_rddExtendType( HB_TYPE fieldType );
 extern HB_EXPORT HB_TYPE   hb_rddFieldType( USHORT extendType );
 #endif
 typedef ERRCODE ( * WACALLBACK )( AREAP, void * );
-extern HB_EXPORT ERRCODE   hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo );
-extern HB_EXPORT ERRCODE   hb_rddGetTempAlias( char * szAliasTmp );
-extern HB_EXPORT void      hb_rddWaShutDown( void );
+extern HB_EXPORT ERRCODE    hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo );
+extern HB_EXPORT ERRCODE    hb_rddGetTempAlias( char * szAliasTmp );
 
+extern HB_EXPORT void         hb_rddWaShutDown( PHB_STACKRDD );
+extern HB_EXPORT PHB_STACKRDD hb_rddWaInit( void );
+
+extern HB_EXPORT BOOL         hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet );
 HB_EXTERN_END
 
 #endif /* HB_APIRDD_H_ */

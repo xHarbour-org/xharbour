@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.96 2008/10/24 11:40:13 marchuet Exp $
+ * $Id: fm.c,v 1.97 2008/10/24 15:23:49 marchuet Exp $
  */
 
 /*
@@ -163,8 +163,8 @@ typedef struct _HB_MEMINFO
    ULONG       ulSignature;
    ULONG       ulSize;
    USHORT      uiProcLine;
-   char        szProcName[ HB_SYMBOL_NAME_LEN + 1 ];
    USHORT      uiAutoRelease;
+   char        szProcName[ HB_SYMBOL_NAME_LEN + 1 ];
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
 } HB_MEMINFO, * PHB_MEMINFO;
@@ -177,7 +177,7 @@ typedef struct _HB_MEMINFO
 #  define HB_MEMINFO_SIZE     ( sizeof( HB_MEMINFO ) + HB_COUNTER_OFFSET )
 #endif
 
-#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE + sizeof( UINT32 ) )
+#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE )
 #define HB_FM_PTR( p )        ( ( PHB_MEMINFO ) ( ( BYTE * ) ( p ) - HB_MEMINFO_SIZE ) )
 
 #define HB_FM_GETSIG( p, n )  HB_GET_UINT32( ( BYTE * )( p ) + ( n ) )
@@ -213,20 +213,8 @@ typedef void * PHB_MEMINFO;
 #define HB_MEM_PTR( p )       ( ( void * ) ( ( BYTE * ) ( p ) + HB_MEMINFO_SIZE ) )
 
 
-#if !defined( HB_THREAD_SUPPORT )
-
-#  undef HB_ATOMIC_DEC
-#  undef HB_ATOMIC_INC
-#  undef HB_ATOMIC_GET
-#  undef HB_ATOMIC_SET
-#  define HB_ATOMIC_INC( p )    ( ++(*(p)) )
-#  define HB_ATOMIC_DEC( p )    ( --(*(p)) )
-#else
-#  undef HB_ATOMIC_DEC
-#  undef HB_ATOMIC_INC
-#  define HB_ATOMIC_INC( p )     InterlockedIncrement( ( long * ) (p) )
-#  define HB_ATOMIC_DEC( p )     InterlockedDecrement( ( long * ) (p) )
-#endif
+#define HB_ATOMIC_INCP( p )      HB_ATOMIC_INC( *(p) )
+#define HB_ATOMIC_DECP( p )      HB_ATOMIC_DEC( *(p) )
 
 #ifndef HB_ATOMIC_GET
 #  define HB_ATOMIC_GET( p )    (*(p))
@@ -646,14 +634,14 @@ HB_FORCE_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 #undef hb_xRefInc
 void hb_xRefInc( void * pMem )
 {
-   HB_ATOMIC_INC( HB_COUNTER_PTR( pMem ) );
+   HB_ATOMIC_INCP( HB_COUNTER_PTR( pMem ) );
 }
 
 /* decrement reference counter, return TRUE when 0 reached */
 #undef hb_xRefDec
 BOOL hb_xRefDec( void * pMem )
 {
-   return HB_ATOMIC_DEC( HB_COUNTER_PTR( pMem ) ) == 0;
+   return HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0;
 }
 
 /* decrement reference counter and free the block when 0 reached */
@@ -665,12 +653,12 @@ void hb_xRefFree( void * pMem )
    if( HB_FM_PTR( pMem )->ulSignature != HB_MEMINFO_SIGNATURE )
       hb_errInternal( HB_EI_XFREEINV, NULL, NULL, NULL );
 
-   if( HB_ATOMIC_DEC( HB_COUNTER_PTR( pMem ) ) == 0 )
+   if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
       hb_xfree( pMem );
 
 #else
 
-   if( HB_ATOMIC_DEC( HB_COUNTER_PTR( pMem ) ) == 0 )
+   if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
       free( ( void * ) HB_FM_PTR( pMem ) );
 
 #endif
@@ -693,7 +681,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
    {
       void * pMemNew = memcpy( hb_xgrab( ulSize ), pMem, HB_MIN( ulSave, ulSize ) );
 
-      if( HB_ATOMIC_DEC( HB_COUNTER_PTR( pMem ) ) == 0 )
+      if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
          hb_xfree( pMem );
 
       return pMemNew;
@@ -711,7 +699,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
       {
          HB_ATOMIC_SET( HB_COUNTER_PTR( HB_MEM_PTR( pMemNew ) ), 1 );
          memcpy( HB_MEM_PTR( pMemNew ), pMem, HB_MIN( ulSave, ulSize ) );
-         if( HB_ATOMIC_DEC( HB_COUNTER_PTR( pMem ) ) == 0 )
+         if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
             free( ( void * ) HB_FM_PTR( pMem ) );
          return HB_MEM_PTR( pMemNew );
       }

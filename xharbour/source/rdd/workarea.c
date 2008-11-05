@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.91 2008/09/15 15:46:47 marchuet Exp $
+ * $Id: workarea.c,v 1.92 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -671,7 +671,7 @@ static ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
 
    hb_strncpy( ( char * ) szAlias,
       pArea->atomAlias && hb_dynsymAreaHandle( ( PHB_DYNS ) pArea->atomAlias )
-      ? hb_dynsymName( ( PHB_DYNS ) pArea->atomAlias ) : "",
+      ? hb_rddGetAliasName( ( PHB_DYNS ) pArea->atomAlias ) : "",
       HB_RDD_MAX_ALIAS_LEN );
 
    return SUCCESS;
@@ -2126,7 +2126,6 @@ HB_EXPORT void hb_rddShutDown( void )
       s_RddList = NULL;
       s_uiRddMax = s_uiRddCount = 0;
    }
-   hb_rddWaShutDown();
 }
 
 /*

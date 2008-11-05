@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.214 2008/06/28 18:51:50 walito Exp $
+* $Id: thread.c,v 1.215 2008/06/28 19:37:20 walito Exp $
 */
 
 /*
@@ -61,6 +61,7 @@
 #include "hbvm.h"
 #include "hbstack.h"
 #include "classes.h"
+#include "hbapirdd.h"
 
 #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
    #include <stdlib.h>
@@ -408,6 +409,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->pThreadID = NULL;
    tc->pThreadReady = NULL;
+
+   tc->rdd = hb_rddWaInit();
 }
 
 /*
@@ -607,6 +610,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          hb_xfree( pStack->pThreadReady );
       }
    }
+
+   hb_rddWaShutDown( pStack->rdd );
 
    // Free only if we are not destroying the main stack
    if ( pStack != &hb_stackMT )
