@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6252 2008/11/05 03:03:16 walito Exp $
+ * $Id: ChangeLog,v 1.6253 2008/11/06 02:23:52 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-06 20:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source\rtl\hbxml.c
+    ! 'Escape' characters, such &amp; or &quot; were not written correctly in node attribute values
+    ! 'Escape' characters in the form &#NN; and &#xHH; were not allowed when reading
 
 2008-11-06 00.20 UTC-0200 Walter Negro <anegro at overnet.com.ar>
   * source/rdd/wacore.c
