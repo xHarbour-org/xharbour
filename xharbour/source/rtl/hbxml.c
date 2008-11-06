@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.31 2007/05/25 11:10:05 toninhofwi Exp $
+ * $Id: hbxml.c,v 1.32 2008/06/28 18:51:49 walito Exp $
  */
 
 /*
@@ -383,11 +383,18 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                else if ( strncmp( bp, "gt", iAmpLen ) == 0 ) chr = '>';
                else if ( strncmp( bp, "quot", iAmpLen ) == 0 ) chr = '"';
                else if ( strncmp( bp, "apos", iAmpLen ) == 0 ) chr = '\'';
+               else if ( *bp == '#' )
+               {
+                  if ( *(++bp) == 'x' )   /* Hexadecimal */
+                     chr = ( ( *( bp + 1 ) - '0' ) << 4 ) + ( *( bp + 2 ) - '0' );
+                  else     /* Decimal */
+                     chr = atoi( bp );
+               }
                /** Reducing an SGS length is legal */
                buf_attrib->length = iPosAmper;
                mxml_sgs_append_char( buf_attrib, chr );
             }
-            else if ( ! isalpha( chr ) )
+            else if ( ! ( isalpha( chr ) || isdigit( chr ) || ( chr == '#' ) ) )
             {
                //error - we have something like &amp &amp
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
@@ -437,7 +444,7 @@ static MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE pAtt
    mxml_output_char( out, '=' );
    mxml_output_char( out, '"' );
 
-   if ( style & MXML_STYLE_NOESCAPE )
+   if ( ! ( style & MXML_STYLE_NOESCAPE ) )
    {
       mxml_output_string_escape(  out,
          pAttr->pValue->item.asString.value );
