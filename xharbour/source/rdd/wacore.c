@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.12 2008/10/23 07:45:32 marchuet Exp $
+ * $Id: wacore.c,v 1.13 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -89,8 +89,6 @@
 
 
 static PHB_STACKRDD s_pRddInfo = NULL;
-static int          s_iSetPrev;
-static BOOL         s_bSetVoided = FALSE;
 
 /*
  * Insert new WorkArea node at current WA position
@@ -415,6 +413,9 @@ HB_EXPORT BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
       }
    }
    hb_threadIdleEnd();
+#else
+   HB_SYMBOL_UNUSED(bPrev);
+   HB_SYMBOL_UNUSED(bSet);
 #endif
    return bOk;
 }
