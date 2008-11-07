@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct
@@ -852,7 +852,7 @@ png_uint_32 PNGAPI
 png_get_asm_flagmask (int flag_select)
 {
     /* obsolete, to be removed from libpng-1.4.0 */
-    flag_select=flag_select;
+    (void) flag_select;
     return 0L;
 }
 
@@ -862,7 +862,7 @@ png_uint_32 PNGAPI
 png_get_mmx_flagmask (int flag_select, int *compilerID)
 {
     /* obsolete, to be removed from libpng-1.4.0 */
-    flag_select=flag_select;
+    (void) flag_select;
     *compilerID = -1;   /* unknown (i.e., no asm/MMX code compiled) */
     return 0L;
 }

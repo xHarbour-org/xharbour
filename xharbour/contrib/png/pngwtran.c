@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngwtran.c - transforms the data in a row for PNG writers
@@ -10,6 +10,10 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
+
+#ifdef __BORLANDC__
+   #pragma option push -w-aus
+#endif
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -573,3 +577,7 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
 }
 #endif /* PNG_MNG_FEATURES_SUPPORTED */
 #endif /* PNG_WRITE_SUPPORTED */
+
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif

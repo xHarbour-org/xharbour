@@ -1,10 +1,10 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.2.31 [August 21, 2008]
+ * Last changed in libpng 1.2.31 [August 19, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1543,8 +1543,8 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
 
-   transforms = transforms; /* quiet compiler warnings */
-   params = params;
+   (void) transforms; /* quiet compiler warnings */
+   (void) params;
 }
 #endif
 #endif /* PNG_WRITE_SUPPORTED */

@@ -1,10 +1,10 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.31 [August 21, 2008]
+ * Last changed in libpng 1.2.33 [October 31, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -614,7 +614,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    png_crc_finish(png_ptr, length);
 
-   info_ptr = info_ptr; /* quiet compiler warnings about unused info_ptr */
+   (void) info_ptr; /* quiet compiler warnings about unused info_ptr */
 }
 
 #if defined(PNG_READ_gAMA_SUPPORTED)
@@ -1943,21 +1943,24 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   key = (png_charp)png_malloc_warn(png_ptr, length + 1);
-   if (key == NULL)
+   png_free(png_ptr, png_ptr->chunkdata);
+   png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (png_ptr->chunkdata == NULL)
    {
      png_warning(png_ptr, "No memory to process text chunk.");
      return;
    }
    slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)key, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
    if (png_crc_finish(png_ptr, skip))
    {
-      png_free(png_ptr, key);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
 
+   key = png_ptr->chunkdata;
    key[slength] = 0x00;
 
    for (text = key; *text; text++)
@@ -1971,7 +1974,8 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (text_ptr == NULL)
    {
      png_warning(png_ptr, "Not enough memory to process text chunk.");
-     png_free(png_ptr, key);
+     png_free(png_ptr, png_ptr->chunkdata);
+     png_ptr->chunkdata = NULL;
      return;
    }
    text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
@@ -1986,7 +1990,8 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
-   png_free(png_ptr, key);
+   png_free(png_ptr, png_ptr->chunkdata);
+   png_ptr->chunkdata = NULL;
    png_free(png_ptr, text_ptr);
    if (ret)
      png_warning(png_ptr, "Insufficient memory to process text chunk.");
@@ -2022,7 +2027,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   png_free(png_ptr,png_ptr->chunkdata);
+   png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (png_ptr->chunkdata == NULL)
    {

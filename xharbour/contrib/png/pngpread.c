@@ -1,15 +1,19 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.32 [September 18, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
+
+#ifdef __BORLANDC__
+   #pragma option push -w-aus
+#endif
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -1282,7 +1286,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
                   (png_uint_32)(png_ptr->zbuf_size 
-                  - png_ptr->zstream.avail_out));
+                  - png_ptr->zstream.avail_out + 1));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -1595,3 +1599,7 @@ png_get_progressive_ptr(png_structp png_ptr)
    return png_ptr->io_ptr;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngread.c - read a PNG file
@@ -1086,8 +1086,8 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL, end_info_ptr = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_free_ptr free_fn = NULL;
-   png_voidp mem_ptr = NULL;
+   png_free_ptr free_fn;
+   png_voidp mem_ptr;
 #endif
 
    png_debug(1, "in png_destroy_read_struct\n");
@@ -1453,8 +1453,8 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
 
-   transforms = transforms; /* quiet compiler warnings */
-   params = params;
+   (void) transforms; /* quiet compiler warnings */
+   (void) params;
 
 }
 #endif /* PNG_INFO_IMAGE_SUPPORTED */

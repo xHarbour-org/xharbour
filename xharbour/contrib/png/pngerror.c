@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* pngerror.c - stub functions for i/o and memory allocation
@@ -300,7 +300,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #else
    warning_message = warning_message; /* make compiler happy */
 #endif
-   png_ptr = png_ptr; /* make compiler happy */
+   (void) png_ptr; /* make compiler happy */
 }
 #endif /* PNG_NO_WARNINGS */
 

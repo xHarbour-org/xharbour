@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
  */
 
 /* png.c - location for general purpose libpng functions
@@ -16,7 +16,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_31 Your_png_h_is_not_version_1_2_31;
+typedef version_1_2_33 Your_png_h_is_not_version_1_2_33;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -736,8 +736,8 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.31 - August 21, 2008\n\
+   (void) png_ptr;  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) "\n libpng version 1.2.33 - October 31, 2008\n\
    Copyright (c) 1998-2008 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -755,7 +755,7 @@ png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   (void) png_ptr;  /* silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
@@ -763,7 +763,7 @@ png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   (void) png_ptr;  /* silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
@@ -771,7 +771,7 @@ png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   (void) png_ptr;  /* silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_HEADER_VERSION_STRING
 #ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
