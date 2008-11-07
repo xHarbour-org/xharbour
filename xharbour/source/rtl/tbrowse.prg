@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.209 2008/10/30 13:33:09 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.210 2008/11/04 22:42:57 modalsist Exp $
  */
 
 /*
@@ -498,16 +498,14 @@ Return Self
 *--------------------------------------------------*
 METHOD GetCellColor( nRow, nCol ) CLASS TDataCache
 *--------------------------------------------------*
-Local aColor, nColIndex 
+Local aColor 
 
-   nColIndex := ::ColIndex( nCol ) 
+   if CacheOK( ::aCache, nRow, nCol )
 
-   if CacheOK( ::aCache, nRow, nColIndex )
-
-      aColor := ::aCache[ nRow ][ nColIndex ]:ColorRect
+      aColor := ::aCache[ nRow ][ nCol ]:ColorRect
 
       if Empty( aColor )
-         aColor := ::aCache[ nRow ][ nColIndex ]:Color
+         aColor := ::aCache[ nRow ][ nCol ]:Color
       endif
 
    endif
@@ -2287,17 +2285,25 @@ Local nRow, aColorRect
 
    endif
 
+   if aRect[TBCRECT_TOP ]   < 1 .or.;
+      aRect[TBCRECT_LEFT]   < 1 .or.;
+      aRect[TBCRECT_BOTTOM] < aRect[TBCRECT_TOP] .or.;
+      aRect[TBCRECT_RIGHT ] < aRect[TBCRECT_LEFT] .or.;
+      aRect[TBCRECT_BOTTOM] > ::nRowCount .or.;
+      aRect[TBCRECT_RIGHT ] > ::nColCount 
+
+      ::oCache:ClearColRect()
+
+      return self
+
+   endif
+
    if ::nFrozenCols > 0 .and. ::nLeftVisible > ::nColCount
       if aRect[ TBCRECT_LEFT ] > ::nColCount
          aRect[ TBCRECT_LEFT ]  := ::nColPos
          aRect[ TBCRECT_RIGHT ] := ::nColPos
       endif
    endif
-
-   aRect [TBCRECT_TOP]    := Min(::nRowCount,Max( aRect[ TBCRECT_TOP    ], 1 ))
-   aRect [TBCRECT_LEFT]   := Min(::nColCount,Max( aRect[ TBCRECT_LEFT   ], 1 ))
-   aRect [TBCRECT_BOTTOM] := Max(1,Min( aRect[ TBCRECT_BOTTOM ], ::nRowCount ))
-   aRect [TBCRECT_RIGHT]  := Max(1,Min( aRect[ TBCRECT_RIGHT  ], ::nColCount ))
 
    aColorRect := { aRect[TBCRECT_TOP],;
                    aRect[TBCRECT_LEFT],; 
