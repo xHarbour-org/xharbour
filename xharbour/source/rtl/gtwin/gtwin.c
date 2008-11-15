@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.119 2008/03/27 15:11:08 likewolf Exp $
+ * $Id: gtwin.c,v 1.120 2008/08/14 09:04:23 andijahja Exp $
  */
 
 /*
@@ -1430,6 +1430,12 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
            s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_MOVED )
         {
           ch = K_MOUSEMOVE;
+        }
+
+        else if( iEventMask & INKEY_MWHEEL &&
+           s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_WHEELED )
+        {
+          ch = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState & 0xFF000000 ? K_MWBACKWARD : K_MWFORWARD ;
         }
 
         else if( iEventMask & INKEY_LDOWN &&

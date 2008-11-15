@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6255 2008/11/07 11:16:49 modalsist Exp $
+ * $Id: ChangeLog,v 1.6256 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-11-15 21:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+   !source/rtl/gtwin/gtwin.c
+     ! Added missing support for  mouse_wheel events
 
 2008-11-08 04:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
