@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.12 2005/11/13 21:01:01 marceloanelli Exp $
+ * $Id: msges.c,v 1.13 2008/08/14 09:04:16 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.12 $ $Date: 2005/11/13 21:01:01 $",         /* Version */
+      "$Revision: 1.13 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
 
       /* Month names */
 
@@ -207,15 +207,14 @@ HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ES )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_ES )
 
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_ES
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_ES = hb_lang_Init_ES;
+#if defined( HB_PRAGMA_STARTUP )                                         
+   #pragma startup hb_lang_Init_ES                                     
+#elif defined( HB_MSC_STARTUP )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #endif                                          
+   #pragma data_seg( HB_MSC_START_SEGMENT )
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_ES = hb_lang_Init_ES;    
    #pragma data_seg()
-#endif
+#endif                                                                 
 

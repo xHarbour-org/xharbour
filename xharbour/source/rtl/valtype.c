@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.11 2007/04/17 01:17:42 toninhofwi Exp $
+ * $Id: valtype.c,v 1.12 2008/01/10 11:27:17 marchuet Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ HB_FUNC( HB_ISBYREF )
 
 HB_FUNC( HB_ISNIL )
 {
-  hb_retl( ISNIL( 1 ) );
+   hb_retl( ISNIL( 1 ) );
 }
 
 HB_FUNC( HB_ISSTRING )
@@ -145,47 +145,47 @@ HB_FUNC( HB_ISMEMO )
 
 HB_FUNC( HB_ISNUMERIC )
 {
-  hb_retl( HB_IS_NUMBER( hb_param( 1, HB_IT_ANY ) ) );
+   hb_retl( HB_IS_NUMBER( hb_param( 1, HB_IT_ANY ) ) );
 }
 
 HB_FUNC( HB_ISLOGICAL )
 {
-  hb_retl( ISLOG( 1 ) );
+   hb_retl( ISLOG( 1 ) );
 }
 
 HB_FUNC( HB_ISDATE )
 {
-  hb_retl( ISDATE( 1 ) );
+   hb_retl( ISDATE( 1 ) );
 }
 
 HB_FUNC( HB_ISDATETIME )
 {
-  hb_retl( ISDATETIME( 1 ) );
+   hb_retl( ISDATETIME( 1 ) );
 }
 
 HB_FUNC( HB_ISARRAY )
 {
-  hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
+   hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
 }
 
 HB_FUNC( HB_ISOBJECT )
 {
-  hb_retl( ISOBJECT( 1 ) );
+   hb_retl( ISOBJECT( 1 ) );
 }
 
 HB_FUNC( HB_ISBLOCK )
 {
-  hb_retl( ISBLOCK( 1 ) );
+   hb_retl( ISBLOCK( 1 ) );
 }
 
 HB_FUNC( HB_ISPOINTER )
 {
-  hb_retl( ISPOINTER( 1 ) );
+   hb_retl( ISPOINTER( 1 ) );
 }
 
 HB_FUNC( HB_ISHASH )
 {
-  hb_retl( ISHASH( 1 ) );
+   hb_retl( ISHASH( 1 ) );
 }
 
 HB_FUNC( HB_ISNULL )

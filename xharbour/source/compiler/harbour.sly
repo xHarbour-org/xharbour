@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.156 2008/06/20 03:46:27 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.157 2008/07/02 18:26:04 ronpinkas Exp $
  */
 
 /*
@@ -198,9 +198,9 @@ static void hb_compDebugStart( void ) { };
 
 %union                  /* special structure used by lex and yacc to share info */
 {
-   char *  string;       /* to hold a string returned by lex */
-   int     iNumber;      /* to hold a temporary integer number */
-   HB_LONG lNumber;      /* to hold a temporary long number */
+   char *  string;      /* to hold a string returned by lex */
+   int     iNumber;     /* to hold a temporary integer number */
+   HB_LONG lNumber;     /* to hold a temporary long number */
    HB_EXPR_PTR asExpr;
    void * pVoid;        /* to hold any memory structure we may need */
    struct
@@ -215,10 +215,10 @@ static void hb_compDebugStart( void ) { };
    } valLong;
    struct
    {
-      double dNumber;   /* to hold a double number returned by lex */
+      double   dNumber;    /* to hold a double number returned by lex */
       /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
-      unsigned char bWidth; /* to hold the width of the value */
-      unsigned char bDec; /* to hold the number of decimal points in the value */
+      UCHAR    bWidth;     /* to hold the width of the value */
+      UCHAR    bDec;       /* to hold the number of decimal points in the value */
       char * szValue;
    } valDouble;
    struct
@@ -285,22 +285,19 @@ static void hb_compDebugStart( void ) { };
 %right  '+' '-'
 %right  '*' '/' '%'
 %right  POWER
-%right UNARY
-
+%right  UNARY
 /*preincrement and predecrement*/
 %right  PRE
-
 /*special operators*/
 %right  ALIASOP '&' '@'
-%right '\n' ';' ','
-
+%right  '\n' ';' ','
 /*the highest precedence*/
 
 %type <string>  IdentName IDENTIFIER MACROVAR MACROTEXT CompTimeStr
 %type <valChar> LITERAL
-%type <valDouble>   NUM_DOUBLE
-%type <valInteger>  NUM_INTEGER
-%type <valLong>     NUM_LONG
+%type <valDouble>  NUM_DOUBLE
+%type <valInteger> NUM_INTEGER
+%type <valLong>    NUM_LONG
 %type <iNumber> FunScope
 %type <iNumber> IfBegin VarList ExtVarList
 %type <iNumber> FieldList

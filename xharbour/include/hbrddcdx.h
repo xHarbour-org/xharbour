@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.58 2008/07/09 16:10:29 marchuet Exp $
+ * $Id: hbrddcdx.h,v 1.59 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -409,7 +409,7 @@ typedef CDXSWAPPAGE * LPCDXSWAPPAGE;
 typedef struct
 {
    LPCDXTAG pTag;             /* current Tag */
-   HB_FHANDLE  hTempFile;        /* handle to temporary file */
+   HB_FHANDLE hTempFile;      /* handle to temporary file */
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */
    BYTE     bTrl;             /* filler char for shorter keys */

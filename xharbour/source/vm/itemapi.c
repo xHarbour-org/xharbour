@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.150 2008/06/25 20:20:54 vouchcac Exp $
+ * $Id: itemapi.c,v 1.151 2008/06/28 18:51:50 walito Exp $
  */
 
 /*
@@ -2542,7 +2542,7 @@ HB_EXPORT PHB_ITEM hb_itemPutCPtr2( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 /*
-HB_EXPORT PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+HB_EXPORT PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    return hb_itemPutCLPtr( pItem, szText, ulLen );
 }

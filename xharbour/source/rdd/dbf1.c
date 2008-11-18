@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.194 2008/09/16 10:10:07 marchuet Exp $
+ * $Id: dbf1.c,v 1.195 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ static ERRCODE hb_dbfUnlockAllRecords( DBFAREAP pArea )
 {
    ERRCODE uiError = SUCCESS;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockAllRecords(%p, %p)", pArea ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockAllRecords(%p)", pArea ));
 
    if( pArea->pLocksPos )
    {
@@ -1544,8 +1544,8 @@ static ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
 
    pArea->fTop = pArea->fBottom = FALSE;
 
-   if( lToSkip == 0 || hb_set.HB_SET_DELETED ||
-       pArea->dbfi.itmCobExpr || pArea->dbfi.fFilter )
+   if( lToSkip == 0 || pArea->dbfi.itmCobExpr || pArea->dbfi.fFilter ||
+       hb_set.HB_SET_DELETED )
       return SUPER_SKIP( ( AREAP ) pArea, lToSkip );
 
    uiError = SELF_SKIPRAW( ( AREAP ) pArea, lToSkip );

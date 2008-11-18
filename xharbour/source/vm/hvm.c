@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.693 2008/08/29 03:00:59 ronpinkas Exp $
+ * $Id: hvm.c,v 1.694 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -1298,7 +1298,7 @@ HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
    }
 #endif
 
-   while( (BOOL) TRUE )
+   for( ;; )
    {
 #ifndef HB_NO_PROFILER
       if( hb_bProfiler )
@@ -4107,29 +4107,33 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
 
    if( HB_IS_NUMINT( pResult ) )
    {
-      HB_LONG lVal = HB_ITEM_GET_NUMINTRAW( pResult );
-	  HB_LONG lNewVal = ( lVal + lAdd );
+      HB_LONG lVal = HB_ITEM_GET_NUMINTRAW( pResult ), lResult;
 
-      if( lAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+      lResult = lVal + lAdd;
+
+      if( lAdd >= 0 ? lResult >= lVal : lResult <  lVal )
       {
-         HB_ITEM_PUT_NUMINTRAW( pResult, lNewVal );
+         HB_ITEM_PUT_NUMINTRAW( pResult, lResult );
          return;
       }
-      dNewVal = ( double ) lNewVal;
+      else
+      {
+         dNewVal = ( double ) lResult;
+      }
    }
    else if( HB_IS_DATE( pResult ) )
    {
       pResult->item.asDate.value += lAdd;
       return;
    }
+   else if( HB_IS_DOUBLE( pResult ) )
+   {
+      dNewVal = pResult->item.asDouble.value + lAdd;
+   }
    else if( HB_IS_STRING( pResult ) && pResult->item.asString.length == 1 )
    {
       hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pResult->item.asString.value[ 0 ] + lAdd ) ], 1 );
       return;
-   }
-   else if( pResult->type & HB_IT_DOUBLE )
-   {
-      dNewVal = pResult->item.asDouble.value + lAdd;
    }
    else if( lAdd == 1 && ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_INC ) )
    {
@@ -4150,7 +4154,7 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
    }
    else
    {
-	  PHB_ITEM pAdd = hb_stackTopItem();
+	   PHB_ITEM pAdd = hb_stackTopItem();
       PHB_ITEM pSubst;
 
       if( lAdd > 0 )

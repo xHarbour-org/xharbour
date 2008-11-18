@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.54 2007/09/11 18:24:23 walito Exp $
+ * $Id: transfrm.c,v 1.55 2007/10/26 23:18:12 modalsist Exp $
  */
 
 /*
@@ -151,7 +151,7 @@ HB_FUNC( TRANSFORM )
                   }
                case HB_CHAR_HT:
                case ' ':
-                  bDone = TRUE;      /* End of function string */
+                  bDone = TRUE;     /* End of function string */
                   break;
                case '!':
                   uiPicFlags |= PF_UPPER;

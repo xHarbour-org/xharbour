@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.97 2008/10/24 15:23:49 marchuet Exp $
+ * $Id: fm.c,v 1.98 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -60,7 +60,6 @@
  *
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  *    hb_xquery()
- *    MEMORY()
  *
  * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
  *    Threadsafing of MT startup and closing sequences
@@ -75,6 +74,7 @@
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
+#include "Windows.h"
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -91,18 +91,18 @@
 #elif defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
    #define HB_FM_WIN32_ALLOC
    #undef HB_FM_DL_ALLOC
-   #undef HB_FM_STD_ALLOC   
+   #undef HB_FM_STD_ALLOC
 #elif defined( HB_FM_WIN32_ALLOC )
    #undef HB_FM_DL_ALLOC
-   #undef HB_FM_STD_ALLOC   
+   #undef HB_FM_STD_ALLOC
 #elif defined( HB_FM_STD_ALLOC )
    #undef HB_FM_DL_ALLOC
    #undef HB_FM_WIN32_ALLOC
 #else
-   #define HB_FM_STD_ALLOC 
+   #define HB_FM_STD_ALLOC
    #undef HB_FM_DL_ALLOC
    #undef HB_FM_WIN32_ALLOC
-#endif   
+#endif
 
 #if defined( HB_FM_DL_ALLOC )
 /* #  define NO_MALLINFO 1 */
@@ -137,9 +137,14 @@
 #     define free( p )           dlfree( ( p ) )
 #  endif
 #elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
+/*
 #  define malloc( n )         ( void * ) LocalAlloc( LMEM_FIXED, ( n ) )
 #  define realloc( p, n )     ( void * ) LocalReAlloc( ( HLOCAL ) ( p ), ( n ), LMEM_MOVEABLE )
 #  define free( p )           LocalFree( ( HLOCAL ) ( p ) )
+*/
+#  define malloc( n )         ( void * ) HeapAlloc( GetProcessHeap(), 0, ( n ) )
+#  define realloc( p, n )     ( void * ) HeapReAlloc( GetProcessHeap(), 0, ( void * ) ( p ), ( n ) )
+#  define free( p )           HeapFree( GetProcessHeap(), 0, ( void * ) ( p ) )
 #endif
 
 #ifndef HB_FM_STATISTICS
@@ -177,12 +182,14 @@ typedef struct _HB_MEMINFO
 #  define HB_MEMINFO_SIZE     ( sizeof( HB_MEMINFO ) + HB_COUNTER_OFFSET )
 #endif
 
-#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE )
+#define HB_FM_GETSIG( p, n )  HB_GET_UINT32( ( BYTE * ) ( p ) + ( n ) )
+#define HB_FM_SETSIG( p, n )  HB_PUT_UINT32( ( BYTE * ) ( p ) + ( n ), HB_MEMINFO_SIGNATURE )
+#define HB_FM_CLRSIG( p, n )  HB_PUT_UINT32( ( BYTE * ) ( p ) + ( n ), 0 )
+
+#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE + sizeof( UINT32 ) )
+
 #define HB_FM_PTR( p )        ( ( PHB_MEMINFO ) ( ( BYTE * ) ( p ) - HB_MEMINFO_SIZE ) )
 
-#define HB_FM_GETSIG( p, n )  HB_GET_UINT32( ( BYTE * )( p ) + ( n ) )
-#define HB_FM_SETSIG( p, n )  HB_PUT_UINT32( ( BYTE * )( p ) + ( n ), HB_MEMINFO_SIGNATURE )
-#define HB_FM_CLRSIG( p, n )  HB_PUT_UINT32( ( BYTE * )( p ) + ( n ), 0 )
 
 /* NOTE: we cannot use here HB_TRACE because it will overwrite the
  * function name/line number of code which called hb_xalloc/hb_xgrab
@@ -478,7 +485,7 @@ HB_EXPORT void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       ULONG ulMemSize;
 
       pMemBlock = HB_FM_PTR( pMem );
-   
+
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
          hb_errInternal( HB_EI_XREALLOCINV, NULL, NULL, NULL );
 
@@ -556,7 +563,12 @@ HB_EXPORT void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    }
 
    if( !pMem )
+   {
+      char * buffer[100];
+      wsprintf( (LPSTR) buffer, "%i\t%i\n", ulSize, GetLastError() );
+      OutputDebugString( (LPSTR) buffer );
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
+   }
 
 #endif
 

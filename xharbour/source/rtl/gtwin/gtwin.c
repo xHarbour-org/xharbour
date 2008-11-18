@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.120 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gtwin.c,v 1.121 2008/11/15 22:57:00 lculik Exp $
  */
 
 /*
@@ -818,12 +818,12 @@ static BOOL hb_gt_win_SetMode( PHB_GT pGT, int iRows, int iCols )
       if( iRows > coBuf.Y )
          iRows = coBuf.Y;
       else
-         coBuf.Y = iRows;
+         coBuf.Y = ( SHORT ) iRows;
 
       if( iCols > coBuf.X )
          iCols = coBuf.X;
       else
-         coBuf.X = iCols;
+         coBuf.X = ( SHORT ) iCols;
 
       /* new console window size and scroll position */
       srWin.Top    = srWin.Left = 0;

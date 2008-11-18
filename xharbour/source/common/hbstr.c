@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.30 2008/08/22 07:37:12 marchuet Exp $
+ * $Id: hbstr.c,v 1.31 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -306,15 +306,15 @@ HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
 
    for( ulCount = 0; ulCount < count; ulCount++ )
    {
-      unsigned char c1 = toupper( (unsigned char) s1[ ulCount ] );
-      unsigned char c2 = toupper( (unsigned char) s2[ ulCount ] );
+      unsigned char c1 = ( char ) toupper( ( unsigned char ) s1[ ulCount ] );
+      unsigned char c2 = ( char ) toupper( ( unsigned char ) s2[ ulCount ] );
 
       if( c1 != c2 )
       {
          rc = ( c1 < c2 ? -1 : 1 );
          break;
       }
-      else if ( !c1 )
+      else if( !c1 )
          break;
    }
 
@@ -339,7 +339,7 @@ HB_EXPORT char * hb_xstrcat( char * szDest, const char * szSrc, ... )
    va_start( va, szSrc );
    while( szSrc )
    {
-      while ( *szSrc )
+      while( *szSrc )
          *szDest++ = *szSrc++;
       szSrc = va_arg( va, char * );
    }
@@ -384,7 +384,7 @@ HB_EXPORT char * hb_xstrcpy( char * szDest, const char * szSrc, ... )
    va_start( va, szSrc );
    while( szSrc )
    {
-      while ( *szSrc )
+      while( *szSrc )
          *szDest++ = *szSrc++;
       szSrc = va_arg( va, char * );
    }
@@ -412,13 +412,13 @@ static double hb_numPow10( int nPrecision )
                                           10000000000000.0,   /* 13 */
                                          100000000000000.0,   /* 14 */
                                         1000000000000000.0 }; /* 15 */
-   if ( nPrecision < 16 )
+   if( nPrecision < 16 )
    {
-      if ( nPrecision >= 0 )
+      if( nPrecision >= 0 )
       {
          return s_dPow10[ nPrecision ];
       }
-      else if ( nPrecision > -16 )
+      else if( nPrecision > -16 )
       {
          return 1.0 / s_dPow10[ ( unsigned int ) -nPrecision ];
       }
@@ -437,7 +437,7 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
    if( dNum == 0.0 )
       return 0.0;
 
-   if ( iDec < 0 )
+   if( iDec < 0 )
    {
       dPow = hb_numPow10( -iDec );
       doComplete5 = dNum / dPow * doBase;
@@ -480,7 +480,7 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
       int iDecR, iPrec;
       BOOL fNeg;
 
-      if ( dNum < 0 )
+      if( dNum < 0 )
       {
          fNeg = TRUE;
          dNum = -dNum;
@@ -492,13 +492,13 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
       iDecR = (int) log10( dNum );
       iPrec = iDecR + iDec;
 
-      if ( iPrec < -1 )
+      if( iPrec < -1 )
       {
          return 0.0;
       }
       else
       {
-         if ( iPrec > HB_NUM_PRECISION )
+         if( iPrec > HB_NUM_PRECISION )
          {
             iDec = HB_NUM_PRECISION - ( dNum < 1.0 ? 0 : 1 ) - iDecR;
             iPrec = -1;
@@ -508,7 +508,7 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
             iPrec -= HB_NUM_PRECISION;
          }
       }
-      if ( iDec < 0 )
+      if( iDec < 0 )
       {
          dPow = hb_numPow10( -iDec );
          doComplete5 = dNum / dPow * doBase + 5.0 + hb_numPow10( iPrec );
@@ -519,7 +519,7 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
          doComplete5 = dNum * dPow * doBase + 5.0 + hb_numPow10( iPrec );
       }
 
-      if ( fNeg )
+      if( fNeg )
       {
          doComplete5 = -doComplete5;
       }
@@ -542,15 +542,15 @@ HB_EXPORT double hb_numRound( double dNum, int iDec )
    modf( doComplete5, &doComplete5i );
 
 #if defined( __XCC__ ) || defined( __POCC__ )
-   if ( iDec < 16 )
+   if( iDec < 16 )
    {
-      if ( iDec >= 0 )
+      if( iDec >= 0 )
          return doComplete5i / (LONGLONG) dPow;
-      else if ( iDec > -16 )
+      else if( iDec > -16 )
          return doComplete5i * (LONGLONG) dPow;
    }
 #endif
-   if ( iDec < 0 )
+   if( iDec < 0 )
       return doComplete5i * dPow;
    else
       return doComplete5i / dPow;
@@ -589,14 +589,14 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth ));
 
-   while ( ulPos < ulLen && isspace( (BYTE) szNum[ulPos] ) )
+   while( ulPos < ulLen && isspace( (BYTE) szNum[ulPos] ) )
       ulPos++;
 
-   if ( ulPos >= ulLen )
+   if( ulPos >= ulLen )
    {
       fNeg = FALSE;
    }
-   else if ( szNum[ulPos] == '-' )
+   else if( szNum[ulPos] == '-' )
    {
       fNeg = TRUE;
       ulPos++;
@@ -604,7 +604,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
    else
    {
       fNeg = FALSE;
-      if ( szNum[ulPos] == '+' )
+      if( szNum[ulPos] == '+' )
          ulPos++;
    }
 
@@ -617,14 +617,14 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       ulPos += 2;
       iWidth = HB_DEFAULT_WIDTH;
       fHex = TRUE;
-      for ( ; ulPos < ulLen; ulPos++ )
+      for( ; ulPos < ulLen; ulPos++ )
       {
          c = szNum[ulPos];
-         if ( c >= '0' && c <= '9' )
+         if( c >= '0' && c <= '9' )
             c -= '0';
-         else if ( c >= 'A' && c <= 'F' )
+         else if( c >= 'A' && c <= 'F' )
             c -= 'A' - 10;
-         else if ( c >= 'a' && c <= 'f' )
+         else if( c >= 'a' && c <= 'f' )
             c -= 'a' - 10;
          else
             break;
@@ -641,16 +641,16 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 
       iWidth = ulPos;
 
-      for ( ; ulPos < ulLen; ulPos++ )
+      for( ; ulPos < ulLen; ulPos++ )
       {
          c = szNum[ulPos];
-         if ( c >= '0' && c <= '9' )
+         if( c >= '0' && c <= '9' )
          {
-            if ( fDbl )
+            if( fDbl )
             {
                *dVal = *dVal * 10.0 + ( c - '0' );
             }
-            else if ( *lVal < lLimV || ( *lVal <= lLimV && ( ( int ) ( c - '0' ) ) <= iLimC ) )
+            else if( *lVal < lLimV || ( *lVal <= lLimV && ( ( int ) ( c - '0' ) ) <= iLimC ) )
             {
                *lVal = *lVal * 10 + ( c - '0' );
             }
@@ -659,39 +659,39 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
                *dVal = (double) *lVal * 10.0 + ( c - '0' );
                fDbl = TRUE;
             }
-            if ( fDec )
+            if( fDec )
                iDec++;
             else
                iWidth++;
          }
-         else if ( c == '.' && !fDec )
+         else if( c == '.' && !fDec )
          {
             fDec = TRUE;
          }
          else
          {
-            while ( !fDec && ulPos < ulLen )
+            while( !fDec && ulPos < ulLen )
             {
-               if ( szNum[ulPos++] == '.' )
+               if( szNum[ulPos++] == '.' )
                   fDec = TRUE;
                else
                   iWidth++;
             }
-            if ( fDec )
+            if( fDec )
                iDecR = ulLen - ulPos;
             break;
          }
       }
    }
 
-   if ( fNeg )
+   if( fNeg )
    {
-      if ( fDbl )
+      if( fDbl )
          *dVal = -*dVal;
       else
          *lVal = -*lVal;
    }
-   if ( !fDbl && (
+   if( !fDbl && (
 #if defined( PCODE_LONG_LIM )
         ( fPCode && !fHex && !PCODE_LONG_LIM( *lVal ) ) ||
 #endif
@@ -700,42 +700,42 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       *dVal = (double) *lVal;
       fDbl = TRUE;
    }
-   if ( iDec )
+   if( iDec )
    {
 #if defined( __XCC__ ) || defined( __POCC__ )
-      if ( iDec < 16 )
+      if( iDec < 16 )
          *dVal /= ( LONGLONG ) hb_numPow10( iDec );
       else
 #endif
          *dVal /= hb_numPow10( iDec );
    }
 
-   if ( piDec )
+   if( piDec )
       *piDec = iDec + iDecR;
-   if ( piWidth )
+   if( piWidth )
    {
-      if ( fHex )
+      if( fHex )
          *piWidth = iWidth;
       else
       {
-         int iSize = fDbl ? HB_DBL_LENGTH( *dVal ) : HB_LONG_LENGTH( *lVal );
-
-         if ( fPCode )
+         if( fPCode )
          {
-            if ( iWidth < 10 || fNeg )
-               *piWidth = iSize;
+            if( iWidth < 10 || fNeg )
+               *piWidth = fDbl ? HB_DBL_LENGTH( *dVal ) : HB_LONG_LENGTH( *lVal );
             else
                *piWidth = iWidth + ( iDec == 0 ? 1 : 0 );
          }
+         else if( iWidth > 10 )
+         {
+            *piWidth = fDbl ? HB_DBL_LENGTH( *dVal ) : HB_LONG_LENGTH( *lVal );
+         }
          else
          {
-            if ( iSize > 10 || iWidth > 10 )
-               *piWidth = iSize;
-            else if ( iDec + iDecR == 0 )
+            if( iDec + iDecR == 0 )
                *piWidth = ( int ) ulLen;
-            else if ( iWidth == 0 )
+            else if( iWidth == 0 )
                *piWidth = 1;
-            else if ( fNeg && iWidth == 1 && *dVal != 0 )
+            else if( fNeg && iWidth == 1 && *dVal != 0 )
                *piWidth = 2;
             else
                *piWidth = iWidth;
@@ -817,7 +817,7 @@ HB_EXPORT char * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen )
       ulLen--;
    }
 
-   while (ulLen--)
+   while(ulLen--)
    {
       *pDest++ = '\0';
    }
@@ -852,7 +852,7 @@ HB_EXPORT char * hb_strncat( char * pDest, const char * pSource, ULONG ulLen )
 /* if someone will need this then please uncomment the cleaning the rest of
    buffer. */
 /*
-   while (ulLen--)
+   while(ulLen--)
    {
       *pDest++ = '\0';
    }
@@ -877,13 +877,13 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
    /* some compilers implement toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && (*pDest++ = toupper( *pSource )) != '\0' )
+   while( ulLen && ( *pDest++ = ( char ) toupper( ( UCHAR ) *pSource ) ) != '\0' )
    {
       ulLen--;
       pSource++;
    }
 
-   while (ulLen--)
+   while( ulLen-- )
    {
       *pDest++ = '\0';
    }
@@ -906,7 +906,7 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyUpperTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
    ulSLen = 0;
-   while ( ulSLen < ulLen && pSource[ ulSLen ] )
+   while( ulSLen < ulLen && pSource[ ulSLen ] )
    {
       ulSLen++;
    }
@@ -919,14 +919,15 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && ulSLen && (*pDest++ = toupper( *pSource )) != '\0' )
+   while( ulLen && ulSLen &&
+          ( *pDest++ = ( char ) toupper( ( UCHAR ) *pSource ) ) != '\0' )
    {
       ulSLen--;
       ulLen--;
       pSource++;
    }
 
-   while (ulLen--)
+   while( ulLen-- )
    {
       *pDest++ = '\0';
    }
@@ -966,7 +967,7 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
       ulLen--;
    }
 
-   while (ulLen--)
+   while( ulLen-- )
    {
       *pDest++ = '\0';
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.282 2008/09/18 08:10:58 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.283 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -1614,6 +1614,26 @@ static ULONG hb_cdxPageGetKeyPage( LPCDXPAGE pPage, int iKey )
                         ( iKey + 1 ) * ( pPage->TagParent->uiLen + 8 ) - 4 ] );
 }
 
+/*
+ * get number of duplicated keys from key in leaf index page
+ */
+static SHORT hb_cdxPageGetKeyTrl( LPCDXPAGE pPage, SHORT iKey )
+{
+#ifdef HB_CDX_DBGCODE_EXT
+   if ( iKey < 0 || iKey >= pPage->iKeys )
+      hb_cdxErrInternal( "hb_cdxPageGetKeyTrl: wrong iKey index." );
+   if ( ( pPage->PageType & CDX_NODE_LEAF ) == 0 )
+      hb_cdxErrInternal( "hb_cdxPageGetKeyTrl: page is not a leaf." );
+#endif
+   if( pPage->pKeyBuf )
+      return pPage->pKeyBuf[ ( iKey + 1 ) * ( pPage->TagParent->uiLen + 6 ) - 1 ];
+   else
+   {
+      BYTE * ptr = &pPage->node.extNode.keyPool[ ( iKey + 1 ) * pPage->ReqByte - 2 ];
+      return ( HB_GET_LE_UINT16( ptr ) >> ( 16 - pPage->TCBits ) ) & pPage->TCMask;
+   }
+}
+
 #if 0
 /*
  * get key from uncompressed page
@@ -2721,8 +2741,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                iSize += iLen - 6 - ( j == 0 ? 0 : pPtr[ ( j + 1 ) * iLen - 2 ] ) - pPtr[ ( j + 1 ) * iLen - 1 ];
             }
             pbKey = hb_cdxPageGetKeyVal( lpTmpPage, 0 );
-            bMax = ( HB_GET_LE_UINT16( &lpTmpPage->node.extNode.keyPool[ lpTmpPage->ReqByte - 2 ] )
-                         >> ( 16 - lpTmpPage->TCBits ) ) & lpTmpPage->TCMask;
+            bMax = hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
 #ifdef HB_CDX_PACKTRAIL
             bMax = iLen - 6 - bMax;
 #else
@@ -2768,7 +2787,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                }
                if ( lpTmpPage->iKeys > 0 )
                {
-                  BYTE bDup = 0, bMax;
+                  BYTE bDup = 0;
                   pPtr = &pKeyPool[ iKeys * iLen ];
                   if ( lpTmpPage->pKeyBuf )
                      memcpy( pPtr, lpTmpPage->pKeyBuf, lpTmpPage->iKeys * iLen );
@@ -7577,8 +7596,8 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                /* TODO: What should be default? */
                /*
                hb_cdxIndexFree( pIndex );
-               hb_fsClose( hFile );
-               hFile = FS_ERROR;
+               hb_fileClose( pFile );
+               pFile = NULL;
                hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
                               szFileName, hb_fsError(), EF_CANDEFAULT );
                */

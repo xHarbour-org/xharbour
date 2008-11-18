@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.6 2006/07/05 02:44:00 ronpinkas Exp $
+ * $Id: tgetint.prg,v 1.7 2008/03/13 10:49:42 likewolf Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
       ENDIF
    ENDIF
 
-   oGet := Get():New( , ,bSetGet, cVarName, cPicture )
+   oGet := Get():New( , , bSetGet, cVarName, cPicture )
 
    oGet:PreBlock := bWhen
    oGet:PostBlock := bValid

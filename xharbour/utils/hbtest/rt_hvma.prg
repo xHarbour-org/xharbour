@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvma.prg,v 1.6 2005/10/29 18:53:39 likewolf Exp $
+ * $Id: rt_hvma.prg,v 1.7 2007/02/27 15:59:43 druzus Exp $
  */
 
 /*
@@ -416,7 +416,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( Len( w_TEST->TYPE_M_E )         , 0                                      )
    TEST_LINE( Len( saArray )                  , 1                                      )
 #ifdef __HARBOUR__
-   TEST_LINE( Len( ErrorNew() )               , if(hb_multithread(),20,17)                                     )
+   TEST_LINE( Len( ErrorNew() )               , if(hb_multithread(),20,19)                                     )
    TEST_LINE( Len( Space( 1000000 ) )         , 1000000                                )
 #else
    TEST_LINE( Len( ErrorNew() )               , 7                                      )

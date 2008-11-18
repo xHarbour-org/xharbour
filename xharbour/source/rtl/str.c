@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.18 2007/05/31 13:01:28 ran_go Exp $
+ * $Id: str.c,v 1.19 2007/07/20 07:57:16 marchuet Exp $
  */
 
 /*
@@ -66,23 +66,24 @@ HB_FUNC( STR )
 
    if( pNumber )
    {
+      int iParams = hb_pcount();
       bValid = TRUE;
 
-      if( hb_pcount() >= 2 )
+      if( iParams >= 2 )
       {
          pWidth = hb_param( 2, HB_IT_NUMERIC );
 
-         if ( ! pWidth && hb_pcount() < 4 )
+         if( ! pWidth && iParams < 4 )
             bValid = FALSE;
       }
-      if( bValid && hb_pcount() >= 3 )
+      if( bValid && iParams >= 3 )
       {
          pDec = hb_param( 3, HB_IT_NUMERIC );
 
-         if ( ! pDec && hb_pcount() < 4 )
+         if ( ! pDec && iParams < 4 )
             bValid = FALSE;
       }
-      if( bValid && hb_pcount() >= 4 )
+      if( bValid && iParams >= 4 )
       {
          PHB_ITEM pLtrim = hb_param( 4, HB_IT_LOGICAL );
 
@@ -124,7 +125,7 @@ HB_FUNC( STR )
         char *szTemp = (char *) hb_xgrab( iLen + 1  ) ;
 
         hb_xmemset( szTemp, '*', iLen );
-		szTemp[ iLen + 1 ] = '\0';
+		  szTemp[ iLen + 1 ] = '\0';
 
         hb_retcAdopt( szTemp ) ;
       }
@@ -134,7 +135,5 @@ HB_FUNC( STR )
       }
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
-   }
 }

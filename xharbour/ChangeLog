@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6256 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.6257 2008/11/15 22:57:00 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-10-24 18:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\vm\fm.c
+    ! fixed fmstat.lib
+    + Added heap functions instead of Local ones to test it. Only used under windows
+      platforms it can increase speed. can be tested running speedtst.prg
+
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    ! fixed bug in joined leaf pages size calculation which activated
+      error massage enabled by HB_CDX_DBGCODE_EXT macro.
+      Thanks to Saulius for reporting the problem.
+      [TOMERGE 1.0]
+
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+    + added ORDLSTDELETE() method.
+      Now ordbagClear() should work for DBFCDX.
+
+  * utils\hbtest\rt_hvma.prg
+  * utils\hbtest\rt_misc.prg
+    + Added test that fails.
+
+  * source\lang\msgca.c
+  * source\lang\msges.c
+  * source\lang\msgeswin.c
+     ! Fix for MSVC 64-bit C mode startup procedure.
+
+  * include\hbapi.h
+  * source\common\hbdate.c
+  * source\common\hbstr.c
+  * source\compiler\harbour.c
+  * source\compiler\harbour.sly
+  * source\rdd\dbf1.c
+  * source\rdd\dbffpt\dbffpt1.c
+  * source\rdd\wacore.c
+  * source\rdd\wafunc.c
+  * source\rdd\workarea.c
+  * source\rtl\abs.c
+  * source\rtl\gtwin\gtwin.c
+  * source\rtl\set.c
+  * source\rtl\space.c
+  * source\rtl\str.c
+  * source\rtl\tgetint.prg
+  * source\rtl\transfrm.c
+  * source\rtl\valtype.c
+  * source\vm\fm.c
+  * source\vm\hvm.c
+  * source\vm\itemapi.c
+    ! minor optimizations and syntax corrections
+
+
 2008-11-15 21:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    !source/rtl/gtwin/gtwin.c
      ! Added missing support for  mouse_wheel events

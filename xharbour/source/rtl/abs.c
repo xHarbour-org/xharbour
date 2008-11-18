@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.7 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: abs.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ HB_FUNC( ABS )
          if( iNumber >= 0 )
             hb_retnilen( iNumber, iWidth );
 #if -HB_INT_MAX > HB_INT_MIN
-         else if ( iNumber < -HB_INT_MAX )
+         else if( iNumber < -HB_INT_MAX )
 #if HB_LONG_MAX > HB_INT_MAX
             hb_retnint( - ( HB_LONG ) iNumber );
 #else
@@ -89,7 +89,7 @@ HB_FUNC( ABS )
          if( lNumber >= 0 )
             hb_retnintlen( lNumber, iWidth );
 #if -HB_LONG_MAX > HB_LONG_MIN
-         else if ( lNumber < -HB_LONG_MAX )
+         else if( lNumber < -HB_LONG_MAX )
             hb_retndlen( - ( double ) lNumber, 0, iDec );
 #endif
          else

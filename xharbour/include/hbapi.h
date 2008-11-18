@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.245 2008/07/30 11:29:09 marchuet Exp $
+ * $Id: hbapi.h,v 1.246 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -226,14 +226,14 @@ HB_EXTERN_BEGIN
                   if( HB_LIM_INT( v ) ) \
                   { \
                      (p)->type = HB_IT_INTEGER; \
-                     (p)->item.asInteger.length = HB_INT_LENGTH( v ); \
+                     (p)->item.asInteger.length = HB_INT_EXPLENGTH( v ); \
                      (p)->item.asInteger.value = ( int ) (v); \
                   } \
                   else \
                   { \
                      (p)->type = HB_IT_LONG; \
                      (p)->item.asLong.value = (v); \
-                     (p)->item.asLong.length = HB_LONG_LENGTH( v ); \
+                     (p)->item.asLong.length = HB_LONG_EXPLENGTH( v ); \
                   } \
                } \
                while( 0 )

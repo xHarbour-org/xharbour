@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmc.h,v 1.5 2008/07/09 16:10:29 marchuet Exp $
+ * $Id: hbrddbmc.h,v 1.6 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -640,7 +640,7 @@ static ERRCODE hb_cdxZap ( CDXAREAP pArea );
 #define hb_cdxSetRel                               NULL
 static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListClear( CDXAREAP pArea );
-#define hb_cdxOrderListDelete                      NULL
+static ERRCODE hb_cdxOrderListDelete( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea );
 #define hb_cdxOrderCondition                       NULL

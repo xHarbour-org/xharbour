@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.207 2008/06/09 22:36:29 ronpinkas Exp $
+ * $Id: harbour.c,v 1.208 2008/06/10 22:51:38 ronpinkas Exp $
  */
 
 /*
@@ -885,6 +885,13 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
 {
    PEXTERN pExtern, pLast;
    PCOMSYMBOL pSym;
+
+   if( strcmp( "_GET_", szExternName ) == 0 )
+   {
+      /* special function to implement @ GET statement */
+      hb_compExternAdd( "__GETA", szNamespace, 0 );
+      szExternName = "__GET";
+   }
 
    pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
 
