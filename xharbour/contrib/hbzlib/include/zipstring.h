@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $RCSfile: zipstring.h,v $
-// $Revision: 1.4 $ $Name:  $
-// $Date: 2005/10/06 18:24:47 $ $Author: lculik $
+// $Revision: 1.5 $ $Name:  $
+// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -30,7 +30,7 @@
 	( to set it to a specified value); setlocale() function is not sufficient here.
 */
 
-#define _USE_OLD_RW_STL
+
 #include <string>
 #include <algorithm>
 #include <stdarg.h>

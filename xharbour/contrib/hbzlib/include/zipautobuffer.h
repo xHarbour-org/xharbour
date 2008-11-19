@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipAutoBuffer.h $
 // $Archive: /ZipArchive/ZipAutoBuffer.h $
-// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
+// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -34,11 +34,11 @@
 class ZIP_API CZipAutoBuffer
 {
 public:
-	operator char*()
+        operator char*() const
 	{
 		return m_pBuffer;
 	}
-#ifndef __BORLANDC__
+#ifndef __BORLANDC__ 
 	operator const char*() const  // Borland seems to have problems with this
 	{
 		return m_pBuffer;
@@ -50,10 +50,12 @@ public:
 
 
 	// may produce ambiguity on some compilers
-//  	operator const char*() const
-//   	{
-//    		return m_pBuffer;
+//#if  (__BORLANDC__ >= 1424) 
+//      operator const char*() const
+//      {
+////              return m_pBuffer;
 //     }
+//#endif
 	const char* GetBuffer() const {return m_pBuffer;}
 	char* Allocate(DWORD iSize, bool bZeroMemory = false);
 	void Release();

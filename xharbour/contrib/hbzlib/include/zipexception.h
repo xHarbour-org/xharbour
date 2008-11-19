@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipException.h $
 // $Archive: /ZipArchive/ZipException.h $
-// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
+// $Date: 2007/06/05 18:21:31 $ $Author: enricomaria $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -29,6 +29,7 @@
 #pragma warning( push )
 #pragma warning (disable:4702) // disable "Unreachable code" warning in Throw function in the Release mode
 #endif // _MSC_VER > 1000
+
 
 
 #include "zipstring.h"
@@ -183,7 +184,7 @@ public:
 	*/
 	int m_iCause;
 
-#if __GNUC__ >=3
+#if __GNUC__ >=3 ||  (__BORLANDC__ >= 1424) 
 	virtual ~CZipException() throw();
 #else
 	virtual ~CZipException();

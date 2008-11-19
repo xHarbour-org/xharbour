@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipBaseException.h $
 // $Archive: /ZipArchive_STL/ZipBaseException.h $
-// $Date: 2003/08/20 15:03:52 $ $Author: lculik $
+// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -13,6 +13,7 @@
 // 
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
+
 
 #ifndef __ZIPBASEEXCEPTION_H__
 #define __ZIPBASEEXCEPTION_H__

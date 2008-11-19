@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
+// $Date: 2008/05/01 11:15:27 $ $Author: andijahja $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -269,7 +269,7 @@ int CZipArchive::GetLocalExtraField(char *pBuf, int iSize)const
 	if (iSize < size)
 		size = iSize;
 
-	memcpy(pBuf, m_centralDir.m_pLocalExtraField, size);
+        memcpy(pBuf, m_centralDir.m_pLocalExtraField.GetBuffer(), size);
 	return size;
 }
 

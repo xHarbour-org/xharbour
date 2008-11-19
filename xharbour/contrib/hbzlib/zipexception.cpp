@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipException.cpp $
 // $Archive: /ZipArchive/ZipException.cpp $
-// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
+// $Date: 2003/10/14 14:12:17 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -37,7 +37,7 @@ CZipException::CZipException(int iCause, LPCTSTR lpszZipName)
 }
 
 //CZipException::~CZipException()
-#if __GNUC__ >=3
+#if __GNUC__ >=3 ||  (__BORLANDC__ >= 1424) 
 	CZipException::~CZipException() throw()
 #else
 	CZipException::~CZipException()
