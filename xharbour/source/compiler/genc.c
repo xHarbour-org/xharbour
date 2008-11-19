@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.171 2008/10/03 03:21:56 ronpinkas Exp $
+ * $Id: genc.c,v 1.172 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@ static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
 static void hb_compWriteDeclareGlobal( FILE *yyc );
 static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL );
+static void hb_compWritePragma( FILE *yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
 {
@@ -726,7 +727,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          while( pUsedNamespace );
       }
 
-      fprintf( yyc, "\n" );
+      /* fprintf( yyc, "\n" ); */
 
       /* write functions prototypes for called functions outside this PRG */
       pFunCall = hb_comp_funcalls.pFirst;
@@ -1243,32 +1244,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "   hb_vmExplicitStartup( symbols_table + %i );\n", iStartupOffset );
          fprintf( yyc, "}\n" );
 
-         fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
-         fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
-                       "   #if _MSC_VER >= 1010\n"
-                       "      #pragma data_seg( \".CRT$XIY\" )\n"
-                       "   #else\n"
-                       "      #pragma data_seg( \"XIY\" )\n"
-                       "   #endif\n"
-                       "   static HB_$INITSYM hb_auto_InitExplicitStartup = hb_InitExplicitStartup;\n"
-                       "   #pragma data_seg()\n"
-                       "#endif\n\n" );
+         hb_compWritePragma( yyc, "hb_auto_InitExplicitStartup", "", "", "hb_InitExplicitStartup" );
       }
 
       if( bCritical )
       {
-         fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
-         fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
-                       "   #if _MSC_VER >= 1010\n"
-                       "      #pragma data_seg( \".CRT$XIY\" )\n"
-                       "   #else\n"
-                       "      #pragma data_seg( \"XIY\" )\n"
-                       "   #endif\n"
-                       "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n"
-                       "   #pragma data_seg()\n"
-                       "#endif\n\n", hb_comp_FileAsSymbol );
+         hb_compWritePragma( yyc, "hb_auto_InitCritical", "", hb_comp_FileAsSymbol, "hb_InitCritical" );
       }
 
       /* Generate functions data
@@ -1579,7 +1560,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
 
 static void hb_compWriteDeclareGlobal( FILE *yyc )
 {
-   fprintf( yyc, "\n#include \"hbapi.h\"\n\n" );
+   fprintf( yyc, "\n#include \"hbapi.h\"\n" );
 
    if( hb_comp_pGlobals )
    {
@@ -1616,7 +1597,7 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
          iGlobals++;
       }
 
-      fprintf( yyc, "}\n" );
+      fprintf( yyc, "}\n\n" );
 
       fprintf( yyc, "#undef HB_MODULE_GLOBALS\n"
                     "#define HB_MODULE_GLOBALS ( module_InitGlobalsArray(), (PHB_ITEM *) pGlobals )\n" );
@@ -1693,24 +1674,9 @@ static void hb_writeEndInit( FILE* yyc )
                  "{ \"!\", {0}, {HB_FUNCNAME( __begin__ )}, NULL },\n"
                  "{ \"!\", {0}, {HB_FUNCNAME( __end__ )}, NULL }"
 #endif
-                 "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
-                 "#if defined(HB_PRAGMA_STARTUP)\n"
-                 "   #pragma startup hb_vm_SymbolInit_%s%s\n"
-                 "#elif defined(HB_MSC_STARTUP)\n"
-                 "   #if _MSC_VER >= 1010\n"
-                 /* [pt] First version of MSC I have that supports this */
-                 /* is msvc4.1 (which is msc 10.10) */
-                 "      #pragma data_seg( \".CRT$XIY\" )\n"
-                 "   #else\n"
-                 "      #pragma data_seg( \"XIY\" )\n"
-                 "   #endif\n"
-                 "   static HB_$INITSYM hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s;\n"
-                 "   #pragma data_seg()\n"
-                 "#endif\n\n",
-                 hb_comp_szPrefix, hb_comp_FileAsSymbol,
-                 hb_comp_szPrefix, hb_comp_FileAsSymbol,
-                 hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                 "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n",
                  hb_comp_szPrefix, hb_comp_FileAsSymbol );
+                 hb_compWritePragma( yyc, "hb_vm_auto_SymbolInit_", hb_comp_szPrefix, hb_comp_FileAsSymbol, "hb_vm_SymbolInit_" );
 }
 
 /*
@@ -1977,6 +1943,23 @@ static void hb_compGenCInLine( FILE *yyc )
       fprintf( yyc, "%s", pInline->pCode );
       pInline = pInline->pNext;
    }
+}
+
+static void hb_compWritePragma( FILE * yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef )
+{
+   fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n"
+                 "   #pragma startup %s%s%s\n"
+                 "#elif defined(HB_MSC_STARTUP)\n"
+                 "   #if defined( HB_OS_WIN_64 )\n"
+                 "      #pragma section( HB_MSC_START_SEGMENT, long, read )\n"
+                 "   #endif\n"
+                 "   #pragma data_seg( HB_MSC_START_SEGMENT )\n"
+                 "   static HB_$INITSYM %s%s%s = %s%s%s;\n"
+                 "   #pragma data_seg()\n"
+                 "#endif\n\n",
+                 szFuncDef, szFuncMid, szFuncEnd,
+                 szFuncName, szFuncMid, szFuncEnd, szFuncDef, szFuncMid, szFuncEnd
+                 );
 }
 
 static HB_GENC_FUNC( hb_p_and )
@@ -4804,7 +4787,7 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
    ULONG lPCodePos = 0;
    int nChar;
 
-   fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
+   fprintf( yyc, "{\n   static const BYTE pcode[] =\n   {\n\t" );
 
    nChar = 0;
 
@@ -4814,7 +4797,7 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 
       if( nChar > 1 )
       {
-         fprintf( yyc, ", " );
+         fprintf( yyc, "," );
       }
 
       if( nChar == 15 )

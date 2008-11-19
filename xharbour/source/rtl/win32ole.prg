@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.164 2008/10/13 16:53:00 kaddath Exp $
+ * $Id: win32ole.prg,v 1.165 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -113,6 +113,10 @@ RETURN VTWrapper( VT_ERROR, DISP_E_PARAMNOTFOUND )
       //#include <OleDB.h>
    #endif
 
+   #if (defined(__MINGW32__) || defined(__DMC__) || defined(__WATCOMC__))
+      #include <OciDL.h>
+   #endif
+
    #include <shlobj.h>
 
    #ifdef __MINGW32__
@@ -151,6 +155,8 @@ RETURN VTWrapper( VT_ERROR, DISP_E_PARAMNOTFOUND )
           { 0x00020400, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
       const IID  IID_IEnumVARIANT =
           { 0x00020404, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
+      const IID  IID_IClassFactory2 =
+          { 0xb196b28f,0xbab4,0x101a,0xb6,0x9c,0,0xaa,0,0x34,0x1d,0x7 };
       HB_EXTERN_END
    #endif
 
@@ -2132,13 +2138,13 @@ RETURN Self
         {
            IClassFactory2 *pCF;
 
-           s_nOleError = CoGetClassObject( (REFCLSID) &ClassID, CLSCTX_SERVER, NULL, (LPIID) &IID_IClassFactory2, (LPVOID *) &pCF );
+           s_nOleError = CoGetClassObject( (REFCLSID) &ClassID, CLSCTX_SERVER, NULL, (REFIID) (LPIID) &IID_IClassFactory2, (LPVOID *) &pCF );
 
            if( SUCCEEDED( s_nOleError ) )
            {
               BSTR bstrLic = hb_oleAnsiToSysString( hb_parc(3) );
 
-              s_nOleError = pCF->lpVtbl->CreateInstanceLic( pCF, NULL, NULL, riid, bstrLic, &pDisp );
+              s_nOleError = pCF->lpVtbl->CreateInstanceLic( pCF, NULL, NULL, (REFIID) riid, bstrLic, &pDisp );
 
               SysFreeString( bstrLic );
               pCF->lpVtbl->Release( pCF );

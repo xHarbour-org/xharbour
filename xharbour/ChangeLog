@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6257 2008/11/15 22:57:00 lculik Exp $
+ * $Id: ChangeLog,v 1.6258 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-19 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/compiler/genc.c
+     ! simplification of start-up function generation
+     ! minor format when -gc0:
+       - remove unnecessary blank lines and spaces between pcode constants
+         to produce more compact output
+
+   * source/rtl/win32ole.prg
+     ! include <OciDL.h> for __MINGW32__, __DMC__ and __WATCOMC__
+     + declaration of IID_IClassFactory2 for OpenWatcom (actually this should
+       have been defined in uuid.lib packed with OpenWatcom binaries, but the
+       current default CVS compiler switches make it invisible. This is most
+       probably due to different compiler flags -> stacks vs registers <?>)
 
 2008-10-24 18:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\vm\fm.c
