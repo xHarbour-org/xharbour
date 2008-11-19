@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.121 2008/11/15 22:57:00 lculik Exp $
+ * $Id: gtwin.c,v 1.122 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -102,6 +102,10 @@
  To disable mouse, initialization was made in cmdarg.c
 */
 static BOOL b_MouseEnable = TRUE;
+
+#ifndef MOUSE_WHEELED
+#define MOUSE_WHEELED 0x0004
+#endif
 
 /* *********************************************************************** */
 
@@ -1844,11 +1848,10 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
    #pragma data_seg()
 #endif

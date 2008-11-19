@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.3 2008/08/03 11:08:28 enricomaria Exp $
+ * $Id: gtwvg.c,v 1.4 2008/09/27 04:10:56 ronpinkas Exp $
  */
 
 /*
@@ -3168,12 +3168,10 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
    #pragma data_seg()
 #endif

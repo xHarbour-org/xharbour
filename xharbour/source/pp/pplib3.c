@@ -1,5 +1,5 @@
 /*
- * $Id: pplib3.c,v 1.3 2007/04/25 01:37:10 ronpinkas Exp $
+ * $Id: pplib3.c,v 1.4 2008/08/14 09:04:19 andijahja Exp $
  */
 
 /*
@@ -76,11 +76,10 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_PPLIB3 )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_vm_SymbolInit_PPLIB3
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_SymbolInit_PPLIB3 = hb_vm_SymbolInit_PPLIB3;
    #pragma data_seg()
 #endif

@@ -64,7 +64,7 @@ static HB_LANG s_lang =
       "svenska",                   /* Name (in native language) */
       "SV",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.1 $ $Date: 2006/11/09 16:13:57 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2008/08/14 09:04:19 $",         /* Version */
 
       /* Month names */
 
@@ -208,11 +208,10 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_SV )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_SV
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_lang_Init_SV = hb_lang_Init_SV;
    #pragma data_seg()
 #endif

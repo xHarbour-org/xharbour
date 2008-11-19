@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.52 2008/05/14 13:28:40 andijahja Exp $
+ * $Id: zip.c,v 1.53 2008/06/20 11:59:49 marchuet Exp $
  */
 
 /*
@@ -1054,12 +1054,10 @@ HB_INIT_SYMBOLS_END( hbzip_CLEANUP )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hbzip_CLEANUP
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_SymbolInit_INIT = hbzip_CLEANUP;
    #pragma data_seg()
 #endif

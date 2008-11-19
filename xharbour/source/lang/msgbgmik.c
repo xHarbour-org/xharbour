@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgmik.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
+ * $Id: msgbgmik.c,v 1.2 2008/08/14 09:04:15 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "º«£ °±ª¨",              /* Name (in native language) */
       "BG",                        /* RFC ID */
       "MIK",                       /* Codepage */
-      "$Revision: 1.1 $ $Date: 2005/11/19 15:52:04 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2008/08/14 09:04:15 $",         /* Version */
 
       /* Month names */
 
@@ -209,11 +209,10 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_BGMIK )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_BGMIK
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_lang_Init_BGMIK = hb_lang_Init_BGMIK;
    #pragma data_seg()
 #endif

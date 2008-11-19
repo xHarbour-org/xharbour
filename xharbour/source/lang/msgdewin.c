@@ -1,5 +1,5 @@
 /*
- * $Id: msgdewin.c,v 1.5 2005/06/10 22:51:36 ronpinkas Exp $
+ * $Id: msgdewin.c,v 1.6 2008/08/14 09:04:16 andijahja Exp $
  * modified 2003 Guenther Steiner <byte-one@aon.at>
  */
 
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Deutsch ANSI",                   /* Name (in native language) */
       "DEWIN",                        /* RFC ID */
       "ANSI",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
 
       /* Month names */
 
@@ -211,11 +211,10 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_DEWIN )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_DEWIN
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_hb_lang_Init_DEWIN = hb_lang_Init_DEWIN;
    #pragma data_seg()
 #endif

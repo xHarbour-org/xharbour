@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6258 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: ChangeLog,v 1.6259 2008/11/19 00:00:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,91 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-19 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/pp/ppcore.c
+    ! initialize PHB_PP_TOKEN pToken (line 429) before used (gcc warning)
+
+  * source/rtl/gtwin/gtwin.c
+    + define MOUSE_WHEELED if not defined (for: __DMC__)
+
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtgui/gtgui.c
+  * source/rtl/gtgui/gtdef.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gttrm/gttrm.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxwc/gtxwc.c
+  * source/rtl/gt_tpl/gt_tpl.c
+  * source/rtl/version.c
+  * source/pp/pplib3.c
+  * source/vm/cmdarg.c
+  * source/ct/ctwin.c
+  * contrib/gtwvg/gtwvg.c
+  * contrib/gtwvw/gtwvw.c
+  * contrib/hbzlib/zip.c
+  * contrib/libnf/fttext.c
+  * source/lang/msgbgmik.c
+  * source/lang/msgbgwin.c
+  * source/lang/msgby866.c
+  * source/lang/msgbywin.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr1250.c
+  * source/lang/msghr437.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgltwin.c
+  * source/lang/msgnl.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgsv.c
+  * source/lang/msgsvwin.c
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/lang/msg_tpl.c
+    ! initialization to support MSVC 64-bit compilation
 
 2008-11-19 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/compiler/genc.c

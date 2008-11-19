@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.15 2008/03/18 03:29:50 modalsist Exp $
+ * $Id: version.c,v 1.16 2008/08/14 09:04:21 andijahja Exp $
  */
 
 /*
@@ -218,11 +218,10 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_vm_SymbolInit_HBVER
 #elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-   #else
-      #pragma data_seg( "XIY" )
+   #if defined( HB_OS_WIN_64 )
+      #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
+   #pragma data_seg( HB_MSC_START_SEGMENT )
    static HB_$INITSYM hb_vm_auto_SymbolInit_HBVER = hb_vm_SymbolInit_HBVER;
    #pragma data_seg()
 #endif
