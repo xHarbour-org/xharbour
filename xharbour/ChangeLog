@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6260 2008/11/19 05:24:51 andijahja Exp $
+ * $Id: ChangeLog,v 1.6261 2008/11/19 15:08:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-20 16:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\vm\fm.c
+    - removed some debug windows info. That I only needs with test purposes.
 
 2008-11-19 13:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    * contrib/hbzlib/include/*.h
@@ -114,7 +118,7 @@
        current default CVS compiler switches make it invisible. This is most
        probably due to different compiler flags -> stacks vs registers <?>)
 
-2008-10-24 18:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+2008-11-18 18:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\vm\fm.c
     ! fixed fmstat.lib
     + Added heap functions instead of Local ones to test it. Only used under windows

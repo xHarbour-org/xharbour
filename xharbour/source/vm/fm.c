@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.98 2008/11/05 03:03:16 walito Exp $
+ * $Id: fm.c,v 1.99 2008/11/18 17:55:58 marchuet Exp $
  */
 
 /*
@@ -74,7 +74,6 @@
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
-#include "Windows.h"
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -564,9 +563,11 @@ HB_EXPORT void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    if( !pMem )
    {
+#if 0   
       char * buffer[100];
       wsprintf( (LPSTR) buffer, "%i\t%i\n", ulSize, GetLastError() );
       OutputDebugString( (LPSTR) buffer );
+#endif      
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
    }
 
