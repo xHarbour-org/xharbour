@@ -1,5 +1,5 @@
-/*
- * $Id: hbstack.h,v 1.51 2008/10/22 08:32:32 marchuet Exp $
+/*	
+ * $Id: hbstack.h,v 1.52 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -165,7 +165,7 @@ typedef struct
 #define hb_stackItemFromBase( n )   ( *( HB_VM_STACK.pBase + (int)(n) + 1 ) )
 #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
 #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 )
-#define hb_stackTotalItems( )       ( HB_VM_STACK.wItems )   
+#define hb_stackTotalItems( )       ( HB_VM_STACK.wItems )
 #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
 #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
 #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
@@ -173,7 +173,7 @@ typedef struct
 #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
 #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
 
-#define hb_stackRDD( )              ( &(HB_VM_STACK.rdd) )
+#define hb_stackRDD( )              ( HB_VM_STACK.rdd )
 
 #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
 #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )

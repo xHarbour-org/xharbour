@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.173 2008/09/06 06:24:02 andijahja Exp $
+ * $Id: filesys.c,v 1.174 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -3647,7 +3647,7 @@ HB_EXPORT BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 
 HB_EXPORT BYTE hb_fsCurDrv( void )
 {
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(OS_UNIX_COMPATIBLE) ||( defined(OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN_32) && !defined(HB_WINCE)))
    HB_THREAD_STUB
 #endif
    /* 'unsigned int' _have to_ be used in Watcom */
@@ -3656,7 +3656,7 @@ HB_EXPORT BYTE hb_fsCurDrv( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
 
 #if defined(OS_HAS_DRIVE_LETTER)
-   
+
    HB_STACK_UNLOCK
    HB_FS_GETDRIVE( uiResult );
    HB_STACK_LOCK
@@ -4190,6 +4190,8 @@ static BOOL hb_fsDisableWaitLocks( int iSet )
 
 HB_FUNC( HB_DISABLEWAITLOCKS )
 {
+   HB_THREAD_STUB
+
    hb_retl( hb_fsDisableWaitLocks( ISLOG( 1 ) ? ( hb_parl( 1 ) ? 1 : 0 ) : -1 ) );
 }
 
