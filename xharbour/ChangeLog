@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6263 2008/11/20 23:16:28 andijahja Exp $
+ * $Id: ChangeLog,v 1.6264 2008/11/21 05:10:06 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-11-21 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2008-11-22 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapifs.h
     - remove declaration of hb_fsDisableWaitLocks() as it is a static function
 
