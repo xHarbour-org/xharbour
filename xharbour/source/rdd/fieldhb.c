@@ -1,5 +1,5 @@
 /*
- * $Id: fieldhb.c,v 1.1 2008/08/18 09:36:49 marchuet Exp $
+ * $Id: fieldhb.c,v 1.2 2008/09/16 10:10:07 marchuet Exp $
  */
 
 /*
@@ -93,3 +93,4 @@ HB_FUNC( FIELDSTEP )
    HB_FUNC_EXEC( HB_FIELDSTEP )
 }
 #endif
+

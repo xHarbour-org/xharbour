@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6262 2008/11/20 15:09:48 marchuet Exp $
+ * $Id: ChangeLog,v 1.6263 2008/11/20 23:16:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-21 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapifs.h
+    - remove declaration of hb_fsDisableWaitLocks() as it is a static function
+
+  * source/rdd/dbcmd.c
+  * source/rdd/fieldhb.c
+    + new line at end of file (gcc warning)
+
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.vc
+  * makefile.wc
+  * common.mak
+  * compile.mak
+    ! move logic for RDDADS thingies to individual makefiles.
+
+  * compile.mak
+    ! change some indentation from spaces to tabs for GNU Make Utility.
+
+  * mdir.bat
+    + deletion of include\hbverbld.h upon clean build
 
 2008-11-21 06:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbstack.h

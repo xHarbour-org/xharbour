@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.57 2008/05/04 14:20:51 andijahja Exp $
+ * $Id: hbapifs.h,v 1.58 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -273,7 +273,7 @@ HB_EXPORT HB_FHANDLE hb_fileHandle( PHB_FILE pFile );
 /* wrapper to fopen() which calls hb_fsNameConv() */
 extern FILE * hb_fopen( const char *path, const char *mode );
 
-extern HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet );
+/* extern HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet ); */
 
 #ifdef HB_OS_WIN_32
    extern int WintoDosError( ULONG lError);

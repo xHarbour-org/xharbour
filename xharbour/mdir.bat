@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.13 2008/07/30 11:29:09 marchuet Exp $
+rem $Id: mdir.bat,v 1.14 2008/08/02 17:18:00 modalsist Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -116,6 +116,8 @@ rem=============================================================================
 :REMOVE
 rem=============================================================================
 ECHO Removing System and Object Files ...
+
+if exist include\hbverbld.h          del include\hbverbld.h
 
 if exist source\pp\pptable.c         del source\pp\pptable.c
 if exist obj\%SUB_DIR%\pptable.obj   del obj\%SUB_DIR%\pptable.obj

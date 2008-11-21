@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.226 2008/09/05 08:38:35 marchuet Exp $
+ * $Id: dbcmd.c,v 1.227 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -2259,3 +2259,4 @@ HB_FUNC( HB_FIELDSTEP )
 }
 
 #endif
+

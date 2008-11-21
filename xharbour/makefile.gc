@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.49 2008/06/05 04:47:46 kaddath Exp $
+# $Id: makefile.gc,v 1.50 2008/07/30 11:29:08 marchuet Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -449,6 +449,10 @@ $(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
 $(XWT_LIB) : $(XWT_LIB_OBJS)
 	$(LIB_CMD)
 
+ifeq ($(HB_ADS_IMPLIB),no)
+RDDADS_LIB_OBJS+=\
+	$(OBJ_DIR)/ace32.o
+endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
 

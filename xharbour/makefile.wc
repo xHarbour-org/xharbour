@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.90 2008/06/06 15:44:30 kaddath Exp $
+# $Id: makefile.wc,v 1.91 2008/07/30 11:29:09 marchuet Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -439,6 +439,11 @@ $(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
 $(XWT_LIB) : $(XWT_LIB_OBJS)
 	$(LIB_CMD)
 
+!if ("$(HB_ADS_IMPLIB)" == "no")
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
+	$(OBJ_DIR)\ace32.obj
+!endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
 

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.25 2008/10/22 08:32:32 marchuet Exp $
+# $Id: compile.mak,v 1.26 2008/10/24 19:38:49 lculik Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -116,7 +116,7 @@ $(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
 $(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
-        $(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
+	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
 
 #===============================================================================
 # HARBOUR.EXE rules
@@ -131,9 +131,9 @@ $(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
 	$(CC_CMD)
 
 $(COMPILER_DIR)$(DIR_SEP)hbslex.c : $(COMPILER_DIR)$(DIR_SEP)harbour.slx
-        TYPE $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp
-        DEL $(COMPILER_DIR)$(DIR_SEP)hbslex.c
-        REN $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp hbslex.c
+	TYPE $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp
+	DEL $(COMPILER_DIR)$(DIR_SEP)hbslex.c
+	REN $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp hbslex.c
 
 $(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbslex.c
 	$(CC_CMD)
@@ -210,12 +210,8 @@ $(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsfunc.c
 $(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)adsmgmnt.c
 	$(CC_CMD)
 
-!ifdef HB_ADS_IMPLIB
-!if "$(HB_ADS_IMPLIB)" == "no"
 $(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT) : $(RDDADS_DIR)$(DIR_SEP)ace32.c
 	$(CC_CMD)
-!endif
-!endif
 
 #===============================================================================
 # RDD.LIB rules
@@ -224,25 +220,25 @@ $(OBJ_DIR)$(DIR_SEP)dbcmd$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmd.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbcmd53$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmd53.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbcmdx$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmdx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbcmdhb$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbcmdhb.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbdrop$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbdrop.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbexists$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbexists.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)fieldhb.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)rddinfo.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)workarea.c
 	$(CC_CMD)
@@ -263,10 +259,10 @@ $(OBJ_DIR)$(DIR_SEP)dbtotal$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbtotal.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbtotalx.c : $(RDD_DIR)$(DIR_SEP)dbtotalx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbtotalx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbtotalx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dblist.c : $(RDD_DIR)$(DIR_SEP)dblist.prg
 	$(HB_CMD)
@@ -275,10 +271,10 @@ $(OBJ_DIR)$(DIR_SEP)dblist$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dblist.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dblistx.c : $(RDD_DIR)$(DIR_SEP)dblistx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dblistx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dblistx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbfuncs.c : $(RDD_DIR)$(DIR_SEP)dbfuncs.prg
 	$(HB_CMD)
@@ -287,10 +283,10 @@ $(OBJ_DIR)$(DIR_SEP)dbfuncs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbfuncs.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbfuncsx.c : $(RDD_DIR)$(DIR_SEP)dbfuncsx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbfuncsx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbfuncsx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsort.c : $(RDD_DIR)$(DIR_SEP)dbsort.prg
 	$(HB_CMD)
@@ -299,10 +295,10 @@ $(OBJ_DIR)$(DIR_SEP)dbsort$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbsort.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsortx.c : $(RDD_DIR)$(DIR_SEP)dbsortx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsortx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbsortx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbdbsort$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hbdbsort.c
 	$(CC_CMD)
@@ -317,16 +313,16 @@ $(OBJ_DIR)$(DIR_SEP)dbstrux$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstrux.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbstruxx.c : $(RDD_DIR)$(DIR_SEP)dbstruxx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbstruxx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstruxx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbstruxu.c : $(RDD_DIR)$(DIR_SEP)dbstruxu.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbstruxu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbstruxu.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbupdat.c : $(RDD_DIR)$(DIR_SEP)dbupdat.prg
 	$(HB_CMD)
@@ -335,10 +331,10 @@ $(OBJ_DIR)$(DIR_SEP)dbupdat$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbupdat.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbupdatx.c : $(RDD_DIR)$(DIR_SEP)dbupdatx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbupdatx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbupdatx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)sdf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)sdf1.c
 	$(CC_CMD)
@@ -353,10 +349,10 @@ $(OBJ_DIR)$(DIR_SEP)rddord$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddord.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)rddordu.c : $(RDD_DIR)$(DIR_SEP)rddordu.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)rddordu$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddordu.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)rddsys.c : $(RDD_DIR)$(DIR_SEP)rddsys.prg
 	$(HB_CMD)
@@ -470,10 +466,10 @@ $(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)maindlle$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindlle.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)memvars$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
 	$(CC_CMD)
@@ -1689,9 +1685,9 @@ $(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
 	$(CC_CMD)
 
 $(MACRO_DIR)$(DIR_SEP)macroslx.c : $(MACRO_DIR)$(DIR_SEP)macro.slx
-        TYPE $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp
-        DEL $(MACRO_DIR)$(DIR_SEP)macroslx.c
-        REN $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp macroslx.c
+	TYPE $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp
+	DEL $(MACRO_DIR)$(DIR_SEP)macroslx.c
+	REN $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp macroslx.c
 
 $(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroslx.c
 	$(CC_CMD)
@@ -1832,10 +1828,10 @@ $(OBJ_DIR)$(DIR_SEP)dbjoin$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbjoin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbjoinx.c : $(RDD_DIR)$(DIR_SEP)dbjoinx.prg
-   $(HB_CMD)
+	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbjoinx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbjoinx.c
-   $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbsdf.c : $(RDD_DIR)$(DIR_SEP)dbsdf.prg
 	$(HB_CMD)
@@ -2018,13 +2014,13 @@ $(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
 # GTWVG.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)gtwvg.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtcore.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtutils.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wvtclass.c
 	$(CC_CMD)
@@ -3139,7 +3135,6 @@ $(OBJ_DIR)$(DIR_SEP)unzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)unzip.c
 
 $(OBJ_DIR)$(DIR_SEP)hbmzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)hbmzip.c
 	$(CC_CMD)
-
 
 #===============================================================================
 # HBZIP.LIB dependencies

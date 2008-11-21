@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.228 2008/10/09 22:53:43 ronpinkas Exp $
+# $Id: makefile.vc,v 1.229 2008/10/18 17:08:54 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -423,6 +423,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 !endif
 
+!ifdef HB_DIR_ADS
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -504,6 +508,11 @@ $(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
 $(XWT_LIB) : $(XWT_LIB_OBJS)
 	$(LIB_CMD)
 
+!if ("$(HB_ADS_IMPLIB)" == "no")
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
+	$(OBJ_DIR)\ace32.obj
+!endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
 

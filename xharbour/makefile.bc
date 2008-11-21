@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.234 2008/07/02 23:45:16 ronpinkas Exp $
+# $Id: makefile.bc,v 1.235 2008/07/30 11:29:08 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -558,6 +558,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
 !endif
 
+!ifdef HB_DIR_ADS
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -633,6 +637,11 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 +)
 !
 
+!if ("$(HB_ADS_IMPLIB)" == "no")
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
+	$(OBJ_DIR)\ace32.obj
+!endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	IF NOT "$(HB_ADS_IMPLIB)" == "no" ECHO Creating $(ACE32_LIB) import library
 	IF NOT "$(HB_ADS_IMPLIB)" == "no" implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"

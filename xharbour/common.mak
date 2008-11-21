@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.28 2008/10/24 11:40:13 marchuet Exp $
+# $Id: common.mak,v 1.29 2008/10/24 19:38:49 lculik Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -649,14 +649,6 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)ads1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)adsfunc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)adsmgmnt$(OBJEXT)
-
-!ifdef HB_ADS_IMPLIB
-!if "$(HB_ADS_IMPLIB)" == "no"
-RDDADS_LIB_OBJS=\
-	$(RDDADS_LIB_OBJS)\
-	$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT)
-!endif
-!endif
 
 #===============================================================================
 # RDD.LIB rules
@@ -1741,11 +1733,6 @@ DLL_PROJECT=\
 	$(HBTESTDLL_EXE)\
 	$(HBMAKEDLL_EXE)\
 	$(XBSCRIPTDLL_EXE)
-
-!ifdef HB_DIR_ADS
-CONTRIB_PROJECT=\
-	$(RDDADS_LIB)
-!endif
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
