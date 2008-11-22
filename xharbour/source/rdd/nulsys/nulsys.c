@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.9 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: nulsys.c,v 1.10 2008/11/22 22:43:53 ronpinkas Exp $
  */
 
 /*
@@ -125,31 +125,14 @@ void hb_rddCloseAll( void ) {}
 void hb_rddShutDown( void ) {}
 
 
-LPRDDNODE hb_rddFindNode( const char * szDriver, USHORT * uiIndex )
+PHB_STACKRDD hb_rddWaInit( void )
 {
-   HB_SYMBOL_UNUSED( szDriver );
-
-   if( uiIndex )
-   {
-      * uiIndex = 0;
-   }
-
    return NULL;
 }
 
-void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
+void hb_rddWaShutDown( PHB_STACKRDD pRddInfo )
 {
-   HB_SYMBOL_UNUSED( pRddNode );
-   HB_SYMBOL_UNUSED( uiRddID );
-
-   return NULL;
-}
-
-LPRDDNODE hb_rddGetNode( USHORT uiNode )
-{
-   HB_SYMBOL_UNUSED( uiNode );
-
-   return NULL;
+   HB_SYMBOL_UNUSED( pRddInfo );
 }
 
 HB_FUNC( RDDSYS ) {}
