@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6268 2008/11/22 11:22:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.6269 2008/11/22 12:23:19 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-22 18:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/estack.c
+    ! restore HB_EXPORT qualifier for functions reset by "#undef"
+  * source/rtl/win32ole.prg
+    ! restore HB_EXPORT qualifier for functions not defined in header file
+
+  * source/rdd/nulsys/nulsys.c
+    + Synched with RDD changes
 
 2008-11-22 14:30 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/rtl/gtwvt/gtwvt.c

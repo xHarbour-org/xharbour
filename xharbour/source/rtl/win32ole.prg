@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.166 2008/11/19 00:00:29 andijahja Exp $
+ * $Id: win32ole.prg,v 1.167 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -231,7 +231,7 @@ RETURN IIF( PCount() == 1, ::Value[nIndex], ::Value[nIndex] := xValue )
 METHOD Enumerate( nEnumOp, nIndex ) CLASS VTarrayWrapper
 
    (nIndex)
-   
+
    SWITCH nEnumOp
       CASE FOREACH_BEGIN
          RETURN ::Value
@@ -748,7 +748,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
    LOCAL xRet
 
    (nIndex)
-   
+
    SWITCH nEnumOp
       CASE FOREACH_BEGIN
          ::pOleEnumerator := ::OleNewEnumerator()
@@ -802,7 +802,7 @@ RETURN Self
 
   HB_EXTERN_BEGIN
   //---------------------------------------------------------------------------//
-  BSTR hb_oleAnsiToSysString( LPSTR cString )
+  HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -824,7 +824,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  LPWSTR hb_oleAnsiToWide( LPSTR cString )
+  HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -846,7 +846,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  LPSTR hb_oleWideToAnsi( BSTR wString )
+  HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
   {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
@@ -871,7 +871,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
+  HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
   {
      BOOL bByRef;
      VARIANT mVariant;

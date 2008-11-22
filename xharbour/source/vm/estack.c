@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.101 2008/11/05 03:03:16 walito Exp $
+ * $Id: estack.c,v 1.102 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ BOOL hb_stack_ready = FALSE;
 /* ------------------------------- */
 
 #undef hb_stackPop
-void hb_stackPop( void )
+HB_EXPORT void hb_stackPop( void )
 {
    HB_THREAD_STUB
 
@@ -106,7 +106,7 @@ void hb_stackPop( void )
 }
 
 #undef hb_stackPopReturn
-void hb_stackPopReturn( void )
+HB_EXPORT void hb_stackPopReturn( void )
 {
    HB_THREAD_STUB
 
@@ -122,7 +122,7 @@ void hb_stackPopReturn( void )
 }
 
 #undef hb_stackDec
-void hb_stackDec( void )
+HB_EXPORT void hb_stackDec( void )
 {
    HB_THREAD_STUB
 
@@ -133,7 +133,7 @@ void hb_stackDec( void )
 }
 
 #undef hb_stackDecrease
-void hb_stackDecrease( ULONG ulItems )
+HB_EXPORT void hb_stackDecrease( ULONG ulItems )
 {
    HB_THREAD_STUB
 
@@ -144,7 +144,7 @@ void hb_stackDecrease( ULONG ulItems )
 }
 
 #undef hb_stackPush
-void hb_stackPush( void )
+HB_EXPORT void hb_stackPush( void )
 {
    HB_THREAD_STUB
 
@@ -156,7 +156,7 @@ void hb_stackPush( void )
 }
 
 #undef hb_stackAllocItem
-HB_ITEM_PTR hb_stackAllocItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void )
 {
    HB_THREAD_STUB
 
@@ -169,7 +169,7 @@ HB_ITEM_PTR hb_stackAllocItem( void )
 }
 
 #undef hb_stackPushReturn
-void hb_stackPushReturn( void )
+HB_EXPORT void hb_stackPushReturn( void )
 {
    HB_THREAD_STUB
 
@@ -395,28 +395,28 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 }
 
 #undef hb_stackTopOffset
-LONG hb_stackTopOffset( void )
+HB_EXPORT LONG hb_stackTopOffset( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
 }
 
 #undef hb_stackBaseOffset
-LONG hb_stackBaseOffset( void )
+HB_EXPORT LONG hb_stackBaseOffset( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
 }
 
 #undef hb_stackTotalItems
-LONG hb_stackTotalItems( void )
+HB_EXPORT LONG hb_stackTotalItems( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.wItems;
 }
 
 #undef hb_stackItemBasePtr
-PHB_ITEM ** hb_stackItemBasePtr( void )
+HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void )
 {
    HB_THREAD_STUB
    return &HB_VM_STACK.pItems;
@@ -436,7 +436,7 @@ PHB_ITEM ** hb_stackItemBasePtr( void )
 #endif
 
 #undef hb_stackItem
-HB_ITEM_PTR hb_stackItem( LONG iItemPos )
+HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos )
 {
    if( iItemPos < 0 )
    {
@@ -447,7 +447,7 @@ HB_ITEM_PTR hb_stackItem( LONG iItemPos )
 }
 
 #undef hb_stackItemFromTop
-HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
+HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 {
    if( nFromTop > 0 )
    {
@@ -464,7 +464,7 @@ PHB_STACKRDD hb_stackRDD( void )
 }
 
 #undef hb_stackItemFromBase
-HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
+HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 {
    if( nFromBase <= 0 )
    {
@@ -477,7 +477,7 @@ HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 }
 
 #undef hb_stackLocalVariable
-HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase )
+HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase )
 {
 //   HB_ITEM_PTR pBase = *HB_VM_STACK.pBase;
 
@@ -491,13 +491,13 @@ HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase )
 }
 
 #undef hb_stackTopItem
-HB_ITEM_PTR hb_stackTopItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void )
 {
     return * HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem
-HB_ITEM_PTR hb_stackBaseItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void )
 {
    return * HB_VM_STACK.pBase;
 }
@@ -505,13 +505,13 @@ HB_ITEM_PTR hb_stackBaseItem( void )
 /* Returns SELF object, an evaluated codeblock or NIL for normal func/proc
 */
 #undef hb_stackSelfItem
-HB_ITEM_PTR hb_stackSelfItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void )
 {
    return * ( HB_VM_STACK.pBase + 1 );
 }
 
 #undef hb_stackReturnItem
-HB_ITEM_PTR hb_stackReturnItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackReturnItem()"));
 
@@ -519,14 +519,14 @@ HB_ITEM_PTR hb_stackReturnItem( void )
 }
 
 #undef hb_stackDateBuffer
-char * hb_stackDateBuffer( void )
+HB_EXPORT char * hb_stackDateBuffer( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDateBuffer()"));
 
    return HB_VM_STACK.szDate;
 }
 
-PHB_ITEM * hb_stackGetBase( int iLevel )
+HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel )
 {
    if( iLevel > 0 )
    {
@@ -553,13 +553,13 @@ PHB_ITEM * hb_stackGetBase( int iLevel )
 }
 
 #undef hb_stackGetActionRequest
-USHORT hb_stackGetActionRequest( void )
+HB_EXPORT USHORT hb_stackGetActionRequest( void )
 {
    return (USHORT) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK );
 }
 
 #undef hb_stackSetActionRequest
-void hb_stackSetActionRequest( USHORT uiAction )
+HB_EXPORT void hb_stackSetActionRequest( USHORT uiAction )
 {
    HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK;
    HB_VM_STACK.uiVMFlags |= uiAction;
