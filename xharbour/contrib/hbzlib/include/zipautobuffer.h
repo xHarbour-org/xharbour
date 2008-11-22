@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipAutoBuffer.h $
 // $Archive: /ZipArchive/ZipAutoBuffer.h $
-// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
+// $Date: 2008/11/19 15:04:30 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -34,7 +34,7 @@
 class ZIP_API CZipAutoBuffer
 {
 public:
-        operator char*() const
+	operator char*()
 	{
 		return m_pBuffer;
 	}
