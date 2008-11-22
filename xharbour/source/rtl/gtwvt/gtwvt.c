@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.181 2008/09/27 04:10:57 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.182 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -2016,7 +2016,7 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
       {
          char * szTitle = NULL;
          if( hb_gt_wvt_GetWindowTitle( pWVT->hWnd, &szTitle ) )
-            pInfo->pResult = hb_itemPutCPtr2( pInfo->pResult, szTitle );
+            pInfo->pResult = hb_itemPutCPtr( pInfo->pResult, szTitle, strlen( szTitle ) );
          else
             pInfo->pResult = hb_itemPutC( pInfo->pResult, NULL );
          if( hb_itemType( pInfo->pNewVal ) & HB_IT_STRING )
