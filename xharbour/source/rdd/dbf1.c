@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.195 2008/10/22 08:32:48 marchuet Exp $
+ * $Id: dbf1.c,v 1.196 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -943,7 +943,7 @@ static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
  * This function is common for different DBF based RDD implementation
  * so I don't make it static
  */
-HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
+ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
 {
    ERRCODE errEGcode;
 
@@ -1001,7 +1001,7 @@ HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
+ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
 {
    ULONG ulBlock= 0;
 
@@ -1034,7 +1034,7 @@ HB_EXPORT ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
+void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutMemoBlock(%p, %hu, %lu)", pArea, uiIndex, ulBlock));
 
@@ -1066,7 +1066,7 @@ HB_EXPORT void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
+ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                      ULONG * pulBlock, ULONG * pulSize,
                                      ULONG * pulType )
 {
@@ -1146,7 +1146,7 @@ HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
+ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                      ULONG ulBlock, ULONG ulSize, ULONG ulType )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSetMemoData(%p, %hu, %lu, %lu, %lu)", pArea, uiIndex, ulBlock, ulSize, ulType));
@@ -1201,7 +1201,7 @@ HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT BOOL hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool )
+BOOL hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool )
 {
    switch( bScheme )
    {
@@ -1243,7 +1243,7 @@ HB_EXPORT BOOL hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-HB_EXPORT BOOL hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos )
+BOOL hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos )
 {
    HB_FOFFSET ulPos, ulPool, ulSize = 1;
    BOOL fRet = FALSE;
@@ -4415,7 +4415,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
 }
 
 #ifndef HB_CDP_SUPPORT_OFF
-HB_EXPORT void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest )
+void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest )
 {
    USHORT uiIndex;
    LPFIELD pField;

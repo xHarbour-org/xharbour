@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.71 2008/04/16 21:36:27 ronpinkas Exp $
+ * $Id: console.c,v 1.72 2008/07/07 13:10:58 modalsist Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ void hb_conOutStd( const char * pStr, ULONG ulLen )
 }
 
 /* Output an item to STDERR */
-HB_EXPORT void hb_conOutErr( const char * pStr, ULONG ulLen )
+void hb_conOutErr( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 

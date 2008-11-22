@@ -1,5 +1,5 @@
 /*
- * $Id: strings.c,v 1.3 2005/04/25 23:11:07 druzus Exp $
+ * $Id: strings.c,v 1.4 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 #include "hbapi.h"
 
-HB_EXPORT BOOL hb_strEmpty( const char * szText, ULONG ulLen )
+BOOL hb_strEmpty( const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strEmpty(%s, %lu)", szText, ulLen));
 

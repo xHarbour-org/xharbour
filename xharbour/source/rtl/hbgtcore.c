@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.8 2008/04/15 19:56:51 ronpinkas Exp $
+ * $Id: hbgtcore.c,v 1.9 2008/09/10 17:56:51 vouchcac Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ static FHANDLE s_hStdIn = 0, s_hStdOut = 1, s_hStdErr = 2;
 /* base GT strucure */
 static PHB_GT_BASE   s_curGT = NULL;
 
-HB_EXPORT PHB_GT hb_gt_Base( void )
+PHB_GT hb_gt_Base( void )
 {
    return s_curGT;
 }
@@ -3196,7 +3196,7 @@ static int hb_gt_FindEntry( const char * pszID )
 
 HB_EXTERN_BEGIN
 
-HB_EXPORT char * hb_gt_FindDefault( void )
+char * hb_gt_FindDefault( void )
 {
    char szFuncName[ 15 + HB_GT_NAME_MAX_ ];
    int iPos;
@@ -3219,13 +3219,13 @@ HB_EXPORT char * hb_gt_FindDefault( void )
    return NULL;
 }
 
-HB_EXPORT void hb_gtSetDefault( const char * szGtName )
+void hb_gtSetDefault( const char * szGtName )
 {
    hb_strncpy( s_gtNameBuf, szGtName, HB_GT_NAME_MAX_ );
    s_defaultGT = s_gtNameBuf;
 }
 
-HB_EXPORT BOOL hb_gtRegister( const HB_GT_INIT * gtInit )
+BOOL hb_gtRegister( const HB_GT_INIT * gtInit )
 {
    if( hb_gt_FindEntry( gtInit->id ) == -1 )
    {
@@ -3235,7 +3235,7 @@ HB_EXPORT BOOL hb_gtRegister( const HB_GT_INIT * gtInit )
    return FALSE;
 }
 
-HB_EXPORT BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
+BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
 {
    int iPos;
 
@@ -3282,7 +3282,7 @@ HB_EXPORT BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
    return FALSE;
 }
 
-HB_EXPORT BOOL hb_gtUnLoad( void )
+BOOL hb_gtUnLoad( void )
 {
    while( s_iGtLinkCount > 0 )
    {
@@ -3295,7 +3295,7 @@ HB_EXPORT BOOL hb_gtUnLoad( void )
    return TRUE;
 }
 
-HB_EXPORT void hb_gtStartupInit( void )
+void hb_gtStartupInit( void )
 {
    char * szGtName;
    BOOL fInit;

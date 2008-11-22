@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.11 2005/03/30 21:30:50 andijahja Exp $
+ * $Id: fserror.c,v 1.12 2008/03/27 10:26:46 likewolf Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static int hb_WinToDosError( ULONG ulError )
 #endif
 
 /* return DOS error code of last operation */
-HB_EXPORT USHORT hb_fsError( void )
+USHORT hb_fsError( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
@@ -189,7 +189,7 @@ HB_EXPORT USHORT hb_fsError( void )
 }
 
 /* return real error code of last operation */
-USHORT  HB_EXPORT hb_fsOsError( void )
+USHORT  hb_fsOsError( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
@@ -198,7 +198,7 @@ USHORT  HB_EXPORT hb_fsOsError( void )
 }
 
 /* set DOS error code for last operation */
-void  HB_EXPORT hb_fsSetError( USHORT uiError )
+void  hb_fsSetError( USHORT uiError )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
@@ -208,7 +208,7 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
 }
 
 /* set error code for last operation */
-void  HB_EXPORT hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
+void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
 {
 
    /* This can change error code so I intentionally disable it */

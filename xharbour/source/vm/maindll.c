@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.9 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: maindll.c,v 1.10 2008/04/22 09:16:05 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    return TRUE;
 }
 
-HB_EXPORT LONG PASCAL HBDLLENTRY( char * cProcName )
+LONG PASCAL HBDLLENTRY( char * cProcName )
 {
    hb_itemDoC( cProcName, 0, 0 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.56 2008/03/21 16:14:52 likewolf Exp $
+ * $Id: runner.c,v 1.57 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -103,10 +103,10 @@ static const BYTE szHead[] = { 192,'H','R','B' };
 #define SYM_NOT_FOUND 0xFFFFFFFFUL  /* Symbol not found.                 */
 
 HB_EXTERN_BEGIN
-HB_EXPORT PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb );
-HB_EXPORT PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
-HB_EXPORT void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
-HB_EXPORT void hb_hrbUnLoad( PHRB_BODY pHrbBody );
+PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb );
+PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
+void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
+void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 HB_EXTERN_END
 
 static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * pulBodyOffset )

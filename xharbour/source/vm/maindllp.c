@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.26 2008/04/22 09:17:59 andijahja Exp $
+ * $Id: maindllp.c,v 1.27 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ static FARPROC hb_GetProcAddress( char* szFuncName )
 }
 
 /* module symbols initialization */
-HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    static FARPROC pProcessSymbols = NULL;
    HB_SYMBOL_UNUSED( pGlobals );
@@ -255,7 +255,7 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
 }
 
 #undef hb_pcount
-HB_EXPORT int  hb_pcount( void )          /* returns the number of suplied parameters */
+int  hb_pcount( void )          /* returns the number of suplied parameters */
 {
    int iReturn;
    static FARPROC pCounts = NULL;

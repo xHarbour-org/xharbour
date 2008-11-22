@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.12 2007/09/22 11:06:58 andijahja Exp $
+ * $Id: hbtrace.c,v 1.13 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ int hb_tracelevel( int new_level )
    return old_level;
 }
 
-HB_EXPORT int hb_tr_level( void )
+int hb_tr_level( void )
 {
    static int s_level = -1;
 
@@ -169,7 +169,7 @@ HB_EXPORT int hb_tr_level( void )
    return s_level;
 }
 
-HB_EXPORT void hb_tr_trace( char * fmt, ... )
+void hb_tr_trace( char * fmt, ... )
 {
    /*
     * If tracing is disabled, do nothing.

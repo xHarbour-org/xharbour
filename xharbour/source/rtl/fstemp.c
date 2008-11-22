@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.26 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: fstemp.c,v 1.27 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX + 1 chars long */
 
-HB_EXPORT HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
+HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
 {
    USHORT nAttemptLeft = 999;
 
@@ -167,7 +167,7 @@ static BOOL fsGetTempDirByCase( BYTE *pszName, const char *pszTempDir )
    return fOK ;
 }
 
-HB_EXPORT HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
+HB_FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
 {
    /* less attemps */
    int iAttemptLeft = 99, iLen;

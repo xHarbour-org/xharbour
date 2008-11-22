@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.14 2008/10/22 08:32:48 marchuet Exp $
+ * $Id: wafunc.c,v 1.15 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK *pstack )
 /*
  * check if a given name can be used as alias expression
  */
-HB_EXPORT ERRCODE hb_rddVerifyAliasName( const char * szAlias )
+ERRCODE hb_rddVerifyAliasName( const char * szAlias )
 {
    char c;
 
@@ -135,7 +135,7 @@ HB_EXPORT ERRCODE hb_rddVerifyAliasName( const char * szAlias )
 /*
  * Prepares a new WorkArea node.
  */
-HB_EXPORT void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
+void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 {
    AREAP pArea;
 
@@ -181,7 +181,7 @@ HB_EXPORT void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
    return ( void * ) pArea;
 }
 
-HB_EXPORT ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
+ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 {
    int i, iArea;
 
@@ -195,7 +195,7 @@ HB_EXPORT ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
    return FAILURE;
 }
 
-HB_EXPORT const char * hb_rddGetAliasName( PHB_DYNS pSymAlias )
+const char * hb_rddGetAliasName( PHB_DYNS pSymAlias )
 {
    const char * szName = hb_dynsymName( pSymAlias );
 #ifdef HB_THREAD_SUPPORT
@@ -211,7 +211,7 @@ HB_EXPORT const char * hb_rddGetAliasName( PHB_DYNS pSymAlias )
 /*
  * allocate and return atomAlias for new workarea or NULL if alias already exist
  */
-HB_EXPORT void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
+void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
 {
    HB_THREAD_STUB
    PHB_DYNS pSymAlias;
@@ -257,7 +257,7 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
 /*
  * Find a field index by name
  */
-HB_EXPORT USHORT hb_rddFieldIndex( AREAP pArea, const char * szName )
+USHORT hb_rddFieldIndex( AREAP pArea, const char * szName )
 {
    USHORT uiCount = 0;
    LPFIELD pField;
@@ -290,7 +290,7 @@ HB_EXPORT USHORT hb_rddFieldIndex( AREAP pArea, const char * szName )
  * find a field expression index, this function strips _FIELD->, FIELD->,
  * alias-> prefixes
  */
-HB_EXPORT USHORT hb_rddFieldExpIndex( AREAP pArea, const char * szField )
+USHORT hb_rddFieldExpIndex( AREAP pArea, const char * szField )
 {
    int n;
 
@@ -357,7 +357,7 @@ HB_EXPORT USHORT hb_rddFieldExpIndex( AREAP pArea, const char * szField )
 /*
  * Find a WorkArea by the alias, return FAILURE if not found
  */
-HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
+ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
 {
    HB_THREAD_STUB
    BOOL fOneLetter;
@@ -410,7 +410,7 @@ HB_EXPORT ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
 /*
  * Select a WorkArea by the symbol name.
  */
-HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
+ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
    HB_THREAD_STUB
    HB_ITEM_PTR pError;
@@ -490,7 +490,7 @@ HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 /*
  * Select a WorkArea by the name.
  */
-HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( const char * szAlias )
+ERRCODE hb_rddSelectWorkAreaAlias( const char * szAlias )
 {
    ERRCODE errCode;
    int iArea;
@@ -532,7 +532,7 @@ HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( const char * szAlias )
 /*
  * Obtain the current value of a field.
  */
-HB_EXPORT ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    AREAP pArea;
 
@@ -561,7 +561,7 @@ HB_EXPORT ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Assign a value to a field.
  */
-HB_EXPORT ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    AREAP pArea;
 
@@ -590,7 +590,7 @@ HB_EXPORT ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Obtain the current value of a field.
  */
-HB_EXPORT ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE errCode;
 
@@ -623,7 +623,7 @@ HB_EXPORT ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol 
 /*
  * Assign a value to a field.
  */
-HB_EXPORT ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE errCode;
 

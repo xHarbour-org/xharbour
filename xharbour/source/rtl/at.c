@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.12 2005/02/25 10:43:47 andijahja Exp $
+ * $Id: at.c,v 1.13 2008/03/27 10:26:46 likewolf Exp $
  */
 
 /*
@@ -136,7 +136,7 @@
 
 #endif
 
-HB_EXPORT ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
    char cLastChar = ' ';
 

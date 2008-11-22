@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.165 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.166 2008/11/19 00:00:29 andijahja Exp $
  */
 
 /*
@@ -802,7 +802,7 @@ RETURN Self
 
   HB_EXTERN_BEGIN
   //---------------------------------------------------------------------------//
-  HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
+  BSTR hb_oleAnsiToSysString( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -824,7 +824,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
+  LPWSTR hb_oleAnsiToWide( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -846,7 +846,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
+  LPSTR hb_oleWideToAnsi( BSTR wString )
   {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
@@ -871,7 +871,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
+  void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
   {
      BOOL bByRef;
      VARIANT mVariant;

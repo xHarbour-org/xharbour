@@ -1,5 +1,5 @@
 /*
- * $Id: inkeyapi.c 8152 2007-12-07 09:44:03Z druzus $
+ * $Id: inkeyapi.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #include "hbgtcore.h"
 
-HB_EXPORT int  hb_inkey( BOOL fWait, double dSeconds, int iEventMask )
+int  hb_inkey( BOOL fWait, double dSeconds, int iEventMask )
 {
    PHB_GT pGT;
 
@@ -62,7 +62,7 @@ HB_EXPORT int  hb_inkey( BOOL fWait, double dSeconds, int iEventMask )
    return pGT ? HB_GTSELF_INKEYGET( pGT, fWait, dSeconds, iEventMask ) : 0;
 }
 
-HB_EXPORT void hb_inkeyPut( int iKey )
+void hb_inkeyPut( int iKey )
 {
    PHB_GT pGT;
 
@@ -73,7 +73,7 @@ HB_EXPORT void hb_inkeyPut( int iKey )
       HB_GTSELF_INKEYPUT( pGT, iKey );
 }
 
-HB_EXPORT int  hb_inkeyLast( int iEventMask )
+int  hb_inkeyLast( int iEventMask )
 {
    PHB_GT pGT;
 
@@ -83,7 +83,7 @@ HB_EXPORT int  hb_inkeyLast( int iEventMask )
    return pGT ? HB_GTSELF_INKEYLAST( pGT, iEventMask ) : 0;
 }
 
-HB_EXPORT int  hb_inkeyNext( int iEventMask )
+int  hb_inkeyNext( int iEventMask )
 {
    PHB_GT pGT;
 
@@ -93,7 +93,7 @@ HB_EXPORT int  hb_inkeyNext( int iEventMask )
    return pGT ? HB_GTSELF_INKEYNEXT( pGT, iEventMask ) : 0;
 }
 
-HB_EXPORT void hb_inkeyPoll( void )
+void hb_inkeyPoll( void )
 {
    PHB_GT pGT;
 
@@ -104,7 +104,7 @@ HB_EXPORT void hb_inkeyPoll( void )
       HB_GTSELF_INKEYPOLL( pGT );
 }
 
-HB_EXPORT int  hb_inkeySetLast( int iKey )
+int  hb_inkeySetLast( int iKey )
 {
    PHB_GT pGT;
 
@@ -114,7 +114,7 @@ HB_EXPORT int  hb_inkeySetLast( int iKey )
    return pGT ? HB_GTSELF_INKEYSETLAST( pGT, iKey ) : 0;
 }
 
-HB_EXPORT void hb_inkeySetText( const char * szText, ULONG ulLen )
+void hb_inkeySetText( const char * szText, ULONG ulLen )
 {
    PHB_GT pGT;
 
@@ -125,7 +125,7 @@ HB_EXPORT void hb_inkeySetText( const char * szText, ULONG ulLen )
       HB_GTSELF_INKEYSETTEXT( pGT, szText, ulLen );
 }
 
-HB_EXPORT void hb_inkeyReset( void )
+void hb_inkeyReset( void )
 {
    PHB_GT pGT;
 
@@ -136,7 +136,7 @@ HB_EXPORT void hb_inkeyReset( void )
       HB_GTSELF_INKEYRESET( pGT );
 }
 
-HB_EXPORT void hb_inkeySetCancelKeys( int iCancelKey, int iCancelKeyEx )
+void hb_inkeySetCancelKeys( int iCancelKey, int iCancelKeyEx )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeySetCancelKeys(%d,%d)", iCancelKey, iCancelKeyEx));
 

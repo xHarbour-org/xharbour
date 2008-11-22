@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.19 2005/11/01 22:05:49 druzus Exp $
+ * $Id: file.c,v 1.20 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 #include "hbapiitm.h"
 #include "hbset.h"
 
-HB_EXPORT BOOL hb_fsFile( BYTE * pFilename )
+BOOL hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL fFree;
@@ -99,7 +99,7 @@ HB_EXPORT BOOL hb_fsFile( BYTE * pFilename )
    return bResult;
 }
 
-HB_EXPORT BOOL hb_fsIsDirectory( BYTE * pFilename )
+BOOL hb_fsIsDirectory( BYTE * pFilename )
 {
    BOOL bResult = FALSE, fFree;
    PHB_FFIND ffind;

@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.13 2007/09/25 02:55:30 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.14 2008/04/04 15:20:46 ronpinkas Exp $
  */
 
 /*
@@ -94,10 +94,10 @@ static PHB_DYNS pHB_CSTRUCTURE = NULL, pPOINTER, pVALUE, pBUFFER, pDEVALUE;
 #include "hbvm.h"
 
 HB_EXTERN_BEGIN
-   HB_EXPORT char * hb_parcstruct( int iParam, ... );
+   char * hb_parcstruct( int iParam, ... );
 HB_EXTERN_END
 
-HB_EXPORT char * hb_parcstruct( int iParam, ... )
+char * hb_parcstruct( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 

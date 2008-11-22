@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.208 2008/06/10 22:51:38 ronpinkas Exp $
+ * $Id: harbour.c,v 1.209 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -718,7 +718,7 @@ static int  s_iDirCase  = HB_SET_CASE_MIXED;
 static BOOL s_fFnTrim   = FALSE;
 static char s_cDirSep   = OS_PATH_DELIMITER;
 
-HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
+BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
 {
    if( s_fFnTrim || s_cDirSep != OS_PATH_DELIMITER ||
        s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )

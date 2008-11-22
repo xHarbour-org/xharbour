@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.29 2008/08/14 09:04:24 andijahja Exp $
+ * $Id: cmdarg.c,v 1.30 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ BOOL   s_WinMainParam   = FALSE;
 
 HB_EXTERN_END
 
-HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
+void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
 {
    hb_hInstance = hInstance;
    hb_hPrevInstance = hPrevInstance;
@@ -83,7 +83,7 @@ HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iC
    s_WinMainParam = TRUE;
 }
 
-HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow )
+BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow )
 {
    if( phInstance )
       *phInstance = hb_hInstance;
@@ -97,7 +97,7 @@ HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, i
 
 #endif
 
-HB_EXPORT void hb_cmdargInit( int argc, char * argv[] )
+void hb_cmdargInit( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_cmdargInit(%d, %p)", argc, argv));
 
@@ -110,7 +110,7 @@ int hb_cmdargARGC( void )
    return s_argc;
 }
 
-HB_EXPORT char ** hb_cmdargARGV( void )
+char ** hb_cmdargARGV( void )
 {
    return s_argv;
 }

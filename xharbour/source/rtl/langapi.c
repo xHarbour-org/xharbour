@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.10 2005/10/15 11:05:44 druzus Exp $
+ * $Id: langapi.c,v 1.11 2008/03/27 10:26:47 likewolf Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ static int hb_langFindPos( char * pszID )
    return -1;
 }
 
-HB_EXPORT BOOL hb_langRegister( PHB_LANG lang )
+BOOL hb_langRegister( PHB_LANG lang )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langRegister(%p)", lang));
 
@@ -116,7 +116,7 @@ HB_EXPORT BOOL hb_langRegister( PHB_LANG lang )
    return FALSE;
 }
 
-HB_EXPORT BOOL hb_langDeRegister( char * pszID )
+BOOL hb_langDeRegister( char * pszID )
 {
    int iPos;
 
@@ -133,7 +133,7 @@ HB_EXPORT BOOL hb_langDeRegister( char * pszID )
       return FALSE;
 }
 
-HB_EXPORT PHB_LANG hb_langFind( char * pszID )
+PHB_LANG hb_langFind( char * pszID )
 {
    int iPos;
 
@@ -144,7 +144,7 @@ HB_EXPORT PHB_LANG hb_langFind( char * pszID )
    return ( iPos != -1 ) ? s_langList[ iPos ] : NULL;
 }
 
-HB_EXPORT PHB_LANG hb_langSelect( PHB_LANG lang )
+PHB_LANG hb_langSelect( PHB_LANG lang )
 {
    PHB_LANG langOld = s_lang;
 
@@ -171,7 +171,7 @@ HB_EXPORT PHB_LANG hb_langSelect( PHB_LANG lang )
    return langOld;
 }
 
-HB_EXPORT char * hb_langSelectID( char * pszID )
+char * hb_langSelectID( char * pszID )
 {
    char * pszIDOld = hb_langID();
 
@@ -182,7 +182,7 @@ HB_EXPORT char * hb_langSelectID( char * pszID )
    return pszIDOld;
 }
 
-HB_EXPORT char * hb_langDGetItem( int iIndex )
+char * hb_langDGetItem( int iIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langDGetItem(%i)", iIndex));
 
@@ -196,7 +196,7 @@ HB_EXPORT char * hb_langDGetItem( int iIndex )
    }
 }
 
-HB_EXPORT char * hb_langID( void )
+char * hb_langID( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langID()"));
 
@@ -208,7 +208,7 @@ HB_EXPORT char * hb_langID( void )
 
 /* NOTE: Caller must free the pointer. */
 
-HB_EXPORT char * hb_langName( void )
+char * hb_langName( void )
 {
    char * pszName = ( char * ) hb_xgrab( 128 );
 
@@ -225,7 +225,7 @@ HB_EXPORT char * hb_langName( void )
 
 /* Compatibility interface */
 
-HB_EXPORT char * hb_langDGetErrorDesc( ULONG ulIndex )
+char * hb_langDGetErrorDesc( ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langDGetErrorDesc(%lu)", ulIndex));
 

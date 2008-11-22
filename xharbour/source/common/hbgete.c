@@ -1,5 +1,5 @@
 /*
- * $Id: hbgete.c,v 1.4 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: hbgete.c,v 1.5 2008/03/27 10:26:45 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
          If the return value is not NULL, the caller must free
          the pointer. [vszakats] */
 
-HB_EXPORT char * hb_getenv( const char * szName )
+char * hb_getenv( const char * szName )
 {
    char * pszBuffer = NULL;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.33 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: hbffind.c,v 1.34 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.33 2008/03/27 10:26:46 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.34 2008/10/22 08:32:52 marchuet Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -234,7 +234,7 @@ FILETIME GetOldesFile( const char * szPath)
 
 /* ------------------------------------------------------------- */
 
-HB_EXPORT ULONG hb_fsAttrFromRaw( ULONG raw_attr )
+ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 {
    ULONG ulAttr;
 
@@ -306,7 +306,7 @@ HB_EXPORT ULONG hb_fsAttrFromRaw( ULONG raw_attr )
    return ulAttr;
 }
 
-HB_EXPORT ULONG hb_fsAttrToRaw( ULONG ulAttr )
+ULONG hb_fsAttrToRaw( ULONG ulAttr )
 {
    ULONG raw_attr;
 
@@ -383,7 +383,7 @@ HB_EXPORT ULONG hb_fsAttrToRaw( ULONG ulAttr )
 /* Converts a CA-Cl*pper compatible file attribute string
    to the internal reprensentation. */
 
-HB_EXPORT ULONG hb_fsAttrEncode( const char * szAttr )
+ULONG hb_fsAttrEncode( const char * szAttr )
 {
    const char * pos = szAttr;
    char ch;
@@ -425,7 +425,7 @@ HB_EXPORT ULONG hb_fsAttrEncode( const char * szAttr )
 
 /* NOTE: szAttr buffer must be at least 16 chars long */
 
-HB_EXPORT char * hb_fsAttrDecode( ULONG ulAttr, char * szAttr )
+char * hb_fsAttrDecode( ULONG ulAttr, char * szAttr )
 {
    char * ptr = szAttr;
 
@@ -664,7 +664,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    sprintf( ffind->szTime, "%02d:%02d:%02d", lHour, lMin, lSec );
 }
 
-HB_EXPORT PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
+PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
 {
    PHB_FFIND ffind = ( PHB_FFIND ) hb_xgrab( sizeof( HB_FFIND ) );
    BOOL bFound;
@@ -884,7 +884,7 @@ HB_EXPORT PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
    return ffind;
 }
 
-HB_EXPORT BOOL hb_fsFindNext( PHB_FFIND ffind )
+BOOL hb_fsFindNext( PHB_FFIND ffind )
 {
    PHB_FFIND_INFO info = ( PHB_FFIND_INFO ) ffind->info;
    BOOL bFound;
@@ -961,7 +961,7 @@ HB_EXPORT BOOL hb_fsFindNext( PHB_FFIND ffind )
    return bFound;
 }
 
-HB_EXPORT void hb_fsFindClose( PHB_FFIND ffind )
+void hb_fsFindClose( PHB_FFIND ffind )
 {
    if( ffind != NULL )
    {

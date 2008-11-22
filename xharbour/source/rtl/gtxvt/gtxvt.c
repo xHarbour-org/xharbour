@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.53 2005/03/31 04:01:23 druzus Exp $
+ * $Id: gtxvt.c,v 1.54 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -3258,37 +3258,37 @@ void xvt_cursorPaint( PXWND_DEF wnd )
 
 // Exported functions for API calls
 
-BOOL HB_EXPORT hb_xvt_gtSetMenuKeyEvent(int iMenuKeyEvent)
+BOOL hb_xvt_gtSetMenuKeyEvent(int iMenuKeyEvent)
 {
    HB_SYMBOL_UNUSED( iMenuKeyEvent );
    return FALSE;
 }
 
 
-BOOL HB_EXPORT hb_xvt_gtSetCodePage(int iCodePage)
+BOOL hb_xvt_gtSetCodePage(int iCodePage)
 {
    HB_SYMBOL_UNUSED( iCodePage );
    return FALSE;
 }
 
-int HB_EXPORT hb_xvt_gtGetLastMenuEvent(void)
+int hb_xvt_gtGetLastMenuEvent(void)
 {
    return 0;
 }
 
-void HB_EXPORT hb_xvt_gtSetWindowTitle(PXWND_DEF wnd, char * title)
+void hb_xvt_gtSetWindowTitle(PXWND_DEF wnd, char * title)
 {
    XStoreName( wnd->dpy, wnd->window, title );
 }
 
 
-void HB_EXPORT hb_xvt_gtSetWindowIcon(int icon)
+void hb_xvt_gtSetWindowIcon(int icon)
 {
    HB_SYMBOL_UNUSED(icon);
 }
 
 
-int HB_EXPORT hb_xvt_gtGetWindowTitle(PXWND_DEF wnd, char *title, int length)
+int hb_xvt_gtGetWindowTitle(PXWND_DEF wnd, char *title, int length)
 {
    char *name;
    XFetchName( wnd->dpy, wnd->window, &name );

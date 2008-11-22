@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.694 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: hvm.c,v 1.695 2008/11/18 17:55:58 marchuet Exp $
  */
 
 /*
@@ -261,7 +261,7 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
 static BOOL    hb_vmDoInitFunc( char *pFuncSym ); /* executes CLIPINIT, HB_OLEINIT and HASHENTRY */
-// HB_EXPORT void hb_vmDoExitFunctions( void );   /* executes all defined PRGs EXIT functions */
+// void hb_vmDoExitFunctions( void );   /* executes all defined PRGs EXIT functions */
 
 
 // extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
@@ -346,7 +346,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 static HB_DYNS ModuleFakeDyn = { 0 };
 
-HB_EXPORT void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
+void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -356,7 +356,7 @@ HB_EXPORT void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
    s_InitFunctions = pLst;
 }
 
-HB_EXPORT void hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo )
+void hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
@@ -527,7 +527,7 @@ void hb_vmSymbolResolveDeferred( void )
 }
 
 /* application entry point */
-HB_EXPORT void hb_vmInit( BOOL bStartMainProc )
+void hb_vmInit( BOOL bStartMainProc )
 {
    HB_SYMB FakeInitSymbol = { "", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
 
@@ -833,7 +833,7 @@ void hb_vmReleaseLocalSymbols( void )
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmReleaseLocalSymbols()"));
 }
 
-HB_EXPORT int hb_vmQuit( void )
+int hb_vmQuit( void )
 {
    HB_SYMB FakeQuitSymbol = { "", {HB_FS_STATIC}, {NULL}, &ModuleFakeDyn };
 
@@ -1249,7 +1249,7 @@ HB_EXPORT int hb_vmQuit( void )
    return s_iErrorLevel;
 }
 
-HB_EXPORT void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
+void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 {
    HB_THREAD_STUB
 
@@ -7085,7 +7085,7 @@ static void hb_vmSwapAlias( void )
 /* Execution                       */
 /* ------------------------------- */
 
-HB_EXPORT void hb_vmDo( USHORT uiParams )
+void hb_vmDo( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -7261,7 +7261,7 @@ static void hb_vmClassError( UINT uiParams, char *szClassName, char *szMsg, PHB_
    }
 }
 
-HB_EXPORT void hb_vmSend( USHORT uiParams )
+void hb_vmSend( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -7689,7 +7689,7 @@ static HARBOUR hb_vmDoBlock( void )
 
 /* Evaluates a passed codeblock item with no arguments passed to a codeblock
 */
-HB_EXPORT HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
+HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
 {
    HB_THREAD_STUB
 
@@ -7710,7 +7710,7 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
  *for example:
  * retVal = hb_vmEvalBlockV( pBlock, 2, pParam1, pParam2 );
 */
-HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
+HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
    va_list va;
@@ -7737,7 +7737,7 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ...
 
 /* Evaluates a passed codeblock item or macro pointer item
  */
-HB_EXPORT PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem )
+PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
@@ -7769,7 +7769,7 @@ HB_EXPORT PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem )
 /*
  * destroy codeblock or macro in given item
  */
-HB_EXPORT void hb_vmDestroyBlockOrMacro( PHB_ITEM pItem )
+void hb_vmDestroyBlockOrMacro( PHB_ITEM pItem )
 {
    if( pItem->type == HB_IT_POINTER )
    {
@@ -7783,7 +7783,7 @@ HB_EXPORT void hb_vmDestroyBlockOrMacro( PHB_ITEM pItem )
 }
 
 
-HB_EXPORT void hb_vmFunction( USHORT uiParams )
+void hb_vmFunction( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -8675,7 +8675,7 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
 /* Push                            */
 /* ------------------------------- */
 
-HB_EXPORT void hb_vmPush( PHB_ITEM pItem )
+void hb_vmPush( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPush(%p) type: %i", pItem, pItem->type ) );
@@ -8683,7 +8683,7 @@ HB_EXPORT void hb_vmPush( PHB_ITEM pItem )
    hb_itemCopy( hb_stackAllocItem(), pItem );
 }
 
-HB_EXPORT void hb_vmPushState( void )
+void hb_vmPushState( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushState()"));
@@ -8694,7 +8694,7 @@ HB_EXPORT void hb_vmPushState( void )
    hb_stackPushReturn();
 }
 
-HB_EXPORT void hb_vmPushNil( void )
+void hb_vmPushNil( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNil()"));
@@ -8702,7 +8702,7 @@ HB_EXPORT void hb_vmPushNil( void )
    hb_stackAllocItem()->type = HB_IT_NIL;
 }
 
-HB_EXPORT void hb_vmPushLogical( BOOL bValue )
+void hb_vmPushLogical( BOOL bValue )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8714,12 +8714,12 @@ HB_EXPORT void hb_vmPushLogical( BOOL bValue )
    pItem->item.asLogical.value = bValue ? TRUE : FALSE;
 }
 
-HB_EXPORT void hb_vmPushNumber( double dNumber, int iDec )
+void hb_vmPushNumber( double dNumber, int iDec )
 {
    hb_vmPushNumType( dNumber, iDec, 0, 0 );
 }
 
-HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
+void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%lf, %d, %i, %i)", dNumber, iDec, iType1, iType2));
 
@@ -8741,7 +8741,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    }
 }
 
-HB_EXPORT void hb_vmPushNumInt( HB_LONG lNumber )
+void hb_vmPushNumInt( HB_LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumInt(%Ld, %i, %i)", lNumber ));
 
@@ -8772,7 +8772,7 @@ static int hb_vmCalcIntWidth( HB_LONG lNumber )
    return iWidth;
 }
 
-HB_EXPORT void hb_vmPushInteger( int iNumber )
+void hb_vmPushInteger( int iNumber )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8821,7 +8821,7 @@ static void hb_vmPushLongConst( LONG lNumber )
 
 #endif
 
-HB_EXPORT void hb_vmPushLong( LONG lNumber )
+void hb_vmPushLong( LONG lNumber )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8868,7 +8868,7 @@ static void hb_vmPushLongLongConst( LONGLONG llNumber )
 }
 #endif
 
-HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
+void hb_vmPushDouble( double dNumber, int iDec )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8935,7 +8935,7 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    }
 }
 
-HB_EXPORT void hb_vmPushDate( LONG lDate )
+void hb_vmPushDate( LONG lDate )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8948,7 +8948,7 @@ HB_EXPORT void hb_vmPushDate( LONG lDate )
    pItem->item.asDate.time  = 0;
 }
 
-HB_EXPORT void hb_vmPushDateTime( LONG lDate, LONG lTime )
+void hb_vmPushDateTime( LONG lDate, LONG lTime )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8961,7 +8961,7 @@ HB_EXPORT void hb_vmPushDateTime( LONG lDate, LONG lTime )
    pItem->item.asDate.time  = lTime;
 }
 
-HB_EXPORT void hb_vmPushPointer( void * pPointer )
+void hb_vmPushPointer( void * pPointer )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -8974,7 +8974,7 @@ HB_EXPORT void hb_vmPushPointer( void * pPointer )
    pItem->item.asPointer.collect = FALSE;
 }
 
-HB_EXPORT void hb_vmPushString( const char * szText, ULONG length )
+void hb_vmPushString( const char * szText, ULONG length )
 {
    HB_THREAD_STUB
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmPushString( \"%s\", %lu ) %p", szText, length, ( * HB_VM_STACK.pPos ) ) );
@@ -8982,7 +8982,7 @@ HB_EXPORT void hb_vmPushString( const char * szText, ULONG length )
    hb_itemPutCL( hb_stackAllocItem(), szText, length );
 }
 
-HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
+void hb_vmPushSymbol( PHB_SYMB pSym )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
@@ -9004,12 +9004,12 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    pItem->item.asSymbol.pCargo = pSymCargo;
 }
 
-HB_EXPORT void hb_vmPushDynSym( PHB_DYNS pDynSym )
+void hb_vmPushDynSym( PHB_DYNS pDynSym )
 {
    hb_vmPushSymbol( pDynSym->pSymbol );
 }
 
-HB_EXPORT void hb_vmPushEvalSym( void )
+void hb_vmPushEvalSym( void )
 {
    hb_vmPushSymbol( &hb_symEval );
 }
@@ -9436,7 +9436,7 @@ static void hb_vmDuplTwo( void )
 /* Pop                             */
 /* ------------------------------- */
 
-HB_EXPORT void hb_vmPopState( void )
+void hb_vmPopState( void )
 {
    HB_THREAD_STUB
 
@@ -10416,7 +10416,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    return pNewSymbols;
 }
 
-HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
@@ -10441,7 +10441,7 @@ HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModule
 
 /* hvm support for pcode DLLs */
 
-HB_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -10464,7 +10464,7 @@ HB_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSym
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
 }
 
-HB_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -10488,12 +10488,12 @@ HB_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSym
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
 }
 
-HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
+PSYMBOLS * hb_vmSymbols( void )
 {
    return &s_pSymbols;
 }
 
-HB_EXPORT PSYMBOLS hb_vmLastModule( void )
+PSYMBOLS hb_vmLastModule( void )
 {
    PSYMBOLS pLastModule = s_pSymbols;
 
@@ -10508,7 +10508,7 @@ HB_EXPORT PSYMBOLS hb_vmLastModule( void )
    return pLastModule;
 }
 
-HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
+void hb_vmExplicitStartup( PHB_SYMB pSymbol )
 {
    s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
    /* printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->value.pFunPtr ); */
@@ -10550,7 +10550,7 @@ static void hb_vmDoInitStatics( void )
    } while( pLastSymbols );
 }
 
-HB_EXPORT void hb_vmDoExitFunctions( void )
+void hb_vmDoExitFunctions( void )
 {
    HB_THREAD_STUB
 
@@ -10718,7 +10718,7 @@ HB_FUNC( ERRORLEVEL )
    }
 }
 
-HB_EXPORT void hb_vmRequestQuit( void )
+void hb_vmRequestQuit( void )
 {
    HB_THREAD_STUB
 
@@ -10727,7 +10727,7 @@ HB_EXPORT void hb_vmRequestQuit( void )
    hb_stackSetActionRequest( HB_QUIT_REQUESTED );
 }
 
-HB_EXPORT void hb_vmRequestEndProc( void )
+void hb_vmRequestEndProc( void )
 {
    HB_THREAD_STUB
 
@@ -10736,7 +10736,7 @@ HB_EXPORT void hb_vmRequestEndProc( void )
    hb_stackSetActionRequest( HB_ENDPROC_REQUESTED );
 }
 
-HB_EXPORT void hb_vmRequestBreak( PHB_ITEM pItem )
+void hb_vmRequestBreak( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
@@ -10777,7 +10777,7 @@ HB_EXPORT void hb_vmRequestBreak( PHB_ITEM pItem )
    hb_stackSetActionRequest( HB_BREAK_REQUESTED );
 }
 
-HB_EXPORT void hb_vmRequestCancel( void )
+void hb_vmRequestCancel( void )
 {
    HB_THREAD_STUB
 
@@ -10815,7 +10815,7 @@ HB_EXPORT void hb_vmRequestCancel( void )
    }
 }
 
-HB_EXPORT USHORT hb_vmRequestQuery( void )
+USHORT hb_vmRequestQuery( void )
 {
    HB_THREAD_STUB
 
@@ -10859,7 +10859,7 @@ void hb_vmRequestRestore( void )
    hb_stackPopReturn();
 }
 
-HB_EXPORT void hb_vmRequestReset( void )
+void hb_vmRequestReset( void )
 {
    HB_THREAD_STUB
 
@@ -10868,7 +10868,7 @@ HB_EXPORT void hb_vmRequestReset( void )
    hb_stackSetActionRequest( 0 );
 }
 
-HB_EXPORT void hb_vmRequest( USHORT uiRequest )
+void hb_vmRequest( USHORT uiRequest )
 {
    HB_THREAD_STUB
 
@@ -10948,7 +10948,7 @@ void hb_vmIsStaticRef( void )
    hb_gcItemRef( &s_aStatics );
 }
 
-HB_EXPORT void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
+void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
 {
    HB_THREAD_STUB
 
@@ -11022,7 +11022,7 @@ HB_FUNC( __TRACEPRGCALLS )
    #endif
 }
 
-HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
+void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
 {
    HB_THREAD_STUB
 
@@ -11072,7 +11072,7 @@ static void hb_vmItemRefDummy( void * value )
 /*
  * push extended item reference
  */
-HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem )
+void hb_vmPushItemRef( PHB_ITEM pItem )
 {
    static const HB_EXTREF s_ItmExtRef = {
              hb_vmItemRefRead,
@@ -11358,7 +11358,7 @@ HB_FUNC( HB_VMMODE )
 
 #ifdef HB_FORCE_LINK_MAIN
 HB_EXTERN_BEGIN
-extern HB_EXPORT void HB_FORCE_LINK_MAIN( void );
+extern void HB_FORCE_LINK_MAIN( void );
 HB_EXTERN_END
 void _hb_forceLinkMain()
 {
@@ -11385,7 +11385,7 @@ static BOOL hb_xvmActionRequest( void )
    return FALSE;
 }
 
-HB_EXPORT void hb_xvmExitProc( ULONG ulPrivateBase )
+void hb_xvmExitProc( ULONG ulPrivateBase )
 {
    HB_THREAD_STUB_STACK
 
@@ -11395,7 +11395,7 @@ HB_EXPORT void hb_xvmExitProc( ULONG ulPrivateBase )
    hb_memvarSetPrivatesBase( ulPrivateBase );
 }
 
-HB_EXPORT void hb_xvmSeqBegin( void )
+void hb_xvmSeqBegin( void )
 {
    HB_THREAD_STUB_STACK
    PHB_SEQUENCE pSequence;
@@ -11427,7 +11427,7 @@ HB_EXPORT void hb_xvmSeqBegin( void )
    HB_VM_STACK.pSequence = pSequence;
 }
 
-HB_EXPORT BOOL hb_xvmSeqEnd( void )
+BOOL hb_xvmSeqEnd( void )
 {
    HB_THREAD_STUB_STACK
    PHB_SEQUENCE pFree;
@@ -11454,7 +11454,7 @@ HB_EXPORT BOOL hb_xvmSeqEnd( void )
    return FALSE;
 }
 
-HB_EXPORT BOOL hb_xvmSeqRecover( void )
+BOOL hb_xvmSeqRecover( void )
 {
    HB_THREAD_STUB_STACK
    PHB_SEQUENCE pFree;
@@ -11483,7 +11483,7 @@ HB_EXPORT BOOL hb_xvmSeqRecover( void )
    return FALSE;
 }
 
-HB_EXPORT void hb_xvmTryBegin( void )
+void hb_xvmTryBegin( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11494,7 +11494,7 @@ HB_EXPORT void hb_xvmTryBegin( void )
    HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( &hb_vm_BreakBlock );
 }
 
-HB_EXPORT BOOL hb_xvmTryEnd( void )
+BOOL hb_xvmTryEnd( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11506,7 +11506,7 @@ HB_EXPORT BOOL hb_xvmTryEnd( void )
    return hb_xvmSeqEnd();
 }
 
-HB_EXPORT void hb_xvmTryEndFin( void )
+void hb_xvmTryEndFin( void )
 {
    HB_THREAD_STUB_STACK
    USHORT uiActionRequest;
@@ -11537,7 +11537,7 @@ HB_EXPORT void hb_xvmTryEndFin( void )
    hb_stackSetActionRequest( uiActionRequest );
 }
 
-HB_EXPORT BOOL hb_xvmTryRecover( void )
+BOOL hb_xvmTryRecover( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11550,7 +11550,7 @@ HB_EXPORT BOOL hb_xvmTryRecover( void )
    return hb_xvmSeqRecover();
 }
 
-HB_EXPORT USHORT hb_xvmBeginFinally( void )
+USHORT hb_xvmBeginFinally( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11563,7 +11563,7 @@ HB_EXPORT USHORT hb_xvmBeginFinally( void )
    return uiActionRequest;
 }
 
-HB_EXPORT BOOL hb_xvmEndFinally( USHORT uiActionRequest )
+BOOL hb_xvmEndFinally( USHORT uiActionRequest )
 {
    HB_THREAD_STUB_STACK
 
@@ -11578,7 +11578,7 @@ HB_EXPORT BOOL hb_xvmEndFinally( USHORT uiActionRequest )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmSetLine( USHORT uiLine )
+void hb_xvmSetLine( USHORT uiLine )
 {
    HB_THREAD_STUB_STACK
 
@@ -11589,7 +11589,7 @@ HB_EXPORT void hb_xvmSetLine( USHORT uiLine )
       hb_vmDebuggerShowLine( uiLine );
 }
 
-HB_EXPORT void hb_xvmBaseLine( USHORT uiLine )
+void hb_xvmBaseLine( USHORT uiLine )
 {
    HB_THREAD_STUB_STACK
 
@@ -11600,7 +11600,7 @@ HB_EXPORT void hb_xvmBaseLine( USHORT uiLine )
       hb_vmDebuggerShowLine( uiLine );
 }
 
-HB_EXPORT void hb_xvmLineOffset( BYTE bLine )
+void hb_xvmLineOffset( BYTE bLine )
 {
    HB_THREAD_STUB_STACK
 
@@ -11616,7 +11616,7 @@ HB_EXPORT void hb_xvmLineOffset( BYTE bLine )
    }
 }
 
-HB_EXPORT BOOL hb_xvmClassSetModule( void )
+BOOL hb_xvmClassSetModule( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pClassHandle;
@@ -11639,7 +11639,7 @@ HB_EXPORT BOOL hb_xvmClassSetModule( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmIVarRef( void )
+BOOL hb_xvmIVarRef( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pSelf, pMsg;
@@ -11731,21 +11731,21 @@ HB_EXPORT BOOL hb_xvmIVarRef( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmFrame( int iLocals, int iParams )
+void hb_xvmFrame( int iLocals, int iParams )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmFrame(%d, %d)", iLocals, iParams));
 
    hb_vmFrame( (unsigned short) iLocals, ( BYTE ) iParams );
 }
 
-HB_EXPORT void hb_xvmSFrame( PHB_SYMB pSymbol )
+void hb_xvmSFrame( PHB_SYMB pSymbol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmSFrame(%p)", pSymbol));
 
    hb_vmSFrame( pSymbol );
 }
 
-HB_EXPORT BOOL hb_xvmDo( USHORT uiParams )
+BOOL hb_xvmDo( USHORT uiParams )
 {
    HB_THREAD_STUB_STACK
 
@@ -11756,7 +11756,7 @@ HB_EXPORT BOOL hb_xvmDo( USHORT uiParams )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmFunction( USHORT uiParams )
+BOOL hb_xvmFunction( USHORT uiParams )
 {
    HB_THREAD_STUB_STACK
 
@@ -11769,7 +11769,7 @@ HB_EXPORT BOOL hb_xvmFunction( USHORT uiParams )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmSend( USHORT uiParams )
+BOOL hb_xvmSend( USHORT uiParams )
 {
    HB_THREAD_STUB_STACK
 
@@ -11782,7 +11782,7 @@ HB_EXPORT BOOL hb_xvmSend( USHORT uiParams )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmSendWith( USHORT uiParams )
+BOOL hb_xvmSendWith( USHORT uiParams )
 {
    HB_THREAD_STUB_STACK
 
@@ -11795,7 +11795,7 @@ HB_EXPORT BOOL hb_xvmSendWith( USHORT uiParams )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmRetValue( void )
+void hb_xvmRetValue( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11805,14 +11805,14 @@ HB_EXPORT void hb_xvmRetValue( void )
    hb_stackReturnItem()->type &= ~HB_IT_MEMOFLAG;
 }
 
-HB_EXPORT void hb_xvmStatics( PHB_SYMB pSymbol, USHORT uiStatics )
+void hb_xvmStatics( PHB_SYMB pSymbol, USHORT uiStatics )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmStatics(%p,%hu)", pSymbol, uiStatics));
 
    hb_vmStatics( pSymbol, uiStatics );
 }
 
-HB_EXPORT void hb_xvmParameter( PHB_SYMB pSymbol, int iParams )
+void hb_xvmParameter( PHB_SYMB pSymbol, int iParams )
 {
    HB_THREAD_STUB_STACK
 
@@ -11821,56 +11821,56 @@ HB_EXPORT void hb_xvmParameter( PHB_SYMB pSymbol, int iParams )
    hb_memvarNewParameter( pSymbol, hb_stackItemFromBase( iParams ) );
 }
 
-HB_EXPORT void hb_xvmPushLocal( SHORT iLocal )
+void hb_xvmPushLocal( SHORT iLocal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushLocal(%hd)", iLocal));
 
    hb_vmPushLocal( iLocal );
 }
 
-HB_EXPORT void hb_xvmPushLocalByRef( SHORT iLocal )
+void hb_xvmPushLocalByRef( SHORT iLocal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushLocalByRef(%hd)", iLocal));
 
    hb_vmPushLocalByRef( iLocal );
 }
 
-HB_EXPORT void hb_xvmPopLocal( SHORT iLocal )
+void hb_xvmPopLocal( SHORT iLocal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPopLocal(%hd)", iLocal));
 
    hb_vmPopLocal( iLocal );
 }
 
-HB_EXPORT void hb_xvmPushStatic( USHORT uiStatic )
+void hb_xvmPushStatic( USHORT uiStatic )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushStatic(%hu)", uiStatic));
 
    hb_vmPushStatic( uiStatic );
 }
 
-HB_EXPORT void hb_xvmPushStaticByRef( USHORT uiStatic )
+void hb_xvmPushStaticByRef( USHORT uiStatic )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushStaticByRef(%hu)", uiStatic));
 
    hb_vmPushStaticByRef( uiStatic );
 }
 
-HB_EXPORT void hb_xvmPopStatic( USHORT uiStatic )
+void hb_xvmPopStatic( USHORT uiStatic )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPopStatic(%hu)", uiStatic));
 
    hb_vmPopStatic( uiStatic );
 }
 
-HB_EXPORT void hb_xvmPushGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
+void hb_xvmPushGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushGlobal(%hu)", uiGlobal));
 
    hb_vmPush( (*pGlobals)[ uiGlobal ] );
 }
 
-HB_EXPORT void hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals )
+void hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB_STACK
 
@@ -11890,7 +11890,7 @@ HB_EXPORT void hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals )
    #endif
 }
 
-HB_EXPORT void hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
+void hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB_STACK
 
@@ -11916,7 +11916,7 @@ HB_EXPORT void hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
    hb_stackDec();
 }
 
-HB_EXPORT BOOL hb_xvmPushVariable( PHB_SYMB pSymbol )
+BOOL hb_xvmPushVariable( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -11927,7 +11927,7 @@ HB_EXPORT BOOL hb_xvmPushVariable( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopVariable( PHB_SYMB pSymbol )
+BOOL hb_xvmPopVariable( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -11939,21 +11939,21 @@ HB_EXPORT BOOL hb_xvmPopVariable( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize )
+void hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlockShort(%p, %p)", pCode));
 
    hb_vmPushBlockShort( pCode, usSize, FALSE );
 }
 
-HB_EXPORT void hb_xvmPushBlock( const BYTE * pCode, USHORT usSize )
+void hb_xvmPushBlock( const BYTE * pCode, USHORT usSize )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlock(%p, %p)", pCode));
 
    hb_vmPushBlock( pCode, usSize, FALSE );
 }
 
-HB_EXPORT void hb_xvmPushSelf( void )
+void hb_xvmPushSelf( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11962,7 +11962,7 @@ HB_EXPORT void hb_xvmPushSelf( void )
    hb_vmPush( hb_stackSelfItem() );
 }
 
-HB_EXPORT BOOL hb_xvmPopLogical( BOOL * pfValue )
+BOOL hb_xvmPopLogical( BOOL * pfValue )
 {
    HB_THREAD_STUB_STACK
 
@@ -11973,7 +11973,7 @@ HB_EXPORT BOOL hb_xvmPopLogical( BOOL * pfValue )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopAlias( void )
+BOOL hb_xvmPopAlias( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11985,7 +11985,7 @@ HB_EXPORT BOOL hb_xvmPopAlias( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmSwapAlias( void )
+BOOL hb_xvmSwapAlias( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -11996,7 +11996,7 @@ HB_EXPORT BOOL hb_xvmSwapAlias( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushField( PHB_SYMB pSymbol )
+BOOL hb_xvmPushField( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12007,7 +12007,7 @@ HB_EXPORT BOOL hb_xvmPushField( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushAlias( void )
+BOOL hb_xvmPushAlias( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12018,7 +12018,7 @@ HB_EXPORT BOOL hb_xvmPushAlias( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushAliasedField( PHB_SYMB pSymbol )
+BOOL hb_xvmPushAliasedField( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12029,7 +12029,7 @@ HB_EXPORT BOOL hb_xvmPushAliasedField( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushAliasedVar( PHB_SYMB pSymbol )
+BOOL hb_xvmPushAliasedVar( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12040,7 +12040,7 @@ HB_EXPORT BOOL hb_xvmPushAliasedVar( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopField( PHB_SYMB pSymbol )
+BOOL hb_xvmPopField( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12052,7 +12052,7 @@ HB_EXPORT BOOL hb_xvmPopField( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushMemvar( PHB_SYMB pSymbol )
+BOOL hb_xvmPushMemvar( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12063,7 +12063,7 @@ HB_EXPORT BOOL hb_xvmPushMemvar( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushMemvarByRef( PHB_SYMB pSymbol )
+BOOL hb_xvmPushMemvarByRef( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12074,7 +12074,7 @@ HB_EXPORT BOOL hb_xvmPushMemvarByRef( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopMemvar( PHB_SYMB pSymbol )
+BOOL hb_xvmPopMemvar( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12086,7 +12086,7 @@ HB_EXPORT BOOL hb_xvmPopMemvar( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopAliasedField( PHB_SYMB pSymbol )
+BOOL hb_xvmPopAliasedField( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12097,7 +12097,7 @@ HB_EXPORT BOOL hb_xvmPopAliasedField( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPopAliasedVar( PHB_SYMB pSymbol )
+BOOL hb_xvmPopAliasedVar( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
 
@@ -12108,7 +12108,7 @@ HB_EXPORT BOOL hb_xvmPopAliasedVar( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLocalAddInt( int iLocal, LONG lAdd )
+BOOL hb_xvmLocalAddInt( int iLocal, LONG lAdd )
 {
    HB_THREAD_STUB_STACK
 
@@ -12119,7 +12119,7 @@ HB_EXPORT BOOL hb_xvmLocalAddInt( int iLocal, LONG lAdd )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLocalAdd( int iLocal )
+BOOL hb_xvmLocalAdd( int iLocal )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -12134,7 +12134,7 @@ HB_EXPORT BOOL hb_xvmLocalAdd( int iLocal )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmEqual( BOOL fExact )
+BOOL hb_xvmEqual( BOOL fExact )
 {
    HB_THREAD_STUB_STACK
 
@@ -12145,7 +12145,7 @@ HB_EXPORT BOOL hb_xvmEqual( BOOL fExact )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmAnd( void )
+BOOL hb_xvmAnd( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12156,7 +12156,7 @@ HB_EXPORT BOOL hb_xvmAnd( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmOr( void )
+BOOL hb_xvmOr( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12167,7 +12167,7 @@ HB_EXPORT BOOL hb_xvmOr( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmNot( void )
+BOOL hb_xvmNot( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12178,7 +12178,7 @@ HB_EXPORT BOOL hb_xvmNot( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmNegate( void )
+BOOL hb_xvmNegate( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12189,7 +12189,7 @@ HB_EXPORT BOOL hb_xvmNegate( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPower( void )
+BOOL hb_xvmPower( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12200,21 +12200,21 @@ HB_EXPORT BOOL hb_xvmPower( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmDuplicate( void )
+void hb_xvmDuplicate( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmDuplicate()"));
 
    hb_vmDuplicate();
 }
 
-HB_EXPORT void hb_xvmDuplTwo( void )
+void hb_xvmDuplTwo( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmDuplTwo()"));
 
    hb_vmDuplTwo();
 }
 
-HB_EXPORT BOOL hb_xvmForTest( void )
+BOOL hb_xvmForTest( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12225,14 +12225,14 @@ HB_EXPORT BOOL hb_xvmForTest( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmFuncPtr( void )
+void hb_xvmFuncPtr( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmFuncPtr()"));
 
    hb_vmFuncPtr();
 }
 
-HB_EXPORT BOOL hb_xvmNotEqual( void )
+BOOL hb_xvmNotEqual( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12243,7 +12243,7 @@ HB_EXPORT BOOL hb_xvmNotEqual( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLess( void )
+BOOL hb_xvmLess( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12254,7 +12254,7 @@ HB_EXPORT BOOL hb_xvmLess( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLessEqual( void )
+BOOL hb_xvmLessEqual( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12265,7 +12265,7 @@ HB_EXPORT BOOL hb_xvmLessEqual( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmGreater( void )
+BOOL hb_xvmGreater( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12276,7 +12276,7 @@ HB_EXPORT BOOL hb_xvmGreater( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmGreaterEqual( void )
+BOOL hb_xvmGreaterEqual( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12287,7 +12287,7 @@ HB_EXPORT BOOL hb_xvmGreaterEqual( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmInstring( void )
+BOOL hb_xvmInstring( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12298,7 +12298,7 @@ HB_EXPORT BOOL hb_xvmInstring( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmAddInt( LONG lAdd )
+BOOL hb_xvmAddInt( LONG lAdd )
 {
    HB_THREAD_STUB_STACK
 
@@ -12309,7 +12309,7 @@ HB_EXPORT BOOL hb_xvmAddInt( LONG lAdd )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPlus( void )
+BOOL hb_xvmPlus( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12322,7 +12322,7 @@ HB_EXPORT BOOL hb_xvmPlus( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMinus( void )
+BOOL hb_xvmMinus( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12333,7 +12333,7 @@ HB_EXPORT BOOL hb_xvmMinus( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMultByInt( LONG lValue )
+BOOL hb_xvmMultByInt( LONG lValue )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pValue;
@@ -12376,7 +12376,7 @@ HB_EXPORT BOOL hb_xvmMultByInt( LONG lValue )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMult( void )
+BOOL hb_xvmMult( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12387,7 +12387,7 @@ HB_EXPORT BOOL hb_xvmMult( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmDivideByInt( LONG lDivisor )
+BOOL hb_xvmDivideByInt( LONG lDivisor )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pValue;
@@ -12441,7 +12441,7 @@ HB_EXPORT BOOL hb_xvmDivideByInt( LONG lDivisor )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmDivide( void )
+BOOL hb_xvmDivide( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12452,7 +12452,7 @@ HB_EXPORT BOOL hb_xvmDivide( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmModulus( void )
+BOOL hb_xvmModulus( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12463,7 +12463,7 @@ HB_EXPORT BOOL hb_xvmModulus( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmInc( void )
+BOOL hb_xvmInc( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12474,7 +12474,7 @@ HB_EXPORT BOOL hb_xvmInc( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmDec( void )
+BOOL hb_xvmDec( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12485,7 +12485,7 @@ HB_EXPORT BOOL hb_xvmDec( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmBitAnd( void )
+BOOL hb_xvmBitAnd( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12496,7 +12496,7 @@ HB_EXPORT BOOL hb_xvmBitAnd( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmBitOr( void )
+BOOL hb_xvmBitOr( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12507,7 +12507,7 @@ HB_EXPORT BOOL hb_xvmBitOr( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmBitXor( void )
+BOOL hb_xvmBitXor( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12518,7 +12518,7 @@ HB_EXPORT BOOL hb_xvmBitXor( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmBitShiftL( void )
+BOOL hb_xvmBitShiftL( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12529,7 +12529,7 @@ HB_EXPORT BOOL hb_xvmBitShiftL( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmBitShiftR( void )
+BOOL hb_xvmBitShiftR( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12540,7 +12540,7 @@ HB_EXPORT BOOL hb_xvmBitShiftR( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLeft( USHORT usLeft )
+BOOL hb_xvmLeft( USHORT usLeft )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pString;
@@ -12573,7 +12573,7 @@ HB_EXPORT BOOL hb_xvmLeft( USHORT usLeft )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmRight( USHORT usRight )
+BOOL hb_xvmRight( USHORT usRight )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pString;
@@ -12598,7 +12598,7 @@ HB_EXPORT BOOL hb_xvmRight( USHORT usRight )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLike( void )
+BOOL hb_xvmLike( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pResult;
@@ -12616,7 +12616,7 @@ HB_EXPORT BOOL hb_xvmLike( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMatch( void )
+BOOL hb_xvmMatch( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pResult;
@@ -12634,14 +12634,14 @@ HB_EXPORT BOOL hb_xvmMatch( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmArrayDim( USHORT uiDimensions )
+void hb_xvmArrayDim( USHORT uiDimensions )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmArrayDim(%hu)", uiDimensions));
 
    hb_vmArrayDim( uiDimensions );
 }
 
-HB_EXPORT void hb_xvmArrayGen( ULONG ulElements )
+void hb_xvmArrayGen( ULONG ulElements )
 {
    HB_THREAD_STUB_STACK
 
@@ -12651,7 +12651,7 @@ HB_EXPORT void hb_xvmArrayGen( ULONG ulElements )
    HB_VM_STACK.iExtraElements = 0;
 }
 
-HB_EXPORT void hb_xvmHashGen( ULONG ulPairs )
+void hb_xvmHashGen( ULONG ulPairs )
 {
    HB_THREAD_STUB_STACK
 
@@ -12853,7 +12853,7 @@ static void hb_vmArrayItemPop( ULONG ulIndex )
 }
 
 
-HB_EXPORT BOOL hb_xvmArrayPush( void )
+BOOL hb_xvmArrayPush( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12864,7 +12864,7 @@ HB_EXPORT BOOL hb_xvmArrayPush( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmArrayPushRef( void )
+BOOL hb_xvmArrayPushRef( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12875,7 +12875,7 @@ HB_EXPORT BOOL hb_xvmArrayPushRef( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmArrayItemPush( ULONG ulIndex )
+BOOL hb_xvmArrayItemPush( ULONG ulIndex )
 {
    HB_THREAD_STUB_STACK
 
@@ -12886,7 +12886,7 @@ HB_EXPORT BOOL hb_xvmArrayItemPush( ULONG ulIndex )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmArrayPop( void )
+BOOL hb_xvmArrayPop( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12897,7 +12897,7 @@ HB_EXPORT BOOL hb_xvmArrayPop( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmArrayPopPlus( void )
+BOOL hb_xvmArrayPopPlus( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12908,7 +12908,7 @@ HB_EXPORT BOOL hb_xvmArrayPopPlus( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmArrayItemPop( ULONG ulIndex )
+BOOL hb_xvmArrayItemPop( ULONG ulIndex )
 {
    HB_THREAD_STUB_STACK
 
@@ -12919,7 +12919,7 @@ HB_EXPORT BOOL hb_xvmArrayItemPop( ULONG ulIndex )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmPushDouble( double dNumber, int iWidth, int iDec )
+void hb_xvmPushDouble( double dNumber, int iWidth, int iDec )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushDouble(%lf, %d, %d)", dNumber, iWidth, iDec));
 
@@ -12927,14 +12927,14 @@ HB_EXPORT void hb_xvmPushDouble( double dNumber, int iWidth, int iDec )
 }
 
 #ifdef HB_LONG_LONG_OFF
-HB_EXPORT void hb_xvmPushLongLong( double dNumber )
+void hb_xvmPushLongLong( double dNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushLongLong(%l.0f)", dNumber));
 
    hb_vmPushDoubleConst( dNumber, HB_DEFAULT_WIDTH, 0 );
 }
 #else
-HB_EXPORT void hb_xvmPushLongLong( LONGLONG llNumber )
+void hb_xvmPushLongLong( LONGLONG llNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushLongLong(%" PFLL "i)", llNumber));
 
@@ -12942,14 +12942,14 @@ HB_EXPORT void hb_xvmPushLongLong( LONGLONG llNumber )
 }
 #endif
 
-HB_EXPORT void hb_xvmLocalName( USHORT uiLocal, char * szLocalName )
+void hb_xvmLocalName( USHORT uiLocal, char * szLocalName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalName(%hu, %s)", uiLocal, szLocalName));
 
    hb_vmLocalName( uiLocal, szLocalName );
 }
 
-HB_EXPORT void hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName )
+void hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmStaticName(%d, %hu, %s)", (int)bIsGlobal, uiStatic, szStaticName));
 
@@ -12957,14 +12957,14 @@ HB_EXPORT void hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStati
    hb_vmStaticName( uiStatic, szStaticName );
 }
 
-HB_EXPORT void hb_xvmModuleName( char * szModuleName )
+void hb_xvmModuleName( char * szModuleName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmModuleName(%s)", szModuleName));
 
    hb_vmModuleName( szModuleName );
 }
 
-HB_EXPORT void hb_xvmMacroList( void )
+void hb_xvmMacroList( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12973,7 +12973,7 @@ HB_EXPORT void hb_xvmMacroList( void )
    HB_VM_STACK.aiExtraElements[ HB_VM_STACK.iExtraElementsIndex++ ] = 0;
 }
 
-HB_EXPORT void hb_xvmMacroListEnd( void )
+void hb_xvmMacroListEnd( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -12982,7 +12982,7 @@ HB_EXPORT void hb_xvmMacroListEnd( void )
    HB_VM_STACK.iExtraElements = HB_VM_STACK.aiExtraElements[ --HB_VM_STACK.iExtraElementsIndex ];
 }
 
-HB_EXPORT BOOL hb_xvmMacroPush( BYTE bFlags )
+BOOL hb_xvmMacroPush( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -12993,7 +12993,7 @@ HB_EXPORT BOOL hb_xvmMacroPush( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmPushMacroRef( void )
+BOOL hb_xvmPushMacroRef( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pTop;
@@ -13007,7 +13007,7 @@ HB_EXPORT BOOL hb_xvmPushMacroRef( void )
 }
 
 
-HB_EXPORT BOOL hb_xvmMacroPushIndex( BYTE bFlags )
+BOOL hb_xvmMacroPushIndex( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13056,7 +13056,7 @@ HB_EXPORT BOOL hb_xvmMacroPushIndex( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPushArg( PHB_SYMB pSymbol, BYTE bFlags )
+BOOL hb_xvmMacroPushArg( PHB_SYMB pSymbol, BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13072,7 +13072,7 @@ HB_EXPORT BOOL hb_xvmMacroPushArg( PHB_SYMB pSymbol, BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPushList( BYTE bFlags )
+BOOL hb_xvmMacroPushList( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13083,7 +13083,7 @@ HB_EXPORT BOOL hb_xvmMacroPushList( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPushPare( BYTE bFlags )
+BOOL hb_xvmMacroPushPare( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13094,7 +13094,7 @@ HB_EXPORT BOOL hb_xvmMacroPushPare( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPushAliased( BYTE bFlags )
+BOOL hb_xvmMacroPushAliased( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13105,7 +13105,7 @@ HB_EXPORT BOOL hb_xvmMacroPushAliased( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPop( BYTE bFlags )
+BOOL hb_xvmMacroPop( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13116,7 +13116,7 @@ HB_EXPORT BOOL hb_xvmMacroPop( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroPopAliased( BYTE bFlags )
+BOOL hb_xvmMacroPopAliased( BYTE bFlags )
 {
    HB_THREAD_STUB_STACK
 
@@ -13127,7 +13127,7 @@ HB_EXPORT BOOL hb_xvmMacroPopAliased( BYTE bFlags )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroSymbol( void )
+BOOL hb_xvmMacroSymbol( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13138,7 +13138,7 @@ HB_EXPORT BOOL hb_xvmMacroSymbol( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmMacroText( void )
+BOOL hb_xvmMacroText( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13149,7 +13149,7 @@ HB_EXPORT BOOL hb_xvmMacroText( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmLocalSetInt( int iLocal, int iVal )
+void hb_xvmLocalSetInt( int iLocal, int iVal )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -13169,7 +13169,7 @@ HB_EXPORT void hb_xvmLocalSetInt( int iLocal, int iVal )
    }
 }
 
-HB_EXPORT void hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
+void hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -13189,7 +13189,7 @@ HB_EXPORT void hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
    }
 }
 
-HB_EXPORT BOOL hb_xvmSwitchCase( LONG lCase )
+BOOL hb_xvmSwitchCase( LONG lCase )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pTop;
@@ -13223,7 +13223,7 @@ HB_EXPORT BOOL hb_xvmSwitchCase( LONG lCase )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmPushWith( void )
+void hb_xvmPushWith( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13239,7 +13239,7 @@ HB_EXPORT void hb_xvmPushWith( void )
    }
 }
 
-HB_EXPORT BOOL hb_xvmWithObject( void )
+BOOL hb_xvmWithObject( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13262,7 +13262,7 @@ HB_EXPORT BOOL hb_xvmWithObject( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmEndWithObject( void )
+BOOL hb_xvmEndWithObject( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13276,7 +13276,7 @@ HB_EXPORT BOOL hb_xvmEndWithObject( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmEnumIndex( void )
+void hb_xvmEnumIndex( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pTop;
@@ -13298,7 +13298,7 @@ HB_EXPORT void hb_xvmEnumIndex( void )
    pTop->item.asLong.length = 10;
 }
 
-HB_EXPORT BOOL hb_xvmForEach( void )
+BOOL hb_xvmForEach( void )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pEnumeration;
@@ -13350,7 +13350,7 @@ HB_EXPORT BOOL hb_xvmForEach( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmEnumerate( void )
+BOOL hb_xvmEnumerate( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13413,7 +13413,7 @@ HB_EXPORT BOOL hb_xvmEnumerate( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmEndEnumerate( void )
+BOOL hb_xvmEndEnumerate( void )
 {
    HB_THREAD_STUB_STACK
 
@@ -13443,7 +13443,7 @@ HB_EXPORT BOOL hb_xvmEndEnumerate( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
+void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -13466,7 +13466,7 @@ HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize,
    }
 }
 
-HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
+void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
 {
    BYTE *pBuffer;
 
@@ -13478,7 +13478,7 @@ HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pV
 }
 
 
-HB_EXPORT void hb_xvmDivert( BOOL bDivertOf )
+void hb_xvmDivert( BOOL bDivertOf )
 {
    hb_vmSetDivert( bDivertOf );
 }
@@ -13487,13 +13487,13 @@ HB_EXPORT void hb_xvmDivert( BOOL bDivertOf )
 /* The debugger support functions */
 /* ------------------------------ */
 
-HB_EXPORT void hb_vmRequestDebug( void )
+void hb_vmRequestDebug( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestDebug()"));
    s_bDebugRequest = TRUE;
 }
 
-HB_EXPORT BOOL hb_dbg_InvokeDebug( BOOL bInvoke )
+BOOL hb_dbg_InvokeDebug( BOOL bInvoke )
 {
    BOOL bRequest = s_bDebugRequest;
 
@@ -13501,7 +13501,7 @@ HB_EXPORT BOOL hb_dbg_InvokeDebug( BOOL bInvoke )
    return bRequest;
 }
 
-HB_EXPORT HB_DBGENTRY_FUNC hb_dbg_SetEntry( HB_DBGENTRY_FUNC pFunDbgEntry )
+HB_DBGENTRY_FUNC hb_dbg_SetEntry( HB_DBGENTRY_FUNC pFunDbgEntry )
 {
    HB_DBGENTRY_FUNC pPrevFunc = s_pFunDbgEntry;
 
@@ -13511,12 +13511,12 @@ HB_EXPORT HB_DBGENTRY_FUNC hb_dbg_SetEntry( HB_DBGENTRY_FUNC pFunDbgEntry )
    return pPrevFunc;
 }
 
-HB_EXPORT PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset )
+PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset )
 {
    return hb_arrayGetItemPtr( &s_aStatics, nStatic + nOffset );
 }
 
-HB_EXPORT ULONG hb_dbg_ProcLevel( void )
+ULONG hb_dbg_ProcLevel( void )
 {
    return s_ulProcLevel;
 }
@@ -13592,12 +13592,12 @@ HB_FUNC( HB_DBG_PROCLEVEL )
    hb_retnl( (LONG) s_ulProcLevel - 1 );   /* Don't count self */
 }
 
-HB_EXPORT ULONG hb_dbg_vmVarGCount( void )
+ULONG hb_dbg_vmVarGCount( void )
 {
    return hb_arrayLen( &s_aGlobals );
 }
 
-HB_EXPORT PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset )
+PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset )
 {
    return hb_arrayGetItemPtr( &s_aGlobals, nGlobal + nOffset );
 }

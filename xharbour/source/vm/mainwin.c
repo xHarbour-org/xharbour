@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.24 2008/03/20 13:07:51 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.25 2008/03/24 23:23:15 ronpinkas Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
 #if ( defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
 HB_EXTERN_BEGIN
-HB_EXPORT void hb_forceLinkMainWin( void ) {}
+void hb_forceLinkMainWin( void ) {}
 HB_EXTERN_END
 #endif
 

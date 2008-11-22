@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.12 2007/04/20 09:41:31 marchuet Exp $
+ * $Id: trim.c,v 1.13 2008/03/27 10:26:47 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 /* trims from the left, and returns a new pointer to szText */
 /* also returns the new length in lLen */
-HB_EXPORT char * hb_strLTrim( const char * szText, ULONG * ulLen )
+char * hb_strLTrim( const char * szText, ULONG * ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strLTrim(%s, %p)", szText, ulLen));
 
@@ -69,7 +69,7 @@ HB_EXPORT char * hb_strLTrim( const char * szText, ULONG * ulLen )
 }
 
 /* return length of szText ignoring trailing white space (or true spaces) */
-HB_EXPORT ULONG hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace )
+ULONG hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strRTrimLen(%s, %lu. %d)", szText, ulLen, (int) bAnySpace));
 

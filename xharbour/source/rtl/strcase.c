@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.22 2007/10/31 12:03:20 marchuet Exp $
+ * $Id: strcase.c,v 1.23 2007/11/13 21:34:11 likewolf Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 #endif
 
 /* converts szText to lower case. Does not create a new string! */
-HB_EXPORT char * hb_strLower( char * szText, ULONG ulLen )
+char * hb_strLower( char * szText, ULONG ulLen )
 {
    ULONG i;
 
@@ -80,7 +80,7 @@ HB_EXPORT char * hb_strLower( char * szText, ULONG ulLen )
    return szText;
 }
 
-HB_EXPORT char * hb_strLowerCopy( char * szText, ULONG ulLen )
+char * hb_strLowerCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -100,7 +100,7 @@ HB_EXPORT char * hb_strLowerCopy( char * szText, ULONG ulLen )
    return szCopy;
 }
 
-HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
+char * hb_strUpperCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -121,7 +121,7 @@ HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
 }
 
 /* converts szText to upper case. Does not create a new string! */
-HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
+char * hb_strUpper( char * szText, ULONG ulLen )
 {
    ULONG i;
 

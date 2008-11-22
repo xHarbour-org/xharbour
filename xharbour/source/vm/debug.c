@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.28 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: debug.c,v 1.29 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ static void hb_dbgStop(void)
 }
 
 HB_EXTERN_BEGIN
-HB_EXPORT PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
+PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 

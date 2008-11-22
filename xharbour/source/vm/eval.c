@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.36 2008/04/22 04:40:41 ronpinkas Exp $
+ * $Id: eval.c,v 1.37 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@
 #include "hbvm.h"
 #include "classes.h"
 
-HB_EXPORT BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalNew(%p, %p)", pEvalInfo, pItem));
 
@@ -108,7 +108,7 @@ HB_EXPORT BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
          all, don't release the eval parameter Items explicitly to make both
          Harbour and CA-Clipper happy. [vszakats] */
 
-HB_EXPORT BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalPutParam(%p, %p)", pEvalInfo, pItem));
 
@@ -122,7 +122,7 @@ HB_EXPORT BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
    return FALSE;
 }
 
-HB_EXPORT PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
+PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 {
    HB_THREAD_STUB
 
@@ -176,7 +176,7 @@ HB_EXPORT PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          once and only once before calling hb_evalRelease(). Harbour doesn't
          have these requirements. [vszakats] */
 
-HB_EXPORT BOOL hb_evalRelease( PEVALINFO pEvalInfo )
+BOOL hb_evalRelease( PEVALINFO pEvalInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalRelease(%p)", pEvalInfo));
 
@@ -206,7 +206,7 @@ HB_EXPORT BOOL hb_evalRelease( PEVALINFO pEvalInfo )
          [vszakats]
 */
 
-HB_EXPORT PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -308,7 +308,7 @@ HB_EXPORT PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
 */
-HB_EXPORT PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -357,7 +357,7 @@ HB_EXPORT PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDoC(), but has additional second parameter
          which set the reference mask for 1-st 32/64 parametes [druzus]
 */
-HB_EXPORT PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -429,7 +429,7 @@ HB_EXPORT PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
  */
 
 /* undocumented Clipper _cEval0() */
-HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock )
+void hb_evalBlock0( PHB_ITEM pCodeBlock )
 {
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pCodeBlock );
@@ -437,7 +437,7 @@ HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock )
 }
 
 /* undocumented Clipper _cEval1() */
-HB_EXPORT void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
+void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
 {
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pCodeBlock );
@@ -446,7 +446,7 @@ HB_EXPORT void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
 }
 
 /* same functionality but with a NULL terminated list of parameters */
-HB_EXPORT void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
+void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 {
    va_list args;
    UINT uiParams = 0;

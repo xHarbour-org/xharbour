@@ -4514,9 +4514,9 @@ saHtmlAnsiEntities := ;
 #include "hbfast.h"
 
 HB_EXTERN_BEGIN
-extern HB_EXPORT ULONG  hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string (case insensitive)*/
+extern ULONG  hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string (case insensitive)*/
 HB_EXTERN_END
-// extern HB_EXPORT int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
+// extern int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
 
 // Case insensitive string comparison to optimize this expression:
 // IF Lower( <cSubStr> ) == Lower( SubStr( <cString>, <nStart>, Len(<cSubStr>) ) )
@@ -4605,7 +4605,7 @@ HB_FUNC( PSTRCOMPI )
     }
 
 // Case insensitive hb_strAt() function
-ULONG HB_EXPORT hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+ULONG hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strAt(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
 

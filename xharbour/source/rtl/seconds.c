@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.14 2007/11/10 18:21:57 likewolf Exp $
+ * $Id: seconds.c,v 1.15 2008/03/09 19:18:25 likewolf Exp $
  */
 
 /*
@@ -71,7 +71,7 @@
    #define ftime _ftime
 #endif
 
-HB_EXPORT void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
+void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
 {
 #if defined(HB_OS_WIN_32)
    SYSTEMTIME st;
@@ -113,7 +113,7 @@ HB_EXPORT void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
 #endif
 }
 
-HB_EXPORT HB_ULONG hb_dateMilliSeconds( void )
+HB_ULONG hb_dateMilliSeconds( void )
 {
 #if defined(HB_OS_WIN_32)
    SYSTEMTIME st;
@@ -144,7 +144,7 @@ HB_EXPORT HB_ULONG hb_dateMilliSeconds( void )
 #endif
 }
 
-HB_EXPORT double hb_dateSeconds( void )
+double hb_dateSeconds( void )
 {
 #if defined(HB_OS_WIN_32)
    SYSTEMTIME SystemTime;
@@ -217,7 +217,7 @@ HB_FUNC( HB_CLOCKS2SECS )
     n == 12 cstime -> sum of the system CPU time of the current + child process
     n == 13 cu+cs  -> sum of cutime + cstime
 */
-HB_EXPORT double hb_secondsCPU( int n )
+double hb_secondsCPU( int n )
 {
    double d = 0.0;
 #if defined( HB_OS_WIN_32 )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.30 2007/11/07 20:20:57 likewolf Exp $
+ * $Id: dbgentry.c,v 1.31 2008/04/06 22:02:49 likewolf Exp $
  */
 
 /*
@@ -359,7 +359,7 @@ hb_dbgActivateVarArray( int nVars, HB_VARINFO *aVars )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
 {
    int i;
@@ -542,7 +542,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -783,7 +783,7 @@ hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cType, int nInd
 }
 
 
-HB_EXPORT void
+void
 hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -825,7 +825,7 @@ hb_dbgClearWatch( HB_WATCHPOINT *pWatch )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgDelBreak( void *handle, int nBreak )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -840,7 +840,7 @@ hb_dbgDelBreak( void *handle, int nBreak )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgDelWatch( void *handle, int nWatch )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1328,7 +1328,7 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
 }
 
 
-HB_EXPORT PHB_ITEM
+PHB_ITEM
 hb_dbgGetExpressionValue( void *handle, char *expression )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1347,7 +1347,7 @@ hb_dbgGetExpressionValue( void *handle, char *expression )
 }
 
 
-HB_EXPORT PHB_ITEM
+PHB_ITEM
 hb_dbgGetSourceFiles( void *handle )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1363,7 +1363,7 @@ hb_dbgGetSourceFiles( void *handle )
 }
 
 
-HB_EXPORT PHB_ITEM
+PHB_ITEM
 hb_dbgGetWatchValue( void *handle, int nWatch )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1399,7 +1399,7 @@ hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine )
 }
 
 
-HB_EXPORT BOOL
+BOOL
 hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1463,7 +1463,7 @@ hb_dbgQuit( HB_DEBUGINFO *info )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetCBTrace( void *handle, BOOL bCBTrace )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1472,7 +1472,7 @@ hb_dbgSetCBTrace( void *handle, BOOL bCBTrace )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetGo( void *handle )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1481,7 +1481,7 @@ hb_dbgSetGo( void *handle )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetInvoke( void *handle, BOOL ( *pFunInvoke )( void ) )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1490,7 +1490,7 @@ hb_dbgSetInvoke( void *handle, BOOL ( *pFunInvoke )( void ) )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetNextRoutine( void *handle )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1499,7 +1499,7 @@ hb_dbgSetNextRoutine( void *handle )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetQuit( void *handle )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1508,7 +1508,7 @@ hb_dbgSetQuit( void *handle )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetToCursor( void *handle, char *szModule, int nLine )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1519,7 +1519,7 @@ hb_dbgSetToCursor( void *handle, char *szModule, int nLine )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetTrace( void *handle )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
@@ -1529,7 +1529,7 @@ hb_dbgSetTrace( void *handle )
 }
 
 
-HB_EXPORT void
+void
 hb_dbgSetWatch( void *handle, int nWatch, char *szExpr, BOOL bTrace )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;

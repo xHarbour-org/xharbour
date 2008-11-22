@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.62 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: direct.c,v 1.63 2008/03/27 10:26:46 likewolf Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    }
 }
 
-HB_EXPORT void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
+void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
    USHORT    uiMask, uiMaskNoLabel;
    BYTE      *szDirSpec;
@@ -337,7 +337,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
    }
 }
 
-HB_EXPORT void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, char* szAttributes, BOOL bMatchCase )
+void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, char* szAttributes, BOOL bMatchCase )
 {
    static BOOL s_bTop = TRUE;
    char cCurDsk;

@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.10 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: ctwin.c,v 1.11 2008/11/19 05:24:51 andijahja Exp $
  */
 
 /*
@@ -1661,7 +1661,7 @@ static int hb_ctw_gt_ReadKey( PHB_GT pGT, int iEventMask )
 /* PUBLIC FUNCTIONS */
 HB_EXTERN_BEGIN
 
-HB_EXPORT BOOL hb_ctwInit( void )
+BOOL hb_ctwInit( void )
 {
    PHB_GT pGT = hb_gt_Base();
    BOOL fResult = FALSE;
@@ -1670,7 +1670,7 @@ HB_EXPORT BOOL hb_ctwInit( void )
    return fResult;
 }
 
-HB_EXPORT int  hb_ctwSetShadowAttr( int iAttr )
+int  hb_ctwSetShadowAttr( int iAttr )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1679,7 +1679,7 @@ HB_EXPORT int  hb_ctwSetShadowAttr( int iAttr )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwSetMoveMode( int iMode )
+int  hb_ctwSetMoveMode( int iMode )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1688,7 +1688,7 @@ HB_EXPORT int  hb_ctwSetMoveMode( int iMode )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
+int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1697,7 +1697,7 @@ HB_EXPORT int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
+int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1709,7 +1709,7 @@ HB_EXPORT int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRigh
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
+int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1718,7 +1718,7 @@ HB_EXPORT int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
+int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1730,7 +1730,7 @@ HB_EXPORT int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight,
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwCloseAllWindows( void )
+int  hb_ctwCloseAllWindows( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1742,7 +1742,7 @@ HB_EXPORT int  hb_ctwCloseAllWindows( void )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwCloseWindow( int iWindow )
+int  hb_ctwCloseWindow( int iWindow )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1754,7 +1754,7 @@ HB_EXPORT int  hb_ctwCloseWindow( int iWindow )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwCurrentWindow( void )
+int  hb_ctwCurrentWindow( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1763,7 +1763,7 @@ HB_EXPORT int  hb_ctwCurrentWindow( void )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwSelectWindow( int iWindow )
+int  hb_ctwSelectWindow( int iWindow )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1775,7 +1775,7 @@ HB_EXPORT int  hb_ctwSelectWindow( int iWindow )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwMaxWindow( void )
+int  hb_ctwMaxWindow( void )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = 0;
@@ -1784,7 +1784,7 @@ HB_EXPORT int  hb_ctwMaxWindow( void )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight )
+int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1793,7 +1793,7 @@ HB_EXPORT int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBotto
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
+int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1802,7 +1802,7 @@ HB_EXPORT int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
+int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1811,7 +1811,7 @@ HB_EXPORT int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, i
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
+int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1820,7 +1820,7 @@ HB_EXPORT int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
+int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1829,7 +1829,7 @@ HB_EXPORT int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
+int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
 {
    PHB_GT pGT = hb_gt_Base();
    int iResult = -1;
@@ -1841,7 +1841,7 @@ HB_EXPORT int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
    return iResult;
 }
 
-HB_EXPORT int  hb_ctwLastKey( void )
+int  hb_ctwLastKey( void )
 {
    /* keyread() in CT3 uses 64512 bytes length buffer
     * when it reach this limit and new key is added the

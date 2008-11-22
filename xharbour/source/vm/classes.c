@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.226 2008/09/27 04:10:57 ronpinkas Exp $
+ * $Id: classes.c,v 1.227 2008/10/22 11:51:15 marchuet Exp $
  */
 
 /*
@@ -217,7 +217,7 @@ USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass
 
 /* All functions contained in classes.c */
 
-HB_EXPORT void     hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
+void     hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend );
 
 static USHORT   hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos );
@@ -877,7 +877,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
    return TRUE;
 }
 
-HB_EXPORT BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
+BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
 {
    USHORT uiAt;
 
@@ -914,7 +914,7 @@ HB_EXPORT BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
  * Get the class name of an object
  *
  */
-HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
+char * hb_objGetClsName( PHB_ITEM pObject )
 {
    char * szClassName;
    USHORT uiClass = hb_objClassH( pObject );
@@ -988,7 +988,7 @@ HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
  * of inheritance.
  *
  */
-HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
+USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
 {
    HB_THREAD_STUB
 
@@ -1026,7 +1026,7 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
    return uiClass;
 }
 
-HB_EXPORT char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
+char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p, %s)", pObject, szName));
 
@@ -1082,7 +1082,7 @@ HB_EXPORT char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
    return "UNKNOWN";
 }
 
-HB_EXPORT ULONG hb_objGetOpOver( const PHB_ITEM pObject )
+ULONG hb_objGetOpOver( const PHB_ITEM pObject )
 {
    USHORT uiClass = hb_objClassH( pObject );
 
@@ -1096,7 +1096,7 @@ HB_EXPORT ULONG hb_objGetOpOver( const PHB_ITEM pObject )
    return 0;
 }
 
-HB_EXPORT PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject )
+PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject )
 {
    USHORT uiClass = hb_objClassH( pObject );
 
@@ -1204,7 +1204,7 @@ static void hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt )
  *
  * Internal function to the function pointer of a message of an object
  */
-HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
+PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
    BOOL bSymbol;
    PHB_FUNC pFunc = hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE, &bSymbol );
@@ -1221,7 +1221,7 @@ HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
    return pFunc;
 }
 
-HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol )
+PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
@@ -1358,7 +1358,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    return NULL;
 }
 
-HB_EXPORT BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
 
@@ -1395,7 +1395,7 @@ HB_EXPORT BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
    return FALSE;
 }
 
-HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
+PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
 {
    PCLASS pClass = s_pClasses + ( uiClass - 1 );
    USHORT uiAt;
@@ -1413,7 +1413,7 @@ HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
    return NULL;
 }
 
-HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
+PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
    USHORT uiClass;
 
@@ -1437,12 +1437,12 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  *
  * <uPtr> should be read as a boolean
  */
-HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
+PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
    return hb_objGetMessage( pObject, szString, NULL );
 }
 
-HB_EXPORT BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
+BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
 {
    BOOL bSymbol = FALSE;
 
@@ -2612,7 +2612,7 @@ HB_FUNC( __CLSNEW )
    hb_retni( uiClass );
 }
 
-HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
+BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
 {
    PCLASS pClass = s_pClasses;
    UINT uiPos = s_uiClasses;
@@ -2773,7 +2773,7 @@ HB_FUNC( __CLSINST )
  *
  * Create a (super)object from class definition <hClass>
  */
-HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
+void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -3164,7 +3164,7 @@ HB_FUNC( __OBJHASMSG )
  * Clone an object. Note the similarity with aClone ;-)
  */
 
-HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pSrcObject )
+PHB_ITEM hb_objClone( PHB_ITEM pSrcObject )
 {
    if( pSrcObject && HB_IS_OBJECT( pSrcObject ) )
    {
@@ -3286,7 +3286,7 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
    return hb_stackReturnItem();
 }
 
-HB_EXPORT void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... )
+void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... )
 {
    hb_vmPushSymbol( pMsgSym->pSymbol );
    hb_vmPush( pObject );
@@ -3698,7 +3698,7 @@ HB_FUNC( __SENDER )
  *
  * based on hb___msgClsH( void )
  */
-HB_EXPORT USHORT hb_objClassH( PHB_ITEM pObject )
+USHORT hb_objClassH( PHB_ITEM pObject )
 {
    USHORT uiClass;
 
@@ -4694,7 +4694,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
    }
 }
 
-HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
+PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 {
    USHORT uiClass;
 
@@ -4752,7 +4752,7 @@ HB_FUNC( HB_OBJMSGPTR )
  * Param: the name of the class
  * output: the position of the class in the array of classes, or nothing.
  */
-HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName )
+UINT hb_clsGetHandleFromName( char *szClassName )
 {
    PCLASS start = s_pClasses;
    USHORT uPos = 0;
@@ -4840,7 +4840,7 @@ HB_FUNC( __SETCLASSSCOPE )
 }
 
 
-HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope )
+BOOL hb_clsSetScope( BOOL bClsScope )
 {
    BOOL bOldClsScope = s_bClsScope;
 

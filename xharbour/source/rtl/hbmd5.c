@@ -1,5 +1,5 @@
 /*
- * $Id: hbmd5.c 9014 2008-07-28 10:37:57Z druzus $
+ * $Id: hbmd5.c,v 1.4 2008/09/06 06:24:03 andijahja Exp $
  */
 
 /*
@@ -274,7 +274,7 @@ static void hb_md5digest( BYTE * md5val, char * digest )
    }
 }
 
-HB_EXPORT void hb_md5( BYTE * ucData, ULONG ulLen, BYTE * ucDigest )
+void hb_md5( BYTE * ucData, ULONG ulLen, BYTE * ucDigest )
 {
    UCHAR buf[ 128 ];
    MD5_BUF md5;
@@ -316,7 +316,7 @@ HB_EXPORT void hb_md5( BYTE * ucData, ULONG ulLen, BYTE * ucDigest )
    hb_md5val( md5.accum, ucDigest );
 }
 
-HB_EXPORT void hb_md5file( FHANDLE hFile, BYTE * ucDigest )
+void hb_md5file( FHANDLE hFile, BYTE * ucDigest )
 {
    MD5_BUF md5;
    ULONG n;
