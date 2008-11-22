@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.235 2008/07/30 11:29:08 marchuet Exp $
+# $Id: makefile.bc,v 1.236 2008/11/21 05:10:07 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -148,6 +148,11 @@ $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 +)
 !
 
+!if ("$(DV_MEMCPY)" == "1")
+COMMON_LIB_OBJS=\
+	$(COMMON_LIB_OBJS)\
+	$(OBJ_DIR)\dvmemcpy.obj
+!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
@@ -395,6 +400,15 @@ COMPILERLIBS=\
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
+!endif
+
+#===============================================================================
+# DANIEL VIK MEMCPY
+#===============================================================================
+!if ("$(DV_MEMCPY)" == "1")
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(OBJ_DIR)\dvmemcpy.obj
 !endif
 
 #===============================================================================

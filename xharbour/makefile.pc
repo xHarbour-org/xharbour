@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.72 2008/05/06 05:47:54 andijahja Exp $
+# $Id: makefile.pc,v 1.73 2008/07/12 14:10:25 modalsist Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -92,6 +92,11 @@ $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
 	$(LIB_CMD)
 
+!if ("$(DV_MEMCPY)" == "1")
+COMMON_LIB_OBJS=\
+	$(COMMON_LIB_OBJS)\
+	$(OBJ_DIR)\dvmemcpy.obj
+!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.50 2008/07/30 11:29:08 marchuet Exp $
+# $Id: makefile.gc,v 1.51 2008/11/21 05:10:07 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -140,6 +140,10 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
+ifeq ($(DV_MEMCPY),1)
+COMMON_LIB_OBJS+=\
+	$(OBJ_DIR)/dvmemcpy.o
+endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -274,6 +278,14 @@ endif
 
 HARBOUR_DLL_OBJS+=\
 	$(RDDADS_LIB_OBJS)
+endif
+
+#===============================================================================
+# DANIEL VIK MEMCPY
+#===============================================================================
+ifeq ($(DV_MEMCPY),1)
+HARBOUR_DLL_OBJS+=\
+	$(OBJ_DIR)/dvmemcpy.o
 endif
 
 #===============================================================================

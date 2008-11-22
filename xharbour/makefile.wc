@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.91 2008/07/30 11:29:09 marchuet Exp $
+# $Id: makefile.wc,v 1.92 2008/11/21 05:10:07 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -122,6 +122,11 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
+!if ("$(DV_MEMCPY)" == "1")
+COMMON_LIB_OBJS=\
+	$(COMMON_LIB_OBJS)\
+	$(OBJ_DIR)\dvmemcpy.obj
+!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -245,6 +250,15 @@ COMPILERLIBS=\
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
+!endif
+
+#===============================================================================
+# DANIEL VIK MEMCPY
+#===============================================================================
+!if ("$(DV_MEMCPY)" == "1")
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(OBJ_DIR)\dvmemcpy.obj
 !endif
 
 #===============================================================================

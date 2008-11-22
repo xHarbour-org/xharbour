@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.26 2008/10/24 19:38:49 lculik Exp $
+# $Id: compile.mak,v 1.27 2008/11/21 05:10:07 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -61,6 +61,9 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 #===============================================================================
 # COMMON.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)dvmemcpy$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)dvmemcpy.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbfopen$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfopen.c
 	$(CC_CMD)
 
