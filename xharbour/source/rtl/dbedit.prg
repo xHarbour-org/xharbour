@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.52 2008/08/26 20:18:20 andijahja Exp $
+ * $Id: dbedit.prg,v 1.53 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -95,6 +95,7 @@
 #ifndef DE_APPEND
 #define DE_APPEND  3
 #endif
+
 
 FUNCTION DBEdit( nTop,;
                  nLeft,;               
@@ -520,8 +521,8 @@ RETURN .T.
 *------------------------------------------------------*
 STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, oTBR)
 *------------------------------------------------------*
-LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,;
-      nKeyNo
+LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged
+
 
   nRet := DE_CONT
 
@@ -561,6 +562,11 @@ LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,;
      oTBR:DeHilite()
      oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{1,2})
 
+  elseif nMode == DE_IDLE .or. nMode == DE_EMPTY
+
+     keyboard chr(0)
+     inkey()
+
   endif
 
   lDeleted := Deleted()
@@ -569,6 +575,7 @@ LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,;
 
   // Call UDF
   nRet := dbe_return( Eval(bFunc, nMode, nColPos, oTBR) )
+
 
   // A change was occurred on UDF (append, delete or skip).
   lChanged := ( nLastRec != LastRec() .or.;
@@ -580,28 +587,36 @@ LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,;
      Return nRet
   endif
 
-  // The UDF has changed file, so dbedit need to be refreshed.
+  // The UDF has changed db/record, so dbedit need to be refreshed.
   if lChanged 
 
-     if LastRec() > nLastRec  // append blank
+     if LastRec() > nLastRec  // append.
+
         nKey := nextkey()
+
         if ( nKey != 0 .and. ! dbe_CursorKey(nKey) ) .or.;
            ordkeyno() < oTBR:RowPos
            oTBR:Gotop()
         endif
-     elseif LastRec() < nLastRec  // Pack
+
+     elseif LastRec() < nLastRec  // pack
+
         oTBR:RowPos := 1
-     elseif Deleted() .and. Lastrec() != 0
-        if SET(_SET_DELETED)
-           dbSkip()
-        endif
-     elseif nRec != Recno()
-        if indexord() != 0
-           nKeyNo := ordkeyno()
+
+     elseif Deleted() .and. Lastrec() != 0  // deleted
+
+        if SET( _SET_DELETED )
+           while ! eof() .and. deleted()
+              dbSkip()
+           enddo
         else
-           nKeyNo := recno()
+           dbe_syncpos(oTBR)
         endif
-        oTBR:RowPos := nKeyNo
+
+     elseif nRec != Recno() // moved.
+
+        dbe_syncpos(oTBR)
+
      endif
 
      if eof() .and. Lastrec() > 0 
@@ -763,3 +778,45 @@ Local aKeys := { K_LEFT,;
                  K_CTRL_PGDN }
 
 Return ( AScan( aKeys, nKey ) != 0 )
+
+*--------------------------------*
+STATIC FUNCTION dbe_syncpos(oTb)
+*--------------------------------*
+local nRec := Recno()
+local nKeyNo := OrdKeyNo()
+local nDel := 0
+
+ if IndexOrd() != 0 
+
+    dbSkip(-1)
+
+    if bof()
+       oTb:RowPos := 1
+    else
+       if ! Set( _SET_DELETED ) 
+          dbGoto(nRec)
+          oTb:RowPos := nKeyNo
+       else
+          Set( _SET_DELETED , .F.)
+          dbGotop()
+          while ! eof() .and. recno() != nRec
+             if deleted()
+                nDel++
+             endif
+             dbskip()
+          enddo
+          dbGoto(nRec)
+          oTb:RowPos := nKeyNo - nDel
+          Set( _SET_DELETED , .T.)
+       endif
+    endif
+
+ else
+
+    if nRec < oTb:RowCount
+       oTb:RowPos := nRec
+    endif
+
+ endif
+
+RETURN NIL
