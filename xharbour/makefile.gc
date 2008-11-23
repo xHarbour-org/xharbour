@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.51 2008/11/21 05:10:07 andijahja Exp $
+# $Id: makefile.gc,v 1.52 2008/11/22 08:25:22 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -92,6 +92,7 @@ HARBOUR_LIBS=\
 	-lbmdbfcdx$(HB_MT)\
 	-lsixcdx$(HB_MT)\
 	-ldbfntx$(HB_MT)\
+	-lrtl$(HB_MT)\
 	-ldbffpt$(HB_MT)\
 	-lhbsix$(HB_MT)\
 	-lhsx$(HB_MT)\
