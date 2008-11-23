@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.124 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: fastitem.c,v 1.125 2008/11/22 11:22:19 andijahja Exp $
  */
 
 /*
@@ -945,7 +945,7 @@ void hb_itemPushStaticString( const char * szText, ULONG length )
 }
 
 #undef hb_retcAdopt
-void HB_EXPORT hb_retcAdopt( char * szText )
+void hb_retcAdopt( char * szText )
 {
    HB_THREAD_STUB
 
@@ -985,7 +985,7 @@ void HB_EXPORT hb_retcAdopt( char * szText )
 }
 
 #undef hb_retclenAdopt
-void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
+void hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 
@@ -1022,7 +1022,7 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 }
 
 #undef hb_retclenAdoptRaw
-void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
+void hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 
@@ -1055,7 +1055,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 }
 
 #undef hb_retcStatic
-void HB_EXPORT hb_retcStatic( const char * szText )
+void hb_retcStatic( const char * szText )
 {
    HB_THREAD_STUB
 
@@ -1073,7 +1073,7 @@ void HB_EXPORT hb_retcStatic( const char * szText )
 }
 
 #undef hb_retclenStatic
-void HB_EXPORT hb_retclenStatic( const char * szText, ULONG ulLen )
+void hb_retclenStatic( const char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 

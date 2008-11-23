@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6269 2008/11/22 12:23:19 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6270 2008/11/22 22:43:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-23 10:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/vm/maindll.h
+     - commented hb_vmProcessSymbols(), because it is defined in hvm.c
+       Having this function in maindllh.c causes application cannot find
+       starting procedure (Internal Error: 9013).
+
+   * include/hbstack.h
+   * include/hbapi.h
+     ! prototype fix: hb_retdts() : char* -> const char *
+     ! rearrange function proto declaration so that function body does not
+       require to bear HB_EXPORT attribute.
+
+   * source/vm/estack.c
+   * source/vm/extend.c
+   * source/vm/fastitem.c
+     - remove (again) HB_EXPORT attributes. (Thanks to Przemek)
 
 2008-11-22 18:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/estack.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.246 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbapi.h,v 1.247 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -390,30 +390,30 @@ extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before relea
 
 /* Extend API */
 extern HB_FORCE_EXPORT char *     hb_parc( int iParam, ... );  /* retrieve a string parameter */
-extern HB_EXPORT char *     hb_parcx( int iParam, ... );  /* retrieve a string parameter */
+extern HB_EXPORT       char *     hb_parcx( int iParam, ... );  /* retrieve a string parameter */
 extern HB_FORCE_EXPORT ULONG      hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
 extern HB_FORCE_EXPORT ULONG      hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
 extern HB_FORCE_EXPORT char *     hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
-extern HB_EXPORT char *     hb_pardts( int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
+extern HB_EXPORT       char *     hb_pardts( int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
 extern HB_FORCE_EXPORT char *     hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
-extern HB_EXPORT char *     hb_pardtsbuff( char * szDateTime, int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
-extern HB_EXPORT LONG       hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
-extern HB_EXPORT LONG       hb_part( int iParam, ... ); /* retrieve a time part from a datetime as long in milliseconds */
-extern HB_EXPORT double     hb_pardtd( int iParam, ... ); /* retrieve a datetime as double - number of days from Julian's day plus time as decimal part of date */
-extern HB_EXPORT double     hb_pardtsec( int iParam, ... ); /* retrieve a datetime as double - number of seconds from Julian's day plus time */
+extern HB_EXPORT       char *     hb_pardtsbuff( char * szDateTime, int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
+extern HB_EXPORT       LONG       hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
+extern HB_EXPORT       LONG       hb_part( int iParam, ... ); /* retrieve a time part from a datetime as long in milliseconds */
+extern HB_EXPORT       double     hb_pardtd( int iParam, ... ); /* retrieve a datetime as double - number of days from Julian's day plus time as decimal part of date */
+extern HB_EXPORT       double     hb_pardtsec( int iParam, ... ); /* retrieve a datetime as double - number of seconds from Julian's day plus time */
 extern HB_FORCE_EXPORT ULONG      hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
 extern HB_FORCE_EXPORT ULONG      hb_parinfo( int iParam ); /* Determine the param count or data type */
 extern HB_FORCE_EXPORT int        hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
 extern HB_FORCE_EXPORT double     hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
 extern HB_FORCE_EXPORT int        hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
 extern HB_FORCE_EXPORT LONG       hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a LONG */
-extern HB_EXPORT HB_LONG    hb_parnint( int iParam, ... ); /* retrieve a numeric parameter as a HB_LONG */
-extern HB_EXPORT void *     hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
-extern HB_EXPORT void *     hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... ); /* retrieve a parameter as a pointer if it's a pointer to GC allocated block */
+extern HB_EXPORT       HB_LONG    hb_parnint( int iParam, ... ); /* retrieve a numeric parameter as a HB_LONG */
+extern HB_EXPORT       void *     hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
+extern HB_EXPORT       void *     hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... ); /* retrieve a parameter as a pointer if it's a pointer to GC allocated block */
 extern HB_FORCE_EXPORT PHB_ITEM   hb_param( int iParam, LONG lMask ); /* retrieve a generic parameter */
 extern HB_FORCE_EXPORT PHB_ITEM   hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern HB_FORCE_EXPORT BOOL       hb_extIsArray( int iParam );
-extern HB_EXPORT BOOL       hb_extIsObject( int iParam );
+extern HB_EXPORT       BOOL       hb_extIsObject( int iParam );
 
 #ifndef HB_LONG_LONG_OFF
 extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric parameter as a double */
@@ -430,6 +430,47 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
 #define HB_VAR_PARAM_FLAG      0x00FF
 #define HB_VAR_PARAM_NONE      0xFFFE
 #define HB_VAR_PARAM_NOERR     0xFFFD
+
+/* JC1: including thread anyways, because it defines some void macros when not in MT
+   hbstack.h includes thread.h */
+#ifndef HB_COMP_H_
+   #include "hbstack.h"
+#endif
+
+extern HB_FORCE_EXPORT int    hb_pcount( void );          /* returns the number of suplied parameters */
+extern HB_FORCE_EXPORT void   hb_ret( void );             /* post a NIL return value */
+extern HB_FORCE_EXPORT void   hb_retc( const char * szText );   /* returns a string */
+extern HB_FORCE_EXPORT void   hb_retclen( const char * szText, ULONG ulLen ); /* returns a string with a specific length */
+extern HB_EXPORT       void   hb_retcAdopt( char * szText );
+extern HB_EXPORT       void   hb_retclenAdopt( char * szText, ULONG ulLen );
+extern HB_EXPORT       void   hb_retclenAdoptRaw( char * szText, ULONG ulLen );
+extern HB_EXPORT       void   hb_retcStatic( const char * szText );
+extern HB_EXPORT       void   hb_retclenStatic( const char * szText, ULONG ulLen );
+extern HB_EXPORT       void   hb_retclenRaw( char * szText, ULONG ulLen );
+extern HB_EXPORT       void   hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
+extern HB_FORCE_EXPORT void   hb_retdts( const char * szDateTime );  /* returns a date, must use yyyymmdd hh:mm:ss.cc format */
+extern HB_FORCE_EXPORT void   hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */
+extern HB_FORCE_EXPORT void   hb_retdl( LONG lJulian );   /* returns a LONG value as a julian date */
+extern HB_EXPORT       void   hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm ); /* returns a datetime */
+extern HB_EXPORT       void   hb_retdtd( double dDateTime ); /* returns a datetime as double */
+extern HB_EXPORT       void   hb_retdtl( LONG lDate, LONG lTime ); /* returns a datetime as Julian›s date and seconds */
+extern HB_FORCE_EXPORT void   hb_retl( int iTrueFalse );  /* returns a logical integer */
+extern HB_FORCE_EXPORT void   hb_retnd( double dNumber ); /* returns a double */
+extern HB_FORCE_EXPORT void   hb_retni( int iNumber );    /* returns a integer number */
+extern HB_FORCE_EXPORT void   hb_retnl( LONG lNumber );   /* returns a LONG number */
+extern HB_FORCE_EXPORT void   hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+extern HB_FORCE_EXPORT void   hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+extern HB_FORCE_EXPORT void   hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
+extern HB_FORCE_EXPORT void   hb_retnllen( LONG lNumber, int iWidth ); /* returns a LONG number, with specific width */
+extern HB_FORCE_EXPORT void   hb_reta( ULONG ulLen );  /* returns an array with a specific length */
+extern HB_EXPORT       void   hb_retptr( void * voidPtr );  /* returns a pointer */
+extern HB_EXPORT       void   hb_retptrGC( void * voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
+extern HB_EXPORT       void   hb_retnint( HB_LONG llNumber );
+extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
+#ifndef HB_LONG_LONG_OFF
+    extern HB_EXPORT   void   hb_retnll( LONGLONG llNumber ); /* returns a long long int */
+    extern HB_EXPORT   void   hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
+#endif
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
@@ -472,53 +513,6 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnintlen( llNumber, iWidth )    hb_itemPutNIntLen( hb_stackReturnItem(), (llNumber), (iWidth) )
     #define hb_retnll( llNumber )                hb_itemPutNLL( hb_stackReturnItem(), (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( hb_stackReturnItem(), (llNumber), (iWidth) )
-
-#else
-   /* JC1: including thread anyways, because it defines some void macros when not in MT
-      hbstack.h includes thread.h */
-   #ifndef HB_COMP_H_
-      #include "hbstack.h"
-   #endif
-    extern HB_FORCE_EXPORT int    hb_pcount( void );          /* returns the number of suplied parameters */
-
-    extern HB_FORCE_EXPORT void   hb_ret( void );             /* post a NIL return value */
-    extern HB_FORCE_EXPORT void   hb_retc( const char * szText );   /* returns a string */
-    extern HB_FORCE_EXPORT void   hb_retclen( const char * szText, ULONG ulLen ); /* returns a string with a specific length */
-
-    extern HB_EXPORT void   hb_retcAdopt( char * szText );
-    extern HB_EXPORT void   hb_retclenAdopt( char * szText, ULONG ulLen );
-    extern HB_EXPORT void   hb_retclenAdoptRaw( char * szText, ULONG ulLen );
-
-    extern HB_EXPORT void   hb_retcStatic( const char * szText );
-    extern HB_EXPORT void   hb_retclenStatic( const char * szText, ULONG ulLen );
-
-    extern HB_EXPORT void   hb_retclenRaw( char * szText, ULONG ulLen );
-
-    extern HB_EXPORT void   hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
-    extern HB_FORCE_EXPORT void   hb_retdts( char * szDateTime );  /* returns a date, must use yyyymmdd hh:mm:ss.cc format */
-    extern HB_FORCE_EXPORT void   hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */
-    extern HB_FORCE_EXPORT void   hb_retdl( LONG lJulian );   /* returns a LONG value as a julian date */
-    extern HB_EXPORT void   hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm ); /* returns a datetime */
-    extern HB_EXPORT void   hb_retdtd( double dDateTime ); /* returns a datetime as double */
-    extern HB_EXPORT void   hb_retdtl( LONG lDate, LONG lTime ); /* returns a datetime as Julian›s date and seconds */
-    extern HB_FORCE_EXPORT void   hb_retl( int iTrueFalse );  /* returns a logical integer */
-    extern HB_FORCE_EXPORT void   hb_retnd( double dNumber ); /* returns a double */
-    extern HB_FORCE_EXPORT void   hb_retni( int iNumber );    /* returns a integer number */
-    extern HB_FORCE_EXPORT void   hb_retnl( LONG lNumber );   /* returns a LONG number */
-    extern HB_FORCE_EXPORT void   hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-    extern HB_FORCE_EXPORT void   hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-    extern HB_FORCE_EXPORT void   hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
-    extern HB_FORCE_EXPORT void   hb_retnllen( LONG lNumber, int iWidth ); /* returns a LONG number, with specific width */
-    extern HB_FORCE_EXPORT void   hb_reta( ULONG ulLen );  /* returns an array with a specific length */
-    extern HB_EXPORT void   hb_retptr( void * voidPtr );  /* returns a pointer */
-    extern HB_EXPORT void   hb_retptrGC( void * voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
-    extern HB_EXPORT void   hb_retnint( HB_LONG llNumber );
-    extern HB_EXPORT void   hb_retnintlen( HB_LONG llNumber, int iWidth );
-#ifndef HB_LONG_LONG_OFF
-    extern HB_EXPORT void   hb_retnll( LONGLONG llNumber ); /* returns a long long int */
-    extern HB_EXPORT void   hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
-#endif
-
 #endif
 
 extern HB_FORCE_EXPORT void    hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */

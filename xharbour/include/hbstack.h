@@ -1,5 +1,5 @@
-/*	
- * $Id: hbstack.h,v 1.52 2008/11/05 03:03:16 walito Exp $
+/*
+ * $Id: hbstack.h,v 1.53 2008/11/20 23:16:28 andijahja Exp $
  */
 
 /*
@@ -159,6 +159,34 @@ typedef struct
    LONG lStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
+extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
+extern HB_EXPORT LONG        hb_stackTopOffset( void );
+extern HB_EXPORT LONG        hb_stackBaseOffset( void );
+extern HB_EXPORT LONG        hb_stackTotalItems( void );   
+extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
+extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
+extern HB_EXPORT char *      hb_stackDateBuffer( void );
+
+extern PHB_STACKRDD hb_stackRDD( void );
+
+extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
+extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
+extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
+extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
+extern HB_EXPORT void        hb_stackPushReturn( void );
+extern HB_EXPORT void        hb_stackPopReturn( void );
+
+extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
+extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
+
+extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
+extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
+
+
 #if defined( HB_STACK_MACROS )
 
 #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (int)(n) ) )
@@ -228,35 +256,6 @@ typedef struct
                                          ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) ) )
 */
 #define hb_stackLocalVariable( p )  ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) )
-
-#else
-
-extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
-extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
-extern HB_EXPORT LONG        hb_stackTopOffset( void );
-extern HB_EXPORT LONG        hb_stackBaseOffset( void );
-extern HB_EXPORT LONG        hb_stackTotalItems( void );   
-extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
-extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
-extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
-extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
-extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
-extern HB_EXPORT char *      hb_stackDateBuffer( void );
-
-extern PHB_STACKRDD hb_stackRDD( void );
-
-extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
-extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
-extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
-extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
-extern HB_EXPORT void        hb_stackPushReturn( void );
-extern HB_EXPORT void        hb_stackPopReturn( void );
-
-extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
-extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
-
-extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
-extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 
 #endif
 
