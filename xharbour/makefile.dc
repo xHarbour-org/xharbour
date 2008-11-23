@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.48 2008/07/30 11:29:08 marchuet Exp $
+# $Id: makefile.dc,v 1.49 2008/11/21 05:10:07 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -248,7 +248,7 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLLEXE_LINK_CMD=LINK $**,$@,,$(HARBOUR_DLL_LIB)+$(COMPILERLIBS)/noi;
+DLLEXE_LINK_CMD=LINK $**,$@,,dllmain.lib $(HARBOUR_DLL_LIB)+$(COMPILERLIBS)/noi;
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked

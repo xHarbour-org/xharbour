@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.695 2008/11/18 17:55:58 marchuet Exp $
+ * $Id: hvm.c,v 1.696 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -10110,11 +10110,11 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 #ifdef DEBUG_SYMBOLS
    if( fDynLib )
    {
-       TraceLog( NULL, "Module: '%s' is DYNAMIC\n", szModuleName );
+      TraceLog( NULL, "Module: '%s' is DYNAMIC\n", szModuleName );
    }
    else
    {
-       TraceLog( NULL, "Module: '%s' is NOT DYNAMIC\n", szModuleName );
+      TraceLog( NULL, "Module: '%s' is NOT DYNAMIC\n", szModuleName );
    }
 #endif
 
@@ -10168,7 +10168,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
 
          #ifdef DEBUG_SYMBOLS
-            TraceLog( NULL, "Public: '%s' of Module: '%s'\n", pSymbol->szName, szModuleName );
+            TraceLog( NULL, "Public: '%s' of Module: '%s' is: %s\n", pSymbol->szName, szModuleName, ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL ? "LOCAL" : "IMPORTED" );
          #endif
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
@@ -10190,6 +10190,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          }
 #endif
 
+         //#define TRACE_DUPLICATE_FUNCTIONS
+
          if( fDynLib )
          {
             if( pSymbol->value.pFunPtr || ( hSymScope & HB_FS_DEFERRED ) )
@@ -10200,23 +10202,120 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                 if( pDynSym )
                 {
-                   pSymbol->pDynSym = pDynSym;
-
-                   // Should we support dynamic overloading of already resolved HB_FS_DEFERRED as per below?
-                   if( pDynSym->pSymbol->value.pFunPtr )
-                   {
-                      if( ( pSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pSymbol->value.pFunPtr == NULL */ )
-                      {
-                         pSymbol->scope.value = (  hSymScope & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
-                         pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
-                      }
-                   }
-                   else if( pSymbol->value.pFunPtr )
+                   if( ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
                    {
                       PSYMBOLS pModuleSymbols;
 
-                      pDynSym->pSymbol = pSymbol;
-                      pDynSym->pModuleSymbols = pNewSymbols;
+                      assert( pSymbol->value.pFunPtr );
+
+                      if( ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) != HB_FS_LOCAL )
+                      {
+                         // This is the first candidate of true local symbol.
+                         pDynSym->pSymbol = pSymbol;
+                         pDynSym->pModuleSymbols = pNewSymbols;
+                      }
+                      else if( pDynSym->pSymbol->value.pFunPtr == pSymbol->value.pFunPtr )
+                      {
+                         #ifdef HB_STARTUP_REVERSED_LINK_ORDER
+
+                           #ifdef TRACE_DUPLICATE_FUNCTIONS
+                              /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                              TraceLog( NULL, "*** WARNING! Function: %s in Module: %s shadows previously registered Module: %s\n",
+                                        pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+                           #endif
+
+                           pDynSym->pSymbol = pSymbol;
+                           pDynSym->pModuleSymbols = pNewSymbols;
+
+                         #else
+
+                           if( pDynSym->pSymbol->scope.value & HB_FS_DYNCODE )
+                           {
+                              #ifdef TRACE_DUPLICATE_FUNCTIONS
+                                 /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                                 TraceLog( NULL, "*** WARNING! Function: %s in Module: %s shadows previously registered DYNAMIC Module: %s\n",
+                                           pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+                              #endif
+
+                              // The prior function was loaded from a DLL, so later registration must always take effect!
+                              pDynSym->pSymbol = pSymbol;
+                              pDynSym->pModuleSymbols = pNewSymbols;
+                           }
+                           else
+                           {
+                              #ifdef TRACE_DUPLICATE_FUNCTIONS
+                                 /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                                 TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously linked Module: %s\n",
+                                           pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+                              #endif
+                           }
+
+                         #endif
+                      }
+                      else
+                      {
+                         assert( pDynSym->pSymbol->value.pFunPtr );
+
+                         #ifdef HB_STARTUP_REVERSED_LINK_ORDER
+
+                           #ifdef TRACE_DUPLICATE_FUNCTIONS
+                              /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                              TraceLog( NULL, "*** WARNING! Function: %s duplicate definition %p in Module: %s shadows previously registered Module: %s Definition %p\n",
+                                        pSymbol->szName, pSymbol->value.pFunPtr, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>", pDynSym->pSymbol->value.pFunPtr );
+                           #endif
+
+                           pDynSym->pSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
+
+                           pDynSym->pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
+                           pDynSym->pSymbol->scope.value |= ( pSymbol->scope.value & HB_FS_PCODEFUNC );
+
+                           pDynSym->pSymbol = pSymbol;
+                           pDynSym->pModuleSymbols = pNewSymbols;
+
+                         #else
+
+                           if( pDynSym->pSymbol->scope.value & HB_FS_DYNCODE )
+                           {
+                              #ifdef TRACE_DUPLICATE_FUNCTIONS
+                                 /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                                 TraceLog( NULL, "*** WARNING! Function: %s duplicate definition %p in Module: %s shadows previously registered DYNAMIC Module: %s Definition %p\n",
+                                           pSymbol->szName, pSymbol->value.pFunPtr, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>", pDynSym->pSymbol->value.pFunPtr );
+                              #endif
+
+                              // The prior function was loaded from a DLL, so later registration must always take effect!
+                              pDynSym->pSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
+
+                              pDynSym->pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
+                              pDynSym->pSymbol->scope.value |= ( pSymbol->scope.value & HB_FS_PCODEFUNC );
+
+                              pDynSym->pSymbol = pSymbol;
+                              pDynSym->pModuleSymbols = pNewSymbols;
+                           }
+                           else
+                           {
+                              #ifdef TRACE_DUPLICATE_FUNCTIONS
+                                 /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                                 TraceLog( NULL, "*** WARNING! Function: %s Duplicate Definition: %p in Module: %s is hidden by previously registered Module: %s Definition: %p\n",
+                                           pSymbol->szName, pSymbol->value.pFunPtr, szModuleName,
+                                           pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>", pDynSym->pSymbol->value.pFunPtr );
+                              #endif
+
+                              /*
+                                 Force all local symbols instances of public function to use the first (or last) registered definition,
+                                 This will force a single function implementation at prg level, even if linker allowed multiple definitions.
+                              */
+                              pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+
+                              pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
+                              pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                           }
+
+                         #endif
+
+                         hSymScope = pSymbol->scope.value;
+                      }
+
+
                       pModuleSymbols = s_pSymbols;
 
                       while( pModuleSymbols )
@@ -10251,26 +10350,31 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                             TraceLog( NULL, "Module: '%s' does NOT have any Deferred Symbols\n", pModuleSymbols->szModuleName );
                          }
                         #endif
+
                          pModuleSymbols = pModuleSymbols->pNext;
                       }
                    }
+                   // Should we support dynamic overloading of already resolved HB_FS_DEFERRED as per below?
+                   else if( pDynSym->pSymbol->value.pFunPtr )
+                   {
+                      if( ( pSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pSymbol->value.pFunPtr == NULL */ )
+                      {
+                         pSymbol->scope.value = (  hSymScope & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                         pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+                      }
+                   }
 
+                   pSymbol->pDynSym = pDynSym;
                    continue;
                 }
-               #ifdef DEBUG_SYMBOLS
-                else
-                {
-                    TraceLog( NULL, "Public '%s' was not yet registered.\n", pSymbol->szName );
-                }
-               #endif
             }
             else // if( pSymbol->value.pFunPtr || ( hSymScope & HB_FS_DEFERRED ) )
             {
-                if( pDynSym )
-                {
-                   pSymbol->pDynSym = pDynSym;
-                    continue;
-                }
+               if( pDynSym )
+               {
+                  pSymbol->pDynSym = pDynSym;
+                  continue;
+               }
             }
          }
          else
@@ -10289,8 +10393,6 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                   }
                   else if( pDynSym->pSymbol->value.pFunPtr == pSymbol->value.pFunPtr )
                   {
-                     //#define TRACE_DUPLICATE_FUNCTIONS
-
                      #ifdef HB_STARTUP_REVERSED_LINK_ORDER
 
                        #ifdef TRACE_DUPLICATE_FUNCTIONS

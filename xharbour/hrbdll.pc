@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.pc,v 1.54 2008/05/06 05:47:50 andijahja Exp $
+# $Id: hrbdll.pc,v 1.55 2008/07/12 14:10:24 modalsist Exp $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -71,7 +71,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=POLINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** dllmain.lib $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project

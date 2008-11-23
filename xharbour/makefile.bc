@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.236 2008/11/21 05:10:07 andijahja Exp $
+# $Id: makefile.bc,v 1.237 2008/11/22 08:25:22 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -456,7 +456,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) c0d32.obj $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,dllmain.lib $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked

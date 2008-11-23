@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.9 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: maindllh.c,v 1.10 2008/11/23 03:23:13 andijahja Exp $
  */
 
 /*
@@ -89,12 +89,10 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    return TRUE;
 }
 
-#if 0
 HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    return hb_vmProcessDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
-#endif
 
 HB_EXTERN_END
 #endif
