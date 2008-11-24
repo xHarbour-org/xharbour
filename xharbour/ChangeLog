@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6276 2008/11/24 05:30:34 andijahja Exp $
+ * $Id: ChangeLog,v 1.6277 2008/11/24 12:56:46 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-24 20:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbvmpub.h
+    ! temporarily uncomment profiler related members of PHB_DYNS.
 
 2008-11-24 09:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * hrbdll.pc

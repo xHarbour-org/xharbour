@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.78 2008/06/28 18:51:49 walito Exp $
+ * $Id: hbvmpub.h,v 1.79 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -375,11 +375,12 @@
       HB_HANDLE hArea;        /* Workarea number */
       HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
-#ifndef HB_NO_PROFILER
+/* Commented because GPF with FWH application when -DHB_NO_PROFILER */
+// #ifndef HB_NO_PROFILER
       ULONG     ulCalls;      /* profiler support */
       ULONG     ulTime;       /* profiler support */
       ULONG     ulRecurse;    /* profiler support */
-#endif
+// #endif
       PSYMBOLS  pModuleSymbols;
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
 
