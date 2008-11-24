@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.28 2008/11/22 08:25:22 andijahja Exp $
+# $Id: compile.mak,v 1.29 2008/11/24 05:30:34 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -135,7 +135,6 @@ $(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
 
 $(COMPILER_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
 	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp
-	$(DEL) $(COMPILER_DIR)$(DIR_SEP)expropta.c
 	$(COPY) $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp $(COMPILER_DIR)$(DIR_SEP)expropta.c
 
 $(COMPILER_DIR)$(DIR_SEP)exproptb.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
