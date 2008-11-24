@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.27 2008/11/21 05:10:07 andijahja Exp $
+# $Id: compile.mak,v 1.28 2008/11/22 08:25:22 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -133,10 +133,22 @@ $(OBJ_DIR)$(DIR_SEP)harboury.c : $(COMPILER_DIR)$(DIR_SEP)harbour.sly
 $(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
 	$(CC_CMD)
 
+$(COMPILER_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp
+	$(DEL) $(COMPILER_DIR)$(DIR_SEP)expropta.c
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp $(COMPILER_DIR)$(DIR_SEP)expropta.c
+
+$(COMPILER_DIR)$(DIR_SEP)exproptb.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptb.c > $(OBJ_DIR)$(DIR_SEP)exproptb.c.tmp
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptb.c.tmp $(COMPILER_DIR)$(DIR_SEP)exproptb.c
+
+$(COMPILER_DIR)$(DIR_SEP)exproptc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptc.c > $(OBJ_DIR)$(DIR_SEP)exproptc.c.tmp
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptc.c.tmp $(COMPILER_DIR)$(DIR_SEP)exproptc.c
+
 $(COMPILER_DIR)$(DIR_SEP)hbslex.c : $(COMPILER_DIR)$(DIR_SEP)harbour.slx
-	TYPE $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp
-	DEL $(COMPILER_DIR)$(DIR_SEP)hbslex.c
-	REN $(COMPILER_DIR)$(DIR_SEP)hbslex.c.tmp hbslex.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(OBJ_DIR)$(DIR_SEP)hbslex.c.tmp
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbslex.c.tmp $(COMPILER_DIR)$(DIR_SEP)hbslex.c
 
 $(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbslex.c
 	$(CC_CMD)
@@ -1688,9 +1700,8 @@ $(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
 	$(CC_CMD)
 
 $(MACRO_DIR)$(DIR_SEP)macroslx.c : $(MACRO_DIR)$(DIR_SEP)macro.slx
-	TYPE $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp
-	DEL $(MACRO_DIR)$(DIR_SEP)macroslx.c
-	REN $(MACRO_DIR)$(DIR_SEP)macroslx.c.tmp macroslx.c
+	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp $(MACRO_DIR)$(DIR_SEP)macroslx.c
 
 $(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroslx.c
 	$(CC_CMD)

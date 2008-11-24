@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.52 2008/11/22 08:25:22 andijahja Exp $
+# $Id: makefile.gc,v 1.53 2008/11/23 06:19:38 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -8,6 +8,9 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
+TYPE=cat
+DEL=RM -f
+COPY=cp
 
 #*******************************************************************************
 ifeq ($(__BLD__),CORE_BLD)
@@ -258,7 +261,7 @@ include common.mak
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32 -lharbour
+	-lole32 -luuid -loleaut32 -lws2_32 -ldllmain -lharbour
 
 COMPILERLIBS1=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\

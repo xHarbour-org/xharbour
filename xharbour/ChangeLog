@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6274 2008/11/23 20:41:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6275 2008/11/24 00:06:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-24 12:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! define LONG_PTR if not defined (for: __DMC__)
+
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+    + macros for GNU and Non-GNU's: TYPE, DEL, COPY.
+
+  * common.mak
+    - remove mainstd.obj dependency for apps created with harbour.dll because
+      dllmain.lib is now linked.
+
+    /*
+    NOTE: At this moment, DMC and OpenWatcom app created with DLL do not work yet.
+    */
+
+  * compile.mak
+    ! revise logic to force compilation of source/compiler/hbslex.c and
+      source/macro/macroslx.c when the respective rule file is newer, to
+      work with GNU and Non-GNU Make as well.
+    + add hacks to force compile:
+      * source/compiler/expropta.c when include/hbexpra.c is newer
+      * source/compiler/exproptb.c when include/hbexprb.c is newer
+      * source/compiler/exproptc.c when include/hbexprc.c is newer
+
+    /*
+    TODO: Force compile hbslex.c and macroslx.c when include/simplex.c is newer.
+    */
 
 2008-11-24 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * makefile.bc

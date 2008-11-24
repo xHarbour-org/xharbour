@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.182 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtwvt.c,v 1.183 2008/11/22 12:23:19 ptsarenko Exp $
  */
 
 /*
@@ -86,6 +86,10 @@
 
 #include "hbstack.h"
 #include "gtwvt.h"
+
+#ifdef __DMC__
+#define LONG_PTR LONG
+#endif
 
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;

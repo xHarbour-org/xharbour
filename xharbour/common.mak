@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.30 2008/11/21 05:10:07 andijahja Exp $
+# $Id: common.mak,v 1.31 2008/11/24 00:06:47 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1200,35 +1200,30 @@ HARBOUR_DLL_OBJS=\
 # XBSCRIPTDLL.EXE rules
 #===============================================================================
 XBSCRIPTDLL_EXE_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(XBSCRIPT_EXE_OBJS)
 
 #===============================================================================
 # HBRUNDLL.EXE rules
 #===============================================================================
 HBRUNDLL_EXE_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(HBRUN_EXE_OBJS)
 
 #===============================================================================
 # HBDOCDLL.EXE rules
 #===============================================================================
 HBDOCDLL_EXE_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(HBDOC_EXE_OBJS)
 
 #===============================================================================
 # HBMAKEDLL.EXE rules
 #===============================================================================
 HBMAKEDLL_EXE_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(HBMAKE_EXE_OBJS)
 
 #===============================================================================
 # HBTESTDLL.EXE rules
 #===============================================================================
 HBTESTDLL_EXE_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(HBTEST_EXE_OBJS)
 
 #===============================================================================
