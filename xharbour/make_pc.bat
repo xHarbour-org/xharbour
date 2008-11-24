@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.30 2008/07/12 14:10:25 modalsist Exp $
+rem $Id: make_pc.bat,v 1.31 2008/07/14 02:50:56 kaddath Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -104,7 +104,6 @@ rem=============================================================================
    SET HB_MT_DIR=\dll
    @CALL mdir.bat dllcreate
    pomake /F hrbdll.pc  >dll_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
