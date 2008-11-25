@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.122 2008/10/22 08:32:32 marchuet Exp $
+* $Id: thread.h,v 1.123 2008/11/05 03:03:16 walito Exp $
 */
 
 /*
@@ -176,7 +176,11 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern DWORD hb_dwCurrentStack;
+#ifndef __IMPORT__
+extern HB_EXPORT DWORD hb_dwCurrentStack;
+#else
+extern HB_IMPORT DWORD hb_dwCurrentStack;
+#endif
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.53 2008/11/20 23:16:28 andijahja Exp $
+ * $Id: hbstack.h,v 1.54 2008/11/23 03:23:13 andijahja Exp $
  */
 
 /*
@@ -146,10 +146,19 @@ typedef struct
    unsigned int uiVMFlags;
 } HB_STACK;
 
-extern HB_STACK hb_stackST;
+#ifndef __IMPORT__
+extern HB_EXPORT HB_STACK hb_stackST;
+#else
+extern HB_IMPORT HB_STACK hb_stackST;
+#endif
+
 extern HB_STACK * hb_stack_ptr;
 #else
-extern HB_STACK hb_stackMT;
+#ifndef __IMPORT__
+extern HB_EXPORT HB_STACK hb_stackMT;
+#else
+extern HB_IMPORT HB_STACK hb_stackMT;
+#endif
 #endif
 
 extern BOOL hb_stack_ready;
