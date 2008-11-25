@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.14 2008/08/02 17:18:00 modalsist Exp $
+rem $Id: mdir.bat,v 1.15 2008/11/21 05:10:07 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -320,6 +320,7 @@ if exist obj\%SUB_DIR%\*.output                      del obj\%SUB_DIR%\*.output
 if exist obj\%SUB_DIR%\*.c                           del obj\%SUB_DIR%\*.c
 if exist obj\%SUB_DIR%\*.ppo                         del obj\%SUB_DIR%\*.ppo
 if exist obj\%SUB_DIR%\*.h                           del obj\%SUB_DIR%\*.h
+if exist obj\%SUB_DIR%\*.tmp                         del obj\%SUB_DIR%\*.tmp
 
 if exist obj\%SUB_DIR%\bin\*.bak                     del obj\%SUB_DIR%\bin\*.bak
 if exist obj\%SUB_DIR%\bin\*%OBJEXT%                 del obj\%SUB_DIR%\bin\*%OBJEXT%
@@ -332,6 +333,7 @@ if exist obj\%SUB_DIR%\mt\*.output                   del obj\%SUB_DIR%\mt\*.outp
 if exist obj\%SUB_DIR%\mt\*.c                        del obj\%SUB_DIR%\mt\*.c
 if exist obj\%SUB_DIR%\mt\*.ppo                      del obj\%SUB_DIR%\mt\*.ppo
 if exist obj\%SUB_DIR%\mt\*.h                        del obj\%SUB_DIR%\mt\*.h
+if exist obj\%SUB_DIR%\mt\*.tmp                      del obj\%SUB_DIR%\mt\*.tmp
 
 if exist bin\%SUB_DIR%\harbour.exp                   del bin\%SUB_DIR%\harbour.exp
 if exist bin\%SUB_DIR%\hbdoc.exp                     del bin\%SUB_DIR%\hbdoc.exp

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.5 2008/04/03 19:35:38 peterrees Exp $
+ * $Id: hbgtcore.h,v 1.6 2008/06/25 20:20:51 vouchcac Exp $
  */
 
 /*
@@ -352,7 +352,6 @@ typedef struct _HB_GT_BASE
 
 } HB_GT_BASE, * PHB_GT_BASE, * PHB_GT;
 
-extern HB_EXPORT PHB_GT hb_gt_Base( void );
 
 #define HB_GTLOCAL(g)   (g)->pGTData[*HB_GTID_PTR]
 
@@ -586,6 +585,7 @@ extern HB_EXPORT PHB_GT hb_gt_Base( void );
 
 HB_EXTERN_BEGIN
 
+extern HB_EXPORT PHB_GT hb_gt_Base( void );
 extern HB_EXPORT char * hb_gt_FindDefault( void );
 extern HB_EXPORT void   hb_gtSetDefault( const char * szGtName );
 extern HB_EXPORT BOOL   hb_gtRegister( const HB_GT_INIT * gtInit );

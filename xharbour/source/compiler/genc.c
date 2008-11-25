@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.172 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: genc.c,v 1.173 2008/11/19 00:00:29 andijahja Exp $
  */
 
 /*
@@ -1560,6 +1560,8 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
 
 static void hb_compWriteDeclareGlobal( FILE *yyc )
 {
+   BOOL bWriteExtern = FALSE;
+
    fprintf( yyc, "\n#include \"hbapi.h\"\n" );
 
    if( hb_comp_pGlobals )
@@ -1569,6 +1571,12 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
 
       while( pGlobal )
       {
+         if ( !bWriteExtern )
+	 {
+            bWriteExtern = TRUE;
+            fprintf( yyc, "\nHB_EXTERN_BEGIN\n" );
+	 }
+
          iGlobals++;
 
          if( pGlobal->szAlias == NULL )
@@ -1581,6 +1589,11 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
          }
 
          pGlobal = pGlobal->pNext;
+      }
+
+      if ( bWriteExtern )
+      {
+         fprintf( yyc, "HB_EXTERN_END\n" );
       }
 
       fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
