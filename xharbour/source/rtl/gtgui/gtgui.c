@@ -1,5 +1,5 @@
 /*
- * $Id: gtgui.c,v 1.5 2008/08/14 09:04:22 andijahja Exp $
+ * $Id: gtgui.c,v 1.6 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ static HB_GT_FUNCS   SuperTable;
 
 /* *********************************************************************** */
 
-static char * hb_gt_gui_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_gui_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_gui_Version(%p,%d)", pGT, iType ) );
 

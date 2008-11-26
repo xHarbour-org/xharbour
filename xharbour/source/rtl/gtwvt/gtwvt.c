@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.183 2008/11/22 12:23:19 ptsarenko Exp $
+ * $Id: gtwvt.c,v 1.184 2008/11/24 05:30:34 andijahja Exp $
  */
 
 /*
@@ -1707,7 +1707,7 @@ static BOOL hb_gt_wvt_SetMode( PHB_GT pGT, int iRow, int iCol )
 
 /* ********************************************************************** */
 
-static char * hb_gt_wvt_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_wvt_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_wvt_Version(%p,%d)", pGT, iType ) );
 
@@ -2485,7 +2485,7 @@ static void hb_gt_wvt_Refresh( PHB_GT pGT )
 
 /* ********************************************************************** */
 
-static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP, BOOL fBox )
+static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
    HB_GTSUPER_SETDISPCP( pGT, pszTermCDP, pszHostCDP, fBox );
 
@@ -2513,7 +2513,7 @@ static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCD
    return TRUE;
 }
 
-static BOOL hb_gt_wvt_SetKeyCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP )
+static BOOL hb_gt_wvt_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP )
 {
    HB_GTSUPER_SETKEYCP( pGT, pszTermCDP, pszHostCDP );
 

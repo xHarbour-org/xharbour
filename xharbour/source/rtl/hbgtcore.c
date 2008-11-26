@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.11 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: hbgtcore.c,v 1.12 2008/11/26 21:01:02 marchuet Exp $
  */
 
 /*
@@ -2816,7 +2816,7 @@ static void hb_gt_def_WhoCares( PHB_GT pGT, void * pCargo )
 /* ************************************************************************* */
 
 #if defined( __GNUC__ ) && 0
-static const HB_GT_FUNCS s_gtCoreFunc =
+static /* const */ HB_GT_FUNCS s_gtCoreFunc =
 {
    Init                       : hb_gt_def_Init                          ,
    Exit                       : hb_gt_def_Exit                          ,
@@ -2934,7 +2934,7 @@ static const HB_GT_FUNCS s_gtCoreFunc =
    WhoCares                   : hb_gt_def_WhoCares
 };
 #else
-static const HB_GT_FUNCS s_gtCoreFunc =
+static /* const */ HB_GT_FUNCS s_gtCoreFunc =
 {
    hb_gt_def_Init                         ,
    hb_gt_def_Exit                         ,
@@ -3200,7 +3200,7 @@ void hb_gtStartupInit( void )
    if( szGtName )
    {
       fInit = hb_gtLoad( szGtName, &s_gtCoreFunc );
-      hb_xfree( szGtName );
+      hb_xfree( (void*) szGtName );
 
       if( fInit )
       {
@@ -3213,7 +3213,7 @@ void hb_gtStartupInit( void )
    if( szGtName )
    {
       fInit = hb_gtLoad( szGtName, &s_gtCoreFunc );
-      hb_xfree( szGtName );
+      hb_xfree( (void*) szGtName );
 
       if( fInit )
       {

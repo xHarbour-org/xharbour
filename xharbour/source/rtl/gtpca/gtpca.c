@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.24 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gtpca.c,v 1.25 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -669,7 +669,7 @@ static void hb_gt_pca_Bell( PHB_GT pGT )
    hb_gt_pca_termFlush();
 }
 
-static char * hb_gt_pca_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_pca_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Version(%p,%d)", pGT, iType ) );
 
@@ -713,7 +713,7 @@ static BOOL hb_gt_pca_Resume( PHB_GT pGT )
    return TRUE;
 }
 
-static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
 
@@ -737,7 +737,7 @@ static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
    return FALSE;
 }
 
-static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
+static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
 
