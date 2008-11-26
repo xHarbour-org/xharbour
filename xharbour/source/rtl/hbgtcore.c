@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.10 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: hbgtcore.c,v 1.11 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -3097,7 +3097,7 @@ static int hb_gt_FindEntry( const char * pszID )
 
 HB_EXTERN_BEGIN
 
-char * hb_gt_FindDefault( void )
+const char * hb_gt_FindDefault( void )
 {
    char szFuncName[ 15 + HB_GT_NAME_MAX_ ];
    int iPos;
@@ -3107,17 +3107,13 @@ char * hb_gt_FindDefault( void )
       snprintf( szFuncName, sizeof( szFuncName ), "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
 
       if( hb_dynsymFind( szFuncName ) )
-      {
          return s_gtInit[ iPos ]->id;
-      }
    }
 
    if( hb_dynsymFind( "HB_GT_NUL_DEFAULT" ) )
-   {
       return "NUL";
-   }
-
-   return NULL;
+   else
+      return NULL;
 }
 
 void hb_gtSetDefault( const char * szGtName )
@@ -3198,10 +3194,8 @@ BOOL hb_gtUnLoad( void )
 
 void hb_gtStartupInit( void )
 {
-   char * szGtName;
+   const char * szGtName = hb_cmdargString( "GT" );
    BOOL fInit;
-
-   szGtName = hb_cmdargString( "GT" );
 
    if( szGtName )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6281 2008/11/26 05:40:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.6283 2008/11/26 17:14:29 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-11-26 22:01 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * include\hbgtcore.h
+   * source\rtl\hbgtcore.c
+     * Cleanning PellesC errors compilation and warnnings in others compilers.
+     
 2008-11-26 18:16 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * common.mak
    * compile.mak
