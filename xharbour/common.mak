@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.31 2008/11/24 00:06:47 andijahja Exp $
+# $Id: common.mak,v 1.32 2008/11/24 05:30:34 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -707,7 +707,8 @@ COMMON_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)expropt1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)expropt2$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)reserved$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbdate$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbdate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbwince$(OBJEXT)
 
 #===============================================================================
 # VM.LIB rules

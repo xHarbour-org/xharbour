@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6280 2008/11/25 06:21:18 andijahja Exp $
+ * $Id: ChangeLog,v 1.6281 2008/11/26 05:40:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-20 16:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * common.mak
+   * compile.mak
+   + source\common\hbwince.c
+     + Added file with wc (WIDECHAR) functions
+
+   * include\hbapigt.h
+   * include\hbgtcore.h
+   * source\rtl\gtapi.c
+   * source\rtl\gtclip.c
+   * source\rtl\gtstd\gtstd.c
+   * source\rtl\gtwin\gtwin.c
+   * source\rtl\hbgtcore.c
+   * source\rtl\setcolor.c
+   * source\rtl\tget.prg
+     ! fixed some SetColor function and ColorSpec data from tget, to be more clipper compatible
+       there are some remaining questions than can be see at hbtest.
+
+   * source\vm\classes.c
+     ! fixed bug when is used profiler with HB_NO_PROFILER
+
+   * source\compiler\exproptb.c
+   * source\compiler\exproptc.c
+     * minor syntax corrections.
 
 2008-11-26 12:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/common/hbver.c
