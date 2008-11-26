@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.173 2008/11/19 00:00:29 andijahja Exp $
+ * $Id: genc.c,v 1.174 2008/11/25 05:15:58 andijahja Exp $
  */
 
 /*
@@ -1960,6 +1960,10 @@ static void hb_compGenCInLine( FILE *yyc )
 
 static void hb_compWritePragma( FILE * yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef )
 {
+   fprintf( yyc, "#if defined(__ICL)\n"
+                 "   #pragma warning(disable:177)\n"
+                 "#endif\n\n" );
+
    fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n"
                  "   #pragma startup %s%s%s\n"
                  "#elif defined(HB_MSC_STARTUP)\n"

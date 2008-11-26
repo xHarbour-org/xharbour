@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFile.h $
 // $Archive: /ZipArchive_STL/ZipFile.h $
-// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
+// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -10,9 +10,10 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
+
 
 #if !defined(AFX_ZIPFILE_H__80609DE0_2C6D_4C94_A90C_0BE34A50C769__INCLUDED_)
 #define AFX_ZIPFILE_H__80609DE0_2C6D_4C94_A90C_0BE34A50C769__INCLUDED_
@@ -30,6 +31,15 @@
 #else
 	#include <unistd.h>
 	#include <errno.h>
+#endif
+
+#if ( defined(__ICL) || (defined(_MSC_VER) && _MSC_VER>=1400) )
+   #define close  _close
+   #define write  _write
+   #define tell   _tell
+   #define read   _read
+   #define lseek  _lseek
+   #define chsize _chsize
 #endif
 
 class ZIP_API CZipFile :public CZipAbstractFile

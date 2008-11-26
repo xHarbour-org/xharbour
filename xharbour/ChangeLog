@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6279 2008/11/25 05:15:58 andijahja Exp $
+ * $Id: ChangeLog,v 1.6280 2008/11/25 06:21:18 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-26 12:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/common/hbver.c
+     + compiler version information for Intel C++ ( __ICL )
+
+   * source/compiler/genc.c
+     + add pragma to disable warning on unused param HB_$INITSYM (for: __ICL )
+
+   * contrib/hbzlib/zipfile.h
+     ! pacify warnings for Intel C++ and MSVS 2005 and newer
 
 2008-11-25 13:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * include/hbstack.h

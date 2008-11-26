@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.44 2008/08/28 11:19:53 andijahja Exp $
+ * $Id: hbver.c,v 1.45 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -481,8 +481,18 @@ char * hb_verCompiler( void )
    iVerMinor = 0;
    iVerPatch = 0;
 
-#elif defined(_MSC_VER)
+#elif defined(__ICL)
+   pszName = "Intel(R) C";
 
+   #if defined(__cplusplus)
+      hb_strncpy( szSub, "++", sizeof( szSub ) - 1 );
+   #endif
+
+   iVerMajor = __ICL / 100;
+   iVerMinor = __ICL % 100;
+   iVerPatch = 0;
+
+#elif defined(_MSC_VER)
    #if (_MSC_VER >= 800)
       pszName = "Microsoft Visual C";
    #else
@@ -597,6 +607,9 @@ char * hb_verCompiler( void )
 
    if( pszName )
    {
+      #if defined( __ICL )
+         snprintf( pszCompiler, 80, "%s%s %hd.%01d Build %u", pszName, szSub, iVerMajor, iVerMinor, __INTEL_COMPILER_BUILD_DATE );
+      #else
       if( iVerPatch != 0 )
       #if defined(_MSC_VER)
          snprintf( pszCompiler, 80, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
@@ -607,6 +620,7 @@ char * hb_verCompiler( void )
          snprintf( pszCompiler, 80, "%s%s %hd.%hd", pszName, szSub, iVerMajor, iVerMinor );
       else
          snprintf( pszCompiler, 80, "%s%s", pszName, szSub );
+      #endif
    }
    else
       hb_strncpy( pszCompiler, "(unknown)", 79 );
