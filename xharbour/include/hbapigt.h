@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.54 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbapigt.h,v 1.55 2008/06/25 20:20:41 vouchcac Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 
 #ifndef HB_APIGT_H_
 #define HB_APIGT_H_
+
 #include "hbapi.h"
 
 HB_EXTERN_BEGIN
@@ -81,8 +82,8 @@ HB_EXTERN_BEGIN
 #include "hbgtinfo.ch"
 
 /* maximum length of color string */
-#define CLR_STRLEN              64
-
+#define HB_CLRSTR_LEN           64
+#define CLR_STRLEN              HB_CLRSTR_LEN
 /* attributes for color strings, these are the same as the ones in color.ch
    but prefixed with HB_ to avoid collision. */
 #define HB_CLR_STANDARD         0
@@ -124,6 +125,18 @@ HB_EXTERN_BEGIN
 #endif
 
 
+/* standard input/output handles
+ * when HB_IO_WIN is set file handles with numbers 0, 1, 2 are
+ * transalted inside filesys to
+ *    GetStdHandle( STD_INPUT_HANDLE )
+ *    GetStdHandle( STD_OUTPUT_HANDLE )
+ *    GetStdHandle( STD_ERROR_HANDLE )
+ */
+#define HB_STDIN_HANDLE    0
+#define HB_STDOUT_HANDLE   1
+#define HB_STDERR_HANDLE   2
+
+
 /* structure used to pass/receive parameters in hb_gtInfo() */
 
 typedef struct
@@ -135,13 +148,13 @@ typedef struct
 
 /* Public interface. These should never change, only be added to. */
 
-extern HB_EXPORT ERRCODE hb_gtInit( FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr );
+extern HB_EXPORT ERRCODE hb_gtInit( HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr );
 extern HB_EXPORT ERRCODE hb_gtExit( void );
 extern HB_EXPORT ERRCODE hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
 extern HB_EXPORT ERRCODE hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
 extern HB_EXPORT ERRCODE hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
 extern HB_EXPORT ERRCODE hb_gtColorSelect( USHORT uiColorIndex );
-extern HB_EXPORT USHORT  hb_gtColorToN( char * szColorString );
+extern HB_EXPORT int     hb_gtColorToN( const char * szColorString );
 extern HB_EXPORT ERRCODE hb_gtColorsToString( int * pColors, int iColorCount, char * pszColorString, int iBufSize );
 extern HB_EXPORT ERRCODE hb_gtDispBegin( void );
 extern HB_EXPORT USHORT  hb_gtDispCount( void );
@@ -181,11 +194,11 @@ extern HB_EXPORT ERRCODE hb_gtTone( double dFrequency, double dDuration );
 extern HB_EXPORT ERRCODE hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
-extern HB_EXPORT char *  hb_gtVersion( int iType );
+extern HB_EXPORT const char * hb_gtVersion( int iType );
 extern HB_EXPORT ERRCODE hb_gtOutStd( BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtOutErr( BYTE * pbyStr, ULONG ulLen );
-extern HB_EXPORT ERRCODE hb_gtSetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox );
-extern HB_EXPORT ERRCODE hb_gtSetKeyCP( char * pszTermCDP, char * pszHostCDP );
+extern HB_EXPORT ERRCODE hb_gtSetDispCP( const char * pszTermCDP, const char * pszHostCDP, BOOL fBox );
+extern HB_EXPORT ERRCODE hb_gtSetKeyCP( const char * pszTermCDP, const char * pszHostCDP );
 extern HB_EXPORT ERRCODE hb_gtInfo( int iType, PHB_GT_INFO pInfo );
 extern HB_EXPORT int     hb_gtAlert( PHB_ITEM pMessage, PHB_ITEM pOptions, int iClrNorm, int iClrHigh, double dDelay );
 extern HB_EXPORT int     hb_gtSetFlag( int iType, int iNewValue );
@@ -198,10 +211,10 @@ extern HB_EXPORT ERRCODE hb_gtGetScrChar( int iRow, int iCol, BYTE * pbColor, BY
 extern HB_EXPORT ERRCODE hb_gtPutScrChar( int iRow, int iCol, BYTE bColor, BYTE bAttr, USHORT usChar );
 extern HB_EXPORT ERRCODE hb_gtFlush( void );
 extern HB_EXPORT ERRCODE hb_gtGetPosEx( int * piRow, int * piCol );
-extern HB_EXPORT ERRCODE hb_gtScrollEx( int iTop, int iLeft, int iBottom, int iRight, BYTE bColor, BYTE bChar, int iRows, int iCols );
-extern HB_EXPORT ERRCODE hb_gtBoxEx( int iTop, int iLeft, int iBottom, int iRight, BYTE * pbyFrame, BYTE bColor );
+extern HB_EXPORT ERRCODE hb_gtScrollEx( int iTop, int iLeft, int iBottom, int iRight, int iColor, int iChar, int iRows, int iCols );
+extern HB_EXPORT ERRCODE hb_gtBoxEx( int iTop, int iLeft, int iBottom, int iRight, BYTE * pbyFrame, int iColor );
 extern HB_EXPORT int     hb_gtGfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor );
-extern HB_EXPORT ERRCODE hb_gtGfxText( int iTop, int iLeft, char * szText, int iColor, int iSize, int iWidth );
+extern HB_EXPORT ERRCODE hb_gtGfxText( int iTop, int iLeft, const char * szText, int iColor, int iSize, int iWidth );
 
 extern HB_EXPORT BOOL    hb_mouseIsPresent( void );
 extern HB_EXPORT BOOL    hb_mouseGetCursor( void );
@@ -272,6 +285,7 @@ extern HB_EXPORT ERRCODE hb_gtSetBorder( HB_GT_RGB * color );
 /* Harbour keyboard support functions */
 extern HB_EXPORT int     hb_inkey( BOOL bWait, double dSeconds, int iEvenMask ); /* Wait for keyboard input */
 extern HB_EXPORT void    hb_inkeyPut( int ch );          /* Inserts an inkey code into the keyboard buffer */
+extern HB_EXPORT void    hb_inkeyIns( int ch );          /* Inserts an inkey code into the keyboard buffer */
 extern HB_EXPORT int     hb_inkeyLast( int iEvenMask );  /* Return the value of the last key that was extracted */
 extern HB_EXPORT int     hb_inkeyNext( int iEvenMask );  /* Return the next key without extracting it */
 extern HB_EXPORT void    hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */

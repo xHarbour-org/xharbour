@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.77 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: gtapi.c,v 1.78 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -81,14 +81,11 @@
 #include "hbgtcore.h"
 #include "hbset.h"
 
-#define HB_STDOUT_HANDLE   1
-#define HB_STDERR_HANDLE   2
-
 static BOOL   s_bInit = FALSE;
 
 /* gt API functions */
 
-ERRCODE hb_gtInit( FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+ERRCODE hb_gtInit( HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    PHB_GT pGT;
 
@@ -304,18 +301,18 @@ ERRCODE hb_gtGetColorStr( char * pszColorString )
       HB_GTSELF_GETCOLORSTR( pGT, pszColorString );
       return SUCCESS;
    }
-   pszColorString[0] = '\0';
+   pszColorString[ 0 ] = '\0';
    return FAILURE;
 }
 
-USHORT hb_gtColorToN( char * szColorString )
+int hb_gtColorToN( const char * szColorString )
 {
    PHB_GT pGT;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtColorToN(%s)", szColorString));
 
    pGT = hb_gt_Base();
-   return pGT ? HB_GTSELF_COLORNUM( pGT, szColorString ) : 0;
+   return ( int ) ( pGT ? HB_GTSELF_COLORNUM( pGT, szColorString ) : 0 );
 }
 
 ERRCODE hb_gtColorsToString( int * pColors, int iColorCount, char * pszColorString, int iBufSize )
@@ -330,7 +327,7 @@ ERRCODE hb_gtColorsToString( int * pColors, int iColorCount, char * pszColorStri
       HB_GTSELF_COLORSTOSTRING( pGT, pColors, iColorCount, pszColorString, iBufSize );
       return SUCCESS;
    }
-   pszColorString[0] = '\0';
+   pszColorString[ 0 ] = '\0';
    return FAILURE;
 }
 
@@ -764,14 +761,14 @@ ERRCODE hb_gtTone( double dFrequency, double dDuration )
    return FAILURE;
 }
 
-char * hb_gtVersion( int iType )
+const char * hb_gtVersion( int iType )
 {
    PHB_GT pGT;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtVersion(%d)",iType));
 
    pGT = hb_gt_Base();
-   return ( char * ) ( pGT ? HB_GTSELF_VERSION( pGT, iType ) : "" );
+   return ( const char * ) ( pGT ? HB_GTSELF_VERSION( pGT, iType ) : "" );
 }
 
 ERRCODE hb_gtSetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr )
@@ -831,7 +828,7 @@ ERRCODE hb_gtOutStd( BYTE * pbyStr, ULONG ulLen )
    if( pGT )
       HB_GTSELF_OUTSTD( pGT, pbyStr, ulLen );
    else
-      hb_fsWriteLarge( HB_STDOUT_HANDLE, pbyStr, ulLen );
+      hb_fsWriteLarge( ( HB_FHANDLE ) HB_STDOUT_HANDLE, pbyStr, ulLen );
 
    return SUCCESS;
 }
@@ -851,7 +848,7 @@ ERRCODE hb_gtOutErr( BYTE * pbyStr, ULONG ulLen )
    return SUCCESS;
 }
 
-ERRCODE hb_gtSetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox )
+ERRCODE hb_gtSetDispCP( const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
    PHB_GT pGT;
 
@@ -866,7 +863,7 @@ ERRCODE hb_gtSetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox )
    return FAILURE;
 }
 
-ERRCODE hb_gtSetKeyCP( char * pszTermCDP, char * pszHostCDP )
+ERRCODE hb_gtSetKeyCP( const char * pszTermCDP, const char * pszHostCDP )
 {
    PHB_GT pGT;
 
@@ -1039,17 +1036,21 @@ ERRCODE hb_gtGetPosEx( int * piRow, int * piCol )
    return FAILURE;
 }
 
-ERRCODE hb_gtScrollEx( int iTop, int iLeft, int iBottom, int iRight, BYTE bColor, BYTE bChar, int iRows, int iCols )
+ERRCODE hb_gtScrollEx( int iTop, int iLeft, int iBottom, int iRight, int iColor, int iChar, int iRows, int iCols )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gtScrollEx(%d, %d, %d, %d, %d, %hd, %d, %d)", iTop, iLeft, iBottom, iRight, bColor, bChar, iRows, iCols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gtScrollEx(%d, %d, %d, %d, %d, %hd, %d, %d)", iTop, iLeft, iBottom, iRight, iColor, iChar, iRows, iCols));
 
    if( iTop <= iBottom && iLeft <= iRight )
    {
       PHB_GT pGT = hb_gt_Base();
       if( pGT )
       {
+         if( iColor == -1 )
+            iColor = HB_GTSELF_GETCOLOR( pGT );
+         if( iChar < 0 )
+            iChar = HB_GTSELF_GETCLEARCHAR( pGT );
          HB_GTSELF_SCROLL( pGT, iTop, iLeft, iBottom, iRight,
-                           bColor, bChar, iRows, iCols );
+                           iColor, iChar, iRows, iCols );
          HB_GTSELF_FLUSH( pGT );
          return SUCCESS;
       }
@@ -1057,16 +1058,18 @@ ERRCODE hb_gtScrollEx( int iTop, int iLeft, int iBottom, int iRight, BYTE bColor
    return FAILURE;
 }
 
-ERRCODE hb_gtBoxEx( int iTop, int iLeft, int iBottom, int iRight, BYTE * pbyFrame, BYTE bColor )
+ERRCODE hb_gtBoxEx( int iTop, int iLeft, int iBottom, int iRight, BYTE * pbyFrame, int iColor )
 {
    PHB_GT pGT;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gtBoxEx(%d, %d, %d, %d, %p, %d)", iTop, iLeft, iBottom, iRight, pbyFrame, bColor));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gtBoxEx(%d, %d, %d, %d, %p, %d)", iTop, iLeft, iBottom, iRight, pbyFrame, iColor));
 
    pGT = hb_gt_Base();
    if( pGT )
    {
-      HB_GTSELF_BOX( pGT, iTop, iLeft, iBottom, iRight, pbyFrame, bColor );
+      if( iColor == -1 )
+         iColor = HB_GTSELF_GETCOLOR( pGT );
+      HB_GTSELF_BOX( pGT, iTop, iLeft, iBottom, iRight, pbyFrame, iColor );
       HB_GTSELF_SETPOS( pGT, iTop + 1, iLeft + 1 );
       HB_GTSELF_FLUSH( pGT );
       return SUCCESS;
@@ -1090,7 +1093,7 @@ int hb_gtGfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, 
    return iResult;
 }
 
-ERRCODE hb_gtGfxText( int iTop, int iLeft, char * cBuf, int iColor, int iSize, int iWidth )
+ERRCODE hb_gtGfxText( int iTop, int iLeft, const char * cBuf, int iColor, int iSize, int iWidth )
 {
    PHB_GT pGT;
 

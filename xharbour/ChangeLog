@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-11-20 16:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+2008-11-26 18:16 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * common.mak
    * compile.mak
    + source\common\hbwince.c

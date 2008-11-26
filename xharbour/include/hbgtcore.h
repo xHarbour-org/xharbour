@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.6 2008/06/25 20:20:51 vouchcac Exp $
+ * $Id: hbgtcore.h,v 1.7 2008/11/25 05:15:58 andijahja Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ struct _HB_GT_BASE;
 
 typedef struct
 {
-   void     (* Init) ( HB_GT_PTR, FHANDLE, FHANDLE, FHANDLE );
+   void     (* Init) ( HB_GT_PTR, HB_FHANDLE, HB_FHANDLE, HB_FHANDLE );
    void     (* Exit) ( HB_GT_PTR );
    void *   (* New) ( HB_GT_PTR );
    void     (* Free) ( HB_GT_PTR );
@@ -178,7 +178,7 @@ typedef struct
    BOOL     (* GetBlink) ( HB_GT_PTR );
    void     (* SetBlink) ( HB_GT_PTR, BOOL );
    void     (* SetSnowFlag) ( HB_GT_PTR, BOOL );
-   char *   (* Version) ( HB_GT_PTR, int );
+   const char * (* Version) ( HB_GT_PTR, int );
    BOOL     (* Suspend) ( HB_GT_PTR );
    BOOL     (* Resume) ( HB_GT_PTR );
    BOOL     (* PreExt) ( HB_GT_PTR );
@@ -192,14 +192,15 @@ typedef struct
    int      (* SetFlag) ( HB_GT_PTR, int, int );
 
    /* internationalization */
-   BOOL     (* SetDispCP) ( HB_GT_PTR, char *, char *, BOOL );
-   BOOL     (* SetKeyCP) ( HB_GT_PTR, char *, char * );
+   BOOL     (* SetDispCP) ( HB_GT_PTR, const char *, const char *, BOOL );
+   BOOL     (* SetKeyCP) ( HB_GT_PTR, const char *, const char * );
 
    /* keyboard */
    int      (* ReadKey) ( HB_GT_PTR, int );
 
    int      (* InkeyGet) ( HB_GT_PTR, BOOL fWait, double dSeconds, int iEventMask );
    void     (* InkeyPut) ( HB_GT_PTR, int iKey );
+   void     (* InkeyIns) ( HB_GT_PTR, int iKey );
    int      (* InkeyLast) ( HB_GT_PTR, int iEventMask );
    int      (* InkeyNext) ( HB_GT_PTR, int iEventMask );
    void     (* InkeyPoll) ( HB_GT_PTR );
@@ -235,22 +236,22 @@ typedef struct
 
    /* Graphics API */
    int      (* GfxPrimitive) ( HB_GT_PTR, int, int, int, int, int, int );
-   void     (* GfxText) ( HB_GT_PTR, int, int, char *, int, int, int );
+   void     (* GfxText) ( HB_GT_PTR, int, int, const char *, int, int, int );
 
 #if 0
-    /* keyboard */
-    int     (* ExtendedKeySupport) ( HB_GT_PTR );
+   /* keyboard */
+   int     (* ExtendedKeySupport) ( HB_GT_PTR );
 
-    /* GT CLIPBOARD functions */
-    void    (* GetClipboard) ( HB_GT_PTR, char *, ULONG * );
-    void    (* SetClipboard) ( HB_GT_PTR, char *, ULONG );
-    ULONG   (* GetClipboardSize) ( HB_GT_PTR );
+   /* GT CLIPBOARD functions */
+   void    (* GetClipboard) ( HB_GT_PTR, char *, ULONG * );
+   void    (* SetClipboard) ( HB_GT_PTR, char *, ULONG );
+   ULONG   (* GetClipboardSize) ( HB_GT_PTR );
 
-    void    (* ProcessMessages) ( HB_GT_PTR );
+   void    (* ProcessMessages) ( HB_GT_PTR );
 
-    /* GT to DRIVER communication functions */
-    void    (* update ) ( HB_GT_PTR, int );
-    int     (* info ) ( HB_GT_PTR, int, BOOL , int , void * );
+   /* GT to DRIVER communication functions */
+   void    (* update ) ( HB_GT_PTR, int );
+   int     (* info ) ( HB_GT_PTR, int, BOOL , int , void * );
 
 #endif
 
@@ -267,7 +268,7 @@ typedef int ( * GTENTRYP_V )( void );
 
 typedef struct _HB_GT_INIT
 {
-   char           * id;
+   const char     * id;
    BOOL           (* init) ( PHB_GT_FUNCS );
    PHB_GT_FUNCS   pSuperTable;
    int *          pGtId;
@@ -313,9 +314,9 @@ typedef struct _HB_GT_BASE
    USHORT         uiExtCount;
    USHORT         uiClearChar;
    BYTE           bClearColor;
-   FHANDLE        hStdIn;
-   FHANDLE        hStdOut;
-   FHANDLE        hStdErr;
+   HB_FHANDLE     hStdIn;
+   HB_FHANDLE     hStdOut;
+   HB_FHANDLE     hStdErr;
 
    BOOL           fDispTrans;
    PHB_CODEPAGE   cdpTerm;
@@ -435,6 +436,7 @@ typedef struct _HB_GT_BASE
 #define HB_GTSELF_READKEY(g,m)                  (g)->pFuncTable->ReadKey(g,m)
 #define HB_GTSELF_INKEYGET(g,w,d,m)             (g)->pFuncTable->InkeyGet(g,w,d,m)
 #define HB_GTSELF_INKEYPUT(g,k)                 (g)->pFuncTable->InkeyPut(g,k)
+#define HB_GTSELF_INKEYINS(g,k)                 (g)->pFuncTable->InkeyIns(g,k)
 #define HB_GTSELF_INKEYLAST(g,m)                (g)->pFuncTable->InkeyLast(g,m)
 #define HB_GTSELF_INKEYNEXT(g,m)                (g)->pFuncTable->InkeyNext(g,m)
 #define HB_GTSELF_INKEYPOLL(g)                  (g)->pFuncTable->InkeyPoll(g)
@@ -468,6 +470,10 @@ typedef struct _HB_GT_BASE
 #define HB_GTSELF_GFXPRIMITIVE(g,i,t,l,b,r,c)   (g)->pFuncTable->GfxPrimitive(g,i,t,l,b,r,c)
 #define HB_GTSELF_GFXTEXT(g,t,l,s,c,h,w)        (g)->pFuncTable->GfxText(g,t,l,s,c,h,w)
 #define HB_GTSELF_WHOCARES(g,p)                 (g)->pFuncTable->WhoCares(g,p)
+
+#ifndef HB_GTSUPERTABLE
+#  define HB_GTSUPERTABLE(g)  HB_GTSUPER
+#endif
 
 #define HB_GTSUPER_INIT(g,i,o,e)                 (HB_GTSUPER)->Init(g,i,o,e)
 #define HB_GTSUPER_EXIT(g)                       (HB_GTSUPER)->Exit(g)
@@ -549,6 +555,7 @@ typedef struct _HB_GT_BASE
 #define HB_GTSUPER_READKEY(g,m)                  (HB_GTSUPER)->ReadKey(g,m)
 #define HB_GTSUPER_INKEYGET(g,w,d,m)             (HB_GTSUPER)->InkeyGet(g,w,d,m)
 #define HB_GTSUPER_INKEYPUT(g,k)                 (HB_GTSUPER)->InkeyPut(g,k)
+#define HB_GTSUPER_INKEYINS(g,k)                 (HB_GTSUPER)->InkeyIns(g,k)
 #define HB_GTSUPER_INKEYLAST(g,m)                (HB_GTSUPER)->InkeyLast(g,m)
 #define HB_GTSUPER_INKEYNEXT(g,m)                (HB_GTSUPER)->InkeyNext(g,m)
 #define HB_GTSUPER_INKEYPOLL(g)                  (HB_GTSUPER)->InkeyPoll(g)
@@ -597,17 +604,17 @@ HB_EXTERN_END
 
 /* low level GT functions common to different GTs supported by RTL */
 extern int  hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC );
-extern BOOL hb_gt_setClipboard( char * szClipData, ULONG ulLen );
+extern BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen );
 extern BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen );
 #if defined( HB_OS_WIN_32 )
-extern BOOL hb_gt_w32_setClipboard( UINT uFormat, char * szClipData, ULONG ulLen );
+extern BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen );
 extern BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen );
 extern int  hb_gt_w32_getKbdState( void );
 extern void hb_gt_w32_setKbdState( int kbdShifts );
 extern void hb_gt_w32_tone( double dFrequency, double dDuration );
 #endif /* HB_OS_WIN_32 */
 #if defined( HB_OS_DOS ) || defined( HB_OS_WIN_32 ) || defined( HB_OS_OS2 )
-int hb_gt_dos_keyCodeTranslate( int iKey );
+extern int hb_gt_dos_keyCodeTranslate( int iKey );
 #endif /* HB_OS_DOS || HB_OS_WIN_32 || HB_OS_OS2 */
 
 #endif /* HB_GTCORE_H_ */

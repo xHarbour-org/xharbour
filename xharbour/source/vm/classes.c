@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.227 2008/10/22 11:51:15 marchuet Exp $
+ * $Id: classes.c,v 1.228 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -4320,6 +4320,10 @@ HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times *
          hb_stornl( pMethod->ulTime, -1, 2 );
          return;
       }
+   #else
+      hb_reta( 2 );
+      hb_stornl( 0, -1, 1 );
+      hb_stornl( 0, -1, 2 );
    #endif
 }
 

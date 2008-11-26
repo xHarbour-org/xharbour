@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.29 2008/11/24 05:30:34 andijahja Exp $
+# $Id: compile.mak,v 1.30 2008/11/24 06:24:57 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -95,6 +95,9 @@ $(OBJ_DIR)$(DIR_SEP)reserved$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)reserved.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbdate$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbdate.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbwince$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbwince.c
 	$(CC_CMD)
 
 #===============================================================================

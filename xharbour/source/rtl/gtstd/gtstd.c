@@ -1,5 +1,5 @@
 /*
- * $Id: gtstd.c,v 1.29 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gtstd.c,v 1.30 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -72,12 +72,12 @@
    #include <sys/types.h>
    #include <sys/wait.h>
 #else
-   #if defined( HB_WIN32_IO )
-      #include <windows.h>
-   #endif
-   #if defined( _MSC_VER ) && !defined( HB_WINCE )
-      #include <conio.h>
-   #endif
+#  if defined( HB_WIN32_IO )
+#     include <windows.h>
+#  endif
+#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_WINCE )
+#     include <conio.h>
+#  endif
 #endif
 
 static int           s_GtId;
@@ -91,9 +91,9 @@ static const BYTE s_szBell[] = { HB_CHAR_BEL, 0 };
 
 typedef struct _HB_GTSTD
 {
-   FHANDLE        hStdin;
-   FHANDLE        hStdout;
-   FHANDLE        hStderr;
+   HB_FHANDLE     hStdin;
+   HB_FHANDLE     hStdout;
+   HB_FHANDLE     hStderr;
    BOOL           fStdinConsole;
    BOOL           fStdoutConsole;
    BOOL           fStderrConsole;
@@ -185,7 +185,7 @@ static void hb_gt_std_newLine( PHB_GTSTD pGTSTD )
 }
 
 
-static void hb_gt_std_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_std_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    PHB_GTSTD pGTSTD;
 
@@ -415,7 +415,7 @@ static void hb_gt_std_Bell( PHB_GT pGT )
    hb_gt_std_termOut( HB_GTSTD_GET( pGT ), s_szBell, 1 );
 }
 
-static char * hb_gt_std_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_std_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_std_Version(%p,%d)", pGT, iType ) );
 
@@ -483,7 +483,7 @@ static void hb_gt_std_Scroll( PHB_GT pGT, int iTop, int iLeft, int iBottom, int 
       HB_GTSUPER_SCROLL( pGT, iTop, iLeft, iBottom, iRight, bColor, bChar, iRows, iCols );
 }
 
-static BOOL hb_gt_std_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_std_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_std_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
 
@@ -509,7 +509,7 @@ static BOOL hb_gt_std_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
    return FALSE;
 }
 
-static BOOL hb_gt_std_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
+static BOOL hb_gt_std_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_std_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
 
@@ -773,7 +773,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif

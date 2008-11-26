@@ -1,5 +1,5 @@
 /*
- * $Id: gtclip.c 8317 2008-03-09 15:49:08Z druzus $
+ * $Id: gtclip.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 static char *     s_szClipboardData;
 static ULONG      s_ulClipboardLen;
 
-BOOL hb_gt_setClipboard( char * szClipData, ULONG ulLen )
+BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen )
 {
    if( s_ulClipboardLen )
       hb_xfree( s_szClipboardData );
@@ -89,26 +89,34 @@ BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen )
 
 #if defined( HB_OS_WIN_32 )
 
-BOOL hb_gt_w32_setClipboard( UINT uFormat, char * szClipData, ULONG ulLen )
+BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen )
 {
-   LPTSTR  lptstrCopy;
-   HGLOBAL hglbCopy;
    BOOL fResult = FALSE;
 
    if( OpenClipboard( NULL ) )
    {
+      HGLOBAL hglbCopy;
+
       EmptyClipboard();
 
       /* Allocate a global memory object for the text. */
-      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ulLen + 1 );
+      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, uFormat == CF_UNICODETEXT ? ( ulLen + 1 ) * sizeof( wchar_t ) : ulLen + 1 );
       if( hglbCopy )
       {
          /* Lock the handle and copy the text to the buffer. */
-         lptstrCopy = ( LPTSTR ) GlobalLock( hglbCopy );
+         LPTSTR lptstrCopy = ( LPTSTR ) GlobalLock( hglbCopy );
          if( lptstrCopy )
          {
-            HB_TCHAR_SETTO( lptstrCopy, szClipData, ulLen );
-            lptstrCopy[ ulLen ] = '\0';
+            if( uFormat == CF_UNICODETEXT )
+            {
+               hb_mbtowcset( ( LPWSTR ) lptstrCopy, szClipData, ulLen );
+               * ( ( ( LPWSTR ) lptstrCopy ) + ulLen ) = L'\0';
+            }
+            else
+            {
+               memcpy( lptstrCopy, szClipData, ulLen );
+               lptstrCopy[ ulLen ] = '\0';
+            }
             fResult = TRUE;
          }
          GlobalUnlock( hglbCopy );
@@ -122,18 +130,15 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, char * szClipData, ULONG ulLen )
 
 BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
 {
-   HGLOBAL hglb;
-   LPTSTR  lptstr;
-
    *pulLen = 0;
    *pszClipData = NULL;
    if( IsClipboardFormatAvailable( uFormat ) && OpenClipboard( NULL ) )
    {
-      hglb = GetClipboardData( uFormat );
+      HGLOBAL hglb = GetClipboardData( uFormat );
       if( hglb )
       {
-         lptstr = ( LPTSTR ) GlobalLock( hglb );
-         if( lptstr != NULL )
+         LPTSTR lptstr = ( LPTSTR ) GlobalLock( hglb );
+         if( lptstr )
          {
             *pulLen = GlobalSize( hglb );
 
@@ -153,4 +158,3 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
 }
 
 #endif /* HB_OS_WIN_32 */
-

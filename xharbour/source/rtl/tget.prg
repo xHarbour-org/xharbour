@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.144 2008/03/13 10:49:42 likewolf Exp $
+ * $Id: tget.prg,v 1.145 2008/06/24 12:50:41 modalsist Exp $
  */
 
 /*
@@ -2236,25 +2236,7 @@ return Self
   not clipper 5.x compatible, and also was not respecting SET INTENSITY
 */
 METHOD SetColorSpec( cColorSpec ) CLASS Get
-
-//   local cClrUnSel, cClrEnh
-
-   if cColorSpec != NIL
-
-/*      cClrUnSel := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ),;
-                                hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ),;
-                                hb_ColorIndex( SetColor(), GET_CLR_UNSELECTED ) )
-
-      cClrEnh   := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ),;
-                                hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ),;
-                                cClrUnSel )
-*/
-
-      ::cColorSpec := buildGetColor(cColorSpec)
-
-   endif
-
-return ::cColorSpec
+return ::cColorSpec := buildGetColor( cColorSpec )
 
 //---------------------------------------------------------------------------//
 
@@ -2527,44 +2509,56 @@ RETURN cDate
 */
 
 STATIC FUNCTION BuildGetColor( cColorSpec )
-   Local cCur
-   Local aTokens
+   Local cCur, nClrOth, nClrUns
 
-   If ! ValType( cColorSpec ) == "C"
-      cColorSpec := Nil                          // Clipper compatibility
-   Endif
+   IF ISCHARACTER( cColorSpec )
+   
+      cCur := SetColor()
 
-   cCur := SetColor()
+      IF Set( _SET_INTENSITY )
 
-   If Set( _SET_INTENSITY )
+         Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
+                               __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
+                               __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
+                               __guiColor( cCur, CLR_BACKGROUND + 1 )
 
-      Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
-                            __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
-                            __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
-                            __guiColor( cCur, CLR_BACKGROUND + 1 )
+      ELSE
+         Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
 
-   Else
-      Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
+      ENDIF
 
-   Endif
+#ifdef HB_COMPAT_C53
+      cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
+                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) ) +;
+                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_CAPTION  ) ) ) != -1, nClrOth, nClrUns ) ) +;
+                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ACCEL    ) ) ) != -1, nClrOth, nClrUns ) )
+#else
+      cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
+                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) )
+#endif
+      
+   ELSEIF ValType( cColorSpec ) $ "UNDBA"
 
-                          /* NOTE */
-   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
-
-   If Len( aTokens ) == 1
-      cColorSpec := cCur + Replicate( "," + cCur, 3 )
-
-   Elseif Len( aTokens ) == 2
-      cColorSpec := cCur + Replicate( "," + aTokens[ 1 ], 2 )
-
-   Elseif Len( aTokens ) == 3
-      cColorSpec := cCur + "," + aTokens[ 1 ]
-
-   Else
-      cColorSpec := aTokens[1] + "," + aTokens[2] + "," + ;
-                    aTokens[3] + "," + aTokens[4]
-
-   Endif
+      cColorSpec := NIL      
+      
+#ifdef HB_COMPAT_C53
+   /* NOTE: This code doesn't seem to make any sense, but seems to 
+            replicate some original C5.3 behaviour. */
+   ELSE
+      cCur := SetColor()
+      IF Set( _SET_INTENSITY )
+         cColorSpec := __guiColor( cCur, CLR_UNSELECTED + 1 ) + "," +; 
+                       __guiColor( cCur, CLR_ENHANCED + 1 ) + "," +;   
+                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
+                       __guiColor( cCur, CLR_BACKGROUND + 1 )
+      ELSE
+         cColorSpec := __guiColor( cCur, CLR_STANDARD + 1 ) + "," +; 
+                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
+                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
+                       __guiColor( cCur, CLR_STANDARD + 1 )
+      ENDIF
+#endif
+   ENDIF      
 
 Return cColorSpec
 
