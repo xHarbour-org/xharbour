@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.228 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: classes.c,v 1.229 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -4304,8 +4304,9 @@ USHORT hb_clsMaxClasses( void )
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {
+   HB_THREAD_STUB_API
+
    #ifndef HB_NO_PROFILER
-      HB_THREAD_STUB_API
 
       PHB_DYNS pMsg = hb_dynsymFindName( hb_parcx( 2 ) );
       PMETHOD pMethod = hb_objGetpMthd( pMsg, (USHORT) hb_parni( 1 ) );
