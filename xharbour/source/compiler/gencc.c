@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.14 2007/04/30 01:16:29 ronpinkas Exp $
+ * $Id: gencc.c,v 1.15 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -1402,7 +1402,7 @@ static HB_GENC_FUNC( hb_p_pushglobal )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushGlobal( %d, &pGlobals );\n",
+   fprintf( cargo->yyc, "\thb_xvmPushGlobal( %d, &ppGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1411,7 +1411,7 @@ static HB_GENC_FUNC( hb_p_pushglobalref )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushGlobalByRef( %d, &pGlobals );\n",
+   fprintf( cargo->yyc, "\thb_xvmPushGlobalByRef( %d, &ppGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1420,7 +1420,7 @@ static HB_GENC_FUNC( hb_p_popglobal )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPopGlobal( %d, &pGlobals );\n",
+   fprintf( cargo->yyc, "\thb_xvmPopGlobal( %d, &ppGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -2024,6 +2024,11 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "{\n" );
    fprintf( yyc, "   ULONG ulPrivateBase = hb_memvarGetPrivatesBase();\n" );
+
+   if( hb_comp_pGlobals )
+   {
+      fprintf ( yyc, "   static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n");
+   }
 
    if( label_info.fCondJump )
    {
