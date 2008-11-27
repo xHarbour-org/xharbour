@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.152 2008/11/18 17:55:58 marchuet Exp $
+ * $Id: itemapi.c,v 1.153 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -1046,18 +1046,14 @@ PHB_ITEM hb_itemPutNI( PHB_ITEM pItem, int iNumber )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
    pItem->type = HB_IT_INTEGER;
    pItem->item.asInteger.value = iNumber;
-   pItem->item.asInteger.length = (UINT) HB_INT_LENGTH( iNumber );
+   pItem->item.asInteger.length = HB_INT_LENGTH( iNumber );
 
    return pItem;
 }
@@ -1096,33 +1092,29 @@ PHB_ITEM hb_itemPutNLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth, iDec));
 
    if( iWidth <= 0 || iWidth > 99 )
-   {
       iWidth = HB_DBL_LENGTH( dNumber );
-   }
 
    if( iDec < 0 )
-   {
       iDec = hb_set.HB_SET_DECIMALS;
-   }
 
-   if( iDec > 0 )
+   if( iDec == 0 )
    {
-      return hb_itemPutNDLen( pItem, dNumber, iWidth, iDec );
-   }
-   else if( HB_DBL_LIM_INT( dNumber ) )
-   {
-      return hb_itemPutNILen( pItem, ( int ) dNumber, iWidth );
-   }
-   else if( HB_DBL_LIM_LONG( dNumber ) )
-   {
+      HB_LONG lNumber = ( HB_LONG ) dNumber;
+
+      if( ( double ) lNumber == dNumber )
+      {
+         if( HB_LIM_INT( lNumber ) )
+            return hb_itemPutNILen( pItem, ( int ) lNumber, iWidth );
+         else
 #ifdef HB_LONG_LONG_OFF
-      return hb_itemPutNLLen( pItem, ( LONG ) dNumber, iWidth );
+            return hb_itemPutNLLen( pItem, ( long ) lNumber, iWidth );
 #else
-      return hb_itemPutNLLLen( pItem, ( LONGLONG ) dNumber, iWidth );
+            return hb_itemPutNLLLen( pItem, ( LONGLONG ) lNumber, iWidth );
 #endif
+      }
    }
 
-   return hb_itemPutNDLen( pItem, dNumber, iWidth, 0 );
+   return hb_itemPutNDLen( pItem, dNumber, iWidth, iDec );
 }
 
 PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
@@ -1132,20 +1124,16 @@ PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
    if( iWidth <= 0 || iWidth > 99 )
    {
 #if defined(__BORLANDC__) && (__BORLANDC__ > 1040) /* Use this only above Borland C++ 3.1 */
       /* Borland C compiled app crashes if a "NaN" double is compared with another double [martin vogel] */
-      if (_isnan (dNumber))
+      if( _isnan( dNumber ) )
       {
          iWidth = 20;
       }
@@ -1155,14 +1143,12 @@ PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
    }
 
    if( iDec < 0 )
-   {
       iDec = hb_set.HB_SET_DECIMALS;
-   }
 
    pItem->type = HB_IT_DOUBLE;
-   pItem->item.asDouble.value = dNumber;
    pItem->item.asDouble.length = (UINT) iWidth;
    pItem->item.asDouble.decimal = (UINT) iDec;
+   pItem->item.asDouble.value = dNumber;
 
    return pItem;
 }
@@ -1174,19 +1160,13 @@ PHB_ITEM hb_itemPutNILen( PHB_ITEM pItem, int iNumber, int iWidth )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
    if( iWidth <= 0 || iWidth > 99 )
-   {
       iWidth = HB_INT_LENGTH( iNumber );
-   }
 
    pItem->type = HB_IT_INTEGER;
    pItem->item.asInteger.value = iNumber;
@@ -1202,28 +1182,22 @@ PHB_ITEM hb_itemPutNLLen( PHB_ITEM pItem, LONG lNumber, int iWidth )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
 #if HB_INT_MAX == LONG_MAX
    if( iWidth <= 0 || iWidth > 99 )
-   {
       iWidth = HB_INT_LENGTH( lNumber );
-   }
+
    pItem->type = HB_IT_INTEGER;
    pItem->item.asInteger.value = (int) lNumber;
    pItem->item.asInteger.length = (UINT) iWidth;
 #else
    if( iWidth <= 0 || iWidth > 99 )
-   {
       iWidth = HB_LONG_LENGTH( lNumber );
-   }
+
    pItem->type = HB_IT_LONG;
    pItem->item.asLong.value = (HB_LONG) lNumber;
    pItem->item.asLong.length = (UINT) iWidth;
@@ -2267,9 +2241,9 @@ char * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq )
 
 PHB_ITEM hb_itemValToStr( PHB_ITEM pItem )
 {
-   ULONG ulLen;
    PHB_ITEM pResult;
    char * buffer;
+   ULONG ulLen;
    BOOL bFreeReq;
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemValToStr(%p)", pItem));
@@ -2564,13 +2538,13 @@ PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    if( ulLen == 0 )
    {
       pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = "";
+      pItem->item.asString.value     = ( char * ) "";
       hb_xfree( szText );
    }
    else if( ulLen == 1 )
    {
       pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = ( char * ) hb_szAscii[ (unsigned char) ( szText[0] ) ];
+      pItem->item.asString.value     = ( char * ) hb_szAscii[ ( unsigned char ) ( szText[0] ) ];
       hb_xfree( szText );
    }
    else

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.229 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: classes.c,v 1.230 2008/11/26 23:03:49 andijahja Exp $
  */
 
 /*
@@ -4309,7 +4309,7 @@ HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times *
    #ifndef HB_NO_PROFILER
 
       PHB_DYNS pMsg = hb_dynsymFindName( hb_parcx( 2 ) );
-      PMETHOD pMethod = hb_objGetpMthd( pMsg, (USHORT) hb_parni( 1 ) );
+      PMETHOD pMethod = hb_objGetpMthd( pMsg, ( USHORT ) hb_parni( 1 ) );
 
       hb_reta( 2 );
       hb_stornl( 0, -1, 1 );

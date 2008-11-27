@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.10 2005/10/29 18:53:39 likewolf Exp $
+ * $Id: rt_misc.prg,v 1.11 2008/11/18 17:55:58 marchuet Exp $
  */
 
 /*
@@ -54,6 +54,13 @@
 
 /* Don't change the position of this #include. */
 #include "rt_vars.ch"
+
+#undef HB_C52_STRICT_OFF
+#ifdef __HARBOUR__
+   #ifndef HB_C52_STRICT
+      #define HB_C52_STRICT_OFF
+   #endif
+#endif
 
 FUNCTION Main_MISC()
    LOCAL oError

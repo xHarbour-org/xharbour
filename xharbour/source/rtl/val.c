@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.19 2004/11/21 21:44:20 druzus Exp $
+ * $Id: val.c,v 1.20 2006/01/30 02:51:25 druzus Exp $
  */
 
 /*
@@ -61,21 +61,19 @@ HB_FUNC( VAL )
 
    if( pText )
    {
-      char * szText = pText->item.asString.value;
-      int iWidth, iDec, iLen = ( int ) pText->item.asString.length;
+      char * szText = hb_itemGetCPtr( pText );
+      int iWidth, iDec, iLen = ( int ) hb_itemGetCLen( pText );
       BOOL fDbl;
       HB_LONG lValue;
       double dValue;
 
       fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue , &iDec, &iWidth );
 
-      if ( !fDbl )
+      if( !fDbl )
          hb_retnintlen( lValue, iWidth );
       else
-         hb_retnlen( dValue, iWidth, iDec );
+         hb_retndlen( dValue, iWidth, iDec );
    }
    else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1098, NULL, "VAL", 1, hb_paramError( 1 ) );
-   }
+      hb_errRT_BASE_SubstR( EG_ARG, 1098, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

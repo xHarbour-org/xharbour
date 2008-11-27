@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6286 2008/11/26 23:03:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.6287 2008/11/27 05:04:53 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-27 16:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rtl\val.c
+    % minor optimization
+  * source\vm\itemapi.c
+    * changed hb_itemPutNLen() function to create integer item only
+      when conversion to HB_LONG does not change value of passed double
+      argument. It fixes some problems like restoring non integer double
+      values with 0 decimal places by __MVRESTORE()
+    thks to Przemyslaw.
+
+  * source\vm\classes.c
+    * minor syntax questions.
+
+  * utils\hbtest\rt_misc.prg
+    ! solved remaining clipper incompatibilities
 
 2008-11-27 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/gencc.c
