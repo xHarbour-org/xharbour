@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.175 2008/11/26 05:40:41 andijahja Exp $
+ * $Id: genc.c,v 1.176 2008/11/28 05:17:45 andijahja Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ static void hb_compGenCCheckInLineStatic( char * str );
 static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption );
 static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
-static void hb_compWriteDeclareGlobal( FILE *yyc );
+static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals );
 static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL );
 static void hb_compWritePragma( FILE *yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef );
 /* struct to hold symbol names of c-in-line static functions */
@@ -875,7 +875,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );
       fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
 
-      hb_compWriteDeclareGlobal( yyc );
+      hb_compWriteDeclareGlobal( yyc, iLocalGlobals );
 
       if( hb_comp_UsedNamespaces.pFirst )
       {
@@ -1556,7 +1556,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
    return ( bStartFunc );
 }
 
-static void hb_compWriteDeclareGlobal( FILE *yyc )
+static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals )
 {
    BOOL bWriteExtern = FALSE;
 
@@ -1595,8 +1595,11 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
       }
 
       fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
-      fprintf ( yyc, "static PHB_ITEM *ppGlobals = pGlobals;\n");
-//    fprintf ( yyc, "static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n");
+
+      if ( iLocalGlobals || ( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT ) )
+      {
+         fprintf ( yyc, "static PHB_ITEM *ppGlobals = pGlobals;\n");
+      }
 
       pGlobal = hb_comp_pGlobals;
 
