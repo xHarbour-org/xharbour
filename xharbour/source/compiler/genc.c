@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.176 2008/11/28 05:17:45 andijahja Exp $
+ * $Id: genc.c,v 1.177 2008/11/28 22:23:27 andijahja Exp $
  */
 
 /*
@@ -1596,7 +1596,7 @@ static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals )
 
       fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
 
-      if ( iLocalGlobals || ( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT ) )
+      if ( iLocalGlobals || ( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE ) )
       {
          fprintf ( yyc, "static PHB_ITEM *ppGlobals = pGlobals;\n");
       }
