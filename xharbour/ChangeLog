@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6287 2008/11/27 05:04:53 andijahja Exp $
+ * $Id: ChangeLog,v 1.6288 2008/11/27 15:54:02 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-11-28 12:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/genc.c
+  * source/compiler/gencc.c
+    ! make global variable as file wide static.
 
 2008-11-27 16:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rtl\val.c

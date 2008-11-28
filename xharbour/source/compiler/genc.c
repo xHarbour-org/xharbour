@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.174 2008/11/25 05:15:58 andijahja Exp $
+ * $Id: genc.c,v 1.175 2008/11/26 05:40:41 andijahja Exp $
  */
 
 /*
@@ -1353,8 +1353,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          fprintf( yyc, "HB_FUNC_REGISTERGLOBAL()\n"
                        "{\n"
-                       "   static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n"
-                       "\n"
                        "   hb_vmRegisterGlobals( &ppGlobals, %i );\n", iGlobals );
          fprintf( yyc, "}\n\n" );
       }
@@ -1597,8 +1595,10 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
       }
 
       fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
-      pGlobal = hb_comp_pGlobals;
+      fprintf ( yyc, "static PHB_ITEM *ppGlobals = pGlobals;\n");
+//    fprintf ( yyc, "static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n");
 
+      pGlobal = hb_comp_pGlobals;
 
       fprintf( yyc, "\nstatic void module_InitGlobalsArray( void )\n{\n" );
 

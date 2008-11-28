@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.15 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: gencc.c,v 1.16 2008/11/27 05:04:53 andijahja Exp $
  */
 
 /*
@@ -2025,14 +2025,13 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
    fprintf( yyc, "{\n" );
    fprintf( yyc, "   ULONG ulPrivateBase = hb_memvarGetPrivatesBase();\n" );
 
-   if( hb_comp_pGlobals )
-   {
-      fprintf ( yyc, "   static PHB_ITEM *ppGlobals = (PHB_ITEM *) pGlobals;\n");
-   }
-
    if( label_info.fCondJump )
    {
       fprintf( yyc, "   BOOL fValue;\n\n" );
+   }
+   else
+   {
+      fprintf( yyc, "\n" );
    }
 
    if( pFunc->cScope & HB_FS_CRITICAL )
@@ -2057,7 +2056,7 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
       fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc, "   hb_xvmExitProc( ulPrivateBase );\n" );
+   fprintf( yyc, "\n   hb_xvmExitProc( ulPrivateBase );\n" );
    fprintf( yyc, "}\n" );
 
    if( label_info.pulLabels )
