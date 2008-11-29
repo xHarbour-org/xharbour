@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.4 2008/09/27 04:10:56 ronpinkas Exp $
+ * $Id: gtwvg.c,v 1.5 2008/11/19 05:24:51 andijahja Exp $
  */
 
 /*
@@ -2006,7 +2006,7 @@ static BOOL hb_gt_wvt_PutChar( PHB_GT pGT, int iRow, int iCol,
 
 /* ********************************************************************** */
 
-static char * hb_gt_wvt_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_wvt_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_wvt_Version(%p,%d)", pGT, iType ) );
 
@@ -2952,6 +2952,7 @@ static void hb_gt_wvt_Refresh( PHB_GT pGT )
 
 /* ********************************************************************** */
 
+#ifdef XXX
 static int hb_gt_wvt_wnd_Create( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRight )
 {
    PHB_GTWVT pWVT;
@@ -3046,10 +3047,11 @@ static int hb_gt_wvt_wnd_Current( PHB_GT pGT )
 
    return 0;
 }
+#endif
 
 /* ********************************************************************** */
 
-static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP, BOOL fBox )
+static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
    PHB_GTWVT pWVT;
 
@@ -3081,7 +3083,7 @@ static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCD
    return TRUE;
 }
 
-static BOOL hb_gt_wvt_SetKeyCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP )
+static BOOL hb_gt_wvt_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP )
 {
    PHB_GTWVT pWVT;
 

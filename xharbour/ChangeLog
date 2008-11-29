@@ -8,12 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-11-29 12:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * include\classes.h
-  * include\hbvmpub.h  
-    * to use old 3rd party libs, is needed to build xharbour with macro HB_LEGACY_LEVEL,
-      because profiler structural variables are eliminated from its structure when are
-      not needed. Are also removed on HB_NO_PROFILER.
+2008-11-29 13:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\gtwvg\gtwvg.c
+    * changed return type to const char * in function hb_gt_wvt_Version()
+    * changed parameters type to const char * in function hb_gt_wvt_SetDispCP()
+    * changed parameters type to const char * in function hb_gt_wvt_SetKeyCP()
+    * guarded by #ifdef 0 currently unused functions
+      hb_gt_wvt_wnd_Create(),
+      hb_gt_wvt_wnd_Destroy()
+      hb_gt_wvt_wnd_Select()
+      hb_gt_wvt_wnd_Current()
+
+  * contrib\what32\source\wincore.prg
+    - commented out #define _WIN32_WINNT 0x0400
 
 2008-11-29 05:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/genc.c
