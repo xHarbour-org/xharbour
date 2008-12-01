@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.6 2004/02/23 10:01:42 andijahja Exp $
+ * $Id: descend.c,v 1.7 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ void hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen )
    else
    {
       for(; ulLen--; szStringTo++, szStringFrom++ )
-         *szStringTo = 256 - *szStringFrom;
+         *szStringTo = ( char ) ( 256 - *szStringFrom );
    }
 }
 
@@ -77,12 +77,12 @@ HB_FUNC( DESCEND )
    {
       if( HB_IS_STRING( pItem ) )
       {
-         ULONG ulLen = pItem->item.asString.length;
+         ULONG ulLen = hb_itemGetCLen( pItem );
 
          if( ulLen > 0 )
          {
-            char * szBuffer = ( char * ) hb_xgrab( ulLen );
-            hb_strDescend( szBuffer, pItem->item.asString.value, ulLen );
+            char * szBuffer = ( char * ) hb_xgrab( ulLen + 1 );
+            hb_strDescend( szBuffer, hb_itemGetCPtr( pItem ), ulLen );
             hb_retclen( szBuffer, ulLen );
             hb_xfree( szBuffer );
          }
@@ -92,7 +92,7 @@ HB_FUNC( DESCEND )
       else if( HB_IS_DATETIME( pItem ) )
          hb_retnd( (double) 5231808 - hb_itemGetDTD( pItem )  );
       else if( HB_IS_DATE( pItem ) )
-         hb_retnl( 5231808 - pItem->item.asDate.value );
+         hb_retnl( 5231808 - hb_itemGetDL( pItem ) );
       else if( HB_IS_NUMERIC( pItem ) )
          hb_retnd( -1 * hb_itemGetND( pItem ) );
       else if( HB_IS_LOGICAL( pItem ) )

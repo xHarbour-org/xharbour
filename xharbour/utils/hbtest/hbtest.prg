@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.13 2005/04/27 22:16:00 andijahja Exp $
+ * $Id: hbtest.prg,v 1.14 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -99,10 +99,10 @@ STATIC s_nEndTime
    REQUEST HB_LANG_EN
 #endif
 
-FUNCTION Main( cPar1, cPar2 )
+PROCEDURE Main( cPar1, cPar2 )
 
    OutStd( "xHarbour Regression Test Suite" + HB_OSNewLine() +;
-           "Copyright 1999-2005, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
+           "Copyright 1999-2008, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
 
    IF cPar1 == NIL
       cPar1 := ""
@@ -123,7 +123,7 @@ FUNCTION Main( cPar1, cPar2 )
               "          /all          Display all tests, not only the failures." + HB_OSNewLine() +;
               "          /skip:<list>  Skip the listed test numbers." + HB_OSNewLine() )
 
-      RETURN NIL
+      RETURN
    ENDIF
 
    /* Initialize test */
@@ -162,7 +162,7 @@ FUNCTION Main( cPar1, cPar2 )
 
    TEST_END()
 
-   RETURN NIL
+   RETURN
 
 /* NOTE: These should always be called last, since they can mess up the test
          environment.
@@ -170,7 +170,7 @@ FUNCTION Main( cPar1, cPar2 )
          Right now the failing __MRestore() will clear all memory variables,
          which is absolutely normal otherwise. */
 
-STATIC FUNCTION Main_LAST()
+STATIC PROCEDURE Main_LAST()
 
    TEST_LINE( MEMVARBLOCK( "mcString" )           , "{||...}"                                         )
 #ifndef __XPP__
@@ -186,9 +186,9 @@ STATIC FUNCTION Main_LAST()
    TEST_LINE( __MSave( BADFNAME(), "*", .T. ) , "E BASE 2006 Create error " + BADFNAME() + " A:3:C:" + BADFNAME() + ";C:*;L:.T. F:DR")
 #endif
 
-   RETURN NIL
+   RETURN
 
-STATIC FUNCTION TEST_BEGIN( cParam )
+STATIC PROCEDURE TEST_BEGIN( cParam )
 
    LOCAL nOpt
    LOCAL aOpt := {"No Optimization",;
@@ -246,21 +246,21 @@ STATIC FUNCTION TEST_BEGIN( cParam )
 
    /* Feedback */
 
-   FWrite( s_nFhnd, "---------------------------------------------------------------------------" + HB_OSNewLine() +;
+   OutMsg( s_nFhnd, "---------------------------------------------------------------------------" + HB_OSNewLine() +;
                     "      Version: " + Version() + HB_OSNewLine() )
 #ifdef __HARBOUR__
-   FWrite( s_nFhnd, "     Compiler: " + HB_Compiler() + HB_OSNewLine() )
-   FWrite( s_nFhnd, " Multi Thread: " + iif(HB_MultiThread(),"ON","OFF") + HB_OSNewLine() )
-   FWrite( s_nFhnd, " Optimization: " + Str(nOpt:=hb_vmMode(),1) + " ("+aOpt[nOpt+1] +")"+ HB_OSNewLine() )
+   OutMsg( s_nFhnd, "     Compiler: " + HB_Compiler() + HB_OSNewLine() )
+   OutMsg( s_nFhnd, " Multi Thread: " + iif(HB_MultiThread(),"ON","OFF") + HB_OSNewLine() )
+   OutMsg( s_nFhnd, " Optimization: " + Str(nOpt:=hb_vmMode(),1) + " ("+aOpt[nOpt+1] +")"+ HB_OSNewLine() )
 #endif
-   FWrite( s_nFhnd, "           OS: " + OS() + HB_OSNewLine() +;
+   OutMsg( s_nFhnd, "           OS: " + OS() + HB_OSNewLine() +;
                     "   Date, Time: " + DToC( Date() ) + " " + Time() + HB_OSNewLine() +;
                     "       Output: " + s_cFileName + HB_OSNewLine() +;
                     "Shortcut opt.: " + iif( s_lShortcut, "ON", "OFF" ) + HB_OSNewLine() +;
                     "     Switches: " + cParam + HB_OSNewLine() +;
                     "===========================================================================" + HB_OSNewLine() )
 
-   FWrite( s_nFhnd, PadR( "R", TEST_RESULT_COL1_WIDTH ) + " " +;
+   OutMsg( s_nFhnd, PadR( "R", TEST_RESULT_COL1_WIDTH ) + " " +;
                     PadR( "No.  Line", TEST_RESULT_COL2_WIDTH ) + " " +;
                     PadR( "TestCall()", TEST_RESULT_COL3_WIDTH ) + " -> " +;
                     PadR( "Result", TEST_RESULT_COL4_WIDTH ) + " | " +;
@@ -327,9 +327,9 @@ STATIC FUNCTION TEST_BEGIN( cParam )
    w_TEST->TYPE_L    := .T.
    w_TEST->TYPE_L_E  := .F.
 
-   RETURN NIL
+   RETURN
 
-FUNCTION TEST_CALL( cBlock, bBlock, xResultExpected )
+PROCEDURE TEST_CALL( cBlock, bBlock, xResultExpected )
    LOCAL xResult
    LOCAL oError
    LOCAL bOldError
@@ -366,7 +366,7 @@ FUNCTION TEST_CALL( cBlock, bBlock, xResultExpected )
       ErrorBlock( bOldError )
 
       IF !( ValType( xResult ) == ValType( xResultExpected ) )
-         IF ValType( xResultExpected) == "C" .AND. ValType( xResult ) $ "ABMO"
+         IF ValType( xResultExpected ) == "C" .AND. ValType( xResult ) $ "ABMO"
             lFailed := !( XToStr( xResult ) == xResultExpected )
          ELSE
             lFailed := .T.
@@ -381,7 +381,7 @@ FUNCTION TEST_CALL( cBlock, bBlock, xResultExpected )
 
       IF lFailed
 
-         FWrite( s_nFhnd, PadR( iif( lFailed, "!", iif( lSkipped, "S", " " ) ), TEST_RESULT_COL1_WIDTH ) + " " +;
+         OutMsg( s_nFhnd, PadR( iif( lFailed, "!", iif( lSkipped, "S", " " ) ), TEST_RESULT_COL1_WIDTH ) + " " +;
                           PadR( Str( s_nCount, 4 ) + " " + ProcName( 1 ) + "(" + LTrim( Str( ProcLine( 1 ), 5 ) ) + ")", TEST_RESULT_COL2_WIDTH ) + " " +;
                           PadR( cBlock, TEST_RESULT_COL3_WIDTH ) +;
                           HB_OSNewLine() +;
@@ -392,7 +392,7 @@ FUNCTION TEST_CALL( cBlock, bBlock, xResultExpected )
 
       ELSE
 
-         FWrite( s_nFhnd, PadR( iif( lFailed, "!", iif( lSkipped, "S", " " ) ), TEST_RESULT_COL1_WIDTH ) + " " +;
+         OutMsg( s_nFhnd, PadR( iif( lFailed, "!", iif( lSkipped, "S", " " ) ), TEST_RESULT_COL1_WIDTH ) + " " +;
                           PadR( Str( s_nCount, 4 ) + " " + ProcName( 1 ) + "(" + LTrim( Str( ProcLine( 1 ), 5 ) ) + ")", TEST_RESULT_COL2_WIDTH ) + " " +;
                           PadR( cBlock, TEST_RESULT_COL3_WIDTH ) + " -> " +;
                           PadR( XToStr( xResult ), TEST_RESULT_COL4_WIDTH ) + " | " +;
@@ -408,12 +408,12 @@ FUNCTION TEST_CALL( cBlock, bBlock, xResultExpected )
       s_nPass++
    ENDIF
 
-   RETURN NIL
+   RETURN
 
 FUNCTION TEST_OPT_Z()
    RETURN s_lShortCut
 
-STATIC FUNCTION TEST_END()
+STATIC PROCEDURE TEST_END()
 
    dbSelectArea( "w_TEST" )
    dbCloseArea()
@@ -422,7 +422,7 @@ STATIC FUNCTION TEST_END()
 
    s_nEndTime := Seconds()
 
-   FWrite( s_nFhnd, "===========================================================================" + HB_OSNewLine() +;
+   OutMsg( s_nFhnd, "===========================================================================" + HB_OSNewLine() +;
                     "Test calls passed: " + Str( s_nPass ) + " ( " + LTrim( Str( ( 1 - ( s_nFail / s_nPass ) ) * 100, 6, 2 ) ) + " % )" + HB_OSNewLine() +;
                     "Test calls failed: " + Str( s_nFail ) + " ( " + LTrim( Str( ( s_nFail / s_nPass ) * 100, 6, 2 ) ) + " % )" + HB_OSNewLine() +;
                     "                   ----------" + HB_OSNewLine() +;
@@ -432,10 +432,10 @@ STATIC FUNCTION TEST_END()
 
    IF s_nFail != 0
       IF "CLIPPER (R)" $ Upper( Version() )
-         FWrite( s_nFhnd, "WARNING ! Failures detected using CA-Clipper." + HB_OSNewLine() +;
+         OutMsg( s_nFhnd, "WARNING ! Failures detected using CA-Clipper." + HB_OSNewLine() +;
                           "Please fix those expected results which are not bugs in CA-Clipper itself." + HB_OSNewLine() )
       ELSE
-         FWrite( s_nFhnd, "WARNING ! Failures detected" + HB_OSNewLine() )
+         OutMsg( s_nFhnd, "WARNING ! Failures detected" + HB_OSNewLine() )
       ENDIF
    ENDIF
 
@@ -445,7 +445,7 @@ STATIC FUNCTION TEST_END()
 
    ErrorLevel( iif( s_nFail != 0, 1, 0 ) )
 
-   RETURN NIL
+   RETURN
 
 FUNCTION XToStr( xValue )
    LOCAL cType := ValType( xValue )
@@ -462,7 +462,7 @@ FUNCTION XToStr( xValue )
       RETURN '"' + xValue + '"'
 
    CASE cType == "N" ; RETURN LTrim( Str( xValue ) )
-   CASE cType == "D" ; RETURN 'SToD("' + DToS( xValue ) + '")'
+   CASE cType == "D" ; RETURN 'HB_SToD("' + DToS( xValue ) + '")'
    CASE cType == "L" ; RETURN iif( xValue, ".T.", ".F." )
    CASE cType == "O" ; RETURN xValue:className() + " Object"
    CASE cType == "U" ; RETURN "NIL"
@@ -494,6 +494,47 @@ FUNCTION XToStrE( xValue )
    CASE cType == "U" ; RETURN "NIL"
    CASE cType == "B" ; RETURN '{||...}'
    CASE cType == "A" ; RETURN '{.[' + LTrim( Str( Len( xValue ) ) ) + '].}'
+   CASE cType == "M" ; RETURN 'M:' + xValue
+   ENDCASE
+
+   RETURN ""
+
+FUNCTION XToStrX( xValue )
+   LOCAL cType := ValType( xValue )
+
+   LOCAL tmp
+   LOCAL cRetVal
+
+   DO CASE
+   CASE cType == "C"
+
+      xValue := StrTran( xValue, Chr(0), '"+Chr(0)+"' )
+      xValue := StrTran( xValue, Chr(9), '"+Chr(9)+"' )
+      xValue := StrTran( xValue, Chr(10), '"+Chr(10)+"' )
+      xValue := StrTran( xValue, Chr(13), '"+Chr(13)+"' )
+      xValue := StrTran( xValue, Chr(26), '"+Chr(26)+"' )
+
+      RETURN xValue
+
+   CASE cType == "N" ; RETURN LTrim( Str( xValue ) )
+   CASE cType == "D" ; RETURN DToS( xValue )
+   CASE cType == "L" ; RETURN iif( xValue, ".T.", ".F." )
+   CASE cType == "O" ; RETURN xValue:className() + " Object"
+   CASE cType == "U" ; RETURN "NIL"
+   CASE cType == "B" ; RETURN '{||...} -> ' + XToStrX( Eval( xValue ) )
+   CASE cType == "A"
+
+      cRetVal := '{ '
+
+      FOR tmp := 1 TO Len( xValue )
+         cRetVal += XToStrX( xValue[ tmp ] )
+         IF tmp < Len( xValue )
+            cRetVal += ", "
+         ENDIF
+      NEXT
+   
+      RETURN cRetVal + ' }'
+
    CASE cType == "M" ; RETURN 'M:' + xValue
    ENDCASE
 
@@ -583,11 +624,12 @@ STATIC FUNCTION CMDLGetValue( cCommandLine, cName, cRetVal )
 
    RETURN cRetVal
 
-#ifndef HAVE_HBCLIP
-#ifndef __HARBOUR__
-#ifndef __XPP__
+#if defined( __XPP__ ) || defined( __HARBOUR )
+FUNCTION HB_SToD( cDate )
+   RETURN SToD( cDate )
+#else
 
-FUNCTION SToD( cDate )
+FUNCTION HB_SToD( cDate )
    LOCAL cOldDateFormat
    LOCAL dDate
 
@@ -606,16 +648,26 @@ FUNCTION SToD( cDate )
    RETURN dDate
 
 #endif
-#endif
-#endif
+
 
 STATIC FUNCTION BADFNAME()
 #ifdef __PLATFORM__UNIX
-   return "*BADNAM/*.MEM"
+   RETURN "*BADNAM/*.MEM"
 #else
-   return "*BADNAM*.MEM"
+   RETURN "*BADNAM*.MEM"
 #endif
 
+STATIC PROCEDURE OutMsg( hFile, cMsg )
+
+   IF hFile == 1
+      OutStd( cMsg )
+   ELSEIF hFile == 2
+      OutErr( cMsg )
+   ELSE
+      FWrite( hFile, cMsg )
+   ENDIF
+
+   RETURN
 
 /* Don't change the position of this #include. */
 #include "rt_init.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.175 2008/11/20 23:16:28 andijahja Exp $
+ * $Id: filesys.c,v 1.176 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -3402,7 +3402,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
     * It will allow us to add drive emulation in hb_fsCurDrv()/hb_fsChDrv()
     * and hb_fsNameConv()
     */
-#if !defined(HB_OS_OS2) && !defined(__MINGW32__)
+#if !( defined(__GNUC__) && ( defined(HB_OS_OS2) || !defined(__MINGW32__) ) )
    if( uiDrive )
    {
       uiCurDrv = hb_fsCurDrv() + 1;
@@ -3416,13 +3416,13 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 #if defined(HB_OS_WIN_32)
 
    HB_TEST_CANCEL_ENABLE_ASYN
-   fResult = GetCurrentDirectory( ulLen, ( char * ) pbyBuffer );
+   fResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( fResult, 0 );
    HB_DISABLE_ASYN_CANC
 
-#elif defined(HB_OS_OS2)
+#elif defined(HB_OS_OS2) && defined(__GNUC__)
 
-   fResult = ( _getcwd1( (char *) pbyBuffer, uiDrive + 'A' - 1 ) == 0 );
+   fResult = ( _getcwd1( ( char * ) pbyBuffer, uiDrive + 'A' - 1 ) == 0 );
    hb_fsSetIOError( fResult, 0 );
 
 #elif defined(HAVE_POSIX_IO)
@@ -3628,7 +3628,7 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 #if defined( _MSC_VER ) || defined( __MINGW32__ )
    bResult = _isatty( hFileHandle ) != 0;
 #else
-   bResult = isatty( hFileHandle ) != 0 ;
+   bResult = isatty( hFileHandle ) != 0;
 #endif
    hb_fsSetIOError( bResult, 0 );
 
@@ -3763,15 +3763,15 @@ HB_FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", pFilename, pDefExt, uiExFlags, pPaths, pError));
 
 #if 0
-   #define FXO_TRUNCATE  0x0100   // Create (truncate if exists)
-   #define FXO_APPEND    0x0200   // Create (append if exists)
-   #define FXO_UNIQUE    0x0400   // Create unique file FO_EXCL ???
-   #define FXO_FORCEEXT  0x0800   // Force default extension
-   #define FXO_DEFAULTS  0x1000   // Use SET command defaults
-   #define FXO_DEVICERAW 0x2000   // Open devices in raw mode
-   // xHarbour extension
-   #define FXO_SHARELOCK 0x4000   // emulate DOS SH_DENY* mode in POSIX OS
-   #define FXO_COPYNAME  0x8000   // copy final szPath into pFilename
+   #define FXO_TRUNCATE  0x0100   /* Create (truncate if exists) */
+   #define FXO_APPEND    0x0200   /* Create (append if exists) */
+   #define FXO_UNIQUE    0x0400   /* Create unique file FO_EXCL ??? */
+   #define FXO_FORCEEXT  0x0800   /* Force default extension */
+   #define FXO_DEFAULTS  0x1000   /* Use SET command defaults */
+   #define FXO_DEVICERAW 0x2000   /* Open devices in raw mode */
+   /* xHarbour extension */
+   #define FXO_SHARELOCK 0x4000   /* emulate DOS SH_DENY* mode in POSIX OS */
+   #define FXO_COPYNAME  0x8000   /* copy final szPath into pFilename */
 
    hb_errGetFileName( pError );
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.7 2005/05/16 21:45:42 andijahja Exp $
+ * $Id: rt_str.prg,v 1.8 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 /* Don't change the position of this #include. */
 #include "rt_vars.ch"
 
-FUNCTION Main_STR()
+PROCEDURE Main_STR()
 
    /* VAL() */
 
@@ -765,7 +765,7 @@ FUNCTION Main_STR()
    TEST_LINE( Stuff("ABCE"+Chr(0)+"F",  2,  3, "xyz")          , "Axyz"+Chr(0)+"F"         )
    TEST_LINE( Stuff("ABC"+Chr(0)+"EF",  2,  3, "x"+Chr(0)+"z") , "Ax"+Chr(0)+"zEF"         )
 
-   RETURN NIL
+   RETURN
 
 /* Don't change the position of this #include. */
 #include "rt_init.ch"

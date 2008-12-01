@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.8 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: hbgtcore.h,v 1.9 2008/11/26 21:01:02 marchuet Exp $
  */
 
 /*
@@ -60,6 +60,8 @@
 
 #include "hbapigt.h"
 #include "hbapicdp.h"
+
+HB_EXTERN_BEGIN
 
 /* extended attributes used by core screen buffer */
 #define HB_GT_ATTR_BOX        0x01
@@ -353,6 +355,7 @@ typedef struct _HB_GT_BASE
 
 } HB_GT_BASE, * PHB_GT_BASE, * PHB_GT;
 
+extern PHB_GT hb_gt_Base( void );
 
 #define HB_GTLOCAL(g)   (g)->pGTData[*HB_GTID_PTR]
 
@@ -590,9 +593,7 @@ typedef struct _HB_GT_BASE
 #define HB_GTSUPER_GFXTEXT(g,t,l,s,c,h,w)        (HB_GTSUPER)->GfxText(g,t,l,s,c,h,w)
 #define HB_GTSUPER_WHOCARES(g,p)                 (HB_GTSUPER)->WhoCares(g,p)
 
-HB_EXTERN_BEGIN
 
-extern HB_EXPORT PHB_GT hb_gt_Base( void );
 extern HB_EXPORT const char * hb_gt_FindDefault( void );
 extern HB_EXPORT void   hb_gtSetDefault( const char * szGtName );
 extern HB_EXPORT BOOL   hb_gtRegister( const HB_GT_INIT * gtInit );
@@ -600,7 +601,7 @@ extern HB_EXPORT BOOL   hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTabl
 extern HB_EXPORT BOOL   hb_gtUnLoad( void );
 extern HB_EXPORT void   hb_gtStartupInit( void );
 
-HB_EXTERN_END
+
 
 /* low level GT functions common to different GTs supported by RTL */
 extern int  hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC );
@@ -616,5 +617,7 @@ extern void hb_gt_w32_tone( double dFrequency, double dDuration );
 #if defined( HB_OS_DOS ) || defined( HB_OS_WIN_32 ) || defined( HB_OS_OS2 )
 extern int hb_gt_dos_keyCodeTranslate( int iKey );
 #endif /* HB_OS_DOS || HB_OS_WIN_32 || HB_OS_OS2 */
+
+HB_EXTERN_END
 
 #endif /* HB_GTCORE_H_ */

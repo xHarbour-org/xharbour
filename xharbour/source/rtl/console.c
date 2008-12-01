@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.72 2008/07/07 13:10:58 modalsist Exp $
+ * $Id: console.c,v 1.73 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -518,7 +518,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiPRow = ( USHORT ) iRow;
-      USHORT uiPCol = ( USHORT ) iCol + hb_set.HB_SET_MARGIN;
+      USHORT uiPCol = ( USHORT ) iCol + ( USHORT ) hb_set.HB_SET_MARGIN;
 
       if( s_uiPRow != uiPRow || s_uiPCol != uiPCol )
       {
@@ -543,7 +543,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
             {
                if( iPtr + s_iCrLfLen > ( int ) sizeof( buf ) )
                {
-                  hb_fsWrite( hb_set.hb_set_printhan, buf, iPtr );
+                  hb_fsWrite( hb_set.hb_set_printhan, buf, ( USHORT ) iPtr );
                   iPtr = 0;
                }
                memcpy( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
@@ -698,7 +698,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
       pszString = hb_itemStringCon( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
-      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
+      hb_gtWriteAt( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
 
       hb_gtSetColorStr( szOldColor );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.80 2008/11/24 13:00:52 andijahja Exp $
+ * $Id: hbvmpub.h,v 1.81 2008/11/29 11:09:22 marchuet Exp $
  */
 
 /*
@@ -375,12 +375,12 @@
       HB_HANDLE hArea;        /* Workarea number */
       HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
+      PSYMBOLS  pModuleSymbols;
 #if ! defined( HB_NO_PROFILER ) || defined( HB_LEGACY_LEVEL )
       ULONG     ulCalls;      /* profiler support */
       ULONG     ulTime;       /* profiler support */
       ULONG     ulRecurse;    /* profiler support */
 #endif
-      PSYMBOLS  pModuleSymbols;
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
 
    #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )

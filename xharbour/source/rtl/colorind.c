@@ -1,5 +1,5 @@
 /*
- * $Id: colorind.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: colorind.c,v 1.3 2004/03/18 03:58:36 ronpinkas Exp $
  */
 
 /*
@@ -56,51 +56,43 @@ HB_FUNC( HB_COLORINDEX )
 {
    if( ISCHAR( 1 ) && ISNUM( 2 ) )
    {
-      char * pszColor = hb_parcx( 1 );
+      char * pszColor = hb_parc( 1 );
       ULONG ulColorPos;
       ULONG ulColorLen;
       USHORT uiColorIndex = ( USHORT ) hb_parni( 2 );
 
       /* Skip the given number of commas */
-
-      for( ulColorPos = 0 ; pszColor[ ulColorPos ] != '\0' && uiColorIndex > 0 ; ulColorPos++ )
+      for( ulColorPos = 0; pszColor[ ulColorPos ] != '\0' && uiColorIndex > 0; ulColorPos++ )
       {
          if( pszColor[ ulColorPos ] == ',' )
             uiColorIndex--;
       }
 
       /* if found, continue */
-
       if( uiColorIndex == 0 )
       {
          /* Skip the spaces after the comma */
-
-         while( pszColor[ ulColorPos ] == ' ' ) ulColorPos++;
+         while( pszColor[ ulColorPos ] == ' ' )
+            ulColorPos++;
 
          /* Search for next comma or end of string */
-
          ulColorLen = 0;
-
          while( pszColor[ ulColorPos + ulColorLen ] != '\0' &&
-                pszColor[ ulColorPos + ulColorLen ] != ',' ) ulColorLen++;
+                pszColor[ ulColorPos + ulColorLen ] != ',' )
+            ulColorLen++;
 
          /* Skip the trailing spaces */
-
          while( ulColorLen > 0 &&
-                pszColor[ ulColorPos + ulColorLen - 1 ] == ' ' ) ulColorLen--;
+                pszColor[ ulColorPos + ulColorLen - 1 ] == ' ' )
+            ulColorLen--;
 
          /* Return the string */
-
          hb_retclen( pszColor + ulColorPos, ulColorLen );
       }
       else
-      {
          hb_retc( "" );
-      }
    }
    else
-   {
       hb_retc( "" );
-   }
 }
 

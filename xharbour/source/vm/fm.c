@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.100 2008/11/20 15:09:48 marchuet Exp $
+ * $Id: fm.c,v 1.101 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -355,8 +355,7 @@ void * hb_xalloc( ULONG ulSize )         /* allocates fixed memory, returns NULL
       return malloc( ulSize );
    }
 #else
-/* allocates fixed memory, exits on failure */
-void * hb_xgrab( ULONG ulSize )
+void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
 {
    PHB_MEMINFO pMem;
 
@@ -562,14 +561,7 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
    }
 
    if( !pMem )
-   {
-#if 0   
-      char * buffer[100];
-      wsprintf( (LPSTR) buffer, "%i\t%i\n", ulSize, GetLastError() );
-      OutputDebugString( (LPSTR) buffer );
-#endif      
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
-   }
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.55 2008/06/25 20:20:41 vouchcac Exp $
+ * $Id: hbapigt.h,v 1.56 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -153,6 +153,7 @@ extern HB_EXPORT ERRCODE hb_gtExit( void );
 extern HB_EXPORT ERRCODE hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
 extern HB_EXPORT ERRCODE hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
 extern HB_EXPORT ERRCODE hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
+extern HB_EXPORT ERRCODE hb_gtDrawBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame, int iColor );
 extern HB_EXPORT ERRCODE hb_gtColorSelect( USHORT uiColorIndex );
 extern HB_EXPORT int     hb_gtColorToN( const char * szColorString );
 extern HB_EXPORT ERRCODE hb_gtColorsToString( int * pColors, int iColorCount, char * pszColorString, int iBufSize );
@@ -194,6 +195,7 @@ extern HB_EXPORT ERRCODE hb_gtTone( double dFrequency, double dDuration );
 extern HB_EXPORT ERRCODE hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
+extern HB_EXPORT ERRCODE hb_gtPutText( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength, int iColor );
 extern HB_EXPORT const char * hb_gtVersion( int iType );
 extern HB_EXPORT ERRCODE hb_gtOutStd( BYTE * pbyStr, ULONG ulLen );
 extern HB_EXPORT ERRCODE hb_gtOutErr( BYTE * pbyStr, ULONG ulLen );

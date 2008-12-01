@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.696 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: hvm.c,v 1.697 2008/11/23 20:41:21 ronpinkas Exp $
  */
 
 /*
@@ -4201,54 +4201,51 @@ static void hb_vmNegate( void )
    if( HB_IS_INTEGER( pItem ) )
    {
 #if -HB_INT_MAX > HB_INT_MIN
-      if ( pItem->item.asInteger.value < -HB_INT_MAX )
+      if( pItem->item.asInteger.value < -HB_INT_MAX )
       {
 #if HB_LONG_MAX > HB_INT_MAX
          HB_LONG lValue = ( HB_LONG ) pItem->item.asInteger.value;
          pItem->type = HB_IT_LONG;
-         pItem->item.asLong.value  = -lValue;
-         pItem->item.asLong.length = (UINT) HB_LONG_LENGTH( -lValue );
+         pItem->item.asLong.value = -lValue;
+         pItem->item.asLong.length = HB_LONG_EXPLENGTH( -lValue );
 #else
          double dValue = ( double ) pItem->item.asInteger.value;
          pItem->type = HB_IT_DOUBLE;
-         pItem->item.asDouble.value  = -dValue;
+         pItem->item.asDouble.value = -dValue;
          pItem->item.asDouble.length = HB_DBL_LENGTH( -dValue );
 #endif
       }
       else
 #endif
       {
-         pItem->item.asInteger.value  = -pItem->item.asInteger.value;
-         pItem->item.asInteger.length = (UINT) HB_INT_LENGTH( pItem->item.asInteger.value );
+         pItem->type = HB_IT_INTEGER;
+         pItem->item.asInteger.value = -pItem->item.asInteger.value;
+         pItem->item.asInteger.length = HB_INT_EXPLENGTH( pItem->item.asInteger.value );
       }
    }
    else if( HB_IS_LONG( pItem ) )
    {
 #if -HB_LONG_MAX > HB_LONG_MIN
-      if ( pItem->item.asLong.value < -HB_LONG_MAX )
+      if( pItem->item.asLong.value < -HB_LONG_MAX )
       {
          double dValue = ( double ) pItem->item.asLong.value;
          pItem->type = HB_IT_DOUBLE;
-         pItem->item.asDouble.value  = -dValue;
-         pItem->item.asDouble.length = (UINT) HB_DBL_LENGTH( -dValue );
+         pItem->item.asDouble.value = -dValue;
+         pItem->item.asDouble.length = HB_DBL_LENGTH( -dValue );
       }
       else
 #endif
       {
-         pItem->item.asLong.value  = -pItem->item.asLong.value;
-         pItem->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem->item.asLong.value );
+         pItem->type = HB_IT_LONG;
+         pItem->item.asLong.value = -pItem->item.asLong.value;
+         pItem->item.asLong.length = HB_LONG_EXPLENGTH( pItem->item.asLong.value );
       }
    }
    else if( HB_IS_DOUBLE( pItem ) )
    {
-      pItem->item.asDouble.value  = -pItem->item.asDouble.value;
-      pItem->item.asDouble.length = (UINT) HB_DBL_LENGTH( pItem->item.asDouble.value );
-   }
-   else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
-   {
-      pItem->item.asInteger.value = - ( int ) ( BYTE ) pItem->item.asString.value[0];
-      pItem->type = HB_IT_INTEGER;
-      pItem->item.asInteger.length = 10;
+      pItem->type = HB_IT_DOUBLE;
+      pItem->item.asDouble.value = -pItem->item.asDouble.value;
+      pItem->item.asDouble.length = HB_DBL_LENGTH( pItem->item.asDouble.value );
    }
    else
    {
@@ -4803,12 +4800,12 @@ static void hb_vmInc( void )
       if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < HB_INT_MAX )
       {
          pItem->item.asInteger.value++;
-         pItem->item.asInteger.length = (UINT) HB_INT_LENGTH( pItem->item.asInteger.value );
+         pItem->item.asInteger.length = HB_INT_EXPLENGTH( pItem->item.asInteger.value );
       }
       else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < HB_LONG_MAX )
       {
          pItem->item.asLong.value++;
-         pItem->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem->item.asLong.value );
+         pItem->item.asLong.length = HB_LONG_EXPLENGTH( pItem->item.asLong.value );
       }
       else
       {
@@ -4865,12 +4862,12 @@ static void hb_vmDec( void )
       if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value > HB_INT_MIN )
       {
          pItem->item.asInteger.value--;
-         pItem->item.asInteger.length = (UINT) HB_INT_LENGTH( pItem->item.asInteger.value );
+         pItem->item.asInteger.length = HB_INT_EXPLENGTH( pItem->item.asInteger.value );
       }
       else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value > HB_LONG_MIN )
       {
          pItem->item.asLong.value--;
-         pItem->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem->item.asLong.value );
+         pItem->item.asLong.length = HB_LONG_EXPLENGTH( pItem->item.asLong.value );
       }
       else
       {
@@ -8782,7 +8779,7 @@ void hb_vmPushInteger( int iNumber )
    pItem = hb_stackAllocItem();
    pItem->type = HB_IT_INTEGER;
    pItem->item.asInteger.value = iNumber;
-   pItem->item.asInteger.length = HB_INT_LENGTH( iNumber );
+   pItem->item.asInteger.length = HB_INT_EXPLENGTH( iNumber );
 }
 
 #if HB_INT_MAX >= INT32_MAX
@@ -8832,11 +8829,11 @@ void hb_vmPushLong( LONG lNumber )
 #if HB_INT_MAX >= LONG_MAX
    pItem->type = HB_IT_INTEGER;
    pItem->item.asInteger.value = ( int ) lNumber;
-   pItem->item.asInteger.length = HB_INT_LENGTH( lNumber );
+   pItem->item.asInteger.length = HB_INT_EXPLENGTH( lNumber );
 #else
    pItem->type = HB_IT_LONG;
    pItem->item.asLong.value = ( HB_LONG ) lNumber;
-   pItem->item.asLong.length = HB_LONG_LENGTH( lNumber );
+   pItem->item.asLong.length = HB_LONG_EXPLENGTH( lNumber );
 #endif
 }
 

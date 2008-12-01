@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6293 2008/11/29 12:05:01 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6294 2008/12/01 00:19:29 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-01 12:44 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbgtcore.h
+    * changes to fix MSVC8 compilation.
+  * include\classes.h
+  * include\hbvmpub.h
+    * moved items profiler data structure at the end of structure, because they are only
+      accessed with profiler.    
+      
+  * include\hbapigt.h
+  * source\rtl\color53.prg
+  * source\rtl\colorind.c
+  * source\rtl\console.c
+  * source\rtl\descend.c
+  * source\rtl\filebuf.c
+  * source\rtl\filesys.c
+  * source\rtl\gtapi.c
+  * source\rtl\gtfunc.c
+  * source\rtl\gttone.c
+  * source\rtl\gtwin\gtwin.c
+    * synced with harbour as possible plus minor optimizations.
+  
+  * source\rtl\tgetint.prg
+  * source\vm\fm.c
+    - removed personal debug info.
+    
+  * source\vm\hvm.c
+    * removed some compilation warnings. 
+  
+  * utils\hbtest\hbtest.prg
+  * utils\hbtest\rt_date.prg
+  * utils\hbtest\rt_misc.prg
+  * utils\hbtest\rt_str.prg
+    * added more test for future correction, and added some optimization
+  
+  * source\rtl\tget.prg  
+    * returned to previous BuildGetColor, and added last correction to be fully compatible.
 
 2008-11-30 21:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.78 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: gtapi.c,v 1.79 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -94,14 +94,15 @@ ERRCODE hb_gtInit( HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE
    hb_gtStartupInit();
 
    pGT = hb_gt_Base();
-   if( pGT )
-   {
-      s_bInit = TRUE;
-      HB_GTSELF_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
-      HB_GTSELF_SETCOLORSTR( pGT, hb_set.HB_SET_COLOR );
-      HB_GTSELF_SETCURSORSTYLE( pGT, SC_NORMAL );
-      HB_GTSELF_FLUSH( pGT );
-   }
+   if( !pGT )
+      return FAILURE;
+
+   s_bInit = TRUE;
+   HB_GTSELF_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
+   HB_GTSELF_SETCOLORSTR( pGT, hb_set.HB_SET_COLOR );
+   HB_GTSELF_SETCURSORSTYLE( pGT, SC_NORMAL );
+   HB_GTSELF_FLUSH( pGT );
+
 
    if( hb_cmdargCheck( "INFO" ) )
    {
@@ -192,6 +193,25 @@ ERRCODE hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
    {
       HB_GTSELF_BOXD( pGT, Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, HB_GTSELF_GETCOLOR( pGT ) );
       HB_GTSELF_SETPOS( pGT, Top + 1, Left + 1 );
+      HB_GTSELF_FLUSH( pGT );
+      return SUCCESS;
+   }
+   return FAILURE;
+}
+
+ERRCODE hb_gtDrawBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, int iColor )
+{
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_gtDrawBox(%hd, %hd, %hd, %hd, %p, %d)", Top, Left, Bottom, Right, pbyFrame, iColor));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+   {
+      if( iColor == -1 )
+         iColor = HB_GTSELF_GETCOLOR( pGT );
+
+      HB_GTSELF_BOX( pGT, Top, Left, Bottom, Right, pbyFrame, iColor );
       HB_GTSELF_FLUSH( pGT );
       return SUCCESS;
    }
@@ -643,6 +663,28 @@ ERRCODE hb_gtSetMode( USHORT uiRows, USHORT uiCols )
    {
       if( HB_GTSELF_SETMODE( pGT, uiRows, uiCols ) )
          return SUCCESS;
+   }
+   return FAILURE;
+}
+
+ERRCODE hb_gtPutText( USHORT uiRow, USHORT uiCol,
+                                BYTE * pStr, ULONG ulLength,
+                                int iColor )
+{
+   PHB_GT pGT;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_gtPutText(%hu, %hu, %p, %lu, %d)", uiRow, uiCol, pStr, ulLength, iColor));
+
+   pGT = hb_gt_Base();
+   if( pGT )
+   {
+      if( iColor == -1 )
+         iColor = HB_GTSELF_GETCOLOR( pGT );
+
+      HB_GTSELF_PUTTEXT( pGT, uiRow, uiCol, iColor, pStr, ulLength );
+      HB_GTSELF_FLUSH( pGT );
+
+      return SUCCESS;
    }
    return FAILURE;
 }

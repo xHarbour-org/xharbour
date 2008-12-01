@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.146 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: tget.prg,v 1.147 2008/12/01 00:19:29 modalsist Exp $
  */
 
 /*
@@ -596,7 +596,7 @@ METHOD Display( lForced ) CLASS Get
       IF ::nDispLen > 8
          ::nDispPos := Max( 1, Min( ::Pos - ::nDispLen + 4, ::nMaxLen - ::nDispLen + 1 ) )
       ELSE
-         ::nDispPos := Max( 1, Min( ::Pos - int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
+         ::nDispPos := Max( 1, Min( ::Pos - Int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
       ENDIF
    ENDIF
 
@@ -2509,7 +2509,7 @@ RETURN cDate
 */
 
 STATIC FUNCTION BuildGetColor( cColorSpec )
-   Local cCur
+   Local cCur, nClrOth, nClrUns
    Local aTokens
 
    If ! ValType( cColorSpec ) == "C"
@@ -2518,35 +2518,28 @@ STATIC FUNCTION BuildGetColor( cColorSpec )
 
    cCur := SetColor()
 
-   If Set( _SET_INTENSITY )
+   IF Set( _SET_INTENSITY )
 
       Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
                             __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
                             __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
                             __guiColor( cCur, CLR_BACKGROUND + 1 )
 
-   Else
+   ELSE
       Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
 
-   Endif
+   ENDIF
 
-                          /* NOTE */
-   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
+#ifdef HB_COMPAT_C53
+   cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
+                 "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) ) +;
+                 "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_CAPTION  ) ) ) != -1, nClrOth, nClrUns ) ) +;
+                 "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ACCEL    ) ) ) != -1, nClrOth, nClrUns ) )
+#else
+   cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
+                 "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) )
+#endif
 
-   If Len( aTokens ) == 1
-      cColorSpec := cCur + Replicate( "," + cCur, 3 )
-
-   Elseif Len( aTokens ) == 2
-      cColorSpec := cCur + Replicate( "," + aTokens[ 1 ], 2 )
-
-   Elseif Len( aTokens ) == 3
-      cColorSpec := cCur + "," + aTokens[ 1 ]
-
-   Else
-      cColorSpec := aTokens[1] + "," + aTokens[2] + "," + ;
-                    aTokens[3] + "," + aTokens[4]
-
-   Endif
 
 Return cColorSpec
 

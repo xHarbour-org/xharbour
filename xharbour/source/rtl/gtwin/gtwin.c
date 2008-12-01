@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.123 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtwin.c,v 1.124 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -730,9 +730,7 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
                      0, 0 );
 
    if( s_HOutput == INVALID_HANDLE_VALUE )
-   {
       hb_errInternal( 10001, "Can't allocate console (output)", "", "" );
-   }
 
    s_HInput = CreateFile( TEXT( "CONIN$" ),                 /* filename    */
                      GENERIC_READ    | GENERIC_WRITE,       /* Access flag */
@@ -742,9 +740,7 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
                      0, 0 );
 
    if( s_HInput == INVALID_HANDLE_VALUE )
-   {
       hb_errInternal( 10001, "Can't allocate console (input)", "", "" );
-   }
 
    GetConsoleScreenBufferInfo( s_HOutput, &s_csbi );
 

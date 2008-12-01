@@ -1,5 +1,5 @@
 /*
- * $Id: gtfunc.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: gtfunc.c,v 1.2 2008/06/25 20:20:52 vouchcac Exp $
  */
 
 /*
@@ -56,9 +56,9 @@
 
 HB_FUNC( HB_SETDISPCP )
 {
-   if ( ISCHAR(1) )
+   if( ISCHAR( 1 ) )
    {
-      if ( hb_pcount() == 2 && ISLOG(2) )
+      if( hb_pcount() == 2 && ISLOG( 2 ) )
          hb_gtSetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
       else
          hb_gtSetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
@@ -69,19 +69,17 @@ HB_FUNC( HB_SETDISPCP )
 
 HB_FUNC( HB_SETKEYCP )
 {
-   if ( ISCHAR(1) )
-   {
+   if( ISCHAR( 1 ) )
       hb_gtSetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
-   }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1089, NULL, "HB_SETKEYCP", HB_ERR_ARGS_BASEPARAMS );
 }
 
 HB_FUNC( HB_SETTERMCP )
 {
-   if ( ISCHAR(1) )
+   if( ISCHAR( 1 ) )
    {
-      if ( hb_pcount() == 2 && ISLOG(2) )
+      if( hb_pcount() == 2 && ISLOG( 2 ) )
       {
          hb_gtSetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
          hb_gtSetKeyCP( hb_parc( 1 ), NULL );
@@ -102,9 +100,9 @@ HB_FUNC( HB_GTINFO )
    {
       HB_GT_INFO gtInfo;
 
-      gtInfo.pNewVal = hb_param( 2, HB_IT_ANY );
-      gtInfo.pNewVal2 = hb_param( 3, HB_IT_ANY ); 
-      gtInfo.pResult = NULL;
+      gtInfo.pNewVal  = hb_param( 2, HB_IT_ANY );
+      gtInfo.pNewVal2 = hb_param( 3, HB_IT_ANY );
+      gtInfo.pResult  = NULL;
 
       hb_gtInfo( hb_parni( 1 ), &gtInfo );
       if( gtInfo.pResult )

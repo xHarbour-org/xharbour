@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.11 2008/11/18 17:55:58 marchuet Exp $
+ * $Id: rt_misc.prg,v 1.12 2008/11/27 15:54:02 marchuet Exp $
  */
 
 /*
@@ -62,9 +62,10 @@
    #endif
 #endif
 
-FUNCTION Main_MISC()
+PROCEDURE Main_MISC()
    LOCAL oError
    LOCAL o, tmp := 0
+
    /* Some random error object tests taken from the separate test source */
 
    oError := ErrorNew()
@@ -76,6 +77,33 @@ FUNCTION Main_MISC()
 #endif
 #ifdef __HARBOUR__
    TEST_LINE( Len( oError )                   , if(hb_multithread(),20,19)                        )
+#endif
+
+   /* SET()s */
+
+   TEST_LINE( Set( _SET_MARGIN     )       , 0 )
+   TEST_LINE( Set( _SET_MARGIN    , -1 )   , "E BASE 2020 Argument error SET A:2:N:25;N:-1 " )
+
+#ifdef HB_COMPAT_C53
+   TEST_LINE( Set( _SET_EVENTMASK  )       , 128 )
+   TEST_LINE( Set( _SET_VIDEOMODE  )       , NIL )
+   TEST_LINE( Set( _SET_MBLOCKSIZE )       , 64 )
+   TEST_LINE( Set( _SET_MFILEEXT   )       , "" )
+   TEST_LINE( Set( _SET_STRICTREAD )       , .F. )
+   TEST_LINE( Set( _SET_OPTIMIZE   )       , .T. )
+   TEST_LINE( Set( _SET_AUTOPEN    )       , .T. )
+   TEST_LINE( Set( _SET_AUTORDER   )       , 0 )
+   TEST_LINE( Set( _SET_AUTOSHARE  )       , 0 )
+
+   TEST_LINE( Set( _SET_EVENTMASK , -1 )   , "E BASE 2020 Argument error SET A:2:N:39;N:-1 " )
+   TEST_LINE( Set( _SET_VIDEOMODE , -1 )   , NIL )
+   TEST_LINE( Set( _SET_MBLOCKSIZE, -1 )   , "E BASE 2020 Argument error SET A:2:N:41;N:-1 " )
+   TEST_LINE( Set( _SET_MFILEEXT  , {} )   , "" )
+   TEST_LINE( Set( _SET_STRICTREAD, {} )   , .F. )
+   TEST_LINE( Set( _SET_OPTIMIZE  , {} )   , .T. )
+   TEST_LINE( Set( _SET_AUTOPEN   , {} )   , .T. )
+   TEST_LINE( Set( _SET_AUTORDER  , -1 )   , "E BASE 2020 Argument error SET A:2:N:46;N:-1 " )
+   TEST_LINE( Set( _SET_AUTOSHARE , -1 )   , "E BASE 2020 Argument error SET A:2:N:47;N:-1 " )
 #endif
 
    /* Some color handling tests */
@@ -319,7 +347,6 @@ FUNCTION Main_MISC()
    TEST_LINE( ( o:colorSpec := '"W"'+"/"+'"R"'             , o:colorSpec ) , "W/R,W/R"                )
    TEST_LINE( ( o:colorSpec := "'W'"+"/"+"'R'"             , o:colorSpec ) , "W/R,W/R"                )
 #endif
-   
    /* "Samples" function tests (AMPM(), DAYS(), ELAPTIME(), ... ) */
 
    TEST_LINE( AMPM( "" )                      , "12 am"                                   )
@@ -372,6 +399,17 @@ FUNCTION Main_MISC()
 #endif
 
    /* NATION functions (do not exist in 5.2e US) */
+
+#ifdef __HARBOUR__
+   #ifndef HB_C52_UNDOC
+      /* NOTE: Use the identical internal versions if Harbour 
+               was compiled without C5.x undocumented features.
+               [vszakats] */
+      #xtranslate NationMsg([<x,...>])  => __NatMsg(<x>)
+      #xtranslate IsAffirm([<x,...>])   => __NatIsAffirm(<x>)
+      #xtranslate IsNegative([<x,...>]) => __NatIsNegative(<x>)
+   #endif
+#endif
 
 #ifndef __XPP__
    TEST_LINE( NationMsg()                     , "Invalid argument" )
@@ -512,46 +550,53 @@ FUNCTION Main_MISC()
    TEST_LINE( saArray:Eval                    , "E BASE 1004 Class: 'ARRAY' has no exported method EVAL A:0: F:S" )
    TEST_LINE( soObject:Eval                   , "E BASE 1004 No exported method EVAL A:0: F:S")
 
-   /* STOD() */
+   /* HB_STOD() */
 
-   /* For these tests in CA-Cl*pper 5.2e the following native STOD() has
+   /* For these tests in CA-Cl*pper 5.2e the following native HB_STOD() has
       been used ( not the emulated one written in Clipper ):
 
-      CLIPPER STOD( void )
+      CLIPPER HB_STOD( void )
       {
          // The length check is a fix to avoid buggy behaviour of _retds()
          _retds( ( ISCHAR( 1 ) && _parclen( 1 ) == 8 ) ? _parc( 1 ) : "        " );
       }
    */
 
+#ifndef RT_NO_C
 #ifndef __XPP__
-   TEST_LINE( SToD()                       , SToD("        ")          )
+   TEST_LINE( HB_SToD()                       , HB_SToD("        ")          )
 #endif
-   TEST_LINE( SToD(1)                      , SToD("        ")          )
-   TEST_LINE( SToD(NIL)                    , SToD("        ")          )
-   TEST_LINE( SToD("")                     , SToD("        ")          )
-   TEST_LINE( SToD("        ")             , SToD("        ")          )
-   TEST_LINE( SToD("       ")              , SToD("        ")          )
-   TEST_LINE( SToD("         ")            , SToD("        ")          )
-   TEST_LINE( SToD(" 1234567")             , SToD("        ")          )
-   TEST_LINE( SToD("1999    ")             , SToD("        ")          )
-   TEST_LINE( SToD("99999999")             , SToD("        ")          )
-   TEST_LINE( SToD("99990101")             , SToD("        ")          )
-   TEST_LINE( SToD("19991301")             , SToD("        ")          )
-   TEST_LINE( SToD("19991241")             , SToD("        ")          )
-   TEST_LINE( SToD("01000101")             , SToD("01000101")          )
-   TEST_LINE( SToD("29991231")             , SToD("29991231")          )
-   TEST_LINE( SToD("19990905")             , SToD("19990905")          )
-   TEST_LINE( SToD(" 9990905")             , SToD("        ")          )
-   TEST_LINE( SToD("1 990905")             , SToD("        ")          )
-   TEST_LINE( SToD("19 90905")             , SToD("17490905")          )
-   TEST_LINE( SToD("199 0905")             , SToD("19740905")          )
-   TEST_LINE( SToD("1999 905")             , SToD("        ")          )
-   TEST_LINE( SToD("19990 05")             , SToD("        ")          )
-   TEST_LINE( SToD("199909 5")             , SToD("        ")          )
-   TEST_LINE( SToD("1999090 ")             , SToD("        ")          )
-   TEST_LINE( SToD("1999 9 5")             , SToD("        ")          )
-   TEST_LINE( SToD("1999090" + Chr(0))     , SToD("        ")          )
+   TEST_LINE( HB_SToD(1)                      , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD(NIL)                    , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("")                     , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("        ")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("       ")              , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("         ")            , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD(" 1234567")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("1999    ")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("99999999")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("99990101")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("19991301")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("19991241")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("01000101")             , HB_SToD("01000101")          )
+   TEST_LINE( HB_SToD("29991231")             , HB_SToD("29991231")          )
+   TEST_LINE( HB_SToD("19990905")             , HB_SToD("19990905")          )
+   TEST_LINE( HB_SToD(" 9990905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("  990905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("   90905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("    0905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("     905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("      05")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("1 990905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("19 90905")             , HB_SToD("17490905")          )
+   TEST_LINE( HB_SToD("199 0905")             , HB_SToD("19740905")          )
+   TEST_LINE( HB_SToD("1999 905")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("19990 05")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("199909 5")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("1999090 ")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("1999 9 5")             , HB_SToD("        ")          )
+   TEST_LINE( HB_SToD("1999090" + Chr(0))     , HB_SToD("        ")          )
+#endif
 
    /* DESCEND() */
 
@@ -587,9 +632,9 @@ FUNCTION Main_MISC()
    TEST_LINE( Descend( Chr(0) )               , ""+Chr(0)+""                                        )
    TEST_LINE( Descend( Chr(0) + "Hello" )     , ""+Chr(0)+"¸›””‘"                                   )
    TEST_LINE( Descend( "Hello"+Chr(0)+"wo" )  , "¸›””‘"+Chr(0)+"‰‘"                                 )
-   TEST_LINE( Descend( SToD( "" ) )        , 5231808                                             )
-   TEST_LINE( Descend( SToD( "01000101" ) ), 3474223                                             )
-   TEST_LINE( Descend( SToD( "19801220" ) ), 2787214                                             )
+   TEST_LINE( Descend( HB_SToD( "" ) )        , 5231808                                             )
+   TEST_LINE( Descend( HB_SToD( "01000101" ) ), 3474223                                             )
+   TEST_LINE( Descend( HB_SToD( "19801220" ) ), 2787214                                             )
 
 #ifdef __HARBOUR__
 
@@ -962,11 +1007,11 @@ FUNCTION Main_MISC()
 
 #endif
 
-   RETURN NIL
+   RETURN
 
 #ifdef __HARBOUR__
 
-FUNCTION Main_OPOVERL()
+PROCEDURE Main_OPOVERL()
    LOCAL oString := HB_TString()
 
    oString:cValue := "Hello"
@@ -999,7 +1044,7 @@ FUNCTION Main_OPOVERL()
    TEST_LINE( oString--                 , "HB_TSTRING Object" )
    TEST_LINE( oString:cValue            , "Hello"             )
 
-   RETURN NIL
+   RETURN
 
 STATIC FUNCTION HB_TString()
 
