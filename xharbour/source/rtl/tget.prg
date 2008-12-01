@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.145 2008/06/24 12:50:41 modalsist Exp $
+ * $Id: tget.prg,v 1.146 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -2509,56 +2509,44 @@ RETURN cDate
 */
 
 STATIC FUNCTION BuildGetColor( cColorSpec )
-   Local cCur, nClrOth, nClrUns
+   Local cCur
+   Local aTokens
 
-   IF ISCHARACTER( cColorSpec )
-   
-      cCur := SetColor()
+   If ! ValType( cColorSpec ) == "C"
+      cColorSpec := Nil                          // Clipper compatibility
+   Endif
 
-      IF Set( _SET_INTENSITY )
+   cCur := SetColor()
 
-         Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
-                               __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
-                               __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
-                               __guiColor( cCur, CLR_BACKGROUND + 1 )
+   If Set( _SET_INTENSITY )
 
-      ELSE
-         Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
+      Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
+                            __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
+                            __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
+                            __guiColor( cCur, CLR_BACKGROUND + 1 )
 
-      ENDIF
+   Else
+      Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
 
-#ifdef HB_COMPAT_C53
-      cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
-                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) ) +;
-                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_CAPTION  ) ) ) != -1, nClrOth, nClrUns ) ) +;
-                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ACCEL    ) ) ) != -1, nClrOth, nClrUns ) )
-#else
-      cColorSpec := hb_NToColor( nClrUns := Max( hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ), 0 ) ) +;
-                    "," + hb_NToColor( iif( ( nClrOth := hb_ColorToN( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ) ) != -1, nClrOth, nClrUns ) )
-#endif
-      
-   ELSEIF ValType( cColorSpec ) $ "UNDBA"
+   Endif
 
-      cColorSpec := NIL      
-      
-#ifdef HB_COMPAT_C53
-   /* NOTE: This code doesn't seem to make any sense, but seems to 
-            replicate some original C5.3 behaviour. */
-   ELSE
-      cCur := SetColor()
-      IF Set( _SET_INTENSITY )
-         cColorSpec := __guiColor( cCur, CLR_UNSELECTED + 1 ) + "," +; 
-                       __guiColor( cCur, CLR_ENHANCED + 1 ) + "," +;   
-                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
-                       __guiColor( cCur, CLR_BACKGROUND + 1 )
-      ELSE
-         cColorSpec := __guiColor( cCur, CLR_STANDARD + 1 ) + "," +; 
-                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
-                       __guiColor( cCur, CLR_STANDARD + 1 ) + "," +;   
-                       __guiColor( cCur, CLR_STANDARD + 1 )
-      ENDIF
-#endif
-   ENDIF      
+                          /* NOTE */
+   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
+
+   If Len( aTokens ) == 1
+      cColorSpec := cCur + Replicate( "," + cCur, 3 )
+
+   Elseif Len( aTokens ) == 2
+      cColorSpec := cCur + Replicate( "," + aTokens[ 1 ], 2 )
+
+   Elseif Len( aTokens ) == 3
+      cColorSpec := cCur + "," + aTokens[ 1 ]
+
+   Else
+      cColorSpec := aTokens[1] + "," + aTokens[2] + "," + ;
+                    aTokens[3] + "," + aTokens[4]
+
+   Endif
 
 Return cColorSpec
 
