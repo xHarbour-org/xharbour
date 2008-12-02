@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6294 2008/12/01 00:19:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.6295 2008/12/01 11:44:59 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-02 13:30 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\classes.h
+  * include\hbvmpub.h
+    * moved items profiler data structure at the end of structure, because they are only
+      accessed with profiler. only without HB_LEGACY_LEVEL
 
 2008-12-01 12:44 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbgtcore.h

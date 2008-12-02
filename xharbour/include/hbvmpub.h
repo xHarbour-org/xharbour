@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.81 2008/11/29 11:09:22 marchuet Exp $
+ * $Id: hbvmpub.h,v 1.82 2008/12/01 11:44:59 marchuet Exp $
  */
 
 /*
@@ -368,7 +368,7 @@
       USHORT     uiFlags;
    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
-
+#if defined( HB_LEGACY_LEVEL )
    /* dynamic symbol structure */
    typedef struct _HB_DYNS
    {
@@ -376,12 +376,25 @@
       HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
       PSYMBOLS  pModuleSymbols;
-#if ! defined( HB_NO_PROFILER ) || defined( HB_LEGACY_LEVEL )
+      ULONG     ulCalls;      /* profiler support */
+      ULONG     ulTime;       /* profiler support */
+      ULONG     ulRecurse;    /* profiler support */
+   } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+#else
+   /* dynamic symbol structure */
+   typedef struct _HB_DYNS
+   {
+      HB_HANDLE hArea;        /* Workarea number */
+      HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
+      PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
+      PSYMBOLS  pModuleSymbols;
+#if ! defined( HB_NO_PROFILER )
       ULONG     ulCalls;      /* profiler support */
       ULONG     ulTime;       /* profiler support */
       ULONG     ulRecurse;    /* profiler support */
 #endif
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+#endif   
 
    #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
    typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );

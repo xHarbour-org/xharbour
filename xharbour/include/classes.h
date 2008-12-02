@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.36 2008/11/29 11:09:22 marchuet Exp $
+ * $Id: classes.h,v 1.37 2008/12/01 11:44:59 marchuet Exp $
  */
 
 /*
@@ -83,7 +83,27 @@ HB_EXTERN_BEGIN
 #define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x02000000 )
 #define HB_CLASS_OP_FOREACH         ( ( ULONG ) 0x04000000 )
 
-
+#if defined( HB_LEGACY_LEVEL )
+typedef struct hb_class_method
+{
+   PHB_DYNS pMessage;            /* Method Symbolic name */
+   PHB_FUNC pFunction;           /* Function 'pointer' */
+   USHORT   uiData;              /* Item position for data (Harbour like, begin from 1) */
+   USHORT   uiDataShared;        /* Item position for datashared (original pos within Shared Class) */
+   USHORT   uiSprClass;          /* Originalclass'handel (super or current class'handel if not herited). */ /*Added by RAC&JF*/
+   USHORT   uiScope;             /* Scoping value */
+   PHB_ITEM pInitValue;          /* Init Value for data */
+   PHB_SYMB pMsgIs;
+   PHB_SYMB pMsgTo;
+   BYTE     bClsDataInitiated;   /* There is one value assigned at init time */
+   ULONG    ulCalls;             /* profiler support */
+   ULONG    ulTime;              /* profiler support */
+   ULONG    ulRecurse;           /* profiler support */
+   BOOL     bIsPersistent;       /* persistence support */
+   USHORT   uiType;              /* Type value */
+   PSYMBOLS pModuleSymbols;      /* Container of the symbol table where the method was defined */
+} METHOD, * PMETHOD;
+#else
 typedef struct hb_class_method
 {
    PHB_DYNS pMessage;            /* Method Symbolic name */
@@ -99,12 +119,13 @@ typedef struct hb_class_method
    BOOL     bIsPersistent;       /* persistence support */
    USHORT   uiType;              /* Type value */
    PSYMBOLS pModuleSymbols;      /* Container of the symbol table where the method was defined */
-#if ! defined( HB_NO_PROFILER ) || defined( HB_LEGACY_LEVEL )   
+#if ! defined( HB_NO_PROFILER )
    ULONG    ulCalls;             /* profiler support */
    ULONG    ulTime;              /* profiler support */
    ULONG    ulRecurse;           /* profiler support */
 #endif
 } METHOD, * PMETHOD;
+#endif
 
 typedef struct hb_class_sync
 {
