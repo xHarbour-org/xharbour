@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6295 2008/12/01 11:44:59 marchuet Exp $
+ * $Id: ChangeLog,v 1.6296 2008/12/02 12:28:49 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-03 12:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbsetup.ch
+  * include\hbsetup.h
+    * format & used MAX_PATH or _MAX_PATH instead of hard coded 255, some systems can support
+      260 chars and more.
+
+  * source\common\hbstr.c
+    ! fixed XCC compilation
+      thks to Przemyslaw
+
+  * source\vm\arrayshb.c
+    ! fixed GPF trap in these functions
+      thks to Przemyslaw
+
+  * include\hbcompat.ch
+    ! changed name of xHarbour include files - they where changed few
+      months ago and now they are the same as in Harbour.
+      thks to Przemyslaw
+
+  * source\rtl\filestat.c
+    ! fixed UNICODE compilation, used ansi functions.
+      thks to Przemyslaw
+
+  * source\rtl\filesys.c
+    * minor changes to CURDIR.
+
+  * include\hbdefs.h
+  * source\rtl\gtwvt\gtwvt.c
+  * source\rtl\setcolor.c
+  * source\vm\fm.c
+  * source\vm\itemapi.c
+    * formatting.
 
 2008-12-02 13:30 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\classes.h

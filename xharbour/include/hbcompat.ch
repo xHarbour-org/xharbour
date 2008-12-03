@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.2 2008/03/18 15:51:39 likewolf Exp $
+ * $Id: hbcompat.ch,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -64,6 +64,15 @@
       #define __PLATFORM__LINUX
    #endif
 
+   #xtranslate hb_gtSys                    => gtSys
+   #xtranslate hb_gtInfo([<x,...>])        => gtInfo(<x>)
+   #xtranslate hb_gtVersion([<x>])         => hb_gt_Version(<x>)
+
+   #xtranslate hb_ScrMaxRow()              => gtInfo( HB_GTI_SCREENHEIGHT )
+   #xtranslate hb_ScrMaxCol()              => gtInfo( HB_GTI_SCREENWIDTH )
+   #xtranslate MaxRow(.T.)                 => gtInfo( HB_GTI_SCREENHEIGHT )
+   #xtranslate MaxCol(.T.)                 => gtInfo( HB_GTI_SCREENWIDTH )
+
    #xtranslate hb_dbPack()             => __dbPack()
    #xtranslate hb_dbZap()              => __dbZap()
    #xtranslate hb_dbDrop([<x,...>])    => dbDrop(<x>)
@@ -101,10 +110,17 @@
    #xtranslate hb_At([<x,...>])        => At(<x>)
 
    #xtranslate hb_ISPOINTER( <xValue> )=> ISPOINTER( <xValue> )
+   #xtranslate hb_ARGV([<x,...>])          => hb_CMDARGARGV(<x>)
 
    #xtranslate hb_IniSetComment([<x,...>]) => hb_SetIniComment(<x>)
    #xtranslate hb_IniRead([<x,...>])       => hb_ReadIni(<x>)
    #xtranslate hb_IniWrite([<x,...>])      => hb_WriteIni(<x>)
+
+   #xtranslate hb_DisableWaitLocks([<x>])  => DisableWaitLocks(<x>)
+
+   #xtranslate hb_mtvm()                   => hb_multiThread()
+   #xtranslate hb_threadWaitForAll()       => WaitForThreads()
+   #xtranslate hb_mutexNotify(<x,...>)     => Notify(<x>)
 
    /* Some statement endings */
    #xcommand ENDSEQUENCE => END
@@ -113,6 +129,10 @@
    #xcommand ENDWITH => END
    #xcommand END WITH => END
    #xcommand END OBJECT => END
+
+   #ifndef HB_SYMBOL_UNUSED
+      #define HB_SYMBOL_UNUSED( symbol )  ( symbol := ( symbol ) )
+   #endif
 
 #else
 
@@ -125,6 +145,27 @@
    #if defined(__PLATFORM__LINUX) && !defined(__PLATFORM__Linux)
       #define __PLATFORM__Linux
    #endif
+
+   /* these are used _by_ MaxRow()/MaxCol() */
+   #define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */
+   #define GTI_SCREEN         1  /* Maximum screen size ('Screen' in CT terms) */
+   #define GTI_CLIENT         2  /* Maximum possible client size of a window */
+   #define GTI_MAX            3  /* Maximum possible window size (in Windows) */
+
+   #xtranslate gtSys                       => hb_gtSys
+   #xtranslate gtInfo([<x,...>])           => hb_gtInfo(<x>)
+   #xtranslate hb_gt_Version([<x>])        => hb_gtVersion(<x>)
+
+   #xtranslate gtSetClipboard(<x>)         => hb_gtInfo( HB_GTI_CLIPBOARDDATA, <x> )
+   #xtranslate gtGetClipboard()            => hb_gtInfo( HB_GTI_CLIPBOARDDATA )
+   #xtranslate gtGetClipBoardSize()        => Len( hb_gtInfo( HB_GTI_CLIPBOARDDATA ) )
+   #xtranslate gtPasteClipBoard([<n>])     => hb_gtInfo( HB_GTI_CLIPBOARDPAST )
+   #xtranslate gtProcessMessages()         => NextKey()
+   #xtranslate gfxPrimitive([<x,...>])     => hb_gfxPrimitive(<x>)
+   #xtranslate gfxText([<x,...>])          => hb_gfxText(<x>)
+   #xtranslate MaxRow(.T.)                 => hb_gtInfo( HB_GTI_VIEWPORTHEIGHT )
+   #xtranslate MaxCol(.T.)                 => hb_gtInfo( HB_GTI_VIEWPORTWIDTH )
+
    #xtranslate hb_isregexstring([<x>]) => hb_isregex(<x>)
    #xtranslate pvalue([<x,...>])       => hb_pvalue(<x>)
    #xtranslate methodName([<x,...>])   => hb_methodName(<x>)
@@ -158,8 +199,14 @@
    #xtranslate hb_ReadIni([<x,...>])       => hb_IniRead(<x>)
    #xtranslate hb_WriteIni([<x,...>])      => hb_IniWrite(<x>)
 
-   #xtranslate Str(<x>,[<y>],[<y>],<z>)=> iif(<z>, LTrim(Str(<x>)), Str(<x>))
-   #xtranslate hb_CMDARGARGV([<x,...>])=> hb_ARGV(0)
+   #xtranslate DisableWaitLocks([<x>])     => hb_DisableWaitLocks(<x>)
+
+   #xtranslate hb_multiThread()            => hb_mtvm()
+   #xtranslate WaitForThreads()            => hb_threadWaitForAll()
+   #xtranslate Notify(<x,...>)             => hb_mutexNotify(<x>)
+
+   #xtranslate Str(<x>,[<y>],[<y>],<z>)    => iif(<z>, hb_NToS(<x>), Str(<x>))
+   #xtranslate hb_CMDARGARGV([<x,...>])    => hb_ARGV(<x>)
 
    /* Hash item functions */
    #xtranslate HASH([<x,...>])         => hb_HASH(<x>)
@@ -265,38 +312,4 @@
 
 #endif
 
-   /* Both for Harbour and xHarbour, compatibility with old xHarbour GT */
-
-   #include "hbgtinfo.ch"
-   #include "hbgfx.ch"
-
-   /* these are used _by_ MaxRow()/MaxCol() */
-   #define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */
-   #define GTI_SCREEN         1  /* Maximum screen size ('Screen' in CT terms) */
-   #define GTI_CLIENT         2  /* Maximum possible client size of a window */
-   #define GTI_MAX            3  /* Maximum possible window size (in Windows) */
-
-   #xtranslate gtSys                   => hb_gtSys
-   #xtranslate gtInfo([<x,...>])       => hb_gtInfo(<x>)
-   #xtranslate hb_gt_Version([<x>])    => hb_gtVersion(<x>)
-
-   #xtranslate gtSetClipboard(<x>)     => hb_gtInfo( GTI_CLIPBOARDDATA, <x> )
-   #xtranslate gtGetClipboard()        => hb_gtInfo( GTI_CLIPBOARDDATA )
-   #xtranslate gtGetClipBoardSize()    => Len( hb_gtInfo( GTI_CLIPBOARDDATA ) )
-   #xtranslate gtPasteClipBoard([<n>]) => hb_gtInfo( GTI_CLIPBOARDPAST )
-   #xtranslate gtProcessMessages()     => NextKey()
-   #xtranslate gfxPrimitive([<x,...>]) => hb_gfxPrimitive(<x>)
-   #xtranslate gfxText([<x,...>])      => hb_gfxText(<x>)
-
-   #xtranslate gtRGB(<r>,<g>,<b>[,<a>])           => hb_gfxMakeColor( <r>, <g>, <b>[, <a>] )
-   #xtranslate gtPoint(<x>,<y>,<c>)               => hb_gfxPutPixel( <y>, <x>, <c> )
-   #xtranslate gtLine(<x1>,<y1>,<x2>,<y2>[,<c>])  => hb_gfxLine( <y1>, <x1>, <y2>, <x2>[, <c>] )
-   #xtranslate gtSquare(<x>,<y>,<w>,<h>[,<c>])    => hb_gfxFilledRect( <y>, <x>, ( <y> ) + ( <h> ), ( <x> ) + ( <w> )[, <c>] )
-   #xtranslate gtRectangle(<x>,<y>,<w>,<h>[,<c>]) => hb_gfxRect( <y>, <x>, ( <y> ) + ( <h> ), ( <x> ) + ( <w> )[, <c>] )
-   #xtranslate gtCircle(<x>,<y>,<w>,<h>[,<c>])    => hb_gfxEllipse( <y>, <x>, ( <h> ) / 2, ( <w> ) / 2[, <c>] )
-   #xtranslate gtDisk(<x>,<y>,<w>,<h>[,<c>])      => hb_gfxFilledEllipse( <y>, <x>, ( <h> ) / 2, ( <w> ) / 2[, <c>] )
-   #xtranslate gtText([<x,...>])                  => hb_gfxText(<x>)
-
 #endif /* __HARBOUR__ */
-
-

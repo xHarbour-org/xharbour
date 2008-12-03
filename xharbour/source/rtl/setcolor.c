@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.5 2008/03/16 19:16:01 likewolf Exp $
+ * $Id: setcolor.c,v 1.6 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -56,17 +56,14 @@
 
 char * hb_conSetColor( const char * szColor )
 {
-   char * szOldColor;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_conSetColor(%s)", szColor));
 
-   szOldColor = hb_set.HB_SET_COLOR;
-   hb_gtGetColorStr( szOldColor );
+   hb_gtGetColorStr( hb_set.HB_SET_COLOR );
 
    if( szColor != ( char * ) NULL )
       hb_gtSetColorStr( szColor );
 
-   return szOldColor;
+   return hb_set.HB_SET_COLOR;
 }
 
 HB_FUNC( SETCOLOR )

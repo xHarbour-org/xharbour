@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.101 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: fm.c,v 1.102 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -144,6 +144,12 @@
 #  define malloc( n )         ( void * ) HeapAlloc( GetProcessHeap(), 0, ( n ) )
 #  define realloc( p, n )     ( void * ) HeapReAlloc( GetProcessHeap(), 0, ( void * ) ( p ), ( n ) )
 #  define free( p )           HeapFree( GetProcessHeap(), 0, ( void * ) ( p ) )
+#endif
+
+#if 0
+#include "hbmemcpy.c"
+#undef memcpy
+#define memcpy( t, f, l ) hb_memcpy( ( t ), ( f ), ( l ) )
 #endif
 
 #ifndef HB_FM_STATISTICS

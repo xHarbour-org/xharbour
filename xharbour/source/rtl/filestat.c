@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.12 2005/09/30 23:44:05 druzus Exp $
+ * $Id: filestat.c,v 1.13 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -51,6 +51,8 @@
  *
  */
 
+#define HB_OS_WIN_32_USED
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbdate.h"
@@ -63,7 +65,6 @@
    #include <sys/types.h>
    #include <sys/stat.h>
 #elif defined( HB_OS_WIN_32 )
-   #include <windows.h>
    #if ( defined(__BORLANDC__) || defined(_MSC_VER) || defined(__LCC__) || defined( __DMC__ )) && ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES ((DWORD)(-1))
    #endif
@@ -119,51 +120,36 @@ static BOOL hb_fsFileStats(
 
       /* Standard characters */
       if ( (usAttr & 4) == 0 ) /* Hidden (can't read)*/
-      {
          ushbAttr |= HB_FA_HIDDEN;
-      }
 
       if ( (usAttr & 2) == 0 ) /* read only (can't write)*/
-      {
          ushbAttr |= HB_FA_READONLY;
-      }
 
       if ( (usAttr & 1) == 1 ) /* executable?  (xbit)*/
-      {
          ushbAttr |= HB_FA_SYSTEM;
-      }
 
       /* Extension characters */
 #ifdef HB_EXTENSION
       if ( ( statbuf.st_mode & S_IFLNK ) == S_IFLNK)
-      {
          *pszAttr++ = 'Z'; /* Xharbour extension */
-      }
+
       if ( ( statbuf.st_mode & S_IFSOCK ) == S_IFSOCK )
-      {
          *pszAttr++ = 'K'; /* Xharbour extension */
-      }
+
       /* device */
       if ( ( statbuf.st_mode & S_IFBLK ) == S_IFBLK ||
             ( statbuf.st_mode & S_IFCHR ) == S_IFCHR )
-      {
          ushbAttr |= HB_FA_DEVICE; /* Xharbour extension */
-      }
+
       if ( ( statbuf.st_mode & S_IFIFO ) == S_IFIFO )
-      {
          *pszAttr++ = 'Y'; /* Xharbour extension */
-      }
 #endif
 
       if ( S_ISDIR( statbuf.st_mode ) )
-      {
          ushbAttr |= HB_FA_DIRECTORY; /* Xharbour extension */
-      }
       /* Give the ARCHIVE if readwrite, not executable and not special */
       else if ( S_ISREG( statbuf.st_mode ) && ushbAttr == 0 )
-      {
          ushbAttr |= HB_FA_ARCHIVE;
-      }
 
       *llSize = ( HB_FOFFSET ) statbuf.st_size;
 
@@ -195,75 +181,81 @@ static BOOL hb_fsFileStats(
 
 #elif defined( HB_OS_WIN_32 )
 
-   DWORD dwAttribs;
-   WIN32_FIND_DATA ffind;
-   HANDLE hFind;
-   FILETIME filetime;
-   SYSTEMTIME time;
-
-   /* Get attributes... */
-   dwAttribs = GetFileAttributes( (char*) pszFileName );
-   if ( dwAttribs == INVALID_FILE_ATTRIBUTES )
    {
-      /* return */
-      return FALSE;
-   }
+      DWORD dwAttribs;
+      WIN32_FIND_DATAA ffind;
+      HANDLE hFind;
+      FILETIME filetime;
+      SYSTEMTIME time;
 
-   hb_fsAttrDecode( hb_fsAttrFromRaw( dwAttribs ), (char*) pszAttr );
-
-   /* If file existed, do a findfirst */
-   hFind = FindFirstFile( (char*) pszFileName, &ffind );
-   if ( hFind != INVALID_HANDLE_VALUE )
-   {
-      CloseHandle( hFind );
-
-      /* get file times and work them out */
-      *llSize = ( HB_FOFFSET ) ffind.nFileSizeLow + ( ( HB_FOFFSET ) ffind.nFileSizeHigh << 32 );
-
-      if ( FileTimeToLocalFileTime( &ffind.ftCreationTime, &filetime ) &&
-           FileTimeToSystemTime( &filetime, &time ) )
+      /* Get attributes... */
+      dwAttribs = GetFileAttributesA( ( char * ) pszFileName );
+      if ( dwAttribs == INVALID_FILE_ATTRIBUTES )
       {
-         *lcDate = hb_dateEncode( time.wYear, time.wMonth, time.wDay );
-         *lcTime = time.wHour * 3600 + time.wMinute * 60 + time.wSecond;
-      }
-      else {
-         *lcDate = hb_dateEncode( 0, 0, 0 );
-         *lcTime = 0;
+         /* return */
+         return FALSE;
       }
 
-      if ( FileTimeToLocalFileTime( &ffind.ftLastAccessTime, &filetime ) &&
-           FileTimeToSystemTime( &filetime, &time ) )
+      hb_fsAttrDecode( hb_fsAttrFromRaw( dwAttribs ), ( char * ) pszAttr );
+
+      /* If file existed, do a findfirst */
+      hFind = FindFirstFileA( ( char * ) pszFileName, &ffind );
+      if ( hFind != INVALID_HANDLE_VALUE )
       {
-         *lmDate = hb_dateEncode( time.wYear, time.wMonth, time.wDay );
-         *lmTime = time.wHour * 3600 + time.wMinute * 60 + time.wSecond;
+         CloseHandle( hFind );
+
+         /* get file times and work them out */
+         *llSize = ( HB_FOFFSET ) ffind.nFileSizeLow + ( ( HB_FOFFSET ) ffind.nFileSizeHigh << 32 );
+
+         if ( FileTimeToLocalFileTime( &ffind.ftCreationTime, &filetime ) &&
+              FileTimeToSystemTime( &filetime, &time ) )
+         {
+            *lcDate = hb_dateEncode( time.wYear, time.wMonth, time.wDay );
+            *lcTime = time.wHour * 3600 + time.wMinute * 60 + time.wSecond;
+         }
+         else
+         {
+            *lcDate = hb_dateEncode( 0, 0, 0 );
+            *lcTime = 0;
+         }
+
+         if ( FileTimeToLocalFileTime( &ffind.ftLastAccessTime, &filetime ) &&
+              FileTimeToSystemTime( &filetime, &time ) )
+         {
+            *lmDate = hb_dateEncode( time.wYear, time.wMonth, time.wDay );
+            *lmTime = time.wHour * 3600 + time.wMinute * 60 + time.wSecond;
+         }
+         else
+         {
+            *lcDate = hb_dateEncode( 0, 0, 0 );
+            *lcTime = 0;
+         }
+         fResult = TRUE;
       }
-      else {
-         *lcDate = hb_dateEncode( 0, 0, 0 );
-         *lcTime = 0;
-      }
-      fResult = TRUE;
    }
 
 #else
 
-   PHB_FFIND findinfo;
    /* Generic algorithm based on findfirst */
-   findinfo = hb_fsFindFirst( (char*) pszFileName, HB_FA_ALL );
-   if ( findinfo )
    {
-      hb_fsAttrDecode( findinfo->attr, (char*) pszAttr );
-      *llSize = ( HB_FOFFSET ) findinfo->size;
-      *lcDate = findinfo->lDate;
-      *lcTime = (findinfo->szTime[0] - '0') * 36000 +
-                (findinfo->szTime[1] - '0') * 3600 +
-                (findinfo->szTime[3] - '0') * 600 +
-                (findinfo->szTime[4] - '0') * 60 +
-                (findinfo->szTime[6] - '0') * 10 +
-                (findinfo->szTime[7] - '0');
-      *lmDate = hb_dateEncode( 0, 0, 0 );
-      *lmTime = 0;
-      hb_fsFindClose( findinfo );
-      fResult = TRUE;
+      PHB_FFIND findinfo = hb_fsFindFirst( ( char * ) pszFileName, HB_FA_ALL );
+
+      if( findinfo )
+      {
+         hb_fsAttrDecode( findinfo->attr, ( char * ) pszAttr );
+         *llSize = ( HB_FOFFSET ) findinfo->size;
+         *lcDate = findinfo->lDate;
+         *lcTime = (findinfo->szTime[0] - '0') * 36000 +
+                   (findinfo->szTime[1] - '0') * 3600 +
+                   (findinfo->szTime[3] - '0') * 600 +
+                   (findinfo->szTime[4] - '0') * 60 +
+                   (findinfo->szTime[6] - '0') * 10 +
+                   (findinfo->szTime[7] - '0');
+         *lmDate = hb_dateEncode( 0, 0, 0 );
+         *lmTime = 0;
+         hb_fsFindClose( findinfo );
+         fResult = TRUE;
+      }
    }
 
 #endif
@@ -282,7 +274,7 @@ HB_FUNC( FILESTATS )
    /* Parameter checking */
    if( !szFile || !*szFile )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "FILESTATS", 1,
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, 1,
             hb_paramError(1) );
       return;
    }
@@ -300,9 +292,7 @@ HB_FUNC( FILESTATS )
       hb_retl( TRUE );
    }
    else
-   {
       hb_retl( FALSE );
-   }
 }
 
 #endif

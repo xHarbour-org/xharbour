@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.153 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: itemapi.c,v 1.154 2008/11/27 15:54:02 marchuet Exp $
  */
 
 /*
@@ -98,7 +98,10 @@
  */
 
 #if !defined(__DJGPP__)
-#include <math.h> /* For log() */
+#  include <math.h> /* For log() */
+#endif
+#if ( defined(_MSC_VER) || (__BORLANDC__ > 1040) || defined(__WATCOMC__) ) && !defined(__DMC__) /* Use this only above Borland C++ 3.1 */
+#  include <float.h>  /* for _finite() and _isnan() */
 #endif
 
 #include <stdio.h>
@@ -108,20 +111,18 @@
 #include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#include "hbapilng.h"
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbmath.h"
 #include "hashapi.h"
-#include "hbapilng.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
 
-#if (defined(__BORLANDC__) || defined(__WATCOMC__) || defined(_MSC_VER)) && !defined(__DMC__)
-#  include <float.h>  /* for _finite() and _isnan() */
-#elif defined( HB_OS_SUNOS )
+#if defined( HB_OS_SUNOS )
 #  include <ieeefp.h>
 #endif
 
@@ -251,7 +252,7 @@ char * hb_itemGetCPtr( PHB_ITEM pItem )
    if( pItem && HB_IS_STRING( pItem ) )
       return pItem->item.asString.value;
    else
-      return "";
+      return ( char * ) "";
 }
 
 ULONG hb_itemGetCLen( PHB_ITEM pItem )
@@ -303,7 +304,7 @@ BOOL hb_itemFreeC( char * szText )
 
 char * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDS(%p, %s)", szDate));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDS(%p, %s)", pItem, szDate));
 
    if( pItem && HB_IS_DATE( pItem ) )
       return hb_dateDecStr( szDate, pItem->item.asDate.value );

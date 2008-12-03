@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.176 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: filesys.c,v 1.177 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -106,6 +106,7 @@
 #  define _LARGEFILE64_SOURCE
 #endif
 
+/* W32 */
 #ifndef HB_OS_WIN_32_USED
    #define HB_OS_WIN_32_USED
 #endif
@@ -137,13 +138,13 @@
       defined(__MINGW32__) || defined(__WATCOMC__) ) && \
       !defined( HB_OS_UNIX ) && !defined( HB_WINCE )
    #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <process.h>
    #if !defined( __POCC__ ) && !defined( __XCC__ )
       #include <share.h>
    #endif
-   #include <fcntl.h>
    #include <errno.h>
    #include <direct.h>
-   #include <process.h>
    #if defined(__BORLANDC__)
       #include <dir.h>
       #include <dos.h>
@@ -337,13 +338,13 @@ static BOOL s_fUseWaitLocks = TRUE;
 
 static HANDLE DosToWinHandle( HB_FHANDLE fHandle )
 {
-   if( fHandle == ( HB_FHANDLE ) 0 )
+   if( fHandle == ( HB_FHANDLE ) HB_STDIN_HANDLE )
       return GetStdHandle( STD_INPUT_HANDLE );
 
-   else if( fHandle == ( HB_FHANDLE ) 1 )
+   else if( fHandle == ( HB_FHANDLE ) HB_STDOUT_HANDLE )
       return GetStdHandle( STD_OUTPUT_HANDLE );
 
-   else if( fHandle == ( HB_FHANDLE ) 2 )
+   else if( fHandle == ( HB_FHANDLE ) HB_STDERR_HANDLE )
       return GetStdHandle( STD_ERROR_HANDLE );
 
    else

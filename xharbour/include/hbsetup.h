@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.48 2008/03/04 17:37:01 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.49 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /*
@@ -65,17 +65,49 @@
 #include <limits.h>
 
 /* ***********************************************************************
- * Include settings common for .PRG and .C files
-*/
+ * Include settings common for .prg and .c files
+ */
 #include "hbsetup.ch"
 
 /* ***********************************************************************
- * NOTE: You can select the default language module used by Harbour by
- *       defining this to a valid language module identifier.
-*/
+ * NOTE: You can select the default language modul used by Harbour, by
+ *       defining this to a valid language modul identifier.
+ */
 
 #ifndef HB_LANG_DEFAULT
-   #define HB_LANG_DEFAULT      EN
+   #define HB_LANG_DEFAULT       EN
+#endif
+
+/* ***********************************************************************
+ * NOTE: You can select the default codepage used by Harbour, by
+ *       defining this to a valid codepage modul identifier.
+ */
+
+#ifndef HB_CODEPAGE_DEFAULT
+   #define HB_CODEPAGE_DEFAULT   EN
+#endif
+
+/* ***********************************************************************
+ * If you turn this on, the memory subsystem will collect trace information
+ * and several statistical data about memory management, it will show
+ * these on exit if memory seem to have been leaked. The memory subsystem
+ * will also do pointer checks. [vszakats]
+ * This should be normally turned off in a final release.
+ *
+ * Note that if you turn this on, Harbour will be slighlty slower, larger
+ * and will consume more memory.
+ *
+ * By default this is turned off.
+ */
+/*#define HB_FM_STATISTICS*/
+
+/* ***********************************************************************
+ * Enable profiler support in HVM
+ * By default this is turned off. Define HB_USE_PROFILER to turn it on.
+ */
+
+#ifndef HB_USE_PROFILER
+   #define HB_NO_PROFILER
 #endif
 
 /* ***********************************************************************
@@ -94,7 +126,7 @@
  * HB_CALL_ON_STARTUP that is defined in 'hbinit.h'
  *
  * By default we are using extensions to ANSI C (symbol is not defined)
-*/
+ */
 /*#define HARBOUR_STRICT_ANSI_C */
 
 /* ***********************************************************************
@@ -104,7 +136,7 @@
  * To use "pascal" mode, you should define this macro to "pascal".
  *
  * By default we are not using any special calling conventions.
-*/
+ */
 /*#define HB_FUNC_CALLCONV*/
 
 /* ***********************************************************************
@@ -113,24 +145,11 @@
  *
  * Note that if you turn this on, the compiler will slighly grow in size.
  *
- * By default this is turned on.
+ * By default this is turned off.
  * TODO: This should be disabled, when the parser has matured.
-*/
+ */
 /*#define HARBOUR_YYDEBUG*/
 
-/* ***********************************************************************
- * If you turn this on, the memory subsystem will collect trace information
- * and several statistical data about memory management, it will show
- * these on exit if memory seem to have been leaked. The memory subsystem
- * will also do pointer checks. [vszakats]
- * This should be normally turned off in a final release.
- *
- * Note that if you turn this on, Harbour will be slighlty slower, larger
- * and will consume more memory.
- *
- * By default this is turned off.
-*/
-/*#define HB_FM_STATISTICS*/
 
 /* ***********************************************************************
  *
@@ -177,7 +196,7 @@
  * Borland C/C++ compilers.
  *
  * By default it is disabled (symbol is not defined)
-*/
+ */
 /*#define HARBOUR_OBJ_GENERATION*/
 
 /* ***********************************************************************
@@ -185,7 +204,7 @@
  * application (main() or WinMain()).
  *
  * By default the standard C main() function will be used.
-*/
+ */
 /*#define HARBOUR_MAIN_STD*/
 /*#define HARBOUR_MAIN_WIN*/
 
@@ -194,7 +213,7 @@
  * compiler and runtime. You can override this setting in the make process.
  *
  * By default this value is 63
-*/
+ */
 #ifndef HB_SYMBOL_NAME_LEN
 /* NOTE: For complete CA-Cl*pper compatibility you can set the maximum
          symbol name to 10. Sometimes this can be useful for compiling legacy
@@ -217,7 +236,7 @@
  * disabled/enabled at runtime using HB_SETMACRO() function
  *
  * By default we do not support commands in the macro compiler.
-*/
+ */
 /* #define HB_MACRO_STATEMENTS */
 
 
@@ -226,7 +245,7 @@
  * beyond the destination array size
  *
  * By default we are 100% Clipper compatible
-*/
+ */
 /* #define HB_FIX_ACOPY_BUG */
 
 /* ***********************************************************************
@@ -241,7 +260,7 @@
  * items, just swapping) in this functions.
  * Using this option makes sorting *much* faster, but if you have a
  * problem, or the low level stuff changes, turn it off. [vszakats]
-*/
+ */
 #define HB_ASORT_OPT_ITEMCOPY
 
 /* ***********************************************************************
@@ -255,7 +274,7 @@
 
 /* ***********************************************************************
  *  Detect GCC/OS2
-*/
+ */
 #if defined(__EMX__) && ! defined(__RSXNT__)
    #define HARBOUR_GCC_OS2
 #endif
@@ -265,7 +284,7 @@
  */
 #if ( defined(__GNUC__) && \
       ! ( defined(__DJGPP__) || defined(__EMX__) || defined(__RSXNT__) || \
-          defined(_Windows) || defined(_WIN32) ) ) || \
+          defined(_Windows) || defined(_WIN32) || defined(_WINCE) ) ) || \
     ( defined(__WATCOMC__) && defined(__LINUX__) )
    #define HOST_OS_UNIX_COMPATIBLE
    #define OS_UNIX_COMPATIBLE
@@ -293,10 +312,36 @@
 #endif
 
 #ifndef _POSIX_PATH_MAX
-   #define _POSIX_PATH_MAX    255
+    #if defined( MAX_PATH )
+       #define _POSIX_PATH_MAX    MAX_PATH  // 260
+    #else
+        #if defined( _MAX_PATH )
+           #define _POSIX_PATH_MAX    _MAX_PATH // 260
+        #else
+           #define _POSIX_PATH_MAX    255
+        #endif
+    #endif
 #endif
 
 #define HB_ISOPTSEP( c ) ( strchr( OS_OPT_DELIMITER_LIST, ( c ) ) != NULL )
+
+/* NOTE:
+   Compiler                                _MSC_VER value
+   --------                                --------------
+   C Compiler version 6.0                  600
+   C/C++ compiler version 7.0              700
+   Visual C++, Windows, version 1.0        800
+   Visual C++, 32-bit, version 1.0         800
+   Visual C++, Windows, version 2.0        900
+   Visual C++, 32-bit, version 2.x         900
+   Visual C++, 32-bit, version 4.0         1000
+   Visual C++, 32-bit, version 5.0         1100
+   Visual C++, 32-bit, version 6.0         1200
+   Visual Studio .NET, version 7.0         1300
+   Visual Studio .NET 2003, version 7.1    1310
+   Visual Studio 2005, version 8.0         1400
+   Visual Studio 2008, version 9.0         1500
+*/
 
 /* ***********************************************************************
  * Platform detection
@@ -344,32 +389,59 @@
    #endif
 #endif
 
+/* Sub-option inside HB_OS_WIN_32 */
+#ifndef HB_OS_WIN_64
+   #if defined(_WIN64)
+      #define HB_OS_WIN_64
+   #endif
+#endif
+
+/* Sub-option inside HB_OS_WIN_32 */
+#ifndef HB_WINCE
+   #if defined(_WINCE) || defined(__CEGCC__) || defined(__MINGW32CE__) || (defined(__POCC_TARGET__) && __POCC_TARGET__ == 2)
+      #define HB_WINCE
+   #endif
+#endif
+
 #ifndef HB_OS_LINUX
-   #if defined(linux) || defined(__linux) || defined(__linux__)
+   #if defined(linux) || defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
       #define HB_OS_LINUX
    #endif
 #endif
 
 #ifndef HB_OS_SUNOS
-   #if defined(sun) || defined(__sun)
+   #if defined(sun) || defined(__sun) || defined(__sun__)
       #define HB_OS_SUNOS
    #endif
 #endif
 
 #ifndef HB_OS_HPUX
-   #if defined(__hpux)
+   /* HP cc in ANSI mode defines __hpux. GCC defines __hpux__ */
+   #if defined(__hpux) || defined(__hpux__)
       #define HB_OS_HPUX
    #endif
 #endif
 
+#ifndef HB_OS_DARWIN
+   #if defined(__APPLE__)
+      #define HB_OS_DARWIN
+   #endif
+#endif
+
 #ifndef HB_OS_BSD
-   #if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __APPLE__ )
+   #if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || \
+       defined( HB_OS_DARWIN ) || defined( __APPLE__ )
       #define HB_OS_BSD
    #endif
 #endif
 
 #ifndef HB_OS_UNIX
-   #if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_LINUX) || defined(HB_OS_BSD) || defined(HB_OS_SUNOS) || defined(HB_OS_HPUX)
+   #if defined(OS_UNIX_COMPATIBLE) || \
+       defined(HB_OS_LINUX) || \
+       defined(HB_OS_DARWIN) || \
+       defined(HB_OS_BSD) || \
+       defined(HB_OS_SUNOS) || \
+       defined(HB_OS_HPUX)
       #define HB_OS_UNIX
    #endif
 #endif
@@ -384,7 +456,7 @@
  * Here you can force the EOL string to be CRLF
  *
  * By default, the EOL string depends upon the detected platform.
-*/
+ */
 /* #define HB_EOL_CRLF */
 #ifdef HB_EOL_CRLF
    #undef OS_EOL_LEN
@@ -395,12 +467,12 @@
  * See also the following files for task specific definitions/settings
  *
  * hbmath.h    - math errors handling
-*/
+ */
 
 /* ***********************************************************************
  * Fix DJGPP in call to: toupper(), tolower(), is...()
  *
-*/
+ */
 #ifdef __DJGPP__
    #include "hbfixdj.h"
 
@@ -421,7 +493,6 @@
       #define snprintf _snprintf
    #endif
 #endif
-
 
 /* ***********************************************************************
  * Extern "C" detection

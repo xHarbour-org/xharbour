@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.32 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: hbstr.c,v 1.33 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -68,22 +68,22 @@
 #include "hbmath.h"
 #include "hbexemem.h"
 
-const char * hb_szAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
-                                 "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
-                                 "\x20", "\x21", "\x22", "\x23", "\x24", "\x25", "\x26", "\x27", "\x28", "\x29", "\x2A", "\x2B", "\x2C", "\x2D", "\x2E", "\x2F",
-                                 "\x30", "\x31", "\x32", "\x33", "\x34", "\x35", "\x36", "\x37", "\x38", "\x39", "\x3A", "\x3B", "\x3C", "\x3D", "\x3E", "\x3F",
-                                 "\x40", "\x41", "\x42", "\x43", "\x44", "\x45", "\x46", "\x47", "\x48", "\x49", "\x4A", "\x4B", "\x4C", "\x4D", "\x4E", "\x4F",
-                                 "\x50", "\x51", "\x52", "\x53", "\x54", "\x55", "\x56", "\x57", "\x58", "\x59", "\x5A", "\x5B", "\x5C", "\x5D", "\x5E", "\x5F",
-                                 "\x60", "\x61", "\x62", "\x63", "\x64", "\x65", "\x66", "\x67", "\x68", "\x69", "\x6A", "\x6B", "\x6C", "\x6D", "\x6E", "\x6F",
-                                 "\x70", "\x71", "\x72", "\x73", "\x74", "\x75", "\x76", "\x77", "\x78", "\x79", "\x7A", "\x7B", "\x7C", "\x7D", "\x7E", "\x7F",
-                                 "\x80", "\x81", "\x82", "\x83", "\x84", "\x85", "\x86", "\x87", "\x88", "\x89", "\x8A", "\x8B", "\x8C", "\x8D", "\x8E", "\x8F",
-                                 "\x90", "\x91", "\x92", "\x93", "\x94", "\x95", "\x96", "\x97", "\x98", "\x99", "\x9A", "\x9B", "\x9C", "\x9D", "\x9E", "\x9F",
-                                 "\xA0", "\xA1", "\xA2", "\xA3", "\xA4", "\xA5", "\xA6", "\xA7", "\xA8", "\xA9", "\xAA", "\xAB", "\xAC", "\xAD", "\xAE", "\xAF",
-                                 "\xB0", "\xB1", "\xB2", "\xB3", "\xB4", "\xB5", "\xB6", "\xB7", "\xB8", "\xB9", "\xBA", "\xBB", "\xBC", "\xBD", "\xBE", "\xBF",
-                                 "\xC0", "\xC1", "\xC2", "\xC3", "\xC4", "\xC5", "\xC6", "\xC7", "\xC8", "\xC9", "\xCA", "\xCB", "\xCC", "\xCD", "\xCE", "\xCF",
-                                 "\xD0", "\xD1", "\xD2", "\xD3", "\xD4", "\xD5", "\xD6", "\xD7", "\xD8", "\xD9", "\xDA", "\xDB", "\xDC", "\xDD", "\xDE", "\xDF",
-                                 "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
-                                 "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
+const char * hb_szAscii[ 256 ] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
+                                   "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
+                                   "\x20", "\x21", "\x22", "\x23", "\x24", "\x25", "\x26", "\x27", "\x28", "\x29", "\x2A", "\x2B", "\x2C", "\x2D", "\x2E", "\x2F",
+                                   "\x30", "\x31", "\x32", "\x33", "\x34", "\x35", "\x36", "\x37", "\x38", "\x39", "\x3A", "\x3B", "\x3C", "\x3D", "\x3E", "\x3F",
+                                   "\x40", "\x41", "\x42", "\x43", "\x44", "\x45", "\x46", "\x47", "\x48", "\x49", "\x4A", "\x4B", "\x4C", "\x4D", "\x4E", "\x4F",
+                                   "\x50", "\x51", "\x52", "\x53", "\x54", "\x55", "\x56", "\x57", "\x58", "\x59", "\x5A", "\x5B", "\x5C", "\x5D", "\x5E", "\x5F",
+                                   "\x60", "\x61", "\x62", "\x63", "\x64", "\x65", "\x66", "\x67", "\x68", "\x69", "\x6A", "\x6B", "\x6C", "\x6D", "\x6E", "\x6F",
+                                   "\x70", "\x71", "\x72", "\x73", "\x74", "\x75", "\x76", "\x77", "\x78", "\x79", "\x7A", "\x7B", "\x7C", "\x7D", "\x7E", "\x7F",
+                                   "\x80", "\x81", "\x82", "\x83", "\x84", "\x85", "\x86", "\x87", "\x88", "\x89", "\x8A", "\x8B", "\x8C", "\x8D", "\x8E", "\x8F",
+                                   "\x90", "\x91", "\x92", "\x93", "\x94", "\x95", "\x96", "\x97", "\x98", "\x99", "\x9A", "\x9B", "\x9C", "\x9D", "\x9E", "\x9F",
+                                   "\xA0", "\xA1", "\xA2", "\xA3", "\xA4", "\xA5", "\xA6", "\xA7", "\xA8", "\xA9", "\xAA", "\xAB", "\xAC", "\xAD", "\xAE", "\xAF",
+                                   "\xB0", "\xB1", "\xB2", "\xB3", "\xB4", "\xB5", "\xB6", "\xB7", "\xB8", "\xB9", "\xBA", "\xBB", "\xBC", "\xBD", "\xBE", "\xBF",
+                                   "\xC0", "\xC1", "\xC2", "\xC3", "\xC4", "\xC5", "\xC6", "\xC7", "\xC8", "\xC9", "\xCA", "\xCB", "\xCC", "\xCD", "\xCE", "\xCF",
+                                   "\xD0", "\xD1", "\xD2", "\xD3", "\xD4", "\xD5", "\xD6", "\xD7", "\xD8", "\xD9", "\xDA", "\xDB", "\xDC", "\xDD", "\xDE", "\xDF",
+                                   "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
+                                   "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
 
 ULONG hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
@@ -165,9 +165,7 @@ char * hb_strndup( const char * pszText, ULONG ulLen )
    ul = 0;
    pszDup = ( char * ) pszText;
    while( ulLen-- && *pszDup++ )
-   {
       ++ul;
-   }
 
    pszDup = ( char * ) hb_xgrab( ul + 1 );
    memcpy( pszDup, pszText, ul );
@@ -183,9 +181,8 @@ ULONG hb_strnlen( const char * pszText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strnlen(%s, %ld)", pszText, ulLen));
 
    while( ulLen-- && *pszText++ )
-   {
       ++ul;
-   }
+
    return ul;
 }
 
@@ -197,14 +194,11 @@ char * hb_strduptrim( const char * pszText )
    HB_TRACE(HB_TR_DEBUG, ("hb_strduptrim(%s)", pszText));
 
    while( pszText[ 0 ] == ' ' )
-   {
       ++pszText;
-   }
+
    ulLen = strlen( pszText );
    while( ulLen && pszText[ ulLen - 1 ] == ' ' )
-   {
       --ulLen;
-   }
 
    pszDup = ( char * ) hb_xgrab( ulLen + 1 );
    memcpy( pszDup, pszText, ulLen );
@@ -220,17 +214,14 @@ ULONG hb_strlentrim( const char * pszText )
    HB_TRACE(HB_TR_DEBUG, ("hb_strlentrim(%s)", pszText));
 
    while( pszText[ 0 ] == ' ' )
-   {
       ++pszText;
-   }
+
    while( pszText[ ul] )
-   {
       ++ul;
-   }
+
    while( ul && pszText[ ul - 1 ] == ' ' )
-   {
       --ul;
-   }
+
    return ul;
 }
 
@@ -396,32 +387,28 @@ char * hb_xstrcpy( char * szDest, const char * szSrc, ... )
 
 static double hb_numPow10( int nPrecision )
 {
-   static const double s_dPow10[16] = {                1.0,   /*  0 */
-                                                      10.0,   /*  1 */
-                                                     100.0,   /*  2 */
-                                                    1000.0,   /*  3 */
-                                                   10000.0,   /*  4 */
-                                                  100000.0,   /*  5 */
-                                                 1000000.0,   /*  6 */
-                                                10000000.0,   /*  7 */
-                                               100000000.0,   /*  8 */
-                                              1000000000.0,   /*  9 */
-                                             10000000000.0,   /* 10 */
-                                            100000000000.0,   /* 11 */
-                                           1000000000000.0,   /* 12 */
-                                          10000000000000.0,   /* 13 */
-                                         100000000000000.0,   /* 14 */
-                                        1000000000000000.0 }; /* 15 */
+   static const double s_dPow10[ 16 ] = {                1.0,   /*  0 */
+                                                        10.0,   /*  1 */
+                                                       100.0,   /*  2 */
+                                                      1000.0,   /*  3 */
+                                                     10000.0,   /*  4 */
+                                                    100000.0,   /*  5 */
+                                                   1000000.0,   /*  6 */
+                                                  10000000.0,   /*  7 */
+                                                 100000000.0,   /*  8 */
+                                                1000000000.0,   /*  9 */
+                                               10000000000.0,   /* 10 */
+                                              100000000000.0,   /* 11 */
+                                             1000000000000.0,   /* 12 */
+                                            10000000000000.0,   /* 13 */
+                                           100000000000000.0,   /* 14 */
+                                          1000000000000000.0 }; /* 15 */
    if( nPrecision < 16 )
    {
       if( nPrecision >= 0 )
-      {
          return s_dPow10[ nPrecision ];
-      }
       else if( nPrecision > -16 )
-      {
          return 1.0 / s_dPow10[ ( unsigned int ) -nPrecision ];
-      }
    }
 
    return pow( 10.0, ( double ) nPrecision );
@@ -486,10 +473,9 @@ double hb_numRound( double dNum, int iDec )
          dNum = -dNum;
       }
       else
-      {
          fNeg = FALSE;
-      }
-      iDecR = (int) log10( dNum );
+
+      iDecR = ( int ) log10( dNum );
       iPrec = iDecR + iDec;
 
       if( iPrec < -1 )
@@ -504,9 +490,7 @@ double hb_numRound( double dNum, int iDec )
             iPrec = -1;
          }
          else
-         {
             iPrec -= HB_NUM_PRECISION;
-         }
       }
       if( iDec < 0 )
       {
@@ -520,9 +504,7 @@ double hb_numRound( double dNum, int iDec )
       }
 
       if( fNeg )
-      {
          doComplete5 = -doComplete5;
-      }
    }
 #else
    if( dNum < 0.0f )
@@ -573,10 +555,8 @@ double hb_numDecConv( double dNum, int iDec )
 {
    if( iDec > 0 )
       return hb_numRound( dNum / hb_numPow10( iDec ), iDec );
-
    else if( iDec < 0 )
       return hb_numRound( dNum * hb_numPow10( -iDec ), 0 );
-
    else
       return hb_numRound( dNum, 0 );
 }
@@ -589,14 +569,14 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth ));
 
-   while( ulPos < ulLen && isspace( (BYTE) szNum[ulPos] ) )
+   while( ulPos < ulLen && isspace( ( BYTE ) szNum[ulPos] ) )
       ulPos++;
 
    if( ulPos >= ulLen )
    {
       fNeg = FALSE;
    }
-   else if( szNum[ulPos] == '-' )
+   else if( szNum[ ulPos ] == '-' )
    {
       fNeg = TRUE;
       ulPos++;
@@ -604,22 +584,22 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
    else
    {
       fNeg = FALSE;
-      if( szNum[ulPos] == '+' )
+      if( szNum[ ulPos ] == '+' )
          ulPos++;
    }
 
    *lVal = 0;
 
    /* Hex Number */
-   if( fPCode && ulPos + 1 < ulLen && szNum[ulPos] == '0' &&
-       ( szNum[ulPos+1] == 'X' || szNum[ulPos+1] == 'x' ) )
+   if( fPCode && ulPos + 1 < ulLen && szNum[ ulPos ] == '0' &&
+       ( szNum[ ulPos + 1 ] == 'X' || szNum[ ulPos + 1 ] == 'x' ) )
    {
       ulPos += 2;
       iWidth = HB_DEFAULT_WIDTH;
       fHex = TRUE;
       for( ; ulPos < ulLen; ulPos++ )
       {
-         c = szNum[ulPos];
+         c = szNum[ ulPos ];
          if( c >= '0' && c <= '9' )
             c -= '0';
          else if( c >= 'A' && c <= 'F' )
@@ -643,7 +623,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 
       for( ; ulPos < ulLen; ulPos++ )
       {
-         c = szNum[ulPos];
+         c = szNum[ ulPos ];
          if( c >= '0' && c <= '9' )
          {
             if( fDbl )
@@ -656,7 +636,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
             }
             else
             {
-               *dVal = (double) *lVal * 10.0 + ( c - '0' );
+               *dVal = ( double ) *lVal * 10.0 + ( c - '0' );
                fDbl = TRUE;
             }
             if( fDec )
@@ -672,7 +652,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
          {
             while( !fDec && ulPos < ulLen )
             {
-               if( szNum[ulPos++] == '.' )
+               if( szNum[ ulPos++ ] == '.' )
                   fDec = TRUE;
                else
                   iWidth++;
@@ -697,7 +677,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 #endif
         fDec ) )
    {
-      *dVal = (double) *lVal;
+      *dVal = ( double ) *lVal;
       fDbl = TRUE;
    }
    if( iDec )
@@ -813,14 +793,10 @@ char * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen )
    pDest[ ulLen ] ='\0';
 
    while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
-   {
       ulLen--;
-   }
 
-   while(ulLen--)
-   {
+   while( ulLen-- )
       *pDest++ = '\0';
-   }
 
    return pBuf;
 }
@@ -845,17 +821,13 @@ char * hb_strncat( char * pDest, const char * pSource, ULONG ulLen )
    }
 
    while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
-   {
       ulLen--;
-   }
 
 /* if someone will need this then please uncomment the cleaning the rest of
    buffer. */
 /*
    while(ulLen--)
-   {
       *pDest++ = '\0';
-   }
 */
    return pBuf;
 }
@@ -884,9 +856,7 @@ char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
    }
 
    while( ulLen-- )
-   {
       *pDest++ = '\0';
-   }
 
    return pBuf;
 }
@@ -907,13 +877,10 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
 
    ulSLen = 0;
    while( ulSLen < ulLen && pSource[ ulSLen ] )
-   {
       ulSLen++;
-   }
+
    while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
-   {
       ulSLen--;
-   }
 
    pDest[ ulLen ] = '\0';
 
@@ -928,9 +895,7 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
    }
 
    while( ulLen-- )
-   {
       *pDest++ = '\0';
-   }
 
    return pBuf;
 }
@@ -949,13 +914,10 @@ char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen )
 
    ulSLen = 0;
    while( ulSLen < ulLen && pSource[ ulSLen ] )
-   {
       ulSLen++;
-   }
+
    while( ulSLen && pSource[ ulSLen - 1 ] == ' ' )
-   {
       ulSLen--;
-   }
 
    pDest[ ulLen ] ='\0';
 
@@ -968,9 +930,7 @@ char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen )
    }
 
    while( ulLen-- )
-   {
       *pDest++ = '\0';
-   }
 
    return pBuf;
 }
@@ -1057,7 +1017,6 @@ char * hb_strRemEscSeq( char *str, ULONG *pLen )
          }
          else
             break;
-            
       }
       *dst++ = ch;
    }
@@ -1074,7 +1033,7 @@ char * hb_strRemEscSeq( char *str, ULONG *pLen )
 /*
  * Simple routine to extract uncommented part of (read) buffer
  */
-char *hb_stripOutComments( char* buffer )
+char * hb_stripOutComments( char * buffer )
 {
    if( buffer && *buffer )
    {

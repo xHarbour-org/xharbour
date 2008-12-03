@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.105 2008/10/28 12:22:42 marchuet Exp $
+ * $Id: hbdefs.h,v 1.106 2008/10/29 12:10:51 marchuet Exp $
  */
 
 /*
@@ -476,12 +476,12 @@
  *       only in strict compatibility mode. [druzus]
  */
 #if HB_INT_MIN < -999999999
-#  define HB_INT_LENGTH( i )        ( ( (i) < -999999999 || (i) > 9999999999 ) ? 20 : 10 )
+#  define HB_INT_LENGTH( i )        ( ( (i) < -999999999 || (i) > 999999999 ) ? 20 : 10 )
 #else
 #  define HB_INT_LENGTH( i )        10
 #  define HB_INT_EXPLENGTH( i )     10
 #  if HB_LONG_MIN < -999999999
-#     define HB_LONG_LENGTH( i )    ( ( (i) < -999999999 || (i) > 9999999999 ) ? 20 : 10 )
+#     define HB_LONG_LENGTH( i )    ( ( (i) < -999999999 || (i) > 999999999 ) ? 20 : 10 )
 #  endif
 #endif
 

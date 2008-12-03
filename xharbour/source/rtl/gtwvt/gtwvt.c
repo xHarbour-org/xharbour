@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.184 2008/11/24 05:30:34 andijahja Exp $
+ * $Id: gtwvt.c,v 1.185 2008/11/26 22:25:27 andijahja Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ static PHB_GTWVT hb_gt_wvt_New( PHB_GT pGT )
    pWVT->COLORS[14]        = YELLOW;
    pWVT->COLORS[15]        = BRIGHT_WHITE;
 
-   /* THEESE are the default font parameters, if not changed by user */
+   /* THESE are the default font parameters, if not changed by user */
    pWVT->PTEXTSIZE.x       = WVT_DEFAULT_FONT_WIDTH;
    pWVT->PTEXTSIZE.y       = WVT_DEFAULT_FONT_HEIGHT;
    pWVT->fontWidth         = WVT_DEFAULT_FONT_WIDTH;
