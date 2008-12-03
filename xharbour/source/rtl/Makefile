@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.77 2008/04/19 12:49:15 lculik Exp $
+# $Id: Makefile,v 1.78 2008/09/11 05:32:35 guerra000 Exp $
 #
 
 ROOT = ../../
@@ -31,6 +31,7 @@ C_SOURCES=\
 	empty.c      \
 	error.c      \
 	file.c       \
+        filebuf.c    \
 	filehb.c     \
 	filestat.c   \
 	filesys.c    \
