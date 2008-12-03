@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.58 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbapifs.h,v 1.59 2008/11/21 05:10:07 andijahja Exp $
  */
 
 /*
@@ -87,6 +87,7 @@ HB_EXTERN_BEGIN
 
 /* File attributes flags */
 #define HB_FA_ALL             0x00000000
+
 #define HB_FA_READONLY        0x00000001     /* R */
 #define HB_FA_HIDDEN          0x00000002     /* H */
 #define HB_FA_SYSTEM          0x00000004     /* S */
@@ -105,6 +106,53 @@ HB_EXTERN_BEGIN
 #define HB_FA_ENCRYPTED       0x00004000     /* E */
 #define HB_FA_VOLCOMP         0x00008000     /* M volume supports compression. */
 
+/* these definitions should be cleared,
+ * now they only help to clean lower level code
+ */
+#define HB_FA_FIFO            HB_FA_TEMPORARY   /* S_ISFIFO() */
+#define HB_FA_FILE            HB_FA_ARCHIVE     /* S_ISREG() */
+#define HB_FA_BLKDEVICE       HB_FA_DEVICE      /* S_ISBLK() */
+#define HB_FA_CHRDEVICE       HB_FA_COMPRESSED  /* S_ISCHR() */
+#define HB_FA_SOCKET          HB_FA_SPARSE      /* S_ISSOCK() */
+#define HB_FA_LINK            HB_FA_REPARSE     /* S_ISLNK() */
+
+/* POSIX file permission */
+#define HB_FA_SUID            0x08000000     /* set user ID on execution */
+#define HB_FA_SGID            0x04000000     /* set group ID on execution */
+#define HB_FA_SVTX            0x02000000     /* sticky bit */
+#define HB_FA_RUSR            0x01000000     /* read by owner */
+#define HB_FA_WUSR            0x00800000     /* write by owner */
+#define HB_FA_XUSR            0x00400000     /* execute/search by owner */
+#define HB_FA_RGRP            0x00200000     /* read by group */
+#define HB_FA_WGRP            0x00100000     /* write by group */
+#define HB_FA_XGRP            0x00080000     /* execute/search by group */
+#define HB_FA_ROTH            0x00040000     /* read by others */
+#define HB_FA_WOTH            0x00020000     /* write by others */
+#define HB_FA_XOTH            0x00010000     /* execute/search by others */
+
+#define HB_FA_UGVS            ( HB_FA_SUID | HB_FA_SGID | HB_FA_SVTX )
+#define HB_FA_RWXU            ( HB_FA_RUSR | HB_FA_WUSR | HB_FA_XUSR )
+#define HB_FA_RWXG            ( HB_FA_RGRP | HB_FA_WGRP | HB_FA_XGRP )
+#define HB_FA_RWXO            ( HB_FA_ROTH | HB_FA_WOTH | HB_FA_XOTH )
+
+/* macros to convert Harbour attributes to POSIX ones */
+#define HB_FA_POSIX_SID(a)    ( ( ( ( a ) & HB_FA_SVTX ) ? S_ISVTX : 0 ) | \
+                                ( ( ( a ) & HB_FA_SGID ) ? S_ISGID : 0 ) | \
+                                ( ( ( a ) & HB_FA_SUID ) ? S_ISUID : 0 ) )
+#define HB_FA_POSIX_OTH(a)    ( ( ( ( a ) & HB_FA_XOTH ) ? S_IXOTH : 0 ) | \
+                                ( ( ( a ) & HB_FA_WOTH ) ? S_IWOTH : 0 ) | \
+                                ( ( ( a ) & HB_FA_ROTH ) ? S_IROTH : 0 ) )
+#define HB_FA_POSIX_GRP(a)    ( ( ( ( a ) & HB_FA_XGRP ) ? S_IXGRP : 0 ) | \
+                                ( ( ( a ) & HB_FA_WGRP ) ? S_IWGRP : 0 ) | \
+                                ( ( ( a ) & HB_FA_RGRP ) ? S_IRGRP : 0 ) )
+#define HB_FA_POSIX_USR(a)    ( ( ( ( a ) & HB_FA_XUSR ) ? S_IXUSR : 0 ) | \
+                                ( ( ( a ) & HB_FA_WUSR ) ? S_IWUSR : 0 ) | \
+                                ( ( ( a ) & HB_FA_RUSR ) ? S_IRUSR : 0 ) )
+
+#define HB_FA_POSIX_ATTR(a)   ( HB_FA_POSIX_OTH(a) | \
+                                HB_FA_POSIX_GRP(a) | \
+                                HB_FA_POSIX_USR(a) | \
+                                HB_FA_POSIX_SID(a) )
 
 extern HB_EXPORT BOOL       hb_fsChDir      ( BYTE * pszDirName ); /* change working directory */
 extern HB_EXPORT USHORT     hb_fsChDrv      ( BYTE nDrive ); /* change working drive */
@@ -126,14 +174,14 @@ extern HB_EXPORT BOOL       hb_fsFile       ( BYTE * pszFileName ); /* determine
 extern HB_EXPORT BOOL       hb_fsIsDirectory( BYTE * pFilename ); /* Determine if given name is a directory */
 extern HB_EXPORT HB_FOFFSET hb_fsFSize      ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
 extern HB_EXPORT HB_FHANDLE hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,
-                                            USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
+                                              USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
 extern HB_EXPORT BYTE *     hb_fsExtName    ( BYTE * pFilename, BYTE * pDefExt,
                                               USHORT uiExFlags, BYTE * pPaths ); /* convert file name for hb_fsExtOpen, caller must free the returned buffer */
 extern HB_EXPORT USHORT     hb_fsIsDrv      ( BYTE nDrive ); /* determine if a drive number is a valid drive */
 extern HB_EXPORT BOOL       hb_fsIsDevice   ( HB_FHANDLE hFileHandle ); /* determine if a file is attached to a device (console?) */
 extern HB_EXPORT BOOL       hb_fsLock       ( HB_FHANDLE hFileHandle, ULONG ulStart, ULONG ulLength, USHORT uiMode ); /* request a lock on a portion of a file */
 extern HB_EXPORT BOOL       hb_fsLockLarge  ( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
-                                            HB_FOFFSET ulLength, USHORT uiMode ); /* request a lock on a portion of a file using 64bit API */
+                                              HB_FOFFSET ulLength, USHORT uiMode ); /* request a lock on a portion of a file using 64bit API */
 extern HB_EXPORT BOOL       hb_fsMkDir      ( BYTE * pszDirName ); /* create a directory */
 extern HB_FORCE_EXPORT HB_FHANDLE hb_fsOpen ( BYTE * pszFileName, USHORT uiFlags ); /* open a file */
 extern HB_FORCE_EXPORT USHORT   hb_fsRead   ( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* read contents of a file into a buffer (<=64K) */
@@ -190,15 +238,15 @@ extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 /* Filename support */
 typedef struct
 {
-   char * szPath;
-   char * szName;
-   char * szExtension;
-   char * szDrive;
+   const char * szPath;
+   const char * szName;
+   const char * szExtension;
+   const char * szDrive;
    char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
 } HB_FNAME, * PHB_FNAME, * HB_FNAME_PTR;
 
-extern HB_EXPORT PHB_FNAME hb_fsFNameSplit( const char * pszFileName ); /* Split given filename into path, name and extension */
-extern HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName ); /* This function joins path, name and extension into a string with a filename */
+extern HB_EXPORT PHB_FNAME  hb_fsFNameSplit( const char * pszFileName ); /* Split given filename into path, name and extension */
+extern HB_EXPORT char *     hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName ); /* This function joins path, name and extension into a string with a filename */
 
 /* Searchable path support */
 typedef struct _HB_PATHNAMES
@@ -210,7 +258,7 @@ typedef struct _HB_PATHNAMES
 
 extern HB_EXPORT void       hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList );
 extern HB_EXPORT void       hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList );
-
+       
 extern HB_EXPORT BOOL       hb_spFile( BYTE * pFilename, BYTE * pRetPath );
 extern HB_EXPORT HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags );
 extern HB_EXPORT HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr );
@@ -232,7 +280,7 @@ typedef struct
    ULONG  attrmask;
    BOOL   bFirst;
 
-   void *      info; /* Pointer to the platform specific find info */
+   void * info; /* Pointer to the platform specific find info */
 
 } HB_FFIND, * PHB_FFIND;
 

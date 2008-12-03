@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.178 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: filesys.c,v 1.179 2008/12/03 13:08:43 marchuet Exp $
  */
 
 /*
@@ -3402,7 +3402,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
     * It will allow us to add drive emulation in hb_fsCurDrv()/hb_fsChDrv()
     * and hb_fsNameConv()
     */
-#if !( defined(__GNUC__) && ( defined(HB_OS_OS2) || !defined(__MINGW32__) ) )
+#if ! defined(__GNUC__) || ( defined(__MINGW32__) && ! defined(HB_OS_OS2) )
    if( uiDrive )
    {
       uiCurDrv = hb_fsCurDrv() + 1;
@@ -4005,7 +4005,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    DWORD dwResult;
 
    HB_TEST_CANCEL_ENABLE_ASYN
-   dwResult = GetCurrentDirectory( ulLen, ( char * ) pbyBuffer );
+   dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( dwResult != 0, 0 );
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
