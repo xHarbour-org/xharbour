@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.59 2008/11/21 05:10:07 andijahja Exp $
+ * $Id: hbapifs.h,v 1.60 2008/12/03 16:55:40 marchuet Exp $
  */
 
 /*
@@ -238,10 +238,10 @@ extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 /* Filename support */
 typedef struct
 {
-   const char * szPath;
-   const char * szName;
-   const char * szExtension;
-   const char * szDrive;
+   char * szPath;
+   char * szName;
+   char * szExtension;
+   char * szDrive;
    char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
 } HB_FNAME, * PHB_FNAME, * HB_FNAME_PTR;
 
@@ -258,7 +258,7 @@ typedef struct _HB_PATHNAMES
 
 extern HB_EXPORT void       hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList );
 extern HB_EXPORT void       hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList );
-       
+
 extern HB_EXPORT BOOL       hb_spFile( BYTE * pFilename, BYTE * pRetPath );
 extern HB_EXPORT HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags );
 extern HB_EXPORT HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr );

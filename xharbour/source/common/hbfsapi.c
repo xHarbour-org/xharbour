@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.17 2008/10/23 19:06:58 marchuet Exp $
+ * $Id: hbfsapi.c,v 1.18 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
 char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 {
    static char s_szPathSep[] = { OS_PATH_DELIMITER, 0 }; /* see NOTE below */
-   char * pszName;
+   const char * pszName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameMerge(%p, %p)", pszFileName, pFileName));
 
@@ -325,7 +325,7 @@ BOOL hb_fsFileExists( const char * pszFileName )
 #elif defined( HB_OS_OS2 )
    {
       FILESTATUS3 fs3;
-      fExist = DosQueryPathInfo( pszFileName, FIL_STANDARD,
+      fExist = DosQueryPathInfo( ( PCSZ ) pszFileName, FIL_STANDARD,
                                  &fs3, sizeof( fs3 ) ) == NO_ERROR &&
                ( fs3.attrFile & FILE_DIRECTORY ) == 0;
    }
@@ -384,7 +384,7 @@ BOOL hb_fsDirExists( const char * pszDirName )
 #elif defined( HB_OS_OS2 )
    {
       FILESTATUS3 fs3;
-      fExist = DosQueryPathInfo( pszDirName, FIL_STANDARD,
+      fExist = DosQueryPathInfo( ( PCSZ ) pszDirName, FIL_STANDARD,
                                  &fs3, sizeof( fs3 ) ) == NO_ERROR &&
                ( fs3.attrFile & FILE_DIRECTORY ) != 0;
    }
