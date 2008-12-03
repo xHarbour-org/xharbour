@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.177 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: filesys.c,v 1.178 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -3392,7 +3392,6 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
    HB_THREAD_STUB
    USHORT uiCurDrv = uiDrive, usError;
-   BOOL fResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
@@ -3415,32 +3414,38 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    HB_STACK_UNLOCK
 
 #if defined(HB_OS_WIN_32)
+{
+   DWORD dwResult;
 
    HB_TEST_CANCEL_ENABLE_ASYN
-   fResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
-   hb_fsSetIOError( fResult, 0 );
+   dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
+   hb_fsSetIOError( dwResult != 0, 0 );
    HB_DISABLE_ASYN_CANC
-
+   HB_STACK_LOCK
+}
 #elif defined(HB_OS_OS2) && defined(__GNUC__)
+{
+   BOOL fResult;
 
    fResult = ( _getcwd1( ( char * ) pbyBuffer, uiDrive + 'A' - 1 ) == 0 );
    hb_fsSetIOError( fResult, 0 );
-
+}
 #elif defined(HAVE_POSIX_IO)
+{
+   BOOL fResult;
 
    fResult = ( getcwd( ( char * ) pbyBuffer, ulLen ) != NULL );
    hb_fsSetIOError( fResult, 0 );
-
+}
 #elif defined(__MINGW32__)
+{
+   BOOL fResult;
 
    fResult = ( _getdcwd( uiDrive, pbyBuffer, ulLen ) != NULL );
    hb_fsSetIOError( fResult, 0 );
-
+}
 #else
-
-   fResult = FALSE;
    hb_fsSetError( ( USHORT ) FS_ERROR );
-
 #endif
 
    HB_STACK_LOCK
@@ -3989,7 +3994,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    HB_THREAD_STUB
 #endif
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuffEx(%hu)", uiDrive));
 
    HB_SYMBOL_UNUSED( uiDrive );
 
