@@ -9,7 +9,7 @@
 */
 
 
-2008-12-03 21:17 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+2008-12-05 11:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbrddbmc.h
   * source\rdd\bmdbfcdx\bmdbfcdx1.c
     ! fixed BM_SetArrayFilter, to generate filter from array of recnos.
