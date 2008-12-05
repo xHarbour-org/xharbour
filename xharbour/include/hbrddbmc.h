@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmc.h,v 1.6 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbrddbmc.h,v 1.7 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -7,7 +7,7 @@
  *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
- * Copyright 2006 Miguel Angel Marchuet <miguelangel@marchuet.net>
+ * Copyright 2006-2008 Miguel Angel Marchuet <miguelangel@marchuet.net>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -555,7 +555,7 @@ typedef CDXAREA * LPCDXAREA;
 #define CDXAREAP LPCDXAREA
 #endif
 
-// m Bitmap, b Size, r RecNo
+/* m Bitmap, b Size, r RecNo */
 #define BM_SetBit(m,b,r) ((r)<=(b))?((m)[((r)-1)>>5] = (m)[((r)-1)>>5] | (1<<(((r)-1)%32))):0
 #define BM_ClrBit(m,b,r) ((r)<=(b))?((m)[((r)-1)>>5] = (m)[((r)-1)>>5] & ~(1<<(((r)-1)%32))):0
 #define BM_GetBit(m,b,r) (((r)<=(b))?(((m)[((r)-1)>>5] & (1<<(((r)-1)%32)))):0)

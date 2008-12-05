@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.50 2008/10/22 08:32:48 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.51 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -6822,7 +6822,7 @@ HB_FUNC( BM_DBGETFILTERARRAY )
 HB_FUNC( BM_DBSETFILTERARRAY )
 {
     HB_THREAD_STUB
-    AREAP pArea = (AREAP) hb_rddGetCurrentWorkAreaPointer();
+    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
     PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
     ULONG ulPos,ulRecCount;
 
@@ -6835,8 +6835,6 @@ HB_FUNC( BM_DBSETFILTERARRAY )
             if( SELF_CLEARFILTER( pArea ) != SUCCESS )
                return;
 
-            pArea->dbfi.itmCobExpr = hb_itemPutC( NULL, "" );
-            pArea->dbfi.abFilterText = hb_itemPutC( NULL, "" );
             pArea->dbfi.fOptimized = TRUE;
             pArea->dbfi.fFilter = TRUE;
 
@@ -6845,14 +6843,17 @@ HB_FUNC( BM_DBSETFILTERARRAY )
             memset( pArea->dbfi.lpvCargo, 0, sizeof( BM_FILTER ) );
 
             ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size = ulRecCount;
-            ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = (ULONG *) hb_xgrab( sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1) );
-            for ( ulPos = 1; ulPos <= ulRecCount; ulPos++ )
-                BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ulRecCount, ulPos );
+            ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = ( ULONG * ) hb_xgrab( sizeof( ULONG ) * (((ulRecCount+1) >> 5) + 1) );
+            memset( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, 0, sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1 ) );
+
             for ( ulPos = 1; ulPos <= hb_arrayLen( pArray ); ulPos++ )
-                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ulRecCount, (ULONG) hb_arrayGetNL( pArray, ulPos ) );
-            pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
+                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ulRecCount, ( ULONG ) hb_arrayGetNL( pArray, ulPos ) );
+            pTag = hb_cdxGetActiveTag( ( CDXAREAP ) pArea );
             if ( pTag ) /* Con índice activo */
+            {
+                pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_RAWCNT );
                 CURKEY_SETLOGCNT( pTag, (hb_arrayLen( pArray )) )
+            }
        }
        else
           hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
@@ -7055,7 +7056,7 @@ static ERRCODE hb_cdxSkipFilter( CDXAREAP pArea, LONG lUpDown )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipFilter(%p, %ld)", pArea, lUpDown));
 
-   if( ! hb_set.HB_SET_DELETED && pArea->dbfi.itmCobExpr == NULL )
+   if( ! hb_set.HB_SET_DELETED && ! pArea->dbfi.fFilter )
       return SUCCESS;
 
    /* Since lToSkip is passed to SkipRaw, it should never request more than

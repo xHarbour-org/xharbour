@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6300 2008/12/03 16:55:40 marchuet Exp $
+ * $Id: ChangeLog,v 1.6301 2008/12/03 20:14:51 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2008-12-03 21:17 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbrddbmc.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+    ! fixed BM_SetArrayFilter, to generate filter from array of recnos.
+
+  * source\rtl\filesys.c
+  * source\rtl\philes.c
+  * source\rtl\valtostr.c
+    ! fixed CurDir, it could fail in some platforms as vmware.
 
 2008-12-03 21:17 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbapifs.h

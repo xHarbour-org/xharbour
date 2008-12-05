@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.179 2008/12/03 13:08:43 marchuet Exp $
+ * $Id: filesys.c,v 1.180 2008/12/03 16:55:40 marchuet Exp $
  */
 
 /*
@@ -3421,7 +3421,6 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( dwResult != 0, 0 );
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
 }
 #elif defined(HB_OS_OS2) && defined(__GNUC__)
 {

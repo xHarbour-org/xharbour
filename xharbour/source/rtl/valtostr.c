@@ -1,5 +1,5 @@
 /*
- * $Id: valtostr.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: valtostr.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -63,14 +63,104 @@ HB_FUNC( HB_VALTOSTR )
    char * buffer = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
 
    if( bFreeReq )
-   {
       hb_retclenAdopt( buffer, ulLen );
-   }
    else
-   {
       hb_retclen( buffer, ulLen );
-   }
 }
 
+HB_FUNC( HB_STRTOEXP )
+{
+   const char * pszString = hb_parc( 1 );
+
+   if( pszString )
+   {
+      ULONG ulLen = hb_parclen( 1 ), ulRet, ul, uQ = 0;
+      int iType = 0;
+      char ch, * pDst, * pszResult;
+
+      for( ul = 0; ul < ulLen; ++ul )
+      {
+         switch( pszString[ ul ] )
+         {
+            case '\\':
+               ++uQ;
+               break;
+            case '"':
+               ++uQ;
+               iType |= 1;
+               break;
+            case '\'':
+               iType |= 2;
+               break;
+            case ']':
+               iType |= 4;
+               break;
+            case '\r':
+            case '\n':
+               iType |= 7;
+               ++uQ;
+               break;
+            case '\0':
+               iType |= 7;
+               uQ += 3;
+               break;
+         }
+      }
+      if( iType == 7 )
+      {
+         ulRet = ulLen + 3 + uQ;
+         pDst = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
+         *pDst++ = 'e';
+         *pDst++ = '"';
+         for( ul = 0; ul < ulLen; ++ul )
+         {
+            ch = pszString[ ul ];
+            switch( ch )
+            {
+               case '\r':
+                  *pDst++ = '\\';
+                  *pDst++ = 'r';
+                  break;
+               case '\n':
+                  *pDst++ = '\\';
+                  *pDst++ = 'n';
+                  break;
+               case '\0':
+                  *pDst++ = '\\';
+                  *pDst++ = '0';
+                  *pDst++ = '0' + ( ch >> 3 );
+                  *pDst++ = '0' + ( ch & 7 );
+                  break;
+               case '\\':
+               case '"':
+                  *pDst++ = '\\';
+               default:
+                  *pDst++ = ch;
+                  break;
+            }
+         }
+         *pDst++ = '"';
+      }
+      else
+      {
+         ulRet = ulLen + 2;
+         pDst = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
+         if( ( iType & 1 ) == 0 )
+            *pDst++ = ch = '"';
+         else if( ( iType & 2 ) == 0 )
+            *pDst++ = ch = '\'';
+         else
+         {
+            *pDst++ = '[';
+            ch = ']';
+         }
+         memcpy( pDst, pszString, ulLen );
+         pDst += ulLen;
+         *pDst++ = ch;
+      }
+      *pDst = '\0';
+      hb_retclenAdopt( pszResult, ulRet );
+   }
+}
 #endif
 

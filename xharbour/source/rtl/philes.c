@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.32 2008/08/06 20:28:37 enricomaria Exp $
+ * $Id: philes.c,v 1.33 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -259,40 +259,12 @@ HB_FUNC( FREADSTR )
 
 HB_FUNC( CURDIR )
 {
-   USHORT uiErrorOld = hb_fsError();
-   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
-   BYTE cCurDrv = hb_fsCurDrv();
-   BYTE cDrv;
-   USHORT uiResult = 0;
+   BYTE byBuffer[ _POSIX_PATH_MAX + 1 ];
 
-   if( pDrv && hb_parclen( 1 ) > 0 )
-   {
-      cDrv = (BYTE) ( toupper( pDrv->item.asString.value[0] ) - 'A');
-      if( cDrv != cCurDrv )
-      {
-         uiResult = hb_fsChDrv( cDrv );
-      }
-   }
-   else
-   {
-      cDrv = cCurDrv;
-   }
+   hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
+      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, byBuffer, _POSIX_PATH_MAX + 1 );
 
-   if ( uiResult == 0 )
-   {
-      hb_fsCurDirBuff( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
-
-      hb_retcAdopt( ( char * ) pbyBuffer );
-
-      hb_fsChDrv( cCurDrv );
-   }
-   else
-   {
-      hb_retc( "" );
-   }
-
-   hb_fsSetError( uiErrorOld );
+   hb_retc( ( char * ) byBuffer );
 }
 
 #ifdef HB_EXTENSION
