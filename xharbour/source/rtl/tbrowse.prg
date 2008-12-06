@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.210 2008/11/04 22:42:57 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.211 2008/11/07 11:16:49 modalsist Exp $
  */
 
 /*
@@ -727,11 +727,17 @@ CLASS TBrowse STATIC
    ASSIGN Stable(l)        INLINE ::lStable := if(hb_islogical(l),l,::lStable)
 
 #ifdef HB_COMPAT_C53
+   ACCESS mRowPos         INLINE if( Set(_SET_EVENTMASK) != INKEY_KEYBOARD,::Hittest(MRow(),MCol()),), ::nMRowPos
+   ASSIGN mRowPos(n)      INLINE ::nMRowPos := if(hb_isnumeric(n),n,::nMRowPos)
+
+   ACCESS mColPos         INLINE if( Set(_SET_EVENTMASK) != INKEY_KEYBOARD,::Hittest(MRow(),MCol()),), ::nMColPos
+   ASSIGN mColPos(n)      INLINE ::nMColPos := if(hb_isnumeric(n),n,::nMColPos)
+
    DATA nRow                               // Row number for the actual cell
    DATA nCol                               // Col number for the actual cell
    DATA aKeys
-   DATA mColPos
-   DATA mRowPos
+   DATA nMColPos
+   DATA nMRowPos
    DATA cMessage
 #endif
 
@@ -1045,8 +1051,8 @@ DEFAULT  nRight  TO MaxCol()
    ::oCache          := TDataCache():New( Self )
 
 #ifdef HB_COMPAT_C53
-   ::mColPos         := 0
-   ::mRowPos         := 0
+   ::nMColPos        := 0
+   ::nMRowPos        := 0
    ::mRect           := { nTop, nLeft, nBottom, nRight }
    ::aVisibleCols    := {}
    ::cMessage        := ''
@@ -3378,26 +3384,26 @@ Local i, nVisCol, nRet
 
    endif
 
-   ::mRowPos := ::nRowPos
-   ::mColPos := ::nColPos
+   ::nMRowPos := ::nRowPos
+   ::nMColPos := ::nColPos
 
    // move internal mouse pointer to correct position
    IF nRet <> HTNOWHERE
 
-      ::mRowPos := mRow - ::mRect[ 1 ] + 1
+      ::nMRowPos := mRow - ::mRect[ 1 ] + 1
 
       nVisCol := len( ::aColumnsSep )
 
       if nVisCol == 0
-         ::mColPos := 1
+         ::nMColPos := 1
 
       elseif mcol >= ::aColumnsSep[ nVisCol ]
-         ::mColPos := nVisCol + ::nLeftVisible - ::nFrozenCols
+         ::nMColPos := nVisCol + ::nLeftVisible - ::nFrozenCols
 
       else
          for i := 1 to nVisCol
             if mcol < ::aColumnsSep[ i ]
-               ::mColPos := i + ::nLeftVisible - ::nFrozenCols - 1
+               ::nMColPos := i + ::nLeftVisible - ::nFrozenCols - 1
                exit
             endif
          next
@@ -3406,15 +3412,15 @@ Local i, nVisCol, nRet
       // if browse has columns that fits exactly horizontally space and
       // I have no border and I'm already on first visible col or on last visible col,
       // then I assume that I want to move horizontally
-      IF ::mRowPos == ::nRowPos .AND. ;
-         ::mColPos == ::nColPos
+      IF ::nMRowPos == ::nRowPos .AND. ;
+         ::nMColPos == ::nColPos
 
-         IF ::mColPos == ::nLeftVisible .AND. ;
+         IF ::nMColPos == ::nLeftVisible .AND. ;
             ::nLeftVisible - ::nFrozenCols > 1 .and. ::nSpacePre = 0
-            ::mColPos--
-         ELSEIF ::mColPos == ::nRightVisible .AND. ;
+            ::nMColPos--
+         ELSEIF ::nMColPos == ::nRightVisible .AND. ;
             ::nRightVisible < ::nColCount .and. ::nSpaceLast = 0
-            ::mColPos++
+            ::nMColPos++
          ENDIF
 
       ENDIF
@@ -3455,7 +3461,7 @@ LOCAL n
 
    if oBrowse:hittest( nMouseRow, nMouseCol ) == HTCELL
 
-      n := oBrowse:mrowpos - oBrowse:nRowPos
+      n := oBrowse:mRowPos - oBrowse:nRowPos
 
       do while n < 0
          n++
@@ -3467,7 +3473,7 @@ LOCAL n
          oBrowse:down():forceStable()
       enddo
 
-      n := oBrowse:mcolpos - oBrowse:colpos
+      n := oBrowse:mColPos - oBrowse:colpos
       if n < oBrowse:leftVisible - oBrowse:colPos .AND. oBrowse:freeze + 1 < oBrowse:leftVisible
          n += ( oBrowse:freeze + 1 - oBrowse:leftVisible )  // hidden cols
       end

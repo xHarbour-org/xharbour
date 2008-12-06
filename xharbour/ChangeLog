@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6301 2008/12/03 20:14:51 marchuet Exp $
+ * $Id: ChangeLog,v 1.6303 2008/12/05 10:52:53 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-12-06 17:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * fixed mouse row/col position detection when mouse event input mask
+      is active.
 
 2008-12-05 11:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbrddbmc.h
