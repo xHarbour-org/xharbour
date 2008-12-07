@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6303 2008/12/05 10:52:53 marchuet Exp $
+ * $Id: ChangeLog,v 1.6304 2008/12/06 20:41:46 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-07 10:22 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/direct.c
+    ! Fixed GPF trap
 
 2008-12-06 17:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
@@ -85,8 +89,8 @@
   * include\classes.h
   * include\hbvmpub.h
     * moved items profiler data structure at the end of structure, because they are only
-      accessed with profiler.    
-      
+      accessed with profiler.
+
   * include\hbapigt.h
   * source\rtl\color53.prg
   * source\rtl\colorind.c
@@ -99,21 +103,21 @@
   * source\rtl\gttone.c
   * source\rtl\gtwin\gtwin.c
     * synced with harbour as possible plus minor optimizations.
-  
+
   * source\rtl\tgetint.prg
   * source\vm\fm.c
     - removed personal debug info.
-    
+
   * source\vm\hvm.c
-    * removed some compilation warnings. 
-  
+    * removed some compilation warnings.
+
   * utils\hbtest\hbtest.prg
   * utils\hbtest\rt_date.prg
   * utils\hbtest\rt_misc.prg
   * utils\hbtest\rt_str.prg
     * added more test for future correction, and added some optimization
-  
-  * source\rtl\tget.prg  
+
+  * source\rtl\tget.prg
     * returned to previous BuildGetColor, and added last correction to be fully compatible.
 
 2008-11-30 21:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -182,7 +186,7 @@
    * include\hbgtcore.h
    * source\rtl\hbgtcore.c
      * Cleanning PellesC errors compilation and warnnings in others compilers.
-     
+
 2008-11-26 18:16 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * common.mak
    * compile.mak

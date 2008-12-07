@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.63 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: direct.c,v 1.64 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -450,9 +450,11 @@ HB_FUNC( DIRECTORYRECURSE )
 #if defined( OS_HAS_DRIVE_LETTER )
          if( bAddDrive )
          {
-            char *szDrvDelim[ 1 ];
+            char *szDrvDelim[2];
+
             szDrvDelim[ 0 ] = (char *) OS_DRIVE_DELIMITER;
             szDrvDelim[ 1 ] = '\0';
+
             szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, OS_PATH_DELIMITER_STRING, fDirSpec->szPath, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
          }
          else
