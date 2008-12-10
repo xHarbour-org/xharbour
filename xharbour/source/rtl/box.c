@@ -1,5 +1,5 @@
 /*
- * $Id: box.c,v 1.2 2004/03/18 03:58:36 ronpinkas Exp $
+ * $Id: box.c,v 1.3 2004/07/10 01:44:21 guerra000 Exp $
  */
 
 /*
@@ -99,5 +99,34 @@ HB_FUNC( DISPBOX )
       {
          hb_gtSetColorStr( szOldColor );
       }
+   }
+}
+
+HB_FUNC( HB_DISPBOX )
+{
+   PHB_ITEM pTop    = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pLeft   = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pBottom = hb_param( 3, HB_IT_NUMERIC );
+   PHB_ITEM pRight  = hb_param( 4, HB_IT_NUMERIC );
+
+   if( pTop && pLeft && pBottom && pRight )
+   {
+      const char * pszBox = hb_parcx( 5 );
+      const char * pszColor = hb_parc( 6 );
+      int iColor;
+
+      if( pszColor )
+         iColor = hb_gtColorToN( pszColor );
+      else if( ISNUM( 6 ) )
+         iColor = hb_parni( 6 );
+      else
+         iColor = -1;
+
+      hb_gtDrawBox( ( SHORT ) hb_itemGetNI( pTop ),
+                    ( SHORT ) hb_itemGetNI( pLeft),
+                    ( SHORT ) hb_itemGetNI( pBottom ),
+                    ( SHORT ) hb_itemGetNI( pRight ),
+                    ( BYTE * ) ( *pszBox ? pszBox : "         " ),
+                    iColor );
    }
 }

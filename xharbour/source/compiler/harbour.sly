@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.157 2008/07/02 18:26:04 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.158 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -4267,6 +4267,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
      /* delete all used expressions */
      hb_compExprDelete( pAssign );
      hb_compStaticDefEnd();
+     hb_compGenStaticName( szName );
   }
   else if( hb_comp_iVarScope == VS_GLOBAL )
   {
@@ -4287,6 +4288,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
      /* delete all used expressions */
      hb_compExprDelete( pAssign );
      hb_compGlobalsDefEnd();
+     hb_compGenGlobalName( szName );
   }
   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
   {

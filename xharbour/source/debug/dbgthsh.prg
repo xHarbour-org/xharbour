@@ -1,5 +1,5 @@
 /*
- * $Id: dbgthsh.prg,v 1.5 2007/10/31 10:44:11 likewolf Exp $
+ * $Id: dbgthsh.prg,v 1.6 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -120,16 +120,16 @@ METHOD addWindows( hHash, nRow ) CLASS HBDbHash
    oBrwSets:Cargo := { 1, {} } // Actual highligthed row
    AAdd( oBrwSets:Cargo[ 2 ], hHash )
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || ::hashName + "[" + HashKeyString( hHash, oBrwSets:cargo[ 1 ] ) + "]" } ) )
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || ::hashName + "[" + HashKeyString( hHash, oBrwSets:cargo[ 1 ] ) + "]" } ) )
 
    // calculate max key length
    nKeyLen := 0
-   HEval( hHash, { | k, v, p | nKeyLen := Max( nKeyLen, Len( ::hashName + "[" + HashKeyString( hHash, p ) + "]" ) ) } )
+   HEval( hHash, {| k, v, p | HB_SYMBOL_UNUSED( k ), HB_SYMBOL_UNUSED( v ), nKeyLen := Max( nKeyLen, Len( ::hashName + "[" + HashKeyString( hHash, p ) + "]" ) ) } )
    oCol:width := nKeyLen
    oCol:DefColor := { 1, 2 }
    nColWidth := oCol:Width
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "" ,{ || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "" ,{ || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
 
    /* 09/08/2004 - <maurilio.longo@libero.it>
                    Setting a fixed width like it is done in the next line of code wich I've
@@ -172,8 +172,9 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbHash
    LOCAL lScoreSave := Set( _SET_SCOREBOARD, .F. )
    LOCAL lExitSave  := Set( _SET_EXIT, .T. )
    LOCAL bInsSave   := SetKey( K_INS )
-   LOCAL cValue     := PadR( __dbgValToStr( HGetValueAt( pItem, nSet ) ),;
-                             oBrowse:nRight - oBrowse:nLeft - oBrowse:GetColumn( 1 ):width )
+   LOCAL oErr, bErrorBlock
+   LOCAL cValue := PadR( __dbgValToStr( HGetValueAt( pItem, nSet ) ),;
+                         oBrowse:nRight - oBrowse:nLeft - oBrowse:GetColumn( 1 ):width )
 
    // make sure browse is stable
    oBrowse:forceStable()
@@ -188,12 +189,18 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbHash
 
    // create a corresponding GET
    @ Row(), oBrowse:nLeft + oBrowse:GetColumn( 1 ):width + 1 GET cValue ;
-      VALID iif( Type( cValue ) == "UE", ( Alert( "Expression error" ), .F. ), .T. )
+      VALID iif( Type( cValue ) == "UE", ( __dbgAlert( "Expression error" ), .F. ), .T. )
 
    READ
 
    IF LastKey() == K_ENTER
-      HSetValueAt( pItem, nSet, &cValue )
+      bErrorBlock := ErrorBlock( {|oErr| break( oErr ) } )
+      BEGIN SEQUENCE
+         HSetValueAt( pItem, nSet, &cValue )
+      RECOVER USING oErr
+         __dbgAlert( oErr:description )
+      END SEQUENCE
+      ErrorBlock( bErrorBlock )
    ENDIF
 
    SetCursor( SC_NONE )
@@ -240,10 +247,10 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, hHash ) CLASS HBDbHash
 
       uValue := HGetValueAt( hHash, nSet )
 
-      IF ValType( uValue ) == "H"
+      IF hb_isHash( uValue )
 
          IF Len( uValue ) == 0
-            Alert( "Hash is empty" )
+            __dbgAlert( "Hash is empty" )
          ELSE
             SetPos( ownd:nBottom, ownd:nLeft )
             ::aWindows[ ::nCurwindow ]:lFocused := .F.
@@ -260,8 +267,8 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, hHash ) CLASS HBDbHash
                ::nCurwindow--
             ENDIF
          ENDIF
-      ELSEIF ISBLOCK( uValue ) .OR. ValType( uValue ) == "P"
-         Alert( "Value cannot be edited" )
+      ELSEIF ISBLOCK( uValue ) .OR. hb_isPointer( uValue )
+         __dbgAlert( "Value cannot be edited" )
       ELSE
          IF ::lEditable
             oBrwSets:RefreshCurrent()
@@ -275,7 +282,7 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, hHash ) CLASS HBDbHash
             oBrwSets:RefreshCurrent()
             oBrwSets:ForceStable()
          ELSE
-            Alert( "Value cannot be edited" )
+            __dbgAlert( "Value cannot be edited" )
          ENDIF
       ENDIF
 
@@ -283,8 +290,8 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, hHash ) CLASS HBDbHash
 
    RefreshVarsS( oBrwSets )
 
-   ::aWindows[ ::nCurwindow ]:SetCaption( cName + "[" + LTrim( Str( oBrwSets:cargo[ 1 ] ) ) + ".." + ;
-                                          LTrim( Str( Len( hHash ) ) ) + "]" )
+   ::aWindows[ ::nCurwindow ]:SetCaption( cName + "[" + hb_NToS( oBrwSets:cargo[ 1 ] ) + ".." + ;
+                                          hb_NToS( Len( hHash ) ) + "]" )
 
    RETURN self
 
@@ -326,7 +333,7 @@ STATIC FUNCTION HashKeyString( hHash, nAt )
    DO CASE
    CASE cType == "C" ; RETURN '"' + xVal + '"'
    CASE cType == "D" ; RETURN '"' + DToC( xVal ) + '"'
-   CASE cType == "N" ; RETURN LTrim( Str( xVal ) )
+   CASE cType == "N" ; RETURN hb_NToS( xVal )
    ENDCASE
   
    RETURN AllTrim( CStr( xVal ) )

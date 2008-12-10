@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmitm.prg,v 1.2 2004/01/29 14:25:59 likewolf Exp $
+ * $Id: dbgtmitm.prg,v 1.3 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -91,12 +91,12 @@ METHOD Display( cClrText, cClrHotKey ) CLASS HBDbMenuItem
 
    LOCAL nAt
 
-   DispOutAt( ::nRow, ::nCol, StrTran( ::cPrompt, "~", "" ), cClrText )
+   hb_dispOutAt( ::nRow, ::nCol, StrTran( ::cPrompt, "~", "" ), cClrText )
 
-   DispOutAt( ::nRow, ::nCol + ;
+   hb_dispOutAt( ::nRow, ::nCol + ;
      ( nAt := At( "~", ::cPrompt ) ) - 1,;
      SubStr( ::cPrompt, nAt + 1, 1 ), cClrHotKey )
 
-   DispOutAt( ::nRow, ::nCol, iif( ::lChecked, Chr( 251 ), "" ), cClrText )
+   hb_dispOutAt( ::nRow, ::nCol, iif( ::lChecked, Chr( 251 ), "" ), cClrText )
 
    RETURN Self

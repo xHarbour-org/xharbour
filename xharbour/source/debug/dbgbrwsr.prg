@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.7 2007/12/17 16:48:42 likewolf Exp $
+ * $Id: dbgbrwsr.prg,v 1.8 2007/12/22 19:07:44 likewolf Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
 
 #include "hbclass.ch"
 
+#include "common.ch"
+
 /* HBDbBrowser
  *
  * A minimalistic TBrowse implementation just enough for use in
@@ -63,12 +65,12 @@ CREATE CLASS HBDbBrowser
 
    VAR Window
    VAR cargo
-   
+
    VAR nTop
    VAR nLeft
    VAR nBottom
    VAR nRight
-   VAR colorSpec
+   VAR cColorSpec
    VAR autoLite INIT .T.
 
    VAR goTopBlock
@@ -91,24 +93,26 @@ CREATE CLASS HBDbBrowser
 
    METHOD New( nTop, nLeft, nBottom, nRight, oParentWindow )
    METHOD AddColumn( oCol )    INLINE AAdd( ::aColumns, oCol ), ::colCount++, Self
+   METHOD Resize( nTop, nLeft, nBottom, nRight )
+   ACCESS ColorSpec            INLINE ::cColorSpec
+   ASSIGN ColorSpec( cColors ) METHOD SetColorSpec( cColors )
    METHOD Configure()
    METHOD DeHiLite()           INLINE Self
-   METHOD Down()               INLINE ::MoveCursor( 1 )
-   METHOD ForceStable()
-   METHOD GetColumn( nColumn ) INLINE ::aColumns[ nColumn ]
+   METHOD HiLite()             INLINE Self
+   METHOD MoveCursor( nSkip )
    METHOD GoTo( nRow )
    METHOD GoTop()              INLINE ::GoTo( 1 ), ::rowPos := 1, ::nFirstVisible := 1, ::RefreshAll()
    METHOD GoBottom()
-   METHOD HiLite()             INLINE Self
-   METHOD Invalidate()         INLINE ::RefreshAll()
-   METHOD MoveCursor( nSkip )
+   METHOD Down()               INLINE ::MoveCursor( 1 )
+   METHOD Up()                 INLINE ::MoveCursor( -1 )
    METHOD PageDown()           INLINE ::MoveCursor( ::rowCount )
    METHOD PageUp()             INLINE ::MoveCursor( -::rowCount )
+   METHOD GetColumn( nColumn ) INLINE ::aColumns[ nColumn ]
    METHOD RefreshAll()         INLINE AFill( ::aRowState, .F. ), Self
-   METHOD RefreshCurrent()     INLINE IIf( ::rowCount > 0, ::aRowState[ ::rowPos ] := .F., ), Self
-   METHOD Resize( nTop, nLeft, nBottom, nRight )
+   METHOD RefreshCurrent()     INLINE iif( ::rowCount > 0 .AND. ::rowPos <= Len( ::aRowState ), ::aRowState[ ::rowPos ] := .F., ), Self
+   METHOD Invalidate()         INLINE ::RefreshAll()
    METHOD Stabilize()          INLINE ::ForceStable()
-   METHOD Up()                 INLINE ::MoveCursor( -1 )
+   METHOD ForceStable()
 
 ENDCLASS
 
@@ -119,22 +123,28 @@ METHOD New( nTop, nLeft, nBottom, nRight, oParentWindow ) CLASS HBDbBrowser
    ::nLeft := nLeft
    ::nBottom := nBottom
    ::nRight := nRight
-   
+
    RETURN Self
 
 METHOD Configure()
    ::rowCount := ::nBottom - ::nTop + 1
    ASize( ::aRowState, ::rowCount )
-   ::aColorSpec := hb_aTokens( ::colorSpec, "," )
    ::lConfigured := .T.
    RETURN Self
+
+METHOD SetColorSpec( cColors )
+   IF ISCHARACTER( cColors )
+      ::cColorSpec := cColors
+      ::aColorSpec := hb_aTokens( ::cColorSpec, "," )
+   ENDIF
+   RETURN ::cColorSpec
 
 METHOD MoveCursor( nSkip )
    LOCAL nSkipped
 
    nSkipped := ::GoTo( ::rowPos + ::nFirstVisible - 1 + nSkip )
    IF !::hitBottom .OR. Abs( nSkipped ) > 0
-      IF IIf( nSkipped > 0, ::rowPos + nSkipped <= ::rowCount, ::rowPos + nSkipped >= 1 )
+      IF iif( nSkipped > 0, ::rowPos + nSkipped <= ::rowCount, ::rowPos + nSkipped >= 1 )
          ::RefreshCurrent()
          ::rowPos += nSkipped
          ::RefreshCurrent()
@@ -146,39 +156,43 @@ METHOD MoveCursor( nSkip )
    RETURN Self
 
 METHOD ForceStable()
-   LOCAL nRow, nCol, xData, oCol, nColX, nWid, xOldColor := SetColor()
+   LOCAL nRow, nCol, xData, oCol, nColX, nWid, aClr, nClr
 
    IF !::lConfigured
-       ::Configure()
+      ::Configure()
    ENDIF
    FOR nRow := 1 TO ::rowCount
       IF Empty( ::aRowState[ nRow ] )
          ::GoTo( ::nFirstVisible + nRow - 1 )
          IF ::hitBottom
-            SetColor( ::aColorSpec[ 1 ] )
-            @ ::nTop + nRow - 1, ::nLeft SAY Space( ::nRight - ::nLeft + 1 )
+            hb_dispOutAt( ::nTop + nRow - 1, ::nLeft, Space( ::nRight - ::nLeft + 1 ), ::aColorSpec[ 1 ] )
          ELSE
             nColX := ::nLeft
             FOR nCol := 1 TO Len( ::aColumns )
                IF nColX <= ::nRight
                   oCol := ::aColumns[ nCol ]
-                  SetColor( ::aColorSpec[ oCol:defColor[ IIf( nRow == ::rowPos, 2, 1 ) ] ] )
                   xData := Eval( oCol:block )
+                  nClr := iif( nRow == ::rowPos, 2, 1 )
+                  aClr := Eval( oCol:colorBlock, xData )
+                  IF ISARRAY( aClr )
+                     nClr := aClr[ nClr ]
+                  ELSE
+                     nClr := oCol:defColor[ nClr ]
+                  ENDIF
                   IF oCol:width == NIL
                      nWid := Len( xData )
                   ELSE
                      nWid := oCol:width
                   ENDIF
-                  @ ::nTop + nRow - 1, nColX SAY PadR( xData, nWid ) + IIf( nCol < Len( ::aColumns ), " ", "" )
+                  hb_dispOutAt( ::nTop + nRow - 1, nColX, PadR( xData, nWid ) + iif( nCol < Len( ::aColumns ), " ", "" ), ::aColorSpec[ nClr ] )
                   nColX += nWid + 1
                ENDIF
-	    NEXT
+            NEXT
          ENDIF
          ::aRowState[ nRow ] := .T.
       ENDIF
    NEXT
    ::GoTo( ::nFirstVisible + ::rowPos - 1 )
-   SetColor( xOldColor )
    SetPos( ::nTop + ::rowPos - 1, ::nLeft )
    RETURN Self
 
@@ -224,5 +238,28 @@ METHOD Resize( nTop, nLeft, nBottom, nRight )
    IF lResize
       ::Configure():ForceStable()
    ENDIF
-      
+
    RETURN self
+
+CREATE CLASS HBDbColumn
+
+   EXPORTED:
+
+   VAR block      AS CODEBLOCK                  /* Code block to retrieve data for the column */
+   VAR colorBlock AS CODEBLOCK INIT {|| NIL }   /* column color block */
+   VAR defColor   AS ARRAY     INIT { 1, 2 }    /* Array of numeric indexes into the color table */
+   VAR width      AS USUAL                      /* Column display width */
+
+   METHOD New( cHeading, bBlock )               /* NOTE: This method is a Harbour extension [vszakats] */
+
+ENDCLASS
+
+METHOD New( cHeading, bBlock ) CLASS HBDbColumn
+
+   HB_SYMBOL_UNUSED( cHeading )
+   ::block := bBlock
+
+   RETURN Self
+
+FUNCTION HBDbColumnNew( cHeading, bBlock )
+   RETURN HBDbColumn():New( cHeading, bBlock )

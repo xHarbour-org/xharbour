@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.42 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gtsln.c,v 1.43 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -61,14 +61,14 @@ static HB_GT_FUNCS   SuperTable;
 #define HB_GTSUPER   (&SuperTable)
 #define HB_GTID_PTR  (&s_GtId)
 
-static FHANDLE s_hStdIn, s_hStdOut, s_hStdErr;
+static HB_FHANDLE s_hStdIn, s_hStdOut, s_hStdErr;
 static BOOL s_fStdInTTY = FALSE, s_fStdOutTTY = FALSE, s_fStdErrTTY = FALSE;
 
 /* does terminal works in Unicode (UTF-8) mode? */
 BOOL hb_sln_Is_Unicode = FALSE;
 
 /* Slang color names */
-static char * s_colorNames[] =
+static const char * s_colorNames[] =
 {
     "black"         ,
     "blue"          ,
@@ -118,7 +118,7 @@ static BOOL s_bSuspended = FALSE;
 /* A definition is a list of pairs of chars. The first char in each pair is  */
 /* an ASCII key, which should be pressed *after* a "DeadKey" was pressed to  */
 /* get the nation char, a second in that pair is a corresponding nation char */
-static char * hb_NationCharsEnvName = "HRBNATIONCHARS";
+static const char * hb_NationCharsEnvName = "HRBNATIONCHARS";
 
 /* *********************************************************************** */
 
@@ -162,7 +162,8 @@ static void hb_sln_colorTrans( void )
        * the same.
        */
       clr = ( bg << 4 ) | ( fg ^ 0x07 );
-      SLtt_set_color( clr, ( char * ) NULL, s_colorNames[ fg ], s_colorNames[ bg ] );
+      SLtt_set_color( clr, ( char * ) NULL, ( char * ) s_colorNames[ fg ],
+                                            ( char * ) s_colorNames[ bg ] );
 #ifdef HB_SLN_UTF8
       s_colorTab[ i ] = clr;
 #else
@@ -536,7 +537,7 @@ static int hb_sln_isUTF8( int iStdOut, int iStdIn )
 {
    if( isatty( iStdOut ) && isatty( iStdIn ) )
    {
-      char * szBuf = "\r\303\255\033[6n";
+      const char * szBuf = "\r\303\255\033[6n";
       struct timeval tv;
       fd_set rdfds;
 
@@ -566,11 +567,11 @@ static int hb_sln_isUTF8( int iStdOut, int iStdIn )
 /* *********************************************************************** */
 
 /* I think this function should not be void. It should be BOOL */
-static void hb_gt_sln_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_sln_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    BOOL gt_Inited = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_sln_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_sln_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr));
 
    /* stdin && stdout && stderr */
    s_hStdIn  = hFilenoStdin;
@@ -689,7 +690,7 @@ static void hb_gt_sln_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    {
       /* something went wrong - restore default settings */
       SLang_reset_tty();
-      hb_errInternal( 9997, "Internal error: screen driver initialization failure", "", "" );
+      hb_errInternal( 9997, "Internal error: screen driver initialization failure", NULL, NULL );
    }
 
    s_fActive = TRUE;
@@ -713,8 +714,8 @@ static void hb_gt_sln_Exit( PHB_GT pGT )
    /* restore a standard bell frequency and duration */
    if( hb_sln_UnderLinuxConsole )
    {
-      SLtt_write_string( "\033[10]" );
-      SLtt_write_string( "\033[11]" );
+      SLtt_write_string( ( char * ) "\033[10]" );
+      SLtt_write_string( ( char * ) "\033[11]" );
       SLtt_flush_output();
    }
 
@@ -817,7 +818,7 @@ static void hb_gt_sln_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 
 /* *********************************************************************** */
 
-static char * hb_gt_sln_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_sln_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_sln_Version(%p)", pGT ) );
 
@@ -926,7 +927,7 @@ static BOOL hb_gt_sln_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 
 /* *********************************************************************** */
 
-static BOOL hb_gt_sln_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP, BOOL fBox )
+static BOOL hb_gt_sln_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTerm = NULL, cdpHost = NULL;
@@ -950,7 +951,7 @@ static BOOL hb_gt_sln_SetDispCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCD
 
 /* *********************************************************************** */
 
-static BOOL hb_gt_sln_SetKeyCP( PHB_GT pGT, char * pszTermCDP, char * pszHostCDP )
+static BOOL hb_gt_sln_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP )
 {
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTerm = NULL, cdpHost = NULL;
@@ -1068,7 +1069,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif

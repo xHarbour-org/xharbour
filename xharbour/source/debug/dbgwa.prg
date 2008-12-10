@@ -1,12 +1,12 @@
 /*
- * $Id: dbgwa.prg,v 1.12 2007/12/04 22:52:49 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.13 2008/03/13 10:49:40 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
  * The Debugger Work Area Inspector
  *
- * Copyright 2001-2002 Ignacio Ortiz de Zuñiga <ignacio@fivetech.com>
+ * Copyright 2001-2002 Ignacio Ortiz de Zuniga <ignacio@fivetech.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,43 +50,44 @@
  *
  */
 
+#include "box.ch"
 #include "common.ch"
 #include "setcurs.ch"
 #include "inkey.ch"
 
-function __dbgShowWorkAreas()
+PROCEDURE __dbgShowWorkAreas()
 
-   local oDlg
-   local oCol
+   LOCAL oDlg
+   LOCAL oCol
 
-   local aAlias := {}
-   local aBrw[ 3 ]
-   local aStruc
-   local aInfo
+   LOCAL aAlias := {}
+   LOCAL aBrw[ 3 ]
+   LOCAL aStruc
+   LOCAL aInfo
 
-   local cColor := iif( __Dbg():lMonoDisplay, "N/W, W/N, W+/W, W+/N", "N/W, N/BG, R/W, R/BG" )
+   LOCAL cColor := iif( __Dbg():lMonoDisplay, "N/W, W/N, W+/W, W+/N", "N/W, N/BG, R/W, R/BG" )
 
-   local n1
-   local n2
-   local n3 := 1
-   local cur_id := 1
+   LOCAL n1
+   LOCAL n2
+   LOCAL n3 := 1
+   LOCAL cur_id := 1
 
-   local nOldArea := Select()
+   LOCAL nOldArea := Select()
 
    /* We can't determine the last used area, so use 512 here */
-   for n1 := 1 to 512
-      if ( n1 )->( Used() )
+   FOR n1 := 1 TO 512
+      IF ( n1 )->( Used() )
          AAdd( aAlias, { n1, Alias( n1 ) } )
-         if n1 == nOldArea
+         IF n1 == nOldArea
             cur_id := Len( aAlias )
-         endif
-      endif
-   next
+         ENDIF
+      ENDIF
+   NEXT
 
-   if Len( aAlias ) == 0
-      Alert( "No workareas in use")
-      return nil
-   endif
+   IF Len( aAlias ) == 0
+      __dbgAlert( "No workareas in use")
+      RETURN
+   ENDIF
 
    IF !Used()
       dbSelectArea( aAlias[ 1 ][ 1 ] )
@@ -112,7 +113,7 @@ function __dbgShowWorkAreas()
                                           Max( 1, n1 + nSkip ) ),;
                                   n1 - nPos }
 
-   aBrw[ 1 ]:AddColumn( oCol := TBColumnNew( "", { || PadR( aAlias[ n1 ][ 2 ], 11 ) } ) )
+   aBrw[ 1 ]:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aAlias[ n1 ][ 2 ], 11 ) } ) )
 
    oCol:ColorBlock := { || iif( aAlias[ n1 ][ 1 ] == Select(), { 3, 4 }, { 1, 2 } ) }
 
@@ -131,9 +132,9 @@ function __dbgShowWorkAreas()
                                                                          Max( 1, n2 + nSkip ) ), ;
                                 n2 - nPos }
 
-   aBrw[ 2 ]:AddColumn( oCol := TBColumnNew( "", { || PadR( aInfo[ n2 ], 38 ) } ) )
+   aBrw[ 2 ]:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aInfo[ n2 ], 38 ) } ) )
 
-   oCol:ColorBlock := { || iif( aAlias[ n1 ][ 1 ] == Select() .and. n2 == 1, { 3, 4 }, { 1, 2 } ) }
+   oCol:ColorBlock := { || iif( aAlias[ n1 ][ 1 ] == Select() .AND. n2 == 1, { 3, 4 }, { 1, 2 } ) }
 
    /* Struc browse */
 
@@ -149,10 +150,10 @@ function __dbgShowWorkAreas()
                                   aBrw[ 3 ]:Cargo := n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
                                           Max( 1, n3 + nSkip ) ), n3 - nPos }
 
-   aBrw[ 3 ]:AddColumn( TBColumnNew( "", { || PadR( aStruc[ n3, 1 ], 11 ) + ;
-                                              aStruc[ n3, 2 ] + ;
-                                              Str( aStruc[ n3, 3 ], 4 ) + ;
-                                              Str( aStruc[ n3, 4 ], 3 ) } ) )
+   aBrw[ 3 ]:AddColumn( HBDbColumnNew( "", { || PadR( aStruc[ n3, 1 ], 11 ) + ;
+                                                aStruc[ n3, 2 ] + ;
+                                                Str( aStruc[ n3, 3 ], 4 ) + ;
+                                                Str( aStruc[ n3, 4 ], 3 ) } ) )
 
    /* Show dialog */
 
@@ -160,46 +161,37 @@ function __dbgShowWorkAreas()
    
    dbSelectArea( nOldArea )
 
-return nil
+   RETURN
 
-static function DlgWorkAreaPaint( oDlg, aBrw )
+STATIC PROCEDURE DlgWorkAreaPaint( oDlg, aBrw )
 
    /* Display captions */
 
-   DispOutAt( oDlg:nTop, oDlg:nLeft + 5, " Area ", oDlg:cColor )
-   DispOutAt( oDlg:nTop, oDlg:nLeft + 28, " Status ", oDlg:cColor )
-   DispOutAt( oDlg:nTop, oDlg:nLeft + 56, " Structure ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop, oDlg:nLeft + 5, " Area ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop, oDlg:nLeft + 28, " Status ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop, oDlg:nLeft + 56, " Structure ", oDlg:cColor )
 
    /* Display separator lines */
 
-   @ oDlg:nTop + 1, oDlg:nLeft + 12 TO ;
-     oDlg:nBottom - 1, oDlg:nLeft + 12 ;
-     COLOR oDlg:cColor
+   hb_dispBox( oDlg:nTop + 1, oDlg:nLeft + 12, oDlg:nBottom - 1, oDlg:nLeft + 12, B_SINGLE, oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop, oDlg:nLeft + 12, Chr( 194 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nBottom, oDlg:nLeft + 12, Chr( 193 ), oDlg:cColor )
 
-   DispOutAt( oDlg:nTop, oDlg:nLeft + 12, Chr( 194 ), oDlg:cColor )
-   DispOutAt( oDlg:nBottom, oDlg:nLeft + 12, Chr( 193 ), oDlg:cColor )
+   hb_dispBox( oDlg:nTop + 1, oDlg:nLeft + 51, oDlg:nBottom - 1, oDlg:nLeft + 51, B_SINGLE, oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop, oDlg:nLeft + 51, Chr( 194 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nBottom, oDlg:nLeft + 51, Chr( 193 ), oDlg:cColor )
 
-   @ oDlg:nTop + 1, oDlg:nLeft + 51 TO ;
-     oDlg:nBottom - 1, oDlg:nLeft + 51 ;
-     COLOR oDlg:cColor
-
-   DispOutAt( oDlg:nTop, oDlg:nLeft + 51, Chr( 194 ), oDlg:cColor )
-   DispOutAt( oDlg:nBottom, oDlg:nLeft + 51, Chr( 193 ), oDlg:cColor )
-
-   @ oDlg:nTop + 6, oDlg:nLeft + 13 TO ;
-     oDlg:nTop + 6, oDlg:nLeft + 50 ;
-     COLOR oDlg:cColor
-
-   DispOutAt( oDlg:nTop + 6, oDlg:nLeft + 12, Chr( 195 ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 6, oDlg:nLeft + 51, Chr( 180 ), oDlg:cColor )
+   hb_dispBox( oDlg:nTop + 6, oDlg:nLeft + 13, oDlg:nTop + 6, oDlg:nLeft + 50, B_SINGLE, oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 6, oDlg:nLeft + 12, Chr( 195 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 6, oDlg:nLeft + 51, Chr( 180 ), oDlg:cColor )
 
    /* Display labels */
 
-   DispOutAt( oDlg:nTop + 1, oDlg:nLeft + 13, "Alias:                Record:         ", oDlg:cColor )
-   DispOutAt( oDlg:nTop + 2, oDlg:nLeft + 13, "   BOF:         Deleted:              ", oDlg:cColor )
-   DispOutAt( oDlg:nTop + 3, oDlg:nLeft + 13, "   EOF:           Found:              ", oDlg:cColor )
-   DispOutAt( oDlg:nTop + 4, oDlg:nLeft + 13, "Filter:                               ", oDlg:cColor )
-   DispOutAt( oDlg:nTop + 5, oDlg:nLeft + 13, "   Key:                               ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 1, oDlg:nLeft + 13, "Alias:                Record:         ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 2, oDlg:nLeft + 13, "   BOF:         Deleted:              ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 3, oDlg:nLeft + 13, "   EOF:           Found:              ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 4, oDlg:nLeft + 13, "Filter:                               ", oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 5, oDlg:nLeft + 13, "   Key:                               ", oDlg:cColor )
 
    /* Stabilize browse */
 
@@ -211,32 +203,31 @@ static function DlgWorkAreaPaint( oDlg, aBrw )
 
    UpdateInfo( oDlg, Alias() )
 
-return nil
+   RETURN
 
-static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
+STATIC PROCEDURE DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
 
-   static s_nFocus := 1
+   LOCAL oDebug := __Dbg()
+   LOCAL nAlias
 
-   local nAlias
+   IF nKey == K_TAB .OR. nKey == K_SH_TAB
+      aBrw[ oDebug:nWaFocus ]:Dehilite()
+      oDebug:nWaFocus += iif( nKey == K_TAB, 1, -1 )
+      IF oDebug:nWaFocus < 1
+         oDebug:nWaFocus := 3
+      ENDIF
+      IF oDebug:nWaFocus > 3
+         oDebug:nWaFocus := 1
+      ENDIF
+      aBrw[ oDebug:nWaFocus ]:Hilite()
+      RETURN
+   ENDIF
 
-   if nKey == K_TAB .or. nKey == K_SH_TAB
-      aBrw[ s_nFocus ]:Dehilite()
-      s_nFocus := s_nFocus + iif( nKey == K_TAB, 1, -1 )
-      if s_nFocus < 1
-         s_nFocus := 3
-      endif
-      if s_nFocus > 3
-         s_nFocus := 1
-      endif
-      aBrw[ s_nFocus ]:Hilite()
-      return nil
-   endif
-
-   do case
-   case s_nFocus == 1
+   DO CASE
+   CASE oDebug:nWaFocus == 1
       nAlias := aBrw[ 1 ]:Cargo
       WorkAreasKeyPressed( nKey, aBrw[ 1 ], Len( aAlias ) )
-      if nAlias != aBrw[ 1 ]:Cargo
+      IF nAlias != aBrw[ 1 ]:Cargo
          aBrw[ 2 ]:GoTop()
          aBrw[ 2 ]:Invalidate()
          aBrw[ 2 ]:ForceStable()
@@ -256,121 +247,121 @@ static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
          aBrw[ 3 ]:ForceStable()
          aBrw[ 3 ]:Dehilite()
          UpdateInfo( oDlg, aAlias[ aBrw[ 1 ]:Cargo ][ 2 ] )
-      endif
-   case s_nFocus == 2
+      ENDIF
+   CASE oDebug:nWaFocus == 2
       WorkAreasKeyPressed( nKey, aBrw[ 2 ], Len( aInfo ) )
-   case s_nFocus == 3
+   CASE oDebug:nWaFocus == 3
       WorkAreasKeyPressed( nKey, aBrw[ 3 ], Len( aStruc ) )
-   endcase
+   ENDCASE
 
-return nil
+   RETURN
 
-static procedure WorkAreasKeyPressed( nKey, oBrw, nTotal )
+STATIC PROCEDURE WorkAreasKeyPressed( nKey, oBrw, nTotal )
 
-   do case
-   case nKey == K_UP
+   DO CASE
+   CASE nKey == K_UP
 
-      if oBrw:Cargo > 1
+      IF oBrw:Cargo > 1
          oBrw:Cargo--
          oBrw:RefreshCurrent()
          oBrw:Up()
          oBrw:ForceStable()
-      endif
+      ENDIF
 
-   case nKey == K_DOWN
+   CASE nKey == K_DOWN
 
-      if oBrw:Cargo < nTotal
+      IF oBrw:Cargo < nTotal
          oBrw:Cargo++
          oBrw:RefreshCurrent()
          oBrw:Down()
          oBrw:ForceStable()
-      endif
+      ENDIF
 
-   case nKey == K_HOME .OR. nKey == K_CTRL_PGUP .OR. nKey == K_CTRL_HOME
+   CASE nKey == K_HOME .OR. nKey == K_CTRL_PGUP .OR. nKey == K_CTRL_HOME
 
-      if oBrw:Cargo > 1
+      IF oBrw:Cargo > 1
          oBrw:Cargo := 1
          oBrw:GoTop()
          oBrw:ForceStable()
-      endif
+      ENDIF
 
-   case nKey == K_END .OR. nKey == K_CTRL_PGDN .OR. nKey == K_CTRL_END
+   CASE nKey == K_END .OR. nKey == K_CTRL_PGDN .OR. nKey == K_CTRL_END
 
-      if oBrw:Cargo < nTotal
+      IF oBrw:Cargo < nTotal
          oBrw:Cargo := nTotal
          oBrw:GoBottom()
          oBrw:ForceStable()
-      endif
+      ENDIF
 
-   endcase
+   ENDCASE
 
-return
+   RETURN
 
-static function DbfInfo( aInfo )
+STATIC FUNCTION DbfInfo( aInfo )
 
-   local nFor
-   local xType
-   local xValue
-   local cValue
+   LOCAL nFor
+   LOCAL xType
+   LOCAL xValue
+   LOCAL cValue
 
    aInfo := {}
 
-   AAdd( aInfo, "[" + LTrim( Str( Select( Alias() ) ) ) + "] " + Alias() )
+   AAdd( aInfo, "[" + hb_NToS( Select( Alias() ) ) + "] " + Alias() )
    AAdd( aInfo, Space( 4 ) + "Current Driver" )
    AAdd( aInfo, Space( 8 ) + rddName() )
    AAdd( aInfo, Space( 4 ) + "Workarea Information" )
-   AAdd( aInfo, Space( 8 ) + "Select Area: " + LTrim( Str( Select() ) ) )
-   AAdd( aInfo, Space( 8 ) + "Record Size: " + LTrim( Str( Recsize() ) ) )
-   AAdd( aInfo, Space( 8 ) + "Header Size: " + LTrim( Str( Header() ) ) )
-   AAdd( aInfo, Space( 8 ) + "Field Count: " + LTrim( Str( FCount() ) ) )
+   AAdd( aInfo, Space( 8 ) + "Select Area: " + hb_NToS( Select() ) )
+   AAdd( aInfo, Space( 8 ) + "Record Size: " + hb_NToS( Recsize() ) )
+   AAdd( aInfo, Space( 8 ) + "Header Size: " + hb_NToS( Header() ) )
+   AAdd( aInfo, Space( 8 ) + "Field Count: " + hb_NToS( FCount() ) )
    AAdd( aInfo, Space( 8 ) + "Last Update: " + DToC( lUpdate() ) )
-   AAdd( aInfo, Space( 8 ) + "Index order: " + LTrim( Str( IndexOrd() ) ) )
+   AAdd( aInfo, Space( 8 ) + "Index order: " + hb_NToS( IndexOrd() ) )
    AAdd( aInfo, Space( 4 ) + "Current Record" )
 
-   for nFor := 1 to FCount()
+   FOR nFor := 1 TO FCount()
 
       xValue := FieldGet( nFor )
       xType  := ValType( xValue )
 
-      do case
-      case xType $ "CM" ; cValue := xValue
-      case xType == "N" ; cValue := LTrim( Str( xValue ) )
-      case xType == "D" ; cValue := DToC( xValue )
-      case xType == "L" ; cValue := iif( xValue, ".T.", ".F." )
-      case xType == "A" ; cValue := "Array"
-      otherwise         ; cValue := "Error"
-      endcase
+      DO CASE
+      CASE xType $ "CM" ; cValue := xValue
+      CASE xType == "N" ; cValue := hb_NToS( xValue )
+      CASE xType == "D" ; cValue := DToC( xValue )
+      CASE xType == "L" ; cValue := iif( xValue, ".T.", ".F." )
+      CASE xType == "A" ; cValue := "Array"
+      OTHERWISE         ; cValue := "Error"
+      ENDCASE
 
       AAdd( aInfo, Space( 8 ) + PadR( FieldName( nFor ), 10) + " = " + PadR( cValue, 17 ) )
 
-   next
+   NEXT
 
-return aInfo
+   RETURN aInfo
 
-static function UpdateInfo( oDlg, cAlias )
+STATIC PROCEDURE UpdateInfo( oDlg, cAlias )
 
-   local nOldArea
+   LOCAL nOldArea
 
-   if Empty( cAlias )
-      return NIL
-   endif
-   
+   IF Empty( cAlias )
+      RETURN
+   ENDIF
+
    nOldArea := Select()
-   
+
    dbSelectArea( cAlias )
 
-   DispOutAt( oDlg:nTop + 1, oDlg:nLeft + 20, PadR( cAlias, 11 ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 1, oDlg:nLeft + 42,;
-              PadR( LTrim( Str( RecNo() ) ) + "/" + LTrim( Str( LastRec() ) ), 9 ),;
-              oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 1, oDlg:nLeft + 20, PadR( cAlias, 11 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 1, oDlg:nLeft + 42,;
+                 PadR( hb_NToS( RecNo() ) + "/" + hb_NToS( LastRec() ), 9 ),;
+                 oDlg:cColor )
 
-   DispOutAt( oDlg:nTop + 2, oDlg:nLeft + 21, iif( Bof(), "Yes", "No " ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 2, oDlg:nLeft + 38, iif( Deleted(), "Yes", "No " ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 3, oDlg:nLeft + 21, iif( Eof(), "Yes", "No " ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 3, oDlg:nLeft + 38, iif( Found(), "Yes", "No " ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 4, oDlg:nLeft + 21, PadR( dbFilter(), 29 ), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 5, oDlg:nLeft + 21, PadR( ordKey(), 29 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 2, oDlg:nLeft + 21, iif( Bof(), "Yes", "No " ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 2, oDlg:nLeft + 38, iif( Deleted(), "Yes", "No " ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 3, oDlg:nLeft + 21, iif( Eof(), "Yes", "No " ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 3, oDlg:nLeft + 38, iif( Found(), "Yes", "No " ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 4, oDlg:nLeft + 21, PadR( dbFilter(), 29 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop + 5, oDlg:nLeft + 21, PadR( ordKey(), 29 ), oDlg:cColor )
 
    dbSelectArea( nOldArea )
 
-return nil
+   RETURN

@@ -1,5 +1,5 @@
 /*
- * $Id: mlcfunc.c,v 1.1 2008/08/29 12:58:46 modalsist Exp $
+ * $Id: mlcfunc.c,v 1.2 2008/09/07 05:24:45 peterrees Exp $
  */
 
 /*
@@ -260,12 +260,7 @@ HB_FUNC( MEMOLINE )
    ULONG  ulEnd, ulOffset = ISNUM(7) ? hb_parnl( 7 ) - 1 : 0;
    ULONG  ulCols   = 0;
 
-   if ( ulOffset < 0 )
-   {
-      ulOffset = 0 ;
-   }
-
-   if ( !pszString )
+   if( !pszString )
    {
       hb_retc( NULL );
       return;

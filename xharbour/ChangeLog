@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6304 2008/12/06 20:41:46 modalsist Exp $
+ * $Id: ChangeLog,v 1.6305 2008/12/07 14:55:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,104 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-10 03:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * common.mak
+  * include/hbextern.ch
+  * source/rtl/Makefile
+  + source/rtl/hbntos.c
+    + Added function HB_NToS( <number> ) -> <string>.
+      This is equivalent to LTrim( Str( <number> ) ), just faster.
+  * include/hbapi.h
+  * source/vm/extend.c
+    + Added hb_retc_null() which is equivalent to hb_retc( NULL ) and will
+      return an empty string. I opted for this because hb_retc( NULL ) usage is
+      not compatible with CA-Cl*pper _retc(), so it might create problems when
+      writing C code intended for both Clipper and Harbour.
+  * include/hbgfx.ch
+  * include/hbgfxdef.ch
+     * GFX_* constants renamed to HB_GFX_*. The old ones are
+       still working but it's recommended to update to use HB_GFX_*.
+  (borrowed from Harbour, by Viktor Szakats)
+
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gttrm/gttrm.c
+  * source/rtl/gtsln/gtsln.c
+    ! fixed reentrance counter resetting
+    * misc cosmetic changes
+  * source/rtl/gttrm/gttrm.c
+    * use CP437 for BOX characters when terminal is in UTF-8 mode
+    ! set default color before raw scrolling in console emulation
+      mode
+    ! fixed redrawing GPM mouse pointer after screen updating
+  * source/rtl/gtxwc/gtxwc.c
+  * source/rtl/gtxwc/gtxwc.h
+    ! use XInitThreads() for MT safe thread access when linked with MT HVM
+    + added optional mutex protection enabled by HB_XWC_XLIB_NEEDLOCKS macro
+      to use when XLib does not support XInitThreads()
+    * added hack for problems with some XLIB versions in heavy stress
+      MT tests
+  * source/rtl/gtcrs/gtcrs.h
+    * removed unnecessary declaration for _POSIX_PATH_MAX
+      it's always defined in Harbour header files
+  * source/rtl/box.c
+    + added HB_DISPBOX() function - works like DISPBOX() bit does not
+      change cursor position and is atomic for other threads
+  * source/rtl/console.c
+    + added HB_DISPOUTAT() which works like DISPOUTAT but does not change
+      cursor position. Xbase++ users can use
+         #xtranslate DispOutAt( <x,...> ) => hb_dispOutAt( <x> )
+      for Xbase++ compatible code
+  * source/rtl/scroll.c
+    + added HB_SCROLL() function - it works like SCROLL() but supports
+      2 additional parameters: color and erase char. It's stateless and
+      atomic in GT access
+  (by Przemyslaw Czerpak, borrowed from Harbour)
+
+  * source/vm/dbgentry.c
+  * source/debug/dbgbrwsr.prg
+  * source/debug/dbghelp.prg
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dbgtmenu.prg
+  * source/debug/dbgtmitm.prg
+  * source/debug/dbgtwin.prg
+  * source/debug/dbgwa.prg
+  * source/debug/debugger.prg
+    * Formatting.
+    * Minimize dependencies on RTL .prg code which can be overloaded by user.
+    * Miscellaneous small optimizations and fixes.
+  * source/debug/tbrwtext.prg
+    * Replaced with new implementation from Lorenzo Fiorini.
+  (borrowed from Harbour, mostly by Przemyslaw Czerpak and Viktor Szakats)
+
+  * include/hbapi.h
+  * include/hbvm.h
+  * source/vm/hash.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/memvars.c
+  * source/vm/hvm.c
+    + Added C level functions hb_hashId(), hb_arrayId(),
+      hb_memvarGetValueBySym(), hb_vmIsMt() compatible with Harbour.
+    * Removed some direct HB_ITEM accesses, small optimizations.
+  * source/vm/estack.c
+    ! Fixed a possible GPF trap in hb_stackPop(). (from Harbour)
+  * include/common.ch
+    ! Fixed HB_SYMBOL_UNUSED() so that it can be used in codeblocks.
+  * source/rtl/mlcfunc.c
+  * source/rtl/tget.prg
+  * source/rtl/trpc.prg
+  * source/rtl/win32ole.prg
+    ! Fixed some warnings.
+
+  * source/compiler/harbour.sly
+    ! Generate debug info for GLOBAL and STATIC variables declared with array
+      dimensions.
+  * source/debug/tbrwtext.prg
+    ! Fixed line coloring in the new code.
 
 2008-12-07 10:22 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/direct.c

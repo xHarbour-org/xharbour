@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.248 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: hbapi.h,v 1.249 2008/12/03 20:11:43 marchuet Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 /* TOFIX: There are several things in this file which are not part of the
           standard Harbour API, in other words these things are not
           guaranteed to remain unchanged. To avoid confusion these should be
-          moved to somewhere else (like HBRTL.H). [vszakats] */
+          moved to somewhere else (like hbrtl.h). [vszakats] */
 
 #ifndef HB_APIEXT_H_
 #define HB_APIEXT_H_
@@ -440,6 +440,7 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
 extern HB_FORCE_EXPORT int    hb_pcount( void );          /* returns the number of suplied parameters */
 extern HB_FORCE_EXPORT void   hb_ret( void );             /* post a NIL return value */
 extern HB_FORCE_EXPORT void   hb_retc( const char * szText );   /* returns a string */
+extern HB_EXPORT void   hb_retc_null( void );       /* returns an empty string */
 extern HB_FORCE_EXPORT void   hb_retclen( const char * szText, ULONG ulLen ); /* returns a string with a specific length */
 extern HB_EXPORT       void   hb_retcAdopt( char * szText );
 extern HB_EXPORT       void   hb_retclenAdopt( char * szText, ULONG ulLen );
@@ -483,6 +484,7 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
     #define hb_ret()                             hb_itemClear( hb_stackReturnItem() )
     #define hb_reta( ulLen )                     hb_arrayNew( hb_stackReturnItem(), (ulLen) )
     #define hb_retc( szText )                    hb_itemPutC( hb_stackReturnItem(), (szText) )
+    #define hb_retc_null()                       hb_itemPutC( hb_stackReturnItem(), NULL )
     #define hb_retclen( szText, ulLen )          hb_itemPutCL( hb_stackReturnItem(), (szText), (ulLen) )
 
     #define hb_retcAdopt( szText )               hb_itemPutCPtr( hb_stackReturnItem(), (szText), strlen( szText ) )
@@ -651,6 +653,9 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject); /* returns a duplicate
    extern void hb_arrayResetHolder( PHB_BASEARRAY pBaseArray, void *pOldHolder, void *pNewHolder );
 #endif
 
+/* hash management */
+extern HB_EXPORT void *    hb_hashId( PHB_ITEM pHash ); /* retrieves the hash unique ID */
+
 /* string management */
 
 #define HB_ISSPACE( c ) ( ( c ) == ' ' || \
@@ -675,8 +680,8 @@ extern HB_EXPORT char *    hb_strndup( const char * pszText, ULONG ulLen ); /* r
 extern HB_EXPORT char *    hb_strduptrim( const char * pszText ); /* returns a pointer to a newly allocated copy of the trimmed source string */
 extern HB_EXPORT ULONG     hb_strlentrim( const char * pszText ); /* like strlen() but result is the length of trimmed text */
 extern HB_EXPORT ULONG     hb_strnlen( const char * pszText, ULONG ulLen ); /* like strlen() but result is limited to ulLen */
-extern HB_EXPORT char *    hb_xstrcat( char * dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
-extern HB_EXPORT char *    hb_xstrcpy( char * szDest, const char *szSrc, ...); /* Concatenates multiple strings into a single result */
+extern HB_EXPORT char *    hb_xstrcat( char * dest, const char * src, ... ); /* Concatenates multiple strings into a single result */
+extern HB_EXPORT char *    hb_xstrcpy( char * szDest, const char * szSrc, ... ); /* Concatenates multiple strings into a single result */
 extern HB_EXPORT BOOL      hb_compStrToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
 extern HB_EXPORT BOOL      hb_valStrnToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by VAL() */
 extern HB_EXPORT BOOL      hb_strToNum( const char * szNum, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
@@ -840,17 +845,18 @@ extern void       hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_IT
 extern int        hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
 extern HB_HANDLE  hb_memvarGetVarHandle( char *szName ); /* retrieve handle of a variable */
 extern HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
-extern           PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a local variable from the eval stack */
+extern PHB_ITEM   hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a local variable from the eval stack */
+extern PHB_ITEM   hb_memvarGetValueBySym( PHB_DYNS pDynSym );
 
 /* console I/O subsystem */
 extern void     hb_conInit( void ); /* initialize the console API system */
 extern void     hb_conRelease( void ); /* release the console API system */
 extern HB_EXPORT char *   hb_conNewLine( void ); /* retrieve a pointer to a static buffer containing new-line characters */
-extern void     hb_conOutAlt( const char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
-extern void     hb_conOutStd( const char * pStr, ULONG ulLen ); /* output an string to STDOUT */
+extern HB_EXPORT void     hb_conOutStd( const char * pStr, ULONG ulLen ); /* output an string to STDOUT */
 extern HB_EXPORT void     hb_conOutErr( const char * pStr, ULONG ulLen ); /* output an string to STDERR */
-extern USHORT   hb_conSetCursor( BOOL bSetCursor, USHORT usNewCursor ); /* retrieve and optionally set cursor shape */
-extern char *   hb_conSetColor( const char * szColor ); /* retrieve and optionally set console color */
+extern HB_EXPORT void     hb_conOutAlt( const char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
+extern HB_EXPORT USHORT   hb_conSetCursor( BOOL bSetCursor, USHORT usNewCursor ); /* retrieve and optionally set cursor shape */
+extern HB_EXPORT char *   hb_conSetColor( const char * szColor ); /* retrieve and optionally set console color */
 extern void     hb_conXSaveRestRelease( void ); /* release the save/restore API */
 
 /* compiler and macro compiler */

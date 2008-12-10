@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.73 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: console.c,v 1.74 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -713,6 +713,35 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    if( bFreeReq )
    {
       hb_xfree( pszString );
+   }
+}
+
+/* Harbour extension, works like DISPOUTAT but does not change cursor position */
+
+HB_FUNC( HB_DISPOUTAT )
+{
+   if( hb_pcount() >= 3 )
+   {
+      char * pszString;
+      ULONG ulLen;
+      BOOL bFreeReq;
+      int iColor;
+
+      pszString = hb_itemStringCon( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
+
+      if( ISCHAR( 4 ) )
+         iColor = hb_gtColorToN( hb_parc( 4 ) );
+      else if( ISNUM( 4 ) )
+         iColor = hb_parni( 4 );
+      else
+         iColor = -1;
+
+      HB_CONSOLE_SAFE_LOCK
+      hb_gtPutText( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ), ( BYTE * ) pszString, ulLen, iColor );
+      HB_CONSOLE_SAFE_UNLOCK
+
+      if( bFreeReq )
+         hb_xfree( pszString );
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.163 2008/06/28 18:51:49 walito Exp $
+ * $Id: arrays.c,v 1.164 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -153,92 +153,6 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    pItem->type = HB_IT_ARRAY;
 
    return TRUE;
-}
-
-BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayAdd(%p, %p)", pArray, pValue));
-
-   if( HB_IS_ARRAY( pArray )  )
-   {
-      PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
-
-      if( pBaseArray->ulLen < ULONG_MAX )
-      {
-         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
-         {
-            pBaseArray->ulLen++;
-         }
-         else
-         {
-            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
-         }
-
-         pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
-         pValue->type &= ~HB_IT_MEMOFLAG;
-         hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
-
-         return TRUE;
-      }
-   }
-
-   return FALSE;
-}
-
-BOOL hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
-
-   if( HB_IS_ARRAY( pArray ) )
-   {
-      PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
-
-      if( pBaseArray->ulLen < ULONG_MAX )
-      {
-         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
-         {
-            pBaseArray->ulLen++;
-         }
-         else
-         {
-            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
-         }
-
-         pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
-         pValue->type &= ~HB_IT_MEMOFLAG;
-         hb_itemForwardValue( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
-
-         return TRUE;
-      }
-   }
-
-   return FALSE;
-}
-
-ULONG hb_arrayLen( PHB_ITEM pArray )
-{
-   ULONG ulLen = 0;
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayLen(%p)", pArray));
-
-   if( HB_IS_ARRAY( pArray ) )
-   {
-      ulLen = pArray->item.asArray.value->ulLen;
-   }
-
-   return ulLen;
-}
-
-BOOL hb_arrayIsObject( PHB_ITEM pArray )
-{
-   BOOL bObj = FALSE;
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayIsObject(%p)", pArray));
-
-   if( HB_IS_ARRAY( pArray ) )
-   {
-      bObj = pArray->item.asArray.value->uiClass != 0;
-   }
-
-   return bObj;
 }
 
 BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
@@ -414,6 +328,101 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
       }
 
       return TRUE;
+   }
+
+   return FALSE;
+}
+
+ULONG hb_arrayLen( PHB_ITEM pArray )
+{
+   ULONG ulLen = 0;
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayLen(%p)", pArray));
+
+   if( HB_IS_ARRAY( pArray ) )
+   {
+      ulLen = pArray->item.asArray.value->ulLen;
+   }
+
+   return ulLen;
+}
+
+BOOL hb_arrayIsObject( PHB_ITEM pArray )
+{
+   BOOL bObj = FALSE;
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayIsObject(%p)", pArray));
+
+   if( HB_IS_ARRAY( pArray ) )
+   {
+      bObj = pArray->item.asArray.value->uiClass != 0;
+   }
+
+   return bObj;
+}
+
+/* retrieves the array unique ID */
+void * hb_arrayId( PHB_ITEM pArray )
+{
+   if( HB_IS_ARRAY( pArray ) )
+      return ( void * ) pArray->item.asArray.value;
+   else
+      return NULL;
+}
+
+BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayAdd(%p, %p)", pArray, pValue));
+
+   if( HB_IS_ARRAY( pArray ) )
+   {
+      PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+
+      if( pBaseArray->ulLen < ULONG_MAX )
+      {
+         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
+         {
+            pBaseArray->ulLen++;
+         }
+         else
+         {
+            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         }
+
+         pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+         pValue->type &= ~HB_IT_MEMOFLAG;
+         hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
+
+         return TRUE;
+      }
+   }
+
+   return FALSE;
+}
+
+BOOL hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
+
+   if( HB_IS_ARRAY( pArray ) )
+   {
+      PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+
+      if( pBaseArray->ulLen < ULONG_MAX )
+      {
+         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
+         {
+            pBaseArray->ulLen++;
+         }
+         else
+         {
+            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         }
+
+         pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+         pValue->type &= ~HB_IT_MEMOFLAG;
+         hb_itemForwardValue( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
+
+         return TRUE;
+      }
    }
 
    return FALSE;
@@ -866,6 +875,7 @@ void * hb_arrayGetPtr( PHB_ITEM pArray, ULONG ulIndex )
 
    return NULL;
 }
+
 
 HB_TYPE hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
 {

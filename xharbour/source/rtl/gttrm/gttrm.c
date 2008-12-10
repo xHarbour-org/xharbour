@@ -1,5 +1,5 @@
 /*
- * $Id: gttrm.c,v 1.2 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gttrm.c,v 1.3 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -115,6 +115,7 @@ static HB_GT_FUNCS   SuperTable;
 #define HB_GTTRM_ATTR_PROT    0x0100
 #define HB_GTTRM_ATTR_ACSC    0x0100
 #endif
+#define HB_GTTRM_ATTR_BOX     0x0800
 
 #define TERM_ANSI       1
 #define TERM_LINUX      2
@@ -298,53 +299,53 @@ typedef struct {
 
 typedef struct _HB_GTTRM
 {
-   PHB_GT   pGT;
+   PHB_GT     pGT;
 
-   FHANDLE  hFileno;
-   FHANDLE  hFilenoStdin;
-   FHANDLE  hFilenoStdout;
-   FHANDLE  hFilenoStderr;
-   int      iRow;
-   int      iCol;
-   int      iLineBufSize;
-   BYTE *   pLineBuf;
-   int      iCurrentSGR, iFgColor, iBgColor, iBold, iBlink, iACSC, iAM;
-   int      iAttrMask;
-   int      iCursorStyle;
+   HB_FHANDLE hFileno;
+   HB_FHANDLE hFilenoStdin;
+   HB_FHANDLE hFilenoStdout;
+   HB_FHANDLE hFilenoStderr;
+   int        iRow;
+   int        iCol;
+   int        iLineBufSize;
+   BYTE *     pLineBuf;
+   int        iCurrentSGR, iFgColor, iBgColor, iBold, iBlink, iACSC, iAM;
+   int        iAttrMask;
+   int        iCursorStyle;
 
-   BOOL     fOutTTY;
-   BOOL     fStdinTTY;
-   BOOL     fStdoutTTY;
-   BOOL     fStderrTTY;
+   BOOL       fOutTTY;
+   BOOL       fStdinTTY;
+   BOOL       fStdoutTTY;
+   BOOL       fStderrTTY;
 
-   BOOL     fPosAnswer;
+   BOOL       fPosAnswer;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE   cdpHost;
-   PHB_CODEPAGE   cdpOut;
-   PHB_CODEPAGE   cdpIn;
-   PHB_CODEPAGE   cdpEN;
+   PHB_CODEPAGE cdpHost;
+   PHB_CODEPAGE cdpOut;
+   PHB_CODEPAGE cdpIn;
+   PHB_CODEPAGE cdpEN;
 #endif
-   BOOL     fUTF8;
-   BYTE     keyTransTbl[ 256 ];
-   int      charmap[256];
+   BOOL       fUTF8;
+   BYTE       keyTransTbl[ 256 ];
+   int        charmap[ 256 ];
 
-   int      chrattr[256];
-   int      boxattr[256];
+   int        chrattr[ 256 ];
+   int        boxattr[ 256 ];
 
-   int      iOutBufSize;
-   int      iOutBufIndex;
-   BYTE *   pOutBuf;
+   int        iOutBufSize;
+   int        iOutBufIndex;
+   BYTE *     pOutBuf;
 
-   int      terminal_type;
-   int      terminal_ext;
+   int        terminal_type;
+   int        terminal_ext;
 
 #if defined( OS_UNIX_COMPATIBLE )
    struct termios saved_TIO, curr_TIO;
-   BOOL     fRestTTY;
+   BOOL       fRestTTY;
 #endif
 
-   double   dToneSeconds;
+   double     dToneSeconds;
 
    /* input events */
    keyTab *pKeyTab;
@@ -722,7 +723,8 @@ static void hb_gt_trm_termOutTrans( PHB_GTTRM pTerm, BYTE * pStr, int iLen, int 
 
       if( pTerm->fUTF8 )
       {
-         if( ( iAttr & HB_GTTRM_ATTR_ACSC ) && pTerm->cdpEN )
+         if( ( iAttr & ( HB_GTTRM_ATTR_ACSC | HB_GTTRM_ATTR_BOX ) ) &&
+             pTerm->cdpEN )
             cdp = pTerm->cdpEN;
          else if( pTerm->cdpHost )
             cdp = pTerm->cdpHost;
@@ -1332,8 +1334,8 @@ static int wait_key( PHB_GTTRM pTerm, int milisec )
    }
 #endif
 
-   counter = ++( pTerm->key_counter );
 restart:
+   counter = ++( pTerm->key_counter );
    nKey = esc = n = i = 0;
 again:
    if( ( nKey = getMouseKey( &pTerm->mLastEvt ) ) != 0 )
@@ -2751,7 +2753,7 @@ static void hb_gt_trm_SetTerm( PHB_GTTRM pTerm )
    }
    pTerm->mouse_type = MOUSE_NONE;
    pTerm->esc_delay  = ESC_DELAY;
-   pTerm->iAttrMask  = ~0;
+   pTerm->iAttrMask  = ~HB_GTTRM_ATTR_BOX;
 
    szTerm = getenv("HB_TERM");
    if( szTerm == NULL || *szTerm == '\0' )
@@ -2842,12 +2844,12 @@ static void hb_gt_trm_SetTerm( PHB_GTTRM pTerm )
    mouse_init( pTerm );
 }
 
-static void hb_gt_trm_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_trm_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    int iRows = 24, iCols = 80;
    PHB_GTTRM pTerm;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_trm_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_trm_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr));
 
    pTerm = ( PHB_GTTRM ) hb_xgrab( sizeof( HB_GTTRM ) );
    memset( pTerm, 0, sizeof( HB_GTTRM ) );
@@ -3102,16 +3104,16 @@ static void hb_gt_trm_Bell( PHB_GT pGT )
    pTerm->Bell( pTerm );
 }
 
-static char * hb_gt_trm_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_trm_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_trm_Version(%p,%d)", pGT, iType ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
    if( iType == 0 )
-      return ( char * ) HB_GT_DRVNAME( HB_GT_NAME );
+      return HB_GT_DRVNAME( HB_GT_NAME );
 
-   return ( char * ) "Harbour terminal driver";
+   return "Harbour terminal driver";
 }
 
 static BOOL hb_gt_trm_Suspend( PHB_GT pGT )
@@ -3172,6 +3174,9 @@ static void hb_gt_trm_Scroll( PHB_GT pGT, int iTop, int iLeft, int iBottom, int 
       {
          /* scroll up the internal screen buffer */
          HB_GTSELF_SCROLLUP( pGT, iRows, bColor, bChar );
+         /* set default color for terminals which use it to erase
+          * scrolled area */
+         pTerm->SetAttributes( pTerm, bColor & pTerm->iAttrMask );
          /* update our internal row position */
          do
             hb_gt_trm_termOut( pTerm, ( BYTE * ) "\n\r", 2 );
@@ -3232,7 +3237,7 @@ static void hb_gt_trm_SetBlink( PHB_GT pGT, BOOL fBlink )
    HB_GTSUPER_SETBLINK( pGT, fBlink );
 }
 
-static BOOL hb_gt_trm_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_trm_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_trm_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
 
@@ -3276,7 +3281,7 @@ static BOOL hb_gt_trm_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
    return FALSE;
 }
 
-static BOOL hb_gt_trm_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
+static BOOL hb_gt_trm_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_trm_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
 
@@ -3334,6 +3339,7 @@ static void hb_gt_trm_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 
    pTerm = HB_GTTRM_GET( pGT );
    pTerm->SetTermMode( pTerm, 0 );
+   pTerm->SetCursorStyle( pTerm, SC_NONE );
    while( iSize-- )
    {
       if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol + iLen, &bColor, &bAttr, &usChar ) )
@@ -3345,6 +3351,8 @@ static void hb_gt_trm_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
          iColor = bColor | ( pTerm->boxattr[ usChar ] & ~HB_GTTRM_ATTR_CHAR );
          if( !pTerm->fUTF8 )
             usChar = pTerm->boxattr[ usChar ] & HB_GTTRM_ATTR_CHAR;
+         else
+            iColor |= HB_GTTRM_ATTR_BOX;
       }
       else
       {
@@ -3402,14 +3410,14 @@ static void hb_gt_trm_Refresh( PHB_GT pGT )
          iStyle = SC_NONE;
    }
    pTerm->SetCursorStyle( pTerm, iStyle );
-   disp_mousecursor( pTerm );
    hb_gt_trm_termFlush( pTerm );
+   disp_mousecursor( pTerm );
 }
 
 static BOOL hb_gt_trm_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 {
    PHB_GTTRM pTerm;
-   char * szVal;
+   const char * szVal;
    int iVal;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_trm_Info(%p,%d,%p)", pGT, iType, pInfo ) );
@@ -3500,7 +3508,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif

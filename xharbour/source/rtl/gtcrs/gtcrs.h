@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.18 2005/08/12 02:44:26 druzus Exp $
+ * $Id: gtcrs.h,v 1.19 2008/03/16 19:16:01 likewolf Exp $
  */
 
 /*
@@ -116,10 +116,6 @@
 
 #ifndef O_ACCMODE
 #  define O_ACCMODE           ( O_RDONLY | O_WRONLY | O_RDWR )
-#endif
-
-#ifndef _POSIX_PATH_MAX
-#  define _POSIX_PATH_MAX     256
 #endif
 
 /* #define HB_GT_CRS_TTYHACK */

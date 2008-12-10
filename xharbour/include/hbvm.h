@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.64 2008/06/25 20:20:51 vouchcac Exp $
+ * $Id: hbvm.h,v 1.65 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -138,6 +138,7 @@ extern HB_EXPORT void     hb_vmPushInteger( int iNumber ); /* pushes a integer n
 extern HB_EXPORT void     hb_vmPushLong( LONG lNumber ); /* pushes a LONG number onto the stack */
 extern HB_EXPORT void     hb_vmPushLongLong( HB_LONG lNumber ); /* pushes a long long number onto the stack */
 extern HB_EXPORT void     hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
+extern HB_EXPORT void     hb_vmPushNumInt( HB_LONG lNumber );  /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 extern HB_EXPORT void     hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
 extern HB_EXPORT void     hb_vmPushString( const char * szText, ULONG length );  /* pushes a string on to the stack */
 extern HB_EXPORT void     hb_vmPushDate( LONG lDate );  /* pushes a LONG date onto the stack */
@@ -150,8 +151,8 @@ extern HB_EXPORT void     hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray );
 extern HB_EXPORT void     hb_vmPushState( void ); /* push current VM state on stack */
 extern HB_EXPORT void     hb_vmPopState( void ); /* pop current VM state from stack */
 extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item reference */
-extern HB_EXPORT void     hb_vmPushNumInt( HB_LONG lNumber ); /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 
+extern HB_EXPORT BOOL     hb_vmIsMt( void ); /* return TRUE if HVM is compiled with thread support */
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );

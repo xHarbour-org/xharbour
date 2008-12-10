@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.76 2008/10/28 12:19:35 marchuet Exp $
+ * $Id: arrayshb.c,v 1.77 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -165,14 +165,7 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
-   if( pArray )
-   {
-      hb_retptr( ( void * ) pArray->item.asArray.value );
-   }
-   else
-   {
-      hb_retptr( NULL );
-   }
+   hb_retptr( hb_arrayId( pArray ) );
 }
 
 // Programmer responability that the ID is of a [still] VALID Array!!!

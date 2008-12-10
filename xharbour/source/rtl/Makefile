@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.78 2008/09/11 05:32:35 guerra000 Exp $
+# $Id: Makefile,v 1.79 2008/12/03 12:18:06 modalsist Exp $
 #
 
 ROOT = ../../
@@ -62,6 +62,7 @@ C_SOURCES=\
 	hbgtcore.c   \
 	hbhex2n.c    \
 	hbmd5.c      \
+	hbntos.c     \
 	hboutdbg.c   \
 	hbrandom.c   \
 	hbserv.c     \

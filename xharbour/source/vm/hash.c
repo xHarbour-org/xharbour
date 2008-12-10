@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.54 2008/03/27 10:26:44 likewolf Exp $
+ * $Id: hash.c,v 1.55 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -3079,6 +3079,17 @@ BOOL hb_hashGetCompatibility( PHB_ITEM pHash )
       }
    }
    return FALSE;
+}
+
+/* retrieves the hash unique ID */
+void * hb_hashId( PHB_ITEM pHash )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashId(%p)", pHash));
+
+   if( HB_IS_HASH( pHash ) )
+      return ( void * ) pHash->item.asHash.value;
+   else
+      return NULL;
 }
 
 HB_EXTERN_END

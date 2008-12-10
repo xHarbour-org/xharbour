@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.103 2008/11/22 22:43:53 ronpinkas Exp $
+ * $Id: estack.c,v 1.104 2008/11/23 03:23:13 andijahja Exp $
  */
 
 /*
@@ -90,18 +90,17 @@ void hb_stackPop( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
-   if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) )
-   {
-      hb_itemClear( *( HB_VM_STACK.pPos - 1 ) );
-   }
-   else
-   {
-      ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL;
-   }
-
    if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
    {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
+   if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos  ) ) )
+   {
+      hb_itemClear( *( HB_VM_STACK.pPos ) );
+   }
+   else
+   {
+      ( *( HB_VM_STACK.pPos ) )->type = HB_IT_NIL;
    }
 }
 
@@ -184,17 +183,16 @@ void hb_stackPushReturn( void )
 
 void hb_stackIncrease( void )
 {
+   HB_THREAD_STUB
    LONG BaseIndex;   /* index of stack base */
    LONG CurrIndex;   /* index of current top item */
    LONG EndIndex;    /* index of current top item */
 
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
+
    #ifndef HB_ARRAY_USE_COUNTER
       PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
    #endif
-
-   HB_THREAD_STUB
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
 
    BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
@@ -415,6 +413,13 @@ LONG hb_stackTotalItems( void )
    return HB_VM_STACK.wItems;
 }
 
+#undef hb_stackRDD
+PHB_STACKRDD hb_stackRDD( void )
+{
+   HB_THREAD_STUB
+   return HB_VM_STACK.rdd;
+}
+
 #undef hb_stackItemBasePtr
 PHB_ITEM ** hb_stackItemBasePtr( void )
 {
@@ -455,12 +460,6 @@ HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
    }
 
    return ( *( HB_VM_STACK.pPos + nFromTop ) );
-}
-
-#undef hb_stackRDD
-PHB_STACKRDD hb_stackRDD( void )
-{
-   return HB_VM_STACK.rdd;
 }
 
 #undef hb_stackItemFromBase
@@ -634,7 +633,7 @@ void hb_stackDispLocal( void )
             break;
 
          case HB_IT_STRING:
-            printf( HB_I_("STRING = \"%s\" "), ( *pBase )->item.asString.value );
+            printf( HB_I_("STRING = \"%s\" "), hb_itemGetCPtr( *pBase ) );
             break;
 
          case HB_IT_SYMBOL:

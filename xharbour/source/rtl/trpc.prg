@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.30 2005/09/30 23:44:05 druzus Exp $
+ * $Id: trpc.prg,v 1.31 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -230,7 +230,7 @@ ENDCLASS
 
 METHOD New( cFname, cSerial, nAuthLevel, oExec, oMeth ) CLASS tRPCFunction
    LOCAL cParam
-   LOCAL cFret, aParams, aFuncDef
+   LOCAL aParams, aFuncDef
 
    // Analyze the function definition
    aFuncDef := HB_Regex( "^([a-zA-Z0-9_-]+)\(([^)]*)\) *(-->)? *(.*)$", cFname )

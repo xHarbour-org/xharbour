@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.13 2007/12/04 22:52:49 likewolf Exp $
+ * $Id: dbgtobj.prg,v 1.14 2008/04/05 13:28:55 likewolf Exp $
  */
 
 /*
@@ -129,21 +129,22 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
    oBrwSets := HBDbBrowser():New( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
    ::ArrayReference := aArray
 
+   oBrwSets:autolite := .T.
    oBrwSets:ColorSpec := __Dbg():ClrModal()
    oBrwSets:GoTopBlock := { || ::Arrayindex := 1 }
    oBrwSets:GoBottomBlock := { || ::arrayindex := Len( ::ArrayReference ) }
    oBrwSets:SkipBlock := { | nSkip, nPos | nPos := ::arrayindex,;
-                          ::arrayindex := iif( nSkip > 0, Min( ::arrayindex + nSkip, Len( ::arrayreference ) ),;
+                          ::arrayindex := iif( nSkip > 0, Min( ::arrayindex + nSkip, Len( ::arrayReference ) ),;
                           Max( 1, ::arrayindex + nSkip ) ), ::arrayindex - nPos }
 
    nMaxLen := ArrayMaxLen( ::AllNames )
-   oBrwSets:AddColumn( oCol := TBColumnNew( "",;
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "",;
                     { || PadR( ::ArrayReference[ ::arrayindex, 1 ], nMaxLen ) } ) )
    oCol:width := nMaxLen
    oCol:ColorBlock := { || { iif( ::Arrayindex == oBrwSets:Cargo, 2, 1 ), 2 } }
    oBrwSets:Freeze := 1
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || iif( ISCHARACTER( ::ArrayReference[ ::ArrayIndex, 2 ] ) .AND. ::ArrayReference[ ::ArrayIndex, 2 ] == "Method",;
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || iif( ISCHARACTER( ::ArrayReference[ ::ArrayIndex, 2 ] ) .AND. ::ArrayReference[ ::ArrayIndex, 2 ] == "Method",;
       "Method",;
       PadR( __dbgValToStr( __objSendMsg( ::TheObj, ::ArrayReference[ ::arrayindex, 1 ] ) ), nWidth  - 12 ) ) } ) )
 
@@ -152,7 +153,7 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
    oCol:width := MaxCol() - 14 - nMaxLen
    oBrwSets:colPos := 2
    ::aWindows[ ::nCurWindow ]:bPainted    := { || oBrwSets:ForceStable() }
-   ::aWindows[ ::nCurWindow ]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ), ::Arrayreference ) }
+   ::aWindows[ ::nCurWindow ]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ), ::ArrayReference ) }
    ::aWindows[ ::nCurwindow ]:cCaption := ::objname + " is of class: " +::TheObj:ClassName()
 
    SetCursor( SC_NONE )
@@ -172,6 +173,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
    LOCAL lExitSave  := Set( _SET_EXIT, .T. )
    LOCAL bInsSave   := SetKey( K_INS )
    LOCAL cValue
+   LOCAL oErr, bErrorBlock
 
    // make sure browse is stable
    oBrowse:forceStable()
@@ -192,7 +194,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
    // create a corresponding GET
    cValue := PadR( __dbgValToStr( pitem[ nSet, 2 ] ), column:Width )
    @ Row(), Col() GET cValue ;
-       VALID iif( Type( cValue ) == "UE", ( Alert( "Expression error" ), .F. ), .T. )
+       VALID iif( Type( cValue ) == "UE", ( __dbgAlert( "Expression error" ), .F. ), .T. )
 
    READ
 
@@ -202,7 +204,13 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
    SetKey( K_INS, bInsSave )
 
    IF LastKey() == K_ENTER
-      __objSendMsg( ::TheObj, "_" + pitem[ nSet, 1 ], &cValue )
+      bErrorBlock := ErrorBlock( {|oErr| break( oErr ) } )
+      BEGIN SEQUENCE
+         __objSendMsg( ::TheObj, "_" + pitem[ nSet, 1 ], &cValue )
+      RECOVER USING oErr
+         __dbgAlert( oErr:description )
+      END SEQUENCE
+      ErrorBlock( bErrorBlock )
    ENDIF
 
    // check exit key from get
@@ -276,7 +284,7 @@ METHOD SetsKeyPressed( nKey, oBrwSets, nSets, aArray ) CLASS HBDbObject
             IF Len( aArray[ nSet, 2 ] ) > 0
                HBDbArray():New( aArray[ nSet, 2 ], ::pitems[ nSet, 1 ] )
             ENDIF
-         ELSEIF ValType( aArray[ nSet, 2 ] ) == "H"
+         ELSEIF hb_isHash( aArray[ nSet, 2 ] )
             IF Len( aArray[ nSet, 2 ] ) > 0
                HBDbHash():New( aArray[ nSet, 2 ], ::pitems[ nSet, 1 ] )
             ENDIF
@@ -285,16 +293,16 @@ METHOD SetsKeyPressed( nKey, oBrwSets, nSets, aArray ) CLASS HBDbObject
          ELSEIF ( ISCHARACTER( aArray[ nSet, 2 ] ) .AND. ;
                   aArray[ nSet, 2 ] == "Method" ) .OR. ;
                 ISBLOCK( aArray[ nSet, 2 ] ) .OR. ;
-                ValType( aArray[ nSet, 2 ] ) == "P"
-            Alert( "Value cannot be edited" )
+                hb_isPointer( aArray[ nSet, 2 ] )
+            __dbgAlert( "Value cannot be edited" )
          ELSE
             IF ::lEditable
                oBrwSets:RefreshCurrent()
-               ::doGet( oBrwSets, ::arrayreference, nSet )
+               ::doGet( oBrwSets, ::arrayReference, nSet )
                oBrwSets:RefreshCurrent()
                oBrwSets:ForceStable()
             else
-               Alert( "Value cannot be edited" )
+               __dbgAlert( "Value cannot be edited" )
             ENDIF
          ENDIF
       ENDIF

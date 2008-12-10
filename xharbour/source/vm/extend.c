@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.69 2008/11/22 11:22:19 andijahja Exp $
+ * $Id: extend.c,v 1.70 2008/11/23 03:23:13 andijahja Exp $
  */
 
 /*
@@ -1088,6 +1088,14 @@ void hb_retc( const char * szText )
    HB_TRACE(HB_TR_DEBUG, ("hb_retc(%s)", szText));
 
    hb_itemPutC( hb_stackReturnItem(), szText );
+}
+
+#undef hb_retc_null
+void hb_retc_null( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retc_null()"));
+
+   hb_itemPutC( hb_stackReturnItem(), NULL );
 }
 
 #undef hb_retclen

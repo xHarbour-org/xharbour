@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.63 2008/08/14 09:04:22 andijahja Exp $
+ * $Id: gtcrs.c,v 1.64 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -758,8 +758,8 @@ static int wait_key( InOutBase * ioBase, int milisec )
       return K_RESIZE;
    }
 
-   counter = ++( ioBase->key_counter );
  restart:
+   counter = ++( ioBase->key_counter );
    nKey = esc = n = i = 0;
  again:
    if ( ( nKey = getMouseKey( &ioBase->mLastEvt ) ) != 0 )
@@ -881,7 +881,7 @@ static int wait_key( InOutBase * ioBase, int milisec )
    return nKey;
 }
 
-static void write_ttyseq( InOutBase * ioBase, char *seq )
+static void write_ttyseq( InOutBase * ioBase, const char *seq )
 {
    if ( ioBase->baseout != NULL )
    {
@@ -1408,11 +1408,11 @@ static void gt_outerr( InOutBase * ioBase, const char *str, int len )
    gt_outstr( ioBase, ioBase->stderrfd, ( unsigned char * ) str, len );
 }
 
-static char *tiGetS( char *capname )
+static char *tiGetS( const char *capname )
 {
    char *ptr;
 
-   ptr = tigetstr( capname );
+   ptr = tigetstr( ( char * ) capname );
    if ( ptr )
    {
       if ( ptr == ( char * ) -1 )
@@ -1834,7 +1834,7 @@ static void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char 
    }
 }
 
-static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
+static void setDispTrans( InOutBase * ioBase, const char *src, const char *dst, int box )
 {
    unsigned char c, d;
    int i, aSet = 0;
@@ -1935,8 +1935,7 @@ static InOutBase *create_ioBase( char *term, int infd, int outfd, int errfd,
       {
          if ( ( i = ptr - term ) >= sizeof( buf ) )
             i = sizeof( buf ) - 1;
-         strncpy( buf, term, i );
-         buf[i] = '\0';
+         hb_strncpy( buf, term, i );
          if ( i )
             crsterm = buf;
       }
@@ -2446,11 +2445,11 @@ void HB_GT_FUNC( gt_CatchSignal( int iSig ) )
 
 /* *********************************************************************** */
 
-static void hb_gt_crs_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_crs_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    InOutBase *ioBase;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr ) );
 
    if( !s_ioBase )
    {
@@ -2478,7 +2477,7 @@ static void hb_gt_crs_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    }
 
    if( !s_ioBase )
-      hb_errInternal( 9997, "Internal error: screen driver initialization failure", "", "" );
+      hb_errInternal( 9997, "Internal error: screen driver initialization failure", NULL, NULL );
 }
 
 /* *********************************************************************** */
@@ -2550,7 +2549,7 @@ static void hb_gt_crs_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 
 /* *********************************************************************** */
 
-static char * hb_gt_crs_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_crs_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_Version(%p,%d)", pGT, iType ) );
 
@@ -2797,7 +2796,7 @@ static int hb_gt_crs_ReadKey( PHB_GT pGT, int iEventMask )
 
 /* *********************************************************************** */
 
-static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
 
@@ -2824,10 +2823,10 @@ static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
             char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
             char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
-            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
-            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
-            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
-            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+            hb_strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars * 2 );
+            hb_strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars * 2 );
+            hb_strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars * 2 );
+            hb_strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars * 2 );
 
             setDispTrans( s_ioBase, pszHostLetters, pszTermLetters, fBox ? 1 : 0 );
 
@@ -2846,7 +2845,7 @@ static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
 
 /* *********************************************************************** */
 
-static BOOL hb_gt_crs_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
+static BOOL hb_gt_crs_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_crs_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
 
@@ -2868,10 +2867,10 @@ static BOOL hb_gt_crs_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
          char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
          char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
-         strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
-         strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
-         strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
-         strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+         hb_strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars * 2 );
+         hb_strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars * 2 );
+         hb_strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars * 2 );
+         hb_strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars * 2 );
 
          setKeyTrans( s_ioBase, ( unsigned char * ) pszTermLetters,
                       ( unsigned char * ) pszHostLetters );
@@ -3014,7 +3013,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif

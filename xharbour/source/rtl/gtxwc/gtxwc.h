@@ -1,12 +1,12 @@
 /*
- * $Id: gtxwc.h,v 1.5 2006/03/01 13:06:30 druzus Exp $
+ * $Id: gtxwc.h,v 1.6 2008/03/16 19:16:04 likewolf Exp $
  */
 
 /*
  * [x]Harbour Project source code:
  *    XWindow Console
  * Copyright 2003 - Giancarlo Niccolai <antispam /at/ niccolai.ws>
- * Copyright 2004/2006 - Przemys³aw Czerpak <druzus /at/ priv.onet.pl>
+ * Copyright 2004/2006 - Przemyslaw Czerpak <druzus /at/ priv.onet.pl>
  *
  * www - http://www.harbour-project.org
  * www - http://www.xharbour.org

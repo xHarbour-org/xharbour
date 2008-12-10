@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.12 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: dbgtarr.prg,v 1.13 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -113,12 +113,12 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbArray
    oBrwSets:Cargo := { 1, {} } // Actual highligthed row
    AAdd( oBrwSets:Cargo[ 2 ], aArray )
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || ::arrayName + "[" + LTrim( Str( oBrwSets:cargo[ 1 ], 6 ) ) + "]" } ) )
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || ::arrayName + "[" + LTrim( Str( oBrwSets:cargo[ 1 ], 6 ) ) + "]" } ) )
    oCol:width := Len( ::arrayName + "[" + LTrim( Str( Len( aArray ), 6 ) ) + "]" )
    oCol:DefColor := { 1, 2 }
    nColWidth := oCol:Width
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || PadR( __dbgValToStr( aArray[ oBrwSets:cargo[ 1 ] ] ), nWidth - nColWidth - 1 ) } ) )
+   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || PadR( __dbgValToStr( aArray[ oBrwSets:cargo[ 1 ] ] ), nWidth - nColWidth - 1 ) } ) )
 
    /* 09/08/2004 - <maurilio.longo@libero.it>
                    Setting a fixed width like it is done in the next line of code wich I've
@@ -161,8 +161,9 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbArray
    LOCAL lScoreSave := Set( _SET_SCOREBOARD, .F. )
    LOCAL lExitSave  := Set( _SET_EXIT, .T. )
    LOCAL bInsSave   := SetKey( K_INS )
-   LOCAL cValue     := PadR( __dbgValToStr( pItem[ nSet ] ),;
-                             oBrowse:nRight - oBrowse:nLeft - oBrowse:GetColumn( 1 ):width )
+   LOCAL oErr, bErrorBlock
+   LOCAL cValue := PadR( __dbgValToStr( pItem[ nSet ] ),;
+                         oBrowse:nRight - oBrowse:nLeft - oBrowse:GetColumn( 1 ):width )
 
    // make sure browse is stable
    oBrowse:forceStable()
@@ -177,12 +178,18 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbArray
 
    // create a corresponding GET
    @ Row(), oBrowse:nLeft + oBrowse:GetColumn( 1 ):width + 1 GET cValue ;
-      VALID iif( Type( cValue ) == "UE", ( Alert( "Expression error" ), .F. ), .T. )
+      VALID iif( Type( cValue ) == "UE", ( __dbgAlert( "Expression error" ), .F. ), .T. )
 
    READ
 
    IF LastKey() == K_ENTER
-      pItem[ nSet ] := &cValue
+      bErrorBlock := {|oErr| break( oErr ) }
+      BEGIN SEQUENCE
+         pItem[ nSet ] := &cValue
+      RECOVER USING oErr
+         __dbgAlert( oErr:description )
+      END SEQUENCE
+      ErrorBlock( bErrorBlock )
    ENDIF
 
    SetCursor( SC_NONE )
@@ -227,7 +234,7 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, aArray ) CLASS HBDbArray
    CASE nKey == K_ENTER
       IF ISARRAY( aArray[ nSet ] )
          IF Len( aArray[ nSet ] ) == 0
-            Alert( "Array is empty" )
+            __dbgAlert( "Array is empty" )
          ELSE
             SetPos( oWnd:nBottom, oWnd:nLeft )
             ::aWindows[ ::nCurWindow ]:lFocused := .F.
@@ -243,22 +250,22 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, aArray ) CLASS HBDbArray
                ::nCurWindow--
             ENDIF
          ENDIF
-      ELSEIF ISBLOCK( aArray[ nSet ] ) .OR. Valtype( aArray[ nSet ] ) == "P"
-         Alert( "Value cannot be edited" )
+      ELSEIF ISBLOCK( aArray[ nSet ] ) .OR. hb_isPointer( aArray[ nSet ] )
+         __dbgAlert( "Value cannot be edited" )
       ELSE
          IF ::lEditable
             oBrwSets:RefreshCurrent()
             IF ISOBJECT( aArray[ nSet ] )
-               __DbgObject( aArray[ nSet ], cName + "[" + LTrim( Str( nSet ) ) + "]" )
-            ELSEIF ValType( aArray[ nSet ] ) == "H"
-               __DbgHashes( aArray[ nSet ], cName + "[" + LTrim( Str( nSet ) ) + "]" )
+               __DbgObject( aArray[ nSet ], cName + "[" + hb_NToS( nSet ) + "]" )
+            ELSEIF hb_isHash( aArray[ nSet ] )
+               __DbgHashes( aArray[ nSet ], cName + "[" + hb_NToS( nSet ) + "]" )
             ELSE
                ::doGet( oBrwsets, aArray, nSet )
             ENDIF
             oBrwSets:RefreshCurrent()
             oBrwSets:ForceStable()
          ELSE
-            Alert( "Value cannot be edited" )
+            __dbgAlert( "Value cannot be edited" )
          ENDIF
       ENDIF
 
@@ -266,8 +273,8 @@ METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, aArray ) CLASS HBDbArray
 
    RefreshVarsS( oBrwSets )
 
-   ::aWindows[ ::nCurWindow ]:SetCaption( cName + "[" + LTrim( Str( oBrwSets:cargo[ 1 ] ) ) + ".." + ;
-                                          LTrim( Str( Len( aArray ) ) ) + "]" )
+   ::aWindows[ ::nCurWindow ]:SetCaption( cName + "[" + hb_NToS( oBrwSets:cargo[ 1 ] ) + ".." + ;
+                                          hb_NToS( Len( aArray ) ) + "]" )
 
    RETURN self
 

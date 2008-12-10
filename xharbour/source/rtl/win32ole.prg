@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.167 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: win32ole.prg,v 1.168 2008/11/22 22:43:53 ronpinkas Exp $
  */
 
 /*
@@ -50,11 +50,16 @@
  */
 
 #ifndef __PLATFORM__Windows
+
+#include "common.ch"
+
   Function CreateObject()
   Return NIL
 
   FUNCTION GetActiveObject( cString )
+    HB_SYMBOL_UNUSED( cString )
   Return NIL
+
 #else
 
 #define HB_CLS_NOTOBJECT

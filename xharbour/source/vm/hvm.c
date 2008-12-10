@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.697 2008/11/23 20:41:21 ronpinkas Exp $
+ * $Id: hvm.c,v 1.698 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -394,6 +394,16 @@ static void hb_vmDoModuleFunctions( PHB_FUNC_LIST pFunctions )
       pLst = pLst->pNext;
    }
 }
+
+#if !defined( HB_THREAD_SUPPORT )
+
+BOOL hb_vmIsMt( void ) { return FALSE; }
+
+#else
+
+BOOL hb_vmIsMt( void ) { return TRUE; }
+
+#endif
 
 static BYTE * hb_vmUnhideString( BYTE uiType, ULONG ulSize, const BYTE * pSource, ULONG ulBufferSize )
 {

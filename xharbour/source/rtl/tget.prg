@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.147 2008/12/01 00:19:29 modalsist Exp $
+ * $Id: tget.prg,v 1.148 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -51,13 +51,14 @@
  */
 
 #include "hbclass.ch"
+#include "hblang.ch"
+
 #include "color.ch"
 #include "common.ch"
 #include "setcurs.ch"
 #include "getexit.ch"
 #include "inkey.ch"
 #include "button.ch"
-#include "hblang.ch"
 
 /* TODO: :posInBuffer( <nRow>, <nCol> ) --> nPos
          Determines a position within the edit buffer based on screen
@@ -2510,7 +2511,6 @@ RETURN cDate
 
 STATIC FUNCTION BuildGetColor( cColorSpec )
    Local cCur, nClrOth, nClrUns
-   Local aTokens
 
    If ! ValType( cColorSpec ) == "C"
       cColorSpec := Nil                          // Clipper compatibility

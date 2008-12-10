@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.133 2008/06/24 18:07:11 ronpinkas Exp $
+ * $Id: memvars.c,v 1.134 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -484,7 +484,6 @@ ULONG hb_memvarGetPrivatesBase( void )
 
 /*
  * This function releases PRIVATE variables created after passed base
- *
  */
 void hb_memvarSetPrivatesBase( ULONG ulBase )
 {
@@ -766,8 +765,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       }
       else
       {
-         /* assignment to undeclared memvar - PRIVATE is assumed
-          */
+         /* assignment to undeclared memvar - PRIVATE is assumed */
          hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, pItem );
       }
 
@@ -1402,7 +1400,7 @@ static HB_DYNS_FUNC( hb_memvarFindPublicByPos )
  * Both pointers points to existing and used data - they shouldn't be
  * deallocated.
  */
-static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName )
+static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, const char ** pszName )
 {
    HB_THREAD_STUB
 
@@ -1494,20 +1492,11 @@ HB_FUNC( __MVPUBLIC )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
-               HB_ITEM VarItem;
-
-               ( &VarItem )->type = HB_IT_NIL;
+               ULONG j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
-                  hb_arrayGet( pMemvar, j, &VarItem );
-                  hb_memvarCreateFromItem( &VarItem, VS_PUBLIC, NULL );
-
-                  if( HB_IS_COMPLEX( &VarItem ) )
-                  {
-                     hb_itemClear( &VarItem );
-                  }
+                  hb_memvarCreateFromItem( hb_arrayGetItemPtr( pMemvar, j ), VS_PUBLIC, NULL );
                }
             }
             else
@@ -1539,7 +1528,7 @@ HB_FUNC( __MVPRIVATE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
+               ULONG j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
@@ -1575,20 +1564,11 @@ HB_FUNC( __MVXRELEASE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
-               HB_ITEM VarItem;
-
-               ( &VarItem )->type = HB_IT_NIL;
+               ULONG j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
-                  hb_arrayGet( pMemvar, j, &VarItem );
-                  hb_memvarRelease( &VarItem );
-
-                  if( HB_IS_COMPLEX( &VarItem ) )
-                  {
-                     hb_itemClear( &VarItem );
-                  }
+                  hb_memvarRelease( hb_arrayGetItemPtr( pMemvar, j ) );
                }
             }
             else
@@ -1678,7 +1658,7 @@ HB_FUNC( __MVDBGINFO )
    else if( iCount >= 2 )     /* request for a value of variable */
    {
       HB_ITEM_PTR pValue;
-      char * szName;
+      const char * szName;
 
       pValue = hb_memvarDebugVariable( hb_parni( 1 ), hb_parni( 2 ), &szName );
 
@@ -1696,8 +1676,7 @@ HB_FUNC( __MVDBGINFO )
             /* szName points directly to a symbol name - it cannot be released
              */
          }
-
-         hb_itemCopy( hb_stackReturnItem(), pValue );
+         hb_itemReturn( pValue );
          /* pValue points directly to the item structure used by this variable
           * this item cannot be released
           */
@@ -1872,11 +1851,11 @@ HB_FUNC( __MVPUT )
 
 typedef struct
 {
-   char *   pszMask;
-   BOOL     bIncludeMask;
-   BOOL     bLongName;
-   BYTE *   buffer;
-   FHANDLE  fhnd;
+   const char * pszMask;
+   BOOL bIncludeMask;
+   BOOL bLongName;
+   BYTE * buffer;
+   HB_FHANDLE fhnd;
    HB_REGEX regEx;
 } MEMVARSAVE_CARGO;
 
@@ -1885,10 +1864,10 @@ typedef struct
 static HB_DYNS_FUNC( hb_memvarSave )
 {
    HB_THREAD_STUB
-   char * pszMask    = ( ( MEMVARSAVE_CARGO * ) Cargo )->pszMask;
+   const char * pszMask    = ( ( MEMVARSAVE_CARGO * ) Cargo )->pszMask;
    BOOL bIncludeMask = ( ( MEMVARSAVE_CARGO * ) Cargo )->bIncludeMask;
    BYTE * buffer     = ( ( MEMVARSAVE_CARGO * ) Cargo )->buffer;
-   FHANDLE fhnd      = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
+   HB_FHANDLE fhnd   = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
    BOOL bLongName    = ( ( MEMVARSAVE_CARGO * ) Cargo )->bLongName;
    UINT	uMemLen	     = 10;
    UINT	uMLen	     = HB_MEM_REC_LEN;
@@ -1905,7 +1884,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
       */
    }
 
-   /* NOTE: Harbour name lengths are not limited, but the .MEM file
+   /* NOTE: Harbour name lengths are not limited, but the .mem file
             structure is not flexible enough to allow for it.
             [vszakats] */
 
@@ -2475,4 +2454,10 @@ HB_FUNC( __MVSYMBOLINFO )
   hb_arrayNew( &Array, 0 );
   hb_dynsymEval( hb_GetSymbolInfo, ( void * ) &Array );
   hb_itemReturnForward( &Array);
+}
+
+/* debugger function */
+PHB_ITEM hb_memvarGetValueBySym( PHB_DYNS pDynSym )
+{
+   return pDynSym->hMemvar ? hb_memvarGetValueByHandle( pDynSym->hMemvar ) : NULL;
 }

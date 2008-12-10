@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.10 2006/10/15 14:47:45 likewolf Exp $
+ * $Id: dbgtwin.prg,v 1.11 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
          redirection, and is also slower. [vszakats] */
 
 #include "hbclass.ch"
+
 #include "hbmemvar.ch"
 
 #include "box.ch"
@@ -128,28 +129,28 @@ METHOD New( nTop, nLeft, nBottom, nRight, cCaption, cColor ) CLASS HBDbWindow
    ::cCaption := cCaption
    ::cColor   := cColor
 
-return Self
+   RETURN Self
 
 METHOD Clear() CLASS HBDbWindow
-  
+ 
    SetColor( ::cColor )
    Scroll( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
 
-return nil
+   RETURN NIL
 
 METHOD Hide() CLASS HBDbWindow
 
    RestScreen( ::nTop, ::nLeft, ::nBottom + iif( ::lShadow, 1, 0 ),;
                ::nRight + iif( ::lShadow, 2, 0 ), ::cBackImage )
-   ::cBackImage := nil
-   ::lVisible := .f.
+   ::cBackImage := NIL
+   ::lVisible := .F.
 
-return nil
+   RETURN NIL
 
 METHOD IsOver( nRow, nCol ) CLASS HBDbWindow
 
-return nRow >= ::nTop .and. nRow <= ::nBottom .and. ;
-       nCol >= ::nLeft .and. nCol <= ::nRight
+   RETURN nRow >= ::nTop .AND. nRow <= ::nBottom .AND. ;
+          nCol >= ::nLeft .AND. nCol <= ::nRight
 
 METHOD ScrollUp( nLines ) CLASS HBDbWindow
 
@@ -158,242 +159,240 @@ METHOD ScrollUp( nLines ) CLASS HBDbWindow
    SetColor( ::cColor )
    Scroll( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1, nLines )
 
-return nil
+   RETURN NIL
 
 METHOD SetCaption( cCaption ) CLASS HBDbWindow
 
    ::cCaption := cCaption
 
-return nil
-  
+   RETURN NIL
+
 METHOD ShowCaption CLASS HBDbWindow
 
-   if ! Empty( ::cCaption )
-      DispOutAt( ::nTop, ::nLeft + ( ( ::nRight - ::nLeft ) / 2 ) - ;
+   IF ! Empty( ::cCaption )
+      hb_dispOutAt( ::nTop, ::nLeft + ( ( ::nRight - ::nLeft ) / 2 ) - ;
          ( ( Len( ::cCaption ) + 2 ) / 2 ),;
          " " + ::cCaption + " ", ::cColor )
-   endif
+   ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD SetFocus( lOnOff ) CLASS HBDbWindow
-  
-   if ! lOnOff .and. ::bLostFocus != nil
+
+   IF ! lOnOff .AND. ::bLostFocus != NIL
       Eval( ::bLostFocus, Self )
-   endif
+   ENDIF
 
    ::lFocused := lOnOff
 
-   if lOnOff .and. ::bGotFocus != nil
+   IF lOnOff .AND. ::bGotFocus != NIL
       Eval( ::bGotFocus, Self )
-   endif
+   ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD Refresh() CLASS HBDbWindow
 
    DispBegin()
 
-   @ ::nTop, ::nLeft, ::nBottom, ::nRight BOX iif( ::lFocused, B_DOUBLE, B_SINGLE ) ;
-      COLOR ::cColor
-
-   DispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
+   hb_dispBox( ::nTop, ::nLeft, ::nBottom, ::nRight, iif( ::lFocused, B_DOUBLE, B_SINGLE ), ::cColor )
+   hb_dispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
 
    ::ShowCaption( ::cCaption )
 
-   if ::bPainted != nil
+   IF ::bPainted != NIL
       Eval( ::bPainted, Self )
-   endif
-   
+   ENDIF
+
    DispEnd()
 
-return nil
+   RETURN NIL
 
 METHOD Show( lFocused ) CLASS HBDbWindow
    LOCAL nRow := Row()
    LOCAL nCol := Col()
 
    DEFAULT lFocused TO ::lFocused
-   
+
    ::cBackImage := SaveScreen( ::nTop, ::nLeft, ::nBottom + iif( ::lShadow, 1, 0 ),;
-                              ::nRight + iif( ::lShadow, 2, 0 ) )
+                               ::nRight + iif( ::lShadow, 2, 0 ) )
    SetColor( ::cColor )
-   Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight )
+   hb_scroll( ::nTop, ::nLeft, ::nBottom, ::nRight )
    ::SetFocus( lFocused )
 
-   if ::lShadow
+   IF ::lShadow
       hb_Shadow( ::nTop, ::nLeft, ::nBottom, ::nRight )
-   endif
+   ENDIF
 
    ::Refresh()
-   ::lVisible := .t.
+   ::lVisible := .T.
 
    SetPos( nRow, nCol )
 
-return nil
+   RETURN NIL
 
 METHOD ShowModal() CLASS HBDbWindow
 
-   local lExit := .f.
-   local nKey
+   LOCAL lExit := .F.
+   LOCAL nKey
 
-   ::lShadow := .t.
+   ::lShadow := .T.
    ::Show()
 
-   do while ! lExit
+   DO WHILE ! lExit
       nKey := Inkey( 0, INKEY_ALL )
 
-      if ::bKeyPressed != nil
+      IF ::bKeyPressed != NIL
          Eval( ::bKeyPressed, nKey )
-      endif
+      ENDIF
 
-      do case
-      case nKey == K_ESC
-         lExit := .t.
+      DO CASE
+      CASE nKey == K_ESC
+         lExit := .T.
 
-      case nKey == K_LBUTTONDOWN
-         if MRow() == ::nTop .and. MCol() >= ::nLeft + 1 .and. ;
+      CASE nKey == K_LBUTTONDOWN
+         IF MRow() == ::nTop .AND. MCol() >= ::nLeft + 1 .AND. ;
             MCol() <= ::nLeft + 3
-            lExit := .t.
-         endif
-      endcase
-   enddo
+            lExit := .T.
+         ENDIF
+      ENDCASE
+   ENDDO
 
    ::Hide()
 
-return nil
+   RETURN NIL
 
 METHOD LButtonDown( nMRow, nMCol ) CLASS HBDbWindow
 
-   if ::bLButtonDown != nil
+   IF ::bLButtonDown != NIL
       Eval( ::bLButtonDown, nMRow, nMCol )
-   endif
+   ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD LDblClick( nMRow, nMCol ) CLASS HBDbWindow
 
-   if ::bLDblClick != nil
+   IF ::bLDblClick != NIL
       Eval( ::bLDblClick, nMRow, nMCol )
-   endif
+   ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD Move() Class HBDbWindow
 
-   local nOldTop    := ::nTop
-   local nOldLeft   := ::nLeft
-   local nOldBottom := ::nbottom
-   local nOldRight  := ::nright
-   local nKey
+   LOCAL nOldTop    := ::nTop
+   LOCAL nOldLeft   := ::nLeft
+   LOCAL nOldBottom := ::nbottom
+   LOCAL nOldRight  := ::nright
+   LOCAL nKey
 
-   do while .t.
-      RestScreen( ,,,, ::cbackimage )
-      DispBox( ::nTop, ::nLeft, ::nRight, ::nBottom, Replicate( Chr( 176 ), 8 ) + " " )
+   DO WHILE .T.
+      RestScreen( ,,,, ::cBackImage )
+      hb_dispBox( ::nTop, ::nLeft, ::nRight, ::nBottom, Replicate( Chr( 176 ), 8 ) + " " )
 
       nKey := Inkey( 0 )
 
-      do case
-      case nKey == K_UP
+      DO CASE
+      CASE nKey == K_UP
 
-         if ::ntop != 0
-            ::ntop--
-            ::nbottom--
-         endif
+         IF ::nTop != 0
+            ::nTop--
+            ::nBottom--
+         ENDIF
 
-      case nKey == K_DOWN
+      CASE nKey == K_DOWN
 
-         if ::nBottom != MaxRow()
+         IF ::nBottom != MaxRow()
             ::nTop++
             ::nBottom++
-         endif
+         ENDIF
 
-      case nKey == K_LEFT
+      CASE nKey == K_LEFT
 
-         if ::nLeft != 0
+         IF ::nLeft != 0
             ::nLeft--
             ::nRight--
-         endif
+         ENDIF
 
-      case nKey == K_RIGHT
+      CASE nKey == K_RIGHT
 
-         if ::nBottom != MaxRow()
+         IF ::nBottom != MaxRow()
             ::nLeft++
             ::nRight++
-         endif
+         ENDIF
 
-      case nKey == K_ESC
+      CASE nKey == K_ESC
 
          ::nTop    := nOldTop
          ::nLeft   := nOldLeft
          ::nBottom := nOldBottom
          ::nRight  := nOldRight
 
-      endcase
+      ENDCASE
 
-      if nKey == K_ESC .or. nKey == K_ENTER
-         exit
-      endif
-   enddo
+      IF nKey == K_ESC .OR. nKey == K_ENTER
+         EXIT
+      ENDIF
+   ENDDO
 
    // __Keyboard( Chr( 0 ) ), Inkey() )
 
-return nil
+   RETURN NIL
 
 METHOD KeyPressed( nKey ) CLASS HBDbWindow
 
-   if ::bKeyPressed != NIL
+   IF ::bKeyPressed != NIL
       Eval( ::bKeyPressed, nKey, Self )
-   endif
+   ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD LoadColors() CLASS HBDbWindow
 
-   local aClr := __DbgColors()
-  
+   LOCAL aClr := __DbgColors()
+
    ::cColor := aClr[ 1 ]
 
    IF ::Browser != NIL
-      ::Browser:ColorSpec := aClr[ 2 ] + "," + aClr[ 5 ] + "," + aClr[ 3 ]
+      ::Browser:ColorSpec := aClr[ 2 ] + "," + aClr[ 5 ] + "," + aClr[ 3 ] + "," + aClr[ 6 ]
    ENDIF
 
-return nil
+   RETURN NIL
 
 METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS HBDbWindow
 
-   local lShow
-  
-   if ( nTop == NIL .OR. nTop == ::nTop ) .AND. ;
+   LOCAL lShow
+
+   IF ( nTop == NIL .OR. nTop == ::nTop ) .AND. ;
       ( nLeft == NIL .OR. nLeft == ::nLeft ) .AND. ;
       ( nBottom == NIL .OR. nBottom == ::nBottom ) .AND. ;
       ( nRight == NIL .OR. nRight == ::nRight )
-      return Self
-   endif
-  
-   if ( lShow := ::lVisible )
+      RETURN Self
+   ENDIF
+
+   IF ( lShow := ::lVisible )
       ::Hide()
-   endif
+   ENDIF
 
-   if nTop != NIL
+   IF nTop != NIL
       ::nTop := nTop
-   endif
-   if nBottom != NIL
+   ENDIF
+   IF nBottom != NIL
       ::nBottom := nBottom
-   endif
-   if nLeft != NIL
+   ENDIF
+   IF nLeft != NIL
       ::nLeft := nLeft
-   endif
-   if nRight != NIL
+   ENDIF
+   IF nRight != NIL
       ::nRight := nRight
-   endif
-  
-   if ::Browser != NIL
-      ::Browser:Resize( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
-   endif
-  
-   if lShow
-      ::Show( ::lFocused )
-   endif
+   ENDIF
 
-return self
+   IF ::Browser != NIL
+      ::Browser:Resize( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
+   ENDIF
+
+   IF lShow
+      ::Show( ::lFocused )
+   ENDIF
+
+   RETURN self

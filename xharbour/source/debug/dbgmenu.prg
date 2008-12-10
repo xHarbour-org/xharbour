@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.11 2007/08/06 20:30:23 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.12 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -50,7 +50,6 @@
  *
  */
 
-#include "hbclass.ch"
 
 #xcommand MENU [<oMenu>] => [ <oMenu> := ] HBDbMenu():New()
 #xcommand MENUITEM [ <oMenuItem> PROMPT ] <cPrompt> ;

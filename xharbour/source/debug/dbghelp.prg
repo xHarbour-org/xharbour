@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.6 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: dbghelp.prg,v 1.7 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -59,10 +59,11 @@
          the debugger output may interfere with the applications output
          redirection, and is also slower. [vszakats] */
 
+#include "box.ch"
 #include "common.ch"
 #include "inkey.ch"
 
-FUNCTION __dbgHelp( nTopic )
+PROCEDURE __dbgHelp( nTopic )
 
    LOCAL oDlg
    LOCAL cColor := iif( __Dbg():lMonoDisplay, "N/W, W/N, W+/W, W+/N", "N/W, N/BG, R/W, R/BG" )
@@ -75,7 +76,7 @@ FUNCTION __dbgHelp( nTopic )
 
    oBrw := HBDbBrowser():New( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 12 )
    oBrw:Cargo := 1
-   oBrw:AddColumn( TBColumnNew( "", { || aTopics[ oBrw:Cargo ][ 1 ] }, 12 ) )
+   oBrw:AddColumn( HBDbColumnNew( "", { || aTopics[ oBrw:Cargo ][ 1 ] }, 12 ) )
    oBrw:ColorSpec := StrTran( __Dbg():ClrModal(), ", R/W", "" )
    oBrw:SkipBlock := { | nSkip, nOld | nOld := oBrw:Cargo, oBrw:Cargo += nSkip,;
                   oBrw:Cargo := Min( Max( oBrw:Cargo, 1 ), Len( aTopics ) ),;
@@ -92,13 +93,13 @@ FUNCTION __dbgHelp( nTopic )
 
    oDlg:ShowModal()
 
-   RETURN NIL
+   RETURN
 
 STATIC PROCEDURE PaintWindow( oDlg, oBrw, aTopics )
 
-   DispBox( oDlg:nTop + 1, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 13, 1, oDlg:cColor )
-   DispOutAt( oDlg:nTop , oDlg:nLeft + 13 , Chr( 194 ), oDlg:cColor )
-   DispOutAt( oDlg:nBottom , oDlg:nLeft + 13 , Chr( 193 ), oDlg:cColor )
+   hb_dispBox( oDlg:nTop + 1, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 13, B_SINGLE, oDlg:cColor )
+   hb_dispOutAt( oDlg:nTop , oDlg:nLeft + 13 , Chr( 194 ), oDlg:cColor )
+   hb_dispOutAt( oDlg:nBottom , oDlg:nLeft + 13 , Chr( 193 ), oDlg:cColor )
 
    oBrw:ForceStable()
    ShowTopic( oDlg, aTopics, oBrw:Cargo, 0 ) // Start on page 1
@@ -175,8 +176,7 @@ STATIC PROCEDURE ProcessKey( nKey, oDlg, oBrw, aTopics )
 
 STATIC PROCEDURE ShowTopic( oDlg, aTopics, nTopic, nPageOp )
 
-   STATIC s_nPage
-
+   local oDebug := __Dbg()
    LOCAL nRows  := oDlg:nBottom - oDlg:nTop - 1
    LOCAL nPages := Len( aTopics[ nTopic ][ 2 ] ) / nRows
    LOCAL nRowsToPaint
@@ -190,25 +190,25 @@ STATIC PROCEDURE ShowTopic( oDlg, aTopics, nTopic, nPageOp )
       IF nPageOp == -1 .OR. nPageOp == 1
          RETURN
       ENDIF
-      s_nPage := 1
+      oDebug:nHelpPage := 1
    ELSE
       DO CASE
       CASE nPageOp == 0 // Show first page
 
-         s_nPage := 1
+         oDebug:nHelpPage := 1
 
       CASE nPageOp == 1 // Show next page
 
-         IF s_nPage < nPages
-            s_nPage++
+         IF oDebug:nHelpPage < nPages
+            oDebug:nHelpPage++
          ELSE
             RETURN
          ENDIF
 
       CASE nPageOp == -1 // Show prev page
 
-         IF s_nPage > 1
-            s_nPage--
+         IF oDebug:nHelpPage > 1
+            oDebug:nHelpPage--
          ELSE
             RETURN
          ENDIF
@@ -218,16 +218,16 @@ STATIC PROCEDURE ShowTopic( oDlg, aTopics, nTopic, nPageOp )
 
    Scroll( oDlg:nTop + 1, oDlg:nLeft + 14, oDlg:nBottom - 1, oDlg:nRight - 1 )
 
-   nRowsToPaint := Min( nRows, Len( aTopics[ nTopic ][ 2 ] ) - ( ( s_nPage - 1 ) * nRows ) )
+   nRowsToPaint := Min( nRows, Len( aTopics[ nTopic ][ 2 ] ) - ( ( oDebug:nHelpPage - 1 ) * nRows ) )
 
    FOR n := 1 TO nRowsToPaint
-      DispOutAt( 2 + n, 16, aTopics[ nTopic ][ 2 ][ ( ( s_nPage - 1 ) * nRows ) + n ] )
+      hb_dispOutAt( 2 + n, 16, aTopics[ nTopic ][ 2 ][ ( ( oDebug:nHelpPage - 1 ) * nRows ) + n ] )
    NEXT
 
    IF Len( aTopics[ nTopic ][ 2 ] ) <= nRows
-      DispOutAt( oDlg:nBottom, oDlg:nRight - 16, " Page 1 of 1 " )
+      hb_dispOutAt( oDlg:nBottom, oDlg:nRight - 16, " Page 1 of 1 " )
    ELSE
-      DispOutAt( oDlg:nBottom, oDlg:nRight - 16, " Page " + Str( s_nPage, 1 ) + " of " + Str( nPages, 1 ) + " " )
+      hb_dispOutAt( oDlg:nBottom, oDlg:nRight - 16, " Page " + Str( oDebug:nHelpPage, 1 ) + " of " + Str( nPages, 1 ) + " " )
    ENDIF
 
    RETURN
@@ -906,7 +906,7 @@ STATIC FUNCTION GetTopics()
       { "Script files contain debugger commands, in the same",;
         "form they would take as input in the Command window.",;
         "By default, script files use the extension CLD, as in",;
-        "'Myscript.CLD'.",;
+        "'myscript.cld'.",;
         "",;
         "",;
         "Creating a script file:",;
@@ -928,7 +928,7 @@ STATIC FUNCTION GetTopics()
         "",;
         "    CLD @<ScriptName> <ProgName>",;
         "",;
-        "In both of these, the extension '.CLD' will be assumed",;
+        "In both of these, the extension '.cld' will be assumed",;
         "if no extension is supplied.",;
         "",;
         "When reading a script file, the debugger will look",;
@@ -937,17 +937,17 @@ STATIC FUNCTION GetTopics()
         "all directories in the PATH environment variable.",;
         "",;
         "",;
-        "INIT.CLD:",;
+        "init.cld:",;
         "",;
         "On startup (or, if it is linked into a program, when",;
         "it is first invoked), the debugger will look for a",;
-        "script file called INIT.CLD, in the current directory",;
+        "script file called init.cld, in the current directory",;
         "and then, if not found, in the directories specified",;
         "by the PATH environment variable.",;
         "",;
-        "If INIT.CLD is found, the debugger will read it",;
+        "If init.cld is found, the debugger will read it",;
         "automatically. It is useful to place general",;
-        "preferences in INIT.CLD -- specifying colors,",;
+        "preferences in init.cld -- specifying colors,",;
         "turning on the CallStack window, and so on." }
 
    RETURN aTopics
