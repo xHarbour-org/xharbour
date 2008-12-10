@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.30 2008/11/24 06:24:57 andijahja Exp $
+# $Id: compile.mak,v 1.31 2008/11/26 17:13:16 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -831,6 +831,9 @@ $(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbgtcore.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hboutdbg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbntos$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbntos.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hblog.c : $(RTL_DIR)$(DIR_SEP)hblog.prg
