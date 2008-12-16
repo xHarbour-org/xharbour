@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.99 2008/06/20 03:46:26 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.100 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -187,9 +187,6 @@ DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT)
                               };
 
@@ -732,28 +729,9 @@ LANGUAGE_RULES_ARE {
       } \
       else \
       { \
-         char *sClose, cTermLen; \
+         char *sClose; \
          \
-         if( sStart[1] == '\0' ) \
-         { \
-            sClose = strchr( szBuffer, sTerm[0] ); \
-            cTermLen = 1; \
-         } \
-         else \
-         { \
-            sClose = strstr( szBuffer, sTerm ); \
-            \
-            if( sClose == NULL ) \
-            { \
-               szBuffer--; iSize++; \
-               sClose = strchr( szBuffer, ']' ); \
-               cTermLen = 1; \
-            } \
-            else \
-            { \
-               cTermLen = 2; \
-            } \
-         } \
+         sClose = strchr( szBuffer, sTerm[0] ); \
          \
          if( sClose ) \
          { \
@@ -771,7 +749,7 @@ LANGUAGE_RULES_ARE {
             \
             strncpy( sPair, szBuffer, iLen ); \
             sPair[ iLen ] = '\0'; \
-            s_szBuffer = sClose + cTermLen; \
+            s_szBuffer = sClose + 1; \
             iSize -= s_szBuffer - szBuffer; \
             yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
             yylval.valChar.length = iLen; \

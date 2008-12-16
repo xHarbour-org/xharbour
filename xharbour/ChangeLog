@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6307 2008/12/10 09:48:38 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6308 2008/12/10 22:25:14 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-15 23:02 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.slx
+    - Removed support for double letters string containers ['...'] ["..."] and [[...]]
+      as PP now uses E"..." instead
 
 2008-12-08 23:24 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\gtwvt\gtwvt.c
