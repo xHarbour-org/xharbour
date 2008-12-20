@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6308 2008/12/10 22:25:14 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6309 2008/12/16 03:44:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-20 17:32 UTC+0100 Francesco Saverio Giudice <info / at / fsgiudice.com>
+  * source/rtl/dumpvar.prg
+    * Updated new syntax: HB_DumpVar( xVar, lRecursive, nMaxRecursionLevel ) -> cDump
+  * source/rtl/objfunc.prg
+    * Updated to use __SetClassScope() to unblock access to protected class vars
 
 2008-12-15 23:02 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.slx

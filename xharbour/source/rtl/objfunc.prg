@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.19 2004/07/23 01:43:52 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.20 2004/07/26 10:38:07 ronpinkas Exp $
  */
 
 /*
@@ -103,6 +103,7 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
    LOCAL aMessages
    LOCAL aReturn
    LOCAL nFirstProperty, cMsg
+   LOCAL lOldScope := __SetClassScope( .F. )
 
    IF ValType( oObject ) != 'O'
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
@@ -129,6 +130,8 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
       ENDIF
    NEXT
 
+   __SetClassScope( lOldScope )
+
 RETURN aReturn
 
 /*
@@ -141,6 +144,7 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
    LOCAL aMessages
    LOCAL aReturn
    LOCAL nFirstProperty, aMsg
+   LOCAL lOldScope := __SetClassScope( .F. )
 
    IF ValType( oObject ) != 'O'
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
@@ -174,6 +178,8 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
       ENDIF
    NEXT
 
+   __SetClassScope( lOldScope )
+
 RETURN aReturn
 
 FUNCTION __objGetMethodList( oObject, nScope )
@@ -189,6 +195,7 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
    LOCAL aVars
    LOCAL aReturn
    LOCAL cVar
+   LOCAL lOldScope := __SetClassScope( .F. )
 
    IF ValType( oObject ) != 'O'
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
@@ -206,6 +213,8 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
          AAdd( aReturn, { cVar, __objSendMsg( oObject, cVar ) } )
       ENDIF
    NEXT
+
+   __SetClassScope( lOldScope )
 
 RETURN aReturn
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.5 2004/03/03 11:41:10 ronpinkas Exp $
+ * $Id: dumpvar.prg,v 1.6 2008/03/13 10:49:41 likewolf Exp $
  */
 
 /*
@@ -74,17 +74,38 @@ RETURN
  *
  * return a string containing a dump of a variable
  *
+ *
+ * 24/09/2006 - FSG
+ * - Added recursion limit
+ * - Added front function with limited parameters and removed support for TAssociative Array
 */
 
-FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
+FUNCTION HB_DumpVar( xVar, lRecursive, nMaxRecursionLevel )
   LOCAL cType := ValType( xVar )
   LOCAL cString := "", cKey
+  LOCAL nRecursionLevel := 1
+  LOCAL nIndent         := 0
 
   //TraceLog( "HB_DumpVariable: xVar, lAssocAsObj, lRecursive", xVar, lAssocAsObj, lRecursive )
 
-  DEFAULT lAssocAsObj TO FALSE
-  DEFAULT lRecursive  TO FALSE
-  DEFAULT nIndent     TO 0
+  DEFAULT nMaxRecursionLevel TO 0
+
+RETURN __HB_DumpVar( xVar,, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
+
+STATIC FUNCTION __HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
+  LOCAL cType := ValType( xVar )
+  LOCAL cString := "", cKey
+
+  DEFAULT lAssocAsObj        TO FALSE
+  DEFAULT lRecursive         TO FALSE
+
+  //TraceLog( "Recursion: xVar, nRecursionLevel, nMaxRecursionLevel", xVar, nRecursionLevel, nMaxRecursionLevel )
+
+  // return if there is limit in recursion
+  IF nMaxRecursionLevel > 0 .AND. ;
+     nRecursionLevel > nMaxRecursionLevel
+     RETURN AsString( xVar )
+  ENDIF
 
   DO CASE
      CASE cType == "O"
@@ -98,7 +119,7 @@ FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
                     cString += Space( nIndent ) + " '" + cKey + "' => " + asString( xVar:SendKey( cKey ) ) + ", " + CRLF
                     IF lRecursive .AND. ValType( xVar:SendKey( cKey ) ) $ "AOH"
                        cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
-                       cString += hb_DumpVar( xVar:SendKey( cKey ),, lRecursive, nIndent+3 )
+                       cString += __HB_DumpVar( xVar:SendKey( cKey ),, lRecursive, nIndent+3, nRecursionLevel + 1, nMaxRecursionLevel )
                        cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
                     ENDIF
                 NEXT
@@ -109,23 +130,35 @@ FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
              cString += Space( nIndent ) + "<" + xVar:ClassName + " Object>" + CRLF
              cString += Space( nIndent ) + " | " + CRLF
              cString += Space( nIndent ) + " +- PRIVATE/HIDDEN:" + CRLF
-             cString += DShowProperties( xVar, HB_OO_CLSTP_HIDDEN, lRecursive, nIndent )
+             cString += DShowProperties( xVar, HB_OO_CLSTP_HIDDEN, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
              cString += Space( nIndent ) + " +- PROTECTED:" + CRLF
-             cString += DShowProperties( xVar, HB_OO_CLSTP_PROTECTED, lRecursive, nIndent )
+             cString += DShowProperties( xVar, HB_OO_CLSTP_PROTECTED, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
              cString += Space( nIndent ) + " +- EXPORTED/VISIBLE/PUBLIC:" + CRLF
-             cString += DShowProperties( xVar, HB_OO_CLSTP_EXPORTED, lRecursive, nIndent )
+             cString += DShowProperties( xVar, HB_OO_CLSTP_EXPORTED, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
              cString += Space( nIndent ) + " +- PUBLISHED:" + CRLF
-             cString += DShowProperties( xVar, HB_OO_CLSTP_PUBLISHED, lRecursive, nIndent )
+             cString += DShowProperties( xVar, HB_OO_CLSTP_PUBLISHED, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
              cString += Space( nIndent ) + " +----------->" + CRLF
           ENDIF
 
      CASE cType == "A"
-          cString += Space( nIndent ) + "Type='" + cType + "' -> " + CRLF
-          cString += DShowArray( xVar, lRecursive, nIndent )
+          IF nRecursionLevel == 1
+             cString += Space( nIndent ) + "Type='A' -> { Array of " + LTrim( Str( Len( xVar ) ) ) + " Items }" + CRLF
+          ENDIF
+          IF nMaxRecursionLevel > 0 .AND. nRecursionLevel > nMaxRecursionLevel
+             cString += AsString( xVar )
+          ELSE
+             cString += DShowArray( xVar, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
+          ENDIF
 
      CASE cType == "H"
-          cString += Space( nIndent ) + "Type='" + cType + "' -> " + CRLF
-          cString += DShowHash( xVar, lRecursive, nIndent )
+          IF nRecursionLevel == 1
+             cString += Space( nIndent ) + "Type='H' -> { Hash of " + LTrim( Str( Len( xVar ) ) ) + " Items }" + CRLF
+          ENDIF
+          IF nMaxRecursionLevel > 0 .AND. nRecursionLevel > nMaxRecursionLevel
+             cString += AsString( xVar )
+          ELSE
+             cString += DShowHash( xVar, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
+          ENDIF
 
      OTHERWISE
           cString +=  Space( nIndent ) + AsString( xVar ) + CRLF
@@ -133,7 +166,7 @@ FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
 
 RETURN cString
 
-STATIC FUNCTION DShowProperties( oVar, nScope, lRecursive, nIndent )
+STATIC FUNCTION DShowProperties( oVar, nScope, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
   LOCAL xProp, aProps
   LOCAL aMethods, aMth
   LOCAL lOldScope
@@ -152,7 +185,7 @@ STATIC FUNCTION DShowProperties( oVar, nScope, lRecursive, nIndent )
         FOR EACH xProp IN aProps
             cString += Space( nIndent ) + " |  +- " + PadR( xProp[ HB_OO_DATA_SYMBOL ], 20 ) + " [" + DecodeType( xProp[ HB_OO_DATA_TYPE ] ) +  "] [" + DecodeScope( xProp[ HB_OO_DATA_SCOPE ] ) + "] " + ValType( xProp[ HB_OO_DATA_VALUE ] ) + " => " + AsString( xProp[ HB_OO_DATA_VALUE ] ) + CRLF
             IF lRecursive .AND. ValType( xProp[ HB_OO_DATA_VALUE ] ) $ "AO"
-               cString += hb_DumpVar( xProp[ HB_OO_DATA_VALUE ],, lRecursive, nIndent+3 ) + CRLF
+               cString += __HB_DumpVar( xProp[ HB_OO_DATA_VALUE ],, lRecursive, nIndent+3, nRecursionLevel + 1, nMaxRecursionLevel ) + CRLF
             ENDIF
         NEXT
         cString += Space( nIndent ) + " |  +- >> End   Data    ------" + CRLF
@@ -172,7 +205,7 @@ STATIC FUNCTION DShowProperties( oVar, nScope, lRecursive, nIndent )
   ENDIF
 RETURN cString
 
-STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent )
+STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
   LOCAL xVal, nChar
   LOCAL cString := ""
 
@@ -188,7 +221,7 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent )
          cString += Space( nIndent ) + " ["+ LTrim( StrZero( HB_EnumIndex(), nChar ) ) + "] => " + AsString( xVal ) + ", " + CRLF
          IF lRecursive .AND. ValType( xVal ) $ "AOH"
             cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
-            cString += hb_DumpVar( xVal,, lRecursive, nIndent+3 )
+            cString += __HB_DumpVar( xVal,, lRecursive, nIndent+3, nRecursionLevel + 1, nMaxRecursionLevel )
             cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
          ENDIF
      NEXT
@@ -200,8 +233,8 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent )
 
 RETURN cString
 
-STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent )
-  LOCAL xVal, xKey, aKeys
+STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
+  LOCAL xVal, nChar, xKey, aKeys
   LOCAL cString := ""
 
   DEFAULT nIndent TO 0
@@ -216,7 +249,7 @@ STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent )
          cString += Space( nIndent ) + " ["+ LTrim( AsString( xKey ) ) + "] => " + AsString( xVal ) + ", " + CRLF
          IF lRecursive .AND. ValType( xVal ) $ "AOH"
             cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
-            cString += hb_DumpVar( xVal,, lRecursive, nIndent+3 )
+            cString += __HB_DumpVar( xVal,, lRecursive, nIndent+3, nRecursionLevel + 1, nMaxRecursionLevel )
             cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
          ENDIF
      NEXT
