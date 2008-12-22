@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.34 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: hbffind.c,v 1.35 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.34 2008/10/22 08:32:52 marchuet Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.35 2008/11/22 08:25:23 andijahja Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -186,7 +186,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.34 2008/10/22 08:32:52 marchuet Exp $" )
 
 #endif
 
-#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+#if !defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX_COMPATIBLE )
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
@@ -726,7 +726,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       if ( szPath[2] == '\0' )
       {
          // 2004-03-05 Clipper compatibility for Directory( "C:", "V" )
-         szPath[2] = OS_PATH_DELIMITER;
+         szPath[2] = HB_OS_PATH_DELIM_CHR;
       }
 
       if ( GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
@@ -750,7 +750,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       if ( pFileName )
       {
         strcpy(pFileName, pszFileName) ;
-        if ( pFileName[iNameLen-1] == OS_PATH_DELIMITER )  //  '\\'
+        if ( pFileName[iNameLen-1] == HB_OS_PATH_DELIM_CHR )  //  '\\'
         {
           strcat(pFileName,"*.*") ; // 26/01/2004: Clipper compatibility
         }
@@ -811,7 +811,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       {
          strncpy( string, pszFileName, _POSIX_PATH_MAX );
          string[ _POSIX_PATH_MAX ] = '\0';
-         pos = strrchr( string, OS_PATH_DELIMITER );
+         pos = strrchr( string, HB_OS_PATH_DELIM_CHR );
          if( pos )
          {
             strcpy( info->pattern, pos + 1 );
@@ -826,7 +826,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       if ( ! *dirname )
       {
          dirname[ 0 ] = '.';
-         dirname[ 1 ] = OS_PATH_DELIMITER;
+         dirname[ 1 ] = HB_OS_PATH_DELIM_CHR;
          dirname[ 2 ] = '\0';
       }
       strcpy(info->szRootDir, dirname);
@@ -1014,7 +1014,7 @@ void hb_fsFindClose( PHB_FFIND ffind )
 #endif
          hb_xfree( ( void * ) ffind->info );
       }
+
       hb_xfree( ( void * ) ffind );
    }
 }
-

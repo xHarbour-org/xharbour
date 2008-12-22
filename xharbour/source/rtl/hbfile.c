@@ -1,12 +1,12 @@
 /*
- * $Id: philesx.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: hbfile.c 9559 2008-10-06 19:30:27Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * CURDRIVE() function
+ * HB_FILEEXISTS() function
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2007 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,33 +50,21 @@
  *
  */
 
-#include <ctype.h>
-
 #include "hbapi.h"
 #include "hbapifs.h"
-#include "hbapierr.h"
 
-#ifdef HB_COMPAT_XPP
-
-/* NOTE: Xbase++ compatible */
-
-HB_FUNC( CURDRIVE )
+HB_FUNC( HB_FNAMEEXISTS )
 {
-   char szDrive[ 1 ];
-
-   szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
-   hb_retclen( szDrive, 1 );
-
-   if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
-   {
-      while( hb_fsChDrv( ( BYTE )( toupper( *hb_parc( 1 ) ) - 'A' ) ) != 0 )
-      {
-         USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 6001, "Operating system error", HB_ERR_FUNCNAME, 0, EF_CANDEFAULT | EF_CANRETRY, HB_ERR_ARGS_BASEPARAMS );
-
-         if( uiAction != E_RETRY )
-            break;
-      }
-   }
+   hb_retl( hb_fsNameExists( hb_parc( 1 ) ) );
 }
 
-#endif
+HB_FUNC( HB_FILEEXISTS )
+{
+   hb_retl( hb_fsFileExists( hb_parc( 1 ) ) );
+}
+
+HB_FUNC( HB_DIREXISTS )
+{
+   hb_retl( hb_fsDirExists( hb_parc( 1 ) ) );
+}
+

@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.14 2007/10/31 10:56:49 marchuet Exp $
+ * $Id: disk.c,v 1.15 2007/12/29 12:50:55 likewolf Exp $
  */
 /*
  * xHarbour Project source code:
@@ -72,179 +72,156 @@
 
 #if defined(HB_OS_WIN_32)
 
-#include <windows.h>
-#include <winbase.h>
-#include <shellapi.h>
+#   include <windows.h>
+#   include <winbase.h>
+#   include <shellapi.h>
 
-#define HB_OS_WIN_32_USED
+#   define HB_OS_WIN_32_USED
 
 #elif defined(HB_OS_DOS)
 
-#include <dos.h>
+#   include <dos.h>
 
 #endif
 
 
-HB_FUNC ( DELETEFILE )
+HB_FUNC( DELETEFILE )
 {
-
    BYTE * pFileName  = ( BYTE *) hb_parcx( 1 ) ;
-   int iRet;
 
-   if ( hb_fsDelete( (BYTE*) pFileName) )
+   if ( hb_fsDelete( pFileName ) )
    {
-      hb_retni ( 0 );
+      hb_retni( 0 );
    }
    else
    {
-      iRet = (int) hb_fsOsError();
-      hb_retni ( iRet * (-1) );
+      hb_retni( -hb_fsOsError() );
    }
 }
 
-HB_FUNC ( DIRMAKE )
+HB_FUNC( DIRMAKE )
 {
+   BYTE *pFileName = ( BYTE * ) hb_parcx( 1 );
 
-   BYTE * pFileName  = ( BYTE *) hb_parcx( 1 ) ;
-   int iRet;
-
-   if ( hb_fsMkDir( pFileName ) )
+   if( hb_fsMkDir( pFileName ) )
    {
-      hb_retni ( 0 );
+      hb_retni( 0 );
    }
    else
    {
-      iRet = (int) hb_fsOsError();
-      hb_retni ( iRet * (-1) );
+      hb_retni( -hb_fsOsError() );
    }
 }
 
-HB_FUNC ( DIRNAME )
+HB_FUNC( DIRNAME )
 {
-   USHORT uiErrorOld = hb_fsError();
-   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   BYTE *pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
 
-   hb_fsCurDirBuff( hb_fsCurDrv(), pbyBuffer + 1, _POSIX_PATH_MAX  );
-   pbyBuffer[0] = OS_PATH_DELIMITER;
+   pbyBuffer[0] = HB_OS_PATH_DELIM_CHR;
+   hb_fsCurDirBuff( hb_fsCurDrv(), pbyBuffer + 1, _POSIX_PATH_MAX );
 
-   hb_retcAdopt( ( char * ) pbyBuffer );
-
-   hb_fsSetError( uiErrorOld );
+   hb_retc_buffer( ( char * ) pbyBuffer );
 }
 
 
-HB_FUNC ( DRIVETYPE )
+HB_FUNC( DRIVETYPE )
 {
-   #if defined(HB_OS_WIN_32)
-      unsigned int uiType;
-      ULONG ulSize = hb_parclen( 1 ) + 2;  /* allow space for '\0' & ":\" */
-      char * pDrive = (char *) hb_xgrab( ulSize + 1 );
+#if defined(HB_OS_WIN_32)
+   ULONG ulSize = hb_parclen( 1 ) + 2;  /* allow space for '\0' & ":\" */
+   char *pszDrive = ( char * ) hb_xgrab( ulSize + 1 );
+   LPTSTR lpDrive;
+   int iType;
 
-      hb_strncpy( pDrive, (char *) hb_parcx( 1 ), ulSize );
+   hb_strncpy( pszDrive, ( char * ) hb_parcx( 1 ), ulSize );
 
-      if ( strstr( pDrive, ":" ) == NULL )
-      {
-         hb_strncat( pDrive, ":", ulSize ) ;
-      }
+   if( strstr( pszDrive, ":" ) == NULL )
+      hb_strncat( pszDrive, ":", ulSize );
 
-      if ( strstr( pDrive, "\\" ) == NULL )
-      {
-         hb_strncat( pDrive, "\\", ulSize ) ;
-      }
+   if( strstr( pszDrive, "\\" ) == NULL )
+      hb_strncat( pszDrive, "\\", ulSize );
 
-      uiType = GetDriveType( pDrive );
-
-      if ( uiType  == DRIVE_RAMDISK )
-      {
-         hb_retni( 0 );  // RAM Drive - Clipper compatible
-      }
-      else if (uiType == DRIVE_REMOVABLE )
-      {
-         hb_retni( 2 );  // Floppy Drive - Clipper compatible
-      }
-      else if (uiType == DRIVE_FIXED )
-      {
-         hb_retni( 3 );  // Hard Drive  - Clipper compatible
-      }
-      else if (uiType == DRIVE_CDROM )
-      {
-         hb_retni( 4 );  // CD-Rom Drive - xHarbour extension
-      }
-      else if (uiType == DRIVE_REMOTE )
-      {
-         hb_retni( 5 );  // Network Drive - xHarbour extension
-      }
-      else
-      {
-         hb_retni( 9 );  // Unknow Drive - xHarbour extension
-      }
-      hb_xfree( pDrive );
-   #else
-      hb_retni(9);
-   #endif
-
-}
-
-HB_FUNC ( FILEMOVE )
-{
-   BYTE * pSourceFile = ( BYTE *) hb_parcx( 1 );
-   BYTE *  pTargetFile = ( BYTE *) hb_parcx( 2 );
-   int iRet;
-
-   if (hb_fsRename( pSourceFile , pTargetFile ) )
+   lpDrive = HB_TCHAR_CONVTO( pszDrive );
+   switch( GetDriveType( lpDrive ) )
    {
-      hb_retni ( 0 );
+      case DRIVE_RAMDISK:
+         iType = 0;           /* RAM Drive - Clipper compatible */
+         break;
+      case DRIVE_REMOVABLE:
+         iType = 2;           /* Floppy Drive - Clipper compatible */
+         break;
+      case DRIVE_FIXED:
+         iType = 3;           /* Hard Drive  - Clipper compatible */
+         break;
+      case DRIVE_CDROM:
+         iType = 4;           /* CD-Rom Drive - xHarbour extension */
+         break;
+      case DRIVE_REMOTE:
+         iType = 5;           /* Network Drive - xHarbour extension */
+         break;
+      default:
+         iType = 9;           /* Unknow Drive - xHarbour extension */
+         break;
+   }
+   hb_retni( iType );
+   hb_xfree( pszDrive );
+   HB_TCHAR_FREE( lpDrive );
+#else
+   hb_retni( 9 );
+#endif
+
+}
+
+HB_FUNC( FILEMOVE )
+{
+   BYTE * pSourceFile = ( BYTE * ) hb_parcx( 1 );
+   BYTE * pTargetFile = ( BYTE * ) hb_parcx( 2 );
+
+   if ( hb_fsRename( pSourceFile, pTargetFile ) )
+   {
+      hb_retni( 0 );
    }
    else
    {
-      iRet = (int) hb_fsOsError();
-      hb_retni ( iRet * (-1) );
+      hb_retni( -hb_fsOsError() );
    }
 }
 
 
 HB_FUNC( NUMDISKL )
+{
 #if defined( HB_OS_DOS )
 #if defined( __DJGPP__ )
-{
    unsigned cur_drive, n_drives;
 
    _dos_getdrive( &cur_drive );
    _dos_setdrive( cur_drive, &n_drives );
    hb_retni( n_drives );
-}
 #else
-{
    /* should be easily implementable somehow similar to DJGPP */
    hb_retni( 26 );
-}
 #endif
 #elif defined( HB_OS_WIN_32 )
-{
    /* LASTDRIVE does not affect Win32 apps, they always have 26 letters avail */
    hb_retni( 26 );
-}
 #else
-{
    /* For Unix, return the most harmless value... or not? */
    hb_retni( 1 );
-}
 #endif
-
+}
 
 
 /*
  * Volume() depends of the CSETSAFETY() setting and, if is true, does not
  * overwrite an existing label. 
  *
- * Syntax is: Volume("x:test") or Volume("x:\test"), where "x" is the
+ * Syntax is: Volume("X:test") or Volume("X:\test"), where "x" is the
  * any drive letter and "test" will be the new volume name. 
  *
  * Notes:
  * 1) if the drive letter is not suplied, then the current drive will 
  *    be used to change voloume name.
- * 2) if Volume("x:") or Volume("x:\") then the volume name of the drive
- *    "x:" will be erased.
+ * 2) if Volume("X:") or Volume("X:\") then the volume name of the drive
+ *    "X:" will be erased.
  * 3) if Volume("") or Volume() then the volume name of the current drive 
  *   will be erased.
  */
@@ -261,7 +238,7 @@ HB_FUNC( VOLUME )
       BYTE *sDiskName;
       char *sRoot = NULL;
       char *sVolName = NULL;
-      char sRootBuf[3], sVolNameBuf[12];
+      char sRootBuf[4], sVolNameBuf[12];
       BOOL fFree;
 
       if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
@@ -272,12 +249,12 @@ HB_FUNC( VOLUME )
          {
             if( fname->szPath )
             {
-               strncpy( sRootBuf, fname->szPath, 3 );
+               hb_strncpy( sRootBuf, fname->szPath, sizeof( sRootBuf ) - 1 );
                sRoot = sRootBuf;
             }
             if( fname->szName )
             {
-               strncpy( sVolNameBuf, fname->szName, 11 );
+               hb_strncpy( sVolNameBuf, fname->szName, sizeof( sVolNameBuf ) - 1 );
                sVolName = sVolNameBuf;
             }
 
@@ -285,14 +262,23 @@ HB_FUNC( VOLUME )
          }
          else
          {
-            strncpy( sVolNameBuf, ( char * ) sDiskName, 11 );
+            hb_strncpy( sVolNameBuf, ( char * ) sDiskName, sizeof( sVolNameBuf ) - 1 );
             sVolName = sVolNameBuf;
          }
          if( fFree )
             hb_xfree( sDiskName );
       }
 #if defined(HB_OS_WIN_32)
-      bReturn = SetVolumeLabel( sRoot, sVolName );
+      {
+         LPTSTR lpRoot, lpVolName;
+         lpRoot = sRoot ? HB_TCHAR_CONVTO( sRoot ) : NULL;
+         lpVolName = sVolName ? HB_TCHAR_CONVTO( sVolName ) : NULL;
+         bReturn = SetVolumeLabel( lpRoot, lpVolName );
+         if( lpRoot )
+            HB_TCHAR_FREE( lpRoot );
+         if( lpVolName )
+            HB_TCHAR_FREE( lpVolName );
+      }
 #endif
    }
    hb_retl( bReturn );
@@ -301,33 +287,30 @@ HB_FUNC( VOLUME )
 /*
  * GetVolInfo() is a new function. It returns the volume name of a Floppy, CD,
  * Hard-disk or mapped network drive.
- * Sintax is: GetVolInfo("x:\")
+ * Syntax is: GetVolInfo("X:\")
  * Note that the trailing backslash is required.
  */
 HB_FUNC( GETVOLINFO )
 {
 #if defined(HB_OS_WIN_32)
-    int iretval;
-    char * sDrive = hb_parcx(1);
-    char sVolName[255];
+   int iretval;
+   char *sDrive = hb_parcx( 1 ), *sVolName;
+   TCHAR lpVolName[256];
+   LPTSTR lpDrive;
 
-    if ( sDrive[0] == 0 )
-    {
-       sDrive = NULL;
-    }
-    iretval = GetVolumeInformation( sDrive,
-                                    sVolName,
-                                    256,
-                                    NULL,
-                                    NULL,
-                                    NULL,
-                                    NULL,
-                                    0 );
+   lpDrive = sDrive[0] ? HB_TCHAR_CONVTO( sDrive ) : NULL;
+   iretval = GetVolumeInformation( lpDrive, lpVolName, 256, NULL, NULL, NULL, NULL, 0 );
+   if( lpDrive )
+      HB_TCHAR_FREE( lpDrive );
 
-    if ( iretval!=0 )
-       hb_retc( sVolName );
-    else
-       hb_retc("");
+   if( iretval != 0 )
+   {
+      sVolName = HB_TCHAR_CONVFROM( lpVolName );
+      hb_retc( sVolName );
+      HB_TCHAR_FREE( sVolName );
+   }
+   else
+      hb_retc( NULL );
 #endif
 }
 
@@ -336,64 +319,65 @@ HB_FUNC( GETVOLINFO )
  * floppy, Hard-disk, CD or mapped network drive. The return value is a dword
  * type. If the drive is not available, volserial() returns -1.
  *
- * Sintax is: VolSerial("x:\")
+ * Sintax is: VolSerial("X:\")
  * Note that the trailing backslash is required.
  *
  * To convert in the hex format, call numtohex() function. 
- * Example: numtohex( volserial("c:\")). 
+ * Example: numtohex( volserial("C:\")). 
  * See volser.prg in xharbour\tests\cttest folder.
  */
 
 HB_FUNC( VOLSERIAL )
 {
 #if defined(HB_OS_WIN_32)
-    int retval;
-    char * sDrive = hb_parcx(1);
-    DWORD dSerial;
+   int retval;
+   char *sDrive = hb_parcx( 1 );
+   LPTSTR lpDrive;
+   DWORD dSerial;
 
-    if ( sDrive[0] == 0 )
-    {
-       sDrive = NULL;
-    }
-    retval = GetVolumeInformation( sDrive,     // RootPathName
-                                   NULL,       // VolumeName
-                                   0,          // VolumeNameSize
-                                   &dSerial,   // VolumeSerialNumber
-                                   NULL,       // MaxComponentLength
-                                   NULL,       // FileSystemFlags
-                                   NULL,       // FileSystemName
-                                   0 );        // FileSystemSize
+   lpDrive = sDrive[0] ? HB_TCHAR_CONVTO( sDrive ) : NULL;
+   retval = GetVolumeInformation( lpDrive,      /* RootPathName */
+                                  NULL,         /* VolumeName */
+                                  0,            /* VolumeNameSize */
+                                  &dSerial,     /* VolumeSerialNumber */
+                                  NULL,         /* MaxComponentLength */
+                                  NULL,         /* FileSystemFlags */
+                                  NULL,         /* FileSystemName */
+                                  0 );          /* FileSystemSize */
+   if( lpDrive )
+      HB_TCHAR_FREE( lpDrive );
 
-    if ( retval!=0 )
-       hb_retnll( dSerial );
-    else
-       hb_retni(-1);
+   if( retval != 0 )
+      hb_retnint( dSerial );
+   else
+      hb_retni( -1 );
 #endif
 }
 
 HB_FUNC( TRUENAME )
 {
+   char *szFile = hb_parc( 1 );
 
-   if( ISCHAR(1) )
+   if( szFile )
    {
-      char * szFile = hb_parc( 1 );
 #ifdef HB_OS_WIN_32
-      char *szBuffRet = NULL ;
-      char buffer[ MAX_PATH + 1 ] = {0};
+      char *szBuffRet;
+      TCHAR buffer[MAX_PATH + 1] = { 0 };
+      LPTSTR lpFile;
 
-      GetFullPathName( (LPCSTR) szFile,
-                            MAX_PATH ,
-                            (LPSTR) buffer ,
-                            &szBuffRet
-                          )  ;
-      hb_retc( buffer );
+      lpFile = HB_TCHAR_CONVTO( szFile );
+      GetFullPathName( lpFile, MAX_PATH, buffer, NULL );
+      HB_TCHAR_FREE( lpFile );
+
+      szBuffRet = HB_TCHAR_CONVFROM( buffer );
+      hb_retc( szBuffRet );
+      HB_TCHAR_FREE( szBuffRet );
 #else
       hb_retc( szFile );
 #endif
    }
    else
    {
-      hb_retc("");
+      hb_retc_null();
    }
-   
 }

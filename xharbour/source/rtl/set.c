@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.92 2008/11/05 03:03:16 walito Exp $
+ * $Id: set.c,v 1.93 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -262,7 +262,7 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
    /* Create full filename */
 
    szPrnFile = path;
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX_COMPATIBLE)
    bPipe = set_specifier == HB_SET_PRINTFILE && file_name[ 0 ] == '|';
    if( bPipe )
    {
@@ -1639,7 +1639,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DELIMCHARS = hb_strdup( "::" );
    hb_set.HB_SET_DELIMITERS = FALSE;
    hb_set.HB_SET_DEVICE = hb_strdup( "SCREEN" );
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX_COMPATIBLE)
    hb_set.HB_SET_EOF = FALSE;
 #else
    hb_set.HB_SET_EOF = TRUE;
@@ -1682,7 +1682,7 @@ void hb_setInitialize( void )
 
    hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
-   hb_set.HB_SET_DIRSEPARATOR = OS_PATH_DELIMITER;
+   hb_set.HB_SET_DIRSEPARATOR = HB_OS_PATH_DELIM_CHR;
    hb_set.HB_SET_VIDEOMODE = 0;
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.HB_SET_DBFLOCKSCHEME = 0;

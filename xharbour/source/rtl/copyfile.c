@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.7 2008/06/21 00:16:03 ronpinkas Exp $
+ * $Id: copyfile.c,v 1.8 2008/07/17 20:11:10 lculik Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 
 #include "hbapi.h"
 #include "hbapierr.h"
-#include "hbapifs.h"
 #include "hbapiitm.h"
+#include "hbapifs.h"
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX_COMPATIBLE)
    #include <sys/stat.h>
    #include <unistd.h>
 #elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
@@ -100,7 +100,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 
       if( fhndDest != FS_ERROR )
       {
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX_COMPATIBLE)
          struct stat struFileInfo;
          int iSuccess = fstat( fhndSource, &struFileInfo );
 #elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
@@ -145,7 +145,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
             hb_evalRelease( &info );
          }
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX_COMPATIBLE)
          if( iSuccess == 0 )
             fchmod( fhndDest, struFileInfo.st_mode );
 #elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )

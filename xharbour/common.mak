@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.33 2008/11/26 17:13:16 marchuet Exp $
+# $Id: common.mak,v 1.34 2008/12/10 00:47:31 likewolf Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -245,6 +245,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbcrc32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrypt$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbffind$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbfile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbhex2n$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbmd5$(OBJEXT)\

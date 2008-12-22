@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.23 2006/09/08 11:42:28 snaiperis Exp $
+ * $Id: hbi18n.c,v 1.24 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -175,7 +175,7 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
 
       sprintf( path, "%s%c%s.%s",
             i18n_dir,
-            OS_PATH_DELIMITER,
+            HB_OS_PATH_DELIM_CHR,
             language,
             HB_I18N_TAB_EXT );
    }

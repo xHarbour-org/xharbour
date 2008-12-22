@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.12 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: hbcc.prg,v 1.13 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -230,7 +230,7 @@ HB_FUNC_STATIC( HB_INT_CSINIT )
    {
       cspath=(BYTE *) hb_xgrab(3);
       cspath[0]='.';
-      cspath[1]=OS_PATH_DELIMITER;
+      cspath[1]=HB_OS_PATH_DELIM_CHR;
       cspath[2]='\0';
    }
 
@@ -238,16 +238,16 @@ HB_FUNC_STATIC( HB_INT_CSINIT )
    {
       cspath=(BYTE *) hb_xrealloc(cspath,3);
       cspath[0]='.';
-      cspath[1]=OS_PATH_DELIMITER;
+      cspath[1]=HB_OS_PATH_DELIM_CHR;
       cspath[2]='\0';
    }
 
    i=strlen((char*) cspath);
 
-   if (cspath[i-1]!=OS_PATH_DELIMITER)
+   if (cspath[i-1]!=HB_OS_PATH_DELIM_CHR)
    {
       cspath=(BYTE *) hb_xrealloc(cspath,i+2);
-      cspath[i]=OS_PATH_DELIMITER;
+      cspath[i]=HB_OS_PATH_DELIM_CHR;
       cspath[i+1]='\0';
    }
 }

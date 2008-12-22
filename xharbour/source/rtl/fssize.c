@@ -1,6 +1,6 @@
 
 /*
- * $Id: fssize.c,v 1.7 2007/12/19 13:15:22 lculik Exp $
+ * $Id: fssize.c,v 1.8 2007/12/23 19:15:16 enricomaria Exp $
  */
 
 /*
@@ -59,10 +59,12 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#if !defined(HB_WINCE)
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#endif
 
-#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+#if !defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX_COMPATIBLE )
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
@@ -75,39 +77,50 @@
    #endif
 #endif
 
+
 HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 {
-   //ULONG ulRet = 0;
-
    if( bUseDirEntry )
    {
-   #if defined( HB_USE_LARGEFILE64 )
+#if defined(HB_WINCE)
+      BOOL fFree;
+      PHB_FFIND ffind;
+      pszFileName = hb_fsNameConv( pszFileName, &fFree );
+      ffind = hb_fsFindFirst( ( char * ) pszFileName, HB_FA_ALL );
+      if( fFree )
+         hb_xfree( pszFileName );
+      hb_fsSetIOError( ffind != NULL, 0 );
+      if( ffind )
+      {
+         HB_FOFFSET size = ffind->size;
+         hb_fsFindClose( ffind );
+         return size;
+      }
+#elif defined( HB_USE_LARGEFILE64 )
       BOOL fResult, fFree;
       struct stat64 statbuf;
       pszFileName = hb_fsNameConv( pszFileName, &fFree );
       fResult = stat64( ( char * ) pszFileName, &statbuf ) == 0;
+      hb_fsSetIOError( fResult, 0 );
       if( fFree )
          hb_xfree( pszFileName );
-      hb_fsSetIOError( fResult, 0 );
       if( fResult )
          return ( HB_FOFFSET ) statbuf.st_size;
-   #else
-
+#else
       BOOL fResult, fFree;
       struct stat statbuf;
       pszFileName = hb_fsNameConv( pszFileName, &fFree );
       fResult = stat( ( char * ) pszFileName, &statbuf ) == 0;
+      hb_fsSetIOError( fResult, 0 );
       if( fFree )
          hb_xfree( pszFileName );
-      hb_fsSetIOError( fResult, 0 );
       if( fResult )
          return ( HB_FOFFSET ) statbuf.st_size;
 #endif
-
    }
    else
    {
-      FHANDLE hFileHandle = hb_fsOpen( pszFileName, 0 );
+      HB_FHANDLE hFileHandle = hb_fsOpen( pszFileName, 0 );
 
       if( hFileHandle != FS_ERROR )
       {
@@ -121,12 +134,8 @@ HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
    return 0;
 }
 
-#ifdef HB_EXTENSION
-
 HB_FUNC( HB_FSIZE )
 {
-   hb_retnint( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parcx( 1 ),
-                                       ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
+   hb_retnint( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parc( 1 ),
+                                    ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
 }
-
-#endif

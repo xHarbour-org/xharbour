@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.79 2008/12/03 12:18:06 modalsist Exp $
+# $Id: Makefile,v 1.80 2008/12/10 00:47:31 likewolf Exp $
 #
 
 ROOT = ../../
@@ -31,7 +31,7 @@ C_SOURCES=\
 	empty.c      \
 	error.c      \
 	file.c       \
-        filebuf.c    \
+	filebuf.c    \
 	filehb.c     \
 	filestat.c   \
 	filesys.c    \
@@ -59,6 +59,7 @@ C_SOURCES=\
 	hbcrc32.c    \
 	hbcrypt.c    \
 	hbffind.c    \
+	hbfile.c     \
 	hbgtcore.c   \
 	hbhex2n.c    \
 	hbmd5.c      \
@@ -84,11 +85,11 @@ C_SOURCES=\
 	memofile.c   \
 	txtline.c    \
 	minmax.c     \
-	mod.c        \
-	mouseapi.c   \
-	mouse53.c    \
-	mousex.c     \
 	mlcfunc.c    \
+	mod.c        \
+	mouse53.c    \
+	mouseapi.c   \
+	mousex.c     \
 	mtran.c      \
 	natmsg.c     \
 	net.c        \

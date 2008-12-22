@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.106 2008/10/29 12:10:51 marchuet Exp $
+ * $Id: hbdefs.h,v 1.107 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -1153,7 +1153,7 @@ typedef unsigned long HB_COUNTER;
  * - GCC on Linux
  * - 06/nov/2004 - <maurilio.longo@libero.it>
  *                 GCC on OS/2 needs this definition, I've found it playing with harbour.dll on OS/2
- *                 Right now I've simply commented out && !defined(HARBOUR_GCC_OS2), to be removed
+ *                 Right now I've simply commented out && !defined(HB_OS_OS2_GCC), to be removed
  *                 if there are no problems in the near future.
  *
  * By default we are using automatic lookup (symbol not defined)
@@ -1167,7 +1167,7 @@ typedef unsigned long HB_COUNTER;
  *                 Most MinGW versions still need it, including some 3.4.5 builds.
  */
 #if ( defined(__WATCOMC__) && (__WATCOMC__<1220) ) || \
-    ( defined(__GNUC__) && !defined(__DJGPP__) /* && !defined(HARBOUR_GCC_OS2)*/ )
+    ( defined(__GNUC__) && !defined(__DJGPP__) /* && !defined(HB_OS_OS2_GCC)*/ )
    #define HARBOUR_START_PROCEDURE "MAIN"
 #endif
 

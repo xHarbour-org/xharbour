@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.18 2008/01/14 12:44:33 walito Exp $
+ * $Id: hbpp.c,v 1.19 2008/01/15 10:13:45 marchuet Exp $
  */
 
 /*
@@ -254,7 +254,7 @@ int main( int argc, char * argv[] )
         char * pDelim;
 
         pPath = szInclude = hb_strdup( szInclude );
-        while( ( pDelim = strchr( pPath, OS_PATH_LIST_SEPARATOR ) ) != NULL )
+        while( ( pDelim = strchr( pPath, HB_OS_PATH_LIST_SEP_CHR ) ) != NULL )
           {
             *pDelim = '\0';
             AddSearchPath( pPath, &hb_comp_pIncludePath );
@@ -692,3 +692,4 @@ PINLINE   hb_compInlineAdd( char * szFunName )
 
 /* Needed for trace */
 BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
+int hb_setGetDirSeparator( void ) { return HB_OS_PATH_DELIM_CHR; }

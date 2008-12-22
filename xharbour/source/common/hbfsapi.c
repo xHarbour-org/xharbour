@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.18 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: hbfsapi.c,v 1.19 2008/12/03 20:11:54 marchuet Exp $
  */
 
 /*
@@ -60,14 +60,23 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hb_io.h"
-#include "hbexemem.h"
-#if !defined( HB_WIN32_IO )
-   #include <errno.h>
-#endif
-#if defined(__GNUC__) || defined(HB_OS_UNIX)
+#include "hbset.h"
+
+#if defined( HB_OS_WIN_32 )
+   #if !defined( INVALID_FILE_ATTRIBUTES )
+      #define INVALID_FILE_ATTRIBUTES     ( ( DWORD ) -1 )
+   #endif
+   #if !defined( FILE_ATTRIBUTE_DEVICE )
+      #define FILE_ATTRIBUTE_DEVICE       0x00000040
+   #endif
+#elif defined( HB_OS_OS2 )
+   #include <os2.h>
+   #include <stdio.h>
+#elif defined( HB_OS_UNIX )
    #include <sys/types.h>
    #include <sys/stat.h>
-   #include <fcntl.h>
+#endif
+#if !defined( HB_WIN32_IO )
    #include <errno.h>
 #endif
 
@@ -75,13 +84,6 @@
          it will do it. [vszakats] */
 extern void hb_fhnd_ForceLink( void );
 
-#ifndef INVALID_FILE_ATTRIBUTES
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-#endif
-
-#ifndef FILE_ATTRIBUTE_DEVICE
-#define FILE_ATTRIBUTE_DEVICE               0x00000040
-#endif
 /*
  * Function that adds zero or more paths to a list of pathnames to search
  */
@@ -97,7 +99,7 @@ void hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList )
    }
 
    pPath = hb_strdup( szPath );
-   while( ( pDelim = strchr( pPath, OS_PATH_LIST_SEPARATOR ) ) != NULL )
+   while( ( pDelim = strchr( pPath, HB_OS_PATH_LIST_SEP_CHR ) ) != NULL )
    {
       *pDelim = '\0';
       *pSearchList = ( HB_PATHNAMES * ) hb_xgrab( sizeof( HB_PATHNAMES ) );
@@ -138,7 +140,7 @@ void hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList )
 PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
 {
    PHB_FNAME pFileName;
-   char * pszPos;
+   char * pszPos, cDirSep;
    int iSize, iPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameSplit(%s)", pszFileName));
@@ -146,6 +148,7 @@ PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
    HB_TRACE(HB_TR_INFO, ("hb_fsFNameSplit: Filename: |%s|\n", pszFileName));
 
    iPos = iSize = hb_strnlen( pszFileName, _POSIX_PATH_MAX );
+   cDirSep = ( char ) hb_setGetDirSeparator();
 
    /* Grab memory, set defaults */
    pFileName = ( PHB_FNAME ) hb_xgrab( sizeof( HB_FNAME ) );
@@ -160,7 +163,8 @@ PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
 
    while( --iPos >= 0 )
    {
-      if( strchr( OS_PATH_DELIMITER_LIST, pszFileName[ iPos ] ) )
+      if( pszFileName[ iPos ] == cDirSep ||
+          strchr( HB_OS_PATH_DELIM_CHR_LIST, pszFileName[ iPos ] ) )
       {
          pFileName->szPath = pszPos;
          hb_strncpy( pszPos, pszFileName, iPos + 1 );
@@ -219,33 +223,35 @@ PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
    return pFileName;
 }
 
-/* NOTE: szFileName buffer must be at least _POSIX_PATH_MAX long */
+/* NOTE: szFileName buffer must be at least _POSIX_PATH_MAX + 1 long.
+ *       Because some freign code may not be updated yet then
+ *       hb_fsFNameMerge() efectively uses only _POSIX_PATH_MAX buffer
+ *       but it will be changed in the future.
+ */
 
 /* This function joins path, name and extension into a string with a filename */
 char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 {
-   static char s_szPathSep[] = { OS_PATH_DELIMITER, 0 }; /* see NOTE below */
    const char * pszName;
+   char cDirSep;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameMerge(%p, %p)", pszFileName, pFileName));
+
+   /* dir separator set by user */ 
+   cDirSep = ( char ) hb_setGetDirSeparator();
 
    /* Set the result to an empty string */
    pszFileName[ 0 ] = '\0';
 
    /* Strip preceding path separators from the filename */
    pszName = pFileName->szName;
-   if( pszName && pszName[ 0 ] != '\0' && strchr( OS_PATH_DELIMITER_LIST, pszName[ 0 ] ) != NULL )
+   if( pszName && pszName[ 0 ] != '\0' && ( pszName[ 0 ] == cDirSep ||
+       strchr( HB_OS_PATH_DELIM_CHR_LIST, pszName[ 0 ] ) != NULL ) )
       pszName++;
 
    /* Add path if specified */
    if( pFileName->szPath )
       hb_strncat( pszFileName, pFileName->szPath, _POSIX_PATH_MAX - 1 );
-
-   /*
-      NOTE: be _very_ careful about "optimizing" this next section code!
-            (specifically, initialising s_szPathSep) as MSVC with /Ni
-            (or anything that infers it like /Ox) will cause you trouble.
-    */
 
    /* If we have a path, append a path separator to the path if there
       was none. */
@@ -253,16 +259,11 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
    {
       int iLen = strlen( pszFileName ) - 1;
 
-      if( strchr( OS_PATH_DELIMITER_LIST, pszFileName[ iLen ] ) == NULL )
+      if( iLen < _POSIX_PATH_MAX - 2 && pszFileName[ iLen ] != cDirSep &&
+          strchr( HB_OS_PATH_DELIM_CHR_LIST, pszFileName[ iLen ] ) == NULL )
       {
-         /*
-             char s_szPathSep[ 2 ];
-
-             s_szPathSep[ 0 ] = OS_PATH_DELIMITER;
-             s_szPathSep[ 1 ] = '\0';
-
-          */
-         hb_strncat( pszFileName, s_szPathSep, _POSIX_PATH_MAX - 1 );
+         pszFileName[ iLen + 1 ] = HB_OS_PATH_DELIM_CHR;
+         pszFileName[ iLen + 2 ] = '\0';
       }
    }
 
@@ -288,6 +289,57 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
    HB_TRACE(HB_TR_INFO, ("hb_fsFNameMerge: Filename: |%s|\n", pszFileName));
 
    return pszFileName;
+}
+
+BOOL hb_fsNameExists( const char * pszFileName )
+{
+   BOOL fExist;
+   BOOL fFree;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsNameExists(%p)", pszFileName));
+
+   if( pszFileName == NULL )
+      return FALSE;
+
+   pszFileName = ( char * ) hb_fsNameConv( ( BYTE * ) pszFileName, &fFree );
+
+#if defined( HB_OS_DOS )
+   {
+#if defined( __DJGPP__ ) || defined(__BORLANDC__)
+      fExist = _chmod( pszFileName, 0, 0 ) != -1;
+#else
+      unsigned int iAttr = 0;
+      fExist = _dos_getfileattr( pszFileName, &iAttr ) == 0;
+#endif
+   }
+#elif defined( HB_OS_WIN_32 )
+   {
+      fExist = ( GetFileAttributesA( pszFileName ) != INVALID_FILE_ATTRIBUTES );
+   }
+#elif defined( HB_OS_OS2 )
+   {
+      FILESTATUS3 fs3;
+      fExist = DosQueryPathInfo( ( PCSZ ) pszFileName, FIL_STANDARD,
+                                 &fs3, sizeof( fs3 ) ) == NO_ERROR;
+   }
+#elif defined( HB_OS_UNIX )
+   {
+      struct stat statbuf;
+
+      fExist = stat( pszFileName, &statbuf ) == 0;
+   }
+#else
+   {
+      int TODO; /* To force warning */
+
+      fExist = FALSE;
+   }
+#endif
+
+   if( fFree )
+      hb_xfree( ( void * ) pszFileName );
+
+   return fExist;
 }
 
 BOOL hb_fsFileExists( const char * pszFileName )

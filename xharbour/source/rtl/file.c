@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.20 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: file.c,v 1.21 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ BOOL hb_fsFile( BYTE * pFilename )
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
    iFileName = strlen( (char*) pFilename ) ;
-   if ( iFileName && pFilename[iFileName-1] != OS_PATH_DELIMITER ) // A directory cannot possibly be a FILE
+   if ( iFileName && pFilename[iFileName-1] != HB_OS_PATH_DELIM_CHR ) // A directory cannot possibly be a FILE
    {                                                               // so only do this is the last char is not
                                                                    // a directory separator character
      if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
@@ -118,7 +118,7 @@ BOOL hb_fsIsDirectory( BYTE * pFilename )
        {
          bResult = TRUE;
        }
-       else if ( pFilename[iFileName-1] == OS_PATH_DELIMITER )
+       else if ( pFilename[iFileName-1] == HB_OS_PATH_DELIM_CHR )
        {
          bResult = TRUE;
        }

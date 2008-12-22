@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.64 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: direct.c,v 1.65 2008/12/07 14:55:04 ronpinkas Exp $
  */
 
 /*
@@ -95,12 +95,14 @@
  * TOFIX:- Volume label support
  *
  */
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbregex.h"
 #include "hbtrace.h"
+
 #include "directry.ch"
 
 static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
@@ -222,7 +224,7 @@ void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bD
    }
    else
    {
-      szDirSpec = (BYTE *) OS_FILE_MASK;
+      szDirSpec = (BYTE *) HB_OS_ALLFILE_MASK;
    }
 
    if( bDirOnly || bFullPath )
@@ -302,7 +304,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
-            char *szSubdir = hb_xstrcpy( NULL, szEntry, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
+            char *szSubdir = hb_xstrcpy( NULL, szEntry, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
             HB_ITEM_NEW( SubDir );
 
             hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
@@ -315,7 +317,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
          }
          else
          {
-            char *sFileName = strrchr( szEntry, OS_PATH_DELIMITER );
+            char *sFileName = strrchr( szEntry, HB_OS_PATH_DELIM_CHR );
 
             if( sFileName == NULL )
             {
@@ -378,7 +380,7 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
    {
       char sRoot[2];
 
-      sRoot[0] = OS_PATH_DELIMITER;
+      sRoot[0] = HB_OS_PATH_DELIM_CHR;
       sRoot[1] = '\0';
 
       hb_fsChDrv( (BYTE ) cCurDsk );
@@ -400,7 +402,7 @@ HB_FUNC( DIRECTORYRECURSE )
    PHB_FNAME fDirSpec;
    HB_ITEM_NEW( Dir );
    char *szFName = NULL;
-#if defined( OS_HAS_DRIVE_LETTER )
+#if defined( HB_OS_HAS_DRIVE_LETTER )
    BOOL bAddDrive = TRUE;
 #endif
    char *szAttributes;
@@ -426,7 +428,7 @@ HB_FUNC( DIRECTORYRECURSE )
 
       if( ( fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value ) ) != NULL )
       {
-#if defined( OS_HAS_DRIVE_LETTER )
+#if defined( HB_OS_HAS_DRIVE_LETTER )
          if( fDirSpec->szDrive == NULL )
          {
             char szDrive[1];
@@ -447,15 +449,15 @@ HB_FUNC( DIRECTORYRECURSE )
             #endif
          }
 
-#if defined( OS_HAS_DRIVE_LETTER )
+#if defined( HB_OS_HAS_DRIVE_LETTER )
          if( bAddDrive )
          {
             char *szDrvDelim[2];
 
-            szDrvDelim[ 0 ] = (char *) OS_DRIVE_DELIMITER;
+            szDrvDelim[ 0 ] = (char *) HB_OS_DRIVE_DELIM_CHR;
             szDrvDelim[ 1 ] = '\0';
 
-            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, OS_PATH_DELIMITER_STRING, fDirSpec->szPath, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, HB_OS_PATH_DELIM_CHR_STRING, fDirSpec->szPath, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
          }
          else
 #endif
@@ -470,7 +472,7 @@ HB_FUNC( DIRECTORYRECURSE )
 	    char szDMCBug[1];
 	    sprintf( szDMCBug, "%s", "" );
 #endif
-            szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, OS_FILE_MASK, NULL );
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, HB_OS_ALLFILE_MASK, NULL );
          }
 
          szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );

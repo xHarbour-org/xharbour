@@ -1,5 +1,5 @@
 /*
- * $Id: hb_io.h,v 1.2 2005/01/10 18:45:33 druzus Exp $
+ * $Id: hb_io.h,v 1.3 2007/12/30 17:49:06 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #ifndef HB__IO_H_
 #define HB__IO_H_
 
-#if defined(OS_UNIX_COMPATIBLE) || \
+#if defined(HB_OS_UNIX_COMPATIBLE) || \
     ( defined(__GNUC__) && ! defined(__MINGW32__) )
    #include <unistd.h>
    #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(__EMX__)

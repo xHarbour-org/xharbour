@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.10 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: hbcy.c,v 1.11 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -330,7 +330,7 @@ static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
             {
                l=1;
 
-               // if (OS_EOL_LEN==2)
+               // if (HB_OS_EOL_LEN==2)
                   // dststr[dstlen++]='\r';
 
                dststr[dstlen++]='\n';
@@ -343,7 +343,7 @@ static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
             if ((l++)%yy_len==0)
             {
                l=1;
-               dstlen+=OS_EOL_LEN;
+               dstlen+=HB_OS_EOL_LEN;
             }
             dstlen+=2;
          }
@@ -362,13 +362,13 @@ static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
          if (dststr)
          {
-            // if (OS_EOL_LEN==2)
+            // if (HB_OS_EOL_LEN==2)
             //   dststr[dstlen++]='\r';
 
             dststr[dstlen++]='\n';
          }
          else
-            dstlen+=OS_EOL_LEN;
+            dstlen+=HB_OS_EOL_LEN;
       }
    }
    return dstlen;

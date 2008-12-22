@@ -90,7 +90,7 @@ BOOL hb_PrinterExists( LPTSTR pPrinterName )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_PrinterExists(%s)", pPrinterName));
 
-   if (!strchr( pPrinterName, OS_PATH_LIST_SEPARATOR )
+   if (!strchr( pPrinterName, HB_OS_PATH_LIST_SEP_CHR )
       && !hb_isLegacyDevice( pPrinterName ) )
 
    {  // Don't bother with test if '\' in string

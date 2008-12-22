@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.16 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: gencobj.c,v 1.17 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -29,9 +29,6 @@
 #include "hbcomp.h"
 #include "hb_io.h"
 
-/* Prototype */
-static char * hb_searchpath( const char *, char *, char * );
-
 
 
 /* QUESTION: Allocate buffer dynamically ? */
@@ -40,6 +37,51 @@ static char * hb_searchpath( const char *, char *, char * );
 #include "hbexemem.h"
 
 /*--------------------------------------------------------------------------*/
+
+static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg )
+{
+   char * pszPath;
+   BOOL bFound = FALSE;
+
+   /* Check current dir first  */
+   if( hb_fsFileExists( ( const char * ) pszFile ) )
+   {
+      sprintf( pszCfg, "%s", pszFile );
+      return ( char * ) pszFile;
+   }
+   else
+   {
+      /* Check if pszFile exists somewhere in the path */
+      while( * pszEnv )
+      {
+         pszPath = pszEnv;
+         while( *pszEnv )
+         {
+            if( *pszEnv == HB_OS_PATH_LIST_SEP_CHR )
+            {
+               *pszEnv++ = '\0';
+               break;
+            }
+            pszEnv++;
+         }
+         if( *pszPath )
+         {
+            sprintf( pszCfg, "%s%c%s", pszPath, HB_OS_PATH_DELIM_CHR, pszFile );
+            if( hb_fsFileExists( ( const char * ) pszCfg ) )
+            {
+               bFound = TRUE;
+               break;
+            }
+         }
+      }
+   }
+
+   /* If not found, make sure to return a NULL string */
+   if( ! bFound )
+      *pszCfg = '\0';
+
+   return ( char * ) pszCfg;
+}
 
 /* Builds platform dependant object module from Harbour C output */
 void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
@@ -57,7 +99,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " > /dev/null"
    #define HB_ACCESS_FLAG F_OK
-#elif defined( OS_DOS_COMPATIBLE )
+#elif defined( HB_OS_DOS_COMPATIBLE )
    char szDefaultPath[ _POSIX_PATH_MAX ] = "PATH";
    char * pszEnv = hb_getenv( "PATH" );
    #define HB_CFG_FILENAME    "harbour.cfg"   
@@ -178,7 +220,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       
    }
 
-   #if defined( OS_DOS_COMPATIBLE ) 
+   #if defined( HB_OS_DOS_COMPATIBLE ) 
    {
       if( pszEnv )
          hb_xfree( ( void * ) pszEnv );
@@ -273,43 +315,4 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
 
    if( pszCfg )
       hb_xfree( pszCfg );
-}
-
-static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg )
-{
-   char * pszPath;
-   char pszDelim[2] = { OS_PATH_LIST_SEPARATOR, '\0'};
-   BOOL bFound = FALSE;
-
-   /* Check current dir first  */
-   if( access( ( const char * ) pszFile, HB_ACCESS_FLAG ) == 0 )
-   {
-      sprintf( pszCfg, "%s", pszFile );
-      return ( char * ) pszFile;
-   }
-   else
-   {
-      /* Check if pszFile exists somewhere in the path */
-      pszPath = strtok( pszEnv, pszDelim );
-      if( pszPath )
-      {
-         while( pszPath )
-         {
-            sprintf( pszCfg, "%s%c%s", pszPath, OS_PATH_DELIMITER, pszFile );
-            if( access( ( const char * ) pszCfg, HB_ACCESS_FLAG ) == 0 )
-            {
-               bFound = TRUE;
-               break;
-            }
-            else
-               pszPath = strtok( NULL, pszDelim );
-         }
-      }
-   }
-
-   /* If not found, make sure to return a NULL string */
-   if( ! bFound )
-      sprintf( pszCfg, "%s", "" );
-
-   return ( char * ) pszCfg;
 }

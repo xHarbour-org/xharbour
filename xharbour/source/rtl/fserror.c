@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.12 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: fserror.c,v 1.13 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -56,20 +56,14 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hbstack.h"
 #include "hb_io.h"
-#include <errno.h>
-
-#ifndef HB_THREAD_SUPPORT
-   static USHORT s_uiErrorLast = 0;
-   static USHORT s_uiOsErrorLast = 0;
-#else
-   #define s_uiErrorLast     HB_VM_STACK.uiErrorLast
-   #define s_uiOsErrorLast   HB_VM_STACK.uiOsErrorLast
+#if !(defined(HB_WIN32_IO) || defined(HB_OS_WIN_32))
+#  include <errno.h>
 #endif
 
 
 /* Try to translate C errno into DOS error code */
-
 #if !defined(HB_WIN32_IO)
 static int hb_errnoToDosError( int ErrCode )
 {
@@ -79,8 +73,11 @@ static int hb_errnoToDosError( int ErrCode )
    /* These C compilers use DOS error codes in errno */
    iResult = ErrCode;
 #else
-   switch ( ErrCode )
+   switch( ErrCode )
    {
+#if defined( ENMFILE )
+      case ENMFILE:
+#endif
       case ENOENT:
          iResult = 2;   /* File not found */
          break;
@@ -125,6 +122,11 @@ static int hb_errnoToDosError( int ErrCode )
          iResult = 25;  /* Seek error */
          break;
 #endif
+#if defined( ENOSPC )
+      case ENOSPC:
+         iResult = 29;  /* Write fault */
+         break;
+#endif
       case EPIPE:
          iResult = 29;  /* Write fault */
          break;
@@ -149,7 +151,7 @@ static int hb_WinToDosError( ULONG ulError )
 {
    int iResult;
 
-   switch ( ulError )
+   switch( ulError )
    {
       case ERROR_ALREADY_EXISTS:
          iResult = 5;
@@ -160,18 +162,15 @@ static int hb_WinToDosError( ULONG ulError )
       case ERROR_PATH_NOT_FOUND:
          iResult = 3;
          break;
-      case  ERROR_TOO_MANY_OPEN_FILES:
+      case ERROR_TOO_MANY_OPEN_FILES:
          iResult = 4;
          break;
       case ERROR_INVALID_HANDLE:
          iResult = 6;
          break;
-      case 25:
-         iResult = 25;
-         break;
 
       default:
-         iResult = ( int ) ulError ;
+         iResult = ( int ) ulError;
          break;
    }
 
@@ -179,74 +178,93 @@ static int hb_WinToDosError( ULONG ulError )
 }
 #endif
 
+/* return FERROR() code */
+USHORT hb_fsGetFError( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsGetFError()"));
+
+   return hb_stackIOErrors()->uiFError;
+}
+
 /* return DOS error code of last operation */
 USHORT hb_fsError( void )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
 
-   return s_uiErrorLast;
+   return hb_stackIOErrors()->uiErrorLast;
 }
 
 /* return real error code of last operation */
-USHORT  hb_fsOsError( void )
+USHORT hb_fsOsError( void )
 {
    HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsOsError()"));
 
-   return s_uiOsErrorLast;
+   return hb_stackIOErrors()->uiOsErrorLast;
+}
+
+/* set FERROR() code */
+void hb_fsSetFError( USHORT uiError )
+{
+   HB_THREAD_STUB
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsSetFError(%hu)", uiError));
+
+   hb_stackIOErrors()->uiFError = uiError;
 }
 
 /* set DOS error code for last operation */
 void  hb_fsSetError( USHORT uiError )
 {
    HB_THREAD_STUB
+   PHB_IOERRORS pIOErrors;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
 
+   pIOErrors = hb_stackIOErrors();
    /* TODO: untranslate uiError into errno */
-   s_uiOsErrorLast = s_uiErrorLast = uiError;
+   pIOErrors->uiOsErrorLast = pIOErrors->uiErrorLast = uiError;
 }
 
 /* set error code for last operation */
 void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
 {
-
-   /* This can change error code so I intentionally disable it */
-   /*
-   HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsSetIOError(%hu)", uiError));
-   */
+   USHORT uiOsErrorLast, uiErrorLast;
+   PHB_IOERRORS pIOErrors;
 
    /* TODO: implement it */
    HB_SYMBOL_UNUSED( uiOperation );
 
-   if ( fResult )
+   if( fResult )
    {
-      s_uiOsErrorLast = s_uiErrorLast = 0;
+      uiOsErrorLast = uiErrorLast = 0;
    }
    else
    {
 #if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
-      s_uiOsErrorLast = (USHORT) GetLastError();
-      s_uiErrorLast = hb_WinToDosError( s_uiOsErrorLast );
+      uiOsErrorLast = ( USHORT ) GetLastError();
+      uiErrorLast = ( USHORT ) hb_WinToDosError( uiOsErrorLast );
 #elif defined(_MSC_VER) || defined(__DMC__)
       #ifdef __XCC__
          extern unsigned long _doserrno;
          extern void __cdecl _dosmaperr( unsigned long oserrno );
          _dosmaperr( GetLastError() );
       #endif
-      if ( _doserrno != 0 )
+      if( _doserrno != 0 )
       {
-         s_uiOsErrorLast = s_uiErrorLast = _doserrno;
+         uiOsErrorLast = uiErrorLast = _doserrno;
       }
       else
       {
-         s_uiOsErrorLast = errno;
-         s_uiErrorLast = hb_errnoToDosError( errno );
+         uiOsErrorLast = errno;
+         uiErrorLast = hb_errnoToDosError( errno );
       }
 #else
-      s_uiOsErrorLast = errno;
-      s_uiErrorLast = hb_errnoToDosError( s_uiOsErrorLast );
+      uiOsErrorLast = errno;
+      uiErrorLast = hb_errnoToDosError( uiOsErrorLast );
 #endif
    }
+   pIOErrors = hb_stackIOErrors();
+   pIOErrors->uiOsErrorLast = uiOsErrorLast;
+   pIOErrors->uiErrorLast = uiErrorLast;
 }

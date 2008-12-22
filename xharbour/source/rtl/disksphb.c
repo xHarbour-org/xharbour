@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.12 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: disksphb.c,v 1.13 2007/11/10 18:21:57 likewolf Exp $
  */
 
 /*
@@ -62,21 +62,15 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_UNIX)
-#  if defined(__WATCOMC__)
-#     include <sys/stat.h>
-#  else
-#     include <sys/statvfs.h>
-#  endif
+#if defined( HB_OS_UNIX ) && !( defined( __WATCOMC__ ) || defined( __CEGCC__ ) )
+   #include <sys/statvfs.h>
 #endif
-
-#ifdef HB_EXTENSION
 
 HB_FUNC( HB_DISKSPACE )
 {
    char szPathBuf[ 4 ];
    char * szPath = hb_parc( 1 );
-   USHORT uiType = ISNUM( 2 ) ? hb_parni( 2 ) : HB_DISK_AVAIL;
+   USHORT uiType = ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : HB_DISK_AVAIL;
    double dSpace = 0.0;
 
    if( uiType > HB_DISK_TOTAL )
@@ -84,18 +78,18 @@ HB_FUNC( HB_DISKSPACE )
 
    if( !szPath )
    {
-#ifdef OS_HAS_DRIVE_LETTER
+#ifdef HB_OS_HAS_DRIVE_LETTER
       if( ISNUM( 1 ) )
       {
          szPathBuf[ 0 ] = ( char ) hb_parni( 1 ) + 'A' - 1;
-         szPathBuf[ 1 ] = OS_DRIVE_DELIMITER;
-         szPathBuf[ 2 ] = OS_PATH_DELIMITER;
+         szPathBuf[ 1 ] = HB_OS_DRIVE_DELIM_CHR;
+         szPathBuf[ 2 ] = HB_OS_PATH_DELIM_CHR;
          szPathBuf[ 3 ] = '\0';
       }
       else
 #endif
       {
-         szPathBuf[ 0 ] = OS_PATH_DELIMITER;
+         szPathBuf[ 0 ] = HB_OS_PATH_DELIM_CHR;
          szPathBuf[ 1 ] = '\0';
       }
       szPath = szPathBuf;
@@ -103,7 +97,7 @@ HB_FUNC( HB_DISKSPACE )
 
 #if defined(HB_OS_DOS)
    {
-      USHORT uiDrive = szPath[ 1 ] != OS_DRIVE_DELIMITER ? 0 :
+      USHORT uiDrive = szPath[ 1 ] != HB_OS_DRIVE_DELIM_CHR ? 0 :
                        ( szPath[ 0 ] >= 'A' && szPath[ 0 ] <= 'Z' ?
                          szPath[ 0 ] - 'A' + 1 :
                        ( szPath[ 0 ] >= 'a' && szPath[ 0 ] <= 'z' ?
@@ -292,7 +286,7 @@ HB_FUNC( HB_DISKSPACE )
    {
       struct _FSALLOCATE fsa;
       USHORT rc;
-      USHORT uiDrive = szPath[ 1 ] != OS_DRIVE_DELIMITER ? 0 :
+      USHORT uiDrive = szPath[ 1 ] != HB_OS_DRIVE_DELIM_CHR ? 0 :
                        ( szPath[ 0 ] >= 'A' && szPath[ 0 ] <= 'Z' ?
                          szPath[ 0 ] - 'A' + 1 :
                        ( szPath[ 0 ] >= 'a' && szPath[ 0 ] <= 'z' ?
@@ -378,5 +372,3 @@ HB_FUNC( HB_DISKSPACE )
 
    hb_retnlen( dSpace, -1, 0 );
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.36 2008/03/27 10:26:46 likewolf Exp $
+* $Id: hbserv.c,v 1.37 2008/11/22 08:25:23 andijahja Exp $
 */
 
 /*
@@ -63,7 +63,7 @@
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 ) // DOS and Darwin < 6.x can't compile this module
 
-#if defined( HB_OS_UNIX ) || defined (HARBOUR_GCC_OS2)
+#if defined( HB_OS_UNIX ) || defined (HB_OS_OS2_GCC)
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
@@ -120,7 +120,7 @@ static int s_translateSignal( UINT sig, UINT subsig );
 * signals, both from kernel or from users.
 *****************************************************************************/
 
-#if defined(HB_OS_UNIX) || defined (HARBOUR_GCC_OS2)
+#if defined(HB_OS_UNIX) || defined (HB_OS_OS2_GCC)
 
 //TODO: Register the old signal action to allow graceful fallback
 //static struct sigaction sa_oldAction[SIGUSR2+1];
@@ -140,7 +140,7 @@ static S_TUPLE s_sigTable[] = {
    {0 , 0, 0}
 };
 
-#if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
+#if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
 static void s_signalHandler( int sig )
 #else
 static void s_signalHandler( int sig, siginfo_t *info, void *v )
@@ -152,7 +152,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    ULONG ulPos;
    int iRet;
 
-   #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
+   #if !( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
    HB_SYMBOL_UNUSED(v);
    #endif
 
@@ -187,7 +187,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          // the third parameter is an array:
 
          pRet = hb_arrayGetItemPtr( pExecArray, 3);
-         #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
+         #if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
          hb_arrayNew( pRet, 1 );
          #elif defined( HB_OS_BSD )
          hb_arrayNew( pRet, info ? 6 : 1 );
@@ -195,7 +195,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          hb_arrayNew( pRet, 6 );
          #endif
          hb_arraySetNI( pRet, HB_SERVICE_OSSIGNAL, sig );
-         #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
+         #if !( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
          #if defined( HB_OS_BSD )
          if (info)
          #endif
@@ -579,7 +579,7 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 static void s_serviceSetHBSig( void )
 {
 
-#if defined( HB_OS_UNIX ) || defined(HARBOUR_GCC_OS2)
+#if defined( HB_OS_UNIX ) || defined(HB_OS_OS2_GCC)
    struct sigaction act;
 
    #if defined(HB_THREAD_SUPPORT) && ! defined(HB_OS_OS2)
@@ -604,7 +604,7 @@ static void s_serviceSetHBSig( void )
       fields */
    memset( &act, 0, sizeof( struct sigaction ) );
 
-   #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
+   #if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
    act.sa_handler = s_signalHandler;
    #else
    // using more descriptive sa_action instead of sa_handler
@@ -615,7 +615,7 @@ static void s_serviceSetHBSig( void )
    #endif
 
 
-   #ifdef HARBOUR_GCC_OS2
+   #ifdef HB_OS_OS2_GCC
    act.sa_flags = SA_NOCLDSTOP;
    #else
    act.sa_flags = SA_NOCLDSTOP | SA_SIGINFO;
@@ -928,13 +928,13 @@ HB_FUNC( HB_SIGNALDESC )
    int iSubSig = hb_parni( 2 );
 
    // UNIX MESSGES
-   #if defined (HB_OS_UNIX) || defined(HARBOUR_GCC_OS2)
+   #if defined (HB_OS_UNIX) || defined(HB_OS_OS2_GCC)
 
    switch ( iSig )
    {
       case SIGSEGV: switch( iSubSig )
       {
-         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
+         #if ! defined(HB_OS_BSD) && ! defined(HB_OS_OS2_GCC) && ! defined( __WATCOMC__ )
          case SEGV_MAPERR: hb_retc( "Segmentation fault: address not mapped to object"); return;
          case SEGV_ACCERR: hb_retc( "Segmentation fault: invalid permissions for mapped object"); return;
          #endif
@@ -943,7 +943,7 @@ HB_FUNC( HB_SIGNALDESC )
 
       case SIGILL: switch( iSubSig )
       {
-         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
+         #if ! defined(HB_OS_BSD) && ! defined(HB_OS_OS2_GCC) && ! defined( __WATCOMC__ )
          case ILL_ILLOPC: hb_retc( "Illegal operation: illegal opcode"); return;
          case ILL_ILLOPN: hb_retc( "Illegal operation: illegal operand"); return;
          case ILL_ILLADR: hb_retc( "Illegal operation: illegal addressing mode"); return;
@@ -958,7 +958,7 @@ HB_FUNC( HB_SIGNALDESC )
 
       case SIGFPE: switch( iSubSig )
       {
-         #if ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
+         #if ! defined(HB_OS_OS2_GCC) && ! defined( __WATCOMC__ )
          #if ! defined( HB_OS_DARWIN )
          case FPE_INTDIV: hb_retc( "Floating point: integer divide by zero"); return;
          case FPE_INTOVF: hb_retc( "Floating point: integer overflow"); return;

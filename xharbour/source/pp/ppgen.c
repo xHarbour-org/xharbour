@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id: ppgen.c,v 1.9 2008/09/16 10:10:07 marchuet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 /*
  * library functions used by PP core code
- * necessary to create stand alone binries
+ * necessary to create standalone binaries
  */
 
 #ifndef hb_xgrab
@@ -74,7 +74,8 @@ char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
 ULONG hb_xquery( USHORT uiMode ) { HB_SYMBOL_UNUSED( uiMode ); return 0; }
 BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
-int hb_verCvsID( void ){ return 0; }
+int hb_setGetDirSeparator( void ) { return HB_OS_PATH_DELIM_CHR; }
+int hb_verCvsID( void ) { return 0; }
 const char * hb_verCvsChangeLogID( void ) { return NULL; }
 const char * hb_verCvsLastEntry( void ) { return NULL; }
 const char * hb_verFlagsC( void ) { return NULL; }
@@ -220,7 +221,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.9 2008/09/16 10:10:07 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -324,7 +325,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.8 2008/06/27 06:21:49 ronpinkas Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.9 2008/09/16 10:10:07 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"
@@ -680,111 +681,4 @@ int main( int argc, char * argv[] )
 
 #if defined( HB_WINCE ) && !defined( __CEGCC__ )
 #  include "hbwmain.c"
-#endif
-
-#if 0
-/*
- * ppgen only functions
- */
-static void hb_pp_usage( char * szName )
-{
-   printf( "Syntax:  %s <file>[.prg] [options]\n\n", szName );
-   printf( "Options: -i<path>  \tadd #include file search path\n"
-           "         -o[<file>]\tcreates .c file with PP rules\n"
-           "         -w        \twrite preprocessed (.ppo) input file\n"
-           "         -q        \tdisable information messages\n" );
-}
-
-int main( int argc, char * argv[] )
-{
-   char * szFile = NULL, * szRuleFile = NULL;
-   BOOL fQuiet = FALSE, fWrite = FALSE;
-   PHB_PP_STATE pState;
-   int iResult, i;
-
-   pState = hb_pp_new();
-
-   if( argc >= 2 )
-   {
-      szFile = argv[1];
-      for( i = 2; szFile && i < argc; i++ )
-      {
-         if( !HB_ISOPTSEP( argv[i][0] ) )
-            szFile = NULL;
-         else
-         {
-            switch( argv[i][1] )
-            {
-               case 'q':
-               case 'Q':
-                  if( argv[i][2] )
-                     szFile = NULL;
-                  else
-                     fQuiet = TRUE;
-                  break;
-
-               case 'w':
-               case 'W':
-                  if( argv[i][2] )
-                     szFile = NULL;
-                  else
-                     fWrite = TRUE;
-                  break;
-
-               case 'i':
-               case 'I':
-                  if( argv[i][2] )
-                     hb_pp_addSearchPath( pState, argv[i] + 2, FALSE );
-                  else
-                     szFile = NULL;
-                  break;
-
-               case 'o':
-               case 'O':
-                  if( argv[i][2] )
-                     szRuleFile = argv[i] + 2;
-                  else
-                     szFile = NULL;
-                  break;
-
-               default:
-                  szFile = NULL;
-                  break;
-            }
-         }
-      }
-   }
-
-   if( szFile )
-   {
-      hb_pp_init( pState, fQuiet, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
-      if( hb_pp_inFile( pState, szFile, TRUE, NULL, TRUE ) )
-      {
-         if( fWrite )
-         {
-            char szFileName[ _POSIX_PATH_MAX + 1 ];
-            PHB_FNAME pFileName;
-
-            pFileName = hb_fsFNameSplit( szFile );
-            pFileName->szExtension = ".ppo";
-            hb_fsFNameMerge( szFileName, pFileName );
-            hb_xfree( pFileName );
-
-            hb_pp_outFile( pState, szFileName, NULL );
-         }
-         iResult = hb_pp_preprocesfile( pState, szRuleFile );
-      }
-      else
-         iResult = 1;
-   }
-   else
-   {
-      hb_pp_usage( argv[0] );
-      iResult = 1;
-   }
-
-   hb_pp_free( pState );
-
-   return iResult;
-}
 #endif

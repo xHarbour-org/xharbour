@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.13 2005/10/02 12:35:11 druzus Exp $
+ * $Id: filestat.c,v 1.14 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbdate.h"
 #include "hbapierr.h"
 
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX_COMPATIBLE )
    #include <unistd.h>
    #include <sys/types.h>
    #include <time.h>
@@ -81,7 +81,7 @@ static BOOL hb_fsFileStats(
 {
    BOOL fResult = FALSE;
 
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX_COMPATIBLE )
 
    struct stat statbuf;
 
@@ -129,7 +129,7 @@ static BOOL hb_fsFileStats(
          ushbAttr |= HB_FA_SYSTEM;
 
       /* Extension characters */
-#ifdef HB_EXTENSION
+
       if ( ( statbuf.st_mode & S_IFLNK ) == S_IFLNK)
          *pszAttr++ = 'Z'; /* Xharbour extension */
 
@@ -143,7 +143,6 @@ static BOOL hb_fsFileStats(
 
       if ( ( statbuf.st_mode & S_IFIFO ) == S_IFIFO )
          *pszAttr++ = 'Y'; /* Xharbour extension */
-#endif
 
       if ( S_ISDIR( statbuf.st_mode ) )
          ushbAttr |= HB_FA_DIRECTORY; /* Xharbour extension */
@@ -294,5 +293,4 @@ HB_FUNC( FILESTATS )
    else
       hb_retl( FALSE );
 }
-
 #endif

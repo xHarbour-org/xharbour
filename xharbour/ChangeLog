@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6310 2008/12/20 16:32:39 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.6311 2008/12/22 19:44:00 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,129 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-23 01:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/hbzlib/zip.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * doc/en/terminal.txt
+  * include/hb_io.h
+  * include/hbapifs.h
+  * include/hbdefs.h
+  * include/hbsetup.h
+  * include/hbwince.h
+  * source/compiler/harbour.c
+  * source/ct/disk.c
+  * source/ct/files.c
+  * source/rtl/console.c
+  * source/rtl/copyfile.c
+  * source/rtl/defpath.c
+  * source/rtl/direct.c
+  * source/rtl/disksphb.c
+  * source/rtl/file.c
+  * source/rtl/filestat.c
+  * source/rtl/fssize.c
+  * source/rtl/hbffind.c
+  * source/rtl/hboutdbg.c
+  * source/rtl/hbserv.c
+  * source/rtl/net.c
+  * source/rtl/philes.c
+  * source/rtl/philesx.c
+  * source/rtl/seconds.c
+  * source/rtl/set.c
+  * source/rtl/tprinter.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gttrm/gttrm.c
+  * source/vm/hbi18n.c
+  * source/vm/inet.c
+  * source/vm/thread.c
+  * utils/hbpp/hbpp.c
+  * utils/hbpp/hbppcore.c
+    * Changed some macros to be in the HB_ namespace, to be
+      possibly shorter, more unified and clearer.
+      OS_UNIX_COMPATIBLE                -> HB_OS_UNIX_COMPATIBLE
+      OS_DOS_COMPATIBLE                 -> HB_OS_DOS_COMPATIBLE
+      OS_PATH_LIST_SEPARATOR            -> HB_OS_PATH_LIST_SEP_CHR
+      OS_PATH_DELIMITER                 -> HB_OS_PATH_DELIM_CHR
+      OS_PATH_DELIMITER_STRING          -> HB_OS_PATH_DELIM_CHR_STRING
+      OS_PATH_DELIMITER_LIST            -> HB_OS_PATH_DELIM_CHR_LIST
+      OS_FILE_MASK                      -> HB_OS_ALLFILE_MASK
+      OS_DRIVE_DELIMITER                -> HB_OS_DRIVE_DELIM_CHR
+      OS_HAS_DRIVE_LETTER               -> HB_OS_HAS_DRIVE_LETTER
+      OS_OPT_DELIMITER_LIST             -> HB_OS_OPT_DELIM_LIST
+      OS_EOL_LEN                        -> HB_OS_EOL_LEN
+      HARBOUR_GCC_OS2                   -> HB_OS_OS2_GCC
+    ; INCOMPATIBLE change, please update your sources, a simple
+      case-sensitive search and replace on .c/.cpp/.h/.hpp files
+      will be enough for most sources.
+    * strncat() -> hb_strncat()
+    * strncpy() -> hb_strncpy()
+    * FHANDLE -> HB_FHANDLE
+    * other minor fixes
+  (by Viktor Szakats, synched to Harbour as possible)
+
+  * source/rtl/filesys.c
+    + Added #define _XOPEN_SOURCE to fix warnings on Unixes.
+    + implemented hb_fsGetAttr() and hb_fsGetFileTime() for DOS, MS-Win,
+      OS2 and *nixes. Please test it on different platforms.
+    + added hb_fsSetFileTime()
+    + added POSIX file attributes with some macros to convert Harbour
+      definitions into OS ones.
+    + added hb_fsSetAttr()
+  * source/pp/ppgen.c
+    ! added hb_setGetDirSeparator()
+  * include/hbdate.h
+  * source/common/hbdate.c
+    + added hb_timeStampEncode()
+  * include/hbstack.h
+  * include/thread.h
+  * source/vm/estack.c
+  * source/rtl/fserror.c
+    * moved IO errors to HVM stack
+    + added special IO error handling which works without HVM stack
+      It allows to use hb_fs*() functions without allocated stack
+      by 3-rd party threads.
+  (by Przemyslaw Czerpak, synched to Harbour as possible)
+
+  * source/common/hbfsapi.c
+  * source/rtl/Makefile
+  * common.mak
+  + source/rtl/hbfile.c
+    + Added hb_fsNameExists() C level function.
+    + Added hb_FNameExists() Harbour level function.
+    ; Both will return true if any kind of directory entry
+      exists with the given name (IOW it doesn't matter
+      if it's a file or directory, or else).
+    + Added hb_fsFileExists(). This is the preferred way to check
+      for the existence of a file, because it is fast and will
+      find a file even if directory traversal is not possible
+      for the file's directory. Works the same way as file
+      existence check in most other tools.
+    + Added HB_FILEEXISTS() Harbour level function to check
+      for the existence of a file. This works better than
+      FILE() in most situations, but it doesn't accept any
+      wildcards.
+    (by Viktor Szakats, synched to Harbour as possible)
+    + Added hb_fsDirExists()
+    + Added HB_DIREXISTS()
+    (by Mindaugas Kavaliauskas, synched to Harbour as possible)
+
+  * source/compiler/gencobj.c
+    ! Fixed to not used access(). Using hb_fsFileExists() instead.
+    (by Viktor Szakats, synched to Harbour as possible)
+
+  * source/common/Makefile
+    ! added hbwince.c
+  * source/compiler/hbusage.c
+    ! Fixed the description of -gc3.
+  * source/rtl/win32ole.prg
+    ! Fixed header filename case.
+  * config/w32/mingw32.cf
+    ! Added zlib to link path.
 
 2008-12-22 20:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\rat.c

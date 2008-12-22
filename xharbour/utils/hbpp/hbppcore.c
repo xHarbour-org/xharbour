@@ -1,5 +1,5 @@
 /*
- * $Id: hbppcore.c,v 1.2 2007/12/21 16:09:07 likewolf Exp $
+ * $Id: hbppcore.c,v 1.3 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -96,14 +96,6 @@
    #include <sys/utsname.h>
 
 #endif
-
-/* 2003-06-25 Ron Pinkas, why did we need that?
-#if defined( OS_UNIX_COMPATIBLE )
-   #include <sys/timeb.h>
-#else
-   #include <sys\timeb.h>
-#endif
-*/
 
 #include <time.h>
 #include <errno.h>

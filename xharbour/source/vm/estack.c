@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.104 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: estack.c,v 1.105 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -79,6 +79,7 @@ HB_STACK hb_stackST;
 HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
 
+static HB_IOERRORS s_IOErrors;
 BOOL hb_stack_ready = FALSE;
 
 /* ------------------------------- */
@@ -412,6 +413,20 @@ LONG hb_stackTotalItems( void )
    HB_THREAD_STUB
    return HB_VM_STACK.wItems;
 }
+
+PHB_IOERRORS hb_stackIOErrors( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   if( hb_stack_ready )
+   {
+      HB_THREAD_STUB
+      return &HB_VM_STACK.IOErrors;
+   }
+#endif
+   return &s_IOErrors;
+}
+
+
 
 #undef hb_stackRDD
 PHB_STACKRDD hb_stackRDD( void )

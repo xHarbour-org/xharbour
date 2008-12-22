@@ -1,5 +1,5 @@
 /*
- * $Id: hbcu.c,v 1.9 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: hbcu.c,v 1.10 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -363,7 +363,7 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
          {
             if (i)
             {
-               //if (OS_EOL_LEN-1)
+               //if (HB_OS_EOL_LEN-1)
                //{
                //   dststr[dstlen++]='\r';
                //}
@@ -382,7 +382,7 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
          }
          else
          {
-            dstlen+=1+(i?OS_EOL_LEN:0);
+            dstlen+=1+(i?HB_OS_EOL_LEN:0);
          }
       }
 
@@ -453,7 +453,7 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
    if (dststr)
    {
-      //if (OS_EOL_LEN-1)
+      //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
@@ -461,7 +461,7 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
       dststr[dstlen++]='\n';
       dststr[dstlen++]=int_uubyte('\0');
 
-      //if (OS_EOL_LEN-1)
+      //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
@@ -470,7 +470,7 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
    }
    else
    {
-      dstlen+=2*OS_EOL_LEN+1;
+      dstlen+=2*HB_OS_EOL_LEN+1;
    }
 
    return dstlen;

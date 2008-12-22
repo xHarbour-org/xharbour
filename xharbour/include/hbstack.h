@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.54 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: hbstack.h,v 1.55 2008/11/25 06:21:18 andijahja Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 /* TOFIX: There are several things in this file which are not part of the
           standard Harbour API, in other words these things are not
           guaranteed to remain unchanged. To avoid confusion these should be
-          moved to somewhere else (like HBRTL.H). [vszakats] */
+          moved to somewhere else (like hbrtl.h). [vszakats] */
 
 #ifndef HB_STACK_H_
 #define HB_STACK_H_
@@ -77,7 +77,6 @@
 #include "thread.h"
 
 HB_EXTERN_BEGIN
-
 
 typedef struct _HB_STACKRDD
 {
@@ -120,6 +119,7 @@ typedef struct
    //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
    PHB_STACKRDD rdd;          /* RDD related data */
+   HB_IOERRORS IOErrors;      /* MT safe buffer for IO errors */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -180,6 +180,7 @@ extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
 extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
 extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
+extern PHB_IOERRORS hb_stackIOErrors( void );
 extern PHB_STACKRDD hb_stackRDD( void );
 
 extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */

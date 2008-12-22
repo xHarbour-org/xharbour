@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.74 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: console.c,v 1.75 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -112,13 +112,13 @@
  */
 
 /* length of buffer for CR/LF characters */
-#if !defined(OS_EOL_LEN) || OS_EOL_LEN < 4
+#if !defined(HB_OS_EOL_LEN) || HB_OS_EOL_LEN < 4
 #  define CRLF_BUFFER_LEN   4
 #else
-#  define CRLF_BUFFER_LEN   OS_EOL_LEN + 1
+#  define CRLF_BUFFER_LEN   HB_OS_EOL_LEN + 1
 #endif
 
-#if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
+#if defined(HB_OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
    static const char s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_LF, 0 };
    static const int  s_iCrLfLen = 1;
 #else

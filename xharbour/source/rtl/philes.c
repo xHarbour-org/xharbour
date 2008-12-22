@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.33 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: philes.c,v 1.34 2008/12/05 10:51:33 marchuet Exp $
  */
 
 /*
@@ -66,44 +66,57 @@
 #endif
 
 #include "hbapi.h"
-#include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
-#include "hbset.h"
-
+#include "hbapiitm.h"
 
 HB_FUNC( FOPEN )
 {
    if( ISCHAR( 1 ) )
-      hb_retnl( hb_fsOpen( ( BYTE * ) hb_parcx( 1 ),
-                           ISNUM( 2 ) ? hb_parni( 2 ) : FO_READ | FO_COMPAT ) );
+   {
+      hb_retnint( ( HB_NHANDLE ) hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
+                  ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : FO_READ | FO_COMPAT ) );
+      hb_fsSetFError( hb_fsError() );
+   }
    else
-      hb_errRT_BASE( EG_ARG, 2021, NULL, "FOPEN", 2, hb_paramError( 1 ), hb_paramError( 2 ) ); /* NOTE: Undocumented but existing Clipper Run-time error */
+   {
+      hb_fsSetFError( 0 );
+      /* NOTE: Undocumented but existing Clipper Run-time error */
+      hb_errRT_BASE( EG_ARG, 2021, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+   }
 }
 
 HB_FUNC( FCREATE )
 {
    if( ISCHAR( 1 ) )
-      hb_retnl( hb_fsCreate( ( BYTE * ) hb_parcx( 1 ),
-                             ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL ) );
+   {
+      hb_retnint( ( HB_NHANDLE ) hb_fsCreate( ( BYTE * ) hb_parc( 1 ),
+                  ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL ) );
+      hb_fsSetFError( hb_fsError() );
+   }
    else
-      hb_retnl( FS_ERROR );
+   {
+      hb_retni( F_ERROR );
+      hb_fsSetFError( 0 );
+   }
 }
-
-#ifdef HB_EXTENSION
 
 HB_FUNC( HB_FCREATE )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsCreateEx( ( BYTE * ) hb_parcx( 1 ),
-                               ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL,
-                               ISNUM( 3 ) ? hb_parni( 3 ) : FO_COMPAT ) );
+   {
+      hb_retnint( ( HB_NHANDLE ) hb_fsCreateEx( ( BYTE * ) hb_parc( 1 ),
+                  ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL,
+                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : FO_COMPAT ) );
+      hb_fsSetFError( hb_fsError() );
+   }
    else
-      hb_retni( FS_ERROR );
+   {
+      hb_retni( F_ERROR );
+      hb_fsSetFError( 0 );
+   }
 }
-
-#endif
 
 /*
   xHarbour extension allows for a 4th optional parameter indicating
@@ -112,14 +125,19 @@ HB_FUNC( HB_FCREATE )
 HB_FUNC( FREAD )
 {
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
-   ULONG ulRead;
+   USHORT uiError = 0;
+   ULONG ulRead = 0;
 
    if( ISNUM( 1 ) && pBuffer && ISBYREF( 2 ) && ISNUM( 3 ) )
    {
+#ifdef HB_EXTENSION
       ULONG ulOffset = hb_parnl( 4 );
-
+#else
+      ULONG ulOffset = 0;
+#endif
       ulRead = hb_parnl( 3 );
-      /* NOTE: CA-Clipper determines the maximum size by calling _parcsiz()
+
+      /* NOTE: CA-Cl*pper determines the maximum size by calling _parcsiz()
                instead of _parclen(), this means that the maximum read length
                will be one more than the length of the passed buffer, because
                the terminating zero could be used if needed. [vszakats] */
@@ -133,34 +151,40 @@ HB_FUNC( FREAD )
             other items which shares this buffer. [druzus] */
          pBuffer = hb_itemUnShare( pBuffer );
 
-         ulRead = hb_fsReadLarge( hb_parnl( 1 ),
-                     ( BYTE * ) hb_itemGetCPtr( pBuffer ) + ulOffset, ulRead );
+         ulRead = hb_fsReadLarge( hb_numToHandle( hb_parnint( 1 ) ),
+                                  ( BYTE * ) hb_itemGetCPtr( pBuffer ) + ulOffset,
+                                  ulRead );
+         uiError = hb_fsError();
       }
       else
       {
          ulRead = 0;
       }
    }
-   else
-   {
-      ulRead = 0;
-   }
 
-   hb_retnl( ulRead );
+   hb_retnint( ulRead );
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FWRITE )
 {
+   USHORT uiError = 0;
+
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
    {
+#ifdef HB_EXTENSION
       ULONG ulOffset = hb_parnl( 4 );
-
-      hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ), ( BYTE * ) hb_parcx( 2 ) + ulOffset, ISNUM( 3 ) ? (ULONG) hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
+#else
+      ULONG ulOffset = 0;
+#endif
+      hb_retnl( hb_fsWriteLarge( hb_numToHandle( hb_parnint( 1 ) ),
+                                 ( BYTE * ) hb_parc( 2 ) + ulOffset,
+                                 ISNUM( 3 ) ? ( ULONG ) hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
+      uiError = hb_fsError();
    }
    else
-   {
-      hb_retnl( 0 );
-   }
+      hb_retni( 0 );
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FERROR )
@@ -178,78 +202,97 @@ HB_FUNC( FERROR )
    #endif
 }
 
-HB_FUNC( HB_OSERROR )
-{
-   hb_retni( hb_fsOsError() );
-}
-
 HB_FUNC( FCLOSE )
 {
-   hb_fsSetError( 0 );
-
+   USHORT uiError = 0;
    if( ISNUM( 1 ) )
    {
-      hb_fsClose( hb_parnl( 1 ) );
-      hb_retl( hb_fsError() == 0 );
+      hb_fsClose( hb_numToHandle( hb_parnint( 1 ) ) );
+      uiError = hb_fsError();
+      hb_retl( uiError == 0 );
    }
    else
       hb_retl( FALSE );
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FERASE )
 {
-   hb_fsSetError( 3 );
+   USHORT uiError = 3;
 
-   hb_retni( ( ISCHAR( 1 ) &&
-               hb_fsDelete( ( BYTE * ) hb_parcx( 1 ) ) ) ? 0 : -1 );
+   if( ISCHAR( 1 ) )
+   {
+      hb_retni( hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) ? 0 : F_ERROR );
+      uiError = hb_fsError();
+   }
+   else
+      hb_retni( F_ERROR );
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FRENAME )
 {
-   hb_fsSetError( 2 );
+   USHORT uiError = 2;
 
-   hb_retni( ( ISCHAR( 1 ) && ISCHAR( 2 ) &&
-               hb_fsRename( ( BYTE * ) hb_parcx( 1 ), ( BYTE * ) hb_parcx( 2 ) ) ) ? 0 : -1 );
+   if( ISCHAR( 1 ) && ISCHAR( 2 ) )
+   {
+      hb_retni( hb_fsRename( ( BYTE * ) hb_parc( 1 ),
+                             ( BYTE * ) hb_parc( 2 ) ) ? 0 : F_ERROR );
+      uiError = hb_fsError();
+   }
+   else
+      hb_retni( F_ERROR );
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FSEEK )
 {
+   USHORT uiError = 0;
+
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_retnint( hb_fsSeekLarge( hb_parnl( 1 ),
+   {
+      hb_retnint( hb_fsSeekLarge( hb_numToHandle( hb_parnint( 1 ) ),
                                   hb_parnint( 2 ),
-                                  ISNUM( 3 ) ? hb_parni( 3 ) : FS_SET ) );
+                                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : FS_SET ) );
+      uiError = hb_fsError();
+   }
    else
-      hb_retnl( 0 );
+      hb_retni( 0 );
+
+   hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FREADSTR )
 {
+   USHORT uiError = 0;
+
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
       ULONG ulToRead = ( ULONG ) hb_parnl( 2 );
 
       if( ulToRead > 0 )
       {
-         FHANDLE fhnd = ( FHANDLE ) hb_parnl( 1 );
+         HB_FHANDLE fhnd = ( HB_FHANDLE ) hb_parni( 1 );
          BYTE * buffer = ( BYTE * ) hb_xgrab( ulToRead + 1 );
          ULONG ulRead;
 
          ulRead = hb_fsReadLarge( fhnd, buffer, ulToRead );
+         uiError = hb_fsError();
          buffer[ ulRead ] = '\0';
 
          /* NOTE: Clipper will not return zero chars from this functions. */
-
-         hb_retcAdopt( ( char * ) buffer );
+         hb_retc_buffer( ( char * ) buffer );
       }
       else
       {
-         hb_retc( "" );
+         hb_retc_null();
       }
    }
    else
    {
-      hb_retc( "" );
+      hb_retc_null();
    }
+   hb_fsSetFError( uiError );
 }
 
 /* NOTE: This function should not return the leading and trailing */
@@ -267,20 +310,23 @@ HB_FUNC( CURDIR )
    hb_retc( ( char * ) byBuffer );
 }
 
-#ifdef HB_EXTENSION
-
 HB_FUNC( HB_F_EOF )
 {
+   USHORT uiError = 6;
+
    if( ISNUM( 1 ) )
    {
-      hb_retl( hb_fsEof( hb_parni( 1 ) ) );
+      hb_retl( hb_fsEof( hb_numToHandle( hb_parnint( 1 ) ) ) );
+      uiError = hb_fsError();
    }
    else
    {
-      hb_fsSetError( (USHORT) FS_ERROR );
       hb_retl( TRUE );
    }
+   hb_fsSetFError( uiError );
 }
+
+#ifdef HB_EXTENSION
 
 HB_FUNC( CURDIRX )
 {
@@ -311,42 +357,89 @@ HB_FUNC( CURDIRX )
 
    hb_fsSetError( uiErrorOld );
 }
+#endif
 
-/** Added by Giancarlo Niccolai */
+HB_FUNC( HB_FCOMMIT )
+{
+   USHORT uiError = 6;
+
+   if( ISNUM( 1 ) )
+   {
+      hb_fsCommit( hb_numToHandle( hb_parnint( 1 ) ) );
+      uiError = hb_fsError();
+   }
+
+   hb_fsSetFError( uiError );
+}
+
+HB_FUNC( HB_FLOCK )
+{
+   USHORT uiError = 0;
+   BOOL fResult = FALSE;
+
+   if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) )
+   {
+      fResult = hb_fsLockLarge( hb_numToHandle( hb_parnint( 1 ) ),
+                                ( HB_FOFFSET ) hb_parnint( 2 ),
+                                ( HB_FOFFSET ) hb_parnint( 3 ),
+                                FL_LOCK | ( ( USHORT ) hb_parni( 4 ) & ~FL_MASK ) );
+      uiError = hb_fsError();
+   }
+   hb_fsSetFError( uiError );
+   hb_retl( fResult );
+}
+
+HB_FUNC( HB_FUNLOCK )
+{
+   USHORT uiError = 0;
+   BOOL fResult = FALSE;
+
+   if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) )
+   {
+      fResult = hb_fsLockLarge( hb_numToHandle( hb_parnint( 1 ) ),
+                                ( HB_FOFFSET ) hb_parnint( 2 ),
+                                ( HB_FOFFSET ) hb_parnint( 3 ),
+                                FL_UNLOCK );
+      uiError = hb_fsError();
+   }
+   hb_fsSetFError( uiError );
+   hb_retl( fResult );
+}
+
+HB_FUNC( HB_OSERROR )
+{
+   hb_retni( hb_fsOsError() );
+}
+
 HB_FUNC( HB_OSPATHSEPARATOR )
 {
-   char ret[2];
-   ret[1] = 0;
-   ret[0] = OS_PATH_DELIMITER;
-
-   hb_retc( ret );
+   hb_retc_const( HB_OS_PATH_DELIM_CHR_STRING );
 }
 
 HB_FUNC( HB_OSPATHLISTSEPARATOR )
 {
-   char ret[2];
-   ret[1] = 0;
-   ret[0] = OS_PATH_LIST_SEPARATOR;
-
-   hb_retc( ret );
+   static const char s_ret[ 2 ] = { HB_OS_PATH_LIST_SEP_CHR, '\0' };
+   hb_retc_const( s_ret );
 }
 
 HB_FUNC( HB_OSPATHDELIMITERS )
 {
-   hb_retc( OS_PATH_DELIMITER_LIST );
+   hb_retc_const( HB_OS_PATH_DELIM_CHR_LIST );
 }
 
 HB_FUNC( HB_OSDRIVESEPARATOR )
 {
-#ifdef OS_DRIVE_DELIMITER
-   char ret[2];
-   ret[0] = OS_DRIVE_DELIMITER;
-   ret[1] = 0;
-
-   hb_retc( ret );
+#ifdef HB_OS_HAS_DRIVE_LETTER
+   static const char s_ret[ 2 ] = { HB_OS_DRIVE_DELIM_CHR, '\0' };
+   hb_retc_const( s_ret );
 #else
-   hb_retc( "" );
+   hb_retc_null();
 #endif
+}
+
+HB_FUNC( HB_OSFILEMASK )
+{
+   hb_retc_const( HB_OS_ALLFILE_MASK );
 }
 
 HB_FUNC( HB_OPENPROCESS )
@@ -518,10 +611,3 @@ HB_FUNC( HB_PROCESSVALUE )
    }
 
 }
-
-HB_FUNC( HB_FCOMMIT )
-{
-   hb_fsCommit( hb_parni(1) );
-}
-
-#endif

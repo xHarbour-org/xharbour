@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.123 2008/11/05 03:03:16 walito Exp $
+* $Id: thread.h,v 1.124 2008/11/25 06:21:18 andijahja Exp $
 */
 
 /*
@@ -53,9 +53,18 @@
 #ifndef HB_THREAD_H_
 #define HB_THREAD_H_
 
+#include "hbapi.h"
+
+typedef struct
+{
+   USHORT   uiFError;
+   USHORT   uiErrorLast;
+   USHORT   uiOsErrorLast;
+}
+HB_IOERRORS, * PHB_IOERRORS;
+
 #ifdef HB_THREAD_SUPPORT
 
-#include "hbapi.h"
 #include "hbmath.h"
 
 #if defined( __DMC__ )
@@ -453,6 +462,7 @@ typedef struct tag_HB_STACK
    //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
    struct _HB_STACKRDD * rdd;   /* RDD related data */
+   HB_IOERRORS IOErrors;      /* MT safe buffer for IO errors */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */

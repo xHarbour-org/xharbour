@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.9 2004/11/23 17:04:22 lf_sfnet Exp $
+ * $Id: net.c,v 1.10 2005/01/10 18:45:36 druzus Exp $
  */
 
 /*
@@ -66,18 +66,20 @@
 #include "hbapi.h"
 #include "hbfast.h"
 
-#if defined(HB_OS_OS2) || defined(OS_UNIX_COMPATIBLE) || defined(__GNUC__)
+#if defined(HB_OS_OS2) && defined(__GNUC__)
 
    #include "hb_io.h"
 
    /* 25/03/2004 - <maurilio.longo@libero.it>
-      not needed anymore as of GCC 3.2.2
+      not needed anymore as of GCC 3.2.2 */
 
-   #if defined(__EMX__)
+   #include <pwd.h>
+   #include <sys/types.h>
+
+   #if defined(__EMX__) && __GNUC__ * 1000 + __GNUC_MINOR__ < 3002
       #include <emx/syscalls.h>
       #define gethostname __gethostname
    #endif
-   */
 
    #define MAXGETHOSTNAME 256      /* should be enough for a host name */
 
@@ -88,10 +90,19 @@
       #include <sys/param.h>
    #endif
 
+#elif defined(HB_OS_UNIX)
+
+   #if !defined(__WATCOMC__)
+      #include <pwd.h>
+      #include <sys/types.h>
+   #endif
+   #include <unistd.h>
+   #define MAXGETHOSTNAME 256      /* should be enough for a host name */
+
 #endif
 
 /* NOTE: Clipper will only return a maximum of 15 bytes from this function.
-         And it will be padded with spaces. Harbour does the same in the
+         And it will be padded with spaces. Harbour does the same on the
          DOS platform.
          [vszakats] */
 
@@ -101,7 +112,7 @@ HB_FUNC( NETNAME )
   
    bGetUser = ( hb_parnl(1) == 1 );
    
-#if defined(HB_OS_OS2) || defined(OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_OS2) || defined(HB_OS_UNIX_COMPATIBLE)
 
    {
 #if defined(__WATCOMC__)

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.60 2008/12/03 16:55:40 marchuet Exp $
+ * $Id: hbapifs.h,v 1.61 2008/12/03 20:11:43 marchuet Exp $
  */
 
 /*
@@ -207,6 +207,9 @@ extern HB_EXPORT HB_FHANDLE hb_fsPOpen      ( BYTE * pFilename, BYTE * pMode );
 extern HB_EXPORT HB_FHANDLE hb_fsGetOsHandle( HB_FHANDLE hFileHandle );
 extern HB_EXPORT void       hb_fsDirectory  ( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 extern HB_EXPORT void       hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
+extern HB_EXPORT USHORT     hb_fsGetFError  ( void ); /* get FERROR() flag */
+extern HB_EXPORT void       hb_fsSetFError  ( USHORT uiError ); /* set FERROR() flag */
+extern HB_EXPORT BOOL       hb_fsNameExists ( const char * pszFileName ); /* check if a name exists in the filesystem (wildcard chars not accepted). */
 extern HB_EXPORT BOOL       hb_fsFileExists ( const char * pszFileName ); /* check if a file exists (wildcard chars not accepted). */
 extern HB_EXPORT BOOL       hb_fsDirExists  ( const char * pszDirName ); /* check if a directory exists (wildcard chars not accepted). */
 
@@ -219,7 +222,7 @@ extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 #define hb_fsFLock( h, s, l )   hb_fsLock( h, s, l, FL_LOCK )
 #define hb_fsFUnlock( h, s, l ) hb_fsLock( h, s, l, FL_UNLOCK )
 
-#if defined( OS_UNIX_COMPATIBLE ) && !defined( HB_USE_SHARELOCKS_OFF )
+#if defined( HB_OS_UNIX_COMPATIBLE ) && !defined( HB_USE_SHARELOCKS_OFF )
 #  define HB_USE_SHARELOCKS
 #  define HB_SHARELOCK_POS          0x7fffffffUL
 #  define HB_SHARELOCK_SIZE         0x1UL
@@ -238,10 +241,10 @@ extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 /* Filename support */
 typedef struct
 {
-   char * szPath;
-   char * szName;
-   char * szExtension;
-   char * szDrive;
+   const char * szPath;
+   const char * szName;
+   const char * szExtension;
+   const char * szDrive;
    char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
 } HB_FNAME, * PHB_FNAME, * HB_FNAME_PTR;
 
@@ -295,7 +298,6 @@ extern HB_EXPORT ULONG     hb_fsAttrToRaw( ULONG ulAttr );
 extern HB_EXPORT ULONG     hb_fsAttrEncode( const char * szAttr );
 extern HB_EXPORT char *    hb_fsAttrDecode( ULONG ulAttr, char * szAttr );
 extern HB_EXPORT BYTE *    hb_fsNameConv( BYTE * szFileName, BOOL * pfFree );
-extern HB_EXPORT BYTE *    hb_fileNameConv( char *str );
 extern HB_EXPORT BOOL      hb_fsMaxFilesError( void );
 
 /* Harbour file functions with shared file handles and locks
@@ -320,6 +322,11 @@ HB_EXPORT HB_FHANDLE hb_fileHandle( PHB_FILE pFile );
 
 /* wrapper to fopen() which calls hb_fsNameConv() */
 extern FILE * hb_fopen( const char *path, const char *mode );
+
+#ifdef HB_LEGACY_LEVEL
+/* Compatibility. Obsolete. */
+extern HB_EXPORT BYTE *    hb_fileNameConv( char * str );
+#endif
 
 /* extern HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet ); */
 

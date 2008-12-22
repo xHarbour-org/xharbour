@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.216 2008/11/05 03:03:16 walito Exp $
+* $Id: thread.c,v 1.217 2008/11/22 08:25:37 andijahja Exp $
 */
 
 /*
@@ -1849,7 +1849,7 @@ HB_FUNC( STOPTHREAD )
    {
       HB_STACK_UNLOCK;
 
-      #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+      #if defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE )
 
          pthread_cancel( pThread->threadId );
          pthread_join( pThread->threadId, NULL );
@@ -1901,7 +1901,7 @@ HB_FUNC( KILLTHREAD )
 
    if( pThread->pStack )
    {
-      #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+      #if defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE )
          pthread_cancel( pThread->threadId );
       #else
          /* Shell locking the thread */
@@ -2817,7 +2817,7 @@ void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
       DosSleep(millisec);
       HB_DISABLE_ASYN_CANC;
 
-   #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+   #elif defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE )
       {
          struct timespec ts, trem;
          ts.tv_sec = millisec / 1000;

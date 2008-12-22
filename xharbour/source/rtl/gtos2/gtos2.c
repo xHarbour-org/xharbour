@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.30 2008/08/14 09:04:23 andijahja Exp $
+ * $Id: gtos2.c,v 1.31 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -113,7 +113,7 @@
 /* convert 16:16 address to 0:32 */
 #define SELTOFLAT(ptr) (void *)(((((ULONG)(ptr))>>19)<<16)|(0xFFFF&((ULONG)(ptr))))
 
-#if defined(HARBOUR_GCC_OS2)
+#if defined(HB_OS_OS2_GCC)
    /* 25/03/2000 - maurilio.longo@libero.it
    OS/2 GCC hasn't got ToolKit headers available */
    #include <stdlib.h>
@@ -136,14 +136,7 @@ static int  s_iCursorStyle;
 
 /* buffer for single screen line */
 static int     s_iLineBufSize = 0;
-static USHORT * s_sLineBuf = NULL;
-
-/* 21/03/2008 - not needed anymore
-   pointer to offscreen video buffer
-static ULONG s_ulLVBptr;
-   length of video buffer
-static USHORT s_usLVBlength;
-*/
+static BYTE *  s_sLineBuf;
 
 /* Code page ID of active codepage at the time harbour program was start */
 static USHORT s_usOldCodePage;
@@ -497,21 +490,19 @@ static void hb_gt_os2_SetCursorStyle( int iStyle )
 
 static void hb_gt_os2_GetScreenContents( PHB_GT pGT )
 {
-   USHORT Cell;
    int iRow, iCol;
-   USHORT usSize;
+   BYTE * pBufPtr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_os2_GetScreenContents(%p)", pGT));
 
    for( iRow = 0; iRow < s_vi.row; ++iRow )
    {
-      usSize = s_vi.col << 1;
+      USHORT usSize = s_vi.col << 1;
       VioReadCellStr( ( PCH ) s_sLineBuf, &usSize, iRow, 0, 0 );
 
-      for( iCol = 0; iCol < s_vi.col; ++iCol )
+      for( iCol = 0, pBufPtr = s_sLineBuf; iCol < s_vi.col; ++iCol, pBufPtr += 2 )
       {
-         Cell = s_sLineBuf[ iCol ];
-         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( Cell & 0xFF00 ) >> 8, 0, Cell & 0x00FF );
+         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, pBufPtr[ 1 ], 0, pBufPtr[ 0 ] );
       }
    }
    HB_GTSELF_COLDAREA( pGT, 0, 0, s_vi.row, s_vi.col );
@@ -529,25 +520,12 @@ static PVOID hb_gt_os2_allocMem( int iSize )
    return pMem;
 }
 
-static void hb_gt_os2_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_os2_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_os2_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
 
-
    s_vi.cb = sizeof( VIOMODEINFO );
    VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
-
-   /* 21/03/2008 - not needed anymore
-   if( VioGetBuf( &s_ulLVBptr, &s_usLVBlength, 0 ) == NO_ERROR )
-   {
-      s_ulLVBptr = ( ULONG ) SELTOFLAT( s_ulLVBptr );
-      VioShowBuf( 0, s_usLVBlength, 0 );
-   }
-   else
-   {
-      s_ulLVBptr = ( ULONG ) NULL;
-   }
-   */
 
    /* Alloc tileable memory for calling a 16 subsystem */
    s_hk = ( PHKBD ) hb_gt_os2_allocMem( sizeof( HKBD ) );
@@ -603,7 +581,7 @@ static void hb_gt_os2_Exit( PHB_GT pGT )
 
    if( s_iLineBufSize > 0 )
    {
-      DosFreeMem( (PVOID) s_sLineBuf );
+      DosFreeMem( ( PVOID ) s_sLineBuf );
       s_iLineBufSize = 0;
    }
 
@@ -716,7 +694,7 @@ static void hb_gt_os2_Tone( PHB_GT pGT, double dFrequency, double dDuration )
    }
 }
 
-static char * hb_gt_os2_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_os2_Version( PHB_GT pGT, int iType )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_os2_Version(%p,%d)", pGT, iType ) );
 
@@ -736,15 +714,12 @@ static BOOL hb_gt_os2_Resize( PHB_GT pGT, int iRows, int iCols )
    {
       HB_GTSELF_GETSIZE( pGT, &iRows, &iCols );
       iRows <<= 1;
-      if( s_iLineBufSize == 0 )
+      if( s_iLineBufSize != iRows )
       {
-         s_sLineBuf = ( USHORT * ) hb_gt_os2_allocMem( iRows );
-         s_iLineBufSize = iRows;
-      }
-      else if( s_iLineBufSize != iRows )
-      {
-         DosFreeMem( (PVOID) s_sLineBuf );
-         s_sLineBuf = ( USHORT * ) hb_gt_os2_allocMem( iRows );
+         if( s_iLineBufSize != 0 )
+            DosFreeMem( ( PVOID ) s_sLineBuf );
+         if( iRows )
+            s_sLineBuf = ( BYTE * ) hb_gt_os2_allocMem( iRows );
          s_iLineBufSize = iRows;
       }
       return TRUE;
@@ -811,7 +786,7 @@ static BOOL hb_gt_os2_Resume( PHB_GT pGT )
 
 static void hb_gt_os2_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 {
-   BYTE bColor, bAttr;
+   BYTE *pBufPtr = s_sLineBuf, bColor, bAttr;
    USHORT usChar;
    int iLen = 0;
 
@@ -822,10 +797,12 @@ static void hb_gt_os2_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
       if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol + iLen, &bColor, &bAttr, &usChar ) )
          break;
 
-      s_sLineBuf[ iLen++ ] = ( bColor << 8 ) + ( usChar & 0xff );
+      *pBufPtr++ = ( BYTE ) usChar;
+      *pBufPtr++ = bColor;
+      ++iLen;
    }
 
-   VioWrtCellStr( ( PCH ) s_sLineBuf, iSize << 1, iRow, iCol, 0 );
+   VioWrtCellStr( ( PCH ) s_sLineBuf, iLen << 1, iRow, iCol, 0 );
 }
 
 static void hb_gt_os2_Refresh( PHB_GT pGT )
@@ -919,7 +896,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
@@ -927,4 +904,3 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
    static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
    #pragma data_seg()
 #endif
-

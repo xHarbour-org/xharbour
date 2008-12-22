@@ -1,5 +1,5 @@
 /*
- * $Id: defpath.c,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
+ * $Id: defpath.c,v 1.2 2007/04/20 09:41:30 marchuet Exp $
  */
 
 /*
@@ -57,21 +57,20 @@
 
 HB_FUNC( DEFPATH )
 {
-   char buffer[ _POSIX_PATH_MAX ];
-   char delimiter[ 2 ] = ":";
+   char buffer[ _POSIX_PATH_MAX + 2 ];
+   char * szDefault;
    int size = 0;
 
-   if( hb_set.HB_SET_DEFAULT )
+   szDefault = hb_setGetDefault();
+   if( szDefault )
    {
       /* Leave enough space to append a path delimiter */
-      strncpy( buffer, hb_set.HB_SET_DEFAULT, sizeof( buffer ) - 1 );
-      size = sizeof( buffer ) - 2;
+      hb_strncpy( buffer, szDefault, sizeof( buffer ) - 1 );
+      size = strlen( buffer );
    }
-   buffer[ size ] = '\0';
-   size = strlen( buffer );
 
    HB_TRACE(HB_TR_INFO, ("HB_DEFPATH: buffer is |%s|, size is %d, last char is |%c|", buffer, size, buffer[ size - 1]));
-   HB_TRACE(HB_TR_INFO, ("HB_DEFPATH: OS_PATH_DELIMITER is |%c| and OS_PATH_LIST_SEPARATOR is |%c|", OS_PATH_DELIMITER, OS_PATH_LIST_SEPARATOR));
+   HB_TRACE(HB_TR_INFO, ("HB_DEFPATH: HB_OS_PATH_DELIM_CHR is |%c| and HB_OS_PATH_LIST_SEP_CHR is |%c|", HB_OS_PATH_DELIM_CHR, HB_OS_PATH_LIST_SEP_CHR));
 
    /* If the path is not empty and it doesn't end with a drive or path
       delimiter, then add the appropriate separator. Use ':' if the size
@@ -79,14 +78,21 @@ HB_FUNC( DEFPATH )
       the path delimiter. This allows the use of a drive letter delimiter
       for DOS compatible operating systems while preventing it from being
       with a Unix compatible OS. */
-   if( size && buffer[ size - 1 ] != ':' && buffer[ size - 1 ] != OS_PATH_DELIMITER )
+#ifdef HB_OS_HAS_DRIVE_LETTER
+   if( size && buffer[ size - 1 ] != HB_OS_PATH_DELIM_CHR &&
+               buffer[ size - 1 ] != HB_OS_DRIVE_DELIM_CHR )
    {
-      if( size > 1 || OS_PATH_LIST_SEPARATOR == ':' )
-         delimiter[ 0 ] = OS_PATH_DELIMITER;
-      strcat( buffer, delimiter );
+      if( size == 1 )
+         buffer[ size++ ] = HB_OS_DRIVE_DELIM_CHR;
+      else
+         buffer[ size++ ] = HB_OS_PATH_DELIM_CHR;
    }
+#else
+   if( size && buffer[ size - 1 ] != HB_OS_PATH_DELIM_CHR )
+      buffer[ size++ ] = HB_OS_PATH_DELIM_CHR;
+#endif
 
-   hb_retc( buffer );
+   hb_retclen( buffer, size );
 }
 
 HB_FUNC( __DEFPATH )

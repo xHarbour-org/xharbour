@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.76 2008/06/27 15:59:35 marchuet Exp $
+* $Id: inet.c,v 1.77 2008/07/01 16:08:53 marchuet Exp $
 */
 
 /*
@@ -63,7 +63,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
+#if defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
    #include <sys/time.h>
 #endif
 

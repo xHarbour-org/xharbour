@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.49 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.50 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -181,7 +181,7 @@
 
 /* ***********************************************************************
  * Use native Windows memory allocation functions (HB_OS_WIN_32)
- * This option can disabled compiler memory allocation optimization
+ * This option can disable compiler memory allocation optimization
  * so you should really have a good reason to enable it
  */
 
@@ -272,12 +272,6 @@
 /* #define HB_FAST_STOD */
 
 
-/* ***********************************************************************
- *  Detect GCC/OS2
- */
-#if defined(__EMX__) && ! defined(__RSXNT__)
-   #define HARBOUR_GCC_OS2
-#endif
 
 /* ***********************************************************************
  * Operating system specific definitions
@@ -287,28 +281,28 @@
           defined(_Windows) || defined(_WIN32) || defined(_WINCE) ) ) || \
     ( defined(__WATCOMC__) && defined(__LINUX__) )
    #define HOST_OS_UNIX_COMPATIBLE
-   #define OS_UNIX_COMPATIBLE
-   #define OS_PATH_LIST_SEPARATOR    ':'
-   #define OS_PATH_DELIMITER         '/'
-   #define OS_PATH_DELIMITER_STRING  "/"
-   #define OS_PATH_DELIMITER_LIST    "/"
-   #define OS_FILE_MASK              "*"
-   #undef  OS_DRIVE_DELIMITER
-   #undef  OS_HAS_DRIVE_LETTER
-   #define OS_OPT_DELIMITER_LIST     "-"
-   #define OS_EOL_LEN                1
+   #define HB_OS_UNIX_COMPATIBLE
+   #define HB_OS_PATH_LIST_SEP_CHR      ':'
+   #define HB_OS_PATH_DELIM_CHR         '/'
+   #define HB_OS_PATH_DELIM_CHR_STRING  "/"
+   #define HB_OS_PATH_DELIM_CHR_LIST    "/"
+   #define HB_OS_ALLFILE_MASK           "*"
+   #undef  HB_OS_DRIVE_DELIM_CHR
+   #undef  HB_OS_HAS_DRIVE_LETTER
+   #define HB_OS_OPT_DELIM_LIST         "-"
+   #define HB_OS_EOL_LEN                1
 #else
    /* we are assuming here the DOS compatible OS */
-   #define OS_DOS_COMPATIBLE
-   #define OS_PATH_LIST_SEPARATOR    ';'
-   #define OS_PATH_DELIMITER         '\\'
-   #define OS_PATH_DELIMITER_STRING  "\\"
-   #define OS_PATH_DELIMITER_LIST    "\\/:"
-   #define OS_FILE_MASK              "*.*"
-   #define OS_DRIVE_DELIMITER        ':'
-   #define OS_HAS_DRIVE_LETTER
-   #define OS_OPT_DELIMITER_LIST     "/-"
-   #define OS_EOL_LEN                2  /* # of bytes in End of Line marker */
+   #define HB_OS_DOS_COMPATIBLE
+   #define HB_OS_PATH_LIST_SEP_CHR      ';'
+   #define HB_OS_PATH_DELIM_CHR         '\\'
+   #define HB_OS_PATH_DELIM_CHR_STRING  "\\"
+   #define HB_OS_PATH_DELIM_CHR_LIST    "\\/:"
+   #define HB_OS_ALLFILE_MASK           "*.*"
+   #define HB_OS_DRIVE_DELIM_CHR        ':'
+   #define HB_OS_HAS_DRIVE_LETTER
+   #define HB_OS_OPT_DELIM_LIST         "/-"
+   #define HB_OS_EOL_LEN                2  /* # of bytes in End of Line marker */
 #endif
 
 #ifndef _POSIX_PATH_MAX
@@ -323,7 +317,7 @@
     #endif
 #endif
 
-#define HB_ISOPTSEP( c ) ( strchr( OS_OPT_DELIMITER_LIST, ( c ) ) != NULL )
+#define HB_ISOPTSEP( c ) ( strchr( HB_OS_OPT_DELIM_LIST, ( c ) ) != NULL )
 
 /* NOTE:
    Compiler                                _MSC_VER value
@@ -374,12 +368,12 @@
    #endif
 #endif
 
+#if defined(__EMX__) && ! defined(__RSXNT__)
+   #define HB_OS_OS2_GCC
+#endif
 #ifndef HB_OS_OS2
-   #if defined(OS2) || defined(__OS2__) || defined(OS_2) || defined(HARBOUR_GCC_OS2)
+   #if defined(OS2) || defined(__OS2__) || defined(OS_2) || defined(HB_OS_OS2_GCC)
       #define HB_OS_OS2
-      #if defined(__EMX__)
-         #define HB_OS_OS2_EMX
-      #endif
    #endif
 #endif
 
@@ -436,7 +430,7 @@
 #endif
 
 #ifndef HB_OS_UNIX
-   #if defined(OS_UNIX_COMPATIBLE) || \
+   #if defined(HB_OS_UNIX_COMPATIBLE) || \
        defined(HB_OS_LINUX) || \
        defined(HB_OS_DARWIN) || \
        defined(HB_OS_BSD) || \
@@ -459,8 +453,17 @@
  */
 /* #define HB_EOL_CRLF */
 #ifdef HB_EOL_CRLF
-   #undef OS_EOL_LEN
-   #define OS_EOL_LEN 2
+   #undef HB_OS_EOL_LEN
+   #define HB_OS_EOL_LEN 2
+#endif
+
+/* Compatibility #defines. These will be removed, so 
+   please use the new names in your code. */
+#ifdef HB_LEGACY_LEVEL
+   #define OS_PATH_DELIMITER            HB_OS_PATH_DELIM_CHR
+   #ifdef HB_OS_UNIX_COMPATIBLE
+      #define OS_UNIX_COMPATIBLE
+   #endif
 #endif
 
 /* ***********************************************************************

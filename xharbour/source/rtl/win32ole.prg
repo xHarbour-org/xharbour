@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.168 2008/11/22 22:43:53 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.169 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ RETURN VTWrapper( VT_ERROR, DISP_E_PARAMNOTFOUND )
    #endif
 
    #if (defined(__MINGW32__) || defined(__DMC__) || defined(__WATCOMC__))
-      #include <OciDL.h>
+      #include <ocidl.h>
    #endif
 
    #include <shlobj.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.209 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: harbour.c,v 1.210 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -710,17 +710,17 @@ void hb_conOutErr( const char * pStr, ULONG ulLen )
 
 char * hb_conNewLine( void )
 {
-   return "\n";
+   return ( char * ) "\n";
 }
 
 static int  s_iFileCase = HB_SET_CASE_MIXED;
 static int  s_iDirCase  = HB_SET_CASE_MIXED;
 static BOOL s_fFnTrim   = FALSE;
-static char s_cDirSep   = OS_PATH_DELIMITER;
+static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
 
 BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
 {
-   if( s_fFnTrim || s_cDirSep != OS_PATH_DELIMITER ||
+   if( s_fFnTrim || s_cDirSep != HB_OS_PATH_DELIM_CHR ||
        s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )
    {
       PHB_FNAME pFileName;
@@ -734,13 +734,13 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
          *pfFree = TRUE;
       }
 
-      if( s_cDirSep != OS_PATH_DELIMITER )
+      if( s_cDirSep != HB_OS_PATH_DELIM_CHR )
       {
          BYTE *p = szFileName;
          while( *p )
          {
             if( *p == s_cDirSep )
-               *p = OS_PATH_DELIMITER;
+               *p = HB_OS_PATH_DELIM_CHR;
             p++;
          }
       }
@@ -760,7 +760,7 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
                ++pFileName->szName;
                --ulLen;
             }
-            pFileName->szName[ulLen] = '\0';
+            ( ( char * ) pFileName->szName )[ulLen] = '\0';
          }
          if( pFileName->szExtension )
          {
@@ -772,7 +772,7 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
                ++pFileName->szExtension;
                --ulLen;
             }
-            pFileName->szExtension[ulLen] = '\0';
+            ( ( char * ) pFileName->szExtension )[ulLen] = '\0';
          }
       }
 
@@ -780,25 +780,25 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
       if( s_iFileCase == HB_SET_CASE_LOWER )
       {
          if( pFileName->szName )
-            hb_strlow( pFileName->szName );
+            hb_strlow( ( char * ) pFileName->szName );
          if( pFileName->szExtension )
-            hb_strlow( pFileName->szExtension );
+            hb_strlow( ( char * ) pFileName->szExtension );
       }
       else if( s_iFileCase == HB_SET_CASE_UPPER )
       {
          if( pFileName->szName )
-            hb_strupr( pFileName->szName );
+            hb_strupr( ( char * ) pFileName->szName );
          if( pFileName->szExtension )
-            hb_strupr( pFileName->szExtension );
+            hb_strupr( ( char * ) pFileName->szExtension );
       }
 
       /* DIRCASE */
       if( pFileName->szPath )
       {
          if( s_iDirCase == HB_SET_CASE_LOWER )
-            hb_strlow( pFileName->szPath );
+            hb_strlow( ( char * ) pFileName->szPath );
          else if( s_iDirCase == HB_SET_CASE_UPPER )
-            hb_strupr( pFileName->szPath );
+            hb_strupr( ( char * ) pFileName->szPath );
       }
 
       hb_fsFNameMerge( ( char * ) szFileName, pFileName );
@@ -808,6 +808,11 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
       *pfFree = FALSE;
 
    return szFileName;
+}
+
+int hb_setGetDirSeparator( void )
+{
+   return s_cDirSep;
 }
 
 /* ------------------------------------------------------------------------- */

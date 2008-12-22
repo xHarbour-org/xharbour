@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.14 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: hbdate.c,v 1.15 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -741,6 +741,28 @@ void hb_dateTimeStr( char * pszTime )
       snprintf( pszTime, 9, "%02d:%02d:%02d", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
    }
 #endif
+}
+
+LONG hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec )
+{
+   LONG lMillisec;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampEncode(%d, %d, %d, %d)", iHour, iMinutes, iSeconds, iMSec));
+
+   if( iHour >= 0 && iHour < 24 &&
+       iMinutes >= 0 && iMinutes < 60 &&
+       iSeconds >= 0 && iSeconds < 60 &&
+       iMSec >= 0 && iMSec < 1000 )
+   {
+      lMillisec = ( ( LONG ) ( iHour * 60 + iMinutes ) * 60 + iSeconds ) *
+                  1000 + iMSec;
+   }
+   else
+   {
+      lMillisec = 0;
+   }
+
+   return lMillisec;
 }
 
 void hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes,

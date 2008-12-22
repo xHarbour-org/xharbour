@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.15 2008/03/09 19:18:25 likewolf Exp $
+ * $Id: seconds.c,v 1.16 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -50,6 +50,11 @@
  *
  */
 
+#define HB_OS_WIN_32_USED
+
+#define INCL_DOS
+#define INCL_DOSPROFILE
+
 #include "hbapi.h"
 #include "hbdate.h"
 
@@ -57,10 +62,10 @@
 
 #if ( defined( HB_OS_BSD ) || defined( HB_OS_LINUX ) ) && !defined( __WATCOMC__ )
    #include <sys/time.h>
-#else
+#elif !( defined( HB_WINCE ) && defined( _MSC_VER ) )
    #include <sys/timeb.h>
 #endif
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX_COMPATIBLE )
    #include <sys/times.h>
    #include <unistd.h>
 #endif
@@ -69,6 +74,13 @@
 #elif defined(_MSC_VER)
    #define timeb _timeb
    #define ftime _ftime
+#endif
+#if defined( HB_OS_OS2 )
+   #define BUFSIZE   16 * 1024
+   #include <unistd.h>
+   #if defined( __WATCOMC__ )
+      #include <process.h>
+   #endif
 #endif
 
 void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
@@ -83,7 +95,7 @@ void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
    *plJulian = hb_dateEncode( st.wYear, st.wMonth, st.wDay );
    *plMilliSec = ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
                  st.wMilliseconds;
-#elif ( defined( HB_OS_LINUX ) && !defined( __WATCOMC__ ) ) || defined( HB_OS_BSD )
+#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
    struct timeval tv;
    struct tm st;
    time_t seconds;
@@ -96,6 +108,19 @@ void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
    *plJulian = hb_dateEncode( st.tm_year + 1900, st.tm_mon + 1, st.tm_mday );
    *plMilliSec = ( ( st.tm_hour * 60 + st.tm_min ) * 60 + st.tm_sec ) * 1000 +
                  tv.tv_usec / 1000;
+#elif defined( HB_OS_BSD )
+   struct timeval tv;
+   struct tm * st;
+   time_t seconds;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
+
+   gettimeofday( &tv, NULL );
+   seconds = tv.tv_sec;
+   st = localtime( &seconds );
+   *plJulian = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
+   *plMilliSec = ( ( st->tm_hour * 60 + st->tm_min ) * 60 + st->tm_sec ) * 1000 +
+                 tv.tv_usec / 1000.0;
 #else
    struct timeb tb;
    struct tm * st;
@@ -157,7 +182,7 @@ double hb_dateSeconds( void )
           ( SystemTime.wMinute * 60 ) +
             SystemTime.wSecond +
           ( ( double ) SystemTime.wMilliseconds / 1000.0 );
-#elif ( defined( HB_OS_LINUX ) && !defined( __WATCOMC__ ) ) || defined( HB_OS_BSD )
+#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
    struct timeval tv;
    struct tm oTime;
    time_t seconds;
@@ -170,6 +195,20 @@ double hb_dateSeconds( void )
    return ( oTime.tm_hour * 3600 ) +
           ( oTime.tm_min * 60 ) +
             oTime.tm_sec +
+          ( ( double ) tv.tv_usec / 1000000.0 );
+#elif defined( HB_OS_BSD )
+   struct timeval tv;
+   struct tm * oTime;
+   time_t seconds;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
+
+   gettimeofday( &tv, NULL );
+   seconds = tv.tv_sec;
+   oTime = localtime( &seconds );
+   return ( oTime->tm_hour * 3600 ) +
+          ( oTime->tm_min * 60 ) +
+            oTime->tm_sec +
           ( ( double ) tv.tv_usec / 1000000.0 );
 #else
    struct timeb tb;
@@ -201,9 +240,16 @@ HB_FUNC( SECONDSCPU )
    hb_retnd( hb_secondsCPU( hb_parni( 1 ) ) );
 }
 
+
+#endif
+
 HB_FUNC( HB_CLOCKS2SECS )
 {
-   hb_retnd( (double) hb_parnl( 1 ) / CLOCKS_PER_SEC );
+#ifdef CLOCKS_PER_SEC
+   hb_retnd( ( double ) hb_parnint( 1 ) / CLOCKS_PER_SEC );
+#else
+   hb_retnd( ( double ) hb_parnint( 1 ) / 1000 );
+#endif
 }
 
 /*
@@ -220,7 +266,7 @@ HB_FUNC( HB_CLOCKS2SECS )
 double hb_secondsCPU( int n )
 {
    double d = 0.0;
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN_32 ) && !defined( HB_OS_UNIX_COMPATIBLE )
    FILETIME Create, Exit, Kernel, User;
    static BOOL s_fInit = FALSE, s_fWinNT = FALSE;
 
@@ -231,10 +277,16 @@ double hb_secondsCPU( int n )
    }
 #endif
 
+#if defined( HB_OS_OS2 )
+   static ULONG s_timer_interval = 0;
+
+   QSGREC ** pBuf;
+#endif
+
    if( ( n < 1 || n > 3 ) && ( n < 11 || n > 13 ) )
       n = 3;
 
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX_COMPATIBLE )
    {
       struct tms tm;
 
@@ -277,15 +329,53 @@ double hb_secondsCPU( int n )
       d /= 10000000.0;
    }
    else
+#elif defined( HB_OS_OS2 )
+
+   if( s_timer_interval == 0 )
+      DosQuerySysInfo( QSV_TIMER_INTERVAL, QSV_TIMER_INTERVAL, ( PVOID ) &s_timer_interval, sizeof( ULONG ) );
+
+   pBuf = ( QSGREC ** ) hb_xalloc( BUFSIZE );
+
+   if( pBuf )
+   {
+#if defined( __GNUC__ )
+      APIRET rc = DosQuerySysState( QS_PROCESS, 0L, _getpid(), 0L, pBuf, BUFSIZE );
+#else
+      APIRET rc = DosQuerySysState( QS_PROCESS, 0L, getpid(), 0L, pBuf, BUFSIZE );
+#endif
+
+      if( rc == NO_ERROR )
+      {
+         QSGREC * pGrec = * pBuf;
+         QSPREC * pPrec = ( QSPREC * ) ( ( ULONG ) pGrec + sizeof( QSGREC ) );
+         QSTREC * pTrec = pPrec->pThrdRec;
+
+         int i;
+
+         for( i = 0; i < pPrec->cTCB; i++, pTrec++ )
+         {
+            if( n & 1 )
+               d += pTrec->usertime;
+
+            if( n & 2 )
+               d += pTrec->systime;
+         }
+
+         d = d * 10.0 / s_timer_interval;
+      }
+
+      hb_xfree( pBuf );
+   }
+   else
+
 #endif
    {
       /* TODO: this code is only for DOS and other platforms which cannot
                calculate process time */
+
       if( n & 1 )
-         d = hb_dateSeconds(  );
+         d = hb_dateSeconds();
    }
 #endif
    return d;
 }
-
-#endif

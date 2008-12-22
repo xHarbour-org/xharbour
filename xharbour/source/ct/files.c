@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.14 2008/02/10 13:14:08 lculik Exp $
+ * $Id: files.c,v 1.15 2008/03/31 12:09:53 modalsist Exp $
  */
 
 /*
@@ -16,7 +16,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or ( at your option )
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -27,7 +27,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA ( or visit the web site http://www.gnu.org/ ).
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -55,11 +55,15 @@
  *
  */
 
+/* W32 */
 #define HB_OS_WIN_32_USED
-#include <hbapi.h>
-#include <hbapifs.h>
 
-#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+#include "hbapi.h"
+#include "hbapifs.h"
+#include "hbapiitm.h"
+#include "hbdate.h"
+
+#if !defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX_COMPATIBLE )
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
@@ -101,7 +105,7 @@
       #include <dir.h>
     #endif
 #endif
-#if defined(OS_UNIX_COMPATIBLE) || (defined(__GNUC__) && !defined(__MINGW32__))
+#if defined(HB_OS_UNIX_COMPATIBLE) || (defined(__GNUC__) && !defined(__MINGW32__))
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -150,7 +154,7 @@
    #define FA_VOLCOMP      32768   /* M */
 #endif
 
-#if defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#if defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 static USHORT osToHarbourMask(  USHORT usMask  )
 {
    USHORT usRetMask;
@@ -163,7 +167,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    if(  usMask == ( USHORT ) -1  )
       return 0;
 
-   #if defined( OS_UNIX_COMPATIBLE )
+   #if defined( HB_OS_UNIX_COMPATIBLE )
       /* The use of any particular FA_ define here is meaningless */
       /* they are essentially placeholders */
       usRetMask = 0;
@@ -569,7 +573,7 @@ HB_FUNC( FILESIZE )
    }
 }
 
-#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
 {
    if ( hb_pcount( ) > 0 )
@@ -695,7 +699,7 @@ HB_FUNC( FILEDATE )
       hb_retd( ( LONG ) ( fsOldFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsOldFiles.ff_fdate & ~0xFFE0 );
     }
 
-#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
    {
       if ( hb_pcount(  ) >0 )
@@ -832,7 +836,7 @@ HB_FUNC( FILETIME )
    }
 }
 
-#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
 {
    const char *szFile = hb_parcx( 1 );
@@ -920,77 +924,127 @@ LPTSTR GetTime( FILETIME *rTime )
 
 HB_FUNC( SETFDATI )
 {
-   if ( hb_pcount() >= 1 )
+   if( hb_pcount() >= 1 )
    {
+      PHB_ITEM pDate, pTime;
       char *szFile = hb_parcx( 1 );
-      char *szDate = NULL, *szTime = NULL;
-      int year, month, day, hour = 0, minute = 0, second = 0;
+      int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
 
-      if ( ISDATE( 2 ) || ISDATE( 3 ) )
-      {
-         szDate = ISDATE(2) ? hb_pards(2) : hb_pards(3);
-         sscanf( szDate, "%4d%2d%2d", &year, &month, &day );
-      }
-      if ( ISCHAR( 2 ) || ISCHAR( 3 ) )
-      {
-         szTime = ISCHAR( 2 ) ? hb_parcx( 2 ) : hb_parcx( 3 );
-         sscanf( szTime, "%2d:%2d:%2d", &hour, &minute, &second );
-      }
+      pDate = hb_param( 2, HB_IT_DATE );
+      if( !pDate )
+         pDate = hb_param( 3, HB_IT_DATE );
+      if( pDate )
+         hb_dateDecode( hb_itemGetDL( pDate ), &year, &month, &day );
+
+      pTime = hb_param( 2, HB_IT_STRING );
+      if( !pTime )
+         pTime = hb_param( 3, HB_IT_STRING );
+      if( pTime )
+         hb_timeStrGet( hb_itemGetCPtr( pTime ), &hour, &minute, &second, NULL );
 
 #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
       {
          FILETIME ft, local_ft;
          SYSTEMTIME st;
-         HANDLE f = (HANDLE)_lopen( szFile, OF_READWRITE | OF_SHARE_COMPAT );
+         HANDLE f = ( HANDLE ) _lopen( szFile, OF_READWRITE | OF_SHARE_COMPAT );
 
-         if ( f != (HANDLE)HFILE_ERROR )
+         if( f != ( HANDLE ) HFILE_ERROR )
          {
-            if ( !szDate || !szTime )
+            if( !pDate || !pTime )
             {
                GetLocalTime( &st );
             }
-            if ( szDate )
+            if( pDate )
             {
-               st.wYear = year;
-               st.wMonth = month;
-               st.wDay = day;
+               st.wYear = ( WORD ) year;
+               st.wMonth = ( WORD ) month;
+               st.wDay = ( WORD ) day;
             }
-            if ( szTime )
+            if( pTime )
             {
-               st.wHour = hour;
-               st.wMinute = minute;
-               st.wSecond = second;
+               st.wHour = ( WORD ) hour;
+               st.wMinute = ( WORD ) minute;
+               st.wSecond = ( WORD ) second;
             }
             SystemTimeToFileTime( &st, &local_ft );
             LocalFileTimeToFileTime( &local_ft, &ft );
             hb_retl( SetFileTime( f, NULL, &ft, &ft ) );
-            _lclose( (HFILE)f );
+            _lclose( ( HFILE ) f );
             return;
          }
       }
-#elif defined( OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ )
+#elif defined( HB_OS_OS2 )
+      {
+         FILESTATUS3 fs3;
+         APIRET ulrc;
+
+         ulrc = DosQueryPathInfo( ( PCSZ ) szFile, FIL_STANDARD, &fs3, sizeof( fs3 ) );
+         if( ulrc == NO_ERROR )
+         {
+            FDATE fdate;
+            FTIME ftime;
+
+            if( !pDate || !pTime )
+            {
+               DATETIME dt;
+
+               DosGetDateTime( &dt );
+
+               fdate.year = dt.year - 1980;
+               fdate.month = dt.month;
+               fdate.day = dt.day;
+               ftime.hours = dt.hours;
+               ftime.minutes = dt.minutes;
+               ftime.twosecs = dt.seconds / 2;
+            }
+
+            if( pDate )
+            {
+               fdate.year = year - 1980;
+               fdate.month = month;
+               fdate.day = day;
+            }
+            if( pTime )
+            {
+               ftime.hours = hour;
+               ftime.minutes = minute;
+               ftime.twosecs = second / 2;
+            }
+            fs3.fdateCreation = fs3.fdateLastAccess = fs3.fdateLastWrite = fdate;
+            fs3.ftimeCreation = fs3.ftimeLastAccess = fs3.ftimeLastWrite = ftime;
+            ulrc = DosSetPathInfo( ( PCSZ ) szFile, FIL_STANDARD,
+                                   &fs3, sizeof( fs3 ), DSPI_WRTTHRU );
+         }
+         hb_retl( ulrc == NO_ERROR );
+         return;
+      }
+#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ )
+
+      if( !pDate && !pTime )
+      {
+         hb_retl( utime( szFile, NULL ) == 0 );
+         return;
+      }
+      else
       {
          struct utimbuf buf;
          struct tm new_value;
 
-         if ( !szDate && !szTime )
-         {
-            hb_retl( utime( szFile, NULL ) == 0 );
-            return;
-         }
-
-         if ( !szDate || !szTime )
+         if( !pDate || !pTime )
          {
             time_t current_time;
 
             current_time = time( NULL );
-#if _POSIX_C_SOURCE < 199506L || defined( HB_OS_DARWIN_5 )
+#   if _POSIX_C_SOURCE < 199506L || defined( HB_OS_DARWIN_5 )
             new_value = *localtime( &current_time );
-#else
+#   else
             localtime_r( &current_time, &new_value );
-#endif
+#   endif
          }
-         if ( szDate )
+         else
+            memset( &new_value, 0, sizeof( new_value ) );
+
+         if( pDate )
          {
 #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
             new_value.tm_year = year;
@@ -1001,7 +1055,7 @@ HB_FUNC( SETFDATI )
 #endif
             new_value.tm_mday = day;
          }
-         if ( szTime )
+         if( pTime )
          {
             new_value.tm_hour = hour;
             new_value.tm_min = minute;
@@ -1011,8 +1065,19 @@ HB_FUNC( SETFDATI )
          hb_retl( utime( szFile, &buf ) == 0 );
          return;
       }
+#else
+      {
+         LONG lJulian, lMillisec;
+
+         lJulian = pDate ? hb_dateEncode( year, month, day ) : -1;
+         lMillisec = pTime ? hb_timeStampEncode( hour, minute, second, 0 ) : -1;
+
+         hb_retl( hb_fsSetFileTime( ( BYTE * ) szFile, lJulian, lMillisec ) );
+         return;
+      }
 #endif
    }
+
    hb_retl( FALSE );
 }
 
@@ -1025,57 +1090,36 @@ HB_FUNC( FILEDELETE )
    {
       BYTE * pDirSpec;
       PHB_FFIND ffind;
-      USHORT uiAttr = HB_FA_ALL;
+      ULONG ulAttr = HB_FA_ALL;
       BOOL fFree;
 
       pDirSpec = hb_fsNameConv( ( BYTE * ) hb_parc( 1 ), &fFree );
       if( ISNUM( 2 ) )
       {
-         uiAttr = hb_parni( 2 );
+         ulAttr = hb_parnl( 2 );
       }
 
-      if( ( ffind = hb_fsFindFirst( ( const char *) pDirSpec, uiAttr ) ) != NULL )
+      if( ( ffind = hb_fsFindFirst( ( char * ) pDirSpec, ulAttr ) ) != NULL )
       {
-         PHB_FNAME fname;
-         BYTE *pCurDir;
-         char cCurDsk;
-         char sRoot[2];
+         PHB_FNAME pFilepath;
 
-         cCurDsk = hb_fsCurDrv() ;
-         pCurDir = hb_fsCurDir( cCurDsk ) ;
-
-         sRoot[0] = OS_PATH_DELIMITER ;
-         sRoot[1] = '\0' ;
-
-         if( ( fname = hb_fsFNameSplit( (char*) pDirSpec )) != NULL )
-         {
-            if( fname->szDrive )
-            {
-               hb_fsChDrv( ( BYTE ) ( fname->szDrive[0] - 'A' ) );
-            }
-
-            if( fname->szPath)
-            {
-               hb_fsChDir( ( BYTE *) fname->szPath );
-            }
-
-            hb_xfree( fname );
-         }
+         pFilepath = hb_fsFNameSplit( ( char * ) pDirSpec );
+         pFilepath->szExtension = NULL;
 
          do
          {
-            if( hb_fsDelete( ( BYTE * ) ffind->szName ) )
-            {
+            char szPath[ _POSIX_PATH_MAX + 1 ];
+
+            pFilepath->szName = ffind->szName;
+            hb_fsFNameMerge( szPath, pFilepath );
+
+            if( hb_fsDelete( ( BYTE * ) szPath ) )
                bReturn = TRUE;
-            }
          }
          while( hb_fsFindNext( ffind ) );
 
+         hb_xfree( pFilepath );
          hb_fsFindClose( ffind );
-
-         hb_fsChDrv( (BYTE ) cCurDsk );
-         hb_fsChDir( ( BYTE *) sRoot ) ;
-         hb_fsChDir( pCurDir );
       }
       if( fFree )
          hb_xfree( pDirSpec );
@@ -1086,22 +1130,23 @@ HB_FUNC( FILEDELETE )
 
 
 
-#if defined( HB_OS_DOS )
 
 HB_FUNC( FILESMAX )
 {
-#ifdef __DJGPP__
+#if defined( __DJGPP__ )
    __dpmi_regs r;
    unsigned handles;
    ULONG psp;
 
-   r.h.ah = 0x62; /* Get PSP address */
+   r.h.ah = 0x62;               /* Get PSP address */
    __dpmi_int( 0x21, &r );
-   psp = ( ( (ULONG) r.x.bx ) << 4 ) & 0xFFFFF;
+   psp = ( ( ( ULONG ) r.x.bx ) << 4 ) & 0xFFFFF;
 
    handles = _farpeekw( _dos_ds, psp + 0x32 );
    hb_retni( handles );
+#elif defined( _SC_OPEN_MAX )
+   hb_retnl( sysconf( _SC_OPEN_MAX ) );
+#else
+   hb_retni( -1 );
 #endif
 }
-
-#endif
