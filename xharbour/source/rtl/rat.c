@@ -1,5 +1,5 @@
 /*
- * $Id: rat.c,v 1.2 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: rat.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -64,15 +64,18 @@ HB_FUNC( RAT )
       {
          char * pszSub = hb_parcx( 1 );
          char * pszText = hb_parcx( 2 );
+         LONG lEnd = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
          BOOL bFound = FALSE;
 
-         while( lPos >= 0 && !bFound )
+         if ( ISNUM( 3 ) )
+             lPos = hb_parnl( 3 ) - 1;
+
+         while( lPos >= lEnd && !bFound )
          {
             if( *( pszText + lPos ) == *pszSub )
                bFound = ( memcmp( pszSub, pszText + lPos, ulSubLen ) == 0 );
             lPos--;
          }
-
          hb_retnl( bFound ? lPos + 2 : 0 );
       }
       else
@@ -82,4 +85,3 @@ HB_FUNC( RAT )
       /* This function never seems to raise an error */
       hb_retni( 0 );
 }
-
