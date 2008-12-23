@@ -1,5 +1,5 @@
 #
-# $Id: xcc.cf,v 1.4 2007/01/11 01:00:34 druzus Exp $
+# $Id: xcc.cf,v 1.5 2008/03/09 18:44:26 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -57,16 +57,14 @@ endif
 LINKLIBS += pcrepos$(LIB_EXT)
 
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
 endif
-LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
+LINKLIBS += zlib$(LIB_EXT)
 
-ifeq ($(HB_MULTI_GT),yes)
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -LIBPATH:$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
 endif
-LINKLIBS += gtnul$(LIB_EXT)
-endif
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), $(gt)$(LIB_EXT))
 
 endif
 

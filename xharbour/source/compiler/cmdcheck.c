@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.39 2008/06/06 03:30:25 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.40 2008/06/09 14:13:07 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
       /* Check all switches in command line
          They start with an OS_OPT_DELIMITER char
       */
-      for( i = 0; i < iArg; i++ )
+      for( i = 1; i < iArg; i++ )
       {
          hb_xstrcat( hb_Command_Line, Args[ i ], " ", NULL );
 
@@ -1259,7 +1259,7 @@ void hb_compChkDefines( int iArg, char * Args[] )
 
       /* Check all switches in command line They start with an OS_OPT_DELIMITER
          char */
-      for( i = 0; i < iArg; i++ )
+      for( i = 1; i < iArg; i++ )
       {
          hb_compChkDefineSwitch( Args[ i ] );
       }

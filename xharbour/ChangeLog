@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6312 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.6313 2008/12/23 16:37:04 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,89 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-23 21:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * xharbour/config/global.cf
+    * formatting
+
+  * xharbour/config/w32/bcc32.cf
+  * xharbour/config/w32/xcc.cf
+    ! updated for new GT and zlib libraries
+
+  * xharbour/contrib/gtwvg/wvtutils.c
+    * use HB_PTRDIFF instead of UINT_PTR which is not available in some
+      C compilers
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/garbage.c
+    * changed ULONG hb_gcIncRef( void * ) to void hb_gcIncRef( void * ).
+      The return value is not necessary and it may be impossible to write
+      machine code without external locking (mutexes) which will make
+      such operation in atomic MT safe way on some CPU. F.e. it's possible
+      to write BOOL hb_atomic_dec( int * ) in assembler for i386 but not
+      int hb_atomic_inc( int * ). Only void hb_atomic_inc( int * ) can be
+      written without additional synchronization mechanism.
+
+  * xharbour/include/hbcompat.ch
+    ! fixed included header files and synced with Harbour version
+      If possible keep this file synced in both projects.
+
+  * xharbour/include/hbdefs.h
+    * disabled HB_FORCE_EXPORT in MinGW builds - it breaks xharbour.dll
+      creation when GNU make is used so also -shared parameter do not work
+      in xhb* scripts.
+
+  * xharbour/include/thread.h
+    + added assembler code for hb_atomic_inc32() and hb_atomic_dec32()
+      for GCC and 32bit builds. It gives as least basic support for
+      MT safe readonly access to complex variables in Linux 32bit builds.
+
+  * xharbour/source/common/hbstr.c
+    ! fixed function name in HB_TRACE message
+
+  * xharbour/source/compiler/cmdcheck.c
+    ! fixed parameter parsing - argv[0] is program name with path and
+      it was used to parse parameters so any '-' and '/' character in
+      harbour binaries name and/or paths were decoded as parameters.
+
+  * xharbour/source/pp/ppcore.c
+    ! fixed accessing freed memory in line number updating
+
+  * xharbour/source/pp/ppgen.c
+    ! added missing #undef HB_VER_L_USR in generated hbverbld.h file
+
+  * xharbour/include/thread.h
+  * xharbour/source/vm/thread.c
+  * xharbour/source/rtl/hbserv.c
+    ! fixed support for HB_THREAD_TLS_KEYWORD - if platform supports it
+      then it gives performance improvement.
+
+  * xharbour/source/rtl/pcre/Makefile
+    ! added include path necessary for POCC/XCC builds with GNU make
+
+  * xharbour/source/vm/classes.c
+    ! fixed casting for memcpy and pClass->pFunError - by default it's
+      declared as function address and passing code segment pointer to
+      memcpy is illegal in some OSes so without valid casting such code
+      cannot be compiled
+    + added __CLS_CNTSHRDATA()
+
+  * xharbour/include/hbtypes.h
+  * xharbour/source/vm/maindllp.c
+    * updated function declarations to current CVS
+    ! fixed wrong default initialization for FHANDLE. It should be
+      ( FHANDLE ) -1 instead of NULL
+
+  * xharbour/utils/hbrun/Makefile
+    ! removed unnecessary zlib from library list - it should be set
+      automatically like pcrepos by *.cf files when rtl is used.
+
+  * xharbour/tests/speedtst.prg
+    * updated speedtst to current Harbour code. This version allows to
+      test also MT performance it's quite good MT stress test - better
+      then dedicated ones
+
+  (by Przemyslaw Czerpak. Thanks!)
 
 2008-12-23 19:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbstack.h

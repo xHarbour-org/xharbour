@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.37 2008/11/22 08:25:23 andijahja Exp $
+* $Id: hbserv.c,v 1.38 2008/12/22 22:09:45 likewolf Exp $
 */
 
 /*
@@ -276,7 +276,12 @@ void *s_signalListener( void *my_stack )
    siginfo_t sinfo;
 #endif
 
+#ifdef HB_THREAD_TLS_KEYWORD
+   hb_thread_stack = my_stack;
+#else
    pthread_setspecific( hb_pkCurrentStack, my_stack );
+#endif
+
    pStack->th_id = HB_CURRENT_THREAD();
    hb_threadLinkStack( pStack );
    HB_STACK_LOCK;
@@ -765,7 +770,11 @@ HB_FUNC( HB_STARTSERVICE )
             return;
          }
          #ifdef HB_THREAD_SUPPORT
-         pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stackMT );
+            #ifdef HB_THREAD_TLS_KEYWORD
+               hb_thread_stack = &hb_stackMT;
+            #else
+               pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stackMT );
+            #endif
          #endif
       }
    }

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2007/11/07 23:34:24 likewolf Exp $
+# $Id: Makefile,v 1.5 2008/05/14 06:40:50 likewolf Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -33,7 +33,6 @@ LIBS=\
 	macro \
 	pp \
 	common \
-	zlib \
 	$(SOCK) \
 
 

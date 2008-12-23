@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.14 2007/03/21 11:26:22 marchuet Exp $
+# $Id: global.cf,v 1.15 2008/03/09 18:44:26 likewolf Exp $
 #
 
 GRANDP = ../../
@@ -7,7 +7,7 @@ HB_ARCH := $(HB_ARCHITECTURE)/$(HB_COMPILER)
 
 HB_DB_DRIVERS=\
 	nulsys \
-        bmdbfcdx \
+	bmdbfcdx \
 	dbfntx \
 	dbfcdx \
 	dbffpt \

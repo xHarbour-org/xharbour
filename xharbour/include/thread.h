@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.124 2008/11/25 06:21:18 andijahja Exp $
+* $Id: thread.h,v 1.125 2008/12/22 22:09:44 likewolf Exp $
 */
 
 /*
@@ -731,6 +731,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
    /* Use __thread keyword where available */
    #if __GNUC__ >= 3 && defined( HB_THREAD_TLS_BUG )
+      extern HB_STACK hb_stackMT;
       #if defined( HB_THREAD_OPTIMIZE_STACK ) && defined( HB_STACK_MACROS )
          #define HB_THREAD_STUB\
             HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stackMT : hb_thread_stack;
@@ -874,8 +875,37 @@ void hb_threadCancelInternal( void );
 
 #else
 
-   #define HB_ATOMIC_INC( x )          ( ++(x) )
-   #define HB_ATOMIC_DEC( x )          ( --(x) )
+   #if HB_COUNTER_SIZE == 4 && defined( __GNUC__ ) && \
+       ( defined( i386 ) || defined( __i386__ ) || defined( __x86_64__ ) )
+
+      static __inline__ void hb_atomic_inc32( volatile int * p )
+      {
+         __asm__ __volatile__(
+            "lock; incl %0\n"
+            :"=m" (*p) :"m" (*p)
+         );
+      }
+
+      static __inline__ int hb_atomic_dec32( volatile int * p )
+      {
+         unsigned char c;
+         __asm__ __volatile__(
+            "lock; decl %0\n"
+            "sete %1\n"
+            :"=m" (*p), "=qm" (c) :"m" (*p) : "memory"
+         );
+         return c == 0;
+      }
+
+      #define HB_ATOMIC_INC( x )    ( hb_atomic_inc32( ( volatile int * ) &(x) ) )
+      #define HB_ATOMIC_DEC( x )    ( hb_atomic_dec32( ( volatile int * ) &(x) ) )
+
+   #else
+
+      #define HB_ATOMIC_INC( x )    ( ++(x) )
+      #define HB_ATOMIC_DEC( x )    ( --(x) )
+
+   #endif
 
    #define HB_CRITICAL_LOCK( x )
    #define HB_CRITICAL_TRYLOCK( x )

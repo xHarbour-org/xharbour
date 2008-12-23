@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.250 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: hbapi.h,v 1.251 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ extern HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern HB_EXPORT void   hb_gcGripDrop( HB_ITEM_PTR pItem );
 
 extern HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
-extern HB_EXPORT ULONG  hb_gcIncRef( void *pBlock );
+extern HB_EXPORT void   hb_gcIncRef( void *pBlock );
 extern HB_EXPORT ULONG  hb_gcDecRef( void *pBlock );
 extern HB_EXPORT void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
 extern HB_EXPORT void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
@@ -519,7 +519,7 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
 
 extern HB_FORCE_EXPORT void    hb_storc( const char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_storclen( const char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
-extern HB_EXPORT int      hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
+extern HB_EXPORT int     hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_stords( const char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stordts( const char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stord( int iYear, int iMonth, int iDay, int iParam, ... ); /* stores a Julian's date value on a variable by reference */

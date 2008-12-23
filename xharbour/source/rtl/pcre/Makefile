@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2007/05/20 03:26:22 ronpinkas Exp $
+# $Id: Makefile,v 1.4 2008/10/24 19:36:34 lculik Exp $
 #
 
 ROOT = ../../../
@@ -31,3 +31,6 @@ C_SOURCES=\
 LIBNAME=pcrepos
 
 include $(TOP)$(ROOT)config/lib.cf
+
+# it's necessary for POCC/XCC compilers
+CFLAGS += -I../../

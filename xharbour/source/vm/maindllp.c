@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.27 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.28 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ char * hb_parc( int iParam, ... )
 
 PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 {
-   PHB_ITEM pReturn;
+   PHB_ITEM pReturn = NULL;
    static FARPROC pParam = NULL;
 
    if ( !pParam )
@@ -238,7 +238,7 @@ PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 
 PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or a NIL item if param not provided */
 {
-   PHB_ITEM pReturn;
+   PHB_ITEM pReturn = NULL;
    static FARPROC pParamError = NULL;
 
    if ( !pParamError )
@@ -257,7 +257,7 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
 #undef hb_pcount
 int  hb_pcount( void )          /* returns the number of suplied parameters */
 {
-   int iReturn;
+   int iReturn = 0;
    static FARPROC pCounts = NULL;
 
    if ( !pCounts )
@@ -520,7 +520,7 @@ void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
 #undef hb_parinfa
 ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or element type of an array parameter */
 {
-   ULONG ulReturn;
+   ULONG ulReturn = 0;
    static FARPROC pParinfa = NULL;
 
    if ( !pParinfa )
@@ -539,7 +539,7 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
 #undef hb_parinfo
 ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 {
-   ULONG ulReturn;
+   ULONG ulReturn = 0;
    static FARPROC pParinfo = NULL;
 
    if ( !pParinfo )
@@ -830,7 +830,7 @@ LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
 }
 
 #undef hb_storc
-void hb_storc( char * szText, int iParam, ... )
+void hb_storc( const char * szText, int iParam, ... )
 {
    static FARPROC pStorC = NULL;
 
@@ -860,7 +860,7 @@ void hb_storc( char * szText, int iParam, ... )
 }
 
 #undef hb_storclen
-void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
+void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
 {
    static FARPROC pStorC = NULL;
 
@@ -890,7 +890,7 @@ void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
 }
 
 #undef hb_stords
-void hb_stords( char * szDate, int iParam, ... )
+void hb_stords( const char * szDate, int iParam, ... )
 {
    static FARPROC pStorDs = NULL;
 
@@ -1390,7 +1390,7 @@ BOOL hb_fsDelete( BYTE * pszFileName )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsWrite
-USHORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+USHORT hb_fsWrite( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 {
    USHORT pReturn = 0;
    static HB_FSWRITE pFunc = NULL;
@@ -1410,7 +1410,7 @@ USHORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsSeek
-ULONG hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
+ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
 {
    ULONG pReturn = 0;
    static HB_FSSEEK pFunc = NULL;
@@ -1430,9 +1430,9 @@ ULONG hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsCreate
-FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
+HB_FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
 {
-   FHANDLE pReturn = NULL;
+   HB_FHANDLE pReturn = ( HB_FHANDLE ) -1;
    static HB_FSCREATE pFunc = NULL;
 
    if ( !pFunc )
@@ -1450,7 +1450,7 @@ FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsRead
-USHORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 {
    USHORT pReturn = 0;
    static HB_FSREAD pFunc = NULL;
@@ -1470,9 +1470,9 @@ USHORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsOpen
-FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
+HB_FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
 {
-   FHANDLE pReturn = NULL;
+   HB_FHANDLE pReturn = ( HB_FHANDLE ) -1;
    static HB_FSOPEN pFunc = NULL;
 
    if ( !pFunc )
@@ -1490,7 +1490,7 @@ FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
 
 //----------------------------------------------------------------------------//
 #undef hb_fsClose
-void hb_fsClose( FHANDLE hFileHandle  )
+void hb_fsClose( HB_FHANDLE hFileHandle  )
 {
    static HB_FSCLOSE pFunc = NULL;
 

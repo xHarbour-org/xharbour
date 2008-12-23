@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.217 2008/11/22 08:25:37 andijahja Exp $
+* $Id: thread.c,v 1.218 2008/12/22 22:09:45 likewolf Exp $
 */
 
 /*
@@ -129,7 +129,7 @@ static UINT s_thread_unique_id;
 #elif defined(HB_OS_OS2)
    PPVOID hb_dwCurrentStack;
    HEV  hb_hevWakeUpAll; /* posted to wake up all threads waiting somewhere on an INDEFINITE wait */
-#else
+#elif !defined(HB_THREAD_TLS_KEYWORD)
    pthread_key_t hb_pkCurrentStack;
 #endif
 
@@ -1020,7 +1020,11 @@ void hb_threadTerminator( void *pData )
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_STACK *_pStack_ = (HB_STACK *) pData;
 #else
-   HB_STACK *_pStack_ = (HB_STACK *) pthread_getspecific( hb_pkCurrentStack );
+   #ifdef HB_THREAD_TLS_KEYWORD
+      HB_STACK *_pStack_ = hb_thread_stack;
+   #else
+      HB_STACK *_pStack_ = (HB_STACK *) pthread_getspecific( hb_pkCurrentStack );
+   #endif
    HB_SYMBOL_UNUSED( pData );
 #endif
 

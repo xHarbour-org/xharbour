@@ -1,505 +1,717 @@
 /*
- * $Id: speedtst.prg,v 1.6 2005/03/31 04:02:54 druzus Exp $
+ * $Id: speedtst.prg 9572 2008-10-07 19:27:33Z druzus $
  */
 
-#define ARR_LEN 16
+/*
+ * Harbour Project source code:
+ *    HVM speed test program
+ *
+ * Copyright 2008 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * www - http://www.harbour-project.org
+ *
+ */
+
+
+#define N_TESTS 54
 #define N_LOOPS 1000000
+#define ARR_LEN 16
 
-//#define NO_DBF_TEST
-#define NO_KEYBOARD_TEST
-#define NO_ASSOC_TEST
-
-#define REAL_TIME
-
-#ifdef __CLIP__
-    #define ASSOC_ARRAY map()
-    #undef REAL_TIME
-#endif
-#ifdef FlagShip
-    #undef REAL_TIME
-    #xtranslate seconds() => fs_seconds()
-#endif
 #ifdef __XHARBOUR__
-    #define ASSOC_ARRAY Hash()
-    #undef REAL_TIME
-#endif
-#ifdef __HARBOUR__
-    #undef REAL_TIME
+   /* By default build xHarbour binaries without MT support
+    * xHarbour needs separated version for MT and ST mode
+    * because standard MT functions are not available in
+    * ST libraries.
+    */
+   #ifndef __ST__
+      #ifndef __MT__
+         #ifndef MT
+            #ifndef HB_THREAD_SUPPORT
+               #define __ST__
+            #endif
+         #endif
+      #endif
+   #endif
 #endif
 
-#ifdef REAL_TIME
-    #xtranslate secondscpu([<x>]) => seconds()
-#endif
-#ifndef EOL
-    #define EOL chr(10)
-#endif
+
 #command ? => outstd(EOL)
-#command ? <xx,...> => outstd(<xx>, EOL)
+#command ? <xx,...> => outstd(EOL);outstd(<xx>)
 
-#ifdef NO_ASSOC_TEST
-    #undef ASSOC_ARRAY
-#endif
+#include "common.ch"
 
-function main()
-#ifndef NO_DBF_TEST
-field F_C, F_N, F_D
-#endif
-memvar M_C, M_N, M_D
-local L_C, L_N, L_D
-local i, j, t, c, c2, n, d, o, bc, tn, total, totalr, aa,;
-      a[ARR_LEN], a2[ARR_LEN], a3[ARR_LEN], aDb, cFi
-#ifdef ASSOC_ARRAY
-    local aAssoc := ASSOC_ARRAY
-#endif
-private M_C := dtos(date()),;
-        M_N := 112345.67,;
-        M_D := date()
-
-#ifndef __CLIP__
-//#ifdef __XHARBOUR__
-//  setcancel(.f.)
-//  altd(0)
-//#endif
-#endif
-#ifdef __CLIP__
-  SET MACRO_IN_STRING OFF
-  //CLEAR SCREEN
-#endif
-#ifdef FlagShip
-  FS_SET( "zerobyte", .t. )
-  FS_SET( "devel", .f. )
-//  FS_SET( "break", 0 )
-//  FS_SET( "debug", 0 )
-#endif
-
-for i:=1 to len(a)
-    a[i]:=i
-    a2[i]:=dtos(date())+chr(i%64+32)+chr(i%64+64)+str(i,10)
-    a3[i]:=stuff(dtos(date()),7,0,".")
-next
-
-? ""
-? VERSION()+", "+OS()
-? "ARR_LEN =", ARR_LEN
-? "N_LOOPS =", N_LOOPS
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-next
-tn:=secondscpu()-t
-? "empty loops overhead =", tn
-#ifdef REAL_TIME
-    ? "real time -> seconds()"
+#ifdef __HARBOUR__
+   #define EOL hb_OSNewLine()
 #else
-    ? "CPU usage -> secondsCPU()"
+   #define HB_SYMBOL_UNUSED( symbol )  ( ( symbol ) )
+   #ifndef __CLIP__
+      #xtranslate secondsCPU() => seconds()
+   #endif
+   #ifndef EOL
+      #define EOL chr(10)
+   #endif
 #endif
-? ""
 
-aDb:={ {"F_C", "C", 10, 0},;
-       {"F_N", "N", 10, 2},;
-       {"F_D", "D",  8, 0} }
-cFi:="tst_tmp.dbf"
-if file(cFi)
-    ferase(cFi)
+#xcommand _( [<cmds,...>] ) => [<cmds>]
+
+#xcommand TEST <testfunc>           ;
+          [ WITH <locals,...> ]     ;
+          [ INIT <init> ]           ;
+          [ EXIT <exit> ]           ;
+          [ INFO <info> ]           ;
+          CODE [<*testExp*>] =>     ;
+   func <testfunc> ;                ;
+      local time, i, x := nil ;     ;
+      [ local <locals> ; ]          ;
+      [ <init> ; ]                  ;
+      time := secondscpu() ;        ;
+      for i:=1 to N_LOOPS ;         ;
+         [<testExp>;]               ;
+      next ;                        ;
+      time := secondscpu() - time ; ;
+      [ <exit> ; ]                  ;
+   return { procname() + ": " + iif( <.info.>, <(info)>, #<testExp> ), time }
+
+
+proc main( ... )
+   local aParams, nMT, cExclude, lScale, cParam, cMemTests, lSyntax, i
+
+   aParams := hb_aparams()
+   lSyntax := lScale := .f.
+   cMemTests := "029 030 023 025 027 040 041 043 052 053 019 022 031 032 054 "
+   cExclude := ""
+   nMT := 0
+   for each cParam in aParams
+      cParam := lower( cParam )
+      if cParam = "--thread"
+         if substr( cParam, 9, 1 ) == "="
+            if isdigit( substr( cParam, 10, 1 ) )
+               nMT := val( substr( cParam, 10 ) )
+            elseif substr( cParam, 10 ) == "all"
+               nMT := -1
+            else
+               lSyntax = .t.
+            endif
+         elseif empty( substr( cParam, 9 ) )
+            nMT := -1
+         else
+            lSyntax = .t.
+         endif
+      elseif cParam = "--exclude="
+         if substr( cParam, 11 ) == "mem"
+            cExclude += cMemTests
+         else
+            cExclude += strtran( strtran( strtran( substr( cParam, 11 ), ;
+                        ".", " " ), ".", " " ), "/", " " ) + " "
+         endif
+      elseif cParam = "--only="
+         cExclude := ""
+         if substr( cParam, 8 ) == "mem"
+            cParam := cMemTests
+         endif
+         for i := 1 to N_TESTS
+            if !strzero( i, 3 ) $ cParam
+               cExclude += strzero( i, 3 ) + " "
+            endif
+         next
+      elseif cParam = "--scale"
+         lScale := .t.
+      else
+         lSyntax = .t.
+      endif
+      if lSyntax
+         ? "Unknown option:", cParam
+         ? "syntax:", hb_argv( 0 ), "[--thread[=<num>]] [--only=<test(s)>] [--exclude=<test(s)>]"
+         ?
+         return
+      endif
+   next
+   test( nMT, cExclude, lScale )
+return
+
+
+#ifdef __XHARBOUR__
+
+   #xtranslate hb_mtvm()                  => hb_multiThread()
+   #xtranslate hb_threadWaitForAll()      => WaitForThreads()
+   #xtranslate hb_mutexNotify(<x,...>)    => Notify(<x>)
+
+#ifndef __ST__
+
+
+   /* do not expect that this code will work with xHarbour.
+    * xHarbour has many race conditions which are exploited quite fast
+    * on real multi CPU machines so it crashes in different places :-(
+    * probably this code should be forwared to xHarbour developers as
+    * some type of MT test
+    */
+
+   /* this define is only for test if emulation function works
+    * without running real test which causes that xHarbour crashes
+    */
+   //#define _DUMY_XHB_TEST_
+
+
+   function hb_mutexSubscribe( mtx, nTimeOut, xSubscribed )
+      local lSubscribed
+      if valtype( nTimeOut ) == "N"
+         nTimeOut := round( nTimeOut * 1000, 0 )
+         xSubscribed := Subscribe( mtx, nTimeOut, @lSubscribed )
+      else
+         xSubscribed := Subscribe( mtx )
+         lSubscribed := .t.
+      endif
+   return lSubscribed
+
+   /* in xHarbour there is race condition in JoinThread() which
+    * fails if thread end before we call it so we cannot use it :-(
+    * this code tries to simulate it and also add support for thread
+    * return value
+    */
+
+   function hb_threadStart( ... )
+      local thId
+      thId := StartThread( @threadFirstFunc(), hb_aParams() )
+      /* Just like in JoinThread() the same race condition exists in
+       * GetThreadId() so we will use HVM thread numbers internally
+       */
+#ifdef _DUMY_XHB_TEST_
+   return val( substr( hb_aParams()[1], 2 ) )
+#else
+   return GetThreadId( thId )
+#endif
+
+   function hb_threadJoin( thId, xResult )
+      xResult := results( thId )
+   return .t.
+
+   static function threadFirstFunc( aParams )
+      local xResult
+#ifdef _DUMY_XHB_TEST_
+      xResult := { "skipped test " + aParams[1], val( substr( aParams[1], 2 ) ) + 0.99 }
+      results( val( substr( aParams[1], 2 ) ), xResult )
+#else
+      xResult := hb_execFromArray( aParams )
+      results( GetThreadId(), xResult )
+#endif
+   return nil
+
+   static function results( nThread, xResult )
+      static s_aResults
+      static s_mutex
+      if s_aResults == nil
+         s_aResults := HSetAutoAdd( hash(), .t. )
+         s_mutex := hb_mutexCreate()
+      endif
+      if pcount() < 2
+         while ! nThread $ s_aResults
+            Subscribe( s_mutex, 1000 )
+         enddo
+         xResult := s_aResults[ nThread ]
+      else
+         s_aResults[ nThread ] := xResult
+         /* We cannot use NotifyAll() here because it will create
+          * race condition. In this program only one thread join
+          * results so we can use simple Notify() as workaround
+          */
+         //NotifyAll( s_mutex )
+         Notify( s_mutex )
+      endif
+   return xResult
+
+#else
+
+   function hb_threadStart()
+   return nil
+   function hb_threadJoin()
+   return nil
+   function hb_mutexCreate()
+   return nil
+   function hb_mutexSubscribe()
+   return nil
+   function hb_mutexLock()
+   return nil
+   function hb_mutexUnlock()
+   return nil
+   function notify()
+   return nil
+   function waitForThreads()
+   return nil
+
+#endif
+
+/* initialize mutex in hb_trheadDoOnce() */
+init proc once_init()
+   hb_threadOnce()
+return
+
+function hb_threadOnce( xOnceControl, bAction )
+   static s_mutex
+   local lFirstCall := .f.
+   if s_mutex == NIL
+      s_mutex := hb_mutexCreate()
+   endif
+   if xOnceControl == NIL
+      hb_mutexLock( s_mutex )
+      if xOnceControl == NIL
+         xOnceControl := .t.
+         lFirstCall := .t.
+         if bAction != NIL
+            eval( bAction )
+         endif
+      endif
+      hb_mutexUnlock( s_mutex )
+   endif
+return lFirstCall
+
+#endif
+
+
+TEST t000 INFO "empty loop overhead" CODE
+
+TEST t001 WITH L_C:=dtos(date()) CODE x := L_C
+
+TEST t002 WITH L_N:=112345.67    CODE x := L_N
+
+TEST t003 WITH L_D:=date()       CODE x := L_D
+
+TEST t004 INIT _( static s_once, S_C ) ;
+          INIT iif( hb_threadOnce( @s_once ), S_C := dtos(date()), ) ;
+          CODE x := S_C
+
+TEST t005 INIT _( static s_once, S_N ) ;
+          INIT iif( hb_threadOnce( @s_once ), S_N := 112345.67, ) ;
+          CODE x := S_N
+
+TEST t006 INIT _( static s_once, S_D ) ;
+          INIT iif( hb_threadOnce( @s_once ), S_D := date(), ) ;
+          CODE x := S_D
+
+TEST t007 INIT _( memvar M_C ) INIT _( private M_C := dtos( date() ) ) ;
+          CODE x := M_C
+
+TEST t008 INIT _( memvar M_N ) INIT _( private M_N := 112345.67 ) ;
+          CODE x := M_N
+
+TEST t009 INIT _( memvar M_D ) INIT _( private M_D := date() ) ;
+          CODE x := M_D
+
+TEST t010 INIT _( memvar P_C ) ;
+          INIT _( static s_once ) ;
+          INIT _( public P_C ) ;
+          INIT iif( hb_threadOnce( @s_once ), P_C := dtos( date() ), ) ;
+          CODE x := P_C
+
+TEST t011 INIT _( memvar P_N ) ;
+          INIT _( static s_once ) ;
+          INIT _( public P_N ) ;
+          INIT iif( hb_threadOnce( @s_once ), P_N := 112345.67, ) ;
+          CODE x := P_N
+
+TEST t012 INIT _( memvar P_D ) ;
+          INIT _( static s_once ) ;
+          INIT _( public P_D ) ;
+          INIT iif( hb_threadOnce( @s_once ), P_D := date(), ) ;
+          CODE x := P_D
+
+TEST t013 INIT _( field F_C ) INIT use_dbsh() EXIT close_db() ;
+          CODE x := F_C
+
+TEST t014 INIT _( field F_N ) INIT use_dbsh() EXIT close_db() ;
+          CODE x := F_N
+
+TEST t015 INIT _( field F_D ) INIT use_dbsh() EXIT close_db() ;
+          CODE x := F_D
+
+TEST t016 WITH o := errorNew() CODE x := o:GenCode
+
+TEST t017 WITH o := errorNew() CODE x := o[8]
+
+TEST t018 CODE round( i / 1000, 2 )
+
+TEST t019 CODE str( i / 1000 )
+
+TEST t020 WITH s := stuff( dtos( date() ), 7, 0, "." ) CODE val( s )
+
+TEST t021 WITH a := afill( array( ARR_LEN ), ;
+                           stuff( dtos( date() ), 7, 0, "." ) ) ;
+          CODE val( a [ i % ARR_LEN + 1 ] )
+
+TEST t022 WITH d := date() CODE dtos( d - i % 10000 )
+
+TEST t023 CODE eval( { || i % ARR_LEN } )
+
+TEST t024 WITH bc := { || i % ARR_LEN } ;
+          INFO eval( bc := { || i % ARR_LEN } ) ;
+          CODE eval( bc )
+
+TEST t025 CODE eval( { |x| x % ARR_LEN }, i )
+
+TEST t026 WITH bc := { |x| x % ARR_LEN } ;
+          INFO eval( bc := { |x| x % ARR_LEN }, i ) ;
+          CODE eval( bc, i )
+
+TEST t027 CODE eval( { |x| f1( x ) }, i )
+
+TEST t028 WITH bc := { |x| f1( x ) } ;
+          INFO eval( bc := { |x| f1( x ) }, i ) ;
+          CODE eval( bc, i )
+
+TEST t029 CODE x := &( "f1(" + str(i) + ")" )
+
+TEST t030 WITH bc CODE bc := &( "{|x|f1(x)}" ); eval( bc, i )
+
+TEST t031 CODE x := valtype( x ) +  valtype( i )
+
+TEST t032 WITH a := afill( array( ARR_LEN ), ;
+                           stuff( dtos( date() ), 7, 0, "." ) ) ;
+          CODE x := strzero( i % 100, 2 ) $ a[ i % ARR_LEN + 1 ]
+
+TEST t033 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] == s
+
+TEST t034 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] = s
+
+TEST t035 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] >= s
+
+TEST t036 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] <= s
+
+TEST t037 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] < s
+
+TEST t038 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+          INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
+          CODE x := a[ i % ARR_LEN + 1 ] > s
+
+TEST t039 WITH a := array( ARR_LEN ) ;
+          INIT aeval( a, { |x,i| a[i] := i, x } ) ;
+          CODE ascan( a, i % ARR_LEN )
+
+TEST t040 WITH a := array( ARR_LEN ) ;
+          INIT aeval( a, { |x,i| a[i] := i, x } ) ;
+          CODE ascan( a, { |x| x == i % ARR_LEN } )
+
+TEST t041 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
+               s := dtos( date() ), s2 := "static text" ;
+          CODE if i%1000==0;a:={};end; aadd(a,{i,1,.t.,s,s2,a2,bc})
+
+TEST t042 WITH a := {} CODE x := a
+
+TEST t043 CODE x := {}
+
+TEST t044 CODE f0()
+
+TEST t045 CODE f1( i )
+
+TEST t046 WITH c := dtos( date() ) ;
+          INFO f2( c[1...8] ) ;
+          CODE f2( c )
+
+TEST t047 WITH c := repl( dtos( date() ), 5000 ) ;
+          INFO f2( c[1...40000] ) ;
+          CODE f2( c )
+
+TEST t048 WITH c := repl( dtos( date() ), 5000 ) ;
+          INFO f2( @c[1...40000] ) ;
+          CODE f2( c )
+
+TEST t049 WITH c := repl( dtos( date() ),5000 ), c2 ;
+          INFO "f2( @c[1...40000] ), c2 := c" ;
+          CODE f2( @c ); c2 := c
+
+TEST t050 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
+               s := dtos( date() ), s2 := "static text", n := 1.23 ;
+          CODE f3( a, a2, s, i, s2, bc, i, n, x )
+
+TEST t051 WITH a := { 1, 2, 3 } CODE f2( a )
+
+TEST t052 CODE x := f4()
+
+TEST t053 CODE x := f5()
+
+TEST t054 WITH c := dtos( date() ) CODE f_prv( c )
+
+function thTest( mtxJobs, aResults )
+   local xJob
+   while .T.
+      hb_mutexSubscribe( mtxJobs,, @xJob )
+      if xJob == NIL
+         exit
+      endif
+      aResults[ xJob ] := &( "t" + strzero( xJob, 3 ) )()
+   enddo
+return nil
+
+function thTestScale( mtxJobs, mtxResults )
+   local xJob
+   while .T.
+      hb_mutexSubscribe( mtxJobs,, @xJob )
+      if xJob == NIL
+         exit
+      endif
+      hb_mutexNotify( mtxResults, &( "t" + strzero( xJob, 3 ) )() )
+   enddo
+return nil
+
+proc test( nMT, cExclude, lScale )
+local nLoopOverHead, nTimes, nSeconds, cNum, aThreads, aResults, ;
+      mtxJobs, mtxResults, nTimeST, nTimeMT, nTimeTotST, nTimeTotMT, ;
+      cTest, x, i, j
+
+create_db()
+
+#ifdef __HARBOUR__
+#include "hbmemory.ch"
+if MEMORY( HB_MEM_USEDMAX ) != 0
+   ? "Warning !!! Memory statistic enabled."
+   ?
+endif
+#endif
+
+//? "Startup loop to increase CPU clock..."
+//x := seconds() + 5; while x > seconds(); enddo
+
+#ifdef __HARBOUR__
+   if !hb_mtvm()
+      if lScale
+         ? "scale test available only in MULTI THREAD mode"
+         ?
+         return
+      endif
+      if nMT != 0
+         ? "SINGLE THREAD mode, number of threads set to 0"
+         nMT := 0
+      endif
+   endif
+   ? date(), time(), os()
+   ? version() + iif( hb_mtvm(), " (MT)" + iif( nMT != 0, "+", "" ), "" ), ;
+     hb_compiler()
+#else
+   ? date(), time(), os()
+   ? version()
+#endif
+if lScale .and. nMT < 1
+   nMT := 1
 endif
 
-#ifndef NO_DBF_TEST
-dbcreate(cFi, aDb)
-select(1)
-use &cFi shared
-dbappend()
-replace F_C with dtos(date())
-replace F_N with 112345.67
-replace F_D with date()
-dbcommit()
-dbunlock()
-
-cFi:="tst_tmp2.dbf"
-if file(cFi)
-    ferase(cFi)
+? "THREADS:", iif( nMT < 0, "all->" + ltrim( str( N_TESTS ) ), ltrim( str( nMT ) ) )
+? "N_LOOPS:", ltrim( str( N_LOOPS ) )
+if !empty( cExclude )
+   ? "excluded tests:", cExclude
 endif
-dbcreate(cFi, aDb)
-select(2)
-use &cFi exclusive
-dbappend()
-replace F_C with dtos(date())
-replace F_N with 112345.67
-replace F_D with date()
-dbcommit()
-dbunlock()
+
+x :=t000()
+nLoopOverHead := x[2]
+
+if lScale
+   ? space(56) + "1 th." + str(nMT,3) + " th.  factor"
+   ? replicate("=",76)
+else
+   ? dsp_result( x, 0 )
+   ? replicate("=",68)
+endif
+
+nSeconds := seconds()
+nTimes := secondsCPU()
+
+#ifdef __HARBOUR__
+   if lScale
+      mtxJobs := hb_mutexCreate()
+      mtxResults := hb_mutexCreate()
+      nTimeTotST := nTimeTotMT := 0
+      for i:=1 to nMT
+         hb_threadStart( "thTestScale", mtxJobs, mtxResults )
+      next
+      for i:=1 to N_TESTS
+         cTest := strzero( i, 3 )
+         if !cTest $ cExclude
+
+            /* linear execution */
+            nTimeST := seconds()
+            for j:=1 to nMT
+               hb_mutexNotify( mtxJobs, i )
+               hb_mutexSubscribe( mtxResults,, @x )
+               cTest := x[1]
+            next
+            nTimeST := seconds() - nTimeST
+            nTimeTotST += nTimeST
+
+            /* simultaneous execution */
+            nTimeMT := seconds()
+            for j:=1 to nMT
+               hb_mutexNotify( mtxJobs, i )
+            next
+            for j:=1 to nMT
+               hb_mutexSubscribe( mtxResults,, @x )
+               cTest := x[1]
+            next
+            nTimeMT := seconds() - nTimeMT
+            nTimeTotMT += nTimeMT
+
+            ? dsp_scaleResult( cTest, nTimeST, nTimeMT, nMT, nLoopOverHead )
+         endif
+
+      next
+      for i:=1 to nMT
+         hb_mutexNotify( mtxJobs, NIL )
+      next
+      hb_threadWaitForAll()
+   elseif nMT < 0
+      aThreads := array( N_TESTS )
+      for i:=1 to N_TESTS
+         cNum := strzero( i, 3 )
+         if !cNum $ cExclude
+            aThreads[ i ] := hb_threadStart( "t" + cNum )
+         endif
+      next
+      for i:=1 to N_TESTS
+         if aThreads[ i ] != NIL .and. hb_threadJoin( aThreads[ i ], @x )
+            ? dsp_result( x, nLoopOverHead )
+         endif
+       next
+   elseif nMT > 0
+      aResults := array( N_TESTS )
+      mtxJobs := hb_mutexCreate()
+      for i:=1 to nMT
+         hb_threadStart( "thTest", mtxJobs, aResults )
+      next
+      for i:=1 to N_TESTS
+         if !strzero( i, 3 ) $ cExclude
+            hb_mutexNotify( mtxJobs, i )
+         endif
+      next
+      for i:=1 to nMT
+         hb_mutexNotify( mtxJobs, NIL )
+      next
+      hb_threadWaitForAll()
+      for i:=1 to N_TESTS
+         if aResults[ i ] != NIL
+            ? dsp_result( aResults[ i ], nLoopOverHead )
+         endif
+      next
+      mtxJobs := NIL
+   else
+      for i:=1 to N_TESTS
+         cNum := strzero( i, 3 )
+         if !cNum $ cExclude
+            ? dsp_result( &( "t" + cNum )(), nLoopOverHead )
+         endif
+      next
+   endif
+#else
+   for i:=1 to N_TESTS
+      cNum := strzero( i, 3 )
+      if !cNum $ cExclude
+         ? dsp_result( &( "t" + cNum )(), nLoopOverHead )
+      endif
+   next
 #endif
 
-L_C := dtos(date())
-L_N := 112345.67
-L_D := date()
+nTimes := secondsCPU() - nTimes
+nSeconds := seconds() - nSeconds
 
-
-total:=secondscpu()
-totalr:=seconds()
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=L_C
-next
-dsp_time( "c:=L_C -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=L_N
-next
-dsp_time( "n:=L_N -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    d:=L_D
-next
-dsp_time( "d:=L_D -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=M_C
-next
-dsp_time( "c:=M_C -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=M_N
-next
-dsp_time( "n:=M_N -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    d:=M_D
-next
-dsp_time( "d:=M_D -> ", t, tn)
-
-#ifndef NO_DBF_TEST
-select(1)
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=F_C
-next
-dsp_time( "(sh) c:=F_C -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=F_N
-next
-dsp_time( "(sh) n:=F_N -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    d:=F_D
-next
-dsp_time( "(sh) d:=F_D -> ", t, tn)
-
-select(2)
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=F_C
-next
-dsp_time( "(ex) c:=F_C -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=F_N
-next
-dsp_time( "(ex) n:=F_N -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    d:=F_D
-next
-dsp_time( "(ex) d:=F_D -> ", t, tn)
-#endif
-
-o:=errorNew()
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=o:GenCode
-next
-dsp_time( "n:=o:GenCode -> ", t, tn)
-
-#ifdef ASSOC_ARRAY
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    aAssoc[a2[i%ARR_LEN+1]+ltrim(str(i%100))]:=i
-next
-dsp_time( "aAssoc[a2[i%ARR_LEN+1]+ltrim(str(i%100)]:=i -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=aAssoc[a2[i%ARR_LEN+1]+ltrim(str(i%100))]
-next
-dsp_time( "c:=aAssoc[a2[i%ARR_LEN+1]+ltrim(str(i%100)] -> ", t, tn)
-#endif
-
-#ifndef NO_KEYBOARD_TEST
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    inkey()
-next
-dsp_time( "inkey() -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    nextkey()
-next
-dsp_time( "nextkey() -> ", t, tn)
-#endif
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    round(i/1000,2)
-next
-dsp_time( "round(i/1000,2) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    str(i/1000)
-next
-dsp_time( "str(i/1000) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    val(a3[i%ARR_LEN+1])
-next
-dsp_time( "val(a3[i%ARR_LEN+1]) -> ", t, tn)
-
-t:=secondscpu()
-j:=date()
-for i:=1 to N_LOOPS
-    dtos(j+i%10000-5000)
-next
-dsp_time( "dtos(j+i%10000-5000) -> ", t, tn)
-
-bc:={||i%ARR_LEN}
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    eval(bc)
-next
-dsp_time( "eval({||i%ARR_LEN}) -> ", t, tn)
-
-bc:={|x|x%ARR_LEN}
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    eval(bc,i)
-next
-dsp_time( "eval({|x|x%ARR_LEN}) -> ", t, tn)
-
-bc:={|x|f1(x)}
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    eval(bc,i)
-next
-dsp_time( "eval({|x|f1(x)}) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    n:=&("f1("+str(i)+")")
-next
-dsp_time( "&('f1('+str(i)+')') -> ", t, tn)
-
-bc:=&("{|x|f1(x)}")
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    eval(bc,i)
-next
-dsp_time( "eval([&('{|x|f1(x)}')]) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j:=valtype(a)+valtype(i)
-next
-dsp_time( "j := valtype(a)+valtype(i) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := str(i%100,2) $ a2[i%ARR_LEN+1]
-next
-dsp_time( "j := str(i%100,2) $ a2[i%ARR_LEN+1] -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := val(a2[i%ARR_LEN+1])
-next
-dsp_time( "j := val(a2[i%ARR_LEN+1]) -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := a2[i%ARR_LEN+1] == c
-next
-dsp_time( "j := a2[i%ARR_LEN+1] == s -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := a2[i%ARR_LEN+1] = c
-next
-dsp_time( "j := a2[i%ARR_LEN+1] = s -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := a2[i%ARR_LEN+1] >= c
-next
-dsp_time( "j := a2[i%ARR_LEN+1] >= s -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    j := a2[i%ARR_LEN+1] < c
-next
-dsp_time( "j := a2[i%ARR_LEN+1] < s -> ", t, tn)
-
-aa:={}
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    if i%1000 == 0
-   aa:={}
-    endif
-    aadd(aa,{i,j,c,a,a2,t,bc})
-next
-dsp_time( "aadd(aa,{i,j,s,a,a2,t,bc}) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f0()
-next
-dsp_time( "f0() -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f1(i)
-next
-dsp_time( "f1(i) -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(c)
-next
-dsp_time( "f2(c["+ltrim(str(len(c)))+"]) -> ", t, tn)
-
-c:=replicate(c,5000)
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(c)
-next
-dsp_time( "f2(c["+ltrim(str(len(c)))+"]) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(@c)
-next
-dsp_time( "f2(@c["+ltrim(str(len(c)))+"]) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(c)
-    c2:=c
-next
-dsp_time( "f2(c["+ltrim(str(len(c)))+"]); c2:=c -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(@c)
-    c2:=c
-next
-dsp_time( "f2(@c["+ltrim(str(len(c)))+"]); c2:=c -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f3(a,a2,c,i,j,t,bc)
-next
-dsp_time( "f3(a,a2,c,i,j,t,bc) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    f2(a2)
-next
-dsp_time( "f2(a2) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    c:=f4()
-next
-dsp_time( "s:=f4() -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    ascan(a,i%ARR_LEN)
-next
-dsp_time( "ascan(a,i%ARR_LEN) -> ", t, tn)
-
-c:=dtos(date())
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    ascan(a2,c+chr(i%64+64))
-next
-dsp_time( "ascan(a2,c+chr(i%64+64)) -> ", t, tn)
-
-t:=secondscpu()
-for i:=1 to N_LOOPS
-    ascan(a,{|x|x==i%ARR_LEN})
-next
-dsp_time( "ascan(a,{|x|x==i%ARR_LEN}) -> ", t, tn)
-
-? replicate("=",60)
-dsp_time( "total application time:", total, 0)
-? padr( "total real time:",50)+str(seconds()-totalr,8,2)
+if lScale
+   ? replicate("=",76)
+   ? dsp_scaleResult( "  TOTAL  ", nTimeTotST, nTimeTotMT, nMT, 0 )
+   ? replicate("=",76)
+else
+   ? replicate("=",68)
+endif
+? dsp_result( { "total application time:", nTimes }, 0)
+? dsp_result( { "total real time:", nSeconds }, 0 )
 ?
-return nil
 
-function dsp_time(s,t,tn)
-? padr(s,50)+str(max(secondscpu()-t-tn,0),8,2)
-return nil
+remove_db()
+return
 
-function f0(x)
+function f0()
 return nil
 
 function f1(x)
-return x+1
+return x
 
-function f2(s)
+function f2(x)
+HB_SYMBOL_UNUSED( x )
 return nil
 
 function f3(a,b,c,d,e,f,g,h,i)
+HB_SYMBOL_UNUSED( a )
+HB_SYMBOL_UNUSED( b )
+HB_SYMBOL_UNUSED( c )
+HB_SYMBOL_UNUSED( d )
+HB_SYMBOL_UNUSED( e )
+HB_SYMBOL_UNUSED( f )
+HB_SYMBOL_UNUSED( g )
+HB_SYMBOL_UNUSED( h )
+HB_SYMBOL_UNUSED( i )
 return nil
 
 function f4()
-return space(50000)
+return space(4000)
 
-#ifdef FlagShip
-    function fs_seconds()
-    LOCAL_DOUBLE nret := 0
-    #Cinline
-    {
-        #include <sys/time.h>
-        struct timeval tv;
-        struct timezone tz;
-        if( !gettimeofday(&tv, NULL) )
-            nret = (double) tv.tv_sec + (double) (tv.tv_usec) / 1000000;
+function f5()
+return space(5)
+
+function f_prv(x)
+   memvar PRV_C
+   private PRV_C := x
+return nil
+
 /*
-            nret = (double) (tv.tv_sec - tz.tz_minuteswest * 60 ) % 86400 +
-                   (double) tv.tv_usec / 1000000;
-*/
-    }
-    #endCinline
-    return ( nret )
+function f_pub(x)
+   memvar PUB_C
+   public PUB_C := x
+return nil
 
-    #ifndef FlagShip5
-        FUNCTION cursesinit()
-        CALL fgsIoctl2
-        #Cinline
-        {
-            #include <fcntl.h>
-            int arg;
-            if ((arg = fcntl(0, F_GETFL, 0)) != -1)
-                fcntl(0, F_SETFL, arg | O_NONBLOCK);
-        }
-        #endCinline
-        return nil
-    #endif
-#endif
+function f_stat(x)
+   static STAT_C
+   STAT_C := x
+return nil
+*/
+
+static func dsp_result( aResult, nLoopOverHead )
+   return padr( "[ " + left( aResult[1], 56 ) + " ]", 60, "." ) + ;
+          strtran( str( max( aResult[2] - nLoopOverHead, 0 ), 8, 2 ), " ", "." )
+
+static func dsp_scaleResult( cTest, nTimeST, nTimeMT, nMT, nLoopOverHead )
+   if .f.
+      nTimeST := max( 0, nTimeST - nMT * nLoopOverHead )
+      nTimeMT := max( 0, nTimeMT - nMT * nLoopOverHead )
+   endif
+   return padr( "[ " + left( cTest, 50 ) + " ]", 54, "_" ) + ;
+          str( nTimeST, 6, 2 ) + " " + str( nTimeMT, 6, 2 ) + " ->" + ;
+          str( nTimeST / nTimeMT, 6, 2 )
+
+
+#define TMP_FILE "_tst_tmp.dbf"
+static proc create_db()
+   remove_db()
+   dbcreate( TMP_FILE, { {"F_C", "C", 10, 0},;
+                         {"F_N", "N", 10, 2},;
+                         {"F_D", "D",  8, 0} } )
+   use TMP_FILE exclusive
+   dbappend()
+   replace F_C with dtos(date())
+   replace F_N with 112345.67
+   replace F_D with date()
+   close
+return
+
+static proc remove_db()
+   ferase( TMP_FILE )
+return
+
+static proc close_db()
+   close
+return
+
+static proc use_dbsh()
+   use TMP_FILE shared
+return

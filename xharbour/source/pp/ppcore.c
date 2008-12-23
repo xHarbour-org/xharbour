@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.277 2008/08/14 09:04:19 andijahja Exp $
+ * $Id: ppcore.c,v 1.278 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -426,18 +426,18 @@ static void hb_pp_tokenListFree( PHB_PP_TOKEN * pTokenPtr )
 
 static void hb_pp_tokenListFreeCmd( PHB_PP_TOKEN * pTokenPtr, PHB_PP_STATE pState )
 {
-   PHB_PP_TOKEN pToken = NULL;
-   BOOL fStop = FALSE;
+   BOOL fStop = FALSE, fLine = FALSE;
 
    while( *pTokenPtr && !fStop )
    {
-      pToken = *pTokenPtr;
+      PHB_PP_TOKEN pToken = *pTokenPtr;
       *pTokenPtr = pToken->pNext;
       fStop = HB_PP_TOKEN_ISEOC( pToken );
+      fLine = HB_PP_TOKEN_ISEOL( pToken ) && ( pToken->type & HB_PP_TOKEN_LINECOUNTER );
       hb_pp_tokenFree( pToken );
    }
 
-   if( HB_PP_TOKEN_ISEOL( pToken ) && ( pToken->type & HB_PP_TOKEN_LINECOUNTER ) )
+   if( fLine )
      pState->pFile->iCurrentLine++;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.99 2008/06/28 18:51:49 walito Exp $
+ * $Id: garbage.c,v 1.100 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -201,13 +201,13 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    }
 }
 
-ULONG hb_gcIncRef( void *pBlock )
+void hb_gcIncRef( void *pBlock )
 {
     HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
 
-	--pAlloc;
+   --pAlloc;
 
-   return HB_ATOMIC_INC( pAlloc->ulHolders );
+   HB_ATOMIC_INC( pAlloc->ulHolders );
 }
 
 ULONG hb_gcDecRef( void *pBlock )

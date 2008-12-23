@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.8 2007/12/28 08:53:46 andijahja Exp $
+ * $Id: hbtypes.h,v 1.9 2008/10/13 20:47:33 kaddath Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbapiitm.h"
 
 //typedef PHB_SYMB ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pModuleSymbols, ... );
-typedef PSYMBOLS ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+typedef PSYMBOLS ( * VM_PROCESS_DLL_SYMBOLS ) ( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
 typedef void ( * VM_DLL_EXECUTE ) ( const BYTE * pCode, PHB_SYMB pSymbols );
 
 typedef BOOL     ( * EXT_IS_ARRAY ) ( int iParam );
@@ -103,16 +103,16 @@ typedef int      ( * HB_PARL2)( int iParam, ULONG ulArrayIndex );
 typedef double   ( * HB_PARND2)( int iParam, ULONG ulArrayIndex );
 typedef int      ( * HB_PARNI2)( int iParam, ULONG ulArrayIndex );
 typedef LONG     ( * HB_PARNL2)( int iParam, ULONG ulArrayIndex );
-typedef int      ( * HB_STORC)( char * szText, int iParam );
-typedef int      ( * HB_STORCLEN)( char * szText, ULONG ulLength, int iParam);
-typedef int      ( * HB_STORDS)( char * szDate, int iParam) ;
+typedef int      ( * HB_STORC)( const char * szText, int iParam );
+typedef int      ( * HB_STORCLEN)( const char * szText, ULONG ulLength, int iParam);
+typedef int      ( * HB_STORDS)( const char * szDate, int iParam) ;
 typedef int      ( * HB_STORL)( int iLogical, int iParam );
 typedef int      ( * HB_STORNI)( int iValue, int iParam );
 typedef int      ( * HB_STORNL)( LONG lValue, int iParam );
 typedef int      ( * HB_STORND)( double dValue, int iParam );
-typedef int      ( * HB_STORC2)( char * szText, int iParam , ULONG ulArrayIndex);
-typedef int      ( * HB_STORCLEN2)( char * szText, ULONG ulLength, int iParam , ULONG ulArrayIndex);
-typedef int      ( * HB_STORDS2)( char * szDate, int iParam , ULONG ulArrayIndex) ;
+typedef int      ( * HB_STORC2)( const char * szText, int iParam , ULONG ulArrayIndex);
+typedef int      ( * HB_STORCLEN2)( const char * szText, ULONG ulLength, int iParam , ULONG ulArrayIndex);
+typedef int      ( * HB_STORDS2)( const char * szDate, int iParam , ULONG ulArrayIndex) ;
 typedef int      ( * HB_STORL2)( int iLogical, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORNI2)( int iValue, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORNL2)( LONG lValue, int iParam , ULONG ulArrayIndex);
@@ -135,12 +135,12 @@ typedef void *   ( * HB_XGRAB)( ULONG ulSize );                 /* allocates mem
 typedef void     ( * HB_XFREE)( void * pMem );                  /* frees memory */
 typedef void *   ( * HB_XREALLOC)( void * pMem, ULONG ulSize ); /* reallocates memory */
 typedef ULONG    ( * HB_XSIZE)( void * pMem );                  /* returns the size of an allocated memory block */
-typedef void     ( * HB_FSCLOSE  ) ( FHANDLE hFileHandle );
+typedef void     ( * HB_FSCLOSE  ) ( HB_FHANDLE hFileHandle );
 typedef BOOL     ( * HB_FSDELETE ) ( BYTE * pszFileName );
-typedef FHANDLE  ( * HB_FSOPEN   ) ( BYTE * pszFileName, USHORT uiFlags );
-typedef USHORT   ( * HB_FSREAD   ) ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
-typedef ULONG    ( * HB_FSSEEK   ) ( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode );
-typedef USHORT   ( * HB_FSWRITE  ) ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
-typedef FHANDLE  ( * HB_FSCREATE ) ( BYTE * pszFileName, USHORT uiAttr );
+typedef HB_FHANDLE  ( * HB_FSOPEN   ) ( BYTE * pszFileName, USHORT uiFlags );
+typedef USHORT   ( * HB_FSREAD   ) ( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
+typedef ULONG    ( * HB_FSSEEK   ) ( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode );
+typedef USHORT   ( * HB_FSWRITE  ) ( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
+typedef HB_FHANDLE  ( * HB_FSCREATE ) ( BYTE * pszFileName, USHORT uiAttr );
 
 #endif /* HB_TYPES_H_ */

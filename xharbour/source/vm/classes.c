@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.230 2008/11/26 23:03:49 andijahja Exp $
+ * $Id: classes.c,v 1.231 2008/11/27 15:54:02 marchuet Exp $
  */
 
 /*
@@ -1342,7 +1342,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
          {
             PHB_SYMB pSymCloned = (PHB_SYMB) hb_xgrab( sizeof( HB_SYMB ) );
 
-            memcpy( pSymCloned, pClass->pFunError, sizeof( HB_SYMB ) );
+            memcpy( pSymCloned, ( void * ) pClass->pFunError, sizeof( HB_SYMB ) );
 
             pSymCloned->szName = pMessage->szName;
             pSymCloned->scope.value |= HB_FS_CLSERROR;
@@ -3468,6 +3468,18 @@ HB_FUNC( __CLS_CNTCLSDATA )
    }
 }
 
+/*
+ * <nSeq> = __cls_CntShrData( <hClass> )
+ *
+ * Return number of class shared datas
+ */
+HB_FUNC( __CLS_CNTSHRDATA )
+{
+   HB_THREAD_STUB_API
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+
+   hb_retni( uiClass ? s_pClasses[ uiClass - 1 ].uiDatasShared : 0 );
+}
 
 /*
  * <nSeq> = __cls_CntData( <hClass> )

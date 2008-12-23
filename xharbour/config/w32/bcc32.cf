@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.10 2007/05/01 00:48:40 toninhofwi Exp $
+# $Id: bcc32.cf,v 1.11 2008/03/09 18:44:26 likewolf Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -43,11 +43,10 @@ endif
 
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)/$(HB_GT_LIB)$(LIB_EXT)
-ifeq ($(HB_MULTI_GT),yes)
-LINKLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)/gtnul$(LIB_EXT)
-endif
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR)/$(gt)$(LIB_EXT))
+
 LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)/pcrepos$(LIB_EXT)
+LINKLIBS += $(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)/zlib$(LIB_EXT)
 endif
 
 ifneq ($(HB_SCREEN_LIB),)
