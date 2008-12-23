@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6313 2008/12/23 16:37:04 likewolf Exp $
+ * $Id: ChangeLog,v 1.6314 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-23 23:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/gtwvg/gtwvg.h
+    ! Fixed building with old Win32 API headers.
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbencode.c
+    char * -> const char *
 
 2008-12-23 21:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * xharbour/config/global.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.8 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: hbencode.c,v 1.9 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -953,7 +953,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLineLength = hb_param(4,HB_IT_NUMERIC);
    char szYYEFileName[ _POSIX_PATH_MAX + 1 ] ;
    char pszFileName[ _POSIX_PATH_MAX + 1 ];
-   char *cMask;
+   const char *cMask;
    USHORT YYELineLength = 128;
    USHORT iPart = 1;
    int iResult = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.6 2008/11/29 12:03:08 enricomaria Exp $
+ * $Id: gtwvg.c,v 1.7 2008/12/10 22:25:14 enricomaria Exp $
  */
 
 /*
@@ -662,7 +662,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
    }
 }
 
-static void hb_gt_wvt_SetWindowTitle( HWND hWnd, char * title )
+static void hb_gt_wvt_SetWindowTitle( HWND hWnd, const char * title )
 {
    LPTSTR text = HB_TCHAR_CONVTO( title );
    SetWindowText( hWnd, text );

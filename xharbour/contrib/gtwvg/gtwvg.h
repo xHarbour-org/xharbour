@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.h 8735 2008-06-15 22:28:36Z vouchcac $
+ * $Id: gtwvg.h,v 1.1 2008/06/25 22:19:18 vouchcac Exp $
  */
 
 /*
@@ -146,6 +146,13 @@
 #define WVT_DLGML_MAX               50
 #define WVT_DLGMD_MAX               50
 //-------------------------------------------------------------------//
+
+#if defined( __DMC__ ) || ( _MSC_VER <= 1200 )
+#define LONG_PTR LONG
+#endif
+#ifndef SetWindowLongPtr
+#define SetWindowLongPtr SetWindowLong
+#endif
 
 #if defined(__DMC__)
    #if (_WIN32_IE >= 0x0300)
