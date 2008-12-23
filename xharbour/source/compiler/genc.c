@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.177 2008/11/28 22:23:27 andijahja Exp $
+ * $Id: genc.c,v 1.178 2008/11/28 23:09:11 andijahja Exp $
  */
 
 /*
@@ -40,7 +40,7 @@ extern void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCInLine( FILE* );
-static void hb_writeEndInit( FILE* yyc );
+static void hb_writeEndInit( FILE* yyc, const char *szModuleName );
 static void hb_compGenCAddProtos( FILE *yyc );
 
 // AJ: 2004-02-05
@@ -52,7 +52,7 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption );
 static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
 static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals );
-static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL );
+static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL, const char * szModuleName );
 static void hb_compWritePragma( FILE *yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
@@ -326,11 +326,12 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
     return pNamespace;
 }
 
-void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
+void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      /* generates the C language output */
 {
-   char szExtName[ _POSIX_PATH_MAX ];
-   char szFileName[ _POSIX_PATH_MAX ];
-   char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
+   char szExtName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szModuleName[ _POSIX_PATH_MAX + 1 ];
+   char szSourceName[ _POSIX_PATH_MAX + 1 ], *pTmp;
    PFUNCTION pFunc;
    PFUNCALL pFunCall;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
@@ -406,30 +407,23 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       fflush( stdout );
    }
 
-   hb_strupr( hb_comp_FileAsSymbol );
-
+   hb_strncpyUpper( szModuleName, pFileName->szName, sizeof( szModuleName ) - 1 );
+   /* replace non ID characters in name of local symbol table by '_' */
    {
-       int iTmp = strlen( hb_comp_FileAsSymbol );
-       int iCh;
+      int iLen = strlen( szModuleName ), i;
 
-       for ( iCh = 0; iCh < iTmp; iCh ++ )
-       {
-          if ( ( hb_comp_FileAsSymbol[ iCh ] == '!' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '~' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '$' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '%' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '\'') ||
-               ( hb_comp_FileAsSymbol[ iCh ] == ')' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '(' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == ' ' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '-' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '@' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '{' ) ||
-               ( hb_comp_FileAsSymbol[ iCh ] == '}' ) )
-          {
-               hb_comp_FileAsSymbol[ iCh ] = '_';
-          }
-       }
+      for( i = 0; i < iLen; i++ )
+      {
+         char c = szModuleName[ i ];
+
+         if( ! ( c >= 'A' && c <= 'Z' ) &&
+             ! ( c >= 'a' && c <= 'z' ) &&
+             ! ( c >= '0' && c <= '9' ) &&
+             ! ( c == '_' ) )
+         {
+            szModuleName[ i ] = '_';
+         }
+      }
    }
 
    {
@@ -843,7 +837,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          }
 
          // Write init function for CRITICAL Functions Mutex initialization.
-         fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
+         fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", szModuleName );
 
          pFunc = hb_comp_functions.pFirst;
          while( pFunc )
@@ -856,7 +850,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             pFunc = pFunc->pNext;
          }
 
-         fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
+         fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", szModuleName );
       }
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
@@ -925,7 +919,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
        */
-      fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
+      fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, szModuleName );
 
       iSymOffset = 0;
       iStartupOffset = -1;
@@ -1224,13 +1218,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       */
       if( pStatSymb )
       {
-         hb_compWriteExternEntries( yyc, bSymFIRST, TRUE, TRUE );
+         hb_compWriteExternEntries( yyc, bSymFIRST, TRUE, TRUE, szModuleName );
       }
 
       /*
          End of initializaton codes
       */
-      hb_writeEndInit( yyc );
+      hb_writeEndInit( yyc, szModuleName );
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __begin__ ){}\n\n" );
@@ -1249,7 +1243,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       if( bCritical )
       {
-         hb_compWritePragma( yyc, "hb_auto_InitCritical", "", hb_comp_FileAsSymbol, "hb_InitCritical" );
+         hb_compWritePragma( yyc, "hb_auto_InitCritical", "", szModuleName, "hb_InitCritical" );
       }
 
       /* Generate functions data
@@ -1414,9 +1408,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          hb_compGenCAddProtos( yyc );
 
-         if ( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE ) )
+         if ( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE, szModuleName ) )
          {
-            hb_writeEndInit( yyc );
+            hb_writeEndInit( yyc, szModuleName );
          }
       }
 
@@ -1466,7 +1460,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 /*
    Write symbol entries to intialized on startup
 */
-static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine, BOOL bPrg )
+static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine, BOOL bPrg, const char *szModuleName )
 {
    BOOL bStartFunc = FALSE;
    BOOL bBegin = FALSE;
@@ -1496,7 +1490,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
                "\n#define __PRG_SOURCE__ \"",hb_comp_PrgFileName,"\"\n\n",
                "#undef HB_PRG_PCODE_VER\n",
                "#define HB_PRG_PCODE_VER ", szVer,"\n",
-               "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_",hb_comp_szPrefix,hb_comp_FileAsSymbol," )\n", NULL );
+               "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_", hb_comp_szPrefix, szModuleName, " )\n", NULL );
          }
 
          if( bPrg )
@@ -1682,7 +1676,7 @@ static void hb_compGenCAddProtos( FILE *yyc )
    }
 }
 
-static void hb_writeEndInit( FILE* yyc )
+static void hb_writeEndInit( FILE* yyc, const char *szModuleName )
 {
    fprintf( yyc,
 #ifdef BROKEN_MODULE_SPACE_LOGIC
@@ -1691,8 +1685,8 @@ static void hb_writeEndInit( FILE* yyc )
                  "{ \"!\", {0}, {HB_FUNCNAME( __end__ )}, NULL }"
 #endif
                  "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n",
-                 hb_comp_szPrefix, hb_comp_FileAsSymbol );
-                 hb_compWritePragma( yyc, "hb_vm_auto_SymbolInit_", hb_comp_szPrefix, hb_comp_FileAsSymbol, "hb_vm_SymbolInit_" );
+                 hb_comp_szPrefix, szModuleName );
+                 hb_compWritePragma( yyc, "hb_vm_auto_SymbolInit_", hb_comp_szPrefix, szModuleName, "hb_vm_SymbolInit_" );
 }
 
 /*

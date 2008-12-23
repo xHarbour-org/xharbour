@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.5 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: hbpcstat.c,v 1.6 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -246,7 +246,7 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
 {
    char szOutFile[ _POSIX_PATH_MAX + 1 ];
    FILE * outfile;
-   char * szExt;
+   const char * szExt;
 
    szExt = pFileName->szExtension;
    pFileName->szExtension = ".p";

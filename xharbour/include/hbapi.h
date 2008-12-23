@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.249 2008/12/03 20:11:43 marchuet Exp $
+ * $Id: hbapi.h,v 1.250 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -517,11 +517,11 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( hb_stackReturnItem(), (llNumber), (iWidth) )
 #endif
 
-extern HB_FORCE_EXPORT void    hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
-extern HB_FORCE_EXPORT void    hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
+extern HB_FORCE_EXPORT void    hb_storc( const char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
+extern HB_FORCE_EXPORT void    hb_storclen( const char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_EXPORT int      hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
-extern HB_FORCE_EXPORT void    hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
-extern HB_EXPORT void    hb_stordts( char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern HB_FORCE_EXPORT void    hb_stords( const char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern HB_EXPORT void    hb_stordts( const char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stord( int iYear, int iMonth, int iDay, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
 extern HB_EXPORT void    hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
 extern HB_EXPORT void    hb_stordl( LONG lJulian, int iParam, ... ); /* stores a Julian's date value on a variable by reference */

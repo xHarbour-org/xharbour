@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.210 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: harbour.c,v 1.211 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
 #endif
 
 static void hb_compInitVars( void );
-static void hb_compGenOutput( int, char *szSourceExtension );
+static void hb_compGenOutput( int, const char *szSourceExtension );
 static void hb_compOutputFile( void );
 
 int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
@@ -123,7 +123,6 @@ char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
-char *         hb_comp_FileAsSymbol;                      /* File Name of last compiled line to be used in program body */
 char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
 PFUNCTION      hb_comp_pInitFunc;
 PFUNCTION      hb_comp_pGlobalsFunc;
@@ -2489,7 +2488,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_bDebugInfo )
    {
-      char szFileName[ _POSIX_PATH_MAX ];
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
       PHB_FNAME hb_FileName;
 
       hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
@@ -3414,7 +3413,7 @@ void hb_compGenJumpHere( HB_ULONG ulOffset )
    hb_compGenJumpThere( ulOffset, hb_comp_functions.pLast->lPCodePos );
 }
 
-void hb_compGenModuleName( char *szFile, char *szFunc )
+void hb_compGenModuleName( const char *szFile, const char *szFunc )
 {
    int iBufLen;
    int iFileLen = strlen( szFile );
@@ -6180,7 +6179,7 @@ void hb_compUsedNamespaceEnd( void )
    hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->pOuter;
 }
 
-static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
+static void hb_compGenOutput( int iLanguage, const char *szSourceExtension )
 {
 
    switch( iLanguage )
@@ -6254,12 +6253,12 @@ static int hb_compCompile( char * szPrg )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ _POSIX_PATH_MAX ];
-      char szPpoName[ _POSIX_PATH_MAX ];
-      char szPptName[ _POSIX_PATH_MAX ];
-      char szHILName[ _POSIX_PATH_MAX ];
-      char szVarListName[ _POSIX_PATH_MAX ];
-      char *szSourceExtension /*, *szSourcePath */;
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char szPpoName[ _POSIX_PATH_MAX + 1 ];
+      char szPptName[ _POSIX_PATH_MAX + 1 ];
+      char szHILName[ _POSIX_PATH_MAX + 1 ];
+      char szVarListName[ _POSIX_PATH_MAX + 1 ];
+      const char *szSourceExtension;
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
@@ -6267,8 +6266,6 @@ static int hb_compCompile( char * szPrg )
       {
          hb_pp_addDefine( hb_comp_PP, "__HRB__", "1" );
       }
-
-      hb_comp_FileAsSymbol = hb_comp_pFileName->szName ;
 
       if( !hb_comp_pFileName->szExtension )
       {
@@ -6293,7 +6290,6 @@ static int hb_compCompile( char * szPrg )
       hb_xfree( szTempName );
 
       szSourceExtension = hb_comp_pFileName->szExtension;
-      /* szSourcePath = hb_comp_pFileName->szPath; */
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
@@ -6334,7 +6330,7 @@ static int hb_compCompile( char * szPrg )
       /* Giancarlo Niccolai: opening/creating i18n file */
       if ( hb_comp_bI18n )
       {
-         char *szExt;
+         const char *szExt;
 
          /* Get correct filename */
          if ( hb_comp_szHILout == NULL )
@@ -6981,8 +6977,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ _POSIX_PATH_MAX ];    /* filename to parse */
-      char szPpoName[ _POSIX_PATH_MAX ];
+      char szFileName[ _POSIX_PATH_MAX + 1 ];    /* filename to parse */
+      char szPpoName[ _POSIX_PATH_MAX + 1 ];
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );

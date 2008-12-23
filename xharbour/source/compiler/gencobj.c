@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.17 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: gencobj.c,v 1.18 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -84,29 +84,29 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
 }
 
 /* Builds platform dependant object module from Harbour C output */
-void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
+void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 {
-   char szFileName[ _POSIX_PATH_MAX ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
    char szLine[ HB_CFG_LINE_LEN ];
    char szCompiler[ HB_CFG_LINE_LEN ] = "";
    char szOptions[ HB_CFG_LINE_LEN ] = "";
    char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
-   char szOutPath[ _POSIX_PATH_MAX ] = "\0";
+   char szOutPath[ _POSIX_PATH_MAX + 1 ] = "\0";
 
 #if defined( HOST_OS_UNIX_COMPATIBLE )
-   char szDefaultPath[ _POSIX_PATH_MAX ] = "/etc:/usr/local/etc";
+   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = "/etc:/usr/local/etc";
    char * pszEnv = szDefaultPath;
    #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " > /dev/null"
    #define HB_ACCESS_FLAG F_OK
 #elif defined( HB_OS_DOS_COMPATIBLE )
-   char szDefaultPath[ _POSIX_PATH_MAX ] = "PATH";
+   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = "PATH";
    char * pszEnv = hb_getenv( "PATH" );
    #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " >nul"      
    #define HB_ACCESS_FLAG 0
 #else
-   char szDefaultPath[ _POSIX_PATH_MAX ] = NULL;
+   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = NULL;
 #endif
    
    FILE * yyc;
@@ -238,7 +238,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    if( hb_comp_pOutPath )
    {
       PHB_FNAME pOut = hb_fsFNameSplit( ( char * ) szFileName );
-      char pszTemp[ _POSIX_PATH_MAX ] = "";
+      char pszTemp[ _POSIX_PATH_MAX + 1 ] = "";
 
       if( hb_comp_pOutPath->szPath )
          pOut->szPath = hb_comp_pOutPath->szPath;

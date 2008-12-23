@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.54 2008/11/19 05:24:51 andijahja Exp $
+ * $Id: zip.c,v 1.55 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -503,7 +503,7 @@ HB_FUNC( HB_GETFILESINZIP )
 {
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
+      char szFile[ _POSIX_PATH_MAX + 1 ];
       char *szZipFileName;
       PHB_ITEM pArray;
       strcpy( szFile, hb_parc( 1 ) );
@@ -530,7 +530,7 @@ HB_FUNC( HB_GETFILECOUNT )
 
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
+      char szFile[ _POSIX_PATH_MAX + 1 ];
       char *szZipFileName;
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -554,7 +554,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
       if ( pParam )
       {
-         char szFile[ _POSIX_PATH_MAX ];
+         char szFile[ _POSIX_PATH_MAX + 1 ];
          PHB_ITEM pExclude = hb_param( 11, HB_IT_STRING | HB_IT_ARRAY );
          char *szZipFileName;
          BYTE *pCurDir;
@@ -627,7 +627,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
       if ( pParam )
       {
-         char szFile[ _POSIX_PATH_MAX ];
+         char szFile[ _POSIX_PATH_MAX + 1 ];
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
          char *szZipFileName;
          BYTE * pCurDir ;
@@ -697,7 +697,7 @@ HB_FUNC( HB_UNZIPFILE )
 
    if( ISCHAR( 1 ) && ( ISARRAY( 6 ) || ISCHAR( 6 ) ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
+      char szFile[ _POSIX_PATH_MAX + 1 ];
       PHB_ITEM pUnzip = hb_param( 6, HB_IT_ANY );
       char *szZipFileName;
       BYTE *pCurDir;
@@ -784,7 +784,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
 
       if ( pDelZip )
       {
-         char szFile[ _POSIX_PATH_MAX ];
+         char szFile[ _POSIX_PATH_MAX + 1 ];
          char *szZipFileName;
          int ulLen;
 
@@ -869,7 +869,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
 
 HB_FUNC( HB_ZIPTESTPK )
 {
-   char szFile[ _POSIX_PATH_MAX ];
+   char szFile[ _POSIX_PATH_MAX + 1 ];
    char *szZipFileName;
 
    strcpy( szFile, hb_parc( 1 ) );
@@ -906,7 +906,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
 
       if ( pDelZip )
       {
-         char szFile[ _POSIX_PATH_MAX ];
+         char szFile[ _POSIX_PATH_MAX + 1 ];
          PHB_ITEM Temp,DelZip;
          char* szZipFileName;
          int ulLen;

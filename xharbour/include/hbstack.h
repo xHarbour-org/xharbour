@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.55 2008/11/25 06:21:18 andijahja Exp $
+ * $Id: hbstack.h,v 1.56 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -119,7 +119,6 @@ typedef struct
    //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
    PHB_STACKRDD rdd;          /* RDD related data */
-   HB_IOERRORS IOErrors;      /* MT safe buffer for IO errors */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */

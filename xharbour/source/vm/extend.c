@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.70 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: extend.c,v 1.71 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -1263,7 +1263,7 @@ void hb_retnintlen( HB_LONG lNumber, int iWidth )
    hb_itemPutNIntLen( hb_stackReturnItem(), lNumber, iWidth );
 }
 
-void hb_storc( char * szText, int iParam, ... )
+void hb_storc( const char * szText, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storc(%s, %d, ...)", szText, iParam));
 
@@ -1296,7 +1296,7 @@ void hb_storc( char * szText, int iParam, ... )
    }
 }
 
-void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
+void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam));
 
@@ -1368,7 +1368,7 @@ int hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
 
 /* szDate must have YYYYMMDD format */
 
-void hb_stords( char * szDate, int iParam, ... )
+void hb_stords( const char * szDate, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stords(%s, %d, ...)", szDate, iParam));
 
@@ -1403,7 +1403,7 @@ void hb_stords( char * szDate, int iParam, ... )
 
 /* szDate must have YYYYMMDDHHMMSS.CCC format */
 
-void hb_stordts( char * szDateTime, int iParam, ... )
+void hb_stordts( const char * szDateTime, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stordts(%s, %d, ...)", szDateTime, iParam));
 

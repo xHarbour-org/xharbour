@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.19 2008/01/15 10:13:45 marchuet Exp $
+ * $Id: hbpp.c,v 1.20 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 
 #include "hbppdef.h"
 #include "hbcomp.h"
+#include "hbset.h"
 
 extern int hb_pp_ParseDefine( char * );
 
@@ -103,8 +104,8 @@ int  hb_comp_iHidden = 0;
 int main( int argc, char * argv[] )
 {
   FILE * handl_o;
-  char szFileName[ _POSIX_PATH_MAX ];
-  char szPpoName[ _POSIX_PATH_MAX ];
+  char szFileName[ _POSIX_PATH_MAX + 1 ];
+  char szPpoName[ _POSIX_PATH_MAX + 1 ];
   int iArg = 1;
   BOOL bOutTable = FALSE;
   BOOL bOutNew = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.186 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: gtwvt.c,v 1.187 2008/12/10 22:25:14 enricomaria Exp $
  */
 
 /*
@@ -87,8 +87,11 @@
 #include "hbstack.h"
 #include "gtwvt.h"
 
-#ifdef __DMC__
+#if defined( __DMC__ ) || ( _MSC_VER <= 1200 )
 #define LONG_PTR LONG
+#endif
+#ifndef SetWindowLongPtr
+#define SetWindowLongPtr SetWindowLong
 #endif
 
 static int           s_GtId;
@@ -591,7 +594,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
    }
 }
 
-static void hb_gt_wvt_SetWindowTitle( HWND hWnd, char * title )
+static void hb_gt_wvt_SetWindowTitle( HWND hWnd, const char * title )
 {
    LPTSTR text = HB_TCHAR_CONVTO( title );
    SetWindowText( hWnd, text );

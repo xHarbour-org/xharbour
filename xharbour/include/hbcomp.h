@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.71 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.72 2008/06/06 03:30:25 ronpinkas Exp $
  */
 
 /*
@@ -597,7 +597,7 @@ extern void hb_compGlobalsDefStart( void );
 extern void hb_compGlobalsDefEnd( void );
 extern void hb_compGenGlobalName( char * );
 
-extern void hb_compGenModuleName( char *szFile, char *szFunc );
+extern void hb_compGenModuleName( const char *szFile, const char *szFunc );
 
 extern HB_EXPR_PTR hb_compErrorStatic( char *, HB_EXPR_PTR );
 extern HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR );
@@ -646,10 +646,10 @@ extern BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearchPath );  /*
 extern char * hb_comp_buffer; /* yacc input buffer */
 
 /* output related functions defined in gen*.c */
-extern void hb_compGenCCode( PHB_FNAME, char *); /* generates the C language output */
+extern void hb_compGenCCode( PHB_FNAME, const char *); /* generates the C language output */
 extern void hb_compGenPortObj( PHB_FNAME );      /* generates the portable objects */
 //extern void hb_compGenObj32( PHB_FNAME );        /* generates OBJ 32 bits */
-extern void hb_compGenCObj( PHB_FNAME, char *);  /* generates platform dependant object module */
+extern void hb_compGenCObj( PHB_FNAME, const char *);  /* generates platform dependant object module */
 
 /* hbident.c   */
 extern char * hb_compIdentifierNew( char * szName, BOOL bCopy ); /* create the reusable identifier */
@@ -675,7 +675,6 @@ extern PCOMDECLARED   hb_comp_pLastMethod;
 extern char *         hb_comp_szFromEnum;
 
 extern HB_PATHNAMES * hb_comp_pIncludePath;
-extern char *         hb_comp_FileAsSymbol;
 extern char *         hb_comp_PrgFileName;
 extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;

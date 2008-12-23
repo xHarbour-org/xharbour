@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.7 2005/03/17 08:41:52 andijahja Exp $
+ * $Id: hbencode.c,v 1.8 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -716,7 +716,7 @@ HB_FUNC( UUENCODE_FILE )
    PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
 
    if ( !pIn )
    {
@@ -749,7 +749,7 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   char szUUEFileName[ _POSIX_PATH_MAX + 1 ] ;
    ULONG ulLine;
 
    if ( !pIn )
@@ -794,7 +794,7 @@ HB_FUNC( B64ENCODE_FILE )
    PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
 
    if ( !pIn )
    {
@@ -827,7 +827,7 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
    ULONG ulLine;
 
    if ( !pIn )
@@ -876,8 +876,8 @@ HB_FUNC( YYENCODE_FILE )
    PHB_ITEM pIn  = hb_param(1,HB_IT_STRING);
    PHB_ITEM pOut = hb_param(2,HB_IT_STRING);
    PHB_ITEM pLineLength = hb_param(3,HB_IT_NUMERIC);
-   char szYYEFileName[ _POSIX_PATH_MAX ] ;
-   char pszFileName[ _POSIX_PATH_MAX ];
+   char szYYEFileName[ _POSIX_PATH_MAX + 1 ] ;
+   char pszFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT YYELineLength = 128;
 
    if ( !pIn )
@@ -951,8 +951,8 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param(2,HB_IT_NUMERIC);
    PHB_ITEM pOut  = hb_param(3,HB_IT_STRING);
    PHB_ITEM pLineLength = hb_param(4,HB_IT_NUMERIC);
-   char szYYEFileName[ _POSIX_PATH_MAX ] ;
-   char pszFileName[ _POSIX_PATH_MAX ];
+   char szYYEFileName[ _POSIX_PATH_MAX + 1 ] ;
+   char pszFileName[ _POSIX_PATH_MAX + 1 ];
    char *cMask;
    USHORT YYELineLength = 128;
    USHORT iPart = 1;

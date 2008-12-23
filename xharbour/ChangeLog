@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6311 2008/12/22 19:44:00 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6312 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-23 19:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbstack.h
+    ! Fixed a typo from my last commit.
+  * source/pp/ppgen.c
+  * utils/hbpp/hbpp.c
+    ! Added missing include from my previous commit.
+  * include/hbapi.h
+  * include/hbcomp.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    ! Buggy code for filename normalization in compiler replaced by Harbour's
+      (written by Przemek).
+    ! global variable hb_comp_FileAsSymbol removed.
+  * contrib/hbzlib/zip.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbencode.c
+  * source/compiler/gencobj.c
+  * source/compiler/genhrb.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbpcstat.c
+  * source/rtl/fnsplit.c
+  * source/rtl/hbffind.c
+  * source/vm/extend.c
+  * utils/hbpp/hbppcore.c
+    ! szFileName buffer for hb_fsFNameMerge() must be at least
+      _POSIX_PATH_MAX + 1 bytes long.
+    ! strncpy() -> hb_strncpy().
+    ! char * -> const char * fixes.
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fixes to build with _MSC_VER <= 1200.
 
 2008-12-23 01:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/hbzlib/zip.c

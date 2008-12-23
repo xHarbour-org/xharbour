@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.35 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: hbffind.c,v 1.36 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.35 2008/11/22 08:25:23 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.36 2008/12/22 22:09:45 likewolf Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -490,10 +490,10 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       struct stat sStat;
 
       #if !defined( __WATCOMC__)
-         strncpy( ffind->szName, info->entry.ff_name, _POSIX_PATH_MAX );
+         hb_strncpy( ffind->szName, info->entry.ff_name, sizeof( ffind->szName ) - 1 );
          ffind->size = info->entry.ff_fsize;
       #else
-         strncpy( ffind->szName, info->entry.name, _POSIX_PATH_MAX );
+         hb_strncpy( ffind->szName, info->entry.name, sizeof( ffind->szName ) - 1 );
          ffind->size = info->entry.size;
       #endif
 
@@ -526,7 +526,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
 #elif defined(HB_OS_OS2)
 
    {
-      strncpy( ffind->szName, info->entry.achName, _POSIX_PATH_MAX );
+      hb_strncpy( ffind->szName, info->entry.achName, sizeof( ffind->szName ) - 1 );
       ffind->size = info->entry.cbFile;
       raw_attr = info->entry.attrFile;
 
@@ -544,7 +544,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       FILETIME ft;
       SYSTEMTIME time;
 
-      strncpy( ffind->szName,( info->hFindFile == INVALID_HANDLE_VALUE ? info->szVolInfo :info->pFindFileData.cFileName ), _POSIX_PATH_MAX );
+      hb_strncpy( ffind->szName,( info->hFindFile == INVALID_HANDLE_VALUE ? info->szVolInfo :info->pFindFileData.cFileName ), sizeof( ffind->szName ) - 1 );
 
       if (info->hFindFile == INVALID_HANDLE_VALUE )
       {
@@ -604,10 +604,9 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       char   szFindFile[ _POSIX_PATH_MAX + 1 ];
 
       ffind->szName[ _POSIX_PATH_MAX ] = '\0';
-      strncpy( ffind->szName, info->entry->d_name, _POSIX_PATH_MAX );
-      szFindFile[ _POSIX_PATH_MAX ] = '\0';
-      strncpy( szFindFile, info->szRootDir, _POSIX_PATH_MAX );
-      strncat( szFindFile, info->entry->d_name, _POSIX_PATH_MAX );
+      hb_strncpy( ffind->szName, info->entry->d_name, sizeof( ffind->szName ) - 1 );
+      hb_strncpy( szFindFile, info->szRootDir, sizeof( szFindFile ) - 1 );
+      hb_strncat( szFindFile, info->entry->d_name, sizeof( szFindFile ) - 1 );
 
 #if defined( HB_USE_LARGEFILE64 )
             
@@ -809,8 +808,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
 
       if( pszFileName )
       {
-         strncpy( string, pszFileName, _POSIX_PATH_MAX );
-         string[ _POSIX_PATH_MAX ] = '\0';
+         hb_strncpy( string, pszFileName, _POSIX_PATH_MAX );
          pos = strrchr( string, HB_OS_PATH_DELIM_CHR );
          if( pos )
          {
