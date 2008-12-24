@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6314 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: ChangeLog,v 1.6315 2008/12/23 20:33:21 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-12-24 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbdefs.h
+    * disabling HB_FORCE_EXPORT in MinGW builds breaks applications using
+      pCode DLL with standard build because the DLL can no longer see the
+      required function in the executable. Compiling xHarbour with -D__EXPORT__
+      will do the job, but that's not the point.
+
+      As a note, functions which are "forced-export" are those required by
+      source/vm/maindllp.c, so pCode DLL users is facilitated by then.
+
+      The sample below fails due to nulling the qualifier:
+
+      ///// BEGIN Application Code
+      PROCEDURE MAIN()
+      ? FOO()
+      ///// END Application Code
+
+      ///// BEGIN DLL Codes
+      typedef void (*HB_RETC)( const char * szText );
+
+      HB_FUNC( FOO ) { my_retc( "FOO" ); }
+
+      void my_retc( const char * szText )
+      {
+	 // Looking "_hb_retc" in EXECUTABLE which is no longer accessible
+	 // due to nulling of HB_FORCE_EXPORT. In my Windows machine, MINGW
+	 // (and others too) cannot work with HB_FORCE_EXPORT nulled.
+         HB_RETC pRetc = GetProcAddress( GetModuleHandle( NULL ), "_hb_retc" );
+         pRetc ( szText );
+      }
+      ///// END DLL Codes
+
+      Because of this, the disabling of HB_FORCE_EXPORT is now guarded by
+      a define constant "NO_DISABLE_FORCE_EXPORT", hence those who want
+      MINGW apps works as before should add this define to disable the hack.
 
 2008-12-23 23:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/gtwvg/gtwvg.h

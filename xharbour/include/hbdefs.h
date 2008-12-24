@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.108 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: hbdefs.h,v 1.109 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -1257,7 +1257,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXPORT
 #endif
 
-#if defined( __MINGW32__ )
+#if ( defined( __MINGW32__ ) && !defined( NO_DISABLE_FORCE_EXPORT ) )
    /* using at least one function with dllexport attribute causes that
     * automatic conversion to import library is disabled in linker so
     * you cannot longer use standard xharbour.dll to link in shared
