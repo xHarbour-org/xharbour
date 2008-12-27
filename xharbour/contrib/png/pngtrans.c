@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
@@ -20,7 +20,7 @@
 void PNGAPI
 png_set_bgr(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_bgr\n");
+   png_debug(1, "in png_set_bgr");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_BGR;
 }
@@ -31,7 +31,7 @@ png_set_bgr(png_structp png_ptr)
 void PNGAPI
 png_set_swap(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_swap\n");
+   png_debug(1, "in png_set_swap");
    if (png_ptr == NULL) return;
    if (png_ptr->bit_depth == 16)
       png_ptr->transformations |= PNG_SWAP_BYTES;
@@ -43,7 +43,7 @@ png_set_swap(png_structp png_ptr)
 void PNGAPI
 png_set_packing(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_packing\n");
+   png_debug(1, "in png_set_packing");
    if (png_ptr == NULL) return;
    if (png_ptr->bit_depth < 8)
    {
@@ -58,7 +58,7 @@ png_set_packing(png_structp png_ptr)
 void PNGAPI
 png_set_packswap(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_packswap\n");
+   png_debug(1, "in png_set_packswap");
    if (png_ptr == NULL) return;
    if (png_ptr->bit_depth < 8)
       png_ptr->transformations |= PNG_PACKSWAP;
@@ -69,7 +69,7 @@ png_set_packswap(png_structp png_ptr)
 void PNGAPI
 png_set_shift(png_structp png_ptr, png_color_8p true_bits)
 {
-   png_debug(1, "in png_set_shift\n");
+   png_debug(1, "in png_set_shift");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;
@@ -81,7 +81,7 @@ png_set_shift(png_structp png_ptr, png_color_8p true_bits)
 int PNGAPI
 png_set_interlace_handling(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_interlace handling\n");
+   png_debug(1, "in png_set_interlace handling");
    if (png_ptr && png_ptr->interlaced)
    {
       png_ptr->transformations |= PNG_INTERLACE;
@@ -101,7 +101,7 @@ png_set_interlace_handling(png_structp png_ptr)
 void PNGAPI
 png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
 {
-   png_debug(1, "in png_set_filler\n");
+   png_debug(1, "in png_set_filler");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_FILLER;
    png_ptr->filler = (png_byte)filler;
@@ -134,7 +134,7 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
 void PNGAPI
 png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
 {
-   png_debug(1, "in png_set_add_alpha\n");
+   png_debug(1, "in png_set_add_alpha");
    if (png_ptr == NULL) return;
    png_set_filler(png_ptr, filler, filler_loc);
    png_ptr->transformations |= PNG_ADD_ALPHA;
@@ -148,7 +148,7 @@ png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
 void PNGAPI
 png_set_swap_alpha(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_swap_alpha\n");
+   png_debug(1, "in png_set_swap_alpha");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_SWAP_ALPHA;
 }
@@ -159,7 +159,7 @@ png_set_swap_alpha(png_structp png_ptr)
 void PNGAPI
 png_set_invert_alpha(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_invert_alpha\n");
+   png_debug(1, "in png_set_invert_alpha");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_INVERT_ALPHA;
 }
@@ -169,7 +169,7 @@ png_set_invert_alpha(png_structp png_ptr)
 void PNGAPI
 png_set_invert_mono(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_invert_mono\n");
+   png_debug(1, "in png_set_invert_mono");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_INVERT_MONO;
 }
@@ -178,7 +178,7 @@ png_set_invert_mono(png_structp png_ptr)
 void /* PRIVATE */
 png_do_invert(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_invert\n");
+   png_debug(1, "in png_do_invert");
   /* This test removed from libpng version 1.0.13 and 1.2.0:
    *   if (row_info->bit_depth == 1 &&
    */
@@ -233,7 +233,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_swap(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_swap\n");
+   png_debug(1, "in png_do_swap");
    if (
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
        row != NULL && row_info != NULL &&
@@ -364,7 +364,7 @@ static PNG_CONST png_byte fourbppswaptable[256] = {
 void /* PRIVATE */
 png_do_packswap(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_packswap\n");
+   png_debug(1, "in png_do_packswap");
    if (
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
        row != NULL && row_info != NULL &&
@@ -396,7 +396,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
 {
-   png_debug(1, "in png_do_strip_filler\n");
+   png_debug(1, "in png_do_strip_filler");
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
    if (row != NULL && row_info != NULL)
 #endif
@@ -554,7 +554,7 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
 void /* PRIVATE */
 png_do_bgr(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_bgr\n");
+   png_debug(1, "in png_do_bgr");
    if (
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
        row != NULL && row_info != NULL &&
@@ -633,7 +633,7 @@ void PNGAPI
 png_set_user_transform_info(png_structp png_ptr, png_voidp
    user_transform_ptr, int user_transform_depth, int user_transform_channels)
 {
-   png_debug(1, "in png_set_user_transform_info\n");
+   png_debug(1, "in png_set_user_transform_info");
    if (png_ptr == NULL) return;
 #if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_ptr->user_transform_ptr = user_transform_ptr;

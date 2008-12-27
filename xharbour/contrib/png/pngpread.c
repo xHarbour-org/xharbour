@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* pngpread.c - read a png file in push mode
@@ -10,10 +10,6 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
-
-#ifdef __BORLANDC__
-   #pragma option push -w-aus
-#endif
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -1066,7 +1062,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
-         info_ptr = info_ptr; /* to quiet some compiler warnings */
+         (void) info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1162,7 +1158,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place zTXt");
-         info_ptr = info_ptr; /* to quiet some compiler warnings */
+         (void) info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1599,7 +1595,3 @@ png_get_progressive_ptr(png_structp png_ptr)
    return png_ptr->io_ptr;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
-
-#ifdef __BORLANDC__
-   #pragma option pop
-#endif

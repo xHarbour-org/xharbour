@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* pngwio.c - functions for data output

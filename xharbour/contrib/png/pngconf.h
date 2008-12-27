@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.33 - October 31, 2008
+ * libpng version 1.2.34 - December 18, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -403,7 +403,6 @@
 #if defined(_MSC_VER) && (defined(WIN32) || defined(_Windows) || \
     defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__))
 #  include <stdlib.h>
-/* #  include <malloc.h> */
 #endif
 
 /* This controls how fine the dithering gets.  As this allocates
@@ -800,6 +799,12 @@
 #endif
 #ifndef PNG_USER_HEIGHT_MAX
 #  define PNG_USER_HEIGHT_MAX 1000000L
+#endif
+
+
+/* Added at libpng-1.2.34 and 1.4.0 */
+#ifndef PNG_STRING_NEWLINE
+#define PNG_STRING_NEWLINE "\n"
 #endif
 
 /* These are currently experimental features, define them if you want */

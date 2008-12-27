@@ -1,5 +1,5 @@
 /*
- * $Id: hbrun.prg,v 1.3 2008/03/04 17:37:03 ronpinkas Exp $
+ * $Id: hbrun.prg,v 1.4 2008/03/18 19:34:11 likewolf Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ FUNCTION _APPMAIN( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cP
 
    IF Empty( cHRBFile )
       OutStd( "xHarbour Runner" + HB_OSNewLine() +;
-              "Copyright 1999-2008, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              "Copyright 1999-2009, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
               "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() + ;
               HB_OSNewLine() +;

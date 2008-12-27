@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
  */
 
 /* pngrio.c - functions for data input
@@ -30,7 +30,7 @@
 void /* PRIVATE */
 png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_debug1(4, "reading %d bytes\n", (int)length);
+   png_debug1(4, "reading %d bytes", (int)length);
    if (png_ptr->read_data_fn != NULL)
       (*(png_ptr->read_data_fn))(png_ptr, data, length);
    else

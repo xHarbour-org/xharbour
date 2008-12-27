@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.20 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: hbpp.c,v 1.21 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ int main( int argc, char * argv[] )
 
   printf( "xHarbour Preprocessor %d.%d.%d\n",
      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION );
-  printf( "Copyright 1999-2008, http://www.xharbour.org\n" );
+  printf( "Copyright 1999-2009, http://www.xharbour.org\n" );
 
   hb_pp_Table();
   stdef = hb_pp_topDefine;
