@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.18 2008/04/03 12:04:53 marchuet Exp $
+ * $Id: client.prg,v 1.19 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ CLASS tIPClient
    DATA SocketCon
    Data lTrace
    Data nHandle
-   
+
    DATA nDefaultRcvBuffSize
    DATA nDefaultSndBuffSize
 
@@ -136,8 +136,8 @@ CLASS tIPClient
    METHOD lastErrorCode() INLINE ::nLastError
    METHOD lastErrorMessage(SocketCon) INLINE ::INetErrorDesc(SocketCon)
 
-   METHOD InetRcvBufSize( SocketCon, nSizeBuff ) 
-   METHOD InetSndBufSize( SocketCon, nSizeBuff ) 
+   METHOD InetRcvBufSize( SocketCon, nSizeBuff )
+   METHOD InetSndBufSize( SocketCon, nSizeBuff )
 
    PROTECTED:
    DATA nLastError INIT 0
@@ -151,7 +151,7 @@ CLASS tIPClient
    METHOD InetErrorCode(SocketCon)
    METHOD InetErrorDesc(SocketCon)
    METHOD InetConnect( cServer, nPort, SocketCon )
-   
+
    METHOD Log()
 
 ENDCLASS
@@ -435,7 +435,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    ::nLastWrite := ::InetSendall( ::SocketCon,  cData , nLen )
 
-   IF .not. Empty( bCommit ) .and. bCommit
+   IF .not. Empty( bCommit )
 
       ::Commit()
 

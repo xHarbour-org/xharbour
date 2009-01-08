@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.53 2008/11/23 06:19:38 andijahja Exp $
+# $Id: makefile.gc,v 1.54 2008/11/24 05:30:34 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -95,6 +95,7 @@ HARBOUR_LIBS=\
 	-lbmdbfcdx$(HB_MT)\
 	-lsixcdx$(HB_MT)\
 	-ldbfntx$(HB_MT)\
+	-ldbfnsx$(HB_MT)\
 	-lrtl$(HB_MT)\
 	-ldbffpt$(HB_MT)\
 	-lhbsix$(HB_MT)\
@@ -221,6 +222,9 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)

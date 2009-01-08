@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.15 2008/11/21 05:10:07 andijahja Exp $
+rem $Id: mdir.bat,v 1.16 2008/11/25 05:15:58 andijahja Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -189,6 +189,8 @@ if exist lib\%LIBPREFIX%dbffpt%LIBEXT%               del lib\%LIBPREFIX%dbffpt%L
 if exist lib\%LIBPREFIX%dbffptmt%LIBEXT%             del lib\%LIBPREFIX%dbffptmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfntx%LIBEXT%               del lib\%LIBPREFIX%dbfntx%LIBEXT%
 if exist lib\%LIBPREFIX%dbfntxmt%LIBEXT%             del lib\%LIBPREFIX%dbfntxmt%LIBEXT%
+if exist lib\%LIBPREFIX%dbfnsx%LIBEXT%               del lib\%LIBPREFIX%dbfnsx%LIBEXT%
+if exist lib\%LIBPREFIX%dbfnsxmt%LIBEXT%             del lib\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%LIBPREFIX%debug%LIBEXT%                del lib\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%LIBPREFIX%dllmain%LIBEXT%              del lib\%LIBPREFIX%dllmain%LIBEXT%
 if exist lib\%LIBPREFIX%fmstat%LIBEXT%               del lib\%LIBPREFIX%fmstat%LIBEXT%
@@ -272,6 +274,8 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%dbffpt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbffptmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbffptmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfntx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfntx%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfntxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfntxmt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfnsx%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%fmstat%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%fmstat%LIBEXT%

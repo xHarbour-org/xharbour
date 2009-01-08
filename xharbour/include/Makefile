@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.33 2008/03/16 19:15:58 likewolf Exp $
+# $Id: Makefile,v 1.34 2008/03/18 15:51:39 likewolf Exp $
 #
 
 ROOT = ../
@@ -39,11 +39,13 @@ C_HEADERS=\
 	hbpcode.h    \
 	hbpp.h       \
 	hbrddcdx.h   \
+	hbrddbmc.h   \
 	hbrdddbf.h   \
 	hbrdddbt.h   \
 	hbrddfpt.h   \
 	hbrdddel.h   \
 	hbrddntx.h   \
+	hbrddnsx.h   \
 	hbrddsdf.h   \
 	hbset.h      \
 	hbsetup.h    \
@@ -114,7 +116,7 @@ PRG_HEADERS=\
 	setcurs.ch   \
 	simpleio.ch  \
 	std.ch       \
-        thtml.ch     \
+	thtml.ch     \
 	ttable.ch    \
 	classex.ch   \
 	cstruct.ch   \
@@ -124,7 +126,7 @@ PRG_HEADERS=\
 	math.ch      \
 	tbrowse.ch   \
 	tip.ch       \
-        thtml.ch     \
+	thtml.ch     \
 	usrrdd.ch    \
 	ct.ch        \
 	ctvideo.ch   \

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.34 2008/12/10 00:47:31 likewolf Exp $
+# $Id: common.mak,v 1.35 2008/12/22 22:09:44 likewolf Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -80,6 +80,7 @@ SIXCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixcdx$(HB_MT)$(LIBEXT)
 BMSIXCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmsixcdx$(HB_MT)$(LIBEXT)
 DBFFPT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbffpt$(HB_MT)$(LIBEXT)
 DBFNTX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfntx$(HB_MT)$(LIBEXT)
+DBFNSX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfnsx$(HB_MT)$(LIBEXT)
 HBSIX_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsix$(HB_MT)$(LIBEXT)
 HSX_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hsx$(HB_MT)$(LIBEXT)
 USRRDD_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)usrrdd$(HB_MT)$(LIBEXT)
@@ -171,6 +172,7 @@ HARBOUR_LIBS=\
 	$(MACRO_LIB)\
 	$(DBFFPT_LIB)\
 	$(DBFNTX_LIB)\
+	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
@@ -588,6 +590,12 @@ DBFFPT_LIB_OBJS=\
 #===============================================================================
 DBFNTX_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dbfntx1$(OBJEXT)\
+
+#===============================================================================
+# DBFNSX.LIB rules
+#===============================================================================
+DBFNSX_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)dbfnsx1$(OBJEXT)
 
 #===============================================================================
 # DBFCDX.LIB rules
@@ -1178,6 +1186,7 @@ HARBOUR_DLL_OBJS=\
 	$(RDD_LIB_OBJS)\
 	$(DBFFPT_LIB_OBJS)\
 	$(DBFNTX_LIB_OBJS)\
+	$(DBFNSX_LIB_OBJS)\
 	$(DBFCDX_LIB_OBJS)\
 	$(BMDBFCDX_LIB_OBJS)\
 	$(SIXCDX_LIB_OBJS)\
@@ -1674,6 +1683,7 @@ ST_PROJECT=\
 	$(TIP_LIB)\
 	$(DBFFPT_LIB)\
 	$(DBFNTX_LIB)\
+	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
@@ -1710,6 +1720,7 @@ MT_PROJECT=\
 	$(TIP_LIB)\
 	$(DBFFPT_LIB)\
 	$(DBFNTX_LIB)\
+	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\

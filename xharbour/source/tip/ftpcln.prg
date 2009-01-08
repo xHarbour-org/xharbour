@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.25 2008/04/03 12:04:54 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.26 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -357,7 +357,7 @@ METHOD TransferStart() CLASS tIPClientFTP
          IF ! Empty( ::nDefaultSndBuffSize )
             ::InetSndBufSize( skt, ::nDefaultSndBuffSize )
          ENDIF
-   
+
          IF ! Empty( ::nDefaultRcvBuffSize )
             ::InetRcvBufSize( skt, ::nDefaultRcvBuffSize )
          ENDIF
@@ -813,7 +813,7 @@ RETURN ::GetReply()
 
 // Return total file size for <cFileSpec>
 METHOD fileSize( cFileSpec ) CLASS tIPClientFTP
-   LOCAL aFiles:=::ListFiles( cFileSpec ), nSize:=0, n
+   LOCAL aFiles := ::ListFiles( cFileSpec ), nSize := 0, n
    FOR n =1 TO Len(aFiles)
        nSize+=Val(aFiles[n][F_SIZE]) // Should [7] not be [F_SIZE] ?
    NEXT

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.233 2008/11/24 00:06:47 andijahja Exp $
+# $Id: makefile.vc,v 1.234 2008/11/24 05:30:34 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -193,6 +193,9 @@ $(RDDS_LIB) : $(RDDS_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)

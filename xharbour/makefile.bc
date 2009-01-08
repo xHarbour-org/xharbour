@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.239 2008/11/24 00:06:47 andijahja Exp $
+# $Id: makefile.bc,v 1.240 2008/11/24 05:30:34 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -233,6 +233,13 @@ $(RDDS_LIB) : $(RDDS_LIB_OBJS)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
 	IF EXIST "$(DBFNTX_LIB)" $(DEL) "$(DBFNTX_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
+	IF EXIST "$(DBFNSX_LIB)" $(DEL) "$(DBFNSX_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)

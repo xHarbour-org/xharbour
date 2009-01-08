@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6317 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: ChangeLog,v 1.6318 2009/01/08 04:36:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-08 11:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * common.mak
+  * compile.mak
+  * include\Makefile
+  * include\hbrddnsx.h
+  * include\hbsetup.h
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * mdir.bat
+  * source\rdd\dbfcdx\dbfnsx1.c
+    + Added dbfnsx rdd form Prezmek harbour's version (many thks to Prezmek)
+    ! fixed OrdBagName it was returning too extension.
+
+  * source\lang\msgca.c
+    ! fixed some catalanish entries.
+
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfntx\dbfntx1.c
+    * reused pError on canretry errors.
+
+  * source\compiler\hbslex.c
+  * source\rtl\philes.c
+  * include\hbrddntx.h
+  * source\tip\client.prg
+  * source\tip\ftpcln.prg
+    * minor syntax modifications.
 
 2008-01-08 00:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbdll.ch

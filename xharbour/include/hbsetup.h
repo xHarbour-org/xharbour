@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.50 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: hbsetup.h,v 1.51 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -464,6 +464,12 @@
    #ifdef HB_OS_UNIX_COMPATIBLE
       #define OS_UNIX_COMPATIBLE
    #endif
+#endif
+
+/* Compatibility #defines. These will be removed, so 
+   please use the new names in your code. */
+#ifdef HB_LEGACY_LEVEL
+   #undef HB_NO_PROFILER
 #endif
 
 /* ***********************************************************************

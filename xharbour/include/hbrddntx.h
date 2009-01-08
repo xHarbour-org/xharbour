@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.42 2008/07/09 16:10:33 marchuet Exp $
+ * $Id: hbrddntx.h,v 1.43 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -301,7 +301,7 @@ typedef NTXSWAPPAGE * LPNTXSWAPPAGE;
 
 typedef struct
 {
-   LPTAGINFO pTag;             /* current Tag */
+   LPTAGINFO pTag;            /* current Tag */
    HB_FHANDLE hTempFile;      /* handle to temporary file */
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */

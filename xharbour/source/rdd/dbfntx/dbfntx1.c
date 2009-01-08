@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.180 2008/09/05 08:38:36 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.181 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -251,14 +251,23 @@ static ULONG hb_ntxGetKeyRec( LPPAGEINFO pPage, SHORT iKey )
 /*
  * generate Run-Time error
  */
-static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * szFileName, USHORT uiOsCode, USHORT uiFlags )
+static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
+                              const char * szFileName, USHORT uiOsCode,
+                              USHORT uiFlags, PHB_ITEM * pErrorPtr )
 {
    PHB_ITEM pError;
    ERRCODE iRet = FAILURE;
 
    if( hb_vmRequestQuery() == 0 )
    {
-      pError = hb_errNew();
+      if( pErrorPtr )
+      {
+         if( ! *pErrorPtr )
+            *pErrorPtr = hb_errNew();
+         pError = *pErrorPtr;
+      }
+      else
+         pError = hb_errNew();
       hb_errPutGenCode( pError, uiGenCode );
       hb_errPutSubCode( pError, uiSubCode );
       hb_errPutOsCode( pError, uiOsCode );
@@ -268,7 +277,8 @@ static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode
       if( uiFlags )
          hb_errPutFlags( pError, uiFlags );
       iRet = SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      if( !pErrorPtr )
+         hb_errRelease( pError );
    }
    return iRet;
 }
@@ -907,7 +917,7 @@ static BOOL hb_ntxBlockRead( LPNTXINDEX pIndex, ULONG ulBlock, BYTE *buffer, int
                       hb_ntxFileOffset( pIndex, ulBlock ) ) != ( ULONG ) iSize )
    {
       hb_ntxErrorRT( pIndex->Owner, EG_READ, EDBF_READ,
-                     pIndex->IndexName, hb_fsError(), 0 );
+                     pIndex->IndexName, hb_fsError(), 0, NULL );
       return FALSE;
    }
    return TRUE;
@@ -928,7 +938,7 @@ static BOOL hb_ntxBlockWrite( LPNTXINDEX pIndex, ULONG ulBlock, BYTE *buffer, in
                        hb_ntxFileOffset( pIndex, ulBlock ) ) != ( ULONG ) iSize )
    {
       hb_ntxErrorRT( pIndex->Owner, EG_WRITE, EDBF_WRITE,
-                     pIndex->IndexName, hb_fsError(), 0 );
+                     pIndex->IndexName, hb_fsError(), 0, NULL );
       return FALSE;
    }
    return TRUE;
@@ -1220,7 +1230,7 @@ static LPPAGEINFO hb_ntxPageLoad( LPTAGINFO pTag, ULONG ulPage )
       if( !ulPage )
       {
          hb_ntxErrorRT( pTag->Owner->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                        pTag->Owner->IndexName, 0, 0 );
+                        pTag->Owner->IndexName, 0, 0, NULL );
          return NULL;
       }
    }
@@ -1320,7 +1330,7 @@ static LPPAGEINFO hb_ntxPageNew( LPTAGINFO pTag, BOOL fNull )
       if( pPage->uiKeys != 0 )
       {
          hb_ntxErrorRT( pTag->Owner->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                        pTag->Owner->IndexName, 0, 0 );
+                        pTag->Owner->IndexName, 0, 0, NULL );
          return NULL;
       }
 #endif
@@ -1889,7 +1899,7 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
    {
 #if defined( HB_NTX_NOMULTITAG )
       hb_ntxErrorRT( pIndex->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                     pIndex->IndexName, hb_fsError(), 0 );
+                     pIndex->IndexName, hb_fsError(), 0, NULL );
       return FAILURE;
 #else
       LPCTXHEADER lpCTX = ( LPCTXHEADER ) pIndex->HeaderBuff;
@@ -1927,7 +1937,7 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
       if( pIndex->Compound )
       {
          hb_ntxErrorRT( pIndex->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                        pIndex->IndexName, hb_fsError(), 0 );
+                        pIndex->IndexName, hb_fsError(), 0, NULL );
          return FAILURE;
       }
       pTag = pIndex->iTags ? pIndex->lpTags[0] : NULL;
@@ -2020,7 +2030,8 @@ static BOOL hb_ntxIndexLockRead( LPNTXINDEX pIndex )
       }
    }
    if( !fOK )
-      hb_ntxErrorRT( pIndex->Owner, EG_LOCK, EDBF_LOCK, pIndex->IndexName, hb_fsError(), 0 );
+      hb_ntxErrorRT( pIndex->Owner, EG_LOCK, EDBF_LOCK,
+                     pIndex->IndexName, hb_fsError(), 0, NULL );
 
    return fOK;
 }
@@ -2063,7 +2074,8 @@ static BOOL hb_ntxIndexLockWrite( LPNTXINDEX pIndex, BOOL fCheck )
       }
    }
    if( !fOK )
-      hb_ntxErrorRT( pIndex->Owner, EG_LOCK, EDBF_LOCK, pIndex->IndexName, hb_fsError(), 0 );
+      hb_ntxErrorRT( pIndex->Owner, EG_LOCK, EDBF_LOCK,
+                     pIndex->IndexName, hb_fsError(), 0, NULL );
 
    return fOK;
 }
@@ -2153,7 +2165,7 @@ static BOOL hb_ntxTagLockRead( LPTAGINFO pTag )
       {
          hb_ntxIndexUnLockRead( pTag->Owner );
          hb_ntxErrorRT( pTag->Owner->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                        pTag->Owner->IndexName, 0, 0 );
+                        pTag->Owner->IndexName, 0, 0, NULL );
       }
    }
    return fOK;
@@ -2173,7 +2185,7 @@ static BOOL hb_ntxTagLockWrite( LPTAGINFO pTag )
       {
          hb_ntxIndexUnLockWrite( pTag->Owner );
          hb_ntxErrorRT( pTag->Owner->Owner, EG_CORRUPTION, EDBF_CORRUPT,
-                        pTag->Owner->IndexName, 0, 0 );
+                        pTag->Owner->IndexName, 0, 0, NULL );
       }
    }
    return fOK;
@@ -4667,7 +4679,7 @@ static void hb_ntxSortBufferFlush( LPNTXSORTINFO pSort )
                      hb_ntxFileOffset( pIndex, pSort->ulFirstIO ) ) != ulSize )
       {
          hb_ntxErrorRT( pIndex->Owner, EG_WRITE, EDBF_WRITE,
-                        pIndex->IndexName, hb_fsError(), 0 );
+                        pIndex->IndexName, hb_fsError(), 0, NULL );
       }
       pSort->ulPagesIO = 0;
       pIndex->fFlush = TRUE;
@@ -4749,9 +4761,9 @@ static void hb_ntxSortWritePage( LPNTXSORTINFO pSort )
       pSort->hTempFile = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, szName );
       if( pSort->hTempFile == FS_ERROR )
          hb_ntxErrorRT( pSort->pTag->Owner->Owner, EG_CREATE, EDBF_CREATE_TEMP,
-                        ( char * ) szName, 0, 0 );
+                        ( const char * ) szName, 0, 0, NULL );
       else
-         pSort->szTempFileName = hb_strdup( ( char * ) szName );
+         pSort->szTempFileName = hb_strdup( ( const char * ) szName );
    }
 
    pSort->pSwapPage[ pSort->ulCurPage ].ulKeys = pSort->ulKeys;
@@ -4760,7 +4772,7 @@ static void hb_ntxSortWritePage( LPNTXSORTINFO pSort )
       pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeekLarge( pSort->hTempFile, 0, FS_END );
       if( hb_fsWriteLarge( pSort->hTempFile, pSort->pStartKey, ulSize ) != ulSize )
          hb_ntxErrorRT( pSort->pTag->Owner->Owner, EG_WRITE, EDBF_WRITE_TEMP,
-                        pSort->szTempFileName, 0, 0 );
+                        pSort->szTempFileName, 0, 0, NULL );
    }
    else
       pSort->pSwapPage[ pSort->ulCurPage ].nOffset = 0;
@@ -4783,7 +4795,7 @@ static void hb_ntxSortGetPageKey( LPNTXSORTINFO pSort, ULONG ulPage,
            hb_fsReadLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize ) )
       {
          hb_ntxErrorRT( pSort->pTag->Owner->Owner, EG_READ, EDBF_READ_TEMP,
-                        pSort->szTempFileName, 0, 0 );
+                        pSort->szTempFileName, 0, 0, NULL );
       }
       pSort->pSwapPage[ ulPage ].nOffset += ulSize;
       pSort->pSwapPage[ ulPage ].ulKeyBuf = ulKeys;
@@ -5363,8 +5375,8 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fileReadAt( pArea->pDataFile, pSort->pBuffIO, pArea->uiRecordLen * iRec,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen +
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
+                              ( HB_FOFFSET ) pArea->uiHeaderLen +
+                              ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                               ( HB_FOFFSET ) pArea->uiRecordLen );
                iRecBuff = 0;
             }
@@ -5423,7 +5435,7 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
 
                default:
                   hb_ntxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDKEY,
-                                 pTag->Owner->IndexName, 0, 0 );
+                                 pTag->Owner->IndexName, 0, 0, NULL );
                   errCode = FAILURE;
                   pTag->Partial = TRUE;
                   pEvalItem = NULL;
@@ -5604,7 +5616,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pItem, BOOL fFi
 
    if( ! pArea->lpCurTag )
    {
-      hb_ntxErrorRT( pArea, EG_NOORDER, EDBF_NOTINDEXED, NULL, 0, EF_CANDEFAULT );
+      hb_ntxErrorRT( pArea, EG_NOORDER, EDBF_NOTINDEXED, NULL, 0, EF_CANDEFAULT, NULL );
       return FAILURE;
    }
    else
@@ -5884,7 +5896,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                            else if( !pTag->Partial && !pTag->UniqueKey )
                               hb_ntxErrorRT( pTag->Owner->Owner,
                                              EG_CORRUPTION, EDBF_CORRUPT,
-                                             pTag->Owner->IndexName, 0, 0 );
+                                             pTag->Owner->IndexName, 0, 0, NULL );
                         }
                      }
                      if( fAdd )
@@ -6086,6 +6098,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
         szTagName[ NTX_MAX_TAGNAME + 1 ], * szKey, * szFor = NULL;
    LPNTXINDEX pIndex, * pIndexPtr;
    LPTAGINFO pTag = NULL;
+   LPDBFDATA pData;
    ERRCODE errCode;
    ULONG ulRecNo;
    BOOL fCompound, fTagName, fBagName, fProd, fLocked = FALSE,
@@ -6165,7 +6178,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       hb_vmDestroyBlockOrMacro( pKeyExp );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       hb_ntxErrorRT( pArea, bType == 'U' ? EG_DATATYPE : EG_DATAWIDTH,
-                     1026, NULL, 0, 0 );
+                     1026, NULL, 0, 0, NULL );
       return FAILURE;
    }
 
@@ -6216,13 +6229,14 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          hb_vmDestroyBlockOrMacro( pKeyExp );
          hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-         hb_ntxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDFOR, NULL, 0, 0 );
+         hb_ntxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDFOR, NULL, 0, 0, NULL );
          return FAILURE;
       }
    }
 
    SELF_GOTO( ( AREAP ) pArea, ulRecNo );
 
+   pData = NTXAREA_DATA( pArea );
    /*
     * abBagName -> cBag, atomBagName -> cTag
     * The following scheme implemented:
@@ -6237,7 +6251,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 #if defined( HB_NTX_NOMULTITAG )
    fCompound = FALSE;
 #else
-   fCompound = fTagName && NTXAREA_DATA( pArea )->fMultiTag;
+   fCompound = fTagName && pData->fMultiTag;
 #endif
    hb_ntxCreateFName( pArea, ( char * ) ( ( fBagName || fCompound ) ?
                       pOrderInfo->abBagName : pOrderInfo->atomBagName ),
@@ -6269,7 +6283,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          hb_vmDestroyBlockOrMacro( pKeyExp );
          if( pForExp != NULL )
             hb_vmDestroyBlockOrMacro( pForExp );
-         hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pIndex->IndexName, 0, 0 );
+         hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pIndex->IndexName, 0, 0, NULL );
          return FAILURE;
       }
 #if 0 /* enable this code if you want to forbid tag deleting in shared mode */
@@ -6278,7 +6292,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          hb_vmDestroyBlockOrMacro( pKeyExp );
          if( pForExp != NULL )
             hb_vmDestroyBlockOrMacro( pForExp );
-         hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pIndex->IndexName, 0, 0 );
+         hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pIndex->IndexName, 0, 0, NULL );
          return FAILURE;
       }
 #endif
@@ -6288,6 +6302,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       PHB_FILE pFile;
       BOOL bRetry, fOld, fShared = pArea->fShared && !fTemporary && !fExclusive;
       USHORT uiFlags = FO_READWRITE | ( fShared ? FO_DENYNONE : FO_EXCLUSIVE );
+      PHB_ITEM pError = NULL;
 
       fOld = fCompound;
       do
@@ -6300,13 +6315,14 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          else
          {
             pFile = hb_fileExtOpen( ( BYTE * ) szFileName, NULL, uiFlags |
-                                  ( fOld ? FXO_APPEND : FXO_TRUNCATE ) |
-                                  FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                  NULL, NULL );
+                                    ( fOld ? FXO_APPEND : FXO_TRUNCATE ) |
+                                    FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                    NULL, pError );
          }
          if( !pFile )
             bRetry = ( hb_ntxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
-                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
+                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                      &pError ) == E_RETRY );
          else
          {
             bRetry = FALSE;
@@ -6315,6 +6331,9 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          }
       }
       while( bRetry );
+
+      if( pError )
+         hb_errRelease( pError );
 
       if( !pFile )
       {
@@ -6360,7 +6379,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
             if( pForExp != NULL )
                hb_vmDestroyBlockOrMacro( pForExp );
             /* hb_ntxSetTagNumbers() */
-            hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0 );
+            hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0, NULL );
             return errCode;
          }
       }
@@ -6381,7 +6400,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       if( pForExp != NULL )
          hb_vmDestroyBlockOrMacro( pForExp );
       /* hb_ntxSetTagNumbers() */
-      hb_ntxErrorRT( pArea, EG_LIMIT, EDBF_LIMITEXCEEDED, pIndex->IndexName, 0, 0 );
+      hb_ntxErrorRT( pArea, EG_LIMIT, EDBF_LIMITEXCEEDED, pIndex->IndexName, 0, 0, NULL );
       return FAILURE;
    }
 
@@ -6412,7 +6431,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pTag = hb_ntxTagNew( pIndex, szTagName, fTagName,
                            szKey, pKeyExp, bType, (USHORT) iLen, (USHORT) iDec,
                            szFor, pForExp,
-                           fAscend, pOrderInfo->fUnique, fCustom, NTXAREA_DATA( pArea )->fSortRecNo );
+                           fAscend, pOrderInfo->fUnique, fCustom, pData->fSortRecNo );
       pTag->Partial = ( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll );
 
       if( ! pIndex->Compound )
@@ -6480,8 +6499,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       *pIndexPtr = pIndex;
    }
    if( pIndex->Production && !pArea->fHasTags &&
-       NTXAREA_DATA( pArea )->fStruct &&
-       ( NTXAREA_DATA( pArea )->fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
+       pData->fStruct && ( pData->fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
    {
       pArea->fHasTags = TRUE;
       if( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) == 0 )
@@ -6538,13 +6556,13 @@ static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
          }
          else if( pIndex->fReadonly )
          {
-            hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pIndex->IndexName, 0, 0 );
+            hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pIndex->IndexName, 0, 0, NULL );
             return FAILURE;
          }
 #if 0 /* enable this code if you want to forbid tag deleting in shared mode */
          else if( pIndex->fShared )
          {
-            hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pIndex->IndexName, 0, 0 );
+            hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pIndex->IndexName, 0, 0, NULL );
             return FAILURE;
          }
 #endif
@@ -6927,7 +6945,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_KEYADD:
             if( pTag->Owner->fReadonly )
             {
-               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pTag->Owner->IndexName, 0, 0 );
+               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY,
+                              pTag->Owner->IndexName, 0, 0, NULL );
                return FAILURE;
             }
             if( pTag->Custom )
@@ -6937,14 +6956,15 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             }
             else
             {
-               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0, NULL );
                return FAILURE;
             }
             break;
          case DBOI_KEYDELETE:
             if( pTag->Owner->fReadonly )
             {
-               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pTag->Owner->IndexName, 0, 0 );
+               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY,
+                              pTag->Owner->IndexName, 0, 0, NULL );
                return FAILURE;
             }
             if( pTag->Custom )
@@ -6954,7 +6974,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             }
             else
             {
-               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0, NULL );
                return FAILURE;
             }
             break;
@@ -7272,6 +7292,8 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    if( ! pIndex )
    {
+      PHB_ITEM pError = NULL;
+
       fReadonly = pArea->fReadonly;
       fShared = pArea->fShared;
       uiFlags = ( fReadonly ? FO_READ : FO_READWRITE ) |
@@ -7280,15 +7302,19 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       {
          fRetry = FALSE;
          pFile = hb_fileExtOpen( ( BYTE * ) szFileName, NULL, uiFlags |
-                               FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                               NULL, NULL );
+                                 FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                 NULL, pError );
          if( !pFile )
          {
             fRetry = ( hb_ntxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
-                     hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
+                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                      &pError ) == E_RETRY );
          }
       }
       while( fRetry );
+
+      if( pError )
+         hb_errRelease( pError );
 
       if( !pFile )
          return FAILURE;
@@ -7317,7 +7343,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       {
          *pIndexPtr = pIndex->pNext;
          hb_ntxIndexFree( pIndex );
-         hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0 );
+         hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0, NULL );
          return errCode;
       }
       /* hb_ntxSetTagNumbers() */
@@ -7439,12 +7465,12 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
 
    if( pArea->fShared )
    {
-      hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pArea->szDataFileName, 0, 0 );
+      hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pArea->szDataFileName, 0, 0, NULL );
       return FAILURE;
    }
    if( pArea->fReadonly )
    {
-      hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pArea->szDataFileName, 0, 0 );
+      hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pArea->szDataFileName, 0, 0, NULL );
       return FAILURE;
    }
 
@@ -7481,7 +7507,7 @@ static ERRCODE ntxInit( LPRDDNODE pRDD )
    if( errCode == SUCCESS )
       NTXNODE_DATA( pRDD )->fMultiTag = TRUE;
 #endif
-      
+
    return errCode;
 }
 
