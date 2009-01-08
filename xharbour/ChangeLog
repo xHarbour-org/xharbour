@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6316 2008/12/24 04:32:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.6317 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-08 00:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbdll.ch
+    + Added few variations (including a simplification) of the IMPORT command
+
+  * source/vm/maindllh.c
+    + Added missing HB_EXPORT qualifier.
 
 2008-12-27 16:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c

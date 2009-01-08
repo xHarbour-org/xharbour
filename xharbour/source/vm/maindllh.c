@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.10 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: maindllh.c,v 1.11 2008/11/23 20:41:21 ronpinkas Exp $
  */
 
 /*
@@ -63,12 +63,12 @@
 #if defined(HB_OS_WIN_32)
 HB_EXTERN_BEGIN
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
-BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
 #else
-BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
