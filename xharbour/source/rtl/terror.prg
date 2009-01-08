@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.18 2006/01/31 21:47:56 ronpinkas Exp $
+ * $Id: terror.prg,v 1.19 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -61,18 +61,11 @@
 
 FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName, ProcName, ProcLine )
 
-   STATIC lInErr := .F., s_oClass
+   STATIC s_oClass
    LOCAL oErr
    LOCAL nLevel, aaStack
 
    //TraceLog( SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName, ProcName, ProcLine )
-
-   // Avoid RECURSIVE Errors.
-   IF lInErr
-      RETURN NIL
-   ELSE
-      lInErr := .T.
-   ENDIF
 
    IF s_oClass == NIL
       s_oClass := HBClass():New( "ERROR" )
@@ -159,8 +152,6 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
       oErr:OsThreadId     := ThreadGetCurrent()
       oErr:VMThreadId     := ThreadGetCurrentInternal()
    #endif
-
-   lInErr := .F.
 
 RETURN oErr
 

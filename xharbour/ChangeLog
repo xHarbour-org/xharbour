@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6318 2009/01/08 04:36:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6319 2009/01/08 09:11:13 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2008-01-08 11:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+2009-01-08 23:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * config/rules.cf
+    * give PRG_USR higher priority then HB_FLAGS
+  * include/thread.h
+    ! fixed declaration of HB_ATOMIC_INC()/HB_ATOMIC_DEC() macros
+      for 32bit x86 *nixes - by mistake it was added to ST section
+  * source/rtl/terror.prg
+    ! removed lInErr static variable - it breaks using errorNew() in
+      MT programs
+  * source/vm/itemapi.c
+    ! fixed copied as is from Harbour hb_itemUnShareString()
+      Harbour uses different HVM internals and such code cannot
+      be copied without adopting to xHarbour
+  * tests/speedtst.prg
+    ! fixed possible race condition in initialization
+    + added SET WORKAREA PRIVATE
+  (by Przemyslaw Czerpak)
+  * include/classes.h
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    ! Avoid s_pClasses reallocation in MT mode.
+    (partially borrowed from Harbour code by Przemyslaw Czerpak)
+  * ChangeLog
+    ! fixed year numbers in last few commits
+
+2009-01-08 11:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * common.mak
   * compile.mak
   * include\Makefile
@@ -40,7 +65,7 @@
   * source\tip\ftpcln.prg
     * minor syntax modifications.
 
-2008-01-08 00:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-08 00:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbdll.ch
     + Added few variations (including a simplification) of the IMPORT command
 

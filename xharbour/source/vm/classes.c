@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.231 2008/11/27 15:54:02 marchuet Exp $
+ * $Id: classes.c,v 1.232 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -195,8 +195,6 @@
    extern BOOL hb_bProfiler; /* profiler activity status */
 #endif
 
-static PCLASS   s_pClasses     = NULL;
-static USHORT   s_uiClasses    = 0;
 static PHB_DYNS s_msgClassName = NULL;
 
 static PHB_DYNS s_msgClassH       = NULL;
@@ -210,10 +208,6 @@ static BOOL     s_bClsAutoInit     = TRUE;
 static BOOL     s_AllowDestructors = TRUE;
 
 /* static PHB_DYNS s_msgClass     = NULL; */
-
-USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
-       hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,
-	   hb_cls_uiHashClass = 0;
 
 /* All functions contained in classes.c */
 
@@ -253,6 +247,53 @@ HARBOUR  hb___msgSetShrData( void );
 HARBOUR  hb___msgGetData( void );
 HARBOUR  hb___msgSetData( void );
 
+USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
+       hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,
+	   hb_cls_uiHashClass = 0;
+
+
+/* ================================================ */
+
+/*
+ * Class definition holder
+ */
+/* In MT mode we are allocating array big enough to hold all
+ * class definitions so we do not have to worry about runtime
+ * s_pClasses reallocation, [druzus]
+ */
+#if defined( HB_THREAD_SUPPORT )
+
+#  define HB_CLASS_POOL_SIZE  16384
+#  define HB_CLASS_LOCK       HB_CRITICAL_LOCK( s_clsMtx );
+#  define HB_CLASS_UNLOCK     HB_CRITICAL_UNLOCK( s_clsMtx );
+   static HB_CRITICAL_T s_clsMtx;
+
+#else
+
+#  define HB_CLASS_POOL_SIZE  0
+#  define HB_CLASS_LOCK
+#  define HB_CLASS_UNLOCK
+
+#endif
+
+#define HB_CLASS_POOL_RESIZE  16
+
+static PCLASS   s_pClasses     = NULL;
+static USHORT   s_uiClsSize    = 0;
+static USHORT   s_uiClasses    = 0;
+
+/*
+ * initialize Classy/OO system at HVM startup
+ */
+void hb_clsInit( void )
+{
+   s_uiClsSize = HB_CLASS_POOL_SIZE;
+   s_uiClasses = 0;
+   s_pClasses = ( PCLASS ) hb_xgrab( sizeof( CLASS ) * ( ( ULONG ) s_uiClsSize + 1 ) );
+#ifdef HB_THREAD_SUPPORT
+   HB_CRITICAL_INIT( s_clsMtx );
+#endif
+}
 
 /*
  * hb_clsRelease( <pClass> )
@@ -2238,19 +2279,19 @@ HB_FUNC( __CLSNEW )
       uiSuper = ( USHORT ) pahSuper->item.asArray.value->ulLen; /* Number of Super class present */
    }
 
+   HB_CLASS_LOCK
+
+   if( s_uiClasses == s_uiClsSize )
+   {
+      s_uiClsSize += HB_CLASS_POOL_RESIZE;
+      s_pClasses = ( PCLASS ) hb_xrealloc( s_pClasses, sizeof( CLASS ) * ( ( ULONG )s_uiClsSize + 1 ) );
+   }
    uiClass = ++s_uiClasses;
-   if( s_pClasses )
-   {
-      s_pClasses = ( PCLASS ) hb_xrealloc( s_pClasses, sizeof( CLASS ) * uiClass );
-   }
-   else
-   {
-      s_pClasses = ( PCLASS ) hb_xgrab( sizeof( CLASS ) );
-   }
-
    pNewCls = s_pClasses + uiClass - 1;
-
    memset( pNewCls, 0, sizeof( CLASS ) );
+
+   HB_CLASS_UNLOCK
+
 /*
    pNewCls->uiDataFirst = 0;
    pNewCls->uiDatas = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.154 2008/11/27 15:54:02 marchuet Exp $
+ * $Id: itemapi.c,v 1.155 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -1521,14 +1521,19 @@ PHB_ITEM hb_itemUnShareString( PHB_ITEM pItem )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnShareString(%p)", pItem));
 
    if( pItem->item.asString.allocated == 0 ||
-       hb_xRefCount( pItem->item.asString.value ) > 1 )
+       *( pItem->item.asString.pulHolders ) > 1 )
    {
       ULONG ulLen = pItem->item.asString.length + 1;
       char *szText = ( char* ) hb_xgrab( ulLen );
 
       hb_xmemcpy( szText, pItem->item.asString.value, ulLen );
       if( pItem->item.asString.allocated )
-         hb_xRefDec( pItem->item.asString.value );
+      {
+         if( HB_ATOMIC_DEC( *( pItem->item.asString.pulHolders ) ) == 0 )
+         {
+            hb_xfree( pItem->item.asString.value );
+         }
+      }
       pItem->item.asString.value = szText;
       pItem->item.asString.allocated = ulLen;
    }

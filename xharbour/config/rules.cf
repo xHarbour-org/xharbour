@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.12 2008/03/13 10:49:39 likewolf Exp $
+# $Id: rules.cf,v 1.13 2008/03/16 19:15:57 likewolf Exp $
 #
 
 # How to run yacc.
@@ -85,7 +85,7 @@ ifeq ($(HB_COMPILER),clipper)
 else
 # Rule to generate a C file from a PRG file.
 %.c : $(GRANDP)%.prg
-	$(HB) $? $(PRG_USR) $(HB_FLAGS)
+	$(HB) $? $(HB_FLAGS) $(PRG_USR)
 endif
 
 ifeq ($(SHLVL),) # COMMAND.COM

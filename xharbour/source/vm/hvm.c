@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.698 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: hvm.c,v 1.699 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -597,6 +597,8 @@ void hb_vmInit( BOOL bStartMainProc )
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
+
+   hb_clsInit();              /* initialize Classy/OO system */
 
    HB_TRACE( HB_TR_INFO, ("errInit") );
    hb_errInit();

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.37 2008/12/01 11:44:59 marchuet Exp $
+ * $Id: classes.h,v 1.38 2008/12/02 12:28:49 marchuet Exp $
  */
 
 /*
@@ -180,6 +180,7 @@ extern USHORT hb_cls_uiArrayClass, hb_cls_uiBlockClass, hb_cls_uiCharacterClass,
        hb_cls_uiLogicalClass, hb_cls_uiNilClass, hb_cls_uiNumericClass, hb_cls_uiPointerClass,
 	   hb_cls_uiHashClass;
 
+extern void       hb_clsInit( void );           /* initialize Classy/OO system at HVM startup */
 extern void hb_clsDisableDestructors( void );
 extern BOOL hb_clsDestructorsAllowed( void );
 extern void hb_clsClearAllClassDatas( void );
