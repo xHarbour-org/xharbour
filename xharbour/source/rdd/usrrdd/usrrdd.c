@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.15 2008/06/04 14:48:52 marchuet Exp $
+ * $Id: usrrdd.c,v 1.16 2008/08/18 09:39:14 marchuet Exp $
  */
 
 /*
@@ -2557,7 +2557,7 @@ static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULO
 
 static ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULONG ulConnect )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p,%lu)", pRDD, pTable, pIndex, ULONG ulConnect));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p,%lu)", pRDD, pTable, pIndex, ulConnect));
 
    if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_EXISTS ) )
       return SUPER_EXISTS( pRDD, pTable, pIndex, ulConnect );

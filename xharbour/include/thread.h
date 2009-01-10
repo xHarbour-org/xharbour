@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.126 2008/12/23 18:06:33 likewolf Exp $
+* $Id: thread.h,v 1.127 2009/01/08 20:28:04 likewolf Exp $
 */
 
 /*
@@ -65,6 +65,7 @@ HB_IOERRORS, * PHB_IOERRORS;
 
 #ifdef HB_THREAD_SUPPORT
 
+#include "hbatomic.h"
 #include "hbmath.h"
 
 #if defined( __DMC__ )
@@ -75,6 +76,9 @@ HB_IOERRORS, * PHB_IOERRORS;
       #define __NT__
    #endif
 #endif
+
+#define HB_ATOMIC_INC( v ) HB_ATOM_INC( &( v ) )
+#define HB_ATOMIC_DEC( v ) HB_ATOM_DEC( &( v ) )
 
 /* disable this macro if malloca/free() is not thread safe */
 #define HB_SAFE_ALLOC
@@ -114,9 +118,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    } HB_WINCOND_T, *PHB_WINCOND_T;
 
    #define HB_THREAD_T                 unsigned
-
-   #define HB_ATOMIC_INC( x )          InterlockedIncrement( (long *) &(x) )
-   #define HB_ATOMIC_DEC( x )          InterlockedDecrement( (long *) &(x) )
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
    #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
@@ -206,9 +207,6 @@ extern HB_IMPORT DWORD hb_dwCurrentStack;
 
    #define HB_COND_T                   HMUX
    #define PHB_COND_T                  PHMUX
-
-   #define HB_ATOMIC_INC( x )          ( ++(x) )
-   #define HB_ATOMIC_DEC( x )          ( --(x) )
 
    #define DWORD                       ULONG
    #define HB_THREAD_T                 TID
@@ -395,38 +393,6 @@ extern PPVOID hb_dwCurrentStack;
 	    : FALSE ) )
 
 #endif
-
-   #if HB_COUNTER_SIZE == 4 && defined( __GNUC__ ) && 1 && \
-       ( defined( i386 ) || defined( __i386__ ) || defined( __x86_64__ ) )
-
-      static __inline__ void hb_atomic_inc32( volatile int * p )
-      {
-         __asm__ __volatile__(
-            "lock; incl %0\n"
-            :"=m" (*p) :"m" (*p)
-         );
-      }
-
-      static __inline__ int hb_atomic_dec32( volatile int * p )
-      {
-         unsigned char c;
-         __asm__ __volatile__(
-            "lock; decl %0\n"
-            "sete %1\n"
-            :"=m" (*p), "=qm" (c) :"m" (*p) : "memory"
-         );
-         return c == 0;
-      }
-
-      #define HB_ATOMIC_INC( x )    ( hb_atomic_inc32( ( volatile int * ) &(x) ) )
-      #define HB_ATOMIC_DEC( x )    ( hb_atomic_dec32( ( volatile int * ) &(x) ) )
-
-   #else
-
-      #define HB_ATOMIC_INC( x )    ( ++(x) )
-      #define HB_ATOMIC_DEC( x )    ( --(x) )
-
-   #endif
 
    #define HB_MUTEX_T                  HB_CRITICAL_T
    #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )

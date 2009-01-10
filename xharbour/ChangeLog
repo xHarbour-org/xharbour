@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6319 2009/01/08 09:11:13 marchuet Exp $
+ * $Id: ChangeLog,v 1.6320 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-11 01:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/Makefile
+  + include/hbatomic.h
+  * include/thread.h
+    ! Added atomic increment/decrement macros for more platforms.
+    (by Przemyslaw Czerpak; borrowed from Harbour)
+  * source/rdd/usrrdd/usrrdd.c
+    ! Fixed a syntax error in HB_TRACE() call.
 
 2009-01-08 23:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/rules.cf
