@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.127 2009/01/08 20:28:04 likewolf Exp $
+* $Id: thread.h,v 1.128 2009/01/10 22:26:04 likewolf Exp $
 */
 
 /*
@@ -65,6 +65,23 @@ HB_IOERRORS, * PHB_IOERRORS;
 
 #ifdef HB_THREAD_SUPPORT
 
+#if defined( HB_OS_WIN_32 )
+   /* This section should be above any #includes that may #include <windows.h> */
+   #ifndef _WIN32_WINNT
+      #define _WIN32_WINNT 0x0400
+   #endif
+   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+
+   /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
+   #define WIN32_LEAN_AND_MEAN
+
+   #ifndef CINTERFACE
+   #define CINTERFACE
+   #endif
+
+   #include <windows.h>
+#endif
+
 #include "hbatomic.h"
 #include "hbmath.h"
 
@@ -93,20 +110,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_VM_UNLOCK_PERIOD 5000
 
 #if defined(HB_OS_WIN_32)
-   #ifndef _WIN32_WINNT
-      #define _WIN32_WINNT 0x0400
-   #endif
-   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
-
-   /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
-   #define WIN32_LEAN_AND_MEAN
-
-   #ifndef CINTERFACE
-   #define CINTERFACE
-   #endif
-
-   #include <windows.h>
-
    typedef struct tag_HB_WINCOND_T
    {
       HANDLE semBlockLock;

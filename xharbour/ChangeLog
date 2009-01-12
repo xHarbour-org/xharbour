@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6320 2009/01/08 20:28:04 likewolf Exp $
+ * $Id: ChangeLog,v 1.6321 2009/01/10 22:26:03 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-12 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/thread.h
+    ! Include windows.h with our filters before other headers that may
+      include it.
 
 2009-01-11 01:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/Makefile
