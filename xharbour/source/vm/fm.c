@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.103 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: fm.c,v 1.104 2009/01/14 10:36:46 marchuet Exp $
  */
 
 /*
@@ -773,7 +773,7 @@ void hb_xinit( void ) /* Initialize fixed memory subsystem */
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
 #if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && ! defined( HB_FM_LOCALALLOC )
       hProcessHeap = GetProcessHeap();
-#endif      
+#endif
 }
 
 /* Returns pointer to string containing printable version
@@ -942,11 +942,11 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    {
       OutputDebugString( "HB_XEXIT(): No Memory Leak Detected." );
 #if defined( HB_FM_STD_ALLOC ) || ( defined( HB_FM_WIN32_ALLOC ) && !defined( HB_OS_WIN_32 ) )
-      OutputDebugString( "ussing HB_FM_STD_ALLOC." );
+      OutputDebugString( "using HB_FM_STD_ALLOC." );
 #elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
-      OutputDebugString( "ussing HB_FM_WIN32_ALLOC." );
+      OutputDebugString( "using HB_FM_WIN32_ALLOC." );
 #elif defined( HB_FM_DL_ALLOC )
-      OutputDebugString( "ussing HB_FM_DL_ALLOC." );
+      OutputDebugString( "using HB_FM_DL_ALLOC." );
 #endif
 #ifdef HB_FM_STATISTICS
       OutputDebugString( "with HB_FM_STATISTICS activated." );
