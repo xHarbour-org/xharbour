@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.102 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: fm.c,v 1.103 2008/12/03 11:09:45 marchuet Exp $
  */
 
 /*
@@ -136,20 +136,16 @@
 #     define free( p )           dlfree( ( p ) )
 #  endif
 #elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
-/*
-#  define malloc( n )         ( void * ) LocalAlloc( LMEM_FIXED, ( n ) )
-#  define realloc( p, n )     ( void * ) LocalReAlloc( ( HLOCAL ) ( p ), ( n ), LMEM_MOVEABLE )
-#  define free( p )           LocalFree( ( HLOCAL ) ( p ) )
-*/
-#  define malloc( n )         ( void * ) HeapAlloc( GetProcessHeap(), 0, ( n ) )
-#  define realloc( p, n )     ( void * ) HeapReAlloc( GetProcessHeap(), 0, ( void * ) ( p ), ( n ) )
-#  define free( p )           HeapFree( GetProcessHeap(), 0, ( void * ) ( p ) )
-#endif
-
-#if 0
-#include "hbmemcpy.c"
-#undef memcpy
-#define memcpy( t, f, l ) hb_memcpy( ( t ), ( f ), ( l ) )
+#  if defined( HB_FM_LOCALALLOC )
+#     define malloc( n )      ( void * ) LocalAlloc( LMEM_FIXED, ( n ) )
+#     define realloc( p, n )  ( void * ) LocalReAlloc( ( HLOCAL ) ( p ), ( n ), LMEM_MOVEABLE )
+#     define free( p )        LocalFree( ( HLOCAL ) ( p ) )
+#  else
+static HANDLE hProcessHeap = 0;
+#     define malloc( n )      ( void * ) HeapAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( n ) )
+#     define realloc( p, n )  ( void * ) HeapReAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ), ( n ) )
+#     define free( p )        HeapFree( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ) )
+#  endif
 #endif
 
 #ifndef HB_FM_STATISTICS
@@ -775,6 +771,9 @@ ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memory block *
 void hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
+#if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && ! defined( HB_FM_LOCALALLOC )
+      hProcessHeap = GetProcessHeap();
+#endif      
 }
 
 /* Returns pointer to string containing printable version

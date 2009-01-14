@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6321 2009/01/10 22:26:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.6322 2009/01/12 11:34:51 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-14 11:34 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\vm\fm.c
+    ! minor optimization, 1 seg more quick speedtst, but remains one important question
+      fmapi is used before its initialization (void hb_xinit( void )) I think this function
+      need be called first of all.
+    - removed test comments.
+    + Added macro HB_FM_LOCALALLOC to use LocalAlloc instead of HeapAlloc. Microsoft says that
+      the use of LocalAlloc need be changed by HeapAlloc, but we leave it here to user election.
 
 2009-01-12 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/thread.h
