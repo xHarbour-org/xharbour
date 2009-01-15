@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.104 2009/01/14 10:36:46 marchuet Exp $
+ * $Id: fm.c,v 1.105 2009/01/14 23:53:01 kaddath Exp $
  */
 
 /*
@@ -142,9 +142,13 @@
 #     define free( p )        LocalFree( ( HLOCAL ) ( p ) )
 #  else
 static HANDLE hProcessHeap = 0;
-#     define malloc( n )      ( void * ) HeapAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( n ) )
-#     define realloc( p, n )  ( void * ) HeapReAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ), ( n ) )
-#     define free( p )        HeapFree( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ) )
+//#     define malloc( n )      ( void * ) HeapAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( n ) )
+//#     define realloc( p, n )  ( void * ) HeapReAlloc( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ), ( n ) )
+//#     define free( p )        HeapFree( ( hProcessHeap ? hProcessHeap : GetProcessHeap() ), 0, ( void * ) ( p ) )
+#     define malloc( n )      ( void * ) HeapAlloc( hProcessHeap, 0, ( n ) )
+#     define realloc( p, n )  ( void * ) HeapReAlloc( hProcessHeap, 0, ( void * ) ( p ), ( n ) )
+#     define free( p )        HeapFree( hProcessHeap, 0, ( void * ) ( p ) )
+
 #  endif
 #endif
 

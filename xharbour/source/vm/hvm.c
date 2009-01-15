@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.699 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: hvm.c,v 1.700 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /*
@@ -557,7 +557,12 @@ void hb_vmInit( BOOL bStartMainProc )
    s_bDebugging = FALSE;
 
    s_pDynsDbgEntry = hb_dynsymFind( "__DBGENTRY" );
+
+   /*
+   Moved to hb_vmProcessSymbols() to avoid GPF trap.
    hb_xinit();
+   */ 
+
    hb_gcInit();
 
 #ifdef HB_THREAD_SUPPORT
@@ -10529,6 +10534,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
 PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
+   static BOOL s_Do_xinit = TRUE;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
 #ifdef HB_THREAD_SUPPORT
@@ -10545,6 +10552,13 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
       hb_errInternal( HB_EI_ERRUNRECOV,
                       "Module: '%s' was compiled into PCODE version: %s,"
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
+
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
+
+      hb_xinit();
    }
 
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
