@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6326 2009/01/15 18:33:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6327 2009/01/16 01:55:59 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-16 11:53 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * contrib\rdd_ads\ads.ch
+  * contrib\rdd_ads\ads1.c
+  * contrib\rdd_ads\rddads.h
+    synced with harbour no code changes.
+
+  * source\rdd\dbfnsx\dbfnsx1.c
+    ! fixed typo in descend flag checking
+    % optimized current key decoding
+    borrowed from Harbour code written by Przemyslaw Czerpak.
+
+  * source\vm\fm.c
+  * source\vm\hvm.c
+    + Add startup code to borland compilers to execute only one time as fisrt fo all
+      hb_xinit.
 
 2009-01-16 04:53 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/Makefile

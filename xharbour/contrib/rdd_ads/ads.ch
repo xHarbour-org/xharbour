@@ -1,5 +1,5 @@
 /*
- * $Id: ads.ch,v 1.10 2008/06/03 23:12:56 kaddath Exp $
+ * $Id: ads.ch,v 1.11 2008/06/04 00:32:26 kaddath Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
    Internet Server capabilities, etc.
 
    So to link to v5, do this:
-   1) Link with an ACE32.LIB created from the version 5
+   1) Link with an ace32.lib created from the version 5
          dll that imports these functions, and
 
    2) Set this "define" when compiling rddads:

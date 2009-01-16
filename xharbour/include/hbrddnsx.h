@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddnsx.h 10002 2008-12-24 08:43:07Z druzus $
+ * $Id: hbrddnsx.h,v 1.1 2009/01/08 09:11:13 marchuet Exp $
  */
 
 /*
@@ -429,6 +429,9 @@ typedef struct _TAGINFO
    USHORT      nField;
    USHORT      uiNumber;
    USHORT      MaxKeys;
+
+   USHORT      CurKeyOffset;
+   USHORT      CurKeyNo;
 
    USHORT      stackSize;
    USHORT      stackLevel;
