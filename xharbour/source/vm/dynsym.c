@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.60 2008/10/23 07:45:32 marchuet Exp $
+ * $Id: dynsym.c,v 1.61 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
    HB_THREAD_STUB
    PHB_DYNS pDynSym;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymNew(%p)", pSymbol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymNew(%p, %p)", pSymbol, pModuleSymbols));
 
    hb_dynsymLock();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.52 2008/06/25 20:20:44 vouchcac Exp $
+ * $Id: hbapiitm.h,v 1.53 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -144,10 +144,11 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutNDLen   ( PHB_ITEM pItem, double dNumber, 
 extern HB_EXPORT PHB_ITEM   hb_itemPutNILen   ( PHB_ITEM pItem, int iNumber, int iWidth );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNLLen   ( PHB_ITEM pItem, LONG lNumber, int iWidth );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNIntLen ( PHB_ITEM pItem, HB_LONG lNumber, int iWidth );
+extern HB_EXPORT PHB_ITEM   hb_itemPutNumType ( PHB_ITEM pItem, double dNumber, int iDec, int iType1, int iType2 );
 extern HB_EXPORT PHB_ITEM   hb_itemPutPtr     ( PHB_ITEM pItem, void * pValue );
 extern HB_EXPORT PHB_ITEM   hb_itemPutPtrGC   ( PHB_ITEM pItem, void * pValue );
+extern HB_EXPORT PHB_ITEM   hb_itemPutSymbol ( PHB_ITEM pItem, PHB_SYMB pSym );
 extern HB_EXPORT PHB_ITEM   hb_itemPutHBLong  ( PHB_ITEM pItem, HB_LONG lNumber );
-extern HB_EXPORT PHB_ITEM   hb_itemPutNumType ( PHB_ITEM pItem, double dNumber, int iDec, int iType1, int iType2 );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNull    ( PHB_ITEM pItem );
 
 extern HB_EXPORT BOOL       hb_itemRelease      ( PHB_ITEM pItem );

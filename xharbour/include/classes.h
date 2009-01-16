@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.38 2008/12/02 12:28:49 marchuet Exp $
+ * $Id: classes.h,v 1.39 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /*
@@ -52,6 +52,8 @@
 
 #ifndef HB_CLASSES_H_
 #define HB_CLASSES_H_
+
+#include "hbapi.h"
 
 HB_EXTERN_BEGIN
 
@@ -208,5 +210,14 @@ extern HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 extern HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem );
 extern HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule );
 
+/* Harbour equivalent for Clipper internal __mdCreate() */
+USHORT hb_clsCreate( USHORT usSize, const char * szClassName );
+/* Harbour equivalent for Clipper internal __mdAdd() */
+void hb_clsAdd( USHORT usClassH, const char * szMethodName, PHB_FUNC pFuncPtr );
+/* Harbour equivalent for Clipper internal __mdAssociate() */
+void hb_clsAssociate( USHORT usClassH );
+
+
 HB_EXTERN_END
+
 #endif

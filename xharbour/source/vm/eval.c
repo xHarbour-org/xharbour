@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.37 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: eval.c,v 1.38 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -794,10 +794,7 @@ HB_FUNC( HB_EXEC )
       //printf( "Sym: '%s' Params: %i\n", pSymbol->szName, iParams );
 
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
-      pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pSymbol;
-
-      pPointer->item.asSymbol.pCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
+      hb_itemPutSymbol( pPointer, pSymbol );
       memcpy( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
@@ -811,7 +808,7 @@ HB_FUNC( HB_EXEC )
          hb_vmDo( (USHORT) iParams );
       }
 
-	  return;
+      return;
    }
 
    hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );

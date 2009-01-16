@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.15 2007/12/21 12:12:21 likewolf Exp $
+ * $Id: hbapierr.h,v 1.16 2008/06/27 06:21:48 ronpinkas Exp $
  */
 
 /*
@@ -100,10 +100,12 @@ HB_EXTERN_BEGIN
    (deprecated, kept for compatibility, use HB_ERR_FUNCNAME instead) */
 extern const char hb_errFuncName;
 
-#define HB_ERR_FUNCNAME ( ( char * ) 1 )
+#define HB_ERR_FUNCNAME                 ( ( const char * ) ( HB_PTRDIFF ) 1 )
 
 /* Standard API */
 
+extern PHB_ITEM hb_errGetCargo          ( PHB_ITEM pError );
+extern PHB_ITEM hb_errGetArgs           ( PHB_ITEM pError );
 extern HB_EXPORT char     * hb_errGetDescription    ( PHB_ITEM pError );
 extern HB_EXPORT char     * hb_errGetFileName       ( PHB_ITEM pError );
 extern HB_EXPORT USHORT   hb_errGetFlags          ( PHB_ITEM pError );
@@ -114,38 +116,38 @@ extern HB_EXPORT USHORT   hb_errGetSeverity       ( PHB_ITEM pError );
 extern HB_EXPORT USHORT   hb_errGetSubCode        ( PHB_ITEM pError );
 extern HB_EXPORT char     * hb_errGetSubSystem    ( PHB_ITEM pError );
 extern HB_EXPORT USHORT   hb_errGetTries          ( PHB_ITEM pError );
-extern HB_EXPORT char     * hb_errGetProcName     ( PHB_ITEM pError );
-extern HB_EXPORT USHORT   hb_errGetProcLine       ( PHB_ITEM pError );
 
-#ifdef HB_THREAD_SUPPORT
+extern HB_EXPORT char *   hb_errGetModuleName     ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetProcName     ( PHB_ITEM pError );
+extern HB_EXPORT UINT     hb_errGetProcLine       ( PHB_ITEM pError );
 extern HB_EXPORT UINT     hb_errGetRunningThreads ( PHB_ITEM pError );
 extern HB_EXPORT HB_THREAD_T hb_errGetThreadId    ( PHB_ITEM pError );
 extern HB_EXPORT UINT     hb_errGetVmThreadId     ( PHB_ITEM pError );
-#endif
+extern HB_EXPORT PHB_ITEM hb_errGetCallStack      ( PHB_ITEM pError );
 
 extern HB_EXPORT USHORT   hb_errLaunch            ( PHB_ITEM pError );
 extern HB_EXPORT PHB_ITEM hb_errNew               ( void );
+extern PHB_ITEM hb_errPutCargo          ( PHB_ITEM pError, PHB_ITEM pCargo );
+extern PHB_ITEM hb_errPutArgsArray      ( PHB_ITEM pError, PHB_ITEM pArgs );
 extern HB_EXPORT PHB_ITEM hb_errPutArgs           ( PHB_ITEM pError, ULONG ulArgCount, ... );
 extern HB_EXPORT PHB_ITEM hb_errPutDescription    ( PHB_ITEM pError, const char * szDescription );
 extern HB_EXPORT PHB_ITEM hb_errPutFileName       ( PHB_ITEM pError, const char * szFileName );
 extern HB_EXPORT PHB_ITEM hb_errPutFlags          ( PHB_ITEM pError, USHORT uiFlags );
 extern HB_EXPORT PHB_ITEM hb_errPutGenCode        ( PHB_ITEM pError, USHORT uiGenCode );
-extern HB_EXPORT PHB_ITEM hb_errPutModuleName     ( PHB_ITEM pError, const char * szModuleName );
 extern HB_EXPORT PHB_ITEM hb_errPutOperation      ( PHB_ITEM pError, const char * szOperation );
 extern HB_EXPORT PHB_ITEM hb_errPutOsCode         ( PHB_ITEM pError, USHORT uiOsCode );
 extern HB_EXPORT PHB_ITEM hb_errPutSeverity       ( PHB_ITEM pError, USHORT uiSeverity );
 extern HB_EXPORT PHB_ITEM hb_errPutSubCode        ( PHB_ITEM pError, USHORT uiSubCode );
 extern HB_EXPORT PHB_ITEM hb_errPutSubSystem      ( PHB_ITEM pError, const char * szSubSystem );
 extern HB_EXPORT PHB_ITEM hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
-extern HB_EXPORT PHB_ITEM hb_errPutProcName       ( PHB_ITEM pError, const char * szProcname );
-extern HB_EXPORT PHB_ITEM hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
-extern HB_EXPORT void     hb_errRelease           ( PHB_ITEM pError );
 
-#ifdef HB_THREAD_SUPPORT
+extern HB_EXPORT PHB_ITEM hb_errPutModuleName     ( PHB_ITEM pError, const char * szModuleName );
+extern HB_EXPORT PHB_ITEM hb_errPutProcName       ( PHB_ITEM pError, const char * szProcname );
+extern HB_EXPORT PHB_ITEM hb_errPutProcLine       ( PHB_ITEM pError, UINT uiProcline );
 extern HB_EXPORT PHB_ITEM hb_errPutRunningThreads ( PHB_ITEM pError, UINT uiCount );
 extern HB_EXPORT PHB_ITEM hb_errPutThreadId       ( PHB_ITEM pError, HB_THREAD_T thId );
 extern HB_EXPORT PHB_ITEM hb_errPutVmThreadId     ( PHB_ITEM pError, UINT uiVmId );
-#endif
+extern HB_EXPORT PHB_ITEM hb_errPutCallStack      ( PHB_ITEM pError, PHB_ITEM pCallStack );
 
 extern HB_EXPORT void     hb_errRelease           ( PHB_ITEM pError );
 

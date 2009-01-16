@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.128 2009/01/10 22:26:04 likewolf Exp $
+* $Id: thread.h,v 1.129 2009/01/12 11:34:51 likewolf Exp $
 */
 
 /*
@@ -62,6 +62,13 @@ typedef struct
    USHORT   uiOsErrorLast;
 }
 HB_IOERRORS, * PHB_IOERRORS;
+
+typedef struct _HB_STACKRDD_TLS
+{
+   BOOL           fNetError;        /* current NETERR() flag */
+   USHORT         uiCurrArea;       /* Current WokrArea number */
+   void *         pCurrArea;        /* Current WorkArea pointer */
+} HB_STACKRDD_TLS, * PHB_STACKRDD_TLS;
 
 #ifdef HB_THREAD_SUPPORT
 
@@ -460,6 +467,7 @@ typedef struct tag_HB_STACK
    //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
    struct _HB_STACKRDD * rdd;   /* RDD related data */
+   HB_STACKRDD_TLS rddTls;      /* RDD related data which is always thread-local */
    HB_IOERRORS IOErrors;      /* MT safe buffer for IO errors */
 
    /* JC1: thread safe classes messaging */
@@ -547,11 +555,6 @@ typedef struct tag_HB_STACK
    ULONG hMemvarsAllocated;
    ULONG hMemvarsLastFree;
 
-   /* Data useful for source/rdd/wacore.c & friends */
-   USHORT uiCurrArea;         /* Selectd area */
-   struct _AREA * pCurrArea;  /* Pointer to a selected and valid area */
-   BOOL fNetError;            /* Error on networked environments */
-
    /* Background per-thread jobs */
    struct HB_BACKGROUNDTASK_ **pBackgroundTasks;
    BOOL bIamBackground;
@@ -575,7 +578,7 @@ typedef struct tag_HB_STACK
    struct tag_HB_THREAD_ID *pThreadID;
    struct tag_HB_STACK *next;
 
-} HB_STACK;
+} HB_STACK, * PHB_STACK;
 
 /*********************************************************************/
 /* Complex PRG LEVEL Mutex Structure                                 */
@@ -872,6 +875,8 @@ void hb_threadCancelInternal( void );
 /* Definitions when threading is turned off */
 
 #else
+
+   #define HB_THREAD_T HB_PTRDIFF
 
    #define HB_ATOMIC_INC( x )    ( ++(x) )
    #define HB_ATOMIC_DEC( x )    ( --(x) )

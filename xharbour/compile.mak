@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.33 2008/12/22 22:09:44 likewolf Exp $
+# $Id: compile.mak,v 1.34 2009/01/08 09:11:13 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -701,6 +701,12 @@ $(OBJ_DIR)$(DIR_SEP)dumpvar.c : $(RTL_DIR)$(DIR_SEP)dumpvar.prg
 $(OBJ_DIR)$(DIR_SEP)dumpvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dumpvar.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)einstvar.c : $(RTL_DIR)$(DIR_SEP)einstvar.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)einstvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)einstvar.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)empty$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)empty.c
 	$(CC_CMD)
 
@@ -1233,12 +1239,6 @@ $(OBJ_DIR)$(DIR_SEP)teditor.c : $(RTL_DIR)$(DIR_SEP)teditor.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)teditor$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)teditor.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)terror.c : $(RTL_DIR)$(DIR_SEP)terror.prg
-	$(HB_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)terror$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)terror.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)text.c : $(RTL_DIR)$(DIR_SEP)text.prg

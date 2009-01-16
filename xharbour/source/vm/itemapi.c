@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.155 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: itemapi.c,v 1.156 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /*
@@ -1203,6 +1203,35 @@ PHB_ITEM hb_itemPutNLLen( PHB_ITEM pItem, LONG lNumber, int iWidth )
    pItem->item.asLong.value = (HB_LONG) lNumber;
    pItem->item.asLong.length = (UINT) iWidth;
 #endif
+
+   return pItem;
+}
+
+
+PHB_ITEM hb_itemPutSymbol( PHB_ITEM pItem, PHB_SYMB pSym )
+{
+   PHB_SYMBCARGO pSymCargo;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutSymbol(%p,%p)", pItem, pSym));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+         hb_itemClear( pItem );
+   }
+   else
+      pItem = hb_itemNew( NULL );
+
+   pItem->type = HB_IT_SYMBOL;
+   pItem->item.asSymbol.value        = pSym;
+   pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
+   pSymCargo->stackbase    = 0;
+   pSymCargo->lineno       = 0;
+   pSymCargo->uiSuperClass = 0;
+   pSymCargo->params       = 0;
+   pSymCargo->locals       = 0;
+   pSymCargo->arguments    = 0;
+   pItem->item.asSymbol.pCargo = pSymCargo;
 
    return pItem;
 }

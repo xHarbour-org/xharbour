@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.56 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: hbstack.h,v 1.57 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -61,18 +61,6 @@
 #include "hbvmpub.h"
 #include "hbapi.h"
 
-#if !defined( STACK_INITHB_ITEMS )
-   #define STACK_INITHB_ITEMS      200
-#endif
-#ifdef HB_THREAD_SUPPORT
-   #if !defined( STACK_THREADHB_ITEMS )
-      #define STACK_THREADHB_ITEMS    100
-   #endif
-#endif
-#if !defined( STACK_EXPANDHB_ITEMS )
-   #define STACK_EXPANDHB_ITEMS    20
-#endif
-
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
@@ -83,14 +71,10 @@ typedef struct _HB_STACKRDD
    const char *   szDefaultRDD;     /* default RDD */
    void **        waList;           /* Allocated WorkAreas */
    USHORT *       waNums;           /* Allocated WorkAreas */
-   void *         pCurrArea;        /* Current WorkArea pointer */
-
-   BOOL           fNetError;        /* current NETERR() flag */
 
    USHORT         uiWaMax;          /* Number of allocated WA */
    USHORT         uiWaSpace;        /* Number of allocated WA */
    USHORT         uiWaNumMax;       /* Number of allocated WA */
-   USHORT         uiCurrArea;       /* Current WokrArea number */
 
 #ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_T  mtxWorkArea;      /* Mutex */
@@ -119,6 +103,7 @@ typedef struct
    //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
    PHB_STACKRDD rdd;          /* RDD related data */
+   HB_STACKRDD_TLS rddTls;    /* RDD related data which is always thread-local */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -143,7 +128,7 @@ typedef struct
    struct _HB_SEQUENCE *pSequence;
 
    unsigned int uiVMFlags;
-} HB_STACK;
+} HB_STACK, * PHB_STACK;
 
 #ifndef __IMPORT__
 extern HB_EXPORT HB_STACK hb_stackST;
@@ -181,6 +166,7 @@ extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
 extern PHB_IOERRORS hb_stackIOErrors( void );
 extern PHB_STACKRDD hb_stackRDD( void );
+extern PHB_STACKRDD_TLS hb_stackRDDTLS( void );
 
 extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
 extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
@@ -195,6 +181,9 @@ extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
 extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
 extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 
+#if defined( _HB_API_INTERNAL_ )
+   void hb_stack_init( PHB_STACK pStack );
+#endif
 
 #if defined( HB_STACK_MACROS )
 
@@ -211,6 +200,7 @@ extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
 
 #define hb_stackRDD( )              ( HB_VM_STACK.rdd )
+#define hb_stackRDDTLS( )           ( &HB_VM_STACK.rddTls )
 
 #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
 #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )
@@ -224,12 +214,12 @@ extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
                                     } while ( 0 )
 
 #define hb_stackPop( )              do { \
-                                       if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
-                                          hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
-                                       else \
-                                          ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL; \
                                        if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
                                           hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                       if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos ) ) ) \
+                                          hb_itemClear( *( HB_VM_STACK.pPos ) ); \
+                                       else \
+                                          ( *( HB_VM_STACK.pPos ) )->type = HB_IT_NIL; \
                                     } while ( 0 )
 
 #define hb_stackPush( )             do { \

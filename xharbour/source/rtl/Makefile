@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.80 2008/12/10 00:47:31 likewolf Exp $
+# $Id: Makefile,v 1.81 2008/12/22 22:09:45 likewolf Exp $
 #
 
 ROOT = ../../
@@ -171,6 +171,7 @@ PRG_SOURCES=\
 	dircmd.prg   \
 	dummy.prg    \
 	dumpvar.prg  \
+	einstvar.prg \
 	errorsys.prg \
 	fieldbl.prg  \
 	getlist.prg  \
@@ -203,7 +204,6 @@ PRG_SOURCES=\
 	tbcolumn.prg \
 	tbrowse.prg  \
 	teditor.prg  \
-	terror.prg   \
 	text.prg     \
 	tget.prg     \
 	tgetint.prg  \

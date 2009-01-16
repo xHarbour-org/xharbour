@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.700 2009/01/08 20:28:04 likewolf Exp $
+ * $Id: hvm.c,v 1.701 2009/01/15 18:33:51 ronpinkas Exp $
  */
 
 /*
@@ -705,7 +705,7 @@ void hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("ModuleFunctions(s_InitFunctions)") );
    hb_vmDoModuleFunctions( s_InitFunctions );
 
-   hb_stackRemove( 0 );
+   hb_stackRemove( 1 );
 
    //printf( "Before InitFunctions\n" );
    HB_TRACE( HB_TR_INFO, ("InitFunctions") );
@@ -1084,7 +1084,7 @@ int hb_vmQuit( void )
 
    //#define DEBUG_DESTRUCTORS
 
-   hb_stackRemove( 0 ); // Base Symbol!
+   hb_stackRemove( 1 ); // Base Symbol!
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After stackRemove\n" );
    #endif
@@ -6592,9 +6592,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
          hb_itemForwardValue( pIndex, pValue );
 
          // Recycle pValue as Message.
-         pValue->type = HB_IT_SYMBOL;
-         pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
-         pValue->item.asSymbol.pCargo->uiSuperClass = 0;
+         hb_itemPutSymbol( pValue, hb_dynsymGetCase( szMessage )->pSymbol );
 
          if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
          {
@@ -9000,22 +8998,12 @@ void hb_vmPushSymbol( PHB_SYMB pSym )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
-   PHB_SYMBCARGO pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
    pItem = hb_stackAllocItem();
-   pItem->type = HB_IT_SYMBOL;
-   pItem->item.asSymbol.value = pSym;
-
-   pSymCargo->stackbase    = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-   pSymCargo->lineno       = 0;
-   pSymCargo->uiSuperClass = 0;
-   pSymCargo->params       = 0;
-   pSymCargo->locals       = 0;
-   pSymCargo->arguments    = 0;
-
-   pItem->item.asSymbol.pCargo = pSymCargo;
+   hb_itemPutSymbol( pItem, pSym );
+   pItem->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
 }
 
 void hb_vmPushDynSym( PHB_DYNS pDynSym )

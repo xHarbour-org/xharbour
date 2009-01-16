@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6325 2009/01/15 08:41:13 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6326 2009/01/15 18:33:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,65 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-16 04:53 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/Makefile
+    ! Removed reference to nonexistent hbcomprs.h.
+
+  * include/classes.h
+  * source/vm/classes.c
+    + Added Harbour-compatible C-level class APIs hb_clsCreate(), hb_clsAdd(),
+      hb_clsAssociate(). Partially borrowed from Harbour code written by
+      Przemyslaw Czerpak.
+
+  * include/hbapiitm.h
+  * source/vm/eval.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+    + added startup symbol to hb_stack. It gives very good stop
+      condition for all procedures which trace stack calls and
+      resolves the problem with hb_stack.pBase which was never
+      pointing to valid function/procedure symbol when no symbol
+      was put on HVM stack. Now after hb_stackInit() the first
+      item is allocated for "hb_stackInit()" symbol so hb_stack.pBase
+      is always a pointer to valid function/procedure symbol.
+    * changed the guard condition for buggy code in hb_stackPop()
+      and similar code from:
+         hb_stack.pPos < hb_stack.pItems
+      to:
+         hb_stack.pPos <= hb_stack.pBase
+      The old condition was generating usable error message only in the
+      startup function. In deeply called functions it was only waste of
+      CPU time on one of the most often call functions. Before it was
+      activated internal stack structures were corrupted.
+    (by Przemyslaw Czerpak, borrowed from Harbour. In xHarbour it's also
+    needed to register classes on startup from C code.)
+    + Added Harbour-compatible hb_itemPutSymbol().
+
+  * common.mak
+  * compile.mak
+  * source/rtl/Makefile
+  - source/rtl/terror.prg
+  + source/rtl/einstvar.prg
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+    * Ported Harbour's C-level implementation of ERROR class. This is faster
+      and allows to avoid PCode execution (which can lead to more errors) on
+      error object creation.
+
+  * include/hbstack.h
+  * include/thread.h
+  * source/rdd/wacore.c
+  * source/vm/thread.c
+  * source/vm/estack.c
+    ! Some RDD data (e.g. current area pointer) must ALWAYS be thread-local in
+      xHarbour, independent of _SET_WORKAREAS_SHARED setting!
+    ! Fixed missing mutex unlock when HB_RDD_MAX_AREA_NUM is reached in
+      hb_rddSelectFirstAvailable().
+    % Optimized stack access some hb_stack*() functions.
+
+  * source/vm/dynsym.c
+    ! Fixed a HB_TRACE call.
 
 2009-01-15 13:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/fm.c

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.35 2008/12/22 22:09:44 likewolf Exp $
+# $Id: common.mak,v 1.36 2009/01/08 09:11:13 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -357,6 +357,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dircmd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dummy$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dumpvar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)einstvar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)error$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)errorsys$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fieldbl$(OBJEXT)\
@@ -391,7 +392,6 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)tbrowse$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tclass$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)teditor$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)terror$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)text$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tget$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tgetint$(OBJEXT)\

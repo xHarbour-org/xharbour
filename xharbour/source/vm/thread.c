@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.218 2008/12/22 22:09:45 likewolf Exp $
+* $Id: thread.c,v 1.219 2008/12/23 18:06:33 likewolf Exp $
 */
 
 /*
@@ -304,10 +304,11 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 */
 void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 {
-   int i;
    ULONG uCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_threadSetupStack(%p, ...)", tc));
+
+   hb_stack_init( tc );
 
    tc->th_id = th;
    tc->uiIdleInspect = 0;
@@ -318,14 +319,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->next = NULL;
 
-   tc->pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_THREADHB_ITEMS );
-   tc->pBase  = tc->pItems;
-   tc->pPos   = tc->pItems;     /* points to the first stack item */
-   tc->wItems = STACK_THREADHB_ITEMS;
-   tc->pEnd   = tc->pItems + tc->wItems;
    tc->pMethod = NULL;
    tc->pSyncId = NULL;
-   tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
    tc->bActive = FALSE;
    tc->iPcodeCount = HB_VM_UNLOCK_PERIOD;
@@ -358,12 +353,6 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->pCleanUpParam = (void **) hb_xgrab( sizeof( void *) * HB_MAX_CLEANUPS );
    #endif
 
-   for( i = 0; i < tc->wItems; i++ )
-   {
-      tc->pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-      tc->pItems[ i ]->type = HB_IT_NIL;
-   }
-
    /* Initialization of "foreach" and "with object" */
    for ( uCount = 0; uCount < HB_MAX_WITH_OBJECTS; uCount++  )
    {
@@ -393,11 +382,6 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->iExtraElements = 0;
    tc->iExtraIndex = 0;
 
-   /* Initialization of source/rdd/wacore.c related variables */
-   tc->uiCurrArea = 1;
-   tc->pCurrArea = NULL;
-   tc->fNetError = FALSE;
-
    /* Initialization of private and public memvars */
    hb_memvarsInit( tc );
 
@@ -409,8 +393,6 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->pThreadID = NULL;
    tc->pThreadReady = NULL;
-
-   tc->rdd = hb_rddWaInit();
 }
 
 /*
@@ -422,7 +404,6 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    PHB_ITEM pPointer;
    PHB_ITEM pItem, *pPos;
    USHORT uiParam = 1;
-   PHB_SYMBCARGO pSymCargo;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_threadFillStack(%p, %p)", pStack, pArgs));
 
@@ -433,18 +414,7 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
 
    if( HB_IS_SYMBOL( pPointer ) )
    {
-      pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
-
-      pSymCargo->stackbase    = pPos - pStack->pItems;
-      pSymCargo->lineno       = 0;
-      pSymCargo->uiSuperClass = 0; //pPointer->item.asSymbol.pCargo->uiSuperClass;
-      pSymCargo->params       = 0;
-      pSymCargo->locals       = 0;
-      pSymCargo->arguments    = 0;
-
-      (*pPos)->type = HB_IT_SYMBOL;
-      (*pPos)->item.asSymbol.value = pPointer->item.asSymbol.value;
-      (*pPos)->item.asSymbol.pCargo = pSymCargo;
+      hb_itemPutSymbol( *pPos, pPointer->item.asSymbol.value );
 
       pPos++;
       (*pPos)->type = HB_IT_NIL;
@@ -465,18 +435,8 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    }
    else if( HB_IS_BLOCK( pPointer ) )
    {
-      pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
-
-      pSymCargo->stackbase    = pPos - pStack->pItems;
-      pSymCargo->lineno       = 0;
-      pSymCargo->uiSuperClass = 0; //pPointer->item.asSymbol.pCargo->uiSuperClass;
-      pSymCargo->params       = 0;
-      pSymCargo->locals       = 0;
-      pSymCargo->arguments    = 0;
-
-      (*pPos)->type = HB_IT_SYMBOL;
-      (*pPos)->item.asSymbol.value = &hb_symEval;
-      (*pPos)->item.asSymbol.pCargo = pSymCargo;
+      hb_itemPutSymbol( *pPos, &hb_symEval );
+      (*pPos)->item.asSymbol.pCargo->stackbase = pPos - pStack->pItems;
 
       pPos++;
       (*pPos)->type = HB_IT_NIL;
@@ -1635,7 +1595,6 @@ HB_FUNC( STARTTHREAD )
    BOOL bIsMethod = FALSE;
    HB_STACK *pStack;
    PHB_THREAD_ID pThread;
-   PHB_SYMBCARGO pSymCargo;
    PHB_THREAD_READY pThreadReady;
 
 #ifdef HB_OS_WIN_32
@@ -1665,24 +1624,13 @@ HB_FUNC( STARTTHREAD )
          return;
       }
 
-      pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
-
-      pSymCargo->stackbase    = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-      pSymCargo->lineno       = 0;
-      pSymCargo->uiSuperClass = 0;
-      pSymCargo->params       = 0;
-      pSymCargo->locals       = 0;
-      pSymCargo->arguments    = 0;
-
       // Converting it to its Symbol.
-      pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pSymbol;
-      pPointer->item.asSymbol.pCargo = pSymCargo;
+      hb_itemPutSymbol( pPointer, pSymbol);
+      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    }
    /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
    {
-      PHB_SYMBCARGO pSymCargo;
       PHB_ITEM pString = hb_arrayGetItemPtr( pArgs, 2 );
 
       if( pString->type == HB_IT_STRING )
@@ -1711,18 +1659,8 @@ HB_FUNC( STARTTHREAD )
       /* Now we must move the object in the second place */
       hb_itemSwap( pPointer, hb_arrayGetItemPtr( pArgs, 2 ) );
 
-      pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
-
-      pSymCargo->stackbase    = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-      pSymCargo->lineno       = 0;
-      pSymCargo->uiSuperClass = 0;
-      pSymCargo->params       = 0;
-      pSymCargo->locals       = 0;
-      pSymCargo->arguments    = 0;
-
-      pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pSymbol;
-      pPointer->item.asSymbol.pCargo = pSymCargo;
+      hb_itemPutSymbol( pPointer, pSymbol );
+      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    }
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
@@ -1736,18 +1674,8 @@ HB_FUNC( STARTTHREAD )
          return;
       }
 
-      pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
-
-      pSymCargo->stackbase    = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-      pSymCargo->lineno       = 0;
-      pSymCargo->uiSuperClass = 0;
-      pSymCargo->params       = 0;
-      pSymCargo->locals       = 0;
-      pSymCargo->arguments    = 0;
-
-      pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pExecSym->pSymbol;
-      pPointer->item.asSymbol.pCargo = pSymCargo;
+      hb_itemPutSymbol( pPointer, pExecSym->pSymbol );
+      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    }
    /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )

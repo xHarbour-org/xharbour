@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.232 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: classes.c,v 1.233 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /*
@@ -1526,7 +1526,8 @@ static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *pp
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
-void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer, USHORT uiID, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pMsgIs, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
+static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
+                          void * pFunc_or_BlockPointer, USHORT uiID, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pMsgIs, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1844,7 +1845,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                         if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB)
                         {
                            hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", szMessage, 1, pInit );
-                           return;
+                           return FALSE;
                         }
 
                         pNewMeth->pInitValue = hb_objClone( pInit );
@@ -1913,7 +1914,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                         if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
                         {
                            hb_errRT_BASE( EG_ARG, 3009, "Class Var's init value can not contain an object with a destructor", szMessage, 1, pInit );
-                           return;
+                           return FALSE;
                         }
 
                         pNewMeth->pInitValue = hb_objClone( pInit );
@@ -2062,7 +2063,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 
          default:
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
-            break;
+            return FALSE;
       }
 
       /*
@@ -2098,6 +2099,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          //TraceLog( NULL, "NEW Method: %s:%s defaulted to CLASS Module: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
       }
    }
+   return TRUE;
 }
 
 /*
@@ -2250,34 +2252,25 @@ USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
 }
 
 /*
- * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [ahSuper], [nBase] )
+ * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [<pSuperArray>], [nBase] )
  *
  * Create a new class
  *
  * <cClassName> Name of the class
  * <nDatas>     Number of DATAs in the class
  * <nMethods>   Number of additional Methods in the class
- * <ahSuper>    Optional handle(s) of superclass(es)
+ * <pSuperArray>     Optional array with handle(s) of superclass(es)
  * <nBase>      Proc level of real class creator
  */
-HB_FUNC( __CLSNEW )
+static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
+                         USHORT uiMethods, PHB_ITEM pSuperArray, UINT uiBase )
 {
-   HB_THREAD_STUB_API
    PCLASS pNewCls;
-   PHB_ITEM pahSuper = hb_param( 4, HB_IT_ARRAY );
-   PHB_ITEM *pBase = hb_stackGetBase( hb_parni( 5 ) + 1 );
-   USHORT i, j, uiSuper = 0;
-   USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
-   USHORT uiClass;
+   USHORT uiClass, uiSuper, i, j;
+   USHORT uiKnownMethods = uiDatas * 2 + uiMethods;
+   PHB_ITEM *pBase = hb_stackGetBase( uiBase + 1 );
 
-   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
-
-   //TraceLog( NULL, "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) );
-
-   if ( pahSuper )
-   {
-      uiSuper = ( USHORT ) pahSuper->item.asArray.value->ulLen; /* Number of Super class present */
-   }
+   uiSuper  = ( USHORT ) ( pSuperArray ? hb_arrayLen( pSuperArray ) : 0 );
 
    HB_CLASS_LOCK
 
@@ -2292,30 +2285,9 @@ HB_FUNC( __CLSNEW )
 
    HB_CLASS_UNLOCK
 
-/*
-   pNewCls->uiDataFirst = 0;
-   pNewCls->uiDatas = 0;
-   pNewCls->uiMethods = 0;
-   pNewCls->uiDatasShared = 0;
-   pNewCls->pClsSymbol = NULL;
-   pNewCls->fOpOver = 0;
-   pNewCls->uiScope = 0;
-   pNewCls->uiDataInitiated = 0;
-   pNewCls->uiFriends = 0;
-   pNewCls->uiFriendFuncs = 0;
-   pNewCls->pInitValues = NULL;
-   pNewCls->pFriends = NULL;
-   pNewCls->pFriendFuncs = NULL;
-   pNewCls->pFunError = NULL;
-   pNewCls->pDestructor = NULL;
-   pNewCls->pMtxSync = NULL
-*/
-
-   pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
-   memcpy( pNewCls->szName, hb_parcx( 1 ), hb_parclen( 1 ) + 1 );
+   pNewCls->szName = hb_strdup( szClassName );
    pNewCls->bActive = TRUE;
-
-   //TraceLog( NULL, "-------------------- Class %s (%i)\n", pNewCls->szName, s_uiClasses + 1 );
+   pNewCls->uiDatas = uiDatas;
 
    if( uiSuper )
    {
@@ -2324,8 +2296,7 @@ HB_FUNC( __CLSNEW )
                            in this function for big classes */
       ULONG nLenClsDatas;
       ULONG nLenInlines;
-      ULONG nLenDatas = hb_parni( 2 );
-      PCLASS   pSprCls = NULL; // To void incorrect warning
+      PCLASS pSprCls = NULL; // To void incorrect warning;
       PMETHOD  pNewMethod;
       PMETHOD  pSprMethod;
       USHORT   uiInit = 0, uiAt;
@@ -2333,18 +2304,15 @@ HB_FUNC( __CLSNEW )
 
       for( i = 1; i <= uiSuper; i++ )
       {
-         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pahSuper, i ) - 1 );
+         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pSuperArray, i ) - 1 );
 
          ulSize += ( ULONG ) pSprCls->uiMethods;
-         nLenDatas += pSprCls->uiDatas;
+         pNewCls->uiDatas += pSprCls->uiDatas;
       }
-
-      pNewCls->uiDatas     = ( USHORT ) nLenDatas;
-
-      if( nLenDatas )
+      if ( pNewCls->uiDatas )
       {
-         pNewCls->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) * nLenDatas );
-         memset( pNewCls->pInitValues, 0, sizeof( CLSDINIT ) * nLenDatas );
+         pNewCls->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) * pNewCls->uiDatas );
+         memset( pNewCls->pInitValues, 0, sizeof( CLSDINIT ) * pNewCls->uiDatas );
       }
 
       pNewCls->uiScope    |= pSprCls->uiScope & ~((USHORT) HB_OO_CLS_INSTANCED);
@@ -2363,7 +2331,7 @@ HB_FUNC( __CLSNEW )
 
       for( i = 1; i <= uiSuper; i++ )
       {
-         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pahSuper, i ) - 1 );
+         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pSuperArray, i ) - 1 );
 
          if( i == 1 )
          {
@@ -2496,25 +2464,13 @@ HB_FUNC( __CLSNEW )
          pNewCls->fOpOver     |= pSprCls->fOpOver;
          pNewCls->uiDataFirst += pSprCls->uiDatas;
       }
-
-     #if 0
-        TraceLog( NULL, "    *** Size: %i\n", ulSize );
-
-        for( i = 0;  i < ulSize; i++ )
-        {
-           TraceLog( NULL, "Saved: %p %s:%s pivot: %i #: %i\n", pNewCls->pMethDyn[i].pMessage, pNewCls->szName, pNewCls->pMethDyn[i].pMessage->pSymbol->szName, i, pNewCls->pMethDyn[i].uiAt );
-        }
-     #endif
-
       pNewCls->uiMethods       = ( USHORT ) ulSize;
       pNewCls->uiDataInitiated = uiInit;
       pNewCls->uiScope        &= ~((USHORT) HB_OO_CLS_INSTANCED);
    }
    else
    {
-      pNewCls->uiDatas = ( USHORT ) hb_parni( 2 );
-
-      HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, hb_parni(3) ) );
+      HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, uiMethods ) );
 
       if( uiKnownMethods == 0 )
       {
@@ -2641,16 +2597,51 @@ HB_FUNC( __CLSNEW )
    if( pBase )
    {
       pNewCls->pClsSymbol = (*pBase)->item.asSymbol.value;
-      //TraceLog( NULL, "NEW Class: '%s' defined in: %s->%s\n", pNewCls->szName, HB_SYM_GETMODULESYM( pNewCls->pClsSymbol ) ? HB_SYM_GETMODULESYM( pNewCls->pClsSymbol )->szModuleName : "", pNewCls->pClsSymbol->szName );
    }
-   #if 0
-      else
-      {
-         //TraceLog( NULL, "NO MODULE!!! for NEW Class: '%s' defined in Function: %s\n", pNewCls->szName, pNewCls->pClsSymbol->szName );
-      }
-   #endif
+   else
+   {
+      /* Use function named pNewCls->szName */
+      pNewCls->pClsSymbol = hb_dynsymGet( pNewCls->szName )->pSymbol;
+   }
 
-   hb_retni( uiClass );
+   return uiClass;
+}
+
+HB_FUNC( __CLSNEW )
+{
+   HB_THREAD_STUB_API
+
+   char * szClassName;
+   PHB_ITEM pDatas, pMethods, pSuperArray, pBaseLevel;
+
+   szClassName = hb_parc( 1 );
+
+   pDatas = hb_param( 2, HB_IT_ANY );
+
+   pMethods = hb_param( 3, HB_IT_ANY );
+
+   pSuperArray = hb_param( 4, HB_IT_ANY );
+   if( pSuperArray && HB_IS_NIL( pSuperArray ) )
+      pSuperArray = NULL;
+
+   pBaseLevel = hb_param( 5, HB_IT_ANY );
+
+   if( szClassName &&
+       ( ! pDatas || HB_IS_NUMERIC( pDatas ) ) &&
+       ( ! pMethods || HB_IS_NUMERIC( pMethods ) ) &&
+       ( ! pSuperArray || HB_IS_ARRAY( pSuperArray ) ) &&
+       ( ! pBaseLevel || HB_IS_NUMERIC( pBaseLevel ) ) )
+   {
+      USHORT uiClass;
+      uiClass = hb_clsNew( szClassName, ( USHORT ) hb_itemGetNI( pDatas ),
+                           ( USHORT ) hb_itemGetNI( pMethods ),
+                           pSuperArray, hb_itemGetNI( pBaseLevel ) );
+      hb_retni( uiClass );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+   }
 }
 
 BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
@@ -5149,4 +5140,34 @@ HB_FUNC( __CLSINSTNAME )
    {
       hb_errRT_BASE( EG_ARG, 3007, "Invalid class name", "__ClsInstName()", 1, hb_paramError(1) );
    }
+}
+
+
+/* Harbour equivalent for Clipper internal __mdCreate() */
+USHORT hb_clsCreate( USHORT usSize, const char * szClassName )
+{
+   return hb_clsNew( szClassName, usSize, 0, NULL, 0);
+}
+
+/* Harbour equivalent for Clipper internal __mdAdd() */
+void hb_clsAdd( USHORT usClassH, const char * szMethodName, PHB_FUNC pFuncPtr )
+{
+   //PHB_SYMB pExecSym;
+
+   /*
+    * We can use empty name "" for this symbol in hb_symbolNew()
+    * It's only envelop for function with additional execution
+    * information for HVM not registered symbol. [druzus]
+    */
+   /*pExecSym = hb_symbolNew( "" );
+   pExecSym->value.pFunPtr = pFuncPtr;*/
+
+   hb_clsAddMsg( usClassH, szMethodName, ( void * ) pFuncPtr/*pExecSym*/, 0, HB_OO_MSG_METHOD, 0, HB_OO_CLSTP_PFUNC, FALSE, NULL, NULL, TRUE, FALSE );
+}
+
+/* Harbour equivalent for Clipper internal __mdAssociate() */
+void hb_clsAssociate( USHORT usClassH )
+{
+   HB_THREAD_STUB_API
+   hb_clsInst( usClassH, hb_stackReturnItem() );
 }
