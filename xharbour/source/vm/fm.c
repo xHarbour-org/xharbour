@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.106 2009/01/15 18:33:51 ronpinkas Exp $
+ * $Id: fm.c,v 1.107 2009/01/16 10:50:23 marchuet Exp $
  */
 
 /*
@@ -1300,6 +1300,6 @@ HB_FUNC( HB_FM_NOSTAT ) {};
 #endif
 
 /* This pragma with maximum priority [64] under c function, all other xharbour startup has priority [100] */
-#if defined(__BORLANDC__)
+#if ( defined(__BORLANDC__) && !defined(__EXPORT__))
    #pragma startup hb_xinit 64
 #endif

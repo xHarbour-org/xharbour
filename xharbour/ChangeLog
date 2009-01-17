@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6327 2009/01/16 01:55:59 likewolf Exp $
+ * $Id: ChangeLog,v 1.6328 2009/01/16 10:50:23 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-17 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+  * source/vm/hvm.c
+    ! __BORLANDC__ harbour.dll operation failed with the new hb_xinit startup.
+      Hence, such start-up is temporarily disabled when creating harbour.dll
+      until a solution comes up.
 
 2009-01-16 11:53 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * contrib\rdd_ads\ads.ch

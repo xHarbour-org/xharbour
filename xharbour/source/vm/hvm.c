@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.702 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: hvm.c,v 1.703 2009/01/16 10:50:23 marchuet Exp $
  */
 
 /*
@@ -10522,7 +10522,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
 PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-#if ! defined(__BORLANDC__)
+#if ( ! defined(__BORLANDC__) || defined( __EXPORT__ ))
    static BOOL s_Do_xinit = TRUE;
 #endif
 
@@ -10543,7 +10543,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
                       "Module: '%s' was compiled into PCODE version: %s,"
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
-#if ! defined(__BORLANDC__)
+#if ( ! defined(__BORLANDC__) || defined( __EXPORT__ ))
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
