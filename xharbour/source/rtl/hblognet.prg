@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.6 2008/03/16 03:24:20 lculik Exp $
+* $Id: hblognet.prg,v 1.7 2008/10/18 17:08:54 ronpinkas Exp $
 */
 
 /*
@@ -206,6 +206,7 @@ CLASS HB_LogInetPort FROM HB_LogChannel
    DATA nPort           INIT 7761
    DATA aListeners      INIT {}
    DATA skIn
+   DATA bOnConnect
 
 #ifdef HB_THREAD_SUPPORT
    DATA bTerminate      INIT .F.
@@ -216,14 +217,14 @@ CLASS HB_LogInetPort FROM HB_LogChannel
    METHOD New( nLevel, nPort )
    METHOD Open( cName )
    METHOD Close( cName )
+   METHOD Connections()
+   METHOD BroadcastMessage( cMessage )
 
 PROTECTED:
    METHOD Send( nStyle, cMessage, cName, nPrio )
 
-#ifdef HB_THREAD_SUPPORT
 HIDDEN:
    METHOD AcceptCon()
-#endif
 
 ENDCLASS
 
@@ -290,25 +291,31 @@ RETURN .T.
 METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
    LOCAL sk, nCount
 
+   // now we transmit the message to all the available channels
+   cMessage := ::Format( nStyle, cMessage, cName, nPrio )
+   ::BroadcastMessage( cMessage + InetCRLF() )
+
+RETURN .T.
+
+
+METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
+   LOCAL sk, nCount
+
+   IF cMessage == NIL
+      cMessage := ""
+   ENDIF
+
 #ifdef HB_THREAD_SUPPORT
    // be sure thread is not busy now
    HB_MutexLock( ::mtxBusy )
 #else
-   // IF we have not a thread, we must see if there is a new connection
-   sk := InetAccept( ::skIn )  //timeout should be short
-
-   IF sk != NIL
-      Aadd( ::aListeners, sk )
-   ENDIF
+   ::AcceptCon()
 #endif
-
-   // now we transmit the message to all the available channels
-   cMessage := ::Format( nStyle, cMessage, cName, nPrio )
 
    nCount := 1
    DO WHILE nCount <= Len( ::aListeners )
       sk := ::aListeners[ nCount ]
-      InetSendAll( sk, cMessage + InetCRLF() )
+      InetSendAll( sk, cMessage )
       // if there is an error, we remove the listener
       IF InetErrorCode( sk ) != 0
          ADel( ::aListeners, nCount )
@@ -324,11 +331,29 @@ METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
 
 RETURN .T.
 
+METHOD Connections() CLASS HB_LogInetPort
+   LOCAL sk, nCount
+
+   ::BroadcastMessage( Chr(0) )
 
 #ifdef HB_THREAD_SUPPORT
+   // be sure thread is not busy now
+   HB_MutexLock( ::mtxBusy )
+#endif
+
+   nCount := Len( ::aListeners )
+
+#ifdef HB_THREAD_SUPPORT
+   HB_MutexUnlock( ::mtxBusy )
+#endif
+
+RETURN nCount
+
+
 METHOD AcceptCon() CLASS HB_LogInetPort
    LOCAL sk
 
+#ifdef HB_THREAD_SUPPORT
    InetSetTimeout( ::skIn, 250 )
    DO WHILE .not. ::bTerminate
       sk := InetAccept( ::skIn )
@@ -339,6 +364,14 @@ METHOD AcceptCon() CLASS HB_LogInetPort
          HB_MutexUnlock( ::mtxBusy )
       ENDIF
    ENDDO
-RETURN .T.
-
+#else
+   sk := InetAccept( ::skIn )
+   // A gentle termination request, or an error
+   IF sk != NIL
+      AAdd( ::aListeners, sk )
+      IF ::bOnConnect <> NIL
+         Eval( ::bOnConnect, sk )
+      ENDIF
+   ENDIF
 #endif
+RETURN .T.

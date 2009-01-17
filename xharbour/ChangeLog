@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6329 2009/01/17 05:14:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.6330 2009/01/17 15:22:29 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-17 16:55 UTC+0100 Francesco Saverio Giudice (info/at/fsgiudice.com)
+  * xharbour/source/rtl/hblog.prg
+    + Added ::Out(...) method to class hb_LogConsole()
+    + Added hb_LogDbf class to log messages into a dbf
+  * xharbour/source/rtl/hblognet.prg
+    + Added METHOD Connections() -> <nConnections> that returns how many
+      connections HB_LogInetPort class is handling
+    + Added METHOD BroadcastMessage( cMessage ) that send a message to any
+      available connections
 
 2009-01-17 16:21 UTC+0100 Francesco Saverio Giudice (info/at/fsgiudice.com)
   + xharbour/source/rdd/usrrdd/rdds/logrdd.prg
@@ -55,7 +65,7 @@
     + Added logrdd.prg
 
   * xharbour/source/rdd/usrrdd/rdds/arrayrdd.prg
-    * Aligned as much as possible to last harbour versione
+    * Aligned as much as possible to last harbour version
     * formatted
     ! Changed AR_CREATE( nWA, aOpenInfo ) behaviour, now it not checks
       if a table exists in memory but act as dbCreate() does.
