@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.7 2008/10/18 17:08:54 ronpinkas Exp $
+* $Id: hblognet.prg,v 1.8 2009/01/17 15:57:14 fsgiudice Exp $
 */
 
 /*
@@ -289,7 +289,6 @@ RETURN .T.
 
 
 METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
-   LOCAL sk, nCount
 
    // now we transmit the message to all the available channels
    cMessage := ::Format( nStyle, cMessage, cName, nPrio )
@@ -332,7 +331,7 @@ METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
 RETURN .T.
 
 METHOD Connections() CLASS HB_LogInetPort
-   LOCAL sk, nCount
+   LOCAL nCount
 
    ::BroadcastMessage( Chr(0) )
 

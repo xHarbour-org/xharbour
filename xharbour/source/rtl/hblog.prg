@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.24 2008/10/18 17:08:54 ronpinkas Exp $
+* $Id: hblog.prg,v 1.25 2009/01/17 15:57:14 fsgiudice Exp $
 */
 
 /*
@@ -700,8 +700,6 @@ RETURN .T.
 
 METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogDbf
 
-   LOCAL cExt, nCount
-
    LogDbf->( dbAppend() )
    LogDbf->priority := nPrio
    LogDbf->date     := Date()
@@ -710,6 +708,7 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogDbf
    LogDbf->message  := cMessage
    LogDbf->( dbCommit() )
 
+   (nStyle)
 RETURN .T.
 
 
