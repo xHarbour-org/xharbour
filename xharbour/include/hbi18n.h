@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.h,v 1.5 2003/08/28 01:35:31 jonnymind Exp $
+ * $Id: hbi18n.h,v 1.6 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /*
@@ -79,11 +79,13 @@ HB_EXTERN_BEGIN
 BOOL hb_i18nInit( char *i18n_dir, char *language );
 void hb_i18nExit( void );
 
-/** Internal routines **/
+/** Low level API routines **/
+PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex );
 char * hb_i18n_build_table_filename( char *i18n_dir, char *language );
 PHB_ITEM hb_i18n_read_table_header( FHANDLE handle );
 BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader );
 PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count );
+PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count );
 BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable );
 BOOL hb_i18n_load_language( char *language );
 

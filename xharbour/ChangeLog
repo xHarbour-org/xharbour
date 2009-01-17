@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6332 2009/01/17 18:07:15 andijahja Exp $
+ * $Id: ChangeLog,v 1.6333 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-17 18:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * common.mak
+    * Formating, spaces -> tab
+
+  * makefile.vc
+    + Added missing $(LFLAGS) to DLLEXE_LINK_CMD
+
+  * include/hbi18n.h
+  * source/vm/hbi18n.c
+    * Synchronized HB_EXTERN_* and low level API
+
+  * source/rdd/usrrdd/rdds/logrdd.prg
+    * Hacked to avoid missing extern in harbour.dll
+      /* Francesco please review */
+
+  * source/vm/errorapi.c
+    * hb_dynsymNew() -> hb_dynsymGetCase() to avoid assertion failure.
+
+  * source/vm/fm.c
+    + Added assertion for hHeapAlloc
+
+  * source/vm/hvm.c
+    + Added hb_xinit() support to harbour.dll
 
 2009-01-18 04:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/classes.h

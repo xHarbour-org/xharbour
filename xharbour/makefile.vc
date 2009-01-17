@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.234 2008/11/24 05:30:34 andijahja Exp $
+# $Id: makefile.vc,v 1.235 2009/01/08 09:11:13 marchuet Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -372,7 +372,7 @@ HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1 =bison -v -d $** -o$@
 BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK $(EXEFLAGS) /OUT:$@ $** $(DLL_MAIN_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(DLL_MAIN_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project

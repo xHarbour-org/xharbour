@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.88 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: errorapi.c,v 1.89 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -853,7 +853,7 @@ void hb_errInit( void )
    s_uiErrorDOS = 0;
 
    /* error function */
-   hb_dynsymNew( &s_symErrorNew, NULL );
+   hb_dynsymGetCase( "ERRORNEW" );
 
    /* Create error class and base object */
    s_pError = hb_itemNew( NULL );

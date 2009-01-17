@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.704 2009/01/17 05:14:41 andijahja Exp $
+ * $Id: hvm.c,v 1.706 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /*
@@ -332,9 +332,24 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 static HB_DYNS ModuleFakeDyn = { 0 };
 
+#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+   static BOOL s_Do_xinit = TRUE;
+#endif
+
 void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
-   PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
+   PHB_FUNC_LIST pLst;
+
+#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
+
+      hb_xinit();
+   }
+#endif
+
+   pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
 
    pLst->pFunc = pFunc;
    pLst->cargo = cargo;
@@ -547,7 +562,7 @@ void hb_vmInit( BOOL bStartMainProc )
    /*
    Moved to hb_vmProcessSymbols() to avoid GPF trap.
    hb_xinit();
-   */ 
+   */
 
    hb_gcInit();
 
@@ -10508,10 +10523,6 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
 PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-#if ( ! defined(__BORLANDC__) || defined( __EXPORT__ ) || !defined(__cplusplus) )
-   static BOOL s_Do_xinit = TRUE;
-#endif
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
 #ifdef HB_THREAD_SUPPORT
@@ -10529,7 +10540,8 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
                       "Module: '%s' was compiled into PCODE version: %s,"
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
-#if ( ! defined(__BORLANDC__) || defined( __EXPORT__ ) || !defined(__cplusplus) )
+
+#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
@@ -10537,6 +10549,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
       hb_xinit();
    }
 #endif
+
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
 
@@ -10562,6 +10575,15 @@ PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
+#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
+
+      hb_xinit();
+   }
+#endif
+
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
 }
 
@@ -10584,6 +10606,15 @@ PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
                       "Module: '%s' was compiled into PCODE version: %s,"
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
+
+#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
+
+      hb_xinit();
+   }
+#endif
 
    // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );

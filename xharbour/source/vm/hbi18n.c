@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.24 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: hbi18n.c,v 1.25 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -84,6 +84,64 @@ static char s_current_language_name[HB_I18N_NAMELEN + 1];
 /** Language considered to be "untranslated", or "international" */
 static char s_base_language[HB_I18N_CODELEN + 1];
 static char s_base_language_name[HB_I18N_NAMELEN];
+
+HB_EXTERN_BEGIN
+
+/***********************************************
+* VM interface
+************************************************/
+
+BOOL hb_i18nInit( char *i18n_dir, char *language )
+{
+
+   // Supposing that the user strings are compiled in English;
+   // this default can be changed later
+   strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
+   strcpy( s_base_language_name, HB_INTERNATIONAL_NAME );
+
+   if ( language == NULL )
+   {
+      language = getenv( "LANG" );
+      if ( language == NULL )
+      {
+         language = getenv( "LC_ALL" );
+      }
+   }
+
+   if ( i18n_dir == NULL )
+   {
+      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, _POSIX_PATH_MAX );
+   }
+   else
+   {
+      strncpy( s_default_i18n_dir, i18n_dir, _POSIX_PATH_MAX );
+   }
+
+   /* No automatic internationalization can be found */
+   if ( language == NULL || ! hb_i18n_load_language( language ) )
+   {
+      strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
+      strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
+      // but we know that we don't want internationalization
+      if ( language != NULL )
+      {
+         return FALSE;
+      }
+   }
+
+   return TRUE;
+}
+
+
+void hb_i18nExit( void )
+{
+   if( s_i18n_table != NULL )
+   {
+      hb_itemRelease( s_i18n_table );
+      s_i18n_table = NULL;
+   }
+}
+
 
 /***************************************
         Low level API interface
@@ -344,7 +402,7 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
    PHB_ITEM pTable;
 
 
-// TODO: unknown size table not supported, since resource size is available only 
+// TODO: unknown size table not supported, since resource size is available only
 //       aligned to 16 bytes.
 
    if ( count < 0 )
@@ -355,7 +413,7 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
 
    szStrLen[8] = '\0';
    pTable = hb_itemNew( NULL );
-   if ( count > 0 ) 
+   if ( count > 0 )
    {
       hb_arrayNew( pTable, count );
    }
@@ -487,13 +545,13 @@ BOOL hb_i18n_load_language( char *language )
       BYTE *    pRes;
 
       hRes = FindResource( NULL, language, "I18N" );
-      if ( ! hRes ) 
+      if ( ! hRes )
       {
          return FALSE;
       }
 
       hMem = LoadResource( NULL, hRes );
-      if ( ! hMem ) 
+      if ( ! hMem )
       {
          return FALSE;
       }
@@ -554,6 +612,8 @@ BOOL hb_i18n_load_language( char *language )
 
    return FALSE;
 }
+
+HB_EXTERN_END
 
 /***************************************
    XHARBOUR MIDDLE LEVEL API
@@ -889,62 +949,6 @@ HB_FUNC( HB_I18NINITIALIZED )
    HB_THREAD_STUB_API
    hb_retl( s_i18n_table != NULL );
 }
-
-/***********************************************
-* VM interface
-************************************************/
-
-BOOL hb_i18nInit( char *i18n_dir, char *language )
-{
-
-   // Supposing that the user strings are compiled in English;
-   // this default can be changed later
-   strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
-   strcpy( s_base_language_name, HB_INTERNATIONAL_NAME );
-
-   if ( language == NULL )
-   {
-      language = getenv( "LANG" );
-      if ( language == NULL )
-      {
-         language = getenv( "LC_ALL" );
-      }
-   }
-
-   if ( i18n_dir == NULL )
-   {
-      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, _POSIX_PATH_MAX );
-   }
-   else
-   {
-      strncpy( s_default_i18n_dir, i18n_dir, _POSIX_PATH_MAX );
-   }
-
-   /* No automatic internationalization can be found */
-   if ( language == NULL || ! hb_i18n_load_language( language ) )
-   {
-      strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
-      strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
-      // but we know that we don't want internationalization
-      if ( language != NULL )
-      {
-         return FALSE;
-      }
-   }
-
-   return TRUE;
-}
-
-
-void hb_i18nExit( void )
-{
-   if( s_i18n_table != NULL )
-   {
-      hb_itemRelease( s_i18n_table );
-      s_i18n_table = NULL;
-   }
-}
-
 
 /*******************************************
 * Publishing the hashtable search algorithm

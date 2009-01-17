@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.108 2009/01/17 05:14:41 andijahja Exp $
+ * $Id: fm.c,v 1.109 2009/01/17 18:07:16 andijahja Exp $
  */
 
 /*
@@ -143,7 +143,7 @@
 #     define free( p )        LocalFree( ( HLOCAL ) ( p ) )
 #  else
 static HANDLE hProcessHeap = 0;
-#     define malloc( n )      ( void * ) HeapAlloc( hProcessHeap, 0, ( n ) )
+#     define malloc( n )      ( assert( hProcessHeap ),  ( void * ) HeapAlloc( hProcessHeap, 0, ( n ) ) )
 #     define realloc( p, n )  ( void * ) HeapReAlloc( hProcessHeap, 0, ( void * ) ( p ), ( n ) )
 #     define free( p )        HeapFree( hProcessHeap, 0, ( void * ) ( p ) )
 
@@ -463,7 +463,7 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
 void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
    HB_TRACE_FM(HB_TR_DEBUG, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
-   
+
 #if 0
    /* disabled to make hb_xrealloc() ANSI-C realloc() compatible */
    if( ! pMem )
@@ -777,9 +777,11 @@ ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memory block *
 int hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
-#if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && ! defined( HB_FM_LOCALALLOC )
+
+   #if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && ! defined( HB_FM_LOCALALLOC )
       hProcessHeap = GetProcessHeap();
-#endif
+   #endif
+
    return 1;
 }
 
@@ -952,7 +954,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       OutputDebugString( "using HB_FM_STD_ALLOC." );
 #elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && defined( HB_FM_LOCALALLOC )
       OutputDebugString( "using HB_FM_WIN32_LOCALALLOC." );
-#elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )      
+#elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 )
       OutputDebugString( "using HB_FM_WIN32_HEAPALLOC." );
 #elif defined( HB_FM_DL_ALLOC )
       OutputDebugString( "using HB_FM_DL_ALLOC." );
@@ -1305,6 +1307,6 @@ HB_FUNC( HB_FM_NOSTAT ) {};
 #endif
 
 /* This pragma with maximum priority [64] under c function, all other xharbour startup has priority [100] */
-#if ( defined(__BORLANDC__) && !defined(__EXPORT__) && !defined(__cplusplus) )
+#if defined(__BORLANDC__) && ( ! defined(__EXPORT__) ) && ( ! defined( __cplusplus) )
    #pragma startup hb_xinit 64
 #endif

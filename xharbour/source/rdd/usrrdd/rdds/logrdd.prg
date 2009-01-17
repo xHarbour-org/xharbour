@@ -1,5 +1,5 @@
 /*
- * $Id: rlcdx.prg 9754 2008-10-27 22:40:04Z vszakats $
+ * $Id: logrdd.prg,v 1.1 2009/01/17 15:22:29 fsgiudice Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
 #define ARRAY_USERLOGBLOCK 7
 
 ANNOUNCE LOGRDD
-REQUEST  HB_LOGRDDINHERIT  /* To be defined at user level */
+//REQUEST  HB_LOGRDDINHERIT  /* To be defined at user level */
 
 STATIC FUNCTION LOGRDD_INIT( nRDD )
    LOCAL lActive, cFileName, cTag, cRDDName
@@ -91,7 +91,9 @@ STATIC FUNCTION LOGRDD_INIT( nRDD )
    #else
       cTag := NETNAME() + "\" + hb_USERNAME()
    #endif
-   cRDDName := hb_LogRddInherit()
+
+   // Avoid missing external in harbour.dll
+   cRDDName := &( "hb_LogRddInherit()" )
 
    /* Log File will be open later so user can change parameters */
 
@@ -192,7 +194,9 @@ REQUEST DBFCDX
  * format: <RDDNAME>_GETFUNCTABLE
  */
 FUNCTION LOGRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-   LOCAL cSuperRDD := hb_LogRddInherit() /* We are inheriting from a User Defined RDD */
+
+   // Avoid missing external in harbour.dll
+   LOCAL cSuperRDD := &( "hb_LogRddInherit()" ) /* We are inheriting from a User Defined RDD */
    LOCAL aMyFunc[ UR_METHODCOUNT ]
 
    aMyFunc[ UR_INIT         ] := ( @LOGRDD_INIT()         )
@@ -211,7 +215,11 @@ RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
                             cSuperRDD, aMyFunc )
 
 INIT PROCEDURE _LOGRDD_INIT()
-   rddRegister( "LOGRDD", RDT_FULL )
+
+   IF Type( "hb_LogRddInherit()" ) == "UI"
+      rddRegister( "LOGRDD", RDT_FULL )
+   ENDIF
+
    RETURN
 
 /* -------------------------------------------------- */
