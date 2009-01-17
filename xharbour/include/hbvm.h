@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.65 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.66 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -160,6 +160,10 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHOR
 extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );
 extern HB_EXPORT void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
+
+/* Object */
+extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
+extern void hb_vmOperatorCallUnary( PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded unary operator */
 
 #if defined(__DMC__) || defined(_MSC_VER) || defined(__POCC__)
    #if !defined(HB_DLL_REQUIRED_DLLMAIN)

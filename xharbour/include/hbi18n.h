@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.h,v 1.4 2003/06/24 00:41:05 jonnymind Exp $
+ * $Id: hbi18n.h,v 1.5 2003/08/28 01:35:31 jonnymind Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ typedef struct tag_hb_i18n_tab_header
    int entries;
 } HB_I18N_TAB_HEADER;
 
+HB_EXTERN_BEGIN
 
 /** VM Interface **/
 BOOL hb_i18nInit( char *i18n_dir, char *language );
@@ -85,5 +86,7 @@ BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader );
 PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count );
 BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable );
 BOOL hb_i18n_load_language( char *language );
+
+HB_EXTERN_END
 
 #endif

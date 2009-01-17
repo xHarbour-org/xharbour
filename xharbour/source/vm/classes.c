@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.233 2009/01/08 20:28:04 likewolf Exp $
+ * $Id: classes.c,v 1.234 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -239,13 +239,6 @@ static HARBOUR  hb___msgEval( void );
 #endif
 static HARBOUR  hb___msgVirtual( void );
 static HARBOUR  hb___msgDelegate( void );
-
-HARBOUR  hb___msgGetClsData( void );
-HARBOUR  hb___msgSetClsData( void );
-HARBOUR  hb___msgGetShrData( void );
-HARBOUR  hb___msgSetShrData( void );
-HARBOUR  hb___msgGetData( void );
-HARBOUR  hb___msgSetData( void );
 
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
        hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,

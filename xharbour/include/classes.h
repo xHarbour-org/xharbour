@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.39 2009/01/08 20:28:04 likewolf Exp $
+ * $Id: classes.h,v 1.40 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -217,6 +217,13 @@ void hb_clsAdd( USHORT usClassH, const char * szMethodName, PHB_FUNC pFuncPtr );
 /* Harbour equivalent for Clipper internal __mdAssociate() */
 void hb_clsAssociate( USHORT usClassH );
 
+extern void hb_clsSetModule( USHORT uiClass );
+extern HARBOUR  hb___msgGetClsData( void );
+extern HARBOUR  hb___msgSetClsData( void );
+extern HARBOUR  hb___msgGetShrData( void );
+extern HARBOUR  hb___msgSetShrData( void );
+extern HARBOUR  hb___msgGetData( void );
+extern HARBOUR  hb___msgSetData( void );
 
 HB_EXTERN_END
 

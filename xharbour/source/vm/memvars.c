@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.134 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: memvars.c,v 1.135 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -167,8 +167,6 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS, BYTE, PHB_ITEM );
 static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
-
-extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
 
 /* Fake Clear all variable - the value will be cleared by subsequent GC scan
  * Should be called at application exit only

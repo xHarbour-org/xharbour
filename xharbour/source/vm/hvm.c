@@ -188,10 +188,6 @@ static void    hb_vmArrayDim( USHORT uiDimensions ); /* generates an uiDimension
 static void    hb_vmArrayGen( ULONG ulElements ); /* generates an ulElements Array and fills it from the stack values */
 static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
 
-/* Object */
-void    hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
-void    hb_vmOperatorCallUnary( PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded unary operator */
-
 /* Database */
 static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workarea using a given item or a substituted value */
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
@@ -263,17 +259,7 @@ static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs I
 static BOOL    hb_vmDoInitFunc( char *pFuncSym ); /* executes CLIPINIT, HB_OLEINIT and HASHENTRY */
 // void hb_vmDoExitFunctions( void );   /* executes all defined PRGs EXIT functions */
 
-
 // extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
-
-extern HARBOUR  hb___msgGetClsData( void );
-extern HARBOUR  hb___msgSetClsData( void );
-extern HARBOUR  hb___msgGetShrData( void );
-extern HARBOUR  hb___msgSetShrData( void );
-extern HARBOUR  hb___msgGetData( void );
-extern HARBOUR  hb___msgSetData( void );
-extern PCLASS   hb_clsClassesArray( void );
-extern void hb_clsSetModule( USHORT uiClass );
 
 #ifndef HB_NO_PROFILER
    BOOL hb_bProfiler = FALSE; /* profiler status is off */
