@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.107 2009/01/16 10:50:23 marchuet Exp $
+ * $Id: fm.c,v 1.108 2009/01/17 05:14:41 andijahja Exp $
  */
 
 /*
@@ -253,6 +253,10 @@ typedef void * PHB_MEMINFO;
 #else
 #  define HB_MEM_THLOCK()
 #  define HB_MEM_THUNLOCK()
+#endif
+
+#ifdef __cplusplus
+   static int ixHarbour_xInit = hb_xinit(); /* Initialize fixed memory subsystem */
 #endif
 
 /* allocates fixed memory, do *not* exits on failure */
@@ -770,12 +774,13 @@ ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memory block *
 #endif
 }
 
-void hb_xinit( void ) /* Initialize fixed memory subsystem */
+int hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
 #if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN_32 ) && ! defined( HB_FM_LOCALALLOC )
       hProcessHeap = GetProcessHeap();
 #endif
+   return 1;
 }
 
 /* Returns pointer to string containing printable version
@@ -1300,6 +1305,6 @@ HB_FUNC( HB_FM_NOSTAT ) {};
 #endif
 
 /* This pragma with maximum priority [64] under c function, all other xharbour startup has priority [100] */
-#if ( defined(__BORLANDC__) && !defined(__EXPORT__))
+#if ( defined(__BORLANDC__) && !defined(__EXPORT__) && !defined(__cplusplus) )
    #pragma startup hb_xinit 64
 #endif

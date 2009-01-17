@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.251 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: hbapi.h,v 1.252 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #define HB_APIEXT_H_
 
 #include "hbvmpub.h"
+
 
 HB_EXTERN_BEGIN
 
@@ -517,10 +518,12 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( hb_stackReturnItem(), (llNumber), (iWidth) )
 #endif
 
+#if !defined( __NO_EXPORT__ )
 extern HB_FORCE_EXPORT void    hb_storc( const char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_storclen( const char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
-extern HB_EXPORT int     hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_FORCE_EXPORT void    hb_stords( const char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
+#endif
+extern HB_EXPORT int     hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_EXPORT void    hb_stordts( const char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern HB_EXPORT void    hb_stord( int iYear, int iMonth, int iDay, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
 extern HB_EXPORT void    hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
@@ -538,7 +541,7 @@ extern HB_EXPORT void    hb_storptr( void * pointer, int iParam, ... ); /* store
    extern HB_EXPORT void   hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
 #endif
 
-extern HB_EXPORT void    hb_xinit( void );                         /* Initialize fixed memory subsystem */
+extern HB_EXPORT int     hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern HB_EXPORT void    hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
 
 #ifndef hb_xalloc
@@ -574,6 +577,7 @@ extern HB_EXPORT ULONG   hb_xquery( USHORT uiMode );               /* Query diff
 extern void *   hb_xmemcpy( void * pDestArg, void * pSourceArg, ULONG ulLen ); /* copy more than memcpy() can */
 extern void *   hb_xmemset( void * pDestArg, int iFill, ULONG ulLen ); /* set more than memset() can */
 #endif
+
 
 /* array management */
 extern HB_FORCE_EXPORT BOOL      hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ); /* creates a new array */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6330 2009/01/17 15:22:29 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.6331 2009/01/17 15:57:14 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-18 01:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+  * source/vm/fm.c
+  * source/vm/hvm.c
+    ! change hb_xinit to return integer for ease initialization on C++ mode.
+    + hb_xinit to execute only one time in C++ mode.
 
 2009-01-17 16:55 UTC+0100 Francesco Saverio Giudice (info/at/fsgiudice.com)
   * xharbour/source/rtl/hblog.prg
