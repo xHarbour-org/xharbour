@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.36 2009/01/08 09:11:13 marchuet Exp $
+# $Id: common.mak,v 1.37 2009/01/16 01:56:00 likewolf Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -665,6 +665,7 @@ RDDADS_LIB_OBJS=\
 #===============================================================================
 RDDS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)arrayrdd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)logrdd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dbtcdx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fcomma$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fptcdx$(OBJEXT)\

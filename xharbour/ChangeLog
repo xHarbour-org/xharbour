@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6328 2009/01/16 10:50:23 marchuet Exp $
+ * $Id: ChangeLog,v 1.6329 2009/01/17 05:14:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,61 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-17 16:21 UTC+0100 Francesco Saverio Giudice (info/at/fsgiudice.com)
+  + xharbour/source/rdd/usrrdd/rdds/logrdd.prg
+    + Added new LOGRDD rdd file and related example
+    ; NOTE:
+      A simple RDD which introduce logging to file. It inheriths from
+      any existent RDD but if you write / replace / delete something
+      on tables it writes changes in a log file.
+      It needs to inherit a standard RDD to which it adds logging
+      capabilities.
+      Related functions:
+      hb_LogRddInherit() -> <cRDDName>
+        REQUESTED - It must returns the standard RDD name to be inherited.
+                    This function HAVE to be defined from user in application.
+      hb_LogRddLogFileName( [<cFileName>] ) -> <cOldFileName>
+        OPTIONAL  - Set/Get logging file name (default "changes.log").
+      hb_LogRddTag( [<cTag>] ) -> <cOldTag>
+        OPTIONAL  - Set/Get Tag string added in each log line.
+                    (default COMPUTERNAME\UserName)
+      hb_LogRddActive( [<lActive>] ) -> <lOldActive>
+        OPTIONAL  - Set/Get logging active status (default .F.).
+      hb_LogRddValueToText( <xValue>] ) -> <cValue>
+                    cValue is formatted as "[<cValType>]>>><cString><<<"
+                    f.e.: date 31/12/2009 is formatted as
+                          "[D]>>>sToD( "20091231" )<<<" in xharbour
+      bMsgLogBlock, defined using hb_LogRddMsgLogBlock(), receives
+          follow parameters:
+          cTag, cRDDName, cCmd, nWA, xPar1, xPar2, xPar3
+          and has to returns a valid formatted string or NIL.
+          In last case nothing is written to log file.
+          xPar1, xPar2 and xPar3 change depends from called commands.
+          For details see at ToString() local function.
+      bUserLogBlock, defined using hb_LogRddUserLogBlock(), receives same
+          parameters of bMsgLogBlock.
+          It have to return nothing, so it is under user control where to
+          log and the format of the log string.
+
+  + xharbour/source/rdd/usrrdd/example/exlog.prg
+    * Example of use of LOGRDD
+      See also local MyToString() function to see how handle commands at
+      user level, otherwise it logs in a standard log file.
+
+  * xharbour/source/rdd/usrrdd/rdds/Makefile
+  * xharbour/common.mak
+  * xharbour/compile.mak
+    + Added logrdd.prg
+
+  * xharbour/source/rdd/usrrdd/rdds/arrayrdd.prg
+    * Aligned as much as possible to last harbour versione
+    * formatted
+    ! Changed AR_CREATE( nWA, aOpenInfo ) behaviour, now it not checks
+      if a table exists in memory but act as dbCreate() does.
+    + Added FileArrayRDD() function to check existence of a table
+      in memory.
+    * removed string lenght limit in case of a Memo field
 
 2009-01-17 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c

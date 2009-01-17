@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.34 2009/01/08 09:11:13 marchuet Exp $
+# $Id: compile.mak,v 1.35 2009/01/16 01:56:00 likewolf Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1841,6 +1841,12 @@ $(OBJ_DIR)$(DIR_SEP)arrayrdd.c : $(RDD_DIR)$(DIR_SEP)usrrdd$(DIR_SEP)rdds$(DIR_S
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)arrayrdd$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)arrayrdd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)logrdd.c : $(RDD_DIR)$(DIR_SEP)usrrdd$(DIR_SEP)rdds$(DIR_SEP)logrdd.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)logrdd$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)logrdd.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbdelim.c : $(RDD_DIR)$(DIR_SEP)dbdelim.prg
