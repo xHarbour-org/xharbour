@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.109 2009/01/17 18:07:16 andijahja Exp $
+ * $Id: fm.c,v 1.110 2009/01/17 23:09:48 ronpinkas Exp $
  */
 
 /*
@@ -253,10 +253,6 @@ typedef void * PHB_MEMINFO;
 #else
 #  define HB_MEM_THLOCK()
 #  define HB_MEM_THUNLOCK()
-#endif
-
-#ifdef __cplusplus
-   static int ixHarbour_xInit = hb_xinit(); /* Initialize fixed memory subsystem */
 #endif
 
 /* allocates fixed memory, do *not* exits on failure */
@@ -1307,6 +1303,6 @@ HB_FUNC( HB_FM_NOSTAT ) {};
 #endif
 
 /* This pragma with maximum priority [64] under c function, all other xharbour startup has priority [100] */
-#if defined(__BORLANDC__) && ( ! defined(__EXPORT__) ) && ( ! defined( __cplusplus) )
+#if ( defined(__BORLANDC__) && ! defined(__EXPORT__) )
    #pragma startup hb_xinit 64
 #endif

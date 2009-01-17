@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.706 2009/01/17 20:54:27 andijahja Exp $
+ * $Id: hvm.c,v 1.707 2009/01/17 23:09:48 ronpinkas Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 static HB_DYNS ModuleFakeDyn = { 0 };
 
-#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    static BOOL s_Do_xinit = TRUE;
 #endif
 
@@ -340,7 +340,7 @@ void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst;
 
-#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
