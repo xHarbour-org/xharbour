@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6337 2009/01/18 00:08:24 andijahja Exp $
+ * $Id: ChangeLog,v 1.6338 2009/01/18 07:19:53 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-18 23:47 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/vm/errorapi.c
+    - Commented out unused variable s_symErrorNew
+
 2009-01-18 00:13 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/contrib/hbmzip/hbmzip.c
     * fixed GPF in hb_zipDeleteFile()

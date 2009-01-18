@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.89 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: errorapi.c,v 1.90 2009/01/17 23:09:48 ronpinkas Exp $
  */
 
 /*
@@ -137,7 +137,7 @@ const char hb_errFuncName = 1;
 
 static PHB_ITEM s_pError = NULL;
 
-static HB_SYMB  s_symErrorNew = { "ERRORNEW", {HB_FS_PUBLIC}, {HB_FUNCNAME( ERRORNEW )}, NULL };
+/* static HB_SYMB  s_symErrorNew = { "ERRORNEW", {HB_FS_PUBLIC}, {HB_FUNCNAME( ERRORNEW )}, NULL }; */
 
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
