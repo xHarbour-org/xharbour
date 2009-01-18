@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.707 2009/01/17 23:09:48 ronpinkas Exp $
+ * $Id: hvm.c,v 1.708 2009/01/17 23:35:24 andijahja Exp $
  */
 
 /*
@@ -10541,7 +10541,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
-#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
@@ -10575,7 +10575,7 @@ PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
-#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
@@ -10607,7 +10607,7 @@ PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
                       "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
-#if ( ! defined(__BORLANDC__ ) ) || defined( __EXPORT__ ) || ( ! defined(__cplusplus) )
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    if( s_Do_xinit )
    {
       s_Do_xinit = FALSE;
