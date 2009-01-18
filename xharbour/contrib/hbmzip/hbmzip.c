@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.1 2008/07/30 10:15:56 marchuet Exp $
+ * $Id: hbmzip.c,v 1.2 2008/08/01 09:41:14 marchuet Exp $
  */
 
 /*
@@ -1155,7 +1155,8 @@ static int hb_zipDeleteFile( const char* szZipFile, const char* szFileMask )
          iResult = unzGetCurrentFileInfo( hUnzip, NULL, NULL, 0,
                                           pExtraField, ufi.size_file_extra,
                                           pszFileComment, ufi.size_file_comment );
-         pszFileComment[ ufi.size_file_comment ] = '\0';
+         if( ufi.size_file_comment )
+            pszFileComment[ ufi.size_file_comment ] = '\0';
          if( iResult != UNZ_OK )
             break;
 
