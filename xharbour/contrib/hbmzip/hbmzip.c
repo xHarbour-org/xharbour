@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.2 2008/08/01 09:41:14 marchuet Exp $
+ * $Id: hbmzip.c,v 1.3 2009/01/18 07:19:16 andresreyesh Exp $
  */
 
 /*
@@ -206,7 +206,15 @@ HB_FUNC( HB_ZIPFILECREATE )
          zfi.tmz_date.tm_hour = iY;
          zfi.tmz_date.tm_min = iM;
          zfi.tmz_date.tm_sec = iD;
+         
+         /* Missed Internal and External File Attributes */
+         /* Begin: 2008-01-19 andresreyesh */
+         
+         zfi.internal_fa = hb_parnl( 5 );
+         zfi.external_fa = hb_parnl( 6 );
 
+         /* End: 2008-01-19 andresreyesh */
+         
          hb_retni( zipOpenNewFileInZip3( hZip, szZipName, &zfi,
                                          NULL, 0, NULL, 0,
                                          hb_parc( 11 ), iMethod, iLevel, 0,
