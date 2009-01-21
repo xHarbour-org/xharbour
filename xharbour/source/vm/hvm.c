@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.708 2009/01/17 23:35:24 andijahja Exp $
+ * $Id: hvm.c,v 1.709 2009/01/18 00:08:24 andijahja Exp $
  */
 
 /*
@@ -1006,7 +1006,9 @@ int hb_vmQuit( void )
       --HB_VM_STACK.pPos;
    }
 
+#if 0
    hb_vmPushSymbol( &FakeQuitSymbol );
+#endif
 
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Stack\n" );
