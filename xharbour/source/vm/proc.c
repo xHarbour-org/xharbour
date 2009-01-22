@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.34 2008/04/22 04:40:43 ronpinkas Exp $
+ * $Id: proc.c,v 1.35 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -114,6 +114,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 {
    PHB_ITEM * pBase, pSelf;
    USHORT uiSuperClass;
+   long lOffset;
 
    // Default and safety to empty string.
    if( szName )
@@ -147,9 +148,9 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       return szName;
    }
 
-   pBase = hb_stackGetBase( iLevel );
+   lOffset = hb_stackBaseProcOffset( iLevel );
 
-   if( pBase )
+   if( lOffset > 0 && ( pBase = hb_stackGetBase( iLevel ) ) != NULL )
    {
       pSelf = *( pBase + 1 );
 
@@ -179,9 +180,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
             {
                if( pSelf->item.asBlock.value->uiClass <= hb_clsMaxClasses() )
                {
-                  PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asBlock.value->uiClass - 1 );
-
-                  strcat( szName, pClass->szName );
+                  strcat( szName, hb_clsName( pSelf->item.asBlock.value->uiClass ) );
                   strcat( szName, ":" );
                }
                else

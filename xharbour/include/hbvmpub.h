@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.82 2008/12/01 11:44:59 marchuet Exp $
+ * $Id: hbvmpub.h,v 1.83 2008/12/02 12:28:49 marchuet Exp $
  */
 
 /*
@@ -106,7 +106,7 @@
 
    #define HB_GETSYM()                 ( ( *HB_VM_STACK.pBase )->item.asSymbol.value )
 
-   #define HB_GETMODULESYM()           HB_SYM_GETMODULESYM( HB_GETSYM() )
+   #define HB_GETMODULESYM()           ( HB_GETSYM()->pDynSym ? HB_SYM_GETMODULESYM( HB_GETSYM() ) : NULL )
 
    #define HB_GETDYNSYM()              HB_SYM_GETDYNSYM( HB_GETSYM() )
    #define HB_GETGLOBALS()             HB_SYM_GETGLOBALS( HB_GETSYM() )

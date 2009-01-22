@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.252 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: hbapi.h,v 1.253 2009/01/17 18:07:15 andijahja Exp $
  */
 
 /*
@@ -735,11 +735,11 @@ extern HB_EXPORT void      hb_put_le_uint64( BYTE * ptr, double d );
 #endif
 
 /* class management */
-extern HB_EXPORT BOOL      hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a class handle inherited from szParentName Class ? */
+extern HB_EXPORT BOOL      hb_clsIsParent( USHORT uiClass, const char * szParentName ); /* is a class handle inherited from szParentName Class ? */
 extern HB_EXPORT BOOL      hb_clsHasMsg( USHORT uiClass, char *szMsg );
 
 /* object management */
-extern HB_EXPORT char *    hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
+extern HB_EXPORT const char * hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
 extern HB_EXPORT char *    hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern HB_EXPORT PHB_FUNC  hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
 extern HB_EXPORT PHB_FUNC  hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.57 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: hbstack.h,v 1.58 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -164,16 +164,27 @@ extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
 extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
 extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
-extern PHB_IOERRORS hb_stackIOErrors( void );
-extern PHB_STACKRDD hb_stackRDD( void );
-extern PHB_STACKRDD_TLS hb_stackRDDTLS( void );
-
-extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
 extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
+extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
 extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
 extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
 extern HB_EXPORT void        hb_stackPushReturn( void );
 extern HB_EXPORT void        hb_stackPopReturn( void );
+extern void        hb_stackRemove( LONG lUntilPos );
+
+/* stack management functions */
+extern LONG       hb_stackBaseProcOffset( int iLevel );
+extern void       hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
+extern void       hb_stackDispCall( void );
+extern void       hb_stackFree( void );       /* releases all memory used by the stack */
+extern void       hb_stackInit( void );       /* initializes the stack */
+extern void       hb_stackIncrease( void );   /* increase the stack size */
+
+
+extern PHB_IOERRORS hb_stackIOErrors( void );
+extern PHB_STACKRDD hb_stackRDD( void );
+extern PHB_STACKRDD_TLS hb_stackRDDTLS( void );
+
 
 extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
 extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
@@ -182,6 +193,10 @@ extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
 extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 
 #if defined( _HB_API_INTERNAL_ )
+
+extern void        hb_stackSetStaticsBase( LONG lBase );
+extern LONG        hb_stackGetStaticsBase( void );
+
    void hb_stack_init( PHB_STACK pStack );
 #endif
 
@@ -203,6 +218,8 @@ extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 #define hb_stackRDDTLS( )           ( &HB_VM_STACK.rddTls )
 
 #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
+#define hb_stackGetStaticsBase( )   ( HB_VM_STACK.lStatics )
+#define hb_stackSetStaticsBase( n ) do { HB_VM_STACK.lStatics = ( n ); } while ( 0 )
 #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiVMFlags & HB_REQUEST_MASK )
 #define hb_stackSetActionRequest( n )   do { \
                                            HB_VM_STACK.uiVMFlags &= ~HB_REQUEST_MASK; HB_VM_STACK.uiVMFlags |= (n); \
@@ -258,14 +275,6 @@ extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 
 #endif
 
-/* stack management functions */
-extern void        hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
-extern void        hb_stackDispCall( void );
-extern void        hb_stackFree( void );       /* releases all memory used by the stack */
-extern void        hb_stackInit( void );       /* initializes the stack */
-extern void        hb_stackIncrease( void );   /* increase the stack size */
-
-extern void        hb_stackRemove( LONG lUntilPos );
 extern HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
 extern HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack );
 HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );

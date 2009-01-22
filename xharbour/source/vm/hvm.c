@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.709 2009/01/18 00:08:24 andijahja Exp $
+ * $Id: hvm.c,v 1.710 2009/01/21 04:52:14 andijahja Exp $
  */
 
 /*
@@ -139,7 +139,7 @@
 
 PHB_FUNC pHVMFuncService = NULL;
 
-static void hb_vmClassError( UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf );
+static void hb_vmClassError( UINT uiParams, const char *szClassName, const char *szMsg, PHB_ITEM pSelf );
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -1006,9 +1006,7 @@ int hb_vmQuit( void )
       --HB_VM_STACK.pPos;
    }
 
-#if 0
    hb_vmPushSymbol( &FakeQuitSymbol );
-#endif
 
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Stack\n" );
@@ -7246,7 +7244,7 @@ void hb_vmDo( USHORT uiParams )
 /* JC1: I need this error display routine to be used also by hash pseudo class
    operators, so I put it here
 */
-static void hb_vmClassError( UINT uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf )
+static void hb_vmClassError( UINT uiParams, const char *szClassName, const char *szMsg, PHB_ITEM pSelf )
 {
    char sDesc[128] = { '\0' };
    PHB_ITEM pArgsArray;
@@ -7538,7 +7536,7 @@ void hb_vmSend( USHORT uiParams )
          }
          else
          {
-            char *sClass = hb_objGetClsName( pSelf );
+            const char *sClass = hb_objGetClsName( pSelf );
             //TraceLog( NULL, "METHOD NOT FOUND!\n" );
             hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
          }
@@ -7599,7 +7597,7 @@ void hb_vmSend( USHORT uiParams )
    {
       if( strncmp( pSym->szName, "CLASSNAME", strlen( pSym->szName ) < 4 ? 4 : strlen( pSym->szName ) ) == 0 )
       {
-         char *sClass = hb_objGetClsName( pSelf );
+         const char *sClass = hb_objGetClsName( pSelf );
          hb_itemPutC( &(HB_VM_STACK.Return), sClass );
       }
       else if( strncmp( pSym->szName, "CLASSH", 6 ) == 0 )
@@ -7608,7 +7606,7 @@ void hb_vmSend( USHORT uiParams )
       }
       else
       {
-         char *sClass = hb_objGetClsName( pSelf );
+         const char *sClass = hb_objGetClsName( pSelf );
          //TraceLog( NULL, "METHOD NOT FOUND!\n" );
          hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
       }
@@ -8410,7 +8408,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
             }
             else
             {
-               char *sClass = hb_objGetClsName( pSelf );
+               const char *sClass = hb_objGetClsName( pSelf );
                hb_vmClassError( hb_pcount(), sClass, pSym->szName, NULL );
             }
          }
@@ -8542,7 +8540,7 @@ static void hb_vmSFrame( PHB_SYMB pSym )      /* sets the statics frame for a fu
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSFrame(%p)", pSym));
 
    /* _INITSTATICS is now the statics frame. Statics() changed it! */
-   HB_VM_STACK.lStatics = pSym->value.iStaticsBase; /* pSym is { "$_INITSTATICS", HB_FS_INITEXIT, _INITSTATICS } for each PRG */
+   hb_stackSetStaticsBase( pSym->value.iStaticsBase ); /* pSym is { "$_INITSTATICS", HB_FS_INITEXIT, _INITSTATICS } for each PRG */
 }
 
 static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the global aStatics array or redimensionates it */
@@ -9060,7 +9058,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
 
    /* store the statics base of function where the codeblock was defined
     */
-   pItem->item.asBlock.statics = HB_VM_STACK.lStatics;
+   pItem->item.asBlock.statics = hb_stackGetStaticsBase();
    /* store the number of expected parameters
     */
    pItem->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( pCode );
@@ -9116,7 +9114,7 @@ static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCod
 
    /* store the statics base of function where the codeblock was defined
     */
-   pItem->item.asBlock.statics = HB_VM_STACK.lStatics;
+   pItem->item.asBlock.statics = hb_stackGetStaticsBase();
    /* store the number of expected parameters
     */
    pItem->item.asBlock.paramcnt = 0;
@@ -9162,7 +9160,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode )
 
    /* store the statics base of function where the codeblock was defined
     */
-   pItem->item.asBlock.statics = HB_VM_STACK.lStatics;
+   pItem->item.asBlock.statics = hb_stackGetStaticsBase();
 
    /* store the number of expected parameters
     */
@@ -9347,7 +9345,7 @@ static void hb_vmPushStatic( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStatic(%hu)", uiStatic));
 
-   pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.lStatics + uiStatic - 1;
+   pStatic = s_aStatics.item.asArray.value->pItems + hb_stackGetStaticsBase() + uiStatic - 1;
    hb_itemCopy( hb_stackAllocItem(),
                 HB_IS_BYREF( pStatic ) ? hb_itemUnRef( pStatic ) : pStatic );
 }
@@ -9361,12 +9359,12 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
 #ifdef HB_UNSHARE_REFERENCES
-   hb_itemUnShare( s_aStatics.item.asArray.value->pItems + HB_VM_STACK.lStatics + uiStatic - 1 );
+   hb_itemUnShare( s_aStatics.item.asArray.value->pItems + hb_stackGetStaticsBase() + uiStatic - 1 );
 #endif
 
    pTop->type = HB_IT_BYREF;
    /* we store the offset instead of a pointer to support a dynamic stack */
-   pTop->item.asRefer.value = HB_VM_STACK.lStatics + uiStatic - 1;
+   pTop->item.asRefer.value = hb_stackGetStaticsBase() + uiStatic - 1;
    pTop->item.asRefer.offset = 0;    /* 0 for static variables */
    pTop->item.asRefer.BasePtr.pBaseArray = s_aStatics.item.asArray.value;
 
@@ -9755,11 +9753,11 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopStatic(%hu)", uiStatic));
 
-   pVal = *( HB_VM_STACK.pPos - 1 );
+   pVal = hb_stackItemFromTop( -1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
    pVal->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
-   pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.lStatics + uiStatic - 1;
+   pStatic = s_aStatics.item.asArray.value->pItems + hb_stackGetStaticsBase() + uiStatic - 1;
 
 //#define DEBUG_STATIC_DESTRUCTORS
 #ifdef DEBUG_STATIC_DESTRUCTORS
@@ -9808,6 +9806,53 @@ static void hb_vmPopStatic( USHORT uiStatic )
 }
 
 /* ----------------------------------------------- */
+/*
+ * Functions to manage module symbols
+ */
+
+PHB_SYMB hb_vmGetRealFuncSym( PHB_SYMB pSym )
+{
+   if( pSym && !( pSym->scope.value & HB_FS_LOCAL ) )
+   {
+      pSym = pSym->pDynSym &&
+           ( pSym->pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) ?
+             pSym->pDynSym->pSymbol : NULL;
+   }
+
+   return pSym;
+}
+
+
+BOOL hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols,
+                             USHORT * puiSymbols )
+{
+   if( pSym )
+   {
+      PSYMBOLS pLastSymbols = s_pSymbols;
+
+/*
+      if( pSym->scope.value & HB_FS_PCODEFUNC )
+         * pSymbols = pSym->value.pCodeFunc->pSymbols;
+*/
+
+      while( pLastSymbols )
+      {
+         if( pLastSymbols->fActive &&
+             pSym >= pLastSymbols->pSymbolTable &&
+             pSym < pLastSymbols->pSymbolTable + pLastSymbols->uiModuleSymbols )
+         {
+            * pSymbols = pLastSymbols->pSymbolTable;
+            * puiSymbols = pLastSymbols->uiModuleSymbols;
+            return TRUE;
+         }
+         pLastSymbols = pLastSymbols->pNext;
+      }
+   }
+
+   * pSymbols = NULL;
+   * puiSymbols = 0;
+   return FALSE;
+}
 
 static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, char * szModuleName )
 {
@@ -11385,14 +11430,14 @@ HB_FUNC( HB_RESTOREBLOCK )
             Block.item.asBlock.value->symbol = ( *( pBase + 1 ) )->item.asBlock.value->symbol;
             Block.item.asBlock.value->lineno = ( *( pBase + 1 ) )->item.asBlock.value->lineno;
 
-            Block.item.asBlock.statics = HB_VM_STACK.lStatics;
+            Block.item.asBlock.statics = hb_stackGetStaticsBase();
          }
          else
          {
             Block.item.asBlock.value->symbol = ( *pBase )->item.asSymbol.value;
             Block.item.asBlock.value->lineno = ( *pBase )->item.asSymbol.pCargo->lineno;
 
-            Block.item.asBlock.statics = HB_VM_STACK.lStatics;
+            Block.item.asBlock.statics = hb_stackGetStaticsBase();
          }
 
          //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6340 2009/01/19 06:40:41 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.6341 2009/01/21 04:52:14 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-22 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/classes.h
+  * include/hbapi.h
+  * include/hbstack.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * source/vm/classes.c
+  * source/vm/estack.c
+  * source/vm/hvm.c
+  * source/vm/proc.c
+    % Simplified code handling friend functions, classes and modules.
+    * char * -> const char * fixes.
+    + Added Harbour compatible API:
+      const char * hb_clsName( USHORT uiClass );
+      LONG hb_stackBaseProcOffset( int iLevel );
+      void hb_stackSetStaticsBase( LONG lBase );
+      LONG hb_stackGetStaticsBase( void );
+    ! Allow base symbol to be STATIC (thus not having a pDynSym).
+    ! Corrected Andi's fix for memory leaks on program exit
+    ! Hide the hb_stackInit base stack item from PROCNAME().
 
 2009-01-21 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/vm/hvm.c

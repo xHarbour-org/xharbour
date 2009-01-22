@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.106 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: estack.c,v 1.107 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ BOOL hb_stack_ready = FALSE;
 
 /* ------------------------------- */
 
-static HB_SYMB s_initSymbol = { "hb_stackInit", { HB_FS_PUBLIC }, { NULL }, NULL };
+static HB_SYMB s_initSymbol = { "hb_stackInit", { HB_FS_STATIC }, { NULL }, NULL };
 
 /* ------------------------------- */
 
@@ -155,6 +155,10 @@ void hb_stackFree( void )
       LONG i = hb_stackST.wItems - 1;
       while( i >= 0 )
       {
+         if( HB_IS_SYMBOL( hb_stackST.pItems[ i ] ) )
+         {
+            hb_xfree( hb_stackST.pItems[ i ]->item.asSymbol.pCargo );
+         }
          hb_xfree( hb_stackST.pItems[ i-- ] );
       }
    }
@@ -433,6 +437,21 @@ LONG hb_stackBaseOffset( void )
 }
 
 
+LONG hb_stackBaseProcOffset( int iLevel )
+{
+   HB_THREAD_STUB
+   LONG lOffset = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+
+   while( iLevel-- > 0 && lOffset > 0 )
+      lOffset = ( * ( HB_VM_STACK.pItems + lOffset ) )->item.asSymbol.pCargo->stackbase;
+
+   if( iLevel < 0 && ( lOffset > 0 || HB_IS_SYMBOL( * HB_VM_STACK.pItems ) ) )
+      return lOffset;
+   else
+      return -1;
+}
+
+
 /**
  JC1: from that point on, stack optimization is no longer needed:
  We have all small functions that reference stack only once, and
@@ -475,6 +494,19 @@ PHB_STACKRDD hb_stackRDD( void )
 PHB_STACKRDD_TLS hb_stackRDDTLS( void )
 {
    return &HB_VM_STACK.rddTls;
+}
+
+
+#undef hb_stackGetStaticsBase
+LONG hb_stackGetStaticsBase( void )
+{
+   return HB_VM_STACK.lStatics;
+}
+
+#undef hb_stackSetStaticsBase
+void hb_stackSetStaticsBase( LONG lBase )
+{
+   HB_VM_STACK.lStatics = lBase;
 }
 
 #undef hb_stackItemBasePtr

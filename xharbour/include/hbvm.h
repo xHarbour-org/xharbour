@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.66 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: hbvm.h,v 1.67 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /*
@@ -96,8 +96,16 @@ extern HB_EXPORT void     hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
 extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+#ifdef _HB_API_INTERNAL_
+   extern BOOL        hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols, USHORT * puiSymbols );
+   extern PHB_SYMB    hb_vmGetRealFuncSym( PHB_SYMB pSym );
+#endif
 
-extern void hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
+
+extern HB_EXPORT void     hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
 
 /* Harbour virtual machine escaping API */
 extern HB_EXPORT void    hb_vmRequestDebug( void );
@@ -154,9 +162,6 @@ extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item refer
 
 extern HB_EXPORT BOOL     hb_vmIsMt( void ); /* return TRUE if HVM is compiled with thread support */
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
 extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );
 extern HB_EXPORT void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );

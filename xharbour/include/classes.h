@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.40 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: classes.h,v 1.41 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /*
@@ -85,6 +85,14 @@ HB_EXTERN_BEGIN
 #define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x02000000 )
 #define HB_CLASS_OP_FOREACH         ( ( ULONG ) 0x04000000 )
 
+typedef struct
+{
+   USHORT   uiData;
+   USHORT   uiAt;
+   PHB_ITEM pInitValue;          /* Init Value for data */
+} CLSDINIT, * PCLSDINIT;
+
+
 #if defined( HB_LEGACY_LEVEL )
 typedef struct hb_class_method
 {
@@ -137,43 +145,35 @@ typedef struct hb_class_sync
 
 typedef struct
 {
-   USHORT   uiData;
-   USHORT   uiAt;
-   PHB_ITEM pInitValue;
-} CLSDINIT, * PCLSDINIT;
-
-typedef struct
-{
    PHB_DYNS pMessage;
    USHORT   uiAt;
 } METHDYN, * PMETHDYN;
 
 typedef struct
 {
-   char *   szName;         /* Class name */
-   USHORT   uiDatas;        /* Total Data Counter */
-   USHORT   uiDataFirst;    /* First uiData from this class */
-   PMETHOD  pMethods;
-   USHORT   uiMethods;      /* Total Method initialised Counter */
-   USHORT   uiReserved;
-   USHORT   uiDatasShared;  /* Total shared Class data within Class data */
-   USHORT   uiScope;
-   PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
-   PHB_ITEM pInlines;       /* Array for inline codeblocks */
-   PHB_FUNC pFunError;      /* error handler for not defined messages */
-   PMETHOD  pDestructor;    /* Destructor */
-   PHB_SYMB pClsSymbol;
-   ULONG    fOpOver;        /* Flags for Operators overload */
-   USHORT   uiDataInitiated;
-   USHORT   uiFriends;
-   USHORT   uiFriendFuncs;
+   char *   szName;           /* Class name */
+   PMETHOD  pMethods;         /* Class methods */
+   PHB_SYMB pClsSymbol;       /* Class function symbol */
+   PHB_SYMB pFriendModule;    /* Class friend symbols */
    PCLSDINIT pInitValues;
+   PHB_ITEM pClassDatas;      /* Harbour Array for ClassDatas and shared */
+   PHB_ITEM pMtxSync;         /* Class sync method mutex */
+   PHB_SYMB * pFriendSyms;    /* Friend functions' symbols */
+   USHORT   uiReserved;
+   USHORT   uiDatasShared;    /* Total shared Class data within Class data */
+   USHORT   uiScope;
+   PHB_ITEM pInlines;         /* Array for inline codeblocks */
+   PHB_FUNC pFunError;        /* error handler for not defined messages */
+   PMETHOD  pDestructor;      /* Destructor */
+   ULONG    fOpOver;          /* Flags for Operators overload */
+   USHORT   uiMethods;        /* Total Method initialised Counter */
+   USHORT   uiDataInitiated;
+   USHORT   uiDatas;          /* Total Data Counter */
+   USHORT   uiDataFirst;      /* First instance item from this class */
+   USHORT   uiFriendSyms;     /* Number of friend function's symbols */
+   USHORT   uiFriendModule;   /* Number of friend symbols in pFriendModule */
    PMETHDYN pMethDyn;
-   USHORT * pFriends;
-   PHB_SYMB * pFriendFuncs;
-   PHB_ITEM pMtxSync;
    BOOL     bActive;
-
 } CLASS, * PCLASS;
 
 extern HB_SYMB  hb_symDestructor;
@@ -206,9 +206,13 @@ extern void hb_clsFinalize( PHB_ITEM pObject );
 
 extern HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName );
 extern HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
-
-extern HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem );
 extern HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule );
+
+/* class management */
+HB_EXPORT extern const char * hb_clsName( USHORT uiClass );
+
+/* object management */
+HB_EXPORT extern USHORT     hb_objGetClass( PHB_ITEM pItem );      /* get object class handle */
 
 /* Harbour equivalent for Clipper internal __mdCreate() */
 USHORT hb_clsCreate( USHORT usSize, const char * szClassName );
