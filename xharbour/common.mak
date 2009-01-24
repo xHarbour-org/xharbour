@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.38 2009/01/17 15:22:29 fsgiudice Exp $
+# $Id: common.mak,v 1.39 2009/01/17 23:09:48 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1179,7 +1179,9 @@ DLL_MAIN_LIB_OBJS=\
 # HARBOUR.DLL Rules
 #===============================================================================
 HARBOUR_DLL_OBJS=\
-	$(RTL_LIB_OBJS)\
+        $(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT)\
+        \
+        $(RTL_LIB_OBJS)\
 	$(PCREPOS_LIB_OBJS)\
 	$(ZLIB_LIB_OBJS)\
 	$(LANG_LIB_OBJS)\
