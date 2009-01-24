@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6343 2009/01/24 00:33:07 likewolf Exp $
+ * $Id: ChangeLog,v 1.6344 2009/01/24 09:07:45 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-24 10:15 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/classes.c
+    * Typo in new hb_clsName()
+
+  * source/rtl/tclass.prg
+    * Avoid possible RTL
 
 2009-01-24 16:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/rtl/filesys.c
@@ -152,7 +159,7 @@
     *  add use of parameters nInternalAttr, nExternalAttr
        in function HB_ZIPFILECREATE()
        [ someone had forgotten ]
-       
+
 2009-01-18 23:47 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/vm/errorapi.c
     - Commented out unused variable s_symErrorNew

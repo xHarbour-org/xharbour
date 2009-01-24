@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.235 2009/01/17 20:54:27 andijahja Exp $
+ * $Id: classes.c,v 1.236 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -960,8 +960,8 @@ const char * hb_objGetClsName( PHB_ITEM pObject )
 
 const char * hb_clsName( USHORT uiClass )
 {
-   if( uiClass && uiClass <= s_uiClasses )
-      return s_pClasses[ uiClass ].szName;
+   if( uiClass && ( uiClass <= s_uiClasses ) )
+      return s_pClasses[ uiClass - 1 ].szName;
    else
       return NULL;
 }

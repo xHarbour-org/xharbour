@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.30 2008/08/03 00:58:30 walito Exp $
+ * $Id: tclass.prg,v 1.31 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,7 @@ STATIC PROCEDURE Create()
          ENDIF
 
          IF ahSuper[ HB_EnumIndex() ] == 0
-            Throw( ErrorNew( "TClass", 0, 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
+            Throw( ErrorNew( "TClass", 0, 1003, ProcName(), "Could not locate super: " , cDato ) )
          ENDIF
       NEXT
 
@@ -584,7 +584,7 @@ STATIC PROCEDURE DivertConstructorCall( ... )
    LOCAL lOldScope, nPos
 
    (nScope)
-   
+
    IF __SetClassAutoInit() //.AND. PCount() > 0
       // Set class scoping off
       lOldScope := __SetClassScope( .F. )
