@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.182 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: filesys.c,v 1.183 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -2015,6 +2015,7 @@ BOOL hb_fsSetDevMode( HB_FHANDLE hFileHandle, USHORT uiDevMode )
 
 BOOL hb_fsGetFileTime( BYTE * pszFileName, LONG * plJulian, LONG * plMillisec )
 {
+   HB_THREAD_STUB
    BOOL fResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsGetFileTime(%s, %p, %p)", pszFileName, plJulian, plMillisec));
@@ -2101,6 +2102,7 @@ BOOL hb_fsGetAttr( BYTE * pszFileName, ULONG * pulAttr )
 
 #if defined( HB_OS_WIN_32 )
    {
+      HB_THREAD_STUB
       DWORD dwAttr;
 
       HB_STACK_UNLOCK
@@ -2187,6 +2189,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
 
 #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
+      HB_THREAD_STUB
       HB_FHANDLE hFile = hb_fsOpen( pszFileName, FO_READWRITE | FO_SHARED );
 
       fResult = hFile != FS_ERROR;
@@ -2354,6 +2357,7 @@ BOOL hb_fsSetAttr( BYTE * pszFileName, ULONG ulAttr )
 
 #if defined( HB_OS_WIN_32 )
    {
+      HB_THREAD_STUB
       DWORD dwFlags = FILE_ATTRIBUTE_ARCHIVE;
 
       if( ulAttr & HB_FA_READONLY )

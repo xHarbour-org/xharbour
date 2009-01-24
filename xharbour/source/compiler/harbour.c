@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.212 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: harbour.c,v 1.213 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -63,6 +63,7 @@
 #include "hbset.h"
 #include "hbdate.h"
 #include "hbverbld.h"
+#include "hbapierr.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>

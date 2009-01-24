@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.10 2008/12/23 20:33:21 likewolf Exp $
+ * $Id: hbencode.c,v 1.11 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -531,7 +531,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
             fclose( outfile );
             filenumber ++;
             *cfile = '\0';
-            hb_snprintf( cfile, sizeof( cFile ), "%s%02d.b64", strOut, filenumber );
+            hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
             outfile = fopen ( cfile, "wb");
 
             if ( !outfile )
