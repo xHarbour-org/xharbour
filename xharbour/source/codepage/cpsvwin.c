@@ -1,5 +1,5 @@
 /*
- * $Id: cpsvwin.c,v 1.3 2008/08/14 09:04:14 andijahja Exp $
+ * $Id: cpsvwin.c,v 1.4 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 /* Language name: Swedish */
 /* ISO language code (2 chars): SV */
-/* Codepage: ISO-8859-1 */
+/* Codepage: Windows-1252 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -84,7 +84,7 @@
  */
 
 static HB_CODEPAGE s_codepage = { "SVWIN",
-    HB_CPID_8859_1,HB_UNITB_8859_1,NUMBER_OF_CHARACTERS,
+    HB_CPID_1252,HB_UNITB_1252,NUMBER_OF_CHARACTERS,
     "A~Á~À~Â~ÃBC~ÇD~ÐE~É~È~Ê~ËFGHI~Í~Ì~Î~ÏJKLMN~ÑO~Ó~Ò~Ô~ÕPQRSTU~Ú~Ù~ÛV~WXY~Ý~Ÿ~ÜZÅÄ~ÆÖ~Ø~Œ",
     "a~á~à~â~ãbc~çd~ðe~é~è~ê~ëfghi~í~ì~î~ïjklmn~ño~ó~ò~ô~õpqrstu~ú~ù~ûv~wxy~ý~ÿ~üzåä~æö~ø~œ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };

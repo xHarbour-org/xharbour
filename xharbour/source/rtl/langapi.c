@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.12 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: langapi.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ HB_LANG_REQUEST( HB_LANG_DEFAULT );
 
 /* NOTE: This is the maximum number of registered languages, later this can be
          made dynamic. */
-#define HB_LANG_MAX_ 64
+#define HB_LANG_MAX_ 128
 
 #define HB_LANG_ITEM_ID_ID         0
 #define HB_LANG_ITEM_ID_NAME       1

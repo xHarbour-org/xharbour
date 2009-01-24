@@ -1,14 +1,14 @@
 /*
- * $Id: cpes850.c,v 1.2 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpes850.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS 850 )
+ * National Collation Support Module (ES850 - Modern Spanish)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2008 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
+ * Spanish Windows support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@
  *
  */
 
-/* Language name: Spanish */
+/* Language name: Spanish (Modern)*/
 /* ISO language code (2 chars): ES */
 /* Codepage: 850 */
 
@@ -59,7 +59,7 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  43    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -75,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-    a~Ä
+      a~_
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,11 +84,11 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ES850", 
-   HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
-   "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", 
-   "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
-   IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
+static HB_CODEPAGE s_codepage = { "ES850",
+    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
+    "Aµ∑éBCÄDEê‘”FGHI÷ﬁÿJKLMN•O‡„ôPQRSTUÈÎöVWXYZ",
+    "a†ÖÑbcádeÇäâfghi°çãjklmn§o¢ïîpqrstu£óÅvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_INIT( ES850 )
 

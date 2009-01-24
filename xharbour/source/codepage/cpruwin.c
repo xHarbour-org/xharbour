@@ -1,5 +1,5 @@
 /*
- * $Id: cpruwin.c,v 1.7 2008/08/14 09:04:13 andijahja Exp $
+ * $Id: cpruwin.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -58,21 +58,21 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "RU1251",
+static HB_CODEPAGE s_codepage = { "RUWIN",
     HB_CPID_1251, HB_UNITB_1251, 36,
     "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß¨ª¯¡",
     "àáâãäåæçèéêëìíîïğñòóôõö÷øùúûüışÿ¸º¿¢",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_INIT( RU1251 )
+HB_CODEPAGE_INIT( RUWIN )
 
 #if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_RU1251
+   #pragma startup hb_codepage_Init_RUWIN
 #elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
    #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_RU1251 = hb_codepage_Init_RU1251;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_RUWIN = hb_codepage_Init_RUWIN;
    #pragma data_seg()
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: cpbgmik.c,v 1.3 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpbgmik.c,v 1.4 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 static HB_CODEPAGE s_codepage = { "BGMIK",
     HB_CPID_MIK, HB_UNITB_MIK, NUMBER_OF_CHARACTERS,
     "€‚ƒ„…†‡‰‹‘’“”•–—™›",
-    " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    " ΅Ά£¤¥¦§¨©ª«¬­®―°±²³΄µ¶·ΈΉΊ»Ό½ΎΏ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_INIT( BGMIK )

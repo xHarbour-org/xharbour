@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.26 2007/11/07 23:34:24 likewolf Exp $
+ * $Id: hbapicdp.h,v 1.27 2008/01/20 21:23:04 likewolf Exp $
  */
 
 /*
@@ -79,10 +79,10 @@ HB_EXTERN_BEGIN
 
 typedef struct _HB_UNITABLE
 {
-   char *   uniID;
-   int      nChars;
-   BOOL     lMulti;
-   USHORT * uniCodes;
+   const char *   uniID;
+   int            nChars;
+   BOOL           lMulti;
+   USHORT *       uniCodes;
 } HB_UNITABLE, * PHB_UNITABLE;
 
 typedef struct _HB_MULTICHAR
@@ -94,12 +94,12 @@ typedef struct _HB_MULTICHAR
 
 typedef struct _HB_CODEPAGE
 {
-   char *         id;
-   char *         uniID;
+   const char *   id;
+   const char *   uniID;
    PHB_UNITABLE   uniTable;
    int            nChars;
-   char *         CharsUpper;
-   char *         CharsLower;
+   const char *   CharsUpper;
+   const char *   CharsLower;
    BOOL           lLatin;
    BOOL           lAccEqual;
    BOOL           lAccInterleave;
@@ -115,41 +115,92 @@ typedef struct _HB_CODEPAGE
 
 #define HB_CPID_437        "cp437"
 #define HB_CPID_737        "cp737"
+#define HB_CPID_775        "cp775"
 #define HB_CPID_850        "cp850"
 #define HB_CPID_852        "cp852"
+#define HB_CPID_855        "cp855"
 #define HB_CPID_857        "cp857"
+#define HB_CPID_860        "cp860"
+#define HB_CPID_861        "cp861"
+#define HB_CPID_862        "cp862"
+#define HB_CPID_863        "cp863"
+#define HB_CPID_864        "cp864"
+#define HB_CPID_865        "cp865"
 #define HB_CPID_866        "cp866"
+#define HB_CPID_869        "cp869"
+#define HB_CPID_874        "cp874"
 #define HB_CPID_1250       "cp1250"
 #define HB_CPID_1251       "cp1251"
 #define HB_CPID_1252       "cp1252"
 #define HB_CPID_1253       "cp1253"
 #define HB_CPID_1254       "cp1254"
+#define HB_CPID_1255       "cp1255"
+#define HB_CPID_1256       "cp1256"
 #define HB_CPID_1257       "cp1257"
+#define HB_CPID_1258       "cp1258"
 #define HB_CPID_8859_1     "iso8859-1"
 #define HB_CPID_8859_1B    "iso8859-1b"
 #define HB_CPID_8859_2     "iso8859-2"
+#define HB_CPID_8859_3     "iso8859-3"
+#define HB_CPID_8859_4     "iso8859-4"
 #define HB_CPID_8859_5     "iso8859-5"
+#define HB_CPID_8859_6     "iso8859-6"
+#define HB_CPID_8859_7     "iso8859-7"
+#define HB_CPID_8859_8     "iso8859-8"
+#define HB_CPID_8859_9     "iso8859-9"
+#define HB_CPID_8859_10    "iso8859-10"
+#define HB_CPID_8859_11    "iso8859-11"
+#define HB_CPID_8859_13    "iso8859-13"
+#define HB_CPID_8859_14    "iso8859-14"
+#define HB_CPID_8859_15    "iso8859-15"
+#define HB_CPID_8859_16    "iso8859-16"
 #define HB_CPID_KOI_8      "koi-8"
 #define HB_CPID_KOI_8U     "koi-8u"
 #define HB_CPID_KAM        "kamenicky"
 #define HB_CPID_MAZ        "plmaz"
 #define HB_CPID_MIK        "bg-mik"
+
 #define HB_UNITB_437       &hb_uniTbl_437
 #define HB_UNITB_737       &hb_uniTbl_737
+#define HB_UNITB_775       &hb_uniTbl_775
 #define HB_UNITB_850       &hb_uniTbl_850
 #define HB_UNITB_852       &hb_uniTbl_852
+#define HB_UNITB_855       &hb_uniTbl_855
 #define HB_UNITB_857       &hb_uniTbl_857
+#define HB_UNITB_860       &hb_uniTbl_860
+#define HB_UNITB_861       &hb_uniTbl_861
+#define HB_UNITB_862       &hb_uniTbl_862
+#define HB_UNITB_863       &hb_uniTbl_863
+#define HB_UNITB_864       &hb_uniTbl_864
+#define HB_UNITB_865       &hb_uniTbl_865
 #define HB_UNITB_866       &hb_uniTbl_866
+#define HB_UNITB_869       &hb_uniTbl_869
+#define HB_UNITB_874       &hb_uniTbl_874
 #define HB_UNITB_1250      &hb_uniTbl_1250
 #define HB_UNITB_1251      &hb_uniTbl_1251
 #define HB_UNITB_1252      &hb_uniTbl_1252
 #define HB_UNITB_1253      &hb_uniTbl_1253
 #define HB_UNITB_1254      &hb_uniTbl_1254
+#define HB_UNITB_1255      &hb_uniTbl_1255
+#define HB_UNITB_1256      &hb_uniTbl_1256
 #define HB_UNITB_1257      &hb_uniTbl_1257
+#define HB_UNITB_1258      &hb_uniTbl_1258
 #define HB_UNITB_8859_1    &hb_uniTbl_8859_1
 #define HB_UNITB_8859_1B   &hb_uniTbl_8859_1b
 #define HB_UNITB_8859_2    &hb_uniTbl_8859_2
+#define HB_UNITB_8859_3    &hb_uniTbl_8859_3 
+#define HB_UNITB_8859_4    &hb_uniTbl_8859_4 
 #define HB_UNITB_8859_5    &hb_uniTbl_8859_5
+#define HB_UNITB_8859_6    &hb_uniTbl_8859_6 
+#define HB_UNITB_8859_7    &hb_uniTbl_8859_7 
+#define HB_UNITB_8859_8    &hb_uniTbl_8859_8 
+#define HB_UNITB_8859_9    &hb_uniTbl_8859_9 
+#define HB_UNITB_8859_10   &hb_uniTbl_8859_10
+#define HB_UNITB_8859_11   &hb_uniTbl_8859_11
+#define HB_UNITB_8859_13   &hb_uniTbl_8859_13
+#define HB_UNITB_8859_14   &hb_uniTbl_8859_14
+#define HB_UNITB_8859_15   &hb_uniTbl_8859_15
+#define HB_UNITB_8859_16   &hb_uniTbl_8859_16
 #define HB_UNITB_KOI_8     &hb_uniTbl_KOI_8
 #define HB_UNITB_KOI_8U    &hb_uniTbl_KOI_8U
 #define HB_UNITB_KAM       &hb_uniTbl_kamenicky
@@ -159,20 +210,45 @@ typedef struct _HB_CODEPAGE
 
 extern HB_UNITABLE hb_uniTbl_437;
 extern HB_UNITABLE hb_uniTbl_737;
+extern HB_UNITABLE hb_uniTbl_775;
 extern HB_UNITABLE hb_uniTbl_850;
 extern HB_UNITABLE hb_uniTbl_852;
+extern HB_UNITABLE hb_uniTbl_855;
 extern HB_UNITABLE hb_uniTbl_857;
+extern HB_UNITABLE hb_uniTbl_860;
+extern HB_UNITABLE hb_uniTbl_861;
+extern HB_UNITABLE hb_uniTbl_862;
+extern HB_UNITABLE hb_uniTbl_863;
+extern HB_UNITABLE hb_uniTbl_864;
+extern HB_UNITABLE hb_uniTbl_865;
 extern HB_UNITABLE hb_uniTbl_866;
+extern HB_UNITABLE hb_uniTbl_869;
+extern HB_UNITABLE hb_uniTbl_874;
 extern HB_UNITABLE hb_uniTbl_1250;
 extern HB_UNITABLE hb_uniTbl_1251;
 extern HB_UNITABLE hb_uniTbl_1252;
 extern HB_UNITABLE hb_uniTbl_1253;
 extern HB_UNITABLE hb_uniTbl_1254;
+extern HB_UNITABLE hb_uniTbl_1255;
+extern HB_UNITABLE hb_uniTbl_1256;
 extern HB_UNITABLE hb_uniTbl_1257;
+extern HB_UNITABLE hb_uniTbl_1258;
 extern HB_UNITABLE hb_uniTbl_8859_1;
 extern HB_UNITABLE hb_uniTbl_8859_1b;
 extern HB_UNITABLE hb_uniTbl_8859_2;
+extern HB_UNITABLE hb_uniTbl_8859_3;
+extern HB_UNITABLE hb_uniTbl_8859_4;
 extern HB_UNITABLE hb_uniTbl_8859_5;
+extern HB_UNITABLE hb_uniTbl_8859_6;
+extern HB_UNITABLE hb_uniTbl_8859_7;
+extern HB_UNITABLE hb_uniTbl_8859_8;
+extern HB_UNITABLE hb_uniTbl_8859_9;
+extern HB_UNITABLE hb_uniTbl_8859_10;
+extern HB_UNITABLE hb_uniTbl_8859_11;
+extern HB_UNITABLE hb_uniTbl_8859_13;
+extern HB_UNITABLE hb_uniTbl_8859_14;
+extern HB_UNITABLE hb_uniTbl_8859_15;
+extern HB_UNITABLE hb_uniTbl_8859_16;
 extern HB_UNITABLE hb_uniTbl_KOI_8;
 extern HB_UNITABLE hb_uniTbl_KOI_8U;
 extern HB_UNITABLE hb_uniTbl_kamenicky;
@@ -189,7 +265,7 @@ extern HB_EXPORT int           hb_cdpcmp( const char *, ULONG, const char *, ULO
 extern HB_EXPORT int           hb_cdpicmp( const char *, ULONG, const char *, ULONG, PHB_CODEPAGE, BOOL );
 extern HB_EXPORT int           hb_cdpchrcmp( char, char, PHB_CODEPAGE );
 extern HB_EXPORT void          hb_cdpReleaseAll( void );
-       
+
 extern HB_EXPORT USHORT        hb_cdpGetU16( PHB_CODEPAGE, BOOL, BYTE );
 extern HB_EXPORT UCHAR         hb_cdpGetChar( PHB_CODEPAGE, BOOL, USHORT );
 extern HB_EXPORT BOOL          hb_cdpGetFromUTF8( PHB_CODEPAGE, BOOL, BYTE, int *, USHORT * );

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.39 2009/01/17 23:09:48 ronpinkas Exp $
+# $Id: common.mak,v 1.40 2009/01/24 15:51:04 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -855,21 +855,43 @@ TIP_LIB_OBJS=\
 # CODEPAGE.LIB rules
 #===============================================================================
 CODEPAGE_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)cpbg866$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpbgiso$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpbgmik$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpbgwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpcs852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpcsiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpcskam$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpcswin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpde850$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpdeiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpdewin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpel737$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpelwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpes850$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpesmwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpes850c$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpesiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpesisoc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpeswin$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cphr1250$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpeswinc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpeswinm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpfr850$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpfriso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpfrwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cphr437$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cphr852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cphrwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cphu852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cphu852s$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cphuiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cphuisos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cphuwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cphuwins$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpit437$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpit850$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpitisb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpitiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpitwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpltwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cppl852$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cppliso$(OBJEXT)\
@@ -877,62 +899,76 @@ CODEPAGE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)cpplwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cppt850$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpptiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpro852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cproiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cprowin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpru866$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpruiso$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cprukoi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpruwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpsk852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpskiso$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpskkam$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpskwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpsl437$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsl852$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsliso$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpslwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsrwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsv850$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsvclip$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpsviso$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpsvwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cptr857$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpua866$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpuakoi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1250$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1251$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1252$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1253$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1254$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1255$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1256$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1257$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1258$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc737$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc775$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc850$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc855$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc857$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc860$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc861$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc862$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc863$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc864$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc865$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc866$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc869$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc874$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc8859_1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)uc8859_2$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc88591b$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_3$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_4$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_5$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_6$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_7$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_8$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc8859_9$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885910$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885911$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885913$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885914$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885915$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc885916$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uckam$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uckoi8$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uckoi8u$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ucmaz$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpbg866$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpbgiso$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpcs852$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpcsiso$(OBJEXT)  \
-	$(OBJ_DIR)$(DIR_SEP)cpcskam$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpcswin$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cphu852s$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cphuiso$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cphuisos$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cphuwins$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpsk852$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpskiso$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpskkam$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpskwin$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpsl437$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpde850$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpdeiso$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpel737$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpfr850$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cptr857$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpruiso$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cpdewin$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)uc1252$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)uc857$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)uc8859_5$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)uckam$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ucmik$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)ucmik$(OBJEXT)\
 
 #===============================================================================
 # CT.LIB rules

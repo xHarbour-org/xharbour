@@ -1,10 +1,10 @@
 /*
- * $Id: uc857.c,v 1.1 2007/01/09 22:05:22 druzus Exp $
+ * $Id: uc857.c,v 1.2 2007/11/07 23:34:27 likewolf Exp $
  */
 
 /*
  * xHarbour Project source code:
- * 
+ * IBM857 <-> Unicode conversion table
  *
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
  * www - http://www.xharbour.org
@@ -55,7 +55,8 @@
 
 #define NUMBER_OF_CHARS    256
 
-static USHORT uniCodes[NUMBER_OF_CHARS] = {
+static USHORT uniCodes[ NUMBER_OF_CHARS ] =
+{
    0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
    0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
    0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,

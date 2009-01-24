@@ -1,5 +1,5 @@
 /*
- * $Id: cpskkam.c,v 1.2 2008/08/14 09:04:13 andijahja Exp $
+ * $Id: cpskkam.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ static HB_CODEPAGE s_codepage = { "SKKAM",
     "a~†~Ñbcád~É.dz..dë.e~Çfgh.ch.i~°jkl~ç~åmn~§o~¢~ìpqr~™s®t~üu~£vwxy~òzë",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( SKKAM );
+HB_CODEPAGE_INIT( SKKAM )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_SKKAM

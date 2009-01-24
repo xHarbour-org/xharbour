@@ -1,10 +1,11 @@
 /*
- * $Id: cpesmwin.c,v 1.7 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpesmwin.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish Modern WIN )
+ * National Collation Support Module (ESMWIN - Modern Spanish)
+ * (COMPATIBILITY - Use ESWIN or ESISO instead.)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org

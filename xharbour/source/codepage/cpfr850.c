@@ -1,10 +1,10 @@
 /*
- * $Id: cpfr850.c,v 1.2 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpfr850.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( French MS-DOS 850 )
+ * National Collation Support Module (French MS-DOS 850)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
@@ -65,7 +65,7 @@
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         1    /* Should be 1, if accented character
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
@@ -87,8 +87,8 @@
 
 static HB_CODEPAGE s_codepage = { "FR850",
     HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
-    "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ",
-    "a†ÖÉÑbcdeÇäàâfghi°çåãjklmno¢ïìîpqrstu£óñÅvwxyz",
+    "A~µ~∑~∂~éBCDE~ê~‘~“~”FGHI~÷~ﬁ~◊~ÿJKLMNO~‡~„~‚~ôPQRSTU~È~Î~Í~öVWXYZ",
+    "a~†~Ö~É~Ñbcde~Ç~ä~à~âfghi~°~ç~å~ãjklmno~¢~ï~ì~îpqrstu~£~ó~ñ~Åvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_INIT( FR850 )

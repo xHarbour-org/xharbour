@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.39 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: cdpapi.c,v 1.40 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -57,22 +57,25 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 
-#   include "hbapiitm.h"
-#   include "hbapicdp.h"
-#   include "hbapierr.h"
+#include "hbapiitm.h"
+#include "hbapicdp.h"
+#include "hbapierr.h"
 
-    /* Now we are using only 16bit Unicode values so the maximum size
-     * of single character encoded in UTF8 is 3 though ISO 10646 Universal
-     * Character Set (UCS) occupies even a 31-bit code space and to encode
-     * all UCS values we will need 6 bytes. Now in practice no one uses
-     * Unicode character over 0xFFFF but it may change in the future so
-     * it's safer to use macro for maximum UTF8 character size. [druzus]
-     */
-#   define HB_MAX_UTF8        3
+#define HB_CDP_MAX_  128
 
-#   define NUMBER_OF_CHARS    256
+/* Now we are using only 16bit Unicode values so the maximum size
+ * of single character encoded in UTF8 is 3 though ISO 10646 Universal
+ * Character Set (UCS) occupies even a 31-bit code space and to encode
+ * all UCS values we will need 6 bytes. Now in practice no one uses
+ * Unicode character over 0xFFFF but it may change in the future so
+ * it's safer to use macro for maximum UTF8 character size. [druzus]
+ */
+#define HB_MAX_UTF8        3
 
-static USHORT s_uniCodes[NUMBER_OF_CHARS] = {
+#define NUMBER_OF_CHARS    256
+
+static USHORT s_uniCodes[ NUMBER_OF_CHARS ] =
+{
    0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
    0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
    0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
@@ -104,7 +107,7 @@ static USHORT s_uniCodes[NUMBER_OF_CHARS] = {
    0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4,
    0x03A6, 0x0398, 0x03A9, 0x03B4, 0x221E, 0x03C6, 0x03B5, 0x2229,
    0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248,
-   0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,
+   0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0
 };
 
 HB_UNITABLE hb_uniTbl_437 = { HB_CPID_437, NUMBER_OF_CHARS, FALSE, s_uniCodes };
@@ -112,7 +115,7 @@ HB_UNITABLE hb_uniTbl_437 = { HB_CPID_437, NUMBER_OF_CHARS, FALSE, s_uniCodes };
 static HB_CODEPAGE s_en_codepage =
    { "EN", HB_CPID_437, HB_UNITB_437, 0, NULL, NULL, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-#   define HB_CDP_MAX_ 64
+HB_CODEPAGE_ANNOUNCE( EN )
 
 static PHB_CODEPAGE s_cdpList[HB_CDP_MAX_] = { &s_en_codepage };
 PHB_CODEPAGE hb_cdp_page = &s_en_codepage;
@@ -476,12 +479,13 @@ PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
    return cdpOld;
 }
 
-char *hb_cdpSelectID( const char *pszID )
+char * hb_cdpSelectID( const char *pszID )
 {
-   char *pszIDOld = hb_cdp_page->id;
+   char *pszIDOld;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_cdpSelectID(%s)", pszID ) );
 
+   pszIDOld = hb_cdp_page->id;
    hb_cdpSelect( hb_cdpFind( pszID ) );
 
    return pszIDOld;

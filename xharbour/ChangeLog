@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6345 2009/01/24 14:49:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6346 2009/01/24 15:51:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,141 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-24 19:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/codepage/cpbgmik.c
+    ! Fixed BGMIK collation encoding. Someone familiar with
+      BG CPs please confirm this, but previously it was
+      almost certainly broken, as the collation was identical
+      to BG866.
+  * source/codepage/cpcs852.c
+  * source/codepage/cpcsiso.c
+  * source/codepage/cpcswin.c
+  * source/codepage/cpcskam.c
+  * source/codepage/cpsk852.c
+  * source/codepage/cpskiso.c
+  * source/codepage/cpskwin.c
+  * source/codepage/cpskkam.c
+    * Removed unnecessary ending ';'
+  * include/hbapicdp.h
+  - source/codepage/cpes850.c
+  + source/codepage/cpes850c.c
+  + source/codepage/cpes850.c
+  - source/codepage/cpeswin.c
+  + source/codepage/cpeswinc.c
+  + source/codepage/cpeswin.c
+  + source/codepage/cpesiso.c
+  + source/codepage/cpesisoc.c
+  - source/codepage/cpesmwin.c
+  + source/codepage/cpeswinm.c
+     * Spanish language support cleaned:
+       Modern collation made the default, fixed
+       CP linkage in ESWIN collations, Clipper
+       compatibility versions renamed to have an
+       ending 'C'
+       Now the following collations are supported:
+       ES850C - Clipper compatibility CP: IBM850
+       ESWINC - Clipper compatibility CP: Windows-1252
+       ESISOC - Clipper compatibility CP: ISO-8859-1
+       ES850  - Modern CP: IBM850
+       ESWIN  - Modern CP: Windows-1252
+       ESISO  - Modern CP: ISO-8859-1
+       ESMWIN - Compatibility with previous Harbour versions and xhb.
+                (this collation has wrong CP linkage, so everyone is
+                encouraged to use ESWIN or ESISO instead.)
+                Intentionally not added to hbextern.ch.
+     ; TODO: Check whether Clipper compatibility is indeed true.
+  * source/codepage/cpfr850.c
+    ! Uppercase and accented characters collation cleaned up.
+  + source/codepage/cpfriso.c
+  + source/codepage/cpfrwin.c
+    + Added new French CPs.
+  + source/codepage/cpro852.c
+  + source/codepage/cproiso.c
+  + source/codepage/cprowin.c
+    + Added Romanian codepages.
+  + source/codepage/cpitwin.c
+    + Added ITWIN. Same as ITISO, with a different attached CP
+      and name.
+  * source/codepage/cpsvwin.c
+    ! Changed internal CP to Windows-1252 from ISO-8859-1,
+      so that it's in sync with its name.
+  + source/codepage/cpsviso.c
+    + Added SVISO, which is the same as SVWIN, except it's
+      internally using ISO-8859-1 CP in sync with its name.
+  * source/codepage/cpuakoi.c
+    ! Fixed CP reference to point to KOI8-U instead of KOI8.
+      Reasons: 1) KOI8-U was used in the _comment_.
+               2) Ukrainian quasi standard is KOI8-U instead of KOI8.
+                  http://aspell.net/charsets/cyrillic.html
+               3) CP KOI8-U wasn't used previously anywhere, yet
+                  was added by same author.
+      I hope the author (Pavel Tsarenko) will be able to verify
+      this change.
+  + source/codepage/uc1255.c
+  + source/codepage/uc1256.c
+  + source/codepage/uc1258.c
+  + source/codepage/uc775.c
+  + source/codepage/uc855.c
+  + source/codepage/uc860.c
+  + source/codepage/uc861.c
+  + source/codepage/uc862.c
+  + source/codepage/uc863.c
+  + source/codepage/uc864.c
+  + source/codepage/uc865.c
+  + source/codepage/uc869.c
+  + source/codepage/uc874.c
+    + Added missing IBM/Windows codepages.
+  + source/codepage/uc8859_3.c
+  + source/codepage/uc8859_4.c
+  + source/codepage/uc8859_6.c
+  + source/codepage/uc8859_7.c
+  + source/codepage/uc8859_8.c
+  + source/codepage/uc8859_9.c
+  + source/codepage/uc885910.c
+  + source/codepage/uc885911.c
+  + source/codepage/uc885913.c
+  + source/codepage/uc885914.c
+  + source/codepage/uc885915.c
+  + source/codepage/uc885916.c
+    + Added remaining ISO 8859 codepages.
+      0x00-0x1F chars are unstandard (following existing files).
+  * source/codepage/uc1250.c
+  * source/codepage/uc1251.c
+  * source/codepage/uc1252.c
+  * source/codepage/uc1253.c
+  * source/codepage/uc1254.c
+  * source/codepage/uc1257.c
+  * source/codepage/uc737.c
+  * source/codepage/uc850.c
+  * source/codepage/uc852.c
+  * source/codepage/uc857.c
+  * source/codepage/uc866.c
+  * source/codepage/uc8859_1.c
+  * source/codepage/uc8859_2.c
+  * source/codepage/uc8859_5.c
+  * source/codepage/uc88591b.c
+  * source/codepage/uckam.c
+  * source/codepage/uckoi8.c
+  * source/codepage/uckoi8u.c
+  * source/codepage/ucmaz.c
+  * source/codepage/ucmik.c
+    * Formatting and comments.
+  (by Viktor Szakats, borrowed from Harbour)
+  * source/rtl/cdpapi.c
+  * source/rtl/langapi.c
+    * increase maximum number of lang and codepage modules from 64 to 128
+      (we already have more then 64)
+    (by Przemyslaw Czerpak, borrowed from Harbour) 
+  - source/codepage/cphr1250.c
+  + source/codepage/cphrwin.c
+  * source/codepage/cpruwin.c
+    * Renamed HR1250 to HRWIN, RU1251 to RUWIN.
+  * common.mak
+  * compile.mak
+  * source/codepage/Makefile
+  * include/hbextern.ch
+    * Updated for modifications above.
 
 2009-01-24 11:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * common.mak

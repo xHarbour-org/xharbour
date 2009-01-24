@@ -1,16 +1,14 @@
 /*
- * $Id: cphr1250.c,v 1.7 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpeswin.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( HR1250 )
+ * National Collation Support Module (ESISOC - Spanish Clipper compatible)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2008 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
- * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
- * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
- * 2006 Alen Uzelac <alen@bbm.hr> Croatian codepage corrected
+ * Spanish support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,15 +51,15 @@
  *
  */
 
-/* Language name: Croatien */
-/* ISO language code (2 chars): HR */
-/* Codepage: 1250 */
+/* Language name: Spanish */
+/* ISO language code (2 chars): ES */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -77,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~€
+      a~_
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -86,22 +84,21 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "HR1250",
-    HB_CPID_1250,HB_UNITB_1250,NUMBER_OF_CHARACTERS,
-    "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWXYZŽ",
-    "abcèædðefghijklmnopqrsštuvwxyzž",
+static HB_CODEPAGE s_codepage = { "ESISOC",
+    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    "AÁBCDEÉFGHIÍJKLMNÑOÓPQRSTUÚÜVWXYZ",
+    "aábcdeéfghiíjklmnñoópqrstuúüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( HR1250 )
+HB_CODEPAGE_INIT( ESISOC )
 
 #if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_HR1250
+   #pragma startup hb_codepage_Init_ESISOC
 #elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
    #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HR1250 = hb_codepage_Init_HR1250;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ESISOC = hb_codepage_Init_ESISOC;
    #pragma data_seg()
 #endif
-

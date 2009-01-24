@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.35 2009/01/16 01:56:00 likewolf Exp $
+# $Id: compile.mak,v 1.36 2009/01/17 15:22:29 fsgiudice Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2089,10 +2089,40 @@ $(OBJ_DIR)$(DIR_SEP)ssf$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtalleg$(DIR_SEP)ssf.c
 #===============================================================================
 # CODEPAGE.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)cpbg866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbg866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpbgiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbgiso.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cpbgmik$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbgmik.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpbgwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbgwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpcs852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcs852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpcsiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcsiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpcskam$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcskam.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpcswin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcswin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpde850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpde850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpdeiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpdeiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpdewin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpdewin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpel737$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpel737.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpelwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpelwin.c
@@ -2101,13 +2131,31 @@ $(OBJ_DIR)$(DIR_SEP)cpelwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpelwin.c
 $(OBJ_DIR)$(DIR_SEP)cpes850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpes850.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpesmwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpesmwin.c
+$(OBJ_DIR)$(DIR_SEP)cpes850c$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpes850c.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpesiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpesiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpesisoc$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpesisoc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpeswin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpeswin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cphr1250$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphr1250.c
+$(OBJ_DIR)$(DIR_SEP)cpeswinc$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpeswinc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpeswinm$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpeswinm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpfr850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpfr850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpfriso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpfriso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpfrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpfrwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cphr437$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphr437.c
@@ -2116,10 +2164,25 @@ $(OBJ_DIR)$(DIR_SEP)cphr437$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphr437.c
 $(OBJ_DIR)$(DIR_SEP)cphr852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphr852.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)cphrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphrwin.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cphu852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphu852.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)cphu852s$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphu852s.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cphuiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cphuisos$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuisos.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cphuwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cphuwins$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuwins.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpit437$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpit437.c
@@ -2132,6 +2195,9 @@ $(OBJ_DIR)$(DIR_SEP)cpitisb$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpitisb.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpitiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpitiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpitwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpitwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpltwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpltwin.c
@@ -2155,115 +2221,25 @@ $(OBJ_DIR)$(DIR_SEP)cppt850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cppt850.c
 $(OBJ_DIR)$(DIR_SEP)cpptiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpptiso.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)cpro852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpro852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cproiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cproiso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cprowin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cprowin.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cpru866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpru866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpruiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpruiso.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cprukoi$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cprukoi.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpruwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpruwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpsl852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsl852.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpslwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpslwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpsrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsrwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpsv850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsv850.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpsvclip$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsvclip.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpsvwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsvwin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpua866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpua866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuawin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpuakoi$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuakoi.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc1250$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1250.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc1251$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1251.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc1253$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1253.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc1254$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1254.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc1257$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1257.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc737$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc737.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc850.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc852.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc8859_1$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_1.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc8859_2$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_2.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uc88591b$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc88591b.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uckoi8$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uckoi8.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)uckoi8u$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uckoi8u.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)ucmaz$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmaz.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpbg866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbg866.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpbgiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpbgiso.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpcs852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcs852.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpcsiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcsiso.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpcskam$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcskam.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cpcswin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpcswin.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cphu852s$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphu852s.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cphuiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuiso.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cphuisos$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuisos.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cphuwins$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cphuwins.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpsk852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsk852.c
@@ -2281,43 +2257,175 @@ $(OBJ_DIR)$(DIR_SEP)cpskwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpskwin.c
 $(OBJ_DIR)$(DIR_SEP)cpsl437$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsl437.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)cpsl852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsl852.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cpsliso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsliso.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cptrwin.c
+$(OBJ_DIR)$(DIR_SEP)cpslwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpslwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpde850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpde850.c
+$(OBJ_DIR)$(DIR_SEP)cpsrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsrwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpdeiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpdeiso.c
+$(OBJ_DIR)$(DIR_SEP)cpsv850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsv850.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpel737$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpel737.c
+$(OBJ_DIR)$(DIR_SEP)cpsvclip$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsvclip.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpfr850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpfr850.c
+$(OBJ_DIR)$(DIR_SEP)cpsviso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsviso.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpsvwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpsvwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cptr857$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cptr857.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpruiso$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpruiso.c
+$(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cptrwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cpdewin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpdewin.c
+$(OBJ_DIR)$(DIR_SEP)cpua866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpua866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpuakoi$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuakoi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuawin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1250$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1250.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1251$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1251.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)uc1252$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1252.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)uc1253$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1253.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1254$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1254.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1255$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1255.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1256$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1256.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1257$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1257.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1258$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1258.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc737$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc737.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc775$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc775.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc850$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc850.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc852$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc855$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc855.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)uc857$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc857.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc860$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc860.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc861$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc861.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc862$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc862.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc863$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc863.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc864$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc864.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc865$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc865.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc869$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc869.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc874$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc874.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_1$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc88591b$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc88591b.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_2$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_3$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_3.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_4$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_4.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)uc8859_5$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_5.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)uc8859_6$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_6.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_7$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_7.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_8$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_8.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc8859_9$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc8859_9.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885910$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885910.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885911$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885911.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885913$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885913.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885914$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885914.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885915$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885915.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc885916$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc885916.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)uckam$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uckam.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uckoi8$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uckoi8.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uckoi8u$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uckoi8u.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmaz$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmaz.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)ucmik$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmik.c

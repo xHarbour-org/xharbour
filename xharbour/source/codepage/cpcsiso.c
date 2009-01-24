@@ -1,5 +1,5 @@
 /*
- * $Id: cpcsiso.c,v 1.2 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpcsiso.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ static HB_CODEPAGE s_codepage = { "CSISO",
     "a~á~äbcèd~ïe~é~ì~ëfgh.ch.i~íjklmn~òo~ó~öpqrøs¹t~»u~ú~ù~üvwxy~ýz¾",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( CSISO );
+HB_CODEPAGE_INIT( CSISO )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_CSISO
