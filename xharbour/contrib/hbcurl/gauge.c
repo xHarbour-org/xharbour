@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.6 2005/06/13 02:02:49 peterrees Exp $
+ * $Id: gauge.c,v 1.1 2005/10/18 23:34:24 lculik Exp $
  */
 
 /*
@@ -182,8 +182,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
 
    if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
    {
-//    sprintf( szPct, "%3.0f\%", fPercent * 100 );
-      sprintf( szPct, "%3.0f%%", fPercent * 100 );
+      hb_snprintf( szPct, sizeof( szPct ), "%3.0f%%", fPercent * 100 );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
                     (USHORT) iCenter + 2, (BYTE *) szPct, 4, TRUE );
    }

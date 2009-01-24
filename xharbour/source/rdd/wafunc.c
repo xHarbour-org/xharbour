@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.15 2008/11/05 03:03:16 walito Exp $
+ * $Id: wafunc.c,v 1.16 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK *pstack )
    else
    {
       char szNewName[270];
-      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymGet( szNewName );
    }
 }
@@ -85,7 +85,7 @@ PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK *pstack )
    else
    {
       char szNewName[270];
-      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymFindName( szNewName );
    }
 }
@@ -187,7 +187,7 @@ ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 
    for( i = 1; i < 1000; i++ )
    {
-      snprintf( szAliasTmp, 11, "__HBTMP%03i", i);
+      hb_snprintf( szAliasTmp, 11, "__HBTMP%03i", i);
       if( hb_rddGetAliasNumber( szAliasTmp, &iArea ) != SUCCESS )
          return SUCCESS;
    }

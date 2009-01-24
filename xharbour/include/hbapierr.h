@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.16 2008/06/27 06:21:48 ronpinkas Exp $
+ * $Id: hbapierr.h,v 1.17 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -96,6 +96,8 @@ HB_EXTERN_BEGIN
 #define HB_ERR_ARGS_BASEPARAMS          0xFFFFFFFF
 #define HB_ERR_ARGS_SELFPARAMS          0xFFFFFFFE
 
+#ifndef HB_COMP_H_
+
 /* pseudo function name in operation description
    (deprecated, kept for compatibility, use HB_ERR_FUNCNAME instead) */
 extern const char hb_errFuncName;
@@ -103,7 +105,6 @@ extern const char hb_errFuncName;
 #define HB_ERR_FUNCNAME                 ( ( const char * ) ( HB_PTRDIFF ) 1 )
 
 /* Standard API */
-
 extern PHB_ITEM hb_errGetCargo          ( PHB_ITEM pError );
 extern PHB_ITEM hb_errGetArgs           ( PHB_ITEM pError );
 extern HB_EXPORT char     * hb_errGetDescription    ( PHB_ITEM pError );
@@ -187,8 +188,6 @@ extern HB_EXPORT USHORT    hb_errRT_DBCMD       ( ULONG ulGenCode, ULONG ulSubCo
 extern HB_EXPORT USHORT    hb_errRT_DBCMD_Ext   ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags );
 extern HB_EXPORT USHORT    hb_errRT_TOOLS       ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
 
-extern HB_EXPORT void      hb_errInternal       ( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 );
-
 /* Low-level error handling */
 struct HB_ERROR_INFO_;   /* forward declaration */
 #define HB_ERROR_HANDLE( hbfunc )   HB_ITEM_PTR hbfunc( struct HB_ERROR_INFO_ * ErrorInfo )
@@ -209,6 +208,10 @@ extern HB_EXPORT HB_ERROR_INFO_PTR  hb_errorHandler( HB_ERROR_INFO_PTR pNewHandl
 
 /* current errorblock item */
 extern HB_EXPORT PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock );
+
+#endif /* HB _COMP_H_ */
+
+extern HB_EXPORT void      hb_errInternal       ( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 ) HB_NORETURN_ATTR;
 
 HB_EXTERN_END
 

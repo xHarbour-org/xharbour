@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.156 2009/01/08 20:28:04 likewolf Exp $
+ * $Id: itemapi.c,v 1.157 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -1748,12 +1748,12 @@ BOOL hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int iDec )
 #endif
 
    /* I would like to know why finite() function is not used for MinGW instead
-      of this hack with snprintf and "#IND" if there are some important reasons
+      of this hack with hb_snprintf and "#IND" if there are some important reasons
       for the code below reenable it and please add description WHY? [druzus] */
    /*
    #elif defined(__MINGW32__)
       || dNumber == s_dInfinity || dNumber == -s_dInfinity ||
-         ( snprintf( szResult, iSize + 1, "%f", dNumber ) > 0 && strstr( szResult, "#IND" ) )
+         ( hb_snprintf( szResult, iSize + 1, "%f", dNumber ) > 0 && strstr( szResult, "#IND" ) )
    */
 
       if( pNumber->item.asDouble.length == 99 || !HB_FINITE_DBL( dNumber ) )
@@ -2185,8 +2185,7 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          buffer = ( char * ) hb_xgrab( size );
          do
          {
-            n =  snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
-
+            n = hb_snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
             if( (n > -1) && (n < size) )
             {
                bFail = FALSE;

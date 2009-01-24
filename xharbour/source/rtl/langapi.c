@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.11 2008/03/27 10:26:47 likewolf Exp $
+ * $Id: langapi.c,v 1.12 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ char * hb_langName( void )
    char * pszName = ( char * ) hb_xgrab( 128 );
 
    if( s_lang )
-      sprintf( pszName, "Harbour Language: %s %s (%s)",
+      hb_snprintf( pszName, 128, "Harbour Language: %s %s (%s)",
          ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_ID ),
          ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAME ),
          ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAMENAT ) );

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.159 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: harbour.sly,v 1.160 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -739,7 +739,7 @@ LineStat   : Crlf          { $<lNumber>$ = 0; }
            | Line          { $<lNumber>$ = 0; }
            | Statement     { $<lNumber>$ = 1; }
            | Declaration   { $<lNumber>$ = 1; }
-           | ControlError  { char LineAsString[32]; sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
+           | ControlError  { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
            ;
 
 ControlError : FunScope2 FUNCTION  IdentName Params Crlf {}
@@ -2480,7 +2480,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                    pClass = NULL;
                  }
 
-                 sprintf( szSetData, "_%s", $1 );
+                 hb_snprintf( szSetData, strlen( $1 ) + 2, "_%s", $1 );
 
                  hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, szSetData );
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
@@ -2563,7 +2563,7 @@ IfBegin    : IF Expression {
                            }
              Crlf
                            {
-                              hb_compExprDelete( hb_compExprGenPush( $2 ) ); $$ = hb_compGenJumpFalse( 0 );
+                              hb_compExprDelete( hb_compExprGenPush( $2 ) ); $<iNumber>$ = hb_compGenJumpFalse( 0 );
                            }
              EmptyStats
                            { $$ = hb_compGenJump( 0 ); hb_compGenJumpHere( $<iNumber>5 ); }
@@ -3684,7 +3684,7 @@ void yyerror( char * s )
          {
             char LineAsString[32];
 
-            sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 );
+            hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
          }
          else
@@ -3731,7 +3731,7 @@ void yyerror( char * s )
             else
             {
                char LineAsString[32];
-               sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 );
+               hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
                hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
             }
          }

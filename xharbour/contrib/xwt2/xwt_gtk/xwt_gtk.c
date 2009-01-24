@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.3 2004/05/20 15:41:38 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.4 2004/12/01 00:50:26 peterrees Exp $
 
    Global declarations, common functions
 
@@ -261,7 +261,7 @@ XWT_MODULE_ANNOUNCE( GTK );
 
 HB_CALL_ON_STARTUP_BEGIN( _xwt_register_gtk )
 
-   sprintf( s_gtkDriver.name, "gtk" );
+   hb_snprintf( s_gtkDriver.name, sizeof( s_gtkDriver.name ), "gtk" );
    s_gtkDriver.init = xwt_gtk_init;
    s_gtkDriver.quit = xwt_gtk_quit;
    s_gtkDriver.process_events = xwt_gtk_process_events;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.34 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: hbstr.c,v 1.35 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -1028,6 +1028,41 @@ char * hb_strRemEscSeq( char *str, ULONG *pLen )
    }
 
    return str;
+}
+
+#undef _HB_SNPRINTF_ADD_EOS
+#undef hb_snprintf
+/* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
+ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
+{
+   va_list arglist;
+   ULONG result;
+
+   va_start( arglist, format );
+
+#if defined( __DJGPP__ ) && ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
+   /* Use vsprintf() for DJGPP <= 2.03.
+      This is a temporary hack, should implement a C99 snprintf() ourselves. */
+   result = vsprintf( buffer, format, arglist );
+#elif defined( _MSC_VER ) && _MSC_VER >= 1400
+   result = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
+#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && !defined( __XCC__ )
+   result = _vsnprintf( buffer, nSize, format, arglist );
+   #define _HB_SNPRINTF_ADD_EOS
+#elif defined( __WATCOMC__ ) && __WATCOMC__ < 1200
+   result = _vbprintf( buffer, nSize, format, arglist );
+#else
+   result = vsnprintf( buffer, nSize, format, arglist );
+#endif
+
+   va_end( arglist );
+
+#ifdef _HB_SNPRINTF_ADD_EOS
+   if( buffer && nSize )
+      buffer[ nSize - 1 ] = '\0';
+#endif
+
+   return result;
 }
 
 /*

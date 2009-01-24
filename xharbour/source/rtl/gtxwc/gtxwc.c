@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.25 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtxwc.c,v 1.26 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -397,7 +397,7 @@ typedef struct tag_x_wnddef
    int col;
    int row;
    int cursorType;
-   
+
    /* last cursor position and shape */
    int lastCursorCol;
    int lastCursorRow;
@@ -3006,7 +3006,7 @@ static BOOL hb_gt_xwc_SetFont( PXWND_DEF wnd, const char *fontFace,
    hb_snprintf( fontString, sizeof(fontString)-1, "-*-%s-%s-r-normal--%d-*-*-*-*-*-%s",
              fontFace, weight, size, encoding == NULL ? "*-*" : encoding );
 */
-   snprintf( fontString, sizeof(fontString)-1, "-*-%s-%s-r-*--%d-*-*-*-*-*-%s",
+   hb_snprintf( fontString, sizeof(fontString)-1, "-*-%s-%s-r-*--%d-*-*-*-*-*-%s",
              fontFace, weight, size, encoding == NULL ? "*-*" : encoding );
 
    xfs = XLoadQueryFont( wnd->dpy, fontString );

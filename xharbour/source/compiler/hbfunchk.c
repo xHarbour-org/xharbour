@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.4 2004/02/09 12:11:30 andijahja Exp $
+ * $Id: hbfunchk.c,v 1.5 2004/04/05 00:16:03 andijahja Exp $
  */
 
 /*
@@ -138,34 +138,34 @@ void hb_compFunCallCheck( char * szFuncCall, int iArgs )
 
    if( iPos >= 0 && ( f[ iPos ].iMinParam != -1 ) )
    {
-      if( iArgs < f[ iPos ].iMinParam || ( f[ iPos ].iMaxParam != -1 && iArgs > f[ iPos ].iMaxParam ) )
+      HB_FUNCINFO *pFunc = &f[ iPos ];
+
+      if( iArgs < pFunc->iMinParam || ( pFunc->iMaxParam != -1 && iArgs > pFunc->iMaxParam ) )
       {
-        if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
-        {
+         char szMsg[ 64 ];
 
-         char szMsg[ 40 ];
-
-         if( f[ iPos ].iMaxParam == -1 )
+         if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
          {
-            sprintf( szMsg, "\nPassed: %i, expected: at least %i", iArgs, f[ iPos ].iMinParam );
-         }
-         else if( f[ iPos ].iMinParam == f[ iPos ].iMaxParam )
-         {
-            sprintf( szMsg, "\nPassed: %i, expected: %i", iArgs, f[ iPos ].iMinParam );
+            if( pFunc->iMaxParam == -1 )
+            {
+               hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: at least %i", iArgs, pFunc->iMinParam );
+            }
+            else if( pFunc->iMinParam == pFunc->iMaxParam )
+            {
+               hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: %i", iArgs, pFunc->iMinParam );
+            }
+            else
+            {
+               hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: %i - %i", iArgs, pFunc->iMinParam, pFunc->iMaxParam );
+            }
          }
          else
          {
-            sprintf( szMsg, "\nPassed: %i, expected: %i - %i", iArgs, f[ iPos ].iMinParam, f[ iPos ].iMaxParam );
+            /* Clipper way */
+            szMsg[ 0 ] = '\0';
          }
-
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CHECKING_ARGS, szFuncCall, szMsg );
-       }
-       else
-       {
-         /* Clipper way */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CHECKING_ARGS, szFuncCall, NULL );
-       }
-     }
+      }
    }
 }
 

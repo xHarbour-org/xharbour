@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.135 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: memvars.c,v 1.136 2009/01/17 20:54:27 andijahja Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
    else
    {
       char szNewName[270];
-      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymGet( szNewName );
    }
 }
@@ -146,7 +146,7 @@ PHB_DYNS s_memvarThFindName( char * szName, HB_STACK *pstack )
    else
    {
       char szNewName[270];
-      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
       return hb_dynsymFindName( szNewName );
    }
 }
@@ -2256,7 +2256,7 @@ HB_FUNC( __MVRESTORE )
                {
                   char szType[6];
 
-                  sprintf( szType, "%i", uiType );
+                  hb_snprintf( szType, sizeof( szType ), "%i", uiType );
                   hb_errInternal( 9100, "Restore failed, unsupported type: %s for: '%s'\n", szType, hb_itemGetCPtr( &Name ) );
                   hb_itemClear( &Item );
                }
@@ -2391,7 +2391,7 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
       {
          char szNewName[270];
 
-         sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
+         hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
 
          pDyn = hb_dynsymFindName( szNewName );
       }

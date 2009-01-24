@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.30 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: cmdarg.c,v 1.31 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -353,8 +353,8 @@ void hb_cmdargProcessVM( void )
          BOOL lMT = pMT->item.asLogical.value;
          PHB_ITEM pOpt = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
          int iOpt = pOpt->item.asInteger.value;
-         //sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
-         sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off", lMT ? "On" : "Off", iOpt );
+         //hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
+         hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off", lMT ? "On" : "Off", iOpt );
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );
          hb_itemRelease( pMT );

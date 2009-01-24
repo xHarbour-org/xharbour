@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.93 2008/11/05 03:03:16 walito Exp $
+ * $Id: workarea.c,v 1.94 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -2144,7 +2144,7 @@ int hb_rddRegister( const char * szDriver, USHORT uiType )
    if( hb_rddFindNode( szDriver, NULL ) )    /* Duplicated RDD */
       return 1;
 
-   snprintf( szGetFuncTable, sizeof( szGetFuncTable ), "%s_GETFUNCTABLE",
+   hb_snprintf( szGetFuncTable, sizeof( szGetFuncTable ), "%s_GETFUNCTABLE",
              szDriver );
    pGetFuncTable = hb_dynsymFindName( szGetFuncTable );
    if( !pGetFuncTable )

@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.32 2008/05/14 13:28:40 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.33 2008/06/20 11:59:50 marchuet Exp $
  */
 
 /*
@@ -359,7 +359,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             hb_arraySetForward( TempArray, Method, hb_itemPutC( Item, szMethod ));
             hb_itemRelease( Item );
 
-            sprintf( szCRC, "%8.8lx\n", ( ULONG )fh.m_uCrc32 );
+            hb_snprintf( szCRC, sizeof( szCRC ), "%8.8lx\n", ( ULONG )fh.m_uCrc32 );
             Item  = hb_itemNew( NULL );
             hb_arraySetForward( TempArray, Crc32, hb_itemPutCL( Item, szCRC, 8 ) );
             hb_itemRelease( Item );
@@ -369,7 +369,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             theTime = fh.GetTime( );
             SzTime =  localtime( &theTime );
-            sprintf( szTime, "%02d:%02d:%02d", SzTime->tm_hour, SzTime->tm_min, SzTime->tm_sec );
+            hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d", SzTime->tm_hour, SzTime->tm_min, SzTime->tm_sec );
 
             Item  = hb_itemNew( NULL );
             hb_arraySetForward( TempArray, Time, hb_itemPutCL( Item, szTime, 8 ) );

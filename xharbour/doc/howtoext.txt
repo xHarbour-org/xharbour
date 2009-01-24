@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.9 2004/05/24 08:23:04 brianhays Exp $
+$Id: howtoext.txt,v 1.10 2005/10/10 08:19:05 brianhays Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -658,7 +658,7 @@ allocated:
 HB_FUNC( CAUSINGLEAK )
 {
    BYTE *szData = (BYTE *) hb_xgrab(100); // memory allocated: 100 bytes
-   sprintf( szData, "test" );
+   hb_snprintf( szData, 100, "test" );
    hb_retc( szData ); // MEMORY LEAK. szData is not returned, only a copy of it is.
 }
 

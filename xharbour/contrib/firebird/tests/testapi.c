@@ -266,17 +266,17 @@ char *getdata(int pos)
 			break;
 		}
 		if ( ( dtype == SQL_TEXT ) || ( dtype == SQL_VARYING ) )
-			sprintf ( p, "%-*s ", len, "NULL" );
+			hb_snprintf( p, MAX_BUFFER, "%-*s ", len, "NULL" );
 		else
-			sprintf ( p, "%*s ", len, "NULL" );
+			hb_snprintf( p, MAX_BUFFER, "%*s ", len, "NULL" );
 	} else {
 		switch ( dtype ) {
 		case SQL_TEXT:
-			sprintf ( p, "%.*s ", var->sqllen, var->sqldata );
+			hb_snprintf( p, MAX_BUFFER, "%.*s ", var->sqllen, var->sqldata );
 			break;
 
 		case SQL_VARYING:
-			sprintf ( p, "%.*s ", var->sqllen, var->sqldata );
+			hb_snprintf( p, MAX_BUFFER, "%.*s ", var->sqllen, var->sqldata );
 			break;
 
 		case SQL_SHORT:
@@ -312,7 +312,7 @@ char *getdata(int pos)
 
 					if ( value >= 0 ) {
 
-						sprintf ( p,
+						hb_snprintf( p, MAX_BUFFER,
 							  "%*" ISC_INT64_FORMAT "d.%0*"
 							  ISC_INT64_FORMAT "d",
 							  field_width - 1 + dscale,
@@ -320,7 +320,7 @@ char *getdata(int pos)
 							  ( ISC_INT64 ) ( value % tens ) );
 					} else if ( ( value / tens ) != 0 ) {
 
-						sprintf ( p,
+						hb_snprintf( p, MAX_BUFFER,
 							  "%*" ISC_INT64_FORMAT "d.%0*"
 							  ISC_INT64_FORMAT "d",
 							  field_width - 1 + dscale,
@@ -328,33 +328,33 @@ char *getdata(int pos)
 							  ( ISC_INT64 ) - ( value % tens ) );
 					} else {
 
-						sprintf ( p, "%*s.%0*" ISC_INT64_FORMAT "d",
+						hb_snprintf( p, MAX_BUFFER, "%*s.%0*" ISC_INT64_FORMAT "d",
 							  field_width - 1 + dscale,
 							  "-0", -dscale,
 							  ( ISC_INT64 ) - ( value % tens ) );
 					}
 				}
 			} else if ( dscale ) {
-				sprintf ( p, "%*" ISC_INT64_FORMAT "d%0*d",
+				hb_snprintf( p, MAX_BUFFER, "%*" ISC_INT64_FORMAT "d%0*d",
 					  field_width, ( ISC_INT64 ) value, dscale, 0 );
 			} else {
-				sprintf ( p, "%*" ISC_INT64_FORMAT "d",
+				hb_snprintf( p, MAX_BUFFER, "%*" ISC_INT64_FORMAT "d",
 					  field_width, ( ISC_INT64 ) value );
 			}
 		};
 			break;
 
 		case SQL_FLOAT:
-			sprintf ( p, "%15g ", *( float ISC_FAR * ) ( var->sqldata ) );
+			hb_snprintf( p, MAX_BUFFER, "%15g ", *( float ISC_FAR * ) ( var->sqldata ) );
 			break;
 
 		case SQL_DOUBLE:
-			sprintf ( p, "%24f ", *( double ISC_FAR * ) ( var->sqldata ) );
+			hb_snprintf( p, MAX_BUFFER, "%24f ", *( double ISC_FAR * ) ( var->sqldata ) );
 			break;
 
 		case SQL_TIMESTAMP:
 			isc_decode_timestamp ( ( ISC_TIMESTAMP ISC_FAR * ) var->sqldata, &times );
-			sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04lui",
+			hb_snprintf( date_s, sizeof( date_s ), "%04d-%02d-%02d %02d:%02d:%02d.%04lui",
 				  times.tm_year + 1900,
 				  times.tm_mon + 1,
 				  times.tm_mday,
@@ -362,32 +362,32 @@ char *getdata(int pos)
 				  times.tm_min,
 				  times.tm_sec,
 				  ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 );
-			sprintf ( p, "%*s ", 24, date_s );
+			hb_snprintf( p, MAX_BUFFER, "%*s ", 24, date_s );
 			break;
 
 		case SQL_TYPE_DATE:
 			isc_decode_sql_date ( ( ISC_DATE ISC_FAR * ) var->sqldata, &times );
-			sprintf ( date_s, "%04d-%02d-%02d",
+			hb_snprintf( date_s, sizeof( date_s ), "%04d-%02d-%02d",
 				  times.tm_year + 1900, times.tm_mon + 1, times.tm_mday );
-			sprintf ( p, "%*s ", 10, date_s );
+			hb_snprintf( p, MAX_BUFFER, "%*s ", 10, date_s );
 			break;
 
 		case SQL_TYPE_TIME:
 			isc_decode_sql_time ( ( ISC_TIME ISC_FAR * ) var->sqldata, &times );
-			sprintf ( date_s, "%02d:%02d:%02d.%04lui",
+			hb_snprintf( date_s, sizeof( date_s ), "%02d:%02d:%02d.%04lui",
 				  times.tm_hour,
 				  times.tm_min,
 				  times.tm_sec, ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 );
-			sprintf ( p, "%*s ", 13, date_s );
+			hb_snprintf( p, MAX_BUFFER, "%*s ", 13, date_s );
 			break;
 
 		case SQL_BLOB:
 		case SQL_ARRAY:
 			/* Print the blob id on blobs or arrays */
 			bid = *( ISC_QUAD ISC_FAR * ) var->sqldata;
-			sprintf ( blob_s, "%08x:%08x", ( unsigned int ) bid.gds_quad_high,
+			hb_snprintf( blob_s, sizeof( blob_s ), "%08x:%08x", ( unsigned int ) bid.gds_quad_high,
 				  ( unsigned int ) bid.gds_quad_low );
-			sprintf ( p, "%17s ", blob_s );
+			hb_snprintf( p, MAX_BUFFER, "%17s ", blob_s );
 			break;
 
 		default:

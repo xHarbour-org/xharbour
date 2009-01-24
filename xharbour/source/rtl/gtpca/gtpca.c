@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.26 2008/11/26 22:25:27 andijahja Exp $
+ * $Id: gtpca.c,v 1.27 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -301,7 +301,7 @@ static void hb_gt_pca_AnsiSetCursorPos( int iRow, int iCol )
    if( s_iRow != iRow || s_iCol != iCol )
    {
       char buff[16];
-      snprintf( buff, sizeof( buff ), "\x1B[%d;%dH", iRow + 1, iCol + 1 );
+      hb_snprintf( buff, sizeof( buff ), "\x1B[%d;%dH", iRow + 1, iCol + 1 );
       hb_gt_pca_termOut( ( BYTE * ) buff, strlen( buff ) );
       s_iRow = iRow;
       s_iCol = iCol;

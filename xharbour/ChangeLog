@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6341 2009/01/21 04:52:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.6342 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,110 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-24 03:32 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * ChangeLog
+    ! Added missing info on __CLSFRIENDLY() function to my previous commit
+      message.
+  * config/darwin/gcc.cf
+  * include/hbatomic.h
+  * include/inet.h
+  * source/rtl/filesys.c
+  * source/vm/errorapi.c
+  * source/vm/thread.c
+    ! Fixed building on Darwin.
+  * source/compiler/harbour.sly
+  * source/macro/macro.y
+    ! Fixed building with Bison 2.4.
+  * include/error.ch
+  * include/hbapierr.h
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    ! Exit on compiler internal errors instead of going into an infinite loop
+      or something worse (synched from Harbour where possible).
+  * include/hbapi.h
+  * include/hbsetup.h
+  * source/common/hbstr.c
+    + Added hb_snprintf() Harbour wrapper for snprintf() which
+      terminates the buffer with a '\0' char for CRTLs that
+      need this (like MSVC).
+      MSVC _snprintf() doesn't do so.
+    * hb_snprintf() used _snprintf_s(), secure version of
+      _snprintf() for MSVS 2005 and upper.
+    (by Viktor Szakats, borrowed from Harbour)
+    + added HB_PRINTF_FORMAT() macro to declare functions with printf()
+      like formatting parameters - now it works only for GCC compilers.
+    + added macros for some function attributes which can be used in
+      the future for optimizations
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+  * contrib/firebird/firebird.c
+  * contrib/firebird/tests/testapi.c
+  * contrib/hbcurl/gauge.c
+  * contrib/hbmzip/hbmzip.c
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/libnf/getver.c
+  * contrib/pgsql/postgres.c
+  * contrib/rdd_ads/ace32.c
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/tp_/win32.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbencode.c
+  * contrib/unicode/hbhex.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_colorselect.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_treelist.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk.c
+  * doc/howtoext.txt
+  * source/common/hbdate.c
+  * source/common/hbver.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/genc.c
+  * source/compiler/gencobj.c
+  * source/compiler/genobj32.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbfunchk.c
+  * source/compiler/hbpcode.c
+  * source/compiler/hbstrong.c
+  * source/ct/ctnet.c
+  * source/ct/dattime2.c
+  * source/ct/files.c
+  * source/pp/ppcore.c
+  * source/pp/ppgen.c
+  * source/pp/pplib.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/wafunc.c
+  * source/rdd/workarea.c
+  * source/rtl/dateshb.c
+  * source/rtl/fkmax.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbgtcore.c
+  * source/rtl/hboutdbg.c
+  * source/rtl/langapi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gttrm/gttrm.c
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxwc/gtxwc.c
+  * source/tip/utils.c
+  * source/vm/cmdarg.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/fm.c
+  * source/vm/hbi18n.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/maindllp.c
+  * source/vm/memvars.c
+  * tests/misc/gauge.c
+  * utils/hbmake/hbmlang.c
+  * utils/hbpp/hbpp.c
+  * utils/hbpp/hbppcomp.c
+  * utils/hbpp/hbppcore.c
+    * sprintf() / snprintf() changed to hb_snprintf() (synched from Harbour
+      where possible).
 
 2009-01-22 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/classes.h
@@ -28,6 +132,8 @@
     ! Allow base symbol to be STATIC (thus not having a pDynSym).
     ! Corrected Andi's fix for memory leaks on program exit
     ! Hide the hb_stackInit base stack item from PROCNAME().
+    * Undocumented __CLSFRIENDLY() function return value changed to an array
+      of friend symbols.
 
 2009-01-21 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/vm/hvm.c

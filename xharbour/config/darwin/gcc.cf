@@ -1,22 +1,29 @@
 #
-# $Id: gcc.cf,v 1.19 2008/03/09 18:44:26 likewolf Exp $
+# $Id: gcc.cf,v 1.20 2008/03/16 19:15:57 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+ifeq ($(HB_COMPILER),gpp)
+   HB_CMP = g++
+else
+   # intentionally used 'cc' instead of 'gcc' - I'm not an Darwin user
+   # but the system where I was testing it has GCC 2.95 named 'cc'
+   HB_CMP = cc
+endif
 
 OBJ_EXT = .o
 EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-# intentionally used 'cc' instead of 'gcc' - I'm not an Darwin user
-# but the system where I was testing it has GCC 2.95 named 'cc'
-CC = $(CCACHE) cc
+CC = $(HB_CCACHE) $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
 # -no-cpp-precomp prevents from using buggy precompiled headers
-CPPFLAGS = -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CPPFLAGS += -no-cpp-precomp
 
 # -fno-common enables building .dylib files
 CFLAGS = -fno-common -Wall -W
@@ -135,8 +142,14 @@ ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
 
+endif
+
+# New pcrepos library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
+LINKLIBS += -lzlib
 endif
 
 LINKLIBS += -lm

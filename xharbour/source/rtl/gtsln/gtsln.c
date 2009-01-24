@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.43 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtsln.c,v 1.44 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -796,9 +796,9 @@ static void hb_gt_sln_Tone( PHB_GT pGT, double dFrequency, double dDuration )
       char escstr[ 64 ];
 
       dFrequency = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
-      snprintf( escstr, 63, "\033[10;%hd]", ( int )dFrequency );
+      hb_snprintf( escstr, 63, "\033[10;%hd]", ( int )dFrequency );
       SLtt_write_string( escstr );
-      snprintf( escstr, 63, "\033[11;%hd]", ( int )( dDuration * 1000.0 / 18.2 ) );
+      hb_snprintf( escstr, 63, "\033[11;%hd]", ( int )( dDuration * 1000.0 / 18.2 ) );
       SLtt_write_string( escstr );
       SLtt_flush_output();
    }

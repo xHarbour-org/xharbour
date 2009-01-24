@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.54 2006/07/16 19:48:57 druzus Exp $
+ * $Id: gtxvt.c,v 1.55 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -408,7 +408,7 @@ static char s_fontReqName[XVT_FONTNAME_SIZE];
 static int s_errorHandler( Display *dpy, XErrorEvent *e )
 {
     char errorText[1024];
-    snprintf( errorText, 1023, "%s", "Xlib error: " );
+    hb_snprintf( errorText, sizeof( errorText ), "%s", "Xlib error: " );
 
     XGetErrorText( dpy, e->error_code,
          errorText + strlen( errorText ),
@@ -1044,7 +1044,7 @@ static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, int weight, int 
       default: wname = "medium";
    }
 
-   snprintf( fontString, 149, "-*-%s-%s-r-normal-*-%d-*-*-*-*-*-%s",
+   hb_snprintf( fontString, sizeof( fontString ), "-*-%s-%s-r-normal-*-%d-*-*-*-*-*-%s",
       fontFace, wname, size, encoding == NULL ? "*-*" : encoding);
 
    xfs = XLoadQueryFont( dpy, fontString );

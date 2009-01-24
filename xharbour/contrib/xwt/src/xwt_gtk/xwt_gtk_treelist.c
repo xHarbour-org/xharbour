@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_treelist.c,v 1.3 2003/11/08 00:45:56 jonnymind Exp $
+   $Id: xwt_gtk_treelist.c,v 1.4 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - management of checkbox widget
 */
@@ -35,16 +35,16 @@ static void xwt_gtk_renderItem( GtkTreeViewColumn *tree_column,
                   "text",  (GValue *) hb_itemGetCPtr( pItem ), NULL );
       break;
       case HB_IT_INTEGER:
-         sprintf( buf, "%d", pItem->item.asInteger.value );
+         hb_snprintf( buf, sizeof( buf ), "%d", pItem->item.asInteger.value );
       break;
       case HB_IT_LONG:
-         sprintf( buf, "%ld", pItem->item.asLong.value );
+         hb_snprintf( buf, sizeof( buf ), "%ld", pItem->item.asLong.value );
       break;
       case HB_IT_DOUBLE:
-         sprintf( buf, "%f", pItem->item.asDouble.value );
+         hb_snprintf( buf, sizeof( buf ), "%f", pItem->item.asDouble.value );
       break;
       default:
-         sprintf( buf, "Not Impl." );
+         hb_snprintf( buf, sizeof( buf ), "Not Impl." );
       break;
    }
 

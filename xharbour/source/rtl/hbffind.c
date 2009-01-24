@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.36 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: hbffind.c,v 1.37 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.36 2008/12/22 22:09:45 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.37 2008/12/23 16:37:06 likewolf Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -660,7 +660,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    hb_dateStrPut( ffind->szDate, lYear, lMonth, lDay );
    ffind->szDate[ 8 ] = '\0';
 
-   sprintf( ffind->szTime, "%02d:%02d:%02d", lHour, lMin, lSec );
+   hb_snprintf( ffind->szTime, sizeof( ffind->szTime ), "%02d:%02d:%02d", lHour, lMin, lSec );
 }
 
 PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )

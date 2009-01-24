@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.10 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: ctnet.c,v 1.11 2008/04/06 11:33:17 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -231,7 +231,7 @@ HB_FUNC( NETREDIR )
       if( bShowError )
       {
          char szCommand[80];
-         snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )",
+         hb_snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )",
                    hb_parcx( 1 ), hb_parcx( 2 ), hb_parcx( 3 ) );
          WNetErrorHandler( dwResult, szCommand );
       }

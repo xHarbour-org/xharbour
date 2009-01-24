@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.15 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: hbdate.c,v 1.16 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ void hb_dateTimeStr( char * pszTime )
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
-      snprintf( pszTime, 9, "%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond );
+      hb_snprintf( pszTime, 9, "%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond );
    }
 #elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
    {
@@ -729,7 +729,7 @@ void hb_dateTimeStr( char * pszTime )
       time( &t );
       localtime_r( &t, &st );
 
-      snprintf( pszTime, 9, "%02d:%02d:%02d", st.tm_hour, st.tm_min, st.tm_sec );
+      hb_snprintf( pszTime, 9, "%02d:%02d:%02d", st.tm_hour, st.tm_min, st.tm_sec );
    }
 #else
    {
@@ -738,7 +738,7 @@ void hb_dateTimeStr( char * pszTime )
 
       time( &t );
       oTime = localtime( &t );
-      snprintf( pszTime, 9, "%02d:%02d:%02d", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
+      hb_snprintf( pszTime, 9, "%02d:%02d:%02d", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
    }
 #endif
 }
@@ -799,7 +799,7 @@ char * hb_timeStampStr( char * szTime, LONG lMillisec )
    HB_TRACE(HB_TR_DEBUG, ("hb_timeStampStr(%p, %ld)", szTime, lMillisec));
 
    hb_timeStampDecode( lMillisec, &iHour, &iMinutes, &iSeconds, &iMSec );
-   snprintf( szTime, 13, "%02d:%02d:%02d.%03d",
+   hb_snprintf( szTime, 13, "%02d:%02d:%02d.%03d",
              iHour, iMinutes, iSeconds, iMSec );
    szTime[ 12 ] = '\0';
 
@@ -817,7 +817,7 @@ char * hb_dateTimeStampStr( char * szDateTime, LONG lJulian, LONG lMillisec )
 
    hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
    hb_timeStampDecode( lMillisec, &iHour, &iMinutes, &iSeconds, &iMSec );
-   snprintf( szDateTime, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+   hb_snprintf( szDateTime, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
              iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec );
    szDateTime[ 23 ] = '\0';
 
@@ -1129,7 +1129,7 @@ char * hb_timeDecStr( char * szTime, LONG lSeconds )
    hb_timeDecode( lSeconds, &iHour, &iMinute, &dSeconds );
 
    //printf( "Origen %lf, Hora: %d, Minutos: %d, Segundos: %f\n", dSeconds, iHour, iMinute, dSeconds );
-   snprintf( szTime, 8 + HB_DATETIMEDECIMALS, "%02d%02d%0*.*f", iHour, iMinute, HB_DATETIMEDECIMALS + 3, HB_DATETIMEDECIMALS, dSeconds );
+   hb_snprintf( szTime, 8 + HB_DATETIMEDECIMALS, "%02d%02d%0*.*f", iHour, iMinute, HB_DATETIMEDECIMALS + 3, HB_DATETIMEDECIMALS, dSeconds );
    //printf( "Final %lf, Hora: %d, Minutos: %d, Segundos: %f, %s\n", dSeconds, iHour, iMinute, dSeconds, szTime );
 
    return szTime;

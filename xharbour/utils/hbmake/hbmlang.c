@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.5 2005/11/05 15:01:52 modalsist Exp $
+ * $Id: hbmlang.c,v 1.6 2008/03/16 19:15:57 likewolf Exp $
  */
 /*
  * Harbour Project source code:
@@ -132,7 +132,7 @@ HB_FUNC(GETUSERLANG)
 }
 
 /*
- * $Id: hbmlang.c,v 1.5 2005/11/05 15:01:52 modalsist Exp $
+ * $Id: hbmlang.c,v 1.6 2008/03/16 19:15:57 likewolf Exp $
  */
 
 /*
@@ -312,7 +312,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
 
    if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
    {
-      snprintf( szPct, sizeof( szPct ), "%3.0f%%", fPercent * 100 );
+      hb_snprintf( szPct, sizeof( szPct ), "%3.0f%%", fPercent * 100 );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
                     (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
    }

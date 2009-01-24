@@ -1,5 +1,5 @@
 /*
- * $Id: hbstrong.c,v 1.2 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: hbstrong.c,v 1.3 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -170,11 +170,11 @@ void hb_compStrongType( int iSize )
              {
                 if( cSubType1 == 'S' && pFunc->iStackClasses )
                 {
-                   sprintf( ( char * ) szType1, "AnyType.SubType[%s]", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%s]", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
                 }
                 else if( cSubType1 == 's' && pFunc->iStackClasses )
                 {
-                   sprintf( ( char * ) szType1, "AnyType.SubType[ARRAY OF %s]", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[ARRAY OF %s]", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
                 }
                 else if( cSubType1 == '-' )
                 {
@@ -182,18 +182,18 @@ void hb_compStrongType( int iSize )
                 }
                 else
                 {
-                   sprintf( ( char * ) szType1, "AnyType.SubType[%c]", cSubType1 );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", cSubType1 );
                 }
              }
              else
              {
                 if( cType1 == 'S' && pFunc->iStackClasses )
                 {
-                   sprintf( ( char * ) szType1, "%s", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%s", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
                 }
                 else if( cType1 == 's' && pFunc->iStackClasses )
                 {
-                   sprintf( ( char * ) szType1, "ARRAY OF %s", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "ARRAY OF %s", pFunc->pStackClasses[ --pFunc->iStackClasses ]->szName );
                 }
                 else if( cType1 == '-' )
                 {
@@ -201,26 +201,26 @@ void hb_compStrongType( int iSize )
                 }
                 else
                 {
-                   sprintf( ( char * ) szType1, "%c", cType1 );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", cType1 );
                 }
              }
 
              cType2 = pDeclared->cType;
              if( cType2 == 'S' )
              {
-                sprintf( ( char * ) szType2, "%s", pDeclared->Extended.pClass->szName );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", pDeclared->Extended.pClass->szName );
              }
              else if( cType2 == 's' )
              {
-                sprintf( ( char * ) szType2, "ARRAY OF %s", pDeclared->Extended.pClass->szName );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", pDeclared->Extended.pClass->szName );
              }
              else if( cType2 == '-' )
              {
-                sprintf( ( char * ) szType2, "NIL" );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "NIL" );
              }
              else
              {
-                sprintf( ( char * ) szType2, "%c", cType2 );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", cType2 );
              }
 
              if( pDeclared->cType != ' ' && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
@@ -333,8 +333,8 @@ void hb_compStrongType( int iSize )
 
                    if( hb_comp_pFormalClass != hb_comp_pParamClass )
                    {
-                      sprintf( ( char * ) szType1, "%s %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
-                      sprintf( ( char * ) szType2, "%s", hb_comp_pFormalClass->szName );
+                      hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%s %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
+                      hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", hb_comp_pFormalClass->szName );
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_TYPE, ( char * ) szType1, ( char * ) szType2 );
                    }
                 }
@@ -345,8 +345,8 @@ void hb_compStrongType( int iSize )
 
                    if( hb_comp_pFormalClass != hb_comp_pParamClass )
                    {
-                      sprintf( ( char * ) szType1, "%s %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
-                      sprintf( ( char * ) szType2, "ARRAY OF %s", hb_comp_pFormalClass->szName );
+                      hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%s %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
+                      hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", hb_comp_pFormalClass->szName );
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_TYPE, ( char * ) szType1, ( char * ) szType2 );
                    }
                 }
@@ -355,12 +355,12 @@ void hb_compStrongType( int iSize )
                    if( cFormalType == 'S' )
                    {
                       PCOMCLASS hb_comp_pParamClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                      sprintf( ( char * ) szType2, "%s", hb_comp_pParamClass->szName );
+                      hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", hb_comp_pParamClass->szName );
                    }
                    else if( cFormalType == 's' )
                    {
                       PCOMCLASS hb_comp_pParamClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                      sprintf( ( char * ) szType2, "ARRAY OF %s", hb_comp_pParamClass->szName );
+                      hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", hb_comp_pParamClass->szName );
                    }
                    else
                    {
@@ -372,19 +372,19 @@ void hb_compStrongType( int iSize )
 
                       if( bByRef )
                       {
-                         sprintf( ( char * ) szType2, "@%c", cFormalType );
+                         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType );
                       }
                       else if( islower( cFormalType ) )
                       {
-                         sprintf( ( char * ) szType2, "ARRAY OF %c", toupper( cFormalType ) );
+                         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
                       }
                       else
                       {
-                         sprintf( ( char * ) szType2, "%c", cFormalType );
+                         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", cFormalType );
                       }
                    }
 
-                   sprintf( ( char * ) szType1, "%s #%i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
+                   hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%s #%i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, iOffset + 1 );
 
                    if( cParamType == ' ' || cParamType == '-' || cParamType == 'U' )
                    {
@@ -403,15 +403,15 @@ void hb_compStrongType( int iSize )
           }
           else
           {
-             sprintf( ( char * ) szType1, "%s got %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, wVar );
+             hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%s got %i", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, wVar );
 
              if( iOptionals )
              {
-                sprintf( ( char * ) szType2, "%i-%i", hb_comp_iParamCount - iOptionals, hb_comp_iParamCount );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%i-%i", hb_comp_iParamCount - iOptionals, hb_comp_iParamCount );
              }
              else
              {
-                sprintf( ( char * ) szType2, "%i", hb_comp_iParamCount - iOptionals );
+                hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%i", hb_comp_iParamCount - iOptionals );
              }
              hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_COUNT, ( char * ) szType1, ( char * ) szType2 );
           }
@@ -476,28 +476,28 @@ void hb_compStrongType( int iSize )
           cSubType1 -= VT_OFFSET_VARIANT;
           if( cSubType1 == 'S' )
           {
-             sprintf( ( char * ) szType1, "AnyType.SubType[Object]" );
+             hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[Object]" );
           }
           else if( cSubType1 == 's' )
           {
-             sprintf( ( char * ) szType1, "AnyType.SubType[ARRAY OF Object]" );
+             hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[ARRAY OF Object]" );
           }
           else if( islower( cSubType1 ) )
           {
-             sprintf( ( char * ) szType1, "AnyType.SubType[ARRAY OF %c]", cSubType1 );
+             hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[ARRAY OF %c]", cSubType1 );
           }
           else if( cSubType1 == '-' )
           {
-             strcpy( ( char * ) szType1,  "AnyType.SubType[NIL]" );
+             strcpy( ( char * ) szType1, "AnyType.SubType[NIL]" );
           }
           else
           {
-             sprintf( ( char * ) szType1, "AnyType.SubType[%c]", cSubType1 );
+             hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", cSubType1 );
           }
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", cSubType1 );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", cSubType1 );
        }
 
        if( cSubType1 == 'O' )
@@ -638,8 +638,8 @@ void hb_compStrongType( int iSize )
 
                     if( hb_comp_pFormalClass != hb_comp_pParamClass )
                     {
-                       sprintf( ( char * ) szType1, "%i", iOffset + 1 );
-                       sprintf( ( char * ) szType2, "%s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%i", iOffset + 1 );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", hb_comp_pFormalClass->szName );
                        hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_TYPE, ( char * ) szType1, ( char * ) szType2 );
                     }
                  }
@@ -650,8 +650,8 @@ void hb_compStrongType( int iSize )
 
                     if( hb_comp_pFormalClass != hb_comp_pParamClass )
                     {
-                       sprintf( ( char * ) szType1, "%i", iOffset + 1 );
-                       sprintf( ( char * ) szType2, "ARRAY OF %s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%i", iOffset + 1 );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", hb_comp_pFormalClass->szName );
                        hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_TYPE, ( char * ) szType1, ( char * ) szType2 );
                     }
                  }
@@ -660,52 +660,52 @@ void hb_compStrongType( int iSize )
                     if( cFormalType == 'S' )
                     {
                        PCOMCLASS hb_comp_pFormalClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                       sprintf( ( char * ) szType2, "%s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", hb_comp_pFormalClass->szName );
                     }
                     else if( cFormalType == 's' )
                     {
                        PCOMCLASS hb_comp_pFormalClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                       sprintf( ( char * ) szType2, "ARRAY OF %s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", hb_comp_pFormalClass->szName );
                     }
                     else
                     {
                        if( cFormalType == ( '-' + VT_OFFSET_BYREF ) || cFormalType >= ( 'A' + VT_OFFSET_BYREF ) )
                        {
-                          sprintf( ( char * ) szType2, "@%c", cFormalType - VT_OFFSET_BYREF );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType - VT_OFFSET_BYREF );
                        }
                        else if( islower( cFormalType ) )
                        {
-                          sprintf( ( char * ) szType2, "ARRAY OF %c", toupper( cFormalType ) );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
                        }
                        else
                        {
-                          sprintf( ( char * ) szType2, "%c", cFormalType );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", cFormalType );
                        }
                     }
 
                     if( pFunc->pStack[ iParamBase + iOffset ] == 'S' )
                     {
                        PCOMCLASS hb_comp_pParamClass = pFunc->pStackClasses[ --pFunc->iStackClasses ];
-                       sprintf( ( char * ) szType1, "(%i) %s", iOffset + 1, hb_comp_pParamClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) %s", iOffset + 1, hb_comp_pParamClass->szName );
                     }
                     else if( pFunc->pStack[ iParamBase + iOffset ] == 's' )
                     {
                        PCOMCLASS hb_comp_pParamClass = pFunc->pStackClasses[ --pFunc->iStackClasses ];
-                       sprintf( ( char * ) szType1, "(%i) ARRAY OF %s", iOffset + 1, hb_comp_pParamClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %s", iOffset + 1, hb_comp_pParamClass->szName );
                     }
                     else
                     {
                        if( pFunc->pStack[ iParamBase + iOffset ] == ( '-' + VT_OFFSET_VARIANT ) || pFunc->pStack[ iParamBase + iOffset ] >= ( 'A' + VT_OFFSET_VARIANT ) )
                        {
-                          sprintf( ( char * ) szType1, "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
                        }
                        else if( islower( pFunc->pStack[ iParamBase + iOffset ] ) )
                        {
-                          sprintf( ( char * ) szType1, "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
                        }
                        else
                        {
-                          sprintf( ( char * ) szType1, "(%i) %c", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) %c", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] );
                        }
                     }
 
@@ -716,52 +716,52 @@ void hb_compStrongType( int iSize )
                     if( cFormalType == 'S' )
                     {
                        PCOMCLASS hb_comp_pFormalClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                       sprintf( ( char * ) szType2, "%s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%s", hb_comp_pFormalClass->szName );
                     }
                     else if( cFormalType == 's' )
                     {
                        PCOMCLASS hb_comp_pFormalClass = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pParamClasses[ iOffset ];
-                       sprintf( ( char * ) szType2, "ARRAY OF %s", hb_comp_pFormalClass->szName );
+                       hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %s", hb_comp_pFormalClass->szName );
                     }
                     else
                     {
                        if( cFormalType == ( '-' + VT_OFFSET_BYREF ) || cFormalType >= ( 'A' + VT_OFFSET_BYREF ) )
                        {
-                          sprintf( ( char * ) szType2, "@%c", cFormalType - VT_OFFSET_BYREF );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType - VT_OFFSET_BYREF );
                        }
                        else if( islower( cFormalType ) )
                        {
-                          sprintf( ( char * ) szType2, "ARRAY OF %c", toupper( cFormalType ) );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
                        }
                        else
                        {
-                          sprintf( ( char * ) szType2, "%c", cFormalType );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", cFormalType );
                        }
                     }
 
                     if( pFunc->pStack[ iParamBase + iOffset ] == 'S' )
                     {
                        PCOMCLASS hb_comp_pParamClass = pFunc->pStackClasses[ --pFunc->iStackClasses ];
-                       sprintf( ( char * ) szType1, "(%i) %s", iOffset + 1, hb_comp_pParamClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) %s", iOffset + 1, hb_comp_pParamClass->szName );
                     }
                     else if( pFunc->pStack[ iParamBase + iOffset ] == 's' )
                     {
                        PCOMCLASS hb_comp_pParamClass = pFunc->pStackClasses[ --pFunc->iStackClasses ];
-                       sprintf( ( char * ) szType1, "(%i) ARRAY OF %s", iOffset + 1, hb_comp_pParamClass->szName );
+                       hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %s", iOffset + 1, hb_comp_pParamClass->szName );
                     }
                     else
                     {
                        if( pFunc->pStack[ iParamBase + iOffset ] == ( '-' + VT_OFFSET_VARIANT ) || pFunc->pStack[ iParamBase + iOffset ] >= ( 'A' + VT_OFFSET_VARIANT ) )
                        {
-                          sprintf( ( char * ) szType1, "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
                        }
                        else if( islower( pFunc->pStack[ iParamBase + iOffset ] ) )
                        {
-                          sprintf( ( char * ) szType1, "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
                        }
                        else
                        {
-                          sprintf( ( char * ) szType1, "(%i) %c", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) %c", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] );
                        }
                     }
 
@@ -772,8 +772,8 @@ void hb_compStrongType( int iSize )
            else
            {
               /*printf( "Method: %s, wVar: %i Parameters: %i Optionals: %i\n", pFunc->pStackFunctions[ pFunc->iStackFunctions ]->szName, wVar, hb_comp_iParamCount, iOptionals );*/
-              sprintf( ( char * ) szType1, "%i", wVar );
-              sprintf( ( char * ) szType2, "%i", hb_comp_iParamCount - iOptionals );
+              hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%i", wVar );
+              hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%i", hb_comp_iParamCount - iOptionals );
               hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_COUNT, ( char * ) szType1, ( char * ) szType2 );
            }
         }
@@ -821,7 +821,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -829,7 +829,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == 'N' )
@@ -895,7 +895,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -903,7 +903,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        if( pFunc->pStack[ pFunc->iStackIndex ] == 'L' )
@@ -945,7 +945,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -953,7 +953,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( cSubType2 && cSubType2 == '-' )
@@ -962,7 +962,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -970,7 +970,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        if( pFunc->pStack[ pFunc->iStackIndex ] == ' ' &&  pFunc->pStack[ pFunc->iStackIndex - 1 ] == ' ' )
@@ -1043,7 +1043,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", cSubType1 );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", cSubType1 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1051,7 +1051,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( cSubType2 && cSubType2 == '-' )
@@ -1060,7 +1060,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", cSubType2 );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", cSubType2 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -1068,7 +1068,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        if( ! cSubType1 )
@@ -1166,7 +1166,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType0 )
        {
-          sprintf( ( char * ) szType0, "AnyType.SubType[%c]", cSubType0 );
+          hb_snprintf( ( char * ) szType0, sizeof( szType0 ), "AnyType.SubType[%c]", cSubType0 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 2 ] == '-' )
        {
@@ -1174,7 +1174,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType0, "%c", pFunc->pStack[ pFunc->iStackIndex - 2 ] );
+          hb_snprintf( ( char * ) szType0, sizeof( szType0 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 2 ] );
        }
 
        /* --- */
@@ -1185,7 +1185,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", cSubType1 );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", cSubType1 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1193,7 +1193,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        /* --- */
@@ -1204,7 +1204,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", cSubType2 );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", cSubType2 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -1212,7 +1212,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        /* --- */
@@ -1309,11 +1309,11 @@ void hb_compStrongType( int iSize )
 
        if( cSubType1 && cSubType1 == '-' )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[NIL]" );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[NIL]" );
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1321,7 +1321,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( cSubType2 && cSubType2 == '-' )
@@ -1330,7 +1330,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -1338,7 +1338,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        if( pFunc->pStack[ pFunc->iStackIndex ] == '-' || pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-'  )
@@ -1398,11 +1398,11 @@ void hb_compStrongType( int iSize )
        }
        if( cSubType1 && cSubType1 == '-' )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[NIL]" );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[NIL]" );
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", cSubType1 );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", cSubType1 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1410,7 +1410,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        /*---*/
@@ -1425,7 +1425,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", cSubType2 );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", cSubType2 );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -1433,7 +1433,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        /*---*/
@@ -1495,7 +1495,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1503,7 +1503,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == ' ' )
@@ -1544,11 +1544,11 @@ void hb_compStrongType( int iSize )
 
        if( cSubType1 && cSubType1 == '-' )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[NIL]" );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[NIL]" );
        }
        else if( cSubType1 )
        {
-          sprintf( ( char * ) szType1, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex - 1 ] == '-' )
        {
@@ -1556,7 +1556,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          sprintf( ( char * ) szType1, "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
+          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "%c", pFunc->pStack[ pFunc->iStackIndex - 1 ] );
        }
 
        if( cSubType2 && cSubType2 == '-' )
@@ -1565,7 +1565,7 @@ void hb_compStrongType( int iSize )
        }
        else if( cSubType2 )
        {
-          sprintf( ( char * ) szType2, "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
+          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "AnyType.SubType[%c]", pFunc->pStack[ pFunc->iStackIndex ] );
        }
        else if( pFunc->pStack[ pFunc->iStackIndex ] == '-' )
        {
@@ -1573,7 +1573,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-         sprintf( ( char * ) szType2, "%c", pFunc->pStack[ pFunc->iStackIndex ] );
+         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "%c", pFunc->pStack[ pFunc->iStackIndex ] );
        }
 
        if( ( pFunc->pStack[ pFunc->iStackIndex ] == ' ' &&  pFunc->pStack[ pFunc->iStackIndex - 1 ] == ' ' ) ||
@@ -2221,7 +2221,7 @@ void hb_compStrongType( int iSize )
              /* Array Of explicit type. */
              char szType[2];
 
-             sprintf( ( char * ) szType, "%c", toupper( cType ) );
+             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", toupper( cType ) );
              hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
           }
           else if( islower( cType ) && toupper( cType ) != cElementType && cElementType != '-' )
@@ -2229,7 +2229,7 @@ void hb_compStrongType( int iSize )
              /* Array Of explicit type. */
              char szType[2];
 
-             sprintf( ( char * ) szType, "%c", toupper( cType ) );
+             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", toupper( cType ) );
              hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
           }
           else
@@ -2453,19 +2453,19 @@ void hb_compStrongType( int iSize )
                 char szType[2];
                 if( pVar->cType == 'S' )
                 {
-                   sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "%s", pVar->Extended.pClass->szName );
                 }
                 else if( pVar->cType == 's' )
                 {
-                   sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
                 }
                 else if( islower( pVar->cType ) )
                 {
-                   sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
                 }
                 else
                 {
-                   sprintf( ( char * ) szType, "%c", pVar->cType );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", pVar->cType );
                 }
 
                 /*printf( "Variable: %s Type: \'%c\' SubType: %c Comparing: %c Recorded: %s\n", pSym->szName, pVar->cType, pVar->cType - 100, pFunc->pStack[ pFunc->iStackIndex ], ( char * ) szType );*/
@@ -2593,23 +2593,23 @@ void hb_compStrongType( int iSize )
              }
              else
              {
-                char szType[2];
+                char szType[ 64 ];
 
                 if( pSym->cType == 'S' )
                 {
-                   sprintf( ( char * ) szType, "%s", pSym->Extended.pClass->szName );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "%s", pSym->Extended.pClass->szName );
                 }
                 else if( pSym->cType == 's' )
                 {
-                   sprintf( ( char * ) szType, "ARRAY OF %s", pSym->Extended.pClass->szName );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pSym->Extended.pClass->szName );
                 }
                 else if( islower( pSym->cType ) )
                 {
-                   sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pSym->cType ) );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pSym->cType ) );
                 }
                 else
                 {
-                   sprintf( ( char * ) szType, "%c", pSym->cType );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", pSym->cType );
                 }
 
                 if( pFunc->pStack[ pFunc->iStackIndex ]  == ( '-' + VT_OFFSET_VARIANT ) || pFunc->pStack[ pFunc->iStackIndex ]  >= ( 'A' + VT_OFFSET_VARIANT ) )
@@ -2775,19 +2775,19 @@ void hb_compStrongType( int iSize )
 
             if( pVar->cType == 'S' )
             {
-               sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "%s", pVar->Extended.pClass->szName );
             }
             else if( pVar->cType == 's' )
             {
-               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
             }
             else if( islower( pVar->cType ) )
             {
-               sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
             }
             else
             {
-               sprintf( ( char * ) szType, "%c", pVar->cType );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", pVar->cType );
             }
 
             if( hb_comp_cCastType == ' ' )
@@ -2956,19 +2956,19 @@ void hb_compStrongType( int iSize )
             char szType[2];
             if( pVar->cType == 'S' )
             {
-               sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "%s", pVar->Extended.pClass->szName );
             }
             else if( pVar->cType == 's' )
             {
-               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
             }
             else if( islower( pVar->cType ) )
             {
-               sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
             }
             else
             {
-               sprintf( ( char * ) szType, "%c", pVar->cType );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", pVar->cType );
             }
 
             if( hb_comp_cCastType == ' ' )

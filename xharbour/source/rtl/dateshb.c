@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.19 2007/06/30 03:06:55 peterrees Exp $
+ * $Id: dateshb.c,v 1.20 2008/07/25 11:13:47 jfgimenez Exp $
  */
 
 /*
@@ -512,7 +512,7 @@ HB_FUNC( TIMEOFDAY )
    {
       int iSeconds = hb_parni(1);
       iSeconds %= 3600*24;
-      sprintf( szResult, "%02d:%02d:%02d",
+      hb_snprintf( szResult, sizeof( szResult ), "%02d:%02d:%02d",
       iSeconds/3600 , (iSeconds % 3600)/60, iSeconds % 60 );
    }
    hb_retclen( szResult, 8 );

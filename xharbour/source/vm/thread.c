@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.219 2008/12/23 18:06:33 likewolf Exp $
+* $Id: thread.c,v 1.220 2009/01/16 01:56:00 likewolf Exp $
 */
 
 /*
@@ -618,7 +618,7 @@ HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
    {
       char errdat[64];
 
-      sprintf( errdat, "Stack not found for Thread %ld",  (LONG) pStack->th_id );
+      hb_snprintf( errdat, sizeof( errdat ), "Stack not found for Thread %ld",  (LONG) pStack->th_id );
       hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadUnlinkStack", 0 );
    }
 
@@ -2032,7 +2032,7 @@ HB_FUNC( GETSYSTEMTHREADID )
    }
    else
    {
-      hb_retnl( HB_VM_STACK.th_id );
+      hb_retnint( ( HB_PTRDIFF ) HB_VM_STACK.th_id );
    }
 }
 

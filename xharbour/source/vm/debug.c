@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.29 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: debug.c,v 1.30 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
       int iLen = strlen( pItem->item.asSymbol.value->szName ) + 2;
       char *sTemp = (char *) hb_xgrab( iLen + 1 );
 
-      sprintf( sTemp, "[%s]", pItem->item.asSymbol.value->szName );
+      hb_snprintf( sTemp, iLen + 1, "[%s]", pItem->item.asSymbol.value->szName );
 
       hb_itemPutCPtr( &Temp, sTemp, iLen );
 

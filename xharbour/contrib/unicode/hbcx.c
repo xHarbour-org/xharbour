@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.12 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: hbcx.c,v 1.13 2008/12/23 20:33:21 likewolf Exp $
  */
 
 /*
@@ -359,7 +359,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
       cMask = pFileName->szName;
    }
 
-   sprintf( szDestFile, "%s%02d%s", cMask, iPart, ".xxe" );
+   hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
 
    OutFile = fopen( szDestFile, "wb" );
 
@@ -390,7 +390,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
             iPart ++;
             ulDecoded = 0;
             fclose( OutFile );
-            sprintf( szDestFile, "%s%02d%s", cMask, iPart, ".xxe" );
+            hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
             OutFile = fopen( szDestFile, "wb" );
             if ( (nSize-i) > UE_STR_LEN )
             {

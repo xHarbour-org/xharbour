@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.45 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: hbver.c,v 1.46 2008/11/26 05:40:41 andijahja Exp $
  */
 
 /*
@@ -97,15 +97,17 @@
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
 
+/* NOTE: Must be larger than 128, which is the maximum size of
+         osVer.szCSDVersion (Win32). [vszakats] */
+#define PLATFORM_BUF_SIZE 255
+
 char * hb_verPlatform( void )
 {
    char * pszPlatform;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
 
-   /* NOTE: Must be larger than 128, which is the maximum size of
-            osVer.szCSDVersion (Win32). [vszakats] */
-   pszPlatform = ( char * ) hb_xgrab( 256 );
+   pszPlatform = ( char * ) hb_xgrab( PLATFORM_BUF_SIZE + 1 );
 
 #if defined(HB_OS_DOS)
 
@@ -115,7 +117,7 @@ char * hb_verPlatform( void )
       regs.h.ah = 0x30;
       HB_DOS_INT86( 0x21, &regs, &regs );
 
-      snprintf( pszPlatform, 256, "DOS %d.%02d", regs.h.al, regs.h.ah );
+      hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "DOS %d.%02d", regs.h.al, regs.h.ah );
 
       /* Host OS detection: Windows 2.x, 3.x, 95/98 */
 
@@ -128,11 +130,11 @@ char * hb_verPlatform( void )
             char szHost[ 128 ];
 
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
-               snprintf( szHost, sizeof( szHost ), " (Windows 2.x)" );
+               hb_snprintf( szHost, sizeof( szHost ), " (Windows 2.x)" );
             else
-               snprintf( szHost, sizeof( szHost ), " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+               hb_snprintf( szHost, sizeof( szHost ), " (Windows %d.%02d)", regs.h.al, regs.h.ah );
 
-            hb_strncat( pszPlatform, szHost, 255 );
+            hb_strncat( pszPlatform, szHost, PLATFORM_BUF_SIZE );
          }
       }
 
@@ -143,7 +145,7 @@ char * hb_verPlatform( void )
          HB_DOS_INT86( 0x21, &regs, &regs );
 
          if( regs.HB_XREGS.bx == 0x3205 )
-            hb_strncat( pszPlatform, " (Windows NT/2000)", 255 );
+            hb_strncat( pszPlatform, " (Windows NT/2000)", PLATFORM_BUF_SIZE );
       }
 
       /* Host OS detection: OS/2 */
@@ -157,11 +159,11 @@ char * hb_verPlatform( void )
             char szHost[ 128 ];
 
             if( regs.h.al == 20 && regs.h.ah > 20 )
-               snprintf( szHost, sizeof( szHost ), " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+               hb_snprintf( szHost, sizeof( szHost ), " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
             else
-               snprintf( szHost, sizeof( szHost ), " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+               hb_snprintf( szHost, sizeof( szHost ), " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
 
-            hb_strncat( pszPlatform, szHost, 255 );
+            hb_strncat( pszPlatform, szHost, PLATFORM_BUF_SIZE );
          }
       }
    }
@@ -179,22 +181,22 @@ char * hb_verPlatform( void )
          /* is this OS/2 2.x ? */
          if( aulQSV[ QSV_VERSION_MINOR - 1 ] < 30 )
          {
-            snprintf( pszPlatform, 256, "OS/2 %ld.%02ld",
+            hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "OS/2 %ld.%02ld",
                       aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10,
                       aulQSV[ QSV_VERSION_MINOR - 1 ] );
          }
          else
-            snprintf( pszPlatform, 256, "OS/2 %2.2f",
+            hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "OS/2 %2.2f",
                       ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
       }
       else
-         snprintf( pszPlatform, 256, "OS/2" );
+         hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "OS/2" );
    }
 
 #elif defined(HB_OS_WIN_32)
 
    {
-      OSVERSIONINFO osVer;
+      OSVERSIONINFOA osVer;
 
       osVer.dwOSVersionInfoSize = sizeof( osVer );
 
@@ -339,7 +341,7 @@ char * hb_verPlatform( void )
                break;
          }
 
-         snprintf( pszPlatform, 256, "Windows %s%s %lu.%02lu.%04d",
+         hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "Windows %s%s %lu.%02lu.%04d",
                    szName ? szName : NULL, szProduct ? szProduct : "",
                    ( ULONG ) osVer.dwMajorVersion,
                    ( ULONG ) osVer.dwMinorVersion,
@@ -352,38 +354,42 @@ char * hb_verPlatform( void )
             int i;
 
             /* Skip the leading spaces (Win95B, Win98) */
-            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( int ) osVer.szCSDVersion[ i ] ); i++ );
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( int ) osVer.szCSDVersion[ i ] ); i++ ) {};
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {
-               hb_strncat( pszPlatform, " ", 255 );
-               hb_strncat( pszPlatform, osVer.szCSDVersion + i, 255 );
+               hb_strncat( pszPlatform, " ", PLATFORM_BUF_SIZE );
+               hb_strncat( pszPlatform, osVer.szCSDVersion + i, PLATFORM_BUF_SIZE );
             }
          }
       }
       else
-         snprintf( pszPlatform, 256, "Windows" );
+         hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "Windows" );
    }
 
+#elif defined(__CEGCC__)
+   {
+      hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "Windows CE" );
+   }
 #elif defined(HB_OS_UNIX)
 
    {
       struct utsname un;
 
       uname( &un );
-      snprintf( pszPlatform, 256, "%s %s %s", un.sysname, un.release, un.machine );
+      hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "%s %s %s", un.sysname, un.release, un.machine );
    }
 
 #elif defined(HB_OS_MAC)
 
    {
-      hb_strncpy( pszPlatform, "MacOS compatible", 255 );
+      hb_strncpy( pszPlatform, "MacOS compatible", PLATFORM_BUF_SIZE );
    }
 
 #else
 
    {
-      hb_strncpy( pszPlatform, "(unknown)", 255 );
+      hb_strncpy( pszPlatform, "(unknown)", PLATFORM_BUF_SIZE );
    }
 
 #endif
@@ -422,6 +428,8 @@ BOOL hb_iswince( void )
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
 
+#define COMPILER_BUF_SIZE 80
+
 char * hb_verCompiler( void )
 {
    char * pszCompiler;
@@ -433,7 +441,7 @@ char * hb_verCompiler( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_verCompiler()"));
 
-   pszCompiler = ( char * ) hb_xgrab( 80 );
+   pszCompiler = ( char * ) hb_xgrab( COMPILER_BUF_SIZE );
    szSub[ 0 ] = '\0';
 
 #if defined(__IBMC__) || defined(__IBMCPP__)
@@ -608,36 +616,36 @@ char * hb_verCompiler( void )
    if( pszName )
    {
       #if defined( __ICL )
-         snprintf( pszCompiler, 80, "%s%s %hd.%01d Build %u", pszName, szSub, iVerMajor, iVerMinor, __INTEL_COMPILER_BUILD_DATE );
+         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%01d Build %u", pszName, szSub, iVerMajor, iVerMinor, __INTEL_COMPILER_BUILD_DATE );
       #else
       if( iVerPatch != 0 )
       #if defined(_MSC_VER)
-         snprintf( pszCompiler, 80, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
       #else
-         snprintf( pszCompiler, 80, "%s%s %hd.%hd.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%hd.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
       #endif
       else if( iVerMajor != 0 || iVerMinor != 0 )
-         snprintf( pszCompiler, 80, "%s%s %hd.%hd", pszName, szSub, iVerMajor, iVerMinor );
+         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%hd", pszName, szSub, iVerMajor, iVerMinor );
       else
-         snprintf( pszCompiler, 80, "%s%s", pszName, szSub );
+         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s", pszName, szSub );
       #endif
    }
    else
-      hb_strncpy( pszCompiler, "(unknown)", 79 );
+      hb_strncpy( pszCompiler, "(unknown)", COMPILER_BUF_SIZE - 1 );
 
 #if defined(__DJGPP__)
 
-   snprintf( szSub, sizeof( szSub ), " (DJGPP %i.%02i)", ( int ) __DJGPP__, ( int ) __DJGPP_MINOR__ );
-   hb_strncat( pszCompiler, szSub, 79 );
+   hb_snprintf( szSub, sizeof( szSub ), " (DJGPP %i.%02i)", ( int ) __DJGPP__, ( int ) __DJGPP_MINOR__ );
+   hb_strncat( pszCompiler, szSub, COMPILER_BUF_SIZE - 1 );
 
 #elif defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__GNUC__)
 
    #if defined( HB_ARCH_16BIT )
-      hb_strncat( pszCompiler, " (16 bit)", 79 );
+      hb_strncat( pszCompiler, " (16 bit)", COMPILER_BUF_SIZE - 1 );
    #elif defined( HB_ARCH_32BIT )
-      hb_strncat( pszCompiler, " (32 bit)", 79 );
+      hb_strncat( pszCompiler, " (32 bit)", COMPILER_BUF_SIZE - 1 );
    #elif defined( HB_ARCH_64BIT )
-      hb_strncat( pszCompiler, " (64 bit)", 79 );
+      hb_strncat( pszCompiler, " (64 bit)", COMPILER_BUF_SIZE - 1 );
    #endif
 
 #endif
@@ -660,7 +668,7 @@ char * hb_verHarbour( void )
       CA-Clipper 5.3b returns: "Clipper (R) 5.3b Intl. (Rev. 338) (1997.04.25)"
    */
 
-   snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s) (Rev. %d)",
+   hb_snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s) (Rev. %d)",
              HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, hb_verCvsID()  );
 
    return pszVersion;
@@ -673,8 +681,7 @@ char * hb_verPCode( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_verPCode()"));
 
    pszPCode = ( char * ) hb_xgrab( 24 );
-
-   snprintf( pszPCode, 24, "PCode Version: %d", HB_PCODE_VER );
+   hb_snprintf( pszPCode, 24, "PCode Version: %d", HB_PCODE_VER );
 
    return pszPCode;
 }
@@ -691,23 +698,13 @@ char *hb_verBuildInfo( BOOL bOut )
 {
    char *szBuildInfo = (char*) hb_xgrab(1024);  // Should be enough IMO
 
-   hb_xmemset( szBuildInfo, '\0', 1024 );
-
    hb_conOutErr_( "Harbour Build Info", 0, bOut );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
    hb_conOutErr_( "---------------------------", 0, bOut );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   {
-      char szLen[ 6 ];
-      sprintf( szLen, "%d", HB_VER_MAJOR );
-      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
-      sprintf( szLen, "%d", HB_VER_MINOR );
-      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
-      sprintf( szLen, "%d", HB_VER_REVISION);
-      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
-      hb_xstrcat( szBuildInfo, HB_VER_LEX, "\t", NULL );
-   }
+   hb_snprintf( szBuildInfo, 1024, "%d(num)\t%d(num)\t%d(num)\t%s\t",
+                HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
 
    {
       char * pszVersion = hb_verHarbour();
@@ -721,7 +718,7 @@ char *hb_verBuildInfo( BOOL bOut )
    {
       char * pszVersion = hb_verPCode();
       char szPCode[3];
-      sprintf( szPCode, "%d", HB_PCODE_VER );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%d", HB_PCODE_VER );
       hb_conOutErr_( pszVersion, 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );
       hb_xstrcat( szBuildInfo, szPCode, "(num)", "\t", NULL );
@@ -929,8 +926,8 @@ char *hb_verBuildInfo( BOOL bOut )
    {
       char buffer[ 64 ];
       char szLen[ 3 ];
-      sprintf( szLen, "%d", HB_SYMBOL_NAME_LEN );
-      sprintf( buffer, "Maximum symbol name length: %i", HB_SYMBOL_NAME_LEN );
+      hb_snprintf( szLen, sizeof( szLen ), "%d", HB_SYMBOL_NAME_LEN );
+      hb_snprintf( buffer, sizeof( buffer ), "Maximum symbol name length: %i", HB_SYMBOL_NAME_LEN );
       hb_xstrcat( szBuildInfo, szLen, "(num)", NULL );
       hb_conOutErr_( buffer, 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );

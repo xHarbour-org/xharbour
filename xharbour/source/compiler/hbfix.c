@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.43 2007/05/12 19:30:59 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.44 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -195,8 +195,8 @@ static HB_FIX_FUNC( hb_p_poplocalnear )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -220,8 +220,8 @@ static HB_FIX_FUNC( hb_p_pushlocalnear )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -245,8 +245,8 @@ static HB_FIX_FUNC( hb_p_pushlocalnearinc )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -270,8 +270,8 @@ static HB_FIX_FUNC( hb_p_pushlocalneardec )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -295,8 +295,8 @@ static HB_FIX_FUNC( hb_p_localnearinc )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -320,8 +320,8 @@ static HB_FIX_FUNC( hb_p_localneardec )
          char sTemp[16];
          char sTemp2[16];
 
-         sprintf( sTemp, "%i", pFunc->wParamCount );
-         sprintf( sTemp2, "%i", iVar );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, sTemp2, sTemp );
       }
    }
@@ -348,7 +348,7 @@ static HB_FIX_FUNC( hb_p_localnearaddint )
         // After fixing this variable cannot be accessed using near code
         char sTemp[16];
 
-        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", (const char *) sTemp );
       }
    }
@@ -375,7 +375,7 @@ static HB_FIX_FUNC( hb_p_localnearsetint )
          // After fixing this variable cannot be accessed using near code
          char sTemp[16];
 
-         sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETINT", sTemp );
       }
    }
@@ -402,7 +402,7 @@ static HB_FIX_FUNC( hb_p_localnearsetstr )
         // After fixing this variable cannot be accessed using near code
         char sTemp[16];
 
-        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTR", (const char *) sTemp );
       }
    }
@@ -429,7 +429,7 @@ static HB_FIX_FUNC( hb_p_localnearsetstrhidden )
         // After fixing this variable cannot be accessed using near code
         char sTemp[16];
 
-        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTRHIDDEN", (const char *) sTemp );
       }
    }
@@ -456,7 +456,7 @@ static HB_FIX_FUNC( hb_p_localnearadd )
         // After fixing this variable cannot be accessed using near code
         char sTemp[16];
 
-        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADD", (const char *) sTemp );
       }
    }

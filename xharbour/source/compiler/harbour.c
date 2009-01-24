@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.211 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: harbour.c,v 1.212 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -481,7 +481,7 @@ void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failu
    {
       char szSize[ 32 ];
 
-      sprintf( szSize, "%lu", ulSize );
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
    }
 
@@ -553,7 +553,7 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
    {
       char szSize[ 32 ];
 
-      sprintf( szSize, "%lu", ulSize );
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
    }
 
@@ -678,13 +678,13 @@ void hb_xexit( void )
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       if( s_ulMemoryBlocks )
       {
          hb_conOutErr( hb_conNewLine(), 0 );
-         snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+         hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
          hb_conOutErr( szBuffer, 0 );
       }
 
@@ -697,6 +697,26 @@ void hb_xexit( void )
                              pMemBlock->ulSize ) ) );
    }
 #endif
+}
+
+/* NOTE: Use as minimal calls from here, as possible.
+         Don't allocate memory from this function. [vszakats] */
+void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
+{
+   char buffer[ 1024 ];
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_errInternal(%lu, %s, %s, %s)", ulIntCode, szText, szPar1, szPar2));
+
+   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_snprintf( buffer, sizeof( buffer ), "Unrecoverable error %lu: ", ulIntCode );
+   hb_conOutErr( buffer, 0 );
+   if( szText )
+   {
+      hb_snprintf( buffer, sizeof( buffer ), szText, szPar1, szPar2 );
+      hb_conOutErr( buffer, 0 );
+   }
+   hb_conOutErr( hb_conNewLine(), 0 );
+   exit( EXIT_FAILURE );
 }
 
 void hb_conOutErr( const char * pStr, ULONG ulLen )
@@ -4664,7 +4684,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
                   {
                      char szFun[ 256 ];
 
-                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, pVar->iDeclLine );
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                   }
 
@@ -4682,7 +4702,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
                   {
                      char szFun[ 256 ];
 
-                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, pVar->iDeclLine );
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                   }
 
@@ -4700,7 +4720,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
                   {
                      char szFun[ 256 ];
 
-                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, pVar->iDeclLine );
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                   }
 
@@ -4718,7 +4738,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
                   {
                      char szFun[ 256 ];
 
-                     sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
+                     hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, pVar->iDeclLine );
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                   }
 
@@ -6272,9 +6292,9 @@ static int hb_compCompile( char * szPrg )
          hb_comp_pFileName->szExtension = ".prg";
       }
 
-      szTempName = (char*) hb_xgrab(_POSIX_PATH_MAX);
-      hb_comp_PrgFileName = (char*) hb_xgrab(_POSIX_PATH_MAX);
-      sprintf(szTempName, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
+      szTempName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+      hb_comp_PrgFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+      hb_snprintf( szTempName, _POSIX_PATH_MAX + 1, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
 
       for( i = 0; i < strlen( szTempName ); i++ )
       {
@@ -6368,11 +6388,11 @@ static int hb_compCompile( char * szPrg )
             else
             {
                // and write header
-               sprintf( head.signature, "\3HIL" );
-               sprintf( head.author, "The xharbour group" );
-               sprintf( head.language, HB_INTERNATIONAL_NAME );
-               sprintf( head.language_int, HB_INTERNATIONAL_NAME );
-               sprintf( head.language_code, HB_INTERNATIONAL_CODE );
+               hb_snprintf( head.signature, sizeof( head.signature ), "\3HIL" );
+               hb_snprintf( head.author, sizeof( head.author ), "The xharbour group" );
+               hb_snprintf( head.language, sizeof( head.language ), HB_INTERNATIONAL_NAME );
+               hb_snprintf( head.language_int, sizeof( head.language_int ), HB_INTERNATIONAL_NAME );
+               hb_snprintf( head.language_code, sizeof( head.language_code ), HB_INTERNATIONAL_CODE );
                head.entries = -1; // unknown
                fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
             }
@@ -6484,7 +6504,7 @@ static int hb_compCompile( char * szPrg )
                hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
 
                /* Update pseudo function name */
-               sprintf( szNewName, "(_INITSTATICS%05d)", hb_comp_iStaticCnt );
+               hb_snprintf( szNewName, sizeof( szNewName ), "(_INITSTATICS%05d)", hb_comp_iStaticCnt );
                hb_comp_pInitFunc->szName = hb_compIdentifierNew( szNewName, TRUE );
 
                hb_compAddInitFunc( hb_comp_pInitFunc );
@@ -6618,7 +6638,7 @@ static int hb_compCompile( char * szPrg )
                         {
                            char szFun[ 256 ];
 
-                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_snprintf( szFun, sizeof( szFun ), "*(%i)", pVar->iDeclLine );
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                         }
 
@@ -6636,7 +6656,7 @@ static int hb_compCompile( char * szPrg )
                         {
                            char szFun[ 256 ];
 
-                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_snprintf( szFun, sizeof( szFun ), "*(%i)", pVar->iDeclLine );
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                         }
 
@@ -6654,7 +6674,7 @@ static int hb_compCompile( char * szPrg )
                         {
                            char szFun[ 256 ];
 
-                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_snprintf( szFun, sizeof( szFun ), "*(%i)", pVar->iDeclLine );
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                         }
 
@@ -6672,7 +6692,7 @@ static int hb_compCompile( char * szPrg )
                         {
                            char szFun[ 256 ];
 
-                           sprintf( szFun, "*(%i)", pVar->iDeclLine );
+                           hb_snprintf( szFun, sizeof( szFun ), "*(%i)", pVar->iDeclLine );
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
                         }
 

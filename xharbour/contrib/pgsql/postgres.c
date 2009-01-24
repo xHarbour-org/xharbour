@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.25 2005/10/24 17:13:30 druzus Exp $
+ * $Id: postgres.c,v 1.26 2008/03/26 23:33:20 modalsist Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -106,7 +106,7 @@ HB_FUNC( PQCONNECT )
    PGconn   *conn;
 
    if( hb_pcount() == 5 )
-      sprintf( conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
+      hb_snprintf( conninfo, sizeof( conninfo ), "dbname = %s host = %s user = %s password = %s port = %i",
                hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), (int) hb_parni(5) );
 
    conn = PQconnectdb( conninfo );

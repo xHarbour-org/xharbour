@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.35 2008/02/09 02:53:19 ronpinkas Exp $
+ * $Id: macro.y,v 1.36 2008/02/18 16:55:15 likewolf Exp $
  */
 
 /*
@@ -1157,11 +1157,11 @@ IndexList   : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExp
 
 CodeBlock  : '{' CBMARKER
                   {
-                    $$ = hb_compExprNewCodeBlock();
+                    $<asExpr>$ = hb_compExprNewCodeBlock();
 
                     if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
                     {
-                       s_Pending[ s_iPending++ ] = $$;
+                       s_Pending[ s_iPending++ ] = $<asExpr>$;
                     }
                   }
              BlockNoVar CBMARKER BlockExpList '}'
@@ -1175,11 +1175,11 @@ CodeBlock  : '{' CBMARKER
                   }
            | '{' CBMARKER
                   {
-                    $$ = hb_compExprNewCodeBlock();
+                    $<asExpr>$ = hb_compExprNewCodeBlock();
 
                     if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
                     {
-                       s_Pending[ s_iPending++ ] = $$;
+                       s_Pending[ s_iPending++ ] = $<asExpr>$;
                     }
                   }
              BlockVarList CBMARKER BlockExpList '}'

@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.11 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: genobj32.c,v 1.12 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ void hb_compGenObj32( PHB_FNAME pFileName )
     fflush( stdout );
   }
 
-  sprintf( compiler, "xHarbour Compiler build %d.%d.%d (%s)", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+  hb_snprintf( compiler, sizeof( compiler ), "xHarbour Compiler build %d.%d.%d (%s)", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
 
   CompiledFileName( hObjFile, szFileName );
   CompilerVersion( hObjFile, compiler );

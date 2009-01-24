@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.4 2007/09/22 05:41:01 andijahja Exp $
+ * $Id: dattime2.c,v 1.5 2008/04/06 11:33:17 likewolf Exp $
  */
 
 /*
@@ -7,17 +7,17 @@
  *   CT3 Date & Time functions, part II: - ADDMONTH()
  *                                       - CTODOW()
  *                                       - CTOMONTH()
- *                                       - DAYSINMONTH() 
- *                                       - DAYSTOMONTH() 
- *                                       - DMY() 
- *                                       - DOY() 
- *                                       - ISLEAP() 
- *                                       - LASTDAYOM() 
- *                                       - MDY() 
- *                                       - NTOCDOW() 
- *                                       - NTOCMONTH() 
- *                                       - QUARTER() 
- *                                       - WEEK() 
+ *                                       - DAYSINMONTH()
+ *                                       - DAYSTOMONTH()
+ *                                       - DMY()
+ *                                       - DOY()
+ *                                       - ISLEAP()
+ *                                       - LASTDAYOM()
+ *                                       - MDY()
+ *                                       - NTOCDOW()
+ *                                       - NTOCMONTH()
+ *                                       - QUARTER()
+ *                                       - WEEK()
  *
  * Copyright 2006 Pavel Tsarenko <tpe2@mail.ru>
  * www - http://www.harbour-project.org
@@ -322,7 +322,7 @@ HB_FUNC( DMY )
       }
       else
       {
-         snprintf( szMDY + iLen, 3, "%02d", iDay );
+         hb_snprintf( szMDY + iLen, 3, "%02d", iDay );
          iLen += 2;
       }
 
@@ -341,12 +341,12 @@ HB_FUNC( DMY )
 
       if( hb_setGetCentury() )
       {
-         snprintf( szMDY + iLen, 5, "%04d", iYear );
+         hb_snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;
       }
       else
       {
-         snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
+         hb_snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
          iLen += 2;
       }
 
@@ -420,19 +420,19 @@ HB_FUNC( MDY )
       }
       else
       {
-         snprintf( szMDY + iLen, 3, "%02d", iDay );
+         hb_snprintf( szMDY + iLen, 3, "%02d", iDay );
          iLen += 2;
       }
       szMDY[iLen++] = ' ';
 
       if( hb_setGetCentury() )
       {
-         snprintf( szMDY + iLen, 5, "%04d", iYear );
+         hb_snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;
       }
       else
       {
-         snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
+         hb_snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
          iLen += 2;
       }
 

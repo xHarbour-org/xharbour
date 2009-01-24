@@ -1,5 +1,5 @@
 /*
- * $Id: win32.c,v 1.2 2004/08/25 13:43:53 mauriliolongo Exp $
+ * $Id: win32.c,v 1.3 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ HB_FUNC( P_INITPORTSPEED ) {
    FillMemory(&dcb, sizeof(dcb), 0);
    dcb.DCBlength = sizeof(dcb);
 
-   sprintf(values, "%lu,%s,%lu,%lu", hb_parnl(2), hb_parcx(4), hb_parnl(3), hb_parnl(5));
+   hb_snprintf( values, sizeof( values ), "%lu,%s,%lu,%lu", hb_parnl( 2 ), hb_parcx( 4 ), hb_parnl( 3 ), hb_parnl( 5 ) );
 
    if ( ! BuildCommDCB(values, &dcb)) {
       hb_retnl(-1);

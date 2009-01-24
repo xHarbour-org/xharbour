@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbhex.c,v 1.3 2004/02/24 14:15:39 andijahja Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ HB_FUNC(HB_NLTOHX)
    if (hb_pcount())
    {
       dststr=(BYTE *) hb_xgrab(9);
-      sprintf((char *) dststr,"%lX",hb_parnl(1));
+      hb_snprintf( ( char * ) dststr, 9, "%lX", hb_parnl( 1 ) );
       hb_retc((char *) dststr);
       hb_xfree(dststr);
    }
@@ -98,7 +98,7 @@ HB_FUNC(HB_NLTOH8)
    if (hb_pcount())
    {
       dststr=(BYTE *) hb_xgrab(9);
-      sprintf((char *) dststr,"%08lX",hb_parnl(1));
+      hb_snprintf( ( char * ) dststr, 9, "%08lX", hb_parnl( 1 ) );
 
       for (i=0;i<8;i++)
       {

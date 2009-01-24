@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.110 2009/01/17 23:09:48 ronpinkas Exp $
+ * $Id: fm.c,v 1.111 2009/01/17 23:35:24 andijahja Exp $
  */
 
 /*
@@ -865,7 +865,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( buffer, "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
+      hb_snprintf( buffer, sizeof( buffer ), "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
 
       if ( hLog )
       {
@@ -894,7 +894,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( buffer, "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
+      hb_snprintf( buffer, sizeof( buffer ), "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
 
       if ( hLog )
       {
@@ -906,7 +906,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       if( s_lMemoryBlocks )
       {
          hb_conOutErr( hb_conNewLine(), 0 );
-         sprintf( buffer, "WARNING! Memory allocated but not released: %li bytes (%li blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
+         hb_snprintf( buffer, sizeof( buffer ), "WARNING! Memory allocated but not released: %li bytes (%li blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
 
          if ( hLog )
          {

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.178 2008/11/28 23:09:11 andijahja Exp $
+ * $Id: genc.c,v 1.179 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -1485,7 +1485,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
          {
             char szVer[5];
             bBegin = TRUE;
-            sprintf( szVer,"%i", HB_PCODE_VER );
+            hb_snprintf( szVer, sizeof( szVer ), "%i", HB_PCODE_VER );
             hb_xstrcat( szEntries,
                "\n#define __PRG_SOURCE__ \"",hb_comp_PrgFileName,"\"\n\n",
                "#undef HB_PRG_PCODE_VER\n",
@@ -1908,8 +1908,9 @@ static void hb_compGenCInLineSymbol()
 
    while( pInline )
    {
-      char *sInline = (char*) hb_xgrab( strlen( (char*) pInline->pCode) + 1 );
-      sprintf( sInline, "%s", pInline->pCode );
+      UINT uiLen = strlen( ( char * ) pInline->pCode ) + 1;
+      char *sInline = (char*) hb_xgrab( uiLen );
+      hb_snprintf( sInline, uiLen, "%s", pInline->pCode );
 
       if( sInline )
       {

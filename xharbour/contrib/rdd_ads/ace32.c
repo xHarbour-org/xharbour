@@ -1,5 +1,5 @@
 /*
- * $Id: ace32.c,v 1.1 2008/05/22 22:10:41 andijahja Exp $
+ * $Id: ace32.c,v 1.2 2008/06/03 23:12:56 kaddath Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ static FARPROC Ace32_GetProcAddress( char* szFuncName )
       else
       {
          char __szError[256];
-         sprintf( __szError, "Cannot find function address: %s", szFuncName );
+         hb_snprintf( __szError, sizeof( __szError ), "Cannot find function address: %s", szFuncName );
          MessageBox( NULL, __szError, szFuncName, MB_ICONSTOP );
          return NULL;
       }
@@ -82,7 +82,7 @@ static FARPROC Ace32_GetProcAddress( char* szFuncName )
    else
    {
       char __szError[256];
-      sprintf( __szError, "Cannot load ace32.dll" );
+      hb_snprintf( __szError, sizeof( __szError ), "Cannot load ace32.dll" );
       MessageBox( NULL, __szError, "Error Loading DLL", MB_ICONSTOP );
       return NULL;
    }

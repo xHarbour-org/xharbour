@@ -1,5 +1,5 @@
 /*
- * $Id: fkmax.c,v 1.1.1.1 2001/12/21 10:41:35 ronpinkas Exp $
+ * $Id: fkmax.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -74,8 +74,7 @@ HB_FUNC( FKLABEL )
       {
          char szName[ 4 ];
 
-         sprintf( szName, "F%i", uiFKey );
-
+         hb_snprintf( szName, sizeof( szName ), "F%i", uiFKey );
          hb_retc( szName );
       }
       else

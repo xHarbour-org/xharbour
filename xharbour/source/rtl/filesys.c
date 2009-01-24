@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.181 2008/12/05 10:51:33 marchuet Exp $
+ * $Id: filesys.c,v 1.182 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -137,6 +137,13 @@
    #if defined( HB_OS_DARWIN )
       #include <crt_externs.h>
       #define environ (*_NSGetEnviron())
+      #if !defined( HB_OS_DARWIN_5 ) && defined( _POSIX_C_SOURCE )
+         /* these declarations are hidden in Darwin headers when
+            _POSIX_C_SOURCE is defined, so declare them ourself */
+         struct tm *gmtime_r(const time_t *, struct tm *);
+         struct tm *localtime_r(const time_t *, struct tm *);
+         int fsync(int);
+      #endif
    #elif !defined( __WATCOMC__ )
       extern char **environ;
    #endif
@@ -1278,8 +1285,9 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
 
    if ( *pos && *pos != '\\')
    {
-      completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + strlen( pos ) +2);
-      sprintf( completeCommand, "%s %s",  fullCommand, pos+1);
+      UINT uiLen = strlen( fullCommand ) + strlen( pos ) + 2;
+      completeCommand = (char *) hb_xgrab( uiLen );
+      hb_snprintf( completeCommand, uiLen, "%s %s",  fullCommand, pos+1);
    }
    else
    {

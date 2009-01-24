@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.253 2009/01/17 18:07:15 andijahja Exp $
+ * $Id: hbapi.h,v 1.254 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -690,6 +690,7 @@ extern HB_EXPORT BOOL      hb_compStrToNum( const char * szNum, ULONG ulLen, HB_
 extern HB_EXPORT BOOL      hb_valStrnToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by VAL() */
 extern HB_EXPORT BOOL      hb_strToNum( const char * szNum, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
 extern HB_EXPORT BOOL      hb_strnToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
+extern HB_EXPORT ULONG     hb_snprintf( char * buffer, ULONG nSize, const char * format, ... ) HB_PRINTF_FORMAT( 3, 4 ); /* snprintf() wrapper */
 
 extern HB_EXPORT BOOL      hb_strMatchFile( const char * pszString, const char * szPattern ); /* compare two strings using platform dependent rules for file matching */
 extern HB_EXPORT BOOL      hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */

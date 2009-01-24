@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_colorselect.c,v 1.1 2004/02/08 13:00:08 lculik Exp $
+   $Id: xwt_gtk_colorselect.c,v 1.2 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - File Selection Box 
 */
@@ -37,7 +37,7 @@ static void color_ok_sel( GtkWidget *widget,  gpointer cb_data )
    					     &color);
    }					     
    #endif
-   sprintf( fname,"#%2ix%2ix%2ix",color.red,color.green,color.blue);
+   hb_snprintf( fname, sizeof( fname ), "#%2ix%2ix%2ix", color.red, color.green, color.blue );
 
 
    // itemPutC uses the char* parameter as it were const: it does not

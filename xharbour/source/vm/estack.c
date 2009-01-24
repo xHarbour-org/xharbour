@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.107 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: estack.c,v 1.108 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -735,7 +735,7 @@ void hb_stackDispCall( void )
 
    if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
    {
-      sprintf( buffer, "Called from hb_vmQuit()" );
+      hb_snprintf( buffer, sizeof( buffer ), "Called from hb_vmQuit()" );
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
 	  return;
@@ -749,11 +749,11 @@ void hb_stackDispCall( void )
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
       {
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer, sizeof( buffer ), HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
       else
       {
-         sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer, sizeof( buffer ), HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
 
       hb_conOutErr( buffer, 0 );
@@ -784,11 +784,11 @@ LONG WINAPI hb_UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionI
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
       {
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer, sizeof( buffer ), HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
       else
       {
-         sprintf( buffer, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer, sizeof( buffer ), HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       }
 
       strcat( msg, buffer );

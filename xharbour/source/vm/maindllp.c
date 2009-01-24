@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.28 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: maindllp.c,v 1.29 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ static FARPROC hb_GetProcAddress( char* szFuncName )
    {
       /* Try #3: Watcom register calling flavor */
       char * szFuncName_ = (char*) hb_xgrab( strlen( szFuncName ) + 1 );
-      sprintf( szFuncName_, "%s_", szFuncName + 1 );
+      hb_snprintf( szFuncName_, strlen( szFuncName ) + 1, "%s_", szFuncName + 1 );
       pFunc = GetProcAddress( hModule, szFuncName_ );
       hb_xfree( szFuncName_ );
 
@@ -133,7 +133,7 @@ static FARPROC hb_GetProcAddress( char* szFuncName )
       {
 	 /* Hands-up ..... */
          char __szError[256];
-         sprintf( __szError, "Cannot find function address: %s", szFuncName );
+         hb_snprintf( __szError, sizeof( __szError ), "Cannot find function address: %s", szFuncName );
          MessageBox( NULL, __szError, szFuncName, MB_ICONSTOP );
 	 return NULL;
       }

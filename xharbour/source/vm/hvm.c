@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.710 2009/01/21 04:52:14 andijahja Exp $
+ * $Id: hvm.c,v 1.711 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -1112,7 +1112,7 @@ int hb_vmQuit( void )
 
          for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
          {
-            sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
+            hb_snprintf( sBuffer, sizeof( sBuffer ), "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
 
             #if defined(HB_OS_WIN_32)
                OutputDebugString( sBuffer );
@@ -7257,7 +7257,7 @@ static void hb_vmClassError( UINT uiParams, const char *szClassName, const char 
    if( *szMsg == '_' )
    {
       //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
-      sprintf( (char *) sDesc, "Class: '%s' has no property", szClassName );
+      hb_snprintf( (char *) sDesc, sizeof( sDesc ), "Class: '%s' has no property", szClassName );
       if( pSelf )
          hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, pSelf );
       else
@@ -7266,7 +7266,7 @@ static void hb_vmClassError( UINT uiParams, const char *szClassName, const char 
    else
    {
       //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
-      sprintf( (char *) sDesc, "Class: '%s' has no exported method", szClassName );
+      hb_snprintf( (char *) sDesc, sizeof( sDesc ), "Class: '%s' has no exported method", szClassName );
       if( pSelf )
          hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, pSelf );
       else
@@ -10581,7 +10581,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
    {
       char szPCode[ 12 ];
 
-      sprintf( szPCode, "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ),  "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
                       "Module: '%s' was compiled into PCODE version: %s,"
@@ -10615,7 +10615,7 @@ PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
    {
       char szPCode[ 12 ];
 
-      sprintf( szPCode, "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
                       "Module: '%s' was compiled into PCODE version: %s,"
@@ -10647,7 +10647,7 @@ PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
    {
       char szPCode[ 12 ];
 
-      sprintf( szPCode, "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
                       "Module: '%s' was compiled into PCODE version: %s,"
@@ -10970,7 +10970,7 @@ void hb_vmRequestCancel( void )
       USHORT uLine = 0;
 
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( buffer, "Cancelled at: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.pCargo->lineno );
+      hb_snprintf( buffer, sizeof( buffer ), "Cancelled at: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.pCargo->lineno );
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
 
@@ -10984,7 +10984,7 @@ void hb_vmRequestCancel( void )
          }
 
          i2 = strlen( (char *) buffer );
-         sprintf( buffer + i2, " (%u)", uLine );
+         hb_snprintf( buffer + i2, sizeof( buffer ) - i2, " (%u)", uLine );
 
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );

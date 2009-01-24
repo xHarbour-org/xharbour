@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.52 2009/01/08 09:11:13 marchuet Exp $
+ * $Id: hbsetup.h,v 1.53 2009/01/15 08:41:13 enricomaria Exp $
  */
 
 /*
@@ -479,27 +479,18 @@
  */
 
 /* ***********************************************************************
- * Fix DJGPP in call to: toupper(), tolower(), is...()
- *
+ * some fixes in compiler header files
  */
-#ifdef __DJGPP__
-   #include "hbfixdj.h"
 
-   /* Substitute snprintf() by sprintf() for DJGPP <= 2.03.
-    * This is a temporary hack, should implement a C99 snprintf() ourselves. */
-   #if ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
-      #define snprintf(s, len, args...) sprintf( (s), ##args )
-   #endif
+#if defined( __DJGPP__ )
+   /* Fix DJGPP in call to: toupper(), tolower(), is...() */
+   #include "hbfixdj.h"
 #elif defined(__XCC__)
    #if !defined(isascii)
       #define isascii(c)   ((unsigned)(c)<=0x7f)
    #endif
    #if !defined(NEED_DUMMY_RETURN)
       #define NEED_DUMMY_RETURN
-   #endif
-#else
-   #if defined(_MSC_VER) || defined(__DMC__)
-      #define snprintf _snprintf
    #endif
 #endif
 
@@ -514,6 +505,43 @@
 #else
    #define HB_EXTERN_BEGIN
    #define HB_EXTERN_END
+#endif
+
+#if defined( __GNUC__ )
+   #define HB_PRINTF_FORMAT( _nStr, _nParam ) \
+                     __attribute__ (( format (printf, _nStr, _nParam)))
+   #define HB_MALLOC_ATTR \
+                     __attribute__ (( malloc ))
+   #define HB_HOT_ATTR \
+                     __attribute__ (( hot ))
+   #define HB_COLD_ATTR \
+                     __attribute__ (( cold ))
+#if 0
+   #define HB_NORETURN_ATTR \
+                     __attribute__ (( noreturn ))
+#  else
+   #define HB_NORETURN_ATTR
+#  endif
+#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 1 ) )
+   #define HB_FLATTEN_ATTR \
+                     __attribute__ (( flatten ))
+#  else
+   #define HB_FLATTEN_ATTR
+#  endif
+#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 3 ) )
+   #define HB_ALLOC_SIZE_ATTR( _nParam ) \
+                     __attribute__ (( alloc_size (_nParam)))
+#  else
+   #define HB_ALLOC_SIZE_ATTR( _nParam )
+#  endif
+#else
+   #define HB_PRINTF_FORMAT( _nStr, _nParam )
+   #define HB_MALLOC_ATTR
+   #define HB_NORETURN_ATTR
+   #define HB_HOT_ATTR
+   #define HB_COLD_ATTR
+   #define HB_FLATTEN_ATTR
+   #define HB_ALLOC_SIZE_ATTR( _nParam )
 #endif
 
 /*
@@ -531,5 +559,6 @@
        #endif
    #endif
 #endif
+
 
 #endif /* HB_SETUP_H_ */

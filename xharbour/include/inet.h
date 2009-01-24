@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.25 2008/04/01 11:03:48 marchuet Exp $
+* $Id: inet.h,v 1.26 2008/06/27 15:59:35 marchuet Exp $
 */
 
 /*
@@ -87,7 +87,7 @@
          extern int h_errno;
          #define HB_INET_CLOSE( x )    close( x )
          #ifdef HB_OS_DARWIN
-            #ifndef socklen_t
+            #if !defined( socklen_t ) && !defined( _SOCKLEN_T )
                #define socklen_t int
             #endif
          #endif

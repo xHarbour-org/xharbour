@@ -106,7 +106,7 @@ HB_FUNC(FBCREATEDB)
     charset = hb_parcx(5);
     dialect = hb_parni(6);
 
-    sprintf(create_db,
+    hb_snprintf(create_db, sizeof( create_db ),
             "CREATE DATABASE '%s' USER '%s' PASSWORD '%s' PAGE_SIZE = %i DEFAULT CHARACTER SET %s",
             db_name, user, pass, page, charset );
 
@@ -543,7 +543,7 @@ HB_FUNC(FBGETDATA)
 
                 case SQL_TIMESTAMP:
                     isc_decode_timestamp ( ( ISC_TIMESTAMP ISC_FAR * ) var->sqldata, &times );
-                    sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04lu",
+                    hb_snprintf( date_s, sizeof( date_s ), "%04d-%02d-%02d %02d:%02d:%02d.%04lu",
                               times.tm_year + 1900,
                               times.tm_mon + 1,
                               times.tm_mday,
@@ -551,26 +551,26 @@ HB_FUNC(FBGETDATA)
                               times.tm_min,
                               times.tm_sec,
                               ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 );
-                    sprintf ( p, "%*s ", 24, date_s );
+                    hb_snprintf( p, MAX_BUFFER, "%s ", date_s );
 
                     _retc(p);
                     break;
 
                 case SQL_TYPE_DATE:
                     isc_decode_sql_date ( ( ISC_DATE ISC_FAR * ) var->sqldata, &times );
-                    sprintf ( date_s, "%04d-%02d-%02d", times.tm_year + 1900, times.tm_mon + 1, times.tm_mday );
-                    sprintf ( p, "%*s ", 8, date_s );
+                    hb_snprintf( date_s, sizeof( date_s ), "%04d-%02d-%02d", times.tm_year + 1900, times.tm_mon + 1, times.tm_mday );
+                    hb_snprintf( p, MAX_BUFFER, "%*s ", 8, date_s );
 
                     _retc(p);
                     break;
 
                 case SQL_TYPE_TIME:
                     isc_decode_sql_time ( ( ISC_TIME ISC_FAR * ) var->sqldata, &times );
-                    sprintf ( date_s, "%02d:%02d:%02d.%04lu",
+                    hb_snprintf( date_s, sizeof( date_s ), "%02d:%02d:%02d.%04lu",
                               times.tm_hour,
                               times.tm_min,
                               times.tm_sec, ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 );
-                    sprintf ( p, "%*s ", 13, date_s );
+                    hb_snprintf( p, MAX_BUFFER, "%*s ", 13, date_s );
 
                     _retc(p);
                     break;
@@ -622,41 +622,41 @@ HB_FUNC(FBGETDATA)
 		    	            tens *= 10;
 
 		                if (value >= 0)
-			                sprintf (p, "%*" ISC_INT64_FORMAT "d.%0*" ISC_INT64_FORMAT "d",
+			                hb_snprintf( p, MAX_BUFFER, "%*" ISC_INT64_FORMAT "d.%0*" ISC_INT64_FORMAT "d",
 				                field_width - 1 + dscale,
 				                (ISC_INT64) value / tens,
 				                -dscale,
 				                (ISC_INT64) value % tens);
 
 		                else if ((value / tens) != 0)
-        			        sprintf (p, "%*" ISC_INT64_FORMAT "d.%0*" ISC_INT64_FORMAT "d",
+        			        hb_snprintf( p, MAX_BUFFER, "%*" ISC_INT64_FORMAT "d.%0*" ISC_INT64_FORMAT "d",
 		        		        field_width - 1 + dscale,
 				                (ISC_INT64) (value / tens),
 				                -dscale,
         				        (ISC_INT64) -(value % tens));
 
 		                else
-        			        sprintf (p, "%*s.%0*" ISC_INT64_FORMAT "d",
+        			        hb_snprintf( p, MAX_BUFFER, "%*s.%0*" ISC_INT64_FORMAT "d",
 		        		        field_width - 1 + dscale,
 				                "-0",
 				                -dscale,
         				        (ISC_INT64) -(value % tens));
 		            }
 		            else if (dscale)
-    		            sprintf (p, "%*" ISC_INT64_FORMAT "d%0*d", field_width, (ISC_INT64) value, dscale, 0);
+    		            hb_snprintf( p, MAX_BUFFER, "%*" ISC_INT64_FORMAT "d%0*d", field_width, (ISC_INT64) value, dscale, 0);
 		            else
-		                sprintf (p, "%*" ISC_INT64_FORMAT "d", field_width, (ISC_INT64) value);
+		                hb_snprintf( p, MAX_BUFFER,  "%*" ISC_INT64_FORMAT "d", field_width, (ISC_INT64) value);
                 };
                     _retc(p);
                     break;
 
                 case SQL_FLOAT:
-                    sprintf(p, "%15g ", *(float ISC_FAR *) (var->sqldata));
+                    hb_snprintf(p, MAX_BUFFER, "%15g ", *(float ISC_FAR *) (var->sqldata));
                     _retc(p);
                     break;
 
                 case SQL_DOUBLE:
-		            sprintf(p, "%24f ", *(double ISC_FAR *) (var->sqldata));
+		            hb_snprintf(p, MAX_BUFFER, "%24f ", *(double ISC_FAR *) (var->sqldata));
                     _retc(p);
                     break;
 
@@ -708,7 +708,7 @@ HB_FUNC(FBGETBLOB)
     while (blob_stat == 0 || status[1] == isc_segment)
     {
         //p = ( char * ) hb_xgrab( blob_seg_len + 1 );
-        sprintf( p, "%*.*s", blob_seg_len, blob_seg_len, blob_segment);
+        hb_snprintf( p, MAX_BUFFER, "%*.*s", blob_seg_len, blob_seg_len, blob_segment);
 
         temp = _itemPutC( NULL, p );
         hb_arrayAdd( aNew, temp ) ;

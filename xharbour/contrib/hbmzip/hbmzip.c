@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.3 2009/01/18 07:19:16 andresreyesh Exp $
+ * $Id: hbmzip.c,v 1.4 2009/01/19 06:40:15 andresreyesh Exp $
  */
 
 /*
@@ -410,7 +410,8 @@ HB_FUNC( HB_UNZIPFILEINFO )
          hb_stord( ufi.tmu_date.tm_year, ufi.tmu_date.tm_mon + 1, ufi.tmu_date.tm_mday, 3 );
 
 
-         snprintf( buf, sizeof( buf ), "%02d:%02d:%02d", ufi.tmu_date.tm_hour,
+
+         hb_snprintf( buf, sizeof( buf ), "%02d:%02d:%02d", ufi.tmu_date.tm_hour,
                    ufi.tmu_date.tm_min, ufi.tmu_date.tm_sec );
          hb_storc( buf, 4 );
          hb_stornl( ufi.internal_fa, 5 );

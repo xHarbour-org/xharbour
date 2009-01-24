@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.9 2005/01/10 18:45:36 druzus Exp $
+ * $Id: hboutdbg.c,v 1.10 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -90,11 +90,11 @@ static void debugInit( void )
    {
       int iRand = ( int ) ( hb_random_num() * 1000000 );
       pFileName = hb_fsFNameSplit( hb_cmdargARGV()[ 0 ] );
-      snprintf( szDebugName, 127, "/tmp/%s%d_dbg", pFileName->szName, iRand );
+      hb_snprintf( szDebugName, sizeof( szDebugName ), "/tmp/%s%d_dbg", pFileName->szName, iRand );
    }
    else
    {
-      snprintf(szDebugName, 127, "/tmp/%s_dbg", s_szDebugName );
+      hb_snprintf(szDebugName, sizeof( szDebugName ), "/tmp/%s_dbg", s_szDebugName );
       pFileName = hb_fsFNameSplit( szDebugName );
    }
 
@@ -111,7 +111,7 @@ static void debugInit( void )
          ( ( char * ) pFileName->szName )[ 20 ] = 0;
       }
 
-      sprintf( szDebugTitle, "%s - Debug", pFileName->szName );
+      hb_snprintf( szDebugTitle, sizeof( szDebugTitle ), "%s - Debug", pFileName->szName );
 
       iPid = fork();
       if( iPid != 0 )

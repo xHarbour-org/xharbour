@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.18 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: gencobj.c,v 1.19 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -32,7 +32,7 @@
 
 
 /* QUESTION: Allocate buffer dynamically ? */
-#define HB_CFG_LINE_LEN    100
+#define HB_CFG_LINE_LEN    ( _POSIX_PATH_MAX << 1 )
 
 #include "hbexemem.h"
 
@@ -46,7 +46,7 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
    /* Check current dir first  */
    if( hb_fsFileExists( ( const char * ) pszFile ) )
    {
-      sprintf( pszCfg, "%s", pszFile );
+      hb_snprintf( pszCfg, _POSIX_PATH_MAX + 1, "%s", pszFile );
       return ( char * ) pszFile;
    }
    else
@@ -66,7 +66,7 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
          }
          if( *pszPath )
          {
-            sprintf( pszCfg, "%s%c%s", pszPath, HB_OS_PATH_DELIM_CHR, pszFile );
+            hb_snprintf( pszCfg, _POSIX_PATH_MAX + 1, "%s%c%s", pszPath, HB_OS_PATH_DELIM_CHR, pszFile );
             if( hb_fsFileExists( ( const char * ) pszCfg ) )
             {
                bFound = TRUE;
@@ -87,10 +87,10 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
 void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ];
-   char szLine[ HB_CFG_LINE_LEN ];
-   char szCompiler[ HB_CFG_LINE_LEN ] = "";
-   char szOptions[ HB_CFG_LINE_LEN ] = "";
-   char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
+   char szLine[ HB_CFG_LINE_LEN + 1 ];
+   char szCompiler[ HB_CFG_LINE_LEN + 1 ] = "";
+   char szOptions[ HB_CFG_LINE_LEN + 1 ] = "";
+   char szCommandLine[ HB_CFG_LINE_LEN * 2 + 1 ];
    char szOutPath[ _POSIX_PATH_MAX + 1 ] = "\0";
 
 #if defined( HOST_OS_UNIX_COMPATIBLE )
@@ -129,7 +129,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
    if( !pszCfg )
    {
       /* Grab space */
-      pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX );
+      pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX + 1 );
 
       if( pszEnv && pszEnv[ 0 ] != '\0' )
       { 
@@ -169,39 +169,39 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
          /* TODO: Check for comments within macros, i.e: CC=bcc32 #comment */
 
          if( *szStr )
+         {
+            szToken = strchr( szStr, '=' );
+
+            if( szToken )
             {
-               szToken = strchr( szStr, '=' );
-            
-               if( szToken )
+               *szToken++ = '\0';
+               if( *szToken )
                {
-                  *szToken++ = '\0';
-                  if ( *szToken )
+                  /* Checks compiler name */
+                  if( ! hb_stricmp( szStr, "CC" ) )
                   {
-                     /* Checks compiler name */
-                     if( ! hb_stricmp( szStr, "CC" ) )
-                     {
-                        sprintf( szCompiler, "%s", szToken );
-                     }
-                     /* Checks optional switches */
-                     else if( ! hb_stricmp( szStr, "CFLAGS" ) )
-                     {
-                        sprintf( szOptions, "%s", szToken );
-                     }
-                     /* Wanna see C compiler output ? */
-                     else if( ! hb_stricmp( szStr, "VERBOSE" ) )
-                     {
-                        if( ! hb_stricmp( szToken, "YES" ) )
-                           bVerbose = TRUE;
-                     }
-                     /* Delete intermediate C file ? */
-                     else if( ! hb_stricmp( szStr, "DELTMP" ) )
-                     {
-                        if( ! hb_stricmp( szToken, "NO" ) )
-                           bDelTmp = FALSE;
-                     }
+                     hb_snprintf( szCompiler, sizeof( szCompiler ), "%s", szToken );
+                  }
+                  /* Checks optional switches */
+                  else if( ! hb_stricmp( szStr, "CFLAGS" ) )
+                  {
+                     hb_snprintf( szOptions, sizeof( szCompiler ), "%s", szToken );
+                  }
+                  /* Wanna see C compiler output ? */
+                  else if( ! hb_stricmp( szStr, "VERBOSE" ) )
+                  {
+                     if( ! hb_stricmp( szToken, "YES" ) )
+                        bVerbose = TRUE;
+                  }
+                  /* Delete intermediate C file ? */
+                  else if( ! hb_stricmp( szStr, "DELTMP" ) )
+                  {
+                     if( ! hb_stricmp( szToken, "NO" ) )
+                        bDelTmp = FALSE;
                   }
                }
             }
+         }
       }
 
       fclose( yyc );
@@ -251,22 +251,22 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
       hb_fsFNameMerge( pszTemp, pOut );
 
 #if defined(_MSC_VER)
-      strcat( szOutPath, "-Fo" );
+      hb_strncat( szOutPath, "-Fo", sizeof( szOutPath ) - 1 );
 #elif defined(__WATCOMC__)
-      strcat( szOutPath, "-fo=" );      
+      hb_strncat( szOutPath, "-fo=", sizeof( szOutPath ) - 1 );      
 #else
-      strcat( szOutPath, "-o" );
+      hb_strncat( szOutPath, "-o", sizeof( szOutPath ) - 1 );
 #endif
 
-      strcat( szOutPath, pszTemp );
+      hb_strncat( szOutPath, pszTemp, sizeof( szOutPath ) - 1 );
 
       hb_xfree( pOut );
    }
 
    if( *szCompiler )
    {
-      sprintf( szCommandLine, "%s %s %s %s", szCompiler, szOptions, szOutPath, szFileName );
-      
+      hb_snprintf( szCommandLine, sizeof( szCommandLine ), "%s %s %s %s", szCompiler, szOptions, szOutPath, szFileName );
+
       if( bVerbose )
       {
          printf( "Exec: %s\n", szCommandLine ) ;

@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.9 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: error.ch,v 1.10 2007/01/12 22:42:00 ronpinkas Exp $
  */
 
 /*
@@ -141,5 +141,8 @@
 #define HB_EI_MEMCORRUPT        9026 /* "Memory corruption detected" */
 #define HB_EI_PREMATURE_RELEASE 9027 /* "Premature Array/Object Release detected" */
 #define HB_EI_ITEMBADSTRING     9028 /* "Invalid String value detected in hb_itemReleaseString()" */
+
+#define HB_EI_COMPBADOPCODE     9100 /* "Unsupported VM opcode" */
+#define HB_EI_COMPBADOPSIZE     9101 /* "Invalid opcode size" */
 
 #endif /* _ERROR_CH */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.25 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: hbi18n.c,v 1.26 2009/01/17 23:09:48 ronpinkas Exp $
  */
 
 /*
@@ -226,12 +226,13 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
 
    if ( strlen( i18n_dir ) > 0 )
    {
-      path = ( char *) hb_xgrab(
+      UINT uiLen = (
          strlen( i18n_dir ) +
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 3 ); // '/', dot and '\0'
 
-      sprintf( path, "%s%c%s.%s",
+      path = ( char * ) hb_xgrab( uiLen );
+      hb_snprintf( path, uiLen, "%s%c%s.%s",
             i18n_dir,
             HB_OS_PATH_DELIM_CHR,
             language,
@@ -239,11 +240,13 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
    }
    else
    {
-      path = ( char *) hb_xgrab(
+      UINT uiLen = (
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 2 ); // dot and '\0'
 
-      sprintf( path, "%s.%s",
+      path = ( char * ) hb_xgrab( uiLen );
+
+      hb_snprintf( path, uiLen, "%s.%s",
             language,
             HB_I18N_TAB_EXT );
    }
@@ -492,7 +495,7 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
          nStrLen = hb_arrayGetCLen( pRow, j )+1;
          if (nStrLen == 1 )
          {
-            sprintf( szStrLen,"%8d", 0 );
+            hb_snprintf( szStrLen, sizeof( szStrLen ), "%8d", 0 );
             if ( hb_fsWrite( handle, (BYTE *) szStrLen, 8 ) != 8 )
             {
                return FALSE;
@@ -501,7 +504,7 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
             continue;
          }
 
-         sprintf( szStrLen,"%8d", nStrLen );
+         hb_snprintf( szStrLen, sizeof( szStrLen ), "%8d", nStrLen );
 
          if ( hb_fsWrite( handle, (BYTE *) szStrLen, 8 ) != 8 )
          {

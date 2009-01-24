@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.72 2008/06/06 03:30:25 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.73 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -338,8 +338,8 @@ typedef  HB_PCODE_FUNC( HB_PCODE_FUNC_, HB_VOID_PTR );
 typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
 extern LONG hb_compPCodeSize( PFUNCTION, ULONG );
-extern void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
-extern void hb_compPCodeTrace( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
+extern void hb_compPCodeEval( PFUNCTION, const HB_PCODE_FUNC_PTR *, void * );
+extern void hb_compPCodeTrace( PFUNCTION, const HB_PCODE_FUNC_PTR *, void * );
 
 extern void hb_compGenLabelTable( PFUNCTION pFunc, PHB_LABEL_INFO label_info );
 extern PHB_DEBUGINFO hb_compGetDebugInfo( void );

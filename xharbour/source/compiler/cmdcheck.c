@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.40 2008/06/09 14:13:07 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.41 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -1120,7 +1120,7 @@ void hb_compChkEnvironVar( char * szSwitch )
 
                    if( strlen( szPrefix ) == 0 )
                    {
-                      sprintf( szPrefix, "%08lX_", PackDateTime() );
+                      hb_snprintf( szPrefix, strlen( s + 1 ), "%08lX_", PackDateTime() );
                    }
 
                    strncpy( hb_comp_szPrefix, szPrefix, 16 );

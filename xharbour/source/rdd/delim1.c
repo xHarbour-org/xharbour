@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.34 2008/09/05 08:38:35 marchuet Exp $
+ * $Id: delim1.c,v 1.35 2008/10/22 08:32:48 marchuet Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ static int hb_delimNextChar( DELIMAREAP pArea )
       pArea->ulBufferStart += pArea->ulBufferIndex;
       pArea->ulBufferIndex = 0;
       pArea->ulBufferRead = hb_fileReadAt( pArea->pFile,
-                                            pArea->pBuffer + ulLeft,
+                                           pArea->pBuffer + ulLeft,
                                            pArea->ulBufferSize - ulLeft,
                                            pArea->ulBufferStart + ulLeft );
       if( pArea->ulBufferRead > 0 &&
@@ -996,11 +996,11 @@ static ERRCODE hb_delimInfo( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          int iSub = hb_itemGetNI( pItem );
 
          if( iSub == 1 )
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "DELIM" );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "DELIM" );
          else if( iSub == 2 )
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "DELIM", pArea->rddID );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "DELIM", pArea->rddID );
          else
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
          hb_itemPutC( pItem, szBuf );
          break;
       }

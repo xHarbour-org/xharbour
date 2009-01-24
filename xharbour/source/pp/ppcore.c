@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.278 2008/11/19 05:24:52 andijahja Exp $
+ * $Id: ppcore.c,v 1.279 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -261,11 +261,11 @@ static void hb_pp_error( PHB_PP_STATE pState, char type, int iError, const char 
       char buffer[ 256 ];
 
       if( pState->pFile )
-         snprintf( line, sizeof( line ), "(%d) ", pState->pFile->iCurrentLine );
+         hb_snprintf( line, sizeof( line ), "(%d) ", pState->pFile->iCurrentLine );
       else
          line[ 0 ] = '\0';
-      snprintf( msg, sizeof( msg ), szMsgTable[ iError - 1 ], szParam );
-      snprintf( buffer, sizeof( buffer ), "%s%s: %s\n", line,
+      hb_snprintf( msg, sizeof( msg ), szMsgTable[ iError - 1 ], szParam );
+      hb_snprintf( buffer, sizeof( buffer ), "%s%s: %s\n", line,
                 type == 'F' ? "Fatal" : type == 'W' ? "Warning" : "Error", msg );
       hb_pp_disp( pState, buffer );
    }
@@ -730,7 +730,7 @@ static void hb_pp_readLine( PHB_PP_STATE pState )
       char szLine[ 12 ];
 
       pState->pFile->iLastDisp = iLine;
-      snprintf( szLine, sizeof( szLine ), "\r%i00\r", iLine );
+      hb_snprintf( szLine, sizeof( szLine ), "\r%i00\r", iLine );
       hb_pp_disp( pState, szLine );
    }
 }
@@ -1036,7 +1036,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
                      else if( pState->pInLineFunc )
                      {
                         char szFunc[ 24 ];
-                        snprintf( szFunc, sizeof( szFunc ), "HB_INLINE_%03d", ++pState->iInLineCount );
+                        hb_snprintf( szFunc, sizeof( szFunc ), "HB_INLINE_%03d", ++pState->iInLineCount );
                         if( pInLinePtr && * pInLinePtr )
                            hb_pp_tokenSetValue( *pInLinePtr, szFunc, strlen( szFunc ) );
                         pState->pInLineFunc( pState->cargo, szFunc,
@@ -1334,7 +1334,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
             char szCh[3];
 
             hb_pp_tokenAddNext( pState, pBuffer, ++ul, HB_PP_TOKEN_NUL );
-            snprintf( szCh, sizeof( szCh ), "%02x", ch & 0xff );
+            hb_snprintf( szCh, sizeof( szCh ), "%02x", ch & 0xff );
             hb_pp_error( pState, 'E', HB_PP_ERR_ILLEGAL_CHAR, szCh );
          }
          else if( HB_PP_ISDIGIT( ch ) )
@@ -2645,7 +2645,7 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    {
       char szLine[ 12 ];
 
-      snprintf( szLine, sizeof( szLine ), "%d", pState->pFile->iCurrentLine );
+      hb_snprintf( szLine, sizeof( szLine ), "%d", pState->pFile->iCurrentLine );
       hb_membufFlush( pState->pBuffer );
       hb_membufAddCh( pState->pBuffer, '(' );
       hb_membufAddStr( pState->pBuffer, szLine );
@@ -4957,7 +4957,7 @@ static void hb_pp_lineTokens( PHB_PP_TOKEN ** pTokenPtr, char * szFileName, int 
 {
    char szLine[ 12 ];
 
-   snprintf( szLine, sizeof( szLine ), "%d", iLine );
+   hb_snprintf( szLine, sizeof( szLine ), "%d", iLine );
    hb_pp_tokenAdd( pTokenPtr, "#", 1, 0, HB_PP_TOKEN_DIRECTIVE | HB_PP_TOKEN_STATIC );
    hb_pp_tokenAdd( pTokenPtr, "line", 4, 0, HB_PP_TOKEN_KEYWORD | HB_PP_TOKEN_STATIC );
    hb_pp_tokenAdd( pTokenPtr, szLine, strlen( szLine ), 1, HB_PP_TOKEN_NUMBER );
@@ -5537,9 +5537,9 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 
 #if defined( __HARBOUR__ ) || defined( __XHARBOUR__ )
 #if defined( __PPGEN__ )
-   snprintf( szResult, sizeof( szResult ), "%05d", HB_MAX( ( HB_VER_MAJOR << 8 ) | HB_VER_MINOR, 1 ) );
+   hb_snprintf( szResult, sizeof( szResult ), "%05d", HB_MAX( ( HB_VER_MAJOR << 8 ) | HB_VER_MINOR, 1 ) );
 #else
-   snprintf( szResult, sizeof( szResult ), "%05d", HB_VER_CVSID );
+   hb_snprintf( szResult, sizeof( szResult ), "%05d", HB_VER_CVSID );
 #endif
 #ifdef __HARBOUR__
    /* __HARBOUR__ */
@@ -5566,7 +5566,7 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
    szResult[ 10 ] = '\0';
    hb_pp_addDefine( pState, "__TIME__", szResult );
 
-   snprintf( szResult, sizeof( szResult ), "%d", ( int ) sizeof( void * ) );
+   hb_snprintf( szResult, sizeof( szResult ), "%d", ( int ) sizeof( void * ) );
 #if defined( HB_ARCH_16BIT )
    hb_pp_addDefine( pState, "__ARCH16BIT__", szResult );
 #elif defined( HB_ARCH_32BIT )

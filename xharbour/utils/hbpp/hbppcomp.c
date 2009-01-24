@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.12 2006/02/15 19:33:05 druzus Exp $
+ * $Id: hbppcomp.c,v 1.1 2007/02/27 15:59:42 druzus Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
 
                     if( lLine )
                     {
-                       sprintf( s_szLine, "#line %d \"%s\"\n", pFile->iLine, pFile->szFileName );
+                       hb_snprintf( s_szLine, sizeof( s_szLine ), "#line %d \"%s\"\n", pFile->iLine, pFile->szFileName );
                     }
                     else
                     {
@@ -164,7 +164,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
                     }
 
                     lLine = 0;
-                    sprintf( s_szLine + strlen( s_szLine ), "#line 1 \"%s\"", hb_comp_files.pLast->szFileName );
+                    hb_snprintf( s_szLine + strlen( s_szLine ), sizeof( s_szLine ) - strlen( s_szLine ), "#line 1 \"%s\"", hb_comp_files.pLast->szFileName );
                  }
                  else
                  {

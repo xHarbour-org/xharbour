@@ -1,5 +1,5 @@
 /*
- * $Id: hbppcore.c,v 1.4 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: hbppcore.c,v 1.5 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -442,7 +442,7 @@ char * hb_ppPlatform( void )
       regs.h.ah = 0x30;
       HB_DOS_INT86( 0x21, &regs, &regs );
 
-      sprintf( szPlatform, "DOS %d.%02d", regs.h.al, regs.h.ah );
+      hb_snprintf( szPlatform, 256, "DOS %d.%02d", regs.h.al, regs.h.ah );
 
       /* Host OS detection: Windows 2.x, 3.x, 95/98 */
 
@@ -454,11 +454,11 @@ char * hb_ppPlatform( void )
          {
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
             {
-               sprintf( szName, " (Windows 2.x)" );
+               hb_snprintf( szName, sizeof( szName ), " (Windows 2.x)" );
             }
             else
             {
-               sprintf( szName, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+               hb_snprintf( szName, sizeof( szName ), " (Windows %d.%02d)", regs.h.al, regs.h.ah );
             }
 
             strcat( szPlatform, szName );
@@ -487,11 +487,11 @@ char * hb_ppPlatform( void )
          {
             if( regs.h.al == 20 && regs.h.ah > 20 )
             {
-               sprintf( szName, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+               hb_snprintf( szName, sizeof( szName ), " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
             }
             else
             {
-               sprintf( szName, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+               hb_snprintf( szName, sizeof( szName ), " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
             }
 
             strcat( szPlatform, szName );
@@ -512,19 +512,19 @@ char * hb_ppPlatform( void )
          /* is this OS/2 2.x ? */
          if( aulQSV[ QSV_VERSION_MINOR - 1 ] < 30 )
          {
-            sprintf( szPlatform, "OS/2 %ld.%02ld",
+            hb_snprintf( szPlatform, 256, "OS/2 %ld.%02ld",
                aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10,
                aulQSV[ QSV_VERSION_MINOR - 1 ] );
          }
          else
          {
-            sprintf( szPlatform, "OS/2 %2.2f",
+            hb_snprintf( szPlatform, 256, "OS/2 %2.2f",
                ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
          }
       }
       else
       {
-         sprintf( szPlatform, "OS/2" );
+         hb_snprintf( szPlatform, 256, "OS/2" );
       }
    }
 
@@ -674,7 +674,7 @@ char * hb_ppPlatform( void )
                break;
          }
 
-         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName,
+         hb_snprintf( szPlatform, 256, "%s %lu.%02lu.%04d", szName,
                               ( ULONG ) osVer.dwMajorVersion,
                               ( ULONG ) osVer.dwMinorVersion,
                               ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
@@ -707,7 +707,7 @@ char * hb_ppPlatform( void )
       struct utsname un;
 
       uname( &un );
-      sprintf( szPlatform, "%s %s", un.sysname, un.release );
+      hb_snprintf( szPlatform, 256, "%s %s", un.sysname, un.release );
    }
 
 #elif defined(HB_OS_MAC)
@@ -797,7 +797,7 @@ void hb_pp_Init( void )
         The check below is to ensure that __HARBOUR__ gets the
         value of 1 by default
       */
-      sprintf( szResult, "%05d", ( usHarbour ? usHarbour : 1 ) );
+      hb_snprintf( szResult, sizeof( szResult ), "%05d", ( usHarbour ? usHarbour : 1 ) );
       hb_pp_AddDefine( "__HARBOUR__", szResult, FALSE );
       hb_pp_AddDefine( "__XHARBOUR__", szResult, FALSE );
    }
@@ -826,7 +826,7 @@ void hb_pp_Init( void )
    {
       char szResult[ 11 ];
 
-      sprintf( szResult, "%d", ( int ) sizeof( void * ) );
+      hb_snprintf( szResult, sizeof( szResult ), "%d", ( int ) sizeof( void * ) );
 #if defined( HB_ARCH_16BIT )
       hb_pp_AddDefine( "__ARCH16BIT__", szResult, FALSE );
 #elif defined( HB_ARCH_32BIT )

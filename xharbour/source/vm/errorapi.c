@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.90 2009/01/17 23:09:48 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.91 2009/01/18 22:45:50 enricomaria Exp $
  */
 
 /*
@@ -561,7 +561,7 @@ HB_FUNC_STATIC( OSTHREADID )
 {
    HB_THREAD_STUB
 
-   hb_retnint( ( HB_LONG ) hb_errGetThreadId( hb_stackSelfItem() ) );
+   hb_retnint( ( HB_LONG ) ( HB_PTRDIFF ) hb_errGetThreadId( hb_stackSelfItem() ) );
 }
 
 HB_FUNC_STATIC( _OSTHREADID )
@@ -572,7 +572,7 @@ HB_FUNC_STATIC( _OSTHREADID )
 
    if( pItem && HB_IS_INTEGER( pItem ) )
    {
-      hb_errPutThreadId( hb_stackSelfItem(), ( HB_THREAD_T ) hb_itemGetNInt( pItem ) );
+      hb_errPutThreadId( hb_stackSelfItem(), ( HB_THREAD_T ) ( HB_PTRDIFF ) hb_itemGetNInt( pItem ) );
    }
    hb_itemReturn( pItem );
 }
@@ -1464,14 +1464,14 @@ HB_THREAD_T hb_errGetThreadId( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetThreadId(%p)", pError));
    
-   return ( HB_THREAD_T ) hb_arrayGetNInt( pError, HB_TERROR_OSTHREADID );
+   return ( HB_THREAD_T ) ( HB_PTRDIFF ) hb_arrayGetNInt( pError, HB_TERROR_OSTHREADID );
 }
 
 PHB_ITEM hb_errPutThreadId( PHB_ITEM pError, HB_THREAD_T thId)
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutThreadId(%p, %X)", pError, (int)thId));
 
-   hb_arraySetNInt( pError, HB_TERROR_OSTHREADID, ( HB_LONG ) thId );
+   hb_arraySetNInt( pError, HB_TERROR_OSTHREADID, ( HB_LONG ) ( HB_PTRDIFF ) thId );
 
    return pError;
 }
@@ -2052,7 +2052,7 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
 
    hb_conOutErr( hb_conNewLine(), 0 );
 
-   sprintf( title, bLang ?
+   hb_snprintf( title, sizeof( title ), bLang ?
                       ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR ) :
                       "Unrecoverable error %lu: ", ulIntCode );
 
@@ -2060,11 +2060,11 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
 
    if( szText != NULL )
    {
-      sprintf( buffer, szText, szPar1, szPar2 );
+      hb_snprintf( buffer, sizeof( buffer ), szText, szPar1, szPar2 );
    }
    else if (bLang)
    {
-      sprintf( buffer, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
+      hb_snprintf( buffer, sizeof( buffer ), ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
    }
 
    hb_conOutErr( buffer, 0 );

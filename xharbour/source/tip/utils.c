@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.8 2006/10/01 11:24:47 enricomaria Exp $
+ * $Id: utils.c,v 1.9 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ HB_FUNC( TIP_TIMESTAMP )
    {
       GetLocalTime( &st );
 
-      sprintf( szRet, "%s, %u %s %u %02u:%02u:%02u %+03d%02d",
+      hb_snprintf( szRet, 64, "%s, %u %s %u %02u:%02u:%02u %+03d%02d",
             days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1],
             st.wYear,
             st.wHour, st.wMinute, st.wSecond,
@@ -122,7 +122,7 @@ HB_FUNC( TIP_TIMESTAMP )
       lDate = hb_itemGetDL( pDate );
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
 
-      sprintf( szRet, "%s, %d %s %d %02u:%02u:%02u %+03d%02d",
+      hb_snprintf( szRet, 64, "%s, %d %s %d %02u:%02u:%02u %+03d%02d",
             days[ hb_dateDOW( iYear, iMonth, iDay ) - 1 ], iDay,
             months[ iMonth -1], iYear,
             (UINT)( ulHour / 3600 ), (UINT)( (ulHour % 3600) / 60 ), (UINT)( ulHour % 60 ),

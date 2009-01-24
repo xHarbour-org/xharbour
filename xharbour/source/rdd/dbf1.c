@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.196 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: dbf1.c,v 1.197 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -3504,14 +3504,14 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          int iSub = hb_itemGetNI( pItem );
 
          if( iSub == 1 )
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "DBF" );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "DBF" );
          else if( iSub == 2 )
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "DBF", pArea->rddID );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "DBF", pArea->rddID );
 /*
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, pArea->pRddNode->szName, pArea->rddID );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, pArea->pRddNode->szName, pArea->rddID );
 */
          else
-            snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
          hb_itemPutC( pItem, szBuf );
          break;
       }

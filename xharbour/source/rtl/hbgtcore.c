@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.12 2008/11/26 21:01:02 marchuet Exp $
+ * $Id: hbgtcore.c,v 1.13 2008/11/26 22:25:27 andijahja Exp $
  */
 
 /*
@@ -3104,7 +3104,7 @@ const char * hb_gt_FindDefault( void )
 
    for( iPos = 0; iPos < s_iGtCount; iPos++ )
    {
-      snprintf( szFuncName, sizeof( szFuncName ), "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
+      hb_snprintf( szFuncName, sizeof( szFuncName ), "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
 
       if( hb_dynsymFind( szFuncName ) )
          return s_gtInit[ iPos ]->id;

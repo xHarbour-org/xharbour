@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.15 2008/03/31 12:09:53 modalsist Exp $
+ * $Id: files.c,v 1.16 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ HB_FUNC( FILEDATE )
          {
             tm_t = sStat.st_mtime;
             filedate = localtime( &tm_t );
-            sprintf( szDate,"%04d%02d%02d",filedate->tm_year+1900,filedate->tm_mon+1,filedate->tm_mday );
+            hb_snprintf( szDate, sizeof( szDate ), "%04d%02d%02d", filedate->tm_year + 1900, filedate->tm_mon + 1, filedate->tm_mday );
             usFileAttr=osToHarbourMask( sStat.st_mode );
 
             if ( ( ushbMask>0 ) & ( ushbMask&usFileAttr ) )
@@ -815,7 +815,7 @@ HB_FUNC( FILETIME )
 
       if ( !iFind )
       {
-         sprintf( szTime, "%02d:%02d:%02d",
+         hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d",
              ( fsFiles.ff_ftime >> 11 ) & 0x1f,
              ( fsFiles.ff_ftime >> 5 ) & 0x3f,
         ( fsFiles.ff_ftime & 0x1f ) << 1 );
@@ -828,7 +828,7 @@ HB_FUNC( FILETIME )
    }
    else
    {
-      sprintf( szTime, "%02d:%02d:%02d",
+      hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d",
                ( fsOldFiles.ff_ftime >> 11 ) & 0x1f,
           ( fsOldFiles.ff_ftime >> 5 ) & 0x3f,
           ( fsOldFiles.ff_ftime & 0x1f ) << 1 );
@@ -848,7 +848,7 @@ HB_FUNC( FILETIME )
    stat( szFile, &sStat );
    tm_t = sStat.st_mtime;
    ft = localtime( &tm_t );
-   sprintf( szTime, "%02d:%02d:%02d", ft->tm_hour, ft->tm_min, ft->tm_sec );
+   hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d", ft->tm_hour, ft->tm_min, ft->tm_sec );
    hb_retc( szTime );
 }
 

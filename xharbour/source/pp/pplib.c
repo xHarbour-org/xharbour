@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $
+ * $Id: pplib.c,v 1.3 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ static void hb_pp_ErrorMessage( void * cargo, const char * szMsgTable[],
    {
       char szMsgBuf[ 1024 ];
       PHB_ITEM pError;
-      snprintf( szMsgBuf, sizeof( szMsgBuf ), szMsgTable[ iCode - 1 ],
+      hb_snprintf( szMsgBuf, sizeof( szMsgBuf ), szMsgTable[ iCode - 1 ],
                 szParam1, szParam2 );
       pError = hb_errRT_New( ES_ERROR, "PP", 9999, ( ULONG ) iCode, szMsgBuf,
                              NULL, 0, EF_NONE | EF_CANDEFAULT );

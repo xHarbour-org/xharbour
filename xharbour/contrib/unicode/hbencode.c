@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.9 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: hbencode.c,v 1.10 2008/12/23 20:33:21 likewolf Exp $
  */
 
 /*
@@ -474,7 +474,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
       return -3;
    }
 
-   sprintf( cfile, "%s%02d.b64", strOut, filenumber );
+   hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
 
    infile = fopen( (char*) strIn, "rb");
 
@@ -531,7 +531,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
             fclose( outfile );
             filenumber ++;
             *cfile = '\0';
-            sprintf( cfile, "%s%02d.b64", strOut, filenumber );
+            hb_snprintf( cfile, sizeof( cFile ), "%s%02d.b64", strOut, filenumber );
             outfile = fopen ( cfile, "wb");
 
             if ( !outfile )
@@ -647,7 +647,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
       return -1;
    }
 
-   sprintf( cfile, "%s%02d.uue", sMask, filenumber );
+   hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
    fpOutFile = fopen ( cfile, "wb" );
 
@@ -682,7 +682,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
         nlinedone = -1;
         filenumber ++;
 
-        sprintf( cfile, "%s%02d.uue", sMask, filenumber );
+        hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
         fpOutFile = fopen ( cfile, "wb");
 
@@ -886,7 +886,7 @@ HB_FUNC( YYENCODE_FILE )
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   sprintf( pszFileName, "%s%s",pFileName->szName,pFileName->szExtension);
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
    filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
@@ -978,7 +978,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   sprintf( pszFileName, "%s%s",pFileName->szName,pFileName->szExtension);
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
    filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
@@ -1032,7 +1032,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 
       if ( nBytes )
       {
-         sprintf( szYYEFileName, "%s%02d%s", cMask, iPart,".yye" );
+         hb_snprintf( szYYEFileName, sizeof( szYYEFileName ), "%s%02d%s", cMask, iPart, ".yye" );
          fDes = fopen( szYYEFileName, "wb");
 
          if ( fDes )
