@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.40 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: cdpapi.c,v 1.41 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -485,7 +485,7 @@ char * hb_cdpSelectID( const char *pszID )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_cdpSelectID(%s)", pszID ) );
 
-   pszIDOld = hb_cdp_page->id;
+   pszIDOld = ( char * ) hb_cdp_page->id;
    hb_cdpSelect( hb_cdpFind( pszID ) );
 
    return pszIDOld;
