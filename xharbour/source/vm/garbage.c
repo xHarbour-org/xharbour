@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.100 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: garbage.c,v 1.101 2008/12/23 18:06:33 likewolf Exp $
  */
 
 /*
@@ -448,6 +448,134 @@ void *hb_gcUnlock( void *pBlock )
    return pBlock;
 }
 
+#define SIMULATE_ITEMREF_RECURSION
+
+#ifdef SIMULATE_ITEMREF_RECURSION
+
+    typedef struct
+    {
+       char cResumePoint;
+
+       union
+       {
+          // ResumePoint_1 does not require any data!
+
+          struct
+          {
+             PHB_ITEM pItem;
+             ULONG ulSize;
+          } ResumePoint_2; //Resume: if( HB_IS_ARRAY( pItem ) )
+
+          struct
+          {
+             PHB_ITEM pKey;
+             PHB_ITEM pValue;
+             ULONG ulSize;
+          } ResumePoint_3; //Resume (after pKey): if( HB_IS_HASH( pItem ) )
+
+          struct
+          {
+             PHB_ITEM pKey;
+             PHB_ITEM pValue;
+             ULONG ulSize;
+          } ResumePoint_4; //Resume (after pValue): if( HB_IS_HASH( pItem ) )
+
+          struct
+          {
+             HB_CODEBLOCK_PTR pCBlock;
+             USHORT ui;
+          } ResumePoint_5; //Resume: if( HB_IS_BLOCK( pItem ) )
+
+       } data;
+
+    } ITEMREF_RESUMEINFO, *PITEMREF_RESUMEINFO;
+
+    #define NESTED_ITEMREF( pNewItem, cNewResumePoint ) \
+            \
+            pResumeInfo[ iResumeCounter ].cResumePoint = ( cNewResumePoint ); \
+            \
+            switch( ( cNewResumePoint ) ) \
+            { \
+               case 1: \
+                  break; \
+              \
+               case 2: \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_2.pItem  = pItem; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_2.ulSize = ulSize; \
+                  break; \
+               \
+               case 3: \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_3.pKey   = pKey; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_3.pValue = pValue; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_3.ulSize = ulSize; \
+                  break; \
+               \
+               case 4: \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_4.pKey   = pKey; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_4.pValue = pValue; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_4.ulSize = ulSize; \
+                  break; \
+               \
+               case 5: \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_5.pCBlock = pCBlock; \
+                  pResumeInfo[ iResumeCounter ].data.ResumePoint_5.ui      = ui; \
+               \
+               default: \
+                  /* Unexpected case! */ \
+                  assert( 0 ); \
+            } \
+            \
+            pResumeInfo = (PITEMREF_RESUMEINFO) hb_xrealloc( (void *) pResumeInfo, ( ++iResumeCounter + 1 ) * sizeof( ITEMREF_RESUMEINFO ) ); \
+            \
+            pItem = ( pNewItem ); \
+            goto ItemRef_Top;
+
+    #define RETURN_OR_RESUME_ITEMREF() \
+            \
+            if( iResumeCounter == 0 ) \
+            { \
+               hb_xfree( (void *) pResumeInfo ); \
+               return; \
+            } \
+            \
+            --iResumeCounter; \
+            \
+            switch( pResumeInfo[ iResumeCounter ].cResumePoint ) \
+            { \
+               case 1: \
+                  goto ItemRef_ResumePoint_1; \
+              \
+               case 2: \
+                  pItem  = pResumeInfo[ iResumeCounter ].data.ResumePoint_2.pItem; \
+                  ulSize = pResumeInfo[ iResumeCounter ].data.ResumePoint_2.ulSize; \
+                  goto ItemRef_ResumePoint_2; \
+               \
+               case 3: \
+                  pKey   = pResumeInfo[ iResumeCounter ].data.ResumePoint_3.pKey; \
+                  pValue = pResumeInfo[ iResumeCounter ].data.ResumePoint_3.pValue; \
+                  ulSize = pResumeInfo[ iResumeCounter ].data.ResumePoint_3.ulSize; \
+                  goto ItemRef_ResumePoint_3; \
+               \
+               case 4: \
+                  pKey   = pResumeInfo[ iResumeCounter ].data.ResumePoint_4.pKey; \
+                  pValue = pResumeInfo[ iResumeCounter ].data.ResumePoint_4.pValue; \
+                  ulSize = pResumeInfo[ iResumeCounter ].data.ResumePoint_4.ulSize; \
+                  goto ItemRef_ResumePoint_4; \
+               \
+               case 5: \
+                  pCBlock = pResumeInfo[ iResumeCounter ].data.ResumePoint_5.pCBlock; \
+                  ui      = pResumeInfo[ iResumeCounter ].data.ResumePoint_5.ui; \
+                  goto ItemRef_ResumePoint_5; \
+               \
+               default: \
+                  /* Unexpected case! */ \
+                  assert( 0 ); \
+            }
+#else
+   #define NESTED_ITEMREF( pNewItem, nIgnore ) hb_gcItemRef( pNewItem )
+   #define RETURN_OR_RESUME_ITEMREF() return
+#endif
+
 
 /* Mark a passed item as used so it will be not released by the GC
 */
@@ -455,31 +583,55 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    HB_THREAD_STUB
 
+   ULONG ulSize;
+   HB_ITEM FakedItem;
+   PHB_ITEM pKey;
+   PHB_ITEM pValue;
+   HB_CODEBLOCK_PTR pCBlock;
+   USHORT ui;
+
+   #ifdef SIMULATE_ITEMREF_RECURSION
+      PITEMREF_RESUMEINFO pResumeInfo = (PITEMREF_RESUMEINFO) hb_xgrab( sizeof( ITEMREF_RESUMEINFO ) );
+      int iResumeCounter = 0;
+   #endif
+
+   FakedItem.type = HB_IT_ARRAY;
+
+   ItemRef_Top:
+
    while( HB_IS_BYREF( pItem ) )
    {
       if( HB_IS_EXTREF( pItem ) )
       {
          pItem->item.asExtRef.func->mark( pItem->item.asExtRef.value );
-         return;
-      }
-      if( HB_IS_MEMVAR( pItem ) == FALSE && pItem->item.asRefer.offset == 0 )
-      {
-         HB_ITEM FakedItem;
 
-         FakedItem.type = HB_IT_ARRAY;
-         FakedItem.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
-
-         hb_gcItemRef( &FakedItem );
+         RETURN_OR_RESUME_ITEMREF();
       }
 
-      if( HB_IS_MEMVAR( pItem ) && HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+      if( HB_IS_MEMVAR( pItem ) == FALSE )
       {
-         pItem->type = HB_IT_NIL;
+         if( pItem->item.asRefer.offset == 0 )
+         {
+            FakedItem.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
+
+            //hb_gcItemRef( &FakedItem );
+            NESTED_ITEMREF( &FakedItem, 1 );
+            ItemRef_ResumePoint_1:
+
+            // return;
+            RETURN_OR_RESUME_ITEMREF();
+         }
       }
       else
       {
-         pItem = hb_itemUnRefOnce( pItem );
+         if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+         {
+            //return;
+            RETURN_OR_RESUME_ITEMREF();
+         }
       }
+
+      pItem = hb_itemUnRefOnce( pItem );
    }
 
    if( HB_IS_ARRAY( pItem ) )
@@ -492,7 +644,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       /* Check this array only if it was not checked yet */
       if( pAlloc->used == s_uUsedFlag )
       {
-         ULONG ulSize = pItem->item.asArray.value->ulLen;
+         ulSize = pItem->item.asArray.value->ulLen;
          /* mark this block as used so it will be no re-checked from
           * other references
           */
@@ -505,11 +657,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          while( ulSize )
          {
             //printf( "Item %p\n", pItem );
-            hb_gcItemRef( pItem++ );
+
+            //hb_gcItemRef( pItem );
+            NESTED_ITEMREF( pItem, 2 );
+            ItemRef_ResumePoint_2:
+
+            ++pItem;
             --ulSize;
          }
       }
-
    }
    else if( HB_IS_HASH( pItem ) )
    {
@@ -519,9 +675,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       /* Check this hash only if it was not checked yet */
       if( pAlloc->used == s_uUsedFlag )
       {
-         ULONG ulSize = pItem->item.asHash.value->ulLen;
-         PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
-         PHB_ITEM pValue = pItem->item.asHash.value->pValues;
+         ulSize = pItem->item.asHash.value->ulLen;
+         pKey = pItem->item.asHash.value->pKeys;
+         pValue = pItem->item.asHash.value->pValues;
 
          /* mark this block as used so it will be no re-checked from
           * other references
@@ -532,8 +688,17 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          while( ulSize )
          {
             //printf( "Kry %p Value: %p\n", pKey, pValue );
-            hb_gcItemRef( pKey++ );
-            hb_gcItemRef( pValue++ );
+
+            //hb_gcItemRef( pKey );
+            NESTED_ITEMREF( pKey, 3 );
+            ItemRef_ResumePoint_3:
+
+            //hb_gcItemRef( pValue );
+            NESTED_ITEMREF( pValue, 4 );
+            ItemRef_ResumePoint_4:
+
+            ++pKey;
+            ++pValue;
             --ulSize;
          }
       }
@@ -546,15 +711,19 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       /* Check this block only if it was not checked yet */
       if( pAlloc->used == s_uUsedFlag )
       {
-         HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
-         USHORT ui = 1;
+         pCBlock = pItem->item.asBlock.value;
+         ui = 1;
 
          pAlloc->used ^= HB_GC_USED_FLAG;  /* mark this codeblock as used */
 
          /* mark as used all detached variables in a codeblock */
          while( ui <= pCBlock->uiLocals )
          {
-            hb_gcItemRef( &pCBlock->pLocals[ ui++ ] );
+            //hb_gcItemRef( &pCBlock->pLocals[ ui ] );
+            NESTED_ITEMREF( &pCBlock->pLocals[ ui ] , 5 );
+           ItemRef_ResumePoint_5:
+
+            ++ui;
          }
       }
    }
@@ -576,8 +745,10 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          }
       }
    }
+
    /* all other data types don't need the GC */
 
+   RETURN_OR_RESUME_ITEMREF();
 }
 
 void hb_gcCollect( void )
