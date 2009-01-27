@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6348 2009/01/25 00:10:29 likewolf Exp $
+ * $Id: ChangeLog,v 1.6349 2009/01/26 22:23:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-26 21:02 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * ./make_gc.bat
+    * Added 'IF "%envvar%"=="" SET ...' to environment variables.
 
 2009-01-26 17:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/garbage.c

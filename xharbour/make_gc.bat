@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_gc.bat,v 1.13 2008/05/07 04:58:33 andijahja Exp $
+rem $Id: make_gc.bat,v 1.14 2008/07/14 02:50:56 kaddath Exp $
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR MINGW32
@@ -11,10 +11,10 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET CC_DIR=C:/MinGW
-SET SUB_DIR=gc
-SET HB_GT_LIB=$(GTWIN_LIB)
-SET BISON_DIR=C:/MSYS/1.0/bin
+IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGW
+IF "%SUB_DIR%"=="" SET SUB_DIR=gc
+IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
+IF "%BISON_DIR%"=="" SET BISON_DIR=C:/MSYS/1.0/bin
 
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
