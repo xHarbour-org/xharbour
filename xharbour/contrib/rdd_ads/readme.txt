@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt 8446 2008-05-18 22:55:03Z vszakats $
+ * $Id: readme.txt,v 1.2 2008/06/03 23:12:56 kaddath Exp $
  */
 
  RDD for Advantage Database Server
@@ -8,8 +8,8 @@
 
  For using this RDD you need to have:
    ace32.dll  ( Advantage Client Engine ),
-   AXCWS32.DLL ( communication layer for remote server ) or
-   ADSLOC32.DLL ( local server )
+   axcws32.dll ( communication layer for remote server ) or
+   adsloc32.dll ( local server )
 
    You need also to create ace32.lib with the help of implib.exe:
      implib ace32.lib ace32.dll

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.29 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: maindllp.c,v 1.30 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -1249,7 +1249,7 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves
 }
 
 #undef hb_xinit
-void hb_xinit( void )                         /* Initialize fixed memory subsystem */
+int hb_xinit( void )                         /* Initialize fixed memory subsystem */
 {
    static HB_XINIT pXinit = NULL;
 
@@ -1262,6 +1262,7 @@ void hb_xinit( void )                         /* Initialize fixed memory subsyst
    {
       pXinit();
    }
+   return 1;
 }
 
 #undef hb_xexit
@@ -1509,3 +1510,38 @@ void hb_fsClose( HB_FHANDLE hFileHandle  )
 
 HB_EXTERN_END
 #endif
+
+#undef _HB_SNPRINTF_ADD_EOS
+#undef hb_snprintf
+/* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
+ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
+{
+   va_list arglist;
+   ULONG result;
+
+   va_start( arglist, format );
+
+#if defined( __DJGPP__ ) && ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
+   /* Use vsprintf() for DJGPP <= 2.03.
+      This is a temporary hack, should implement a C99 snprintf() ourselves. */
+   result = vsprintf( buffer, format, arglist );
+#elif defined( _MSC_VER ) && _MSC_VER >= 1400
+   result = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
+#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && !defined( __XCC__ )
+   result = _vsnprintf( buffer, nSize, format, arglist );
+   #define _HB_SNPRINTF_ADD_EOS
+#elif defined( __WATCOMC__ ) && __WATCOMC__ < 1200
+   result = _vbprintf( buffer, nSize, format, arglist );
+#else
+   result = vsnprintf( buffer, nSize, format, arglist );
+#endif
+
+   va_end( arglist );
+
+#ifdef _HB_SNPRINTF_ADD_EOS
+   if( buffer && nSize )
+      buffer[ nSize - 1 ] = '\0';
+#endif
+
+   return result;
+}

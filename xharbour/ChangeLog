@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6349 2009/01/26 22:23:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6350 2009/01/27 03:00:14 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-28 16:46 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbsetup.h
+    + added HB_NO_TRACE as default, when trace will be required need add macro HB_PRG_TRACE.
+      By default this is turned off. Define HB_PRG_TRACE to turn it on.
+      
+  * source\rdd\dbfnsx\dbfnsx1.c
+    * synced with harbour.
+
+  * contrib\rdd_ads\readme.txt    
+  * source\vm\fm.c
+    * minor syntax changes.
+    
+  * source\vm\maindllp.c
+    ! fixed added hb_snprintf as api one nedded for dll with PCODE.
 
 2009-01-26 21:02 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./make_gc.bat

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.53 2009/01/15 08:41:13 enricomaria Exp $
+ * $Id: hbsetup.h,v 1.54 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -108,6 +108,14 @@
 
 #ifndef HB_USE_PROFILER
    #define HB_NO_PROFILER
+#endif
+
+/* ***********************************************************************
+ * Enable trace support in HVM
+ * By default this is turned off. Define HB_PRG_TRACE to turn it on.
+ */
+#ifndef HB_PRG_TRACE
+#define HB_NO_TRACE
 #endif
 
 /* ***********************************************************************

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.111 2009/01/17 23:35:24 andijahja Exp $
+ * $Id: fm.c,v 1.112 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -146,7 +146,6 @@ static HANDLE hProcessHeap = 0;
 #     define malloc( n )      ( assert( hProcessHeap ),  ( void * ) HeapAlloc( hProcessHeap, 0, ( n ) ) )
 #     define realloc( p, n )  ( void * ) HeapReAlloc( hProcessHeap, 0, ( void * ) ( p ), ( n ) )
 #     define free( p )        HeapFree( hProcessHeap, 0, ( void * ) ( p ) )
-
 #  endif
 #endif
 
