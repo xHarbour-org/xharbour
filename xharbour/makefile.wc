@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.96 2008/11/24 05:30:34 andijahja Exp $
+# $Id: makefile.wc,v 1.97 2009/01/08 09:11:13 marchuet Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -235,6 +235,9 @@ $(MISC_LIB) : $(MISC_LIB_OBJS)
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
 
+$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
+	$(LIB_CMD)
+
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -339,7 +342,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(DLL_MAIN_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project

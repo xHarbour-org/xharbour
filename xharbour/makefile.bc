@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.240 2008/11/24 05:30:34 andijahja Exp $
+# $Id: makefile.bc,v 1.241 2009/01/08 09:11:13 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -385,6 +385,13 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 +)
 !
 
+$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
+	IF EXIST "$(USE_DLL_LIB)" $(DEL) "$(USE_DLL_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -471,7 +478,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) c0d32.obj $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(DLL_MAIN_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
