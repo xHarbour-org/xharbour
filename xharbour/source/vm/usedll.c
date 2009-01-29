@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.12 2009/01/08 04:36:05 ronpinkas Exp $
+ * $Id: maindllu.c,v 1.1 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -55,54 +55,16 @@
  *
  */
 
-/*
-  NOTE: This is a system source linked into harbour.dll
-
-  WARNING: Do NOT link this into other dll!
-
-           DLL applications which are staticly linked
-           against harbour.dll, should be linked to maindlle.c
-           by means of dllmain.lib!
-*/
-
 #define HB_OS_WIN_32_USED
 
 #include "hbtypes.h"
 
-
 #if defined(HB_OS_WIN_32)
 HB_EXTERN_BEGIN
-#if defined(HB_DLL_REQUIRED_DLLMAIN)
-HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
-{
-   HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
-#else
-HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
-{
-   HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
-#endif
-
-   HB_SYMBOL_UNUSED( hInstance );
-   HB_SYMBOL_UNUSED( pvReserved );
-
-   switch( fdwReason )
-   {
-      case DLL_PROCESS_ATTACH:
-         break;
-
-      case DLL_PROCESS_DETACH:
-         break;
-   }
-
-   return TRUE;
-}
 
 HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   return hb_vmProcessSysDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
+   return hb_vmProcessExeUsesDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
-
 HB_EXTERN_END
 #endif

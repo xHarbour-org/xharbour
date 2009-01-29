@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.91 2009/01/18 22:45:50 enricomaria Exp $
+ * $Id: errorapi.c,v 1.92 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -556,7 +556,7 @@ HB_FUNC_STATIC( _RUNNINGTHREADS )
    }
    hb_retni( iValue );
 }
-   
+
 HB_FUNC_STATIC( OSTHREADID )
 {
    HB_THREAD_STUB
@@ -576,7 +576,7 @@ HB_FUNC_STATIC( _OSTHREADID )
    }
    hb_itemReturn( pItem );
 }
-   
+
 HB_FUNC_STATIC( VMTHREADID )
 {
    HB_THREAD_STUB
@@ -596,7 +596,7 @@ HB_FUNC_STATIC( _VMTHREADID )
    }
    hb_retni( iValue );
 }
-   
+
 HB_FUNC_STATIC( MODULENAME )
 {
    HB_THREAD_STUB
@@ -728,7 +728,7 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
-      hb_procinfo( 0, NULL, NULL, szModuleName );
+      hb_procinfo( 1, NULL, NULL, szModuleName );
       hb_errPutModuleName( pError, szModuleName );
    }
    if ( ISCHAR( 8 ) )
@@ -737,7 +737,7 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
-      hb_errPutProcName( pError, hb_procinfo( 0, szProcName, NULL, NULL ) );
+      hb_errPutProcName( pError, hb_procinfo( 1, szProcName, NULL, NULL ) );
    }
    if ( ISNUM( 9 ) )
    {
@@ -745,13 +745,13 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
-      hb_procinfo( 0, NULL, &uLine, NULL );
+      hb_procinfo( 1, NULL, &uLine, NULL );
       hb_errPutProcLine( pError, uLine );
    }
 
    /* Build callstack array */
    pCallStack = hb_itemArrayNew( 0 );
-   for ( iLevel = 0;
+   for ( iLevel = 1;
          hb_procinfo( iLevel, szProcName, &uLine, szModuleName ) && *szProcName;
          iLevel++ )
    {
@@ -1431,7 +1431,7 @@ PHB_ITEM hb_errPutSubSystem( PHB_ITEM pError, const char * szSubSystem )
 char * hb_errGetProcName( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetProcName(%p)", pError));
-   
+
    return hb_arrayGetCPtr( pError, HB_TERROR_PROCNAME );
 }
 
@@ -1454,7 +1454,7 @@ UINT hb_errGetProcLine( PHB_ITEM pError )
 PHB_ITEM hb_errPutProcLine( PHB_ITEM pError, UINT uiLine )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutProcLine(%p, %d)", pError, uiLine));
-   
+
    hb_arraySetNI( pError, HB_TERROR_PROCLINE, uiLine );
 
    return pError;
@@ -1463,7 +1463,7 @@ PHB_ITEM hb_errPutProcLine( PHB_ITEM pError, UINT uiLine )
 HB_THREAD_T hb_errGetThreadId( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetThreadId(%p)", pError));
-   
+
    return ( HB_THREAD_T ) ( HB_PTRDIFF ) hb_arrayGetNInt( pError, HB_TERROR_OSTHREADID );
 }
 
@@ -1630,7 +1630,7 @@ PHB_ITEM hb_errRT_New(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine, NULL ) );
+   hb_errPutProcName( pError, hb_procinfo( 1, szName, &uLine, NULL ) );
    hb_errPutProcLine( pError, uLine );
 
    #ifdef HB_THREAD_SUPPORT

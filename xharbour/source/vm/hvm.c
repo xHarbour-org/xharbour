@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.711 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: hvm.c,v 1.712 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -10199,7 +10199,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pSymbolTable;
       }
 
-      if( ! s_pSymStart && ! fDynLib && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 )
+      if( ! s_pSymStart && fDynLib == FALSE && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 )
       {
          /* first public defined symbol to start execution */
          s_pSymStart = pSymbol;
@@ -10600,9 +10600,8 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
 
-/* hvm support for pcode DLLs */
-
-PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+/* HVM & RTL in harbour.dll */
+PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -10634,7 +10633,61 @@ PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
 }
 
-PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+/*
+   This is the worker function for the hb_vmProcessSymbols() variation from maindlle.c
+   It is important that prg dlls which are staticly linked to harbour.dll should be
+   linked to dllmain.lib, ahead of harbour.dll, so that hb_vmProcessSymbols() from maindlle.c
+   will be used to process the prg dll's symbols, instead of the vmProcessSymbols() from
+   maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
+*/
+PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+{
+   PSYMBOLS pNewSymbols;
+   PHB_SYMB pSymStart = s_pSymStart;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
+
+#ifdef HB_THREAD_SUPPORT
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
+#endif
+
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szPCode[ 12 ];
+
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
+
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
+
+#if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
+
+      hb_xinit();
+   }
+#endif
+
+   // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
+   pNewSymbols = hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
+   // Incase any of the prg dll's sources was *not* compiled with -n0!
+   s_pSymStart = pSymStart;
+
+   return pNewSymbols;
+}
+
+/*
+   This is the worker function for the hb_vmProcessSymbols() variation from usedll.c
+   It is important that prg exes which are staticly linked to harbour.dll should be
+   linked to usedll.lib, ahead of harbour.dll, so that hb_vmProcessSymbols() from usedll.c
+   will be used to process the client exe symbols, instead of the vmProcessSymbols() from
+   maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
+*/
+PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 

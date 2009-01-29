@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6351 2009/01/28 15:42:06 marchuet Exp $
+ * $Id: ChangeLog,v 1.6352 2009/01/29 09:58:40 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-29 11:57 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * common.mak
+   * compile.mak
+     + Added new use_dll.lib
+     - Moved mainstd.c and mainwin.c from dllmain.lib to use_dll.lib
+
+   * makefile.vc
+     + Added $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
+     * Replaced $(DLL_MAIN_LIB) with $(USE_DLL_LIB) in DLLEXE_LINK_CMD
+     /*
+        Please synch these changes to makefile.* of other compilers
+      */
+
+   * mdir.bat
+     * Add import lib harbour.lib to appropriate compiler sub folder of \xharbour\lib
+
+
+   * source/vm/maindlle.c
+     * Changed to use hb_vmProcessPrgDllSymbols() for better self describing
+     + Added comment:
+        /*
+          NOTE: This source should be compiled into dllmain.lib
+                and linked to any dll of prg code, which will be
+                staticly linked against harbour.dll
+
+          WARNING: Do NOT link this into any EXE application!
+
+                   EXE applications which are staticly linked
+                   against harbour.dll, should be linked to usedll.c
+                   by means of use_dll.lib!
+        */
+
+
+   * source/vm/maindllh.c
+     * Changed to use hb_vmProcessSysDllSymbols() for better self describing
+     + Added comment:
+        /*
+          NOTE: This is a system source linked into harbour.dll
+
+          WARNING: Do NOT link this into other dll!
+
+                   DLL applications which are staticly linked
+                   against harbour.dll, should be linked to maindlle.c
+                   by means of dllmain.lib!
+        */
+
+   + source/vm/usedll.c
+     + New source to be comiled into use_dll.lib and linked to any application
+       staticly linked to harbour.dll.
+       /*
+           NOTE: Make sure to link use_dll.lib aheadu of harbour.lib!
+        */
+
+   * include/hbvm.h
+   * source/vm/hvm.c
+     * hb_vmProcessDllSymbols() -> hb_vmProcessSysDllSymbols()
+     * hb_vmProcessExeSymbols() -> hb_vmProcessPrgDllSymbols()
+     + hb_vmProcessExeUsesDllSymbols() to services new usedll.c
+
+   * source/vm/errorapi.c
+     * Few typos in new HB_FUNC( ERRORNEW )
+
 
 2009-01-29 11:02 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * rdd\bmdbfcdx\bmdbfcdx1.c
@@ -18,7 +81,7 @@
     ! added RT errors for invalid KEY or FOR expressions (from harbour)
     % removed unused static variable and its related code.
   * rdd\dbfntx\dbfntx1.c
-    ! fixed possible GPF caused by corrupted indexes  
+    ! fixed possible GPF caused by corrupted indexes
   * vm\dlmalloc.c
     * disable #pragma warning ... in MinGW builds. If some newer MinGW
       versions support it and it's useful then it can be enabled after
@@ -28,14 +91,14 @@
   * include\hbsetup.h
     + added HB_NO_TRACE as default, when trace will be required need add macro HB_PRG_TRACE.
       By default this is turned off. Define HB_PRG_TRACE to turn it on.
-      
+
   * source\rdd\dbfnsx\dbfnsx1.c
     * synced with harbour.
 
-  * contrib\rdd_ads\readme.txt    
+  * contrib\rdd_ads\readme.txt
   * source\vm\fm.c
     * minor syntax changes.
-    
+
   * source\vm\maindllp.c
     ! fixed added hb_snprintf as api one nedded for dll with PCODE.
 

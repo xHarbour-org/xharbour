@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.40 2009/01/24 15:51:04 ronpinkas Exp $
+# $Id: common.mak,v 1.41 2009/01/24 16:53:10 likewolf Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -99,6 +99,7 @@ VM_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)vm$(HB_MT)$(LIBEXT)
 FMSTAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fmstat$(HB_MT)$(LIBEXT)
 ODBC_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbodbc$(LIBEXT)
 DLL_MAIN_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dllmain$(LIBEXT)
+USE_DLL_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)use_dll$(LIBEXT)
 MISC_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libmisc$(LIBEXT)
 GTCGI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtcgi$(LIBEXT)
 GTDOS_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gtdos$(LIBEXT)
@@ -1207,9 +1208,15 @@ MISC_LIB_OBJS=\
 # DLLMAIN.LIB rules
 #===============================================================================
 DLL_MAIN_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT)\
         $(OBJ_DIR)$(DIR_SEP)maindlle$(OBJEXT)
+
+#===============================================================================
+# USEDLL.LIB rules
+#===============================================================================
+USE_DLL_LIB_OBJS=\
+        $(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT)\
+        $(OBJ_DIR)$(DIR_SEP)usedll$(OBJEXT)
 
 #===============================================================================
 # HARBOUR.DLL Rules
@@ -1740,6 +1747,7 @@ ST_PROJECT=\
 	$(CODEPAGE_LIB)\
 	$(ZLIB_LIB)\
 	$(DLL_MAIN_LIB)\
+	$(USE_DLL_LIB)\
 	$(ODBC_LIB)\
 	$(MISC_LIB)\
 	$(HBPP_EXE)\

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.8 2008/04/22 09:16:05 andijahja Exp $
+ * $Id: maindlle.c,v 1.1 2008/10/09 22:53:44 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,18 @@
  *
  */
 
+/*
+  NOTE: This source should be compiled into dllmain.lib
+        and linked to any dll of prg code, which will be
+        staticly linked against harbour.dll
+
+  WARNING: Do NOT link this into any EXE application!
+
+           EXE applications which are staticly linked
+           against harbour.dll, should be linked to usedll.c
+           by means of use_dll.lib!
+*/
+
 #define HB_OS_WIN_32_USED
 
 #include "hbtypes.h"
@@ -91,7 +103,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
 
 HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   return hb_vmProcessExeSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
+   return hb_vmProcessPrgDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
 HB_EXTERN_END
 #endif

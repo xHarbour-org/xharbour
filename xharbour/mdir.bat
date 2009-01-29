@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.16 2008/11/25 05:15:58 andijahja Exp $
+rem $Id: mdir.bat,v 1.17 2009/01/08 09:11:13 marchuet Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -60,8 +60,8 @@ rem=============================================================================
 rem=============================================================================
 ECHO System Files Succesfully Built ...
 ECHO Copying System Files to BIN and LIB Folders ...
-if exist bin\ppgen.exe           del   bin\ppgen.exe 
-if exist bin\%SUB_DIR%\ppgen.exe del   bin\%SUB_DIR%\ppgen.exe 
+if exist bin\ppgen.exe           del   bin\ppgen.exe
+if exist bin\%SUB_DIR%\ppgen.exe del   bin\%SUB_DIR%\ppgen.exe
 if exist bin\%SUB_DIR%\*.exe xcopy     bin\%SUB_DIR%\*.exe bin /D /Y > nul
 if exist lib\%SUB_DIR%\*%LIBEXT% xcopy lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
 if exist bin\%SUB_DIR%\*.tds xcopy     bin\%SUB_DIR%\*.tds bin /D /Y > nul
@@ -76,13 +76,14 @@ rem=============================================================================
 ECHO DLL Files Succesfully Built ...
 ECHO Copying DLL Files to BIN Folder ...
 if exist hdll.tmp del hdll.tmp
-if exist bin\%SUB_DIR%\harbour.lib     copy bin\%SUB_DIR%\harbour.lib     lib > nul
-if exist bin\%SUB_DIR%\harbour.dll     copy bin\%SUB_DIR%\harbour.dll     bin > nul
-if exist bin\%SUB_DIR%\hbdocdll.exe    copy bin\%SUB_DIR%\hbdocdll.exe    bin > nul
-if exist bin\%SUB_DIR%\hbmakedll.exe   copy bin\%SUB_DIR%\hbmakedll.exe   bin > nul
-if exist bin\%SUB_DIR%\hbrundll.exe    copy bin\%SUB_DIR%\hbrundll.exe    bin > nul
-if exist bin\%SUB_DIR%\hbtestdll.exe   copy bin\%SUB_DIR%\hbtestdll.exe   bin > nul
-if exist bin\%SUB_DIR%\xbscriptdll.exe copy bin\%SUB_DIR%\xbscriptdll.exe bin > nul
+if exist bin\%SUB_DIR%\harbour.lib     copy bin\%SUB_DIR%\harbour.lib     lib           > nul
+if exist bin\%SUB_DIR%\harbour.lib     copy bin\%SUB_DIR%\harbour.lib     lib\%SUB_DIR% > nul
+if exist bin\%SUB_DIR%\harbour.dll     copy bin\%SUB_DIR%\harbour.dll     bin           > nul
+if exist bin\%SUB_DIR%\hbdocdll.exe    copy bin\%SUB_DIR%\hbdocdll.exe    bin           > nul
+if exist bin\%SUB_DIR%\hbmakedll.exe   copy bin\%SUB_DIR%\hbmakedll.exe   bin           > nul
+if exist bin\%SUB_DIR%\hbrundll.exe    copy bin\%SUB_DIR%\hbrundll.exe    bin           > nul
+if exist bin\%SUB_DIR%\hbtestdll.exe   copy bin\%SUB_DIR%\hbtestdll.exe   bin           > nul
+if exist bin\%SUB_DIR%\xbscriptdll.exe copy bin\%SUB_DIR%\xbscriptdll.exe bin           > nul
 ECHO Done ...
 ECHO.
 goto EXIT

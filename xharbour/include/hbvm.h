@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.67 2009/01/17 20:54:27 andijahja Exp $
+ * $Id: hbvm.h,v 1.68 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -97,8 +97,10 @@ extern HB_EXPORT void     hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 /* Harbour virtual machine functions */
 extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals );
+
 #ifdef _HB_API_INTERNAL_
    extern BOOL        hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols, USHORT * puiSymbols );
    extern PHB_SYMB    hb_vmGetRealFuncSym( PHB_SYMB pSym );
