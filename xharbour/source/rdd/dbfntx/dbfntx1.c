@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.181 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.182 2009/01/08 09:11:14 marchuet Exp $
  */
 
 /*
@@ -852,7 +852,7 @@ static BOOL hb_ntxCheckRecordScope( NTXAREAP pArea, ULONG ulRec )
 {
    LONG lRecNo = ( LONG ) ulRec;
 
-   if ( SELF_COUNTSCOPE( ( AREAP ) pArea, NULL, &lRecNo ) == SUCCESS && lRecNo == 0 )
+   if( SELF_COUNTSCOPE( ( AREAP ) pArea, NULL, &lRecNo ) == SUCCESS && lRecNo == 0 )
    {
       return FALSE;
    }
@@ -1990,7 +1990,7 @@ static void hb_ntxIndexFlush( LPNTXINDEX pIndex )
       if( pIndex->Changed )
          hb_ntxIndexHeaderSave( pIndex );
    }
-   else
+   else if( pIndex->iTags )
    {
       if( pIndex->Changed || pIndex->lpTags[ 0 ]->HdrChanged )
          hb_ntxTagHeaderSave( pIndex->lpTags[ 0 ] );
@@ -4327,11 +4327,11 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
 {
    NTXAREAP pArea = pTag->Owner->Owner;
    BOOL fFound = FALSE;
-   HB_REGEX RegEx;
+   PHB_REGEX pRegEx;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ntxOrdSkipRegEx(%p, %d, %p)", pTag, fForward, pRegExItm));
 
-   if( pTag->KeyType != 'C' || !hb_regexGet( &RegEx, pRegExItm, 0, 0 ) )
+   if( pTag->KeyType != 'C' || !hb_regexGet( pRegEx, pRegExItm, 0, 0 ) )
    {
       if( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) != SUCCESS )
          return FALSE;
@@ -4361,12 +4361,12 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
             if( SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra ) != SUCCESS )
                break;
 
-            if( hb_ntxRegexMatch( pTag, &RegEx, ( char * ) pTag->CurKeyInfo->key ) )
+            if( hb_ntxRegexMatch( pTag, pRegEx, ( char * ) pTag->CurKeyInfo->key ) )
             {
                ULONG ulRecNo = pArea->ulRecNo;
                if( SELF_SKIPFILTER( ( AREAP ) pArea, fForward ? 1 : -1 ) != SUCCESS ||
                    pArea->ulRecNo == ulRecNo ||
-                   hb_ntxRegexMatch( pTag, &RegEx, ( char * ) pTag->CurKeyInfo->key ) )
+                   hb_ntxRegexMatch( pTag, pRegEx, ( char * ) pTag->CurKeyInfo->key ) )
                {
                   fFound = TRUE;
                   break;
@@ -4398,7 +4398,7 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
    else
       pArea->fEof = FALSE;
 
-   hb_regexFree( &RegEx );
+   hb_regexFree( pRegEx );
 
    return fFound;
 }
@@ -5307,7 +5307,7 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
       {
          if( pArea->lpdbOrdCondInfo->itmRecID )
             ulStartRec = hb_itemGetNL( pArea->lpdbOrdCondInfo->itmRecID );
-         if ( ulStartRec )
+         if( ulStartRec )
          {
             ulNextCount = 1;
          }
@@ -6320,14 +6320,14 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
                                     NULL, pError );
          }
          if( !pFile )
-            bRetry = ( hb_ntxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
-                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
-                                      &pError ) == E_RETRY );
+            bRetry = hb_ntxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
+                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                    &pError ) == E_RETRY;
          else
          {
             bRetry = FALSE;
             if( fOld )
-               fOld = ( hb_fileSize( pFile ) != 0 );
+               fOld = hb_fileSize( pFile ) != 0;
          }
       }
       while( bRetry );
@@ -6785,8 +6785,12 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutC( pInfo->itmResult, pTag->KeyExpr );
             break;
          case DBOI_BAGNAME:
-            hb_itemPutC( pInfo->itmResult, pTag->Owner->IndexName );
+         {
+            PHB_FNAME pFileName = hb_fsFNameSplit( pTag->Owner->IndexName );
+            pInfo->itmResult = hb_itemPutC( pInfo->itmResult, pFileName->szName );
+            hb_xfree( pFileName );
             break;
+         }
          case DBOI_NAME:
             hb_itemPutC( pInfo->itmResult, pTag->TagName );
             break;
@@ -7255,7 +7259,7 @@ static ERRCODE ntxCountScope( NTXAREAP pArea, void * pPtr, LONG * plRecNo )
 {
    HB_TRACE(HB_TR_DEBUG, ("ntxCountScope(%p, %p, %p)", pArea, pPtr, plRecNo));
 
-   if ( pPtr == NULL )
+   if( pPtr == NULL )
    {
       return SUCCESS;
    }
@@ -7306,9 +7310,9 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
                                  NULL, pError );
          if( !pFile )
          {
-            fRetry = ( hb_ntxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
-                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
-                                      &pError ) == E_RETRY );
+            fRetry = hb_ntxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
+                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                    &pError ) == E_RETRY;
          }
       }
       while( fRetry );

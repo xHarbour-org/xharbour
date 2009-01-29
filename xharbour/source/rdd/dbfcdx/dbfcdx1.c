@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.284 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.285 2009/01/08 09:11:13 marchuet Exp $
  */
 
 /*
@@ -131,8 +131,6 @@ static int hb_cdxPageRootSplit( LPCDXPAGE pPage );
 
 /* free create index structur */
 static void hb_cdxSortFree( LPCDXSORTINFO pSort );
-
-static USHORT s_uiRddId = ( USHORT ) -1;
 
 static RDDFUNCS cdxSuper;
 static const RDDFUNCS cdxTable =
@@ -3567,10 +3565,10 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
 
    pTag->AscendKey = pTag->UsrAscend = ( HB_GET_LE_UINT16( tagHeader.ascendFlg ) == 0 );
    pTag->UsrUnique = FALSE;
-   if ( pTag->OptFlags & CDX_TYPE_STRUCTURE || ! *pTag->KeyExpr )
+   if( pTag->OptFlags & CDX_TYPE_STRUCTURE )
       return;
 
-   if ( SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->KeyExpr ) == FAILURE )
+   if( !*pTag->KeyExpr || SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->KeyExpr ) == FAILURE )
    {
       pTag->RootBlock = 0; /* To force RT error - index corrupted */
       return;
@@ -5561,14 +5559,14 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                                  PHB_ITEM pRegExItm )
 {
    BOOL fFound = FALSE, fFirst = TRUE;
-   HB_REGEX RegEx;
+   PHB_REGEX pRegEx;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %p)", pArea, pTag, fForward, pRegExItm));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
 
-   if( !pTag || pTag->uiType != 'C' || !hb_regexGet( &RegEx, pRegExItm, 0, 0 ) )
+   if( !pTag || pTag->uiType != 'C' || !hb_regexGet( pRegEx, pRegExItm, 0, 0 ) )
    {
       if( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) == FAILURE )
          return FALSE;
@@ -5595,12 +5593,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipNext( pTag );
       while ( !pTag->TagEOF )
       {
-         if( hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
+         if( hb_cdxRegexMatch( pArea, pRegEx, pTag->CurKey ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
+                 hb_cdxRegexMatch( pArea, pRegEx, pTag->CurKey ) )
             {
                fFound = TRUE;
                break;
@@ -5616,12 +5614,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipPrev( pTag );
       while ( !pTag->TagBOF )
       {
-         if( hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
+         if( hb_cdxRegexMatch( pArea, pRegEx, pTag->CurKey ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
+                 hb_cdxRegexMatch( pArea, pRegEx, pTag->CurKey ) )
             {
                fFound = TRUE;
                break;
@@ -5645,7 +5643,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    else
       pArea->fEof = FALSE;
 
-   hb_regexFree( &RegEx );
+   hb_regexFree( pRegEx );
 
    return fFound;
 }
@@ -7165,9 +7163,9 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                               FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
                               NULL, pError );
       if( !pFile )
-         bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
-                                   hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
-                                   &pError ) == E_RETRY );
+         bRetry = hb_cdxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
+                                 hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                 &pError ) == E_RETRY;
       else
       {
          if( hb_fileSize( pFile ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) )
@@ -7397,7 +7395,10 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    }
 
    if( SELF_COMPILE( (AREAP) pArea, ( BYTE * ) hb_itemGetCPtr( pOrderInfo->abExpr ) ) == FAILURE )
+   {
+      hb_cdxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDKEY, NULL, 0, 0, NULL );
       return FAILURE;
+   }
 
    pKeyExp = pArea->valResult;
    pArea->valResult = NULL;
@@ -7474,6 +7475,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          {
             hb_vmDestroyBlockOrMacro( pKeyExp );
             SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+            hb_cdxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDFOR, NULL, 0, 0, NULL );
             return FAILURE;
          }
          pForExp = pArea->valResult;
@@ -7582,9 +7584,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                                     NULL, pError );
          }
          if( !pFile )
-            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
-                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
-                                      &pError ) == E_RETRY );
+            bRetry = hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
+                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT,
+                                    &pError ) == E_RETRY;
          else
          {
             bRetry = FALSE;
@@ -7979,7 +7981,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
    switch( uiIndex )
    {
       case DBOI_CONDITION:
-         pInfo->itmResult = hb_itemPutC( pInfo->itmResult, ( pTag ? pTag->ForExpr : NULL ) );
+         pInfo->itmResult = hb_itemPutC( pInfo->itmResult, pTag ? pTag->ForExpr : NULL );
          if ( pTag && pInfo->itmNewVal && HB_IS_STRING( pInfo->itmNewVal ) )
          {
             if ( pTag->ForExpr != NULL )
@@ -9582,11 +9584,10 @@ HB_FUNC( SIXCDX ) {;}
 HB_FUNC( SIXCDX_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount, uiRddId;
+   USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_parptr( 1 );
    pTable = ( RDDFUNCS * ) hb_parptr( 2 );
-   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("SIXCDX_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
@@ -9602,14 +9603,6 @@ HB_FUNC( SIXCDX_GETFUNCTABLE )
       if ( errCode != SUCCESS )
          errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBF" );
       hb_retni( errCode );
-      if ( errCode == SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-      }
    }
    else
       hb_retni( FAILURE );
@@ -9646,11 +9639,10 @@ HB_FUNC( DBFCDX ) {;}
 HB_FUNC( DBFCDX_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount, uiRddId;
+   USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_parptr( 1 );
    pTable = ( RDDFUNCS * ) hb_parptr( 2 );
-   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
@@ -9665,14 +9657,6 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
          errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFDBT" );
       if( errCode != SUCCESS )
          errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBF" );
-      if( errCode == SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-      }
       hb_retni( errCode );
    }
    else

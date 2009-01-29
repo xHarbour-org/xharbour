@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6350 2009/01/27 03:00:14 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6351 2009/01/28 15:42:06 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-01-29 11:02 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * rdd\bmdbfcdx\bmdbfcdx1.c
+    ! fixed possible GPF caused by missing RT error (from harbour)
+    ! added RT errors for invalid KEY or FOR expressions (from harbour)
+    % removed unused static variable and its related code.
+  * rdd\dbfcdx\dbfcdx1.c
+    ! fixed possible GPF caused by missing RT error (from harbour)
+    ! added RT errors for invalid KEY or FOR expressions (from harbour)
+    % removed unused static variable and its related code.
+  * rdd\dbfntx\dbfntx1.c
+    ! fixed possible GPF caused by corrupted indexes  
+  * vm\dlmalloc.c
+    * disable #pragma warning ... in MinGW builds. If some newer MinGW
+      versions support it and it's useful then it can be enabled after
+      checking MinGW version
 
 2009-01-28 16:46 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbsetup.h
