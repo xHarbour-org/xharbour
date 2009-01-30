@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.182 2009/01/08 09:11:14 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.183 2009/01/29 09:58:40 marchuet Exp $
  */
 
 /*
@@ -4327,7 +4327,7 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
 {
    NTXAREAP pArea = pTag->Owner->Owner;
    BOOL fFound = FALSE;
-   PHB_REGEX pRegEx;
+   PHB_REGEX pRegEx = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ntxOrdSkipRegEx(%p, %d, %p)", pTag, fForward, pRegExItm));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6354 2009/01/29 21:35:31 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6355 2009/01/30 18:52:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-01-30 20:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rdd\dbfntx\dbfntx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+    * Pacified warnings
+
 2009-01-30 14:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
    * source/vm/errorapi.c
      * Make sure that error object always has the call stack info in :aaStack
-  * source/vm/arrays.c
-    * Minor optimization in hb_arrayDel()
+   * source/vm/arrays.c
+     * Minor optimization in hb_arrayDel()
 
 2009-01-29 22:36 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * makefile.bc
   * makefile.dc
   * makefile.wc
-    - Synched with makefile.vc
+    * Synched with makefile.vc
 
 2009-01-29 11:57 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
    * common.mak
