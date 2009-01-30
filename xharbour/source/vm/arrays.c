@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.164 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: arrays.c,v 1.165 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -445,7 +445,7 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
             hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
          }
 
-         hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
+         //hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
       }
       return TRUE;
    }
@@ -604,7 +604,7 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
          #else
             hb_errInternal( HB_EI_ERRUNRECOV, "Cyclic Reference assignment.", NULL, NULL );
          #endif
- 
+
          return FALSE;
       }
 

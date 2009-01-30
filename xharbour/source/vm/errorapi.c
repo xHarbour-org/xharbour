@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.92 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: errorapi.c,v 1.93 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -693,10 +693,14 @@ HB_FUNC( ERRORNEW )
    HB_THREAD_STUB
 
    PHB_ITEM pError = hb_errNew(), pCallStack;
-   int iLevel;
    char szModuleName[ _POSIX_PATH_MAX + 1 ];
    char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
+
+   // hb_errNew() defaults to stack level 0, remove the entry for ERRORNEW()!
+   pCallStack = hb_errGetCallStack( pError );
+   hb_arrayDel( pCallStack, 1 );
+   hb_arraySize( pCallStack, hb_arrayLen( pCallStack ) - 1 );
 
    if ( ISCHAR( 1 ) )
    {
@@ -728,6 +732,7 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
+      // Must override default stack level 0, in hb_errNew()!
       hb_procinfo( 1, NULL, NULL, szModuleName );
       hb_errPutModuleName( pError, szModuleName );
    }
@@ -737,6 +742,7 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
+      // Must override default stack level 0, in hb_errNew()!
       hb_errPutProcName( pError, hb_procinfo( 1, szProcName, NULL, NULL ) );
    }
    if ( ISNUM( 9 ) )
@@ -745,26 +751,10 @@ HB_FUNC( ERRORNEW )
    }
    else
    {
+      // Must override default stack level 0, in hb_errNew()!
       hb_procinfo( 1, NULL, &uLine, NULL );
       hb_errPutProcLine( pError, uLine );
    }
-
-   /* Build callstack array */
-   pCallStack = hb_itemArrayNew( 0 );
-   for ( iLevel = 1;
-         hb_procinfo( iLevel, szProcName, &uLine, szModuleName ) && *szProcName;
-         iLevel++ )
-   {
-      PHB_ITEM pItem = hb_itemArrayNew( 3 );
-
-      hb_arraySetC( pItem, 1, szModuleName );
-      hb_arraySetC( pItem, 2, szProcName );
-      hb_arraySetNI( pItem, 3, ( int ) uLine );
-      hb_arrayAddForward( pCallStack, pItem );
-      hb_itemRelease( pItem );
-   }
-   hb_errPutCallStack( pError, pCallStack );
-   hb_itemRelease( pCallStack );
 
    #ifdef HB_THREAD_SUPPORT
       hb_errPutRunningThreads( pError, hb_threadCountStacks() );
@@ -884,23 +874,43 @@ PHB_ITEM hb_errNew( void )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pError;
-   PSYMBOLS pModuleSymbols;
+   PHB_ITEM pError, pCallStack;
+   int iLevel;
+   char szModuleName[ _POSIX_PATH_MAX + 1 ];
+   char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
+   USHORT uLine;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
-   if( !s_pError || !HB_IS_OBJECT( s_pError ) )
+   if( (! s_pError ) || ( ! HB_IS_OBJECT( s_pError ) ) )
    {
       hb_errInternal( HB_EI_ERRRECFAILURE, NULL, NULL, NULL );
    }
 
    pError = hb_arrayClone( s_pError, NULL );
 
-   pModuleSymbols = HB_GETMODULESYM();
-   if( pModuleSymbols )
+   /* Build callstack array */
+   pCallStack = hb_itemArrayNew( 0 );
+   for ( iLevel = 0; hb_procinfo( iLevel, szProcName, &uLine, szModuleName ) && *szProcName; iLevel++ )
    {
-      hb_errPutModuleName( pError, pModuleSymbols->szModuleName );
+      PHB_ITEM pItem = hb_itemArrayNew( 3 );
+
+      if( iLevel == 0 )
+      {
+         hb_errPutModuleName( pError, szModuleName );
+         hb_errPutProcName( pError, szProcName );
+         hb_errPutProcLine( pError, uLine );
+      }
+
+      hb_arraySetC( pItem, 1, szModuleName );
+      hb_arraySetC( pItem, 2, szProcName );
+      hb_arraySetNI( pItem, 3, ( int ) uLine );
+
+      hb_arrayAddForward( pCallStack, pItem );
+      hb_itemRelease( pItem );
    }
+   hb_errPutCallStack( pError, pCallStack );
+   hb_itemRelease( pCallStack );
 
    return pError;
 }
@@ -1618,8 +1628,6 @@ PHB_ITEM hb_errRT_New(
    HB_THREAD_STUB
 
    PHB_ITEM pError = hb_errNew();
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
-   USHORT uLine;
 
    hb_errPutSeverity( pError, uiSeverity );
    hb_errPutSubSystem( pError, szSubSystem ? szSubSystem : HB_ERR_SS_BASE );
@@ -1629,9 +1637,6 @@ PHB_ITEM hb_errRT_New(
    hb_errPutOperation( pError, szOperation ? szOperation : "" );
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
-
-   hb_errPutProcName( pError, hb_procinfo( 1, szName, &uLine, NULL ) );
-   hb_errPutProcLine( pError, uLine );
 
    #ifdef HB_THREAD_SUPPORT
       hb_errPutThreadId( pError, HB_CURRENT_THREAD() );
@@ -1656,13 +1661,18 @@ PHB_ITEM hb_errRT_New_Subst(
                                    ulSubCode, szDescription, szOperation,
                                    uiOsCode, uiFlags | EF_CANSUBSTITUTE );
 
+      /* One level deeper for these errors */
    if( strcmp( szSubSystem, HB_ERR_SS_BASE ) == 0 && ( ( ulGenCode == EG_NOVARMETHOD && ulSubCode == 1005 ) || ( ulGenCode == EG_NOMETHOD && ulSubCode == 1004 ) ) )
    {
-      /* One level deeper for these errors */
-      char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
+      char szModuleName[ _POSIX_PATH_MAX + 1 ];
+      char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
       USHORT uLine;
 
-      hb_errPutProcName( pError, hb_procinfo( 1, szName, &uLine, NULL ) );
+      hb_procinfo( 1, szProcName, &uLine, szModuleName );
+
+      // Must override default stack level 0, in hb_errNew()!
+      hb_errPutModuleName( pError, szModuleName );
+      hb_errPutProcName( pError, szProcName );
       hb_errPutProcLine( pError, uLine );
    }
 
