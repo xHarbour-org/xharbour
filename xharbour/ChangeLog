@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6355 2009/01/30 18:52:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6356 2009/01/30 19:50:47 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-01 04:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/classes.h
+  * source/vm/classes.c
+    + Added void hb_clsAddData( USHORT usClassH, const char * szDataName,
+      USHORT uiID ) which adds data access/assign messages.
+  * source/vm/errorapi.c
+    * Changed ERROR object to use real datas instead of methods for all
+      instance variables, so the object can be easily serialized. On
+      assignment, methods are still used to do extra work, e.g. validation.
 
 2009-01-30 20:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rdd\dbfntx\dbfntx1.c

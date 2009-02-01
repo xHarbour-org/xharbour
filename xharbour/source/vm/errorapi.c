@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.93 2009/01/29 16:30:41 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.94 2009/01/30 18:52:36 ronpinkas Exp $
  */
 
 /*
@@ -126,8 +126,11 @@
 #define HB_TERROR_VMTHREADID        17
 #define HB_TERROR_MODULENAME        18
 #define HB_TERROR_CALLSTACK         19
+#define HB_TERROR_CANDEFAULT        20
+#define HB_TERROR_CANRETRY          21
+#define HB_TERROR_CANSUBST          22
 
-#define HB_TERROR_IVARCOUNT         19
+#define HB_TERROR_IVARCOUNT         22
 
 
 HB_FUNC_EXTERN( ERRORNEW );
@@ -196,33 +199,6 @@ static BOOL hb_errGetNumCode( int * piValue, const char * szOperation )
 }
 
 
-HB_FUNC_STATIC( CARGO )
-{
-   HB_THREAD_STUB
-
-   hb_itemReturn( hb_errGetCargo( hb_stackSelfItem() ) );
-}
-
-HB_FUNC_STATIC( _CARGO )
-{
-   HB_THREAD_STUB
-
-   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
-
-   if( pItem )
-      hb_errPutCargo( hb_stackSelfItem(), pItem );
-
-   hb_itemReturn( pItem );
-}
-
-
-HB_FUNC_STATIC( ARGS )
-{
-   HB_THREAD_STUB
-
-   hb_itemReturn( hb_errGetArgs( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _ARGS )
 {
    HB_THREAD_STUB
@@ -235,13 +211,6 @@ HB_FUNC_STATIC( _ARGS )
    hb_itemReturn( pItem );
 }
 
-
-HB_FUNC_STATIC( CANDEFAULT )
-{
-   HB_THREAD_STUB
-
-   hb_retl( ( hb_errGetFlags( hb_stackSelfItem() ) & EF_CANDEFAULT ) != 0 );
-}
 
 HB_FUNC_STATIC( _CANDEFAULT )
 {
@@ -262,13 +231,6 @@ HB_FUNC_STATIC( _CANDEFAULT )
 }
 
 
-HB_FUNC_STATIC( CANRETRY )
-{
-   HB_THREAD_STUB
-
-   hb_retl( ( hb_errGetFlags( hb_stackSelfItem() ) & EF_CANRETRY ) != 0 );
-}
-
 HB_FUNC_STATIC( _CANRETRY )
 {
    HB_THREAD_STUB
@@ -287,13 +249,6 @@ HB_FUNC_STATIC( _CANRETRY )
    }
 }
 
-
-HB_FUNC_STATIC( CANSUBST )
-{
-   HB_THREAD_STUB
-
-   hb_retl( ( hb_errGetFlags( hb_stackSelfItem() ) & EF_CANSUBSTITUTE ) != 0 );
-}
 
 HB_FUNC_STATIC( _CANSUBST )
 {
@@ -314,13 +269,6 @@ HB_FUNC_STATIC( _CANSUBST )
 }
 
 
-HB_FUNC_STATIC( DESCRIPTION )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetDescription( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _DESCRIPTION )
 {
    HB_THREAD_STUB
@@ -333,13 +281,6 @@ HB_FUNC_STATIC( _DESCRIPTION )
    hb_itemReturn( pItem );
 }
 
-
-HB_FUNC_STATIC( FILENAME )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetFileName( hb_stackSelfItem() ) );
-}
 
 HB_FUNC_STATIC( _FILENAME )
 {
@@ -354,13 +295,6 @@ HB_FUNC_STATIC( _FILENAME )
 }
 
 
-HB_FUNC_STATIC( OPERATION )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetOperation( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _OPERATION )
 {
    HB_THREAD_STUB
@@ -374,13 +308,6 @@ HB_FUNC_STATIC( _OPERATION )
 }
 
 
-HB_FUNC_STATIC( SUBSYSTEM )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetSubSystem( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _SUBSYSTEM )
 {
    HB_THREAD_STUB
@@ -393,13 +320,6 @@ HB_FUNC_STATIC( _SUBSYSTEM )
    hb_itemReturn( pItem );
 }
 
-
-HB_FUNC_STATIC( GENCODE )
-{
-   HB_THREAD_STUB
-
-   hb_retni( hb_errGetGenCode( hb_stackSelfItem() ) );
-}
 
 HB_FUNC_STATIC( _GENCODE )
 {
@@ -418,13 +338,6 @@ HB_FUNC_STATIC( _GENCODE )
 }
 
 
-HB_FUNC_STATIC( OSCODE )
-{
-   HB_THREAD_STUB
-
-   hb_retni( hb_errGetOsCode( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _OSCODE )
 {
    HB_THREAD_STUB
@@ -437,13 +350,6 @@ HB_FUNC_STATIC( _OSCODE )
    hb_retni( iValue );
 }
 
-
-HB_FUNC_STATIC( SUBCODE )
-{
-   HB_THREAD_STUB
-
-   hb_retni( hb_errGetSubCode( hb_stackSelfItem() ) );
-}
 
 HB_FUNC_STATIC( _SUBCODE )
 {
@@ -458,13 +364,6 @@ HB_FUNC_STATIC( _SUBCODE )
 }
 
 
-HB_FUNC_STATIC( SEVERITY )
-{
-   HB_THREAD_STUB
-
-   hb_retni( hb_errGetSeverity( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _SEVERITY )
 {
    HB_THREAD_STUB
@@ -478,13 +377,6 @@ HB_FUNC_STATIC( _SEVERITY )
 }
 
 
-HB_FUNC_STATIC( TRIES )
-{
-   HB_THREAD_STUB
-
-   hb_retni( hb_errGetTries( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _TRIES )
 {
    HB_THREAD_STUB
@@ -497,12 +389,6 @@ HB_FUNC_STATIC( _TRIES )
    hb_retni( iValue );
 }
 
-HB_FUNC_STATIC( PROCNAME )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetProcName( hb_stackSelfItem() ) );
-}
 
 HB_FUNC_STATIC( _PROCNAME )
 {
@@ -517,12 +403,6 @@ HB_FUNC_STATIC( _PROCNAME )
    hb_itemReturn( pItem );
 }
 
-HB_FUNC_STATIC( PROCLINE )
-{
-   HB_THREAD_STUB
-
-   hb_retni( ( int ) hb_errGetProcLine( hb_stackSelfItem() ) );
-}
 
 HB_FUNC_STATIC( _PROCLINE )
 {
@@ -535,13 +415,6 @@ HB_FUNC_STATIC( _PROCLINE )
       hb_errPutProcLine( hb_stackSelfItem(), ( USHORT ) iValue );
    }
    hb_retni( iValue );
-}
-
-HB_FUNC_STATIC( RUNNINGTHREADS )
-{
-   HB_THREAD_STUB
-
-   hb_retni( ( int ) hb_errGetRunningThreads( hb_stackSelfItem() ) );
 }
 
 HB_FUNC_STATIC( _RUNNINGTHREADS )
@@ -557,13 +430,6 @@ HB_FUNC_STATIC( _RUNNINGTHREADS )
    hb_retni( iValue );
 }
 
-HB_FUNC_STATIC( OSTHREADID )
-{
-   HB_THREAD_STUB
-
-   hb_retnint( ( HB_LONG ) ( HB_PTRDIFF ) hb_errGetThreadId( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _OSTHREADID )
 {
    HB_THREAD_STUB
@@ -575,13 +441,6 @@ HB_FUNC_STATIC( _OSTHREADID )
       hb_errPutThreadId( hb_stackSelfItem(), ( HB_THREAD_T ) ( HB_PTRDIFF ) hb_itemGetNInt( pItem ) );
    }
    hb_itemReturn( pItem );
-}
-
-HB_FUNC_STATIC( VMTHREADID )
-{
-   HB_THREAD_STUB
-
-   hb_retni( ( int ) hb_errGetVmThreadId( hb_stackSelfItem() ) );
 }
 
 HB_FUNC_STATIC( _VMTHREADID )
@@ -597,13 +456,6 @@ HB_FUNC_STATIC( _VMTHREADID )
    hb_retni( iValue );
 }
 
-HB_FUNC_STATIC( MODULENAME )
-{
-   HB_THREAD_STUB
-
-   hb_retc( hb_errGetModuleName( hb_stackSelfItem() ) );
-}
-
 HB_FUNC_STATIC( _MODULENAME )
 {
    HB_THREAD_STUB
@@ -615,13 +467,6 @@ HB_FUNC_STATIC( _MODULENAME )
       hb_errPutModuleName( hb_stackSelfItem(), hb_itemGetCPtr( pItem ) );
    }
    hb_itemReturn( pItem );
-}
-
-HB_FUNC_STATIC( AASTACK )
-{
-   HB_THREAD_STUB
-
-   hb_itemReturn( hb_errGetCallStack( hb_stackSelfItem() ) );
 }
 
 HB_FUNC_STATIC( _AASTACK )
@@ -640,50 +485,50 @@ static USHORT hb_errClassCreate( void )
 {
    USHORT usClassH = hb_clsCreate( HB_TERROR_IVARCOUNT, "ERROR" );
 
-   hb_clsAdd( usClassH, "ARGS"          , HB_FUNCNAME( ARGS )         );
-   hb_clsAdd( usClassH, "_ARGS"         , HB_FUNCNAME( _ARGS )        );
-   hb_clsAdd( usClassH, "CANDEFAULT"    , HB_FUNCNAME( CANDEFAULT )   );
-   hb_clsAdd( usClassH, "_CANDEFAULT"   , HB_FUNCNAME( _CANDEFAULT )  );
-   hb_clsAdd( usClassH, "CANRETRY"      , HB_FUNCNAME( CANRETRY )     );
-   hb_clsAdd( usClassH, "_CANRETRY"     , HB_FUNCNAME( _CANRETRY )    );
-   hb_clsAdd( usClassH, "CANSUBSTITUTE" , HB_FUNCNAME( CANSUBST )     );
-   hb_clsAdd( usClassH, "_CANSUBSTITUTE", HB_FUNCNAME( _CANSUBST )    );
-   hb_clsAdd( usClassH, "CARGO"         , HB_FUNCNAME( CARGO )        );
-   hb_clsAdd( usClassH, "_CARGO"        , HB_FUNCNAME( _CARGO )       );
-   hb_clsAdd( usClassH, "DESCRIPTION"   , HB_FUNCNAME( DESCRIPTION )  );
-   hb_clsAdd( usClassH, "_DESCRIPTION"  , HB_FUNCNAME( _DESCRIPTION ) );
-   hb_clsAdd( usClassH, "FILENAME"      , HB_FUNCNAME( FILENAME )     );
-   hb_clsAdd( usClassH, "_FILENAME"     , HB_FUNCNAME( _FILENAME )    );
-   hb_clsAdd( usClassH, "GENCODE"       , HB_FUNCNAME( GENCODE )      );
-   hb_clsAdd( usClassH, "_GENCODE"      , HB_FUNCNAME( _GENCODE )     );
-   hb_clsAdd( usClassH, "OPERATION"     , HB_FUNCNAME( OPERATION )    );
-   hb_clsAdd( usClassH, "_OPERATION"    , HB_FUNCNAME( _OPERATION )   );
-   hb_clsAdd( usClassH, "OSCODE"        , HB_FUNCNAME( OSCODE )       );
-   hb_clsAdd( usClassH, "_OSCODE"       , HB_FUNCNAME( _OSCODE )      );
-   hb_clsAdd( usClassH, "SEVERITY"      , HB_FUNCNAME( SEVERITY )     );
-   hb_clsAdd( usClassH, "_SEVERITY"     , HB_FUNCNAME( _SEVERITY )    );
-   hb_clsAdd( usClassH, "SUBCODE"       , HB_FUNCNAME( SUBCODE )      );
-   hb_clsAdd( usClassH, "_SUBCODE"      , HB_FUNCNAME( _SUBCODE )     );
-   hb_clsAdd( usClassH, "SUBSYSTEM"     , HB_FUNCNAME( SUBSYSTEM )    );
-   hb_clsAdd( usClassH, "_SUBSYSTEM"    , HB_FUNCNAME( _SUBSYSTEM )   );
-   hb_clsAdd( usClassH, "TRIES"         , HB_FUNCNAME( TRIES )        );
-   hb_clsAdd( usClassH, "_TRIES"        , HB_FUNCNAME( _TRIES )       );
+   hb_clsAddData( usClassH, "ARGS"          , HB_TERROR_ARGS              );
+   hb_clsAdd(     usClassH, "_ARGS"         , HB_FUNCNAME( _ARGS )        );
+   hb_clsAddData( usClassH, "CANDEFAULT"    , HB_TERROR_CANDEFAULT        );
+   hb_clsAdd(     usClassH, "_CANDEFAULT"   , HB_FUNCNAME( _CANDEFAULT )  );
+   hb_clsAddData( usClassH, "CANRETRY"      , HB_TERROR_CANRETRY          );
+   hb_clsAdd(     usClassH, "_CANRETRY"     , HB_FUNCNAME( _CANRETRY )    );
+   hb_clsAddData( usClassH, "CANSUBSTITUTE" , HB_TERROR_CANSUBST          );
+   hb_clsAdd(     usClassH, "_CANSUBSTITUTE", HB_FUNCNAME( _CANSUBST )    );
+   hb_clsAddData( usClassH, "CARGO"         , HB_TERROR_CARGO             );
+   hb_clsAddData( usClassH, "_CARGO"        , HB_TERROR_CARGO             );
+   hb_clsAddData( usClassH, "DESCRIPTION"   , HB_TERROR_DESCRIPTION       );
+   hb_clsAdd(     usClassH, "_DESCRIPTION"  , HB_FUNCNAME( _DESCRIPTION ) );
+   hb_clsAddData( usClassH, "FILENAME"      , HB_TERROR_FILENAME          );
+   hb_clsAdd(     usClassH, "_FILENAME"     , HB_FUNCNAME( _FILENAME )    );
+   hb_clsAddData( usClassH, "GENCODE"       , HB_TERROR_GENCODE           );
+   hb_clsAdd(     usClassH, "_GENCODE"      , HB_FUNCNAME( _GENCODE )     );
+   hb_clsAddData( usClassH, "OPERATION"     , HB_TERROR_OPERATION         );
+   hb_clsAdd(     usClassH, "_OPERATION"    , HB_FUNCNAME( _OPERATION )   );
+   hb_clsAddData( usClassH, "OSCODE"        , HB_TERROR_OSCODE            );
+   hb_clsAdd(     usClassH, "_OSCODE"       , HB_FUNCNAME( _OSCODE )      );
+   hb_clsAddData( usClassH, "SEVERITY"      , HB_TERROR_SEVERITY          );
+   hb_clsAdd(     usClassH, "_SEVERITY"     , HB_FUNCNAME( _SEVERITY )    );
+   hb_clsAddData( usClassH, "SUBCODE"       , HB_TERROR_SUBCODE           );
+   hb_clsAdd(     usClassH, "_SUBCODE"      , HB_FUNCNAME( _SUBCODE )     );
+   hb_clsAddData( usClassH, "SUBSYSTEM"     , HB_TERROR_SUBSYSTEM         );
+   hb_clsAdd(     usClassH, "_SUBSYSTEM"    , HB_FUNCNAME( _SUBSYSTEM )   );
+   hb_clsAddData( usClassH, "TRIES"         , HB_TERROR_TRIES             );
+   hb_clsAdd(     usClassH, "_TRIES"        , HB_FUNCNAME( _TRIES )       );
 
    /* xHarbour additions: */
-   hb_clsAdd( usClassH, "PROCNAME"      , HB_FUNCNAME( PROCNAME )     );
-   hb_clsAdd( usClassH, "_PROCNAME"     , HB_FUNCNAME( _PROCNAME )    );
-   hb_clsAdd( usClassH, "PROCLINE"      , HB_FUNCNAME( PROCLINE )     );
-   hb_clsAdd( usClassH, "_PROCLINE"     , HB_FUNCNAME( _PROCLINE )    );
-   hb_clsAdd( usClassH, "RUNNINGTHREADS", HB_FUNCNAME( RUNNINGTHREADS ) );
-   hb_clsAdd( usClassH, "_RUNNINGTHREADS", HB_FUNCNAME( _RUNNINGTHREADS ) );
-   hb_clsAdd( usClassH, "OSTHREADID"    , HB_FUNCNAME( OSTHREADID )   );
-   hb_clsAdd( usClassH, "_OSTHREADID"   , HB_FUNCNAME( _OSTHREADID )  );
-   hb_clsAdd( usClassH, "VMTHREADID"    , HB_FUNCNAME( VMTHREADID )   );
-   hb_clsAdd( usClassH, "_VMTHREADID"   , HB_FUNCNAME( _VMTHREADID )  );
-   hb_clsAdd( usClassH, "MODULENAME"    , HB_FUNCNAME( MODULENAME )   );
-   hb_clsAdd( usClassH, "_MODULENAME"   , HB_FUNCNAME( _MODULENAME )  );
-   hb_clsAdd( usClassH, "AASTACK"       , HB_FUNCNAME( AASTACK )      );
-   hb_clsAdd( usClassH, "_AASTACK"      , HB_FUNCNAME( _AASTACK )     );
+   hb_clsAddData( usClassH, "PROCNAME"      , HB_TERROR_PROCNAME          );
+   hb_clsAdd(     usClassH, "_PROCNAME"     , HB_FUNCNAME( _PROCNAME )    );
+   hb_clsAddData( usClassH, "PROCLINE"      , HB_TERROR_PROCLINE          );
+   hb_clsAdd(     usClassH, "_PROCLINE"     , HB_FUNCNAME( _PROCLINE )    );
+   hb_clsAddData( usClassH, "RUNNINGTHREADS", HB_TERROR_RUNNINGTHREADS    );
+   hb_clsAdd(     usClassH, "_RUNNINGTHREADS", HB_FUNCNAME( _RUNNINGTHREADS ) );
+   hb_clsAddData( usClassH, "OSTHREADID"    , HB_TERROR_OSTHREADID        );
+   hb_clsAdd(     usClassH, "_OSTHREADID"   , HB_FUNCNAME( _OSTHREADID )  );
+   hb_clsAddData( usClassH, "VMTHREADID"    , HB_TERROR_VMTHREADID        );
+   hb_clsAdd(     usClassH, "_VMTHREADID"   , HB_FUNCNAME( _VMTHREADID )  );
+   hb_clsAddData( usClassH, "MODULENAME"    , HB_TERROR_MODULENAME        );
+   hb_clsAdd(     usClassH, "_MODULENAME"   , HB_FUNCNAME( _MODULENAME )  );
+   hb_clsAddData( usClassH, "AASTACK"       , HB_TERROR_CALLSTACK         );
+   hb_clsAdd(     usClassH, "_AASTACK"      , HB_FUNCNAME( _AASTACK )     );
 
    return usClassH;
 }
@@ -872,8 +717,6 @@ void hb_errExit( void )
 
 PHB_ITEM hb_errNew( void )
 {
-   HB_THREAD_STUB
-
    PHB_ITEM pError, pCallStack;
    int iLevel;
    char szModuleName[ _POSIX_PATH_MAX + 1 ];
@@ -1581,6 +1424,9 @@ PHB_ITEM hb_errPutFlags( PHB_ITEM pError, USHORT uiFlags )
 
    uiFlags &= EF_CANRETRY | EF_CANSUBSTITUTE | EF_CANDEFAULT;
    hb_arraySetNI( pError, HB_TERROR_FLAGS, uiFlags );
+   hb_arraySetL( pError, HB_TERROR_CANRETRY, ( uiFlags & EF_CANRETRY ) != 0 );
+   hb_arraySetL( pError, HB_TERROR_CANDEFAULT, ( uiFlags & EF_CANDEFAULT ) != 0 );
+   hb_arraySetL( pError, HB_TERROR_CANSUBST, ( uiFlags & EF_CANSUBSTITUTE ) != 0 );
 
    return pError;
 }

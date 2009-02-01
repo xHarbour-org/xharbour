@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.236 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: classes.c,v 1.237 2009/01/24 14:49:03 ronpinkas Exp $
  */
 
 /*
@@ -2185,9 +2185,9 @@ USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
 /*
  * Create a new class
  *
- * <szClassName> Name of the class
- * <uiDatas>     Number of DATAs in the class
- * <uiMethods>   Number of additional Methods in the class
+ * <szClassName>     Name of the class
+ * <uiDatas>         Number of DATAs in the class
+ * <uiMethods>       Number of additional Methods in the class
  * <pSuperArray>     Optional array with handle(s) of superclass(es)
  * <pClassFunc>      Class function symbol, when NULL public function
  *                   with the same name as szClassName is used
@@ -5065,7 +5065,15 @@ void hb_clsAdd( USHORT usClassH, const char * szMethodName, PHB_FUNC pFuncPtr )
    /*pExecSym = hb_symbolNew( "" );
    pExecSym->value.pFunPtr = pFuncPtr;*/
 
-   hb_clsAddMsg( usClassH, szMethodName, ( void * ) pFuncPtr/*pExecSym*/, 0, HB_OO_MSG_METHOD, 0, HB_OO_CLSTP_PFUNC, FALSE, NULL, NULL, TRUE, FALSE );
+   hb_clsAddMsg( usClassH, szMethodName, ( void * ) pFuncPtr/*pExecSym*/, 0,
+                 HB_OO_MSG_METHOD, 0, HB_OO_CLSTP_PFUNC, FALSE, NULL, NULL,
+                 TRUE, FALSE );
+}
+
+void hb_clsAddData( USHORT usClassH, const char * szDataName, USHORT uiID )
+{
+   hb_clsAddMsg( usClassH, szDataName, NULL, uiID, HB_OO_MSG_DATA, 0,
+                 HB_OO_CLSTP_EXPORTED, FALSE, NULL, NULL, TRUE, FALSE );
 }
 
 /* Harbour equivalent for Clipper internal __mdAssociate() */
