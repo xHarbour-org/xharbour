@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.75 2008/11/24 05:30:34 andijahja Exp $
+# $Id: makefile.pc,v 1.76 2009/01/08 09:11:13 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -198,6 +198,9 @@ $(MISC_LIB) : $(MISC_LIB_OBJS)
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
+
+$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
+        $(LIB_CMD)
 
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
