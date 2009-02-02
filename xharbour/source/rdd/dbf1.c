@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.197 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: dbf1.c,v 1.198 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -73,7 +73,6 @@
 #  include "hbapicdp.h"
 #endif
 
-static USHORT s_uiRddId = ( USHORT ) -1;
 static RDDFUNCS dbfSuper;
 static const RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                                    ( DBENTRYP_BP ) hb_dbfEof,
@@ -5510,7 +5509,6 @@ static ERRCODE hb_dbfExit( LPRDDNODE pRDD )
       hb_xfree( pRDD->lpvCargo );
       pRDD->lpvCargo = NULL;
    }
-   s_uiRddId = ( USHORT ) -1;
 
    return SUCCESS;
 }
@@ -5690,11 +5688,10 @@ HB_FUNC( _DBF ) { ; }
 HB_FUNC( DBF_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount, uiRddId;
+   USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_parptr( 1 );
    pTable = ( RDDFUNCS * ) hb_parptr( 2 );
-   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("DBF_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
@@ -5706,14 +5703,6 @@ HB_FUNC( DBF_GETFUNCTABLE )
          * uiCount = RDDFUNCSCOUNT;
       errCode = hb_rddInherit( pTable, &dbfTable, &dbfSuper, NULL );
       hb_retni( errCode );
-      if( errCode == SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-      }
    }
    else
       hb_retni( FAILURE );

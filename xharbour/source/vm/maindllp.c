@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.30 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: maindllp.c,v 1.31 2009/01/28 15:42:06 marchuet Exp $
  */
 
 /*
@@ -146,13 +146,13 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
    static FARPROC pProcessSymbols = NULL;
    HB_SYMBOL_UNUSED( pGlobals );
 
-   /* notice hb_vmProcessDllSymbols() must be used, and not
+   /* notice hb_vmProcessSysDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
     * adjustments are required
     */
    if ( !pProcessSymbols )
    {
-      pProcessSymbols = hb_GetProcAddress( "_hb_vmProcessDllSymbols" );
+      pProcessSymbols = hb_GetProcAddress( "_hb_vmProcessSysDllSymbols" );
    }
 
    if( pProcessSymbols )

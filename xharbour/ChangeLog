@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6357 2009/02/01 01:28:40 likewolf Exp $
+ * $Id: ChangeLog,v 1.6358 2009/02/01 07:20:22 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-02 12:29 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * rdd\dbf1.c
+    - removed unused static variable.
+
+  * vm\hvm.c
+    * minor syntax changes at trace.
+
+  * vm\maindllp.c
+    * Call correct new function hb_vmProcessSysDllSymbols instead of hb_vmProcessDllSymbols
+      Old one.
 
 2009-02-01 01:18 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./makefile.pc

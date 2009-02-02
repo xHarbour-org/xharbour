@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.712 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: hvm.c,v 1.713 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -10603,7 +10603,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
 /* HVM & RTL in harbour.dll */
 PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSysDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
