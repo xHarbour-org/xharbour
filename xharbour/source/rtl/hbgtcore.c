@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.13 2008/11/26 22:25:27 andijahja Exp $
+ * $Id: hbgtcore.c,v 1.14 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -446,14 +446,14 @@ static void hb_gt_def_StringToColors( PHB_GT pGT, const char * szColorString, in
          pColors[ nPos ] = 0;
       }
       if( nColor != -1 )
+      {
          pColors[ nPos ] = nColor;
+         if( nPos == HB_CLR_ENHANCED && *piColorCount > HB_CLR_UNSELECTED )
+            pColors[ HB_CLR_UNSELECTED ] = nColor;
+      }
       ++nPos;
    }
    while( szColorString );
-
-   if( nPos >= HB_CLR_ENHANCED && nPos < HB_CLR_UNSELECTED &&
-       *piColorCount > HB_CLR_UNSELECTED )
-      pColors[ HB_CLR_UNSELECTED ] = pColors[ HB_CLR_ENHANCED ];
 }
 
 static void hb_gt_def_ColorsToString( PHB_GT pGT, int * pColors, int iColorCount, char * pszColorString, int iBufSize )
@@ -2256,7 +2256,7 @@ static void hb_gt_def_InkeyIns( PHB_GT pGT, int iKey )
 /* helper internal function */
 static BOOL hb_gt_def_InkeyNextCheck( PHB_GT pGT, int iEventMask, int * iKey )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_gt_def_InkeyNextCheck(%p,%d)", pGT, iKey) );
+   HB_TRACE( HB_TR_DEBUG, ("hb_gt_def_InkeyNextCheck(%p,%p)", pGT, iKey) );
 
    if( pGT->StrBuffer )
    {
@@ -2319,7 +2319,7 @@ static void hb_gt_def_InkeyPoll( PHB_GT pGT )
 
    /*
     * Clipper 5.3 always poll events without respecting
-    * hb_set.HB_SET_TYPEAHEAD when CL5.2 only when it's non zero.
+    * _SET_TYPEAHEAD when CL5.2 only when it's non zero.
     * IMHO keeping CL5.2 behavior will be more accurate for xharbour
     * because it allow to control it by user what some times could be
     * necessary due to different low level GT behavior on some platforms

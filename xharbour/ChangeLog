@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6358 2009/02/01 07:20:22 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6359 2009/02/02 11:25:59 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-02 15:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/itemapi.c
+    % eliminated hb_snpritf() from HB_IT_POINTER conversion in
+      hb_itemString()
+  * source/rtl/hbgtcore.c
+    ! fixed UNSELECTED color updating in SetColor(). It should be changed
+      only and always when ENHANCED color is changed
+    (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-02-02 12:29 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * rdd\dbf1.c
