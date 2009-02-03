@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.160 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: harbour.sly,v 1.161 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -2763,7 +2763,7 @@ EndSwitchID : ENDSWITCH
             | END
             ;
 
-SwitchBegin : SWITCH Expression {
+SwitchBegin : SWITCH Expression {  hb_comp_bDontGenLineNum = FALSE; hb_compLinePush();
                                    hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0;
                                    hb_compExprDelete( hb_compExprGenPush( $2 ) );
 

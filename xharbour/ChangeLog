@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6359 2009/02/02 11:25:59 marchuet Exp $
+ * $Id: ChangeLog,v 1.6360 2009/02/02 12:19:17 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-03 09:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.sly
+    ! Fixed generation of line number for SWITCH expression
 
 2009-02-02 15:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/itemapi.c
