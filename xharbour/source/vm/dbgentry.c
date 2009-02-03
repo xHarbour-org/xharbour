@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.32 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: dbgentry.c,v 1.33 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -1003,7 +1003,7 @@ static int hb_dbgEvalSubstituteVar( HB_WATCHPOINT *watch, char *szWord, int nSta
    t[ nStart + 6 ] = '0' + ( char ) ( ( j + 1 ) / 10 );
    t[ nStart + 7 ] = '0' + ( char ) ( ( j + 1 ) % 10 );
    t[ nStart + 8 ] = ']';
-   hb_strncpy( t + nStart + 9, watch->szExpr + nStart + nLen, strlen( watch->szExpr ) - nLen + 1 - nStart );
+   hb_strncpy( t + nStart + 9, watch->szExpr + nStart + nLen, strlen( watch->szExpr ) - nLen - nStart );
    FREE( watch->szExpr );
    watch->szExpr = t;
    return nStart + 9;
