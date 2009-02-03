@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.7 2008/03/19 00:17:33 ronpinkas Exp $
+ * $Id: sendmail.prg,v 1.8 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    DEFAULT lTrace      TO .F.
    DEFAULT lPopAuth    TO .T.
    DEFAULT lNoAuth     TO .F.
-   DEFAULT nTimeOut    TO 20000
+   DEFAULT nTimeOut    TO 3000
    DEFAULT cReplyTo    TO ""
 
    cUser := StrTran( cUser, "@", "&at;" )
