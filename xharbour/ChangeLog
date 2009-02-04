@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6363 2009/02/03 22:41:09 lculik Exp $
+ * $Id: ChangeLog,v 1.6364 2009/02/04 00:11:38 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-03 23:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/arrays.c
+    * Prevents "AEVAL in progress" flag for not to be cleared.
 
 2009-02-04 03:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.165 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: arrays.c,v 1.166 2009/01/30 18:52:36 ronpinkas Exp $
  */
 
 /*
@@ -1366,7 +1366,6 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
          UINT uiFlags = pBaseArray->uiFlags;
 
          ulLen = pBaseArray->ulLen;
-         pBaseArray->uiFlags |= 0xF000;
 
          if( pulStart && ( *pulStart >= 1 ) )
          {
@@ -1386,6 +1385,8 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
             {
                ulCount = ulLen - ulStart + 1;
             }
+
+            pBaseArray->uiFlags |= 0xF000;
 
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
