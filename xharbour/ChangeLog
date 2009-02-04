@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6365 2009/02/04 05:17:53 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6366 2009/02/04 10:45:54 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-02-04 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/macro/macro.y
+    % Some duplicated code removed (by Przemyslaw Czerpak, ported from
+      Harbour).
 
 2009-02-04 11:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * rdd\dbcmd53.c

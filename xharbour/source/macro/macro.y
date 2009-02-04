@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.36 2008/02/18 16:55:15 likewolf Exp $
+ * $Id: macro.y,v 1.37 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <asExpr>  ObjectMethod
 %type <asExpr>  IfInline
 %type <asExpr>  ExpList PareExpList PareExpListAlias AsParamList RootParamList
-%type <asExpr>  Expression SimpleExpression
+%type <asExpr>  Expression SimpleExpression LeftExpression
 %type <asExpr>  EmptyExpression
 %type <asExpr>  ExprAssign ExprOperEq ExprPreOp ExprPostOp
 %type <asExpr>  ExprMath ExprBool ExprRelation ExprUnary
@@ -771,29 +771,7 @@ SendId      : IdentName      { $$ = hb_compExprNewFunName( $1 ); }
             | MacroExpr      { $$ = $1; $1->value.asMacro.SubType = HB_ET_MACRO_SYMBOL; }
             ;
 
-ObjectData  : NumValue ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | NilValue ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | LiteralValue ':' SendId    { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | CodeBlock ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | Logical ':' SendId         { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | Date ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | DateTime ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | SelfValue ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | Array ':' SendId           { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | Hash ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | ArrayAt ':' SendId         { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | Variable ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | AliasVar ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | AliasExpr ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | MacroVar ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | MacroExpr ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | FunCall ':' SendId         { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | PareExpList ':' SendId     { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | VariableAt ':' SendId      { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | ObjectMethod ':' SendId    { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | ObjectData ':' SendId      { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | WithMethod ':' SendId      { $$ = hb_compExprNewSendExp( $1, $3 ); }
-            | WithData ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
+ObjectData  : LeftExpression ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
             ;
 
 WithData    : ':' SendId                 {
@@ -879,6 +857,32 @@ EmptyExpression: /* nothing => nil */        { $$ = hb_compExprNewEmpty(); }
             | Expression
             ;
 
+LeftExpression : NumValue
+               | NilValue
+               | Date
+               | DateTime
+               | LiteralValue
+               | CodeBlock
+               | Logical
+               | SelfValue
+               | Array
+               | ArrayAt
+               | Hash
+               | AliasVar
+               | AliasExpr
+               | MacroVar
+               | MacroExpr
+               | Variable
+               | VariableAt
+               | PareExpList
+               | FunCall
+               | IfInline
+               | ObjectData
+               | ObjectMethod
+               | WithData
+               | WithMethod
+               ;
+
 /* NOTE: PostOp can be used in one context only - it uses $0 rule
  *    (the rule that stands before PostOp)
  */
@@ -889,30 +893,7 @@ PostOp      : INC    { $$ = hb_compExprNewPostInc( $<asExpr>0 ); }
 /* NOTE: We cannot use 'Expression PostOp' because it caused
  * shift/reduce conflicts
  */
-ExprPostOp  : NumValue     PostOp %prec POST  { $$ = $2; }
-            | NilValue     PostOp %prec POST  { $$ = $2; }
-            | LiteralValue PostOp %prec POST  { $$ = $2; }
-            | CodeBlock    PostOp %prec POST  { $$ = $2; }
-            | Logical      PostOp %prec POST  { $$ = $2; }
-            | Date         PostOp %prec POST  { $$ = $2; }
-            | DateTime     PostOp %prec POST  { $$ = $2; }
-            | SelfValue    PostOp %prec POST  { $$ = $2; }
-            | Array        PostOp %prec POST  { $$ = $2; }
-            | Hash         PostOp %prec POST  { $$ = $2; }
-            | ArrayAt      PostOp %prec POST  { $$ = $2; }
-            | Variable     PostOp %prec POST  { $$ = $2; }
-            | MacroVar     PostOp %prec POST  { $$ = $2; }
-            | MacroExpr    PostOp %prec POST  { $$ = $2; }
-            | AliasVar     PostOp %prec POST  { $$ = $2; }
-            | AliasExpr    PostOp %prec POST  { $$ = $2; }
-            | VariableAt   PostOp %prec POST  { $$ = $2; }
-            | PareExpList  PostOp %prec POST  { $$ = $2; }
-            | IfInline     PostOp %prec POST  { $$ = $2; }
-            | FunCall      PostOp %prec POST  { $$ = $2; }
-            | ObjectData   PostOp %prec POST  { $$ = $2; }
-            | ObjectMethod PostOp %prec POST  { $$ = $2; }
-            | WithData     PostOp %prec POST  { $$ = $2; }
-            | WithMethod   PostOp %prec POST  { $$ = $2; }
+ExprPostOp  : LeftExpression PostOp %prec POST  { $$ = $2; }
             ;
 
 ExprPreOp   : INC Expression  %prec PRE      { $$ = hb_compExprNewPreInc( $2 ); }
@@ -926,184 +907,46 @@ ExprUnary   : NOT Expression                 { $$ = hb_compExprNewNot( $2 ); }
 
 ExprAssign  : NumValue     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | NilValue     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | Date         INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | DateTime     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | LiteralValue INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | CodeBlock    INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | Logical      INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | Date         INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | DateTime     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | SelfValue    INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | Array        INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | Hash         INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | ArrayAt      INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | Variable     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | MacroVar     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | MacroExpr    INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | Hash         INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | AliasVar     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | AliasExpr    INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | MacroVar     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | MacroExpr    INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | Variable     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | VariableAt   INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | PareExpList  INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
-            | IfInline     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | FunCall      INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
+            | IfInline     INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | ObjectData   INASSIGN Expression  { HB_MACRO_IFENABLED( $$, hb_compExprAssign( $1, $3 ), HB_SM_HARBOUR ); }
             | ObjectMethod INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             | WithData     INASSIGN Expression  { HB_MACRO_IFENABLED( $$, hb_compExprAssign( $1, $3 ), HB_SM_HARBOUR ); }
             | WithMethod   INASSIGN Expression  { $$ = hb_compExprAssign( $1, $3 ); }
             ;
 
-ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprPlusEq  : LeftExpression PLUSEQ  Expression { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprMinusEq : LeftExpression MINUSEQ Expression { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprMultEq  : LeftExpression MULTEQ  Expression { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprDivEq   : LeftExpression DIVEQ   Expression { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprModEq   : LeftExpression MODEQ   Expression { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | NilValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | LiteralValue EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | CodeBlock    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Logical      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Date         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | DateTime     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | SelfValue    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Array        EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Hash         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ArrayAt      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | Variable     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroVar     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | MacroExpr    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasVar     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | AliasExpr    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | VariableAt   EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | PareExpList  EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | IfInline     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | FunCall      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectData   EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | ObjectMethod EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithData     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
-            | WithMethod   EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+ExprExpEq   : LeftExpression EXPEQ   Expression { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprOperEq  : ExprPlusEq      { $$ = $1; }
