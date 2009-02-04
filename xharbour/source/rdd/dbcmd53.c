@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd53.c,v 1.1 2008/08/18 09:36:48 marchuet Exp $
+ * $Id: dbcmd53.c,v 1.2 2008/08/21 12:47:44 marchuet Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ HB_FUNC( DBRECORDINFO )
 }
 
 /*
- * DBFILEPUT/BLOB2FILE - retrieve memo contents into file
+ * DBFILEGET/BLOB2FILE/BLOBEXPORT - retrieve memo contents into file
  */
 HB_FUNC( DBFILEGET )
 {
@@ -478,9 +478,13 @@ HB_FUNC( DBFILEGET )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
+HB_FUNC( BLOBEXPORT )
+{
+   HB_FUNC_EXEC( DBFILEGET );
+}
 
 /*
- * DBFILEPUT/FILE2BLOB - store file contents in MEMO
+ * DBFILEPUT/FILE2BLOB/BLOBIMPORT - store file contents in MEMO
  */
 HB_FUNC( DBFILEPUT )
 {
@@ -509,4 +513,8 @@ HB_FUNC( DBFILEPUT )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
+HB_FUNC( BLOBIMPORT )
+{
+   HB_FUNC_EXEC( DBFILEPUT );
+}
 #endif

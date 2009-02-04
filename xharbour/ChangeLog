@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6364 2009/02/04 00:11:38 likewolf Exp $
+ * $Id: ChangeLog,v 1.6365 2009/02/04 05:17:53 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2009-02-04 11:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * rdd\dbcmd53.c
+    + Added missing functions BlobImport and BlobExport, they was called
+      DbFilePut and DbFileGet
+
+      BlobExport( <nFieldPos>, <cTargetFile>, [<nMode>] ) --> lSuccess
+      BlobImport( <nFieldPos>, <cSourceFile> ) --> lSuccess
 
 2009-02-03 23:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/arrays.c
