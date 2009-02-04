@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6362 2009/02/03 16:23:55 likewolf Exp $
+ * $Id: ChangeLog,v 1.6363 2009/02/03 22:41:09 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-04 03:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    ! fixed _FIELD indirectly used as alias, f.e.:
+         ? ("_FIELD")->NAME
+      or:
+         M->var := "_FIELD"
+         ? ("&var")->NAME
+    ! do not overwrite 1-st error object by others which can appear
+      during macro TYPE() checking
+    ! Fixed some other possible error object leaks
+    * removed hb_compMemvarCheck() - this function was not doing
+      anything - only slows the TYPE() by calling hb_dynsymFind()
+      one or two times.
+    + added TODO note: memvars create by TYPE() have PUBLIC scope
+      in Clipper. Clipper also always tries to evaluate valid expressions
+      inside TYPE even if the contain UDF. UDF only stops evaluation
+      so:
+         TYPE( "(val:=1) + f() + (val2:=2)" )
+      creates in clipper public variable VAL but not VAL2.
+    % minor optimizations
+  * include/hbcompat.ch
+    * added Harbour compatible translations
+      hb_openProcess() <-> hb_processOpen()
+      hb_closeProcess() <-> hb_processClose()
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+  * source/vm/errorapi.c
+    ! Assign default value to :filename ivar of ERROR object.
 
 2009-02-03 21:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * contrib/what32/source/_wintree.c

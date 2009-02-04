@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.80 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: macro.c,v 1.81 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,6 @@
 #include "hbmacro.h"
 #include "hbcomp.h"
 #include "hbstack.h"
-#include "hbmemvar.ch"   /* for values returned by hb_memvarScope() */
 #include "hbapirdd.h"
 #include "hbfast.h"
 #include "hbdate.h"
@@ -80,7 +79,6 @@ BOOL hb_comp_bShortCuts = TRUE;
 static ULONG s_macroFlags = HB_SM_HARBOUR | HB_SM_XBASE | HB_SM_SHORTCUTS;
 
 static void hb_macroUseAliased( HB_ITEM_PTR, HB_ITEM_PTR, int, BYTE );
-static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL );
 
 /* ************************************************************************* */
 
@@ -93,6 +91,8 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL );
  */
 static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, int iLen )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_macroParse(%p, %s, %i)", pMacro, szString, iLen));
+
    /* update the current status for logical shortcuts */
    hb_comp_bShortCuts = pMacro->supported & HB_SM_SHORTCUTS;
 
@@ -102,8 +102,6 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, int iLen )
    pMacro->pos    = 0;
    pMacro->bShortCuts = hb_comp_bShortCuts;
    pMacro->pError = NULL;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroParse(%p, %s, %i)", pMacro, szString, iLen));
 
    /* initialize the output (pcode) buffer - it will be filled by yacc */
    pMacro->pCodeInfo = (HB_PCODE_INFO_PTR ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
@@ -134,7 +132,8 @@ void hb_macroDelete( HB_MACRO_PTR pMacro )
 
    hb_xfree( (void *) pMacro->pCodeInfo->pCode );
    hb_xfree( (void *) pMacro->pCodeInfo );
-
+   if( pMacro->pError )
+      hb_errRelease( pMacro->pError );
    if( pMacro->Flags & HB_MACRO_DEALLOCATE )
    {
       hb_xfree( pMacro );
@@ -149,7 +148,7 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroCheckParam(%p)", pItem));
 
-   if( ! HB_IS_STRING(pItem) )
+   if( ! HB_IS_STRING( pItem ) )
    {
       HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pItem );
 
@@ -192,14 +191,15 @@ static HB_ERROR_HANDLE( hb_macroErrorType )
    HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) ErrorInfo->Cargo;
 
    /* copy error object for later diagnostic usage */
-   pMacro->pError = hb_itemNew( ErrorInfo->Error );
+   if( !pMacro->pError )
+      pMacro->pError = hb_itemNew( ErrorInfo->Error );
 
    pMacro->status &= ~HB_MACRO_CONT;
-   /* ignore rest of compiled code
-    */
+
+   /* ignore rest of compiled code */
    hb_vmRequestEndProc();
 
-   return NULL;      /* ignore this error */
+   return NULL;   /* ignore this error */
 }
 
 
@@ -235,12 +235,11 @@ static void hb_macroSyntaxError( HB_MACRO_PTR pMacro, const char *sSource )
 {
    HB_ITEM_PTR pResult;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError.(%s)", sSource));
+   HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError.(%p, %s)", pMacro, sSource));
 
    if( pMacro->pError )
    {
       hb_errLaunch( pMacro->pError );
-      hb_itemRelease( pMacro->pError );
       hb_macroDelete( pMacro );
    }
    else
@@ -373,7 +372,9 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
       * (only _a-zA-Z are allowed)
       */
       ++pHead;    /* skip '&' character */
-      if( *pHead == '_' || (*pHead >= 'A' && *pHead <= 'Z') || (*pHead >= 'a' && *pHead <= 'z') )
+      if( *pHead == '_' ||
+          ( *pHead >= 'A' && *pHead <= 'Z' ) ||
+          ( *pHead >= 'a' && *pHead <= 'z' ) )
       {
          /* extract a variable name */
          /* NOTE: the extracted name can be longer then supported maximal
@@ -445,9 +446,9 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
                      ULONG ulTail = pTail - szResult;
 
                      ulResBufLen = ulResStrLen;
-                     szResult    = ( char * ) hb_xrealloc( szResult, ulResBufLen + 1 );
-                     pHead       = szResult + ulHead;
-                     pTail        = szResult + ulTail;
+                     szResult = ( char * ) hb_xrealloc( szResult, ulResBufLen + 1 );
+                     pHead = szResult + ulHead;
+                     pTail = szResult + ulTail;
                   }
                }
                else
@@ -557,7 +558,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       if( iContext != 0 )
       {
          /*
-          * If compiled in xbase compatibility mode:
+          * If compiled in Xbase++ compatibility mode:
           * macro := "1,2"
           * funCall( &macro )  ==>  funCall( 1, 2 )
           * { &macro }  ==>  { 1, 2 }
@@ -568,7 +569,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
           * macro := "1,2"
           * EVAL( {|| &macro} )
           *
-         */
+          */
          struMacro.Flags |= HB_MACRO_GEN_LIST;
 
          if( iContext == HB_P_MACROPUSHPARE )
@@ -1050,10 +1051,10 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
           */
          if( struMacro.exprType == HB_ET_CODEBLOCK )
          {
-           /* Clipper ignores any undeclared symbols or UDFs if the
-            * compiled expression is a valid codeblock
-            */
-           szType = "B";
+            /* Clipper ignores any undeclared symbols or UDFs if the
+             * compiled expression is a valid codeblock
+             */
+            szType = "B";
          }
          else if( struMacro.status & HB_MACRO_UNKN_SYM )
          {
@@ -1135,11 +1136,6 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
          szType = "UE";  /* syntax error during compilation */
       }
 
-      if ( struMacro.pError )
-      {
-         hb_itemRelease( struMacro.pError );
-         struMacro.pError = NULL;
-      }
       hb_macroDelete( &struMacro );
    }
    else
@@ -1313,59 +1309,12 @@ ULONG hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
    return HB_PCODE_DATA->lPCodePos - 2;
 }
 
-/* Checks if there is a visible memvar variable
- * szVarName = variable name
-*/
-static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
-{
-   /* Test if variable exist if called from TYPE() function only */
-   if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
-   {
-      /* checking for variable is quite expensive than don't check it
-       * if there are already some undefined symbols or variables
-       */
-      if( ! ( HB_MACRO_DATA->status & (HB_MACRO_UNKN_VAR | HB_MACRO_UNKN_SYM) ) )
-      {
-         if( hb_memvarScope( szVarName ) <= HB_MV_ERROR )
-         {
-            PHB_DYNS pDyn;
-
-            pDyn = hb_dynsymFind( szVarName );
-
-            /* there is no memvar or field variable visible at this moment */
-            if( pDyn == NULL )
-            {
-               HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
-               HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
-            }
-            else if( pDyn->hMemvar == 0 )
-            {
-               HB_ITEM Dummy;
-
-               Dummy.type = HB_IT_NIL;
-
-               if( hb_rddFieldGet( &Dummy, pDyn->pSymbol ) == SUCCESS )
-               {
-                  if( HB_IS_COMPLEX( &Dummy ) )
-                  {
-                     hb_itemClear( &Dummy );
-                  }
-               }
-               else
-               {
-                  HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
-               }
-            }
-         }
-      }
-   }
-}
-
 /*
  * Function generates pcode for passed memvar name
  */
 void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 {
+   BYTE byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
    HB_DYNS_PTR pSym;
 
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
@@ -1373,30 +1322,27 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
       /* we are determining the type of expression (called from TYPE() function)
        * then we shouldn't create the requested variable if it doesn't exist
        */
-      if( !hb_dynsymFind( szVarName ) )
+      pSym = hb_dynsymFind( szVarName );
+      if( !pSym )
       {
          HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
+         pSym = hb_dynsymGetCase( szVarName );
       }
    }
+   else
+      /* Find the address of passed symbol - create the symbol if doesn't exist
+       * (Clipper compatibility). */
+      pSym = hb_dynsymGetCase( szVarName );
 
-   /* Find the address of passed symbol - create the symbol if doesn't exist
-    * (Clipper compatibility). */
-   pSym = hb_dynsymGetCase( szVarName );
-
-   hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
-   {
-      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
-
-      HB_PUT_PTR( byBuf, pSym );
-      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
-   }
-
-   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
+   byBuf[ 0 ] = bPCode;
+   HB_PUT_PTR( &byBuf[ 1 ], pSym );
+   hb_compGenPCodeN( byBuf, sizeof( byBuf ), HB_MACRO_PARAM );
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
 void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, HB_MACRO_DECL )
 {
+   BYTE byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
    HB_DYNS_PTR pSym;
 
    HB_SYMBOL_UNUSED( bAlias );
@@ -1441,18 +1387,12 @@ void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, 
       hb_xfree( szSymbolName ); // Not a typo, see above hb_xstrcpy()
    }
 
-   hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
-   {
-      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
-
-      HB_PUT_PTR( byBuf, pSym );
-      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
-   }
-
-   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
+   byBuf[ 0 ] = HB_P_MPUSHSYM;
+   HB_PUT_PTR( &byBuf[ 1 ], pSym );
+   hb_compGenPCodeN( byBuf, sizeof( byBuf ), HB_MACRO_PARAM );
 }
 
-/* generates the pcode to push integer number on the virtual machine stack */
+/* generates the pcode to push a long number on the virtual machine stack */
 void hb_compGenPushLong( HB_LONG lNumber, HB_MACRO_DECL )
 {
    if( lNumber == 0 )
@@ -1518,21 +1458,15 @@ void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType, HB_MACRO_DECL )
 /* sends a message to an object */
 void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
 {
+   BYTE byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
+
    /* Find the address of passed symbol - create the symbol if doesn't exist
     */
-   HB_DYNS_PTR pSym;
+   HB_DYNS_PTR pSym = hb_dynsymGetCase( szMsgName );
 
-   pSym = hb_dynsymGetCase( szMsgName );
-
-   hb_compGenPCode1( HB_P_MMESSAGE, HB_MACRO_PARAM );
-   {
-      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
-
-      HB_PUT_PTR( byBuf, pSym );
-      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
-   }
-
-   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
+   byBuf[ 0 ] = HB_P_MMESSAGE;
+   HB_PUT_PTR( &byBuf[ 1 ], pSym );
+   hb_compGenPCodeN( byBuf, sizeof( byBuf ), HB_MACRO_PARAM );
 }
 
 /* generates an underscore-symbol name for a data assignment */
@@ -1567,8 +1501,8 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    {
       /* Clipper always uses MEMVAR as oppose to FIELD or VARIABLE
          when assigning into ambigious variable in Macro Compiler. */
+      /* TODO: memvars created inside TYPE() function should have PUBLIC scope */
       hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 
@@ -1586,36 +1520,24 @@ void hb_compGenPopAliasedVar( char * szVarName,
    {
       if( szAlias )
       {
-         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-         {  /* M->variable */
+         int iLen = strlen( szAlias );
+
+         if( szAlias[ 0 ] == 'M' && ( iLen == 1 ||
+             ( iLen >= 4 && iLen <= 6 && strncmp( szAlias, "MEMVAR", iLen ) == 0 ) ) )
+         {  /* M-> or MEMV-> or MEMVA-> or MEMVAR-> variable */
+            /* TODO: memvars created inside TYPE() function should have PUBLIC scope */
             hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-            hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+         }
+         else if( iLen >= 4 && iLen <= 6 &&
+                  ( strncmp( szAlias, "FIELD", iLen ) == 0 ||
+                    strncmp( szAlias, "_FIELD", iLen ) == 0 ) )
+         {  /* FIELD-> */
+            hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
          }
          else
-         {
-            int iCmp = strncmp( szAlias, "MEMVAR", 4 );
-            if( iCmp == 0 )
-                  iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
-            if( iCmp == 0 )
-            {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-               hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-            }
-            else
-            {  /* field variable */
-               iCmp = strncmp( szAlias, "FIELD", 4 );
-               if( iCmp == 0 )
-                  iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
-               if( iCmp == 0 )
-               {  /* FIELD-> */
-                  hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
-               }
-               else
-               {  /* database alias */
-                  hb_compGenPushSymbol( szAlias, NULL, TRUE, HB_MACRO_PARAM );
-                  hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, HB_MACRO_PARAM );
-               }
-            }
+         {  /* database alias */
+            hb_compGenPushSymbol( szAlias, NULL, TRUE, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, HB_MACRO_PARAM );
          }
       }
       else
@@ -1630,8 +1552,8 @@ void hb_compGenPopAliasedVar( char * szVarName,
        * NOTE: An alias will be determined at runtime then we cannot decide
        * here if passed name is either a field or a memvar
        */
+      /* TODO: memvars created inside TYPE() function should have PUBLIC scope */
       hb_compMemvarGenPCode( HB_P_MPOPALIASEDVAR, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 
@@ -1651,20 +1573,7 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      #if 0
-         if( hb_rddGetCurrentFieldPos( szVarName ) )
-         {
-            hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
-         }
-         else
-         {
-            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
-            hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-         }
-      #else
-         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
-         hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-      #endif
+      hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
    }
 }
 
@@ -1679,19 +1588,18 @@ void hb_compGenPushVarRef( char * szVarName, HB_MACRO_DECL )
    else
    {
       hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 
+/* generates the pcode to push a memory variable by reference to the virtual machine stack */
 void hb_compGenPushMemVarRef( char * szVarName, HB_MACRO_DECL )
 {
    hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
-   hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
 }
 
- /* generates the pcode to push an aliased variable value to the virtual
-  * machine stack
-  */
+/* generates the pcode to push an aliased variable value to the virtual
+ * machine stack
+ */
 void hb_compGenPushAliasedVar( char * szVarName,
                                BOOL bPushAliasValue,
                                char * szAlias,
@@ -1707,8 +1615,11 @@ void hb_compGenPushAliasedVar( char * szVarName,
          * FIELD->var
          * MEMVAR->var
          */
-         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-         {  /* M->variable */
+         int iLen = strlen( szAlias );
+
+         if( szAlias[ 0 ] == 'M' && ( iLen == 1 ||
+             ( iLen >= 4 && iLen <= 6 && strncmp( szAlias, "MEMVAR", iLen ) == 0 ) ) )
+         {  /* M-> or MEMV-> or MEMVA-> or MEMVAR-> variable */
             if( lWorkarea == -1 )
             {
                hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
@@ -1717,50 +1628,17 @@ void hb_compGenPushAliasedVar( char * szVarName,
             {
                hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
             }
-
-            hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+         }
+         else if( iLen >= 4 && iLen <= 6 && 
+                  ( strncmp( szAlias, "FIELD", iLen ) == 0 ||
+                    strncmp( szAlias, "_FIELD", iLen ) == 0 ) )
+         {  /* FIELD-> */
+            hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
          }
          else
-         {
-            int iCmp = strncmp( szAlias, "MEMVAR", 4 );
-
-            if( iCmp == 0 )
-            {
-               iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
-            }
-
-            if( iCmp == 0 )
-            {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               if( lWorkarea == -1 )
-               {
-                  hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
-               }
-               else
-               {
-                  hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
-               }
-
-               hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-            }
-            else
-            {  /* field variable */
-               iCmp = strncmp( szAlias, "FIELD", 4 );
-
-               if( iCmp == 0 )
-               {
-                  iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
-               }
-
-               if( iCmp == 0 )
-               {  /* FIELD-> */
-                  hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
-               }
-               else
-               {  /* database alias */
-                  hb_compGenPushSymbol( szAlias, NULL, TRUE, HB_MACRO_PARAM );
-                  hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, HB_MACRO_PARAM );
-               }
-            }
+         {  /* database alias */
+            hb_compGenPushSymbol( szAlias, NULL, TRUE, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, HB_MACRO_PARAM );
          }
       }
       else
@@ -1776,7 +1654,6 @@ void hb_compGenPushAliasedVar( char * szVarName,
        * here if passed name is either a field or a memvar
        */
       hb_compMemvarGenPCode( HB_P_MPUSHALIASEDVAR, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 

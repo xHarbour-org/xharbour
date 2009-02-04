@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.713 2009/01/29 16:30:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.714 2009/02/02 11:25:10 marchuet Exp $
  */
 
 /*
@@ -9256,8 +9256,10 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          }
       }
       else if( pAlias->item.asString.length >= 4 &&
-               hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
-                                     pAlias->item.asString.length ) == 0 )
+               ( hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
+                                       pAlias->item.asString.length ) == 0 ||
+                 hb_strnicmp( szAlias, "_FIELD", /* _FIELD-> or _FIE-> */
+                                       pAlias->item.asString.length ) == 0 ) )
       {
          hb_rddGetFieldValue( pAlias, pSym );
          return;
@@ -9671,8 +9673,10 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
          }
       }
       else if( pAlias->item.asString.length >= 4 &&
-               hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
-                                     pAlias->item.asString.length ) == 0 )
+               ( hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
+                                     pAlias->item.asString.length ) == 0 ||
+                 hb_strnicmp( szAlias, "_FIELD", /* _FIELD-> or _FIE-> */
+                                       pAlias->item.asString.length ) == 0 ) )
       {
          hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
          hb_stackPop();    /* alias */

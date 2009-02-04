@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.94 2009/01/30 18:52:36 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.95 2009/02/01 01:28:40 likewolf Exp $
  */
 
 /*
@@ -694,6 +694,9 @@ void hb_errInit( void )
    s_pError = hb_itemNew( NULL );
    hb_clsAssociate( hb_errClassCreate() );
    hb_itemMove( s_pError, hb_stackReturnItem() );
+
+   /* Assign default values */
+   hb_errPutFileName( s_pError, "" );
 
    #ifndef HB_THREAD_SUPPORT
       s_errorBlock = hb_itemNew( NULL );
