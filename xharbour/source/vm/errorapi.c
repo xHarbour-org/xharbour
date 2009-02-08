@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.96 2009/02/04 00:11:38 likewolf Exp $
+ * $Id: errorapi.c,v 1.97 2009/02/08 05:32:32 guerra000 Exp $
  */
 
 /*
@@ -486,12 +486,9 @@ static USHORT hb_errClassCreate( void )
    USHORT usClassH = hb_clsCreate( HB_TERROR_IVARCOUNT, "ERROR" );
    PHB_ITEM pString, pNumber, pLogical, pArray;
 
-   pString = hb_itemNew( NULL );
-   hb_itemPutC( pString, "" );
-   pNumber = hb_itemNew( NULL );
-   hb_itemPutNI( pNumber, 0 );
-   pLogical = hb_itemNew( NULL );
-   hb_itemPutL( pLogical, 0 );
+   pString = hb_itemPutC( NULL, "" );
+   pNumber = hb_itemPutNI( NULL, 0 );
+   pLogical = hb_itemPutL( NULL, FALSE );
    pArray = hb_itemArrayNew( 0 );
 
    hb_clsAddDataInit( usClassH, "ARGS"          , HB_TERROR_ARGS              ,  pArray );
@@ -539,6 +536,10 @@ static USHORT hb_errClassCreate( void )
    hb_clsAddDataInit( usClassH, "AASTACK"       , HB_TERROR_CALLSTACK         ,  pArray );
    hb_clsAdd(         usClassH, "_AASTACK"      , HB_FUNCNAME( _AASTACK )     );
 
+   hb_itemRelease( pString );
+   hb_itemRelease( pNumber );
+   hb_itemRelease( pLogical );
+   hb_itemRelease( pArray );
    return usClassH;
 }
 
@@ -703,9 +704,6 @@ void hb_errInit( void )
    s_pError = hb_itemNew( NULL );
    hb_clsAssociate( hb_errClassCreate() );
    hb_itemMove( s_pError, hb_stackReturnItem() );
-
-   /* Assign default values */
-   hb_errPutFileName( s_pError, "" );
 
    #ifndef HB_THREAD_SUPPORT
       s_errorBlock = hb_itemNew( NULL );
