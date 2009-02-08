@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.95 2009/02/01 01:28:40 likewolf Exp $
+ * $Id: errorapi.c,v 1.96 2009/02/04 00:11:38 likewolf Exp $
  */
 
 /*
@@ -484,51 +484,60 @@ HB_FUNC_STATIC( _AASTACK )
 static USHORT hb_errClassCreate( void )
 {
    USHORT usClassH = hb_clsCreate( HB_TERROR_IVARCOUNT, "ERROR" );
+   PHB_ITEM pString, pNumber, pLogical, pArray;
 
-   hb_clsAddData( usClassH, "ARGS"          , HB_TERROR_ARGS              );
-   hb_clsAdd(     usClassH, "_ARGS"         , HB_FUNCNAME( _ARGS )        );
-   hb_clsAddData( usClassH, "CANDEFAULT"    , HB_TERROR_CANDEFAULT        );
-   hb_clsAdd(     usClassH, "_CANDEFAULT"   , HB_FUNCNAME( _CANDEFAULT )  );
-   hb_clsAddData( usClassH, "CANRETRY"      , HB_TERROR_CANRETRY          );
-   hb_clsAdd(     usClassH, "_CANRETRY"     , HB_FUNCNAME( _CANRETRY )    );
-   hb_clsAddData( usClassH, "CANSUBSTITUTE" , HB_TERROR_CANSUBST          );
-   hb_clsAdd(     usClassH, "_CANSUBSTITUTE", HB_FUNCNAME( _CANSUBST )    );
-   hb_clsAddData( usClassH, "CARGO"         , HB_TERROR_CARGO             );
-   hb_clsAddData( usClassH, "_CARGO"        , HB_TERROR_CARGO             );
-   hb_clsAddData( usClassH, "DESCRIPTION"   , HB_TERROR_DESCRIPTION       );
-   hb_clsAdd(     usClassH, "_DESCRIPTION"  , HB_FUNCNAME( _DESCRIPTION ) );
-   hb_clsAddData( usClassH, "FILENAME"      , HB_TERROR_FILENAME          );
-   hb_clsAdd(     usClassH, "_FILENAME"     , HB_FUNCNAME( _FILENAME )    );
-   hb_clsAddData( usClassH, "GENCODE"       , HB_TERROR_GENCODE           );
-   hb_clsAdd(     usClassH, "_GENCODE"      , HB_FUNCNAME( _GENCODE )     );
-   hb_clsAddData( usClassH, "OPERATION"     , HB_TERROR_OPERATION         );
-   hb_clsAdd(     usClassH, "_OPERATION"    , HB_FUNCNAME( _OPERATION )   );
-   hb_clsAddData( usClassH, "OSCODE"        , HB_TERROR_OSCODE            );
-   hb_clsAdd(     usClassH, "_OSCODE"       , HB_FUNCNAME( _OSCODE )      );
-   hb_clsAddData( usClassH, "SEVERITY"      , HB_TERROR_SEVERITY          );
-   hb_clsAdd(     usClassH, "_SEVERITY"     , HB_FUNCNAME( _SEVERITY )    );
-   hb_clsAddData( usClassH, "SUBCODE"       , HB_TERROR_SUBCODE           );
-   hb_clsAdd(     usClassH, "_SUBCODE"      , HB_FUNCNAME( _SUBCODE )     );
-   hb_clsAddData( usClassH, "SUBSYSTEM"     , HB_TERROR_SUBSYSTEM         );
-   hb_clsAdd(     usClassH, "_SUBSYSTEM"    , HB_FUNCNAME( _SUBSYSTEM )   );
-   hb_clsAddData( usClassH, "TRIES"         , HB_TERROR_TRIES             );
-   hb_clsAdd(     usClassH, "_TRIES"        , HB_FUNCNAME( _TRIES )       );
+   pString = hb_itemNew( NULL );
+   hb_itemPutC( pString, "" );
+   pNumber = hb_itemNew( NULL );
+   hb_itemPutNI( pNumber, 0 );
+   pLogical = hb_itemNew( NULL );
+   hb_itemPutL( pLogical, 0 );
+   pArray = hb_itemArrayNew( 0 );
+
+   hb_clsAddDataInit( usClassH, "ARGS"          , HB_TERROR_ARGS              ,  pArray );
+   hb_clsAdd(         usClassH, "_ARGS"         , HB_FUNCNAME( _ARGS )        );
+   hb_clsAddDataInit( usClassH, "CANDEFAULT"    , HB_TERROR_CANDEFAULT        ,  pLogical );
+   hb_clsAdd(         usClassH, "_CANDEFAULT"   , HB_FUNCNAME( _CANDEFAULT )  );
+   hb_clsAddDataInit( usClassH, "CANRETRY"      , HB_TERROR_CANRETRY          ,  pLogical );
+   hb_clsAdd(         usClassH, "_CANRETRY"     , HB_FUNCNAME( _CANRETRY )    );
+   hb_clsAddDataInit( usClassH, "CANSUBSTITUTE" , HB_TERROR_CANSUBST          ,  pLogical );
+   hb_clsAdd(         usClassH, "_CANSUBSTITUTE", HB_FUNCNAME( _CANSUBST )    );
+   hb_clsAddData(     usClassH, "CARGO"         , HB_TERROR_CARGO             );
+   hb_clsAddData(     usClassH, "_CARGO"        , HB_TERROR_CARGO             );
+   hb_clsAddDataInit( usClassH, "DESCRIPTION"   , HB_TERROR_DESCRIPTION       ,  pString );
+   hb_clsAdd(         usClassH, "_DESCRIPTION"  , HB_FUNCNAME( _DESCRIPTION ) );
+   hb_clsAddDataInit( usClassH, "FILENAME"      , HB_TERROR_FILENAME          ,  pString );
+   hb_clsAdd(         usClassH, "_FILENAME"     , HB_FUNCNAME( _FILENAME )    );
+   hb_clsAddDataInit( usClassH, "GENCODE"       , HB_TERROR_GENCODE           ,  pLogical );
+   hb_clsAdd(         usClassH, "_GENCODE"      , HB_FUNCNAME( _GENCODE )     );
+   hb_clsAddDataInit( usClassH, "OPERATION"     , HB_TERROR_OPERATION         ,  pString );
+   hb_clsAdd(         usClassH, "_OPERATION"    , HB_FUNCNAME( _OPERATION )   );
+   hb_clsAddDataInit( usClassH, "OSCODE"        , HB_TERROR_OSCODE            ,  pLogical );
+   hb_clsAdd(         usClassH, "_OSCODE"       , HB_FUNCNAME( _OSCODE )      );
+   hb_clsAddDataInit( usClassH, "SEVERITY"      , HB_TERROR_SEVERITY          ,  pLogical );
+   hb_clsAdd(         usClassH, "_SEVERITY"     , HB_FUNCNAME( _SEVERITY )    );
+   hb_clsAddDataInit( usClassH, "SUBCODE"       , HB_TERROR_SUBCODE           ,  pLogical );
+   hb_clsAdd(         usClassH, "_SUBCODE"      , HB_FUNCNAME( _SUBCODE )     );
+   hb_clsAddDataInit( usClassH, "SUBSYSTEM"     , HB_TERROR_SUBSYSTEM         ,  pString );
+   hb_clsAdd(         usClassH, "_SUBSYSTEM"    , HB_FUNCNAME( _SUBSYSTEM )   );
+   hb_clsAddDataInit( usClassH, "TRIES"         , HB_TERROR_TRIES             ,  pNumber );
+   hb_clsAdd(         usClassH, "_TRIES"        , HB_FUNCNAME( _TRIES )       );
 
    /* xHarbour additions: */
-   hb_clsAddData( usClassH, "PROCNAME"      , HB_TERROR_PROCNAME          );
-   hb_clsAdd(     usClassH, "_PROCNAME"     , HB_FUNCNAME( _PROCNAME )    );
-   hb_clsAddData( usClassH, "PROCLINE"      , HB_TERROR_PROCLINE          );
-   hb_clsAdd(     usClassH, "_PROCLINE"     , HB_FUNCNAME( _PROCLINE )    );
-   hb_clsAddData( usClassH, "RUNNINGTHREADS", HB_TERROR_RUNNINGTHREADS    );
-   hb_clsAdd(     usClassH, "_RUNNINGTHREADS", HB_FUNCNAME( _RUNNINGTHREADS ) );
-   hb_clsAddData( usClassH, "OSTHREADID"    , HB_TERROR_OSTHREADID        );
-   hb_clsAdd(     usClassH, "_OSTHREADID"   , HB_FUNCNAME( _OSTHREADID )  );
-   hb_clsAddData( usClassH, "VMTHREADID"    , HB_TERROR_VMTHREADID        );
-   hb_clsAdd(     usClassH, "_VMTHREADID"   , HB_FUNCNAME( _VMTHREADID )  );
-   hb_clsAddData( usClassH, "MODULENAME"    , HB_TERROR_MODULENAME        );
-   hb_clsAdd(     usClassH, "_MODULENAME"   , HB_FUNCNAME( _MODULENAME )  );
-   hb_clsAddData( usClassH, "AASTACK"       , HB_TERROR_CALLSTACK         );
-   hb_clsAdd(     usClassH, "_AASTACK"      , HB_FUNCNAME( _AASTACK )     );
+   hb_clsAddDataInit( usClassH, "PROCNAME"      , HB_TERROR_PROCNAME          ,  pString );
+   hb_clsAdd(         usClassH, "_PROCNAME"     , HB_FUNCNAME( _PROCNAME )    );
+   hb_clsAddDataInit( usClassH, "PROCLINE"      , HB_TERROR_PROCLINE          ,  pLogical );
+   hb_clsAdd(         usClassH, "_PROCLINE"     , HB_FUNCNAME( _PROCLINE )    );
+   hb_clsAddDataInit( usClassH, "RUNNINGTHREADS", HB_TERROR_RUNNINGTHREADS    ,  pLogical );
+   hb_clsAdd(         usClassH, "_RUNNINGTHREADS", HB_FUNCNAME( _RUNNINGTHREADS ) );
+   hb_clsAddDataInit( usClassH, "OSTHREADID"    , HB_TERROR_OSTHREADID        ,  pLogical );
+   hb_clsAdd(         usClassH, "_OSTHREADID"   , HB_FUNCNAME( _OSTHREADID )  );
+   hb_clsAddDataInit( usClassH, "VMTHREADID"    , HB_TERROR_VMTHREADID        ,  pLogical );
+   hb_clsAdd(         usClassH, "_VMTHREADID"   , HB_FUNCNAME( _VMTHREADID )  );
+   hb_clsAddDataInit( usClassH, "MODULENAME"    , HB_TERROR_MODULENAME        ,  pString );
+   hb_clsAdd(         usClassH, "_MODULENAME"   , HB_FUNCNAME( _MODULENAME )  );
+   hb_clsAddDataInit( usClassH, "AASTACK"       , HB_TERROR_CALLSTACK         ,  pArray );
+   hb_clsAdd(         usClassH, "_AASTACK"      , HB_FUNCNAME( _AASTACK )     );
 
    return usClassH;
 }

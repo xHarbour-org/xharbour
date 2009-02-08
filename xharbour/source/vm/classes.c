@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.237 2009/01/24 14:49:03 ronpinkas Exp $
+ * $Id: classes.c,v 1.238 2009/02/01 01:28:40 likewolf Exp $
  */
 
 /*
@@ -5081,4 +5081,10 @@ void hb_clsAssociate( USHORT usClassH )
 {
    HB_THREAD_STUB_API
    hb_clsInst( usClassH, hb_stackReturnItem() );
+}
+
+void hb_clsAddDataInit( USHORT usClassH, const char * szDataName, USHORT uiID, PHB_ITEM pInit )
+{
+   hb_clsAddMsg( usClassH, szDataName, NULL, uiID, HB_OO_MSG_DATA, 0,
+                 HB_OO_CLSTP_EXPORTED, FALSE, NULL, pInit, TRUE, FALSE );
 }

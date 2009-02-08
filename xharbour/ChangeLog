@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6366 2009/02/04 10:45:54 marchuet Exp $
+ * $Id: ChangeLog,v 1.6367 2009/02/04 11:26:56 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-07 23:31 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * include/classes.h
+  * source/vm/classes.c
+    + Added void hb_clsAddDataInit( USHORT usClassH,
+      const char * szDataName, USHORT uiID, PHB_ITEM pInit ) which
+      adds data access/assign messages with an initial value.
+  * source/vm/errorapi.c
+    * Initializes ERROR class' DATAs.
 
 2009-02-04 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/macro/macro.y
