@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6367 2009/02/04 11:26:56 likewolf Exp $
+ * $Id: ChangeLog,v 1.6368 2009/02/08 05:32:32 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-08 15:12 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/hbffind.c
+    * Moved ulAttr and raw_attr initialization to zero on variable
+      declaration instead of once on all platforms (Unix one was
+      not initialized).
 
 2009-02-07 23:31 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * include/classes.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.37 2008/12/23 16:37:06 likewolf Exp $
+ * $Id: hbffind.c,v 1.38 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.37 2008/12/23 16:37:06 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.38 2009/01/24 00:33:09 likewolf Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -236,13 +236,12 @@ FILETIME GetOldesFile( const char * szPath)
 
 ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 {
-   ULONG ulAttr;
+   ULONG ulAttr = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsAttrFromRaw(%lu)", raw_attr));
 
 #if defined(HB_OS_DOS)
 
-   ulAttr = 0;
    if( raw_attr & FA_ARCH )   ulAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FA_HIDDEN ) ulAttr |= HB_FA_HIDDEN;
    if( raw_attr & FA_RDONLY ) ulAttr |= HB_FA_READONLY;
@@ -252,7 +251,6 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 
 #elif defined(HB_OS_OS2)
 
-   ulAttr = 0;
    if( raw_attr & FILE_ARCHIVED )  ulAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FILE_DIRECTORY ) ulAttr |= HB_FA_DIRECTORY;
    if( raw_attr & FILE_HIDDEN )    ulAttr |= HB_FA_HIDDEN;
@@ -261,7 +259,6 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 
 #elif defined(HB_OS_WIN_32)
 
-   ulAttr = 0;
    if( raw_attr & FILE_ATTRIBUTE_ARCHIVE )   ulAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FILE_ATTRIBUTE_DIRECTORY ) ulAttr |= HB_FA_DIRECTORY;
    if( raw_attr & FILE_ATTRIBUTE_HIDDEN )    ulAttr |= HB_FA_HIDDEN;
@@ -299,7 +296,6 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 #else
 
    HB_SYMBOL_UNUSED( raw_attr );
-   ulAttr = 0;
 
 #endif
 
@@ -308,13 +304,12 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
 
 ULONG hb_fsAttrToRaw( ULONG ulAttr )
 {
-   ULONG raw_attr;
+   ULONG raw_attr = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsAttrToRaw(%lu)", ulAttr));
 
 #if defined(HB_OS_DOS)
 
-   raw_attr = 0;
    if( ulAttr & HB_FA_ARCHIVE )   raw_attr |= FA_ARCH;
    if( ulAttr & HB_FA_DIRECTORY ) raw_attr |= FA_DIREC;
    if( ulAttr & HB_FA_HIDDEN )    raw_attr |= FA_HIDDEN;
@@ -324,7 +319,6 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
 
 #elif defined(HB_OS_OS2)
 
-   raw_attr = 0;
    if( ulAttr & HB_FA_ARCHIVE )   raw_attr |= FILE_ARCHIVED;
    if( ulAttr & HB_FA_DIRECTORY ) raw_attr |= FILE_DIRECTORY;
    if( ulAttr & HB_FA_HIDDEN )    raw_attr |= FILE_HIDDEN;
@@ -332,8 +326,6 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
    if( ulAttr & HB_FA_SYSTEM )    raw_attr |= FILE_SYSTEM;
 
 #elif defined(HB_OS_WIN_32)
-
-   raw_attr = 0;
 
    if( ulAttr & HB_FA_ARCHIVE )   raw_attr |= FILE_ATTRIBUTE_ARCHIVE;
    if( ulAttr & HB_FA_DIRECTORY ) raw_attr |= FILE_ATTRIBUTE_DIRECTORY;
@@ -360,8 +352,6 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
 
 #elif defined(HB_OS_UNIX)
 
-   raw_attr = 0;
-
    if( ulAttr & HB_FA_ARCHIVE )    raw_attr |= S_IFREG;
    if( ulAttr & HB_FA_DIRECTORY )  raw_attr |= S_IFDIR;
    if( ulAttr & HB_FA_REPARSE )    raw_attr |= S_IFLNK;
@@ -373,7 +363,6 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
 #else
 
    HB_SYMBOL_UNUSED( ulAttr );
-   raw_attr = 0;
 
 #endif
 
@@ -593,9 +582,9 @@ static void hb_fsFindFill( PHB_FFIND ffind )
 #elif defined(HB_OS_UNIX)
    {
 #if defined( HB_USE_LARGEFILE64 )
-            struct stat64 sStat;            
+            struct stat64 sStat;
 #else
-            struct stat sStat;            
+            struct stat sStat;
 #endif
 
       //struct stat sStat;
@@ -609,10 +598,10 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       hb_strncat( szFindFile, info->entry->d_name, sizeof( szFindFile ) - 1 );
 
 #if defined( HB_USE_LARGEFILE64 )
-            
+
       stat64( szFindFile, &sStat )  ;
 #else
-            
+
       stat( szFindFile, &sStat );
 #endif
 
