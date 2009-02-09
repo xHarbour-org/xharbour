@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.43 2009/02/01 01:28:40 likewolf Exp $
+ * $Id: classes.h,v 1.44 2009/02/08 05:32:32 guerra000 Exp $
  */
 
 /*
@@ -219,7 +219,7 @@ USHORT hb_clsCreate( USHORT usSize, const char * szClassName );
 /* Harbour equivalent for Clipper internal __mdAdd() */
 void hb_clsAdd( USHORT usClassH, const char * szMethodName, PHB_FUNC pFuncPtr );
 void hb_clsAddData( USHORT usClassH, const char * szDataName, USHORT uiID );
-//
+/* ... */
 void hb_clsAddDataInit( USHORT usClassH, const char * szDataName, USHORT uiID, PHB_ITEM pInit );
 /* Harbour equivalent for Clipper internal __mdAssociate() */
 void hb_clsAssociate( USHORT usClassH );

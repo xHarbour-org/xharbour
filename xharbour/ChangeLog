@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6369 2009/02/08 21:13:26 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6370 2009/02/08 21:32:55 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-08 19:39 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * include/classes.h
+    * Changed // to /* */ comment from my previous commit.
+  * source/vm/errorapi.c
+    ! Fixed wrong default value types for ERROR class DATAs from my
+      previous commit.
 
 2009-02-09 00:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/errorapi.c
