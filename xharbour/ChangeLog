@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6370 2009/02/08 21:32:55 likewolf Exp $
+ * $Id: ChangeLog,v 1.6371 2009/02/09 01:42:19 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-10 10:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include/dbinfo.ch
+  * source/rdd/workarea.c
+    + Added missing support to change CPpage from workarea, now is possible to use
+      DbInfo( DBI_CPID [, <codepage> ] ) the use of the code page depends of RDD
+      actually dbfcdx, bmdbfcdx, dbfntx for example make automatic translate form 
+      DBI_CPID to current application CPID. After release I planning to add automatic
+      translate to specific CPCONVERTTO at each wa. It will help to work with oem, ansi
+      or another charset.
 
 2009-02-08 19:39 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * include/classes.h

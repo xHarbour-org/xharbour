@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.25 2007/09/25 07:32:28 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.26 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -287,6 +287,7 @@
 #define DBI_MEMOPACK            142  /* Pack memo file */
 #define DBI_DIRTYREAD           143  /* Get/Set index dirty read flag */
 #define DBI_POSITIONED          144  /* Is cursor positioned to valid record */
+#define DBI_CPID                145  /* is the codepage/collation asigned to table */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */

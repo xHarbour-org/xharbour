@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.94 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: workarea.c,v 1.95 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -833,6 +833,20 @@ static ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case DBI_RDD_VERSION:
          hb_itemPutC( pItem, NULL );
          break;
+
+      case DBI_CPID:
+         if( HB_IS_STRING( pItem ) )
+         {
+            PHB_CODEPAGE cdpage = hb_cdpFind( hb_itemGetCPtr( pItem ) );
+            if ( cdpage )
+               pArea->cdPage = cdpage;
+         }      
+         if ( pArea->cdPage )
+            hb_itemPutC( pItem, ( char * ) pArea->cdPage->id );
+         else
+            hb_itemPutC( pItem, "" );
+         break;
+         
 
       default:
          return FAILURE;
