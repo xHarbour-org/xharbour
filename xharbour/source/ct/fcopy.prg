@@ -1,5 +1,5 @@
 /*
- * $Id: fcopy.prg,v 1.3 2005/12/12 14:27:58 modalsist Exp $
+ * $Id: fcopy.prg,v 1.4 2008/03/31 12:09:53 modalsist Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 
 
 #include "fileio.ch"
+#include "common.ch"
 #define  F_BLOCK   512
 
 Static nSrchand
@@ -87,6 +88,8 @@ Function FileCopy(cSource, cDest, lMode)
 
   lStillOpen := .F.
   nSrcHand := fOpen(cSource, FO_READ)
+  
+  HB_SYMBOL_UNUSED( lMode )
 
   IF nSrcHand > 0
 

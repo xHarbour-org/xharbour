@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.16 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: files.c,v 1.17 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -458,7 +458,6 @@ HB_FUNC( FILESEEK )
    }
 }
 
-
 HB_FUNC( FILESIZE )
 {
 
@@ -581,21 +580,21 @@ HB_FUNC( FILESIZE )
       const char *szFile=hb_parcx( 1 );
       USHORT   ushbMask = FA_ARCH;
       USHORT   usFileAttr;
-#if  defined(__USE_LARGEFILE64)      
+#if  defined(__USE_LARGEFILE64)
       struct stat64 sStat;
 #else
       struct stat sStat;
-#endif      
+#endif
 
       if ( ISNUM( 2 ) )
       {
          ushbMask=hb_parni( 2 );
       }
-#if  defined(__USE_LARGEFILE64)      
+#if  defined(__USE_LARGEFILE64)
       if ( stat64( szFile,&sStat  ) != -1 )
 #else
      if ( stat( szFile,&sStat  ) != -1 )
-#endif      
+#endif
       {
          usFileAttr=osToHarbourMask( sStat.st_mode );
 

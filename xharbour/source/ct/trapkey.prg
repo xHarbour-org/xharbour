@@ -1,5 +1,5 @@
 /*
- * $Id: trapkey.prg,v 1.1 2007/11/23 20:00:00 ptsarenko Exp $
+ * $Id: trapkey.prg,v 1.1 2007/11/23 18:50:39 ptsarenko Exp $
  */
 /*
  * Harbour Project source code:
@@ -105,7 +105,10 @@ Function InkeyTrap( nDelay )
 Local nKey := INKEY( 0 )
 Local bKeyBlock
 
+HB_SYMBOL_UNUSED( nDelay )
+
 IF nKey # 0 .and. ( bKeyBlock := SETKEY( nKey ) ) <> NIL
    EVAL( bKeyBlock, PROCNAME(1), PROCLINE(1), "" )
 ENDIF
+
 Return nKey

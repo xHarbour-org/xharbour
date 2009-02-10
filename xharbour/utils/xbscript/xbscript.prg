@@ -4832,10 +4832,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    LOCAL sTmp, nLastPosition := 0
    LOCAL lMaintainPending
 
-   #ifdef __CONCILE_PCODE__
-      LOCAL cPCode
-   #endif
-
    s_bRTEBlock := s_bDefRTEBlock
 
    #ifdef __HARBOUR__
@@ -7161,7 +7157,7 @@ RETURN 0
 
 STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
-  LOCAL sExp, sTemp, Counter, sToken, sList
+  LOCAL sExp, Counter, sToken, sList
   LOCAL sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
   LOCAL s1, s2, s4, s5, sNext1, sNext2, sNext3, sNext4, sNext5, nLen, nNextLen
   LOCAL sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper

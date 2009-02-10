@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.6 2008/03/13 10:49:41 likewolf Exp $
+ * $Id: dumpvar.prg,v 1.7 2008/12/20 16:32:39 fsgiudice Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ RETURN
 
 FUNCTION HB_DumpVar( xVar, lRecursive, nMaxRecursionLevel )
   LOCAL cType := ValType( xVar )
-  LOCAL cString := "", cKey
+  LOCAL cString := ""
   LOCAL nRecursionLevel := 1
   LOCAL nIndent         := 0
 
@@ -234,7 +234,7 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent, nRecursionLevel, nMaxRecu
 RETURN cString
 
 STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent, nRecursionLevel, nMaxRecursionLevel )
-  LOCAL xVal, nChar, xKey, aKeys
+  LOCAL xVal, xKey, aKeys
   LOCAL cString := ""
 
   DEFAULT nIndent TO 0
