@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvm.prg,v 1.2 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: rt_hvm.prg,v 1.3 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -56,7 +56,6 @@
 #include "rt_vars.ch"
 
 FUNCTION Main_HVM()
-   LOCAL nA, nB, nC
 
 /* NOTE: CA-Cl*pper PP fails on these
    TEST_LINE( "1" .AND. "2"                   , "E BASE 1066 Argument error conditional " )

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_file.prg,v 1.4 2004/04/02 19:45:03 andijahja Exp $
+ * $Id: rt_file.prg,v 1.5 2004/04/02 20:09:08 andijahja Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 
 /* Don't change the position of this #include. */
 #include "rt_vars.ch"
+MEMVAR mnLongP
 
 /* NOTE: The order of the tests is relevant here, so don't
          rearrange them. */

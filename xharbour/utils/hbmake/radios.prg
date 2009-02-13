@@ -1,5 +1,5 @@
 /*
- * $Id: radios.prg,v 1.2 2004/12/25 23:52:18 modalsist Exp $
+ * $Id: radios.prg,v 1.3 2008/03/13 10:49:44 likewolf Exp $
  */
 /*
  * Harbour Project source code:
@@ -80,7 +80,7 @@ LOCAL nStartGet := Len(aGetList) + 1
     oGet:radioGsb  := bVar
     oGet:radioGets := Array(nGets)
 
-    Aeval(oGet:radioGets, {|x, n| oGet:radioGets[n] := nStartGet + n - 1})
+    Aeval(oGet:radioGets, {| , n| oGet:radioGets[n] := nStartGet + n - 1})
 
     // Radio gets have their own reader, of course
     oGet:reader := {|o| RadioReader(o, aGetList) }
@@ -93,7 +93,7 @@ RETURN oGet
 
 FUNCTION t(c)
 
-RETURN {|x| c }
+RETURN {|| c }
 
 
 // The reader for radio buttons

@@ -1,5 +1,5 @@
 /*
- * $Id: rtf.prg,v 1.2 2003/08/02 18:09:53 lculik Exp $
+ * $Id: rtf.prg,v 1.3 2003/10/04 18:59:31 lculik Exp $
  */
 
 /*
@@ -317,6 +317,8 @@ METHOD WritekLink( aLink ,lAlink) CLASS TRTF
 Local cItem:=' '
 Local nPos:=0
 Local nSize:=Len(aLink)
+
+(lAlink)
 
 if nSize >2
 For nPos:=1 to nSize

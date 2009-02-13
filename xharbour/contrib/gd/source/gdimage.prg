@@ -1,5 +1,5 @@
 /*
- * $Id: gdimage.prg,v 1.4 2006/01/08 22:29:24 fsgiudice Exp $
+ * $Id: gdimage.prg,v 1.5 2006/01/21 00:46:35 fsgiudice Exp $
  */
 
 /*
@@ -265,8 +265,8 @@ CLASS GDImage
    METHOD SetInterlaceOn()                 INLINE gdImageInterlace( ::pImage, TRUE )
    METHOD SetInterlaceOff()                INLINE gdImageInterlace( ::pImage, FALSE )
 
-   METHOD GetTrueColor( r, g, b )          INLINE gdTrueColor( r, g, b )
-   METHOD GetTrueColorAlpha( r, g, b, a )  INLINE gdTrueColorAlpha( r, g, b, a )
+   METHOD GetTrueColor( r, g, b )          INLINE Self, gdTrueColor( r, g, b )
+   METHOD GetTrueColorAlpha( r, g, b, a )  INLINE Self, gdTrueColorAlpha( r, g, b, a )
 
    /* COPY AND RESIZING FUNCTIONS */
    METHOD Copy()
@@ -290,10 +290,10 @@ CLASS GDImage
    METHOD Compare( oDestImage )            INLINE gdImageCompare( oDestImage:pImage, ::pImage )
 
 
-   METHOD Radians( nAngle )                INLINE PI() * nAngle / 180
-   METHOD Degres( nRadians )               INLINE nRadians * 180 / PI()
+   METHOD Radians( nAngle )                INLINE Self, PI() * nAngle / 180
+   METHOD Degres( nRadians )               INLINE Self, nRadians * 180 / PI()
 
-   METHOD Version()                        INLINE gdVersion()
+   METHOD Version()                        INLINE Self, gdVersion()
 
 ENDCLASS
 

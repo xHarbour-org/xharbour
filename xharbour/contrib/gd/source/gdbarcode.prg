@@ -595,9 +595,6 @@ METHOD GenCodei25() CLASS TCode
    LOCAL lError   := .F.
    LOCAL bc_string := ::text
    LOCAL new_string := ""
-   LOCAL lbc
-   LOCAL c
-   LOCAL xi,k,i,l,s
 
    If ( Len(::text) % 2 )!= 0
       ::DrawError("Invalid barcode lenght")
@@ -633,9 +630,8 @@ Return NIL
 */
 METHOD MixCode(value) CLASS TCode
 
-   LOCAL l,i,k ,t
+   LOCAL l,i,k
    LOCAL s
-   LOCAL echo
    LOCAL bar_string := ""
    LOCAL cfirst
    LOCAL cnext

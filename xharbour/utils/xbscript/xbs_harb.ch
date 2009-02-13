@@ -69,7 +69,7 @@
                                                                  ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
 
      METHOD SetScript( cText, nStartLine, cName )       INLINE ( IIF( Empty( ::cText ), , ::nNextDynProc := 1 ), ;
-                                                                 ::cText := cText, ;
+                                                                 ::cText := cText, ::cName := cName,;
                                                                  ::acLines := HB_aTokens( StrTran( cText, Chr(13), "" ), Chr(10) ), ;
                                                                  ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
 

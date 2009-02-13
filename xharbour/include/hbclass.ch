@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.63 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.64 2008/08/03 00:58:30 walito Exp $
  */
 
 /*
@@ -221,10 +221,10 @@ DECLARE HBClass ;
   <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND CLASS <!Class!> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self| Self, <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND CLASS <!Class!> WITH MESSAGE <Message>( <params,...> ) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self, <params>| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self, <params>| Self, <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 // EXTEND native type classes.
 #xcommand OVERRIDE METHOD <!Message!> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
@@ -240,10 +240,10 @@ DECLARE HBClass ;
   _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER,  HASH> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| Self, <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH MESSAGE <Message>( <params,...> ) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| Self, <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 // Extend native type (NOT using standard classes)
 #xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
@@ -253,10 +253,10 @@ DECLARE HBClass ;
   __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| Self, <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH MESSAGE <Message>(<params,...>) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, Self, <params>| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 // ENABLE
 #xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH>] => _<type>() [;_<typeN>()]
@@ -666,27 +666,27 @@ DECLARE HBClass ;
 
 // METHOD ... INLINE LOCAL ...
 #xcommand METHOD <MethodName> [ AS <type> ] INLINE [Local <v>,] <Code,...> [<other>] => ;
-          METHOD <MethodName> [ AS <type> ] BLOCK {|Self [,<v>] | <Code> } [<other>]
+          METHOD <MethodName> [ AS <type> ] BLOCK {|Self [,<v>] | Self, <Code> } [<other>]
 
 // METHOD ...( <,...> ) INLINE LOCAL ...
 /* Must have secondary version with params becuase params are used in the block */
 #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] INLINE [Local <v>,] <Code,...> [<other>] => ;
-          METHOD <MethodName>( [<params>] ) [ AS <type> ] BLOCK {|Self [,<params>] [,<v>] | <Code> } [<other>]
+          METHOD <MethodName>( [<params>] ) [ AS <type> ] BLOCK {|Self [,<params>] [,<v>] | Self, <Code> } [<other>]
 
 // METHOD ... INLINE ...
 #xcommand METHOD <MethodName> [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER _AsFunc_( <MethodName> ) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   if( __lInactive, s_oClass:ModInline( _AsStr_( <MethodName> ), {|Self | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ), ;
-   s_oClass:AddInline( _AsStr_( <MethodName> ), {|Self | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ) )
+   if( __lInactive, s_oClass:ModInline( _AsStr_( <MethodName> ), {|Self | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ), ;
+   s_oClass:AddInline( _AsStr_( <MethodName> ), {|Self | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ) )
 
 // METHOD ...( <,...> ) INLINE ...
 /* Must have secondary version with params because params are used in the block */
 #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER <MethodName>([<params>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   if( __lInactive, s_oClass:ModInline( _AsStr_( <MethodName> ), {|Self [,<params>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ), ;
-   s_oClass:AddInline( _AsStr_( <MethodName> ), {|Self [,<params>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ) )
+   if( __lInactive, s_oClass:ModInline( _AsStr_( <MethodName> ), {|Self [,<params>] | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ), ;
+   s_oClass:AddInline( _AsStr_( <MethodName> ), {|Self [,<params>] | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> ) )
 
 
 #XCOMMAND INLINE METHOD <!Method!>[()] => WITH OBJECT \<|Self|; #undef __METHOD__; #define __METHOD__ <Method>
@@ -725,8 +725,8 @@ DECLARE HBClass ;
 #endif
 
 #xcommand OPERATOR <op> [ARG <xArg>] INLINE <Code,...> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVARE>] => ;
-if( __lInactive, s_oClass:ModInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ), ;
-s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) )
+if( __lInactive, s_oClass:ModInline( <(op)>, {|Self [, <xArg>] | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ), ;
+s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | Self, <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) )
 
 //command OPERATOR <op> ARG <xArg> INLINE [Local lx,...] <Code,...> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
 //oClass:AddInline( <(op)>, {|Self, <xArg> [,<lx>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) )
@@ -881,8 +881,8 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 
 #xcommand ACCESS <AccessName> [ AS <type> ] INLINE [Local <v>,] <code,...> [<persistent: PERSISTENT, PROPERTY>] => ;
    _HB_MEMBER _AsFunc_( <AccessName> ) [ AS <type> ];;
-   if( __lInactive, s_oClass:ModInline( _AsStr_( <AccessName> ), {|Self [,<v>] | <code> }, HB_OO_CLSTP_EXPORTED, <.persistent.> ), ;
-   s_oClass:AddInline( _AsStr_( <AccessName> ), {|Self [,<v>] | <code> }, HB_OO_CLSTP_EXPORTED, <.persistent.> ) )
+   if( __lInactive, s_oClass:ModInline( _AsStr_( <AccessName> ), {|Self [,<v>] | Self, <code> }, HB_OO_CLSTP_EXPORTED, <.persistent.> ), ;
+   s_oClass:AddInline( _AsStr_( <AccessName> ), {|Self [,<v>] | Self, <code> }, HB_OO_CLSTP_EXPORTED, <.persistent.> ) )
 
 #xcommand ACCESS <AccessName> [ AS <type> ] DEFERRED => ;
    _HB_MEMBER _AsFunc_( <AccessName> ) [ AS <type> ];;
@@ -914,8 +914,8 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 
 #xcommand ASSIGN <AssignName>( [<params,...>] ) [ AS <type> ] INLINE [Local <v>,] <Code,...> => ;
    _HB_MEMBER _<AssignName>([<params>]) [ AS <type> ];;
-   if( __lInactive, s_oClass:ModInline( _AsStr_( _<AssignName> ), {|Self [,<params>] [,<v>] | <Code> }, HB_OO_CLSTP_EXPORTED ), ;
-   s_oClass:AddInline( _AsStr_( _<AssignName> ), {|Self [,<params>] [,<v>] | <Code> }, HB_OO_CLSTP_EXPORTED ) )
+   if( __lInactive, s_oClass:ModInline( _AsStr_( _<AssignName> ), {|Self [,<params>] [,<v>] | Self, <Code> }, HB_OO_CLSTP_EXPORTED ), ;
+   s_oClass:AddInline( _AsStr_( _<AssignName> ), {|Self [,<params>] [,<v>] | Self, <Code> }, HB_OO_CLSTP_EXPORTED ) )
 
 #xcommand ON ERROR <MethodName> => ERROR HANDLER <MethodName>;
 

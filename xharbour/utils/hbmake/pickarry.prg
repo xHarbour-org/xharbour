@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.12 2005/03/31 20:24:54 modalsist Exp $
+ * $Id: pickarry.prg,v 1.13 2008/03/13 10:49:44 likewolf Exp $
  */
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -98,9 +98,9 @@ DEFAULT lLib to .F.
       FOR EACH cItem IN aDefault
 
          if !lLib
-            x := AScan( IN_ARRAY, { | a, y | SubStr( a, 4, At(' ', alltrim(a) ) - 1 ) == cItem } )
+            x := AScan( IN_ARRAY, { | a | SubStr( a, 4, At(' ', alltrim(a) ) - 1 ) == cItem } )
          else
-            x := AScan( IN_ARRAY, { | a, y | alltrim(cItem) IN a } )
+            x := AScan( IN_ARRAY, { | a | alltrim(cItem) IN a } )
          endif
 
          IF x != 0
@@ -114,9 +114,9 @@ DEFAULT lLib to .F.
             cItem := SubStr( cItem, Rat( '\', cItem ) - 1 )
 
             if !lLib
-               x := AScan( aTemp, { | a, y | SubStr( a, 4, At( ' ', a ) - 1 ) == cItem } )
+               x := AScan( aTemp, { | a | SubStr( a, 4, At( ' ', a ) - 1 ) == cItem } )
             else
-               x := AScan( IN_ARRAY, { | a, y | alltrim(cItem) IN a } )
+               x := AScan( IN_ARRAY, { | a | alltrim(cItem) IN a } )
             endif
 
             IF x != 0

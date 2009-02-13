@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.125 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.126 2008/03/20 16:59:20 ronpinkas Exp $
  */
 
 /*
@@ -107,7 +107,11 @@ extern int hb_compFieldGetPos( char *, PFUNCTION );
 
    extern int hb_compMemvarGetPos( char *, PFUNCTION );
 
-   extern BOOL hb_comp_AmbiguousVar;
+   // Ron Pinkas 2009/02/12 - redundant flag
+   #if 0
+      extern BOOL hb_comp_AmbiguousVar;
+   #endif
+
    extern int hb_comp_iExitLevel;
 
    extern HB_COMP_IDS hb_compExpr_IDs;
@@ -1289,10 +1293,13 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   }
                   else
                   {
-                     if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-                     {
-                        hb_comp_AmbiguousVar = TRUE;
-                     }
+                     // Ron Pinkas 2009/02/12 - if es2 is used the compilation will be stopped without the need for this flag!
+                     #if 0
+                        if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+                        {
+                           hb_comp_AmbiguousVar = TRUE;
+                        }
+                     #endif
 
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, pSelf->value.asList.pExprList->value.asSymbol.szName, NULL );
 

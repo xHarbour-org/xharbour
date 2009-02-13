@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.213 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: harbour.c,v 1.214 2009/01/24 09:07:45 andijahja Exp $
  */
 
 /*
@@ -203,11 +203,14 @@ int            hb_comp_iHidden = 0;
 static BOOL hb_comp_bExternal   = FALSE;
 */
 
-/* Limit the warning that stop compilation into ambiguous reference only so
-   that warnings on uninitialized locals would not stop compilation when
-   exit severity is set to 2
-*/
-BOOL hb_comp_AmbiguousVar = FALSE;
+// Ron Pinkas 2009/02/12 WHY not respect es2 for any warning - as per Clipper docs?
+#if 0
+   /* Limit the warning that stop compilation into ambiguous reference only so
+      that warnings on uninitialized locals would not stop compilation when
+      exit severity is set to 2
+   */
+   BOOL hb_comp_AmbiguousVar = FALSE;
+#endif
 
 NAMESPACES hb_comp_Namespaces, hb_comp_UsedNamespaces;
 
@@ -3625,13 +3628,16 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
        */
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, szVarName, NULL );
 
-      /* Clipper compatibility
-         Should not compile with /es2 eventhough /v is used
-      */
-      if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-      {
-         hb_comp_AmbiguousVar = TRUE;
-      }
+      // Ron Pinkas 2009/02/12 - if es2 is used the compilation will be stopped without the need for this flag!
+      #if 0
+         /* Clipper compatibility
+            Should not compile with /es2 eventhough /v is used
+         */
+         if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+         {
+            hb_comp_AmbiguousVar = TRUE;
+         }
+      #endif
 
       if( bPCode == HB_P_POPVARIABLE )
       {
@@ -3648,7 +3654,11 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
    }
    else
    {
-      hb_comp_AmbiguousVar = TRUE;
+      // Ron Pinkas 2009/02/12 - redundant flag
+      #if 0
+         hb_comp_AmbiguousVar = TRUE;
+      #endif
+
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
    }
 
@@ -4750,7 +4760,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
          /* Check if the function returned some value
           */
-         if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 )
+         if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 && ( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE ) == 0)
          {
             hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_FUN_WITH_NO_RETURN, pFunc->szName, NULL );
          }
@@ -6589,10 +6599,10 @@ static int hb_compCompile( char * szPrg )
 
             /* End of finalization phase. */
 
-            // if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
-            if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
+            //if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
+            if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
             {
-               if( hb_comp_iErrorCount )
+               if( hb_comp_iErrorCount || ( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET ) )
                {
                   iStatus = EXIT_FAILURE;
                   bSkipGen = TRUE;
@@ -6601,12 +6611,6 @@ static int hb_compCompile( char * szPrg )
                else if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
                {
                   iStatus = EXIT_FAILURE;
-               }
-               else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-               {
-                  iStatus = EXIT_FAILURE;
-                  bSkipGen = TRUE;
-                  printf( "\nNo code generated.\n" );
                }
             }
 
@@ -7053,7 +7057,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
                yyparse();
 
                hb_comp_iExitLevel = ( i > hb_comp_iExitLevel ? i : hb_comp_iExitLevel );
-               hb_comp_bAnyWarning = ( b ? b : hb_comp_bAnyWarning );
+               hb_comp_bAnyWarning = b || hb_comp_bAnyWarning;
             }
 
             if( hb_comp_bAnyWarning )

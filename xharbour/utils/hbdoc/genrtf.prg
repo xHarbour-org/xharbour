@@ -1,10 +1,10 @@
 /*
- * $Id: genrtf.prg,v 1.4 2003/12/29 18:25:56 lculik Exp $
+ * $Id: genrtf.prg,v 1.5 2005/02/04 09:11:30 patrickmast Exp $
  */
 
 /*
  * Harbour Project source code:
- * GENRTF support module for hbdoc document Extractor 
+ * GENRTF support module for hbdoc document Extractor
  *
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -179,8 +179,8 @@ FUNCTION ProcessRtf()
    //  Entry Point
    //
    //  Put up information labels
-   @ INFILELINE, 20 SAY "Extracting: "          
-   @ MODULELINE, 20 SAY "Documenting: "         
+   @ INFILELINE, 20 SAY "Extracting: "
+   @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
    oRtf := tRtf():new( "rtf\xharbour.rtf" ):WriteHeader()
    FOR i := 1 TO nFiles
@@ -190,16 +190,16 @@ FUNCTION ProcessRtf()
       nCommentLen := IIF( AT( ".ASM", UPPER( aDirList[ i, F_NAME ] ) ) > 0, 2, 4 )
       nReadHandle := FT_FUSE( aDirList[ i, F_NAME ] )
       @ INFILELINE, 33 CLEAR TO INFILELINE, MAXCOL()
-      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )         
+      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )
       @ MODULELINE, 33 CLEAR TO LINELINE, MAXCOL()
-      @ LINELINE, 27   SAY "Line:"                                  
+      @ LINELINE, 27   SAY "Line:"
 
       nLineCnt := 0
 
       IF nReadHandle < 0
          WRITE_ERROR( "Can't open file: (Dos Error " + STR( FERROR() ) + ")",,,, aDirList[ i, F_NAME ] )
          @ ERRORLINE,  0 CLEAR TO ERRORLINE, MAXCOL()
-         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]         
+         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]
          LOOP
       ENDIF
       lEof    := .F.
@@ -216,7 +216,7 @@ FUNCTION ProcessRtf()
          cBuffer := TRIM( SUBSTR( ReadLN( @lEof ), nCommentLen ) )
          nLineCnt ++
          IF nLineCnt % 10 = 0
-            @ LINELINE, 33 SAY STR( nLineCnt, 5, 0 )         
+            @ LINELINE, 33 SAY STR( nLineCnt, 5, 0 )
          ENDIF
          //  check to see if we are in doc mode or getting out of doc mode
 
@@ -261,7 +261,7 @@ FUNCTION ProcessRtf()
 //                    oRtf:WriteKLink(aAlso,.f.)
 //                  else
                   oRtf:WriteKLink(aAlso)
-//                  endif  
+//                  endif
                ENDIF
                lDoc := .F.
 
@@ -279,9 +279,9 @@ FUNCTION ProcessRtf()
                cBuffer := ReadLN( @lEof )
                nLineCnt ++
                //  Save the function name
-               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) ) 
+               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) )
                @ MODULELINE, 33 CLEAR TO MODULELINE, MAXCOL()
-               @ MODULELINE, 33 SAY cFuncName         
+               @ MODULELINE, 33 SAY cFuncName
 
                nMode := D_NORMAL
 
@@ -345,9 +345,9 @@ FUNCTION ProcessRtf()
                cBuffer := ReadLN( @lEof )
                nLineCnt ++
                //  Save the function name
-               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) ) 
+               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) )
                @ MODULELINE, 33 CLEAR TO MODULELINE, MAXCOL()
-               @ MODULELINE, 33 SAY cFuncName         
+               @ MODULELINE, 33 SAY cFuncName
 
                nMode := D_NORMAL
 
@@ -358,7 +358,7 @@ FUNCTION ProcessRtf()
                cBuffer := ReadLN( @lEof )
                nLineCnt ++
                //  get the category
-               cCategory :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) ) 
+               cCategory :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) )
 
                //  3) One line description
 
@@ -1061,7 +1061,7 @@ FUNCTION GenRtfTable( oRtf )
    LOCAL x
    LOCAL lCar       := .f.
    LOCAL nMax2
-   LOCAL nPos2 
+   LOCAL nPos2
    LOCAL nPos
    LOCAL aLensFItem := {}
    LOCAL aLensSItem := {}
@@ -1298,7 +1298,6 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
    LOCAL nPos
    LOCAL cCuritem
    LOCAL lReturn
-   LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )

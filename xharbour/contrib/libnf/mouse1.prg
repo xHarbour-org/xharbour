@@ -29,7 +29,7 @@ static lMinit:=.F.
 		nCol=VAL(nCol)
 	ENDIF
 
-     if  !FT_MINIT() 
+     if  !FT_MINIT()
         @ maxrow(), 0 say "Mouse driver is not installed!"
 
         return ""
@@ -589,7 +589,7 @@ aReg[AX]=27
 
 FT_INT86( 51, aReg )        // execute mouse interrupt
 
-*/                           
+*/
 // Set the return values
 
 nHoriz = _mget_horispeed()
@@ -732,6 +732,7 @@ RETURN NIL
 
 FUNCTION FT_MGETPAGE(nPage)
 
+(nPage)
 
 // Set up register
 /*

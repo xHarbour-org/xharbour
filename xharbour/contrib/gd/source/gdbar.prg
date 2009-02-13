@@ -274,7 +274,6 @@ Return NIL
 METHOD DrawText(lIsI25) CLASS TBarCode
 
    LOCAL xPosition
-   LOCAL text_color
 
    DEFAULT lIsI25 TO .F.
 
@@ -330,7 +329,6 @@ METHOD GetPathImageOut() CLASS TBarCode
 
 METHOD Finish( image_style, quality, nFG  ) CLASS TBarCode
 
-   LOCAL oImgResize
 
    DEFAULT image_style TO IMG_FORMAT_PNG
    DEFAULT quality     TO 95

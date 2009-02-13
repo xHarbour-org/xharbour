@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.6 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: pdfhbdocs.prg,v 1.7 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -68,9 +68,6 @@ STATIC NumofRows
 STATIC LEAD               := 10
 STATIC iRow               := 800
 STATIC fCurrentRowSetting := 800
-STATIC fOldPos
-STATIC iWidth
-STATIC iCol
 STATIC sziFontBold        := 0
 STATIC fFootBottom        := 40
 STATIC fColumn            := 10
@@ -78,11 +75,7 @@ STATIC sziFont            := 0
 STATIC fPageWidth         := a4_width
 STATIC fPageHeigth        := a4_height
 STATIC iPage              := 1
-STATIC uiLen
-STATIC uiCount
-STATIC bTItems
 STATIC bFItems
-STATIC szUserpass
 STATIC iLastLinkPos       := 0
 STATIC oPdf
 
@@ -139,10 +132,6 @@ FUNCTION HB_PDFENDPAGE
 RETURN NIL
 
 FUNCTION HB_PDFNEWPAGE( szTitleT, szFile )
-
-LOCAL image
-LOCAL scale_x
-LOCAL scale_y
 
    oPdf:pdfNewPage( "A4", Iif( fPageHeigth < fPageWidth, "P", "L" ),, "Courier", 0 )
    IF Ischaracter( szFile )
@@ -795,7 +784,6 @@ LOCAL i
 FUNCTION PDFDRAWPAGE( aPage, bOnNewPage )
 
 LOCAL cItem
-LOCAL i
 
    FOR each cItem in aPage
 
@@ -843,8 +831,10 @@ RETURN nil
 FUNCTION getText( szText, iFont, irow, icol, iw )
 
 LOCAL h
-LOCAL w
 LOCAL c
+
+   (iFont)
+
    h := fontSizePoints * 2.1
    c := opdf:pdfTextCount( szText, irow, icol, iw, 0, 2 )
    h += fontSizePoints * c
@@ -855,6 +845,9 @@ FUNCTION PdfMaxBoxSize( pText, iFont, pEnd, iw, pStart )
 LOCAL fMax         := 0
 LOCAL fCurrentSize
 LOCAL ulTempPos
+
+   (iw)
+
    FOR ulTempPos := 1 TO Len( pText )
 
       fCurrentSize := getText( pText[ ulTempPos ], iFont, pStart[ ulTempPos ], iRow, pEnd[ ulTempPos ] )

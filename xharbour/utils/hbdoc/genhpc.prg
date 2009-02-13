@@ -1,10 +1,10 @@
 /*
- * $Id: genhpc.prg,v 1.6 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genhpc.prg,v 1.1.1.1 2001/12/21 10:45:18 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * GENHPC support module for hbdoc document Extractor 
+ * GENHPC support module for hbdoc document Extractor
  *
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -71,9 +71,10 @@
 #define DELIM   "$"                 // keyword delimiter
 
 #xtranslate UPPERLOWER(<exp>) => (UPPER(SUBSTR(<exp>,1,1))+LOWER(SUBSTR(<exp>,2)))
+
 MEMVAR aDirList
 MEMVAR aDocInfo
-MEMVAR aWww
+
 STATIC NWRITEHANDLE
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -168,9 +169,9 @@ FUNCTION ProcessFiles()
    //  Entry Point
    //
    //  Put up information labels
-   @ INFILELINE, 20 SAY "Extracting: "         
+   @ INFILELINE, 20 SAY "Extracting: "
 
-   @ MODULELINE, 20 SAY "Documenting: "         
+   @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
 
    FOR i := 1 TO nFiles
@@ -180,16 +181,16 @@ FUNCTION ProcessFiles()
       nCommentLen := IIF( AT( ".ASM", UPPER( aDirList[ i, F_NAME ] ) ) > 0, 2, 3 )
       nReadHandle := FT_FUSE( aDirList[ i, F_NAME ] )
       @ INFILELINE, 33 CLEAR TO INFILELINE, MAXCOL()
-      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )         
+      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )
       @ MODULELINE, 33 CLEAR TO LINELINE, MAXCOL()
-      @ LINELINE, 27   SAY "Line:"                                  
+      @ LINELINE, 27   SAY "Line:"
 
       nLineCnt := 0
 
       IF nReadHandle < 0
          WRITE_ERROR( "Can't open file: (Dos Error " + STR( FERROR() ) + ")",,,, aDirList[ i, F_NAME ] )
          @ ERRORLINE,  0 CLEAR TO ERRORLINE, MAXCOL()
-         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]         
+         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]
          LOOP
       ENDIF
       lEof := .F.

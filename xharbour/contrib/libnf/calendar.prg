@@ -121,7 +121,7 @@ FUNCTION FT_CALENDAR (nRow, nCol, cColor, lShadow, lShowHelp)
  LOCAL  nJump :=0, nKey :=0, cSavColor, cSaveScreen, cSaveCursor
  LOCAL  aRetVal[8]
  LOCAL  nHelpRow, cSaveHelp, lHelpIsDisplayed :=.F.
- LOCAL  nDay1, nDay2, dDate
+ LOCAL  nDay1, nDay2
 
  nRow    := IIF ( nRow <> NIL, nRow, 1 )           //check display row
  nCol    := IIF ( nCol <> NIL, nCol, 63)           //check display col

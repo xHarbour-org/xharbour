@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6372 2009/02/10 09:12:12 marchuet Exp $
+ * $Id: ChangeLog,v 1.6373 2009/02/10 09:40:06 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-13 09:20 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
+   * include/hbexprb.c
+   * source/compiler/harbour.c
+     ! Fixed -es switch to promote all warnings into errors, as per Clipper docs
+
+   * include/hbclass.ch
+     * Hack to avoid warning about unused codeblock argument Self for INLINE methods not utilzing Self
+
+   * utils/hbdoc/genasc.prg
+   * utils/hbdoc/genchm.prg
+   * utils/hbdoc/genhpc.prg
+   * utils/hbdoc/genhtm.prg
+   * utils/hbdoc/genng.prg
+   * utils/hbdoc/genos2.prg
+   * utils/hbdoc/genrtf.prg
+   * utils/hbdoc/hbdoc.prg
+   * utils/hbdoc/rtf.prg
+   * utils/hbmake/hbmake.prg
+   * utils/hbmake/pickarry.prg
+   * utils/hbmake/radios.prg
+   * utils/hbtest/rt_array.prg
+   * utils/hbtest/rt_file.prg
+   * utils/hbtest/rt_hvm.prg
+   * utils/hbtest/rt_vars.ch
+   * utils/xbscript/xbs_harb.ch
+   * utils/xbscript/xbscript.prg
+   * contrib/gd/source/gdbar.prg
+   * contrib/gd/source/gdbarcode.prg
+   * contrib/gd/source/gdimage.prg
+   * contrib/libnf/aading.prg
+   * contrib/libnf/aredit.prg
+   * contrib/libnf/calendar.prg
+   * contrib/libnf/clrsel.prg
+   * contrib/libnf/eltime.prg
+   * contrib/libnf/menu1.prg
+   * contrib/libnf/mouse1.prg
+   * contrib/libnf/pegs.prg
+   * contrib/libnf/popadder.prg
+   * contrib/libnf/savesets.prg
+   * contrib/libnf/tbwhile.prg
+   * contrib/libnf/xbox.prg
+   * contrib/pdflib/pdf1.prg
+   * contrib/pdflib/pdfhbdocs.prg
+   * contrib/tp_/telepath.prg
+     ! Fixed all compiler warnings
 
 2009-02-10 10:44 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\ct\fcopy.prg
@@ -22,7 +68,7 @@
   * source/rdd/workarea.c
     + Added missing support to change CPpage from workarea, now is possible to use
       DbInfo( DBI_CPID [, <codepage> ] ) the use of the code page depends of RDD
-      actually dbfcdx, bmdbfcdx, dbfntx for example make automatic translate form 
+      actually dbfcdx, bmdbfcdx, dbfntx for example make automatic translate form
       DBI_CPID to current application CPID. After release I planning to add automatic
       translate to specific CPCONVERTTO at each wa. It will help to work with oem, ansi
       or another charset.

@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.11 2005/10/13 08:12:18 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.12 2005/10/24 14:39:26 mauriliolongo Exp $
  */
 
 /*
@@ -537,7 +537,6 @@ return p_CRC32( cString )
 function tp_waitfor( ... )
 
    local aParam := hb_AParams()
-   local nDone
    local nPort, nTimeout, lIgnorecase
 
    nPort := aParam[ 1 ]

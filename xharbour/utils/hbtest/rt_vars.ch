@@ -1,5 +1,5 @@
 /*
- * $Id: rt_vars.ch,v 1.2 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_vars.ch,v 1.1.1.1 2001/12/21 10:44:54 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,8 @@
  *
  */
 
+#pragma -W0
+
 MEMVAR mxNotHere /* Please don't declare this variable, since it's used to test undeclared MEMVAR situations. */
 MEMVAR mcLongerNameThen10Chars
 MEMVAR mcString
@@ -59,7 +61,6 @@ MEMVAR mcStringW
 MEMVAR mnIntZ
 MEMVAR mnDoubleZ
 MEMVAR mnIntP
-MEMVAR mnLongP
 MEMVAR mnDoubleP
 MEMVAR mnDoubleI
 MEMVAR mnIntN

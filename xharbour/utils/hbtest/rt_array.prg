@@ -1,5 +1,5 @@
 /*
- * $Id: rt_array.prg,v 1.4 2004/02/09 04:51:32 andijahja Exp $
+ * $Id: rt_array.prg,v 1.5 2007/02/27 15:59:43 druzus Exp $
  */
 
 /*
@@ -326,7 +326,7 @@ FUNCTION Main_ARRAY()
 #endif
    TEST_LINE( aScan( "A", "A" )               , 0           )
    TEST_LINE( aScan( "A", {|| .F. } )         , 0           )
-   TEST_LINE( aScan( {1,2,3}, {|x| NIL } )    , 0           )
+   TEST_LINE( aScan( {1,2,3}, {|| NIL } )    , 0           )
    TEST_LINE( aScan( saAllTypes, scString   ) , 1           )
 #ifdef __HARBOUR__
    TEST_LINE( aScan( @saAllTypes, scString )  , 1           ) /* Bug in CA-Cl*pper, it will return 0 */

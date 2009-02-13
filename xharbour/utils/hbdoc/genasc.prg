@@ -1,10 +1,10 @@
 /*
- * $Id: genasc.prg,v 1.1.1.1 2001/12/21 10:45:13 ronpinkas Exp $
+ * $Id: genasc.prg,v 1.2 2004/08/25 17:02:57 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
- * GENASC support module for hbdoc document Extractor 
+ * GENASC support module for hbdoc document Extractor
  *
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -72,11 +72,12 @@
 #define DELIM   "$"                 // keyword delimiter
 
 #xtranslate UPPERLOWER(<exp>) => (UPPER(SUBSTR(<exp>,1,1))+LOWER(SUBSTR(<exp>,2)))
+
 MEMVAR aDirList
 MEMVAR aDocInfo
-MEMVAR aWww
 MEMVAR LCONTINUOUS
 MEMVAR lAuthor
+
 STATIC NWRITEHANDLE
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -132,7 +133,7 @@ FUNCTION ASCIIFiles()
    LOCAL cSeeAlso
    LOCAL cTemp
    LOCAL cChar
-   LOCAL nDocCnt     := 0 
+   LOCAL nDocCnt     := 0
    LOCAL lBlankLine  := .F.                // Blank line encountered and sent out
    LOCAL lAddBlank   := .F.                // Need to add a blank line if next line is not blank
    LOCAL lFunc       := .T.                // currently a function rather than a command
@@ -173,8 +174,8 @@ FUNCTION ASCIIFiles()
    //  Entry Point
    //
    //  Put up information labels
-   @ INFILELINE, 20 SAY "Extracting: "          
-   @ MODULELINE, 20 SAY "Documenting: "         
+   @ INFILELINE, 20 SAY "Extracting: "
+   @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
 
    FOR i := 1 TO nFiles
@@ -184,16 +185,16 @@ FUNCTION ASCIIFiles()
       nCommentLen := IIF( AT( ".ASM", UPPER( aDirList[ i, F_NAME ] ) ) > 0, 2, 3 )
       nReadHandle := FT_FUSE( aDirList[ i, F_NAME ] )
       @ INFILELINE, 33 CLEAR TO INFILELINE, MAXCOL()
-      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )         
+      @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )
       @ MODULELINE, 33 CLEAR TO LINELINE, MAXCOL()
-      @ LINELINE, 27   SAY "Line:"                                  
+      @ LINELINE, 27   SAY "Line:"
 
       nLineCnt := 0
 
       IF nReadHandle < 0
          WRITE_ERROR( "Can't open file: (Dos Error " + STR( FERROR() ) + ")",,,, aDirList[ i, F_NAME ] )
          @ ERRORLINE,  0 CLEAR TO ERRORLINE, MAXCOL()
-         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]         
+         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ i, F_NAME ]
          LOOP
       ENDIF
       lEof := .F.
@@ -207,7 +208,7 @@ FUNCTION ASCIIFiles()
          cBuffer := TRIM( SUBSTR( ReadLN( @lEof ), nCommentLen ) )
          nLineCnt ++
          IF nLineCnt % 10 = 0
-            @ LINELINE, 33 SAY STR( nLineCnt, 5, 0 )         
+            @ LINELINE, 33 SAY STR( nLineCnt, 5, 0 )
          ENDIF
 
          //  check to see if we are in doc mode or getting out of doc mode
@@ -277,7 +278,7 @@ FUNCTION ASCIIFiles()
                //  Save the function name
                cFuncName := UPPER( ALLTRIM( SUBSTR( cBuffer, nCommentLen ) ) )
                @ MODULELINE, 33 CLEAR TO MODULELINE, MAXCOL()
-               @ MODULELINE, 33 SAY cFuncName         
+               @ MODULELINE, 33 SAY cFuncName
 
                nMode := D_NORMAL
 

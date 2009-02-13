@@ -1,5 +1,5 @@
 /*
- * $Id: pdf1.prg,v 1.3 2004/07/27 09:26:22 lculik Exp $
+ * $Id: pdf1.prg,v 1.4 2005/10/08 14:13:49 lculik Exp $
  */
 
 /*
@@ -212,8 +212,6 @@ RETURN SELF
 
 METHOD Pdfnewpage( _cPageSize, _cPageOrient, _nLpi, _cFontName, _nFontType, _nFontSize ) CLASS TPdf
 
-LOCAL _nFont
-LOCAL _nSize
 LOCAL nAdd   := 76.2
    DEFAULT _cPageSize TO ::aReport[ PAGESIZE ]
    DEFAULT _cPageOrient TO ::aReport[ PAGEORIENT ]
@@ -255,10 +253,8 @@ LOCAL k
 LOCAL nImage
 LOCAL nFont
 LOCAL nImageHandle
-LOCAL aImageInfo
 LOCAL Row          := 0
 LOCAL rowsperstrip
-LOCAL height
 LOCAL res
 
    Aadd( ::aReport[ REFS ], ::aReport[ DOCLEN ] )
@@ -542,6 +538,7 @@ METHOD Pdfsetfont( _cFont, _nType, _nSize, cId ) CLASS TPdf
    DEFAULT _nType TO 0
    DEFAULT _nSize TO 10
 
+   (cId)
    _cFont                := Upper( _cFont )
    ::aReport[ FONTSIZE ] := _nSize
 
@@ -563,7 +560,6 @@ RETURN nil
 
 METHOD Pdfdrawheader() CLASS TPdf
 
-LOCAL nI
 LOCAL _nFont
 LOCAL _nSize
 LOCAL nLen   := Len( ::aReport[ HEADER ] )
@@ -632,7 +628,6 @@ LOCAL nTemp
 LOCAL nHandle
 LOCAL cValues
 LOCAL c2
-LOCAL nI
 LOCAL nFieldType
 LOCAL nCount
 LOCAL nPos
@@ -1248,8 +1243,6 @@ RETURN aTemp
 
 METHOD Pdfimage( cFile, nRow, nCol, nHeight, nWidth, cId, Scalex, Scaley )
 
-LOCAL nImage
-
    DEFAULT nRow TO ::aReport[ REPORTLINE ]
    DEFAULT nCol TO 0
    DEFAULT nHeight TO 0
@@ -1266,7 +1259,6 @@ METHOD Pdfatsay( cString, nRow, nCol, lExact, cId ) CLASS TPdf
 
 LOCAL _nFont
 LOCAL lReverse
-LOCAL nId
 LOCAL nAt
 
    DEFAULT nRow TO ::aReport[ REPORTLINE ]
@@ -1343,23 +1335,10 @@ METHOD Pdfclose() CLASS TPdf
 
 LOCAL nI
 LOCAL cTemp
-LOCAL nCurLevel
-LOCAL nRec
 LOCAL nObj1
-LOCAL nLast
-LOCAL nCount
-LOCAL nFirst
-LOCAL nRecno
 LOCAL nBooklen
-LOCAL aImageInfo
-LOCAL cBuffer
-LOCAL nBuffer
-LOCAL nRead
-LOCAL nLen
-LOCAL k
-LOCAL nImageHandle
 
-FIELD FIRST, PREV, NEXT, LAST, COUNT, PARENT, PAGE, COORD, TITLE, LEVEL
+//FIELD FIRST, PREV, NEXT, LAST, COUNT, PARENT, PAGE, COORD, TITLE, LEVEL
 
    ::pdfClosePage()
 
@@ -1643,10 +1622,10 @@ LOCAL cp
 LOCAL i
 LOCAL width  := 0.0
 LOCAL nWidth := 0.00
-LOCAL nI
-LOCAL nLen
 LOCAL nArr
 LOCAL nAdd   := ( ::aReport[ FONTNAME ] - 1 ) % 4
+
+   (Font)
 
    IF ::pdfGetFontInfo( "NAME" ) = "Times"
       nArr := 1
@@ -1719,7 +1698,6 @@ RETURN NIL
 METHOD Pdfpnginfo( cFile ) CLASS TPdf
 
 LOCAL c255
-LOCAL nAt
 LOCAL nHandle
 LOCAL nWidth       := 0
 LOCAL nHeight      := 0

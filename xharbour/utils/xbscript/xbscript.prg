@@ -92,7 +92,9 @@
    // Enable extended syntax.
    #ifdef __XHARBOUR__
       #ifndef NODYN
-         #define DYN
+         #ifndef DYN
+            #define DYN
+         #endif
       #endif
 
       #ifndef NOMACRO
@@ -918,7 +920,7 @@ PROCEDURE PP_Break( xVal )
 
   Break( xVal )
 
-RETURN
+//RETURN
 
 PROCEDURE PP_ResetStack( aProcedures )
 
@@ -1030,7 +1032,7 @@ RETURN
      STATIC s_InlineMethodID := 0
 
      // Debug only!
-     #if 1
+     #if 0
         LOCAL oErr
      #endif
 
@@ -1562,6 +1564,8 @@ RETURN
 
      //OutputDebugString( sSymbol )
 
+     (nLine)
+
      //#define OPTIMIZE_SETLINE
      #ifdef OPTIMIZE_SETLINE
         aProcedure := { sSymbol, Chr( HB_P_NOOP ), {}, 0, { {}, {}, {}, {}, {}, {} }, .F., {}, NIL, {} }
@@ -1975,6 +1979,8 @@ RETURN
         Throw( ErrorNew( [PP], 0, 2099, [Parse], [Missing case handler, line: ] + Str( aFlow[2] ), { nLine } ) )
      ENDIF
 
+     (sCondition)
+
      IF aFlow[1] == 'S'
         // Patch fall through of last SWITCh branch.
         //No need to JUMP/PATCH at all!
@@ -2051,6 +2057,8 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
      LOCAL nPos
+
+     (nLine)
 
      cPCode += Chr( HB_P_JUMP )
 
@@ -2145,6 +2153,8 @@ RETURN
      LOCAL aFlow := aProcedure[3][ raScan( aProcedure[3], {|_1| _1[1] $ "WFES" } ) ]
      LOCAL cPCode := aProcedure[2]
 
+     (nLine)
+
      cPCode += Chr( HB_P_JUMP )
 
      IF aFlow[1] $ "FW"
@@ -2166,6 +2176,8 @@ RETURN
 
      LOCAL aFlow := aProcedure[3][ raScan( aProcedure[3], {|_1| _1[1] $ "WFES" } ) ]
      LOCAL cPCode := aProcedure[2]
+
+     (nLine)
 
      cPCode += Chr( HB_P_JUMP )
 
@@ -2190,6 +2202,8 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
      LOCAL nPos
+
+     (nLine)
 
      // Patch LOOP Jumps
      FOR EACH nPos IN aForFlow[7]
@@ -2270,6 +2284,8 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
      LOCAL nPos
+
+     (nLine)
 
      cPCode += Chr( HB_P_JUMP )
 
@@ -2367,6 +2383,8 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
 
+     (nLine)
+
      //TraceLog( nLine )
 
      IF aFlow[4] == 0
@@ -2462,6 +2480,8 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
 
+     (nLine)
+
      IF aFlow[4] == 0
         cPCode += Chr( HB_P_TRYEND )
 
@@ -2554,6 +2574,8 @@ RETURN
 
      //LOCAL aFlow := aProcedure[3][-1]
      LOCAL cPCode := aProcedure[2]
+
+     (nLine)
 
      IF cPCode[-1] == HB_P_NOOP
         cPCode[-1] := HB_P_ENDWITHOBJECT
@@ -3955,7 +3977,8 @@ PROCEDURE RP_Dot()
 
    LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp, bKey5, bKey24
 
-   LOCAL bErrHandler, oErr
+   LOCAL bErrHandler
+   //LOCAL oErr
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + [;;Please try Interpreter mode, using the -R switch...] )
@@ -4426,7 +4449,7 @@ RETURN s_xRet
 
 //--------------------------------------------------------------//
 
-FUNCTION PP__Return( xRet )
+PROCEDURE PP__Return( xRet )
 
    s_xRet := xRet
 
@@ -4435,7 +4458,7 @@ FUNCTION PP__Return( xRet )
    s_lReturnRequested := .T.
    BREAK .T.
 
-RETURN NIL
+//RETURN
 
 //--------------------------------------------------------------//
 
@@ -12563,7 +12586,7 @@ STATIC FUNCTION DefRTEHandler( e )
    ErrorLevel(1)
    Break( e )
 
-RETURN .F.
+//RETURN .F.
 
 //--------------------------------------------------------------//
 FUNCTION PP_ErrorMessage( e )

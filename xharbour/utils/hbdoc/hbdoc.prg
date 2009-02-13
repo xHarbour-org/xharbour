@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.12 2005/02/04 09:11:30 patrickmast Exp $ 
+ * $Id: hbdoc.prg,v 1.13 2005/02/17 12:22:30 andijahja Exp $
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2005/02/04 09:11:30 $
- * Revision..: $Revision: 1.12 $
+ * Date......: $Date: 2005/02/17 12:22:30 $
+ * Revision..: $Revision: 1.13 $
  * Log file..: $Logfile:     $
  *
  *
@@ -104,7 +104,7 @@
  *
  *    V1.07
  *    Added back the "<" and ">" symbols
- *    Fixed the links on the Harbour.htm file           
+ *    Fixed the links on the Harbour.htm file
  *    Fixed the help text when hbdoc is called with out any parameter
  */
 
@@ -129,7 +129,7 @@
 MEMVAR aDirList
 MEMVAR aDocInfo
 MEMVAR aDocwwwInfo
-MEMVAR aClassList 
+MEMVAR aClassList
 MEMVAR aLinkInfo
 MEMVAR aAuthorList
 MEMVAR lAscii
@@ -141,15 +141,14 @@ MEMVAR lNgi
 MEMVAR lOs2
 MEMVAR lPdf
 MEMVAR lWww
-MEMVAR lWww2 
+MEMVAR lWww2
 MEMVAR lChm
-MEMVAR lChm2 
+MEMVAR lChm2
 MEMVAR lNorton
 MEMVAR aWWW
 MEMVAR lTroff
 MEMVAR aResult
-MEMVAR theHandle
- 
+
 STATIC cTitle:=''
 
 /*
@@ -172,34 +171,34 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    LOCAL nItem
    LOCAL nHpj
    LOCAL cItem:=''
-   LOCAL cFName 
+   LOCAL cFName
    LOCAL cLName
-   LOCAL aName 
-   LOCAL nLen 
+   LOCAL aName
+   LOCAL nLen
    LOCAL lDone
    LOCAL cMI
    LOCAL oHtmIndex
    LOCAL cFileName
- 
+
    LOCAL cCompiler     // Compiler type
    LOCAL oHtm
    LOCAL oHtm1
-    
+
    LOCAL nPos
    LOCAL ppp
    LOCAL aMetaContents:={}
    Local aTemp:={}
    LOCAL lAdded:=.f.
    Local aRtfid
-    
+
    LOCAL nCount_1 := 1
-   LOCAL nCount_2 := 1 
+   LOCAL nCount_2 := 1
 
    PUBLIC theHandle
    PUBLIC aDirList
    PUBLIC aDocInfo    := {}
    PUBLIC aDocWwwInfo := {}
-   PUBLIC aClassList  := {} 
+   PUBLIC aClassList  := {}
    PUBLIC aLinkInfo   := {}
    PUBLIC aAuthorList := {}
    PUBLIC lAscii      := .F.               // Create ascii output instead of NG/EH input
@@ -234,7 +233,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    //  See if flag is there
 
-   IF .NOT. EMPTY( cFlags )   
+   IF .NOT. EMPTY( cFlags )
       IF LEFT( cFlags, 1 ) == "-" .OR. LEFT( cFlags, 1 ) == "/"
          IF ( cFlags := UPPER( RIGHT( cFlags, 3 ) ) ) == "TXT"
             lAscii      := .T.
@@ -288,10 +287,10 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       outstd( "          /rtf Winhelp source code for Windows"+ hb_osnewline() )
       outstd( "          /os2 OS/2 help source code For OS/2"+ hb_osnewline() )
       outstd( "          /htm Generate HTML output"+ hb_osnewline() )
-      outstd( "          /ht2 Generate HTML output (new doc model)"+ hb_osnewline() ) 
+      outstd( "          /ht2 Generate HTML output (new doc model)"+ hb_osnewline() )
       outstd( "          /chm Generate HTML source files for Windows .CHM Help files"+ hb_osnewline() )
       outstd( "          /ch2 Generate HTML source files for Windows .CHM Help files"+ hb_osnewline() )
-      outstd( "               (new doc model)"+ hb_osnewline() ) 
+      outstd( "               (new doc model)"+ hb_osnewline() )
       outstd( "          /pdf Generate an Adobe Portable Document (.PDF)"+ hb_osnewline() )
       outstd( "          /trf Gerenate Linux TROFF code"+ hb_osnewline() )
       outstd( "          /doc Create continuous ASCII file w/o author information"+ hb_osnewline() )
@@ -642,9 +641,9 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
           ohtm:=THTML():new('htm\hb'+strtran(citem," ","")+'.htm',aMetaContents)
           ohtm:WriteText('<h2>'+adocinfo[1,1]+'</h2><br>')
           ohtm:WriteText("<table>")
-  
+
       for ppp:=1 to len(adocinfo)
-      
+
            if citem ==adocinfo[ppp,1]
                oHtm:WritelinkTable(adocinfo[ppp,4],adocinfo[ppp,2],adocinfo[ppp,3])
            else
