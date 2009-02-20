@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.27 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: gtpca.c,v 1.28 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -754,7 +754,7 @@ static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = b_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 
@@ -778,7 +778,7 @@ static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = b_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 

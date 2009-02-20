@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.26 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.27 2009/02/10 09:12:16 marchuet Exp $
  */
 
 /*
@@ -288,6 +288,7 @@
 #define DBI_DIRTYREAD           143  /* Get/Set index dirty read flag */
 #define DBI_POSITIONED          144  /* Is cursor positioned to valid record */
 #define DBI_CPID                145  /* is the codepage/collation asigned to table */
+#define DBI_ISTEMPORARY         146  /* Is the table a temporary one? */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */
@@ -301,7 +302,7 @@
 #define DBI_RM_COUNT            158  /* number of records set in record map */
 #define DBI_RM_HANDLE           159  /* get/set record map filter handle */
 
-/* BLOB support - definitions for internal use by BLOB.CH */
+/* BLOB support - definitions for internal use by blob.ch */
 #define DBI_BLOB_DIRECT_EXPORT  201
 #define DBI_BLOB_DIRECT_GET     202
 #define DBI_BLOB_DIRECT_IMPORT  203

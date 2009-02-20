@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.7 2007/12/01 22:54:58 andijahja Exp $
+ * $Id: token1.c,v 1.8 2007/12/04 23:06:19 andijahja Exp $
  */
 
 /*
@@ -65,8 +65,8 @@
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
   #if 0
-  #define TOUPPER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_upper[ ( UCHAR ) c ] : toupper( ( UCHAR ) c) )
-  #define TOLOWER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_lower[ ( UCHAR ) c ] : tolower( ( UCHAR ) c) )
+  #define TOUPPER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_upper[ ( UCHAR ) c ] : toupper( ( UCHAR ) c) )
+  #define TOLOWER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_lower[ ( UCHAR ) c ] : tolower( ( UCHAR ) c) )
   #endif
   #define TOUPPER(c)    ct__toupper( ( UCHAR ) c )
   #define TOLOWER(c)    ct__tolower( ( UCHAR ) c )

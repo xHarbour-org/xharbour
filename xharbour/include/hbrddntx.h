@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.43 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbrddntx.h,v 1.44 2009/01/08 09:11:13 marchuet Exp $
  */
 
 /*
@@ -403,6 +403,7 @@ typedef struct _NTXAREA
    BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
    BOOL     fShared;                /* Shared file */
    BOOL     fReadonly;              /* Read only file */
+   BOOL     fTemporary;             /* Temporary file */
    BOOL     fValidBuffer;           /* State of buffer */
    BOOL     fPositioned;            /* Positioned record */
    BOOL     fRecordChanged;         /* Record changed */

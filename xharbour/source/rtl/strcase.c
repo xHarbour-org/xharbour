@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.23 2007/11/13 21:34:11 likewolf Exp $
+ * $Id: strcase.c,v 1.24 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -69,9 +69,9 @@ char * hb_strLower( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strLower(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
+   if( (hb_cdppage())->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) hb_cdp_page->s_lower[ (BYTE) szText[ i ] ];
+         szText[ i ] = (char) (hb_cdppage())->s_lower[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -88,9 +88,9 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strLowerCopy(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
+   if( (hb_cdppage())->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) hb_cdp_page->s_lower[ (BYTE) szText[ i ] ];
+         szCopy[ i ] = (char) (hb_cdppage())->s_lower[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -108,9 +108,9 @@ char * hb_strUpperCopy( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpperCopy(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
+   if( (hb_cdppage())->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) hb_cdp_page->s_upper[ (BYTE) szText[ i ] ];
+         szCopy[ i ] = (char) (hb_cdppage())->s_upper[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -128,9 +128,9 @@ char * hb_strUpper( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpper(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
+   if( (hb_cdppage())->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) hb_cdp_page->s_upper[ (BYTE) szText[ i ] ];
+         szText[ i ] = (char) (hb_cdppage())->s_upper[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -143,8 +143,8 @@ char * hb_strUpper( char * szText, ULONG ulLen )
 int hb_charUpper( int iChar )
 {
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
-      return (unsigned char) hb_cdp_page->s_upper[ (unsigned char) iChar ];
+   if( (hb_cdppage())->nChars )
+      return (unsigned char) (hb_cdppage())->s_upper[ (unsigned char) iChar ];
    else
 #endif
       return toupper( (unsigned char) iChar );
@@ -154,8 +154,8 @@ int hb_charUpper( int iChar )
 int hb_charLower( int iChar )
 {
 #ifndef HB_CDP_SUPPORT_OFF
-   if( hb_cdp_page->nChars )
-      return (unsigned char) hb_cdp_page->s_lower[ (unsigned char) iChar ];
+   if( (hb_cdppage())->nChars )
+      return (unsigned char) (hb_cdppage())->s_lower[ (unsigned char) iChar ];
    else
 #endif
       return tolower( (unsigned char) iChar );

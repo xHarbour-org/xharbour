@@ -75,9 +75,9 @@ function fromUnicode( cString )
 *-----------------------------------------------------------------------------*
 Function Alert( cMsg, aChoices )
 
-   Local aDlg, i, j, n, aWid, aChoose, amSG
+   Local aDlg, i, n, aChoose, amSG
    Local hWnd, hDC
-   Local lErr := .F., e, w , h, t := 0, cTitle, msgh, butwidth
+   Local lErr := .F., w , h, t := 0, cTitle, msgh, butwidth
    Local crpos := 0, txth := 0, atm := { }
    LOCAL hFont:=CreateFont( { 8, 0, 0, 0, 700, 0, 0, 0, 0, 1, 2, 1, 34, "MS Sans Serif" } )
    LOCAL hOldFont
@@ -113,7 +113,7 @@ Function Alert( cMsg, aChoices )
 
    amSG := str2a( cMsg, CR )
 
-   AEVAL( amSG, { | X, Y | w := Max( w, GetTextExtentPoint32( hDC, AllTrim( X ) ) [ 1 ] ) } )
+   AEVAL( amSG, { | X | w := Max( w, GetTextExtentPoint32( hDC, AllTrim( X ) ) [ 1 ] ) } )
    w += 20
 
 * --------- total width of choices, also add "&" to the choices (if needed)
@@ -184,6 +184,8 @@ Function Alert( cMsg, aChoices )
 *----------------------------------------------------------------------------*
 
 Function AlertProc( hDlg, nMsg, nwParam, nlParam )
+
+   (nlParam) // to remove warnings
 
    Do Case
    Case nMsg == WM_INITDIALOG
@@ -475,7 +477,6 @@ Function Array2Bin( aValues, aTypes )
    Local nLen := Len( aValues )
    Local nDone := 0
    Local cType
-   Local cTypeType
    Local xValue
    Local xType
    Local nQty := 0
@@ -779,7 +780,7 @@ return hFont
 
 FUNCTION GetMessageFont( nWeight ) // retrieves the current font used in MessageBox
 
-   LOCAL cBuff, n
+   LOCAL cBuff
    LOCAL ncm IS NONCLIENTMETRICS
 
    ncm:cbSize := ncm:sizeof()

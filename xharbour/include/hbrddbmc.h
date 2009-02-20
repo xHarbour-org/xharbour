@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmc.h,v 1.7 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: hbrddbmc.h,v 1.8 2008/12/05 10:51:32 marchuet Exp $
  */
 
 /*
@@ -513,6 +513,7 @@ typedef struct _CDXAREA
    BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
    BOOL     fShared;                /* Shared file */
    BOOL     fReadonly;              /* Read only file */
+   BOOL     fTemporary;             /* Temporary file */
    BOOL     fValidBuffer;           /* State of buffer */
    BOOL     fPositioned;            /* Positioned record */
    BOOL     fRecordChanged;         /* Record changed */

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.41 2009/01/24 16:53:10 likewolf Exp $
+# $Id: common.mak,v 1.42 2009/01/29 16:30:41 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -970,6 +970,22 @@ CODEPAGE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)uckoi8u$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ucmaz$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ucmik$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc037$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1006$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1026$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc424$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc500$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc856$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc875$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucascii$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucatari$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmacce$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmaccyr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmacgrk$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmacice$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmacrom$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucmactrk$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ucnext$(OBJEXT)\
 
 #===============================================================================
 # CT.LIB rules

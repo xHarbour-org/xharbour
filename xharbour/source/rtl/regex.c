@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.62 2007/11/29 07:33:24 andijahja Exp $
+ * $Id: regex.c,v 1.63 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -736,7 +736,7 @@ HB_FUNC( HB_REGEXALL )
 HB_FUNC( HB_REGEXMATCH )
 {
    HB_THREAD_STUB_API
-   hb_retl ( hb_regex( hb_parl(3) ? 1 : 2, NULL, NULL ) );
+   hb_retl( hb_regex( hb_parl( 3 ) ? 1 /* LIKE */ : 2 /* HAS */, NULL, NULL ) );
 }
 
 // Splits the string in an array of matched expressions

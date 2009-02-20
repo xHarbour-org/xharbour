@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.8 2004/12/28 07:16:12 druzus Exp $
+ * $Id: is.c,v 1.9 2005/04/18 19:26:55 druzus Exp $
  */
 
 /*
@@ -69,8 +69,8 @@ HB_FUNC( ISALPHA )
       if( isalpha( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( hb_cdp_page->nChars && szString[0] &&
-           ( strchr( hb_cdp_page->CharsUpper, *szString ) || strchr( hb_cdp_page->CharsLower, *szString ) ) )
+      else if( (hb_cdppage())->nChars && szString[0] &&
+           ( strchr( (hb_cdppage())->CharsUpper, *szString ) || strchr( (hb_cdppage())->CharsLower, *szString ) ) )
          hb_retl( TRUE );
 #endif
       else
@@ -103,7 +103,7 @@ HB_FUNC( ISUPPER )
       if( isupper( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( hb_cdp_page->nChars && szString[0] && strchr( hb_cdp_page->CharsUpper, *szString ) )
+      else if( (hb_cdppage())->nChars && szString[0] && strchr( (hb_cdppage())->CharsUpper, *szString ) )
          hb_retl( TRUE );
 #endif
       else
@@ -124,7 +124,7 @@ HB_FUNC( ISLOWER )
       if( islower( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( hb_cdp_page->nChars && szString[0] && strchr( hb_cdp_page->CharsLower, *szString ) )
+      else if( (hb_cdppage())->nChars && szString[0] && strchr( (hb_cdppage())->CharsLower, *szString ) )
          hb_retl( TRUE );
 #endif
       else

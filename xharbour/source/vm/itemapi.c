@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.158 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: itemapi.c,v 1.159 2009/02/02 12:19:17 likewolf Exp $
  */
 
 /*
@@ -1627,9 +1627,9 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
    if( ulMinLen )
    {
 #ifndef HB_CDP_SUPPORT_OFF
-      if( hb_cdp_page->lSort )
+      if( (hb_cdppage())->lSort )
          iRet = hb_cdpcmp( szFirst, ulLenFirst, szSecond, ulLenSecond,
-                           hb_cdp_page, hb_set.HB_SET_EXACT || bForceExact );
+                           hb_cdppage(), hb_set.HB_SET_EXACT || bForceExact );
       else
 #endif
       {

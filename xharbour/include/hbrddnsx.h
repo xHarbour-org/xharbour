@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddnsx.h,v 1.1 2009/01/08 09:11:13 marchuet Exp $
+ * $Id: hbrddnsx.h,v 1.2 2009/01/16 10:50:23 marchuet Exp $
  */
 
 /*
@@ -601,6 +601,7 @@ typedef struct _NSXAREA
    BOOL        fMemoFlush;          /* data was written to MEMO and not commited */
    BOOL        fShared;             /* Shared file */
    BOOL        fReadonly;           /* Read only file */
+   BOOL        fTemporary;          /* Temporary file */
    BOOL        fValidBuffer;        /* State of buffer */
    BOOL        fPositioned;         /* Positioned record */
    BOOL        fRecordChanged;      /* Record changed */

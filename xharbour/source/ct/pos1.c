@@ -1,5 +1,5 @@
 /*
- * $Id: pos1.c,v 1.5 2007/02/13 19:02:24 druzus Exp $
+ * $Id: pos1.c,v 1.6 2007/12/01 22:33:22 andijahja Exp $
  */
 
 /*
@@ -62,9 +62,9 @@
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
   #if 0
-  #define ISUPPER(c)    ( hb_cdp_page->nChars ? isupper( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsUpper, ( UCHAR ) c ) != NULL : isupper( ( UCHAR ) c ) )
-  #define ISLOWER(c)    ( hb_cdp_page->nChars ? islower( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsLower, ( UCHAR ) c ) != NULL : islower( ( UCHAR ) c ) )
-  #define ISALPHA(c)    ( hb_cdp_page->nChars ? isalpha( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsUpper, ( UCHAR ) c ) != NULL || strchr( hb_cdp_page->CharsLower, c ) != NULL : isalpha( ( UCHAR ) c ) )
+  #define ISUPPER(c)    ( (hb_cdppage())->nChars ? isupper( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL : isupper( ( UCHAR ) c ) )
+  #define ISLOWER(c)    ( (hb_cdppage())->nChars ? islower( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsLower, ( UCHAR ) c ) != NULL : islower( ( UCHAR ) c ) )
+  #define ISALPHA(c)    ( (hb_cdppage())->nChars ? isalpha( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL || strchr( hb_cdp_page->CharsLower, c ) != NULL : isalpha( ( UCHAR ) c ) )
   #endif
   #define ISUPPER(c)    __isupper( ( UCHAR ) c )
   #define ISLOWER(c)    __islower( ( UCHAR ) c )

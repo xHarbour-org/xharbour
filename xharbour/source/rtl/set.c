@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.93 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: set.c,v 1.94 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
 #include "hbapifs.h"
 #include "hbapigt.h"
 #include "hbapilng.h"
+#include "hbapicdp.h"
 #include "hbapirdd.h"
 #include "hbset.h"
 
@@ -313,13 +314,13 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
    {
       BOOL bCreate = FALSE;
 
-      if ( bPipe )
+      if( bPipe )
          handle = hb_fsPOpen( ( BYTE * ) file_name, ( BYTE * ) "w" );
       else if ( bTemp )
          handle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, ( BYTE * ) s_PrintFileName );
       else
       {
-         if ( bAppend )
+         if( bAppend )
          {  /* Append mode */
             if( hb_fsFile( ( BYTE * ) szPrnFile ) )
             {  /* If the file already exists, open it (in read-write mode, in
@@ -347,9 +348,11 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
                   }
                }
             }
-            else bCreate = TRUE; /* Otherwise create a new file. */
+            else
+               bCreate = TRUE; /* Otherwise create a new file. */
          }
-         else bCreate = TRUE; /* Always create a new file for overwrite mode. */
+         else
+            bCreate = TRUE; /* Always create a new file for overwrite mode. */
 
          if( bCreate )
          {
@@ -387,6 +390,43 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
    }
    hb_fsSetError( user_ferror ); /* Restore the current user file error code */
    return handle;
+}
+
+static void hb_set_OSCODEPAGE( void )
+{
+   int i;
+
+   for( i = 0; i < 256; ++i )
+   {
+      hb_set.hb_set_oscptransto[ i ] = ( UCHAR ) i;
+      hb_set.hb_set_oscptransfrom[ i ] = ( UCHAR ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+
+   {
+      char * pszHostCDP = hb_cdpID();
+      char * pszFileCDP = hb_set.HB_SET_OSCODEPAGE;
+
+      if( pszFileCDP && pszFileCDP[ 0 ] && pszHostCDP )
+      {
+         PHB_CODEPAGE cdpFile = hb_cdpFind( pszFileCDP );
+         PHB_CODEPAGE cdpHost = hb_cdpFind( pszHostCDP );
+
+         if( cdpFile && cdpHost && cdpFile != cdpHost &&
+             cdpFile->nChars && cdpFile->nChars == cdpHost->nChars )
+         {
+            for( i = 0; i < cdpHost->nChars; ++i )
+            {
+               hb_set.hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsUpper[ i ] ] = ( UCHAR ) cdpFile->CharsUpper[ i ];
+               hb_set.hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsLower[ i ] ] = ( UCHAR ) cdpFile->CharsLower[ i ];
+               hb_set.hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsUpper[ i ] ] = ( UCHAR ) cdpHost->CharsUpper[ i ];
+               hb_set.hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsLower[ i ] ] = ( UCHAR ) cdpHost->CharsLower[ i ];
+            }
+         }
+      }
+   }
+#endif
 }
 
 // Sets default printer device
@@ -445,47 +485,16 @@ void hb_set_SetPrinterStop( void )
    }
 }
 
-HB_FUNC( SETCANCEL )
-{
-   hb_retl( hb_set.HB_SET_CANCEL );
-
-   if( ISLOG( 1 ) )
-   {
-      hb_set.HB_SET_CANCEL = hb_parl( 1 );
-   }
-}
-
-HB_FUNC( __SETCENTURY )
+BOOL hb_setSetCentury( BOOL new_century_setting )
 {
    BOOL old_century_setting = hb_set.hb_set_century;
 
+   hb_set.hb_set_century = new_century_setting;
    /*
-    * Change the setting if the parameter is a logical value, or is
-    * either "ON" or "OFF" (regardless of case)
-    */
-   if( ISLOG( 1 ) )
-      hb_set.hb_set_century = hb_parl( 1 );
-   else if( ISCHAR( 1 ) )
-   {
-      char * szString = hb_parc( 1 );
-      ULONG ulLen = hb_parclen( 1 );
-
-      if( ulLen >= 2
-       && toupper( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && toupper( ( UCHAR ) szString[ 1 ] ) == 'N' )
-         hb_set.hb_set_century = TRUE;
-      else if( ulLen >= 3
-       && toupper( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && toupper( ( UCHAR ) szString[ 1 ] ) == 'F'
-       && toupper( ( UCHAR ) szString[ 2 ] ) == 'F' )
-         hb_set.hb_set_century = FALSE;
-   }
-
-   /*
-    * Finally, if the setting changed, adjust the current date format to use
+    * if the setting changed, adjust the current date format to use
     * the correct number of year digits.
     */
-   if( old_century_setting != hb_set.hb_set_century )
+   if( old_century_setting != new_century_setting )
    {
       int count, digit, size, y_size, y_start, y_stop;
       char * szDateFormat, * szNewFormat;
@@ -499,10 +508,12 @@ HB_FUNC( __SETCENTURY )
          digit = toupper( ( UCHAR ) szDateFormat[ count ] );
          if( digit == 'Y' )
          {
-            if( y_start == -1 ) y_start = count;
+            if( y_start == -1 )
+               y_start = count;
          }
-         else if( y_start > -1 && y_stop == -1 ) y_stop = count;
-         szDateFormat[ count ] = digit;
+         else if( y_start > -1 && y_stop == -1 )
+            y_stop = count;
+         szDateFormat[ count ] = ( char ) digit;
       }
       /* Determine size of year in current format */
       if( y_start < 0 )
@@ -510,11 +521,13 @@ HB_FUNC( __SETCENTURY )
          y_start = 0; /* There is no year in the current format */
          y_stop = 0;
       }
-      else if( y_stop < 0 ) y_stop = size; /* All digits are year digits */
+      else if( y_stop < 0 )
+         y_stop = size; /* All digits are year digits */
       y_size = y_stop - y_start;
       /* Calculate size of new format */
       size -= y_size;
-      if( hb_set.hb_set_century ) size += 4;
+      if( new_century_setting )
+         size += 4;
       else size += 2;
 
       /* Create the new date format */
@@ -525,9 +538,11 @@ HB_FUNC( __SETCENTURY )
          if( y_start > 0 ) memcpy( szNewFormat, szDateFormat, y_start );
          szNewFormat[ y_start ] = '\0';
          hb_strncat( szNewFormat, "YY", size );
-         if( hb_set.hb_set_century ) hb_strncat( szNewFormat, "YY", size );
+         if( new_century_setting )
+            hb_strncat( szNewFormat, "YY", size );
          format_len = strlen( szDateFormat );
-         if( y_stop < format_len ) hb_strncat( szNewFormat, szDateFormat + y_stop, size );
+         if( y_stop < format_len )
+            hb_strncat( szNewFormat, szDateFormat + y_stop, size );
          /* DATE FORMAT is under direct control of SET, so notify when it
             it is changed indirectly via __SETCENTURY() */
          hb_setListenerNotify( HB_SET_DATEFORMAT, HB_SET_LISTENER_BEFORE );
@@ -538,7 +553,25 @@ HB_FUNC( __SETCENTURY )
    }
 
    /* Return the previous setting */
+   return old_century_setting;
+}
+
+HB_FUNC( __SETCENTURY )
+{
+   BOOL old_century_setting = hb_setGetCentury();
+   PHB_ITEM pNewVal = hb_param( 1, HB_IT_ANY );
+
+   if( pNewVal )
+      hb_setSetCentury( set_logical( pNewVal, old_century_setting ) );
+
    hb_retl( old_century_setting );
+}
+
+HB_FUNC( SETCANCEL )
+{
+   hb_retl( hb_setGetCancel() );
+   /* SETCANCEL() accepts only logical parameters */
+   hb_setSetItem( HB_SET_CANCEL, hb_param( 1, HB_IT_LOGICAL ) );
 }
 
 HB_FUNC( SET )
@@ -552,9 +585,9 @@ HB_FUNC( SET )
 
    if( args > 1 ) hb_setListenerNotify( set_specifier, HB_SET_LISTENER_BEFORE );
 
-   switch ( set_specifier )
+   switch( set_specifier )
    {
-      case HB_SET_ALTERNATE  :
+      case HB_SET_ALTERNATE:
          hb_retl( hb_set.HB_SET_ALTERNATE );
          if( args > 1 )
          {
@@ -562,16 +595,11 @@ HB_FUNC( SET )
          }
          break;
 
-      case HB_SET_ALTFILE    :
+      case HB_SET_ALTFILE:
          if( hb_set.HB_SET_ALTFILE )
-         {
             hb_retc( hb_set.HB_SET_ALTFILE );
-         }
          else
-         {
             hb_retc( NULL );
-         }
-
          if( args > 1 )
          {
             if( HB_IS_NIL( pArg2 ) )
@@ -587,16 +615,10 @@ HB_FUNC( SET )
                hb_set.HB_SET_ALTFILE = set_string( pArg2, hb_set.HB_SET_ALTFILE );
             }
          }
-
          if( args > 2 )
-         {
             bFlag = set_logical( pArg3, FALSE );
-         }
          else
-         {
             bFlag = FALSE;
-         }
-
          if( args > 1 )
          {
             close_text( hb_set.hb_set_althan );
@@ -611,89 +633,67 @@ HB_FUNC( SET )
             }
          }
          break;
-      case HB_SET_AUTOPEN    :
+      case HB_SET_AUTOPEN:
          hb_retl( hb_set.HB_SET_AUTOPEN );
          if( args > 1 )
-         {
             hb_set.HB_SET_AUTOPEN = set_logical( pArg2, hb_set.HB_SET_AUTOPEN );
-         }
          break;
-      case HB_SET_AUTORDER   :
+      case HB_SET_AUTORDER:
          hb_retni( hb_set.HB_SET_AUTORDER );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_AUTORDER ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_AUTORDER = set_number( pArg2, hb_set.HB_SET_AUTORDER );
-            }
          }
          break;
-      case HB_SET_AUTOSHARE  :
+      case HB_SET_AUTOSHARE:
          hb_retni( hb_set.HB_SET_AUTOSHARE );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_AUTOSHARE ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_AUTOSHARE = set_number( pArg2, hb_set.HB_SET_AUTOSHARE );
-            }
          }
          break;
-      case HB_SET_BELL       :
+      case HB_SET_BELL:
          hb_retl( hb_set.HB_SET_BELL );
          if( args > 1 )
-         {
             hb_set.HB_SET_BELL = set_logical( pArg2, hb_set.HB_SET_BELL );
-         }
          break;
 
-      case HB_SET_CANCEL     :
+      case HB_SET_CANCEL:
          hb_retl( hb_set.HB_SET_CANCEL );
          if( args > 1 )
-         {
             hb_set.HB_SET_CANCEL = set_logical( pArg2, hb_set.HB_SET_CANCEL );
-         }
          break;
 
-      case HB_SET_COLOR      :
+      case HB_SET_COLOR:
          hb_retc( hb_conSetColor( args >= 2 && HB_IS_STRING( pArg2 ) ? hb_itemGetCPtr( pArg2 ) : ( char * ) NULL ) );
          break;
-      case HB_SET_CONFIRM    :
+      case HB_SET_CONFIRM:
          hb_retl( hb_set.HB_SET_CONFIRM );
          if( args > 1 )
-         {
             hb_set.HB_SET_CONFIRM = set_logical( pArg2, hb_set.HB_SET_CONFIRM );
-         }
          break;
-      case HB_SET_CONSOLE    :
+      case HB_SET_CONSOLE:
          hb_retl( hb_set.HB_SET_CONSOLE );
          if( args > 1 )
-         {
             hb_set.HB_SET_CONSOLE = set_logical( pArg2, hb_set.HB_SET_CONSOLE );
-         }
          break;
-      case HB_SET_CURSOR     :
+      case HB_SET_CURSOR:
          if( args >= 2 && HB_IS_NUMERIC( pArg2 ) )
             hb_retni( hb_conSetCursor( TRUE, hb_itemGetNI( pArg2 ) ) );
          else
             hb_retni( hb_conSetCursor( FALSE, 0 ) );
          break;
-      case HB_SET_DATEFORMAT :
+      case HB_SET_DATEFORMAT:
          if( hb_set.HB_SET_DATEFORMAT )
-         {
             hb_retc( hb_set.HB_SET_DATEFORMAT );
-         }
          else
-         {
             hb_retc( NULL );
-         }
 
          if( args > 1 )
          {
@@ -708,13 +708,9 @@ HB_FUNC( SET )
                ch = hb_set.HB_SET_DATEFORMAT[i];
 
                if( !flag && ( ch == 'Y' || ch == 'y' ) )
-               {
                   year++;   /* Only count the first set of consecutive "Y"s. */
-               }
                else if( year )
-               {
                   flag = TRUE; /* Indicate non-consecutive. */
-               }
             }
 
             flag = ( year >= 4 );
@@ -727,66 +723,56 @@ HB_FUNC( SET )
             }
          }
          break;
-      case HB_SET_DEBUG      :
+      case HB_SET_DEBUG:
          hb_retl( hb_set.HB_SET_DEBUG );
          if( args > 1 )
-         {
             hb_set.HB_SET_DEBUG = set_logical( pArg2, hb_set.HB_SET_DEBUG );
-         }
          break;
-      case HB_SET_DECIMALS   :
+      case HB_SET_DECIMALS:
          hb_retni( hb_set.HB_SET_DECIMALS );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_DECIMALS ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_DECIMALS = set_number( pArg2, hb_set.HB_SET_DECIMALS );
-            }
          }
          break;
 
-      case HB_SET_DEFAULT    :
-         if( hb_set.HB_SET_DEFAULT ) hb_retc( hb_set.HB_SET_DEFAULT );
-         else hb_retc( NULL );
-         if( args > 1 ) hb_set.HB_SET_DEFAULT = set_string( pArg2, hb_set.HB_SET_DEFAULT );
+      case HB_SET_DEFAULT:
+         if( hb_set.HB_SET_DEFAULT )
+            hb_retc( hb_set.HB_SET_DEFAULT );
+         else
+            hb_retc( NULL );
+         if( args > 1 )
+            hb_set.HB_SET_DEFAULT = set_string( pArg2, hb_set.HB_SET_DEFAULT );
          break;
 
-      case HB_SET_DELETED    :
+      case HB_SET_DELETED:
          hb_retl( hb_set.HB_SET_DELETED );
          if( args > 1 )
-         {
             hb_set.HB_SET_DELETED = set_logical( pArg2, hb_set.HB_SET_DELETED );
-         }
          break;
 
-      case HB_SET_DELIMCHARS :
-         if( hb_set.HB_SET_DELIMCHARS ) hb_retc( hb_set.HB_SET_DELIMCHARS );
-         else hb_retc( NULL );
-         if( args > 1 ) hb_set.HB_SET_DELIMCHARS = set_string( pArg2, hb_set.HB_SET_DELIMCHARS );
+      case HB_SET_DELIMCHARS:
+         if( hb_set.HB_SET_DELIMCHARS )
+            hb_retc( hb_set.HB_SET_DELIMCHARS );
+         else
+            hb_retc( NULL );
+         if( args > 1 )
+            hb_set.HB_SET_DELIMCHARS = set_string( pArg2, hb_set.HB_SET_DELIMCHARS );
          break;
-
-      case HB_SET_DELIMITERS :
+      case HB_SET_DELIMITERS:
          hb_retl( hb_set.HB_SET_DELIMITERS );
          if( args > 1 )
-         {
             hb_set.HB_SET_DELIMITERS = set_logical( pArg2, hb_set.HB_SET_DELIMITERS );
-         }
          break;
 
-      case HB_SET_DEVICE     :
+      case HB_SET_DEVICE:
          if( hb_set.HB_SET_DEVICE )
-         {
             hb_retc( hb_set.HB_SET_DEVICE );
-         }
          else
-         {
             hb_retc( NULL );
-         }
-
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /* If the print file is not already open, open it in overwrite mode. */
@@ -802,11 +788,11 @@ HB_FUNC( SET )
 
          }
          break;
-      case HB_SET_EOF        :
+      case HB_SET_EOF:
          hb_retl( hb_set.HB_SET_EOF );
          if( args > 1 ) hb_set.HB_SET_EOF = set_logical( pArg2, hb_set.HB_SET_EOF );
          break;
-      case HB_SET_EPOCH      :
+      case HB_SET_EPOCH:
          hb_retni( hb_set.HB_SET_EPOCH );
          if( args > 1 )
          {
@@ -816,55 +802,43 @@ HB_FUNC( SET )
                hb_set.HB_SET_EPOCH = set_number( pArg2, hb_set.HB_SET_EPOCH );
          }
          break;
-
-      case HB_SET_ESCAPE     :
+      case HB_SET_ESCAPE:
          hb_retl( hb_set.HB_SET_ESCAPE );
          if( args > 1 )
-         {
             hb_set.HB_SET_ESCAPE = set_logical( pArg2, hb_set.HB_SET_ESCAPE );
-         }
          break;
-
-      case HB_SET_EVENTMASK  :
+      case HB_SET_EVENTMASK:
          hb_retni( hb_set.HB_SET_EVENTMASK );
-         if( args > 1 ) hb_set.HB_SET_EVENTMASK = set_number( pArg2, hb_set.HB_SET_EVENTMASK );
+         if( args > 1 )
+            hb_set.HB_SET_EVENTMASK = set_number( pArg2, hb_set.HB_SET_EVENTMASK );
          break;
-
-      case HB_SET_EXACT      :
+      case HB_SET_EXACT:
          hb_retl( hb_set.HB_SET_EXACT );
          if( args > 1 )
-         {
             hb_set.HB_SET_EXACT = set_logical( pArg2, hb_set.HB_SET_EXACT );
-         }
          break;
 
-      case HB_SET_EXCLUSIVE  :
+      case HB_SET_EXCLUSIVE:
          hb_retl( hb_set.HB_SET_EXCLUSIVE );
          if( args > 1 )
-         {
             hb_set.HB_SET_EXCLUSIVE = set_logical( pArg2, hb_set.HB_SET_EXCLUSIVE );
-         }
          break;
 
-      case HB_SET_EXIT       :
+      case HB_SET_EXIT:
          hb_retl( hb_set.HB_SET_EXIT );
          if( args > 1 )
-         {
             hb_set.HB_SET_EXIT = set_logical( pArg2, hb_set.HB_SET_EXIT );
-         }
          break;
-
-      case HB_SET_EXTRA      :
+      case HB_SET_EXTRA:
          hb_retl( hb_set.HB_SET_EXTRA );
          if( args > 1 )
-         {
             hb_set.HB_SET_EXTRA = set_logical( pArg2, hb_set.HB_SET_EXTRA );
-         }
          break;
-
-      case HB_SET_EXTRAFILE  :
-         if( hb_set.HB_SET_EXTRAFILE ) hb_retc( hb_set.HB_SET_EXTRAFILE );
-         else hb_retc( NULL );
+      case HB_SET_EXTRAFILE:
+         if( hb_set.HB_SET_EXTRAFILE )
+            hb_retc( hb_set.HB_SET_EXTRAFILE );
+         else
+            hb_retc( NULL );
          if( args > 1 )
          {
             if( HB_IS_NIL( pArg2 ) )
@@ -880,158 +854,101 @@ HB_FUNC( SET )
                hb_set.HB_SET_EXTRAFILE = set_string( pArg2, hb_set.HB_SET_EXTRAFILE );
             }
          }
-
          if( args > 2 )
-         {
             bFlag = set_logical( pArg3, FALSE );
-         }
          else
-         {
             bFlag = FALSE;
-         }
-
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             close_text( hb_set.hb_set_extrahan );
 
             if( hb_set.HB_SET_EXTRAFILE && strlen( hb_set.HB_SET_EXTRAFILE ) > 0 )
-            {
                hb_set.hb_set_extrahan = open_handle( hb_set.HB_SET_EXTRAFILE, bFlag, ".prn", HB_SET_EXTRAFILE );
-            }
             else
-            {
                hb_set.hb_set_extrahan = FS_ERROR;
-            }
          }
          break;
-
-      case HB_SET_FIXED      :
+      case HB_SET_FIXED:
          hb_retl( hb_set.HB_SET_FIXED );
          if( args > 1 )
-         {
             hb_set.HB_SET_FIXED = set_logical( pArg2, hb_set.HB_SET_FIXED );
-         }
          break;
 
-      case HB_SET_INSERT     :
+      case HB_SET_INSERT:
          hb_retl( hb_set.HB_SET_INSERT );
          if( args > 1 )
-         {
             hb_set.HB_SET_INSERT = set_logical( pArg2, hb_set.HB_SET_INSERT );
-         }
          break;
-
-      case HB_SET_INTENSITY  :
+      case HB_SET_INTENSITY:
          hb_retl( hb_set.HB_SET_INTENSITY );
          if( args > 1 )
-         {
             hb_set.HB_SET_INTENSITY = set_logical( pArg2, hb_set.HB_SET_INTENSITY );
-         }
          break;
-
-      case HB_SET_MARGIN     :
+      case HB_SET_MARGIN:
          hb_retni( hb_set.HB_SET_MARGIN );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_MARGIN ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_MARGIN = set_number( pArg2, hb_set.HB_SET_MARGIN );
-            }
          }
          break;
-
-      case HB_SET_MBLOCKSIZE :
+      case HB_SET_MBLOCKSIZE:
          hb_retni( hb_set.HB_SET_MBLOCKSIZE );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_MBLOCKSIZE ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_MBLOCKSIZE = set_number( pArg2, hb_set.HB_SET_MBLOCKSIZE );
-            }
          }
          break;
-
-      case HB_SET_MCENTER    :
+      case HB_SET_MCENTER:
          hb_retl( hb_set.HB_SET_MCENTER );
          if( args > 1 )
-         {
             hb_set.HB_SET_MCENTER = set_logical( pArg2, hb_set.HB_SET_MCENTER );
-         }
          break;
-
-      case HB_SET_MESSAGE    :
+      case HB_SET_MESSAGE:
          hb_retni( hb_set.HB_SET_MESSAGE );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_MESSAGE ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_MESSAGE = set_number( pArg2, hb_set.HB_SET_MESSAGE );
-            }
          }
          break;
-
-      case HB_SET_MFILEEXT   :
+      case HB_SET_MFILEEXT:
          hb_retc( hb_set.HB_SET_MFILEEXT );
          if( args > 1 )
-         {
             hb_set.HB_SET_MFILEEXT = set_string( pArg2, hb_set.HB_SET_MFILEEXT );
-         }
          break;
-
-      case HB_SET_OPTIMIZE   :
+      case HB_SET_OPTIMIZE:
          hb_retl( hb_set.HB_SET_OPTIMIZE );
          if( args > 1 )
-         {
             hb_set.HB_SET_OPTIMIZE = set_logical( pArg2, hb_set.HB_SET_OPTIMIZE );
-         }
          break;
-
-      case HB_SET_FORCEOPT   :
+      case HB_SET_FORCEOPT:
          hb_retl( hb_set.HB_SET_FORCEOPT );
          if( args > 1 )
-         {
             hb_set.HB_SET_FORCEOPT = set_logical( pArg2, hb_set.HB_SET_FORCEOPT );
-         }
          break;
-
-      case HB_SET_STRICTREAD :
+      case HB_SET_STRICTREAD:
          hb_retl( hb_set.HB_SET_STRICTREAD );
          if( args > 1 )
-         {
             hb_set.HB_SET_STRICTREAD = set_logical( pArg2, hb_set.HB_SET_STRICTREAD );
-         }
          break;
-
-      case HB_SET_HARDCOMMIT :
+      case HB_SET_HARDCOMMIT:
          hb_retl( hb_set.HB_SET_HARDCOMMIT );
          if( args > 1 )
-         {
             hb_set.HB_SET_HARDCOMMIT = set_logical( pArg2, hb_set.HB_SET_HARDCOMMIT );
-         }
          break;
-
-      case HB_SET_PATH       :
+      case HB_SET_PATH:
          if( hb_set.HB_SET_PATH )
-         {
             hb_retc( hb_set.HB_SET_PATH );
-         }
          else
-         {
             hb_retc( NULL );
-         }
-
          if( args > 1 )
          {
             hb_setFreeSetPath();
@@ -1039,43 +956,27 @@ HB_FUNC( SET )
             hb_fsAddSearchPath( hb_set.HB_SET_PATH, &sp_set_path );
          }
          break;
-
-      case HB_SET_PRINTER    :
+      case HB_SET_PRINTER:
          hb_retl( hb_set.HB_SET_PRINTER );
          if( args > 1 )
          {
             hb_set.HB_SET_PRINTER = set_logical( pArg2, hb_set.HB_SET_PRINTER );
 
             if( hb_set.HB_SET_PRINTER )
-            {
                hb_set_SetPrinterStart();
-            }
             else
-            {
                hb_set_SetPrinterStop();
-            }
          }
          break;
-
       case HB_SET_PRINTFILE  :
          if( hb_set.HB_SET_PRINTFILE )
-         {
             hb_retc( hb_set.HB_SET_PRINTFILE );
-         }
          else
-         {
             hb_retc( NULL );
-         }
-
          if( args > 2 )
-         {
             bFlag = set_logical( pArg3, FALSE );
-         }
          else
-         {
             bFlag = FALSE;
-         }
-
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
@@ -1089,39 +990,26 @@ HB_FUNC( SET )
                s_isDefaultPrinterDevice = FALSE;
             }
             else
-            {
                hb_set_SetDefaultPrinter(); // Make sure there is a default print file name "PRN"
-            }
          }
          break;
-
-      case HB_SET_SCOREBOARD :
+      case HB_SET_SCOREBOARD:
          hb_retl( hb_set.HB_SET_SCOREBOARD );
          if( args > 1 )
-         {
             hb_set.HB_SET_SCOREBOARD = set_logical( pArg2, hb_set.HB_SET_SCOREBOARD );
-         }
          break;
-
       case HB_SET_SCROLLBREAK:
          hb_retl( hb_set.HB_SET_SCROLLBREAK );
          if( args > 1 )
-         {
             hb_set.HB_SET_SCROLLBREAK = set_logical( pArg2, hb_set.HB_SET_SCROLLBREAK );
-         }
          break;
-
-      case HB_SET_SOFTSEEK   :
+      case HB_SET_SOFTSEEK:
          hb_retl( hb_set.HB_SET_SOFTSEEK );
          if( args > 1 )
-         {
             hb_set.HB_SET_SOFTSEEK = set_logical( pArg2, hb_set.HB_SET_SOFTSEEK );
-         }
          break;
-
-      case HB_SET_TYPEAHEAD  :
+      case HB_SET_TYPEAHEAD:
          hb_retni( hb_set.HB_SET_TYPEAHEAD );
-
          if( args > 1 )
          {
             /* Set the value and limit the range */
@@ -1130,79 +1018,56 @@ HB_FUNC( SET )
             hb_set.HB_SET_TYPEAHEAD = set_number( pArg2, old );
 
             if( hb_set.HB_SET_TYPEAHEAD == 0 )
-            {
                  /* Do nothing */ ;
-            }
             else if( hb_set.HB_SET_TYPEAHEAD < 16 )
-            {
                 hb_set.HB_SET_TYPEAHEAD = 16;
-            }
             else if( hb_set.HB_SET_TYPEAHEAD > 4096 )
-            {
                 hb_set.HB_SET_TYPEAHEAD = 4096;
-            }
             /* reset keyboard buffer */
             hb_inkeyReset();
          }
          break;
-
-      case HB_SET_UNIQUE     :
+      case HB_SET_UNIQUE:
          hb_retl( hb_set.HB_SET_UNIQUE );
          if( args > 1 )
-         {
             hb_set.HB_SET_UNIQUE = set_logical( pArg2, hb_set.HB_SET_UNIQUE );
-         }
          break;
-
-      case HB_SET_VIDEOMODE  :
+      case HB_SET_VIDEOMODE:
          hb_retni( hb_set.HB_SET_VIDEOMODE );
-
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_VIDEOMODE ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_VIDEOMODE = set_number( pArg2, hb_set.HB_SET_VIDEOMODE );
-            }
          }
          break;
-
-      case HB_SET_WRAP       :
+      case HB_SET_WRAP:
          hb_retl( hb_set.HB_SET_WRAP );
          if( args > 1 )
-         {
             hb_set.HB_SET_WRAP = set_logical( pArg2, hb_set.HB_SET_WRAP );
-         }
          break;
-
-      case HB_SET_LANGUAGE   :
+      case HB_SET_LANGUAGE:
          hb_retc( hb_langID() );
-         if( args > 1 && ! HB_IS_NIL( pArg2 ) )
-         {
+         if( args > 1 && HB_IS_STRING( pArg2 ) )
             hb_langSelectID( hb_itemGetCPtr( pArg2 ) );
-         }
          break;
-
-      case HB_SET_IDLEREPEAT :
+      case HB_SET_CODEPAGE:
+         hb_retc( hb_cdpID() );
+         if( args > 1 && HB_IS_STRING( pArg2 ) )
+            hb_cdpSelectID( hb_itemGetCPtr( pArg2 ) );
+         break;
+      case HB_SET_IDLEREPEAT:
          hb_retl( hb_set.HB_SET_IDLEREPEAT );
          if( args > 1 )
-         {
             hb_set.HB_SET_IDLEREPEAT = set_logical( pArg2, hb_set.HB_SET_IDLEREPEAT );
-         }
          break;
-
-       case HB_SET_TRACE :
-          hb_retl( hb_set.HB_SET_TRACE );
-          if( args > 1 )
-          {
-             hb_set.HB_SET_TRACE = set_logical( pArg2, hb_set.HB_SET_TRACE );
-          }
-          break;
-
-       case HB_SET_TRACEFILE :
+      case HB_SET_TRACE:
+         hb_retl( hb_set.HB_SET_TRACE );
+         if( args > 1 )
+            hb_set.HB_SET_TRACE = set_logical( pArg2, hb_set.HB_SET_TRACE );
+         break;
+      case HB_SET_TRACEFILE:
           hb_retc( (char *) ( hb_set.HB_SET_TRACEFILE ) );
 
           if( args > 1 && HB_IS_STRING( pArg2 ) )
@@ -1238,7 +1103,7 @@ HB_FUNC( SET )
           }
           break;
 
-      case HB_SET_TRACESTACK :
+      case HB_SET_TRACESTACK:
          hb_retni( hb_set.HB_SET_TRACESTACK );
          if( args > 1 )
          {
@@ -1278,7 +1143,7 @@ HB_FUNC( SET )
             }
          }
          break;
-      case HB_SET_PRINTERJOB    :
+      case HB_SET_PRINTERJOB:
          if ( hb_set.hb_set_printerjob )
          {
            hb_retc( hb_set.hb_set_printerjob );
@@ -1304,102 +1169,72 @@ HB_FUNC( SET )
            }
          }
          break;
-      case HB_SET_FILECASE   :
+      case HB_SET_FILECASE:
          hb_retni( hb_set.HB_SET_FILECASE );
          if( args > 1 )
          {
             if( HB_IS_STRING( pArg2 ) )
             {
                if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "LOWER" ) )
-               {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
-               }
                else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "UPPER" ) )
-               {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_UPPER;
-               }
                else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "MIXED" ) )
-               {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
-               }
                else
-               {
                   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               }
             }
             else if( HB_IS_NUMERIC( pArg2 ) )
             {
                if( set_number( pArg2, hb_set.HB_SET_FILECASE ) < 0 )
-               {
                   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               }
+
                else
-               {
                   hb_set.HB_SET_FILECASE = set_number( pArg2, hb_set.HB_SET_FILECASE );
-               }
             }
             else
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
          }
          break;
-
-      case HB_SET_DIRCASE :
+      case HB_SET_DIRCASE:
          hb_retni( hb_set.HB_SET_DIRCASE );
          if( args > 1 )
          {
             if( HB_IS_STRING( pArg2 ) )
             {
                if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "LOWER" ) )
-               {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
-               }
                else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "UPPER" ) )
-               {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_UPPER;
-               }
                else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "MIXED" ) )
-               {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
-               }
                else
-               {
                   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               }
             }
             else if( HB_IS_NUMERIC( pArg2 ) )
             {
                if( set_number( pArg2, hb_set.HB_SET_DIRCASE ) < 0 )
-               {
                   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               }
+
                else
-               {
                   hb_set.HB_SET_DIRCASE = set_number( pArg2, hb_set.HB_SET_DIRCASE );
-               }
             }
             else
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
          }
          break;
-
-      case HB_SET_DIRSEPARATOR :
+      case HB_SET_DIRSEPARATOR:
       {
          char szDirSep[ 2 ];
          szDirSep[ 0 ] = ( char ) hb_set.HB_SET_DIRSEPARATOR;
          szDirSep[ 1 ] = '\0';
          hb_retc( szDirSep );
          if( args > 1 )
-         {
             hb_set.HB_SET_DIRSEPARATOR = set_char( pArg2, hb_set.HB_SET_DIRSEPARATOR );
-         }
          break;
       }
 
-      case HB_SET_ERRORLOOP :
+      case HB_SET_ERRORLOOP:
          hb_retni( hb_set.HB_SET_ERRORLOOP );
          if( args > 1 )
          {
@@ -1408,69 +1243,60 @@ HB_FUNC( SET )
                hb_set.HB_SET_ERRORLOOP = hb_itemGetNI( pArg2 );
 
                if( hb_set.HB_SET_ERRORLOOP < 0 )
-               {
                   hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               }
                else if( hb_set.HB_SET_ERRORLOOP == 0 )
-               {
                   hb_set.HB_SET_ERRORLOOP = 8;
-               }
             }
             else
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
          }
          break;
 
       case HB_SET_OUTPUTSAFETY:
          hb_retl( hb_set.HB_SET_OUTPUTSAFETY );
          if ( args > 1 )
-         {
             hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
-         }
          break;
-
       case HB_SET_DBFLOCKSCHEME:
          hb_retni( hb_set.HB_SET_DBFLOCKSCHEME );
          if( args > 1 )
          {
             if( set_number( pArg2, hb_set.HB_SET_DBFLOCKSCHEME ) < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_DBFLOCKSCHEME = set_number( pArg2, hb_set.HB_SET_DBFLOCKSCHEME );
-            }
          }
          break;
       case HB_SET_DEFEXTENSIONS:
          hb_retl( hb_set.HB_SET_DEFEXTENSIONS );
          if( args > 1 ) hb_set.HB_SET_DEFEXTENSIONS = set_logical( pArg2, hb_set.HB_SET_DEFEXTENSIONS );
          break;
-      case HB_SET_EOL        :
-         if( hb_set.HB_SET_EOL ) hb_retc( hb_set.HB_SET_EOL );
-         else hb_retc( NULL );
-         if( args > 1 ) hb_set.HB_SET_EOL = set_string( pArg2, hb_set.HB_SET_EOL );
+      case HB_SET_EOL:
+         if( hb_set.HB_SET_EOL )
+            hb_retc( hb_set.HB_SET_EOL );
+         else
+            hb_retc( NULL );
+         if( args > 1 )
+            hb_set.HB_SET_EOL = set_string( pArg2, hb_set.HB_SET_EOL );
          break;
-
       case HB_SET_BACKGROUNDTASKS:
          hb_retl( hb_set.HB_SET_BACKGROUNDTASKS );
          if( args > 1 )
-         {
             hb_set.HB_SET_BACKGROUNDTASKS = set_logical( pArg2, hb_set.HB_SET_BACKGROUNDTASKS );
-         }
          break;
-
       case HB_SET_TRIMFILENAME:
          hb_retl( hb_set.HB_SET_TRIMFILENAME );
          if( args > 1 )
-         {
             hb_set.HB_SET_TRIMFILENAME = set_logical( pArg2, hb_set.HB_SET_TRIMFILENAME );
+         break;
+      case HB_SET_OSCODEPAGE:
+         hb_retc( hb_set.HB_SET_OSCODEPAGE );
+         if( args > 1 )
+         {
+            hb_set.HB_SET_OSCODEPAGE = set_string( pArg2, hb_set.HB_SET_OSCODEPAGE );
+            hb_set_OSCODEPAGE();
          }
          break;
-
       case HB_SET_BACKGROUNDTICK:
          hb_retnl( hb_set.HB_SET_BACKGROUNDTICK );
          if( args > 1 )
@@ -1478,17 +1304,12 @@ HB_FUNC( SET )
             int iNewVal = set_number( pArg2, hb_set.HB_SET_BACKGROUNDTICK );
 
             if( iNewVal < 0 )
-            {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-            }
             else
-            {
                hb_set.HB_SET_BACKGROUNDTICK = iNewVal == 0 ? 1000 : iNewVal;
-            }
          }
          break;
-
-      case HB_SET_ERRORLOG    :
+      case HB_SET_ERRORLOG:
          hb_reta( 2 );
          hb_storc( (char *) ( hb_set.HB_SET_ERRORLOG ), -1, 1 );
          hb_storl( hb_set.HB_SET_APPENDERROR, -1, 2 );
@@ -1506,33 +1327,23 @@ HB_FUNC( SET )
          if( args > 1 )
          {
             if( HB_IS_STRING( pArg2 ) )
-            {
                strcpy( hb_set.HB_SET_ERRORLOG, pArg2->item.asString.value );
-            }
 
             if( pArg3 && HB_IS_LOGICAL( pArg3 ) )
-            {
                hb_set.HB_SET_APPENDERROR = pArg3->item.asLogical.value;
-            }
          }
          break;
 
-      case HB_SET_TIMEFORMAT :
+      case HB_SET_TIMEFORMAT:
          if( hb_set.HB_SET_TIMEFORMAT )
-         {
             hb_retc( hb_set.HB_SET_TIMEFORMAT );
-         }
          else
-         {
             hb_retc( NULL );
-         }
 
          if( args > 1 )
-         {
             hb_set.HB_SET_TIMEFORMAT = set_string( pArg2, hb_set.HB_SET_TIMEFORMAT );
-         }
-         break;
 
+         break;
       case HB_SET_MACROBLOCKVARS:
          if( pArg3 && HB_IS_BLOCK( pArg3 ) )
          {
@@ -1689,6 +1500,8 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DEFEXTENSIONS = TRUE;
    hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
    hb_set.HB_SET_TRIMFILENAME = FALSE;
+   hb_set.HB_SET_OSCODEPAGE = hb_strdup( "" );
+   hb_set_OSCODEPAGE();
 
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
 
@@ -1751,6 +1564,7 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
    if( hb_set.HB_SET_EOL )        hb_xfree( hb_set.HB_SET_EOL );
+   if( hb_set.HB_SET_OSCODEPAGE ) hb_xfree( hb_set.HB_SET_OSCODEPAGE );
    if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
    if( hb_set.HB_SET_TIMEFORMAT ) hb_xfree( hb_set.HB_SET_TIMEFORMAT );
 
@@ -1773,9 +1587,13 @@ int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
    p_sl->callback = callback;
    p_sl->listener = s_next_listener++;
    p_sl->next = NULL;
-   if( sp_sl_last ) sp_sl_last->next = p_sl;
-   else if( ! sp_sl_first ) sp_sl_first = p_sl;
+
+   if( sp_sl_last )
+      sp_sl_last->next = p_sl;
+   else if( ! sp_sl_first )
+      sp_sl_first = p_sl;
    sp_sl_last = p_sl;
+
    return p_sl->listener;
 }
 
@@ -1811,6 +1629,625 @@ int hb_setListenerRemove( int listener )
       }
    }
    return listener;
+}
+
+static BOOL hb_setSetFile( HB_set_enum set_specifier, const char * szFile, BOOL fAdditive )
+{
+   BOOL fResult = TRUE;
+
+   switch( set_specifier )
+   {
+      case HB_SET_ALTFILE:
+         if( hb_set.HB_SET_ALTFILE )
+            hb_xfree( hb_set.HB_SET_ALTFILE );
+         /* Limit size of SET strings to 64K, truncating if source is longer */
+         hb_set.HB_SET_ALTFILE = szFile ? hb_strndup( szFile, USHRT_MAX ) : NULL;
+         close_text( hb_set.hb_set_althan );
+         hb_set.hb_set_althan = FS_ERROR;
+         if( hb_set.HB_SET_ALTFILE && hb_set.HB_SET_ALTFILE[ 0 ] != '\0' )
+            hb_set.hb_set_althan = open_handle( hb_set.HB_SET_ALTFILE,
+                                               fAdditive, ".txt", HB_SET_ALTFILE );
+         break;
+
+      case HB_SET_EXTRAFILE:
+         if( hb_set.HB_SET_EXTRAFILE )
+            hb_xfree( hb_set.HB_SET_EXTRAFILE );
+         /* Limit size of SET strings to 64K, truncating if source is longer */
+         hb_set.HB_SET_EXTRAFILE = szFile ? hb_strndup( szFile, USHRT_MAX ) : NULL;
+         if( szFile )
+         {
+            close_text( hb_set.hb_set_extrahan );
+            hb_set.hb_set_extrahan = FS_ERROR;
+            if( hb_set.HB_SET_EXTRAFILE && hb_set.HB_SET_EXTRAFILE[ 0 ] != '\0' )
+               hb_set.hb_set_extrahan = open_handle( hb_set.HB_SET_EXTRAFILE,
+                                                    fAdditive, ".prn", HB_SET_EXTRAFILE );
+         }
+         break;
+
+      case HB_SET_PRINTFILE:
+         if( hb_set.HB_SET_PRINTFILE )
+            hb_xfree( hb_set.HB_SET_PRINTFILE );
+         /* Limit size of SET strings to 64K, truncating if source is longer */
+         hb_set.HB_SET_PRINTFILE = szFile ? hb_strndup( szFile, USHRT_MAX ) : NULL;
+         if( szFile )
+         {
+            close_binary( hb_set.hb_set_printhan );
+            hb_set.hb_set_printhan = FS_ERROR;
+            if( hb_set.HB_SET_PRINTFILE && hb_set.HB_SET_PRINTFILE[ 0 ] != '\0' )
+               hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE,
+                                                    fAdditive, ".prn", HB_SET_PRINTFILE );
+         }
+         break;
+
+      default:
+         fResult = FALSE;
+         break;
+   }
+
+   return fResult;
+}
+
+BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
+{
+   BOOL fResult = FALSE;
+   char * szValue;
+   int iValue;
+
+   if( pItem )
+   {
+      hb_setListenerNotify( set_specifier, HB_SET_LISTENER_BEFORE );
+
+      switch( set_specifier )
+      {
+         case HB_SET_ALTFILE:
+         case HB_SET_EXTRAFILE:
+         case HB_SET_PRINTFILE:
+            /* This sets needs 3-rd parameter to indicate additive mode
+             * so they cannot be fully supported by this function
+             */
+            fResult = hb_setSetFile( set_specifier, HB_IS_STRING( pItem ) ?
+                                     hb_itemGetCPtr( pItem ) : NULL, FALSE );
+            break;
+
+         case HB_SET_ALTERNATE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_ALTERNATE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_AUTOPEN:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_AUTOPEN = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_BELL:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_BELL = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_CANCEL:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_CANCEL = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_CONFIRM:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_CONFIRM = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_CONSOLE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_CONSOLE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DEBUG:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_DEBUG = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DELETED:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_DELETED = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DELIMITERS:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_DELIMITERS = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EOF:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_EOF = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_ESCAPE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_ESCAPE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EXACT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_EXACT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EXCLUSIVE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_EXCLUSIVE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EXIT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_EXIT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EXTRA:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_EXTRA = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_FIXED:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_FIXED = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_IDLEREPEAT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_IDLEREPEAT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_INSERT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_INSERT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_INTENSITY:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_INTENSITY = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_MCENTER:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_MCENTER = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_OPTIMIZE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_OPTIMIZE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_FORCEOPT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_FORCEOPT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_PRINTER:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_PRINTER = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_SCOREBOARD:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_SCOREBOARD = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_SCROLLBREAK:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_SCROLLBREAK = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_SOFTSEEK:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_SOFTSEEK = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_STRICTREAD:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_STRICTREAD = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_UNIQUE:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_UNIQUE = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_WRAP:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_WRAP = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_HARDCOMMIT:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_HARDCOMMIT = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DEFEXTENSIONS:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_DEFEXTENSIONS = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_TRIMFILENAME:
+            if( HB_IS_LOGICAL( pItem ) )
+            {
+               hb_set.HB_SET_TRIMFILENAME = hb_itemGetL( pItem );
+               fResult = TRUE;
+            }
+            break;
+
+         case HB_SET_DECIMALS:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_DECIMALS = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_EPOCH:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_EPOCH = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_MBLOCKSIZE:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_MBLOCKSIZE = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_DBFLOCKSCHEME:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_DBFLOCKSCHEME = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_AUTORDER:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_AUTORDER = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_AUTOSHARE:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_AUTOSHARE = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_CURSOR:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               hb_conSetCursor( TRUE, ( USHORT ) hb_itemGetNI( pItem ) );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EVENTMASK:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_EVENTMASK = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_MARGIN:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_MARGIN = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_MESSAGE:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               iValue = hb_itemGetNI( pItem );
+               if( iValue >= 0 )
+               {
+                  hb_set.HB_SET_MESSAGE = iValue;
+                  fResult = TRUE;
+               }
+            }
+            break;
+         case HB_SET_TYPEAHEAD:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               /* Set the value and limit the range */
+               hb_set.HB_SET_TYPEAHEAD = hb_itemGetNI( pItem );
+               if( hb_set.HB_SET_TYPEAHEAD == 0 )
+                  /* Do nothing */ ;
+               else if( hb_set.HB_SET_TYPEAHEAD < 16 )
+                  hb_set.HB_SET_TYPEAHEAD = 16;
+               else if( hb_set.HB_SET_TYPEAHEAD > 4096 )
+                  hb_set.HB_SET_TYPEAHEAD = 4096;
+               /* reset keyboard buffer */
+               hb_inkeyReset();
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_VIDEOMODE:
+            if( HB_IS_NUMERIC( pItem ) )
+            {
+               hb_set.HB_SET_VIDEOMODE = hb_itemGetNI( pItem );
+               fResult = TRUE;
+            }
+            break;
+
+         case HB_SET_COLOR:
+            if( HB_IS_STRING( pItem ) )
+            {
+               hb_conSetColor( hb_itemGetCPtr( pItem ) );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_LANGUAGE:
+            if( HB_IS_STRING( pItem ) )
+            {
+               hb_langSelectID( hb_itemGetCPtr( pItem ) );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_CODEPAGE:
+            if( HB_IS_STRING( pItem ) )
+            {
+               hb_cdpSelectID( hb_itemGetCPtr( pItem ) );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_FILECASE:
+         case HB_SET_DIRCASE:
+            iValue = -1;
+            if( HB_IS_STRING( pItem ) )
+            {
+               if( ! hb_stricmp( hb_itemGetCPtr( pItem ), "LOWER" ) )
+                  iValue = HB_SET_CASE_LOWER;
+               else if( ! hb_stricmp( hb_itemGetCPtr( pItem ), "UPPER" ) )
+                  iValue = HB_SET_CASE_UPPER;
+               else if( ! hb_stricmp( hb_itemGetCPtr( pItem ), "MIXED" ) )
+                  iValue = HB_SET_CASE_MIXED;
+            }
+            else if( HB_IS_NUMERIC( pItem ) )
+               iValue = hb_itemGetNI( pItem );
+
+            if( iValue == HB_SET_CASE_LOWER ||
+                iValue == HB_SET_CASE_UPPER ||
+                iValue == HB_SET_CASE_MIXED )
+            {
+               if( set_specifier == HB_SET_FILECASE )
+                  hb_set.HB_SET_FILECASE = iValue;
+               else
+                  hb_set.HB_SET_DIRCASE = iValue;
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DATEFORMAT:
+            if( HB_IS_STRING( pItem ) )
+            {
+               int iYear = 0;
+
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_DATEFORMAT )
+                  hb_xfree( hb_set.HB_SET_DATEFORMAT );
+               hb_set.HB_SET_DATEFORMAT = szValue;
+               while( *szValue )
+               {
+                  if( *szValue == 'Y' || *szValue == 'y' )
+                     ++iYear;
+                  else if( iYear )   /* Only count the first set of consecutive "Y"s. */
+                     break;
+                  ++szValue;
+               }
+               if( hb_set.hb_set_century ? iYear < 4 : iYear >= 4 )
+                  /* CENTURY is not controlled directly by SET, so there is no
+                     notification for changing it indirectly via DATE FORMAT. */
+                  hb_set.hb_set_century = iYear >= 4;
+            }
+            break;
+         case HB_SET_DIRSEPARATOR:
+            if( hb_itemGetCLen( pItem ) > 0 )
+            {
+               hb_set.HB_SET_DIRSEPARATOR = hb_itemGetCPtr( pItem )[ 0 ];
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DEVICE:
+            if( HB_IS_STRING( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_DEVICE )
+                  hb_xfree( hb_set.HB_SET_DEVICE );
+               hb_set.HB_SET_DEVICE = szValue;
+
+               /* If the print file is not already open, open it in overwrite mode. */
+               if( hb_stricmp( szValue, "PRINTER" ) == 0 && hb_set.hb_set_printhan == FS_ERROR &&
+                   hb_set.HB_SET_PRINTFILE && hb_set.HB_SET_PRINTFILE[ 0 ] != '\0' )
+                  hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE,
+                                                       FALSE, ".prn", HB_SET_PRINTFILE );
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_MFILEEXT:
+            if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_MFILEEXT )
+                  hb_xfree( hb_set.HB_SET_MFILEEXT );
+               hb_set.HB_SET_MFILEEXT = szValue;
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DEFAULT:
+            if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_DEFAULT )
+                  hb_xfree( hb_set.HB_SET_DEFAULT );
+               hb_set.HB_SET_DEFAULT = szValue;
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_DELIMCHARS:
+            if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_DELIMCHARS )
+                  hb_xfree( hb_set.HB_SET_DELIMCHARS );
+               hb_set.HB_SET_DELIMCHARS = szValue;
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_EOL:
+            if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_EOL )
+                  hb_xfree( hb_set.HB_SET_EOL );
+               hb_set.HB_SET_EOL = szValue;
+               fResult = TRUE;
+            }
+            break;
+         case HB_SET_OSCODEPAGE:
+            if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
+            {
+               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               if( hb_set.HB_SET_OSCODEPAGE )
+                  hb_xfree( hb_set.HB_SET_OSCODEPAGE );
+               hb_set.HB_SET_OSCODEPAGE = szValue;
+               hb_set_OSCODEPAGE();
+               fResult = TRUE;
+            }
+            break;
+
+         case HB_SET_INVALID_:
+            break;
+#if 0
+         /*
+          * intentionally removed default: clause to enable C compiler warning
+          * when not all HB_SET_* cases are implemented. [druzus]
+          */
+         default:
+            break;
+#endif
+      }
+      hb_setListenerNotify( set_specifier, HB_SET_LISTENER_AFTER );
+   }
+
+   return fResult;
+}
+
+BOOL hb_setSetItem2( HB_set_enum set_specifier, PHB_ITEM pItem1, PHB_ITEM pItem2 )
+{
+   BOOL fResult = FALSE;
+
+   if( pItem1 )
+   {
+      switch( set_specifier )
+      {
+         case HB_SET_ALTFILE:
+         case HB_SET_EXTRAFILE:
+         case HB_SET_PRINTFILE:
+            hb_setListenerNotify( set_specifier, HB_SET_LISTENER_BEFORE );
+            fResult = hb_setSetFile( set_specifier, HB_IS_STRING( pItem1 ) ?
+                                     hb_itemGetCPtr( pItem1 ) : NULL,
+                                     pItem2 && set_logical( pItem2, FALSE ) );
+            hb_setListenerNotify( set_specifier, HB_SET_LISTENER_AFTER );
+            break;
+         default:
+            fResult = hb_setSetItem( set_specifier, pItem1 );
+      }
+   }
+   return fResult;
 }
 
 BOOL    hb_setGetL( HB_set_enum set_specifier )
@@ -1926,6 +2363,7 @@ BOOL    hb_setGetL( HB_set_enum set_specifier )
       case HB_SET_DIRSEPARATOR:
       case HB_SET_DBFLOCKSCHEME:
       case HB_SET_EOL:
+      case HB_SET_OSCODEPAGE:
       case HB_SET_INVALID_:
          break;
 #if 0
@@ -1977,6 +2415,12 @@ char *  hb_setGetCPtr( HB_set_enum set_specifier )
       case HB_SET_EOL:
          return hb_set.HB_SET_EOL;
 
+      case HB_SET_OSCODEPAGE:
+         return hb_set.HB_SET_OSCODEPAGE;
+      case HB_SET_LANGUAGE:
+         return hb_langID();
+      case HB_SET_CODEPAGE:
+         return hb_cdpID();
       case HB_SET_ALTERNATE:
       case HB_SET_AUTOPEN:
       case HB_SET_AUTORDER:
@@ -2024,7 +2468,6 @@ char *  hb_setGetCPtr( HB_set_enum set_specifier )
       case HB_SET_UNIQUE:
       case HB_SET_VIDEOMODE:
       case HB_SET_WRAP:
-      case HB_SET_LANGUAGE:
       case HB_SET_IDLEREPEAT:
       case HB_SET_FILECASE:
       case HB_SET_DIRCASE:
@@ -2137,10 +2580,12 @@ int     hb_setGetNI( HB_set_enum set_specifier )
       case HB_SET_UNIQUE:
       case HB_SET_WRAP:
       case HB_SET_LANGUAGE:
+      case HB_SET_CODEPAGE:
       case HB_SET_IDLEREPEAT:
       case HB_SET_EOL:
       case HB_SET_DEFEXTENSIONS:
       case HB_SET_TRIMFILENAME:
+      case HB_SET_OSCODEPAGE:
       case HB_SET_WORKAREAS_SHARED:
       case HB_SET_INVALID_:
          break;
@@ -2472,6 +2917,63 @@ char *  hb_setGetEOL( void )
 BOOL    hb_setGetTrimFileName( void )
 {
    return hb_set.HB_SET_TRIMFILENAME;
+}
+
+char *  hb_setGetOSCODEPAGE( void )
+{
+   return hb_set.HB_SET_OSCODEPAGE;
+}
+
+UCHAR * hb_osEncode( UCHAR * szFileName, BOOL * pfFree )
+{
+   *pfFree = FALSE;
+
+#if defined( HB_MT_VM )
+   if( hb_stackId() )
+#endif
+   {
+      BOOL bCPConv = hb_setGetOSCODEPAGE() && hb_setGetOSCODEPAGE()[ 0 ];
+
+      if( bCPConv )
+      {
+         UCHAR * p = szFileName;
+         UCHAR * pCPTrans = hb_set.hb_set_oscptransto;
+
+         while( *p )
+         {
+            *p = pCPTrans[ ( UCHAR ) *p ];
+            p++;
+         }
+      }
+   }
+
+   return szFileName;
+}
+
+UCHAR * hb_osDecode( UCHAR * szFileName, BOOL * pfFree )
+{
+   *pfFree = FALSE;
+
+#if defined( HB_MT_VM )
+   if( hb_stackId() )
+#endif
+   {
+      BOOL bCPConv = hb_setGetOSCODEPAGE() && hb_setGetOSCODEPAGE()[ 0 ];
+
+      if( bCPConv )
+      {
+         UCHAR * p = szFileName;
+         UCHAR * pCPTrans = hb_set.hb_set_oscptransfrom;
+
+         while( *p )
+         {
+            *p = pCPTrans[ ( UCHAR ) *p ];
+            p++;
+         }
+      }
+   }
+
+   return szFileName;
 }
 
 BOOL hb_setAppendError( void )

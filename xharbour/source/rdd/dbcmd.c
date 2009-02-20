@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.227 2008/10/22 08:32:48 marchuet Exp $
+ * $Id: dbcmd.c,v 1.228 2008/11/21 05:10:07 andijahja Exp $
  */
 
 /*
@@ -405,6 +405,62 @@ HB_FUNC( DBCREATE )
                                szAlias, fKeepOpen,
                                szCpId, ulConnection,
                                pStruct, pDelim ) == SUCCESS );
+}
+
+/*
+ *    dbCreateTemp( <cAlias>, <aStruct>, <cRDD>, <cCodePage>, <nConnection> ) -> <lSuccess>
+ */
+HB_FUNC( DBCREATETEMP )
+{
+   HB_THREAD_STUB
+   char * szAlias, * szDriver, * szCpId;
+   USHORT uiSize, uiLen;
+   PHB_ITEM pStruct, pFieldDesc;
+   ULONG ulConnection;
+
+   szAlias = hb_parc( 1 );
+   pStruct = hb_param( 2, HB_IT_ARRAY );
+   szDriver = hb_parc( 3 );
+   szCpId = hb_parc( 4 );
+   ulConnection = hb_parnl( 5 );
+
+   /*
+    * Clipper allows to use empty struct array for RDDs which does not
+    * support fields, f.e.: DBFBLOB in CL5.3
+    * In CL5.3 it's also possible to create DBF file without fields.
+    * if some RDD wants to block it then they should serve it in lower
+    * level, [druzus]
+    */
+   if( !szAlias || !pStruct
+#ifdef HB_C52_STRICT
+       || hb_arrayLen( pStruct ) == 0
+#endif
+       )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, HB_ERR_FUNCNAME );
+      return;
+   }
+   uiLen = ( USHORT ) hb_arrayLen( pStruct );
+
+   for( uiSize = 1; uiSize <= uiLen; ++uiSize )
+   {
+      pFieldDesc = hb_arrayGetItemPtr( pStruct, uiSize );
+
+      /* Validate items types of fields */
+      if( hb_arrayLen( pFieldDesc ) < 4 ||
+          !( hb_arrayGetType( pFieldDesc, 1 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 2 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 3 ) & HB_IT_NUMERIC ) ||
+          !( hb_arrayGetType( pFieldDesc, 4 ) & HB_IT_NUMERIC ) )
+      {
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, HB_ERR_FUNCNAME );
+         return;
+      }
+   }
+
+   hb_retl( hb_rddCreateTableTemp( szDriver, szAlias,
+                                   szCpId, ulConnection,
+                                   pStruct ) == SUCCESS );
 }
 
 /*

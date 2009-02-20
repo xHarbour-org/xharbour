@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbf2txt.c,v 1.1 2006/06/14 13:56:20 druzus Exp $
  */
 
 /*
@@ -108,7 +108,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 #ifndef HB_CDP_SUPPORT_OFF
          if( cdp )
          {
-            hb_cdpnTranslate( szStrEsc, hb_cdp_page, cdp, hb_itemGetCLen( pValue ) );
+            hb_cdpnTranslate( szStrEsc, hb_cdppage(), cdp, hb_itemGetCLen( pValue ) );
          }
 #endif
          szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
@@ -206,7 +206,7 @@ HB_FUNC( DBF2TEXT )
       return;
    }
 
-   if( cdp && cdp == hb_cdp_page )
+   if( cdp && cdp == hb_cdppage() )
    {
       cdp = NULL;
    }

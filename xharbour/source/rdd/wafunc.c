@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.16 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: wafunc.c,v 1.17 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -811,6 +811,70 @@ ERRCODE hb_rddCreateTable( const char * szFileName, const char * szDriver,
    }
 
    if( !fKeepOpen || errCode != SUCCESS )
+   {
+      hb_rddReleaseCurrentArea();
+      hb_rddSelectWorkAreaNumber( uiPrevArea );
+   }
+
+   return errCode;
+}
+
+ERRCODE hb_rddCreateTableTemp( const char * szDriver,
+                               const char * szAlias,
+                               const char * szCpId, ULONG ulConnection,
+                               PHB_ITEM pStruct )
+{
+   char szDriverBuffer[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
+   DBOPENINFO pInfo;
+   PHB_ITEM pItem;
+   ERRCODE errCode;
+   USHORT uiPrevArea;
+   AREAP pArea;
+
+   if( szDriver && szDriver[ 0 ] )
+   {
+      hb_strncpyUpper( szDriverBuffer, szDriver, sizeof( szDriverBuffer ) - 1 );
+      szDriver = szDriverBuffer;
+   }
+   else
+      szDriver = hb_rddDefaultDrv( NULL );
+
+   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+
+   /* 0 means chose first available in hb_rddInsertAreaNode() */
+   hb_rddSelectWorkAreaNumber( 0 );
+
+   /* Create a new WorkArea node */
+   if( ! hb_rddInsertAreaNode( szDriver ) )
+   {
+      hb_rddSelectWorkAreaNumber( uiPrevArea );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, HB_ERR_FUNCNAME );
+      return FAILURE;
+   }
+   pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+
+   /* Fill pInfo structure */
+   pInfo.uiArea = pArea->uiArea;
+   pInfo.abName = NULL;
+   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.fShared = FALSE;
+   pInfo.fReadonly = FALSE;
+   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.ulConnection = ulConnection;
+   pInfo.lpdbHeader = NULL;
+
+   pItem = hb_itemPutL( NULL, TRUE );
+   errCode = SELF_INFO( pArea, DBI_ISTEMPORARY, pItem );
+   hb_itemRelease( pItem );
+
+   if( errCode == SUCCESS )
+   {
+      errCode = SELF_CREATEFIELDS( pArea, pStruct );
+      if( errCode == SUCCESS )
+         errCode = SELF_CREATE( pArea, &pInfo );
+   }
+
+   if( errCode != SUCCESS )
    {
       hb_rddReleaseCurrentArea();
       hb_rddSelectWorkAreaNumber( uiPrevArea );

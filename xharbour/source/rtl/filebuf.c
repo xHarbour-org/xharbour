@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.2 2008/11/05 03:03:16 walito Exp $
+ * $Id: filebuf.c,v 1.3 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -501,6 +501,22 @@ PHB_FILE hb_fileCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix,
    HB_FHANDLE hFile;
 
    hFile = hb_fsCreateTemp( pszDir, pszPrefix, ulAttr, pszName );
+   if( hFile != FS_ERROR )
+      pFile = hb_fileNew( hFile, FALSE, 0, 0, FALSE );
+
+   return pFile;
+}
+
+PHB_FILE hb_fileCreateTempEx( BYTE * pszName,
+                              const BYTE * pszDir,
+                              const BYTE * pszPrefix,
+                              const BYTE * pszExt,
+                              ULONG ulAttr )
+{
+   PHB_FILE pFile = NULL;
+   HB_FHANDLE hFile;
+
+   hFile = hb_fsCreateTempEx( pszName, pszDir, pszPrefix, pszExt, ulAttr );
    if( hFile != FS_ERROR )
       pFile = hb_fileNew( hFile, FALSE, 0, 0, FALSE );
 

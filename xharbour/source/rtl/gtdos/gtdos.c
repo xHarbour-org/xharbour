@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.31 2008/08/14 09:04:22 andijahja Exp $
+ * $Id: gtdos.c,v 1.32 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -1252,7 +1252,7 @@ static BOOL hb_gt_dos_SetDispCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP,
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
 
    if( pszTermCDP && pszHostCDP )
    {
@@ -1294,7 +1294,7 @@ static BOOL hb_gt_dos_SetKeyCP( PHB_GT pGT, char *pszTermCDP, char *pszHostCDP )
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
    {
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = b_cdpID();
    }
 
    if( pszTermCDP && pszHostCDP )

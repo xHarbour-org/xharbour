@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.44 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: gtsln.c,v 1.45 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -664,8 +664,8 @@ static void hb_gt_sln_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
 
             /* initialize conversion tables */
             hb_sln_colorTrans();
-            hb_sln_setCharTrans( hb_cdp_page, NULL, TRUE );
-            hb_sln_setKeyTrans( hb_cdp_page, NULL );
+            hb_sln_setCharTrans( hb_cdppage(), NULL, TRUE );
+            hb_sln_setKeyTrans( hb_cdppage(), NULL );
 
             /* ensure we are in a normal chars set */
             SLtt_set_alt_char_set( 0 );
@@ -936,7 +936,7 @@ static BOOL hb_gt_sln_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char
    if ( pszHostCDP && *pszHostCDP )
       cdpHost = hb_cdpFind( pszHostCDP );
    if ( ! cdpHost )
-      cdpHost = hb_cdp_page;
+      cdpHost = hb_cdppage();
 
    if ( pszTermCDP && *pszTermCDP )
       cdpTerm = hb_cdpFind( pszTermCDP );
@@ -960,7 +960,7 @@ static BOOL hb_gt_sln_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char 
    if ( pszHostCDP && *pszHostCDP )
       cdpHost = hb_cdpFind( pszHostCDP );
    if ( ! cdpHost )
-      cdpHost = hb_cdp_page;
+      cdpHost = hb_cdppage();
 
    if ( pszTermCDP && *pszTermCDP )
       cdpTerm = hb_cdpFind( pszTermCDP );

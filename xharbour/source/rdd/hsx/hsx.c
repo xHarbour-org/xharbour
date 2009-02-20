@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.14 2007/03/02 02:36:23 druzus Exp $
+ * $Id: hsx.c,v 1.15 2008/06/04 14:48:52 marchuet Exp $
  */
 
 /*
@@ -385,10 +385,10 @@ static int hb_hsxHashVal( int c1, int c2, int iKeyBits,
    if ( fNoCase )
    {
 #ifndef HB_CDP_SUPPORT_OFF
-      if ( iFilter == 3 && hb_cdp_page->nChars )
+      if ( iFilter == 3 && (hb_cdppage())->nChars )
       {
-         c1 = ( BYTE ) hb_cdp_page->s_upper[ c1 ];
-         c2 = ( BYTE ) hb_cdp_page->s_upper[ c2 ];
+         c1 = ( BYTE ) (hb_cdppage())->s_upper[ c1 ];
+         c2 = ( BYTE ) (hb_cdppage())->s_upper[ c2 ];
       }
       else
 #endif
@@ -474,10 +474,10 @@ static int hb_hsxStrCmp( BYTE * pSub, ULONG ulSub, BYTE * pStr, ULONG ulLen,
          if ( fNoCase )
          {
 #ifndef HB_CDP_SUPPORT_OFF
-            if ( iFilter == 3 && hb_cdp_page->nChars )
+            if ( iFilter == 3 && (hb_cdppage())->nChars )
             {
-               c1 = ( BYTE ) hb_cdp_page->s_upper[ c1 ];
-               c2 = ( BYTE ) hb_cdp_page->s_upper[ c2 ];
+               c1 = ( BYTE ) (hb_cdppage())->s_upper[ c1 ];
+               c2 = ( BYTE ) (hb_cdppage())->s_upper[ c2 ];
             }
             else
 #endif

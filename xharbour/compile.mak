@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.37 2009/01/24 16:53:10 likewolf Exp $
+# $Id: compile.mak,v 1.38 2009/01/29 16:30:41 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2432,6 +2432,54 @@ $(OBJ_DIR)$(DIR_SEP)ucmaz$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmaz.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)ucmik$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmik.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc037$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc037.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1006$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1006.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1026$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1026.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc424$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc424.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc500$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc500.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc856$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc856.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc875$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc875.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucascii$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucascii.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucatari$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucatari.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmacce$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmacce.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmaccyr$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmaccyr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmacgrk$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmacgrk.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmacice$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmacice.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmacrom$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmacrom.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucmactrk$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucmactrk.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ucnext$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)ucnext.c
 	$(CC_CMD)
 
 #===============================================================================

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.4 2006/02/13 23:10:24 druzus Exp $
+ * $Id: hbdbsort.c,v 1.5 2006/08/19 11:22:28 druzus Exp $
  */
 
 /*
@@ -241,9 +241,9 @@ void hb_dbQSortComplete( LPDBQUICKSORT pQuickSort )
          pQuickSort->pSwapBufferA[ 0 ] = ' ';
 
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdp_page )
+         if( pArea->cdPage != hb_cdppage() )
          {
-            hb_dbfTranslateRec( (DBFAREAP) pArea, (BYTE *) pQuickSort->pSwapBufferA, hb_cdp_page, pArea->cdPage );
+            hb_dbfTranslateRec( (DBFAREAP) pArea, (BYTE *) pQuickSort->pSwapBufferA, hb_cdppage(), pArea->cdPage );
          }
 #endif
 

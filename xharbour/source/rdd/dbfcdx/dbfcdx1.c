@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.286 2009/01/29 09:58:40 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.287 2009/01/30 19:50:47 enricomaria Exp $
  */
 
 /*
@@ -661,7 +661,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
    pKey = hb_cdxKeyPut( pKey, ptr, ( USHORT ) ulLen, ulRec );
 #ifndef HB_CDP_SUPPORT_OFF
    if ( fTrans && pTag->uiType == 'C' )
-      hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pKey->len );
+      hb_cdpnTranslate( ( char * ) pKey->val, hb_cdppage(), pTag->pIndex->pArea->cdPage, pKey->len );
 #else
    HB_SYMBOL_UNUSED( fTrans );
 #endif
@@ -681,12 +681,12 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
       {
          case 'C':
 #ifndef HB_CDP_SUPPORT_OFF
-            if( fTrans && pTag->pIndex->pArea->cdPage != hb_cdp_page )
+            if( fTrans && pTag->pIndex->pArea->cdPage != hb_cdppage() )
             {
                char * pVal = ( char * ) hb_xgrab( pKey->len + 1 );
                memcpy( pVal, pKey->val, pKey->len );
                pVal[ pKey->len ] = '\0';
-               hb_cdpnTranslate( pVal, pTag->pIndex->pArea->cdPage, hb_cdp_page,
+               hb_cdpnTranslate( pVal, pTag->pIndex->pArea->cdPage, hb_cdppage(),
                                  pKey->len );
                pItem = hb_itemPutCPtr( pItem, pVal, pKey->len );
             }
@@ -5409,10 +5409,10 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pArea->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdppage() )
    {
       szPattern = szFree = hb_strdup( szPattern );
-      hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
+      hb_cdpTranslate( szPattern, hb_cdppage(), pArea->cdPage );
    }
 #endif
    while( iFixed < pTag->uiLen && szPattern[ iFixed ] &&
@@ -5540,10 +5540,10 @@ static BOOL hb_cdxRegexMatch( CDXAREAP pArea, PHB_REGEX pRegEx, LPCDXKEY pKey )
 #ifndef HB_CDP_SUPPORT_OFF
    char szBuff[ CDX_MAXKEY + 1 ];
 
-   if( pArea->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdppage() )
    {
       memcpy( szBuff, szKey, pKey->len + 1 );
-      hb_cdpnTranslate( szBuff, pArea->cdPage, hb_cdp_page, pKey->len );
+      hb_cdpnTranslate( szBuff, pArea->cdPage, hb_cdppage(), pKey->len );
       szKey = szBuff;
    }
 #else
@@ -7489,6 +7489,10 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          pForExp = hb_itemNew( pArea->lpdbOrdCondInfo->itmCobFor );
       }
    }
+
+   if( pArea->fTemporary )
+      fTemporary = TRUE;
+
    /* Test conditional expression */
    if ( pForExp )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.2 2009/01/16 10:50:23 marchuet Exp $
+ * $Id: dbfnsx1.c,v 1.3 2009/01/28 15:42:06 marchuet Exp $
  */
 
 /*
@@ -652,7 +652,7 @@ static LPKEYINFO hb_nsxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
          }
 #ifndef HB_CDP_SUPPORT_OFF
          if( fTrans )
-            hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pTag->KeyLength );
+            hb_cdpnTranslate( ( char * ) pKey->val, hb_cdppage(), pTag->pIndex->pArea->cdPage, pTag->KeyLength );
 #else
          HB_SYMBOL_UNUSED( fTrans );
 #endif
@@ -691,12 +691,12 @@ static PHB_ITEM hb_nsxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
       {
          case 'C':
 #ifndef HB_CDP_SUPPORT_OFF
-            if( fTrans && pTag->pIndex->pArea->cdPage != hb_cdp_page )
+            if( fTrans && pTag->pIndex->pArea->cdPage != hb_cdppage() )
             {
                char * pVal = ( char * ) hb_xgrab( pTag->KeyLength + 1 );
                memcpy( pVal, pKey->val, pTag->KeyLength );
                pVal[ pTag->KeyLength ] = '\0';
-               hb_cdpnTranslate( pVal, pTag->pIndex->pArea->cdPage, hb_cdp_page,
+               hb_cdpnTranslate( pVal, pTag->pIndex->pArea->cdPage, hb_cdppage(),
                                  pTag->KeyLength );
                pItem = hb_itemPutCPtr( pItem, pVal, pTag->KeyLength );
             }
@@ -4530,10 +4530,10 @@ static BOOL hb_nsxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pArea->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdppage() )
    {
       szPattern = szFree = hb_strdup( szPattern );
-      hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
+      hb_cdpTranslate( szPattern, hb_cdppage(), pArea->cdPage );
    }
 #endif
    while( iFixed < pTag->KeyLength && szPattern[ iFixed ] &&
@@ -4638,10 +4638,10 @@ static BOOL hb_nsxRegexMatch( LPTAGINFO pTag, PHB_REGEX pRegEx, const char * szK
 #ifndef HB_CDP_SUPPORT_OFF
    char szBuff[ NSX_MAXKEYLEN + 1 ];
 
-   if( pTag->pIndex->pArea->cdPage != hb_cdp_page )
+   if( pTag->pIndex->pArea->cdPage != hb_cdppage() )
    {
       memcpy( szBuff, pTag->CurKeyInfo->val, pTag->KeyLength + 1 );
-      hb_cdpnTranslate( szBuff, pTag->pIndex->pArea->cdPage, hb_cdp_page, pTag->KeyLength );
+      hb_cdpnTranslate( szBuff, pTag->pIndex->pArea->cdPage, hb_cdppage(), pTag->KeyLength );
       szKey = szBuff;
    }
 #else
@@ -6649,6 +6649,9 @@ static ERRCODE hb_nsxOrderCreate( NSXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          pArea->valResult = NULL;
       }
    }
+
+   if( pArea->fTemporary )
+      fTemporary = TRUE;
 
    /* Test conditional expression */
    if( pForExp )

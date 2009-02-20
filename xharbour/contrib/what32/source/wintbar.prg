@@ -159,6 +159,8 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons)
 METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip )
 
   LOCAL tbb IS TBBUTTON
+  
+  (cText) // to remove warning
 
   tbb:ibitmap   :=IFNIL(nIndex,-1,nIndex)
   tbb:idCommand :=nId // must be supplied
@@ -223,7 +225,7 @@ METHOD Create(hParent,nStyle,nId,nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp)
  ::hWnd:=CreateToolBarEx(::hParent,::nStyle,::nId,nImg,hBMInst,nBMId,cButtons,LEN(::aButtons),;
                  xbtn,yBtn,xBmp,yBmp, tbb:sizeof())
 
- ::nProc:=SetProcedure(::hParent,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY})
+ ::nProc:=SetProcedure(::hParent,{|hWnd, nMsg,nwParam,nlParam| (hWnd),::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY})
 
 
 //   SendMessage(::hWnd,TB_BUTTONSTRUCTSIZE,::aButtons[1]:sizeof,0)
@@ -258,10 +260,9 @@ METHOD tbProc(nMsg,nwParam,nlParam)
    LOCAL Hdr
    LOCAL Ttt
    LOCAL nmt
-   LOCAL nID
-   LOCAL hMenu,rc,aRect, aPoint
+   LOCAL hMenu,aRect, aPoint
    LOCAL n,x
-   LOCAL hic
+
    DO CASE
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
@@ -326,41 +327,32 @@ RETURN( CallWindowProc(::nProc,::hParent,nMsg,nwParam,nlParam))
 
 METHOD CreateButtons()
 
-   LOCAL aSize
    LOCAL i
-
-
-
 
    FOR i:=1 TO LEN(::aBitmaps)
 
 
-
-
    NEXT
 
-
 RETURN(NIL)
-
-
-
-
-
-
-
 
 *-----------------------------------------------------------------------------*
 
 
 METHOD setsizes(xBtn,yBtn,xImg,yImg )
+   (xBtn)
+   (yBtn)
+   (xImg)
+   (yImg)
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-METHOD setheight(nHeight )
+METHOD setheight( nHeight )
+   (nHeight)
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-METHOD loadbitmap
+METHOD loadbitmap()
 RETURN(self)
 *-----------------------------------------------------------------------------*
 

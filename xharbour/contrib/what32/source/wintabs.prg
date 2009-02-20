@@ -96,10 +96,7 @@ METHOD TabProc(hDlg, nMsg, nwParam, nlParam)
 
    LOCAL tnhdr
 
-   LOCAL n,nSel
-   LOCAL lVisible
-   LOCAL lEnabled
-   LOCAL nLen
+   LOCAL nSel
 
    IF nMsg==WM_NOTIFY
 
@@ -205,7 +202,6 @@ METHOD Configure()
    LOCAL hCtrl
    LOCAL i
    LOCAL aPt
-   LOCAL bBlock
 
    aPt:={aTab[1],aTab[2]}
    ClientToScreen(::hTab   ,aPt)

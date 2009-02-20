@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.14 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: hbgtcore.c,v 1.15 2009/02/02 12:19:17 likewolf Exp $
  */
 
 /*
@@ -1385,7 +1385,7 @@ static BOOL hb_gt_def_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char
 {
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 

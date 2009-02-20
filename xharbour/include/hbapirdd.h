@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.51 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.52 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -1205,6 +1205,11 @@ extern HB_EXPORT ERRCODE   hb_rddCreateTable(
                               BOOL fKeepOpen,
                               const char * szCpId, ULONG ulConnection,
                               PHB_ITEM pStruct, PHB_ITEM pDelim );
+extern HB_EXPORT ERRCODE   hb_rddCreateTableTemp(
+                              const char * szDriver,
+                              const char * szAlias,
+                              const char * szCpId, ULONG ulConnection,
+                              PHB_ITEM pStruct );
 extern HB_EXPORT ERRCODE   hb_dbTransStruct(
                               AREAP lpaSource, AREAP lpaDest,
                               LPDBTRANSINFO lpdbTransInfo,

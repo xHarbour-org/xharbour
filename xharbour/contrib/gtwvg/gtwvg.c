@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.7 2008/12/10 22:25:14 enricomaria Exp $
+ * $Id: gtwvg.c,v 1.8 2008/12/23 20:33:21 likewolf Exp $
  */
 
 /*
@@ -1891,8 +1891,8 @@ static void hb_gt_wvt_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   pWVT->hostCDP    = hb_cdp_page;
-   pWVT->inCDP      = hb_cdp_page;
+   pWVT->hostCDP    = hb_cdppage();
+   pWVT->inCDP      = hb_cdppage();
 #endif
 
    /* Set default window title */
@@ -2998,8 +2998,8 @@ static int hb_gt_wvt_wnd_Create( PHB_GT pGT, int iTop, int iLeft, int iBottom, i
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   pWVT->hostCDP    = hb_cdp_page;
-   pWVT->inCDP      = hb_cdp_page;
+   pWVT->hostCDP    = hb_cdppage();
+   pWVT->inCDP      = hb_cdppage();
 #endif
 
    hb_gt_wvt_SetMode( pGT, pWVT->ROWS, pWVT->COLS );
@@ -3067,8 +3067,8 @@ static BOOL hb_gt_wvt_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char
     */
    if( !pszHostCDP || !*pszHostCDP )
    {
-      if( hb_cdp_page )
-         pszHostCDP = hb_cdp_page->id;
+      if( hb_cdppage() )
+         pszHostCDP = hb_cdpID();
       else if( pszTermCDP && *pszTermCDP )
          pszHostCDP = pszTermCDP;
    }
@@ -3099,8 +3099,8 @@ static BOOL hb_gt_wvt_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char 
     */
    if( !pszHostCDP || !*pszHostCDP )
    {
-      if( hb_cdp_page )
-         pszHostCDP = hb_cdp_page->id;
+      if( hb_cdppage() )
+         pszHostCDP = hb_cdpID();
       else if( pszTermCDP && *pszTermCDP )
          pszHostCDP = pszTermCDP;
    }

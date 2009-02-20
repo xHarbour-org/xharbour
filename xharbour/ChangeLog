@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6373 2009/02/10 09:40:06 marchuet Exp $
+ * $Id: ChangeLog,v 1.6374 2009/02/13 16:12:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,132 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-20 13:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * contrib\gtwvg\gtwvg.c
+   * contrib\what32\source\debug.prg
+   * contrib\what32\source\errorsys.prg
+   * contrib\what32\source\whatutil.prg
+   * contrib\what32\source\wincore.prg
+   * contrib\what32\source\winrbar.prg
+   * contrib\what32\source\wintabs.prg
+   * contrib\what32\source\wintbar.prg
+     - removes unused variables.
+
+   * include\hbapicdp.h
+   * source\rtl\cdpapi.c   
+     + HB_CDPSELECT() which does the same as HB_SETCODEPAGE(), but
+       aligns well with function naming rules and namespace.
+       HB_SETCODEPAGE() still works, but usage is not recommended.
+     + Added HB_CDPUNIID( <cHarbourCP> ) -> <cCPName>
+       This will return the std CP ID of a Harbour CP, or empty
+       if the Harbour CP isn't linked.
+     - removed global code page variable: hb_cdp_page and moved
+       code page settings to HVM stack
+     + added new function hb_cdpID() which returns current code page
+       character ID
+     + added new functions hb_vmCDP() and hb_vmSetCDP() to get/set
+       active for given thread code page structure
+     
+   * include\dbinfo.ch
+     + added DBI_ISTEMPORARY
+     + added DBI_CPID
+     
+   * include\hbapifs.h
+   * include\hbapirdd.h
+   * include\hbrddbmc.h
+   * include\hbrddcdx.h
+   * include\hbrdddbf.h
+   * include\hbrddnsx.h
+   * include\hbrddntx.h
+   * source\compiler\exproptb.c
+   * source\ct\pos1.c
+   * source\ct\token1.c
+   * source\rdd\bmdbfcdx\bmdbfcdx1.c
+   * source\rdd\dbcmd.c
+    + added .prg function to create temporary files:
+         hb_dbCreateTemp( <cAlias>, <aStruct>, <cRDD>, ;
+                          <cCodePage>, <nConnection> ) -> <lSuccess>
+      Not all RDDs have to support it. It's verified by support for
+      DBI_ISTEMPORARY dbInfo() action.
+   * source\rdd\dbf1.c
+   * source\rdd\dbfcdx\dbfcdx1.c
+   * source\rdd\dbfdbt\dbfdbt1.c
+   * source\rdd\dbffpt\dbffpt1.c
+   * source\rdd\dbfnsx\dbfnsx1.c
+   * source\rdd\dbfntx\dbfntx1.c
+     + added support for temporary tables in native RDDs.   
+   * source\rdd\delim1.c
+   * source\rdd\hbdbsort.c
+   * source\rdd\hsx\hsx.c
+   * source\rdd\sdf1.c
+   * source\rdd\wafunc.c
+     + added hb_rddCreateTableTemp() C function to create temporary
+       table which are automatically deleted on close. All indexes and
+       memo files for such tables are also in temporary files and
+       automatically deleted on close. Please remember that Harbour uses
+       OS functions to create temporary files so it's installation dependent
+       how much disk space is available for them. Some RDDs may also do
+       not create temporary files but keep everything in memory if they
+       decide it's more efficient.
+   
+   * source\rdd\workarea.c
+   * source\rtl\dbf2txt.c
+   * source\rtl\filebuf.c
+   * source\rtl\fstemp.c
+   * source\rtl\gtcgi\gtcgi.c
+   * source\rtl\gtcrs\gtcrs.c
+   * source\rtl\gtdos\gtdos.c
+   * source\rtl\gtpca\gtpca.c
+   * source\rtl\gtsln\gtsln.c
+   * source\rtl\gtstd\gtstd.c
+   * source\rtl\gttrm\gttrm.c
+   * source\rtl\gtwin\gtwin.c
+   * source\rtl\gtwvt\gtwvt.c
+   * source\rtl\gtxwc\gtxwc.c
+   * source\rtl\hbgtcore.c
+   * source\rtl\is.c
+   * source\rtl\regex.c
+   * source\rtl\strcase.c
+   * source\rtl\transfrm.c
+   * source\vm\itemapi.c
+     * removed references to hb_cdp_page with hb_cdppage() to avoid problems at dll referencing to
+       an external static variable.
+     + Added missing support of charset at vfpdbf tables. now automatically detect its charset and
+       make translations as posible to application one. No too when DbCreate or DbUseArea are called
+       with collation it is saved at header of vfpdbf tables.
+
+   * include\hbset.h       
+   * source\rtl\set.c     
+     * revided setGet functions with the idea to change all references to hb_set with apropiated setGet
+       to avoid problems at dll or api changes at mt mode.
+     + divided __SETCENTURY() PRG function into two functions:
+       __SETCENTURY() and public C function hb_setSetCentury()
+       to manipulate century setting from C code.
+       Modyfication by Francesco Saverio Giudice
+     + added _SET_CODEPAGE which works like _SET_LANGUAGE giving common
+      interface
+
+   * common.mak
+   * compile.mak
+   + source\codepage\uc037.c
+   + source\codepage\uc1006.c
+   + source\codepage\uc1026.c
+   + source\codepage\uc424.c
+   + source\codepage\uc500.c
+   + source\codepage\uc856.c
+   + source\codepage\uc875.c
+   + source\codepage\ucascii.c
+   + source\codepage\ucatari.c
+   + source\codepage\ucmacce.c
+   + source\codepage\ucmaccyr.c
+   + source\codepage\ucmacgrk.c
+   + source\codepage\ucmacice.c
+   + source\codepage\ucmacrom.c
+   + source\codepage\ucmactrk.c
+   + source\codepage\ucnext.c
+     + Added missing charset from harbour thk's to vicktor. It will be used to finish charset support
+       at vfpdbf tables.
 
 2009-02-13 09:20 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
    * include/hbexprb.c

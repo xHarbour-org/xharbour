@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.35 2008/10/22 08:32:48 marchuet Exp $
+ * $Id: delim1.c,v 1.36 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -555,12 +555,12 @@ static ERRCODE hb_delimGetValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pIte
    {
       case HB_FT_STRING:
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdp_page )
+         if( pArea->cdPage != hb_cdppage() )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
             memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
             pVal[ pField->uiLen ] = '\0';
-            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdp_page, pField->uiLen );
+            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdppage(), pField->uiLen );
             hb_itemPutCPtr( pItem, pVal, pField->uiLen );
          }
          else
@@ -675,7 +675,7 @@ static ERRCODE hb_delimPutValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pIte
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
-            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdp_page, pArea->cdPage, uiSize );
+            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->cdPage, uiSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
@@ -1246,10 +1246,10 @@ static ERRCODE hb_delimCreate( DELIMAREAP pArea, LPDBOPENINFO pCreateInfo )
    {
       pArea->cdPage = hb_cdpFind( (char *) pCreateInfo->cdpId );
       if( !pArea->cdPage )
-         pArea->cdPage = hb_cdp_page;
+         pArea->cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdp_page;
+      pArea->cdPage = hb_cdppage();
 #endif
 
    pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
@@ -1334,10 +1334,10 @@ static ERRCODE hb_delimOpen( DELIMAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       pArea->cdPage = hb_cdpFind( (char *) pOpenInfo->cdpId );
       if( !pArea->cdPage )
-         pArea->cdPage = hb_cdp_page;
+         pArea->cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdp_page;
+      pArea->cdPage = hb_cdppage();
 #endif
 
    uiFlags = ( pArea->fReadonly ? FO_READ : FO_READWRITE ) |

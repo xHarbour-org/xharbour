@@ -151,7 +151,7 @@ METHOD create(hParent,nStyle)
                            0)
 
 
-  ::nProc:=SetProcedure(::hParent,{|hWnd, nMsg,nwParam,nlParam| ::rbProc(nMsg,nwParam,nlParam)},{WM_SIZE})
+  ::nProc:=SetProcedure(::hParent,{|hWnd, nMsg,nwParam,nlParam| (hWnd),::rbProc(nMsg,nwParam,nlParam)},{WM_SIZE})
 
 
 
@@ -187,6 +187,8 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
 
    LOCAL rbBand IS REBARBANDINFO
    LOCAL aRect:=GetWindowRect(hChild)
+   
+   (nPos) // to remove warning
 
    rbBand:Reset()
 
@@ -208,9 +210,5 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
 
   // view rbBand,aRect,LoadBitmap(hInstance(), "IDB_BACKGRND"), rbBand:value
 
-   // Add the band
-   RETURN (SendMessage(::hWnd, RB_INSERTBAND, -1, rbBand:value ) <> 0 )
-
-   RETURN(self)
-
-
+       // Add the band
+RETURN (SendMessage(::hWnd, RB_INSERTBAND, -1, rbBand:value ) <> 0 )

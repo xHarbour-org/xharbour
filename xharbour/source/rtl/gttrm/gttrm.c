@@ -1,5 +1,5 @@
 /*
- * $Id: gttrm.c,v 1.5 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: gttrm.c,v 1.6 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -729,7 +729,7 @@ static void hb_gt_trm_termOutTrans( PHB_GTTRM pTerm, BYTE * pStr, int iLen, int 
          else if( pTerm->cdpHost )
             cdp = pTerm->cdpHost;
          else
-            cdp = hb_cdp_page;
+            cdp = hb_cdppage();
       }
 
       if( cdp )
@@ -3245,7 +3245,7 @@ static BOOL hb_gt_trm_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 
@@ -3289,7 +3289,7 @@ static BOOL hb_gt_trm_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 

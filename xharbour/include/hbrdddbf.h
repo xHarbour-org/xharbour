@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.36 2008/03/13 11:12:06 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.37 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -223,6 +223,7 @@ typedef struct _DBFAREA
    BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
    BOOL     fShared;                /* Shared file */
    BOOL     fReadonly;              /* Read only file */
+   BOOL     fTemporary;             /* Temporary file */
    BOOL     fValidBuffer;           /* State of buffer */
    BOOL     fPositioned;            /* Positioned record */
    BOOL     fRecordChanged;         /* Record changed */

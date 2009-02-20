@@ -25,7 +25,7 @@ PROCEDURE ErrorSys( )
 STATIC FUNCTION DefError( e )
 
    LOCAL cMessage, aOptions, nChoice
-   LOCAL cErr, SourceLine
+   LOCAL cErr
    LOCAL cProcStack := ''
    LOCAL i
 
@@ -91,7 +91,7 @@ STATIC FUNCTION DefError( e )
       IF ( aOptions[ nChoice ] == "Break" )
          SET DELETED ON
          BREAK( e )
-         RETURN( .F. )
+         //RETURN( .F. )
       ELSEIF ( aOptions[ nChoice ] == "Retry" )
          RETURN ( .T. )
       ELSEIF ( aOptions[ nChoice ] == "Default" )
@@ -153,8 +153,6 @@ STATIC FUNCTION ErrorMessage( e )
 
 STATIC FUNCTION LogError( e, cProcStack )
 
-   LOCAL r, c
-   LOCAL h
    LOCAL Args := convertargs( e:args )
    LOCAL i    := 3
    LOCAL cErr := ''
@@ -237,7 +235,7 @@ STATIC FUNCTION PrintError
 
    BREAK
 
-   RETURN ( .F. )
+//   RETURN ( .F. )
 
 
 *------------------------------------------------------------------------------*
@@ -488,9 +486,9 @@ STATIC FUNCTION GenCodeText( n )
 
 STATIC FUNCTION eAlert( cMsg, aChoices, cDetail )
 
-   LOCAL aDlg, i, j, n, aWid, aChoose, aMsg
+   LOCAL aDlg, i, n, aChoose, aMsg
    LOCAL hWnd, hDC
-   LOCAL lErr     := .F., e, w , h, t := 0, cTitle, Msgh, ButWidth
+   LOCAL lErr     := .F., w , h, t := 0, cTitle, Msgh, ButWidth
    LOCAL crPos    := 0, txth := 0, atm := { }
    LOCAL isDetail := .F.
 
@@ -519,7 +517,7 @@ STATIC FUNCTION eAlert( cMsg, aChoices, cDetail )
 
    w := GetTextExtentPoint32( hDC, AllTrim( cTitle ) ) [ 1 ]
    aMsg := str2a( cMsg, CR )
-   AEVAL( aMsg, { | x, Y | w := Max( w, GetTextExtentPoint32( hDC, AllTrim( x ) ) [ 1 ] ) } )
+   AEVAL( aMsg, { | x | w := Max( w, GetTextExtentPoint32( hDC, AllTrim( x ) ) [ 1 ] ) } )
    w += 20
 
    //--------- total width of choices, also add "&" to the choices (if needed)
@@ -584,6 +582,8 @@ STATIC FUNCTION eAlert( cMsg, aChoices, cDetail )
 STATIC FUNCTION eAlertProc( hDlg, nMsg, nwParam, nlParam, isDetail, hWnd, n )
 
    LOCAL aRect
+   
+   (nlParam)
 
    DO CASE
    CASE nMsg == WM_INITDIALOG

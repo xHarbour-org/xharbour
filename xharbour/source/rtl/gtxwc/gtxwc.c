@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.26 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: gtxwc.c,v 1.27 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -3038,7 +3038,7 @@ static PXWND_DEF hb_gt_xwc_CreateWndDef( PHB_GT pGT )
    hb_gt_xwc_SetScrBuff( wnd, XWC_DEFAULT_COLS, XWC_DEFAULT_ROWS );
    wnd->fWinResize = FALSE;
 #ifndef HB_CDP_SUPPORT_OFF
-   wnd->hostCDP = hb_cdp_page;
+   wnd->hostCDP = hb_cdppage();
 #endif
    wnd->cursorType = SC_NORMAL;
 
@@ -3679,8 +3679,8 @@ static BOOL hb_gt_xwc_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char
     */
    if( !pszHostCDP || !*pszHostCDP )
    {
-      if( hb_cdp_page )
-         pszHostCDP = hb_cdp_page->id;
+      if( hb_cdppage() )
+         pszHostCDP = hb_cdpID();
       else if( pszTermCDP && *pszTermCDP )
          pszHostCDP = pszTermCDP;
    }
@@ -3723,8 +3723,8 @@ static BOOL hb_gt_xwc_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char 
     */
    if( !pszTermCDP || !*pszTermCDP )
    {
-      if( hb_cdp_page )
-         pszTermCDP = hb_cdp_page->id;
+      if( hb_cdppage() )
+         pszTermCDP = hb_cdpID();
       else if( pszHostCDP && *pszHostCDP )
          pszTermCDP = pszHostCDP;
    }

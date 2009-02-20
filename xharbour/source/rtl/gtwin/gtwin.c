@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.124 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: gtwin.c,v 1.125 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -1507,7 +1507,7 @@ static BOOL hb_gt_win_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
 
    if( pszTermCDP && pszHostCDP )
    {
@@ -1549,7 +1549,7 @@ static BOOL hb_gt_win_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
    {
-      pszHostCDP = hb_cdp_page->id;
+      pszHostCDP = hb_cdpID();
    }
 
    if( pszTermCDP && pszHostCDP )

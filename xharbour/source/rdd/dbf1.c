@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.198 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: dbf1.c,v 1.199 2009/02/02 11:25:10 marchuet Exp $
  */
 
 /*
@@ -1877,12 +1877,12 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case HB_FT_STRING:
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdp_page )
+         if( pArea->cdPage != hb_cdppage() )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
             memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
             pVal[ pField->uiLen ] = '\0';
-            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdp_page, pField->uiLen );
+            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdppage(), pField->uiLen );
             hb_itemPutCPtr( pItem, pVal, pField->uiLen );
          }
          else
@@ -2323,7 +2323,7 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
-            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdp_page, pArea->cdPage, uiSize );
+            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->cdPage, uiSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
@@ -2687,6 +2687,9 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    {
       hb_fileClose( pArea->pDataFile );
       pArea->pDataFile = NULL;
+
+      if( pArea->fTemporary )
+         hb_fsDelete( ( BYTE * ) pArea->szDataFileName );
    }
 
    /* Close the memo file */
@@ -2694,7 +2697,12 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    {
       hb_fileClose( pArea->pMemoFile );
       pArea->pMemoFile = NULL;
+
+      if( pArea->fTemporary )
+         hb_fsDelete( ( BYTE * ) pArea->szMemoFileName );
    }
+
+   pArea->fTemporary = FALSE;
 
    /* Free field offset array */
    if( pArea->pFieldOffset )
@@ -2758,26 +2766,29 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    pArea->lpdbOpenInfo = pCreateInfo;
 
-   pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
-
-   if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
+   if( ! pArea->fTemporary )
    {
-      pItem = hb_itemPutC( pItem, NULL );
-      if( SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem ) != SUCCESS )
+      pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
+  
+      if( hb_set.HB_SET_DEFEXTENSIONS && ! pFileName->szExtension )
       {
-         hb_itemRelease( pItem );
-         hb_xfree( pFileName );
-         pArea->lpdbOpenInfo = NULL;
-         return FAILURE;
+         pItem = hb_itemPutC( pItem, NULL );
+         if( SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem ) != SUCCESS )
+         {
+            hb_itemRelease( pItem );
+            hb_xfree( pFileName );
+            pArea->lpdbOpenInfo = NULL;
+            return FAILURE;
+         }
+         pFileName->szExtension = hb_itemGetCPtr( pItem );
+         hb_fsFNameMerge( ( char * ) szFileName, pFileName );
       }
-      pFileName->szExtension = hb_itemGetCPtr( pItem );
-      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      else
+      {
+         hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
+      }
+      hb_xfree( pFileName );
    }
-   else
-   {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
-   }
-   hb_xfree( pFileName );
 
    pItem = hb_itemPutL( pItem, FALSE );
    fRawBlob = SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_BLOB_SUPPORT, pCreateInfo->ulConnection, pItem ) == SUCCESS &&
@@ -2853,10 +2864,13 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       /* Try create */
       do
       {
-         pArea->pDataFile = hb_fileExtOpen( szFileName, NULL,
-                                            FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
-                                            FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                            NULL, pError );
+         if( pArea->fTemporary )
+            pArea->pDataFile = hb_fileCreateTempEx( szFileName, NULL, NULL, NULL, FC_TEMPORARY );
+         else
+            pArea->pDataFile = hb_fileExtOpen( szFileName, NULL,
+                                               FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
+                                               FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                               NULL, pError );
          if( ! pArea->pDataFile )
          {
             if( !pError )
@@ -3208,10 +3222,10 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    {
       pArea->cdPage = hb_cdpFind( (char *) pCreateInfo->cdpId );
       if( !pArea->cdPage )
-         pArea->cdPage = hb_cdp_page;
+         pArea->cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdp_page;
+      pArea->cdPage = hb_cdppage();
 #endif
 
    pItem = hb_itemNew( NULL );
@@ -3385,6 +3399,13 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_ISREADONLY:
          hb_itemPutL( pItem, pArea->fReadonly );
+         break;
+
+      case DBI_ISTEMPORARY:
+         if( !pArea->pDataFile && !pArea->pMemoFile && HB_IS_LOGICAL( pItem ) )
+            pArea->fTemporary = hb_itemGetL( pItem );
+         else
+            hb_itemPutL( pItem, pArea->fTemporary );
          break;
 
       case DBI_VALIDBUFFER:
@@ -3749,11 +3770,11 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       pArea->cdPage = hb_cdpFind( (char *) pOpenInfo->cdpId );
       if( !pArea->cdPage )
-         pArea->cdPage = hb_cdp_page;
+         pArea->cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdp_page;
-#endif
+      pArea->cdPage = hb_cdppage();
+#endif         
    pArea->fShared = pOpenInfo->fShared;
    pArea->fReadonly = pOpenInfo->fReadonly;
    /* Force exclusive mode
@@ -4522,9 +4543,9 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
          /* Copy data */
          memcpy( pBuffer, pArea->pRecord, pArea->uiRecordLen );
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdp_page )
+         if( pArea->cdPage != hb_cdppage() )
          {
-            hb_dbfTranslateRec( pArea, pBuffer, pArea->cdPage, hb_cdp_page );
+            hb_dbfTranslateRec( pArea, pBuffer, pArea->cdPage, hb_cdppage() );
          }
 #endif
          pBuffer += pArea->uiRecordLen;
@@ -5167,6 +5188,47 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                   pArea->bMemoType = DB_MEMO_FPT;
                   pArea->fHasMemo = TRUE;
                }
+#ifndef HB_COMPAT_FOXPRO
+               switch( pArea->dbfHeader.bCodePage )
+               {
+                  case 0x01:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_437 ); break;
+                  case 0x69:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_MAZ ); break;
+                  case 0x6A:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_737 ); break;
+                  case 0x02:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_850 ); break;
+                  case 0x64:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_852 ); break;        
+                  case 0x6B:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_857 ); break;
+                  case 0x67:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_861 ); break;     
+                  case 0x66:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_865 ); break;        
+                  case 0x65:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_866 ); break;
+                  case 0x7C:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_874 ); break;
+                  case 0x68:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_KAM ); break;       
+                  case 0xC8:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1250 ); break;
+                  case 0xC9:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1251 ); break;
+                  case 0x03:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1252 ); break;        
+                  case 0xCB:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1253 ); break;
+                  case 0xCA:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1254 ); break;
+                  case 0x7D:
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1255 ); break;        
+                  case 0x7E:
+                     Area->cdPage = hb_cdpcharsetFind( HB_CPID_1256 ); break;
+               }
+#endif                        
                break;
 
             case 0x03:
@@ -5277,6 +5339,72 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
       pArea->dbfHeader.bVersion = ( pArea->fAutoInc ? 0x31 : 0x30 );
       if( pArea->fHasMemo && pArea->bMemoType == DB_MEMO_FPT )
          pArea->dbfHeader.bHasTags |= 0x02;
+      /*
+         Code page 	Platform 	               Code page identifier    xharbour charset
+         437 	      U.S. MS-DOS 	            x01                     HB_CPID_437
+         620 * 	   Mazovia (Polish) MS-DOS    x69                     HB_CPID_MAZ
+         737 * 	   Greek MS-DOS (437G) 	      x6A                     HB_CPID_737
+         850 	      International MS-DOS 	   x02                     HB_CPID_850
+         852 	      Eastern European MS-DOS    x64                     HB_CPID_852
+         857 	      Turkish MS-DOS 	         x6B                     HB_CPID_857
+         861 	      Icelandic MS-DOS 	         x67                     HB_CPID_861
+         865 	      Nordic MS-DOS 	            x66                     HB_CPID_865
+         866 	      Russian MS-DOS 	         x65                     HB_CPID_866
+         874 	      Thai Windows 	            x7C                     HB_CPID_874
+         895 * 	   Kamenicky (Czech) MS-DOS 	x68                     HB_CPID_KAM
+         932 	      Japanese Windows 	         x7B
+         936 	      Chinese (PRC, Singapore) Windows 	x7A
+         949 	      Korean Windows 	         x79
+         950 	      Chinese (Hong Kong SAR, Taiwan) Windows 	x78
+         1250 	      Eastern European Windows 	xC8                     HB_CPID_1250
+         1251 	      Russian Windows 	         xC9                     HB_CPID_1251
+         1252 	      Windows ANSI 	            x03                     HB_CPID_1252
+         1253 	      Greek Windows 	            xCB                     HB_CPID_1253
+         1254 	      Turkish Windows 	         xCA                     HB_CPID_1254
+         1255 	      Hebrew Windows 	         x7D                     HB_CPID_1255
+         1256 	      Arabic Windows 	         x7E                     HB_CPID_1256
+         10000 	   Standard Macintosh 	      x04                     HB_CPID_10000
+         10006 	   Greek Macintosh 	         x98                     HB_CPID_10006
+         10007 * 	   Russian Macintosh 	      x96                     HB_CPID_10007
+         10029 	   Macintosh EE 	            x97                     HB_CPID_10029
+         * Not detected when you include CODEPAGE=AUTO in your configuration file.
+      */         
+      if( strcmp( pArea->cdPage->uniID, HB_CPID_437 ) == 0 )
+         pArea->dbfHeader.bCodePage = 0x01;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_MAZ ) == 0 )
+         pArea->dbfHeader.bCodePage = 0x69;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_737 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x6A;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_850 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x02;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_852 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x64;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_857 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x6B;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_861 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x67;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_865 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x66;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_866 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x65;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_874 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x7C;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_KAM ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x68;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1250 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0xC8;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1251 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0xC9;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1252 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x03;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1253 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0xCB;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1254 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0xCA;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1255 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x7D;
+      else if( strcmp( pArea->cdPage->uniID, HB_CPID_1256 ) == 0 )
+            pArea->dbfHeader.bCodePage = 0x7E;
    }
    else
    {

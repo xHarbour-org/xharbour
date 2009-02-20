@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.27 2008/01/20 21:23:04 likewolf Exp $
+ * $Id: hbapicdp.h,v 1.28 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -159,6 +159,22 @@ typedef struct _HB_CODEPAGE
 #define HB_CPID_KAM        "kamenicky"
 #define HB_CPID_MAZ        "plmaz"
 #define HB_CPID_MIK        "bg-mik"
+#define HB_CPID_037        "cp037"
+#define HB_CPID_424        "cp424"
+#define HB_CPID_500        "cp500"
+#define HB_CPID_856        "cp856"
+#define HB_CPID_875        "cp875"
+#define HB_CPID_1006       "cp1006"
+#define HB_CPID_1026       "cp1026"
+#define HB_CPID_10000      "macroman"
+#define HB_CPID_10006      "macgreek"
+#define HB_CPID_10007      "maccyrillic"
+#define HB_CPID_10029      "maccentraleurope"
+#define HB_CPID_10079      "maciceland"
+#define HB_CPID_10081      "macturkish"
+#define HB_CPID_ATARIST    "atarist"
+#define HB_CPID_NEXTSTEP   "nextstep"
+#define HB_CPID_USASCII    "us-ascii"
 
 #define HB_UNITB_437       &hb_uniTbl_437
 #define HB_UNITB_737       &hb_uniTbl_737
@@ -188,13 +204,13 @@ typedef struct _HB_CODEPAGE
 #define HB_UNITB_8859_1    &hb_uniTbl_8859_1
 #define HB_UNITB_8859_1B   &hb_uniTbl_8859_1b
 #define HB_UNITB_8859_2    &hb_uniTbl_8859_2
-#define HB_UNITB_8859_3    &hb_uniTbl_8859_3 
-#define HB_UNITB_8859_4    &hb_uniTbl_8859_4 
+#define HB_UNITB_8859_3    &hb_uniTbl_8859_3
+#define HB_UNITB_8859_4    &hb_uniTbl_8859_4
 #define HB_UNITB_8859_5    &hb_uniTbl_8859_5
-#define HB_UNITB_8859_6    &hb_uniTbl_8859_6 
-#define HB_UNITB_8859_7    &hb_uniTbl_8859_7 
-#define HB_UNITB_8859_8    &hb_uniTbl_8859_8 
-#define HB_UNITB_8859_9    &hb_uniTbl_8859_9 
+#define HB_UNITB_8859_6    &hb_uniTbl_8859_6
+#define HB_UNITB_8859_7    &hb_uniTbl_8859_7
+#define HB_UNITB_8859_8    &hb_uniTbl_8859_8
+#define HB_UNITB_8859_9    &hb_uniTbl_8859_9
 #define HB_UNITB_8859_10   &hb_uniTbl_8859_10
 #define HB_UNITB_8859_11   &hb_uniTbl_8859_11
 #define HB_UNITB_8859_13   &hb_uniTbl_8859_13
@@ -206,6 +222,22 @@ typedef struct _HB_CODEPAGE
 #define HB_UNITB_KAM       &hb_uniTbl_kamenicky
 #define HB_UNITB_MAZ       &hb_uniTbl_mazovia
 #define HB_UNITB_MIK       &hb_uniTbl_MIK
+#define HB_UNITB_037       &hb_uniTbl_037
+#define HB_UNITB_424       &hb_uniTbl_424
+#define HB_UNITB_500       &hb_uniTbl_500
+#define HB_UNITB_856       &hb_uniTbl_856
+#define HB_UNITB_875       &hb_uniTbl_875
+#define HB_UNITB_1006      &hb_uniTbl_1006
+#define HB_UNITB_1026      &hb_uniTbl_1026
+#define HB_UNITB_10000     &hb_uniTbl_10000
+#define HB_UNITB_10006     &hb_uniTbl_10006
+#define HB_UNITB_10007     &hb_uniTbl_10007
+#define HB_UNITB_10029     &hb_uniTbl_10029
+#define HB_UNITB_10079     &hb_uniTbl_10079
+#define HB_UNITB_10081     &hb_uniTbl_10081
+#define HB_UNITB_ATARIST   &hb_uniTbl_ATARIST
+#define HB_UNITB_NEXTSTEP  &hb_uniTbl_NEXTSTEP
+#define HB_UNITB_USASCII   &hb_uniTbl_USASCII
 #define HB_UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
@@ -254,11 +286,29 @@ extern HB_UNITABLE hb_uniTbl_KOI_8U;
 extern HB_UNITABLE hb_uniTbl_kamenicky;
 extern HB_UNITABLE hb_uniTbl_mazovia;
 extern HB_UNITABLE hb_uniTbl_MIK;
+extern HB_UNITABLE hb_uniTbl_037;
+extern HB_UNITABLE hb_uniTbl_424;
+extern HB_UNITABLE hb_uniTbl_500;
+extern HB_UNITABLE hb_uniTbl_856;
+extern HB_UNITABLE hb_uniTbl_875;
+extern HB_UNITABLE hb_uniTbl_1006;
+extern HB_UNITABLE hb_uniTbl_1026;
+extern HB_UNITABLE hb_uniTbl_10000;
+extern HB_UNITABLE hb_uniTbl_10006;
+extern HB_UNITABLE hb_uniTbl_10007;
+extern HB_UNITABLE hb_uniTbl_10029;
+extern HB_UNITABLE hb_uniTbl_10079;
+extern HB_UNITABLE hb_uniTbl_10081;
+extern HB_UNITABLE hb_uniTbl_ATARIST;
+extern HB_UNITABLE hb_uniTbl_NEXTSTEP;
+extern HB_UNITABLE hb_uniTbl_USASCII;
 
 extern HB_EXPORT BOOL          hb_cdpRegister( PHB_CODEPAGE );
 extern HB_EXPORT char *        hb_cdpSelectID( const char * );
+extern HB_EXPORT char *        hb_cdpID( void );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdpSelect( PHB_CODEPAGE );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdpFind( const char * );
+extern HB_EXPORT PHB_CODEPAGE  hb_cdpcharsetFind( const char *pszID );
 extern HB_EXPORT void          hb_cdpTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE );
 extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, ULONG );
 extern HB_EXPORT int           hb_cdpcmp( const char *, ULONG, const char *, ULONG, PHB_CODEPAGE, BOOL );
@@ -277,7 +327,6 @@ extern HB_EXPORT ULONG         hb_cdpUTF8StringLength( const BYTE *, ULONG );
 extern HB_EXPORT BYTE *        hb_cdpUTF8StringSubstr( const BYTE *, ULONG, ULONG, ULONG, ULONG * );
 extern HB_EXPORT ULONG         hb_cdpUTF8StringPeek( const BYTE *, ULONG, ULONG );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdppage( void );
-extern PHB_CODEPAGE hb_cdp_page;
 
 HB_EXTERN_END
 

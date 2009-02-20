@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.41 2009/01/24 16:53:10 likewolf Exp $
+ * $Id: cdpapi.c,v 1.42 2009/01/25 00:10:30 likewolf Exp $
  */
 
 /*
@@ -301,6 +301,22 @@ static int hb_cdpFindPos( const char *pszID )
    return -1;
 }
 
+static int hb_cdpcharsetFindPos( const char *pszuniID )
+{
+   int iPos;
+
+   if( pszuniID != NULL )
+   {
+      for( iPos = 0; iPos < HB_CDP_MAX_ && s_cdpList[iPos]; iPos++ )
+      {
+         if( strcmp( s_cdpList[iPos]->uniID, pszuniID ) == 0 )
+            return iPos;
+      }
+   }
+
+   return -1;
+}
+
 BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_cdpRegister(%p)", cdpage ) );
@@ -465,6 +481,17 @@ PHB_CODEPAGE hb_cdpFind( const char *pszID )
    return ( iPos != -1 ) ? s_cdpList[iPos] : NULL;
 }
 
+PHB_CODEPAGE hb_cdpcharsetFind( const char *pszID )
+{
+   int iPos;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cdpcharsetFind(%s)", pszID ) );
+
+   iPos = hb_cdpcharsetFindPos( pszID );
+
+   return ( iPos != -1 ) ? s_cdpList[iPos] : NULL;
+}
+
 PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
 {
    PHB_CODEPAGE cdpOld = hb_cdp_page;
@@ -472,11 +499,16 @@ PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
    HB_TRACE( HB_TR_DEBUG, ( "hb_cdpSelect(%p)", cdpage ) );
 
    if( cdpage )
-   {
       hb_cdp_page = cdpage;
-   }
 
    return cdpOld;
+}
+
+char * hb_cdpID( void )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cdpID()" ) );
+
+   return hb_cdp_page ? ( char * ) hb_cdp_page->id : NULL;
 }
 
 char * hb_cdpSelectID( const char *pszID )
@@ -485,7 +517,7 @@ char * hb_cdpSelectID( const char *pszID )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_cdpSelectID(%s)", pszID ) );
 
-   pszIDOld = ( char * ) hb_cdp_page->id;
+   pszIDOld = hb_cdpID();
    hb_cdpSelect( hb_cdpFind( pszID ) );
 
    return pszIDOld;
@@ -1181,12 +1213,24 @@ void hb_cdpReleaseAll( void )
    }
 }
 
-HB_FUNC( HB_SETCODEPAGE )
+HB_FUNC( HB_CDPSELECT )
 {
-   hb_retc( hb_cdp_page->id );
+   hb_retc( hb_cdpID() );
 
    if( ISCHAR( 1 ) )
       hb_cdpSelectID( hb_parc( 1 ) );
+}
+
+HB_FUNC( HB_CDPUNIID )
+{
+   PHB_CODEPAGE cdp = hb_cdpFind( hb_parcx( 1 ) );
+
+   hb_retc( cdp ? cdp->uniID : NULL );
+}
+
+HB_FUNC( HB_SETCODEPAGE )
+{
+   HB_FUNC_EXEC( HB_CDPSELECT );
 }
 
 HB_FUNC( HB_TRANSLATE )
