@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.27 2008/11/26 22:25:27 andijahja Exp $
+ * $Id: gtcgi.c,v 1.28 2009/02/20 12:48:31 marchuet Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ static BOOL hb_gt_cgi_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP )
-      pszHostCDP = b_cdpID();
+      pszHostCDP = hb_cdpID();
    if( !pszTermCDP )
       pszTermCDP = pszHostCDP;
 
