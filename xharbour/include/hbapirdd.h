@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.52 2008/11/05 03:03:16 walito Exp $
+ * $Id: hbapirdd.h,v 1.53 2009/02/20 12:48:03 marchuet Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 HB_EXTERN_BEGIN
 
 #ifdef HB_CDP_SUPPORT_OFF
-   typedef void * PHB_CODEPAGE
+   typedef void * PHB_CODEPAGE;
 #endif
 
 #define HB_RDD_MAX_DRIVERNAME_LEN          32

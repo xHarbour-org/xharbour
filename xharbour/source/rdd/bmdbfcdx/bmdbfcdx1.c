@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.55 2009/01/30 19:50:47 enricomaria Exp $
+ * $Id: bmdbfcdx1.c,v 1.56 2009/02/20 12:48:09 marchuet Exp $
  */
 
 /*
@@ -2795,7 +2795,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                iSize += iLen - 6 - ( j == 0 ? 0 : pPtr[ ( j + 1 ) * iLen - 2 ] ) - pPtr[ ( j + 1 ) * iLen - 1 ];
             }
             pbKey = hb_cdxPageGetKeyVal( lpTmpPage, 0 );
-            bMax = hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
+            bMax = (BYTE) hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
 #ifdef HB_CDX_PACKTRAIL
             bMax = iLen - 6 - bMax;
 #else
