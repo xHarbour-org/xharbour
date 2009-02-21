@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6374 2009/02/13 16:12:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6375 2009/02/20 12:47:39 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-21 10:40 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
+   * bin\bld_vc.bat
+     + Added auto detection and setup of compiler
+     /* 
+       I suggest same for all other compilers (bld_*.bat)
+      */
+ 
+   * makefile.vc
+     * Protected $(HB_DIR_ADS)\ace32.lib with ""
+
+   * source\compiler\harbour.c
+   * source\compiler\harbour.sly
+     * 2 fixes to support of nameless codeblock arguments
 
 2009-02-20 13:50 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * contrib\gtwvg\gtwvg.c

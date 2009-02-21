@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld_vc.bat,v 1.12 2001/11/04 12:57:43 vszakats Exp $
+rem $Id: bld_vc.bat,v 1.1 2001/12/22 06:36:17 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -14,4 +14,34 @@ rem ---------------------------------------------------------------
 set HB_ARCHITECTURE=w32
 set HB_COMPILER=msvc
 
+:FIND_VC
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
+
+:SET_VC2008
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   GOTO SET_PATH
+
+:SET_VC2005
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   GOTO SET_PATH
+
+:SET_VC2003
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
+   GOTO SET_PATH
+
+:SET_VC6
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\VC98
+   GOTO SET_PATH
+
+:SET_PATH
+IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
+SET _PATH=%PATH%
+SET PATH="%CC_DIR%\bin";%~dp0;%PATH%
+ 
 call bld.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
+
+SET PATH=_%PATH%
+SET _PATH=

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.236 2009/01/17 23:09:48 ronpinkas Exp $
+# $Id: makefile.vc,v 1.237 2009/01/29 16:30:41 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -289,7 +289,7 @@ DLL_MT=mt
 !if ("$(HB_ADS_IMPLIB)"=="no")
 !else
 COMPILERLIBS=\
-    $(HB_DIR_ADS)\ace32.lib
+    "$(HB_DIR_ADS)\ace32.lib"
 !endif
 
 HARBOUR_DLL_OBJS=\

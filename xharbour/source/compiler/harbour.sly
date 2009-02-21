@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.161 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: harbour.sly,v 1.162 2009/02/03 12:51:36 ronpinkas Exp $
  */
 
 /*
@@ -2145,24 +2145,27 @@ CodeBlock  : '{' CBMARKER
                }
            ;
 
-BlockParams : /* empty list */    { $$ = NULL; }
-            | BlockVarList {
-                             HB_CBVAR_PTR pVar = ( HB_CBVAR_PTR ) $1->value.asList.pIndex;
+BlockParams : BlockVarList {
+                             HB_CBVAR_PTR pVar = (HB_CBVAR_PTR) $1->value.asList.pIndex;
 
-                             if( pVar )
+                             while( pVar->pNext )
                              {
-                                while( pVar->pNext )
-                                {
-                                   pVar = pVar->pNext;
-                                }
+                                pVar = pVar->pNext;
+                             }
 
-                                if( pVar->szName == NULL )
+                             if( pVar->szName == NULL )
+                             {
+                                if( pVar == (HB_CBVAR_PTR) $1->value.asList.pIndex )
+                                {
+                                   //{|| ...} not realy a nameless argument.
+                                }
+                                else
                                 {
                                    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NAMELESS_PARAM, NULL, NULL );
                                    hb_compExprDelete( $1 );
                                    $$ = NULL;
                                 }
-                             }
+                             }                             
                            }
             ;
 
@@ -2199,10 +2202,10 @@ BlockExpList : Expression                  { pBlockSimple = $1;   $$ = hb_compEx
  * in BlockExpList to refer the same rule defined in Codeblock
  */
 
-BlockVarList : IdentName AsType                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-             | ',' IdentName AsType               { hb_comp_iVarScope = VS_LOCAL; hb_compExprCBVarAdd( $<asExpr>0, NULL, hb_comp_cVarType ); $$ = hb_compExprCBVarAdd( $<asExpr>0, $2, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-             | BlockVarList ','                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, NULL, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-             | BlockVarList ',' IdentName AsType  { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+BlockVarList : IdentName AsType                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1,    hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             |                                    { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, NULL , hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             | BlockVarList ',' IdentName AsType  { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $1, $3,    hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             | BlockVarList ','                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $1, NULL,  hb_comp_cVarType ); hb_comp_cVarType = ' '; }
              ;
 
 /* There is a conflict between the use of IF( Expr1, Expr2, Expr3 )
