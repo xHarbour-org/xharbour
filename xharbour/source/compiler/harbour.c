@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.215 2009/02/13 16:12:23 ronpinkas Exp $
+ * $Id: harbour.c,v 1.216 2009/02/21 15:14:24 ronpinkas Exp $
  */
 
 /*
@@ -1370,7 +1370,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                   hb_comp_functions.pLast->bFlags |= FUN_USES_LOCAL_PARAMS;
                }
 
-               if( hb_comp_bDebugInfo )
+               if( hb_comp_bDebugInfo && szVarName )
                {
                   hb_compGenLocalName( wLocal, szVarName );
                }
