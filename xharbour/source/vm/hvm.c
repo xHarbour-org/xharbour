@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.714 2009/02/02 11:25:10 marchuet Exp $
+ * $Id: hvm.c,v 1.715 2009/02/04 00:11:38 likewolf Exp $
  */
 
 /*
@@ -532,6 +532,31 @@ void hb_vmSymbolResolveDeferred( void )
          TraceLog( NULL, "Module: '%s' does NOT have any Deferred Symbols\n", pModuleSymbols->szModuleName );
       }
      #endif
+
+      pModuleSymbols = pModuleSymbols->pNext;
+   }
+}
+
+static void hb_vmSymbolOverloadDefinition( PHB_DYNS pDynSym )
+{
+   PSYMBOLS pModuleSymbols = s_pSymbols;
+
+   while( pModuleSymbols )
+   {
+      PHB_SYMB pModuleSymbol, pOverloadedSym = pDynSym->pSymbol;
+      register UINT ui;
+
+      for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
+      {
+         pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
+
+         if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->value.pFunPtr != pOverloadedSym->value.pFunPtr )
+         {
+            pModuleSymbol->value.pFunPtr = pOverloadedSym->value.pFunPtr;
+            pModuleSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
+            pModuleSymbol->scope.value |= ( pOverloadedSym->scope.value & HB_FS_PCODEFUNC );
+         }
+      }
 
       pModuleSymbols = pModuleSymbols->pNext;
    }
@@ -10326,6 +10351,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                            pDynSym->pSymbol = pSymbol;
                            pDynSym->pModuleSymbols = pNewSymbols;
 
+                           hb_vmSymbolOverloadDefinition( pDynSym );
                          #else
 
                            if( pDynSym->pSymbol->scope.value & HB_FS_DYNCODE )
@@ -10344,6 +10370,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                               pDynSym->pSymbol = pSymbol;
                               pDynSym->pModuleSymbols = pNewSymbols;
+
+                              hb_vmSymbolOverloadDefinition( pDynSym );
                            }
                            else
                            {
@@ -10362,6 +10390,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                               pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
                               pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+
+                              hb_vmSymbolOverloadDefinition( pDynSym );
                            }
 
                          #endif
@@ -10503,6 +10533,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                        pDynSym->pSymbol = pSymbol;
                        pDynSym->pModuleSymbols = pNewSymbols;
 
+                       hb_vmSymbolOverloadDefinition( pDynSym );
                      #else
 
                        if( pDynSym->pSymbol->scope.value & HB_FS_DYNCODE )
@@ -10521,6 +10552,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                           pDynSym->pSymbol = pSymbol;
                           pDynSym->pModuleSymbols = pNewSymbols;
+
+                          hb_vmSymbolOverloadDefinition( pDynSym );
                        }
                        else
                        {
@@ -10539,6 +10572,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                           pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
                           pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+
+                          hb_vmSymbolOverloadDefinition( pDynSym );
                        }
 
                      #endif

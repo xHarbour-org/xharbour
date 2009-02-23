@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.58 2008/03/16 03:24:20 lculik Exp $
+ * $Id: errorsys.prg,v 1.59 2008/04/05 20:31:24 likewolf Exp $
  */
 
 /*
@@ -82,6 +82,16 @@ STATIC FUNCTION DefError( oError )
    LOCAL nChoice
 
    LOCAL n
+
+   n := 0
+   WHILE ! Empty( ProcName( ++n ) )
+      IF ProcName( n ) == ProcName()
+         TraceLog( "Error system failure!", oError:ProcName, oError:ProcLine(), oError:ModuleName, oError:description )
+         Alert( "Error system failure!;Please correct error handler:;" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
+         ErrorLevel( 1 )
+         QUIT
+      ENDIF
+   ENDDO
 
    // By default, division by zero results in zero
    IF oError:genCode == EG_ZERODIV
@@ -259,13 +269,12 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nHandle
      LOCAL nBytes
 
-
      LOCAL nHandle2   := -1
      LOCAL cLogFile2  := "_error.log"
      LOCAL cBuff      := ""
      LOCAL nRead      := 0
 
-     
+
      nCols := MaxCol()
      IF nCols > 0
         nRows := MaxRow()
@@ -273,7 +282,7 @@ STATIC FUNCTION LogError( oerr )
      ENDIF
      //Alert( 'An error occured, Information will be ;written to error.log' )
 
-     If !lAppendLog 
+     If !lAppendLog
         nHandle := FCreate( cLogFile, FC_NORMAL )
      Else
         If !File( cLogFile )
@@ -317,7 +326,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, 'Multi Threading....: ' + If( Hb_MultiThread(),"YES","NO" ) )
         FWriteLine( nHandle, 'VM Optimization....: ' + strvalue( Hb_VmMode() ) )
 
-        IF Type( "Select()" ) != "UI"
+        IF Type( "Select()" ) == "UI"
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Current Area ......:' + strvalue( &("Select()") ) )
         ENDIF
@@ -379,7 +388,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "SET IDLEREPEAT.....: " + strvalue( Set( _SET_IDLEREPEAT ), .T. ) )
         FWriteLine( nHandle, "SET INSERT.........: " + strvalue( Set( _SET_INSERT ), .T. ) )
         FWriteLine( nHandle, "SET INTENSITY......: " + strvalue( Set( _SET_INTENSITY ), .T. ) )
-                                                                          
+
         FWriteLine( nHandle, "SET LANGUAGE.......: " + strvalue( Set( _SET_LANGUAGE )      ) )
 
         FWriteLine( nHandle, "SET MARGIN.........: " + strvalue( Set( _SET_MARGIN )      ) )
@@ -424,7 +433,7 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
         FWriteLine( nHandle, "" )
 
-        IF Type( "Select()" ) != "UI"
+        IF Type( "Select()" ) == "UI"
            For nCount := 1 To 600
               If !Empty( ( nCount )->( &("Alias()") ) )
                  ( nCount )->( FWriteLine( nHandle, "Work Area No ......: " + strvalue( &("Select()") ) ) )

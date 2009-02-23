@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld_vc.bat,v 1.1 2001/12/22 06:36:17 ronpinkas Exp $
+rem $Id: bld_vc.bat,v 1.2 2009/02/21 15:14:24 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -45,3 +45,4 @@ call bld.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 SET PATH=_%PATH%
 SET _PATH=
+SET CC_DIR=

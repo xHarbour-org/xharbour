@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6376 2009/02/21 15:14:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6377 2009/02/21 19:01:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-23 16:26 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
+   * bin\bld_vc.bat
+     * Added missing reset of CC_DIR
+
+   * source\rtl\errorsys.prg
+     ! Fixed 2 bad typos
+     + Added protection against recursive errors
+
+   * source\vm\hvm.c
+     + Added hb_vmSymbolOverloadDefinition() to patch all previously processed symbols,
+       once overloaded definition is processed.
 
 2009-02-21 14:28 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
    * include\hbapirdd.h
@@ -17,10 +29,10 @@
 2009-02-21 10:40 UTC-1137 Ron Pinkas <ron/at/xharbour.com>
    * bin\bld_vc.bat
      + Added auto detection and setup of compiler
-     /* 
+     /*
        I suggest same for all other compilers (bld_*.bat)
       */
- 
+
    * makefile.vc
      * Protected $(HB_DIR_ADS)\ace32.lib with ""
 
@@ -40,7 +52,7 @@
      - removes unused variables.
 
    * include\hbapicdp.h
-   * source\rtl\cdpapi.c   
+   * source\rtl\cdpapi.c
      + HB_CDPSELECT() which does the same as HB_SETCODEPAGE(), but
        aligns well with function naming rules and namespace.
        HB_SETCODEPAGE() still works, but usage is not recommended.
@@ -53,11 +65,11 @@
        character ID
      + added new functions hb_vmCDP() and hb_vmSetCDP() to get/set
        active for given thread code page structure
-     
+
    * include\dbinfo.ch
      + added DBI_ISTEMPORARY
      + added DBI_CPID
-     
+
    * include\hbapifs.h
    * include\hbapirdd.h
    * include\hbrddbmc.h
@@ -81,7 +93,7 @@
    * source\rdd\dbffpt\dbffpt1.c
    * source\rdd\dbfnsx\dbfnsx1.c
    * source\rdd\dbfntx\dbfntx1.c
-     + added support for temporary tables in native RDDs.   
+     + added support for temporary tables in native RDDs.
    * source\rdd\delim1.c
    * source\rdd\hbdbsort.c
    * source\rdd\hsx\hsx.c
@@ -95,7 +107,7 @@
        how much disk space is available for them. Some RDDs may also do
        not create temporary files but keep everything in memory if they
        decide it's more efficient.
-   
+
    * source\rdd\workarea.c
    * source\rtl\dbf2txt.c
    * source\rtl\filebuf.c
@@ -122,8 +134,8 @@
        make translations as posible to application one. No too when DbCreate or DbUseArea are called
        with collation it is saved at header of vfpdbf tables.
 
-   * include\hbset.h       
-   * source\rtl\set.c     
+   * include\hbset.h
+   * source\rtl\set.c
      * revided setGet functions with the idea to change all references to hb_set with apropiated setGet
        to avoid problems at dll or api changes at mt mode.
      + divided __SETCENTURY() PRG function into two functions:
