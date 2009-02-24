@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.33 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: dbgentry.c,v 1.34 2009/02/03 16:23:55 likewolf Exp $
  */
 
 /*
@@ -1418,6 +1418,10 @@ static void hb_dbgQuit( HB_DEBUGINFO *info )
       if ( module->nStatics )
       {
          FREE( module->aStatics );
+      }
+      if ( module->nGlobals )
+      {
+         FREE( module->aGlobals );
       }
       if ( module->szModule )
       {
