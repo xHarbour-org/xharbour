@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6378 2009/02/23 21:00:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6379 2009/02/23 21:45:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-24 13:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * contrib\rdd_ads\ads1.c
+   * contrib\rdd_ads\rddads.h
+   * include\clipdefs.h
+   * include\hbapi.h
+   * include\hbapigt.h
+   * include\hbapirdd.h
+   * include\hbrddbmc.h
+   * include\hbrddcdx.h
+   * include\hbrdddbf.h
+   * include\hbrdddbt.h
+   * include\hbrddfpt.h
+   * include\hbrddntx.h
+   * source\rdd\bmdbfcdx\bmdbfcdx1.c
+   * source\rdd\dbcmd.c
+   * source\rdd\dbcmd53.c
+   * source\rdd\dbcmdx.c
+   * source\rdd\dbf1.c
+   * source\rdd\dbfcdx\dbfcdx1.c
+   * source\rdd\dbfdbt\dbfdbt1.c
+   * source\rdd\dbffpt\dbffpt1.c
+   * source\rdd\dbfnsx\dbfnsx1.c
+   * source\rdd\dbfntx\dbfntx1.c
+   * source\rdd\delim1.c
+   * source\rdd\hbdbsort.c
+   * source\rdd\hbsix\sxcrypt.c
+   * source\rdd\hbsix\sxord.c
+   * source\rdd\hbsix\sxtable.c
+   * source\rdd\hsx\hsx.c
+   * source\rdd\nulsys\nulsys.c
+   * source\rdd\sdf1.c
+   * source\rdd\usrrdd\usrrdd.c
+   * source\rdd\wacore.c
+   * source\rdd\wafunc.c
+   * source\rdd\workarea.c
+   * source\rtl\gtapi.c
+   * source\vm\hvm.c
+   * source\vm\memvars.c
+     * Changed SUCCESS by HB_SUCCESS, FAILURE by HB_FAILURE & ERRCODE by HB_ERRCODE.
+     ! removed direct access to external static hb_set, to fix problems at DLL.
+     ! accept invalid string key expression if codeblock key expression
+       is given when createindex.
 
 2009-02-23 05:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
    * source/compiler/harbour.c

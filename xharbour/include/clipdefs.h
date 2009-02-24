@@ -1,5 +1,5 @@
 /*
- * $Id: clipdefs.h,v 1.5 2005/02/24 13:04:52 andijahja Exp $
+ * $Id: clipdefs.h,v 1.6 2007/11/29 11:15:47 andijahja Exp $
  */
 
 /*
@@ -113,8 +113,8 @@ typedef NEARP * NEARPP;
 #endif
 
 typedef void *  HANDLE;
-typedef ERRCODE IHELP;
-typedef ERRCODE ICODE;
+typedef HB_ERRCODE IHELP;
+typedef HB_ERRCODE ICODE;
 
 /* default func ptr -- USHORT return, USHORT param */
 typedef USHORT  ( * FUNCP )( USHORT param, ...);

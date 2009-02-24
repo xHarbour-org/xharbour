@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.136 2009/01/17 20:54:27 andijahja Exp $
+ * $Id: memvars.c,v 1.137 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -776,11 +776,11 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
    }
 }
 
-ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
+HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 {
    HB_THREAD_STUB
    PHB_DYNS pDyn;
-   ERRCODE bSuccess = FAILURE;
+   HB_ERRCODE bSuccess = FAILURE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGet(%p, %p)", pItem, pMemvarSymb));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c,v 1.4 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: dbcmdx.c,v 1.5 2008/08/21 12:47:44 marchuet Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ HB_FUNC( ORDWILDSEEK )
       {
          BOOL fCont = hb_parl( 2 ), fBack = hb_parl( 3 ), fFound = FALSE;
          DBORDERINFO OrderInfo;
-         ERRCODE errCode = SUCCESS;
+         HB_ERRCODE errCode = HB_SUCCESS;
 
          memset( &OrderInfo, 0, sizeof( DBORDERINFO ) );
          OrderInfo.itmResult = hb_itemNew( NULL );
@@ -100,21 +100,21 @@ HB_FUNC( ORDWILDSEEK )
             else
                errCode = SELF_GOTOP( pArea );
 
-            if( errCode == SUCCESS )
+            if( errCode == HB_SUCCESS )
             {
                errCode = SELF_ORDINFO( pArea, DBOI_KEYVAL, &OrderInfo );
-               if( errCode == SUCCESS )
+               if( errCode == HB_SUCCESS )
                {
                   szKey = hb_itemGetCPtr( OrderInfo.itmResult );
                   fFound = hb_strMatchWild( szKey, szPattern );
                }
             }
          }
-         if( !fFound && errCode == SUCCESS )
+         if( !fFound && errCode == HB_SUCCESS )
          {
             OrderInfo.itmNewVal = hb_param( 1, HB_IT_STRING );
             if( SELF_ORDINFO( pArea, fBack ? DBOI_SKIPWILDBACK : DBOI_SKIPWILD,
-                          &OrderInfo ) == SUCCESS )
+                          &OrderInfo ) == HB_SUCCESS )
                fFound = hb_itemGetL( OrderInfo.itmResult );
          }
          hb_itemRelease( OrderInfo.itmResult );
@@ -138,7 +138,7 @@ HB_FUNC( DBSKIPPER )
       BOOL fBEof;
       ULONG ulRecords = 0;
 
-      if( SELF_RECCOUNT( pArea, &ulRecords ) == SUCCESS && ulRecords > 0 )
+      if( SELF_RECCOUNT( pArea, &ulRecords ) == HB_SUCCESS && ulRecords > 0 )
       {
          if( ISNUM( 1 ) )
             lRecs = hb_parnl( 1 );
@@ -147,13 +147,13 @@ HB_FUNC( DBSKIPPER )
             SELF_SKIP( pArea, 0 );
          else if( lRecs > 0 )
          {
-            if( SELF_EOF( pArea, &fBEof ) == SUCCESS )
+            if( SELF_EOF( pArea, &fBEof ) == HB_SUCCESS )
             {
                while( lSkipped < lRecs )
                {
-                  if( SELF_SKIP( pArea, 1 ) != SUCCESS )
+                  if( SELF_SKIP( pArea, 1 ) != HB_SUCCESS )
                      break;
-                  if( SELF_EOF( pArea, &fBEof ) != SUCCESS )
+                  if( SELF_EOF( pArea, &fBEof ) != HB_SUCCESS )
                      break;
                   if( fBEof )
                   {
@@ -168,9 +168,9 @@ HB_FUNC( DBSKIPPER )
          {
             while( lSkipped > lRecs )
             {
-               if( SELF_SKIP( pArea, -1 ) != SUCCESS )
+               if( SELF_SKIP( pArea, -1 ) != HB_SUCCESS )
                   break;
-               if( SELF_BOF( pArea, &fBEof ) != SUCCESS )
+               if( SELF_BOF( pArea, &fBEof ) != HB_SUCCESS )
                   break;
                if( fBEof )
                   break;

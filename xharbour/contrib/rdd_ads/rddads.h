@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.22 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: rddads.h,v 1.23 2009/01/16 10:50:23 marchuet Exp $
  */
 
 /*
@@ -236,7 +236,7 @@ extern int hb_ads_iCharType;
 extern BOOL hb_ads_bTestRecLocks;
 extern ADSHANDLE hb_ads_hConnect;
 
-extern ERRCODE hb_adsCloseCursor( ADSAREAP pArea );
+extern HB_ERRCODE hb_adsCloseCursor( ADSAREAP pArea );
 extern ADSAREAP hb_adsGetWorkAreaPointer( void );
 
 #ifdef ADS_USE_OEM_TRANSLATION

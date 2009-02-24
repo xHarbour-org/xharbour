@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.15 2008/11/22 08:25:22 andijahja Exp $
+ * $Id: wacore.c,v 1.16 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -187,7 +187,7 @@ static void hb_waNodeDelete( PHB_STACKRDD pRddInfo, PHB_STACKRDD_TLS pRddTls )
 /*
  * Return the next free WorkArea for later use.
  */
-ERRCODE hb_rddSelectFirstAvailable( void )
+HB_ERRCODE hb_rddSelectFirstAvailable( void )
 {
    HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
@@ -211,14 +211,14 @@ ERRCODE hb_rddSelectFirstAvailable( void )
    {
       UNLOCK_AREA
 
-      return FAILURE;
+      return HB_FAILURE;
    }
    pRddTls = hb_stackRDDTLS();
    HB_SET_WA( uiArea );
 
    UNLOCK_AREA
 
-   return SUCCESS;
+   return HB_SUCCESS;
 }
 
 /*
@@ -257,7 +257,7 @@ USHORT hb_rddInsertAreaNode( const char *szDriver )
 
    if( pRddTls->uiCurrArea == 0 )
    {
-      if( hb_rddSelectFirstAvailable() != SUCCESS )
+      if( hb_rddSelectFirstAvailable() != HB_SUCCESS )
          return 0;
    }
 
@@ -290,7 +290,7 @@ void hb_rddReleaseCurrentArea( void )
 
    LOCK_AREA
 
-   if( SELF_CLOSE( pArea ) == FAILURE )
+   if( SELF_CLOSE( pArea ) == HB_FAILURE )
    {
       UNLOCK_AREA
 
@@ -554,11 +554,11 @@ void hb_rddUnLockAll( void )
 /*
  * call a pCallBack function with all open workareas ###
  */
-ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
+HB_ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
 {
    HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
-   ERRCODE errCode = SUCCESS;
+   HB_ERRCODE errCode = HB_SUCCESS;
    USHORT uiIndex;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p,%p)", pCallBack, cargo));
@@ -570,7 +570,7 @@ ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
    for( uiIndex = 1; uiIndex < pRddInfo->uiWaMax; uiIndex++ )
    {
       errCode = pCallBack( ( AREAP ) pRddInfo->waList[ uiIndex ], cargo );
-      if( errCode != SUCCESS )
+      if( errCode != HB_SUCCESS )
          break;
    }
 
@@ -674,7 +674,7 @@ int hb_rddGetCurrentWorkAreaNumber( void )
 /*
  * Select a WorkArea by the number.
  */
-ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
+HB_ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 {
    HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
@@ -694,5 +694,5 @@ ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 
    UNLOCK_AREA
 
-   return ( pRddTls->pCurrArea == NULL ) ? FAILURE : SUCCESS;
+   return ( pRddTls->pCurrArea == NULL ) ? HB_FAILURE : HB_SUCCESS;
 }

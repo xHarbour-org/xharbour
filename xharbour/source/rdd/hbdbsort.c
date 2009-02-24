@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.5 2006/08/19 11:22:28 druzus Exp $
+ * $Id: hbdbsort.c,v 1.6 2009/02/20 12:48:16 marchuet Exp $
  */
 
 /*
@@ -248,8 +248,8 @@ void hb_dbQSortComplete( LPDBQUICKSORT pQuickSort )
 #endif
 
          /* Append a new record and copy data */
-         if( SELF_APPEND( pArea, TRUE ) == FAILURE ||
-             SELF_PUTREC( pArea, pQuickSort->pSwapBufferA ) == FAILURE )
+         if( SELF_APPEND( pArea, TRUE ) == HB_FAILURE ||
+             SELF_PUTREC( pArea, pQuickSort->pSwapBufferA ) == HB_FAILURE )
             break;
       }
    }

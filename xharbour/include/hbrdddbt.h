@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.11 2005/10/30 14:45:48 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.12 2006/06/27 21:26:00 druzus Exp $
  */
 
 /*
@@ -111,12 +111,12 @@ typedef DBTAREA * LPDBTAREA;
 #define hb_dbtFieldName                            NULL
 #define hb_dbtFlush                                NULL
 #define hb_dbtGetRec                               NULL
-static ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-static ERRCODE hb_dbtGetVarLen( DBTAREAP pArea, USHORT uiIndex, ULONG * pLength );
+static HB_ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+static HB_ERRCODE hb_dbtGetVarLen( DBTAREAP pArea, USHORT uiIndex, ULONG * pLength );
 #define hb_dbtGoCold                               NULL
 #define hb_dbtGoHot                                NULL
 #define hb_dbtPutRec                               NULL
-static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+static HB_ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 #define hb_dbtRecall                               NULL
 #define hb_dbtRecCount                             NULL
 #define hb_dbtRecInfo                              NULL
@@ -126,11 +126,11 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 #define hb_dbtAlias                                NULL
 #define hb_dbtClose                                NULL
 #define hb_dbtCreate                               NULL
-static ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+static HB_ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 #define hb_dbtNewArea                              NULL
 #define hb_dbtOpen                                 NULL
 #define hb_dbtRelease                              NULL
-static ERRCODE hb_dbtStructSize( DBTAREAP pArea, USHORT * uiSize );
+static HB_ERRCODE hb_dbtStructSize( DBTAREAP pArea, USHORT * uiSize );
 #define hb_dbtSysName                              NULL
 #define hb_dbtEval                                 NULL
 #define hb_dbtPack                                 NULL
@@ -176,9 +176,9 @@ static ERRCODE hb_dbtStructSize( DBTAREAP pArea, USHORT * uiSize );
 #define hb_dbtLock                                 NULL
 #define hb_dbtUnLock                               NULL
 #define hb_dbtCloseMemFile                         NULL
-static ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo );
+static HB_ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo );
 #define hb_dbtGetValueFile                         NULL
-static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo );
+static HB_ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_dbtPutValueFile                         NULL
 #define hb_dbtReadDBHeader                         NULL
 #define hb_dbtWriteDBHeader                        NULL
@@ -186,7 +186,7 @@ static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_dbtExit                                 NULL
 #define hb_dbtDrop                                 NULL
 #define hb_dbtExists                               NULL
-static ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
+static HB_ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_dbtWhoCares                             NULL
 
 HB_EXTERN_END

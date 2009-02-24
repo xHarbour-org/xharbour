@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.137 2009/01/16 10:50:23 marchuet Exp $
+ * $Id: ads1.c,v 1.138 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -161,12 +161,12 @@ static void adsSetSend( void )
    AdsSetDecimals( ( UNSIGNED16 ) hb_setGetNI( HB_SET_DECIMALS ) );
 }
 
-static ERRCODE commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
+static HB_ERRCODE commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
                             USHORT uiOsCode, const char * szFileName,
                             USHORT uiFlags, PHB_ITEM * pErrorPtr )
 {
    PHB_ITEM pError;
-   ERRCODE errCode = FAILURE;
+   HB_ERRCODE errCode = FAILURE;
 
    if( hb_vmRequestQuery() == 0 )
    {
@@ -380,7 +380,7 @@ static ADSHANDLE hb_adsFindBag( ADSAREAP pArea, char * szBagName )
 #endif
 }
 
-static ERRCODE hb_adsUpdateAreaFlags( ADSAREAP pArea )
+static HB_ERRCODE hb_adsUpdateAreaFlags( ADSAREAP pArea )
 {
    UNSIGNED16 u16Bof, u16Eof, u16Found;
 
@@ -397,7 +397,7 @@ static ERRCODE hb_adsUpdateAreaFlags( ADSAREAP pArea )
    return SUCCESS;
 }
 
-static ERRCODE hb_adsCheckLock( ADSAREAP pArea )
+static HB_ERRCODE hb_adsCheckLock( ADSAREAP pArea )
 {
    if( hb_ads_bTestRecLocks && pArea->fShared && !pArea->fFLocked )
    {
@@ -514,7 +514,7 @@ static void adsScopeGet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB_IT
    }
 }
 
-static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB_ITEM pItem )
+static HB_ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB_ITEM pItem )
 {
    UNSIGNED16 u16DataType = ADS_STRINGKEY ;
    UNSIGNED8 *pucScope;
@@ -682,9 +682,9 @@ static void adsSetRelPos( ADSAREAP pArea, ADSHANDLE hOrder, double dPos )
    pArea->hOrdCurrent = hCurrOrder;
 }
 
-ERRCODE hb_adsCloseCursor( ADSAREAP pArea )
+HB_ERRCODE hb_adsCloseCursor( ADSAREAP pArea )
 {
-   ERRCODE uiError;
+   HB_ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_adsCloseCursor(%p)", pArea));
 
@@ -730,7 +730,7 @@ ERRCODE hb_adsCloseCursor( ADSAREAP pArea )
  * -- ADS METHODS --
  */
 
-static ERRCODE adsBof( ADSAREAP pArea, BOOL * pBof )
+static HB_ERRCODE adsBof( ADSAREAP pArea, BOOL * pBof )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsBof(%p, %p)", pArea, pBof));
 
@@ -743,7 +743,7 @@ static ERRCODE adsBof( ADSAREAP pArea, BOOL * pBof )
    return SUCCESS;
 }
 
-static ERRCODE adsEof( ADSAREAP pArea, BOOL * pEof )
+static HB_ERRCODE adsEof( ADSAREAP pArea, BOOL * pEof )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsEof(%p, %p)", pArea, pEof));
 
@@ -756,7 +756,7 @@ static ERRCODE adsEof( ADSAREAP pArea, BOOL * pEof )
    return SUCCESS;
 }
 
-static ERRCODE adsFound( ADSAREAP pArea, BOOL * pFound )
+static HB_ERRCODE adsFound( ADSAREAP pArea, BOOL * pFound )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsFound(%p, %p)", pArea, pFound));
 
@@ -769,7 +769,7 @@ static ERRCODE adsFound( ADSAREAP pArea, BOOL * pFound )
    return SUCCESS;
 }
 
-static ERRCODE adsGoBottom( ADSAREAP pArea )
+static HB_ERRCODE adsGoBottom( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsGoBottom(%p)", pArea));
 
@@ -789,7 +789,7 @@ static ERRCODE adsGoBottom( ADSAREAP pArea )
    return SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
 }
 
-static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
+static HB_ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
 {
 /*
  * TODO: bh: Note  Explicitly moving to a deleted record when using the
@@ -871,7 +871,7 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
    return ( ulRetVal == AE_SUCCESS ? SUCCESS : FAILURE );
 }
 
-static ERRCODE adsGoToId( ADSAREAP pArea, PHB_ITEM pItem )
+static HB_ERRCODE adsGoToId( ADSAREAP pArea, PHB_ITEM pItem )
 {
    ULONG ulRecNo;
 
@@ -889,7 +889,7 @@ static ERRCODE adsGoToId( ADSAREAP pArea, PHB_ITEM pItem )
    }
 }
 
-static ERRCODE adsGoTop( ADSAREAP pArea )
+static HB_ERRCODE adsGoTop( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsGoTop(%p)", pArea));
 
@@ -909,7 +909,7 @@ static ERRCODE adsGoTop( ADSAREAP pArea )
    return SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
 }
 
-static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast )
+static HB_ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast )
 {
    UNSIGNED32 u32RecNo = 0, u32NewRec;
    UNSIGNED16 u16SeekType = ( bSoftSeek ) ? ADS_SOFTSEEK : ADS_HARDSEEK,
@@ -1014,8 +1014,8 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
     * AdsSkip( -1 ) above */
    if( pArea->fBof && !pArea->fEof )
    {
-      ERRCODE errCode = SELF_GOTO( ( AREAP ) pArea, 0 );
-      /* ERRCODE errCode = SELF_GOTOP( ( AREAP ) pArea ); */
+      HB_ERRCODE errCode = SELF_GOTO( ( AREAP ) pArea, 0 );
+      /* HB_ERRCODE errCode = SELF_GOTOP( ( AREAP ) pArea ); */
       pArea->fBof = FALSE;
       return errCode;
    }
@@ -1128,7 +1128,7 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    return SUCCESS;
 }
 
-static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
+static HB_ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSkip(%p, %ld)", pArea, lToSkip));
 
@@ -1183,7 +1183,7 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
    }
    else
    {
-      ERRCODE errCode = SUCCESS;
+      HB_ERRCODE errCode = SUCCESS;
       LONG lSkipper;
 
       if( !pArea->fPositioned && lToSkip < 0 )
@@ -1248,10 +1248,10 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
    }
 }
 
-static ERRCODE adsSkipFilter( ADSAREAP pArea, LONG lUpDown )
+static HB_ERRCODE adsSkipFilter( ADSAREAP pArea, LONG lUpDown )
 {
    BOOL fBottom;
-   ERRCODE uiError;
+   HB_ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("adsSkipFilter(%p, %ld)", pArea, lUpDown));
 
@@ -1318,7 +1318,7 @@ static ERRCODE adsSkipFilter( ADSAREAP pArea, LONG lUpDown )
 #define  adsSkipRaw               NULL
 #define  adsAddField              NULL
 
-static ERRCODE adsAppend( ADSAREAP pArea, BOOL fUnLockAll )
+static HB_ERRCODE adsAppend( ADSAREAP pArea, BOOL fUnLockAll )
 {
    UNSIGNED32 u32RetVal;
 
@@ -1371,7 +1371,7 @@ static ERRCODE adsAppend( ADSAREAP pArea, BOOL fUnLockAll )
    return FAILURE;
 }
 
-static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
+static HB_ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
 {
    USHORT uiItems, uiCount, uiLen, uiDec;
    DBFIELDINFO dbFieldInfo;
@@ -1681,7 +1681,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
    return SUCCESS;
 }
 
-static ERRCODE adsDeleteRec( ADSAREAP pArea )
+static HB_ERRCODE adsDeleteRec( ADSAREAP pArea )
 {
    UNSIGNED32 u32RetVal;
 
@@ -1705,7 +1705,7 @@ static ERRCODE adsDeleteRec( ADSAREAP pArea )
    return u32RetVal == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
-static ERRCODE adsDeleted( ADSAREAP pArea, BOOL * pDeleted )
+static HB_ERRCODE adsDeleted( ADSAREAP pArea, BOOL * pDeleted )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsDeleted(%p, %p)", pArea, pDeleted));
 
@@ -1731,7 +1731,7 @@ static ERRCODE adsDeleted( ADSAREAP pArea, BOOL * pDeleted )
    return SUCCESS;
 }
 
-static ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
+static HB_ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
 {
    UNSIGNED16 u16Fields;
 
@@ -1745,7 +1745,7 @@ static ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
 
 #define  adsFieldDisplay          NULL
 
-static ERRCODE adsFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pItem )
+static HB_ERRCODE adsFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pItem )
 {
    LPFIELD pField;
 
@@ -1837,7 +1837,7 @@ static ERRCODE adsFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITE
    return SUCCESS;
 }
 
-static ERRCODE adsFieldName( ADSAREAP pArea, USHORT uiIndex, void * szName )
+static HB_ERRCODE adsFieldName( ADSAREAP pArea, USHORT uiIndex, void * szName )
 {
    UNSIGNED16 u16Len = pArea->uiMaxFieldNameLength + 1;
 
@@ -1851,7 +1851,7 @@ static ERRCODE adsFieldName( ADSAREAP pArea, USHORT uiIndex, void * szName )
    return SUCCESS;
 }
 
-static ERRCODE adsFlush( ADSAREAP pArea )
+static HB_ERRCODE adsFlush( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsFlush(%p)", pArea ));
 
@@ -1876,7 +1876,7 @@ static ERRCODE adsFlush( ADSAREAP pArea )
    return SUCCESS;
 }
 
-static ERRCODE adsGetRec( ADSAREAP pArea, BYTE ** pBuffer )
+static HB_ERRCODE adsGetRec( ADSAREAP pArea, BYTE ** pBuffer )
 {
    UNSIGNED32 u32Len = pArea->uiRecordLen, u32Result;
 
@@ -1898,7 +1898,7 @@ static ERRCODE adsGetRec( ADSAREAP pArea, BYTE ** pBuffer )
    return u32Result == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
-static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD    pField;
    BYTE *     pBuffer = pArea->pRecord;
@@ -2149,7 +2149,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    return SUCCESS;
 }
 
-static ERRCODE adsGetVarLen( ADSAREAP pArea, USHORT uiIndex, ULONG * ulLen )
+static HB_ERRCODE adsGetVarLen( ADSAREAP pArea, USHORT uiIndex, ULONG * ulLen )
 {
    LPFIELD pField;
 
@@ -2194,7 +2194,7 @@ static ERRCODE adsGetVarLen( ADSAREAP pArea, USHORT uiIndex, ULONG * ulLen )
 #define  adsGoCold                NULL
 #define  adsGoHot                 NULL
 
-static ERRCODE adsPutRec( ADSAREAP pArea, BYTE * pBuffer )
+static HB_ERRCODE adsPutRec( ADSAREAP pArea, BYTE * pBuffer )
 {
    UNSIGNED32 u32Len = pArea->uiRecordLen, u32Result;
 
@@ -2219,7 +2219,7 @@ static ERRCODE adsPutRec( ADSAREAP pArea, BYTE * pBuffer )
 }
 
 
-static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+static HB_ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD pField;
    USHORT uiCount;
@@ -2396,7 +2396,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    return SUCCESS;
 }
 
-static ERRCODE adsRecall( ADSAREAP pArea )
+static HB_ERRCODE adsRecall( ADSAREAP pArea )
 {
    UNSIGNED32 u32RetVal;
 
@@ -2420,7 +2420,7 @@ static ERRCODE adsRecall( ADSAREAP pArea )
    return u32RetVal == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
-static ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
+static HB_ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
 {
    UNSIGNED32 u32RecCount = 0, u32Result;
 
@@ -2432,10 +2432,10 @@ static ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
    return u32Result == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
-static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo )
+static HB_ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo )
 {
    ULONG ulRecNo = hb_itemGetNL( pRecID );
-   ERRCODE uiRetVal = SUCCESS;
+   HB_ERRCODE uiRetVal = SUCCESS;
 
    HB_TRACE(HB_TR_DEBUG, ("adsRecInfo(%p, %p, %hu, %p)", pArea, pRecID, uiInfoType, pInfo));
 
@@ -2496,7 +2496,7 @@ static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, P
 }
 
 
-static ERRCODE adsRecNo( ADSAREAP pArea, ULONG * ulRecNo )
+static HB_ERRCODE adsRecNo( ADSAREAP pArea, ULONG * ulRecNo )
 {
    UNSIGNED32 u32RecNo, u32Result;
 
@@ -2515,9 +2515,9 @@ static ERRCODE adsRecNo( ADSAREAP pArea, ULONG * ulRecNo )
    return u32Result == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
-static ERRCODE adsRecId( ADSAREAP pArea, PHB_ITEM pRecNo )
+static HB_ERRCODE adsRecId( ADSAREAP pArea, PHB_ITEM pRecNo )
 {
-   ERRCODE errCode;
+   HB_ERRCODE errCode;
    ULONG ulRecNo;
 
    HB_TRACE(HB_TR_DEBUG, ("adsRecId(%p, %p)", pArea, pRecNo));
@@ -2530,14 +2530,14 @@ static ERRCODE adsRecId( ADSAREAP pArea, PHB_ITEM pRecNo )
 #define  adsSetFieldExtent        NULL
 #define  adsAlias                 NULL
 
-static ERRCODE adsClose( ADSAREAP pArea )
+static HB_ERRCODE adsClose( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsClose(%p)", pArea));
 
    return hb_adsCloseCursor( pArea );
 }
 
-static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
+static HB_ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
    ADSHANDLE hTable, hConnection;
    UNSIGNED32 uRetVal, u32Length, uiFldLen, uiLen;
@@ -2726,7 +2726,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    return SELF_GOTOP( ( AREAP ) pArea );
 }
 
-static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+static HB_ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    UNSIGNED32 uRetVal;
 
@@ -2874,9 +2874,9 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    return SUCCESS;
 }
 
-static ERRCODE adsNewArea( ADSAREAP pArea )
+static HB_ERRCODE adsNewArea( ADSAREAP pArea )
 {
-   ERRCODE errCode;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("adsNewArea(%p)", pArea));
 
@@ -2915,7 +2915,7 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
    return errCode;
 }
 
-static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
+static HB_ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    ADSHANDLE hTable = 0, hStatement = 0, hConnection;
    UNSIGNED32 u32RetVal, u32Length;
@@ -3202,7 +3202,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 
 #define  adsRelease               NULL
 
-static ERRCODE adsStructSize( ADSAREAP pArea, USHORT * StructSize )
+static HB_ERRCODE adsStructSize( ADSAREAP pArea, USHORT * StructSize )
 {
    HB_SYMBOL_UNUSED( pArea );
 
@@ -3211,7 +3211,7 @@ static ERRCODE adsStructSize( ADSAREAP pArea, USHORT * StructSize )
    return SUCCESS;
 }
 
-static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
+static HB_ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
 {
    UNSIGNED16 u16TableType;
    UNSIGNED32 u32RetVal;
@@ -3253,7 +3253,7 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
 
 #define  adsEval                  NULL
 
-static ERRCODE adsPack( ADSAREAP pArea )
+static HB_ERRCODE adsPack( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsPack(%p)", pArea));
 
@@ -3278,7 +3278,7 @@ static ERRCODE adsPack( ADSAREAP pArea )
 #define  adsTrans                 NULL
 #define  adsTransRec              NULL
 
-static ERRCODE adsZap( ADSAREAP pArea )
+static HB_ERRCODE adsZap( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsZap(%p)", pArea));
 
@@ -3298,9 +3298,9 @@ static ERRCODE adsZap( ADSAREAP pArea )
    return SELF_GOTOP( ( AREAP ) pArea );
 }
 
-static ERRCODE adsChildEnd( ADSAREAP pArea, LPDBRELINFO pRelInfo )
+static HB_ERRCODE adsChildEnd( ADSAREAP pArea, LPDBRELINFO pRelInfo )
 {
-   ERRCODE uiError;
+   HB_ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("adsChildEnd(%p, %p)", pArea, pRelInfo));
 
@@ -3314,7 +3314,7 @@ static ERRCODE adsChildEnd( ADSAREAP pArea, LPDBRELINFO pRelInfo )
    return uiError;
 }
 
-static ERRCODE adsChildStart( ADSAREAP pArea, LPDBRELINFO pRelInfo )
+static HB_ERRCODE adsChildStart( ADSAREAP pArea, LPDBRELINFO pRelInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsChildStart(%p, %p)", pArea, pRelInfo));
 
@@ -3323,7 +3323,7 @@ static ERRCODE adsChildStart( ADSAREAP pArea, LPDBRELINFO pRelInfo )
    return SUPER_CHILDSTART( ( AREAP ) pArea, pRelInfo );
 }
 
-static ERRCODE adsChildSync( ADSAREAP pArea, LPDBRELINFO pRelInfo )
+static HB_ERRCODE adsChildSync( ADSAREAP pArea, LPDBRELINFO pRelInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsChildSync(%p, %p)", pArea, pRelInfo));
 
@@ -3337,7 +3337,7 @@ static ERRCODE adsChildSync( ADSAREAP pArea, LPDBRELINFO pRelInfo )
 
 #define adsSyncChildren                         NULL
 
-static ERRCODE adsClearRel( ADSAREAP pArea )
+static HB_ERRCODE adsClearRel( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsClearRel(%p)", pArea ));
 
@@ -3347,7 +3347,7 @@ static ERRCODE adsClearRel( ADSAREAP pArea )
    return SUCCESS;
 }
 
-static ERRCODE adsForceRel( ADSAREAP pArea )
+static HB_ERRCODE adsForceRel( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsForceRel(%p)", pArea));
 
@@ -3371,7 +3371,7 @@ static ERRCODE adsForceRel( ADSAREAP pArea )
 #define adsRelEval                              NULL
 #define adsRelText                              NULL
 
-static ERRCODE adsSetRel( ADSAREAP pArea, LPDBRELINFO  lpdbRelations )
+static HB_ERRCODE adsSetRel( ADSAREAP pArea, LPDBRELINFO  lpdbRelations )
 {
    UNSIGNED32 ulRetVal = ( UNSIGNED32 ) ~AE_SUCCESS;
    UNSIGNED8 *szExp;
@@ -3404,7 +3404,7 @@ static ERRCODE adsSetRel( ADSAREAP pArea, LPDBRELINFO  lpdbRelations )
    return SUPER_SETREL( ( AREAP ) pArea, lpdbRelations );
 }
 
-static ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    ADSHANDLE ahIndex[ 50 ];
    UNSIGNED16 u16ArrayLen = 50;
@@ -3433,7 +3433,7 @@ static ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    return SUCCESS;
 }
 
-static ERRCODE adsOrderListClear( ADSAREAP pArea )
+static HB_ERRCODE adsOrderListClear( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListClear(%p)", pArea));
 
@@ -3448,7 +3448,7 @@ static ERRCODE adsOrderListClear( ADSAREAP pArea )
    return SUCCESS;
 }
 
-static ERRCODE adsOrderListDelete( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE adsOrderListDelete( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListDelete(%p, %p)", pArea, pOrderInfo));
 
@@ -3474,7 +3474,7 @@ static ERRCODE adsOrderListDelete( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    return FAILURE;
 }
 
-static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    ADSHANDLE hIndex;
    UNSIGNED8 pucTagName[ ADS_MAX_TAG_NAME + 1 ];
@@ -3536,7 +3536,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    return SUCCESS;
 }
 
-static ERRCODE adsOrderListRebuild( ADSAREAP pArea )
+static HB_ERRCODE adsOrderListRebuild( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListRebuild(%p)", pArea));
 
@@ -3547,7 +3547,7 @@ static ERRCODE adsOrderListRebuild( ADSAREAP pArea )
 
 #define  adsOrderCondition        NULL
 
-static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
+static HB_ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 {
    ADSHANDLE  hIndex;
    ADSHANDLE  hTableOrIndex ;
@@ -3686,7 +3686,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    return SELF_GOTOP( ( AREAP ) pArea );
 }
 
-static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    ADSHANDLE hIndex;
    UNSIGNED32 u32RetVal;
@@ -3718,7 +3718,7 @@ static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    return SUCCESS;
 }
 
-static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo )
 {
    ADSHANDLE  hIndex  = 0;
    UNSIGNED8  aucBuffer[ MAX_STR_LEN + 1 ];
@@ -4177,7 +4177,7 @@ these are really global settings:
    return SUCCESS;
 }
 
-static ERRCODE adsClearFilter( ADSAREAP pArea )
+static HB_ERRCODE adsClearFilter( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsClearFilter(%p)", pArea));
    /*
@@ -4197,7 +4197,7 @@ static ERRCODE adsClearFilter( ADSAREAP pArea )
 #define  adsFilterText            NULL
 #define  adsScopeInfo             NULL
 
-static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
+static HB_ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSetFilter(%p, %p)", pArea, pFilterInfo));
 
@@ -4244,7 +4244,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 #define  adsError                 NULL
 #define  adsEvalBlock             NULL
 
-static ERRCODE adsRawLock( ADSAREAP pArea, USHORT uiAction, ULONG ulRecNo )
+static HB_ERRCODE adsRawLock( ADSAREAP pArea, USHORT uiAction, ULONG ulRecNo )
 {
    UNSIGNED32 u32RetVal;
    HB_TRACE(HB_TR_DEBUG, ("adsRawLock(%p, %hu, %lu)", pArea, uiAction, ulRecNo));
@@ -4310,7 +4310,7 @@ static ERRCODE adsRawLock( ADSAREAP pArea, USHORT uiAction, ULONG ulRecNo )
    return SUCCESS;
 }
 
-static ERRCODE adsLock( ADSAREAP pArea, LPDBLOCKINFO pLockInfo )
+static HB_ERRCODE adsLock( ADSAREAP pArea, LPDBLOCKINFO pLockInfo )
 {
    USHORT   uiAction;
    ULONG    ulRecNo;
@@ -4354,7 +4354,7 @@ static ERRCODE adsLock( ADSAREAP pArea, LPDBLOCKINFO pLockInfo )
    return SUCCESS;
 }
 
-static ERRCODE adsUnLock( ADSAREAP pArea, PHB_ITEM pRecNo )
+static HB_ERRCODE adsUnLock( ADSAREAP pArea, PHB_ITEM pRecNo )
 {
    ULONG ulRecNo;
 
@@ -4369,7 +4369,7 @@ static ERRCODE adsUnLock( ADSAREAP pArea, PHB_ITEM pRecNo )
 #define  adsCloseMemFile          NULL
 #define  adsCreateMemFile         NULL
 
-static ERRCODE adsGetValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+static HB_ERRCODE adsGetValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
 {
    UNSIGNED32 u32RetVal;
 
@@ -4399,7 +4399,7 @@ static ERRCODE adsGetValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, U
 
 #define  adsOpenMemFile           NULL
 
-static ERRCODE adsPutValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+static HB_ERRCODE adsPutValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
 {
    UNSIGNED32 u32RetVal;
 
@@ -4439,7 +4439,7 @@ static ERRCODE adsPutValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, U
 
 
 /* TODO: Use AdsDeleteFile() */
-static ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
+static HB_ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile, * szExt;
    PHB_ITEM pFileExt = NULL;
@@ -4525,7 +4525,7 @@ static ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex
                                                   UNSIGNED8    *pucFileName,
                                                   UNSIGNED16   *pusOnDisk );
 */
-static ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
+static HB_ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile;
    PHB_ITEM pFileExt = NULL;
@@ -4562,7 +4562,7 @@ static ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemInd
 
 #define  adsInit                  NULL
 
-static ERRCODE adsExit( LPRDDNODE pRDD )
+static HB_ERRCODE adsExit( LPRDDNODE pRDD )
 {
    HB_SYMBOL_UNUSED( pRDD );
 
@@ -4591,7 +4591,7 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
 }
 
 
-static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+static HB_ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
@@ -4753,7 +4753,7 @@ static void adsRegisterRDD( USHORT * pusRddId )
 
    if( pTable )
    {
-      ERRCODE errCode;
+      HB_ERRCODE errCode;
 
       if( uiCount )
          * uiCount = RDDFUNCSCOUNT;

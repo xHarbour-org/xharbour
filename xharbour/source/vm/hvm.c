@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.715 2009/02/04 00:11:38 likewolf Exp $
+ * $Id: hvm.c,v 1.716 2009/02/23 21:00:20 ronpinkas Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ static void    hb_vmArrayGen( ULONG ulElements ); /* generates an ulElements Arr
 static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
 
 /* Database */
-static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workarea using a given item or a substituted value */
+static HB_ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workarea using a given item or a substituted value */
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
 
 /* Hash */
@@ -6989,10 +6989,10 @@ void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol, PHB_ITEM pResul
 /* Database                        */
 /* ------------------------------- */
 
-static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
+static HB_ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
 {
    HB_THREAD_STUB
-   ERRCODE errCode;
+   HB_ERRCODE errCode;
    BOOL fRepeat;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSelectWorkArea(%p,%p)", pAlias, pField));

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.254 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: hbapi.h,v 1.255 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -314,7 +314,11 @@ typedef struct
 } DYNHB_ITEM, *PDYNHB_ITEM, *DYNHB_ITEM_PTR;
 
 /* RDD method return codes */
-typedef USHORT ERRCODE;
+typedef USHORT HB_ERRCODE;
+#define HB_SUCCESS            0
+#define HB_FAILURE            1
+
+/* return codes for other modules*/
 #define SUCCESS            0
 #define FAILURE            1
 
@@ -839,7 +843,7 @@ extern void       hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the refe
 extern void       hb_memvarValueDecRef( HB_HANDLE hValue ); /* decrease the reference count of a global value */
 extern void       hb_memvarValueDecGarbageRef( HB_HANDLE hValue ); /* decrease the reference count of a detached local variable */
 extern void       hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem ); /* copy an item into a symbol */
-extern ERRCODE    hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
+extern HB_ERRCODE    hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
 extern void       hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item, with error trapping */
 extern void       hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy a reference to a symbol value into an item, with error trapping */
 extern HB_EXPORT ULONG    hb_memvarGetPrivatesBase( void ); /* retrieve current PRIVATE variables stack base */
