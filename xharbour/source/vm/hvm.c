@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.716 2009/02/23 21:00:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.717 2009/02/24 12:38:33 marchuet Exp $
  */
 
 /*
@@ -990,6 +990,11 @@ int hb_vmQuit( void )
    hb_i18nExit();
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After i18n\n" );
+   #endif
+
+   hb_serviceExit();
+   #ifdef TRACE_QUIT
+      TraceLog( NULL, "After Service\n" );
    #endif
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
