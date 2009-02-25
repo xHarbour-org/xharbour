@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6382 2009/02/24 20:46:36 andijahja Exp $
+ * $Id: ChangeLog,v 1.6383 2009/02/25 14:30:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2009-02-25 09:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
    * include/hbexprb.c
-     ! Fixed compile ime optimization of Upper() to process chars as unsigned char
+     ! Fixed compile time optimization of Upper() to process chars as unsigned char
 
    /*
       This still leaves the question of CODEPAGE support for compile time optimizations

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.127 2009/02/13 16:12:23 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.128 2009/02/25 14:30:22 ronpinkas Exp $
  */
 
 /*
@@ -1731,15 +1731,14 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      if( pReduced->ExprType == HB_ET_STRING )
                      {
                         ULONG i;
-                        unsigned char *sCopy = (char *) hb_xgrab( pReduced->ulLength + 1 );
+                        unsigned char *sCopy = (unsigned char *) hb_xgrab( pReduced->ulLength + 1 );
 
                         memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
 
-                        pReduced = hb_compExprNewString( sCopy, pReduced->ulLength, TRUE );
+                        pReduced = hb_compExprNewString( (char *) sCopy, pReduced->ulLength, TRUE );
 
                         for ( i = 0; i < pReduced->ulLength; i++ )
                         {
-                           printf( "Chr: %i, __touppertab[]->%i, toupper()->%i\n", sCopy[i], __touppertab[ sCopy[i] ], toupper( sCopy[i] ) );
                            sCopy[i] = toupper( sCopy[i] );
                         }
 
