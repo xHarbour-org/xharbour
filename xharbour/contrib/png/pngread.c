@@ -1,12 +1,12 @@
 /*
- * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.35 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -910,7 +910,6 @@ png_read_image(png_structp png_ptr, png_bytepp image)
 void PNGAPI
 png_read_end(png_structp png_ptr, png_infop info_ptr)
 {
-   (void) info_ptr;
    png_debug(1, "in png_read_end");
    if (png_ptr == NULL) return;
    png_crc_finish(png_ptr, 0); /* Finish off CRC from last IDAT chunk */
@@ -1087,8 +1086,8 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL, end_info_ptr = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_free_ptr free_fn; // = NULL;
-   png_voidp mem_ptr; // = NULL;
+   png_free_ptr free_fn;
+   png_voidp mem_ptr;
 #endif
 
    png_debug(1, "in png_destroy_read_struct");
@@ -1441,11 +1440,11 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
+      png_memset(info_ptr->row_pointers, 0, info_ptr->height
+         * png_sizeof(png_bytep));
       for (row = 0; row < (int)info_ptr->height; row++)
-      {
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));
-      }
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);

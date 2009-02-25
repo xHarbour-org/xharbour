@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct
@@ -872,9 +872,7 @@ png_byte PNGAPI
 png_get_mmx_bitdepth_threshold (png_structp png_ptr)
 {
     /* obsolete, to be removed from libpng-1.4.0 */
-    // return (png_ptr? 0: 0);
-    (void) png_ptr;
-    return 0;
+    return (png_ptr? 0: 0);
 }
 
 /* this function was added to libpng 1.2.0 */
@@ -888,7 +886,7 @@ png_get_mmx_rowbytes_threshold (png_structp png_ptr)
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-/* these functions were added to libpng 1.2.6 */
+/* These functions were added to libpng 1.2.6 */
 png_uint_32 PNGAPI
 png_get_user_width_max (png_structp png_ptr)
 {

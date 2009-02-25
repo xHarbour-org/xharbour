@@ -1,12 +1,12 @@
 /*
- * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.35 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -20,6 +20,9 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef _MSC_VER
+#define fileno _fileno
+#endif
 #ifdef PNG_WRITE_SUPPORTED
 
 /* Write the data to whatever output you are using.  The default routine
@@ -140,7 +143,7 @@ png_default_flush(png_structp png_ptr)
    if (png_ptr == NULL) return;
 #if !defined(_WIN32_WCE)
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
-   if (io_ptr != NULL)
+   if (io_ptr != NULL && fileno(io_ptr) != -1)
       fflush(io_ptr);
 #endif
 }

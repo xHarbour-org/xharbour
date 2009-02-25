@@ -1,12 +1,12 @@
 /*
- * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.34 - December 18, 2008
+ * libpng version 1.2.35 - February 14, 2009
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -236,6 +236,8 @@
 #  include <windows.h>
    /* Console I/O functions are not supported on WindowsCE */
 #  define PNG_NO_CONSOLE_IO
+   /* abort() may not be supported on some/all Windows CE platforms */
+#  define PNG_ABORT() exit(-1)
 #  ifdef PNG_DEBUG
 #    undef PNG_DEBUG
 #  endif
@@ -402,7 +404,7 @@
 /* I have no idea why is this necessary... */
 #if defined(_MSC_VER) && (defined(WIN32) || defined(_Windows) || \
     defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__))
-#  include <stdlib.h>
+#  include <malloc.h>
 #endif
 
 /* This controls how fine the dithering gets.  As this allocates

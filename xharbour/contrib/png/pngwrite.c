@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.3 2008/11/07 20:58:07 andijahja Exp $
+ * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.2.31 [August 19, 2008]
+ * Last changed in libpng 1.2.34 [December 18, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
