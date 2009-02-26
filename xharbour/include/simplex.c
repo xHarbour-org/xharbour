@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.33 2008/04/12 18:57:36 ronpinkas Exp $
+ * $Id: simplex.c,v 1.34 2008/04/12 23:31:59 andijahja Exp $
  */
 
 /*
@@ -543,10 +543,10 @@ static int rulecmp( const void * pLeft, const void * pRight );
 YY_DECL
 {
     if( sPair == NULL )
-	 {
+    {
         sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
         LEX_USER_SETUP();
-	 }
+    }
 
     if( YY_BUF_SIZE > 0 && szLexBuffer == NULL )
     {
@@ -1467,6 +1467,9 @@ void SimpLex_CheckWords( void )
             sKeys2Match = pNextSpacer + 4;
             DEBUG_INFO( printf( "Partial %s Match! [%s] == [%s] - Looking for: [%s]\n", sDesc, sWord2Check, aCheck[i].sWord, sKeys2Match ) );
 
+            /* Saving Token Length. */
+            iSavedLen = iLen;
+
             // Held Token at this point may only be acOmmit, acReturn, acNewLine, or sSelf.
             if( iHold )
             {
@@ -1482,9 +1485,6 @@ void SimpLex_CheckWords( void )
 
             /* Saving this pointer of the input stream, we might have to get here again. */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
-
-            /* Saving Token Length. */
-            iSavedLen = iLen;
 
             DEBUG_INFO( printf( "Saved Buffer Position: %i at: [%s] Len: %i\n", iBaseSize, szBaseBuffer, iSavedLen ) );
          }
