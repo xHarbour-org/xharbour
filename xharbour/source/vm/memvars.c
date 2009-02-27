@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.137 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: memvars.c,v 1.138 2009/02/24 12:38:33 marchuet Exp $
  */
 
 /*
@@ -2094,8 +2094,27 @@ HB_FUNC( __MVRESTORE )
 
       if( ! bAdditive )
       {
+         PHB_DYNS pDynGetList = hb_dynsymFind( "GETLIST" );
+         PHB_ITEM pGetListVal;
+
+         if( pDynGetList && pDynGetList->hMemvar )
+         {
+            pGetListVal = hb_itemNew( hb_memvarGetValueByHandle( pDynGetList->hMemvar ) );
+         }
+         else
+         {
+            pGetListVal = NULL;
+         }
+
          hb_dynsymEval( hb_memvarClear, NULL );
          s_privateStackBase = s_privateStackCnt = 0;
+
+         // Clipper does not seem to care if the Restore operation might have overriden the value!!!
+         if( pGetListVal )
+         {
+            hb_memvarCreateFromDynSymbol( pDynGetList, VS_PUBLIC, pGetListVal );
+            hb_itemRelease( pGetListVal ) ;
+         }
       }
 
       /* xHarbour extended feature, save variables with 64 chars long */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6389 2009/02/27 12:19:12 modalsist Exp $
+ * $Id: ChangeLog,v 1.6390 2009/02/27 14:17:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-27 15:03 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * source\vm\memvars.c
+     ! Fixed __M[V]RESTORE() to be Clipper compatible.
+       Clipper protects the value of GetList if it exists, when ADDITIVE not specified
 
 2009-02-27 09:45 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
    * utils/xbscript/xbscript.prg
