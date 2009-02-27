@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.191 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: hbmake.prg,v 1.192 2009/02/13 16:12:24 ronpinkas Exp $
  */
 
 /*
@@ -60,8 +60,6 @@
 #include "radios.ch"
 #include "inkey.ch"
 
-
-//#include "wvtgui.ch"
 
 #define EOL Hb_OsNewLine()
 #define CRLF Hb_OsNewLine()
@@ -3007,8 +3005,8 @@ Endif // Create and compile
          FWrite( s_nMakeFileHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib "  + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSE
          if lGtwvt
-            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib wvtgui.lib")
-            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvt.lib wvtgui.lib")
+            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib gtwvg.lib")
+            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvt.lib gtwvg.lib")
          elseif lGtwvw
             cDefaultLibs   := if(lMWvW,'mwvw.lib ', '') + strtran(cDefaultLibs,"gtwin.lib","gtwvw.lib ")
             cDefaultLibsMt := if(lMWvW,'mwvw.lib ', '') + strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib ")

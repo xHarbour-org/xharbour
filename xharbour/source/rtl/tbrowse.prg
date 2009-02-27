@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.211 2008/11/07 11:16:49 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.212 2008/12/06 20:41:46 modalsist Exp $
  */
 
 /*
@@ -189,8 +189,10 @@ CLASS TDataCache STATIC
    METHOD   SetColRect( aRect )          // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
    METHOD   ResetColRectArea()           // Reset colorrect area.
    METHOD   ResetColRect()               // Reset colorrect array.
-PROTECTED:
+
+//PROTECTED:
    METHOD  InitCache()                   // Init DataCache vars.
+
 HIDDEN:
 
    DATA  nCurRow                         // Current Row inside cache
@@ -235,8 +237,8 @@ METHOD InitCache( lNew ) CLASS TDataCache
 *-----------------------------------------*
 Default lNew to .f.
 
-   ::nMaxRow  := ::oBrowse:RowCount
-   ::nLastRow := Max(1, ::nMaxRow )
+   ::nMaxRow  := Max(1,::oBrowse:RowCount)
+   ::nLastRow := ::nMaxRow 
 
    ::lInvalid := .F.
    ::aCache   := Array( ::nMaxRow )
@@ -823,7 +825,7 @@ CLASS TBrowse STATIC
    METHOD DelColumn( nPos )                       // Delete a column object from a Tbrowse
    METHOD InsColumn( nPos, oCol )                 // Insert a column object in a Tbrowse
 
-   METHOD GetColumn( nColumn )                    // Gets a specific TBColumn object
+   METHOD GetColumn( xColumn )                    // Returns a specific TBColumn object by it's position or name.
    METHOD SetColumn( nColumn, oCol )              // Replaces one TBColumn object with another
 
    METHOD ColWidth( nColumn )                     // Returns the display width of a particular column
@@ -851,6 +853,11 @@ CLASS TBrowse STATIC
    METHOD HitTest( nMouseRow,nMouseCol )
    METHOD SetStyle( nStyle,lSetting )
    ACCESS Style INLINE ::aStyle
+#endif
+
+#ifdef HB_EXTENSION
+   METHOD GetColPos( cName )                            // Gets a Column position into tbrowse by it's name.
+   METHOD GetColName( nPos )                            // Gets a Column name into tbrowse by it's number position.
 #endif
 
 
@@ -1386,9 +1393,57 @@ LOCAL oOldCol
 Return oOldCol
 
 *------------------------------------------------------*
-METHOD GetColumn( nColumn ) CLASS TBrowse
+METHOD GetColumn( xColumn ) CLASS TBrowse
 *------------------------------------------------------*
-Return iif( 0 < nColumn .AND. nColumn <= ::nColCount, ::aColsInfo[ nColumn, TBCI_OBJ ], NIL )
+Local aCol, oCol
+
+if hb_isnumeric(xColumn)
+
+   if xColumn > 0 .and. xColumn <= ::nColCount
+      oCol := ::aColsInfo[ xColumn, TBCI_OBJ ]
+   endif
+
+#ifdef HB_EXTENSION
+elseif hb_isstring(xColumn)
+
+   if ! empty( xColumn )
+
+      for each aCol in ::aColsInfo
+          if Upper( aCol[ TBCI_HEADING ] ) == Upper( xColumn )
+             oCol := aCol[ TBCI_OBJ ]
+             exit
+          endif
+      next
+
+   endif
+#endif
+endif
+
+Return oCol
+
+#ifdef HB_EXTENSION
+*------------------------------------------------------*
+METHOD GetColPos( cName ) CLASS TBrowse
+*------------------------------------------------------*
+Local nPos := 0
+
+   if hb_isString( cName ) .and. ! empty( cName )
+      nPos := AScan( ::aColsInfo, {|x,y| ! empty(x) .and. Upper( ::aColsInfo[y,TBCI_HEADING] ) == Upper( cName ) } )
+   endif
+
+Return nPos
+
+*------------------------------------------------------*
+METHOD GetColName( nPos ) CLASS TBrowse
+*------------------------------------------------------*
+Local cName := ""
+
+   if hb_isNumeric( nPos ) .and. nPos > 0 .and. nPos <= ::nColCount
+      cName := ::aColsInfo[ nPos, TBCI_HEADING ]
+   endif
+
+Return cName
+#endif
 
 *------------------------------------------------------*
 METHOD DelColumn( nPos ) CLASS TBrowse
