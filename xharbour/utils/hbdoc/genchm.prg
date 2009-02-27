@@ -1,5 +1,5 @@
 /*
- * $Id: genchm.prg,v 1.3 2005/02/04 09:11:28 patrickmast Exp $
+ * $Id: genchm.prg,v 1.4 2009/02/13 16:12:24 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,6 @@ MEMVAR aDocInfo
 MEMVAR aWww
 MEMVAR aResult
 
-STATIC aAlso
 STATIC aFiTable       := {}
 STATIC aSiTable       := {}
 STATIC lIsTable       := .F.

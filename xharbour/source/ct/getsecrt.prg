@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.9 2006/02/01 19:47:21 gdrouillard Exp $
+ * $Id: getsecrt.prg,v 1.10 2008/03/13 10:49:39 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 
 #include "setcurs.ch"
 
-MEMVAR nLen
 #command @ <row>, <col> GET <var>                                ;
                         [<clauses,...>]                          ;
                         PASSWORD                                 ;

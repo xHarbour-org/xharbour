@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.7 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id: pdfhbdocs.prg,v 1.8 2009/02/13 16:12:21 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,6 @@ STATIC sziFont            := 0
 STATIC fPageWidth         := a4_width
 STATIC fPageHeigth        := a4_height
 STATIC iPage              := 1
-STATIC bFItems
 STATIC iLastLinkPos       := 0
 STATIC oPdf
 

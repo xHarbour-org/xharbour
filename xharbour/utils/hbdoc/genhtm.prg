@@ -1,5 +1,5 @@
 /*
- * $Id: genhtm.prg,v 1.6 2005/02/04 09:11:29 patrickmast Exp $
+ * $Id: genhtm.prg,v 1.7 2009/02/13 16:12:24 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,6 @@ MEMVAR aDirList
 MEMVAR aDocInfo, aDocwwwInfo
 MEMVAR aWww,aResult
 
-STATIC aAlso
 STATIC aFiTable       := {}
 STATIC aSiTable       := {}
 STATIC lIsTable       := .F.
