@@ -861,7 +861,6 @@ STATIC FUNCTION PP_InitContext()
    aPPContext[ PP_CONTEXT_nIfLevel ] := 0
    aPPContext[ PP_CONTEXT_aProcStack ] := {}
    aPPContext[ PP_CONTEXT_nProcStack ] := 0
-   aPPContext[ PP_CONTEXT_aProc ] := NIL
 
    aPPContext[ PP_CONTEXT_asPrivates ] := {}
    aPPContext[ PP_CONTEXT_asPublics ] := {}
