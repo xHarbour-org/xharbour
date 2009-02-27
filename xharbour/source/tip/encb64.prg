@@ -1,5 +1,5 @@
 /*
- * $Id: encb64.prg,v 1.3 2005/09/01 02:39:10 lculik Exp $
+ * $Id: encb64.prg,v 1.4 2007/02/27 15:59:40 druzus Exp $
  */
 
 /*
@@ -137,12 +137,12 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
             break;
          case 2:
             cElem1 = nPos < nLen -1 ? (unsigned char) cData[ nPos + 1] : 0;
-            cElem = ((cElem & 0x3) << 4) | cElem1 >> 4;
+            cElem = ((cElem & 0x3) << 4) | (cElem1 >> 4);
             nPos++;
             break;
          case 3:
             cElem1 = nPos < nLen -1 ? (unsigned char) cData[ nPos + 1] : 0;
-            cElem = ((cElem & 0xF) << 2) | cElem1 >> 6;
+            cElem = ((cElem & 0xF) << 2) | (cElem1 >> 6);
             nPos++;
             break;
          case 4:
