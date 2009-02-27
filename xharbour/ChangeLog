@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6388 2009/02/27 11:09:52 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6389 2009/02/27 12:19:12 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-02-27 09:45 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * utils/xbscript/xbscript.prg
+     * Compiler warning
+
 2009-02-27 09:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     + added GetColPos() and GetColName() methods. These methods are usefull
-      to create dinamic tbrowse/browse/dbedit. 
+      to create dinamic tbrowse/browse/dbedit.
     ! fix to work with contrib/gtwvg/tests/demowvg.prg
 
   * source/utils/hbmake/hbmake.prg

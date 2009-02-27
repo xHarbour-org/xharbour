@@ -390,7 +390,7 @@ STATIC s_sFile := "", s_sIncludeFile
 STATIC s_nRow, s_nCol
 
 STATIC s_nProcId := 0, s_aProcedures := {}, s_xRet, s_nIfLevel := 0, ;
-       s_aProcStack := {}, s_nProcStack := 0, s_aProc
+       s_aProcStack := {}, s_nProcStack := 0
 
 STATIC s_asPrivates := {}, s_asPublics := {}, s_asLocals := {}, ;
        s_aStatics, s_aParams := {}
@@ -445,45 +445,44 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #define PP_CONTEXT_nIfLevel               26
 #define PP_CONTEXT_aProcStack             27
 #define PP_CONTEXT_nProcStack             28
-#define PP_CONTEXT_aProc                  29
-#define PP_CONTEXT_asPrivates             30
-#define PP_CONTEXT_asPublics              31
-#define PP_CONTEXT_asLocals               32
-#define PP_CONTEXT_aStatics               33
-#define PP_CONTEXT_aParams                34
-#define PP_CONTEXT_sModule                35
-#define PP_CONTEXT_aInitExit              36
-#define PP_CONTEXT_nCompIf                37
-#define PP_CONTEXT_nCompLoop              38
-#define PP_CONTEXT_aIfJumps               39
-#define PP_CONTEXT_aLoopJumps             40
-#define PP_CONTEXT_acFlowType             41
-#define PP_CONTEXT_nFlowId                42
-#define PP_CONTEXT_lRunLoaded             43
-#define PP_CONTEXT_lDotLoaded             44
-#define PP_CONTEXT_lClsLoaded             45
-#define PP_CONTEXT_lFWLoaded              46
-#define PP_CONTEXT_aSwitchDefs            47
-#define PP_CONTEXT_sPending               48
-#define PP_CONTEXT_lTrying                49
-#define PP_CONTEXT_lReturnRequested       50
-#define PP_CONTEXT_bExternalRecovery      51
-#define PP_CONTEXT_anEnumIndex            52
-#define PP_CONTEXT_nForEachIndex          53
-#define PP_CONTEXT_aEnumerations          54
-#define PP_CONTEXT_anEnumerator           55
-#define PP_CONTEXT_anForEachStartingBlock 56
-#define PP_CONTEXT_bDefRTEBlock           57
-#define PP_CONTEXT_bRTEBlock              58
-#define PP_CONTEXT_bInterceptRTEBlock     59
-#define PP_CONTEXT_anRecover              60
-#define PP_CONTEXT_acRecover              61
-#define PP_CONTEXT_aSequence              62
-#define PP_CONTEXT_bDbgMatch              63
-#define PP_CONTEXT_bDbgExp                64
-#define PP_CONTEXT_bDbgPPO                65
+#define PP_CONTEXT_asPrivates             29
+#define PP_CONTEXT_asPublics              30
+#define PP_CONTEXT_asLocals               31
+#define PP_CONTEXT_aStatics               32
+#define PP_CONTEXT_aParams                33
+#define PP_CONTEXT_sModule                34
+#define PP_CONTEXT_aInitExit              35
+#define PP_CONTEXT_nCompIf                36
+#define PP_CONTEXT_nCompLoop              37
+#define PP_CONTEXT_aIfJumps               38
+#define PP_CONTEXT_aLoopJumps             39
+#define PP_CONTEXT_acFlowType             40
+#define PP_CONTEXT_nFlowId                41
+#define PP_CONTEXT_lRunLoaded             42
+#define PP_CONTEXT_lDotLoaded             43
+#define PP_CONTEXT_lClsLoaded             44
+#define PP_CONTEXT_lFWLoaded              45
+#define PP_CONTEXT_aSwitchDefs            46
+#define PP_CONTEXT_sPending               47
+#define PP_CONTEXT_lTrying                48
+#define PP_CONTEXT_lReturnRequested       49
+#define PP_CONTEXT_bExternalRecovery      50
+#define PP_CONTEXT_anEnumIndex            51
+#define PP_CONTEXT_nForEachIndex          52
+#define PP_CONTEXT_aEnumerations          53
+#define PP_CONTEXT_anEnumerator           54
+#define PP_CONTEXT_anForEachStartingBlock 55
+#define PP_CONTEXT_bDefRTEBlock           56
+#define PP_CONTEXT_bRTEBlock              57
+#define PP_CONTEXT_bInterceptRTEBlock     58
+#define PP_CONTEXT_anRecover              59
+#define PP_CONTEXT_acRecover              60
+#define PP_CONTEXT_aSequence              61
+#define PP_CONTEXT_bDbgMatch              62
+#define PP_CONTEXT_bDbgExp                63
+#define PP_CONTEXT_bDbgPPO                64
 
-#define PP_CONTEXT_SIZE                   65
+#define PP_CONTEXT_SIZE                   64
 
 STATIC s_aPPContext
 
