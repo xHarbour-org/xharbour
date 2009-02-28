@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.56 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: transfrm.c,v 1.57 2009/02/20 12:48:31 marchuet Exp $
  */
 
 /*
@@ -72,7 +72,7 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
-  #define TOUPPER(c)    (((hb_cdppage())->nChars)? (char)(hb_cdppage())->s_upper[c&255] : toupper( (BYTE) c ) )
+  #define TOUPPER(c)    (((hb_cdppage())->nChars)? (char)(hb_cdppage())->s_upper[c&255] : (char)toupper( (BYTE) c ) )
 #else
   #define TOUPPER(c)    toupper( (BYTE) c )
 #endif
@@ -335,7 +335,7 @@ HB_FUNC( TRANSFORM )
                         szResult[ ulResultPos++ ] = ( szExp[ ulExpPos ] == 't' ||
                                                       szExp[ ulExpPos ] == 'T' ||
                                                       szExp[ ulExpPos ] == 'y' ||
-                                                      szExp[ ulExpPos ] == 'Y' ) ? 'Y' : 'N';
+                                                      szExp[ ulExpPos ] == 'Y' ) ? (char)'Y' : (char)'N';
                         ulExpPos++;
                         bAnyPic = TRUE;
                         break;
@@ -1091,7 +1091,7 @@ HB_FUNC( TRANSFORM )
                {
                   if( !bDone )
                   {
-                     szResult[ ulResultPos ] = hb_itemGetL( pValue ) ? 'Y' : 'N';
+                     szResult[ ulResultPos ] = hb_itemGetL( pValue ) ? (char)'Y' : (char)'N';
                      bDone = TRUE;           /* Logical written          */
                   }
                   else
@@ -1106,7 +1106,7 @@ HB_FUNC( TRANSFORM )
                {
                   if( !bDone )
                   {
-                     szResult[ ulResultPos ] = hb_itemGetL( pValue ) ? 'T' : 'F';
+                     szResult[ ulResultPos ] = hb_itemGetL( pValue ) ? (char)'T' : (char)'F';
                      bDone = TRUE;
                   }
                   else

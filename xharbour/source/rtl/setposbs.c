@@ -1,5 +1,5 @@
 /*
- * $Id: setposbs.c,v 1.1.1.1 2001/12/21 10:42:02 ronpinkas Exp $
+ * $Id: setposbs.c,v 1.2 2008/03/16 19:16:01 likewolf Exp $
  */
 
 /*
@@ -67,5 +67,5 @@ HB_FUNC( SETPOSBS ) /* Move the screen position to the right by one column */
             [vszakats] */
 
    hb_gtGetPos( &iRow, &iCol );
-   hb_gtSetPos( iRow, iCol + 1 );
+   hb_gtSetPos( iRow,  (SHORT) (iCol + 1 ));
 }

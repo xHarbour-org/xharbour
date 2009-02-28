@@ -1,5 +1,5 @@
 /*
- * $Id: soundex.c,v 1.2 2004/02/20 12:52:52 druzus Exp $
+ * $Id: soundex.c,v 1.3 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -87,14 +87,14 @@ HB_FUNC( SOUNDEX )
 
          /* Convert to uppercase: toupper() */
          if( cChar >= 'a' && cChar <= 'z' )
-            cChar -= ( 'a' - 'A' );
+            cChar -= (char) ( 'a' - 'A' );
 
          /* Check if isalpha() */
          if( cChar >= 'A' && cChar <= 'Z' )
          {
             static const char s_szTable[] = "01230120022455012623010202"; /* NOTE: SoundEx result codes for letters from "A" to "Z" */
                                          /* "ABCDEFGHIJKLMNOPQRSTUVWXYZ" */
-            char cCharConverted = ( ( cChar - 'A' ) > ( (char) sizeof( s_szTable ) - 1 ) ) ? '9' : s_szTable[ cChar - 'A' ];
+            char cCharConverted = ( ( cChar - 'A' ) > ( (char) sizeof( s_szTable ) - 1 ) ) ? (char) '9' : (char) s_szTable[ cChar - 'A' ];
 
             if( nResultPos == 0 )
                szResult[ nResultPos++ ] = cChar;

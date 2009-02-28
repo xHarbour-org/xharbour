@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.38 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: hbffind.c,v 1.39 2009/02/08 21:13:26 guerra000 Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.38 2009/01/24 00:33:09 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.39 2009/02/08 21:13:26 guerra000 Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -533,7 +533,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       FILETIME ft;
       SYSTEMTIME time;
 
-      hb_strncpy( ffind->szName,( info->hFindFile == INVALID_HANDLE_VALUE ? info->szVolInfo :info->pFindFileData.cFileName ), sizeof( ffind->szName ) - 1 );
+      hb_strncpy( ffind->szName,( info->hFindFile == INVALID_HANDLE_VALUE ? (const char *) info->szVolInfo : (const char *)info->pFindFileData.cFileName ), sizeof( ffind->szName ) - 1 );
 
       if (info->hFindFile == INVALID_HANDLE_VALUE )
       {

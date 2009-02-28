@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.23 2007/12/23 18:36:26 likewolf Exp $
+ * $Id: expropt1.c,v 1.24 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -151,7 +151,7 @@ HB_EXPR_PTR hb_compExprNew( int iType )
 
    pExpr = ( HB_EXPR_PTR ) HB_XGRAB( sizeof( HB_EXPR ) );
 
-   pExpr->ExprType = iType;
+   pExpr->ExprType = (unsigned char)iType;
    pExpr->pNext    = NULL;
    pExpr->ValType  = HB_EV_UNKNOWN;
    pExpr->Counter  = 1;
@@ -1094,12 +1094,12 @@ HB_EXPR_PTR hb_compExprNewNegate( HB_EXPR_PTR pNegExpr )
       if( pNegExpr->value.asNum.NumType == HB_ET_DOUBLE )
       {
          pNegExpr->value.asNum.dVal = - pNegExpr->value.asNum.dVal;
-         pNegExpr->value.asNum.bWidth = HB_DBL_LENGTH( pNegExpr->value.asNum.dVal );
+         pNegExpr->value.asNum.bWidth = (unsigned char) HB_DBL_LENGTH( pNegExpr->value.asNum.dVal );
       }
       else
       {
          pNegExpr->value.asNum.lVal = - pNegExpr->value.asNum.lVal;
-         pNegExpr->value.asNum.bWidth = HB_LONG_LENGTH( pNegExpr->value.asNum.lVal );
+         pNegExpr->value.asNum.bWidth = (unsigned char) HB_LONG_LENGTH( pNegExpr->value.asNum.lVal );
       }
       pExpr = pNegExpr;
    }

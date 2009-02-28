@@ -1,5 +1,5 @@
 /*
- * $Id: setpos.c,v 1.2 2004/10/23 23:31:31 oh1 Exp $
+ * $Id: setpos.c,v 1.3 2008/03/16 19:16:01 likewolf Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 HB_FUNC( SETPOS ) /* Sets the screen position */
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_gtSetPos( hb_parni( 1 ), hb_parni( 2 ) );
+      hb_gtSetPos( ( SHORT ) hb_parni( 1 ), ( SHORT ) hb_parni( 2 ) );
 }
 
 HB_FUNC( ROW ) /* Return the current screen row position (zero origin) */

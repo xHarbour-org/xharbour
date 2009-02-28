@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.6 2004/04/11 20:00:10 vouchcac Exp $
+ * $Id: scroll.c,v 1.7 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -137,8 +137,8 @@ HB_FUNC( SCROLLFIXED )
                 ( USHORT ) hb_parni( 2 ),
                 ( USHORT ) hb_parni( 3 ),
                 ( USHORT ) hb_parni( 4 ),
-                hb_parni( 5 ),   /* Defaults to zero on bad type */
-                hb_parni( 6 ) ); /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 5 ),   /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 6 ) ); /* Defaults to zero on bad type */
 }
 
 

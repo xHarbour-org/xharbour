@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.34 2008/12/05 10:51:33 marchuet Exp $
+ * $Id: philes.c,v 1.35 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( FOPEN )
    if( ISCHAR( 1 ) )
    {
       hb_retnint( ( HB_NHANDLE ) hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
-                  ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : FO_READ | FO_COMPAT ) );
+                  ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : ( USHORT ) (FO_READ | FO_COMPAT )) );
       hb_fsSetFError( hb_fsError() );
    }
    else
@@ -107,8 +107,8 @@ HB_FUNC( HB_FCREATE )
    if( ISCHAR( 1 ) )
    {
       hb_retnint( ( HB_NHANDLE ) hb_fsCreateEx( ( BYTE * ) hb_parc( 1 ),
-                  ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL,
-                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : FO_COMPAT ) );
+                  ISNUM( 2 ) ? ( ULONG ) hb_parni( 2 ) : ( ULONG ) FC_NORMAL,
+                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : ( USHORT )FO_COMPAT ) );
       hb_fsSetFError( hb_fsError() );
    }
    else
@@ -253,7 +253,7 @@ HB_FUNC( FSEEK )
    {
       hb_retnint( hb_fsSeekLarge( hb_numToHandle( hb_parnint( 1 ) ),
                                   hb_parnint( 2 ),
-                                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : FS_SET ) );
+                                  ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : ( USHORT )FS_SET ) );
       uiError = hb_fsError();
    }
    else
@@ -305,7 +305,7 @@ HB_FUNC( CURDIR )
    BYTE byBuffer[ _POSIX_PATH_MAX + 1 ];
 
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, byBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, _POSIX_PATH_MAX + 1 );
 
    hb_retc( ( char * ) byBuffer );
 }
@@ -382,7 +382,7 @@ HB_FUNC( HB_FLOCK )
       fResult = hb_fsLockLarge( hb_numToHandle( hb_parnint( 1 ) ),
                                 ( HB_FOFFSET ) hb_parnint( 2 ),
                                 ( HB_FOFFSET ) hb_parnint( 3 ),
-                                FL_LOCK | ( ( USHORT ) hb_parni( 4 ) & ~FL_MASK ) );
+                                ( USHORT ) (FL_LOCK | ( ( USHORT ) hb_parni( 4 ) & ~FL_MASK ) ) );
       uiError = hb_fsError();
    }
    hb_fsSetFError( uiError );

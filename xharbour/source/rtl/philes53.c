@@ -1,5 +1,5 @@
 /*
- * $Id: philes53.c,v 1.3 2001/06/14 21:20:43 dholm Exp $
+ * $Id: philes53.c,v 1.1.1.1 2001/12/21 10:41:57 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 HB_FUNC( FSETDEVMOD )
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_fsSetDevMode( hb_parni( 1 ), hb_parni( 2 ) );
+      hb_fsSetDevMode( ( HB_FHANDLE ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ) );
 }
 
 #endif

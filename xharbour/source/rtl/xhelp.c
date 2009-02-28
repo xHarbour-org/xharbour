@@ -1,5 +1,5 @@
 /*
- * $Id: xhelp.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
+ * $Id: xhelp.c,v 1.2 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_FUNC( __XHELP )
    {
       /* awhite: push the existing params after the dyn symbol */
 
-      USHORT uiPCount = hb_pcount();
+      USHORT uiPCount = (USHORT)hb_pcount();
       USHORT uiParam;
 
       hb_vmPushSymbol( pDynSym->pSymbol );

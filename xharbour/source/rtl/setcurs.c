@@ -1,5 +1,5 @@
 /*
- * $Id: setcurs.c,v 1.6 2001/04/12 18:56:29 dholm Exp $
+ * $Id: setcurs.c,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
  */
 
 /*
@@ -76,5 +76,5 @@ HB_FUNC( SETCURSOR )
    hb_retni( uiCursor );
 
    if( ISNUM( 1 ) )
-      hb_gtSetCursor( hb_parni( 1 ) );
+      hb_gtSetCursor( ( USHORT ) hb_parni( 1 ) );
 }

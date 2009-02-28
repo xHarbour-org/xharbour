@@ -1,5 +1,5 @@
 /*
- * $Id: philesx.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: philesx.c,v 1.4 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( CURDRIVE )
 {
    char szDrive[ 1 ];
 
-   szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
+   szDrive[ 0 ] = ( ( char ) hb_fsCurDrv()  + 'A');
    hb_retclen( szDrive, 1 );
 
    if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )

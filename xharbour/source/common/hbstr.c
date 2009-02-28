@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.35 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: hbstr.c,v 1.36 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -1072,7 +1072,7 @@ char * hb_stripOutComments( char * buffer )
 {
    if( buffer && *buffer )
    {
-      USHORT ui = strlen( buffer );
+      USHORT ui = (USHORT) strlen( buffer );
       char *szOut = (char*) hb_xgrab( ui + 1 );
       int i;
       int uu = 0;

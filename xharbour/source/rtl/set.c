@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.94 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: set.c,v 1.95 2009/02/20 12:48:31 marchuet Exp $
  */
 
 /*
@@ -685,7 +685,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_CURSOR:
          if( args >= 2 && HB_IS_NUMERIC( pArg2 ) )
-            hb_retni( hb_conSetCursor( TRUE, hb_itemGetNI( pArg2 ) ) );
+            hb_retni( hb_conSetCursor( TRUE, ( USHORT ) hb_itemGetNI( pArg2 ) ) );
          else
             hb_retni( hb_conSetCursor( FALSE, 0 ) );
          break;
@@ -1134,7 +1134,7 @@ HB_FUNC( SET )
                }
                else
                {
-                  hb_set.HB_SET_TRACESTACK = set_number( pArg2, hb_set.HB_SET_TRACESTACK );
+                  hb_set.HB_SET_TRACESTACK = (char) set_number( pArg2, hb_set.HB_SET_TRACESTACK );
                }
             }
             else
@@ -1230,7 +1230,7 @@ HB_FUNC( SET )
          szDirSep[ 1 ] = '\0';
          hb_retc( szDirSep );
          if( args > 1 )
-            hb_set.HB_SET_DIRSEPARATOR = set_char( pArg2, hb_set.HB_SET_DIRSEPARATOR );
+            hb_set.HB_SET_DIRSEPARATOR =  set_char( pArg2, hb_set.HB_SET_DIRSEPARATOR );
          break;
       }
 

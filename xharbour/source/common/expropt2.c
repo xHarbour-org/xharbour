@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.14 2007/08/28 15:51:33 ronpinkas Exp $
+ * $Id: expropt2.c,v 1.15 2007/08/28 19:04:54 ronpinkas Exp $
  */
 
 /*
@@ -242,7 +242,7 @@ HB_EXPR_PTR hb_compExprReduceMult( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                  pRight->value.asNum.bDec == HB_DEFAULT_DECIMALS )
                pSelf->value.asNum.bDec = HB_DEFAULT_DECIMALS;
             else
-               pSelf->value.asNum.bDec = pLeft->value.asNum.bDec + pRight->value.asNum.bDec;
+               pSelf->value.asNum.bDec = (unsigned char) ( pLeft->value.asNum.bDec + pRight->value.asNum.bDec);
             pSelf->value.asNum.NumType = HB_ET_DOUBLE;
 
             break;
@@ -1086,7 +1086,7 @@ HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL )
                pSelf->ExprType = HB_ET_NUMERIC;
                pSelf->ValType  = HB_EV_NUMERIC;
                pSelf->value.asNum.NumType = HB_ET_LONG;
-               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal >> pRight->value.asNum.lVal;
+               pSelf->value.asNum.lVal =  pLeft->value.asNum.lVal >> pRight->value.asNum.lVal ;
                pSelf->value.asNum.bDec = 0;
                break;
 
