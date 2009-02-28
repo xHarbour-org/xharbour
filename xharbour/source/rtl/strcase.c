@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.24 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: strcase.c,v 1.25 2009/02/20 12:48:31 marchuet Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ char * hb_strLower( char * szText, ULONG ulLen )
    else
 #endif
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = tolower( (BYTE) szText[ i ] );
+         szText[ i ] = (char) tolower( (BYTE) szText[ i ] );
 
    return szText;
 }
@@ -94,7 +94,7 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
    else
 #endif
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = tolower( (BYTE) szText[ i ] );
+         szCopy[ i ] = (char) tolower( (BYTE) szText[ i ] );
    szCopy[ i ] = '\0';
 
    return szCopy;
@@ -114,7 +114,7 @@ char * hb_strUpperCopy( char * szText, ULONG ulLen )
    else
 #endif
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = toupper( (BYTE) szText[ i ] );
+         szCopy[ i ] = (char) toupper( (BYTE) szText[ i ] );
    szCopy[ i ] = '\0';
 
    return szCopy;
@@ -134,7 +134,7 @@ char * hb_strUpper( char * szText, ULONG ulLen )
    else
 #endif
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = toupper( (BYTE) szText[ i ] );
+         szText[ i ] = (char) toupper( (BYTE) szText[ i ] );
 
    return szText;
 }
