@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.10 2008/08/26 07:44:43 marchuet Exp $
+ * $Id: common.ch,v 1.11 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -122,9 +122,13 @@
 
 /* To suppress unused variable -w2 warnings. The code snippet will be
    optimized out by the compiler, so it won't cause any overhead.
-   It can be used in codeblocks, too. */
-/* Please keep it synced with the similar #define in hbclass.ch */
-#define HB_SYMBOL_UNUSED( symbol )  ( ( symbol ) )
+   It can be used in codeblocks, too, but you could also use NAMELESS
+   Codeblock Arguments.
 
+   Please keep it synced with the similar #define in hbclass.ch
+ */
+#ifndef HB_SYMBOL_UNUSED
+   #define HB_SYMBOL_UNUSED( symbol )  ( symbol )
+#endif
 
 #endif /* HB_COMMON_CH_ */

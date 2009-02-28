@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.5 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: hbcompat.ch,v 1.6 2009/02/04 00:11:38 likewolf Exp $
  */
 
 /*
@@ -132,7 +132,7 @@
    #xcommand END OBJECT => END
 
    #ifndef HB_SYMBOL_UNUSED
-      #define HB_SYMBOL_UNUSED( symbol )  ( symbol := ( symbol ) )
+      #define HB_SYMBOL_UNUSED( symbol )  ( symbol )
    #endif
 
 #else
