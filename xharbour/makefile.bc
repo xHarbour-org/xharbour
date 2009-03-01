@@ -44,7 +44,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__ -w
+CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__
 HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -Llib\b32 $(LFLAGS) c0x32.obj $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
@@ -463,7 +463,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 INCLUDE_DIR =include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) -I$(INCLUDE_DIR) -d -w
+CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) -I$(INCLUDE_DIR) -d -w3
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -po$(OBJ_DIR)\ -q0 -w2 -es2 -gc2
 
 # User flags should be able to override everything!
