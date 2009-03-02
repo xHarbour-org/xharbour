@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.183 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: filesys.c,v 1.184 2009/01/24 09:07:45 andijahja Exp $
  */
 
 /*
@@ -890,7 +890,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
                              HB_FHANDLE *fhStdout, HB_FHANDLE *fhStderr,
                              BOOL bBackground, ULONG *ProcessID )
 {
-   HB_FHANDLE hRet = FS_ERROR;
+   HB_FHANDLE hRet;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )", pFilename, fhStdin, fhStdout, fhStderr));
 
