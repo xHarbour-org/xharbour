@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.10 2005/12/13 20:11:22 ronpinkas Exp $
+ * $Id: calconst.c,v 1.11 2005/12/13 20:42:01 ronpinkas Exp $
  */
 
 /*
@@ -286,7 +286,7 @@ char * NextTokenInConstant( char **pExp )
    }
 
    // Numbers
-   if( isdigit( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '-' || (*pExp)[0] == '+' )
+   if( HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '-' || (*pExp)[0] == '+' )
    {
       int i = 0;
 
@@ -341,7 +341,7 @@ char * NextTokenInConstant( char **pExp )
       {
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
-      } while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) );
+      } while( i < 31 && HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) );
 
       // Decimals
       if( i < 31 && (*pExp)[0] == '.' )
@@ -349,7 +349,7 @@ char * NextTokenInConstant( char **pExp )
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
 
-         while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) )
+         while( i < 31 && HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
@@ -382,7 +382,7 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp)++;
    }
-   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'A' && toupper( (*pExp)[2] ) == 'N' && toupper( (*pExp)[3] ) == 'D' && toupper( (*pExp)[4] ) == '.' )
+   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'A' && HB_TOUPPER( (*pExp)[2] ) == 'N' && HB_TOUPPER( (*pExp)[3] ) == 'D' && HB_TOUPPER( (*pExp)[4] ) == '.' )
    {
       sToken[0] = '&';
       sToken[1] = '&';
@@ -390,14 +390,14 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp) += 5;
    }
-   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'N' && toupper( (*pExp)[2] ) == 'O' && toupper( (*pExp)[3] ) == 'T' && toupper( (*pExp)[4] ) == '.' )
+   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'N' && HB_TOUPPER( (*pExp)[2] ) == 'O' && HB_TOUPPER( (*pExp)[3] ) == 'T' && HB_TOUPPER( (*pExp)[4] ) == '.' )
    {
       sToken[0] = '!';
       sToken[1] = '\0';
 
       (*pExp) += 5;
    }
-   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'O' && toupper( (*pExp)[2] ) == 'R' && toupper( (*pExp)[3] ) == '.' )
+   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'O' && HB_TOUPPER( (*pExp)[2] ) == 'R' && HB_TOUPPER( (*pExp)[3] ) == '.' )
    {
       sToken[0] = '|';
       sToken[1] = '|';
@@ -405,21 +405,21 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp) += 4;
    }
-   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'T' && toupper( (*pExp)[2] ) == '.' )
+   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'T' && HB_TOUPPER( (*pExp)[2] ) == '.' )
    {
       sToken[0] = '1';
       sToken[1] = '\0';
 
       (*pExp) += 3;
    }
-   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'F' && toupper( (*pExp)[2] ) == '.' )
+   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'F' && HB_TOUPPER( (*pExp)[2] ) == '.' )
    {
       sToken[0] = '0';
       sToken[1] = '\0';
 
       (*pExp) += 3;
    }
-   else if( isalpha( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' )
+   else if( HB_ISALPHA( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' )
    {
       int i = 0;
 
@@ -427,7 +427,7 @@ char * NextTokenInConstant( char **pExp )
       {
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
-      } while( isalnum( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' );
+      } while( HB_ISALNUM( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' );
    }
 
    // Might be a first char of a double char operator!

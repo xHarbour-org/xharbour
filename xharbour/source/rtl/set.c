@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.95 2009/02/20 12:48:31 marchuet Exp $
+ * $Id: set.c,v 1.96 2009/02/28 08:44:29 lculik Exp $
  */
 
 /*
@@ -138,13 +138,13 @@ static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
       ULONG ulLen = hb_itemGetCLen( pItem );
 
       if( ulLen >= 2
-       && toupper( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && toupper( ( UCHAR ) szString[ 1 ] ) == 'N' )
+       && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
+       && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'N' )
          bLogical = TRUE;
       else if( ulLen >= 3
-       && toupper( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && toupper( ( UCHAR ) szString[ 1 ] ) == 'F'
-       && toupper( ( UCHAR ) szString[ 2 ] ) == 'F' )
+       && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
+       && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'F'
+       && HB_TOUPPER( ( UCHAR ) szString[ 2 ] ) == 'F' )
          bLogical = FALSE;
    }
 
@@ -505,7 +505,7 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
       size = strlen( szDateFormat );
       for( count = 0; count < size; count++ )
       {
-         digit = toupper( ( UCHAR ) szDateFormat[ count ] );
+         digit = HB_TOUPPER( ( UCHAR ) szDateFormat[ count ] );
          if( digit == 'Y' )
          {
             if( y_start == -1 )

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.96 2009/02/10 09:12:18 marchuet Exp $
+ * $Id: workarea.c,v 1.97 2009/02/24 12:38:16 marchuet Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 #else
       pFieldInfo.uiFlags = 0;
 #endif
-      iData = toupper( hb_arrayGetCPtr( pFieldDesc, DBS_TYPE )[ 0 ] );
+      iData = HB_TOUPPER( hb_arrayGetCPtr( pFieldDesc, DBS_TYPE )[ 0 ] );
       switch( iData )
       {
          case 'C':

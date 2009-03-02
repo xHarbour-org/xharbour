@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.34 2009/02/03 16:23:55 likewolf Exp $
+ * $Id: dbgentry.c,v 1.35 2009/02/24 14:28:41 ronpinkas Exp $
  */
 
 /*
@@ -973,8 +973,8 @@ static PHB_ITEM hb_dbgEvalMacro( char *szExpr, PHB_ITEM pItem )
 }
 
 
-#define IS_IDENT_START( c ) ( isalpha( (UCHAR) (c) ) || (c) == '_' )
-#define IS_IDENT_CHAR( c ) ( IS_IDENT_START( (c) ) || isdigit( (UCHAR) (c) ) )
+#define IS_IDENT_START( c ) ( HB_ISALPHA( (UCHAR) (c) ) || (c) == '_' )
+#define IS_IDENT_CHAR( c ) ( IS_IDENT_START( (c) ) || HB_ISDIGIT( (UCHAR) (c) ) )
 
 static int hb_dbgEvalSubstituteVar( HB_WATCHPOINT *watch, char *szWord, int nStart, int nLen )
 {

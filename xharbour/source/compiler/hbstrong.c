@@ -1,5 +1,5 @@
 /*
- * $Id: hbstrong.c,v 1.3 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: hbstrong.c,v 1.4 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -126,13 +126,13 @@ void hb_compStrongType( int iSize )
              {
                 /* No casting - do nothing. */
              }
-             else if( toupper( hb_comp_cCastType ) == 'S' )
+             else if( HB_TOUPPER( hb_comp_cCastType ) == 'S' )
              {
                 PCOMCLASS pClass = hb_compClassFind( hb_comp_szFromClass );
 
                 if( pClass )
                 {
-                   if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+                   if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                    {
                       pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] = pClass;
                    }
@@ -145,7 +145,7 @@ void hb_compStrongType( int iSize )
                 else
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pDeclared->szName );
-                   pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
+                   pFunc->pStack[ pFunc->iStackIndex ] = ( HB_ISUPPER( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                 }
 
                 hb_comp_cCastType = ' ';
@@ -365,7 +365,7 @@ void hb_compStrongType( int iSize )
                    else
                    {
                       /* Cleanup. */
-                      if( toupper( cParamType ) == 'S' && pFunc->iStackClasses )
+                      if( HB_TOUPPER( cParamType ) == 'S' && pFunc->iStackClasses )
                       {
                          --pFunc->iStackClasses;
                       }
@@ -374,9 +374,9 @@ void hb_compStrongType( int iSize )
                       {
                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType );
                       }
-                      else if( islower( cFormalType ) )
+                      else if( HB_ISLOWER( cFormalType ) )
                       {
-                         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
+                         hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", HB_TOUPPER( cFormalType ) );
                       }
                       else
                       {
@@ -482,7 +482,7 @@ void hb_compStrongType( int iSize )
           {
              hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[ARRAY OF Object]" );
           }
-          else if( islower( cSubType1 ) )
+          else if( HB_ISLOWER( cSubType1 ) )
           {
              hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "AnyType.SubType[ARRAY OF %c]", cSubType1 );
           }
@@ -655,7 +655,7 @@ void hb_compStrongType( int iSize )
                        hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PARAM_TYPE, ( char * ) szType1, ( char * ) szType2 );
                     }
                  }
-                 else if( islower( cFormalType ) && pFunc->pStack[ iParamBase + iOffset ] == 'A' )
+                 else if( HB_ISLOWER( cFormalType ) && pFunc->pStack[ iParamBase + iOffset ] == 'A' )
                  {
                     if( cFormalType == 'S' )
                     {
@@ -673,9 +673,9 @@ void hb_compStrongType( int iSize )
                        {
                           hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType - VT_OFFSET_BYREF );
                        }
-                       else if( islower( cFormalType ) )
+                       else if( HB_ISLOWER( cFormalType ) )
                        {
-                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", HB_TOUPPER( cFormalType ) );
                        }
                        else
                        {
@@ -699,9 +699,9 @@ void hb_compStrongType( int iSize )
                        {
                           hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
                        }
-                       else if( islower( pFunc->pStack[ iParamBase + iOffset ] ) )
+                       else if( HB_ISLOWER( pFunc->pStack[ iParamBase + iOffset ] ) )
                        {
-                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, HB_TOUPPER( pFunc->pStack[ iParamBase + iOffset ] ) );
                        }
                        else
                        {
@@ -729,9 +729,9 @@ void hb_compStrongType( int iSize )
                        {
                           hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "@%c", cFormalType - VT_OFFSET_BYREF );
                        }
-                       else if( islower( cFormalType ) )
+                       else if( HB_ISLOWER( cFormalType ) )
                        {
-                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", toupper( cFormalType ) );
+                          hb_snprintf( ( char * ) szType2, sizeof( szType2 ), "ARRAY OF %c", HB_TOUPPER( cFormalType ) );
                        }
                        else
                        {
@@ -755,9 +755,9 @@ void hb_compStrongType( int iSize )
                        {
                           hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) AnyType.SubType[%c]", iOffset + 1, pFunc->pStack[ iParamBase + iOffset ] - VT_OFFSET_VARIANT );
                        }
-                       else if( islower( pFunc->pStack[ iParamBase + iOffset ] ) )
+                       else if( HB_ISLOWER( pFunc->pStack[ iParamBase + iOffset ] ) )
                        {
-                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, toupper( pFunc->pStack[ iParamBase + iOffset ] ) );
+                          hb_snprintf( ( char * ) szType1, sizeof( szType1 ), "(%i) ARRAY OF %c", iOffset + 1, HB_TOUPPER( pFunc->pStack[ iParamBase + iOffset ] ) );
                        }
                        else
                        {
@@ -793,7 +793,7 @@ void hb_compStrongType( int iSize )
            printf( "\nDeclared Method!!! Stack: %i Type: %c\n", pFunc->iStackIndex, pFunc->pStack[ pFunc->iStackIndex - 1 ] );
            */
 
-           if( toupper( pFunc->pStack[ pFunc->iStackIndex - 1 ] ) == 'S' && pFunc->iStackClasses < 8 )
+           if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex - 1 ] ) == 'S' && pFunc->iStackClasses < 8 )
            {
               /*
               printf( "\nNested CLASS!!! Stack: %i Type: %c Class: %s\n", pFunc->iStackIndex, pFunc->pStack[ pFunc->iStackIndex - 1 ], pFunc->pStackFunctions[ pFunc->iStackFunctions ]->Extended.pClass->szName );
@@ -1721,7 +1721,7 @@ void hb_compStrongType( int iSize )
              {
                 pFunc->pStack[ pFunc->iStackIndex++ ] = pDeclared->cType;
 
-                if( toupper( pDeclared->cType ) == 'S' && pFunc->iStackClasses < 8 )
+                if( HB_TOUPPER( pDeclared->cType ) == 'S' && pFunc->iStackClasses < 8 )
                 {
                    pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pDeclared->Extended.pClass;
                 }
@@ -1848,7 +1848,7 @@ void hb_compStrongType( int iSize )
              cType = pVar->cType;
           }
 
-          if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
+          if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses < 8 )
           {
             /* Object of declared class */
             pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
@@ -1918,7 +1918,7 @@ void hb_compStrongType( int iSize )
              cType = pVar->cType;
           }
 
-          if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
+          if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses < 8 )
           {
              /* Object of declared class */
              pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
@@ -2043,7 +2043,7 @@ void hb_compStrongType( int iSize )
              {
                 pFunc->pStack[ pFunc->iStackIndex - 1 ] = pVar->cType + VT_OFFSET_BYREF;
              }
-             else if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
+             else if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses < 8 )
              {
                 /* Object of declared class */
                 pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
@@ -2069,7 +2069,7 @@ void hb_compStrongType( int iSize )
              {
                 pFunc->pStack[ pFunc->iStackIndex - 1 ] = pSym->cType + VT_OFFSET_BYREF;
              }
-             else if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
+             else if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses < 8 )
              {
                 /* Object of declared class */
                 pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pSym->Extended.pClass;
@@ -2168,10 +2168,10 @@ void hb_compStrongType( int iSize )
           /* Variant Array Element - Type unknown. */
           pFunc->pStack[ pFunc->iStackIndex - 1 ] = ' ';
        }
-       else if( islower( cType ) )
+       else if( HB_ISLOWER( cType ) )
        {
          /* Now we have the declared array element on the stack.*/
-         pFunc->pStack[ pFunc->iStackIndex - 1 ] = toupper( cType );
+         pFunc->pStack[ pFunc->iStackIndex - 1 ] = HB_TOUPPER( cType );
        }
        else
        {
@@ -2216,20 +2216,20 @@ void hb_compStrongType( int iSize )
           {
              /* Array of variant can hold any value. */
           }
-          else if( islower( cType ) && cElementType == ' ' )
+          else if( HB_ISLOWER( cType ) && cElementType == ' ' )
           {
              /* Array Of explicit type. */
              char szType[2];
 
-             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", toupper( cType ) );
+             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", HB_TOUPPER( cType ) );
              hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
           }
-          else if( islower( cType ) && toupper( cType ) != cElementType && cElementType != '-' )
+          else if( HB_ISLOWER( cType ) && HB_TOUPPER( cType ) != cElementType && cElementType != '-' )
           {
              /* Array Of explicit type. */
              char szType[2];
 
-             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", toupper( cType ) );
+             hb_snprintf( ( char * ) szType, sizeof( szType ), "%c", HB_TOUPPER( cType ) );
              hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
           }
           else
@@ -2291,7 +2291,7 @@ void hb_compStrongType( int iSize )
        /* Ambigious Variable, will be determined only in Run Time! */
        pFunc->iStackIndex--;
 
-       if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+       if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
        {
           --pFunc->iStackClasses;
        }
@@ -2302,7 +2302,7 @@ void hb_compStrongType( int iSize )
        /* Ambigious Variable, will be determined only in Run Time! */
        pFunc->iStackIndex--;
 
-       if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+       if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
        {
           --pFunc->iStackClasses;
        }
@@ -2435,7 +2435,7 @@ void hb_compStrongType( int iSize )
                    cType -= VT_OFFSET_VARIANT;
                 }
 
-                if( toupper( cType ) == 'S' && pFunc->iStackClasses )
+                if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses )
                 {
                    pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
                 }
@@ -2459,9 +2459,9 @@ void hb_compStrongType( int iSize )
                 {
                    hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
                 }
-                else if( islower( pVar->cType ) )
+                else if( HB_ISLOWER( pVar->cType ) )
                 {
-                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", HB_TOUPPER( pVar->cType ) );
                 }
                 else
                 {
@@ -2472,13 +2472,13 @@ void hb_compStrongType( int iSize )
 
                 if( hb_comp_cCastType == ' ' )
                    ; /* No casting - do nothing. */
-                else if( toupper( hb_comp_cCastType ) == 'S' )
+                else if( HB_TOUPPER( hb_comp_cCastType ) == 'S' )
                 {
                    PCOMCLASS pClass = hb_compClassFind( hb_comp_szFromClass );
 
                    if( pClass )
                    {
-                      if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+                      if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                       {
                          pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] = pClass;
                       }
@@ -2491,7 +2491,7 @@ void hb_compStrongType( int iSize )
                    else
                    {
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                      pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
+                      pFunc->pStack[ pFunc->iStackIndex ] = ( HB_ISUPPER( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                    }
 
                    hb_comp_cCastType = ' ';
@@ -2511,19 +2511,19 @@ void hb_compStrongType( int iSize )
                 {
                    /* NIL allowed into all types */
                 }
-                else if( pVar->cType == 'a' && islower( pFunc->pStack[ pFunc->iStackIndex ] ) )
+                else if( pVar->cType == 'a' && HB_ISLOWER( pFunc->pStack[ pFunc->iStackIndex ] ) )
                 {
                    /* Array Of ANYTYPE may accept any Array  */
                 }
-                else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
+                else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
                 }
-                else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
+                else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
                 }
-                else if( islower( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+                else if( HB_ISLOWER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
                 }
@@ -2561,7 +2561,7 @@ void hb_compStrongType( int iSize )
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
                    }
                 }
-                else if( isupper( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+                else if( HB_ISUPPER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
                 }
@@ -2586,7 +2586,7 @@ void hb_compStrongType( int iSize )
                 }
 
                 /* Will need the Class Handle. */
-                if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+                if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                 {
                    pSym->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
                 }
@@ -2603,9 +2603,9 @@ void hb_compStrongType( int iSize )
                 {
                    hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pSym->Extended.pClass->szName );
                 }
-                else if( islower( pSym->cType ) )
+                else if( HB_ISLOWER( pSym->cType ) )
                 {
-                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pSym->cType ) );
+                   hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", HB_TOUPPER( pSym->cType ) );
                 }
                 else
                 {
@@ -2621,19 +2621,19 @@ void hb_compStrongType( int iSize )
                 {
                    /* NIL allowed into all types */
                 }
-                else if( pSym->cType == 'a' && islower( pFunc->pStack[ pFunc->iStackIndex ] ) )
+                else if( pSym->cType == 'a' && HB_ISLOWER( pFunc->pStack[ pFunc->iStackIndex ] ) )
                 {
                    /* Array Of ANYTYPE may accept any Array  */
                 }
-                else if( islower( pSym->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
+                else if( HB_ISLOWER( pSym->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
                 }
-                else if( islower( pSym->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
+                else if( HB_ISLOWER( pSym->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
                 }
-                else if( islower( pSym->cType ) && pSym->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+                else if( HB_ISLOWER( pSym->cType ) && pSym->cType != pFunc->pStack[ pFunc->iStackIndex ] )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
                 }
@@ -2669,7 +2669,7 @@ void hb_compStrongType( int iSize )
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pSym->szName, ( char * ) szType );
                    }
                 }
-                else if( isupper( pSym->cType ) && pSym->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+                else if( HB_ISUPPER( pSym->cType ) && pSym->cType != pFunc->pStack[ pFunc->iStackIndex ] )
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ASSIGN_TYPE, pSym->szName, ( char * ) szType );
                 }
@@ -2678,7 +2678,7 @@ void hb_compStrongType( int iSize )
        }
 
        /* Resetting */
-       if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+       if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
        {
           --pFunc->iStackClasses;
        }
@@ -2760,7 +2760,7 @@ void hb_compStrongType( int iSize )
                cType -= VT_OFFSET_VARIANT;
             }
 
-            if( toupper( cType ) == 'S' && pFunc->iStackClasses )
+            if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses )
             {
                pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
             }
@@ -2781,9 +2781,9 @@ void hb_compStrongType( int iSize )
             {
                hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
             }
-            else if( islower( pVar->cType ) )
+            else if( HB_ISLOWER( pVar->cType ) )
             {
-               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", HB_TOUPPER( pVar->cType ) );
             }
             else
             {
@@ -2792,13 +2792,13 @@ void hb_compStrongType( int iSize )
 
             if( hb_comp_cCastType == ' ' )
                ; /* No casting - do nothing. */
-            else if( toupper( hb_comp_cCastType ) == 'S' )
+            else if( HB_TOUPPER( hb_comp_cCastType ) == 'S' )
             {
                PCOMCLASS pClass = hb_compClassFind( hb_comp_szFromClass );
 
                if( pClass )
                {
-                  if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+                  if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                   {
                      pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] = pClass;
                   }
@@ -2811,7 +2811,7 @@ void hb_compStrongType( int iSize )
                else
                {
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
+                  pFunc->pStack[ pFunc->iStackIndex ] = ( HB_ISUPPER( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                }
 
                hb_comp_cCastType = ' ';
@@ -2831,19 +2831,19 @@ void hb_compStrongType( int iSize )
             {
                /* NIL allowed into all types */
             }
-            else if( pVar->cType == 'a' && islower( pFunc->pStack[ pFunc->iStackIndex ] ) )
+            else if( pVar->cType == 'a' && HB_ISLOWER( pFunc->pStack[ pFunc->iStackIndex ] ) )
             {
                /* Array Of ANYTYPE may accept any Array  */
             }
-            else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
+            else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
             }
-            else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
+            else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
             }
-            else if( islower( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+            else if( HB_ISLOWER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
             }
@@ -2879,7 +2879,7 @@ void hb_compStrongType( int iSize )
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
                }
             }
-            else if( isupper( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+            else if( HB_ISUPPER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
             }
@@ -2887,7 +2887,7 @@ void hb_compStrongType( int iSize )
        }
 
        /* Resetting */
-       if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+       if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
        {
           --pFunc->iStackClasses;
        }
@@ -2938,7 +2938,7 @@ void hb_compStrongType( int iSize )
             {
                cType -= VT_OFFSET_VARIANT;
             }
-            if( toupper( cType ) == 'S' && pFunc->iStackClasses )
+            if( HB_TOUPPER( cType ) == 'S' && pFunc->iStackClasses )
             {
                pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
             }
@@ -2962,9 +2962,9 @@ void hb_compStrongType( int iSize )
             {
                hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %s", pVar->Extended.pClass->szName );
             }
-            else if( islower( pVar->cType ) )
+            else if( HB_ISLOWER( pVar->cType ) )
             {
-               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", toupper( pVar->cType ) );
+               hb_snprintf( ( char * ) szType, sizeof( szType ), "ARRAY OF %c", HB_TOUPPER( pVar->cType ) );
             }
             else
             {
@@ -2973,13 +2973,13 @@ void hb_compStrongType( int iSize )
 
             if( hb_comp_cCastType == ' ' )
                ; /* No casting - do nothing. */
-            else if( toupper( hb_comp_cCastType ) == 'S' )
+            else if( HB_TOUPPER( hb_comp_cCastType ) == 'S' )
             {
                PCOMCLASS pClass = hb_compClassFind( hb_comp_szFromClass );
 
                if( pClass )
                {
-                  if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+                  if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                   {
                      pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] = pClass;
                   }
@@ -2992,7 +2992,7 @@ void hb_compStrongType( int iSize )
                else
                {
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
+                  pFunc->pStack[ pFunc->iStackIndex ] = ( HB_ISUPPER( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                }
 
                hb_comp_cCastType = ' ';
@@ -3012,19 +3012,19 @@ void hb_compStrongType( int iSize )
             {
                /* NIL allowed into all types */
             }
-            else if( pVar->cType == 'a' && islower( pFunc->pStack[ pFunc->iStackIndex ] ) )
+            else if( pVar->cType == 'a' && HB_ISLOWER( pFunc->pStack[ pFunc->iStackIndex ] ) )
             {
                /* Array Of ANYTYPE may accept any Array  */
             }
-            else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
+            else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == ' ' )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
             }
-            else if( islower( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
+            else if( HB_ISLOWER( pVar->cType ) && pFunc->pStack[ pFunc->iStackIndex ] == 'A' )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_SUSPECT, ( char * ) szType, NULL );
             }
-            else if( islower( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+            else if( HB_ISLOWER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, ( char * ) szType, NULL );
             }
@@ -3062,7 +3062,7 @@ void hb_compStrongType( int iSize )
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
                }
             }
-            else if( isupper( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
+            else if( HB_ISUPPER( pVar->cType ) && pVar->cType != pFunc->pStack[ pFunc->iStackIndex ] )
             {
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
             }
@@ -3070,7 +3070,7 @@ void hb_compStrongType( int iSize )
        }
 
        /* Resetting */
-       if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
+       if( HB_TOUPPER( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
        {
          --pFunc->iStackClasses;
        }

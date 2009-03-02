@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.216 2009/02/21 15:14:24 ronpinkas Exp $
+ * $Id: harbour.c,v 1.217 2009/02/23 21:45:04 ronpinkas Exp $
  */
 
 /*
@@ -1023,7 +1023,7 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
 
          pDeclared->cParamTypes[ pDeclared->iParamCount - 1 ] = cValueType;
 
-         if ( toupper( cValueType ) == 'S' )
+         if ( HB_TOUPPER( cValueType ) == 'S' )
          {
             pDeclared->pParamClasses[ pDeclared->iParamCount - 1 ] = hb_compClassFind( hb_comp_szFromClass );
 
@@ -1053,7 +1053,7 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
 
       hb_comp_pLastMethod->cParamTypes[ hb_comp_pLastMethod->iParamCount - 1 ] = cValueType;
 
-      if ( toupper( cValueType ) == 'S' )
+      if ( HB_TOUPPER( cValueType ) == 'S' )
       {
          hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ] = hb_compClassFind( hb_comp_szFromClass );
 
@@ -1150,7 +1150,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    pVar->pNext = NULL;
    pVar->iDeclLine = hb_comp_iLine - 1;
 
-   if ( toupper( cValueType ) == 'S' )
+   if ( HB_TOUPPER( cValueType ) == 'S' )
    {
       /*
       printf( "\nVariable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );

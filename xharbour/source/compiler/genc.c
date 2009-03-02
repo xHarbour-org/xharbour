@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.179 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: genc.c,v 1.180 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -514,7 +514,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
             bCritical = TRUE;
          }
 
-         if( pFunc->pNamespace && ( isalpha( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
+         if( pFunc->pNamespace && ( HB_ISALPHA( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
          {
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {
@@ -1264,7 +1264,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
 
-         if( pFunc->pNamespace && ( isalpha( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
+         if( pFunc->pNamespace && ( HB_ISALPHA( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
          {
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {

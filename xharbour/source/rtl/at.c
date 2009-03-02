@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.13 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: at.c,v 1.14 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -175,7 +175,7 @@ ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText,
 
          if( szText[ ulPos ] == '[' && szSub[0] != '[' )
          {
-            if( ! ( isalpha( (BYTE) cLastChar ) || isdigit( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+            if( ! ( HB_ISALPHA( (BYTE) cLastChar ) || HB_ISDIGIT( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
             {
                while( ++ulPos < ulLen && szText[ ulPos ] != ']' )
                {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.16 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: hbdate.c,v 1.17 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -275,10 +275,10 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
 
       while( format_count < size )
       {
-         digit = toupper( ( UCHAR ) *szPtr );
+         digit = HB_TOUPPER( ( UCHAR ) *szPtr );
          szPtr++;
          digit_count = 1;
-         while( toupper( ( UCHAR ) *szPtr ) == digit && format_count < size )
+         while( HB_TOUPPER( ( UCHAR ) *szPtr ) == digit && format_count < size )
          {
             szPtr++;
             if( format_count + digit_count < size ) digit_count++;
@@ -459,10 +459,10 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
 
       while( format_count < size )
       {
-         digit = toupper( *szPtr );
+         digit = HB_TOUPPER( *szPtr );
          szPtr++;
          digit_count = 1;
-         while( toupper( *szPtr ) == digit && format_count < size )
+         while( HB_TOUPPER( *szPtr ) == digit && format_count < size )
          {
             szPtr++;
             if( format_count + digit_count < size ) digit_count++;

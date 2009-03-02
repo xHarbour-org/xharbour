@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.55 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: hash.c,v 1.56 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  *
  */
 
-#include "ctype.h"      // toupper()
+#include "ctype.h"      // HB_TOUPPER()
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -99,8 +99,8 @@ static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL
    {
       for( ul = 0; ul < ulLen; ul++ )
       {
-         c1 = toupper( (unsigned char) pStr1[ ul ] );
-         c2 = toupper( (unsigned char) pStr2[ ul ] );
+         c1 = HB_TOUPPER( (unsigned char) pStr1[ ul ] );
+         c2 = HB_TOUPPER( (unsigned char) pStr2[ ul ] );
 
          if( c1 != c2 )
          {

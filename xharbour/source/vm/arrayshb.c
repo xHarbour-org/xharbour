@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.77 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: arrayshb.c,v 1.78 2008/12/10 00:47:32 likewolf Exp $
  */
 
 /*
@@ -606,7 +606,7 @@ HB_FUNC( HB_AEXPRESSIONS )
             break;
 
          case '[' :
-            if( bArray || ( i && isalnum( ( BYTE ) pLine->item.asString.value[i - 1] ) ) )
+            if( bArray || ( i && HB_ISALNUM( ( BYTE ) pLine->item.asString.value[i - 1] ) ) )
             {
                iIndexs++;
             }

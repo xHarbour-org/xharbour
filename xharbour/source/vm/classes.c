@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.238 2009/02/01 01:28:40 likewolf Exp $
+ * $Id: classes.c,v 1.239 2009/02/08 05:32:32 guerra000 Exp $
  */
 
 /*
@@ -180,7 +180,7 @@
 #include "thread.h"
 #endif
 
-#include <ctype.h>             /* For toupper() */
+#include <ctype.h>             /* For HB_TOUPPER() */
 
 /* DEBUG only*/
 /* #include <windows.h> */
@@ -3820,7 +3820,7 @@ static HARBOUR hb___msgClsParent( void )
 
       for( i = 0; szParentName[ i ] != '\0'; i++ )
       {
-         szParentName[ i ] = ( char ) toupper( szParentName[ i ] );
+         szParentName[ i ] = ( char ) HB_TOUPPER( szParentName[ i ] );
       }
 
       hb_retl( hb_clsIsParent( uiClass , szParentName ) );

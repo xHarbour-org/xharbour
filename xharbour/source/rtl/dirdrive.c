@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: dirdrive.c,v 1.3 2005/11/04 12:06:00 druzus Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ HB_FUNC( ISDISK )
    USHORT uiErrorOld = hb_fsError();
 
    hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsIsDrv( ( BYTE )( toupper( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
+            hb_fsIsDrv( ( BYTE )( HB_TOUPPER( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
             FALSE );
 
    hb_fsSetError( uiErrorOld );
@@ -116,7 +116,7 @@ HB_FUNC( DISKCHANGE )
    USHORT uiErrorOld = hb_fsError();
 
    hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsChDrv( ( BYTE )( toupper( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
+            hb_fsChDrv( ( BYTE )( HB_TOUPPER( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
             FALSE );
 
    hb_fsSetError( uiErrorOld );

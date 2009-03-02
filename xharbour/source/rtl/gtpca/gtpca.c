@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.29 2009/02/20 12:48:33 marchuet Exp $
+ * $Id: gtpca.c,v 1.30 2009/02/20 17:45:51 marchuet Exp $
  */
 
 /*
@@ -276,7 +276,7 @@ static void hb_gt_pca_AnsiGetCurPos( int * iRow, int * iCol )
          do
          {
             ch = ( USHORT ) getc( stdin );
-            if( isdigit( ch ) )
+            if( HB_ISDIGIT( ch ) )
             {
                value = ( value * 10 ) + ( ch - '0' );
             }

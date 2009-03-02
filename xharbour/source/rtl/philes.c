@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.35 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: philes.c,v 1.36 2009/02/28 08:44:29 lculik Exp $
  */
 
 /*
@@ -305,7 +305,7 @@ HB_FUNC( CURDIR )
    BYTE byBuffer[ _POSIX_PATH_MAX + 1 ];
 
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( HB_TOUPPER( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, _POSIX_PATH_MAX + 1 );
 
    hb_retc( ( char * ) byBuffer );
 }
@@ -338,7 +338,7 @@ HB_FUNC( CURDIRX )
 
    if( pDrv && hb_parclen( 1 ) > 0 )
    {
-      cDrv = (BYTE) ( toupper( pDrv->item.asString.value[0] ) - 'A');
+      cDrv = (BYTE) ( HB_TOUPPER( pDrv->item.asString.value[0] ) - 'A');
       if( cDrv != cCurDrv )
       {
          hb_fsChDrv( cDrv );

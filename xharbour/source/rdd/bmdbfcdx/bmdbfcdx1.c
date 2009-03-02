@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.57 2009/02/21 19:01:51 ronpinkas Exp $
+ * $Id: bmdbfcdx1.c,v 1.58 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -10333,16 +10333,16 @@ HB_FUNC( BMSIXCDX_GETFUNCTABLE )
 
    HB_TRACE(HB_TR_DEBUG, ("BMSIXCDX_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
-   if ( pTable )
+   if( pTable )
    {
       HB_ERRCODE errCode;
 
-      if ( uiCount )
+      if( uiCount )
          * uiCount = RDDFUNCSCOUNT;
       errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFFPT" );
-      if ( errCode != HB_SUCCESS )
+      if( errCode != HB_SUCCESS )
          errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFDBT" );
-      if ( errCode != HB_SUCCESS )
+      if( errCode != HB_SUCCESS )
          errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBF" );
       hb_retni( errCode );
    }

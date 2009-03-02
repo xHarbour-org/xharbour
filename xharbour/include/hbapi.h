@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.255 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbapi.h,v 1.256 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -664,18 +664,6 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject); /* returns a duplicate
 /* hash management */
 extern HB_EXPORT void *    hb_hashId( PHB_ITEM pHash ); /* retrieves the hash unique ID */
 
-/* string management */
-
-#define HB_ISSPACE( c ) ( ( c ) == ' ' || \
-                          ( c ) == HB_CHAR_HT || \
-                          ( c ) == HB_CHAR_LF || \
-                          ( c ) == HB_CHAR_CR )
-
-#define HB_ISFIRSTIDCHAR(c)   ( ( (c) >= 'A' && (c) <= 'Z' ) || \
-                                ( (c) >= 'a' && (c) <= 'z' ) || (c) == '_' )
-#define HB_ISNEXTIDCHAR(c)    ( HB_ISFIRSTIDCHAR(c) || \
-                                ( ( (c) >= '0' && (c) <= '9' ) ) )
-
 extern const char * hb_szAscii[ 256 ];      /* array of 1 character length strings */
 
 extern HB_EXPORT int       hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
@@ -843,7 +831,7 @@ extern void       hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the refe
 extern void       hb_memvarValueDecRef( HB_HANDLE hValue ); /* decrease the reference count of a global value */
 extern void       hb_memvarValueDecGarbageRef( HB_HANDLE hValue ); /* decrease the reference count of a detached local variable */
 extern void       hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem ); /* copy an item into a symbol */
-extern HB_ERRCODE    hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
+extern HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
 extern void       hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item, with error trapping */
 extern void       hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy a reference to a symbol value into an item, with error trapping */
 extern HB_EXPORT ULONG    hb_memvarGetPrivatesBase( void ); /* retrieve current PRIVATE variables stack base */

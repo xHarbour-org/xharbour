@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.717 2009/02/24 12:38:33 marchuet Exp $
+ * $Id: hvm.c,v 1.718 2009/02/24 20:46:36 andijahja Exp $
  */
 
 /*
@@ -7085,7 +7085,7 @@ static HB_ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
                }
                else
                {
-                  errCode = FAILURE;
+                  errCode = HB_FAILURE;
                }
             }
             else
@@ -9423,9 +9423,9 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
          * in a current workarea - if it is not a field (FAILURE)
          * then try the memvar variable
          */
-      if( hb_rddFieldGet( pItem, pVarSymb ) != SUCCESS )
+      if( hb_rddFieldGet( pItem, pVarSymb ) != HB_SUCCESS )
       {
-         if( hb_memvarGet( pItem, pVarSymb ) != SUCCESS )
+         if( hb_memvarGet( pItem, pVarSymb ) != HB_SUCCESS )
          {
             HB_ITEM_PTR pError;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.8 2007/12/04 23:06:19 andijahja Exp $
+ * $Id: token1.c,v 1.9 2009/02/20 12:48:09 marchuet Exp $
  */
 
 /*
@@ -65,28 +65,28 @@
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
   #if 0
-  #define TOUPPER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_upper[ ( UCHAR ) c ] : toupper( ( UCHAR ) c) )
-  #define TOLOWER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_lower[ ( UCHAR ) c ] : tolower( ( UCHAR ) c) )
+  #define TOUPPER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_upper[ ( UCHAR ) c ] : HB_TOUPPER( ( UCHAR ) c) )
+  #define TOLOWER(c)    ( (hb_cdppage())->nChars ? (hb_cdppage())->s_lower[ ( UCHAR ) c ] : HB_TOLOWER( ( UCHAR ) c) )
   #endif
-  #define TOUPPER(c)    ct__toupper( ( UCHAR ) c )
-  #define TOLOWER(c)    ct__tolower( ( UCHAR ) c )
+  #define TOUPPER(c)    ct__HB_TOUPPER( ( UCHAR ) c )
+  #define TOLOWER(c)    ct__HB_TOLOWER( ( UCHAR ) c )
 #else
-  #define TOUPPER(c)    toupper( ( UCHAR ) c )
-  #define TOLOWER(c)    tolower( ( UCHAR ) c )
+  #define TOUPPER(c)    HB_TOUPPER( ( UCHAR ) c )
+  #define TOLOWER(c)    HB_TOLOWER( ( UCHAR ) c )
 #endif
 
 #ifndef HB_CDP_SUPPORT_OFF
 
-static UCHAR ct__toupper( UCHAR c )
+static UCHAR ct__HB_TOUPPER( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
-  return  ( __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : toupper( c ) );
+  return  ( __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : HB_TOUPPER( c ) );
 }
 
-static UCHAR ct__tolower( UCHAR c )
+static UCHAR ct__HB_TOLOWER( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
-  return ( __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : tolower( c ) );
+  return ( __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : HB_TOLOWER( c ) );
 }
 
 #endif

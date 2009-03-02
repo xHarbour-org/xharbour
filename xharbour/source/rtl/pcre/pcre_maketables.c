@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: pcre_maketables.c,v 1.8 2008/09/05 19:41:20 andijahja Exp $
  */
 
 /*************************************************
@@ -85,11 +85,11 @@ p = yield;
 
 /* First comes the lower casing table */
 
-for (i = 0; i < 256; i++) *p++ = tolower(i);
+for (i = 0; i < 256; i++) *p++ = HB_TOLOWER(i);
 
 /* Next the case-flipping table */
 
-for (i = 0; i < 256; i++) *p++ = islower(i)? toupper(i) : tolower(i);
+for (i = 0; i < 256; i++) *p++ = HB_ISLOWER(i)? toupper(i) : tolower(i);
 
 /* Then the character class tables. Don't try to be clever and save effort on
 exclusive ones - in some locales things may be different. Note that the table
@@ -103,10 +103,10 @@ specially. */
 memset(p, 0, cbit_length);
 for (i = 0; i < 256; i++)
   {
-  if (isdigit(i)) p[cbit_digit  + i/8] |= 1 << (i&7);
-  if (isupper(i)) p[cbit_upper  + i/8] |= 1 << (i&7);
-  if (islower(i)) p[cbit_lower  + i/8] |= 1 << (i&7);
-  if (isalnum(i)) p[cbit_word   + i/8] |= 1 << (i&7);
+  if (HB_ISDIGIT(i)) p[cbit_digit  + i/8] |= 1 << (i&7);
+  if (HB_ISUPPER(i)) p[cbit_upper  + i/8] |= 1 << (i&7);
+  if (HB_ISLOWER(i)) p[cbit_lower  + i/8] |= 1 << (i&7);
+  if (HB_ISALNUM(i)) p[cbit_word   + i/8] |= 1 << (i&7);
   if (i == '_')   p[cbit_word   + i/8] |= 1 << (i&7);
   if (isspace(i)) p[cbit_space  + i/8] |= 1 << (i&7);
   if (isxdigit(i))p[cbit_xdigit + i/8] |= 1 << (i&7);
@@ -125,10 +125,10 @@ for (i = 0; i < 256; i++)
   {
   int x = 0;
   if (i != 0x0b && isspace(i)) x += ctype_space;
-  if (isalpha(i)) x += ctype_letter;
-  if (isdigit(i)) x += ctype_digit;
+  if (HB_ISALPHA(i)) x += ctype_letter;
+  if (HB_ISDIGIT(i)) x += ctype_digit;
   if (isxdigit(i)) x += ctype_xdigit;
-  if (isalnum(i) || i == '_') x += ctype_word;
+  if (HB_ISALNUM(i) || i == '_') x += ctype_word;
 
   /* Note: strchr includes the terminating zero in the characters it considers.
   In this instance, that is ok because we want binary zero to be flagged as a

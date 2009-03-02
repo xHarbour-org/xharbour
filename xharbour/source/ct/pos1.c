@@ -1,5 +1,5 @@
 /*
- * $Id: pos1.c,v 1.6 2007/12/01 22:33:22 andijahja Exp $
+ * $Id: pos1.c,v 1.7 2009/02/20 12:48:08 marchuet Exp $
  */
 
 /*
@@ -62,17 +62,17 @@
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
   #if 0
-  #define ISUPPER(c)    ( (hb_cdppage())->nChars ? isupper( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL : isupper( ( UCHAR ) c ) )
-  #define ISLOWER(c)    ( (hb_cdppage())->nChars ? islower( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsLower, ( UCHAR ) c ) != NULL : islower( ( UCHAR ) c ) )
-  #define ISALPHA(c)    ( (hb_cdppage())->nChars ? isalpha( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL || strchr( hb_cdp_page->CharsLower, c ) != NULL : isalpha( ( UCHAR ) c ) )
+  #define ISUPPER(c)    ( (hb_cdppage())->nChars ? HB_ISUPPER( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL : HB_ISUPPER( ( UCHAR ) c ) )
+  #define ISLOWER(c)    ( (hb_cdppage())->nChars ? HB_ISLOWER( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsLower, ( UCHAR ) c ) != NULL : HB_ISLOWER( ( UCHAR ) c ) )
+  #define ISALPHA(c)    ( (hb_cdppage())->nChars ? HB_ISALPHA( ( UCHAR ) c ) || strchr( (hb_cdppage())->CharsUpper, ( UCHAR ) c ) != NULL || strchr( hb_cdp_page->CharsLower, c ) != NULL : HB_ISALPHA( ( UCHAR ) c ) )
   #endif
-  #define ISUPPER(c)    __isupper( ( UCHAR ) c )
-  #define ISLOWER(c)    __islower( ( UCHAR ) c )
-  #define ISALPHA(c)    __isalpha( ( UCHAR ) c )
+  #define ISUPPER(c)    __HB_ISUPPER( ( UCHAR ) c )
+  #define ISLOWER(c)    __HB_ISLOWER( ( UCHAR ) c )
+  #define ISALPHA(c)    __HB_ISALPHA( ( UCHAR ) c )
 #else
-  #define ISUPPER(c)    isupper( ( UCHAR ) c )
-  #define ISLOWER(c)    islower( ( UCHAR ) c )
-  #define ISALPHA(c)    isalpha( ( UCHAR ) c )
+  #define ISUPPER(c)    HB_ISUPPER( ( UCHAR ) c )
+  #define ISLOWER(c)    HB_ISLOWER( ( UCHAR ) c )
+  #define ISALPHA(c)    HB_ISALPHA( ( UCHAR ) c )
 #endif
 
 
@@ -84,22 +84,22 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 
-static BOOL __isupper( UCHAR c )
+static BOOL __HB_ISUPPER( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
-  return ( __hb_cdp_page->nChars ? isupper( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL : isupper( c ) );
+  return ( __hb_cdp_page->nChars ? HB_ISUPPER( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL : HB_ISUPPER( c ) );
 }
 
-static BOOL __islower( UCHAR c )
+static BOOL __HB_ISLOWER( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
-  return ( __hb_cdp_page->nChars ? islower( c ) || strchr( __hb_cdp_page->CharsLower, c ) != NULL : islower( c ) );
+  return ( __hb_cdp_page->nChars ? HB_ISLOWER( c ) || strchr( __hb_cdp_page->CharsLower, c ) != NULL : HB_ISLOWER( c ) );
 }
 
-static BOOL __isalpha( UCHAR c )
+static BOOL __HB_ISALPHA( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
-  return ( __hb_cdp_page->nChars ? isalpha( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL || strchr( __hb_cdp_page->CharsLower, c ) != NULL : isalpha( c ) );
+  return ( __hb_cdp_page->nChars ? HB_ISALPHA( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL || strchr( __hb_cdp_page->CharsLower, c ) != NULL : HB_ISALPHA( c ) );
 }
 
 #endif /* HB_CDP_SUPPORT_OFF */
@@ -131,7 +131,7 @@ static void do_pos1 (int iSwitch)
 
     if (iSwitch == DO_POS1_POSRANGE)
     {
-      
+
       if (hb_parclen (1) == 0)
       {
         hb_retnl (0);
@@ -151,7 +151,7 @@ static void do_pos1 (int iSwitch)
       {
         ucChar2 = *(hb_parc (2));
       }
-      
+
       iParamShift += 2;
     }
 
@@ -187,7 +187,7 @@ static void do_pos1 (int iSwitch)
         {
           iDoRet = ((ucChar1 <= *puc) && (ucChar2 >= *puc));
         }; break;
-        
+
         case DO_POS1_POSUPPER:
         {
           iDoRet = ISUPPER(*puc);
@@ -233,7 +233,7 @@ static void do_pos1 (int iSwitch)
                                    hb_paramError (1), hb_paramError (2), hb_paramError (3),
                                    hb_paramError (4), hb_paramError (5));
         }; break;
-        
+
         case DO_POS1_POSUPPER:
         {
           pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_POSUPPER,
@@ -242,7 +242,7 @@ static void do_pos1 (int iSwitch)
         }; break;
       }
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

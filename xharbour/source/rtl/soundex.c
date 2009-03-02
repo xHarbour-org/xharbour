@@ -1,5 +1,5 @@
 /*
- * $Id: soundex.c,v 1.3 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: soundex.c,v 1.4 2009/02/28 08:44:30 lculik Exp $
  */
 
 /*
@@ -80,16 +80,16 @@ HB_FUNC( SOUNDEX )
       {
          char cChar = pszString[ nPos ];
 
-         /* NOTE: Intentionally not using toupper()/isalpha() to be 100%
+         /* NOTE: Intentionally not using HB_TOUPPER()/HB_ISALPHA() to be 100%
                   Clipper compatible here, these ANSI C functions may behave
                   differently for accented and national characters. It's also
                   faster this way. [vszakats] */
 
-         /* Convert to uppercase: toupper() */
+         /* Convert to uppercase: HB_TOUPPER() */
          if( cChar >= 'a' && cChar <= 'z' )
             cChar -= (char) ( 'a' - 'A' );
 
-         /* Check if isalpha() */
+         /* Check if HB_ISALPHA() */
          if( cChar >= 'A' && cChar <= 'Z' )
          {
             static const char s_szTable[] = "01230120022455012623010202"; /* NOTE: SoundEx result codes for letters from "A" to "Z" */

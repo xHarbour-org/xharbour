@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.8 2008/07/02 18:26:04 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.9 2008/07/13 01:45:22 ronpinkas Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bAutoMemvarAssume;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bAutoMemvarAssume = iValue != 0;
@@ -112,7 +112,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bDebugInfo;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bDebugInfo = iValue != 0;
@@ -138,7 +138,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bLineNumbers;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bLineNumbers = iValue != 0;
@@ -149,7 +149,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bStartProc;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bStartProc = iValue != 0;
@@ -160,7 +160,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bPPO;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bPPO = iValue != 0;
@@ -171,7 +171,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bQuiet;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bQuiet = iValue != 0;
@@ -192,7 +192,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bForceMemvars;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bForceMemvars = iValue != 0;
@@ -203,7 +203,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_bShortCuts;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bShortCuts = iValue == 0;
@@ -214,7 +214,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             if( piPrevious )
             {
                *piPrevious = (int) hb_comp_iWarnings;
-               cIndex[0] = tolower( szSwitch[ 0 ] );
+               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             if( iValue >= 0 && iValue <= 4 )

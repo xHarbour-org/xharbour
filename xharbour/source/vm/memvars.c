@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.138 2009/02/24 12:38:33 marchuet Exp $
+ * $Id: memvars.c,v 1.139 2009/02/27 19:36:10 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
-#include <ctype.h> /* for toupper() function */
+#include <ctype.h> /* for HB_TOUPPER() function */
 
 #include "hbvmopt.h"
 #include "hbapi.h"

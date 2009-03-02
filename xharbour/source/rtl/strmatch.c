@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.12 2008/08/21 12:47:45 marchuet Exp $
+ * $Id: strmatch.c,v 1.13 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
          }
          else
          {
-            while( toupper( *pszString ) != toupper( *pszMask ) )
+            while( HB_TOUPPER( *pszString ) != HB_TOUPPER( *pszMask ) )
             {
                if( *( ++pszString ) == '\0' )
                {
@@ -91,7 +91,7 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
                }
             }
 
-            while( toupper( *pszString ) == toupper( *pszMask ) )
+            while( HB_TOUPPER( *pszString ) == HB_TOUPPER( *pszMask ) )
             {
                if( *( ++pszString ) == '\0' )
                {
@@ -102,7 +102,7 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
             pszMask++;
          }
       }
-      else if( toupper( *pszMask ) != toupper( *pszString ) && *pszMask != '?' )
+      else if( HB_TOUPPER( *pszMask ) != HB_TOUPPER( *pszString ) && *pszMask != '?' )
       {
          return FALSE;
       }

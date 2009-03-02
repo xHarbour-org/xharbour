@@ -1,5 +1,5 @@
 /*
- * $Id: hbfopen.c,v 1.2 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbfopen.c,v 1.3 2008/01/14 11:08:29 likewolf Exp $
  */
 
 /*
@@ -56,6 +56,7 @@ FILE * hb_fopen( const char *path, const char *mode )
 {
    BOOL fFree;
    char * pszFile = ( char * ) hb_fsNameConv( ( BYTE * ) path, &fFree );
+
    FILE * file = fopen( pszFile, mode );
 
    if( fFree )
@@ -63,5 +64,3 @@ FILE * hb_fopen( const char *path, const char *mode )
 
    return file;
 }
-
-

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.42 2009/01/25 00:10:30 likewolf Exp $
+ * $Id: cdpapi.c,v 1.43 2009/02/20 12:48:23 marchuet Exp $
  */
 
 /*
@@ -360,8 +360,8 @@ BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
 
                   for( i = 0; i < 256; i++ )
                   {
-                     cdpage->s_upper[i] = ( char ) toupper( ( UCHAR ) i );
-                     cdpage->s_lower[i] = ( char ) tolower( ( UCHAR ) i );
+                     cdpage->s_upper[i] = ( char ) HB_TOUPPER( ( UCHAR ) i );
+                     cdpage->s_lower[i] = ( char ) HB_TOLOWER( ( UCHAR ) i );
                   }
                   if( strpbrk( cdpage->CharsUpper, "~." ) != NULL )
                   {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.32 2008/06/28 18:51:49 walito Exp $
+ * $Id: hbxml.c,v 1.33 2008/11/06 18:58:27 jfgimenez Exp $
  */
 
 /*
@@ -240,7 +240,7 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                   return MXML_STATUS_DONE;
 
                default:
-                  if ( isalpha( chr ) )
+                  if ( HB_ISALPHA( chr ) )
                   {
                      if ( mxml_sgs_append_char( buf_name, chr ) != MXML_STATUS_OK )
                      {
@@ -259,7 +259,7 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
 
          // scanning for a name
          case 1:
-            if ( isalnum( chr ) || chr == '_' || chr == '-' || chr == ':' )
+            if ( HB_ISALNUM( chr ) || chr == '_' || chr == '-' || chr == ':' )
             {
                if ( mxml_sgs_append_char( buf_name, chr ) != MXML_STATUS_OK )
                {
@@ -394,7 +394,7 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                buf_attrib->length = iPosAmper;
                mxml_sgs_append_char( buf_attrib, chr );
             }
-            else if ( ! ( isalpha( chr ) || isdigit( chr ) || ( chr == '#' ) ) )
+            else if ( ! ( HB_ISALPHA( chr ) || HB_ISDIGIT( chr ) || ( chr == '#' ) ) )
             {
                //error - we have something like &amp &amp
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
@@ -911,7 +911,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
       switch ( iStatus )
       {
          case 0:
-            if ( isalpha( chr ) ) {
+            if ( HB_ISALPHA( chr ) ) {
                // can't cause reallocations
                buf[ iPos++ ] = chr;
                iStatus = 1;
@@ -925,7 +925,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
          break;
 
          case 1:
-            if ( isalnum( chr ) || chr == '_' || chr == '-' || chr == ':' )
+            if ( HB_ISALNUM( chr ) || chr == '_' || chr == '-' || chr == ':' )
             {
                // can't cause reallocations
                buf[ iPos++ ] = chr;
@@ -1532,7 +1532,7 @@ static MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc,
                node = mxml_node_new( doc );
                mxml_node_read_pi( ref, node, doc );
             }
-            else if ( isalpha( chr ) )
+            else if ( HB_ISALPHA( chr ) )
             {
                mxml_refil_ungetc( ref, chr );
                node = mxml_node_new( doc );
@@ -1550,7 +1550,7 @@ static MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc,
             {
                iStatus = 3;
             }
-            else if ( isalpha( chr ) )
+            else if ( HB_ISALPHA( chr ) )
             {
                node = mxml_node_new( doc );
                mxml_refil_ungetc( ref, chr );

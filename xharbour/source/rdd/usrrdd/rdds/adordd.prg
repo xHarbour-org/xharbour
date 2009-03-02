@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.17 2008/09/16 10:10:07 marchuet Exp $
+ * $Id: adordd.prg,v 1.18 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -1305,7 +1305,7 @@ STATIC FUNCTION ADO_SEEK( nWA, lSoftSeek, cKey, lFindLast )
 
 //oRecordSet:Find( aWAData[ WA_SCOPEINFO ][ UR_SI_CFOR ], If( lContinue, 1, 0 ) )
    LPCDXKEY pKey;
-   ERRCODE retval = SUCCESS;
+   HB_ERRCODE retval = SUCCESS;
    BOOL  fEOF = FALSE, fLast;
    ULONG ulRec;
 

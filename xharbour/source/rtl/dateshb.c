@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.20 2008/07/25 11:13:47 jfgimenez Exp $
+ * $Id: dateshb.c,v 1.21 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -151,7 +151,7 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
       {
          digit = szDate[ count ];
 
-         if( isdigit( digit ) )
+         if( HB_ISDIGIT( digit ) )
          {
             /* Process the digit for the current date field */
             if( d_pos == 1 )
@@ -279,7 +279,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
       for( count = 0; count < size; count++ )
       {
          digit = szTime[ count ];
-         if( isdigit( digit ) )
+         if( HB_ISDIGIT( digit ) )
          {
             /* Process the digit for the current date field */
             if( h_pos == 1 )

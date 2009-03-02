@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.39 2009/02/08 21:13:26 guerra000 Exp $
+ * $Id: hbffind.c,v 1.40 2009/02/28 08:44:29 lculik Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.39 2009/02/08 21:13:26 guerra000 Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.40 2009/02/28 08:44:29 lculik Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -380,7 +380,7 @@ ULONG hb_fsAttrEncode( const char * szAttr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsAttrEncode(%p)", szAttr));
 
-   while( ( ch = ( char ) toupper( *pos ) ) != '\0' )
+   while( ( ch = ( char ) HB_TOUPPER( *pos ) ) != '\0' )
    {
       switch( ch )
       {

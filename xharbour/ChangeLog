@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6392 2009/02/28 01:58:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6393 2009/02/28 08:49:44 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,53 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-03-02 10:24 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * include\hbapi.h
+   * include\hbdefs.h
+   * source\common\hbdate.c
+   * source\common\hbfopen.c
+   * source\common\hbstr.c
+   * source\compiler\calconst.c
+   * source\compiler\cmdcheck.c
+   * source\compiler\exproptb.c
+   * source\compiler\genc.c
+   * source\compiler\harbour.c
+   * source\compiler\hbstrong.c
+   * source\compiler\ppcomp.c
+   * source\ct\pos1.c
+   * source\ct\token1.c
+   * source\rdd\bmdbfcdx\bmdbfcdx1.c
+   * source\rdd\usrrdd\rdds\adordd.prg
+   * source\rdd\workarea.c
+   * source\rtl\at.c
+   * source\rtl\cdpapi.c
+   * source\rtl\dateshb.c
+   * source\rtl\dirdrive.c
+   * source\rtl\gtpca\gtpca.c
+   * source\rtl\hbffind.c
+   * source\rtl\hbxml.c
+   * source\rtl\is.c
+   * source\rtl\natmsg.c
+   * source\rtl\pcre\pcre_maketables.c
+   * source\rtl\philes.c
+   * source\rtl\philesx.c
+   * source\rtl\set.c
+   * source\rtl\soundex.c
+   * source\rtl\strcase.c
+   * source\rtl\strmatch.c
+   * source\rtl\transfrm.c
+   * source\vm\arrayshb.c
+   * source\vm\classes.c
+   * source\vm\dbgentry.c
+   * source\vm\hash.c
+   * source\vm\hvm.c
+   * source\vm\memvars.c
+    + Added macros:
+      HB_TOUPPER(), HB_TOLOWER(), HB_ISUPPER(), HB_ISLOWER(),
+      HB_ISALPHA(), HB_ISDIGIT().
+    * Replaced tolower()/toupper()/isdigit() with macros or other
+      constructs.
+      This fixes some castings.
 
 2009-02-28 05:40 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    * source/rtl/xhelp.c

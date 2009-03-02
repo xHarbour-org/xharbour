@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.41 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: cmdcheck.c,v 1.42 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -149,10 +149,10 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                   {
                      case 'b' :
                      case 'B' :
-                       if( Args[i][j + 1] && toupper( Args[i][j + 1] ) == 'U' &&
-                           Args[i][j + 2] && toupper( Args[i][j + 2] ) == 'I' &&
-                           Args[i][j + 3] && toupper( Args[i][j + 3] ) == 'L' &&
-                           Args[i][j + 4] && toupper( Args[i][j + 4] ) == 'D' )
+                       if( Args[i][j + 1] && HB_TOUPPER( Args[i][j + 1] ) == 'U' &&
+                           Args[i][j + 2] && HB_TOUPPER( Args[i][j + 2] ) == 'I' &&
+                           Args[i][j + 3] && HB_TOUPPER( Args[i][j + 3] ) == 'L' &&
+                           Args[i][j + 4] && HB_TOUPPER( Args[i][j + 4] ) == 'D' )
                        {
                           Switch[2] = 'U';
                           Switch[3] = 'I';
@@ -176,9 +176,9 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'c' :
                      case 'C' :
-                       if( Args[i][j + 1] && toupper( Args[i][j + 1] ) == 'R' &&
-                           Args[i][j + 2] && toupper( Args[i][j + 2] ) == 'E' &&
-                           Args[i][j + 3] && toupper( Args[i][j + 3] ) == 'D' )
+                       if( Args[i][j + 1] && HB_TOUPPER( Args[i][j + 1] ) == 'R' &&
+                           Args[i][j + 2] && HB_TOUPPER( Args[i][j + 2] ) == 'E' &&
+                           Args[i][j + 3] && HB_TOUPPER( Args[i][j + 3] ) == 'D' )
                        {
                           Switch[2] = 'R';
                           Switch[3] = 'E';
@@ -187,15 +187,15 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                           j += 4;
 
-                          if( Args[i][j] && toupper( Args[i][j] ) == 'I' )
+                          if( Args[i][j] && HB_TOUPPER( Args[i][j] ) == 'I' )
                           {
                              j++;
 
-                             if( Args[i][j] && toupper( Args[i][j] ) == 'T' )
+                             if( Args[i][j] && HB_TOUPPER( Args[i][j] ) == 'T' )
                              {
                                 j++;
 
-                                if( Args[i][j] && toupper( Args[i][j] ) == 'S' )
+                                if( Args[i][j] && HB_TOUPPER( Args[i][j] ) == 'S' )
                                 {
                                    j++;
                                 }
@@ -223,7 +223,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'e' :
                      case 'E' :
-                       if( Args[i][j + 1] && toupper( ( BYTE ) Args[i][j + 1] ) == 'S' && Args[i][j + 2] && isdigit( ( BYTE ) Args[i][j + 2] ) )
+                       if( Args[i][j + 1] && HB_TOUPPER( ( BYTE ) Args[i][j + 1] ) == 'S' && Args[i][j + 2] && HB_ISDIGIT( ( BYTE ) Args[i][j + 2] ) )
                        {
                           Switch[2] = 'S';
                           Switch[3] = Args[i][j + 2];
@@ -246,7 +246,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                      case 'G' :
                           /* Required argument */
                           Switch[2] = Args[i][j + 1];
-                          if( isdigit( ( BYTE ) Args[i][j + 2] ) )
+                          if( HB_ISDIGIT( ( BYTE ) Args[i][j + 2] ) )
                           {
                              /* Optional argument */
                              Switch[3] = Args[i][j + 2];
@@ -339,7 +339,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'q' :
                      case 'Q' :
-                       if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
+                       if( Args[i][j + 1] && HB_ISDIGIT( ( BYTE ) Args[i][j + 1] ) )
                        {
                           Switch[2] = Args[i][j + 1];
                           Switch[3] = '\0';
@@ -952,10 +952,10 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'u':
              case 'U':
-                if ( s[1] && toupper( s[1] ) == 'N'
-                     && s[2] && toupper( s[2] ) == 'D'
-                     && s[3] && toupper( s[3] ) == 'E'
-                     && s[4] && toupper( s[4] ) == 'F'
+                if ( s[1] && HB_TOUPPER( s[1] ) == 'N'
+                     && s[2] && HB_TOUPPER( s[2] ) == 'D'
+                     && s[3] && HB_TOUPPER( s[3] ) == 'E'
+                     && s[4] && HB_TOUPPER( s[4] ) == 'F'
                      && s[5] == ':' )
                 {
                    /* NOTE: Ignore these -undef: switches will be processed separately */
@@ -980,7 +980,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 {
                    hb_comp_bForceMemvars = FALSE;
                 }
-                else if( toupper( *( s + 1 ) ) == 'D' )
+                else if( HB_TOUPPER( *( s + 1 ) ) == 'D' )
                 {
                    hb_comp_autoDeferred = TRUE;
                 }
@@ -999,7 +999,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 {
                    hb_comp_iWarnings = 1;
                 }
-                else if( isdigit( s[ 1 ] ) && s[ 2 ] == '\0' )
+                else if( HB_ISDIGIT( s[ 1 ] ) && s[ 2 ] == '\0' )
                 {
                    /*there is -w<0,1,2,3> probably */
 
@@ -1015,7 +1015,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                       hb_comp_bWarnUnUsedBlockParams = TRUE;
                    }
                 }
-                else if( isalpha( s[ 1 ] ) )
+                else if( HB_ISALPHA( s[ 1 ] ) )
                 {
                    unsigned int i = 0;
                    char * szOption = hb_strupr( hb_strdup( s + 1 ) );
@@ -1194,11 +1194,11 @@ static void hb_compChkDefineSwitch( char * pszSwitch )
          }
          hb_xfree( szDefText );
       }
-      else if ( pszSwitch[1] && toupper( pszSwitch[1] ) == 'U'
-                && pszSwitch[2] && toupper( pszSwitch[2] ) == 'N'
-                && pszSwitch[3] && toupper( pszSwitch[3] ) == 'D'
-                && pszSwitch[4] && toupper( pszSwitch[4] ) == 'E'
-                && pszSwitch[5] && toupper( pszSwitch[5] ) == 'F'
+      else if ( pszSwitch[1] && HB_TOUPPER( pszSwitch[1] ) == 'U'
+                && pszSwitch[2] && HB_TOUPPER( pszSwitch[2] ) == 'N'
+                && pszSwitch[3] && HB_TOUPPER( pszSwitch[3] ) == 'D'
+                && pszSwitch[4] && HB_TOUPPER( pszSwitch[4] ) == 'E'
+                && pszSwitch[5] && HB_TOUPPER( pszSwitch[5] ) == 'F'
                 && pszSwitch[6] == ':' )
       {
          char *szDefText = hb_strdup( pszSwitch + 7 );

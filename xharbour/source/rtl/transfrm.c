@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.57 2009/02/20 12:48:31 marchuet Exp $
+ * $Id: transfrm.c,v 1.58 2009/02/28 08:44:30 lculik Exp $
  */
 
 /*
@@ -72,9 +72,9 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
-  #define TOUPPER(c)    (((hb_cdppage())->nChars)? (char)(hb_cdppage())->s_upper[c&255] : (char)toupper( (BYTE) c ) )
+  #define TOUPPER(c)    (((hb_cdppage())->nChars)? (char)(hb_cdppage())->s_upper[c&255] : HB_TOUPPER( (BYTE) c ) )
 #else
-  #define TOUPPER(c)    toupper( (BYTE) c )
+  #define TOUPPER(c)    HB_TOUPPER( (BYTE) c )
 #endif
 
 /* Picture function flags */
@@ -136,7 +136,7 @@ HB_FUNC( TRANSFORM )
 
          while( ulPicLen && ! bDone )
          {
-            switch( toupper( *szPic ) )
+            switch( HB_TOUPPER( *szPic ) )
             {
                case '9':
                   if( ulPicLen == 1 || strchr( szPic, ' ' ) != NULL || strchr( szPic, HB_CHAR_HT ) != NULL )
@@ -647,7 +647,7 @@ HB_FUNC( TRANSFORM )
          LONGLONG llPush  = 0;
 
          if( HB_IS_LONG( pValue ) )
-         {   
+         {
             llValue = hb_itemGetNLL( pValue );
          }
          else
@@ -875,7 +875,7 @@ HB_FUNC( TRANSFORM )
                      }
                      else if( cPic == ',' && bInit )    /* Comma                    */
                      {
-                        if( iCount && isdigit( ( BYTE ) szStr[ iCount - 1 ] ) )
+                        if( iCount && HB_ISDIGIT( ( BYTE ) szStr[ iCount - 1 ] ) )
                         {                                /* May we place it     */
                           if( uiPicFlags & PF_EXCHANG )
                              szResult[ i ] = '.';
@@ -927,23 +927,23 @@ HB_FUNC( TRANSFORM )
                for( iCount = 0; ( ULONG ) iCount < i; iCount++ )
                    /* Permit to detect overflow when picture init with mask */
                {
-                  if( isdigit( ( BYTE ) szResult[ iCount ] ) &&
+                  if( HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) &&
                        !( szResult[ iCount ] == '0' ) &&       /* if not PF_PADL */
                        ( iCount == 0 ||
-                       !isdigit( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
+                       !HB_ISDIGIT( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
                                                                /* Overflow */
                   {
                      for( iCount++; ( ULONG ) iCount < i; iCount++ )
                      {
-                        if( isdigit( ( BYTE ) szResult[ iCount ] ) )
+                        if( HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) )
                            szResult[ iCount ] = '*';
                      }
                      break;
                   }
                   else
                   {
-                     if( !isdigit( ( BYTE ) szResult[ iCount ] ) ||
-                            ( szResult[ iCount ] == '0' && !isdigit( ( BYTE ) szPic[ iCount ] ) ) )
+                     if( !HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) ||
+                            ( szResult[ iCount ] == '0' && !HB_ISDIGIT( ( BYTE ) szPic[ iCount ] ) ) )
                      {
                         bDollarSign = ( szPic[ iCount ] == '$' );
                         break;
@@ -967,23 +967,23 @@ HB_FUNC( TRANSFORM )
                for( iCount = 0; ( ULONG ) iCount < i; iCount++ )
                    /* Permit to detect overflow when picture init with mask */
                {
-                  if( isdigit( ( BYTE ) szResult[ iCount ] ) &&
+                  if( HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) &&
                        !( szResult[ iCount ] == '0' ) &&       /* if not PF_PADL */
                        ( iCount == 0 ||
-                       !isdigit( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
+                       !HB_ISDIGIT( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
                                                                /* Overflow */
                   {
                      for( iCount++; ( ULONG ) iCount < i; iCount++ )
                      {
-                        if( isdigit( ( BYTE ) szResult[ iCount ] ) )
+                        if( HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) )
                            szResult[ iCount ] = '*';
                      }
                      break;
                   }
                   else
                   {
-                     if( !isdigit( ( BYTE ) szResult[ iCount ] ) ||
-                            ( szResult[ iCount ] == '0' && !isdigit( ( BYTE ) szPic[ iCount ] ) ) )
+                     if( !HB_ISDIGIT( ( BYTE ) szResult[ iCount ] ) ||
+                            ( szResult[ iCount ] == '0' && !HB_ISDIGIT( ( BYTE ) szPic[ iCount ] ) ) )
                      {
                         for( ; ( ULONG ) iCount < i; iCount++ )
                         {
