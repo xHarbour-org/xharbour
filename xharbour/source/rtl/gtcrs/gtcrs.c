@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.66 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: gtcrs.c,v 1.67 2009/02/20 12:48:31 marchuet Exp $
  */
 
 /*
@@ -2805,7 +2805,7 @@ static BOOL hb_gt_crs_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = b_cdpID();
+      pszHostCDP = hb_cdpID();
       if ( !pszHostCDP )
          pszHostCDP = pszTermCDP;
    }
@@ -2854,7 +2854,7 @@ static BOOL hb_gt_crs_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
 #ifndef HB_CDP_SUPPORT_OFF
    if( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = b_cdpID();
+      pszHostCDP = hb_cdpID();
    }
 
    if( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
