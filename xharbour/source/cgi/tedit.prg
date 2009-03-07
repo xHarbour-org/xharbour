@@ -1,5 +1,5 @@
 /*
- * $Id: tedit.prg,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: tedit.prg,v 1.5 2006/06/22 03:50:13 lculik Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ CLASS THtmlControl
 
    METHOD SetLabel( l ) INLINE ::lLabel := l
 
-   METHOD Put( lPut )
+   METHOD Put()
 
    METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled )
 
@@ -192,7 +192,7 @@ ENDCLASS
 *
 */
 
-METHOD Put( lPut ) CLASS THtmlControl
+METHOD Put() CLASS THtmlControl
 
    LOCAL i
    LOCAL cStr := ""
@@ -512,6 +512,8 @@ ENDCLASS
 */
 
 METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS THtmlForm
+
+   HB_SYMBOL_UNUSED( cAction )
 
    DEFAULT cName TO "Form1"
    DEFAULT cMethod TO "POST"

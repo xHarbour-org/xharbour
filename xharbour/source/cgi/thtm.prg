@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.7 2006/06/22 03:50:13 lculik Exp $
+ * $Id: thtm.prg,v 1.8 2008/03/13 10:49:39 likewolf Exp $
  */
 
 /*
@@ -175,7 +175,7 @@ CLASS THtml
    METHOD NewTableCell( cAlign, cColor, cFont, nSize, cFntColor, nHeight, cBgPic, ;
                         nWidth, lWrap, nCSpan, nRSpan, cValing, clrdrk, clrlt, cBdrClr, cclass )
 
-   METHOD EndTableCell( lFont )
+   METHOD EndTableCell()
 
    METHOD EndTable()
 
@@ -1483,7 +1483,7 @@ METHOD NewTableCell( cAlign, cColor, ;
 *
 */
 
-METHOD EndTableCell( lFont ) CLASS THtml
+METHOD EndTableCell() CLASS THtml
 
    IF ::lFont
       ::cStr +=  "</font></td>" + CRLF() 
@@ -1593,7 +1593,9 @@ METHOD FormSubmit( cText ) CLASS THtml
 *
 */
 
-METHOD FormImage( cText, name, File ) CLASS THtml
+METHOD FormImage( cText, name, file ) CLASS THtml
+
+   HB_SYMBOL_UNUSED( cText )
 
    ::cStr +=  '<INPUT TYPE="IMAGE" NAME="' + name + '" SRC="' + file + '">' + CRLF() 
 

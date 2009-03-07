@@ -1,5 +1,5 @@
 /*
- * $Id: hjwindow.prg,v 1.2 2005/10/14 07:25:11 lf_sfnet Exp $
+ * $Id: hjwindow.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -81,9 +81,9 @@ CLASS TJsWindow
 
    METHOD setOnUnLoad( c ) INLINE ::onUnLoad := c
 
-   METHOD Alert( c ) INLINE ::QOut( "alert('c')" )
+   METHOD Alert( c ) INLINE ::QOut( "alert('" + c + "')" )
 
-   METHOD confirm( c ) INLINE ::QOut( "confirm('c')" )
+   METHOD confirm( c ) INLINE ::QOut( "confirm('" + c + "')" )
 
    METHOD SetSize( x, y, h, w )
 

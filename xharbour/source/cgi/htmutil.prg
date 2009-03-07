@@ -1,5 +1,5 @@
 /*
- * $Id: htmutil.prg,v 1.4 2006/05/13 16:48:34 lculik Exp $
+ * $Id: htmutil.prg,v 1.5 2006/06/28 20:56:31 lculik Exp $
  */
 
 /*
@@ -143,7 +143,7 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
 RETURN Nil
 
 
-PROC htmlBrowse( oHtm, cAction, lUseLinks, cTarget, cAlias )
+PROC htmlBrowse( oHtm, cAction, lUseLinks )
 
    LOCAL i
    LOCAL n      := 0
@@ -325,9 +325,9 @@ Class JWindow
 
    METHOD setOnUnLoad( c ) INLINE ::onUnLoad := c
 
-   METHOD Alert( c ) INLINE ::QOut( "alert('c')" )
+   METHOD Alert( c ) INLINE ::QOut( "alert('" + c + "')" )
 
-   METHOD confirm( c ) INLINE ::QOut( "confirm('c')" )
+   METHOD confirm( c ) INLINE ::QOut( "confirm('" + c + "')" )
 
    METHOD SetSize( x, y, h, w )
 

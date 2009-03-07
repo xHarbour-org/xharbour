@@ -1,5 +1,5 @@
 /*
- * $Id: cgi.prg,v 1.4 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: cgi.prg,v 1.5 2008/06/27 15:59:35 marchuet Exp $
  */
 /*
  * xHarbour Project source code:
@@ -181,7 +181,7 @@ METHOD Flush() CLASS TIpCgi
    local nFileSize
    local cSID := ::cSID
    local cSession
-   hEval( ::hCookies, { |k,v,n| ::cCgiHeader += 'Set-Cookie: ' + k + '=' + v + ';' + _CRLF } )
+   hEval( ::hCookies, { |k,v| ::cCgiHeader += 'Set-Cookie: ' + k + '=' + v + ';' + _CRLF } )
    cStream := ::cCgiHeader + _CRLF + ::cHtmlPage + _CRLF
    nLen := len( cStream )
    lRet := ( Fwrite( CGI_OUT, cStream, nLen ) == nLen )
@@ -205,6 +205,10 @@ METHOD DestroySession( cID ) CLASS TIpCgi
    local cFile
    local cSID := ::cSID
    local lRet
+
+   if !empty( cID )
+      cSID := cID
+   endif
 
    if !empty( cSID )
       ::hSession := {=>}
@@ -374,7 +378,7 @@ STATIC FUNCTION HtmlTag( xVal, cKey )
 STATIC FUNCTION HtmlAllTag( hTags, cSep )
    local cVal := ''
    DEFAULT cSep TO ' '
-   hEval( hTags, { |key,value,pos| cVal += HtmlTag( hTags, key ) + cSep } )
+   hEval( hTags, { |k| cVal += HtmlTag( hTags, k ) + cSep } )
    return cVal
 STATIC FUNCTION HtmlOption( xVal, cKey, cPre, cPost, lScan )
    local cVal := ''
@@ -398,7 +402,7 @@ STATIC FUNCTION HtmlAllOption( hOptions, cSep )
    local cVal := ''
    DEFAULT cSep TO ' '
    if !empty( hOptions )
-      hEval( hOptions, { |key,value,pos| cVal += HtmlOption( hOptions, key,,, .t. ) + cSep } )
+      hEval( hOptions, { |k| cVal += HtmlOption( hOptions, k,,, .t. ) + cSep } )
    endif
    return cVal
 STATIC FUNCTION HtmlValue( xVal, cKey, cDefault )
@@ -417,7 +421,7 @@ STATIC FUNCTION HtmlAllValue( hValues, cSep )
    local cVal := ''
    DEFAULT cSep TO ' '
    if !empty( hValues )
-      hEval( hValues, { |key,value,pos| cVal += HtmlValue( hValues, key ) + cSep } )
+      hEval( hValues, { |k| cVal += HtmlValue( hValues, k ) + cSep } )
    endif
    return cVal
 STATIC FUNCTION HtmlScript( xVal, cKey )
