@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.78 2008/03/16 19:15:57 likewolf Exp $
+# $Id: hb-func.sh,v 1.79 2008/04/28 02:18:57 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -134,20 +134,29 @@ mk_hbtools()
     HB_SLN_LIB=""
     if [ "${HB_COMPILER}" = "mingw32" ]; then
         HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+        HB_WITHOUT_X11="yes"
+    elif [ "${HB_COMPILER}" = "cemgw" ]; then
+        HB_SYS_LIBS="${HB_SYS_LIBS} -lwininet -lws2 -lcommdlg -lcommctrl -luuid -lole32"
+        HB_WITHOUT_X11="yes"
     elif [ "${HB_COMPILER}" = "djgpp" ]; then
         HB_SYS_LIBS="${HB_SYS_LIBS}"
+        HB_WITHOUT_X11="yes"
     else
+        HB_CRS_LIB=""
         if [ "${HB_ARCHITECTURE}" = "linux" ]; then
-            HB_SYS_LIBS="${HB_SYS_LIBS} -ldl"
-        fi
-        if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+            HB_SYS_LIBS="${HB_SYS_LIBS} -ldl -lrt"
+        elif [ "${HB_ARCHITECTURE}" = "sunos" ]; then
             HB_SYS_LIBS="${HB_SYS_LIBS} -lrt"
+            HB_SYS_LIBS="${HB_SYS_LIBS} -lsocket -lnsl -lresolv"
             HB_CRS_LIB="curses"
-        elif [ -n "${HB_CURSES_VER}" ]; then
+        elif [ "${HB_ARCHITECTURE}" = "hpux" ]; then
+            HB_SYS_LIBS="${HB_SYS_LIBS} -lrt"
+        fi
+        if [ -n "${HB_CURSES_VER}" ]; then
             HB_CRS_LIB="${HB_CURSES_VER}"
         elif [ "${HB_NCURSES_194}" = "yes" ]; then
             HB_CRS_LIB="ncur194"
-        else
+        elif [ -z "${HB_CRS_LIB}" ]; then
             HB_CRS_LIB="ncurses"
         fi
         HB_SLN_LIB="slang"
@@ -367,6 +376,11 @@ if [ "\${HB_WITHOUT_X11}" != "yes" ]; then
 fi
 [ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="-l\${HB_GPM_LIB} \${SYSTEM_LIBS}"
 
+
+if [ "\${HB_STATIC}" = "no" ]; then
+    SYSTEM_LIBS=""
+fi
+
 if [ "\${HB_XBGTK}" = "yes" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
 elif [ "\${HB_XHGTK}" = "yes" ]; then
@@ -473,7 +487,8 @@ fi
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
 FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
-FOUTE="\${FOUTE%.[oc]}${hb_exesuf}"
+FOUTE="\${FOUTE%.[oc]}"
+FOUTE="\${FOUTE%${hb_exesuf}}${hb_exesuf}"
 
 hb_cc()
 {
@@ -588,7 +603,7 @@ EOF
 
 mk_hblibso()
 {
-    local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs full_lib_name full_lib_name_mt linker_options
+    local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs full_lib_name full_lib_name_mt linker_options linker_mtoptions gpm
 
     name=`get_solibname`
     hb_rootdir="${1-.}"
@@ -600,6 +615,32 @@ mk_hblibso()
     (cd $HB_LIB_INSTALL
     LIBS=""
     LIBSMT=""
+    gpm="${HB_GPM_MOUSE}"
+    linker_options="-lm"
+    linker_mtoptions=""
+    if [ "${HB_COMPILER}" = "mingw32" ]; then
+        linker_options="${linker_options} -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+    elif [ "${HB_COMPILER}" = "mingwce" ]; then
+        linker_options="${linker_options} -lwininet -lws2 -lcommdlg -lcommctrl -luuid -lole32"
+    elif [ "${HB_COMPILER}" = "djgpp" ]; then
+        linker_options="${linker_options}"
+    elif [ "${HB_ARCHITECTURE}" = "linux" ]; then
+        linker_options="${linker_options} -ldl -lrt"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+        linker_options="${linker_options} -lrt -lsocket -lnsl -lresolv"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "hpux" ]; then
+        linker_options="${linker_options} -lrt"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "bsd" ]; then
+        linker_options="$-L/usr/local/lib {linker_options}"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+        linker_options="-L/sw/lib -L/opt/local/lib ${linker_options}"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    fi
+
     for l in ${hb_libs}
     do
         case $l in
@@ -612,21 +653,34 @@ mk_hblibso()
                 else
                     lm="${ls}"
                 fi
-                if [ -f $ls ]
-                then
-                    LIBS="$LIBS $ls"
-                fi
                 if [ -f $lm ]
                 then
                     LIBSMT="$LIBSMT $lm"
                 fi
-                if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+                if [ -f $ls ]
+                then
+                    LIBS="$LIBS $ls"
                     if [ "${l}" = gtcrs ]; then
-                        linker_options="$linker_options -lncurses"
+                        if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+                            linker_options="$linker_options -lcurses"
+                        else
+                            linker_options="$linker_options -lncurses"
+                        fi
                     elif [ "${l}" = gtsln ]; then
                         if [ "${HB_WITHOUT_GTSLN}" != "yes" ]; then
                             linker_options="$linker_options -lslang"
                         fi
+                    elif [ "${l}" = gtxwc ]; then
+                        [ -d "/usr/X11R6/lib" ] && \
+                           linker_options="$linker_options -L/usr/X11R6/lib"
+                        [ -d "/usr/X11R6/lib64" ] && \
+                           linker_options="$linker_options -L/usr/X11R6/lib64"
+                        linker_options="$linker_options -lX11"
+                    fi
+                    if [ "${gpm}" = yes ] && ( [ "${l}" = gtcrs ] || \
+                       [ "${l}" = gtsln ] || [ "${l}" = gttrm ] ); then
+                        linker_options="$linker_options -lgpm"
+                        gpm=""
                     fi
                 fi
                 ;;
@@ -636,7 +690,6 @@ mk_hblibso()
         lib_ext=".dylib"
         full_lib_name="lib${name}.${hb_ver}${lib_ext}"
         full_lib_name_mt="lib${name}mt.${hb_ver}${lib_ext}"
-        linker_options="-L/sw/lib -L/opt/local/lib $linker_options"
     elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
         lib_ext=".dll"
         full_lib_name="${name}${lib_ext}"
@@ -656,10 +709,10 @@ mk_hblibso()
         hb_mkslib="${HB_BIN_INSTALL}/hb-mkslib"
     fi
     echo "Making ${full_lib_name}..."
-    ${hb_mkslib} ${full_lib_name} $LIBS ${linker_options}
+    ${hb_mkslib} ${full_lib_name} ${LIBS} ${linker_options}
     if [ "$HB_MT" = "MT" ]; then
         echo "Making ${full_lib_name_mt}..."
-        ${hb_mkslib} ${full_lib_name_mt} $LIBSMT ${linker_options}
+        ${hb_mkslib} ${full_lib_name_mt} ${LIBSMT} ${linker_mtoptions} ${linker_options}
     fi
     for l in ${full_lib_name} ${full_lib_name_mt}
     do
