@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.6 2004/03/02 17:31:28 druzus Exp $
+# $Id: install.cf,v 1.7 2008/03/16 19:15:57 likewolf Exp $
 #
 
 ifeq ($(INSTALL_OBJS),) # Empty install list
@@ -26,7 +26,8 @@ else  # bash
 INSTALL_DIRSH = $(subst \,/,$(INSTALL_DIR))
 INSTALL_OBJSH = $(subst \,/,$(INSTALL_OBJS))
 INSTALL_RULE =\
-	@if [ ! -d $(INSTALL_DIRSH) ]; \
+	@$(MDP) $(INSTALL_DIRSH); \
+	if [ ! -d $(INSTALL_DIRSH) ]; \
 	then \
 	  echo "! Can't install, path not found: $(INSTALL_DIRSH)" 1>&2; \
 	else \

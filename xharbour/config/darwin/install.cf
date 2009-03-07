@@ -1,9 +1,10 @@
 #
-# $Id: install.cf,v 1.1 2002/12/04 23:06:46 likewolf Exp $
+# $Id: install.cf,v 1.2 2003/01/07 10:48:18 likewolf Exp $
 #
 
 INSTALL_RULE =\
-	@if [ ! -d $(INSTALL_DIR) ]; \
+	@$(MDP) $(INSTALL_DIR); \
+	if [ ! -d $(INSTALL_DIR) ]; \
 	then \
 	  echo "! Can't install, path not found:" $(INSTALL_DIR); \
 	else \
@@ -22,4 +23,3 @@ INSTALL_RULE =\
 	    $(RANLIB) $(foreach file,$(notdir $(INSTALL_OBJS)),$(INSTALL_DIR)/$(file)); \
 	  fi \
 	fi
-

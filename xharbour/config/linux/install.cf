@@ -1,9 +1,10 @@
 #
-# $Id: install.cf,v 1.2 2003/12/07 19:36:18 druzus Exp $
+# $Id: install.cf,v 1.3 2003/12/13 17:55:11 druzus Exp $
 #
 
 INSTALL_RULE =\
-	@if [ ! -d $(INSTALL_DIR) ]; \
+	@$(MDP) $(INSTALL_DIR); \
+	if [ ! -d $(INSTALL_DIR) ]; \
 	then \
 	  echo "! Can't install, path not found:" $(INSTALL_DIR); \
 	else \

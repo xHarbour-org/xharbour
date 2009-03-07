@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.40 2008/03/16 19:15:57 likewolf Exp $
+# $Id: gcc.cf,v 1.41 2008/04/19 12:49:15 lculik Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -23,10 +23,6 @@ CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 # We are under linux
 CFLAGS = -DHB_OS_LINUX -Wall -W
 
-# uncomment this if you want to force relocateable code for .so libs
-# it's necessary on some platforms but can reduce performance
-#CFLAGS += -fPIC
-
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
@@ -37,6 +33,14 @@ ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 endif
 else
+# force relocateable code for .so libs
+# it's necessary on some platforms but can reduce performance
+ifeq ($(shell sh -c 'uname -m 2>/dev/null'),x86_64)
+USE_FPIC = yes
+endif
+ifeq ($(USE_FPIC),yes)
+CFLAGS += -fPIC
+endif
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
 CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE

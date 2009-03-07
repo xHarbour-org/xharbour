@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.25 2007/12/04 22:52:49 likewolf Exp $
+# $Id: make_gnu.sh,v 1.26 2008/03/16 19:15:55 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -23,9 +23,9 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     else
         hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
-            *windows*|*mingw32*|msys*)    hb_arch="w32" ;;
-            *dos)   hb_arch="dos" ;;
-            *bsd)   hb_arch="bsd" ;;
+            *windows*|*mingw32*|msys*) hb_arch="w32" ;;
+            *dos)                      hb_arch="dos" ;;
+            *bsd)                      hb_arch="bsd" ;;
         esac
     fi
     export HB_ARCHITECTURE="$hb_arch"
@@ -88,32 +88,16 @@ if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 
 if [ "$HB_COMMERCE" = yes ]
 then
-   export HB_GPM_MOUSE=no
-   export HB_WITHOUT_GTSLN=yes
+    export HB_GPM_MOUSE=no
+    export HB_WITHOUT_GTSLN=yes
 fi
 
 # export PRG_USR=
 # export C_USR=
 # export L_USR=
 
-if [ "$HB_ARCHITECTURE" = "linux" ]
-then
-    if [ "${C_USR}" == "${C_USR//-fPIC/}" ]
-    then
-        HB_CPU=`uname -m`
-        case "$HB_CPU" in
-            *[@_]64)
-                export C_USR="$C_USR -fPIC"
-                HB_ARCH64="yes"
-                ;;
-            *)
-                ;;
-        esac
-    fi
-fi
-
 [ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
-[ -z "$HB_INSTALL_PREFIX" ] && export HB_INSTALL_PREFIX=/usr/local
+[ -z "$HB_INSTALL_PREFIX" ] && export HB_INSTALL_PREFIX="/usr/local"
 
 # Set to constant value to be consistent with the non-GNU make files.
 
@@ -126,16 +110,16 @@ case "$HB_INSTALL_PREFIX" in
         ;;
 esac
 
-if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$HB_INSTALL_PREFIX/bin; fi
-if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$HB_INSTALL_PREFIX/lib$hb_instsubdir; fi
-if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$HB_INSTALL_PREFIX/include$hb_instsubdir; fi
+if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL="$HB_INSTALL_PREFIX/bin"; fi
+if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/lib$hb_instsubdir"; fi
+if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include$hb_instsubdir"; fi
 
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-   echo "Error: HB_ARCHITECTURE is not set."
+    echo "Error: HB_ARCHITECTURE is not set."
 fi
 if [ -z "$HB_COMPILER" ]; then
-   echo "Error: HB_COMPILER is not set."
+    echo "Error: HB_COMPILER is not set."
 fi
 
 if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
@@ -208,17 +192,17 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
 
 else
 
-   # ---------------------------------------------------------------
-   # Start the GNU make system
+    # ---------------------------------------------------------------
+    # Start the GNU make system
 
-   if [ "$HB_ARCHITECTURE" = "bsd" ] || uname|grep "BSD$" &> /dev/null || [ "$HB_ARCHITECTURE" = "hpux" ]
-   then
-      gmake $*
-   else
-      make $*
-   fi
+    if [ "$HB_ARCHITECTURE" = "bsd" ] || uname|grep "BSD$" &> /dev/null || [ "$HB_ARCHITECTURE" = "hpux" ]
+    then
+       gmake $*
+    else
+       make $*
+    fi
 
-   if [ "$*" = "clean" ]; then
-      find . -type d -name "$HB_ARCHITECTURE" | xargs rmdir 2> /dev/null
-   fi
+    if [ "$*" = "clean" ]; then
+       find . -type d -name "$HB_ARCHITECTURE" | xargs rmdir 2> /dev/null
+    fi
 fi

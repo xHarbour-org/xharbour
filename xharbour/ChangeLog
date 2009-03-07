@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6396 2009/03/05 23:43:05 lculik Exp $
+ * $Id: ChangeLog,v 1.6397 2009/03/07 12:30:19 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-07 16:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * config/bsd/install.cf
+  * config/darwin/install.cf
+  * config/dos/install.cf
+  * config/hpux/install.cf
+  * config/linux/install.cf
+  * config/sunos/install.cf
+  * config/w32/install.cf
+    ! Create installation directories if they don't already exist.
+  * make_gnu.sh
+  * config/linux/gcc.cf
+    ! Use -fPIC only for shared library code compilation, not for binaries.
 
 2009-03-07 15:28 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * bin/hb-func.sh

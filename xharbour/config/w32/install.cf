@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.5 2003/12/13 17:55:11 druzus Exp $
+# $Id: install.cf,v 1.6 2005/02/18 21:20:04 druzus Exp $
 #
 
 ifeq ($(INSTALL_OBJS),) # Empty install list
@@ -30,7 +30,8 @@ INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file))
 else  # bash
 
 INSTALL_RULE =\
-	@if [ ! -d $(INSTALL_DIR) ]; \
+	@$(MDP) $(INSTALL_DIR); \
+	if [ ! -d $(INSTALL_DIR) ]; \
 	then \
 	  echo "! Can't install, path not found:" $(INSTALL_DIR); \
 	else \
