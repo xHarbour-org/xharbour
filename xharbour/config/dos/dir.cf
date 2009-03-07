@@ -1,5 +1,5 @@
 #
-# $Id: dir.cf,v 1.3 2003/12/23 00:49:08 druzus Exp $
+# $Id: dir.cf,v 1.4 2004/03/02 17:31:28 druzus Exp $
 #
 
 ifeq ($(PM),) # Only traverse directories if not compiling a specific module
@@ -20,8 +20,8 @@ $(DIR_MAKE) -C $(file) $@
 
 endef
 
-DIR_LIST := $(subst /,\,$(DIRS))
-DIR_MAKE := $(subst /,\,$(MK))
+DIR_LIST = $(subst /,\,$(DIRS))
+DIR_MAKE = $(subst /,\,$(MK))
 DIR_RULE = $(foreach file, $(DIR_LIST), $(dir_mk))
 
 else  # bash

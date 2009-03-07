@@ -1,10 +1,12 @@
 #
-# $Id: Makefile,v 1.6 2008/09/11 05:32:35 guerra000 Exp $
+# $Id: Makefile,v 1.7 2008/12/22 22:09:44 likewolf Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
+	expropt1.c \
+	expropt2.c \
 	hbfsapi.c \
 	hbfopen.c \
 	hbgete.c \
@@ -16,8 +18,6 @@ C_SOURCES=\
 	hbver.c \
 	hbarch.c \
 	reserved.c \
-	expropt1.c \
-	expropt2.c \
 
 PRG_SOURCES=\
 

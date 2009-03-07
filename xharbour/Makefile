@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2004/09/03 16:40:56 lf_sfnet Exp $
+# $Id: Makefile,v 1.7 2004/09/14 20:15:12 druzus Exp $
 #
 
 ROOT = ./
@@ -7,7 +7,7 @@ ROOT = ./
 DIRS=\
 	include \
 	source \
-	utils \
+	utils{source} \
 #	tests \
 #	samples \
 

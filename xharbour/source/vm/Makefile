@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.25 2007/04/12 03:17:17 andresreyesh Exp $
+# $Id: Makefile,v 1.26 2008/03/16 19:15:56 likewolf Exp $
 #
 
 ROOT = ../../
@@ -26,6 +26,7 @@ else
 endif
 
 C_SOURCES=\
+	hvm.c        \
 	arrays.c     \
 	arrayshb.c   \
 	asort.c      \
@@ -48,7 +49,6 @@ C_SOURCES=\
 	garbage.c    \
 	hash.c       \
 	hbi18n.c     \
-	hvm.c        \
 	inet.c       \
 	initexit.c   \
 	initsymb.c   \

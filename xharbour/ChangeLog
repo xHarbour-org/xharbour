@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6398 2009/03/07 13:02:37 likewolf Exp $
+ * $Id: ChangeLog,v 1.6399 2009/03/07 13:45:33 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-07 16:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * Makefile
+  * source/Makefile
+    * set directory dependencies for parallel compilation
+  * config/bin.cf
+  * config/dir.cf
+  * config/lib.cf
+    + added explicit support for make recursive calls.
+    * rewritten DIR_RULE to use only GNU make commands instead of OS scripts.
+      Now config/<arch>/dir.cf files are not longer used except with GNU Make
+      3.79.1.
+    + added support for dependencies between build directories for
+      parallel execution. If compilation of dirX needs results of
+      dirY and dirZ compilation then it hsould be declared as:
+         dirX{dirY,dirZ}
+    % process directories defined in DIRS simultaneously when -j<N>
+      GNU make switch is used - it gives additional speed improvement
+      on multi CPU machines
+  * config/dos/dir.cf
+  * config/w32/dir.cf
+    * changed simple assignments to recursive ones
+  * source/common/Makefile
+  * source/vm/Makefile
+    * moved biggest files to begin of file list for better parallel
+      compilation utilization.
+
+   The parallel compilation can be enabled by using -j<n> GNU make
+   switch on multiprocess platforms, f.e.:
+      ./gnu_make.sh -j3
+   It should give some speed improvement even on single CPU machines.
+   These are results of clean Harbour compilation on my 3 phantom CPU
+   computer:
+
+      1. leaner compilation without -j<n>                6m29.895s
+      2. parallel compilation with -j5 but without
+         parallel directory processing                   3m20.163s
+      3. parallel compilation with -j5 and with new
+         parallel directory processing                   2m6.168s
+  (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-03-07 16:43 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/cgi/hjwindow.prg

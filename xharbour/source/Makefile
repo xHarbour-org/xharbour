@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2005/10/05 21:39:34 lf_sfnet Exp $
+# $Id: Makefile,v 1.9 2005/10/08 08:54:54 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -23,26 +23,28 @@ DIRS=\
 
 else
 
+HB_COMP_REF={compiler}
+
 DIRS=\
 	common \
-	pp \
-	compiler \
-	rtl \
-	vm \
+	pp{common} \
+	compiler{pp} \
+	rtl$(HB_COMP_REF) \
+	vm$(HB_COMP_REF) \
 	macro \
 	codepage \
 	lang \
-	rdd \
-	debug \
-	odbc \
-	ct \
+	rdd$(HB_COMP_REF) \
+	debug$(HB_COMP_REF) \
+	odbc$(HB_COMP_REF) \
+	ct$(HB_COMP_REF) \
 	misc \
-	cgi
+	cgi$(HB_COMP_REF)
 
 ifneq ($(HB_ARCHITECTURE),dos)
 
 DIRS+=\
-	tip 
+	tip$(HB_COMP_REF) 
 
 endif
 

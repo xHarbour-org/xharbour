@@ -1,5 +1,5 @@
 #
-# $Id: bin.cf,v 1.10 2000/02/14 16:19:50 vszel Exp $
+# $Id: bin.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -35,8 +35,8 @@ ALL_OBJS = $(ALL_C_OBJS) $(ALL_PRG_OBJS)
 
 first:: dirbase descend
 
-descend :
-	@$(MK) -C $(ARCH_DIR) -f $(GRANDP)Makefile 'TOP=$(GRANDP)' $(EXE_NAME)
+descend:: dirbase
+	+@$(MK) -C $(ARCH_DIR) -f $(GRANDP)Makefile 'TOP=$(GRANDP)' $(EXE_NAME)
 
 $(EXE_NAME) : $(ALL_OBJS)
 	$(LD_RULE)
