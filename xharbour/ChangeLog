@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6400 2009/03/07 13:48:14 likewolf Exp $
+ * $Id: ChangeLog,v 1.6401 2009/03/11 10:40:28 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-11 14:04 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * config/bsd/gcc.cf
+  * config/darwin/gcc.cf
+  * config/dos/gcc.cf
+  * config/hpux/gcc.cf
+  * config/linux/gcc.cf
+  * config/os2/gcc.cf
+  * config/sunos/gcc.cf
+  * config/w32/gcc.cf
+    + Added support for overriding a compiler executable name via HB_CMP
+      environment variable.
+  * config/hpux/gcc.cf
+    ! Fixed a typo in dbffpt library name.
 
 2009-03-11 13:38 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * xharbour/bin/hb-func.sh

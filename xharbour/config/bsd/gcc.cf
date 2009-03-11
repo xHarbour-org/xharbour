@@ -1,15 +1,23 @@
 #
-# $Id: gcc.cf,v 1.14 2008/03/09 18:44:26 likewolf Exp $
+# $Id: gcc.cf,v 1.15 2008/03/19 21:35:18 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+ifeq ($(HB_CMP),)
+ifeq ($(HB_COMPILER),gpp)
+   HB_CMP = g++
+else
+   HB_CMP = $(HB_COMPILER)
+endif
+endif
 
 OBJ_EXT = .o
 EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = $(HB_CCACHE) gcc
+CC = $(HB_CCACHE) $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
@@ -31,7 +39,7 @@ HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
 
-LD = $(HB_CCACHE) gcc
+LD = $(HB_CCACHE) $(HB_CMP)
 LD_OUT = -o
 
 # Add all libraries specified in CONTRIBS and LIBS.

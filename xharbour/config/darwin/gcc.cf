@@ -1,15 +1,15 @@
 #
-# $Id: gcc.cf,v 1.20 2008/03/16 19:15:57 likewolf Exp $
+# $Id: gcc.cf,v 1.21 2009/01/24 00:33:08 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
 
+ifeq ($(HB_CMP),)
 ifeq ($(HB_COMPILER),gpp)
    HB_CMP = g++
 else
-   # intentionally used 'cc' instead of 'gcc' - I'm not an Darwin user
-   # but the system where I was testing it has GCC 2.95 named 'cc'
-   HB_CMP = cc
+   HB_CMP = $(HB_COMPILER)
+endif
 endif
 
 OBJ_EXT = .o
@@ -37,9 +37,6 @@ ifeq ($(HB_LEX),SIMPLEX)
 endif
 CFLAGS += -DHB_OS_DARWIN
 
-LD = cc
-LD_OUT = -o
-
 ifeq ($(HB_LIBCOMP_MT),)
   # always add thread support if not compiling a lib and using vmmt
   ifeq ($(findstring vmmt,$(LIBS)),vmmt)
@@ -52,6 +49,9 @@ else
     HB_MT_FLAGS = -DHB_THREAD_SUPPORT
   endif
 endif
+
+LD = $(HB_CCACHE) $(HB_CMP)
+LD_OUT = -o
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)

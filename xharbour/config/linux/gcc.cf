@@ -1,13 +1,15 @@
 #
-# $Id: gcc.cf,v 1.41 2008/04/19 12:49:15 lculik Exp $
+# $Id: gcc.cf,v 1.42 2009/03/07 13:02:38 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
 
+ifeq ($(HB_CMP),)
 ifeq ($(HB_COMPILER),gpp)
    HB_CMP = g++
 else
    HB_CMP = $(HB_COMPILER)
+endif
 endif
 
 OBJ_EXT = .o

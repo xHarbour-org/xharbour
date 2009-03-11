@@ -1,15 +1,23 @@
 #
-# $Id: djgpp.cf,v 1.14 2008/03/09 18:44:26 likewolf Exp $
+# $Id: djgpp.cf,v 1.15 2008/03/16 19:15:57 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+ifeq ($(HB_CMP),)
+ifeq ($(HB_COMPILER),gpp)
+   HB_CMP = g++
+else
+   HB_CMP = gcc
+endif
+endif
 
 OBJ_EXT = .o
 EXE_EXT = .exe
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = gcc
+CC = $(HB_CCACHE) $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -Iinclude
@@ -21,7 +29,7 @@ ifeq ($(HB_LEX),SIMPLEX)
   CFLAGS += -DSIMPLEX
 endif
 
-LD = gcc
+LD = $(HB_CCACHE) $(HB_CMP)
 LD_OUT = -o
 LDLIBS = -lm
 
