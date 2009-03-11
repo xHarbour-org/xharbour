@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6399 2009/03/07 13:45:33 likewolf Exp $
+ * $Id: ChangeLog,v 1.6400 2009/03/07 13:48:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-11 13:38 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/global.cf
+  * xharbour/source/rdd/dbfnsx/Makefile
+    ! cleaned dbfnsx RDD name to be compatible with other dbf* RDDs
+      and fixed builds which needs pack_src.sh
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+  * xharbour/source/rtl/gtalleg/ssf.c
+  * xharbour/source/rtl/gtalleg/ssf.h
+    ! fixed for new #define constants
+
+  * xharbour/source/rtl/filesys.c
+    ! fixed warning cleanup which from warning
+      created very serious bug in non Windows builds.
+
+  (by Przemyslaw Czerpak. Thanks Przemek!)
 
 2009-03-07 16:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * Makefile

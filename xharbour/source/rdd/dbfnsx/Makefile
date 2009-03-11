@@ -1,5 +1,5 @@
 #
-# $Id: Makefile 10003 2008-12-24 12:29:54Z druzus $
+# $Id: Makefile,v 1.1 2009/01/08 09:11:14 marchuet Exp $
 #
 
 ROOT = ../../../
@@ -7,6 +7,6 @@ ROOT = ../../../
 C_SOURCES=\
 	dbfnsx1.c \
 
-LIBNAME=rddnsx
+LIBNAME=dbfnsx
 
 include $(TOP)$(ROOT)config/lib.cf

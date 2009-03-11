@@ -1,10 +1,10 @@
 /*
- * $Id: gtalleg.c,v 1.48 2008/08/14 09:04:22 andijahja Exp $
+ * $Id: gtalleg.c,v 1.49 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
 * xHarbour Project source code:
-* Allegro based virtual gt with graphic extensions.
+* Allegro based virtual GT with graphic extensions.
 *
 * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
 * www - http://www.xharbour.org
@@ -97,7 +97,7 @@ static int s_iGFXHeight = 0;
 /* update region in pixels */
 static HB_GT_RECT s_GFXUpd;
 
-/* current CLIP region in pixels (modified by GFX_SETCLIP) */
+/* current CLIP region in pixels (modified by HB_GFX_SETCLIP) */
 static HB_GT_RECT s_CLIP;
 
 /* cursor position and style */
@@ -209,7 +209,7 @@ static const gtAllegKey s_CtrlTable[GT_CTRL_TABLE_SIZE] = {
 #define MK_GT8BCOLOR(n)          ((n & 0xFF) / 16 | (n & 0xFF00) / 256)
 
 
-static void hb_gt_alleg_Error( char * szMsg )
+static void hb_gt_alleg_Error( const char * szMsg )
 {
    s_fGtError = TRUE;
    hb_errInternal( 9997, "%s: %s", szMsg, allegro_error );
@@ -516,10 +516,10 @@ static BOOL hb_gt_alleg_InitializeScreen( PHB_GT pGT, int iRows, int iCols, BOOL
       s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  /* bright white */
 
       s_bmp = al_create_system_bitmap(AL_SCREEN_W, AL_SCREEN_H);
-      if( s_bmp == NULL )
+      if( !s_bmp )
       {
          s_bmp = al_create_bitmap(AL_SCREEN_W, AL_SCREEN_H);
-         if( s_bmp == NULL )
+         if( !s_bmp )
          {
             hb_gt_alleg_Error( "Could not allocate double buffer bitmap" );
          }
@@ -543,11 +543,11 @@ static BOOL hb_gt_alleg_InitializeScreen( PHB_GT pGT, int iRows, int iCols, BOOL
    return lMode;
 }
 
-static void hb_gt_alleg_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
+static void hb_gt_alleg_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHANDLE hFilenoStderr )
 {
    int iRet;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_alleg_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_alleg_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr));
 
    ssfCreateThinFont( &s_ssfDefaultFont );
 
@@ -583,14 +583,14 @@ static void hb_gt_alleg_Exit( PHB_GT pGT )
    }
 }
 
-static char * hb_gt_alleg_Version( PHB_GT pGT, int iType )
+static const char * hb_gt_alleg_Version( PHB_GT pGT, int iType )
 {
    HB_SYMBOL_UNUSED( pGT );
 
    if( iType == 0 )
       return HB_GT_DRVNAME( HB_GT_NAME );
 
-   return "Harbour Terminal: Multiplatform Allegro graphics console";
+   return "Harbour Terminal: Portable Allegro GUI console";
 }
 
 static BOOL hb_gt_alleg_SetMode( PHB_GT pGT, int iRows, int iCols )
@@ -940,35 +940,35 @@ static int hb_gt_alleg_gfx_Primitive( PHB_GT pGT, int iType, int iTop, int iLeft
 
    switch( iType )
    {
-      case GFX_ACQUIRESCREEN:
+      case HB_GFX_ACQUIRESCREEN:
          al_acquire_bitmap(s_bmp);
          break;
 
-      case GFX_RELEASESCREEN:
+      case HB_GFX_RELEASESCREEN:
          al_release_bitmap(s_bmp);
          break;
 
-      case GFX_MAKECOLOR:
+      case HB_GFX_MAKECOLOR:
          iRet = al_make_color(iTop, iLeft, iBottom);
          break;
 
-      case GFX_CLIPTOP:
+      case HB_GFX_CLIPTOP:
          iRet = s_CLIP.iTop;
          break;
 
-      case GFX_CLIPLEFT:
+      case HB_GFX_CLIPLEFT:
          iRet = s_CLIP.iLeft;
          break;
 
-      case GFX_CLIPBOTTOM:
+      case HB_GFX_CLIPBOTTOM:
          iRet = s_CLIP.iBottom;
          break;
 
-      case GFX_CLIPRIGHT:
+      case HB_GFX_CLIPRIGHT:
          iRet = s_CLIP.iRight;
          break;
 
-      case GFX_SETCLIP:
+      case HB_GFX_SETCLIP:
          al_set_clip(s_bmp, iLeft, iTop, iRight, iBottom);
          s_CLIP.iTop = iTop;
          s_CLIP.iLeft = iLeft;
@@ -976,22 +976,22 @@ static int hb_gt_alleg_gfx_Primitive( PHB_GT pGT, int iType, int iTop, int iLeft
          s_CLIP.iRight = iRight;
          break;
 
-      case GFX_DRAWINGMODE:
-         iRet = GFX_MODE_SOLID;
+      case HB_GFX_DRAWINGMODE:
+         iRet = HB_GFX_MODE_SOLID;
          break;
 
-      case GFX_GETPIXEL:
+      case HB_GFX_GETPIXEL:
          iRet = al_get_pixel(s_bmp, iLeft, iTop);
          break;
 
-      case GFX_PUTPIXEL:
+      case HB_GFX_PUTPIXEL:
          al_acquire_bitmap(s_bmp);
          al_put_pixel(s_bmp, iLeft, iTop, iBottom);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop,iLeft,iTop,iLeft);
          break;
 
-      case GFX_LINE:
+      case HB_GFX_LINE:
          al_acquire_bitmap(s_bmp);
          if( iLeft == iRight )
             al_draw_vline(s_bmp, iLeft, iTop, iBottom, iColor);
@@ -1003,49 +1003,49 @@ static int hb_gt_alleg_gfx_Primitive( PHB_GT pGT, int iType, int iTop, int iLeft
          GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
          break;
 
-      case GFX_RECT:
+      case HB_GFX_RECT:
          al_acquire_bitmap(s_bmp);
          al_draw_rect(s_bmp, iLeft, iTop, iRight, iBottom, iColor);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
          break;
 
-      case GFX_FILLEDRECT:
+      case HB_GFX_FILLEDRECT:
          al_acquire_bitmap(s_bmp);
          al_draw_rect_fill(s_bmp, iLeft, iTop, iRight, iBottom, iColor);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
          break;
 
-      case GFX_CIRCLE:
+      case HB_GFX_CIRCLE:
          al_acquire_bitmap(s_bmp);
          al_draw_circle(s_bmp, iLeft, iTop, iBottom, iRight);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop-iBottom,iLeft-iBottom,iTop+iBottom,iLeft+iBottom);
          break;
 
-      case GFX_FILLEDCIRCLE:
+      case HB_GFX_FILLEDCIRCLE:
          al_acquire_bitmap(s_bmp);
          al_draw_circle_fill(s_bmp, iLeft, iTop, iBottom, iRight);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop-iBottom,iLeft-iBottom,iTop+iBottom,iLeft+iBottom);
          break;
 
-      case GFX_ELLIPSE:
+      case HB_GFX_ELLIPSE:
          al_acquire_bitmap(s_bmp);
          al_draw_ellipse(s_bmp, iLeft, iTop, iRight, iBottom, iColor);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop-iBottom,iLeft-iRight,iTop+iBottom,iLeft+iRight);
          break;
 
-      case GFX_FILLEDELLIPSE:
+      case HB_GFX_FILLEDELLIPSE:
          al_acquire_bitmap(s_bmp);
          al_draw_ellipse_fill(s_bmp, iLeft, iTop, iRight, iBottom, iColor);
          al_release_bitmap(s_bmp);
          GT_UPD_GFXRECT(iTop-iBottom,iLeft-iRight,iTop+iBottom,iLeft+iRight);
          break;
 
-      case GFX_FLOODFILL:
+      case HB_GFX_FLOODFILL:
          al_acquire_bitmap(s_bmp);
          al_floodfill(s_bmp, iLeft, iTop, iBottom);
          al_release_bitmap(s_bmp);
@@ -1064,7 +1064,7 @@ static int hb_gt_alleg_gfx_Primitive( PHB_GT pGT, int iType, int iTop, int iLeft
    return iRet;
 }
 
-static void hb_gt_alleg_gfx_Text( PHB_GT pGT, int iTop, int iLeft, char * cBuf, int iColor, int iSize, int iWidth )
+static void hb_gt_alleg_gfx_Text( PHB_GT pGT, int iTop, int iLeft, const char * cBuf, int iColor, int iSize, int iWidth )
 {
    int iBottom, iRight;
 
@@ -1219,7 +1219,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif
@@ -1232,7 +1232,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 /*
 * this is necessary if you want to link with .so allegro libs
-* or when link staticalt and your linker will force to link main()
+* or when link statically and your linker will force to link main()
 * from allegro library not the harbour one
 */
 int _mangled_main( int argc, char * argv[] )

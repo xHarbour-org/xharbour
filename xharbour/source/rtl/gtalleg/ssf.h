@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.13 2006/02/16 21:31:00 maurifull Exp $
+ * $Id: ssf.h,v 1.14 2008/03/18 15:51:40 likewolf Exp $
  */
 
 /*
@@ -61,6 +61,29 @@
 
 #ifndef _SSF_H_
 #define _SSF_H_
+
+#if defined(__BORLANDC__)
+   #define ALLEGRO_NO_ASM
+   #define ALLEGRO_BCC32
+#elif defined(_MSC_VER)
+   #if defined(_WIN64)
+      #define ALLEGRO_NO_ASM
+   #endif
+   #define ALLEGRO_MSVC
+#elif defined(__MINGW32__) || defined(__CYGWIN__)
+   #define ALLEGRO_MINGW32
+   #if defined(__CYGWIN__)
+      #define SCAN_DEPEND
+   #endif
+#elif defined(__DMC__)
+   #define ALLEGRO_DMC
+#elif defined(__DJGPP__)
+   #define ALLEGRO_DJGPP
+#elif defined(__WATCOMC__)
+   #define ALLEGRO_WATCOM
+#elif defined(HB_OS_DARWIN)
+   #define ALLEGRO_MACOSX
+#endif
 
 #include <allegro.h>
 
@@ -236,6 +259,6 @@ typedef struct _ssfFont {
 extern void ssfCreateThinFont(ssfFont *sfont);
 extern void ssfSetFontSize(ssfFont *sfont, unsigned short fsize);
 extern unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color);
-extern int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color);
+extern int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, const char *s, int x, int y, int color);
 
 #endif  /* _SSF_H_ */

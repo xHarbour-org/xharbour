@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.15 2008/03/09 18:44:26 likewolf Exp $
+# $Id: global.cf,v 1.16 2008/12/23 18:06:33 likewolf Exp $
 #
 
 GRANDP = ../../
@@ -9,6 +9,7 @@ HB_DB_DRIVERS=\
 	nulsys \
 	bmdbfcdx \
 	dbfntx \
+	dbfnsx \
 	dbfcdx \
 	dbffpt \
 	hbsix \

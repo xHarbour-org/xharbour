@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.184 2009/01/24 09:07:45 andijahja Exp $
+ * $Id: filesys.c,v 1.185 2009/03/02 18:58:02 enricomaria Exp $
  */
 
 /*
@@ -890,7 +890,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
                              HB_FHANDLE *fhStdout, HB_FHANDLE *fhStderr,
                              BOOL bBackground, ULONG *ProcessID )
 {
-   HB_FHANDLE hRet;
+   HB_FHANDLE hRet = ( HB_FHANDLE ) FS_ERROR;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )", pFilename, fhStdin, fhStdout, fhStderr));
 
@@ -1227,7 +1227,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
       if ( !CreatePipe( &hPipeInRd, &hPipeInWr, &secatt, 0 ) )
       {
          hb_fsSetIOError( FALSE, 0 );
-         return FS_ERROR;
+         return hRet;
       }
    }
 
@@ -1236,7 +1236,6 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
       if ( !CreatePipe( &hPipeOutRd, &hPipeOutWr, &secatt, 0 ) )
       {
          hb_fsSetIOError( FALSE, 0 );
-         hRet = FS_ERROR;
          goto ret_close_1;
       }
    }
@@ -1252,7 +1251,6 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
       if ( !CreatePipe( &hPipeErrRd, &hPipeErrWr, &secatt, 0 ) )
       {
          hb_fsSetIOError( FALSE, 0 );
-         hRet = FS_ERROR;
          goto ret_close_2;
       }
    }
@@ -1355,7 +1353,6 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
       ) )
    {
       hb_fsSetIOError( FALSE, 0 );
-      hRet = FS_ERROR;
       hb_xfree( completeCommand );
       goto ret_close_3;
    }

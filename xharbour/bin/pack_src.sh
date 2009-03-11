@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.26 2008/04/28 01:42:46 lculik Exp $
+# $Id: pack_src.sh,v 1.27 2008/04/28 01:48:54 lculik Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -125,6 +125,11 @@ $hb_collect source/rdd/bmdbfcdx/Makefile
 $hb_collect source/rdd/bmdbfcdx/*.[ch]
 $hb_collect source/rdd/bmdbfcdx/*.prg
 
+
+# SOURCE\RDD\DBFNSX
+$hb_collect source/rdd/dbfnsx/Makefile
+$hb_collect source/rdd/dbfnsx/*.[ch]
+$hb_collect source/rdd/dbfnsx/*.prg
 
 # SOURCE\RDD\DBFNTX
 $hb_collect source/rdd/dbfntx/Makefile

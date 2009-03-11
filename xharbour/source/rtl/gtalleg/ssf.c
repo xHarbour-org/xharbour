@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.c,v 1.6 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: ssf.c,v 1.7 2008/03/18 15:51:40 likewolf Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ USHORT ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int col
    return (sfont->fsize / 2);
 }
 
-int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color)
+int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, const char *s, int x, int y, int color)
 {
    int i = 0;
 

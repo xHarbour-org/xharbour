@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.79 2008/04/28 02:18:57 lculik Exp $
+# $Id: hb-func.sh,v 1.80 2009/03/07 12:30:20 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -71,7 +71,7 @@ mk_hbgetlibs()
         then
             libs="$libs gtwin"
         fi
-        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
+        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfnsx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
     else
         echo -n "$@"
     fi
