@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.17 2009/01/08 09:11:13 marchuet Exp $
+rem $Id: mdir.bat,v 1.18 2009/01/29 16:30:41 ronpinkas Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -510,7 +510,7 @@ SET LIBEXT=
 SET OBJEXT=
 SET DIR_SEP=
 SET PATH=%_PATH%
-
+SET _PATH=
 IF NOT "%LIBPREFIX%"=="" SET LIBPREFIX=
 IF NOT "%_PATH%"    =="" SET _PATH=
 IF NOT "%HB_MT%"    =="" SET HB_MT=

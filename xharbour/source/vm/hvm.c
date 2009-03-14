@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.718 2009/02/24 20:46:36 andijahja Exp $
+ * $Id: hvm.c,v 1.719 2009/03/02 09:20:17 marchuet Exp $
  */
 
 /*
@@ -1305,7 +1305,6 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
    ULONG lNextSection /*= 0*/;
    ULONG lCatchSection = 0;
    ULONG lFinallySection = 0;
-   ULONG ulPrivateBase = 0;
    ULONG wEnumCollectionCounter = HB_VM_STACK.wEnumCollectionCounter;
    ULONG wWithObjectCounter = HB_VM_STACK.wWithObjectCounter;
    BOOL bCanRecover = FALSE;
@@ -1332,12 +1331,6 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
     * macro evaluation belong to a function/procedure where macro
     * compiler was called.
     */
-
-   /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
-   if( pSymbols )
-   {
-      ulPrivateBase = hb_memvarGetPrivatesBase();
-   }
 
 #ifndef HB_NO_PROFILER
    if( hb_bProfiler )
@@ -3847,12 +3840,6 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             /* IMHO It will be cleaner to make exactly the same action here
                as for HB_P_ENDPROC, instead of this direct return, Druzus */
 
-            /* end of a codeblock - stop evaluation */
-            if( pSymbols )
-            {
-               hb_memvarSetPrivatesBase( ulPrivateBase );
-            }
-
             /*
              * *** NOTE!!! Return!!!
              */
@@ -4069,11 +4056,6 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
    HB_STACK_LOCK;
 
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
-
-   if( pSymbols )
-   {
-      hb_memvarSetPrivatesBase( ulPrivateBase );
-   }
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
@@ -5787,7 +5769,10 @@ static void hb_vmBitAnd( void )
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) & hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -5812,6 +5797,7 @@ static void hb_vmBitAnd( void )
          for( ulPos1 = ulPos2 = 0; ulPos1 < ulLen1; ulPos1++ )
          {
             pString1[ulPos1] &= pString2[ulPos2];
+
             if( ++ulPos2 == ulLen2 )
             {
                ulPos2 = 0;
@@ -5830,7 +5816,7 @@ static void hb_vmBitAnd( void )
          char   cVal = (char) hb_itemGetNL( pItem2 );
          char * pString = pItem1->item.asString.value;
 
-         if( !HB_IS_STRINGWR( pItem1 ) )
+         if( ! HB_IS_STRINGWR( pItem1 ) )
          {
             pString = (char*) hb_xgrab( ulLen + 1 );
             hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
@@ -5858,13 +5844,17 @@ static void hb_vmBitAnd( void )
 
       pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = lVal;
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( lVal );
 
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) & hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else
@@ -5896,7 +5886,10 @@ static void hb_vmBitOr( void )
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) | hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -5965,12 +5958,17 @@ static void hb_vmBitOr( void )
 
       pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = lVal;
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( lVal );
+
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) | hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else
@@ -6003,7 +6001,10 @@ static void hb_vmBitXor( void )
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) ^ hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -6072,12 +6073,17 @@ static void hb_vmBitXor( void )
 
       pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = lVal;
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( lVal );
+
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) ^ hb_itemGetNInt( pItem2 );
+      pItem1->item.asLong.length = (UINT) HB_LONG_LENGTH( pItem1->item.asLong.value );
+      // Don't move up!
       pItem1->type = HB_IT_LONG;
+
       hb_stackPop();
    }
    else
@@ -11661,14 +11667,14 @@ static BOOL hb_xvmActionRequest( void )
    return FALSE;
 }
 
-void hb_xvmExitProc( ULONG ulPrivateBase )
+void hb_xvmExitProc()
 {
    HB_THREAD_STUB_STACK
 
    if( hb_stackGetActionRequest() & HB_ENDPROC_REQUESTED )
+   {
       hb_stackSetActionRequest( 0 );
-
-   hb_memvarSetPrivatesBase( ulPrivateBase );
+   }
 }
 
 void hb_xvmSeqBegin( void )

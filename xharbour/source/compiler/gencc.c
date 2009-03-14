@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.16 2008/11/27 05:04:53 andijahja Exp $
+ * $Id: gencc.c,v 1.17 2008/11/28 05:17:45 andijahja Exp $
  */
 
 /*
@@ -2023,7 +2023,6 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
    }
 
    fprintf( yyc, "{\n" );
-   fprintf( yyc, "   ULONG ulPrivateBase = hb_memvarGetPrivatesBase();\n" );
 
    if( label_info.fCondJump )
    {
@@ -2056,7 +2055,7 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
       fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc, "\n   hb_xvmExitProc( ulPrivateBase );\n" );
+   fprintf( yyc, "\n   hb_xvmExitProc();\n" );
    fprintf( yyc, "}\n" );
 
    if( label_info.pulLabels )

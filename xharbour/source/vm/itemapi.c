@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.159 2009/02/02 12:19:17 likewolf Exp $
+ * $Id: itemapi.c,v 1.160 2009/02/20 12:48:41 marchuet Exp $
  */
 
 /*
@@ -1226,6 +1226,7 @@ PHB_ITEM hb_itemPutSymbol( PHB_ITEM pItem, PHB_SYMB pSym )
    pItem->item.asSymbol.value        = pSym;
    pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
    pSymCargo->stackbase    = 0;
+   pSymCargo->privatesbase = 0;
    pSymCargo->lineno       = 0;
    pSymCargo->uiSuperClass = 0;
    pSymCargo->params       = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.56 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: hash.c,v 1.57 2009/03/02 09:20:17 marchuet Exp $
  */
 
 /*
@@ -3090,6 +3090,13 @@ void * hb_hashId( PHB_ITEM pHash )
       return ( void * ) pHash->item.asHash.value;
    else
       return NULL;
+}
+
+HB_FUNC( HB_HASHID )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+
+   hb_retptr( hb_hashId( pHash ) );
 }
 
 HB_EXTERN_END

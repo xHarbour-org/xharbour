@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.139 2009/02/27 19:36:10 ronpinkas Exp $
+ * $Id: memvars.c,v 1.140 2009/03/02 09:20:17 marchuet Exp $
  */
 
 /*
@@ -513,11 +513,8 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
       }
    }
 
-   /* s_privateStackBase can be 0 if any privates have been CLEARed */
-   if ( ulBase < s_privateStackBase )
-   {
-      s_privateStackBase = ulBase;
-   }
+   assert( ulBase <= s_privateStackBase );
+   s_privateStackBase = ulBase;
 }
 
 /*
@@ -1292,13 +1289,14 @@ static HB_DYNS_FUNC( hb_memvarClear )
 {
    HB_THREAD_STUB
 
-   HB_SYMBOL_UNUSED( Cargo );
-
    if( pDynSymbol->hMemvar )
    {
-      s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
-      hb_memvarValueDecRef( pDynSymbol->hMemvar );
-      pDynSymbol->hMemvar = 0;
+      if( pDynSymbol->hMemvar != (HB_HANDLE) Cargo )
+      {
+         s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
+         hb_memvarValueDecRef( pDynSymbol->hMemvar );
+         pDynSymbol->hMemvar = 0;
+      }
    }
 
    return TRUE;
@@ -1539,6 +1537,9 @@ HB_FUNC( __MVPRIVATE )
             }
          }
       }
+
+     // Created vars should be owned by our caller!!!
+     s_privateStackBase = s_privateStackCnt;
    }
 }
 
@@ -1635,11 +1636,30 @@ HB_FUNC( __MVSCOPE )
    hb_retni( iMemvar );
 }
 
-HB_FUNC( __MVCLEAR )
+static void hb_memvarClearAll( void )
 {
    HB_THREAD_STUB
-   hb_dynsymEval( hb_memvarClear, NULL );
-   s_privateStackBase = s_privateStackCnt = 0;
+   PHB_DYNS pGetList = hb_dynsymFind( "GETLIST" );
+
+   // Let all existing stack frames know they don't have any privates, any longer!
+   hb_stackClearPrivateBases();
+
+   s_privateStackBase = 0;
+   hb_memvarSetPrivatesBase( 0 );
+
+   if( pGetList && pGetList->hMemvar )
+   {
+      hb_dynsymEval( hb_memvarClear, (void *) pGetList->hMemvar );
+   }
+   else
+   {
+      hb_dynsymEval( hb_memvarClear, NULL );
+   }
+}
+
+HB_FUNC( __MVCLEAR )
+{
+   hb_memvarClearAll();
 }
 
 HB_FUNC( __MVDBGINFO )
@@ -1820,6 +1840,9 @@ HB_FUNC( __MVPUT )
          #endif
 
          hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, pValue );
+
+         // Created var should be owned by our caller!!!
+         s_privateStackBase = s_privateStackCnt;
       }
 
       hb_itemForwardValue( hb_stackReturnItem(), pValue );
@@ -2094,27 +2117,7 @@ HB_FUNC( __MVRESTORE )
 
       if( ! bAdditive )
       {
-         PHB_DYNS pDynGetList = hb_dynsymFind( "GETLIST" );
-         PHB_ITEM pGetListVal;
-
-         if( pDynGetList && pDynGetList->hMemvar )
-         {
-            pGetListVal = hb_itemNew( hb_memvarGetValueByHandle( pDynGetList->hMemvar ) );
-         }
-         else
-         {
-            pGetListVal = NULL;
-         }
-
-         hb_dynsymEval( hb_memvarClear, NULL );
-         s_privateStackBase = s_privateStackCnt = 0;
-
-         // Clipper does not seem to care if the Restore operation might have overriden the value!!!
-         if( pGetListVal )
-         {
-            hb_memvarCreateFromDynSymbol( pDynGetList, VS_PUBLIC, pGetListVal );
-            hb_itemRelease( pGetListVal ) ;
-         }
+         hb_memvarClearAll();
       }
 
       /* xHarbour extended feature, save variables with 64 chars long */
@@ -2311,22 +2314,24 @@ HB_FUNC( __MVRESTORE )
 
                   hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
                }
-
-               hb_itemReturnForward( &Item );
             }
          }
 
-         hb_itemClear( &Item );
+         hb_fsClose( fhnd );
+
+         // Created vars should be owned by our caller!!!
+         s_privateStackBase = s_privateStackCnt;
+
          hb_itemClear( &Name );
 
          hb_regexFree( &RegEx );
-
-         hb_fsClose( fhnd );
 
          if( buffer )
          {
            hb_xfree( buffer );
          }
+
+         hb_itemReturnForward( &Item );
       }
       else
       {

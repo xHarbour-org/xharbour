@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.58 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: hbstack.h,v 1.59 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
 extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
 extern HB_EXPORT LONG        hb_stackTopOffset( void );
 extern HB_EXPORT LONG        hb_stackBaseOffset( void );
-extern HB_EXPORT LONG        hb_stackTotalItems( void );   
+extern HB_EXPORT LONG        hb_stackTotalItems( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
@@ -275,10 +275,10 @@ extern LONG        hb_stackGetStaticsBase( void );
 
 #endif
 
-extern HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
-extern HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack );
+HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
+HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack );
 HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );
-
+HB_EXPORT void hb_stackClearPrivateBases( void );
 HB_EXTERN_END
 
 #endif /* HB_STACK_H_ */

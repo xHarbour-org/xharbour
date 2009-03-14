@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.108 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: estack.c,v 1.109 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -363,6 +363,7 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
    pStack->lStatics = HB_VM_STACK.lStatics;
 
+   pItem->item.asSymbol.pCargo->privatesbase = hb_memvarGetPrivatesBase();
    pItem->item.asSymbol.pCargo->arguments = uiParams;
 
    HB_VM_STACK.pBase = pBase;
@@ -376,8 +377,10 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    int iLocal;
    PHB_ITEM pDetached;
    USHORT uiRequest;
-   LONG stackbase = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->stackbase;
-   int iArgs = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo->arguments;
+   PHB_SYMBCARGO pCargo = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo;
+   LONG stackbase = pCargo->stackbase;
+   int iArgs = pCargo->arguments;
+   ULONG ulPrivateBase = pCargo->privatesbase;
 
    uiRequest = hb_vmRequestQuery();
    hb_vmRequestReset();
@@ -416,10 +419,25 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
       --HB_VM_STACK.pPos;
    }
 
+   hb_memvarSetPrivatesBase( ulPrivateBase );
+
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + stackbase;
    HB_VM_STACK.lStatics = pStack->lStatics;
 
    hb_vmRequest( uiRequest );
+}
+
+void hb_stackClearPrivateBases( void )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pBase = * HB_VM_STACK.pBase;
+
+   while( pBase->item.asSymbol.pCargo->privatesbase != 0 )
+   {
+      pBase->item.asSymbol.pCargo->privatesbase = 0;
+      pBase = * ( HB_VM_STACK.pItems + pBase->item.asSymbol.pCargo->stackbase );
+   }
 }
 
 #undef hb_stackTopOffset

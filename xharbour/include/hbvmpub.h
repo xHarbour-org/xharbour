@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.83 2008/12/02 12:28:49 marchuet Exp $
+ * $Id: hbvmpub.h,v 1.84 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -268,6 +268,7 @@
    typedef struct _HB_SYMBCARGO
    {
       LONG        stackbase;
+      ULONG       privatesbase;
       USHORT      lineno;
       USHORT      arguments;
       USHORT      locals;
@@ -394,7 +395,7 @@
       ULONG     ulRecurse;    /* profiler support */
 #endif
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
-#endif   
+#endif
 
    #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
    typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );

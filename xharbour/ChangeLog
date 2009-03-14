@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6401 2009/03/11 10:40:28 likewolf Exp $
+ * $Id: ChangeLog,v 1.6402 2009/03/11 11:04:08 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-13 23:58 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * mdir.bat
+   * bin/bld_vc.bat
+     * Typo and ommisions
+
+   * source/vm/hvm.c
+     * Corrected few missing setting of item.asLong.length
+
+   * source/vm/hash.c
+     + Added missing prg callable HB_HASHID(), symetric with HB_ARRAID()
+
+   * include/hbxvm.h
+   * source/compiler/gencc.c
+   * include/hbvmpub.h
+   * source/vm/itemapi.c
+   * source/vm/hvm.c
+     + Added member privatesbase to HB_SYMBCARGO
+     * Removed all ulPrivateBase in favor of new item.asSymbol.pCargo->privatesbase
+       so that CLEAR MEMORY & RESTORE FROM could reset stack frames' private base information
+       by means of new hb_memvarClearAll()
+
+   * include/hbstack.h
+   * source/vm/estack.c
+     + Added set/reset of new item.asSymbol.pCargo->privatesbase to hb_stack<New|Old>Frame()
+     + Added hb_stackClearPrivateBases() to service new hb_memvarClearAll()
+
+   * source/vm/memvars.c
+     * __MVRESTORE() with out ADDITIVE caluse and __MVCLEAR() to use new shared worker, hb_memvarClearAll()
+     + New worker hb_memvarClearAll() adds:
+         + Call hb_stackClearPrivateBases() to advise existing frames of privates removal
+         + Explicit reset of privates (s_privateStack)
+         * Correct Clipper compatible protection of PUBLIC GetList
 
 2009-03-11 14:04 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/bsd/gcc.cf
@@ -181,7 +214,7 @@
      source/common/hbstr.c
      source/common/expropt1.c
      source/common/expropt2.c
-     ! type cast 
+     ! type cast
 
 
 2009-02-27 21:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
