@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.37 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: macro.y,v 1.38 2009/02/04 11:26:56 likewolf Exp $
  */
 
 /*
@@ -313,6 +313,31 @@ Main : Expression '\n'  {
 
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
+     | IDENTIFIER IDENTIFIER {
+                           HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
+
+                           //printf( "Macro: %s\n", HB_MACRO_DATA->string );
+
+                           hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+
+                           while ( s_iPending )
+                           {
+                              hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
+                           }
+
+                           if( $1 == $2 )
+                           {
+                              hb_xfree( $1 );
+                           }
+                           else
+                           {
+                              hb_xfree( $1 );
+                              hb_xfree( $2 );
+                           }
+                           yylval.string = NULL;
+
+                           HB_MACRO_ABORT;
+                        }
      | Expression error {
                            HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
 
@@ -355,7 +380,7 @@ Main : Expression '\n'  {
                         }
      ;
 
-IdentName  : IDENTIFIER      { $$ = $1; }
+IdentName  : IDENTIFIER      { $$ = $1; $1 = NULL; }
            ;
 
 /* Numeric values
@@ -511,10 +536,10 @@ ArrayAt     : Array ArrayIndex   { $$ = $2; }
 
 /* Variables
  */
-Variable    : IDENTIFIER            { $$ = hb_compExprNewVar( $1 ); }
+Variable    : IdentName            { $$ = hb_compExprNewVar( $1 ); }
             ;
 
-VarAlias    : IDENTIFIER ALIASOP    { $$ = hb_compExprNewAlias( $1 ); }
+VarAlias    : IdentName ALIASOP    { $$ = hb_compExprNewAlias( $1 ); }
             ;
 
 /* Macro variables - this can signal compilation errors
@@ -581,7 +606,7 @@ FieldVarAlias  : FieldAlias VarAlias            { hb_compExprDelete( $1, HB_MACR
                | FieldAlias MacroExprAlias      { hb_compExprDelete( $1, HB_MACRO_PARAM ); $$ = $2; }
                ;
 
-AliasId     : IDENTIFIER      { $$ = hb_compExprNewVar( $1 ); }
+AliasId     : IdentName       { $$ = hb_compExprNewVar( $1 ); }
             | MacroVar        { $$ = $1; }
             ;
 
@@ -630,8 +655,8 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             | PareExpList   ArrayIndex    { $$ = $2; }
             ;
 
-NamespacePath : IDENTIFIER '.'           { $$ = $1; }
-              | NamespacePath IDENTIFIER '.' {
+NamespacePath : IdentName '.'           { $$ = $1; }
+              | NamespacePath IdentName '.' {
                                                $$ = hb_xstrcpy( NULL, $1, ".", $2, NULL );
                                                hb_xfree( $1 );
                                                $1 = NULL;
@@ -639,7 +664,7 @@ NamespacePath : IDENTIFIER '.'           { $$ = $1; }
 
 /* Function call
  */
-FunCall     : IDENTIFIER '(' ArgList ')'   {
+FunCall     : IdentName '(' ArgList ')'   {
                                             $$ = hb_compExprNewFunCall( hb_compExprNewFunName( $1 ), $3, HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( $$ );
 
@@ -666,7 +691,7 @@ FunCall     : IDENTIFIER '(' ArgList ')'   {
                                                s_iPending--;
                                             }
                                           }
-            | IDENTIFIER '(' error        {
+            | IdentName '(' error        {
                                             hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
                                             if( yychar == IDENTIFIER && yylval.string )
@@ -695,7 +720,7 @@ ArgList    : Argument                     {
            | ArgList ',' Argument         { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
 
-ByRefArg   : '@' IDENTIFIER               { $$ = hb_compExprNewVarRef( $2 ); }
+ByRefArg   : '@' IdentName                { $$ = hb_compExprNewVarRef( $2 ); }
            ;
 
 Argument   : EmptyExpression           { $$ = $1; }
@@ -1048,8 +1073,8 @@ BlockExpList: Expression                  { $$ = hb_compExprAddListExpr( $<asExp
 BlockNoVar : /* empty list */    { $$ = NULL; }
 ;
 
-BlockVarList: IDENTIFIER                  { $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, HB_MACRO_PARAM ); }
-            | BlockVarList ',' IDENTIFIER { $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, HB_MACRO_PARAM ); HB_MACRO_CHECK( $$ ); }
+BlockVarList: IdentName                  { $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, HB_MACRO_PARAM ); }
+            | BlockVarList ',' IdentName { $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, HB_MACRO_PARAM ); HB_MACRO_CHECK( $$ ); }
             ;
 
 ExpList     : '(' EmptyExpression          { $$ = hb_compExprNewList( $2 ); }

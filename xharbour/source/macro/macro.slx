@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.36 2008/02/11 02:25:16 ronpinkas Exp $
+ * $Id: macro.slx,v 1.37 2008/06/27 19:47:49 ronpinkas Exp $
  */
 
 /*
@@ -652,14 +652,38 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return FIELD;
 
       case HB_ID_QSELF :
+         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         {
+            /*
+               <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
+               significance. We only need to avoid memory leak.
+            */
+            hb_xfree( pYYLVAL->string );
+         }
          pYYLVAL->string = hb_strdup( "QSELF" );
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_ID_IIF :
+         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         {
+            /*
+               <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
+               significance. We only need to avoid memory leak.
+            */
+            hb_xfree( pYYLVAL->string );
+         }
          pYYLVAL->string = hb_strdup( "IIF" );
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_ID_IF :
+         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         {
+            /*
+               <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
+               significance. We only need to avoid memory leak.
+            */
+            hb_xfree( pYYLVAL->string );
+         }
          pYYLVAL->string = hb_strdup( "IF" );
          return IDENTIFIER + DONT_REDUCE;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.719 2009/03/02 09:20:17 marchuet Exp $
+ * $Id: hvm.c,v 1.720 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -3060,7 +3060,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_PUSHLOCALNEARINC:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;// = NULL;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
 
