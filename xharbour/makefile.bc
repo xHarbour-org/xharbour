@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.242 2009/01/29 21:35:32 enricomaria Exp $
+# $Id: makefile.bc,v 1.244 2009/03/01 23:18:29 lculik Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -416,7 +416,7 @@ DLL_MT=mt
 !if "$(HB_ADS_IMPLIB)" == "no"
 !else
 COMPILERLIBS=\
-	ace32.lib
+	$(LIB_DIR)$(DIR_SEP)ace32.lib
 !endif
 
 HARBOUR_DLL_OBJS=\

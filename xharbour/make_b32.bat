@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.40 2008/06/04 14:41:10 guerra000 Exp $
+rem $Id: make_b32.bat,v 1.41 2008/07/14 02:50:56 kaddath Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -168,6 +168,8 @@ rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL mdir.bat clean
+   IF EXIST "%HB_DIR_ADS%\ace32.dll" implib -c lib\b32\ace32.lib "%HB_DIR_ADS%\ace32.dll"
+   IF EXIST lib\b32\ace32.lib copy lib\b32\ace32.lib lib
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****
