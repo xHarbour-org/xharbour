@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.6 2009/02/20 12:48:16 marchuet Exp $
+ * $Id: hbdbsort.c,v 1.7 2009/02/24 12:38:16 marchuet Exp $
  */
 
 /*
@@ -50,6 +50,19 @@
  *
  */
 
+#define HB_TRIGVAR_BYREF
+
+#include "hbapi.h"
+#include "hbinit.h"
+#include "hbvm.h"
+#include "hbapiitm.h"
+#include "hbrdddbf.h"
+#include "hbdbf.h"
+#include "hbapierr.h"
+#include "hbapilng.h"
+#include "hbset.h"
+#include "hbdate.h"
+#include "hbmath.h"
 #include "hbdbsort.h"
 
 BOOL hb_dbQSortInit( LPDBQUICKSORT pQuickSort, LPDBSORTINFO pSortInfo, USHORT uiRecordLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6403 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6404 2009/03/25 21:33:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-03-26 10:280 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * source\rdd\hbdbsort.c
+     * Synched include files as per dbf1.c as brute force correction to GPF trap
+       due to structure alignment difference of DBQUICKSORT
+
+   /*
+      NOTE: RDD Developers hsould seriously cleanup and systemize the RDD header files,
+            to avoid such dangerous trap!!!
+    */
 
 2009-03-25 17:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source\macro\macro.slx
