@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.18 2009/01/29 16:30:41 ronpinkas Exp $
+rem $Id: mdir.bat,v 1.19 2009/03/14 04:34:18 ronpinkas Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -502,8 +502,8 @@ goto EXIT
 rem=============================================================================
 :RESET_ENVAR
 rem=============================================================================
-SET CC_DIR=
-SET BISON_DIR=
+rem SET CC_DIR=
+rem SET BISON_DIR=
 SET SUB_DIR=
 SET HB_GT_LIB=
 SET LIBEXT=

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.244 2009/03/01 23:18:29 lculik Exp $
+# $Id: makefile.bc,v 1.245 2009/03/26 19:23:46 ronpinkas Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -46,7 +46,7 @@ INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__
 HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
-LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -Llib\b32 $(LFLAGS) c0x32.obj $**,$@,,
+LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
@@ -477,8 +477,8 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) c0d32.obj $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) c0x32.obj $**,$@,,$(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) "$(CC_DIR)\lib\c0d32.obj" $**,$@,,$(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -506,7 +506,7 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	ILINK32 $(DLLFLAGS) @&&!
-c0d32.obj $**, $@,, $(COMPILERLIBS)
+"$(CC_DIR)\lib\c0d32.obj" $**, $@,, $(COMPILERLIBS)
 !
 
 #*******************************************************************************

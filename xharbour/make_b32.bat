@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.41 2008/07/14 02:50:56 kaddath Exp $
+rem $Id: make_b32.bat,v 1.42 2009/03/26 19:23:46 ronpinkas Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -11,12 +11,55 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-if "%BCCDIR%" == "" SET BCCDIR=C:\BORLAND\BCC58
-
-IF "%CC_DIR%"=="" SET CC_DIR=C:\BORLAND\BCC58
-IF "%BISON_DIR%"=="" SET BISON_DIR=C:\BISON\BIN
 IF "%SUB_DIR%"=="" SET SUB_DIR=b32
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
+
+
+IF NOT '%CC_DIR%'=='' GOTO FIND_BISON
+ 
+:FIND_BCC
+   IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
+   IF EXIST \Borland\bcc58                   GOTO SET_BORLAND_58
+   IF EXIST \bcc58                           GOTO SET_BCC_58
+   IF EXIST \Borland\bcc55                   GOTO SET_BORLAND_55
+   IF EXIST \bcc55                           GOTO SET_BCC_55
+   GOTO FIND_BISON
+ 
+:SET_BDS_40
+   SET CC_DIR=%ProgramFiles%\Borland\BDS\4.0
+   GOTO FIND_BISON
+
+:SET_BORLAND_58
+   SET CC_DIR=\Borland\bcc58
+   GOTO FIND_BISON
+
+:SET_BCC_58
+   SET CC_DIR=\bcc58
+   GOTO FIND_BISON
+
+:SET_BORLAND_55
+   SET CC_DIR=\Borland\bcc55
+   GOTO FIND_BISON
+
+:SET_BCC_55
+   SET CC_DIR=\bcc55
+   GOTO FIND_BISON
+
+:FIND_BISON
+   IF NOT '%BISON_DIR%'=='' GOTO READY
+   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
+   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
+   GOTO READY
+ 
+:SET_BISON1
+   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
+   GOTO READY
+
+:SET_BISON2
+   SET BISON_DIR=\GnuWin32\Bin
+   GOTO READY 
+
+:READY
 
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
