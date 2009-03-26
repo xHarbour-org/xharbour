@@ -1,11 +1,11 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.18 2007/02/27 15:59:33 druzus Exp $
+rem $Id: pack_src.bat,v 1.19 2007/10/31 03:07:49 patrickmast Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
 
-set hb_ver=1.00.00
+set hb_ver=1.20.01
 
 if '%TZ%' == '' set TZ=PST8PDT
 
