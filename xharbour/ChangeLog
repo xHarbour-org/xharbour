@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6404 2009/03/25 21:33:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6405 2009/03/26 15:01:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2009-03-26 10:280 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-03-26 10:41 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * include/hbdefs.h
+     - Reverted wrong definition of HB_SYMBOL_UNUSED() under xCC and PellesC
+
+   * include/hbver.h
+     * Increased to 1.2.1 in preperation for pending release
+
+2009-03-26 10:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source\rdd\hbdbsort.c
      * Synched include files as per dbf1.c as brute force correction to GPF trap
        due to structure alignment difference of DBQUICKSORT
 
    /*
-      NOTE: RDD Developers hsould seriously cleanup and systemize the RDD header files,
+      NOTE: RDD Developers should seriously cleanup and systemize the RDD header files,
             to avoid such dangerous trap!!!
     */
 
-2009-03-25 17:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-03-25 17:00 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source\macro\macro.slx
   * source\macro\macro.y
     ! Fixed GPF trap related to double freeing yylval.string
@@ -26,7 +33,7 @@
   * source\vm\hvm.c
     * Compiler warning
 
-2009-03-13 23:58 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-03-13 23:58 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * mdir.bat
    * bin/bld_vc.bat
      * Typo and ommisions
@@ -235,7 +242,7 @@
      ! type cast
 
 
-2009-02-27 21:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-27 21:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * utils/xbscript/xbscript.prg
    + utils/xbscript/clsresults.ch
      ! Fixed Clipper compilation
@@ -246,12 +253,12 @@
    * include/hbcompat.ch
      ! Fixed double definition, and simplified HB_SYMBOL_UNUSED
 
-2009-02-27 15:03 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-27 15:03 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source\vm\memvars.c
      ! Fixed __M[V]RESTORE() to be Clipper compatible.
        Clipper protects the value of GetList if it exists, when ADDITIVE not specified
 
-2009-02-27 09:45 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-27 09:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * utils/xbscript/xbscript.prg
      * Compiler warning
 
@@ -284,7 +291,7 @@
   * contrib\pdflib\pdfhbdocs.prg
     - Removed unused variable STATIC bFItems
 
-2009-02-27 22:25 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-27 22:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/simplex.c
     ! Fixed silly typo that caused a rare bug
 
@@ -308,7 +315,7 @@
   * contrib/png/pngwutil.c
     ! updated to version 1.2.35
 
-2009-02-25 09:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-25 09:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * include/hbexprb.c
      ! Fixed compile time optimization of Upper() to process chars as unsigned char
 
@@ -322,7 +329,7 @@
     + missing hb_serviceExit() on Quit which cause memory leak when
       calling xHarbour service routine
 
-2009-02-24 09:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-24 09:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/dbgentry.c
     ! Fixed memory leak related to debug info of Globals
 
@@ -369,11 +376,11 @@
      ! accept invalid string key expression if codeblock key expression
        is given when createindex.
 
-2009-02-23 05:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-23 05:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/compiler/harbour.c
      ! Fixed GPF trap introduced by recent fix to codeblock nameless arguments
 
-2009-02-23 16:26 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-23 16:26 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * bin\bld_vc.bat
      * Added missing reset of CC_DIR
 
@@ -385,13 +392,13 @@
      + Added hb_vmSymbolOverloadDefinition() to patch all previously processed symbols,
        once overloaded definition is processed.
 
-2009-02-21 14:28 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-21 14:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * include\hbapirdd.h
      * Typo
    * source\rdd\bmdbfcdx\bmdbfcdx1.c
      * Type cast
 
-2009-02-21 10:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-21 10:40 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * bin\bld_vc.bat
      + Added auto detection and setup of compiler
      /*
@@ -531,7 +538,7 @@
      + Added missing charset from harbour thk's to vicktor. It will be used to finish charset support
        at vfpdbf tables.
 
-2009-02-13 09:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-13 09:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * include/hbexprb.c
    * source/compiler/harbour.c
      ! Fixed -es switch to promote all warnings into errors, as per Clipper docs
@@ -679,7 +686,7 @@
   * source/vm/dbgentry.c
     ! Fixed a string buffer overflow.
 
-2009-02-03 09:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-02-03 09:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/compiler/harbour.sly
     ! Fixed generation of line number for SWITCH expression
 
@@ -723,7 +730,7 @@
   * source\rdd\bmdbfcdx\bmdbfcdx1.c
     * Pacified warnings
 
-2009-01-30 14:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-30 14:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/vm/errorapi.c
      * Make sure that error object always has the call stack info in :aaStack
    * source/vm/arrays.c
@@ -735,7 +742,7 @@
   * makefile.wc
     * Synched with makefile.vc
 
-2009-01-29 11:57 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-29 11:57 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * common.mak
    * compile.mak
      + Added new use_dll.lib
@@ -833,7 +840,7 @@
   * ./make_gc.bat
     * Added 'IF "%envvar%"=="" SET ...' to environment variables.
 
-2009-01-26 17:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-26 17:50 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/garbage.c
     ! Refactored hb_gcItemRef() so that it works withOUT recursion.
       This can be disabled by commenting the #define SIMULATE_ITEMREF_RECURSION on line 451
@@ -985,7 +992,7 @@
   * include/hbextern.ch
     * Updated for modifications above.
 
-2009-01-24 11:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-24 11:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * common.mak
     + Readded missing dllmain to harbour.dll
 
@@ -1000,7 +1007,7 @@
        so we can review the correct solution.
      */
 
-2009-01-24 10:15 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-24 10:15 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/classes.c
     * Typo in new hb_clsName()
 
@@ -1174,7 +1181,7 @@
   * xharbour/source/rtl/hblognet.prg
     * fixed defined but unused vars
 
-2009-01-17 18:35 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-17 18:35 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * common.mak
     * Formating, spaces -> tab
 
@@ -1363,7 +1370,7 @@
   * source/vm/dynsym.c
     ! Fixed a HB_TRACE call.
 
-2009-01-15 13:55 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-15 13:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/fm.c
     - Removed missing initialization protection for hProcessHeap from maloc/realloc/free macros.
   * source/vm/hvm.c
@@ -1463,7 +1470,7 @@
   * source\tip\ftpcln.prg
     * minor syntax modifications.
 
-2009-01-08 00:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2009-01-08 00:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbdll.ch
     + Added few variations (including a simplification) of the IMPORT command
 
@@ -1788,7 +1795,7 @@
   * source/rtl/objfunc.prg
     * Updated to use __SetClassScope() to unblock access to protected class vars
 
-2008-12-15 23:02 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-12-15 23:02 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/compiler/harbour.slx
     - Removed support for double letters string containers ['...'] ["..."] and [[...]]
       as PP now uses E"..." instead
@@ -1900,7 +1907,7 @@
   * source/debug/tbrwtext.prg
     ! Fixed line coloring in the new code.
 
-2008-12-07 10:22 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-12-07 10:22 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/direct.c
     ! Fixed GPF trap
 
@@ -2188,7 +2195,7 @@
   * common.mak
     - remove dependency of maindllh.c
 
-2008-11-23 16:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-11-23 16:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/hvm.c
     * Synched if( fDynLib ) branch of hb_vmRegisterSymbols()
 
@@ -2227,7 +2234,7 @@
    * source/vm/fastitem.c
      - remove (again) HB_EXPORT attributes. (Thanks to Przemek)
 
-2008-11-22 18:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+2008-11-22 18:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/estack.c
     ! restore HB_EXPORT qualifier for functions reset by "#undef"
   * source/rtl/win32ole.prg

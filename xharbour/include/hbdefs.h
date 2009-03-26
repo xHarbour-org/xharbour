@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.110 2008/12/24 04:32:11 andijahja Exp $
+ * $Id: hbdefs.h,v 1.111 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -1137,11 +1137,7 @@ typedef unsigned long HB_COUNTER;
 #define HB_MACRO2STRING( macro )    HB_MACRO2STRING_( macro )
 #define HB_MACRO2STRING_( macro )   #macro
 
-#if defined( __POCC__ ) || defined( __XCC__ )
-   #define HB_SYMBOL_UNUSED( symbol )  do if( symbol ) {;} while( 0 )
-#else
-   #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
-#endif
+#define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
 
 /* ***********************************************************************
  * The name of starting procedure
