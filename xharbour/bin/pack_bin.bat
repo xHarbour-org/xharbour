@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_bin.bat,v 1.13 2007/11/08 02:56:31 lculik Exp $
+rem $Id: pack_bin.bat,v 1.14 2009/03/26 16:33:20 ronpinkas Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
@@ -75,6 +75,7 @@ if     "%hb_compiler%"     == "bcc16"   %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
 if     "%hb_compiler%"     == "icc"     %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
 if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
+if     "%hb_compiler%"     == "pocc"    %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
 
 set hb_filename=xharbour-%hb_ver%.log.%hb_architecture%.%hb_compiler%%hb_ext%
 
@@ -86,10 +87,12 @@ if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_compiler%"     == "bcc16"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b16/*.map
 if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b32/*.map
 if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% bin/vc/*.map
+rem if     "%hb_compiler%"     == "pocc"    %hb_archbin% %hb_archopt%  %hb_filename% bin/pc/*.map
 
 if     "%hb_compiler%"     == "bcc16"   %hb_archbin% %hb_archopt%  %hb_filename% make_b16.log
 if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename% make_b32.log
 if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% make_vc.log
+if     "%hb_compiler%"     == "pocc"    %hb_archbin% %hb_archopt%  %hb_filename% *_pc.log
 
 if     "%hb_compiler%"     == "gcc"     %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.log
 if     "%hb_compiler%"     == "mingw32" %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.log
