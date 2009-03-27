@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.76 2009/01/08 09:11:13 marchuet Exp $
+# $Id: makefile.pc,v 1.77 2009/02/01 07:20:22 guerra000 Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -50,7 +50,7 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(HARBOURFLAGS) $** -o$@
 CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" 
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
-LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
+LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN" /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
 LIB_CMD      =POLIB /OUT:$@ $**
 BISON_CMD1   =bison -v -d $** -o$@

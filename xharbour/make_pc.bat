@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.31 2008/07/14 02:50:56 kaddath Exp $
+rem $Id: make_pc.bat,v 1.32 2008/11/24 12:56:46 modalsist Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -10,11 +10,40 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
-IF "%CC_DIR%"=="" SET CC_DIR=C:\PELLESC
-IF "%BISON_DIR%"=="" SET BISON_DIR=C:\BISON\BIN
+
 IF "%SUB_DIR%"=="" SET SUB_DIR=pc
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 
+IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+ 
+:FIND_POCC
+   IF EXIST "%ProgramFiles%\PellesC" GOTO SET_POCC
+   IF EXIST \PellesC                 GOTO SET_POCC2
+   GOTO FIND_BISON
+ 
+:SET_POCC
+   SET CC_DIR=%ProgramFiles%\PellesC
+   GOTO FIND_BISON
+
+:SET_POCC2
+   SET CC_DIR=\PellesC
+   GOTO FIND_BISON
+
+:FIND_BISON
+   IF NOT "%BISON_DIR%"=="" GOTO READY
+   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
+   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
+   GOTO READY
+ 
+:SET_BISON1
+   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
+   GOTO READY
+
+:SET_BISON2
+   SET BISON_DIR=\GnuWin32\Bin
+   GOTO READY 
+
+:READY   
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
