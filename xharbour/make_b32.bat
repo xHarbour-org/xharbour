@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_b32.bat,v 1.42 2009/03/26 19:23:46 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.43 2009/03/26 23:29:42 ronpinkas Exp $
 rem
 rem FILE: make_b32.bat
 rem BATCH FILE FOR BORLAND C++
@@ -15,7 +15,7 @@ IF "%SUB_DIR%"=="" SET SUB_DIR=b32
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 
 
-IF NOT '%CC_DIR%'=='' GOTO FIND_BISON
+IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
  
 :FIND_BCC
    IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
@@ -46,7 +46,7 @@ IF NOT '%CC_DIR%'=='' GOTO FIND_BISON
    GOTO FIND_BISON
 
 :FIND_BISON
-   IF NOT '%BISON_DIR%'=='' GOTO READY
+   IF NOT "%BISON_DIR%"=="" GOTO READY
    IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
    IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
    GOTO READY
