@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2007/08/06 20:30:23 likewolf Exp $
+# $Id: Makefile,v 1.8 2008/05/05 14:41:10 lculik Exp $
 #
 
 ROOT = ../../
@@ -24,3 +24,9 @@ include $(TOP)$(ROOT)config/lib.cf
 
 pptable.c : ppgen$(EXE_EXT)
 	$(HB_PPGEN_PATH)/ppgen$(EXE_EXT) $(TOP)$(ROOT)include/hbstdgen.ch -opptable.c -q -c$(TOP)$(ROOT)ChangeLog -v$(TOP)$(ROOT)include/hbverbld.h
+
+# ppcore.c includes hbverbld.h in xHarbour so it must have a dependency on ppgen run:
+ppcore$(OBJ_EXT) : | pptable.c
+
+clean ::
+	-$(RM) $(TOP)$(ROOT)include/hbverbld.h

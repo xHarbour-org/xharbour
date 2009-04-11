@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6405 2009/03/26 15:01:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6406 2009/03/26 15:15:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-11 23:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/pp/Makefile
+    ! Removed generated include/hbverbld.h on clean.
+    ! Added a dependency of ppcore.$(OBJ_EXT) on hbverbld.h to fix parallel
+      build.
 
 2009-03-26 10:41 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * include/hbdefs.h
