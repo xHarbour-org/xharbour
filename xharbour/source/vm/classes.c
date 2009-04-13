@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.239 2009/02/08 05:32:32 guerra000 Exp $
+ * $Id: classes.c,v 1.240 2009/03/02 09:20:16 marchuet Exp $
  */
 
 /*
@@ -274,6 +274,19 @@ static USHORT   s_uiClasses    = 0;
 
 
 /* ================================================ */
+
+
+static BOOL hb_clsHasParent( PCLASS pClass, PHB_DYNS pParentSym )
+{
+   USHORT uiAt = hb_clsFindMethod( pParentSym, pClass, NULL );
+
+   if( uiAt )
+   {
+      return ( pClass->pMethods[ uiAt - 1 ].pFunction == hb___msgSuper );
+   }
+   return FALSE;
+}
+
 
 static BOOL hb_clsIsFriendSymbol( PCLASS pClass, PHB_SYMB pSym )
 {
@@ -614,7 +627,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          // ----------------- Compare Modules -----------------
          if( HB_IS_OBJECT( pCaller ) )
          {
-            pSym = s_pClasses[ pCaller->item.asArray.value->uiClass - 1 ].pClsSymbol;
+            pSym = s_pClasses[ pCaller->item.asArray.value->uiClass - 1 ].pClassFuncSym;
          }
          else if( HB_IS_BLOCK( pCaller ) )
          {
@@ -749,26 +762,17 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                   else
                   {
                      // If we got here, this MUST be a Derived NON HIDDEN, NON READONLY Message, thus a Derived PROTECTED Method.
-                     PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
-                     USHORT uiAt;
                      char *szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
-                     PMETHOD pCallMeth = pCallerClass->pMethods;
 
                      #ifdef DEBUG_SCOPE
                         printf( "Defined in: %s\n", szClassOfMessage );
                      #endif
 
                      // Is the Caller derived from the Object?
-                     for( uiAt = pCallerClass->uiMethods + 1; --uiAt; pCallMeth++ )
+                     if( hb_clsIsParent( pCaller->item.asArray.value->uiClass, szClassOfMessage ) )
                      {
-                        if( pCallMeth->uiScope & HB_OO_CLSTP_CLASS )
-                        {
-                           if( strcmp( pCallMeth->pMessage->pSymbol->szName, szClassOfMessage ) == 0 )
-                           {
-                              // Derived class - allow access to PROTECTED.
-                              return TRUE;
-                           }
-                        }
+                        /* Derived class - allow access to PROTECTED. */
+                        return TRUE;
                      }
                   }
                }
@@ -783,35 +787,27 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                else
                {
                   PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
-                  USHORT uiAt;
-                  char *szObjectClass = pCallerClass->szName;
-                  PMETHOD pCallMeth = pCallerClass->pMethods;
+                  char *szObjectClass = pClass->szName;
 
                   // Is the Caller derived from the Object?
-                  for( uiAt = pCallerClass->uiMethods + 1; --uiAt; pCallMeth++ )
+                  if( hb_clsIsParent( pCaller->item.asArray.value->uiClass, szObjectClass ) )
                   {
-                     if( pCallMeth->uiScope & HB_OO_CLSTP_CLASS )
+                     if( uiScope & HB_OO_CLSTP_PROTECTED )
                      {
-                        if( strcmp( pCallMeth->pMessage->pSymbol->szName, szObjectClass ) == 0 )
+                        if( uiScope & HB_OO_CLSTP_READONLY )
                         {
-                           if( uiScope & HB_OO_CLSTP_PROTECTED )
-                           {
-                              if( uiScope & HB_OO_CLSTP_READONLY )
-                              {
-                                 // PROTECTED + READONLY can NOT be written from subclass.
-                                 goto ScopeError;
-                              }
-                              else
-                              {
-                                 // PROTECTED (NON READONLY) can be written from subclass.
-                                 return TRUE;
-                              }
-                           }
-
-                           // All other scopes are NOT allowed even in derived class.
+                           /* PROTECTED + READONLY can NOT be written from subclass. */
+                           goto ScopeError;
+                        }
+                        else
+                        {
+                           /* PROTECTED (NON READONLY) can be written from subclass. */
                            return TRUE;
                         }
                      }
+
+                     /* All other scopes are NOT allowed even in derived class. */
+                     return TRUE;
                   }
                }
                // This is NOT an Inherted Method, and Caller is Different Class - No restricted scope could be valid (excpet READONLY addressed above)!
@@ -855,29 +851,20 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
    return TRUE;
 }
 
-BOOL hb_clsIsParent(  USHORT uiClass, const char * szParentName )
+BOOL hb_clsIsParent( USHORT uiClass, const char * szParentName )
 {
-   USHORT uiAt;
-
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
-      PMETHOD pMethod = pClass->pMethods;
 
       if( strcmp( pClass->szName, szParentName ) == 0 )
-      {
          return TRUE;
-      }
-
-      for( uiAt = pClass->uiMethods + 1; --uiAt; pMethod++)
+      else
       {
-         if( pMethod->uiScope & HB_OO_CLSTP_CLASS )
-         {
-            if( strcmp( pMethod->pMessage->pSymbol->szName, szParentName ) == 0 )
-            {
-               return TRUE;
-            }
-         }
+         PHB_DYNS pMsg = hb_dynsymFindName( szParentName );
+
+         if( pMsg )
+            return hb_clsHasParent( pClass, pMsg );
       }
    }
 
@@ -887,10 +874,7 @@ BOOL hb_clsIsParent(  USHORT uiClass, const char * szParentName )
 /* ================================================ */
 
 /*
- * <szName> = ( pObject )
- *
  * Get the class name of an object
- *
  */
 const char * hb_objGetClsName( PHB_ITEM pObject )
 {
@@ -1088,7 +1072,7 @@ PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject )
 
    if( uiClass )
    {
-      return ( s_pClasses + ( uiClass - 1 ) )->pClsSymbol;
+      return ( s_pClasses + ( uiClass - 1 ) )->pClassFuncSym;
    }
 
    return NULL;
@@ -1183,6 +1167,22 @@ static void hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt )
       }
    }
 
+}
+
+static void hb_clsMakeSuperObject( PHB_ITEM pDest, PHB_ITEM pObject,
+                                   USHORT uiSuperClass )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsMakeSuperObject(%p, %p, %hu)", pDest, pObject, uiSuperClass));
+
+   /* create a fake object array */
+   hb_arrayNew( pDest, 1 );
+   /* Now save the Self object as the 1st elem. */
+   hb_arraySet( pDest, 1, pObject );
+   /* And transform it into a fake object */
+   /* backup of actual handel */
+   pDest->item.asArray.value->uiPrevCls = hb_objClassH( pObject );
+   /* superclass handel casting */
+   pDest->item.asArray.value->uiClass = uiSuperClass;
 }
 
 /*
@@ -2200,8 +2200,11 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                          BOOL fModuleFriendly )
 {
    PCLASS pNewCls;
-   USHORT uiClass, uiSuper, i, j;
-   USHORT uiKnownMethods = uiDatas * 2 + uiMethods;
+   PMETHOD pMethod;
+   USHORT i, uiSuper, uiSuperCls;
+   USHORT uiClass, j, uiAt;
+   USHORT uiKnownMethods = uiDatas * 2 + uiMethods + 1; /* add 1 for self class casting */
+   int iPos;
 
    uiSuper  = ( USHORT ) ( pSuperArray ? hb_arrayLen( pSuperArray ) : 0 );
    pClassFunc = hb_vmGetRealFuncSym( pClassFunc );
@@ -2220,9 +2223,10 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
    HB_CLASS_UNLOCK
 
    pNewCls->szName = hb_strdup( szClassName );
+   pNewCls->pClassSym = hb_dynsymGet( pNewCls->szName );
    if( !pClassFunc )
-      pClassFunc = hb_vmGetRealFuncSym( hb_dynsymGet( pNewCls->szName )->pSymbol );
-   pNewCls->pClsSymbol = pClassFunc;
+      pClassFunc = hb_vmGetRealFuncSym( pNewCls->pClassSym->pSymbol );
+   pNewCls->pClassFuncSym = pClassFunc;
    if( fModuleFriendly )
       hb_vmFindModuleSymbols( pClassFunc, &pNewCls->pFriendModule,
                                           &pNewCls->uiFriendModule );
@@ -2238,17 +2242,19 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
       ULONG nLenClsDatas;
       ULONG nLenInlines;
       PCLASS pSprCls = NULL; // To void incorrect warning;
-      PMETHOD  pNewMethod;
       PMETHOD  pSprMethod;
-      USHORT   uiInit = 0, uiAt;
-      int      iPos;
+      USHORT   uiInit = 0;
 
       for( i = 1; i <= uiSuper; i++ )
       {
-         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pSuperArray, i ) - 1 );
+         uiSuperCls = ( USHORT ) hb_arrayGetNI( pSuperArray, i );
+         if( uiSuperCls && uiSuperCls < s_uiClasses )
+         {
+            pSprCls = s_pClasses + uiSuperCls - 1;
 
-         ulSize += ( ULONG ) pSprCls->uiMethods;
-         pNewCls->uiDatas += pSprCls->uiDatas;
+            ulSize += ( ULONG ) pSprCls->uiMethods;
+            pNewCls->uiDatas += pSprCls->uiDatas;
+         }
       }
       if ( pNewCls->uiDatas )
       {
@@ -2272,138 +2278,141 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
 
       for( i = 1; i <= uiSuper; i++ )
       {
-         pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pSuperArray, i ) - 1 );
-
-         if( i == 1 )
+         uiSuperCls = ( USHORT ) hb_arrayGetNI( pSuperArray, i );
+         if( uiSuperCls && uiSuperCls < s_uiClasses )
          {
-            if( pSprCls->pFunError )
+            PCLASS pSprCls;
+            
+            pSprCls = s_pClasses + uiSuperCls - 1;
+            if( i == 1 )
             {
-               pNewCls->pFunError = pSprCls->pFunError;
-               pNewCls->uiScope |= HB_OO_CLS_ONERROR_SUPER;
-            }
-
-            pNewCls->pDestructor = pSprCls->pDestructor;
-
-            /* CLASS DATA Not Shared ( new array, new value ) */
-            pNewCls->pClassDatas  = hb_arrayClone( pSprCls->pClassDatas, NULL );
-            pNewCls->pInlines = hb_arrayClone( pSprCls->pInlines, NULL );
-            pNewCls->uiDatasShared = pSprCls->uiDatasShared;
-            memcpy( pNewCls->pMethDyn, pSprCls->pMethDyn, pSprCls->uiMethods * sizeof( METHDYN ) );
-         }
-         else
-         {
-            USHORT uiNew, uiAdd = 0;
-            USHORT nLen, ui;
-            PHB_ITEM pClsAnyTmp;
-
-            /* Ok add now the previous len to the offset */
-            nLenClsDatas  = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
-            nLenInlines   = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
-
-            /* ClassDatas */
-            pClsAnyTmp = hb_arrayClone( pSprCls->pClassDatas, NULL );
-
-            nLen = ( USHORT ) pClsAnyTmp->item.asArray.value->ulLen;
-            ui   = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
-            nLen += ui;
-            hb_arraySize( pNewCls->pClassDatas, nLen );
-
-            for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
-            {
-               hb_arrayGet( pClsAnyTmp, ++ uiAdd, hb_arrayGetItemPtr( pNewCls->pClassDatas, uiNew ) );
-            }
-
-            hb_itemRelease( pClsAnyTmp );
-
-            /* SharedDatas */
-            pNewCls->uiDatasShared += pSprCls->uiDatasShared;
-
-            /* Inlines */
-            pClsAnyTmp = hb_arrayClone( pSprCls->pInlines, NULL );
-            ui = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
-            nLen = ( USHORT ) (pClsAnyTmp)->item.asArray.value->ulLen;
-            nLen += ui;
-            hb_arraySize( pNewCls->pInlines, nLen );
-            uiAdd = 0;
-
-            for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
-            {
-               hb_arrayGet( pClsAnyTmp, ++ uiAdd, hb_arrayGetItemPtr( pNewCls->pInlines, uiNew ) );
-            }
-
-            hb_itemRelease( pClsAnyTmp );
-         }
-
-
-         pSprMethod = pSprCls->pMethods;
-         j = pSprCls->uiMethods + 1;
-
-         for( ; --j; pNewMethod++, pSprMethod++ )
-         {
-            uiAt = hb_clsFindMethod( pSprMethod->pMessage, pNewCls, &iPos );
-
-            if( uiAt )
-            {
-               pNewMethod = pNewCls->pMethods + uiAt - 1;
-               hb_xmemcpy( pNewMethod, pSprMethod, sizeof( METHOD ) );
-            }
-            else
-            {
-               pNewCls->uiMethods++;
-               pNewMethod = pNewCls->pMethods + (USHORT) ulSize;
-               hb_xmemcpy( pNewMethod, pSprMethod, sizeof( METHOD ) );
-               ++ulSize;
-               uiAt = (USHORT) ulSize;
-               hb_clsSaveMethod( pNewMethod->pMessage, iPos, pNewCls, (USHORT) ulSize );
-            }
-
-            //TraceLog( NULL, "NEW INHERITED Method: %s:%s from CLASS %s Module: %s Pos: %i %i\n", pNewCls->szName, pNewMethod->pMessage->pSymbol->szName, pSprCls->szName, pNewMethod->pModuleSymbols->szModuleName, iPos, ulSize );
-
-            if( pNewMethod->pFunction == hb___msgSetClsData ||
-                pNewMethod->pFunction == hb___msgGetClsData )
-            {
-               pNewMethod->uiData += ( USHORT ) nLenClsDatas;
-            }
-            else if( pNewMethod->pFunction == hb___msgSetData ||
-                     pNewMethod->pFunction == hb___msgGetData )
-            {
-               pNewMethod->uiData += pNewCls->uiDataFirst;
-            }
-            else if( pNewMethod->pFunction == hb___msgEvalInline )
-            {
-               pNewMethod->uiData += ( USHORT ) nLenInlines;
-            }
-
-            pNewMethod->uiScope |= HB_OO_CLSTP_SUPER;
-
-            if( pNewMethod->pInitValue )
-            {
-               if( HB_IS_ARRAY( pNewMethod->pInitValue ) )
+               if( pSprCls->pFunError )
                {
-                  pNewMethod->pInitValue = hb_arrayClone( pNewMethod->pInitValue, NULL );
+                  pNewCls->pFunError = pSprCls->pFunError;
+                  pNewCls->uiScope |= HB_OO_CLS_ONERROR_SUPER;
                }
-               else if( HB_IS_HASH( pNewMethod->pInitValue ) )
+
+               pNewCls->pDestructor = pSprCls->pDestructor;
+
+               /* CLASS DATA Not Shared ( new array, new value ) */
+               pNewCls->pClassDatas  = hb_arrayClone( pSprCls->pClassDatas, NULL );
+               pNewCls->pInlines = hb_arrayClone( pSprCls->pInlines, NULL );
+               pNewCls->uiDatasShared = pSprCls->uiDatasShared;
+               memcpy( pNewCls->pMethDyn, pSprCls->pMethDyn, pSprCls->uiMethods * sizeof( METHDYN ) );
+            }
+            else if( !hb_clsHasParent( pNewCls, pSprCls->pClassSym ) )
+            {
+               USHORT uiNew, uiAdd = 0;
+               USHORT nLen, ui;
+               PHB_ITEM pClsAnyTmp;
+
+               /* Ok add now the previous len to the offset */
+               nLenClsDatas  = ( USHORT ) hb_itemSize( pNewCls->pClassDatas );
+               nLenInlines   = ( USHORT ) hb_itemSize( pNewCls->pInlines );
+
+               /* ClassDatas */
+               pClsAnyTmp = hb_arrayClone( pSprCls->pClassDatas, NULL );
+
+               nLen = ( USHORT ) hb_itemSize( pClsAnyTmp );
+               ui   = ( USHORT ) hb_itemSize( pNewCls->pClassDatas );
+               nLen += ui;
+               hb_arraySize( pNewCls->pClassDatas, nLen );
+
+               for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
                {
-                  pNewMethod->pInitValue = hb_hashClone( pNewMethod->pInitValue, NULL );
+                  hb_arrayGet( pClsAnyTmp, ++ uiAdd, hb_arrayGetItemPtr( pNewCls->pClassDatas, uiNew ) );
+               }
+
+               hb_itemRelease( pClsAnyTmp );
+
+               /* SharedDatas */
+               pNewCls->uiDatasShared += pSprCls->uiDatasShared;
+
+               /* Inlines */
+               pClsAnyTmp = hb_arrayClone( pSprCls->pInlines, NULL );
+               ui = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
+               nLen = ( USHORT ) (pClsAnyTmp)->item.asArray.value->ulLen;
+               nLen += ui;
+               hb_arraySize( pNewCls->pInlines, nLen );
+               uiAdd = 0;
+
+               for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
+               {
+                  hb_arrayGet( pClsAnyTmp, ++ uiAdd, hb_arrayGetItemPtr( pNewCls->pInlines, uiNew ) );
+               }
+
+               hb_itemRelease( pClsAnyTmp );
+            }
+
+            pSprMethod = pSprCls->pMethods;
+            j = pSprCls->uiMethods + 1;
+
+            for( ; --j; pMethod++, pSprMethod++ )
+            {
+               uiAt = hb_clsFindMethod( pSprMethod->pMessage, pNewCls, &iPos );
+
+               if( uiAt )
+               {
+                  pMethod = pNewCls->pMethods + uiAt - 1;
+                  hb_xmemcpy( pMethod, pSprMethod, sizeof( METHOD ) );
                }
                else
                {
-                  pNewMethod->pInitValue = hb_itemNew( pNewMethod->pInitValue );
+                  pNewCls->uiMethods++;
+                  pMethod = pNewCls->pMethods + (USHORT) ulSize;
+                  hb_xmemcpy( pMethod, pSprMethod, sizeof( METHOD ) );
+                  ++ulSize;
+                  uiAt = (USHORT) ulSize;
+                  hb_clsSaveMethod( pMethod->pMessage, iPos, pNewCls, (USHORT) ulSize );
                }
 
-               if( pNewMethod->pFunction == hb___msgSetData ||
-                     pNewMethod->pFunction == hb___msgGetData )
+               //TraceLog( NULL, "NEW INHERITED Method: %s:%s from CLASS %s Module: %s Pos: %i %i\n", pNewCls->szName, pNewMethod->pMessage->pSymbol->szName, pSprCls->szName, pNewMethod->pModuleSymbols->szModuleName, iPos, ulSize );
+
+               if( pMethod->pFunction == hb___msgSetClsData ||
+                   pMethod->pFunction == hb___msgGetClsData )
                {
-                  pNewCls->pInitValues[ uiInit ].uiData     = pNewMethod->uiData;
-                  pNewCls->pInitValues[ uiInit ].uiAt       = uiAt;
-                  pNewCls->pInitValues[ uiInit ].pInitValue = pNewMethod->pInitValue;
-                  uiInit++;
+                  pMethod->uiData += ( USHORT ) nLenClsDatas;
+               }
+               else if( pMethod->pFunction == hb___msgSetData ||
+                        pMethod->pFunction == hb___msgGetData )
+               {
+                  pMethod->uiData += pNewCls->uiDataFirst;
+               }
+               else if( pMethod->pFunction == hb___msgEvalInline )
+               {
+                  pMethod->uiData += ( USHORT ) nLenInlines;
+               }
+
+               pMethod->uiScope |= HB_OO_CLSTP_SUPER;
+
+               if( pMethod->pInitValue )
+               {
+                  if( HB_IS_ARRAY( pMethod->pInitValue ) )
+                  {
+                     pMethod->pInitValue = hb_arrayClone( pMethod->pInitValue, NULL );
+                  }
+                  else if( HB_IS_HASH( pMethod->pInitValue ) )
+                  {
+                     pMethod->pInitValue = hb_hashClone( pMethod->pInitValue, NULL );
+                  }
+                  else
+                  {
+                     pMethod->pInitValue = hb_itemNew( pMethod->pInitValue );
+                  }
+
+                  if( pMethod->pFunction == hb___msgSetData ||
+                      pMethod->pFunction == hb___msgGetData )
+                  {
+                     pNewCls->pInitValues[ uiInit ].uiData     = pMethod->uiData;
+                     pNewCls->pInitValues[ uiInit ].uiAt       = uiAt;
+                     pNewCls->pInitValues[ uiInit ].pInitValue = pMethod->pInitValue;
+                     uiInit++;
+                  }
                }
             }
+            pNewCls->fOpOver     |= pSprCls->fOpOver;
+            pNewCls->uiDataFirst += pSprCls->uiDatas;
          }
-
-         pNewCls->fOpOver     |= pSprCls->fOpOver;
-         pNewCls->uiDataFirst += pSprCls->uiDatas;
       }
       pNewCls->uiMethods       = ( USHORT ) ulSize;
       pNewCls->uiDataInitiated = uiInit;
@@ -2412,11 +2421,6 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
    else
    {
       HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, uiMethods ) );
-
-      if( uiKnownMethods == 0 )
-      {
-         uiKnownMethods = 1;
-      }
 
       pNewCls->uiReserved  = ( USHORT ) uiKnownMethods;
       pNewCls->pMethods    = ( PMETHOD ) hb_xgrab( uiKnownMethods * sizeof( METHOD ) );
@@ -2430,6 +2434,22 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
       {
          pNewCls->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) * pNewCls->uiDatas );
          memset( pNewCls->pInitValues, 0, sizeof( CLSDINIT ) * pNewCls->uiDatas );
+      }
+   }
+
+   /* add self class casting */
+   if( hb_stricmp( pNewCls->szName, pNewCls->pClassSym->pSymbol->szName ) == 0 )
+   {
+      uiAt = hb_clsFindMethod( pNewCls->pClassSym, pNewCls, &iPos );
+      if( !uiAt )
+      {
+         pMethod = pNewCls->pMethods + pNewCls->uiMethods;
+         pMethod->pMessage = pNewCls->pClassSym;
+         pMethod->uiSprClass = uiClass;
+         pMethod->uiScope = HB_OO_CLSTP_EXPORTED;
+         pMethod->pFunction = hb___msgSuper;
+         pNewCls->uiMethods++;
+         hb_clsSaveMethod( pMethod->pMessage, iPos, pNewCls, pNewCls->uiMethods );
       }
    }
 
@@ -2594,7 +2614,7 @@ BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
    pModuleSymbols = pModule->pSymbolTable;
    while ( uiPos )
    {
-      if( hb_vmFindModuleSymbols( pClass->pClsSymbol, &pThisModuleSymbols, &uiSymbols )
+      if( hb_vmFindModuleSymbols( pClass->pClassFuncSym, &pThisModuleSymbols, &uiSymbols )
           && pThisModuleSymbols == pModuleSymbols )
       {
          pClass->bActive = FALSE;
@@ -2632,7 +2652,7 @@ HB_FUNC( __CLSACTIVE )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pClsSymbol == (*pBase)->item.asSymbol.value )
+      if( pClass->pClassFuncSym == (*pBase)->item.asSymbol.value )
       {
          pClass->bActive = TRUE;
          hb_retl( TRUE );
@@ -2654,7 +2674,7 @@ HB_FUNC( __CLSSETMODULE )
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
       if( !pClass->bActive )
       {
-         pClass->pClsSymbol = (*pBase)->item.asSymbol.value;
+         pClass->pClassFuncSym = (*pBase)->item.asSymbol.value;
          hb_retl( TRUE );
          return;
       }
@@ -3811,7 +3831,7 @@ static HARBOUR hb___msgClsParent( void )
 
    if( HB_IS_OBJECT( pItemParam ) )
    {
-      hb_retl( hb_clsIsParent( uiClass , hb_objGetClsName( pItemParam ) ) );
+      hb_retl( hb_clsIsParent( uiClass, hb_objGetClsName( pItemParam ) ) );
    }
    else if( HB_IS_STRING( pItemParam ) )
    {
@@ -4069,17 +4089,8 @@ static HARBOUR hb___msgSuper( void )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pObject = hb_stackSelfItem();
-   PHB_ITEM pReturn = hb_stackReturnItem();
-
-   hb_arrayNew( pReturn, 1 );
-
-   /* Now save the Self object as the 1st elem. */
-   hb_arraySet( pReturn, 1 , pObject );
-
-   /* And transform it into a fake object */
-   pReturn->item.asArray.value->uiPrevCls  = hb_objClassH( pObject ); /* backup of actual handel */
-   pReturn->item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;     /* superclass handel casting */
+   hb_clsMakeSuperObject( hb_stackReturnItem(), hb_stackSelfItem(),
+                          (HB_VM_STACK.pMethod)->uiSprClass );
 }
 
 /*
@@ -4796,7 +4807,7 @@ void hb_clsSetModule( USHORT uiClass )
 
    if( uiClass && uiClass <= s_uiClasses )
    {
-      ( s_pClasses + ( uiClass - 1 ) )->pClsSymbol = HB_GETSYM();
+      ( s_pClasses + ( uiClass - 1 ) )->pClassFuncSym = HB_GETSYM();
    }
 }
 
@@ -4872,7 +4883,7 @@ static BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
 
          if( uiFriendClass <= s_uiClasses )
          {
-            pFriendSym = s_pClasses[ uiFriendClass - 1 ].pClsSymbol;
+            pFriendSym = s_pClasses[ uiFriendClass - 1 ].pClassFuncSym;
          }
       }
       else if( HB_IS_STRING( pFriend ) )
@@ -4884,7 +4895,7 @@ static BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
 
          if( uiFriendClass <= s_uiClasses )
          {
-            pFriendSym = s_pClasses[ uiFriendClass - 1 ].pClsSymbol;
+            pFriendSym = s_pClasses[ uiFriendClass - 1 ].pClassFuncSym;
          }
       }
       else if( HB_IS_POINTER( pFriend ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6407 2009/04/11 19:45:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.6408 2009/04/13 13:50:08 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-13 18:22 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/classes.h
+  * source/vm/classes.c
+    + Added self class casting.
+    % Optimized some checks for derived class.
+    ! Do not add unnecessary messages for the same class when it's inherited
+      more than once (appears several times in super classes tree).
+    ! Added some parameter validation on class creation (could GPF).
+  * source/rtl/tclass.prg
+    ! Removed addition of super class casting messages - they're now created
+      automatically on C level.
+    (modeled after Harbour code by Przemyslaw Czerpak)
+
+  * source/vm/classes.c
+    ! Fixed incorrect scope violation when a subclass accesses a PROTECTED
+      message in another instance of its superclass.
 
 2009-04-13 17:48 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * tests/tstscope.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.31 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.32 2009/01/24 14:49:03 ronpinkas Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
  *
  */
 
-// Harbour Class HBClass to build classes
+/* Harbour Class HBClass to build classes */
 
 #include "common.ch"
 #include "hboo.ch"
@@ -175,7 +175,7 @@ RETURN Self
 STATIC PROCEDURE Create()
 
    LOCAL Self := QSelf()
-   LOCAL n
+   //LOCAL n
    LOCAL nLen := Len( ::acSuper )
    LOCAL nLenDatas := Len( ::aDatas ) //Datas local to the class !!
    LOCAL nDataBegin := 0
@@ -225,14 +225,14 @@ STATIC PROCEDURE Create()
          nClassBegin  += __cls_CntClsData( cDato )     // Get offset for new ClassData
       NEXT
 
-      __clsAddMsg( hClass, Upper( ::acSuper[ 1 ] ), 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], HB_OO_CLSTP_CLASS + 1 )
+      //__clsAddMsg( hClass, Upper( ::acSuper[ 1 ] ), 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], HB_OO_CLSTP_CLASS + 1 )
       // nData begin stay here the same so as, SUPER and __SUPER will share the same pointer to super object with the first one.
       __clsAddMsg( hClass, "SUPER"                , 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
       __clsAddMsg( hClass, "__SUPER"              , 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
 
-      FOR n := 2 TO nLen
-         __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), HB_EnumIndex(), HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
-      NEXT
+      //FOR n := 2 TO nLen
+      //   __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), HB_EnumIndex(), HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
+      //NEXT
    ENDIF
 //   __clsAddMsg( hClass, Upper( ::cName ), 0, HB_OO_MSG_SUPER, hClass, 1 )
 
