@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6410 2009/04/13 14:45:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.6411 2009/04/13 16:57:26 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-14 00:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * tests/speedtst.prg
+    * added warning message when HVM debugger is enabled
+    * simplified xHarbour MT test - use mutexes as internal thread IDs
+      as workarounds for race conditions in xHarbour .prg MT API.
+    * updated to compile with FlagShip
+    * update to compile with MT support using xBase++ MT .prg API.
+    + added new tests of dynamic code blocks performance
+    * modified to compile by __XPP__ and __CLIP__ - now for single
+      thread only
+    + added one new test
+    * updated to work with CA-Cl*pper
+  + tests/clsccast.prg
+    + added test code for proper class data allocating and casting
+  + tests/clsicast.prg
+    + added test code for proper instance area allocating and casting
+  + tests/clsscast.prg
+    + added test code for shared class data allocating and casting
+  + tests/clsnv.prg
+    + added test code for non virtual hidden class members
+  (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-04-13 20:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/hvm.c

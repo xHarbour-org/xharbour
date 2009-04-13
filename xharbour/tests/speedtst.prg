@@ -1,5 +1,5 @@
 /*
- * $Id: speedtst.prg,v 1.8 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: speedtst.prg,v 1.9 2009/01/08 20:28:04 likewolf Exp $
  */
 
 /*
@@ -11,15 +11,69 @@
  *
  */
 
-#define N_TESTS 54
+/* Harbour MT functions used int hit test */
+/*
+#xtranslate hb_mutexSubscribe(      => mt_mutexSubscribe(
+#xtranslate hb_mutexNotify(         => mt_mutexNotify(
+#xtranslate hb_mutexCreate(         => mt_mutexCreate(
+#xtranslate hb_threadOnce(          => mt_threadOnce(
+#xtranslate hb_threadStart(         => mt_threadStart(
+#xtranslate hb_threadJoin(          => mt_threadJoin(
+#xtranslate hb_threadWaitForAll(    => mt_threadWaitForAll(
+*/
+
+#define N_TESTS 56
 #define N_LOOPS 1000000
 #define ARR_LEN 16
 
+#ifndef __HARBOUR__
+   #ifndef __XPP__
+      #ifndef __CLIP__
+         #ifndef FlagShip
+            #define __CLIPPER__
+         #endif
+      #endif
+   #endif
+#endif
+
+
+#ifdef __CLIPPER__
+   /* Clipper does not support multithreading */
+   #ifndef __ST__
+      #define __ST__
+   #endif
+   /* Clipper does not have function to extract process time */
+   #xtranslate secondsCPU() => seconds()
+#endif
+
+#ifdef FlagShip
+   #define __NO_OBJ_ARRAY__
+   /* FlagShip does not support multithreading */
+   #ifndef __ST__
+      #define __ST__
+   #endif
+   /* the FlagShip version of seconds() returns integer values */
+   #xtranslate seconds() => fs_seconds()
+#endif
+
+#ifdef __XPP__
+   #define __NO_OBJ_ARRAY__
+   /* Has xBase++ function to extract process time? */
+   #xtranslate secondsCPU() => seconds()
+#endif
+
+#ifdef __CLIP__
+   #define __NO_OBJ_ARRAY__
+   /* CLIP version for MT performance testing is not ready yet */
+   #ifndef __ST__
+      #define __ST__
+   #endif
+#endif
+
 #ifdef __XHARBOUR__
-   /* By default build xHarbour binaries without MT support
-    * xHarbour needs separated version for MT and ST mode
-    * because standard MT functions are not available in
-    * ST libraries.
+   /* By default build xHarbour binaries without MT support.
+    * xHarbour needs separated source code versions for MT and ST mode
+    * because standard MT functions are not available in ST libraries.
     */
    #ifndef __ST__
       #ifndef __MT__
@@ -32,55 +86,81 @@
    #endif
 #endif
 
+/* by default create MT version */
+#ifndef __MT__
+   #ifndef __ST__
+      #define __MT__
+   #endif
+#endif
 
-#command ? => outstd(EOL)
-#command ? <xx,...> => outstd(EOL);outstd(<xx>)
 
-#include "common.ch"
+#command ? => spd_out(EOL)
+#command ? <xx,...> => spd_out(EOL);spd_out(<xx>)
+#command ?? <xx,...> => spd_out(<xx>)
 
 #ifdef __HARBOUR__
    #define EOL hb_OSNewLine()
 #else
-   #define HB_SYMBOL_UNUSED( symbol )  ( ( symbol ) )
-   #ifndef __CLIP__
-      #xtranslate secondsCPU() => seconds()
-   #endif
    #ifndef EOL
       #define EOL chr(10)
    #endif
 #endif
 
-#xcommand _( [<cmds,...>] ) => [<cmds>]
-
 #xcommand TEST <testfunc>           ;
           [ WITH <locals,...> ]     ;
+          [ STATIC <statics,...> ]  ;
+          [ FIELD  <fields,...> ]   ;
+          [ MEMVAR <memvars,...> ]  ;
+          [ PRIVATE <privates,...> ];
+          [ PUBLIC <publics,...> ]  ;
           [ INIT <init> ]           ;
           [ EXIT <exit> ]           ;
           [ INFO <info> ]           ;
-          CODE [<*testExp*>] =>     ;
+          CODE [ <testExp,...> ] => ;
    func <testfunc> ;                ;
-      local time, i, x := nil ;     ;
+      local time, i:=nil, x:=nil ;  ;
       [ local <locals> ; ]          ;
+      [ static <statics> ; ]        ;
+      [ field <fields> ; ]          ;
+      [ memvar <memvars> ; ]        ;
+      [ private <privates> ; ]      ;
+      [ public <publics> ; ]        ;
       [ <init> ; ]                  ;
       time := secondscpu() ;        ;
       for i:=1 to N_LOOPS ;         ;
-         [<testExp>;]               ;
+         [ ( <testExp> ) ; ]        ;
       next ;                        ;
       time := secondscpu() - time ; ;
       [ <exit> ; ]                  ;
    return { procname() + ": " + iif( <.info.>, <(info)>, #<testExp> ), time }
 
+STATIC s_lStdOut := .F.
 
+#ifdef __HARBOUR__
+#ifndef __XHARBOUR__
+#include "hbver.ch"
+#endif
+#endif
+
+#ifdef __HARBOUR__
 proc main( ... )
-   local aParams, nMT, cExclude, lScale, cParam, cMemTests, lSyntax, i
+   local aParams := hb_aparams()
+#else
+proc main( _p01, _p02, _p03, _p04, _p05, _p06, _p07, _p08, _p09, _p10, ;
+           _p11, _p12, _p13, _p14, _p15, _p16, _p17, _p18, _p19, _p20 )
+   local aParams := ;
+      asize( { _p01, _p02, _p03, _p04, _p05, _p06, _p07, _p08, _p09, _p10, ;
+               _p11, _p12, _p13, _p14, _p15, _p16, _p17, _p18, _p19, _p20 }, ;
+             min( pCount(), 20 ) )
+#endif
+   local nMT, cExclude, lScale, cParam, cMemTests, lSyntax, i, j
 
-   aParams := hb_aparams()
    lSyntax := lScale := .f.
-   cMemTests := "029 030 023 025 027 040 041 043 052 053 019 022 031 032 054 "
+   cMemTests := "030 031 023 025 027 041 042 044 053 054 019 022 032 033 055 056 "
    cExclude := ""
    nMT := 0
-   for each cParam in aParams
-      cParam := lower( cParam )
+   for j := 1 to len( aParams )
+      cParam := lower( aParams[ j ] )
       if cParam = "--thread"
          if substr( cParam, 9, 1 ) == "="
             if isdigit( substr( cParam, 10, 1 ) )
@@ -112,164 +192,78 @@ proc main( ... )
                cExclude += strzero( i, 3 ) + " "
             endif
          next
-      elseif cParam = "--scale"
+      elseif cParam == "--scale"
          lScale := .t.
+      elseif cParam == "--stdout"
+         s_lStdOut := .t.
       else
          lSyntax = .t.
       endif
       if lSyntax
          ? "Unknown option:", cParam
-         ? "syntax:", hb_argv( 0 ), "[--thread[=<num>]] [--only=<test(s)>] [--exclude=<test(s)>]"
+         ? "syntax: speedtst [--thread[=<num>]] [--only=<test(s)>] [--exclude=<test(s)>]"
          ?
          return
       endif
    next
+
+   IF ! s_lStdOut
+      set alternate to ( FN_ExtSet( hb_progname(), ".txt" ) ) additive
+      set alternate on
+   ENDIF
+   // set console off
+
    test( nMT, cExclude, lScale )
+
+   IF ! s_lStdOut
+      set alternate off
+      set alternate to
+   ENDIF
+
 return
 
+STATIC PROCEDURE spd_out( p1, p2, p3, p4, p5, p6 )
+   IF s_lStdOut
+      DO CASE
+      CASE PCount() == 0 ; OutStd()
+      CASE PCount() == 1 ; OutStd( p1 )
+      CASE PCount() == 2 ; OutStd( p1, p2 )
+      CASE PCount() == 3 ; OutStd( p1, p2, p3 )
+      CASE PCount() == 4 ; OutStd( p1, p2, p3, p4 )
+      CASE PCount() == 5 ; OutStd( p1, p2, p3, p4, p5 )
+      CASE PCount() == 6 ; OutStd( p1, p2, p3, p4, p5, p6 )
+      ENDCASE
+   ELSE
+      DO CASE
+      CASE PCount() == 0 ; QQOut()
+      CASE PCount() == 1 ; QQOut( p1 )
+      CASE PCount() == 2 ; QQOut( p1, p2 )
+      CASE PCount() == 3 ; QQOut( p1, p2, p3 )
+      CASE PCount() == 4 ; QQOut( p1, p2, p3, p4 )
+      CASE PCount() == 5 ; QQOut( p1, p2, p3, p4, p5 )
+      CASE PCount() == 6 ; QQOut( p1, p2, p3, p4, p5, p6 )
+      ENDCASE
+   ENDIF
+   RETURN
 
+STATIC FUNCTION FN_ExtSet( cFileName, cExt )
+   LOCAL cDir, cName
+
+   hb_FNameSplit( cFileName, @cDir, @cName )
+
+   RETURN hb_FNameMerge( cDir, cName, cExt )
+
+#ifndef __HARBOUR__
+STATIC FUNCTION hb_progname()
+   RETURN "speedtst"
+#else
 #ifdef __XHARBOUR__
-
-   #xtranslate hb_mtvm()                  => hb_multiThread()
-   #xtranslate hb_threadWaitForAll()      => WaitForThreads()
-   #xtranslate hb_mutexNotify(<x,...>)    => Notify(<x>)
-
-#ifndef __ST__
-
-
-   /* do not expect that this code will work with xHarbour.
-    * xHarbour has many race conditions which are exploited quite fast
-    * on real multi CPU machines so it crashes in different places :-(
-    * probably this code should be forwared to xHarbour developers as
-    * some type of MT test
-    */
-
-   /* this define is only for test if emulation function works
-    * without running real test which causes that xHarbour crashes
-    */
-   //#define _DUMY_XHB_TEST_
-
-
-   function hb_mutexSubscribe( mtx, nTimeOut, xSubscribed )
-      local lSubscribed
-      if valtype( nTimeOut ) == "N"
-         nTimeOut := round( nTimeOut * 1000, 0 )
-         xSubscribed := Subscribe( mtx, nTimeOut, @lSubscribed )
-      else
-         xSubscribed := Subscribe( mtx )
-         lSubscribed := .t.
-      endif
-   return lSubscribed
-
-   /* in xHarbour there is race condition in JoinThread() which
-    * fails if thread end before we call it so we cannot use it :-(
-    * this code tries to simulate it and also add support for thread
-    * return value
-    */
-
-   function hb_threadStart( ... )
-      local thId
-      thId := StartThread( @threadFirstFunc(), hb_aParams() )
-      /* Just like in JoinThread() the same race condition exists in
-       * GetThreadId() so we will use HVM thread numbers internally
-       */
-#ifdef _DUMY_XHB_TEST_
-   return val( substr( hb_aParams()[1], 2 ) )
-#else
-   return GetThreadId( thId )
+STATIC FUNCTION hb_progname()
+   RETURN "speedtst"
+#endif
 #endif
 
-   function hb_threadJoin( thId, xResult )
-      xResult := results( thId )
-   return .t.
-
-   static function threadFirstFunc( aParams )
-      local xResult
-#ifdef _DUMY_XHB_TEST_
-      xResult := { "skipped test " + aParams[1], val( substr( aParams[1], 2 ) ) + 0.99 }
-      results( val( substr( aParams[1], 2 ) ), xResult )
-#else
-      xResult := hb_execFromArray( aParams )
-      results( GetThreadId(), xResult )
-#endif
-   return nil
-
-   static function results( nThread, xResult )
-      static s_aResults
-      static s_mutex
-      if s_aResults == nil
-         s_aResults := HSetAutoAdd( hash(), .t. )
-         s_mutex := hb_mutexCreate()
-      endif
-      if pcount() < 2
-         while ! nThread $ s_aResults
-            Subscribe( s_mutex, 1000 )
-         enddo
-         xResult := s_aResults[ nThread ]
-      else
-         s_aResults[ nThread ] := xResult
-         /* We cannot use NotifyAll() here because it will create
-          * race condition. In this program only one thread join
-          * results so we can use simple Notify() as workaround
-          */
-         //NotifyAll( s_mutex )
-         Notify( s_mutex )
-      endif
-   return xResult
-
-#else
-
-   function hb_threadStart()
-   return nil
-   function hb_threadJoin()
-   return nil
-   function hb_mutexCreate()
-   return nil
-   function hb_mutexSubscribe()
-   return nil
-   function hb_mutexLock()
-   return nil
-   function hb_mutexUnlock()
-   return nil
-   function notify()
-   return nil
-   function waitForThreads()
-   return nil
-
-#endif
-
-/* initialize mutex in hb_trheadDoOnce() */
-init proc once_init()
-   set workarea private
-   hb_threadOnce()
-   /* initialize error object to reduce possible crashes when two
-    * threads will try to create new error class simultaneously
-    * xHarbour does not have any protection against such situation
-    */
-   errorNew()
-return
-
-function hb_threadOnce( xOnceControl, bAction )
-   static s_mutex
-   local lFirstCall := .f.
-   if s_mutex == NIL
-      s_mutex := hb_mutexCreate()
-   endif
-   if xOnceControl == NIL
-      hb_mutexLock( s_mutex )
-      if xOnceControl == NIL
-         if bAction != NIL
-            eval( bAction )
-         endif
-         xOnceControl := .t.
-         lFirstCall := .t.
-      endif
-      hb_mutexUnlock( s_mutex )
-   endif
-return lFirstCall
-
-#endif
-
+/*** TESTS ***/
 
 TEST t000 INFO "empty loop overhead" CODE
 
@@ -279,57 +273,63 @@ TEST t002 WITH L_N:=112345.67    CODE x := L_N
 
 TEST t003 WITH L_D:=date()       CODE x := L_D
 
-TEST t004 INIT _( static s_once, S_C ) ;
+TEST t004 STATIC s_once := NIL, S_C ;
           INIT hb_threadOnce( @s_once, {|| S_C := dtos( date() ) } ) ;
           CODE x := S_C
 
-TEST t005 INIT _( static s_once, S_N ) ;
+TEST t005 STATIC s_once := NIL, S_N ;
           INIT hb_threadOnce( @s_once, {|| S_N := 112345.67 } ) ;
           CODE x := S_N
 
-TEST t006 INIT _( static s_once, S_D ) ;
+TEST t006 STATIC s_once := NIL, S_D ;
           INIT hb_threadOnce( @s_once, {|| S_D := date() } ) ;
           CODE x := S_D
 
-TEST t007 INIT _( memvar M_C ) INIT _( private M_C := dtos( date() ) ) ;
-          CODE x := M_C
+TEST t007 MEMVAR M_C ;
+          PRIVATE M_C := dtos( date() ) ;
+          CODE x := M->M_C
 
-TEST t008 INIT _( memvar M_N ) INIT _( private M_N := 112345.67 ) ;
-          CODE x := M_N
+TEST t008 MEMVAR M_N ;
+          PRIVATE M_N := 112345.67 ;
+          CODE x := M->M_N
 
-TEST t009 INIT _( memvar M_D ) INIT _( private M_D := date() ) ;
-          CODE x := M_D
+TEST t009 MEMVAR M_D ;
+          PRIVATE M_D := date() ;
+          CODE x := M->M_D
 
-TEST t010 INIT _( memvar P_C ) ;
-          INIT _( static s_once ) ;
-          INIT _( public P_C ) ;
-          INIT hb_threadOnce( @s_once, {|| P_C := dtos( date() ) } ) ;
-          CODE x := P_C
+TEST t010 STATIC s_once := NIL ;
+          MEMVAR P_C ;
+          PUBLIC P_C ;
+          INIT hb_threadOnce( @s_once, {|| M->P_C := dtos( date() ) } ) ;
+          CODE x := M->P_C
 
-TEST t011 INIT _( memvar P_N ) ;
-          INIT _( static s_once ) ;
-          INIT _( public P_N ) ;
-          INIT hb_threadOnce( @s_once, {|| P_N := 112345.67 } ) ;
-          CODE x := P_N
+TEST t011 STATIC s_once := NIL ;
+          MEMVAR P_N ;
+          PUBLIC P_N ;
+          INIT hb_threadOnce( @s_once, {|| M->P_N := 112345.67 } ) ;
+          CODE x := M->P_N
 
-TEST t012 INIT _( memvar P_D ) ;
-          INIT _( static s_once ) ;
-          INIT _( public P_D ) ;
-          INIT hb_threadOnce( @s_once, {|| P_D := date() } ) ;
-          CODE x := P_D
+TEST t012 STATIC s_once := NIL ;
+          MEMVAR P_D ;
+          PUBLIC P_D ;
+          INIT hb_threadOnce( @s_once, {|| M->P_D := date() } ) ;
+          CODE x := M->P_D
 
-TEST t013 INIT _( field F_C ) INIT use_dbsh() EXIT close_db() ;
+TEST t013 FIELD  F_C ;
+          INIT use_dbsh() EXIT close_db() ;
           CODE x := F_C
 
-TEST t014 INIT _( field F_N ) INIT use_dbsh() EXIT close_db() ;
+TEST t014 FIELD F_N ;
+          INIT use_dbsh() EXIT close_db() ;
           CODE x := F_N
 
-TEST t015 INIT _( field F_D ) INIT use_dbsh() EXIT close_db() ;
+TEST t015 FIELD F_D ;
+          INIT use_dbsh() EXIT close_db() ;
           CODE x := F_D
 
-TEST t016 WITH o := errorNew() CODE x := o:GenCode
+TEST t016 WITH o := errorNew() CODE x := o:Args
 
-TEST t017 WITH o := errorNew() CODE x := o[8]
+TEST t017 WITH o := errorArray() CODE x := o[2]
 
 TEST t018 CODE round( i / 1000, 2 )
 
@@ -361,90 +361,101 @@ TEST t028 WITH bc := { |x| f1( x ) } ;
           INFO eval( bc := { |x| f1( x ) }, i ) ;
           CODE eval( bc, i )
 
-TEST t029 CODE x := &( "f1(" + str(i) + ")" )
+TEST t029 WITH bc := mkBlock( "{ |x| f1( x ) }" ) ;
+          INFO eval( bc := &("{ |x| f1( x ) }"), i ) ;
+          CODE eval( bc, i )
 
-TEST t030 WITH bc CODE bc := &( "{|x|f1(x)}" ); eval( bc, i )
+TEST t030 CODE x := &( 'f1(' + str(i) + ')' )
 
-TEST t031 CODE x := valtype( x ) +  valtype( i )
+TEST t031 WITH bc CODE bc := &( '{|x|f1(x)}' ), eval( bc, i )
 
-TEST t032 WITH a := afill( array( ARR_LEN ), ;
+TEST t032 CODE x := valtype( x ) +  valtype( i )
+
+TEST t033 WITH a := afill( array( ARR_LEN ), ;
                            stuff( dtos( date() ), 7, 0, "." ) ) ;
           CODE x := strzero( i % 100, 2 ) $ a[ i % ARR_LEN + 1 ]
 
-TEST t033 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t034 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] == s
 
-TEST t034 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t035 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] = s
 
-TEST t035 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t036 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] >= s
 
-TEST t036 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t037 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] <= s
 
-TEST t037 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t038 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] < s
 
-TEST t038 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
+TEST t039 WITH a := array( ARR_LEN ), s := dtos( date() ) ;
           INIT aeval( a, { |x,i| a[i] := left( s + s, i ), x } ) ;
           CODE x := a[ i % ARR_LEN + 1 ] > s
 
-TEST t039 WITH a := array( ARR_LEN ) ;
+TEST t040 WITH a := array( ARR_LEN ) ;
           INIT aeval( a, { |x,i| a[i] := i, x } ) ;
           CODE ascan( a, i % ARR_LEN )
 
-TEST t040 WITH a := array( ARR_LEN ) ;
+TEST t041 WITH a := array( ARR_LEN ) ;
           INIT aeval( a, { |x,i| a[i] := i, x } ) ;
           CODE ascan( a, { |x| x == i % ARR_LEN } )
 
-TEST t041 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
+TEST t042 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
                s := dtos( date() ), s2 := "static text" ;
-          CODE if i%1000==0;a:={};end; aadd(a,{i,1,.t.,s,s2,a2,bc})
+          CODE iif( i%1000==0, a:={}, ) , aadd(a,{i,1,.t.,s,s2,a2,bc})
 
-TEST t042 WITH a := {} CODE x := a
+TEST t043 WITH a := {} CODE x := a
 
-TEST t043 CODE x := {}
+TEST t044 CODE x := {}
 
-TEST t044 CODE f0()
+TEST t045 CODE f0()
 
-TEST t045 CODE f1( i )
+TEST t046 CODE f1( i )
 
-TEST t046 WITH c := dtos( date() ) ;
-          INFO f2( c[1...8] ) ;
-          CODE f2( c )
-
-TEST t047 WITH c := repl( dtos( date() ), 5000 ) ;
-          INFO f2( c[1...40000] ) ;
+TEST t047 WITH c := dtos( date() ) ;
+          INFO "f2( c[1...8] )" ;
           CODE f2( c )
 
 TEST t048 WITH c := repl( dtos( date() ), 5000 ) ;
-          INFO f2( @c[1...40000] ) ;
+          INFO "f2( c[1...40000] )" ;
           CODE f2( c )
 
-TEST t049 WITH c := repl( dtos( date() ),5000 ), c2 ;
-          INFO "f2( @c[1...40000] ), c2 := c" ;
-          CODE f2( @c ); c2 := c
+TEST t049 WITH c := repl( dtos( date() ), 5000 ) ;
+          INFO "f2( @c[1...40000] )" ;
+          CODE f2( @c )
 
-TEST t050 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
+TEST t050 WITH c := repl( dtos( date() ),5000 ), c2 ;
+          INFO "f2( @c[1...40000] ), c2 := c" ;
+          CODE f2( @c ), c2 := c
+
+TEST t051 WITH a := {}, a2 := { 1, 2, 3 }, bc := { |x| f1(x) }, ;
                s := dtos( date() ), s2 := "static text", n := 1.23 ;
           CODE f3( a, a2, s, i, s2, bc, i, n, x )
 
-TEST t051 WITH a := { 1, 2, 3 } CODE f2( a )
+TEST t052 WITH a := { 1, 2, 3 } CODE f2( a )
 
-TEST t052 CODE x := f4()
+TEST t053 CODE x := f4()
 
-TEST t053 CODE x := f5()
+TEST t054 CODE x := f5()
 
-TEST t054 WITH c := dtos( date() ) CODE f_prv( c )
+TEST t055 CODE x := space(16)
+
+TEST t056 WITH c := dtos( date() ) CODE f_prv( c )
+
+/*** end of tests ***/
+
+
+#ifdef __MT__
 
 function thTest( mtxJobs, aResults )
-   local xJob
+   local xJob := NIL
    while .T.
       hb_mutexSubscribe( mtxJobs,, @xJob )
       if xJob == NIL
@@ -455,7 +466,7 @@ function thTest( mtxJobs, aResults )
 return nil
 
 function thTestScale( mtxJobs, mtxResults )
-   local xJob
+   local xJob := NIL
    while .T.
       hb_mutexSubscribe( mtxJobs,, @xJob )
       if xJob == NIL
@@ -465,6 +476,9 @@ function thTestScale( mtxJobs, mtxResults )
    enddo
 return nil
 
+#endif
+
+
 proc test( nMT, cExclude, lScale )
 local nLoopOverHead, nTimes, nSeconds, cNum, aThreads, aResults, ;
       mtxJobs, mtxResults, nTimeST, nTimeMT, nTimeTotST, nTimeTotMT, ;
@@ -473,35 +487,42 @@ local nLoopOverHead, nTimes, nSeconds, cNum, aThreads, aResults, ;
 create_db()
 
 #ifdef __HARBOUR__
-#include "hbmemory.ch"
-if MEMORY( HB_MEM_USEDMAX ) != 0
-   ? "Warning !!! Memory statistic enabled."
-   ?
-endif
+   #include "hbmemory.ch"
+   if MEMORY( HB_MEM_USEDMAX ) != 0
+      ? "Warning !!! Memory statistic enabled."
+      ?
+   endif
+   if type( "__DBGENTRY()" ) == "UI"
+      ? "Warning !!! HVM debugger enabled."
+      ?
+   endif
 #endif
 
 //? "Startup loop to increase CPU clock..."
 //x := seconds() + 5; while x > seconds(); enddo
 
-#ifdef __HARBOUR__
-   if !hb_mtvm()
-      if lScale
-         ? "scale test available only in MULTI THREAD mode"
-         ?
-         return
-      endif
-      if nMT != 0
-         ? "SINGLE THREAD mode, number of threads set to 0"
-         nMT := 0
-      endif
-   endif
-   ? date(), time(), os()
-   ? version() + iif( hb_mtvm(), " (MT)" + iif( nMT != 0, "+", "" ), "" ), ;
-     hb_compiler()
+#ifdef __MT__
+if !hb_mtvm()
 #else
-   ? date(), time(), os()
-   ? version()
+if .t.
 #endif
+   if lScale
+      ? "scale test available only in MULTI THREAD mode"
+      ?
+      return
+   endif
+   if nMT != 0
+      ? "SINGLE THREAD mode, number of threads set to 0"
+      nMT := 0
+   endif
+endif
+? date(), time(), os()
+? version() + iif( hb_mtvm(), " (MT)" + iif( nMT != 0, "+", "" ), "" ), ""
+#ifdef __HARBOUR__
+   ?? hb_compiler(), ""
+#endif
+?? spd_cpu()
+
 if lScale .and. nMT < 1
    nMT := 1
 endif
@@ -526,13 +547,15 @@ endif
 nSeconds := seconds()
 nTimes := secondsCPU()
 
-#ifdef __HARBOUR__
+nTimeTotST := nTimeTotMT := 0
+
+#ifdef __MT__
    if lScale
+      aThreads := array( nMT )
       mtxJobs := hb_mutexCreate()
       mtxResults := hb_mutexCreate()
-      nTimeTotST := nTimeTotMT := 0
       for i:=1 to nMT
-         hb_threadStart( "thTestScale", mtxJobs, mtxResults )
+         aThreads[ i ] := hb_threadStart( "thTestScale", mtxJobs, mtxResults )
       next
       for i:=1 to N_TESTS
          cTest := strzero( i, 3 )
@@ -567,7 +590,7 @@ nTimes := secondsCPU()
       for i:=1 to nMT
          hb_mutexNotify( mtxJobs, NIL )
       next
-      hb_threadWaitForAll()
+      hb_threadWaitForAll( aThreads )
    elseif nMT < 0
       aThreads := array( N_TESTS )
       for i:=1 to N_TESTS
@@ -580,12 +603,13 @@ nTimes := secondsCPU()
          if aThreads[ i ] != NIL .and. hb_threadJoin( aThreads[ i ], @x )
             ? dsp_result( x, nLoopOverHead )
          endif
-       next
+      next
    elseif nMT > 0
+      aThreads := array( nMT )
       aResults := array( N_TESTS )
       mtxJobs := hb_mutexCreate()
       for i:=1 to nMT
-         hb_threadStart( "thTest", mtxJobs, aResults )
+         aThreads[ i ] := hb_threadStart( "thTest", mtxJobs, aResults )
       next
       for i:=1 to N_TESTS
          if !strzero( i, 3 ) $ cExclude
@@ -595,7 +619,7 @@ nTimes := secondsCPU()
       for i:=1 to nMT
          hb_mutexNotify( mtxJobs, NIL )
       next
-      hb_threadWaitForAll()
+      hb_threadWaitForAll( aThreads )
       for i:=1 to N_TESTS
          if aResults[ i ] != NIL
             ? dsp_result( aResults[ i ], nLoopOverHead )
@@ -643,19 +667,9 @@ function f1(x)
 return x
 
 function f2(x)
-HB_SYMBOL_UNUSED( x )
 return nil
 
 function f3(a,b,c,d,e,f,g,h,i)
-HB_SYMBOL_UNUSED( a )
-HB_SYMBOL_UNUSED( b )
-HB_SYMBOL_UNUSED( c )
-HB_SYMBOL_UNUSED( d )
-HB_SYMBOL_UNUSED( e )
-HB_SYMBOL_UNUSED( f )
-HB_SYMBOL_UNUSED( g )
-HB_SYMBOL_UNUSED( h )
-HB_SYMBOL_UNUSED( i )
 return nil
 
 function f4()
@@ -681,6 +695,16 @@ function f_stat(x)
 return nil
 */
 
+static function mkBlock(x)
+return &x
+
+static function errorArray()
+#ifdef __NO_OBJ_ARRAY__
+   return array(16)
+#else
+   return errorNew()
+#endif
+
 static func dsp_result( aResult, nLoopOverHead )
    return padr( "[ " + left( aResult[1], 56 ) + " ]", 60, "." ) + ;
           strtran( str( max( aResult[2] - nLoopOverHead, 0 ), 8, 2 ), " ", "." )
@@ -703,10 +727,10 @@ static proc create_db()
                          {"F_D", "D",  8, 0} } )
    use TMP_FILE exclusive
    dbappend()
-   replace F_C with dtos(date())
-   replace F_N with 112345.67
-   replace F_D with date()
-   close
+   field->F_C := dtos(date())
+   field->F_N := 112345.67
+   field->F_D := date()
+   dbclosearea()
 return
 
 static proc remove_db()
@@ -714,9 +738,296 @@ static proc remove_db()
 return
 
 static proc close_db()
-   close
+   dbclosearea()
 return
 
 static proc use_dbsh()
    use TMP_FILE shared
 return
+
+#ifdef __HARBOUR__
+#ifndef __XHARBOUR__
+   static function spd_cpu()
+   return hb_version( HB_VERSION_CPU )
+#endif
+#endif
+#ifdef __CLIPPER__
+   static function spd_cpu()
+   return "x86"
+#endif
+#ifdef FlagShip
+   static function spd_cpu()
+   return "?"
+#endif
+#ifdef __CLIP__
+   static function spd_cpu()
+   return "?"
+#endif
+#ifdef __XPP__
+   static function spd_cpu()
+   return "x86"
+#endif
+#ifdef __XHARBOUR__
+   static function spd_cpu()
+   return "?"
+#endif
+
+#ifdef __CLIPPER__
+   static function hb_mtvm()
+   return .f.                 /* Clipper does not support MT */
+#endif
+#ifdef FlagShip
+   static function hb_mtvm()
+   return .f.                 /* FlagShip does not support MT */
+#endif
+#ifdef __CLIP__
+   static function hb_mtvm()
+   return .t.                 /* CLIP always uses VM with MT support */
+#endif
+#ifdef __XPP__
+   static function hb_mtvm()
+   return .t.                 /* xBase++ always uses VM with MT support */
+#endif
+#ifdef __XHARBOUR__
+   static function hb_mtvm()
+   return hb_multiThread()    /* check for MT support in xHarbour VM */
+#endif
+
+
+#ifndef __MT__
+
+   /* trivial single thread version of once execution */
+   static function hb_threadOnce( xOnceControl, bAction )
+      local lFirstCall := .f.
+      if xOnceControl == NIL
+         if bAction != NIL
+            eval( bAction )
+         endif
+         xOnceControl := .t.
+         lFirstCall := .t.
+      endif
+   return lFirstCall
+
+#else
+
+   /* Add support for MT functions for used compiler
+    */
+
+#ifdef __XHARBOUR__
+
+   static function hb_mutexSubscribe( mtx, nTimeOut, xSubscribed )
+      local lSubscribed
+      if valtype( nTimeOut ) == "N"
+         nTimeOut := round( nTimeOut * 1000, 0 )
+         xSubscribed := Subscribe( mtx, nTimeOut, @lSubscribed )
+      else
+         xSubscribed := Subscribe( mtx )
+         lSubscribed := .t.
+      endif
+   return lSubscribed
+
+   static function hb_mutexNotify( mtx, xValue )
+      Notify( mtx, xValue )
+   return nil
+
+   /* In xHarbour there is race condition in JoinThread() which fails if
+    * thread have ended before call to JoinThread() so we cannot use it.
+    * Exactly the same problem exists in GetThreadId().
+    * As workaround we will use mutexes as thread IDs and notify/subscribe
+    * mechanism to simulate thread join operation and passing thread return
+    * value.
+    */
+   static function hb_threadStart( ... )
+      local thId
+      thId := hb_mutexCreate()
+      /* For some reasons codeblocks as thread startup entry are broken
+       * in xHarbour so we use intermediate function instead
+       */
+      StartThread( @_thFuncFirst(), thId, hb_aParams() )
+   return thId
+
+   static function _thFuncFirst( thID, aParams )
+      Notify( thId, hb_execFromArray( aParams ) )
+   return nil
+
+   static function hb_threadJoin( thId, xResult )
+      xResult := Subscribe( thId )
+   return .t.
+
+   static function hb_threadWaitForAll()
+      WaitForThreads()
+   return nil
+
+   static function hb_threadOnce( xOnceControl, bAction )
+      static s_mutex
+      local lFirstCall := .f.
+      if s_mutex == NIL
+         s_mutex := hb_mutexCreate()
+      endif
+      if xOnceControl == NIL
+         hb_mutexLock( s_mutex )
+         if xOnceControl == NIL
+            if bAction != NIL
+               eval( bAction )
+            endif
+            xOnceControl := .t.
+            lFirstCall := .t.
+         endif
+         hb_mutexUnlock( s_mutex )
+      endif
+   return lFirstCall
+
+   init proc once_init()
+      /* set workareas local to thread */
+      set workarea private
+      /* initialize mutex in hb_threadOnce() */
+      hb_threadOnce()
+      /* initialize error object to reduce to chance for possible crash
+       * when two threads try to create new error class simultaneously.
+       * xHarbour does not have any protection against such situation
+       */
+      errorNew()
+   return
+
+#endif /* __XHARBOUR__ */
+
+
+#ifdef __XPP__
+
+#ifdef __HARBOUR__
+   /* for testing. Harbour also can use xBase++ API in this code */
+   #include "hbclass.ch"
+#endif
+
+   INIT PROCEDURE once_init()
+      /* initialize sync object in hb_threadOnce() */
+      hb_threadOnce()
+      RETURN
+
+   CLASS Notifier
+      PROTECTED:
+         VAR aQueue
+         VAR oSignal
+      EXPORTED:
+         METHOD init
+         SYNC METHOD notify
+         SYNC METHOD subscribe
+   ENDCLASS
+
+   METHOD Notifier:init
+      ::aQueue := {}
+      ::oSignal := Signal():new()
+      RETURN self
+
+   METHOD Notifier:notify( xValue )
+      AAdd( ::aQueue, xValue )
+      ::oSignal:signal()
+      RETURN self
+
+   METHOD Notifier:subscribe()
+      LOCAL xResult
+      WHILE Len( ::aQueue ) == 0
+         ::oSignal:wait()
+      ENDDO
+      xResult := ::aQueue[ 1 ]
+      ADel( ::aQueue, 1 )
+      ASize( ::aQueue, Len( ::aQueue ) - 1 )
+      RETURN xResult
+
+
+   STATIC FUNCTION hb_mutexSubscribe( mtx, nTimeOut, xResult )
+      /* Ignore timeout - it's not used in this test */
+      xResult := mtx:subscribe()
+      RETURN .T.
+
+   STATIC FUNCTION hb_mutexNotify( mtx, xValue )
+      RETURN mtx:notify( xValue )
+
+   STATIC FUNCTION hb_mutexCreate()
+      RETURN Notifier():new()
+
+
+   CLASS Once
+      EXPORTED:
+         SYNC METHOD onceDo
+   ENDCLASS
+
+   METHOD Once:onceDo( xOnceControl, bAction )
+      LOCAL lFirstCall := .f.
+      IF xOnceControl == NIL
+         IF bAction != NIL
+            Eval( bAction )
+         ENDIF
+         xOnceControl := .t.
+         lFirstCall := .t.
+      ENDIF
+      RETURN lFirstCall
+
+   STATIC FUNCTION hb_threadOnce( xOnceControl, bAction )
+      STATIC s_oObject := NIL
+      IF s_oObject == NIL
+         s_oObject := Once():new()
+      ENDIF
+      RETURN s_oObject:onceDo( @xOnceControl, bAction )
+
+   STATIC FUNCTION hb_threadStart( cFunc, xPar1, xPar2, xPar3 )
+      LOCAL oThread
+      oThread := Thread():new()
+      oThread:start( cFunc, xPar1, xPar2, xPar3 )
+      RETURN oThread
+
+   STATIC FUNCTION hb_threadJoin( oThread, xResult )
+      oThread:synchronize( 0 )
+      xResult := oThread:result
+      RETURN .T.
+
+   STATIC FUNCTION hb_threadWaitForAll( aThreads )
+      ThreadWaitAll( aThreads )
+      RETURN NIL
+
+#endif /* __XPP__ */
+
+
+/*
+   static function hb_threadStart( cFunc, xPar1, xPar2, xPar3 )
+   return nil
+
+   static function hb_threadJoin( thId, xResult )
+   return nil
+
+   static function hb_mutexCreate()
+   return nil
+
+   static function hb_mutexSubscribe()
+   return nil
+   static function hb_mutexLock()
+   return nil
+   static function hb_mutexUnlock()
+   return nil
+   static function hb_mutexNotify()
+   return nil
+   static function hb_threadWaitForAll()
+   return nil
+   static function hb_mtvm()
+   return .f.
+*/
+
+#endif
+
+#ifdef FlagShip
+   static function fs_seconds()
+      LOCAL_DOUBLE nret := 0
+      #Cinline
+      {
+         #include <sys/time.h>
+         struct timeval tv;
+         if( gettimeofday(&tv, NULL) == 0 )
+            nret = (double) tv.tv_sec + (double) (tv.tv_usec) / 1000000;
+      }
+      #endCinline
+   return nret
+   #ifndef FlagShip5
+      FUNCTION cursesinit()
+      return nil
+   #endif
+#endif
