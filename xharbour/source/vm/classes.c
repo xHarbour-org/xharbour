@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.240 2009/03/02 09:20:16 marchuet Exp $
+ * $Id: classes.c,v 1.241 2009/04/13 14:24:26 likewolf Exp $
  */
 
 /*
@@ -786,7 +786,6 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                }
                else
                {
-                  PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
                   char *szObjectClass = pClass->szName;
 
                   // Is the Caller derived from the Object?

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.720 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.721 2009/03/25 21:33:54 ronpinkas Exp $
  */
 
 /*
@@ -3060,7 +3060,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_PUSHLOCALNEARINC:
          {
-            PHB_ITEM pLocal;// = NULL;
+            PHB_ITEM pLocal;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
 
@@ -3073,7 +3073,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_PUSHLOCALNEARDEC:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
 
@@ -3086,7 +3086,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_LOCALNEARADD:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADD") );
 
@@ -3099,7 +3099,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_LOCALNEARADDINT:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;
             int iAdd = HB_PCODE_MKSHORT( &pCode[ w + 2 ] );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
@@ -3112,7 +3112,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_LOCALNEARINC:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
 
@@ -3124,7 +3124,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_LOCALNEARDEC:
          {
-            PHB_ITEM pLocal = NULL;
+            PHB_ITEM pLocal;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARDEC") );
 
