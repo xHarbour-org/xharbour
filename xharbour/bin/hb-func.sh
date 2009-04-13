@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.80 2009/03/07 12:30:20 likewolf Exp $
+# $Id: hb-func.sh,v 1.81 2009/03/11 10:40:29 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -26,11 +26,12 @@ get_hbplatform()
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' fedora-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
-        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' suse-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' suse-release 2>/dev/null) && echo "sus$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' openSUSE-release 2>/dev/null) && echo "sus$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
-        [ "${id}" = "" ] && id=`uname -sr | tr '[ A-Z]' '[_a-z]'`
+        [ "${id}" = "" ] && id=`uname -s | tr '[ A-Z]' '[_a-z]'`
         case "${id}" in
             mingw*) id="mingw" ;;
             *) ;;
@@ -57,7 +58,7 @@ get_solibname()
 
     name="${HB_SHAREDLIB_NAME}"
     [ -z "${name}" ] && name="xharbour"
-    echo -n "${name}"
+    echo "${name}"
 }
 
 mk_hbgetlibs()
@@ -71,9 +72,9 @@ mk_hbgetlibs()
         then
             libs="$libs gtwin"
         fi
-        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfnsx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
+        echo "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfnsx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
     else
-        echo -n "$@"
+        echo "$@"
     fi
 }
 
@@ -88,9 +89,9 @@ mk_hbgetlibsctb()
         then
             libs="$libs gtwin"
         fi
-        echo -n "$libs rddads nf"
+        echo "$libs rddads nf"
     else
-        echo -n "$@"
+        echo "$@"
     fi
 }
 
@@ -111,14 +112,35 @@ mk_hbtools()
     elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
         hb_tool="$1/${hb_pref}-build"
         hb_path_separator=":"
-        hb_static="yes"
-        hb_static_default=" (default)"
+        if [ "${HB_MK_STATIC}" = "yes" ]; then
+            hb_static="yes"
+            hb_static_default=" (default)"
+        else
+            hb_static="no"
+            hb_shared_default=" (default)"
+        fi
         hb_exesuf=".exe"
+    elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+        hb_tool="$1/${hb_pref}-build"
+        hb_path_separator=":"
+        if [ "${HB_MK_STATIC}" = "yes" ]; then
+            hb_static="yes"
+            hb_static_default=" (default)"
+        else
+            hb_static="no"
+            hb_shared_default=" (default)"
+        fi
+        hb_exesuf=""
     else
         hb_tool="$1/${hb_pref}-build"
         hb_path_separator=":"
-        hb_static="no"
-        hb_shared_default=" (default)"
+        if [ "${HB_MK_STATIC}" = "yes" ]; then
+            hb_static="yes"
+            hb_static_default=" (default)"
+        else
+            hb_static="no"
+            hb_shared_default=" (default)"
+        fi
         hb_exesuf=""
     fi
     hb_libs=`mk_hbgetlibs "$2"`
@@ -277,6 +299,11 @@ HB_HWGUI=""
 HB_USRLIBS=""
 HB_USRLPATH=""
 HB_GEN=""
+LN_OPT="${CC_L_USR}"
+CC_OPT="${CC_C_USR}"
+HB_OPT="${CC_PRG_USR}"
+[ "\${HB_GEN}" != "" ] || HB_OPT="\${HB_OPT} -gc0"
+
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
@@ -316,6 +343,9 @@ while [ \$n -lt \${#P[@]} ]; do
         -g[cohwij])  HB_GEN="\${v#-g}"; p="\${v}" ;;
         -gc[0-9])    HB_GEN="c"; p="\${v}" ;;
         -go[0-9])    HB_GEN="o"; p="\${v}" ;;
+        --hbdirlib)  echo "\${HB_LIB_INSTALL}"; HB_EXIT="yes" ;;
+        --hbdirinc)  echo "\${HB_INC_INSTALL}"; HB_EXIT="yes" ;;
+        --hbdirbin)  echo "\${HB_BIN_INSTALL}"; HB_EXIT="yes" ;;
         -*)          p="\${v}" ;;
         *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -323,6 +353,9 @@ while [ \$n -lt \${#P[@]} ]; do
     n=\$[\$n + 1]
 done
 P=( "\${PP[@]}" )
+
+[ "\${P}" != "" ] && HB_EXIT="no"
+[ "\${HB_EXIT}" = "yes" ] && exit
 
 case "\${HB_MT}" in
     [Mm][Tt]|[Yy][Ee][Ss]|1)  HB_MT="MT";;
@@ -348,11 +381,6 @@ HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
-
-LN_OPT="${CC_L_USR}"
-CC_OPT="${CC_C_USR}"
-HB_OPT="${CC_PRG_USR}"
-[ "\${HB_GEN}" != "" ] || HB_OPT="\${HB_OPT} -gc0"
 
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
@@ -433,8 +461,16 @@ else
         pref="lib"
         ext=".so"
     fi
-    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}mt\${ext}" ] && l="\${l}mt"
-    [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}\${ext}" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    if [ "\${HB_MT}" = "MT" ]; then
+        if [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}mt\${ext}" ]; then
+            l="\${l}mt"
+        fi
+    fi
+    if [ -n "\${l}" ]; then
+        if [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}\${ext}" ]; then
+            HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+        fi
+    fi
     libs="gtalleg hbodbc debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
@@ -462,9 +498,14 @@ else
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 fi
 
-l="mainwin"
-[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+l=""
+if [ "\${HB_COMPILER}" = "mingw32" ]; then
+    l="mainwin"
+fi
+if [ -n "\${l}" ]; then
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+fi
 
 l="fmstat"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
@@ -692,8 +733,8 @@ mk_hblibso()
         full_lib_name_mt="lib${name}mt.${hb_ver}${lib_ext}"
     elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
         lib_ext=".dll"
-        full_lib_name="${name}${lib_ext}"
-        full_lib_name_mt="${name}mt${lib_ext}"
+        full_lib_name="${name}-${hb_ver}${lib_ext}"
+        full_lib_name_mt="${name}mt-${hb_ver}${lib_ext}"
     elif [ "${HB_ARCHITECTURE}" = "hpux" ]; then
         lib_ext=".sl"
         full_lib_name="lib${name}-${hb_ver}${lib_ext}"

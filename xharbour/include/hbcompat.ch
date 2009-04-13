@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.6 2009/02/04 00:11:38 likewolf Exp $
+ * $Id: hbcompat.ch,v 1.7 2009/02/28 01:58:50 ronpinkas Exp $
  */
 
 /*
@@ -119,6 +119,9 @@
 
    #xtranslate hb_DisableWaitLocks([<x>])  => DisableWaitLocks(<x>)
 
+   #xtranslate hb_gtLock()                 => HBCONSOLELOCK()
+   #xtranslate hb_gtUnLock()               => HBCONSOLEUNLOCK()
+
    #xtranslate hb_mtvm()                   => hb_multiThread()
    #xtranslate hb_threadWaitForAll()       => WaitForThreads()
    #xtranslate hb_mutexNotify(<x,...>)     => Notify(<x>)
@@ -132,7 +135,7 @@
    #xcommand END OBJECT => END
 
    #ifndef HB_SYMBOL_UNUSED
-      #define HB_SYMBOL_UNUSED( symbol )  ( symbol )
+      #define HB_SYMBOL_UNUSED( symbol )  ( symbol := ( symbol ) )
    #endif
 
 #else
@@ -181,17 +184,12 @@
    #xtranslate FileSize(<x>)               => hb_FSize(<x>)
    #xtranslate WildMatch([<x,...>])        => hb_WildMatch(<x>)
    #xtranslate hb_DeserialNext(<x>)        => hb_Deserialize(<x>)
+   #xtranslate hb_funcptr(<x>)             => __dynsn2sym(<x>)
 
    #xtranslate HexToNum([<c,...>])         => hb_HexToNum(<c>)
    #xtranslate NumToHex([<n,...>])         => hb_NumToHex(<n>)
    #xtranslate HexToStr([<c,...>])         => hb_HexToStr(<c>)
    #xtranslate StrToHex([<c,...>])         => hb_StrToHex(<c>)
-
-   #xtranslate AScan(<a>,<b>,[<c>],[<d>],<e>) => hb_AScan(<a>,<b>,<c>,<d>,<e>)
-   #xtranslate RAScan([<x,...>])              => hb_RAScan(<x>)
-   #xtranslate AIns(<a>,<n>,[<x,...>])        => hb_AIns(<a>,<n>,<x>)
-   #xtranslate ADel(<a>,<n>,<l>)              => hb_ADel(<a>,<n>,<l>)
-   #xtranslate At(<a>,<b>,[<x,...>])          => hb_At(<a>,<b>,<x>)
 
    #xtranslate ISPOINTER( <xValue> )       => hb_ISPOINTER( <xValue> )
 
@@ -201,12 +199,65 @@
 
    #xtranslate DisableWaitLocks([<x>])     => hb_DisableWaitLocks(<x>)
 
-   #xtranslate hb_multiThread()            => hb_mtvm()
-   #xtranslate WaitForThreads()            => hb_threadWaitForAll()
-   #xtranslate Notify(<x,...>)             => hb_mutexNotify(<x>)
+   #xtranslate HBCONSOLELOCK()             => hb_gtLock()
+   #xtranslate HBCONSOLEUNLOCK()           => hb_gtUnLock()
 
    #xtranslate Str(<x>,[<y>],[<y>],<z>)    => iif(<z>, hb_NToS(<x>), Str(<x>))
    #xtranslate hb_CMDARGARGV([<x,...>])    => hb_ARGV(<x>)
+
+   #xtranslate AScan(<a>,<b>,[<c>],[<d>],<e>)  => hb_AScan(<a>,<b>,<c>,<d>,<e>)
+   #xtranslate RAScan([<x,...>])               => hb_RAScan(<x>)
+   #xtranslate AIns(<a>,<n>,[<x,...>])         => hb_AIns(<a>,<n>,<x>)
+   #xtranslate ADel(<a>,<n>,<l>)               => hb_ADel(<a>,<n>,<l>)
+   #xtranslate At(<a>,<b>,[<x,...>])           => hb_At(<a>,<b>,<x>)
+
+   /* MT functions */
+   #xtranslate hb_MultiThread()                => hb_mtvm()
+   #xtranslate GetCurrentThread()              => hb_threadSelf()
+   #xtranslate GetThreadId( [<x,...>] )        => hb_threadId( <x> )
+   #xtranslate ThreadGetCurrentInternal()      => hb_threadId()
+   #xtranslate IsSameThread( <x> [,<y>] )      => ( hb_threadId( <x> ) == hb_threadId( <y> ) )
+   #xtranslate IsValidThread( <x> )            => ( hb_threadId( <x> ) != 0 )
+   #xtranslate JoinThread( <x> )               => hb_threadJoin( <x> )
+   #xtranslate KillThread( <x> )               => hb_threadQuitRequest( <x> )
+   #xtranslate StopThread( <x> )               => hb_threadQuitRequest( <x> ); hb_threadJoin( <x> )
+   #xtranslate KillAllThreads()                => hb_threadTerminateAll()
+   #xtranslate WaitForThreads()                => hb_threadWaitForAll()
+
+   #xtranslate ThreadSleep( <x> )              => hb_idleSleep( <x> / 1000 )
+   #xtranslate SecondsSleep( <x> )             => hb_idleSleep( <x> )
+
+   #xtranslate DestroyMutex( <x> )             =>
+   #xtranslate hb_MutexTryLock( <x> )          => hb_MutexLock( <x>, 0 )
+   #xtranslate hb_MutexTimeOutLock( <x> )      => hb_MutexLock( <x>, 0 )
+   #xtranslate hb_MutexTimeOutLock( <x>, <n> ) => hb_MutexLock( <x>, <n> / 1000 )
+   #xtranslate Notify( <x,...> )               => hb_mutexNotify( <x> )
+   #xtranslate NotifyAll( <x,...> )            => hb_mutexNotifyAll( <x> )
+
+   /* not possible to well replicate xHarbour behavior because its buggy
+      these function results are different on different platform, chosen
+      translation which returns compatible types (numeric) */
+   #xtranslate ThreadGetCurrent()              => hb_threadId()
+   #xtranslate GetSystemThreadId( [<x,...>] )  => hb_threadId( <x> )
+
+   /* do not need translation */
+   /* hb_MutexCreate()                         => hb_mutexCreate() */
+   /* hb_mutexUnlock( <x> )                    => hb_mutexUnlock( <x> ) */
+
+   /* do not need translation only when xHarbour code is compiled by Harbour */
+   /* hb_MutexLock( <x> )                      => hb_MutexLock( <x> ) */
+
+   /* functions I do not want to document as public .prg API in Harbour */
+   /* ThreadInspect() */
+   /* ThreadInspectEnd() */
+   /* ThreadIsInspect() */
+
+   /* functions which are not necessary in Harbour */
+   /* hb_ThreadGetTryErrorArray() */
+   /* ThreadIdleFence() */
+
+   /* function which I can add but it's not very usable in real life */
+   /* hb_ThreadCountStacks() */
 
    /* Hash item functions */
    #xtranslate HASH([<x,...>])             => hb_HASH(<x>)
@@ -306,9 +357,16 @@
    #translate ( <exp1> LIKE <exp2> )   => ( HB_REGEXLIKE( (<exp2>), (<exp1>) ) )
    #translate ( <exp1> \<\< <exp2> )   => ( HB_BITSHIFT( (<exp1>), (<exp2>) ) )
    #translate ( <exp1> >> <exp2> )     => ( HB_BITSHIFT( (<exp1>), -(<exp2>) ) )
-   #translate ( <exp1> | <exp2> )      => ( HB_BITOR( (<exp1>), (<exp2>) ) )
-   #translate ( <exp1> & <exp2> )      => ( HB_BITAND( (<exp1>), (<exp2>) ) )
-   #translate ( <exp1> ^^ <exp2> )     => ( HB_BITXOR( (<exp1>), (<exp2>) ) )
+   /* NOTE: These macros can break some valid Harbour/Clipper constructs,
+            so they are disabled by default. Enable them with care, or
+            even better to switch to use HB_BIT*() functions directly.
+            They are optimized by Harbour compiler the same way (and even
+            more) as these C-like operators, without any bad side-effects. */
+   #if defined( XHB_BITOP )
+      #translate ( <exp1> | <exp2> )      => ( HB_BITOR( (<exp1>), (<exp2>) ) )
+      #translate ( <exp1> & <exp2> )      => ( HB_BITAND( (<exp1>), (<exp2>) ) )
+      #translate ( <exp1> ^^ <exp2> )     => ( HB_BITXOR( (<exp1>), (<exp2>) ) )
+   #endif
 
 #endif
 
