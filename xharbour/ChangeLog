@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6411 2009/04/13 16:57:26 likewolf Exp $
+ * $Id: ChangeLog,v 1.6412 2009/04/13 20:05:41 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-14 00:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + config/none.cf
+    + added dummy header file for GNU make to avoid errors on unsupported
+      platforms
+  (by Przemyslaw Czerpak, borrowed from Harbour)
+
+  * source/odbc/Makefile
+  * source/odbc/odbc.c
+    + Platform protection moved to Makefile level.
+  (by Viktor Szakats, borrowed from Harbour)
 
 2009-04-14 00:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * tests/speedtst.prg

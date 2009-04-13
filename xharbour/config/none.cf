@@ -1,0 +1,29 @@
+#
+# $Id: none.cf 10153 2009-02-03 02:05:45Z druzus $
+#
+
+ifneq ($(HB_ARCHITECTURE),)
+ifneq ($(HB_COMPILER),)
+
+CMDPREF:=
+ifeq ($(SHLVL),)
+ifneq ($(COMSPEC),)
+CMDPREF:=$(COMSPEC) /C
+endif
+endif
+
+ifneq ($(LIBNAME),)
+   DIR_RULE := @$(CMDPREF)echo "The '$(LIBNAME)' library ignored."
+else
+   DIR_RULE :=
+endif
+
+all : first
+
+
+first clean install::
+	$(DIR_RULE)
+
+endif
+endif
+

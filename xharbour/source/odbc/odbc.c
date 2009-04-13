@@ -1,13 +1,12 @@
 /*
- * $Id: odbc.c,v 1.35 2008/06/01 19:43:01 guerra000 Exp $
+ * $Id: odbc.c,v 1.36 2008/09/11 05:32:36 guerra000 Exp $
  */
 
 /*
  * Harbour Project source code
+ * This file contains source for first ODBC routines.
  *
- * This file contains source for first odbc routines.
- *
- * Copyright 1999  Antonio Linares <alinares@fivetech.com>
+ * Copyright 1999 Antonio Linares <alinares@fivetech.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -60,13 +59,6 @@
  *    HB_SQLDESCRIB()
  *    HB_SQLEXTENDE()
  *
- * See doc/license.txt for licensing terms.
- */
-
-/*
- * The following parts are Copyright of the individual authors.
- * www - http://www.xharbour.org
- *
  * Copyright 1996 Marcelo Lombardo <lombardo@uol.com.br>
  *    SQLGETINFO()
  *    SQLSETCONNECTOPTION()
@@ -84,8 +76,6 @@
 
 #include "hbapi.h"
 
-#if !defined(HB_OS_DOS) && !defined(HB_OS_OS2)
-
 #if defined(HB_OS_WIN_32)
    #include <windows.h>
 #endif
@@ -95,7 +85,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#if defined(HB_OS_LINUX) && defined(__WATCOMC__)
+#if defined( HB_OS_LINUX ) && defined( __WATCOMC__ )
 #include "/usr/include/sql.h"
 #include "/usr/include/sqlext.h"
 #include "/usr/include/sqltypes.h"
@@ -497,8 +487,8 @@ HB_FUNC( SQLSTOD )
 {
    if( hb_parclen( 1 ) >= 10 )
    {
-      char *szSqlDate = hb_parc( 1 );  /* YYYY-MM-DD */
-      char szHrbDate[9];               /* YYYYMMDD */
+      char * szSqlDate = hb_parc( 1 );  /* YYYY-MM-DD */
+      char szHrbDate[ 9 ];              /* YYYYMMDD */
 
       szHrbDate[ 0 ] = szSqlDate[ 0 ];
       szHrbDate[ 1 ] = szSqlDate[ 1 ];
@@ -539,5 +529,3 @@ HB_FUNC( SQLBINDOUTPARAM ) /* SqlBindOutParam( nStatementHandle, nParameterNumbe
 #endif
 
 #endif     /* HSTMT */
-
-#endif     /* !defined(HB_OS_DOS) && !defined(HB_OS_OS2) */
