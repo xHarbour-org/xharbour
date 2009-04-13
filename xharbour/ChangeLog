@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6406 2009/03/26 15:15:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6407 2009/04/11 19:45:46 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-13 17:48 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * tests/tstscope.prg
+  * tests/scope1.prg
+  * tests/scope2.prg
+    + Added a test demonstrating erroneous scope violation when a subclass
+      sends a PROTECTED message to another instance of its superclass.
+    * Some small hacks to allow compilation with Harbour.
 
 2009-04-11 23:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/pp/Makefile

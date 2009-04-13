@@ -1,9 +1,18 @@
+/* $Id$ */
+
 /*
    This file is to be used as a secondary linked module along with tstscope.prg and scope2.prg.
  */
 
 #include "hbclass.ch"
 #include "classex.ch"
+
+#ifndef __XHARBOUR__
+#xcommand TRY  => BEGIN SEQUENCE WITH {|oErr| Break( oErr )}
+#xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->
+#xcommand PRIVATE: => HIDDEN:
+#xcommand PUBLIC: => EXPORTED:
+#endif
 
 CLASS TParent
 
@@ -17,7 +26,6 @@ CLASS TParent
 
    PRIVATE:
       DATA PrivateOfParent INIT "PrivateOfParent"
-
    PUBLIC:
    METHOD ChangeReadOnly(x) INLINE ::ReadOnlyOfParent := x
 

@@ -1,9 +1,16 @@
+/* $Id$ */
+
 /*
    This file is to be used with secondary linked modules scope1.prg and scope2.prg.
  */
 
 #include "hbclass.ch"
 #include "classex.ch"
+
+#ifndef __XHARBOUR__
+#xcommand TRY  => BEGIN SEQUENCE WITH {|oErr| Break( oErr )}
+#xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->
+#endif
 
 PROCEDURE Main()
 
