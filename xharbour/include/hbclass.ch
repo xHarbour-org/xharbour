@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.64 2008/08/03 00:58:30 walito Exp $
+ * $Id: hbclass.ch,v 1.65 2009/02/13 16:12:21 ronpinkas Exp $
  */
 
 /*
@@ -79,17 +79,17 @@
 /* This is work in progress ... */
 /* FWOBJECT AND CLASSY compatibility are the base of this work */
 /* VO is just here as I like it's way of */
-/* instanciating object but there is only a very few VO keywords here :-( */
+/* instantiating object but there is only a very few VO keywords here :-( */
 /* TOPCLASS is better implemented because I like the way some Classy command */
 /* are simplified */
 /* There is also a big common block extending in fact each of the four base syntax */
 /* it seem actually impossible to completely separate it without creating */
-/* four differents include file (what I would not see in fact ) */
+/* four different include files (what I would not see in fact ) */
 
 /* There is also two compatibility define you can use */
-/* HB_CLS_NOTOBJECT wich IF DEFINED, disable the auto inherit of HBObject */
-/* (wich in fact also disable the classy compatibility :new(...) => :Init(...)  */
-/* HB_CLS_NOAUTOINIT wich disable the (VO like) AutoInit for Logical and Numeric */
+/* HB_CLS_NOTOBJECT which IF DEFINED, disable the auto inherit of HBObject */
+/* (which in fact also disable the classy compatibility :new(...) => :Init(...)  */
+/* HB_CLS_NOAUTOINIT which disable the (VO like) AutoInit for Logical and Numeric */
 /* when not specifically initiated */
 /* These two are disabled by default */
 /* So Each class _inherit_ of HBObject by default and */
@@ -177,7 +177,7 @@ DECLARE HBClass ;
 #ifndef HB_CLS_TOP
 #ifndef HB_CLS_XB
 
- /* IF NOTHING DECIDED BY THE PROGRAMER USE ALL */
+/* IF NOTHING DECIDED BY THE PROGRAMMER USE ALL */
 #define HB_CLS_FWO
 #define HB_CLS_CSY
 #define HB_CLS_VO

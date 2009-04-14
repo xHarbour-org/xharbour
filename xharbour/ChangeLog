@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6412 2009/04/13 20:05:41 likewolf Exp $
+ * $Id: ChangeLog,v 1.6413 2009/04/13 20:42:35 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-14 13:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * source/common/expropt2.c
+    ! restored Mindaugas code for UPPER optimization and added logic to
+      optimize UPPER for strings with only Latin letters, digit and spaces
+      just like in Clipper. Now code like:
+        ? Upper( chr(65)+chr(66)+chr(67)+"0123 QWE asd " ) + "ZXC"
+      is fully optimized at compile time to single string expression.
+  (by Przemyslaw Czerpak and Mindaugas Kavaliauskas, borrowed from Harbour)
+
+  * include/hbclass.ch
+    * Some comment typos fixed.
 
 2009-04-14 00:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   + config/none.cf

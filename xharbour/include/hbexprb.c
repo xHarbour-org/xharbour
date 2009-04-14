@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.128 2009/02/25 14:30:22 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.129 2009/02/25 14:36:20 ronpinkas Exp $
  */
 
 /*
@@ -1721,30 +1721,10 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf = pReduced;
                      }
                   }
-                  /*
-                    TODO: Clipper optimizes Upper() but what about codepage support?
-                   */
-                  else if( HB_EXPR_ISBUILTIN_ID( szName, UPPER ) && usCount == 1 )
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, UPPER ) )
                   {
-                     pReduced = pParms->value.asList.pExprList;
-
-                     if( pReduced->ExprType == HB_ET_STRING )
-                     {
-                        ULONG i;
-                        unsigned char *sCopy = (unsigned char *) hb_xgrab( pReduced->ulLength + 1 );
-
-                        memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
-
-                        pReduced = hb_compExprNewString( (char *) sCopy, pReduced->ulLength, TRUE );
-
-                        for ( i = 0; i < pReduced->ulLength; i++ )
-                        {
-                           sCopy[i] = toupper( sCopy[i] );
-                        }
-
-                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                        pSelf = pReduced;
-                     }
+                     if( usCount )
+                        hb_compExprReduceUPPER( pSelf, HB_MACRO_PARAM );
                   }
                   else if( HB_EXPR_ISBUILTIN_ID( szName, CHR ) && usCount )
                   {
