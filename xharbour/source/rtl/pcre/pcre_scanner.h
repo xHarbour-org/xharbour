@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
  */
 
 // Copyright (c) 2005, Google Inc.

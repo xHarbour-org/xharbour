@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2008 University of Cambridge
+           Copyright (c) 1997-2009 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -106,11 +106,11 @@ switch (what)
   break;
 
   case PCRE_CONFIG_MATCH_LIMIT:
-  *((unsigned int *)where) = MATCH_LIMIT;
+  *((unsigned long int *)where) = MATCH_LIMIT;
   break;
 
   case PCRE_CONFIG_MATCH_LIMIT_RECURSION:
-  *((unsigned int *)where) = MATCH_LIMIT_RECURSION;
+  *((unsigned long int *)where) = MATCH_LIMIT_RECURSION;
   break;
 
   case PCRE_CONFIG_STACKRECURSE:

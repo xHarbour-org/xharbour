@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2008 University of Cambridge
+           Copyright (c) 1997-2009 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -277,6 +277,7 @@ int iStartOffset; /* Ron Pinkas - added to support REG_STARTEND */
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
+if ((eflags & REG_NOTEMPTY) != 0) options |= PCRE_NOTEMPTY;
 
 ((regex_t *)preg)->re_erroffset = (size_t)(-1);  /* Only has meaning after compile */
 
@@ -358,7 +359,6 @@ if (rc >= 0)
     }
   return 0;
   }
-
 else
   {
   if (allocated_ovector) free(ovector);

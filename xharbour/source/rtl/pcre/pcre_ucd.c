@@ -1,6 +1,8 @@
+/*
+ * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
+ */
 
 #include "config.h"
-
 #include "pcre_internal.h"
 
 /* Unicode character database. */
