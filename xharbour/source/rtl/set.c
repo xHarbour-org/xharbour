@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.96 2009/02/28 08:44:29 lculik Exp $
+ * $Id: set.c,v 1.97 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ static HB_PATHNAMES * sp_set_path;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
       extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
 #endif
-char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 ];
+char s_PrintFileName[ HB_PATH_MAX ], s_PrinterName[ HB_PATH_MAX ];
 BOOL s_isDefaultPrinterDevice;    // Printer is the default device
 static void hb_setFreeSetPath( void )
 {
@@ -255,7 +255,7 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
    USHORT user_ferror;
    HB_FHANDLE handle;
    PHB_FNAME pFilename;
-   char path[ _POSIX_PATH_MAX + 1 ], *szPrnFile ;
+   char path[ HB_PATH_MAX ], *szPrnFile ;
    BOOL bPipe = FALSE, bTemp = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("open_handle(%s, %d, %s, %d)", file_name, (int) bAppend, def_ext, (int) set_specifier));
 
@@ -289,7 +289,7 @@ static HB_FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, H
       {
          if ( hb_stricmp( s_PrinterName, "prn" ) == 0 )
          {
-            DWORD nSize= _POSIX_PATH_MAX ;
+            DWORD nSize = HB_PATH_MAX - 1;
             hb_GetDefaultPrinter( (LPTSTR) s_PrinterName, &nSize );
             if ( !s_PrinterName[0] )
                strcpy( s_PrinterName, "lpt1" ) ;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.40 2009/02/28 08:44:29 lculik Exp $
+ * $Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.40 2009/02/28 08:44:29 lculik Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -176,8 +176,8 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.40 2009/02/28 08:44:29 lculik Exp $" )
    {
       DIR *           dir;
       struct dirent * entry;
-      char            pattern[ _POSIX_PATH_MAX + 1 ];
-      char            szRootDir[ _POSIX_PATH_MAX + 1 ];
+      char            pattern[ HB_PATH_MAX ];
+      char            szRootDir[ HB_PATH_MAX ];
    } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
 #else
@@ -590,9 +590,8 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       //struct stat sStat;
       time_t ftime;
       struct tm * ft;
-      char   szFindFile[ _POSIX_PATH_MAX + 1 ];
+      char   szFindFile[ HB_PATH_MAX ];
 
-      ffind->szName[ _POSIX_PATH_MAX ] = '\0';
       hb_strncpy( ffind->szName, info->entry->d_name, sizeof( ffind->szName ) - 1 );
       hb_strncpy( szFindFile, info->szRootDir, sizeof( szFindFile ) - 1 );
       hb_strncat( szFindFile, info->entry->d_name, sizeof( szFindFile ) - 1 );
@@ -641,7 +640,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
 
    /* Do the conversions common for all platforms */
 
-   ffind->szName[ _POSIX_PATH_MAX ] = '\0';
+   ffind->szName[ HB_PATH_MAX - 1 ] = '\0';
 
    ffind->attr = hb_fsAttrFromRaw( raw_attr );
 
@@ -783,8 +782,8 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
 #elif defined(HB_OS_UNIX)
    {
       PHB_FFIND_INFO info;
-      char     string[ _POSIX_PATH_MAX + 1 ];
-      char     dirname[ _POSIX_PATH_MAX + 1 ];
+      char     string[ HB_PATH_MAX ];
+      char     dirname[ HB_PATH_MAX ];
       char *   pos;
 
       HB_SYMBOL_UNUSED( ulAttr );
@@ -797,17 +796,17 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
 
       if( pszFileName )
       {
-         hb_strncpy( string, pszFileName, _POSIX_PATH_MAX );
+         hb_strncpy( string, pszFileName, sizeof( string ) - 1 );
          pos = strrchr( string, HB_OS_PATH_DELIM_CHR );
          if( pos )
          {
-            strcpy( info->pattern, pos + 1 );
+            hb_strncpy( info->pattern, pos + 1, sizeof( info->pattern ) - 1 );
             *( pos + 1 ) = '\0';
-            strcpy( dirname, string );
+            hb_strncpy( dirname, string, sizeof( dirname ) - 1 );
          }
          else
          {
-            strcpy( info->pattern, string );
+            hb_strncpy( info->pattern, string, sizeof( info->pattern ) - 1 );
          }
       }
       if ( ! *dirname )
@@ -816,7 +815,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
          dirname[ 1 ] = HB_OS_PATH_DELIM_CHR;
          dirname[ 2 ] = '\0';
       }
-      strcpy(info->szRootDir, dirname);
+      hb_strncpy( info->szRootDir, dirname, sizeof( info->szRootDir ) - 1 );
 
       if( ! *info->pattern )
       {

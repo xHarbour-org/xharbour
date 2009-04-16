@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.166 2009/01/30 18:52:36 ronpinkas Exp $
+ * $Id: arrays.c,v 1.167 2009/02/04 05:17:53 guerra000 Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    #define DEBUG_OWNERS
 
    #ifdef DEBUG_ARRAYS
-      char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+      char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
       static int s_i = 0;
 
       if( s_i++ > 0 )
@@ -1607,7 +1607,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 
              while( pOwners )
              {
-                //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+                //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
                 //USHORT uiLine;
 
                 if( pOwners->pOwner != (void *) pArray )
@@ -1634,7 +1634,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
-      //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+      //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
       //USHORT uiLine;
 
       // hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -2096,7 +2096,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
       {
       	#ifdef DEBUG_OWNERS
-           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
            USHORT uiLine;
 
            hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -2163,7 +2163,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       else
       {
       	#ifdef DEBUG_OWNERS
-           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
            USHORT uiLine;
 
            hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -2233,7 +2233,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       else
       {
       	#ifdef DEBUG_OWNERS
-           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+           char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ HB_PATH_MAX ];
            USHORT uiLine;
 
            hb_procinfo( 0, szProc, &uiLine, szModule  );

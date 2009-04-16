@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.55 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: zip.c,v 1.56 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -108,7 +108,7 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    PHB_ITEM Temp;
    BOOL bOkAdd;
    int ulLen = hb_arrayLen(ZipArray);
-   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+   char sRegEx[ HB_PATH_MAX + HB_PATH_MAX ];
 
    Wild2RegEx( szSkleton, sRegEx, FALSE );
 
@@ -130,7 +130,7 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
 
          if( pFileName->szName )
          {
-            char *szFile = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+            char *szFile = (char*) hb_xgrab( HB_PATH_MAX );
             pFileName->szPath = (char*) "";
             hb_fsFNameMerge( szFile, pFileName );
             bOkAdd =  ( hb_stricmp(szSkleton,szFile) ==0  ? 1 : 0 );
@@ -427,7 +427,7 @@ HB_FUNC( HB_ZIPFILE )
 
       if ( pParam )
       {
-         char szFile[ _POSIX_PATH_MAX ];
+         char szFile[ HB_PATH_MAX ];
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
          BYTE *pCurDir;
          char *szZipFileName;
@@ -503,7 +503,7 @@ HB_FUNC( HB_GETFILESINZIP )
 {
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX + 1 ];
+      char szFile[ HB_PATH_MAX ];
       char *szZipFileName;
       PHB_ITEM pArray;
       strcpy( szFile, hb_parc( 1 ) );
@@ -530,7 +530,7 @@ HB_FUNC( HB_GETFILECOUNT )
 
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX + 1 ];
+      char szFile[ HB_PATH_MAX ];
       char *szZipFileName;
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -554,7 +554,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
       if ( pParam )
       {
-         char szFile[ _POSIX_PATH_MAX + 1 ];
+         char szFile[ HB_PATH_MAX ];
          PHB_ITEM pExclude = hb_param( 11, HB_IT_STRING | HB_IT_ARRAY );
          char *szZipFileName;
          BYTE *pCurDir;
@@ -627,7 +627,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
       if ( pParam )
       {
-         char szFile[ _POSIX_PATH_MAX + 1 ];
+         char szFile[ HB_PATH_MAX ];
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
          char *szZipFileName;
          BYTE * pCurDir ;
@@ -697,7 +697,7 @@ HB_FUNC( HB_UNZIPFILE )
 
    if( ISCHAR( 1 ) && ( ISARRAY( 6 ) || ISCHAR( 6 ) ) )
    {
-      char szFile[ _POSIX_PATH_MAX + 1 ];
+      char szFile[ HB_PATH_MAX ];
       PHB_ITEM pUnzip = hb_param( 6, HB_IT_ANY );
       char *szZipFileName;
       BYTE *pCurDir;
@@ -784,7 +784,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
 
       if ( pDelZip )
       {
-         char szFile[ _POSIX_PATH_MAX + 1 ];
+         char szFile[ HB_PATH_MAX ];
          char *szZipFileName;
          int ulLen;
 
@@ -869,7 +869,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
 
 HB_FUNC( HB_ZIPTESTPK )
 {
-   char szFile[ _POSIX_PATH_MAX + 1 ];
+   char szFile[ HB_PATH_MAX ];
    char *szZipFileName;
 
    strcpy( szFile, hb_parc( 1 ) );
@@ -906,7 +906,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
 
       if ( pDelZip )
       {
-         char szFile[ _POSIX_PATH_MAX + 1 ];
+         char szFile[ HB_PATH_MAX ];
          PHB_ITEM Temp,DelZip;
          char* szZipFileName;
          int ulLen;
@@ -999,7 +999,7 @@ HB_FUNC(HB_UNZIPALLFILE)
 {
     if ( ! ISCHAR(6) && ! ISARRAY(6) )
     {
-        char szFile[_POSIX_PATH_MAX];
+        char szFile[ HB_PATH_MAX ];
         char *szZipFile;
         PHB_ITEM pProgress = ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7, HB_IT_BLOCK ) ) : hb_itemNew( NULL );
         strcpy(szFile, hb_parc(1));

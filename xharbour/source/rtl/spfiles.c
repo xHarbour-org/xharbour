@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.9 2005/03/31 03:58:52 druzus Exp $
+ * $Id: spfiles.c,v 1.10 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
    }
    else
    {
-      Path = (BYTE *) hb_xgrab( _POSIX_PATH_MAX + 1 );
+      Path = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
    }
 
    pFilepath = hb_fsFNameSplit( (char*) pFilename );
@@ -125,7 +125,7 @@ BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
 
 HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags )
 {
-   BYTE path[ _POSIX_PATH_MAX + 1 ];
+   BYTE path[ HB_PATH_MAX ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_spOpen(%p, %hu)", pFilename, uiFlags));
 
@@ -137,15 +137,16 @@ HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags )
 
 HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr )
 {
-   BYTE path[ _POSIX_PATH_MAX + 1 ];
-   PHB_FNAME pFilepath = hb_fsFNameSplit( (char*) pFilename );
+   BYTE path[ HB_PATH_MAX ];
+   PHB_FNAME pFilepath;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_spCreate(%p, %lu)", pFilename, ulAttr));
 
+   pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
    if( ! pFilepath->szPath && hb_set.HB_SET_DEFAULT )
       pFilepath->szPath = hb_set.HB_SET_DEFAULT;
 
-   hb_fsFNameMerge( (char*) path, pFilepath );
+   hb_fsFNameMerge( ( char * ) path, pFilepath );
    hb_xfree( pFilepath );
 
    return hb_fsCreate( path, ulAttr );
@@ -153,15 +154,16 @@ HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr )
 
 HB_FHANDLE hb_spCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags )
 {
-   BYTE path[ _POSIX_PATH_MAX + 1 ];
-   PHB_FNAME pFilepath = hb_fsFNameSplit( (char*) pFilename );
+   BYTE path[ HB_PATH_MAX ];
+   PHB_FNAME pFilepath;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_spCreateEx(%p, %lu, %hu)", pFilename, ulAttr, uiFlags));
 
+   pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
    if( ! pFilepath->szPath && hb_set.HB_SET_DEFAULT )
       pFilepath->szPath = hb_set.HB_SET_DEFAULT;
 
-   hb_fsFNameMerge( (char*) path, pFilepath );
+   hb_fsFNameMerge( ( char * ) path, pFilepath );
    hb_xfree( pFilepath );
 
    return hb_fsCreateEx( path, ulAttr, uiFlags );

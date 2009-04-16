@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.11 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbencode.c,v 1.12 2009/01/24 09:07:45 andijahja Exp $
  */
 
 /*
@@ -716,7 +716,7 @@ HB_FUNC( UUENCODE_FILE )
    PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
+   char szUUEFileName[ HB_PATH_MAX ];
 
    if ( !pIn )
    {
@@ -749,7 +749,7 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX + 1 ] ;
+   char szUUEFileName[ HB_PATH_MAX ] ;
    ULONG ulLine;
 
    if ( !pIn )
@@ -794,7 +794,7 @@ HB_FUNC( B64ENCODE_FILE )
    PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
+   char szUUEFileName[ HB_PATH_MAX ];
 
    if ( !pIn )
    {
@@ -827,7 +827,7 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ _POSIX_PATH_MAX + 1 ];
+   char szUUEFileName[ HB_PATH_MAX ];
    ULONG ulLine;
 
    if ( !pIn )
@@ -876,8 +876,8 @@ HB_FUNC( YYENCODE_FILE )
    PHB_ITEM pIn  = hb_param(1,HB_IT_STRING);
    PHB_ITEM pOut = hb_param(2,HB_IT_STRING);
    PHB_ITEM pLineLength = hb_param(3,HB_IT_NUMERIC);
-   char szYYEFileName[ _POSIX_PATH_MAX + 1 ] ;
-   char pszFileName[ _POSIX_PATH_MAX + 1 ];
+   char szYYEFileName[ HB_PATH_MAX ] ;
+   char pszFileName[ HB_PATH_MAX ];
    USHORT YYELineLength = 128;
 
    if ( !pIn )
@@ -951,8 +951,8 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    PHB_ITEM pLine = hb_param(2,HB_IT_NUMERIC);
    PHB_ITEM pOut  = hb_param(3,HB_IT_STRING);
    PHB_ITEM pLineLength = hb_param(4,HB_IT_NUMERIC);
-   char szYYEFileName[ _POSIX_PATH_MAX + 1 ] ;
-   char pszFileName[ _POSIX_PATH_MAX + 1 ];
+   char szYYEFileName[ HB_PATH_MAX ] ;
+   char pszFileName[ HB_PATH_MAX ];
    const char *cMask;
    USHORT YYELineLength = 128;
    USHORT iPart = 1;

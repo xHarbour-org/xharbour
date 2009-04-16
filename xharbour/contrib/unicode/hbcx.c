@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.13 2008/12/23 20:33:21 likewolf Exp $
+ * $Id: hbcx.c,v 1.14 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -298,7 +298,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    int c1, c2, c3;
    int iPart = 1;
    const char *szFileName, *cMask;
-   char szDestFile[ _POSIX_PATH_MAX + 1 ] ;
+   char szDestFile[ HB_PATH_MAX ] ;
 
    if ( !pInFile )
    {
@@ -471,7 +471,7 @@ HB_FUNC ( XXENCODE_FILE )
    FILE *infile, *OutFile;
    int c1, c2, c3;
    char *szFileName;
-   char szDestFile[ _POSIX_PATH_MAX + 1 ] ;
+   char szDestFile[ HB_PATH_MAX ] ;
 
    if ( !pInFile )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.185 2009/02/20 12:48:21 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.186 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -4757,7 +4757,7 @@ static void hb_ntxSortWritePage( LPNTXSORTINFO pSort )
 
    if( pSort->hTempFile == FS_ERROR )
    {
-      BYTE szName[ _POSIX_PATH_MAX + 1 ];
+      BYTE szName[ HB_PATH_MAX ];
       pSort->hTempFile = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, szName );
       if( pSort->hTempFile == FS_ERROR )
          hb_ntxErrorRT( pSort->pTag->Owner->Owner, EG_CREATE, EDBF_CREATE_TEMP,
@@ -6036,7 +6036,7 @@ static HB_ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( errCode == HB_SUCCESS && NTXAREA_DATA( pArea )->fStruct &&
        ( NTXAREA_DATA( pArea )->fStrictStruct ? pArea->fHasTags : hb_set.HB_SET_AUTOPEN ) )
    {
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];
 
       hb_ntxCreateFName( pArea, NULL, NULL, szFileName, NULL );
       if( hb_spFile( ( BYTE * ) szFileName, NULL ) ||
@@ -6094,7 +6094,7 @@ static HB_ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 {
    PHB_ITEM pResult, pKeyExp, pForExp = NULL;
    int iLen, iDec, iTag, i;
-   char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ],
+   char szFileName[ HB_PATH_MAX ], szSpFile[ HB_PATH_MAX ],
         szTagName[ NTX_MAX_TAGNAME + 1 ], * szKey, * szFor = NULL;
    LPNTXINDEX pIndex, * pIndexPtr;
    LPTAGINFO pTag = NULL;
@@ -7273,7 +7273,7 @@ static HB_ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    USHORT uiFlags;
    PHB_FILE pFile;
-   char szFileName[ _POSIX_PATH_MAX + 1 ], szTagName[ NTX_MAX_TAGNAME + 1 ];
+   char szFileName[ HB_PATH_MAX ], szTagName[ NTX_MAX_TAGNAME + 1 ];
    LPNTXINDEX pIndex, *pIndexPtr;
    HB_ERRCODE errCode;
    BOOL fRetry, fReadonly, fShared, fProd;
@@ -7397,7 +7397,7 @@ static HB_ERRCODE ntxOrderListClear( NTXAREAP pArea )
 static HB_ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    char szTagName[ NTX_MAX_TAGNAME + 1 ];
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ HB_PATH_MAX ];
    LPNTXINDEX pIndex, * pIndexPtr;
    BOOL fProd;
 

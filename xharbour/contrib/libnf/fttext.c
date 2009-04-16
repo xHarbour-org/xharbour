@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.15 2007/04/22 22:50:26 ronpinkas Exp $
+ * $Id: fttext.c,v 1.16 2007/04/25 01:37:09 ronpinkas Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ typedef struct _FT_FFILE
 {
    LONG     nCurrent    ;
    FILE     *fHandle    ;
-   char     szFileName[_POSIX_PATH_MAX]        ;
+   char     szFileName[ HB_PATH_MAX ];
    char     szAlias   [HB_SYMBOL_NAME_LEN + 1] ;
    int      iArea       ;
    BOOL     bChange     ;

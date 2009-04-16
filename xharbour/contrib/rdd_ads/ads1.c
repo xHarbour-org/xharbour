@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.138 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: ads1.c,v 1.139 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -4441,7 +4441,7 @@ static HB_ERRCODE adsPutValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile
 /* TODO: Use AdsDeleteFile() */
 static HB_ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile, * szExt;
+   char szFileName[ HB_PATH_MAX ], * szFile, * szExt;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE, fResult = FALSE;
@@ -4527,7 +4527,7 @@ static HB_ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
 */
 static HB_ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile;
+   char szFileName[ HB_PATH_MAX ], * szFile;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.180 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: genc.c,v 1.181 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -328,10 +328,10 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
 
 void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      /* generates the C language output */
 {
-   char szExtName[ _POSIX_PATH_MAX + 1 ];
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
-   char szModuleName[ _POSIX_PATH_MAX + 1 ];
-   char szSourceName[ _POSIX_PATH_MAX + 1 ], *pTmp;
+   char szExtName[ HB_PATH_MAX ];
+   char szFileName[ HB_PATH_MAX ];
+   char szModuleName[ HB_PATH_MAX ];
+   char szSourceName[ HB_PATH_MAX ], *pTmp;
    PFUNCTION pFunc;
    PFUNCALL pFunCall;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;

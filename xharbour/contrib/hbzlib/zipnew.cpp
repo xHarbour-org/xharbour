@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.33 2008/06/20 11:59:50 marchuet Exp $
+ * $Id: zipnew.cpp,v 1.34 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -403,7 +403,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 char *hb___CheckFile( char * szFile )
 {
    PHB_FNAME pFileName = hb_fsFNameSplit( szFile );
-   char *szZipName = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   char *szZipName = (char*) hb_xgrab( HB_PATH_MAX );
 
    if ( ! pFileName->szExtension )
    {
@@ -563,7 +563,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    ULONG ulCount;
    int iCause = 0;
    // int iMode ;
-   char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   char  * szPath = (char*) hb_xgrab( HB_PATH_MAX );
    BOOL bFreePath = TRUE;
 
    BOOL bChange = FALSE;
@@ -613,7 +613,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, HB_PATH_MAX );
          }
          else
          {
@@ -1010,7 +1010,7 @@ BOOL bChange=FALSE;
    SpanCallback span;
    SpanActionCallback spanac;
 
-   char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   char  * szPath = (char*) hb_xgrab( HB_PATH_MAX );
    BOOL bFreePath = TRUE;
 
 
@@ -1054,7 +1054,7 @@ BOOL bChange=FALSE;
       {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, HB_PATH_MAX );
          }
          else
          {

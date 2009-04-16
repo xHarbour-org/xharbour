@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.65 2008/12/07 14:55:04 ronpinkas Exp $
+ * $Id: direct.c,v 1.66 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -345,8 +345,8 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
    char cCurDsk;
    BYTE *pCurDir;
    HB_ITEM_NEW( Dir );
-   // Arbitary value which should be enough
-   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+   /* An arbitrary value which should be enough */
+   char sRegEx[ HB_PATH_MAX + HB_PATH_MAX ];
 
    Wild2RegEx( szFName, sRegEx, bMatchCase );
 
@@ -407,7 +407,7 @@ HB_FUNC( DIRECTORYRECURSE )
 #endif
    char *szAttributes;
 
-   if( pDirSpec && pDirSpec->item.asString.length <= _POSIX_PATH_MAX )
+   if( pDirSpec && pDirSpec->item.asString.length < HB_PATH_MAX )
    {
       szAttributes = (char*) hb_xgrab( 3 + 1 ); // DHS
       hb_xmemset( szAttributes, 0, 4 );

@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.12 2008/12/23 18:06:33 likewolf Exp $
+ * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.12 2008/12/23 18:06:33 likewolf Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -327,7 +327,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.12 2008/12/23 18:06:33 likewolf Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"
@@ -639,7 +639,7 @@ int main( int argc, char * argv[] )
          char * szSVNID = (char*) hb_xgrab(10);
          if( fWrite )
          {
-            char szFileName[ _POSIX_PATH_MAX + 1 ];
+            char szFileName[ HB_PATH_MAX ];
             PHB_FNAME pFileName;
 
             pFileName = hb_fsFNameSplit( szFile );

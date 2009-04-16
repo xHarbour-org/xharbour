@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.200 2009/02/20 12:48:15 marchuet Exp $
+ * $Id: dbf1.c,v 1.201 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -2760,7 +2760,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    BYTE * pBuffer;
    PHB_FNAME pFileName;
    PHB_ITEM pItem = NULL, pError;
-   BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
+   BYTE szFileName[ HB_PATH_MAX ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCreate(%p, %p)", pArea, pCreateInfo));
 
@@ -3712,7 +3712,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    BYTE * pBuffer;
    LPDBFFIELD pField;
    DBFIELDINFO dbFieldInfo;
-   BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
+   BYTE szFileName[ HB_PATH_MAX ];
    char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
@@ -5487,7 +5487,7 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
 
 static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile, * szExt;
+   char szFileName[ HB_PATH_MAX ], * szFile, * szExt;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE, fResult = FALSE;
@@ -5569,7 +5569,7 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
 
 static HB_ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile;
+   char szFileName[ HB_PATH_MAX ], * szFile;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.13 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id: hbcc.prg,v 1.14 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -316,7 +316,7 @@ HB_FUNC( HB_CSREG )
       }
 
       csname=(BYTE*)hb_parc(1);
-      filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
+      filepath=(BYTE *) hb_xgrab(HB_PATH_MAX);
       strcpy((char *) filepath,(char *) cspath);
       strcat((char *) filepath,(char *) csname);
       strcat((char *) filepath,(char *) HB_CSFEXT);
@@ -569,7 +569,7 @@ HB_FUNC( HB_CSAVAIL )
 
    if (ISCHAR(1))
    {
-      filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
+      filepath=(BYTE *) hb_xgrab(HB_PATH_MAX);
       strcpy((char*)filepath,(char*)cspath);
       strcat((char*)filepath,hb_parc(1));
       strcat((char*)filepath,HB_CSFEXT);

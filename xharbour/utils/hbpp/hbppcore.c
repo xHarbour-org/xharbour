@@ -1,5 +1,5 @@
 /*
- * $Id: hbppcore.c,v 1.5 2008/12/23 16:37:06 likewolf Exp $
+ * $Id: hbppcore.c,v 1.6 2009/01/24 00:33:10 likewolf Exp $
  */
 
 /*
@@ -282,7 +282,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 
          if( hb_comp_pFileName->szName )
          {
-            char szFileName[ _POSIX_PATH_MAX + 1 ];
+            char szFileName[ HB_PATH_MAX ];
 
             if( ! hb_comp_pFileName->szExtension )
                hb_comp_pFileName->szExtension = ".ch";
@@ -857,7 +857,7 @@ void hb_pp_Init( void )
 int hb_pp_ParseDirective( char * sLine )
 {
   char sDirective[ MAX_NAME ];
-  char szInclude[ _POSIX_PATH_MAX + 1 ];
+  char szInclude[ HB_PATH_MAX ];
   int i;
   char szExpandedLine[ HB_PP_STR_SIZE ];
 

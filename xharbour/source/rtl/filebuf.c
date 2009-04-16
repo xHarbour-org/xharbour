@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.3 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: filebuf.c,v 1.4 2009/02/20 12:48:24 marchuet Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ PHB_FILE hb_fileExtOpen( BYTE * pFilename, BYTE * pDefExt,
          pFile = NULL;
       }
       else if( uiExFlags & FXO_COPYNAME )
-         hb_strncpy( ( char * ) pFilename, ( char * ) pszFile, _POSIX_PATH_MAX );
+         hb_strncpy( ( char * ) pFilename, ( char * ) pszFile, HB_PATH_MAX - 1 );
 
       if( pError )
       {

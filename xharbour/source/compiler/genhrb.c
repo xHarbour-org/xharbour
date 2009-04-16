@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.14 2008/03/24 12:43:42 likewolf Exp $
+ * $Id: genhrb.c,v 1.15 2008/12/23 16:37:05 likewolf Exp $
  */
 
 /*
@@ -34,7 +34,7 @@
 
 void hb_compGenPortObj( PHB_FNAME pFileName )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ HB_PATH_MAX ];
    PFUNCTION pFunc /*= hb_comp_functions.pFirst */;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    HB_SYMBOLSCOPE hSymScope;

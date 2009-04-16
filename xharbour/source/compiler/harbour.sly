@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.162 2009/02/03 12:51:36 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.163 2009/02/21 15:14:24 ronpinkas Exp $
  */
 
 /*
@@ -403,8 +403,8 @@ CompTimeStr : LITERAL {
                hb_compAutoOpenAdd( $1.string );
             }
             | LITERAL '+' LITERAL {
-               char szFileName[ _POSIX_PATH_MAX + 1 ];
-               hb_strncat( hb_strncpy( szFileName, $1.string, _POSIX_PATH_MAX ), $3.string, _POSIX_PATH_MAX );
+               char szFileName[ HB_PATH_MAX ];
+               hb_strncat( hb_strncpy( szFileName, $1.string, HB_PATH_MAX ), $3.string, HB_PATH_MAX );
                hb_compAutoOpenAdd( hb_compIdentifierNew( szFileName, TRUE ) );
                if( $1.dealloc )
                {
@@ -3777,7 +3777,7 @@ BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearch )
 
          while( pSearch && !yyin )
          {
-            char szFName[ _POSIX_PATH_MAX + 1 ];    /* filename to parse */
+            char szFName[ HB_PATH_MAX ];    /* filename to parse */
 
             pFileName->szPath = pSearch->szPath;
             hb_fsFNameMerge( szFName, pFileName );

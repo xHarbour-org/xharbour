@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.57 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: runner.c,v 1.58 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -559,7 +559,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
 
 PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ HB_PATH_MAX ];
    PHRB_BODY pHrbBody = NULL;
    PHB_FNAME pFileName;
    FHANDLE hFile;

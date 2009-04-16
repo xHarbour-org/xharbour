@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.15 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: disk.c,v 1.16 2008/12/22 22:09:45 likewolf Exp $
  */
 /*
  * xHarbour Project source code:
@@ -115,10 +115,10 @@ HB_FUNC( DIRMAKE )
 
 HB_FUNC( DIRNAME )
 {
-   BYTE *pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   BYTE *pbyBuffer = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
 
    pbyBuffer[0] = HB_OS_PATH_DELIM_CHR;
-   hb_fsCurDirBuff( hb_fsCurDrv(), pbyBuffer + 1, _POSIX_PATH_MAX );
+   hb_fsCurDirBuff( hb_fsCurDrv(), pbyBuffer + 1, HB_PATH_MAX - 1 - 1 );
 
    hb_retc_buffer( ( char * ) pbyBuffer );
 }

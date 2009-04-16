@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.35 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: proc.c,v 1.36 2009/01/22 11:28:10 likewolf Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ HB_FUNC( PROCLINE )
 
 HB_FUNC( PROCFILE )
 {
-   char szModuleName[ _POSIX_PATH_MAX + 1 ];
+   char szModuleName[ HB_PATH_MAX ];
 
    hb_procinfo( hb_parni( 1 ) + 1, NULL, NULL, szModuleName );
 

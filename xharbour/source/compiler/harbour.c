@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.217 2009/02/23 21:45:04 ronpinkas Exp $
+ * $Id: harbour.c,v 1.218 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -751,8 +751,8 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
 
       if( pfFree )
       {
-         BYTE * szNew = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, _POSIX_PATH_MAX );
+         BYTE * szNew = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, HB_PATH_MAX - 1 );
          szFileName = szNew;
          *pfFree = TRUE;
       }
@@ -2512,7 +2512,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_bDebugInfo )
    {
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];
       PHB_FNAME hb_FileName;
 
       hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
@@ -6284,11 +6284,11 @@ static int hb_compCompile( char * szPrg )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
-      char szPpoName[ _POSIX_PATH_MAX + 1 ];
-      char szPptName[ _POSIX_PATH_MAX + 1 ];
-      char szHILName[ _POSIX_PATH_MAX + 1 ];
-      char szVarListName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];
+      char szPpoName[ HB_PATH_MAX ];
+      char szPptName[ HB_PATH_MAX ];
+      char szHILName[ HB_PATH_MAX ];
+      char szVarListName[ HB_PATH_MAX ];
       const char *szSourceExtension;
 
       /* Clear and reinitialize preprocessor state */
@@ -6303,9 +6303,9 @@ static int hb_compCompile( char * szPrg )
          hb_comp_pFileName->szExtension = ".prg";
       }
 
-      szTempName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-      hb_comp_PrgFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-      hb_snprintf( szTempName, _POSIX_PATH_MAX + 1, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
+      szTempName = ( char * ) hb_xgrab( HB_PATH_MAX );
+      hb_comp_PrgFileName = ( char * ) hb_xgrab( HB_PATH_MAX );
+      hb_snprintf( szTempName, HB_PATH_MAX, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
 
       for( i = 0; i < strlen( szTempName ); i++ )
       {
@@ -7002,8 +7002,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ _POSIX_PATH_MAX + 1 ];    /* filename to parse */
-      char szPpoName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];    /* filename to parse */
+      char szPpoName[ HB_PATH_MAX ];
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
@@ -7174,9 +7174,9 @@ static int hb_compProcessRSPFile( char* szRspName )
    }
    else
    {
-      char *szFile = (char*) hb_xgrab( _POSIX_PATH_MAX );
+      char *szFile = (char*) hb_xgrab( HB_PATH_MAX );
 
-      hb_xmemset( szFile, '\0', _POSIX_PATH_MAX );
+      hb_xmemset( szFile, '\0', HB_PATH_MAX );
 
       while ( ( ch = fgetc ( inFile ) ) != EOF )
       {
@@ -7197,7 +7197,7 @@ static int hb_compProcessRSPFile( char* szRspName )
 //            iProcess ++;
 
             i = 0;
-            hb_xmemset( szFile, '\0', _POSIX_PATH_MAX );
+            hb_xmemset( szFile, '\0', HB_PATH_MAX );
          }
          else if ( ch == '#' )
 	 {

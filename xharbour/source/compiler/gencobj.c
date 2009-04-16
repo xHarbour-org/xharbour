@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.19 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: gencobj.c,v 1.20 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -32,7 +32,7 @@
 
 
 /* QUESTION: Allocate buffer dynamically ? */
-#define HB_CFG_LINE_LEN    ( _POSIX_PATH_MAX << 1 )
+#define HB_CFG_LINE_LEN    ( HB_PATH_MAX << 1 )
 
 #include "hbexemem.h"
 
@@ -46,7 +46,7 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
    /* Check current dir first  */
    if( hb_fsFileExists( ( const char * ) pszFile ) )
    {
-      hb_snprintf( pszCfg, _POSIX_PATH_MAX + 1, "%s", pszFile );
+      hb_snprintf( pszCfg, HB_PATH_MAX, "%s", pszFile );
       return ( char * ) pszFile;
    }
    else
@@ -66,7 +66,7 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
          }
          if( *pszPath )
          {
-            hb_snprintf( pszCfg, _POSIX_PATH_MAX + 1, "%s%c%s", pszPath, HB_OS_PATH_DELIM_CHR, pszFile );
+            hb_snprintf( pszCfg, HB_PATH_MAX, "%s%c%s", pszPath, HB_OS_PATH_DELIM_CHR, pszFile );
             if( hb_fsFileExists( ( const char * ) pszCfg ) )
             {
                bFound = TRUE;
@@ -86,27 +86,27 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
 /* Builds platform dependant object module from Harbour C output */
 void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ HB_PATH_MAX ];
    char szLine[ HB_CFG_LINE_LEN + 1 ];
    char szCompiler[ HB_CFG_LINE_LEN + 1 ] = "";
    char szOptions[ HB_CFG_LINE_LEN + 1 ] = "";
    char szCommandLine[ HB_CFG_LINE_LEN * 2 + 1 ];
-   char szOutPath[ _POSIX_PATH_MAX + 1 ] = "\0";
+   char szOutPath[ HB_PATH_MAX ] = "\0";
 
 #if defined( HOST_OS_UNIX_COMPATIBLE )
-   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = "/etc:/usr/local/etc";
+   char szDefaultPath[ HB_PATH_MAX ] = "/etc:/usr/local/etc";
    char * pszEnv = szDefaultPath;
    #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " > /dev/null"
    #define HB_ACCESS_FLAG F_OK
 #elif defined( HB_OS_DOS_COMPATIBLE )
-   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = "PATH";
+   char szDefaultPath[ HB_PATH_MAX ] = "PATH";
    char * pszEnv = hb_getenv( "PATH" );
    #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " >nul"      
    #define HB_ACCESS_FLAG 0
 #else
-   char szDefaultPath[ _POSIX_PATH_MAX + 1 ] = NULL;
+   char szDefaultPath[ HB_PATH_MAX ] = NULL;
 #endif
    
    FILE * yyc;
@@ -129,7 +129,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
    if( !pszCfg )
    {
       /* Grab space */
-      pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX + 1 );
+      pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ HB_PATH_MAX );
 
       if( pszEnv && pszEnv[ 0 ] != '\0' )
       { 
@@ -238,7 +238,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
    if( hb_comp_pOutPath )
    {
       PHB_FNAME pOut = hb_fsFNameSplit( ( char * ) szFileName );
-      char pszTemp[ _POSIX_PATH_MAX + 1 ] = "";
+      char pszTemp[ HB_PATH_MAX ] = "";
 
       if( hb_comp_pOutPath->szPath )
          pOut->szPath = hb_comp_pOutPath->szPath;

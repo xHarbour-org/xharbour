@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.140 2009/03/02 09:20:17 marchuet Exp $
+ * $Id: memvars.c,v 1.141 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -2015,7 +2015,7 @@ HB_FUNC( __MVSAVE )
    if( hb_pcount() >= 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
    {
       PHB_FNAME pFileName;
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];
       FHANDLE fhnd;
       UINT uLen = HB_MEM_REC_LEN;
 
@@ -2105,7 +2105,7 @@ HB_FUNC( __MVRESTORE )
    if( ISCHAR( 1 ) && ISLOG( 2 ) )
    {
       PHB_FNAME pFileName;
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ HB_PATH_MAX ];
       FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );

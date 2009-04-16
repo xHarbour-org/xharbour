@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.4 2009/01/19 06:40:15 andresreyesh Exp $
+ * $Id: hbmzip.c,v 1.5 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -394,18 +394,18 @@ HB_FUNC( HB_UNZIPFILEINFO )
 
    if( hUnzip )
    {
-      char           szFileName[ _POSIX_PATH_MAX + 1 ];
+      char           szFileName[ HB_PATH_MAX ];
       unz_file_info  ufi;
       int            iResult;
       char           buf[ 16 ];
 
-      iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szFileName, _POSIX_PATH_MAX,
+      iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szFileName, HB_PATH_MAX - 1,
                                        NULL, 0, NULL, 0 );
       hb_retni( iResult );
 
       if( iResult == UNZ_OK )
       {
-         szFileName[ _POSIX_PATH_MAX ] = '\0';
+         szFileName[ HB_PATH_MAX - 1 ] = '\0';
          hb_storc( szFileName, 2 );
          hb_stord( ufi.tmu_date.tm_year, ufi.tmu_date.tm_mon + 1, ufi.tmu_date.tm_mday, 3 );
 
@@ -884,14 +884,14 @@ HB_FUNC( HB_ZIPSTOREFILE )
 
 static int hb_unzipExtractCurrentFile( unzFile hUnzip, const char* szFileName, const char* szPassword )
 {
-   char           szName[ _POSIX_PATH_MAX + 1 ];
+   char           szName[ HB_PATH_MAX ];
    ULONG          ulPos, ulLen;
    char           cSep, * pString;
    unz_file_info  ufi;
    int            iResult;
    FHANDLE        hFile;
 
-   iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szName, _POSIX_PATH_MAX,
+   iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szName, HB_PATH_MAX - 1,
                                     NULL, 0, NULL, 0 );
    if( iResult != UNZ_OK )
       return iResult;
@@ -1090,8 +1090,8 @@ HB_FUNC( HB_UNZIPEXTRACTCURRENTFILE )
 
 static int hb_zipDeleteFile( const char* szZipFile, const char* szFileMask )
 {
-   char szTempFile[ _POSIX_PATH_MAX + 1 ];
-   char szCurrFile[ _POSIX_PATH_MAX + 1 ];
+   char szTempFile[ HB_PATH_MAX ];
+   char szCurrFile[ HB_PATH_MAX ];
    PHB_FNAME pFileName;
    FHANDLE hFile;
    unzFile hUnzip;
@@ -1148,7 +1148,7 @@ static int hb_zipDeleteFile( const char* szZipFile, const char* szFileMask )
 
    while( iResult == UNZ_OK )
    {
-      iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szCurrFile, _POSIX_PATH_MAX, NULL, 0, NULL, 0 );
+      iResult = unzGetCurrentFileInfo( hUnzip, &ufi, szCurrFile, HB_PATH_MAX - 1, NULL, 0, NULL, 0 );
       if( iResult != UNZ_OK )
          break;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.6 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: hbpcstat.c,v 1.7 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -244,7 +244,7 @@ static const char * hb_comp_pcode_names[] =
 
 void hb_compPCodeStat( PHB_FNAME pFileName )
 {
-   char szOutFile[ _POSIX_PATH_MAX + 1 ];
+   char szOutFile[ HB_PATH_MAX ];
    FILE * outfile;
    const char * szExt;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: defpath.c,v 1.2 2007/04/20 09:41:30 marchuet Exp $
+ * $Id: defpath.c,v 1.3 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 HB_FUNC( DEFPATH )
 {
-   char buffer[ _POSIX_PATH_MAX + 2 ];
+   char buffer[ HB_PATH_MAX - 1 + 2 ];
    char * szDefault;
    int size = 0;
 

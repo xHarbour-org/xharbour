@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.36 2009/02/28 08:44:29 lculik Exp $
+ * $Id: philes.c,v 1.37 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -302,10 +302,10 @@ HB_FUNC( FREADSTR )
 
 HB_FUNC( CURDIR )
 {
-   BYTE byBuffer[ _POSIX_PATH_MAX + 1 ];
+   BYTE byBuffer[ HB_PATH_MAX ];
 
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( HB_TOUPPER( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( HB_TOUPPER( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, sizeof( byBuffer ) );
 
    hb_retc( ( char * ) byBuffer );
 }
@@ -331,7 +331,7 @@ HB_FUNC( HB_F_EOF )
 HB_FUNC( CURDIRX )
 {
    USHORT uiErrorOld = hb_fsError();
-   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
    PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
    BYTE cCurDrv = hb_fsCurDrv();
    BYTE cDrv;
@@ -349,7 +349,7 @@ HB_FUNC( CURDIRX )
       cDrv = cCurDrv;
    }
 
-   hb_fsCurDirBuffEx( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
+   hb_fsCurDirBuffEx( cDrv, pbyBuffer, HB_PATH_MAX );
 
    hb_retcAdopt( ( char * ) pbyBuffer );
 

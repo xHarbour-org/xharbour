@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.63 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: regex.c,v 1.64 2009/02/20 12:48:26 marchuet Exp $
  */
 
 /*
@@ -692,7 +692,7 @@ HB_FUNC( HB_ATX )
 HB_FUNC( WILD2REGEX )
 {
    HB_THREAD_STUB_API
-   char sRegEx[ _POSIX_PATH_MAX ];
+   char sRegEx[ HB_PATH_MAX ];
    int iLen = Wild2RegEx( hb_parcx( 1 ), sRegEx, hb_parl( 2 ) );
 
    hb_retclen( sRegEx, iLen );

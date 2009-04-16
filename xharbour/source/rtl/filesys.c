@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.185 2009/03/02 18:58:02 enricomaria Exp $
+ * $Id: filesys.c,v 1.186 2009/03/11 10:40:29 likewolf Exp $
  */
 
 /*
@@ -244,7 +244,7 @@
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
-       * define and efectively enables lseek64/flock64/ftruncate64 functions
+       * defined and efectively enables lseek64/flock64/ftruncate64 functions
        * on 32bit machines.
        */
       #define HB_USE_LARGEFILE64
@@ -3760,11 +3760,11 @@ BOOL hb_fsRmDir( BYTE * pDirname )
 
 BYTE * hb_fsCurDir( USHORT uiDrive )
 {
-   static BYTE pbyDirBuffer[ _POSIX_PATH_MAX + 1 ];
+   static BYTE pbyDirBuffer[ HB_PATH_MAX ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDir(%hu)", uiDrive));
 
-   hb_fsCurDirBuff( uiDrive, pbyDirBuffer, _POSIX_PATH_MAX + 1 );
+   hb_fsCurDirBuff( uiDrive, pbyDirBuffer, HB_PATH_MAX );
 
    return ( BYTE * ) pbyDirBuffer;
 }
@@ -4064,7 +4064,7 @@ BYTE * hb_fsExtName( BYTE * pFilename, BYTE * pDefExt,
    BOOL fIsFile = FALSE;
    BYTE * szPath;
 
-   szPath = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   szPath = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
 
    pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
 
@@ -4240,7 +4240,7 @@ HB_FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    }
 
    if( uiExFlags & FXO_COPYNAME && hFile != FS_ERROR )
-      hb_strncpy( ( char * ) pFilename, ( char * ) szPath, _POSIX_PATH_MAX );
+      hb_strncpy( ( char * ) pFilename, ( char * ) szPath, HB_PATH_MAX - 1 );
 
    hb_xfree( szPath );
    return hFile;
@@ -4295,11 +4295,11 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
 
 BYTE * hb_fsCurDirEx( USHORT uiDrive )
 {
-   static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
+   static BYTE s_byDirBuffer[ HB_PATH_MAX ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDir(%hu)", uiDrive));
 
-   hb_fsCurDirBuffEx( uiDrive, s_byDirBuffer, _POSIX_PATH_MAX + 1 );
+   hb_fsCurDirBuffEx( uiDrive, s_byDirBuffer, HB_PATH_MAX );
 
    return ( BYTE * ) s_byDirBuffer;
 }
@@ -4419,8 +4419,8 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
 
       if( pfFree )
       {
-         BYTE * szNew = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, _POSIX_PATH_MAX );
+         BYTE * szNew = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, HB_PATH_MAX - 1 );
          szFileName = szNew;
          *pfFree = TRUE;
       }

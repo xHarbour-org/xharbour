@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.22 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: hbpp.c,v 1.23 2009/01/24 00:33:10 likewolf Exp $
  */
 
 /*
@@ -104,8 +104,8 @@ int  hb_comp_iHidden = 0;
 int main( int argc, char * argv[] )
 {
   FILE * handl_o;
-  char szFileName[ _POSIX_PATH_MAX + 1 ];
-  char szPpoName[ _POSIX_PATH_MAX + 1 ];
+  char szFileName[ HB_PATH_MAX ];
+  char szPpoName[ HB_PATH_MAX ];
   int iArg = 1;
   BOOL bOutTable = FALSE;
   BOOL bOutNew = FALSE;

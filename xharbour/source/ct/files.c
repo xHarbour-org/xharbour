@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.17 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: files.c,v 1.18 2009/02/10 09:40:09 marchuet Exp $
  */
 
 /*
@@ -1107,7 +1107,7 @@ HB_FUNC( FILEDELETE )
 
          do
          {
-            char szPath[ _POSIX_PATH_MAX + 1 ];
+            char szPath[ HB_PATH_MAX ];
 
             pFilepath->szName = ffind->szName;
             hb_fsFNameMerge( szPath, pFilepath );

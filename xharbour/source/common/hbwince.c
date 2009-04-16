@@ -1,5 +1,5 @@
 /*
- * $Id: hbwince.c 9628 2008-10-13 19:30:38Z druzus $
+ * $Id: hbwince.c,v 1.1 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -646,7 +646,7 @@ UINT WINAPI GetTempFileNameA( LPCSTR tmpdir, LPCSTR prefix, UINT unique, LPSTR f
    {
       char *afilename = hb_wctomb( wfilename );
 
-      hb_strncpy( filename, afilename, _POSIX_PATH_MAX );
+      hb_strncpy( filename, afilename, HB_PATH_MAX - 1 );
       hb_xfree( afilename );
    }
    SetLastError( dwError );

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.98 2009/02/08 21:32:55 likewolf Exp $
+ * $Id: errorapi.c,v 1.99 2009/02/09 01:42:21 guerra000 Exp $
  */
 
 /*
@@ -548,7 +548,7 @@ HB_FUNC( ERRORNEW )
    HB_THREAD_STUB
 
    PHB_ITEM pError = hb_errNew(), pCallStack;
-   char szModuleName[ _POSIX_PATH_MAX + 1 ];
+   char szModuleName[ HB_PATH_MAX ];
    char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
 
@@ -729,7 +729,7 @@ PHB_ITEM hb_errNew( void )
 {
    PHB_ITEM pError, pCallStack;
    int iLevel;
-   char szModuleName[ _POSIX_PATH_MAX + 1 ];
+   char szModuleName[ HB_PATH_MAX ];
    char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
 
@@ -1520,7 +1520,7 @@ PHB_ITEM hb_errRT_New_Subst(
       /* One level deeper for these errors */
    if( strcmp( szSubSystem, HB_ERR_SS_BASE ) == 0 && ( ( ulGenCode == EG_NOVARMETHOD && ulSubCode == 1005 ) || ( ulGenCode == EG_NOMETHOD && ulSubCode == 1004 ) ) )
    {
-      char szModuleName[ _POSIX_PATH_MAX + 1 ];
+      char szModuleName[ HB_PATH_MAX ];
       char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
       USHORT uLine;
 

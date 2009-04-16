@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6415 2009/04/16 01:50:40 lculik Exp $
+ * $Id: ChangeLog,v 1.6416 2009/04/16 09:20:59 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,77 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-16 18:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/hbcurl/hbcurl.c
+  * contrib/hbmzip/hbmzip.c
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/libnf/fttext.c
+  * contrib/rdd_ads/ads1.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbencode.c
+  * include/hbapifs.h
+  * include/hbdbsort.h
+  * include/hbset.h
+  * source/common/hbfsapi.c
+  * source/common/hbwince.c
+  * source/compiler/genc.c
+  * source/compiler/gencobj.c
+  * source/compiler/genhrb.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbpcstat.c
+  * source/ct/disk.c
+  * source/ct/files.c
+  * source/pp/ppcore.c
+  * source/pp/ppgen.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfnsx/dbfnsx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/hbsix/sxfname.c
+  * source/rdd/hbsix/sxsem.c
+  * source/rdd/hsx/hsx.c
+  * source/rtl/defpath.c
+  * source/rtl/direct.c
+  * source/rtl/filebuf.c
+  * source/rtl/filehb.c
+  * source/rtl/filesys.c
+  * source/rtl/fnsplit.c
+  * source/rtl/fstemp.c
+  * source/rtl/gtchrmap.c
+  * source/rtl/hbffind.c
+  * source/rtl/philes.c
+  * source/rtl/regex.c
+  * source/rtl/set.c
+  * source/rtl/spfiles.c
+  * source/vm/arrays.c
+  * source/vm/errorapi.c
+  * source/vm/hbi18n.c
+  * source/vm/memvars.c
+  * source/vm/proc.c
+  * source/vm/runner.c
+  * utils/hbpp/hbpp.c
+  * utils/hbpp/hbppcore.c
+    * _POSIX_PATH_MAX + 1 -> HB_PATH_MAX
+    * _POSIX_PATH_MAX -> HB_PATH_MAX - 1
+    Please update your .c code to use new constant.
+  (by Viktor Szakats, borrowed from Harbour)
+  * include/hbsetup.h
+    ! Reverted _POSIX_PATH_MAX change from 2008-12-03 12:10 UTC+0100 by
+      Miguel, as it introduced different structure alignment problems
+      depending on the order of headers included. Thanks Przemek who found the
+      bug!
+    + Added HB_PATH_MAX hardcoded as 264 (260 + NUL char + alignment filler).
+  * source/rdd/hsx/hsx1.c
+    ! Fixed some search-and-replace typos.
 
 2009-04-16 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h

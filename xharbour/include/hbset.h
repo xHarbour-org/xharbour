@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.46 2008/11/05 03:03:16 walito Exp $
+ * $Id: hbset.h,v 1.47 2009/02/20 12:48:07 marchuet Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ typedef struct
    int        HB_SET_DBFLOCKSCHEME;
 
    BOOL       HB_SET_TRACE;
-   char       HB_SET_TRACEFILE[_POSIX_PATH_MAX];
+   char       HB_SET_TRACEFILE[ HB_PATH_MAX ];
    char       HB_SET_TRACESTACK;
 
    int        HB_SET_ERRORLOOP;
@@ -234,7 +234,7 @@ typedef struct
    BOOL       HB_SET_TRIMFILENAME;
    char *     HB_SET_OSCODEPAGE;
    BOOL       HB_SET_APPENDERROR;
-   char       HB_SET_ERRORLOG[_POSIX_PATH_MAX];
+   char       HB_SET_ERRORLOG[ HB_PATH_MAX];
    char *     HB_SET_TIMEFORMAT;
    BOOL       HB_SET_MACROBLOCKVARS;
    BOOL       HB_SET_WORKAREAS_SHARED;

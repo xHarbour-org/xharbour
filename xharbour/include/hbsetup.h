@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.54 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbsetup.h,v 1.55 2009/01/28 15:42:06 marchuet Exp $
  */
 
 /*
@@ -297,8 +297,9 @@
    #define HB_OS_ALLFILE_MASK           "*"
    #undef  HB_OS_DRIVE_DELIM_CHR
    #undef  HB_OS_HAS_DRIVE_LETTER
-   #define HB_OS_OPT_DELIM_LIST         "-"
    #define HB_OS_EOL_LEN                1
+   #define HB_OS_OPT_DELIM_LIST         "-"
+   #define HB_ISOPTSEP( c )             ( ( c ) == '-' )
 #else
    /* we are assuming here the DOS compatible OS */
    #define HB_OS_DOS_COMPATIBLE
@@ -309,23 +310,18 @@
    #define HB_OS_ALLFILE_MASK           "*.*"
    #define HB_OS_DRIVE_DELIM_CHR        ':'
    #define HB_OS_HAS_DRIVE_LETTER
-   #define HB_OS_OPT_DELIM_LIST         "/-"
    #define HB_OS_EOL_LEN                2  /* # of bytes in End of Line marker */
+   #define HB_OS_OPT_DELIM_LIST         "/-"
+   #define HB_ISOPTSEP( c )             ( ( c ) == '-' || ( c ) == '/' )
 #endif
 
-#ifndef _POSIX_PATH_MAX
-    #if defined( MAX_PATH )
-       #define _POSIX_PATH_MAX    MAX_PATH  // 260
-    #else
-        #if defined( _MAX_PATH )
-           #define _POSIX_PATH_MAX    _MAX_PATH // 260
-        #else
-           #define _POSIX_PATH_MAX    255
-        #endif
-    #endif
+#ifdef HB_LEGACY_LEVEL2
+   #ifndef _POSIX_PATH_MAX
+      #define _POSIX_PATH_MAX    255
+   #endif
 #endif
 
-#define HB_ISOPTSEP( c ) ( strchr( HB_OS_OPT_DELIM_LIST, ( c ) ) != NULL )
+#define HB_PATH_MAX     264 /* with trailing 0 byte */
 
 /* NOTE:
    Compiler                                _MSC_VER value

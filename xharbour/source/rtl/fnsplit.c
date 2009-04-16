@@ -1,5 +1,5 @@
 /*
- * $Id: fnsplit.c,v 1.4 2005/11/01 22:05:50 druzus Exp $
+ * $Id: fnsplit.c,v 1.5 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ HB_FUNC( HB_FNAMESPLIT )
 HB_FUNC( HB_FNAMEMERGE )
 {
    HB_FNAME pFileName;
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ HB_PATH_MAX ];
 
    pFileName.szPath = hb_parc( 1 );
    pFileName.szName = hb_parc( 2 );

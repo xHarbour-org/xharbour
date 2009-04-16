@@ -1,5 +1,5 @@
 /*
- * $Id: sxfname.c,v 1.1 2007/10/31 08:30:32 marchuet Exp $
+ * $Id: sxfname.c,v 1.2 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_FUNC( SX_FNAMEPARSER )
 
    if( szFileName )
    {
-      char szPathBuf[ _POSIX_PATH_MAX + 1 ];
+      char szPathBuf[ HB_PATH_MAX ];
       PHB_FNAME pFileName;
       ULONG ulLen;
       BOOL fFree;

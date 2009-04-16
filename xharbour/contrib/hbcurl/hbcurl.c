@@ -645,7 +645,7 @@ HB_FUNC(CURL_EASY_SETOPT)
          fclose( pConn->fFile.stream );
       }
 
-      pConn->fFile.filename = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+      pConn->fFile.filename = ( char * ) hb_xgrab( HB_PATH_MAX );
       strcpy( ( char * ) pConn->fFile.filename, (char * ) hb_parc( 3 ) );
       pConn->fFile.stream = NULL;
       curl_easy_setopt(pConn->curl, CURLOPT_WRITEFUNCTION, hb_WriteFtpDownload );  

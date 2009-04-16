@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.12 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: genobj32.c,v 1.13 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ static char * szPrefix = "_HB_FUN_";
 
 void hb_compGenObj32( PHB_FNAME pFileName )
 {
-  char szFileName[ _POSIX_PATH_MAX + 1 ];
+  char szFileName[ HB_PATH_MAX ];
   FILE * hObjFile;  /* file handle for OBJ output */
   char compiler[ 70 ];
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.26 2009/01/17 23:09:48 ronpinkas Exp $
+ * $Id: hbi18n.c,v 1.27 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
 static PHB_ITEM s_i18n_table = NULL;
 
 /** Default translation files directory */
-static char s_default_i18n_dir[ _POSIX_PATH_MAX + 1];
+static char s_default_i18n_dir[ HB_PATH_MAX ];
 
 /** And our current language */
 static char s_current_language[HB_I18N_CODELEN + 1];
@@ -110,11 +110,11 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
 
    if ( i18n_dir == NULL )
    {
-      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, _POSIX_PATH_MAX );
+      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, HB_PATH_MAX - 1 );
    }
    else
    {
-      strncpy( s_default_i18n_dir, i18n_dir, _POSIX_PATH_MAX );
+      strncpy( s_default_i18n_dir, i18n_dir, HB_PATH_MAX - 1 );
    }
 
    /* No automatic internationalization can be found */
@@ -851,7 +851,7 @@ HB_FUNC( HB_I18NSETPATH )
       return;
    }
 
-   strncpy( s_default_i18n_dir, hb_parc( 1 ), _POSIX_PATH_MAX );
+   strncpy( s_default_i18n_dir, hb_parc( 1 ), HB_PATH_MAX - 1 );
 }
 
 /* Gets default directory */
