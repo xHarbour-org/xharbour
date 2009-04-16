@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: scope1.prg,v 1.3 2009/04/13 13:50:08 likewolf Exp $ */
 
 /*
    This file is to be used as a secondary linked module along with tstscope.prg and scope2.prg.
@@ -12,9 +12,11 @@
 #xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->
 #xcommand PRIVATE: => HIDDEN:
 #xcommand PUBLIC: => EXPORTED:
+#else
+#xtranslate MODULE FRIENDLY =>
 #endif
 
-CLASS TParent
+CLASS TParent MODULE FRIENDLY
 
    PROPERTY Property READ FProperty WRITE FProperty
 
