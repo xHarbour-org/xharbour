@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.192 2009/02/13 16:12:24 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.193 2009/02/27 12:19:25 modalsist Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ShowHelp()
       Return .F.
    endif
-
+   
    cExt := SubStr( cFile, At(".",cFile) )
 
    IF ! Empty(cExt) .AND. lower(cExt) IN s_cInvalidExt
@@ -1422,11 +1422,11 @@ FUNCTION CompileFiles()
                   IF llinux
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   ELSE
-                     IF s_lMSVcc //.OR. s_lPocc
-                        cComm := Strtran( cComm, "-Fo$*", "-Fo" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
-                     ELSE
+//                     IF s_lMSVcc //.OR. s_lPocc
+//                        cComm := Strtran( cComm, "-Fo$*", "-Fo" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
+//                     ELSE
                         cComm := Strtran( cComm, "o$*", "o" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
-                     ENDIF
+//                     ENDIF
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
@@ -3073,7 +3073,7 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL)  $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = link" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
@@ -4937,7 +4937,7 @@ FUNCTION BuildMscCfgFile()
       endif
 
       FWrite( nCfg, "CC=cl" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__" + ReplaceMacros( "-I$(HB_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I$(HB_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
