@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.19 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: wafunc.c,v 1.20 2009/04/16 21:57:18 likewolf Exp $
  */
 
 /*
@@ -59,7 +59,31 @@
 #include "hbvm.h"
 #include "rddsys.ch"
 
-#ifdef HB_THREAD_SUPPORT
+#define HB_GET_AREA_HANDLE( pDyn ) \
+   ( pDyn ) ? ( int ) hb_dynsymAreaHandle( ( pDyn ) ) : 0
+
+#ifndef HB_THREAD_SUPPORT
+
+#define HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias ) \
+   iArea = HB_GET_AREA_HANDLE( ( pSymAlias )->pDynSym );
+#define HB_GET_AREA_HANDLE_FROM_NAME( iArea, szAlias ) \
+   { \
+      PHB_DYNS pDyn = hb_dynsymFindName( ( szAlias ) ); \
+      iArea = HB_GET_AREA_HANDLE( pDyn ); \
+   }
+
+#else
+
+#define HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias ) \
+   { \
+      PHB_DYNS pDyn = hb_setGetWorkareasShared() ? ( pSymAlias )->pDynSym : s_rddAliasThFind( ( pSymAlias )->szName, &HB_VM_STACK ); \
+      iArea = HB_GET_AREA_HANDLE( pDyn ); \
+   }
+#define HB_GET_AREA_HANDLE_FROM_NAME( iArea, szName ) \
+   { \
+      PHB_DYNS pDyn = hb_setGetWorkareasShared() ? hb_dynsymFindName( szName ) : s_rddAliasThFind( ( szName ), &HB_VM_STACK ); \
+      iArea = HB_GET_AREA_HANDLE( pDyn ); \
+   }
 
 PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK *pstack )
 {
@@ -91,7 +115,8 @@ PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK *pstack )
    }
 }
 
-#endif
+#endif /* !HB_THREAD_SUPPORT */
+
 
 /*
  * check if a given name can be used as alias expression
@@ -393,15 +418,7 @@ HB_ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
    }
    else
    {
-      PHB_DYNS pSymAlias;
-#ifdef HB_THREAD_SUPPORT
-      if ( ! hb_setGetWorkareasShared() )
-         pSymAlias = s_rddAliasThFind( szAlias, &HB_VM_STACK );
-      else
-#endif
-         pSymAlias = hb_dynsymFindName( szAlias );
-
-      *iArea = pSymAlias ? ( int ) hb_dynsymAreaHandle( pSymAlias ) : 0;
+      HB_GET_AREA_HANDLE_FROM_NAME( *iArea, szAlias );
       if( *iArea == 0 )
       {
          return HB_FAILURE;
@@ -425,14 +442,7 @@ HB_ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
-#ifdef HB_THREAD_SUPPORT
-   if ( ! hb_setGetWorkareasShared() )
-      pDyn = s_rddAliasThFind( pSymAlias->szName, &HB_VM_STACK );
-   else
-#endif
-      pDyn = pSymAlias->pDynSym;
-
-   iArea = pDyn ? ( int ) hb_dynsymAreaHandle( pDyn ) : 0;
+   HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias );
    if( iArea )
    {
       hb_rddSelectWorkAreaNumber( iArea );
@@ -473,7 +483,7 @@ HB_ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    {
       if( hb_errLaunch( pError ) != E_RETRY )
          break;
-      iArea = pDyn ? ( int ) hb_dynsymAreaHandle( pDyn ) : 0;
+      HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias );
       if( iArea )
       {
          hb_rddSelectWorkAreaNumber( iArea );
