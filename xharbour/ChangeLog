@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6417 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: ChangeLog,v 1.6418 2009/04/16 15:25:33 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-17 01:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rdd/wafunc.c
+    ! Fixed segfault on accessing work area by alias in MT mode both with
+      shared and private workareas. Allocate thread-specific alias dynsyms
+      only with SET WORKAREA PRIVATE.
 
 2009-04-16 19:23 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * tests/scope1.prg

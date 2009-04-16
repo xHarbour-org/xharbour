@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.18 2009/02/20 12:48:16 marchuet Exp $
+ * $Id: wafunc.c,v 1.19 2009/02/24 12:38:16 marchuet Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 #include "hbapirdd.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbset.h"
 #include "hbvm.h"
 #include "rddsys.ch"
 
@@ -233,10 +234,11 @@ void * hb_rddAllocWorkAreaAlias( const char * szAlias, int iArea )
    }
 
 #ifdef HB_THREAD_SUPPORT
-   pSymAlias = s_rddAliasThGet( szAlias, &HB_VM_STACK );
-#else
-   pSymAlias = hb_dynsymGet( szAlias );
+   if ( ! hb_setGetWorkareasShared() )
+      pSymAlias = s_rddAliasThGet( szAlias, &HB_VM_STACK );
+   else
 #endif
+      pSymAlias = hb_dynsymGet( szAlias );
    if( hb_dynsymAreaHandle( pSymAlias ) != 0 )
    {
       pSymAlias = NULL;
@@ -391,11 +393,13 @@ HB_ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
    }
    else
    {
+      PHB_DYNS pSymAlias;
 #ifdef HB_THREAD_SUPPORT
-      PHB_DYNS pSymAlias = s_rddAliasThFind( szAlias, &HB_VM_STACK );
-#else
-      PHB_DYNS pSymAlias = hb_dynsymFindName( szAlias );
+      if ( ! hb_setGetWorkareasShared() )
+         pSymAlias = s_rddAliasThFind( szAlias, &HB_VM_STACK );
+      else
 #endif
+         pSymAlias = hb_dynsymFindName( szAlias );
 
       *iArea = pSymAlias ? ( int ) hb_dynsymAreaHandle( pSymAlias ) : 0;
       if( *iArea == 0 )
@@ -417,18 +421,18 @@ HB_ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    HB_ERRCODE errCode;
    const char * szName;
    int iArea;
-#ifdef HB_THREAD_SUPPORT
    PHB_DYNS pDyn;
-#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
 #ifdef HB_THREAD_SUPPORT
-   pDyn  = s_rddAliasThFind( pSymAlias->szName, &HB_VM_STACK );
-   iArea = ( int ) hb_dynsymAreaHandle( pDyn );
-#else
-   iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
+   if ( ! hb_setGetWorkareasShared() )
+      pDyn = s_rddAliasThFind( pSymAlias->szName, &HB_VM_STACK );
+   else
 #endif
+      pDyn = pSymAlias->pDynSym;
+
+   iArea = pDyn ? ( int ) hb_dynsymAreaHandle( pDyn ) : 0;
    if( iArea )
    {
       hb_rddSelectWorkAreaNumber( iArea );
@@ -469,11 +473,7 @@ HB_ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    {
       if( hb_errLaunch( pError ) != E_RETRY )
          break;
-#ifdef HB_THREAD_SUPPORT
-      iArea = ( int ) hb_dynsymAreaHandle( pDyn );
-#else
-      iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
-#endif
+      iArea = pDyn ? ( int ) hb_dynsymAreaHandle( pDyn ) : 0;
       if( iArea )
       {
          hb_rddSelectWorkAreaNumber( iArea );
