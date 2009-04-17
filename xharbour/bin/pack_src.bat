@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.19 2007/10/31 03:07:49 patrickmast Exp $
+rem $Id: pack_src.bat,v 1.20 2009/03/26 16:33:20 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -26,8 +26,9 @@ rem README.TXT
 
 rem ROOT
 %hb_archbin% %hb_archopt%  %hb_filename% *.bat
-%hb_archbin% %hb_archopt%  %hb_filename% ?akefile.*
+%hb_archbin% %hb_archopt%  %hb_filename% makefile.*
 %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.*
+%hb_archbin% %hb_archopt%  %hb_filename% *.mak
 
 rem BIN
 %hb_archbin% %hb_archopt%  %hb_filename% bin/*.bat
@@ -144,6 +145,9 @@ rem SOURCE\RTL\PCRE
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/ChangeLog
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.c
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.dist
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.generic
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.src
 
 rem SOURCE\RTL\GT_TPL
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gt_tpl/Makefile

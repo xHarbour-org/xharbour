@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.34 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.35 2008/02/09 02:53:17 ronpinkas Exp $
  */
 
 /*
@@ -375,7 +375,10 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       #else
         if( pName->ExprType == HB_ET_FUNNAME )
         {
-           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol.szName, NULL );
+           if( ! HB_EXPR_ISBUILTIN_ID( pName->value.asSymbol.szName, HASH ) )
+           {
+              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol.szName, NULL );
+           }
         }
         else
         {

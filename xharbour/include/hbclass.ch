@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.65 2009/02/13 16:12:21 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.66 2009/04/14 09:14:06 likewolf Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ DECLARE HBClass ;
   __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| Self, <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 #xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> WITH MESSAGE <Message>(<params,...>) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;
-  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, Self, <params>| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent.>, <.Case.> )
 
 // ENABLE
 #xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH>] => _<type>() [;_<typeN>()]
