@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6420 2009/04/16 22:51:24 likewolf Exp $
+ * $Id: ChangeLog,v 1.6421 2009/04/17 13:28:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-17 16:32 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rdd\wafunc.c
+    - Commented out unused variable pDyn in function hb_rddSelectWorkAreaSymbol()
 
 2009-04-17 08:54 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * bin\pack_bin.bat

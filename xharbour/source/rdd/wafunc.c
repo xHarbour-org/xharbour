@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.20 2009/04/16 21:57:18 likewolf Exp $
+ * $Id: wafunc.c,v 1.21 2009/04/16 22:51:25 likewolf Exp $
  */
 
 /*
@@ -438,7 +438,7 @@ HB_ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    HB_ERRCODE errCode;
    const char * szName;
    int iArea;
-   PHB_DYNS pDyn;
+//   PHB_DYNS pDyn;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
