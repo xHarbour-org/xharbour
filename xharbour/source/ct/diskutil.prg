@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.8 2007/08/25 17:42:53 paultucker Exp $
+ * $Id: diskutil.prg,v 1.9 2007/10/24 10:50:44 modalsist Exp $
  */
 /*
  * xHarbour Project source code.
@@ -191,47 +191,19 @@ December/2004 - EF
 RETURN ( nErr )
 
 
-*--------------------------
-FUNCTION DiskFree( cDrive )
-*--------------------------
-Local nRet:=0
-LOCAL cPath := Diskname()+":"+DirName()
-
-   IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := DiskName()
-   ENDIF
-
-   IF at(":",cDrive)==0
-      cDrive += ":"
-   ENDIF
-
-   IF DiskReady(cDrive)
-      /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
-       * This function changes directory if you pass a drive letter than current,
-       * so it's need to save the full path before call hb_DiskSpace and restore
-       * them after.
-       */
-      nRet := hb_DiskSpace( cDrive , HB_DISK_FREE )
-   ENDIF
-
-   DirChange( cPath )
-
-RETURN (nRet)
-
-
 
 *-----------------------------------
 FUNCTION DiskReady( cDrive , lMode )
 *-----------------------------------
-   LOCAL lReturn, cCurrent := DiskName()
+LOCAL lReturn, cDsk, cCurDsk 
 
    default( @lMode , .F. )
 // lMode -> True = Windows/DOS mode. If a disk is not ready, open a dialog.
 //          False = Bios mode. If a disk is not ready don´t open a dialog.
 
-   IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := cCurrent
-   ENDIF
+   cCurDsk := DiskName()
+
+   cDsk := _Drive( cDrive )
 
    IF valtype(lMode) != "L"
       lMode := .F.
@@ -239,13 +211,13 @@ FUNCTION DiskReady( cDrive , lMode )
 
    IF lMode
       // Windows/DOS access mode. xHarbour RTL. Source is in "dirdrive.c".
-      lReturn := DiskChange( cDrive )
+      lReturn := DiskChange( cDsk )
       IF lReturn
-         DiskChange( cCurrent )
+         DiskChange( cCurDsk )
       ENDIF
    ELSE
       // Bios access mode. xHarbour RTL. Source is in "dirdrive.c".
-      lReturn := IsDisk( cDrive )
+      lReturn := IsDisk( cDsk )
    ENDIF
 
 RETURN ( lReturn )
@@ -255,21 +227,19 @@ RETURN ( lReturn )
 *------------------------------------
 FUNCTION DiskReadyW( cDrive , lMode )
 *------------------------------------
-   LOCAL nHd, cFile, lReturn := .F., cCurrent := DiskName()
+LOCAL cDsk, nHd, cFile, lReturn := .F., cCurrent := DiskName()
 
    default( @lMode  , .T. )
 // lMode -> Windows/DOS write ready mode. Same as DiskReady().
 
-   IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := cCurrent
-   ENDIF
+   cDsk := _Drive(cDrive)
 
    IF valtype(lMode) != "L"
       lMode := .T.
    ENDIF
 
    IF lMode
-      IF DiskChange( cDrive )
+      IF DiskChange( cDsk )
          cFile := "wwxxyyzz.xyz"
          nHd := FCreate( cFile , 0 )
          IF nHd > 0
@@ -283,31 +253,57 @@ FUNCTION DiskReadyW( cDrive , lMode )
 
 RETURN lReturn
 
+*--------------------------
+FUNCTION DiskFree( cDrive )
+*--------------------------
+Local nRet := 0
+Local cDsk,cCurPath, cCurDir
 
-*---------------------------
-FUNCTION DiskTotal( cDrive )
-*---------------------------
-LOCAL nRet:=0
-LOCAL cPath := Diskname()+":"+DirName()
+   cCurDir  := DirName()
+   cCurPath := DiskName()+":\"+cCurDir
 
-   IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := DiskName()
-   ENDIF
+   cDsk := _Drive( cDrive )
 
-   IF at(":",cDrive) == 0
-      cDrive += ":"
-   ENDIF
-
-   IF DiskReady( cDrive )
+   if DiskReady( cDsk )
       /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
        * This function changes directory if you pass a drive letter than current,
        * so it's need to save the full path before call hb_DiskSpace and restore
        * them after.
        */
-      nRet := hb_DiskSpace( cDrive , HB_DISK_TOTAL )
+      nRet := hb_DiskSpace( cDsk , HB_DISK_FREE )
+   endif
+
+   if !( DirName() == cCurDir )
+      DirChange( cCurPath )
+   endif
+
+RETURN (nRet)
+
+
+
+*---------------------------
+FUNCTION DiskTotal( cDrive )
+*---------------------------
+LOCAL nRet:=0
+LOCAL cDsk, cCurPath, cCurDir
+
+   cCurDir  := DirName()
+   cCurPath := DiskName()+":\"+cCurDir
+
+   cDsk := _Drive(cDrive)
+
+   IF DiskReady( cDsk )
+      /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+       * This function changes directory if you pass a drive letter than current,
+       * so it's need to save the full path before call hb_DiskSpace and restore
+       * them after.
+       */
+      nRet := hb_DiskSpace( cDsk , HB_DISK_TOTAL )
    ENDIF
 
-   DirChange( cPath )
+   if !( DirName() == cCurDir )
+      DirChange( cCurPath )
+   endif
 
 RETURN (nRet)
 
@@ -315,26 +311,25 @@ RETURN (nRet)
 FUNCTION DiskUsed( cDrive )
 *--------------------------
 Local nRet := 0
-Local cPath := Diskname()+":"+DirName()
+LOCAL cDsk, cCurPath, cCurDir
 
-   IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := DiskName()
-   ENDIF
+   cCurDir  := DirName()
+   cCurPath := DiskName()+":\"+cCurDir
 
-   IF at(":",cDrive) == 0
-      cDrive += ":"
-   ENDIF
+   cDsk := _Drive(cDrive)
 
-   IF DiskReady(cDrive)
+   IF DiskReady( cDsk )
       /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
        * This function changes directory if you pass a drive letter than current,
        * so it's need to save the full path before call hb_DiskSpace and restore
        * them after.
        */
-      nRet := hb_DiskSpace( cDrive , HB_DISK_USED )
+      nRet := hb_DiskSpace( cDsk , HB_DISK_USED )
    ENDIF
 
-   DirChange( cPath )
+   if !( DirName() == cCurDir )
+      DirChange( cCurPath )
+   endif
 
 RETURN ( nRet )
 
@@ -515,3 +510,29 @@ FUNCTION RenameFile( cOldFileName , cNewFileName )
 *-------------------------------------------------
 // FileMove function source is in "xharbour/source/ct/disk.c"
 RETURN ( FileMove( cOldFileName , cNewFileName )  )
+
+*--------------------------------*
+STATIC FUNCTION _Drive( cDsk )
+*--------------------------------*
+Local cCurDisk, cDrive
+
+   cDrive := cDsk
+
+   cCurDisk := DiskName()
+
+   if cCurDisk[-1] != ":"
+      cCurDisk += ":"
+   endif
+
+   if empty( cDrive ) .or. ! IsAlpha( cDrive )
+      cDrive := cCurDisk
+   endif
+
+   cDrive := StrTran(cDrive,"/","")
+   cDrive := StrTran(cDrive,"\","")
+
+   if cDrive[-1] != ":"
+      cDrive += ":"
+   endif
+
+Return cDrive

@@ -79,7 +79,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.20"
+STATIC s_cHbMakeVersion  := "1.30"
 STATIC s_lPrint          := .F.
 STATIC s_lEdit           := .F.
 STATIC s_aDefines        := {}
@@ -161,7 +161,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ShowHelp()
       Return .F.
    endif
-   
+
    cExt := SubStr( cFile, At(".",cFile) )
 
    IF ! Empty(cExt) .AND. lower(cExt) IN s_cInvalidExt
@@ -674,7 +674,6 @@ FUNCTION ParseMakeFile( cFile )
             IF aTemp[ 1 ] == "COMPRESS"
                s_lCompress := "YES" IN aTemp[ 2 ]
             ENDIF
-
 
             IF aTemp[ 1 ] == "GUI"
                s_lGui := "YES" IN aTemp[ 2 ]
@@ -1566,12 +1565,10 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
    LOCAL nLenaSrc     := Len( aSrc )
 
    LOCAL lFwh         := .F.
-// LOCAL lxFwh        := .F.
-   LOCAL lC4W         := .F.
    LOCAL lMiniGui     := .F.
    LOCAL lHwGui       := .F.
-   LOCAL lWhoo        := .F.
    LOCAL lWhat32      := .F.
+   LOCAL lGtCgi       := .F.
    LOCAL lGtWvt       := .F.
    LOCAL lGtWvw       := .F.
    LOCAL lMWvw        := .F.
@@ -1588,7 +1585,6 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
 
    // External GUI Libs
    LOCAL cFwhPath     := Space( 200 )
-   LOCAL cC4WPath     := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
    LOCAL cHwPath      := Space( 200 )
    LOCAL cxHGPath     := Space( 200 )
@@ -1638,7 +1634,7 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
    LOCAL cDrive       := ""
    LOCAL cPath        := ""
    LOCAL cTest        := ""
-   LOCAL cGuiLib      := "None"
+   LOCAL cGTLib       := "CONSOLE"
    LOCAL aLibs
    LOCAL aLibsIn      := {}
    LOCAL aLibsOut     := {}
@@ -1754,21 +1750,20 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
          lCompMod        := oMake:lCompMod
          s_lGenppo       := oMake:lGenppo
          s_lGui          := oMake:lGui
-         cRdd            := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
-         cGuiLib         := IIF( oMake:lFwh   , "FWH", ;
-                            IIF( oMake:lMini  , "MINIGUI", ;
-                            IIF( oMake:lWhoo  , "WHOO", ;
-                            IIF( oMake:lCw    , "C4W", ;
+         cRdd            := IIF( oMake:lRddAds, "RddAds",;
+                            IIF( oMake:lMediator, "Mediator", "None" ) )
+         cGTLib          := IIF( oMake:lFwh   , "FWH", ;
+                            IIF( oMake:lMiniGui  , "MINIGUI", ;
                             IIF( oMake:lHwGui , "HWGUI", ;
-                            IIF( oMake:lGtWvt , "GTWVT", ;
+                            IIF( oMake:lCgi , "GTCGI", ;
+                            IIF( oMake:lGtWvt , "GTWVT/GTWVG", ;
                             IIF( oMake:lMWvW  , "GTWVW+MWVW", ;
                             IIF( oMake:lGtWvw , "GTWVW", ;
                             IIF( oMake:lXWt   , "XWT", ;
                             IIF( oMake:lWhat32, "WHAT32", ;
-                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) ) ))
+                            IIF( oMake:lxHGtk , "XHGTK", "CONSOLE" ) ) ) ) ) ) ) ) ) ) 
          cFwhpath        := padr(oMake:cFmc,200)
          cApolloPath     := padr(oMake:cFmc,200)
-         cC4WPath        := padr(oMake:cFmc,200)
          cMiniPath       := padr(oMake:cFmc,200)
          cHwPath         := padr(oMake:cFmc,200)
          cxHGPath        := padr(oMake:cFmc,200)
@@ -1967,11 +1962,11 @@ While .t.
                  STATE OsSpec(getlist,2,@cCompiler);
                  DROPDOWN
 
-   @ 01,56       SAY s_aLangMessages[ 30 ]
+   @ 01,55       SAY s_aLangMessages[ 30 ]
 
-   @ 01,67,10,78 GET cGuiLib;
-                 LISTBOX { "None","C4W","FWH","GTWVT","GTWVW","GTWVW+MWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"};
-                 STATE OsSpec(getlist,3,@cGuiLib);
+   @ 01,66,10,78 GET cGTLib;
+                 LISTBOX { "CONSOLE","FWH","GTCGI","GTWVT/GTWVG","GTWVW","GTWVW+MWVW","HWGUI","MINIGUI","XWT","WHAT32","XHGTK"};
+                 STATE OsSpec(getlist,3,@cGTLib);
                  DROPDOWN;
                  WHEN CheckCompiler(cOS);
                  MESSAGE s_aLangMessages[ 51 ]
@@ -2037,18 +2032,18 @@ While .t.
       lUseXharbourDll:= .T.
    endif
 
-   lFwh      := "FWH"      IN alltrim(cGuiLib)
-   lC4W      := "C4W"      IN alltrim(cGuiLib)
-   lMiniGui  := "MINIGUI"  IN alltrim(cGuiLib)
-   lHwGui    := "HWGUI"    IN alltrim(cGuiLib)
-   lWhoo     := "WHOO"     IN alltrim(cGuiLib)
-   lWhat32   := "WHAT32"   IN alltrim(cGuiLib)
-   lGtWvt    := "GTWVT"    IN alltrim(cGuiLib)
-   lGtWvw    := "GTWVW"    IN alltrim(cGuiLib)
-   lMWvw     := "MWVW"     IN alltrim(cGuiLib)
-   lXwt      := "XWT"      IN alltrim(cGuiLib)
-   lxHGtk    := "XHGTK"    IN alltrim(cGuiLib)
-   s_lGui := lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw .or. lMWvw
+   lFwh      := "FWH"      IN alltrim(cGTLib)
+   lMiniGui  := "MINIGUI"  IN alltrim(cGTLib)
+   lHwGui    := "HWGUI"    IN alltrim(cGTLib)
+   lWhat32   := "WHAT32"   IN alltrim(cGTLib)
+   lGtCgi    := "GTCGI"    IN alltrim(cGTLib)
+   lGtWvt    := "GTWVT"    IN alltrim(cGTLib)
+   lGtWvw    := "GTWVW"    IN alltrim(cGTLib)
+   lMWvw     := "MWVW"     IN alltrim(cGTLib)
+   lXwt      := "XWT"      IN alltrim(cGTLib)
+   lxHGtk    := "XHGTK"    IN alltrim(cGTLib)
+
+   s_lGui := lFwh .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw .or. lMWvw
 
    lRddAds   := "RddAds"   IN cRdd
    lMediator := "Mediator" IN cRdd
@@ -2060,34 +2055,36 @@ While .t.
    ENDIF
 
    IF lFwh
+      @  3, 40 SAY space(maxcol()-40-1)
       @  3, 40 SAY "FWH path";
                GET cFwhPath;
                PICT "@S25"
-   ELSEIF lC4W
-      @  3, 40 SAY "C4W path";
-               GET cC4WPath;
-               PICT "@S25"
    ELSEIF lMiniGui
+      @  3, 40 SAY space(maxcol()-40-1)
       @  3, 40 SAY "MiniGui path";
                GET cMiniPath;
                PICT "@S25"
    ELSEIF lHwGui
+      @  3, 40 SAY space(maxcol()-40-1)
       @  3, 40 SAY "HwGUI path";
                GET cHwPath;
                PICT "@S25"
    ELSEIF lxHGtk
+      @  3, 40 SAY space(maxcol()-40-1)
       @  3, 40 SAY "xHGtk path";
                GET cxHGPath;
                PICT "@S25"
    ENDIF
 
    IF lMediator
+      @  3, 40 SAY space(maxcol()-40-1)
       @  3, 40 SAY "Mediator path";
                GET cMedPath;
                PICT "@S25"
    ENDIF
 
    IF lApollo
+      @  3, 40 SAY space(maxcol()-40-1)
       @ 03, 40 SAY "Apollo path";
                GET cApolloPath;
                PICT "@S25"
@@ -2324,7 +2321,7 @@ Endif // Create and compile
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\BIN\bcc32 -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__ -n"+if(s_lasdll,"1","")+" -go" + if(s_lGenCsource,"3","") + " -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+IIF( lWhoo," -I$(WHOO)\include ","")+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__ -n"+if(s_lasdll,"1","")+" -go" + if(s_lGenCsource,"3","") + " -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
       ELSE
          AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) )) + " -o$* $**" } )
       ENDIF
@@ -2362,9 +2359,9 @@ Endif // Create and compile
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\bin\cl -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS) -go" + if(s_lGenCsource,"3","") + "  -I$(C4W)\include" + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS) -go" + if(s_lGenCsource,"3","") + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
       ELSE
-         AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -I$(C4W)\include -o$* $**" } )
+         AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -o$* $**" } )
       ENDIF
 
       AAdd( s_aCommands, { ".rc.res:", "$(CC_DIR)\rc $(RFLAGS) $<" } )
@@ -2375,7 +2372,7 @@ Endif // Create and compile
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\BIN\pocc -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__ -n"+if(s_lasdll,"1","")+" -go" + if(s_lGenCsource,"3","") + " -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+IIF( lWhoo," -I$(WHOO)\include ","")+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$** $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__ -n"+if(s_lasdll,"1","")+" -go" + if(s_lGenCsource,"3","") + " -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$** $**" } )
       ELSE
          AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) )) + " -o$** $**" } )
       ENDIF
@@ -2657,8 +2654,6 @@ Endif // Create and compile
 
    IF lFwh
       FWrite( s_nMakeFileHandle, "FWH = " + alltrim(cFwhPath) + CRLF )
-   ELSEIF lC4W
-      FWrite( s_nMakeFileHandle, "C4W = " + alltrim(cC4WPath) + CRLF )
    ELSEIF lMiniGui
       FWrite( s_nMakeFileHandle, "MINIGUI = " + alltrim(cMiniPath) + CRLF )
    ELSEIF lHwGui
@@ -2674,8 +2669,6 @@ Endif // Create and compile
 
    ELSEIF lXwt
       FWrite( s_nMakeFileHandle, "XWT = " + CRLF )
-   ELSEIF lWhoo
-      FWrite( s_nMakeFileHandle, "WHOO = " + CRLF )
    ELSEIF lWhat32
       FWrite( s_nMakeFileHandle, "WHAT32 = " + CRLF )
    ELSEIF lxHGtk
@@ -2690,7 +2683,8 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "APOLLO = " + alltrim(cApolloPath) + CRLF )
    ENDIF
 
-   FWrite( s_nMakeFileHandle, "GUI = " + iif(lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw , "YES", "NO" ) + CRLF )
+   FWrite( s_nMakeFileHandle, "CGI = " + iif( lGtCgi , "YES", "NO" ) + CRLF )
+   FWrite( s_nMakeFileHandle, "GUI = " + iif(lFwh .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw , "YES", "NO" ) + CRLF )
    FWrite( s_nMakeFileHandle, "MT = " + IIF( s_lMt, "YES", "NO" ) + CRLF )
 
    FOR x := 1 TO Len( s_aMacros )
@@ -2852,8 +2846,13 @@ Endif // Create and compile
       cDefaultLibsMt := StrTran( cDefaultLibsMt, "bcc640mt.lib", "")
    ENDIF
 
+   if lGtCgi
+      cDefaultLibs   := StrTran( cDefaultLibs, "gtwin.lib", "gtwin.lib gtcgi.lib")
+      cDefaultLibsMt := StrTran( cDefaultLibsMt, "gtwinmt.lib", "gtwinmt.lib gtcgimt.lib")
+   endif
+
    // if external libs was selected...
-   IF Len( aLibsOut ) > 0 .AND. s_lExternalLib
+   IF ! Empty( aLibsOut ) .and. s_lExternalLib 
 
       IF s_lMSVcc .OR. s_lBcc .OR. s_lPocc
 
@@ -2863,14 +2862,19 @@ Endif // Create and compile
             cOldLib := cDefaultLibsMt
          ENDIF
 
-         // searching for html lib...
+         // searching for html/cgi lib...
          nPos := AScan( aLibsOut, { | z | At( "html", Lower( z ) ) > 0 } )
+         if nPos = 0
+            nPos := AScan( aLibsOut, { | z | At( "cgi", Lower( z ) ) > 0 } )
+         endif
 
-         IF nPos > 0
-            cHtmlLib += aLibsOut[ nPos ]
-            aDel( aLibsOut, nPos )
-            aSize( aLibsOut, Len( aLibsOut ) - 1 )
-            cOldLib := StrTran( cOldLib, "gtwin" , "gtcgi" )
+         IF nPos > 0  
+            if nPos > 0
+               cHtmlLib += aLibsOut[ nPos ]
+               ADel( aLibsOut, nPos )
+               ASize( aLibsOut, Len( aLibsOut ) - 1 )
+            endif
+            // cOldLib := StrTran( cOldLib, "gtwin", "gtcgi" )
          ENDIF
 
          // searching for mysql lib...
@@ -2899,6 +2903,9 @@ Endif // Create and compile
       IF s_lGcc
 
          nPos := AScan( aLibsOut, { | z | At( "html", Lower( z ) ) > 0 } )
+         if nPos = 0
+            nPos := AScan( aLibsOut, { | z | At( "cgi", Lower( z ) ) > 0 } )
+         endif
 
          IF nPos > 0
             cHtmlLib += "-l" + Strtran( aLibsOut[ nPos ], '.a', "" )
@@ -2927,7 +2934,7 @@ Endif // Create and compile
                cOldLib        := " " + cDefLibGccLibs
                cDefLibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
 
-               IF "html" IN cDefLibGccLibs
+               IF "html" IN cDefLibGccLibs .or. "cgi" IN cDefLibGccLibs .or. lGtCgi
                    cDefLibGccLibs := StrTran( cDefLibGccLibs, "gtcrs" , "gtcgi" )
                    cDefLibGccLibs := StrTran( cDefLibGccLibs, "ncurses" , "" )
                ENDIF
@@ -2937,7 +2944,7 @@ Endif // Create and compile
                cOldLib          := " " + cDefLibGccLibsMt
                cDefLibGccLibsMt := cHtmlLib + " " + cOldLib + " " + cLibs
 
-               IF "html" IN cDefLibGccLibsMt
+               IF "html" IN cDefLibGccLibsMt .or. "cgi" IN cDefLibGccLibsMt .or. lGtCgi
                    cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "gtcrs" , "gtcgi" )
                    cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "ncurses" , "" )
                ENDIF
@@ -2950,14 +2957,14 @@ Endif // Create and compile
                cOldLib     := " " + cGccLibsOs2
                cGccLibsOs2 := cHtmlLib + " " + cOldLib + " " + cLibs
 
-               IF "html" IN cGccLibsOs2
+               IF "html" IN cGccLibsOs2 .or. "cgi" IN cGccLibsOs2 .or. lGtCgi
                    cGccLibsOs2 := StrTran( cGccLibsOs2, "gtos2" , "gtcgi" )
                ENDIF
 
             ELSE
                cOldLib       := " " + cGccLibsOs2Mt
                cGccLibsOs2Mt := cHtmlLib + " " + cOldLib + " " + cLibs
-               IF "html" IN cGccLibsOs2Mt
+               IF "html" IN cGccLibsOs2Mt .or. "cgi" IN cGccLibsOs2Mt .or. lGtCgi
                    cGccLibsOs2Mt := StrTran( cGccLibsOs2Mt, "gtos2" , "gtcgi" )
                ENDIF
 
@@ -2982,7 +2989,7 @@ Endif // Create and compile
 
 
    IF s_lBcc .OR. s_lMSVcc .OR. s_lPocc
-      if lFwh .or. lMiniGui .or. lC4W .or. lWhoo .or. lHwGui .or. lWhat32
+      if lFwh .or. lMiniGui .or. lHwGui .or. lWhat32
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtgui.lib")
             cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtgui.lib")
       endif
@@ -2995,14 +3002,10 @@ Endif // Create and compile
          ENDIF
       ELSEIF lMiniGui
          FWrite( s_nMakeFileHandle, "LIBFILES = minigui.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
-      ELSEIF lWhoo
-         FWrite( s_nMakeFileHandle, "LIBFILES = whoo.lib what32.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lWhat32
          FWrite( s_nMakeFileHandle, "LIBFILES = what32.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lHwGui
          FWrite( s_nMakeFileHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
-      ELSEIF lC4W
-         FWrite( s_nMakeFileHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib "  + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSE
          if lGtwvt
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib gtwvg.lib")
@@ -3059,11 +3062,11 @@ Endif // Create and compile
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
 /* added "-x" flag to LFLAGS statment to suppress creation of map file and speed up link. */
-      FWrite( s_nMakeFileHandle, "LFLAGS = -L$(CC_DIR)\lib\obj;$(CC_DIR)\lib;$(HB_DIR)\lib -Gn -M -m -s -Tp"+ if(s_lasdll,"d","e") + " -x" + IIF( lFWH .or. lMiniGui .or. lWhoo .or. lHwgui .or. lGtWvt .or. lGtWvw ," -aa"," -ap") + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = -L$(CC_DIR)\lib\obj;$(CC_DIR)\lib;$(HB_DIR)\lib -Gn -M -m -s -Tp"+ if(s_lasdll,"d","e") + " -x" + IIF( lFWH .or. lMiniGui .or. lHwgui .or. lGtWvt .or. lGtWvw ," -aa"," -ap") + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = ilink32" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lGtWvw .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lGtWvw .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
@@ -3073,11 +3076,11 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL)  $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib "  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = link" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLOBJ = " + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib " + CRLF )
 
@@ -3086,13 +3089,13 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL)  /Ze /Go /Ot /Tx86-coff /I$(INCLUDE_DIR) $(C_USR) $(CFLAGS)" +IIF( s_lMt, ' /D"HB_THREAD_SUPPORT" /MT' , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB /MACHINE:IX86"+IIF(!s_lGui," /SUBSYSTEM:CONSOLE"," /SUBSYSTEM:WINDOWS") + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86"+IIF( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE") + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = polink" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLOBJ = " + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib schannel.lib" + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib" + CRLF )
 
    ELSEIF s_lGcc
 
@@ -3162,7 +3165,7 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "    $(PROJECT),, +" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(ALLLIB), +" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(DEFFILE), +" + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(ALLRES) " + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(ALLRES)" + if(s_lPocc,","," ") + CRLF )
       FWrite( s_nMakeFileHandle, "!" + CRLF )
 
    ELSEIF s_lGcc
@@ -4280,9 +4283,9 @@ FUNCTION CreateLibMakeFile( cFile )
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\bin\cl -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -go" + if(s_lGenCsource,"3","") + " -n -I$(HB_DIR)\include $(HARBOURFLAGS) -I$(C4W)\include -o$* $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -go" + if(s_lGenCsource,"3","") + " -n -I$(HB_DIR)\include $(HARBOURFLAGS) -o$* $**" } )
       ELSE
-         AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -I$(C4W)\include -o$* $**" } )
+         AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -o$* $**" } )
       ENDIF
 
       AAdd( s_aCommands, { ".rc.res:", "$(CC_DIR)\BIN\rc $(RFLAGS) $<" } )
@@ -4937,7 +4940,7 @@ FUNCTION BuildMscCfgFile()
       endif
 
       FWrite( nCfg, "CC=cl" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I$(HB_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__" + ReplaceMacros( "-I$(HB_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
@@ -5495,7 +5498,7 @@ LOCAL aLang := Array( 67 )
       aLang[27] :=  "Enviroment options"
       aLang[28] := "Select the OS"
       aLang[29] := "Select the C Compiler"
-      aLang[30] := "Graph Lib"
+      aLang[30] := "GT/GUI Lib"
       aLang[31] := "xHarbour Options"
       aLang[32] := "Automatic memvar declaration /a"
       aLang[33] := "Variables are assumed M-> /v"
@@ -5568,7 +5571,7 @@ LOCAL aLang := Array( 67 )
       aLang[27] := "Opciones de Ambiente"
       aLang[28] := "Seleccione SO"
       aLang[29] := "Seleccione Compilador C"
-      aLang[30] := "Lib Grafica"
+      aLang[30] := "GT/GUI Lib"
       aLang[31] := "Opciones de lo xHarbour"
       aLang[32] := "Declaraci¢n automatica de memvar /a"
       aLang[33] := "Variables ser n assumidas M-> /v "
@@ -5640,7 +5643,7 @@ LOCAL aLang := Array( 67 )
       aLang[27] := "Op‡äes de Ambiente"
       aLang[28] := "Selecione o SO"
       aLang[29] := "Selecione Compilador C"
-      aLang[30] := "Lib Gr f."
+      aLang[30] := "GT/GUI lib"
       aLang[31] := "Op‡äes do xHarbour"
       aLang[32] := "Declara‡Æo Autom tica de Memvar /a"
       aLang[33] := "Vari veis sÆo assumidas M-> /v"

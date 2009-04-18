@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6421 2009/04/17 13:28:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6422 2009/04/17 14:33:21 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-18 19:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/diskutil.prg
+    * fixed diskfree(), disktotal(), diskused() to restore early path. 
+
+  * source/rtl/dbedit.prg
+    * fixed to call udf before process a key exception. 
+
+  * source/rtl/tbrowse.prg
+    * fixed colorrect process. 
+
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/tmake.prg
+    * adjusted to set GTCGI to compile with html/cgi lib.
+      Note: Under Pelles C, this lib is named htmlcgi.lib, instead as done
+      with Borland, html.lib and cgi.lib.
+    * changed title "graphic lib" to "GT/GUI lib".
+    * changed graphic lib item name "none" to "console".
+    * fix to save minigui or hwgui lib path under PellesC.
+    * fix to compile resource file under PellesC.
 
 2009-04-17 16:32 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rdd\wafunc.c

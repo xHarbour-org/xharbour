@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.53 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: dbedit.prg,v 1.54 2008/11/23 16:29:26 modalsist Exp $
  */
 
 /*
@@ -451,11 +451,12 @@ LOCAL oTBR,;
              if nRet != DE_CONT
                 nRet := DE_CONT /* force dbedit DE_CONT state after idle mode. */
              endif
+
           endif
 
        else
 
-          nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
+ //         nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
           lExcept := .f.
           if lastkey() == K_ENTER
              oTBR:RefreshCurrent()
@@ -495,6 +496,12 @@ LOCAL oTBR,;
     endif
 
     if nKey != 0
+
+       nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, oTBR)
+
+       if nRet == DE_ABORT
+          EXIT
+       endif
 
        if dbe_ProcessKey( nKey, oTBR) = DE_ABORT
           EXIT
@@ -783,21 +790,23 @@ Return ( AScan( aKeys, nKey ) != 0 )
 STATIC FUNCTION dbe_syncpos(oTb)
 *--------------------------------*
 local nRec := Recno()
-local nKeyNo := OrdKeyNo()
+local nKeyNo := 0
 local nDel := 0
+local lDeleted := .f.
 
  if IndexOrd() != 0 
 
+    nKeyNo := OrdKeyNo()
     dbSkip(-1)
 
     if bof()
        oTb:RowPos := 1
     else
-       if ! Set( _SET_DELETED ) 
+       lDeleted := Set( _SET_DELETED, .F. )
+       if ! lDeleted
           dbGoto(nRec)
           oTb:RowPos := nKeyNo
        else
-          Set( _SET_DELETED , .F.)
           dbGotop()
           while ! eof() .and. recno() != nRec
              if deleted()
@@ -807,8 +816,8 @@ local nDel := 0
           enddo
           dbGoto(nRec)
           oTb:RowPos := nKeyNo - nDel
-          Set( _SET_DELETED , .T.)
        endif
+       Set( _SET_DELETED , lDeleted )
     endif
 
  else

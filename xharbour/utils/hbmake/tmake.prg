@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.19 2007/09/27 11:09:34 modalsist Exp $
+ * $Id: tmake.prg,v 1.20 2008/03/13 10:49:44 likewolf Exp $
  */
 
 /*
@@ -90,16 +90,15 @@ DATA  aLangMessages  init {}
 DATA  cDefLang
 DATA  lFwh           init .F.
 DATA  lxFwh          init .F.
-DATA  lCw            init .F.
-DATA  lMini          init .F.
+DATA  lMiniGui       init .F.
 DATA  lHwgui         init .F.
+DATA  lCGI           Init .F.
 DATA  lGui           Init .F.
 DATA  lGtwvt         init .F.
 DATA  lGtwvw         init .F.
 DATA  lMWvW          init .F.
 DATA  lXWT           init .F.
 DATA  lxHGtk         init .F.
-DATA  lWhoo          init .F.
 DATA  lWhat32        init .F.
 DATA  lRddAds        init .F.
 DATA  lMediator      init .F.
@@ -264,11 +263,6 @@ METHOD ReadMakefile(cFile) CLASS THbMake
                    ::lRddAds :=  "rddads" in aTemp[ 2 ]
                 ENDIF
 
-                IF aTemp[ 1 ] == "C4W"
-                   ::cFMC:= aTemp[2]
-                   ::lCw :=.t.
-                endif
-
                 IF aTemp[ 1 ] == "FWH"
                    ::cFMC:= aTemp[2]
                    ::lFwh           :=.t.
@@ -276,7 +270,7 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
                 IF aTemp[ 1 ] == "MINIGUI"
                    ::cFMC:= aTemp[2]
-                   ::lmini :=.t.
+                   ::lMiniGui :=.t.
                 endif
 
                 IF aTemp[ 1 ] == "HWGUI"
@@ -302,11 +296,6 @@ METHOD ReadMakefile(cFile) CLASS THbMake
                 IF aTemp[ 1 ] == "XWT"
                    ::cFMC:= ""
                    ::lXWT :=.t.
-                endif
-
-                IF aTemp[ 1 ] == "WHOO"
-                   ::cFMC:= aTemp[2]
-                   ::lWhoo  :=.t.
                 endif
 
                 IF aTemp[ 1 ] == "WHAT32"
@@ -346,6 +335,10 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
                 IF aTemp[ 1 ] == "MT"
                    ::lMt := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "CGI"
+                   ::lCGI := "YES" IN aTemp[ 2 ]
                 endif
 
                 IF aTemp[ 1 ] == "GUI"
