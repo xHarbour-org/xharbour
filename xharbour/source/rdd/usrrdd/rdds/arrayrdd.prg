@@ -1,5 +1,5 @@
 /*
- * $Id: arrayrdd.prg,v 1.6 2009/04/21 11:09:30 lculik Exp $
+ * $Id: arrayrdd.prg,v 1.7 2009/04/21 13:36:49 fsgiudice Exp $
  */
 
 /*
@@ -88,11 +88,10 @@ ANNOUNCE ARRAYRDD
 #define WADATA_TOP           8
 #define WADATA_BOTTOM        9
 #define WADATA_FOUND        10
-#define WADATA_LOCKS        11
-#define WADATA_FILTERINFO   12
+#define WADATA_FILTERINFO   11
 
 // This define lenght of WADATA
-#define WADATA_SIZEOF       12
+#define WADATA_SIZEOF       11
 
 #define RECDATA_DELETED      1
 #define RECDATA_LOCKED       2
@@ -141,7 +140,6 @@ STATIC FUNCTION AR_WADATAINIT()
             FALSE  ,; // WADATA_TOP
             FALSE  ,; // WADATA_BOTTOM
             FALSE  ,; // WADATA_FOUND
-            {}     ,; // WADATA_LOCKS
             NIL     ; // WADATA_FILTERINFO
           }
 
@@ -367,6 +365,7 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
    ENDIF
 
    IF nResult == SUCCESS
+      aDBFData[ DATABASE_OPENNUMBER ]++ 
       AR_GOTOP( nWA )
    ENDIF
 
