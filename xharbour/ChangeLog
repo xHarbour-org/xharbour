@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6422 2009/04/17 14:33:21 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6423 2009/04/18 22:44:01 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-02-41 08:20 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+
+  * source/rdd/usrrdd/rdds/arrayrdd.prg
+     add recNo()
+     add rLock()
+     add dbUnlock()
+     add __dbPack()
+     add dbSetFilter()
+     add dbClearFilter()
+     fix bug in dbCreate() when type of field is in lower case
+     fix bug in dbUseArea() when it try to open a file in exclusive and it is opened
+     fix bun in dbUseArea() when it try to open a file opened in exclusive 
+     All Fix provided by Quique on xharbour news
 
 2009-04-18 19:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/diskutil.prg
