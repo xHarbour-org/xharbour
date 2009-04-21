@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.213 2009/02/27 12:19:16 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.214 2009/04/18 22:44:01 modalsist Exp $
  */
 
 /*
@@ -420,6 +420,7 @@ Local aColor, nColIndex
   endif
 
 RETURN aColor
+
 
 *--------------------------------------------------*
 METHOD GetCellValue( nRow, nCol ) CLASS TDataCache
@@ -1000,7 +1001,8 @@ HIDDEN:
    DATA nPrevDelColPos                            // Save previous colpos before delcolumn(). For clipper compatibility.
    DATA nMoveTo      INIT 0                       // To control vertical movements
    DATA aPendingMovements                         // There is any movement pending
-   DATA lColorRect                                // Is colorrect active ?
+   DATA lColorRect                                // colorrect active
+   DATA lRectPainted                              // colorrect area painted 
 
 END CLASS
 
@@ -1013,8 +1015,6 @@ DEFAULT  nLeft   TO 0
 DEFAULT  nBottom TO MaxRow()
 DEFAULT  nRight  TO MaxCol()
 
-
-   Dispbegin()
 
    nTop    := Max(0,nTop)
    nLeft   := Max(0,nLeft)
@@ -1092,6 +1092,8 @@ DEFAULT  nRight  TO MaxCol()
 
    ::aPendingMovements := {}
    ::lColorRect := .f.
+   ::lRectPainted := .f.
+
 
 Return Self
 
@@ -1330,6 +1332,7 @@ METHOD ColInfo( oCol,lAdd ) CLASS Tbrowse
 LOCAL aCol
 
    DEFAULT lAdd TO .f.
+
 
    if ! lAdd .and. hb_IsObject( oCol ) .and. hb_IsBlock( oCol:block )
       aCol := { oCol, valtype( Eval( oCol:block )), ::SetColumnWidth( oCol ),;
@@ -1665,6 +1668,7 @@ LOCAL nWidth := 0, nHeadWidth := 0, nFootWidth := 0, nLen := 0
 
          nLen := LenVal( xRes, cType, oCol:Picture )
 
+         default oCol:Heading to ""
          cHeading := oCol:Heading + ";"
          while ( nL := Len( __StrTkPtr( @cHeading, @nTokenPos, ";" ) ) ) > 0
             nHeadWidth := Max( nHeadWidth, nL )
@@ -1672,6 +1676,7 @@ LOCAL nWidth := 0, nHeadWidth := 0, nFootWidth := 0, nLen := 0
 
          nTokenPos := 0
 
+         default oCol:Footing to ""
          cFooting  := oCol:Footing + ";"
          while ( nL := Len( __StrTkPtr( @cFooting, @nTokenPos, ";" ) ) ) > 0
             nFootWidth := Max( nFootWidth, nL )
@@ -1897,6 +1902,8 @@ METHOD SkipRows() CLASS Tbrowse
 
  endif
 
+ ::lRectPainted := .f.
+
 RETURN SELF
 
 *------------------------------------------------------*
@@ -1907,8 +1914,8 @@ METHOD Moved() CLASS TBrowse
 
    // No need to Dehilite() current cell more than once
    if ::Stable
-      ::DeHilite()
-      ::Stable := .F.
+      ::setHilite(.f.)
+      ::Stable := .f.
    endif
 
 RETURN Self
@@ -1930,7 +1937,6 @@ METHOD ResetMove() CLASS TBrowse
   ::nRowsToSkip := 0
   ::nRowsSkipped := 0
   ::nMoveTo := _TB_MOVE_NONE
-  ::aPendingMovements := {}
 
 Return Self
 
@@ -2408,6 +2414,7 @@ Local nRow, aColorRect, lfullArea := .f.
                   aRect[_TB_COLORRECT_BOTTOM] = ::nRowCount .and.;
                   aRect[_TB_COLORRECT_RIGHT ] = ::nColCount )
 
+   ::lColorRect := .t.
 
    if ::lConfigured
 
@@ -2416,12 +2423,12 @@ Local nRow, aColorRect, lfullArea := .f.
       // and now let's refresh new aRect covered area
       if ! Empty( ::aRedraw )
          for nRow := aRect[ _TB_COLORRECT_TOP ] to aRect[ _TB_COLORRECT_BOTTOM ]
-             ::aRedraw[ nRow ] := .T.
+             ::aRedraw[ nRow ] := .t.
          next
       endif
 
-      ::lStable := .F.
-      ::ForceStable()
+      ::lRectPainted := .t.
+      ::forcestable()
 
    else
       
@@ -2430,7 +2437,6 @@ Local nRow, aColorRect, lfullArea := .f.
 
    endif
 
-   ::lColorRect := .t.
 
 Return Self
 
@@ -2465,6 +2471,8 @@ Local nMoveTo := ::nMoveTo
       ::nColPos := Min(::nPrevDelColPos,::nColCount)
       ::nPrevDelColPos := 0
    ENDIF
+
+   Dispbegin()
 
    // Configure the browse if not configured yet.
    ::PerformConfiguration()
@@ -2537,13 +2545,15 @@ Local nMoveTo := ::nMoveTo
 
    endif
 
-   if ::lAutoLite
+   if ::lAutoLite .and. ! ::lRectPainted 
       ::SetHilite(.t.)
    else
       ::PosCursor()
    endif
 
    SetCursor( nCursor )
+
+   ::aPendingMovements := {}
 
    while DispCount() != 0
      Dispend()
@@ -2732,8 +2742,9 @@ RETURN SELF
 *------------------------------------------------------*
 METHOD DrawRow( nRow ) CLASS TBrowse
 *------------------------------------------------------*
-LOCAL colorSpec, cColor, nColFrom, lDisplay, nCursor
-LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, xCellValue, nGap
+LOCAL colorSpec, nColFrom, cColor, lDisplay, nCursor
+LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
+
 
    nGap       := 0
    ColorSpec  := ::aColorSpec[ 1 ]   // first pair of color into array
@@ -2772,6 +2783,7 @@ LOCAL nCol, nRow2Fill, nLeftColPos, cColBlanks, xCellValue, nGap
 
       // Doesn't need to be redrawn. Control loop into Stabilize()
       ::aRedraw[ nRow ] := .f.
+
 
    else  // ! lDisplay
 
@@ -2850,7 +2862,6 @@ METHOD DispCell( nRow, nCol, xValue, nColor ) CLASS TBrowse
 *-----------------------------------------------------------*
 LOCAL aColsInfo, oCol, nWidth, nLen, nScrCol, nNotLeftCol
 LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
-
 
    aColsInfo := ::aColsInfo[ nCol ]
 
@@ -2980,7 +2991,6 @@ LOCAL nScrCol     // Screen col
 LOCAL nNotLeftCol // Screen col position of first char of not left justified columns
 LOCAL xValue, nColor, nCursor
  
-Default lHilite to ::lAutolite
 
    if lHilite
       nColor := _TB_COLOR_ENHANCED

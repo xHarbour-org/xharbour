@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6425 2009/04/21 13:36:49 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.6426 2009/04/21 22:05:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-21 20:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * fix on colorrect process to work in browse() function.
+
 2009-04-21 19:20 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * source/rdd/usrrdd/rdds/arrayrdd.prg
     * few fixes provided by Quique
