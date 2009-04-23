@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.7 2004/09/08 02:52:48 ronpinkas Exp $
+* $Id: hbini.prg,v 1.8 2004/09/26 14:48:42 jonnymind Exp $
 */
 
 /*
@@ -155,28 +155,32 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
 
    cLine := ""
    DO WHILE Len( cData ) > 0
-      nLineEnd := At( chr(13)+chr(10), Substr( cData, 1, 256) )
+      nLineEnd := At( chr(10), Left( cData, 256) )
       IF nLineEnd == 0
-         nLineEnd := At( chr(10), Substr( cData, 1, 256) )
          IF nLineEnd == 0
+            // Support for MAC line termination (13)
             nLineEnd := At( chr(13), Substr( cData, 1, 256) )
             IF nLineEnd == 0
                nLineEnd := Len( cData )
             ENDIF
          ENDIF
+      ELSE
+         // 13 + 10
+         IF cData[ nLineEnd - 1 ] == 13
+            nLineEnd--
+         ENDIF
       ENDIF
 
       // Get the current line
-      cLine += AllTrim( Substr( cData, 1, nLineEnd-1 ) )
-      // if line terminator is 13/10 add one character
-      // (added also support for MAC line termination 10 + 13)
-      IF Len( cData ) > nLineEnd .and. ;
-            ( cData[ nLineEnd + 1 ] == chr(10) .or. cData[ nLineEnd + 1 ] == chr(13) )
+      cLine += AllTrim( Left( cData, nLineEnd - 1 ) )
+
+      // if line terminator is 13 + 10 restore eol position
+      IF cData[ nLineEnd ] == 13 .AND. cData[ nLineEnd + 1 ] == 10
          nLineEnd++
       ENDIF
 
       // remove current line
-      cData := Substr( cData, nLineEnd+1 )
+      cData := Substr( cData, nLineEnd + 1 )
 
       //Skip void lines
       IF Len( cLine ) == 0
