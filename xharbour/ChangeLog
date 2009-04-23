@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6427 2009/04/21 23:19:47 modalsist Exp $
+ * $Id: ChangeLog,v 1.6428 2009/04/23 13:05:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-23 16:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\dbinfo.ch
+  * include\hbapi.h
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * include\hbrdddbf.h
+  * include\hbrddnsx.h
+  * include\hbsxfunc.h
+  * include\std.ch
+  * source\codepage\cppl852.c
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbf1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfnsx\dbfnsx1.c
+  * source\rtl\file.c
+   * source\rtl\valtype.c
+  * source\vm\itemapi.c
+    + Added internal item type TIMESTAMP, the union of TIMESTAMP + DATE => DATETIME.
+    + Added capabilities of index over field type DATETIME (T) and TIMESTAMP (@) (it will be need test).
+      only for nsx and cdx index types.
+    * simplified code and minor adjusts. 
+    * Changed ( ( LPDBFDATA ) pRDD->lpvCargo ) by DBFNODE_DATA( pRDD ), to do more readable code.
+  * source\rtl\filesys.c
+    + Added partial support to  OSCodePage in function hb_fsNameConv.
+ 
+ * source\rtl\spfiles.c
+    + added hb_spFileExists( BYTE * pFilename, BYTE * pRetPath ) called from rdds.
+    * simplified code and minor adjusts. 
+    * Used hb_setGetDefault() instead of hb_set.HB_SET_DEFAULT, to respect access to static variables
+      from DLL.
 
 2009-04-23 08:31 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/hbini.prg

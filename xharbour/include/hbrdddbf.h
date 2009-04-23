@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.38 2009/02/20 12:48:05 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.39 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -113,9 +113,13 @@ HB_EXTERN_BEGIN
 #define HB_IDXREAD_CLEANMASK  HB_IDXREAD_DIRTY
 #define HB_IDXREAD_DIRTYMASK  (HB_IDXREAD_DIRTY|HB_IDXREAD_DEFAULT)
 
-#define HB_DIRTYREAD(w)       ( ( ( ( LPDBFDATA ) SELF_RDDNODE( w )-> \
-                                    lpvCargo )->uiDirtyRead & \
-                                           (w)->uiDirtyRead ) != 0 )
+#define DBFNODE_DATA( r )     ( ( LPDBFDATA ) ( r )->lpvCargo )
+
+#define DBFAREA_DATA( w )     DBFNODE_DATA( SELF_RDDNODE( w ) )
+
+
+#define HB_DIRTYREAD( w )     ( ( DBFAREA_DATA( w )->uiDirtyRead & \
+                                              ( w )->uiDirtyRead ) != 0 )
 
 
 /*
@@ -363,18 +367,18 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
 
 #endif /* HB_EXTERNAL_RDDDBF_USE */
 
-extern HB_EXPORT ULONG   hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
-extern HB_EXPORT void    hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex,
-                                             ULONG ulBlock );
+extern HB_EXPORT ULONG      hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern HB_EXPORT void       hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex,
+                                                ULONG ulBlock );
 extern HB_EXPORT HB_ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
-                                            ULONG * pulBlock, ULONG * pulSize,
-                                            ULONG * pulType );
+                                               ULONG * pulBlock, ULONG * pulSize,
+                                               ULONG * pulType );
 extern HB_EXPORT HB_ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
-                                            ULONG ulBlock, ULONG ulSize,
-                                            ULONG ulType );
+                                               ULONG ulBlock, ULONG ulSize,
+                                               ULONG ulType );
 extern HB_EXPORT HB_ERRCODE hb_dbfGetEGcode( HB_ERRCODE errCode );
-extern HB_EXPORT BOOL    hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
-extern HB_EXPORT BOOL    hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
+extern HB_EXPORT BOOL       hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+extern HB_EXPORT BOOL       hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
 
 #ifndef HB_CDP_SUPPORT_OFF
 extern HB_EXPORT void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest );

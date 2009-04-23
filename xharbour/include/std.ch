@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.31 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id: std.ch,v 1.32 2008/11/05 03:03:16 walito Exp $
  */
 
 /*
@@ -689,6 +689,7 @@
    #command SET DIRCASE <(x)>             => Set( _SET_DIRCASE, <(x)> )
    #command SET DIRCASE (<x>)             => Set( _SET_DIRCASE, <x> )
    #command SET DIRSEPARATOR <x>          => Set( _SET_DIRSEPARATOR, <x> )
+   #command SET TRIMFILENAME <x:ON,OFF,&> => Set( _SET_TRIMFILENAME, <(x)> )
    #command SET OUTPUT SAFETY <x:ON,OFF,&> => Set( _SET_OUTPUTSAFETY, <(x)> )
    #command SET OUTPUT SAFETY (<x>)       => Set( _SET_OUTPUTSAFETY, <x> )
    #command SET DBFLOCKSCHEME TO <x>      => Set( _SET_DBFLOCKSCHEME, <x> )

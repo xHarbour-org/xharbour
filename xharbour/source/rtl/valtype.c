@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.12 2008/01/10 11:27:17 marchuet Exp $
+ * $Id: valtype.c,v 1.13 2008/11/18 17:55:45 marchuet Exp $
  */
 
 /*
@@ -133,16 +133,6 @@ HB_FUNC( HB_ISNIL )
    hb_retl( ISNIL( 1 ) );
 }
 
-HB_FUNC( HB_ISSTRING )
-{
-  hb_retl( ISCHAR(1) && hb_param( 1, HB_IT_MEMOFLAG ) == NULL );
-}
-
-HB_FUNC( HB_ISMEMO )
-{
-  hb_retl( hb_param( 1, HB_IT_MEMOFLAG ) != NULL );
-}
-
 HB_FUNC( HB_ISNUMERIC )
 {
    hb_retl( HB_IS_NUMBER( hb_param( 1, HB_IT_ANY ) ) );
@@ -163,14 +153,9 @@ HB_FUNC( HB_ISDATETIME )
    hb_retl( ISDATETIME( 1 ) );
 }
 
-HB_FUNC( HB_ISARRAY )
+HB_FUNC( HB_ISTIMESTAMP )
 {
-   hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
-}
-
-HB_FUNC( HB_ISOBJECT )
-{
-   hb_retl( ISOBJECT( 1 ) );
+   hb_retl( ISTIMESTAMP( 1 ) );
 }
 
 HB_FUNC( HB_ISBLOCK )
@@ -181,6 +166,31 @@ HB_FUNC( HB_ISBLOCK )
 HB_FUNC( HB_ISPOINTER )
 {
    hb_retl( ISPOINTER( 1 ) );
+}
+
+HB_FUNC( HB_ISSTRING )
+{
+   hb_retl( ISCHAR( 1 ) );
+}
+
+HB_FUNC( HB_ISCHAR )
+{
+   hb_retl( ( hb_parinfo( 1 ) & HB_IT_MEMO ) == HB_IT_STRING );
+}
+
+HB_FUNC( HB_ISMEMO )
+{
+   hb_retl( ( hb_parinfo( 1 ) & HB_IT_MEMOFLAG ) != 0 );
+}
+
+HB_FUNC( HB_ISARRAY )
+{
+   hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
+}
+
+HB_FUNC( HB_ISOBJECT )
+{
+   hb_retl( ISOBJECT( 1 ) );
 }
 
 HB_FUNC( HB_ISHASH )
@@ -196,12 +206,12 @@ HB_FUNC( HB_ISNULL )
    {
       if( HB_IS_STRING( pItem ) )
       {
-         hb_retl( pItem->item.asString.length == 0 );
+         hb_retl( hb_itemGetCLen( pItem ) == 0 );
          return;
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         hb_retl( pItem->item.asArray.value->ulLen == 0 );
+         hb_retl( hb_arrayLen( pItem ) == 0 );
          return;
       }
       else if( HB_IS_HASH( pItem ) )

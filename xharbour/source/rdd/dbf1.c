@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.201 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: dbf1.c,v 1.202 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ static HB_LONG hb_dbfGetRowVer( DBFAREAP pArea, USHORT uiField, HB_LONG * pValue
                       sizeof( DBFHEADER ) + uiField * sizeof( DBFFIELD ) ) ==
        sizeof( dbField ) )
    {
-      *pValue = HB_GET_LE_UINT64( &dbField.bReserved2 ) + 1;
+      *pValue = HB_GET_LE_UINT64( dbField.bReserved2 ) + 1;
       HB_PUT_LE_UINT64( dbField.bReserved2, *pValue );
       hb_fileWriteAt( pArea->pDataFile, ( BYTE * ) &dbField, sizeof( dbField ),
                       sizeof( DBFHEADER ) + uiField * sizeof( DBFFIELD ) );
@@ -2352,14 +2352,8 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
                memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
             }
          }
-         else if( pField->uiType == HB_FT_DATETIME )
-         {
-            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                              hb_itemGetDL( pItem ) );
-            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + 4,
-                              hb_itemGetT( pItem ) );
-         }
-         else if( pField->uiType == HB_FT_TIMESTAMP )
+         else if( pField->uiType == HB_FT_DATETIME ||
+                  pField->uiType == HB_FT_TIMESTAMP )
          {
             HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                               hb_itemGetDL( pItem ) );
@@ -2878,11 +2872,11 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
                pError = hb_errNew();
                hb_errPutGenCode( pError, EG_CREATE );
                hb_errPutSubCode( pError, EDBF_CREATE_DBF );
-               hb_errPutOsCode( pError, hb_fsError() );
                hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
                hb_errPutFileName( pError, ( char * ) szFileName );
                hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
             }
+            hb_errPutOsCode( pError, hb_fsError() );
             fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
          }
          else
@@ -3839,11 +3833,11 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pError = hb_errNew();
                hb_errPutGenCode( pError, EG_OPEN );
                hb_errPutSubCode( pError, EDBF_OPEN_DBF );
-               hb_errPutOsCode( pError, hb_fsError() );
                hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
                hb_errPutFileName( pError, ( char * ) szFileName );
                hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
             }
+            hb_errPutOsCode( pError, hb_fsError() );
             fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
          }
          else
@@ -5516,8 +5510,8 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
    hb_fsFNameMerge( szFileName, pFileName );
    hb_xfree( pFileName );
 
-   /* Use hb_spFile first to locate table which can be in differ path */
-   if( hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szFileName ) )
+   /* Use hb_spFileExists first to locate table which can be in differ path */
+   if( hb_spFileExists( ( BYTE * ) szFileName, ( BYTE * ) szFileName ) )
    {
       fResult = hb_fsDelete( ( BYTE * ) szFileName );
       if( fResult && fTable )
@@ -5527,7 +5521,7 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
           * supported and if yes then try to delete memo file if it exists
           * in the same directory as table file
           * hb_fsFNameSplit() repeated intentionally to respect
-          * the path set by hb_spFile()
+          * the path set by hb_spFileExists()
           */
          pFileName = hb_fsFNameSplit( szFileName );
          pFileExt = hb_itemPutC( pFileExt, NULL );
@@ -5600,19 +5594,19 @@ static HB_ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pI
       hb_itemRelease( pFileExt );
    }
 
-   return hb_spFile( ( BYTE * ) szFileName, NULL ) ? HB_SUCCESS : HB_FAILURE;
+   return hb_spFileExists( ( BYTE * ) szFileName, NULL ) ? HB_SUCCESS : HB_FAILURE;
 }
 
 static HB_ERRCODE hb_dbfInit( LPRDDNODE pRDD )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfInit(%p)", pRDD));
 
-   pRDD->lpvCargo = hb_xgrab( sizeof( DBFDATA ) );
-   memset( pRDD->lpvCargo, 0, sizeof( DBFDATA ) );
+   DBFNODE_DATA( pRDD ) = hb_xgrab( sizeof( DBFDATA ) );
+   memset( DBFNODE_DATA( pRDD ), 0, sizeof( DBFDATA ) );
 
-   ( ( LPDBFDATA ) pRDD->lpvCargo )->bTableType = DB_DBF_STD;
-   ( ( LPDBFDATA ) pRDD->lpvCargo )->bCryptType = DB_CRYPT_NONE;
-   ( ( LPDBFDATA ) pRDD->lpvCargo )->uiDirtyRead = HB_IDXREAD_CLEANMASK;
+   DBFNODE_DATA( pRDD )->bTableType = DB_DBF_STD;
+   DBFNODE_DATA( pRDD )->bCryptType = DB_CRYPT_NONE;
+   DBFNODE_DATA( pRDD )->uiDirtyRead = HB_IDXREAD_CLEANMASK;
 
    return HB_SUCCESS;
 }
@@ -5623,7 +5617,7 @@ static HB_ERRCODE hb_dbfExit( LPRDDNODE pRDD )
 
    if( pRDD->lpvCargo )
    {
-      LPDBFDATA pData = ( LPDBFDATA ) pRDD->lpvCargo;
+      LPDBFDATA pData = DBFNODE_DATA( pRDD );
 
       if( pData->szTrigger )
          hb_xfree( pData->szTrigger );
@@ -5647,7 +5641,7 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
-   pData = ( LPDBFDATA ) pRDD->lpvCargo;
+   pData = DBFNODE_DATA( pRDD );
 
    switch( uiIndex )
    {

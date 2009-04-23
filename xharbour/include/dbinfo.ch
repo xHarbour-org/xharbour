@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.27 2009/02/10 09:12:16 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.28 2009/02/20 12:47:56 marchuet Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+/* NOTE: This file is also used by C code. */
 
 #ifndef HB_DBINFO_CH_
 #define HB_DBINFO_CH_

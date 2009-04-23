@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.61 2009/02/20 12:48:04 marchuet Exp $
+ * $Id: hbrddcdx.h,v 1.62 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -136,7 +136,7 @@ HB_EXTERN_BEGIN
 #define HB_CDXMAXKEY( x )     ((USHORT) ((x) > CDX_MAXKEY ? CDX_MAXKEY : (x)))
 #define HB_CDXBITMASK( x )    ((LONG) ((1L<<(x))-1))
 
-/* #define FAST_GOCOLD( A )      (((CDXAREAP) (A))->fRecordChanged || ((CDXAREAP) (A))->fCdxAppend ? (SELF_GOCOLD((A))) : SUCCESS) */
+/* #define FAST_GOCOLD( A )      (((CDXAREAP) (A))->fRecordChanged || ((CDXAREAP) (A))->fCdxAppend ? (SELF_GOCOLD((A))) : HB_SUCCESS) */
 #define FAST_GOCOLD( A )      SELF_GOCOLD(A)
 
 
@@ -148,6 +148,10 @@ HB_EXTERN_BEGIN
 #define CDX_TYPE_COMPACT       0x20    /* FoxPro */
 #define CDX_TYPE_COMPOUND      0x40    /* FoxPro */
 #define CDX_TYPE_STRUCTURE     0x80    /* FoxPro */
+
+#define CDX_CMP_EXACT          0x00    /* exact comparision */
+#define CDX_CMP_PREFIX         0x01    /* prefix comparision */
+#define CDX_CMP_DATE           0x02    /* date comparision */
 
 /*
  SIx3 order temperature flags:
@@ -247,7 +251,8 @@ struct _CDXTAG;   /* forward declaration */
 typedef struct _CDXKEY
 {
    BYTE *   val;
-   BYTE     len;
+   USHORT   len;
+   USHORT   mode;
    ULONG    rec;
 } CDXKEY;
 typedef CDXKEY * LPCDXKEY;

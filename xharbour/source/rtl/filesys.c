@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.186 2009/03/11 10:40:29 likewolf Exp $
+ * $Id: filesys.c,v 1.187 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -4393,6 +4393,7 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
    int iFileCase, iDirCase;
    char cDirSep;
    BOOL fTrim;
+   BOOL bCPConv;
 /*
    Convert file and dir case. The allowed SET options are:
       LOWER - Convert all caracters of file to lower
@@ -4410,9 +4411,13 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
    cDirSep = ( char ) hb_setGetDirSeparator();
    iFileCase = hb_setGetFileCase();
    iDirCase = hb_setGetDirCase();
+   bCPConv = hb_setGetOSCODEPAGE() && hb_setGetOSCODEPAGE()[ 0 ];
 
-   if( fTrim || cDirSep != HB_OS_PATH_DELIM_CHR ||
-       iFileCase != HB_SET_CASE_MIXED || iDirCase != HB_SET_CASE_MIXED )
+   if( fTrim ||
+       cDirSep != HB_OS_PATH_DELIM_CHR ||
+       iFileCase != HB_SET_CASE_MIXED ||
+       iDirCase != HB_SET_CASE_MIXED ||
+       bCPConv )
    {
       PHB_FNAME pFileName;
       ULONG ulLen;
@@ -4425,14 +4430,27 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
          *pfFree = TRUE;
       }
 
-      if( cDirSep != HB_OS_PATH_DELIM_CHR )
+      if( cDirSep != HB_OS_PATH_DELIM_CHR || bCPConv )
       {
-         BYTE *p = szFileName;
+         BYTE * p = szFileName;
+
          while( *p )
          {
-            if( *p == cDirSep )
+            if( cDirSep != HB_OS_PATH_DELIM_CHR && *p == cDirSep )
                *p = HB_OS_PATH_DELIM_CHR;
             p++;
+         }
+      }
+
+      if( bCPConv )
+      {
+         BOOL fFree;
+         BYTE * pbyResult = hb_osEncode( ( BYTE * ) szFileName, &fFree );
+
+         if( fFree )
+         {
+            hb_strncpy( ( char * ) szFileName, ( char * ) pbyResult, HB_PATH_MAX );
+            hb_xfree( pbyResult );
          }
       }
 
@@ -4446,14 +4464,14 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
             ulLen = strlen( pFileName->szName );
             ulLen = hb_strRTrimLen( pFileName->szName, ulLen, FALSE );
             pFileName->szName = hb_strLTrim( pFileName->szName, &ulLen );
-            ( ( char * ) pFileName->szName )[ulLen] = '\0';
+            ( ( char * ) pFileName->szName )[ ulLen ] = '\0';
          }
          if( pFileName->szExtension )
          {
             ulLen = strlen( pFileName->szExtension );
             ulLen = hb_strRTrimLen( pFileName->szExtension, ulLen, FALSE );
             pFileName->szExtension = hb_strLTrim( pFileName->szExtension, &ulLen );
-            ( ( char * ) pFileName->szExtension )[ulLen] = '\0';
+            ( ( char * ) pFileName->szExtension )[ ulLen ] = '\0';
          }
       }
 
