@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6428 2009/04/23 13:05:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6429 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-04-23 13:43 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source\rdd\dbfnsx\dbfnsx1.c
+    * Corrected typo
+	 
 2009-04-23 16:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\dbinfo.ch
   * include\hbapi.h

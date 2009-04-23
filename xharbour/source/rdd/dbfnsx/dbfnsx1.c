@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.6 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: dbfnsx1.c,v 1.7 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -747,7 +747,7 @@ static PHB_ITEM hb_nsxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
             break;
          case 'T':
             HB_ORD2DBL( pKey->val, &d );
-            pItem = hb_itemPutTD( pItem, d );
+            pItem = hb_itemPutDTD( pItem, d );
             break;
          case 'L':
             pItem = hb_itemPutL( pItem, pKey->val[0] == 'T' );
