@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.63 2009/02/20 12:48:01 marchuet Exp $
+ * $Id: hbapifs.h,v 1.64 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -267,6 +267,7 @@ extern HB_EXPORT BOOL       hb_spFile( BYTE * pFilename, BYTE * pRetPath );
 extern HB_EXPORT HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags );
 extern HB_EXPORT HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr );
 extern HB_EXPORT HB_FHANDLE hb_spCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags );
+extern HB_EXPORT BOOL       hb_spFileExists( BYTE * pFilename, BYTE * pRetPath );
 
 /* File Find API structure */
 typedef struct

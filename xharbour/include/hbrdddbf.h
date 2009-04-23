@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.39 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.40 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -113,7 +113,8 @@ HB_EXTERN_BEGIN
 #define HB_IDXREAD_CLEANMASK  HB_IDXREAD_DIRTY
 #define HB_IDXREAD_DIRTYMASK  (HB_IDXREAD_DIRTY|HB_IDXREAD_DEFAULT)
 
-#define DBFNODE_DATA( r )     ( ( LPDBFDATA ) ( r )->lpvCargo )
+#define DBFNODE_DATARAW( r )  ( (r)->lpvCargo )
+#define DBFNODE_DATA( r )     ( (LPDBFDATA) DBFNODE_DATARAW( r )  )
 
 #define DBFAREA_DATA( w )     DBFNODE_DATA( SELF_RDDNODE( w ) )
 

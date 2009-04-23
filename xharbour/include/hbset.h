@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.47 2009/02/20 12:48:07 marchuet Exp $
+ * $Id: hbset.h,v 1.48 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -360,6 +360,8 @@ extern HB_EXPORT BOOL       hb_setGetAppendError( void );
 extern HB_EXPORT char *     hb_setGetErrorLog( void );
 extern HB_EXPORT char *     hb_setGetTimeFormat( void );
 extern HB_EXPORT BOOL       hb_setGetWorkareasShared( void );
+extern HB_EXPORT UCHAR *    hb_osEncode( UCHAR * szFileName, BOOL * pfFree );
+extern HB_EXPORT UCHAR *    hb_osDecode( UCHAR * szFileName, BOOL * pfFree );
 
 #ifndef HB_SET_STACK
    #define HB_SET_STACK (*hb_GetSetStructPtr())

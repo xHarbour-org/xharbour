@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.202 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: dbf1.c,v 1.203 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -3768,7 +3768,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
       pArea->cdPage = hb_cdppage();
-#endif         
+#endif
    pArea->fShared = pOpenInfo->fShared;
    pArea->fReadonly = pOpenInfo->fReadonly;
    /* Force exclusive mode
@@ -5194,35 +5194,35 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                   case 0x02:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_850 ); break;
                   case 0x64:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_852 ); break;        
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_852 ); break;
                   case 0x6B:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_857 ); break;
                   case 0x67:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_861 ); break;     
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_861 ); break;
                   case 0x66:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_865 ); break;        
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_865 ); break;
                   case 0x65:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_866 ); break;
                   case 0x7C:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_874 ); break;
                   case 0x68:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_KAM ); break;       
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_KAM ); break;
                   case 0xC8:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1250 ); break;
                   case 0xC9:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1251 ); break;
                   case 0x03:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1252 ); break;        
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1252 ); break;
                   case 0xCB:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1253 ); break;
                   case 0xCA:
                      pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1254 ); break;
                   case 0x7D:
-                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1255 ); break;        
+                     pArea->cdPage = hb_cdpcharsetFind( HB_CPID_1255 ); break;
                   case 0x7E:
                      Area->cdPage = hb_cdpcharsetFind( HB_CPID_1256 ); break;
                }
-#endif                        
+#endif
                break;
 
             case 0x03:
@@ -5362,7 +5362,7 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
          10007 * 	   Russian Macintosh 	      x96                     HB_CPID_10007
          10029 	   Macintosh EE 	            x97                     HB_CPID_10029
          * Not detected when you include CODEPAGE=AUTO in your configuration file.
-      */         
+      */
       if( strcmp( pArea->cdPage->uniID, HB_CPID_437 ) == 0 )
          pArea->dbfHeader.bCodePage = 0x01;
       else if( strcmp( pArea->cdPage->uniID, HB_CPID_MAZ ) == 0 )
@@ -5601,7 +5601,7 @@ static HB_ERRCODE hb_dbfInit( LPRDDNODE pRDD )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfInit(%p)", pRDD));
 
-   DBFNODE_DATA( pRDD ) = hb_xgrab( sizeof( DBFDATA ) );
+   DBFNODE_DATARAW( pRDD ) = (LPDBFDATA) hb_xgrab( sizeof( DBFDATA ) );
    memset( DBFNODE_DATA( pRDD ), 0, sizeof( DBFDATA ) );
 
    DBFNODE_DATA( pRDD )->bTableType = DB_DBF_STD;
