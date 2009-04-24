@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.21 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: dateshb.c,v 1.22 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -398,9 +398,7 @@ HB_FUNC( DTOC )
       hb_retc( hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, hb_set.HB_SET_DATEFORMAT ) );
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "DTOC", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( DTOS )
@@ -412,9 +410,7 @@ HB_FUNC( DTOS )
       hb_retc( hb_pardsbuff( szDate, 1 ) );
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "DTOS", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( STOD )
@@ -487,9 +483,7 @@ HB_FUNC( DAY )
       hb_retnilen( iDay, 3 );
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1114, NULL, "DAY", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( TIME )
@@ -527,6 +521,16 @@ HB_FUNC( DATE )
    hb_retd( iYear, iMonth, iDay );
 }
 
+HB_FUNC( DOW )
+{
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate )
+      hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 1115, NULL, "DOW", 1, hb_paramError( 1 ) );
+}
+
 HB_FUNC( DATETIME )
 {
    int iYear, iMonth, iDay, iHour, iMinute;
@@ -536,30 +540,14 @@ HB_FUNC( DATETIME )
    hb_retdt( iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
 }
 
-HB_FUNC( DOW )
-{
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
-   if( pDate )
-   {
-      hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1115, NULL, "DOW", 1, hb_paramError( 1 ) );
-   }
-}
 
 HB_FUNC( TTOD )
 {
    if( ISDATE( 1 ) )
-   {
       hb_retdl( hb_pardl( 1 ) );
-   }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOD", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( TTOS )
@@ -586,18 +574,12 @@ HB_FUNC( TTOC )
       hb_pardtsbuff( szDate, 1);
 
       if( (ISNUM(2) && hb_parni(2) == 2) || (ISLOG(2) && !hb_parl(2) ) )
-      {
          hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, NULL, hb_set.HB_SET_TIMEFORMAT ) );
-      }
       else
-      {
          hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT ) );
-      }
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "TTOC", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( HOUR )
@@ -613,9 +595,7 @@ HB_FUNC( HOUR )
       hb_retnilen( iHour, 2 );
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "HOUR", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( MINUTE )
@@ -631,9 +611,7 @@ HB_FUNC( MINUTE )
       hb_retnilen( iMinute, 2 );
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "MINUTE", 1, hb_paramError( 1 ) );
-   }
 }
 
 HB_FUNC( SECS )

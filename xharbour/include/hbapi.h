@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.257 2009/03/02 09:20:03 marchuet Exp $
+ * $Id: hbapi.h,v 1.258 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -76,6 +76,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_DOUBLE    ( ( HB_TYPE ) 0x00010 )
 #define HB_IT_DATE      ( ( HB_TYPE ) 0x00020 )
 #define HB_IT_TIMESTAMP ( ( HB_TYPE ) 0x00040 )
+#define HB_IT_DATETIME  ( ( HB_TYPE ) 0x00060 )
 #define HB_IT_LOGICAL   ( ( HB_TYPE ) 0x00080 )
 #define HB_IT_SYMBOL    ( ( HB_TYPE ) 0x00100 )
 #define HB_IT_ALIAS     ( ( HB_TYPE ) 0x00200 )
@@ -93,7 +94,6 @@ HB_EXTERN_BEGIN
 #define HB_IT_OBJECT    HB_IT_ARRAY
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
-#define HB_IT_DATETIME  ( ( HB_TYPE ) ( HB_IT_DATE | HB_IT_TIMESTAMP ) )
 #define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFFFFFF )
 #define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_POINTER | HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF | HB_IT_SYMBOL ) )
 #define HB_IT_GCITEM    ( ( HB_TYPE ) ( HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_HASH | HB_IT_POINTER | HB_IT_BYREF ) )

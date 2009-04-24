@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.58 2009/02/28 08:44:30 lculik Exp $
+ * $Id: transfrm.c,v 1.59 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -100,10 +100,10 @@ HB_FUNC( TRANSFORM )
    PHB_ITEM pPic = hb_param( 2, HB_IT_STRING ); /* Picture string */
    BOOL bError = FALSE;
 
-   if( pPic && pPic->item.asString.length > 0 )
+   if( pPic && hb_itemGetCLen( pPic ) > 0 )
    {
-      char * szPic = pPic->item.asString.value;
-      ULONG  ulPicLen = pPic->item.asString.length;
+      char * szPic = hb_itemGetCPtr( pPic );
+      ULONG  ulPicLen = hb_itemGetCLen( pPic );
       USHORT uiPicFlags; /* Function flags */
 
       ULONG  ulParamS = 0; /* To avoid GCC -O2 warning */
@@ -217,8 +217,8 @@ HB_FUNC( TRANSFORM )
 
       if( HB_IS_STRING( pValue ) )
       {
-         char * szExp = pValue->item.asString.value;
-         ULONG  ulExpLen = pValue->item.asString.length;
+         char * szExp = hb_itemGetCPtr( pValue );
+         ULONG  ulExpLen = hb_itemGetCLen( pValue );
          ULONG  ulExpPos = 0;
          char * szPicNew = NULL;
 
@@ -247,8 +247,7 @@ HB_FUNC( TRANSFORM )
          if( ( uiPicFlags & PF_DATE ) ||
            ( ( uiPicFlags & PF_BRITISH ) && ( uiPicFlags & PF_REMAIN ) ) )
          {
-            hb_dateFormat( "XXXXXXXX", szPicDate, hb_set.HB_SET_DATEFORMAT );
-
+            hb_dateFormat( "XXXXXXXX", szPicDate, hb_setGetDateFormat() );
             szPic = szPicDate;
             ulPicLen = strlen( szPicDate );
          }
@@ -466,7 +465,7 @@ HB_FUNC( TRANSFORM )
       {
          char szPicDate[ 11 ];
          char szDate[ 9 ];
-         char * cDtFormat =  hb_set.HB_SET_DATEFORMAT;
+         char * cDtFormat =  hb_setGetDateFormat();
 
          ULONG nFor;
 
@@ -1066,16 +1065,13 @@ HB_FUNC( TRANSFORM )
       {
          BOOL bDone = FALSE;
          BOOL bExit = FALSE;
-
          char cPic;
 
          ulResultPos = 0;
-
          szResult = ( char * ) hb_xgrab( ulPicLen + 2 );
 
          for( ; ( ulPicLen || !bDone ) && !bExit ; ulResultPos++, szPic++, ulPicLen-- )
          {
-
             if( ulPicLen )
                cPic = *szPic;
             else
@@ -1122,7 +1118,6 @@ HB_FUNC( TRANSFORM )
             if( !( uiPicFlags & PF_REMAIN ) )
                bExit = TRUE;
          }
-
       }
 
       /* ======================================================= */
@@ -1168,6 +1163,14 @@ HB_FUNC( TRANSFORM )
       {
          hb_itemReturn( pValue );
       }
+      else if( HB_IS_TIMESTAMP( pValue ) )
+      {
+         char szDateTime[ 26 ];
+         char szDate[ 19 ];
+         
+         hb_datetimeDecStr( szDate, pValue->item.asDate.value, pValue->item.asDate.time );
+         hb_retc( hb_datetimeFormat( szDate, szDateTime, hb_setGetDateFormat(), hb_setGetTimeFormat() ) );
+      }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
          char szDate[ 9 ];
@@ -1192,9 +1195,7 @@ HB_FUNC( TRANSFORM )
          hb_retc( hb_itemGetL( pValue ) ? "T" : "F" );
       }
       else
-      {
          bError = TRUE;
-      }
    }
    else
       bError = TRUE;

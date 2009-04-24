@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.97 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: set.c,v 1.98 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -200,9 +200,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
       szString[ 0 ] = '\0';
    }
    else
-   {
       szString = szOldString;
-   }
 
    return szString;
 }
@@ -1428,6 +1426,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_CONFIRM = FALSE;
    hb_set.HB_SET_CONSOLE = TRUE;
    hb_set.HB_SET_DATEFORMAT = hb_strdup( "mm/dd/yy" );
+   hb_set.HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.cc" );
    /*
     * Tests shows that Clipper has two different flags to control ALT+D
     * and ALTD() behavior and on startup these flags are not synchronized.
@@ -1524,7 +1523,6 @@ void hb_setInitialize( void )
    hb_set.hb_set_printerjob=NULL;
    hb_set.hb_set_winprinter=FALSE;
 
-   hb_set.HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.cc" );
 
    hb_set.HB_SET_MACROBLOCKVARS = FALSE;
    hb_set.HB_SET_WORKAREAS_SHARED = TRUE;
@@ -1556,6 +1554,7 @@ void hb_setRelease( void )
 
    if( hb_set.HB_SET_ALTFILE )    hb_xfree( hb_set.HB_SET_ALTFILE );
    if( hb_set.HB_SET_DATEFORMAT ) hb_xfree( hb_set.HB_SET_DATEFORMAT );
+   if( hb_set.HB_SET_TIMEFORMAT ) hb_xfree( hb_set.HB_SET_TIMEFORMAT );
    if( hb_set.HB_SET_DEFAULT )    hb_xfree( hb_set.HB_SET_DEFAULT );
    if( hb_set.HB_SET_DELIMCHARS ) hb_xfree( hb_set.HB_SET_DELIMCHARS );
    if( hb_set.HB_SET_DEVICE )     hb_xfree( hb_set.HB_SET_DEVICE );
@@ -1566,7 +1565,6 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_EOL )        hb_xfree( hb_set.HB_SET_EOL );
    if( hb_set.HB_SET_OSCODEPAGE ) hb_xfree( hb_set.HB_SET_OSCODEPAGE );
    if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
-   if( hb_set.HB_SET_TIMEFORMAT ) hb_xfree( hb_set.HB_SET_TIMEFORMAT );
 
    hb_set.HB_SET_TYPEAHEAD = 0;   hb_inkeyReset(); /* reset keyboard buffer */
 
@@ -2684,9 +2682,14 @@ BOOL    hb_setGetConsole( void )
    return hb_set.HB_SET_CONSOLE;
 }
 
-char *  hb_setGetDateFormat( void )
+char * hb_setGetDateFormat( void )
 {
    return hb_set.HB_SET_DATEFORMAT;
+}
+
+char * hb_setGetTimeFormat( void )
+{
+   return hb_set.HB_SET_TIMEFORMAT;
 }
 
 BOOL    hb_setGetDebug( void )

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.214 2009/04/18 22:44:01 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.215 2009/04/21 23:19:47 modalsist Exp $
  */
 
 /*
@@ -1160,7 +1160,7 @@ Default nMode to 0    // first configuration
 
              xVal := Eval( aCol[ _TB_COLINFO_OBJ ]:block )
 
-             aCol[ _TB_COLINFO_TYPE      ] := valtype( xVal )
+             aCol[ _TB_COLINFO_TYPE      ] := ValType( xVal )
              aCol[ _TB_COLINFO_HEADING   ] := aCol[ _TB_COLINFO_OBJ ]:heading
              aCol[ _TB_COLINFO_FOOTING   ] := aCol[ _TB_COLINFO_OBJ ]:footing
              aCol[ _TB_COLINFO_PICT      ] := iif( Empty( aCol[ _TB_COLINFO_OBJ ]:Picture ), "", aCol[ _TB_COLINFO_OBJ ]:Picture )
@@ -1179,7 +1179,7 @@ Default nMode to 0    // first configuration
              DEFAULT aCol[ _TB_COLINFO_DEFCOLOR,3 ] TO 1
              DEFAULT aCol[ _TB_COLINFO_DEFCOLOR,4 ] TO 1
 
-             if aCol[ _TB_COLINFO_TYPE ] == 'D' .and. empty( aCol[ _TB_COLINFO_PICT ] )
+             if aCol[ _TB_COLINFO_TYPE ] == 'D' .and. empty( aCol[ _TB_COLINFO_PICT ] ) .AND. ! HB_IsTimeStamp( xVal )
                 aCol[ _TB_COLINFO_PICT ] := '@D'
              endif
 
@@ -3610,26 +3610,9 @@ STATIC FUNCTION LenVal( xVal, cType, cPict )
       case "N"
       case "C"
       case "D"
-         If !Empty( cPict )
-            nLen := Len( Transform( xVal, cPict ) )
-            exit
-         Endif
-
-         Switch cType
-            case "N"
-               nLen := Len( Str( xVal ) )
-               exit
-
-            case "C"
-               nLen := Len( xVal )
-               exit
-
-            case "D"
-               nLen := Len( DToC( xVal ) )
-               exit
-         end
+         /* If cPict is empty, transform functions returns proper value in each valtype */
+         nLen := Len( Transform( xVal, cPict ) )
          exit
-
       default
          nLen := 0
 
