@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.8 2004/09/26 14:48:42 jonnymind Exp $
+* $Id: hbini.prg,v 1.9 2009/04/23 13:05:23 ronpinkas Exp $
 */
 
 /*
@@ -159,14 +159,14 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       IF nLineEnd == 0
          IF nLineEnd == 0
             // Support for MAC line termination (13)
-            nLineEnd := At( chr(13), Substr( cData, 1, 256) )
+            nLineEnd := At( chr(13), Left( cData, 256) )
             IF nLineEnd == 0
-               nLineEnd := Len( cData )
+               nLineEnd := Len( cData ) + 1
             ENDIF
          ENDIF
       ELSE
          // 13 + 10
-         IF cData[ nLineEnd - 1 ] == 13
+         IF nLineEnd > 1 .AND. cData[ nLineEnd - 1 ] == 13
             nLineEnd--
          ENDIF
       ENDIF
@@ -175,7 +175,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       cLine += AllTrim( Left( cData, nLineEnd - 1 ) )
 
       // if line terminator is 13 + 10 restore eol position
-      IF cData[ nLineEnd ] == 13 .AND. cData[ nLineEnd + 1 ] == 10
+      IF Len( cLine ) > nLineEnd .AND. cData[ nLineEnd ] == 13 .AND. cData[ nLineEnd + 1 ] == 10
          nLineEnd++
       ENDIF
 
