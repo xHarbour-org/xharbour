@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.7 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: dbfnsx1.c,v 1.8 2009/04/23 18:14:34 ronpinkas Exp $
  */
 
 /*
@@ -4706,7 +4706,7 @@ static BOOL hb_nsxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
 {
    NSXAREAP pArea = pTag->pIndex->pArea;
    BOOL fFound = FALSE;
-   PHB_REGEX pRegEx;
+   PHB_REGEX pRegEx = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_nsxOrdSkipRegEx(%p, %d, %p)", pTag, fForward, pRegExItm));
 
