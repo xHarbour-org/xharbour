@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.181 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: genc.c,v 1.182 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -1794,8 +1794,8 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
       sInline += 7;
       iOption = HB_PROTO_FUNC_PUBLIC;
 
-      /* If it is a PHB_FUNC then skip it */
-      if ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' )
+      /* If it is a PHB_FUNC then skip it OR HB_FUNC is prefixed with other character */
+      if ( ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' ) || ( *(sInline - 8 ) != 32 && *(sInline - 8 ) != 10 ) )
       {
          continue;
       }
@@ -1914,8 +1914,10 @@ static void hb_compGenCInLineSymbol()
 
       if( sInline )
       {
-         hb_compGenCCheckInLineStatic( sInline );
+         char *szStripped = hb_stripOutComments( sInline );
+         hb_compGenCCheckInLineStatic( szStripped );
          hb_xfree( sInline );
+         hb_xfree( szStripped );
          pInline = pInline->pNext;
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.37 2009/02/28 08:44:29 lculik Exp $
+ * $Id: hbstr.c,v 1.38 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -1067,15 +1067,16 @@ ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
 
 /*
  * Simple routine to extract uncommented part of (read) buffer
+ * First written: 2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
  */
 char * hb_stripOutComments( char * buffer )
 {
    if( buffer && *buffer )
    {
-      USHORT ui = (USHORT) strlen( buffer );
+      ULONG ui = (ULONG) strlen( buffer );
       char *szOut = (char*) hb_xgrab( ui + 1 );
-      int i;
-      int uu = 0;
+      ULONG i;
+      ULONG uu = 0;
       char *last;
 
       hb_xmemset( szOut, 0, ui + 1 );
