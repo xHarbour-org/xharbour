@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.182 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: genc.c,v 1.183 2009/04/27 10:05:09 andijahja Exp $
  */
 
 /*
@@ -1786,8 +1786,27 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
    char *szTmp, *szTmp2;
    int iOption;
    char *sBase = sInline;
+   ULONG uL, i = 0, uLine = strlen( sInline );
+   char *szDummy = (char*) hb_xgrab( uLine + 1 );
 
-   //printf( "%s\n", sInline );
+   memset( szDummy, 0, uLine + 1 );
+
+   for( uL = 0; uL < uLine; uL++ )
+   {
+      if ( sInline[uL] == '"' )
+      {
+         while( ++uL < uLine )
+         {
+            if( sInline[uL] == '"' )
+               break;
+         }
+      }
+      else
+         szDummy[i++] = sInline[uL];
+   }
+
+   strcpy( sInline, szDummy );
+   hb_xfree( szDummy );
 
    while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
@@ -1795,7 +1814,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
       iOption = HB_PROTO_FUNC_PUBLIC;
 
       /* If it is a PHB_FUNC then skip it OR HB_FUNC is prefixed with other character */
-      if ( ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' ) || ( *(sInline - 8 ) != 32 && *(sInline - 8 ) != 10 ) )
+      if ( ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' ) )
       {
          continue;
       }
@@ -1868,6 +1887,12 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
                 sInline[5] == 'I' &&
                 sInline[6] == 'C' )
       {
+
+         if ( sInline[7] != ' ' && sInline[7] != '(' )
+	 {
+            sInline += 7;
+            continue;
+	 }
          iOption = HB_PROTO_FUNC_STATIC;
          sInline += 7;
       }

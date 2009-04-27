@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6435 2009/04/27 08:40:16 marchuet Exp $
+ * $Id: ChangeLog,v 1.6436 2009/04/27 10:05:09 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-28 06:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/genc.c
+    ! minor fix in parsing function name (yet to be improved) so that
+      a more "dirty" code like below is now compiled fine.
+      (Thanks to Przemek for pointing it out)
+
+        proc main()
+           ? YEAR( DATE() ), MONTH( DATE() ), DAY( DATE() ), TEST()
+           ? T1(), T2()
+        return
+        #pragma begindump
+        #include "hbapi.h"
+        /* are comments stripped? If not then HB_FUNC_STATIC( DATE )
+           in comment can create troubles. */
+        // HB_FUNC_STATIC( YEAR ) just like this one in C++ comments
+        #define MYHB_FUNC_STATIC( fun )  #fun // to test whole word tokens
+        #define HB_FUNC_STATIC_STR( fun )  #fun // to test whole word tokens
+        /* COMMENT */HB_FUNC_STATIC( TEST )
+        {
+           hb_retc( " HB_FUNC_STATIC( DAY )\n{ ... }\n" HB_FUNC_STATIC_STR( MONTH ) );
+        }
+        #pragma enddump
+
+        #pragma begindump
+        HB_FUNC_STATIC(T1){hb_retc("T1");}HB_FUNC_STATIC(T2){hb_retc("T2");}
+        #pragma enddump
 
 2009-04-27 17:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbstr.c
