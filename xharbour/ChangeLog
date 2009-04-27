@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6433 2009/04/24 09:52:13 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6434 2009/04/24 15:48:49 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-04-27 17:49 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+    * minor adjusts, an added a few comments.
+  * tests\datetime.prg
+    * Added DbSkip( 0 ) to clarify how works STAMPED fieldtype TIMESTAMP.
 
 2009-04-24 17:49 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbapi.h

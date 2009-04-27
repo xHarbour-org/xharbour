@@ -22,6 +22,7 @@ PROCEDURE Main()
       FIELD->DATE     := Date() - nItem
       FIELD->DATETIME := DateTime() - nItem
       FIELD->STRINGDT := TTOC( FIELD->DATETIME )
+      DbSkip( 0 ) /* To force TIME STAMP update */
       FIELD->STRINGT  := TTOC( FIELD->TIMESTAMP )
    NEXT
 

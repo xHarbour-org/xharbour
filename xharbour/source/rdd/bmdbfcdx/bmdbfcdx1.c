@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.60 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: bmdbfcdx1.c,v 1.61 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -638,11 +638,12 @@ static BYTE hb_cdxItemType( PHB_ITEM pItem )
       case HB_IT_DOUBLE:
          return 'N';
 
-      case HB_IT_DATE:
-         return 'D';
-
+      /* HB_IT_DATE + HB_IT_TIMESTAMP */
       case HB_IT_DATETIME:
          return 'T';
+
+      case HB_IT_DATE:
+         return 'D';
 
       case HB_IT_LOGICAL:
          return 'L';
@@ -2841,7 +2842,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                iSize += iLen - 6 - ( j == 0 ? 0 : pPtr[ ( j + 1 ) * iLen - 2 ] ) - pPtr[ ( j + 1 ) * iLen - 1 ];
             }
             pbKey = hb_cdxPageGetKeyVal( lpTmpPage, 0 );
-            bMax = (BYTE) hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
+            bMax = ( BYTE ) hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
 #ifdef HB_CDX_PACKTRAIL
             bMax = iLen - 6 - bMax;
 #else
@@ -10277,14 +10278,15 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo, cTemp, 8 );
                   break;
 
-               case HB_IT_DATE:
-                  d = ( double ) hb_itemGetDL( pItem );
+               /* HB_IT_DATE + HB_IT_TIMESTAMP */
+               case HB_IT_DATETIME:
+                  d = hb_itemGetDTD( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo, cTemp, 8 );
                   break;
 
-               case HB_IT_DATETIME:
-                  d = hb_itemGetDTD( pItem );
+               case HB_IT_DATE:
+                  d = ( double ) hb_itemGetDL( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo, cTemp, 8 );
                   break;
