@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.183 2009/04/27 10:05:09 andijahja Exp $
+ * $Id: genc.c,v 1.184 2009/04/27 23:37:49 andijahja Exp $
  */
 
 /*
@@ -1663,10 +1663,12 @@ static void hb_compGenCAddProtos( FILE *yyc )
          {
             fprintf( yyc, "HB_FUNC_INIT( %s );\n",pTemp->szName);
          }
+	 #if 0
          else if ( pTemp->Type == HB_PROTO_FUNC_STATIC && hb_compSymbFound( pTemp->szName ) )
          {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pTemp->szName );
          }
+	 #endif
          else if ( pTemp->Type == HB_PROTO_FUNC_PUBLIC )
          {
             fprintf( yyc, "HB_FUNC( %s );\n", pTemp->szName );
@@ -1739,14 +1741,6 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption )
 static void hb_compCStatSymList( char* statSymName, int iOption )
 {
    PSSYMLIST pTemp, pLast;
-   int ulLen = strlen( statSymName );
-
-   while( ulLen && HB_ISSPACE( statSymName[ ulLen - 1 ] ) )
-   {
-      ulLen--;
-   }
-
-   statSymName[ ulLen ] = '\0';
 
    if (hb_compCStaticSymbolFound( statSymName, iOption ))
    {
@@ -1898,10 +1892,12 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
       }
 
       szTmp = strchr( sInline, '(' );
+
       if( szTmp == NULL )
       {
          continue;
       }
+
       szTmp++;
 
       while( HB_ISSPACE( *szTmp ) )
@@ -1910,6 +1906,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
       }
 
       szTmp2 = strchr( szTmp, ')' );
+
       if( szTmp2 == NULL )
       {
          continue;
@@ -1917,7 +1914,17 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
 
       *szTmp2 = '\0';
 
+      uL = strlen( szTmp );
+
+      while( uL && HB_ISSPACE( szTmp[ uL - 1 ] ) )
+      {
+         uL--;
+      }
+
+      szTmp[ uL ] = '\0';
+
       hb_compCStatSymList( szTmp, iOption );
+
       *szTmp2 = ')';
 
       sInline = szTmp2 + 1;
