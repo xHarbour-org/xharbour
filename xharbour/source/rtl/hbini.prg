@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.9 2009/04/23 13:05:23 ronpinkas Exp $
+* $Id: hbini.prg,v 1.10 2009/04/24 02:41:08 ronpinkas Exp $
 */
 
 /*
@@ -175,7 +175,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       cLine += AllTrim( Left( cData, nLineEnd - 1 ) )
 
       // if line terminator is 13 + 10 restore eol position
-      IF Len( cLine ) > nLineEnd .AND. cData[ nLineEnd ] == 13 .AND. cData[ nLineEnd + 1 ] == 10
+      IF Len( cData ) > nLineEnd .AND. cData[ nLineEnd ] == 13 .AND. cData[ nLineEnd + 1 ] == 10
          nLineEnd++
       ENDIF
 

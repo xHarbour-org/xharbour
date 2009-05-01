@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.169 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: win32ole.prg,v 1.170 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -2751,13 +2751,17 @@ RETURN Self
         // Try to apply the requested message to the DEFAULT Method of the object if any.
         if( bTryDefault )
         {
+           bTryDefault = FALSE;
+
            if( SUCCEEDED( ( /* s_nOleError = */ OleGetValue( pDisp ) ) ) )
            {
-              bTryDefault = FALSE;
-
               //TraceLog( NULL, "Try using DISPID_VALUE\n" );
               pDisp = OleVal.n1.n2.n3.pdispVal;
               goto OleGetID;
+           }
+           else
+           {
+              pDisp = NULL;
            }
         }
 
@@ -2768,7 +2772,7 @@ RETURN Self
      FreeParams( &DispParams, aPrgParams );
 
      // We are responsible to release the Default Interface which we retrieved
-     if( bTryDefault == FALSE && pDisp )
+     if( ( bTryDefault == FALSE ) && pDisp )
      {
         pDisp->lpVtbl->Release( pDisp );
      }
