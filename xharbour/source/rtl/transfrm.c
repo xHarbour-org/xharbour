@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.59 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: transfrm.c,v 1.60 2009/04/24 15:48:50 marchuet Exp $
  */
 
 /*
@@ -1163,7 +1163,7 @@ HB_FUNC( TRANSFORM )
       {
          hb_itemReturn( pValue );
       }
-      else if( HB_IS_TIMESTAMP( pValue ) )
+      else if( HB_IS_DATETIME( pValue ) )
       {
          char szDateTime[ 26 ];
          char szDate[ 19 ];

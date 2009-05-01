@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.161 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.162 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -755,7 +755,7 @@ PHB_ITEM hb_itemPutDTS( PHB_ITEM pItem, const char * szDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeEncStr( szDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMESTAMP;
+   pItem->type |= HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -774,7 +774,7 @@ PHB_ITEM hb_itemPutDT( PHB_ITEM pItem, int iYear, int iMonth, int iDay, int iHou
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeEncode( &pItem->item.asDate.value, &pItem->item.asDate.time,
                      iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, NULL );
-   pItem->type |= HB_IT_TIMESTAMP;
+   pItem->type |= HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -792,7 +792,7 @@ PHB_ITEM hb_itemPutDTL( PHB_ITEM pItem, LONG lDate, LONG lTime )
 
    pItem = hb_itemPutDate( pItem, lDate );
    pItem->item.asDate.time = lTime % ( 86400 * HB_DATETIMEINSEC );
-   pItem->type |= HB_IT_TIMESTAMP;
+   pItem->type |= HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -803,7 +803,7 @@ PHB_ITEM hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeUnpack( dDateTime / 86400, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMESTAMP;
+   pItem->type |= HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -814,7 +814,7 @@ PHB_ITEM hb_itemPutDTD( PHB_ITEM pItem, double dDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeUnpack( dDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMESTAMP;
+   pItem->type |= HB_IT_TIMEFLAG;
 
    return pItem;
 }

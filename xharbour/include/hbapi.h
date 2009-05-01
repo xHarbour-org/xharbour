@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.258 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: hbapi.h,v 1.259 2009/04/24 15:48:49 marchuet Exp $
  */
 
 /*
@@ -75,8 +75,8 @@ HB_EXTERN_BEGIN
 #define HB_IT_LONG      ( ( HB_TYPE ) 0x00008 )
 #define HB_IT_DOUBLE    ( ( HB_TYPE ) 0x00010 )
 #define HB_IT_DATE      ( ( HB_TYPE ) 0x00020 )
-#define HB_IT_TIMESTAMP ( ( HB_TYPE ) 0x00040 )
-#define HB_IT_DATETIME  ( ( HB_TYPE ) 0x00060 )
+#define HB_IT_TIMEFLAG  ( ( HB_TYPE ) 0x00040 )
+#define HB_IT_DATETIME  (  HB_IT_TIMEFLAG | HB_IT_DATE )
 #define HB_IT_LOGICAL   ( ( HB_TYPE ) 0x00080 )
 #define HB_IT_SYMBOL    ( ( HB_TYPE ) 0x00100 )
 #define HB_IT_ALIAS     ( ( HB_TYPE ) 0x00200 )
@@ -128,8 +128,8 @@ HB_EXTERN_BEGIN
 #define HB_IS_NIL( p )        ( HB_ITEM_TYPE( p ) == HB_IT_NIL )
 #define HB_IS_ARRAY( p )      ( HB_ITEM_TYPE( p ) == HB_IT_ARRAY )
 #define HB_IS_BLOCK( p )      ( HB_ITEM_TYPE( p ) == HB_IT_BLOCK )
-#define HB_IS_DATE( p )       ( HB_ITEM_TYPE( p ) == HB_IT_DATE )
-#define HB_IS_TIMESTAMP( p )  ( HB_ITEM_TYPE( p ) == HB_IT_TIMESTAMP )
+#define HB_IS_DATE( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_DATE ) != 0 )
+#define HB_IS_DATETIME( p )   ( HB_ITEM_TYPE( p ) == HB_IT_DATETIME )
 #define HB_IS_DOUBLE( p )     ( HB_ITEM_TYPE( p ) == HB_IT_DOUBLE )
 #define HB_IS_INTEGER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_INTEGER )
 #define HB_IS_LOGICAL( p )    ( HB_ITEM_TYPE( p ) == HB_IT_LOGICAL )
@@ -146,7 +146,6 @@ HB_EXTERN_BEGIN
 #define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
 #define HB_IS_NUMERIC( p )    ( HB_IS_NUMBER( p ) || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
 #define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
-#define HB_IS_DATETIME( p )   ( ( HB_ITEM_TYPE( p ) & HB_IT_DATETIME ) != 0 )
 #define HB_IS_ORDERABLE( p )  ( ( HB_ITEM_TYPE( p ) & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) != 0 )
 #define HB_IS_COMPLEX( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 )
 #define HB_IS_SIMPLE( p )     ( ( HB_ITEM_TYPE( p ) & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
@@ -167,7 +166,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_ARRAY( p )      ( ( HB_ITEM_TYPERAW( p ) & HB_IT_ARRAY ) != 0 )
 #define HB_IS_BLOCK( p )      ( ( HB_ITEM_TYPERAW( p ) & HB_IT_BLOCK ) != 0 )
 #define HB_IS_DATE( p )       ( ( HB_ITEM_TYPERAW( p ) & HB_IT_DATE ) != 0 )
-#define HB_IS_TIMESTAMP( p )  ( ( HB_ITEM_TYPERAW( p ) & HB_IT_TIMESTAMP ) != 0 )
+#define HB_IS_DATETIME( p )   ( ( HB_ITEM_TYPERAW( p ) & HB_IT_TIMEFLAG ) != 0 )
 #define HB_IS_DOUBLE( p )     ( ( HB_ITEM_TYPERAW( p ) & HB_IT_DOUBLE ) != 0 )
 #define HB_IS_INTEGER( p )    ( ( HB_ITEM_TYPERAW( p ) & HB_IT_INTEGER ) != 0 )
 #define HB_IS_LOGICAL( p )    ( ( HB_ITEM_TYPERAW( p ) & HB_IT_LOGICAL ) != 0 )
@@ -185,7 +184,6 @@ HB_EXTERN_BEGIN
 #define HB_IS_NUMERIC( p )    ( ( HB_ITEM_TYPERAW( p ) & ( HB_IT_NUMERIC | HB_IT_DATE ) ) != 0 || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
 #define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPERAW( p ) & HB_IT_NUMERIC ) != 0 )
 #define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPERAW( p ) & HB_IT_NUMINT ) != 0 )
-#define HB_IS_DATETIME( p )   ( ( HB_ITEM_TYPERAW( p ) & HB_IT_DATETIME ) != 0 )
 #define HB_IS_ORDERABLE( p )  ( ( HB_ITEM_TYPERAW( p ) & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) != 0 )
 #define HB_IS_COMPLEX( p )    ( ( HB_ITEM_TYPERAW( p ) & HB_IT_COMPLEX ) != 0 )
 #define HB_IS_SIMPLE( p )     ( ( HB_ITEM_TYPERAW( p ) & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) ) != 0 )
@@ -211,8 +209,7 @@ HB_EXTERN_BEGIN
 #define ISNUM( n )         ( hb_param( n, HB_IT_NUMERIC ) != NULL )
 #define ISLOG( n )         ( hb_param( n, HB_IT_LOGICAL ) != NULL )
 #define ISDATE( n )        ( hb_param( n, HB_IT_DATE ) != NULL )
-#define ISTIMESTAMP( n )   ( hb_param( n, HB_IT_TIMESTAMP ) != NULL )   /* Not available in CA-Cl*pper. */
-#define ISDATETIME( n )    ( hb_param( n, HB_IT_DATE ) != NULL && hb_param( n, HB_IT_DATE )->item.asDate.time != 0 )
+#define ISDATETIME( n )    ( hb_param( n, HB_IT_DATETIME ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISMEMO( n )        ( hb_param( n, HB_IT_MEMO ) != NULL )
 #define ISBYREF( n )       ( ( hb_parinfo( n ) & HB_IT_BYREF ) != 0 ) /* NOTE: Intentionally using a different method */
 #define ISARRAY( n )       ( hb_param( n, HB_IT_ARRAY ) != NULL )

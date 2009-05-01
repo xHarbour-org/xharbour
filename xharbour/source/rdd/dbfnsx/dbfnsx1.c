@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.8 2009/04/23 18:14:34 ronpinkas Exp $
+ * $Id: dbfnsx1.c,v 1.9 2009/04/24 09:52:14 enricomaria Exp $
  */
 
 /*
@@ -549,11 +549,12 @@ static BYTE hb_nsxItemType( PHB_ITEM pItem )
       case HB_IT_DOUBLE:
          return 'N';
 
+      /* HB_IT_DATE + HB_IT_TIMEFLAG */
+      case HB_IT_DATETIME:
+         return 'T';
+         
       case HB_IT_DATE:
          return 'D';
-
-      case HB_IT_TIMESTAMP:
-         return 'T';
 
       case HB_IT_LOGICAL:
          return 'L';
@@ -5912,7 +5913,7 @@ static HB_ERRCODE hb_nsxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                   break;
 
                case HB_IT_DATE:
-               case HB_IT_TIMESTAMP:
+               case HB_IT_DATETIME:
                   if( pTag->KeyType == 'T' )
                      d = hb_itemGetDTD( pItem );
                   else

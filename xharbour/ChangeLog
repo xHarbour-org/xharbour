@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6438 2009/04/28 07:06:30 andijahja Exp $
+ * $Id: ChangeLog,v 1.6439 2009/05/01 10:56:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-01 22:29 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbapi.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfnsx\dbfnsx1.c
+  * source\rtl\transfrm.c
+  * source\rtl\valtype.c
+  * source\vm\hvm.c
+  * source\vm\itemapi.c
+    * Removed HB_IT_TIMESTAMP, and changed (.time != 0) by HB_IIT_TIMEFLAG how will be added to
+      HB_IT_DATE when time has value. It's little faster, and more clear.
+    ! fixed VM to work with this changes.
 
 2009-05-01 0618 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/rtl/hbini.prg

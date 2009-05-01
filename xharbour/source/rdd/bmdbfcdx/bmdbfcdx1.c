@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.61 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.62 2009/04/27 08:40:16 marchuet Exp $
  */
 
 /*
@@ -638,7 +638,7 @@ static BYTE hb_cdxItemType( PHB_ITEM pItem )
       case HB_IT_DOUBLE:
          return 'N';
 
-      /* HB_IT_DATE + HB_IT_TIMESTAMP */
+      /* HB_IT_DATE + HB_IT_TIMEFLAG */
       case HB_IT_DATETIME:
          return 'T';
 
@@ -10278,7 +10278,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo, cTemp, 8 );
                   break;
 
-               /* HB_IT_DATE + HB_IT_TIMESTAMP */
+               /* HB_IT_DATE + HB_IT_TIMEFLAG */
                case HB_IT_DATETIME:
                   d = hb_itemGetDTD( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );

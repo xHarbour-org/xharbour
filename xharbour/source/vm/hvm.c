@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.721 2009/03/25 21:33:54 ronpinkas Exp $
+ * $Id: hvm.c,v 1.722 2009/04/13 16:57:27 likewolf Exp $
  */
 
 /*
@@ -8671,7 +8671,7 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
       hb_itemClear( pResult );
    }
 
-   pResult->type = HB_IT_DATE;
+   pResult->type = lTime ? HB_IT_DATETIME : HB_IT_DATE;
    pResult->item.asDate.time  = lTime;
    pResult->item.asDate.value = lDate;
 
@@ -8714,7 +8714,7 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
      lDate = 0;
    }
 
-   pDate->type = HB_IT_DATE;
+   pDate->type = lTime ? HB_IT_DATETIME : HB_IT_DATE;
    pDate->item.asDate.value = lDate;
    pDate->item.asDate.time  = lTime;
    return;
@@ -9005,7 +9005,7 @@ void hb_vmPushDateTime( LONG lDate, LONG lTime )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushDateTime(%ld,%ld)", lDate, lTime));
 
    pItem = hb_stackAllocItem();
-   pItem->type = HB_IT_DATE;
+   pItem->type = HB_IT_DATETIME;
    pItem->item.asDate.value = lDate;
    pItem->item.asDate.time  = lTime;
 }
@@ -9559,6 +9559,7 @@ static double hb_vmPopNumber( void )
          break;
 
       case HB_IT_DATE:
+      case HB_IT_DATETIME:      
          dNumber = (double) pItem->item.asDate.value;
          if( pItem->item.asDate.time )
          {

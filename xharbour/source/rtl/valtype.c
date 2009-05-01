@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.13 2008/11/18 17:55:45 marchuet Exp $
+ * $Id: valtype.c,v 1.14 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ HB_FUNC( HB_ISDATETIME )
 
 HB_FUNC( HB_ISTIMESTAMP )
 {
-   hb_retl( ISTIMESTAMP( 1 ) );
+   hb_retl( ( hb_parinfo( 1 ) & HB_IT_TIMEFLAG ) != 0 );   
 }
 
 HB_FUNC( HB_ISBLOCK )
