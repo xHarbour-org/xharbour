@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.722 2009/04/13 16:57:27 likewolf Exp $
+ * $Id: hvm.c,v 1.723 2009/05/01 21:11:03 marchuet Exp $
  */
 
 /*
@@ -9559,12 +9559,10 @@ static double hb_vmPopNumber( void )
          break;
 
       case HB_IT_DATE:
-      case HB_IT_DATETIME:      
          dNumber = (double) pItem->item.asDate.value;
-         if( pItem->item.asDate.time )
-         {
-           dNumber = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-         }
+         break;      
+      case HB_IT_DATETIME:      
+         dNumber = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          break;
 
       case HB_IT_STRING:
