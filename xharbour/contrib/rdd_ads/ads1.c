@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.140 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: ads1.c,v 1.141 2009/05/04 08:25:44 marchuet Exp $
  */
 
 /*
@@ -572,7 +572,7 @@ static HB_ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, 
                      ++lTime;
                      HB_PUT_BE_UINT32( pKeyBuf, lDate );
                      HB_PUT_BE_UINT32( &pKeyBuf[ 4 ], lTime );
-                     AdsSetScope( hOrder, nScope, pKeyBuf, HB_IS_TIMESTAMP( pItem ) ? 8 : 4, ADS_RAWKEY );
+                     AdsSetScope( hOrder, nScope, pKeyBuf, HB_IS_DATETIME( pItem ) ? 8 : 4, ADS_RAWKEY );
                      break;
                   }
 #if ADS_LIB_VERSION >= 900

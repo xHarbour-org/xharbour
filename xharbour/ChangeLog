@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6441 2009/05/04 08:25:44 marchuet Exp $
+ * $Id: ChangeLog,v 1.6442 2009/05/04 11:44:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-04 21:39 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * contrib\rdd_ads\ads1.c
+    ! fixed, xharbour API uses HB_IS_DATETIME instead of HB_IS_TIMESTAMP.
 
 2009-05-04 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbstr.c
