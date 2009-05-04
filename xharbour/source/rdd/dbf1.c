@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.203 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: dbf1.c,v 1.204 2009/04/23 22:07:19 ronpinkas Exp $
  */
 
 /*
@@ -290,7 +290,7 @@ static void hb_dbfUpdateStampFields( DBFAREAP pArea )
 
 static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
 {
-   BYTE *pPtr = pArea->pRecord, bFill = ' ', bNext;
+   BYTE * pPtr = pArea->pRecord, bFill = ' ', bNext;
    ULONG ulSize = 1; /* 1 byte ' ' for DELETE flag */
    USHORT uiCount;
    LPFIELD pField;
@@ -3197,7 +3197,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
 #endif
 
-   pArea->fShared = FALSE;    /* pCreateInfo->fShared; */
+   pArea->fShared = FALSE;    /* pCreateInfo->fShared */
    pArea->fReadonly = FALSE;  /* pCreateInfo->fReadonly */
    pArea->ulRecCount = 0;
    pArea->uiHeaderLen = ( USHORT ) ( sizeof( DBFHEADER ) + ulSize );

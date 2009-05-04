@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6439 2009/05/01 10:56:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6440 2009/05/01 21:05:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-04 10:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * contrib\rdd_ads\ads1.c
+    * changed FAILURE by HB_FAILURE, SUCCESS by HB_SUCCESS
+    * changed support of datetime (TIMESTAMP) fields from string items to datetime items.
+    * changes support of varlength fields adding subtypes ADS_VARBINARY_FOX, ADS_VARCHAR_FOX, ADS_VARCHAR
+      (synced with harbour as possible)
+  * source\rdd\dbf1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+    * white spaces.
 
 2009-05-01 22:29 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbapi.h

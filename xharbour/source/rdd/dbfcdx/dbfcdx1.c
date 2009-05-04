@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.292 2009/04/27 08:40:16 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.293 2009/05/01 21:10:19 marchuet Exp $
  */
 
 /*
@@ -4738,7 +4738,7 @@ static void hb_cdxIndexReindex( LPCDXINDEX pIndex )
    {
       pTag = pTagList;
       hb_cdxIndexAddTag( pIndex, pTag->szName, pTag->KeyExpr, pTag->pKeyItem,
-         (BYTE) pTag->uiType, pTag->uiLen, pTag->ForExpr, pTag->pForItem,
+         ( BYTE ) pTag->uiType, pTag->uiLen, pTag->ForExpr, pTag->pForItem,
          pTag->AscendKey, pTag->UniqueKey, pTag->Custom, TRUE );
       pTagList = pTag->pNext;
       pTag->pKeyItem = pTag->pForItem = NULL;
