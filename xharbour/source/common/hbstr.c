@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.39 2009/04/27 10:05:09 andijahja Exp $
+ * $Id: hbstr.c,v 1.40 2009/05/04 11:44:23 andijahja Exp $
  */
 
 /*
@@ -1112,26 +1112,6 @@ char * hb_stripOutComments( char * buffer )
          szOut[ uu ++ ] = buffer[ i ];
       }
 
-      /* trim left */
-      ui = strlen( szOut );
-      while( ui && HB_ISSPACE( *szOut ) )
-      {
-         szOut++;
-         ui--;
-      }
-
-      /* trim right */
-      last = szOut + strlen ( szOut );
-      while ( last > szOut )
-      {
-         if ( !HB_ISSPACE( *( last - 1 ) ) )
-         {
-            break;
-         }
-         last--;
-      }
-
-      *last = 0;
       return( szOut );
    }
    else
