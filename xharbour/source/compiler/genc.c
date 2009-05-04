@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.184 2009/04/27 23:37:49 andijahja Exp $
+ * $Id: genc.c,v 1.185 2009/04/28 07:06:31 andijahja Exp $
  */
 
 /*
@@ -1778,117 +1778,15 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
 static void hb_compGenCCheckInLineStatic( char *sInline )
 {
    char *szTmp, *szTmp2;
-   int iOption;
-   char *sBase = sInline;
-   ULONG uL, i = 0, uLine = strlen( sInline );
-   char *szDummy = (char*) hb_xgrab( uLine + 1 );
+   ULONG uL;
 
-   memset( szDummy, 0, uLine + 1 );
-
-   for( uL = 0; uL < uLine; uL++ )
+   while( ( sInline = strstr( sInline, "HB_FUNC_STATIC" ) ) != NULL )
    {
-      if ( sInline[uL] == '"' )
-      {
-         while( ++uL < uLine )
-         {
-            if( sInline[uL] == '"' )
-               break;
-         }
-      }
-      else
-         szDummy[i++] = sInline[uL];
-   }
+      sInline += 14;
 
-   strcpy( sInline, szDummy );
-   hb_xfree( szDummy );
-
-   while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
-   {
-      sInline += 7;
-      iOption = HB_PROTO_FUNC_PUBLIC;
-
-      /* If it is a PHB_FUNC then skip it OR HB_FUNC is prefixed with other character */
-      if ( ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' ) )
+      if ( sInline[0] != ' ' && sInline[0] != '(' )
       {
          continue;
-      }
-      /* If it is a HB_FUNCNAME, we want it for externs */
-      else if ( sInline[0] == 'N' &&
-                sInline[1] == 'A' &&
-                sInline[2] == 'M' &&
-                sInline[3] == 'E' )
-      {
-         sInline += 4;
-         continue;
-      }
-      /* If it is a HB_FUNC_PTR then skip it */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'P' &&
-                sInline[2] == 'T' &&
-                sInline[3] == 'R' )
-      {
-         sInline += 4;
-         continue;
-      }
-      /* If it is a HB_FUNC_EXTERN then skip it */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'E' &&
-                sInline[2] == 'X' &&
-                sInline[3] == 'T' &&
-                sInline[4] == 'E' &&
-                sInline[5] == 'R' &&
-                sInline[6] == 'N' )
-      {
-         sInline += 7;
-         continue;
-      }
-      /* If it is a HB_FUNC_EXEC then skip it */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'E' &&
-                sInline[2] == 'X' &&
-                sInline[3] == 'E' &&
-                sInline[4] == 'C' )
-      {
-         sInline += 5;
-         continue;
-      }
-      /* If it is a HB_FUNC_EXIT */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'E' &&
-                sInline[2] == 'X' &&
-                sInline[3] == 'I' &&
-                sInline[4] == 'T' )
-      {
-         iOption = HB_PROTO_FUNC_EXIT;
-         sInline += 5;
-      }
-      /* If it is a HB_FUNC_INIT */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'I' &&
-                sInline[2] == 'N' &&
-                sInline[3] == 'I' &&
-                sInline[4] == 'T' )
-      {
-         iOption = HB_PROTO_FUNC_INIT;
-         sInline += 5;
-      }
-      /* If it is a HB_FUNC_STATIC we want it */
-      else if ( sInline[0] == '_' &&
-                sInline[1] == 'S' &&
-                sInline[2] == 'T' &&
-                sInline[3] == 'A' &&
-                sInline[4] == 'T' &&
-                sInline[5] == 'I' &&
-                sInline[6] == 'C' )
-      {
-
-         if ( sInline[7] != ' ' && sInline[7] != '(' )
-	 {
-            sInline += 7;
-            continue;
-	 }
-         iOption = HB_PROTO_FUNC_STATIC;
-         sInline += 7;
       }
 
       szTmp = strchr( sInline, '(' );
@@ -1923,7 +1821,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
 
       szTmp[ uL ] = '\0';
 
-      hb_compCStatSymList( szTmp, iOption );
+      hb_compCStatSymList( szTmp, HB_PROTO_FUNC_STATIC );
 
       *szTmp2 = ')';
 

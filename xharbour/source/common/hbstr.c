@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.38 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: hbstr.c,v 1.39 2009/04/27 10:05:09 andijahja Exp $
  */
 
 /*
@@ -1113,9 +1113,11 @@ char * hb_stripOutComments( char * buffer )
       }
 
       /* trim left */
-      while ( HB_ISSPACE( *szOut ) )
+      ui = strlen( szOut );
+      while( ui && HB_ISSPACE( *szOut ) )
       {
-         strcpy( szOut, szOut + 1 );
+         szOut++;
+         ui--;
       }
 
       /* trim right */

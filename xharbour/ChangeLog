@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6440 2009/05/01 21:05:24 marchuet Exp $
+ * $Id: ChangeLog,v 1.6441 2009/05/04 08:25:44 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-04 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbstr.c
+    ! minor optimization on string left-trimming
+
+  * source/compiler/genc.c
+    ! fix inconsistent function protopyte declaration
+      NOTE: still has a bug to fix on an abnormal use of "HB_FUNC_STATIC(X)",
+            with quotation marks, but IMO this is a rare and an unusual usage,
+            but yet, to be fixed. IOW, under normal usage, static functions under
+            pragma begindump/enddump should now work OK.
+
 
 2009-05-04 10:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * contrib\rdd_ads\ads1.c
