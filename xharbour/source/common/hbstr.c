@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.40 2009/05/04 11:44:23 andijahja Exp $
+ * $Id: hbstr.c,v 1.41 2009/05/04 19:45:45 andijahja Exp $
  */
 
 /*
@@ -1077,7 +1077,7 @@ char * hb_stripOutComments( char * buffer )
       char *szOut = (char*) hb_xgrab( ui + 1 );
       ULONG i;
       ULONG uu = 0;
-      char *last;
+      /* char *last; */
 
       hb_xmemset( szOut, 0, ui + 1 );
 
