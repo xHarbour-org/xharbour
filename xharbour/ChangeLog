@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6445 2009/05/05 18:42:33 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6446 2009/05/05 19:49:17 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -42,7 +42,7 @@
     * changed FAILURE by HB_FAILURE, SUCCESS by HB_SUCCESS
     * changed support of datetime (TIMESTAMP) fields from string items to datetime items.
     * changes support of varlength fields adding subtypes ADS_VARBINARY_FOX, ADS_VARCHAR_FOX, ADS_VARCHAR
-      (synced with harbour as possible)
+      (synced with harbour as possible, harbour code by Przemyslaw Czerpak )
   * source\rdd\dbf1.c
   * source\rdd\dbfcdx\dbfcdx1.c
     * white spaces.
@@ -56,7 +56,7 @@
   * source\rtl\valtype.c
   * source\vm\hvm.c
   * source\vm\itemapi.c
-    * Removed HB_IT_TIMESTAMP, and changed (.time != 0) by HB_IIT_TIMEFLAG how will be added to
+    * Removed HB_IT_TIMESTAMP, and changed (.time != 0) by HB_IT_TIMEFLAG how will be added to
       HB_IT_DATE when time has value. It's little faster, and more clear.
     ! fixed VM to work with this changes.
 
@@ -184,8 +184,10 @@
       only for nsx and cdx index types.
     * simplified code and minor adjusts.
     * Changed ( ( LPDBFDATA ) pRDD->lpvCargo ) by DBFNODE_DATA( pRDD ), to do more readable code.
+      (Original ideas by Przemyslaw Czerpak at harbour)
   * source\rtl\filesys.c
     + Added partial support to  OSCodePage in function hb_fsNameConv.
+      hb_osEncode()/hb_osDecode() ported from harbour by Viktor Szakats
 
  * source\rtl\spfiles.c
     + added hb_spFileExists( BYTE * pFilename, BYTE * pRetPath ) called from rdds.
