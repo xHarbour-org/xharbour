@@ -1069,7 +1069,7 @@ ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
  * Simple routine to extract uncommented part of (read) buffer
  * First written: 2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
  */
-char * hb_stripOutComments( char * buffer )
+char * hb_stripOutComments( char * buffer, BOOL bStripString )
 {
    if( buffer && *buffer )
    {
@@ -1077,13 +1077,15 @@ char * hb_stripOutComments( char * buffer )
       char *szOut = (char*) hb_xgrab( ui + 1 );
       ULONG i;
       ULONG uu = 0;
-      /* char *last; */
+      char sCurrent;
 
       hb_xmemset( szOut, 0, ui + 1 );
 
       for ( i = 0; i < ui; i ++ )
       {
-         if ( buffer[ i ] == '/' )
+         sCurrent = buffer[ i ];
+
+         if ( sCurrent == '/' )
          {
             if( buffer [ i + 1 ] == '*' )
             {
@@ -1108,6 +1110,25 @@ char * hb_stripOutComments( char * buffer )
                }
             }
          }
+         else if ( bStripString && ( sCurrent == '"' || sCurrent == '\'' ) )
+	 {
+            while ( ++ i < ui )
+            {
+               if ( buffer [ i ] == '\\' )
+	       {
+                  if ( buffer [ ++ i ] == sCurrent )
+		  {
+                     i ++;
+		  }
+	       }
+
+               if ( buffer [ i ] == sCurrent )
+	       {
+		  i ++;
+                  break;
+	       }
+            }
+	 }
 
          szOut[ uu ++ ] = buffer[ i ];
       }

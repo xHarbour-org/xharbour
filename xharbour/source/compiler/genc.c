@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.185 2009/04/28 07:06:31 andijahja Exp $
+ * $Id: genc.c,v 1.186 2009/05/04 11:44:23 andijahja Exp $
  */
 
 /*
@@ -1844,7 +1844,7 @@ static void hb_compGenCInLineSymbol()
 
       if( sInline )
       {
-         char *szStripped = hb_stripOutComments( sInline );
+         char *szStripped = hb_stripOutComments( sInline, TRUE );
          hb_compGenCCheckInLineStatic( szStripped );
          hb_xfree( sInline );
          hb_xfree( szStripped );

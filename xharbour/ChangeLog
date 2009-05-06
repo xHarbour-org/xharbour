@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6446 2009/05/05 19:49:17 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6447 2009/05/06 08:22:57 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-06 23:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + add second parameter to hb_stripOutComments( char* buffer, BOOL bStripChars )
+      to strip strings (used in parsing function names in pragma begin/enddump)
+      (Thanks to Przemek for pointing it out)
+  * source/compiler/gen.c
+    ! sync with the new parameter added to hb_stripOutComments()
 
 2009-05-05 21:48 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\common\hbstr.c
