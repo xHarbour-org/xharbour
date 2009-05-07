@@ -1,5 +1,5 @@
 /*
- * $Id: cprukoi.c,v 1.7 2008/08/14 09:04:13 andijahja Exp $
+ * $Id: cprukoi.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): RU */
 /* Codepage: KOI-8 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

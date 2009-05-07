@@ -1,5 +1,5 @@
 /*
- * $Id: cpcskam.c,v 1.4 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpcskam.c,v 1.5 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): CS */
 /* Codepage: 895(KAM) */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -69,8 +68,8 @@
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   1    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all 
-                                       characters being compared are the same 
+                                       only if the unaccented versions of all
+                                       characters being compared are the same
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the

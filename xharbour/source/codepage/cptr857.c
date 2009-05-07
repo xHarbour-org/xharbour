@@ -1,5 +1,5 @@
 /*
- * $Id: cptr857.c,v 1.2 2008/08/14 09:04:14 andijahja Exp $
+ * $Id: cptr857.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code TR : ( please look it up in /doc/lang_id.txt ) */
 /* Codepage: 857 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6448 2009/05/06 15:57:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.6449 2009/05/07 08:07:18 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,80 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-07 13:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/codepage/cp_tpl.c
+  * source/codepage/cpbg866.c
+  * source/codepage/cpbgiso.c
+  * source/codepage/cpbgmik.c
+  * source/codepage/cpbgwin.c
+  * source/codepage/cpcs852.c
+  * source/codepage/cpcsiso.c
+  * source/codepage/cpcskam.c
+  * source/codepage/cpcswin.c
+  * source/codepage/cpde850.c
+  * source/codepage/cpdeiso.c
+  * source/codepage/cpdewin.c
+  * source/codepage/cpel737.c
+  * source/codepage/cpelwin.c
+  * source/codepage/cpes850.c
+  * source/codepage/cpes850c.c
+  * source/codepage/cpesiso.c
+  * source/codepage/cpesisoc.c
+  * source/codepage/cpeswin.c
+  * source/codepage/cpeswinc.c
+  * source/codepage/cpeswinm.c
+  * source/codepage/cpfr850.c
+  * source/codepage/cpfriso.c
+  * source/codepage/cpfrwin.c
+  * source/codepage/cphr437.c
+  * source/codepage/cphr852.c
+  * source/codepage/cphrwin.c
+  * source/codepage/cphu852.c
+  * source/codepage/cphu852s.c
+  * source/codepage/cphuiso.c
+  * source/codepage/cphuisos.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cphuwins.c
+  * source/codepage/cpit437.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpitwin.c
+  * source/codepage/cpltwin.c
+  * source/codepage/cppl852.c
+  * source/codepage/cppliso.c
+  * source/codepage/cpplmaz.c
+  * source/codepage/cpplwin.c
+  * source/codepage/cppt850.c
+  * source/codepage/cpptiso.c
+  * source/codepage/cpro852.c
+  * source/codepage/cproiso.c
+  * source/codepage/cprowin.c
+  * source/codepage/cpru866.c
+  * source/codepage/cpruiso.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruwin.c
+  * source/codepage/cpsk852.c
+  * source/codepage/cpskiso.c
+  * source/codepage/cpskkam.c
+  * source/codepage/cpskwin.c
+  * source/codepage/cpsl437.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpsv850.c
+  * source/codepage/cpsvclip.c
+  * source/codepage/cpsviso.c
+  * source/codepage/cpsvwin.c
+  * source/codepage/cptr857.c
+  * source/codepage/cptrwin.c
+  * source/codepage/cpua866.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpuawin.c
+    % Removed unneeded #include <ctype.h>; formatting.
+    (by Viktor Szakats, borrowed from Harbour)
 
 2009-05-07 12:04 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/dbgwa.prg

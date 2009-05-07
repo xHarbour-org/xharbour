@@ -1,5 +1,5 @@
 /*
- * $Id: cphu852s.c,v 1.2 2008/08/14 09:04:07 andijahja Exp $
+ * $Id: cphu852s.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): HU */
 /* Codepage: 852 (sixhu852 compatible) */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

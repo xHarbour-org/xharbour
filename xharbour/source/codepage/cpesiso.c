@@ -1,5 +1,5 @@
 /*
- * $Id: cpesiso.c 9834 2008-11-04 21:51:51Z vszakats $
+ * $Id: cpesiso.c,v 1.1 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): ES */
 /* Codepage: ISO-8859-1 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -102,4 +101,3 @@ HB_CODEPAGE_INIT( ESISO )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ESISO = hb_codepage_Init_ESISO;
    #pragma data_seg()
 #endif
-

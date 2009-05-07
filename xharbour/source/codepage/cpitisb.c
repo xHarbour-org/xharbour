@@ -1,5 +1,5 @@
 /*
- * $Id: cpitisb.c,v 1.10 2008/08/14 09:04:12 andijahja Exp $
+ * $Id: cpitisb.c,v 1.11 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): IT */
 /* Codepage: ISO-8859-1b (with BOX characters) */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -87,7 +86,7 @@
 static HB_CODEPAGE s_codepage = { "ITISB",
     HB_CPID_8859_1B, HB_UNITB_8859_1B, NUMBER_OF_CHARACTERS,
     "AÀÁÂÃÄÅBCDEÈÉFGHIÌÍJKLMNOÒÓPQRSTUÙÚVWXYZ",
-    "aàáâãäåbcdeèéfghiìíjklmnoòópqrstuùúvwxyz",        
+    "aàáâãäåbcdeèéfghiìíjklmnoòópqrstuùúvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_INIT( ITISB )

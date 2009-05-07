@@ -1,5 +1,5 @@
 /*
- * $Id: cpeswin.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpeswinc.c,v 1.1 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): ES (please look it up in /doc/lang_id.txt) */
 /* Codepage: Windows-1252 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

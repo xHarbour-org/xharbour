@@ -1,5 +1,5 @@
 /*
- * $Id: cpuakoi.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpuakoi.c,v 1.8 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): UA */
 /* Codepage: KOI8-U */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cpfrwin.c 9813 2008-11-03 07:58:22Z vszakats $
+ * $Id: cpfrwin.c,v 1.1 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): FR */
 /* Codepage: Windows-1252 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cpitiso.c,v 1.11 2008/08/14 09:04:13 andijahja Exp $
+ * $Id: cpitiso.c,v 1.12 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): IT */
 /* Codepage: ISO-8859-1 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

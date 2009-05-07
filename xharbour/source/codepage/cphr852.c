@@ -1,5 +1,5 @@
 /*
- * $Id: cphr852.c,v 1.7 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cphr852.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -57,7 +57,6 @@
 /* ISO language code (2 chars): HR */
 /* Codepage: 852 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -104,4 +103,3 @@ HB_CODEPAGE_INIT( HR852 )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HR852 = hb_codepage_Init_HR852;
    #pragma data_seg()
 #endif
-

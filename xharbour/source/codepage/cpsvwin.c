@@ -1,5 +1,5 @@
 /*
- * $Id: cpsvwin.c,v 1.4 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpsvwin.c,v 1.5 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): SV */
 /* Codepage: Windows-1252 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

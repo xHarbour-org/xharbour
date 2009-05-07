@@ -1,5 +1,5 @@
 /*
- * $Id: cpit437.c,v 1.7 2008/08/14 09:04:07 andijahja Exp $
+ * $Id: cpit437.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -53,7 +53,6 @@
 /* ISO language code (2 chars): IT */
 /* Codepage: 437 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

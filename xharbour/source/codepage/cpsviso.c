@@ -1,5 +1,5 @@
 /*
- * $Id: cpsviso.c 9834 2008-11-04 21:51:51Z vszakats $
+ * $Id: cpsviso.c,v 1.1 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): SV */
 /* Codepage: ISO-8859-1 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

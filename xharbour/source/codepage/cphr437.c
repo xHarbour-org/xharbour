@@ -1,5 +1,5 @@
 /*
- * $Id: cphr437.c,v 1.10 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cphr437.c,v 1.11 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): HR */
 /* Codepage: 437 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -102,4 +101,3 @@ HB_CODEPAGE_INIT( HR437 )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HR437 = hb_codepage_Init_HR437;
    #pragma data_seg()
 #endif
-

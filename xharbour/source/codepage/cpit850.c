@@ -1,5 +1,5 @@
 /*
- * $Id: cpit850.c,v 1.8 2008/08/14 09:04:10 andijahja Exp $
+ * $Id: cpit850.c,v 1.9 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): IT */
 /* Codepage: 850 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

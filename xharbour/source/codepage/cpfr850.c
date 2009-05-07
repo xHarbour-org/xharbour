@@ -1,5 +1,5 @@
 /*
- * $Id: cpfr850.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpfr850.c,v 1.4 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -56,7 +56,6 @@
 /* ISO language code (2 chars): FR */
 /* Codepage: 850 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cpel737.c,v 1.2 2008/08/14 09:04:06 andijahja Exp $
+ * $Id: cpel737.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
 */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): EL */
 /* Codepage: 737 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
@@ -63,13 +62,13 @@
                                        here, accented - are considered. */
 #define IS_LATIN               0    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         1    /* Should be 1, if accented character 
+#define ACCENTED_EQUAL         1    /* Should be 1, if accented character
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all 
-                                       characters being compared are the same 
+                                       only if the unaccented versions of all
+                                       characters being compared are the same
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the

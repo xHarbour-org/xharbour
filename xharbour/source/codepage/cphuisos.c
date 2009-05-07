@@ -1,5 +1,5 @@
 /*
- * $Id: cphuisos.c,v 1.3 2008/08/14 09:04:07 andijahja Exp $
+ * $Id: cphuisos.c,v 1.4 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): HU */
 /* Codepage: ISO-8859-2 (sixhu852 flavour) */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

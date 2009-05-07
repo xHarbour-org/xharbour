@@ -1,5 +1,5 @@
 /*
- * $Id: cpruwin.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpruwin.c,v 1.9 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): RU */
 /* Codepage: Windows-1251 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

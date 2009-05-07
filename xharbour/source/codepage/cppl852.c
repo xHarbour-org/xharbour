@@ -1,5 +1,5 @@
 /*
- * $Id: cppl852.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cppl852.c,v 1.8 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 /* ISO language code (2 chars): PL */
 /* Codepage: 852 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 

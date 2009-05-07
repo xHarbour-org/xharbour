@@ -1,5 +1,5 @@
 /*
- * $Id: cpruiso.c,v 1.2 2008/08/14 09:04:13 andijahja Exp $
+ * $Id: cpruiso.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 /* ISO language code (2 chars): RU */
 /* Codepage: ISO-8859-5 */
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
