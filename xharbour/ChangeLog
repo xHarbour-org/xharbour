@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6447 2009/05/06 08:22:57 marchuet Exp $
+ * $Id: ChangeLog,v 1.6448 2009/05/06 15:57:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-07 12:04 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/dbgwa.prg
+    ! Guard against recursive debugger activation when a user callback
+      containing debug info is implicitly called from the debugger's workarea
+      browser.
+  + tests/testrel.prg
+    + Added a test for SET RELATION.
 
 2009-05-06 23:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapi.h

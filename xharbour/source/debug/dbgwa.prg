@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.13 2008/03/13 10:49:40 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.14 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -320,7 +320,7 @@ STATIC FUNCTION DbfInfo( aInfo )
 
    FOR nFor := 1 TO FCount()
 
-      xValue := FieldGet( nFor )
+      xValue := __Dbg():GetExprValue( "FieldGet(" + hb_NToS( nFor ) + ")" )
       xType  := ValType( xValue )
 
       DO CASE
