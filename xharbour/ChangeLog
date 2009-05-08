@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6449 2009/05/07 08:07:18 likewolf Exp $
+ * $Id: ChangeLog,v 1.6450 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-08 0618 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * bin/bld.bat
+    + Added usrrdd rdds libraries to MSVC lib list
+    /* We should really try to stndardize list of libs across all compilers where possible - any valunteer? */
+
+  * source/compiler/harbour.sly
+    * Added explicit support for empty lines in namespace definitions
+  * tests/extnamespace.prg
+    * Typos in comments
 
 2009-05-07 13:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/codepage/cp_tpl.c

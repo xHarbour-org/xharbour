@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.163 2009/02/21 15:14:24 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.164 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -2165,7 +2165,7 @@ BlockParams : BlockVarList {
                                    hb_compExprDelete( $1 );
                                    $$ = NULL;
                                 }
-                             }                             
+                             }
                            }
             ;
 
@@ -3532,26 +3532,31 @@ NamespaceDefinition : DEFINE_NAMESPACE IdentName Crlf
                                  {
                                    hb_compUsedNamespaceNew( $2, NSTYPE_SPACE );
                                  }
-                      NamespaceMemberDefinition {}
+                      NamespaceDefinitions
                       END Crlf
                                  {
                                    hb_compUsedNamespaceEnd();
                                  }
-
                     ;
+
+NamespaceDefinitions : Crlf
+                     | Line
+                     | NamespaceDefinition
+                     | NamespaceMemberDefinition
+                     | NamespaceDefinitions
+                       Crlf
+                     | NamespaceDefinitions
+                       Line
+                     | NamespaceDefinitions
+                       NamespaceDefinition
+                     | NamespaceDefinitions
+                       NamespaceMemberDefinition
+                     ;
 
 NamespaceMemberDefinition : DEFINE_NAMESPACEMEMBER IdentName Crlf
                                  {
                                    hb_compUsedNamespaceNew( $2, NSTYPE_MEMBER );
                                  }
-                          | NamespaceDefinition
-                          | NamespaceMemberDefinition
-                            DEFINE_NAMESPACEMEMBER IdentName Crlf
-                                 {
-                                   hb_compUsedNamespaceNew( $3, NSTYPE_MEMBER );
-                                 }
-                          | NamespaceMemberDefinition
-                            NamespaceDefinition
                           ;
 
 

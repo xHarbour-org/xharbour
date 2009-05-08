@@ -7,7 +7,7 @@ IMPLEMENTS NAMESPACE SubExtern
      // No qualifier needed for SAME level memebers.
       Ext2()
 
-      // Called to sub level must be explicit!
+      // Calls to sub level must be explicit!
       MyNameSpace.SubExtern.SubSubExtern.SubExt()
 
    RETURN
@@ -21,7 +21,7 @@ IMPLEMENTS NAMESPACE SubExtern
       PROCEDURE SubExt()
          ? ProcName()
 
-         // STATICs of can only be accesed in same compilation unit!
+         // STATICs members can only be accesed in same compilation unit!
          SubExtStatic()
       RETURN
 
