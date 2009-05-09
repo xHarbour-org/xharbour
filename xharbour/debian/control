@@ -2,7 +2,7 @@ Source: xharbour
 Section: devel
 Priority: optional
 Maintainer: Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
-Build-Depends: debhelper (>= 4.0.0),  bison, libncurses5-dev, libgpmg1-dev, libslang1-dev, gcc
+Build-Depends: debhelper (>= 4.0.0),  bison, libncurses5-dev, libgpmg1-dev, libslang2-dev, gcc
 Standards-Version: 3.6.1
 
 Package: xharbour
