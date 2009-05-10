@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: png.c,v 1.5 2009/02/25 22:47:09 andijahja Exp $
  */
 
 /* pngpread.c - read a png file in push mode

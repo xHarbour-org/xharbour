@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: png.c,v 1.5 2009/02/25 22:47:09 andijahja Exp $
  */
 
 /* pngrtran.c - transforms the data in a row for PNG readers
@@ -458,10 +458,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int num_green = (1 << PNG_DITHER_GREEN_BITS);
       int num_blue = (1 << PNG_DITHER_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
-
       png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
          (png_uint_32)(num_entries * png_sizeof(png_byte)));
-
       png_memset(png_ptr->palette_lookup, 0, num_entries *
          png_sizeof(png_byte));
 
@@ -4128,13 +4126,12 @@ png_build_gamma_table(png_structp png_ptr)
 
      png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
+     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p)); 
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
         double fin, fout;
         png_uint_32 last, max;
-
-        png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p)); 
 
         for (i = 0; i < num; i++)
         {
@@ -4190,7 +4187,6 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
-
         png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p)); 
 
         for (i = 0; i < num; i++)
@@ -4215,7 +4211,6 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
-
         png_memset(png_ptr->gamma_16_from_1, 0,
            num * png_sizeof(png_uint_16p)); 
 

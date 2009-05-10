@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.170 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: win32ole.prg,v 1.171 2009/05/01 10:56:03 ronpinkas Exp $
  */
 
 /*
@@ -1696,7 +1696,11 @@ RETURN Self
               // pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
 	      // Not sure if this is correct, but by this change GCC now quiet
 	      // and also the other compilers
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+              pUnk->lpVtbl->QueryInterface( pUnk, (REFIID)  IID_IDispatch, (void **) pDisp );
+#else
               pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) pDisp );
+#endif
            }
            // Intentionally fall through
 
@@ -2143,7 +2147,11 @@ RETURN Self
         {
            IClassFactory2 *pCF;
 
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = CoGetClassObject( (REFCLSID)  ClassID, CLSCTX_SERVER, NULL, (REFIID) IID_IClassFactory2, (LPVOID *) &pCF );
+#else
            s_nOleError = CoGetClassObject( (REFCLSID) &ClassID, CLSCTX_SERVER, NULL, (REFIID) (LPIID) &IID_IClassFactory2, (LPVOID *) &pCF );
+#endif
 
            if( SUCCEEDED( s_nOleError ) )
            {
@@ -2158,7 +2166,11 @@ RETURN Self
         else
         {
            //TraceLog( NULL, "Class: %i\n", ClassID );
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = CoCreateInstance( (REFCLSID)  ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
+#else
            s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
+#endif
            //TraceLog( NULL, "Result: %p\n", s_nOleError );
         }
      }
@@ -2213,7 +2225,11 @@ RETURN Self
 
      if( SUCCEEDED( s_nOleError ) )
      {
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+        s_nOleError = GetActiveObject( (REFCLSID)  ClassID, NULL, &pUnk );
+#else
         s_nOleError = GetActiveObject( (REFCLSID) &ClassID, NULL, &pUnk );
+#endif
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -2264,6 +2280,17 @@ RETURN Self
      {
         memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                             DispID,
+                                             (REFIID) IID_NULL,
+                                             LOCALE_SYSTEM_DEFAULT,
+                                             DISPATCH_PROPERTYPUTREF,
+                                             pDispParams,
+                                             NULL,    // No return value
+                                             &excep,
+                                             &uArgErr );
+#else
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                              DispID,
                                              (REFIID) &IID_NULL,
@@ -2273,6 +2300,7 @@ RETURN Self
                                              NULL,    // No return value
                                              &excep,
                                              &uArgErr );
+#endif
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -2282,6 +2310,17 @@ RETURN Self
 
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+     s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                          DispID,
+                                          (REFIID) IID_NULL,
+                                          LOCALE_SYSTEM_DEFAULT,
+                                          DISPATCH_PROPERTYPUT,
+                                          pDispParams,
+                                          NULL,    // No return value
+                                          &excep,
+                                          &uArgErr );
+#else
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
@@ -2291,6 +2330,7 @@ RETURN Self
                                           NULL,    // No return value
                                           &excep,
                                           &uArgErr );
+#endif
 
      pDispParams->rgdispidNamedArgs = NULL;
      pDispParams->cNamedArgs = 0;
@@ -2303,6 +2343,17 @@ RETURN Self
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+     s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                          DispID,
+                                          (REFIID)  IID_NULL,
+                                          LOCALE_SYSTEM_DEFAULT,
+                                          DISPATCH_METHOD,
+                                          pDispParams,
+                                          &RetVal,
+                                          &excep,
+                                          &uArgErr );
+#else
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
@@ -2312,6 +2363,7 @@ RETURN Self
                                           &RetVal,
                                           &excep,
                                           &uArgErr );
+#endif
 
      return s_nOleError;
   }
@@ -2321,6 +2373,17 @@ RETURN Self
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+     s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                          DispID,
+                                          (REFIID) IID_NULL,
+                                          LOCALE_SYSTEM_DEFAULT,
+                                          DISPATCH_PROPERTYGET,
+                                          pDispParams,
+                                          &RetVal,
+                                          &excep,
+                                          &uArgErr );
+#else
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
@@ -2330,7 +2393,7 @@ RETURN Self
                                           &RetVal,
                                           &excep,
                                           &uArgErr );
-
+#endif
      //TraceLog( NULL, "OleGetValue: %p\n", s_nOleError );
 
      return s_nOleError;
@@ -2476,19 +2539,35 @@ RETURN Self
 
         if( RetVal.n1.n2.vt == ( VT_UNKNOWN | VT_BYREF ) )
         {
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = (*RetVal.n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppunkVal, (REFIID)  IID_IEnumVARIANT, &pEnumVariant );
+#else
            s_nOleError = (*RetVal.n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppunkVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
+#endif
         }
         else if( RetVal.n1.n2.vt == VT_UNKNOWN )
         {
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, (REFIID)  IID_IEnumVARIANT, &pEnumVariant );
+#else
            s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
+#endif
         }
         else if( RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
         {
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = (*RetVal.n1.n2.n3.ppdispVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppdispVal, (REFIID)  IID_IEnumVARIANT, &pEnumVariant );
+#else
            s_nOleError = (*RetVal.n1.n2.n3.ppdispVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppdispVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
+#endif
         }
         else if( RetVal.n1.n2.vt == VT_DISPATCH )
         {
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+           s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, (REFIID) IID_IEnumVARIANT, &pEnumVariant );
+#else
            s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
+#endif
         }
         else
         {
@@ -2531,7 +2610,11 @@ RETURN Self
      else*/ if( szName[0] == '_' && szName[1] && hb_pcount() >= 1 )
      {
         bstrMessage = hb_oleAnsiToSysString( szName + 1 );
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID)  IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, pDispID );
+#else
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, pDispID );
+#endif
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %p\n", hb_stackBaseItem()->item.asSymbol.value->szName + 1, DispID, s_nOleError );
 
@@ -2552,7 +2635,11 @@ RETURN Self
      {
         // Try again without removing the assign prefix (_).
         bstrMessage = hb_oleAnsiToSysString( szName );
+#if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID)  IID_NULL, (wchar_t **) &bstrMessage, 1, 0, pDispID );
+#else
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, 0, pDispID );
+#endif
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %p\n", szName, *pDispID, s_nOleError );
      }

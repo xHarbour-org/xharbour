@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: png.c,v 1.5 2009/02/25 22:47:09 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct
@@ -872,7 +872,8 @@ png_byte PNGAPI
 png_get_mmx_bitdepth_threshold (png_structp png_ptr)
 {
     /* obsolete, to be removed from libpng-1.4.0 */
-    return (png_ptr? 0: 0);
+    (void) png_ptr;
+    return 0;
 }
 
 /* this function was added to libpng 1.2.0 */

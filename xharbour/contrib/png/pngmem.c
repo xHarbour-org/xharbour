@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: png.c,v 1.5 2009/02/25 22:47:09 andijahja Exp $
  */
 
 /* pngmem.c - stub functions for memory allocation
@@ -427,6 +427,7 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
    it not to.  See zconf.h and png.h for more information.  zlib does
    need to allocate exactly 64K, so whatever you call here must
    have the ability to do that. */
+
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)

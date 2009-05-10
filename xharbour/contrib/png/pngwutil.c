@@ -1,12 +1,12 @@
 /*
- * $Id: png.c,v 1.4 2008/12/27 09:48:13 andijahja Exp $
+ * $Id: png.c,v 1.5 2009/02/25 22:47:09 andijahja Exp $
  */
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.34 [December 18, 2008]
+ * Last changed in libpng 1.2.36 [May 7, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -788,6 +788,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    {
       png_warning(png_ptr,
         "Embedded profile length too large in iCCP chunk");
+      png_free(png_ptr, new_name);
       return;
    }
 
@@ -1762,9 +1763,9 @@ png_write_start_row(png_structp png_ptr)
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
      /* set up previous row buffer */
-      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
+     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
         (png_uint_32)buf_size);
-      png_memset(png_ptr->prev_row, 0, buf_size);
+     png_memset(png_ptr->prev_row, 0, buf_size);
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
