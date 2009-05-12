@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.215 2009/04/21 23:19:47 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.216 2009/04/24 15:48:50 marchuet Exp $
  */
 
 /*
@@ -409,7 +409,7 @@ Local aColor, nColIndex
 
   nColIndex := ::ColIndex( nCol )
 
-  if CacheOK( ::aCache, nRow, nColIndex )
+  if CacheOK( ::aCache, nRow, nColIndex, "O" ) 
 
      aColor := ::aCache[ nRow ][ nColIndex ]:ColorRect
 
@@ -435,7 +435,7 @@ Local nColIndex, xValue
 
   nColIndex := ::ColIndex( nCol )
 
-  if CacheOK( ::aCache, nRow, nColIndex )
+  if CacheOK( ::aCache, nRow, nColIndex, "O" ) 
      xValue := ::aCache[ nRow ][ nColIndex ]:Value
   endif
 
@@ -484,6 +484,12 @@ Local aCol, oCell, nRectPos, nCol, nColIndex, xValue
 
    for nCol := ::nCachedColLeft to ::nCachedColRight
 
+       if ::oBrowse:Freeze > 0
+          if !( nCol <= ::oBrowse:Freeze .or. nCol >= ::oBrowse:LeftVisible )
+             LOOP
+          endif
+       endif
+
        aCol := ::oBrowse:aColsInfo[ nCol ]
        oCell := TDataCell():New()
 
@@ -519,6 +525,7 @@ Local aCol, oCell, nRectPos, nCol, nColIndex, xValue
    next
 
 Return Self
+
 
 *--------------------------------------------------*
 METHOD SetColRect( aRect, lfull ) CLASS TDataCache
@@ -582,7 +589,7 @@ LOCAL nRow, nCol, nColIndex
 
          nColIndex := ::ColIndex(nCol)
 
-         if CacheOK( ::aCache, nRow, nColIndex )
+         if CacheOK( ::aCache, nRow, nColIndex, "O" ) 
             ::aCache[ nRow ][ nColIndex ]:ColorRect := NIL
          endif
 
@@ -668,7 +675,7 @@ Local nColIndex, nCol, nRow, aRect
 
               nColIndex := ::ColIndex(nCol)
 
-              if CacheOK( ::aCache, nRow, nColIndex )
+              if CacheOK( ::aCache, nRow, nColIndex, "O" ) 
                  ::aCache[ nRow ][ nColIndex ]:ColorRect := aRect[4]
               endif
 
@@ -2505,6 +2512,7 @@ Local nMoveTo := ::nMoveTo
       endif
 
       cCurColor := SetColor( ColorSpec )
+
       Scroll(::nWTop,::nWLeft,::nWBottom,::nWRight,0)
       SetPos(0,0)
       SetColor( cCurColor )
@@ -3665,7 +3673,7 @@ end
 Return xValue
 
 *---------------------------------------------------*
-STATIC FUNCTION CacheOK( a, n, n2 )
+STATIC FUNCTION CacheOK( a, n, n2, t )
 *---------------------------------------------------*
 * Test the validity of the cache array before assess/assign value for it.
 * This test avoid error if array is empty or element is out of bound or nil.
@@ -3674,11 +3682,12 @@ LOCAL lRet := .F.
 lRet := ( hb_IsArray(a) .AND.;
          Len(a)>0 .AND.;
          hb_IsNumeric(n) .AND. n>0 .AND.;
-         Len(a)>=n .AND. !hb_IsNil(a[n]) )
+         Len(a)>=n .AND. !hb_IsNil(a[n]) ) .and.;
+         iif( hb_IsNil(n2) .and. !hb_IsNil(t), valtype( a[n] ) == t,.t.)
 
 
 If lRet .AND. !hb_IsNil(n2) .AND. hb_IsNumeric(n2) .AND. n2>0
-   lRet := ( Len( a[n] ) >= n2 )
+   lRet := ( Len( a[n] ) >= n2 ) .and. iif( !hb_IsNil(t), valtype( a[n,n2] ) == t,.t.)
 Endif
 
 Return lRet

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6451 2009/05/08 13:32:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6452 2009/05/10 06:45:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,89 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-11 22:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+
+  * include\win32prn.ch
+    + created a cutted header from win32prn.prg file to allow the use of printer
+      constants by users.
+  * source\rtl\win32prn.prg
+    + added #include "win32prn.ch" statement.
+
+  * source\rtl\tbrowse.prg
+    * fixed to speed-up navigation on tbrowse with many columns, under frozen state.
+
+  * tests\xmltest\hbxml.ch
+    + created new styles:
+      HBXML_STYLE_NOINDENT   - no indent nodes. all nodes will be places on leftmost margin.
+      HBXML_STYLE_NONEWLINE  - no indent nodes and no insert new line at end of nodes.
+                               (all nodes will be placed on an unique line).
+  * tests\xmltest\hbxml.h
+    + created new styles:
+      MXML_STYLE_NOINDENT   - c version of HBXML_STYLE_NOINDENT
+      MXML_STYLE_NONEWLINE  - c version of HBXML_STYLE_NONEWLINE
+
+  * tests\xmltest\hbxml.c
+    * fixed to indent nodes on MXML_STYLE_TAB and MXML_STYLE_THREESPACES.
+    * updated to work with new styles MXML_STYLE_NOINDENT and MXML_STYLE_NONEWLINE.
+
+  * tests\xmltest\txml.prg
+    * TxmlNode() class:
+      * enhanced New() method to verify if <aAttribute) argument is a hash.
+      + created AttribCount() method to return the amount of attributes into node.
+      + created GetValues() method to return an array of all values into node.
+      + created GetKeys() method to return an array of all keys into node.
+      + created GetPair(nPos) method to return an array of key/value pair relative at
+      nPos given.
+
+    - removed TxmlIteratorScan() class. Merged on TxmlIterator class.
+    - removed TXmlIteratorRegex() class Merged on TxmlIterator class.
+
+    * TXmlIterator() class:
+      + added lRegex data to set regular expression on find() method.
+      + added FindNext() method to return the next node found after Find()
+        method call, in accordance with search criteria (early next() method).
+      + changed Next() method to return next node in tree.
+      + changed MathCriteria() method to work with common string values or
+        regular expressions used on both Find()/FindNext() methods.
+
+      note: to find regular expressions you must set <lRegex> to true before
+            call find() method.
+
+    * TXmlDocument() class:
+      + created <cHeader> data.
+      + created FindNext() method. This method will find the next node that
+        is found in FindFirst() method in accordance with search criteria.
+        This method replace the early Next() method.
+      + created XmlValid() method to test xml file before load it.
+      + created CurNode access to return the current node on xml document.
+      + created ErrorMsg access to return an error message description based
+        on error code.
+      * changed Next() method to returns the next node in tree. Not the next
+        node found in Findfirst() method.
+      * enhanced New() method to open a xml file by given name.
+        note: The TxmlDocument() continue to accept nil, node object, file handle,
+        header and now file name argument.
+
+        TxmlDocument():New( NIL ) - to create a new empty xml document.
+        TxmlDocument():New( oNode )
+        TxmlDocument():New( nFileHandle, nStyle )
+        TxmlDocument():New( "document.xml", nStyle )
+        TxmlDocument():New( <?xml version="1.0"?>, nStyle )
+
+        see xharbour\tests\newtxml sample files.
+
+      * enhanced Write() method to writes directly to a file name or file handle.
+        This method will writes the <cHeader> content or <?xml version="1.0"?> to
+        the top of xml file.
+
+
+  * tests\xmltest\xmliter.prg
+  * tests\xmltest\xmltest.prg
+    * added new tests updated for the Txml... classes.
+
+  * utils\hbmake\hbmake.prg
+    added "schannel.lib" to the Pelles C lib list.
 
 2009-05-10 13:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/win32ole.prg
