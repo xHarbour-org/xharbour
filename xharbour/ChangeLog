@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6453 2009/05/12 01:40:21 modalsist Exp $
+ * $Id: ChangeLog,v 1.6454 2009/05/12 11:53:31 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-12 09:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * tests\xmltest\txml.prg
+    * added next() wrapper method to TxmlIteratorScan()/TxmlIteratorRegex() classes.
+    note: TxmlIteratorScan:Next() and TxmlIteratorRegex:Next() haves different
+          result than TxmlIterator:Next() class.
 
 2009-05-12 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * tests\xmltest\txml.prg

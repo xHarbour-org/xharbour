@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.12 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: txml.prg,v 1.2 2009/05/12 11:53:31 modalsist Exp $
  */
 
 /*
@@ -389,22 +389,28 @@ RETURN lFound
    IteratorScan / IteratorRegex classes
    note: Wrapper classes for old ones
 *********************************************/
+
 CLASS TxmlIteratorScan FROM TxmlIterator
   METHOD New( oNodeTop ) CONSTRUCTOR
+  METHOD Next() INLINE Super:FindNext()
 END CLASS
 
 METHOD New( oNodeTop ) CLASS TxmlIteratorScan
   super:New( oNodeTop )
 Return Self
 
+
 CLASS TxmlIteratorRegex FROM TxmlIterator
-METHOD New( oNodeTop ) CONSTRUCTOR
+  METHOD New( oNodeTop ) CONSTRUCTOR
+  METHOD Next() INLINE Super:FindNext()
 END CLASS
 
 METHOD New( oNodeTop ) CLASS TxmlIteratorRegex
   super:New( oNodeTop )
   ::lRegex:= .T.
 Return Self
+
+
 
 
 /********************************************
