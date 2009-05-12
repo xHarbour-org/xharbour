@@ -386,6 +386,28 @@ RETURN lFound
 
 
 /********************************************
+   IteratorScan / IteratorRegex classes
+   note: Wrapper classes for old ones
+*********************************************/
+CLASS TxmlIteratorScan FROM TxmlIterator
+  METHOD New( oNodeTop ) CONSTRUCTOR
+END CLASS
+
+METHOD New( oNodeTop ) CLASS TxmlIteratorScan
+  super:New( oNodeTop )
+Return Self
+
+CLASS TxmlIteratorRegex FROM TxmlIterator
+METHOD New( oNodeTop ) CONSTRUCTOR
+END CLASS
+
+METHOD New( oNodeTop ) CLASS TxmlIteratorRegex
+  super:New( oNodeTop )
+  ::lRegex:= .T.
+Return Self
+
+
+/********************************************
    XML Document Class
 *********************************************/
 CLASS TXmlDocument
