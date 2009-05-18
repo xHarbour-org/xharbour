@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6454 2009/05/12 11:53:31 modalsist Exp $
+ * $Id: ChangeLog,v 1.6455 2009/05/12 12:17:33 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-18 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\dbinfo.ch
+  * include\hbdbf.h
+  * include\std.ch
+  * source\rdd\dbcmd.c
+  * source\rdd\dbf1.c
+    * fixed, field type "C" or "M" marked as HB_FF_BINARY don't execute translate code.
+      Remember that possible flags are (5 parameter of array at DbCreate):
+	#define HB_FF_HIDDEN          0x0001 /* System Column (not visible to user) */
+	#define HB_FF_NULLABLE        0x0002 /* Column can store null values */
+	#define HB_FF_BINARY          0x0004 /* Binary column AND NOCPTRANS*/
+	#define HB_FF_AUTOINC         0x0008 /* Column is autoincrementing */
+	#define HB_FF_COMPRESSED      0x0010 /* Column is compressed */
+	#define HB_FF_ENCRYPTED       0x0020 /* Column is encrypted */
+    + Added next commands and function to the future support of transactions TTS,
+      by the moment can be used manually, or to test pending transaction from dbf
+      of dBase IV.
+
+      DbInfo( DBI_TTS_INCOMPLETE [, <lOnOff>] )
+        Changes or read transaction mark.
+      RESET [IN <alias>]
+        Reset transaction mark from table and his data to rollback.
+      ISMARKED()
+      	Return if a table is marked with transaction in course.
+
+  * source\rdd\dbffpt\dbffpt1.c
+    ! fixed, field type "C" or "M" marked as binary don't execute translate code.
+    ! fixed typification of memo field as SMT_IT_CHAR under DB_MEMO_SMT type.
+
+Best regards,
+Miguel Angel Marchuet
 
 2009-05-12 09:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * tests\xmltest\txml.prg

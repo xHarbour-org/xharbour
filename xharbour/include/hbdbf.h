@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.10 2007/05/11 10:22:07 marchuet Exp $
+ * $Id: hbdbf.h,v 1.11 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -69,8 +69,11 @@ typedef struct _DBFHEADER
    BYTE   uiHeaderLen[ 2 ];
    BYTE   uiRecordLen[ 2 ];
    BYTE   bReserved1[ 2 ];
-   BYTE   bTransaction;       /* 1-transaction begin */
-   BYTE   bEncrypted;         /* 1-encryptpted table */
+   BYTE   bTransaction;       /* dBaseIV flag, incomplete transaction 
+                                                                                    Begin Transaction sets it to 0x01 
+                                                                                    End Transaction or RollBack reset it to 0x00 */
+   BYTE   bEncrypted;         /* Encryption flag, encrypted 0x01 else 0x00 
+                                                                                    Changing the flag does not encrypt or decrypt the records */
    BYTE   bReserved2[ 12 ];
    BYTE   bHasTags;           /* bit filed: 1-production index, 2-memo file in VFP */
    BYTE   bCodePage;

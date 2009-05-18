@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.229 2009/02/20 12:48:11 marchuet Exp $
+ * $Id: dbcmd.c,v 1.230 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -920,6 +920,21 @@ HB_FUNC( __DBZAP )
       SELF_ZAP( pArea );
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
+}
+
+HB_FUNC( ISMARKED )
+{
+   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+
+   if( pArea )
+   {
+      PHB_ITEM pItem = hb_itemPutL( NULL, NULL );
+      SELF_INFO( pArea, DBI_TTS_INCOMPLETE, pItem );
+      hb_itemReturnRelease( pItem );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
+
 }
 
 HB_FUNC( DELETED )

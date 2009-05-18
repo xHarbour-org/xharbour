@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.32 2008/11/05 03:03:16 walito Exp $
+ * $Id: std.ch,v 1.33 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -552,6 +552,7 @@
             ordListRebuild()
 #command REINDEX        => ordListRebuild()
 
+#command RESET [IN <ualias>] => [( <ualias> )->](DbInfo( DBI_TTS_INCOMPLETE, .F. ))
 
 #command READ           => ReadModal(GetList) ; GetList := {}
 #command READ SAVE      => ReadModal(GetList)

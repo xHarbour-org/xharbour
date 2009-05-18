@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.28 2009/02/20 12:47:56 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.29 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -291,6 +291,7 @@
 #define DBI_POSITIONED          144  /* Is cursor positioned to valid record */
 #define DBI_CPID                145  /* is the codepage/collation asigned to table */
 #define DBI_ISTEMPORARY         146  /* Is the table a temporary one? */
+#define DBI_TTS_INCOMPLETE      147  /* incomplete transaction */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */
@@ -369,6 +370,5 @@
 #define DB_DBFLOCK_VFP        3
 #define DB_DBFLOCK_CL53EXT    4
 #define DB_DBFLOCK_XHB64      5
-
 
 #endif /* HB_DBINFO_CH_ */

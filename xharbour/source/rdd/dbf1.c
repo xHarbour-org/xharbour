@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.204 2009/04/23 22:07:19 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.205 2009/05/04 08:25:44 marchuet Exp $
  */
 
 /*
@@ -574,6 +574,25 @@ static BOOL hb_dbfWriteRecord( DBFAREAP pArea )
 }
 
 /*
+ * Transaction table ON/OFF
+ */
+static void hb_dbfTableTransaction( DBFAREAP pArea, BOOL fTransaction )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfTableTransaction(%p,%d)", pArea, pPasswd, fTransaction ));
+
+   if( !pArea->fReadonly )
+   {
+      if( pArea->dbfHeader.bTransaction && ! fTransaction )
+      {
+         /* TODO reset transaction of current session */
+      }
+      pArea->dbfHeader.bTransaction = fTransaction ? ( BYTE ) 1 : ( BYTE ) 0;
+      pArea->fUpdateHeader = TRUE;
+      SELF_WRITEDBHEADER( ( AREAP ) pArea );
+   }
+}
+
+/*
  * Set encryption password
  */
 static BOOL hb_dbfPasswordSet( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fRaw )
@@ -1066,8 +1085,8 @@ void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
  * so I left it in DBF.
  */
 HB_ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
-                                     ULONG * pulBlock, ULONG * pulSize,
-                                     ULONG * pulType )
+                              ULONG * pulBlock, ULONG * pulSize,
+                              ULONG * pulType )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetMemoData(%p, %hu, %p, %p, %p)", pArea, uiIndex, pulBlock, pulSize, pulType));
 
@@ -1877,7 +1896,7 @@ static HB_ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
    {
       case HB_FT_STRING:
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdppage() )
+         if( pArea->cdPage != hb_cdppage() && ( pField->uiFlags & HB_FF_BINARY ) == 0 )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
             memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
@@ -2323,7 +2342,8 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
-            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->cdPage, uiSize );
+            if( ( pField->uiFlags & HB_FF_BINARY ) == 0 )
+                hb_cdpnTranslate( ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->cdPage, uiSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
@@ -3332,7 +3352,7 @@ static HB_ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case DBI_GETHEADERSIZE:
          hb_itemPutNL( pItem, pArea->uiHeaderLen );
          break;
-
+         
       case DBI_LASTUPDATE:
          hb_itemPutD( pItem, 1900 + pArea->dbfHeader.bYear,
                              pArea->dbfHeader.bMonth,
@@ -3381,12 +3401,22 @@ static HB_ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          BOOL fShared = pArea->fShared;
 
          if( HB_IS_LOGICAL( pItem ) )
-         {
             pArea->fShared = hb_itemGetL( pItem );
-         }
+
          hb_itemPutL( pItem, fShared );
          break;
       }
+
+      case DBI_TTS_INCOMPLETE:
+      {
+         BOOL bTransaction = pArea->dbfHeader.bTransaction;
+         if( HB_IS_LOGICAL( pItem ) )
+            hb_dbfTableTransaction( pArea, hb_itemGetL( pItem ) );
+
+         hb_itemPutL( pItem, bTransaction );
+         break;
+      }
+      
       case DBI_ISFLOCK:
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
@@ -4436,7 +4466,7 @@ void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, P
 
    for( uiIndex = 0, pField = pArea->lpFields; uiIndex < pArea->uiFieldCount; uiIndex++, pField++ )
    {
-      if( pField->uiType == HB_FT_STRING && ( pField->uiFlags && HB_FF_BINARY ) == 0 )
+      if( pField->uiType == HB_FT_STRING && ( pField->uiFlags & HB_FF_BINARY ) == 0 )
       {
          hb_cdpnTranslate( ( char * ) pBuffer + pArea->pFieldOffset[ uiIndex ], cdp_src, cdp_dest, pField->uiLen );
       }
