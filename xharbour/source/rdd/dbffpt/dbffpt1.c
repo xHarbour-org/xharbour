@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.101 2009/05/18 10:29:46 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.102 2009/05/19 16:34:58 marchuet Exp $
  */
 
 /*
@@ -491,7 +491,7 @@ static HB_ERRCODE hb_fptPutRootBlock( FPTAREAP pArea, ULONG ulBlock )
 static void hb_fptSortGCitems( LPMEMOGCTABLE pGCtable )
 {
    ULONG ulOffset, ulSize;
-   BOOL fMoved = TRUE;
+   BOOL fChanged, fMoved = TRUE;
    int i, j, l;
 
    /* this table should be allready quite good sorted so this simple
@@ -507,11 +507,14 @@ static void hb_fptSortGCitems( LPMEMOGCTABLE pGCtable )
          if( pGCtable->pGCitems[i].ulSize > pGCtable->pGCitems[i+1].ulSize )
          {
             ulOffset = pGCtable->pGCitems[i+1].ulOffset;
-            ulSize = pGCtable->pGCitems[i+1].ulSize;
+            ulSize   = pGCtable->pGCitems[i+1].ulSize;
+            fChanged = pGCtable->pGCitems[i+1].fChanged;
             pGCtable->pGCitems[i+1].ulSize   = pGCtable->pGCitems[i].ulSize;
             pGCtable->pGCitems[i+1].ulOffset = pGCtable->pGCitems[i].ulOffset;
+            pGCtable->pGCitems[i+1].fChanged = pGCtable->pGCitems[i].fChanged;
             pGCtable->pGCitems[ i ].ulSize   = ulSize;
             pGCtable->pGCitems[ i ].ulOffset = ulOffset;
+            pGCtable->pGCitems[ i ].fChanged = fChanged;
             fMoved = TRUE;
             pGCtable->bChanged |= 2;
             l = i;
@@ -549,7 +552,8 @@ static void hb_fptPackGCitems( LPMEMOGCTABLE pGCtable )
             {
                if( ulEnd == pGCtable->pGCitems[j].ulOffset )
                {
-                  pGCtable->pGCitems[i].ulSize += pGCtable->pGCitems[j].ulSize;
+                  pGCtable->pGCitems[i].ulSize  += pGCtable->pGCitems[j].ulSize;
+                  pGCtable->pGCitems[i].fChanged = TRUE;
                   pGCtable->pGCitems[j].ulOffset = pGCtable->pGCitems[j].ulSize = 0;
                   pGCtable->bChanged |= 2;
                   i = -1;
@@ -570,6 +574,7 @@ static void hb_fptPackGCitems( LPMEMOGCTABLE pGCtable )
          {
             pGCtable->pGCitems[j].ulOffset = pGCtable->pGCitems[i].ulOffset;
             pGCtable->pGCitems[j].ulSize   = pGCtable->pGCitems[i].ulSize;
+            pGCtable->pGCitems[j].fChanged = pGCtable->pGCitems[i].fChanged;
          }
          j++;
       }
@@ -605,8 +610,15 @@ static HB_ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, US
    {
       if( pGCtable->pGCitems[i].fChanged )
       {
-         if( pArea->uiMemoVersion == DB_MEMOVER_FLEX ||
-             pArea->uiMemoVersion == DB_MEMOVER_CLIP )
+         if( ( pArea->uiMemoVersion == DB_MEMOVER_FLEX ||
+               pArea->uiMemoVersion == DB_MEMOVER_CLIP ) &&
+             /* TODO: check what FLEX/CL53 exactly does in such situations */
+             /*       Tests show that FLEX/CL53 does not reuse larger blocks
+              *       which can leave 8 or less dummy bytes so such problem
+              *       does not exists. [druzus]
+              */
+             pGCtable->pGCitems[i].ulSize * pArea->uiMemoBlockSize >=
+             sizeof( FPTBLOCK ) )
          {
             HB_PUT_BE_UINT32( fptBlock.type, FPTIT_FLEX_UNUSED );
             HB_PUT_BE_UINT32( fptBlock.size, pArea->uiMemoBlockSize *
@@ -630,7 +642,7 @@ static HB_ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, US
  * Add new block to GC free memo blocks list.
  */
 static HB_ERRCODE hb_fptGCfreeBlock( FPTAREAP pArea, LPMEMOGCTABLE pGCtable,
-                                  ULONG ulOffset, ULONG ulByteSize, BOOL fRaw )
+                                     ULONG ulOffset, ULONG ulByteSize, BOOL fRaw )
 {
    HB_ERRCODE errCode = HB_SUCCESS;
    ULONG ulSize;
@@ -2844,15 +2856,15 @@ static HB_ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
  * Write memo data.
  */
 static HB_ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, ULONG ulSize,
-                                BYTE *bBufPtr, HB_FHANDLE hFile,
-                                ULONG ulType, ULONG ulLen, ULONG * ulStoredBlock )
+                                   BYTE *bBufPtr, HB_FHANDLE hFile,
+                                   ULONG ulType, ULONG ulLen, ULONG * pulStoredBlock )
 {
    MEMOGCTABLE fptGCtable;
    HB_ERRCODE errCode;
    BOOL bWrite;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptWriteMemo(%p, %lu, %lu, %p, %p, %lu, %lu, %p)",
-         pArea, ulBlock, ulSize, bBufPtr, ( void * ) ( HB_PTRDIFF ) hFile, ulType, ulLen, ulStoredBlock));
+         pArea, ulBlock, ulSize, bBufPtr, ( void * ) ( HB_PTRDIFF ) hFile, ulType, ulLen, pulStoredBlock));
 
    bWrite = ( ulLen != 0 || ( pArea->bMemoType == DB_MEMO_FPT &&
               ulType != FPTIT_TEXT && ulType != FPTIT_BINARY &&
@@ -2860,7 +2872,7 @@ static HB_ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, ULONG ulSize,
 
    if( ulBlock == 0 && !bWrite )
    {
-      * ulStoredBlock = 0;
+      *pulStoredBlock = 0;
       return HB_SUCCESS;
    }
 
@@ -2887,7 +2899,7 @@ static HB_ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, ULONG ulSize,
    {
       HB_FOFFSET fOffset;
 
-      errCode = hb_fptGCgetFreeBlock( pArea, &fptGCtable, ulStoredBlock, ulLen,
+      errCode = hb_fptGCgetFreeBlock( pArea, &fptGCtable, pulStoredBlock, ulLen,
                                       ulType == FPTIT_DUMMY );
       if( errCode != HB_SUCCESS )
       {
@@ -2895,7 +2907,7 @@ static HB_ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, ULONG ulSize,
          return errCode;
       }
 
-      fOffset = FPT_BLOCK_OFFSET( *ulStoredBlock );
+      fOffset = FPT_BLOCK_OFFSET( *pulStoredBlock );
       if( pArea->bMemoType == DB_MEMO_FPT && ulType != FPTIT_DUMMY )
       {
          FPTBLOCK fptBlock;
@@ -2958,14 +2970,14 @@ static HB_ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, ULONG ulSize,
             ULONG ulBlocks = ( ulLen + sizeof( FPTBLOCK ) + pArea->uiMemoBlockSize - 1 ) /
                               pArea->uiMemoBlockSize;
             hb_fileWriteAt( pArea->pMemoFile, ( BYTE * ) "\xAF", 1,
-                            FPT_BLOCK_OFFSET( *ulStoredBlock + ulBlocks ) - 1 );
+                            FPT_BLOCK_OFFSET( *pulStoredBlock + ulBlocks ) - 1 );
          }
       }
       pArea->fMemoFlush = TRUE;
    }
    else
    {
-      * ulStoredBlock = 0;
+      *pulStoredBlock = 0;
    }
 
    if( errCode == HB_SUCCESS )
@@ -4726,7 +4738,7 @@ static HB_ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            LPDBFDATA pData = ( LPDBFDATA ) SELF_RDDNODE( pArea )->lpvCargo;
+            LPDBFDATA pData = DBFAREA_DATA( pArea );
             char * szMFileExt;
             if( pData->szMemoExt[ 0 ] )
                hb_itemPutC( pItem, pData->szMemoExt );
@@ -5029,7 +5041,7 @@ static HB_ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
-   pData = ( LPDBFDATA ) pRDD->lpvCargo;
+   pData = DBFNODE_DATA( pRDD );
 
    switch( uiIndex )
    {

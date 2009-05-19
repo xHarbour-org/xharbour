@@ -15,7 +15,6 @@
       bytes. Thanks to Mike Evans for self contain example.
       (by Przemyslaw Czerpak, borrowed from Harbour)
 
-
 2009-05-19 18:37 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * common.mak
   * compile.mak
