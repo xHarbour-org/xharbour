@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.29 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.30 2009/05/18 10:29:46 marchuet Exp $
  */
 
 /*
@@ -346,6 +346,8 @@
 /* DBF TYPES */
 #define DB_DBF_STD            1
 #define DB_DBF_VFP            2
+#define DB_DBF_IV             3
+#define DB_DBF_V              4
 
 /* MEMO TYPES */
 #define DB_MEMO_NONE          0

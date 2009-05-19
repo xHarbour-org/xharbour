@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.54 2008/11/24 05:30:34 andijahja Exp $
+# $Id: makefile.gc,v 1.55 2009/01/08 09:11:13 marchuet Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -201,6 +201,9 @@ $(MACRO_LIB) : $(MACRO_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(USRRDD_LIB) : $(USRRDD_LIB_OBJS)

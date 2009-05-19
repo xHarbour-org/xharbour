@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.38 2009/01/29 16:30:41 ronpinkas Exp $
+# $Id: compile.mak,v 1.39 2009/02/20 12:47:55 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1754,6 +1754,12 @@ $(OBJ_DIR)$(DIR_SEP)dbfnsx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfnsx$(DIR_SEP)dbfns
 # DBFCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfcdx$(DIR_SEP)dbfcdx1.c
+	$(CC_CMD)
+
+#===============================================================================
+# DBFMDX.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)dbfmdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfmdx$(DIR_SEP)dbfmdx1.c
 	$(CC_CMD)
 
 #===============================================================================

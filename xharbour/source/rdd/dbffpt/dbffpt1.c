@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.100 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: dbffpt1.c,v 1.101 2009/05/18 10:29:46 marchuet Exp $
  */
 
 /*
@@ -3195,6 +3195,8 @@ static BOOL hb_fptHasMemoData( FPTAREAP pArea, USHORT uiIndex )
          }
       }
       else if( pField->uiType == HB_FT_MEMO ||
+               pField->uiType == HB_FT_BINARY ||
+               pField->uiType == HB_FT_BINARY ||
                pField->uiType == HB_FT_PICTURE ||
                pField->uiType == HB_FT_BLOB ||
                pField->uiType == HB_FT_OLE )
@@ -3411,6 +3413,7 @@ static HB_ERRCODE hb_fptGetVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
       }
    }
    else if( pField->uiType == HB_FT_MEMO ||
+            pField->uiType == HB_FT_BINARY ||
             pField->uiType == HB_FT_PICTURE ||
             pField->uiType == HB_FT_BLOB ||
             pField->uiType == HB_FT_OLE )
@@ -3532,6 +3535,7 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
 
    if( pField->uiType == HB_FT_ANY ||
        pField->uiType == HB_FT_MEMO ||
+       pField->uiType == HB_FT_BINARY ||
        pField->uiType == HB_FT_PICTURE ||
        pField->uiType == HB_FT_BLOB ||
        pField->uiType == HB_FT_OLE )
@@ -3782,6 +3786,7 @@ static HB_ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLeng
 
    if( pArea->fHasMemo && pArea->pMemoFile &&
        ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO ||
+         pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BINARY ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BLOB ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE ) )
@@ -4054,6 +4059,7 @@ static HB_ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szF
 
    if( pArea->fHasMemo && pArea->pMemoFile &&
        ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO ||
+         pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BINARY ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BLOB ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE ||
@@ -4248,6 +4254,7 @@ static HB_ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szF
 
    if( pArea->fHasMemo && pArea->pMemoFile &&
        ( pField->uiType == HB_FT_MEMO ||
+         pField->uiType == HB_FT_BINARY ||
          pField->uiType == HB_FT_PICTURE ||
          pField->uiType == HB_FT_BLOB ||
          pField->uiType == HB_FT_OLE ||
@@ -4373,6 +4380,7 @@ static HB_ERRCODE hb_fptDoPackRec( FPTAREAP pArea )
       LPFIELD pField = pArea->lpFields + uiField;
 
       if( pField->uiType == HB_FT_MEMO ||
+          pField->uiType == HB_FT_BINARY ||
           pField->uiType == HB_FT_PICTURE ||
           pField->uiType == HB_FT_BLOB ||
           pField->uiType == HB_FT_OLE )
@@ -4947,6 +4955,7 @@ static HB_ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType
 
    if( pArea->fHasMemo && pArea->pMemoFile &&
        ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO ||
+         pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BINARY ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_BLOB ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE ) )

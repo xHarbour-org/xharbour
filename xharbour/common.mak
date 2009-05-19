@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.43 2009/02/20 12:47:53 marchuet Exp $
+# $Id: common.mak,v 1.44 2009/03/27 02:49:39 ronpinkas Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -75,7 +75,9 @@ COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
 CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(HB_MT)$(LIBEXT)
 DBFCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfcdx$(HB_MT)$(LIBEXT)
+DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
 BMDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmdbfcdx$(HB_MT)$(LIBEXT)
+DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
 SIXCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixcdx$(HB_MT)$(LIBEXT)
 BMSIXCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmsixcdx$(HB_MT)$(LIBEXT)
 DBFFPT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbffpt$(HB_MT)$(LIBEXT)
@@ -175,6 +177,7 @@ HARBOUR_LIBS=\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
+	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\
@@ -603,6 +606,12 @@ DBFNSX_LIB_OBJS=\
 #===============================================================================
 DBFCDX_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dbfcdx1$(OBJEXT)
+
+#===============================================================================
+# DBFMDX.LIB rules
+#===============================================================================
+DBFMDX_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)dbfmdx1$(OBJEXT)
 
 #===============================================================================
 # BMDBFCDX.LIB rules
@@ -1250,6 +1259,7 @@ HARBOUR_DLL_OBJS=\
 	$(DBFNTX_LIB_OBJS)\
 	$(DBFNSX_LIB_OBJS)\
 	$(DBFCDX_LIB_OBJS)\
+	$(DBFMDX_LIB_OBJS)\
 	$(BMDBFCDX_LIB_OBJS)\
 	$(SIXCDX_LIB_OBJS)\
 	$(BMSIXCDX_LIB_OBJS)\
@@ -1747,6 +1757,7 @@ ST_PROJECT=\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
+	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\
@@ -1785,6 +1796,7 @@ MT_PROJECT=\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
+	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.54 2009/02/21 19:01:50 ronpinkas Exp $
+ * $Id: hbapirdd.h,v 1.55 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -122,6 +122,7 @@ HB_EXTERN_BEGIN
 #define HB_FT_BLOB            19    /* "W" */
 #define HB_FT_OLE             20    /* "G" */
 #define HB_FT_TIME            21    /* "T" len 4 */
+#define HB_FT_BINARY          22    /* "B" DBase IV or upper */
 
 
 

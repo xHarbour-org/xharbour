@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.53 2009/01/08 09:11:13 marchuet Exp $
+# $Id: makefile.dc,v 1.54 2009/01/29 21:35:32 enricomaria Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -114,6 +114,9 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.237 2009/01/29 16:30:41 ronpinkas Exp $
+# $Id: makefile.vc,v 1.238 2009/02/21 15:14:24 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -169,6 +169,9 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.205 2009/05/04 08:25:44 marchuet Exp $
+ * $Id: dbf1.c,v 1.206 2009/05/18 10:29:46 marchuet Exp $
  */
 
 /*
@@ -305,6 +305,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
          case HB_FT_PICTURE:
          case HB_FT_BLOB:
          case HB_FT_OLE:
+         case HB_FT_BINARY:
             bNext = uiLen == 10 ? ' ' : '\0';
             break;
 
@@ -1094,6 +1095,7 @@ HB_ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
 
    if( uiIndex >= pArea->uiFieldCount ||
        ( pArea->lpFields[ uiIndex ].uiType != HB_FT_MEMO &&
+         pArea->lpFields[ uiIndex ].uiType != HB_FT_BINARY &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_PICTURE &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_BLOB &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_OLE ) )
@@ -1171,6 +1173,7 @@ HB_ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
 
    if( uiIndex >= pArea->uiFieldCount ||
        ( pArea->lpFields[ uiIndex ].uiType != HB_FT_MEMO &&
+         pArea->lpFields[ uiIndex ].uiType != HB_FT_BINARY &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_PICTURE &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_BLOB &&
          pArea->lpFields[ uiIndex ].uiType != HB_FT_OLE ) )
@@ -1638,6 +1641,7 @@ static HB_ERRCODE hb_dbfAddField( DBFAREAP pArea, LPDBFIELDINFO pFieldInfo )
 
    if( pArea->bMemoType == DB_MEMO_SMT &&
        ( pFieldInfo->uiType == HB_FT_MEMO ||
+         pFieldInfo->uiType == HB_FT_BINARY ||
          pFieldInfo->uiType == HB_FT_PICTURE ||
          pFieldInfo->uiType == HB_FT_BLOB ||
          pFieldInfo->uiType == HB_FT_OLE ) )
@@ -2074,6 +2078,7 @@ static HB_ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          break;
 
       case HB_FT_MEMO:
+      case HB_FT_BINARY:      
       case HB_FT_OLE:
       case HB_FT_PICTURE:
       case HB_FT_BLOB:
@@ -2326,6 +2331,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
    uiIndex--;
    pField = pArea->lpFields + uiIndex;
    if( pField->uiType == HB_FT_MEMO ||
+       pField->uiType == HB_FT_BINARY ||
        pField->uiType == HB_FT_PICTURE ||
        pField->uiType == HB_FT_BLOB ||
        pField->uiType == HB_FT_OLE )
@@ -2840,6 +2846,10 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    {
       pArea->bMemoType = DB_MEMO_FPT;
    }
+   else if( pArea->bTableType == DB_DBF_IV )
+   {
+      pArea->bMemoType = DB_MEMO_DBT;   
+   }
    else if( pArea->bMemoType == 0 )
    {
       /* get memo type */
@@ -2979,6 +2989,14 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->fHasMemo = TRUE;
             break;
 
+         case HB_FT_BINARY:
+            pThisField->bType = 'B';
+            pField->uiLen = 10;
+            pThisField->bLen = ( BYTE ) pField->uiLen;
+            pArea->uiRecordLen += pField->uiLen;
+            pArea->fHasMemo = TRUE;
+            break;
+
          case HB_FT_BLOB:
             pThisField->bType = 'W';
             if( pField->uiLen != 4 || pArea->bMemoType == DB_MEMO_SMT )
@@ -3055,7 +3073,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_FT_DOUBLE:
          case HB_FT_CURDOUBLE:
-            pThisField->bType = 'B';
+            pThisField->bType = pArea->bTableType == DB_DBF_IV ? 'O': 'B';
             pField->uiLen = 8;
             pThisField->bLen = ( BYTE ) pField->uiLen;
             pThisField->bDec = ( BYTE ) pField->uiDec;
@@ -3670,6 +3688,7 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
             for( uiFields = 0; uiFields < pArea->uiFieldCount; uiFields++ )
             {
                if( pArea->lpFields[ uiFields ].uiType == HB_FT_MEMO ||
+                   pArea->lpFields[ uiFields ].uiType == HB_FT_BINARY ||
                    pArea->lpFields[ uiFields ].uiType == HB_FT_PICTURE ||
                    pArea->lpFields[ uiFields ].uiType == HB_FT_BLOB ||
                    pArea->lpFields[ uiFields ].uiType == HB_FT_OLE )
@@ -4068,11 +4087,19 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             /* See note above */
             break;
 
-         case '8':
          case 'B':
+            if( pArea->bTableType == DB_DBF_IV && dbFieldInfo.uiLen == 10 )
+            {
+               dbFieldInfo.uiType = HB_FT_BINARY;            
+               pArea->fHasMemo = TRUE;               
+               dbFieldInfo.uiFlags |= HB_FF_BINARY;            
+               break;
+            }
+         case 'O': /* dBase IV double */
+         case '8':
             dbFieldInfo.uiType = HB_FT_DOUBLE;
             dbFieldInfo.uiDec = pField->bDec;
-            if( dbFieldInfo.uiLen != 8 )
+            if( dbFieldInfo.uiLen != 8 ) 
                errCode = HB_FAILURE;
             break;
 
@@ -4139,6 +4166,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             dbFieldInfo.uiType = HB_FT_MEMO;
             pArea->fHasMemo = TRUE;
             break;
+            
 #ifdef HB_COMPAT_FOXPRO
          case 'P':
             dbFieldInfo.uiType = HB_FT_PICTURE;
@@ -5203,9 +5231,9 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
 
          switch( pArea->dbfHeader.bVersion )
          {
-            case 0x31:
+            case 0x31: /* Visual FoxPro w. AutoIncrement field */
                pArea->fAutoInc = TRUE;
-            case 0x30:
+            case 0x30: /* Visual FoxPro w. DBC or Visual FoxPro */
                pArea->bTableType = DB_DBF_VFP;
                if( pArea->dbfHeader.bHasTags & 0x02 )
                {
@@ -5255,20 +5283,27 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
 #endif
                break;
 
-            case 0x03:
+            case 0x02: /* FoxBASE */
+            case 0x03: /* FoxBASE+/Dbase III plus, no memo */
                break;
 
-            case 0x83:
+            case 0x04: /* dBASE IV w/o memo file */
+            case 0x7B: /* dBASE IV with memo */
+            case 0x8B: /* dBASE IV w. memo */  
+               pArea->bTableType = DB_DBF_IV;
+            case 0x83: /* dBASE III+ with memo file DBT*/
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_DBT;
                break;
 
-            case 0xE5:
+            case 0xE5: /* Clipper SIX driver w. SMT memo file. 
+                          Note! Clipper SIX driver sets lowest 3 bytes to 110 in descriptor of crypted databases.
+                          So, 3->6, 83h->86h, F5->F6, E5->E6 etc. */
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_SMT;
                break;
 
-            case 0xF5:
+            case 0xF5: /* FoxPro w. memo file */
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_FPT;
                break;
@@ -5429,6 +5464,13 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
             pArea->dbfHeader.bCodePage = 0x7D;
       else if( strcmp( pArea->cdPage->uniID, HB_CPID_1256 ) == 0 )
             pArea->dbfHeader.bCodePage = 0x7E;
+   }
+   else if( pArea->bTableType == DB_DBF_IV )
+   {
+      if( pArea->fHasMemo )
+         pArea->dbfHeader.bVersion = 0x8B;
+      else
+         pArea->dbfHeader.bVersion = 0x03;
    }
    else
    {
