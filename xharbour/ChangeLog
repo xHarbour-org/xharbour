@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6456 2009/05/18 10:29:45 marchuet Exp $
+ * $Id: ChangeLog,v 1.6458 2009/05/19 16:36:26 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-19 18:57 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * harbour/source/rdd/dbffpt/dbffpt1.c
+    ! fixed two bugs in garbage collector. One of them was critical and could
+      cause FPT or DBV file corruption when memoblock size was smaller then 8
+      bytes. Thanks to Mike Evans for self contain example.
+      (by Przemyslaw Czerpak, borrowed from Harbour)
+
 
 2009-05-19 18:37 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * common.mak
