@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6455 2009/05/12 12:17:33 modalsist Exp $
+ * $Id: ChangeLog,v 1.6456 2009/05/18 10:29:45 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-18 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * common.mak
+  * compile.mak
+  * include\dbinfo.ch
+  * include\hbapirdd.h
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * mdir.bat
+  + include\hbrddmdx.h
+  + source\rdd\dbfmdx\Makefile
+  + source\rdd\dbfmdx\dbfmdx1.c
+    + Added dbfmdx version IV, dbf works, but by the moment mdx is a clone of cdx
+      please don't use yet.
+
+  * source\rdd\dbf1.c
+  * source\rdd\dbffpt\dbffpt1.c
+    + Added field type "O" double compatible with dbase IV, and added too field type
+      binary "B" that works as a memo "M" but with no translation field type of
+      dBase V.
+      Now we full support dBase IV,V dbf file.
 
 2009-05-18 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\dbinfo.ch
