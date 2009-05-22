@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.10 2005/01/10 18:45:36 druzus Exp $
+ * $Id: net.c,v 1.11 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -101,47 +101,24 @@
 
 #endif
 
-/* NOTE: Clipper will only return a maximum of 15 bytes from this function.
-         And it will be padded with spaces. Harbour does the same on the
-         DOS platform.
-         [vszakats] */
-
-HB_FUNC( NETNAME )
+void hb_netname( char * pszNetName, BOOL bGetUser )
 {
-   BOOL bGetUser;
-  
-   bGetUser = ( hb_parnl(1) == 1 );
-   
 #if defined(HB_OS_OS2) || defined(HB_OS_UNIX_COMPATIBLE)
 
-   {
-#if defined(__WATCOMC__)
-      char * pszValue = hb_getenv( "HOSTNAME" );
-#else
-      char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
-      pszValue[ 0 ] = '\0';
-      gethostname( pszValue, MAXGETHOSTNAME );
-#endif
-      hb_retcAdopt( pszValue );
-   }
+   #if defined(__WATCOMC__)
+      pszNetName = hb_getenv( "HOSTNAME" );
+   #else
+      pszNetName[ 0 ] = '\0';
+      gethostname( pszNetName, MAXGETHOSTNAME );
+   #endif
 
 #elif defined(HB_OS_DOS)
 
    #if defined(__DJGPP__) || defined(__RSX32__) || defined(__GNUC__)
-      {
-         char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
-         pszValue[ 0 ] = '\0';
-
-         gethostname( pszValue, MAXGETHOSTNAME );
-
-         hb_retcAdopt( pszValue );
-      }
+      pszNetName[ 0 ] = '\0';
+      gethostname( pszNetName, MAXGETHOSTNAME );
    #elif defined(__WATCOMC__)
-
-         char * pszValue;
-         pszValue = hb_getenv( "COMPUTERNAME" );
-
-         hb_retcAdopt( pszValue );
+      pszNetName = hb_getenv( "COMPUTERNAME" );
    #else
       {
          char szValue[ 16 ];
@@ -158,33 +135,46 @@ HB_FUNC( NETNAME )
             HB_DOS_INT86X( 0x21, &regs, &regs, &sregs );
          }
 
-         hb_retc( regs.h.ch == 0 ? "" : szValue );
+         if( regs.h.ch == 0 )
+            pszNetName[ 0 ] = '\0';
+         else
+            memcpy( pszNetName, szValue, 16 );
       }
    #endif
 
 #elif defined(HB_OS_WIN_32)
-
    {
       DWORD ulLen = MAX_COMPUTERNAME_LENGTH + 1;
-      char * pszValue = ( char * ) hb_xgrab( ulLen );
 
-      pszValue[ 0 ] = '\0';
+      pszNetName[ 0 ] = '\0';
 
       if( bGetUser ) 
-      {
-         GetUserName( pszValue, &ulLen );
-      }
+         GetUserName( pszNetName, &ulLen );
       else
-      {   
-      GetComputerName( pszValue, &ulLen );
-      }    
-
-      hb_retcAdopt( pszValue );
+         GetComputerName( pszNetName, &ulLen );
    }
-
 #else
 
-   hb_retc( "" );
+   pszNetName[ 0 ] = '\0';
 
 #endif
 }
+
+/* NOTE: Clipper will only return a maximum of 15 bytes from this function.
+         And it will be padded with spaces. Harbour does the same on the
+         DOS platform.
+         [vszakats] */
+#if defined(HB_OS_WIN_32)
+#define MAXGETHOSTNAME  MAX_COMPUTERNAME_LENGTH
+#endif
+#ifndef MAXGETHOSTNAME
+#define MAXGETHOSTNAME  16
+#endif
+HB_FUNC( NETNAME )
+{
+   char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
+  
+   hb_netname( pszValue, hb_parnl( 1 ) == 1 );
+   hb_retcAdopt( pszValue );
+}   
+   

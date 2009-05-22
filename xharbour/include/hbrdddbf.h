@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.40 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.41 2009/04/23 22:07:19 ronpinkas Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ typedef struct _DBFAREA
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
    USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
-   /*
+/*
    *  DBFS's additions to the workarea structure
    *
    *  Warning: The above section MUST match WORKAREA exactly!  Any
@@ -247,6 +247,8 @@ typedef struct _DBFAREA
    ULONG    ulNumLocksPos;          /* Number of records locked */
    BYTE *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
+   USHORT   uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */   
+   USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */   
 } DBFAREA;
 
 typedef DBFAREA * LPDBFAREA;

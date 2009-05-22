@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.30 2009/05/18 10:29:46 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.31 2009/05/19 16:34:58 marchuet Exp $
  */
 
 /*
@@ -237,6 +237,7 @@
 #define DBRI_RAWRECORD            7
 #define DBRI_RAWMEMOS             8
 #define DBRI_RAWDATA              9
+#define DBRI_DBASELOCK           10  /* get lock info */
 
 /* constants for dbInfo()  */
 #define DBI_ISDBF                 1  /* Does this RDD support DBFs? */

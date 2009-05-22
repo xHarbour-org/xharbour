@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.13 2008/07/30 11:29:10 marchuet Exp $
+ * $Id: hbdate.h,v 1.14 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ extern HB_EXPORT HB_ULONG hb_dateMilliSeconds( void );
 extern HB_EXPORT double hb_secondsCPU( int n );
 extern HB_EXPORT void   hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec );
 extern HB_EXPORT char * hb_timeStampStr( char * szTime, LONG lMillisec );
+extern HB_EXPORT void   hb_dbaselockEncode( char * pszTimeDate );
 extern HB_EXPORT LONG   hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec );
 extern HB_EXPORT void   hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
 extern HB_EXPORT void   hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );

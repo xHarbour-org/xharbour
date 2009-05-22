@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.55 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.56 2009/05/19 16:34:58 marchuet Exp $
  */
 
 /*
@@ -162,6 +162,7 @@ HB_EXTERN_BEGIN
 #define HEADER_UNLOCK      6
 #define APPEND_LOCK        7
 #define APPEND_UNLOCK      8
+#define REC_LOCK_TEST      9
 
 
 

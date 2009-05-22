@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmc.h,v 1.10 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: hbrddbmc.h,v 1.11 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -537,6 +537,7 @@ typedef struct _CDXAREA
    ULONG    ulNumLocksPos;          /* Number of records locked */
    BYTE *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
+   USHORT   uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */         
    USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */
 
    /*

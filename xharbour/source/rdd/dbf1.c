@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.206 2009/05/18 10:29:46 marchuet Exp $
+ * $Id: dbf1.c,v 1.207 2009/05/19 16:34:58 marchuet Exp $
  */
 
 /*
@@ -72,6 +72,9 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
 #endif
+
+/* at net.c */
+void hb_netname( char * pszNetName, BOOL bGetUser );
 
 static RDDFUNCS dbfSuper;
 static const RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
@@ -252,6 +255,42 @@ static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNext
    }
 
    return nPreviousValue;
+}
+
+/*      
+0-1  The first two bytes (binary integer) tell whether a user has changed the record. Every committed change
+     is counted encreasing the count by one.
+2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
+5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
+8-24 The remaining 16 characters are optional. They tell the name of the user that placed the lock.
+*/    
+static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
+{
+   if( pArea->uidbaselock && ulRecNo )
+   {
+      BYTE * pPtr;
+      BYTE * pRecord = hb_xgrab( pArea->uiRecordLen );
+
+
+      if( hb_fileReadAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
+                      ( HB_FOFFSET ) pArea->uiHeaderLen +
+                      ( HB_FOFFSET ) ( ulRecNo - 1 ) *
+                      ( HB_FOFFSET ) pArea->uiRecordLen ) == ( ULONG ) pArea->uiRecordLen )
+      {
+      
+         pPtr = pRecord + pArea->pFieldOffset[ pArea->uidbaselock ] + 2;
+         hb_dbaselockEncode( ( char * ) pPtr );
+         /* Login name of user who locked record or file */
+         if( pArea->lpFields[ pArea->uidbaselock ].uiLen >= 24 )
+            hb_netname( ( char * ) pPtr + 6, 0 );
+
+         hb_fileWriteAt( pArea->pDataFile, pPtr, pArea->lpFields[ pArea->uidbaselock ].uiLen - 3,
+                         ( HB_FOFFSET ) pArea->uiHeaderLen +
+                         ( HB_FOFFSET ) ( ( ulRecNo - 1 ) * pArea->uiRecordLen ) +
+                         ( HB_FOFFSET ) ( pArea->pFieldOffset[ pArea->uidbaselock ] + 2 ) );
+      }                           
+      hb_xfree( pRecord );                                                   
+   }
 }
 
 static void hb_dbfUpdateStampFields( DBFAREAP pArea )
@@ -806,7 +845,7 @@ static HB_ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResul
       if( SELF_FORCEREL( ( AREAP ) pArea ) != HB_SUCCESS )
          return HB_FAILURE;
    }
-
+  
    if( pArea->fFLocked )
    {
       * pResult = TRUE;
@@ -845,6 +884,7 @@ static HB_ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResul
                                                    ( pArea->ulNumLocksPos + 1 ) *
                                                      sizeof( ULONG ) );
       }
+      
       pArea->pLocksPos[ pArea->ulNumLocksPos++ ] = ulRecNo;
       * pResult = TRUE;
       if( ulRecNo == pArea->ulRecNo )
@@ -861,6 +901,7 @@ static HB_ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResul
             pArea->fValidBuffer = FALSE;
          }
       }
+      hb_dbfUpdatedbaselockValue( pArea, ulRecNo );
    }
    else
       * pResult = FALSE;
@@ -2973,6 +3014,14 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pThisField->bDec = ( BYTE ) ( pField->uiLen >> 8 );
             pArea->uiRecordLen += pField->uiLen;
             break;
+            
+         /* system fields */   
+         case HB_FT_NONE:
+            pThisField->bType = '0';
+            pThisField->bLen = ( BYTE ) pField->uiLen;
+            pThisField->bFieldFlags |= HB_FF_HIDDEN;
+            pArea->uiRecordLen += pField->uiLen;
+            break;            
 
          case HB_FT_LOGICAL:
             pThisField->bType = 'L';
@@ -3434,7 +3483,7 @@ static HB_ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutL( pItem, bTransaction );
          break;
       }
-      
+     
       case DBI_ISFLOCK:
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
@@ -3709,6 +3758,62 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
          hb_itemPutCPtr( pInfo, ( char * ) pResult, ulLength );
          break;
       }
+      case DBRI_DBASELOCK:
+         if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) && !pArea->fShared )
+         {
+            errResult = HB_FAILURE;
+            hb_itemPutNull( pInfo );
+            break;
+         }
+         /*      
+         0-1  The first two bytes (binary integer) tell whether a user has changed the record. Every committed change
+              is counted encreasing the count by one.
+         2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
+         5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
+         8-24 The remaining 16 characters are optional. They tell the name of the user that placed the lock.
+         */    
+         if( pArea->uidbaselock )
+         {
+            BYTE * pPtr = pArea->pRecord + pArea->pFieldOffset[ pArea->uidbaselock ];
+
+            if( SELF_RAWLOCK( ( AREAP ) pArea, REC_LOCK_TEST, pArea->ulRecNo ) == HB_SUCCESS )
+            {
+               errResult = HB_FAILURE;
+               hb_itemPutNull( pInfo );
+               break;
+            }
+            
+            switch( hb_itemGetNL( pInfo ) )
+            {
+               case 0: /* Time when lock was placed */
+               {
+                  char szTime[9];
+                  pPtr += 2;
+                  hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d", (int) pPtr[0], (int) pPtr[1], (int) pPtr[2] );
+                  hb_itemPutC( pInfo, szTime);
+                  break;
+               }
+               case 1: /* Date when lock was placed */
+                  pPtr += 5;
+                  hb_itemPutDL( pInfo, hb_dateEncode( pPtr[0] + 1900, pPtr[1], pPtr[2] ) );
+                  break;
+               case 2: /* Login name of user who locked record or file */
+                  if( pArea->lpFields[ pArea->uidbaselock ].uiLen >= 24 )
+                  {
+                     pPtr += 8;
+                     hb_itemPutCPtr( pInfo, ( char * ) pPtr, 16 );
+                  }
+                  else
+                     hb_itemPutC( pInfo, "" );
+                  break;
+               default:
+                  errResult = HB_FAILURE;
+            }
+         }
+         else
+            hb_itemPutNull( pInfo );
+         break;
+     
 
       default:
          errResult = SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
@@ -4215,6 +4320,13 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                continue;
             }
 #endif
+            else if( memcmp( dbFieldInfo.atomName, "_DBASELOCK", 10 ) == 0 )
+            {
+               dbFieldInfo.uiType = HB_FT_NONE;
+               dbFieldInfo.uiFlags |= HB_FF_HIDDEN; /* To support it under all DBF formats */
+               pArea->uidbaselock = uiCount;
+               break;
+            }
 
          default:
             errCode = HB_FAILURE;
@@ -4883,6 +4995,7 @@ static HB_ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo 
             break;
 
          case REC_LOCK:
+         case REC_LOCK_TEST:         
             if( !pArea->fFLocked )
             {
                if( iDir < 0 )
@@ -4894,6 +5007,8 @@ static HB_ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo 
 
                if( !fLck )
                   uiErr = HB_FAILURE;
+               else if( uiAction == REC_LOCK_TEST )
+                  hb_dbfRawLock( pArea, REC_UNLOCK, ulRecNo );
             }
             break;
 
@@ -4926,7 +5041,13 @@ static HB_ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo 
                if( !fLck )
                   uiErr = HB_FAILURE;
                else
+               {
+                  /*
+                  if( uiAction == APPEND_LOCK )
+                     hb_dbfUpdatedbaselockValue( pArea );
+                  */
                   pArea->fHeaderLocked = TRUE;
+               }
             }
             break;
 

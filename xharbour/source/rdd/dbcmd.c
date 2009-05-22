@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.230 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: dbcmd.c,v 1.231 2009/05/18 10:29:46 marchuet Exp $
  */
 
 /*
@@ -934,7 +934,29 @@ HB_FUNC( ISMARKED )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
+}
+/*
+0 Time when lock was placed
+1 Date when lock was placed
+2 Login name of user who locked record or file
+*/
+HB_FUNC( LKSYS )
+{
+   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
+   if( pArea )
+   {
+      PHB_ITEM pInfo = hb_param( 1, HB_IT_NUMERIC );
+      if( pInfo )
+      {
+         SELF_RECINFO( pArea, 0, DBRI_DBASELOCK, pInfo );
+         hb_itemReturn( pInfo );
+      }
+      else
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, HB_ERR_FUNCNAME );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME );
 }
 
 HB_FUNC( DELETED )

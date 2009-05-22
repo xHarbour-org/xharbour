@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.63 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: hbrddmdx.h,v 1.1 2009/05/19 16:34:58 marchuet Exp $
  */
 
 /*
@@ -444,7 +444,7 @@ typedef struct _CDXAREA
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
    USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
-   /*
+/*
    *  DBFS's additions to the workarea structure
    *
    *  Warning: The above section MUST match WORKAREA exactly!  Any
@@ -499,9 +499,10 @@ typedef struct _CDXAREA
    ULONG    ulNumLocksPos;          /* Number of records locked */
    BYTE *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
+   USHORT   uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */  
    USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */
 
-   /*
+/*
    *  CDX's additions to the workarea structure
    *
    *  Warning: The above section MUST match DBFAREA exactly! Any

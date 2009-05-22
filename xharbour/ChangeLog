@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6458 2009/05/19 16:36:26 marchuet Exp $
+ * $Id: ChangeLog,v 1.6460 2009/05/19 16:58:35 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,71 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-22 18:00 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbdate.h  
+  * source\common\hbdate.c
+    + Added api hb_dbaselockEncode( char * pszTimeDate ) to encode this time of fields.  
+  * include\dbinfo.ch
+    + Added #define DBRI_DBASELOCK           10  /* get lock info */
+      to get info about lock on shared tables and locked registers.
+  * source\rdd\dbcmd.c
+    + added LKSYS( nInfo ) function with this parameter:
+      0 Time when lock was placed
+      1 Date when lock was placed
+      2 Login name of user who locked record or file
+  * include\hbapirdd.h
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * include\hbrdddbf.h
+  * include\hbrddmdx.h
+  * include\hbrddnsx.h
+  * include\hbrddntx.h
+  * source\rdd\dbf1.c
+  * source\rdd\workarea.c
+    * modified dbf rdd structure, all rdds based on DBF need to be actualiced.
+    + Added support to add system fields Type 0, for example _DBASELOCK
+    + Added support to _dbaselock hidden field with lock information (user,time & date)
+    + Added function LKSYS to retrieve lock information, works in similar way as dBase IV.
+    ! fixed FieldType to retrive correct type for system fields and dbase IV binary memo.
+    sample of use:
+      FUNCTION MAIN()
+         LOCAL n
+
+         SET DATE FORMAT "DD/MM/YYYY"
+         RDDSETDEFAULT( "DBFCDX" )
+
+         SET DELETED ON
+
+         DBCREATE( "TMPTEST", { { "A1", "C", 10, 0 },;
+                                { "_DBASELOCK", "0", 24, 0, 0x0001 } } )
+
+         USE TMPTEST SHARED NEW ALIAS "ONE"
+
+         FOR n := 1 TO 10
+           APPEND BLANK
+           REPLACE FIELD->A1 WITH "0123456789"
+         NEXT
+
+         DBGOTOP()
+         DBRLOCK( RecNo() )
+
+         USE TMPTEST SHARED NEW ALIAS "TWO"
+         DBGOTOP()
+         IF ! DbRLock( RecNo() )
+           ? LKSYS( 0 )
+           ? LKSYS( 1 )
+           ? LKSYS( 2 )
+         ENDIF
+
+         WAIT
+
+      RETURN NIL
+    
+  
+  * source\rtl\net.c
+    + created void hb_netname( char * pszNetName, BOOL bGetUser ) and used from NETNAME.
+      to call it from c code of rdd.
 
 2009-05-19 18:57 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * harbour/source/rdd/dbffpt/dbffpt1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.97 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: workarea.c,v 1.98 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -369,6 +369,14 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
             break;
 
          case 'B':
+            /* dBase IV Binary memo */
+            if( uiLen == 10 )
+            {
+               pFieldInfo.uiType = HB_FT_BINARY;
+               pFieldInfo.uiLen = 10;
+               break;
+            }
+            /* else as HB_FT_DOUBLE */
          case '8':
             pFieldInfo.uiType = HB_FT_DOUBLE;
             pFieldInfo.uiLen = 8;
@@ -458,6 +466,11 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
          case 'G':
             pFieldInfo.uiType = HB_FT_OLE;
             pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            break;
+
+         case '0':
+            pFieldInfo.uiType = HB_FT_NONE;
+            pFieldInfo.uiLen = uiLen;
             break;
 
          default:
@@ -594,7 +607,15 @@ static HB_ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PH
             case HB_FT_OLE:
                hb_itemPutC( pItem, "G" );
                break;
-
+               
+            case HB_FT_BINARY:
+               hb_itemPutC( pItem, "B" );
+               break;
+               
+            case HB_FT_NONE:
+               hb_itemPutC( pItem, "0" );
+               break;               
+               
             default:
                hb_itemPutC( pItem, "U" );
                break;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddnsx.h,v 1.3 2009/02/20 12:48:05 marchuet Exp $
+ * $Id: hbrddnsx.h,v 1.4 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -626,6 +626,8 @@ typedef struct _NSXAREA
    ULONG       ulNumLocksPos;       /* Number of records locked */
    BYTE *      pCryptKey;           /* Pointer to encryption key */
    PHB_DYNS    pTriggerSym;         /* DynSym pointer to trigger function */
+   USHORT      uidbaselock;         /* position of _dbaselock field 0 if doesn't exists */      
+   USHORT      uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */         
    USHORT      uiFieldNullFlags;    /* Number of Field _NullFlags */
 
    /*

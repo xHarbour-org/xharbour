@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.17 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbdate.c,v 1.18 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -739,6 +739,43 @@ void hb_dateTimeStr( char * pszTime )
       time( &t );
       oTime = localtime( &t );
       hb_snprintf( pszTime, 9, "%02d:%02d:%02d", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
+   }
+#endif
+}
+
+/*
+2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
+5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
+*/
+void hb_dbaselockEncode( char * pszTimeDate )
+{
+#if defined(HB_OS_WIN_32)
+   {
+      SYSTEMTIME st;
+      GetLocalTime( &st );
+      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                st.wHour, st.wMinute, st.wSecond, st.wYear - 1900, st.wMonth, st.wDay );
+   }
+#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+   {
+      time_t t;
+      struct tm st;
+
+      time( &t );
+      localtime_r( &t, &st );
+
+      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                st.tm_hour, st.tm_min, st.tm_sec, st.tm_year, st.tm_mon + 1, st.tm_mday );
+   }
+#else
+   {
+      time_t t;
+      struct tm * oTime;
+
+      time( &t );
+      oTime = localtime( &t );
+      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                oTime->tm_hour, oTime->tm_min, oTime->tm_sec, oTime->tm_year, oTime->tm_mon + 1, oTime->tm_mday );
    }
 #endif
 }
