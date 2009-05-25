@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.64 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbapifs.h,v 1.65 2009/04/23 22:07:19 ronpinkas Exp $
  */
 
 /*
@@ -265,6 +265,7 @@ extern HB_EXPORT void       hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList );
 
 extern HB_EXPORT BOOL       hb_spFile( BYTE * pFilename, BYTE * pRetPath );
 extern HB_EXPORT HB_FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags );
+extern HB_EXPORT BOOL       hb_spFileExists( BYTE * pFilename, BYTE * pRetPath );
 extern HB_EXPORT HB_FHANDLE hb_spCreate( BYTE * pFilename, ULONG ulAttr );
 extern HB_EXPORT HB_FHANDLE hb_spCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags );
 extern HB_EXPORT BOOL       hb_spFileExists( BYTE * pFilename, BYTE * pRetPath );

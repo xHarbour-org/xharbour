@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.260 2009/05/01 21:09:36 marchuet Exp $
+ * $Id: hbapi.h,v 1.261 2009/05/06 15:57:41 andijahja Exp $
  */
 
 /*
@@ -967,6 +967,10 @@ extern HB_EXPORT BOOL   hb_iswinnt( void ); /* return .T. if OS == WinNt, 2000, 
 extern HB_EXPORT BOOL   hb_iswince( void ); /* return .T. if OS is Windows CE or Windows Mobile */
 extern char * hb_builddate( void ); /* return date and time of harbour.exe build */
 extern char * hb_credits( void ); /* return credits of harbour.exe build */
+
+/* OS/Harbour codepage conversion */
+extern HB_EXPORT BYTE * hb_osEncode( BYTE * szFileName, BOOL * pfFree ); /* Convert a string sent to a system call, from Harbour codepage. */
+extern HB_EXPORT BYTE * hb_osDecode( BYTE * szFileName, BOOL * pfFree ); /* Convert a string received from a system call, to Harbour codepage. */
 
 /* Executable array execution */
 extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );
