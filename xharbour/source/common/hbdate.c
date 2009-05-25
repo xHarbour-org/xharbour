@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.18 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: hbdate.c,v 1.19 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -753,8 +753,8 @@ void hb_dbaselockEncode( char * pszTimeDate )
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
-      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
-                st.wHour, st.wMinute, st.wSecond, st.wYear - 1900, st.wMonth, st.wDay );
+      hb_snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                   st.wHour, st.wMinute, st.wSecond, st.wYear - 1900, st.wMonth, st.wDay );
    }
 #elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
    {
@@ -764,8 +764,8 @@ void hb_dbaselockEncode( char * pszTimeDate )
       time( &t );
       localtime_r( &t, &st );
 
-      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
-                st.tm_hour, st.tm_min, st.tm_sec, st.tm_year, st.tm_mon + 1, st.tm_mday );
+      hb_snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                   st.tm_hour, st.tm_min, st.tm_sec, st.tm_year, st.tm_mon + 1, st.tm_mday );
    }
 #else
    {
@@ -774,8 +774,8 @@ void hb_dbaselockEncode( char * pszTimeDate )
 
       time( &t );
       oTime = localtime( &t );
-      snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
-                oTime->tm_hour, oTime->tm_min, oTime->tm_sec, oTime->tm_year, oTime->tm_mon + 1, oTime->tm_mday );
+      hb_snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
+                   oTime->tm_hour, oTime->tm_min, oTime->tm_sec, oTime->tm_year, oTime->tm_mon + 1, oTime->tm_mday );
    }
 #endif
 }

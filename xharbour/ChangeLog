@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6460 2009/05/19 16:58:35 marchuet Exp $
+ * $Id: ChangeLog,v 1.6461 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-25 16:15 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbrddnsx.h
+  * source\common\hbdate.c
+    ! fixed some missing code from last update. fixed msvc build and dbfnsx rdd.
 
 2009-05-22 18:00 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbdate.h  
