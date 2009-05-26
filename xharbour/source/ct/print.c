@@ -1,5 +1,5 @@
 /*
- * $Id: print.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: print.c,v 1.2 2009/05/26 16:35:10 ptsarenko Exp $
  */
 
 /*
@@ -185,10 +185,10 @@ HB_FUNC( PRINTSEND )
 
    if( usLen )
    {
-      hFile = hb_fsOpen( szPort, FO_WRITE );
+      hFile = hb_fsOpen( ( BYTE * ) szPort, FO_WRITE );
       if( hFile != FS_ERROR )
       {
-         usRet = hb_fsWrite( hFile, szStr, usLen );
+         usRet = hb_fsWrite( hFile, ( BYTE * ) szStr, usLen );
          hb_fsClose( hFile );
       }
    }
