@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.207 2009/05/19 16:34:58 marchuet Exp $
+ * $Id: dbf1.c,v 1.208 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -269,7 +269,7 @@ static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
    if( pArea->uidbaselock && ulRecNo )
    {
       BYTE * pPtr;
-      BYTE * pRecord = hb_xgrab( pArea->uiRecordLen );
+      BYTE * pRecord = ( BYTE * ) hb_xgrab( pArea->uiRecordLen );
 
 
       if( hb_fileReadAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
@@ -2303,10 +2303,10 @@ static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
       }
 
       /* Write data to file */
-      uiWritten = hb_fileWriteAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
-                                  ( HB_FOFFSET ) pArea->uiHeaderLen +
-                                  ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
-                                  ( HB_FOFFSET ) pArea->uiRecordLen );
+      uiWritten = ( USHORT )hb_fileWriteAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
+                                            ( HB_FOFFSET ) pArea->uiHeaderLen +
+                                            ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
+                                            ( HB_FOFFSET ) pArea->uiRecordLen );
       if( pRecord != pArea->pRecord )
          hb_xfree( pRecord );
 
@@ -3003,7 +3003,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
 #ifdef HB_COMPAT_FOXPRO
       /* field flags */
-      pThisField->bFieldFlags = pField->uiFlags;
+      pThisField->bFieldFlags = ( BYTE ) pField->uiFlags;
 #endif
 
       switch( pField->uiType )
@@ -3244,43 +3244,21 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    // Adding field _NullFlags automatically
    if( pArea->bFlagCount )
    {
-      DBFIELDINFO pFieldInfo;
-      USHORT uiLen = pArea->bFlagCount;
+      hb_strncpy( ( char * ) pThisField->bName, "_NullFlags", sizeof( pThisField->bName ) - 1 );
+      pArea->pFieldOffset[ pArea->uiFieldCount ] = pArea->uiRecordLen;
 
-      pFieldInfo.uiLen = 0;
-      while( uiLen > 8 )
-      {
-         uiLen -= 8;
-         pFieldInfo.uiLen ++;
-      }
-      if( uiLen > 0 )
-         pFieldInfo.uiLen ++;
+      /* field offset */
+      if( pArea->bTableType == DB_DBF_VFP )
+         HB_PUT_LE_UINT16( pThisField->bReserved1, pArea->uiRecordLen );
 
-      pFieldInfo.uiTypeExtended = 0;
-      memcpy( pFieldInfo.atomName, "_NullFlags", 10 );
-      pFieldInfo.uiDec = 0;
-      pFieldInfo.uiFlags = HB_FF_HIDDEN;
-      pFieldInfo.uiType = HB_FT_NONE;
+      /* field flags */
+      pThisField->bFieldFlags = HB_FF_HIDDEN;
 
-      if( SELF_ADDFIELD( ( AREAP ) pArea, &pFieldInfo ) != HB_SUCCESS )
-         return HB_FAILURE;
-      else
-      {
-         LPFIELD pField = pArea->lpFields + pArea->uiFieldCount;
-         strncpy( ( char * ) pThisField->bName,
-                  hb_dynsymName( ( PHB_DYNS ) pField->sym ), 10 );
-         pArea->pFieldOffset[ pArea->uiFieldCount ] = pArea->uiRecordLen;
-         /* field offset */
-         if( pArea->bTableType == DB_DBF_VFP )
-            HB_PUT_LE_UINT16( pThisField->bReserved1, pArea->uiRecordLen );
-         /* field flags */
-         pThisField->bFieldFlags = pField->uiFlags;
-
-         pThisField->bType = '0';
-         pThisField->bLen = ( BYTE ) pField->uiLen;
-         pThisField->bDec = ( BYTE ) ( pField->uiLen >> 8 );
-         pArea->uiRecordLen += pField->uiLen;
-      }
+      pThisField->bType = '0';
+      uiCount = ( pArea->bFlagCount + 7 ) >> 3;
+      pThisField->bLen = ( BYTE ) uiCount;
+      pThisField->bDec = ( BYTE ) ( uiCount >> 8 );
+      pArea->uiRecordLen += uiCount;
    }
 #endif
 
@@ -5286,8 +5264,8 @@ static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szF
       }
       else
       {
-         uiRead = hb_fileReadAt( pFile, pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                                 pField->uiLen, 0 );
+         uiRead = ( USHORT ) hb_fileReadAt( pFile, pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                                            pField->uiLen, 0 );
          if( uiRead != ( USHORT ) FS_ERROR && uiRead < pField->uiLen )
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiRead,
                     ' ', pField->uiLen - uiRead );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.102 2009/05/19 16:34:58 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.103 2009/05/19 16:57:38 marchuet Exp $
  */
 
 /*
@@ -2625,7 +2625,7 @@ static HB_ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
    {
       errCode = hb_dbfGetMemoData( ( DBFAREAP ) pArea, uiIndex - 1,
                                    &ulBlock, &ulSize, &ulType );
-      uiFlags = pArea->lpFields[ uiIndex - 1 ].uiFlags;
+      uiFlags = ( BYTE ) pArea->lpFields[ uiIndex - 1 ].uiFlags;
    }
    else if( ! hb_fptHasDirectAccess( pArea ) )
    {
@@ -3412,7 +3412,7 @@ static HB_ERRCODE hb_fptGetVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
             if( hFile != FS_ERROR )
                uiError = EDBF_DATATYPE;
             else
-               uiError = hb_fptReadSMTBlock( pArea, pItem, ulBlock, 0, pArea->lpFields[ uiIndex - 1 ].uiFlags );
+               uiError = hb_fptReadSMTBlock( pArea, pItem, ulBlock, 0, ( BYTE ) pArea->lpFields[ uiIndex - 1 ].uiFlags );
          }
          else if( uiType == HB_VF_BLOB )
             uiError = hb_fptReadBlobBlock( pArea, pItem, hFile, ulBlock, 0 );
@@ -3637,7 +3637,7 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
                   if( hb_fptCountSMTDataLength( pArea, &fOffset ) != HB_SUCCESS )
                      ulOldSize = 0;
                   else
-                     ulOldSize = fOffset - FPT_BLOCK_OFFSET( ulOldBlock );
+                     ulOldSize = ( ULONG ) ( fOffset - FPT_BLOCK_OFFSET( ulOldBlock ) );
                }
             }
          }
@@ -3722,7 +3722,7 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
             ULONG ulArrayCount = 0;
             ulNewSize = hb_fptCountSMTItemLength( pArea, pItem, &ulArrayCount );
             pBlock = pAlloc = ( BYTE * ) hb_xgrab( ulNewSize );
-            hb_fptStoreSMTItem( pArea, pItem, &pBlock, pField->uiFlags );
+            hb_fptStoreSMTItem( pArea, pItem, &pBlock, ( BYTE ) pField->uiFlags );
             pBlock = pAlloc;
             uiType = HB_VF_ARRAY;
          }
@@ -4463,7 +4463,7 @@ static HB_ERRCODE hb_fptDoPackRec( FPTAREAP pArea )
             case HB_VF_ARRAY:
                from = FPT_BLOCK_OFFSET( ulBlock );
                errCode = hb_fptCountSMTDataLength( pArea, &from );
-               ulSize = from - FPT_BLOCK_OFFSET( ulBlock );
+               ulSize = ( ULONG ) ( from - FPT_BLOCK_OFFSET( ulBlock ) );
                break;
             case HB_VF_DNUM:
                if( pField->uiLen <= 12 )

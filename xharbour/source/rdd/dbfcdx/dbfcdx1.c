@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.293 2009/05/01 21:10:19 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.294 2009/05/04 08:25:44 marchuet Exp $
  */
 
 /*
@@ -861,16 +861,16 @@ static BOOL hb_cdxTopScope( LPCDXTAG pTag )
    {
       pKey = pTag->topScopeKey;
       return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, pKey->len,
-                               pTag->CurKey->val, pTag->CurKey->len,
+             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
                                pKey->mode ) <= 0;
    }
    else
    {
       pKey = pTag->bottomScopeKey;
       return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, pKey->len,
-                               pTag->CurKey->val, pTag->CurKey->len,
+             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
                                pKey->mode ) >= 0;
    }
 }
@@ -886,16 +886,16 @@ static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
    {
       pKey = pTag->bottomScopeKey;
       return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, pKey->len,
-                               pTag->CurKey->val, pTag->CurKey->len,
+             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
                                pKey->mode ) >= 0;
    }
    else
    {
       pKey = pTag->topScopeKey;
       return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, pKey->len,
-                               pTag->CurKey->val, pTag->CurKey->len,
+             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
                                pKey->mode ) <= 0;
    }
 }
@@ -3858,7 +3858,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, ULONG ulKeyRec )
    while( l < r )
    {
       n = (l + r ) >> 1;
-      k = hb_cdxValCompare( pPage->TagParent, pKey->val, pKey->len,
+      k = hb_cdxValCompare( pPage->TagParent, pKey->val, ( BYTE ) pKey->len,
                             hb_cdxPageGetKeyVal( pPage, n ),
                             (BYTE) pPage->TagParent->uiLen, pKey->mode );
       if( k == 0 )

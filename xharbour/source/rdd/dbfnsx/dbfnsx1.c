@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.10 2009/05/01 21:10:19 marchuet Exp $
+ * $Id: dbfnsx1.c,v 1.11 2009/05/25 14:37:59 marchuet Exp $
  */
 
 /*
@@ -251,7 +251,7 @@ static USHORT hb_nsxLeafGetKey( LPTAGINFO pTag, LPPAGEINFO pPage, USHORT uiOffse
    ucSize = ptr[ uiOffset++ ];
    if( ucSize != ucRecLen + 1 ) /* key value is not fully duplicated */
    {
-      UCHAR len = pTag->KeyLength;
+      UCHAR len = ( UCHAR ) pTag->KeyLength;
 
       /* ucSize = 0 is a special case when RecLen is 4 and KeySize is 250
        * in such case ucSize - ( ucRecLen + 2 ) gives 250 = NSX_MAXKEYLEN
@@ -4153,7 +4153,7 @@ static BOOL hb_nsxOrdKeyGoto( LPTAGINFO pTag, ULONG ulKeyNo )
                }
                else
                {
-                  pTag->stack[ iLevel ].ikey -= ulKeyNo;
+                  pTag->stack[ iLevel ].ikey -= ( SHORT ) ulKeyNo;
                   ulKeyNo = 0;
                }
             }
@@ -4209,7 +4209,7 @@ static BOOL hb_nsxOrdKeyGoto( LPTAGINFO pTag, ULONG ulKeyNo )
                }
                else
                {
-                  pTag->stack[ iLevel ].ikey += ulKeyNo;
+                  pTag->stack[ iLevel ].ikey += ( SHORT ) ulKeyNo;
                   ulKeyNo = 0;
                }
             }

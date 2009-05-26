@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.35 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: sdf1.c,v 1.36 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -104,8 +104,8 @@ static HB_ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfReadRecord(%p)", pArea));
 
    uiToRead = pArea->uiRecordLen + pArea->uiEolLen + 2;
-   uiRead = hb_fileReadAt( pArea->pFile, pArea->pRecord, uiToRead,
-                           pArea->ulRecordOffset );
+   uiRead = ( USHORT ) hb_fileReadAt( pArea->pFile, pArea->pRecord, uiToRead,
+                                      pArea->ulRecordOffset );
    if( uiRead > 0 && uiRead < uiToRead && pArea->pRecord[ uiRead - 1 ] == '\032' )
       --uiRead;
 
@@ -168,8 +168,8 @@ static HB_ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
 
          do
          {
-            uiRead = hb_fileReadAt( pArea->pFile, pArea->pRecord + uiRest,
-                                    uiToRead - uiRest, ulOffset + uiRest ) + uiRest;
+            uiRead = ( USHORT ) hb_fileReadAt( pArea->pFile, pArea->pRecord + uiRest,
+                                               uiToRead - uiRest, ulOffset + uiRest ) + uiRest;
             if( uiRead > 0 && uiRead < uiToRead &&
                 pArea->pRecord[ uiRead - 1 ] == '\032' )
                --uiRead;
