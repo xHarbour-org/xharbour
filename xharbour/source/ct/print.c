@@ -1,5 +1,5 @@
 /*
- * $Id: print.c,v 1.3 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: print.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ HB_FUNC( PRINTREADY )
 
 HB_FUNC( PRINTSEND )
 {
-#ifdef __DJGPP__
+#if defined(__DJGPP__)
    __dpmi_regs r;
 
    r.x.dx = hb_parni( 2 ) - 1;
@@ -131,9 +131,16 @@ HB_FUNC( PRINTSEND )
       r.h.al = hb_parni( 1 );
       __dpmi_int( 0x17, &r );
       if ( r.h.ah & 1 )
-        hb_retni( 1 );
-      else hb_retni( 0 );
-   } else if ( ISCHAR( 1 ) ) {
+      {
+         hb_retni( 1 );
+      }
+      else
+      {
+         hb_retni( 0 );
+      }
+   }
+   else if ( ISCHAR( 1 ) )
+   {
       char *string = hb_parcx( 1 );
       int i, len = hb_parclen( 1 );
 
@@ -144,9 +151,48 @@ HB_FUNC( PRINTSEND )
          __dpmi_int( 0x17, &r );
       }
       if ( r.h.ah & 1 )
+      {
         hb_retni( len - ( i - 1 ) );
+      }
       else
+      {
         hb_retni( 0 );
+      }
    }
+#elif defined( HB_OS_WIN_32 )
+   char *szPort = "lpt1";
+   char *szChr = " ";
+   char *szStr = NULL;
+   USHORT usLen = 0, usRet = 0;
+   FHANDLE hFile;
+
+   if( ISNUM( 1 ) )
+   {
+      szChr[0] = (char) hb_parni( 1 );
+      szStr = szChr;
+      usLen = 1;
+   }
+   else if( ISCHAR( 1 ) )
+   {
+      szStr = hb_parcx( 1 );
+      usLen = hb_parclen( 1 );
+   }
+
+   if( ISNUM( 2 ) )
+   {
+      szPort[3] = (char) hb_parni(2) + '0';
+   }
+
+   if( usLen )
+   {
+      hFile = hb_fsOpen( szPort, FO_WRITE );
+      if( hFile != FS_ERROR )
+      {
+         usRet = hb_fsWrite( hFile, szStr, usLen );
+         hb_fsClose( hFile );
+      }
+   }
+   hb_retni( usRet );
+
 #endif
 }
