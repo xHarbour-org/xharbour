@@ -1,5 +1,5 @@
 /*
- * $Id: arrayrdd.prg,v 1.7 2009/04/21 13:36:49 fsgiudice Exp $
+ * $Id: arrayrdd.prg,v 1.8 2009/04/21 22:05:51 lculik Exp $
  */
 
 /*
@@ -627,7 +627,9 @@ STATIC FUNCTION AR_SKIPRAW( nWA, nRecords )
             nResult := AR_GOTO( nWA, 1 )
             aWAData[ WADATA_BOF ]   := .T.
             // Hack for dbf1.c hack GOTOP
+            /*
             aWAData[ WADATA_FORCEBOF ] := .T.
+            */
 
       ELSE
 
@@ -680,24 +682,25 @@ STATIC FUNCTION AR_DELETE( nWA )
 
    ENDIF
 
-//   IF aOpenInfo[ UR_OI_SHARED ] .AND. !( aWAData[ WADATA_RECNO ] IN aWAData[ WADATA_LOCKS ] )
+IF !aWAData[ WADATA_EOF ]
      IF aOpenInfo[ UR_OI_SHARED ] .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_LOCKED ] <> nWA
 
-      oError := ErrorNew()
-      oError:GenCode     := EG_UNLOCKED
-      oError:SubCode     := 1022 // EDBF_UNLOCKED
-      oError:Description := HB_LANGERRMSG( EG_UNLOCKED )
-      oError:FileName    := aOpenInfo[ UR_OI_NAME ]
-      UR_SUPER_ERROR( nWA, oError )
-      RETURN FAILURE
+        oError := ErrorNew()
+        oError:GenCode     := EG_UNLOCKED
+        oError:SubCode     := 1022 // EDBF_UNLOCKED
+        oError:Description := HB_LANGERRMSG( EG_UNLOCKED )
+        oError:FileName    := aOpenInfo[ UR_OI_NAME ]
+        UR_SUPER_ERROR( nWA, oError )
+        RETURN FAILURE
 
-   ENDIF
+     ENDIF
 
-   IF Len( aRecInfo ) > 0 .AND. aWAData[ WADATA_RECNO ] <= Len( aRecInfo )
-      aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] := .T.
-   ENDIF
+     IF Len( aRecInfo ) > 0 .AND. aWAData[ WADATA_RECNO ] <= Len( aRecInfo )
+        aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] := .T.
+     ENDIF 
+ENDIF
 
-   RETURN SUCCESS
+RETURN SUCCESS
 
 STATIC FUNCTION AR_DELETED( nWA, lDeleted )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
@@ -749,19 +752,25 @@ STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
 STATIC FUNCTION AR_LOCK( nWA, aLock )
    local aWAData  := USRRDD_AREADATA( nWA )
    local nReg     := if( aLock[ UR_LI_RECORD ] == nil, aWAData[ WADATA_RECNO ], aLock[ UR_LI_RECORD ] )
-   LOCAL aRecInfo := aWAData[ WADATA_DATABASE, DATABASE_RECINFO,nReg ]
-   if aWAData[ WADATA_OPENINFO, UR_OI_SHARED ]
-      IF aRecInfo[ RECDATA_LOCKED ] == nWA
-         aLock[ UR_LI_RESULT ] := .t.
-      elseIf aRecInfo[ RECDATA_LOCKED ] <> 0
-         aLock[ UR_LI_RESULT ] := .f.
-      else
-         aRecInfo[ RECDATA_LOCKED ] := nWA
-         aLock[ UR_LI_RESULT ] := .t.
-      ENDIF
-   else
+   LOCAL aRecInfo
+
+   IF aWAData[ WADATA_EOF ]
       aLock[ UR_LI_RESULT ] := .t.
-   endIf
+   else
+      aRecInfo := aWAData[ WADATA_DATABASE, DATABASE_RECINFO,nReg ]
+      if aWAData[ WADATA_OPENINFO, UR_OI_SHARED ]
+         IF aRecInfo[ RECDATA_LOCKED ] == nWA
+            aLock[ UR_LI_RESULT ] := .t.
+         elseIf aRecInfo[ RECDATA_LOCKED ] <> 0
+            aLock[ UR_LI_RESULT ] := .f.
+         else
+            aRecInfo[ RECDATA_LOCKED ] := nWA
+            aLock[ UR_LI_RESULT ] := .t.
+         ENDIF
+      else
+         aLock[ UR_LI_RESULT ] := .t.
+      endIf
+  ENDIF
 RETURN SUCCESS
 
 STATIC FUNCTION AR_RECID( nWA, nRecNo )
@@ -891,6 +900,9 @@ STATIC FUNCTION AR_ORDINFO( nWA, xMsg, xValue )
 
    RETURN SUCCESS
 
+STATIC FUNCTION AR_DUMMY()
+  // function for when be necesary for the rdd doesn't cause error
+RETURN SUCCESS 
 /*
  * This function have to exist in all RDD and then name have to be in
  * format: <RDDNAME>_GETFUNCTABLE
@@ -901,6 +913,7 @@ FUNCTION ARRAYRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
    aMyFunc[ UR_INIT         ] := ( @AR_INIT()         )
    aMyFunc[ UR_NEW          ] := ( @AR_NEW()          )
+   aMyFunc[ UR_FLUSH        ] := ( @AR_DUMMY()        ) 
    aMyFunc[ UR_CREATE       ] := ( @AR_CREATE()       )
    aMyFunc[ UR_CREATEFIELDS ] := ( @AR_CREATEFIELDS() )
    aMyFunc[ UR_OPEN         ] := ( @AR_OPEN()         )
@@ -1096,7 +1109,19 @@ FUNCTION FileArrayRdd( cFullName )
       nReturn := FAILURE
 
    ENDIF
-   RETURN ( nReturn == SUCCESS )
+RETURN ( nReturn == SUCCESS )
+
+FUNCTION setArryRdd( aArray )
+LOCAL aRecInfo
+LOCAL nWA      := select()
+LOCAL aDBFData := USRRDD_AREADATA( nWA )[ WADATA_DATABASE ]
+aDBFData[ DATABASE_RECORDS ] := aArray
+aDBFData[ DATABASE_RECINFO ] := array( len( aArray ) )
+FOR each aRecInfo in aDBFData[ DATABASE_RECINFO ]
+   aRecInfo := AR_RECDATAINIT()
+NEXT
+AR_GOTOP( nWA )
+RETURN nil 
 
 STATIC FUNCTION BlankRecord( aStruct )
    LOCAL nLenStruct := Len( aStruct )
