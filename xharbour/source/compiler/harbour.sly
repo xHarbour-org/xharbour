@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.164 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: harbour.sly,v 1.165 2009/05/08 13:32:43 ronpinkas Exp $
  */
 
 /*
@@ -2117,6 +2117,7 @@ CodeBlock  : '{' CBMARKER
                         pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
                         pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}", 1, FALSE ) );
                         $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
+                        hb_compExprDelete( $<asExpr>3 );
                      }
                      else if( s_bBlockDeclared )
                      {
@@ -2127,6 +2128,7 @@ CodeBlock  : '{' CBMARKER
                      {
                         char *szLastBlock = hb_comp_SLX_LastBlock( FALSE );
                         $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( szLastBlock, strlen( szLastBlock ), FALSE ), 0, NULL );
+                        hb_compExprDelete( $<asExpr>3 );
                      }
                   }
                   else

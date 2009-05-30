@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6467 2009/05/26 16:35:10 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6468 2009/05/26 19:01:58 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-05-29 21:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * makefile.bc
+    * Corrected cg32.lib to be first lib when used
+	 
+  * source/compiler/harbour.sly
+    ! Fixed 2 memory leaks
 
 2009-05-26 22:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/ct/print.c
@@ -294,7 +301,7 @@ Miguel Angel Marchuet
   * contrib/png/pngwutil.c
     ! updated to version 1.2.36
 
-2009-05-08 0618 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+2009-05-08 00:00 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * bin/bld.bat
     + Added usrrdd rdds libraries to MSVC lib list
     /* We should really try to stndardize list of libs across all compilers where possible - any valunteer? */
@@ -447,7 +454,7 @@ Miguel Angel Marchuet
       HB_IT_DATE when time has value. It's little faster, and more clear.
     ! fixed VM to work with this changes.
 
-2009-05-01 0618 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+2009-05-01 06:18 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/rtl/hbini.prg
      * Silly typo in my last commit
   * source/rtl/win32ole.prg

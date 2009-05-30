@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.246 2009/03/26 23:29:42 ronpinkas Exp $
+# $Id: makefile.bc,v 1.247 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -80,8 +80,8 @@ COMPILERLIBS=\
 
 !if $d(HB_CG32)
 COMPILERLIBS=\
-	$(COMPILERLIBS)\
-	cg32.lib
+	cg32.lib\
+	$(COMPILERLIBS)
 !endif
 
 HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
@@ -492,8 +492,8 @@ DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_D
 #===============================================================================
 !if $d(HB_CG32)
 COMPILERLIBS=\
-	$(COMPILERLIBS)\
 	cg32.lib\
+	$(COMPILERLIBS)\
 	cw32mt.lib\
 	import32.lib
 !else
