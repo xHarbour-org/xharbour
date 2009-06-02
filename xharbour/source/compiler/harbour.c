@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.218 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: harbour.c,v 1.219 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -6486,7 +6486,6 @@ static int hb_compCompile( char * szPrg )
                   hb_compAutoOpen( pAutoOpen->szName, &bSkipGen );
                }
 
-               hb_xfree( pAutoOpen->szName );
                hb_xfree( pAutoOpen );
             }
 
@@ -6946,7 +6945,7 @@ void hb_compAutoOpenAdd( char * szName )
    {
       PAUTOOPEN pAutoOpen = ( PAUTOOPEN ) hb_xgrab( sizeof( AUTOOPEN ) ), pLast;
 
-      pAutoOpen->szName = hb_strdup( szName );
+      pAutoOpen->szName = szName;
       pAutoOpen->pNext  = NULL;
 
       if( hb_comp_pAutoOpen == NULL )
@@ -7079,6 +7078,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
             fprintf( hb_comp_errFile, "Cannot open %s, assumed external\n", szFileName );
          }
       }
+		
+      hb_xfree( hb_comp_pFileName );
    }
    else
    {

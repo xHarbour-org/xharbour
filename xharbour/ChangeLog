@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6468 2009/05/26 19:01:58 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6469 2009/05/30 01:58:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-06-02 19:15 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * source/compiler/harbour.c
+     ! Removed redundant use of hb_strdup() in hb_compAutoOpenAdd() and related hb_xfree()
+     ! Fixed memory leak in hb_compAutoOpen()
+     
 2009-05-29 21:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * makefile.bc
     * Corrected cg32.lib to be first lib when used
