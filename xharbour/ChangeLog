@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6469 2009/05/30 01:58:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6470 2009/06/02 23:54:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-06-02 19:33 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * source/rtl/tgetlist
+     * Protected few LOCAL declaration with #ifdef HB_EXT_INKEY
+
 2009-06-02 19:15 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/compiler/harbour.c
      ! Removed redundant use of hb_strdup() in hb_compAutoOpenAdd() and related hb_xfree()
      ! Fixed memory leak in hb_compAutoOpen()
-     
+
 2009-05-29 21:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * makefile.bc
     * Corrected cg32.lib to be first lib when used
-	 
+
   * source/compiler/harbour.sly
     ! Fixed 2 memory leaks
 
@@ -57,9 +61,9 @@
     ! fixed some missing code from last update. fixed msvc build and dbfnsx rdd.
 
 2009-05-22 18:00 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * include\hbdate.h  
+  * include\hbdate.h
   * source\common\hbdate.c
-    + Added api hb_dbaselockEncode( char * pszTimeDate ) to encode this time of fields.  
+    + Added api hb_dbaselockEncode( char * pszTimeDate ) to encode this time of fields.
   * include\dbinfo.ch
     + Added #define DBRI_DBASELOCK           10  /* get lock info */
       to get info about lock on shared tables and locked registers.
@@ -115,8 +119,8 @@
          WAIT
 
       RETURN NIL
-    
-  
+
+
   * source\rtl\net.c
     + created void hb_netname( char * pszNetName, BOOL bGetUser ) and used from NETNAME.
       to call it from c code of rdd.

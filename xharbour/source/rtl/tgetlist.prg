@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.47 2008/03/18 01:03:27 likewolf Exp $
+ * $Id: tgetlist.prg,v 1.48 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -285,8 +285,9 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
    local nMouseRow, nMouseColumn
    local nButton
    local nHotItem
+   #ifdef HB_EXT_INKEY
    local cToPaste, nI, nLen
-   
+   #endif
 
    if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
       if ::GetDoSetKey( bKeyBlock )
@@ -316,7 +317,9 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
 METHOD GetApplyKey( nKey ) CLASS HBGetList
 
    local cKey, bKeyBlock, oGet := ::oGet
+   #ifdef HB_EXT_INKEY
    local cToPaste, nI, nLen
+   #endif
 
    if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
       ::GetDoSetKey( bKeyBlock )
@@ -534,7 +537,7 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 
       Default
 
-         if nKey >= 32 .and. nKey <= 255 
+         if nKey >= 32 .and. nKey <= 255
 
             if ::lInValid
                /*  2007/JUL/06 - E.F. Disabled oGet:DelEnd() for Clipper compatibility.
@@ -551,13 +554,13 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
             endif
 
             cKey := Chr( nKey )
-            
-            if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," ) 
+
+            if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," )
                oGet:changed := .t.  // 2006/DEC/22 - E.F. Fixed by Marco Bernardi.
                oGet:ToDecPos()
 
             /* 2007/SEP/25 -EF - Deny type minus sign more than one time.  */
-            elseif oGet:type == "N" .and. cKey == "-" .and. oGet:Minus  
+            elseif oGet:type == "N" .and. cKey == "-" .and. oGet:Minus
             else
                if Set( _SET_INSERT )
                   oGet:Insert( cKey )
