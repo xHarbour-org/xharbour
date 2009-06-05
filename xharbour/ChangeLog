@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6471 2009/06/03 00:09:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6472 2009/06/04 22:00:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-06 00:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * common.mak
+  * compile.mak
+  + include\hbapises.h
+  + source\rtl\session.c
+    + Added api session to support transactions. a group of workareas can
+      be created with the same session, all the files into the session will
+      be rollback by request, or commited.
+      HB_SESSIONNEW( [cUserName] ) -> nSessionId
+      HB_SESSIONSELECT( [nSessionId] ) -> nCurrentSessionId
+      HB_SESSIONUSERNAME() -> cUserName
+      HB_SETSESSION( [nSessionId] ) -> nCurrentSessionId
+      
+      remain to add command CREATE SESSION [cUserName] as in dBase IV or higher.
 
 2009-06-05 05:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
@@ -27,7 +42,6 @@
   * contrib/png/pngwtran.c
   * contrib/png/pngwutil.c
     ! updated to version 1.2.37
-
 
 2009-06-02 19:33 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/rtl/tgetlist

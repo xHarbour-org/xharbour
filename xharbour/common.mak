@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.44 2009/03/27 02:49:39 ronpinkas Exp $
+# $Id: common.mak,v 1.45 2009/05/19 16:34:58 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -305,6 +305,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)saverest$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)scroll$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)seconds$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)session$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)set$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readexit$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readins$(OBJEXT)\

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.39 2009/02/20 12:47:55 marchuet Exp $
+# $Id: compile.mak,v 1.40 2009/05/19 16:34:58 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1125,6 +1125,9 @@ $(OBJ_DIR)$(DIR_SEP)scrollbr$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)scrollbr.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)seconds$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)seconds.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)session$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)session.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)set$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)set.c
