@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.33 2008/11/06 18:58:27 jfgimenez Exp $
+ * $Id: hbxml.c,v 1.1 2009/05/25 15:32:49 modalsist Exp $
  */
 
 /*
@@ -1686,7 +1686,7 @@ static void mxml_node_file_indent( MXML_OUTPUT *out, int depth, int style )
          mxml_output_char( out, '\t');
       else if (  style & MXML_STYLE_THREESPACES )
          mxml_output_string_len( out, "   ", 3 );
-      else
+      else  /* MXML_STYLE_INDENT */
          mxml_output_char( out, ' ' );
    }
 }
@@ -1696,12 +1696,14 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
    HB_ITEM child;
    HB_ITEM hbtemp;
    int depth = 0;
-   int mustIndent = 0;
+   BOOL bnewline = !( style & MXML_STYLE_NONEWLINE );
+   BOOL bmustIndent = ( bnewline && !(style & MXML_STYLE_NOINDENT) );
 
    hbtemp.type = HB_IT_NIL;
    child.type = HB_IT_NIL;
 
-   if ( style & MXML_STYLE_INDENT ) {
+   if ( (style & MXML_STYLE_INDENT) || (style & MXML_STYLE_TAB) || (style & MXML_STYLE_THREESPACES) )
+   {
       hb_objSendMsg( pNode, "DEPTH", 0 );
       depth = HB_VM_STACK.Return.item.asInteger.value - 1;
       mxml_node_file_indent( out, depth, style );
@@ -1732,16 +1734,21 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
          if ( hbtemp.type == HB_IT_NIL && child.type == HB_IT_NIL )
          {
             mxml_output_string_len( out, "/>", 2 );
+            if( bnewline)
+            {
             mxml_output_string( out, hb_conNewLine() );
+            }
          }
          else
          {
             mxml_output_char( out, '>' );
 
             if ( child.type != HB_IT_NIL ) {
-               mustIndent = 1;
+               /*mustIndent = 1;*/
+               if( bnewline)
+               {
                mxml_output_string( out, hb_conNewLine() );
-
+               }
                while ( child.type != HB_IT_NIL )
                {
                   mxml_node_write( out, &child, style );
@@ -1752,7 +1759,7 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
 
             if ( hbtemp.type != HB_IT_NIL )
             {
-               if ( mustIndent && ( style & MXML_STYLE_INDENT ) )
+               if ( bmustIndent ) /*&& ( style & MXML_STYLE_INDENT ) )*/
                {
                      mxml_node_file_indent( out, depth+1, style );
                }
@@ -1769,7 +1776,7 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                }
             }
 
-            if ( mustIndent && ( style & MXML_STYLE_INDENT ))
+            if ( bmustIndent ) /* && ( style & MXML_STYLE_INDENT )) */
                mxml_node_file_indent( out, depth, style );
 
 
@@ -1779,7 +1786,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
             mxml_output_char( out, '>' );
+            if( bnewline )
+            {
             mxml_output_string( out, hb_conNewLine() );
+            }
          }
       break;
 
@@ -1790,7 +1800,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
             mxml_output_string_len( out, " -->", 4 );
+            if( bnewline )
+            {
             mxml_output_string( out, hb_conNewLine() );
+            }
       break;
 
       case MXML_TYPE_CDATA:
@@ -1800,7 +1813,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
             mxml_output_string_len( out, " ]]>", 4 );
+            if( bnewline )
+            {
             mxml_output_string( out, hb_conNewLine() );
+            }
       break;
 
       case MXML_TYPE_DATA:
@@ -1816,7 +1832,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
          }
+         if( bnewline )
+         {
          mxml_output_string( out, hb_conNewLine() );
+         }
       break;
 
       case MXML_TYPE_DIRECTIVE:
@@ -1835,7 +1854,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.length );
          }
          mxml_output_char( out, '>' );
+         if( bnewline )
+         {
          mxml_output_string( out, hb_conNewLine() );
+         }
       break;
 
       case MXML_TYPE_PI:
@@ -1854,7 +1876,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.length );
          }
          mxml_output_string_len( out, "?>", 2 );
+         if( bnewline )
+         {
          mxml_output_string( out, hb_conNewLine() );
+         }
       break;
 
       case MXML_TYPE_DOCUMENT:
@@ -1867,7 +1892,10 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
             hb_objSendMsg( &child, "ONEXT", 0 );
             hb_itemCopy( &child, &(HB_VM_STACK.Return) );
          }
+         if( bnewline )
+         {
          mxml_output_string( out, hb_conNewLine() );
+         }
       break;
 
    }
