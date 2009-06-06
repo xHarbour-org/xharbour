@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.c 7630 2007-08-02 15:45:52Z druzus $
+ * $Id: dattime3.c,v 1.1 2008/03/16 19:15:59 likewolf Exp $
  */
  
 /*
@@ -141,16 +141,23 @@ static BOOL _hb_timeValid( char * szTime, ULONG ulLen, int * piDecode )
 {
    BOOL fValid = FALSE;
 
-   if( ulLen == 2 || ulLen == 5 || ulLen == 8 || ulLen == 11 )
+   /* NOTE: In CA-Clipper Tools, timevalid() is limited to HH:MM:SS:hh (hundredth).
+            In xHarbour, timevalid() is extended to HH:MM:SS:ttt (thousandth).
+   */
+   if( ulLen == 2 || ulLen == 5 || ulLen == 8 || ulLen == 11 || ulLen == 12 )
    {
-      static const int s_iMax[] = { 23, 59, 59, 99 };
+      static int s_iMax[] = { 23, 59, 59, 99 };
+
+      if( ulLen == 12 )
+        s_iMax[3] = 999;
+
       int i, iVal;
       ULONG ul;
 
       fValid = TRUE;
       for( ul = 0; fValid && ul < ulLen; ++ul )
       {
-         fValid = ul % 3 == 2 ? szTime[ul] == ':' :
+         fValid = ul < 11 && ul % 3 == 2 ? szTime[ul] == ':' :
                   ( szTime[ul] >= '0' && szTime[ul] <= '9' );
       }
       for( ul = 0, i = 0; fValid && ul < ulLen; ul += 3, ++i )
@@ -228,7 +235,7 @@ static BOOL _hb_timeValid( char * szTime, ULONG ulLen, int * piDecode )
 
 HB_FUNC( TIMEVALID )
 {
-   hb_retl( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), NULL ) );
+   hb_retl( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), NULL ));
 }
 
 

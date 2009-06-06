@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6472 2009/06/04 22:00:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.6473 2009/06/05 22:31:53 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-06 12:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/cttime.prg
+    * fixed SecToTime() function to return hundredth with 2 digits.
+    * extended Sectotime() to work with thousandth.
+      new syntax: Sectotime( <nSeconds>, [<lHundredth>], [<lThousandth>] )
+      If lThousandth is true, it will return 3 digits after seconds.
+      This parameter supersede <lHundredth>.
+    * extended TimeToSec() to work with thousandth.
+      Now this function will convert "HH:MM:SS:ttt" also.
+
+  * source/ct/dattime3.c
+    * extended timevalid() to validate thousandth of seconds.
+      Now the time string "HH:MM:SS:ttt" is valid.
 
 2009-06-06 00:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * common.mak

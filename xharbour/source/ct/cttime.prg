@@ -1,5 +1,5 @@
 /*
- * $Id: cttime.prg,v 1.1 2004/08/27 14:43:25 paultucker Exp $
+ * $Id: cttime.prg,v 1.2 2007/11/14 12:10:11 lculik Exp $
  */
 
 /*
@@ -52,39 +52,63 @@
  */
 
 function TIMETOSEC( cTime )
-local nSec := 0, nLen, i, aLim, aMod, nInd, n
-if cTime == NIL
-    nSec := seconds()
-elseif valtype( cTime ) == "C"
-    nLen := len( cTime )
-    if ( nLen + 1 ) % 3 == 0 .and. nLen <= 11
-        nInd := 1
-        aLim := { 24, 60, 60, 100 }
-        aMod := { 3600, 60, 1, 1/100 }
-        for i := 1 to nLen step 3
-            if isdigit( substr( cTime, i,     1 ) ) .and. ;
-               isdigit( substr( cTime, i + 1, 1 ) ) .and. ;
-               ( i == nLen - 1 .or. substr( cTime, i + 2, 1 ) == ":" ) .and. ;
-               ( n := val( substr( cTime, i, 2 ) ) ) < aLim[ nInd ]
-                nSec += n * aMod[ nInd ] 
-            else
-                nSec := 0
-                exit
-            endif
-            ++nInd
-        next
+local nSec, nLen, nVal
+
+nSec := seconds()
+
+/* NOTE: In CA-Clipper Tools, timetosec() is limited to HH:MM:SS:hh (hundredth).
+         In xHarbour, timetosec() is extended to HH:MM:SS:ttt (thousandth).
+ */
+if valtype( cTime ) == "C"
+
+    nSec := 0
+    nLen := Len( cTime )
+
+    if Timevalid( cTime )
+
+       if nLen >= 2  // HH
+          nVal := Val(SubStr(cTime,1,2))  // hours
+          nSec += nVal * 3600
+       endif
+
+       if nLen >= 5 // HH:MM
+          nVal := Val(SubStr(cTime,4,2))  // minutes
+          nSec += nVal * 60
+       endif
+
+       if nLen >= 8 // HH:MM:SS
+          nVal := Val(SubStr(cTime,7,2))  // seconds
+          nSec += nVal
+       endif
+
+       if nLen = 11 // HH:MM:SS:hh
+          nVal := Val(SubStr(cTime,10,2)) // hundredth
+          nSec += nVal / 100
+       elseif nLen = 12  // HH:MM:SS:ttt
+          nVal := Val(SubStr(cTime,10,3)) // thousandth
+          nSec += nVal / 1000
+       endif
+
+    else
+       nSec := -1  // Clipper compliant.
     endif
+
 endif
-return round( nSec, 2) /* round FL val to be sure that you can compare it */
+return round( nSec, iif( nSec - int(nSec) > 0, iif(nLen=12,3,2), 0) )
 
 
-function SECTOTIME( nSec, lHundr )
+function SECTOTIME( nSec, lHundr, lThous )
 local i, h, n
 n := iif( !valtype( nSec ) == "N", seconds(), nSec )
+h := ""
 if valtype( lHundr ) == "L" .and. lHundr
-   h := strzero( ( nSec * 100 ) % 100, 4 )
-else
-   h := ""
+   h := strzero( ( nSec * 100 ) % 100, 2 )
+endif
+/* NOTE: In CA-Clipper Tools, sectotime() is limited to HH:MM:SS:hh (hundredth).
+         In xHarbour, sectotime() is extended to HH:MM:SS:ttt (thousandth).
+ */
+if valtype( lThous ) == "L" .and. lThous
+   h := strzero( ( nSec * 1000 ) % 1000, 3 )
 endif
 n := int( n % 86400 )
 for i := 1 to 3
