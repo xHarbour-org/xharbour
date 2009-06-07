@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.c,v 1.1 2008/03/16 19:15:59 likewolf Exp $
+ * $Id: dattime3.c,v 1.2 2009/06/06 15:15:45 modalsist Exp $
  */
  
 /*
@@ -148,11 +148,11 @@ static BOOL _hb_timeValid( char * szTime, ULONG ulLen, int * piDecode )
    {
       static int s_iMax[] = { 23, 59, 59, 99 };
 
-      if( ulLen == 12 )
-        s_iMax[3] = 999;
-
       int i, iVal;
       ULONG ul;
+
+      if( ulLen == 12 )
+        s_iMax[3] = 999;
 
       fValid = TRUE;
       for( ul = 0; fValid && ul < ulLen; ++ul )
