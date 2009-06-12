@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.10 2007/01/12 22:42:00 ronpinkas Exp $
+ * $Id: error.ch,v 1.11 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
 #define EG_READ         23
 #define EG_WRITE        24
 #define EG_PRINT        25
+#define EG_RENAME       26
 
 #define EG_UNSUPPORTED  30
 #define EG_LIMIT        31

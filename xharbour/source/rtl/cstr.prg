@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.37 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.38 2007/09/24 01:56:06 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,8 @@
 
 #include "error.ch"
 
+#include "hbclass.ch"
+
 /*
    For performance NOT using OS indpendant R/T function,
    this define only used in ValTpPrg() which currently only used in win32.
@@ -83,9 +85,6 @@ FUNCTION CStr( xExp )
 
       CASE 'N'
          RETURN Str( xExp )
-
-      CASE 'M'
-         RETURN xExp
 
       CASE 'A'
          RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
@@ -135,25 +134,22 @@ FUNCTION CStrToVal( cExp, cType )
       CASE 'N'
          RETURN Val( cExp )
 
-      CASE 'M'
-         RETURN cExp
-
       CASE 'U'
          RETURN NIL
 
       /*
       CASE 'A'
-         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'B'
-         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'O'
-         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
       */
 
       DEFAULT
-         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
    END
 
 RETURN NIL
@@ -200,9 +196,6 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
       CASE 'N'
          RETURN Str( xVal )
-
-      CASE 'M'
-         RETURN StringToLiteral( xVal )
 
       CASE 'A'
          IF cName == NIL
@@ -332,9 +325,6 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
       CASE 'N'
          RETURN Ltrim( Str( xVal ) )
 
-      CASE 'M'
-         RETURN xVal
-
       CASE 'A'
          IF cName == NIL
             cName := "M->__ValToPrgExp_Array"
@@ -424,4 +414,246 @@ RETURN cRet
 FUNCTION PrgExpToVal( cExp )
 RETURN &( cExp )
 
+//--------------------------------------------------------------//
+FUNCTION ValToArray( xVal )
+
+   IF ValType( xVal ) == 'A'
+      RETURN xVal
+   ENDIF
+
+RETURN { xVal }
+
+//--------------------------------------------------------------//
+FUNCTION ValToBlock( xVal )
+
+   IF ValType( xVal ) == 'B'
+      RETURN xVal
+   ENDIF
+
+RETURN { || xVal }
+
+//--------------------------------------------------------------//
+FUNCTION ValToCharacter( xVal )
+
+   IF ValType( xVal ) == 'C'
+      RETURN xVal
+   ENDIF
+
+RETURN LTrim( CStr( xVal ) )
+
+
+//--------------------------------------------------------------//
+FUNCTION ValToDate( xVal )
+
+   LOCAL cType := ValType( xVal )
+
+   SWITCH cType
+      CASE 'A'
+      CASE 'H'
+      CASE 'L'
+      CASE 'O'
+      CASE 'U'
+         EXIT
+
+      CASE 'B'
+         RETURN ValToDate( Eval( xVal ) )
+
+      CASE 'C'
+         IF xVal[3] >= '0' .AND. xVal[3] <= '9' .AND. xVal[5] >= '0' .AND. xVal[5] <= '9'
+            RETURN sToD( xVal )
+         ELSE
+            RETURN cToD( xVal )
+         ENDIF
+
+      CASE 'D'
+         RETURN xVal
+
+      CASE 'N'
+      CASE 'P'
+         RETURN {^ 1900/01/01 } + xVal
+
+      DEFAULT
+         Throw( ErrorNew( "VALTODATE", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
+   END
+
+RETURN cToD( "" )
+
+//--------------------------------------------------------------//
+FUNCTION ValToHash( xVal )
+
+   IF ValType( xVal ) == 'H'
+      RETURN xVal
+   ENDIF
+
+RETURN { ValToCharacter( xVal ) => xVal }
+
+//--------------------------------------------------------------//
+FUNCTION ValToLogical( xVal )
+
+   LOCAL cType := ValType( xVal )
+
+   SWITCH cType
+      CASE 'A'
+      CASE 'D'
+      CASE 'H'
+      CASE 'N'
+      CASE 'O'
+      CASE 'P'
+         RETURN ! Empty( xVal )
+
+      CASE 'B'
+         RETURN ValToLogical( Eval( xVal ) )
+
+      CASE 'C'
+         IF xVal[1] == '.' .AND. xVal[3] == '.' .AND. Upper( xVal[2] ) IN "TFYN"
+            RETURN Uppe( xVal[2] ) IN "TY"
+         ELSEIF Len( xVal ) == 1 .AND. Upper( xVal ) IN "TFYN"
+            RETURN Upper( xVal ) IN "TY"
+         ELSE
+            RETURN ! Empty( xVal )
+         ENDIF
+         EXIT
+
+      CASE 'L'
+         RETURN xVal
+
+      CASE 'U'
+         RETURN .F.
+
+      DEFAULT
+         Throw( ErrorNew( "VALTOLOGICAL", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
+   END
+
+RETURN .F.
+
+//--------------------------------------------------------------//
+FUNCTION ValToNumber( xVal )
+
+   LOCAL cType := ValType( xVal )
+
+   SWITCH cType
+      CASE 'A'
+      CASE 'H'
+         RETURN Len( xVal )
+
+      CASE 'B'
+         RETURN ValToNumber( Eval( xVal ) )
+
+      CASE 'C'
+         RETURN Val( xVal )
+
+      CASE 'D'
+         RETURN xVal - {^ 1900/01/01 }
+
+      CASE 'L'
+         RETURN IIF( xVal, 1, 0 )
+
+      CASE 'O'
+         RETURN xVal:hClass
+
+      CASE 'N'
+         RETURN xVal
+
+      CASE 'P'
+         RETURN xVal - 0
+
+      CASE 'U'
+         RETURN 0
+
+      DEFAULT
+         Throw( ErrorNew( "VALTONUMBER", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
+   END
+
+RETURN 0
+
+//--------------------------------------------------------------//
+FUNCTION ValToObject( xVal )
+
+   LOCAL cType := ValType( xVal )
+
+   SWITCH cType
+      CASE 'A'
+         ENABLE TYPE CLASS ARRAY
+         EXIT
+
+      CASE 'B'
+         ENABLE TYPE CLASS BLOCK
+         EXIT
+
+      CASE 'C'
+         ENABLE TYPE CLASS CHARACTER
+         EXIT
+
+      CASE 'D'
+         ENABLE TYPE CLASS DATE
+         EXIT
+
+      CASE 'H'
+         ENABLE TYPE CLASS HASH
+         EXIT
+
+      CASE 'L'
+         ENABLE TYPE CLASS LOGICAL
+         EXIT
+
+      CASE 'N'
+         ENABLE TYPE CLASS NUMERIC
+         EXIT
+
+      CASE 'O'
+         RETURN xVal
+
+      CASE 'P'
+         ENABLE TYPE CLASS POINTER
+         EXIT
+
+      CASE 'U'
+         ENABLE TYPE CLASS NIL
+         EXIT
+
+      DEFAULT
+         Throw( ErrorNew( "VALTOOBJECT", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
+   END
+
+RETURN 0
+
+//--------------------------------------------------------------//
+FUNCTION ValToType( xVal, cType )
+
+   SWITCH cType
+      CASE 'A'
+         RETURN ValToArray( xVal )
+
+      CASE 'B'
+         RETURN ValToBlock( xVal )
+
+      CASE 'C'
+         RETURN ValToCharacter( xVal )
+
+      CASE 'D'
+         RETURN ValToDate( xVal )
+
+      CASE 'H'
+         RETURN ValToHash( xVal )
+
+      CASE 'L'
+         RETURN ValToLogical( xVal )
+
+      CASE 'N'
+         RETURN ValToNumber( xVal )
+
+      CASE 'O'
+         RETURN ValToObject( xVal )
+
+      CASE 'P'
+         RETURN ValToNumber( xVal )
+
+      CASE 'U'
+         RETURN NIL
+
+      DEFAULT
+         Throw( ErrorNew( "VALTOTYPE", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
+   END
+
+RETURN NIL
 //--------------------------------------------------------------//

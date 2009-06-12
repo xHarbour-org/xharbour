@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.11 2007/03/30 16:10:27 marchuet Exp $
+ * $Id: dbstrux.prg,v 1.12 2008/08/18 09:39:13 marchuet Exp $
  */
 
 /*
@@ -8,6 +8,12 @@
  *
  * Copyright 1999 {list of individual authors and e-mail addresses}
  * www - http://www.harbour-project.org
+ *
+ * dbModifyStructure( <cFile> )           -> lSuccess
+ * dbImport( <cFile|nArea> )              -> lSuccess
+ * dbMerge( <cFile|nArea> [, <lAppend>] ) -> lSuccess
+ *
+ * Copyright 2009 Ron Pinkas <Ron.Pinkas at xHarbour.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +61,9 @@
 #include "common.ch"
 #include "dbstruct.ch"
 
+#include "dbinfo.ch"
+#include "error.ch"
+
 FUNCTION __dbCopyStruct( cFileName, aFieldList )
    RETURN dbCreate( cFileName, __dbStructFilter( dbStruct(), aFieldList ) )
 
@@ -74,7 +83,7 @@ FUNCTION __dbCopyXStruct( cFileName )
    BEGIN SEQUENCE
 
       dbSelectArea( 0 )
-      __dbCreate( cFileName, NIL, NIL, .F., NIL )
+      __dbCreate( cFileName, NIL, NIL, .F., ProcName() )
 
       AEval( aStruct, {| aField | iif( aField[ DBS_TYPE ] == "C" .AND. aField[ DBS_LEN ] > 255,;
                                      ( aField[ DBS_DEC ] := Int( aField[ DBS_LEN ] / 256 ), aField[ DBS_LEN ] := aField[ DBS_LEN ] % 256 ), ),;
@@ -101,7 +110,7 @@ FUNCTION __dbCopyXStruct( cFileName )
 
    RETURN .T.
 
-/* NOTE: Compared to CA-Cl*pper, Harbour has two extra parameters 
+/* NOTE: Compared to CA-Cl*pper, Harbour has two extra parameters
          (cCodePage, nConnection). */
 
 FUNCTION __dbCreate( cFileName, cFileFrom, cRDD, lNew, cAlias, cCodePage, nConnection )
@@ -142,7 +151,7 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDD, lNew, cAlias, cCodePage, nConne
             dbSelectArea( nOldArea )
          ENDIF
 
-         /* Type detection is more in sync with dbCreate() logic in Harbour, as lowercase "C" 
+         /* Type detection is more in sync with dbCreate() logic in Harbour, as lowercase "C"
             and padded/continued strings ("C ", "C...") are also accepted. */
 
          AEval( aStruct, {| aField | iif( Upper( Left( aField[ DBS_TYPE ], 1 ) ) == "C" .AND. aField[ DBS_DEC ] != 0,;
@@ -182,3 +191,230 @@ FUNCTION __dbStructFilter( aStruct, aFieldList )
          iif( nIndex == 0, NIL, AAdd( aStructFiltered, aStruct[ nIndex] ) ) } )
 
    RETURN aStructFiltered
+
+/*
+  xHarbour extensions by Ron Pinkas
+ */
+//----------------------------------------------------------------------------//
+FUNCTION dbModifyStructure( cFile )
+
+   LOCAL lRet
+   LOCAL cExt
+   LOCAL cTable
+   LOCAL cBakFile
+   LOCAL cStructureFile
+   LOCAL cNewFile
+   LOCAL oErr
+   LOCAL nPresetArea := Select()
+   LOCAL nSourceArea
+   LOCAL cDateTime   := SubStr( dtos( Date() ), 3 ) + "." + StrTran( Left( Time(), 5 ), ":", "." )
+
+   TRY
+      // Open exclusively, get name info, and create the structure db.
+      //-------------------------------------------------------------//
+      USE ( cFile ) ALIAS ModifySource EXCLUSIVE NEW
+      nSourceArea := Select()
+
+      cFile := dbInfo( DBI_FULLPATH )
+      cExt  := dbInfo( DBI_TABLEEXT )
+
+      hb_FNameSplit( cFile, , @cTable )
+
+      cBakFile       := cTable + ".bak." + cDateTime + cExt
+      cStructureFile := cTable + ".str." + cDateTime + cExt
+      cNewFile       := cTable + ".new." + cDateTime + cExt
+
+      COPY STRUCTURE EXTENDED TO ( cStructureFile )
+      //-------------------------------------------------------------//
+
+      // Let user modify the structure.
+      //-------------------------------------------------------------//
+      USE ( cStructureFile ) ALIAS NewStructure EXCLUSIVE NEW
+
+      Browse( 0, 0, Min( 20, MaxRow() - 1 ), Min( MaxCol() - 30, 50 ) )
+
+      CLOSE
+
+      CREATE ( cNewFile ) FROM ( cStructureFile ) ALIAS NEW_MODIFIED NEW
+      //-------------------------------------------------------------//
+
+
+      // Import data into the new file, and close it
+      //-------------------------------------------------------------//
+      lRet := dbImport( nSourceArea )
+      CLOSE
+
+      SELECT ( nSourceArea )
+      CLOSE
+
+      SELECT ( nPresetArea )
+      //-------------------------------------------------------------//
+
+      // Rename original as backup, and new file as the new original.
+      //-------------------------------------------------------------//
+      IF lRet
+         IF FRename( cFile, cBakFile ) == -1
+            BREAK
+         ENDIF
+
+         IF FRename( cNewFile, cFile ) == -1
+            // If we can't then try to restore backup as original
+            IF FRename( cBakFile, cFile ) == -1
+               // Oops - must advise the user!
+               oErr := ErrorNew()
+               oErr:severity     := ES_ERROR
+               oErr:genCode      := EG_RENAME
+               oErr:subSystem    := "DBCMD"
+               oErr:canDefault   := .F.
+               oErr:canRetry     := .F.
+               oErr:canSubtitute := .F.
+               oErr:operation    := cFile
+               oErr:subCode      := 1101
+               oErr:args         := { cNewFile, cBakFile }
+
+               BREAK oErr
+            ENDIF
+         ENDIF
+      ENDIF
+      //-------------------------------------------------------------//
+
+   CATCH oErr
+      IF oErr:ClassName == "ERROR"
+         IF oErr:genCode == EG_RENAME
+            // This kind of error must be reported
+            lRet := Throw( oErr )
+         ELSE
+            lRet := .F.
+         ENDIF
+      ELSE
+         lRet := .F.
+      ENDIF
+   END
+
+   SELECT ( nPresetArea )
+
+RETURN lRet
+
+//----------------------------------------------------------------------------//
+FUNCTION dbImport( xSource )
+
+RETURN dbMerge( xSource )
+
+//----------------------------------------------------------------------------//
+FUNCTION dbMerge( xSource, lAppend )
+
+   LOCAL nArea, nSource, nRecNo
+   LOCAL aFields
+   LOCAL cField, xField
+   LOCAL nSourcePos, aTranslate := {}, aTranslation, oErr
+   LOCAL cTargetType
+
+   // Safety
+   //-------------------------------------------------------------//
+   IF LastRec() > 0
+      IF ! ( lAppend == .T. )
+         RETURN .F.
+      ENDIF
+   ENDIF
+   //-------------------------------------------------------------//
+
+   // Validate args
+   //-------------------------------------------------------------//
+   IF ValType( xSource ) == 'C'
+      nArea := Select()
+
+      USE ( xSource ) ALIAS MergeSource EXCLUSIVE NEW
+      nSource := Select()
+
+      SELECT ( nArea )
+   ELSEIF ValType( xSource ) == 'N'
+      nSource := xSource
+   ELSE
+      RETURN .F.
+   ENDIF
+   //-------------------------------------------------------------//
+
+   // Temp working record
+   IF LastRec() == 0
+      APPEND BLANK
+   ENDIF
+
+   // Create translation plan
+   //-------------------------------------------------------------//
+   aFields := Array( FCount() )
+   aFields( aFields )
+
+   FOR EACH cField IN aFields
+      nSourcePos := (nSource)->( FieldPos( cField ) )
+
+      IF nSourcePos > 0
+         TRY
+            // Save
+            xField := FieldGet( HB_EnumIndex() )
+
+            // Test type compatability
+            FieldPut( HB_EnumIndex(), (nSource)->( FieldGet( nSourcePos ) ) )
+
+            // Restore
+            FieldPut( HB_EnumIndex(), xField )
+
+            // Ok to process
+            aAdd( aTranslate, { HB_EnumIndex(), nSourcePos, {|xSource| xSource } } )
+         CATCH oErr
+            cTargetType := ValType( FieldGet( HB_EnumIndex() ) )
+
+            TRY
+               // Test type compatability
+               FieldPut( HB_EnumIndex(), ValToType( (nSource)->( FieldGet( nSourcePos ) ), cTargetType ) )
+
+               // Restore
+               FieldPut( HB_EnumIndex(), xField )
+
+               // Ok to process
+               aAdd( aTranslate, { HB_EnumIndex(), nSourcePos, {|xSource| ValToType( xSource, cTargetType ) } } )
+            CATCH oErr
+               //TraceLog( oErr:Description, oErr:Operation )
+            END
+         END
+      ENDIF
+   NEXT
+   //-------------------------------------------------------------//
+
+   // Reset
+   //-------------------------------------------------------------//
+   IF LastRec() == 1 .AND. ! ( lAppend == .T. )
+      DELETE
+      ZAP
+   ENDIF
+   //-------------------------------------------------------------//
+
+   // Process
+   //-------------------------------------------------------------//
+   nRecNo := (nSource)->( RecNo() )
+   (nSource)->( dbGoTop(1) )
+
+   WHILE ! (nSource)->( Eof() )
+      APPEND BLANK
+
+      FOR EACH aTranslation IN aTranslate
+         FieldPut( aTranslation[1], Eval( aTranslation[3], (nSource)->( FieldGet( aTranslation[2] ) ) ) )
+      NEXT
+
+      (nSource)->( dbSkip() )
+   ENDDO
+
+   (nSource)->( dbGoTo( nRecNo ) )
+   //-------------------------------------------------------------//
+
+   // Reset
+   //-------------------------------------------------------------//
+   IF ! Empty( nArea )
+      SELECT ( nSource )
+      CLOSE
+      SELECT ( nArea )
+   ENDIF
+   //-------------------------------------------------------------//
+
+RETURN .T.
+
+//----------------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.18 2008/08/25 15:47:40 modalsist Exp $
+ * $Id: browse.prg,v 1.19 2008/08/26 20:18:20 andijahja Exp $
  */
 
 /*
@@ -72,12 +72,14 @@ function Browse( nTop, nLeft, nBottom, nRight )
    Local bAction
    Local lKeyPressed
    Local aRect, cField, lShared
+   Local lReadOnly
 
    if ! Used()
       return .f.
    end
 
    lShared := dbInfo( DBI_SHARED )
+   lReadOnly := dbInfo( DBI_ISREADONLY )
 
    s_ldbBottom := dbBottom()
    s_ldbEmpty  := dbEmpty()
@@ -178,7 +180,15 @@ function Browse( nTop, nLeft, nBottom, nRight )
          case K_DOWN
             if !eof()
                s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
-               oBrw:Down()
+               IF s_ldbAppend
+                  IF lReadOnly
+                     Tone( 261.70, 0.1 )
+                  ELSE
+                     oBrw:Down()
+                  ENDIF
+               ELSE
+                  oBrw:Down()
+               ENDIF
             endif
             exit
 
@@ -206,11 +216,16 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
             if !eof()
                s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
-               if s_ldbAppend
-                  oBrw:Down()
-               else
+
+               IF s_ldbAppend
+                  IF lReadOnly
+                     Tone( 261.70, 0.1 )
+                  ELSE
+                     oBrw:Down()
+                  ENDIF
+               ELSE
                   oBrw:PageDown()
-               endif
+               ENDIF
             endif
             exit
 
@@ -273,8 +288,13 @@ function Browse( nTop, nLeft, nBottom, nRight )
             eval(bBlock)
             exit
 
-        case K_DEL
-            if ! eof() .and. if( lShared, RLock(), .t. )
+         case K_DEL
+            IF lReadOnly
+               Tone( 261.70, 0.1 )
+               EXIT
+            ENDIF
+
+            if ( ! eof() ) .and. if( lShared, RLock(), .t. )
                if ( Deleted() )
                   dbRecall()
                else
@@ -286,11 +306,21 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
         case K_ENTER
+            IF lReadOnly
+               Tone( 261.70, 0.1 )
+               EXIT
+            ENDIF
+
             nKey := doget( oBrw, lShared )
             lRefresh    := .t.
             lKeyPressed := (nKey != 0)
             exit
+
         default
+            IF lReadOnly
+               Tone( 261.70, 0.1 )
+               EXIT
+            ENDIF
             keyboard Chr(K_ENTER) + Chr(nKey)
             exit
       end
@@ -367,7 +397,7 @@ static function DOGET( oBrowse, lShared )
    lMemo := ( ValType( FieldGet( FieldPos( oCol:Heading ) ) ) == 'M' )
 
    IF lMemo
-      cMemoField := oCol:Heading 
+      cMemoField := oCol:Heading
       xData := FieldGet( FieldPos( cMemoField ) )
       nTop    :=  oBrowse:nTop+5
       nLeft   :=  oBrowse:nLeft+10
@@ -414,7 +444,7 @@ static function DOGET( oBrowse, lShared )
 
    lSuccess := .F.
 
-   if lSave  
+   if lSave
 
       if eof()
          dbAppend()
@@ -483,7 +513,7 @@ static function EXITKEY( lExit, oBrw )
       // first column of the next row, if is not the last.
       //
       if oBrw:ColPos == oBrw:ColCount
-         if !s_ldbBottom .and. !s_ldbEmpty 
+         if !s_ldbBottom .and. !s_ldbEmpty
             oBrw:PanHome()
             nReturn := K_DOWN
          else

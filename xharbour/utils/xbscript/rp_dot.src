@@ -9,6 +9,22 @@
        ; SetPos( 2, 0 )
 
 #COMMAND BROWSE => Browse( 1, 0, MaxRow() - 1, MaxCol() )
+
+#COMMAND LIST STRUCTURE    => DISPLAY STRUCTURE
+#COMMAND DISPLAY STRUCTURE => M->__nArea := Select();
+                            ; COPY STRUCTURE EXTENDED TO _$struct$_;
+                            ; USE _$struct$_ ALIAS NewStructure READONLY NEW;
+                            ; Browse();
+                            ; CLOSE;
+                            ; SELECT ( M->__nArea )
+
+#COMMAND MODIFY STRUCTURE  => M->__nArea := Select();
+                            ; M->__cFile := dbInfo( 10 );
+                            ; CLOSE;
+                            ; dbModifyStructure( M->__cFile );
+                            ; SELECT ( M->__nArea );
+                            ; USE ( M->__cFile )
+
 #COMMAND EXIT   => __QUIT()
 #COMMAND QUIT   => __QUIT()
 

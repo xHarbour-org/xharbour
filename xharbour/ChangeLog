@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6475 2009/06/06 16:02:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.6476 2009/06/07 11:20:22 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,56 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-12 14:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/error.ch
+    + Added: #define EG_RENAME       26
+  * source/rtl/browse.prg
+    ! Fixed Browse() to disable editing on READONLY data
+  * source/rtl/cstr.prg
+    + Added:
+             ValToArray( <xAnyType> )        -> xAnyType (if array) or { <xAnyType> }
+             ValToDate( <xAnyType> )         -> cTod(), sToD(), or Number + {^ 1900/01/01 } or empty date
+             ValToHash( <xAnyType >          -> xAnyType (if hash) or { ValToCharacter( xAnyType ) => xAnyType }
+             ValToLogical( <xAnyType >       -> xAnyType (if logical) or interpret: "T|F|Y|N|.T.|.F.|.Y.|.F." or Empty( xVal )
+             ValToNumber( <xAnyType> )       -> xAnyType (if number) or Len(Array|Hash) or Date - {^ 1900/01/01 } or .T. as 1 or Object:hClass
+             ValToArray( <xAnyType> )        -> xAnyType (if object) or ENABLE TYPE CLASS for given type
+             ValToType( <xVal>, <cAnyType> ) -> Convert any type to any other type as per above.
+
+     /* For more details on the translation logic please refer to the code,
+        as the space enough doesn't allow for a detailed description of
+        every translation.
+      */
+  * source/rdd/dbstrux.prg
+    ! Fixed __dbCopyXStruct() to support all valid file names (by using a valid ALIAS)
+    + Added:
+             dbModifyStructure( <cFile> )    -> lSuccess
+                This is a high level function utilizing Brose() to allow user to modify or add field definitions.
+                The function will then import all data from the original file into the new definitions.
+                Data types changes will not cause any errors, and data will be converted as appropriate.
+
+             dbImport( <cSourceFile|nSourceArea> )  -> lSuccess
+               This function will import all data from the source file into the empty file in current work area.
+               The function will locate all fields in the source which are defined in the open area, and will
+               import all data, as appropriate, regardless of data type discrepencies.
+
+             dbMerge( <cFile|nArea> [, <lAppend>] ) -> lSuccess
+               This function will import all data from the source file into the file in current work area.
+               If the current file is NOT empty then the lAppend optional argument must be set to .T. or
+               the function will abort the operation.
+               The function will locate all fields in the source which are defined in the open area, and will
+               import all data, as appropriate, regardless of data type discrepencies.
+
+  * utils/xbscript/rp_dot.src
+  * utils/xbscript/xbscript.prg
+    + Added support for:
+                         LIST STRUCTURE
+                         DISPLAY STRUCTURE
+                         MODIFY STRUCTURE
+
+  + tests/modistru.prg
+     + Added new sample to demonstrate usage of new dbModifyStructure()
+
 
 2009-06-07 13:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\ct\dattime3.c
@@ -59,7 +109,7 @@
       HB_SESSIONSELECT( [nSessionId] ) -> nCurrentSessionId
       HB_SESSIONUSERNAME() -> cUserName
       HB_SETSESSION( [nSessionId] ) -> nCurrentSessionId
-      
+
       remain to add command CREATE SESSION [cUserName] as in dBase IV or higher.
 
 2009-06-05 05:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
