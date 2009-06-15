@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6481 2009/06/15 16:37:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6482 2009/06/15 16:39:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-15 20:30 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source\rtl\empty.c
+    ! Empty( <datetime> ) was returning always .T.
 
 2009-06-15 17:35 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
