@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6480 2009/06/15 15:34:01 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6481 2009/06/15 16:37:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2009-06-15 17:35 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
-    % Reverted the previous change in hb_oleAnsiToSysString()
+    * Reverted the previous change in hb_oleAnsiToSysString()
 
 2009-06-15 14:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
