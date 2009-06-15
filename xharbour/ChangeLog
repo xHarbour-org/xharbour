@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6476 2009/06/07 11:20:22 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6477 2009/06/12 19:05:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-15 13:10 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source/rtl/win32ole.prg
+    ! DATETIME values was not sent to OLE
+    ! hb_oleAnsiToSysString() was returning a NULL value instead of an empty BSTR when an empty string was passed to it
 
 2009-06-12 14:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/error.ch
