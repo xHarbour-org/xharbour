@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.173 2009/05/10 06:51:58 andijahja Exp $
+ * $Id: win32ole.prg,v 1.174 2009/06/15 11:07:01 jfgimenez Exp $
  */
 
 /*
@@ -825,7 +825,7 @@ RETURN Self
         }
      }
 	  else
-		  return SysAllocStringLen( "\0", 1 );
+		  return SysAllocStringLen( L"\0", 1 );
 
      return NULL;
   }

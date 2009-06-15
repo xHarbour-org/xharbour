@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6477 2009/06/12 19:05:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6478 2009/06/15 11:07:33 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-15 14:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source/rtl/win32ole.prg
+    ! Pacified warning
+  * source\rtl\txml.prg
+    ! XML data was not readed when using TXMLDocument():New( <cXMLString> )
 
 2009-06-15 13:10 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
