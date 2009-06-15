@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.171 2009/05/01 10:56:03 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.173 2009/05/10 06:51:58 andijahja Exp $
  */
 
 /*
@@ -824,6 +824,8 @@ RETURN Self
            SysFreeString( bstrString );
         }
      }
+	  else
+		  return SysAllocStringLen( "\0", 1 );
 
      return NULL;
   }
@@ -1018,6 +1020,7 @@ RETURN Self
            break;
 
         case HB_IT_DATE:
+        case HB_IT_DATE | HB_IT_TIMEFLAG:
           if( pItem->item.asDate.value == 0 )
           {
              pVariant->n1.n2.vt = VT_NULL;
