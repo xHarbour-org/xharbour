@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6479 2009/06/15 11:57:02 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6480 2009/06/15 15:34:01 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -14,8 +14,8 @@
 
 2009-06-15 14:00 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
-    ! Pacified warning
-  * source\rtl\txml.prg
+    * Pacified warning
+  * source/rtl/txml.prg
     ! XML data was not readed when using TXMLDocument():New( <cXMLString> )
 
 2009-06-15 13:10 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
