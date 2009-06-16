@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.11 2008/03/16 03:24:20 lculik Exp $
+ * $Id: ttable.prg,v 1.12 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
          ELSE
             IF nType == 1
                cWord := "( " + DBINFO( 33 ) + " - Record Lock )"
-            ELSEIF nType == 1
+            ELSEIF nType == 2
                cWord := "( " + DBINFO( 33 ) + " - File Lock )"
             ELSEIF nType == 3
                cWord := "( " + DBINFO( 33 ) + " - File Append )"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6482 2009/06/15 16:39:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6483 2009/06/15 18:27:24 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-16 08:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * fixed to refresh cursor position after any circunstances.
+      Bug reported by Daniel S. Almeida.
+
+  * source/rtl/ttable.prg
+    * fixed line 204 as reported by Grzegorz from comp.lang.xharbour news.
 
 2009-06-15 20:30 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source\rtl\empty.c

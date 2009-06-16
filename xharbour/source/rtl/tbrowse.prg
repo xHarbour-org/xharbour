@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.216 2009/04/24 15:48:50 marchuet Exp $
+ * $Id: tbrowse.prg,v 1.217 2009/05/12 01:40:21 modalsist Exp $
  */
 
 /*
@@ -444,7 +444,7 @@ Return xValue
 *----------------------------------------------*
 METHOD SyncData( nRow ) CLASS TDataCache
 *----------------------------------------------*
-Local nSkip, nCurRow, nSkipped
+Local nSkip, nCurRow, nSkipped, nDiff
 
   // if cursor is on an new row, I need sync it.
   if ::nCurRow > ::nLastRow
@@ -457,7 +457,16 @@ Local nSkip, nCurRow, nSkipped
      // Sync data cache cursor with browse row.
      nSkip := ( nCurRow - nRow )
      nSkipped := ::Skip( -nSkip )
-     if nSkipped != 0 .and. ::nCurRow != nRow
+     nDiff := nSkip + nSkipped    // How many Rows was possible to back ?
+
+     if nSkip > 0 .and. nDiff > 0  // Is Backing ? Can't Skip back all Rows pretended ?
+        // So, we need to reposicionate ::oBrowse:nRowPos, to avoid empty Rows on Top of Browse
+        ::oBrowse:nRowPos := max(::oBrowse:nRowPos - nDiff,1)
+        ::nCurRow := max(::nCurRow - nDiff,1)
+        // Since, we did a Vertical Scroll, lets force redraw all Rows after ::nCurRow
+        AFill( ::aCache, NIL )
+
+     elseif nSkipped != 0 .and. ::nCurRow != nRow
         ::nCurRow := nRow
      endif
   endif
