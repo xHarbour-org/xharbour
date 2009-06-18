@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.723 2009/05/01 21:11:03 marchuet Exp $
+ * $Id: hvm.c,v 1.724 2009/05/01 21:31:58 marchuet Exp $
  */
 
 /*
@@ -7717,7 +7717,7 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.lStatics = pBlock->item.asBlock.statics;
 
-   if( ! ( pBlock->item.asBlock.value->uiFlags & CBF_PRIVATE_VARS ) )
+/*   if( ! ( pBlock->item.asBlock.value->uiFlags & CBF_PRIVATE_VARS ) ) */
    {
       pModuleSymbols = HB_SYM_GETMODULESYM( pBaseSym->item.asSymbol.value );
    }
@@ -7729,6 +7729,12 @@ static HARBOUR hb_vmDoBlock( void )
    HB_VM_STACK.lStatics = lStatics;
 
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmDoBlock()"));
+
+   if( ( pBlock->item.asBlock.value->uiFlags & CBF_PRIVATE_VARS ) )
+   {
+      // Set last PrivateBase to avoid delete memvars created in codeblock
+      pBaseSym->item.asSymbol.pCargo->privatesbase = hb_memvarGetPrivatesBase();
+   }
 
    // Restore line numer.
    pBaseSym->item.asSymbol.pCargo->lineno = uiLine;
