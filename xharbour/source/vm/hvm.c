@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.724 2009/05/01 21:31:58 marchuet Exp $
+ * $Id: hvm.c,v 1.725 2009/06/18 21:59:50 walito Exp $
  */
 
 /*
@@ -7674,7 +7674,7 @@ static HARBOUR hb_vmDoBlock( void )
 
    PHB_ITEM pBaseSym = (*HB_VM_STACK.pBase);
    PHB_ITEM pBlock;
-   PSYMBOLS pModuleSymbols = NULL;
+   PSYMBOLS pModuleSymbols; /* = NULL; */
    int iParam;
    LONG lStatics;
    USHORT uiLine;

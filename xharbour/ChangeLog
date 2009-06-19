@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6484 2009/06/16 11:34:31 modalsist Exp $
+ * $Id: ChangeLog,v 1.6485 2009/06/18 21:59:50 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-19 18:50 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\hvm.c
+    - Commented out unused initialization value NULL of variable pModuleSymbols
+      in function hb_vmDoBlock()
 
 2009-06-18 18:46 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * source/vm/hvm.c
