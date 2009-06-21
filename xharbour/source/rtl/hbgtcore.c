@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.15 2009/02/02 12:19:17 likewolf Exp $
+ * $Id: hbgtcore.c,v 1.16 2009/02/20 12:48:24 marchuet Exp $
  */
 
 /*
@@ -2369,7 +2369,7 @@ static int hb_gt_def_InkeyGet( PHB_GT pGT, BOOL fWait, double dSeconds, int iEve
       if( !fWait || hb_vmRequestQuery() != 0 )
          return 0;
 
-      hb_idleState( TRUE );
+      hb_idleState( !dSeconds );
    }
    while( end_timer == 0 || end_timer > hb_dateMilliSeconds() );
 
