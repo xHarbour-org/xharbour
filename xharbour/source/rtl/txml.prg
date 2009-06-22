@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.13 2009/06/06 16:02:26 modalsist Exp $
+ * $Id: txml.prg,v 1.14 2009/06/15 11:57:02 jfgimenez Exp $
  */
 
 /*
@@ -148,29 +148,24 @@ RETURN xRet
 *-----------------------------------------------------------------------------*
 METHOD SetAttribute( xAttrib, xValue )  CLASS TXmlNode
 *-----------------------------------------------------------------------------*
-Local lRet := .f.
 
-if ! empty( xAttrib ) .and. ! empty( xValue )
+if ! empty( xAttrib )
 
    if HB_isString( xAttrib )  // attribute name (key name)
 
-      if HHasKey( ::aAttributes, xAttrib)
-         HSet(::aAttributes, xAttrib, xValue )
-         lRet := .t.
-      endif
+      ::aAttributes[ xAttrib ] := xValue
 
    elseif HB_isNumeric( xAttrib ) // attribute position (key ordinal position)
 
       if Len( ::aAttributes ) >= xAttrib
          HSetValueAt( ::aAttributes, xAttrib, xValue )
-         lRet := .t.
       endif
 
    endif
 
 endif
 
-RETURN lRet
+RETURN xValue
 
 *-----------------------------------------------------------------------------*
 METHOD NextInTree() CLASS TXmlNode

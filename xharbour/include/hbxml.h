@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.1 2009/05/12 01:31:08 modalsist Exp $
+ * $Id: hbxml.h,v 1.10 2009/06/06 16:02:26 modalsist Exp $
  */
 
 /*
@@ -87,12 +87,12 @@
 #define MXML_MAX_DEPTH        64
 
 /* Styles */
-#define MXML_STYLE_NOINDENT      0x0000 /* no indent nodes and insert new line after each node */
-#define MXML_STYLE_INDENT        0x0001 /* indent nodes with 1 space and insert new line after each node  (default) */
-#define MXML_STYLE_TAB           0x0002 /* indent nodes with tab spaces and insert new line after each node  */
-#define MXML_STYLE_THREESPACES   0x0004 /* indent nodes with 3 spaces and insert new line after each node  */
-#define MXML_STYLE_NOESCAPE      0x0008
-#define MXML_STYLE_NONEWLINE     0x0016 /* no indent and no insert new line */
+#define MXML_STYLE_NOINDENT      0 /* no indent nodes and insert new line after each node */
+#define MXML_STYLE_INDENT        1 /* indent nodes with 1 space and insert new line after each node  (default) */
+#define MXML_STYLE_TAB           2 /* indent nodes with tab spaces and insert new line after each node  */
+#define MXML_STYLE_THREESPACES   4 /* indent nodes with 3 spaces and insert new line after each node  */
+#define MXML_STYLE_NOESCAPE      8
+#define MXML_STYLE_NONEWLINE    16 /* no indent and no insert new line */
 
 /* Status vaules */
 

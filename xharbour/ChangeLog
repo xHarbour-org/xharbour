@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6486 2009/06/19 16:51:35 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6487 2009/06/21 08:47:06 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-22 13:40 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+  * source/rtl/txml.prg
+    % Restored previous behaviour of method SetAttribute(), but allow to change attributes by its ordinal position
+  * include/hbxml.h
+    ! Fixed wrong value for MXML_STYLE_NONEWLINE
+
 2009-06-19 20:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\hbgtcore.c
      * change hb_idleState( TRUE ) to hb_idleState( !dSeconds )
