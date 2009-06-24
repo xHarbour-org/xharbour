@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.141 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: memvars.c,v 1.142 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -2077,7 +2077,7 @@ HB_FUNC( __MVSAVE )
 
          msc.buffer[ 0 ] = '\x1A';
          hb_fsWrite( fhnd, msc.buffer, 1 );
-
+         hb_fsCommit( fhnd ) ;
          hb_fsClose( fhnd );
 
          hb_xfree( msc.buffer );
