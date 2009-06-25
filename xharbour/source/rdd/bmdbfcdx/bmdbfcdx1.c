@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.62 2009/04/27 08:40:16 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.63 2009/05/01 21:10:19 marchuet Exp $
  */
 
 /*
@@ -5683,8 +5683,8 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                                  PHB_ITEM pRegExItm )
 {
    BOOL fFound = FALSE, fFirst = TRUE;
-   PHB_REGEX pRegEx = 0;
-
+   HB_REGEX RegEx ;
+   PHB_REGEX pRegEx = &RegEx;
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %p)", pArea, pTag, fForward, pRegExItm));
 
    if( FAST_GOCOLD( ( AREAP ) pArea ) == HB_FAILURE )

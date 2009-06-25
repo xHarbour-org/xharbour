@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6488 2009/06/22 11:42:28 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.6489 2009/06/24 01:42:40 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2009-06-25 16:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfmdx\dbfmdx1.c
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+     * fix GPF in hb_cdxDBOISkipRegEx()
+
 2009-06-24 13:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\vm\memvars.c
      * in HB_FUNC( __MVSAVE ) added hb_fsCommit( fhnd ) to flush SAVEed memvars
