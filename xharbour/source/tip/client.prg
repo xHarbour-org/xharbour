@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.20 2009/01/08 09:11:14 marchuet Exp $
+ * $Id: client.prg,v 1.21 2009/06/29 13:03:51 lculik Exp $
  */
 
 /*
@@ -654,7 +654,7 @@ RETURN Self
 
 
 METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent)
-Local pSocket
+//Local pSocket
 Local cLine
 Local cRequest := ""
 Local cPass := ""
@@ -676,7 +676,7 @@ IF ::InetErrorCode( ::SocketCon ) == 0
       ENDIF
       IF !empty(cUserAgent )
          cLine := sprintf( "User-Agent: %s", cUserAgent ) + Chr( 13 ) + Chr( 10 )
-         cRequest += sLine
+         cRequest += cLine
       ENDIF
       cRequest += Chr( 13 ) + Chr( 10 )
       ::InetSendAll( ::SocketCon, cRequest )
@@ -705,6 +705,7 @@ Method ReadHTTPProxyResponse(dwTimeout, sResponse)
 Local  bMoreDataToRead := .t.
 Local nLength,nData
 Local szResponse
+HB_SYMBOL_UNUSED( dwTimeout )
 WHILE bMoreDataToRead
   
    szResponse := space(1)

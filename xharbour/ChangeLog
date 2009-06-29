@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6491 2009/06/29 13:03:50 lculik Exp $
+ * $Id: ChangeLog,v 1.6492 2009/06/29 13:58:43 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-06-29 21:25 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\tip\client.prg
+    * Fixed typo: replaced sLine with cLine in method Openproxy()
+    - Commented out unused variable pSocket in method Openproxy()
+    * Add HB_SYMBOL_UNUSED( dwTimeout ) for unused dwTimeout parameter in
+      method ReadHTTPProxyResponse()
 
 2009-06-29 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
