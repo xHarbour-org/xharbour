@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.217 2009/05/12 01:40:21 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.218 2009/06/16 11:34:32 modalsist Exp $
  */
 
 /*
@@ -769,6 +769,9 @@ CLASS TBrowse STATIC
 
    ACCESS mColPos         INLINE if( Set(_SET_EVENTMASK) != INKEY_KEYBOARD,::Hittest(MRow(),MCol()),), ::nMColPos
    ASSIGN mColPos(n)      INLINE ::nMColPos := if(hb_isnumeric(n),n,::nMColPos)
+
+   ACCESS Message         INLINE ::cMessage
+   ASSIGN Message(c)      INLINE ::cMessage := if(hb_isString(c),c,::nMessage)
 
    DATA nRow                               // Row number for the actual cell
    DATA nCol                               // Col number for the actual cell
