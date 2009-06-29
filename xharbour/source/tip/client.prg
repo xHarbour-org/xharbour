@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.19 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: client.prg,v 1.20 2009/01/08 09:11:14 marchuet Exp $
  */
 
 /*
@@ -70,6 +70,10 @@
 /* 2007-06-01, Toninho@fwi
    Added data ::nWrite to work like ::nRead
 */
+/* 2009-06-29, Luiz Rafael Culik( luiz at xharbour dot com dot br
+   Added support for proxy connection
+*/
+
 
 #include "hbclass.ch"
 #include "error.ch"
@@ -120,6 +124,15 @@ CLASS tIPClient
    DATA exGauge
 
    DATA Cargo
+
+   // Data For proxy connection
+   DATA cProxyHost
+   DATA nProxyPort
+   DATA cProxyUser
+   DATA cProxyPassword
+   Method SetProxy()
+   METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent)
+   Method ReadHTTPProxyResponse()
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
@@ -205,6 +218,7 @@ RETURN self
 METHOD Open( cUrl ) CLASS tIPClient
 
    LOCAL nPort
+   Local cResp:=""
 
    IF HB_IsString( cUrl )
       ::oUrl := tUrl():New( cUrl )
@@ -215,16 +229,19 @@ METHOD Open( cUrl ) CLASS tIPClient
    ELSE
       nPort := ::oUrl:nPort
    ENDIF
-
    ::SocketCon := InetCreate()
-
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   ::InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
+   if !empty( ::cProxyHost )
+      if !::openProxy( ::oUrl:cServer,nport,::cProxyHost,::nProxyPort,@cResp,::cProxyUser ,::cProxyPassword,::nConnTimeout,'')
+         return .F.
+      endif
+   else
+      ::InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
 
-   IF ::InetErrorCode( ::SocketCon ) != 0
-      RETURN .F.
-   ENDIF
-
+      IF ::InetErrorCode( ::SocketCon ) != 0
+         RETURN .F.
+      ENDIF
+   endif
    ::isOpen := .T.
 RETURN .T.
 
@@ -625,3 +642,87 @@ METHOD Log( ... ) CLASS tIPClient
    fWrite( ::nHandle, cMsg )
 
 RETURN Self
+
+
+METHOD SetProxy( cProxyHost, nProxyPort, cProxyUser, cProxyPassword )  CLASS tIPClient
+   ::cProxyHost     := cProxyHost
+   ::nProxyPort     := nProxyPort
+   ::cProxyUser     := cProxyUser 
+   ::cProxyPassword := cProxyPassword
+RETURN Self
+
+
+
+METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent)
+Local pSocket
+Local cLine
+Local cRequest := ""
+Local cPass := ""
+Local cEncoded := ''
+Local lRet := .T.
+
+Local pEx,nResponseCode
+Local sResponseCode,nFirstSpace
+::InetConnect( cProxy, nProxyPort, ::SocketCon )
+IF ::InetErrorCode( ::SocketCon ) == 0
+   Try
+      cLine := sprintf( 'CONNECT %s:%d HTTP/1', cServer, nPort) + CHR( 13 ) + CHR( 10 )
+      cRequest += cLine
+      IF !empty( cUserName )
+         cPass := sprintf( '%s:%s', cUserName, cPassWord )
+         cEncoded := hb_base64( cPass, Len( cPass ) )
+         cLine := sprintf( "Proxy-authorization: Basic %s", cEncoded ) + Chr( 13 ) + Chr( 10 )
+         cRequest += cLine
+      ENDIF
+      IF !empty(cUserAgent )
+         cLine := sprintf( "User-Agent: %s", cUserAgent ) + Chr( 13 ) + Chr( 10 )
+         cRequest += sLine
+      ENDIF
+      cRequest += Chr( 13 ) + Chr( 10 )
+      ::InetSendAll( ::SocketCon, cRequest )
+      cResp := ''
+      ::ReadHTTPProxyResponse(nTimeOut, @cResp,::SocketCon)
+      nFirstSpace := at(" ",cResp )
+      IF ( nFirstSpace != 0)
+         sResponseCode := Right( cResp, Len( cResp ) - nFirstSpace )
+         nResponseCode = val( sResponseCode )
+         IF ( nResponseCode != 200 )
+            Throw( Errornew( "INETCONNECTPROXY", 0, 4000, Procname(), "Connection refused" ) )
+         ENDIF
+      ENDIF
+   catch pEx 
+      ::close( )
+      lRet := .F.
+   END
+   
+ENDIF
+RETURN  lRet
+
+
+
+Method ReadHTTPProxyResponse(dwTimeout, sResponse)
+
+Local  bMoreDataToRead := .t.
+Local nLength,nData
+Local szResponse
+WHILE bMoreDataToRead
+  
+   szResponse := space(1)
+   nData := inetRecv(::SocketCon,@szResponse, 1)
+   IF (nData == 0)
+      throw(Errornew("INETCONNECTPROXY" ,0,4000,Procname(),"Disconnected"))
+   ENDIF 
+   sResponse += szResponse
+
+   nLength = len(sResponse)
+   IF nLength >= 4   
+      bMoreDataToRead := !( ( substr( sResponse, nLength - 3 , 1 )== chr( 13 ) ) .and. ( substr( sResponse, nLength - 2, 1 ) == chr( 10 ) ) .and. ;
+                           ( substr( sResponse, nLength - 1, 1 ) == chr( 13 ) ) .and. ( substr( sResponse, nLength, 1 ) == chr( 10 ) ) ) 
+   ENDIF
+ENDDO
+RETURN nil
+
+
+
+
+
