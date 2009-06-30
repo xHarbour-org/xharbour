@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.218 2009/06/16 11:34:32 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.219 2009/06/29 13:58:43 modalsist Exp $
  */
 
 /*
@@ -747,7 +747,7 @@ CLASS TBrowse
 CLASS TBrowse STATIC
 #endif
 *------------------------------------------------------*
-                                                
+
    ACCESS AutoLite         INLINE ::lAutoLite     // Logical value to control highlighting
    ASSIGN AutoLite(l)      INLINE ::lAutoLite := if(hb_islogical(l),l,::lAutoLite)
 
@@ -771,7 +771,7 @@ CLASS TBrowse STATIC
    ASSIGN mColPos(n)      INLINE ::nMColPos := if(hb_isnumeric(n),n,::nMColPos)
 
    ACCESS Message         INLINE ::cMessage
-   ASSIGN Message(c)      INLINE ::cMessage := if(hb_isString(c),c,::nMessage)
+   ASSIGN Message(c)      INLINE ::cMessage := if(hb_isString(c),c,::cMessage)
 
    DATA nRow                               // Row number for the actual cell
    DATA nCol                               // Col number for the actual cell
