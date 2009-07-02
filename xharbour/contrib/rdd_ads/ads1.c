@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.141 2009/05/04 08:25:44 marchuet Exp $
+ * $Id: ads1.c,v 1.142 2009/05/04 19:43:49 marchuet Exp $
  */
 
 /*
@@ -162,8 +162,8 @@ static void adsSetSend( void )
 }
 
 static HB_ERRCODE commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
-                            USHORT uiOsCode, const char * szFileName,
-                            USHORT uiFlags, PHB_ITEM * pErrorPtr )
+                               USHORT uiOsCode, const char * szFileName,
+                               USHORT uiFlags, PHB_ITEM * pErrorPtr )
 {
    PHB_ITEM pError;
    HB_ERRCODE errCode = HB_FAILURE;
@@ -1997,7 +1997,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case HB_FT_STRING:
       case HB_FT_VARLENGTH:
-         u32Length = pArea->maxFieldLen;
+         u32Length = pArea->maxFieldLen + 1;
          if( !pArea->fPositioned )
          {
             u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
