@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.143 2009/07/02 11:40:29 marchuet Exp $
+ * $Id: ads1.c,v 1.144 2009/07/03 08:03:09 marchuet Exp $
  */
 
 /*
@@ -2195,30 +2195,30 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_PICTURE:
       {
          UNSIGNED8 *pucBuf;
-         UNSIGNED32 pulLen;
-         UNSIGNED16 pusType;
+         UNSIGNED32 u32Len;
+         UNSIGNED16 u16Type;
 
-         ulRetVal = AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
+         ulRetVal = AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &u16Type );
          if( ulRetVal != AE_SUCCESS )
             hb_itemPutC( pItem, "" );
-         else if( pusType != ADS_BINARY && pusType != ADS_IMAGE )
+         else if( u16Type != ADS_BINARY && u16Type != ADS_IMAGE )
          {
             ulRetVal = AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &u32Len );
             if( ulRetVal != AE_SUCCESS )
                hb_itemPutC( pItem, "" );
             else
             {
-               if( pulLen > 0 )
+               if( u32Len > 0 )
                {
-                  pulLen++;                 /* make room for NULL */
-                  pucBuf = ( UNSIGNED8 * ) hb_xgrab( pulLen );
-                  ulRetVal = AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
+                  u32Len++;                 /* make room for NULL */
+                  pucBuf = ( UNSIGNED8 * ) hb_xgrab( u32Len );
+                  ulRetVal = AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &u32Len, ADS_NONE );
                   if( ulRetVal != AE_SUCCESS )
                      hb_itemPutC( pItem, "" );
                   else
                   {
-                     char * szRet = hb_adsAnsiToOem( ( char * ) pucBuf, pulLen );
-                     hb_itemPutCL( pItem, szRet, pulLen );
+                     char * szRet = hb_adsAnsiToOem( ( char * ) pucBuf, u32Len );
+                     hb_itemPutCL( pItem, szRet, u32Len );
                      hb_adsOemAnsiFree( szRet );
                   }
                   hb_xfree( pucBuf );
@@ -2234,10 +2234,10 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                hb_itemPutC( pItem, "" );
             else
             {
-               pulLen++;                  /* make room for NULL */
-               pucBuf = ( UNSIGNED8 * ) hb_xgrab( pulLen );
-               AdsGetBinary( pArea->hTable, ADSFIELD( uiIndex ), 0, pucBuf, &pulLen );
-               hb_itemPutCPtr( pItem, ( char * ) pucBuf, pulLen );
+               u32Len++;                  /* make room for NULL */
+               pucBuf = ( UNSIGNED8 * ) hb_xgrab( u32Len );
+               AdsGetBinary( pArea->hTable, ADSFIELD( uiIndex ), 0, pucBuf, &u32Len );
+               hb_itemPutCPtr( pItem, ( char * ) pucBuf, u32Len );
             }
          }
          hb_itemSetCMemo( pItem );
