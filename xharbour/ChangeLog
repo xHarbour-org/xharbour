@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6493 2009/06/29 19:20:49 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6494 2009/06/30 12:40:14 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-04 01:47 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source\rtl\gtclip.c
+    ! Fixed hb_gt_w32_getClipboard() to respect NULL termination when format is CF_TEXT or CF_OEMTEXT
 
 2009-06-30 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

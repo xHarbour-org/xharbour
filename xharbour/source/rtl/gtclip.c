@@ -1,5 +1,5 @@
 /*
- * $Id: gtclip.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: gtclip.c,v 1.2 2008/11/26 17:13:16 marchuet Exp $
  */
 
 /*
@@ -132,15 +132,23 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
 {
    *pulLen = 0;
    *pszClipData = NULL;
+
    if( IsClipboardFormatAvailable( uFormat ) && OpenClipboard( NULL ) )
    {
       HGLOBAL hglb = GetClipboardData( uFormat );
+
       if( hglb )
       {
          LPTSTR lptstr = ( LPTSTR ) GlobalLock( hglb );
+
          if( lptstr )
          {
             *pulLen = GlobalSize( hglb );
+
+            if( uFormat == CF_TEXT || uFormat == CF_OEMTEXT )
+            {
+               *pulLen = strlen( lptstr );
+            }
 
             if( *pulLen )
             {
@@ -148,9 +156,11 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
                HB_TCHAR_GETFROM( *pszClipData, lptstr, *pulLen );
                ( *pszClipData )[ *pulLen ] = '\0';
             }
+
             GlobalUnlock( hglb );
          }
       }
+
       CloseClipboard();
    }
 
