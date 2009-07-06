@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.23 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: file.c,v 1.24 2009/07/06 08:06:24 marchuet Exp $
  */
 
 /*
@@ -63,6 +63,10 @@
 
 #if defined( HB_WIN32_IO )
    #include <windows.h>
+#endif
+
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
 
 BOOL hb_fsFile( BYTE * pFilename )
