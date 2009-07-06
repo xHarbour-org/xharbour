@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.144 2009/07/03 08:03:09 marchuet Exp $
+ * $Id: ads1.c,v 1.145 2009/07/03 08:10:48 marchuet Exp $
  */
 
 /*
@@ -1997,12 +1997,11 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case HB_FT_STRING:
       case HB_FT_VARLENGTH:
-         u32Length = pArea->maxFieldLen + 1;
+         u32Length = pArea->maxFieldLen;
          if( !pArea->fPositioned )
          {
             u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
             memset( pBuffer, ' ', u32Length );
-            ulRetVal = AE_SUCCESS;
          }
 #ifdef ADS_USE_OEM_TRANSLATION
 #if ADS_LIB_VERSION >= 900
@@ -2012,18 +2011,18 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #endif
          {
 #if ADS_LIB_VERSION >= 600
-            ulRetVal = AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length );
-            if( ulRetVal != AE_SUCCESS )
+            if( AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length ) == AE_NO_CURRENT_RECORD )
             {
                u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
                memset( pBuffer, ' ', u32Length );
+               hb_adsUpdateAreaFlags( pArea );
             }
 #else
-            ulRetVal = AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE );
-            if( ulRetVal != AE_SUCCESS )
+            if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE ) == AE_NO_CURRENT_RECORD )
             {
                u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
                memset( pBuffer, ' ', u32Length );
+               hb_adsUpdateAreaFlags( pArea );
             }
             else
             {
@@ -2034,14 +2033,13 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #endif
          }
 #endif
-         else
+         else if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE ) == AE_NO_CURRENT_RECORD )
          {
-            ulRetVal = AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE );
-            if( ulRetVal != AE_SUCCESS )
-            {
-               u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
-               memset( pBuffer, ' ', u32Length );
-            }
+            u32Length = pField->uiType == HB_FT_STRING ? pField->uiLen : 0;
+            memset( pBuffer, ' ', u32Length );
+            /* It should not happen - sth desynchronize WA with ADS,
+               update area flags, Druzus */
+            hb_adsUpdateAreaFlags( pArea );
          }
          hb_itemPutCL( pItem, ( char * ) pBuffer, u32Length );
          break;
@@ -2051,8 +2049,9 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_TIME:
       {
          SIGNED32 lTime = 0, lDate = 0;
+         u32Length = pArea->maxFieldLen + 1;
          ulRetVal = AdsGetMilliseconds( pArea->hTable, ADSFIELD( uiIndex ), &lTime );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             lTime = 0;
             pArea->fEof = TRUE;
@@ -2060,7 +2059,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else if( pField->uiType != HB_FT_TIME )
          {
             ulRetVal = AdsGetJulian( pArea->hTable, ADSFIELD( uiIndex ), &lDate );
-            if( ulRetVal != AE_SUCCESS )
+            if( ulRetVal == AE_NO_CURRENT_RECORD )
             {
                pArea->fEof = TRUE;
                lDate = 0;
@@ -2073,7 +2072,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       {
          SIGNED32 lVal = 0;
          ulRetVal = AdsGetLong( pArea->hTable, ADSFIELD( uiIndex ), &lVal );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             lVal = 0;
             pArea->fEof = TRUE;
@@ -2085,11 +2084,12 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
       }
 #if ADS_LIB_VERSION >= 700 && !defined(HB_LONG_LONG_OFF)
+
       case HB_FT_AUTOINC:
       {
          SIGNED64 qVal = 0;
          ulRetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             qVal = 0;
             pArea->fEof = TRUE;
@@ -2101,7 +2101,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       {
          SIGNED64 qVal = 0;
          ulRetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             qVal = 0;
             pArea->fEof = TRUE;
@@ -2116,7 +2116,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          DOUBLE   dVal = 0;
 
          ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             dVal = 0.0;
             pArea->fEof = TRUE;
@@ -2133,7 +2133,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          DOUBLE   dVal = 0;
 
          ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
-         if( ulRetVal != AE_SUCCESS )
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             dVal = 0.0;
             pArea->fEof = TRUE;
@@ -2167,8 +2167,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       {
          SIGNED32 lDate;
 
-         ulRetVal = AdsGetJulian( pArea->hTable, ADSFIELD( uiIndex ), &lDate );
-         if( ulRetVal != AE_SUCCESS )
+         if( AdsGetJulian( pArea->hTable, ADSFIELD( uiIndex ), &lDate ) == AE_NO_CURRENT_RECORD )
          {
             pArea->fEof = TRUE;
             lDate = 0;
@@ -2178,94 +2177,73 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
 
       case HB_FT_LOGICAL:
-      {
-         UNSIGNED16 pbValue = FALSE;
-         ulRetVal = AdsGetLogical( pArea->hTable, ADSFIELD( uiIndex ), &pbValue );
-         if( ulRetVal != AE_SUCCESS )
          {
-            pbValue = FALSE;
-            pArea->fEof = TRUE;
+            UNSIGNED16 pbValue = FALSE;
+            if( AdsGetLogical( pArea->hTable, ADSFIELD( uiIndex ), &pbValue ) == AE_NO_CURRENT_RECORD )
+            {
+               pbValue = FALSE;
+               pArea->fEof = TRUE;
+            }
+            hb_itemPutL( pItem, pbValue != 0 );
+            break;
          }
-         hb_itemPutL( pItem, pbValue != 0 );
-         break;
-      }
 
       case HB_FT_MEMO:
       case HB_FT_BLOB:
       case HB_FT_PICTURE:
       {
          UNSIGNED8 *pucBuf;
-         UNSIGNED32 u32Len;
-         UNSIGNED16 u16Type;
+         UNSIGNED32 pulLen;
+         UNSIGNED16 pusType;
 
-         ulRetVal = AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &u16Type );
-         if( ulRetVal != AE_SUCCESS )
-            hb_itemPutC( pItem, "" );
-         else if( u16Type != ADS_BINARY && u16Type != ADS_IMAGE )
+         AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
+
+         if( pusType != ADS_BINARY && pusType != ADS_IMAGE )
          {
-            ulRetVal = AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &u32Len );
-            if( ulRetVal != AE_SUCCESS )
+            if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
+            {
                hb_itemPutC( pItem, "" );
+            }
             else
             {
-               if( u32Len > 0 )
+               if( pulLen > 0 )
                {
-                  u32Len++;                 /* make room for NULL */
-                  pucBuf = ( UNSIGNED8 * ) hb_xgrab( u32Len );
-                  ulRetVal = AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &u32Len, ADS_NONE );
-                  if( ulRetVal != AE_SUCCESS )
-                     hb_itemPutC( pItem, "" );
-                  else
-                  {
-                     char * szRet = hb_adsAnsiToOem( ( char * ) pucBuf, u32Len );
-                     hb_itemPutCL( pItem, szRet, u32Len );
-                     hb_adsOemAnsiFree( szRet );
-                  }
+                  char * szRet;
+
+                  pulLen++;                 /* make room for NULL */
+                  pucBuf = ( UNSIGNED8 * ) hb_xgrab( pulLen );
+                  AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
+
+                  szRet = hb_adsAnsiToOem( ( char * ) pucBuf, pulLen );
+                  hb_itemPutCL( pItem, szRet, pulLen );
+                  hb_adsOemAnsiFree( szRet );
+
                   hb_xfree( pucBuf );
                }
                else
+               {
                   hb_itemPutC( pItem, "" );
+               }
             }
          }
          else
          {
-            ulRetVal = AdsGetBinaryLength( pArea->hTable, ADSFIELD( uiIndex ), &u32Len );
-            if( ulRetVal != AE_SUCCESS )
+            if( AdsGetBinaryLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
+            {
                hb_itemPutC( pItem, "" );
+            }
             else
             {
-               u32Len++;                  /* make room for NULL */
-               pucBuf = ( UNSIGNED8 * ) hb_xgrab( u32Len );
-               AdsGetBinary( pArea->hTable, ADSFIELD( uiIndex ), 0, pucBuf, &u32Len );
-               hb_itemPutCPtr( pItem, ( char * ) pucBuf, u32Len );
+               pulLen++;                  /* make room for NULL */
+               pucBuf = ( UNSIGNED8 * ) hb_xgrab( pulLen );
+               AdsGetBinary( pArea->hTable, ADSFIELD( uiIndex ), 0, pucBuf, &pulLen );
+               hb_itemPutCPtr( pItem, ( char * ) pucBuf, pulLen );
             }
          }
          hb_itemSetCMemo( pItem );
          break;
       }
-      default:
-         commonError( pArea, EG_DATATYPE, 1020, 0, NULL, 0, NULL );
-         return HB_FAILURE;
    }
-
-   if( ulRetVal == AE_NO_CURRENT_RECORD )
-   {
-      if( pArea->fPositioned )
-      {
-         /* It should not happen - sth desynchronize WA with ADS,
-            update area flags, Druzus */
-         hb_adsUpdateAreaFlags( pArea );
-      }
-   }
-   else if( ulRetVal != AE_SUCCESS )
-   {
-      if( ulRetVal == AE_DATA_TOO_LONG )
-         commonError( pArea, EG_DATAWIDTH, EDBF_DATAWIDTH, 0, NULL, 0, NULL );
-      else
-         commonError( pArea, EG_READ, ( USHORT ) ulRetVal, 0, NULL, 0, NULL );
-      return HB_FAILURE;
-   }
-
    return HB_SUCCESS;
 }
 
@@ -2289,7 +2267,7 @@ static HB_ERRCODE adsGetVarLen( ADSAREAP pArea, USHORT uiIndex, ULONG * ulLen )
 
       if( !pArea->fPositioned )
          *ulLen = 0;
-      else if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &u32Len ) != AE_SUCCESS )
+      else if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &u32Len ) == AE_NO_CURRENT_RECORD )
       {
          /* It should not happen - sth desynchronize WA with ADS,
             update area flags, Druzus */
