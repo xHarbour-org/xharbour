@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.22 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: file.c,v 1.23 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -53,12 +53,17 @@
 /*
 * hb_fsIsDirectory( BYTE * pFilename ) -- determine if a given file is a directory
 *     Copyright 2004 Giancarlo Niccolai
+* modified by Miguel Angel Marchuet at 2009, to fix hb_fsIsDirectory( "\\MACHINE\UNIT" ) style calls
 */
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbset.h"
+
+#if defined( HB_WIN32_IO )
+   #include <windows.h>
+#endif
 
 BOOL hb_fsFile( BYTE * pFilename )
 {
@@ -102,7 +107,6 @@ BOOL hb_fsFile( BYTE * pFilename )
 BOOL hb_fsIsDirectory( BYTE * pFilename )
 {
    BOOL bResult = FALSE, fFree;
-   PHB_FFIND ffind;
    int iFileName ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDirectory(%s)", ( char * ) pFilename));
@@ -110,20 +114,30 @@ BOOL hb_fsIsDirectory( BYTE * pFilename )
    pFilename = hb_fsNameConv( pFilename, &fFree );
    iFileName = strlen( (char*) pFilename );
 
-   if ( iFileName )
+   if( iFileName )
    {
-     if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
-     {
-       if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
-       {
-         bResult = TRUE;
-       }
-       else if ( pFilename[iFileName-1] == HB_OS_PATH_DELIM_CHR )
-       {
-         bResult = TRUE;
-       }
-       hb_fsFindClose( ffind );
-     }
+      #if defined( HB_OS_WIN_32 )
+      {
+         DWORD dAttr = GetFileAttributes( ( LPCTSTR ) pFilename );
+         bResult = ( dAttr == INVALID_FILE_ATTRIBUTES ? FALSE : ( dAttr & FILE_ATTRIBUTE_DIRECTORY ) );
+      }
+      #else
+      {
+         PHB_FFIND ffind;
+         if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
+         {
+            if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
+            {
+               bResult = TRUE;
+            }
+            else if ( pFilename[iFileName-1] == HB_OS_PATH_DELIM_CHR )
+            {
+               bResult = TRUE;
+            }
+            hb_fsFindClose( ffind );
+         }
+      }
+      #endif
    }
    hb_fsSetError( 0 );
 

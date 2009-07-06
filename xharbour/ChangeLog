@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6494 2009/06/30 12:40:14 modalsist Exp $
+ * $Id: ChangeLog,v 1.6495 2009/07/04 06:24:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-06 10:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/rtl/file.c
+    * Changed IsDirectory to fix IsDirectory( "\\machine\c" ) style call
+      under windows platforms.
 
 2009-07-04 01:47 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source\rtl\gtclip.c
