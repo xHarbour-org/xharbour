@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.14 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.15 2008/09/15 15:46:47 marchuet Exp $
  */
 
 /*
@@ -116,14 +116,14 @@ HB_FUNC( HB_COMPRESS )
       return;
    }
 
-   cSource = hb_itemGetCPtr( pSource ); 
+   cSource = hb_itemGetCPtr( pSource );
    if (hb_pcount() > iFirst + 1 )
    {
       ulSrclen = (ULONG) hb_parnl( iFirst + 2 );
    }
    else
    {
-      ulSrclen = hb_itemGetCLen( pSource ); 
+      ulSrclen = hb_itemGetCLen( pSource );
    }
 
    /* Allocation mode: user provided or allocated here */
@@ -206,7 +206,7 @@ HB_FUNC( HB_UNCOMPRESS )
       return;
    }
 
-   cSource = hb_itemGetCPtr( pSource ); 
+   cSource = hb_itemGetCPtr( pSource );
    ulDstlen = (ULONG) hb_parnl( 1 );
    if (hb_pcount() > 2 )
    {
@@ -214,7 +214,7 @@ HB_FUNC( HB_UNCOMPRESS )
    }
    else
    {
-      ulSrclen = hb_itemGetCLen( pSource ); 
+      ulSrclen = hb_itemGetCLen( pSource );
    }
 
    /* Allocation mode: user provided or allocated here */
@@ -265,7 +265,7 @@ HB_FUNC( HB_UNCOMPRESS )
       }
       else
       {
-         hb_retclenAdoptRaw( cDest, ulDstlen );
+         hb_retclenAdopt( cDest, ulDstlen );
       }
    }
    s_hb_compress_error = cerr;

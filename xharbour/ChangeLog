@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6495 2009/07/04 06:24:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6496 2009/07/06 08:06:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-10 10:49 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * Corrected HB_FUNC( HB_UNCOMPRESS ) to use hb_retclenAdopt() instead of hb_retclenAdoptRaw()
 
 2009-07-06 10:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source/rtl/file.c
@@ -1883,7 +1886,7 @@ Miguel Angel Marchuet
      + New source to be comiled into use_dll.lib and linked to any application
        staticly linked to harbour.dll.
        /*
-           NOTE: Make sure to link use_dll.lib aheadu of harbour.lib!
+           NOTE: Make sure to link use_dll.lib ahead of harbour.lib!
         */
 
    * include/hbvm.h
