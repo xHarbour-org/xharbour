@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.98 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: set.c,v 1.99 2009/04/24 15:48:50 marchuet Exp $
  */
 
 /*
@@ -1552,21 +1552,86 @@ void hb_setRelease( void )
    close_text( hb_set.hb_set_extrahan );
    close_binary( hb_set.hb_set_printhan );
 
-   if( hb_set.HB_SET_ALTFILE )    hb_xfree( hb_set.HB_SET_ALTFILE );
-   if( hb_set.HB_SET_DATEFORMAT ) hb_xfree( hb_set.HB_SET_DATEFORMAT );
-   if( hb_set.HB_SET_TIMEFORMAT ) hb_xfree( hb_set.HB_SET_TIMEFORMAT );
-   if( hb_set.HB_SET_DEFAULT )    hb_xfree( hb_set.HB_SET_DEFAULT );
-   if( hb_set.HB_SET_DELIMCHARS ) hb_xfree( hb_set.HB_SET_DELIMCHARS );
-   if( hb_set.HB_SET_DEVICE )     hb_xfree( hb_set.HB_SET_DEVICE );
-   if( hb_set.HB_SET_EXTRAFILE )  hb_xfree( hb_set.HB_SET_EXTRAFILE );
-   if( hb_set.HB_SET_MFILEEXT  )  hb_xfree( hb_set.HB_SET_MFILEEXT );
-   if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
-   if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
-   if( hb_set.HB_SET_EOL )        hb_xfree( hb_set.HB_SET_EOL );
-   if( hb_set.HB_SET_OSCODEPAGE ) hb_xfree( hb_set.HB_SET_OSCODEPAGE );
-   if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
+   if( hb_set.HB_SET_ALTFILE )
+   {
+      hb_xfree( hb_set.HB_SET_ALTFILE );
+      hb_set.HB_SET_ALTFILE = NULL;
+   }
 
-   hb_set.HB_SET_TYPEAHEAD = 0;   hb_inkeyReset(); /* reset keyboard buffer */
+   if( hb_set.HB_SET_DATEFORMAT )
+   {
+      hb_xfree( hb_set.HB_SET_DATEFORMAT );
+      hb_set.HB_SET_DATEFORMAT = NULL;
+   }
+
+   if( hb_set.HB_SET_TIMEFORMAT )
+   {
+      hb_xfree( hb_set.HB_SET_TIMEFORMAT );
+      hb_set.HB_SET_TIMEFORMAT = NULL;
+   }
+
+   if( hb_set.HB_SET_DEFAULT )
+   {
+      hb_xfree( hb_set.HB_SET_DEFAULT );
+      hb_set.HB_SET_DEFAULT = NULL;
+   }
+
+   if( hb_set.HB_SET_DELIMCHARS )
+   {
+      hb_xfree( hb_set.HB_SET_DELIMCHARS );
+      hb_set.HB_SET_DELIMCHARS = NULL;
+   }
+
+   if( hb_set.HB_SET_DEVICE )
+   {
+      hb_xfree( hb_set.HB_SET_DEVICE );
+      hb_set.HB_SET_DEVICE = NULL;
+   }
+
+   if( hb_set.HB_SET_EXTRAFILE )
+   {
+      hb_xfree( hb_set.HB_SET_EXTRAFILE );
+      hb_set.HB_SET_EXTRAFILE = NULL;
+   }
+
+   if( hb_set.HB_SET_MFILEEXT  )
+   {
+      hb_xfree( hb_set.HB_SET_MFILEEXT );
+      hb_set.HB_SET_MFILEEXT = NULL;
+   }
+
+   if( hb_set.HB_SET_PATH )
+   {
+      hb_xfree( hb_set.HB_SET_PATH );
+      hb_set.HB_SET_PATH = NULL;
+   }
+
+   if( hb_set.HB_SET_PRINTFILE )
+   {
+      hb_xfree( hb_set.HB_SET_PRINTFILE );
+      hb_set.HB_SET_PRINTFILE = NULL;
+   }
+
+   if( hb_set.HB_SET_EOL )
+   {
+      hb_xfree( hb_set.HB_SET_EOL );
+      hb_set.HB_SET_EOL = NULL;
+   }
+
+   if( hb_set.HB_SET_OSCODEPAGE )
+   {
+      hb_xfree( hb_set.HB_SET_OSCODEPAGE );
+      hb_set.HB_SET_OSCODEPAGE = NULL;
+   }
+
+   if( hb_set.hb_set_printerjob )
+   {
+      hb_xfree( hb_set.hb_set_printerjob );
+      hb_set.hb_set_printerjob = NULL;
+   }
+
+   hb_set.HB_SET_TYPEAHEAD = 0;
+   hb_inkeyReset(); /* reset keyboard buffer */
 
    while( sp_sl_first )
    {

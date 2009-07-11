@@ -46,6 +46,7 @@
 #COMMAND OTHERWISE          => __SetOtherwise()
 #COMMAND ENDCASE [<x,...>]  => __SetEndCase() [<-x->]
 
-#COMMAND DO <file>.prg      => PP_Run( #<file> + ".prg" )
+#COMMAND DO <file>.PRG      => PP_Run( #<file> + ".prg" )
+#COMMAND DO <file>.PRG WITH <params,...> => PP_Run( #<file> + ".prg", {<params>} )
 
 #command CD <(dir)>         => DirChange( <(dir)> )

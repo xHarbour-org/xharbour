@@ -102,7 +102,8 @@
 
 #COMMAND WITH OBJECT <withobject>                        => PP__WITHOBJECT <withobject>
 
-#COMMAND DO <(file)>.prg => PP_Run( #<file> + ".prg" )
+#COMMAND DO <file>.PRG                                   => PP_Run( #<file> + ".prg" )
+#COMMAND DO <file>.PRG WITH <params,...>                 => PP_Run( #<file> + ".prg", {<params>} )
 
 #COMMAND INIT PROCEDURE <!name!>[()]            => PP_PROC_INIT <name>
 #COMMAND EXIT PROCEDURE <!name!>[()]            => PP_PROC_EXIT <name>
