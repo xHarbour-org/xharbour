@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.40 2009/05/19 16:34:58 marchuet Exp $
+# $Id: compile.mak,v 1.41 2009/06/05 22:31:53 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2821,10 +2821,7 @@ $(OBJ_DIR)$(DIR_SEP)wordrepl$(OBJEXT) : $(CT_DIR)$(DIR_SEP)wordrepl.c
 $(OBJ_DIR)$(DIR_SEP)wordtoch$(OBJEXT) : $(CT_DIR)$(DIR_SEP)wordtoch.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)blank.c : $(CT_DIR)$(DIR_SEP)blank.prg
-	$(HB_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)blank$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)blank.c
+$(OBJ_DIR)$(DIR_SEP)blank$(OBJEXT) : $(CT_DIR)$(DIR_SEP)blank.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)color.c : $(CT_DIR)$(DIR_SEP)color.prg

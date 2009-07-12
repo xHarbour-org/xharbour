@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.97 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: adsfunc.c,v 1.98 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -1213,14 +1213,12 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
 
    if( /* hb_ads_hConnect && */ pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_adsOemToAnsi( hb_parc( 1 ), hb_parclen( 1 ) );
+      char * pucStmt = hb_parc( 1 );
       ADSHANDLE hCursor = 0;
 
       UNSIGNED32 ulRetVal = AdsExecuteSQLDirect( pArea->hStatement,
                                                  ( UNSIGNED8 * ) pucStmt,
                                                  &hCursor );
-
-      hb_adsOemAnsiFree( pucStmt );
 
       if( ulRetVal == AE_SUCCESS )
       {
@@ -1262,12 +1260,10 @@ HB_FUNC( ADSPREPARESQL )
 
    if( /* hb_ads_hConnect && */ pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_adsOemToAnsi( hb_parc( 1 ), hb_parclen( 1 ) );
+      char * pucStmt = hb_parc( 1 );
 
       UNSIGNED32 ulRetVal = AdsPrepareSQL( pArea->hStatement,
                                            ( UNSIGNED8 * ) pucStmt );
-
-      hb_adsOemAnsiFree( pucStmt );
 
       if( ulRetVal == AE_SUCCESS )
          hb_retl( TRUE );
@@ -1331,11 +1327,9 @@ HB_FUNC( ADSVERIFYSQL )
 
    if( pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_adsOemToAnsi( hb_parc( 1 ), hb_parclen( 1 ) );
+      char * pucStmt = hb_parc( 1 );
 
       hb_retl( AdsVerifySQL( pArea->hStatement, ( UNSIGNED8 * ) pucStmt ) == AE_SUCCESS );
-
-      hb_adsOemAnsiFree( pucStmt );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, HB_ERR_FUNCNAME );
