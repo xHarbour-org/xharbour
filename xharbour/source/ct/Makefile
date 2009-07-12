@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.22 2008/03/16 19:15:59 likewolf Exp $
+# $Id: Makefile,v 1.23 2008/03/18 06:41:39 likewolf Exp $
 #
 
 ROOT = ../../
@@ -14,6 +14,7 @@ C_SOURCES = \
 	bit1.c \
 	bit2.c \
 	bit3.c \
+	blank.c \
 	charevod.c \
 	charlist.c \
 	charmirr.c \
@@ -85,7 +86,6 @@ C_SOURCES = \
 	wordtoch.c \
 
 PRG_SOURCES= \
-	blank.prg \
 	color.prg \
 	ct.prg \
 	ctmisc.prg \
