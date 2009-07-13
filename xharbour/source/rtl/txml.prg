@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.14 2009/06/15 11:57:02 jfgimenez Exp $
+ * $Id: txml.prg,v 1.15 2009/06/22 11:42:29 jfgimenez Exp $
  */
 
 /*
@@ -578,7 +578,9 @@ Local fHandle, cHeader, lOK := .f., cFileName
         ::oRoot:Write( fHandle, nStyle )
         lOK := ( FError() == 0 )
      endif
-     FClose(fHandle)
+     if hb_isNumeric( xFile )
+        FClose(fHandle)
+     endif
   endif
 
   if ! lOK
