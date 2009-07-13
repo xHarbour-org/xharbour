@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.45 2009/05/19 16:34:58 marchuet Exp $
+# $Id: common.mak,v 1.46 2009/06/05 22:31:53 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -932,9 +932,11 @@ CODEPAGE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)cpsvwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cptr857$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cpua1125$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpua866$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpuakoi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)uc1125$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1250$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1251$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)uc1252$(OBJEXT)\
@@ -1007,6 +1009,7 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)atadjust$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)atnum$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)atrepl$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)blank$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)bit1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)bit2$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)bit3$(OBJEXT)\
@@ -1077,7 +1080,6 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)wordrepl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wordtoch$(OBJEXT)\
 	\
-	$(OBJ_DIR)$(DIR_SEP)blank$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)color$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ct$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ctmisc$(OBJEXT)\

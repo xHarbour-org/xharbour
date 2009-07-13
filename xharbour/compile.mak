@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.41 2009/06/05 22:31:53 marchuet Exp $
+# $Id: compile.mak,v 1.42 2009/07/12 07:06:37 ptsarenko Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2299,6 +2299,9 @@ $(OBJ_DIR)$(DIR_SEP)cptr857$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cptr857.c
 $(OBJ_DIR)$(DIR_SEP)cptrwin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cptrwin.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)cpua1125$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpua1125.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)cpua866$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpua866.c
 	$(CC_CMD)
 
@@ -2306,6 +2309,9 @@ $(OBJ_DIR)$(DIR_SEP)cpuakoi$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuakoi.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cpuawin$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)cpuawin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)uc1125$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1125.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)uc1250$(OBJEXT) : $(CODEPAGE_DIR)$(DIR_SEP)uc1250.c
