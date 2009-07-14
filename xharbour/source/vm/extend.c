@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.71 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: extend.c,v 1.72 2008/12/23 16:37:06 likewolf Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ char * hb_parcx( int iParam, ... )
          ulArrayIndex = va_arg( va, ULONG );
          va_end( va );
 
-         return hb_arrayGetCPtr( pItem, ulArrayIndex );
+         return (char *) ( hb_arrayGetCPtr( pItem, ulArrayIndex ) || "" );
       }
    }
 
