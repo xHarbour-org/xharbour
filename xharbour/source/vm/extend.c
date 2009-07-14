@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.72 2008/12/23 16:37:06 likewolf Exp $
+ * $Id: extend.c,v 1.73 2009/07/14 02:44:28 ronpinkas Exp $
  */
 
 /*
@@ -248,6 +248,7 @@ char * hb_parcx( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
+         char * szElement;
          va_list va;
          ULONG ulArrayIndex;
 
@@ -255,7 +256,12 @@ char * hb_parcx( int iParam, ... )
          ulArrayIndex = va_arg( va, ULONG );
          va_end( va );
 
-         return (char *) ( hb_arrayGetCPtr( pItem, ulArrayIndex ) || "" );
+         szElement = hb_arrayGetCPtr( pItem, ulArrayIndex );
+
+         if( szElement )
+         {
+            return szElement;
+         }
       }
    }
 
