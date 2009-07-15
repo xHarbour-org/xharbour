@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6504 2009/07/14 02:44:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6505 2009/07/14 12:34:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-14 20:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
+  * source/codepage/cpua1125.c
+  * source/codepage/cpua866.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpuawin.c
+    * added "CYRILLIC LETTER GHE WITH UPTURN" letter
+  * include/hbextern.ch
+    * updated for HB_CODEPAGE_UA1125
+
+  + source/lang/msguados.c
+  * source/lang/Makefile
+  * common.mak
+  * compile.mak
+    + added ukrainian language module for cp1125
+
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+    * minor correction
 
 2009-07-14 08:03 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/extend.c

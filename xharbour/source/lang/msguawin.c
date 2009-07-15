@@ -1,5 +1,5 @@
 /*
- * $Id: msguawin.c,v 1.5 2008/08/14 09:04:19 andijahja Exp $
+ * $Id: msguawin.c,v 1.6 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -63,10 +63,10 @@ static HB_LANG s_lang =
 
       "UAWIN",                     /* ID */
       "Ukrainian",                 /* Name (in English) */
-      "Український",               /* Name (in native language) */
+      "Українська",                /* Name (in native language) */
       "UA",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.5 $ $Date: 2008/08/14 09:04:19 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
 
       /* Month names */
 

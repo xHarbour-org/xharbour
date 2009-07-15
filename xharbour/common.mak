@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.46 2009/06/05 22:31:53 marchuet Exp $
+# $Id: common.mak,v 1.47 2009/07/13 16:58:06 ptsarenko Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -520,6 +520,7 @@ LANG_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)msgsv$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)msgsvwin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)msgua866$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)msguados$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)msguakoi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)msguawin$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)msgzhb5$(OBJEXT)\

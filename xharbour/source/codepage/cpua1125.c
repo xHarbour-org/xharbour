@@ -1,5 +1,5 @@
 /*
- * $Id: cpua1125.c,v 1.1 2009/07/13 08:32:32 ptsarenko Exp $
+ * $Id: cpua1125.c,v 1.1 2009/07/13 16:58:06 ptsarenko Exp $
  */
 
 /*
@@ -59,9 +59,9 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "UA1125",
-    HB_CPID_1125, HB_UNITB_1125, 36,
-    "€‚ƒ„…πτ†‡φψ‰‹‘’“”•–—™›",
-    " ΅Ά£¤¥ρυ¦§¨χω©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    HB_CPID_1125, HB_UNITB_1125, 37,
+    "€‚ƒς„…πτ†‡φψ‰‹‘’“”•–—™›",
+    " ΅Ά£σ¤¥ρυ¦§¨χω©ª«¬­®―ΰαβγδεζηθικλμνξο",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_INIT( UA1125 )

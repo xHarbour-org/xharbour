@@ -1,5 +1,5 @@
 /*
- * $Id: cpua866.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpua866.c,v 1.8 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -58,9 +58,9 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "UA866",
-    HB_CPID_866,HB_UNITB_866,36,
-    "€‚ƒ„…πς†‡Iτ‰‹‘’“”•–—™›",
-    " ΅Ά£¤¥ρσ¦§¨iυ©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    HB_CPID_866, HB_UNITB_866, 37,
+    "€‚ƒƒ„…πς†‡Iτ‰‹‘’“”•–—™›",
+    " ΅Ά££¤¥ρσ¦§¨iυ©ª«¬­®―ΰαβγδεζηθικλμνξο",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_INIT( UA866 )

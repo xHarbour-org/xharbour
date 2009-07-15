@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.42 2009/07/12 07:06:37 ptsarenko Exp $
+# $Id: compile.mak,v 1.43 2009/07/13 16:58:06 ptsarenko Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1689,6 +1689,9 @@ $(OBJ_DIR)$(DIR_SEP)msgsvwin$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msgsvwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)msgua866$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msgua866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)msguados$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msguados.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)msguakoi$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msguakoi.c
