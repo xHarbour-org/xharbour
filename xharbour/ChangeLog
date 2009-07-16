@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6505 2009/07/14 12:34:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6506 2009/07/15 17:14:56 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-15 21:15 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
+  * source/lang/msgua866.c
+  * source/lang/msguados.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+    * fixed ukrainian localization, and synced with Harbour, thanks to
+      Petr Chornyj and Viktor Szakats.
+      Petr, note, that cp866 does not have a separate code for
+      "BYELORUSSIAN-UKRAINIAN I", and codes for other ukrainian letters
+      are different from cp1125.
 
 2009-07-14 20:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/codepage/cpua1125.c
