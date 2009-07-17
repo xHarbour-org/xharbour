@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6506 2009/07/15 17:14:56 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6507 2009/07/16 18:15:03 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-16 19:30 UTC-0800 Brian Hays <bhays/at/abacuslaw.com>
+  * contrib\rdd_ads\ads1.c
+    * fixed buffer handling for adsScopeSet and GetValue and related funcs.
+      Since way back, buffers were short by 1 byte, and ace calls were
+      throwing errors that were essentially ignored. It only worked because the
+      one missing byte was of course the trailing null. But all errors other
+      than "eof" were ignored.
+
+      Fix provided by Przemyslaw Czerpak (Thanks!) based on:
+      2009-05-14 19:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+      * harbour/contrib/rddads/ads1.c
+         ! fixed minimal record buffer size calculation
+         ! fixed adsGetValue() method hacked to not report errors due to too
+            small field buffer.
+            Warning! Now ADS RDD will report any error as RTE if sth wrong
+            will happen in one of AdsGet*() function when field is read so
+            it's possible that also some other hidden bugs will be exploited
+            and you will see RTE. Please test it.
 
 2009-07-15 21:15 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/lang/msgua866.c
