@@ -1,14 +1,17 @@
 /*
- * $Id: png.c,v 1.7 2009/05/10 06:51:00 andijahja Exp $
+ * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
  */
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
  * Last changed in libpng 1.2.36 [May 14, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  */
 
 #define PNG_INTERNAL
@@ -637,8 +640,8 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_LEGACY_SUPPORTED)
+    defined(PNG_LEGACY_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 void PNGAPI
 png_set_user_transform_info(png_structp png_ptr, png_voidp
    user_transform_ptr, int user_transform_depth, int user_transform_channels)

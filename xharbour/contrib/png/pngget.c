@@ -1,14 +1,18 @@
 /*
- * $Id: png.c,v 1.7 2009/05/10 06:51:00 andijahja Exp $
+ * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct
  *
  * Last changed in libpng 1.2.37 [June 4, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
  */
 
 #define PNG_INTERNAL
@@ -911,9 +915,9 @@ png_byte PNGAPI
 png_get_mmx_bitdepth_threshold (png_structp png_ptr)
 {
     /* Obsolete, to be removed from libpng-1.4.0 */
-    /* return (png_ptr? 0: 0); */
+    // return (png_ptr? 0: 0);
     (void) png_ptr;
-    return 0;
+    return (0);
 }
 
 /* This function was added to libpng 1.2.0 */
@@ -939,6 +943,6 @@ png_get_user_height_max (png_structp png_ptr)
     return (png_ptr? png_ptr->user_height_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
- 
+
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

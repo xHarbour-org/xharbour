@@ -1,14 +1,17 @@
 /*
- * $Id: png.c,v 1.7 2009/05/10 06:51:00 andijahja Exp $
+ * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
  */
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.37 [June 4, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
+ * Last changed in libpng 1.2.38 [July 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  *
  * This file contains functions optionally called by an application
  * in order to tell libpng how to handle data when reading a PNG.
@@ -717,8 +720,8 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_LEGACY_SUPPORTED)
+    defined(PNG_LEGACY_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 void PNGAPI
 png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    read_user_transform_fn)
@@ -1180,10 +1183,6 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          {
             if (png_ptr->transformations & PNG_EXPAND_tRNS)
               info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
-#if 0 /* Removed from libpng-1.2.27 */
-            else
-              info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
-#endif
          }
          if (info_ptr->bit_depth < 8)
             info_ptr->bit_depth = 8;
@@ -1377,12 +1376,12 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 /* From Andreas Dilger e-mail to png-implement, 26 March 1998:
- * 
+ *
  *   In most cases, the "simple transparency" should be done prior to doing
  *   gray-to-RGB, or you will have to test 3x as many bytes to check if a
  *   pixel is transparent.  You would also need to make sure that the
  *   transparency information is upgraded to RGB.
- * 
+ *
  *   To summarize, the current flow is:
  *   - Gray + simple transparency -> compare 1 or 2 gray bytes and composite
  *                                   with background "in place" if transparent,
@@ -1808,6 +1807,9 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
+#ifdef __BORLANDC__
+   #pragma option push -w-sig
+#endif
 void /* PRIVATE */
 png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 {
@@ -3991,6 +3993,9 @@ png_do_expand(png_row_infop row_info, png_bytep row,
       }
    }
 }
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif
 #endif
 
 #if defined(PNG_READ_DITHER_SUPPORTED)
@@ -4205,7 +4210,7 @@ png_build_gamma_table(png_structp png_ptr)
 
      png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
-     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p)); 
+     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p));
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
@@ -4267,7 +4272,7 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
-        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p)); 
+        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {
@@ -4293,7 +4298,7 @@ png_build_gamma_table(png_structp png_ptr)
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
         png_memset(png_ptr->gamma_16_from_1, 0,
-           num * png_sizeof(png_uint_16p)); 
+           num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {
