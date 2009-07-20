@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.1 2009/05/25 15:32:49 modalsist Exp $
+ * $Id: hbxml.c,v 1.35 2009/06/06 16:02:26 modalsist Exp $
  */
 
 /*
@@ -1756,12 +1756,16 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                   hb_itemCopy( &child, &(HB_VM_STACK.Return) );
                }
             }
+            else
+            {
+               bmustIndent = FALSE;
+            }
 
             if ( hbtemp.type != HB_IT_NIL )
             {
                if ( bmustIndent ) /*&& ( style & MXML_STYLE_INDENT ) )*/
                {
-                     mxml_node_file_indent( out, depth+1, style );
+//                     mxml_node_file_indent( out, depth+1, style );
                }
 
                if ( ! ( style & MXML_STYLE_NOESCAPE ) )

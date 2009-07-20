@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.16 2009/07/13 10:20:48 jfgimenez Exp $
+ * $Id: txml.prg,v 1.17 2009/07/13 19:38:38 jfgimenez Exp $
  */
 
 /*
@@ -472,7 +472,7 @@ Local nh, lnew := .f.
                ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
                ::Read( uXml, nStyle )
                if "xml" in uXml
-                  ::cHeader := uXml
+                  //::cHeader := uXml
                   lnew := .t.
                endif
             else
@@ -548,7 +548,7 @@ Local fHandle, cHeader, lOK := .f., cFileName
 
   cHeader := ::cHeader
 
-  if nStyle != HBXML_STYLE_NONEWLINE
+  if nStyle != HBXML_STYLE_NONEWLINE  .and. ! empty( cHeader )
      cHeader += hb_osnewline()
   endif
 
@@ -572,7 +572,9 @@ Local fHandle, cHeader, lOK := .f., cFileName
   endif
 
   if lOK
-     FWrite( fHandle, cHeader, len(cHeader) )
+     if ! empty( cHeader )
+        FWrite( fHandle, cHeader, len(cHeader) )
+     endif
      lOK := ( FError() == 0 )
      if lOK
         ::oRoot:Write( fHandle, nStyle )
