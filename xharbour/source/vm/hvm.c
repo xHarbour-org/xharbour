@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.725 2009/06/18 21:59:50 walito Exp $
+ * $Id: hvm.c,v 1.726 2009/06/19 16:51:36 enricomaria Exp $
  */
 
 /*
@@ -9566,8 +9566,8 @@ static double hb_vmPopNumber( void )
 
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;
-         break;      
-      case HB_IT_DATETIME:      
+         break;
+      case HB_IT_DATETIME:
          dNumber = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          break;
 
@@ -9956,9 +9956,8 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
          if( ! HB_ISINITEXIT( pSymbols->pSymbolTable[ ui ].scope.value ) )
          {
             pSymbols->pSymbolTable[ ui ].value.pFunPtr = NULL;
+            pSymbols->pSymbolTable[ ui ].scope.value &= ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE | HB_FS_LOCAL );
          }
-
-         pSymbols->pSymbolTable[ ui ].scope.value &= ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE );
       }
 
       pSymbols->hDynLib = NULL;
