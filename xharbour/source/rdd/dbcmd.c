@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.231 2009/05/18 10:29:46 marchuet Exp $
+ * $Id: dbcmd.c,v 1.232 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -1334,6 +1334,7 @@ HB_FUNC( ORDCREATE )
       dbOrderInfo.atomBagName = ( BYTE * ) hb_parcx( 2 );
       dbOrderInfo.itmOrder = NULL;
       dbOrderInfo.fUnique = ISLOG( 5 ) ? ( BOOL ) hb_parl( 5 ) : hb_setGetUnique();
+      dbOrderInfo.uiRemote = ISNUM( 10 ) ? ( USHORT ) hb_parni( 10 ) : 0;
       dbOrderInfo.abExpr = hb_param( 3, HB_IT_STRING );
       if( ( ( dbOrderInfo.abBagName == NULL || strlen( ( char * ) dbOrderInfo.abBagName ) == 0 ) &&
             ( dbOrderInfo.atomBagName == NULL || strlen( ( char * ) dbOrderInfo.atomBagName ) == 0 ) ) ||

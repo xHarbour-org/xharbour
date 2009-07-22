@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddmdx.h,v 1.1 2009/05/19 16:34:58 marchuet Exp $
+ * $Id: hbrddmdx.h,v 1.2 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -379,7 +379,7 @@ typedef CDXSWAPPAGE * LPCDXSWAPPAGE;
 typedef struct
 {
    LPCDXTAG pTag;             /* current Tag */
-   HB_FHANDLE hTempFile;      /* handle to temporary file */
+   PHB_FILE pTempFile;        /* pointer to temporary file */
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */
    BYTE     bTrl;             /* filler char for shorter keys */
@@ -433,6 +433,7 @@ typedef struct _CDXAREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

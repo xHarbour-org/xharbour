@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddnsx.h,v 1.5 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: hbrddnsx.h,v 1.6 2009/05/25 14:14:00 marchuet Exp $
  */
 
 /*
@@ -560,6 +560,7 @@ typedef struct _NSXAREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

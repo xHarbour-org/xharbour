@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.41 2009/04/23 22:07:19 ronpinkas Exp $
+ * $Id: hbrdddbf.h,v 1.42 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -181,6 +181,7 @@ typedef struct _DBFAREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */
@@ -381,6 +382,7 @@ extern HB_EXPORT HB_ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                                ULONG ulType );
 extern HB_EXPORT HB_ERRCODE hb_dbfGetEGcode( HB_ERRCODE errCode );
 extern HB_EXPORT BOOL       hb_dbfLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+extern HB_EXPORT BOOL       hb_dbfnetLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
 extern HB_EXPORT BOOL       hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
 
 #ifndef HB_CDP_SUPPORT_OFF

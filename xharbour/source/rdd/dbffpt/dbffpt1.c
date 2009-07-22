@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.103 2009/05/19 16:57:38 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.104 2009/05/26 11:25:32 marchuet Exp $
  */
 
 /*
@@ -2435,8 +2435,8 @@ static HB_ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * 
 }
 
 static HB_ERRCODE hb_fptCopyToRawFile( PHB_FILE pSrc, HB_FOFFSET from,
-                                    HB_FHANDLE hDst,
-                                    HB_FOFFSET size )
+                                       HB_FHANDLE hDst,
+                                       HB_FOFFSET size )
 {
    HB_ERRCODE errCode = HB_SUCCESS;
    if( size )
@@ -2504,7 +2504,7 @@ static HB_ERRCODE hb_fptCopyToFile( PHB_FILE pSrc, HB_FOFFSET from,
 }
 
 static HB_ERRCODE hb_fptReadRawBlock( FPTAREAP pArea, BYTE * bBuffer, HB_FHANDLE hFile,
-                                   ULONG ulBlock, ULONG ulSize )
+                                      ULONG ulBlock, ULONG ulSize )
 {
    HB_ERRCODE errCode = HB_SUCCESS;
 

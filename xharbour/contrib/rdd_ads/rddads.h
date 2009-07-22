@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.23 2009/01/16 10:50:23 marchuet Exp $
+ * $Id: rddads.h,v 1.24 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -163,6 +163,7 @@ typedef struct _ADSAREA_
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.10 2007/05/04 11:29:01 marchuet Exp $
+# $Id: Makefile,v 1.11 2008/09/11 05:32:36 guerra000 Exp $
 #
 
 ROOT = ../../
@@ -10,6 +10,7 @@ C_SOURCES=\
 	wacore.c \
 	wafunc.c \
 	dbf1.c \
+	dbf1net.c \
 	dbnubs.c \
 	delim1.c \
 	sdf1.c \

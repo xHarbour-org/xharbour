@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.4 2009/02/20 12:48:24 marchuet Exp $
+ * $Id: filebuf.c,v 1.5 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -440,7 +440,7 @@ BOOL hb_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen,
       fResult = hb_fileUnlock( pFile, &fLockFS, ulStart, ulLen );
       HB_CRITICAL_UNLOCK( s_fileMtx );
       if( fLockFS )
-         hb_fsLockLarge( pFile->hFile, ulStart, ulLen, iType );
+         hb_fsLockLarge( pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
    }
    else
    {
@@ -449,7 +449,7 @@ BOOL hb_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen,
       HB_CRITICAL_UNLOCK( s_fileMtx );
       if( fLockFS )
       {
-         fResult = hb_fsLockLarge( pFile->hFile, ulStart, ulLen, iType );
+         fResult = hb_fsLockLarge( pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
          if( !fResult )
          {
             HB_CRITICAL_LOCK( s_fileMtx );
@@ -482,6 +482,21 @@ BOOL hb_fileTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
 HB_FOFFSET hb_fileSize( PHB_FILE pFile )
 {
    return hb_fsSeekLarge( pFile->hFile, 0, FS_END );
+}
+
+HB_FOFFSET hb_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags )
+{
+   return hb_fsSeekLarge( pFile->hFile, llOffset, uiFlags );
+}
+
+ULONG hb_fileWriteLarge( PHB_FILE pFile, const BYTE * pBuff, ULONG ulCount )
+{
+   return hb_fsWriteLarge( pFile->hFile, pBuff, ulCount );
+}   
+
+ULONG hb_fileReadLarge( PHB_FILE pFile, BYTE * pBuff, ULONG ulCount )
+{
+   return hb_fsReadLarge( pFile->hFile, pBuff, ulCount );
 }
 
 void hb_fileCommit( PHB_FILE pFile )

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.81 2008/12/22 22:09:45 likewolf Exp $
+# $Id: Makefile,v 1.82 2009/01/16 01:56:00 likewolf Exp $
 #
 
 ROOT = ../../
@@ -34,6 +34,7 @@ C_SOURCES=\
 	filebuf.c    \
 	filehb.c     \
 	filestat.c   \
+	filenet.c    \
 	filesys.c    \
 	fkmax.c      \
 	fnsplit.c    \
@@ -62,6 +63,7 @@ C_SOURCES=\
 	hbfile.c     \
 	hbgtcore.c   \
 	hbhex2n.c    \
+	hbip.c       \
 	hbmd5.c      \
 	hbntos.c     \
 	hboutdbg.c   \

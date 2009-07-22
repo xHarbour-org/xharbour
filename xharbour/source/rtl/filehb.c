@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.5 2004/01/07 11:58:46 jonnymind Exp $
+ * $Id: filehb.c,v 1.6 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -53,6 +53,9 @@
 /*
 * IsDirectory( cPath ) -- determine if a given file is a directory
 * Copyright 2004 Giancarlo Niccolai
+*
+* Changed by Miguel Angel Marchuet to fix IsDirectory( "\\machine\c" ) style call.
+* under windows platforms. (2009)
 */
 
 #include "hbapi.h"
@@ -71,6 +74,6 @@ HB_FUNC( FILE )
 HB_FUNC( ISDIRECTORY )
 {
    PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
-
+   
    hb_retl( ( pFile && pFile->item.asString.length < HB_PATH_MAX ) ? hb_fsIsDirectory( ( BYTE * ) pFile->item.asString.value ) : FALSE );
 }

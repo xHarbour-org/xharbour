@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.63 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: hbrddcdx.h,v 1.64 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -468,6 +468,7 @@ typedef struct _CDXAREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

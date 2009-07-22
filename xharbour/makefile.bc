@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.247 2009/05/19 16:34:58 marchuet Exp $
+# $Id: makefile.bc,v 1.248 2009/05/30 01:58:31 ronpinkas Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -175,6 +175,13 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 +)
 !
 
+$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
+	IF EXIST "$(REDBFFPT_LIB)" $(DEL) "$(REDBFFPT_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
 	IF EXIST "$(DBFCDX_LIB)" $(DEL) "$(DBFCDX_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
@@ -191,6 +198,13 @@ $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
 	IF EXIST "$(BMDBFCDX_LIB)" $(DEL) "$(BMDBFCDX_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
+	IF EXIST "$(REDBFCDX_LIB)" $(DEL) "$(REDBFCDX_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)

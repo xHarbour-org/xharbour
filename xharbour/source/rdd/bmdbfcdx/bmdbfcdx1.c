@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.63 2009/05/01 21:10:19 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.64 2009/06/25 04:48:28 peterrees Exp $
  */
 
 /*
@@ -9652,19 +9652,19 @@ static void hb_cdxSortWritePage( LPCDXSORTINFO pSort )
 
    hb_cdxSortSortPage( pSort );
 
-   if( pSort->hTempFile == FS_ERROR )
+   if( ! pSort->pTempFile )
    {
       BYTE szName[ HB_PATH_MAX ];
-      pSort->hTempFile = hb_fsCreateTemp( NULL, NULL, FC_TEMPORARY, szName );
-      if( pSort->hTempFile == FS_ERROR )
+      pSort->pTempFile = hb_fileCreateTemp( NULL, NULL, FC_TEMPORARY, szName );
+      if( ! pSort->pTempFile )
       {
          hb_errInternal( 9301, "hb_cdxSortWritePage: Can't create temporary file.", NULL, NULL );
       }
       pSort->szTempFileName = hb_strdup( ( char * ) szName );
    }
    pSort->pSwapPage[ pSort->ulCurPage ].ulKeys = pSort->ulKeys;
-   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeekLarge( pSort->hTempFile, 0, FS_END );
-   if( hb_fsWriteLarge( pSort->hTempFile, pSort->pKeyPool, ulSize ) != ulSize )
+   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fileSeekLarge( pSort->pTempFile, 0, FS_END );
+   if( hb_fileWriteLarge( pSort->pTempFile, pSort->pKeyPool, ulSize ) != ulSize )
    {
       hb_errInternal( 9302, "hb_cdxSortWritePage: Write error in temporary file.", NULL, NULL );
    }
@@ -9682,8 +9682,8 @@ static void hb_cdxSortGetPageKey( LPCDXSORTINFO pSort, ULONG ulPage,
       ULONG ulKeys = HB_MIN( pSort->ulPgKeys, pSort->pSwapPage[ ulPage ].ulKeys );
       ULONG ulSize = ulKeys * ( iLen + 4 );
 
-      if( hb_fsSeekLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
-           hb_fsReadLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize )
+      if( hb_fileSeekLarge( pSort->pTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
+           hb_fileReadLarge( pSort->pTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize )
       {
          hb_errInternal( 9303, "hb_cdxSortGetPageKey: Read error from temporary file.", NULL, NULL );
       }
@@ -9930,7 +9930,7 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
    }
 
    pSort->pTag = pTag;
-   pSort->hTempFile = FS_ERROR;
+   pSort->pTempFile = NULL;
    pSort->keyLen = iLen;
    pSort->bTrl = pTag->bTrail;
    pSort->fUnique = pTag->UniqueKey;
@@ -9947,9 +9947,9 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
 
 static void hb_cdxSortFree( LPCDXSORTINFO pSort )
 {
-   if( pSort->hTempFile != FS_ERROR )
+   if( pSort->pTempFile )
    {
-      hb_fsClose( pSort->hTempFile );
+      hb_fileClose( pSort->pTempFile );
    }
    if( pSort->szTempFileName )
    {

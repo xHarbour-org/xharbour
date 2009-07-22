@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.238 2009/02/21 15:14:24 ronpinkas Exp $
+# $Id: makefile.vc,v 1.239 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -168,6 +168,9 @@ $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
+$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
+	$(LIB_CMD)
+
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -175,6 +178,9 @@ $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)

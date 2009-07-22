@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.78 2009/03/27 02:57:04 ronpinkas Exp $
+# $Id: makefile.pc,v 1.79 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -139,6 +139,9 @@ $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
 	$(LIB_CMD)
 
+$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -146,6 +149,9 @@ $(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)

@@ -1,12 +1,13 @@
 #
-# $Id: Makefile,v 1.2 2007/01/22 08:33:40 marchuet Exp $
+# $Id: Makefile,v 1.3 2007/03/08 16:06:45 marchuet Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
 	bmdbfcdx1.c \
-   bmsixcdx1.c
+	redbfcdx1.c \
+	bmsixcdx1.c
 
 LIBNAME=bmdbfcdx
 

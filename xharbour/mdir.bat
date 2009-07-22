@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.20 2009/03/26 23:29:42 ronpinkas Exp $
+rem $Id: mdir.bat,v 1.21 2009/05/19 16:34:58 marchuet Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -184,6 +184,8 @@ if exist lib\%LIBPREFIX%dbfmdx%LIBEXT%               del lib\%LIBPREFIX%dbfmdx%L
 if exist lib\%LIBPREFIX%dbfmdxmt%LIBEXT%             del lib\%LIBPREFIX%dbfmdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%bmdbfcdx%LIBEXT%             del lib\%LIBPREFIX%bmdbfcdx%LIBEXT%
 if exist lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%
+if exist lib\%LIBPREFIX%redbfcdx%LIBEXT%             del lib\%LIBPREFIX%redbfcdx%LIBEXT%
+if exist lib\%LIBPREFIX%redbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%redbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%bmsixcdx%LIBEXT%             del lib\%LIBPREFIX%bmsixcdx%LIBEXT%
 if exist lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfdbt%LIBEXT%               del lib\%LIBPREFIX%dbfdbt%LIBEXT%

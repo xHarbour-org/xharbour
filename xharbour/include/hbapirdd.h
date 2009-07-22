@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.56 2009/05/19 16:34:58 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.57 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
+#include "hbapises.h"
 
 HB_EXTERN_BEGIN
 
@@ -278,6 +279,7 @@ typedef struct
    BYTE *             atomBagName;        /* Name of the Order */
    PHB_ITEM           itmOrder;
    BOOL               fUnique;            /* Flag to determine if all keys are unique */
+   USHORT             uiRemote;           /* Flag to determine if order is remote 0 : native 1 : local 2 : remote */ 
    PHB_ITEM           itmCobExpr;         /* Code block containing the KEY expression */
    PHB_ITEM           abExpr;             /* String containing the KEY expression */
    LPDBCONSTRAINTINFO lpdbConstraintInfo; /* Relational constraint info */
@@ -364,7 +366,6 @@ typedef struct
 } DBFILTERINFO;
 
 typedef DBFILTERINFO * LPDBFILTERINFO;
-
 
 
 /*
@@ -585,6 +586,7 @@ typedef struct _AREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

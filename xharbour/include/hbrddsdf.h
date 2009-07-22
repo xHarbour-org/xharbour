@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.9 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbrddsdf.h,v 1.10 2008/10/22 08:32:32 marchuet Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ typedef struct _SDFAREA
    BOOL fFound;                  /* TRUE if "found" */
    DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
    DBFILTERINFO dbfi;            /* Filter in effect */
+   PHB_SESSION dbssi;            /* Session info used on transactions */
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */

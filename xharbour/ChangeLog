@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6510 2009/07/20 18:22:20 modalsist Exp $
+ * $Id: ChangeLog,v 1.6511 2009/07/21 21:26:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,108 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-22 18:52 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * common.mak
+  * compile.mak
+  * makefile.bc
+    + Added new RDD REDBFCDX.
+
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+    ! Fixed writing over not existing position when creating new file.
+    ! fixed signature of dBase IV dbf files.
+    + Added parameter to OrdCreate to indicate if created index will be local or remote.
+      for example it will be used on client server rdds to create temporal indexes on local
+      machine.
+
+  + source/rdd/dbfnet.c
+  + source/rdd/bmdbfcdx/redbfcdx1.c
+  + source/rdd/dbffpt/redbffpt1.c
+    + Support of dbf based remote rdds. New rdd Client/Server REDBFCDX 100% compatible with
+      BMDBFCDX.
+
+  + source/rtl/filenet.c
+    + Added API for new NETRDD system.
+
+  * source/rtl/file.c
+    + Added DWORD hb_fsGetFileAttributes( char * szFile ) to appi to acces to file atributes from c level.
+
+  * source/rtl/filebuf.c
+    ! fixed warnings.
+    + Added API
+      HB_FOFFSET hb_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags )
+      ULONG hb_fileWriteLarge( PHB_FILE pFile, const BYTE * pBuff, ULONG ulCount )
+      ULONG hb_fileReadLarge( PHB_FILE pFile, BYTE * pBuff, ULONG ulCount )
+
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rtl/filesys.c
+    * minor formating.
+
+  * include/hbapifs.h
+    + new API for NETRDD subsystem:
+        HB_EXPORT PHB_FILE   hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths,
+                                                PHB_ITEM pError, BOOL fBufferLock );
+        HB_EXPORT PHB_FILE   hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName );
+        HB_EXPORT PHB_FILE   hb_fileNetCreateTempEx( BYTE * pszName,
+                                                     const BYTE * pszDir,
+                                                     const BYTE * pszPrefix,
+                                                     const BYTE * pszExt,
+                                                     ULONG ulAttr );
+        HB_EXPORT void       hb_fileNetClose( PHB_FILE pFile );
+        HB_EXPORT BOOL       hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int iType );
+        HB_EXPORT ULONG      hb_fileNetReadAt( PHB_FILE pFile, BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset );
+        HB_EXPORT ULONG      hb_fileNetReadLarge( PHB_FILE pFile, BYTE * buffer, ULONG ulSize );
+        HB_EXPORT ULONG      hb_fileNetWriteAt( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset );
+        HB_EXPORT USHORT     hb_fileNetWrite( PHB_FILE pFile, const BYTE * pBuffer, USHORT uiCount );
+        HB_EXPORT ULONG      hb_fileNetWriteLarge( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize );
+        HB_EXPORT BOOL       hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset );
+        HB_EXPORT HB_FOFFSET hb_fileNetSize( PHB_FILE pFile );
+        HB_EXPORT HB_FOFFSET hb_fileNetSeek( PHB_FILE pFile, LONG lOffset, USHORT uiFlags );
+        HB_EXPORT HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags );
+        HB_EXPORT BOOL       hb_fileNetDelete( BYTE * pFilename, USHORT uiRemote );
+        HB_EXPORT void       hb_fileNetCommit( PHB_FILE pFile );
+        HB_EXPORT HB_FHANDLE hb_fileNetHandle( PHB_FILE pFile );
+        HB_EXPORT BOOL       hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath );
+        HB_EXPORT BOOL       hb_FileNetFile( BYTE * pFilename );
+        HB_EXPORT PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAttr );
+        HB_EXPORT BOOL       hb_FileNetFindNext( PHB_NETFFIND pffind );
+        HB_EXPORT void       hb_FileNetFindClose( PHB_NETFFIND pffind );
+        HB_EXPORT ULONG      hb_fileNetGetFileAttributes( BYTE * pFilename );
+        HB_EXPORT void       hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
+        HB_EXPORT BOOL       hb_fileNetMkDir( BYTE * pPath );
+        HB_EXPORT BOOL       hb_fileNetRmDir( BYTE * pPath );
+        HB_EXPORT USHORT     hb_fileNetRemote( PHB_FILE pFile );
+
+  * include/hbrddbmc.h
+  * include/hbrddcdx.h
+  * include/hbrdddbf.h
+  * include/hbrdddel.h
+  * include/hbrddmdx.h
+  * include/hbrddnsx.h
+  * include/hbrddntx.h
+  * include/hbrddsdf.h
+  * include/hbapirdd.h
+  * include/rddads.h
+  + include/hbrddrec.h
+    + Added item to rdd structures to indicate: Flag to determine if order is remote 0 : native 1 : local 2 : remote
+        USHORT uiRemote
+    + Added PHB_SESSION dbssi to wa structure.
+    + Added extern HB_EXPORT BOOL       hb_dbfnetLockIdxFile( PHB_FILE pFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+      than can be accesed form NETRDD subsystem.
+
+  + source/rtl/hbip.c
+  + include/hbipapi.h
+    + Added reduced inet api used on NETRDD subsystem.
+
+  * source/rdd/dbfmdx/dbfmdx1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * modified all file intances to use file buffer as posible. Previous step to convert all
+      rdds Client/Server or Local depending of the existing connection at its session.
+
+  * source/rdd/dbextrux.prg
+    + Added optional parameter to __dbCopyStruct( cFileName, aFieldList, cRddName ) to indicate RddName
 
 2009-07-21 16:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source\vm\hvm.c

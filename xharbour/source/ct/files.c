@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.18 2009/02/10 09:40:09 marchuet Exp $
+ * $Id: files.c,v 1.19 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -212,14 +212,12 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    #endif
 #endif
 
-HB_FUNC( FILEATTR )
+DWORD hb_fsGetFileAttributes( char * szFile )
 {
-
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
-      if( ISCHAR(1) )
+      if( szFile )
       {
-         char *szFile=hb_parcx( 1 );
          int iAttri=0;
 
          #if defined( __BORLANDC__ ) && ( __BORLANDC__ >= 1280 )
@@ -233,11 +231,11 @@ HB_FUNC( FILEATTR )
             iAttri =  _chmod(  szFile, 0  );
          #endif
 
-         hb_retni( iAttri );
+         return ( DWORD ) iAttri ;
       }
       else
       {
-         hb_retni( ( int ) fsOldFiles.ff_attrib );
+         return ( DWORD ) fsOldFiles.ff_attrib;
       }
       #endif
 
@@ -245,24 +243,29 @@ HB_FUNC( FILEATTR )
    {
       DWORD dAttr;
 
-      if( ISCHAR(1) )
+      if( szFile )
       {
-         LPCTSTR cFile = hb_parcx( 1 );
+         LPCTSTR cFile = szFile;
          dAttr = GetFileAttributes( cFile );
       }
       else
       {
          dAttr = Lastff32.dwFileAttributes;
       }
-      hb_retnl( dAttr );
+      return ( DWORD ) dAttr ;
 
    }
    #else
-   {
-      hb_retnl( FA_ARCH );
-   }
+      return ( DWORD ) FA_ARCH ;
    #endif
+}
 
+HB_FUNC( FILEATTR )
+{
+    if( ISCHAR( 1 ) )
+        hb_retnl( hb_fsGetFileAttributes( hb_parcx( 1 ) ) );
+    else
+        hb_retnl( hb_fsGetFileAttributes( NULL ) );
 }
 
 HB_FUNC( SETFATTR )

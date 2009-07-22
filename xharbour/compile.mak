@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.43 2009/07/13 16:58:06 ptsarenko Exp $
+# $Id: compile.mak,v 1.44 2009/07/15 17:14:56 ptsarenko Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -268,6 +268,9 @@ $(OBJ_DIR)$(DIR_SEP)wafunc$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wafunc.c
 
 $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1.c
 	$(CC_CMD)
+   
+$(OBJ_DIR)$(DIR_SEP)dbf1net$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1net.c
+	$(CC_CMD)   
 
 $(OBJ_DIR)$(DIR_SEP)dbtotal.c : $(RDD_DIR)$(DIR_SEP)dbtotal.prg
 	$(HB_CMD)
@@ -749,6 +752,9 @@ $(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filebuf.c
 $(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filehb.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)filenet$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filenet.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)filestat$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filestat.c
 	$(CC_CMD)
 
@@ -841,6 +847,9 @@ $(OBJ_DIR)$(DIR_SEP)hbfile$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbfile.c
 
 $(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbgtcore.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbip$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbip.c
+	$(CC_CMD)   
 
 $(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hboutdbg.c
 	$(CC_CMD)
@@ -1745,6 +1754,12 @@ $(OBJ_DIR)$(DIR_SEP)dbffpt1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbffpt$(DIR_SEP)dbffp
 	$(CC_CMD)
 
 #===============================================================================
+# REDBFFPT.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)redbffpt1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbffpt$(DIR_SEP)redbffpt1.c
+	$(CC_CMD)
+
+#===============================================================================
 # DBFNTX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfntx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfntx$(DIR_SEP)dbfntx1.c
@@ -1774,6 +1789,11 @@ $(OBJ_DIR)$(DIR_SEP)dbfmdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfmdx$(DIR_SEP)dbfmd
 $(OBJ_DIR)$(DIR_SEP)bmdbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)bmdbfcdx$(DIR_SEP)bmdbfcdx1.c
 	$(CC_CMD)
 
+#===============================================================================
+# REDBFCDX.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)redbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)bmdbfcdx$(DIR_SEP)redbfcdx1.c
+	$(CC_CMD)
 #===============================================================================
 # SIXCDX.LIB rules
 #===============================================================================

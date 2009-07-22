@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.44 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: session.c,v 1.1 2009/06/05 22:31:53 marchuet Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ BOOL hb_sessionRegister( PHB_SESSION session )
 
 HB_FUNC( HB_SESSIONNEW )
 {
-   PHB_SESSION session;
+   PHB_SESSION session = ( PHB_SESSION ) hb_xalloc( sizeof( PHB_SESSION ) );
    
    session->id = 0;
    if( ISCHAR( 1 ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.187 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: filesys.c,v 1.188 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -4056,8 +4056,7 @@ BYTE hb_fsCurDrv( void )
 /* convert file name for hb_fsExtOpen
  * caller must free the returned buffer
  */
-BYTE * hb_fsExtName( BYTE * pFilename, BYTE * pDefExt,
-                               USHORT uiExFlags, BYTE * pPaths )
+BYTE * hb_fsExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths )
 {
    HB_PATHNAMES * pNextPath;
    PHB_FNAME pFilepath;
@@ -4132,8 +4131,8 @@ BYTE * hb_fsExtName( BYTE * pFilename, BYTE * pDefExt,
 }
 
 HB_FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
-                                   USHORT uiExFlags, BYTE * pPaths,
-                                   PHB_ITEM pError )
+                         USHORT uiExFlags, BYTE * pPaths,
+                         PHB_ITEM pError )
 {
    HB_FHANDLE hFile;
    USHORT uiFlags;

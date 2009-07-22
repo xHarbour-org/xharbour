@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.208 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: dbf1.c,v 1.209 2009/05/26 11:25:31 marchuet Exp $
  */
 
 /*
@@ -5610,8 +5610,12 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
       HB_FOFFSET llOffset = ( HB_FOFFSET ) pArea->uiHeaderLen +
                             ( HB_FOFFSET ) pArea->uiRecordLen *
                             ( HB_FOFFSET ) pArea->ulRecCount;
-      hb_fileWriteAt( pArea->pDataFile, ( BYTE * ) "\032", 1, llOffset );
-      hb_fileTruncAt( pArea->pDataFile, llOffset + 1 );
+      /* protection against file create */
+      if( hb_fileSize( pArea->pDataFile ) > llOffset )                              
+      {
+         hb_fileWriteAt( pArea->pDataFile, ( BYTE * ) "\032", 1, llOffset );
+         hb_fileTruncAt( pArea->pDataFile, llOffset + 1 );
+      }
    }
 
    HB_PUT_LE_UINT32( pArea->dbfHeader.ulRecCount,  pArea->ulRecCount );
@@ -5847,6 +5851,7 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
          {
             case DB_DBF_STD:        /* standard dBase/Clipper DBF file */
             case DB_DBF_VFP:        /* VFP DBF file */
+            case DB_DBF_IV:         /* dBase IV DBF file */                        
                pData->bTableType = iType;
          }
          break;

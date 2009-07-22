@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005/10/18 12:14:32 druzus Exp $
+# $Id: Makefile,v 1.5 2007/01/11 01:00:35 druzus Exp $
 #
 
 ROOT = ../../../
@@ -10,6 +10,7 @@ endif
 
 C_SOURCES=\
 	dbffpt1.c \
+	redbffpt1.c \
 
 LIBNAME=dbffpt
 

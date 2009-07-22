@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.47 2009/07/13 16:58:06 ptsarenko Exp $
+# $Id: common.mak,v 1.48 2009/07/15 17:14:56 ptsarenko Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -77,10 +77,12 @@ CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(HB_MT)$(LIBEXT)
 DBFCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfcdx$(HB_MT)$(LIBEXT)
 DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
 BMDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmdbfcdx$(HB_MT)$(LIBEXT)
+REDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbfcdx$(HB_MT)$(LIBEXT)
 DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
 SIXCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixcdx$(HB_MT)$(LIBEXT)
 BMSIXCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmsixcdx$(HB_MT)$(LIBEXT)
 DBFFPT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbffpt$(HB_MT)$(LIBEXT)
+REDBFFPT_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbffpt$(HB_MT)$(LIBEXT)
 DBFNTX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfntx$(HB_MT)$(LIBEXT)
 DBFNSX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfnsx$(HB_MT)$(LIBEXT)
 HBSIX_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsix$(HB_MT)$(LIBEXT)
@@ -174,11 +176,13 @@ HARBOUR_LIBS=\
 	$(RDD_LIB)\
 	$(MACRO_LIB)\
 	$(DBFFPT_LIB)\
+	$(REDBFFPT_LIB)\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
+	$(REDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\
 	$(HBSIX_LIB)\
@@ -224,6 +228,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)file$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filenet$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filestat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filesys$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fserror$(OBJEXT)\
@@ -254,6 +259,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbfile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbhex2n$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbip$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbmd5$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbntos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT)\
@@ -553,6 +559,7 @@ RDD_LIB_OBJS=\
               $(OBJ_DIR)$(DIR_SEP)wacore$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)wafunc$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT)\
+              $(OBJ_DIR)$(DIR_SEP)dbf1net$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbnubs$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)delim1$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)sdf1$(OBJEXT)\
@@ -592,6 +599,12 @@ DBFFPT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dbffpt1$(OBJEXT)\
 
 #===============================================================================
+# REDBFFPT.LIB rules
+#===============================================================================
+REDBFFPT_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)redbffpt1$(OBJEXT)\
+
+#===============================================================================
 # DBFNTX.LIB rules
 #===============================================================================
 DBFNTX_LIB_OBJS=\
@@ -620,6 +633,12 @@ DBFMDX_LIB_OBJS=\
 #===============================================================================
 BMDBFCDX_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)bmdbfcdx1$(OBJEXT)
+   
+#===============================================================================
+# REDBFCDX.LIB rules
+#===============================================================================
+REDBFCDX_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)redbfcdx1$(OBJEXT)
 
 #===============================================================================
 # SIXCDX.LIB rules
@@ -1260,11 +1279,13 @@ HARBOUR_DLL_OBJS=\
 	$(MACRO_LIB_OBJS)\
 	$(RDD_LIB_OBJS)\
 	$(DBFFPT_LIB_OBJS)\
+	$(REDBFFPT_LIB_OBJS)\
 	$(DBFNTX_LIB_OBJS)\
 	$(DBFNSX_LIB_OBJS)\
 	$(DBFCDX_LIB_OBJS)\
 	$(DBFMDX_LIB_OBJS)\
 	$(BMDBFCDX_LIB_OBJS)\
+	$(REDBFCDX_LIB_OBJS)\
 	$(SIXCDX_LIB_OBJS)\
 	$(BMSIXCDX_LIB_OBJS)\
 	$(HBSIX_LIB_OBJS)\
@@ -1758,11 +1779,13 @@ ST_PROJECT=\
 	$(RDD_LIB)\
 	$(TIP_LIB)\
 	$(DBFFPT_LIB)\
+	$(REDBFFPT_LIB)\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
+	$(REDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\
 	$(HBSIX_LIB)\
@@ -1797,11 +1820,13 @@ MT_PROJECT=\
 	$(RDD_LIB)\
 	$(TIP_LIB)\
 	$(DBFFPT_LIB)\
+	$(REDBFFPT_LIB)\
 	$(DBFNTX_LIB)\
 	$(DBFNSX_LIB)\
 	$(DBFCDX_LIB)\
 	$(DBFMDX_LIB)\
 	$(BMDBFCDX_LIB)\
+	$(REDBFCDX_LIB)\
 	$(SIXCDX_LIB)\
 	$(BMSIXCDX_LIB)\
 	$(HBSIX_LIB)\
@@ -1823,7 +1848,7 @@ DLL_PROJECT=\
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GDLIB_LIB)\
-        $(GTWVG_LIB)\
+	$(GTWVG_LIB)\
 	$(LIBNF_LIB)\
 	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\

@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.12 2008/08/18 09:39:13 marchuet Exp $
+ * $Id: dbstrux.prg,v 1.13 2009/06/12 19:05:31 ronpinkas Exp $
  */
 
 /*
@@ -64,8 +64,8 @@
 #include "dbinfo.ch"
 #include "error.ch"
 
-FUNCTION __dbCopyStruct( cFileName, aFieldList )
-   RETURN dbCreate( cFileName, __dbStructFilter( dbStruct(), aFieldList ) )
+FUNCTION __dbCopyStruct( cFileName, aFieldList, cRddName )
+   RETURN dbCreate( cFileName, __dbStructFilter( dbStruct(), aFieldList ), cRddName )
 
 FUNCTION __dbCopyXStruct( cFileName )
    LOCAL nOldArea
