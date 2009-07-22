@@ -22,7 +22,7 @@ FUNCTION MAIN( cRdd, cIP )
     SET AUTOPEN ON
 
     IF cRdd == 'REDBFCDX'
-        ? "CONECTED A IP: " + cIP + ":2813"
+        ? "CONECTED TO IP: " + cIP + ":2813"
         pConn := NET_OPENCONNECTION( cIP, 2813 )
         IF Empty( pConn )
             ? "SERVER DON'T WORK"
@@ -31,14 +31,14 @@ FUNCTION MAIN( cRdd, cIP )
     ENDIF
 
     IF ! HB_DBExists( "TMPTEST" )
-        ? "creando tabla"
+        ? "CREATE TABLE"
         DBCREATE( "TMPTEST", { { "A1", "C", 10, 0 } }, cRdd )
     ENDIF
 
     USE TMPTEST SHARED NEW ALIAS "ONE" VIA ( cRdd )
 
     IF LastRec() < 50000
-        ? "a¤adiendo 50000 registros"
+        ? "Adding 50000 Rregisters"
         p := seconds()
         FOR n := 1 TO 50000
             APPEND BLANK
@@ -54,8 +54,8 @@ FUNCTION MAIN( cRdd, cIP )
         INDEX ON FIELD->A1 TAG tg1 TO ("TMPTEST.CDX")
     ENDIF
 
-    ? "Indice activo : " + ORDKEY()
-    ? "Filtrando por : " + "RecNo() > 100 .AND. RecNo() < 200"
+    ? "Index active : " + ORDKEY()
+    ? "Filtering by : " + "RecNo() > 100 .AND. RecNo() < 200"
     p := seconds()
     DbSetFilter( {|| RecNo() > 100 .AND. RecNo() < 200 }, "RecNo() > 100 .AND. RecNo() < 200" )
     ?? " -> " + AllTrim( Str( seconds() - p ) ) + " seconds"
