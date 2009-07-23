@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.9 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: utils.c,v 1.10 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
 HB_FUNC( TIP_TIMESTAMP )
 {
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-   ULONG ulHour = hb_parl(2);
+   ULONG ulHour = hb_parnl(2);
    int nLen;
    TIME_ZONE_INFORMATION tzInfo;
    LONG lDate;
@@ -100,10 +100,6 @@ HB_FUNC( TIP_TIMESTAMP )
    if ( GetTimeZoneInformation( &tzInfo ) == TIME_ZONE_ID_INVALID )
    {
       tzInfo.Bias = 0;
-   }
-   else
-   {
-      tzInfo.Bias -= tzInfo.Bias;
    }
 
    if ( !pDate )
