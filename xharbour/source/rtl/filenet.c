@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.5 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: filenet.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ static char szDataACK[HB_LENGTH_ACK];
 
 static PHB_FILE s_openFiles = NULL;
 
-#define _DBG_
+//#define _DBG_
 
 typedef struct
 {
