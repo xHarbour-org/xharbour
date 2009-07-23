@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6512 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: ChangeLog,v 1.6513 2009/07/22 19:13:00 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-23 12:30 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/rtl/filenet.c
+    * modified some api to be able to work without client/server.
+    
+  - bin/hbfilere.exe
+    - Removed temporary until we decided to be free full code or not. If any body needs it
+      please contact with me.
 
 2009-07-22 21:07 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   + tests/netrdd.prg

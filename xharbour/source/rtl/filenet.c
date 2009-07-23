@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $
+ * $Id: filenet.c,v 1.2 2009/07/23 08:23:51 marchuet Exp $
  */
 
 /*
@@ -684,29 +684,34 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
    }
    else   
    {
-      char szData[HB_PATH_MAX * 3 + 32];
-      int nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%hu|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( BYTE * ) "" ),
-                           uiExFlags, ( pPaths ? pPaths: ( BYTE * ) "" ) );
-      HB_PUT_BE_UINT32( szData, nSend );                           
-
-      /* hFile = hb_fsExtOpen( pFilename, pDefExt, uiExFlags, pPaths, pError ); */
-      if( hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1000 ) )
+      if( hSocket )
       {
-         char * ptr;
-         USHORT uiError;
-         
-         ptr = hb_NetFirstChar();
-         hb_NetGetCmdItem( &ptr, szData ); ptr ++;
-         sscanf( szData, "%p|" , &hFile );
-         hb_NetGetCmdItem( &ptr, szData );
-         sscanf( szData, "%hu|" , &uiError );
-         hb_fsSetError( uiError );
+         char szData[HB_PATH_MAX * 3 + 32];
+         int nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%hu|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( BYTE * ) "" ),
+                              uiExFlags, ( pPaths ? pPaths: ( BYTE * ) "" ) );
+         HB_PUT_BE_UINT32( szData, nSend );                           
+
+         /* hFile = hb_fsExtOpen( pFilename, pDefExt, uiExFlags, pPaths, pError ); */
+         if( hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1000 ) )
+         {
+            char * ptr;
+            USHORT uiError;
+            
+            ptr = hb_NetFirstChar();
+            hb_NetGetCmdItem( &ptr, szData ); ptr ++;
+            sscanf( szData, "%p|" , &hFile );
+            hb_NetGetCmdItem( &ptr, szData );
+            sscanf( szData, "%hu|" , &uiError );
+            hb_fsSetError( uiError );
+         }
+         else
+         {
+            hFile = FS_ERROR;
+            hb_fsSetError( ( USHORT ) FS_ERROR );
+         }
       }
       else
-      {
-         hFile = FS_ERROR;
-         hb_fsSetError( ( USHORT ) FS_ERROR );
-      }
+         hFile = hb_fsExtOpen( pFilename, pDefExt, uiExFlags, pPaths, pError );
 
       if( hFile != FS_ERROR )
       {
@@ -1237,26 +1242,30 @@ PHB_FILE hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULON
 
 static BOOL hb_NetFileExists( const char * pszFileName )
 {
-   char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
-   int nSend;
-   
-   /* BOOL hb_fsFileExists( const char * pszFileName ) */
-   nSend = sprintf( szData + HB_LENGTH_ACK, "M|%s|\r\n", pszFileName );
-   HB_PUT_BE_UINT32( szData, nSend );
-   hb_NetSingleSendSingleRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1011 );
-   return ( strncmp( szBuffer, szOk, 2 ) == 0 );
+   if( hSocket )
+   {
+      char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
+      int nSend = sprintf( szData + HB_LENGTH_ACK, "M|%s|\r\n", pszFileName );
+      HB_PUT_BE_UINT32( szData, nSend );
+      hb_NetSingleSendSingleRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1011 );
+      return ( strncmp( szBuffer, szOk, 2 ) == 0 );
+   }
+   else
+      return hb_fsFileExists( pszFileName );
 }
 
 BOOL hb_FileNetFile( BYTE * pFilename )
 {
-   char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
-   int nSend;
-   
-   /* BOOL hb_fsFile( const char * pszFileName ) */
-   nSend = sprintf( szData + HB_LENGTH_ACK, "N|%s|\r\n", pFilename );
-   HB_PUT_BE_UINT32( szData, nSend );
-   hb_NetSingleSendSingleRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1012 );
-   return ( strncmp( szBuffer, szOk, 2 ) == 0 );
+   if( hSocket )
+   {
+      char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
+      int nSend = sprintf( szData + HB_LENGTH_ACK, "N|%s|\r\n", pFilename );
+      HB_PUT_BE_UINT32( szData, nSend );
+      hb_NetSingleSendSingleRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1012 );
+      return ( strncmp( szBuffer, szOk, 2 ) == 0 );
+   }
+   else
+      return hb_fsFile( pFilename );
 }
 
 BOOL hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath )
