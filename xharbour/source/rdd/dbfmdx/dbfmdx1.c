@@ -1,12 +1,16 @@
 /*
- * $Id: dbfmdx1.c,v 1.2 2009/06/25 04:48:28 peterrees Exp $
+ * $Id: dbfmdx1.c,v 1.3 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
  * xHarbour Project source code:
- * DBFMDX RDD
+ * DBFCDX RDD (ver.2)
  *
- * Copyright 2009 Miguel Angel Marchuet <miguelangel@marchuet.net>
+ * Copyright 1999-2002 Bruno Cantero <bruno@issnet.net>
+ * Copyright 2000-2003 Horacio Roldan <harbour_ar@yahoo.com.ar> (portions)
+ * Copyright 2003 Przemyslaw Czerpak <druzus@priv.onet.pl> - all code except
+ * hb_cdxTagDoIndex and related hb_cdxSort* rewritten.
+ * Copyright 2004 Przemyslaw Czerpak <druzus@priv.onet.pl> - rest of code rewritten
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
