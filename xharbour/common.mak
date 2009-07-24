@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.48 2009/07/15 17:14:56 ptsarenko Exp $
+# $Id: common.mak,v 1.49 2009/07/22 16:55:02 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -633,7 +633,7 @@ DBFMDX_LIB_OBJS=\
 #===============================================================================
 BMDBFCDX_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)bmdbfcdx1$(OBJEXT)
-   
+
 #===============================================================================
 # REDBFCDX.LIB rules
 #===============================================================================
