@@ -1,5 +1,5 @@
 #include "website.ch"
-
+REQUEST HB_GT_CGI_DEFAULT
 request DBFCDX
 
 STATIC scSession  := ""
@@ -9,7 +9,7 @@ STATIC soIni
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-PROC Process( cCmd, cRecno )  // --> CMD line params. passed by server
+PROC MAIN( cCmd, cRecno )  // --> CMD line params. passed by server
 LOCAL oCgi, aCmd, cQuery
 
 SET DATE BRITISH

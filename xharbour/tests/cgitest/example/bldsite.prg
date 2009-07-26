@@ -1,3 +1,4 @@
+REQUEST HB_GT_CGI_DEFAULT
 #include "website.ch"
 
 request dbfcdx
@@ -33,7 +34,7 @@ IF "%" $ cCmd
       cSiteRoot := aCmd[2]
 
       IF EMPTY( cSiteRoot )
-         cSiteRoot := "g:\apache2.2\htdocs"
+         cSiteRoot := "c:\apache2.2\htdocs"
       ENDIF
       TraceLog(cSiteroot)
 
@@ -253,7 +254,7 @@ RETURN
 PROCEDURE BlankPage( oCgi )
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 LOCAL oHtm
-oHtm := THTML():CGINew(, "ACTION Error !!!" )
+oHtm := THTML():cgiNew(, "ACTION Error !!!" )
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")

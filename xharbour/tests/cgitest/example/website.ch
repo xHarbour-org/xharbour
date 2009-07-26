@@ -2,7 +2,7 @@
 #include "htmlform.ch"
 #include "htmlclrs.ch"
 // addresses
-#define WEB_ROOT          IniGet("general","webSiteRoot", "g:\apache2.2\htdocs")
+#define WEB_ROOT          "c:\apache2.2\htdocs"
 #define WEB_EMAIL         IniGet("info","email")
 
 // images

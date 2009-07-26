@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.8 2008/03/13 10:49:39 likewolf Exp $
+ * $Id: thtm.prg,v 1.9 2009/03/07 13:45:33 likewolf Exp $
  */
 
 /*
@@ -82,6 +82,7 @@ CLASS THtml
                //cStyle, aimages, baseURL, baseTarget, ;
                //nRefresh, cRefreshURL, cStyleScr, lnocache )
    METHOD Newalt(cType)
+   MeTHOD CGINEW()
    METHOD New( cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
                   bgImage, bgColor, txtColor, cJavaCode, ;
                   onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
@@ -256,6 +257,29 @@ ENDCLASS
 *     Starts a new CGI-HTML stream file.
 */
 
+
+METHOD cgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
+                  BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
+                  onLoad, onUnload, ;
+                  cLinkClr, cVLinkClr, cALinkClr, ;
+                  cStyle, aImages, aServerSrc, ;
+                  cBaseURL, cBaseTarget, ;
+                  nRefresh, cRefreshURL, cStyleScr, ;
+                  lNocache, NOF, nMarginTop, nMarginHeight, ;
+                  nMarginWidth, nMarginLeft ,lCgi,cFile) CLASS THtml
+              
+                  return ::new( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
+                  BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
+                  onLoad, onUnload, ;
+                  cLinkClr, cVLinkClr, cALinkClr, ;
+                  cStyle, aImages, aServerSrc, ;
+                  cBaseURL, cBaseTarget, ;
+                  nRefresh, cRefreshURL, cStyleScr, ;
+                  lNocache, NOF, nMarginTop, nMarginHeight, ;
+                  nMarginWidth, nMarginLeft ,.T.,cFile) 
+
+
+
 METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
                   BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
                   onLoad, onUnload, ;
@@ -281,8 +305,10 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       DEFAULT cLinkTitle TO cTitle
       DEFAULT cRefreshURL TO ""
       DEFAULT cCharset TO "windows-1251"
+      DEFAULT lNocache TO .f.
    endif
-   
+
+
    ::nH    := STD_OUT 
    ::Title := cTitle
    if lCgi   
@@ -290,9 +316,11 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    else
       ::FName := cFile      
    endif
-   if lCgi   
-      ::cStr +=  'Content-Type: text/html' + CRLF() + CRLF() 
+   if lCgi
+      ::cStr +=  'Content-Type: text/html' + CRLF() + CRLF()
+      fwrite(::nh,::cStr)
    endif
+   ::cStr:=''
 
    ::cStr +=  '<HTML>' + CRLF() + ;
            '<HEAD>' + CRLF() + ;
@@ -2221,6 +2249,9 @@ FUNCTION HtmlPadR( cStr, n )
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+function ANY2STR( xVal )
+return  HTMLANY2STR( xVal )
+
 FUNCTION HTMLANY2STR( xVal )
 
    LOCAL xRet := NIL

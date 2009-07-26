@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.10 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: utils.c,v 1.11 2009/07/23 20:29:41 lculik Exp $
  */
 
 /*
@@ -90,6 +90,8 @@ HB_FUNC( TIP_TIMESTAMP )
          "Oct", "Nov", "Dec" };
    char *szRet = (char *) hb_xgrab( 64 );
    SYSTEMTIME st;
+   DWORD retval;
+   int hours =0, minutes =0;    
 
 
    if ( !ulHour )
@@ -97,11 +99,32 @@ HB_FUNC( TIP_TIMESTAMP )
       ulHour = 0;
    }
 
-   if ( GetTimeZoneInformation( &tzInfo ) == TIME_ZONE_ID_INVALID )
-   {
+   retval = GetTimeZoneInformation( &tzInfo );
+   if ( retval == TIME_ZONE_ID_INVALID )
+   {  
       tzInfo.Bias = 0;
+      tzInfo.StandardBias = 0;
+      tzInfo.DaylightBias = 0; 
+      hours   = 0;
+      minutes = 0;
+      
    }
-
+   else
+   {
+      hours   = (int) tzInfo.Bias / 60;
+      minutes = (int) tzInfo.Bias % 60;
+      if ( retval == TIME_ZONE_ID_STANDARD ) 
+      {
+         hours   += (int) tzInfo.StandardBias / 60;
+         minutes += (int) tzInfo.StandardBias % 60;
+      }
+      else
+      {
+         hours   += (int) tzInfo.DaylightBias / 60;
+         minutes += (int) tzInfo.DaylightBias % 60;
+      }          
+   }
+           
    if ( !pDate )
    {
       GetLocalTime( &st );
@@ -110,8 +133,8 @@ HB_FUNC( TIP_TIMESTAMP )
             days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1],
             st.wYear,
             st.wHour, st.wMinute, st.wSecond,
-            (int)( tzInfo.Bias / 60 ),
-            (int)( tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ) );
+            (int) hours,
+            (int)( minutes > 0 ? - minutes : minutes ) );
    }
    else
    {
@@ -122,8 +145,8 @@ HB_FUNC( TIP_TIMESTAMP )
             days[ hb_dateDOW( iYear, iMonth, iDay ) - 1 ], iDay,
             months[ iMonth -1], iYear,
             (UINT)( ulHour / 3600 ), (UINT)( (ulHour % 3600) / 60 ), (UINT)( ulHour % 60 ),
-            (int)( tzInfo.Bias / 60 ),
-            (int)( tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ) );
+            (int) hours,
+            (int)( minutes > 0 ? - minutes : minutes ) );
    }
 
 
@@ -142,7 +165,7 @@ HB_FUNC( TIP_TIMESTAMP )
 HB_FUNC( TIP_TIMESTAMP )
 {
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-   ULONG ulHour = hb_parl(2);
+   ULONG ulHour = hb_parnl(2);
    int nLen;
    char szDate[9];
    struct tm tmTime;
