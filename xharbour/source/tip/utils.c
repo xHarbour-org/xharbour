@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.11 2009/07/23 20:29:41 lculik Exp $
+ * $Id: utils.c,v 1.12 2009/07/26 17:01:48 lculik Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ HB_FUNC( TIP_TIMESTAMP )
             st.wYear,
             st.wHour, st.wMinute, st.wSecond,
             (int) hours,
-            (int)( minutes > 0 ? - minutes : minutes ) );
+            (int)( minutes < 0 ? - minutes : minutes ) );
    }
    else
    {
@@ -146,7 +146,7 @@ HB_FUNC( TIP_TIMESTAMP )
             months[ iMonth -1], iYear,
             (UINT)( ulHour / 3600 ), (UINT)( (ulHour % 3600) / 60 ), (UINT)( ulHour % 60 ),
             (int) hours,
-            (int)( minutes > 0 ? - minutes : minutes ) );
+            (int)( minutes < 0 ? - minutes : minutes ) );
    }
 
 
