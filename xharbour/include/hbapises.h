@@ -1,5 +1,5 @@
 /*
- * $Id: hbapises.h,v 1.1 2009/06/05 22:31:53 marchuet Exp $
+ * $Id: hbapises.h,v 1.2 2009/07/29 17:15:53 marchuet Exp $
  */
 
 /*

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.80 2009/07/22 16:55:02 marchuet Exp $
+# $Id: makefile.pc,v 1.81 2009/07/29 17:15:53 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -64,6 +64,7 @@ COMPILERLIBS=\
 	advapi32.lib\
 	ole32.lib\
 	uuid.lib\
+	wsock32.lib\
 	oleaut32.lib\
 	winmm.lib\
 	mpr.lib

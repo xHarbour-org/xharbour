@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.5 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbfilere.c,v 1.1 2009/07/29 17:15:54 marchuet Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ void main( int argc, char * argv[] )
 
 	strcpy( pServiceName, "File_Server" );
 
-	::InitializeCriticalSection(&myCS);
+	InitializeCriticalSection( &myCS );
    
 	if( strcmp( "-i", lpCmdLineData ) == 0 || strcmp( "-I", lpCmdLineData ) == 0 )
    {
@@ -324,7 +324,7 @@ void ExecuteSubProcess( void )
 	{
 		SvcDebugOut( "StartServiceCtrlDispatcher failed, error code = %d\n", ( void * ) GetLastError() );
 	}
-	::DeleteCriticalSection( &myCS );
+	DeleteCriticalSection( &myCS );
 }
 
 VOID WINAPI ServiceMain( DWORD dwArgc, LPTSTR *lpszArgv )

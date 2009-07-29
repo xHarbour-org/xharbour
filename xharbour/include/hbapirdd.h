@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.57 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.58 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -53,13 +53,13 @@
 #ifndef HB_APIRDD_H_
 #define HB_APIRDD_H_
 
+#include "hbapises.h"
 #include "hbapifs.h"
 #include "dbinfo.ch"   /* Constants for SELF_ORDINFO, SELF_INFO(), SELF_RECINFO() */
 #include "dbstruct.ch" /* Constants for SELF_FIELDINFO() */
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
-#include "hbapises.h"
 
 HB_EXTERN_BEGIN
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6518 2009/07/26 17:01:48 lculik Exp $
+ * $Id: ChangeLog,v 1.6519 2009/07/29 17:15:53 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2009-07-23 12:30 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+2009-07-30 00:01 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+  * include\hbapirdd.h
+  * include\hbapises.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\bmdbfcdx\redbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfmdx\dbfmdx1.c
+  * utils\hbfilere\hbfilere.c  
+    * Ridiculous changes to do happy PellesC compiler.
+    
+  * makefile.pc
+    + Added missing wsock32.lib to COMPILERLIBS
+
+2009-07-29 19:40 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
   * common.mak
   * compile.mak
   * makefile.bc

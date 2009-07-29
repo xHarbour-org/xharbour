@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.295 2009/05/26 11:25:32 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.296 2009/06/25 04:48:28 peterrees Exp $
  */
 
 /*
@@ -856,23 +856,24 @@ static BOOL hb_cdxEvalSeekCond( LPCDXTAG pTag, PHB_ITEM pCondItem )
 static BOOL hb_cdxTopScope( LPCDXTAG pTag )
 {
    LPCDXKEY pKey;
+   BOOL bRet;
 
    if( pTag->UsrAscend )
-   {
       pKey = pTag->topScopeKey;
-      return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
-                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
-                               pKey->mode ) <= 0;
-   }
+   else
+      pKey = pTag->bottomScopeKey;
+      
+   if( !pKey || !pKey->len )
+      bRet = TRUE;
    else
    {
-      pKey = pTag->bottomScopeKey;
-      return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
-                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
-                               pKey->mode ) >= 0;
+      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
+                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
+                                pKey->mode ); 
+      bRet = pTag->UsrAscend ? i <= 0: i >= 0;
    }
+
+   return bRet;   
 }
 
 /*
@@ -881,23 +882,23 @@ static BOOL hb_cdxTopScope( LPCDXTAG pTag )
 static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
 {
    LPCDXKEY pKey;
+   BOOL bRet;
 
    if( pTag->UsrAscend )
-   {
       pKey = pTag->bottomScopeKey;
-      return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
-                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
-                               pKey->mode ) >= 0;
-   }
+   else
+      pKey = pTag->topScopeKey;
+      
+   if( !pKey || !pKey->len )
+      bRet = TRUE;
    else
    {
-      pKey = pTag->topScopeKey;
-      return !pKey || !pKey->len ||
-             hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
-                               pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
-                               pKey->mode ) <= 0;
-   }
+      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
+                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
+                                pKey->mode ); 
+      bRet = pTag->UsrAscend ? i <= 0: i >= 0;
+   }                                
+   return bRet;
 }
 
 /*
