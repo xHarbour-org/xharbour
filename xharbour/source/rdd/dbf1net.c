@@ -1,13 +1,19 @@
 /*
- * $Id: dbf1.c,v 1.209 2009/05/26 11:25:31 marchuet Exp $
+ * $Id: dbf1net.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
  * DBF RDD module
  *
+ * www - http://www.harbour-project.org 
+ *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * www - http://www.harbour-project.org
+ *
+ * www - http://www.xharbour.org
+ * 
+ * Copyright 2009 Miguel Angel Marchuet <soporte-2@dsgsoftware.com> (migration to client/server)
+ * of DSG Software S.L.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -572,9 +578,9 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
 
    /* Read data from file */
    if( hb_fileNetReadAt( pArea->pDataFile, pArea->pRecord, pArea->uiRecordLen,
-                      ( HB_FOFFSET ) pArea->uiHeaderLen +
-                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
-                      ( HB_FOFFSET ) pArea->uiRecordLen ) !=
+                         ( HB_FOFFSET ) pArea->uiHeaderLen +
+                         ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
+                         ( HB_FOFFSET ) pArea->uiRecordLen ) !=
        ( ULONG ) pArea->uiRecordLen )
    {
       PHB_ITEM pError = hb_errNew();

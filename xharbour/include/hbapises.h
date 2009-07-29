@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.44 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: hbapises.h,v 1.1 2009/06/05 22:31:53 marchuet Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_EXTERN_BEGIN
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_SESSION_REQUEST()      HB_SESSION_REQUEST_()
 #define HB_SESSION_REQUEST_()     HB_FUNC_EXTERN( HB_SESSION ); \
-                                  void hb_codepage_ForceLink( void ) \
+                                  void hb_session_ForceLink( void ) \
                                   { \
                                     HB_FUNC_EXEC( HB_SESSION ); \
                                   }

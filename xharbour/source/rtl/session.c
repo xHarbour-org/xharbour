@@ -1,5 +1,5 @@
 /*
- * $Id: session.c,v 1.1 2009/06/05 22:31:53 marchuet Exp $
+ * $Id: session.c,v 1.2 2009/07/22 16:55:13 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 
 #define HB_SESSION_MAX_  1024
 
-static HB_SESSION s_session = { 1, "XHARBOUR" };
+static HB_SESSION s_session = { 1, "XHARBOUR", 0 };
 
 HB_SESSION_ANNOUNCE()
 

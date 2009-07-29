@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.63 2009/05/01 21:10:19 marchuet Exp $
+ * $Id: redbfcdx1.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $
  */
 
 /*
@@ -11,6 +11,7 @@
  * Copyright 2003 Przemyslaw Czerpak <druzus@priv.onet.pl> - all code except
  * hb_cdxTagDoIndex and related hb_cdxSort* rewritten.
  * Copyright 2004 Przemyslaw Czerpak <druzus@priv.onet.pl> - rest of code rewritten
+ *
  * Copyright 2006-2009 Miguel Angel Marchuet <miguelangel@marchuet.net>
  *    RE_DbSeekWild( uKey, [lSoftSeek], [lFindLast], [lNext], [lAll] ) => .T./.F. or aSeekRec when lAll clause
  *    RE_Turbo( lOnOff )
@@ -27,7 +28,9 @@
  *    hb_cdxSetFilter
  *    hb_cdxSkipFilter
  *    IMPLEMENTATION of Bitmap filters
- * www - http://www.xharbour.org
+ *
+ * Copyright 2009 Miguel Angel Marchuet <soporte-2@dsgsoftware.com> (migration to client/server)
+ * of DSG Software S.L.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1206,8 +1209,6 @@ static void hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
       pIndex->freePage = ulFree;
       hb_cdxIndexDiscardBuffers( pIndex );
    }
-   /* TODO: !!! ## remove it it's for test only */
-   /* hb_cdxIndexDiscardBuffers( pIndex ); */
 }
 
 /*
@@ -1242,7 +1243,7 @@ static BOOL hb_cdxIndexLockRead( LPCDXINDEX pIndex )
   else
   {
    ret = hb_dbfnetLockIdxFile( pIndex->pFile, pIndex->pArea->bLockType,
-                            FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
+                               FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
    if( !ret )
       hb_cdxErrorRT( pIndex->pArea, EG_LOCK, EDBF_LOCK, pIndex->szFileName, hb_fsError(), 0, NULL );
 
@@ -9638,9 +9639,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fileNetReadAt( pArea->pDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec,
-                              ( HB_FOFFSET ) pArea->uiHeaderLen +
-                              ( HB_FOFFSET ) ( ulRecNo - 1 ) *
-                              ( HB_FOFFSET ) pArea->uiRecordLen );
+                                 ( HB_FOFFSET ) pArea->uiHeaderLen +
+                                 ( HB_FOFFSET ) ( ulRecNo - 1 ) *
+                                 ( HB_FOFFSET ) pArea->uiRecordLen );
                iRecBuff = 0;
             }
             pArea->pRecord = pSort->pRecBuff + iRecBuff * pArea->uiRecordLen;

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.44 2009/07/15 17:14:56 ptsarenko Exp $
+# $Id: compile.mak,v 1.45 2009/07/22 16:55:02 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -24,6 +24,9 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
 
 $(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
 	$(CMN_LINK_CMD)
+
+$(HBFILERE_EXE) : $(HBFILERE_EXE_OBJS)
+	$(EXE_LINK_CMD)
 
 $(HBPP_EXE) : $(HBPP_EXE_OBJS)
 	$(CMN_LINK_CMD)
@@ -3280,6 +3283,12 @@ $(OBJ_DIR)$(DIR_SEP)xbscript.c : $(XBSCRIPT_DIR)$(DIR_SEP)xbscript.prg
 	$(HB_CMD_MAIN)
 
 $(OBJ_DIR)$(DIR_SEP)xbscript$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)xbscript.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBFILERE.EXE rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbfilere$(OBJEXT) : $(HBFILERE_DIR)$(DIR_SEP)hbfilere.c
 	$(CC_CMD)
 
 #

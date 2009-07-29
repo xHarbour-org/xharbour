@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.239 2009/05/19 16:34:58 marchuet Exp $
+# $Id: makefile.vc,v 1.240 2009/07/22 16:55:02 marchuet Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -86,8 +86,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
-
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT

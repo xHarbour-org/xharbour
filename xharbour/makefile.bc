@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.248 2009/05/30 01:58:31 ronpinkas Exp $
+# $Id: makefile.bc,v 1.249 2009/07/22 16:55:02 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -45,7 +45,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__
-HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
+HARBOURFLAGS =$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT

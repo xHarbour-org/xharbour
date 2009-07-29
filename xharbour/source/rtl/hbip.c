@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.13 2008/12/22 20:26:56 ptsarenko Exp $  */
+/*  $Id: hbip.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -196,7 +196,7 @@ void hb_ipCleanup( void )
 void hb_ipSetBufSize( HB_SOCKET_T hSocket, int iBufSend, int iBufRecv )
 {
    int value;
-   int len = sizeof(value);
+   int len = sizeof( value );
 
    if( iBufSend && !getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &value, (int*) &len ) )
    {
@@ -466,7 +466,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
    int iLen = sizeof( iBufferMax );
 
    getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &iBufferMax, (int*) &iLen );
-   /*iBufferMax = iBufferMax / (int) 2;*/
+   iBufferMax = iBufferMax / (int) 2;
    
    iSent = iLen = 0;
 
@@ -539,7 +539,7 @@ HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
          /* Set internal socket send buffer to 64k,
          * this should fix the speed problems some users have reported
          */
-         hb_ipSetBufSize( hSocket, 16384, 16384 );
+         hb_ipSetBufSize( hSocket, 65537 /*16384*/, 65537 /*16384*/ );
 
          if( ! hb_socketConnect( hSocket, &remote, timeout ) )
             hSocket = ( HB_SOCKET_T ) -1;
@@ -667,7 +667,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
       /* Set internal socket send buffer to 64k,
       * this should fix the speed problems some users have reported
       */
-      hb_ipSetBufSize( incoming, 16384, 16384 );
+      hb_ipSetBufSize( incoming, 65537 /*16384*/, 65537 /*16384*/ );
       return incoming;
    }
 }

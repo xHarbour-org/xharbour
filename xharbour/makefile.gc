@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.55 2009/01/08 09:11:13 marchuet Exp $
+# $Id: makefile.gc,v 1.56 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -44,7 +44,7 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =include
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)

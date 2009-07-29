@@ -1,14 +1,13 @@
 /*
- * $Id: filenet.c,v 1.2 2009/07/23 08:23:51 marchuet Exp $
+ * $Id: filenet.c,v 1.3 2009/07/23 10:27:49 marchuet Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  *    functions to access files with shared handles and locks
- *    (buffers in the future)
  *
-* Copyright 2009 Miguel Angel Marchuet Frutos <miguelangel@marchuet.net>
- * www - http://www.xharbour.org
+ * Copyright 2009 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+ * of DSG Software S.L.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +79,9 @@ static char szDataACK[HB_LENGTH_ACK];
 
 static PHB_FILE s_openFiles = NULL;
 
-//#define _DBG_
+/*
+#define _DBG_
+*/
 
 typedef struct
 {
@@ -118,9 +119,9 @@ static HB_CRITICAL_T  s_fileMtx;
 static HB_SOCKET_T hSocket;
 static char * szBuffer   = NULL;
 static ULONG  lBufferLen = 0;
-static char * szOk       = "+1";
+static const char * szOk       = "+1";
 
-#define BUFFER_SIZE 10240 // 8192
+#define BUFFER_SIZE 32767 
 
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 
@@ -389,7 +390,7 @@ static long int hb_Net_Recv( HB_SOCKET_T hSocket )
    }
    ulDataLen = HB_GET_BE_UINT32( szBuffer );
 
-   if( ulDataLen > 0 )
+   if( ulDataLen > 0 && ulRead < ( ulDataLen + HB_LENGTH_ACK ) )
    {
    
       if( lBufferLen < ulDataLen + 1 + HB_LENGTH_ACK )
@@ -475,7 +476,6 @@ static long int hb_Net_SingleRecv( HB_SOCKET_T hSocket )
 
 static long int hb_NetDataSendSingleRecv( HB_SOCKET_T hCurSocket, char * szData, ULONG ulLen )
 {
-   //sprintf( szDataLen, HB_ACK_SEND, ulLen );
    HB_PUT_BE_UINT32( szDataACK, ulLen );
 #if defined(_DBG_)         
    OutputDebugString( "---------------------1" );
@@ -499,7 +499,7 @@ static int hb_NetSendSingleRecv( HB_SOCKET_T hCurSocket, char * sData, ULONG ulL
    lRet = hb_NetDataSendSingleRecv( hCurSocket, sData, ulLen );
    
    if( !lRet )
-      hb_errRT_BASE( EG_DATATYPE, 1000, NULL, "Sending error", 0 );
+      hb_errRT_BASE( EG_DATATYPE, 1000, NULL, "Server don't answer", 0 );
    else if( *szBuffer == '-' && iErr )
    {
       hb_errRT_BASE( EG_DATATYPE, iErr, NULL, szBuffer, 0 );
@@ -578,6 +578,36 @@ static void hb_NetCloseConnection( HB_SOCKET_T hCurSocket )
    }
 } 
 
+USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+{
+   if( hSocket )
+   {
+      char szData[ 25 + HB_LENGTH_ACK ];
+      int nSend;
+      
+      /* USHORT hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ) */
+      nSend = sprintf( szData + HB_LENGTH_ACK, "W|%hu|%lu|\r\n", uiDrive, ulLen );
+      HB_PUT_BE_UINT32( szData, nSend );
+      if( hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1020 ) )
+      {
+         char * ptr;
+         USHORT uiRet;
+         
+         ptr = hb_NetFirstChar();
+         hb_NetGetCmdItem( &ptr, ( char * ) pbyBuffer ); ptr ++;
+         hb_NetGetCmdItem( &ptr, szData );
+         sscanf( szData, "%hu|" , &uiRet );
+         return uiRet;
+      }
+      else
+      {
+         return 0;
+      }      
+   }
+   else
+      return hb_fsCurDirBuffEx( uiDrive, pbyBuffer, ulLen );
+}
+
 static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths )
 {
    HB_PATHNAMES * pNextPath;
@@ -601,9 +631,17 @@ static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags,
    else if( uiExFlags & FXO_DEFAULTS )
    {
       char * szDefault = hb_setGetDefault();
-      if( szDefault )
+      if( szDefault && *szDefault )
       {
          pFilepath->szPath = szDefault;
+         hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+         fIsFile = hb_FileNetFile( szPath );
+      }
+      else
+      {
+         BYTE pbyDirBuffer[ HB_PATH_MAX ];
+         hb_fileNetCurDirBuffEx( 0, pbyDirBuffer, HB_PATH_MAX );
+         pFilepath->szPath = ( char * ) pbyDirBuffer;
          hb_fsFNameMerge( ( char * ) szPath, pFilepath );
          fIsFile = hb_FileNetFile( szPath );
       }
@@ -644,14 +682,14 @@ static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags,
       }
    }
    else
-   {
+   {  
       hb_fsFNameMerge( ( char * ) szPath, pFilepath );
    }
    hb_xfree( pFilepath );
 
    return szPath;
 } 
- 
+
 PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
                             USHORT uiExFlags, BYTE * pPaths,
                             PHB_ITEM pError, BOOL fBufferLock )
@@ -877,24 +915,19 @@ ULONG hb_fileNetReadAt( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize, HB_FOFFSET
 
       nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", pFile->hFile, ulSize, llOffset );
       HB_PUT_BE_UINT32( szData, nSend );
+
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1004 );
       if( ulLen )
       {
-         char * ptr;
          char * ptrBuf;
-         ULONG ulSize;
          USHORT uiError;
-         ptrBuf = hb_NetFirstChar();
-         ptr = hb_strToken( ptrBuf, ulLen, 1, &ulSize );
-         sscanf( ptr, "%lu" , &ulRead );
-         ptr = hb_strToken( ptrBuf, ulLen, 2, &ulSize );
-         sscanf( ptr, "%hu" , &uiError );
+
+         ptrBuf = szBuffer + HB_LENGTH_ACK;
+         ulRead = ulLen - 3;
+         uiError = HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
-         {
-            ptr = hb_strToken( ptrBuf, ulLen, 3, &ulSize );
-            memcpy( pBuffer, ptr, ulRead );
-         }
+            memcpy( pBuffer, ptrBuf + 4, ulRead );
       }
       else
       {
@@ -925,22 +958,15 @@ ULONG hb_fileNetReadLarge( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize )
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 );
       if( ulLen )
       {
-         char * ptr;
          char * ptrBuf;
-         ULONG ulSize;
          USHORT uiError;
 
-         ptrBuf = hb_NetFirstChar();
-         ptr = hb_strToken( ptrBuf, ulLen, 1, &ulSize );
-         sscanf( ptr, "%lu" , &ulRead );
-         ptr = hb_strToken( ptrBuf, ulLen, 2, &ulSize );
-         sscanf( ptr, "%hu" , &uiError );
+         ptrBuf = szBuffer + HB_LENGTH_ACK;
+         ulRead = ulLen - 3;
+         uiError = HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
-         {
-            ptr = hb_strToken( ptrBuf, ulLen, 3, &ulSize );
-            memcpy( pBuffer, ptr, ulRead );
-         }
+            memcpy( pBuffer, ptrBuf + 4, ulRead );
       }
       else
       {

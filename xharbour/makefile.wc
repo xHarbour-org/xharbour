@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.98 2009/01/29 21:35:32 enricomaria Exp $
+# $Id: makefile.wc,v 1.99 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -40,7 +40,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6517 2009/07/24 00:16:59 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6518 2009/07/26 17:01:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,53 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-23 12:30 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+  * common.mak
+  * compile.mak
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * mdir.bat
+    - removed -p and changed to -gc0 from standard build.
+    + Added build of Remote File Server. bin\hbfilere.exe
+    
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+    * minor pad changes.
+    
+  * source\rtl\filenet.c  
+  * source\rdd\bmdbfcdx\redbfcdx1.c
+  * source\rdd\dbf1net.c
+    * Modified protocol to accel reading operations. by default it operates in turbo mode, if
+      you want to acces to the same files by another rdd at the same time, you need RE_Turbo( .F. )
+      to reactivate read lock index.
+
+  * include\hbipapi.h    
+  * source\rtl\hbip.c
+    * modified buffers as recomend microsoft:
+      To modify the socket send buffer, use the Windows Sockets getsockopt function to determine the current
+      socket send buffer size (SO_SNDBUF), and then use the setsockopt function to set the socket send buffer size.
+      When you are finished, the SO_SNDBUF value must be at least 1 byte larger than the program send buffer size.
+      Modify the send call or the WSASend call to specify a buffer size at least 1 byte smaller than the SO_SNDBUF
+      value. In the earlier example in the "Cause" section of this article.
+      http://support.microsoft.com/kb/823764/en-us/
+
+  * include\hbapises.h      
+  * source\rtl\session.c
+    ! added some fixes but remains unfinished.
+  
+  + utils\Makefile
+  + utils\hbfilere\Makefile
+  + utils\hbfilere\hbfilere.c
+  + utils\hbfilere\hbfilere.h
+    + Added full code of Senior File Server for xharbour. By the moment only
+      rdd REDBFCDX can connect with this server, but i hope at next weeks, all
+      dbf based rdds can connect with it optional, and add full FILE api to work
+      with remote files.
+
 
 2009-07-26 13:30 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * source/tip/utils.c

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.54 2009/01/29 21:35:32 enricomaria Exp $
+# $Id: makefile.dc,v 1.55 2009/05/19 16:34:58 marchuet Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -35,8 +35,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
 CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
-HB_CMD=$(HARBOUR_EXE) -iinclude -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -iinclude -n -q0 -po$(OBJ_DIR)\ -w -es2 -gc2 $** -o$@
+HB_CMD=$(HARBOUR_EXE) -iinclude -n1 -q0 -w2 -es2 -gc0 $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -iinclude -n -q0 -w -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 LIB_CMD=LIB -c -n $@ $**

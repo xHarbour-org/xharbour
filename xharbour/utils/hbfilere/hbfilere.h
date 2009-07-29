@@ -1,11 +1,10 @@
-/*  $Id: hbipapi.h,v 1.1 2009/07/22 17:09:14 marchuet Exp $  */
+/*  $Id: srvleto.h,v 1.2 2008/03/13 18:47:23 alkresin Exp $  */
 
 /*
- * Harbour Project source code:
- * Header file for Leto RDD and Server
+ * xHarbour Project source code:
  *
- * Copyright 2008 Alexander S. Kresin <alex / at / belacy.belgorod.su>
- * www - http://www.harbour-project.org
+ * Copyright 2009 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+ * of DSG Software S.L.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,38 +47,48 @@
  *
  */
 
-#if defined( HB_OS_WIN_32 ) && !defined( WIN32 )
-   #define WIN32
-#endif
-#if !defined( unix ) && ( defined( __LINUX__ ) || defined( HB_OS_LINUX ) )
-   #define unix
+#include "hbapirdd.h"
+#include "hbipapi.h"
+
+#if defined( HB_OS_WIN_32 )
+   #include "windows.h"
 #endif
 
-#if defined( __WATCOMC__ ) || defined( __LCC__ )
-   #define _declspec( dllexport ) __declspec( dllexport )
-#endif
+BOOL hb_ip_rfd_isset( HB_SOCKET_T hSocket );
+int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen );
+void hb_ip_rfd_set( HB_SOCKET_T hSocket );
 
-#define HB_SENDRECV_BUFFER_SIZE         32767
 #if defined( HB_OS_WIN_32 )
    #define HB_SOCKET_T SOCKET
-   #include <winsock2.h>
 #else
    #define HB_SOCKET_T int
-#endif
+#endif 
 
-extern int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout );
-extern int hb_ipRecv( HB_SOCKET_T hSocket, char *Buffer, int iMaxLen );
-extern int hb_ipSend( HB_SOCKET_T hSocket, char *Buffer, int iSend, int timeout );
-extern HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout );
-extern HB_SOCKET_T hb_ipServer( int iPort, char * szAddress, int iListen );
-extern HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long int * lPort );
-extern void   hb_ipInit( void );
-extern void   hb_ipCleanup( void );
-extern int    hb_iperrorcode( void );
-extern char * hb_ipErrorDesc( void );
-extern void   hb_ipclose( HB_SOCKET_T hSocket );
-extern void   hb_ip_rfd_zero( void);
-extern void   hb_ip_rfd_clr( HB_SOCKET_T hSocket );
-extern void   hb_ip_rfd_set( HB_SOCKET_T hSocket );
-extern BOOL   hb_ip_rfd_isset( HB_SOCKET_T hSocket );
-extern int    hb_ip_rfd_select( int iTimeOut );
+#define USERS_REALLOC       20
+
+typedef struct _HB_FILE
+{
+   BYTE *            pFileName;
+   int               used;
+   BOOL              shared;
+   HB_FHANDLE        hFile;
+   struct _HB_FILE * pNext;
+   struct _HB_FILE * pPrev;
+}
+HB_FILE;
+
+typedef struct
+{
+   HB_SOCKET_T hSocket;
+   BYTE *      pBuffer;
+   ULONG       ulBufferLen;
+   BYTE *      pBufAnswer;
+   ULONG       ulBufAnswerLen;   
+   BYTE *      pBufTemp;
+   ULONG       ulBufTempLen;      
+   BYTE *      pBufRead;
+   ULONG       ulDataLen;
+   ULONG       ulDataRead;
+   BYTE *      szAddr;
+   PHB_FILE    s_openFiles;
+} USERSTRU, *PUSERSTRU;

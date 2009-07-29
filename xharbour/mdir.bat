@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.21 2009/05/19 16:34:58 marchuet Exp $
+rem $Id: mdir.bat,v 1.22 2009/07/22 16:55:02 marchuet Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -64,8 +64,8 @@ if exist bin\ppgen.exe           del   bin\ppgen.exe
 if exist bin\%SUB_DIR%\ppgen.exe del   bin\%SUB_DIR%\ppgen.exe
 if exist bin\%SUB_DIR%\*.exe xcopy     bin\%SUB_DIR%\*.exe bin /D /Y > nul
 if exist lib\%SUB_DIR%\*%LIBEXT% xcopy lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
-if exist bin\%SUB_DIR%\*.tds xcopy     bin\%SUB_DIR%\*.tds bin /D /Y > nul
-if exist lib\%SUB_DIR%\*.bak del       lib\%SUB_DIR%\*.bak
+if exist bin\%SUB_DIR%\*.tds     xcopy bin\%SUB_DIR%\*.tds bin /D /Y > nul
+if exist lib\%SUB_DIR%\*.bak     del   lib\%SUB_DIR%\*.bak
 ECHO Done ...
 ECHO.
 goto EXIT
@@ -132,6 +132,11 @@ if exist bin\hbdoc.exe      del bin\hbdoc.exe
 if exist bin\hbdoc.tds      del bin\hbdoc.tds
 if exist bin\hbdoc.map      del bin\hbdoc.map
 if exist bin\hbdoc.cgl      del bin\hbdoc.cgl
+
+if exist bin\hbfilere.exe   del bin\hbfilere.exe
+if exist bin\hbfilere.tds   del bin\hbfilere.tds
+if exist bin\hbfilere.map   del bin\hbfilere.map
+if exist bin\hbfilere.cgl   del bin\hbfilere.cgl
 
 if exist bin\hbmake.exe     del bin\hbmake.exe
 if exist bin\hbmake.tds     del bin\hbmake.tds
@@ -249,6 +254,7 @@ if exist bin\*.map del bin\*.map
 
 if exist bin\%SUB_DIR%\harbour.exe                   del bin\%SUB_DIR%\harbour.exe
 if exist bin\%SUB_DIR%\hbdoc.exe                     del bin\%SUB_DIR%\hbdoc.exe
+if exist bin\%SUB_DIR%\hbfilere.exe                  del bin\%SUB_DIR%\hbfilere.exe
 if exist bin\%SUB_DIR%\hbmake.exe                    del bin\%SUB_DIR%\hbmake.exe
 if exist bin\%SUB_DIR%\hbpp.exe                      del bin\%SUB_DIR%\hbpp.exe
 if exist bin\%SUB_DIR%\hbrun.exe                     del bin\%SUB_DIR%\hbrun.exe
@@ -348,6 +354,7 @@ if exist obj\%SUB_DIR%\mt\*.tmp                      del obj\%SUB_DIR%\mt\*.tmp
 
 if exist bin\%SUB_DIR%\harbour.exp                   del bin\%SUB_DIR%\harbour.exp
 if exist bin\%SUB_DIR%\hbdoc.exp                     del bin\%SUB_DIR%\hbdoc.exp
+if exist bin\%SUB_DIR%\hbfilere.exp                  del bin\%SUB_DIR%\hbfilere.exp
 if exist bin\%SUB_DIR%\hbmake.exp                    del bin\%SUB_DIR%\hbmake.exp
 if exist bin\%SUB_DIR%\hbpp.exp                      del bin\%SUB_DIR%\hbpp.exp
 if exist bin\%SUB_DIR%\hbrun.exp                     del bin\%SUB_DIR%\hbrun.exp
@@ -359,6 +366,7 @@ if exist bin\%SUB_DIR%\xbscript.exp                  del bin\%SUB_DIR%\xbscript.
 
 if exist bin\%SUB_DIR%\harbour%LIBEXT%               del bin\%SUB_DIR%\harbour%LIBEXT%
 if exist bin\%SUB_DIR%\hbdoc%LIBEXT%                 del bin\%SUB_DIR%\hbdoc%LIBEXT%
+if exist bin\%SUB_DIR%\hbfilere%LIBEXT%              del bin\%SUB_DIR%\hbfilere%LIBEXT%
 if exist bin\%SUB_DIR%\hbmake%LIBEXT%                del bin\%SUB_DIR%\hbmake%LIBEXT%
 if exist bin\%SUB_DIR%\hbpp%LIBEXT%                  del bin\%SUB_DIR%\hbpp%LIBEXT%
 if exist bin\%SUB_DIR%\hbrun%LIBEXT%                 del bin\%SUB_DIR%\hbrun%LIBEXT%

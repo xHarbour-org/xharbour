@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.49 2009/07/22 16:55:02 marchuet Exp $
+# $Id: common.mak,v 1.50 2009/07/24 00:16:59 guerra000 Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -44,6 +44,7 @@ HBDOC_DIR     =utils$(DIR_SEP)hbdoc
 HBPP_DIR      =utils$(DIR_SEP)hbpp
 HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
+HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
@@ -156,6 +157,7 @@ HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)harbour$(LIBEXT)
 HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour.exe
 HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp.exe
 PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen.exe
+HBFILERE_EXE=$(BIN_DIR)$(DIR_SEP)hbfilere.exe
 HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT).exe
 HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT).exe
 HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc.exe
@@ -1140,6 +1142,12 @@ HBPP_EXE_OBJS=\
 PPGEN_EXE_OBJS=$(OBJ_DIR)$(DIR_SEP)ppgen$(OBJEXT)
 
 #===============================================================================
+# HBFILERE.EXE rules
+#===============================================================================
+HBFILERE_EXE_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbfilere$(OBJEXT)\
+
+#===============================================================================
 # HARBOUR.EXE rules
 #===============================================================================
 HARBOUR_EXE_OBJS=\
@@ -1809,6 +1817,7 @@ ST_PROJECT=\
 	$(HBMAKE_EXE)\
 	$(XBSCRIPT_EXE)\
 	$(HBTEST_EXE)\
+	$(HBFILERE_EXE)\
 	$(HBRUN_EXE)
 
 MT_PROJECT=\

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.79 2009/05/19 16:34:58 marchuet Exp $
+# $Id: makefile.pc,v 1.80 2009/07/22 16:55:02 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -34,7 +34,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(OBJ_DIR)"
-HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:

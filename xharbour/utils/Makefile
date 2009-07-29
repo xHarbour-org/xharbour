@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2004/05/20 21:09:22 ronpinkas Exp $
+# $Id: Makefile,v 1.5 2007/01/11 01:00:35 druzus Exp $
 #
 
 ROOT = ../
@@ -11,6 +11,7 @@ DIRS=\
 	hbtest \
 	hbmake \
 	hbdict \
+	hbfilere \
 	xbscript \
 	$(HB_UTILS) \
 #	hbextern \
