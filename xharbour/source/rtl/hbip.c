@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.2 2009/07/29 17:15:54 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -229,7 +229,7 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
 
    if( timeout == -1 )
    {
-      if( select( hSocket+1, &set, NULL, NULL, NULL ) < 0 )
+      if( select( hSocket + 1, &set, NULL, NULL, NULL ) < 0 )
       {
          HB_SOCKET_SET_ERROR();
          return 0;
@@ -239,7 +239,7 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
    {
       tv.tv_sec = timeout/ 1000;
       tv.tv_usec = (timeout % 1000) * 1000;
-      if( select( hSocket+1, &set, NULL, NULL, &tv ) < 0 )
+      if( select( hSocket + 1, &set, NULL, NULL, &tv ) < 0 )
       {
          HB_SOCKET_SET_ERROR();
          return 0;
