@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.25 2009/01/17 15:57:14 fsgiudice Exp $
+* $Id: hblog.prg,v 1.26 2009/01/17 23:23:08 fsgiudice Exp $
 */
 
 /*
@@ -524,6 +524,14 @@ METHOD Open( cProgName ) CLASS HB_LogFile
       END
    ELSE
       ::nFileHandle := FCreate( ::cFileName )
+
+      // FCreate leaves the file open in exclusive mode
+      // so we close the new handle and open the file in shared mode
+      FClose( ::nFileHandle )
+      ::nFileHandle := FOpen( ::cFileName, FO_READWRITE )
+      IF ::nFileHandle > 0
+         Fseek( ::nFileHandle, 0 ,FS_END )
+      END
    ENDIF
 
    IF ::nFileHandle < 0
@@ -577,6 +585,14 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
          IF FRename( ::cFileName, ::cFileName + ".000" ) == 0
             ::nFileHandle := FCreate( ::cFileName )
             Fwrite( ::nFileHandle, HB_BldLogMsg( HB_LogDateStamp(), Time(), "LogFile: Reopening file due to size limit breaking", HB_OsNewLine() ) )
+            
+            // FCreate leaves the file open in exclusive mode
+            // so we close the new handle and open the file in shared mode
+            FClose( ::nFileHandle )
+            ::nFileHandle := FOpen( ::cFileName, FO_READWRITE )
+            IF ::nFileHandle > 0
+               Fseek( ::nFileHandle, 0 ,FS_END )
+            END
          ENDIF
       ENDIF
    ENDIF

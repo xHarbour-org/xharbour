@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6520 2009/07/29 22:18:23 marchuet Exp $
+ * $Id: ChangeLog,v 1.6521 2009/07/30 09:00:05 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-30 12:25 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * c:\xHarbour\source\rtl\hblog.prg
+    ! Fixed METHOD Send() and METHOD Open() to close the file created with 
+      FCreate and re-open it in shared mode after creating a new one.
+      The problem is that after the file has crossed the size limit, the new file
+      is read only.
 
 2009-07-30 11:03 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
   * source\rdd\bmdbfcdx\bmdbfcdx1.c
@@ -723,12 +730,12 @@
   * source\rdd\dbf1.c
     * fixed, field type "C" or "M" marked as HB_FF_BINARY don't execute translate code.
       Remember that possible flags are (5 parameter of array at DbCreate):
-	#define HB_FF_HIDDEN          0x0001 /* System Column (not visible to user) */
-	#define HB_FF_NULLABLE        0x0002 /* Column can store null values */
-	#define HB_FF_BINARY          0x0004 /* Binary column AND NOCPTRANS*/
-	#define HB_FF_AUTOINC         0x0008 /* Column is autoincrementing */
-	#define HB_FF_COMPRESSED      0x0010 /* Column is compressed */
-	#define HB_FF_ENCRYPTED       0x0020 /* Column is encrypted */
+   #define HB_FF_HIDDEN          0x0001 /* System Column (not visible to user) */
+   #define HB_FF_NULLABLE        0x0002 /* Column can store null values */
+   #define HB_FF_BINARY          0x0004 /* Binary column AND NOCPTRANS*/
+   #define HB_FF_AUTOINC         0x0008 /* Column is autoincrementing */
+   #define HB_FF_COMPRESSED      0x0010 /* Column is compressed */
+   #define HB_FF_ENCRYPTED       0x0020 /* Column is encrypted */
     + Added next commands and function to the future support of transactions TTS,
       by the moment can be used manually, or to test pending transaction from dbf
       of dBase IV.
@@ -738,7 +745,7 @@
       RESET [IN <alias>]
         Reset transaction mark from table and his data to rollback.
       ISMARKED()
-      	Return if a table is marked with transaction in course.
+         Return if a table is marked with transaction in course.
 
   * source\rdd\dbffpt\dbffpt1.c
     ! fixed, field type "C" or "M" marked as binary don't execute translate code.
@@ -2967,9 +2974,9 @@ Miguel Angel Marchuet
 
       void my_retc( const char * szText )
       {
-	 // Looking "_hb_retc" in EXECUTABLE which is no longer accessible
-	 // due to nulling of HB_FORCE_EXPORT. In my Windows machine, MINGW
-	 // (and others too) cannot work with HB_FORCE_EXPORT nulled.
+    // Looking "_hb_retc" in EXECUTABLE which is no longer accessible
+    // due to nulling of HB_FORCE_EXPORT. In my Windows machine, MINGW
+    // (and others too) cannot work with HB_FORCE_EXPORT nulled.
          HB_RETC pRetc = GetProcAddress( GetModuleHandle( NULL ), "_hb_retc" );
          pRetc ( szText );
       }
@@ -3716,8 +3723,8 @@ Miguel Angel Marchuet
           Daniel Vik, claimed to be superior above the packaged one.
           This function is enabled by setting an envar as follows:
           SET DV_MEMCPY=1
-	  By doing so, the compiler's native memcpy will be overridden.
-	  At the moment, OpenWatcom and PellesC does not compile.
+     By doing so, the compiler's native memcpy will be overridden.
+     At the moment, OpenWatcom and PellesC does not compile.
     */
 
   * source/common/hbarch.c
