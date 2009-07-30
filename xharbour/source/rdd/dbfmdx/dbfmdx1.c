@@ -1,5 +1,5 @@
 /*
- * $Id: dbfmdx1.c,v 1.4 2009/07/23 10:42:37 marchuet Exp $
+ * $Id: dbfmdx1.c,v 1.5 2009/07/29 22:18:23 marchuet Exp $
  */
 
 /*
@@ -848,7 +848,7 @@ static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
       int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
                                 pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
                                 pKey->mode ); 
-      bRet = pTag->UsrAscend ? i <= 0: i >= 0;
+      bRet = pTag->UsrAscend ? i >= 0: i <= 0;
    }                                
    return bRet;
 }

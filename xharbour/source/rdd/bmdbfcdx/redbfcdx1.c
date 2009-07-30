@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.2 2009/07/29 17:15:54 marchuet Exp $
+ * $Id: redbfcdx1.c,v 1.3 2009/07/29 22:18:23 marchuet Exp $
  */
 
 /*
@@ -873,7 +873,7 @@ static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
       int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
                                 pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
                                 pKey->mode ); 
-      bRet = pTag->UsrAscend ? i <= 0: i >= 0;
+      bRet = pTag->UsrAscend ? i >= 0: i <= 0;
    }                                
    return bRet;
 }
