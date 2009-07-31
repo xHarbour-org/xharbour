@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6521 2009/07/30 09:00:05 marchuet Exp $
+ * $Id: ChangeLog,v 1.6522 2009/07/30 19:34:48 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-31 12:15 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+  * include\hbrdddbf.h
+  * include\hbrdddbt.h
+  * include\hbrddfpt.h
+  * source\rdd\dbf1.c
+    - removed twice used headers.
+    * Changed if expression that contains a function call to be happy to PellesC 6.0.
 
 2009-07-30 12:25 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
   * c:\xHarbour\source\rtl\hblog.prg

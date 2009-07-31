@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.12 2006/06/27 21:26:00 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.13 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "hbsetup.h"
 #include "hbdbf.h"
 #include "hbdbferr.h"
-#include "hbapirdd.h"
+//#include "hbapirdd.h"
 #define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 

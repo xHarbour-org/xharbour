@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.209 2009/05/26 11:25:31 marchuet Exp $
+ * $Id: dbf1.c,v 1.210 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include "hbvm.h"
 #include "hbapiitm.h"
 #include "hbrdddbf.h"
-#include "hbdbf.h"
+//#include "hbdbf.h"
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "hbset.h"
@@ -5611,7 +5611,8 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
                             ( HB_FOFFSET ) pArea->uiRecordLen *
                             ( HB_FOFFSET ) pArea->ulRecCount;
       /* protection against file create */
-      if( hb_fileSize( pArea->pDataFile ) > llOffset )                              
+      HB_FOFFSET llSize = hb_fileSize( pArea->pDataFile );
+      if( llSize > llOffset )                              
       {
          hb_fileWriteAt( pArea->pDataFile, ( BYTE * ) "\032", 1, llOffset );
          hb_fileTruncAt( pArea->pDataFile, llOffset + 1 );
