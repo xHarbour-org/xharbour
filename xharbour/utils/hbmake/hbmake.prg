@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.196 2009/05/12 01:40:21 modalsist Exp $
+ * $Id: hbmake.prg,v 1.197 2009/07/31 12:41:52 modalsist Exp $
  */
 
 /*
@@ -3163,7 +3163,7 @@ Endif // Create and compile
 if s_lPocc 
 // PellesC v.5x needs /alternatename flag. It seems a bug.
 //    FWrite( s_nMakeFileHandle, "    $(LFLAGS) +" + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(LFLAGS) /ALTERNATENAME:_WizMain=WizMain +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(LFLAGS) /ALTERNATENAME:_WizMain=WizMain /ALTERNATENAME:_errno=___errno +" + CRLF )
 else
       FWrite( s_nMakeFileHandle, "    $(LFLAGS) +" + CRLF )
 endif

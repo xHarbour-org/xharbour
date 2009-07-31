@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6523 2009/07/31 10:16:16 marchuet Exp $
+ * $Id: ChangeLog,v 1.6524 2009/07/31 12:41:50 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-07-31 10:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils\hbmake\hbmake.prg
+    * added /alternatename flag to link under Pelles v5.x
 
 2009-07-31 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat
