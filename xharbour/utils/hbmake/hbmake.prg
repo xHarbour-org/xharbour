@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.195 2009/04/18 22:44:01 modalsist Exp $
+ * $Id: hbmake.prg,v 1.196 2009/05/12 01:40:21 modalsist Exp $
  */
 
 /*
@@ -3089,13 +3089,13 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL)  /Ze /Go /Ot /Tx86-coff /I$(INCLUDE_DIR) $(C_USR) $(CFLAGS)" +IIF( s_lMt, ' /D"HB_THREAD_SUPPORT" /MT' , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86"+IIF( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE") + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86"+IIF( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE ") + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = polink" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib schannel.lib" + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib schannel.lib comctl32.lib" + CRLF )
 
    ELSEIF s_lGcc
 
@@ -3160,7 +3160,13 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "$(PROJECT): $(CFILES) $(OBJFILES) $(RESDEPEN) $(DEFFILE)" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(CC_DIR)\BIN\$(LINKER) @&&!  " + CRLF )
+if s_lPocc 
+// PellesC v.5x needs /alternatename flag. It seems a bug.
+//    FWrite( s_nMakeFileHandle, "    $(LFLAGS) +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(LFLAGS) /ALTERNATENAME:_WizMain=WizMain +" + CRLF )
+else
       FWrite( s_nMakeFileHandle, "    $(LFLAGS) +" + CRLF )
+endif
       FWrite( s_nMakeFileHandle, "    $(ALLOBJ), +" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(PROJECT),, +" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(ALLLIB), +" + CRLF )

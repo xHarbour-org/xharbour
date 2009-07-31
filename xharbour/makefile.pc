@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.81 2009/07/29 17:15:53 marchuet Exp $
+# $Id: makefile.pc,v 1.82 2009/07/29 22:18:23 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -21,7 +21,7 @@ COPY=copy
 TYPE=type
 !endif
 
-# Comment the following line when using version lower then 5.00
+# Comment the following line when using version lower than 5.00
 .PHONY : ALL
 
 #===============================================================================
@@ -50,7 +50,10 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(HARBOURFLAGS) $** -o$@
 CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" 
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
-LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN" /MACHINE:IX86 /SUBSYSTEM:CONSOLE
+#--------------------------------------------------------
+# Pelles C v.5x need /alternatename flag. It seems a bug.
+#--------------------------------------------------------
+LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN" /MACHINE:IX86 /SUBSYSTEM:CONSOLE /ALTERNATENAME:_WizMain=WizMain /ALTERNATENAME:_errno=___errno
 LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
 LIB_CMD      =POLIB /OUT:$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
@@ -67,7 +70,8 @@ COMPILERLIBS=\
 	wsock32.lib\
 	oleaut32.lib\
 	winmm.lib\
-	mpr.lib
+        mpr.lib \
+        comctl32.lib
 HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
 CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)

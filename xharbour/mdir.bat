@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.22 2009/07/22 16:55:02 marchuet Exp $
+rem $Id: mdir.bat,v 1.23 2009/07/29 17:15:53 marchuet Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -190,6 +190,7 @@ if exist lib\%LIBPREFIX%dbfmdxmt%LIBEXT%             del lib\%LIBPREFIX%dbfmdxmt
 if exist lib\%LIBPREFIX%bmdbfcdx%LIBEXT%             del lib\%LIBPREFIX%bmdbfcdx%LIBEXT%
 if exist lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%redbfcdx%LIBEXT%             del lib\%LIBPREFIX%redbfcdx%LIBEXT%
+if exist lib\%LIBPREFIX%redbffpt%LIBEXT%             del lib\%LIBPREFIX%redbffpt%LIBEXT%
 if exist lib\%LIBPREFIX%redbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%redbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%bmsixcdx%LIBEXT%             del lib\%LIBPREFIX%bmsixcdx%LIBEXT%
 if exist lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%
@@ -239,6 +240,7 @@ if exist lib\%LIBPREFIX%sixcdx%LIBEXT%               del lib\%LIBPREFIX%sixcdx%L
 if exist lib\%LIBPREFIX%sixcdxmt%LIBEXT%             del lib\%LIBPREFIX%sixcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%tip%LIBEXT%                  del lib\%LIBPREFIX%tip%LIBEXT%
 if exist lib\%LIBPREFIX%tipmt%LIBEXT%                del lib\%LIBPREFIX%tipmt%LIBEXT%
+if exist lib\%LIBPREFIX%use_dll%LIBEXT%              del lib\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%LIBPREFIX%usrrdd%LIBEXT%               del lib\%LIBPREFIX%usrrdd%LIBEXT%
 if exist lib\%LIBPREFIX%usrrddmt%LIBEXT%             del lib\%LIBPREFIX%usrrddmt%LIBEXT%
 if exist lib\%LIBPREFIX%vm%LIBEXT%                   del lib\%LIBPREFIX%vm%LIBEXT%
@@ -275,6 +277,9 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%bmsixcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%bmsixcdx%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%bmsixcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%bmsixcdxmt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%redbfcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%redbfcdx%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%redbffpt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%redbffpt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%redbfcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%redbfcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%codepage%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%codepage%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%common%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%common%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%ct%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%ct%LIBEXT%
@@ -325,6 +330,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%tip%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%tipmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%usrrdd%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%usrrdd%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%usrrddmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%usrrddmt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%
