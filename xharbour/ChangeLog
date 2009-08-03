@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6525 2009/07/31 13:26:04 modalsist Exp $
+ * $Id: ChangeLog,v 1.6526 2009/08/01 17:10:02 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2009-08-03 08:44 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+  * source/ct/files.c
+    ! fixed declaration to compile under linux
+    
 2009-08-01 14:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils\hbmake\hbmake.prg
     * fix to parse "=" into /alternatename link flag properly, for PellesC v.5x and later.

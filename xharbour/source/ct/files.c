@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.19 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: files.c,v 1.20 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    #endif
 #endif
 
-DWORD hb_fsGetFileAttributes( char * szFile )
+ULONG hb_fsGetFileAttributes( char * szFile )
 {
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
@@ -231,17 +231,17 @@ DWORD hb_fsGetFileAttributes( char * szFile )
             iAttri =  _chmod(  szFile, 0  );
          #endif
 
-         return ( DWORD ) iAttri ;
+         return ( ULONG ) iAttri ;
       }
       else
       {
-         return ( DWORD ) fsOldFiles.ff_attrib;
+         return ( ULONG ) fsOldFiles.ff_attrib;
       }
       #endif
 
    #elif defined( HB_OS_WIN_32 )
    {
-      DWORD dAttr;
+      ULONG dAttr;
 
       if( szFile )
       {
@@ -252,11 +252,11 @@ DWORD hb_fsGetFileAttributes( char * szFile )
       {
          dAttr = Lastff32.dwFileAttributes;
       }
-      return ( DWORD ) dAttr ;
+      return ( ULONG ) dAttr ;
 
    }
    #else
-      return ( DWORD ) FA_ARCH ;
+      return ( ULONG ) FA_ARCH ;
    #endif
 }
 
