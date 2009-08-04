@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.1 2009/07/29 17:15:54 marchuet Exp $
+ * $Id: hbfilere.c,v 1.2 2009/07/29 22:18:23 marchuet Exp $
  */
 
 /*
@@ -726,31 +726,11 @@ static void filere_LockLarge( PUSERSTRU pUStru, BYTE* szData )
 
 static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
 {
-   //BYTE * ptr;
-   ULONG /*ulSize,*/ ulCount, ulRead;
+   ULONG ulCount, ulRead;
    HB_FHANDLE hFileHandle;
    HB_FOFFSET llOffset;
 
    // Reading params
-/*   
-   ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
-   if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
-   else
-      hFileHandle = 0;
-
-   ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 2, &ulSize );
-   if( ulSize )
-      sscanf( ( char * ) ptr, "%lu", &ulCount );
-   else
-      ulCount = 0;
-
-   ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 3, &ulSize );
-   if( ulSize )
-      sscanf( ( char * ) ptr, "%" PFHL "i", &llOffset );
-   else
-      llOffset = 0;
-      */
    sscanf( ( char * ) szData, "%p|%lu|%" PFHL "i|\r\n", &hFileHandle, &ulCount, &llOffset );
 
    if( ulCount )      
@@ -776,24 +756,10 @@ static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
 
 static void filere_ReadLarge( PUSERSTRU pUStru, BYTE* szData )
 {
-//   BYTE * ptr;
-   ULONG /*ulSize,*/ ulCount, ulRead;
+   ULONG ulCount, ulRead;
    HB_FHANDLE hFileHandle;
 
    /* Reading params */
-/*   
-   ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
-   if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
-   else
-      hFileHandle = 0;
-      
-   ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 2, &ulSize );
-   if( ulSize )
-      sscanf( ( char * ) ptr, "%lu", &ulCount );
-   else
-      ulCount = 0;
-*/      
    sscanf( ( char * ) szData, "%p|%lu|\r\n", &hFileHandle, &ulCount );
 
    /* Clear error */

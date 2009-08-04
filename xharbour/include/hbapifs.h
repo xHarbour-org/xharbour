@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.66 2009/05/25 14:37:59 marchuet Exp $
+ * $Id: hbapifs.h,v 1.67 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -351,12 +351,13 @@ typedef struct
  
 HB_EXPORT PHB_FILE   hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths,
                                         PHB_ITEM pError, BOOL fBufferLock );
-HB_EXPORT PHB_FILE   hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName );
-HB_EXPORT PHB_FILE   hb_fileNetCreateTempEx( BYTE * pszName,
+HB_EXPORT PHB_FILE   hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszFileName );
+HB_EXPORT PHB_FILE   hb_fileNetCreateTempEx( BYTE * pszFileName,
                                              const BYTE * pszDir,
                                              const BYTE * pszPrefix,
                                              const BYTE * pszExt,
                                              ULONG ulAttr );
+HB_EXPORT PHB_FILE   hb_fileNetGetFileToTemp( PHB_FILE pFile, BYTE * pszFileName );
 HB_EXPORT void       hb_fileNetClose( PHB_FILE pFile );
 HB_EXPORT BOOL       hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int iType );
 HB_EXPORT ULONG      hb_fileNetReadAt( PHB_FILE pFile, BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset );
@@ -368,15 +369,16 @@ HB_EXPORT BOOL       hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset );
 HB_EXPORT HB_FOFFSET hb_fileNetSize( PHB_FILE pFile );
 HB_EXPORT HB_FOFFSET hb_fileNetSeek( PHB_FILE pFile, LONG lOffset, USHORT uiFlags );
 HB_EXPORT HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags );
-HB_EXPORT BOOL       hb_fileNetDelete( BYTE * pFilename, USHORT uiRemote );
+HB_EXPORT BOOL       hb_fileNetDelete( BYTE * pszFilename, USHORT uiRemote );
 HB_EXPORT void       hb_fileNetCommit( PHB_FILE pFile );
 HB_EXPORT HB_FHANDLE hb_fileNetHandle( PHB_FILE pFile );
 HB_EXPORT BOOL       hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath );
 HB_EXPORT BOOL       hb_FileNetFile( BYTE * pFilename );
+HB_EXPORT BYTE *     hb_fileNetFileName( PHB_FILE pFile );
 HB_EXPORT PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAttr );
 HB_EXPORT BOOL       hb_FileNetFindNext( PHB_NETFFIND pffind );
 HB_EXPORT void       hb_FileNetFindClose( PHB_NETFFIND pffind );
-HB_EXPORT ULONG      hb_fileNetGetFileAttributes( BYTE * pFilename );
+HB_EXPORT ULONG      hb_fileNetGetFileAttributes( BYTE * pszFilename );
 HB_EXPORT void       hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 HB_EXPORT BOOL       hb_fileNetMkDir( BYTE * pPath );
 HB_EXPORT BOOL       hb_fileNetRmDir( BYTE * pPath );

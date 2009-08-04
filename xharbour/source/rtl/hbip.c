@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.2 2009/07/29 17:15:54 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.3 2009/07/30 16:15:16 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -14,6 +14,9 @@
  *
  * Copyright 2008 Alexander S. Kresin <alex / at / belacy.belgorod.su>
  * updated for Leto db server
+ *
+ * Copyright 2009 Miguel Angel Marchuet Frutos <soporte-2@dsgsoftware.com>
+ * updated for remote file server
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,6 +157,8 @@ static void hb_ipLinuxSigusrHandle( int sig )
    #define SOCKOPT4  void*
 #endif
 
+#define BUFFER_SIZE 65536 //8192
+
 static volatile int s_iSessions = 0;
 static char *errorDesc;
 static int errorCode;
@@ -215,6 +220,7 @@ void hb_ipSetBufSize( HB_SOCKET_T hSocket, int iBufSend, int iBufRecv )
            setsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_RCVBUF, (char const *) (SOCKOPT4) &value, (int) sizeof( value ) );
        }
    }
+   getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_RCVBUF, (char*) (SOCKOPT4) &value, (int*) len );
 }
 
 int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
@@ -466,7 +472,6 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
    int iLen = sizeof( iBufferMax );
 
    getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &iBufferMax, (int*) &iLen );
-   iBufferMax = iBufferMax / (int) 2;
    
    iSent = iLen = 0;
 
@@ -476,24 +481,25 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
    {
       iBufferLen = ( iBufferMax > iSend - iSent )? iSend - iSent : iBufferMax;
 
-      iLen = 0;
       if( hb_selectWriteSocket( hSocket, timeout ) )
          iLen = send( hSocket, szBuffer + iSent, iBufferLen, MSG_NOSIGNAL );
-
-      if( iLen > 0 )
-      {
-         iSent += iLen;
-      }
-      else if( iLen == 0 )
-      {
-         HB_SOCKET_SET_ERROR2( -1 , "Timeout" );
-         break;
-      }
       else
+         iLen = 0;
+
+      if( iLen <= 0 )
       {
-         HB_SOCKET_SET_ERROR();
-         break;
+         if( iLen == 0 )
+         {
+            HB_SOCKET_SET_ERROR2( -1 , "Timeout" );
+         }
+         else
+         {
+            HB_SOCKET_SET_ERROR();
+         }
+         break;         
       }
+
+      iSent += iLen;
    }
    if( iLen > 0 )
    {
@@ -539,7 +545,7 @@ HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
          /* Set internal socket send buffer to 64k,
          * this should fix the speed problems some users have reported
          */
-         hb_ipSetBufSize( hSocket, 65537 /*16384*/, 65537 /*16384*/ );
+         hb_ipSetBufSize( hSocket, BUFFER_SIZE, BUFFER_SIZE );
 
          if( ! hb_socketConnect( hSocket, &remote, timeout ) )
             hSocket = ( HB_SOCKET_T ) -1;
@@ -667,7 +673,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
       /* Set internal socket send buffer to 64k,
       * this should fix the speed problems some users have reported
       */
-      hb_ipSetBufSize( incoming, 65537 /*16384*/, 65537 /*16384*/ );
+      hb_ipSetBufSize( hSocket, BUFFER_SIZE, BUFFER_SIZE );
       return incoming;
    }
 }

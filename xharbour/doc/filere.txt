@@ -1,0 +1,82 @@
+INSTALL THE SERVER
+=====================================================================
+
+    steps to install:
+      1) copy the server bin\hbfilere.exe at root data folder, from bin directory
+      2) execute hbfilere.exe -i // to install the service and start
+      use SET DEFAULT TO <ROOTDATAPATH> and SET PATH TO <OTHERDATAPATH> to 
+      indicate how the server see the files
+      bin/hbfilere.exe -s // to start the service
+      bin/hbfilere.exe -k // to kill the service
+      bin/hbfilere.exe -u // to kill and uninstall the service
+
+PRG level API for Remote File System
+=====================================================================
+
+NET_COPYTO( <cLocalFile>, <cRemoteFile>|<cRemoteDevice> )
+NET_COPYFROM( <cRemoteFile>, <cLocalFile>|<cLocalDevice> )
+NET_COPYFILE( <cRemoteFile>, <cRemoteFile>|<cRemoteDevice> )
+
+NET_FRENAME( <cRemoteOldFile>, <cRemoteNewFile> ) --> nSuccess
+NET_FERASE( <cRemoteFile> ) --> nSuccess
+
+NET_MAKEDIR( <cRemoteDirectory> ) --> nOSError
+NET_DIRREMOVE( <cRemoteDirectory> ) --> nOSError
+NET_FILEATTR( [<cRemoteFileName>] ) --> nAttributes
+NET_DIRECTORY( <cRemoteDirSpec>, [<cAttributes>] ) --> aDirectory
+
+NET_OPENCONNECTION( <cIPServer|cNameServer>, <nPort> ) -> pSocket
+NET_CLOSECONNECTION( pSocket )
+
+NET_SETBUFFERSIZE( nBufferSize ) -> nBufferSize
+// Some net cards need a specific size to optimize speed. try with
+// aBuffSizes := {1024,2048,4096,8192,16384,32768,65535}
+// We've detected that some operating systems with 100Mb Cards runs better with 8Kb of buffer
+
+C level API
+=====================================================================
+PHB_FILE   hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths,
+                                        PHB_ITEM pError, BOOL fBufferLock );
+PHB_FILE   hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszFileName );
+PHB_FILE   hb_fileNetCreateTempEx( BYTE * pszFileName,
+                                             const BYTE * pszDir,
+                                             const BYTE * pszPrefix,
+                                             const BYTE * pszExt,
+                                             ULONG ulAttr );
+PHB_FILE   hb_fileNetGetFileToTemp( PHB_FILE pFile, BYTE * pszFileName );
+void       hb_fileNetClose( PHB_FILE pFile );
+BOOL       hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int iType )
+ULONG      hb_fileNetReadAt( PHB_FILE pFile, BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset )
+ULONG      hb_fileNetReadLarge( PHB_FILE pFile, BYTE * buffer, ULONG ulSize )
+ULONG      hb_fileNetWriteAt( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset )
+USHORT     hb_fileNetWrite( PHB_FILE pFile, const BYTE * pBuffer, USHORT uiCount )
+ULONG      hb_fileNetWriteLarge( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize )
+BOOL       hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
+HB_FOFFSET hb_fileNetSize( PHB_FILE pFile )
+HB_FOFFSET hb_fileNetSeek( PHB_FILE pFile, LONG lOffset, USHORT uiFlags )
+HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags )
+BOOL       hb_fileNetDelete( BYTE * pszFilename, USHORT uiRemote )
+void       hb_fileNetCommit( PHB_FILE pFile )
+HB_FHANDLE hb_fileNetHandle( PHB_FILE pFile )
+BOOL       hb_FileNetExists( BYTE * pszFileName, BYTE * pRetPath )
+BOOL       hb_FileNetFile( BYTE * pFilename )
+BYTE *     hb_fileNetFileName( PHB_FILE pFile )
+PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAttr )
+BOOL       hb_FileNetFindNext( PHB_NETFFIND pffind )
+void       hb_FileNetFindClose( PHB_NETFFIND pffind )
+ULONG      hb_fileNetGetFileAttributes( BYTE * pszFileName )
+void       hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
+BOOL       hb_fileNetMkDir( BYTE * pPath )
+BOOL       hb_fileNetRmDir( BYTE * pPath )
+USHORT     hb_fileNetRemote( PHB_FILE pFile )
+
+TODO:
+
+NET_FOPEN
+NET_FSEEK
+NET_FREAD
+NET_FWRITE
+NET_FREADAT
+NET_FWRITEAT
+NET_FLOCK
+NET_FCLOSE

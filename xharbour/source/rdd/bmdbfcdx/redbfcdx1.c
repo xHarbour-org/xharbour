@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.3 2009/07/29 22:18:23 marchuet Exp $
+ * $Id: redbfcdx1.c,v 1.4 2009/07/30 08:59:16 marchuet Exp $
  */
 
 /*
@@ -8754,6 +8754,12 @@ static HB_ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
     if( pArea->dbfi.fOptimized )
     {
+        BYTE pszFileName[ HB_PATH_MAX ];
+        PHB_FILE pDataFile = pArea->pDataFile;
+        
+        /* Get dbf file to temp buffer */
+        pArea->pDataFile = hb_fileNetGetFileToTemp( pDataFile, pszFileName );
+            
         pArea->dbfi.lpvCargo = hb_xgrab( sizeof( BM_FILTER ) );
         memset( pArea->dbfi.lpvCargo, 0, sizeof( BM_FILTER ) );
 
@@ -8767,8 +8773,14 @@ static HB_ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
         if( pTag ) /* with active index */
         {
+            BYTE pszIndexFileName[ HB_PATH_MAX ];
+            PHB_FILE pIndexFile = pTag->pIndex->pFile;
+        
             if( FAST_GOCOLD( ( AREAP ) pArea ) == HB_FAILURE )
                return HB_FAILURE;
+
+            /* Get index file to temp buffer */
+            pTag->pIndex->pFile = hb_fileNetGetFileToTemp( pTag->pIndex->pFile, pszIndexFileName );
 
             hb_cdxIndexLockRead( pTag->pIndex );
             hb_cdxTagRefreshScope( pTag );
@@ -8789,6 +8801,11 @@ static HB_ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
             hb_cdxIndexUnLockRead( pTag->pIndex );
             pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_RAWCNT );
             CURKEY_SETLOGCNT( pTag, ulLogKeyCount );
+
+            /* restore index */            
+            hb_fileNetClose( pTag->pIndex->pFile );
+            hb_fsDelete( pszIndexFileName );
+            pTag->pIndex->pFile = pIndexFile;
         }
         else
         {
@@ -8802,6 +8819,12 @@ static HB_ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
             }
         }
         pArea->dbfi.fFilter = TRUE;
+        
+        /* restore dbf */            
+        hb_fileNetClose( pArea->pDataFile );
+        hb_fsDelete( pszFileName );
+        pArea->pDataFile = pDataFile;
+        
     }
 
     return HB_SUCCESS;

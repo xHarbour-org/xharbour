@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.3 2009/07/23 10:27:49 marchuet Exp $
+ * $Id: filenet.c,v 1.4 2009/07/29 17:15:54 marchuet Exp $
  */
 
 /*
@@ -120,19 +120,21 @@ static HB_SOCKET_T hSocket;
 static char * szBuffer   = NULL;
 static ULONG  lBufferLen = 0;
 static const char * szOk       = "+1";
+static int sBufferSize = 32767;
 
-#define BUFFER_SIZE 32767 
+#define BUFFER_SIZE sBufferSize 
 
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 
-static PHB_FILE hb_fileFind( BYTE * pFileName )
+static PHB_FILE hb_fileFind( BYTE * pFileName, HB_SOCKET_T hSocketLoc )
 {
    if( s_openFiles && pFileName )
    {
       PHB_FILE pFile = s_openFiles;
       do
       {
-         if( strncmp( ( const char * ) pFile->pFileName, ( char * ) pFileName, strlen( ( const char * ) pFileName ) ) == 0 )
+         if( hSocketLoc == pFile->hSocket &&
+             strncmp( ( const char * ) pFile->pFileName, ( char * ) pFileName, strlen( ( const char * ) pFileName ) ) == 0 )
             return pFile;
          pFile = pFile->pNext;
       }
@@ -141,14 +143,14 @@ static PHB_FILE hb_fileFind( BYTE * pFileName )
    return NULL;
 }
 
-static PHB_FILE hb_fileFindByHandle( HB_FHANDLE hFile )
+static PHB_FILE hb_fileFindByHandle( HB_FHANDLE hFile, HB_SOCKET_T hSocketLoc )
 {
    if( s_openFiles && hFile )
    {
       PHB_FILE pFile = s_openFiles;
       do
       {
-         if( pFile->hFile == hFile )
+         if( hSocketLoc == pFile->hSocket && pFile->hFile == hFile )
             return pFile;
          pFile = pFile->pNext;
       }
@@ -159,7 +161,7 @@ static PHB_FILE hb_fileFindByHandle( HB_FHANDLE hFile )
 
 static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock, BOOL fRemote, BYTE * pFileName )
 {
-   PHB_FILE pFile = ( pFileName ? hb_fileFindByHandle( hFile ) : NULL );
+   PHB_FILE pFile = ( pFileName && fRemote ? hb_fileFindByHandle( hFile, fRemote ? hSocket : 0 ) : NULL );
 
    if( !pFile )
    {
@@ -435,10 +437,20 @@ static void hb_NetOpenConnection( char * szAddr, int iPort )
 
 static long int hb_NetDataSingleSendRecv( HB_SOCKET_T hCurSocket, char * szData, ULONG ulLen )
 {
+//   static ulmax = 0;
 #if defined(_DBG_)         
    OutputDebugString( "---------1---------2---------3---------4" );
    OutputDebugString( szData + HB_LENGTH_ACK );         
-#endif   
+#endif
+/*
+   if( ulLen > ulmax )
+   {
+      char bb[20];
+      ulmax = ulLen;
+      sprintf( bb, "%lu\r\n", ulmax );
+      OutputDebugString( bb );
+   }
+*/   
    if ( hb_ipSend( hCurSocket, szData, ulLen, -1 ) != ( int ) ulLen )
       return 0;
 
@@ -703,7 +715,7 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
    fShared = ( uiExFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0;
    pszFile = hb_NetExtName( pFilename, pDefExt, uiExFlags, pPaths );
 
-   pFile = hb_fileFind( pszFile );
+   pFile = hb_fileFind( pszFile, hSocket );
    if( pFile )
    {
       if( !fShared || ! pFile->shared || ( uiExFlags & FXO_TRUNCATE ) != 0 )
@@ -1248,6 +1260,11 @@ HB_FHANDLE hb_fileNetHandle( PHB_FILE pFile )
 {
    return pFile ? pFile->hFile : FS_ERROR;
 }
+
+BYTE * hb_fileNetFileName( PHB_FILE pFile )
+{
+   return pFile->pFileName;
+}   
 
 USHORT hb_fileNetRemote( PHB_FILE pFile )
 {
@@ -2059,6 +2076,30 @@ HB_FUNC( NET_COPYFILE )
    }
 }
 
+PHB_FILE hb_fileNetGetFileToTemp( PHB_FILE pDataFile, BYTE * pszFileName )
+{
+   PHB_FILE pDataTemp;
+   BYTE * buffer;
+   ULONG ulRead;
+        
+   pDataTemp = hb_fileNetCreateTempEx( pszFileName, NULL, NULL, NULL, FC_TEMPORARY );
+   buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+   hb_fileNetSeekLarge( pDataFile, 0, SEEK_SET );
+   while( ( ulRead = hb_fileNetReadLarge( pDataFile, buffer, BUFFER_SIZE ) ) != 0 )
+   {
+      while( hb_fileNetWriteLarge( pDataTemp, buffer, ulRead ) != ulRead )
+      {
+         USHORT uiAction = hb_errRT_BASE_Ext1( EG_WRITE, 2016, NULL, ( char * ) hb_fileNetFileName( pDataFile ), hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
+         if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+         {
+            break;
+         }
+      }
+   }
+   hb_xfree( buffer );
+   return pDataTemp;
+}        
+
 HB_FUNC( NET_FRENAME )
 {
    USHORT uiError = 3;
@@ -2136,6 +2177,14 @@ HB_FUNC( NET_OPENCONNECTION )
 HB_FUNC( NET_CLOSECONNECTION )
 {
    hb_NetCloseConnection( ( HB_SOCKET_T ) hb_parptr( 1 ) );
+}
+
+HB_FUNC( NET_SETBUFFERSIZE )
+{
+   if( hb_parni( 1 ) )
+      sBufferSize = hb_parni( 1 );
+      
+   hb_retni( sBufferSize );
 }
 
 static void hb_fileNet_init( void * cargo )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6526 2009/08/01 17:10:02 modalsist Exp $
+ * $Id: ChangeLog,v 1.6527 2009/08/03 11:47:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-04 11:46 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+  * include\hbapifs.h
+  * source\rdd\bmdbfcdx\redbfcdx1.c
+  * source\rtl\filenet.c
+  * source\rtl\hbip.c
+  * utils\hbfilere\hbfilere.c
+    + Added local buffer to increase speed on SET OPTIMIZE ON filters.
+    + Added NET_SETBUFFERSIZE( nBufferSize ) -> nBufferSize to change size of buffer
+      on client machine.
+    ! Fixed handle file buffers, it was merging local and remote files with the same
+      name, path and handle.
+  + doc\filere.txt
+    + Added File Remote API documentation.
+
 2009-08-03 08:44 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
   * source/ct/files.c
     ! fixed declaration to compile under linux
