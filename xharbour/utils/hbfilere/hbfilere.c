@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.2 2009/07/29 22:18:23 marchuet Exp $
+ * $Id: hbfilere.c,v 1.3 2009/08/04 09:50:23 marchuet Exp $
  */
 
 /*
@@ -85,7 +85,12 @@ typedef struct _HB_FILE * PHB_FILE;
 void ServiceExecution( void );
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 
-VOID SvcDebugOut(LPSTR String, void * Status);
+#if defined( HB_OS_WIN_32 )
+void SvcDebugOut( LPSTR String, void * Status );
+#else
+#define DWORD ULONG
+void SvcDebugOut( char * String, void * Status ):
+#endif
 
 static PUSERSTRU s_users = NULL;
 static USHORT uiUsersMax = 0;         // Higher index of user structure, which was busy 
@@ -103,11 +108,14 @@ static BYTE pPaths[HB_PATH_MAX];
 static char szDataACK[HB_LENGTH_ACK];
 
 static HB_SOCKET_T  hSocketMain;       // Initial server socket 
+#if defined( HB_OS_WIN_32 )
 static HANDLE       hProcessHeap = 0;
+#endif
 int                 iServerPort = 2813;
 
 #define		MAX_NUM_OF_PROCESS		1
 /** Window Service **/
+#if defined( HB_OS_WIN_32 )
 VOID ServiceMainProc();
 VOID Install( char* pPath, char* pName, char* pDescription );
 VOID UnInstall( char* pName );
@@ -132,12 +140,15 @@ SERVICE_TABLE_ENTRY	lpServiceStartTable[] =
 SERVICE_STATUS_HANDLE   hServiceStatusHandle; 
 SERVICE_STATUS          ServiceStatus; 
 
+#endif
+
 void main( int argc, char * argv[] )
 { 
+#if defined( HB_OS_WIN_32 )   
    char pModuleFile[501];
    PHB_FNAME pFilepath;
    DWORD dwSize = GetModuleFileName( NULL, pModuleFile, 500 );   
-      
+
    hProcessHeap = GetProcessHeap();   
 	
 	/* initialize variables for .exe file name */
@@ -153,7 +164,7 @@ void main( int argc, char * argv[] )
    
 	if( argc >= 2 )
 		strcpy( lpCmdLineData, argv[1] );
-
+      
 	strcpy( pServiceName, "File_Server" );
 
 	InitializeCriticalSection( &myCS );
@@ -174,8 +185,12 @@ void main( int argc, char * argv[] )
 		RunService( pServiceName );
 	else
 		ExecuteSubProcess();
+#else      
+   ServiceExecution();      
+#endif   
 }
 
+#if defined( HB_OS_WIN_32 )
 VOID Install( char* pPath, char* pName, char* pDescription )
 {  
 	SC_HANDLE schSCManager = OpenSCManager( NULL, NULL, SC_MANAGER_CREATE_SERVICE ); 
@@ -400,6 +415,7 @@ VOID WINAPI ServiceHandler( DWORD fdwControl )
    } 
 }
 
+
 /* Memory functions */
 
 static void * fl_alloc( ULONG ulSize )
@@ -420,7 +436,26 @@ static void fl_free( void * pHeapMem )
 {
    HeapFree( hProcessHeap, 0, pHeapMem );
 } 
+#else
+static void * fl_alloc( ULONG ulSize )
+{
+   return ( void * ) malloc( ulSize );
+} 
 
+static void * fl_realloc( void * pHeapMem, ULONG ulSize )
+{
+   if( pHeapMem )
+      pHeapMem = ( void * ) realloc( pHeapMem, ulSize );
+   else
+      pHeapMem = ( void * ) malloc( ulSize );
+   return pHeapMem;
+} 
+
+static void fl_free( void * pHeapMem )
+{
+   free( pHeapMem );
+} 
+#endif   
 /* File buffer functions */
 
 static PHB_FILE hb_fileFind( PUSERSTRU pUStru, BYTE * pFileName )
@@ -1633,8 +1668,13 @@ void ServiceExecution( void )
       return;
    hb_ip_rfd_set( hSocketMain );
 
+#if defined( HB_OS_WIN_32 )
    while( ServiceStatus.dwCurrentState == SERVICE_RUNNING || ServiceStatus.dwCurrentState == SERVICE_PAUSED )
+#else
+   for(;;)
+#endif   
    {
+#if defined( HB_OS_WIN_32 )   
       if( ServiceStatus.dwCurrentState == SERVICE_PAUSED )
       {
          #if defined( HB_OS_WIN_32 )
@@ -1644,6 +1684,7 @@ void ServiceExecution( void )
          #endif
          continue;
       }
+#endif      
       if( hb_ip_rfd_select( 1 ) > 0 )
       {
          if( hb_ip_rfd_isset( hSocketMain ) )
@@ -1675,9 +1716,16 @@ void ServiceExecution( void )
 
 }
 
-VOID SvcDebugOut( LPSTR String, void * Status )
+#if defined( HB_OS_WIN_32 )
+void SvcDebugOut( LPSTR String, void * Status )
 {
    char pBuffer[500];
    sprintf( pBuffer, String, Status );
    OutputDebugString( pBuffer );
 }
+#else
+void SvcDebugOut( char * String, void * Status )
+{
+   printf( pBuffer, String, Status );
+}
+#endif

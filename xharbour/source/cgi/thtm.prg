@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.9 2009/03/07 13:45:33 likewolf Exp $
+ * $Id: thtm.prg,v 1.10 2009/07/26 17:01:48 lculik Exp $
  */
 
 /*
@@ -267,7 +267,7 @@ METHOD cgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
                   nRefresh, cRefreshURL, cStyleScr, ;
                   lNocache, NOF, nMarginTop, nMarginHeight, ;
                   nMarginWidth, nMarginLeft ,lCgi,cFile) CLASS THtml
-              
+   (lCgi) /* unused variable */
                   return ::new( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
                   BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
                   onLoad, onUnload, ;
