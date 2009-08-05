@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6528 2009/08/04 09:50:23 marchuet Exp $
+ * $Id: ChangeLog,v 1.6529 2009/08/05 10:55:53 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,9 +12,9 @@
   * source\rtl\filenet.c
     ! fixed and optimized reuse file handle under windows 2008 server platforms working as client.
   * source\rtl\hbip.c
-    % minor optimizacions.
+    % minor optimizations.
   * tests\netrdd.prg
-    * Added test to get best buffer size for tcp transmisions.
+    * Added test to get best buffer size for tcp transmissions.
 
 2009-08-04 11:46 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
   * include\hbapifs.h
