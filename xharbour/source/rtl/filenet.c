@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.4 2009/07/29 17:15:54 marchuet Exp $
+ * $Id: filenet.c,v 1.5 2009/08/04 09:50:23 marchuet Exp $
  */
 
 /*
@@ -437,20 +437,10 @@ static void hb_NetOpenConnection( char * szAddr, int iPort )
 
 static long int hb_NetDataSingleSendRecv( HB_SOCKET_T hCurSocket, char * szData, ULONG ulLen )
 {
-//   static ulmax = 0;
 #if defined(_DBG_)         
    OutputDebugString( "---------1---------2---------3---------4" );
    OutputDebugString( szData + HB_LENGTH_ACK );         
 #endif
-/*
-   if( ulLen > ulmax )
-   {
-      char bb[20];
-      ulmax = ulLen;
-      sprintf( bb, "%lu\r\n", ulmax );
-      OutputDebugString( bb );
-   }
-*/   
    if ( hb_ipSend( hCurSocket, szData, ulLen, -1 ) != ( int ) ulLen )
       return 0;
 
@@ -710,7 +700,6 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
    BOOL fShared;
    HB_FHANDLE hFile;
    BYTE * pszFile;
-   BOOL fResult;
 
    fShared = ( uiExFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0;
    pszFile = hb_NetExtName( pFilename, pDefExt, uiExFlags, pPaths );
@@ -719,17 +708,13 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
    if( pFile )
    {
       if( !fShared || ! pFile->shared || ( uiExFlags & FXO_TRUNCATE ) != 0 )
-         fResult = FALSE;
-      else
-         pFile->used++;
-   }
-  
-   if( pFile )
-   {
-      if( !fResult )
       {
          hb_fsSetError( ( uiExFlags & FXO_TRUNCATE ) ? 5 : 32 );
          pFile = NULL;
+      }         
+      else
+      {
+         pFile->used++;
       }
    }
    else   

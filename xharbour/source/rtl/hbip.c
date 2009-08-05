@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.3 2009/07/30 16:15:16 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.4 2009/08/04 09:50:23 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -80,7 +80,7 @@
    #define HB_SOCKET_T SOCKET
    #include <winsock2.h>
    #include <windows.h>
-
+   
    #define HB_IP_CLOSE( x )    closesocket( x )
 #else
 
@@ -464,7 +464,21 @@ int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen )
 
    return iLen ;
 }
-
+/*
+#if defined( HB_OS_WIN_32 )
+int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
+{
+   LPTRANSMIT_PACKETS_ELEMENT lpPacketArray;
+   lpPacketArray->dwElFlags = TP_ELEMENT_MEMORY;
+   lpPacketArray->cLength = 0;
+   lpPacketArray->pBuffer = szBuffer;
+   if( TransmitPackets( hSocket, lpPacketArray, 1, iSend, TF_USE_DEFAULT_WORKER ) )
+      return iSend;
+   else
+      return -1;
+}
+#else
+*/
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
 {
    int iSent, iBufferLen;
@@ -510,6 +524,9 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
       return -1;
    }
 }
+/*
+#endif
+*/
 
 HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
 {

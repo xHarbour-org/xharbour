@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6527 2009/08/03 11:47:21 lculik Exp $
+ * $Id: ChangeLog,v 1.6528 2009/08/04 09:50:23 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-05 12:57 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
+  * source\rtl\filenet.c
+    ! fixed and optimized reuse file handle under windows 2008 server platforms working as client.
+  * source\rtl\hbip.c
+    % minor optimizacions.
+  * tests\netrdd.prg
+    * Added test to get best buffer size for tcp transmisions.
 
 2009-08-04 11:46 UTC+0100 Miguel Angel Marchuet <soporte-2@dsgsoftware.com>
   * include\hbapifs.h

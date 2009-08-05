@@ -4,6 +4,7 @@ REQUEST DBFCDX,REDBFCDX,BMDBFCDX
 
 FUNCTION MAIN( cRdd, cIP )
     LOCAL n,t,m,p,J, pConn
+    LOCAL aBuffSize, nBuffSize, nNewTime, nTime, nBestBuffSize
 
     IF Empty( cRdd )
         cRdd := "REDBFCDX"
@@ -53,6 +54,28 @@ FUNCTION MAIN( cRdd, cIP )
     ELSE
         INDEX ON FIELD->A1 TAG tg1 TO ("TMPTEST.CDX")
     ENDIF
+    
+    // Determine best buffer size for transmisions
+    IF cRdd == 'REDBFCDX'
+       ? " "
+       aBuffSize := { 1024, 2048, 4096, 8192, 16384, 32768, 63488 }
+       FOR EACH nBuffSize IN aBuffSize
+          Net_SetBufferSize( nBuffSize )
+          p := seconds()
+          NET_COPYFROM( "TMPTEST.DBF", "TMPTEST.DBF" )
+          nNewTime := seconds() - p
+          IF Empty( nTime ) .OR. nNewTime <= nTime
+             nTime := nNewTime
+             nBestBuffSize := nBuffSize
+          ENDIF
+          ? " with buffer " + AllTrim( Str( nBuffSize / 1024 ) ) + " Kb " + AllTrim( Str( nNewTime ) ) + " seconds"
+       NEXT
+       ? " "
+       ? "Established " + AllTrim( Str( nBestBuffSize / 1024 ) ) + " Kb of buffer"
+       Net_SetBufferSize( nBestBuffSize )
+       ? " "
+    ENDIF
+    
 
     ? "Index active : " + ORDKEY()
     ? "Filtering by : " + "RecNo() > 100 .AND. RecNo() < 200"
