@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.4 2009/07/30 08:59:16 marchuet Exp $
+ * $Id: redbfcdx1.c,v 1.5 2009/08/04 09:50:23 marchuet Exp $
  */
 
 /*
@@ -109,7 +109,7 @@
 #endif
 
 /*
- * Tag->fRePos = TURE means that rootPage->...->childLeafPage path is
+ * Tag->fRePos = TRUE means that rootPage->...->childLeafPage path is
  * bad and has to be reloaded
  * CurKey->rec == 0 means that there is no correct CurKey
  */
@@ -1201,6 +1201,7 @@ static void hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
    }
    ulFree = HB_GET_LE_UINT32( &byBuf[0] );
    ulVer = HB_GET_BE_UINT32( &byBuf[4] );
+
    if( !pIndex->fShared )
       pIndex->ulVersion = pIndex->freePage;
    else if( ulVer != pIndex->ulVersion || ulFree != pIndex->freePage )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.3 2009/08/04 09:50:23 marchuet Exp $
+ * $Id: hbfilere.c,v 1.4 2009/08/05 20:11:12 marchuet Exp $
  */
 
 /*
@@ -73,6 +73,19 @@ typedef struct _HB_FILE * PHB_FILE;
 #endif
 #include "sys/stat.h"
 
+#if !defined( HB_OS_WIN_32 )
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <string.h>
+#include <assert.h>
+#include <signal.h>
+#endif
+
 /*
 #define MY_DBG_
 #define MY_DBG_2
@@ -114,8 +127,8 @@ static HANDLE       hProcessHeap = 0;
 int                 iServerPort = 2813;
 
 #define		MAX_NUM_OF_PROCESS		1
-/** Window Service **/
 #if defined( HB_OS_WIN_32 )
+/** Window Service **/
 VOID ServiceMainProc();
 VOID Install( char* pPath, char* pName, char* pDescription );
 VOID UnInstall( char* pName );
@@ -139,7 +152,12 @@ SERVICE_TABLE_ENTRY	lpServiceStartTable[] =
 
 SERVICE_STATUS_HANDLE   hServiceStatusHandle; 
 SERVICE_STATUS          ServiceStatus; 
-
+#else
+/** Linux daemon **/
+static int              ServiceStatus;
+#define SERVICE_STOPPED 1
+#define SERVICE_PAUSED  2
+#define SERVICE_RUNNING 3
 #endif
 
 void main( int argc, char * argv[] )
@@ -185,8 +203,42 @@ void main( int argc, char * argv[] )
 		RunService( pServiceName );
 	else
 		ExecuteSubProcess();
-#else      
-   ServiceExecution();      
+#else
+   /* Our process ID and Session ID */
+   pid_t pid, sid;
+      
+   // Setup signal handling before we start
+   signal( SIGHUP, signal_handler );
+   signal( SIGTERM, signal_handler );
+   signal( SIGINT, signal_handler );
+   signal( SIGQUIT, signal_handler );
+   
+   /* Fork off the parent process */
+   pid = fork();
+   if (pid < 0) {
+      exit(EXIT_FAILURE);
+   }
+   /* If we got a good PID, then
+      we can exit the parent process. */
+   if (pid > 0) {
+      exit(EXIT_SUCCESS);
+   }
+
+   /* Change the file mode mask */
+   umask(0);
+
+   /* Create a new SID for the child process */
+   sid = setsid();
+   if (sid < 0) {
+      /* Log the failure */
+      exit(EXIT_FAILURE);
+   }
+
+   ServiceStatus = SERVICE_RUNNING;
+   ServiceExecution();
+
+   exit(0);
+   
 #endif   
 }
 
@@ -415,7 +467,6 @@ VOID WINAPI ServiceHandler( DWORD fdwControl )
    } 
 }
 
-
 /* Memory functions */
 
 static void * fl_alloc( ULONG ulSize )
@@ -437,6 +488,21 @@ static void fl_free( void * pHeapMem )
    HeapFree( hProcessHeap, 0, pHeapMem );
 } 
 #else
+
+void signal_handler(int sig) {
+ 
+    switch(sig) {
+        case SIGHUP:
+        case SIGINT:            
+        case SIGTERM:
+        case SIGQUIT:        
+			   ServiceStatus = SERVICE_STOPPED;         
+            break;
+    }
+}
+
+/* Memory functions */
+
 static void * fl_alloc( ULONG ulSize )
 {
    return ( void * ) malloc( ulSize );
@@ -1014,7 +1080,7 @@ static void filere_Commit( PUSERSTRU pUStru, BYTE* szData )
 
    /* Clear error */
    hb_fsSetError( 0 );
-     
+
    /* hb_fsCommit( pFile->hFile ) */
    hb_fsCommit( hFileHandle );
    
@@ -1671,11 +1737,14 @@ void ServiceExecution( void )
 #if defined( HB_OS_WIN_32 )
    while( ServiceStatus.dwCurrentState == SERVICE_RUNNING || ServiceStatus.dwCurrentState == SERVICE_PAUSED )
 #else
-   for(;;)
+   while( ServiceStatus == SERVICE_RUNNING || ServiceStatus == SERVICE_PAUSED )
 #endif   
    {
 #if defined( HB_OS_WIN_32 )   
       if( ServiceStatus.dwCurrentState == SERVICE_PAUSED )
+#else      
+      if( ServiceStatus == SERVICE_PAUSED )
+#endif      
       {
          #if defined( HB_OS_WIN_32 )
          Sleep( 0 );
@@ -1684,7 +1753,7 @@ void ServiceExecution( void )
          #endif
          continue;
       }
-#endif      
+
       if( hb_ip_rfd_select( 1 ) > 0 )
       {
          if( hb_ip_rfd_isset( hSocketMain ) )
