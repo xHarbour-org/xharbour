@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.4 2009/08/05 20:11:12 marchuet Exp $
+ * $Id: hbfilere.c,v 1.5 2009/08/06 16:08:58 marchuet Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 void SvcDebugOut( LPSTR String, void * Status );
 #else
 #define DWORD ULONG
-void SvcDebugOut( char * String, void * Status ):
+void SvcDebugOut( char * String, void * Status );
 #endif
 
 static PUSERSTRU s_users = NULL;
@@ -154,6 +154,8 @@ SERVICE_STATUS_HANDLE   hServiceStatusHandle;
 SERVICE_STATUS          ServiceStatus; 
 #else
 /** Linux daemon **/
+void signal_handler( int sig );
+
 static int              ServiceStatus;
 #define SERVICE_STOPPED 1
 #define SERVICE_PAUSED  2
@@ -738,7 +740,7 @@ static void filere_ExtOpen( PUSERSTRU pUStru, BYTE * szData )
       pUStru->ulBufAnswerLen = 35 + HB_LENGTH_ACK;
       pUStru->pBufAnswer = ( BYTE * ) fl_realloc( pUStru->pBufAnswer, pUStru->ulBufAnswerLen );
    }
-   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|\r\n", hFileHandle, hb_fsError() );
+   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|\r\n", ( void * ) hFileHandle, hb_fsError() );
    HB_PUT_BE_UINT32( pUStru->pBufAnswer, ulSize );
    filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulSize + HB_LENGTH_ACK );
 }
@@ -752,7 +754,7 @@ static void filere_Close( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = ( BYTE * ) hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p", ( void ** )  &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -797,7 +799,7 @@ static void filere_LockLarge( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
       
@@ -832,7 +834,7 @@ static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
    HB_FOFFSET llOffset;
 
    // Reading params
-   sscanf( ( char * ) szData, "%p|%lu|%" PFHL "i|\r\n", &hFileHandle, &ulCount, &llOffset );
+   sscanf( ( char * ) szData, "%p|%lu|%" PFHL "i|\r\n", ( void ** ) &hFileHandle, &ulCount, &llOffset );
 
    if( ulCount )      
    {
@@ -861,7 +863,7 @@ static void filere_ReadLarge( PUSERSTRU pUStru, BYTE* szData )
    HB_FHANDLE hFileHandle;
 
    /* Reading params */
-   sscanf( ( char * ) szData, "%p|%lu|\r\n", &hFileHandle, &ulCount );
+   sscanf( ( char * ) szData, "%p|%lu|\r\n", ( void ** ) &hFileHandle, &ulCount );
 
    /* Clear error */
    hb_fsSetError( 0 );
@@ -897,7 +899,7 @@ static void filere_WriteAt( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -938,7 +940,7 @@ static void filere_WriteLarge( PUSERSTRU pUStru, BYTE * szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p|", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p|", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -974,7 +976,7 @@ static void filere_Write( PUSERSTRU pUStru, BYTE * szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p|", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p|", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -1010,7 +1012,7 @@ static void filere_TruncAt( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -1038,7 +1040,7 @@ static void filere_SeekLarge( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%p", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
    
@@ -1074,7 +1076,7 @@ static void filere_Commit( PUSERSTRU pUStru, BYTE* szData )
    /* Reading params */
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulLen );
    if( ulLen )
-      sscanf( ( char * ) ptr, "%p|", &hFileHandle );
+      sscanf( ( char * ) ptr, "%p|", ( void ** ) &hFileHandle );
    else
       hFileHandle = 0;
 
@@ -1795,6 +1797,6 @@ void SvcDebugOut( LPSTR String, void * Status )
 #else
 void SvcDebugOut( char * String, void * Status )
 {
-   printf( pBuffer, String, Status );
+   printf( String, Status );
 }
 #endif
