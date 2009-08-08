@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.176 2009/06/15 15:34:02 jfgimenez Exp $
+ * $Id: win32ole.prg,v 1.177 2009/08/08 01:17:44 what32 Exp $
  */
 
 /*
@@ -2847,14 +2847,7 @@ RETURN Self
               pDisp = OleVal.n1.n2.n3.pdispVal;
               goto OleGetID;
            }
-           else
-           {
-              pDisp = NULL;
-           }
         }
-
-//        //TraceLog( NULL, "Invoke Failed!\n" );
-//        OleThrowError();
         return;
      }
 

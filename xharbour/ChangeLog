@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6532 2009/08/06 16:09:56 marchuet Exp $
+ * $Id: ChangeLog,v 1.6533 2009/08/08 01:19:45 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-08 14:54 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * c:\xHarbour\source\rtl\win32ole.prg
+    ! Fixed Warning W8004 source\\rtl\\win32ole.prg 2852: 'pDisp' is assigned
+      a value that is never used in function HB_FUN_TOLEAUTO_ONERROR.
+
 
 2009-08-07 18:14 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
   * c:\xHarbour\source\rtl\win32ole.prg
