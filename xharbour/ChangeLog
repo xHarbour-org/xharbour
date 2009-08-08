@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6531 2009/08/05 20:11:12 marchuet Exp $
+ * $Id: ChangeLog,v 1.6532 2009/08/06 16:09:56 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-08-07 18:14 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * c:\xHarbour\source\rtl\win32ole.prg
+    ! Fixed ONERROR to return instead of OleThrowError() because some symbols
+      always return E_FAIL.
+    
 2009-08-06 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rdd\bmdbfcdx\redbfcdx1.c
   * source\rtl\filenet.c
