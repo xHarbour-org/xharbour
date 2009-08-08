@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.175 2009/06/15 11:57:02 jfgimenez Exp $
+ * $Id: win32ole.prg,v 1.176 2009/06/15 15:34:02 jfgimenez Exp $
  */
 
 /*
@@ -1695,8 +1695,8 @@ RETURN Self
            if( pUnk )
            {
               // pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
-	      // Not sure if this is correct, but by this change GCC now quiet
-	      // and also the other compilers
+         // Not sure if this is correct, but by this change GCC now quiet
+         // and also the other compilers
 #if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
               pUnk->lpVtbl->QueryInterface( pUnk, (REFIID)  IID_IDispatch, (void **) pDisp );
 #else
@@ -2853,8 +2853,9 @@ RETURN Self
            }
         }
 
-        //TraceLog( NULL, "Invoke Failed!\n" );
-        OleThrowError();
+//        //TraceLog( NULL, "Invoke Failed!\n" );
+//        OleThrowError();
+        return;
      }
 
      FreeParams( &DispParams, aPrgParams );
