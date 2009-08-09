@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.50 2009/07/24 00:16:59 guerra000 Exp $
+# $Id: common.mak,v 1.51 2009/07/29 17:15:53 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -66,6 +66,7 @@ HBCC_DIR      =contrib$(DIR_SEP)unicode
 WHAT32_DIR    =contrib$(DIR_SEP)what32
 XWT_DIR       =contrib$(DIR_SEP)xwt
 XWT2_DIR      =contrib$(DIR_SEP)xwt2
+TIPSSL_DIR    =contrib$(DIR_SEP)tipssl
 
 INCLUDE_DIR2  =include
 
@@ -139,6 +140,7 @@ XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
 XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
 HBHPDF_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbhpdf$(LIBEXT)
+TIPSSL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tipssl$(HB_MT)$(LIBEXT)
 
 #===============================================================================
 # Macros For DLL Build
@@ -1771,6 +1773,20 @@ HBHPDF_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT)
+
+#===============================================================================
+# TIPSSL.LIB rules
+#===============================================================================
+TIPSSL_LIB_OBJS=\
+   $(OBJ_DIR)$(DIR_SEP)inetssl$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)client$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)httpcln$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mail$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)popcln$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)smtpcln$(OBJEXT)\
+   $(OBJ_DIR)$(DIR_SEP)sendmail$(OBJEXT)
+
 
 #===============================================================================
 # Build Target

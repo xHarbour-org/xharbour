@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.249 2009/07/22 16:55:02 marchuet Exp $
+# $Id: makefile.bc,v 1.250 2009/07/29 17:15:53 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -481,10 +481,14 @@ CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
+!ifdef HB_DIR_OPENSSL
+OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"\include
+!endif
+
 INCLUDE_DIR =include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) -I$(INCLUDE_DIR) -d -w3
+CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -d -w3
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -po$(OBJ_DIR)\ -q0 -w2 -es2 -gc2
 
 # User flags should be able to override everything!
@@ -539,6 +543,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 # HB_FIREBIRD=1
 # HB_MYSQL=1
 # HB_PGSQL=1
+# TIPSSL=1
 
 HB_FREEIMAGE=1
 HB_WHAT32=1
@@ -617,6 +622,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
 
 !ifdef HB_DIR_ADS
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
+!endif
+
+!ifdef TIPSSL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 !endif
 
 ALL: $(CONTRIB_PROJECT)
