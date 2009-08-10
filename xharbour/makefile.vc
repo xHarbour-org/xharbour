@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.241 2009/07/29 17:15:53 marchuet Exp $
+# $Id: makefile.vc,v 1.242 2009/08/09 20:47:53 lculik Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -355,7 +355,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MT
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
 !ifdef HB_DIR_OPENSSL
-OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"\include
+OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"
 !endif
 
 INCLUDE_DIR =include
@@ -378,7 +378,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/OPT:WIN98 /SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -FD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR)\include -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -FD -Gs -W3 -D_CRT_SECURE_NO_DEPRECATE -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
@@ -494,6 +494,10 @@ CLIBFLAGS   =$(CLIBFLAGS)
 !ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
+!ifdef HB_DIR_OPENSSL
+OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"
+!endif
+
 INCLUDE_DIR =include
 INCLUDE_DIR =-I$(INCLUDE_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
@@ -502,7 +506,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(OPENSSL_DIR)\include $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -D_CRT_SECURE_NO_DEPRECATE -DHB_OS_WIN_32_USED
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 

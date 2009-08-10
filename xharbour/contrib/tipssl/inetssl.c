@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.78 2008/12/22 22:09:45 likewolf Exp $
+* $Id: inetssl.c,v 1.1 2009/08/09 17:28:07 lculik Exp $
 */
 
 /*
@@ -2576,34 +2576,6 @@ HB_FUNC(INITSSLRANDFILE)
    hb_retl( 1 );
 }
 
-char *sslbase64( const unsigned char *input, int length)
-{
-   BIO *bmem, *b64;
-   BUF_MEM *bptr;
-   char *buff ;
-   b64 = BIO_new( BIO_f_base64() );
-   bmem = BIO_new( BIO_s_mem() );
-   b64 = BIO_push( b64, bmem);
-   BIO_write( b64, input, length );
-   BIO_flush( b64 );
-   BIO_get_mem_ptr( b64, &bptr );
-   buff = ( char * ) hb_xgrab( bptr->length );
-
-   memcpy( buff, bptr->data, bptr->length - 1 );
-   buff[ bptr->length - 1 ] = 0;
-
-   BIO_free_all( b64 );
-
-   return buff;
-}
-
-HB_FUNC( SSL_BASE64)
-{
-   char * szItem = hb_parcx( 1 );
-   int nLen = hb_parni( 2 );
-   char * szRet =sslbase64( szItem, nLen );
-   hb_retcAdopt( szRet );
-}
 
 
 #endif
