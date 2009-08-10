@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.44 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: achoice.prg,v 1.45 2008/10/18 17:08:54 ronpinkas Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ ENDCLASS
 #define IsAvailableItem( nItem )     ( IsItemSelectable( ( nItem ), ::nItems, ::uSelect, ::acItems ) )
 
 METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow ) CLASS TAChoice
+Local aItems
 
    ::nTop    := IF( HB_ISNUMERIC( nTop ),    nTop,    0 )
    ::nLeft   := IF( HB_ISNUMERIC( nLeft ),   nLeft,   0 )
@@ -190,7 +191,14 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
 
    ::nSize   := ::nBottom - ::nTop
 
-   ::acItems := acItems
+   if hb_IsArray( acItems[1] )
+      aItems := {}
+      AEval( acItems, {|a| aadd( aItems, hb_Valtostr(a[1])) } )
+      ::acItems := aItems
+   else
+      ::acItems := acItems
+   endif
+
    ::uSelect := uSelect
    ::nItems  := 0
 
@@ -257,7 +265,7 @@ LOCAL nPage := ::nSize + 1
 
       /* 2008/JAN/17 - E.F. Force to process pending key, if any */
       IF nMode == AC_SELECT
-         if NextKey() == 0
+         if NextKey() == 0 .or. nUserMode == AC_NO_USER_FUNCTION 
             EXIT
          else
             ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
@@ -281,7 +289,7 @@ LOCAL nPage := ::nSize + 1
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
          nKey := INKEY( 0 )
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
-          nUserMode := AC_EXCEPT
+         nUserMode := AC_EXCEPT
          nMode := AC_GOTO
       ELSE
          // Send AC_IDLE to user's function
@@ -398,6 +406,14 @@ LOCAL nPage := ::nSize + 1
 
          CASE K_LEFT
          CASE K_RIGHT
+            IF ! ::lUserFunc
+               nUserMode := AC_NO_USER_FUNCTION
+               nMode := AC_ABORT
+            ELSE
+               nUserMode := AC_EXCEPT
+            ENDIF
+            EXIT
+
          CASE K_CTRL_LEFT
          CASE K_CTRL_RIGHT
          CASE K_CTRL_UP
