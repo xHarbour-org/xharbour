@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.6 2007/09/06 15:40:35 lculik Exp $
+ * $Id: smtpcln.prg,v 1.1 2009/08/09 17:28:07 lculik Exp $
  */
 
 /*
@@ -185,7 +185,6 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
    Local cUser
    Local cTemp :=""
-   Local lRet
 
    IF .not. ::super:Open( cUrl )
       RETURN .F.

@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.9 2009/02/03 22:41:09 lculik Exp $
+ * $Id: sendmail.prg,v 1.1 2009/08/09 17:28:07 lculik Exp $
  */
 
 /*
@@ -54,13 +54,6 @@
 
 #include "common.ch"
 
-//func main
-
-//HB_SendMail( 'smtp.gmail.com', 465, 'culikr@gmail.com', {'culikr@gmail.com','luiz@xharbour.com.br'}, , , 'GMAIl'+hb_osnewline()+'cBodydfdsfdsfdsf'+hb_osnewline()+'erwerewrewr'+hb_osnewline()+hb_osnewline()+'erewrewrew', 'dsfdfdafdasfcSubject',{'sendmail.zip'} , 'culikr@gmail.com','kl6qaxv9', 'pop.gmail.com:995', , , .t., .t., , ,  )
-//HB_SendMail( 'smtp.mail.yahoo.com.br', 465, 'culikbr@yahoo.com.br', {'culikbr@yahoo.com.br','luiz@xharbour.com.br'},    ,     ,'yahoo555'+hb_osnewline()+ 'cBodydfdsfdsfdsf'+hb_osnewline()+'erwerewrewr'+hb_osnewline()+'erewrewrew'              , 'dsfdfdafdasfcSubject',{'sendmail.zip'}       , 'culikbr@yahoo.com.br','kl6qaxv9', 'pop.mail.yahoo.com.br:995', , , .t., .t., , , , .t. ,, "v:\openssl\bin\aa")
-//HB_SendMail( 'smtp.live.com'         , 25   , 'culikr@hotmail.com', {'culikr@hotmail.com'  ,'luiz@xharbour.com.br'},    ,     , 'hotmail'+hb_osnewline()+'cBodydfdsfdsfdsf'+hb_osnewline()+'erwerewrewr'+hb_osnewline()+hb_osnewline()+'erewrewrew', 'dsfdfdafdasfcSubject',  {'sendmail.zip'}     , 'culikr@hotmail.com'  ,'kl6qaxv9', 'pop3.live.com:995'        , , , .t., .t., , , , .T.  )
-//HB_SendMail( 'smtp.xharbour.com.br', , 'luiz@xharbour.com.br', {'luiz@xharbour.com.br'}, , , 'xharbour'+hb_osnewline()+'cBodydfdsfdsfdsf'+hb_osnewline()+'erwerewrewr'+hb_osnewline()+hb_osnewline()+'erewrewrew', 'dsfdfdafdasfcSubject',{'sendmail.zip'} , 'luiz@xharbour.com.br','kl6qaxv9', 'pop.xharbour.com.br', , , .t., .t., , ,  )
-//return nil
 
 FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth, lNoAuth, nTimeOut, cReplyTo, lSSL, CaFile, CAPath )
    /*
@@ -100,8 +93,6 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lConnect      := .T.
    LOCAL oPop
    LOCAL adata:={},nCount,nSize,nSent
-   Local cmail,ocmail
-   Local cEmailList,aEmaillist
 
 
    DEFAULT cUser       TO ""
@@ -182,7 +173,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          IF oPop:Open()
             oPop:Close()
          ENDIF
-      CATCH
+      CATCH e
          lReturn := .F.
       END
 

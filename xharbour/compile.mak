@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.45 2009/07/22 16:55:02 marchuet Exp $
+# $Id: compile.mak,v 1.46 2009/07/29 17:15:53 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -4777,3 +4777,51 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_ext_g
 $(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_u3d.c
 	$(CC_CMD)
 
+
+#===============================================================================
+# TIPSSL.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)inetssl$(OBJEXT) : $(TIPSSL_DIR)$(DIR_SEP)inetssl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)client1.c : $(TIPSSL_DIR)$(DIR_SEP)client.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)client1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)client1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sendmail1.c : $(TIPSSL_DIR)$(DIR_SEP)sendmail.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sendmail1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ftpcln1.c : $(TIPSSL_DIR)$(DIR_SEP)ftpcln.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ftpcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ftpcln1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)httpcln1.c : $(TIPSSL_DIR)$(DIR_SEP)httpcln.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)httpcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)httpcln1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mail1.c : $(TIPSSL_DIR)$(DIR_SEP)mail.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mail1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)mail1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)popcln1.c : $(TIPSSL_DIR)$(DIR_SEP)popcln.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)popcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)popcln1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)smtpcln1.c : $(TIPSSL_DIR)$(DIR_SEP)smtpcln.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)smtpcln1.c
+	$(CC_CMD)

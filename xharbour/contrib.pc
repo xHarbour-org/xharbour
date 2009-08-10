@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: contrib.pc,v 1.3 2008/07/12 14:10:24 modalsist Exp $
+# $Id: contrib.pc,v 1.4 2008/07/30 14:44:45 marchuet Exp $
 #
 # MAKEFILE FOR PELLESC (CONTRIBS)
 #
@@ -23,6 +23,7 @@ HB_GTWVG=1
 #HB_MZIP=1
 #HB_ZIP=1
 #HB_XWT=1
+#TIPSSL=1
 
 #===============================================================================
 # Append your own build flags here
@@ -82,6 +83,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
 !endif
 
+!ifdef TIPSSL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -139,6 +144,9 @@ $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 	$(LIB_CMD)
 
 #===============================================================================
