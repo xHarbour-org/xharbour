@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6534 2009/08/08 21:58:08 what32 Exp $
+ * $Id: ChangeLog,v 1.6535 2009/08/09 17:28:05 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-08-10 18:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rtl\win32prn.prg
+    + added TextOutW and TextOutWAt methods to print UNICODE
+      changed contributed by Michael Ang
 
 2009-08-04 14:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
   !common.mak
@@ -25,7 +29,7 @@
   + contrib/tipssl/smtpcln.prg
   + contrib/tipssl/inetssl.c
   + contrib/tipssl/inetssl.h
-    * Added Code to support ssl connection for http/smtp/pop3 
+    * Added Code to support ssl connection for http/smtp/pop3
 
   + contrib/tipssl/Makefile
   + contrib/tipssl/test.prg
@@ -44,10 +48,10 @@
     copy all content between -----BEGIN CERTIFICATE-----/-----END CERTIFICATE----- inclusive
     this lines to one file ( if more then one occurence, create an file to each one
     save each file in openssl\bin\certs with .pem extension. in linux save the files to  /etc/ssl/certs
-  
+
     open an dos shell
     under windows do
-    
+
     go top openssl\bin\certs
     run openssl" x509 -hash -fingerprint -noout -in fileyousaved.pem
     copy fileyousave.pem to hash returned on command above
@@ -59,14 +63,14 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
-  
- 
 
 
 
 
 
- 
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.28 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: win32prn.prg,v 1.29 2009/05/12 01:40:21 modalsist Exp $
  */
 
 /*
@@ -123,6 +123,9 @@ CLASS WIN32PRN
 
   METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert)     // set TA_* defines above
   METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert)     // set TA_* defines above
+  METHOD TextOutWAt(nPosX,nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+
 
 
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
@@ -541,6 +544,34 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN
   ENDIF
   RETURN( .T. )
 
+METHOD TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
+  LOCAL nPosX
+  IF nAlignHori == NIL
+     nAlignHori:= ::SetTextHori
+  ENDIF
+  IF nAlignVert == NIL
+     nAlignVert:= ::SetTextVert
+  ENDIF
+  IF lUpdatePosX == NIL
+     lUpdatePosX:=.T.
+  ENDIF
+  IF lNewLine == NIL
+    lNewLine:= .F.
+  ENDIF
+  IF wString!=NIL
+    //#TODO: count len of unicode, for now assume as 2 bytes per charactor
+    nPosX:= TextOutW(::hPrinterDC, ::PosX, ::PosY, wString, LEN(wString)/2, ::fCharWidth, nAlignHori, nAlignVert)
+    ::HavePrinted:= .T.
+    IF lUpdatePosX
+      ::PosX+= nPosX
+    ENDIF
+    IF lNewLine
+      ::NewLine()
+    ENDIF
+  ENDIF
+  RETURN( .T. )
+
+
 METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
   IF lNewLine == NIL
     lNewLine:= .F.
@@ -551,6 +582,18 @@ METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlign
   ::SetPos(nPosX,nPosY)
   ::TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
   RETURN(.T.)
+
+METHOD TextOutWAt(nPosX,nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
+  IF lNewLine == NIL
+    lNewLine:= .F.
+  ENDIF
+  IF lUpdatePosX == NIL
+    lUpdatePosX:= .T.
+  ENDIF
+  ::SetPos(nPosX,nPosY)
+  ::TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
+  RETURN(.T.)
+
 
 METHOD GetCharWidth() CLASS WIN32PRN
   LOCAL nWidth:= 0
@@ -809,6 +852,47 @@ HB_FUNC_STATIC(TEXTOUT)
   }
   hb_retnl(Result) ;
 }
+
+HB_FUNC_STATIC(TEXTOUTW)
+{
+  LONG Result = 0 ;
+  HDC hDC = (HDC) hb_parnl(1) ;
+  UINT uiAlignHori = ( UINT ) hb_parnl( 7 ) ;
+  UINT uiAlignVert = ( UINT ) hb_parnl( 8 ) ;
+  SIZE sSize ;
+  if (hDC)
+  {
+    int iLen   = (int) hb_parnl(5) ;
+    if ( iLen > 0 )
+    {
+      int iRow   = (int) hb_parnl(2) ;
+      int iCol   = (int) hb_parnl(3) ;
+      WCHAR *pszData = ( WCHAR *) hb_parc(4) ;
+      int iWidth = ISNUM(6) ? (int) hb_parnl(6) : 0 ;
+      SetTextAlign((HDC) hDC, uiAlignHori | uiAlignVert | TA_NOUPDATECP) ;
+      if (iWidth < 0 && iLen < 1024 )
+      {
+        int n= iLen, aFixed[1024] ;
+        iWidth = -iWidth ;
+        while( n )
+        {
+          aFixed[ --n ] = iWidth;
+        }
+        if (ExtTextOutW( hDC, iRow, iCol, 0, NULL, pszData, iLen, aFixed ))
+        {
+          Result = (LONG) (iLen * iWidth) ;
+        }
+      }
+      else if (TextOutW(hDC, iRow, iCol, pszData, iLen))
+      {
+        GetTextExtentPoint32W(hDC, pszData, iLen , &sSize) ;  // Get the length of the text in device size
+        Result = (LONG) sSize.cx ;   // return the width so we can update the current pen position (::PosY)
+      }
+    }
+  }
+  hb_retnl(Result) ;
+}
+
 
 HB_FUNC_STATIC(GETTEXTSIZE)
 {
