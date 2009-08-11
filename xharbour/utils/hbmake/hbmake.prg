@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.198 2009/07/31 13:26:04 modalsist Exp $
+ * $Id: hbmake.prg,v 1.199 2009/08/01 17:10:03 modalsist Exp $
  */
 
 /*
@@ -3121,7 +3121,9 @@ Endif // Create and compile
       FWrite( nSFhandle, "CFLAG1 = $(SHELL)  /Ze /Go /Ot /Tx86-coff /I$(INCLUDE_DIR) $(C_USR) $(CFLAGS)" +IIF( s_lMt, ' /D"HB_THREAD_SUPPORT" /MT' , "" ) + CRLF )
       FWrite( nSFhandle, "CFLAG2 = " + CRLF )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
-      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86" + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + " /ALTERNATENAME:_WizMain=WizMain /ALTERNATENAME:_errno=___errno" + CRLF )
+// use this line if you are using PellesC 5.x
+//      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86" + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + " /ALTERNATENAME:_WizMain=WizMain /ALTERNATENAME:_errno=___errno" + CRLF )
+      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB "+ if(lMinigui,"/LIBPATH:$(MINIGUI)\LIB ","" ) + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) + " /MACHINE:IX86" + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )
       FWrite( nSFhandle, "LINKER = polink" + CRLF )
       FWrite( nSFhandle, " " + CRLF )
