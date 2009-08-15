@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
+ * $Id: pngwtran.c,v 1.9 2009/07/17 13:09:12 andijahja Exp $
  */
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.38 [July 16, 2009]
+ * Last changed in libpng 1.2.39 [August 13, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -711,7 +711,8 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 {
    int i;
 
-   png_debug1(1, "in %s storage function", (png_ptr->chunk_name[0] == '\0' ?
+   png_debug1(1, "in %s storage function", ((png_ptr == NULL ||
+      png_ptr->chunk_name[0] == '\0') ?
       "text" : (png_const_charp)png_ptr->chunk_name));
 
    if (png_ptr == NULL || info_ptr == NULL || num_text == 0)

@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
+ * $Id: pngwtran.c,v 1.9 2009/07/17 13:09:12 andijahja Exp $
  */
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.37 [July 16, 2009]
+ * Last changed in libpng 1.2.38 [July 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
