@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.8 2007/09/06 15:40:35 lculik Exp $
+ * $Id: popcln.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -79,9 +79,16 @@ CLASS tIPClientPOP FROM tIPClient
    METHOD GetOK()
    METHOD countMail()
    METHOD retrieveAll()
-
+   METHOD PopClnDesTructor
 ENDCLASS
 
+PROCEDURE PopClnDesTructor CLASS  tIPClientPOP
+
+   IF ::lTrace .and. ::nHandle > 0
+      fClose( ::nHandle )
+      ::nHandle := -1
+   ENDIF
+Return
 
 METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
 
@@ -148,6 +155,7 @@ METHOD Close() CLASS tIPClientPOP
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    if ::ltrace
       fClose(::nHandle)
+      ::nhandle := -1
    endif
 
    ::Quit()

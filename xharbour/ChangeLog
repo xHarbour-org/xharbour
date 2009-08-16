@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6541 2009/08/11 13:31:05 modalsist Exp $
+ * $Id: ChangeLog,v 1.6542 2009/08/15 14:12:55 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-16 11:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+  * source/tip/client.prg
+    init ::nhandle as -1
+  * source/tip/ftpcln.prg
+    source/tip/popln.prg
+    source/tip/smtpcln.prg
+    ! added destructor to close trace file, if still open
+  * source/tip/utils.c
+    ! fixes to tip_timestamp provided by Klaus
 
 2009-08-15 21:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c

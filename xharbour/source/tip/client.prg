@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.21 2009/06/29 13:03:51 lculik Exp $
+ * $Id: client.prg,v 1.22 2009/06/29 19:20:49 enricomaria Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ CLASS tIPClient
    DATA nStatus                              // basic status
    DATA SocketCon
    Data lTrace
-   Data nHandle
+   Data nHandle   INIT -1
 
    DATA nDefaultRcvBuffSize
    DATA nDefaultSndBuffSize

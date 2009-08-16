@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.5 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: smtpcln.prg,v 1.6 2007/09/06 15:40:35 lculik Exp $
  */
 
 /*
@@ -81,9 +81,19 @@ CLASS tIPClientSMTP FROM tIPClient
    METHOD ServerSuportSecure(lAuthp,lAuthl) 
 
    METHOD sendMail
+   METHOD SmtpClnDesTructor
    HIDDEN:
    DATA isAuth INIT .F.
 ENDCLASS
+
+
+PROCEDURE SmtpClnDesTructor CLASS  tIPClientPOP
+
+   IF ::lTrace .and. ::nHandle > 0
+      fClose( ::nHandle )
+      ::nHandle := -1
+   ENDIF
+Return 
 
 METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientSMTP
 local cFile :="sendmail"
@@ -136,6 +146,7 @@ METHOD Close() CLASS tIPClientSMTP
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    if ::ltrace
       fClose(::nHandle)
+      ::nhandle := -1
    endif
    ::Quit()
 RETURN ::super:Close()

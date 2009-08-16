@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.13 2009/07/26 23:23:18 lculik Exp $
+ * $Id: utils.c,v 1.14 2009/07/30 16:15:16 marchuet Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ HB_FUNC( TIP_TIMESTAMP )
    char *szRet = (char *) hb_xgrab( 64 );
    SYSTEMTIME st;
    DWORD retval;
-   int hours, minutes;    
+   int hours =0, minutes =0;    
 
 
    if ( !ulHour )
@@ -133,7 +133,7 @@ HB_FUNC( TIP_TIMESTAMP )
             days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1],
             st.wYear,
             st.wHour, st.wMinute, st.wSecond,
-            (int) hours,
+            (int) -hours,
             (int)( minutes < 0 ? - minutes : minutes ) );
    }
    else
@@ -145,7 +145,7 @@ HB_FUNC( TIP_TIMESTAMP )
             days[ hb_dateDOW( iYear, iMonth, iDay ) - 1 ], iDay,
             months[ iMonth -1], iYear,
             (UINT)( ulHour / 3600 ), (UINT)( (ulHour % 3600) / 60 ), (UINT)( ulHour % 60 ),
-            (int) hours,
+            (int) -hours,
             (int)( minutes < 0 ? - minutes : minutes ) );
    }
 

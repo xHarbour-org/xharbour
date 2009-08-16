@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.26 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.27 2009/01/08 09:11:14 marchuet Exp $
  */
 
 /*
@@ -160,7 +160,17 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD MPut
    METHOD StartCleanLogFile()
    METHOD fileSize( cFileSpec )
+   METHOD FtpClnDesTructor
 ENDCLASS
+
+PROCEDURE FtpClnDesTructor CLASS  tIPClientPOP
+
+   IF ::lTrace .and. ::nHandle > 0
+      fClose( ::nHandle )
+      ::nHandle := -1
+   ENDIF
+Return
+
 
 
 METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientFTP
@@ -275,6 +285,7 @@ METHOD Close() CLASS tIPClientFTP
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    if ::ltrace
       fClose(::nHandle)
+      ::nhandle := -1
    endif
 
    ::Quit()
