@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.6 2007/09/06 15:40:35 lculik Exp $
+ * $Id: smtpcln.prg,v 1.7 2009/08/16 14:39:15 lculik Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ CLASS tIPClientSMTP FROM tIPClient
 ENDCLASS
 
 
-PROCEDURE SmtpClnDesTructor CLASS  tIPClientPOP
+PROCEDURE SmtpClnDesTructor CLASS  tIPClientsmtp
 
    IF ::lTrace .and. ::nHandle > 0
       fClose( ::nHandle )

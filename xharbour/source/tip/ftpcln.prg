@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.27 2009/01/08 09:11:14 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.28 2009/08/16 14:39:15 lculik Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD FtpClnDesTructor
 ENDCLASS
 
-PROCEDURE FtpClnDesTructor CLASS  tIPClientPOP
+PROCEDURE FtpClnDesTructor CLASS  tIPClientftp
 
    IF ::lTrace .and. ::nHandle > 0
       fClose( ::nHandle )
