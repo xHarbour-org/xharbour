@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6544 2009/08/17 01:20:41 lculik Exp $
+ * $Id: ChangeLog,v 1.6545 2009/08/17 16:12:52 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-17 21:31 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rtl/dirdrive.c
+  * source/rtl/filesys.c
+  * source/rtl/philes.c
+  * source/rtl/philesx.c
+    ! fixed CURDRIVE() and DISKNAME() to not return "A" in OS-es which
+      does not use drive letters
+    ! eliminated toupper()
+    % minor cleanup and speed improvement
+  (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-08-17 20:09 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/tbrwtext.prg

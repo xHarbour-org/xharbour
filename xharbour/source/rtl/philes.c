@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.37 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: philes.c,v 1.38 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -302,12 +302,21 @@ HB_FUNC( FREADSTR )
 
 HB_FUNC( CURDIR )
 {
-   BYTE byBuffer[ HB_PATH_MAX ];
+   char szBuffer[ HB_PATH_MAX ];
+   USHORT uiDrive = 0;
+   const char * szDrive;
 
-   hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( HB_TOUPPER( *hb_parc( 1 ) ) - 'A' + 1 ) : ( USHORT )  0, byBuffer, sizeof( byBuffer ) );
+   szDrive = hb_parc( 1 );
+   if( szDrive )
+   {
+      if( *szDrive >= 'A' && *szDrive <= 'Z' )
+         uiDrive = *szDrive - ( 'A' - 1 );
+      else if( *szDrive >= 'a' && *szDrive <= 'z' )
+         uiDrive = *szDrive - ( 'a' - 1 );
+   }
+   hb_fsCurDirBuff( uiDrive, ( BYTE * ) szBuffer, sizeof( szBuffer ) );
 
-   hb_retc( ( char * ) byBuffer );
+   hb_retc( szBuffer );
 }
 
 HB_FUNC( HB_F_EOF )

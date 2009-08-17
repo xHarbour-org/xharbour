@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.188 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: filesys.c,v 1.189 2009/07/22 16:55:13 marchuet Exp $
  */
 
 /*
@@ -3928,6 +3928,35 @@ USHORT hb_fsChDrv( BYTE nDrive )
 
 /* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
 
+BYTE hb_fsCurDrv( void )
+{
+#if defined(HB_OS_UNIX_COMPATIBLE) ||( defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN_32) && !defined(HB_WINCE)))
+   HB_THREAD_STUB
+#endif
+   /* 'unsigned int' _have to_ be used in Watcom */
+   UINT uiResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
+
+#if defined( HB_OS_HAS_DRIVE_LETTER )
+
+   HB_STACK_UNLOCK
+   HB_FS_GETDRIVE( uiResult );
+   hb_fsSetError( 0 );
+   HB_STACK_LOCK
+
+#else
+
+   uiResult = 0;
+   hb_fsSetError( ( USHORT ) FS_ERROR );
+
+#endif
+
+   return ( BYTE ) uiResult; /* Return the drive number, base 0. */
+}
+
+/* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
+
 /* TOFIX: This isn't fully compliant because CA-Cl*pper doesn't access
           the drive before checking. hb_fsIsDrv only returns TRUE
           if there is a disk in the drive. */
@@ -3958,7 +3987,7 @@ USHORT hb_fsIsDrv( BYTE nDrive )
       uiResult = ( type == DRIVE_UNKNOWN || type == DRIVE_NO_ROOT_DIR ) ? F_ERROR : 0;
       hb_fsSetError( 0 );
    }
-#elif defined(HB_OS_HAS_DRIVE_LETTER)
+#elif defined( HB_OS_HAS_DRIVE_LETTER )
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */
@@ -4005,7 +4034,7 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
    bResult = GetFileType( DosToWinHandle( hFileHandle ) ) == FILE_TYPE_CHAR;
    hb_fsSetIOError( bResult, 0 );
 
-#elif defined(HB_FS_FILE_IO)
+#elif defined( HB_FS_FILE_IO )
 
 #if defined( _MSC_VER ) || defined( __MINGW32__ )
    bResult = _isatty( hFileHandle ) != 0;
@@ -4023,34 +4052,6 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 #endif
 
    return bResult;
-}
-
-/* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
-
-BYTE hb_fsCurDrv( void )
-{
-#if defined(HB_OS_UNIX_COMPATIBLE) ||( defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN_32) && !defined(HB_WINCE)))
-   HB_THREAD_STUB
-#endif
-   /* 'unsigned int' _have to_ be used in Watcom */
-   UINT uiResult;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
-
-#if defined(HB_OS_HAS_DRIVE_LETTER)
-
-   HB_STACK_UNLOCK
-   HB_FS_GETDRIVE( uiResult );
-   HB_STACK_LOCK
-
-#else
-
-   uiResult = 0;
-   hb_fsSetError( ( USHORT ) FS_ERROR );
-
-#endif
-
-   return ( BYTE ) uiResult; /* Return the drive number, base 0. */
 }
 
 /* convert file name for hb_fsExtOpen

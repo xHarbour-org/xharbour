@@ -1,5 +1,5 @@
 /*
- * $Id: philesx.c,v 1.5 2009/02/28 08:44:29 lculik Exp $
+ * $Id: philesx.c,v 1.6 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -50,8 +50,6 @@
  *
  */
 
-#include <ctype.h>
-
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
@@ -62,21 +60,38 @@
 
 HB_FUNC( CURDRIVE )
 {
-   char szDrive[ 1 ];
+#if defined( HB_OS_HAS_DRIVE_LETTER )
+   char szCurDrive[ 1 ];
+   const char * szDrive;
 
-   szDrive[ 0 ] = ( ( char ) hb_fsCurDrv()  + 'A');
-   hb_retclen( szDrive, 1 );
+   szCurDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
+   hb_retclen( szCurDrive, 1 );
 
-   if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
+   szDrive = hb_parc( 1 );
+   if( szDrive )
    {
-      while( hb_fsChDrv( ( BYTE )( HB_TOUPPER( *hb_parc( 1 ) ) - 'A' ) ) != 0 )
-      {
-         USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 6001, "Operating system error", HB_ERR_FUNCNAME, 0, EF_CANDEFAULT | EF_CANRETRY, HB_ERR_ARGS_BASEPARAMS );
+      int iDrive = -1;
 
-         if( uiAction != E_RETRY )
-            break;
+      if( *szDrive >= 'A' && *szDrive <= 'Z' )
+         iDrive = *szDrive - 'A';
+      else if( *szDrive >= 'a' && *szDrive <= 'z' )
+         iDrive = *szDrive - 'a';
+
+      if( iDrive >= 0 )
+      {
+         while( hb_fsChDrv( ( BYTE ) iDrive ) != 0 )
+         {
+            USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 6001, "Operating system error",
+                                                  HB_ERR_FUNCNAME, 0, EF_CANDEFAULT | EF_CANRETRY,
+                                                  HB_ERR_ARGS_BASEPARAMS );
+            if( uiAction != E_RETRY )
+               break;
+         }
       }
    }
+#else
+   hb_retc_null();
+#endif
 }
 
 #endif

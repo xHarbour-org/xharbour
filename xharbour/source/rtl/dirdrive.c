@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.3 2005/11/04 12:06:00 druzus Exp $
+ * $Id: dirdrive.c,v 1.4 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -104,9 +104,17 @@ HB_FUNC( ISDISK )
 {
    USHORT uiErrorOld = hb_fsError();
 
-   hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsIsDrv( ( BYTE )( HB_TOUPPER( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
-            FALSE );
+   BOOL fResult = FALSE;
+   const char * szDrive = hb_parc( 1 );
+
+   if( szDrive )
+   {
+      if( *szDrive >= 'A' && *szDrive <= 'Z' )
+         fResult = hb_fsIsDrv( *szDrive - 'A' ) == 0;
+      else if( *szDrive >= 'a' && *szDrive <= 'z' )
+         fResult = hb_fsIsDrv( *szDrive - 'a' ) == 0;
+   }
+   hb_retl( fResult );
 
    hb_fsSetError( uiErrorOld );
 }
@@ -115,23 +123,34 @@ HB_FUNC( DISKCHANGE )
 {
    USHORT uiErrorOld = hb_fsError();
 
-   hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsChDrv( ( BYTE )( HB_TOUPPER( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
-            FALSE );
+   BOOL fResult = FALSE;
+   const char * szDrive = hb_parc( 1 );
+
+   if( szDrive )
+   {
+      if( *szDrive >= 'A' && *szDrive <= 'Z' )
+         fResult = hb_fsChDrv( *szDrive - 'A' ) == 0;
+      else if( *szDrive >= 'a' && *szDrive <= 'z' )
+         fResult = hb_fsChDrv( *szDrive - 'a' ) == 0;
+   }
+   hb_retl( fResult );
 
    hb_fsSetError( uiErrorOld );
 }
 
 HB_FUNC( DISKNAME )
 {
+#if defined( HB_OS_HAS_DRIVE_LETTER )
    USHORT uiErrorOld = hb_fsError();
    char szDrive[ 1 ];
 
    szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
-
    hb_retclen( szDrive, 1 );
 
    hb_fsSetError( uiErrorOld );
+#else
+   hb_retc_null();
+#endif
 }
 
 #endif
