@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.7 2009/08/16 14:39:15 lculik Exp $
+ * $Id: smtpcln.prg,v 1.8 2009/08/16 21:32:52 lculik Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ CLASS tIPClientSMTP FROM tIPClient
    METHOD ServerSuportSecure(lAuthp,lAuthl) 
 
    METHOD sendMail
-   METHOD SmtpClnDesTructor
+   DESTRUCTOR SmtpClnDesTructor
    HIDDEN:
    DATA isAuth INIT .F.
 ENDCLASS

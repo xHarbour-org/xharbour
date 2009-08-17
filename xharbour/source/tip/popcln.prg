@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: popcln.prg,v 1.10 2009/08/16 14:39:15 lculik Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ CLASS tIPClientPOP FROM tIPClient
    METHOD GetOK()
    METHOD countMail()
    METHOD retrieveAll()
-   METHOD PopClnDesTructor
+   DESTRUCTOR PopClnDesTructor
 ENDCLASS
 
 PROCEDURE PopClnDesTructor CLASS  tIPClientPOP

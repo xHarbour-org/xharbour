@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.28 2009/08/16 14:39:15 lculik Exp $
+ * $Id: ftpcln.prg,v 1.29 2009/08/16 21:32:52 lculik Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD MPut
    METHOD StartCleanLogFile()
    METHOD fileSize( cFileSpec )
-   METHOD FtpClnDesTructor
+   DESTRUCTOR FtpClnDesTructor
 ENDCLASS
 
 PROCEDURE FtpClnDesTructor CLASS  tIPClientftp

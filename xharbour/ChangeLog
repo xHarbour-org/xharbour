@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6542 2009/08/15 14:12:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.6543 2009/08/16 14:39:14 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-08-16 22:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+  * source/tip/ftpcln.prg
+    source/tip/popln.prg
+    source/tip/smtpcln.prg
+    minor fix to previus commit
+  
 2009-08-16 11:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
   * source/tip/client.prg
     init ::nhandle as -1
