@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6543 2009/08/16 14:39:14 lculik Exp $
+ * $Id: ChangeLog,v 1.6544 2009/08/17 01:20:41 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2009-08-16 22:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+2009-08-17 20:09 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/tbrwtext.prg
+    ! Bug fixed in Search() method (by Alexander Kresin, borrowed from
+      Harbour).
+    ! Fixed RTE on deleting the last tracepoint.
+  * ChangeLog
+    ! Fixed typos in recent ChangeLog entries by Luiz.
+  * ChangeLog.028
+    ! Fixed Viktor's name in the ChangeLog.
+
+2009-08-16 22:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/ftpcln.prg
     source/tip/popln.prg
     source/tip/smtpcln.prg
     minor fix to previus commit
-  
-2009-08-16 11:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+
+2009-08-16 11:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/client.prg
     init ::nhandle as -1
   * source/tip/ftpcln.prg
@@ -51,19 +61,19 @@
   * utils\hbmake\hbmake.prg
     * commented "/alternatename" link flag. Needed only for PellesC 5.x
 
-2009-08-11 09:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+2009-08-11 09:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! makefile.vc
     makefile.bc
     ! minor adjust to compile tipssl
 
 
-2009-08-10 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+2009-08-10 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! makefile.vc
     ! minor adjust
   ! contrib/tipssl/inetssl.c
     ! removed ssl_base64 function
 
-2009-08-10 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+2009-08-10 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! common.mak
   ! compile.mak
     makefile.bc
@@ -84,7 +94,7 @@
     + added TextOutW and TextOutWAt methods to print UNICODE
       changed contributed by Michael Ang
 
-2009-08-04 14:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br
+2009-08-04 14:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   !common.mak
    makefile.bc
     !changed to compile tipssl

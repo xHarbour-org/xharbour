@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6265 2008/11/21 05:14:36 andijahja Exp $
+ * $Id: ChangeLog.028,v 1.1 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -1243,7 +1243,7 @@
        return first relation expression (Clipper compatible)
      ! fixed to not respect bitmap filters when structural order
        is scanned, f.e. in OrdListAdd() with active bitmap filter.
-       Synched with Harbour. Thanks to Przemyslaw Czerpak and Vicktor Szakáts
+       Synched with Harbour. Thanks to Przemyslaw Czerpak and Viktor Szakáts
 
 2008-08-14 15:30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rdd/dbf1.c

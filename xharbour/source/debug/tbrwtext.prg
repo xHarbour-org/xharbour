@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.21 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.22 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -230,7 +230,7 @@ METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS HBBrwText
    ENDIF
    IF lResize
       ::oBrw:Resize( nTop, nLeft, nBottom, nRight )
-      ::nWidth := nRight - nLeft + 1
+      ::nWidth := ::nRight - ::nLeft + 1
    ENDIF
 
    RETURN Self
@@ -258,6 +258,7 @@ METHOD Search( cString, lCaseSensitive, nMode ) CLASS HBBrwText
 
    LOCAL bMove
    LOCAL lFound := .F.
+   LOCAL n
 
    IF !lCaseSensitive
       cString := Upper( cString )
@@ -273,9 +274,12 @@ METHOD Search( cString, lCaseSensitive, nMode ) CLASS HBBrwText
       bMove := {|| ::Skip( -1 ) }
    ENDCASE
 
+   n := ::nRow
+
    DO WHILE Eval( bMove ) != 0
-      IF cString $ IIF( lCaseSensitive, ::cCurLine, Upper( ::cCurLine ) )
+      IF cString $ IIF( lCaseSensitive, ::aRows[ ::nRow ], Upper( ::aRows[ ::nRow ] ) )
          lFound := .T.
+         ::oBrw:MoveCursor( ::nRow - n )
          ::RefreshAll()
          EXIT
       ENDIF
