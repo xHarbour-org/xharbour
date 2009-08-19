@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.7 2009/02/28 01:58:50 ronpinkas Exp $
+ * $Id: hbcompat.ch,v 1.8 2009/04/13 14:45:44 likewolf Exp $
  */
 
 /*
@@ -57,16 +57,12 @@
 
 #ifdef __XHARBOUR__
 
-   #if defined(__PLATFORM__Windows) .AND. !defined(__PLATFORM__WINDOWS)
+   #if defined( __PLATFORM__Windows ) .AND. !defined( __PLATFORM__WINDOWS )
       #define __PLATFORM__WINDOWS
    #endif
-   #if defined(__PLATFORM__Linux) .AND. !defined(__PLATFORM__LINUX)
+   #if defined( __PLATFORM__Linux ) .AND. !defined( __PLATFORM__LINUX )
       #define __PLATFORM__LINUX
    #endif
-
-   #xtranslate hb_gtSys                    => gtSys
-   #xtranslate hb_gtInfo([<x,...>])        => gtInfo(<x>)
-   #xtranslate hb_gtVersion([<x>])         => hb_gt_Version(<x>)
 
    #xtranslate hb_ScrMaxRow()              => gtInfo( HB_GTI_SCREENHEIGHT )
    #xtranslate hb_ScrMaxCol()              => gtInfo( HB_GTI_SCREENWIDTH )
@@ -92,6 +88,7 @@
    #xtranslate hb_adler32([<x,...>])       => hb_checksum(<x>)
    #xtranslate hb_setLastKey([<x,...>])    => setLastKey(<x>)
    #xtranslate hb_CStr([<x,...>])          => CStr(<x>)
+   #xtranslate hb_valToExp([<x,...>])      => ValToPrgExp(<x>)
    #xtranslate hb_DirExists(<x>)           => IsDirectory(<x>)
    #xtranslate hb_rddInfo([<x,...>])       => rddInfo(<x>)
    #xtranslate hb_idleSleep([<x,...>])     => SecondsSleep(<x>)
@@ -111,6 +108,19 @@
    #xtranslate hb_ADel([<x,...>])          => ADel(<x>)
    #xtranslate hb_At([<x,...>])            => At(<x>)
 
+   #xtranslate hb_DateTime()               => DateTime()
+   #xtranslate hb_Hour([<x>])              => Hour(<x>)
+   #xtranslate hb_Minute([<x>])            => Minute(<x>)
+   #xtranslate hb_TToS([<x>])              => TToS(<x>)
+   #xtranslate hb_SToT([<x>])              => SToT(<x>)
+   #xtranslate hb_TToC([<x,...>])          => TToC(<x>)
+   #xtranslate hb_CToT([<x,...>])          => CToT(<x>)
+
+   #xtranslate hb_GetEnv([<x,...>])        => GetEnv(<x>)
+   #xtranslate hb_SetKey([<x,...>])        => SetKey(<x>)
+
+   #xtranslate hb_i18n_gettext(<x>)        => i18n(<x>)
+
    #xtranslate hb_ARGV([<x,...>])          => hb_CMDARGARGV(<x>)
 
    #xtranslate hb_IniSetComment([<x,...>]) => hb_SetIniComment(<x>)
@@ -122,9 +132,105 @@
    #xtranslate hb_gtLock()                 => HBCONSOLELOCK()
    #xtranslate hb_gtUnLock()               => HBCONSOLEUNLOCK()
 
+   /* MT functions */
    #xtranslate hb_mtvm()                   => hb_multiThread()
+   #xtranslate hb_threadSelf()             => GetCurrentThread()
+   #xtranslate hb_threadId( [<x,...>] )    => GetThreadId( <x> )
+   #xtranslate hb_threadStart( <x,...> )   => StartThread( [<x>] )
+   #xtranslate hb_threadJoin( <x> )        => JoinThread( <x> )
+   #xtranslate hb_threadQuitRequest( <x> ) => KillThread( <x> )
    #xtranslate hb_threadWaitForAll()       => WaitForThreads()
+   #xtranslate hb_threadTerminateAll()     => KillAllThreads()
+
    #xtranslate hb_mutexNotify(<x,...>)     => Notify(<x>)
+   #xtranslate hb_mutexNotifyAll(<x,...>)  => NotifyAll(<x>)
+
+   #xtranslate hb_mutexSubscribe(<x,...>)  => {|mtx, nTimeOut, xSubscribed| ;;
+                                                local lSubscribed ;;
+                                                xSubscribed := Subscribe( mtx, ;
+                                                                          iif( hb_isNumeric( nTimeOut ), nTimeOut * 1000, ), ;
+                                                                          @lSubscribed ) ;
+                                                return lSubscribed ; }:eval( <x> )
+   #xtranslate hb_mutexSubscribeNow(<x,...>) => {|mtx, nTimeOut, xSubscribed| ;;
+                                                local lSubscribed ;;
+                                                xSubscribed := SubscribeNow( mtx, ;
+                                                                             iif( hb_isNumeric( nTimeOut ), nTimeOut * 1000, ), ;
+                                                                             @lSubscribed ) ;
+                                                return lSubscribed ; }:eval( <x> )
+
+   #xtranslate hb_MutexLock( <x>, <n> )    => iif( !hb_isNumeric( <n> ), hb_MutexLock( <x> ) ;
+                                                 iif( <n> <= 0, hb_MutexTryLock( <x> ), ;
+                                                    hb_MutexTimeOutLock( <x>, <n> ) ) )
+
+   /* Hash item functions */
+   #xtranslate hb_HASH([<x,...>])          => HASH(<x>)
+   #xtranslate hb_HHASKEY([<x,...>])       => HHASKEY(<x>)
+   #xtranslate hb_HPOS([<x,...>])          => HGETPOS(<x>)
+   #xtranslate hb_HGET([<x,...>])          => HGET(<x>)
+   #xtranslate hb_HSET([<x,...>])          => HSET(<x>)
+   #xtranslate hb_HDEL([<x,...>])          => HDEL(<x>)
+   #xtranslate hb_HKEYAT([<x,...>])        => HGETKEYAT(<x>)
+   #xtranslate hb_HVALUEAT([<x,...>])      => HGETVALUEAT(<x>)
+   #xtranslate hb_HVALUEAT([<x,...>])      => HSETVALUEAT(<x>)
+   #xtranslate hb_HPAIRAT([<x,...>])       => HGETPAIRAT(<x>)
+   #xtranslate hb_HDELAT([<x,...>])        => HDELAT(<x>)
+   #xtranslate hb_HKEYS([<x,...>])         => HGETKEYS(<x>)
+   #xtranslate hb_HVALUES([<x,...>])       => HGETVALUES(<x>)
+   #xtranslate hb_HFILL([<x,...>])         => HFILL(<x>)
+   #xtranslate hb_HCLONE([<x,...>])        => HCLONE(<x>)
+   #xtranslate hb_HCOPY([<x,...>])         => HCOPY(<x>)
+   #xtranslate hb_HMERGE([<x,...>])        => HMERGE(<x>)
+   #xtranslate hb_HEVAL([<x,...>])         => HEVAL(<x>)
+   #xtranslate hb_HSCAN([<x,...>])         => HSCAN(<x>)
+   #xtranslate hb_HSETCASEMATCH([<x,...>]) => HSETCASEMATCH(<x>)
+   #xtranslate hb_HCASEMATCH([<x,...>])    => HGETCASEMATCH(<x>)
+   #xtranslate hb_HSETAUTOADD([<x,...>])   => HSETAUTOADD(<x>)
+   #xtranslate hb_HAUTOADD([<x,...>])      => HGETAUTOADD(<x>)
+   #xtranslate hb_HALLOCATE([<x,...>])     => HALLOCATE(<x>)
+   #xtranslate hb_HDEFAULT([<x,...>])      => HDEFAULT(<x>)
+
+   /* Inet functions */
+   #xtranslate hb_INETINIT([<x,...>])                => INETINIT(<x>)
+   #xtranslate hb_INETCLEANUP([<x,...>])             => INETCLEANUP(<x>)
+   #xtranslate hb_INETCREATE([<x,...>])              => INETCREATE(<x>)
+   #xtranslate hb_INETCLOSE([<x,...>])               => INETCLOSE(<x>)
+   #xtranslate hb_INETFD([<x,...>])                  => INETFD(<x>)
+   #xtranslate hb_INETSTATUS([<x,...>])              => INETSTATUS(<x>)
+   #xtranslate hb_INETERRORCODE([<x,...>])           => INETERRORCODE(<x>)
+   #xtranslate hb_INETERRORDESC([<x,...>])           => INETERRORDESC(<x>)
+   #xtranslate hb_INETCLEARERROR([<x,...>])          => INETCLEARERROR(<x>)
+   #xtranslate hb_INETCOUNT([<x,...>])               => INETCOUNT(<x>)
+   #xtranslate hb_INETADDRESS([<x,...>])             => INETADDRESS(<x>)
+   #xtranslate hb_INETPORT([<x,...>])                => INETPORT(<x>)
+   #xtranslate hb_INETTIMEOUT([<x,...>])             => INETSETTIMEOUT(<x>)
+   #xtranslate hb_INETTIMEOUT([<x,...>])             => INETGETTIMEOUT(<x>)
+   #xtranslate hb_INETCLEARTIMEOUT([<x,...>])        => INETCLEARTIMEOUT(<x>)
+   #xtranslate hb_INETTIMELIMIT([<x,...>])           => INETSETTIMELIMIT(<x>)
+   #xtranslate hb_INETTIMELIMIT([<x,...>])           => INETGETTIMELIMIT(<x>)
+   #xtranslate hb_INETCLEARTIMELIMIT([<x,...>])      => INETCLEARTIMELIMIT(<x>)
+   #xtranslate hb_INETPERIODCALLBACK([<x,...>])      => INETSETPERIODCALLBACK(<x>)
+   #xtranslate hb_INETPERIODCALLBACK([<x,...>])      => INETGETPERIODCALLBACK(<x>)
+   #xtranslate hb_INETCLEARPERIODCALLBACK([<x,...>]) => INETCLEARPERIODCALLBACK(<x>)
+   #xtranslate hb_INETRECV([<x,...>])                => INETRECV(<x>)
+   #xtranslate hb_INETRECVALL([<x,...>])             => INETRECVALL(<x>)
+   #xtranslate hb_INETRECVLINE([<x,...>])            => INETRECVLINE(<x>)
+   #xtranslate hb_INETRECVENDBLOCK([<x,...>])        => INETRECVENDBLOCK(<x>)
+   #xtranslate hb_INETDATAREADY([<x,...>])           => INETDATAREADY(<x>)
+   #xtranslate hb_INETSEND([<x,...>])                => INETSEND(<x>)
+   #xtranslate hb_INETSENDALL([<x,...>])             => INETSENDALL(<x>)
+   #xtranslate hb_INETGETHOSTS([<x,...>])            => INETGETHOSTS(<x>)
+   #xtranslate hb_INETGETALIAS([<x,...>])            => INETGETALIAS(<x>)
+   #xtranslate hb_INETSERVER([<x,...>])              => INETSERVER(<x>)
+   #xtranslate hb_INETACCEPT([<x,...>])              => INETACCEPT(<x>)
+   #xtranslate hb_INETCONNECT([<x,...>])             => INETCONNECT(<x>)
+   #xtranslate hb_INETCONNECTIP([<x,...>])           => INETCONNECTIP(<x>)
+   #xtranslate hb_INETDGRAMBIND([<x,...>])           => INETDGRAMBIND(<x>)
+   #xtranslate hb_INETDGRAM([<x,...>])               => INETDGRAM(<x>)
+   #xtranslate hb_INETDGRAMSEND([<x,...>])           => INETDGRAMSEND(<x>)
+   #xtranslate hb_INETDGRAMRECV([<x,...>])           => INETDGRAMRECV(<x>)
+   #xtranslate hb_INETCRLF([<x,...>])                => INETCRLF(<x>)
+   #xtranslate hb_INETISSOCKET([<x,...>])            => ISINETSOCKET(<x>)
+   #xtranslate hb_INETCLOSE([<x,...>])               => INETDESTROY(<x>)
 
    /* Some statement endings */
    #xcommand ENDSEQUENCE => END
@@ -140,10 +246,10 @@
 
 #else
 
-   #if defined(__PLATFORM__WINDOWS) .AND. !defined(__PLATFORM__Windows)
+   #if defined( __PLATFORM__WINDOWS ) .AND. !defined( __PLATFORM__Windows )
       #define __PLATFORM__Windows
    #endif
-   #if defined(__PLATFORM__LINUX) .AND. !defined(__PLATFORM__Linux)
+   #if defined( __PLATFORM__LINUX ) .AND. !defined( __PLATFORM__Linux )
       #define __PLATFORM__Linux
    #endif
 
@@ -152,10 +258,6 @@
    #define GTI_SCREEN         1  /* Maximum screen size ('Screen' in CT terms) */
    #define GTI_CLIENT         2  /* Maximum possible client size of a window */
    #define GTI_MAX            3  /* Maximum possible window size (in Windows) */
-
-   #xtranslate gtSys                       => hb_gtSys
-   #xtranslate gtInfo([<x,...>])           => hb_gtInfo(<x>)
-   #xtranslate hb_gt_Version([<x>])        => hb_gtVersion(<x>)
 
    #xtranslate gtSetClipboard(<x>)         => hb_gtInfo( HB_GTI_CLIPBOARDDATA, <x> )
    #xtranslate gtGetClipboard()            => hb_gtInfo( HB_GTI_CLIPBOARDDATA )
@@ -178,7 +280,8 @@
    #xtranslate hb_checksum([<x,...>])      => hb_adler32(<x>)
    #xtranslate setLastKey([<x,...>])       => hb_setLastKey(<x>)
    #xtranslate CStr([<x,...>])             => hb_CStr(<x>)
-   #xtranslate IsDirectory(<x>)            => hb_DirExists(<x>)
+   #xtranslate ValToPrgExp([<x,...>])      => hb_valToExp(<x>)
+   #xtranslate IsDirectory(<x>)            => hb_dirExists(<x>)
    #xtranslate SecondsSleep([<x,...>])     => hb_idleSleep(<x>)
    #xtranslate NetName(<n>)                => iif( hb_isNumeric( <n> ) .AND. <n> == 1, hb_UserName(), NetName() )
    #xtranslate FileSize(<x>)               => hb_FSize(<x>)
@@ -211,6 +314,20 @@
    #xtranslate ADel(<a>,<n>,<l>)               => hb_ADel(<a>,<n>,<l>)
    #xtranslate At(<a>,<b>,[<x,...>])           => hb_At(<a>,<b>,<x>)
 
+   #xtranslate DateTime()                      => hb_DateTime()
+   #xtranslate Hour([<x>])                     => hb_Hour(<x>)
+   #xtranslate Minute([<x>])                   => hb_Minute(<x>)
+   #xtranslate TToS([<x>])                     => hb_TToS(<x>)
+   #xtranslate SToT([<x>])                     => hb_SToT(<x>)
+   #xtranslate TToC([<x,...>])                 => hb_TToC(<x>)
+   #xtranslate CToT([<x,...>])                 => hb_CToT(<x>)
+
+   #xtranslate GetEnv([<x,...>])               => hb_GetEnv(<x>)
+   #xtranslate SetKey([<x,...>])               => hb_SetKey(<x>)
+   #xtranslate MemoWrit(<x>,<y>,<z>)           => iif( hb_isLogical(<z>) .AND. <z>, MemoWrit(<x>,<y>), hb_MemoWrit(<x>,<y>) )
+
+   #xtranslate i18n(<x>)                       => hb_i18n_gettext(<x>)
+
    /* MT functions */
    #xtranslate hb_MultiThread()                => hb_mtvm()
    #xtranslate GetCurrentThread()              => hb_threadSelf()
@@ -225,14 +342,31 @@
    #xtranslate WaitForThreads()                => hb_threadWaitForAll()
 
    #xtranslate ThreadSleep( <x> )              => hb_idleSleep( <x> / 1000 )
-   #xtranslate SecondsSleep( <x> )             => hb_idleSleep( <x> )
 
    #xtranslate DestroyMutex( <x> )             =>
-   #xtranslate hb_MutexTryLock( <x> )          => hb_MutexLock( <x>, 0 )
-   #xtranslate hb_MutexTimeOutLock( <x> )      => hb_MutexLock( <x>, 0 )
-   #xtranslate hb_MutexTimeOutLock( <x>, <n> ) => hb_MutexLock( <x>, <n> / 1000 )
+   #xtranslate hb_MutexTryLock( <x> )          => hb_mutexLock( <x>, 0 )
+   #xtranslate hb_MutexTimeOutLock( <x> )      => hb_mutexLock( <x>, 0 )
+   #xtranslate hb_MutexTimeOutLock( <x>, <n> ) => hb_mutexLock( <x>, IIF( hb_isNumeric( <n> ), <n> / 1000, 0 ) )
+
    #xtranslate Notify( <x,...> )               => hb_mutexNotify( <x> )
    #xtranslate NotifyAll( <x,...> )            => hb_mutexNotifyAll( <x> )
+   #xtranslate Subscribe( <x,...> )            => {|mtx, nTimeOut, lSubscribed| ;;
+                                                   local xSubscribed ;;
+                                                   lSubscribed := hb_mutexSubscribe( mtx, ;
+                                                                                     iif( hb_isNumeric( nTimeOut ), nTimeOut / 1000, ), ;
+                                                                                     @xSubscribed ) ;
+                                                   return xSubscribed ; }:eval( <x> )
+   #xtranslate SubscribeNow( <x,...> )         => {|mtx, nTimeOut, lSubscribed| ;;
+                                                   local xSubscribed ;;
+                                                   lSubscribed := hb_mutexSubscribeNow( mtx, ;
+                                                                                        iif( hb_isNumeric( nTimeOut ), nTimeOut / 1000, ), ;
+                                                                                        @xSubscribed ) ;
+                                                   return xSubscribed ; }:eval( <x> )
+
+   #xtranslate StartThread( [<x>] )            => hb_threadStart( <x> )
+   #xtranslate StartThread( <x>, <y> [, <z,...>] ) => iif( valtype( <x> ) == "O" .and. hb_isString( <y> ), ;
+                                                           hb_threadStart( {|...| (<x>):&(<y>)( ... ) } [, <z>] ), ;
+                                                           hb_threadStart( <x>, <y> [, <z>] ) )
 
    /* not possible to well replicate xHarbour behavior because its buggy
       these function results are different on different platform, chosen
@@ -242,10 +376,10 @@
 
    /* do not need translation */
    /* hb_MutexCreate()                         => hb_mutexCreate() */
-   /* hb_mutexUnlock( <x> )                    => hb_mutexUnlock( <x> ) */
+   /* hb_MutexUnlock( <x> )                    => hb_mutexUnlock( <x> ) */
 
    /* do not need translation only when xHarbour code is compiled by Harbour */
-   /* hb_MutexLock( <x> )                      => hb_MutexLock( <x> ) */
+   /* hb_MutexLock( <x> )                      => hb_mutexLock( <x> ) */
 
    /* functions I do not want to document as public .prg API in Harbour */
    /* ThreadInspect() */
@@ -326,7 +460,7 @@
    #xtranslate INETDGRAMSEND([<x,...>])           => hb_INETDGRAMSEND(<x>)
    #xtranslate INETDGRAMRECV([<x,...>])           => hb_INETDGRAMRECV(<x>)
    #xtranslate INETCRLF([<x,...>])                => hb_INETCRLF(<x>)
-   #xtranslate ISINETSOCKET([<x,...>])            => HB_INETISSOCKET(<x>)
+   #xtranslate ISINETSOCKET([<x,...>])            => hb_INETISSOCKET(<x>)
    #xtranslate INETDESTROY([<x,...>])             => iif( HB_INETISSOCKET( <x> ), hb_INETCLOSE( <x> ), )
 
    /* THROW => generate error */

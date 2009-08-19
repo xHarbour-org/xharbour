@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6546 2009/08/17 17:32:34 likewolf Exp $
+ * $Id: ChangeLog,v 1.6547 2009/08/19 17:02:08 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-20 00:02 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * include/hbcompat.ch
+    + added missing translation rules for MT functions for both Harbour
+      and xHarbour sections.
+    ! removed some old not longer valid translations
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+    + Added INET and HASH function name conversion from
+      Harbour to xhb.
+    + Added translation for these functions:
+      DATETIME(), HOUR(), MINUTE(), TTOS(), STOT(), TTOC(), CTOT()
+    + Added cross mappings for xhb SETKEY().
+    + Added HB_GETENV() <-> GETENV() conversions.
+    + Added MEMOWRIT() translation for xhb sources.
+    + Added i18n() compatibility translation.
+    (by Viktor Szakats, borrowed from Harbour)
 
 2009-08-19 21:01 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rdd/workarea.c
