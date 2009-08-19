@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.31 2007/05/02 06:19:56 walito Exp $
+ * $Id: hbsrlraw.c,v 1.32 2007/05/25 11:10:05 toninhofwi Exp $
  */
 
 /*
@@ -86,10 +86,12 @@ HB_FUNC( HB_CREATELEN8 )
    }
    else if( ISBYREF( 1 ) && ISCHAR(1) && ISNUM( 2 ) )
    {
-      PHB_ITEM pItem = hb_itemUnShare( hb_param(1, HB_IT_STRING) );
-      if( pItem && pItem->item.asString.length >= 8 )
+      char * buffer;
+      ULONG ulLen;
+
+      if( hb_itemGetWriteCL( hb_param( 1, HB_IT_STRING ), &buffer, &ulLen ) && ulLen >= 8 )
       {
-         hb_createlen8( ( BYTE *) pItem->item.asString.value, hb_parnint( 2 ) );
+         hb_createlen8( ( BYTE *) buffer, hb_parnint( 2 ) );
       }
    }
 }

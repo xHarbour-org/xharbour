@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.43 2009/02/20 12:48:23 marchuet Exp $
+ * $Id: cdpapi.c,v 1.44 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -1471,8 +1471,12 @@ HB_FUNC( HB_UTF8POKE )
          ++n2;
          if( n == n2 )
          {
-            pText = hb_itemUnShareString( pText );
-            u16toutf8( ( BYTE * ) & hb_itemGetCPtr( pText )[ulPos], uc );
+            char * szText;
+            if( hb_itemGetWriteCL( pText, &szText, &ulLen ) &&
+                ulPos + n <= ulLen )
+            {
+               u16toutf8( ( BYTE * ) &szText[ulPos], uc );
+            }
             hb_itemReturn( pText );
          }
          else

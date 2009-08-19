@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6547 2009/08/19 17:02:08 likewolf Exp $
+ * $Id: ChangeLog,v 1.6548 2009/08/19 20:03:41 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-20 02:38 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/hbmzip/hbmzip.c
+  * source/rtl/cdpapi.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/philes.c
+  * source/rtl/strpeek.c
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+    + added new function:
+         BOOL hb_itemGetWriteCL( PHB_ITEM pItem,
+                                 char ** pszValue, ULONG * pulLen );
+      which converts item string buffer to writable state to use with
+      functions like FREAD() instead of hb_itemUnShare*()
+    * updated other code to respect above modifications
+  (by Przemyslaw Czerpak, borrowed from Harbour)
+  * source/rtl/hbsrlraw.c
+    * Updated to use hb_itemGetWriteCL().
 
 2009-08-20 00:02 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * include/hbcompat.ch

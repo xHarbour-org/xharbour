@@ -1,5 +1,5 @@
 /*
- * $Id: strpeek.c,v 1.5 2005/11/22 02:01:43 druzus Exp $
+ * $Id: strpeek.c,v 1.6 2006/03/25 02:22:40 druzus Exp $
  */
 
 /*
@@ -81,12 +81,13 @@ HB_FUNC( STRPOKE )
 
    if( pText && ISNUM( 2 ) && ISNUM( 3 ) )
    {
-      ULONG ulPos = hb_parnl( 2 );
+      ULONG ulPos = hb_parnl( 2 ), ulLen;
+      char * pszText;
 
-      if( ulPos > 0 && ulPos <= pText->item.asString.length )
+      if( ulPos > 0 && hb_itemGetWriteCL( pText, &pszText, &ulLen ) &&
+          ulPos <= ulLen )
       {
-         pText = hb_itemUnShare( pText );
-         pText->item.asString.value[ ulPos - 1 ] = (char) ( hb_parni( 3 ) & 0xff );
+         pszText[ ulPos - 1 ] = ( char ) ( hb_parni( 3 ) & 0xff );
       }
       hb_itemReturn( pText );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.38 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: philes.c,v 1.39 2009/08/17 17:32:34 likewolf Exp $
  */
 
 /*
@@ -126,7 +126,8 @@ HB_FUNC( FREAD )
 {
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    USHORT uiError = 0;
-   ULONG ulRead = 0;
+   ULONG ulRead = 0, ulSize;
+   char * buffer;
 
    if( ISNUM( 1 ) && pBuffer && ISBYREF( 2 ) && ISNUM( 3 ) )
    {
@@ -142,18 +143,10 @@ HB_FUNC( FREAD )
                will be one more than the length of the passed buffer, because
                the terminating zero could be used if needed. [vszakats] */
 
-      if( ulOffset + ulRead <= hb_parcsiz( 2 ) )
+      if( ulOffset + ulRead <= hb_parcsiz( 2 ) &&
+          hb_itemGetWriteCL( pBuffer, &buffer, &ulSize ) )
       {
-         /* NOTE: Warning, the read buffer will be directly modified,
-                  this is normal here ! [vszakats] */
-
-         /* Unshare the item to avoid GPF on static buffers and changing
-            other items which shares this buffer. [druzus] */
-         pBuffer = hb_itemUnShare( pBuffer );
-
-         ulRead = hb_fsReadLarge( hb_numToHandle( hb_parnint( 1 ) ),
-                                  ( BYTE * ) hb_itemGetCPtr( pBuffer ) + ulOffset,
-                                  ulRead );
+         ulRead = hb_fsReadLarge( hb_numToHandle( hb_parnint( 1 ) ), ( BYTE * ) buffer + ulOffset, ulRead );
          uiError = hb_fsError();
       }
       else

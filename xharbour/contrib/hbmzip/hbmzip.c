@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.5 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbmzip.c,v 1.6 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -468,26 +468,26 @@ HB_FUNC( HB_UNZIPFILEOPEN )
 HB_FUNC( HB_UNZIPFILEREAD )
 {
    PHB_ITEM  pBuffer = hb_param( 2, HB_IT_STRING );
+   char *    buffer;
+   ULONG     ulSize;
 
-   if( pBuffer && ISBYREF( 2 ) )
+   if( pBuffer && ISBYREF( 2 ) &&
+       hb_itemGetWriteCL( pBuffer, &buffer, &ulSize ) )
    {
       unzFile hUnzip = hb_unzipfileParam( 1 );
 
       if( hUnzip )
       {
-         ULONG     ulRead;
-         ULONG     ulSize = hb_parclen( 2 );
          int       iResult;
 
          if( ISNUM( 3 ) )
          {
-            ulRead = (ULONG) hb_parnl( 3 );
+            ULONG ulRead = (ULONG) hb_parnl( 3 );
             if( ulRead < ulSize )
                ulSize = ulRead;
          }
 
-         pBuffer = hb_itemUnShareString( pBuffer );
-         iResult = unzReadCurrentFile( hUnzip, hb_itemGetCPtr( pBuffer ), ulSize );
+         iResult = unzReadCurrentFile( hUnzip, buffer, ulSize );
          hb_retnl( iResult );
       }
    }

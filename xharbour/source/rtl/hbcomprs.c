@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.15 2008/09/15 15:46:47 marchuet Exp $
+ * $Id: hbcomprs.c,v 1.16 2009/07/10 15:26:10 ronpinkas Exp $
  */
 
 /*
@@ -136,12 +136,7 @@ HB_FUNC( HB_COMPRESS )
       ulBufLen = 0;
       if( pDest && pDestLen && ulDstlen > 0 )
       {
-         pDest = hb_itemUnShare( pDest );
-         if( HB_IS_STRING( pDest ) )
-         {
-            cDest = hb_itemGetCPtr( pDest );
-            ulBufLen = hb_itemGetCLen( pDest );
-         }
+         hb_itemGetWriteCL( pDest, &cDest, &ulBufLen );
       }
       if( cDest == NULL || ulBufLen < ulDstlen )
       {
@@ -225,12 +220,7 @@ HB_FUNC( HB_UNCOMPRESS )
       ulBufLen = 0;
       if( pDest )
       {
-         pDest = hb_itemUnShare( pDest );
-         if( HB_IS_STRING( pDest ) )
-         {
-            cDest = hb_itemGetCPtr( pDest );
-            ulBufLen = hb_itemGetCLen( pDest );
-         }
+         hb_itemGetWriteCL( pDest, &cDest, &ulBufLen );
       }
       if( cDest == NULL || ulBufLen < ulDstlen )
       {

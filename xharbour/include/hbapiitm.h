@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.53 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.54 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -168,6 +168,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references
 extern HB_EXPORT PHB_ITEM   hb_itemUnShare  ( PHB_ITEM pItem ); /* un-share given string item */
 extern HB_EXPORT PHB_ITEM   hb_itemUnShareString( PHB_ITEM pItem ); /* un-share given string item - the pItem have to be valid unrefed string item */
 extern HB_EXPORT void       hb_itemResizeString( PHB_ITEM pItem, ULONG ulLen );
+extern HB_EXPORT BOOL         hb_itemGetWriteCL( PHB_ITEM pItem, char ** pszValue, ULONG * pulLen );
 
 extern HB_EXPORT PHB_ITEM   hb_itemUnRefOnce( PHB_ITEM pItem ); /* de-references passed variable, one step*/
 extern HB_EXPORT char *     hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */

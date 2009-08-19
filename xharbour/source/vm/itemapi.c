@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.162 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: itemapi.c,v 1.163 2009/05/01 21:11:03 marchuet Exp $
  */
 
 /*
@@ -1342,36 +1342,6 @@ PHB_ITEM hb_itemUnRefOnce( PHB_ITEM pItem )
 }
 
 /* Internal API, not standard Clipper */
-/* UnShare string buffer of given item */
-
-PHB_ITEM hb_itemUnShare( PHB_ITEM pItem )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnShare(%p)", pItem));
-
-   if( HB_IS_BYREF( pItem ) )
-   {
-      pItem = hb_itemUnRef( pItem );
-   }
-
-   if( HB_IS_STRING( pItem ) )
-   {
-      if( pItem->item.asString.allocated == 0 || *( pItem->item.asString.pulHolders ) > 1 )
-      {
-         ULONG ulLen1 = pItem->item.asString.length;
-         ULONG ulLen2 = ulLen1 ? ulLen1 : 1;
-         char *sString = ( char* ) hb_xgrab( ulLen2 + 1 );
-
-         hb_xmemcpy( (void *) sString, (void *) pItem->item.asString.value, ulLen1 + 1 );
-
-         hb_itemPutCPtr( pItem, sString, ulLen2 );
-         pItem->item.asString.length = ulLen1;
-      }
-   }
-
-   return pItem;
-}
-
-/* Internal API, not standard Clipper */
 /* UnShare string buffer of given string item */
 
 PHB_ITEM hb_itemUnShareString( PHB_ITEM pItem )
@@ -1398,6 +1368,45 @@ PHB_ITEM hb_itemUnShareString( PHB_ITEM pItem )
    pItem->type &= ~HB_IT_DEFAULT;
 
    return pItem;
+}
+
+/* Internal API, not standard Clipper */
+/* UnShare string buffer of given item */
+
+PHB_ITEM hb_itemUnShare( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnShare(%p)", pItem));
+
+   if( HB_IS_BYREF( pItem ) )
+   {
+      pItem = hb_itemUnRef( pItem );
+   }
+
+   if( HB_IS_STRING( pItem ) )
+   {
+      return hb_itemUnShareString( pItem );
+   }
+   return pItem;
+}
+
+BOOL hb_itemGetWriteCL( PHB_ITEM pItem, char ** pszValue, ULONG * pulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetWriteCL(%p,%p,%p)", pItem, pszValue, pulLen));
+
+   if( pItem )
+   {
+      if( HB_IS_BYREF( pItem ) )
+         pItem = hb_itemUnRef( pItem );
+
+      if( HB_IS_STRING( pItem ) )
+      {
+         hb_itemUnShareString( pItem );
+         *pulLen = pItem->item.asString.length;
+         *pszValue = pItem->item.asString.value;
+         return TRUE;
+      }
+   }
+   return FALSE;
 }
 
 /* Internal API, not standard Clipper */
