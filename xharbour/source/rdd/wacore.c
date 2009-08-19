@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.16 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: wacore.c,v 1.17 2009/02/24 12:38:16 marchuet Exp $
  */
 
 /*
@@ -222,7 +222,7 @@ HB_ERRCODE hb_rddSelectFirstAvailable( void )
 }
 
 /*
- * Creare and insert the new WorkArea node
+ * Create and insert the new WorkArea node
  */
 USHORT hb_rddInsertAreaNode( const char *szDriver )
 {
@@ -351,10 +351,10 @@ BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
    hb_threadWaitForIdle();
    if( !bSet )
    {
-      // Hay que crear las estructuras HB_STACKRDD para cada thread y guardarlas en los respectivos stack
-      // y hay que destruir el LOCK_AREA y poner fMtLockInit en FALSE
+      /* We must create HB_STACKRDD structures for each thread and save them in their respective stacks
+       * And we must destroy the LOCK_AREA and set fMtLockInit to FALSE */
 
-      HB_STACK *p = hb_ht_stack->next; // Comenzamos desde el segundo thread
+      PHB_STACK p = hb_ht_stack->next; /* Start from the second thread */
       PHB_STACKRDD pRddInfo;
 
       while( p )
@@ -384,12 +384,12 @@ BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
    }
    else
    {
-      // Hay que verificar que no haya areas abiertas en ninguno de los threads excepto el principal.
-      // Hay que destruir las estructuras HB_STACKRDD de cada thread, excepto el del principal y
-      // setear en cada stack para que use el puntero a HB_STACKRDD del principal.
-      // En el thread principal, si hay areas abiertas, hay que crear el LOCK_AREA y poner el fMtLockInit en TRUE.
+      /* We must verify that there are no open areas in any thread except the main one.
+       * We must destroy HB_STACKRDD structures of each thread except the main one and
+       * set each stack's HB_STACKRDD pointer to the main thread's HB_STACKRDD.
+       * In the main thread, if there are open areas, create the LOCK_AREA and set fMtLockInit to TRUE. */
 
-      HB_STACK *p = hb_ht_stack->next; // Comenzamos desde el segundo thread
+      HB_STACK *p = hb_ht_stack->next; /* Start from the second thread */
       PHB_STACKRDD pRddInfo;
 
       while( p )
@@ -404,7 +404,7 @@ BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
 
       if( bOk )
       {
-         p = hb_ht_stack; // Comenzamos desde el primer thread
+         p = hb_ht_stack; /* Start from the first thread */
          pRddInfo = p->rdd;
 
          if( pRddInfo->uiWaMax > 0 )
