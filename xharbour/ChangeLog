@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6548 2009/08/19 20:03:41 likewolf Exp $
+ * $Id: ChangeLog,v 1.6549 2009/08/19 22:40:47 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-20 03:18 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * include/hbxml.h
+  * source/rtl/hbxml.c
+    ! Fixed to retrieve file handles with hb_itemGetNInt() and hb_parnint(),
+      instead of long versions.
+    % hb_itemRelease( hb_itemReturn() ) -> hb_itemReturnRelease()
+    * isspace() -> HB_ISSPACE(). HB_ISSPACE() should be
+      revised in the future if Unicode is used, but until
+      then this is fine here.
+    * FHANDLE -> HB_FHANDLE
+    (by Viktor Szakats, borrowed from Harbour)
+    * Updated to use hb_itemGetWriteCL().
+    * use const char * instead of char * in places which should be marked
+      as const
+    * cleanup errors in strict ANSI C compilation
+    (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-08-20 02:38 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/hbmzip/hbmzip.c
