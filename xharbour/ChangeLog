@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6545 2009/08/17 16:12:52 likewolf Exp $
+ * $Id: ChangeLog,v 1.6546 2009/08/17 17:32:34 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-19 21:01 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rdd/workarea.c
+    % A small optimization in hb_waAddField().
+    ! keep EOF position synced in relation positioning
+    * added small protection against releasing WA by user codeblock in
+      EVALBLOCK() method
+  (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-08-17 21:31 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rtl/dirdrive.c

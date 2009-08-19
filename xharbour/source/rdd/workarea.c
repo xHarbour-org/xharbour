@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.98 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: workarea.c,v 1.99 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -242,18 +242,19 @@ static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 static HB_ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 {
    LPFIELD pField;
-   char szFieldName[ HB_SYMBOL_NAME_LEN + 1 ], *szPtr;
+   char szFieldName[ HB_SYMBOL_NAME_LEN + 1 ];
+   const char *szPtr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waAddField(%p, %p)", pArea, pFieldInfo));
 
    /* Validate the name of field */
-   szPtr = ( char * ) pFieldInfo->atomName;
+   szPtr = ( const char * ) pFieldInfo->atomName;
    while( HB_ISSPACE( *szPtr ) )
    {
       ++szPtr;
    }
    hb_strncpyUpperTrim( szFieldName, szPtr, sizeof( szFieldName ) - 1 );
-   if( strlen( szFieldName ) == 0 )
+   if( szFieldName[ 0 ] == 0 )
       return HB_FAILURE;
 
    pField = pArea->lpFields + pArea->uiFieldCount;
@@ -269,14 +270,14 @@ static HB_ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 
 #ifdef HB_COMPAT_FOXPRO
    pField->uiStep = pFieldInfo->uiStep;
-   
+
    if( pField->uiFlags & HB_FF_NULLABLE )
       pField->bNullPos = (pArea->bFlagCount ++);
    if( pField->uiType == HB_FT_VARLENGTH )
       pField->bVarPos = (pArea->bFlagCount ++);
    if( pField->uiFlags & HB_FF_HIDDEN )
       pArea->uiFieldHidden ++;
-#endif      
+#endif
 
    pArea->uiFieldCount ++;
    return HB_SUCCESS;
@@ -499,9 +500,9 @@ static HB_ERRCODE hb_waFieldCount( AREAP pArea, USHORT * uiFields )
 
 #ifdef HB_COMPAT_FOXPRO
    * uiFields = pArea->uiFieldCount - pArea->uiFieldHidden;
-#else   
+#else
    * uiFields = pArea->uiFieldCount;
-#endif   
+#endif
    return HB_SUCCESS;
 }
 
@@ -607,15 +608,15 @@ static HB_ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PH
             case HB_FT_OLE:
                hb_itemPutC( pItem, "G" );
                break;
-               
+
             case HB_FT_BINARY:
                hb_itemPutC( pItem, "B" );
                break;
-               
+
             case HB_FT_NONE:
                hb_itemPutC( pItem, "0" );
-               break;               
-               
+               break;
+
             default:
                hb_itemPutC( pItem, "U" );
                break;
@@ -861,13 +862,12 @@ static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             PHB_CODEPAGE cdpage = hb_cdpFind( hb_itemGetCPtr( pItem ) );
             if ( cdpage )
                pArea->cdPage = cdpage;
-         }      
+         }
          if ( pArea->cdPage )
             hb_itemPutC( pItem, ( char * ) pArea->cdPage->id );
          else
             hb_itemPutC( pItem, "" );
          break;
-         
 
       default:
          return HB_FAILURE;
@@ -1439,57 +1439,65 @@ static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
    DBORDERINFO pInfo;
    HB_ERRCODE errCode;
    int iOrder;
+   BOOL fEof;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waRelEval(%p, %p)", pArea, pRelInfo));
 
-   errCode = SELF_EVALBLOCK( pRelInfo->lpaParent, pRelInfo->itmCobExpr );
-
+   errCode = SELF_EOF( pRelInfo->lpaParent, &fEof );
    if( errCode == HB_SUCCESS )
    {
-      /*
-       *  Check the current order
-       */
-      pResult = pRelInfo->lpaParent->valResult;
-      pRelInfo->lpaParent->valResult = NULL;
-      memset( &pInfo, 0, sizeof( DBORDERINFO ) );
-      pInfo.itmResult = hb_itemPutNI( NULL, 0 );
-      errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
-
-      if( errCode == HB_SUCCESS )
+      if( fEof )
+         errCode = SELF_GOTO( pArea, 0 );
+      else
       {
-         iOrder = hb_itemGetNI( pInfo.itmResult );
-         if( iOrder != 0 )
-         {
-            if( pRelInfo->isScoped )
-            {
-               pInfo.itmNewVal = pResult;
-               errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
-               if( errCode == HB_SUCCESS )
-                  errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
-            }
-            if( errCode == HB_SUCCESS )
-               errCode = SELF_SEEK( pArea, FALSE, pResult, FALSE );
-         }
-         else
+         errCode = SELF_EVALBLOCK( pRelInfo->lpaParent, pRelInfo->itmCobExpr );
+         if( errCode == HB_SUCCESS )
          {
             /*
-             * If current order equals to zero, use GOTOID instead of SEEK
-             * Unfortunately it interacts with buggy .prg code which returns
-             * non numerical values from relation expression and RDD accepts
-             * only numerical record ID. In such case SELF_GOTO() works like
-             * SELF_GOEOF() but SELF_GOTOID() reports error. So for Clipper
-             * compatibility SELF_GOTO() is used here but if RDD can use
-             * non numerical record IDs then this method should be overloaded
-             * to use SELF_GOTOID(), [druzus]
+             *  Check the current order
              */
-            /* errCode = SELF_GOTOID( pArea, pResult ); */
-            errCode = SELF_GOTO( pArea, hb_itemGetNL( pResult ) );
+            pResult = pRelInfo->lpaParent->valResult;
+            pRelInfo->lpaParent->valResult = NULL;
+            memset( &pInfo, 0, sizeof( DBORDERINFO ) );
+            pInfo.itmResult = hb_itemPutNI( NULL, 0 );
+            errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
+
+            if( errCode == HB_SUCCESS )
+            {
+               iOrder = hb_itemGetNI( pInfo.itmResult );
+               if( iOrder != 0 )
+               {
+                  if( pRelInfo->isScoped )
+                  {
+                     pInfo.itmNewVal = pResult;
+                     errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
+                     if( errCode == HB_SUCCESS )
+                        errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
+                  }
+                  if( errCode == HB_SUCCESS )
+                     errCode = SELF_SEEK( pArea, FALSE, pResult, FALSE );
+               }
+               else
+               {
+                  /*
+                   * If current order equals to zero, use GOTOID instead of SEEK
+                   * Unfortunately it interacts with buggy .prg code which returns
+                   * non numerical values from relation expression and RDD accepts
+                   * only numerical record ID. In such case SELF_GOTO() works like
+                   * SELF_GOEOF() but SELF_GOTOID() reports error. So for Clipper
+                   * compatibility SELF_GOTO() is used here but if RDD can use
+                   * non numerical record IDs then this method should be overloaded
+                   * to use SELF_GOTOID(), [druzus]
+                   */
+                  /* errCode = SELF_GOTOID( pArea, pResult ); */
+                  errCode = SELF_GOTO( pArea, hb_itemGetNL( pResult ) );
+               }
+            }
+            hb_itemRelease( pInfo.itmResult );
+            hb_itemRelease( pResult );
          }
       }
-      hb_itemRelease( pInfo.itmResult );
-      hb_itemRelease( pResult );
    }
-
    return errCode;
 }
 
@@ -1747,15 +1755,20 @@ static HB_ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
 static HB_ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 {
    PHB_ITEM pItem;
-   int iCurrArea;
+   int iCurrArea, iUsedArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waEvalBlock(%p, %p)", pArea, pBlock));
 
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
-   if( iCurrArea != pArea->uiArea )
-      hb_rddSelectWorkAreaNumber( pArea->uiArea );
+   iUsedArea = pArea->uiArea;
+   if( iCurrArea != iUsedArea )
+      hb_rddSelectWorkAreaNumber( iUsedArea );
 
    pItem = hb_vmEvalBlockOrMacro( pBlock );
+
+   if( ( AREAP ) hb_rddGetWorkAreaPointer( iUsedArea ) != pArea )
+      return HB_FAILURE;
+
    if( ! pArea->valResult )
       pArea->valResult = hb_itemNew( NULL );
    hb_itemCopy( pArea->valResult, pItem );
@@ -2079,7 +2092,7 @@ static USHORT      s_uiRddMax   = 0;      /* Size of RDD pool */
 static USHORT      s_uiRddCount = 0;      /* Number of registered RDD */
 
 /*
- * Get RDD node poionter
+ * Get RDD node pointer
  */
 LPRDDNODE hb_rddGetNode( USHORT uiNode )
 {
