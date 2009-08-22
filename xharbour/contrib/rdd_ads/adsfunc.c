@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.98 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: adsfunc.c,v 1.99 2009/07/12 07:06:37 ptsarenko Exp $
  */
 
 /*
@@ -1519,8 +1519,10 @@ HB_FUNC( ADSGETLASTERROR )
    AdsGetLastError( &ulLastErr,
                     aucError,
                     &usLength );
-
-   hb_storclen( ( char * ) aucError, usLength, 1 );
+   if( ulLastErr > 0 )
+      hb_storclen( ( char * ) aucError, usLength, 1 );
+   else
+      hb_storc( "", 1 );
 
    hb_retnl( ulLastErr );
 }

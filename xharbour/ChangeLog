@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6550 2009/08/19 23:19:52 likewolf Exp $
+ * $Id: ChangeLog,v 1.6551 2009/08/19 23:28:44 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-21 19:44 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * contrib/rdd_ads/adsfunc.c
+    * ensured byRef error text is an empty string if there is no error
+      in AdsGetLastError. Before, it was returning 601 bytes of garbage.
 
 2009-08-20 03:27 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rdd/wacore.c
