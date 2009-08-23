@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.46 2009/07/29 17:15:53 marchuet Exp $
+# $Id: compile.mak,v 1.47 2009/08/10 18:41:05 lculik Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -3357,6 +3357,29 @@ $(OBJ_DIR)$(DIR_SEP)gdimage.c : $(GDLIB_DIR)$(DIR_SEP)source$(DIR_SEP)gdimage.pr
 $(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)gtwvw.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)wvwdraw$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwdraw.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwmenu$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwmenu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwtbar$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwtbar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwstbar$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwstbar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwpush$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwpush.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwcheck$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwcheck.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwedit$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwedit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wvwfuncs$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwfuncs.c
+	$(CC_CMD)
 
 #===============================================================================
 # HBMLIB_LIB.LIB dependencies

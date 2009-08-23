@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.243 2009/08/10 19:24:57 lculik Exp $
+# $Id: makefile.vc,v 1.244 2009/08/11 11:53:03 lculik Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -411,7 +411,7 @@ CPLUSPLUS=1
 
 # Uncomment this section if you have want to build the libraries.
 # HB_GTWVG=1
-# HB_GTWVW=1
+HB_GTWVW=1
 # HB_FIREBIRD=1
 # HB_MYSQL=1
 # HB_PGSQL=1

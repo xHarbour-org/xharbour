@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: contrib.pc,v 1.4 2008/07/30 14:44:45 marchuet Exp $
+# $Id: contrib.pc,v 1.5 2009/08/10 18:41:05 lculik Exp $
 #
 # MAKEFILE FOR PELLESC (CONTRIBS)
 #
@@ -14,7 +14,7 @@
 
 # Uncomment this section if you have want to build the libraries.
 HB_GTWVG=1
-#HB_GTWVW=1
+HB_GTWVW=1
 #HB_WHAT32=1
 #HB_FIREBIRD=1
 #HB_FREEIMAGE=1
