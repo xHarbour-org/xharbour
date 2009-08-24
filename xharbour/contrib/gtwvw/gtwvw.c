@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.49 2009/08/23 22:46:11 lculik Exp $
+* $Id: gtwvw.c,v 1.50 2009/08/24 12:34:40 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -3988,7 +3988,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
       }
 
       pWindowData->bIgnoreWM_SYSCHAR = FALSE;
-      //return( 0 );
+      break;
     }
 
     case WM_QUERYENDSESSION: /* Closing down computer */
