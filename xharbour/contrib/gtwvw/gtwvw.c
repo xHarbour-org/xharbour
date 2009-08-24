@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: gtwvw.c,v 1.49 2009/08/23 22:46:11 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -4582,7 +4582,7 @@ RECT hb_gt_wvwGetColRowFromXYRect( WIN_DATA * pWindowData, RECT xy )
  * This works because we are using the FIXED system font
  *
  */
-static RECT hb_gt_wvwGetXYFromColRowRect( WIN_DATA * pWindowData, RECT colrow )
+RECT hb_gt_wvwGetXYFromColRowRect( WIN_DATA * pWindowData, RECT colrow )
 {
   RECT xy = { 0 };
 
@@ -7905,7 +7905,7 @@ char * hb_gt_wvw_GetAppName( void )
 
 APP_DATA hb_gt_wvwGetAppData( void )
 {
-	return (APP_DATA) s_pWvwData->s_sApp;
+   return s_pWvwData->s_sApp;
 }	
 
 WVW_DATA * hb_getWvwData( void ) 
