@@ -4370,7 +4370,11 @@ FUNCTION AnsiToHtml( cAnsiText )
       nEnd  := parser:p_pos
       cText := SubStr( parser:p_str, nStart, nEnd-nStart )
 
-      DO WHILE .NOT. ( (cChr := P_NEXT(parser)) $ "; " )  .AND. .NOT. parser:p_pos == 0; ENDDO
+      DO WHILE .NOT. ( (cChr := P_NEXT(parser)) $ "; " ) .AND. Asc(cChr) > 0 .AND. .NOT. parser:p_pos == 0; ENDDO
+
+      if Asc(cChr) == 0
+         LOOP
+      endif
 
       SWITCH cChr
       CASE ";"
