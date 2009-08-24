@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.50 2009/08/24 12:34:40 lculik Exp $
+* $Id: gtwvw.c,v 1.51 2009/08/24 17:55:59 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -791,6 +791,19 @@ void hb_gt_wvw_SetPos(PHB_GT pGT, int iRow, int iCol )
     hb_gt_wvwFUNCEpilogue( );
   }
 }
+
+
+static int hb_gt_wvw_MaxCol( PHB_GT pGT )
+{
+   return s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ]->COLS - 1;
+}
+
+/*-------------------------------------------------------------------*/
+static int hb_gt_wvw_MaxRow( PHB_GT pGT )
+{
+   return s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ]->ROWS - 1;
+}
+
 
 /*-------------------------------------------------------------------*/
 
@@ -7801,6 +7814,9 @@ static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 
     pFuncTable->Init                  = hb_gt_wvw_Init;
     pFuncTable->Exit                  = hb_gt_wvw_Exit;
+    pFuncTable->MaxCol                = hb_gt_wvw_MaxCol;       
+    pFuncTable->MaxRow                = hb_gt_wvw_MaxRow;  
+    
     pFuncTable->SetPos                = hb_gt_wvw_SetPos;
     pFuncTable->IsColor               = hb_gt_wvw_IsColor;
     pFuncTable->GetCursorStyle        = hb_gt_wvw_GetCursorStyle;

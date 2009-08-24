@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.199 2009/08/01 17:10:03 modalsist Exp $
+ * $Id: hbmake.prg,v 1.200 2009/08/11 13:31:05 modalsist Exp $
  */
 
 /*
@@ -459,7 +459,7 @@ FUNCTION MAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
       ENDIF
    ENDIF
 
-   ferase( s_cMakeFileName )
+//   ferase( s_cMakeFileName )
 
    SET CURSOR ON
 
@@ -1245,6 +1245,7 @@ FUNCTION CompileFiles()
                   ENDIF
                   cComm := Strtran( cComm, "$**", cPrg )
                   cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+
                   Outstd( cComm )
                   Outstd( CRLF )
                   setpos(9,0)
@@ -1456,11 +1457,13 @@ FUNCTION CompileFiles()
 //                        cComm := Strtran( cComm, "-Fo$*", "-Fo" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
 //                     ELSE
                         cComm := Strtran( cComm, "o$*", "o" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
+
 //                     ENDIF
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
                   cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+
 
                   @4,16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
@@ -4978,7 +4981,7 @@ FUNCTION BuildMscCfgFile()
       endif
 
       FWrite( nCfg, "CC=cl" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__" + ReplaceMacros( "-I$(HB_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I$(HB_DIR)\include -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
