@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6556 2009/08/24 18:03:18 lculik Exp $
+ * $Id: ChangeLog,v 1.6557 2009/08/24 22:50:21 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-26 12:43 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * ChangeLog
+    ! Restored my and Augusto's ChangeLog entries from 19-21 August, which
+      were accidentally deleted by Luiz.
 
 2009-08-24 19:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/tip/thtml.prg
@@ -52,6 +57,75 @@
     makefile.wc
     contrib.pc
     !updated to compile gtwvw
+
+2009-08-21 19:44 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * contrib/rdd_ads/adsfunc.c
+    * ensured byRef error text is an empty string if there is no error
+      in AdsGetLastError. Before, it was returning 601 bytes of garbage.
+
+2009-08-20 03:27 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rdd/wacore.c
+    * Translated Walter's comments from Spanish to English. Both are not my
+      native languages, so please check it.
+
+2009-08-20 03:18 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * include/hbxml.h
+  * source/rtl/hbxml.c
+    ! Fixed to retrieve file handles with hb_itemGetNInt() and hb_parnint(),
+      instead of long versions.
+    % hb_itemRelease( hb_itemReturn() ) -> hb_itemReturnRelease()
+    * isspace() -> HB_ISSPACE(). HB_ISSPACE() should be
+      revised in the future if Unicode is used, but until
+      then this is fine here.
+    * FHANDLE -> HB_FHANDLE
+    (by Viktor Szakats, borrowed from Harbour)
+    * Updated to use hb_itemGetWriteCL().
+    * use const char * instead of char * in places which should be marked
+      as const
+    * cleanup errors in strict ANSI C compilation
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+
+2009-08-20 02:38 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/hbmzip/hbmzip.c
+  * source/rtl/cdpapi.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/philes.c
+  * source/rtl/strpeek.c
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+    + added new function:
+         BOOL hb_itemGetWriteCL( PHB_ITEM pItem,
+                                 char ** pszValue, ULONG * pulLen );
+      which converts item string buffer to writable state to use with
+      functions like FREAD() instead of hb_itemUnShare*()
+    * updated other code to respect above modifications
+  (by Przemyslaw Czerpak, borrowed from Harbour)
+  * source/rtl/hbsrlraw.c
+    * Updated to use hb_itemGetWriteCL().
+
+2009-08-20 00:02 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * include/hbcompat.ch
+    + added missing translation rules for MT functions for both Harbour
+      and xHarbour sections.
+    ! removed some old not longer valid translations
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+    + Added INET and HASH function name conversion from
+      Harbour to xhb.
+    + Added translation for these functions:
+      DATETIME(), HOUR(), MINUTE(), TTOS(), STOT(), TTOC(), CTOT()
+    + Added cross mappings for xhb SETKEY().
+    + Added HB_GETENV() <-> GETENV() conversions.
+    + Added MEMOWRIT() translation for xhb sources.
+    + Added i18n() compatibility translation.
+    (by Viktor Szakats, borrowed from Harbour)
+
+2009-08-19 21:01 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rdd/workarea.c
+    % A small optimization in hb_waAddField().
+    ! keep EOF position synced in relation positioning
+    * added small protection against releasing WA by user codeblock in
+      EVALBLOCK() method
+  (by Przemyslaw Czerpak, borrowed from Harbour)
 
 2009-08-17 21:31 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rtl/dirdrive.c
