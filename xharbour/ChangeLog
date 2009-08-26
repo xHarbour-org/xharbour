@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6558 2009/08/26 08:50:06 likewolf Exp $
+ * $Id: ChangeLog,v 1.6559 2009/08/26 16:02:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -36,7 +36,8 @@
 2009-08-24 09:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/gtwvw/gtwvw.c
   ! contrib/gtwvw/hbgtwvw.h
-   minor ajust to typecast
+   minor ajust to typecast. reported on xharbour developer list and xharbour portuguese
+   news by reynaldo henrique
 
 2009-08-23 19:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/gtwvw/gtwvw.c
