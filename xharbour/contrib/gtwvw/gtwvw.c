@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.51 2009/08/24 17:55:59 lculik Exp $
+* $Id: gtwvw.c,v 1.52 2009/08/24 18:03:18 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -5288,8 +5288,8 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
   pWindowData->usSBHeight= 0;
 
   pWindowData->bSBPaint = FALSE;
-//  pWindowData->cSBColorForeground = NULL;
-//  pWindowData->cSBColorBackground = NULL;
+  pWindowData->cSBColorForeground = NULL;
+  pWindowData->cSBColorBackground = NULL;
 
   pWindowData->hToolBar = NULL;
   pWindowData->usTBHeight= 0;
@@ -5320,20 +5320,20 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
 
 static void hb_gt_wvwAddCharToInputQueue ( int iKey )
 {
-  int iNextPos;
+  UINT uiWinNum  =  s_pWvwData->s_usNumWindows-1;
+  int iNextPos = s_pWvwData->s_pWindows[ uiWinNum ]->keyPointerIn;
   if ( iKey == K_MOUSEMOVE || iKey == K_NCMOUSEMOVE)
   {
-     if ( s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyLast == iKey && s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn != s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerOut )
+     if ( s_pWvwData->s_pWindows[ uiWinNum ]->keyLast == iKey && s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn != s_pWvwData->s_pWindows[ uiWinNum ]->keyPointerOut )
         return;
   }
 
-  s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyLast = iKey;
-  iNextPos = ( s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn >= WVW_CHAR_QUEUE_SIZE - 1 ) ? 0 : s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn+1 ;
-  if ( iNextPos != s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerOut )
-  {
-    s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->Keys[ s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn ] = iKey ;
-    s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->keyPointerIn = iNextPos ;
-  }
+  s_pWvwData->s_pWindows[ uiWinNum ]->Keys[iNextPos] =  s_pWvwData->s_pWindows[ uiWinNum ]->keyLast = iKey;
+  if ( ++iNextPos >=  WVW_CHAR_QUEUE_SIZE )
+     iNextPos = 0;
+  if ( iNextPos != s_pWvwData->s_pWindows[ uiWinNum ]->keyPointerOut  )
+    s_pWvwData->s_pWindows[ uiWinNum ] ->keyPointerIn = iNextPos ;
+
 }
 
 /*-------------------------------------------------------------------*/
