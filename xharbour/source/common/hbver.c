@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.46 2008/11/26 05:40:41 andijahja Exp $
+ * $Id: hbver.c,v 1.47 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -466,6 +466,8 @@ char * hb_verCompiler( void )
    pszName = "Pelles ISO C Compiler";
    iVerMajor = __POCC__ / 100;
    iVerMinor = __POCC__ % 100;
+   if ( ( iVerMajor == 2 ) && ( iVerMinor == 70 ) )
+      pszName = "XCC ISO C Compiler";
    iVerPatch = 0;
 
 #elif defined(__XCC__)
@@ -536,8 +538,12 @@ char * hb_verCompiler( void )
       iVerPatch = 0;
    #endif
 
-   #if (__BORLANDC__ >= 1424) /* Version 5.9 */
-      pszName = "CodeGear C++";
+   #if (__BORLANDC__ >= 1424)      /* Version 5.9 */
+      #if (__BORLANDC__ >= 1568)   /* Version 6.2 */
+        pszName = "Embarcadero C++";
+      #else
+        pszName = "CodeGear C++";
+      #endif
    #else
       pszName = "Borland C++";
    #endif
