@@ -1,11 +1,13 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.1 2002/07/11 02:57:52 lculik Exp $
+rem $Id: make_vc.bat,v 1.1 2006/02/25 00:00:36 ronpinkas Exp $
 rem 
 
 :BUILD
 
-   nmake /f makefile.vc %1 %2 %3 > make_vc.log
+   cd ..\..
+   make_vc contrib
+   cd contrib\gtwvw
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK

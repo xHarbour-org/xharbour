@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id:  $
+rem $Id: make_b32.bat,v 1.1 2004/10/25 07:30:03 bdj Exp $
 rem
 
 if "%1" == "clean" goto CLEAN
@@ -8,7 +8,9 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
-   make -fmakefile.bc %1 %2 %3 > make_b32.log
+   cd ..\..
+   make_b32 contrib
+   cd contrib\gtwvw
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
