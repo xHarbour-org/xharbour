@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6561 2009/08/27 05:29:38 andijahja Exp $
+ * $Id: ChangeLog,v 1.6562 2009/08/28 01:24:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -20,8 +20,8 @@
      + Added auto detection of OpenSSL
 
    * source/rdd/dbcmd.c
-     * Hack to __DBCOPY() to explictly prefix target file with the current path
-       to to avoid inadvertant override of file in the SET PATH folder.
+     * Hack to __DBCOPY() to explicitly prefix target file with the current path
+       to to avoid inadvertent override of file in the SET PATH folder.
 
        /*
           NOTE: RDD authors please review if this is the correct place for such hack.
