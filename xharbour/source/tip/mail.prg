@@ -1,5 +1,5 @@
 /*
- * $Id: mail.prg,v 1.5 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: mail.prg,v 1.6 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -610,8 +610,12 @@ RETURN .T.
 
 
 METHOD attachFile( cFileName ) CLASS TipMail
+
    LOCAL cContent := MemoRead( cFileName )
-   LOCAL cMimeType:= TIP_FileMimetype( cFileName )
+   Local cFname, cFext 
+   Local xDummy := HB_FNameSplit( cFileName,, @cFname, @cFext )
+
+   LOCAL cMimeType:= HB_SetMimeType( cFileName, cFname, cFext )
    LOCAL cDelim   := HB_OsPathSeparator()
 
    LOCAL oAttach
@@ -620,7 +624,42 @@ METHOD attachFile( cFileName ) CLASS TipMail
       RETURN .F.
    ENDIF
 
-   oAttach   := TIPMail():new( cContent, "base64" )
+   IF ".html" in lower( cFext ) .OR. ".htm" in lower( cFext )
+      cMimeType += "; charset=ISO-8859-1"
+   ENDIF
+
+//   oAttach   := TIPMail():new( cContent, "base64" )
+      IF Lower( cFileName ) LIKE ".+\.(vbd|asn|asz|asd|pqi|tsp|exe|sml|ofml)"    .OR. ;
+         Lower( cFileName ) LIKE ".+\.(pfr|frl|spl|gz||stk|ips|ptlk|hqx|mbd)"    .OR. ;
+         Lower( cFileName ) LIKE ".+\.(mfp|pot|pps|ppt|ppz|doc|n2p|bin|class)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(lha|lzh|lzx|dbf|cdx|dbt|fpt|ntx|oda)"     .OR. ;
+         Lower( cFileName ) LIKE ".+\.(axs|zpa|pdf|ai|eps|ps|shw|qrt|rtc|rtf)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(smp|dst|talk|tbk|vmd|vmf|wri|wid|rrf)"    .OR. ;
+         Lower( cFileName ) LIKE ".+\.(wis|ins|tmv|arj|asp|aabaam|aas|bcpio)"    .OR. ;
+         Lower( cFileName ) LIKE ".+\.(vcd|chat|cnc|coda|page|z|con|cpio|pqf)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(csh|cu|csm|dcr|dir|dxr|swa|dvi|evy|ebk)"  .OR. ;
+         Lower( cFileName ) LIKE ".+\.(gtar|hdf|map|phtml|php3|ica|ipx|ips|js)"  .OR. ;
+         Lower( cFileName ) LIKE ".+\.(latex|bin|mif|mpl|mpire|adr|wlt|nc|cdf)"  .OR. ;
+         Lower( cFileName ) LIKE ".+\.(npx|nsc|pgp|css|sh||shar|swf|spr|sprite)" .OR. ;
+         Lower( cFileName ) LIKE ".+\.(sit|sca|sv4cpio|sv4crc|tar|tcl|tex)"      .OR. ;
+         Lower( cFileName ) LIKE ".+\.(texinfo|texi|tlk|t|tr|roff|man|mems)"     .OR. ;
+         Lower( cFileName ) LIKE ".+\.(alt|che|ustar|src|xls|xlt|zip|au|snd)"    .OR. ;
+         Lower( cFileName ) LIKE ".+\.(es|gsm|gsd|rmf|tsi|vox|wtx|aif|aiff)"     .OR. ;
+         Lower( cFileName ) LIKE ".+\.(aifc|cht|dus|mid|midi|mp3|mp2|m3u|ram)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(ra|rpm|stream|rmf|vqf|vql|vqe|wav|wtx)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(mol|pdb|dwf|ivr|cod|cpi|fif|gif|ief)"     .OR. ;
+         Lower( cFileName ) LIKE ".+\.(jpeg|jpg|jpe|rip|svh|tiff|tif|mcf|svf)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(dwg|dxf|wi|ras|etf|fpx|fh5|fh4|fhc|dsf)"  .OR. ;
+         Lower( cFileName ) LIKE ".+\.(pnm|pbm|pgm|ppm|rgb|xbm|xpm|xwd|dig)"     .OR. ;
+         Lower( cFileName ) LIKE ".+\.(push|wan|waf||afl|mpeg|mpg|mpe|qt|mov)"   .OR. ;
+         Lower( cFileName ) LIKE ".+\.(viv|vivo|asf|asx|avi|movie|vgm|vgx)"      .OR. ;
+         Lower( cFileName ) LIKE ".+\.(xdr|vgp|vts|vtts|3dmf|3dm|qd3d|qd3)"      .OR. ;
+         Lower( cFileName ) LIKE ".+\.(svr|wrl|wrz|vrt)" .OR. Empty(cFExt)
+         oAttach   := TIPMail():new( cContent, "base64" )
+      ELSE
+         oAttach   := TIPMail():new( cContent, "7-bit" )
+      ENDIF
+
    cFileName := SubStr( cFileName, Rat( cFileName, cDelim ) + 1 )
 
    oAttach:setFieldPart  ( "Content-Type", cMimeType )

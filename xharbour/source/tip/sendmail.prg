@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.8 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: sendmail.prg,v 1.9 2009/02/03 22:41:09 lculik Exp $
  */
 
 /*
@@ -91,6 +91,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lConnect      := .T.
    LOCAL oPop
    LOCAL adata:={},nCount,nSize,nSent
+   LOCAL cTemp
 
    DEFAULT cUser       TO ""
    DEFAULT cPass       TO ""
@@ -103,6 +104,11 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    DEFAULT lNoAuth     TO .F.
    DEFAULT nTimeOut    TO 3000
    DEFAULT cReplyTo    TO ""
+
+   IF Valtype( aFiles ) == "C"
+      cTemp := aFiles
+      aFiles := { cTemp }
+   ENDIF
 
    cUser := StrTran( cUser, "@", "&at;" )
 
@@ -319,54 +325,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          EXIT
       ENDIF
 
-      oAttach := TipMail():New()
-
-      HB_FNameSplit( cFile,, @cFname, @cFext )
-
-      IF Lower( cFile ) LIKE ".+\.(vbd|asn|asz|asd|pqi|tsp|exe|sml|ofml)"    .OR. ;
-         Lower( cFile ) LIKE ".+\.(pfr|frl|spl|gz||stk|ips|ptlk|hqx|mbd)"    .OR. ;
-         Lower( cFile ) LIKE ".+\.(mfp|pot|pps|ppt|ppz|doc|n2p|bin|class)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(lha|lzh|lzx|dbf|cdx|dbt|fpt|ntx|oda)"     .OR. ;
-         Lower( cFile ) LIKE ".+\.(axs|zpa|pdf|ai|eps|ps|shw|qrt|rtc|rtf)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(smp|dst|talk|tbk|vmd|vmf|wri|wid|rrf)"    .OR. ;
-         Lower( cFile ) LIKE ".+\.(wis|ins|tmv|arj|asp|aabaam|aas|bcpio)"    .OR. ;
-         Lower( cFile ) LIKE ".+\.(vcd|chat|cnc|coda|page|z|con|cpio|pqf)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(csh|cu|csm|dcr|dir|dxr|swa|dvi|evy|ebk)"  .OR. ;
-         Lower( cFile ) LIKE ".+\.(gtar|hdf|map|phtml|php3|ica|ipx|ips|js)"  .OR. ;
-         Lower( cFile ) LIKE ".+\.(latex|bin|mif|mpl|mpire|adr|wlt|nc|cdf)"  .OR. ;
-         Lower( cFile ) LIKE ".+\.(npx|nsc|pgp|css|sh||shar|swf|spr|sprite)" .OR. ;
-         Lower( cFile ) LIKE ".+\.(sit|sca|sv4cpio|sv4crc|tar|tcl|tex)"      .OR. ;
-         Lower( cFile ) LIKE ".+\.(texinfo|texi|tlk|t|tr|roff|man|mems)"     .OR. ;
-         Lower( cFile ) LIKE ".+\.(alt|che|ustar|src|xls|xlt|zip|au|snd)"    .OR. ;
-         Lower( cFile ) LIKE ".+\.(es|gsm|gsd|rmf|tsi|vox|wtx|aif|aiff)"     .OR. ;
-         Lower( cFile ) LIKE ".+\.(aifc|cht|dus|mid|midi|mp3|mp2|m3u|ram)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(ra|rpm|stream|rmf|vqf|vql|vqe|wav|wtx)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(mol|pdb|dwf|ivr|cod|cpi|fif|gif|ief)"     .OR. ;
-         Lower( cFile ) LIKE ".+\.(jpeg|jpg|jpe|rip|svh|tiff|tif|mcf|svf)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(dwg|dxf|wi|ras|etf|fpx|fh5|fh4|fhc|dsf)"  .OR. ;
-         Lower( cFile ) LIKE ".+\.(pnm|pbm|pgm|ppm|rgb|xbm|xpm|xwd|dig)"     .OR. ;
-         Lower( cFile ) LIKE ".+\.(push|wan|waf||afl|mpeg|mpg|mpe|qt|mov)"   .OR. ;
-         Lower( cFile ) LIKE ".+\.(viv|vivo|asf|asx|avi|movie|vgm|vgx)"      .OR. ;
-         Lower( cFile ) LIKE ".+\.(xdr|vgp|vts|vtts|3dmf|3dm|qd3d|qd3)"      .OR. ;
-         Lower( cFile ) LIKE ".+\.(svr|wrl|wrz|vrt)"                       .OR. Empty(cFExt)
-         oAttach:SetEncoder( "base64" )
-      ELSE
-         oAttach:SetEncoder( "7-bit" )
-      ENDIF
-
-      cMimeText := HB_SetMimeType( cFile, cFname, cFext )
-      // Some EMAIL readers use Content-Type to check for filename
-
-      IF ".html" in lower( cFext) .OR. ".htm" in lower( cFext )
-         cMimeText += "; charset=ISO-8859-1"
-      ENDIF
-
-      oAttach:hHeaders[ "Content-Type" ] := cMimeText
-      // But usually, original filename is set here
-      oAttach:hHeaders[ "Content-Disposition" ] := "attachment; filename=" + cFname + cFext
-      oAttach:SetBody( cData )
-      oMail:Attach( oAttach )
-
+      omail:AttachFile( cFile )
    NEXT
 
    IF lRead
