@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.23 2009/07/29 17:15:53 marchuet Exp $
+rem $Id: mdir.bat,v 1.24 2009/07/31 12:41:52 modalsist Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -23,6 +23,11 @@ if "%1"=="resetenvar"  goto RESET_ENVAR
 if "%1"=="RESETENVAR"  goto RESET_ENVAR
 if "%1"=="howto"       goto _SYNTAX
 if "%1"=="HOWTO"       goto _SYNTAX
+
+rem=============================================================================
+rem Auto Detection
+rem=============================================================================
+IF "%HB_DIR_OPENSSL%"=="" IF EXIST \OpenSSL\include\openssl SET HB_DIR_OPENSSL=\OpenSSL
 
 rem=============================================================================
 :CREATE

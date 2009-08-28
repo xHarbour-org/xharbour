@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6560 2009/08/26 17:21:35 lculik Exp $
+ * $Id: ChangeLog,v 1.6561 2009/08/27 05:29:38 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-27 20:53 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * makefile.bc
+   * makefile.vc
+     * Only build tipssl.lib if HB_DIR_OPENSSL is set
+       /*
+          NOTE: Seems the none of the other make file
+          are updated to build tipssl.lib at all!!!
+        */
+   * mdir.bat
+     + Added auto detection of OpenSSL
+
+   * source/rdd/dbcmd.c
+     * Hack to __DBCOPY() to explictly prefix target file with the current path
+       to to avoid inadvertant override of file in the SET PATH folder.
+
+       /*
+          NOTE: RDD authors please review if this is the correct place for such hack.
+        */
 
 2009-08-27 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c

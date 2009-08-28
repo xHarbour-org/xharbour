@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.232 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: dbcmd.c,v 1.233 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -2109,9 +2109,31 @@ HB_FUNC( __DBCOPY )
 {
    HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+
    if( pArea )
+   {
+      char *szFile = hb_parcx( 1 );
+      char szPath[ HB_PATH_MAX ];
+
+     #ifdef HB_OS_HAS_DRIVE_LETTER
+      if( strchr( szFile, HB_OS_PATH_DELIM_CHR ) == NULL && strchr( szFile, HB_OS_DRIVE_DELIM_CHR ) == NULL )
+     #else
+      if( strchr( szFile, HB_OS_PATH_DELIM_CHR ) == NULL )
+     #endif
+      {
+         szPath[0] = HB_OS_PATH_DELIM_CHR;
+         szPath[1] = '\0';
+
+         hb_fsCurDirBuff( 0, (BYTE *) szPath + 1, sizeof( szPath ) - 1 );
+
+         strcat( szPath, HB_OS_PATH_DELIM_CHR_STRING );
+         strcat( szPath, szFile );
+
+         szFile = szPath;
+      }
+
       hb_retl( HB_SUCCESS == hb_rddTransRecords( pArea,
-               hb_parc( 1 ),                     /* file name */
+               szFile,                           /* file name */
                hb_parc( 8 ),                     /* RDD */
                hb_parnl( 9 ),                    /* connection */
                hb_param( 2, HB_IT_ARRAY ),       /* Fields */
@@ -2125,8 +2147,11 @@ HB_FUNC( __DBCOPY )
                hb_param( 7, HB_IT_LOGICAL ),     /* Rest */
                hb_parc( 10 ),                    /* Codepage */
                hb_param( 11, HB_IT_ANY ) ) );    /* Delimiter */
+   }
    else
+   {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "COPY TO" );
+   }
 }
 
 HB_FUNC( HB_RDDGETTEMPALIAS )

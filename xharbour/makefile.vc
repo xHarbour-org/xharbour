@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.244 2009/08/11 11:53:03 lculik Exp $
+# $Id: makefile.vc,v 1.245 2009/08/23 22:46:11 lculik Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -472,7 +472,7 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
 !endif
 
-!ifdef TIPSSL
+!ifdef HB_DIR_OPENSSL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 !endif
 
