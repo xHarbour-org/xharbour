@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.9 2009/02/03 22:41:09 lculik Exp $
+ * $Id: sendmail.prg,v 1.10 2009/08/28 14:12:25 lculik Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    cReplyTo   -> Optional.
    */
 
-   LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cFname, cFext, cData, oUrl1
+   LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cData, oUrl1
 
    LOCAL cTmp          :=""
    LOCAL cMimeText     := ""
