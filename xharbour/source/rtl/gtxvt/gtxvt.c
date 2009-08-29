@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.55 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: gtxvt.c,v 1.56 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    // Pipe stream for input queue (wnd to app)
    pipe( streamChr );
 
-   if ( hb_set.HB_SET_GTMODE == 1 )
+   if ( hb_setGetGTMode() == 1 )
    {
       s_childPid = fork();
       if ( s_childPid != 0 )
@@ -534,7 +534,7 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
       False,
       GrabModeAsync, GrabModeAsync );
 
-   if ( hb_set.HB_SET_GTMODE == 1 )
+   if ( hb_setGetGTMode() == 1 )
    {
       //we'r done. Now the ball passes to the window managing function
       xvt_processMessages( wnd );

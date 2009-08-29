@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.30 2009/02/20 12:48:24 marchuet Exp $
+ * $Id: fstemp.c,v 1.31 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ static BOOL fsGetTempDirByCase( BYTE * pszName, const char * pszTempDir )
    if( pszTempDir && *pszTempDir != '\0' )
    {
       hb_strncpy( ( char * ) pszName, ( char * ) pszTempDir, HB_PATH_MAX - 1 );
-      switch( hb_set.HB_SET_DIRCASE )
+      switch( hb_setGetDirCase() )
       {
          case HB_SET_CASE_LOWER:
             hb_strLower( ( char * ) pszName, strlen( ( char * ) pszName ) );
@@ -136,9 +136,9 @@ static HB_FHANDLE hb_fsCreateTempLow( const BYTE * pszDir, const BYTE * pszPrefi
       if( pszName[0] != '\0' )
       {
          int len = strlen( ( char * ) pszName );
-         if( pszName[ len - 1 ] != ( BYTE ) hb_set.HB_SET_DIRSEPARATOR )
+         if( pszName[ len - 1 ] != ( BYTE ) HB_OS_PATH_DELIM_CHR )
          {
-            pszName[ len ] = ( BYTE ) hb_set.HB_SET_DIRSEPARATOR;
+            pszName[ len ] = ( BYTE ) HB_OS_PATH_DELIM_CHR;
             pszName[ len + 1 ] = '\0';
          }
       }
@@ -151,10 +151,10 @@ static HB_FHANDLE hb_fsCreateTempLow( const BYTE * pszDir, const BYTE * pszPrefi
          return FS_ERROR;
 
 #if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )
-      if( hb_set.HB_SET_FILECASE != HB_SET_CASE_LOWER &&
-          hb_set.HB_SET_FILECASE != HB_SET_CASE_UPPER &&
-          hb_set.HB_SET_DIRCASE != HB_SET_CASE_LOWER &&
-          hb_set.HB_SET_DIRCASE != HB_SET_CASE_UPPER &&
+      if( hb_setGetFileCase() != HB_SET_CASE_LOWER &&
+          hb_setGetFileCase() != HB_SET_CASE_UPPER &&
+          hb_setGetDirCase() != HB_SET_CASE_LOWER &&
+          hb_setGetDirCase() != HB_SET_CASE_UPPER &&
           pszExt == NULL )
       {
          hb_strncat( ( char * ) pszName, "XXXXXX", HB_PATH_MAX - 1 );

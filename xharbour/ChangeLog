@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6564 2009/08/28 14:12:22 lculik Exp $
+ * $Id: ChangeLog,v 1.6565 2009/08/29 20:26:17 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-30 00:51 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/gtwvg/gtwvg.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/hbsix/sxfname.c
+  * source/rdd/hsx/hsx.c
+  * source/rtl/bkgtsks.c
+  * source/rtl/console.c
+  * source/rtl/dateshb.c
+  * source/rtl/fstemp.c
+  * source/rtl/gtapi.c
+  * source/rtl/hbgtcore.c
+  * source/rtl/idle.c
+  * source/rtl/inkey.c
+  * source/rtl/mlcfunc.c
+  * source/rtl/readexit.c
+  * source/rtl/readins.c
+  * source/rtl/setcolor.c
+  * source/rtl/str.c
+  * source/rtl/transfrm.c
+  * source/rtl/txtline.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxvt/gtxvt.c
+  * source/vm/runner.c
+  * tests/misc/date.c
+    * Replaced direct hb_set struct access by hb_set*() function calls.
+    ! Fixed SETCOLOR() to return old color value, not new.
+    % Some small optimization in HB_READLINE().
+  (mostly borrowed from Harbour code by Przemyslaw Czerpak and Viktor Szakats).
+
 
 2009-08-30 00:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/tip/Makefile

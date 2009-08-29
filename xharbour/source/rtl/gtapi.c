@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.80 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: gtapi.c,v 1.81 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ HB_ERRCODE hb_gtInit( HB_FHANDLE hFilenoStdin, HB_FHANDLE hFilenoStdout, HB_FHAN
 
    s_bInit = TRUE;
    HB_GTSELF_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
-   HB_GTSELF_SETCOLORSTR( pGT, hb_set.HB_SET_COLOR );
+   HB_GTSELF_SETCOLORSTR( pGT, hb_setGetColor() );
    HB_GTSELF_SETCURSORSTYLE( pGT, SC_NORMAL );
    HB_GTSELF_FLUSH( pGT );
 

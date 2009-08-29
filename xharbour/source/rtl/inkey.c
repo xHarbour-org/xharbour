@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.58 2008/04/03 19:35:38 peterrees Exp $
+ * $Id: inkey.c,v 1.59 2008/04/04 15:20:46 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ HB_FUNC( INKEY )
    {
       iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
-                       ISNUM( 2 ) ? hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
+                       ISNUM( 2 ) ? hb_parni( 2 ) : hb_setGetEventMask() );
 
       if( iKey == 0 || !s_inKeyBlockAfter )
          break;
@@ -260,7 +260,7 @@ HB_FUNC( HB_KEYPUT )
 
 HB_FUNC( NEXTKEY )
 {
-   hb_retni( hb_inkeyNext( ISNUM( 1 ) ? hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
+   hb_retni( hb_inkeyNext( ISNUM( 1 ) ? hb_parni( 1 ) : hb_setGetEventMask() ) );
 }
 
 HB_FUNC( LASTKEY )

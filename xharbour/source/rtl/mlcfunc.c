@@ -1,5 +1,5 @@
 /*
- * $Id: mlcfunc.c,v 1.2 2008/09/07 05:24:45 peterrees Exp $
+ * $Id: mlcfunc.c,v 1.3 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -204,9 +204,8 @@ static PHB_EOL_INFO hb_mlGetEOLs( int iParam, int * piEOLs )
    if( iEOLs == 0 )
    {
       pEOLs = ( PHB_EOL_INFO ) hb_xgrab( sizeof( HB_EOL_INFO ) );
-      if( hb_set.HB_SET_EOL && hb_set.HB_SET_EOL[ 0 ] )
-         pEOLs->szEOL = hb_set.HB_SET_EOL;
-      else
+      pEOLs->szEOL = hb_setGetEOL();
+      if( !pEOLs->szEOL || !pEOLs->szEOL[ 0 ] )
          pEOLs->szEOL = hb_conNewLine();
       pEOLs->ulLen = strlen( pEOLs->szEOL );
       iEOLs = pEOLs->ulLen ? 1 : 0;

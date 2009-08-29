@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.186 2009/02/24 12:38:32 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.187 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -3375,7 +3375,7 @@ static ULONG hb_ntxPageCountKeys( LPTAGINFO pTag, ULONG ulPage )
 }
 
 /*
- * count relative position of current location in page stack 
+ * count relative position of current location in page stack
  */
 static double hb_ntxTagCountRelKeyPos( LPTAGINFO pTag )
 {
@@ -3518,7 +3518,7 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
          szTagName[ 0 ] = '\0';
    }
 
-   if( ( hb_set.HB_SET_DEFEXTENSIONS && !pFileName->szExtension ) || !fName )
+   if( ( hb_setGetDefExtension() && !pFileName->szExtension ) || !fName )
    {
       DBORDERINFO pExtInfo;
       memset( &pExtInfo, 0, sizeof( pExtInfo ) );
@@ -5330,7 +5330,7 @@ static HB_ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
          }
       }
 
-      fDirectRead = !hb_set.HB_SET_STRICTREAD && /* !pArea->lpdbRelations && */
+      fDirectRead = !hb_setGetStrictRead() && /* !pArea->lpdbRelations && */
                     ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ||
                       ( pArea->lpCurTag == NULL && !fUseFilter ) );
 
@@ -5777,7 +5777,7 @@ static HB_ERRCODE ntxFlush( NTXAREAP pArea )
    {
       uiError = SUPER_FLUSH( ( AREAP ) pArea );
 
-      if( hb_set.HB_SET_HARDCOMMIT )
+      if( hb_setGetHardCommit() )
       {
          LPNTXINDEX pIndex = pArea->lpIndexes;
          while( pIndex )
@@ -6034,7 +6034,7 @@ static HB_ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
    errCode = SUPER_OPEN( ( AREAP ) pArea, pOpenInfo );
 
    if( errCode == HB_SUCCESS && NTXAREA_DATA( pArea )->fStruct &&
-       ( NTXAREA_DATA( pArea )->fStrictStruct ? pArea->fHasTags : hb_set.HB_SET_AUTOPEN ) )
+       ( NTXAREA_DATA( pArea )->fStrictStruct ? pArea->fHasTags : hb_setGetAutOpen() ) )
    {
       char szFileName[ HB_PATH_MAX ];
 
@@ -6051,7 +6051,7 @@ static HB_ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
          errCode = SELF_ORDLSTADD( ( AREAP ) pArea, &pOrderInfo );
          if( errCode == HB_SUCCESS )
          {
-            pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
+            pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_setGetAutOrder() );
             errCode = SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
             hb_itemRelease( pOrderInfo.itmOrder );
             if( errCode == HB_SUCCESS )
@@ -6502,7 +6502,7 @@ static HB_ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       *pIndexPtr = pIndex;
    }
    if( pIndex->Production && !pArea->fHasTags &&
-       pData->fStruct && ( pData->fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
+       pData->fStruct && ( pData->fStrictStruct || hb_setGetAutOpen() ) )
    {
       pArea->fHasTags = TRUE;
       if( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) == 0 )
@@ -6550,7 +6550,7 @@ static HB_ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
             hb_ntxIndexFree( pIndex );
             if( fProd && pArea->fHasTags &&
                 NTXAREA_DATA( pArea )->fStruct &&
-                ( NTXAREA_DATA( pArea )->fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
+                ( NTXAREA_DATA( pArea )->fStrictStruct || hb_setGetAutOpen() ) )
             {
                pArea->fHasTags = FALSE;
                if( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) != 0 )
@@ -7380,7 +7380,7 @@ static HB_ERRCODE ntxOrderListClear( NTXAREAP pArea )
       pIndex = *pIndexPtr;
       if( NTXAREA_DATA( pArea )->fStruct && pIndex->Production &&
           ( NTXAREA_DATA( pArea )->fStrictStruct ? pArea->fHasTags :
-                                                   hb_set.HB_SET_AUTOPEN ) )
+                                                   hb_setGetAutOpen() ) )
       {
          pIndexPtr = &pIndex->pNext;
       }
@@ -7412,7 +7412,7 @@ static HB_ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    if( pIndex && !( pIndex->Production && NTXAREA_DATA( pArea )->fStruct &&
                     ( NTXAREA_DATA( pArea )->fStrictStruct ?
-                      pArea->fHasTags : hb_set.HB_SET_AUTOPEN ) ) )
+                      pArea->fHasTags : hb_setGetAutOpen() ) ) )
    {
       pIndexPtr = &pArea->lpIndexes;
       while( *pIndexPtr )

@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.15 2008/08/29 12:58:46 modalsist Exp $
+ * $Id: txtline.c,v 1.16 2008/08/30 01:24:30 modalsist Exp $
  */
 
 /*
@@ -248,7 +248,6 @@ HB_FUNC( HB_READLINE )
    ULONG ulEndOffset, ulTextLen;
    LONG lEnd;
    HB_ITEM Opt;
-   BOOL bAlloc_EOL = FALSE;
    BOOL bAlloc_Term1 = FALSE;
 
    if( !ISCHAR( 1 ) )
@@ -271,13 +270,7 @@ HB_FUNC( HB_READLINE )
 
    if( ! ( ISARRAY( 2 ) || ISCHAR( 2 ) ) )
    {
-      if( ! hb_set.HB_SET_EOL )
-      {
-         hb_set.HB_SET_EOL = hb_strdup( hb_conNewLine() );
-         bAlloc_EOL = TRUE;
-      }
-
-      pTerm1 = hb_itemPutC( NULL, hb_set.HB_SET_EOL );
+      pTerm1 = hb_itemPutC( NULL, hb_setGetEOL() );
       bAlloc_Term1 = TRUE;
    }
    else
@@ -317,11 +310,6 @@ HB_FUNC( HB_READLINE )
    hb_storl( bEOF, 8 );
    hb_stornl( lEnd + ulStartOffset + 1, 9 );
    hb_stornl( ulEndOffset + ulStartOffset + 1, 10 );
-
-   if( bAlloc_EOL )
-   {
-      hb_xfree( hb_set.HB_SET_EOL );
-   }
 
    if( bAlloc_Term1 )
    {

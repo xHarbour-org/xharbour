@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.8 2008/12/23 20:33:21 likewolf Exp $
+ * $Id: gtwvg.c,v 1.9 2009/02/20 12:47:56 marchuet Exp $
  */
 
 /*
@@ -1646,7 +1646,7 @@ static LRESULT CALLBACK hb_gt_wvt_WndProc( HWND hWnd, UINT message, WPARAM wPara
       case WM_CLOSE:  /* Clicked 'X' on system menu */
          if( hb_gt_wvt_FireEvent( pWVT, HB_GTE_CLOSE ) == 0 )
          {
-            if( hb_set.HB_SET_CANCEL )
+            if( hb_setGetCancel() )
                hb_vmRequestCancel();
          }
          return 0;

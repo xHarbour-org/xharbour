@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.16 2009/02/20 12:48:24 marchuet Exp $
+ * $Id: hbgtcore.c,v 1.17 2009/06/21 08:47:06 peterrees Exp $
  */
 
 /*
@@ -2295,14 +2295,14 @@ static void hb_gt_def_InkeyPollDo( PHB_GT pGT )
       {
          case HB_BREAK_FLAG:           /* Check for Ctrl+Break */
          case K_ALT_C:                 /* Check for normal Alt+C */
-            if( hb_set.HB_SET_CANCEL )
+            if( hb_setGetCancel() )
             {
                hb_vmRequestCancel();   /* Request cancellation */
                return;
             }
             break;
          case K_ALT_D:                 /* Check for Alt+D */
-            if( hb_set.HB_SET_DEBUG )
+            if( hb_setGetDebug() )
             {
                hb_vmRequestDebug();    /* Request the debugger */
                return;
@@ -2324,7 +2324,7 @@ static void hb_gt_def_InkeyPoll( PHB_GT pGT )
     * because it allow to control it by user what some times could be
     * necessary due to different low level GT behavior on some platforms
     */
-   if( hb_set.HB_SET_TYPEAHEAD )
+   if( hb_setGetTypeAhead() )
    {
       hb_gt_def_InkeyPollDo( pGT );
    }
@@ -2489,7 +2489,7 @@ static void hb_gt_def_InkeyReset( PHB_GT pGT )
    pGT->inkeyHead = 0;
    pGT->inkeyTail = 0;
 
-   iTypeAhead = hb_set.HB_SET_TYPEAHEAD;
+   iTypeAhead = hb_setGetTypeAhead();
 
    if( iTypeAhead != pGT->inkeyBufferSize )
    {

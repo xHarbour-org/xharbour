@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.60 2009/04/24 15:48:50 marchuet Exp $
+ * $Id: transfrm.c,v 1.61 2009/05/01 21:11:03 marchuet Exp $
  */
 
 /*
@@ -489,7 +489,7 @@ HB_FUNC( TRANSFORM )
 
          if( uiPicFlags & PF_BRITISH )  // "@E"
          {
-             if( hb_set.hb_set_century )
+             if( hb_setGetCentury() )
              {
                // set date American
                if( strcmp( cDtFormat,"mm/dd/yyyy") == 0 )
@@ -591,8 +591,8 @@ HB_FUNC( TRANSFORM )
          {
             hb_dateFormat( "99999999", szPicDate,
                ( uiPicFlags & PF_BRITISH ) ?
-                 ( hb_set.hb_set_century ? "DD/MM/YYYY" : "DD/MM/YY" ) :
-                 hb_set.HB_SET_DATEFORMAT );
+                 ( hb_setGetCentury() ? "DD/MM/YYYY" : "DD/MM/YY" ) :
+                 hb_setGetDateFormat() );
 
             ulPicLen = strlen( szPicDate );
 
@@ -682,9 +682,7 @@ HB_FUNC( TRANSFORM )
          /* Support date function for numbers */
          if( uiPicFlags & PF_DATE )
          {
-            hb_dateFormat( "99999999", szPicDate,
-                 hb_set.HB_SET_DATEFORMAT );
-
+            hb_dateFormat( "99999999", szPicDate, hb_setGetDateFormat() );
             szPic = szPicDate;
             ulPicLen = strlen( szPicDate );
          }
@@ -1176,7 +1174,7 @@ HB_FUNC( TRANSFORM )
          char szDate[ 9 ];
          char szResult[ 11 ];
 
-         hb_retc( hb_dateFormat( hb_itemGetDS( pValue, szDate ), szResult, hb_set.HB_SET_DATEFORMAT ) );
+         hb_retc( hb_dateFormat( hb_itemGetDS( pValue, szDate ), szResult, hb_setGetDateFormat() ) );
       }
       else if( HB_IS_NUMERIC( pValue ) )
       {

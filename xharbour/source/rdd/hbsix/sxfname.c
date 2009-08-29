@@ -1,5 +1,5 @@
 /*
- * $Id: sxfname.c,v 1.2 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: sxfname.c,v 1.3 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ HB_FUNC( SX_FNAMEPARSER )
       if( !ISLOG( 3 ) || !hb_parl( 3 ) )
          pFileName->szExtension = NULL;
 
-      if( !hb_set.HB_SET_TRIMFILENAME )
+      if( !hb_setGetTrimFileName() )
       {
          if( pFileName->szName )
          {

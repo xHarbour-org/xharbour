@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.22 2008/02/02 16:09:30 ronpinkas Exp $
+ * $Id: bkgtsks.c,v 1.23 2008/04/27 14:00:45 andijahja Exp $
  */
 
 /*
@@ -170,7 +170,7 @@ void hb_backgroundRun( void )
    HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
 
-   if( ! s_bIamBackground && hb_set.HB_SET_BACKGROUNDTASKS )
+   if( ! s_bIamBackground && hb_setGetBackgroundTasks() )
    {
       s_bIamBackground = TRUE;
 
@@ -212,13 +212,16 @@ void hb_backgroundRun( void )
 /* RUN all tasks also if SET BACKGROUND TASKS is OFF */
 void hb_backgroundRunForced( void )
 {
-   BOOL bOldSet   = hb_set.HB_SET_BACKGROUNDTASKS;
+   BOOL bOldSet   = hb_setGetBackgroundTasks();
+   PHB_ITEM pItem = hb_itemPutL( NULL, TRUE );
 
-   hb_set.HB_SET_BACKGROUNDTASKS = TRUE;
+   hb_setSetItem( HB_SET_BACKGROUNDTASKS, pItem );
 
    hb_backgroundRun();
 
-   hb_set.HB_SET_BACKGROUNDTASKS = bOldSet;
+   hb_itemPutL( pItem, bOldSet );
+   hb_setSetItem( HB_SET_BACKGROUNDTASKS, pItem );
+   hb_itemRelease( pItem );
 }
 
 /* RUN only one tasks, intentionally no check if bacground are active is done */
@@ -281,9 +284,10 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
    SHORT iTask;
    PHB_BACKGROUNDTASK pBkgTask;
    PHB_ITEM pItem = NULL;
-   BOOL bOldSet   = hb_set.HB_SET_BACKGROUNDTASKS;
+   BOOL bOldSet   = hb_setGetBackgroundTasks();
+   PHB_ITEM pSet = hb_itemPutL( NULL, FALSE );
 
-   hb_set.HB_SET_BACKGROUNDTASKS = FALSE;
+   hb_setSetItem( HB_SET_BACKGROUNDTASKS, pSet );
 
    iTask = 0;
    while( iTask < s_uiBackgroundMaxTask )
@@ -315,7 +319,9 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
       ++iTask;
    }
 
-   hb_set.HB_SET_BACKGROUNDTASKS = bOldSet;
+   hb_itemPutL( pSet, bOldSet );
+   hb_setSetItem( HB_SET_BACKGROUNDTASKS, pSet );
+   hb_itemRelease( pSet );
 
    return pItem;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.22 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: dateshb.c,v 1.23 2009/04/24 15:48:49 marchuet Exp $
  */
 
 /*
@@ -105,11 +105,12 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
    if( szDate )
    {
       int d_pos = 0, m_pos = 0, y_pos = 0;
-      int count, digit, non_digit, size = strlen( hb_set.HB_SET_DATEFORMAT );
+      char * szFormat = hb_setGetDateFormat();
+      int count, digit, non_digit, size = strlen( szFormat );
 
       for( count = 0; count < size; count++ )
       {
-         switch( hb_set.HB_SET_DATEFORMAT[ count ] )
+         switch( szFormat[ count ] )
          {
             case 'D':
             case 'd':
@@ -197,8 +198,8 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
 
       if( y_value >= 0 && y_value < 100 )
       {
-         count = hb_set.HB_SET_EPOCH % 100;
-         digit = hb_set.HB_SET_EPOCH / 100;
+         count = hb_setGetEpoch() % 100;
+         digit = hb_setGetEpoch() / 100;
 
          if( y_value >= count )
          {
@@ -222,7 +223,8 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
    int h_value = 0, m_value = 0;
    double s_value = 0;
    int h_pos = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
-   int count, digit, non_digit, size = strlen( hb_set.HB_SET_TIMEFORMAT );
+   char * szFormat = hb_setGetTimeFormat();
+   int count, digit, non_digit, size = strlen( szFormat );
    int fin = 0, pm = 0, divisor = 10;
 
    if( szTime )
@@ -230,7 +232,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
       digit = 1;
       for( count = 0; count < size; count++ )
       {
-         switch( hb_set.HB_SET_TIMEFORMAT[ count ] )
+         switch( szFormat[ count ] )
          {
             case 'H':
             case 'h':
@@ -262,8 +264,8 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
             case 'p':
                if( p_pos == 0 )
                {
-                  if( hb_set.HB_SET_TIMEFORMAT[ count+1 ] == 'M' ||
-                      hb_set.HB_SET_TIMEFORMAT[ count+1 ] == 'm' )
+                  if( szFormat[ count + 1 ] == 'M' ||
+                      szFormat[ count + 1 ] == 'm' )
                   {
                      p_pos = digit++;
                      count++;
@@ -395,7 +397,7 @@ HB_FUNC( DTOC )
       char szDate[ 9 ];
       char szFormatted[ 11 ];
 
-      hb_retc( hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, hb_set.HB_SET_DATEFORMAT ) );
+      hb_retc( hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, hb_setGetDateFormat() ) );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "DTOC", 1, hb_paramError( 1 ) );
@@ -574,9 +576,9 @@ HB_FUNC( TTOC )
       hb_pardtsbuff( szDate, 1);
 
       if( (ISNUM(2) && hb_parni(2) == 2) || (ISLOG(2) && !hb_parl(2) ) )
-         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, NULL, hb_set.HB_SET_TIMEFORMAT ) );
+         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, NULL, hb_setGetTimeFormat() ) );
       else
-         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT ) );
+         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, hb_setGetDateFormat(), hb_setGetTimeFormat() ) );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "TTOC", 1, hb_paramError( 1 ) );

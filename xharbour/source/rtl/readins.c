@@ -1,5 +1,5 @@
 /*
- * $Id: readins.c,v 1.0 2005/02/12 04:37:16 guerra000 Exp $
+ * $Id: readins.c,v 1.1 2005/03/31 06:39:19 guerra000 Exp $
  */
 
 /*
@@ -58,10 +58,10 @@
 
 HB_FUNC( READINSERT )
 {
-   hb_retl( hb_set.HB_SET_INSERT );
+   hb_retl( hb_setGetInsert() );
 
    if( ISLOG( 1 ) )
    {
-      hb_set.HB_SET_INSERT = hb_parl( 1 );
+      hb_setSetItem( HB_SET_INSERT, hb_param( 1, HB_IT_ANY ) );
    }
 }

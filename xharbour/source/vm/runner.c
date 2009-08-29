@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.58 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: runner.c,v 1.59 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -567,7 +567,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
    /* Create full filename */
 
    pFileName = hb_fsFNameSplit( szHrb );
-   if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
+   if( hb_setGetDefExtension() && pFileName->szExtension == NULL )
    {
       pFileName->szExtension = ".hrb";
    }

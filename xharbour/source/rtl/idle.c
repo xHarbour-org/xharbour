@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.27 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: idle.c,v 1.28 2009/07/26 17:01:48 lculik Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ void hb_idleState( BOOL bIndefinite )
       }
       else
       {
-         if( s_uiIdleMaxTask && hb_set.HB_SET_IDLEREPEAT &&
+         if( s_uiIdleMaxTask && hb_setGetIdleRepeat() &&
              s_uiIdleTask == s_uiIdleMaxTask )
          {
             s_uiIdleTask = 0;

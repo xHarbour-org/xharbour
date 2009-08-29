@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
+ * $Id: date.c,v 1.1 2005/10/13 12:01:10 lf_sfnet Exp $
  */
 
 /*
@@ -71,14 +71,14 @@ HB_FUNC( MDY )
 
    iLen = strlen( hb_dateCMonth( iMonth ) );
 
-   iBufferLen = iLen + ( hb_set.hb_set_century ? 9 : 7 );
+   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
    szReturn = ( char * ) hb_xgrab( iBufferLen );
 
    memset( szReturn, ' ', iBufferLen + 1 );
    memcpy( szReturn, hb_dateCMonth( iMonth ), iLen );
    memcpy( szReturn + iLen + 1, szFormatted + 3, 2 );
    szReturn[ iLen + 3 ] = ',';
-   memcpy( szReturn + iLen + 5, szFormatted + 6 + ( hb_set.hb_set_century ? 0 : 2 ), 2 + ( hb_set.hb_set_century ? 2 : 0 ) );
+   memcpy( szReturn + iLen + 5, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
 
    hb_retclen( szReturn, iBufferLen );
    hb_xfree( szReturn );
@@ -100,13 +100,13 @@ HB_FUNC( DMY )
 
    iLen = strlen( hb_dateCMonth( iMonth ) );
 
-   iBufferLen = iLen + ( hb_set.hb_set_century ? 9 : 7 );
+   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
    szReturn = ( char * ) hb_xgrab( iBufferLen );
 
    memset( szReturn, ' ', iBufferLen );
    memcpy( szReturn, szFormatted + 3, 2 );
    memcpy( szReturn + 3, hb_dateCMonth( iMonth ), iLen );
-   memcpy( szReturn + iLen + 4, szFormatted + 6 + ( hb_set.hb_set_century ? 0 : 2 ), 2 + ( hb_set.hb_set_century ? 2 : 0 ) );
+   memcpy( szReturn + iLen + 4, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
 
    hb_retclen( szReturn, iBufferLen );
    hb_xfree( szReturn );

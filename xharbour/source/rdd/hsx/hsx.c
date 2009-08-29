@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.17 2009/02/24 12:38:32 marchuet Exp $
+ * $Id: hsx.c,v 1.18 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -1149,7 +1149,7 @@ static int hb_hsxNext( int iHandle, ULONG * pulRecNo )
          iRetVal = hb_hsxRead( iHandle, ++pHSX->ulCurrRec, &pRecPtr );
          if( iRetVal != HSX_SUCCESS )
             break;
-         if ( ! hb_set.HB_SET_DELETED || ( *pRecPtr & 0x80 ) == 0 ) /* Not deleted */
+         if( ! hb_setGetDeleted() || ( *pRecPtr & 0x80 ) == 0 ) /* Not deleted */
          {
             for ( i = 0; i < pHSX->uiRecordSize; i++ )
             {
@@ -1441,7 +1441,7 @@ static int hb_hsxOpen( char * szFile, int iBufSize, int iMode )
 
    fReadonly = ( iMode & 0x02 ) != 0;
    fShared = ( iMode & 0x01 ) == 0;
-   if( hb_set.HB_SET_AUTOSHARE == 2 )
+   if( hb_setGetAutoShare() == 2 )
       fShared = FALSE;
    uiFlags = ( fReadonly ? FO_READ : FO_READWRITE ) |
              ( fShared ? FO_DENYNONE : FO_EXCLUSIVE );

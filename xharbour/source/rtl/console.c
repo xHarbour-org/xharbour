@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.75 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: console.c,v 1.76 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -88,13 +88,13 @@
    or calls to hb_param* / hb_ret* family functions with this macros. This macros
    are inner shell locks. */
    #define HB_CONSOLE_SAFE_LOCK\
-      HB_CLEANUP_PUSH( hb_set.HB_SET_OUTPUTSAFETY ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );\
-      if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
+      HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );\
+      if ( hb_setGetOutputSafety() ) {\
          HB_CRITICAL_LOCK( hb_outputMutex );\
       }
 
    #define HB_CONSOLE_SAFE_UNLOCK \
-      if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
+      if ( hb_setGetOutputSafety() ) {\
          HB_CRITICAL_UNLOCK( hb_outputMutex );\
       }\
       HB_CLEANUP_POP;
@@ -267,32 +267,32 @@ void hb_conOutAlt( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
 
-   if( hb_set.HB_SET_CONSOLE )
+   if( hb_setGetConsole() )
    {
       hb_gtWriteCon( ( BYTE * ) pStr, ulLen );
    }
 
-   if( hb_set.HB_SET_ALTERNATE && hb_set.hb_set_althan != FS_ERROR )
+   if( hb_setGetAlternate() && hb_setGetAltHan() != FS_ERROR )
    {
       /* Print to alternate file if SET ALTERNATE ON and valid alternate file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_althan, ( BYTE * ) pStr, ulLen );
+      hb_fsWriteLarge( hb_setGetAltHan(), ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
-   if( hb_set.hb_set_extrahan != FS_ERROR )
+   if( hb_setGetExtraHan() != FS_ERROR )
    {
       /* Print to extra file if valid alternate file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_extrahan, ( BYTE * ) pStr, ulLen );
+      hb_fsWriteLarge( hb_setGetExtraHan(), ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
-   if( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )
+   if( hb_setGetPrinter() && hb_setGetPrintHan() != FS_ERROR )
    {
       /* Print to printer if SET PRINTER ON and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      hb_fsWriteLarge( hb_setGetPrintHan(), ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -303,13 +303,13 @@ static void hb_conOutDev( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
 
-   if( hb_set.hb_set_printhan != FS_ERROR &&
-       hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )
+   if( hb_setGetPrintHan() != FS_ERROR &&
+       hb_stricmp( hb_setGetDevice(), "PRINTER" ) == 0 )
    {
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
 
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      hb_fsWriteLarge( hb_setGetPrintHan(), ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -442,26 +442,26 @@ HB_FUNC( QOUT )
 
    HB_CONSOLE_SAFE_LOCK
 
-   if( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )
+   if( hb_setGetPrinter() && hb_setGetPrintHan() != FS_ERROR )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       BYTE buf[ 80 ];
 
       s_uiPRow++;
-      s_uiPCol = hb_set.HB_SET_MARGIN;
+      s_uiPCol = hb_setGetMargin();
       if( s_uiPCol )
       {
          if( s_uiPCol > sizeof( buf ) )
          {
             BYTE * pBuf = ( BYTE * ) hb_xgrab( s_uiPCol );
             memset( pBuf, ' ', s_uiPCol );
-            hb_fsWrite( hb_set.hb_set_printhan, pBuf, s_uiPCol );
+            hb_fsWrite( hb_setGetPrintHan(), pBuf, s_uiPCol );
             hb_xfree( pBuf );
          }
          else
          {
             memset( buf, ' ', s_uiPCol );
-            hb_fsWrite( hb_set.hb_set_printhan, buf, s_uiPCol );
+            hb_fsWrite( hb_setGetPrintHan(), buf, s_uiPCol );
          }
       }
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
@@ -483,8 +483,8 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    if( hb_set_SetPrinterStart() )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      static const BYTE byEop[ 4 ] = { 0x0C, 0x0D, 0x00, 0x00 }; /* Buffer is 4 bytes to make CodeGuard happy */
-      hb_fsWrite( hb_set.hb_set_printhan, byEop, 2 );
+      static const BYTE s_byEop[ 4 ] = { 0x0C, 0x0D, 0x00, 0x00 }; /* Buffer is 4 bytes to make CodeGuard happy */
+      hb_fsWrite( hb_setGetPrintHan(), s_byEop, 2 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       hb_set_SetPrinterStop();
    }
@@ -513,12 +513,12 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
 
-   if( hb_set.hb_set_printhan != FS_ERROR &&
-       hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )
+   if( hb_setGetPrintHan() != FS_ERROR &&
+       hb_stricmp( hb_setGetDevice(), "PRINTER" ) == 0 )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiPRow = ( USHORT ) iRow;
-      USHORT uiPCol = ( USHORT ) iCol + ( USHORT ) hb_set.HB_SET_MARGIN;
+      USHORT uiPCol = ( USHORT ) iCol + ( USHORT ) hb_setGetMargin();
 
       if( s_uiPRow != uiPRow || s_uiPCol != uiPCol )
       {
@@ -543,7 +543,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
             {
                if( iPtr + s_iCrLfLen > ( int ) sizeof( buf ) )
                {
-                  hb_fsWrite( hb_set.hb_set_printhan, buf, ( USHORT ) iPtr );
+                  hb_fsWrite( hb_setGetPrintHan(), buf, ( USHORT ) iPtr );
                   iPtr = 0;
                }
                memcpy( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
@@ -562,7 +562,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
          {
             if( iPtr == ( int ) sizeof( buf ) )
             {
-               hb_fsWrite( hb_set.hb_set_printhan, buf, iPtr );
+               hb_fsWrite( hb_setGetPrintHan(), buf, ( USHORT ) iPtr );
                iPtr = 0;
             }
             buf[ iPtr++ ] = ' ';
@@ -570,7 +570,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
          }
 
          if( iPtr )
-            hb_fsWrite( hb_set.hb_set_printhan, buf, iPtr );
+            hb_fsWrite( hb_setGetPrintHan(), buf, ( SHORT ) iPtr );
       }
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
