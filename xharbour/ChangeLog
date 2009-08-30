@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6565 2009/08/29 20:26:17 likewolf Exp $
+ * $Id: ChangeLog,v 1.6566 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-30 14:22 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/vm/itemapi.c
+    ! Finalized fixing hb_itemUnShareString() copied from Harbour as is. It
+      did not update the string refcounter.
 
 2009-08-30 00:51 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/gtwvg/gtwvg.c
