@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.53 2009/08/26 16:02:31 lculik Exp $
+* $Id: gtwvw.c,v 1.54 2009/08/30 15:08:44 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -238,7 +238,7 @@ static void    hb_gt_wvwSetWindowTitle( UINT usWinNum, char * title );
 static BOOL    hb_gt_wvw_GetWindowTitle( UINT usWinNum, char ** title );
 static DWORD   hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName );
 static DWORD   hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, char *icon );
-static IPicture * hb_gt_wvwLoadPicture( char * image );
+
 static BOOL    hb_gt_wvwSetCentreWindow( UINT usWinNum, BOOL bCentre, BOOL bPaint );
 
 static BOOL    hb_gt_wvwValidWindowSize( WIN_DATA * pWindowData, int rows, int cols, HFONT hFont, int iWidth,
