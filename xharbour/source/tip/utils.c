@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.14 2009/07/30 16:15:16 marchuet Exp $
+ * $Id: utils.c,v 1.15 2009/08/16 14:39:15 lculik Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ HB_FUNC( TIP_TIMESTAMP )
    char *szRet = (char *) hb_xgrab( 64 );
    SYSTEMTIME st;
    DWORD retval;
-   int hours =0, minutes =0;    
+   int hours, minutes;    
 
 
    if ( !ulHour )

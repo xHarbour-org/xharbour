@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6566 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: ChangeLog,v 1.6567 2009/08/30 10:22:23 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-08-30 14:58 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\tip\utils.c
+    - Removed unused initialization values for minutes and hours variables in
+      function HB_FUNC( TIP_TIMESTAMP )
 
 2009-08-30 14:22 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/vm/itemapi.c
