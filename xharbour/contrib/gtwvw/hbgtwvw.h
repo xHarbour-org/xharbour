@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.15 2007/05/24 03:05:51 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.16 2009/08/23 22:46:12 lculik Exp $
  */
 
 /*
@@ -658,8 +658,12 @@ extern USHORT  hb_gt_wvwGetMouseX( WIN_DATA * pWindowData );
 extern USHORT  hb_gt_wvwGetMouseY( WIN_DATA * pWindowData );
 extern USHORT hb_gt_wvwRowOfs( UINT usWinNum );
 extern USHORT hb_gt_wvwColOfs( UINT usWinNum );
-
-
+extern HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
+extern HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
+extern IPicture * hb_gt_wvwLoadPicture( char * image );
+extern BOOL HB_EXPORT hb_gt_wvwDestroyPicture( IPicture * iPicture );
+extern int nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );
+extern LPWORD lpwAlign( LPWORD lpIn );
 HB_EXTERN_END
 
 #endif
