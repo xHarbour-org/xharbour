@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.53 2009/08/10 18:41:05 lculik Exp $
+# $Id: common.mak,v 1.54 2009/08/23 22:46:11 lculik Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1883,6 +1883,7 @@ CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GDLIB_LIB)\
 	$(GTWVG_LIB)\
+   $(GTWVW_LIB)\
 	$(LIBNF_LIB)\
 	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\
