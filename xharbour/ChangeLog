@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6569 2009/08/30 15:08:44 lculik Exp $
+ * $Id: ChangeLog,v 1.6570 2009/08/30 18:43:07 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-01 10:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * source/vm/hvm.c
+     ! Corrected #if 1 to #if 0, and added explnataion comment,
+       why 1 + 'a' is not at all same as 'a' + 1.
+
+   * source/vm/arrays.c
+     * Minor typo, return statement was misplaced.
+   * source/vm/arrayshb.c
+     ! Corrected aDel() to not shrink the array unless an element was truely deleted.
 
 2009-08-30 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/gtwvw/gtwvw.c

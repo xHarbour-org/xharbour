@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.78 2008/12/10 00:47:32 likewolf Exp $
+ * $Id: arrayshb.c,v 1.79 2009/03/02 09:20:16 marchuet Exp $
  */
 
 /*
@@ -319,27 +319,19 @@ HB_FUNC( ADEL )
 
    if( pArray )
    {
-    #ifndef HB_C52_STRICT
-      PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
-    #endif
-
       if( pArray->item.asArray.value->ulLen )
       {
-         if( ISNUM( 2 ) && hb_parnl( 2 ) )
+         if( hb_arrayDel( pArray, ( ISNUM( 2 ) ? hb_parnl( 2 ) : 1 ) ) )
          {
-            hb_arrayDel( pArray, hb_parnl( 2 ) );
-         }
-         else
-         {
-            hb_arrayDel( pArray, 1 );
-         }
+            #ifndef HB_C52_STRICT
+               PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
 
-         #ifndef HB_C52_STRICT
-            if( pShrink && pShrink->item.asLogical.value )
-            {
-               hb_arraySize( pArray, pArray->item.asArray.value->ulLen - 1 );
-            }
-         #endif
+               if( pShrink && pShrink->item.asLogical.value )
+               {
+                  hb_arraySize( pArray, pArray->item.asArray.value->ulLen - 1 );
+               }
+            #endif
+         }
       }
 
       /* ADel() returns the array itself */

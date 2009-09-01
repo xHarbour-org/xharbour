@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.167 2009/02/04 05:17:53 guerra000 Exp $
+ * $Id: arrays.c,v 1.168 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -446,8 +446,8 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
          }
 
          //hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
+         return TRUE;
       }
-      return TRUE;
    }
 
    return FALSE;

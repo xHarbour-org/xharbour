@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.726 2009/06/19 16:51:36 enricomaria Exp $
+ * $Id: hvm.c,v 1.727 2009/07/21 21:26:38 ronpinkas Exp $
  */
 
 /*
@@ -4360,12 +4360,18 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    {
       hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pLeft->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pRight ) ) ], 1 );
    }
-   #if 1 // Shoud: 1 + "a" produce "b" like 1 + Date() produces Date() + 1?
+  #if 0
+   /*
+      Shoud: 1 + "a" produce "b" like 1 + Date() produces Date() + 1?
+
+      RP: No, because single Char are considered numeric when used in numeric context.
+      The left side determines the context. Clipper's handling of 1 + Date() is an odd exception.
+    */
    else if( HB_IS_STRING( pRight ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
       hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pRight->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pLeft ) ) ], 1 );
    }
-   #endif
+  #endif
    else if( HB_IS_NUMINT( pLeft ) && HB_IS_NUMINT( pRight ) )
    {
       HB_LONG lNumber1 = hb_itemGetNInt( pLeft );
