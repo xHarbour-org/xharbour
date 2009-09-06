@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.55 2009/08/30 18:43:08 lculik Exp $
+* $Id: gtwvw.c,v 1.56 2009/09/06 12:43:43 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -1373,7 +1373,7 @@ static BOOL hb_gt_wvwGetCharFromInputQueue ( int *c )
    if( pWindow->keyPointerOut != pWindow->keyPointerIn )
    {
       *c = pWindow->Keys[ pWindow->keyPointerOut ];
-      if( ++pWindow->keyPointerOut >= WVT_CHAR_QUEUE_SIZE )
+      if( ++pWindow->keyPointerOut >= WVW_CHAR_QUEUE_SIZE )
       {
          pWindow->keyPointerOut = 0;
       }
