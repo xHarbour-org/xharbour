@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.54 2009/08/30 15:08:44 lculik Exp $
+* $Id: gtwvw.c,v 1.55 2009/08/30 18:43:08 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -1353,6 +1353,9 @@ static void hb_gt_wvw_OutErr( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
 
 static BOOL hb_gt_wvwGetCharFromInputQueue ( int *c )
 {
+  UINT uiWindow = s_pWvwData->s_usNumWindows - 1;
+  WIN_DATA *pWindow = s_pWvwData->s_pWindows [ uiWindow ] ;
+/*
   int iNextPos;
   BOOL bRet = FALSE;
 
@@ -1366,6 +1369,20 @@ static BOOL hb_gt_wvwGetCharFromInputQueue ( int *c )
     bRet =  TRUE;
   }
   return( bRet );
+  */
+   if( pWindow->keyPointerOut != pWindow->keyPointerIn )
+   {
+      *c = pWindow->Keys[ pWindow->keyPointerOut ];
+      if( ++pWindow->keyPointerOut >= WVT_CHAR_QUEUE_SIZE )
+      {
+         pWindow->keyPointerOut = 0;
+      }
+      return TRUE;
+   }
+
+   *c = 0;
+   return FALSE;
+
 }
 
 /*-------------------------------------------------------------------*/
