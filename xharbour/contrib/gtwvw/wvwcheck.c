@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwcheck.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * WVWcheck.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -144,10 +144,10 @@ HB_FUNC( WVW_CXCREATE)
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    // int   iStyle;
    UINT uiPBid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( BYTE )hb_parni( 2 ),
+            usLeft   = ( BYTE )hb_parni( 3 ),
+            usBottom = ( BYTE )hb_parni( 4 ),
+            usRight  = ( BYTE )hb_parni( 5 );
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
@@ -368,12 +368,12 @@ HB_FUNC( WVW_CXSETFONT )
    pData->s_lfCX.lfEscapement     = 0;
    pData->s_lfCX.lfOrientation    = 0;
    pData->s_lfCX.lfWeight         = ISNIL( 5 ) ? pData->s_lfCX.lfWeight : hb_parni( 5 );
-   pData->s_lfCX.lfItalic         = ISNIL( 7 ) ? pData->s_lfCX.lfItalic : hb_parl( 7 );
-   pData->s_lfCX.lfUnderline      = ISNIL( 8 ) ? pData->s_lfCX.lfUnderline : hb_parl( 8 );
-   pData->s_lfCX.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfCX.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfCX.lfItalic         = ISNIL( 7 ) ? pData->s_lfCX.lfItalic    : ( BYTE )hb_parl( 7 );
+   pData->s_lfCX.lfUnderline      = ISNIL( 8 ) ? pData->s_lfCX.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfCX.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfCX.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfCX.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfCX.lfQuality        = ISNIL( 6 ) ? pData->s_lfCX.lfQuality : hb_parni( 6 );
+   pData->s_lfCX.lfQuality        = ISNIL( 6 ) ? pData->s_lfCX.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfCX.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {
@@ -494,10 +494,10 @@ HB_FUNC( WVW_PGCREATE)
    BOOL  bSmooth   = ( !ISLOG( 9 ) ? FALSE : hb_parl( 9 ) );
    BOOL  bVertical = ( !ISLOG(10 ) ? FALSE : hb_parl(10 ) );
    UINT  uiPGid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
 
    InitCommonControls();
 

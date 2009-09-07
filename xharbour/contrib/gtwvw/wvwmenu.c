@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwmenu.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * WVWMENU.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -250,8 +250,8 @@ HB_FUNC( WVW_SETMENUKEYEVENT )
 //
 HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
 {
-   HBITMAP hBitmapUnchecked;
-   HBITMAP hBitmapChecked;
+   HBITMAP hBitmapUnchecked = NULL;
+   HBITMAP hBitmapChecked = NULL;
    char szResname[_MAX_PATH+1];
    int iWidth, iHeight;
 
@@ -310,7 +310,7 @@ HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
    if ( !ISNIL(2) )
    {
    SetMenuItemBitmaps( (HMENU) HB_PARHANDLE(1) , hb_parni(2), MF_BYCOMMAND , (HBITMAP) hBitmapUnchecked, (HBITMAP) hBitmapChecked ) ;
-}
+   }
    else
    {
      SetMenuItemBitmaps( (HMENU) HB_PARHANDLE(1) , hb_parni(3), MF_BYPOSITION , (HBITMAP) hBitmapUnchecked, (HBITMAP) hBitmapChecked ) ;

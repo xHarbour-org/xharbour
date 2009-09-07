@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwstbar.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * WVWstbar.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -403,12 +403,12 @@ HB_FUNC( WVW_SBSETFONT )
    pData->s_lfSB.lfEscapement     = 0;
    pData->s_lfSB.lfOrientation    = 0;
    pData->s_lfSB.lfWeight         = ISNIL( 5 ) ? pData->s_lfSB.lfWeight : hb_parni( 5 );
-   pData->s_lfSB.lfItalic         = ISNIL( 7 ) ? pData->s_lfSB.lfItalic : hb_parl( 7 );
-   pData->s_lfSB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfSB.lfUnderline : hb_parl( 8 );
-   pData->s_lfSB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfSB.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfSB.lfItalic         = ISNIL( 7 ) ? pData->s_lfSB.lfItalic :    ( BYTE )hb_parl( 7 );
+   pData->s_lfSB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfSB.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfSB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfSB.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfSB.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfSB.lfQuality        = ISNIL( 6 ) ? pData->s_lfSB.lfQuality : hb_parni( 6 );
+   pData->s_lfSB.lfQuality        = ISNIL( 6 ) ? pData->s_lfSB.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfSB.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {
@@ -497,8 +497,8 @@ HB_FUNC( WVW_XBCREATE)
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    int  iStyle = (int) ( !ISNUM( 2 ) ? -1 : hb_parni( 2 ) );
    UINT uiXBid;
-   USHORT   usTop    = hb_parni( 3 ),
-            usLeft   = hb_parni( 4 ),
+   USHORT   usTop    = ( USHORT )hb_parni( 3 ),
+            usLeft   = ( USHORT )hb_parni( 4 ),
             usBottom,
             usRight;
 
@@ -510,7 +510,7 @@ HB_FUNC( WVW_XBCREATE)
 
    if (iStyle==SBS_VERT)
    {
-     usBottom = usTop + hb_parni( 5 ) -1;
+     usBottom = usTop + (USHORT)hb_parni( 5 ) -1;
      usRight = usLeft;
 
      iOffTop    = !ISNIL( 7 ) ? hb_parni( 7,1 ) : 0 ;
@@ -520,7 +520,7 @@ HB_FUNC( WVW_XBCREATE)
    }
    else
    {
-     usRight = usLeft + hb_parni( 5 ) -1;
+     usRight = usLeft + (USHORT)hb_parni( 5 ) -1;
      usBottom = usTop;
 
      iOffTop    = !ISNIL( 7 ) ? hb_parni( 7,1 ) : +3-pWindowData->byLineSpacing ;

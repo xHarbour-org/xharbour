@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwtbar.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * WVWtbar.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500

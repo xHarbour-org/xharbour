@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwpush.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * WVWpush.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -142,10 +142,10 @@ HB_FUNC( WVW_PBCREATE)
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    // int   iStyle;
    UINT uiPBid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT ) hb_parni( 2 ),
+            usLeft   = ( USHORT ) hb_parni( 3 ),
+            usBottom = ( USHORT ) hb_parni( 4 ),
+            usRight  = ( USHORT ) hb_parni( 5 );
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
@@ -383,12 +383,12 @@ HB_FUNC( WVW_PBSETFONT )
    pData->s_lfPB.lfEscapement     = 0;
    pData->s_lfPB.lfOrientation    = 0;
    pData->s_lfPB.lfWeight         = ISNIL( 5 ) ? pData->s_lfPB.lfWeight : hb_parni( 5 );
-   pData->s_lfPB.lfItalic         = ISNIL( 7 ) ? pData->s_lfPB.lfItalic : hb_parl( 7 );
-   pData->s_lfPB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfPB.lfUnderline : hb_parl( 8 );
-   pData->s_lfPB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfPB.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfPB.lfItalic         = ISNIL( 7 ) ? pData->s_lfPB.lfItalic    : ( BYTE )hb_parl( 7 );
+   pData->s_lfPB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfPB.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfPB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfPB.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfPB.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfPB.lfQuality        = ISNIL( 6 ) ? pData->s_lfPB.lfQuality : hb_parni( 6 );
+   pData->s_lfPB.lfQuality        = ISNIL( 6 ) ? pData->s_lfPB.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfPB.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {
@@ -499,9 +499,9 @@ HB_FUNC( WVW_CBCREATE)
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    
    UINT uiCBid;
-   USHORT   usWidth  = hb_parni( 4 );
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
+   USHORT   usWidth  = ( USHORT )hb_parni( 4 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
             usBottom = usTop,
             usRight  = usLeft + usWidth - 1;
    USHORT   usNumElement = (USHORT) (ISARRAY(5) ? hb_arrayLen( hb_param(5, HB_IT_ARRAY) ) : 0);
@@ -510,7 +510,7 @@ HB_FUNC( WVW_CBCREATE)
 
    /* in the future combobox type might be selectable by 8th parameter */
    int      iStyle = CBS_DROPDOWNLIST | WS_VSCROLL;
-   BYTE     bKbdType = ISNUM(9) ? hb_parni(9) : WVW_CB_KBD_STANDARD;
+   BYTE     bKbdType = ISNUM(9) ? (BYTE)hb_parni(9) : (BYTE)WVW_CB_KBD_STANDARD;
 
 
    if (pWindowData->hCBfont==NULL)
@@ -835,12 +835,12 @@ HB_FUNC( WVW_CBSETFONT )
    pData->s_lfCB.lfEscapement     = 0;
    pData->s_lfCB.lfOrientation    = 0;
    pData->s_lfCB.lfWeight         = ISNIL( 5 ) ? pData->s_lfCB.lfWeight : hb_parni( 5 );
-   pData->s_lfCB.lfItalic         = ISNIL( 7 ) ? pData->s_lfCB.lfItalic : hb_parl( 7 );
-   pData->s_lfCB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfCB.lfUnderline : hb_parl( 8 );
-   pData->s_lfCB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfCB.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfCB.lfItalic         = ISNIL( 7 ) ? pData->s_lfCB.lfItalic    : ( BYTE )hb_parl( 7 );
+   pData->s_lfCB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfCB.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfCB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfCB.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfCB.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfCB.lfQuality        = ISNIL( 6 ) ? pData->s_lfCB.lfQuality : hb_parni( 6 );
+   pData->s_lfCB.lfQuality        = ISNIL( 6 ) ? pData->s_lfCB.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfCB.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {

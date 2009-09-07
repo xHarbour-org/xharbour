@@ -1,5 +1,5 @@
 /*
-* $Id: wvwfuncs.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
+* $Id: wvwfuncs.c,v 1.2 2009/08/30 15:08:45 lculik Exp $
  */
 /*
  * WVWDRAW.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -484,10 +484,10 @@ HB_FUNC( WVW_GBCREATE )
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    // int   iStyle;
    UINT uiPBid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
@@ -516,10 +516,10 @@ HB_FUNC( WVW_RBCREATE )
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    // int   iStyle;
    UINT uiPBid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
@@ -1333,8 +1333,8 @@ HB_FUNC(TOOLBARADDBUTTONS)
 //         tb[ ulCount ].iBitmap   = ulID > 0 ? ( int ) ulCount : -1;
 //      }
       tb[ ulCount ].idCommand = hb_arrayGetNI( pTemp, 2 );
-      tb[ ulCount ].fsState   = hb_arrayGetNI( pTemp, 3 );
-      tb[ ulCount ].fsStyle   = hb_arrayGetNI( pTemp, 4 );
+      tb[ ulCount ].fsState   = ( BYTE )hb_arrayGetNI( pTemp, 3 );
+      tb[ ulCount ].fsStyle   = ( BYTE )hb_arrayGetNI( pTemp, 4 );
       tb[ ulCount ].dwData    = hb_arrayGetNI( pTemp, 5 );
       tb[ ulCount ].iString   = hb_arrayGetCLen( pTemp, 6 )  >0 ? ( int ) hb_arrayGetCPtr( pTemp, 6 ) : 0 ;
 
@@ -1729,13 +1729,13 @@ HB_FUNC( WVW_LOADFONT )
    logfont.lfEscapement     = ( ISNIL( 11 ) ? 0 : ( hb_parni( 11 ) * 10 ) );
    logfont.lfOrientation    = 0;
    logfont.lfWeight         = ( ISNIL(  5 ) ? 0 : hb_parni( 5 ) );
-   logfont.lfItalic         = ( ISNIL(  6 ) ? 0 : hb_parl(  6 ) );
-   logfont.lfUnderline      = ( ISNIL(  7 ) ? 0 : hb_parl(  7 ) );
-   logfont.lfStrikeOut      = ( ISNIL(  8 ) ? 0 : hb_parl(  8 ) );
-   logfont.lfCharSet        = ( ISNIL(  9 ) ? pWindowData->CodePage : hb_parni(  9 ) );
+   logfont.lfItalic         = ( ISNIL(  6 ) ? 0 : ( BYTE )hb_parl(  6 ) );
+   logfont.lfUnderline      = ( ISNIL(  7 ) ? 0 : ( BYTE )hb_parl(  7 ) );
+   logfont.lfStrikeOut      = ( ISNIL(  8 ) ? 0 : ( BYTE )hb_parl(  8 ) );
+   logfont.lfCharSet        = ( ISNIL(  9 ) ? ( BYTE )pWindowData->CodePage : ( BYTE )hb_parni(  9 ) );
    logfont.lfOutPrecision   = 0;
    logfont.lfClipPrecision  = 0;
-   logfont.lfQuality        = ( ISNIL( 10 ) ? DEFAULT_QUALITY : hb_parni( 10 ) );
+   logfont.lfQuality        = ( ISNIL( 10 ) ? ( BYTE )DEFAULT_QUALITY : (BYTE)hb_parni( 10 ) );
    logfont.lfPitchAndFamily = FF_DONTCARE;
    logfont.lfHeight         = ( ISNIL(  3 ) ? pWindowData->fontHeight : hb_parni( 3 ) );
    logfont.lfWidth          = ( ISNIL(  4 ) ? ( pWindowData->fontWidth < 0 ? -pWindowData->fontWidth : pWindowData->fontWidth ) : hb_parni( 4 ) );
@@ -1827,11 +1827,11 @@ HB_FUNC( WVW_CHOOSEFONT )
    lf.lfHeight         = PointSize;
    lf.lfWidth          = ISNIL( 3 ) ? 0 : hb_parni( 3 );
    lf.lfWeight         = ISNIL( 4 ) ? 0 : hb_parni( 4 );
-   lf.lfItalic         = ISNIL( 6 ) ? 0 : hb_parl( 6 );
-   lf.lfUnderline      = ISNIL( 7 ) ? 0 : hb_parl( 7 );
-   lf.lfStrikeOut      = ISNIL( 8 ) ? 0 : hb_parl( 8 );
+   lf.lfItalic         = ISNIL( 6 ) ? 0 : ( BYTE )hb_parl( 6 );
+   lf.lfUnderline      = ISNIL( 7 ) ? 0 : ( BYTE )hb_parl( 7 );
+   lf.lfStrikeOut      = ISNIL( 8 ) ? 0 : ( BYTE )hb_parl( 8 );
    lf.lfCharSet        = DEFAULT_CHARSET;
-   lf.lfQuality        = ISNIL( 5 ) ? DEFAULT_QUALITY : hb_parni( 5 );
+   lf.lfQuality        = ISNIL( 5 ) ? DEFAULT_QUALITY : ( BYTE )hb_parni( 5 );
    lf.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 1 ) )
    {
@@ -1937,8 +1937,8 @@ HB_FUNC( WVW_SETMOUSEPOS )
    POINT xy = { 0 };
    UINT usWinNum = WVW_WHICH_WINDOW;
    WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );         
-   USHORT   usRow    = hb_parni( 2 ),
-            usCol   = hb_parni( 3 );
+   USHORT   usRow    = ( USHORT )hb_parni( 2 ),
+            usCol    = ( USHORT )hb_parni( 3 );
 
    if (hb_gt_wvw_GetMainCoordMode())
    {
@@ -1981,10 +1981,10 @@ HB_FUNC( WVW_FILLRECTANGLE )
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
    COLORREF crRGBcolor = ( ISNIL( 6 ) ? 0 : hb_parnl( 6 ) );
    BOOL     bTight = ( ISNIL( 7 ) ? FALSE : hb_parl( 7 ) );
    BOOL     bUseBrush = ( ISNIL( 8 ) ? FALSE : hb_parl( 8 ) );
@@ -2210,7 +2210,7 @@ HB_FUNC( WVW_SETBRUSH )
 HB_FUNC( WVW__MAKEDLGTEMPLATE )
 {
    WORD  *p, *pdlgtemplate ;
-   WORD  nItems = hb_parni( 1, 4 ) ;
+   WORD  nItems = (WORD)hb_parni( 1, 4 ) ;
    int   i, nchar ;
    DWORD lStyle ;
 
@@ -2644,10 +2644,10 @@ HB_FUNC( WVW_SAVESCREEN )
    PHB_ITEM  info = hb_itemArrayNew(3);
    PHB_ITEM  temp = hb_itemNew(NULL);
 
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
 
    if (hb_gt_wvw_GetMainCoordMode())
    {
@@ -2702,10 +2702,10 @@ HB_FUNC( WVW_RESTSCREEN )
 
    BOOL    bResult = FALSE;
    BOOL    bDoNotDestroyBMP = ISNIL( 7 ) ? FALSE : hb_parl( 7 );
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
    if (hb_gt_wvw_GetMainCoordMode())
    {
      hb_wvw_HBFUNCPrologue(usWinNum, &usTop, &usLeft, &usBottom, &usRight);
@@ -2788,13 +2788,13 @@ HB_FUNC( WVW_CREATEFONT )
    logfont.lfEscapement     = ( ISNIL( 10 ) ? 0 : ( hb_parni( 10 ) * 10 ) );
    logfont.lfOrientation    = 0;
    logfont.lfWeight         = ( ISNIL(  4 ) ? 0 : hb_parni( 4 ) );
-   logfont.lfItalic         = ( ISNIL(  5 ) ? 0 : hb_parl(  5 ) );
-   logfont.lfUnderline      = ( ISNIL(  6 ) ? 0 : hb_parl(  6 ) );
-   logfont.lfStrikeOut      = ( ISNIL(  7 ) ? 0 : hb_parl(  7 ) );
-   logfont.lfCharSet        = ( ISNIL(  8 ) ? pWindowData->CodePage : hb_parni( 8 ) );
+   logfont.lfItalic         = ( ISNIL(  5 ) ? 0 : ( BYTE )hb_parl(  5 ) );
+   logfont.lfUnderline      = ( ISNIL(  6 ) ? 0 : ( BYTE )hb_parl(  6 ) );
+   logfont.lfStrikeOut      = ( ISNIL(  7 ) ? 0 : ( BYTE )hb_parl(  7 ) );
+   logfont.lfCharSet        = ( ISNIL(  8 ) ? ( BYTE )pWindowData->CodePage : (BYTE)hb_parni( 8 ) );
    logfont.lfOutPrecision   = 0;
    logfont.lfClipPrecision  = 0;
-   logfont.lfQuality        = ( ISNIL( 9 ) ? DEFAULT_QUALITY : hb_parni( 9 ) );
+   logfont.lfQuality        = ( ISNIL( 9 ) ? ( BYTE )DEFAULT_QUALITY : (BYTE)hb_parni( 9 ) );
    logfont.lfPitchAndFamily = FF_DONTCARE;
    logfont.lfHeight         = ( ISNIL(  2 ) ? pWindowData->fontHeight : hb_parni( 2 ) );
    logfont.lfWidth          = ( ISNIL(  3 ) ? ( pWindowData->fontWidth < 0 ? -pWindowData->fontWidth : pWindowData->fontWidth ) : hb_parni( 3 ) );

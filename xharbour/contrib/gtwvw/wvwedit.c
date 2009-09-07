@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.48 2008/11/19 05:24:51 andijahja Exp $
+* $Id: wvwedit.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
  */
 /*
  * wvwedit.C
@@ -80,7 +80,7 @@
 #include <stdlib.h>
 
 #define TTS_BALLOON             0x40 // added by MAG
-#define HB_OS_WIN_32_USED
+
 
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
@@ -147,10 +147,10 @@ HB_FUNC( WVW_EBCREATE)
    int   iTop, iLeft, iBottom, iRight;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    UINT  uiEBid;
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = hb_parni( 4 ),
-            usRight  = hb_parni( 5 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ( USHORT )hb_parni( 4 ),
+            usRight  = ( USHORT )hb_parni( 5 );
    LPTSTR   lpszText = hb_parcx( 6 );
 
    BOOL     bMultiline = (ISLOG(8) ? hb_parl(8) : FALSE);
@@ -496,12 +496,12 @@ HB_FUNC( WVW_EBSETFONT )
    pData->s_lfEB.lfEscapement     = 0;
    pData->s_lfEB.lfOrientation    = 0;
    pData->s_lfEB.lfWeight         = ISNIL( 5 ) ? pData->s_lfEB.lfWeight : hb_parni( 5 );
-   pData->s_lfEB.lfItalic         = ISNIL( 7 ) ? pData->s_lfEB.lfItalic : hb_parl( 7 );
-   pData->s_lfEB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfEB.lfUnderline : hb_parl( 8 );
-   pData->s_lfEB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfEB.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfEB.lfItalic         = ISNIL( 7 ) ? pData->s_lfEB.lfItalic    : ( BYTE )hb_parl( 7 );
+   pData->s_lfEB.lfUnderline      = ISNIL( 8 ) ? pData->s_lfEB.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfEB.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfEB.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfEB.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfEB.lfQuality        = ISNIL( 6 ) ? pData->s_lfEB.lfQuality : hb_parni( 6 );
+   pData->s_lfEB.lfQuality        = ISNIL( 6 ) ? pData->s_lfEB.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfEB.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {
@@ -605,7 +605,7 @@ HB_FUNC( WVW_EBGETTEXT )
 
    }
 
-   usLen = SendMessage( (HWND) pcd->hWndCtrl, WM_GETTEXTLENGTH, 0, 0 ) + 1 ;
+   usLen = ( USHORT )SendMessage( (HWND) pcd->hWndCtrl, WM_GETTEXTLENGTH, 0, 0 ) + 1 ;
 
    lpszTextANSI = ( LPTSTR ) hb_xgrab( usLen );
 
@@ -755,17 +755,17 @@ HB_FUNC( WVW_STCREATE )
    BOOL bBorder = hb_parnl( 7 ) ;
    ULONG ulExStyle = 0  | ( bBorder ? WS_EX_CLIENTEDGE:0 );
 
-   USHORT   usWidth  = hb_parni( 4 );
-   USHORT   usTop    = hb_parni( 2 ),
-            usLeft   = hb_parni( 3 ),
-            usBottom = ISNUM(11) ?hb_parni(11) :usTop,
-            usRight  = ISNUM(12) ? hb_parni( 12 )  :usLeft + usWidth - 1;
+   USHORT   usWidth  = ( USHORT )hb_parni( 4 );
+   USHORT   usTop    = ( USHORT )hb_parni( 2 ),
+            usLeft   = ( USHORT )hb_parni( 3 ),
+            usBottom = ISNUM(11) ? ( USHORT )hb_parni(11) : usTop,
+            usRight  = ISNUM(12) ? ( USHORT )hb_parni( 12 ) : usLeft + usWidth - 1;
    //char * sText = hb_parc( 5 );
 
 
    int  iStyle =  ( bBorder ? WS_BORDER :0 ) ;
    int  iBox = ISNUM(10) ? hb_parni( 10 ) : 0;
-   HFONT hFont ;
+   HFONT hFont = NULL;
    if (iBox > 0 )
       iStyle |= iBox;
 
@@ -893,12 +893,12 @@ HB_FUNC( WVW_STSETFONT )
    pData->s_lfST.lfEscapement     = 0;
    pData->s_lfST.lfOrientation    = 0;
    pData->s_lfST.lfWeight         = ISNIL( 5 ) ? pData->s_lfST.lfWeight : hb_parni( 5 );
-   pData->s_lfST.lfItalic         = ISNIL( 7 ) ? pData->s_lfST.lfItalic : hb_parl( 7 );
-   pData->s_lfST.lfUnderline      = ISNIL( 8 ) ? pData->s_lfST.lfUnderline : hb_parl( 8 );
-   pData->s_lfST.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfST.lfStrikeOut : hb_parl( 9 );
+   pData->s_lfST.lfItalic         = ISNIL( 7 ) ? pData->s_lfST.lfItalic    : ( BYTE )hb_parl( 7 );
+   pData->s_lfST.lfUnderline      = ISNIL( 8 ) ? pData->s_lfST.lfUnderline : ( BYTE )hb_parl( 8 );
+   pData->s_lfST.lfStrikeOut      = ISNIL( 9 ) ? pData->s_lfST.lfStrikeOut : ( BYTE )hb_parl( 9 );
    pData->s_lfST.lfCharSet        = DEFAULT_CHARSET;
 
-   pData->s_lfST.lfQuality        = ISNIL( 6 ) ? pData->s_lfST.lfQuality : hb_parni( 6 );
+   pData->s_lfST.lfQuality        = ISNIL( 6 ) ? pData->s_lfST.lfQuality : ( BYTE )hb_parni( 6 );
    pData->s_lfST.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 2 ) )
    {
