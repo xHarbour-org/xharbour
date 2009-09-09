@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.219 2009/06/29 13:58:43 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.220 2009/06/30 12:40:14 modalsist Exp $
  */
 
 /*
@@ -409,7 +409,7 @@ Local aColor, nColIndex
 
   nColIndex := ::ColIndex( nCol )
 
-  if CacheOK( ::aCache, nRow, nColIndex, "O" ) 
+  if CacheOK( ::aCache, nRow, nColIndex, "O" )
 
      aColor := ::aCache[ nRow ][ nColIndex ]:ColorRect
 
@@ -427,7 +427,7 @@ METHOD GetCellValue( nRow, nCol ) CLASS TDataCache
 *--------------------------------------------------*
 Local nColIndex, xValue
 
-  if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow 
+  if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow
      Return NIL
   endif
  
@@ -480,7 +480,7 @@ RETURN Self
 *----------------------------------------------*
 METHOD FillRow( nRow ) CLASS TDataCache
 *----------------------------------------------*
-Local aCol, oCell, nRectPos, nCol, nColIndex, xValue
+Local aCol, oCell, nRectPos, nCol, nColIndex, xValue, aColor
 
    if nRow > ::nMaxRow
       RETURN Self
@@ -508,9 +508,15 @@ Local aCol, oCell, nRectPos, nCol, nColIndex, xValue
           xValue := if( :Value = NIL, BlankValue(aCol),:Value )
 
           if HB_IsBlock( aCol[ _TB_COLINFO_OBJ ]:ColorBlock )
-             :Color := DefColorOK( ::oBrowse:ColorSpec, Eval( aCol[ _TB_COLINFO_OBJ ]:ColorBlock, xValue ) )
+             aColor := Eval( aCol[ _TB_COLINFO_OBJ ]:ColorBlock, xValue )
           endif
-    
+
+          if HB_IsArray( aColor )
+             :Color := DefColorOK( ::oBrowse:ColorSpec, aColor )
+          else
+             :Color := DefColorOK( ::oBrowse:ColorSpec, aCol[ _TB_COLINFO_OBJ ]:DefColor )
+          endif
+
           if ! Empty( ::aRect ) .and.;
              ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
 
@@ -2872,7 +2878,7 @@ LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
       // Mark all remaining rows as drawn
       AFill(::aRedraw, .F., nRow)
 
-   endif 
+   endif
 
 
 Return Nil
@@ -2912,10 +2918,10 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
    aCellColor := ::oCache:GetCellColor( nRow, nCol )
 
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
-   if Empty( aCellColor ) 
+   if Empty( aCellColor )
       nColorIndex := DefColorOK( ::cColorSpec, oCol:DefColor )[ nColor ]
    else
-      nColorIndex := aCellColor[ nColor ] 
+      nColorIndex := aCellColor[ nColor ]
    endif
 
    cColor := hb_ColorIndex( ::cColorSpec, nColorIndex - 1  )
@@ -3264,7 +3270,8 @@ Return Self
 METHOD SetColorSpec( cColor ) CLASS TBrowse
 *---------------------------------------------------*
 
- if ! Empty( cColor ) 
+ if ! Empty( cColor )
+    cColor := StrTran(cColor," ","")
     ::lConfigured := .f.
     ::aColorSpec := Color2Array( cColor )
     ::cColorSpec := cColor
@@ -3713,13 +3720,20 @@ STATIC FUNCTION DefColorOK( cColorSpec, aDefColor )
 Local aColorSpec
 Local lOK := .T.
 Local nIndex := 0
+Local aDef
+
+#ifdef HB_COMPAT_C53
+   aDef := {1,2,1,1}
+#else
+   aDef := {1,2}
+#endif
 
  if Empty( cColorSpec )
     cColorSpec := SetColor()
  endif
 
  if Empty( aDefColor )
-    aDefColor := {1,2,1,1}
+    aDefColor := aDef
  endif
 
  aColorSpec := Color2Array( cColorSpec )
@@ -3731,7 +3745,7 @@ Local nIndex := 0
      ENDIF
  NEXT
 
-Return iif( lOK, aDefColor, {1,2,1,1} )
+Return iif( lOK, aDefColor, aDef )
 
 
 *******************************************************************
