@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.38 2008/12/22 22:09:45 likewolf Exp $
+* $Id: hbserv.c,v 1.39 2008/12/23 18:06:33 likewolf Exp $
 */
 
 /*
@@ -49,6 +49,8 @@
 * if you do not wish that, delete this exception notice.
 *
 */
+
+#define _HB_API_INTERNAL_
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -264,12 +266,12 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
 /* 2003 - <maurilio.longo@libero.it>
    to fix as soon as thread support is ready on OS/2
 */
-#if defined(HB_THREAD_SUPPORT) && ! defined(HB_OS_OS2)
-void *s_signalListener( void *my_stack )
+#if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_OS2 )
+static void * s_signalListener( void * my_stack )
 {
    static BOOL bFirst = TRUE;
    sigset_t passall;
-   HB_STACK *pStack = (HB_STACK*) my_stack;
+   HB_STACK * pStack = ( HB_STACK * ) my_stack;
 #if defined( HB_OS_BSD )
    int sig;
 #else
@@ -286,10 +288,10 @@ void *s_signalListener( void *my_stack )
    hb_threadLinkStack( pStack );
    HB_STACK_LOCK;
 
-   // and now accepts all signals
+   /* and now accepts all signals */
    sigemptyset( &passall );
 
-   // and wait for all signals
+   /* and wait for all signals */
    sigaddset( &passall, SIGHUP );
    sigaddset( &passall, SIGQUIT );
    sigaddset( &passall, SIGILL );
@@ -305,14 +307,16 @@ void *s_signalListener( void *my_stack )
    pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL );
    pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL );
 
-   while ( 1 ) {
-      // allow safe cancelation
+   while ( 1 )
+   {
+      /* allow safe cancelation */
       HB_STACK_UNLOCK;
 
       // reset signal handling; this is done here (so I don't
       // mangle with pthread_ calls, and I don't hold mutexes),
       // and just once (doing it twice would be useless).
-      if ( bFirst ) {
+      if ( bFirst )
+      {
          pthread_sigmask( SIG_SETMASK, &passall, NULL );
          bFirst = FALSE;
       }
@@ -329,7 +333,7 @@ void *s_signalListener( void *my_stack )
       sigwaitinfo( &passall, &sinfo );
 #endif
 
-      // lock stack before passing the ball to VM.
+      /* lock stack before passing the ball to VM. */
       HB_STACK_LOCK;
 #if defined( HB_OS_BSD )
       s_signalHandler( sig, NULL, NULL );
@@ -544,7 +548,7 @@ extern DWORD hb_dwCurrentStack;
 BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 {
 #ifdef HB_THREAD_SUPPORT
-   HB_STACK *pStack = NULL;
+   PHB_STACK pStack = NULL;
 
    /* we need a new stack: this is NOT an hb thread. */
 
@@ -713,7 +717,7 @@ static void s_signalHandlersInit()
 {
    #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) )
       pthread_t res;
-      HB_STACK *pStack;
+      PHB_STACK pStack;
 
       s_serviceSetHBSig();
 

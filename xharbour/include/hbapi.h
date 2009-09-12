@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.261 2009/05/06 15:57:41 andijahja Exp $
+ * $Id: hbapi.h,v 1.262 2009/05/25 14:37:59 marchuet Exp $
  */
 
 /*
@@ -437,12 +437,6 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
 #define HB_VAR_PARAM_FLAG      0x00FF
 #define HB_VAR_PARAM_NONE      0xFFFE
 #define HB_VAR_PARAM_NOERR     0xFFFD
-
-/* JC1: including thread anyways, because it defines some void macros when not in MT
-   hbstack.h includes thread.h */
-#ifndef HB_COMP_H_
-   #include "hbstack.h"
-#endif
 
 extern HB_FORCE_EXPORT int    hb_pcount( void );          /* returns the number of suplied parameters */
 extern HB_FORCE_EXPORT void   hb_ret( void );             /* post a NIL return value */

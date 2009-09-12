@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.164 2009/08/19 22:40:47 likewolf Exp $
+ * $Id: itemapi.c,v 1.165 2009/08/30 10:22:24 likewolf Exp $
  */
 
 /*
@@ -862,7 +862,7 @@ PHB_ITEM hb_itemPutNDDec( PHB_ITEM pItem, double dNumber, int iDec )
    pItem->item.asDouble.decimal = (UINT) iDec;
    if( iDec == HB_DEFAULT_DECIMALS )
    {
-      pItem->item.asDouble.decimal = (UINT) hb_set.HB_SET_DECIMALS;
+      pItem->item.asDouble.decimal = (UINT) hb_stackSetStruct()->HB_SET_DECIMALS;
    }
 
    return pItem;
@@ -924,7 +924,7 @@ PHB_ITEM hb_itemPutNLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
       iWidth = HB_DBL_LENGTH( dNumber );
 
    if( iDec < 0 )
-      iDec = hb_set.HB_SET_DECIMALS;
+      iDec = hb_stackSetStruct()->HB_SET_DECIMALS;
 
    if( iDec == 0 )
    {
@@ -972,7 +972,9 @@ PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
    }
 
    if( iDec < 0 )
-      iDec = hb_set.HB_SET_DECIMALS;
+   {
+      iDec = hb_stackSetStruct()->HB_SET_DECIMALS;
+   }
 
    pItem->type = HB_IT_DOUBLE;
    pItem->item.asDouble.length = (UINT) iWidth;
@@ -1452,7 +1454,7 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
    ulLenFirst = pFirst->item.asString.length;
    ulLenSecond = pSecond->item.asString.length;
 
-   if( hb_set.HB_SET_EXACT && !bForceExact )
+   if( !bForceExact && hb_stackSetStruct()->HB_SET_EXACT )
    {
       /* SET EXACT ON and not using == */
       /* Don't include trailing spaces */
@@ -1460,6 +1462,7 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
          ulLenFirst--;
       while( ulLenSecond > ulLenFirst && szSecond[ ulLenSecond - 1 ] == ' ' )
          ulLenSecond--;
+      bForceExact = TRUE;
    }
 
    ulMinLen = ulLenSecond;
@@ -1474,7 +1477,7 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
 #ifndef HB_CDP_SUPPORT_OFF
       if( (hb_cdppage())->lSort )
          iRet = hb_cdpcmp( szFirst, ulLenFirst, szSecond, ulLenSecond,
-                           hb_cdppage(), hb_set.HB_SET_EXACT || bForceExact );
+                           hb_cdppage(), bForceExact );
       else
 #endif
       {
@@ -1498,7 +1501,7 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
          if( !iRet && ulLenFirst != ulLenSecond )
          {
             /* Force an exact comparison? */
-            if( hb_set.HB_SET_EXACT || bForceExact || ulLenSecond > ulLenFirst )
+            if( bForceExact || ulLenSecond > ulLenFirst )
             {
                iRet = 1;
                if( ulLenFirst < ulLenSecond )
@@ -1514,7 +1517,7 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
       /* Both empty ? */
       if( ulLenFirst != ulLenSecond )
       {
-         if( hb_set.HB_SET_EXACT || bForceExact )
+         if( bForceExact )
          {
             iRet = 1;
             if( ulLenFirst < ulLenSecond )
@@ -1850,10 +1853,10 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          iWidth = 90;
 
       /* Limit the number of decimal places. */
-      if( hb_set.HB_SET_FIXED )
+      if( hb_stackSetStruct()->HB_SET_FIXED )
       {
          /* If fixed mode is enabled, always use the default. */
-         iDec = hb_set.HB_SET_DECIMALS;
+         iDec = hb_stackSetStruct()->HB_SET_DECIMALS;
       }
 
       if( pWidth )
@@ -1932,7 +1935,7 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             hb_dateDecStr( szDate, pItem->item.asDate.value );
 
             buffer = ( char * ) hb_xgrab( 11 );
-            hb_dateFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT );
+            hb_dateFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT );
             * ulLen = strlen( buffer );
             * bFreeReq = TRUE;
          }
@@ -1942,7 +1945,7 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             buffer = ( char * ) hb_xgrab( 26 );
 
             hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
-            hb_datetimeFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT );
+            hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
 
             * ulLen = strlen( buffer );
             * bFreeReq = TRUE;
@@ -1956,7 +1959,7 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          buffer = ( char * ) hb_xgrab( 26 );
 
          hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
-         hb_datetimeFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT );
+         hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
 
 
 

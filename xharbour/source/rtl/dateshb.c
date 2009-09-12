@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.23 2009/04/24 15:48:49 marchuet Exp $
+ * $Id: dateshb.c,v 1.24 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
    if( szDate )
    {
       int d_pos = 0, m_pos = 0, y_pos = 0;
-      char * szFormat = hb_setGetDateFormat();
+      const char * szFormat = hb_setGetDateFormat();
       int count, digit, non_digit, size = strlen( szFormat );
 
       for( count = 0; count < size; count++ )
@@ -223,7 +223,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
    int h_value = 0, m_value = 0;
    double s_value = 0;
    int h_pos = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
-   char * szFormat = hb_setGetTimeFormat();
+   const char * szFormat = hb_setGetTimeFormat();
    int count, digit, non_digit, size = strlen( szFormat );
    int fin = 0, pm = 0, divisor = 10;
 

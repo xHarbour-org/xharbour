@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.23 2008/04/27 14:00:45 andijahja Exp $
+ * $Id: bkgtsks.c,v 1.24 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
+#define _HB_API_INTERNAL_
 
 #include "hbapi.h"
 #include "hbapiitm.h"

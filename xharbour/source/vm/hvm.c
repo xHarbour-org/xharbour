@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.727 2009/07/21 21:26:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.728 2009/09/01 14:39:42 ronpinkas Exp $
  */
 
 /*
@@ -399,10 +399,26 @@ static void hb_vmDoModuleFunctions( PHB_FUNC_LIST pFunctions )
 #if !defined( HB_THREAD_SUPPORT )
 
 BOOL hb_vmIsMt( void ) { return FALSE; }
+void hb_vmLock( void ) {}
+void hb_vmUnlock( void ) {}
 
 #else
 
 BOOL hb_vmIsMt( void ) { return TRUE; }
+
+/* unlock VM, allow GC and other exclusive single task code execution */
+void hb_vmUnlock( void )
+{
+   HB_THREAD_STUB
+   HB_STACK_UNLOCK
+}
+
+/* lock VM blocking GC and other exclusive single task code execution */
+void hb_vmLock( void )
+{
+   HB_THREAD_STUB
+   HB_STACK_LOCK
+}
 
 #endif
 
@@ -637,8 +653,12 @@ void hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("dynsymNew") );
    hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
 
-   HB_TRACE( HB_TR_INFO, ("setInitialize") );
-   hb_setInitialize();        /* initialize Sets */
+   {
+      HB_THREAD_STUB
+      /* _SET_* initialization */
+      HB_TRACE( HB_TR_INFO, ("setInitialize") );
+      hb_setInitialize( hb_stackSetStruct() );
+   }
 
    HB_TRACE( HB_TR_INFO, ("conInit") );
    hb_conInit();    /* initialize Console */
@@ -898,7 +918,7 @@ int hb_vmQuit( void )
    /* Quit sequences for non-main thread */
    /* We are going to quit now, so we don't want to have mutexes
       blocking our output */
-   hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+   hb_stackSetStruct()->HB_SET_OUTPUTSAFETY = FALSE;
 
    if( ! HB_SAME_THREAD( hb_main_thread_id, HB_CURRENT_THREAD() ) )
    {
@@ -1246,7 +1266,7 @@ int hb_vmQuit( void )
       TraceLog( NULL, "After Con\n" );
    #endif
 
-   hb_setRelease();             /* releases Sets */
+   hb_setRelease( hb_stackSetStruct() );  /* releases Sets */
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Set\n" );
    #endif
@@ -1310,6 +1330,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
    BOOL bCanRecover = FALSE;
    BOOL bCanFinalize = FALSE;
    BOOL bDynCode = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
+   PHB_SET_STRUCT pSet = hb_stackSetStruct();
 
 #ifndef HB_GUI
    static USHORT uiPolls = 1;
@@ -1356,7 +1377,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 #ifndef HB_GUI
       if( ! --uiPolls )
       {
-         if( hb_set.HB_SET_CANCEL || hb_set.HB_SET_DEBUG )
+         if( pSet->HB_SET_CANCEL || pSet->HB_SET_DEBUG )
          {
             hb_inkeyPoll();
          }
@@ -1364,7 +1385,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 #endif
 
 #if !defined( HB_THREAD_SUPPORT )
-      if( hb_set.HB_SET_BACKGROUNDTASKS && ( ++s_iBackground > hb_set.HB_SET_BACKGROUNDTICK ) )
+      if( pSet->HB_SET_BACKGROUNDTASKS && ( ++s_iBackground > pSet->HB_SET_BACKGROUNDTICK ) )
       {
         hb_backgroundRun();
         s_iBackground = 0;
@@ -4042,7 +4063,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
          HB_STACK_LOCK;
 
          /* Run background functions every unlock period */
-         if( hb_set.HB_SET_BACKGROUNDTASKS )
+         if( pSet->HB_SET_BACKGROUNDTASKS )
          {
             hb_backgroundRun();
          }
@@ -4667,7 +4688,7 @@ static void hb_vmDivide( void )
             hb_vmPushNumber( hb_vmPopNumber() / dDivisor, 0 );
          else
          */
-         hb_vmPushDouble( hb_vmPopNumber() / dDivisor, hb_set.HB_SET_DECIMALS );
+         hb_vmPushDouble( hb_vmPopNumber() / dDivisor, hb_stackSetStruct()->HB_SET_DECIMALS );
       }
    }
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_DIVIDE )
@@ -4719,15 +4740,17 @@ static void hb_vmModulus( void )
       }
       else
       {
+         PHB_SET_STRUCT pSet = hb_stackSetStruct();
+
          pItem2->type = HB_IT_NIL;
          hb_stackDec(); /* pop divisor from the stack */
          hb_stackDec();
          /* NOTE: Clipper always returns the result of modulus
                   with the SET number of decimal places. */
-         if ( hb_set.HB_SET_DECIMALS == 0 )
+         if ( pSet->HB_SET_DECIMALS == 0 )
             hb_vmPushNumInt( HB_ITEM_GET_NUMINTRAW( pItem1 ) % lDivisor );
          else
-            hb_vmPushDouble( ( double ) ( HB_ITEM_GET_NUMINTRAW( pItem1 ) % lDivisor ), hb_set.HB_SET_DECIMALS );
+            hb_vmPushDouble( ( double ) ( HB_ITEM_GET_NUMINTRAW( pItem1 ) % lDivisor ), pSet->HB_SET_DECIMALS );
       }
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
@@ -4752,7 +4775,7 @@ static void hb_vmModulus( void )
 
          /* NOTE: Clipper always returns the result of modulus
                   with the SET number of decimal places. */
-         hb_vmPushDouble( fmod( hb_vmPopNumber(), dDivisor ), hb_set.HB_SET_DECIMALS );
+         hb_vmPushDouble( fmod( hb_vmPopNumber(), dDivisor ), hb_stackSetStruct()->HB_SET_DECIMALS );
       }
    }
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_MOD )
@@ -4793,7 +4816,7 @@ static void hb_vmPower( void )
 
       /* NOTE: Clipper always returns the result of power
                with the SET number of decimal places. */
-      hb_vmPushDouble( pow( d1, d2 ), hb_set.HB_SET_DECIMALS );
+      hb_vmPushDouble( pow( d1, d2 ), hb_stackSetStruct()->HB_SET_DECIMALS );
    }
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_POWER )
    {
@@ -8782,6 +8805,8 @@ void hb_vmPushNumber( double dNumber, int iDec )
 
 void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%lf, %d, %i, %i)", dNumber, iDec, iType1, iType2));
 
    if( iDec || iType1 & HB_IT_DOUBLE || iType2 & HB_IT_DOUBLE )
@@ -8798,7 +8823,7 @@ void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
    }
    else
    {
-      hb_vmPushDouble( dNumber, hb_set.HB_SET_DECIMALS );
+      hb_vmPushDouble( dNumber, hb_stackSetStruct()->HB_SET_DECIMALS );
    }
 }
 
@@ -8942,7 +8967,7 @@ void hb_vmPushDouble( double dNumber, int iDec )
    pItem->item.asDouble.length = HB_DBL_LENGTH( dNumber );
    if( iDec == HB_DEFAULT_DECIMALS )
    {
-      pItem->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+      pItem->item.asDouble.decimal = hb_stackSetStruct()->HB_SET_DECIMALS;
    }
    else
    {
@@ -8978,9 +9003,10 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    pItem = hb_stackAllocItem();
    pItem->type = HB_IT_DOUBLE;
    pItem->item.asDouble.value = dNumber;
+
    if( iDec == HB_DEFAULT_DECIMALS )
    {
-      pItem->item.asDouble.decimal = (UINT) hb_set.HB_SET_DECIMALS;
+      pItem->item.asDouble.decimal = hb_stackSetStruct()->HB_SET_DECIMALS;
    }
    else
    {
@@ -9219,7 +9245,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode )
    pItem->item.asBlock.value->symbol = ( *HB_VM_STACK.pBase )->item.asSymbol.value;
    pItem->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.pCargo->lineno;
 
-   if( hb_set.HB_SET_MACROBLOCKVARS )
+   if( hb_stackSetStruct()->HB_SET_MACROBLOCKVARS )
    {
       pItem->item.asBlock.value->uiFlags |= CBF_PRIVATE_VARS;
    }
@@ -11075,7 +11101,7 @@ void hb_vmRequestCancel( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
 
-   if( hb_set.HB_SET_CANCEL )
+   if( hb_stackSetStruct()->HB_SET_CANCEL )
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 +  64 ]; // 64 for the Canceled at: (%i) overhead.
       register UINT i = 1;
@@ -12706,7 +12732,7 @@ BOOL hb_xvmDivideByInt( LONG lDivisor )
       }
       else
       {
-         hb_itemPutNDDec( pValue, hb_itemGetND( pValue ) / lDivisor, hb_set.HB_SET_DECIMALS );
+         hb_itemPutNDDec( pValue, hb_itemGetND( pValue ) / lDivisor, hb_stackSetStruct()->HB_SET_DECIMALS );
       }
    }
    else if( hb_objGetOpOver( pValue ) & HB_CLASS_OP_DIVIDE )

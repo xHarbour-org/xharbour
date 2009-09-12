@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.58 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.59 2009/07/29 22:18:23 marchuet Exp $
  */
 
 /*
@@ -1243,10 +1243,18 @@ typedef HB_ERRCODE ( * WACALLBACK )( AREAP, void * );
 extern HB_EXPORT HB_ERRCODE   hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo );
 extern HB_EXPORT HB_ERRCODE   hb_rddGetTempAlias( char * szAliasTmp );
 
+#ifdef _HB_API_INTERNAL_
+
+#include "hbstack.h"
+
 extern HB_EXPORT void         hb_rddWaShutDown( PHB_STACKRDD );
 extern HB_EXPORT PHB_STACKRDD hb_rddWaInit( void );
+#endif
 
+#ifdef _HB_SET_INTERNAL_
 extern HB_EXPORT BOOL         hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet );
+#endif
+
 HB_EXTERN_END
 
 #endif /* HB_APIRDD_H_ */

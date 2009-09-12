@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.9 2005/09/22 01:11:59 druzus Exp $
+ * $Id: setkey.c,v 1.10 2008/04/16 21:36:27 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,6 @@
 #include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbapigt.h"
-#include "hbstack.h"
 
 typedef struct HB_SETKEY_
 {

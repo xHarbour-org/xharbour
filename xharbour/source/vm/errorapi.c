@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.99 2009/02/09 01:42:21 guerra000 Exp $
+ * $Id: errorapi.c,v 1.100 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -102,7 +102,7 @@
    go into an infinite loop, this is an emulated version of the Clipper
    "Unrecoverable error 650: Processor stack fault" internal error, but
    better shows what is really the problem. [vszakats] */
-#define HB_ERROR_LAUNCH_MAX hb_set.HB_SET_ERRORLOOP
+#define HB_ERROR_LAUNCH_MAX hb_stackSetStruct()->HB_SET_ERRORLOOP
 
 /* Error class instance variables offsets */
 #define HB_TERROR_CARGO             1
@@ -159,8 +159,6 @@ static PHB_ITEM s_pError = NULL;
    #endif
 
 #endif
-
-extern HB_SET_STRUCT hb_set;
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    #include "hbserv.h"
@@ -880,7 +878,7 @@ USHORT hb_errLaunch( PHB_ITEM pError )
             hb_itemRelease( pError );
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
-            hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+            hb_stackSetStruct()->HB_SET_OUTPUTSAFETY = FALSE;
             hb_threadIdleEnd();
             exit( hb_vmQuit() );
          #endif
@@ -1072,7 +1070,7 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
          #if defined( HB_THREAD_SUPPORT )
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
-            hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+            hb_stackSetStruct()->HB_SET_OUTPUTSAFETY = FALSE;
             hb_threadIdleEnd();
          #endif
 

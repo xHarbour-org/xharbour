@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.11 2008/11/22 23:18:19 ronpinkas Exp $
+ * $Id: nulsys.c,v 1.12 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 
 #include "hbapi.h"
 #include "hbapirdd.h"
+#include "hbstack.h"
 
 HB_ERRCODE hb_rddSelectWorkAreaAlias( const char * szName )
 {

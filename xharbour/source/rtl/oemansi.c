@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.9 2005/09/22 01:11:59 druzus Exp $
+ * $Id: oemansi.c,v 1.10 2007/04/20 09:41:31 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,6 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
-#include "hbstack.h"
 
 #ifdef HB_EXTENSION
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.21 2009/04/16 22:51:25 likewolf Exp $
+ * $Id: wafunc.c,v 1.22 2009/04/17 14:33:21 enricomaria Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  *
  */
 
+#define _HB_API_INTERNAL_
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbapiitm.h"
@@ -73,6 +74,8 @@
    }
 
 #else
+
+#include "hbstack.h"
 
 #define HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias ) \
    { \

@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.5 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: filebuf.c,v 1.6 2009/07/22 16:55:13 marchuet Exp $
  */
 
 /*
@@ -324,10 +324,10 @@ PHB_FILE hb_fileExtOpen( BYTE * pFilename, BYTE * pDefExt,
    pszFile = hb_fsExtName( pFilename, pDefExt, uiExFlags, pPaths );
 
 #if defined( HB_OS_UNIX )
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    fResult = stat( ( char * ) pszFile, &statbuf ) == 0;
    hb_fsSetIOError( fResult, 0 );
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fResult )
    {
@@ -372,14 +372,14 @@ PHB_FILE hb_fileExtOpen( BYTE * pFilename, BYTE * pDefExt,
       {
          ULONG device = 0, inode = 0;
 #if defined( HB_OS_UNIX )
-         HB_STACK_UNLOCK
+         hb_vmUnlock();
          if( fstat( hFile, &statbuf ) == 0 )
          {
             device = ( ULONG ) statbuf.st_dev;
             inode  = ( ULONG ) statbuf.st_ino;
          }
          hb_fsSetIOError( fResult, 0 );
-         HB_STACK_LOCK
+         hb_vmLock();
 #endif
 
          HB_CRITICAL_LOCK( s_fileMtx );

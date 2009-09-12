@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.99 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: workarea.c,v 1.100 2009/08/19 17:02:09 likewolf Exp $
  */
 
 /*
@@ -1866,9 +1866,8 @@ static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnecti
          break;
       case RDDI_MEMOEXT:
       {
-         char * szResult = hb_setGetMFileExt();
-         if( szResult )
-            szResult = hb_strdup( szResult );
+         const char * szExt = hb_setGetMFileExt();
+         char * szResult = szExt ? hb_strdup( szExt ) : NULL;
          if( hb_itemType( pItem ) & HB_IT_STRING )
          {
             hb_setSetItem( HB_SET_MFILEEXT, pItem );

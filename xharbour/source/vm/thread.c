@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.220 2009/01/16 01:56:00 likewolf Exp $
+* $Id: thread.c,v 1.221 2009/01/24 00:33:10 likewolf Exp $
 */
 
 /*
@@ -572,6 +572,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    hb_rddWaShutDown( pStack->rdd );
+
+   hb_setRelease( &pStack->set );
 
    // Free only if we are not destroying the main stack
    if ( pStack != &hb_stackMT )
@@ -1700,6 +1702,13 @@ HB_FUNC( STARTTHREAD )
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
    pStack->pThreadReady = pThreadReady;
+
+   {
+      PHB_SET_STRUCT pSet = hb_setClone( hb_stackSetStruct() );
+
+      memcpy( &pStack->set, pSet, sizeof( HB_SET_STRUCT ) );
+      hb_xfree( pSet );
+   }
 
    /* Forbid usage of stack before that new thread's VM takes care of it */
    hb_threadFillStack( pStack, pArgs );

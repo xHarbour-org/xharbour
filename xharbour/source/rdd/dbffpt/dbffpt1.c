@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.104 2009/05/26 11:25:32 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.105 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -4739,13 +4739,12 @@ static HB_ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else
          {
             LPDBFDATA pData = DBFAREA_DATA( pArea );
-            char * szMFileExt;
+            const char * szExt;
             if( pData->szMemoExt[ 0 ] )
                hb_itemPutC( pItem, pData->szMemoExt );
             else if( pArea->bMemoType == DB_MEMO_FPT &&
-                     ( szMFileExt = hb_setGetMFileExt() ) != NULL &&
-                     *szMFileExt )
-               hb_itemPutC( pItem, szMFileExt );
+                     ( szExt = hb_setGetMFileExt() ) != NULL && *szExt )
+               hb_itemPutC( pItem, szExt );
             else
             {
                const char * szExt = hb_memoDefaultFileExt( pArea->bMemoType, pArea->rddID );
@@ -5047,26 +5046,23 @@ static HB_ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
    {
       case RDDI_MEMOEXT:
       {
-         char * szNew = hb_itemGetCPtr( pItem ), *szMFileExt;
+         const char * szExt = hb_itemGetCPtr( pItem );
+         char * szNewVal;
 
-         if( szNew && szNew[0] == '.' && szNew[1] )
-            szNew = hb_strdup( szNew );
-         else
-            szNew = NULL;
+         szNewVal = szExt[0] == '.' && szExt[1] ? hb_strdup( szExt ) : NULL;
 
          if( pData->szMemoExt[ 0 ] )
             hb_itemPutC( pItem, pData->szMemoExt );
          else if( pData->bMemoType == DB_MEMO_FPT && pRDD->rddID != s_uiRddIdBLOB &&
-                  ( szMFileExt = hb_setGetMFileExt() ) != NULL &&
-                  *szMFileExt )
-            hb_itemPutC( pItem, szMFileExt );
+                  ( szExt = hb_setGetMFileExt() ) != NULL && *szExt )
+            hb_itemPutC( pItem, szExt );
          else
             hb_itemPutC( pItem, hb_memoDefaultFileExt( pData->bMemoType, pRDD->rddID ) );
 
-         if( szNew )
+         if( szNewVal )
          {
-            hb_strncpy( pData->szMemoExt, szNew, sizeof( pData->szMemoExt ) - 1 );
-            hb_xfree( szNew );
+            hb_strncpy( pData->szMemoExt, szNewVal, sizeof( pData->szMemoExt ) - 1 );
+            hb_xfree( szNewVal );
          }
          break;
       }

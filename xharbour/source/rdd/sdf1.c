@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.36 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: sdf1.c,v 1.37 2009/05/26 11:25:32 marchuet Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ static const USHORT s_uiNumLength[ 9 ] = { 0, 4, 6, 8, 11, 13, 16, 18, 20 };
 
 static void hb_sdfInitArea( SDFAREAP pArea, char * szFileName )
 {
-   char * szEol;
+   const char * szEol;
 
    /* Allocate only after succesfully open file */
    pArea->szFileName = hb_strdup( szFileName );

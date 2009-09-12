@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.146 2009/07/06 07:45:10 marchuet Exp $
+ * $Id: ads1.c,v 1.147 2009/07/17 02:49:14 brianhays Exp $
  */
 
 /*
@@ -70,18 +70,6 @@
 #include "rddads.h"
 
 #include <ctype.h>
-
-/*
- * This code is a workaround for not working HB_IMPORT attribute
- * it should not be necessary
- */
-#ifndef HB_SET_IMPORT
-   static HB_SET_STRUCT * s_hb_set_ptr = NULL;
-#  define hb_set              ( * s_hb_set_ptr )
-#  define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
-#else
-#  define HB_ADS_SET_INIT()   do { } while(0)
-#endif
 
 static int s_iSetListenerHandle = 0;
 

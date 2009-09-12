@@ -1,5 +1,5 @@
 /*
- * $Id: readexit.c,v 1.1 2005/03/31 06:39:19 guerra000 Exp $
+ * $Id: readexit.c,v 1.2 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -51,9 +51,6 @@
  */
 
 #include "hbapi.h"
-#include "hbapiitm.h"
-#include "hbfast.h"
-#include "hbstack.h"
 #include "hbset.h"
 
 HB_FUNC( READEXIT )

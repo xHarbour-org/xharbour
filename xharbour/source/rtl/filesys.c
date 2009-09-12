@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.189 2009/07/22 16:55:13 marchuet Exp $
+ * $Id: filesys.c,v 1.190 2009/08/17 17:32:34 likewolf Exp $
  */
 
 /*
@@ -121,6 +121,7 @@
 #include <ctype.h>
 
 #include "hbapi.h"
+#include "hbvm.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbdate.h"
@@ -733,7 +734,7 @@ HB_FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
           pbyTmp = NULL;
 
       //JC1: unlocking the stack to allow cancelation points
-      HB_STACK_UNLOCK;
+      hb_vmUnlock();
 
       if( pipe( hPipeHandle ) == 0 ) {
          if( ( pid = fork() ) != -1 ) {
@@ -781,7 +782,7 @@ HB_FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
          }
       }
       hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-      HB_STACK_LOCK;
+      hb_vmLock();
 
       if( pbyTmp )
          hb_xfree( pbyTmp );
@@ -1460,9 +1461,9 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
       }
       else
       {
-         HB_STACK_UNLOCK;
+         hb_vmUnlock();
          iRetStatus = waitpid( (pid_t) fhProc, &iStatus, 0 );
-         HB_STACK_LOCK;
+         hb_vmLock();
       }
    }
    else
@@ -1501,7 +1502,7 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
 
    HB_SYMBOL_UNUSED( bWait );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    HB_TEST_CANCEL_ENABLE_ASYN
    #ifdef __BORLANDC__
       iPid = cwait( &iRetStatus, (int) fhProc, 0 );
@@ -1509,7 +1510,7 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
       iPid = _cwait( &iRetStatus, (int) fhProc, 0 );
    #endif
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK;
+   hb_vmLock();
 
    if ( iPid != (int) fhProc )
    {
@@ -1530,11 +1531,11 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
       dwTime = INFINITE;
    }
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    HB_TEST_CANCEL_ENABLE_ASYN
    dwResult = WaitForSingleObject( DosToWinHandle(fhProc), dwTime );
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK;
+   hb_vmLock();
 
    if ( dwResult == WAIT_OBJECT_0 )
    {
@@ -1629,7 +1630,7 @@ HB_FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
    // Unlocking stack to allow cancelation points
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -1708,7 +1709,7 @@ HB_FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 #endif
 
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fFree )
       hb_xfree( pFilename );
@@ -1726,7 +1727,7 @@ HB_FHANDLE hb_fsCreate( BYTE * pFilename, ULONG ulAttr )
 
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -1799,7 +1800,7 @@ HB_FHANDLE hb_fsCreate( BYTE * pFilename, ULONG ulAttr )
 #endif
 
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fFree )
       hb_xfree( pFilename );
@@ -1823,7 +1824,7 @@ HB_FHANDLE hb_fsCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags )
 
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -1893,7 +1894,7 @@ HB_FHANDLE hb_fsCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags )
 #endif
 
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fFree )
       hb_xfree( pFilename );
@@ -1908,7 +1909,7 @@ void hb_fsClose( HB_FHANDLE hFileHandle )
 
 #if defined(HB_FS_FILE_IO)
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -1918,7 +1919,7 @@ void hb_fsClose( HB_FHANDLE hFileHandle )
       hb_fsSetIOError( close( hFileHandle ) == 0, 0 );
    #endif
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #else
 
@@ -2028,7 +2029,7 @@ BOOL hb_fsGetFileTime( BYTE * pszFileName, LONG * plJulian, LONG * plMillisec )
          FILETIME ft, local_ft;
          SYSTEMTIME st;
 
-         HB_STACK_UNLOCK
+         hb_vmUnlock();
          if( GetFileTime( DosToWinHandle( hFile ), NULL, NULL, &ft ) &&
              FileTimeToLocalFileTime( &ft, &local_ft ) &&
              FileTimeToSystemTime( &local_ft, &st ) )
@@ -2039,7 +2040,7 @@ BOOL hb_fsGetFileTime( BYTE * pszFileName, LONG * plJulian, LONG * plMillisec )
             fResult = TRUE;
          }
          hb_fsSetIOError( fResult, 0 );
-         HB_STACK_LOCK
+         hb_vmLock();
          hb_fsClose( hFile );
       }
    }
@@ -2050,7 +2051,7 @@ BOOL hb_fsGetFileTime( BYTE * pszFileName, LONG * plJulian, LONG * plMillisec )
 
       pszFileName = hb_fsNameConv( pszFileName, &fFree );
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       if( stat( ( char * ) pszFileName, &sStat ) == 0 )
       {
          time_t ftime;
@@ -2069,7 +2070,7 @@ BOOL hb_fsGetFileTime( BYTE * pszFileName, LONG * plJulian, LONG * plMillisec )
          fResult = TRUE;
       }
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
 
       if( fFree )
          hb_xfree( pszFileName );
@@ -2102,7 +2103,7 @@ BOOL hb_fsGetAttr( BYTE * pszFileName, ULONG * pulAttr )
       HB_THREAD_STUB
       DWORD dwAttr;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       dwAttr = GetFileAttributesA( ( char * ) pszFileName );
 
       if( dwAttr != INVALID_FILE_ATTRIBUTES )
@@ -2111,10 +2112,10 @@ BOOL hb_fsGetAttr( BYTE * pszFileName, ULONG * pulAttr )
          fResult = TRUE;
       }
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined( HB_OS_DOS )
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    {
 #if defined( __DJGPP__ ) || defined(__BORLANDC__)
       int attr = _chmod( ( char * ) pszFileName, 0, 0 );
@@ -2129,13 +2130,13 @@ BOOL hb_fsGetAttr( BYTE * pszFileName, ULONG * pulAttr )
       }
       hb_fsSetIOError( fResult, 0 );
    }
-   HB_STACK_LOCK
+   hb_vmLock();
 #elif defined( HB_OS_OS2 )
    {
       FILESTATUS3 fs3;
       APIRET ulrc;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       ulrc = DosQueryPathInfo( ( PCSZ ) pszFileName, FIL_STANDARD, &fs3, sizeof( fs3 ) );
       if( ulrc == NO_ERROR )
       {
@@ -2143,20 +2144,20 @@ BOOL hb_fsGetAttr( BYTE * pszFileName, ULONG * pulAttr )
          fResult = TRUE;
       }
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined( HB_OS_UNIX )
    {
       struct stat sStat;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       if( stat( ( char * ) pszFileName, &sStat ) == 0 )
       {
          *pulAttr = hb_fsAttrFromRaw( sStat.st_mode );
          fResult = TRUE;
       }
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #else
    {
@@ -2195,7 +2196,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
          FILETIME ft, local_ft;
          SYSTEMTIME st;
 
-         HB_STACK_UNLOCK
+         hb_vmUnlock();
          if( lJulian <= 0 || lMillisec < 0 )
             GetLocalTime( &st );
          else
@@ -2218,7 +2219,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
          LocalFileTimeToFileTime( &local_ft, &ft );
          fResult = SetFileTime( DosToWinHandle( hFile ), NULL, &ft, &ft ) != 0;
          hb_fsSetIOError( fResult, 0 );
-         HB_STACK_LOCK
+         hb_vmLock();
          hb_fsClose( hFile );
       }
    }
@@ -2230,7 +2231,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
 
       pszFileName = hb_fsNameConv( pszFileName, &fFree );
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       ulrc = DosQueryPathInfo( ( PCSZ ) pszFileName, FIL_STANDARD, &fs3, sizeof( fs3 ) );
       if( ulrc == NO_ERROR )
       {
@@ -2270,7 +2271,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
       }
       fResult = ulrc == NO_ERROR;
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
       if( fFree )
          hb_xfree( pszFileName );
    }
@@ -2280,7 +2281,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
 
       pszFileName = hb_fsNameConv( pszFileName, &fFree );
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       if( lJulian <= 0 && lMillisec )
       {
          fResult = utime( ( char * ) pszFileName, NULL ) == 0;
@@ -2327,7 +2328,7 @@ BOOL hb_fsSetFileTime( BYTE * pszFileName, LONG lJulian, LONG lMillisec )
          fResult = utime( ( char * ) pszFileName, &buf ) == 0;
       }
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
       if( fFree )
          hb_xfree( pszFileName );
    }
@@ -2365,10 +2366,10 @@ BOOL hb_fsSetAttr( BYTE * pszFileName, ULONG ulAttr )
          dwFlags |= FILE_ATTRIBUTE_SYSTEM;
       if( ulAttr & HB_FA_NORMAL )
          dwFlags |= FILE_ATTRIBUTE_NORMAL;
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       fResult = SetFileAttributesA( ( char * ) pszFileName, dwFlags );
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined( HB_OS_OS2 )
    {
@@ -2385,7 +2386,7 @@ BOOL hb_fsSetAttr( BYTE * pszFileName, ULONG ulAttr )
       if( ulAttr & HB_FA_ARCHIVE )
          ulOsAttr |= FILE_ARCHIVED;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       ulrc = DosQueryPathInfo( ( PCSZ ) pszFileName, FIL_STANDARD, &fs3, sizeof( fs3 ) );
       if( ulrc == NO_ERROR )
       {
@@ -2395,19 +2396,19 @@ BOOL hb_fsSetAttr( BYTE * pszFileName, ULONG ulAttr )
       }
       fResult = ulrc == NO_ERROR;
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined( HB_OS_DOS )
 
    ulAttr &= ~( HB_FA_ARCHIVE | HB_FA_HIDDEN | HB_FA_READONLY | HB_FA_SYSTEM );
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 #  if defined( __DJGPP__ ) || defined( __BORLANDC__ )
    fResult = _chmod( ( char * ) pszFileName, 1, ulAttr ) != -1;
 #  else
    fResult = _dos_setfileattr( ( char * ) pszFileName, ulAttr ) != -1;
 #  endif
    hb_fsSetIOError( fResult, 0 );
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #elif defined( HB_OS_UNIX_COMPATIBLE )
    {
@@ -2428,10 +2429,10 @@ BOOL hb_fsSetAttr( BYTE * pszFileName, ULONG ulAttr )
             if( iAttr & S_IROTH ) iAttr |= S_IXOTH;
          }
       }
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       fResult = chmod( ( char * ) pszFileName, iAttr ) != -1;
       hb_fsSetIOError( fResult, 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #else
    {
@@ -2457,7 +2458,7 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 
 #if defined(HB_FS_FILE_IO)
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
    #if defined(HB_WIN32_IO)
       {
@@ -2483,7 +2484,7 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    if( uiRead == ( USHORT ) -1 )
       uiRead = 0;
 
-   HB_STACK_LOCK
+   hb_vmLock();
 #else
 
    uiRead = 0;
@@ -2503,7 +2504,7 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
 
 #if defined(HB_FS_FILE_IO)
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
    #if defined(HB_WIN32_IO)
       {
@@ -2552,7 +2553,7 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
 
    #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #else
 
@@ -2573,7 +2574,7 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 
 #if defined(HB_FS_FILE_IO)
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
    #if defined(HB_WIN32_IO)
    {
@@ -2642,7 +2643,7 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
    }
    #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #else
 
@@ -2666,7 +2667,7 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount
    #if defined(HB_WIN32_IO)
    {
       ulWritten = 0;
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       if( ulCount )
       {
          hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL ), 0 );
@@ -2675,10 +2676,10 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount
       {
          hb_fsSetIOError( SetEndOfFile( DosToWinHandle( hFileHandle ) ), 0 );
       }
-      HB_STACK_LOCK
+      hb_vmLock();
    }
    #else
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -2745,7 +2746,7 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount
       }
 
       HB_DISABLE_ASYN_CANC
-      HB_STACK_LOCK
+      hb_vmLock();
 
    #endif
 
@@ -2765,38 +2766,38 @@ ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount, HB_FOFFS
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadAt(%p, %p, %lu, %" PFHL "i)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount, llOffset));
 
-#if defined(HB_FS_FILE_IO)
+#if defined( HB_FS_FILE_IO )
 
-   #if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
+#  if defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
    {
-      HB_STACK_UNLOCK
-      #if defined(HB_USE_LARGEFILE64)
-         ulRead = pread64( hFileHandle, pBuff, ulCount, llOffset );
-      #else
-         ulRead = pread( hFileHandle, pBuff, ulCount, llOffset );
-      #endif
-      hb_fsSetIOError( ulRead != (ULONG) -1, 0 );
+      hb_vmUnlock();
+#     if defined( HB_USE_LARGEFILE64 )
+      ulRead = pread64( hFileHandle, pBuff, ulCount, llOffset );
+#     else
+      ulRead = pread( hFileHandle, pBuff, ulCount, llOffset );
+#     endif
+      hb_fsSetIOError( ulRead != ( ULONG ) -1, 0 );
       if( ulRead == ( ULONG ) -1 )
          ulRead = 0;
-      HB_STACK_LOCK
+      hb_vmLock();
    }
-   #else
-   #if defined(HB_WIN32_IO)
+#  else
+#     if defined(HB_WIN32_IO)
    if( hb_iswinnt() )
    {
       OVERLAPPED Overlapped;
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       memset( &Overlapped, 0, sizeof( Overlapped ) );
       Overlapped.Offset     = ( DWORD ) ( llOffset & 0xFFFFFFFF ),
       Overlapped.OffsetHigh = ( DWORD ) ( llOffset >> 32 ),
       hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
                                  pBuff, ulCount, &ulRead, &Overlapped ), 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
    else
    #endif
    {
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       /* TOFIX: this is not atom operation. It has to be fixed for RDD
        *        file access with shared file handles in aliased work areas
        */
@@ -2804,9 +2805,9 @@ ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount, HB_FOFFS
          ulRead = hb_fsReadLarge( hFileHandle, pBuff, ulCount );
       else
          ulRead = 0;
-      HB_STACK_LOCK
+      hb_vmLock();
    }
-   #endif
+#  endif
 
 #else
 
@@ -2829,7 +2830,7 @@ ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount, H
 
    #if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
    {
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       #if defined(HB_USE_LARGEFILE64)
          ulWritten = pwrite64( hFileHandle, pBuff, ulCount, llOffset );
       #else
@@ -2838,25 +2839,25 @@ ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount, H
       hb_fsSetIOError( ulWritten != (ULONG) -1, 0 );
       if( ulWritten == ( ULONG ) -1 )
          ulWritten = 0;
-      HB_STACK_LOCK
+      hb_vmLock();
    }
    #else
    #if defined(HB_WIN32_IO)
    if( hb_iswinnt() )
    {
       OVERLAPPED Overlapped;
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       memset( &Overlapped, 0, sizeof( Overlapped ) );
       Overlapped.Offset     = ( DWORD ) ( llOffset & 0xFFFFFFFF ),
       Overlapped.OffsetHigh = ( DWORD ) ( llOffset >> 32 ),
       hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle ),
                                   pBuff, ulCount, &ulWritten, &Overlapped ), 0 );
-      HB_STACK_LOCK
+      hb_vmLock();
    }
    else
    #endif
    {
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       /* TOFIX: this is not atom operation. It has to be fixed for RDD
        *        file access with shared file handles in aliased work areas
        */
@@ -2864,7 +2865,7 @@ ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount, H
          ulWritten = hb_fsWriteLarge( hFileHandle, pBuff, ulCount );
       else
          ulWritten = 0;
-      HB_STACK_LOCK
+      hb_vmLock();
    }
    #endif
 
@@ -2887,7 +2888,7 @@ BOOL hb_fsTruncAt( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset )
 
 #if defined(HB_FS_FILE_IO)
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    #if defined(HB_WIN32_IO)
    {
       ULONG ulOffsetLow  = ( ULONG ) ( llOffset & ULONG_MAX ),
@@ -2912,7 +2913,7 @@ BOOL hb_fsTruncAt( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset )
       fResult = ftruncate( hFileHandle, llOffset ) != -1;
    #endif
    hb_fsSetIOError( fResult, 0 );
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #else
 
@@ -2929,7 +2930,7 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", ( void * ) ( HB_PTRDIFF ) hFileHandle));
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 #if defined(HB_OS_WIN_32)
    {
@@ -3000,7 +3001,7 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 }
 
 BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
@@ -3014,7 +3015,7 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsLock(%p, %lu, %lu, %hu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, ulStart, ulLength, uiMode));
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 #if defined(HB_WIN32_IO)
    // allowing async cancelation here
@@ -3215,7 +3216,7 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
    return bResult;
 }
@@ -3244,7 +3245,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
          s_bWinNt = hb_iswinnt() ;
       }
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       HB_TEST_CANCEL_ENABLE_ASYN
 
       switch( uiMode & FL_MASK )
@@ -3302,7 +3303,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       hb_fsSetIOError( bResult, 0 );
 
       HB_DISABLE_ASYN_CANC
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined(HB_USE_LARGEFILE64)
    {
@@ -3310,7 +3311,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
 
       struct flock64 lock_info;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       HB_TEST_CANCEL_ENABLE_ASYN
 
       switch( uiMode & FL_MASK )
@@ -3345,7 +3346,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       hb_fsSetIOError( bResult, 0 );
 
       HB_DISABLE_ASYN_CANC
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #else
    bResult = hb_fsLock( hFileHandle, (ULONG) ulStart, (ULONG) ulLength, uiMode );
@@ -3368,7 +3369,7 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, lOffset, uiFlags));
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -3448,7 +3449,7 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 #endif
 
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 
    return ulPos;
 }
@@ -3468,7 +3469,7 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
       ULONG ulOffsetLow  = ( ULONG ) ( llOffset & ULONG_MAX ),
             ulOffsetHigh = ( ULONG ) ( llOffset >> 32 );
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       HB_TEST_CANCEL_ENABLE_ASYN
 
       if( llOffset < 0 && Flags == SEEK_SET )
@@ -3494,7 +3495,7 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
       }
 
       HB_DISABLE_ASYN_CANC
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #elif defined(HB_USE_LARGEFILE64)
    {
@@ -3502,7 +3503,7 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
 
       USHORT Flags = convert_seek_flags( uiFlags );
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       HB_TEST_CANCEL_ENABLE_ASYN
 
       if( llOffset < 0 && Flags == SEEK_SET )
@@ -3522,7 +3523,7 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
       }
 
       HB_DISABLE_ASYN_CANC
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #else
    llPos = (HB_FOFFSET) hb_fsSeek( hFileHandle, (LONG) llOffset, uiFlags );
@@ -3548,7 +3549,7 @@ BOOL hb_fsDelete( BYTE * pFilename )
 
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 
 #if defined(HB_OS_WIN_32)
@@ -3578,7 +3579,7 @@ BOOL hb_fsDelete( BYTE * pFilename )
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fFree )
       hb_xfree( pFilename );
@@ -3597,7 +3598,7 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
    pOldName = hb_fsNameConv( pOldName, &fFreeOld );
    pNewName = hb_fsNameConv( pNewName, &fFreeNew );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 
 #if defined(HB_OS_WIN_32)
@@ -3621,7 +3622,7 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 #endif
 
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
    if( fFreeOld )
       hb_xfree( pOldName );
@@ -3643,7 +3644,7 @@ BOOL hb_fsMkDir( BYTE * pDirname )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 #if defined(HB_OS_WIN_32)
 
@@ -3671,7 +3672,7 @@ BOOL hb_fsMkDir( BYTE * pDirname )
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
    if( fFree )
       hb_xfree( pDirname );
 
@@ -3688,7 +3689,7 @@ BOOL hb_fsChDir( BYTE * pDirname )
 
    pDirname = hb_fsNameConv( pDirname, &fFree );
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 #if defined(HB_OS_WIN_32)
 
@@ -3710,7 +3711,7 @@ BOOL hb_fsChDir( BYTE * pDirname )
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
    if( fFree )
       hb_xfree( pDirname );
 
@@ -3727,7 +3728,7 @@ BOOL hb_fsRmDir( BYTE * pDirname )
 
    pDirname = hb_fsNameConv( pDirname, &fFree );
 
-   HB_STACK_LOCK
+   hb_vmUnlock();
 
 #if defined(HB_OS_WIN_32)
 
@@ -3748,7 +3749,7 @@ BOOL hb_fsRmDir( BYTE * pDirname )
 
 #endif
 
-   HB_STACK_UNLOCK
+   hb_vmLock();
    if( fFree )
       hb_xfree( pDirname );
 
@@ -3796,7 +3797,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    }
 #endif
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
 
 #if defined(HB_OS_WIN_32)
 
@@ -3827,7 +3828,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 
 #endif
 
-   HB_STACK_LOCK
+   hb_vmLock();
 
    usError = hb_fsError();
 
@@ -3892,7 +3893,7 @@ USHORT hb_fsChDrv( BYTE nDrive )
       /* 'unsigned int' _have to_ be used in Watcom */
       UINT uiSave, uiNewDrive;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       /* allowing async cancelation here */
       HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -3913,7 +3914,7 @@ USHORT hb_fsChDrv( BYTE nDrive )
          hb_fsSetError( ( USHORT ) FS_ERROR );
       }
       HB_DISABLE_ASYN_CANC
-      HB_STACK_UNLOCK
+      hb_vmLock();
    }
 #else
 
@@ -3940,10 +3941,10 @@ BYTE hb_fsCurDrv( void )
 
 #if defined( HB_OS_HAS_DRIVE_LETTER )
 
-   HB_STACK_UNLOCK
+   hb_vmUnlock();
    HB_FS_GETDRIVE( uiResult );
    hb_fsSetError( 0 );
-   HB_STACK_LOCK
+   hb_vmLock();
 
 #else
 
@@ -3981,9 +3982,9 @@ USHORT hb_fsIsDrv( BYTE nDrive )
       buffer[ 2 ] = '\\';
       buffer[ 3 ] = '\0';
 
-      HB_STACK_UNLOCK
-      type = GetDriveTypeA( ( LPCSTR ) buffer );
-      HB_STACK_LOCK
+      hb_vmUnlock();
+      type = GetDriveTypeA( buffer );
+      hb_vmLock();
       uiResult = ( type == DRIVE_UNKNOWN || type == DRIVE_NO_ROOT_DIR ) ? F_ERROR : 0;
       hb_fsSetError( 0 );
    }
@@ -3993,7 +3994,7 @@ USHORT hb_fsIsDrv( BYTE nDrive )
        */
       UINT uiSave, uiNewDrive;
 
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
 
       HB_FS_GETDRIVE( uiSave );
       HB_FS_SETDRIVE( nDrive );
@@ -4010,7 +4011,7 @@ USHORT hb_fsIsDrv( BYTE nDrive )
       }
       HB_FS_SETDRIVE( uiSave );
 
-      HB_STACK_LOCK
+      hb_vmLock();
    }
 #else
 
@@ -4031,17 +4032,21 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 
 #if defined(HB_OS_WIN_32)
 
+   hb_vmUnlock();
    bResult = GetFileType( DosToWinHandle( hFileHandle ) ) == FILE_TYPE_CHAR;
    hb_fsSetIOError( bResult, 0 );
+   hb_vmLock();
 
 #elif defined( HB_FS_FILE_IO )
 
+   hb_vmUnlock();
 #if defined( _MSC_VER ) || defined( __MINGW32__ )
    bResult = _isatty( hFileHandle ) != 0;
 #else
    bResult = isatty( hFileHandle ) != 0;
 #endif
    hb_fsSetIOError( bResult, 0 );
+   hb_vmLock();
 
 #else
 
@@ -4079,7 +4084,7 @@ BYTE * hb_fsExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * 
    }
    else if( uiExFlags & FXO_DEFAULTS )
    {
-      char * szDefault = hb_setGetDefault();
+      const char * szDefault = hb_setGetDefault();
       if( szDefault )
       {
          pFilepath->szPath = szDefault;
@@ -4181,9 +4186,9 @@ HB_FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
          iLock = LOCK_SH | LOCK_NB;
       else
          iLock = LOCK_EX | LOCK_NB;
-      HB_STACK_UNLOCK
+      hb_vmUnlock();
       iLock = flock( hFile, iLock );
-      HB_STACK_LOCK
+      hb_vmLock();
       if( iLock != 0 )
 #else
       USHORT uiLock;
@@ -4250,17 +4255,17 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
 {
    BOOL fResult;
 
-#if defined(__DJGPP__) || defined(__CYGWIN__) || \
-    defined(HB_WIN32_IO) || defined(HB_WINCE) || \
-    defined(HB_OS_UNIX_COMPATIBLE)
+   hb_vmUnlock();
+
+#if defined( __DJGPP__ ) || defined(__CYGWIN__ ) || \
+    defined( HB_WIN32_IO ) || defined( HB_WINCE ) || \
+    defined( HB_OS_UNIX_COMPATIBLE )
 
    HB_THREAD_STUB
 {
    HB_FOFFSET curPos;
    HB_FOFFSET endPos;
    HB_FOFFSET newPos;
-
-   HB_STACK_UNLOCK
 
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
@@ -4281,14 +4286,14 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
 
    HB_DISABLE_ASYN_CANC
 
-   HB_STACK_LOCK
-
    fResult = !fResult || curPos == endPos;
 }
 #else
    fResult = eof( hFileHandle ) != 0;
    hb_fsSetIOError( fResult, 0 );
 #endif
+
+   hb_vmLock();
 
    return fResult;
 }
@@ -4324,7 +4329,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( dwResult != 0, 0 );
    HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
+   hb_vmLock();
 }
 
 #elif defined(HB_OS_OS2)

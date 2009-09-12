@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.109 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: estack.c,v 1.110 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -177,6 +177,16 @@ void hb_stackFree( void )
    hb_threadDestroyStack( &hb_stackMT );
 
 #endif
+}
+
+#undef hb_stackSetStruct
+PHB_SET_STRUCT hb_stackSetStruct( void )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackSetStruct()"));
+
+   return &HB_VM_STACK.set;
 }
 
 #undef hb_stackPop

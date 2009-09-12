@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.142 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: memvars.c,v 1.143 2009/06/24 01:42:40 peterrees Exp $
  */
 
 /*
@@ -2016,7 +2016,7 @@ HB_FUNC( __MVSAVE )
    {
       PHB_FNAME pFileName;
       char szFileName[ HB_PATH_MAX ];
-      FHANDLE fhnd;
+      HB_FHANDLE fhnd;
       UINT uLen = HB_MEM_REC_LEN;
 
       if( ISLOG( 4 ) && hb_parl( 4 ) )
@@ -2028,13 +2028,11 @@ HB_FUNC( __MVSAVE )
 
       pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
 
-      if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
+      if( pFileName->szExtension == NULL && hb_stackSetStruct()->HB_SET_DEFEXTENSIONS )
          pFileName->szExtension = ".mem";
 
-      if( pFileName->szPath == NULL )
-      {
-         pFileName->szPath = hb_set.HB_SET_DEFAULT;
-      }
+      if( ! pFileName->szPath )
+         pFileName->szPath = hb_stackSetStruct()->HB_SET_DEFAULT;
 
       hb_fsFNameMerge( szFileName, pFileName );
       hb_xfree( pFileName );
@@ -2136,11 +2134,11 @@ HB_FUNC( __MVRESTORE )
 
       pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
 
-      if( hb_set.HB_SET_DEFEXTENSIONS && pFileName->szExtension == NULL )
+      if( pFileName->szExtension == NULL && hb_stackSetStruct()->HB_SET_DEFEXTENSIONS )
          pFileName->szExtension = ".mem";
 
-      if( pFileName->szPath == NULL )
-         pFileName->szPath = hb_set.HB_SET_DEFAULT;
+      if( ! pFileName->szPath )
+         pFileName->szPath = hb_stackSetStruct()->HB_SET_DEFAULT;
 
       hb_fsFNameMerge( szFileName, pFileName );
       hb_xfree( pFileName );

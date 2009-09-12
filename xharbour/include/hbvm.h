@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.68 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: hbvm.h,v 1.69 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -163,6 +163,8 @@ extern HB_EXPORT void     hb_vmPopState( void ); /* pop current VM state from st
 extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item reference */
 
 extern HB_EXPORT BOOL     hb_vmIsMt( void ); /* return TRUE if HVM is compiled with thread support */
+extern HB_EXPORT void     hb_vmLock( void ); /* lock VM blocking GC execution by other threads */
+extern HB_EXPORT void     hb_vmUnlock( void ); /* unlock VM, allow GC execution */
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );

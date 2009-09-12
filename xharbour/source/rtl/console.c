@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.76 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: console.c,v 1.77 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
+#define _HB_API_INTERNAL_
 
 #include "hbapi.h"
 #include "hbapiitm.h"

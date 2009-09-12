@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.38 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: delim1.c,v 1.39 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ static const USHORT s_uiNumLength[ 9 ] = { 0, 4, 6, 8, 11, 13, 16, 18, 20 };
 
 static void hb_delimInitArea( DELIMAREAP pArea, char * szFileName )
 {
-   char * szEol;
+   const char * szEol;
 
    /* Allocate only after succesfully open file */
    pArea->szFileName = hb_strdup( szFileName );

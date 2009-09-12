@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.17 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: hbapierr.h,v 1.18 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 #include "hbapi.h"
 #include "error.ch"
+#include "thread.h"
 
 HB_EXTERN_BEGIN
 

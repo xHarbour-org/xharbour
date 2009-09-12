@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.59 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: hbstack.h,v 1.60 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -61,10 +61,15 @@
 #include "hbvmpub.h"
 #include "hbapi.h"
 
+#define _HB_SET_INTERNAL_
+#include "hbset.h"
+
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
 HB_EXTERN_BEGIN
+
+#if defined( _HB_API_INTERNAL_ )
 
 typedef struct _HB_STACKRDD
 {
@@ -83,6 +88,7 @@ typedef struct _HB_STACKRDD
 #endif
 }
 HB_STACKRDD, * PHB_STACKRDD;
+
 
 struct hb_class_method;
 
@@ -105,6 +111,7 @@ typedef struct
    PHB_STACKRDD rdd;          /* RDD related data */
    HB_STACKRDD_TLS rddTls;    /* RDD related data which is always thread-local */
 
+   HB_SET_STRUCT set;
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
 
@@ -145,12 +152,22 @@ extern HB_IMPORT HB_STACK hb_stackMT;
 #endif
 #endif
 
+
 extern BOOL hb_stack_ready;
 
 typedef struct
 {
    LONG lStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
+
+#else
+
+#ifndef HB_THREAD_SUPPORT
+typedef void * PHB_STACK;
+#endif
+typedef void * PHB_STACKRDD;
+
+#endif /* _HB_API_INTERNAL_ */
 
 extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
 extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
@@ -198,7 +215,13 @@ extern void        hb_stackSetStaticsBase( LONG lBase );
 extern LONG        hb_stackGetStaticsBase( void );
 
    void hb_stack_init( PHB_STACK pStack );
+
+#endif /* _HB_API_INTERNAL_ */
+
+#if defined( _HB_API_INTERNAL_ ) || defined( _HB_SET_INTERNAL_ )
+   extern PHB_SET_STRUCT hb_stackSetStruct( void );
 #endif
+
 
 #if defined( HB_STACK_MACROS )
 
@@ -273,10 +296,15 @@ extern LONG        hb_stackGetStaticsBase( void );
 */
 #define hb_stackLocalVariable( p )  ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) )
 
+#define hb_stackSetStruct( )        ( &HB_VM_STACK.set )
+
 #endif
 
+#ifdef _HB_API_INTERNAL_
 HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
 HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack );
+#endif
+
 HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );
 HB_EXPORT void hb_stackClearPrivateBases( void );
 HB_EXTERN_END

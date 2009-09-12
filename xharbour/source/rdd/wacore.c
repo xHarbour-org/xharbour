@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.17 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: wacore.c,v 1.18 2009/08/19 23:28:44 likewolf Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 /* JC1: optimizing stack access under MT */
 #define HB_THREAD_OPTIMIZE_STACK
 #endif
+#define _HB_API_INTERNAL_
 
 #include "hbapi.h"
 #include "hbapirdd.h"
@@ -371,6 +372,7 @@ BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
          pRddInfo->ulCounter     = 1;
 
          p->rdd = pRddInfo;
+         p->set.HB_SET_WORKAREAS_SHARED = bSet;
 
          p = p->next;
       }
@@ -417,6 +419,7 @@ BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
          {
             hb_xfree( p->rdd );
             p->rdd = pRddInfo;
+            p->set.HB_SET_WORKAREAS_SHARED = bSet;
             p = p->next;
          }
       }

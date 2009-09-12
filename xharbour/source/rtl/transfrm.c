@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.61 2009/05/01 21:11:03 marchuet Exp $
+ * $Id: transfrm.c,v 1.62 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -68,7 +68,6 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
-#include "hbstack.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
@@ -465,7 +464,7 @@ HB_FUNC( TRANSFORM )
       {
          char szPicDate[ 11 ];
          char szDate[ 9 ];
-         char * cDtFormat =  hb_setGetDateFormat();
+         const char * cDtFormat = hb_setGetDateFormat();
 
          ULONG nFor;
 

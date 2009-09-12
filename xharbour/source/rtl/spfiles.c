@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.11 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: spfiles.c,v 1.12 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
    }
    else
    {
-      char * szDefault = hb_setGetDefault();
+      const char * szDefault = hb_setGetDefault();
       if( szDefault )
       {
          pFilepath->szPath = szDefault;
@@ -139,7 +139,7 @@ BOOL hb_spFileExists( BYTE * pFilename, BYTE * pRetPath )
    }
    else
    {
-      char * szDefault = hb_setGetDefault();
+      const char * szDefault = hb_setGetDefault();
       if( szDefault )
       {
          pFilepath->szPath = szDefault;

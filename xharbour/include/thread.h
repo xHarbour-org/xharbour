@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.129 2009/01/12 11:34:51 likewolf Exp $
+* $Id: thread.h,v 1.130 2009/01/16 01:56:00 likewolf Exp $
 */
 
 /*
@@ -445,6 +445,10 @@ extern PPVOID hb_dwCurrentStack;
 * Enanched stack for multithreading
 */
 
+#if defined( _HB_API_INTERNAL_ )
+
+#include "hbset.h" /* For stack definition */
+
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;
 struct _AREA;
@@ -470,6 +474,7 @@ typedef struct tag_HB_STACK
    HB_STACKRDD_TLS rddTls;      /* RDD related data which is always thread-local */
    HB_IOERRORS IOErrors;      /* MT safe buffer for IO errors */
 
+   HB_SET_STRUCT set;
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
    struct hb_class_sync * pSyncId;
@@ -595,7 +600,7 @@ typedef struct tag_HB_MUTEX_STRUCT
    struct tag_HB_MUTEX_STRUCT *next;
    struct tag_HB_MUTEX_STRUCT *prev;
 }
-HB_MUTEX_STRUCT;
+HB_MUTEX_STRUCT, * PHB_MUTEX_STRUCT;
 
 /*********************************************************************/
 /* Thread object structure                                           */
@@ -623,6 +628,13 @@ typedef struct tag_HB_THREAD_READY
    volatile BOOL        bActive;
    HB_COUNTER           ulCounter;
 } HB_THREAD_READY, *PHB_THREAD_READY;
+
+#else
+
+typedef void * PHB_STACK;
+typedef void * PHB_MUTEX_STRUCT;
+
+#endif /* _HB_API_INTERNAL_ */
 
 /*********************************************************************/
 /* Shared resource is a set of a resource, a mutex and a condition. */
@@ -806,29 +818,29 @@ extern BOOL hb_bIdleFence;
 /* Function and globals definitions */
 extern HB_EXPORT BOOL hb_vm_bQuitRequest;
 
-extern HB_STACK *last_stack;
-extern HB_STACK *hb_ht_stack;
-extern HB_MUTEX_STRUCT *hb_ht_mutex;
+extern PHB_STACK last_stack;
+extern PHB_STACK hb_ht_stack;
+extern PHB_MUTEX_STRUCT hb_ht_mutex;
 extern HB_THREAD_T hb_main_thread_id;
 extern BOOL hb_threadIsInspector;
 
-extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
-extern void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th );
-extern HB_STACK *hb_threadLinkStack( HB_STACK *tc );
-extern HB_STACK *hb_threadUnlinkStack( HB_STACK *pStack );
-extern void hb_threadDestroyStack( HB_STACK *pStack );
-extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
+extern PHB_STACK hb_threadCreateStack( HB_THREAD_T th_id );
+extern void hb_threadSetupStack( PHB_STACK tc, HB_THREAD_T th );
+extern PHB_STACK hb_threadLinkStack( PHB_STACK tc );
+extern PHB_STACK hb_threadUnlinkStack( PHB_STACK pStack );
+extern void hb_threadDestroyStack( PHB_STACK pStack );
+extern PHB_STACK hb_threadGetStack( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
 extern int hb_threadCountStacks( void );
-extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
+extern void hb_threadFillStack( PHB_STACK pStack, PHB_ITEM pArgs );
 extern HB_EXPORT void hb_threadWaitAll( void );
 extern HB_EXPORT void hb_threadKillAll( void );
 extern void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu );
 extern void hb_mutexForceUnlock( void *);
 extern void hb_rawMutexForceUnlock( void *);
-extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
-extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
+extern PHB_MUTEX_STRUCT hb_threadLinkMutex( PHB_MUTEX_STRUCT mx );
+extern PHB_MUTEX_STRUCT hb_threadUnlinkMutex( PHB_MUTEX_STRUCT mx );
 extern void hb_threadTerminator( void *pData );
 extern void hb_threadWaitForIdle( void );
 extern void hb_threadIdleEnd( void );
@@ -845,10 +857,10 @@ extern void hb_clsUnmutexSync( void );
 extern void hb_clsRemutexSync( void );
 
 /* External functions used by thread as helper */
-extern void hb_memvarsInit( HB_STACK * );
-extern void hb_memvarsRelease( HB_STACK * );
-extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack );
-extern HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
+extern void hb_memvarsInit( PHB_STACK );
+extern void hb_memvarsRelease( PHB_STACK );
+extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, PHB_STACK pStack );
+extern HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, PHB_STACK pStack );
 
 /* Used by dynsym thread specific system */
 void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
