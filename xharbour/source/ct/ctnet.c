@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.11 2008/04/06 11:33:17 likewolf Exp $
+ * $Id: ctnet.c,v 1.12 2009/01/24 00:33:09 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -145,7 +145,7 @@ BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
    return TRUE;
 }
 
-static BOOL hb_IsNetShared( LPSTR szLocalDevice )
+static BOOL hb_IsNetShared( const char *szLocalDevice )
 {
    TCHAR lpRemoteDevice[80];
    LPTSTR lpLocalDevice;
@@ -177,7 +177,7 @@ HB_FUNC( NETCANCEL )
 
 HB_FUNC( NETPRINTER )
 {
-   char * cPrn = hb_setGetCPtr( HB_SET_PRINTFILE );   /* query default local printer port. */
+   const char * cPrn = hb_setGetCPtr( HB_SET_PRINTFILE );   /* query default local printer port. */
 
    /* 2007/MAR/26 - E.F.
     * In xHarbour the default printer port is "PRN". Because "PRN" can't be

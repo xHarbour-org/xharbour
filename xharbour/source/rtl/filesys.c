@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.190 2009/08/17 17:32:34 likewolf Exp $
+ * $Id: filesys.c,v 1.191 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -1503,13 +1503,11 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
    HB_SYMBOL_UNUSED( bWait );
 
    hb_vmUnlock();
-   HB_TEST_CANCEL_ENABLE_ASYN
    #ifdef __BORLANDC__
       iPid = cwait( &iRetStatus, (int) fhProc, 0 );
    #else
       iPid = _cwait( &iRetStatus, (int) fhProc, 0 );
    #endif
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    if ( iPid != (int) fhProc )
@@ -1532,9 +1530,7 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
    }
 
    hb_vmUnlock();
-   HB_TEST_CANCEL_ENABLE_ASYN
    dwResult = WaitForSingleObject( DosToWinHandle(fhProc), dwTime );
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    if ( dwResult == WAIT_OBJECT_0 )
@@ -1631,8 +1627,6 @@ HB_FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    // Unlocking stack to allow cancelation points
    hb_vmUnlock();
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined(HB_WIN32_IO)
    {
@@ -1708,7 +1702,6 @@ HB_FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
 #endif
 
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    if( fFree )
@@ -1728,8 +1721,6 @@ HB_FHANDLE hb_fsCreate( BYTE * pFilename, ULONG ulAttr )
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
    hb_vmUnlock();
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined(HB_WIN32_IO)
    {
@@ -1799,7 +1790,6 @@ HB_FHANDLE hb_fsCreate( BYTE * pFilename, ULONG ulAttr )
 
 #endif
 
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    if( fFree )
@@ -1825,8 +1815,6 @@ HB_FHANDLE hb_fsCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags )
    pFilename = hb_fsNameConv( pFilename, &fFree );
 
    hb_vmUnlock();
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined( HB_WIN32_IO )
    {
@@ -1893,7 +1881,6 @@ HB_FHANDLE hb_fsCreateEx( BYTE * pFilename, ULONG ulAttr, USHORT uiFlags )
 
 #endif
 
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    if( fFree )
@@ -1910,15 +1897,12 @@ void hb_fsClose( HB_FHANDLE hFileHandle )
 #if defined(HB_FS_FILE_IO)
 
    hb_vmUnlock();
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
    #if defined(HB_WIN32_IO)
       hb_fsSetIOError( CloseHandle( DosToWinHandle( hFileHandle ) ), 0 );
    #else
       hb_fsSetIOError( close( hFileHandle ) == 0, 0 );
    #endif
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
 #else
@@ -2466,19 +2450,15 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
          BOOL fResult;
 
          // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
          fResult = ReadFile( DosToWinHandle( hFileHandle ), pBuff, ( DWORD ) uiCount, &dwRead, NULL );
          hb_fsSetIOError( fResult, 0 );
-         HB_DISABLE_ASYN_CANC
 
          uiRead = fResult ? ( USHORT ) dwRead : 0;
       }
    #else
       // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
       uiRead = read( hFileHandle, pBuff, uiCount );
       hb_fsSetIOError( uiRead != ( USHORT ) -1, 0 );
-      HB_DISABLE_ASYN_CANC
    #endif
 
    if( uiRead == ( USHORT ) -1 )
@@ -2511,8 +2491,6 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
          DWORD dwWritten = 0;
          BOOL fResult;
 
-         // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
          if( uiCount )
          {
              fResult = WriteFile( DosToWinHandle( hFileHandle ), pBuff, uiCount, &dwWritten, NULL );
@@ -2523,14 +2501,10 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
              fResult = SetEndOfFile( DosToWinHandle( hFileHandle ) );
          }
          hb_fsSetIOError( fResult, 0 );
-         HB_DISABLE_ASYN_CANC
 
          uiWritten = fResult ? ( USHORT ) dwWritten : 0;
       }
    #else
-
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       if( uiCount )
       {
@@ -2548,8 +2522,6 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
 #endif
          uiWritten = 0;
       }
-
-      HB_DISABLE_ASYN_CANC
 
    #endif
 
@@ -2578,22 +2550,15 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 
    #if defined(HB_WIN32_IO)
    {
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-
       hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
                                  pBuff, ulCount, &ulRead, NULL ), 0 );
-      HB_DISABLE_ASYN_CANC
    }
    #elif defined(HB_FS_LARGE_OPTIMIZED)
    {
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
       ulRead = read( hFileHandle, pBuff, ulCount );
       hb_fsSetIOError( ulRead != (ULONG) -1, 0 );
       if( ulRead == ( ULONG ) -1 )
          ulRead = 0;
-      HB_DISABLE_ASYN_CANC
    }
    #else
    {
@@ -2604,7 +2569,6 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 
       ulRead = 0;
 
-      HB_TEST_CANCEL_ENABLE_ASYN
       while( ulLeftToRead )
       {
          /* Determine how much to read this time */
@@ -2639,7 +2603,6 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
          pPtr += uiRead;
       }
       hb_fsSetIOError( ulLeftToRead == 0, 0 );
-      HB_DISABLE_ASYN_CANC
    }
    #endif
 
@@ -2680,8 +2643,6 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount
    }
    #else
       hb_vmUnlock();
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       if( ulCount )
       #if defined(HB_FS_LARGE_OPTIMIZED)
@@ -2745,7 +2706,6 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount
          ulWritten = 0;
       }
 
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
 
    #endif
@@ -2935,7 +2895,6 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
 #if defined(HB_OS_WIN_32)
    {
       // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
       #if defined(HB_WIN32_IO)
          hb_fsSetIOError( FlushFileBuffers( ( HANDLE ) DosToWinHandle( hFileHandle ) ), 0 );
       #else
@@ -2945,7 +2904,6 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
             hb_fsSetIOError( _commit( hFileHandle ) == 0, 0 );
          #endif
       #endif
-      HB_DISABLE_ASYN_CANC
    }
 
 #elif defined(HB_OS_OS2)
@@ -3018,8 +2976,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
    hb_vmUnlock();
 
 #if defined(HB_WIN32_IO)
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    if ( !s_bInit )
    {
       s_bInit = TRUE ;
@@ -3068,7 +3024,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
          bResult = FALSE;
    }
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 #elif defined(HB_OS_OS2)
    {
       struct _FILELOCK fl, ful;
@@ -3106,8 +3061,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
    {
       ULONG ulOldPos;
 
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
       ulOldPos = lseek( hFileHandle, 0L, SEEK_CUR );
       lseek( hFileHandle, ulStart, SEEK_SET );
       switch( uiMode & FL_MASK )
@@ -3125,14 +3078,11 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
       lseek( hFileHandle, ulOldPos, SEEK_SET );
-      HB_DISABLE_ASYN_CANC
    }
 #elif defined(__MINGW32__)
    {
       ULONG ulOldPos;
 
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
       ulOldPos = lseek( hFileHandle, 0L, SEEK_CUR );
       lseek( hFileHandle, ulStart, SEEK_SET );
       switch( uiMode & FL_MASK )
@@ -3150,7 +3100,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
       lseek( hFileHandle, ulOldPos, SEEK_SET );
-      HB_DISABLE_ASYN_CANC
    }
 #elif defined(HB_OS_UNIX)
    {
@@ -3191,8 +3140,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
    }
 #elif defined(HAVE_POSIX_IO) && !defined(__IBMCPP__) && ( !defined(__GNUC__) || defined(__DJGPP__) )
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    switch( uiMode & FL_MASK )
    {
       case FL_LOCK:
@@ -3207,7 +3154,6 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
          bResult = FALSE;
    }
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #else
 
@@ -3246,7 +3192,6 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       }
 
       hb_vmUnlock();
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       switch( uiMode & FL_MASK )
       {
@@ -3302,7 +3247,6 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
 
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
    }
 #elif defined(HB_USE_LARGEFILE64)
@@ -3312,7 +3256,6 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       struct flock64 lock_info;
 
       hb_vmUnlock();
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       switch( uiMode & FL_MASK )
       {
@@ -3345,7 +3288,6 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
 
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
    }
 #else
@@ -3370,8 +3312,6 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, lOffset, uiFlags));
 
    hb_vmUnlock();
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined(HB_FS_FILE_IO)
 {
@@ -3448,7 +3388,6 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    ulPos = 0;
 #endif
 
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 
    return ulPos;
@@ -3470,7 +3409,6 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
             ulOffsetHigh = ( ULONG ) ( llOffset >> 32 );
 
       hb_vmUnlock();
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       if( llOffset < 0 && Flags == SEEK_SET )
       {
@@ -3494,7 +3432,6 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
       }
 
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
    }
 #elif defined(HB_USE_LARGEFILE64)
@@ -3504,7 +3441,6 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
       USHORT Flags = convert_seek_flags( uiFlags );
 
       hb_vmUnlock();
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       if( llOffset < 0 && Flags == SEEK_SET )
       {
@@ -3522,7 +3458,6 @@ HB_FOFFSET hb_fsSeekLarge( HB_FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT u
          llPos = lseek64( hFileHandle, 0L, SEEK_CUR );
       }
 
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
    }
 #else
@@ -3554,10 +3489,8 @@ BOOL hb_fsDelete( BYTE * pFilename )
 
 #if defined(HB_OS_WIN_32)
 
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = DeleteFileA( ( char * ) pFilename );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HAVE_POSIX_IO)
 
@@ -3566,11 +3499,8 @@ BOOL hb_fsDelete( BYTE * pFilename )
 
 #elif defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__)
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = ( remove( ( char * ) pFilename ) == 0 );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #else
 
@@ -3603,11 +3533,8 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
 #if defined(HB_OS_WIN_32)
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = MoveFileA( ( char * ) pOldName, ( char * ) pNewName );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HB_FS_FILE_IO)
 
@@ -3648,11 +3575,8 @@ BOOL hb_fsMkDir( BYTE * pDirname )
 
 #if defined(HB_OS_WIN_32)
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = CreateDirectoryA( ( char * ) pDirname, NULL );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
@@ -3693,11 +3617,8 @@ BOOL hb_fsChDir( BYTE * pDirname )
 
 #if defined(HB_OS_WIN_32)
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = SetCurrentDirectoryA( ( char * ) pDirname );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
@@ -3732,10 +3653,8 @@ BOOL hb_fsRmDir( BYTE * pDirname )
 
 #if defined(HB_OS_WIN_32)
 
-   HB_TEST_CANCEL_ENABLE_ASYN
    bResult = RemoveDirectoryA( ( char * ) pDirname );
    hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
@@ -3801,10 +3720,8 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 
 #if defined(HB_OS_WIN_32)
 
-   HB_TEST_CANCEL_ENABLE_ASYN
    fResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( fResult, 0 );
-   HB_DISABLE_ASYN_CANC
 
 #elif defined(HB_OS_OS2) && defined(__GNUC__)
 
@@ -3894,8 +3811,6 @@ USHORT hb_fsChDrv( BYTE nDrive )
       UINT uiSave, uiNewDrive;
 
       hb_vmUnlock();
-      /* allowing async cancelation here */
-      HB_TEST_CANCEL_ENABLE_ASYN
 
       HB_FS_GETDRIVE( uiSave );
       HB_FS_SETDRIVE( nDrive );
@@ -3913,7 +3828,6 @@ USHORT hb_fsChDrv( BYTE nDrive )
          uiResult = ( USHORT ) FS_ERROR;
          hb_fsSetError( ( USHORT ) FS_ERROR );
       }
-      HB_DISABLE_ASYN_CANC
       hb_vmLock();
    }
 #else
@@ -4267,9 +4181,6 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
    HB_FOFFSET endPos;
    HB_FOFFSET newPos;
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
-
    curPos = hb_fsSeekLarge( hFileHandle, 0L, SEEK_CUR );
    if( curPos != -1 )
    {
@@ -4283,8 +4194,6 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
       fResult = FALSE;
    }
    hb_fsSetIOError( fResult, 0 );
-
-   HB_DISABLE_ASYN_CANC
 
    fResult = !fResult || curPos == endPos;
 }
@@ -4325,10 +4234,8 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
    DWORD dwResult;
 
-   HB_TEST_CANCEL_ENABLE_ASYN
    dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( dwResult != 0, 0 );
-   HB_DISABLE_ASYN_CANC
    hb_vmLock();
 }
 

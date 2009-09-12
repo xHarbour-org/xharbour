@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6574 2009/09/09 13:44:47 modalsist Exp $
+ * $Id: ChangeLog,v 1.6575 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-12 22:48 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/ct/ctnet.c
+    ! Use const char * for some Set values.
+  * source/rtl/filesys.c
+  * source/vm/hvm.c
+    ! Moved HB_TEST_CANCEL_ENABLE_ASYN and HB_DISABLE_ASYN_CANC to hb_vmLock()
+      and hb_vmLock() respectively, to fix building under Windows.
+  * source/rtl/gtwvt/gtwvt.c
+    ! Added a hack to allow access to internal hb_stack_ready variable.
 
 2009-09-12 22:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * include/hbapi.h

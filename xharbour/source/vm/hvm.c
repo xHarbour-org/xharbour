@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.728 2009/09/01 14:39:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.729 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -411,12 +411,18 @@ void hb_vmUnlock( void )
 {
    HB_THREAD_STUB
    HB_STACK_UNLOCK
+#if defined( HB_OS_WIN_32 )
+   HB_TEST_CANCEL_ENABLE_ASYN
+#endif
 }
 
 /* lock VM blocking GC and other exclusive single task code execution */
 void hb_vmLock( void )
 {
    HB_THREAD_STUB
+#if defined( HB_OS_WIN_32 )
+   HB_DISABLE_ASYN_CANC
+#endif
    HB_STACK_LOCK
 }
 
