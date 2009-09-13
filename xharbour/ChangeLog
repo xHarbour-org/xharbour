@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6577 2009/09/13 00:48:29 likewolf Exp $
+ * $Id: ChangeLog,v 1.6578 2009/09/13 01:41:23 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-13 16:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/hbzlib/Makefile
+    ! Fixed a typo in my recent commit.
 
 2009-09-13 05:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/Makefile
@@ -130,7 +134,7 @@
 
 2009-09-01 10:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/vm/hvm.c
-     ! Corrected #if 1 to #if 0, and added explnataion comment,
+     ! Corrected #if 1 to #if 0, and added explanataion comment,
        why 1 + 'a' is not at all same as 'a' + 1.
 
    * source/vm/arrays.c
@@ -192,7 +196,6 @@
     % Some small optimization in HB_READLINE().
   (mostly borrowed from Harbour code by Przemyslaw Czerpak and Viktor Szakats).
 
-
 2009-08-30 00:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/tip/Makefile
     ! Added sendmail.prg compilation for GNU Makefiles.
@@ -202,9 +205,9 @@
 2009-08-28 11:15 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/tip/mail.prg
      source/tip/sendmail.prg
-     ! Fixed attachement when parameter was character. reported by
+     ! Fixed attachment when parameter was character. reported by
        Robert Campsmith  on comp.lang.xharbour
-     ! Enhaced the attachfile() method from  tipmail class
+     ! Enhamced the attachfile() method from tipmail class
 
 2009-08-27 20:53 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * makefile.bc

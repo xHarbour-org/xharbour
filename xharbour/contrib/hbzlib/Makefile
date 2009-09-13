@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2004/02/14 13:23:15 lculik Exp $
+# $Id: Makefile,v 1.6 2009/09/13 01:41:23 likewolf Exp $
 #
 
 ROOT = ../../
@@ -28,7 +28,7 @@ CPP_SOURCES := \
 	ZipString.cpp
 
 ifeq ($(HB_ARCHITECTURE),linux)
-CPP_SOURCES +=
+CPP_SOURCES +=\
 	../../Linux/ZipPathComponent.cpp \
 	../../Linux/ZipPlatform.cpp \
 
