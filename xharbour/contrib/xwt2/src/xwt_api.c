@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
+   $Id: xwt_api.c,v 1.2 2007/05/25 11:10:05 toninhofwi Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -23,10 +23,9 @@ static PXWT_DRIVER s_driver = NULL;
 int xwt_rise_event( PHB_ITEM pObject, char *szEventType, int argc, ... )
 {
    PHB_DYNS pExecSym;
-   HB_ITEM hbEventParams, hbItem;
-   HB_ITEM hbEvent;
+   PHB_ITEM hbEventParams, hbItem;
+   PHB_ITEM hbEvent;
 
-   PHB_BASEARRAY pBaseArray;
    int i;
    va_list ap;
 
@@ -41,14 +40,12 @@ int xwt_rise_event( PHB_ITEM pObject, char *szEventType, int argc, ... )
    }
    */
    /* Create the array for event parameters */
-   hbEventParams.type = HB_IT_NIL;
-   hb_arrayNew( &hbEventParams, argc );
+   hbEventParams = hb_itemArrayNew( argc );
    va_start(ap, argc);
 
-   pBaseArray = ( PHB_BASEARRAY ) hbEventParams.item.asArray.value;
-   for ( i = 0 ; i < argc; i ++)
+   for ( i = 1 ; i <= argc; i ++)
    {
-      hb_itemForwardValue( pBaseArray->pItems + i, va_arg(ap, PHB_ITEM) );
+      hb_arraySetForward( hbEventParams, i, va_arg( ap, PHB_ITEM ) );
    }
    va_end( ap );
 
@@ -59,21 +56,18 @@ int xwt_rise_event( PHB_ITEM pObject, char *szEventType, int argc, ... )
    hb_vmDo( 0 );
 
    /* The event is in the return */
-   hbEvent.type = HB_IT_NIL;
-   hb_itemCopy( &hbEvent, &(HB_VM_STACK.Return) );
+   hbEvent = hb_itemNew( hb_stackReturnItem() );
    /* Call the constructor */
-   hbItem.type = HB_IT_NIL;
-   hb_itemPutCStatic( &hbItem, szEventType );
-   hb_objSendMsg( &hbEvent, "NEW", 3, &hbItem, pObject, &hbEventParams );
+   hbItem = hb_itemPutCStatic( NULL, szEventType );
+   hb_objSendMsg( hbEvent, "NEW", 3, hbItem, pObject, hbEventParams );
 
    /* Rise the event in pObject */
-   hb_objSendMsg( pObject, "RISEEVENT", 1, &hbEvent );
-   hb_itemClear( &hbEvent );
-   hb_itemClear( &hbItem );
-   hb_itemClear( &hbEventParams );
+   hb_objSendMsg( pObject, "RISEEVENT", 1, hbEvent );
+   hb_itemRelease( hbEvent );
+   hb_itemRelease( hbItem );
+   hb_itemRelease( hbEventParams );
 
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
-         HB_VM_STACK.Return.item.asLogical.value == TRUE )
+   if( hb_itemGetL( hb_stackReturnItem() ) )
    {
       return TRUE;
    }
@@ -86,10 +80,9 @@ HB_FUNC( XWT_FASTRISEEVENT )
 {
    PHB_DYNS pExecSym;
    PHB_ITEM pEventId, pSender;
-   HB_ITEM hbEvent;
-   HB_ITEM hbEventParams;
+   PHB_ITEM hbEvent;
+   PHB_ITEM hbEventParams;
    int nParamCount, i;
-   PHB_BASEARRAY pBaseArray;
 
    /* Get the parameters the array for event parameters */
    pEventId = hb_param( 1, HB_IT_STRING );
@@ -107,21 +100,19 @@ HB_FUNC( XWT_FASTRISEEVENT )
       return;
    }*/
 
-   nParamCount = hb_pcount() -2 ;
+   nParamCount = hb_pcount() - 2;
    if ( nParamCount < 0 )
    {
       nParamCount = 0;
    }
    /* Create the array for event parameters */
-   hbEventParams.type = HB_IT_NIL;
-   hb_arrayNew( &hbEventParams, nParamCount );
+   hbEventParams = hb_itemArrayNew( nParamCount );
 
    if ( nParamCount > 0 )
    {
-      pBaseArray = ( PHB_BASEARRAY ) hbEventParams.item.asArray.value;
-      for ( i = 0 ; i < nParamCount; i ++)
+      for ( i = 1; i <= nParamCount; i ++)
       {
-         hb_itemForwardValue( pBaseArray->pItems + i, hb_param( i+3, HB_IT_ANY) );
+         hb_arraySetForward( hbEventParams, i, hb_param( i + 2, HB_IT_ANY ) );
       }
    }
 
@@ -132,24 +123,19 @@ HB_FUNC( XWT_FASTRISEEVENT )
    hb_vmDo( 0 );
 
    /* The event is in the return */
-   hbEvent.type = HB_IT_NIL;
-   hb_itemCopy( &hbEvent, &(HB_VM_STACK.Return) );
+   hbEvent = hb_itemNew( hb_stackReturnItem() );
 
-   hb_objSendMsg( &hbEvent, "NEW", 3, pEventId, pSender, &hbEventParams );
+   hb_objSendMsg( hbEvent, "NEW", 3, pEventId, pSender, hbEventParams );
 
    /* Rise the event in pObject */
    //TODO: Implement here the riseevent loop
-   hb_objSendMsg( pSender, "RISEEVENT", 1, &hbEvent );
-   hb_itemClear( &hbEvent );
-   hb_itemClear( &hbEventParams );
+   hb_objSendMsg( pSender, "RISEEVENT", 1, hbEvent );
+   hb_itemRelease( hbEvent );
+   hb_itemRelease( hbEventParams );
 
-
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
-         HB_VM_STACK.Return.item.asLogical.value == TRUE )
-   {
-      hb_retl( TRUE );
-   }
-   hb_retl( FALSE );
+   /* This line could be skipped as well, but then someone could see it as an
+    * error -- Ph. */
+   hb_retl( hb_itemGetL( hb_stackReturnItem() ) );
 }
 
 
@@ -324,7 +310,7 @@ HB_FUNC( XWT_MSGBOX )
    if ( pParent != NULL )
    {
       hb_objSendMsg( pParent, "ORAWWIDGET", 0 );
-      wParent = (PXWT_WIDGET) hb_itemGetPtr( &(HB_VM_STACK.Return) );
+      wParent = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
    }
    else
    {

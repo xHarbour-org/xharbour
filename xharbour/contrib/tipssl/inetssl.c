@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.c,v 1.1 2009/08/09 17:28:07 lculik Exp $
+* $Id: inetssl.c,v 1.2 2009/08/10 19:24:57 lculik Exp $
 */
 
 /*
@@ -1185,7 +1185,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
             hb_execFromArray( Socket->caPeriodic );
 
             /* do we continue? */
-            if( ! hb_itemGetL( &HB_VM_STACK.Return ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
+            if( ! hb_itemGetL( hb_stackReturnItem() ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
             {
                HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
                hb_retni( iReceived );
@@ -1310,7 +1310,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
          {
             hb_execFromArray( Socket->caPeriodic );
           //   do we continue? 
-            if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
+            if ( hb_itemGetL( hb_stackReturnItem() ) &&
                (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
             {
                continue;
@@ -1516,7 +1516,7 @@ HB_FUNC( INETSSLRECVENDBLOCK )
          {
             hb_execFromArray( Socket->caPeriodic );
 
-            if( hb_itemGetL( &HB_VM_STACK.Return ) &&
+            if( hb_itemGetL( hb_stackReturnItem() ) &&
                 ( Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ) )
             {
                continue;

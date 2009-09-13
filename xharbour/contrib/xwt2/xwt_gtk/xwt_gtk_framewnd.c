@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.3 2004/06/14 18:03:38 lculik Exp $
 
    GTK interface - Frame window
 */
@@ -192,7 +192,6 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 {
    PXWT_GTK_FRAMEWND frame;
    GtkWidget *menu;
-   PHB_BASEARRAY pBaseArray;
    ULONG ulPos;
 
    // eventually reset the menu bar
@@ -204,17 +203,13 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
       return;
    }
    
-   pBaseArray = pMenuArray->item.asArray.value;
-    
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
    // todo: cancelation of the old bar
 
-   for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+   for ( ulPos = 1; ulPos <= hb_itemSize( pMenuArray ); ulPos++ )
    {
-      PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
-
-      hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
+      hb_objSendMsg( hb_arrayGetItemPtr( pMenuArray, ulPos ), "ORAWWIDGET",0 );
+      xwtData = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
       menu = ((PXWT_GTK_BASE)xwtData->widget_data)->top_widget( xwtData );
       gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar), menu );
    }
@@ -224,26 +219,22 @@ void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData )
 {
    PXWT_GTK_FRAMEWND frame;
    GtkWidget *menu;
-   PHB_BASEARRAY pBaseArray;
    ULONG ulPos;
    PHB_ITEM pMenuArray;
 
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
    
    hb_objSendMsg( xwtData->pOwner, "AMENUS", 0 );
-   pMenuArray = &(HB_VM_STACK.Return);
+   pMenuArray = hb_stackReturnItem();
    if ( ! HB_IS_ARRAY( pMenuArray ) )
    {
       return;
    }
    
-   pBaseArray = pMenuArray->item.asArray.value;
-   
-   for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+   for ( ulPos = 1; ulPos <= hb_itemSize( pMenuArray ); ulPos++ )
    {
-      PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
-      hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
+      hb_objSendMsg( hb_arrayGetItemPtr( pMenuArray, ulPos ), "ORAWWIDGET",0 );
+      xwtData = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
       menu = ((PXWT_GTK_BASE)xwtData->widget_data)->top_widget( xwtData );
       g_object_ref( G_OBJECT( menu ) );
       gtk_container_remove (GTK_CONTAINER (frame->menu_bar), menu );        

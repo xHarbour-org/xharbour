@@ -3,12 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_base.c,v 1.5 2004/06/14 18:03:38 lculik Exp $
+   $Id: xwt_gtk_base.c,v 1.6 2004/06/16 13:48:04 lculik Exp $
 
    GTK Base widget for XWT system.
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include "hbtrace.h"
 #include <xwt.ch>

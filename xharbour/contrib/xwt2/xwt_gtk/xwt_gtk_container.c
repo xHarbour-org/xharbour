@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_container.c,v 1.3 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_container.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    Abstract container management.
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt.ch>
 #include <xwt_api.h>

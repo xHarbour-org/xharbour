@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_align.c,v 1.2 2004/05/20 15:41:38 jonnymind Exp $
+   $Id: xwt_gtk_align.c,v 1.3 2004/05/21 12:21:34 jonnymind Exp $
 
   Align widget - block over unaligned widgets to provide them with alignment ability.
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt.ch>
 #include <xwt_api.h>

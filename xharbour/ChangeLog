@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6582 2009/09/13 18:26:44 lculik Exp $
+ * $Id: ChangeLog,v 1.6583 2009/09/13 20:03:57 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-14 01:11 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/tipssl/inetssl.c
+  * contrib/xwt/src/xwt_api.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_framewnd.c
+  * contrib/xwt2/src/xwt_api.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_framewnd.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_textarea.c
+    ! Removed some more direct HB_VM_STACK and HB_ITEM access.
+  * contrib/xwt2/xwt_gtk/xwt_gtk_align.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_base.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_container.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_label.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_layout.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_sensible.c
+  * contrib/xwt2/xwt_gtk/xwt_gtk_window.c
+    ! Added missing #include "hbapiitm.h".
 
 2009-09-14 00:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/xwt/src/xwt_win/xwt_win_framewnd.c

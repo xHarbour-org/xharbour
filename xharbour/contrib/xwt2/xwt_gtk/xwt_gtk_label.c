@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_label.c,v 1.2 2004/05/24 22:53:00 lculik Exp $
 
    Label - Basic text label to draw on the screen
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt.ch>
 #include <xwt_api.h>

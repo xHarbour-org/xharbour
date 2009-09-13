@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.6 2005/10/24 04:01:52 druzus Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.7 2009/09/13 12:45:39 likewolf Exp $
 
    GTK interface - Frame window
 */
@@ -100,18 +100,15 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 {
    PXWT_GTK_FRAMEWND frame;
-   PHB_BASEARRAY pBaseArray = pMenuArray->item.asArray.value;
    ULONG ulPos;
 
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
    // todo: cancelation of the old bar
 
-   for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+   for ( ulPos = 1; ulPos <= hb_itemSize( pMenuArray ); ulPos++ )
    {
-      PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
-
-      hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) hb_stackReturnItem()->item.asPointer.value;
+      hb_objSendMsg( hb_arrayGetItemPtr( pMenuArray, ulPos ), "ORAWWIDGET", 0 );
+      xwtData = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
       gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar),
          GTK_WIDGET( xwtData->get_top_widget( xwtData->widget_data ) ) );
    }
@@ -120,17 +117,15 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 {
    PXWT_GTK_FRAMEWND frame;
-   PHB_BASEARRAY pBaseArray = pMenuArray->item.asArray.value;
    ULONG ulPos;
 
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
    // todo: cancelation of the old bar
 
-   for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+   for ( ulPos = 1; ulPos <= hb_itemSize( pMenuArray ); ulPos++ )
    {
-      PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
-      hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) hb_stackReturnItem()->item.asPointer.value;
+      hb_objSendMsg( hb_arrayGetItemPtr( pMenuArray, ulPos ), "ORAWWIDGET", 0 );
+      xwtData = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
       gtk_container_remove (GTK_CONTAINER (frame->menu_bar), 
          GTK_WIDGET( xwtData->get_top_widget( xwtData->widget_data ) ) );        
    }

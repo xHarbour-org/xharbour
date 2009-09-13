@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textarea.c,v 1.2 2004/05/21 12:21:34 jonnymind Exp $
+   $Id: xwt_gtk_textarea.c,v 1.3 2004/06/14 18:03:38 lculik Exp $
 
    Text Area - Advanced editor
 */
@@ -84,9 +84,9 @@ static BOOL xwt_gtk_textarea_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
 
       // retreive the required slice
       hb_objSendMsg( widget->pOwner, "NSLICESTART", 0 );
-      nStart = hb_itemGetNI( &HB_VM_STACK.Return );
+      nStart = hb_itemGetNI( hb_stackReturnItem() );
       hb_objSendMsg( widget->pOwner, "NSLICEEND", 0 );
-      nEnd = hb_itemGetNI( &HB_VM_STACK.Return );
+      nEnd = hb_itemGetNI( hb_stackReturnItem() );
       gtk_text_buffer_get_end_iter( wSelf->textbuf, &endIter );
       nMax = gtk_text_iter_get_offset( &endIter );
       if ( nStart > nEnd || nStart < 0 || nEnd > nMax )
@@ -248,9 +248,9 @@ static BOOL xwt_gtk_textarea_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
 
       // retreive the required slice
       hb_objSendMsg( widget->pOwner, "NSLICESTART", 0 );
-      nStart = hb_itemGetNI( &HB_VM_STACK.Return );
+      nStart = hb_itemGetNI( hb_stackReturnItem() );
       hb_objSendMsg( widget->pOwner, "NSLICEEND", 0 );
-      nEnd = hb_itemGetNI( &HB_VM_STACK.Return );
+      nEnd = hb_itemGetNI( hb_stackReturnItem() );
       gtk_text_buffer_get_end_iter( wSelf->textbuf, &endIter );
       nMax = gtk_text_iter_get_offset( &endIter );
 

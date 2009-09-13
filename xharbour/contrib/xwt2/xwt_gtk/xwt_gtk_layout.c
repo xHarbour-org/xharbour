@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.2 2004/05/21 12:21:34 jonnymind Exp $
+   $Id: xwt_gtk_layout.c,v 1.3 2004/06/16 13:48:04 lculik Exp $
 
    Layout - Horizontal or vertical layout manager
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt.ch>
 #include <xwt_api.h>

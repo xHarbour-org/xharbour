@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_window.c,v 1.2 2004/06/14 18:03:38 lculik Exp $
+   $Id: xwt_gtk_window.c,v 1.3 2004/06/16 13:48:04 lculik Exp $
 
    GTK interface - Window widget specifics
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>

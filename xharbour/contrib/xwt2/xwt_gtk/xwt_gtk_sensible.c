@@ -3,12 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_sensible.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
   Sensible widget - block over normally unsensible widgets (labels and images)
   to give them eventual responsivity to events.
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hashapi.h"
 #include <xwt.ch>
 #include <xwt_api.h>

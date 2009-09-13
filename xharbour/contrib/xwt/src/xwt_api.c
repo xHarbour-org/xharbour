@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.22 2007/05/25 11:10:05 toninhofwi Exp $
+   $Id: xwt_api.c,v 1.23 2009/09/13 12:45:39 likewolf Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -23,8 +23,6 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    PHB_ITEM pEventParams, pItem;
    PHB_ITEM pEvent;
 
-
-   PHB_BASEARRAY pBaseArray;
    int i;
    va_list ap;
 
@@ -32,7 +30,7 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    /*
    Disactivated because ::RiseEvent backpropagates the event to the owner
    hb_objSendMsg( pObject, "AEVENTLISTENERS", 0 );
-   pBaseArray = ( PHB_BASEARRAY ) HB_VM_STACK.Return.item.asArray.value;
+   pBaseArray = hb_arrayId( hb_stackReturnItem() );
    if( pBaseArray->ulLen == 0 )
    {
       return FALSE;
@@ -43,10 +41,9 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    hb_arrayNew( pEventParams, argc );
    va_start(ap, argc);
 
-   pBaseArray = ( PHB_BASEARRAY ) pEventParams->item.asArray.value;
-   for ( i = 0 ; i < argc; i ++)
+   for ( i = 1 ; i <= argc; i ++)
    {
-      hb_itemForwardValue( pBaseArray->pItems + i, va_arg(ap, PHB_ITEM) );
+      hb_itemForwardValue( hb_arrayGetItemPtr( pEventParams, i ), va_arg(ap, PHB_ITEM) );
    }
    va_end( ap );
 
@@ -87,7 +84,6 @@ HB_FUNC( XWT_FASTRISEEVENT )
    PHB_ITEM pEvent;
    PHB_ITEM pEventId, pSender, pEventParams;
    int nParamCount, i;
-   PHB_BASEARRAY pBaseArray;
 
    /* Get the parameters the array for event parameters */
    pEventId = hb_param( 1, HB_IT_NUMERIC );
@@ -98,7 +94,7 @@ HB_FUNC( XWT_FASTRISEEVENT )
    /*
    Disactivated because ::RiseEvent backpropagates the event to the owner
    hb_objSendMsg( pSender, "AEVENTLISTENERS", 0 );
-   pBaseArray = ( PHB_BASEARRAY ) HB_VM_STACK.Return.item.asArray.value;
+   pBaseArray = ( PHB_BASEARRAY ) hb_arrayId( hb_stackReturnItem() );
    if( pBaseArray->ulLen == 0 )
    {
       hb_retl( FALSE );
@@ -116,10 +112,9 @@ HB_FUNC( XWT_FASTRISEEVENT )
 
    if ( nParamCount > 0 )
    {
-      pBaseArray = ( PHB_BASEARRAY ) pEventParams->item.asArray.value;
       for ( i = 0 ; i < nParamCount; i ++)
       {
-         hb_itemForwardValue( pBaseArray->pItems + i, hb_param( i+3, HB_IT_ANY) );
+         hb_itemForwardValue( hb_arrayGetItemPtr( pEventParams, i ), hb_param( i + 2, HB_IT_ANY ) );
       }
    }
 
