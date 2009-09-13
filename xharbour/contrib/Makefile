@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2005/10/05 21:39:34 lf_sfnet Exp $
+# $Id: Makefile,v 1.7 2009/09/13 01:41:23 likewolf Exp $
 #
 
 ROOT = ../
@@ -30,7 +30,9 @@ DIRS=\
 else
 
 DIRS=\
+	hbzlib \
 	libnf \
+	xwt \
 
 endif
 endif

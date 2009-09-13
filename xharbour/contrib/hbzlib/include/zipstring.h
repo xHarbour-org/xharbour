@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $RCSfile: zipstring.h,v $
-// $Revision: 1.5 $ $Name:  $
-// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
+// $Revision: 1.6 $ $Name:  $
+// $Date: 2008/11/19 15:04:31 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <cctype>
 
 #include "ZipExport.h"
