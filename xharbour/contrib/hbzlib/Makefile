@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/09/23 04:52:34 paultucker Exp $
+# $Id: Makefile,v 1.5 2004/02/14 13:23:15 lculik Exp $
 #
 
 ROOT = ../../
@@ -11,7 +11,7 @@ C_SOURCES = \
 	zip.c \
 
 
-CPP_SOURCES = \
+CPP_SOURCES := \
 	stdafx.cpp \
 	ziparchive.cpp \
 	zipautobuffer.cpp \
@@ -23,12 +23,16 @@ CPP_SOURCES = \
 	zipfileheader.cpp \
 	zipmemfile.cpp \
 	zipnew.cpp \
-	../../Linux/ZipPathComponent.cpp \
-	../../Linux/ZipPlatform.cpp \
 	zipplatformcomm.cpp \
 	zipstorage.cpp \
 	ZipString.cpp
 
+ifeq ($(HB_ARCHITECTURE),linux)
+CPP_SOURCES +=
+	../../Linux/ZipPathComponent.cpp \
+	../../Linux/ZipPlatform.cpp \
+
+endif
 
 
 PRG_SOURCES= \
@@ -43,7 +47,7 @@ INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
 
 
-CFLAGS := $(CFLAGS) -I../../Linux -I../.. -I/usr/include
+CFLAGS := $(CFLAGS) -I../../Linux -I../..
 
 
 

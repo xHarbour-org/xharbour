@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2005/06/21 20:19:49 druzus Exp $
+# $Id: Makefile,v 1.6 2005/10/05 21:39:34 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -7,6 +7,8 @@ ROOT = ../
 ifeq ($(HB_ARCHITECTURE),w32)
 
 DIRS=\
+	gtwvg \
+	gtwvw \
 	hbzlib \
 	libnf \
 	rdd_ads \

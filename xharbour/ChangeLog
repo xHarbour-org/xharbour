@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6576 2009/09/12 18:47:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.6577 2009/09/13 00:48:29 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-13 05:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/Makefile
+    + Added gtwvg and gtwvw to contrib GNU Makefile.
+  * contrib/gtwvg/gtwvg.c
+    ! Fixed a memory leak.
+  * contrib/gtwvw/Makefile
+    + Added missing .c files to gtwvw GNU Makefile.
+  * contrib/hbzlib/Makefile
+    ! Removed Linux/ZipPathComponent.cpp and Linux/ZipPlatform.cpp from
+      Windows builds. Removed -I/usr/include from CFLAGS, which broke
+      cross-compiling from Unices. hbzlib does not build under Linux anyway.
+  * contrib/hbzlib/include/zipfilemapping.h
+    ! Fixed #included filename case.
+  * contrib/libnf/floptst.prg
+    ! Removed an unused variable.
+  * contrib/rdd_ads/ads1.c
+    ! Removed an unused and no longer existant HB_ADS_SET_INIT() macro.
 
 2009-09-13 04:48 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   + contrib/gtwvg/Makefile

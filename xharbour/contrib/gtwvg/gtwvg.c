@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.10 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: gtwvg.c,v 1.11 2009/09/13 00:48:30 likewolf Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ static void hb_gt_wvt_FreeAll( void )
 
       for ( iPos = 1; iPos < WVT_MAX_WINDOWS; iPos++ )
       {
-         if( !s_wvtWindows[ iPos ] == NULL )
+         if( s_wvtWindows[ iPos ] != NULL )
          {
             hb_gt_wvt_Free( s_wvtWindows[ iPos ] );
             HB_GTSUPER_EXIT( s_wvtWindows[ iPos ]->pGT );

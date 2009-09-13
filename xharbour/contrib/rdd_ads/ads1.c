@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.147 2009/07/17 02:49:14 brianhays Exp $
+ * $Id: ads1.c,v 1.148 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -4976,8 +4976,6 @@ HB_FUNC( ADS ) { ; }
 static void hb_adsRddInit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
-
-   HB_ADS_SET_INIT();
 
    if( hb_rddRegister( "ADS", RDT_FULL ) > 1 ||
        hb_rddRegister( "ADT", RDT_FULL ) > 1 ||
