@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2009/09/13 01:41:23 likewolf Exp $
+# $Id: Makefile,v 1.7 2009/09/13 12:36:08 likewolf Exp $
 #
 
 ROOT = ../../
@@ -31,6 +31,13 @@ ifeq ($(HB_ARCHITECTURE),linux)
 CPP_SOURCES +=\
 	../../Linux/ZipPathComponent.cpp \
 	../../Linux/ZipPlatform.cpp \
+
+endif
+
+ifeq ($(HB_ARCHITECTURE),w32)
+CPP_SOURCES +=\
+   zippathcomponent.cpp \
+   zipplatform.cpp \
 
 endif
 
