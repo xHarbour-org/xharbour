@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.9 2009/02/20 12:47:56 marchuet Exp $
+ * $Id: gtwvg.c,v 1.10 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
    #define HB_OS_WIN_32_USED
 #endif
 
+#define _HB_API_INTERNAL_ /* for hb_stack_ready, should be eliminated later */
 #include "hbstack.h"
 #include "gtwvg.h"
 
