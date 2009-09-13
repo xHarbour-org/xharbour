@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: combobox.prg,v 1.1 2004/01/26 13:52:21 lculik Exp $
+   $Id: combobox.prg,v 1.2 2004/01/26 20:30:11 lculik Exp $
 
    Widget class - basic widget & event management
 */
@@ -19,7 +19,8 @@ ENDCLASS
 
 METHOD New( cText, nX, nY, oParent ,aItems ) CLASS XWTComboBox
 
-Local bRes,bVis := .T.
+   LOCAL bVis := .T.
+
    ::Super:New()
    ::nWidgetType := XWT_TYPE_COMBOBOX
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_COMBOBOX )

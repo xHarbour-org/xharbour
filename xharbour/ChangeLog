@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6578 2009/09/13 01:41:23 likewolf Exp $
+ * $Id: ChangeLog,v 1.6579 2009/09/13 12:36:08 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-13 16:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/xwt/Makefile
+  * contrib/xwt/src/Makefile
+  * contrib/xwt/src/combobox.prg
+  * contrib/xwt/src/listbox.prg
+  * contrib/xwt/src/xwt_api.c
+  * contrib/xwt/src/xwt_gtk/Makefile
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.h
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_calendar.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_colorselect.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_container.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_fileselect.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_fontselect.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_framewnd.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_grid.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_image.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_label.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_layout.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_menuitem.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_pane.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_progressbar.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_splitter.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_viewport.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_window.c
+  * contrib/xwt/test/Makefile
+    ! Fixed contrib/xwt build under Linux.
 
 2009-09-13 16:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/hbzlib/Makefile

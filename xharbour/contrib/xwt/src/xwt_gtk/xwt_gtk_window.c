@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_window.c,v 1.3 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_window.c,v 1.4 2003/08/27 20:09:24 xthefull Exp $
 
    GTK interface - Window widget specifics
 */
@@ -28,11 +28,7 @@ static gboolean wnd_evt_destroy( GtkWidget *widget,  GdkEvent  *event, gpointer 
 static void *wnd_get_mainwidget( void *data )
 {
    PXWT_GTK_WND wnd = (PXWT_GTK_WND) data;
-   #if __GNUC__ <3
    return wnd->a.main_widget;
-   #else
-   return wnd->main_widget;
-   #endif
 }
 
 static void *wnd_get_topwidget( void *data )
@@ -46,20 +42,9 @@ BOOL xwt_gtk_createWindow( PXWT_WIDGET xwtData )
    XWT_GTK_WND *wnd = (XWT_GTK_WND *) hb_xgrab( sizeof( XWT_GTK_WND ) );
 
    wnd->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-   #if __GNUC__ <3
-   {
    wnd->a.main_widget = gtk_fixed_new();
    gtk_container_add (GTK_CONTAINER (wnd->window), wnd->a.main_widget);
    gtk_widget_show (wnd->a.main_widget);
-   }
-   #else
-   {
-   wnd->main_widget = gtk_fixed_new();
-   gtk_container_add (GTK_CONTAINER (wnd->window), wnd->main_widget);
-   gtk_widget_show (wnd->main_widget);
-   }
-
-   #endif
 
    /* The window destroy event is the only one that can be risen independently by the user,
    so it must be checked and passed to the internal destroy system.

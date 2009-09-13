@@ -1,22 +1,12 @@
 ##################################
-# $Id: Makefile,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+# $Id: Makefile,v 1.2 2004/08/21 17:27:13 lf_sfnet Exp $
 #
 # Toplevel XWT makefile
 
-all:
-	make -C src
-	make -C src/xwt_gtk
-	make -C test
+ROOT=../../
 
-clean:
-	make -C src clean
-	make -C src/xwt_gtk clean
-	make -C test clean
-	rm -f lib/*.a
+DIRS=\
+    src \
+    test \
 
-
-install:
-	make -C src install
-	make -C src/xwt_gtk install
-	make -C test clean
-
+include $(ROOT)config/dir.cf

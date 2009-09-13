@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_image.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_image.c,v 1.6 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - Clickable image widget
 */
@@ -61,31 +61,16 @@ static void image_destroy( void *data )
 BOOL xwt_gtk_createImage( PXWT_WIDGET xwtData )
 {
    PXWT_GTK_IMAGE imgdata = (PXWT_GTK_IMAGE) hb_xgrab( sizeof( XWT_GTK_IMAGE ) );
-   #if __GNUC__ <3
    imgdata->a.a.a.main_widget = gtk_image_new();
-   #else
-   imgdata->main_widget = gtk_image_new();
-   #endif
-   #if __GNUC__ <3
    imgdata->a.a.align = imgdata->a.evt_window = NULL;
    imgdata->a.a.iVAlign = XWT_ALIGN_CENTER;
    imgdata->a.a.iHAlign = XWT_ALIGN_CENTER;
-   #else
-   imgdata->align = imgdata->evt_window = NULL;
-   imgdata->iVAlign = XWT_ALIGN_CENTER;
-   imgdata->iHAlign = XWT_ALIGN_CENTER;
-
-   #endif
    xwt_gtk_set_alignment( (PXWT_GTK_ALIGN) imgdata );
 
    imgdata->pixmap = NULL;
    imgdata->filename = NULL;
 
-   #if __GNUC__ <3
    gtk_widget_show( GTK_WIDGET( imgdata->a.a.a.main_widget ) );
-   #else
-   gtk_widget_show( GTK_WIDGET( imgdata->main_widget ) );
-   #endif
 
    xwtData->widget_data = imgdata;
    xwtData->destructor = image_destroy;
@@ -104,18 +89,10 @@ BOOL xwt_gtk_imageLoad( PXWT_WIDGET wSelf, const char *filename )
       hb_xfree( imgdata->filename );
       imgdata->filename = NULL;
    }
-   #if __GNUC__ <3
    gtk_image_set_from_file( GTK_IMAGE( imgdata->a.a.a.main_widget ) , filename );
-   #else
-   gtk_image_set_from_file( GTK_IMAGE( imgdata->main_widget ) , filename );
-   #endif
 
    /* An invalid load will default to the stock icon "broken image" */
-   #if __GNUC__ <3
    if ( gtk_image_get_storage_type( GTK_IMAGE( imgdata->a.a.a.main_widget) ) != GTK_IMAGE_STOCK )
-   #else
-   if ( gtk_image_get_storage_type( GTK_IMAGE( imgdata->main_widget) ) != GTK_IMAGE_STOCK )
-   #endif
    {
       imgdata->filename = (char *) hb_xgrab( strlen( filename ) + 1 );
       strcpy( imgdata->filename, filename );
@@ -128,11 +105,7 @@ BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf )
 {
    PXWT_GTK_IMAGE imgSelf = ( PXWT_GTK_IMAGE ) wSelf->widget_data;
    GtkWidget *evt;
-   #if __GNUC__ <3
    if ( imgSelf->a.evt_window != NULL )
-   #else
-   if ( imgSelf->evt_window != NULL )
-   #endif
    {
       return FALSE;
    }
@@ -143,10 +116,6 @@ BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf )
    g_signal_connect (G_OBJECT (evt),"button_press_event",
                       G_CALLBACK (button_press_callback), wSelf->owner);
    gtk_widget_show( evt );
-   #if __GNUC__ <3
    imgSelf->a.evt_window = evt;
-   #else
-   imgSelf->evt_window = evt;
-   #endif
    return TRUE;
 }

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_progressbar.c,v 1.1 2004/02/08 13:00:08 lculik Exp $
+   $Id: xwt_gtk_progressbar.c,v 1.2 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - File Selection Box 
 */
@@ -21,16 +21,9 @@
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
 //   XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-//  #if __GNUC__ <3
 //   fname = gtk_file_selection_get_filename (
 //      GTK_FILE_SELECTION ( xwtFilew->a.main_widget )
 //   );
-//   #else
-//   fname = gtk_file_selection_get_filename (
-//      GTK_FILE_SELECTION ( xwtFilew->main_widget )
-//   );
-
-//   #endif
 
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
@@ -67,11 +60,7 @@ BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData )
 
    progress = gtk_progress_bar_new ();
    // this widget is NOT displayed by default
-   #if __GNUC__ <3
    xwtProgress->a.main_widget = progress;
-   #else
-   xwtProgress->main_widget = progress;
-   #endif
    xwtProgress->modal = FALSE;
    xwtProgress->canceled = FALSE;
 

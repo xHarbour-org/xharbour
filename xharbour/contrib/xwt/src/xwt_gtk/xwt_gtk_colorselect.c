@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_colorselect.c,v 1.2 2005/10/24 04:01:52 druzus Exp $
+   $Id: xwt_gtk_colorselect.c,v 1.3 2009/01/24 00:33:08 likewolf Exp $
 
    GTK interface - File Selection Box 
 */
@@ -25,18 +25,8 @@ static void color_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-   #if __GNUC__ <3
-   {
-      colorsel = GTK_COLOR_SELECTION (GTK_COLOR_SELECTION_DIALOG (xwtFilew->a.main_widget)->colorsel);
-      gtk_color_selection_get_current_color (colorsel,
-   }					     &color);
-   #else
-   {
-      colorsel = GTK_COLOR_SELECTION (GTK_COLOR_SELECTION_DIALOG (xwtFilew->main_widget)->colorsel);
-      gtk_color_selection_get_current_color (colorsel,
-   					     &color);
-   }					     
-   #endif
+   colorsel = GTK_COLOR_SELECTION( GTK_COLOR_SELECTION_DIALOG( xwtFilew->a.main_widget )->colorsel );
+   gtk_color_selection_get_current_color( colorsel, &color );
    hb_snprintf( fname, sizeof( fname ), "#%2ix%2ix%2ix", color.red, color.green, color.blue );
 
 
@@ -75,11 +65,7 @@ BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData )
 
    filew = gtk_color_selection_dialog_new("");
    // this widget is NOT displayed by default
-   #if __GNUC__ <3
    xwtFilew->a.main_widget = filew;
-   #else
-   xwtFilew->main_widget = filew;
-   #endif
    xwtFilew->modal = FALSE;
    xwtFilew->canceled = FALSE;
 

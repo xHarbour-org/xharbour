@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.4 2004/11/21 21:43:35 druzus Exp $
+   $Id: xwt_gtk_calendar.c,v 1.5 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - File Selection Box 
 */
@@ -41,15 +41,8 @@ static void calendar_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-  #if __GNUC__ <3
-     gtk_calendar_get_date (GTK_CALENDAR(GTK_XWTCALENDAR_SELECTION_DIALOG( xwtFilew->a.main_widget)->calendar ),&year,&month,&day
-   );
-   #else
-    gtk_calendar_get_date(
-      GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG  ( xwtFilew->main_widget)->calendar ),&year,&month,&day
-   );
-
-   #endif
+   gtk_calendar_get_date( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG( xwtFilew->a.main_widget )->calendar ),
+                          &year, &month, &day );
 
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
@@ -213,11 +206,7 @@ BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET xwtData )
 
    filew = gtk_XwtCalendar_selection_dialog_new("");
    // this widget is NOT displayed by default
-   #if __GNUC__ <3
    xwtCalendarW->a.main_widget = filew;
-   #else
-   xwtCalendarW->main_widget = filew;
-   #endif
    xwtCalendarW->modal = FALSE;
    xwtCalendarW->canceled = FALSE;
 

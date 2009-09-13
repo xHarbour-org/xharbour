@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fontselect.c,v 1.2 2004/01/25 02:42:00 lculik Exp $
+   $Id: xwt_gtk_fontselect.c,v 1.3 2005/10/24 04:01:52 druzus Exp $
 
    GTK interface - File Selection Box 
 */
@@ -22,15 +22,7 @@ static void font_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-  #if __GNUC__ <3
-   fname =   gtk_font_selection_dialog_get_font_name ( GTK_FONT_SELECTION( xwtFilew->a.main_widget )
-   );
-   #else
-   fname = gtk_font_selection_dialog_get_font_name(
-      GTK_FONT_SELECTION_DIALOG ( xwtFilew->main_widget )
-   );
-
-   #endif
+   fname = gtk_font_selection_dialog_get_font_name( GTK_FONT_SELECTION( xwtFilew->a.main_widget ) );
 
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
@@ -67,11 +59,7 @@ BOOL xwt_gtk_createFontSelection( PXWT_WIDGET xwtData )
 
    filew = gtk_font_selection_dialog_new("");
    // this widget is NOT displayed by default
-   #if __GNUC__ <3
    xwtFilew->a.main_widget = filew;
-   #else
-   xwtFilew->main_widget = filew;
-   #endif
    xwtFilew->modal = FALSE;
    xwtFilew->canceled = FALSE;
 

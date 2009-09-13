@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.21 2004/04/28 18:20:16 druzus Exp $
+   $Id: xwt_api.c,v 1.22 2007/05/25 11:10:05 toninhofwi Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -58,7 +58,7 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
 
    /* The event is in the return */
    pEvent = hb_itemNew( NULL );
-   hb_itemCopy( pEvent, &(HB_VM_STACK.Return) );
+   hb_itemCopy( pEvent, hb_stackReturnItem() );
    /* Call the constructor */
    pItem = hb_itemNew( NULL );
    hb_itemPutNI( pItem, iEventType );
@@ -72,8 +72,7 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    hb_itemRelease( pEvent );
    hb_itemRelease( pItem );
 
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
-         HB_VM_STACK.Return.item.asLogical.value == TRUE )
+   if( hb_itemGetL( hb_stackReturnItem() ) )
    {
       return TRUE;
    }
@@ -132,7 +131,7 @@ HB_FUNC( XWT_FASTRISEEVENT )
 
    /* The event is in the return */
    pEvent = hb_itemNew( NULL );
-   hb_itemCopy( pEvent, &(HB_VM_STACK.Return) );
+   hb_itemCopy( pEvent, hb_stackReturnItem() );
 
    hb_objSendMsg( pEvent, "NEW", 3, pEventId, pSender, pEventParams );
 
@@ -144,8 +143,7 @@ HB_FUNC( XWT_FASTRISEEVENT )
    hb_itemRelease( pEvent );
    hb_itemRelease( pEventParams );
 
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
-         HB_VM_STACK.Return.item.asLogical.value == TRUE )
+   if( hb_itemGetL( hb_stackReturnItem() ) )
    {
       hb_retl( TRUE );
    }
