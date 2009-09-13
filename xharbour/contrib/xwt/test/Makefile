@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.6 2004/08/21 17:27:14 lf_sfnet Exp $
+# $Id: Makefile,v 1.7 2009/09/13 12:45:39 likewolf Exp $
 #
 # Makefile for XWT Test program
 #
@@ -19,12 +19,18 @@ LIBS=\
 	macro \
 	common \
 
+ifeq ($(HB_ARCHITECTURE),w32)
+XWT_BACKEND=xwt_win
+else
+XWT_BACKEND=xwt_gtk
+GTK_LIBS := $(shell pkg-config --libs gtk+-2.0)
+endif
+
 CONTRIBS=\
 	xwt \
-	xwt_gtk \
+	$(XWT_BACKEND) \
 
 include $(TOP)$(ROOT)config/bin.cf
 
-GTK_LIBS := $(shell pkg-config --libs gtk+-2.0)
 HB_INC_COMPILE += -I$(TOP)../include
-LINKPATHS += -L$(TOP)../src/$(HB_ARCH) -L$(TOP)../src/xwt_gtk/$(HB_ARCH) $(GTK_LIBS)
+LINKPATHS += -L$(TOP)../src/$(HB_ARCH) -L$(TOP)../src/$(XWT_BACKEND)/$(HB_ARCH) $(GTK_LIBS)

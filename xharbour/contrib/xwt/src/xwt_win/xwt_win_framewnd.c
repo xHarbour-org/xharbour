@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.8 2008/05/01 03:36:58 andijahja Exp $
+   $Id: xwt_win_framewnd.c,v 1.9 2008/05/01 22:28:51 andijahja Exp $
 
    MS-Windows interface - Frame window
 */
@@ -98,7 +98,6 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
 {
    MENUITEMINFO miInfo;
    MENUINFO mInfo;
-   PHB_BASEARRAY pBar = pMenuArray->item.asArray.value;
    ULONG ulPos;
    HMENU hMenu;
 
@@ -116,14 +115,14 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
    /* Generic menuitem settings */
    miInfo.cbSize = sizeof(MENUITEMINFO);
 
-   for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
+   for ( ulPos = 0; ulPos < hb_itemSize( pMenuArray ); ulPos++ )
    {
-      PHB_ITEM pMenuItem = pBar->pItems + ulPos;
+      PHB_ITEM pMenuItem = hb_arrayGetItemPtr( pMenuArray, ulPos + 1);
       PXWT_WIN_MENUDATA menuData;
       PXWT_WIDGET widget;
 
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      widget = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
+      widget = (PXWT_WIDGET) hb_itemGetPtr( hb_stackReturnItem() );
       menuData = (PXWT_WIN_MENUDATA) widget->widget_data;
 
       miInfo.fMask = MIIM_DATA | MIIM_TYPE ;
@@ -139,17 +138,17 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
 
       // is it a menu item?
       hb_objSendMsg( pMenuItem, "GETTYPE",0 );
-      if (  hb_itemGetNI( &HB_VM_STACK.Return ) == XWT_TYPE_MENU )
+      if (  hb_itemGetNI( hb_stackReturnItem() ) == XWT_TYPE_MENU )
       {
          miInfo.fMask |= MIIM_SUBMENU;
          hb_objSendMsg( pMenuItem, "ACHILDREN",0 );
-         miInfo.hSubMenu = xwt_win_createMenuFromArray( &HB_VM_STACK.Return );
+         miInfo.hSubMenu = xwt_win_createMenuFromArray( hb_stackReturnItem() );
       }
       else {
          //gets the ID
          miInfo.fMask |= MIIM_ID;
          hb_objSendMsg( pMenuItem, "NID",0 );
-         miInfo.wID = hb_itemGetNI( &HB_VM_STACK.Return );
+         miInfo.wID = hb_itemGetNI( hb_stackReturnItem() );
       }
 
       InsertMenuItem( hMenu, ulPos, TRUE, &miInfo );
@@ -222,10 +221,10 @@ static PHB_ITEM xwt_win_findMenuItem( PHB_BASEARRAY pBar, UINT uiId )
       PHB_ITEM pMenuItem = pBar->pItems + ulPos;
 
       hb_objSendMsg( pMenuItem, "GETTYPE",0 );
-      if (  hb_itemGetNI( &HB_VM_STACK.Return ) == XWT_TYPE_MENUITEM )
+      if (  hb_itemGetNI( hb_stackReturnItem() ) == XWT_TYPE_MENUITEM )
       {
          hb_objSendMsg( pMenuItem, "NID",0 );
-         if( uiId == (unsigned)  hb_itemGetNI( &HB_VM_STACK.Return ) )
+         if( uiId == (unsigned)  hb_itemGetNI( hb_stackReturnItem() ) )
          {
             return pMenuItem;
          }
@@ -233,7 +232,7 @@ static PHB_ITEM xwt_win_findMenuItem( PHB_BASEARRAY pBar, UINT uiId )
       else
       {
          hb_objSendMsg( pMenuItem, "ACHILDREN",0 );
-         pRet = xwt_win_findMenuItem( HB_VM_STACK.Return.item.asArray.value, uiId );
+         pRet = xwt_win_findMenuItem( hb_arrayId( hb_stackReturnItem() ), uiId );
          if ( pRet != NULL )
          {
             return pRet;

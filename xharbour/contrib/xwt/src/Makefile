@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+# $Id: Makefile,v 1.2 2009/09/13 12:45:39 likewolf Exp $
 #
 # Makefile for XWT library
 #
@@ -52,7 +52,13 @@ include $(TOP)$(ROOT)config/lib.cf
 HB_INC_COMPILE += -I$(TOP)../include
 CFLAGS += -I$(TOP)../include
 
+ifeq ($(HB_ARCHITECTURE),w32)
+DIRS=\
+    xwt_win \
+
+else
 DIRS=\
     xwt_gtk \
 
+endif
 include $(TOP)$(ROOT)config/dir.cf
