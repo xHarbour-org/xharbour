@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6583 2009/09/13 20:03:57 likewolf Exp $
+ * $Id: ChangeLog,v 1.6584 2009/09/13 21:12:27 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-15 20:34 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rtl/dbf2txt.c
+    ! fixed two bad bugs which can cause GPF or some other bad results
+      I'd seen after short check. I haven't analyzed this code carefully
+      for others. (by Przemyslaw Czerpak, borrowed from Harbour)
+    * Formatting.
+    ! Fixed for Win64. (by Viktor Szakats, borrowed from Harbour)
 
 2009-09-14 01:11 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/tipssl/inetssl.c

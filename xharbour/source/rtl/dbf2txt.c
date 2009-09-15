@@ -1,5 +1,5 @@
 /*
- * $Id: dbf2txt.c,v 1.1 2006/06/14 13:56:20 druzus Exp $
+ * $Id: dbf2txt.c,v 1.2 2009/02/20 12:48:24 marchuet Exp $
  */
 
 /*
@@ -59,10 +59,10 @@
 #include "hbvm.h"
 
 /* Escaping delimited strings. Need to be cleaned/optimized/improved */
-static char *hb_strescape( char *szInput, int lLen, char *cDelim )
+static char * hb_strescape( const char * szInput, int lLen, const char * cDelim )
 {
    int     lCnt = 0;
-   char  * szChr;
+   const char * szChr;
    char  * szEscape;
    char  * szReturn;
 
@@ -90,9 +90,9 @@ static char *hb_strescape( char *szInput, int lLen, char *cDelim )
 
 /* Export field values to text file */
 #ifndef HB_CDP_SUPPORT_OFF
-static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim, PHB_CODEPAGE cdp )
+static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDelim, PHB_CODEPAGE cdp )
 #else
-static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
+static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDelim )
 #endif
 {
    switch( hb_itemType( pValue ) )
@@ -100,18 +100,18 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       /* a "C" field */
       case HB_IT_STRING:
       {
-         char *szStrEsc;
-         char *szString;
+         char * szStrEsc;
+         char * szString;
 
          szStrEsc = hb_strescape( hb_itemGetCPtr( pValue ),
                                   hb_itemGetCLen( pValue ), cDelim );
 #ifndef HB_CDP_SUPPORT_OFF
          if( cdp )
          {
-            hb_cdpnTranslate( szStrEsc, hb_cdppage(), cdp, hb_itemGetCLen( pValue ) );
+            hb_cdpnTranslate( szStrEsc, hb_cdppage(), cdp, strlen( szStrEsc ) );
          }
 #endif
-         szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
+         szString = hb_xstrcpy( NULL, cDelim, szStrEsc, cDelim, NULL );
 
          /* FWrite( handle, szString ) */
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
@@ -124,7 +124,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       /* a "D" field */
       case HB_IT_DATE:
       {
-         char *szDate = (char*) hb_xgrab( 9 );
+         char * szDate = ( char * ) hb_xgrab( 9 );
 
          hb_itemGetDS( pValue, szDate );
          hb_fsWriteLarge( handle, (BYTE*) szDate, strlen( szDate ) );
@@ -134,7 +134,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       /* an "L" field */
       case HB_IT_LOGICAL:
       {
-         hb_fsWriteLarge( handle, (BYTE*) ( hb_itemGetL( pValue )  ? "T" : "F" ), 1 );
+         hb_fsWriteLarge( handle, (BYTE*) ( hb_itemGetL( pValue ) ? "T" : "F" ), 1 );
          break;
       }
       /* an "N" field */
@@ -147,7 +147,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          if ( szResult )
          {
             ULONG ulLen = strlen( szResult );
-            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
+            const char * szTrimmed = hb_strLTrim( szResult, &ulLen );
 
             hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
@@ -164,18 +164,16 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 
 HB_FUNC( DBF2TEXT )
 {
-   HB_THREAD_STUB
+   PHB_ITEM pWhile   = hb_param( 1, HB_IT_BLOCK );
+   PHB_ITEM pFor     = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pFields  = hb_param( 3, HB_IT_ARRAY );
 
-   PHB_ITEM pWhile  = hb_param( 1, HB_IT_BLOCK );
-   PHB_ITEM pFor    = hb_param( 2, HB_IT_BLOCK );
-   PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
-
-   char *cDelim   = hb_parc( 4 );
-   FHANDLE handle = (FHANDLE) hb_parnl(5);
-   BYTE *cSep     = (BYTE *) hb_parc( 6 );
-   int nCount     = (int) hb_parnl( 7 );
+   const char * cDelim = hb_parc( 4 );
+   HB_FHANDLE handle = ( HB_FHANDLE ) hb_parnint( 5 );
+   const char * cSep = hb_parc( 6 );
+   int nCount        = hb_parni( 7 );
 #ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE cdp = hb_cdpFind( (char *) hb_parc( 8 ) );
+   PHB_CODEPAGE cdp  = hb_cdpFind( (char *) hb_parc( 8 ) );
 #endif
 
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -193,8 +191,7 @@ HB_FUNC( DBF2TEXT )
 
    BOOL bNoFieldPassed = ( pFields == NULL || hb_arrayLen( pFields ) == 0 );
 
-
-   if( !pArea )
+   if( ! pArea )
    {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "COPY TO" );
       return;
@@ -213,25 +210,23 @@ HB_FUNC( DBF2TEXT )
 
    pTmp = hb_itemNew( NULL );
 
-   if ( !cDelim )
+   if ( ! cDelim )
    {
       cDelim = "\"";
    }
 
-   if ( cSep )
-   {
-      iSepLen = strlen( (char*) cSep );
-   }
+   if( cSep )
+      iSepLen = hb_parclen( 6 );
    else
    {
-      cSep = (BYTE*) ',';
+      cSep = ",";
       iSepLen = 1;
    }
 
    SELF_FIELDCOUNT( pArea, &uiFields );
 
    while( ( nCount == -1 || nCount > 0 ) &&
-          ( !pWhile || hb_itemGetL( hb_vmEvalBlock( pWhile ) ) ) )
+          ( ! pWhile || hb_itemGetL( hb_vmEvalBlock( pWhile ) ) ) )
    {
       /* While !BOF() .AND. !EOF() */
       SELF_EOF( pArea, &bEof );
@@ -244,7 +239,7 @@ HB_FUNC( DBF2TEXT )
 
       /* For condition is met */
       /* if For is NULL, hb__Eval returns TRUE */
-      if( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
+      if( ! pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
       {
          /* User does not request fields, copy all fields */
          if( bNoFieldPassed )
@@ -253,7 +248,7 @@ HB_FUNC( DBF2TEXT )
             {
                if ( bWriteSep )
                {
-                  hb_fsWriteLarge( handle, cSep, iSepLen );
+                  hb_fsWriteLarge( handle, ( BYTE * ) cSep, iSepLen );
                }
 
                SELF_GETVALUE( pArea, ui, pTmp );
@@ -273,7 +268,7 @@ HB_FUNC( DBF2TEXT )
 
             for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
             {
-               char * szFieldName = hb_arrayGetCPtr( pFields, uiItter );
+               const char * szFieldName = hb_arrayGetCPtr( pFields, uiItter );
                if( szFieldName )
                {
                   int iPos = hb_rddFieldIndex( pArea, szFieldName );
@@ -282,7 +277,7 @@ HB_FUNC( DBF2TEXT )
                   {
                      if ( bWriteSep )
                      {
-                        hb_fsWriteLarge( handle, cSep, iSepLen );
+                        hb_fsWriteLarge( handle, ( BYTE * ) cSep, iSepLen );
                      }
                      SELF_GETVALUE( pArea, iPos, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
