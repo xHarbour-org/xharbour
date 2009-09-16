@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6586 2009/09/16 04:34:15 andijahja Exp $
+ * $Id: ChangeLog,v 1.6587 2009/09/16 08:40:37 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,10 @@
 */
 
 2009-09-16 16:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/common/hbfopen.c
    * source/rtl/trace.c
-     ! add include "hbapifs.h"
+     ! add include "hbapifs.h" aftaer "hbapi.h"
+     ! changed previous entry into this one
 
 2009-09-16 11:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/common/hbfopen.c
