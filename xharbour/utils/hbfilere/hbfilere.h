@@ -1,4 +1,4 @@
-/*  $Id: srvleto.h,v 1.2 2008/03/13 18:47:23 alkresin Exp $  */
+/*  $Id: hbfilere.h,v 1.1 2009/07/29 17:15:54 marchuet Exp $  */
 
 /*
  * xHarbour Project source code:
@@ -51,9 +51,35 @@
 #include "hbipapi.h"
 
 #if defined( HB_OS_WIN_32 )
-   #include "windows.h"
+   #include "ws2spi.h"
+   #include "mswsock.h"
 #endif
 
+#include "hbapi.h"
+#include "hbvm.h"
+#ifdef __XHARBOUR__
+   #include "hbfast.h"
+#else
+   #include "hbapicls.h"
+#endif
+#include "hbapifs.h"
+#ifdef __CONSOLE__
+   #include "hbset.h"
+#endif
+#include "sys/stat.h"
+
+#if !defined( HB_OS_WIN_32 )
+   #include <sys/types.h>
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <fcntl.h>
+   #include <errno.h>
+   #include <unistd.h>
+   #include <syslog.h>
+   #include <string.h>
+   #include <assert.h>
+   #include <signal.h>
+#endif
 BOOL hb_ip_rfd_isset( HB_SOCKET_T hSocket );
 int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen );
 void hb_ip_rfd_set( HB_SOCKET_T hSocket );
@@ -74,6 +100,8 @@ typedef struct _HB_FILE
    HB_FHANDLE        hFile;
    struct _HB_FILE * pNext;
    struct _HB_FILE * pPrev;
+   HANDLE            hMap;
+   BYTE *            pView;
 }
 HB_FILE;
 

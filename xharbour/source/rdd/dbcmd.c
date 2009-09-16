@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.233 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: dbcmd.c,v 1.234 2009/08/28 01:24:25 ronpinkas Exp $
  */
 
 /*
@@ -928,7 +928,7 @@ HB_FUNC( ISMARKED )
 
    if( pArea )
    {
-      PHB_ITEM pItem = hb_itemPutL( NULL, NULL );
+      PHB_ITEM pItem = hb_itemPutL( NULL, FALSE );
       SELF_INFO( pArea, DBI_TTS_INCOMPLETE, pItem );
       hb_itemReturnRelease( pItem );
    }

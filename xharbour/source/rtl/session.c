@@ -1,5 +1,5 @@
 /*
- * $Id: session.c,v 1.2 2009/07/22 16:55:13 marchuet Exp $
+ * $Id: session.c,v 1.3 2009/07/29 17:15:54 marchuet Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ int hb_sessionID( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_sessionID()" ) );
 
-   return pSession ? ( int ) pSession->id : NULL;
+   return pSession ? ( int ) pSession->id : ( int ) NULL;
 }
 
 int hb_sessionSelectID( const int sessionID )

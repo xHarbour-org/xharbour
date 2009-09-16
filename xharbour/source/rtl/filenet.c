@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.6 2009/08/05 10:55:53 marchuet Exp $
+ * $Id: filenet.c,v 1.7 2009/09/16 04:34:16 andijahja Exp $
  */
 
 /*
@@ -734,7 +734,7 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
             
             ptr = hb_NetFirstChar();
             hb_NetGetCmdItem( &ptr, szData ); ptr ++;
-            sscanf( szData, "%p|" , &hFile );
+            sscanf( szData, "%p|" , ( void ** ) &hFile );
             hb_NetGetCmdItem( &ptr, szData );
             sscanf( szData, "%hu|" , &uiError );
             hb_fsSetError( uiError );
@@ -813,7 +813,7 @@ void hb_fileNetClose( PHB_FILE pFile )
       
       if( hCurSocket )
       {
-         nSend = sprintf( szData + HB_LENGTH_ACK, "B|%p|\r\n", hFile );
+         nSend = sprintf( szData + HB_LENGTH_ACK, "B|%p|\r\n", ( void * ) hFile );
          HB_PUT_BE_UINT32( szData, nSend );
          hb_NetSingleSendSingleRecv( hCurSocket, szData, nSend + HB_LENGTH_ACK, 1001 );
       }
@@ -849,7 +849,7 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
          
          if( pFile->hSocket )
          {
-            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
+            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
             HB_PUT_BE_UINT32( szData, nSend );
             hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1002 );
          }
@@ -877,7 +877,7 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
          
          if( pFile->hSocket )
          {
-            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
+            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
             HB_PUT_BE_UINT32( szData, nSend );
             if( hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1003 ) )
                fResult = ( strncmp( szBuffer, szOk, 2 ) == 0 );
@@ -910,7 +910,7 @@ ULONG hb_fileNetReadAt( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize, HB_FOFFSET
       ULONG ulLen;
       int nSend;
 
-      nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", pFile->hFile, ulSize, llOffset );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", ( void * ) pFile->hFile, ulSize, llOffset );
       HB_PUT_BE_UINT32( szData, nSend );
 
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1004 );
@@ -950,7 +950,7 @@ ULONG hb_fileNetReadLarge( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize )
       ULONG ulLen;
       int nSend;
    
-      nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", pFile->hFile, ulSize );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", ( void * ) pFile->hFile, ulSize );
       HB_PUT_BE_UINT32( szData, nSend );
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 );
       if( ulLen )
@@ -990,7 +990,7 @@ ULONG hb_fileNetWriteAt( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize, HB_F
       ULONG ulLen;
 
       szData = ( char * ) hb_xgrab( 40 + ulSize );
-      ulLen = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", pFile->hFile, ulSize, llOffset );
+      ulLen = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) pFile->hFile, ulSize, llOffset );
       ptr = szData + HB_LENGTH_ACK + ulLen;
       memcpy( ptr, ( char * ) buffer, ulSize );
       ptr = ptr + ulSize;
@@ -1034,7 +1034,7 @@ ULONG hb_fileNetWriteLarge( PHB_FILE pFile, const BYTE * pBuffer, ULONG ulSize )
       ULONG ulLen;      
    
       szData = ( char * ) hb_xgrab( 36 + ulSize + HB_LENGTH_ACK );
-      ulLen = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", pFile->hFile, ulSize );
+      ulLen = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ulSize );
       ptr = szData + HB_LENGTH_ACK + ulLen;
       memcpy( ptr, ( char * ) pBuffer, ulSize );
       ptr = ptr + ulSize;
@@ -1079,7 +1079,7 @@ USHORT hb_fileNetWrite( PHB_FILE pFile, const BYTE * pBuffer, USHORT uiCount )
       ULONG ulLen;
    
       szData = ( char * ) hb_xgrab( 36 + uiCount + HB_LENGTH_ACK );
-      ulLen = sprintf( szData + HB_LENGTH_ACK, "O|%p|%hu|", pFile->hFile, uiCount );
+      ulLen = sprintf( szData + HB_LENGTH_ACK, "O|%p|%hu|", ( void * ) pFile->hFile, uiCount );
       ptr = szData + HB_LENGTH_ACK + ulLen;
       memcpy( ptr, ( char * ) pBuffer, uiCount );
       ptr = ptr + uiCount;
@@ -1120,7 +1120,7 @@ BOOL hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
       char szData[30 + HB_LENGTH_ACK];
       int nSend;
    
-      nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", pFile->hFile, llOffset );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) pFile->hFile, llOffset );
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1006 ) )
          return ( strncmp( szBuffer, szOk, 2 ) == 0 );
@@ -1142,7 +1142,7 @@ HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFl
       char szData[50 + HB_LENGTH_ACK];
       ULONG nSend;      
       
-      nSend = sprintf( szData + HB_LENGTH_ACK, "G|%p|%" PFHL "i|%hu|\r\n", pFile->hFile, llOffset, uiFlags );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "G|%p|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, llOffset, uiFlags );
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1007 ) )
       {
@@ -1153,7 +1153,7 @@ HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFl
          hb_NetGetCmdItem( &ptr, szData ); ptr ++;
          sscanf( szData, "%" PFHL "i" , &llRet );
          hb_NetGetCmdItem( &ptr, szData );
-         sscanf( szData, "%lu" , &uiError );
+         sscanf( szData, "%hu" , &uiError );
          hb_fsSetError( uiError );
       }
       else
@@ -1187,7 +1187,7 @@ void hb_fileNetCommit( PHB_FILE pFile )
       char szData[36 + HB_LENGTH_ACK];
       int nSend;
    
-      nSend = sprintf( szData + HB_LENGTH_ACK, "H|%p|\r\n", pFile->hFile );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "H|%p|\r\n", ( void * ) pFile->hFile );
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 ) )
       {
@@ -1405,7 +1405,7 @@ PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAttr )
          sscanf( ptr, "%lu" , &pffind->lDate );
          ptr = hb_strToken( ptrBuf, ulLen, 5, &ulSize );
          memcpy( pffind->szTime, ptr, 8 );
-         pffind->szTime[9] = '\0';
+         pffind->szTime[8] = '\0';
          ptr = hb_strToken( ptrBuf, ulLen, 6, &ulSize );
          sscanf( ptr, "%hu" , &uiError );
          hb_fsSetError( uiError );
@@ -1452,7 +1452,7 @@ BOOL hb_FileNetFindNext( PHB_NETFFIND pffind )
       sscanf( ptr, "%lu" , &pffind->lDate );
       ptr = hb_strToken( ptrBuf, ulLen, 4, &ulSize );
       memcpy( pffind->szTime, ptr, 8 );
-      pffind->szTime[9] = '\0';
+      pffind->szTime[8] = '\0';
       ptr = hb_strToken( ptrBuf, ulLen, 5, &ulSize );
       bFound = (ptr[0] == '1' ? TRUE : FALSE);
       ptr = hb_strToken( ptrBuf, ulLen, 6, &ulSize );

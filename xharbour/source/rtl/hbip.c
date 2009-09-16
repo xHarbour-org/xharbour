@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.4 2009/08/04 09:50:23 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.5 2009/08/05 10:55:53 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -464,21 +464,8 @@ int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen )
 
    return iLen ;
 }
-/*
-#if defined( HB_OS_WIN_32 )
-int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
-{
-   LPTRANSMIT_PACKETS_ELEMENT lpPacketArray;
-   lpPacketArray->dwElFlags = TP_ELEMENT_MEMORY;
-   lpPacketArray->cLength = 0;
-   lpPacketArray->pBuffer = szBuffer;
-   if( TransmitPackets( hSocket, lpPacketArray, 1, iSend, TF_USE_DEFAULT_WORKER ) )
-      return iSend;
-   else
-      return -1;
-}
-#else
-*/
+
+
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
 {
    int iSent, iBufferLen;
@@ -524,9 +511,6 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
       return -1;
    }
 }
-/*
-#endif
-*/
 
 HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
 {

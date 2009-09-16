@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.5 2009/08/06 16:08:58 marchuet Exp $
+ * $Id: hbfilere.c,v 1.6 2009/08/06 21:01:56 marchuet Exp $
  */
 
 /*
@@ -60,31 +60,6 @@ struct _HB_FILE;
 typedef struct _HB_FILE * PHB_FILE;
 
 #include "hbfilere.h"
-#include "hbapi.h"
-#include "hbvm.h"
-#ifdef __XHARBOUR__
-   #include "hbfast.h"
-#else
-   #include "hbapicls.h"
-#endif
-#include "hbapifs.h"
-#ifdef __CONSOLE__
-#include "hbset.h"
-#endif
-#include "sys/stat.h"
-
-#if !defined( HB_OS_WIN_32 )
-#include <sys/types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <syslog.h>
-#include <string.h>
-#include <assert.h>
-#include <signal.h>
-#endif
 
 /*
 #define MY_DBG_
@@ -96,6 +71,7 @@ typedef struct _HB_FILE * PHB_FILE;
 
 //static void StartListening( int iServerPort );
 void ServiceExecution( void );
+int filere_Send( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 
 #if defined( HB_OS_WIN_32 )
@@ -123,6 +99,9 @@ static char szDataACK[HB_LENGTH_ACK];
 static HB_SOCKET_T  hSocketMain;       // Initial server socket 
 #if defined( HB_OS_WIN_32 )
 static HANDLE       hProcessHeap = 0;
+#if defined( LPFN_TRANSMITPACKETS )
+static LPFN_TRANSMITPACKETS lpfnTransmitPackets;
+#endif
 #endif
 int                 iServerPort = 2813;
 
@@ -152,6 +131,7 @@ SERVICE_TABLE_ENTRY	lpServiceStartTable[] =
 
 SERVICE_STATUS_HANDLE   hServiceStatusHandle; 
 SERVICE_STATUS          ServiceStatus; 
+
 #else
 /** Linux daemon **/
 void signal_handler( int sig );
@@ -245,6 +225,25 @@ void main( int argc, char * argv[] )
 }
 
 #if defined( HB_OS_WIN_32 )
+int filere_Send( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
+{
+#if defined( LPFN_TRANSMITPACKETS )
+   if( lpfnTransmitPackets )
+   {
+      TRANSMIT_PACKETS_ELEMENT lpPacketArray;
+      lpPacketArray.dwElFlags = TP_ELEMENT_MEMORY;
+      lpPacketArray.cLength = iSend;
+      lpPacketArray.pBuffer = szBuffer;
+      if( lpfnTransmitPackets( hSocket, &lpPacketArray, 1, iSend, NULL, TF_USE_DEFAULT_WORKER ) )
+         return iSend;
+      else
+         return -1;
+   }
+   else
+#endif   
+      return hb_ipSend( hSocket, szBuffer, iSend, timeout );
+}      
+
 VOID Install( char* pPath, char* pName, char* pDescription )
 {  
 	SC_HANDLE schSCManager = OpenSCManager( NULL, NULL, SC_MANAGER_CREATE_SERVICE ); 
@@ -490,6 +489,10 @@ static void fl_free( void * pHeapMem )
    HeapFree( hProcessHeap, 0, pHeapMem );
 } 
 #else
+int filere_Send( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
+{
+   return hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
+}      
 
 void signal_handler(int sig) {
  
@@ -570,6 +573,8 @@ static PHB_FILE hb_fileNew( PUSERSTRU pUStru, HB_FHANDLE hFile, BOOL fShared, BY
       memcpy( ( char * ) pFile->pFileName, ( char * ) pFileName, strlen( ( char * ) pFileName ) );
       pFile->hFile     = hFile;
       pFile->shared    = fShared;
+      pFile->hMap      = NULL;
+      pFile->pView     = NULL;
 
       if( pUStru->s_openFiles )
       {
@@ -595,8 +600,8 @@ static void filere_SendAnswer( PUSERSTRU pUStru, BYTE* szData, ULONG ulLen )
    OutputDebugString( ( char * ) szDataACK );
    OutputDebugString( ( char * ) szData );         
 #endif   
-   hb_ipSend( pUStru->hSocket, szDataACK, HB_LENGTH_ACK, -1 );
-   if( hb_ipSend( pUStru->hSocket, ( char * ) szData, ulLen, -1 ) != ( int ) ulLen )
+   filere_Send( pUStru->hSocket, szDataACK, HB_LENGTH_ACK, -1 );
+   if( filere_Send( pUStru->hSocket, ( char * ) szData, ulLen, -1 ) != ( int ) ulLen )
       SvcDebugOut( "Data send failed, error code = %s\n", ( void * ) hb_ipErrorDesc() );
 }
 
@@ -605,17 +610,17 @@ static void filere_SendSingleAnswer( PUSERSTRU pUStru, BYTE* szData, ULONG ulLen
 #if defined(MY_DBG_)      
    OutputDebugString( ( char * ) szData + HB_LENGTH_ACK );         
 #endif   
-   hb_ipSend( pUStru->hSocket, ( char * ) szData, ulLen, -1 );
+   filere_Send( pUStru->hSocket, ( char * ) szData, ulLen, -1 );
 }
 
 static void filere_SendOkAnswer( PUSERSTRU pUStru )
 {
-   hb_ipSend( pUStru->hSocket, ( char * ) szOk, 2, -1 );
+   filere_Send( pUStru->hSocket, ( char * ) szOk, 2, -1 );
 }
 
 static void filere_SendFalseAnswer( PUSERSTRU pUStru )
 {
-   hb_ipSend( pUStru->hSocket, ( char * ) szFalse, 2, -1 );
+   filere_Send( pUStru->hSocket, ( char * ) szFalse, 2, -1 );
 }
 
 static BYTE * hb_strToken( BYTE * szText, ULONG ulText, ULONG ulIndex, ULONG * pulLen )
@@ -731,9 +736,21 @@ static void filere_ExtOpen( PUSERSTRU pUStru, BYTE * szData )
       hFileHandle = hb_fsExtOpen( pFilename, pDefExt, uiExFlags, pPaths, NULL );
       if( hFileHandle != FS_ERROR )
       {
+#if 0         
+         pFile = hb_fileNew( pUStru, hFileHandle, fShared, pFilename );
+#else         
          hb_fileNew( pUStru, hFileHandle, fShared, pFilename );
+#endif
       }
    }
+
+#if 0   
+   if( pFile && ! pFile->hMap )
+   {
+      pFile->hMap = CreateFileMapping( (HANDLE) hFileHandle, NULL, PAGE_READWRITE, 0, 0, NULL );
+      pFile->pView = ( BYTE * ) MapViewOfFile( pFile->hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0 );
+   }
+#endif
    
    if( pUStru->ulBufAnswerLen < 35 + HB_LENGTH_ACK )
    {
@@ -779,6 +796,12 @@ static void filere_Close( PUSERSTRU pUStru, BYTE* szData )
             hb_fsClose( hFileHandle );
             if( pFile->pFileName )
                fl_free( pFile->pFileName );
+#if 0               
+            if( pFile->pView )
+               UnmapViewOfFile( pFile->pView );
+            if( pFile->hMap )
+               CloseHandle( pFile->hMap );
+#endif               
             fl_free( pFile );
          }
       }
@@ -832,6 +855,7 @@ static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
    ULONG ulCount, ulRead;
    HB_FHANDLE hFileHandle;
    HB_FOFFSET llOffset;
+   PHB_FILE pFile;
 
    // Reading params
    sscanf( ( char * ) szData, "%p|%lu|%" PFHL "i|\r\n", ( void ** ) &hFileHandle, &ulCount, &llOffset );
@@ -844,7 +868,14 @@ static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
          pUStru->ulBufAnswerLen = ulCount + 9;
          pUStru->pBufAnswer = ( BYTE * ) fl_realloc( pUStru->pBufAnswer, pUStru->ulBufAnswerLen );
       }
-      ulRead = hb_fsReadAt( hFileHandle, pUStru->pBufAnswer + 8, ulCount, llOffset );
+      pFile = hb_fileFindByHandle( pUStru, hFileHandle );
+      if( pFile && pFile->hMap )
+      {
+         ulRead = ulCount;
+         memcpy( pUStru->pBufAnswer + 8, pFile->pView + llOffset, ulCount );
+      }
+      else
+         ulRead = hb_fsReadAt( hFileHandle, pUStru->pBufAnswer + 8, ulCount, llOffset );
       HB_PUT_BE_UINT32( pUStru->pBufAnswer, 4 + ulRead );
       HB_PUT_BE_UINT32( pUStru->pBufAnswer + 4, hb_fsError() );
       filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulRead + 8 );
@@ -1737,6 +1768,28 @@ void ServiceExecution( void )
    hb_ip_rfd_set( hSocketMain );
 
 #if defined( HB_OS_WIN_32 )
+
+#if defined( LPFN_TRANSMITPACKETS )
+   EnterCriticalSection( &myCS );
+   if( ! lpfnTransmitPackets )
+   {
+       /* Get pointers to the ws2_32 implementations.
+        * NOTE: This assumes that ws2_32 contains only one implementation
+        * of these functions, i.e. that you cannot get different functions
+        * back by passing another socket in. If that ever changes, we'll need
+        * to think about associating the functions with the socket and
+        * exposing that information to this dll somehow.
+        */
+       const GUID guidTransmitPackets = WSAID_TRANSMITPACKETS;
+       DWORD len;
+
+       WSAIoctl( hSocketMain, SIO_GET_EXTENSION_FUNCTION_POINTER,
+                 ( void * ) &guidTransmitPackets, sizeof( guidTransmitPackets ),
+                 &lpfnTransmitPackets, sizeof( lpfnTransmitPackets ), &len, NULL, NULL );
+   }
+   LeaveCriticalSection( &myCS );
+#endif
+
    while( ServiceStatus.dwCurrentState == SERVICE_RUNNING || ServiceStatus.dwCurrentState == SERVICE_PAUSED )
 #else
    while( ServiceStatus == SERVICE_RUNNING || ServiceStatus == SERVICE_PAUSED )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.47 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: hbver.c,v 1.48 2009/08/27 05:29:38 andijahja Exp $
  */
 
 /*
@@ -524,11 +524,23 @@ char * hb_verCompiler( void )
 
 #elif defined(__BORLANDC__)
 
-   #if (__BORLANDC__ == 1040) /* Version 3.1 */
+   #if (__BORLANDC__ == 0x0400) /* Version 3.0 */
+      iVerMajor = 3;
+      iVerMinor = 0;
+      iVerPatch = 0;
+   #elif (__BORLANDC__ == 0x0410) /* Version 3.1 */
       iVerMajor = 3;
       iVerMinor = 1;
       iVerPatch = 0;
-   #elif (__BORLANDC__ >= 1280) /* Version 5.x */
+   #elif (__BORLANDC__ == 0x0452) /* Version 4.0 */
+      iVerMajor = 4;
+      iVerMinor = 0;
+      iVerPatch = 0;
+   #elif (__BORLANDC__ == 0x0460) /* Version 4.5 */
+      iVerMajor = 4;
+      iVerMinor = 5;
+      iVerPatch = 0;
+   #elif (__BORLANDC__ >= 0x0500) /* Version 5.x */
       iVerMajor = __BORLANDC__ >> 8;
       iVerMinor = ( __BORLANDC__ & 0xFF ) >> 4;
       iVerPatch = __BORLANDC__ & 0xF;
@@ -538,8 +550,8 @@ char * hb_verCompiler( void )
       iVerPatch = 0;
    #endif
 
-   #if (__BORLANDC__ >= 1424)      /* Version 5.9 */
-      #if (__BORLANDC__ >= 1568)   /* Version 6.2 */
+   #if (__BORLANDC__ >= 0x0590)      /* Version 5.9 */
+      #if (__BORLANDC__ >= 0x0620)   /* Version 6.2 */
         pszName = "Embarcadero C++";
       #else
         pszName = "CodeGear C++";

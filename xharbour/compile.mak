@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.47 2009/08/10 18:41:05 lculik Exp $
+# $Id: compile.mak,v 1.48 2009/08/23 22:46:11 lculik Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -26,7 +26,7 @@ $(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
 	$(CMN_LINK_CMD)
 
 $(HBFILERE_EXE) : $(HBFILERE_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(EXE_LINK_CMD) Ws2_32.lib
 
 $(HBPP_EXE) : $(HBPP_EXE_OBJS)
 	$(CMN_LINK_CMD)
