@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPathComponent.cpp $
 // $Archive: /ZipArchive_Linux/ZipPathComponent.cpp $
-// $Date: 02-01-19 17:28 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 19:33:52 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -44,7 +44,9 @@ void CZipPathComponent::SetFullPath(LPCTSTR lpszFullPath)
 		szTempPath = szTempPath.Mid(i);		
 	}
 	else
+	{
 		m_szPrefix.Empty();
+	}	
 
 
 	m_szDrive.Empty(); 
@@ -60,18 +62,24 @@ void CZipPathComponent::SetFullPath(LPCTSTR lpszFullPath)
 	{
 		m_szDirectory = szTempPath.Left(p);
 		if (p == szTempPath.GetLength() - 1 )
+		{
 			return; // no filename present
+		}	
 		else 
+		{
 			p++;
+		}	
 	}
 	else 
+	{
 		p = 0;
+	}	
 
 	// p points at the beginning of the filename
 	m_szFileTitle = szTempPath.Mid(p);
 	for (p = m_szFileTitle.GetLength() - 1; p >= 0; p--)
-		if (m_szFileTitle[p] == _T('.'))
-			break;
+		if (m_szFileTitle[p] == _T('.'))		
+			break;			
 
 	if (p != -1)
 	{

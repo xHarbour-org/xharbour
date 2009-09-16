@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $RCSfile: zipstring.h,v $
-// $Revision: 1.6 $ $Name:  $
-// $Date: 2008/11/19 15:04:31 $ $Author: lculik $
+// $Revision: 1.7 $ $Name:  $
+// $Date: 2009/09/13 13:03:32 $ $Author: likewolf $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -125,7 +125,7 @@ class ZIP_API CZipString : public stdbs
 public:
 	CZipString(){}
 	explicit CZipString (TCHAR ch, int nRepeat = 1):stdbs(nRepeat, ch){}
-	CZipString( const CZipString& stringSrc ) {assign(stringSrc);}
+	CZipString( const CZipString& stringSrc ):stdbs(stringSrc){}
 	CZipString( const stdbs& stringSrc ) {assign(stringSrc);}
 	CZipString( LPCTSTR lpsz ){if (!lpsz) Empty(); else assign(lpsz);}
 	operator LPCTSTR() const{return c_str();}

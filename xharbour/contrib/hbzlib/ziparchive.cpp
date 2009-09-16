@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2008/05/01 11:15:27 $ $Author: andijahja $
+// $Date: 2008/11/19 15:04:31 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -46,7 +46,7 @@ void CZipAddNewFileInfo::Defaults()
 	m_iReplaceIndex = -1;
 	m_nBufSize = 65536;
 	m_iComprLevel = -1; // default
-
+	m_pFile = NULL;
 }
 
 CZipArchive::CZipArchive()

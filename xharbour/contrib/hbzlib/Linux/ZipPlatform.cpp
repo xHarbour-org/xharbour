@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive_Linux/ZipPlatform.cpp $
-// $Date: 02-03-23 2:13 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 19:33:52 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -71,14 +71,16 @@ bool ZipPlatform::GetFileSize(LPCTSTR lpszFileName, DWORD& dSize)
 CZipString ZipPlatform::GetTmpFileName(LPCTSTR lpszPath, DWORD iSizeNeeded)
 {
 	TCHAR empty[] = _T(""), prefix [] = _T("zar");
-	TCHAR* buf = NULL;
+//	TCHAR* buf = NULL;
 	CZipString tempPath;
 	if (lpszPath)
 	{
 		// first try the user provided directory
 		tempPath = lpszPath;
 		if (ZipPlatform::GetDeviceFreeSpace(tempPath) < iSizeNeeded)
+		{
 			tempPath.Empty();
+		}	
 		else
 		{
 			CZipPathComponent::AppendSeparator(tempPath);
@@ -87,9 +89,13 @@ CZipString ZipPlatform::GetTmpFileName(LPCTSTR lpszPath, DWORD iSizeNeeded)
 			TCHAR* c = mktemp(tempPath.GetBuffer(tempPath.GetLength()));
 			tempPath.ReleaseBuffer();
 			if (c)
+			{
 				return tempPath;
+			}	
 			else
+			{
 				tempPath.Empty();
+			}	
 		}
 	}
 
@@ -102,11 +108,15 @@ CZipString ZipPlatform::GetTmpFileName(LPCTSTR lpszPath, DWORD iSizeNeeded)
 	{
 		CZipPathComponent zpc(tempPath);
 		if (ZipPlatform::GetDeviceFreeSpace(zpc.GetFilePath()) < iSizeNeeded)
+		{
 			return empty;
+		}	
 		return tempPath;
 	}
 	else 
+	{
 		return empty;
+	}	
 }
 
 bool ZipPlatform::GetCurrentDirectory(CZipString& sz)
@@ -164,13 +174,19 @@ int ZipPlatform::FileExists(LPCTSTR lpszName)
 {
     	struct stat st;
 	if (stat(lpszName, &st) != 0)
+	{
 		return 0;
+	}	
 	else
 	{
 		if (S_ISDIR(st.st_mode))
+		{
 			return -1;
+		}	
 		else
+		{
 			return 1;
+		}	
 	}
 
 
@@ -179,18 +195,23 @@ int ZipPlatform::FileExists(LPCTSTR lpszName)
 
 ZIPINLINE  bool ZipPlatform::IsDriveRemovable(LPCTSTR lpszFilePath)
 {
+        ( void )lpszFilePath;
 	// not implemmented
 	return true;
 }
 
 ZIPINLINE  bool ZipPlatform::SetVolLabel(LPCTSTR lpszPath, LPCTSTR lpszLabel)
-{
+{       
+        ( void ) lpszPath;
+	( void ) lpszLabel;
 	// not implemmented
         return true;
 }
 
 ZIPINLINE void ZipPlatform::AnsiOem(CZipAutoBuffer& buffer, bool bAnsiToOem)
-{
+{       
+       ( void ) buffer;
+       ( void ) bAnsiToOem;
 	// not implemmented
 }
 
@@ -198,9 +219,13 @@ ZIPINLINE  bool ZipPlatform::RemoveFile(LPCTSTR lpszFileName, bool bThrow)
 {
 	if (unlink(lpszFileName) != 0)
 		if (bThrow)
+		{
 			CZipException::Throw(CZipException::notRemoved, lpszFileName);
+		}	
 		else 
+		{
 			return false;
+		}	
 	return true;
 
 
@@ -210,9 +235,13 @@ ZIPINLINE  bool ZipPlatform::RenameFile( LPCTSTR lpszOldName, LPCTSTR lpszNewNam
 
 	if (rename(lpszOldName, lpszNewName) != 0)
 		if (bThrow)
+		{
 			CZipException::Throw(CZipException::notRenamed, lpszOldName);
+		}	
 		else 
+		{
 			return false;
+		}	
 		return true;
 
 }
@@ -255,7 +284,8 @@ bool ZipPlatform::TruncateFile(int iDes, DWORD iSize)
 }
 
 int ZipPlatform::OpenFile(LPCTSTR lpszFileName, UINT iMode, int iShareMode)
-{
+{       
+        ( void ) iShareMode ;
 	return  open(lpszFileName, iMode, S_IRUSR | S_IWUSR | S_IRGRP |S_IROTH );
 }
 

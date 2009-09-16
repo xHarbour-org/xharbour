@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.h $
 // $Archive: /ZipArchive/ZipArchive.h $
-// $Date: 2008/04/17 12:56:41 $ $Author: lculik $
+// $Date: 2008/04/17 19:14:29 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -107,34 +107,35 @@
 */
 struct ZIP_API CZipAddNewFileInfo
 {
-	CZipAddNewFileInfo(LPCTSTR lpszFilePath, bool bFullPath = true)
-		: m_szFilePath(lpszFilePath),m_bFullPath(bFullPath)
+	CZipAddNewFileInfo(LPCTSTR lpszFilePath, bool bFullPath = true)		
 	{
-		m_pFile = NULL;
-		Defaults();
+ 	        Defaults();
+	        m_szFilePath =lpszFilePath;
+		m_bFullPath = bFullPath;
 	}
-	CZipAddNewFileInfo(LPCTSTR lpszFilePath, LPCTSTR lpszFileNameInZip)
-		: m_szFilePath(lpszFilePath), m_szFileNameInZip(lpszFileNameInZip)
+	CZipAddNewFileInfo(LPCTSTR lpszFilePath, LPCTSTR lpszFileNameInZip)		
 	{
-		m_pFile = NULL;
 		Defaults();
+		m_szFilePath =lpszFilePath;
+		m_szFileNameInZip =lpszFileNameInZip;
 	}
-	CZipAddNewFileInfo(CZipAbstractFile* pFile, LPCTSTR lpszFileNameInZip)
-		: m_pFile(pFile), m_szFileNameInZip(lpszFileNameInZip)
+	CZipAddNewFileInfo(CZipAbstractFile* pFile, LPCTSTR lpszFileNameInZip)		 
 	{
 		Defaults();
+		m_pFile =pFile;
+        	m_szFileNameInZip=lpszFileNameInZip;
 	}
 	/**
 		the full path to the file to be added; if it is empty you need to set #m_pFile
 	*/
-	CZipString m_szFilePath;
+	CZipString m_szFilePath ;
 
 	/**
 		the file name that will be stored in the archive (if the file is a directory,
 		there is a path separator automatically added at the end); #SetRootPath
 		function has no effect on this parameter
 	*/
-	CZipString m_szFileNameInZip;
+	CZipString m_szFileNameInZip ;
 
 	/**
 	It has only the meaning when #m_szFileNameInZip is not specified and #m_szFilePath is not empty.

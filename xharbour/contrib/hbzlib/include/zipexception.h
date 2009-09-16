@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipException.h $
 // $Archive: /ZipArchive/ZipException.h $
-// $Date: 2007/06/05 18:21:31 $ $Author: enricomaria $
+// $Date: 2008/11/19 15:04:31 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -55,7 +55,7 @@ public:
 */
 		CZipException(int iCause = generic, LPCTSTR lpszZipName = NULL);
 
-		CZipException(CZipException& e)
+		CZipException(CZipException& e):CZipBaseException(e)
 		{
 			m_szFileName = e.m_szFileName;
 			m_iCause = e.m_iCause;
