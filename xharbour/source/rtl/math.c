@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.25 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: math.c,v 1.26 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -62,7 +62,9 @@
 #  include <math.h>
 #endif
 
-#define _HB_API_INTERNAL_
+#ifndef _HB_API_INTERNAL_
+   #define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6584 2009/09/13 21:12:27 likewolf Exp $
+ * $Id: ChangeLog,v 1.6585 2009/09/15 16:35:00 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-16 11:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/common/hbfopen.c
+   * source/rtl/spfiles.c
+   * source/rtl/trace.c
+     ! hbapifs.h -> hbapi.h
+       fix to compile with _HB_API_INTERNAL_ and HB_STACK_MACROSand HB_API_MACROS
+
+   * source/rtl/filenet.c
+   * source/rdd/dbffpt/redbffpt1.c
+     ! type cast
+
+   * source/vm/initexit.c
+   * source/rtl/bkgtsks.c
+   * source/rtl/console.c
+   * source/rtl/hbserv.c
+   * source/rtl/math.c
+   * source/rdd/wafunc.c
+   * source/rdd/wacore.c
+      ! define _HB_API_INTERNAL_ only if not defined yet.
 
 2009-09-15 20:34 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rtl/dbf2txt.c

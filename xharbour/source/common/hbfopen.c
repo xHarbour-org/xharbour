@@ -1,5 +1,5 @@
 /*
- * $Id: hbfopen.c,v 1.3 2008/01/14 11:08:29 likewolf Exp $
+ * $Id: hbfopen.c,v 1.4 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -50,7 +50,8 @@
  *
  */
 
-#include "hbapifs.h"
+// #include "hbapifs.h"
+#include "hbapi.h"
 
 FILE * hb_fopen( const char *path, const char *mode )
 {

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.39 2008/12/23 18:06:33 likewolf Exp $
+* $Id: hbserv.c,v 1.40 2009/09/12 18:01:43 likewolf Exp $
 */
 
 /*
@@ -50,8 +50,9 @@
 *
 */
 
-#define _HB_API_INTERNAL_
-
+#ifndef _HB_API_INTERNAL_
+   #define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"

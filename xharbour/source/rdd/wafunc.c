@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.22 2009/04/17 14:33:21 enricomaria Exp $
+ * $Id: wafunc.c,v 1.23 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -51,7 +51,9 @@
  *
  */
 
-#define _HB_API_INTERNAL_
+#ifndef _HB_API_INTERNAL_
+   #define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbapiitm.h"

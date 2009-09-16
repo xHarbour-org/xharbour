@@ -1,5 +1,5 @@
 /*
- * $Id: initexit.c,v 1.2 2008/06/03 04:59:57 ronpinkas Exp $
+ * $Id: initexit.c,v 1.3 2009/09/12 18:01:44 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,9 @@
  *
  */
 
-#define _HB_API_INTERNAL_
+#ifndef _HB_API_INTERNAL_
+   #define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"

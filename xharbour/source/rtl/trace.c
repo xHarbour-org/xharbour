@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.22 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: trace.c,v 1.23 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 #include "hbtrace.h"
-#include "hbapifs.h"
+#include "hbapi.h"
 #include "hbapierr.h"
 
 #ifdef HB_EXTENSION

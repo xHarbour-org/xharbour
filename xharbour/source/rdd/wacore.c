@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.18 2009/08/19 23:28:44 likewolf Exp $
+ * $Id: wacore.c,v 1.19 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -55,8 +55,9 @@
 /* JC1: optimizing stack access under MT */
 #define HB_THREAD_OPTIMIZE_STACK
 #endif
-#define _HB_API_INTERNAL_
-
+#ifndef _HB_API_INTERNAL_
+   #define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbapiitm.h"

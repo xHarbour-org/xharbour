@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.5 2009/08/04 09:50:23 marchuet Exp $
+ * $Id: filenet.c,v 1.6 2009/08/05 10:55:53 marchuet Exp $
  */
 
 /*
@@ -632,7 +632,7 @@ static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags,
    }
    else if( uiExFlags & FXO_DEFAULTS )
    {
-      char * szDefault = hb_setGetDefault();
+      char * szDefault = (char*) hb_setGetDefault();
       if( szDefault && *szDefault )
       {
          pFilepath->szPath = szDefault;
@@ -1316,7 +1316,7 @@ BOOL hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath )
    }
    else
    {
-      char * szDefault = hb_setGetDefault();
+      char * szDefault = (char*) hb_setGetDefault();
       if( szDefault )
       {
          pFilepath->szPath = szDefault;

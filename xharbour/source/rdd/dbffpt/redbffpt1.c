@@ -1,5 +1,5 @@
 /*
- * $Id: redbffpt1.c,v 1.104 2009/05/26 11:25:32 marchuet Exp $
+ * $Id: redbffpt1.c,v 1.1 2009/07/22 17:09:14 marchuet Exp $
  */
 
 /*
@@ -4734,7 +4734,7 @@ static HB_ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             if( pData->szMemoExt[ 0 ] )
                hb_itemPutC( pItem, pData->szMemoExt );
             else if( pArea->bMemoType == DB_MEMO_FPT &&
-                     ( szMFileExt = hb_setGetMFileExt() ) != NULL &&
+                     ( szMFileExt = (char*) hb_setGetMFileExt() ) != NULL &&
                      *szMFileExt )
                hb_itemPutC( pItem, szMFileExt );
             else
@@ -5048,7 +5048,7 @@ static HB_ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
          if( pData->szMemoExt[ 0 ] )
             hb_itemPutC( pItem, pData->szMemoExt );
          else if( pData->bMemoType == DB_MEMO_FPT && pRDD->rddID != s_uiRddIdBLOB &&
-                  ( szMFileExt = hb_setGetMFileExt() ) != NULL &&
+                  ( szMFileExt = (char*) hb_setGetMFileExt() ) != NULL &&
                   *szMFileExt )
             hb_itemPutC( pItem, szMFileExt );
          else

@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.12 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: spfiles.c,v 1.13 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#include "hbapifs.h"
+#include "hbapi.h"
 #include "hbset.h"
 
 BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
