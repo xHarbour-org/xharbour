@@ -8,20 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2009-09-16 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   * compile.mak
-   * utils\hbfilere\hbfilere.c
-   * utils\hbfilere\hbfilere.h
-     + Added TransmitPackets that increase transfer speed. Remember that is needed to build
-       with versions of borland 5.8 or newer, or msvc compiler.
-   * source\common\hbver.c
-     + Added recognision of more versions of borland compilers.
-   * source\rtl\hbip.c
-     - removed unneeded code.
-   * source\rtl\filenet.c   
-   * source\rtl\session.c
-   * source\rdd\dbcmd.c   
-     ! fixed some warnings.
+2009-09-16 20:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\idle.c
+    + Added #include "thread.h" for hb_threadSleep()
 
 2009-09-16 16:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/common/hbfopen.c

@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.28 2009/07/26 17:01:48 lculik Exp $
+ * $Id: idle.c,v 1.29 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -77,6 +77,7 @@
 #include "hbvm.h"
 #include "hbdate.h"
 #include "error.ch"
+#include "thread.h"
 #if defined( HB_OS_UNIX )
    #include <sys/times.h>
    #include <unistd.h>
