@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2008/11/19 15:04:31 $ $Author: lculik $
+// $Date: 2009/09/16 21:22:20 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -1072,7 +1072,7 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 
 	m_centralDir.RemoveFromDisk();
 
-	DWORD uTotalToMoveBytes = 0, uLastOffset = m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore();
+   DWORD uTotalToMoveBytes = 0, uLastOffset = (DWORD)(m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore());
 	// count the number of bytes to move
 	for (i = uSize - 1; i >=0 ; i--)
 	{
@@ -1108,7 +1108,7 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 				uOffsetStart = 0;  // never be at the beginning, because the first file is always to be deleted
 			}
 			if (i == uSize - 1)
-				uTemp = (m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore()) - uTemp;
+            uTemp = (DWORD)(m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore()) - uTemp;
 			else
 				uTemp = aInfo[i+1].m_pHeader->m_uOffset - uTemp;
 
@@ -1124,13 +1124,13 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 
 	}
 	if (uOffsetStart)
-		MovePackedFiles(uOffsetStart,
-			m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore(),
+      MovePackedFiles((DWORD)uOffsetStart,
+         (DWORD)(m_storage.m_pFile->GetLength() - m_centralDir.GetBytesBefore()),
 			uMoveBy, pCallback);
 
 	m_info.ReleaseBuf();
 	if (uMoveBy) // just in case
-		m_storage.m_pFile->SetLength(m_storage.m_pFile->GetLength() - uMoveBy);
+      m_storage.m_pFile->SetLength((ZIP_ULONGLONG)(m_storage.m_pFile->GetLength() - uMoveBy));
 
 	if (pCallback)
 		pCallback->CallbackEnd();
@@ -1287,7 +1287,7 @@ bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
    {
 
       if (info.m_pFile)
-         iFileSize = info.m_pFile->GetLength();
+         iFileSize = (DWORD)info.m_pFile->GetLength();
       else
       {
          if (!ZipPlatform::GetFileSize(info.m_szFilePath, iFileSize) && bEff)
@@ -1397,7 +1397,7 @@ bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
 
    ASSERT(pf);
    // call init before opening (in case of exception we have the names)
-   iFileSize = pf->GetLength();
+   iFileSize = (DWORD)pf->GetLength();
 
 
    bool bRet;
@@ -1587,7 +1587,7 @@ bool CZipArchive::AddNewFile(CZipAddNewFileInfo& info)
 	{
 
 		if (info.m_pFile)
-			iFileSize = info.m_pFile->GetLength();
+         iFileSize = (DWORD)info.m_pFile->GetLength();
 		else
 		{
 			if (!ZipPlatform::GetFileSize(info.m_szFilePath, iFileSize) && bEff)
@@ -1696,7 +1696,7 @@ bool CZipArchive::AddNewFile(CZipAddNewFileInfo& info)
 
 	ASSERT(pf);
 	// call init before opening (in case of exception we have the names)
-	iFileSize = pf->GetLength();
+   iFileSize = (DWORD)pf->GetLength();
 
 
 	bool bRet;
@@ -2848,7 +2848,7 @@ bool CZipArchive::GetFromArchive(CZipArchive& zip, WORD uIndex, int iReplaceInde
 		if (info.m_bOnDisk)
 			uEndOffset = info.m_uOffset;
 		else
-			uEndOffset = pFile->GetLength();
+         uEndOffset = (DWORD)pFile->GetLength();
 	}
 	uEndOffset += zip.m_centralDir.GetBytesBefore();
 	DWORD uStartOffset = zip.m_centralDir.GetBytesBefore() + fh.m_uOffset + fh.GetSize(true);
@@ -3072,7 +3072,7 @@ bool CZipArchive::RenameFile(WORD uIndex, LPCTSTR lpszNewName)
 
 		m_info.Init();
 		DWORD uStartOffset = fh.m_uOffset + 30 + uFileNameLen;
-		DWORD uFileLen = m_storage.m_pFile->GetLength();
+      DWORD uFileLen = ( DWORD ) m_storage.m_pFile->GetLength();
 		DWORD uEndOffset = uFileLen - m_centralDir.GetBytesBefore();
 		CZipActionCallback* pCallback = GetCallback(cbRename);
 		if (pCallback)
@@ -3151,7 +3151,7 @@ void CZipArchive::MakeSpaceForReplace(int iReplaceIndex, DWORD uTotal, LPCTSTR l
 {
 
 	ASSERT(iReplaceIndex < GetCount() - 1);
-	DWORD uReplaceStart = m_storage.m_pFile->GetPosition() - m_centralDir.GetBytesBefore();
+   DWORD uReplaceStart = (DWORD)(m_storage.m_pFile->GetPosition() - m_centralDir.GetBytesBefore());
 	DWORD uReplaceEnd = m_centralDir.m_headers[iReplaceIndex + 1]->m_uOffset;
 	DWORD uReplaceTotal = uReplaceEnd - uReplaceStart;
 	int iDelta = uTotal - uReplaceTotal;
@@ -3161,7 +3161,7 @@ void CZipArchive::MakeSpaceForReplace(int iReplaceIndex, DWORD uTotal, LPCTSTR l
 
 		//	m_info.Init(); don't - the calling functions will
 		CZipActionCallback* pCallback = GetCallback(CZipArchive::cbReplace);
-		DWORD uFileLen = m_storage.m_pFile->GetLength();
+      DWORD uFileLen = (DWORD)m_storage.m_pFile->GetLength();
 		DWORD uUpperLimit = uFileLen - m_centralDir.GetBytesBefore(); // will be added in MovePackedFiles
 		if (pCallback)
 		{

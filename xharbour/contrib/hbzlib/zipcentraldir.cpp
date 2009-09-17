@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipCentralDir.cpp $
 // $Archive: /ZipArchive/ZipCentralDir.cpp $
-// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $
+// $Date: 2009/09/13 13:03:32 $ $Author: likewolf $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -114,8 +114,9 @@ DWORD CZipCentralDir::Locate()
 {
 
 	// maximum size of end of central dir record
-	long uMaxRecordSize = 0xffff + CENTRALDIRSIZE;
-	DWORD uFileSize = m_pStorage->m_pFile->GetLength();
+   long uMaxRecordSize = 0xffff + CENTRALDIRSIZE;
+
+   DWORD uFileSize = (DWORD) m_pStorage->m_pFile->GetLength();
 
 	if ((DWORD)uMaxRecordSize > uFileSize)
 		uMaxRecordSize = uFileSize;
@@ -607,7 +608,7 @@ bool CZipCentralDir::RemoveDataDescr(bool bFromBuffer)
 	}
 	else
 	{
-		uSize = m_pStorage->m_pFile->GetLength();
+      uSize = (DWORD) m_pStorage->m_pFile->GetLength();
 		// we cannot use CZipMemFile in multidisk archive
 		// so it MUST be CZipFile
 		if (!fm.CreateMapping(static_cast<CZipFile*>(m_pStorage->m_pFile)))
