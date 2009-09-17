@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.29 2009/08/16 21:32:52 lculik Exp $
+ * $Id: ftpcln.prg,v 1.30 2009/08/17 01:20:42 lculik Exp $
  */
 
 /*
@@ -160,6 +160,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD MPut
    METHOD StartCleanLogFile()
    METHOD fileSize( cFileSpec )
+   METHOD CDUP()
    DESTRUCTOR FtpClnDesTructor
 ENDCLASS
 
@@ -321,6 +322,10 @@ METHOD CWD( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "CWD " + cPath + ::cCRLF )
 RETURN ::GetReply()
 
+
+METHOD CDUP(  ) CLASS tIPClientFTP
+   ::InetSendall( ::SocketCon, "CDUP " + ::cCRLF )
+RETURN ::GetReply()
 
 METHOD PWD() CLASS tIPClientFTP
 
