@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive_Linux/ZipPlatform.cpp $
-// $Date: 2003/08/20 19:33:52 $ $Author: lculik $
+// $Date: 2009/09/16 21:22:20 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -218,6 +218,7 @@ ZIPINLINE void ZipPlatform::AnsiOem(CZipAutoBuffer& buffer, bool bAnsiToOem)
 ZIPINLINE  bool ZipPlatform::RemoveFile(LPCTSTR lpszFileName, bool bThrow)
 {
 	if (unlink(lpszFileName) != 0)
+   {
 		if (bThrow)
 		{
 			CZipException::Throw(CZipException::notRemoved, lpszFileName);
@@ -225,7 +226,8 @@ ZIPINLINE  bool ZipPlatform::RemoveFile(LPCTSTR lpszFileName, bool bThrow)
 		else 
 		{
 			return false;
-		}	
+		}
+   }
 	return true;
 
 
@@ -234,6 +236,7 @@ ZIPINLINE  bool ZipPlatform::RenameFile( LPCTSTR lpszOldName, LPCTSTR lpszNewNam
 {
 
 	if (rename(lpszOldName, lpszNewName) != 0)
+   {
 		if (bThrow)
 		{
 			CZipException::Throw(CZipException::notRenamed, lpszOldName);
@@ -241,8 +244,9 @@ ZIPINLINE  bool ZipPlatform::RenameFile( LPCTSTR lpszOldName, LPCTSTR lpszNewNam
 		else 
 		{
 			return false;
-		}	
-		return true;
+		}
+   }
+   return true;
 
 }
 ZIPINLINE  bool ZipPlatform::IsDirectory(DWORD uAttr)

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPathComponent.cpp $
 // $Archive: /ZipArchive_Linux/ZipPathComponent.cpp $
-// $Date: 2003/08/20 19:33:52 $ $Author: lculik $
+// $Date: 2009/09/16 21:22:20 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -37,7 +37,7 @@ void CZipPathComponent::SetFullPath(LPCTSTR lpszFullPath)
 		iLen = szTempPath.GetLength();
 	CZipString szPossiblePrefix = szTempPath.Left(iLen);
 	szPossiblePrefix.MakeLower(); // must perform case insensitive comparison
-	while (++i < iLen && szPossiblePrefix[i] == szPrefix[i]); 
+   while (++i < iLen && szPossiblePrefix[i] == szPrefix[i]) ;   
 	if (i == 2 || i == 4 || i == 8) // unc path, unicode path or unc path meeting windows file name conventions
 	{
 		m_szPrefix = szTempPath.Left(i);
@@ -47,7 +47,7 @@ void CZipPathComponent::SetFullPath(LPCTSTR lpszFullPath)
 	{
 		m_szPrefix.Empty();
 	}	
-
+   
 
 	m_szDrive.Empty(); 
 	m_szFileTitle.Empty();

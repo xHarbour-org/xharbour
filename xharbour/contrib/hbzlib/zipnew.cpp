@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.34 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: zipnew.cpp,v 1.35 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -76,6 +76,7 @@ class SpanCallback : public CZipSpanCallback
    bool Callback( int iProgress )
    {
       PHB_ITEM Disk = hb_itemPutNL( NULL, m_uDiskNeeded ) ;
+      ( void ) iProgress;              
 
       hb_vmEvalBlockV( ChangeDiskBlock, 1, Disk);
 
@@ -90,7 +91,7 @@ class SpanActionCallback : public CZipActionCallback
    bool Callback( int iProgress )
    {
       PHB_ITEM Disk = hb_itemPutNL( NULL , m_uTotalSoFar ), Total= hb_itemPutNL( NULL, m_uTotalToDo );
-
+      ( void ) iProgress;        
 
       hb_vmEvalBlockV( pProgressInfo, 2, Disk, Total);
 

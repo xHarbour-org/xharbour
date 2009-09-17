@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.20 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: zipcomp.cpp,v 1.21 2008/05/02 05:30:29 andijahja Exp $
  */
  
 /*
@@ -70,7 +70,7 @@ class SpanCallbackc : public CZipSpanCallback
    bool Callback( int iProgress )
    {
       PHB_ITEM Disk=hb_itemPutNL( NULL, m_uDiskNeeded );
-        
+      ( void ) iProgress;        
       hb_vmEvalBlockV( ChangeDiskBlock, 1, Disk  );
       hb_itemRelease( Disk );
 
@@ -83,6 +83,7 @@ class SpanActionCallbackc : public CZipActionCallback
    bool Callback( int iProgress )
    {
       PHB_ITEM Disk =hb_itemPutNL(NULL, m_uTotalSoFar ),  Total=hb_itemPutNL( NULL, m_uTotalToDo );
+      ( void ) iProgress;
 
 
       hb_vmEvalBlockV( pProgressInfo, 2, Disk,Total);

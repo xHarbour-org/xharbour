@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2009/09/16 21:22:20 $ $Author: lculik $
+// $Date: 2009/09/17 16:36:51 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -1144,13 +1144,13 @@ void CZipArchive::DeleteFiles(CZipWordArray &aIndexes)
 bool CZipArchive::AddNewFile(LPCTSTR lpszFilePath,
                              int iComprLevel,
                              bool bFullPath,
-							 int iSmartLevel,
+                             int iSmartLevel,
                              unsigned long nBufSize)
 {
 
 	CZipAddNewFileInfo zanfi (lpszFilePath, bFullPath);
 	zanfi.m_iComprLevel = iComprLevel;
-	zanfi.m_iSmartLevel = zipsmSafeSmart;
+   zanfi.m_iSmartLevel = iSmartLevel;
 	zanfi.m_nBufSize = nBufSize;
 	return AddNewFile(zanfi);
 }
@@ -1164,7 +1164,7 @@ bool CZipArchive::AddNewFileDrv(LPCTSTR lpszFilePath,
 
    CZipAddNewFileInfo zanfi (lpszFilePath, bFullPath);
    zanfi.m_iComprLevel = iComprLevel;
-   zanfi.m_iSmartLevel = zipsmSafeSmart;
+   zanfi.m_iSmartLevel = iSmartLevel;
    zanfi.m_nBufSize = nBufSize;
    return AddNewFileDrv(zanfi);
 }
@@ -1177,7 +1177,7 @@ bool CZipArchive::AddNewFile(LPCTSTR lpszFilePath,
 {
 	CZipAddNewFileInfo zanfi(lpszFilePath, lpszFileNameInZip);
 	zanfi.m_iComprLevel = iComprLevel;
-	zanfi.m_iSmartLevel = zipsmSafeSmart;
+   zanfi.m_iSmartLevel = iSmartLevel;
 	zanfi.m_nBufSize = nBufSize;
 	return AddNewFile(zanfi);
 }
@@ -1190,7 +1190,7 @@ bool CZipArchive::AddNewFile(CZipMemFile& mf,
 {
 	CZipAddNewFileInfo zanfi(&mf, lpszFileNameInZip);
 	zanfi.m_iComprLevel = iComprLevel;
-	zanfi.m_iSmartLevel = zipsmSafeSmart;
+   zanfi.m_iSmartLevel = iSmartLevel;
 	zanfi.m_nBufSize = nBufSize;
 	return AddNewFile(zanfi);
 }
