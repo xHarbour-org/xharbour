@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.38 2009/02/04 11:26:56 likewolf Exp $
+ * $Id: macro.y,v 1.39 2009/03/25 21:33:54 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,10 @@
 
 //JC1: yylex is not threadsafe, we need mutexes
 #include "hbstack.h"    // that also includes thread.h
+
+#ifdef HB_THREAD_SUPPORT
+  #include "thread.h"
+#endif
 
 /* Compile using: bison -d -p hb_comp macro.y */
 

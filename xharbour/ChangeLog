@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6594 2009/09/17 17:35:59 lculik Exp $
+ * $Id: ChangeLog,v 1.6595 2009/09/18 07:49:43 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-18 13:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/thread.h
+  * source/vm/thread.c
+    * Fix MSVC compilation - wrap external callable functions with HB_EXTERN_BEGIN/END
+
+  * source/macro/macro.y
+  * source/rtl/hbserv.c
+    + Added missing: #include "thread.h"
+
+  * source/rtl/win32ole.prg
+    * Reverted to call OleThrowError()
+    ! Fixed ANSITOWIDE() and WIDETOANSI()
+
+  * contrib/xwt/src/xwt_win/xwt_win_framewnd.c
+    * Missing type cast
+
 2009-09-17 14:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/hbzlib/Linux/ZipPlatform.cpp
     contrib/hbzlib/Linux/ZipPathComponent.cpp
@@ -45,8 +62,8 @@
     * source\rtl\filenet.c
     * source\rtl\session.c
     * source\rdd\dbcmd.c
-      ! fixed some warnings.    
-    
+      ! fixed some warnings.
+
 2009-09-16 20:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\idle.c
     + Added #include "thread.h" for hb_threadSleep()
@@ -249,7 +266,7 @@
     ! Use const char * for some Set values.
   * source/rdd/wacore.c
     * Propagate HB_SET_WORKAREA_SHARED value to other threads when it's
-      changed. 
+      changed.
   + tests/mtset.prg
     + Added a test for Set() thread-safety.
 

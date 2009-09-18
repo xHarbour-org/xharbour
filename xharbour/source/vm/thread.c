@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.221 2009/01/24 00:33:10 likewolf Exp $
+* $Id: thread.c,v 1.222 2009/09/12 18:01:44 likewolf Exp $
 */
 
 /*
@@ -132,6 +132,9 @@ static UINT s_thread_unique_id;
 #elif !defined(HB_THREAD_TLS_KEYWORD)
    pthread_key_t hb_pkCurrentStack;
 #endif
+
+
+HB_EXTERN_BEGIN
 
 /* Declarations of shell mutexes */
 HB_COND_T hb_threadStackCond;
@@ -282,7 +285,6 @@ static UINT hb_threadUniqueId( void )
 
    return uiRet;
 }
-
 
 /*
   Creating a new stack
@@ -2511,6 +2513,8 @@ BOOL hb_threadMutexTryLock( PHB_ITEM pItem, BOOL bError )
    return bLock;
 }
 
+HB_EXTERN_END
+
 HB_FUNC( HB_MUTEXTRYLOCK )
 {
    HB_THREAD_STUB_API
@@ -2732,13 +2736,14 @@ HB_FUNC( NOTIFYALL )
    }
 }
 
-
 #endif //thread support
 
 
 /******************************************************************/
 /* Part 7: Xharbour thread functions available in ST mode         */
 /******************************************************************/
+
+HB_EXTERN_BEGIN
 
 void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
 {
@@ -2789,6 +2794,8 @@ void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
 
    HB_STACK_LOCK;
 }
+
+HB_EXTERN_END
 
 HB_FUNC( THREADSLEEP )
 {

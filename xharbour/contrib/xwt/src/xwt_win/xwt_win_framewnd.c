@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.9 2008/05/01 22:28:51 andijahja Exp $
+   $Id: xwt_win_framewnd.c,v 1.10 2009/09/13 20:03:57 likewolf Exp $
 
    MS-Windows interface - Frame window
 */
@@ -232,7 +232,7 @@ static PHB_ITEM xwt_win_findMenuItem( PHB_BASEARRAY pBar, UINT uiId )
       else
       {
          hb_objSendMsg( pMenuItem, "ACHILDREN",0 );
-         pRet = xwt_win_findMenuItem( hb_arrayId( hb_stackReturnItem() ), uiId );
+         pRet = xwt_win_findMenuItem( (PHB_BASEARRAY) hb_arrayId( hb_stackReturnItem() ), uiId );
          if ( pRet != NULL )
          {
             return pRet;
@@ -251,52 +251,52 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
     WPARAM wParam,
     LPARAM lParam
 )
-{ 
+{
    XWT_WIN_MAKESELF( hwnd );
-   
+
    switch( uMsg ) {
-      case WM_CREATE: 
+      case WM_CREATE:
       break;
-         
+
       case WM_COMMAND:
          if ( HIWORD( wParam ) == 0 )
          {
             PHB_BASEARRAY pMenu = (( PXWT_WIN_DATA) _wSelf->widget_data )->pMenu;
             PHB_ITEM pMenuItem;
-            
+
             pMenuItem = xwt_win_findMenuItem( pMenu, LOWORD( wParam ) );
 
             if ( pMenuItem != NULL )
-            {            
-               xwt_rise_event( pMenuItem, XWT_E_CLICKED, 0 ); 
+            {
+               xwt_rise_event( pMenuItem, XWT_E_CLICKED, 0 );
             }
          }
       return 0;
-      
+
       case WM_CLOSE:
          if ( ! xwt_rise_event( &Self, XWT_E_DESTROY_REQ, 0 ) )
          {
-            // This will 1: rise destroyed event, 2: call widget destructor, 
+            // This will 1: rise destroyed event, 2: call widget destructor,
             //   3: rise destruction signals/events in all the childs
             hb_objSendMsg( &Self, "DESTROY", 0 );
          }
       return 0;
-   
+
       //todo: rise XWT events
    }
-   
+
    // event managed
    return DefWindowProc( hwnd, uMsg, wParam, lParam );
-}      
+}
 
 /* Create the window */
-   
+
 BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
 {
    PXWT_WIN_DATA data;
    HWND hWnd;
-   
-   hWnd =  CreateWindow( 
+
+   hWnd =  CreateWindow(
     XWT_WIN_FRMCLSNAME,
     "", // no name now
     WS_SYSMENU | WS_OVERLAPPEDWINDOW ,  // not visible now
@@ -310,7 +310,7 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
     NULL // no win parameter
    );
 
-   if ( hWnd == NULL ) 
+   if ( hWnd == NULL )
       return FALSE;
 
    data = (PXWT_WIN_DATA) hb_xgrab( sizeof( XWT_WIN_DATA ) );
@@ -324,10 +324,10 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
    data->pMenu = NULL;
    data->hMainWidget = NULL;
    data->hStatusBar = NULL;
-   
+
    /* BackReferences our XWT widget */
    SetWindowLong( hWnd, GWL_USERDATA, (LONG) xwtData );
-      
+
    /* Forward reference the window into XWT_WIDGET */
    xwtData->widget_data = (void *) data;
    xwtData->destructor = xwt_win_free_wnd;

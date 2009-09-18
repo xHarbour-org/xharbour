@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.130 2009/01/16 01:56:00 likewolf Exp $
+* $Id: thread.h,v 1.131 2009/09/12 18:01:43 likewolf Exp $
 */
 
 /*
@@ -533,7 +533,7 @@ typedef struct tag_HB_STACK
    struct _HB_FINALLY *pFinally;
 
    unsigned int uiVMFlags;
-   
+
    /* FS api error system */
    USHORT uiErrorLast;
    USHORT uiOsErrorLast;
@@ -779,6 +779,10 @@ typedef struct tag_HB_SHARED_RESOURCE
       HB_CRITICAL_UNLOCK( mutex );\
    }
 
+HB_EXTERN_BEGIN
+
+extern HB_COND_T hb_threadStackCond;
+
 /************************************************************
 * List of mutexes that can be used to regulate concurency
 *************************************************************/
@@ -798,6 +802,7 @@ extern HB_CRITICAL_T hb_garbageAllocMutex;
 extern HB_CRITICAL_T hb_macroMutex;
 /* Mutex to control dynsym scanning and add */
 extern HB_CRITICAL_T hb_dynsymMutex;
+
 /* As dynsym require recursive locks, here I provide an hook that can
    be used in system that do not provide a native spinlock count to
    implement a user-defined spinlock scheme */
@@ -882,6 +887,8 @@ void hb_threadCancelInternal( void );
    BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
    void hb_threadMtxPoll( HB_CRITICAL_T mtx );
 #endif
+
+HB_EXTERN_END
 
 /******************************************************/
 /* Definitions when threading is turned off */

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.40 2009/09/12 18:01:43 likewolf Exp $
+* $Id: hbserv.c,v 1.41 2009/09/16 04:34:16 andijahja Exp $
 */
 
 /*
@@ -62,6 +62,10 @@
 #include "hbstack.h"
 #include "hbserv.h"
 
+#ifdef HB_THREAD_SUPPORT
+   #include "thread.h"
+#endif
+
 #include <stdio.h>
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 ) // DOS and Darwin < 6.x can't compile this module
@@ -101,7 +105,7 @@ static int sb_isService = 0;
 
 /* There is a service mutex in multithreading */
 #ifdef HB_THREAD_SUPPORT
-static HB_CRITICAL_T s_ServiceMutex;
+   static HB_CRITICAL_T s_ServiceMutex;
 #endif
 
 /* This structure holds a translation to transform a certain OS level signal

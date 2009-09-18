@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.177 2009/08/08 01:17:44 what32 Exp $
+ * $Id: win32ole.prg,v 1.178 2009/08/08 21:58:09 what32 Exp $
  */
 
 /*
@@ -839,6 +839,9 @@ RETURN Self
 
         if( MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, nConvertedLen ) )
         {
+           //printf( "\nAnsi: '%s'\n", cString );
+           //printf( "Wide: '%ls' Len: %i : %i\n", wString, wcslen( wString ), nConvertedLen );
+
            return wString;
         }
         else
@@ -851,7 +854,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
+  HB_EXPORT LPSTR hb_oleWideToAnsi( LPWSTR wString )
   {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
@@ -861,6 +864,9 @@ RETURN Self
 
         if( WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL ) )
         {
+           //printf( "\nWide: '%ls'\n", wString );
+           //printf( "Ansi: '%s'\n", cString );
+
            return cString;
         }
         else
@@ -868,9 +874,6 @@ RETURN Self
            hb_xfree( cString );
         }
      }
-
-     //wprintf( L"\nWide: '%s'\n", wString );
-     //printf( "\nAnsi: '%s'\n", cString );
 
      return NULL;
   }
@@ -1228,11 +1231,12 @@ RETURN Self
 
      if( cString )
      {
-        BSTR wString = hb_oleAnsiToWide( cString );
+        LPWSTR wString = hb_oleAnsiToWide( cString );
 
         if( wString )
         {
-           hb_retclenAdoptRaw( (char *) wString, SysStringLen( wString ) );
+           hb_retclenAdoptRaw( (char *) wString, ( wcslen( wString ) + 1 ) * 2 );
+           //printf( "Returning: '%ls' Len: %i\n", hb_stackReturnItem()->item.asString.value, hb_stackReturnItem()->item.asString.length );
            return;
         }
      }
@@ -1244,7 +1248,7 @@ RETURN Self
   //---------------------------------------------------------------------------//
   HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
   {
-     BSTR wString = ( BSTR ) hb_parc( 1 );
+     LPWSTR wString = (LPWSTR) hb_parc( 1 );
 
      if( wString )
      {
@@ -2847,8 +2851,14 @@ RETURN Self
               pDisp = OleVal.n1.n2.n3.pdispVal;
               goto OleGetID;
            }
+           else
+           {
+              pDisp = NULL;
+           }
         }
-        return;
+
+        //TraceLog( NULL, "Invoke Failed!\n" );
+        OleThrowError();
      }
 
      FreeParams( &DispParams, aPrgParams );
