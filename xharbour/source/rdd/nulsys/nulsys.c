@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.12 2009/02/24 12:38:32 marchuet Exp $
+ * $Id: nulsys.c,v 1.13 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -126,6 +126,8 @@ void hb_rddCloseAll( void ) {}
 void hb_rddShutDown( void ) {}
 
 
+HB_EXTERN_BEGIN
+
 PHB_STACKRDD hb_rddWaInit( void )
 {
    return NULL;
@@ -135,6 +137,8 @@ void hb_rddWaShutDown( PHB_STACKRDD pRddInfo )
 {
    HB_SYMBOL_UNUSED( pRddInfo );
 }
+
+HB_EXTERN_END
 
 HB_FUNC( RDDSYS ) {}
 

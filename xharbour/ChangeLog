@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6595 2009/09/18 07:49:43 marchuet Exp $
+ * $Id: ChangeLog,v 1.6596 2009/09/18 17:41:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-18 16:59 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rdd/nulsys/nulsys.c
+    * MSVC linker - Wrap hb_rddWaInit() and hb_rddWaShutDown() with HB_EXTERN_BEGIN/END
 
 2009-09-18 13:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/thread.h
