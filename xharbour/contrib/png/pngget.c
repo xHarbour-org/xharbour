@@ -1,5 +1,5 @@
 /*
- * $Id: pngwtran.c,v 1.9 2009/07/17 13:09:12 andijahja Exp $
+ * $Id: png.c,v 1.10 2009/08/15 14:12:55 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct

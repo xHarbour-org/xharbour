@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.8 2009/06/04 22:00:56 andijahja Exp $
+ * $Id: png.c,v 1.10 2009/08/15 14:12:55 andijahja Exp $
  */
 
 /* pngwtran.c - transforms the data in a row for PNG writers

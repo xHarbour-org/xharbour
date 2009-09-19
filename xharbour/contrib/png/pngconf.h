@@ -1,10 +1,10 @@
 /*
- * $Id: pngwtran.c,v 1.9 2009/07/17 13:09:12 andijahja Exp $
+ * $Id: png.c,v 1.10 2009/08/15 14:12:55 andijahja Exp $
  */
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.39 - August 13, 2009
+ * libpng version 1.2.40 - September 10, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
