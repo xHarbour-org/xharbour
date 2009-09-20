@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.89 2008/03/18 06:41:39 likewolf Exp $
+ * $Id: debugger.prg,v 1.90 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -192,9 +192,13 @@ CREATE CLASS HBDebugger
 
    VAR nMaxRow
    VAR nMaxCol
+   VAR nAppMaxRow, nAppMaxCol  //x new: app's maxrow/col
+   VAR nAppWindow
+
 
    VAR hUserWindow
    VAR hDebuggerWindow
+   VAR nDebuggerWindow
    VAR lDebuggerWindowIsOpen INIT .F.
 
    VAR aBreakPoints      INIT {}
@@ -239,6 +243,7 @@ CREATE CLASS HBDebugger
    VAR lPPO              INIT .F.
    VAR lRunAtStartup     INIT .T.   // Clipper compatible
    VAR lLineNumbers      INIT .T.
+   VAR cGTVersion        INIT ' '
    VAR nHelpPage         INIT 1
    VAR nWaFocus          INIT 1
 
@@ -394,8 +399,22 @@ METHOD New() CLASS HBDebugger
    ::lGo := ::lRunAtStartup
 
    /* Store the initial screen dimensions for now */
-   ::nMaxRow := MaxRow()
-   ::nMaxCol := MaxCol()
+   IF hb_gtVersion() == 'WVW' .and. ;
+      !( type( 'WVW_NOPENWINDOW()' ) == 'U' .OR. Type( 'WVW_NSETCURWINDOW()' ) == 'U' .OR. ;
+      Type( 'WNDINIT()' ) == 'U')
+      ::cGTVersion := 'WVW'
+      ::nMaxRow := DEBUGGER_MAXROW
+      ::nMaxCol := DEBUGGER_MAXCOL
+   ELSE
+
+      ::nMaxRow := MaxRow()
+      ::nMaxCol := MaxCol()
+   ENDIF
+
+   /* Store the initial screen dimensions for now */
+   ::nAppMaxRow := MaxRow()
+   ::nAppMaxCol := MaxCol()
+
 
    ::oPullDown := __dbgBuildMenu( Self )
 
@@ -421,14 +440,37 @@ METHOD New() CLASS HBDebugger
 
 METHOD OpenDebuggerWindow() CLASS HBDebugger
 
+   
+
    IF !::lDebuggerWindowIsOpen
-      ::hUserWindow := hb_gtInfo( HB_GTI_GETWIN )
-      IF ::hDebuggerWindow == NIL
-         ::hDebuggerWindow := hb_gtInfo( HB_GTI_GETWIN, ;
+      IF ::cGTVersion == 'WVW'
+         ::nAppMaxRow := maxrow()
+         ::nAppMaxCol := maxcol()
+         ::nAppWindow := hb_ExecFromArray( 'WVW_NSETCURWINDOW' )
+         ::lDebuggerWindowIsOpen := .T.
+         IF !Type( 'WNDINIT()' ) == 'U'
+            ::hDebuggerWindow := hb_ExecFromArray( 'WNDINIT', ;
+                      {  DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
+                        DEBUGGER_MAXROW, DEBUGGER_MAXCOL , "Debugger"} )
+
+         ELSE
+            ::hDebuggerWindow := hb_ExecFromArray( 'WVW_NOPENWINDOW', ;
+                      { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
+                        DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
+         ENDIF
+
+
+         hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::hDebuggerWindow } )
+
+      ELSE
+         ::hUserWindow := hb_gtInfo( HB_GTI_GETWIN )
+         IF ::hDebuggerWindow == NIL
+            ::hDebuggerWindow := hb_gtInfo( HB_GTI_GETWIN, ;
                                  { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
                                    DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
-      ELSE
-         hb_gtInfo( HB_GTI_SETWIN, ::hDebuggerWindow )
+         ELSE
+            hb_gtInfo( HB_GTI_SETWIN, ::hDebuggerWindow )
+         ENDIF
       ENDIF
       ::lDebuggerWindowIsOpen := .T.
    ENDIF
@@ -439,8 +481,24 @@ METHOD OpenDebuggerWindow() CLASS HBDebugger
 METHOD CloseDebuggerWindow() CLASS HBDebugger
 
    IF ::lDebuggerWindowIsOpen
-      ::hDebuggerWindow := hb_gtInfo( HB_GTI_GETWIN )
-      hb_gtInfo( HB_GTI_SETWIN, ::hUserWindow )
+      IF ::cGTVersion == 'WVW'
+         IF !Type( 'WNDCLOSE()' ) == 'U'
+            hb_ExecFromArray( 'WNDCLOSE' )
+            hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
+         ELSE
+            hb_ExecFromArray( 'WVW_LCLOSEWINDOW' )  
+            hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
+
+         ENDIF
+         IF !( Type( 'WVW_SHOWWINDOW()' ) == 'U' )
+           hb_ExecFromArray( 'WVW_SHOWWINDOW' )
+         ENDIF
+
+      ELSE
+
+         ::hDebuggerWindow := hb_gtInfo( HB_GTI_GETWIN )
+         hb_gtInfo( HB_GTI_SETWIN, ::hUserWindow )
+      ENDIF
       ::lDebuggerWindowIsOpen := .F.
    ENDIF
 
@@ -1483,6 +1541,7 @@ METHOD HandleEvent() CLASS HBDebugger
 
 METHOD Hide() CLASS HBDebugger
    ::CloseDebuggerWindow()
+
    RETURN NIL
 
 

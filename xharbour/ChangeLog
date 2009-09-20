@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6597 2009/09/18 21:30:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6598 2009/09/19 13:41:12 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-20 12:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+   * source/debug/debug.prg
+     ! allow to use debugger with gtwvw or wvwtools
+   * contrib/gtwvw/hbgtwvw.h
+   * contrib/gtwvw/gtwvw.c
+     app_data is now pointer
+     ! changes all s_sApp. to s_sApp->
+   * contrib/gtwvw/wvwdraw.c
+   * contrib/gtwvw/wwwfuncs
+     ! changes all s_sApp. to s_sApp->
 
 2009-09-19 20:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * contrib/png/png.c

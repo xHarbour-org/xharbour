@@ -1,5 +1,5 @@
 /*
-* $Id: wvwfuncs.c,v 1.2 2009/08/30 15:08:45 lculik Exp $
+* $Id: wvwfuncs.c,v 1.3 2009/09/07 21:36:20 lculik Exp $
  */
 /*
  * WVWDRAW.C
@@ -1487,11 +1487,11 @@ HB_FUNC( WINDOW2BITMAP )
 HB_FUNC( WVW_SETMAXBMCACHE )
 {
    WVW_DATA *  p = hb_getWvwData();	
-   UINT uiOldMaxBMcache = p->s_sApp.uiMaxBMcache;
+   UINT uiOldMaxBMcache = p->s_sApp->uiMaxBMcache;
 
    if ( ! ISNIL( 1 ) )
    {
-     p->s_sApp.uiMaxBMcache = (UINT) hb_parni( 1 );
+     p->s_sApp->uiMaxBMcache = (UINT) hb_parni( 1 );
    }
 
    hb_retni( uiOldMaxBMcache );
@@ -1503,7 +1503,7 @@ HB_FUNC( WVW_SETMAXBMCACHE )
 HB_FUNC( WVW_NUMBMCACHE )
 {
    WVW_DATA *  p = hb_getWvwData();
-   hb_retni( p->s_sApp.uiBMcache );
+   hb_retni( p->s_sApp->uiBMcache );
 }
 
 
@@ -1540,7 +1540,7 @@ HB_FUNC (WVW_SETTIMER)
    UINT usWinNum = WVW_WHICH_WINDOW;
    WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );   
 
-   if ( p->s_sApp.pSymWVW_TIMER )
+   if ( p->s_sApp->pSymWVW_TIMER )
    {
      SetTimer( pWindowData->hWnd, WVW_ID_BASE_TIMER+usWinNum, (UINT) hb_parni(2), NULL );
 
@@ -1563,7 +1563,7 @@ HB_FUNC (WVW_KILLTIMER)
    UINT usWinNum = WVW_WHICH_WINDOW;
    WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );   
 
-   if ( p->s_sApp.pSymWVW_TIMER )
+   if ( p->s_sApp->pSymWVW_TIMER )
    {
      KillTimer( pWindowData->hWnd, WVW_ID_BASE_TIMER+usWinNum );
      hb_retl( TRUE );
@@ -1701,12 +1701,12 @@ HB_FUNC( WVW_LOADPICTURE )
 
    if ( iPicture )
    {
-      if ( p->s_sApp.iPicture[ iSlot ] )
+      if ( p->s_sApp->iPicture[ iSlot ] )
       {
-         hb_gt_wvwDestroyPicture( p->s_sApp.iPicture[ iSlot ] );
+         hb_gt_wvwDestroyPicture( p->s_sApp->iPicture[ iSlot ] );
       }
 
-      p->s_sApp.iPicture[ iSlot ] = iPicture;
+      p->s_sApp->iPicture[ iSlot ] = iPicture;
       bResult = TRUE;
    }
    hb_retl( bResult );
@@ -1745,11 +1745,11 @@ HB_FUNC( WVW_LOADFONT )
    hFont = CreateFontIndirect( &logfont );
    if ( hFont )
    {
-      if ( p->s_sApp.hUserFonts[ iSlot ] )
+      if ( p->s_sApp->hUserFonts[ iSlot ] )
       {
-         DeleteObject( (HFONT) p->s_sApp.hUserFonts[ iSlot ] );
+         DeleteObject( (HFONT) p->s_sApp->hUserFonts[ iSlot ] );
       }
-      p->s_sApp.hUserFonts[ iSlot ] = hFont;
+      p->s_sApp->hUserFonts[ iSlot ] = hFont;
    }
 }
 
@@ -1773,11 +1773,11 @@ HB_FUNC( WVW_LOADPEN )
 
    if ( hPen )
    {
-      if ( p->s_sApp.hUserPens[ iSlot ] )
+      if ( p->s_sApp->hUserPens[ iSlot ] )
       {
-         DeleteObject( (HPEN) p->s_sApp.hUserPens[ iSlot ] );
+         DeleteObject( (HPEN) p->s_sApp->hUserPens[ iSlot ] );
       }
-      p->s_sApp.hUserPens[ iSlot ] = hPen;
+      p->s_sApp->hUserPens[ iSlot ] = hPen;
 
       hb_retl( TRUE );
    }
@@ -2034,7 +2034,7 @@ HB_FUNC( WVW_FILLRECTANGLE )
 
    if (!bUseBrush)
    {
-     SelectObject( p->s_pWindows[0]->hdc, (HBRUSH) p->s_sApp.OriginalBrush );
+     SelectObject( p->s_pWindows[0]->hdc, (HBRUSH) p->s_sApp->OriginalBrush );
      DeleteObject( hBrush );
    }
 
@@ -2139,12 +2139,12 @@ HB_FUNC( WVW_SETPEN )
       s_pWvwData->s_pWindows[usWinNum]->currentPen = hPen;
       */
 
-      if ( p->s_sApp.currentPen )
+      if ( p->s_sApp->currentPen )
       {
-         DeleteObject( (HPEN) p->s_sApp.currentPen );
+         DeleteObject( (HPEN) p->s_sApp->currentPen );
       }
 
-      p->s_sApp.currentPen = hPen;
+      p->s_sApp->currentPen = hPen;
 
       hb_retl( TRUE );
    }
@@ -2191,12 +2191,12 @@ HB_FUNC( WVW_SETBRUSH )
       s_pWvwData->s_pWindows[usWinNum]->currentBrush = hBrush;
       */
 
-      if ( p->s_sApp.currentBrush )
+      if ( p->s_sApp->currentBrush )
       {
-         SelectObject( p->s_pWindows[0]->hdc, (HBRUSH) p->s_sApp.OriginalBrush );
-         DeleteObject( (HBRUSH) p->s_sApp.currentBrush );
+         SelectObject( p->s_pWindows[0]->hdc, (HBRUSH) p->s_sApp->OriginalBrush );
+         DeleteObject( (HBRUSH) p->s_sApp->currentBrush );
       }
-      p->s_sApp.currentBrush = hBrush;
+      p->s_sApp->currentBrush = hBrush;
 
       hb_retl( TRUE );
    }
@@ -2381,7 +2381,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
    for ( iIndex = 0; iIndex < WVW_DLGML_MAX; iIndex++ )
    {
-      if ( p->s_sApp.hDlgModeless[ iIndex ] == NULL )
+      if ( p->s_sApp->hDlgModeless[ iIndex ] == NULL )
       {
          break;
       }
@@ -2458,24 +2458,24 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
       if ( hDlg )
       {
-         p->s_sApp.hDlgModeless[ iIndex ] = hDlg;
+         p->s_sApp->hDlgModeless[ iIndex ] = hDlg;
          if ( pFunc )
          {
 
             /* if codeblock, store the codeblock and lock it there */
             if (HB_IS_BLOCK( pFirst ))
             {
-               p->s_sApp.pcbFunc[ iIndex ] = pFunc;
+               p->s_sApp->pcbFunc[ iIndex ] = pFunc;
 
             }
 
-            p->s_sApp.pFunc[ iIndex ] = pFunc;
-            p->s_sApp.iType[ iIndex ] = iType;
+            p->s_sApp->pFunc[ iIndex ] = pFunc;
+            p->s_sApp->iType[ iIndex ] = iType;
          }
          else
          {
-            p->s_sApp.pFunc[ iIndex ] = NULL;
-            p->s_sApp.iType[ iIndex ] = 0;
+            p->s_sApp->pFunc[ iIndex ] = NULL;
+            p->s_sApp->iType[ iIndex ] = 0;
          }
          SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
       }
@@ -2487,7 +2487,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
             hb_itemRelease( pFunc );
          }
 
-         p->s_sApp.hDlgModeless[ iIndex ] = NULL;
+         p->s_sApp->hDlgModeless[ iIndex ] = NULL;
       }
    }
 
@@ -2510,7 +2510,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    /* check if we still have room for a new dialog */
    for ( iIndex = 0; iIndex < WVW_DLGMD_MAX; iIndex++ )
    {
-      if ( p->s_sApp.hDlgModal[ iIndex ] == NULL )
+      if ( p->s_sApp->hDlgModal[ iIndex ] == NULL )
       {
          break;
       }
@@ -2527,11 +2527,11 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    {
       /* pFunc is pointing to stored code block (later) */
 
-      p->s_sApp.pcbFuncModal[ iIndex ] = hb_itemNew( pFirst );
+      p->s_sApp->pcbFuncModal[ iIndex ] = hb_itemNew( pFirst );
 
-      pFunc = p->s_sApp.pcbFuncModal[ iIndex ];
-      p->s_sApp.pFuncModal[ iIndex ] = pFunc;
-      p->s_sApp.iTypeModal[ iIndex ] = 2;
+      pFunc = p->s_sApp->pcbFuncModal[ iIndex ];
+      p->s_sApp->pFuncModal[ iIndex ] = pFunc;
+      p->s_sApp->iTypeModal[ iIndex ] = 2;
    }
    else if( pFirst->type == HB_IT_STRING )
    {
@@ -2542,8 +2542,8 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
       {
          pFunc = ( PHB_ITEM ) pExecSym;
       }
-      p->s_sApp.pFuncModal[ iIndex ] = pFunc;
-      p->s_sApp.iTypeModal[ iIndex ] = 1;
+      p->s_sApp->pFuncModal[ iIndex ] = pFunc;
+      p->s_sApp->iTypeModal[ iIndex ] = 1;
    }
 
    switch ( iResource )

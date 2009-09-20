@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.16 2009/08/23 22:46:12 lculik Exp $
+ * $Id: hbgtwvw.h,v 1.17 2009/08/30 15:08:45 lculik Exp $
  */
 
 /*
@@ -571,7 +571,7 @@ typedef struct wvw_data
  UINT s_usCurWindow ;                 /*current window handled by HB_GT_FUNC(...) */
 
  WIN_DATA *s_pWindows[ WVW_MAXWINDOWS ];   /*array of WIN_DATA                         */
- APP_DATA s_sApp;                          /*application wide vars                     */
+ APP_DATA *s_sApp;                          /*application wide vars                     */
 
 }WVW_DATA ;
 
@@ -589,7 +589,7 @@ extern HANDLE  hb_hPrevInstance;
 extern BOOL hb_gt_wvw_GetMainCoordMode( void );
 extern UINT hb_gt_wvw_GetNumWindows( void );
 extern UINT hb_gt_wvw_GetCurWindow( void );
-extern APP_DATA hb_gt_wvwGetAppData( void );
+extern APP_DATA* hb_gt_wvwGetAppData( void );
 extern WIN_DATA * hb_gt_wvw_GetWindowsData( UINT iWin ) ;
 extern WVW_DATA * hb_getWvwData( void ) ;
 extern char * hb_gt_wvw_GetAppName( void );

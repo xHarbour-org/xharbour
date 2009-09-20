@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.57 2009/09/06 14:39:32 lculik Exp $
+* $Id: gtwvw.c,v 1.58 2009/09/07 21:36:20 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -437,8 +437,11 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    
    if ( bStartMode )
    { 
-      s_pWvwData = (WVW_DATA*) hb_xgrab( sizeof (WVW_DATA )) ;
+      s_pWvwData = (WVW_DATA*) hb_xgrab( sizeof (WVW_DATA ) ) ;
       memset( s_pWvwData, 0, sizeof( WVW_DATA ) ) ;
+      s_pWvwData->s_sApp = (APP_DATA *) hb_xgrab( sizeof( APP_DATA ) );
+      memset(s_pWvwData->s_sApp, 0, sizeof( APP_DATA ) ) ;
+
       s_pWvwData->s_uiPaintRefresh = 100;  
       s_pWvwData->s_bMainCoordMode = FALSE;  
       s_pWvwData->s_bVertCaret     = FALSE;  
@@ -507,14 +510,14 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
       Ap¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
       o handle original da PEN e BRUSH do Device Context
    */
-   s_pWvwData->s_sApp.OriginalPen   = (HPEN) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp.penWhite );
-   s_pWvwData->s_sApp.OriginalBrush = (HBRUSH) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.currentBrush );
+   s_pWvwData->s_sApp->OriginalPen   = (HPEN) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->penWhite );
+   s_pWvwData->s_sApp->OriginalBrush = (HBRUSH) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->currentBrush );
    /*
       E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
       quando for utilizar DeleteObject()
    */
-   SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp.OriginalPen );
-   SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+   SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
+   SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
 
    /* SUPER GT initialization */
    HB_GTSUPER_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
@@ -554,9 +557,9 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
 
     for ( i = 0; i < WVW_DLGML_MAX; i++ )
     {
-       if ( s_pWvwData->s_sApp.hDlgModeless[ i ] )
+       if ( s_pWvwData->s_sApp->hDlgModeless[ i ] )
        {
-          SendMessage( s_pWvwData->s_sApp.hDlgModeless[ i ], WM_CLOSE, 0, 0 );
+          SendMessage( s_pWvwData->s_sApp->hDlgModeless[ i ], WM_CLOSE, 0, 0 );
        }
     }
 
@@ -570,7 +573,7 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
        {
 
          KillTimer( pWindowData->hWnd, WVW_ID_SYSTEM_TIMER );
-         if ( s_pWvwData->s_sApp.pSymWVW_TIMER )
+         if ( s_pWvwData->s_sApp->pSymWVW_TIMER )
          {
            KillTimer( pWindowData->hWnd, WVW_ID_BASE_TIMER+j );
          }
@@ -587,59 +590,59 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
             /*
               Seleciona PEN e BRUSH Originais
             */
-            SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp.OriginalPen );
-            SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+            SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
+            SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
 
             /*
              Com PENs e BRUSHes liberadas, efetua exclusÆo
             */
-            if (s_pWvwData->s_sApp.penWhite)
+            if (s_pWvwData->s_sApp->penWhite)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penWhite );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penWhite );
             }
-            if (s_pWvwData->s_sApp.penWhiteDim)
+            if (s_pWvwData->s_sApp->penWhiteDim)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penWhiteDim );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penWhiteDim );
             }
-            if (s_pWvwData->s_sApp.penBlack)
+            if (s_pWvwData->s_sApp->penBlack)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penBlack );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penBlack );
             }
-            if (s_pWvwData->s_sApp.penDarkGray)
+            if (s_pWvwData->s_sApp->penDarkGray)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penDarkGray );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penDarkGray );
             }
-            if (s_pWvwData->s_sApp.penGray)
+            if (s_pWvwData->s_sApp->penGray)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penGray );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penGray );
             }
-            if (s_pWvwData->s_sApp.penNull)
+            if (s_pWvwData->s_sApp->penNull)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.penNull );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->penNull );
             }
-            if (s_pWvwData->s_sApp.currentPen)
+            if (s_pWvwData->s_sApp->currentPen)
             {
-               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp.currentPen );
+               DeleteObject( ( HPEN   ) s_pWvwData->s_sApp->currentPen );
             }
-            if (s_pWvwData->s_sApp.currentBrush)
+            if (s_pWvwData->s_sApp->currentBrush)
             {
-               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp.currentBrush );
+               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp->currentBrush );
             }
-            if (s_pWvwData->s_sApp.diagonalBrush)
+            if (s_pWvwData->s_sApp->diagonalBrush)
             {
-               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp.diagonalBrush );
+               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp->diagonalBrush );
             }
-            if (s_pWvwData->s_sApp.solidBrush)
+            if (s_pWvwData->s_sApp->solidBrush)
             {
-               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp.solidBrush );
+               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp->solidBrush );
             }
-            if (s_pWvwData->s_sApp.wvwWhiteBrush)
+            if (s_pWvwData->s_sApp->wvwWhiteBrush)
             {
-               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp.wvwWhiteBrush );
+               DeleteObject( ( HBRUSH ) s_pWvwData->s_sApp->wvwWhiteBrush );
             }
-            if (s_pWvwData->s_sApp.gridPen)
+            if (s_pWvwData->s_sApp->gridPen)
             {
-               DeleteObject( ( HPEN ) s_pWvwData->s_sApp.gridPen );
+               DeleteObject( ( HPEN ) s_pWvwData->s_sApp->gridPen );
             }
          }
 
@@ -712,59 +715,61 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
 
     for ( i = 0; i < WVW_PICTURES_MAX; i++ )
     {
-       if ( s_pWvwData->s_sApp.iPicture[ i ] )
+       if ( s_pWvwData->s_sApp->iPicture[ i ] )
        {
-          hb_gt_wvwDestroyPicture( s_pWvwData->s_sApp.iPicture[ i ] );
+          hb_gt_wvwDestroyPicture( s_pWvwData->s_sApp->iPicture[ i ] );
        }
     }
 
     for ( i = 0; i < WVW_FONTS_MAX; i++ )
     {
-       if ( s_pWvwData->s_sApp.hUserFonts[ i ] )
+       if ( s_pWvwData->s_sApp->hUserFonts[ i ] )
        {
-          DeleteObject( (HFONT) s_pWvwData->s_sApp.hUserFonts[ i ] );
+          DeleteObject( (HFONT) s_pWvwData->s_sApp->hUserFonts[ i ] );
        }
     }
 
     for ( i = 0; i < WVW_PENS_MAX; i++ )
     {
-       if ( s_pWvwData->s_sApp.hUserPens[ i ] )
+       if ( s_pWvwData->s_sApp->hUserPens[ i ] )
        {
-          DeleteObject( (HPEN) s_pWvwData->s_sApp.hUserPens[ i ] );
+          DeleteObject( (HPEN) s_pWvwData->s_sApp->hUserPens[ i ] );
        }
     }
 
-    if ( s_pWvwData->s_sApp.hMSImg32 )
+    if ( s_pWvwData->s_sApp->hMSImg32 )
     {
-       FreeLibrary( s_pWvwData->s_sApp.hMSImg32 );
+       FreeLibrary( s_pWvwData->s_sApp->hMSImg32 );
     }
 
-    while (s_pWvwData->s_sApp.pbhBitmapList)
+    while (s_pWvwData->s_sApp->pbhBitmapList)
     {
-      pbh     = s_pWvwData->s_sApp.pbhBitmapList->pNext;
-      DeleteObject (s_pWvwData->s_sApp.pbhBitmapList->hBitmap) ;
+      pbh     = s_pWvwData->s_sApp->pbhBitmapList->pNext;
+      DeleteObject (s_pWvwData->s_sApp->pbhBitmapList->hBitmap) ;
 
-      hb_xfree( s_pWvwData->s_sApp.pbhBitmapList );
-      s_pWvwData->s_sApp.pbhBitmapList = pbh;
+      hb_xfree( s_pWvwData->s_sApp->pbhBitmapList );
+      s_pWvwData->s_sApp->pbhBitmapList = pbh;
     }
 
-    while (s_pWvwData->s_sApp.pphPictureList)
+    while (s_pWvwData->s_sApp->pphPictureList)
     {
-      pph     = s_pWvwData->s_sApp.pphPictureList->pNext;
-      hb_gt_wvwDestroyPicture(s_pWvwData->s_sApp.pphPictureList->iPicture) ;
+      pph     = s_pWvwData->s_sApp->pphPictureList->pNext;
+      hb_gt_wvwDestroyPicture(s_pWvwData->s_sApp->pphPictureList->iPicture) ;
 
-      hb_xfree( s_pWvwData->s_sApp.pphPictureList );
-      s_pWvwData->s_sApp.pphPictureList = pph;
+      hb_xfree( s_pWvwData->s_sApp->pphPictureList );
+      s_pWvwData->s_sApp->pphPictureList = pph;
     }
 
-    while (s_pWvwData->s_sApp.pbhUserBitmap)
+    while (s_pWvwData->s_sApp->pbhUserBitmap)
     {
-      pbh     = s_pWvwData->s_sApp.pbhUserBitmap->pNext;
-      DeleteObject (s_pWvwData->s_sApp.pbhUserBitmap->hBitmap) ;
+      pbh     = s_pWvwData->s_sApp->pbhUserBitmap->pNext;
+      DeleteObject (s_pWvwData->s_sApp->pbhUserBitmap->hBitmap) ;
 
-      hb_xfree( s_pWvwData->s_sApp.pbhUserBitmap );
-      s_pWvwData->s_sApp.pbhUserBitmap = pbh;
+      hb_xfree( s_pWvwData->s_sApp->pbhUserBitmap );
+      s_pWvwData->s_sApp->pbhUserBitmap = pbh;
     }
+    if ( s_pWvwData->s_sApp )
+       hb_xfree( s_pWvwData->s_sApp ); 
     if ( s_pWvwData) 
        hb_xfree( s_pWvwData ) ;
 
@@ -879,11 +884,11 @@ static void hb_gt_wvw_SetCursorStyle( PHB_GT pGT, int iStyle )
   {
     if (!s_pWvwData->s_bVertCaret)
     {
-      s_pWvwData->s_sApp.CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->PTEXTSIZE.x, pWindowData->CaretSize );
+      s_pWvwData->s_sApp->CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->PTEXTSIZE.x, pWindowData->CaretSize );
     }
     else
     {
-      s_pWvwData->s_sApp.CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->CaretSize, pWindowData->PTEXTSIZE.y );
+      s_pWvwData->s_sApp->CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->CaretSize, pWindowData->PTEXTSIZE.y );
     }
   }
   hb_gt_wvwSetCaretOn( pWindowData, bCursorOn );
@@ -2316,12 +2321,12 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
    for ( iIndex = 0; iIndex < WVW_DLGML_MAX; iIndex++ )
    {
-      if ( ( s_pWvwData->s_sApp.hDlgModeless[ iIndex ] != NULL ) && ( s_pWvwData->s_sApp.hDlgModeless[ iIndex ] == hDlg ) )
+      if ( ( s_pWvwData->s_sApp->hDlgModeless[ iIndex ] != NULL ) && ( s_pWvwData->s_sApp->hDlgModeless[ iIndex ] == hDlg ) )
       {
-         if ( s_pWvwData->s_sApp.pFunc[ iIndex ] != NULL )
+         if ( s_pWvwData->s_sApp->pFunc[ iIndex ] != NULL )
          {
-            pFunc = s_pWvwData->s_sApp.pFunc[ iIndex ];
-            iType = s_pWvwData->s_sApp.iType[ iIndex ];
+            pFunc = s_pWvwData->s_sApp->pFunc[ iIndex ];
+            iType = s_pWvwData->s_sApp->iType[ iIndex ];
          }
          break;
       }
@@ -2356,7 +2361,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
             /*
             
-            if (s_pWvwData->s_sApp.pFunc[ iIndex ]->type == HB_IT_BLOCK)
+            if (s_pWvwData->s_sApp->pFunc[ iIndex ]->type == HB_IT_BLOCK)
             {
               HB_ITEM hihDlg, himessage, hiwParam, hilParam;
               PHB_ITEM pReturn;
@@ -2373,7 +2378,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_itemDo( (PHB_ITEM) s_pWvwData->s_sApp.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) s_pWvwData->s_sApp->pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
 
               bReturn = hb_itemGetNL( pReturn );
               hb_itemRelease( pReturn );
@@ -2385,7 +2390,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
                if( hb_vmRequestReenter() )
                {
                   hb_vmPushEvalSym();
-                  hb_vmPush( s_pWvwData->s_sApp.pFunc[ iIndex ] );
+                  hb_vmPush( s_pWvwData->s_sApp->pFunc[ iIndex ] );
                   hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hDlg );
                   hb_vmPushNumInt( message );
                   hb_vmPushNumInt( wParam );
@@ -2438,15 +2443,15 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
       case WM_NCDESTROY:
       {
-         if ( s_pWvwData->s_sApp.pFunc[ iIndex ] != NULL && s_pWvwData->s_sApp.iType[ iIndex ] == 2 )
+         if ( s_pWvwData->s_sApp->pFunc[ iIndex ] != NULL && s_pWvwData->s_sApp->iType[ iIndex ] == 2 )
          {
-            hb_itemRelease( s_pWvwData->s_sApp.pFunc[ iIndex ] );
+            hb_itemRelease( s_pWvwData->s_sApp->pFunc[ iIndex ] );
 
          }
-         s_pWvwData->s_sApp.hDlgModeless[ iIndex ] = NULL;
+         s_pWvwData->s_sApp->hDlgModeless[ iIndex ] = NULL;
 
-         s_pWvwData->s_sApp.pFunc[ iIndex ] = NULL;
-         s_pWvwData->s_sApp.iType[ iIndex ] = (int) NULL;
+         s_pWvwData->s_sApp->pFunc[ iIndex ] = NULL;
+         s_pWvwData->s_sApp->iType[ iIndex ] = (int) NULL;
          bReturn = FALSE;
       }
       break;
@@ -2467,7 +2472,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
 
    if ( iFirst > 0 && iFirst <= WVW_DLGMD_MAX )
    {
-      s_pWvwData->s_sApp.hDlgModal[ iFirst-1 ] = hDlg ;
+      s_pWvwData->s_sApp->hDlgModal[ iFirst-1 ] = hDlg ;
       SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
       return ( bReturn );
    }
@@ -2476,12 +2481,12 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
 
    for ( iIndex = 0; iIndex < WVW_DLGMD_MAX; iIndex++ )
    {
-      if ( ( s_pWvwData->s_sApp.hDlgModal[ iIndex ] != NULL ) && ( s_pWvwData->s_sApp.hDlgModal[ iIndex ] == hDlg ) )
+      if ( ( s_pWvwData->s_sApp->hDlgModal[ iIndex ] != NULL ) && ( s_pWvwData->s_sApp->hDlgModal[ iIndex ] == hDlg ) )
       {
-         if ( s_pWvwData->s_sApp.pFuncModal[ iIndex ] != NULL )
+         if ( s_pWvwData->s_sApp->pFuncModal[ iIndex ] != NULL )
          {
-            pFunc = s_pWvwData->s_sApp.pFuncModal[ iIndex ];
-            iType = s_pWvwData->s_sApp.iTypeModal[ iIndex ];
+            pFunc = s_pWvwData->s_sApp->pFuncModal[ iIndex ];
+            iType = s_pWvwData->s_sApp->iTypeModal[ iIndex ];
          }
          break;
       }
@@ -2514,7 +2519,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
          {
             /* eval the codeblock */
             /*
-            if (s_pWvwData->s_sApp.pFuncModal[ iIndex ]->type == HB_IT_BLOCK )
+            if (s_pWvwData->s_sApp->pFuncModal[ iIndex ]->type == HB_IT_BLOCK )
             {
               HB_ITEM hihDlg, himessage, hiwParam, hilParam;
               PHB_ITEM pReturn;
@@ -2531,7 +2536,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_itemDo( (PHB_ITEM) s_pWvwData->s_sApp.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) s_pWvwData->s_sApp->pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
               hb_itemRelease( pReturn );
             }
@@ -2594,14 +2599,14 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
 
       case WM_NCDESTROY:
       {
-         if ( s_pWvwData->s_sApp.pFuncModal[ iIndex ] != NULL && s_pWvwData->s_sApp.iTypeModal[ iIndex ] == 2 )
+         if ( s_pWvwData->s_sApp->pFuncModal[ iIndex ] != NULL && s_pWvwData->s_sApp->iTypeModal[ iIndex ] == 2 )
          {
-            hb_itemRelease( s_pWvwData->s_sApp.pFuncModal[ iIndex ] );
+            hb_itemRelease( s_pWvwData->s_sApp->pFuncModal[ iIndex ] );
 
          }
-         s_pWvwData->s_sApp.hDlgModal[ iIndex ]   = NULL;
-         s_pWvwData->s_sApp.pFuncModal[ iIndex ]  = NULL;
-         s_pWvwData->s_sApp.iTypeModal[ iIndex ]  = ( int ) NULL;
+         s_pWvwData->s_sApp->hDlgModal[ iIndex ]   = NULL;
+         s_pWvwData->s_sApp->pFuncModal[ iIndex ]  = NULL;
+         s_pWvwData->s_sApp->iTypeModal[ iIndex ]  = ( int ) NULL;
          bReturn = FALSE;
       }
       break;
@@ -2639,33 +2644,33 @@ static void hb_gt_wvwCreateObjects( UINT usWinNum )
       return;
    }
 
-   s_pWvwData->s_sApp.penWhite     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
-   s_pWvwData->s_sApp.penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
-   s_pWvwData->s_sApp.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
-   s_pWvwData->s_sApp.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
-   s_pWvwData->s_sApp.penGray      = CreatePen( PS_SOLID, 0, ( COLORREF ) _COLORS[ 7 ] );
-   s_pWvwData->s_sApp.penNull      = CreatePen( PS_NULL , 0, ( COLORREF ) _COLORS[ 7 ] );
-   s_pWvwData->s_sApp.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
+   s_pWvwData->s_sApp->penWhite     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
+   s_pWvwData->s_sApp->penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
+   s_pWvwData->s_sApp->penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
+   s_pWvwData->s_sApp->penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
+   s_pWvwData->s_sApp->penGray      = CreatePen( PS_SOLID, 0, ( COLORREF ) _COLORS[ 7 ] );
+   s_pWvwData->s_sApp->penNull      = CreatePen( PS_NULL , 0, ( COLORREF ) _COLORS[ 7 ] );
+   s_pWvwData->s_sApp->currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
 
    lb.lbStyle      = BS_NULL;
    lb.lbColor      = RGB( 198,198,198 );
    lb.lbHatch      = 0;
-   s_pWvwData->s_sApp.currentBrush = CreateBrushIndirect( &lb );
+   s_pWvwData->s_sApp->currentBrush = CreateBrushIndirect( &lb );
 
    lb.lbStyle      = BS_HATCHED;
    lb.lbColor      = RGB( 210,210,210 );
    lb.lbHatch      = HS_DIAGCROSS; /* HS_BDIAGONAL; */
-   s_pWvwData->s_sApp.diagonalBrush = CreateBrushIndirect( &lb );
+   s_pWvwData->s_sApp->diagonalBrush = CreateBrushIndirect( &lb );
 
    lb.lbStyle      = BS_SOLID;
    lb.lbColor      = 0;   /* RGB( 0,0,0 ); */
    lb.lbHatch      = 0;
-   s_pWvwData->s_sApp.solidBrush = CreateBrushIndirect( &lb );
+   s_pWvwData->s_sApp->solidBrush = CreateBrushIndirect( &lb );
 
    lb.lbStyle      = BS_SOLID;
    lb.lbColor      = _COLORS[ 7 ];
    lb.lbHatch      = 0;
-   s_pWvwData->s_sApp.wvwWhiteBrush= CreateBrushIndirect( &lb );
+   s_pWvwData->s_sApp->wvwWhiteBrush= CreateBrushIndirect( &lb );
 
 }
 
@@ -2836,7 +2841,7 @@ static void hb_gt_wvwResetWindowSize( WIN_DATA * pWindowData, HWND hWnd )
   pWindowData->PTEXTSIZE.y = tm.tmHeight;       /*     but seems to be a problem on Win9X so */
                                       /*     assume proportional fonts always for Win9X */
 
-  if (pWindowData->fontWidth < 0 || s_pWvwData->s_sApp.Win9X || ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) || ( pWindowData->PTEXTSIZE.x != tm.tmMaxCharWidth ) )
+  if (pWindowData->fontWidth < 0 || s_pWvwData->s_sApp->Win9X || ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) || ( pWindowData->PTEXTSIZE.x != tm.tmMaxCharWidth ) )
   {
 
     pWindowData->FixedFont = FALSE;
@@ -3055,7 +3060,7 @@ static void xUserPaintNow( UINT usWinNum )
 
   if( hb_vmRequestReenter() )
   {
-     hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_PAINT );
+     hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_PAINT );
   hb_vmPushNil();
   hb_vmPushInteger( ( int ) (usWinNum)  );
 
@@ -3096,7 +3101,7 @@ static void xUserTimerNow( UINT usWinNum, HWND hWnd, UINT message, WPARAM wParam
 
   if( hb_vmRequestReenter() )
   {
-     hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_TIMER);
+     hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_TIMER);
      hb_vmPushNil();
      hb_vmPushInteger( ( int ) (usWinNum)  );
      hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd    );
@@ -3323,12 +3328,12 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
     case WM_MENUSELECT:
     {
-      if ( s_pWvwData->s_sApp.pSymWVW_MENUSELECT )
+      if ( s_pWvwData->s_sApp->pSymWVW_MENUSELECT )
       {
         if( hb_vmRequestReenter() )
         {
 
-           hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_MENUSELECT );
+           hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_MENUSELECT );
            hb_vmPushNil();
            hb_vmPushInteger( ( int ) (usWinNum)  );
            hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd    );
@@ -3520,7 +3525,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         FillRect( hdc, &rcRect, hBrush );
 
-        SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+        SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
         DeleteObject( hBrush );
       }
 
@@ -3569,7 +3574,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
           FillRect( hdc, &rcRect, hBrush );
 
-          SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+          SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
           DeleteObject( hBrush );
         }
 
@@ -3597,7 +3602,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( pWindowData->bPaint )
       {
-        if ( s_pWvwData->s_sApp.pSymWVW_PAINT )
+        if ( s_pWvwData->s_sApp->pSymWVW_PAINT )
         {
 
           pWindowData->bPaintPending = TRUE;
@@ -3656,12 +3661,12 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
       if ( pWindowData->bGetFocus )
       {
 
-        if ( s_pWvwData->s_sApp.pSymWVW_SETFOCUS )
+        if ( s_pWvwData->s_sApp->pSymWVW_SETFOCUS )
         {
            if( hb_vmRequestReenter() )
            {
  
-              hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_SETFOCUS);
+              hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_SETFOCUS);
               hb_vmPushNil();
               hb_vmPushInteger( ( int ) (usWinNum)  );
               hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd    );
@@ -3688,13 +3693,13 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         hb_gt_wvwKillCaret( pWindowData );
 
-      if ( s_pWvwData->s_sApp.pSymWVW_KILLFOCUS )
+      if ( s_pWvwData->s_sApp->pSymWVW_KILLFOCUS )
       {
 //        hb_vmPushState();
-//        hb_vmPushSymbol( s_pWvwData->s_sApp.pSymWVW_KILLFOCUS->pSymbol );
+//        hb_vmPushSymbol( s_pWvwData->s_sApp->pSymWVW_KILLFOCUS->pSymbol );
         if( hb_vmRequestReenter() )
         {
-           hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_KILLFOCUS ) ;
+           hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_KILLFOCUS ) ;
         hb_vmPushNil();
         hb_vmPushInteger( ( int ) (usWinNum)  );
            hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd );
@@ -3768,7 +3773,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
           break;
         case VK_F4:
         {
-          if ( s_pWvwData->s_sApp.AltF4Close && bAlt )
+          if ( s_pWvwData->s_sApp->AltF4Close && bAlt )
           {
             return( DefWindowProc( hWnd, message, wParam, lParam ) );
           }
@@ -4151,7 +4156,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_MOUSEWHEEL:
     case WM_NCMOUSEMOVE:
     {
-      //_asm { int 3h };
+
       if ( !hb_gt_wvwAcceptingInput() || ( usWinNum != s_pWvwData->s_usNumWindows-1 ) )
       {
 
@@ -4170,7 +4175,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
          xUserPaintNow(usWinNum);
       }
 
-      if ( wParam >= WVW_ID_BASE_TIMER && s_pWvwData->s_sApp.pSymWVW_TIMER )
+      if ( wParam >= WVW_ID_BASE_TIMER && s_pWvwData->s_sApp->pSymWVW_TIMER )
       {
         xUserTimerNow(usWinNum, hWnd, message, wParam, lParam);
       }
@@ -4217,11 +4222,11 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
          hb_gt_wvwResetWindowSize( pWindowData, hWnd );
 
-         if ( s_pWvwData->s_sApp.pSymWVW_SIZE )
+         if ( s_pWvwData->s_sApp->pSymWVW_SIZE )
          {
            if( hb_vmRequestReenter() )
            {
-              hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_SIZE );
+              hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_SIZE );
               hb_vmPushNil();
               hb_vmPushInteger( ( int ) (usWinNum)  );
               hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF )hWnd    );
@@ -4242,11 +4247,11 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
       if (hb_wvw_Move_Ready( 0 ))
       {
 
-         if (s_pWvwData->s_sApp.pSymWVW_MOVE )
+         if (s_pWvwData->s_sApp->pSymWVW_MOVE )
          {
            if( hb_vmRequestReenter() )
            {
-              hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_MOVE );
+              hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_MOVE );
               hb_vmPushNil();
               hb_vmPushInteger( ( int ) (usWinNum)  );
               hb_vmPushNumInt( wParam  );
@@ -4261,11 +4266,11 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_CTLCOLORSTATIC:
     case WM_CTLCOLOREDIT:
 
-      if ( s_pWvwData->s_sApp.pSymWVW_ONCTLCOLOR)
+      if ( s_pWvwData->s_sApp->pSymWVW_ONCTLCOLOR)
       {
 
         SetBkMode((HDC)wParam,TRANSPARENT);
-        hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_ONCTLCOLOR );
+        hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_ONCTLCOLOR );
         hb_vmPushNil();
         hb_vmPushNumInt( wParam  );
         hb_vmPushNumInt( lParam  );
@@ -4426,7 +4431,7 @@ static HWND hb_gt_wvwCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->hWnd = hWnd;
 
-  if ( s_pWvwData->s_sApp.pSymWVW_PAINT && s_pWvwData->s_uiPaintRefresh > 0)
+  if ( s_pWvwData->s_sApp->pSymWVW_PAINT && s_pWvwData->s_uiPaintRefresh > 0)
   {
     SetTimer( hWnd, WVW_ID_SYSTEM_TIMER, (UINT) s_pWvwData->s_uiPaintRefresh, NULL );
   }
@@ -4551,9 +4556,9 @@ DWORD hb_gt_wvwProcessMessages( WIN_DATA * pWindowData )
     bProcessed = FALSE;
     for ( iIndex = 0; iIndex < WVW_DLGML_MAX; iIndex++ )
     {
-       if ( s_pWvwData->s_sApp.hDlgModeless[ iIndex ] != 0 )
+       if ( s_pWvwData->s_sApp->hDlgModeless[ iIndex ] != 0 )
        {
-          if ( IsDialogMessage( s_pWvwData->s_sApp.hDlgModeless[ iIndex ], &msg ) )
+          if ( IsDialogMessage( s_pWvwData->s_sApp->hDlgModeless[ iIndex ], &msg ) )
           {
              bProcessed = TRUE;
              break;
@@ -4707,19 +4712,19 @@ static void hb_gt_wvwCreateCaret(WIN_DATA * pWindowData)
    {
      if (!s_pWvwData->s_bVertCaret)
      {
-       s_pWvwData->s_sApp.CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->PTEXTSIZE.x, pWindowData->CaretSize );
+       s_pWvwData->s_sApp->CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->PTEXTSIZE.x, pWindowData->CaretSize );
      }
      else
      {
-       s_pWvwData->s_sApp.CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->CaretSize, pWindowData->PTEXTSIZE.y );
+       s_pWvwData->s_sApp->CaretExist = CreateCaret( pWindowData->hWnd, ( HBITMAP ) NULL, pWindowData->CaretSize, pWindowData->PTEXTSIZE.y );
      }
    }
    else
    {
-     s_pWvwData->s_sApp.CaretExist = FALSE;
+     s_pWvwData->s_sApp->CaretExist = FALSE;
    }
 
-   if ( s_pWvwData->s_sApp.CaretExist && s_pWvwData->s_sApp.displayCaret )
+   if ( s_pWvwData->s_sApp->CaretExist && s_pWvwData->s_sApp->displayCaret )
    {
       hb_gt_wvwSetCaretPos(pWindowData);
       ShowCaret( pWindowData->hWnd );
@@ -4732,10 +4737,10 @@ static void hb_gt_wvwKillCaret( WIN_DATA * pWindowData )
 {
    HB_SYMBOL_UNUSED( pWindowData );
 
-   if ( s_pWvwData->s_sApp.CaretExist )
+   if ( s_pWvwData->s_sApp->CaretExist )
    {
       DestroyCaret();
-      s_pWvwData->s_sApp.CaretExist = FALSE ;
+      s_pWvwData->s_sApp->CaretExist = FALSE ;
    }
 }
 
@@ -4770,7 +4775,7 @@ static BOOL hb_gt_wvwSetCaretPos(WIN_DATA * pWindowData)
       xy.x += pWindowData->PTEXTSIZE.x;
     }
   }
-  if ( s_pWvwData->s_sApp.CaretExist )
+  if ( s_pWvwData->s_sApp->CaretExist )
   {
     SetCaretPos( xy.x, xy.y);
   }
@@ -5111,7 +5116,7 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
     pWindowData->caretPos.x       = 0;
     pWindowData->caretPos.y       = 0;
 
-    s_pWvwData->s_sApp.CaretExist       = FALSE;
+    s_pWvwData->s_sApp->CaretExist       = FALSE;
 
     pWindowData->CaretSize        = 2;
     pWindowData->mousePos.x       = 0;
@@ -5123,7 +5128,7 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
     pWindowData->keyLast          = 0;
     memset( &pWindowData->Keys, 0, sizeof( pWindowData->Keys ) );    
 
-    s_pWvwData->s_sApp.displayCaret     = TRUE;
+    s_pWvwData->s_sApp->displayCaret     = TRUE;
 
     pWindowData->RectInvalid.left = -1 ;
 
@@ -5148,8 +5153,8 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
 
     osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
     GetVersionEx ( &osvi );
-    s_pWvwData->s_sApp.Win9X            = ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS );
-    s_pWvwData->s_sApp.AltF4Close       = FALSE;
+    s_pWvwData->s_sApp->Win9X            = ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS );
+    s_pWvwData->s_sApp->AltF4Close       = FALSE;
 
     pWindowData->InvalidateWindow = TRUE;
     pWindowData->EnableShortCuts  = FALSE;
@@ -5242,51 +5247,51 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
     s_pWvwData->s_lfST.lfPitchAndFamily = FF_DONTCARE;
     strcpy( s_pWvwData->s_lfST.lfFaceName, pWindowData->fontFace);
 
-    s_pWvwData->s_sApp.pSymWVW_PAINT    = hb_dynsymFind( "WVW_PAINT" ) ;
-    s_pWvwData->s_sApp.pSymWVW_SETFOCUS = hb_dynsymFind( "WVW_SETFOCUS" ) ;
-    s_pWvwData->s_sApp.pSymWVW_KILLFOCUS= hb_dynsymFind( "WVW_KILLFOCUS" ) ;
-    s_pWvwData->s_sApp.pSymWVW_MOUSE    = hb_dynsymFind( "WVW_MOUSE" ) ;
-    s_pWvwData->s_sApp.pSymWVW_MENUSELECT = hb_dynsymFind( "WVW_MENUSELECT" ) ;
-    s_pWvwData->s_sApp.pSymWVW_TBMOUSE  = hb_dynsymFind( "WVW_TBMOUSE" ) ;
+    s_pWvwData->s_sApp->pSymWVW_PAINT    = hb_dynsymFind( "WVW_PAINT" ) ;
+    s_pWvwData->s_sApp->pSymWVW_SETFOCUS = hb_dynsymFind( "WVW_SETFOCUS" ) ;
+    s_pWvwData->s_sApp->pSymWVW_KILLFOCUS= hb_dynsymFind( "WVW_KILLFOCUS" ) ;
+    s_pWvwData->s_sApp->pSymWVW_MOUSE    = hb_dynsymFind( "WVW_MOUSE" ) ;
+    s_pWvwData->s_sApp->pSymWVW_MENUSELECT = hb_dynsymFind( "WVW_MENUSELECT" ) ;
+    s_pWvwData->s_sApp->pSymWVW_TBMOUSE  = hb_dynsymFind( "WVW_TBMOUSE" ) ;
 
-    s_pWvwData->s_sApp.pSymWVW_SIZE     = hb_dynsymFind( "WVW_SIZE" ) ;
-    s_pWvwData->s_sApp.pSymWVW_MOVE     = hb_dynsymFind( "WVW_MOVE" ) ;
+    s_pWvwData->s_sApp->pSymWVW_SIZE     = hb_dynsymFind( "WVW_SIZE" ) ;
+    s_pWvwData->s_sApp->pSymWVW_MOVE     = hb_dynsymFind( "WVW_MOVE" ) ;
 
-    s_pWvwData->s_sApp.pSymWVW_INPUTFOCUS = hb_dynsymFind( "WVW_INPUTFOCUS" ) ;
-    s_pWvwData->s_sApp.pSymWVW_TIMER = hb_dynsymFind( "WVW_TIMER" ) ;
-    s_pWvwData->s_sApp.pSymWVW_ONCTLCOLOR = hb_dynsymFind( "WVW_ONCTLCOLOR" ) ;
+    s_pWvwData->s_sApp->pSymWVW_INPUTFOCUS = hb_dynsymFind( "WVW_INPUTFOCUS" ) ;
+    s_pWvwData->s_sApp->pSymWVW_TIMER = hb_dynsymFind( "WVW_TIMER" ) ;
+    s_pWvwData->s_sApp->pSymWVW_ONCTLCOLOR = hb_dynsymFind( "WVW_ONCTLCOLOR" ) ;
 
     h = LoadLibraryEx( "msimg32.dll", NULL, 0 );
     if ( h )
     {
-      s_pWvwData->s_sApp.pfnGF = ( wvwGradientFill ) GetProcAddress( h, "GradientFill" );
-      if ( s_pWvwData->s_sApp.pfnGF )
+      s_pWvwData->s_sApp->pfnGF = ( wvwGradientFill ) GetProcAddress( h, "GradientFill" );
+      if ( s_pWvwData->s_sApp->pfnGF )
       {
-        s_pWvwData->s_sApp.hMSImg32 = h;
+        s_pWvwData->s_sApp->hMSImg32 = h;
       }
     }
 
     for ( iIndex = 0; iIndex < WVW_DLGML_MAX; iIndex++ )
     {
-       s_pWvwData->s_sApp.hDlgModeless[ iIndex ]        = NULL;
+       s_pWvwData->s_sApp->hDlgModeless[ iIndex ]        = NULL;
 
-       s_pWvwData->s_sApp.pFunc[ iIndex ]               = NULL;
-       s_pWvwData->s_sApp.iType[ iIndex ]               = (int) NULL;
+       s_pWvwData->s_sApp->pFunc[ iIndex ]               = NULL;
+       s_pWvwData->s_sApp->iType[ iIndex ]               = (int) NULL;
     }
 
     for ( iIndex = 0; iIndex < WVW_DLGMD_MAX; iIndex++ )
     {
-       s_pWvwData->s_sApp.hDlgModal[ iIndex ]           = NULL;
-       s_pWvwData->s_sApp.pFuncModal[ iIndex ]          = NULL;
-       s_pWvwData->s_sApp.iTypeModal[ iIndex ]          = ( int ) NULL;
+       s_pWvwData->s_sApp->hDlgModal[ iIndex ]           = NULL;
+       s_pWvwData->s_sApp->pFuncModal[ iIndex ]          = NULL;
+       s_pWvwData->s_sApp->iTypeModal[ iIndex ]          = ( int ) NULL;
     }
 
-    s_pWvwData->s_sApp.pbhBitmapList = NULL;
-    s_pWvwData->s_sApp.pphPictureList = NULL;
+    s_pWvwData->s_sApp->pbhBitmapList = NULL;
+    s_pWvwData->s_sApp->pphPictureList = NULL;
 
-    s_pWvwData->s_sApp.pbhUserBitmap = NULL;
-    s_pWvwData->s_sApp.uiBMcache = 0;
-    s_pWvwData->s_sApp.uiMaxBMcache = WVW_DEFAULT_MAX_BMCACHE;
+    s_pWvwData->s_sApp->pbhUserBitmap = NULL;
+    s_pWvwData->s_sApp->uiBMcache = 0;
+    s_pWvwData->s_sApp->uiMaxBMcache = WVW_DEFAULT_MAX_BMCACHE;
 
   }
   else
@@ -5481,7 +5486,7 @@ static void hb_gt_wvwSetStringInTextBuffer( WIN_DATA * pWindowData, int col, int
 static void hb_gt_wvwSetCaretOn( WIN_DATA * pWindowData, BOOL bOn )
 {
 
-  if ( s_pWvwData->s_sApp.CaretExist )
+  if ( s_pWvwData->s_sApp->CaretExist )
   {
     if ( bOn )
     {
@@ -5494,7 +5499,7 @@ static void hb_gt_wvwSetCaretOn( WIN_DATA * pWindowData, BOOL bOn )
     }
   }
 
-  s_pWvwData->s_sApp.displayCaret = bOn;
+  s_pWvwData->s_sApp->displayCaret = bOn;
 }
 
 /*-------------------------------------------------------------------*/
@@ -5516,7 +5521,7 @@ static void hb_gt_wvwMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
 
   HB_SYMBOL_UNUSED( hWnd );
   HB_SYMBOL_UNUSED( wParam );
-  //_asm { int 3h };
+
   if ( message == WM_MOUSEMOVE || message == WM_NCMOUSEMOVE )
   {
     if ( ! pWindowData->MouseMove )
@@ -5638,13 +5643,13 @@ static void hb_gt_wvwMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
        break;
   }
 
-  if ( s_pWvwData->s_sApp.pSymWVW_MOUSE && keyCode != 0 )
+  if ( s_pWvwData->s_sApp->pSymWVW_MOUSE && keyCode != 0 )
   {
     
     if( hb_vmRequestReenter() )
     {
     
-       hb_vmPushDynSym( s_pWvwData->s_sApp.pSymWVW_MOUSE );
+       hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_MOUSE );
     hb_vmPushNil();
     hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
     hb_vmPushLong( ( SHORT ) keyCode );
@@ -5790,10 +5795,10 @@ static void hb_gt_wvwTBMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT messa
        break;
   }
 
-  if ( s_pWvwData->s_sApp.pSymWVW_TBMOUSE && keyCode != 0 )
+  if ( s_pWvwData->s_sApp->pSymWVW_TBMOUSE && keyCode != 0 )
   {
     hb_vmPushState();
-    hb_vmPushSymbol( s_pWvwData->s_sApp.pSymWVW_TBMOUSE->pSymbol );
+    hb_vmPushSymbol( s_pWvwData->s_sApp->pSymWVW_TBMOUSE->pSymbol );
     hb_vmPushNil();
     hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
     hb_vmPushLong( ( SHORT ) keyCode );
@@ -5955,7 +5960,7 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
       return( 0 );
     }
 
-    if ( s_pWvwData->s_sApp.pSymWVW_PAINT && s_pWvwData->s_uiPaintRefresh > 0)
+    if ( s_pWvwData->s_sApp->pSymWVW_PAINT && s_pWvwData->s_uiPaintRefresh > 0)
     {
       SetTimer( hWnd, WVW_ID_SYSTEM_TIMER, (UINT) s_pWvwData->s_uiPaintRefresh, NULL );
     }
@@ -5994,8 +5999,8 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
        E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
        quando for utilizar DeleteObject()
     */
-    SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HPEN) s_pWvwData->s_sApp.OriginalPen );
-    SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+    SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
+    SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
 
 
     return ( s_pWvwData->s_usNumWindows-1 );
@@ -6020,7 +6025,7 @@ static void hb_gt_wvwCloseWindow( void )
 
       KillTimer( pWindowData->hWnd, WVW_ID_SYSTEM_TIMER );
 
-      if ( s_pWvwData->s_sApp.pSymWVW_TIMER )
+      if ( s_pWvwData->s_sApp->pSymWVW_TIMER )
       {
         KillTimer( pWindowData->hWnd, WVW_ID_BASE_TIMER+s_pWvwData->s_usNumWindows-1 );
       }
@@ -6177,14 +6182,14 @@ static void hb_gt_wvwInputNotAllowed( UINT usWinNum, UINT message, WPARAM wParam
   /* user may handle this event and returns .t. from .PRG level
      using function WVW_INPUTFOCUS()
    */
-  if ( s_pWvwData->s_sApp.pSymWVW_INPUTFOCUS )
+  if ( s_pWvwData->s_sApp->pSymWVW_INPUTFOCUS )
   {
     BOOL bHandled = FALSE;
 
     if( hb_vmRequestReenter() )
     {
 
-       hb_vmPushSymbol( s_pWvwData->s_sApp.pSymWVW_INPUTFOCUS->pSymbol );
+       hb_vmPushSymbol( s_pWvwData->s_sApp->pSymWVW_INPUTFOCUS->pSymbol );
        hb_vmPushNil();
        hb_vmPushInteger( ( int ) (usWinNum)  );
        hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) s_pWvwData->s_pWindows[ usWinNum ]->hWnd    );
@@ -6363,7 +6368,7 @@ void hb_gt_wvwFUNCEpilogue( void )
 
   hb_gt_wvwSetCurWindow( 0 );
 
-  if ( s_pWvwData->s_sApp.CaretExist && s_pWvwData->s_sApp.displayCaret )
+  if ( s_pWvwData->s_sApp->CaretExist && s_pWvwData->s_sApp->displayCaret )
   {
      hb_gt_wvwSetCaretPos(s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]);
 
@@ -7058,7 +7063,7 @@ static void hb_gt_wvwFillLineSpace( WIN_DATA * pWindowData, HDC hdc, USHORT star
   rc.bottom  = rc.top + (pWindowData->byLineSpacing / 2);
   FillRect( hdc, &rc, hBrush );
 
-  SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp.OriginalBrush );
+  SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
   DeleteObject( hBrush );
 
 }
@@ -7315,8 +7320,8 @@ BOOL HB_EXPORT hb_gt_wvwSetAltF4Close( BOOL bCanClose )
 {
   BOOL bWas;
 
-  bWas = s_pWvwData->s_sApp.AltF4Close;
-  s_pWvwData->s_sApp.AltF4Close = bCanClose;
+  bWas = s_pWvwData->s_sApp->AltF4Close;
+  s_pWvwData->s_sApp->AltF4Close = bCanClose;
   return( bWas );
 }
 
@@ -7766,11 +7771,11 @@ HB_EXPORT void hb_gt_wvwDrawBoxRaised( UINT usWinNum, int iTop, int iLeft, int i
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhiteDim );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhiteDim );
    }
    else
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhite );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhite );
    }
 
    MoveToEx( pWindowData->hdc, iLeft, iTop, NULL );        /*  Top Inner  */
@@ -7781,7 +7786,7 @@ HB_EXPORT void hb_gt_wvwDrawBoxRaised( UINT usWinNum, int iTop, int iLeft, int i
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhite );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhite );
 
      MoveToEx( pWindowData->hdc, iLeft-1, iTop-1, NULL );    /*  Top Outer  */
      LineTo( pWindowData->hdc, iRight+1, iTop-1 );
@@ -7792,11 +7797,11 @@ HB_EXPORT void hb_gt_wvwDrawBoxRaised( UINT usWinNum, int iTop, int iLeft, int i
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penDarkGray );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penDarkGray );
    }
    else
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penBlack );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penBlack );
    }
 
    MoveToEx( pWindowData->hdc, iLeft, iBottom, NULL );     /*  Bottom Inner  */
@@ -7807,7 +7812,7 @@ HB_EXPORT void hb_gt_wvwDrawBoxRaised( UINT usWinNum, int iTop, int iLeft, int i
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penBlack );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penBlack );
 
      MoveToEx( pWindowData->hdc, iLeft-1, iBottom+1, NULL ); /*  Bottom Outer */
      LineTo( pWindowData->hdc, iRight+1+1, iBottom+1 );
@@ -7835,11 +7840,11 @@ HB_EXPORT void hb_gt_wvwDrawBoxRecessed( UINT usWinNum, int iTop, int iLeft, int
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhiteDim );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhiteDim );
    }
    else
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhite );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhite );
    }
 
    MoveToEx( pWindowData->hdc, iRight, iTop, NULL );            /* Right Inner  */
@@ -7850,7 +7855,7 @@ HB_EXPORT void hb_gt_wvwDrawBoxRecessed( UINT usWinNum, int iTop, int iLeft, int
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penWhite );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penWhite );
 
      MoveToEx( pWindowData->hdc, iRight+1, iTop-1, NULL );        /* Right Outer  */
      LineTo( pWindowData->hdc, iRight + 1, iBottom + 1 );
@@ -7860,7 +7865,7 @@ HB_EXPORT void hb_gt_wvwDrawBoxRecessed( UINT usWinNum, int iTop, int iLeft, int
 
    }
 
-   SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penGray );
+   SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penGray );
 
    MoveToEx( pWindowData->hdc, iLeft, iTop, NULL );             /* Left Inner */
    LineTo( pWindowData->hdc, iLeft, iBottom );
@@ -7870,7 +7875,7 @@ HB_EXPORT void hb_gt_wvwDrawBoxRecessed( UINT usWinNum, int iTop, int iLeft, int
 
    if (!bTight)
    {
-     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp.penDarkGray );
+     SelectObject( pWindowData->hdc, s_pWvwData->s_sApp->penDarkGray );
 
      MoveToEx( pWindowData->hdc, iLeft - 1, iTop - 1, NULL );     /* Left Outer */
      LineTo( pWindowData->hdc, iLeft - 1 , iBottom + 1 );
@@ -8015,7 +8020,7 @@ char * hb_gt_wvw_GetAppName( void )
 	return s_pWvwData->szAppName;
 }	
 
-APP_DATA hb_gt_wvwGetAppData( void )
+APP_DATA *hb_gt_wvwGetAppData( void )
 {
    return s_pWvwData->s_sApp;
 }	
@@ -8700,7 +8705,7 @@ HB_FUNC( WVW_SETPAINTREFRESH )
    {
      s_pWvwData->s_uiPaintRefresh = hb_parni( 1 );
 
-     if ( s_pWvwData->s_sApp.pSymWVW_PAINT )
+     if ( s_pWvwData->s_sApp->pSymWVW_PAINT )
      {
        UINT i;
        for (i=0; i<s_pWvwData->s_usNumWindows; i++)
@@ -9516,7 +9521,7 @@ HB_FUNC( WVW_MAXIMIZE )
 {
    UINT usWinNum = WVW_WHICH_WINDOW;
 
-   if ( !(s_pWvwData->s_sApp.pSymWVW_SIZE) )
+   if ( !(s_pWvwData->s_sApp->pSymWVW_SIZE) )
    {
      /* the old, default behaviour as in gtwvt */
      ShowWindow( s_pWvwData->s_pWindows[usWinNum]->hWnd, SW_RESTORE );
@@ -9564,11 +9569,11 @@ HB_FUNC( WVW_RESTORE )
 /* NOTE: this is not supported in GTWVW
 HB_FUNC( WVW_SETGUI )
 {
-   BOOL bGui = s_pWvwData->s_sApp.bGui;
+   BOOL bGui = s_pWvwData->s_sApp->bGui;
 
    if ( ! ISNIL( 1 ) )
    {
-      s_pWvwData->s_sApp.bGui = hb_parl( 1 );
+      s_pWvwData->s_sApp->bGui = hb_parl( 1 );
    }
 
    hb_retl( bGui );
@@ -9842,7 +9847,7 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib)
    Windows controls such as toolbar, pushbutton, checkbox, etc */
 HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
 {
-  BITMAP_HANDLE * pbh = s_pWvwData->s_sApp.pbhBitmapList;
+  BITMAP_HANDLE * pbh = s_pWvwData->s_sApp->pbhBitmapList;
 
   BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
   while (pbh)
@@ -9878,9 +9883,9 @@ void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight
   pbhNew->hBitmap = hBitmap;
   pbhNew->iWidth = iWidth;
   pbhNew->iHeight = iHeight;
-  pbhNew->pNext = s_pWvwData->s_sApp.pbhBitmapList;
+  pbhNew->pNext = s_pWvwData->s_sApp->pbhBitmapList;
 
-  s_pWvwData->s_sApp.pbhBitmapList = pbhNew;
+  s_pWvwData->s_sApp->pbhBitmapList = pbhNew;
 
 }
 
@@ -9888,7 +9893,7 @@ void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight
    Windows controls such as toolbar, pushbutton, checkbox, etc */
 static IPicture * FindPictureHandle(char * szFileName, int * piWidth, int * piHeight)
 {
-  PICTURE_HANDLE * pph = s_pWvwData->s_sApp.pphPictureList;
+  PICTURE_HANDLE * pph = s_pWvwData->s_sApp->pphPictureList;
 
   BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
   while (pph)
@@ -9923,9 +9928,9 @@ static void AddPictureHandle(char * szFileName, IPicture * iPicture, int iWidth,
   pphNew->iPicture = iPicture;
   pphNew->iWidth = iWidth;
   pphNew->iHeight = iHeight;
-  pphNew->pNext = s_pWvwData->s_sApp.pphPictureList;
+  pphNew->pNext = s_pWvwData->s_sApp->pphPictureList;
 
-  s_pWvwData->s_sApp.pphPictureList = pphNew;
+  s_pWvwData->s_sApp->pphPictureList = pphNew;
 
 }
 
@@ -9935,7 +9940,7 @@ static void AddPictureHandle(char * szFileName, IPicture * iPicture, int iWidth,
  */
 static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
 {
-  BITMAP_HANDLE * pbh = s_pWvwData->s_sApp.pbhUserBitmap;
+  BITMAP_HANDLE * pbh = s_pWvwData->s_sApp->pbhUserBitmap;
   BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
 
   while (pbh)
@@ -9973,11 +9978,11 @@ static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, 
   pbhNew->iWidth = iWidth;
   pbhNew->iHeight = iHeight;
 
-  if (s_pWvwData->s_sApp.uiBMcache >= s_pWvwData->s_sApp.uiMaxBMcache)
+  if (s_pWvwData->s_sApp->uiBMcache >= s_pWvwData->s_sApp->uiMaxBMcache)
   {
     BITMAP_HANDLE *pbhTail, *pbhPrev;
 
-    pbhTail = s_pWvwData->s_sApp.pbhUserBitmap;
+    pbhTail = s_pWvwData->s_sApp->pbhUserBitmap;
     pbhPrev = NULL;
     while (pbhTail && pbhTail->pNext)
     {
@@ -9995,15 +10000,15 @@ static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, 
        }
        else
        {
-         s_pWvwData->s_sApp.pbhUserBitmap = NULL;
+         s_pWvwData->s_sApp->pbhUserBitmap = NULL;
        }
-       s_pWvwData->s_sApp.uiBMcache--;
+       s_pWvwData->s_sApp->uiBMcache--;
     }
   }
 
-  s_pWvwData->s_sApp.uiBMcache++;
-  pbhNew->pNext = s_pWvwData->s_sApp.pbhUserBitmap;
-  s_pWvwData->s_sApp.pbhUserBitmap = pbhNew;
+  s_pWvwData->s_sApp->uiBMcache++;
+  pbhNew->pNext = s_pWvwData->s_sApp->pbhUserBitmap;
+  s_pWvwData->s_sApp->pbhUserBitmap = pbhNew;
 
 }
 
@@ -10405,17 +10410,17 @@ LRESULT CALLBACK hb_gt_wvwTBProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
 
        hdc = GetDC(hWnd);
 
-       hOldObj = SelectObject( hdc, s_pWvwData->s_sApp.penWhite );
+       hOldObj = SelectObject( hdc, s_pWvwData->s_sApp->penWhite );
 
        MoveToEx( hdc, 0, iTop, NULL );            /* Top */
        LineTo( hdc, iRight, iTop );
 
-       SelectObject( hdc, s_pWvwData->s_sApp.penBlack );
+       SelectObject( hdc, s_pWvwData->s_sApp->penBlack );
 
        MoveToEx( hdc, 0, iTop+2, NULL );            /* Bottom */
        LineTo( hdc, iRight, iTop+2 );
 
-       SelectObject( hdc, s_pWvwData->s_sApp.penDarkGray );
+       SelectObject( hdc, s_pWvwData->s_sApp->penDarkGray );
        MoveToEx( hdc, 0, iTop+1, NULL );            /* Middle */
        LineTo( hdc, iRight, iTop+1 );
 
