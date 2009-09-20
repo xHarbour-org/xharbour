@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6598 2009/09/19 13:41:12 andijahja Exp $
+ * $Id: ChangeLog,v 1.6599 2009/09/20 15:17:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2009-09-20 12:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-   * source/debug/debug.prg
+   * source/debug/debugger.prg
      ! allow to use debugger with gtwvw or wvwtools
    * contrib/gtwvw/hbgtwvw.h
    * contrib/gtwvw/gtwvw.c
