@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.48 2009/08/23 22:46:11 lculik Exp $
+# $Id: compile.mak,v 1.49 2009/09/16 15:53:42 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -513,7 +513,7 @@ $(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT) : $(VM_DIR)$(DIR_SEP)runner.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)usedll$(OBJEXT) : $(VM_DIR)$(DIR_SEP)usedll.c
-        $(CC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)thread$(OBJEXT) : $(VM_DIR)$(DIR_SEP)thread.c
 	$(CC_CMD)
