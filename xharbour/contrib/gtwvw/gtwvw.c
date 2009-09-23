@@ -1,5 +1,5 @@
 /*
-* $Id: gtwvw.c,v 1.58 2009/09/07 21:36:20 lculik Exp $
+* $Id: gtwvw.c,v 1.59 2009/09/20 15:17:07 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -966,7 +966,7 @@ static void hb_gt_wvw_PutText( PHB_GT pGT, int iRow, int iCol, BYTE bColor, BYTE
     hb_gt_wvwFUNCPrologue(2, &iRow, &iCol, NULL, NULL);
   }
 
-  hb_gt_wvw_vPutText(  s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ],  (USHORT)iRow,  (USHORT)iCol, (USHORT)iRow, (USHORT)iCol+((USHORT)(ULONG)(ulLen))-1, pText, bColor);
+  hb_gt_wvw_vPutText(  s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ],  (USHORT)iRow,  (USHORT)iCol, (USHORT)iRow, (USHORT) ulLen == 0 ? (USHORT)0 : (USHORT) iCol+((USHORT)(ULONG)(ulLen))-1, pText, bColor);
 
 
 
