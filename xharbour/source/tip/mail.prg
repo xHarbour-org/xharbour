@@ -1,5 +1,5 @@
 /*
- * $Id: mail.prg,v 1.6 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: mail.prg,v 1.7 2009/08/28 14:12:25 lculik Exp $
  */
 
 /*
@@ -663,10 +663,10 @@ METHOD attachFile( cFileName ) CLASS TipMail
    cFileName := SubStr( cFileName, Rat( cFileName, cDelim ) + 1 )
 
    oAttach:setFieldPart  ( "Content-Type", cMimeType )
-   oAttach:setFieldOption( "Content-Type", "name", cFileName )
+   oAttach:setFieldOption( "Content-Type", "name", cFname + cFext )
 
    oAttach:setFieldPart  ( "Content-Disposition", "attachment" )
-   oAttach:setFieldOption( "Content-Disposition", "filename", cFileName )
+   oAttach:setFieldOption( "Content-Disposition", "filename", cFname + cFext )
 
 RETURN ::attach( oAttach )
 
