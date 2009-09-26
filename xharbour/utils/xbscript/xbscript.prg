@@ -4978,14 +4978,17 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    BEGIN SEQUENCE
 
       WHILE ( nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE ) ) > 2
-         //TraceLog( nLen, sBuffer )
          nPosition := 1
          nMaxPos   := nLen - 1
+
+         //TraceLog( "***", nLen, nMaxPos, sBuffer )
 
          WHILE nPosition < nMaxPos .OR. SubStr( sBuffer, nPosition, 1 ) == Chr(10)
 
              cPrev := cChar
              cChar := SubStr( sBuffer, nPosition, 1 )
+
+             //TraceLog( nPosition, nMaxPos, sBuffer, cChar, cPrev )
 
              DO CASE
                 CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '*' )
@@ -5247,6 +5250,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
                          nPosition := 1
                          LOOP
@@ -5271,6 +5275,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
                          nPosition := 1
                          LOOP
@@ -5301,6 +5306,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
                          nPosition := 1
                          LOOP
