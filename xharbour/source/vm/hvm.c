@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.729 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: hvm.c,v 1.730 2009/09/12 18:47:44 likewolf Exp $
  */
 
 /*
@@ -1284,14 +1284,6 @@ int hb_vmQuit( void )
    #endif
 #endif
 
-   while( HB_VM_STACK.pSequence )
-   {
-      PHB_SEQUENCE pFree = HB_VM_STACK.pSequence;
-
-      HB_VM_STACK.pSequence = HB_VM_STACK.pSequence->pPrev;
-
-      hb_xfree( (void *) pFree );
-   }
    #ifdef TRACE_QUIT
       TraceLog( NULL, "After Sequence\n" );
    #endif

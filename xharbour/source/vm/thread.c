@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.222 2009/09/12 18:01:44 likewolf Exp $
+* $Id: thread.c,v 1.223 2009/09/18 17:41:41 ronpinkas Exp $
 */
 
 /*
@@ -575,11 +575,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    hb_rddWaShutDown( pStack->rdd );
 
-   hb_setRelease( &pStack->set );
-
    // Free only if we are not destroying the main stack
    if ( pStack != &hb_stackMT )
    {
+
+      hb_setRelease( &pStack->set );
+
       while( pStack->pSequence )
       {
          PHB_SEQUENCE pFree = pStack->pSequence;

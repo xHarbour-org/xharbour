@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.110 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: estack.c,v 1.111 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -153,15 +153,18 @@ void hb_stackFree( void )
 
    {
       LONG i = hb_stackST.wItems - 1;
+
       while( i >= 0 )
       {
          if( HB_IS_SYMBOL( hb_stackST.pItems[ i ] ) )
          {
             hb_xfree( hb_stackST.pItems[ i ]->item.asSymbol.pCargo );
          }
+
          hb_xfree( hb_stackST.pItems[ i-- ] );
       }
    }
+
    hb_xfree( hb_stackST.pItems );
 
    hb_stackST.pItems = NULL;
@@ -171,6 +174,15 @@ void hb_stackFree( void )
    hb_stackST.wItems = 0;
 
    hb_rddWaShutDown( hb_stackST.rdd );
+
+   while( hb_stackST.pSequence )
+   {
+      PHB_SEQUENCE pFree = hb_stackST.pSequence;
+
+      hb_stackST.pSequence = hb_stackST.pSequence->pPrev;
+
+      hb_xfree( (void *) pFree );
+   }
 
 #else
 
