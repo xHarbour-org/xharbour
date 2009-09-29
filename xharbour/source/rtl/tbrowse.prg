@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.220 2009/06/30 12:40:14 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.221 2009/09/09 13:44:47 modalsist Exp $
  */
 
 /*
@@ -3264,7 +3264,7 @@ METHOD SetRowPos( nRow ) CLASS TBrowse
 
    endif
 
-Return Self
+Return ::nRowPos
 
 *---------------------------------------------------*
 METHOD SetColorSpec( cColor ) CLASS TBrowse

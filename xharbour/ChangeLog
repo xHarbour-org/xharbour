@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6603 2009/09/26 17:49:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6604 2009/09/27 00:05:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-29 12:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed method setrowpos to return ::nrowpos insted of self. Reported on
+      xharbour portuguese new by Jose Claudio
 
 2009-09-26 19:33 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/thread.c
