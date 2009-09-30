@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.24 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: rddads.h,v 1.25 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -66,21 +66,21 @@
 #include "ace.h"
 
 /* Autodetect ACE version. */
-#if   defined(ADS_KEEP_AOF_PLAN)
+#if   defined( ADS_KEEP_AOF_PLAN )
    #define _ADS_LIB_VERSION 910 /* or upper */
-#elif defined(ADS_NOTIFICATION_CONNECTION)
+#elif defined( ADS_NOTIFICATION_CONNECTION )
    #define _ADS_LIB_VERSION 900
-#elif defined(ADS_UDP_IP_CONNECTION)
+#elif defined( ADS_UDP_IP_CONNECTION )
    #define _ADS_LIB_VERSION 810
-#elif defined(ADS_REPLICATION_CONNECTION)
+#elif defined( ADS_REPLICATION_CONNECTION )
    #define _ADS_LIB_VERSION 800
-#elif defined(ADS_NOT_AUTO_OPEN)
+#elif defined( ADS_NOT_AUTO_OPEN )
    #define _ADS_LIB_VERSION 710
-#elif defined(ADS_FTS_INDEX_ORDER)
+#elif defined( ADS_FTS_INDEX_ORDER )
    #define _ADS_LIB_VERSION 700
-#elif defined(ADS_COMPRESS_ALWAYS)
+#elif defined( ADS_COMPRESS_ALWAYS )
    #define _ADS_LIB_VERSION 620
-#elif defined(ADS_USER_DEFINED)
+#elif defined( ADS_USER_DEFINED )
    #define _ADS_LIB_VERSION 611
 #else
    #define _ADS_LIB_VERSION 500
@@ -147,33 +147,7 @@ HB_EXTERN_BEGIN
 
 typedef struct _ADSAREA_
 {
-   struct _RDDFUNCS * lprfsHost; /* Virtual method table for this workarea */
-   USHORT uiArea;                /* The number assigned to this workarea */
-   void * atomAlias;             /* Pointer to the alias symbol for this workarea */
-   USHORT uiFieldExtent;         /* Total number of fields allocated */
-   USHORT uiFieldCount;          /* Total number of fields used */
-   USHORT uiFieldHidden;         /* Total number of fields hidden */
-   LPFIELD lpFields;             /* Pointer to an array of fields */
-   void * lpFieldExtents;        /* Void ptr for additional field properties */
-   PHB_ITEM valResult;           /* All purpose result holder */
-   BOOL fTop;                    /* TRUE if "top" */
-   BOOL fBottom;                 /* TRUE if "bottom" */
-   BOOL fBof;                    /* TRUE if "bof" */
-   BOOL fEof;                    /* TRUE if "eof" */
-   BOOL fFound;                  /* TRUE if "found" */
-   DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
-   DBFILTERINFO dbfi;            /* Filter in effect */
-   PHB_SESSION dbssi;            /* Session info used on transactions */
-   LPDBORDERCONDINFO lpdbOrdCondInfo;
-   LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
-   USHORT uiParents;             /* Number of parents for this area */
-   USHORT heap;
-   USHORT heapSize;
-   USHORT rddID;
-   USHORT uiMaxFieldNameLength;
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
-   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
+   AREA area;
 
    /*
     *  ADS's additions to the workarea structure
@@ -186,7 +160,7 @@ typedef struct _ADSAREA_
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
 
    char *   szDataFileName;      /* Name of data file */
-   USHORT   uiRecordLen;         /* Size of record */
+   ULONG    ulRecordLen;         /* Size of record */
    ULONG    ulRecNo;             /* Current record */
    BYTE *   pRecord;             /* Buffer of record data */
    ULONG    maxFieldLen;         /* Max field length in table record */
@@ -196,7 +170,7 @@ typedef struct _ADSAREA_
    BOOL     fReadonly;           /* Read only file */
    BOOL     fFLocked;            /* TRUE if file is locked */
 
-   int      iFileType;           /* adt/cdx/ntx */
+   int      iFileType;           /* adt/cdx/ntx/vfp */
 
    ADSHANDLE hTable;
    ADSHANDLE hOrdCurrent;
@@ -205,13 +179,13 @@ typedef struct _ADSAREA_
 
 typedef ADSAREA * ADSAREAP;
 
-#define SELF_RESETREL( p )    if( pArea->lpdbPendingRel ) \
+#define SELF_RESETREL( p )    if( (p)->lpdbPendingRel ) \
                               { \
-                                 if( pArea->lpdbPendingRel->isScoped && \
-                                    !pArea->lpdbPendingRel->isOptimized ) \
-                                    SELF_FORCEREL( ( AREAP ) pArea ); \
+                                 if( (p)->lpdbPendingRel->isScoped && \
+                                    !(p)->lpdbPendingRel->isOptimized ) \
+                                    SELF_FORCEREL( &(p)->area ); \
                                  else \
-                                    pArea->lpdbPendingRel = NULL; \
+                                    (p)->lpdbPendingRel = NULL; \
                               }
 
 
@@ -229,21 +203,20 @@ typedef ADSAREA * ADSAREAP;
 #define HB_ADS_PUTCONNECTION( p, h )   hb_itemPutNL( ( p ), ( LONG ) ( h ) )
 #define HB_ADS_DEFCONNECTION( v )      ( ( v ) ? ( ADSHANDLE ) ( v ) : hb_ads_hConnect )
 
-
-extern int hb_ads_iFileType;                 /* current global setting */
-extern int hb_ads_iLockType;
-extern int hb_ads_iCheckRights;
-extern int hb_ads_iCharType;
-extern BOOL hb_ads_bTestRecLocks;
-extern ADSHANDLE hb_ads_hConnect;
+extern int        hb_ads_iFileType; /* current global setting */
+extern int        hb_ads_iLockType;
+extern int        hb_ads_iCheckRights;
+extern int        hb_ads_iCharType;
+extern BOOL       hb_ads_bTestRecLocks;
+extern ADSHANDLE  hb_ads_hConnect;
 
 extern HB_ERRCODE hb_adsCloseCursor( ADSAREAP pArea );
-extern ADSAREAP hb_adsGetWorkAreaPointer( void );
+extern ADSAREAP   hb_adsGetWorkAreaPointer( void );
 
 #ifdef ADS_USE_OEM_TRANSLATION
-   extern BOOL hb_ads_bOEM;
-   extern char * hb_adsOemToAnsi( char * pcString, ULONG ulLen );
-   extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
+   extern BOOL   hb_ads_bOEM;
+   extern char * hb_adsOemToAnsi( const char * pcString, ULONG ulLen );
+   extern char * hb_adsAnsiToOem( const char * pcString, ULONG ulLen );
    void hb_adsOemAnsiFree( char * pcString );
 
    typedef UNSIGNED32 (WINAPI *ADSSETFIELDRAW_PTR)( ADSHANDLE hObj,
@@ -273,8 +246,8 @@ extern ADSAREAP hb_adsGetWorkAreaPointer( void );
                                          UNSIGNED8* pucFileName );
 
 #else
-#  define hb_adsOemToAnsi( s, l )     ( s )
-#  define hb_adsAnsiToOem( s, l )     ( s )
+#  define hb_adsOemToAnsi( s, l )     ( ( char * ) ( s ) )
+#  define hb_adsAnsiToOem( s, l )     ( ( char * ) ( s ) )
 #  define hb_adsOemAnsiFree( s )
 #endif
 

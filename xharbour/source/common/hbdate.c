@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.19 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: hbdate.c,v 1.20 2009/05/25 14:14:00 marchuet Exp $
  */
 
 /*
@@ -153,9 +153,9 @@ void hb_dateDecode( LONG lJulian, int *piYear, int *piMonth, int *piDay )
       V = 80 * lJulian / 2447;
       U = V / 11;
 
-      *piYear  = (int) ( X + U + ( W - 49 ) * 100 );
-      *piMonth = (int) ( V + 2 - ( U * 12 ) );
-      *piDay   = (int) ( lJulian - ( 2447 * V / 80 ) );
+      *piYear  = ( int ) ( X + U + ( W - 49 ) * 100 );
+      *piMonth = ( int ) ( V + 2 - ( U * 12 ) );
+      *piDay   = ( int ) ( lJulian - ( 2447 * V / 80 ) );
    }
    else
    {
@@ -278,7 +278,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
          digit = HB_TOUPPER( ( UCHAR ) *szPtr );
          szPtr++;
          digit_count = 1;
-         while( HB_TOUPPER( ( UCHAR ) *szPtr ) == digit && format_count < size )
+         while( ( ( int ) HB_TOUPPER( ( UCHAR ) *szPtr ) ) == digit && format_count < size )
          {
             szPtr++;
             if( format_count + digit_count < size ) digit_count++;
@@ -462,7 +462,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
          digit = HB_TOUPPER( *szPtr );
          szPtr++;
          digit_count = 1;
-         while( HB_TOUPPER( *szPtr ) == digit && format_count < size )
+         while( ( ( int ) HB_TOUPPER( ( UCHAR ) *szPtr ) ) == digit && format_count < size )
          {
             szPtr++;
             if( format_count + digit_count < size ) digit_count++;

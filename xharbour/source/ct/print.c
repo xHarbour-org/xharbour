@@ -1,5 +1,5 @@
 /*
- * $Id: print.c,v 1.2 2009/05/26 16:35:10 ptsarenko Exp $
+ * $Id: print.c,v 1.3 2009/05/26 19:01:58 ptsarenko Exp $
  */
 
 /*
@@ -160,35 +160,32 @@ HB_FUNC( PRINTSEND )
       }
    }
 #elif defined( HB_OS_WIN_32 )
-   char *szPort = "lpt1";
-   char *szChr = " ";
+   char szChr[ 2 ] = { ' ', '\0' };
+   char szPort[ 5 ] = { 'l', 'p', 't', '1', '\0' };
    char *szStr = NULL;
    USHORT usLen = 0, usRet = 0;
-   FHANDLE hFile;
 
    if( ISNUM( 1 ) )
    {
-      szChr[0] = (char) hb_parni( 1 );
+      szChr[ 0 ] = ( char ) hb_parni( 1 );
       szStr = szChr;
       usLen = 1;
    }
    else if( ISCHAR( 1 ) )
    {
       szStr = hb_parcx( 1 );
-      usLen = hb_parclen( 1 );
+      usLen = ( USHORT ) hb_parclen( 1 );
    }
 
    if( ISNUM( 2 ) )
-   {
-      szPort[3] = (char) hb_parni(2) + '0';
-   }
+      szPort[ 3 ] = ( char ) hb_parni( 2 ) + '0';
 
    if( usLen )
    {
-      hFile = hb_fsOpen( ( BYTE * ) szPort, FO_WRITE );
+      HB_FHANDLE hFile = hb_fsOpen( szPort, FO_WRITE );
       if( hFile != FS_ERROR )
       {
-         usRet = hb_fsWrite( hFile, ( BYTE * ) szStr, usLen );
+         usRet = hb_fsWrite( hFile, szStr, usLen );
          hb_fsClose( hFile );
       }
    }

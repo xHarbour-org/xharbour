@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.4 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: dirdrive.c,v 1.5 2009/08/17 17:32:34 likewolf Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( DIRCHANGE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsChDir( ( BYTE * ) hb_parc( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsChDir( hb_parc( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -79,7 +79,7 @@ HB_FUNC( MAKEDIR )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsMkDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsMkDir( hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -91,7 +91,7 @@ HB_FUNC( DIRREMOVE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsRmDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsRmDir( hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 

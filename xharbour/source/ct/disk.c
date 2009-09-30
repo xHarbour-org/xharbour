@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.16 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: disk.c,v 1.17 2009/04/16 14:57:35 likewolf Exp $
  */
 /*
  * xHarbour Project source code:
@@ -87,7 +87,7 @@
 
 HB_FUNC( DELETEFILE )
 {
-   BYTE * pFileName  = ( BYTE *) hb_parcx( 1 ) ;
+   const char * pFileName  = hb_parcx( 1 ) ;
 
    if ( hb_fsDelete( pFileName ) )
    {
@@ -101,26 +101,22 @@ HB_FUNC( DELETEFILE )
 
 HB_FUNC( DIRMAKE )
 {
-   BYTE *pFileName = ( BYTE * ) hb_parcx( 1 );
+   const char *pFileName = hb_parcx( 1 );
 
    if( hb_fsMkDir( pFileName ) )
-   {
       hb_retni( 0 );
-   }
    else
-   {
       hb_retni( -hb_fsOsError() );
-   }
 }
 
 HB_FUNC( DIRNAME )
 {
-   BYTE *pbyBuffer = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+   char *pbyBuffer = ( char * ) hb_xgrab( HB_PATH_MAX );
 
    pbyBuffer[0] = HB_OS_PATH_DELIM_CHR;
    hb_fsCurDirBuff( hb_fsCurDrv(), pbyBuffer + 1, HB_PATH_MAX - 1 - 1 );
 
-   hb_retc_buffer( ( char * ) pbyBuffer );
+   hb_retc_buffer( pbyBuffer );
 }
 
 
@@ -132,7 +128,7 @@ HB_FUNC( DRIVETYPE )
    LPTSTR lpDrive;
    int iType;
 
-   hb_strncpy( pszDrive, ( char * ) hb_parcx( 1 ), ulSize );
+   hb_strncpy( pszDrive, hb_parcx( 1 ), ulSize );
 
    if( strstr( pszDrive, ":" ) == NULL )
       hb_strncat( pszDrive, ":", ulSize );
@@ -173,17 +169,13 @@ HB_FUNC( DRIVETYPE )
 
 HB_FUNC( FILEMOVE )
 {
-   BYTE * pSourceFile = ( BYTE * ) hb_parcx( 1 );
-   BYTE * pTargetFile = ( BYTE * ) hb_parcx( 2 );
+   const char * pSourceFile = hb_parcx( 1 );
+   const char * pTargetFile = hb_parcx( 2 );
 
    if ( hb_fsRename( pSourceFile, pTargetFile ) )
-   {
       hb_retni( 0 );
-   }
    else
-   {
       hb_retni( -hb_fsOsError() );
-   }
 }
 
 
@@ -235,17 +227,17 @@ HB_FUNC( VOLUME )
    if( !ct_getsafety() )
    {
       PHB_FNAME fname;
-      BYTE *sDiskName;
+      const char *sDiskName;
       char *sRoot = NULL;
       char *sVolName = NULL;
       char sRootBuf[4], sVolNameBuf[12];
-      BOOL fFree;
+      char * pszFree;
 
       if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
       {
-         sDiskName = hb_fsNameConv( ( BYTE * ) hb_parc( 1 ), &fFree );
+         sDiskName = hb_fsNameConv( hb_parc( 1 ), &pszFree );
 
-         if( ( fname = hb_fsFNameSplit( ( char * ) sDiskName ) ) != NULL )
+         if( ( fname = hb_fsFNameSplit( sDiskName ) ) != NULL )
          {
             if( fname->szPath )
             {
@@ -262,11 +254,11 @@ HB_FUNC( VOLUME )
          }
          else
          {
-            hb_strncpy( sVolNameBuf, ( char * ) sDiskName, sizeof( sVolNameBuf ) - 1 );
+            hb_strncpy( sVolNameBuf, sDiskName, sizeof( sVolNameBuf ) - 1 );
             sVolName = sVolNameBuf;
          }
-         if( fFree )
-            hb_xfree( sDiskName );
+         if( pszFree )
+            hb_xfree( pszFree );
       }
 #if defined(HB_OS_WIN_32)
       {
@@ -294,7 +286,7 @@ HB_FUNC( GETVOLINFO )
 {
 #if defined(HB_OS_WIN_32)
    int iretval;
-   char *sDrive = hb_parcx( 1 ), *sVolName;
+   const char *sDrive = hb_parcx( 1 );
    TCHAR lpVolName[256];
    LPTSTR lpDrive;
 
@@ -305,12 +297,12 @@ HB_FUNC( GETVOLINFO )
 
    if( iretval != 0 )
    {
-      sVolName = HB_TCHAR_CONVFROM( lpVolName );
+      char * sVolName = HB_TCHAR_CONVFROM( lpVolName );
       hb_retc( sVolName );
       HB_TCHAR_FREE( sVolName );
    }
    else
-      hb_retc( NULL );
+      hb_retc_null();
 #endif
 }
 
@@ -322,8 +314,8 @@ HB_FUNC( GETVOLINFO )
  * Sintax is: VolSerial("X:\")
  * Note that the trailing backslash is required.
  *
- * To convert in the hex format, call numtohex() function. 
- * Example: numtohex( volserial("C:\")). 
+ * To convert in the hex format, call numtohex() function.
+ * Example: numtohex( volserial("C:\")).
  * See volser.prg in xharbour\tests\cttest folder.
  */
 
@@ -331,7 +323,7 @@ HB_FUNC( VOLSERIAL )
 {
 #if defined(HB_OS_WIN_32)
    int retval;
-   char *sDrive = hb_parcx( 1 );
+   const char *sDrive = hb_parcx( 1 );
    LPTSTR lpDrive;
    DWORD dSerial;
 
@@ -356,7 +348,7 @@ HB_FUNC( VOLSERIAL )
 
 HB_FUNC( TRUENAME )
 {
-   char *szFile = hb_parc( 1 );
+   const char * szFile = hb_parc( 1 );
 
    if( szFile )
    {
@@ -377,7 +369,5 @@ HB_FUNC( TRUENAME )
 #endif
    }
    else
-   {
       hb_retc_null();
-   }
 }

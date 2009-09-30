@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.39 2009/08/17 17:32:34 likewolf Exp $
+ * $Id: philes.c,v 1.40 2009/08/19 22:40:47 likewolf Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ HB_FUNC( FOPEN )
 {
    if( ISCHAR( 1 ) )
    {
-      hb_retnint( ( HB_NHANDLE ) hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
+      hb_retnint( ( HB_NHANDLE ) hb_fsOpen( hb_parc( 1 ),
                   ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : ( USHORT ) (FO_READ | FO_COMPAT )) );
       hb_fsSetFError( hb_fsError() );
    }
@@ -91,7 +91,7 @@ HB_FUNC( FCREATE )
 {
    if( ISCHAR( 1 ) )
    {
-      hb_retnint( ( HB_NHANDLE ) hb_fsCreate( ( BYTE * ) hb_parc( 1 ),
+      hb_retnint( ( HB_NHANDLE ) hb_fsCreate( hb_parc( 1 ),
                   ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL ) );
       hb_fsSetFError( hb_fsError() );
    }
@@ -106,7 +106,7 @@ HB_FUNC( HB_FCREATE )
 {
    if( ISCHAR( 1 ) )
    {
-      hb_retnint( ( HB_NHANDLE ) hb_fsCreateEx( ( BYTE * ) hb_parc( 1 ),
+      hb_retnint( ( HB_NHANDLE ) hb_fsCreateEx( hb_parc( 1 ),
                   ISNUM( 2 ) ? ( ULONG ) hb_parni( 2 ) : ( ULONG ) FC_NORMAL,
                   ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : ( USHORT )FO_COMPAT ) );
       hb_fsSetFError( hb_fsError() );
@@ -212,10 +212,11 @@ HB_FUNC( FCLOSE )
 HB_FUNC( FERASE )
 {
    USHORT uiError = 3;
+   const char * szFile = hb_parc( 1 );
 
-   if( ISCHAR( 1 ) )
+   if( szFile )
    {
-      hb_retni( hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) ? 0 : F_ERROR );
+      hb_retni( hb_fsDelete( szFile ) ? 0 : F_ERROR );
       uiError = hb_fsError();
    }
    else
@@ -226,11 +227,12 @@ HB_FUNC( FERASE )
 HB_FUNC( FRENAME )
 {
    USHORT uiError = 2;
+   const char * szFileOld = hb_parc( 1 ),
+              * szFileNew = hb_parc( 2 );
 
-   if( ISCHAR( 1 ) && ISCHAR( 2 ) )
+   if( szFileOld && szFileNew )
    {
-      hb_retni( hb_fsRename( ( BYTE * ) hb_parc( 1 ),
-                             ( BYTE * ) hb_parc( 2 ) ) ? 0 : F_ERROR );
+      hb_retni( hb_fsRename( szFileOld, szFileNew ) ? 0 : F_ERROR );
       uiError = hb_fsError();
    }
    else
@@ -266,7 +268,7 @@ HB_FUNC( FREADSTR )
       if( ulToRead > 0 )
       {
          HB_FHANDLE fhnd = ( HB_FHANDLE ) hb_parni( 1 );
-         BYTE * buffer = ( BYTE * ) hb_xgrab( ulToRead + 1 );
+         char * buffer = ( char * ) hb_xgrab( ulToRead + 1 );
          ULONG ulRead;
 
          ulRead = hb_fsReadLarge( fhnd, buffer, ulToRead );
@@ -274,17 +276,13 @@ HB_FUNC( FREADSTR )
          buffer[ ulRead ] = '\0';
 
          /* NOTE: Clipper will not return zero chars from this functions. */
-         hb_retc_buffer( ( char * ) buffer );
+         hb_retc_buffer( buffer );
       }
       else
-      {
          hb_retc_null();
-      }
    }
    else
-   {
       hb_retc_null();
-   }
    hb_fsSetFError( uiError );
 }
 
@@ -307,7 +305,7 @@ HB_FUNC( CURDIR )
       else if( *szDrive >= 'a' && *szDrive <= 'z' )
          uiDrive = *szDrive - ( 'a' - 1 );
    }
-   hb_fsCurDirBuff( uiDrive, ( BYTE * ) szBuffer, sizeof( szBuffer ) );
+   hb_fsCurDirBuff( uiDrive, szBuffer, sizeof( szBuffer ) );
 
    hb_retc( szBuffer );
 }
@@ -333,7 +331,7 @@ HB_FUNC( HB_F_EOF )
 HB_FUNC( CURDIRX )
 {
    USHORT uiErrorOld = hb_fsError();
-   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+   char * pbyBuffer = ( char * ) hb_xgrab( HB_PATH_MAX );
    PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
    BYTE cCurDrv = hb_fsCurDrv();
    BYTE cDrv;
@@ -353,7 +351,7 @@ HB_FUNC( CURDIRX )
 
    hb_fsCurDirBuffEx( cDrv, pbyBuffer, HB_PATH_MAX );
 
-   hb_retcAdopt( ( char * ) pbyBuffer );
+   hb_retcAdopt( pbyBuffer );
 
    hb_fsChDrv( cCurDrv );
 

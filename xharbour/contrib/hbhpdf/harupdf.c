@@ -1,5 +1,5 @@
 /*
- * $Id: harupdf.c 8582 2008-06-03 07:14:05Z vszakats $
+ * $Id: harupdf.c,v 1.2 2008/09/06 06:20:56 andijahja Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ HB_FUNC( HPDF_FREE )
 //
 HB_FUNC( HPDF_NEWDOC )
 {
-   hb_retnl( (long) HPDF_NewDoc( HPDF_Doc_par( 1 ) ) );
+   hb_retnl( ( long ) HPDF_NewDoc( HPDF_Doc_par( 1 ) ) );
 }
 //----------------------------------------------------------------------//
 // HPdf_FreeDoc( hNewDoc ) -> NIL
@@ -150,13 +150,13 @@ HB_FUNC( HPDF_FREEDOCALL )
 //
 HB_FUNC( HPDF_SAVETOFILE )
 {
-   BOOL   fFree;
-   BYTE * pszFileName = hb_fsNameConv( ( BYTE * ) hb_parc( 2 ), &fFree );
+   char * pszFree = NULL;
+   const char * pszFileName = hb_fsNameConv( hb_parc( 2 ), &pszFree );
 
-   hb_retnl( (long) HPDF_SaveToFile( HPDF_Doc_par( 1 ), ( char * ) pszFileName ) );
+   hb_retnl( ( long ) HPDF_SaveToFile( HPDF_Doc_par( 1 ), pszFileName ) );
 
-   if( fFree )
-      hb_xfree( ( void * ) pszFileName );
+   if( pszFree )
+      hb_xfree( ( void * ) pszFree );
 }
 //----------------------------------------------------------------------//
 // HPdf_SaveToStream( hDoc ) -> hStatus
@@ -315,30 +315,30 @@ HB_FUNC( HPDF_GETFONT )
 //
 HB_FUNC( HPDF_LOADTYPE1FONTFROMFILE )
 {
-   BOOL   fFree1;
-   BYTE * pszFileName1 = hb_fsNameConv( ( BYTE * ) hb_parc( 2 ), &fFree1 );
-   BOOL   fFree2;
-   BYTE * pszFileName2 = hb_fsNameConv( ( BYTE * ) hb_parc( 3 ), &fFree2 );
+   char * pszFree1 = NULL;
+   const char * pszFileName1 = hb_fsNameConv( hb_parc( 2 ), &pszFree1 );
+   char * pszFree2 = NULL;
+   const char * pszFileName2 = hb_fsNameConv( hb_parc( 3 ), &pszFree2 );
 
-   hb_retc( HPDF_LoadType1FontFromFile( HPDF_Doc_par( 1 ), ( char * ) pszFileName1, ( char * ) pszFileName2 ) );
+   hb_retc( HPDF_LoadType1FontFromFile( HPDF_Doc_par( 1 ), pszFileName1, pszFileName2 ) );
 
-   if( fFree1 )
-      hb_xfree( pszFileName1 );
+   if( pszFree1 )
+      hb_xfree( pszFree1 );
 
-   if( fFree2 )
-      hb_xfree( pszFileName2 );
+   if( pszFree2 )
+      hb_xfree( pszFree2 );
 }
 //----------------------------------------------------------------------//
 // HPdf_LoadTTFontFromFile( hDoc, cTTFontFileName, lEmbed ) -> cFontName
 //
 HB_FUNC( HPDF_LOADTTFONTFROMFILE )
 {
-   BOOL   fFree;
-   BYTE * pszFileName = hb_fsNameConv( ( BYTE * ) hb_parc( 2 ), &fFree );
+   char * pszFree = NULL;
+   const char * pszFileName = hb_fsNameConv( hb_parc( 2 ), &pszFree );
 
-   hb_retc( HPDF_LoadTTFontFromFile( HPDF_Doc_par( 1 ), ( char * ) pszFileName, hb_parl( 3 ) ) );
+   hb_retc( HPDF_LoadTTFontFromFile( HPDF_Doc_par( 1 ), pszFileName, hb_parl( 3 ) ) );
 
-   if( fFree )
+   if( pszFree )
       hb_xfree( ( void * ) pszFileName );
 }
 //----------------------------------------------------------------------//
@@ -346,13 +346,13 @@ HB_FUNC( HPDF_LOADTTFONTFROMFILE )
 //
 HB_FUNC( HPDF_LOADTTFONTFROMFILE2 )
 {
-   BOOL   fFree;
-   BYTE * pszFileName = hb_fsNameConv( ( BYTE * ) hb_parc( 2 ), &fFree );
+   char * pszFree = NULL;
+   const char * pszFileName = hb_fsNameConv( hb_parc( 2 ), &pszFree );
 
-   hb_retc( HPDF_LoadTTFontFromFile2( HPDF_Doc_par( 1 ), ( char * ) pszFileName, hb_parni( 3 ), hb_parl( 4 ) ) );
+   hb_retc( HPDF_LoadTTFontFromFile2( HPDF_Doc_par( 1 ), pszFileName, hb_parni( 3 ), hb_parl( 4 ) ) );
 
-   if( fFree )
-      hb_xfree( ( void * ) pszFileName );
+   if( pszFree )
+      hb_xfree( ( void * ) pszFree );
 }
 //----------------------------------------------------------------------//
 // HPdf_AddPageLabel( hDoc, nPageNum, nPgNoStyle, nFirstPageInRange, cPrefixToLabel ) -> hStatus

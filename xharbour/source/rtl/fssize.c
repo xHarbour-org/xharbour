@@ -1,6 +1,6 @@
 
 /*
- * $Id: fssize.c,v 1.8 2007/12/23 19:15:16 enricomaria Exp $
+ * $Id: fssize.c,v 1.9 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -78,17 +78,17 @@
 #endif
 
 
-HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
+HB_FOFFSET hb_fsFSize( const char * pszFileName, BOOL bUseDirEntry )
 {
    if( bUseDirEntry )
    {
 #if defined(HB_WINCE)
-      BOOL fFree;
+      char * pszFree;
       PHB_FFIND ffind;
-      pszFileName = hb_fsNameConv( pszFileName, &fFree );
-      ffind = hb_fsFindFirst( ( char * ) pszFileName, HB_FA_ALL );
-      if( fFree )
-         hb_xfree( pszFileName );
+      pszFileName = hb_fsNameConv( pszFileName, &pszFree );
+      ffind = hb_fsFindFirst( pszFileName, HB_FA_ALL );
+      if( pszFree )
+         hb_xfree( pszFree );
       hb_fsSetIOError( ffind != NULL, 0 );
       if( ffind )
       {
@@ -97,23 +97,25 @@ HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
          return size;
       }
 #elif defined( HB_USE_LARGEFILE64 )
-      BOOL fResult, fFree;
+      char * pszFree;
+      BOOL fResult;
       struct stat64 statbuf;
-      pszFileName = hb_fsNameConv( pszFileName, &fFree );
-      fResult = stat64( ( char * ) pszFileName, &statbuf ) == 0;
+      pszFileName = hb_fsNameConv( pszFileName, &pszFree );
+      fResult = stat64( pszFileName, &statbuf ) == 0;
       hb_fsSetIOError( fResult, 0 );
-      if( fFree )
-         hb_xfree( pszFileName );
+      if( pszFree )
+         hb_xfree( pszFree );
       if( fResult )
          return ( HB_FOFFSET ) statbuf.st_size;
 #else
-      BOOL fResult, fFree;
+      char * pszFree;
+      BOOL fResult;
       struct stat statbuf;
-      pszFileName = hb_fsNameConv( pszFileName, &fFree );
+      pszFileName = hb_fsNameConv( pszFileName, &pszFree );
       fResult = stat( ( char * ) pszFileName, &statbuf ) == 0;
       hb_fsSetIOError( fResult, 0 );
-      if( fFree )
-         hb_xfree( pszFileName );
+      if( pszFree )
+         hb_xfree( pszFree );
       if( fResult )
          return ( HB_FOFFSET ) statbuf.st_size;
 #endif
@@ -136,6 +138,6 @@ HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 
 HB_FUNC( HB_FSIZE )
 {
-   hb_retnint( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parc( 1 ),
-                                    ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
+   const char * pszFile = hb_parc( 1 );
+   hb_retnint( pszFile ? hb_fsFSize( pszFile, ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
 }

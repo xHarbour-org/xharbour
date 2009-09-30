@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.23 2009/01/24 00:33:10 likewolf Exp $
+ * $Id: hbpp.c,v 1.24 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -617,7 +617,7 @@ void hb_compGenWarning( const char* _szWarnings[], char cPrefix, int iWarning, c
     {
       const char *szText = _szWarnings[ iWarning - 1 ];
 
-      if( (szText[ 0 ] - '0') <= s_iWarnings )
+      if( ( ( int ) (szText[ 0 ] - '0') ) <= s_iWarnings )
         {
           printf( "\r(%i) ", hb_comp_iLine );
           printf( "Warning %c%04i  ", cPrefix, iWarning );
@@ -695,5 +695,5 @@ PINLINE   hb_compInlineAdd( char * szFunName )
 }
 
 /* Needed for trace */
-BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
+const char * hb_fsNameConv( const char * szFileName, char ** pszFree ) { if( pszFree ) * pszFree = NULL; return szFileName; }
 int hb_setGetDirSeparator( void ) { return HB_OS_PATH_DELIM_CHR; }

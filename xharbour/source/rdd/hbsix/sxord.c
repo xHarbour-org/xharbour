@@ -1,5 +1,5 @@
 /*
- * $Id: sxord.c,v 1.2 2008/09/05 08:38:36 marchuet Exp $
+ * $Id: sxord.c,v 1.3 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -267,7 +267,7 @@ HB_FUNC( SX_THERMOMETER )
          i = hb_itemGetNI( Info.itmResult );
          if( i )
          {
-            static const USHORT s_iStates[] = 
+            static const USHORT s_iStates[] =
                      { DBOI_CUSTOM, DBOI_CHGONLY, DBOI_PARTIAL };
             iTemperature = 4;
             for( i = 0; i < 3; ++i, --iTemperature )
@@ -395,7 +395,7 @@ HB_FUNC( SX_I_INDEXNAME )
       return;
    }
 
-   hb_retc( NULL );
+   hb_retc_null();
 }
 
 HB_FUNC( SX_I_TAGNAME )
@@ -412,7 +412,7 @@ HB_FUNC( SX_I_TAGNAME )
       return;
    }
 
-   hb_retc( NULL );
+   hb_retc_null();
 }
 
 HB_FUNC( SX_INDEXCOUNT )
@@ -447,7 +447,7 @@ HB_FUNC( SX_INDEXNAME )
          hb_itemReturnRelease( Info.itmResult );
       }
       else
-         hb_retc( NULL );
+         hb_retc_null();
    }
 }
 
@@ -682,7 +682,7 @@ HB_FUNC( SX_TAGUNIQUE )
 HB_FUNC( SX_WILDSEEK )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   char * szPattern = hb_parc( 1 );
+   const char * szPattern = hb_parc( 1 );
    BOOL fCont = ISLOG( 2 ) && hb_parl( 2 );
    BOOL fFound = FALSE;
    int iOrder = 0;
@@ -709,7 +709,7 @@ HB_FUNC( SX_WILDSEEK )
                errCode = SELF_ORDINFO( pArea, DBOI_KEYVAL, &Info );
                if( errCode == HB_SUCCESS )
                {
-                  char * szKey = hb_itemGetCPtr( Info.itmResult );
+                  const char * szKey = hb_itemGetCPtr( Info.itmResult );
                   fFound = hb_strMatchWild( szKey, szPattern );
                }
             }

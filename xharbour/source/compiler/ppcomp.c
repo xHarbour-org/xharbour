@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.9 2008/07/13 01:45:22 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.10 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
 
    HB_SYMBOL_UNUSED( cargo );
 
-   if( i > 1 && szSwitch[ i - 1 ] - '0' == iValue )
+   if( i > 1 && ( ( int ) ( szSwitch[ i - 1 ] - '0' ) ) == iValue )
       --i;
 
    if( i == 1 )

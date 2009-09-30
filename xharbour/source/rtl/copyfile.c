@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.8 2008/07/17 20:11:10 lculik Exp $
+ * $Id: copyfile.c,v 1.9 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCopy(%s, %s)", szSource, szDest));
 
-   while( ( fhndSource = hb_spOpen( ( BYTE * ) szSource, FO_READ | FO_SHARED | FO_PRIVATE ) ) == FS_ERROR )
+   while( ( fhndSource = hb_spOpen( szSource, FO_READ | FO_SHARED | FO_PRIVATE ) ) == FS_ERROR )
    {
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2012, NULL, szSource, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
@@ -86,9 +86,9 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 
    if( fhndSource != FS_ERROR )
    {
-      FHANDLE fhndDest;
+      HB_FHANDLE fhndDest;
 
-      while( ( fhndDest = hb_fsCreate( ( BYTE * ) szDest, FC_NORMAL ) ) == FS_ERROR )
+      while( ( fhndDest = hb_fsCreate( szDest, FC_NORMAL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_CREATE, 2012, NULL, szDest, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 

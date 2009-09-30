@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.12 2009/01/24 09:07:45 andijahja Exp $
+ * $Id: hbencode.c,v 1.13 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -887,7 +887,7 @@ HB_FUNC( YYENCODE_FILE )
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
    hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
+   filelen = hb_fsFSize( pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {
@@ -978,8 +978,8 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s", pFileName->szName, pFileName->szExtension );
+   filelen = hb_fsFSize( pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {

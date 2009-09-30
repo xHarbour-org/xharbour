@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.37 2009/05/26 11:25:32 marchuet Exp $
+ * $Id: sdf1.c,v 1.38 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -111,13 +111,13 @@ static HB_ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
 
    if( uiRead == 0 )
    {
-      pArea->fEof = TRUE;
+      pArea->area.fEof = TRUE;
       pArea->fPositioned = FALSE;
       hb_sdfClearRecordBuffer( pArea );
    }
    else
    {
-      pArea->fEof = FALSE;
+      pArea->area.fEof = FALSE;
       pArea->fPositioned = TRUE;
       uiEolPos = ( USHORT ) hb_strAt( pArea->szEol, pArea->uiEolLen,
                                       ( char * ) pArea->pRecord, uiRead );
@@ -205,7 +205,7 @@ static HB_ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
 
    if( pArea->ulNextOffset == ( HB_FOFFSET ) -1 )
    {
-      pArea->fEof = TRUE;
+      pArea->area.fEof = TRUE;
       pArea->fPositioned = FALSE;
       hb_sdfClearRecordBuffer( pArea );
       return HB_SUCCESS;
@@ -229,8 +229,8 @@ static HB_ERRCODE hb_sdfGoTop( SDFAREAP pArea )
    if( SELF_GOCOLD( ( AREAP ) pArea ) != HB_SUCCESS )
       return HB_FAILURE;
 
-   pArea->fTop = TRUE;
-   pArea->fBottom = FALSE;
+   pArea->area.fTop = TRUE;
+   pArea->area.fBottom = FALSE;
 
    pArea->ulRecordOffset = 0;
    pArea->ulRecNo = 1;
@@ -338,7 +338,7 @@ static HB_ERRCODE hb_sdfAppend( SDFAREAP pArea, BOOL fUnLockAll )
 
    pArea->ulRecordOffset = pArea->ulFileSize;
    pArea->ulRecNo = ++pArea->ulRecCount;
-   pArea->fEof = FALSE;
+   pArea->area.fEof = FALSE;
    pArea->fPositioned = TRUE;
    hb_sdfClearRecordBuffer( pArea );
 
@@ -355,7 +355,7 @@ static HB_ERRCODE hb_sdfDeleteRec( SDFAREAP pArea )
    if( pArea->fRecordChanged )
    {
       pArea->ulRecCount--;
-      pArea->fEof = TRUE;
+      pArea->area.fEof = TRUE;
       pArea->fPositioned = pArea->fRecordChanged = FALSE;
       hb_sdfClearRecordBuffer( pArea );
    }
@@ -373,17 +373,17 @@ static HB_ERRCODE hb_sdfGetValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    --uiIndex;
-   pField = pArea->lpFields + uiIndex;
+   pField = pArea->area.lpFields + uiIndex;
    switch( pField->uiType )
    {
       case HB_FT_STRING:
 #ifndef HB_CDP_SUPPORT_OFF
-         if( pArea->cdPage != hb_cdppage() )
+         if( pArea->area.cdPage != hb_cdppage() )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
             memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
             pVal[ pField->uiLen ] = '\0';
-            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdppage(), pField->uiLen );
+            hb_cdpnTranslate( pVal, pArea->area.cdPage, hb_cdppage(), pField->uiLen );
             hb_itemPutCPtr( pItem, pVal, pField->uiLen );
          }
          else
@@ -484,7 +484,7 @@ static HB_ERRCODE hb_sdfPutValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
 
    uiError = HB_SUCCESS;
    --uiIndex;
-   pField = pArea->lpFields + uiIndex;
+   pField = pArea->area.lpFields + uiIndex;
    if( pField->uiType != HB_FT_MEMO && pField->uiType != HB_FT_NONE )
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
@@ -497,7 +497,7 @@ static HB_ERRCODE hb_sdfPutValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
-            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->cdPage, uiSize );
+            hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->area.cdPage, uiSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
@@ -603,9 +603,9 @@ static HB_ERRCODE hb_sdfTrans( SDFAREAP pArea, LPDBTRANSINFO pTransInfo )
 
    if( pTransInfo->uiFlags & DBTF_MATCH )
    {
-      if( !pArea->fTransRec || pArea->cdPage != pTransInfo->lpaDest->cdPage )
+      if( !pArea->fTransRec || pArea->area.cdPage != pTransInfo->lpaDest->cdPage )
          pTransInfo->uiFlags &= ~DBTF_PUTREC;
-      else if( pArea->rddID == pTransInfo->lpaDest->rddID )
+      else if( pArea->area.rddID == pTransInfo->lpaDest->rddID )
          pTransInfo->uiFlags |= DBTF_PUTREC;
       else
       {
@@ -751,7 +751,7 @@ static HB_ERRCODE hb_sdfInfo( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( iSub == 1 )
             hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "SDF" );
          else if( iSub == 2 )
-            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "SDF", pArea->rddID );
+            hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "SDF", pArea->area.rddID );
          else
             hb_snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
          hb_itemPutC( pItem, szBuf );
@@ -865,7 +865,7 @@ static HB_ERRCODE hb_sdfAddField( SDFAREAP pArea, LPDBFIELDINFO pFieldInfo )
    }
 
    /* Update field offset */
-   pArea->pFieldOffset[ pArea->uiFieldCount ] = pArea->uiRecordLen;
+   pArea->pFieldOffset[ pArea->area.uiFieldCount ] = pArea->uiRecordLen;
    pArea->uiRecordLen += pFieldInfo->uiLen;
 
    return SUPER_ADDFIELD( ( AREAP ) pArea, pFieldInfo );
@@ -970,7 +970,7 @@ static HB_ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
    PHB_FNAME pFileName;
    PHB_ITEM pError = NULL;
    BOOL fRetry;
-   BYTE szFileName[ HB_PATH_MAX ];
+   char szFileName[ HB_PATH_MAX ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfCreate(%p,%p)", pArea, pCreateInfo));
 
@@ -979,26 +979,26 @@ static HB_ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
 #ifndef HB_CDP_SUPPORT_OFF
    if( pCreateInfo->cdpId )
    {
-      pArea->cdPage = hb_cdpFind( (char *) pCreateInfo->cdpId );
-      if( !pArea->cdPage )
-         pArea->cdPage = hb_cdppage();
+      pArea->area.cdPage = hb_cdpFind( pCreateInfo->cdpId );
+      if( !pArea->area.cdPage )
+         pArea->area.cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdppage();
+      pArea->area.cdPage = hb_cdppage();
 #endif
 
-   pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
+   pFileName = hb_fsFNameSplit( pCreateInfo->abName );
    if( hb_setGetDefExtension() && ! pFileName->szExtension )
    {
       PHB_ITEM pItem = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pItem );
       pFileName->szExtension = hb_itemGetCPtr( pItem );
-      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_fsFNameMerge( szFileName, pFileName );
       hb_itemRelease( pItem );
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, sizeof( szFileName ) - 1 );
+      hb_strncpy( szFileName, pCreateInfo->abName, sizeof( szFileName ) - 1 );
    }
    hb_xfree( pFileName );
 
@@ -1008,7 +1008,7 @@ static HB_ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
       pArea->pFile = hb_fileExtOpen( szFileName, NULL,
                                      FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
                                      FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                     NULL, pError );
+                                     NULL, pError, FALSE );
       if( !pArea->pFile )
       {
          if( !pError )
@@ -1018,7 +1018,7 @@ static HB_ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
             hb_errPutSubCode( pError, EDBF_CREATE_DBF );
             hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-            hb_errPutFileName( pError, ( char * ) szFileName );
+            hb_errPutFileName( pError, szFileName );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
@@ -1041,7 +1041,7 @@ static HB_ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
       return errCode;
    }
 
-   hb_sdfInitArea( pArea, ( char * ) szFileName );
+   hb_sdfInitArea( pArea, szFileName );
 
    /* Position cursor at the first record */
    return SELF_GOTOP( ( AREAP ) pArea );
@@ -1057,7 +1057,7 @@ static HB_ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    HB_ERRCODE errCode;
    USHORT uiFlags;
    BOOL fRetry;
-   BYTE szFileName[ HB_PATH_MAX ];
+   char szFileName[ HB_PATH_MAX ];
    char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_sdfOpen(%p,%p)", pArea, pOpenInfo));
@@ -1067,37 +1067,42 @@ static HB_ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
 #ifndef HB_CDP_SUPPORT_OFF
    if( pOpenInfo->cdpId )
    {
-      pArea->cdPage = hb_cdpFind( (char *) pOpenInfo->cdpId );
-      if( !pArea->cdPage )
-         pArea->cdPage = hb_cdppage();
+      pArea->area.cdPage = hb_cdpFind( pOpenInfo->cdpId );
+      if( !pArea->area.cdPage )
+         pArea->area.cdPage = hb_cdppage();
    }
    else
-      pArea->cdPage = hb_cdppage();
+      pArea->area.cdPage = hb_cdppage();
 #endif
 
    uiFlags = ( pArea->fReadonly ? FO_READ : FO_READWRITE ) |
              ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE );
 
-   pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
+   pFileName = hb_fsFNameSplit( pOpenInfo->abName );
    /* Add default file name extension if necessary */
    if( hb_setGetDefExtension() && ! pFileName->szExtension )
    {
       PHB_ITEM pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pFileExt );
       pFileName->szExtension = hb_itemGetCPtr( pFileExt );
-      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_fsFNameMerge( szFileName, pFileName );
       hb_itemRelease( pFileExt );
    }
    else
    {
-      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, sizeof( szFileName ) - 1 );
+      hb_strncpy( szFileName, pOpenInfo->abName, sizeof( szFileName ) - 1 );
    }
 
    /* Create default alias if necessary */
    if( !pOpenInfo->atomAlias && pFileName->szName )
    {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, sizeof( szAlias ) - 1 );
-      pOpenInfo->atomAlias = ( BYTE * ) szAlias;
+      const char * szName = strrchr( pFileName->szName, ':' );
+      if( szName == NULL )
+         szName = pFileName->szName;
+      else
+         ++szName;
+      hb_strncpyUpperTrim( szAlias, szName, sizeof( szAlias ) - 1 );
+      pOpenInfo->atomAlias = szAlias;
    }
    hb_xfree( pFileName );
 
@@ -1106,7 +1111,7 @@ static HB_ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       pArea->pFile = hb_fileExtOpen( szFileName, NULL, uiFlags |
                                      FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                                     NULL, pError );
+                                     NULL, pError, FALSE );
       if( !pArea->pFile )
       {
          if( !pError )
@@ -1116,7 +1121,7 @@ static HB_ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
             hb_errPutSubCode( pError, EDBF_OPEN_DBF );
             hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-            hb_errPutFileName( pError, ( char * ) szFileName );
+            hb_errPutFileName( pError, szFileName );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
@@ -1139,7 +1144,7 @@ static HB_ERRCODE hb_sdfOpen( SDFAREAP pArea, LPDBOPENINFO pOpenInfo )
       return HB_FAILURE;
    }
 
-   hb_sdfInitArea( pArea, ( char * ) szFileName );
+   hb_sdfInitArea( pArea, szFileName );
 
    /* Position cursor at the first record */
    return SELF_GOTOP( ( AREAP ) pArea );
@@ -1208,10 +1213,10 @@ static const RDDFUNCS sdfTable = { NULL /* hb_sdfBof */,
                                    ( DBENTRYP_S ) hb_sdfSetFieldExtent,
                                    NULL /* hb_sdfAlias */,
                                    ( DBENTRYP_V ) hb_sdfClose,
-                                   ( DBENTRYP_VP ) hb_sdfCreate,
+                                   ( DBENTRYP_VO ) hb_sdfCreate,
                                    ( DBENTRYP_SI ) hb_sdfInfo,
                                    ( DBENTRYP_V ) hb_sdfNewArea,
-                                   ( DBENTRYP_VP ) hb_sdfOpen,
+                                   ( DBENTRYP_VO ) hb_sdfOpen,
                                    NULL /* hb_sdfRelease */,
                                    ( DBENTRYP_SP ) hb_sdfStructSize,
                                    NULL /* hb_sdfSysName */,
@@ -1269,6 +1274,7 @@ static const RDDFUNCS sdfTable = { NULL /* hb_sdfBof */,
                                    NULL /* hb_sdfExit */,
                                    NULL /* hb_sdfDrop */,
                                    NULL /* hb_sdfExists */,
+                                   NULL /* hb_sdfRename */,
                                    ( DBENTRYP_RSLV ) hb_sdfRddInfo,
                                    NULL /* hb_sdfWhoCares */
                            };

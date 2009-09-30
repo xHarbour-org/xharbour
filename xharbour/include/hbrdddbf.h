@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.43 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.44 2009/07/31 10:16:16 marchuet Exp $
  */
 
 /*
@@ -113,10 +113,10 @@ HB_EXTERN_BEGIN
 #define HB_IDXREAD_CLEANMASK  HB_IDXREAD_DIRTY
 #define HB_IDXREAD_DIRTYMASK  (HB_IDXREAD_DIRTY|HB_IDXREAD_DEFAULT)
 
-#define DBFNODE_DATARAW( r )  ( (r)->lpvCargo )
+#define DBFNODE_DATARAW( r )  ( ( r )->lpvCargo )
 #define DBFNODE_DATA( r )     ( (LPDBFDATA) DBFNODE_DATARAW( r )  )
 
-#define DBFAREA_DATA( w )     DBFNODE_DATA( SELF_RDDNODE( w ) )
+#define DBFAREA_DATA( w )     DBFNODE_DATA( SELF_RDDNODE( &( w )->area ) )
 
 
 #define HB_DIRTYREAD( w )     ( ( DBFAREA_DATA( w )->uiDirtyRead & \
@@ -143,16 +143,15 @@ typedef struct _DBFDATA
    BYTE     bMemoType;        /* DB_MEMO_FPT */
    BYTE     bMemoExtType;     /* DB_MEMOVER_FLEX */
    USHORT   uiDirtyRead;      /* HB_IDXREAD_CLEANMASK */
-   USHORT   uiMemoBlockSize;  /* 0 */
+   ULONG    ulMemoBlockSize;  /* 0 */
 
    BOOL     fSortRecNo;
    BOOL     fMultiKey;
    BOOL     fStruct;
    BOOL     fStrictStruct;
    BOOL     fMultiTag;
-} DBFDATA;
+} DBFDATA, * LPDBFDATA;
 
-typedef DBFDATA * LPDBFDATA;
 
 
 
@@ -165,35 +164,9 @@ typedef DBFDATA * LPDBFDATA;
 
 typedef struct _DBFAREA
 {
-   struct _RDDFUNCS * lprfsHost; /* Virtual method table for this workarea */
-   USHORT uiArea;                /* The number assigned to this workarea */
-   void * atomAlias;             /* Pointer to the alias symbol for this workarea */
-   USHORT uiFieldExtent;         /* Total number of fields allocated */
-   USHORT uiFieldCount;          /* Total number of fields used */
-   USHORT uiFieldHidden;         /* Total number of fields hidden */
-   LPFIELD lpFields;             /* Pointer to an array of fields */
-   void * lpFieldExtents;        /* Void ptr for additional field properties */
-   PHB_ITEM valResult;           /* All purpose result holder */
-   BOOL fTop;                    /* TRUE if "top" */
-   BOOL fBottom;                 /* TRUE if "bottom" */
-   BOOL fBof;                    /* TRUE if "bof" */
-   BOOL fEof;                    /* TRUE if "eof" */
-   BOOL fFound;                  /* TRUE if "found" */
-   DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
-   DBFILTERINFO dbfi;            /* Filter in effect */
-   PHB_SESSION dbssi;            /* Session info used on transactions */
-   LPDBORDERCONDINFO lpdbOrdCondInfo;
-   LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
-   USHORT uiParents;             /* Number of parents for this area */
-   USHORT heap;
-   USHORT heapSize;
-   USHORT rddID;
-   USHORT uiMaxFieldNameLength;
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
-   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
+   AREA area;
 
-/*
+   /*
    *  DBFS's additions to the workarea structure
    *
    *  Warning: The above section MUST match WORKAREA exactly!  Any
@@ -208,8 +181,8 @@ typedef struct _DBFAREA
    char *   szMemoFileName;         /* Name of memo file */
    USHORT   uiHeaderLen;            /* Size of header */
    USHORT   uiRecordLen;            /* Size of record */
-   USHORT   uiMemoBlockSize;        /* Size of memo block */
-   USHORT   uiNewBlockSize;         /* Size of new memo block */
+   ULONG    ulMemoBlockSize;        /* Size of memo block */
+   ULONG    ulNewBlockSize;         /* Size of new memo block */
    USHORT   uiMemoVersion;          /* MEMO file version */
    USHORT   uiDirtyRead;            /* Index dirty read bit filed */
    BYTE     bTableType;             /* DBF type */
@@ -246,7 +219,7 @@ typedef struct _DBFAREA
    LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
    ULONG *  pLocksPos;              /* List of records locked */
    ULONG    ulNumLocksPos;          /* Number of records locked */
-   BYTE *   pCryptKey;              /* Pointer to encryption key */
+   char *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
    USHORT   uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */   
    USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */   
@@ -292,7 +265,7 @@ static HB_ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
 static HB_ERRCODE hb_dbfGetVarLen( DBFAREAP pArea, USHORT uiIndex, ULONG * pLength );
 static HB_ERRCODE hb_dbfGoCold( DBFAREAP pArea );
 static HB_ERRCODE hb_dbfGoHot( DBFAREAP pArea );
-static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer );
+static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, const BYTE * pBuffer );
 static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 static HB_ERRCODE hb_dbfRecall( DBFAREAP pArea );
 static HB_ERRCODE hb_dbfRecCount( DBFAREAP pArea, ULONG * pRecCount );
@@ -354,9 +327,9 @@ static HB_ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo );
 static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo );
 #define hb_dbfCloseMemFile                         NULL
 static HB_ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo );
-static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
+static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode );
 static HB_ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo );
-static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
+static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode );
 
 static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea );
 static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea );
@@ -365,6 +338,7 @@ static HB_ERRCODE hb_dbfInit( LPRDDNODE pRDD );
 static HB_ERRCODE hb_dbfExit( LPRDDNODE pRDD );
 static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect );
 static HB_ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect );
+static HB_ERRCODE hb_dbfRename( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, PHB_ITEM pNewName, ULONG ulConnect );
 static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 
 #define hb_dbfWhoCares                             NULL

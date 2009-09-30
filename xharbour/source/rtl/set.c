@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.100 2009/07/11 23:00:35 ronpinkas Exp $
+ * $Id: set.c,v 1.101 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -55,8 +55,8 @@
  * www - http://www.harbour-project.org
  *
  * Copyright 2008-2009 Viktor Szakats <viktor.szakats@syenar.hu>
- *    hb_osEncode()
- *    hb_osDecode()
+ *    hb_osEncodeCP()
+ *    hb_osDecodeCP()
  *
  * See COPYING for licensing terms.
  *
@@ -95,7 +95,7 @@ typedef struct
 
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
-      extern LONG hb_PrintFileRaw(UCHAR *cPrinterName,UCHAR *cFileName, UCHAR *cDocName) ;
+      extern LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocName ) ;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
       extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
 #endif
@@ -191,12 +191,12 @@ static void close_binary( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( pSet->hb_set_winprinter && ( pSet->hb_set_printhan == handle ) && s_PrintFileName[0] )
       {
-         if ( hb_fsFSize( (BYTE *) s_PrintFileName, FALSE ) > 0 )
+         if ( hb_fsFSize( s_PrintFileName, FALSE ) > 0 )
          {
-            hb_PrintFileRaw( (BYTE *) s_PrinterName, (BYTE *) s_PrintFileName,
-                            (BYTE *) ( pSet->hb_set_printerjob ? pSet->hb_set_printerjob : s_PrintFileName ) ) ;
+            hb_PrintFileRaw( s_PrinterName, s_PrintFileName,
+                            ( pSet->hb_set_printerjob ? pSet->hb_set_printerjob : s_PrintFileName ) ) ;
          }
-         hb_fsDelete( (BYTE *) s_PrintFileName );
+         hb_fsDelete( s_PrintFileName );
       }
 #else
       HB_SYMBOL_UNUSED( pSet );
@@ -287,17 +287,17 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
       BOOL bCreate = FALSE;
 
       if( bPipe )
-         handle = hb_fsPOpen( ( BYTE * ) file_name, ( BYTE * ) "w" );
+         handle = hb_fsPOpen( file_name, "w" );
       else if ( bTemp )
-         handle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, ( BYTE * ) s_PrintFileName );
+         handle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, s_PrintFileName );
       else
       {
          if( bAppend )
          {  /* Append mode */
-            if( hb_fsFile( ( BYTE * ) szPrnFile ) )
+            if( hb_fsFile( szPrnFile ) )
             {  /* If the file already exists, open it (in read-write mode, in
                   case of non-Unix and text modes). */
-               handle = hb_fsOpen( ( BYTE * ) szPrnFile, FO_READWRITE);
+               handle = hb_fsOpen( szPrnFile, FO_READWRITE);
                if( handle != FS_ERROR )
                {  /* Position to EOF */
                   /* Special binary vs. text file handling - even for UN*X, now
@@ -331,12 +331,12 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
            if ( hb_isLegacyDevice( s_PrinterName ) )
             {  // according to the Win SDK devices should be opened not created
-               handle = hb_fsOpen( ( BYTE * ) szPrnFile, FO_READWRITE );
+               handle = hb_fsOpen( szPrnFile, FO_READWRITE );
             }
             else
 #endif
             {
-               handle = hb_fsCreateEx( ( BYTE * ) szPrnFile, FC_NORMAL, FO_DENYNONE );
+               handle = hb_fsCreateEx( szPrnFile, FC_NORMAL, FO_DENYNONE );
             }
          }
       }
@@ -377,7 +377,7 @@ static void hb_set_OSCODEPAGE( PHB_SET_STRUCT pSet )
 #ifndef HB_CDP_SUPPORT_OFF
 
    {
-      char * pszHostCDP = hb_cdpID();
+      const char * pszHostCDP = hb_cdpID();
       char * pszFileCDP = pSet->HB_SET_OSCODEPAGE;
 
       if( pszFileCDP && pszFileCDP[ 0 ] && pszHostCDP )
@@ -3128,60 +3128,80 @@ const char * hb_setGetOSCODEPAGE( void )
    return hb_stackSetStruct()->HB_SET_OSCODEPAGE;
 }
 
-UCHAR * hb_osEncode( UCHAR * szFileName, BOOL * pfFree )
+const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSize )
 {
    HB_THREAD_STUB
-
-   *pfFree = FALSE;
 
 #if defined( HB_MT_VM )
    if( hb_stackId() )
 #endif
    {
-      BOOL bCPConv = hb_setGetOSCODEPAGE() && hb_setGetOSCODEPAGE()[ 0 ];
-
-      if( bCPConv )
+      PHB_CODEPAGE cdpOS = ( PHB_CODEPAGE ) hb_stackSetStruct()->HB_SET_OSCODEPAGE;
+      if( cdpOS )
       {
-         UCHAR * p = szFileName;
-         UCHAR * pCPTrans = hb_stackSetStruct()->hb_set_oscptransto;
-
-         while( *p )
+         PHB_CODEPAGE cdpHost = hb_cdppage();
+         if( cdpHost && cdpHost != cdpOS )
          {
-            *p = pCPTrans[ ( UCHAR ) *p ];
-            p++;
+            ULONG ulSize = 0;
+            char * pszBuf;
+
+            if( pszFree == NULL )
+            {
+               pszFree = ( char ** ) &szName;
+               ulSize = strlen( szName );
+            }
+            pszBuf = *pszFree;
+            if( pulSize == NULL )
+               pulSize = &ulSize;
+            else if( *pulSize > 0 )
+               ulSize = *pulSize - 1;
+
+            szName = hb_cdpnDup3( szName, ( ULONG ) strlen( szName ),
+                                  pszBuf, &ulSize, pszFree, pulSize,
+                                  cdpHost, cdpOS );
          }
       }
    }
 
-   return szFileName;
+   return szName;
 }
 
-UCHAR * hb_osDecode( UCHAR * szFileName, BOOL * pfFree )
+const char * hb_osDecodeCP( const char * szName, char ** pszFree, ULONG * pulSize )
 {
    HB_THREAD_STUB
-
-   *pfFree = FALSE;
 
 #if defined( HB_MT_VM )
    if( hb_stackId() )
 #endif
    {
-      BOOL bCPConv = hb_setGetOSCODEPAGE() && hb_setGetOSCODEPAGE()[ 0 ];
-
-      if( bCPConv )
+      PHB_CODEPAGE cdpOS = ( PHB_CODEPAGE ) hb_stackSetStruct()->HB_SET_OSCODEPAGE;
+      if( cdpOS )
       {
-         UCHAR * p = szFileName;
-         UCHAR * pCPTrans = hb_stackSetStruct()->hb_set_oscptransfrom;
-
-         while( *p )
+         PHB_CODEPAGE cdpHost = hb_cdppage();
+         if( cdpHost && cdpHost != cdpOS )
          {
-            *p = pCPTrans[ ( UCHAR ) *p ];
-            p++;
+            ULONG ulSize = 0;
+            char * pszBuf;
+
+            if( pszFree == NULL )
+            {
+               pszFree = ( char ** ) &szName;
+               ulSize = strlen( szName );
+            }
+            pszBuf = *pszFree;
+            if( pulSize == NULL )
+               pulSize = &ulSize;
+            else if( *pulSize > 0 )
+               ulSize = *pulSize - 1;
+
+            szName = hb_cdpnDup3( szName, ( ULONG ) strlen( szName ),
+                                  pszBuf, &ulSize, pszFree, pulSize,
+                                  cdpOS, cdpHost );
          }
       }
    }
 
-   return szFileName;
+   return szName;
 }
 
 BOOL hb_setGetAppendError( void )

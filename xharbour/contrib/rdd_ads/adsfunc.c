@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.99 2009/07/12 07:06:37 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.100 2009/08/22 03:41:14 what32 Exp $
  */
 
 /*
@@ -50,7 +50,9 @@
  *
  */
 
+#ifndef HB_OS_WIN_32_USED
 #define HB_OS_WIN_32_USED
+#endif
 
 #include "hbvm.h"
 #include "hbapi.h"
@@ -81,7 +83,7 @@ ADSHANDLE hb_ads_hConnect = 0;
 
 BOOL hb_ads_bOEM = FALSE;
 
-char * hb_adsOemToAnsi( char * pcString, ULONG ulLen )
+char * hb_adsOemToAnsi( const char * pcString, ULONG ulLen )
 {
    if( hb_ads_bOEM )
    {
@@ -90,10 +92,10 @@ char * hb_adsOemToAnsi( char * pcString, ULONG ulLen )
       pszDst[ ulLen ] = '\0';
       return pszDst;
    }
-   return pcString;
+   return ( char * ) pcString;
 }
 
-char * hb_adsAnsiToOem( char * pcString, ULONG ulLen )
+char * hb_adsAnsiToOem( const char * pcString, ULONG ulLen )
 {
    if( hb_ads_bOEM )
    {
@@ -102,7 +104,7 @@ char * hb_adsAnsiToOem( char * pcString, ULONG ulLen )
       pszDst[ ulLen ] = '\0';
       return pszDst;
    }
-   return pcString;
+   return ( char * ) pcString;
 }
 
 void hb_adsOemAnsiFree( char * pcString )
@@ -418,11 +420,10 @@ HB_FUNC( ADSSETEXACT )
 
 HB_FUNC( ADSBLOB2FILE )
 {
-   char * szFileName = hb_parcx( 1 );
-   char * szFieldName = hb_parcx( 2 );
+   const char * szFileName = hb_parcx( 1 );
+   const char * szFieldName = hb_parcx( 2 );
 
-   if( strlen( szFileName ) &&
-       strlen( szFieldName ) )
+   if( *szFileName && *szFieldName )
    {
       ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 
@@ -439,11 +440,10 @@ HB_FUNC( ADSBLOB2FILE )
 
 HB_FUNC( ADSFILE2BLOB )
 {
-   char * szFileName = hb_parcx( 1 );
-   char * szFieldName = hb_parcx( 2 );
+   const char * szFileName = hb_parcx( 1 );
+   const char * szFieldName = hb_parcx( 2 );
 
-   if( strlen( szFileName ) &&
-       strlen( szFieldName ) )
+   if( *szFileName && *szFieldName )
    {
       ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 
@@ -487,11 +487,7 @@ HB_FUNC( ADSKEYNO )
             UNSIGNED8 ordNum = ( UNSIGNED8 ) hb_itemGetNI( pxOrder );
 
             if( ordNum > 0 ) /* otherwise leave hIndex at 0 */
-            {
-               AdsGetIndexHandleByOrder( pArea->hTable,
-                                         ordNum,
-                                         &hIndex );
-            }
+               AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
          }
          else if( hb_itemGetCLen( pxOrder ) == 0 ) /* passed empty string */
          {
@@ -505,17 +501,9 @@ HB_FUNC( ADSKEYNO )
          }
 
          if( hIndex == 0 ) /* no index selected */
-         {
-            AdsGetRecordNum( pArea->hTable,
-                             usFilterOption,
-                             &pulKey );
-         }
+            AdsGetRecordNum( pArea->hTable, usFilterOption, &pulKey );
          else
-         {
-            AdsGetKeyNum( hIndex,
-                          usFilterOption,
-                          &pulKey );
-         }
+            AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
 
          hb_retnl( pulKey );
       }
@@ -554,11 +542,7 @@ HB_FUNC( ADSKEYCOUNT )
             UNSIGNED8 ordNum = ( UNSIGNED8 ) hb_itemGetNI( pxOrder );
 
             if( ordNum > 0 ) /* otherwise leave hIndex at 0 */
-            {
-               AdsGetIndexHandleByOrder( pArea->hTable,
-                                         ordNum,
-                                         &hIndex );
-            }
+               AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
          }
          else if( hb_itemGetCLen( pxOrder ) == 0 ) /* passed empty string */
          {
@@ -1173,9 +1157,9 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
 
                hb_strncpy( szAlias, ISCHAR( 1 ) ? hb_parc( 1 ) : "ADSSQL",
                            sizeof( szAlias ) - 1 );
-               pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAlias,
-                                                            pArea->uiArea );
-               if( pArea->atomAlias )
+               pArea->area.atomAlias = hb_rddAllocWorkAreaAlias( szAlias,
+                                                            pArea->area.uiArea );
+               if( pArea->area.atomAlias )
                {
                   pArea->hTable = 0;
                   pArea->hOrdCurrent = 0;
@@ -1183,14 +1167,8 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
                   fResult = TRUE;
                }
                else
-                  /* QUESTION: Is this right? [vszakats] */
                   hb_rddReleaseCurrentArea();
             }
-#if 0
-            /* QUESTION: Shouldn't we call AdsCloseSQLStatement() if pArea was NULL? [vszakats] */
-            else
-               AdsCloseSQLStatement( adsStatementHandle );
-#endif
          }
          else
             AdsCloseSQLStatement( adsStatementHandle );
@@ -1227,7 +1205,7 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
             DBOPENINFO pInfo;
 
             memset( &pInfo, 0, sizeof( DBOPENINFO ) );
-            pInfo.abName = ( BYTE * ) "";
+            pInfo.abName = "";
             pInfo.fReadonly = TRUE;
             pArea->hTable = hCursor;
             SELF_OPEN( ( AREAP ) pArea, &pInfo );
@@ -1299,7 +1277,7 @@ HB_FUNC( ADSEXECUTESQL )
             DBOPENINFO pInfo;
 
             memset( &pInfo, 0, sizeof( DBOPENINFO ) );
-            pInfo.abName = ( BYTE * ) "";
+            pInfo.abName = "";
             pInfo.fReadonly = TRUE;
             pArea->hTable = hCursor;
             SELF_OPEN( ( AREAP ) pArea, &pInfo );

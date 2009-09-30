@@ -1,5 +1,5 @@
 /*
- * $Id: hbsxfunc.h,v 1.3 2006/08/19 11:22:28 druzus Exp $
+ * $Id: hbsxfunc.h,v 1.4 2009/04/23 14:31:48 marchuet Exp $
  */
 
 /*
@@ -63,13 +63,13 @@
 HB_EXTERN_BEGIN
 
 char * hb_sxDtoP( char * pDate, LONG lJulian );
-LONG hb_sxPtoD( char * pDate );
+LONG hb_sxPtoD( const char * pDate );
 
-void hb_sxEnCrypt( BYTE * pSrc, BYTE * pDst, BYTE * pKeyVal, ULONG ulLen );
-void hb_sxDeCrypt( BYTE * pSrc, BYTE * pDst, BYTE * pKeyVal, ULONG ulLen );
+void hb_sxEnCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG ulLen );
+void hb_sxDeCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG ulLen );
 
-BOOL hb_LZSSxDecompressMem( BYTE * pSrcBuf, ULONG ulSrcLen, BYTE * pDstBuf, ULONG ulDstLen );
-BOOL hb_LZSSxCompressMem( BYTE * pSrcBuf, ULONG ulSrcLen, BYTE * pDstBuf, ULONG ulDstLen, ULONG * pulSize );
+BOOL hb_LZSSxDecompressMem( const char * pSrcBuf, ULONG ulSrcLen, char * pDstBuf, ULONG ulDstLen );
+BOOL hb_LZSSxCompressMem( const char * pSrcBuf, ULONG ulSrcLen, char * pDstBuf, ULONG ulDstLen, ULONG * pulSize );
 BOOL hb_LZSSxCompressFile( HB_FHANDLE hInput, HB_FHANDLE hOutput, ULONG * pulSize );
 BOOL hb_LZSSxDecompressFile( HB_FHANDLE hInput, HB_FHANDLE hOutput );
 

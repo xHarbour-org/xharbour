@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.9 2008/08/29 12:58:46 modalsist Exp $
+ * $Id: memofile.c,v 1.10 2008/08/30 01:24:30 modalsist Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( MEMOREAD )
 
    if( pFileName )
    {
-      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) hb_itemGetCPtr( pFileName ), FO_READ | FO_SHARED | FO_PRIVATE );
+      HB_FHANDLE fhnd = hb_fsOpen( hb_itemGetCPtr( pFileName ), FO_READ | FO_SHARED | FO_PRIVATE );
 
       if( fhnd != FS_ERROR )
       {
@@ -72,7 +72,7 @@ HB_FUNC( MEMOREAD )
 
          if( ulSize != 0 )
          {
-            BYTE * pbyBuffer;
+            void * pbyBuffer;
 
             /* Don't read the file terminating EOF character */
 
@@ -88,7 +88,7 @@ HB_FUNC( MEMOREAD )
             }
             #endif
 
-            pbyBuffer = ( BYTE * ) hb_xgrab( ulSize + sizeof( char ) );
+            pbyBuffer = hb_xgrab( ulSize + sizeof( char ) );
 
             hb_fsSeek( fhnd, 0, FS_SET );
             hb_fsReadLarge( fhnd, pbyBuffer, ulSize );
@@ -115,13 +115,13 @@ static BOOL hb_memowrit( BOOL bWriteEOF )
 
    if( pFileName && pString )
    {
-      FHANDLE fhnd = hb_fsCreate( ( BYTE * ) hb_itemGetCPtr( pFileName ), FC_NORMAL );
+      HB_FHANDLE fhnd = hb_fsCreate( hb_itemGetCPtr( pFileName ), FC_NORMAL );
 
       if( fhnd != FS_ERROR )
       {
          ULONG ulSize = hb_itemGetCLen( pString );
 
-         bRetVal = ( hb_fsWriteLarge( fhnd, ( BYTE * ) hb_itemGetCPtr( pString ), ulSize ) == ulSize );
+         bRetVal = ( hb_fsWriteLarge( fhnd, hb_itemGetCPtr( pString ), ulSize ) == ulSize );
 
          /* NOTE: CA-Cl*pper will add the EOF even if the write failed. [vszakats] */
          /* NOTE: CA-Cl*pper will not return .F. when the EOF could not be written. [vszakats] */

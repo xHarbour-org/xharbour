@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.14 2008/12/22 22:09:44 likewolf Exp $
+ * $Id: hbcc.prg,v 1.15 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ typedef struct int_hb_csinfo {
 //Common static variables
 static ULONG LastError=0, lcs=0;
 static HB_CSINFO **pcs;
-static BYTE *cspath=NULL;
+static char *cspath = NULL;
 static BYTE *base64a=(BYTE*) "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static BYTE *trchars=(BYTE*) "/\047(),.:?\n\r\v\t ";
 static BYTE *wspchars; //="\n\r\v\t ";
@@ -224,11 +224,11 @@ HB_FUNC_STATIC( HB_INT_CSINIT )
    pcs=NULL;
    lcs=0;
    wspchars=(BYTE*) strchr((char*)trchars,'\n');
-   cspath=(BYTE*) hb_getenv("HBCSPATH");
+   cspath= hb_getenv("HBCSPATH");
 
    if (cspath==NULL)
    {
-      cspath=(BYTE *) hb_xgrab(3);
+      cspath = ( char * ) hb_xgrab(3);
       cspath[0]='.';
       cspath[1]=HB_OS_PATH_DELIM_CHR;
       cspath[2]='\0';
@@ -236,17 +236,17 @@ HB_FUNC_STATIC( HB_INT_CSINIT )
 
    if (cspath[0]=='\0')
    {
-      cspath=(BYTE *) hb_xrealloc(cspath,3);
-      cspath[0]='.';
-      cspath[1]=HB_OS_PATH_DELIM_CHR;
-      cspath[2]='\0';
+      cspath = ( char * ) hb_xrealloc(cspath,3);
+      cspath[0]= '.';
+      cspath[1]= HB_OS_PATH_DELIM_CHR;
+      cspath[2]= '\0';
    }
 
-   i=strlen((char*) cspath);
+   i=strlen( cspath );
 
    if (cspath[i-1]!=HB_OS_PATH_DELIM_CHR)
    {
-      cspath=(BYTE *) hb_xrealloc(cspath,i+2);
+      cspath = ( char * ) hb_xrealloc(cspath,i+2);
       cspath[i]=HB_OS_PATH_DELIM_CHR;
       cspath[i+1]='\0';
    }
@@ -303,7 +303,7 @@ HB_FUNC( HB_CSREG )
 {
    ULONG i,j;
    BYTE c;
-   BYTE *filepath, *csname;
+   char * filepath, * csname;
    FHANDLE hf;
 
    if (ISCHAR(1))
@@ -315,13 +315,13 @@ HB_FUNC( HB_CSREG )
          return;
       }
 
-      csname=(BYTE*)hb_parc(1);
-      filepath=(BYTE *) hb_xgrab(HB_PATH_MAX);
-      strcpy((char *) filepath,(char *) cspath);
-      strcat((char *) filepath,(char *) csname);
-      strcat((char *) filepath,(char *) HB_CSFEXT);
+      csname = hb_parc( 1 );
+      filepath = ( char * ) hb_xgrab( HB_PATH_MAX );
+      strcpy( filepath, cspath );
+      strcat( filepath, csname );
+      strcat( filepath, (char *) HB_CSFEXT);
 
-      if (hb_spFile(filepath,NULL)==FALSE)
+      if ( hb_spFile( filepath, NULL ) == FALSE )
       {
          hb_xfree(filepath);
          LastError=HB_CSERR_BADCS;
@@ -329,7 +329,7 @@ HB_FUNC( HB_CSREG )
          return;
       }
 
-      hf=hb_fsOpen(filepath,FO_READ|FO_DENYNONE);
+      hf = hb_fsOpen( filepath, FO_READ | FO_DENYNONE );
 
       if (hf<0)
       {
@@ -364,12 +364,12 @@ HB_FUNC( HB_CSREG )
          return;
       }
 
-      filepath=(BYTE *) hb_xrealloc(filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
+      filepath = ( char * ) hb_xrealloc( filepath, CSINFO_HEADSZ - CSINFO_MAXNAME );
       i=hb_fsRead(hf,filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
 
       if (i<(CSINFO_HEADSZ - CSINFO_MAXNAME))
       {
-         hb_xfree(filepath);
+         hb_xfree( filepath );
          lcs--;
          hb_xfree(pcs[lcs]);
          pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
@@ -378,10 +378,10 @@ HB_FUNC( HB_CSREG )
          return;
       }
 
-      pcs[lcs-1]->chsz=filepath[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
-      pcs[lcs-1]->defchar[0]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME];
-      pcs[lcs-1]->defchar[1]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
-      pcs[lcs-1]->ltc2u=filepath[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
+      pcs[lcs-1]->chsz = filepath[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
+      pcs[lcs-1]->defchar[0] = filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME];
+      pcs[lcs-1]->defchar[1] = filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
+      pcs[lcs-1]->ltc2u = filepath[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
       j=0;
 
       for (i=0;i<CSINFO_MAXLEAD;i++)
@@ -564,17 +564,17 @@ HB_FUNC( HB_CSOPENED )
 
 HB_FUNC( HB_CSAVAIL )
 {
-   BYTE *filepath;
+   char * filepath;
    BOOL x;
 
    if (ISCHAR(1))
    {
-      filepath=(BYTE *) hb_xgrab(HB_PATH_MAX);
-      strcpy((char*)filepath,(char*)cspath);
-      strcat((char*)filepath,hb_parc(1));
-      strcat((char*)filepath,HB_CSFEXT);
-      x=hb_spFile(filepath,NULL);
-      hb_xfree(filepath);
+      filepath = ( char * ) hb_xgrab(HB_PATH_MAX);
+      strcpy( filepath, cspath );
+      strcat( filepath, hb_parc(1) );
+      strcat( filepath, HB_CSFEXT );
+      x = hb_spFile( filepath, NULL );
+      hb_xfree( filepath );
 
       if (x)
       {
@@ -597,21 +597,21 @@ HB_FUNC( HB_CSAVAIL )
 HB_FUNC( HB_CSLIST )
 {
    ULONG i;
-   BYTE *cslist;
+   char * cslist;
 
-   LastError=HB_CSERR_OK;
-   cslist=(BYTE *) hb_xgrab(1);
+   LastError = HB_CSERR_OK;
+   cslist = ( char * ) hb_xgrab(1);
    cslist[0]='\0';
 
    for (i=0;i<lcs;i++)
    {
-      cslist=(BYTE *) hb_xrealloc(cslist,strlen((char*)cslist)+strlen((char*)pcs[i]->name)+2);
-      strcat((char*) cslist,(char*)",");
-      strcat((char*) cslist,(char*)pcs[i]->name);
+      cslist = ( char * ) hb_xrealloc( cslist, strlen( cslist ) + strlen( ( char * ) pcs[i]->name ) + 2 );
+      strcat( cslist, ( char * ) "," );
+      strcat( cslist, ( char * ) pcs[i]->name );
    }
 
-   hb_retc((char*)(cslist+1));
-   hb_xfree(cslist);
+   hb_retc( cslist + 1 );
+   hb_xfree( cslist );
 }
 
 HB_FUNC( HB_CSTOCS )

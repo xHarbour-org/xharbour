@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.6 2009/08/06 21:01:56 marchuet Exp $
+ * $Id: hbfilere.c,v 1.7 2009/09/16 15:53:42 marchuet Exp $
  */
 
 /*
@@ -89,9 +89,9 @@ static USHORT uiUsers = 0;            // Number of users connected
 static BYTE * szOk    = ( BYTE * ) "+1";
 static BYTE * szFalse = ( BYTE * ) "+0";
 
-static BYTE pFilename[HB_PATH_MAX];
-static BYTE pDefExt[HB_PATH_MAX];
-static BYTE pPaths[HB_PATH_MAX];
+static char pFilename[HB_PATH_MAX];
+static char pDefExt[HB_PATH_MAX];
+static char pPaths[HB_PATH_MAX];
 
 #define HB_LENGTH_ACK         4
 static char szDataACK[HB_LENGTH_ACK];
@@ -160,7 +160,7 @@ void main( int argc, char * argv[] )
 	}
    
    pFilepath = hb_fsFNameSplit( pModuleFile );
-   hb_fsChDir( ( BYTE * ) pFilepath->szPath );
+   hb_fsChDir( pFilepath->szPath );
    
 	if( argc >= 2 )
 		strcpy( lpCmdLineData, argv[1] );
@@ -529,14 +529,14 @@ static void fl_free( void * pHeapMem )
 #endif   
 /* File buffer functions */
 
-static PHB_FILE hb_fileFind( PUSERSTRU pUStru, BYTE * pFileName )
+static PHB_FILE hb_fileFind( PUSERSTRU pUStru, char * pFileName )
 {
    if( pUStru->s_openFiles && pFileName )
    {
       PHB_FILE pFile = pUStru->s_openFiles;
       do
       {
-         if( strcmp( ( char * ) pFile->pFileName, ( char * ) pFileName ) == 0 )
+         if( strcmp( pFile->pFileName, pFileName ) == 0 )
             return pFile;
          pFile = pFile->pNext;
       }
@@ -561,7 +561,7 @@ static PHB_FILE hb_fileFindByHandle( PUSERSTRU pUStru, HB_FHANDLE hFile )
    return NULL;
 }
 
-static PHB_FILE hb_fileNew( PUSERSTRU pUStru, HB_FHANDLE hFile, BOOL fShared, BYTE * pFileName )
+static PHB_FILE hb_fileNew( PUSERSTRU pUStru, HB_FHANDLE hFile, BOOL fShared, char * pFileName )
 {
    PHB_FILE pFile = hb_fileFind( pUStru, pFileName );
 
@@ -569,8 +569,8 @@ static PHB_FILE hb_fileNew( PUSERSTRU pUStru, HB_FHANDLE hFile, BOOL fShared, BY
    {
       pFile = ( PHB_FILE ) fl_alloc( sizeof( HB_FILE ) );
       memset( pFile, 0, sizeof( HB_FILE ) );
-      pFile->pFileName = ( BYTE * ) fl_alloc( HB_PATH_MAX );
-      memcpy( ( char * ) pFile->pFileName, ( char * ) pFileName, strlen( ( char * ) pFileName ) );
+      pFile->pFileName = ( char * ) fl_alloc( HB_PATH_MAX );
+      memcpy( pFile->pFileName, pFileName, strlen( pFileName ) );
       pFile->hFile     = hFile;
       pFile->shared    = fShared;
       pFile->hMap      = NULL;
@@ -872,7 +872,7 @@ static void filere_ReadAt( PUSERSTRU pUStru, BYTE* szData )
       if( pFile && pFile->hMap )
       {
          ulRead = ulCount;
-         memcpy( pUStru->pBufAnswer + 8, pFile->pView + llOffset, ulCount );
+         memcpy( pUStru->pBufAnswer + 8, pFile->pView + ( long ) llOffset, ulCount );
       }
       else
          ulRead = hb_fsReadAt( hFileHandle, pUStru->pBufAnswer + 8, ulCount, llOffset );
@@ -1144,19 +1144,19 @@ static void filere_Delete( PUSERSTRU pUStru, BYTE* szData )
 static void filere_Rename( PUSERSTRU pUStru, BYTE* szData )
 {
    BYTE * ptr;
-   BYTE * pFileOld;
-   BYTE * pFileNew;
+   char * pFileOld;
+   char * pFileNew;
    ULONG ulSize;
    
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 1, &ulSize );
    if( ulSize )
    {
-      pFileOld = ( BYTE * ) fl_alloc( ( ulSize + 1 ) * sizeof( BYTE ) );
+      pFileOld = ( char * ) fl_alloc( ( ulSize + 1 ) * sizeof( char ) );
       memcpy( pFileOld, ptr, ulSize );
       pFileOld[ulSize] = '\0';
       
       ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 2, &ulSize );
-      pFileNew = ( BYTE * ) fl_alloc( ( ulSize + 1 ) * sizeof( BYTE ) );
+      pFileNew = ( char * ) fl_alloc( ( ulSize + 1 ) * sizeof( char ) );
       memcpy( pFileNew, ptr, ulSize );
       pFileNew[ulSize] = '\0';
       
@@ -1345,7 +1345,7 @@ static void filere_CurDirBuffEx( PUSERSTRU pUStru, BYTE* szData )
    ULONG ulSize, ulLen;
    USHORT uiDrive, uiRet;
    BYTE * ptr;
-   static BYTE pbyDirBuffer[ HB_PATH_MAX ];
+   static char pbyDirBuffer[ HB_PATH_MAX ];
    
    // Reading params 
    ptr = hb_strToken( szData, strlen( ( char * ) szData ), 1, &ulSize );

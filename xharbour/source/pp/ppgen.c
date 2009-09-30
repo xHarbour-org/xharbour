@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
 char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
 ULONG hb_xquery( USHORT uiMode ) { HB_SYMBOL_UNUSED( uiMode ); return 0; }
-BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
+const char * hb_fsNameConv( const char * szFileName, char ** pszFree ) { if( pszFree ) * pszFree = NULL; return szFileName; }
 int hb_setGetDirSeparator( void ) { return HB_OS_PATH_DELIM_CHR; }
 int hb_verCvsID( void ) { return 0; }
 const char * hb_verCvsChangeLogID( void ) { return NULL; }
@@ -223,7 +223,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -327,7 +327,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"

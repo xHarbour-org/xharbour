@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.262 2009/05/25 14:37:59 marchuet Exp $
+ * $Id: hbapi.h,v 1.263 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -899,7 +899,7 @@ extern HB_EXPORT void         hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags );
 extern HB_EXPORT void         hb_macroTextValue( HB_ITEM_PTR pItem ); /* macro text substitution */
 extern HB_EXPORT void         hb_macroPushSymbol( HB_ITEM_PTR pItem ); /* handle a macro function calls, e.g. var := &macro() */
 extern HB_EXPORT void         hb_macroRun( HB_MACRO_PTR pMacro ); /* executes pcode compiled by macro compiler */
-extern HB_EXPORT HB_MACRO_PTR hb_macroCompile( char * szString ); /* compile a string and return a pcode buffer */
+extern HB_EXPORT HB_MACRO_PTR hb_macroCompile( const char * szString ); /* compile a string and return a pcode buffer */
 extern HB_EXPORT void         hb_macroDelete( HB_MACRO_PTR pMacro ); /* release all memory allocated for macro evaluation */
 extern HB_EXPORT char *       hb_macroTextSubst( char * szString, ULONG *pulStringLen ); /* substitute macro variables occurences within a given string */
 extern HB_EXPORT BOOL         hb_macroIsIdent( char * szString ); /* determine if a string is a valid function or variable name */
@@ -963,8 +963,8 @@ extern char * hb_builddate( void ); /* return date and time of harbour.exe build
 extern char * hb_credits( void ); /* return credits of harbour.exe build */
 
 /* OS/Harbour codepage conversion */
-extern HB_EXPORT BYTE * hb_osEncode( BYTE * szFileName, BOOL * pfFree ); /* Convert a string sent to a system call, from Harbour codepage. */
-extern HB_EXPORT BYTE * hb_osDecode( BYTE * szFileName, BOOL * pfFree ); /* Convert a string received from a system call, to Harbour codepage. */
+extern HB_EXPORT const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSize ); /* Convert a string sent to a system call, from Harbour codepage. */
+extern HB_EXPORT const char * hb_osDecodeCP( const char * szName, char ** pszFree, ULONG * pulSize ); /* Convert a string received from a system call, to Harbour codepage. */
 
 /* Executable array execution */
 extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );

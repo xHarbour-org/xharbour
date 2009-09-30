@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.59 2009/07/29 22:18:23 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.60 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -183,13 +183,13 @@ struct _RDDNODE;
 
 typedef struct
 {
-   BYTE *   atomName;         /* FIELD (symbol) name */
-   HB_TYPE  uiType;           /* FIELD type */
-   USHORT   uiTypeExtended;   /* FIELD type extended */
-   USHORT   uiLen;            /* Overall FIELD length */
-   USHORT   uiDec;            /* Decimal places of numeric FIELD */
-   USHORT   uiFlags;          /* FIELD flags */
-   USHORT   uiStep;           /* FIELD Step for autoincremental */
+   const char *   atomName;         /* FIELD (symbol) name */
+   USHORT         uiType;           /* FIELD type */
+   USHORT         uiTypeExtended;   /* FIELD type extended */
+   USHORT         uiLen;            /* Overall FIELD length */
+   USHORT         uiDec;            /* Decimal places of numeric FIELD */
+   USHORT         uiFlags;          /* FIELD flags */
+   USHORT         uiStep;           /* FIELD Step for autoincremental */
 } DBFIELDINFO;
 
 typedef DBFIELDINFO * LPDBFIELDINFO;
@@ -204,14 +204,15 @@ typedef DBFIELDINFO * LPDBFIELDINFO;
 
 typedef struct
 {
-   USHORT uiArea;          /* Work Area number of the data store */
-   BYTE * abName;          /* The qualified name of the data store */
-   BYTE * atomAlias;       /* The logical name of the data store */
-   BOOL   fShared;         /* Share mode of the data store */
-   BOOL   fReadonly;       /* Readonly mode of the data store */
-   BYTE * cdpId;           /* Id of a codepage */
-   ULONG  ulConnection;    /* connection handler for RDDs which support it */
-   void * lpdbHeader;      /* Pointer to a header of the data store */
+   USHORT         uiArea;           /* Work Area number of the data store */
+   USHORT         unused;
+   const char *   abName;           /* The qualified name of the data store */
+   const char *   atomAlias;        /* The logical name of the data store */
+   BOOL           fShared;          /* Share mode of the data store */
+   BOOL           fReadonly;        /* Readonly mode of the data store */
+   const char *   cdpId;            /* Id of a codepage */
+   ULONG          ulConnection;     /* connection handler for RDDs which support it */
+   void *         lpdbHeader;       /* Pointer to a header of the data store */
 } DBOPENINFO;
 
 typedef DBOPENINFO * LPDBOPENINFO;
@@ -227,8 +228,8 @@ typedef DBOPENINFO * LPDBOPENINFO;
 typedef struct _DBORDERCONDINFO
 {
    BOOL     fActive;
-   BYTE *   abFor;
-   BYTE *   abWhile;
+   char *   abFor;
+   char *   abWhile;
    PHB_ITEM itmCobFor;
    PHB_ITEM itmCobWhile;
    PHB_ITEM itmCobEval;
@@ -257,10 +258,10 @@ typedef DBORDERCONDINFO * LPDBORDERCONDINFO;
 
 typedef struct
 {
-   BYTE *             abConstrName;       /* Name of relational integrity constraint */
-   BYTE *             abTargetName;       /* Name of target relation table */
-   PHB_ITEM           itmRelationKey;     /* Array of columns in source table to match target primary key */
-   BOOL               fEnabled;           /* Is constraint enabled ? */
+   const char *   abConstrName;     /* Name of relational integrity constraint */
+   const char *   abTargetName;     /* Name of target relation table */
+   PHB_ITEM       itmRelationKey;   /* Array of columns in source table to match target primary key */
+   BOOL           fEnabled;         /* Is constraint enabled ? */
 } DBCONSTRAINTINFO;
 
 typedef DBCONSTRAINTINFO * LPDBCONSTRAINTINFO;
@@ -275,8 +276,8 @@ typedef DBCONSTRAINTINFO * LPDBCONSTRAINTINFO;
 typedef struct
 {
    LPDBORDERCONDINFO  lpdbOrdCondInfo;    /* Conditional information */
-   BYTE *             abBagName;          /* Name of the Order bag */
-   BYTE *             atomBagName;        /* Name of the Order */
+   const char *       abBagName;          /* Name of the Order bag */
+   const char *       atomBagName;        /* Name of the Order */
    PHB_ITEM           itmOrder;
    BOOL               fUnique;            /* Flag to determine if all keys are unique */
    USHORT             uiRemote;           /* Flag to determine if order is remote 0 : native 1 : local 2 : remote */ 
@@ -343,7 +344,8 @@ typedef DBSCOPEINFO * LPDBSCOPEINFO;
 
 typedef struct
 {
-   USHORT nScope;        /* scope operation: TOPSCOPE/ENDSCOPE */
+   USHORT   nScope;     /* scope operation: TOPSCOPE/ENDSCOPE */
+   USHORT   unused;
    PHB_ITEM scopeValue;
 } DBORDSCOPEINFO;
 
@@ -494,9 +496,10 @@ typedef DBSORTITEM * LPDBSORTITEM;
 
 typedef struct
 {
-   DBTRANSINFO   dbtri;        /* Destination workarea transfer information */
-   LPDBSORTITEM  lpdbsItem;    /* Fields which compose the key values for the sort */
-   USHORT        uiItemCount;  /* The number of fields above */
+   DBTRANSINFO    dbtri;         /* Destination workarea transfer information */
+   LPDBSORTITEM   lpdbsItem;     /* Fields which compose the key values for the sort */
+   USHORT         uiItemCount;   /* The number of fields above */
+   USHORT         unused;
 } DBSORTINFO;
 
 typedef DBSORTINFO * LPDBSORTINFO;
@@ -515,7 +518,7 @@ typedef struct
 {
    PHB_ITEM itmRecID;
    USHORT   uiMethod;
-   BOOL     fResult;
+   USHORT   fResult;
 } DBLOCKINFO;
 
 typedef DBLOCKINFO * LPDBLOCKINFO;
@@ -532,7 +535,7 @@ typedef DBLOCKINFO * LPDBLOCKINFO;
 
 typedef struct _FIELD
 {
-   HB_TYPE  uiType;           /* Field type */
+   USHORT   uiType;           /* Field type */
    USHORT   uiTypeExtended;   /* Field type - extended */
    USHORT   uiLen;            /* Field length */
    USHORT   uiDec;            /* Decimal length */
@@ -572,10 +575,12 @@ typedef struct _AREA
    struct _RDDFUNCS * lprfsSuper;/* Virtual super method table for this workarea */
 #endif
    USHORT uiArea;                /* The number assigned to this workarea */
+   USHORT rddID;                 /* RDD id */
    void * atomAlias;             /* Pointer to the alias symbol for this workarea */
    USHORT uiFieldExtent;         /* Total number of fields allocated */
    USHORT uiFieldCount;          /* Total number of fields used */
    USHORT uiFieldHidden;         /* Total number of fields hidden */
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
    LPFIELD lpFields;             /* Pointer to an array of fields */
    void * lpFieldExtents;        /* Void ptr for additional field properties */
    PHB_ITEM valResult;           /* All purpose result holder */
@@ -590,13 +595,11 @@ typedef struct _AREA
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
    USHORT uiParents;             /* Number of parents for this area */
+   USHORT uiMaxFieldNameLength;
    USHORT heap;
    USHORT heapSize;
-   USHORT rddID;
-   USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 } AREA;
 
 typedef AREA * LPAREA;
@@ -608,198 +611,204 @@ typedef AREA * LPAREA;
 
 /*--------------------* Virtual Method Table *----------------------*/
 
-typedef USHORT ( * DBENTRYP_V    )( AREAP area );
-typedef USHORT ( * DBENTRYP_BP   )( AREAP area, BOOL * param );
-typedef USHORT ( * DBENTRYP_B    )( AREAP area, BOOL param );
-typedef USHORT ( * DBENTRYP_L    )( AREAP area, LONG param );
-typedef USHORT ( * DBENTRYP_UL   )( AREAP area, ULONG param );
-typedef USHORT ( * DBENTRYP_I    )( AREAP area, PHB_ITEM param );
-typedef USHORT ( * DBENTRYP_SI   )( AREAP area, USHORT index, PHB_ITEM param );
-typedef USHORT ( * DBENTRYP_VP   )( AREAP area, LPDBOPENINFO param );
-typedef USHORT ( * DBENTRYP_VT   )( AREAP area, LPDBTRANSINFO param );
-typedef USHORT ( * DBENTRYP_VF   )( AREAP area, LPDBFIELDINFO param );
-typedef USHORT ( * DBENTRYP_VL   )( AREAP area, LPDBLOCKINFO param );
-typedef USHORT ( * DBENTRYP_VR   )( AREAP area, LPDBRELINFO param );
-typedef USHORT ( * DBENTRYP_VS   )( AREAP area, LPDBSORTINFO param );
-typedef USHORT ( * DBENTRYP_VFI  )( AREAP area, LPDBFILTERINFO param );
-typedef USHORT ( * DBENTRYP_VEI  )( AREAP area, LPDBEVALINFO param );
-typedef USHORT ( * DBENTRYP_VLO  )( AREAP area, LPDBSCOPEINFO param );
-typedef USHORT ( * DBENTRYP_VOC  )( AREAP area, LPDBORDERCREATEINFO param );
-typedef USHORT ( * DBENTRYP_VOI  )( AREAP area, LPDBORDERCONDINFO param );
-typedef USHORT ( * DBENTRYP_VOS  )( AREAP area, LPDBORDSCOPEINFO param );
-typedef USHORT ( * DBENTRYP_OI   )( AREAP area, LPDBORDERINFO param );
-typedef USHORT ( * DBENTRYP_OII  )( AREAP area, USHORT index, LPDBORDERINFO param );
-typedef USHORT ( * DBENTRYP_SP   )( AREAP area, USHORT * param );
-typedef USHORT ( * DBENTRYP_P    )( AREAP area, BYTE * param );
-typedef USHORT ( * DBENTRYP_PP   )( AREAP area, BYTE ** param );
-typedef USHORT ( * DBENTRYP_S    )( AREAP area, USHORT param );
-typedef USHORT ( * DBENTRYP_LP   )( AREAP area, LONG * param );
-typedef USHORT ( * DBENTRYP_ULP  )( AREAP area, ULONG * param );
-typedef USHORT ( * DBENTRYP_SVP  )( AREAP area, USHORT index, void * param );
-typedef USHORT ( * DBENTRYP_SVPB )( AREAP area, USHORT index, void * param, USHORT p3 );
-typedef USHORT ( * DBENTRYP_VSP  )( AREAP area, USHORT action, ULONG lRecord );
-typedef USHORT ( * DBENTRYP_SVL  )( AREAP area, USHORT index, ULONG * param );
-typedef USHORT ( * DBENTRYP_SSI  )( AREAP area, USHORT p1, USHORT p2, PHB_ITEM p3 );
-typedef USHORT ( * DBENTRYP_ISI  )( AREAP area, PHB_ITEM p1, USHORT p2, PHB_ITEM p3 );
-typedef USHORT ( * DBENTRYP_BIB  )( AREAP area, BOOL p1, PHB_ITEM p2, BOOL p3 );
-typedef USHORT ( * DBENTRYP_VPL  )( AREAP area, void * p1, LONG p2 );
-typedef USHORT ( * DBENTRYP_VPLP )( AREAP area, void * p1, LONG * p2 );
-typedef USHORT ( * DBENTRYP_LSP  )( AREAP area, ULONG p1, BOOL * p2 );
+typedef USHORT ( * DBENTRYP_V     )( AREAP area );
+typedef USHORT ( * DBENTRYP_BP    )( AREAP area, BOOL * param );
+typedef USHORT ( * DBENTRYP_B     )( AREAP area, BOOL param );
+typedef USHORT ( * DBENTRYP_L     )( AREAP area, LONG param );
+typedef USHORT ( * DBENTRYP_UL    )( AREAP area, ULONG param );
+typedef USHORT ( * DBENTRYP_I     )( AREAP area, PHB_ITEM param );
+typedef USHORT ( * DBENTRYP_SI    )( AREAP area, USHORT index, PHB_ITEM param );
+typedef USHORT ( * DBENTRYP_VO    )( AREAP area, LPDBOPENINFO param );
+typedef USHORT ( * DBENTRYP_VT    )( AREAP area, LPDBTRANSINFO param );
+typedef USHORT ( * DBENTRYP_VF    )( AREAP area, LPDBFIELDINFO param );
+typedef USHORT ( * DBENTRYP_VL    )( AREAP area, LPDBLOCKINFO param );
+typedef USHORT ( * DBENTRYP_VR    )( AREAP area, LPDBRELINFO param );
+typedef USHORT ( * DBENTRYP_VS    )( AREAP area, LPDBSORTINFO param );
+typedef USHORT ( * DBENTRYP_VFI   )( AREAP area, LPDBFILTERINFO param );
+typedef USHORT ( * DBENTRYP_VEI   )( AREAP area, LPDBEVALINFO param );
+typedef USHORT ( * DBENTRYP_VLO   )( AREAP area, LPDBSCOPEINFO param );
+typedef USHORT ( * DBENTRYP_VOC   )( AREAP area, LPDBORDERCREATEINFO param );
+typedef USHORT ( * DBENTRYP_VOO   )( AREAP area, LPDBORDERCONDINFO param );
+typedef USHORT ( * DBENTRYP_VOS   )( AREAP area, LPDBORDSCOPEINFO param );
+typedef USHORT ( * DBENTRYP_VOI   )( AREAP area, LPDBORDERINFO param );
+typedef USHORT ( * DBENTRYP_SVOI  )( AREAP area, USHORT index, LPDBORDERINFO param );
+typedef USHORT ( * DBENTRYP_SP    )( AREAP area, USHORT * param );
+typedef USHORT ( * DBENTRYP_P     )( AREAP area, const BYTE * param );
+typedef USHORT ( * DBENTRYP_CP    )( AREAP area, char * param );
+typedef USHORT ( * DBENTRYP_CC    )( AREAP area, const char * param );
+typedef USHORT ( * DBENTRYP_PP    )( AREAP area, BYTE ** param );
+typedef USHORT ( * DBENTRYP_S     )( AREAP area, USHORT param );
+typedef USHORT ( * DBENTRYP_LP    )( AREAP area, LONG * param );
+typedef USHORT ( * DBENTRYP_ULP   )( AREAP area, ULONG * param );
+typedef USHORT ( * DBENTRYP_SVP   )( AREAP area, USHORT index, void * param );
+typedef USHORT ( * DBENTRYP_SSP   )( AREAP area, USHORT index, USHORT * param );
+typedef USHORT ( * DBENTRYP_SCP   )( AREAP area, USHORT index, char * param );
+typedef USHORT ( * DBENTRYP_SCCS  )( AREAP area, USHORT index, const char * param, USHORT p3 );
+typedef USHORT ( * DBENTRYP_VSP   )( AREAP area, USHORT action, ULONG lRecord );
+typedef USHORT ( * DBENTRYP_SVL   )( AREAP area, USHORT index, ULONG * param );
+typedef USHORT ( * DBENTRYP_SSI   )( AREAP area, USHORT p1, USHORT p2, PHB_ITEM p3 );
+typedef USHORT ( * DBENTRYP_ISI   )( AREAP area, PHB_ITEM p1, USHORT p2, PHB_ITEM p3 );
+typedef USHORT ( * DBENTRYP_BIB   )( AREAP area, BOOL p1, PHB_ITEM p2, BOOL p3 );
+typedef USHORT ( * DBENTRYP_VPL   )( AREAP area, void * p1, LONG p2 );
+typedef USHORT ( * DBENTRYP_VPLP  )( AREAP area, void * p1, LONG * p2 );
+typedef USHORT ( * DBENTRYP_LSP   )( AREAP area, ULONG p1, BOOL * p2 );
 
 /* this methods DO USE take a Workarea but an RDDNODE */
 
-typedef USHORT ( * DBENTRYP_R    )( struct _RDDNODE * pRDD );
-typedef USHORT ( * DBENTRYP_RVVL )( struct _RDDNODE * pRDD, PHB_ITEM p1, PHB_ITEM p2, ULONG p3 );
-typedef USHORT ( * DBENTRYP_RSLV )( struct _RDDNODE * pRDD, USHORT index, ULONG p1, PHB_ITEM p2 );
+typedef USHORT ( * DBENTRYP_R     )( struct _RDDNODE * pRDD );
+typedef USHORT ( * DBENTRYP_RVVL  )( struct _RDDNODE * pRDD, PHB_ITEM p1, PHB_ITEM p2, ULONG p3 );
+typedef USHORT ( * DBENTRYP_RVVVL )( struct _RDDNODE * pRDD, PHB_ITEM p1, PHB_ITEM p2, PHB_ITEM p3, ULONG p4 );
+typedef USHORT ( * DBENTRYP_RSLV  )( struct _RDDNODE * pRDD, USHORT index, ULONG p1, PHB_ITEM p2 );
 /*--------------------* Virtual Method Table *----------------------*/
 
 typedef struct _RDDFUNCS
 {
    /* Movement and positioning methods */
 
-   DBENTRYP_BP   bof;               /* Determine logical beginning of file. */
-   DBENTRYP_BP   eof;               /* Determine logical end of file. */
-   DBENTRYP_BP   found;             /* Determine outcome of the last search operation. */
-   DBENTRYP_V    goBottom;          /* Position cursor at the last record. */
-   DBENTRYP_UL   go;                /* Position cursor at a specific physical record. */
-   DBENTRYP_I    goToId;            /* Position the cursor to a specific, physical identity. */
-   DBENTRYP_V    goTop;             /* Position cursor at the first record. */
-   DBENTRYP_BIB  seek;              /*  */
-   DBENTRYP_L    skip;              /* Reposition cursor relative to current position. */
-   DBENTRYP_L    skipFilter;        /*-Reposition cursor respecting any filter setting. */
-   DBENTRYP_L    skipRaw;           /* Reposition cursor, regardless of filter. */
+   DBENTRYP_BP    bof;              /* Determine logical beginning of file. */
+   DBENTRYP_BP    eof;              /* Determine logical end of file. */
+   DBENTRYP_BP    found;            /* Determine outcome of the last search operation. */
+   DBENTRYP_V     goBottom;         /* Position cursor at the last record. */
+   DBENTRYP_UL    go;               /* Position cursor at a specific physical record. */
+   DBENTRYP_I     goToId;           /* Position the cursor to a specific, physical identity. */
+   DBENTRYP_V     goTop;            /* Position cursor at the first record. */
+   DBENTRYP_BIB   seek;             /*  */
+   DBENTRYP_L     skip;             /* Reposition cursor relative to current position. */
+   DBENTRYP_L     skipFilter;       /*-Reposition cursor respecting any filter setting. */
+   DBENTRYP_L     skipRaw;          /* Reposition cursor, regardless of filter. */
 
 
    /* Data management */
 
-   DBENTRYP_VF   addField;          /* Add a field to the WorkArea. */
-   DBENTRYP_B    append;            /* Append a record to the WorkArea. */
-   DBENTRYP_I    createFields;      /*-Add all fields defined in an array to the WorkArea. */
-   DBENTRYP_V    deleterec;         /* Delete a record. */
-   DBENTRYP_BP   deleted;           /* Determine deleted status for a record. */
-   DBENTRYP_SP   fieldCount;        /*-Determine the number of fields in the WorkArea. */
-   DBENTRYP_VF   fieldDisplay;      /*  */
-   DBENTRYP_SSI  fieldInfo;         /*-Retrieve information about a field. */
-   DBENTRYP_SVP  fieldName;         /*-Determine the name associated with a field number. */
-   DBENTRYP_V    flush;             /* Write data buffer to the data store. */
-   DBENTRYP_PP   getRec;            /*  */
-   DBENTRYP_SI   getValue;          /* Obtain the current value of a field. */
-   DBENTRYP_SVL  getVarLen;         /* Obtain the length of a field value. */
-   DBENTRYP_V    goCold;            /* Perform a write of WorkArea memory to the data store. */
-   DBENTRYP_V    goHot;             /* Mark the WorkArea data buffer as hot. */
-   DBENTRYP_P    putRec;            /* Replace the current record. */
-   DBENTRYP_SI   putValue;          /* Assign a value to a field. */
-   DBENTRYP_V    recall;            /* Undelete the current record. */
-   DBENTRYP_ULP  reccount;          /* Obtain number of records in WorkArea. */
-   DBENTRYP_ISI  recInfo;           /*  */
-   DBENTRYP_ULP  recno;             /* Obtain physical row number at current WorkArea cursor position. */
-   DBENTRYP_I    recid;             /* Obtain physical row ID at current WorkArea cursor position. */
-   DBENTRYP_S    setFieldExtent;    /* Establish the extent of the array of fields for a WorkArea. */
+   DBENTRYP_VF    addField;         /* Add a field to the WorkArea. */
+   DBENTRYP_B     append;           /* Append a record to the WorkArea. */
+   DBENTRYP_I     createFields;     /*-Add all fields defined in an array to the WorkArea. */
+   DBENTRYP_V     deleterec;        /* Delete a record. */
+   DBENTRYP_BP    deleted;          /* Determine deleted status for a record. */
+   DBENTRYP_SP    fieldCount;       /*-Determine the number of fields in the WorkArea. */
+   DBENTRYP_VF    fieldDisplay;     /*  */
+   DBENTRYP_SSI   fieldInfo;        /*-Retrieve information about a field. */
+   DBENTRYP_SCP   fieldName;        /*-Determine the name associated with a field number. */
+   DBENTRYP_V     flush;            /* Write data buffer to the data store. */
+   DBENTRYP_PP    getRec;           /*  */
+   DBENTRYP_SI    getValue;         /* Obtain the current value of a field. */
+   DBENTRYP_SVL   getVarLen;        /* Obtain the length of a field value. */
+   DBENTRYP_V     goCold;           /* Perform a write of WorkArea memory to the data store. */
+   DBENTRYP_V     goHot;            /* Mark the WorkArea data buffer as hot. */
+   DBENTRYP_P     putRec;           /* Replace the current record. */
+   DBENTRYP_SI    putValue;         /* Assign a value to a field. */
+   DBENTRYP_V     recall;           /* Undelete the current record. */
+   DBENTRYP_ULP   reccount;         /* Obtain number of records in WorkArea. */
+   DBENTRYP_ISI   recInfo;          /*  */
+   DBENTRYP_ULP   recno;            /* Obtain physical row number at current WorkArea cursor position. */
+   DBENTRYP_I     recid;            /* Obtain physical row ID at current WorkArea cursor position. */
+   DBENTRYP_S     setFieldExtent;   /* Establish the extent of the array of fields for a WorkArea. */
 
 
    /* WorkArea/Database management */
 
-   DBENTRYP_P    alias;             /*-Obtain the alias of the WorkArea. */
-   DBENTRYP_V    close;             /* Close the table in the WorkArea. */
-   DBENTRYP_VP   create;            /* Create a data store in the specified WorkArea. */
-   DBENTRYP_SI   info;              /* Retrieve information about the current driver (DBI). */
-   DBENTRYP_V    newarea;           /* Clear the WorkArea for use. */
-   DBENTRYP_VP   open;              /* Open a data store in the WorkArea. */
-   DBENTRYP_V    release;           /*-Release all references to a WorkArea. */
-   DBENTRYP_SP   structSize;        /* Retrieve the size of the WorkArea structure. */
-   DBENTRYP_P    sysName;           /* Obtain the name of replaceable database driver (RDD) subsystem. */
-   DBENTRYP_VEI  dbEval;            /*-Evaluate code block for each record in WorkArea. */
-   DBENTRYP_V    pack;              /* Remove records marked for deletion from a database. */
-   DBENTRYP_LSP  packRec;           /*  */
-   DBENTRYP_VS   sort;              /* Physically reorder a database. */
-   DBENTRYP_VT   trans;             /* Copy one or more records from one WorkArea to another. */
-   DBENTRYP_VT   transRec;          /* Copy a record to another WorkArea. */
-   DBENTRYP_V    zap;               /* Physically remove all records from data store. */
+   DBENTRYP_CP    alias;            /*-Obtain the alias of the WorkArea. */
+   DBENTRYP_V     close;            /* Close the table in the WorkArea. */
+   DBENTRYP_VO    create;           /* Create a data store in the specified WorkArea. */
+   DBENTRYP_SI    info;             /* Retrieve information about the current driver (DBI). */
+   DBENTRYP_V     newarea;          /* Clear the WorkArea for use. */
+   DBENTRYP_VO    open;             /* Open a data store in the WorkArea. */
+   DBENTRYP_V     release;          /*-Release all references to a WorkArea. */
+   DBENTRYP_SP    structSize;       /* Retrieve the size of the WorkArea structure. */
+   DBENTRYP_CP    sysName;          /* Obtain the name of replaceable database driver (RDD) subsystem. */
+   DBENTRYP_VEI   dbEval;           /*-Evaluate code block for each record in WorkArea. */
+   DBENTRYP_V     pack;             /* Remove records marked for deletion from a database. */
+   DBENTRYP_LSP   packRec;          /*  */
+   DBENTRYP_VS    sort;             /* Physically reorder a database. */
+   DBENTRYP_VT    trans;            /* Copy one or more records from one WorkArea to another. */
+   DBENTRYP_VT    transRec;         /* Copy a record to another WorkArea. */
+   DBENTRYP_V     zap;              /* Physically remove all records from data store. */
 
 
    /* Relational Methods */
 
-   DBENTRYP_VR   childEnd;          /* Report end of relation. */
-   DBENTRYP_VR   childStart;        /* Report initialization of a relation. */
-   DBENTRYP_VR   childSync;         /* Post a pending relational movement. */
-   DBENTRYP_V    syncChildren;      /*-Force relational movement in child WorkAreas. */
-   DBENTRYP_V    clearRel;          /* Clear all relations in the specified WorkArea. */
-   DBENTRYP_V    forceRel;          /* Force relational seeks in the specified WorkArea. */
-   DBENTRYP_SVP  relArea;           /*-Obtain the workarea number of the specified relation. */
-   DBENTRYP_VR   relEval;           /*-Evaluate a block against the relation in specified WorkArea. */
-   DBENTRYP_SI   relText;           /*-Obtain the character expression of the specified relation. */
-   DBENTRYP_VR   setRel;            /*-Set a relation in the parent file. */
+   DBENTRYP_VR    childEnd;         /* Report end of relation. */
+   DBENTRYP_VR    childStart;       /* Report initialization of a relation. */
+   DBENTRYP_VR    childSync;        /* Post a pending relational movement. */
+   DBENTRYP_V     syncChildren;     /*-Force relational movement in child WorkAreas. */
+   DBENTRYP_V     clearRel;         /* Clear all relations in the specified WorkArea. */
+   DBENTRYP_V     forceRel;         /* Force relational seeks in the specified WorkArea. */
+   DBENTRYP_SSP   relArea;          /*-Obtain the workarea number of the specified relation. */
+   DBENTRYP_VR    relEval;          /*-Evaluate a block against the relation in specified WorkArea. */
+   DBENTRYP_SI    relText;          /*-Obtain the character expression of the specified relation. */
+   DBENTRYP_VR    setRel;           /*-Set a relation in the parent file. */
 
 
    /* Order Management */
 
-   DBENTRYP_OI   orderListAdd;      /*  */
-   DBENTRYP_V    orderListClear;    /*  */
-   DBENTRYP_OI   orderListDelete;   /*  */
-   DBENTRYP_OI   orderListFocus;    /*  */
-   DBENTRYP_V    orderListRebuild;  /*  */
-   DBENTRYP_VOI  orderCondition;    /*  */
-   DBENTRYP_VOC  orderCreate;       /*  */
-   DBENTRYP_OI   orderDestroy;      /*  */
-   DBENTRYP_OII  orderInfo;         /*-Retrieve information about the current order that SELF could not. */
+   DBENTRYP_VOI   orderListAdd;     /*  */
+   DBENTRYP_V     orderListClear;   /*  */
+   DBENTRYP_VOI   orderListDelete;  /*  */
+   DBENTRYP_VOI   orderListFocus;   /*  */
+   DBENTRYP_V     orderListRebuild; /*  */
+   DBENTRYP_VOO   orderCondition;   /*  */
+   DBENTRYP_VOC   orderCreate;      /*  */
+   DBENTRYP_VOI   orderDestroy;     /*  */
+   DBENTRYP_SVOI  orderInfo;        /*-Retrieve information about the current order that SELF could not. */
 
 
    /* Filters and Scope Settings */
 
-   DBENTRYP_V    clearFilter;       /*-Clear the active filter expression. */
-   DBENTRYP_V    clearLocate;       /*-Clear the active locate expression. */
-   DBENTRYP_V    clearScope;        /*  */
-   DBENTRYP_VPLP countScope;        /*  */
-   DBENTRYP_I    filterText;        /*-Return filter condition of the specified WorkArea. */
-   DBENTRYP_SI   scopeInfo;         /*  */
-   DBENTRYP_VFI  setFilter;         /* Set the filter condition for the specified WorkArea. */
-   DBENTRYP_VLO  setLocate;         /*-Set the locate scope for the specified WorkArea. */
-   DBENTRYP_VOS  setScope;          /*  */
-   DBENTRYP_VPL  skipScope;         /*  */
-   DBENTRYP_B    locate;            /* reposition cursor to postions set by setLocate */
+   DBENTRYP_V     clearFilter;      /*-Clear the active filter expression. */
+   DBENTRYP_V     clearLocate;      /*-Clear the active locate expression. */
+   DBENTRYP_V     clearScope;       /*  */
+   DBENTRYP_VPLP  countScope;       /*  */
+   DBENTRYP_I     filterText;       /*-Return filter condition of the specified WorkArea. */
+   DBENTRYP_SI    scopeInfo;        /*  */
+   DBENTRYP_VFI   setFilter;        /* Set the filter condition for the specified WorkArea. */
+   DBENTRYP_VLO   setLocate;        /*-Set the locate scope for the specified WorkArea. */
+   DBENTRYP_VOS   setScope;         /*  */
+   DBENTRYP_VPL   skipScope;        /*  */
+   DBENTRYP_B     locate;           /* reposition cursor to postions set by setLocate */
 
 
    /* Miscellaneous */
 
-   DBENTRYP_P    compile;           /*-Compile a character expression. */
-   DBENTRYP_I    error;             /*-Raise a runtime error. */
-   DBENTRYP_I    evalBlock;         /*-Evaluate a code block. */
+   DBENTRYP_CC    compile;          /*-Compile a character expression. */
+   DBENTRYP_I     error;            /*-Raise a runtime error. */
+   DBENTRYP_I     evalBlock;        /*-Evaluate a code block. */
 
 
    /* Network operations */
 
-   DBENTRYP_VSP  rawlock;           /* Perform a lowlevel network lock in the specified WorkArea. */
-   DBENTRYP_VL   lock;              /* Perform a network lock in the specified WorkArea. */
-   DBENTRYP_I    unlock;            /* Release network locks in the specified WorkArea. */
+   DBENTRYP_VSP   rawlock;          /* Perform a lowlevel network lock in the specified WorkArea. */
+   DBENTRYP_VL    lock;             /* Perform a network lock in the specified WorkArea. */
+   DBENTRYP_I     unlock;           /* Release network locks in the specified WorkArea. */
 
 
    /* Memofile functions */
 
-   DBENTRYP_V    closeMemFile;      /* Close a memo file in the WorkArea. */
-   DBENTRYP_VP   createMemFile;     /* Create a memo file in the WorkArea. */
-   DBENTRYP_SVPB getValueFile;      /*  */
-   DBENTRYP_VP   openMemFile;       /* Open a memo file in the specified WorkArea. */
-   DBENTRYP_SVPB putValueFile;      /*  */
+   DBENTRYP_V     closeMemFile;     /* Close a memo file in the WorkArea. */
+   DBENTRYP_VO    createMemFile;    /* Create a memo file in the WorkArea. */
+   DBENTRYP_SCCS  getValueFile;     /*  */
+   DBENTRYP_VO    openMemFile;      /* Open a memo file in the specified WorkArea. */
+   DBENTRYP_SCCS  putValueFile;     /*  */
 
 
    /* Database file header handling */
 
-   DBENTRYP_V    readDBHeader;      /* Read the database file header record in the WorkArea. */
-   DBENTRYP_V    writeDBHeader;     /* Write the database file header record in the WorkArea. */
+   DBENTRYP_V     readDBHeader;     /* Read the database file header record in the WorkArea. */
+   DBENTRYP_V     writeDBHeader;    /* Write the database file header record in the WorkArea. */
 
 
-   /* non WorkArea functions       */
+   /* non WorkArea functions */
 
-   DBENTRYP_R    init;              /* init RDD after registration */
-   DBENTRYP_R    exit;              /* unregister RDD */
-   DBENTRYP_RVVL drop;              /* remove table */
-   DBENTRYP_RVVL exists;            /* check if table exist */
-   DBENTRYP_RSLV rddInfo;           /* RDD info */
+   DBENTRYP_R     init;             /* init RDD after registration */
+   DBENTRYP_R     exit;             /* unregister RDD */
+   DBENTRYP_RVVL  drop;             /* remove table or index */
+   DBENTRYP_RVVL  exists;           /* check if table or index exists */
+   DBENTRYP_RVVVL rename;           /* rename table or index */
+   DBENTRYP_RSLV  rddInfo;          /* RDD info */
 
 
    /* Special and reserved methods */
 
-   DBENTRYP_SVP  whoCares;          /*  */
+   DBENTRYP_SVP   whoCares;         /*  */
 
 } RDDFUNCS;
 
@@ -811,11 +820,12 @@ typedef RDDFUNCS * PRDDFUNCS;
 typedef struct _RDDNODE
 {
    char szName[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ]; /* Name of RDD */
+   USHORT   rddID;            /* RDD id */
    USHORT   uiType;           /* Type of RDD */
-   USHORT   rddID;            /* Type of RDD */
+   USHORT   uiAreaSize;       /* Size of the WorkArea */
+   USHORT   unused;           /* filler */
    RDDFUNCS pTable;           /* Table of functions */
    RDDFUNCS pSuperTable;      /* Table of super functions */
-   USHORT   uiAreaSize;       /* Size of the WorkArea */
    void     *lpvCargo;        /* RDD specific extended data, if used then
                                  RDD should free it in EXIT() non WA method */
 } RDDNODE;
@@ -983,6 +993,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_EXIT(r)                    ((*(r)->pTable.exit)(r))
 #define SELF_DROP(r, it, ii, l)         ((*(r)->pTable.drop)(r, it, ii, l))
 #define SELF_EXISTS(r, it, ii, l)       ((*(r)->pTable.exists)(r, it, ii, l))
+#define SELF_RENAME(r, it, ii, in, l)   ((*(r)->pTable.rename)(r, it, ii, in, l))
 #define SELF_RDDINFO(r, i, l, g)        ((*(r)->pTable.rddInfo)(r, i, l, g))
 
 
@@ -1152,6 +1163,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_EXIT(r)                   ((*(__SUPERTABLE(r))->exit)(r))
 #define SUPER_DROP(r, it, ii, l)        ((*(__SUPERTABLE(r))->drop)(r, it, ii, l))
 #define SUPER_EXISTS(r, it, ii, l)      ((*(__SUPERTABLE(r))->exists)(r, it, ii, l))
+#define SUPER_RENAME(r, it, ii, in, l)  ((*(__SUPERTABLE(r))->rename)(r, it, ii, in, l))
 #define SUPER_RDDINFO(r, i, l, g)       ((*(__SUPERTABLE(r))->rddInfo)(r, i, l, g))
 
 #define ISSUPER_INIT(r)                 ((__SUPERTABLE(r))->init != NULL)

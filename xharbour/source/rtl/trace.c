@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.24 2009/09/16 04:34:16 andijahja Exp $
+ * $Id: trace.c,v 1.25 2009/09/16 08:40:38 andijahja Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ void hb_traceInit( void )
    FILE *fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
-   if( s_bDoInit && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( ( BYTE *) "trace.log" ) )
+   if( s_bDoInit && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( "trace.log" ) )
    {
       s_bDoInit = FALSE;
 

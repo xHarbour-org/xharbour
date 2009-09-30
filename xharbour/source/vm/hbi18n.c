@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.27 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: hbi18n.c,v 1.28 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -537,7 +537,7 @@ BOOL hb_i18n_load_language( char *language )
    PHB_ITEM pTable;
 
    path = hb_i18n_build_table_filename( NULL, language );
-   handle = hb_fsOpen( (BYTE *) path, FO_READ ); // on error will fail on next op
+   handle = hb_fsOpen( path, FO_READ ); // on error will fail on next op
    hb_xfree( path );
 
    if ( handle == FS_ERROR )
@@ -655,7 +655,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = hb_fsOpen( ( BYTE * ) pParam->item.asString.value, FO_READ );
+      handle = hb_fsOpen( pParam->item.asString.value, FO_READ );
    }
    else
    {
@@ -776,7 +776,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    if ( HB_IS_STRING( pParam ) )
    {
 
-      handle = hb_fsCreate( (BYTE *) pParam->item.asString.value, FC_NORMAL );
+      handle = hb_fsCreate( pParam->item.asString.value, FC_NORMAL );
 
       // an opening failure will cause following operations to fail
       if ( handle == FS_ERROR ) {

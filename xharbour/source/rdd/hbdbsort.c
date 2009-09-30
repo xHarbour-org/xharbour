@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.7 2009/02/24 12:38:16 marchuet Exp $
+ * $Id: hbdbsort.c,v 1.8 2009/03/26 15:01:25 ronpinkas Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ul
       bAscending = ( ( pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiFlags & SF_ASCEND ) == SF_ASCEND );
 
       uiField = pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiField - 1;
-      pField = pArea->lpFields + uiField;
+      pField = pArea->area.lpFields + uiField;
       if( pField->uiType == HB_IT_MEMO )
          continue;
       if( pField->uiType == HB_IT_LOGICAL )

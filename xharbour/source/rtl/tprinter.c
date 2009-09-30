@@ -504,47 +504,47 @@ HB_FUNC( PRINTERPORTTONAME )
 }
 #define BIG_PRINT_BUFFER (1024*32)
 
-LONG hb_PrintFileRaw( UCHAR *cPrinterName, UCHAR *cFileName, UCHAR *cDocName )
+LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocName )
 {
    UCHAR  printBuffer[ BIG_PRINT_BUFFER ] ;
    HANDLE  hPrinter, hFile ;
    DOC_INFO_1 DocInfo ;
    DWORD nRead, nWritten, Result;
 
-   if ( OpenPrinter( (char *) cPrinterName, &hPrinter, NULL) != 0 )
+   if ( OpenPrinter( cPrinterName, &hPrinter, NULL ) != 0 )
    {
-      DocInfo.pDocName = (char *) cDocName ;
+      DocInfo.pDocName = cDocName ;
       DocInfo.pOutputFile = NULL ;
       DocInfo.pDatatype = "RAW" ;
-      if ( StartDocPrinter(hPrinter,1,(UCHAR *) &DocInfo) != 0 )
+      if ( StartDocPrinter( hPrinter, 1, ( UCHAR * ) &DocInfo ) != 0 )
       {
-         if ( StartPagePrinter(hPrinter) != 0 )
+         if ( StartPagePrinter( hPrinter ) != 0 )
          {
-            hFile = CreateFile( (const char *) cFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)   ;
+            hFile = CreateFile( cFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
             if (hFile != INVALID_HANDLE_VALUE )
             {
-               while (ReadFile(hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL) && (nRead > 0))
+               while (ReadFile( hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL ) && (nRead > 0))
                {
                   if (printBuffer[nRead-1] == 26 )
                   {
                      nRead-- ; // Skip the EOF() character
                   }
-                  WritePrinter(hPrinter, printBuffer, nRead, &nWritten) ;
+                  WritePrinter( hPrinter, printBuffer, nRead, &nWritten ) ;
                }
                Result = 1 ;
-               CloseHandle(hFile) ;
+               CloseHandle( hFile ) ;
             }
             else
             {
                Result= -6 ;
             }
-            EndPagePrinter(hPrinter) ;
+            EndPagePrinter( hPrinter ) ;
          }
          else
          {
             Result = -4 ;
          }
-         EndDocPrinter(hPrinter);
+         EndDocPrinter( hPrinter );
       }
       else
       {
@@ -561,14 +561,14 @@ LONG hb_PrintFileRaw( UCHAR *cPrinterName, UCHAR *cFileName, UCHAR *cDocName )
 
 HB_FUNC( PRINTFILERAW )
 {
-   UCHAR *cPrinterName, *cFileName, *cDocName ;
+   char * cPrinterName, * cFileName, * cDocName ;
    DWORD Result = -1 ;
 
-   if ( ISCHAR(1) && ISCHAR(2) )
+   if ( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      cPrinterName = (UCHAR *) hb_parcx( 1 ) ;
-      cFileName = (UCHAR *) hb_parcx( 2 ) ;
-      cDocName = ( ISCHAR(3) ? (UCHAR *) hb_parcx( 3 ) : cFileName ) ;
+      cPrinterName = hb_parcx( 1 ) ;
+      cFileName = hb_parcx( 2 ) ;
+      cDocName = ( ISCHAR(3) ? hb_parcx( 3 ) : cFileName ) ;
       Result = hb_PrintFileRaw( cPrinterName, cFileName, cDocName ) ;
    }
    hb_retnl( Result ) ;

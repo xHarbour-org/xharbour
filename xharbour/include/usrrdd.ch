@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.ch,v 1.5 2007/10/31 10:56:49 marchuet Exp $
+ * $Id: usrrdd.ch,v 1.6 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -169,12 +169,13 @@
 #define UR_EXIT                                95
 #define UR_DROP                                96
 #define UR_EXISTS                              97
-#define UR_RDDINFO                             98
+#define UR_RENAME                              98
+#define UR_RDDINFO                             99
 
 /* Special and reserved methods */
-#define UR_WHOCARES                            99
+#define UR_WHOCARES                           100
 
-#define UR_METHODCOUNT                         99
+#define UR_METHODCOUNT                        100
 
 
 /* FIELD types */
@@ -368,5 +369,9 @@
 #define UR_DBRI_RAWMEMOS             8
 #define UR_DBRI_RAWDATA              9
 
-#define SUCCESS   0
-#define FAILURE   1
+#define HB_SUCCESS            0
+#define HB_FAILURE            1
+
+/* Compatibility #defines. Don't use them with new code and in Harbour sources. */
+#define SUCCESS               0
+#define FAILURE               1

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.30 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.31 2008/02/04 17:06:28 ronpinkas Exp $
  */
 
 /*
@@ -28,7 +28,7 @@
 
 #include "hbcomp.h"
 
-extern char *yytext;
+//extern char *yytext;
 
 /* Table with parse errors */
 const char * hb_comp_szErrors[] =
@@ -191,7 +191,7 @@ void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, c
    int iLine = hb_comp_iLine - 1;
    char * szFile = hb_pp_fileName( hb_comp_PP );
 
-   if( ( szText[ 0 ] - '0' ) <= hb_comp_iWarnings )
+   if( ( ( int ) ( szText[ 0 ] - '0' ) ) <= hb_comp_iWarnings )
    {
       if( szFile )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: sxtable.c,v 1.3 2008/09/05 08:38:36 marchuet Exp $
+ * $Id: sxtable.c,v 1.4 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ HB_FUNC( SX_TABLENAME )
       hb_itemReturnRelease( pList );
    }
    else
-      hb_retc( NULL );
+      hb_retc_null();
 }
 
 static void hb_sxRollBackChild( AREAP pArea, PHB_ITEM pItem )
@@ -480,11 +480,11 @@ HB_FUNC( _SXOPENINIT )
             pInfo->fReadonly = hb_parl( 2 );
          if( ISCHAR( 4 ) )
          {
-            char * szAlias = hb_parc( 1 );
+            const char * szAlias = hb_parc( 1 );
             if( szAlias && szAlias[ 0 ] )
-               pInfo->atomAlias = ( BYTE * ) hb_dynsymName( hb_dynsymGet( szAlias ) );
+               pInfo->atomAlias = hb_dynsymName( hb_dynsymGet( szAlias ) );
             else
-               pInfo->atomAlias = ( BYTE * ) "";
+               pInfo->atomAlias = "";
          }
       }
    }

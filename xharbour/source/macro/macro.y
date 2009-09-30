@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.39 2009/03/25 21:33:54 ronpinkas Exp $
+ * $Id: macro.y,v 1.40 2009/09/18 17:41:41 ronpinkas Exp $
  */
 
 /*
@@ -73,6 +73,11 @@
 #endif
 
 /* Compile using: bison -d -p hb_comp macro.y */
+
+/* to pacify some warnings in BCC */
+#if defined( __BORLANDC__ ) && !defined( __STDC__ )
+#  define __STDC__
+#endif
 
 /* NOTE: these symbols are used internally in bison.simple
  */

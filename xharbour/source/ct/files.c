@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.20 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: files.c,v 1.21 2009/08/03 11:47:22 lculik Exp $
  */
 
 /*
@@ -1090,22 +1090,20 @@ HB_FUNC( FILEDELETE )
 
    if( ISCHAR( 1 ) )
    {
-      BYTE * pDirSpec;
+      const char * pDirSpec;
       PHB_FFIND ffind;
       ULONG ulAttr = HB_FA_ALL;
-      BOOL fFree;
+      char * pszFree;
 
-      pDirSpec = hb_fsNameConv( ( BYTE * ) hb_parc( 1 ), &fFree );
+      pDirSpec = hb_fsNameConv( hb_parc( 1 ), &pszFree );
       if( ISNUM( 2 ) )
-      {
          ulAttr = hb_parnl( 2 );
-      }
 
-      if( ( ffind = hb_fsFindFirst( ( char * ) pDirSpec, ulAttr ) ) != NULL )
+      if( ( ffind = hb_fsFindFirst( pDirSpec, ulAttr ) ) != NULL )
       {
          PHB_FNAME pFilepath;
 
-         pFilepath = hb_fsFNameSplit( ( char * ) pDirSpec );
+         pFilepath = hb_fsFNameSplit( pDirSpec );
          pFilepath->szExtension = NULL;
 
          do
@@ -1115,7 +1113,7 @@ HB_FUNC( FILEDELETE )
             pFilepath->szName = ffind->szName;
             hb_fsFNameMerge( szPath, pFilepath );
 
-            if( hb_fsDelete( ( BYTE * ) szPath ) )
+            if( hb_fsDelete( szPath ) )
                bReturn = TRUE;
          }
          while( hb_fsFindNext( ffind ) );
@@ -1123,8 +1121,8 @@ HB_FUNC( FILEDELETE )
          hb_xfree( pFilepath );
          hb_fsFindClose( ffind );
       }
-      if( fFree )
-         hb_xfree( pDirSpec );
+      if( pszFree )
+         hb_xfree( pszFree );
    }
 
    hb_retl( bReturn );

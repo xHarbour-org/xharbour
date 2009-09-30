@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.11 2008/08/01 09:41:14 marchuet Exp $
+ * $Id: sxcompr.c,v 1.12 2008/10/22 08:32:52 marchuet Exp $
  */
 
 /*
@@ -560,15 +560,15 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
 }
 
 
-BOOL hb_LZSSxCompressMem( BYTE * pSrcBuf, ULONG ulSrcLen,
-                          BYTE * pDstBuf, ULONG ulDstLen,
+BOOL hb_LZSSxCompressMem( const char * pSrcBuf, ULONG ulSrcLen,
+                          char * pDstBuf, ULONG ulDstLen,
                           ULONG * pulSize )
 {
    PHB_LZSSX_COMPR pCompr;
    ULONG ulSize;
 
-   pCompr = hb_LZSSxInit( FS_ERROR, pSrcBuf, ulSrcLen,
-                          FS_ERROR, pDstBuf, ulDstLen );
+   pCompr = hb_LZSSxInit( FS_ERROR, ( BYTE * ) pSrcBuf, ulSrcLen,
+                          FS_ERROR, ( BYTE * ) pDstBuf, ulDstLen );
    ulSize = hb_LZSSxEncode( pCompr );
    hb_LZSSxExit( pCompr );
    if( pulSize )
@@ -576,14 +576,14 @@ BOOL hb_LZSSxCompressMem( BYTE * pSrcBuf, ULONG ulSrcLen,
    return ( ulSize <= ulDstLen );
 }
 
-BOOL hb_LZSSxDecompressMem( BYTE * pSrcBuf, ULONG ulSrcLen,
-                            BYTE * pDstBuf, ULONG ulDstLen )
+BOOL hb_LZSSxDecompressMem( const char * pSrcBuf, ULONG ulSrcLen,
+                            char * pDstBuf, ULONG ulDstLen )
 {
    PHB_LZSSX_COMPR pCompr;
    BOOL fResult;
 
-   pCompr = hb_LZSSxInit( FS_ERROR, pSrcBuf, ulSrcLen,
-                          FS_ERROR, pDstBuf, ulDstLen );
+   pCompr = hb_LZSSxInit( FS_ERROR, ( BYTE * ) pSrcBuf, ulSrcLen,
+                          FS_ERROR, ( BYTE * ) pDstBuf, ulDstLen );
    fResult = hb_LZSSxDecode( pCompr );
    hb_LZSSxExit( pCompr );
    return fResult;
@@ -617,17 +617,17 @@ HB_FUNC( SX_FCOMPRESS )
 {
    BOOL fRet = FALSE;
    HB_FHANDLE hInput, hOutput;
-   char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
+   const char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
    BYTE buf[ 4 ];
    ULONG ulSize;
 
    if( szSource && *szSource && szDestin && *szDestin )
    {
-      hInput = hb_fsExtOpen( ( BYTE * ) szSource, NULL, FO_READ | FO_DENYNONE |
-                              FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
+      hInput = hb_fsExtOpen( szSource, NULL, FO_READ | FO_DENYNONE |
+                             FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
       if( hInput != FS_ERROR )
       {
-         hOutput = hb_fsExtOpen( ( BYTE * ) szDestin, NULL, FO_READWRITE |
+         hOutput = hb_fsExtOpen( szDestin, NULL, FO_READWRITE |
                                  FO_EXCLUSIVE | FXO_TRUNCATE |
                                  FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
          if( hOutput != FS_ERROR )
@@ -654,15 +654,15 @@ HB_FUNC( SX_FDECOMPRESS )
 {
    BOOL fRet = FALSE;
    HB_FHANDLE hInput, hOutput;
-   char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
+   const char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
 
    if( szSource && *szSource && szDestin && *szDestin )
    {
-      hInput = hb_fsExtOpen( ( BYTE * ) szSource, NULL, FO_READ | FO_DENYNONE |
-                              FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
+      hInput = hb_fsExtOpen( szSource, NULL, FO_READ | FO_DENYNONE |
+                             FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
       if( hInput != FS_ERROR )
       {
-         hOutput = hb_fsExtOpen( ( BYTE * ) szDestin, NULL, FO_READWRITE |
+         hOutput = hb_fsExtOpen( szDestin, NULL, FO_READWRITE |
                                  FO_EXCLUSIVE | FXO_TRUNCATE |
                                  FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
          if( hOutput != FS_ERROR )
@@ -680,7 +680,8 @@ HB_FUNC( SX_FDECOMPRESS )
 
 HB_FUNC( _SX_STRCOMPRESS )
 {
-   BYTE * pStr = ( BYTE * ) hb_parc( 1 ), * pBuf;
+   const char * pStr = hb_parc( 1 );
+   char * pBuf;
 
    if( pStr )
    {
@@ -688,7 +689,7 @@ HB_FUNC( _SX_STRCOMPRESS )
 
       /* this is for strict SIX compatibility - in general very bad idea */
       ulBuf = ulLen + 257;
-      pBuf = ( BYTE * ) hb_xgrab( ulBuf );
+      pBuf = ( char * ) hb_xgrab( ulBuf );
       HB_PUT_LE_UINT32( pBuf, ulLen );
       if( ! hb_LZSSxCompressMem( pStr, ulLen, pBuf + 4, ulBuf - 4, &ulDst ) )
       {
@@ -697,7 +698,7 @@ HB_FUNC( _SX_STRCOMPRESS )
          memcpy( pBuf + 4, pStr, ulLen );
          ulDst = ulLen;
       }
-      hb_retclen( ( char * ) pBuf, ulDst + 4 );
+      hb_retclen( pBuf, ulDst + 4 );
       hb_xfree( pBuf );
    }
    else
@@ -707,7 +708,8 @@ HB_FUNC( _SX_STRCOMPRESS )
 HB_FUNC( _SX_STRDECOMPRESS )
 {
    BOOL fOK = FALSE;
-   BYTE * pStr = ( BYTE * ) hb_parc( 1 ), * pBuf;
+   const char * pStr = hb_parc( 1 );
+   char * pBuf;
 
    if( pStr )
    {
@@ -718,17 +720,17 @@ HB_FUNC( _SX_STRDECOMPRESS )
          ulBuf = HB_GET_LE_UINT32( pStr );
          if( ulBuf == HB_SX_UNCOMPRESED )
          {
-            hb_retclen( ( char * ) pStr + 4, ulLen - 4 );
+            hb_retclen( pStr + 4, ulLen - 4 );
             fOK = TRUE;
          }
          else
          {
-            pBuf = ( BYTE * ) hb_xalloc( ulBuf + 1 );
+            pBuf = ( char * ) hb_xalloc( ulBuf + 1 );
             if( pBuf )
             {
                fOK = hb_LZSSxDecompressMem( pStr + 4, ulLen - 4, pBuf, ulBuf );
                if( fOK )
-                  hb_retclen_buffer( ( char * ) pBuf, ulBuf );
+                  hb_retclen_buffer( pBuf, ulBuf );
                else
                   hb_xfree( pBuf );
             }

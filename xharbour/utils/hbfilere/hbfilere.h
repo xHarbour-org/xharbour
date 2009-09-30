@@ -1,4 +1,4 @@
-/*  $Id: hbfilere.h,v 1.1 2009/07/29 17:15:54 marchuet Exp $  */
+/*  $Id: hbfilere.h,v 1.2 2009/09/16 15:53:42 marchuet Exp $  */
 
 /*
  * xHarbour Project source code:
@@ -94,7 +94,7 @@ void hb_ip_rfd_set( HB_SOCKET_T hSocket );
 
 typedef struct _HB_FILE
 {
-   BYTE *            pFileName;
+   char *            pFileName;
    int               used;
    BOOL              shared;
    HB_FHANDLE        hFile;

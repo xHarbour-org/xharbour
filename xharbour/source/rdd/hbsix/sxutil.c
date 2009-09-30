@@ -1,5 +1,5 @@
 /*
- * $Id: sxutil.c 7771 2007-09-25 01:21:03Z druzus $
+ * $Id: sxutil.c,v 1.1 2007/10/31 08:30:33 marchuet Exp $
  */
 
 /*
@@ -58,12 +58,11 @@
 
 HB_FUNC( SX_SLIMFAST )
 {
-   char * szExp = hb_parc( 1 );
+   const char * szExp = hb_parc( 1 );
 
    if( szExp && *szExp )
    {
-      char * szExp = hb_parc( 1 ), * szDst;
-      char cQuote = 0, c;
+      char * szDst, cQuote = 0, c;
       ULONG ulDst;
 
       szDst = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
@@ -87,12 +86,12 @@ HB_FUNC( SX_SLIMFAST )
       hb_retclen_buffer( szDst, ulDst );
    }
    else
-      hb_retc( NULL );
+      hb_retc_null();
 }
 
 HB_FUNC( SX_WILDMATCH )
 {
-   char * szPattern = hb_parc( 1 ), * szValue = hb_parc( 2 );
+   const char * szPattern = hb_parc( 1 ), * szValue = hb_parc( 2 );
    BOOL fMatch = FALSE;
 
    if( szPattern && szPattern[0] && szValue )

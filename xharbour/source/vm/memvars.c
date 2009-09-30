@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.143 2009/06/24 01:42:40 peterrees Exp $
+ * $Id: memvars.c,v 1.144 2009/09/12 18:01:44 likewolf Exp $
  */
 
 /*
@@ -2039,7 +2039,7 @@ HB_FUNC( __MVSAVE )
 
       /* Create .mem file */
 
-      while( ( fhnd = hb_fsCreate( ( BYTE * ) szFileName, FC_NORMAL ) ) == FS_ERROR )
+      while( ( fhnd = hb_fsCreate( szFileName, FC_NORMAL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_CREATE, 2006, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 
@@ -2104,7 +2104,7 @@ HB_FUNC( __MVRESTORE )
    {
       PHB_FNAME pFileName;
       char szFileName[ HB_PATH_MAX ];
-      FHANDLE fhnd;
+      HB_FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );
       BOOL bLongName = ISLOG(3) ? hb_parl( 3 ) : FALSE;
@@ -2145,7 +2145,7 @@ HB_FUNC( __MVRESTORE )
 
       /* Open .mem file */
 
-      while( ( fhnd = hb_fsExtOpen( ( BYTE * ) szFileName, (BYTE *) ".mem", FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
+      while( ( fhnd = hb_fsExtOpen( szFileName, NULL, FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2005, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 

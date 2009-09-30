@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.6 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: filehb.c,v 1.7 2009/07/22 16:55:13 marchuet Exp $
  */
 
 /*
@@ -66,14 +66,14 @@
 
 HB_FUNC( FILE )
 {
-   PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
+   const char * szFile = hb_parc( 1 );
 
-   hb_retl( ( pFile && pFile->item.asString.length < HB_PATH_MAX ) ? hb_spFile( ( BYTE * ) pFile->item.asString.value, NULL ) : FALSE );
+   hb_retl( szFile ? hb_spFile( szFile, NULL ) : FALSE );
 }
 
 HB_FUNC( ISDIRECTORY )
 {
-   PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
-   
-   hb_retl( ( pFile && pFile->item.asString.length < HB_PATH_MAX ) ? hb_fsIsDirectory( ( BYTE * ) pFile->item.asString.value ) : FALSE );
+   const char * szFile = hb_parc( 1 );
+
+   hb_retl( szFile ? hb_fsIsDirectory( szFile ) : FALSE );
 }

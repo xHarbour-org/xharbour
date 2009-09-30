@@ -1,5 +1,5 @@
 /*
- * $Id: mkdir.c,v 1.1 2006/12/14 15:46:03 sirep Exp $
+ * $Id: mkdir.c,v 1.6 2007/01/08 20:13:09 marceloanelli Exp $
  */
 
 /*; File......: MKDIR.ASM
@@ -123,7 +123,7 @@ HB_FUNC( FT_MKDIR )
 #elif defined( __WIN32__ )
    UINT iResult;
 
-   hb_fsMkDir( (BYTE *) hb_parcx(1) );
+   hb_fsMkDir( hb_parcx( 1 ) );
 
    iResult = (UINT) GetLastError();
 
@@ -142,7 +142,7 @@ HB_FUNC( FT_MKDIR )
    int iRet = 0;
    if ( ISCHAR( 1 ) )
    {
-       bResult = hb_fsMkDir( ( BYTE * ) hb_parcx(1) );
+       bResult = hb_fsMkDir( hb_parcx( 1 ) );
        if ( !bResult )
        {
          iRet = 5;

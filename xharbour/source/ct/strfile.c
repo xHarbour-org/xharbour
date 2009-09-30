@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.5 2006/10/02 18:03:04 ptsarenko Exp $
+ * $Id: strfile.c,v 1.6 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -105,10 +105,10 @@ HB_FUNC( CSETSAFETY )
    }
 }
 
-static LONG ct_StrFile( BYTE * pFileName, BYTE * pcStr, ULONG ulLen, BOOL bOverwrite, LONG lOffset,
+static LONG ct_StrFile( const char * pFileName, const char * pcStr, ULONG ulLen, BOOL bOverwrite, LONG lOffset,
                         BOOL bTrunc )
 {
-   FHANDLE hFile;
+   HB_FHANDLE hFile;
    BOOL bOpen = FALSE;
    BOOL bFile = hb_fsFile( pFileName );
    ULONG ulWrite = 0;
@@ -119,30 +119,20 @@ static LONG ct_StrFile( BYTE * pFileName, BYTE * pcStr, ULONG ulLen, BOOL bOverw
       bOpen = TRUE;
    }
    else if( !bFile || !ct_getsafety() )
-   {
       hFile = hb_fsCreate( pFileName, ct_getfcreate() );
-   }
    else
-   {
       hFile = FS_ERROR;
-   }
 
    if( hFile != FS_ERROR )
    {
-      if ( lOffset )
-      {
+      if( lOffset )
          hb_fsSeek( hFile, lOffset, FS_SET );
-      }
-      else if ( bOpen ) 
-      {
+      else if( bOpen )
          hb_fsSeek( hFile, 0, FS_END );
-      }
 
       ulWrite = hb_fsWriteLarge( hFile, pcStr, ulLen );
       if( ( ulWrite == ulLen ) && bOpen && bTrunc )
-      {
          hb_fsWrite( hFile, NULL, 0 );
-      }
 
       hb_fsClose( hFile );
    }
@@ -153,21 +143,19 @@ HB_FUNC( STRFILE )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      hb_retnl( ct_StrFile( ( BYTE * ) hb_parc( 2 ), ( BYTE * ) hb_parc( 1 ),
+      hb_retnl( ct_StrFile( hb_parc( 2 ), hb_parc( 1 ),
                             hb_parclen( 1 ), ISLOG( 3 ) && hb_parl( 3 ),
                             hb_parnl( 4 ), ISLOG( 5 ) && hb_parl( 5 ) ) );
    }
    else
-   {
       hb_retni( 0 );
-   }
 }
 
 HB_FUNC( FILESTR )
 {
    if( ISCHAR( 1 ) )
    {
-      FHANDLE hFile = hb_fsOpen( ( BYTE * ) hb_parc( 1 ), FO_READ );
+      HB_FHANDLE hFile = hb_fsOpen( hb_parc( 1 ), FO_READ );
 
       if( hFile != FS_ERROR )
       {
@@ -188,30 +176,24 @@ HB_FUNC( FILESTR )
          pcResult = ( char * ) hb_xgrab( lLength + 1 );
          if( lLength > 0 )
          {
-            lLength = hb_fsReadLarge( hFile, ( BYTE * ) pcResult, ( ULONG ) lLength );
+            lLength = hb_fsReadLarge( hFile, pcResult, ( ULONG ) lLength );
          }
 
          if( bCtrlZ )
          {
             pCtrlZ = ( char * ) memchr( pcResult, 26, lLength );
             if( pCtrlZ )
-            {
                lLength = pCtrlZ - pcResult;
-            }
          }
 
          hb_fsClose( hFile );
          hb_retclen_buffer( pcResult, lLength );
       }
       else
-      {
-         hb_retc( NULL );
-      }
+         hb_retc_null();
    }
    else
-   {
-      hb_retc( NULL );
-   }
+      hb_retc_null();
 }
 
 HB_FUNC( SCREENFILE )
@@ -226,7 +208,7 @@ HB_FUNC( SCREENFILE )
 
       hb_gtSave( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), pBuffer );
 
-      hb_retnl( ct_StrFile( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) pBuffer,
+      hb_retnl( ct_StrFile( hb_parc( 1 ), pBuffer,
                             ulSize, ISLOG( 2 ) && hb_parl( 2 ), hb_parnl( 3 ),
                             ISLOG( 4 ) && hb_parl( 4 ) ) );
       hb_xfree( pBuffer );
@@ -241,11 +223,11 @@ HB_FUNC( FILESCREEN )
 {
    if( ISCHAR( 1 ) )
    {
-      FHANDLE hFile = hb_fsOpen( ( BYTE * ) hb_parc( 1 ), FO_READ );
+      HB_FHANDLE hFile = hb_fsOpen( hb_parc( 1 ), FO_READ );
 
       if( hFile != FS_ERROR )
       {
-         char *pBuffer;
+         char * pBuffer;
          ULONG ulSize;
          LONG lLength;
 
@@ -257,7 +239,7 @@ HB_FUNC( FILESCREEN )
          hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &ulSize );
          pBuffer = ( char * ) hb_xgrab( ulSize );
 
-         lLength = hb_fsReadLarge( hFile, ( BYTE * ) pBuffer, ulSize );
+         lLength = hb_fsReadLarge( hFile, pBuffer, ulSize );
          hb_gtRest( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), pBuffer );
 
          hb_xfree( pBuffer );
@@ -266,12 +248,8 @@ HB_FUNC( FILESCREEN )
          hb_retnl( lLength );
       }
       else
-      {
          hb_retni( 0 );
-      }
    }
    else
-   {
       hb_retni( 0 );
-   }
 }

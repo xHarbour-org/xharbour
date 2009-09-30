@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6604 2009/09/27 00:05:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6605 2009/09/29 15:37:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,106 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-09-30 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * contrib\rdd_ads\ads1.c
+   * contrib\rdd_ads\adsfunc.c
+   * contrib\rdd_ads\rddads.h
+   * include\hbapi.h
+   * include\hbapicdp.h
+   * include\hbapifs.h
+   * include\hbapirdd.h
+   * include\hbdbf.h
+   * include\hbdbsort.h
+   * include\hbrddbmc.h
+   * include\hbrddcdx.h
+   * include\hbrdddbf.h
+   * include\hbrdddel.h
+   * include\hbrddfpt.h
+   * include\hbrddmdx.h
+   * include\hbrddnsx.h
+   * include\hbrddntx.h
+   * include\hbrddrec.h
+   * include\hbrddsdf.h
+   * include\hbsxfunc.h
+   * include\thread.h
+   * include\usrrdd.ch
+   * source\common\hbdate.c
+   * source\common\hbfopen.c
+   * source\common\hbfsapi.c
+   * source\compiler\harbour.c
+   * source\compiler\hbgenerr.c
+   * source\compiler\ppcomp.c
+   * source\ct\disk.c
+   * source\ct\files.c
+   * source\ct\print.c
+   * source\ct\strfile.c
+   * source\macro\macro.y
+   * source\misc\hb_f.c
+   * source\pp\ppgen.c
+   * source\rdd\bmdbfcdx\bmdbfcdx1.c
+   * source\rdd\bmdbfcdx\redbfcdx1.c
+   * source\rdd\dbcmd.c
+   * source\rdd\dbf1.c
+   * source\rdd\dbf1net.c
+   * source\rdd\dbfcdx\dbfcdx1.c
+   * source\rdd\dbffpt\dbffpt1.c
+   * source\rdd\dbffpt\redbffpt1.c
+   * source\rdd\dbfmdx\dbfmdx1.c
+   * source\rdd\dbfnsx\dbfnsx1.c
+   * source\rdd\dbfntx\dbfntx1.c
+   * source\rdd\delim1.c
+   * source\rdd\hbdbsort.c
+   * source\rdd\hbsix\sxcompr.c
+   * source\rdd\hbsix\sxcrypt.c
+   * source\rdd\hbsix\sxdate.c
+   * source\rdd\hbsix\sxfname.c
+   * source\rdd\hbsix\sxord.c
+   * source\rdd\hbsix\sxsem.c
+   * source\rdd\hbsix\sxtable.c
+   * source\rdd\hbsix\sxutil.c
+   * source\rdd\hsx\hsx.c
+   * source\rdd\sdf1.c
+   * source\rdd\usrrdd\usrrdd.c
+   * source\rdd\wafunc.c
+   * source\rdd\workarea.c
+   * source\rtl\cdpapi.c
+   * source\rtl\copyfile.c
+   * source\rtl\dirdrive.c
+   * source\rtl\direct.c
+   * source\rtl\file.c
+   * source\rtl\filebuf.c
+   * source\rtl\filehb.c
+   * source\rtl\filenet.c
+   * source\rtl\filesys.c
+   * source\rtl\fssize.c
+   * source\rtl\fstemp.c
+   * source\rtl\hbip.c
+   * source\rtl\hbmd5.c
+   * source\rtl\memofile.c
+   * source\rtl\natmsg.c
+   * source\rtl\philes.c
+   * source\rtl\set.c
+   * source\rtl\spfiles.c
+   * source\rtl\trace.c
+   * source\tip\utils.c
+   * source\vm\hbi18n.c
+   * source\vm\macro.c
+   * source\vm\memvars.c
+   * source\vm\runner.c
+   * utils\hbfilere\hbfilere.c
+   * utils\hbfilere\hbfilere.h
+   * utils\hbpp\hbpp.c
+     * changed var types from BYTE to char and added const, to remove some compile warnings
+       and to me more compatible with 3rd party libraries builded for harbour and xharbour.
+       This changes don't take advantage at runtime but some protection at build xharbour time.
+     ! fixed a lot of compile warnings.
+     + Added full remote rdd support using rem: prefix at database file name. As suggest me Ron Pinkas
+       and later Przemyslaw Czerpak, using an array of function pointers. 
+     * filebuf was developed by Przemyslaw Czerpak, borrowed from Harbour, and modified by me to add
+       especific xharbour features to remote conections.
+     * Changed rdd structures to do more easy 3rd party developers job in the future. 
+
 
 2009-09-29 12:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/tbrowse.prg

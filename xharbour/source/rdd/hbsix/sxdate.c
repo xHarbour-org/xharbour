@@ -1,5 +1,5 @@
 /*
- * $Id: sxdate.c,v 1.2 2005/10/18 12:14:33 druzus Exp $
+ * $Id: sxdate.c,v 1.3 2005/10/24 01:04:34 druzus Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ char * hb_sxDtoP( char * pDate, LONG lJulian )
    return pDate;
 }
 
-LONG hb_sxPtoD( char * pDate )
+LONG hb_sxPtoD( const char * pDate )
 {
    int iYear, iMonth, iDay;
    LONG lPDate;

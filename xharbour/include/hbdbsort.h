@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.h,v 1.5 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbdbsort.h,v 1.6 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_EXTERN_BEGIN
 typedef struct _DBQUICKSORT
 {
    HB_FHANDLE hFile;
-   BYTE szTempName[ HB_PATH_MAX ];
+   char szTempName[ HB_PATH_MAX ];
    BYTE * pBuffer;
    BYTE * pSwapBufferA;
    BYTE * pSwapBufferB;

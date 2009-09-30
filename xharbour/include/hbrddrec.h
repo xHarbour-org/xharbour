@@ -1,9 +1,9 @@
 /*
- * $Id: hbrddbmc.h,v 1.12 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: hbrddrec.h,v 1.1 2009/07/22 17:09:14 marchuet Exp $
  */
 
 /*
- * BMDBFCDX RDD (ver.2)
+ * REDBFCDX RDD (ver.2)
  *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
@@ -114,18 +114,18 @@ HB_EXTERN_BEGIN
 
 #define CURKEY_RAWCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_RAWCNT) != 0)
 #define CURKEY_LOGCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_LOGCNT) != 0)
-#define CURKEY_SETLOGCNT(pTag, lKeyCount) { (pTag)->curKeyState |= CDX_CURKEY_LOGCNT; \
-                                            (pTag)->logKeyCount = (lKeyCount); }
+#define CURKEY_SETLOGCNT(pTag, lKeyCount) do { (pTag)->curKeyState |= CDX_CURKEY_LOGCNT; \
+                                               (pTag)->logKeyCount = (lKeyCount); } while(0)
 
 #define CURKEY_RAWPOS(pTag)   ( ((pTag)->curKeyState & CDX_CURKEY_RAWPOS) != 0 && \
                                  (pTag)->rawKeyRec == (pTag)->CurKey->rec )
-#define CURKEY_SETRAWPOS(pTag) { (pTag)->curKeyState |= CDX_CURKEY_RAWPOS; \
-                                 (pTag)->rawKeyRec = (pTag)->CurKey->rec; }
+#define CURKEY_SETRAWPOS(pTag) do { (pTag)->curKeyState |= CDX_CURKEY_RAWPOS; \
+                                    (pTag)->rawKeyRec = (pTag)->CurKey->rec; } while(0)
 
 #define CURKEY_LOGPOS(pTag)   ( ((pTag)->curKeyState & CDX_CURKEY_LOGPOS) != 0 && \
-                                 (pTag)->logKeyRec == (pTag)->pIndex->pArea->ulRecNo )
-#define CURKEY_SETLOGPOS(pTag) { (pTag)->curKeyState |= CDX_CURKEY_LOGPOS; \
-                                 (pTag)->logKeyRec = (pTag)->pIndex->pArea->ulRecNo; }
+                                 (pTag)->logKeyRec == (pTag)->pIndex->pArea->dbfarea.ulRecNo )
+#define CURKEY_SETLOGPOS(pTag) do { (pTag)->curKeyState |= CDX_CURKEY_LOGPOS; \
+                                    (pTag)->logKeyRec = (pTag)->pIndex->pArea->dbfarea.ulRecNo; } while(0)
 
 /*
 #define CURKEY_UNDEF(pTag)    (((pTag)->curKeyState & CDX_CURKEY_UNDEF) != 0)
@@ -139,7 +139,7 @@ HB_EXTERN_BEGIN
 #define HB_CDXMAXKEY( x )     ((USHORT) ((x) > CDX_MAXKEY ? CDX_MAXKEY : (x)))
 #define HB_CDXBITMASK( x )    ((LONG) ((1L<<(x))-1))
 
-/* #define FAST_GOCOLD( A )      (((CDXAREAP) (A))->fRecordChanged || ((CDXAREAP) (A))->fCdxAppend ? (SELF_GOCOLD((A))) : HB_SUCCESS) */
+/* #define FAST_GOCOLD( A )      ((A)->dbfarea.fRecordChanged || (A)->fCdxAppend ? (SELF_GOCOLD((AREAP)(A))) : HB_SUCCESS) */
 #define FAST_GOCOLD( A )      SELF_GOCOLD(A)
 
 
@@ -200,8 +200,10 @@ typedef struct _CDXTAGHEADER
    BYTE     keySize  [ 2 ];   /* key length */
    BYTE     indexOpt;         /* index options see CDX_TYPE_* */
    BYTE     indexSig;         /* index signature */
-   BYTE     reserved2[ 484 ];
-   BYTE     ignoreCase[ 2 ];  /* 1 = ignore case, key converted to upper */
+   BYTE     reserved2[ 478 ];
+   BYTE     codepage[ 5 ];    /* VFP codepage */
+   BYTE     ignoreCase;       /* 1 = ignore case, key converted to upper */
+   BYTE     reserved3[ 2 ];
    BYTE     ascendFlg[ 2 ];   /* 0 = ascending  1 = descending */
    BYTE     forExpPos[ 2 ];   /* offset of filter expression */
    BYTE     forExpLen[ 2 ];   /* length of filter expression */
@@ -339,6 +341,7 @@ typedef struct _CDXTAG
    BOOL     ChgOnly;          /* only existing key modifications are updated, no new key added */
    BOOL     UsrAscend;        /* user settable ascending/descending order flag */
    BOOL     UsrUnique;        /* user settable unique order flag */
+   BOOL     IgnoreCase;       /* ignore case (upper keys) */
 
    BOOL     TagChanged;
    BOOL     TagBOF;
@@ -456,91 +459,7 @@ typedef CDXSORTINFO * LPCDXSORTINFO;
 
 typedef struct _CDXAREA
 {
-   struct _RDDFUNCS * lprfsHost; /* Virtual method table for this workarea */
-   USHORT uiArea;                /* The number assigned to this workarea */
-   void * atomAlias;             /* Pointer to the alias symbol for this workarea */
-   USHORT uiFieldExtent;         /* Total number of fields allocated */
-   USHORT uiFieldCount;          /* Total number of fields used */
-   USHORT uiFieldHidden;         /* Total number of fields hidden */
-   LPFIELD lpFields;             /* Pointer to an array of fields */
-   void * lpFieldExtents;        /* Void ptr for additional field properties */
-   PHB_ITEM valResult;           /* All purpose result holder */
-   BOOL fTop;                    /* TRUE if "top" */
-   BOOL fBottom;                 /* TRUE if "bottom" */
-   BOOL fBof;                    /* TRUE if "bof" */
-   BOOL fEof;                    /* TRUE if "eof" */
-   BOOL fFound;                  /* TRUE if "found" */
-   DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
-   DBFILTERINFO dbfi;            /* Filter in effect */
-   PHB_SESSION dbssi;            /* Session info used on transactions */
-   LPDBORDERCONDINFO lpdbOrdCondInfo;
-   LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
-   USHORT uiParents;             /* Number of parents for this area */
-   USHORT heap;
-   USHORT heapSize;
-   USHORT rddID;
-   USHORT uiMaxFieldNameLength;
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
-   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
-
-   /*
-   *  DBFS's additions to the workarea structure
-   *
-   *  Warning: The above section MUST match WORKAREA exactly!  Any
-   *  additions to the structure MUST be added below, as in this
-   *  example.
-   */
-
-   PHB_FILE pDataFile;              /* Data file handle */
-   PHB_FILE pMemoFile;              /* Memo file handle */
-   PHB_FILE pMemoTmpFile;           /* Memo temporary file handle */
-   char *   szDataFileName;         /* Name of data file */
-   char *   szMemoFileName;         /* Name of memo file */
-   USHORT   uiHeaderLen;            /* Size of header */
-   USHORT   uiRecordLen;            /* Size of record */
-   USHORT   uiMemoBlockSize;        /* Size of memo block */
-   USHORT   uiNewBlockSize;         /* Size of new memo block */
-   USHORT   uiMemoVersion;          /* MEMO file version */
-   USHORT   uiDirtyRead;            /* Index dirty read bit filed */
-   BYTE     bTableType;             /* DBF type */
-   BYTE     bMemoType;              /* MEMO type used in DBF memo fields */
-   BYTE     bLockType;              /* Type of locking shemes */
-   BYTE     bCryptType;             /* Type of used encryption */
-   DBFHEADER dbfHeader;             /* DBF header buffer */
-   USHORT * pFieldOffset;           /* Pointer to field offset array */
-   BYTE *   pRecord;                /* Buffer of record data */
-   ULONG    ulRecCount;             /* Total records */
-   ULONG    ulRecNo;                /* Current record */
-   BOOL     fAutoInc;               /* WorkArea with auto increment fields */
-   BOOL     fHasMemo;               /* WorkArea with Memo fields */
-   BOOL     fHasTags;               /* WorkArea with MDX or CDX index */
-   BOOL     fModStamp;              /* WorkArea with modification autoupdate fields */
-   BOOL     fDataFlush;             /* data was written to DBF and not commited */
-   BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
-   BOOL     fShared;                /* Shared file */
-   BOOL     fReadonly;              /* Read only file */
-   BOOL     fTemporary;             /* Temporary file */
-   BOOL     fValidBuffer;           /* State of buffer */
-   BOOL     fPositioned;            /* Positioned record */
-   BOOL     fRecordChanged;         /* Record changed */
-   BOOL     fAppend;                /* TRUE if new record is added */
-   BOOL     fDeleted;               /* TRUE if record is deleted */
-   BOOL     fEncrypted;             /* TRUE if record is encrypted */
-   BOOL     fTableEncrypted;        /* TRUE if table is encrypted */
-   BOOL     fUpdateHeader;          /* Update header of file */
-   BOOL     fFLocked;               /* TRUE if file is locked */
-   BOOL     fHeaderLocked;          /* TRUE if DBF header is locked */
-   BOOL     fPackMemo;              /* Pack memo file in pack operation */
-   BOOL     fTrigger;               /* Execute trigger function */
-   LPDBOPENINFO lpdbOpenInfo;       /* Pointer to current dbOpenInfo structure in OPEN/CREATE methods */
-   LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
-   ULONG *  pLocksPos;              /* List of records locked */
-   ULONG    ulNumLocksPos;          /* Number of records locked */
-   BYTE *   pCryptKey;              /* Pointer to encryption key */
-   PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
-   USHORT   uidbaselock;            /* position of _dbaselock field 0 if doesn't exists */         
-   USHORT   uiFieldNullFlags;       /* Number of Field _NullFlags */
+   DBFAREA dbfarea;
 
    /*
    *  CDX's additions to the workarea structure
@@ -550,11 +469,12 @@ typedef struct _CDXAREA
    *  example.
    */
 
-   BOOL           fCdxAppend;    /* Appended record changed */
-   LPCDXINDEX     lpIndexes;     /* Pointer to indexes array  */
-   USHORT         uiTag;         /* current tag focus */
    LPCDXSORTINFO  pSort;         /* Index build structure */
-   BYTE *         bCdxSortTab;   /* Table with storted characters */
+   LPCDXINDEX     lpIndexes;     /* Pointer to indexes array  */
+   BYTE *         bCdxSortTab;   /* Table with sorted characters */
+   BOOL           fCdxAppend;    /* Appended record changed */
+   BOOL           fSortCDP;      /* Use CDP functions for sorting */
+   USHORT         uiTag;         /* current tag focus */
 
 } CDXAREA;
 
@@ -684,6 +604,7 @@ static HB_ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxExit                                 NULL
 #define hb_cdxDrop                                 NULL
 #define hb_cdxExists                               NULL
+#define hb_cdxRename                               NULL
 static HB_ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_cdxWhoCares                             NULL
 

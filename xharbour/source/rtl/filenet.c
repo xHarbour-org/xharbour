@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.7 2009/09/16 04:34:16 andijahja Exp $
+ * $Id: filenet.c,v 1.8 2009/09/16 15:53:42 marchuet Exp $
  */
 
 /*
@@ -55,6 +55,9 @@
 struct _HB_FILE;
 typedef struct _HB_FILE * PHB_FILE;
 
+/* file name prefix used by this file IO implementation */
+#define NETIO_FILE_PREFIX     "rem:"
+#define NETIO_FILE_PREFIX_LEN strlen( NETIO_FILE_PREFIX )
 
 #include "hbapi.h"
 #include "hbinit.h"
@@ -92,7 +95,7 @@ HB_FLOCK, * PHB_FLOCK;
 
 typedef struct _HB_FILE
 {
-   BYTE *            pFileName;
+   char *            pFileName;
    int               used;
    BOOL              shared;
    BOOL              BufferLock;
@@ -126,7 +129,7 @@ static int sBufferSize = 32767;
 
 int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
 
-static PHB_FILE hb_fileFind( BYTE * pFileName, HB_SOCKET_T hSocketLoc )
+static PHB_FILE hb_fileFind( char * pFileName, HB_SOCKET_T hSocketLoc )
 {
    if( s_openFiles && pFileName )
    {
@@ -159,7 +162,7 @@ static PHB_FILE hb_fileFindByHandle( HB_FHANDLE hFile, HB_SOCKET_T hSocketLoc )
    return NULL;
 }
 
-static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock, BOOL fRemote, BYTE * pFileName )
+static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock, BOOL fRemote, char * pFileName )
 {
    PHB_FILE pFile = ( pFileName && fRemote ? hb_fileFindByHandle( hFile, fRemote ? hSocket : 0 ) : NULL );
 
@@ -167,7 +170,7 @@ static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock,
    {
       pFile = ( PHB_FILE ) hb_xgrab( sizeof( HB_FILE ) );
       memset( pFile, 0, sizeof( HB_FILE ) );
-      pFile->pFileName = ( BYTE * ) hb_xalloc( HB_PATH_MAX );
+      pFile->pFileName = ( char * ) hb_xalloc( HB_PATH_MAX );
       memset( pFile->pFileName, 0, sizeof( HB_PATH_MAX ) );
       if( pFileName )
          memcpy( pFile->pFileName, pFileName, strlen( ( const char * ) pFileName ) );      
@@ -580,14 +583,14 @@ static void hb_NetCloseConnection( HB_SOCKET_T hCurSocket )
    }
 } 
 
-USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 {
    if( hSocket )
    {
       char szData[ 25 + HB_LENGTH_ACK ];
       int nSend;
       
-      /* USHORT hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ) */
+      /* USHORT hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen ) */
       nSend = sprintf( szData + HB_LENGTH_ACK, "W|%hu|%lu|\r\n", uiDrive, ulLen );
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1020 ) )
@@ -610,14 +613,14 @@ USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
       return hb_fsCurDirBuffEx( uiDrive, pbyBuffer, ulLen );
 }
 
-static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags, BYTE * pPaths )
+static char * hb_NetExtName( const char * pFilename, const char * pDefExt, USHORT uiExFlags, const char * pPaths )
 {
    HB_PATHNAMES * pNextPath;
    PHB_FNAME pFilepath;
    BOOL fIsFile = FALSE;
-   BYTE * szPath;
+   char * szPath;
 
-   szPath = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+   szPath = ( char * ) hb_xgrab( HB_PATH_MAX );
 
    pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
 
@@ -641,7 +644,7 @@ static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags,
       }
       else
       {
-         BYTE pbyDirBuffer[ HB_PATH_MAX ];
+         char pbyDirBuffer[ HB_PATH_MAX ];
          hb_fileNetCurDirBuffEx( 0, pbyDirBuffer, HB_PATH_MAX );
          pFilepath->szPath = ( char * ) pbyDirBuffer;
          hb_fsFNameMerge( ( char * ) szPath, pFilepath );
@@ -692,14 +695,14 @@ static BYTE * hb_NetExtName( BYTE * pFilename, BYTE * pDefExt, USHORT uiExFlags,
    return szPath;
 } 
 
-PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
-                            USHORT uiExFlags, BYTE * pPaths,
+PHB_FILE hb_fileNetExtOpen( const char * pFilename, const char * pDefExt,
+                            USHORT uiExFlags, const char * pPaths,
                             PHB_ITEM pError, BOOL fBufferLock )
 {
    PHB_FILE pFile;
    BOOL fShared;
    HB_FHANDLE hFile;
-   BYTE * pszFile;
+   char * pszFile;
 
    fShared = ( uiExFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0;
    pszFile = hb_NetExtName( pFilename, pDefExt, uiExFlags, pPaths );
@@ -722,8 +725,8 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
       if( hSocket )
       {
          char szData[HB_PATH_MAX * 3 + 32];
-         int nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%hu|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( BYTE * ) "" ),
-                              uiExFlags, ( pPaths ? pPaths: ( BYTE * ) "" ) );
+         int nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%hu|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( char * ) "" ),
+                              uiExFlags, ( pPaths ? pPaths: ( char * ) "" ) );
          HB_PUT_BE_UINT32( szData, nSend );                           
 
          /* hFile = hb_fsExtOpen( pFilename, pDefExt, uiExFlags, pPaths, pError ); */
@@ -757,7 +760,7 @@ PHB_FILE hb_fileNetExtOpen( BYTE * pFilename, BYTE * pDefExt,
 
       if( pError )
       {
-         BYTE * szPath;
+         char * szPath;
          szPath = hb_NetExtName( pFilename, pDefExt, uiExFlags, pPaths );
          hb_errPutFileName( pError, ( char * ) szPath );
          if( hFile == FS_ERROR )
@@ -900,7 +903,7 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
    return fResult;
 }
 
-ULONG hb_fileNetReadAt( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize, HB_FOFFSET llOffset )
+ULONG hb_fileNetReadAt( PHB_FILE pFile, void * pBuffer, ULONG ulSize, HB_FOFFSET llOffset )
 {
    ULONG ulRead;   
    
@@ -940,7 +943,7 @@ ULONG hb_fileNetReadAt( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize, HB_FOFFSET
    return ulRead;   
 }
 
-ULONG hb_fileNetReadLarge( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize )
+ULONG hb_fileNetReadLarge( PHB_FILE pFile, void * pBuffer, ULONG ulSize )
 {
    ULONG ulRead;   
    
@@ -979,7 +982,7 @@ ULONG hb_fileNetReadLarge( PHB_FILE pFile, BYTE * pBuffer, ULONG ulSize )
    return ulRead;   
 }
 
-ULONG hb_fileNetWriteAt( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize, HB_FOFFSET llOffset )
+ULONG hb_fileNetWriteAt( PHB_FILE pFile, const void * buffer, ULONG ulSize, HB_FOFFSET llOffset )
 {
    ULONG ulWrite;
    
@@ -1023,7 +1026,7 @@ ULONG hb_fileNetWriteAt( PHB_FILE pFile, const BYTE * buffer, ULONG ulSize, HB_F
    return ulWrite;
 }
 
-ULONG hb_fileNetWriteLarge( PHB_FILE pFile, const BYTE * pBuffer, ULONG ulSize )
+ULONG hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, ULONG ulSize )
 {
    ULONG ulWrite;
    
@@ -1068,7 +1071,7 @@ ULONG hb_fileNetWriteLarge( PHB_FILE pFile, const BYTE * pBuffer, ULONG ulSize )
    return ulWrite;
 }
 
-USHORT hb_fileNetWrite( PHB_FILE pFile, const BYTE * pBuffer, USHORT uiCount )
+USHORT hb_fileNetWrite( PHB_FILE pFile, const char * pBuffer, USHORT uiCount )
 {
    USHORT uiWrite;
    
@@ -1211,7 +1214,7 @@ void hb_fileNetCommit( PHB_FILE pFile )
    
 }
 
-BOOL hb_fileNetDelete( BYTE * pFilename, USHORT uiRemote )
+BOOL hb_fileNetDelete( const char * pFilename, USHORT uiRemote )
 {
    if( uiRemote == 1 )
    {
@@ -1229,12 +1232,12 @@ BOOL hb_fileNetDelete( BYTE * pFilename, USHORT uiRemote )
    }
 }
 
-BOOL hb_fileNetRename( BYTE * pOldName, BYTE * pNewName )
+BOOL hb_fileNetRename( const char * pOldName, const char * pNewName )
 {
    char szData[ HB_PATH_MAX + HB_PATH_MAX + 6 + HB_LENGTH_ACK ];
    int nSend;
    
-   /* BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName ) */
+   /* BOOL hb_fsRename( char * pOldName, char * pNewName ) */
    nSend = sprintf( szData + HB_LENGTH_ACK, "V|%s|%s|\r\n", pOldName, pNewName );
    HB_PUT_BE_UINT32( szData, nSend );
    hb_NetSingleSendSingleRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1019 );
@@ -1246,7 +1249,7 @@ HB_FHANDLE hb_fileNetHandle( PHB_FILE pFile )
    return pFile ? pFile->hFile : FS_ERROR;
 }
 
-BYTE * hb_fileNetFileName( PHB_FILE pFile )
+char * hb_fileNetFileName( PHB_FILE pFile )
 {
    return pFile->pFileName;
 }   
@@ -1256,7 +1259,7 @@ USHORT hb_fileNetRemote( PHB_FILE pFile )
    return ( USHORT ) ( ( pFile && pFile->hSocket ) ? 2 : 1 );
 }
 
-PHB_FILE hb_fileNetCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, ULONG ulAttr, BYTE * pszName )
+PHB_FILE hb_fileNetCreateTemp( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszName )
 {
    PHB_FILE pFile = NULL;
    HB_FHANDLE hFile;
@@ -1282,7 +1285,7 @@ static BOOL hb_NetFileExists( const char * pszFileName )
       return hb_fsFileExists( pszFileName );
 }
 
-BOOL hb_FileNetFile( BYTE * pFilename )
+BOOL hb_FileNetFile( char * pFilename )
 {
    if( hSocket )
    {
@@ -1296,16 +1299,21 @@ BOOL hb_FileNetFile( BYTE * pFilename )
       return hb_fsFile( pFilename );
 }
 
-BOOL hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath )
+static BOOL hb_FileNetAccept( const char * pFilename )
 {
-   BYTE *Path;
+   return hb_strnicmp( pFilename, NETIO_FILE_PREFIX, NETIO_FILE_PREFIX_LEN ) == 0;
+}
+
+BOOL hb_FileNetExists( const char * pFilename, char * pRetPath )
+{
+   char *Path;
    BOOL bIsFile = FALSE;
    PHB_FNAME pFilepath;
 
    if( pRetPath )
       Path = pRetPath;
    else
-      Path = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
+      Path = ( char * ) hb_xgrab( HB_PATH_MAX );
 
    pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
 
@@ -1358,10 +1366,10 @@ BOOL hb_FileNetExists( BYTE * pFilename, BYTE * pRetPath )
    return bIsFile;
 }
 
-PHB_FILE hb_fileNetCreateTempEx( BYTE * pszName,
-                                 const BYTE * pszDir,
-                                 const BYTE * pszPrefix,
-                                 const BYTE * pszExt,
+PHB_FILE hb_fileNetCreateTempEx( char * pszName,
+                                 const char * pszDir,
+                                 const char * pszPrefix,
+                                 const char * pszExt,
                                  ULONG ulAttr )
 {
    PHB_FILE pFile = NULL;
@@ -1549,10 +1557,10 @@ static void hb_FileNetGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHO
 void hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
    USHORT    uiMask, uiMaskNoLabel;
-   BYTE      *szDirSpec;
+   char      *szDirSpec;
 
    PHB_FNAME fDirSpec = NULL;
-   BOOL fFree = FALSE;
+   char * pszFree = NULL;
    /* Get the passed attributes and convert them to Harbour Flags */
 
    uiMask = HB_FA_ARCHIVE
@@ -1588,11 +1596,11 @@ void hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BO
 
    if ( szSkleton && strlen( szSkleton ) > 0 )
    {
-      szDirSpec = (BYTE *) hb_fsNameConv( ( BYTE * ) szSkleton, &fFree );
+      szDirSpec = (char *) hb_fsNameConv( ( char * ) szSkleton, &pszFree );
    }
    else
    {
-      szDirSpec = (BYTE *) HB_OS_ALLFILE_MASK;
+      szDirSpec = (char *) HB_OS_ALLFILE_MASK;
    }
 
    if( bDirOnly || bFullPath )
@@ -1606,7 +1614,7 @@ void hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BO
 
          if( fDirSpec->szPath )
          {
-            hb_fsChDir( (BYTE *) fDirSpec->szPath );
+            hb_fsChDir( (char *) fDirSpec->szPath );
          }
       }
    }
@@ -1626,13 +1634,13 @@ void hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BO
       hb_xfree( fDirSpec );
    }
 
-   if( fFree )
+   if( pszFree )
    {
-      hb_xfree( szDirSpec );
+      hb_xfree( pszFree );
    }
 }
 
-ULONG hb_fileNetGetFileAttributes( BYTE * pFilename )
+ULONG hb_fileNetGetFileAttributes( char * pFilename )
 {
    char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
    int nSend;
@@ -1657,13 +1665,13 @@ ULONG hb_fileNetGetFileAttributes( BYTE * pFilename )
       return 0;
 }
 
-BOOL hb_fileNetMkDir( BYTE * pPath )
+BOOL hb_fileNetMkDir( char * pPath )
 {
    char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
    int nSend;
    ULONG ulSize, ulLen;
    
-   /* BOOL hb_fsMkDir( BYTE * pPath ) */
+   /* BOOL hb_fsMkDir( char * pPath ) */
    nSend = sprintf( szData + HB_LENGTH_ACK, "T|%s|\r\n", pPath );
    HB_PUT_BE_UINT32( szData, nSend );
    ulLen = hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1017 );
@@ -1686,13 +1694,13 @@ BOOL hb_fileNetMkDir( BYTE * pPath )
       return FALSE;
 }
 
-BOOL hb_fileNetRmDir( BYTE * pPath )
+BOOL hb_fileNetRmDir( char * pPath )
 {
    char szData[HB_PATH_MAX + 5 + HB_LENGTH_ACK];
    int nSend;
    ULONG ulSize, ulLen;   
    
-   /* BOOL hb_fsRmDir( BYTE * pPath ) */
+   /* BOOL hb_fsRmDir( char * pPath ) */
    nSend = sprintf( szData + HB_LENGTH_ACK, "U|%s|\r\n", pPath );
    HB_PUT_BE_UINT32( szData, nSend );
    ulLen = hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1018 );
@@ -1737,7 +1745,7 @@ static BOOL hb_FileNetCopyTo( char * szSource, char * szDest, PHB_ITEM block )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_FileNetCopyTo(%s, %s)", szSource, szDest));
 
-   while( ( fhndSource = hb_spOpen( ( BYTE * ) szSource, FO_READ | FO_SHARED | FO_PRIVATE ) ) == FS_ERROR )
+   while( ( fhndSource = hb_spOpen( ( char * ) szSource, FO_READ | FO_SHARED | FO_PRIVATE ) ) == FS_ERROR )
    {
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2012, NULL, szSource, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
@@ -1753,7 +1761,7 @@ static BOOL hb_FileNetCopyTo( char * szSource, char * szDest, PHB_ITEM block )
 
       for(;;)
       {
-         pfDest = hb_fileNetExtOpen( ( BYTE * ) szDest, NULL,
+         pfDest = hb_fileNetExtOpen( ( char * ) szDest, NULL,
                                      FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE | FXO_SHARELOCK | FXO_COPYNAME,
                                      NULL, NULL, FALSE );
          if( pfDest )
@@ -1781,10 +1789,10 @@ static BOOL hb_FileNetCopyTo( char * szSource, char * szDest, PHB_ITEM block )
          BOOL bSuccess = GetFileInformationByHandle( (HANDLE) fhndSource, &hFileInfo);
 #endif
 */
-         BYTE * buffer;
+         char * buffer;
          ULONG ulRead;
 
-         buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+         buffer = ( char * ) hb_xgrab( BUFFER_SIZE );
 
          bRetVal = TRUE;
 
@@ -1857,7 +1865,7 @@ static BOOL hb_FileNetCopyFrom( char * szSource, char * szDest, PHB_ITEM block )
 
    for(;;)
    {
-      pfSource = hb_fileNetExtOpen( ( BYTE * ) szSource, NULL,
+      pfSource = hb_fileNetExtOpen( ( char * ) szSource, NULL,
                                     FO_READ | FO_SHARED | FXO_SHARELOCK | FXO_COPYNAME,
                                     NULL, NULL, FALSE );
       if( pfSource )
@@ -1879,7 +1887,7 @@ static BOOL hb_FileNetCopyFrom( char * szSource, char * szDest, PHB_ITEM block )
    {
       HB_FHANDLE fhndDest;
       
-      while( ( fhndDest = hb_fsCreate( ( BYTE * ) szDest, FC_NORMAL ) ) == FS_ERROR )
+      while( ( fhndDest = hb_fsCreate( ( char * ) szDest, FC_NORMAL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_CREATE, 2012, NULL, szDest, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
@@ -1891,10 +1899,10 @@ static BOOL hb_FileNetCopyFrom( char * szSource, char * szDest, PHB_ITEM block )
 
       if( fhndDest != FS_ERROR )
       {
-         BYTE * buffer;
+         char * buffer;
          ULONG ulRead;
 
-         buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+         buffer = ( char * ) hb_xgrab( BUFFER_SIZE );
 
          bRetVal = TRUE;
 
@@ -1959,7 +1967,7 @@ static BOOL hb_FileNetCopyFile( char * szSource, char * szDest, PHB_ITEM block )
 
    for(;;)
    {
-      pfSource = hb_fileNetExtOpen( ( BYTE * ) szSource, NULL,
+      pfSource = hb_fileNetExtOpen( ( char * ) szSource, NULL,
                                     FO_READ | FO_SHARED | FXO_SHARELOCK | FXO_COPYNAME,
                                     NULL, NULL, FALSE );
       if( pfSource )
@@ -1983,7 +1991,7 @@ static BOOL hb_FileNetCopyFile( char * szSource, char * szDest, PHB_ITEM block )
 
       for(;;)
       {
-         pfDest = hb_fileNetExtOpen( ( BYTE * ) szDest, NULL,
+         pfDest = hb_fileNetExtOpen( ( char * ) szDest, NULL,
                                      FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE | FXO_SHARELOCK | FXO_COPYNAME,
                                      NULL, NULL, FALSE );
          if( pfDest )
@@ -2003,10 +2011,10 @@ static BOOL hb_FileNetCopyFile( char * szSource, char * szDest, PHB_ITEM block )
       
       if( pfDest )
       {
-         BYTE * buffer;
+         char * buffer;
          ULONG ulRead;
 
-         buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+         buffer = ( char * ) hb_xgrab( BUFFER_SIZE );
 
          bRetVal = TRUE;
 
@@ -2061,14 +2069,14 @@ HB_FUNC( NET_COPYFILE )
    }
 }
 
-PHB_FILE hb_fileNetGetFileToTemp( PHB_FILE pDataFile, BYTE * pszFileName )
+PHB_FILE hb_fileNetGetFileToTemp( PHB_FILE pDataFile, char * pszFileName )
 {
    PHB_FILE pDataTemp;
-   BYTE * buffer;
+   char * buffer;
    ULONG ulRead;
         
    pDataTemp = hb_fileNetCreateTempEx( pszFileName, NULL, NULL, NULL, FC_TEMPORARY );
-   buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+   buffer = ( char * ) hb_xgrab( BUFFER_SIZE );
    hb_fileNetSeekLarge( pDataFile, 0, SEEK_SET );
    while( ( ulRead = hb_fileNetReadLarge( pDataFile, buffer, BUFFER_SIZE ) ) != 0 )
    {
@@ -2091,7 +2099,7 @@ HB_FUNC( NET_FRENAME )
 
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      hb_retni( hb_fileNetRename( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) hb_parc( 2 ) ) ? 0 : F_ERROR );
+      hb_retni( hb_fileNetRename( ( char * ) hb_parc( 1 ), ( char * ) hb_parc( 2 ) ) ? 0 : F_ERROR );
       uiError = hb_fsError();
    }
    else
@@ -2105,7 +2113,7 @@ HB_FUNC( NET_FERASE )
 
    if( ISCHAR( 1 ) )
    {
-      hb_retni( hb_fileNetDelete( ( BYTE * ) hb_parc( 1 ), 2 ) ? 0 : F_ERROR );
+      hb_retni( hb_fileNetDelete( ( char * ) hb_parc( 1 ), 2 ) ? 0 : F_ERROR );
       uiError = hb_fsError();
    }
    else
@@ -2118,7 +2126,7 @@ HB_FUNC( NET_MAKEDIR )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fileNetMkDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fileNetMkDir( ( char * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -2130,7 +2138,7 @@ HB_FUNC( NET_DIRREMOVE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fileNetRmDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fileNetRmDir( ( char * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -2139,7 +2147,7 @@ HB_FUNC( NET_DIRREMOVE )
 
 HB_FUNC( NET_FILEATTR )
 {
-   hb_retnl( hb_fileNetGetFileAttributes( ( BYTE * ) hb_parcx( 1 ) ) );
+   hb_retnl( hb_fileNetGetFileAttributes( ( char * ) hb_parcx( 1 ) ) );
 }
 
 HB_FUNC( NET_DIRECTORY )
@@ -2172,6 +2180,31 @@ HB_FUNC( NET_SETBUFFERSIZE )
    hb_retni( sBufferSize );
 }
 
+static const HB_FILE_FUNCS * hb_fileNetMethods( void )
+{
+   static const HB_FILE_FUNCS s_fileFuncs =
+   {
+      hb_FileNetAccept,
+      hb_FileNetExists,
+      hb_fileNetDelete,
+      hb_fileNetRename,
+      hb_fileNetExtOpen,
+      hb_fileNetClose,
+      hb_fileNetLock,
+      hb_fileNetReadAt,
+      hb_fileNetWriteAt,
+      hb_fileNetTruncAt,
+      hb_fileNetSize,
+      hb_fileNetSeekLarge,
+      hb_fileNetWriteLarge,
+      hb_fileNetReadLarge,
+      hb_fileNetCommit,
+      hb_fileNetHandle
+   };
+
+   return &s_fileFuncs;
+}
+
 static void hb_fileNet_init( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
@@ -2183,6 +2216,7 @@ static void hb_fileNet_init( void * cargo )
       lBufferLen = HB_SENDRECV_BUFFER_SIZE;
       szBuffer = ( char * ) hb_xalloc( lBufferLen );
       hb_xautorelease( ( void * ) szBuffer );
+      hb_fileRegister( hb_fileNetMethods() );
    }
 }
 

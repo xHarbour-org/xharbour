@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.59 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: runner.c,v 1.60 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -562,7 +562,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
    char szFileName[ HB_PATH_MAX ];
    PHRB_BODY pHrbBody = NULL;
    PHB_FNAME pFileName;
-   FHANDLE hFile;
+   HB_FHANDLE hFile;
 
    /* Create full filename */
 
@@ -578,7 +578,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
 
    do
    {
-      hFile = hb_fsOpen( ( BYTE * ) szFileName, FO_READ );
+      hFile = hb_fsOpen( szFileName, FO_READ );
    }
    while( hFile == FS_ERROR &&
           hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, hb_fsError(),

@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.5 2009/08/05 10:55:53 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.6 2009/09/16 15:53:42 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -831,7 +831,7 @@ HB_FUNC( HB_IPERRORDESC )
    hb_retc( errorDesc );
 }
 
-char * hb_ipErrorDesc()
+char * hb_ipErrorDesc( void )
 {
    return errorDesc;
 }   

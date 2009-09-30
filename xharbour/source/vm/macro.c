@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.81 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: macro.c,v 1.82 2009/02/04 00:11:38 likewolf Exp $
  */
 
 /*
@@ -847,10 +847,11 @@ char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString )
  * NOTE: it can be called to implement an index key evaluation
  * use hb_macroRun() to evaluate a compiled pcode
  */
-HB_MACRO_PTR hb_macroCompile( char * szString )
+HB_MACRO_PTR hb_macroCompile( const char * szString )
 {
    HB_MACRO_PTR pMacro;
    int iStatus;
+   char * pszString;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroCompile(%s)", szString));
 
@@ -861,17 +862,14 @@ HB_MACRO_PTR hb_macroCompile( char * szString )
    pMacro->status    = HB_MACRO_CONT;
    pMacro->supported = s_macroFlags;
 
-   szString = (char *) hb_strdup( szString );
+   pszString = ( char * ) szString;
 
-   iStatus = hb_macroParse( pMacro, szString, strlen( szString ) );
+   iStatus = hb_macroParse( pMacro, pszString, strlen( pszString ) );
 
-   hb_xfree( (void *) szString );
 
    if( ! ( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) ) )
    {
       hb_macroDelete( pMacro );
-      // Since it have HB_MACRO_DEALLOCATE flag, hb_macroDelete releases it.
-      // hb_xfree( pMacro );
       pMacro = NULL;
    }
 

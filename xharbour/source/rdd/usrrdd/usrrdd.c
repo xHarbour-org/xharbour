@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.17 2009/01/10 22:26:04 likewolf Exp $
+ * $Id: usrrdd.c,v 1.18 2009/02/24 12:38:32 marchuet Exp $
  */
 
 /*
@@ -217,7 +217,7 @@ static BOOL hb_usrItemToFieldInfo( PHB_ITEM pItem, LPDBFIELDINFO pFieldInfo )
 {
    if( pItem && hb_arrayLen( pItem ) == UR_FI_SIZE )
    {
-      pFieldInfo->atomName       = ( BYTE * ) hb_usrArrayGetC( pItem, UR_FI_NAME );
+      pFieldInfo->atomName       = hb_usrArrayGetC( pItem, UR_FI_NAME );
       pFieldInfo->uiType         = hb_arrayGetNI( pItem, UR_FI_TYPE );
       pFieldInfo->uiTypeExtended = hb_arrayGetNI( pItem, UR_FI_TYPEEXT );
       pFieldInfo->uiLen          = hb_arrayGetNI( pItem, UR_FI_LEN );
@@ -255,11 +255,11 @@ static BOOL hb_usrItemToOpenInfo( PHB_ITEM pItem, LPDBOPENINFO pOpenInfo )
    if( pItem && hb_arrayLen( pItem ) == UR_OI_SIZE )
    {
       pOpenInfo->uiArea       = hb_arrayGetNI( pItem, UR_OI_AREA );
-      pOpenInfo->abName       = ( BYTE * ) hb_usrArrayGetC( pItem, UR_OI_NAME );
-      pOpenInfo->atomAlias    = ( BYTE * ) hb_usrArrayGetC( pItem, UR_OI_ALIAS );
+      pOpenInfo->abName       = hb_usrArrayGetC( pItem, UR_OI_NAME );
+      pOpenInfo->atomAlias    = hb_usrArrayGetC( pItem, UR_OI_ALIAS );
       pOpenInfo->fShared      = hb_arrayGetL( pItem, UR_OI_SHARED );
       pOpenInfo->fReadonly    = hb_arrayGetL( pItem, UR_OI_READONLY );
-      pOpenInfo->cdpId        = ( BYTE * ) hb_usrArrayGetC( pItem, UR_OI_CDPID );
+      pOpenInfo->cdpId        = hb_usrArrayGetC( pItem, UR_OI_CDPID );
       pOpenInfo->ulConnection = hb_arrayGetNL( pItem, UR_OI_CONNECT );
       pOpenInfo->lpdbHeader   = hb_arrayGetPtr( pItem, UR_OI_HEADER );
       return TRUE;
@@ -662,8 +662,8 @@ static BOOL hb_usrItemToOrderCondInfo( PHB_ITEM pItem,
    if( pItem && hb_arrayLen( pItem ) == UR_ORC_SIZE )
    {
       pOrderCondInfo->fActive       = hb_arrayGetL( pItem, UR_ORC_ACTIVE );
-      pOrderCondInfo->abFor         = ( BYTE * ) hb_usrArrayGetC( pItem, UR_ORC_CFOR );
-      pOrderCondInfo->abWhile       = ( BYTE * ) hb_usrArrayGetC( pItem, UR_ORC_CWHILE );
+      pOrderCondInfo->abFor         = ( char * ) hb_usrArrayGetC( pItem, UR_ORC_CFOR );
+      pOrderCondInfo->abWhile       = ( char * ) hb_usrArrayGetC( pItem, UR_ORC_CWHILE );
       pOrderCondInfo->itmCobFor     = hb_usrArrayGet( pItem, UR_ORC_BFOR, HB_IT_ANY );
       pOrderCondInfo->itmCobWhile   = hb_usrArrayGet( pItem, UR_ORC_BWHILE, HB_IT_ANY );
       pOrderCondInfo->itmCobEval    = hb_usrArrayGet( pItem, UR_ORC_BEVAL, HB_IT_ANY );
@@ -711,9 +711,9 @@ static void hb_usrOrderCondFree( LPDBORDERCONDINFO pOrderCondInfo )
 static void hb_usrOrderCondClone( LPDBORDERCONDINFO pOrderCondInfo )
 {
    if( pOrderCondInfo->abFor )
-      pOrderCondInfo->abFor = ( BYTE * ) hb_strdup( ( char * ) pOrderCondInfo->abFor );
+      pOrderCondInfo->abFor = hb_strdup( pOrderCondInfo->abFor );
    if( pOrderCondInfo->abWhile )
-      pOrderCondInfo->abWhile = ( BYTE * ) hb_strdup( ( char * ) pOrderCondInfo->abWhile );
+      pOrderCondInfo->abWhile = hb_strdup( pOrderCondInfo->abWhile );
    if( pOrderCondInfo->itmCobFor )
       pOrderCondInfo->itmCobFor = hb_itemNew( pOrderCondInfo->itmCobFor );
    if( pOrderCondInfo->itmCobWhile )
@@ -775,8 +775,8 @@ static BOOL hb_usrItemToOrderCreateInfo( PHB_ITEM pItem,
          pOrderCreateInfo->lpdbOrdCondInfo = NULL;
       }
 
-      pOrderCreateInfo->abBagName   = ( BYTE * ) hb_usrArrayGetC( pItem, UR_ORCR_BAGNAME );
-      pOrderCreateInfo->atomBagName = ( BYTE * ) hb_usrArrayGetC( pItem, UR_ORCR_TAGNAME );
+      pOrderCreateInfo->abBagName   = hb_usrArrayGetC( pItem, UR_ORCR_BAGNAME );
+      pOrderCreateInfo->atomBagName = hb_usrArrayGetC( pItem, UR_ORCR_TAGNAME );
       pOrderCreateInfo->itmOrder    = hb_usrArrayGet( pItem, UR_ORCR_ORDER, HB_IT_ANY );
       pOrderCreateInfo->fUnique     = hb_arrayGetL( pItem, UR_ORCR_UNIQUE );
       pOrderCreateInfo->itmCobExpr  = hb_usrArrayGet( pItem, UR_ORCR_BKEY, HB_IT_ANY );
@@ -893,7 +893,7 @@ static HB_ERRCODE hb_usrStructSize( AREAP pArea, USHORT * puiSize )
    return errCode;
 }
 
-static HB_ERRCODE hb_usrSysName( AREAP pArea, BYTE * szSysName )
+static HB_ERRCODE hb_usrSysName( AREAP pArea, char * szSysName )
 {
    LONG lOffset;
 
@@ -1223,7 +1223,7 @@ static HB_ERRCODE hb_usrFieldDisplay( AREAP pArea, LPDBFIELDINFO pFieldInfo )
    return hb_usrReturn();
 }
 
-static HB_ERRCODE hb_usrFieldName( AREAP pArea, USHORT uiIndex, void * szName )
+static HB_ERRCODE hb_usrFieldName( AREAP pArea, USHORT uiIndex, char * szName )
 {
    LONG lOffset;
 
@@ -1352,7 +1352,7 @@ static HB_ERRCODE hb_usrGoHot( AREAP pArea )
    return hb_usrReturn();
 }
 
-static HB_ERRCODE hb_usrPutRec( AREAP pArea, BYTE * pBuffer )
+static HB_ERRCODE hb_usrPutRec( AREAP pArea, const BYTE * pBuffer )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrPutRec(%p,%p)", pArea, pBuffer));
 
@@ -1360,7 +1360,7 @@ static HB_ERRCODE hb_usrPutRec( AREAP pArea, BYTE * pBuffer )
       return SUPER_PUTREC( pArea, pBuffer );
 
    hb_vmPushInteger( pArea->uiArea );
-   hb_vmPushPointer( pBuffer );
+   hb_vmPushPointer( ( void * ) pBuffer );
    hb_vmDo( 2 );
 
    return hb_usrReturn();
@@ -1577,7 +1577,7 @@ static HB_ERRCODE hb_usrSetFieldExtent( AREAP pArea, USHORT uiFieldExtent )
  * WorkArea/Database management
  */
 
-static HB_ERRCODE hb_usrAlias( AREAP pArea, BYTE * szAlias )
+static HB_ERRCODE hb_usrAlias( AREAP pArea, char * szAlias )
 {
    LONG lOffset;
 
@@ -1898,19 +1898,18 @@ static HB_ERRCODE hb_usrForceRel( AREAP pArea )
    return hb_usrReturn();
 }
 
-static HB_ERRCODE hb_usrRelArea( AREAP pArea, USHORT uiRelNo, void * pRelArea )
+static HB_ERRCODE hb_usrRelArea( AREAP pArea, USHORT uiRelNo, USHORT * puiRelArea )
 {
    LONG lOffset;
-   USHORT * puiRelArea = ( USHORT * ) pRelArea;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrRelArea(%p,%hu,%p)", pArea, uiRelNo, pRelArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrRelArea(%p,%hu,%p)", pArea, uiRelNo, puiRelArea));
 
    lOffset = hb_stackTopOffset() - hb_stackBaseOffset();
    hb_vmPushInteger( 0 );
    if( !hb_usrPushMethod( SELF_USRNODE( pArea )->pMethods, UR_RELAREA ) )
    {
       hb_stackPop();
-      return SUPER_RELAREA( pArea, uiRelNo, pRelArea );
+      return SUPER_RELAREA( pArea, uiRelNo, puiRelArea );
    }
 
    hb_vmPushInteger( pArea->uiArea );
@@ -2308,7 +2307,7 @@ static HB_ERRCODE hb_usrLocate( AREAP pArea, BOOL fContinue )
  * Miscellaneous
  */
 
-static HB_ERRCODE hb_usrCompile( AREAP pArea, BYTE * szExpr )
+static HB_ERRCODE hb_usrCompile( AREAP pArea, const char * szExpr )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrCompile(%p,%p)", pArea, szExpr));
 
@@ -2316,7 +2315,7 @@ static HB_ERRCODE hb_usrCompile( AREAP pArea, BYTE * szExpr )
       return SUPER_COMPILE( pArea, szExpr );
 
    hb_vmPushInteger( pArea->uiArea );
-   hb_vmPushString( ( char * ) szExpr, strlen( ( char * ) szExpr ) );
+   hb_vmPushString( szExpr, strlen( szExpr ) );
    hb_vmDo( 2 );
 
    return hb_usrReturn();
@@ -2471,7 +2470,7 @@ static HB_ERRCODE hb_usrOpenMemFile( AREAP pArea, LPDBOPENINFO pOpenInfo )
    return hb_usrReturn();
 }
 
-static HB_ERRCODE hb_usrGetValueFile( AREAP pArea, USHORT uiIndex, void * szFile, USHORT uiMode )
+static HB_ERRCODE hb_usrGetValueFile( AREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrGetValueFile(%p,%hu,%p,%hu)", pArea, uiIndex, szFile, uiMode));
 
@@ -2480,14 +2479,14 @@ static HB_ERRCODE hb_usrGetValueFile( AREAP pArea, USHORT uiIndex, void * szFile
 
    hb_vmPushInteger( pArea->uiArea );
    hb_vmPushInteger( uiIndex );
-   hb_vmPushString( ( char * ) szFile, strlen( ( char * ) szFile ) );
+   hb_vmPushString( szFile, strlen( szFile ) );
    hb_vmPushInteger( uiMode );
    hb_vmDo( 4 );
 
    return hb_usrReturn();
 }
 
-static HB_ERRCODE hb_usrPutValueFile( AREAP pArea, USHORT uiIndex, void * szFile, USHORT uiMode )
+static HB_ERRCODE hb_usrPutValueFile( AREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrPutValueFile(%p,%hu,%p,%hu)", pArea, uiIndex, szFile, uiMode));
 
@@ -2496,7 +2495,7 @@ static HB_ERRCODE hb_usrPutValueFile( AREAP pArea, USHORT uiIndex, void * szFile
 
    hb_vmPushInteger( pArea->uiArea );
    hb_vmPushInteger( uiIndex );
-   hb_vmPushString( ( char * ) szFile, strlen( ( char * ) szFile ) );
+   hb_vmPushString( szFile, strlen( szFile ) );
    hb_vmPushInteger( uiMode );
    hb_vmDo( 4 );
 
@@ -2567,6 +2566,23 @@ static HB_ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex
    hb_vmPush( pIndex );
    hb_vmPushLong( ulConnect );
    hb_vmDo( 4 );
+
+   return hb_usrReturn();
+}
+
+static HB_ERRCODE hb_usrRename( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, PHB_ITEM pNewName, ULONG ulConnection )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrRename(%p,%p,%p,%p,%lu)", pRDD, pTable, pIndex, pNewName, ulConnection));
+
+   if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_RENAME ) )
+      return SUPER_RENAME( pRDD, pTable, pIndex, pNewName, ulConnection );
+
+   hb_vmPushInteger( pRDD->rddID );
+   hb_vmPush( pTable );
+   hb_vmPush( pIndex );
+   hb_vmPush( pNewName );
+   hb_vmPushLong( ulConnection );
+   hb_vmDo( 5 );
 
    return hb_usrReturn();
 }
@@ -2653,7 +2669,7 @@ static const RDDFUNCS usrFuncTable =
    /* ( DBENTRYP_V )    */ hb_usrSyncChildren,/* SyncChildren  */
    /* ( DBENTRYP_V )    */ hb_usrClearRel,    /* ClearRel      */
    /* ( DBENTRYP_V )    */ hb_usrForceRel,    /* ForceRel      */
-   /* ( DBENTRYP_SVP )  */ hb_usrRelArea,     /* RelArea       */
+   /* ( DBENTRYP_SCS )  */ hb_usrRelArea,     /* RelArea       */
    /* ( DBENTRYP_VR )   */ hb_usrRelEval,     /* RelEval       */
    /* ( DBENTRYP_SI )   */ hb_usrRelText,     /* RelText       */
    /* ( DBENTRYP_VR )   */ hb_usrSetRel,      /* SetRel        */
@@ -2708,6 +2724,7 @@ static const RDDFUNCS usrFuncTable =
    /* ( DBENTRYP_R )    */ NULL, /* RDD */    /* Exit    */
    /* ( DBENTRYP_RVVL ) */ hb_usrDrop,        /* Drop    */
    /* ( DBENTRYP_RVVL ) */ hb_usrExists,      /* Exists  */
+   /* ( DBENTRYP_RVVVL )*/ hb_usrRename,      /* Rename  */
    /* ( DBENTRYP_RSLV ) */ hb_usrRddInfo,     /* RddInfo */
 
    /* Special and reserved methods */
@@ -2779,7 +2796,7 @@ static const RDDFUNCS rddFuncTable =
    /* ( DBENTRYP_V )    */ NULL,              /* SyncChildren  */
    /* ( DBENTRYP_V )    */ NULL,              /* ClearRel      */
    /* ( DBENTRYP_V )    */ NULL,              /* ForceRel      */
-   /* ( DBENTRYP_SVP )  */ NULL,              /* RelArea       */
+   /* ( DBENTRYP_SCS )  */ NULL,              /* RelArea       */
    /* ( DBENTRYP_VR )   */ NULL,              /* RelEval       */
    /* ( DBENTRYP_SI )   */ NULL,              /* RelText       */
    /* ( DBENTRYP_VR )   */ NULL,              /* SetRel        */
@@ -2834,6 +2851,7 @@ static const RDDFUNCS rddFuncTable =
    /* ( DBENTRYP_R )    */ hb_usrExit,        /* Exit    */
    /* ( DBENTRYP_RVVL ) */ NULL,              /* Drop    */
    /* ( DBENTRYP_RVVL ) */ NULL,              /* Exists  */
+   /* ( DBENTRYP_RVVVL )*/ NULL,              /* Rename  */
    /* ( DBENTRYP_RSLV ) */ NULL,              /* RddInfo */
 
    /* Special and reserved methods */
@@ -2844,7 +2862,7 @@ HB_FUNC( USRRDD_GETFUNCTABLE )
 {
    RDDFUNCS * pSelfTable, * pSuperTable;
    USHORT * puiCount, uiResult, uiCount, uiSize;
-   char * szSuperRDD;
+   const char * szSuperRDD;
    PHB_ITEM pMethods;
 
    HB_TRACE(HB_TR_DEBUG, ("USRRDD_GETFUNCTABLE()"));
@@ -2865,9 +2883,9 @@ HB_FUNC( USRRDD_GETFUNCTABLE )
       * puiCount = RDDFUNCSCOUNT;
       uiSize = ( USHORT ) hb_arrayLen( pMethods );
 
-      pUsrFunction = ( DBENTRYP_V * ) &usrFuncTable;
-      pRddFunction = ( DBENTRYP_V * ) &rddFuncTable;
-      pFunction = ( DBENTRYP_V * ) &funcTable;
+      pUsrFunction = ( const DBENTRYP_V * ) ( const void * ) &usrFuncTable;
+      pRddFunction = ( const DBENTRYP_V * ) ( const void * ) &rddFuncTable;
+      pFunction    = ( DBENTRYP_V * ) ( void * ) &funcTable;
 
       for( uiCount = 1; uiCount <= RDDFUNCSCOUNT; ++uiCount )
       {
@@ -3068,8 +3086,6 @@ static AREAP hb_usrGetAreaParam( int iParams )
 
    if( iParams <= hb_pcount() )
    {
-      AREAP pArea;
-
       if( ISNUM( 1 ) )
          pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
       else
@@ -3360,11 +3376,11 @@ HB_FUNC_UR_SUPER( PUTREC )
    {
       if( ISPOINTER( 2 ) )
       {
-         hb_retni( SUPER_PUTREC( pArea, ( BYTE * ) hb_parptr( 2 ) ) );
+         hb_retni( SUPER_PUTREC( pArea, ( const BYTE * ) hb_parptr( 2 ) ) );
       }
       else if( ISCHAR( 2 ) )
       {
-         hb_retni( SUPER_PUTREC( pArea, ( BYTE * ) hb_parc( 2 ) ) );
+         hb_retni( SUPER_PUTREC( pArea, ( const BYTE * ) hb_parc( 2 ) ) );
       }
       else
       {
@@ -3492,7 +3508,7 @@ HB_FUNC_UR_SUPER( ALIAS )
    {
       char szAlias[ HB_RDD_MAX_ALIAS_LEN + 1 ];
 
-      hb_retni( SUPER_ALIAS( pArea, ( BYTE * ) szAlias ) );
+      hb_retni( SUPER_ALIAS( pArea, szAlias ) );
       hb_storc( szAlias, 2 );
    }
 }
@@ -4077,7 +4093,7 @@ HB_FUNC_UR_SUPER( COMPILE )
    {
       if( ISCHAR( 2 ) )
       {
-         hb_retni( SUPER_COMPILE( pArea, ( BYTE * ) hb_parc( 2 ) ) );
+         hb_retni( SUPER_COMPILE( pArea, hb_parc( 2 ) ) );
       }
       else
       {
@@ -4268,6 +4284,17 @@ HB_FUNC_UR_SUPER( EXISTS )
       hb_retni( SUPER_EXISTS( pRDD, hb_param( 2, HB_IT_ANY ),
                                     hb_param( 3, HB_IT_ANY ),
                                     hb_parnl( 4 ) ) );
+}
+
+HB_FUNC_UR_SUPER( RENAME )
+{
+   LPRDDNODE pRDD = hb_usrGetNodeParam( 2 );
+
+   if( pRDD )
+      hb_retni( SUPER_RENAME( pRDD, hb_param( 2, HB_IT_ANY ),
+                                    hb_param( 3, HB_IT_ANY ),
+                                    hb_param( 4, HB_IT_ANY ),
+                                    hb_parnl( 5 ) ) );
 }
 
 HB_FUNC_UR_SUPER( RDDINFO )

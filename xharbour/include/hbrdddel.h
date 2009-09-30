@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.11 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: hbrdddel.h,v 1.12 2009/07/22 16:55:02 marchuet Exp $
  */
 
 /*
@@ -70,33 +70,7 @@ HB_EXTERN_BEGIN
 
 typedef struct _DELIMAREA
 {
-   struct _RDDFUNCS * lprfsHost; /* Virtual method table for this workarea */
-   USHORT uiArea;                /* The number assigned to this workarea */
-   void * atomAlias;             /* Pointer to the alias symbol for this workarea */
-   USHORT uiFieldExtent;         /* Total number of fields allocated */
-   USHORT uiFieldCount;          /* Total number of fields used */
-   USHORT uiFieldHidden;         /* Total number of fields hidden */
-   LPFIELD lpFields;             /* Pointer to an array of fields */
-   void * lpFieldExtents;        /* Void ptr for additional field properties */
-   PHB_ITEM valResult;           /* All purpose result holder */
-   BOOL fTop;                    /* TRUE if "top" */
-   BOOL fBottom;                 /* TRUE if "bottom" */
-   BOOL fBof;                    /* TRUE if "bof" */
-   BOOL fEof;                    /* TRUE if "eof" */
-   BOOL fFound;                  /* TRUE if "found" */
-   DBSCOPEINFO dbsi;             /* Info regarding last LOCATE */
-   DBFILTERINFO dbfi;            /* Filter in effect */
-   PHB_SESSION dbssi;            /* Session info used on transactions */
-   LPDBORDERCONDINFO lpdbOrdCondInfo;
-   LPDBRELINFO lpdbRelations;    /* Parent/Child relationships used */
-   USHORT uiParents;             /* Number of parents for this area */
-   USHORT heap;
-   USHORT heapSize;
-   USHORT rddID;
-   USHORT uiMaxFieldNameLength;
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
-   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
-   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
+   AREA area;
 
    /*
    *  DELIM's additions to the workarea structure

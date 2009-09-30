@@ -1,5 +1,5 @@
 /*
- * $Id: hb_f.c,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
+ * $Id: hb_f.c,v 1.2 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ HB_FUNC( HB_FUSE )
      else
          open_flags = 0;
 
-      handles[area]  = hb_fsOpen( ( BYTE * ) hb_parcx(1), open_flags );
+      handles[area]  = hb_fsOpen( hb_parcx(1), open_flags );
       offset[area]   = 0;
       recno[area]    = 1;
       b              = ( char * )hb_xgrab( b_size );

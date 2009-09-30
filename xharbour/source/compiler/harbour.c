@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.219 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: harbour.c,v 1.220 2009/06/02 23:54:17 ronpinkas Exp $
  */
 
 /*
@@ -741,7 +741,8 @@ static int  s_iDirCase  = HB_SET_CASE_MIXED;
 static BOOL s_fFnTrim   = FALSE;
 static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
 
-BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
+
+const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
 {
    if( s_fFnTrim || s_cDirSep != HB_OS_PATH_DELIM_CHR ||
        s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )
@@ -749,17 +750,15 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
       PHB_FNAME pFileName;
       ULONG ulLen;
 
-      if( pfFree )
+      if( pszFree )
       {
-         BYTE * szNew = ( BYTE * ) hb_xgrab( HB_PATH_MAX );
-         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, HB_PATH_MAX - 1 );
-         szFileName = szNew;
-         *pfFree = TRUE;
+         szFileName = *pszFree = hb_strncpy( ( char * ) hb_xgrab( HB_PATH_MAX ),
+                                             szFileName, HB_PATH_MAX - 1 );
       }
 
       if( s_cDirSep != HB_OS_PATH_DELIM_CHR )
       {
-         BYTE *p = szFileName;
+         char *p = ( char * ) szFileName;
          while( *p )
          {
             if( *p == s_cDirSep )
@@ -768,7 +767,7 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
          }
       }
 
-      pFileName = hb_fsFNameSplit( ( char * ) szFileName );
+      pFileName = hb_fsFNameSplit( szFileName );
 
       /* strip trailing and leading spaces */
       if( s_fFnTrim )
@@ -827,8 +826,8 @@ BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
       hb_fsFNameMerge( ( char * ) szFileName, pFileName );
       hb_xfree( pFileName );
    }
-   else if( pfFree )
-      *pfFree = FALSE;
+   else if( pszFree )
+      *pszFree = NULL;
 
    return szFileName;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.35 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: zipnew.cpp,v 1.36 2009/09/17 17:35:59 lculik Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
    BOOL bReturn = TRUE;
    BOOL bAdded;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
+   BOOL bFileExist = hb_fsFile( szFile );
    CZipString szArchive = szFile;
 
    CZipArchive szZip;
@@ -614,14 +614,14 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, HB_PATH_MAX );
+            hb_fsCurDirBuffEx( 0, szPath, HB_PATH_MAX );
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
 
-         hb_fsChDir((BYTE*)"\\");
+         hb_fsChDir( "\\" );
          szZip.SetRootPath(szPath);
       }
       for ( iCause = 1 ; ( iCause <=  ( int ) hb_arrayLen( pSelArray ) ) ; iCause ++ )
@@ -704,7 +704,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    if (szPath)
    {
-      hb_fsChDir((BYTE*)szPath);
+      hb_fsChDir( szPath );
       if ( bFreePath )
       {
          hb_xfree(szPath);
@@ -1055,14 +1055,14 @@ BOOL bChange=FALSE;
       {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, HB_PATH_MAX );
+            hb_fsCurDirBuffEx( 0, szPath, HB_PATH_MAX );
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
 
-         hb_fsChDir((BYTE*)"\\");
+         hb_fsChDir( "\\" );
          szZip.SetRootPath(szPath);
       }
 
@@ -1104,7 +1104,7 @@ BOOL bChange=FALSE;
                      {
 
             szZip.SetPassword(szPassWord);
-            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            szZip.ExtractFile( ( WORD ) uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
             }
             else
             {
@@ -1130,7 +1130,7 @@ BOOL bChange=FALSE;
     }
    if (szPath)
    {
-      hb_fsChDir((BYTE*)szPath);
+      hb_fsChDir( szPath );
       if ( bFreePath )
       {
          hb_xfree(szPath);

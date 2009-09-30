@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.13 2006/03/20 23:39:34 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.14 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -120,7 +120,7 @@ static void * LoadImageFromFile( char *szFile, int *sz )
    void *iptr;
    FHANDLE fhandle;
 
-   if ( ( fhandle = hb_fsOpen( ( BYTE * ) szFile, FO_READ ) ) != FS_ERROR )
+   if ( ( fhandle = hb_fsOpen( szFile, FO_READ ) ) != FS_ERROR )
    {
       /* get lenght */
       *sz = hb_fsSeek( fhandle, 0, FS_END );
@@ -148,7 +148,7 @@ static void * LoadImageFromFile( char *szFile, int *sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void SaveImageToHandle( FHANDLE fhandle, void *iptr, int sz )
+static void SaveImageToHandle( FHANDLE fhandle, void * iptr, int sz )
 {
    if ( !(fhandle) )
    {
@@ -161,11 +161,11 @@ static void SaveImageToHandle( FHANDLE fhandle, void *iptr, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void SaveImageToFile( char *szFile, void *iptr, int sz )
+static void SaveImageToFile( char * szFile, void * iptr, int sz )
 {
    FHANDLE fhandle;
 
-   if ( ( fhandle = hb_fsCreate( ( BYTE * ) szFile, FC_NORMAL ) ) != FS_ERROR )
+   if ( ( fhandle = hb_fsCreate( szFile, FC_NORMAL ) ) != FS_ERROR )
    {
       /* Write Image */
       SaveImageToHandle( fhandle, ( BYTE *) iptr, (ULONG) sz );
@@ -177,11 +177,11 @@ static void SaveImageToFile( char *szFile, void *iptr, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void AddImageToFile( char *szFile, void *iptr, int sz )
+static void AddImageToFile( char * szFile, void * iptr, int sz )
 {
    FHANDLE fhandle;
 
-   if ( ( fhandle = hb_fsOpen( ( BYTE * ) szFile, FO_READWRITE ) ) != FS_ERROR )
+   if ( ( fhandle = hb_fsOpen( szFile, FO_READWRITE ) ) != FS_ERROR )
    {
       /* move to end of file */
       hb_fsSeek(fhandle, 0, FS_END);

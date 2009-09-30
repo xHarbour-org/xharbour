@@ -1,5 +1,5 @@
 /*
- * $Id: natmsg.c,v 1.3 2005/03/31 03:58:52 druzus Exp $
+ * $Id: natmsg.c,v 1.4 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 #define _LF_YN                  12      /* "Y/N" */ /* NOTE: This must be in uppercase. [vszakats] */
 #define _INVALID_EXPR           13      /* "INVALID EXPRESSION" */
 
-char * hb_nationGetMsg( USHORT uiMsg )
+static char * hb_nationGetMsg( USHORT uiMsg )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_nationGetMsg(%hu)", uiMsg));
 
@@ -99,14 +99,14 @@ HB_FUNC( ISAFFIRM )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
-   hb_retl( pItem && pItem->item.asString.length >= 1 && HB_TOUPPER( pItem->item.asString.value[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 0 ] );
+   hb_retl( pItem && hb_itemGetCLen( pItem ) >= 1 && hb_charUpper( hb_itemGetCPtr( pItem )[ 0 ] ) == hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 )[ 0 ] );
 }
 
 HB_FUNC( ISNEGATIVE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
-   hb_retl( pItem && pItem->item.asString.length >= 1 && HB_TOUPPER( pItem->item.asString.value[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 2 ] );
+   hb_retl( pItem && hb_itemGetCLen( pItem ) >= 1 && hb_charUpper( hb_itemGetCPtr( pItem )[ 0 ] ) == hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 )[ 2 ] );
 }
 
 HB_FUNC( NATIONMSG )

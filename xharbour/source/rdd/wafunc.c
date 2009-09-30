@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.23 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: wafunc.c,v 1.24 2009/09/16 04:34:16 andijahja Exp $
  */
 
 /*
@@ -337,7 +337,7 @@ USHORT hb_rddFieldExpIndex( AREAP pArea, const char * szField )
       int i, j, l;
 
       n = 0;
-      if( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) == HB_SUCCESS )
+      if( SELF_ALIAS( pArea, szAlias ) == HB_SUCCESS )
          l = strlen( szAlias );
       else
          l = 0;
@@ -732,11 +732,11 @@ HB_ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
 
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
-   pInfo.abName = ( BYTE * ) szFileName;
-   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.abName = szFileName;
+   pInfo.atomAlias = szAlias;
    pInfo.fShared = fShared;
    pInfo.fReadonly = fReadonly;
-   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.cdpId = szCpId;
    pInfo.ulConnection = ulConnection;
    pInfo.lpdbHeader = NULL;
 
@@ -805,11 +805,11 @@ HB_ERRCODE hb_rddCreateTable( const char * szFileName, const char * szDriver,
 
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
-   pInfo.abName = ( BYTE * ) szFileName;
-   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.abName = szFileName;
+   pInfo.atomAlias = szAlias;
    pInfo.fShared = FALSE;
    pInfo.fReadonly = FALSE;
-   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.cdpId = szCpId;
    pInfo.ulConnection = ulConnection;
    pInfo.lpdbHeader = NULL;
 
@@ -871,10 +871,10 @@ HB_ERRCODE hb_rddCreateTableTemp( const char * szDriver,
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
    pInfo.abName = NULL;
-   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.atomAlias = szAlias;
    pInfo.fShared = FALSE;
    pInfo.fReadonly = FALSE;
-   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.cdpId = szCpId;
    pInfo.ulConnection = ulConnection;
    pInfo.lpdbHeader = NULL;
 
@@ -937,9 +937,9 @@ void hb_tblStructure( AREAP pArea, PHB_ITEM pStruct, USHORT uiSize )
    }
 }
 
-static char * hb_dbTransFieldPos( PHB_ITEM pFields, USHORT uiField )
+static const char * hb_dbTransFieldPos( PHB_ITEM pFields, USHORT uiField )
 {
-   char * szField = NULL;
+   const char * szField = NULL;
    PHB_ITEM pItem;
 
    pItem = hb_arrayGetItemPtr( pFields, uiField );
@@ -965,7 +965,7 @@ HB_ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
 {
    USHORT uiFields, uiSize, uiCount, uiPosSrc, uiPosDst, uiSizeSrc, uiSizeDst;
    HB_ERRCODE errCode;
-   char * szField;
+   const char * szField;
    BOOL fAll;
 
    errCode = SELF_FIELDCOUNT( lpaSource, &uiSizeSrc );

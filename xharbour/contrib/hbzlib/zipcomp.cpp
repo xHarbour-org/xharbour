@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.21 2008/05/02 05:30:29 andijahja Exp $
+ * $Id: zipcomp.cpp,v 1.22 2009/09/17 17:35:59 lculik Exp $
  */
  
 /*
@@ -101,7 +101,7 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
    const char *szDummy ;
    char *szDummyLower = NULL;
    char *szFileLower = hb_strdup((char *)szFile) ;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
+   BOOL bFileExist = hb_fsFile( szFile );
    BOOL bAdded     = FALSE;
    BOOL bReturn    = TRUE;
    DWORD dwSize;
@@ -227,7 +227,7 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
    DWORD dwSize;
    BOOL bAdded     = FALSE;
    BOOL bReturn    = TRUE;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
+   BOOL bFileExist = hb_fsFile( szFile );
 
    CZipArchive szZip;
    SpanCallbackc span;
@@ -352,7 +352,7 @@ bool hb_SetProgressofTdSpan( DWORD a, int iSoFar, void* pData ){
 int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    DWORD dwSize;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
+   BOOL bFileExist = hb_fsFile( szFile );
    BOOL bReturn    = TRUE;
    BOOL bAdded     = FALSE;
 
@@ -473,7 +473,7 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
    DWORD dwSize;
    BOOL bAdded     = FALSE;
    BOOL bReturn    = TRUE;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
+   BOOL bFileExist = hb_fsFile( szFile );
 
    CZipArchive szZip;
    SpanCallbackc span;

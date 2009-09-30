@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.28 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: hbrddfpt.h,v 1.29 2009/07/31 10:16:16 marchuet Exp $
  */
 
 /*
@@ -343,15 +343,16 @@ static HB_ERRCODE hb_fptPackRec( FPTAREAP pArea, ULONG ulRecNo, BOOL *pfWritten 
 #define hb_fptUnLock                               NULL
 #define hb_fptCloseMemFile                         NULL
 static HB_ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo );
-static HB_ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
+static HB_ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode );
 static HB_ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo );
-static HB_ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
+static HB_ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode );
 #define hb_fptReadDBHeader                         NULL
 #define hb_fptWriteDBHeader                        NULL
 #define hb_fptInit                                 NULL
 #define hb_fptExit                                 NULL
 #define hb_fptDrop                                 NULL
 #define hb_fptExists                               NULL
+#define hb_fptRename                               NULL
 static HB_ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_fptWhoCares                             NULL
 
