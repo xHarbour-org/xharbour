@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6605 2009/09/29 15:37:46 lculik Exp $
+ * $Id: ChangeLog,v 1.6606 2009/09/30 16:19:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-01 10:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * common.mak
+   * compile.mak
+   * source\rdd\Makefile
+   + source\rdd\dbrename.c
+     + Added DBRENAME( <cTableName>, <cIndexName>, <cNewName>, [<cRddName>], [<nConnection>] ) or
+       DBRENAME( <cFileName>, <cNewFileName> )  to the famili of RDD functions DBDROP DBEXIST, that can admit
+       to rename at server side the files, too at client side. It first was implemented only at filenet api with
+       the next functions more:
+		NET_COPYTO( <cLocalFile>, <cRemoteFile>|<cRemoteDevice> )
+		NET_COPYFROM( <cRemoteFile>, <cLocalFile>|<cLocalDevice> )
+		NET_COPYFILE( <cRemoteFile>, <cRemoteFile>|<cRemoteDevice> )
+	
+		NET_FRENAME( <cRemoteOldFile>, <cRemoteNewFile> ) --> nSuccess
+		NET_FERASE( <cRemoteFile> ) --> nSuccess
+
+		NET_MAKEDIR( <cRemoteDirectory> ) --> nOSError
+		NET_DIRREMOVE( <cRemoteDirectory> ) --> nOSError
+		NET_FILEATTR( [<cRemoteFileName>] ) --> nAttributes
+		NET_DIRECTORY( <cRemoteDirSpec>, [<cAttributes>] ) --> aDirectory
+
+		NET_OPENCONNECTION( <cIPServer|cNameServer>, <nPort> ) -> pSocket
+		NET_CLOSECONNECTION( pSocket )
 
 2009-09-30 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * contrib\rdd_ads\ads1.c

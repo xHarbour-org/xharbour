@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.54 2009/08/23 22:46:11 lculik Exp $
+# $Id: common.mak,v 1.55 2009/08/31 15:02:20 lculik Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -557,6 +557,7 @@ RDD_LIB_OBJS=\
               $(OBJ_DIR)$(DIR_SEP)dbcmdhb$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbdrop$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbexists$(OBJEXT)\
+              $(OBJ_DIR)$(DIR_SEP)dbrename$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT)\

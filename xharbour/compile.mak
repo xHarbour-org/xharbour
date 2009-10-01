@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.49 2009/09/16 15:53:42 marchuet Exp $
+# $Id: compile.mak,v 1.50 2009/09/22 14:10:48 lculik Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -252,6 +252,9 @@ $(OBJ_DIR)$(DIR_SEP)dbdrop$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbdrop.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbexists$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbexists.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbrename$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbrename.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)fieldhb.c

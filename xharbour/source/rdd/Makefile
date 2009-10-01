@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2008/09/11 05:32:36 guerra000 Exp $
+# $Id: Makefile,v 1.12 2009/07/22 16:55:02 marchuet Exp $
 #
 
 ROOT = ../../
@@ -12,6 +12,7 @@ C_SOURCES=\
 	dbf1.c \
 	dbf1net.c \
 	dbnubs.c \
+	dbrename.c \
 	delim1.c \
 	sdf1.c \
 	hbdbsort.c \
