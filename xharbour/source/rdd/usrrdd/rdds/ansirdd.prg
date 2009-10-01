@@ -1,12 +1,12 @@
 /*
- * $Id: ansirdd.prg,v 1.3 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: ansirdd.prg,v 1.4 2008/09/16 10:10:07 marchuet Exp $
  */
 
 /*
  * Harbour Project source code:
  *    ANSIRDD
  *
- * Copyright 2007 Miguel Angel Marchuet Frutos <miguelangel /at/ marchuet.net>
+ * Copyright 2007 Miguel Angel Marchuet Frutos <miguelangel@marchuet.net>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,14 +48,6 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
- */
-
-/*
- * A simple RDD which introduce lock counters. It has full DBFCDX
- * functionality from which it inherits but if you execute DBRLOCK(100)
- * twice then you will have to also repeat call to DBRUNLOCK(100) to
- * really unlock the record 100. The same if for FLOCK()
- * This idea comes from one of messages sent by Mindaugas Kavaliauskas.
  */
 
 #include "rddsys.ch"
