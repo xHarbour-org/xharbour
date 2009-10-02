@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.168 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: arrays.c,v 1.169 2009/09/01 14:39:42 ronpinkas Exp $
  */
 
 /*
@@ -434,18 +434,22 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      ULONG ulLen = pArray->item.asArray.value->ulLen;
+      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
+      ULONG ulLen = pBaseArray->ulLen;
 
-      if( ulIndex > 0 && ulIndex <= ulLen )
+      if( ulIndex > 0 && ulIndex < ulLen )
       {
-         PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-
          for( ulIndex--; ulIndex < ulLen - 1; ulIndex++ )       /* move items */
          {
             hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
          }
 
-         //hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
+         return TRUE;
+      }
+      else if( ulIndex == ulLen )
+      {
+         hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
+
          return TRUE;
       }
    }

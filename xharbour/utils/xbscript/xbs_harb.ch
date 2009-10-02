@@ -200,7 +200,7 @@
         FOR nLine := nStart TO nLines
            sLine := acPPed[nLine]
            IF ! Empty( sLine )
-              //OutputDebugString( "COMPILE: (" + Str( nLine ) + ") " + sLine + EOL )
+              //OutputDebugString( "COMPILE: (" + Str( nLine, 3 ) + "+" + Str( ::nStartLine, 3 ) + ") " + sLine + EOL )
               PP_CompileLine( sLine, nLine + ::nStartLine, ::aCompiledProcs, ::aInitExit, @nProcId )
            ENDIF
         NEXT
