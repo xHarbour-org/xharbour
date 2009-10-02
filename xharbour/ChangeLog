@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6608 2009/10/01 15:19:29 marchuet Exp $
+ * $Id: ChangeLog,v 1.6609 2009/10/02 13:23:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-01 19:04 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\usrrdd\rdds\ansirdd.prg
+    ! fixed FieldGet value was empty always.
 
 2009-10-02 08:53 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source\vm\arrays.c

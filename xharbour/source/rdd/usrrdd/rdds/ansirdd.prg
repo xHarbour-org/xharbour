@@ -1,5 +1,5 @@
 /*
- * $Id: ansirdd.prg,v 1.4 2008/09/16 10:10:07 marchuet Exp $
+ * $Id: ansirdd.prg,v 1.5 2009/10/01 15:19:30 marchuet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ ANNOUNCE ANSIRDD
 
 STATIC FUNCTION ANSI_GETVALUE( nWA, nField, xValue )
 
-   LOCAL nResult := UR_SUPER_GETVALUE( nWA, nField, xValue )
+   LOCAL nResult := UR_SUPER_GETVALUE( nWA, nField, @xValue )
 
    IF nResult == SUCCESS .AND. ValType( xValue ) == 'C'
       xValue := hb_OemToAnsi( xValue )
