@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6609 2009/10/02 13:23:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6610 2009/10/02 17:02:55 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-04 12:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed return values from assigns, as suggested by Jose Claudio from brazilian's news.
+    ! fixed method stabilize() to call dispend() only for dispbegin() called 
+      under this instance of tbrowse, as suggested by Jose Claudio from brazilian's news. 
+    ! fix to reset ::lrectpainted data after stable.
 
 2009-10-01 19:04 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rdd\usrrdd\rdds\ansirdd.prg

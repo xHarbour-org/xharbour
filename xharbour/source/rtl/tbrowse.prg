@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.221 2009/09/09 13:44:47 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.222 2009/09/29 15:37:47 lculik Exp $
  */
 
 /*
@@ -755,10 +755,10 @@ CLASS TBrowse STATIC
 *------------------------------------------------------*
 
    ACCESS AutoLite         INLINE ::lAutoLite     // Logical value to control highlighting
-   ASSIGN AutoLite(l)      INLINE ::lAutoLite := if(hb_islogical(l),l,::lAutoLite)
+   ASSIGN AutoLite(l)      INLINE ::lAutoLite := if(hb_islogical(l),l,::lAutoLite), ::lAutoLite
 
    ACCESS Cargo            INLINE ::uCargo        // User-definable variable
-   ASSIGN Cargo(u)         INLINE ::uCargo := u
+   ASSIGN Cargo(u)         INLINE ::uCargo := u, ::uCargo
 
    ACCESS LeftVisible      INLINE ::nLeftVisible  // Indicates position of leftmost unfrozen column in display
    ACCESS RightVisible     INLINE ::nRightVisible // Indicates position of rightmost unfrozen column in display
@@ -767,17 +767,17 @@ CLASS TBrowse STATIC
    ACCESS RowCount         INLINE ::nRowCount     // Number of visible data rows in the TBrowse display
 
    ACCESS Stable           INLINE ::lStable       // Indicates if the TBrowse object is stable
-   ASSIGN Stable(l)        INLINE ::lStable := if(hb_islogical(l),l,::lStable)
+   ASSIGN Stable(l)        INLINE ::lStable := if(hb_islogical(l),l,::lStable), ::lStable
 
 #ifdef HB_COMPAT_C53
    ACCESS mRowPos         INLINE if( Set(_SET_EVENTMASK) != INKEY_KEYBOARD,::Hittest(MRow(),MCol()),), ::nMRowPos
-   ASSIGN mRowPos(n)      INLINE ::nMRowPos := if(hb_isnumeric(n),n,::nMRowPos)
+   ASSIGN mRowPos(n)      INLINE ::nMRowPos := if(hb_isnumeric(n),n,::nMRowPos), ::nMRowPos
 
    ACCESS mColPos         INLINE if( Set(_SET_EVENTMASK) != INKEY_KEYBOARD,::Hittest(MRow(),MCol()),), ::nMColPos
-   ASSIGN mColPos(n)      INLINE ::nMColPos := if(hb_isnumeric(n),n,::nMColPos)
+   ASSIGN mColPos(n)      INLINE ::nMColPos := if(hb_isnumeric(n),n,::nMColPos), ::nMColPos
 
    ACCESS Message         INLINE ::cMessage
-   ASSIGN Message(c)      INLINE ::cMessage := if(hb_isString(c),c,::cMessage)
+   ASSIGN Message(c)      INLINE ::cMessage := if(hb_isString(c),c,::cMessage), ::cMessage
 
    DATA nRow                               // Row number for the actual cell
    DATA nCol                               // Col number for the actual cell
@@ -804,10 +804,10 @@ CLASS TBrowse STATIC
    ASSIGN RowPos( nRow )       INLINE ::SetRowPos( nRow )
 
    ACCESS HitBottom            INLINE ::lHitBottom              // Indicates the end of available data
-   ASSIGN HitBottom( lbottom ) INLINE ::lHitBottom := if( hb_islogical(lbottom), lbottom, ::lHitbottom )  
+   ASSIGN HitBottom( lbottom ) INLINE ::lHitBottom := if( hb_islogical(lbottom), lbottom, ::lHitbottom ) , ::lHitbottom 
 
    ACCESS HitTop               INLINE ::lHitTop                 // Indicates the beginning of available data
-   ASSIGN HitTop( lTop )       INLINE ::lHitTop := if( hb_islogical(lTop), lTop, ::lHitTop )  
+   ASSIGN HitTop( lTop )       INLINE ::lHitTop := if( hb_islogical(lTop), lTop, ::lHitTop ), ::lHitTop  
 
    ACCESS nTop                 INLINE ::GetCoordinate( 0 )
    ASSIGN nTop( nTop )         INLINE ::SetCoordinate( 0, nTop )
@@ -822,25 +822,25 @@ CLASS TBrowse STATIC
    ASSIGN nRight( nRight )     INLINE ::SetCoordinate( 3, nRight )
 
    ACCESS ColSep               INLINE ::cColSep    // Column separator character
-   ASSIGN ColSep( cSep )       INLINE ::SetSeparator( 0, cSep )
+   ASSIGN ColSep( cSep )       INLINE ::SetSeparator( 0, cSep ), cSep
 
    ACCESS FootSep              INLINE ::cFootSep   // Footing separator character
-   ASSIGN FootSep( cSep )      INLINE ::SetSeparator( 1, cSep )
+   ASSIGN FootSep( cSep )      INLINE ::SetSeparator( 1, cSep ), cSep
 
    ACCESS HeadSep              INLINE ::cHeadSep   // Head separator character
-   ASSIGN HeadSep( cSep )      INLINE ::SetSeparator( 2, cSep )
+   ASSIGN HeadSep( cSep )      INLINE ::SetSeparator( 2, cSep ), cSep
 
    ACCESS Freeze               INLINE ::nFrozenCols     // Number of columns to freeze/frozen
-   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .F. 
+   ASSIGN Freeze( nHowMany )   INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .F. , ::nFrozenCols
 
    ACCESS GoTopBlock           INLINE ::bGoTopBlock        // Code block executed by TBrowse:goTop()
-   ASSIGN GoTopBlock(b)        INLINE ::bGoTopBlock := ::SetMoveBlock(0,b)
+   ASSIGN GoTopBlock(b)        INLINE ::bGoTopBlock := ::SetMoveBlock(0,b), ::bGoTopBlock
 
    ACCESS GoBottomBlock        INLINE ::bGoBottomBlock     // Code block executed by TBrowse:goBottom()
-   ASSIGN GoBottomBlock(b)     INLINE ::bGoBottomBlock := ::SetMoveBlock(1,b)
+   ASSIGN GoBottomBlock(b)     INLINE ::bGoBottomBlock := ::SetMoveBlock(1,b), ::bGoBottomBlock
 
    ACCESS SkipBlock            INLINE ::bSkipBlock         // Code block executed by TBrowse:SkipBlock()
-   ASSIGN SkipBlock(b)         INLINE ::bSkipBlock := ::SetMoveBlock(2,b)    
+   ASSIGN SkipBlock(b)         INLINE ::bSkipBlock := ::SetMoveBlock(2,b), ::bSkipBlock    
 
    METHOD New( nTop, nLeft, nBottom, nRight )  // Constructor
 
@@ -1029,6 +1029,8 @@ HIDDEN:
    DATA lColorRect                                // colorrect active
    DATA lRectPainted                              // colorrect area painted 
 
+   DATA nDispbegin   INIT 0
+   
 END CLASS
 
 *------------------------------------------------------*
@@ -2485,8 +2487,9 @@ Local nMoveTo := ::nMoveTo
       if ::nColCount > 0
          ::PosCursor()
       endif
-      while DispCount() != 0
+      while ::nDispbegin > 0
          Dispend()
+         ::nDispbegin --
       enddo
       Return .T.
    endif
@@ -2498,6 +2501,7 @@ Local nMoveTo := ::nMoveTo
    ENDIF
 
    Dispbegin()
+   ::nDispbegin++
 
    // Configure the browse if not configured yet.
    ::PerformConfiguration()
@@ -2580,9 +2584,12 @@ Local nMoveTo := ::nMoveTo
    SetCursor( nCursor )
 
    ::aPendingMovements := {}
+   ::lRectPainted := .f.
+  
 
-   while DispCount() != 0
+   while ::nDispbegin > 0
      Dispend()
+     ::nDispbegin --
    enddo
 
 Return .T.
@@ -3201,7 +3208,7 @@ METHOD SetBorder( cBorder ) CLASS TBrowse
       ::Configure( 0 )
    endif
 
-Return self
+Return ::cBorder
 
 *------------------------------------------------*
 METHOD SetSeparator( nType, cSep ) CLASS TBrowse
@@ -3277,7 +3284,7 @@ METHOD SetColorSpec( cColor ) CLASS TBrowse
     ::cColorSpec := cColor
  endif
 
-RETURN Self
+RETURN ::cColorSpec
 
 *---------------------------------------------------*
 METHOD GetCoordinate( nType ) CLASS TBrowse
