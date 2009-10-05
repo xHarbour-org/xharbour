@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6610 2009/10/02 17:02:55 marchuet Exp $
+ * $Id: ChangeLog,v 1.6611 2009/10/04 16:02:15 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-05 16:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbapierr.h
+  * include\hbinit.h
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * include\hbrdddbf.h
+  * include\hbrdddbt.h
+  * include\hbrddfpt.h
+  * include\hbrddmdx.h
+  * include\hbrddnsx.h
+  * include\hbrddntx.h
+  * include\hbrddrec.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\bmdbfcdx\redbfcdx1.c
+  * source\rdd\dbf1.c
+  * source\rdd\dbf1net.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbffpt\dbffpt1.c
+  * source\rdd\dbffpt\redbffpt1.c
+  * source\rdd\dbfmdx\dbfmdx1.c
+  * source\rdd\dbfntx\dbfntx1.c
+  * source\vm\errorapi.c
+    * more pending casting and cleaning structures
+
+  * makefile.bc
+  * mdir.bat
+  * common.mak
+  * compile.mak
+  * contrib\Makefile
+  + contrib\filemem\filemem.c
+  + contrib\filemem\makefile
+  + contrib\filemem\tests\test.prg
+    + Added memory file subsytem developed by Mindaugas Kavaliauskas for harbour.
+      the files with prefix "mem:" in his named will be opened and created in memory
+      if filemem.lib is added and REQUEST HB_MEMIO.
 
 2009-10-04 12:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

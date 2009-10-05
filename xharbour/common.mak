@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.55 2009/08/31 15:02:20 lculik Exp $
+# $Id: common.mak,v 1.56 2009/10/01 07:48:41 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -49,6 +49,7 @@ HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
+FILEMEM_DIR   =contrib$(DIR_SEP)filemem
 FIREBIRD_DIR  =contrib$(DIR_SEP)firebird
 FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
 GDLIB_DIR     =contrib$(DIR_SEP)gd
@@ -120,6 +121,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+FILEMEM_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)filemem$(LIBEXT)
 FIREBIRD_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)firebird$(LIBEXT)
 FREEIMAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fi_lib$(LIBEXT)
 GDLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)gdlib$(LIBEXT)
@@ -1351,6 +1353,12 @@ HBTESTDLL_EXE_OBJS=\
 #===============================================================================
 
 #===============================================================================
+# FILEMEM.LIB dependencies
+#===============================================================================
+FILEMEM_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)filemem$(OBJEXT)
+
+#===============================================================================
 # GTWVG.LIB dependencies
 #===============================================================================
 GTWVG_LIB_OBJS=\
@@ -1882,9 +1890,10 @@ DLL_PROJECT=\
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
+	$(FILEMEM_LIB)\
 	$(GDLIB_LIB)\
 	$(GTWVG_LIB)\
-   $(GTWVW_LIB)\
+	$(GTWVW_LIB)\
 	$(LIBNF_LIB)\
 	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\

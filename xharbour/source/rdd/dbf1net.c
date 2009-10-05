@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1net.c,v 1.2 2009/07/29 17:15:54 marchuet Exp $
+ * $Id: dbf1net.c,v 1.3 2009/09/30 16:19:36 marchuet Exp $
  */
 
 /*
@@ -58,18 +58,21 @@
 
 #define HB_TRIGVAR_BYREF
 
+#include "hbrdddbf.h"
+#include "hbdbsort.h"
+
 #include "hbapi.h"
 #include "hbinit.h"
 #include "hbvm.h"
 #include "hbapiitm.h"
-#include "hbrdddbf.h"
-//#include "hbdbf.h"
+
+
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "hbset.h"
 #include "hbdate.h"
 #include "hbmath.h"
-#include "hbdbsort.h"
+
 #include "hbsxfunc.h"
 #include "error.ch"
 #include "rddsys.ch"
@@ -83,107 +86,7 @@
 void hb_netname( char * pszNetName, BOOL bGetUser );
 
 static RDDFUNCS dbfSuper;
-static const RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
-                                   ( DBENTRYP_BP ) hb_dbfEof,
-                                   ( DBENTRYP_BP ) hb_dbfFound,
-                                   ( DBENTRYP_V ) hb_dbfGoBottom,
-                                   ( DBENTRYP_UL ) hb_dbfGoTo,
-                                   ( DBENTRYP_I ) hb_dbfGoToId,
-                                   ( DBENTRYP_V ) hb_dbfGoTop,
-                                   ( DBENTRYP_BIB ) hb_dbfSeek,
-                                   ( DBENTRYP_L ) hb_dbfSkip,
-                                   ( DBENTRYP_L ) hb_dbfSkipFilter,
-                                   ( DBENTRYP_L ) hb_dbfSkipRaw,
-                                   ( DBENTRYP_VF ) hb_dbfAddField,
-                                   ( DBENTRYP_B ) hb_dbfAppend,
-                                   ( DBENTRYP_I ) hb_dbfCreateFields,
-                                   ( DBENTRYP_V ) hb_dbfDeleteRec,
-                                   ( DBENTRYP_BP ) hb_dbfDeleted,
-                                   ( DBENTRYP_SP ) hb_dbfFieldCount,
-                                   ( DBENTRYP_VF ) hb_dbfFieldDisplay,
-                                   ( DBENTRYP_SSI ) hb_dbfFieldInfo,
-                                   ( DBENTRYP_SCP ) hb_dbfFieldName,
-                                   ( DBENTRYP_V ) hb_dbfFlush,
-                                   ( DBENTRYP_PP ) hb_dbfGetRec,
-                                   ( DBENTRYP_SI ) hb_dbfGetValue,
-                                   ( DBENTRYP_SVL ) hb_dbfGetVarLen,
-                                   ( DBENTRYP_V ) hb_dbfGoCold,
-                                   ( DBENTRYP_V ) hb_dbfGoHot,
-                                   ( DBENTRYP_P ) hb_dbfPutRec,
-                                   ( DBENTRYP_SI ) hb_dbfPutValue,
-                                   ( DBENTRYP_V ) hb_dbfRecall,
-                                   ( DBENTRYP_ULP ) hb_dbfRecCount,
-                                   ( DBENTRYP_ISI ) hb_dbfRecInfo,
-                                   ( DBENTRYP_ULP ) hb_dbfRecNo,
-                                   ( DBENTRYP_I ) hb_dbfRecId,
-                                   ( DBENTRYP_S ) hb_dbfSetFieldExtent,
-                                   ( DBENTRYP_CP ) hb_dbfAlias,
-                                   ( DBENTRYP_V ) hb_dbfClose,
-                                   ( DBENTRYP_VO ) hb_dbfCreate,
-                                   ( DBENTRYP_SI ) hb_dbfInfo,
-                                   ( DBENTRYP_V ) hb_dbfNewArea,
-                                   ( DBENTRYP_VO ) hb_dbfOpen,
-                                   ( DBENTRYP_V ) hb_dbfRelease,
-                                   ( DBENTRYP_SP ) hb_dbfStructSize,
-                                   ( DBENTRYP_CP ) hb_dbfSysName,
-                                   ( DBENTRYP_VEI ) hb_dbfEval,
-                                   ( DBENTRYP_V ) hb_dbfPack,
-                                   ( DBENTRYP_LSP ) hb_dbfPackRec,
-                                   ( DBENTRYP_VS ) hb_dbfSort,
-                                   ( DBENTRYP_VT ) hb_dbfTrans,
-                                   ( DBENTRYP_VT ) hb_dbfTransRec,
-                                   ( DBENTRYP_V ) hb_dbfZap,
-                                   ( DBENTRYP_VR ) hb_dbfChildEnd,
-                                   ( DBENTRYP_VR ) hb_dbfChildStart,
-                                   ( DBENTRYP_VR ) hb_dbfChildSync,
-                                   ( DBENTRYP_V ) hb_dbfSyncChildren,
-                                   ( DBENTRYP_V ) hb_dbfClearRel,
-                                   ( DBENTRYP_V ) hb_dbfForceRel,
-                                   ( DBENTRYP_SSP ) hb_dbfRelArea,
-                                   ( DBENTRYP_VR ) hb_dbfRelEval,
-                                   ( DBENTRYP_SI ) hb_dbfRelText,
-                                   ( DBENTRYP_VR ) hb_dbfSetRel,
-                                   ( DBENTRYP_VOI ) hb_dbfOrderListAdd,
-                                   ( DBENTRYP_V ) hb_dbfOrderListClear,
-                                   ( DBENTRYP_VOI ) hb_dbfOrderListDelete,
-                                   ( DBENTRYP_VOI ) hb_dbfOrderListFocus,
-                                   ( DBENTRYP_V ) hb_dbfOrderListRebuild,
-                                   ( DBENTRYP_VOO ) hb_dbfOrderCondition,
-                                   ( DBENTRYP_VOC ) hb_dbfOrderCreate,
-                                   ( DBENTRYP_VOI ) hb_dbfOrderDestroy,
-                                   ( DBENTRYP_SVOI ) hb_dbfOrderInfo,
-                                   ( DBENTRYP_V ) hb_dbfClearFilter,
-                                   ( DBENTRYP_V ) hb_dbfClearLocate,
-                                   ( DBENTRYP_V ) hb_dbfClearScope,
-                                   ( DBENTRYP_VPLP ) hb_dbfCountScope,
-                                   ( DBENTRYP_I ) hb_dbfFilterText,
-                                   ( DBENTRYP_SI ) hb_dbfScopeInfo,
-                                   ( DBENTRYP_VFI ) hb_dbfSetFilter,
-                                   ( DBENTRYP_VLO ) hb_dbfSetLocate,
-                                   ( DBENTRYP_VOS ) hb_dbfSetScope,
-                                   ( DBENTRYP_VPL ) hb_dbfSkipScope,
-                                   ( DBENTRYP_B ) hb_dbfLocate,
-                                   ( DBENTRYP_CC ) hb_dbfCompile,
-                                   ( DBENTRYP_I ) hb_dbfError,
-                                   ( DBENTRYP_I ) hb_dbfEvalBlock,
-                                   ( DBENTRYP_VSP ) hb_dbfRawLock,
-                                   ( DBENTRYP_VL ) hb_dbfLock,
-                                   ( DBENTRYP_I ) hb_dbfUnLock,
-                                   ( DBENTRYP_V ) hb_dbfCloseMemFile,
-                                   ( DBENTRYP_VO ) hb_dbfCreateMemFile,
-                                   ( DBENTRYP_SCCS ) hb_dbfGetValueFile,
-                                   ( DBENTRYP_VO ) hb_dbfOpenMemFile,
-                                   ( DBENTRYP_SCCS ) hb_dbfPutValueFile,
-                                   ( DBENTRYP_V ) hb_dbfReadDBHeader,
-                                   ( DBENTRYP_V ) hb_dbfWriteDBHeader,
-                                   ( DBENTRYP_R ) hb_dbfInit,
-                                   ( DBENTRYP_R ) hb_dbfExit,
-                                   ( DBENTRYP_RVVL ) hb_dbfDrop,
-                                   ( DBENTRYP_RVVL ) hb_dbfExists,
-                                   ( DBENTRYP_RVVVL ) hb_dbfRename,
-                                   ( DBENTRYP_RSLV ) hb_dbfRddInfo,
-                                   ( DBENTRYP_SVP ) hb_dbfWhoCares
-                                 };
+
 
 /*
  * Common functions.
@@ -1292,6 +1195,8 @@ static HB_ERRCODE hb_dbfGoTop( DBFAREAP pArea )
    return SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
 }
 
+#define hb_dbfSeek                  NULL
+
 /*
  * Reposition cursor relative to current position.
  */
@@ -1333,6 +1238,8 @@ static HB_ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
 
    return uiError;
 }
+
+#define hb_dbfSkipFilter            NULL
 
 /*
  * Reposition cursor, regardless of filter.
@@ -1492,6 +1399,8 @@ static HB_ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    return HB_SUCCESS;
 }
 
+#define hb_dbfCreateFields          NULL
+
 /*
  * Delete a record.
  */
@@ -1547,6 +1456,11 @@ static HB_ERRCODE hb_dbfDeleted( DBFAREAP pArea, BOOL * pDeleted )
    * pDeleted = pArea->fDeleted;
    return HB_SUCCESS;
 }
+
+#define hb_dbfFieldCount            NULL
+#define hb_dbfFieldDisplay          NULL
+#define hb_dbfFieldInfo             NULL
+#define hb_dbfFieldName             NULL
 
 /*
  * Write data buffer to the data store.
@@ -2009,10 +1923,10 @@ static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, const BYTE * pBuffer )
       }
 
       /* Write data to file */
-      uiWritten = ( USHORT )hb_fileNetWriteAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
-                                            ( HB_FOFFSET ) pArea->uiHeaderLen +
-                                            ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
-                                            ( HB_FOFFSET ) pArea->uiRecordLen );
+      uiWritten = ( USHORT ) hb_fileNetWriteAt( pArea->pDataFile, pRecord, pArea->uiRecordLen,
+                                               ( HB_FOFFSET ) pArea->uiHeaderLen +
+                                               ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
+                                               ( HB_FOFFSET ) pArea->uiRecordLen );
       if( pRecord != pArea->pRecord )
          hb_xfree( pRecord );
 
@@ -2350,9 +2264,9 @@ static HB_ERRCODE hb_dbfRecCount( DBFAREAP pArea, ULONG * pRecCount )
 /*
  * Obtain physical row number at current WorkArea cursor position.
  */
-static HB_ERRCODE hb_dbfRecNo( DBFAREAP pArea, ULONG * ulRecNo )
+static HB_ERRCODE hb_dbfRecNo( DBFAREAP pArea, ULONG * pulRecNo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfRecNo(%p, %p)", pArea, ulRecNo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfRecNo(%p, %p)", pArea, pulRecNo));
 
    if( pArea->lpdbPendingRel )
    {
@@ -2360,7 +2274,7 @@ static HB_ERRCODE hb_dbfRecNo( DBFAREAP pArea, ULONG * ulRecNo )
          return HB_FAILURE;
    }
 
-   *ulRecNo = pArea->ulRecNo;
+   *pulRecNo = pArea->ulRecNo;
    return HB_SUCCESS;
 }
 
@@ -2412,6 +2326,8 @@ static HB_ERRCODE hb_dbfSetFieldExtent( DBFAREAP pArea, USHORT uiFieldExtent )
 
    return HB_SUCCESS;
 }
+
+#define hb_dbfAlias                 NULL
 
 /*
  * Close the table in the WorkArea.
@@ -3529,6 +3445,14 @@ static HB_ERRCODE hb_dbfNewArea( DBFAREAP pArea )
    pArea->uiDirtyRead = HB_IDXREAD_DEFAULT;
    /* Size for deleted records flag */
    pArea->uiRecordLen = 1;
+
+   {
+      PHB_ITEM pItem = hb_itemPutNI( NULL, 0 );
+      if( SELF_RDDINFO( SELF_RDDNODE( &pArea->area ), RDDI_TABLETYPE, 0, pItem ) == HB_SUCCESS )
+         pArea->bTableType = hb_itemGetNI( pItem );
+      hb_itemRelease( pItem );
+   }
+
    return HB_SUCCESS;
 }
 
@@ -4120,6 +4044,8 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    return errCode;
 }
 
+#define hb_dbfRelease               NULL
+
 /*
  * Retrieve the size of the WorkArea structure.
  */
@@ -4131,6 +4057,9 @@ static HB_ERRCODE hb_dbfStructSize( DBFAREAP pArea, USHORT * uiSize )
    * uiSize = sizeof( DBFAREA );
    return HB_SUCCESS;
 }
+
+#define hb_dbfSysName               NULL
+#define hb_dbfEval                  NULL
 
 /*
  * Pack helper function called for each packed record
@@ -4442,6 +4371,8 @@ static HB_ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo )
    return SUPER_TRANS( ( AREAP ) pArea, pTransInfo );
 }
 
+#define hb_dbfTransRec              NULL
+
 /*
  * Physically remove all records from data store.
  */
@@ -4581,6 +4512,9 @@ static HB_ERRCODE hb_dbfChildSync( DBFAREAP pArea, LPDBRELINFO pRelInfo )
    return HB_SUCCESS;
 }
 
+#define hb_dbfSyncChildren          NULL
+#define hb_dbfClearRel              NULL
+
 /*
  * Force relational seeks in the specified WorkArea.
  */
@@ -4604,6 +4538,40 @@ static HB_ERRCODE hb_dbfForceRel( DBFAREAP pArea )
    return HB_SUCCESS;
 }
 
+#define hb_dbfRelArea               NULL
+#define hb_dbfRelEval               NULL
+#define hb_dbfRelText               NULL
+#define hb_dbfSetRel                NULL
+
+#define hb_dbfOrderListAdd          NULL
+#define hb_dbfOrderListClear        NULL
+#define hb_dbfOrderListDelete       NULL
+#define hb_dbfOrderListFocus        NULL
+#define hb_dbfOrderListRebuild      NULL
+#define hb_dbfOrderCondition        NULL
+#define hb_dbfOrderCreate           NULL
+#define hb_dbfOrderDestroy          NULL
+#define hb_dbfOrderInfo             NULL
+
+/*
+ * Clear the filter condition for the specified WorkArea.
+ */
+static HB_ERRCODE hb_dbfClearFilter( DBFAREAP pArea )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfClearFilter(%p)", pArea));
+
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   return SUPER_CLEARFILTER( ( AREAP ) pArea );
+}
+
+#define hb_dbfClearLocate           NULL
+#define hb_dbfClearScope            NULL
+#define hb_dbfCountScope            NULL
+#define hb_dbfFilterText            NULL
+#define hb_dbfScopeInfo             NULL
+
 /*
  * Set the filter condition for the specified WorkArea.
  */
@@ -4612,13 +4580,19 @@ static HB_ERRCODE hb_dbfSetFilter( DBFAREAP pArea, LPDBFILTERINFO pFilterInfo )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSetFilter(%p, %p)", pArea, pFilterInfo));
 
    if( pArea->lpdbPendingRel )
-   {
-      if( SELF_FORCEREL( ( AREAP ) pArea ) != HB_SUCCESS )
-         return HB_FAILURE;
-   }
+      SELF_FORCEREL( ( AREAP ) pArea );
 
    return SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo );
 }
+
+#define hb_dbfSetLocate             NULL
+#define hb_dbfSetScope              NULL
+#define hb_dbfSkipScope             NULL
+#define hb_dbfLocate                NULL
+
+#define hb_dbfCompile               NULL
+#define hb_dbfError                 NULL
+#define hb_dbfEvalBlock             NULL
 
 /*
  * Perform a network lowlevel lock in the specified WorkArea.
@@ -4775,18 +4749,15 @@ static HB_ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo )
  */
 static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo )
 {
-   HB_ERRCODE uiError;
-   ULONG ulRecNo;
+   HB_ERRCODE uiError = HB_SUCCESS;
 
    HB_TRACE(HB_TR_DEBUG, ("dbfUnLock(%p, %p)", pArea, pRecNo));
 
-   ulRecNo = hb_itemGetNL( pRecNo );
-
-   uiError = HB_SUCCESS;
    if( pArea->fShared )
    {
       if( pArea->ulNumLocksPos > 0 )
       {
+         ULONG ulRecNo = hb_itemGetNL( pRecNo );
          /* Unlock all records? */
          if( ulRecNo == 0 )
             uiError = hb_dbfUnlockAllRecords( pArea );
@@ -4800,6 +4771,8 @@ static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo )
    }
    return uiError;
 }
+
+#define hb_dbfCloseMemFile          NULL
 
 /*
  * Create a memo file in the WorkArea.
@@ -5779,6 +5752,111 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
 
    return HB_SUCCESS;
 }
+
+#define hb_dbfWhoCares              NULL
+
+
+static const RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
+                                   ( DBENTRYP_BP ) hb_dbfEof,
+                                   ( DBENTRYP_BP ) hb_dbfFound,
+                                   ( DBENTRYP_V ) hb_dbfGoBottom,
+                                   ( DBENTRYP_UL ) hb_dbfGoTo,
+                                   ( DBENTRYP_I ) hb_dbfGoToId,
+                                   ( DBENTRYP_V ) hb_dbfGoTop,
+                                   ( DBENTRYP_BIB ) hb_dbfSeek,
+                                   ( DBENTRYP_L ) hb_dbfSkip,
+                                   ( DBENTRYP_L ) hb_dbfSkipFilter,
+                                   ( DBENTRYP_L ) hb_dbfSkipRaw,
+                                   ( DBENTRYP_VF ) hb_dbfAddField,
+                                   ( DBENTRYP_B ) hb_dbfAppend,
+                                   ( DBENTRYP_I ) hb_dbfCreateFields,
+                                   ( DBENTRYP_V ) hb_dbfDeleteRec,
+                                   ( DBENTRYP_BP ) hb_dbfDeleted,
+                                   ( DBENTRYP_SP ) hb_dbfFieldCount,
+                                   ( DBENTRYP_VF ) hb_dbfFieldDisplay,
+                                   ( DBENTRYP_SSI ) hb_dbfFieldInfo,
+                                   ( DBENTRYP_SCP ) hb_dbfFieldName,
+                                   ( DBENTRYP_V ) hb_dbfFlush,
+                                   ( DBENTRYP_PP ) hb_dbfGetRec,
+                                   ( DBENTRYP_SI ) hb_dbfGetValue,
+                                   ( DBENTRYP_SVL ) hb_dbfGetVarLen,
+                                   ( DBENTRYP_V ) hb_dbfGoCold,
+                                   ( DBENTRYP_V ) hb_dbfGoHot,
+                                   ( DBENTRYP_P ) hb_dbfPutRec,
+                                   ( DBENTRYP_SI ) hb_dbfPutValue,
+                                   ( DBENTRYP_V ) hb_dbfRecall,
+                                   ( DBENTRYP_ULP ) hb_dbfRecCount,
+                                   ( DBENTRYP_ISI ) hb_dbfRecInfo,
+                                   ( DBENTRYP_ULP ) hb_dbfRecNo,
+                                   ( DBENTRYP_I ) hb_dbfRecId,
+                                   ( DBENTRYP_S ) hb_dbfSetFieldExtent,
+                                   ( DBENTRYP_CP ) hb_dbfAlias,
+                                   ( DBENTRYP_V ) hb_dbfClose,
+                                   ( DBENTRYP_VO ) hb_dbfCreate,
+                                   ( DBENTRYP_SI ) hb_dbfInfo,
+                                   ( DBENTRYP_V ) hb_dbfNewArea,
+                                   ( DBENTRYP_VO ) hb_dbfOpen,
+                                   ( DBENTRYP_V ) hb_dbfRelease,
+                                   ( DBENTRYP_SP ) hb_dbfStructSize,
+                                   ( DBENTRYP_CP ) hb_dbfSysName,
+                                   ( DBENTRYP_VEI ) hb_dbfEval,
+                                   ( DBENTRYP_V ) hb_dbfPack,
+                                   ( DBENTRYP_LSP ) hb_dbfPackRec,
+                                   ( DBENTRYP_VS ) hb_dbfSort,
+                                   ( DBENTRYP_VT ) hb_dbfTrans,
+                                   ( DBENTRYP_VT ) hb_dbfTransRec,
+                                   ( DBENTRYP_V ) hb_dbfZap,
+                                   ( DBENTRYP_VR ) hb_dbfChildEnd,
+                                   ( DBENTRYP_VR ) hb_dbfChildStart,
+                                   ( DBENTRYP_VR ) hb_dbfChildSync,
+                                   ( DBENTRYP_V ) hb_dbfSyncChildren,
+                                   ( DBENTRYP_V ) hb_dbfClearRel,
+                                   ( DBENTRYP_V ) hb_dbfForceRel,
+                                   ( DBENTRYP_SSP ) hb_dbfRelArea,
+                                   ( DBENTRYP_VR ) hb_dbfRelEval,
+                                   ( DBENTRYP_SI ) hb_dbfRelText,
+                                   ( DBENTRYP_VR ) hb_dbfSetRel,
+                                   ( DBENTRYP_VOI ) hb_dbfOrderListAdd,
+                                   ( DBENTRYP_V ) hb_dbfOrderListClear,
+                                   ( DBENTRYP_VOI ) hb_dbfOrderListDelete,
+                                   ( DBENTRYP_VOI ) hb_dbfOrderListFocus,
+                                   ( DBENTRYP_V ) hb_dbfOrderListRebuild,
+                                   ( DBENTRYP_VOO ) hb_dbfOrderCondition,
+                                   ( DBENTRYP_VOC ) hb_dbfOrderCreate,
+                                   ( DBENTRYP_VOI ) hb_dbfOrderDestroy,
+                                   ( DBENTRYP_SVOI ) hb_dbfOrderInfo,
+                                   ( DBENTRYP_V ) hb_dbfClearFilter,
+                                   ( DBENTRYP_V ) hb_dbfClearLocate,
+                                   ( DBENTRYP_V ) hb_dbfClearScope,
+                                   ( DBENTRYP_VPLP ) hb_dbfCountScope,
+                                   ( DBENTRYP_I ) hb_dbfFilterText,
+                                   ( DBENTRYP_SI ) hb_dbfScopeInfo,
+                                   ( DBENTRYP_VFI ) hb_dbfSetFilter,
+                                   ( DBENTRYP_VLO ) hb_dbfSetLocate,
+                                   ( DBENTRYP_VOS ) hb_dbfSetScope,
+                                   ( DBENTRYP_VPL ) hb_dbfSkipScope,
+                                   ( DBENTRYP_B ) hb_dbfLocate,
+                                   ( DBENTRYP_CC ) hb_dbfCompile,
+                                   ( DBENTRYP_I ) hb_dbfError,
+                                   ( DBENTRYP_I ) hb_dbfEvalBlock,
+                                   ( DBENTRYP_VSP ) hb_dbfRawLock,
+                                   ( DBENTRYP_VL ) hb_dbfLock,
+                                   ( DBENTRYP_I ) hb_dbfUnLock,
+                                   ( DBENTRYP_V ) hb_dbfCloseMemFile,
+                                   ( DBENTRYP_VO ) hb_dbfCreateMemFile,
+                                   ( DBENTRYP_SCCS ) hb_dbfGetValueFile,
+                                   ( DBENTRYP_VO ) hb_dbfOpenMemFile,
+                                   ( DBENTRYP_SCCS ) hb_dbfPutValueFile,
+                                   ( DBENTRYP_V ) hb_dbfReadDBHeader,
+                                   ( DBENTRYP_V ) hb_dbfWriteDBHeader,
+                                   ( DBENTRYP_R ) hb_dbfInit,
+                                   ( DBENTRYP_R ) hb_dbfExit,
+                                   ( DBENTRYP_RVVL ) hb_dbfDrop,
+                                   ( DBENTRYP_RVVL ) hb_dbfExists,
+                                   ( DBENTRYP_RVVVL ) hb_dbfRename,
+                                   ( DBENTRYP_RSLV ) hb_dbfRddInfo,
+                                   ( DBENTRYP_SVP ) hb_dbfWhoCares
+                                 };
 
 HB_FUNC( _DBFNET ) { ; }
 

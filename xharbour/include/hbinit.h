@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.30 2008/03/04 17:37:01 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.31 2008/08/21 12:47:43 marchuet Exp $
  */
 
 /*
@@ -59,10 +59,10 @@ HB_EXTERN_BEGIN
 
 extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 
-#if defined(_MSC_VER) && !defined(_WIN64) && \
-    !defined(__LCC__) && !defined(__POCC__) && !defined(__XCC__) && \
+#if defined( _MSC_VER ) && !defined(_WIN64) && \
+    !defined( __LCC__ ) && !defined( __POCC__ ) && !defined( __XCC__ ) && \
     !defined(HARBOUR_STRICT_ANSI_C) && !defined(HB_STATIC_STARTUP) && \
-    !defined(HB_PRAGMA_STARTUP) && !defined(HB_MSC_STARTUP)
+    !defined( HB_PRAGMA_STARTUP ) && !defined( HB_MSC_STARTUP )
 
    /* In order to maintain compatibility with other products, MSVC should
       always use this startup.  If you know that you can use HB_STATIC_STARTUP
@@ -112,9 +112,9 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
-#elif defined(__GNUC__)
+#elif defined( __GNUC__ )
 
-   #if defined(HB_PRAGMA_STARTUP) || defined(HB_MSC_STARTUP)
+   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_MSC_STARTUP )
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
@@ -141,7 +141,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
 
    typedef int (* HB_$INITSYM)( void );
 
@@ -180,9 +180,9 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
        output of a generated prg for example
    */
 
-#elif defined(HB_STATIC_STARTUP) || defined(__cplusplus)
+#elif defined( HB_STATIC_STARTUP ) || defined( __cplusplus )
 
-   #if defined(HB_PRAGMA_STARTUP) || defined(HB_MSC_STARTUP)
+   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_MSC_STARTUP )
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
@@ -223,14 +223,14 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       } \
       static int DUMMY_CallOnStart_##func = func();
 
-#elif defined(HB_PRAGMA_STARTUP) || \
-      defined(__BORLANDC__) || defined(__LCC__) || defined(__POCC__) || defined(__XCC__)
+#elif defined( HB_PRAGMA_STARTUP ) || \
+      defined( __BORLANDC__ ) || defined( __LCC__ ) || defined( __POCC__ ) || defined( __XCC__ )
 
-   #if defined(HB_MSC_STARTUP)
+   #if defined( HB_MSC_STARTUP )
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
-   #if !defined(HB_PRAGMA_STARTUP)
+   #if !defined( HB_PRAGMA_STARTUP )
       #define HB_PRAGMA_STARTUP
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.13 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: hbrdddbt.h,v 1.14 2009/07/31 10:16:16 marchuet Exp $
  */
 
 /*
@@ -53,11 +53,6 @@
 #ifndef HB_RDDDBT_H_
 #define HB_RDDDBT_H_
 
-#include "hbsetup.h"
-#include "hbdbf.h"
-#include "hbdbferr.h"
-//#include "hbapirdd.h"
-#define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
 HB_EXTERN_BEGIN
@@ -83,111 +78,8 @@ typedef DBTAREA * LPDBTAREA;
 #endif
 
 
-/*
- * -- DBFDBT METHODS --
- */
-
+#undef  SUPERTABLE
 #define SUPERTABLE                         ( &dbtSuper )
-
-#define hb_dbtBof                                  NULL
-#define hb_dbtEof                                  NULL
-#define hb_dbtFound                                NULL
-#define hb_dbtGoBottom                             NULL
-#define hb_dbtGoTo                                 NULL
-#define hb_dbtGoToId                               NULL
-#define hb_dbtGoTop                                NULL
-#define hb_dbtSeek                                 NULL
-#define hb_dbtSkip                                 NULL
-#define hb_dbtSkipFilter                           NULL
-#define hb_dbtSkipRaw                              NULL
-#define hb_dbtAddField                             NULL
-#define hb_dbtAppend                               NULL
-#define hb_dbtCreateFields                         NULL
-#define hb_dbtDeleteRec                            NULL
-#define hb_dbtDeleted                              NULL
-#define hb_dbtFieldCount                           NULL
-#define hb_dbtFieldDisplay                         NULL
-#define hb_dbtFieldInfo                            NULL
-#define hb_dbtFieldName                            NULL
-#define hb_dbtFlush                                NULL
-#define hb_dbtGetRec                               NULL
-static HB_ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-static HB_ERRCODE hb_dbtGetVarLen( DBTAREAP pArea, USHORT uiIndex, ULONG * pLength );
-#define hb_dbtGoCold                               NULL
-#define hb_dbtGoHot                                NULL
-#define hb_dbtPutRec                               NULL
-static HB_ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-#define hb_dbtRecall                               NULL
-#define hb_dbtRecCount                             NULL
-#define hb_dbtRecInfo                              NULL
-#define hb_dbtRecNo                                NULL
-#define hb_dbtRecId                                NULL
-#define hb_dbtSetFieldExtent                       NULL
-#define hb_dbtAlias                                NULL
-#define hb_dbtClose                                NULL
-#define hb_dbtCreate                               NULL
-static HB_ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-#define hb_dbtNewArea                              NULL
-#define hb_dbtOpen                                 NULL
-#define hb_dbtRelease                              NULL
-static HB_ERRCODE hb_dbtStructSize( DBTAREAP pArea, USHORT * uiSize );
-#define hb_dbtSysName                              NULL
-#define hb_dbtEval                                 NULL
-#define hb_dbtPack                                 NULL
-#define hb_dbtPackRec                              NULL
-#define hb_dbtSort                                 NULL
-#define hb_dbtTrans                                NULL
-#define hb_dbtTransRec                             NULL
-#define hb_dbtZap                                  NULL
-#define hb_dbtChildEnd                             NULL
-#define hb_dbtChildStart                           NULL
-#define hb_dbtChildSync                            NULL
-#define hb_dbtSyncChildren                         NULL
-#define hb_dbtClearRel                             NULL
-#define hb_dbtForceRel                             NULL
-#define hb_dbtRelArea                              NULL
-#define hb_dbtRelEval                              NULL
-#define hb_dbtRelText                              NULL
-#define hb_dbtSetRel                               NULL
-#define hb_dbtOrderListAdd                         NULL
-#define hb_dbtOrderListClear                       NULL
-#define hb_dbtOrderListDelete                      NULL
-#define hb_dbtOrderListFocus                       NULL
-#define hb_dbtOrderListRebuild                     NULL
-#define hb_dbtOrderCondition                       NULL
-#define hb_dbtOrderCreate                          NULL
-#define hb_dbtOrderDestroy                         NULL
-#define hb_dbtOrderInfo                            NULL
-#define hb_dbtClearFilter                          NULL
-#define hb_dbtClearLocate                          NULL
-#define hb_dbtClearScope                           NULL
-#define hb_dbtCountScope                           NULL
-#define hb_dbtFilterText                           NULL
-#define hb_dbtScopeInfo                            NULL
-#define hb_dbtSetFilter                            NULL
-#define hb_dbtSetLocate                            NULL
-#define hb_dbtSetScope                             NULL
-#define hb_dbtSkipScope                            NULL
-#define hb_dbtLocate                               NULL
-#define hb_dbtCompile                              NULL
-#define hb_dbtError                                NULL
-#define hb_dbtEvalBlock                            NULL
-#define hb_dbtRawLock                              NULL
-#define hb_dbtLock                                 NULL
-#define hb_dbtUnLock                               NULL
-#define hb_dbtCloseMemFile                         NULL
-static HB_ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo );
-#define hb_dbtGetValueFile                         NULL
-static HB_ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo );
-#define hb_dbtPutValueFile                         NULL
-#define hb_dbtReadDBHeader                         NULL
-#define hb_dbtWriteDBHeader                        NULL
-#define hb_dbtInit                                 NULL
-#define hb_dbtExit                                 NULL
-#define hb_dbtDrop                                 NULL
-#define hb_dbtExists                               NULL
-static HB_ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
-#define hb_dbtWhoCares                             NULL
 
 HB_EXTERN_END
 

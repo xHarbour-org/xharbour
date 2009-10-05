@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.254 2009/08/23 22:46:11 lculik Exp $
+# $Id: makefile.bc,v 1.255 2009/08/28 01:24:25 ronpinkas Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -744,6 +744,13 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	IF EXIST "$(WHAT32_LIB)" $(DEL) "$(WHAT32_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
+	IF EXIST "$(FILEMEM_LIB)" $(DEL) "$(FILEMEM_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)

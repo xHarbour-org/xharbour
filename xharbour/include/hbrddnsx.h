@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddnsx.h,v 1.7 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: hbrddnsx.h,v 1.8 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -176,10 +176,6 @@ LEAF KEY COMPRESSION:
 #ifndef HB_RDDNSX_H_
 #define HB_RDDNSX_H_
 
-#include "hbsetup.h"
-#include "hbapirdd.h"
-#include "hbdbferr.h"
-#define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
 HB_EXTERN_BEGIN
@@ -570,6 +566,7 @@ typedef NSXAREA * LPNSXAREA;
 #define NSXAREAP LPNSXAREA
 #endif
 
+#undef  SUPERTABLE
 #define SUPERTABLE                         ( &nsxSuper )
 
 HB_EXTERN_END

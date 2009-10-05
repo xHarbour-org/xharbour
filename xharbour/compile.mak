@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.50 2009/09/22 14:10:48 lculik Exp $
+# $Id: compile.mak,v 1.51 2009/10/01 07:48:41 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -2083,6 +2083,12 @@ $(OBJ_DIR)$(DIR_SEP)gtwin$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwin$(DIR_SEP)gtwin.c
 # GTWVT.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
+	$(CC_CMD)
+
+#===============================================================================
+# FILEMEM.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)filemem$(OBJEXT) : $(FILEMEM_DIR)$(DIR_SEP)filemem.c
 	$(CC_CMD)
 
 #===============================================================================

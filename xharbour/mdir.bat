@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ============================================================================
 rem
-rem $Id: mdir.bat,v 1.24 2009/07/31 12:41:52 modalsist Exp $
+rem $Id: mdir.bat,v 1.25 2009/08/28 01:24:25 ronpinkas Exp $
 rem
 rem FILE    : mdir.bat
 rem PURPOSE : Create Target Directories If Not Exist and Clean Up
@@ -99,6 +99,7 @@ rem=============================================================================
 ECHO Contrib Libraries Succesfully Built ...
 ECHO Copying Contrib Libraries to LIB Folder ...
 if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%    lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%  lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%    lib >NUL
@@ -114,6 +115,8 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    lib >NUL
+
 ECHO Done ...
 ECHO.
 goto EXIT
@@ -209,6 +212,7 @@ if exist lib\%LIBPREFIX%dbfnsx%LIBEXT%               del lib\%LIBPREFIX%dbfnsx%L
 if exist lib\%LIBPREFIX%dbfnsxmt%LIBEXT%             del lib\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%LIBPREFIX%debug%LIBEXT%                del lib\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%LIBPREFIX%dllmain%LIBEXT%              del lib\%LIBPREFIX%dllmain%LIBEXT%
+if exist lib\%LIBPREFIX%filemem%LIBEXT%              del lib\%LIBPREFIX%filemem%LIBEXT%
 if exist lib\%LIBPREFIX%fmstat%LIBEXT%               del lib\%LIBPREFIX%fmstat%LIBEXT%
 if exist lib\%LIBPREFIX%fmstatmt%LIBEXT%             del lib\%LIBPREFIX%fmstatmt%LIBEXT%
 if exist lib\%LIBPREFIX%gtcgi%LIBEXT%                del lib\%LIBPREFIX%gtcgi%LIBEXT%
@@ -301,6 +305,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%fmstat%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%fmstat%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%fmstatmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%fmstatmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtcgi%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%gtcgi%LIBEXT%
@@ -465,6 +470,7 @@ if exist obj\%SUB_DIR%\*.c                          del obj\%SUB_DIR%\*.c
 if exist obj\%SUB_DIR%\mt\*.c                       del obj\%SUB_DIR%\mt\*.c
 
 if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%firebird%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%fi_lib%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gdlib%LIBEXT%
@@ -479,8 +485,10 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%
 
 if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIBEXT%
+if exist lib\%LIBPREFIX%filemem%LIBEXT%             del lib\%LIBPREFIX%firemem%LIBEXT%
 if exist lib\%LIBPREFIX%firebird%LIBEXT%            del lib\%LIBPREFIX%firebird%LIBEXT%
 if exist lib\%LIBPREFIX%fi_lib%LIBEXT%              del lib\%LIBPREFIX%fi_lib%LIBEXT%
 if exist lib\%LIBPREFIX%gdlib%LIBEXT%               del lib\%LIBPREFIX%gdlib%LIBEXT%
@@ -494,6 +502,7 @@ if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBE
 if exist lib\%LIBPREFIX%what32%LIBEXT%              del lib\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%LIBPREFIX%xwt%LIBEXT%                 del lib\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvg%LIBEXT%               del lib\%LIBPREFIX%gtwvg%LIBEXT%
+if exist lib\%LIBPREFIX%gtwvt%LIBEXT%               del lib\%LIBPREFIX%gtwvt%LIBEXT%
 
 IF EXIST make_%SUB_DIR%.log                         del make_%SUB_DIR%.log
 IF EXIST dll_%SUB_DIR%.log                          del dll_%SUB_DIR%.log

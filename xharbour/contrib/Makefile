@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2009/09/13 01:41:23 likewolf Exp $
+# $Id: Makefile,v 1.8 2009/09/13 13:03:32 likewolf Exp $
 #
 
 ROOT = ../
@@ -12,6 +12,7 @@ DIRS=\
 	hbzlib \
 	libnf \
 	rdd_ads \
+	filemem \
 
 
 else
