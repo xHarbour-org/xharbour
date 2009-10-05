@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.56 2009/10/01 07:48:41 marchuet Exp $
+# $Id: common.mak,v 1.57 2009/10/05 14:41:40 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1372,15 +1372,15 @@ GTWVG_LIB_OBJS=\
 # GTWVW.LIB dependencies
 #===============================================================================
 GTWVW_LIB_OBJS=\
-   $(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwdraw$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwmenu$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwtbar$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwstbar$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwpush$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwcheck$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwedit$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)wvwfuncs$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)gtwvw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwdraw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwmenu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwtbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwstbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwpush$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwcheck$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwedit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wvwfuncs$(OBJEXT)
 
 
 #===============================================================================

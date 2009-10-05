@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.245 2009/08/23 22:46:11 lculik Exp $
+# $Id: makefile.vc,v 1.246 2009/08/28 01:24:25 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -412,6 +412,7 @@ CPLUSPLUS=1
 # Uncomment this section if you have want to build the libraries.
 # HB_GTWVG=1
 HB_GTWVW=1
+HB_FILEMEM=1
 # HB_FIREBIRD=1
 # HB_MYSQL=1
 # HB_PGSQL=1
@@ -450,6 +451,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
 
 !ifdef HB_GTWVG
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVG_LIB)
+!endif
+
+!ifdef HB_FILEMEM
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FILEMEM_LIB)
 !endif
 
 !ifdef HB_GTWVW
@@ -570,7 +575,10 @@ $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
-        $(LIB_CMD)
+	$(LIB_CMD)
+
+$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
+	$(LIB_CMD)
 
 $(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
 	$(LIB_CMD)
