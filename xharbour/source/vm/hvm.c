@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.730 2009/09/12 18:47:44 likewolf Exp $
+ * $Id: hvm.c,v 1.731 2009/09/27 00:05:24 ronpinkas Exp $
  */
 
 /*
@@ -335,6 +335,8 @@ static HB_DYNS ModuleFakeDyn = { 0 };
 #if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    static BOOL s_Do_xinit = TRUE;
 #endif
+
+extern void hb_filebufInit( void );
 
 void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
@@ -677,6 +679,9 @@ void hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("il8nInit") );
    hb_i18nInit( NULL, NULL );  // try to open default language.
+
+   HB_TRACE( HB_TR_INFO, ("filebufInit") );
+   hb_filebufInit();
 
    HB_TRACE( HB_TR_INFO, ("SymbolInit_RT") );
    hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */

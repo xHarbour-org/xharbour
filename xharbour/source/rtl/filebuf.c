@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.7 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: filebuf.c,v 1.8 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -774,27 +774,9 @@ PHB_FILE hb_fileCreateTempEx( char * pszName,
    return pFile;
 }
 
-#ifdef HB_THREAD_SUPPORT
-
-static void hb_filebuf_init( void * cargo )
+void hb_filebufInit( void )
 {
-   HB_SYMBOL_UNUSED( cargo );
-   HB_CRITICAL_INIT( s_fileMtx );
-}
-
-HB_CALL_ON_STARTUP_BEGIN( _hb_filebuf_init_ )
-   hb_vmAtInit( hb_filebuf_init, NULL );
-HB_CALL_ON_STARTUP_END( _hb_filebuf_init_ )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup _hb_filebuf_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_INIT( s_fileMtx );
    #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_filebuf_init = _hb_filebuf_init_;
-   #pragma data_seg()
-#endif
-
-#endif
+}

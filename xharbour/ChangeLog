@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6611 2009/10/04 16:02:15 modalsist Exp $
+ * $Id: ChangeLog,v 1.6612 2009/10/05 14:41:40 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-05 20:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source\rtl\filebuf.c
+    - Removed static startup call to hb_vmAtInit( hb_filebuf_init, NULL );
+    + Added callable void hb_filebufInit()
+  * source\vm\hvm.c
+    + Added call to hb_filebufInit() in hb_vmInit()
+     ! Fixed GPF trap related to utilization of hb_filebuf system by the init modue of other module
+       (such as RDD), because execution order of hb_vmAtInit() functions is undetermined.
 
 2009-10-05 16:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\hbapierr.h
@@ -47,8 +56,8 @@
 2009-10-04 12:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed return values from assigns, as suggested by Jose Claudio from brazilian's news.
-    ! fixed method stabilize() to call dispend() only for dispbegin() called 
-      under this instance of tbrowse, as suggested by Jose Claudio from brazilian's news. 
+    ! fixed method stabilize() to call dispend() only for dispbegin() called
+      under this instance of tbrowse, as suggested by Jose Claudio from brazilian's news.
     ! fix to reset ::lrectpainted data after stable.
 
 2009-10-01 19:04 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
