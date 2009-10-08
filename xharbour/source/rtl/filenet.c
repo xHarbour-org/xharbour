@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.9 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: filenet.c,v 1.10 2009/10/01 15:19:30 marchuet Exp $
  */
 
 /*
@@ -52,8 +52,6 @@
 
 /* this has to be declared before hbapifs.h is included */
 #define _HB_FILE_INTERNAL_
-struct _HB_FILE;
-typedef struct _HB_FILE * PHB_FILE;
 
 /* file name prefix used by this file IO implementation */
 #define NETIO_FILE_PREFIX     "rem:"

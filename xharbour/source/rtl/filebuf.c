@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.8 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: filebuf.c,v 1.9 2009/10/06 00:59:28 ronpinkas Exp $
  */
 
 /*
@@ -53,9 +53,6 @@
 
 /* this has to be declared before hbapifs.h is included */
 #define _HB_FILE_INTERNAL_
-struct _HB_FILE;
-typedef struct _HB_FILE * PHB_FILE;
-
 
 #include "hbapi.h"
 #include "hbinit.h"
