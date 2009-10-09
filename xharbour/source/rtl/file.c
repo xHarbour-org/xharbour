@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.25 2009/07/06 11:22:57 marchuet Exp $
+ * $Id: file.c,v 1.26 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -122,31 +122,32 @@ BOOL hb_fsIsDirectory( const char * pszFilename )
    while( iLen && strchr( HB_OS_PATH_DELIM_CHR_LIST, pszFilename[ iLen - 1 ] ) )
       --iLen;
 
-   if( pszFilename[ iLen ] )
-   {
-      if( pszFree )
-         pszFree[ iLen ] = '\0';
-      else
-         pszFilename = pszFree = hb_strndup( pszFilename, iLen );
-   }
-
    if( iLen && iLen <= ( HB_PATH_MAX - 1 ) )
    {
       #if defined( HB_OS_WIN_32 )
       {
          DWORD dAttr = GetFileAttributes( ( LPCTSTR ) pszFilename );
+         OutputDebugString( pszFilename );
          bResult = ( dAttr == INVALID_FILE_ATTRIBUTES ? FALSE : ( dAttr & FILE_ATTRIBUTE_DIRECTORY ) );
       }
       #else
       {
          PHB_FFIND ffind;
+
+         if( pszFilename[ iLen ] )
+         {
+            if( pszFree )
+               pszFree[ iLen ] = '\0';
+            else
+               pszFilename = pszFree = hb_strndup( pszFilename, iLen );
+         }
+
          if( ( ffind = hb_fsFindFirst( pszFilename, HB_FA_DIRECTORY ) ) != NULL )
          {
             if( ( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
                bResult = TRUE;
             hb_fsFindClose( ffind );
          }
-   
       }
       #endif
    }
