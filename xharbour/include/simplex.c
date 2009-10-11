@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.34 2008/04/12 23:31:59 andijahja Exp $
+ * $Id: simplex.c,v 1.35 2009/02/26 02:55:47 ronpinkas Exp $
  */
 
 /*
@@ -649,7 +649,7 @@ int SimpLex_GetNextToken( void )
             {
                if( iLen )
                {
-                  DEBUG_INFO( printf( "Holding Stream Mode: '%c' Buffer = >%s<\n", chr, szBuffer ) );
+                  DEBUG_INFO( printf( "Holding Stream Mode(%i): '%c' '%s' Buffer = >%s<\n", iPairToken, chr, sStart, szBuffer ) );
 
                   /* Terminate and Check Token to the left. */
                   sToken[ iLen ] = '\0';
@@ -1471,11 +1471,18 @@ void SimpLex_CheckWords( void )
             iSavedLen = iLen;
 
             // Held Token at this point may only be acOmmit, acReturn, acNewLine, or sSelf.
-            if( iHold )
+            if( iHold || iPairToken )
             {
-               iHold--;
+               if( iHold )
+               {
+                  iHold--;
 
-               iLen = iLastLen;
+                  iLen = iLastLen;
+               }
+               else
+               {
+                  iLen = strlen( sStart );
+               }
 
                s_szBuffer -= iLen;
                iSize += iLen;

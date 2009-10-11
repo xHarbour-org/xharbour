@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.35 2008/02/09 02:53:17 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.36 2009/04/17 13:28:14 ronpinkas Exp $
  */
 
 /*
@@ -176,7 +176,7 @@ void hb_compExprINIT( void )
    hb_compExpr_IDs.HB_ENUMINDEX    = hb_compIdentifierNew( "HB_ENUMINDEX", TRUE );
    hb_compExpr_IDs.HB_QWITH        = hb_compIdentifierNew( "HB_QWITH", TRUE );
    hb_compExpr_IDs.HB_SETWITH      = hb_compIdentifierNew( "HB_SETWITH", TRUE );
-   hb_compExpr_IDs.I18N            = hb_compIdentifierNew( "I18n", TRUE );
+   hb_compExpr_IDs.I18N            = hb_compIdentifierNew( "I18N", TRUE );
    hb_compExpr_IDs.LEFT            = hb_compIdentifierNew( "LEFT", TRUE );
    hb_compExpr_IDs.LEN             = hb_compIdentifierNew( "LEN", TRUE );
    hb_compExpr_IDs.RIGHT           = hb_compIdentifierNew( "RIGHT", TRUE );

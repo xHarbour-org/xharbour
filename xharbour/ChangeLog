@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6614 2009/10/08 06:29:20 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6615 2009/10/09 14:02:43 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-10 21:22 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbexpra.c
+    * Typo "I18n" to "I18N" /* Fix contributed by Klas Engwall */
+
+  * include/simplex.c
+    ! Fixed wrong rewinding in SimpLex_CheckWords() after <Holding Stream Mode> (iPairToken)
 
 2009-10-09 16:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * file.c
