@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.241 2009/04/13 14:24:26 likewolf Exp $
+ * $Id: classes.c,v 1.242 2009/04/13 16:57:27 likewolf Exp $
  */
 
 /*
@@ -153,6 +153,9 @@
  "^^"    = __OpBitXor
  ">>"    = __OpBitShiftR
  "<<"    = __OpBitShiftL
+
+ * ...
+ "$$"    = __OpContains
 
  *
  *
@@ -1622,6 +1625,11 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
              {
                 pMessage = hb_dynsymGet( "__OpBitShiftL" ) ;
                 fOpOver  = HB_CLASS_OP_BITSHIFTL;
+             }
+             else if (strcmp( "$$", szMessage) == 0 )
+             {
+                pMessage = hb_dynsymGet( "__OpContains" ) ;
+                fOpOver  = HB_CLASS_OP_CONTAINS;
              }
              break;
 

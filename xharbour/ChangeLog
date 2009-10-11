@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6615 2009/10/09 14:02:43 marchuet Exp $
+ * $Id: ChangeLog,v 1.6616 2009/10/11 01:56:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-11 13:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * include/classes.h
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + "$$"/"contains" operator overload added.
+      value $ object -> object:__opcontains( value )
 
 2009-10-10 21:22 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbexpra.c

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.45 2009/02/09 01:42:21 guerra000 Exp $
+ * $Id: classes.h,v 1.46 2009/04/13 14:24:26 likewolf Exp $
  */
 
 /*
@@ -84,6 +84,7 @@ HB_EXTERN_BEGIN
 #define HB_CLASS_OP_BITSHIFTR       ( ( ULONG ) 0x01000000 )
 #define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x02000000 )
 #define HB_CLASS_OP_FOREACH         ( ( ULONG ) 0x04000000 )
+#define HB_CLASS_OP_CONTAINS        ( ( ULONG ) 0x08000000 )
 
 typedef struct
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.731 2009/09/27 00:05:24 ronpinkas Exp $
+ * $Id: hvm.c,v 1.732 2009/10/06 00:59:28 ronpinkas Exp $
  */
 
 /*
@@ -5458,6 +5458,11 @@ static void hb_vmInstringOrArray( void )
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_INSTRING )
    {
       hb_vmOperatorCall( pItem1, pItem2, "__OPINSTRING", NULL, 2, NULL );
+      hb_itemPushForward( &(HB_VM_STACK.Return ) );
+   }
+   else if( hb_objGetOpOver( pItem2 ) & HB_CLASS_OP_CONTAINS )
+   {
+      hb_vmOperatorCall( pItem2, pItem1, "__OPCONTAINS", NULL, 2, NULL );
       hb_itemPushForward( &(HB_VM_STACK.Return ) );
    }
    else if( HB_IS_ARRAY( pItem2 ) )
