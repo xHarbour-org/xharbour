@@ -520,7 +520,7 @@ LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocNa
       {
          if ( StartPagePrinter( hPrinter ) != 0 )
          {
-            hFile = CreateFile( cFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+            hFile = CreateFile( cFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
             if (hFile != INVALID_HANDLE_VALUE )
             {
                while (ReadFile( hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL ) && (nRead > 0))
