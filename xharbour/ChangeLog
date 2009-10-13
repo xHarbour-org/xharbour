@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6617 2009/10/11 19:05:58 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6618 2009/10/13 06:08:36 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-13 16:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rtl/win32ole.prg
+    ! Fixed GPF trap related to double release of VT_DISPATCH stored at OleValue
+
 2009-10-13 19:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\tprinter.c
     * alter hb_PrintFileRaw() to open printed file in FILE_SHARE_READ mode

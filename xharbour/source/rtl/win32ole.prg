@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.178 2009/08/08 21:58:09 what32 Exp $
+ * $Id: win32ole.prg,v 1.179 2009/09/18 17:41:41 ronpinkas Exp $
  */
 
 /*
@@ -2849,6 +2849,7 @@ RETURN Self
            {
               //TraceLog( NULL, "Try using DISPID_VALUE\n" );
               pDisp = OleVal.n1.n2.n3.pdispVal;
+              OleVal.n1.n2.vt = VT_EMPTY;
               goto OleGetID;
            }
            else
