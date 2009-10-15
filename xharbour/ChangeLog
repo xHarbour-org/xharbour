@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6618 2009/10/13 06:08:36 peterrees Exp $
+ * $Id: ChangeLog,v 1.6619 2009/10/13 20:36:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2009-10-15 08:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/libnf/chdir.c
+    contrib/libnf/rmdir.c
+    ! added missing typecast
+  * contrib/libnf/mkdir.c
+    ! added missing inclue hbapifs.h
+      added missing typecast
+  * source/rdd/dbf1.c
+    source/rdd/dbfntx/dbfntx1.c
+    source/rdd/dbfcdx/dbfcdx1.c
+    ! added missing typecast to hb_filedelete
+    
 2009-10-13 16:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/win32ole.prg
     ! Fixed GPF trap related to double release of VT_DISPATCH stored at OleValue

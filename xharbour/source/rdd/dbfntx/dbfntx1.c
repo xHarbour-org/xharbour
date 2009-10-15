@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.189 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.190 2009/10/05 14:41:55 marchuet Exp $
  */
 
 /*
@@ -1796,7 +1796,7 @@ static void hb_ntxIndexFree( LPNTXINDEX pIndex )
       hb_fileClose( pIndex->DiskFile );
       if( pIndex->fDelete )
       {
-         hb_fileDelete( pIndex->RealName ? pIndex->RealName : pIndex->IndexName, NULL );
+         hb_fileDelete( ( const char * ) pIndex->RealName ? pIndex->RealName : pIndex->IndexName, (USHORT)NULL );
       }
    }
    if( pIndex->IndexName )

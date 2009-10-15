@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.6 2007/01/08 20:13:09 marceloanelli Exp $
+ * $Id: rmdir.c,v 1.7 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /* File......: RMDIR.ASM
@@ -106,7 +106,7 @@ HB_FUNC(FT_RMDIR)
 #elif defined(__WIN32__)
    UINT iResult;
 
-   hb_fsRmDir( hb_parcx( 1 ) );
+   hb_fsRmDir( ( const char * ) hb_parcx( 1 ) );
 
    iResult = (UINT) GetLastError();
 
@@ -121,7 +121,7 @@ HB_FUNC(FT_RMDIR)
    int iRet = 0;
    if ( ISCHAR( 1 ) )
    {
-       bResult = hb_fsRmDir( hb_parcx( 1 ) );
+       bResult = hb_fsRmDir( ( const char * ) hb_parcx( 1 ) );
        if ( !bResult )
        {
          iRet = 5;

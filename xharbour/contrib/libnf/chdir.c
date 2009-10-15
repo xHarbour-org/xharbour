@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.9 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: chdir.c,v 1.10 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -127,7 +127,7 @@ HB_FUNC( FT_CHDIR )
 
    if ( pDir && strlen( pDir->item.asString.value ) > 0 )
    {
-      bResult = hb_fsChDir( pDir->item.asString.value );
+      bResult = hb_fsChDir( ( const char * ) pDir->item.asString.value );
       if ( !bResult )
       {
          dError = GetLastError();
@@ -148,11 +148,11 @@ HB_FUNC( FT_CHDIR )
    {
      if ( pDir && strlen( pDir->item.asString.value ) > 0 )
      {
-       bResult = hb_fsChDir( pDir->item.asString.value );
+       bResult = hb_fsChDir( ( const char * ) pDir->item.asString.value );
        if ( !bResult )
        {
          iRet = 3;
-       }
+       }       
      }
    }
    else

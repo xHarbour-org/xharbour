@@ -1,5 +1,5 @@
 /*
- * $Id: mkdir.c,v 1.6 2007/01/08 20:13:09 marceloanelli Exp $
+ * $Id: mkdir.c,v 1.7 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*; File......: MKDIR.ASM
@@ -81,7 +81,7 @@ End
 /* This is the New one Rewriten in C*/
 
 #include "hbapi.h"
-
+#include "hbapifs.h"
 #if defined( HB_OS_DOS )
    #include <dos.h>
    #if defined( __DJGPP__ )
@@ -123,7 +123,7 @@ HB_FUNC( FT_MKDIR )
 #elif defined( __WIN32__ )
    UINT iResult;
 
-   hb_fsMkDir( hb_parcx( 1 ) );
+   hb_fsMkDir( ( const char * ) hb_parcx( 1 ) );
 
    iResult = (UINT) GetLastError();
 
@@ -142,7 +142,7 @@ HB_FUNC( FT_MKDIR )
    int iRet = 0;
    if ( ISCHAR( 1 ) )
    {
-       bResult = hb_fsMkDir( hb_parcx( 1 ) );
+       bResult = hb_fsMkDir( ( const char * )  hb_parcx( 1 ) );
        if ( !bResult )
        {
          iRet = 5;
