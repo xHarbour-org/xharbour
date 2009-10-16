@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.165 2009/08/30 10:22:24 likewolf Exp $
+ * $Id: itemapi.c,v 1.166 2009/09/12 18:01:44 likewolf Exp $
  */
 
 /*
@@ -2318,86 +2318,88 @@ PHB_ITEM hb_itemPutNull( PHB_ITEM pItem )
    return pItem;
 }
 
-
-
-PHB_ITEM hb_itemPutCPtr2( PHB_ITEM pItem, char * szText )
-{
-   ULONG ulLen;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr2(%p, %s)", pItem, szText));
-
-   if( pItem )
+#if 0
+   PHB_ITEM hb_itemPutCPtr2( PHB_ITEM pItem, char * szText )
    {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+      ULONG ulLen;
 
-   ulLen = szText ? strlen( szText ) : 0;
+      HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr2(%p, %s)", pItem, szText));
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = ulLen;
-   if( ulLen == 0 )
-   {
-      pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = "";
-      hb_xfree( szText );
-   }
-   else if( ulLen == 1 )
-   {
-      pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = ( char * ) hb_szAscii[ (unsigned char) ( szText[0] ) ];
-      hb_xfree( szText );
-   }
-   else
-   {
-      szText[ ulLen ] = '\0';
-      pItem->item.asString.allocated = ulLen + 1;
-      pItem->item.asString.value     = szText;
-   }
+      if( pItem )
+      {
+         if( HB_IS_COMPLEX( pItem ) )
+            hb_itemClear( pItem );
+      }
+      else
+         pItem = hb_itemNew( NULL );
 
-   return pItem;
-}
-/*
-PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
-{
-   return hb_itemPutCLPtr( pItem, szText, ulLen );
-}
-*/
-PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCLPtr(%p, %s, %lu)", pItem, szText, ulLen));
+      ulLen = szText ? strlen( szText ) : 0;
 
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+      pItem->type = HB_IT_STRING;
+      pItem->item.asString.length = ulLen;
+      if( ulLen == 0 )
+      {
+         pItem->item.asString.allocated = 0;
+         pItem->item.asString.value     = "";
+         hb_xfree( szText );
+      }
+      else if( ulLen == 1 )
+      {
+         pItem->item.asString.allocated = 0;
+         pItem->item.asString.value     = ( char * ) hb_szAscii[ (unsigned char) ( szText[0] ) ];
+         hb_xfree( szText );
+      }
+      else
+      {
+         szText[ ulLen ] = '\0';
+         pItem->item.asString.allocated = ulLen + 1;
+         pItem->item.asString.value     = szText;
+      }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = ulLen;
-   if( ulLen == 0 )
-   {
-      pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = ( char * ) "";
-      hb_xfree( szText );
-   }
-   else if( ulLen == 1 )
-   {
-      pItem->item.asString.allocated = 0;
-      pItem->item.asString.value     = ( char * ) hb_szAscii[ ( unsigned char ) ( szText[0] ) ];
-      hb_xfree( szText );
-   }
-   else
-   {
-      szText[ ulLen ] = '\0';
-      pItem->item.asString.allocated = ulLen + 1;
-      pItem->item.asString.value     = szText;
+      return pItem;
    }
 
-   return pItem;
-}
+   /*
+   PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+   {
+      return hb_itemPutCPtr( pItem, szText, ulLen );
+   }
+   */
+   PHB_ITEM hb_itemPutCLPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+   {
+      HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCLPtr(%p, %s, %lu)", pItem, szText, ulLen));
+
+      if( pItem )
+      {
+         if( HB_IS_COMPLEX( pItem ) )
+            hb_itemClear( pItem );
+      }
+      else
+         pItem = hb_itemNew( NULL );
+
+      pItem->type = HB_IT_STRING;
+      pItem->item.asString.length = ulLen;
+
+      if( ulLen == 0 )
+      {
+         pItem->item.asString.allocated = 0;
+         pItem->item.asString.value     = ( char * ) "";
+         hb_xfree( szText );
+      }
+      else if( ulLen == 1 )
+      {
+         pItem->item.asString.allocated = 0;
+         pItem->item.asString.value     = ( char * ) hb_szAscii[ ( unsigned char ) ( szText[0] ) ];
+         hb_xfree( szText );
+      }
+      else
+      {
+         szText[ ulLen ] = '\0';
+         pItem->item.asString.allocated = ulLen + 1;
+         pItem->item.asString.value     = szText;
+      }
+
+      return pItem;
+   }
+#endif
 

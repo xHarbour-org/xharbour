@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.54 2009/01/16 01:56:00 likewolf Exp $
+ * $Id: hbapiitm.h,v 1.55 2009/08/19 22:40:47 likewolf Exp $
  */
 
 /*
@@ -118,10 +118,18 @@ extern HB_EXPORT PHB_ITEM   hb_itemParam    ( USHORT uiParam );
 
 extern HB_EXPORT PHB_ITEM   hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime );
 extern HB_EXPORT PHB_ITEM   hb_itemPutDate( PHB_ITEM pItem, LONG lDate );
+
 extern HB_EXPORT PHB_ITEM   hb_itemPutC       ( PHB_ITEM pItem, const char * szText );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern HB_EXPORT PHB_ITEM   hb_itemPutCLPtr   ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr2   ( PHB_ITEM pItem, char * szText );
+
+#if 0
+   extern HB_EXPORT PHB_ITEM   hb_itemPutCLPtr   ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+   extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr2   ( PHB_ITEM pItem, char * szText );
+#else
+   #define hb_itemPutCLPtr( pItem, szText, ulLen ) hb_itemPutCPtr( pItem, szText, ulLen )
+   #define hb_itemPutCPtr2( pItem, szText ) hb_itemPutC( pItem, szText )
+#endif
+
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRaw    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCL      ( PHB_ITEM pItem, const char * szText, ULONG ulLen );
