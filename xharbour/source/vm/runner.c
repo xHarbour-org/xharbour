@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.60 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: runner.c,v 1.61 2009/09/30 16:20:23 marchuet Exp $
  */
 
 /*
@@ -314,7 +314,10 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 
    hb_hrbExit( pHrbBody );
 
-   hb_clsDeactiveClass( pHrbBody->pModuleSymbols );
+   if( pHrbBody->pModuleSymbols )
+   {
+      hb_clsDeactiveClass( pHrbBody->pModuleSymbols );
+   }
 
    if( pHrbBody->pNamespaces )
    {

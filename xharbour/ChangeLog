@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6621 2009/10/16 05:44:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6622 2009/10/17 18:34:10 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-17 13:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/runner.c
+    ! Prevents GPF trap when HRB file contains unregistered symbols.
 
 2009-10-17 20:30 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
   * source\tip\encoding\base64.c
