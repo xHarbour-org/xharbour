@@ -1,3 +1,4 @@
+#include "thread.h"
 #include "uuencode.h"
 #include "hbapi.h"
 #include "hbapifs.h"

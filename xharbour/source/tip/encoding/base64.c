@@ -1,3 +1,4 @@
+#include "thread.h"
 #include "base64.h"
 #include "hbapi.h"
 #include "hbapifs.h"
