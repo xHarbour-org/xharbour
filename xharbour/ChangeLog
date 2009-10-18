@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6622 2009/10/17 18:34:10 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6623 2009/10/17 18:56:35 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-17 23:39 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/debug/tbrwtext.prg
+    * Changed Text2Array() to fix line changes when EOL is CR+LF
+      (hb_atokens() doesn't support delimiters with more than
+      one character long).
 
 2009-10-17 13:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/runner.c

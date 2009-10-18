@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.22 2008/12/10 00:47:31 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.23 2009/08/17 16:12:52 likewolf Exp $
  */
 
 /*
@@ -337,21 +337,21 @@ METHOD GoNext() CLASS HBBrwText
 
    RETURN lMoved
 
-STATIC FUNCTION WhichEOL( cString )
-
-   LOCAL nCRPos := At( Chr( 13 ), cString )
-   LOCAL nLFPos := At( Chr( 10 ), cString )
-
-   IF nCRPos > 0 .AND. nLFPos == 0
-      RETURN Chr( 13 )
-   ELSEIF nCRPos == 0 .AND. nLFPos >  0
-      RETURN Chr( 10 )
-   ELSEIF nCRPos > 0 .AND. nLFPos == nCRPos + 1
-      RETURN Chr( 13 ) + Chr( 10 )
-   ENDIF
-
-   RETURN HB_OSNewLine()
-
 STATIC FUNCTION Text2Array( cString )
-
-   RETURN hb_aTokens( cString, WhichEOL( cString ) )
+LOCAL aLines, nBase, nCurrent
+   aLines := {}
+   nCurrent := 1
+   DO WHILE nCurrent <= LEN( cString )
+      nBase := nCurrent
+      DO WHILE nCurrent <= LEN( cString ) .AND. ! cString[ nCurrent ] $ CHR( 13 ) + CHR( 10 )
+         nCurrent++
+      ENDDO
+      AADD( aLines, SUBSTR( cString, nBase, nCurrent - nBase ) )
+      IF cString[ nCurrent ] == CHR( 13 )
+         nCurrent++
+      ENDIF
+      IF cString[ nCurrent ] == CHR( 10 )
+         nCurrent++
+      ENDIF
+   ENDDO
+RETURN aLines
