@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6623 2009/10/17 18:56:35 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6624 2009/10/18 04:39:39 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-10-20 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/config.h
+  * source/rtl/pcre/config.h.generic
+  * source/rtl/pcre/pcre.h.generic
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/pcre_chartables.c.dist
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_newline.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcre_printint.src
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_ucd.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_xclass.c
+  * source/rtl/pcre/ucp.h
+    ! updated to version 8.0
+
+    /*
+    To Ron Pinkas: I still brought forward your patch on pcreposix.c,
+    would you please kindly review if the patch is still applicable to
+    the current version)
+    */
 
 2009-10-17 23:39 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/debug/tbrwtext.prg
