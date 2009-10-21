@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.79 2009/03/02 09:20:16 marchuet Exp $
+ * $Id: arrayshb.c,v 1.80 2009/09/01 14:39:42 ronpinkas Exp $
  */
 
 /*
@@ -321,7 +321,9 @@ HB_FUNC( ADEL )
    {
       if( pArray->item.asArray.value->ulLen )
       {
-         if( hb_arrayDel( pArray, ( ISNUM( 2 ) ? hb_parnl( 2 ) : 1 ) ) )
+         long lpos = ISNUM( 2 ) ? hb_parnl( 2 ) : 1;
+         lpos = lpos > 0 ? lpos : hb_arrayLen( pArray ) + lpos + 1;
+         if( hb_arrayDel( pArray, ( ULONG ) lpos ) )
          {
             #ifndef HB_C52_STRICT
                PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
