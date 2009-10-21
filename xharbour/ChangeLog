@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6624 2009/10/18 04:39:39 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6625 2009/10/20 05:37:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2009-10-21 17:32 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/vm/arrayshb.c
+    * 2nd parameter of ADEL function can be now negative referente position to array.
 
 2009-10-20 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h
