@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.33 2009/04/23 14:31:48 marchuet Exp $
+ * $Id: std.ch,v 1.34 2009/05/18 10:29:46 marchuet Exp $
  */
 
 /*
@@ -702,7 +702,7 @@
    #command SET BACKGROUND TASKS <x:ON,OFF,&> => Set( _SET_BACKGROUNDTASKS, <(x)> )
    #command SET BACKGROUND TASKS (<x>)    => Set( _SET_BACKGROUNDTASKS, <x> )
    #command SET BACKGROUNDTICK <x>        => Set( _SET_BACKGROUNDTICK, <x> )
-   #command SET ERRORLOG TO [<filename>] [<additive: ADDITIVE>] => Set( _SET_ERRORLOG, <(filename)>, <.additive.> )
+   #command SET ERRORLOG TO [<(filename)>] [<additive: ADDITIVE>] => Set( _SET_ERRORLOG, <(filename)>, <.additive.> )
    #command SET TIME FORMAT [TO] <f>      => Set( _SET_TIMEFORMAT, <f> )
    #command SET MACRO BLOCK VARS <x:ON,OFF,&> => Set( _SET_MACROBLOCKVARS, <(x)> )
    #command SET MACRO BLOCK VARS XHARBOUR => Set( _SET_MACROBLOCKVARS, .T. )

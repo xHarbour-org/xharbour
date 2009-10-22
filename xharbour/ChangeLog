@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6625 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: ChangeLog,v 1.6626 2009/10/21 15:26:52 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2009-10-22 18:30 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include\std.ch
+    * Added support for extended expression in command SET ERRORLOG TO
 
 2009-10-21 17:32 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source/vm/arrayshb.c
