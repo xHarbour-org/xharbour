@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.10 2009/10/01 15:19:30 marchuet Exp $
+ * $Id: filenet.c,v 1.11 2009/10/08 06:29:20 guerra000 Exp $
  */
 
 /*
@@ -71,6 +71,10 @@
 #if !defined(HB_WINCE)
 #  include <sys/types.h>
 #  include <sys/stat.h>
+#endif
+#if  ( defined( __GNUC__ ) && \
+     ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
+#include <netinet/in.h>
 #endif
 
 #define HB_FLOCK_RESIZE       16

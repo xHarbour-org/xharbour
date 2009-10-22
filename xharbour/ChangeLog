@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6626 2009/10/21 15:26:52 marchuet Exp $
+ * $Id: ChangeLog,v 1.6627 2009/10/22 16:29:28 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2009-10-22 21:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/filenet.c
+    ! added missing #include for htons under linux
+  * source/rtl/diskphb.c
+      ! typecast to hb_fsNameConv
+  * source/rtl/ftemp.c
+     ! added typecast to fsGetTempDirByCase
+  * source/rtl/isprint.c
+     ! fixed type cast to hb_fsOpen
 
 2009-10-22 18:30 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include\std.ch

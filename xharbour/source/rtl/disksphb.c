@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.13 2007/11/10 18:21:57 likewolf Exp $
+ * $Id: disksphb.c,v 1.14 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ HB_FUNC( HB_DISKSPACE )
       struct statvfs sf;
       BOOL fFree = FALSE;
 
-      szPath = ( char * ) hb_fsNameConv( ( BYTE * ) szPath, &fFree );
+      szPath = ( char * ) hb_fsNameConv( ( const char * ) szPath, &fFree );
 
       if( statvfs( szPath, &sf ) == 0 )
       {

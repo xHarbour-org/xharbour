@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.32 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: fstemp.c,v 1.33 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
             pszName[ 1 ] = '\0';
          }
 #else
-         char * pszTmpDir = hb_getenv( "TMPDIR" );
+         const char * pszTmpDir = hb_getenv( "TMPDIR" );
 
          if( !fsGetTempDirByCase( pszName, pszTmpDir ) )
          {

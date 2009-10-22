@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.26 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: isprint.c,v 1.27 2005/03/31 03:58:52 druzus Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ BOOL hb_printerIsReady( char * pszPrinterName )
             [vszakats] */
 
    {
-      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) pszPrinterName, FO_WRITE | FO_SHARED | FO_PRIVATE );
+      FHANDLE fhnd = hb_fsOpen( ( const char * ) pszPrinterName, FO_WRITE | FO_SHARED | FO_PRIVATE );
       bIsPrinter = ( fhnd != FS_ERROR );
       hb_fsClose( fhnd );
    }
