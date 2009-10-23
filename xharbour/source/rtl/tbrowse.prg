@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.222 2009/09/29 15:37:47 lculik Exp $
+ * $Id: tbrowse.prg,v 1.223 2009/10/04 16:02:15 modalsist Exp $
  */
 
 /*
@@ -3403,9 +3403,9 @@ METHOD InitKeys( o ) CLASS TBrowse
               { K_RIGHT,       {| oB | oB:Right()   , 0 } } ,;
               { K_UP,          {| oB | oB:Up()      , 0 } } ,;
               { K_ESC,         {|    | -1               } } ,;
-              { K_MWFORWARD,   {| oB | oB:Up()      , 0 } } ,;
-              { K_MWBACKWARD,  {| oB | oB:Down()    , 0 } } ,;
-              { K_LBUTTONDOWN, {| oB       | tbmouse( ob, MRow(), MCol() ) } } }
+              { K_MWFORWARD,   {| oB | iif(oB:hittest( MRow(), MCol() ) != HTNOWHERE, oB:Up(),0), 0 } } ,;
+              { K_MWBACKWARD,  {| oB | iif(oB:hittest( MRow(), MCol() ) != HTNOWHERE, oB:Down(),0), 0 } } ,;
+              { K_LBUTTONDOWN, {| oB | tbmouse( oB, MRow(), MCol() ) } } }
 Return o
 
 *---------------------------------------------------*
@@ -3471,7 +3471,7 @@ Local i, nVisCol, nRet
 
       if mRow == ::nTop .AND. mCol == ::nLeft
         nRet := HTTOPLEFT
-      elseif mRow == ::nTop    .AND. mCol == ::nRight
+      elseif mRow == ::nTop .AND. mCol == ::nRight
         nRet := HTTOPRIGHT
       elseif mRow == ::nBottom .AND. mCol == ::nLeft
         nRet := HTBOTTOMLEFT
@@ -3496,7 +3496,7 @@ Local i, nVisCol, nRet
       elseif mCol >= ::nRight - ::nSpaceLast + 1 .AND. mCol <= ::nwRight
              // if i'm on right side (also consider spaces on right)
         nRet := HTRIGHT
-      elseif ::lHeadSep     .AND. mRow == ::nTop + ::nHeaderHeight
+      elseif ::lHeadSep .AND. mRow == ::nTop + ::nHeaderHeight
          // if i'm on header sep
          nRet := HTHEADSEP
 //      elseif mRow >= ::nTop .AND. mRow <= ::nTop + ::nHeaderHeight
@@ -3549,10 +3549,10 @@ Local i, nVisCol, nRet
          ::nMColPos == ::nColPos
 
          IF ::nMColPos == ::nLeftVisible .AND. ;
-            ::nLeftVisible - ::nFrozenCols > 1 .and. ::nSpacePre = 0
+            ::nLeftVisible - ::nFrozenCols > 1 //.and. ::nSpacePre = 0
             ::nMColPos--
          ELSEIF ::nMColPos == ::nRightVisible .AND. ;
-            ::nRightVisible < ::nColCount .and. ::nSpaceLast = 0
+            ::nRightVisible < ::nColCount //.and. ::nSpaceLast = 0
             ::nMColPos++
          ENDIF
 
@@ -3590,6 +3590,7 @@ Return Self
 *---------------------------------------------------*
 FUNCTION TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 *---------------------------------------------------*
+
 LOCAL n
 
    if oBrowse:hittest( nMouseRow, nMouseCol ) == HTCELL
@@ -3598,18 +3599,20 @@ LOCAL n
 
       do while n < 0
          n++
-         oBrowse:up():forceStable()
+         oBrowse:refreshCurrent():up()
       enddo
 
       do while n > 0
          n--
-         oBrowse:down():forceStable()
+         oBrowse:refreshCurrent():down()
       enddo
 
       n := oBrowse:mColPos - oBrowse:colpos
+
       if n < oBrowse:leftVisible - oBrowse:colPos .AND. oBrowse:freeze + 1 < oBrowse:leftVisible
          n += ( oBrowse:freeze + 1 - oBrowse:leftVisible )  // hidden cols
-      end
+      endif
+
       do while n < 0
          n++
          oBrowse:left()
@@ -3620,12 +3623,16 @@ LOCAL n
          oBrowse:right()
       enddo
 
+      oBrowse:refreshall()
+
       return 0
+
    endif
 
 return 1
 
 #endif
+
 
 *---------------------------------------------------*
 STATIC FUNCTION LenVal( xVal, cType, cPict )
