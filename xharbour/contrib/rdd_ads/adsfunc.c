@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.100 2009/08/22 03:41:14 what32 Exp $
+ * $Id: adsfunc.c,v 1.101 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -1477,6 +1477,14 @@ HB_FUNC( ADSCONNECTION )                /* Get/Set func to switch between connec
    HB_ADS_RETCONNECTION( hb_ads_hConnect );
 
    hb_ads_hConnect = HB_ADS_PARCONNECTION( 1 );
+}
+
+HB_FUNC( ADSISCONNECTIONALIVE )                // Determine if passed or default connection is still valid
+{
+   UNSIGNED16 bConnectionIsAlive;
+
+   AdsIsConnectionAlive( HB_ADS_PARCONNECTION( 1 ), &bConnectionIsAlive );
+   hb_retl( bConnectionIsAlive );
 }
 
 HB_FUNC( ADSGETHANDLETYPE )             /* DD, admin, table */
