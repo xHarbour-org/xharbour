@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.200 2009/08/11 13:31:05 modalsist Exp $
+ * $Id: hbmake.prg,v 1.201 2009/08/24 18:03:18 lculik Exp $
  */
 
 /*
@@ -4450,7 +4450,8 @@ FUNCTION CreateScriptLib( cFile )
       ENDIF
 
    ELSE
-      FWrite( nSFhandle, "PROJECT = " + IIF( lInstallLib, "$(HB_DIR)\lib\", "" ) + Alltrim( Lower( cLibName ) ) + ".lib " + "$(PR)" + CRLF )
+         FWrite( nSFhandle, "PROJECT = " + IIF( lInstallLib, "$(HB_DIR)\lib\", "" ) + Alltrim( Lower( cLibName ) ) + ".lib " + "$(PR)" + CRLF )
+
    ENDIF
 
    IF ! s_lExtended
@@ -4559,7 +4560,7 @@ FUNCTION CreateScriptLib( cFile )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
       FWrite( nSFhandle, "LFLAGS = " + CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )
-      FWrite( nSFhandle, "LINKER = lib $(PROJECT)" + CRLF )
+      FWrite( nSFhandle, "LINKER = lib " + CRLF )
       FWrite( nSFhandle, " " + CRLF )
       FWrite( nSFhandle, "ALLOBJ = $(OBJFILES) $(OBJCFILES) " + CRLF )
       FWrite( nSFhandle, "ALLRES = $(RESDEPEN)" + CRLF )
