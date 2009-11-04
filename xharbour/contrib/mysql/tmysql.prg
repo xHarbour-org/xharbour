@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.16 2006/11/18 21:33:26 oh1 Exp $
+ * $Id: tmysql.prg,v 1.17 2007/07/17 21:01:17 andresreyesh Exp $
  */
 
  /*
@@ -315,7 +315,7 @@ CLASS TMySQLQuery
    METHOD   Locate( cFieldName, Value, bPartialKey, bSoftSeek )
 
    METHOD   RecCount()   INLINE ::nNumRows
-
+   METHOD   RenameTable( old_cTable, new_cTable )  // rename table
    PROTECTED:
 
    DATA lEof
@@ -1422,6 +1422,13 @@ METHOD Error() CLASS TMySQLServer
 
 return iif(::nSocket > 0, sqlGetErr(::nSocket), "No connection to server")
 
+METHOD RenameTable( old_cTable, new_cTable ) CLASS TMySQLServer
+   local cDropQuery := "ALTER TABLE " + Lower( old_cTable)+" RENAME "+ 
+Lower( new_cTable)
+   if sqlQuery( ::nSocket, cDropQuery ) == 0
+     return .T.
+   endif
+return .F.
 
 /* TOFIX: Conversion creates a .dbf with fields of wrong dimension (often) */
 METHOD TableStruct( cTable ) CLASS TMySQLServer
