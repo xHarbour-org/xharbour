@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6629 2009/10/23 10:05:20 modalsist Exp $
+ * $Id: ChangeLog,v 1.6630 2009/10/28 22:52:34 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-04 12:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/ct/disk.c
+    ! fixed dirname to be ct compatible and added an parameter to specify the drive
 
 2009-10-28 15:28 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
   * contrib\rdd_ads\adsfunc.c
