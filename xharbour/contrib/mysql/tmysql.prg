@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.17 2007/07/17 21:01:17 andresreyesh Exp $
+ * $Id: tmysql.prg,v 1.18 2009/11/04 15:12:56 lculik Exp $
  */
 
  /*
@@ -315,7 +315,7 @@ CLASS TMySQLQuery
    METHOD   Locate( cFieldName, Value, bPartialKey, bSoftSeek )
 
    METHOD   RecCount()   INLINE ::nNumRows
-   METHOD   RenameTable( old_cTable, new_cTable )  // rename table
+
    PROTECTED:
 
    DATA lEof
@@ -1177,7 +1177,7 @@ CLASS TMySQLServer
                                              // Returns .T. if something went wrong
 
    METHOD   Error()                          // Returns textual description of last error
-
+   METHOD   RenameTable( old_cTable, new_cTable )  // rename table
 ENDCLASS
 
 
