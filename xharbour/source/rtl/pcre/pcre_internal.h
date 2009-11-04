@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
+ * $Id: pcre_internal.h,v 1.14 2009/10/20 05:37:22 andijahja Exp $
  */
 
 /*************************************************
@@ -605,8 +605,10 @@ variable-length repeat, or a anything other than literal characters. */
 /* Miscellaneous definitions. The #ifndef is to pacify compiler warnings in
 environments where these macros are defined elsewhere. Unfortunately, there
 is no way to do the same for the typedef. */
-
+#if ! defined( HB_DEFS_H_ )
 typedef int BOOL;
+#endif
+
 
 #ifndef FALSE
 #define FALSE   0
