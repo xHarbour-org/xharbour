@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.17 2009/07/13 19:38:38 jfgimenez Exp $
+ * $Id: txml.prg,v 1.18 2009/07/20 18:22:20 modalsist Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 
 #include "hbxml.ch"
 #include "hbclass.ch"
+#include "fileio.ch"
 
 /********************************************
    XML Node  class
@@ -419,40 +420,43 @@ CLASS TXmlDocument
    DATA nLine
    DATA oErrorNode
    DATA nNodeCount
-
+   DATA cSignature
+   
    METHOD New( uXml, nStyle )         CONSTRUCTOR
-   METHOD Read( xData, nStyle )       INLINE HBXML_DATAREAD( Self, xData, nStyle ) /* xData can be xml content or file handle */
-   METHOD ToString( nStyle )          INLINE ::oRoot:ToString( nStyle )
+   METHOD Read( xData, nStyle )       
+   METHOD ToString( nStyle )          INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oRoot:ToString( nStyle ) ,"")
    METHOD Write( cFileName, nStyle )
 
    METHOD FindFirst( cName, cAttrib, cValue, cData )
    METHOD FindFirstRegex( cName, cAttrib, cValue, cData )
-   METHOD FindNext()                  INLINE ::oIterator:FindNext()
-   METHOD Next()                      INLINE ::oIterator:Next()
+   METHOD FindNext()                  INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oIterator:FindNext(), NIL )
+   METHOD Next()                      INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oIterator:Next(), NIL )
 
    METHOD GetContext()
 
-   ACCESS CurNode                     INLINE ::oIterator:GetNode()
+
+   ACCESS CurNode                     INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oIterator:GetNode(), NIL )
    ACCESS ErrorMsg                    INLINE HB_XMLERRORDESC( ::nError )
 
 HIDDEN:
 
    DATA oIterator
    DATA cHeader
-
-   METHOD XmlValid()
-
+   
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 METHOD New( uXml, nStyle ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
-Local nh, lnew := .f.
+Local nh, lNew
 
    ::nStatus := HBXML_STATUS_OK
    ::nError := HBXML_ERROR_NONE
    ::nLine := 1
    ::nNodeCount := 0
+   ::cSignature := ""
+     
+   lNew := .f.
 
    IF uXml == NIL
       ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
@@ -466,71 +470,76 @@ Local nh, lnew := .f.
          CASE 'N'    /* file handle */
             ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
             ::Read( uXml, nStyle )
-            exit
+            EXIT
          CASE 'C'    /* xml file name or xml header */
             if ! file( uXml )
                ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
                ::Read( uXml, nStyle )
-               if "xml" in uXml
-                  //::cHeader := uXml
-                  lnew := .t.
-               endif
             else
                nh := FOpen( uXml )
                if nh == -1
                   ::nStatus := HBXML_STATUS_ERROR
-                  ::nError  := HBXML_ERROR_IO
+                  ::nError := HBXML_ERROR_IO
                else
                   ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
                   ::Read( nh, nStyle )
                   FClose( nh )
                endif
             endif
+            EXIT
+         DEFAULT
+            ::nStatus := HBXML_STATUS_ERROR
+            ::nError := HBXML_ERROR_WRONGENTITY
       END
    ENDIF
 
-   if ! lnew .and. ! ::xmlvalid()
-      ::nStatus := HBXML_STATUS_ERROR
-      ::nError  := HBXML_ERROR_IO
-   else
+   if ::nStatus = HBXML_STATUS_OK
+      if empty( ::cHeader ) .and. lNew .and. ::oRoot:oChild != NIL .and. ::oRoot:oChild:cName == "xml"
+         ::cHeader := "<?xml "+::oRoot:oChild:cData+"?>"
+      endif
       ::oIterator := TXmlIterator():New( ::oRoot )
+   else
+      ::nStatus := HBXML_STATUS_ERROR
+      ::nError := HBXML_ERROR_INVNODE
    endif
 
 RETURN Self
 
 *-----------------------------------------------------------------------------*
-METHOD XmlValid() CLASS TXmlDocument
-*-----------------------------------------------------------------------------*
-Local lValid := .f.
-  if ( hb_isObject( ::oRoot ) .and. ::oRoot:oChild != NIL )
-     lValid := ::oRoot:oChild:cName == "xml"
-     if lValid
-        ::cHeader := ::oRoot:oChild:cData
-     endif
-  endif
-RETURN lValid
-
-*-----------------------------------------------------------------------------*
 METHOD FindFirst( cName, cAttrib, cValue, cData ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
-   ::oIterator:lRegex := .f.
-RETURN ::oIterator:Find( cName, cAttrib, cValue, cData )
+Local oNode
+
+   if ::nStatus = HBXML_STATUS_OK
+      ::oIterator:lRegex := .f.
+      oNode := ::oIterator:Find( cName, cAttrib, cValue, cData )
+   endif
+   
+RETURN oNode
 
 
 *-----------------------------------------------------------------------------*
 METHOD FindFirstRegex( cName, cAttrib, cValue, cData ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
-   ::oIterator:lRegex := .t.
-RETURN ::oIterator:Find( cName, cAttrib, cValue, cData )
+Local oNode
+
+   if ::nStatus = HBXML_STATUS_OK
+      ::oIterator:lRegex := .t.
+      oNode := ::oIterator:Find( cName, cAttrib, cValue, cData )
+   endif
+   
+RETURN oNode
 
 *-----------------------------------------------------------------------------*
 METHOD GetContext() CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
    LOCAL oDoc
 
-   oDoc := TXmlDocument():New()
-   oDoc:oRoot := ::oIterator:GetNode()
-
+   if ::nStatus = HBXML_STATUS_OK
+      oDoc := TXmlDocument():New()
+      oDoc:oRoot := ::oIterator:GetNode()
+   endif
+   
 RETURN oDoc
 
 *-----------------------------------------------------------------------------*
@@ -538,7 +547,7 @@ METHOD Write( xFile, nStyle ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
 Local fHandle, cHeader, lOK := .f., cFileName
 
-  if empty( xFile )
+  if empty( xFile ) .or. ::nStatus != HBXML_STATUS_OK
      return .f.
   endif
 
@@ -562,6 +571,7 @@ Local fHandle, cHeader, lOK := .f., cFileName
      endif
 
      fHandle := FCreate( cFileName )
+
      lOK := ( FError() == 0 )
 
   elseif hb_isNumeric( xFile )
@@ -572,10 +582,14 @@ Local fHandle, cHeader, lOK := .f., cFileName
   endif
 
   if lOK
-     if ! empty( cHeader )
-        FWrite( fHandle, cHeader, len(cHeader) )
+     if ! empty( ::cSignature )
+        FWrite( fHandle, ::cSignature, len( ::cSignature ) )
+        lOK := ( FError() == 0 )
      endif
-     lOK := ( FError() == 0 )
+     if lOK .and. ! empty( cHeader )
+        FWrite( fHandle, cHeader, len(cHeader) )
+        lOK := ( FError() == 0 )
+     endif
      if lOK
         ::oRoot:Write( fHandle, nStyle )
         lOK := ( FError() == 0 )
@@ -592,3 +606,37 @@ Local fHandle, cHeader, lOK := .f., cFileName
 
 Return lOK
 
+*-----------------------------------------------------------------------------*
+METHOD Read( xData, nStyle ) CLASS TXmlDocument
+*-----------------------------------------------------------------------------*
+* read a file handle or xml content
+* xData can be xml content or file handle
+*-----------------------------------------------------------------------------*
+Local cBOM 
+
+ if ValType( xData ) == "N"  // file handle
+    FSeek( xData, 0, FS_SET )
+    cBOM := FReadStr( xData, 3 )
+    FSeek( xData, 0, FS_SET )
+ elseif valtype( xData ) == "C"  // Xml content.
+    cBOM := Left(xData,3)
+ else
+    ::nStatus := HBXML_STATUS_MALFORMED
+    ::nError := HBXML_ERROR_INVNODE
+ endif
+ 
+ /* The xml document can have the utf-8 signature named BOM (Byte Order Mark),
+    composed by a sequence of 3 characters, like chr(239), chr(187) and chr(191) 
+    or EF, BB and BF.
+    This signature is always at the beginning of the file, before <?xml> tag and can
+    cause unexpected results. So we need treat it.
+    More detais at http://www.w3.org/International/questions/qa-utf8-bom */
+ if Asc( cBOM[1] ) = 239 .and. Asc( cBOM[2] ) = 187 .and. Asc( cBOM[3] ) = 191
+    ::cSignature := cBOM
+ endif 
+
+ ::nStatus := HBXML_DATAREAD( Self, xData, nStyle ) 
+
+Return Self
+
+ 

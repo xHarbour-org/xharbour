@@ -1,5 +1,5 @@
 /*
- * $Id: asciisum.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: asciisum.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -55,8 +55,6 @@
 
 #include "ct.h"
 
-
-
 HB_FUNC (ASCIISUM)
 {
 
@@ -68,10 +66,9 @@ HB_FUNC (ASCIISUM)
     ULONG ulResult = 0;
 
     for (sPos = 0; sPos < sStrSize; sPos++)
-      ulResult += (ULONG)pcString[sPos];
+      ulResult += (BYTE) pcString[sPos];
 
     hb_retnl (ulResult);
-
   }
   else
   {
@@ -92,9 +89,7 @@ HB_FUNC (ASCIISUM)
       hb_retnl (0);
     }
   }
-
   return;
-
 }
 
 

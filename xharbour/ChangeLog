@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6631 2009/11/04 13:41:43 lculik Exp $
+ * $Id: ChangeLog,v 1.6632 2009/11/04 15:12:55 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-04 22:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/asciisum.c
+    ! fixed to sum asc code of characters above of 127.
+
+  * source/rtl/hbxml.c
+    * changed mxml_node_read() to jump when reach BOM (Byte of Mark)
+      signature of any UTF-8 documents.
+
+  * source/rtl/txml.prg
+    + added ::cSignature data to get/put BOM on Read()/Write() methods.
+      obs: After read a xml document via TXmlDocument:Read() method, the
+           UTF-8 signature will be saved on ::cSignature data, if any.
+           I you want not restore this, simply empty the ::cSignature
+           data before call TXmlDocument:Write() method. By default the
+           signature will be saved.
+    * changed TXmlDocument:Read() method to get BOM (Byte of Mark)
+      on ::cSignature in any UTF-8 files.
+      changed TxmlDocument:Read() return value. Now it will return self
+      instead status code. The status code can be accessed from ::nStatus
+      data after read operation.
+    * changed TxmlDocument:Write() to put ::cSignature data at beggining
+      of xml content, if any.
+    - removed TXmlDocument:XmlValid() hidden method.
+    * changed all TxmlDocument methods to run only if status is equal to
+      HBXML_STATUS_OK.
 
 2009-11-04 13:11 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/mysql/tmysql.prg
@@ -30,8 +56,6 @@
  with mouse wheel on console window, that is changing MCol()
     MRow() values, so if you use mouse wheel to change tbrowse rows, the behaviour can be unexpected.
  
-  
-
 2009-10-22 21:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/filenet.c
     ! added missing #include for htons under linux
