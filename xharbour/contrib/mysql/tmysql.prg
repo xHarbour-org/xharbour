@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.18 2009/11/04 15:12:56 lculik Exp $
+ * $Id: tmysql.prg,v 1.19 2009/11/04 19:51:49 lculik Exp $
  */
 
  /*
@@ -1423,8 +1423,7 @@ METHOD Error() CLASS TMySQLServer
 return iif(::nSocket > 0, sqlGetErr(::nSocket), "No connection to server")
 
 METHOD RenameTable( old_cTable, new_cTable ) CLASS TMySQLServer
-   local cDropQuery := "ALTER TABLE " + Lower( old_cTable)+" RENAME "+ 
-Lower( new_cTable)
+   local cDropQuery := "ALTER TABLE " + Lower( old_cTable)+" RENAME "+ Lower( new_cTable)
    if sqlQuery( ::nSocket, cDropQuery ) == 0
      return .T.
    endif
