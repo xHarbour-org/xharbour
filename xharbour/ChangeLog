@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6632 2009/11/04 15:12:55 lculik Exp $
+ * $Id: ChangeLog,v 1.6633 2009/11/05 00:15:26 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2009-11-06 17:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * mdir.bat
+    + added reddbffptmt* into :remove session.
+
+  * source/rtl/tget.prg
+    ! fixed default value of ::xVarGet to 0, as suggested by JC.
+    ! fixed _delete() method for values under "@L" picture.
+    ! fixed _NumToLeft() method for values under "@E" picture.
+    * changed scope of Putmask() and HasScroll() methods to protected.
+
+  * source/rtl/txml.prg
+    * fixed TXmlDocument:Read() method. Missing return self if <xData>
+      is invalid.
 
 2009-11-04 22:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/asciisum.c

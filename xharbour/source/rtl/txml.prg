@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.18 2009/07/20 18:22:20 modalsist Exp $
+ * $Id: txml.prg,v 1.19 2009/11/05 00:15:26 modalsist Exp $
  */
 
 /*
@@ -609,8 +609,7 @@ Return lOK
 *-----------------------------------------------------------------------------*
 METHOD Read( xData, nStyle ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
-* read a file handle or xml content
-* xData can be xml content or file handle
+* Read a xml file through file handle or xml content <xData>.
 *-----------------------------------------------------------------------------*
 Local cBOM 
 
@@ -623,6 +622,7 @@ Local cBOM
  else
     ::nStatus := HBXML_STATUS_MALFORMED
     ::nError := HBXML_ERROR_INVNODE
+    Return Self
  endif
  
  /* The xml document can have the utf-8 signature named BOM (Byte Order Mark),
@@ -637,6 +637,4 @@ Local cBOM
 
  ::nStatus := HBXML_DATAREAD( Self, xData, nStyle ) 
 
-Return Self
-
- 
+Return Self    

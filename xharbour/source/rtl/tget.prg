@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.148 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: tget.prg,v 1.149 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -172,6 +172,8 @@ CLASS Get
    METHOD SetColorSpec( cColorSpec )
    METHOD SetPicture( cPicture )
 
+   METHOD PutMask( cBuffer, lEdit )
+   METHOD HasScroll() INLINE ::nDispLen != ::nMaxLen
 
    HIDDEN:              /*  H I D D E N  */
 
@@ -186,6 +188,8 @@ CLASS Get
    DATA nDispLenReduce   INIT 0    // idem.
 
    DATA lNumToLeft  INIT .F.       // to "@L" mask
+   DATA lNeverDeleted INIT .T.
+    
    METHOD _NumToLeft()             // idem.
    METHOD StopMoveH()               // idem
 
@@ -193,11 +197,8 @@ CLASS Get
    METHOD DeleteAll()
    METHOD IsEditable( nPos )
    METHOD Input( cChar )
-   METHOD PutMask( cBuffer, lEdit )
    METHOD FirstEditable( )
    METHOD LastEditable( )
-
-   METHOD HasScroll() INLINE ::nDispLen != ::nMaxLen
 
    DATA lForceCentury                 // to "@2" or "@4" masks.
    DATA lCentury INIT __SetCentury()  // idem
@@ -436,6 +437,7 @@ METHOD ParsePict( cPicture ) CLASS Get
 
          /* E.F. 2007/FEB/03 - Assign default mask format in accordance with
                                buffer lenght and dec pos. */
+         DEFAULT ::xVarGet TO 0
 
          if ::nMaxLen != NIL .and. ::DecPos != NIL
 
@@ -653,6 +655,7 @@ METHOD Display( lForced ) CLASS Get
 
       ENDIF
 
+
       /* 2007/SEP/14 - E.F. - Display buffer content only if not object as
                               ListBox, CheckCob, PushButton or RadioGroup.
       */
@@ -815,6 +818,7 @@ METHOD Reset() CLASS Get
       ::buffer := ::PutMask( ::VarGet(), .f. )
       ::Pos := ::FirstEditable()
       ::TypeOut := .f.
+      ::lNeverDeleted := .T.
    endif
 
 return Self
@@ -1629,8 +1633,7 @@ LOCAL xBuffer
    ::VarPut( xBuffer, .t. )
 
 return Self
-
-//---------------------------------------------------------------------------//
+               //---------------------------------------------------------------------------//
 
 METHOD IsEditable( nPos ) CLASS Get
 
@@ -2042,7 +2045,9 @@ METHOD _Delete( lDisplay ) CLASS Get
       ::DeleteAll()
    else
       /* 2007/FEB/24 - E.F. - Adjust ::Pos value under @L picture */
+
       if ::lNumToLeft
+
          if ::lDecPos
             if ::Pos < ::DecPos 
                ::Pos++
@@ -2050,17 +2055,17 @@ METHOD _Delete( lDisplay ) CLASS Get
             if ::Pos-1 < ::DecPos
                ::lDecPos := .f.
             endif
-         elseif IsDigit( Right(::buffer,1)) .and. ::Pos+1 == ::nMaxLen
+         elseif ::lNeverDeleted .or. ( IsDigit( Right(::buffer,1)) .and. ::Pos+1 == ::nMaxLen )
             ::Pos++
          endif
+
       endif
 
-      ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1 ) + ;
+      ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1) + ;
                   SubStr( ::buffer, ::Pos + 1, nMaxLen - ::Pos ) + " " +;
                   SubStr( ::buffer, nMaxLen + 1 ), ::nMaxLen )
 
    endif
-
 
    if ::type == "D"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
@@ -2070,20 +2075,25 @@ METHOD _Delete( lDisplay ) CLASS Get
 
    ::Changed := .T.
 
+   if ::lNeverDeleted
+      ::lNeverDeleted := .F.
+   endif
+
    if lDisplay
       ::Display()
    endif
-
+  
 return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DeleteAll() CLASS Get
+METHOD DeleteAll() CLASS Get
 
    local xValue
 
    ::lEdit := .t.
    ::lUndo := .f.
+   ::lNeverDeleted := .T.
 
    Switch ::type
    case "C"
@@ -2129,7 +2139,7 @@ PROCEDURE DeleteAll() CLASS Get
       ENDIF
    ENDIF
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -2361,7 +2371,7 @@ LOCAL cColor, cBuff, nValue
      nValue := ::UnTransform()
      cBuff := Transform( nValue, SubStr( ::picture, at( "9", ::Picture ) ) )
 
-     IF "," IN ::cPicture .AND. "." IN ::cPicture
+     IF "," IN ::cPicture .OR. "." IN ::cPicture
         IF "R" IN ::cPicFunc .AND. !("E" IN ::cPicFunc)
            cBuff := StrTran(cBuff, ".", "" )
            cBuff := StrTran(cBuff, ",", "" )
