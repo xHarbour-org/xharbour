@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6633 2009/11/05 00:15:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.6634 2009/11/06 19:54:17 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2009-11-08 23:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+   * include/Makefile
+    ! added missing hbapises.h
+    
+
 2009-11-06 17:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat
     + added reddbffptmt* into :remove session.
