@@ -1,5 +1,5 @@
 /*
- * $Id: maindlle.c,v 1.1 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: maindlle.c,v 1.2 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -67,12 +67,12 @@
            by means of use_dll.lib!
 */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbtypes.h"
 
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )

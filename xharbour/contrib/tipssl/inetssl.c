@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.c,v 1.2 2009/08/10 19:24:57 lculik Exp $
+* $Id: inetssl.c,v 1.3 2009/09/13 21:12:27 likewolf Exp $
 */
 
 /*
@@ -77,7 +77,7 @@
    #include <sys/ioctl.h>
 #endif
 
-#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN_32 )
+#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN )
    /* NET_SIZE_T exists because of shortsightedness on the POSIX committee.  BSD
     * systems used "int *" as the parameter to accept(), getsockname(),
     * getpeername() et al.  Consequently many unixes took an int * for that
@@ -102,7 +102,7 @@
 
 int verify_depth=0;
 int verify_error=X509_V_OK;
-BIO *bio_err=NULL; 
+BIO *bio_err=NULL;
 static int              allow_self_certification = FALSE;
 #define STRLEN             256
 #if defined( HB_OS_HPUX )
@@ -179,15 +179,15 @@ static int check_preverify(X509_STORE_CTX *ctx) {
     /* Remote site specified a certificate, but it's not correct */
     /* Reject connection */
     return 0;
-  } 
+  }
 
-  if(allow_self_certification && 
+  if(allow_self_certification &&
      (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT))
   {
     /* Let's accept self signed certs for the moment! */
     ctx->error=0;
     return TRUE;
-  } 
+  }
 
   /* Reject connection */
   return FALSE;
@@ -208,7 +208,7 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx) {
 
   if(ctx->error_depth==0 &&
      X509_STORE_get_by_subject(ctx, X509_LU_X509,
-			       X509_get_subject_name(ctx->current_cert), 
+			       X509_get_subject_name(ctx->current_cert),
 			       &found_cert)!=1)
   {
 
@@ -216,7 +216,7 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx) {
 
   }
 
-  return 1; 
+  return 1;
 
 }
 
@@ -228,12 +228,12 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char * msg, int length, int* i
    int r;
    fd_set fd_r, fd_w;
    struct timeval tv;
-   
+
    do
    {
       ret = SSL_write(Socket->pSSL, msg, length);
       sslerr = SSL_get_error(Socket->pSSL, ret);
-      
+
       if ( ret > 0)
       {
         r = 1;
@@ -248,8 +248,8 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char * msg, int length, int* i
          tv.tv_sec = Socket->timeout  / 1000;
          tv.tv_usec = ( Socket->timeout % 1000 ) * 1000;
       }
-      
-      switch (sslerr) 
+
+      switch (sslerr)
       {
          case SSL_ERROR_WANT_READ:
             FD_SET(Socket->com,&fd_r);
@@ -260,16 +260,16 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char * msg, int length, int* i
          default:
             return -1;
       }
-      if( Socket->timeout > 0 )    
+      if( Socket->timeout > 0 )
          r = select(Socket->com+1,&fd_r,&fd_w,NULL,&tv);
       else
          r = select(Socket->com+1,&fd_r,&fd_w,NULL,NULL);
-   
+
    } while ( ret == -1 && r != 0 );
-   
+
    if ( r == 0)
       return -1;
-      
+
    return ret;
 }
 
@@ -279,17 +279,17 @@ int can_read( int socket, int timeout )
    int r= 0;
    fd_set rset;
    struct timeval tv;
-   
+
    FD_ZERO( &rset );
    FD_SET( socket, &rset );
    tv.tv_sec = timeout/ 1000;
    tv.tv_usec = ( timeout % 1000 ) * 1000;
-   
+
    do
    {
       r= select( socket + 1, &rset, NULL, NULL, &tv );
    }  while(r == -1 && errno == EINTR);
-   
+
    return ( r > 0 );
 
 }
@@ -297,14 +297,14 @@ int can_read( int socket, int timeout )
 /* utility function to read/write to SSL Sockets with timeout */
 int hb_inetSSLRead( HB_SSL_SOCKET_STRUCT * Socket, char * msg, int length, int * iRet)
 {
-	  
+
 
    int ret;
    int sslerr;
    int r;
    fd_set fd_r, fd_w;
    struct timeval tv;
-   
+
    do
    {
       ret = SSL_read( Socket->pSSL, msg, length );
@@ -314,7 +314,7 @@ int hb_inetSSLRead( HB_SSL_SOCKET_STRUCT * Socket, char * msg, int length, int *
        *iRet =0 ;
         break;
       }
-    
+
       FD_ZERO( &fd_r );
       FD_ZERO( &fd_w );
       if( Socket->timeout > 0 )
@@ -322,7 +322,7 @@ int hb_inetSSLRead( HB_SSL_SOCKET_STRUCT * Socket, char * msg, int length, int *
         tv.tv_sec = Socket->timeout/ 1000;
         tv.tv_usec = ( Socket->timeout % 1000 ) * 1000;
       }
-      *iRet= sslerr; 
+      *iRet= sslerr;
       switch (sslerr)
       {
          case SSL_ERROR_WANT_READ:
@@ -332,21 +332,21 @@ int hb_inetSSLRead( HB_SSL_SOCKET_STRUCT * Socket, char * msg, int length, int *
             FD_SET( Socket->com, &fd_w );
             break;
          default:
-            if ( sslerr == SSL_ERROR_ZERO_RETURN ) 
+            if ( sslerr == SSL_ERROR_ZERO_RETURN )
             { /* remote host has closed connection */
                 return -1;
-            }         
+            }
          return -1;
       }
-      if( Socket->timeout > 0 )	
+      if( Socket->timeout > 0 )
          r = select( Socket->com + 1, &fd_r, NULL, NULL, &tv );
       else
          r= select( Socket->com + 1, &fd_r, NULL, NULL, NULL ) ;
    } while ( ret == -1 && r != 0 );
-   
+
    if ( r==0 )
       return -1;
-      
+
    return ret;
 }
 
@@ -439,7 +439,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
    struct hostent *Host = NULL;
 
    /* let's see if name is an IP address; not necessary on linux */
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    ULONG ulAddr;
 
    ulAddr = inet_addr( name );
@@ -463,7 +463,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
 
    if( Host == NULL && Socket != NULL )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       HB_SOCKET_SET_ERROR2( Socket, WSAGetLastError() , "Generic error in GetHostByName()" );
       WSASetLastError( 0 );
 #elif defined(HB_OS_OS2) || defined(HB_OS_HPUX) || defined(__WATCOMC__)
@@ -480,7 +480,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetNonBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 1;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 
@@ -499,7 +499,7 @@ static void hb_socketSetNonBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 0;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 #else
@@ -517,7 +517,7 @@ static void hb_socketSetBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
 {
    int iErr1;
-   #if ! defined(HB_OS_WIN_32)
+   #if ! defined(HB_OS_WIN)
       int iErrval;
       socklen_t iErrvalLen;
    #endif
@@ -531,7 +531,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
    iErr1 = connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) );
    if( iErr1 != 0 )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       if( WSAGetLastError() != WSAEWOULDBLOCK )
 #else
       if( errno != EINPROGRESS )
@@ -543,7 +543,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
       {
          /* Now we wait for socket connection or timeout */
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
          iErr1 = hb_selectWriteExceptSocket( Socket );
          if( iErr1 == 2 )
          {
@@ -582,7 +582,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
             HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
          }
 
-         /* 
+         /*
          * Read real buffer sizes from socket
          */
          {
@@ -630,7 +630,7 @@ static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 
    if( Socket->com > 0 )
    {
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -660,7 +660,7 @@ HB_FUNC( INETSSLINIT )
    }
    else
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
       #elif defined( HB_OS_LINUX )
@@ -674,7 +674,7 @@ HB_FUNC( INETSSLCLEANUP )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSACleanup();
       #endif
    }
@@ -689,7 +689,7 @@ HB_FUNC( INETSSLCREATE )
    PHB_ITEM pSocket = NULL;
    int iRet1;
    int iRet2;
-   char * szCAPath; 
+   char * szCAPath;
    char * szCAFile;
    HB_SSL_SOCKET_STRUCT *Socket;
    HB_SSL_SOCKET_INIT( Socket, pSocket );
@@ -712,7 +712,7 @@ HB_FUNC( INETSSLCREATE )
  //  SSL_CTX_set_info_callback( Socket->pCTX, apps_ssl_info_callback );
    Socket->pBio = BIO_new_socket( Socket->com, BIO_NOCLOSE );
 
-   Socket->pSSL   = SSL_new( Socket->pCTX ); 
+   Socket->pSSL   = SSL_new( Socket->pCTX );
 
    hb_itemReturnRelease( pSocket );
 }
@@ -730,20 +730,20 @@ HB_FUNC( INETSSLCLOSE )
       SSL_shutdown( Socket->pSSL );
       SSL_free(     Socket->pSSL );
       SSL_CTX_free( Socket->pCTX );
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
       #elif !defined(__WATCOMC__)
          shutdown( Socket->com, SHUT_RDWR );
       #endif
-    
+
       hb_retni( HB_INET_CLOSE( Socket->com ) );
 
       Socket->com = 0;
       Socket->pSSL = NULL ;
       Socket->pSSL = NULL ;
-      Socket->pCTX = NULL ;      
+      Socket->pCTX = NULL ;
       #ifdef HB_OS_LINUX
          kill( 0, HB_INET_LINUX_INTERRUPT );
       #endif
@@ -1309,7 +1309,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
          if( Socket->caPeriodic != NULL )
          {
             hb_execFromArray( Socket->caPeriodic );
-          //   do we continue? 
+          //   do we continue?
             if ( hb_itemGetL( hb_stackReturnItem() ) &&
                (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
             {
@@ -1317,10 +1317,10 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
             }
          }
 
-        //  this signals timeout 
+        //  this signals timeout
          iLen = -2;
       }
-        
+
       if( iLen > 0 )
       {
          /* verify endsequence recognition automata status */
@@ -1895,7 +1895,7 @@ HB_FUNC( INETSSLSERVER )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    Socket->com = socket( AF_INET, SOCK_STREAM, 0 );
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0 );
@@ -1965,7 +1965,7 @@ HB_FUNC( INETSSLACCEPT )
    struct sockaddr_in si_remote;
 #if defined(_XOPEN_SOURCE_EXTENDED)
    socklen_t Len;
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    int Len;
 #else
    UINT Len;
@@ -2004,7 +2004,7 @@ HB_FUNC( INETSSLACCEPT )
 
          if(incoming == ( HB_SOCKET_T ) -1 )
          {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
             iError = WSAGetLastError();
 #else
             iError = errno;
@@ -2057,19 +2057,19 @@ static int handle_error(int code, HB_SSL_SOCKET_STRUCT *Socket) {
   int ssl_error= SSL_get_error(Socket->pSSL, code);
 
   switch (ssl_error) {
-    
+
   case SSL_ERROR_WANT_READ:
     if( can_read(Socket->com, Socket->timeout))
       return TRUE;
 //    LogError("%s: Openssl read timeout error!\n", prog);
     break;
-      
+
   case SSL_ERROR_WANT_WRITE:
     if(can_read(Socket->com, Socket->timeout))
       return TRUE;
   //  LogError("%s: Openssl write timeout error!\n", prog);
     break;
-    
+
   case SSL_ERROR_SYSCALL:
 //    LogError("%s: Openssl syscall error: %s!\n", prog, STRERROR);
     break;
@@ -2077,7 +2077,7 @@ static int handle_error(int code, HB_SSL_SOCKET_STRUCT *Socket) {
   case SSL_ERROR_SSL:
 //    LogError("%s: Openssl engine error: %s\n", prog, SSLERROR);
     break;
-      
+
   default:
 //    LogError("%s: Openssl error!\n", prog);
     break;
@@ -2135,7 +2135,7 @@ HB_FUNC( INETSSLCONNECT )
    if( Host != NULL )
    {
       /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -2155,7 +2155,7 @@ HB_FUNC( INETSSLCONNECT )
 
          HB_STACK_UNLOCK;
          HB_TEST_CANCEL_ENABLE_ASYN;
-         
+
 
          hb_socketConnect( Socket );
          hb_socketSetNonBlocking( Socket );
@@ -2215,7 +2215,7 @@ HB_FUNC( INETSSLCONNECTIP )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -2269,7 +2269,7 @@ HB_FUNC( INETSSLDGRAMBIND )
    HB_SSL_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2363,7 +2363,7 @@ HB_FUNC( INETSSLDGRAM )
    HB_SSL_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2459,7 +2459,7 @@ HB_FUNC( INETSSLDGRAMRECV )
    int iLen, iMaxLen;
    char *Buffer;
    BOOL fRepeat;
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    int iDtLen = sizeof( struct sockaddr );
 #else
    socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );
@@ -2554,7 +2554,7 @@ HB_FUNC(SSL_INIT)
 {
    SSL_library_init();
    SSL_load_error_strings();
-   OpenSSL_add_all_algorithms(); 
+   OpenSSL_add_all_algorithms();
 }
 
 HB_FUNC(INITSSLRANDFILE)
@@ -2566,7 +2566,7 @@ HB_FUNC(INITSSLRANDFILE)
       hb_retl( 0 );
       return;
    }
- 
+
    RAND_load_file( pszRandFile, -1 );
    if ( RAND_status() == 0)
    {

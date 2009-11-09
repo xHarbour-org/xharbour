@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.17 2009/06/21 08:47:06 peterrees Exp $
+ * $Id: hbgtcore.c,v 1.18 2009/08/29 20:56:43 likewolf Exp $
  */
 
 /*
@@ -1135,7 +1135,7 @@ static void hb_gt_def_ScrollArea( PHB_GT pGT, int iTop, int iLeft, int iBottom, 
       iLength = iColSize + 1;
       iColOld = iColNew = iLeft;
 
-      if ( iCols >= 0 )
+      if( iCols >= 0 )
       {
          iColOld += iCols;
          iColSize -= iCols;
@@ -1987,7 +1987,7 @@ static void hb_gt_def_SemiCold( PHB_GT pGT )
 {
    int i;
    for( i = 0; i < pGT->iHeight; ++i )
-      pGT->pLines[ i ]  = FALSE;
+      pGT->pLines[ i ] = FALSE;
    pGT->fRefresh = FALSE;
 }
 
@@ -2325,9 +2325,7 @@ static void hb_gt_def_InkeyPoll( PHB_GT pGT )
     * necessary due to different low level GT behavior on some platforms
     */
    if( hb_setGetTypeAhead() )
-   {
       hb_gt_def_InkeyPollDo( pGT );
-   }
 }
 
 /* Return the next key without extracting it */
@@ -2519,6 +2517,7 @@ static void hb_gt_def_InkeyExit( PHB_GT pGT )
       hb_xfree( pGT->StrBuffer );
       pGT->StrBuffer = NULL;
    }
+
    if( pGT->inkeyBufferSize > HB_DEFAULT_INKEY_BUFSIZE )
    {
       hb_xfree( pGT->inkeyBuffer );
@@ -3057,20 +3056,24 @@ static /* const */ HB_GT_FUNCS s_gtCoreFunc =
 
 static char s_gtNameBuf[ HB_GT_NAME_MAX_ + 1 ];
 
-#if defined(HB_GT_DEFAULT)
-   const char * s_defaultGT = HB_GT_DRVNAME( HB_GT_DEFAULT );
-#elif defined(HB_GT_LIB)
-   const char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
-#elif defined(HB_OS_LINUX)
-   const char * s_defaultGT = "crs";
-#elif defined(HB_OS_WIN_32)
-   const char * s_defaultGT = "win";
-#elif defined(HB_OS_DOS)
-   const char * s_defaultGT = "dos";
-#elif defined(HB_OS_OS2)
-   const char * s_defaultGT = "os2";
+#if defined( HB_GT_DEFAULT )
+   const char * hb_gt_szNameDefault = HB_GT_DRVNAME( HB_GT_DEFAULT );
+#elif defined( HB_GT_LIB )
+   const char * hb_gt_szNameDefault = HB_GT_DRVNAME( HB_GT_LIB );
+#elif defined( HB_OS_LINUX )
+   const char * hb_gt_szNameDefault = "crs";
+#elif defined( HB_OS_WIN_CE )
+   const char * hb_gt_szNameDefault = "wvt";
+#elif defined( HB_OS_WIN )
+   const char * hb_gt_szNameDefault = "win";
+#elif defined( HB_OS_DOS )
+   const char * hb_gt_szNameDefault = "dos";
+#elif defined( HB_OS_OS2 )
+   const char * hb_gt_szNameDefault = "os2";
+#elif defined( HB_OS_UNIX )
+   const char * hb_gt_szNameDefault = "trm";
 #else
-   const char * s_defaultGT = "std";
+   const char * hb_gt_szNameDefault = "std";
 #endif
 
 static const HB_GT_INIT * s_gtInit[ HB_GT_MAX_ ];
@@ -3104,8 +3107,8 @@ const char * hb_gt_FindDefault( void )
 
    for( iPos = 0; iPos < s_iGtCount; iPos++ )
    {
-      hb_snprintf( szFuncName, sizeof( szFuncName ), "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
-
+      hb_snprintf( szFuncName, sizeof( szFuncName ),
+                "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
       if( hb_dynsymFind( szFuncName ) )
          return s_gtInit[ iPos ]->id;
    }
@@ -3119,7 +3122,7 @@ const char * hb_gt_FindDefault( void )
 void hb_gtSetDefault( const char * szGtName )
 {
    hb_strncpy( s_gtNameBuf, szGtName, HB_GT_NAME_MAX_ );
-   s_defaultGT = s_gtNameBuf;
+   hb_gt_szNameDefault = s_gtNameBuf;
 }
 
 BOOL hb_gtRegister( const HB_GT_INIT * gtInit )
@@ -3226,7 +3229,7 @@ void hb_gtStartupInit( void )
       return;
    }
 
-   if( hb_gtLoad( s_defaultGT, &s_gtCoreFunc ) )
+   if( hb_gtLoad( hb_gt_szNameDefault, &s_gtCoreFunc ) )
    {
       return;
    }

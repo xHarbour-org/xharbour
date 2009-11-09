@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.5 2006/04/07 09:47:19 lculik Exp $
+ * $Id: caplock.c,v 1.6 2008/05/01 10:49:39 andijahja Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #include <hbapi.h>
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    #include <windows.h>
 
    BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL bParam )
@@ -116,7 +116,7 @@ HB_FUNC(FT_CAPLOCK)
    }
    return;
    }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    #define HB_VK_CAPITAL        0x14
    BOOL bCurrentStatus;
    BOOL bParam = ISLOG(1);

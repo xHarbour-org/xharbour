@@ -1,5 +1,5 @@
 /*
- * $Id: ace32.c,v 1.2 2008/06/03 23:12:56 kaddath Exp $
+ * $Id: ace32.c,v 1.3 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -50,8 +50,8 @@
  *
  */
 
-#ifndef HB_OS_WIN_32_USED
-#define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+#define HB_OS_WIN_USED
 #endif
 
 #include "rddads.h"

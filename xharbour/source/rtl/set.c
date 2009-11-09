@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.101 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: set.c,v 1.102 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #include <ctype.h>
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #define _HB_SET_INTERNAL_
 
 #include "hbvmopt.h"
@@ -93,7 +93,7 @@ typedef struct
    int               counter;
 } HB_SET_LISTENER_LST, * PHB_SET_LISTENER_LST;
 
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
       extern LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocName ) ;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
@@ -188,7 +188,7 @@ static void close_binary( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
       USHORT user_ferror = hb_fsError();
       hb_fsClose( handle );
       hb_fsSetError( user_ferror );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( pSet->hb_set_winprinter && ( pSet->hb_set_printhan == handle ) && s_PrintFileName[0] )
       {
          if ( hb_fsFSize( s_PrintFileName, FALSE ) > 0 )
@@ -256,7 +256,7 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
       hb_xfree( pFilename );
 
       strcpy(s_PrinterName, file_name) ;
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( set_specifier == HB_SET_PRINTFILE )
       {
          if ( hb_stricmp( s_PrinterName, "prn" ) == 0 )
@@ -328,7 +328,7 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
 
          if( bCreate )
          {
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
            if ( hb_isLegacyDevice( s_PrinterName ) )
             {  // according to the Win SDK devices should be opened not created
                handle = hb_fsOpen( szPrnFile, FO_READWRITE );

@@ -1,19 +1,19 @@
 /*
- * $Id: gtwvt.c,v 1.190 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: gtwvt.c,v 1.191 2009/09/12 18:47:44 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * Video subsystem for Win32 using GUI windows instead of Console
+ * Video subsystem for Windows using GUI windows instead of Console
  *     Copyright 2003 Peter Rees <peter@rees.co.nz>
  *                    Rees Software & Systems Ltd
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
  *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
- *   Video subsystem for Win32 compilers
+ *   Video subsystem for Windows compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
  *
  * Copyright 2006 Przemyslaw Czerpak <druzus /at/ priv.onet.pl>
  *    Adopted to new GT API
@@ -82,7 +82,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #define _HB_API_INTERNAL_ /* for hb_stack_ready */
 #include "hbstack.h"
@@ -125,7 +125,7 @@ static PHB_GTWVT hb_gt_wvt_Find( HWND hWnd )
 
    while( iCount && iPos < WVT_MAX_WINDOWS )
    {
-      if( s_wvtWindows[iPos] )
+      if( s_wvtWindows[ iPos ] )
       {
          if( s_wvtWindows[iPos]->hWnd == hWnd )
             return s_wvtWindows[iPos];
@@ -442,7 +442,7 @@ static void hb_gt_wvt_ResetWindowSize( PHB_GTWVT pWVT )
                     tm.tmAveCharWidth; /* For fixed FONT should == tm.tmMaxCharWidth */
    pWVT->PTEXTSIZE.y = tm.tmHeight;    /* but seems to be a problem on Win9X so */
                                        /* assume proportional fonts always for Win9X */
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
    pWVT->FixedFont = FALSE;
 #else
    pWVT->FixedFont = !pWVT->Win9X && pWVT->fontWidth >= 0 &&
@@ -555,7 +555,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
             pWVT->PTEXTSIZE.x = tm.tmAveCharWidth;
             pWVT->PTEXTSIZE.y = tm.tmHeight;
 
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
             pWVT->FixedFont = FALSE;
 #else
             pWVT->FixedFont = !pWVT->Win9X && pWVT->fontWidth >= 0 &&

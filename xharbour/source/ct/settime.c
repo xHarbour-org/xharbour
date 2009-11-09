@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.4 2005/05/16 21:45:40 andijahja Exp $
+ * $Id: settime.c,v 1.5 2008/03/16 19:15:59 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -57,10 +57,10 @@
 #include "hbapi.h"
 #include "hbdate.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 #include <windows.h>
 #include <winbase.h>
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #endif
 
 #if defined( HB_OS_LINUX )
@@ -74,7 +74,7 @@
 HB_FUNC ( SETNEWDATE )
 {
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 {
    WORD wNewYear,wNewMonth,wNewDay,wNewDayOfWeek;
    // BOOL lMode;
@@ -123,7 +123,7 @@ HB_FUNC ( SETNEWDATE )
 
 HB_FUNC ( SETNEWTIME )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 {
    WORD wNewHour,wNewMin,wNewSec;
    // BOOL lMode;
@@ -158,9 +158,9 @@ HB_FUNC ( SETNEWTIME )
    tm += lNewTime - ( tm % 86400 );
 
    hb_retl( stime(&tm) == 0);
-}   
+}
 #else
    hb_retl( FALSE );
-#endif   
+#endif
 
 }

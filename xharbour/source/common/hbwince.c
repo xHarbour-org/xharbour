@@ -1,5 +1,5 @@
 /*
- * $Id: hbwince.c,v 1.1 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: hbwince.c,v 1.2 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -58,12 +58,12 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbdate.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 void hb_mbtowccpy( wchar_t *dstW, const char *srcA, ULONG ulLen )
 {
@@ -128,7 +128,7 @@ void hb_wctombget( char *dstA, const wchar_t *srcW, unsigned long ulLen )
    WideCharToMultiByte( CP_ACP, 0, srcW, ulLen, dstA, ulLen, NULL, NULL );
 }
 
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
 
 int remove( const char *filename )
 {
@@ -808,6 +808,6 @@ BOOL WINAPI GetDiskFreeSpaceA( LPCSTR path, PDWORD pdwSectorsPerCluster,
 
 #endif /* 0 */
 
-#endif /* HB_WINCE */
+#endif /* HB_OS_WIN_CE */
 
-#endif /* HB_OS_WIN_32 */
+#endif /* HB_OS_WIN */

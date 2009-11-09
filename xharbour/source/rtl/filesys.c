@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.192 2009/09/12 18:47:44 likewolf Exp $
+ * $Id: filesys.c,v 1.193 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -111,8 +111,8 @@
 #define INCL_DOSDATETIME  /* DATETIME functions  */
 
 /* W32 */
-#ifndef HB_OS_WIN_32_USED
-   #define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+   #define HB_OS_WIN_USED
 #endif
 
 #define HB_THREAD_OPTIMIZE_STACK
@@ -153,7 +153,7 @@
 #if ( defined(__DMC__) || defined(__BORLANDC__) || \
       defined(__IBMCPP__) || defined(_MSC_VER) || \
       defined(__MINGW32__) || defined(__WATCOMC__) ) && \
-      !defined( HB_OS_UNIX ) && !defined( HB_WINCE )
+      !defined( HB_OS_UNIX ) && !defined( HB_OS_WIN_CE )
    #include <sys/stat.h>
    #include <fcntl.h>
    #include <process.h>
@@ -426,7 +426,7 @@ static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
    }
    else if( ulAttr == FC_TEMPORARY )
    {
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
       *dwAttr = FILE_ATTRIBUTE_TEMPORARY;
 #else
       *dwAttr = FILE_ATTRIBUTE_NORMAL;
@@ -434,7 +434,7 @@ static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
    }
    else
    {
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
       if( ulAttr & FC_TEMPORARY )
          *dwAttr = FILE_ATTRIBUTE_TEMPORARY;
       else
@@ -895,7 +895,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )", pFilename, fhStdin, fhStdout, fhStderr));
 
-#if defined(HB_OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO) ) || defined (HB_OS_OS2)
+#if defined(HB_OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN ) && ! defined( HB_WIN32_IO) ) || defined (HB_OS_OS2)
 {
    #ifndef MAXFD
       #define MAXFD       1024
@@ -907,7 +907,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
    int size;
    char *command;
 
-   #ifdef HB_OS_WIN_32
+   #ifdef HB_OS_WIN
       int pid;
       #define pipe(x)   _pipe( x, 2048, _O_BINARY )
    #else
@@ -978,7 +978,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
       }
    }
 
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    {
       int oldstdin, oldstdout, oldstderr;
       int iFlags;
@@ -1109,7 +1109,7 @@ HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
    }
 
    // I am che child
- #ifndef HB_OS_WIN_32
+ #ifndef HB_OS_WIN
    else
    {
       command = ( char * ) hb_xgrab( strlen( pFilename ) + 2 );
@@ -1496,7 +1496,7 @@ int hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait )
       }
    }
 }
-#elif defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO )
+#elif defined( HB_OS_WIN ) && ! defined( HB_WIN32_IO )
 {
    int iPid;
 
@@ -1586,7 +1586,7 @@ BOOL hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 #elif defined( HB_WIN32_IO )
    bRet = (TerminateProcess( DosToWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
    hb_fsSetIOError( bRet, 0 );
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
 {
    HANDLE hProc;
 
@@ -1945,7 +1945,7 @@ BOOL hb_fsSetDevMode( HB_FHANDLE hFileHandle, USHORT uiDevMode )
    return iRet != -1;
 }
 #elif ( defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__) ) && \
-      !defined(HB_WINCE)
+      !defined(HB_OS_WIN_CE)
 {
    int iRet = 0;
 
@@ -1971,7 +1971,7 @@ BOOL hb_fsSetDevMode( HB_FHANDLE hFileHandle, USHORT uiDevMode )
 
    return iRet != -1;
 }
-#elif defined( HB_OS_UNIX ) || defined( HB_WINCE )
+#elif defined( HB_OS_UNIX ) || defined( HB_OS_WIN_CE )
 
    HB_SYMBOL_UNUSED( hFileHandle );
 
@@ -2081,7 +2081,7 @@ BOOL hb_fsGetAttr( const char * pszFileName, ULONG * pulAttr )
    fResult = FALSE;
    pszFileName = hb_fsNameConv( pszFileName, &pszFree );
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    {
       HB_THREAD_STUB
       DWORD dwAttr;
@@ -2168,7 +2168,7 @@ BOOL hb_fsSetFileTime( const char * pszFileName, LONG lJulian, LONG lMillisec )
    hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
    hb_timeStampDecode( lMillisec, &iHour, &iMinute, &iSecond, &iMSec );
 
-#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
    {
       HB_THREAD_STUB
       HB_FHANDLE hFile = hb_fsOpen( pszFileName, FO_READWRITE | FO_SHARED );
@@ -2336,7 +2336,7 @@ BOOL hb_fsSetAttr( const char * pszFileName, ULONG ulAttr )
 
    pszFileName = hb_fsNameConv( pszFileName, &pszFree );
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    {
       HB_THREAD_STUB
       DWORD dwFlags = FILE_ATTRIBUTE_ARCHIVE;
@@ -2442,7 +2442,7 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, void * pBuff, USHORT uiCount )
 #if defined( HB_FS_FILE_IO )
 
    hb_vmUnlock();
- 
+
    #if defined( HB_WIN32_IO )
       {
          DWORD dwRead;
@@ -2891,7 +2891,7 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
 
    hb_vmUnlock();
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       // allowing async cancelation here
       #if defined(HB_WIN32_IO)
@@ -3486,7 +3486,7 @@ BOOL hb_fsDelete( const char * pFilename )
    hb_vmUnlock();
 
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    bResult = DeleteFileA( pFilename );
    hb_fsSetIOError( bResult, 0 );
@@ -3530,7 +3530,7 @@ BOOL hb_fsRename( const char * pOldName, const char * pNewName )
    hb_vmUnlock();
 
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    bResult = MoveFileA( pOldName, pNewName );
    hb_fsSetIOError( bResult, 0 );
@@ -3572,7 +3572,7 @@ BOOL hb_fsMkDir( const char * pDirname )
 
    hb_vmUnlock();
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    bResult = CreateDirectoryA( pDirname, NULL );
    hb_fsSetIOError( bResult, 0 );
@@ -3614,7 +3614,7 @@ BOOL hb_fsChDir( const char * pDirname )
 
    hb_vmUnlock();
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    bResult = SetCurrentDirectoryA( pDirname );
    hb_fsSetIOError( bResult, 0 );
@@ -3650,7 +3650,7 @@ BOOL hb_fsRmDir( const char * pDirname )
 
    hb_vmUnlock();
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    bResult = RemoveDirectoryA( pDirname );
    hb_fsSetIOError( bResult, 0 );
@@ -3717,7 +3717,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 
    hb_vmUnlock();
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    fResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( fResult, 0 );
@@ -3844,7 +3844,7 @@ USHORT hb_fsChDrv( BYTE nDrive )
 
 BYTE hb_fsCurDrv( void )
 {
-#if defined(HB_OS_UNIX_COMPATIBLE) ||( defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN_32) && !defined(HB_WINCE)))
+#if defined(HB_OS_UNIX_COMPATIBLE) ||( defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN) && !defined(HB_OS_WIN_CE)))
    HB_THREAD_STUB
 #endif
    /* 'unsigned int' _have to_ be used in Watcom */
@@ -3877,7 +3877,7 @@ BYTE hb_fsCurDrv( void )
 
 USHORT hb_fsIsDrv( BYTE nDrive )
 {
-#if defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN_32) && !defined(HB_WINCE))
+#if defined(HB_OS_HAS_DRIVE_LETTER) ||(defined(HB_OS_WIN) && !defined(HB_OS_WIN_CE))
    HB_THREAD_STUB
 #endif
 
@@ -3885,7 +3885,7 @@ USHORT hb_fsIsDrv( BYTE nDrive )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDrv(%d)", (int) nDrive));
 
-#if defined(HB_OS_WIN_32) && !defined(HB_WINCE)
+#if defined(HB_OS_WIN) && !defined(HB_OS_WIN_CE)
    {
       char buffer[ 4 ];
       UINT type;
@@ -3943,7 +3943,7 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDevice(%p)", ( void * ) ( HB_PTRDIFF ) hFileHandle));
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    hb_vmUnlock();
    bResult = GetFileType( DosToWinHandle( hFileHandle ) ) == FILE_TYPE_CHAR;
@@ -4171,7 +4171,7 @@ BOOL hb_fsEof( HB_FHANDLE hFileHandle )
    hb_vmUnlock();
 
 #if defined( __DJGPP__ ) || defined(__CYGWIN__ ) || \
-    defined( HB_WIN32_IO ) || defined( HB_WINCE ) || \
+    defined( HB_WIN32_IO ) || defined( HB_OS_WIN_CE ) || \
     defined( HB_OS_UNIX_COMPATIBLE )
 
    HB_THREAD_STUB
@@ -4219,7 +4219,7 @@ char * hb_fsCurDirEx( USHORT uiDrive )
 
 USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    HB_THREAD_STUB
 #endif
 
@@ -4229,7 +4229,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 
    pbyBuffer[ 0 ] = '\0';
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 {
    DWORD dwResult;
 

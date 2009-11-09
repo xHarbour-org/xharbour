@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.10 2008/04/22 09:16:05 andijahja Exp $
+ * $Id: maindll.c,v 1.11 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -55,12 +55,12 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbvm.h"
 #include "hbapiitm.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {

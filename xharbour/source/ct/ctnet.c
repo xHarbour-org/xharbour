@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.12 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: ctnet.c,v 1.13 2009/09/12 18:47:44 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -89,12 +89,12 @@
 #include "hbset.h"
 #include "hbapierr.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 #   include <windows.h>
 #   include <winnetwk.h>
 
-#   define HB_OS_WIN_32_USED
+#   define HB_OS_WIN_USED
 
 BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
 {
@@ -103,9 +103,9 @@ BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
    if( dwErrorCode != ERROR_EXTENDED_ERROR )
    {
       pError = hb_errRT_New( ES_ERROR,
-                             HB_ERR_SS_TOOLS, 
-                             9999, 
-                             9999, 
+                             HB_ERR_SS_TOOLS,
+                             9999,
+                             9999,
                              "Windows Network operation failed",
                              lpszFunction, ( USHORT ) dwErrorCode, EF_NONE );
       hb_errLaunch( pError );
@@ -168,7 +168,7 @@ HB_FUNC( NETCANCEL )
    dwResult = WNetCancelConnection( lpDevice, TRUE ); /* FALSE = fail if exist open files or print jobs. */
 
    HB_TCHAR_FREE( lpDevice );
-   /* TRUE = force cancel connection even if exist                                                                                                          
+   /* TRUE = force cancel connection even if exist
     *        open files or print jobs.
     */
    hb_retl( dwResult == NO_ERROR );

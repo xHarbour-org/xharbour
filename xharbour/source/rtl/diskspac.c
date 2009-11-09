@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.9 2005/01/10 18:45:33 druzus Exp $
+ * $Id: diskspac.c,v 1.10 2005/03/31 03:58:51 druzus Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #define INCL_BASE
 #define INCL_DOSERRORS
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapierr.h"
@@ -100,7 +100,7 @@ HB_FUNC( DISKSPACE )
          bError = TRUE;
    }
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    {
       typedef BOOL ( WINAPI * P_GDFSE )( LPCTSTR, PULARGE_INTEGER,

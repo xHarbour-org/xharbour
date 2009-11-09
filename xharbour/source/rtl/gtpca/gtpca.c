@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.30 2009/02/20 17:45:51 marchuet Exp $
+ * $Id: gtpca.c,v 1.31 2009/03/02 09:20:16 marchuet Exp $
  */
 
 /*
@@ -84,7 +84,7 @@
 #  if defined( HB_WIN32_IO )
 #     include <windows.h>
 #  endif
-#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_WINCE )
+#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_OS_WIN_CE )
 #     include <conio.h>
 #  endif
 #endif
@@ -601,7 +601,7 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
             ch = s_keyTransTbl[ bChar ];
       }
    }
-#elif defined( _MSC_VER ) && !defined( HB_WINCE )
+#elif defined( _MSC_VER ) && !defined( HB_OS_WIN_CE )
    if( s_bStdinConsole )
    {
       if( _kbhit() )

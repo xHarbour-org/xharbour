@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.25 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: bkgtsks.c,v 1.26 2009/09/16 04:34:16 andijahja Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
 #ifndef _HB_API_INTERNAL_

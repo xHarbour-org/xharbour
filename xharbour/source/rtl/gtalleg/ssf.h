@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.14 2008/03/18 15:51:40 likewolf Exp $
+ * $Id: ssf.h,v 1.15 2009/03/11 10:40:29 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
    #define ALLEGRO_NO_ASM
    #define ALLEGRO_BCC32
 #elif defined(_MSC_VER)
-   #if defined(_WIN64)
+   #if defined(HB_OS_WIN_64)
       #define ALLEGRO_NO_ASM
    #endif
    #define ALLEGRO_MSVC

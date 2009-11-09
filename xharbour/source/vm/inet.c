@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.77 2008/07/01 16:08:53 marchuet Exp $
+* $Id: inet.c,v 1.78 2008/12/22 22:09:45 likewolf Exp $
 */
 
 /*
@@ -73,7 +73,7 @@
    #include <sys/ioctl.h>
 #endif
 
-#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN_32 )
+#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN )
    /* NET_SIZE_T exists because of shortsightedness on the POSIX committee.  BSD
     * systems used "int *" as the parameter to accept(), getsockname(),
     * getpeername() et al.  Consequently many unixes took an int * for that
@@ -215,7 +215,7 @@ static struct hostent * hb_getHosts( char * name, HB_SOCKET_STRUCT *Socket )
    struct hostent *Host = NULL;
 
    /* let's see if name is an IP address; not necessary on linux */
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    ULONG ulAddr;
 
    ulAddr = inet_addr( name );
@@ -239,7 +239,7 @@ static struct hostent * hb_getHosts( char * name, HB_SOCKET_STRUCT *Socket )
 
    if( Host == NULL && Socket != NULL )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       HB_SOCKET_SET_ERROR2( Socket, WSAGetLastError() , "Generic error in GetHostByName()" );
       WSASetLastError( 0 );
 #elif defined(HB_OS_OS2) || defined(HB_OS_HPUX) || defined(__WATCOMC__)
@@ -256,7 +256,7 @@ static struct hostent * hb_getHosts( char * name, HB_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetNonBlocking( HB_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 1;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 
@@ -275,7 +275,7 @@ static void hb_socketSetNonBlocking( HB_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetBlocking( HB_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 0;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 #else
@@ -293,7 +293,7 @@ static void hb_socketSetBlocking( HB_SOCKET_STRUCT *Socket )
 static int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
 {
    int iErr1;
-   #if ! defined(HB_OS_WIN_32)
+   #if ! defined(HB_OS_WIN)
       int iErrval;
       socklen_t iErrvalLen;
    #endif
@@ -307,7 +307,7 @@ static int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
    iErr1 = connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) );
    if( iErr1 != 0 )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       if( WSAGetLastError() != WSAEWOULDBLOCK )
 #else
       if( errno != EINPROGRESS )
@@ -319,7 +319,7 @@ static int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
       {
          /* Now we wait for socket connection or timeout */
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
          iErr1 = hb_selectWriteExceptSocket( Socket );
          if( iErr1 == 2 )
          {
@@ -358,7 +358,7 @@ static int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
             HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
          }
 
-         /* 
+         /*
          * Read real buffer sizes from socket
          */
          {
@@ -406,7 +406,7 @@ static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 
    if( Socket->com > 0 )
    {
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -436,7 +436,7 @@ HB_FUNC( INETINIT )
    }
    else
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
       #elif defined( HB_OS_LINUX )
@@ -450,7 +450,7 @@ HB_FUNC( INETCLEANUP )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSACleanup();
       #endif
    }
@@ -484,7 +484,7 @@ HB_FUNC( INETCLOSE )
    }
    else if( Socket->com )
    {
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -1637,7 +1637,7 @@ HB_FUNC( INETSERVER )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    Socket->com = socket( AF_INET, SOCK_STREAM, 0 );
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0 );
@@ -1707,7 +1707,7 @@ HB_FUNC( INETACCEPT )
    struct sockaddr_in si_remote;
 #if defined(_XOPEN_SOURCE_EXTENDED)
    socklen_t Len;
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    int Len;
 #else
    UINT Len;
@@ -1746,7 +1746,7 @@ HB_FUNC( INETACCEPT )
 
          if(incoming == ( HB_SOCKET_T ) -1 )
          {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
             iError = WSAGetLastError();
 #else
             iError = errno;
@@ -1830,7 +1830,7 @@ HB_FUNC( INETCONNECT )
    if( Host != NULL )
    {
       /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -1888,7 +1888,7 @@ HB_FUNC( INETCONNECTIP )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -1942,7 +1942,7 @@ HB_FUNC( INETDGRAMBIND )
    HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2036,7 +2036,7 @@ HB_FUNC( INETDGRAM )
    HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2132,7 +2132,7 @@ HB_FUNC( INETDGRAMRECV )
    int iLen, iMaxLen;
    char *Buffer;
    BOOL fRepeat;
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    int iDtLen = sizeof( struct sockaddr );
 #else
    socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );

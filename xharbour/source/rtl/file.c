@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.27 2009/10/09 14:02:43 marchuet Exp $
+ * $Id: file.c,v 1.28 2009/10/09 14:11:25 marchuet Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ BOOL hb_fsIsDirectory( const char * pszFilename )
 
    if( iLen && iLen <= ( HB_PATH_MAX - 1 ) )
    {
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
       {
          DWORD dAttr = GetFileAttributes( ( LPCTSTR ) pszFilename );
          bResult = ( dAttr == INVALID_FILE_ATTRIBUTES ? FALSE : ( dAttr & FILE_ATTRIBUTE_DIRECTORY ) );

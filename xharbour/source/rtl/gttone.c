@@ -1,5 +1,5 @@
 /*
- * $Id: gttone.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: gttone.c,v 1.2 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -9,7 +9,7 @@
  * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
- * the body of TONE function from W32 taken from GTWIN created by
+ * the body of TONE function from Windows taken from GTWIN created by
  * the following authors:
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  * Copyright 1999-2006 Paul Tucker <ptucker@sympatico.ca>
@@ -61,10 +61,10 @@
 /* NOTE: User programs should never call this layer directly! */
 
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include "hbgtcore.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
 #if defined( HB_ARCH_32BIT ) && !defined( _M_ARM ) && \
     ( defined(__BORLANDC__) || defined(_MSC_VER) || \
@@ -80,7 +80,7 @@ static int hb_Inp9x( USHORT usPort )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort));
 
-   #if defined( __BORLANDC__ ) || defined(__DMC__)
+   #if defined( __BORLANDC__ ) || defined( __DMC__ )
 
       _DX = usPort;
       __emit__(0xEC);         /* ASM  IN AL, DX */
@@ -118,7 +118,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
 
-   #if defined( __BORLANDC__ ) || defined(__DMC__)
+   #if defined( __BORLANDC__ ) || defined( __DMC__ )
 
       _DX = usPort;
       _AL = usVal;
@@ -167,7 +167,7 @@ static void hb_gt_w9xTone( double dFreq, double dDurat )
    if( dFreq >= 20.0 )
    {
       /* Setup Sound Control Port Registers and timer channel 2 */
-      hb_Outp9x(67, 182) ;
+      hb_Outp9x( 67, 182 ) ;
 
       lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
 
@@ -201,12 +201,10 @@ static void hb_gt_w9xTone( double dFreq, double dDurat )
       /* (11111100B is bitmask to disable sound) */
       /* Turn off the Speaker ! */
 
-      hb_Outp9x(97, hb_Inp9x( 97 ) & 0xFC);
+      hb_Outp9x( 97, hb_Inp9x( 97 ) & 0xFC );
    }
    else
-   {
       hb_idleSleep( dDurat );
-   }
 }
 #endif
 
@@ -255,8 +253,8 @@ void hb_gt_w32_tone( double dFrequency, double dDuration )
    else  /* If Windows 95 or 98, use w9xTone for chosen C compilers */
    {
       #if defined( HB_ARCH_32BIT ) && !defined( _M_ARM ) && \
-           ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-             defined( __WATCOMC__ )  || defined(__MINGW32__) )
+          ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+            defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
          hb_gt_w9xTone( dFrequency, dDuration );
       #else
          hb_gt_wNtTone( dFrequency, dDuration );
@@ -264,4 +262,4 @@ void hb_gt_w32_tone( double dFrequency, double dDuration )
    }
 }
 
-#endif /* HB_OS_WIN_32 */
+#endif /* HB_OS_WIN */

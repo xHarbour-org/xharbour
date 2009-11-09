@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.101 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: adsfunc.c,v 1.102 2009/10/28 22:52:34 what32 Exp $
  */
 
 /*
@@ -50,8 +50,8 @@
  *
  */
 
-#ifndef HB_OS_WIN_32_USED
-#define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+#define HB_OS_WIN_USED
 #endif
 
 #include "hbvm.h"

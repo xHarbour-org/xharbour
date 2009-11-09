@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.14 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: disksphb.c,v 1.15 2009/10/22 22:58:31 lculik Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 #define INCL_BASE
 #define INCL_DOSERRORS
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include <ctype.h>
 
@@ -147,7 +147,7 @@ HB_FUNC( HB_DISKSPACE )
          break;
       }
    }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    {
 #if defined(_MSC_VER) || defined(__LCC__) || \
     ( defined(__GNUC__) && !defined(__RSXNT__) )
@@ -174,7 +174,7 @@ HB_FUNC( HB_DISKSPACE )
          UINT uiErrMode = SetErrorMode( SEM_FAILCRITICALERRORS );
          BOOL fResult;
 
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
          LPTSTR lpPath = HB_TCHAR_CONVTO( szPath );
 
          fResult = GetDiskFreeSpaceEx( lpPath,

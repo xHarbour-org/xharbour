@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.9 2006/10/13 16:41:24 ptsarenko Exp $
+ * $Id: hbzip2.h,v 1.10 2007/06/05 18:21:31 enricomaria Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 #ifndef HB_APIZLIB_H_
 #define HB_APIZLIB_H_
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include <hbapiitm.h>
 #include <hbapifs.h>
 /* #include <hbapigt.h> */

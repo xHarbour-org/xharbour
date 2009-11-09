@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.18 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: disk.c,v 1.19 2009/11/04 13:41:43 lculik Exp $
  */
 /*
  * xHarbour Project source code:
@@ -70,13 +70,13 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 #   include <windows.h>
 #   include <winbase.h>
 #   include <shellapi.h>
 
-#   define HB_OS_WIN_32_USED
+#   define HB_OS_WIN_USED
 
 #elif defined(HB_OS_DOS)
 
@@ -138,7 +138,7 @@ HB_FUNC( DIRNAME )
 
 HB_FUNC( DRIVETYPE )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    ULONG ulSize = hb_parclen( 1 ) + 2;  /* allow space for '\0' & ":\" */
    char *pszDrive = ( char * ) hb_xgrab( ulSize + 1 );
    LPTSTR lpDrive;
@@ -208,7 +208,7 @@ HB_FUNC( NUMDISKL )
    /* should be easily implementable somehow similar to DJGPP */
    hb_retni( 26 );
 #endif
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
    /* LASTDRIVE does not affect Win32 apps, they always have 26 letters avail */
    hb_retni( 26 );
 #else
@@ -220,17 +220,17 @@ HB_FUNC( NUMDISKL )
 
 /*
  * Volume() depends of the CSETSAFETY() setting and, if is true, does not
- * overwrite an existing label. 
+ * overwrite an existing label.
  *
  * Syntax is: Volume("X:test") or Volume("X:\test"), where "x" is the
- * any drive letter and "test" will be the new volume name. 
+ * any drive letter and "test" will be the new volume name.
  *
  * Notes:
- * 1) if the drive letter is not suplied, then the current drive will 
+ * 1) if the drive letter is not suplied, then the current drive will
  *    be used to change voloume name.
  * 2) if Volume("X:") or Volume("X:\") then the volume name of the drive
  *    "X:" will be erased.
- * 3) if Volume("") or Volume() then the volume name of the current drive 
+ * 3) if Volume("") or Volume() then the volume name of the current drive
  *   will be erased.
  */
 
@@ -276,7 +276,7 @@ HB_FUNC( VOLUME )
          if( pszFree )
             hb_xfree( pszFree );
       }
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       {
          LPTSTR lpRoot, lpVolName;
          lpRoot = sRoot ? HB_TCHAR_CONVTO( sRoot ) : NULL;
@@ -300,7 +300,7 @@ HB_FUNC( VOLUME )
  */
 HB_FUNC( GETVOLINFO )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    int iretval;
    const char *sDrive = hb_parcx( 1 );
    TCHAR lpVolName[256];
@@ -337,7 +337,7 @@ HB_FUNC( GETVOLINFO )
 
 HB_FUNC( VOLSERIAL )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    int retval;
    const char *sDrive = hb_parcx( 1 );
    LPTSTR lpDrive;
@@ -368,7 +368,7 @@ HB_FUNC( TRUENAME )
 
    if( szFile )
    {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
       char *szBuffRet;
       TCHAR buffer[MAX_PATH + 1] = { 0 };
       LPTSTR lpFile;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.7 2009/08/19 22:40:47 likewolf Exp $
+ * $Id: hbmzip.c,v 1.8 2009/09/30 16:19:24 marchuet Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "zip.h"
 #include "unzip.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #include "windows.h"
 #elif defined( HB_OS_UNIX )
    #include <sys/types.h>
@@ -206,15 +206,15 @@ HB_FUNC( HB_ZIPFILECREATE )
          zfi.tmz_date.tm_hour = iY;
          zfi.tmz_date.tm_min = iM;
          zfi.tmz_date.tm_sec = iD;
-         
+
          /* Missed Internal and External File Attributes */
          /* Begin: 2008-01-19 andresreyesh */
-         
+
          zfi.internal_fa = hb_parnl( 5 );
          zfi.external_fa = hb_parnl( 6 );
 
          /* End: 2008-01-19 andresreyesh */
-         
+
          hb_retni( zipOpenNewFileInZip3( hZip, szZipName, &zfi,
                                          NULL, 0, NULL, 0,
                                          hb_parc( 11 ), iMethod, iLevel, 0,
@@ -657,7 +657,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
    memset( &zfi, 0, sizeof( zfi ) );
    fError = FALSE;
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    {
       ulExtAttr = GetFileAttributesA( szFileName );
 
@@ -812,7 +812,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
 
       if( hFile != FS_ERROR )
       {
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
          {
             FILETIME    ftutc, ft;
             SYSTEMTIME  st;
@@ -945,7 +945,7 @@ static int hb_unzipExtractCurrentFile( unzFile hUnzip, const char* szFileName, c
          }
          hb_xfree( pString );
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
          {
             FILETIME    ftutc, ft;
             SYSTEMTIME  st;
@@ -976,7 +976,7 @@ static int hb_unzipExtractCurrentFile( unzFile hUnzip, const char* szFileName, c
    unzCloseCurrentFile( hUnzip );
 
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    {
       SetFileAttributesA( szName, ufi.external_fa & 0xFF );
    }

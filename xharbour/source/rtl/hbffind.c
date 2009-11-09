@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: hbffind.c,v 1.42 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -58,14 +58,14 @@
 
 #define INCL_DOSFILEMGR
 #define INCL_DOSERRORS
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.42 2009/04/16 14:57:35 likewolf Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -146,7 +146,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $" )
       ULONG           findCount;
    } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    typedef struct
    {
@@ -200,7 +200,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.41 2009/03/02 09:20:04 marchuet Exp $" )
 #endif
 
 /* Internal funtion , Convert Windows Error Values to Dos Error Values */
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 
 FILETIME GetOldesFile( const char * szPath)
 {
@@ -257,7 +257,7 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
    if( raw_attr & FILE_READONLY )  ulAttr |= HB_FA_READONLY;
    if( raw_attr & FILE_SYSTEM )    ulAttr |= HB_FA_SYSTEM;
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    if( raw_attr & FILE_ATTRIBUTE_ARCHIVE )   ulAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FILE_ATTRIBUTE_DIRECTORY ) ulAttr |= HB_FA_DIRECTORY;
@@ -325,7 +325,7 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
    if( ulAttr & HB_FA_READONLY )  raw_attr |= FILE_READONLY;
    if( ulAttr & HB_FA_SYSTEM )    raw_attr |= FILE_SYSTEM;
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    if( ulAttr & HB_FA_ARCHIVE )   raw_attr |= FILE_ATTRIBUTE_ARCHIVE;
    if( ulAttr & HB_FA_DIRECTORY ) raw_attr |= FILE_ATTRIBUTE_DIRECTORY;
@@ -528,7 +528,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       lSec   = info->entry.ftimeLastWrite.twosecs;
    }
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    {
       FILETIME ft;
       SYSTEMTIME time;
@@ -697,7 +697,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       hb_fsSetIOError( bFound, 0 );
 
    }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
   {
     PHB_FFIND_INFO info;
     ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
@@ -893,7 +893,7 @@ BOOL hb_fsFindNext( PHB_FFIND ffind )
                             info->findCount > 0;
       hb_fsSetIOError( bFound, 0 );
    }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    {
       bFound = FALSE;
       if( FindNextFile( info->hFindFile, &info->pFindFileData ) )
@@ -974,7 +974,7 @@ void hb_fsFindClose( PHB_FFIND ffind )
          {
             DosFindClose( info->hFindFile );
          }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
          {
             if( info->hFindFile != INVALID_HANDLE_VALUE )
             {

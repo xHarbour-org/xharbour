@@ -3,7 +3,7 @@
 // Graphic Pen functions
 
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #define _WIN32_WINNT   0x0400
 
 //#include <shlobj.h>
@@ -20,9 +20,9 @@
 HB_FUNC( CREATEPEN )
 {
    hb_retnl( (LONG) CreatePen(
-               hb_parni( 1 ),	// pen style 
-               hb_parni( 2 ),	// pen width  
-               (COLORREF) hb_parnl( 3 ) 	// pen color 
+               hb_parni( 1 ),	// pen style
+               hb_parni( 2 ),	// pen width
+               (COLORREF) hb_parnl( 3 ) 	// pen color
              ) );
 }
 
@@ -87,7 +87,7 @@ HB_FUNC( EXTCREATEPEN )
                                   (DWORD) hb_parnl( 2 ),
                                   &LOGBRUSH            ,
                                   (DWORD) hb_parnl( 4 ),
-                                  &&dWord4             
+                                  &&dWord4
                                   ) ) ;
 }
 

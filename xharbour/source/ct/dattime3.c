@@ -1,7 +1,7 @@
 /*
- * $Id: dattime3.c,v 1.2 2009/06/06 15:15:45 modalsist Exp $
+ * $Id: dattime3.c,v 1.3 2009/06/07 11:20:23 enricomaria Exp $
  */
- 
+
 /*
  * Harbour Project source code:
  *   CT3 Date & Time functions:
@@ -51,11 +51,11 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbdate.h"
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 #   include <windows.h>
 #   include <winbase.h>
 #elif defined( HB_OS_LINUX )
@@ -298,7 +298,7 @@ HB_FUNC( SETTIME )
    iTime[0] = iTime[1] = iTime[2] = iTime[3] = 0;
    if( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), iTime ) )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       SYSTEMTIME st;
       GetLocalTime( &st );
       st.wHour         = iTime[0];
@@ -384,7 +384,7 @@ HB_FUNC( SETDATE )
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       if( iYear >= 1970 )
       {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
          SYSTEMTIME st;
          GetLocalTime( &st );
          st.wYear      = iYear;

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.101 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: errorapi.c,v 1.102 2009/10/05 14:41:55 marchuet Exp $
  */
 
 /*
@@ -93,8 +93,8 @@
 #include "hbset.h"
 #include "hbvm.h"
 
-#ifdef HB_OS_WIN_32
-   #define HB_OS_WIN_32_USED
+#ifdef HB_OS_WIN
+   #define HB_OS_WIN_USED
    #include "windows.h"
 #endif
 
@@ -1935,7 +1935,7 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_stackDispCall();
 
-   #ifdef HB_OS_WIN_32
+   #ifdef HB_OS_WIN
       MessageBox( NULL, buffer, title, MB_ICONSTOP );
    #endif
 

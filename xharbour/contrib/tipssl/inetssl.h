@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.27 2009/01/24 00:33:08 likewolf Exp $
+* $Id: inetssl.h,v 1.1 2009/08/09 17:28:07 lculik Exp $
 */
 
 /*
@@ -70,7 +70,7 @@
    #if defined( HB_OS_DOS )
        #define HB_NO_DEFAULT_INET
    #else
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define _WINSOCK2_H
          #define HB_SOCKET_T SOCKET
@@ -124,10 +124,10 @@
       } HB_SSL_SOCKET_STRUCT;
 
       #define HB_SSLPARSOCKET( n )     ( ( HB_SSL_SOCKET_STRUCT * ) hb_parptrGC( hb_inetSocketFinalize, n ) )
-                  
+
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
               s->errorDesc = strerror( s->errorCode );\

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.31 2009/01/28 15:42:06 marchuet Exp $
+ * $Id: maindllp.c,v 1.32 2009/02/02 11:25:10 marchuet Exp $
  */
 
 /*
@@ -56,12 +56,12 @@
  */
 
 #define __NO_EXPORT__
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include "hbtypes.h"
 
 HB_EXTERN_BEGIN
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
 static HMODULE hModule = NULL;
 static FARPROC pExtIsArray = NULL;

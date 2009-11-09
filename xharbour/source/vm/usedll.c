@@ -1,5 +1,5 @@
 /*
- * $Id: maindllu.c,v 1.1 2008/10/09 22:53:44 ronpinkas Exp $
+ * $Id: usedll.c,v 1.1 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -55,11 +55,11 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbtypes.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
 
 HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */

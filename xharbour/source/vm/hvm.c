@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.732 2009/10/06 00:59:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.733 2009/10/11 19:05:58 guerra000 Exp $
  */
 
 /*
@@ -127,7 +127,7 @@
    HB_VM_REQUESTS
 #endif
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
 
@@ -413,7 +413,7 @@ void hb_vmUnlock( void )
 {
    HB_THREAD_STUB
    HB_STACK_UNLOCK
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    HB_TEST_CANCEL_ENABLE_ASYN
 #endif
 }
@@ -422,7 +422,7 @@ void hb_vmUnlock( void )
 void hb_vmLock( void )
 {
    HB_THREAD_STUB
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    HB_DISABLE_ASYN_CANC
 #endif
    HB_STACK_LOCK
@@ -741,7 +741,7 @@ void hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("InitClip") );
    hb_vmDoInitFunc( "CLIPINIT" ); // Initialize ErrorBlock() and __SetHelpK()
 
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       if( hb_dynsymFind( "TOLEAUTO" ) )
       {
          if( OleInitialize( NULL ) == S_OK ) // Do NOT use SUCCEEDED() due to S_FALSE!
@@ -935,7 +935,7 @@ int hb_vmQuit( void )
    {
       hb_vm_bQuitRequest = TRUE;
 
-      #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+      #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
          HB_DISABLE_ASYN_CANC
          HB_STACK_LOCK
          hb_threadCancelInternal(); // never returns
@@ -1175,7 +1175,7 @@ int hb_vmQuit( void )
          {
             hb_snprintf( sBuffer, sizeof( sBuffer ), "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
 
-            #if defined(HB_OS_WIN_32)
+            #if defined(HB_OS_WIN)
                OutputDebugString( sBuffer );
             #else
                printf( sBuffer );
@@ -1293,7 +1293,7 @@ int hb_vmQuit( void )
       TraceLog( NULL, "After Sequence\n" );
    #endif
 
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       if( s_bUnInitOle )
       {
          OleUninitialize();
@@ -11671,7 +11671,7 @@ HB_FUNC( HB_VMMODE )
 
 #undef HB_FORCE_LINK_MAIN
 
-#if defined(HB_OS_WIN_32) && !defined(__EXPORT__) && \
+#if defined(HB_OS_WIN) && !defined(__EXPORT__) && \
     ( defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW32__) )
 
 #  define HB_FORCE_LINK_MAIN  hb_forceLinkMainWin

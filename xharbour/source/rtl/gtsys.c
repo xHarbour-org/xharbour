@@ -1,5 +1,5 @@
 /*
- * $Id: gtsys.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id: gtsys.c,v 1.2 2008/03/20 00:01:05 ronpinkas Exp $
  */
 
 /*
@@ -59,21 +59,22 @@
 
 #include "hbgtcore.h"
 
-#if defined(HB_GT_DEFAULT)
+#if defined( HB_GT_DEFAULT )
    HB_GT_REQUEST( HB_GT_DEFAULT )
-#elif defined(HB_GT_LIB)
+#elif defined( HB_GT_LIB )
    HB_GT_REQUEST( HB_GT_LIB )
-#elif defined(HB_OS_LINUX)
+#elif defined( HB_OS_LINUX )
    HB_GT_REQUEST( CRS )
-#elif defined(HB_OS_WIN_32)
-   /*
-    Moved to mainwin, and mainstd so that we request GUI or WIN based on app type
-    HB_GT_REQUEST( WIN )
-   */
-#elif defined(HB_OS_DOS)
+#elif defined( HB_OS_WIN_CE )
+   HB_GT_REQUEST( WVT )
+#elif defined( HB_OS_WIN )
+   /*HB_GT_REQUEST( WIN )*/
+#elif defined( HB_OS_DOS )
    HB_GT_REQUEST( DOS )
-#elif defined(HB_OS_OS2)
+#elif defined( HB_OS_OS2 )
    HB_GT_REQUEST( OS2 )
+#elif defined( HB_OS_UNIX )
+   HB_GT_REQUEST( TRM )
 #else
    HB_GT_REQUEST( STD )
 #endif

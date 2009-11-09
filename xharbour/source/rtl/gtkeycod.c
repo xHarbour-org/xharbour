@@ -1,5 +1,5 @@
 /*
- * $Id: gtkeycod.c 8193 2007-12-22 10:28:28Z druzus $
+ * $Id: gtkeycod.c,v 1.1 2008/03/18 11:05:37 likewolf Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 #include "hbgtcore.h"
 
-#if defined( HB_OS_DOS ) || defined( HB_OS_WIN_32 ) || defined( HB_OS_OS2 )
+#if defined( HB_OS_DOS ) || defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
 
 int hb_gt_dos_keyCodeTranslate( int iKey )
 {
@@ -175,4 +175,4 @@ int hb_gt_dos_keyCodeTranslate( int iKey )
    return iKey;
 }
 
-#endif /* HB_OS_DOS || HB_OS_WIN_32 || HB_OS_OS2 */
+#endif /* HB_OS_DOS || HB_OS_WIN || HB_OS_OS2 */

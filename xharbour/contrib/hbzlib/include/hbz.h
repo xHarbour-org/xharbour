@@ -1,6 +1,6 @@
 #ifndef HB_APIZLIB_H_
 #define HB_APIZLIB_H_
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include <hbsetup.h>
 #include <hbapiitm.h>
 #include <hbapifs.h>
@@ -61,7 +61,7 @@ class SpanActionCallback : public CZipActionCallback
       hb_vmEvalBlockV( pProgressInfo, 2,pDisk,pTotal);
       hb_itemRelease(pDisk);
       hb_itemRelease(pTotal);
-      return iReturn;    
+      return iReturn;
  }
 };
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.149 2009/09/13 01:41:23 likewolf Exp $
+ * $Id: ads1.c,v 1.150 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #define HB_SET_IMPORT
 #define SUPERTABLE ( &adsSuper )

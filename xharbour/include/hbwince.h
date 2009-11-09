@@ -1,5 +1,5 @@
 /*
- * $Id: hbwince.h,v 1.1 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbwince.h,v 1.2 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -50,14 +50,14 @@
  *
  */
 
-#ifndef HB_WINCE_H_
-#define HB_WINCE_H_
+#ifndef HB_OS_WIN_CE_H_
+#define HB_OS_WIN_CE_H_
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 HB_EXTERN_BEGIN
 
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
 #  undef  HB_OS_HAS_DRIVE_LETTER
 
 /* defined(__CEGCC__) || defined(__MINGW32CE__) */
@@ -71,7 +71,7 @@ extern int remove( const char *filename );
 extern int system( const char *string );
 extern char *strerror( int errnum );
 
-#if defined( HB_OS_WIN_32_USED ) && defined( _MSC_VER )
+#if defined( HB_OS_WIN_USED ) && defined( _MSC_VER )
 
    #ifndef MAX_COMPUTERNAME_LENGTH
       #define MAX_COMPUTERNAME_LENGTH           31
@@ -176,9 +176,9 @@ extern char *strerror( int errnum );
       #define GlobalFlags(lp)             LocalFlags(lp)
    #endif
    #endif
-#endif /* HB_OS_WIN_32_USED && _MSC_VER */
+#endif /* HB_OS_WIN_USED && _MSC_VER */
 
-#endif /* HB_WINCE */
+#endif /* HB_OS_WIN_CE */
 
 extern wchar_t * hb_mbtowc( const char *srcA );
 extern char * hb_wctomb( const wchar_t *srcW );
@@ -216,6 +216,6 @@ extern void hb_wctombget( char *dstA, const wchar_t *srcW, unsigned long ulLen )
 
 HB_EXTERN_END
 
-#endif /* HB_OS_WIN_32 */
+#endif /* HB_OS_WIN */
 
-#endif /* HB_WINCE_H_ */
+#endif /* HB_OS_WIN_CE_H_ */

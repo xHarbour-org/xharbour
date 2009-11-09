@@ -1,4 +1,4 @@
-/*  $Id: hbipapi.h,v 1.1 2009/07/22 17:09:14 marchuet Exp $  */
+/*  $Id: hbipapi.h,v 1.2 2009/07/29 17:15:54 marchuet Exp $  */
 
 /*
  * Harbour Project source code:
@@ -48,7 +48,7 @@
  *
  */
 
-#if defined( HB_OS_WIN_32 ) && !defined( WIN32 )
+#if defined( HB_OS_WIN ) && !defined( WIN32 )
    #define WIN32
 #endif
 #if !defined( unix ) && ( defined( __LINUX__ ) || defined( HB_OS_LINUX ) )
@@ -60,7 +60,7 @@
 #endif
 
 #define HB_SENDRECV_BUFFER_SIZE         32767
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #define HB_SOCKET_T SOCKET
    #include <winsock2.h>
 #else

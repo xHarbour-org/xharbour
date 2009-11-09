@@ -3,13 +3,13 @@
 // Brush functions
 
 /*
-   
+
    GetBrushOrgEx(hDC) -> aPt, or NIL on failure
    SetBrushOrgEx(hDC,x,y,) -> aOldPt, or NIL on failure
 
 */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #define _WIN32_WINNT   0x0400
 
 #include <windows.h>
@@ -39,7 +39,7 @@ HB_FUNC( CREATEPATTERNBRUSH )
 HB_FUNC( CREATEDIBPATTERNBRUSH )
 {
    hb_retnl( (LONG) CreateDIBPatternBrush( (HGLOBAL) hb_parnl( 1 ),
-                                           (UINT) hb_parni( 2 )   
+                                           (UINT) hb_parni( 2 )
                                            ) ) ;
 }
 
@@ -63,7 +63,7 @@ HB_FUNC( CREATEBRUSHINDIRECT )
 
 HB_FUNC( CREATEHATCHBRUSH )
 {
-   
+
    hb_retnl( (LONG) CreateHatchBrush( hb_parni( 1 ), (COLORREF) hb_parnl(2) ) ) ;
 }
 
@@ -122,7 +122,7 @@ HB_FUNC( FIXBRUSHORGEX )
    hb_retl( FixBrushOrgEx( (HDC) hb_parnl( 1 ),
                            hb_parni( 2 )      ,
                            hb_parni( 3 )      ,
-                           Point            
+                           Point
                            ) ) ;
 }
 
@@ -135,16 +135,16 @@ HB_FUNC( GETBRUSHORGEX )
 {
    POINT Point ;
    PHB_ITEM aPt;
-   PHB_ITEM temp ;  
+   PHB_ITEM temp ;
 
-   if ( GetBrushOrgEx( (HDC) hb_parnl( 1 ), &Point ) ) 
+   if ( GetBrushOrgEx( (HDC) hb_parnl( 1 ), &Point ) )
    {
      aPt = _itemArrayNew( 2 );
 
      temp = _itemPutNL( NULL, Point.x );
      hb_arraySet( aPt, 1, temp );
      _itemRelease( temp );
-             
+
      temp = _itemPutNL( NULL, Point.y );
      hb_arraySet( aPt, 2, temp );
      _itemRelease( temp );
@@ -166,25 +166,25 @@ HB_FUNC( SETBRUSHORGEX )
 
    POINT Point ;
    PHB_ITEM aPt;
-   PHB_ITEM temp ;  
+   PHB_ITEM temp ;
 
-   if ( SetBrushOrgEx( (HDC) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ), &Point) ) 
+   if ( SetBrushOrgEx( (HDC) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ), &Point) )
    {
      aPt = _itemArrayNew( 2 );
 
      temp = _itemPutNL( NULL, Point.x );
      hb_arraySet( aPt, 1, temp );
      _itemRelease( temp );
-             
+
      temp = _itemPutNL( NULL, Point.y );
      hb_arraySet( aPt, 2, temp );
      _itemRelease( temp );
 
      _itemReturn( aPt );
      _itemRelease( aPt );
- 
-   }        
- 
+
+   }
+
 }
 
 

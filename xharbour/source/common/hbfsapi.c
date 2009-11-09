@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.21 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbfsapi.c,v 1.22 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -55,14 +55,14 @@
 #define INCL_DOSERRORS    /* DOS error values    */
 
 /* W32 */
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hb_io.h"
 #include "hbset.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #if !defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES     ( ( DWORD ) -1 )
    #endif
@@ -80,7 +80,7 @@
    #include <errno.h>
 #endif
 
-/* NOTE: Not really belongs here, but until we can't find a better place 
+/* NOTE: Not really belongs here, but until we can't find a better place
          it will do it. [vszakats] */
 extern void hb_fhnd_ForceLink( void );
 
@@ -312,7 +312,7 @@ BOOL hb_fsNameExists( const char * pszFileName )
       fExist = _dos_getfileattr( pszFileName, &iAttr ) == 0;
 #endif
    }
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
    {
       fExist = ( GetFileAttributesA( pszFileName ) != INVALID_FILE_ATTRIBUTES );
    }
@@ -365,7 +365,7 @@ BOOL hb_fsFileExists( const char * pszFileName )
                ( iAttr & 0x10 ) == 0;
 #endif
    }
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
    {
       DWORD   dwAttr;
 
@@ -425,7 +425,7 @@ BOOL hb_fsDirExists( const char * pszDirName )
                ( iAttr & 0x10 ) != 0;
 #endif
    }
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
    {
       DWORD   dwAttr;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.111 2009/03/02 09:20:04 marchuet Exp $
+ * $Id: hbdefs.h,v 1.112 2009/03/26 15:15:01 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,13 @@
 
 #include "hbsetup.h"
 
+/* Compatibility. Do not use HB_OS_WIN_32_USED anymore. */
+#ifdef HB_LEGACY_LEVEL2
+   #if defined( HB_OS_WIN_32_USED ) && ! defined( HB_OS_WIN_USED )
+      #define HB_OS_WIN_USED
+   #endif
+#endif
+
 #if defined( __XCC__ ) || defined( __MINGW32__ ) || \
     ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
     ( defined( __GNUC__ ) && \
@@ -83,29 +90,29 @@
 #define HB_LONG_LONG_OFF
 */
 
-#if defined( HB_OS_WIN_32 ) || defined( _WIN64 )
-   #if defined( _WIN64 )
+#if defined( HB_OS_WIN ) || defined( HB_OS_WIN_64 )
+   #if defined( HB_OS_WIN_64 )
       #undef HB_LONG_LONG_OFF
       #define HB_STRICT_ALIGNMENT
-      #if !defined( HB_OS_WIN_32 )
-         #define HB_OS_WIN_32
+      #if !defined( HB_OS_WIN )
+         #define HB_OS_WIN
       #endif
    #endif
 
    #if !defined( HB_WIN32_IO_OFF )
       #define HB_WIN32_IO
    #endif
-   #if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_32_USED )
+   #if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_USED )
       /* disabled to avoid problems with windows.h */
-      /* #define HB_OS_WIN_32_USED */
+      /* #define HB_OS_WIN_USED */
    #endif
 #else
    #undef HB_WIN32_IO
-   #undef HB_OS_WIN_32_USED
+   #undef HB_OS_WIN_USED
 #endif
 
 /* Include windows.h if applicable and requested */
-#if defined( HB_OS_WIN_32_USED ) && defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN_USED ) && defined( HB_OS_WIN )
 
    #define WIN32_LEAN_AND_MEAN
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
@@ -143,11 +150,11 @@
 
    #include <dos.h>
 
-   #if defined(__WATCOMC__) && defined(__386__) && !defined(__WINDOWS_386__)
+   #if defined( __WATCOMC__ ) && defined( __386__ ) && !defined( __WINDOWS_386__ )
       #define HB_DOS_INT86 int386
       #define HB_DOS_INT86X int386x
       #define HB_XREGS w
-   #elif defined(__RSX32__)
+   #elif defined( __RSX32__ )
       #define HB_DOS_INT86 _int86
       #define HB_DOS_INT86X _int86x
       #define HB_XREGS x
@@ -171,14 +178,12 @@
 
 #endif
 
-#if defined( HB_OS_WIN_32 )
-   #include "hbwince.h"
-#endif
-
 #if ! defined( HB_DONT_DEFINE_BASIC_TYPES )
 
-   #undef BOOL                            /* boolean */
-   typedef int BOOL;
+   #if ! defined( HB_DONT_DEFINE_BOOL )
+      #undef BOOL                         /* boolean */
+      typedef int BOOL;
+   #endif
 
    #undef UINT                            /* varies with platform */
    typedef unsigned int UINT;
@@ -189,17 +194,21 @@
    #undef UCHAR                           /* 1 byte unsigned */
    typedef unsigned char UCHAR;
 
-   #undef BYTE                            /* 1 byte unsigned */
-   typedef unsigned char BYTE;
+   #if ! defined( HB_DONT_DEFINE_BYTE )
+      #undef BYTE                            /* 1 byte unsigned */
+      typedef unsigned char BYTE;
+   #endif
 
    #undef SHORT                           /* 2 bytes signed */
-   typedef short int SHORT;
+   typedef signed short int SHORT;
 
    #undef USHORT                          /* 2 bytes unsigned */
    typedef unsigned short int USHORT;
 
-   #undef LONG                            /* 4 or 8 bytes signed */
-   typedef long LONG;
+   #if ! defined( HB_DONT_DEFINE_LONG )
+      #undef LONG                         /* 4 or 8 bytes signed */
+      typedef long LONG;
+   #endif
 
    #undef ULONG                           /* 4 or 8 bytes unsigned */
    typedef unsigned long ULONG;
@@ -227,16 +236,16 @@
 
 #ifndef HB_LONG_LONG_OFF
 
-   #if ! defined(HB_DONT_DEFINE_BASIC_TYPES) && ! defined(_WINNT_H)
-      #if !defined(LONGLONG)
-         #if defined(__GNUC__)
-            typedef long long LONGLONG;
+   #if ! defined( HB_DONT_DEFINE_BASIC_TYPES ) && ! defined( _WINNT_H )
+      #if !defined( LONGLONG )
+         #if defined( __GNUC__ )
+            typedef signed long long LONGLONG;
          #else
             typedef __int64 LONGLONG;
          #endif
       #endif
-      #if !defined(ULONGLONG)
-         #if defined(__GNUC__)
+      #if !defined( ULONGLONG )
+         #if defined( __GNUC__ )
             typedef unsigned long long ULONGLONG;
          #else
             typedef unsigned __int64 ULONGLONG;
@@ -244,30 +253,30 @@
       #endif
    #endif
 
-   #if !defined(ULONGLONG_MAX)
-      #if defined(_UI64_MAX)
+   #if !defined( ULONGLONG_MAX )
+      #if defined( _UI64_MAX )
          #define ULONGLONG_MAX      _UI64_MAX
-      #elif defined(ULLONG_MAX)
+      #elif defined( ULLONG_MAX )
          #define ULONGLONG_MAX      ULLONG_MAX
-      #elif defined(ULONG_LONG_MAX)
+      #elif defined( ULONG_LONG_MAX )
          #define ULONGLONG_MAX      ULONG_LONG_MAX
       #else
          #define ULONGLONG_MAX      18446744073709551615ULL
       #endif
    #endif
-   #if !defined(LONGLONG_MAX)
-      #if defined(_I64_MAX)
+   #if !defined( LONGLONG_MAX )
+      #if defined( _I64_MAX )
          #define LONGLONG_MAX       _I64_MAX
-      #elif defined(LLONG_MAX)
+      #elif defined( LLONG_MAX )
          #define LONGLONG_MAX       LLONG_MAX
-      #elif defined(LONG_LONG_MAX)
+      #elif defined( LONG_LONG_MAX )
          #define LONGLONG_MAX       LONG_LONG_MAX
       #else
          #define LONGLONG_MAX       9223372036854775807LL
       #endif
    #endif
-   #if !defined(LONGLONG_MIN)
-      #if defined(_I64_MIN)
+   #if !defined( LONGLONG_MIN )
+      #if defined( _I64_MIN )
          #define LONGLONG_MIN       _I64_MIN
       #elif defined(LLONG_MIN)
          #define LONGLONG_MIN       LLONG_MIN
@@ -284,7 +293,7 @@
  * below are some hacks which don't have to be true on some machines
  * please update it if necessary
  */
-#if defined( _WIN64 )
+#if defined( HB_OS_WIN_64 )
 #  define HB_ARCH_64BIT
 #elif ULONG_MAX > UINT_MAX && UINT_MAX > USHRT_MAX
 #  define HB_ARCH_64BIT
@@ -317,7 +326,7 @@
       typedef UINT         UINT32;
 #  endif
 #  if !defined( INT32 )
-      typedef int          INT32;
+      typedef signed int   INT32;
 #  endif
 #  if !defined( UINT32_MAX )
 #     define UINT32_MAX    UINT_MAX
@@ -359,12 +368,12 @@
 #  define INT24_MIN     -8388608L
 #endif
 
-#if defined( HB_ARCH_64BIT ) && !defined( _WIN64 )
+#if defined( HB_ARCH_64BIT ) && !defined( HB_OS_WIN_64 )
 #  if !defined( UINT64 )
-     typedef ULONG        UINT64;
+     typedef ULONG         UINT64;
 #  endif
 #  if !defined( INT64 )
-     typedef LONG         INT64;
+     typedef LONG          INT64;
 #  endif
 #  if !defined( UINT64_MAX )
 #    define UINT64_MAX    ULONG_MAX
@@ -377,19 +386,19 @@
 #  endif
 #elif !defined( HB_LONG_LONG_OFF )
 #  if !defined( UINT64 )
-     typedef ULONGLONG    UINT64;
+     typedef ULONGLONG     UINT64;
 #  endif
 #  if !defined( INT64 )
-     typedef LONGLONG     INT64;
+     typedef LONGLONG      INT64;
 #  endif
 #  if !defined( UINT64_MAX )
-#    define UINT64_MAX    ULONGLONG_MAX
+#    define UINT64_MAX     ULONGLONG_MAX
 #  endif
 #  if !defined( INT64_MAX )
-#    define INT64_MAX     LONGLONG_MAX
+#    define INT64_MAX      LONGLONG_MAX
 #  endif
 #  if !defined( INT64_MIN )
-#    define INT64_MIN     LONGLONG_MIN
+#    define INT64_MIN      LONGLONG_MIN
 #  endif
 #endif
 
@@ -529,7 +538,7 @@ typedef unsigned long HB_COUNTER;
 #endif
 
 /* type for memory pointer diff */
-#if defined( _WIN64 )
+#if defined( HB_OS_WIN_64 )
    typedef LONGLONG HB_PTRDIFF;
 #else
    typedef long HB_PTRDIFF;
@@ -665,8 +674,8 @@ typedef unsigned long HB_COUNTER;
 
 #define HB_SWAP_UINT64( w )      ( ( UINT64 ) ( ( ( ( UINT64 ) ( w ) & HB_LL( 0x00000000000000FF ) ) << 56 ) | \
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0x000000000000FF00 ) ) << 40 ) | \
-                                                ( ( ( UINT64 ) ( w ) & HB_LL( 0x0000000000FF0000 ) ) >> 24 ) | \
-                                                ( ( ( UINT64 ) ( w ) & HB_LL( 0x00000000FF000000 ) ) >>  8 ) | \
+                                                ( ( ( UINT64 ) ( w ) & HB_LL( 0x0000000000FF0000 ) ) << 24 ) | \
+                                                ( ( ( UINT64 ) ( w ) & HB_LL( 0x00000000FF000000 ) ) <<  8 ) | \
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0x000000FF00000000 ) ) >>  8 ) | \
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0x0000FF0000000000 ) ) >> 24 ) | \
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0x00FF000000000000 ) ) >> 40 ) | \
@@ -1192,7 +1201,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
          in the RSXNT doc/ directory for more information. */
       #define HB_FORCE_EXPORT
 
-   #elif defined( __GNUC__ ) && defined( HB_OS_WIN_32 )
+   #elif defined( __GNUC__ ) && defined( HB_OS_WIN )
       #define HB_FORCE_EXPORT __attribute__ (( dllexport ))
 
    #elif defined( __GNUC__ ) && defined( HB_OS_LINUX )
@@ -1227,7 +1236,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
          in the RSXNT doc/ directory for more information. */
       #define HB_EXPORT
 
-   #elif defined( __GNUC__ ) && defined( HB_OS_WIN_32 )
+   #elif defined( __GNUC__ ) && defined( HB_OS_WIN )
       #define HB_EXPORT __attribute__ (( dllexport ))
 
    #elif defined( __GNUC__ ) && defined( HB_OS_LINUX )
@@ -1242,7 +1251,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #elif defined( ASANLM ) || defined( ASANT )
       #define HB_EXPORT
 
-   #elif defined( WIN32 )
+   #elif defined( HB_OS_WIN )
       #define HB_EXPORT _declspec( dllexport )
 
    #else
@@ -1272,7 +1281,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
       in the RSXNT doc/ directory for more information. */
    #define HB_IMPORT
 
-#elif defined( __GNUC__ ) && defined( HB_OS_WIN_32 )
+#elif defined( __GNUC__ ) && defined( HB_OS_WIN )
    #define HB_IMPORT __attribute__ (( dllimport ))
 
 #elif defined( __BORLANDC__ )
@@ -1284,7 +1293,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #elif defined( ASANLM ) || defined( ASANT )
    #define HB_IMPORT
 
-#elif defined( WIN32 )
+#elif defined( HB_OS_WIN )
    #define HB_IMPORT _declspec( dllimport )
 
 #else
@@ -1293,6 +1302,10 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #endif
 #else
    #define HB_IMPORT
+#endif
+
+#if defined( HB_OS_WIN )
+   #include "hbwince.h"
 #endif
 
 /* Function declaration macros */
@@ -1312,7 +1325,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXTERN_
 #else
    #define HB_EXTERN_C_
-   #define HB_EXTERN_ extern
+   #define HB_EXTERN_   extern
 #endif
 
 #define HB_NAMESPACE_NAME( namespaceid, funcname )             _##namespaceid##_##funcname

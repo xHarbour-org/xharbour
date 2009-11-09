@@ -5,7 +5,7 @@
 #include "hbapi.h"
 #include "hblogdef.ch"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 #include "windows.h"
 
 static HANDLE s_RegHandle;
@@ -30,7 +30,7 @@ static BOOL s_IsWindowsNt( void )
 
 HB_FUNC( HB_SYSLOGOPEN )
 {
-   #if defined( HB_OS_WIN_32 )
+   #if defined( HB_OS_WIN )
       #if (WINVER >= 0x0400)
       //Ok, we compiled under NT, but we must not use this function
       // when RUNNING on a win98.
@@ -56,7 +56,7 @@ HB_FUNC( HB_SYSLOGOPEN )
 
 HB_FUNC( HB_SYSLOGCLOSE )
 {
-   #if defined( HB_OS_WIN_32 )
+   #if defined( HB_OS_WIN )
       #if (WINVER >= 0x0400)
       if ( s_IsWindowsNt() )
       {
@@ -80,7 +80,7 @@ HB_FUNC( HB_SYSLOGCLOSE )
 
 HB_FUNC( HB_SYSLOGMESSAGE )
 {
-   #if defined( HB_OS_WIN_32 )
+   #if defined( HB_OS_WIN )
       #if (WINVER >= 0x0400)
       WORD logval;
       if ( s_IsWindowsNt() )

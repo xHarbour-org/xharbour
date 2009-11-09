@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.12 2009/05/26 11:25:32 marchuet Exp $
+ * $Id: dbfnsx1.c,v 1.13 2009/09/30 16:19:48 marchuet Exp $
  */
 
 /*
@@ -5190,7 +5190,7 @@ static void hb_nsxSortAddNodeKey( LPNSXSORTINFO pSort, UCHAR *pKeyVal, ULONG ulR
       {
          pSort->ulLastLeaf = ulPage;
          hb_nsxSetPageType( pSort->NodeList[ 0 ], NSX_LEAFPAGE );
-         hb_nsxSetKeyRecSize( pSort->NodeList[ iLevel ], pSort->recSize );
+         hb_nsxSetKeyRecSize( pSort->NodeList[ 0 ], pSort->recSize );
          pSort->NodeList[ 0 ]->uiOffset = NSX_LEAFKEYOFFSET;
       }
       else
@@ -5615,7 +5615,12 @@ static void hb_nsxSortOut( LPNSXSORTINFO pSort )
 #endif
 
    if( pSort->NodeList[ 0 ] == NULL )
+   {
       pSort->NodeList[ 0 ] = hb_nsxPageNew( pTag, TRUE );
+      hb_nsxSetPageType( pSort->NodeList[ 0 ], NSX_LEAFPAGE );
+      hb_nsxSetKeyRecSize( pSort->NodeList[ 0 ], pSort->recSize );
+      pSort->NodeList[ 0 ]->uiOffset = NSX_LEAFKEYOFFSET;
+   }
 
    iLevel = 0;
    ulPage = 0;
@@ -7909,6 +7914,8 @@ static HB_ERRCODE hb_nsxOrderListFocus( NSXAREAP pArea, LPDBORDERINFO pOrderInfo
 
    if( pOrderInfo->itmOrder )
    {
+      LPTAGINFO pTag = hb_nsxFindTag( pArea, pOrderInfo->itmOrder,
+                                      pOrderInfo->atomBagName );
       /*
        * In Clipper 5.3 DBFCDX (COMIX) when bad name or order is given
        * tag number is set to 0 (natural record order). CL52 RDDs and
@@ -7917,14 +7924,13 @@ static HB_ERRCODE hb_nsxOrderListFocus( NSXAREAP pArea, LPDBORDERINFO pOrderInfo
        * RDDs and I chosen DBFCDX one as default. [druzus]
        */
 #ifdef HB_C52_STRICT
-      LPTAGINFO pTag = hb_nsxFindTag( pArea, pOrderInfo->itmOrder,
-                                      pOrderInfo->atomBagName );
-      if( pTag )
-         pArea->lpCurTag = pTag;
-#else
-      pArea->lpCurTag = hb_nsxFindTag( pArea, pOrderInfo->itmOrder,
-                                       pOrderInfo->atomBagName );
+      if( pTag ||
+          ( HB_IS_NUMERIC( pOrderInfo->itmOrder ) &&
+            hb_itemGetNI( pOrderInfo->itmOrder ) == 0 ) ||
+          ( HB_IS_STRING( pOrderInfo->itmOrder ) &&
+            hb_itemGetCLen( pOrderInfo->itmOrder ) == 0 ) )
 #endif
+         pArea->lpCurTag = pTag;
    }
 
    return HB_SUCCESS;
@@ -8053,29 +8059,14 @@ static const RDDFUNCS nsxTable = {
                              NULL,
                              NULL,
                              NULL,
-                             ( DBENTRYP_V ) hb_nsxGoBottom,
+              ( DBENTRYP_V ) hb_nsxGoBottom,
                              NULL,
                              NULL,
-                             ( DBENTRYP_V ) hb_nsxTop,
-                             ( DBENTRYP_BIB ) hb_nsxSeek,
+              ( DBENTRYP_V ) hb_nsxTop,
+            ( DBENTRYP_BIB ) hb_nsxSeek,
                              NULL,
                              NULL,
-                             ( DBENTRYP_L ) hb_nsxSkipRaw,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             ( DBENTRYP_V ) hb_nsxFlush,
-                             NULL,
-                             NULL,
-                             NULL,
-                             ( DBENTRYP_V ) hb_nsxGoCold,
-                             ( DBENTRYP_V ) hb_nsxGoHot,
+              ( DBENTRYP_L ) hb_nsxSkipRaw,
                              NULL,
                              NULL,
                              NULL,
@@ -8085,21 +8076,12 @@ static const RDDFUNCS nsxTable = {
                              NULL,
                              NULL,
                              NULL,
-                             ( DBENTRYP_V ) hb_nsxClose,
+              ( DBENTRYP_V ) hb_nsxFlush,
                              NULL,
                              NULL,
                              NULL,
-                             ( DBENTRYP_VO ) hb_nsxOpen,
-                             NULL,
-                             ( DBENTRYP_SP ) hb_nsxStructSize,
-                             NULL,
-                             NULL,
-                             ( DBENTRYP_V ) hb_nsxPack,
-                             NULL,
-                             NULL,
-                             NULL,
-                             NULL,
-                             ( DBENTRYP_V ) hb_nsxZap,
+              ( DBENTRYP_V ) hb_nsxGoCold,
+              ( DBENTRYP_V ) hb_nsxGoHot,
                              NULL,
                              NULL,
                              NULL,
@@ -8109,20 +8091,44 @@ static const RDDFUNCS nsxTable = {
                              NULL,
                              NULL,
                              NULL,
-                             NULL,
-                             ( DBENTRYP_VOI ) hb_nsxOrderListAdd,
-                             ( DBENTRYP_V ) hb_nsxOrderListClear,
-                             ( DBENTRYP_VOI ) hb_nsxOrderListDelete,
-                             ( DBENTRYP_VOI ) hb_nsxOrderListFocus,
-                             ( DBENTRYP_V ) hb_nsxOrderListRebuild,
-                             NULL,
-                             ( DBENTRYP_VOC ) hb_nsxOrderCreate,
-                             ( DBENTRYP_VOI ) hb_nsxOrderDestroy,
-                             ( DBENTRYP_SVOI ) hb_nsxOrderInfo,
+              ( DBENTRYP_V ) hb_nsxClose,
                              NULL,
                              NULL,
                              NULL,
-                             ( DBENTRYP_VPLP ) hb_nsxCountScope,
+             ( DBENTRYP_VO ) hb_nsxOpen,
+                             NULL,
+             ( DBENTRYP_SP ) hb_nsxStructSize,
+                             NULL,
+                             NULL,
+              ( DBENTRYP_V ) hb_nsxPack,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+              ( DBENTRYP_V ) hb_nsxZap,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+            ( DBENTRYP_VOI ) hb_nsxOrderListAdd,
+              ( DBENTRYP_V ) hb_nsxOrderListClear,
+            ( DBENTRYP_VOI ) hb_nsxOrderListDelete,
+            ( DBENTRYP_VOI ) hb_nsxOrderListFocus,
+              ( DBENTRYP_V ) hb_nsxOrderListRebuild,
+                             NULL,
+            ( DBENTRYP_VOC ) hb_nsxOrderCreate,
+            ( DBENTRYP_VOI ) hb_nsxOrderDestroy,
+           ( DBENTRYP_SVOI ) hb_nsxOrderInfo,
+                             NULL,
+                             NULL,
+                             NULL,
+           ( DBENTRYP_VPLP ) hb_nsxCountScope,
                              NULL,
                              NULL,
                              NULL,

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.16 2009/08/30 12:57:17 enricomaria Exp $
+ * $Id: utils.c,v 1.17 2009/09/30 16:20:22 marchuet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include "hbapifs.h"
 #include "hbapierr.h"
 
-#ifndef HB_OS_WIN_32
+#ifndef HB_OS_WIN
    #include <time.h>
 #else
    #include <windows.h>
@@ -72,7 +72,7 @@
 */
 
 /* sadly, many strftime windows implementations are broken */
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 
 HB_FUNC( TIP_TIMESTAMP )
 {
@@ -91,7 +91,7 @@ HB_FUNC( TIP_TIMESTAMP )
    char *szRet = (char *) hb_xgrab( 64 );
    SYSTEMTIME st;
    DWORD retval;
-   int hours, minutes;    
+   int hours, minutes;
 
 
    if ( !ulHour )
@@ -101,19 +101,19 @@ HB_FUNC( TIP_TIMESTAMP )
 
    retval = GetTimeZoneInformation( &tzInfo );
    if ( retval == TIME_ZONE_ID_INVALID )
-   {  
+   {
       tzInfo.Bias = 0;
       tzInfo.StandardBias = 0;
-      tzInfo.DaylightBias = 0; 
+      tzInfo.DaylightBias = 0;
       hours   = 0;
       minutes = 0;
-      
+
    }
    else
    {
       hours   = (int) tzInfo.Bias / 60;
       minutes = (int) tzInfo.Bias % 60;
-      if ( retval == TIME_ZONE_ID_STANDARD ) 
+      if ( retval == TIME_ZONE_ID_STANDARD )
       {
          hours   += (int) tzInfo.StandardBias / 60;
          minutes += (int) tzInfo.StandardBias % 60;
@@ -122,9 +122,9 @@ HB_FUNC( TIP_TIMESTAMP )
       {
          hours   += (int) tzInfo.DaylightBias / 60;
          minutes += (int) tzInfo.DaylightBias % 60;
-      }          
+      }
    }
-           
+
    if ( !pDate )
    {
       GetLocalTime( &st );

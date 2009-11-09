@@ -1,17 +1,17 @@
 /*
- * $Id: gtwin.c,v 1.126 2009/02/20 12:48:36 marchuet Exp $
+ * $Id: gtwin.c,v 1.127 2009/05/05 18:42:33 ptsarenko Exp $
  */
 
 /*
  * Harbour Project source code:
- * Video subsystem for Win32 compilers ver.2
- * Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ * Video subsystem for Windows compilers ver.2
+ * Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
  *
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
- *   Video subsystem for Win32 compilers
+ *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
+ *   Video subsystem for Windows compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
  *     (with 2004 work on Readkey)
  *
@@ -77,7 +77,7 @@
 /* TODO: include any standard headers here */
 /* *********************************************************************** */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbgtcore.h"
 #include "hbinit.h"
@@ -94,7 +94,7 @@
 #  include <wincon.h>
 #endif
 
-#if defined( _MSC_VER ) || defined(__WATCOMC__)
+#if defined( _MSC_VER ) || defined( __WATCOMC__ )
 #  include <conio.h>
 #endif
 
@@ -109,11 +109,11 @@ static BOOL b_MouseEnable = TRUE;
 
 /* *********************************************************************** */
 
-#if defined(__IBMCPP__)
+#if defined( __IBMCPP__ )
    #undef WORD                            /* 2 bytes unsigned */
    typedef unsigned short int WORD;
 #else
-   #if ! defined(HB_DONT_DEFINE_BASIC_TYPES)
+   #if ! defined( HB_DONT_DEFINE_BASIC_TYPES )
       #undef WORD                            /* 2 bytes unsigned */
       typedef USHORT WORD;
 
@@ -122,11 +122,11 @@ static BOOL b_MouseEnable = TRUE;
    #endif
 #endif
 
-#if ! defined(__GNUC__) && defined(__CYGWIN__)
+#if ! defined( __GNUC__ ) && defined( __CYGWIN__ )
    typedef WORD far * LPWORD;
 #endif
 
-#if defined(__RSXNT__)
+#if defined( __RSXNT__ )
    #ifndef FROM_LEFT_1ST_BUTTON_PRESSED
       #define FROM_LEFT_1ST_BUTTON_PRESSED    0x0001
    #endif
@@ -183,25 +183,33 @@ static DWORD         s_cNumRead;   /* Ok to use DWORD here, because this is spec
 static DWORD         s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
 static WORD          s_wRepeated = 0;   /* number of times the event (key) was repeated */
 static INPUT_RECORD  s_irInBuf[ INPUT_BUFFER_LEN ];
+#if !defined( HB_CDP_SUPPORT_OFF )
+#if defined( UNICODE )
+static PHB_CODEPAGE  s_cdpHost;
+static PHB_CODEPAGE  s_cdpBox;
+static PHB_CODEPAGE  s_cdpIn;
+#else
 static BYTE          s_charTransRev[ 256 ];
 static BYTE          s_charTrans[ 256 ];
 static BYTE          s_keyTrans[ 256 ];
+#endif
+#endif
 static int           s_altisdown = 0;
 static int           s_altnum = 0;
-
 static int           s_mouseLast;  /* Last mouse button to be pressed                   */
 static int           hb_mouse_iCol;
 static int           hb_mouse_iRow;
 
 static OSVERSIONINFO s_osv;
 
-typedef struct _ClipKeyCode {
+typedef struct _CLIPKEYCODE
+{
     int key;
     int alt_key;
     int ctrl_key;
     int shift_key;
     int altgr_key;
-} ClipKeyCode;
+} CLIPKEYCODE;
 
 #define CLIP_STDKEY_COUNT      96
 #define CLIP_EXTKEY_COUNT      34
@@ -209,7 +217,7 @@ typedef struct _ClipKeyCode {
 /* Keypad keys */
 
 
-static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
+static const CLIPKEYCODE stdKeyTab[CLIP_STDKEY_COUNT] = {
     { 32,                  0,             0,         0,             0}, /* ' ' */
     { 33,                  0,             0,         0,             0}, /* '!' */
     { 34,                  0,             0,         0,             0}, /* '"' */
@@ -359,7 +367,7 @@ static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
 #define K_SH_ENTER          K_ENTER  /* Shift-Enter == Enter */
 #endif
 
-static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
+static const CLIPKEYCODE extKeyTab[CLIP_EXTKEY_COUNT] = {
    {K_F1,          K_ALT_F1,     K_CTRL_F1,   K_SH_F1,    K_ALT_F1}, /*  00 */
    {K_F2,          K_ALT_F2,     K_CTRL_F2,   K_SH_F2,    K_ALT_F2}, /*  01 */
    {K_F3,          K_ALT_F3,     K_CTRL_F3,   K_SH_F3,    K_ALT_F3}, /*  02 */
@@ -403,8 +411,6 @@ static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
 
 };
 
-/* *********************************************************************** */
-
 static int hb_gt_win_getKbdState( void )
 {
    int iKbdState = 0;
@@ -419,6 +425,13 @@ static int hb_gt_win_getKbdState( void )
    if( GetKeyState( VK_NUMLOCK ) & 0x01 ) iKbdState |= HB_GTI_KBD_NUMLOCK;
    if( GetKeyState( VK_CAPITAL ) & 0x01 ) iKbdState |= HB_GTI_KBD_CAPSLOCK;
    if( GetKeyState( VK_INSERT  ) & 0x01 ) iKbdState |= HB_GTI_KBD_INSERT;
+
+   if( GetKeyState( VK_LSHIFT   ) & 0x80 ) iKbdState |= HB_GTI_KBD_LSHIFT;
+   if( GetKeyState( VK_RSHIFT   ) & 0x80 ) iKbdState |= HB_GTI_KBD_RSHIFT;
+   if( GetKeyState( VK_LCONTROL ) & 0x80 ) iKbdState |= HB_GTI_KBD_LCTRL;
+   if( GetKeyState( VK_RCONTROL ) & 0x80 ) iKbdState |= HB_GTI_KBD_RCTRL;
+   if( GetKeyState( VK_LMENU    ) & 0x80 ) iKbdState |= HB_GTI_KBD_LALT;
+   if( GetKeyState( VK_RMENU    ) & 0x80 ) iKbdState |= HB_GTI_KBD_RALT;
 
    return iKbdState;
 }
@@ -489,10 +502,10 @@ static void hb_gt_win_xScreenUpdate( void )
          COORD coDest, coSize;
          SMALL_RECT srWin;
 
-         coSize.Y = _GetScreenHeight();
-         coSize.X = _GetScreenWidth();
-         coDest.Y = s_usUpdtTop;
-         coDest.X = s_usUpdtLeft;
+         coSize.Y     = _GetScreenHeight();
+         coSize.X     = _GetScreenWidth();
+         coDest.Y     = s_usUpdtTop;
+         coDest.X     = s_usUpdtLeft;
          srWin.Top    = ( SHORT ) s_usUpdtTop;
          srWin.Left   = ( SHORT ) s_usUpdtLeft;
          srWin.Bottom = ( SHORT ) s_usUpdtBottom;
@@ -581,8 +594,30 @@ static void hb_gt_win_xGetScreenContents( PHB_GT pGT, SMALL_RECT * psrWin )
       i = iRow * _GetScreenWidth() + psrWin->Left;
       for( iCol = psrWin->Left; iCol <= psrWin->Right; ++iCol )
       {
-         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( BYTE ) s_pCharInfoScreen[i].Attributes, 0,
-                               s_charTransRev[ ( BYTE ) s_pCharInfoScreen[i].Char.AsciiChar ] );
+#if defined( HB_CDP_SUPPORT_OFF )
+         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( BYTE ) s_pCharInfoScreen[ i ].Attributes, 0,
+                               ( BYTE ) s_pCharInfoScreen[ i ].Char.AsciiChar );
+#elif defined( UNICODE )
+         USHORT uc = s_pCharInfoScreen[ i ].Char.UnicodeChar, u2;
+         BYTE bAttr = 0;
+
+         /* TODO: optimize it by creating conversion table - it can be
+          *       very slow in some cases
+          */
+
+         u2 = hb_cdpGetChar( s_cdpHost, FALSE, uc );
+         if( u2 == '?' && uc >= 0x100 && s_cdpHost != s_cdpBox )
+         {
+            u2 = hb_cdpGetChar( s_cdpBox, FALSE, uc );
+            if( u2 != '?' )
+               bAttr |= HB_GT_ATTR_BOX;
+         }
+         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( BYTE ) s_pCharInfoScreen[ i ].Attributes,
+                               bAttr, u2 );
+#else
+         HB_GTSELF_PUTSCRCHAR( pGT, iRow, iCol, ( BYTE ) s_pCharInfoScreen[ i ].Attributes, 0,
+                               s_charTransRev[ ( BYTE ) s_pCharInfoScreen[ i ].Char.AsciiChar ] );
+#endif
          ++i;
       }
    }
@@ -667,13 +702,9 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    s_osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
    GetVersionEx( &s_osv );
    if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
-   {
       s_dwAltGrBits = RIGHT_ALT_PRESSED;
-   }
    else
-   {
       s_dwAltGrBits = LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED;
-   }
 
    /* stdin && stdout && stderr */
    s_hStdIn  = hFilenoStdin;
@@ -688,6 +719,11 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    s_bSpecialKeyHandling = FALSE;
    s_bAltKeyHandling = TRUE;
 
+#if !defined( HB_CDP_SUPPORT_OFF ) && defined( UNICODE )
+   s_cdpHost = s_cdpIn = hb_vmCDP();
+   s_cdpBox = hb_cdpFind( "EN" );
+#endif
+
    /* initialize code page translation */
    HB_GTSELF_SETDISPCP( pGT, NULL, NULL, FALSE );
    HB_GTSELF_SETKEYCP( pGT, NULL, NULL );
@@ -696,9 +732,7 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    SetConsoleCtrlHandler( hb_gt_win_CtrlHandler, TRUE );
 
    if( hb_dynsymFind( "HB_NOMOUSE" ) )
-   {
       b_MouseEnable = FALSE;
-   }
 
 #ifndef HB_NO_ALLOC_CONSOLE
    /*
@@ -735,9 +769,7 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
       }
 #endif
       if( s_HInput == INVALID_HANDLE_VALUE )
-      {
          hb_errInternal( 10001, "Can't allocate console", "", "" );
-      }
    }
 
    HB_GTSUPER_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
@@ -768,8 +800,8 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    memcpy( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
 
    s_csbi.srWindow.Top = s_csbi.srWindow.Left = 0;
-   s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth()-1 );
-   s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, _GetScreenHeight()-1 );
+   s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth() - 1 );
+   s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, _GetScreenHeight() - 1 );
 
    SetConsoleWindowInfo( s_HOutput, TRUE,  &s_csbi.srWindow );
    SetConsoleScreenBufferSize( s_HOutput, s_csbi.dwSize );
@@ -940,7 +972,7 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
          on Keydown, it better be the alt or a numpad key,
          or bail out.
       */
-      switch(wKey)
+      switch( wKey )
       {
          case 0x38:
          case 0x47:
@@ -956,7 +988,7 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
             break;
 
          default:
-            *paltisdown=0;
+            *paltisdown = 0;
             break;
       }
    }
@@ -966,7 +998,7 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
 
       unsigned short nm = 10;
 
-      switch(wKey)
+      switch( wKey )
       {
          case 0x38:
             /* Alt key ... */
@@ -999,7 +1031,7 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
          case 0x47: --nm;
          case 0x48: --nm;
          case 0x49: --nm;
-            *paltnum = ((*paltnum * 10) & 0xff) + nm;
+            *paltnum = ( ( *paltnum * 10 ) & 0xff ) + nm;
             break;
 
          default:
@@ -1155,7 +1187,7 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
 {
    int ch = 0,
        extKey = -1;
-   const ClipKeyCode *clipKey = NULL;
+   const CLIPKEYCODE * clipKey = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_win_ReadKey(%p,%d)", pGT, iEventMask));
 
@@ -1238,9 +1270,16 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
             /* Save the keyboard state and ASCII,scan, key code */
             WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
             WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
-            DWORD dwState= s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
+            DWORD dwState = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
 
+#if defined( UNICODE )
+            ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.UnicodeChar;
+#  if !defined( HB_CDP_SUPPORT_OFF )
+            ch = hb_cdpGetChar( s_cdpIn, FALSE, ( USHORT ) ch );
+#  endif
+#else
             ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
+#endif
 
             /*
              * Under Win9x, Upper row keys are affected by caps-lock
@@ -1272,70 +1311,40 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
             }
 
             if( s_wRepeated == 0 )
-            {
                s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
-            }
 
             if( s_wRepeated > 0 ) /* Might not be redundant */
-            {
                s_wRepeated--;
-            }
 #if 0
             printf( "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
 #endif
 
             if( wChar == 8 )        /* VK_BACK */
-            {
                extKey = EXKEY_BS;
-            }
             else if( wChar == 9 )   /* VK_TAB */
-            {
                extKey = EXKEY_TAB;
-            }
             else if( wChar == 13 )  /* VK_RETURN */
-            {
                extKey = EXKEY_ENTER;
-            }
             else if( wChar == 27 )  /* VK_ESCAPE */
-            {
                extKey = EXKEY_ESC;
-            }
             else if( wChar == 33 )  /* VK_PRIOR */
-            {
                extKey = EXKEY_PGUP;
-            }
             else if( wChar == 34 )  /* VK_NEXT */
-            {
                extKey = EXKEY_PGDN;
-            }
             else if( wChar == 35 )  /* VK_END */
-            {
                extKey = EXKEY_END;
-            }
             else if( wChar == 36 )  /* VK_HOME */
-            {
                extKey = EXKEY_HOME;
-            }
             else if( wChar == 37 )  /* VK_LEFT */
-            {
                extKey = EXKEY_LEFT;
-            }
             else if( wChar == 38 )  /* VK_UP */
-            {
                extKey = EXKEY_UP;
-            }
             else if( wChar == 39 )  /* VK_RIGHT */
-            {
                extKey = EXKEY_RIGHT;
-            }
             else if( wChar == 40 )  /* VK_DOWN */
-            {
                extKey = EXKEY_DOWN;
-            }
             else if( wChar == 45 )  /* VK_INSERT */
-            {
                extKey = EXKEY_INS;
-            }
             else if( wChar == 46 && (!(ch==46)) )  /* VK_DELETE */
             {
                /* International keyboard under Win98 - when VirtualKey and Ascii
@@ -1350,86 +1359,56 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
                ch = 47;
             }
             else if( wChar == 106 ) /* VK_MULTIPLY */
-            {
                extKey = EXKEY_KPASTERISK;
-            }
             else if( wChar == 107 ) /* VK_ADD */
-            {
                extKey = EXKEY_KPPLUS;
-            }
             else if( wChar == 109 ) /* VK_SUBTRACT */
-            {
                extKey = EXKEY_KPMINUS;
-            }
             else if( wChar == 111 ||   /* VK_DIVIDE */
-                    ( wChar == 191 && ( dwState & ENHANCED_KEY )))
+                    ( wChar == 191 && ( dwState & ENHANCED_KEY ) ) )
             {
                /* This should be for other than Win98 */
                extKey = EXKEY_KPDIVIDE;
             }
             else if( wChar >= 112 && wChar <= 123 )   /* F1-F12 VK_F1-VK_F12 */
-            {
                extKey = wChar - 112;
-            }
             else if( ch >= K_SPACE && ch <= K_CTRL_BS )
-            {
                clipKey = &stdKeyTab[ ch - K_SPACE ];
-            }
             else if( ch > 0 && ch < K_SPACE && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
-            {
                clipKey = &stdKeyTab[ ch + '@' ];
-            }
             else if( ch < 0 ) /* international keys */
-            {
                ch += 256;
-            }
 
             if( extKey > -1 )
-            {
                clipKey = &extKeyTab[ extKey ];
-            }
 
             if( clipKey )
             {
                if( ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
                {
                   if( clipKey->key == K_TAB )
-                  {
                      ch = K_CTRL_SH_TAB;
-                  }
                }
                else if( dwState & LEFT_ALT_PRESSED )
-               {
                   ch = clipKey->alt_key;
-               }
                else if( dwState & RIGHT_ALT_PRESSED )
-               {
                   ch = clipKey->altgr_key;
-               }
                else if( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) )
-               {
                   ch = clipKey->ctrl_key;
-               }
                else if( dwState & SHIFT_PRESSED )
-               {
                   ch = clipKey->shift_key;
-               }
                else
-               {
                   ch = clipKey->key;
-               }
 
                if( ch == 0 )  /* for keys that are only on shift or AltGr */
-               {
                   ch = clipKey->key;
-               }
             }
 
             /* national codepage translation */
+#if !defined( HB_CDP_SUPPORT_OFF ) && !defined( UNICODE )
             if( ch > 0 && ch <= 255 )
-            {
                ch = s_keyTrans[ ch ];
-            }
+#endif
          }
       }
       else if( b_MouseEnable &&
@@ -1485,15 +1464,11 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
 
       /* Set up to process the next input event (if any) */
       if( s_wRepeated == 0 )
-      {
          s_cNumIndex++;
-      }
    }
 #if 0
    if( ch )
-   {
       printf(" %ld:%ld",ch,extKey);
-   }
 #endif
 
    return ch;
@@ -1516,39 +1491,62 @@ static void hb_gt_win_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 
 static BOOL hb_gt_win_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
 {
-   int i;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_win_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox));
 
    HB_GTSUPER_SETDISPCP( pGT, pszTermCDP, pszHostCDP, fBox );
 
-   for( i = 0; i < 256; i++ )
-      s_charTrans[ i ] = ( BYTE ) i;
-
 #ifndef HB_CDP_SUPPORT_OFF
-   if( !pszHostCDP )
+
+#if defined( UNICODE )
+   /*
+    * We are displaying text in U16 so pszTermCDP is unimportant.
+    * We only have to know what is the internal application codepage
+    * to make proper translation
+    */
+   if( !pszHostCDP || !*pszHostCDP )
       pszHostCDP = hb_cdpID();
 
-   if( pszTermCDP && pszHostCDP )
+   if( pszHostCDP && *pszHostCDP )
    {
-      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
-                   cdpHost = hb_cdpFind( pszHostCDP );
-      if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
-          cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      PHB_CODEPAGE cdpHost = hb_cdpFind( pszHostCDP );
+      if( cdpHost )
+         s_cdpHost = cdpHost;
+   }
+
+#else
+   {
+      int i;
+
+      for( i = 0; i < 256; i++ )
+         s_charTrans[ i ] = ( BYTE ) i;
+
+      if( !pszHostCDP )
+         pszHostCDP = hb_cdpID();
+
+      if( pszTermCDP && pszHostCDP )
       {
-         for( i = 0; i < cdpHost->nChars; ++i )
+         PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                      cdpHost = hb_cdpFind( pszHostCDP );
+         if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+             cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
          {
-            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
-                         ( BYTE ) cdpTerm->CharsUpper[ i ];
-            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
-                         ( BYTE ) cdpTerm->CharsLower[ i ];
+            for( i = 0; i < cdpHost->nChars; ++i )
+            {
+               s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                            ( BYTE ) cdpTerm->CharsUpper[ i ];
+               s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                            ( BYTE ) cdpTerm->CharsLower[ i ];
+            }
          }
       }
+
+      for( i = 0; i < 256; i++ )
+         s_charTransRev[ s_charTrans[ i ] ] = ( BYTE ) i;
+
    }
 #endif
 
-   for( i = 0; i < 256; i++ )
-      s_charTransRev[ s_charTrans[ i ] ] = ( BYTE ) i;
+#endif
 
    return TRUE;
 }
@@ -1557,37 +1555,58 @@ static BOOL hb_gt_win_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 static BOOL hb_gt_win_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
 {
-   int i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_win_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP));
 
    HB_GTSUPER_SETKEYCP( pGT, pszTermCDP, pszHostCDP );
 
-   for( i = 0; i < 256; i++ )
-      s_keyTrans[ i ] = ( BYTE ) i;
-
 #ifndef HB_CDP_SUPPORT_OFF
-   if( !pszHostCDP )
-   {
+
+#if defined( UNICODE )
+   /*
+    * We are receiving WM_CHAR events in U16 so pszTermCDP is unimportant.
+    * We only have to know what is the internal application codepage
+    * to make proper translation
+    */
+   if( !pszHostCDP || !*pszHostCDP )
       pszHostCDP = hb_cdpID();
+
+   if( pszHostCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpHost = hb_cdpFind( pszHostCDP );
+      if( cdpHost )
+         s_cdpIn = cdpHost;
    }
 
-   if( pszTermCDP && pszHostCDP )
+#else
    {
-      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
-                   cdpHost = hb_cdpFind( pszHostCDP );
-      if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
-          cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      int i;
+
+      for( i = 0; i < 256; i++ )
+         s_keyTrans[ i ] = ( BYTE ) i;
+
+      if( !pszHostCDP )
+         pszHostCDP = hb_cdpID();
+
+      if( pszTermCDP && pszHostCDP )
       {
-         for( i = 0; i < cdpHost->nChars; ++i )
+         PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                      cdpHost = hb_cdpFind( pszHostCDP );
+         if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+             cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
          {
-            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
-                        ( BYTE ) cdpTerm->CharsUpper[ i ];
-            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
-                        ( BYTE ) cdpTerm->CharsLower[ i ];
+            for( i = 0; i < cdpHost->nChars; ++i )
+            {
+               s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                           ( BYTE ) cdpTerm->CharsUpper[ i ];
+               s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                           ( BYTE ) cdpTerm->CharsLower[ i ];
+            }
          }
       }
    }
+#endif
+
 #endif
 
    return TRUE;
@@ -1606,6 +1625,29 @@ static BOOL hb_gt_win_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          pInfo->pResult = hb_itemPutL( pInfo->pResult, TRUE );
          break;
 
+      case HB_GTI_CODEPAGE:
+      {
+         UINT uiCodePage = GetConsoleCP();
+         UINT uiCodePageNew = hb_itemGetNI( pInfo->pNewVal );
+         pInfo->pResult = hb_itemPutNI( pInfo->pResult, uiCodePage );
+         if( ( hb_itemType( pInfo->pNewVal ) & HB_IT_NUMERIC ) && uiCodePageNew != uiCodePage )
+         {
+            SetConsoleCP( uiCodePageNew );
+            SetConsoleOutputCP( uiCodePageNew );
+         }
+         break;
+      }
+      case HB_GTI_BOXCP:
+#if !defined( HB_CDP_SUPPORT_OFF ) && defined( UNICODE )
+         pInfo->pResult = hb_itemPutC( pInfo->pResult,
+                                       s_cdpBox ? s_cdpBox->id : NULL );
+         if( hb_itemType( pInfo->pNewVal ) & HB_IT_STRING )
+         {
+            PHB_CODEPAGE cdpBox = hb_cdpFind( hb_itemGetCPtr( pInfo->pNewVal ) );
+            if( cdpBox )
+               s_cdpBox = cdpBox;
+         }
+#endif
       case HB_GTI_WINTITLE:
       {
          TCHAR buff[ 256 ];
@@ -1681,9 +1723,7 @@ static BOOL hb_gt_win_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
                                                 ulLen );
             }
             else
-            {
                pInfo->pResult = hb_itemPutC( pInfo->pResult, "" );
-            }
          }
          break;
 
@@ -1719,7 +1759,7 @@ static BOOL hb_gt_win_mouse_ButtonState( PHB_GT pGT, int iButton )
 
    if( iButton == 0 )
       fReturn = ( GetKeyState( VK_LBUTTON ) & 0x8000 ) != 0;
-   else if( iButton== 1 )
+   else if( iButton == 1 )
       fReturn = ( GetKeyState( VK_RBUTTON ) & 0x8000 ) != 0;
    else if( iButton == 2 )
       fReturn = ( GetKeyState( VK_MBUTTON ) & 0x8000 ) != 0;
@@ -1756,8 +1796,16 @@ static void hb_gt_win_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
       {
          if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol++, &bColor, &bAttr, &usChar ) )
             break;
-         s_pCharInfoScreen[i].Char.AsciiChar = ( CHAR ) s_charTrans[ usChar & 0xFF ];
-         s_pCharInfoScreen[i].Attributes = ( WORD ) ( bColor & 0xFF );
+#if defined( HB_CDP_SUPPORT_OFF )
+         s_pCharInfoScreen[ i ].Char.UnicodeChar = usChar;
+#elif defined( UNICODE )
+         s_pCharInfoScreen[ i ].Char.UnicodeChar =
+               hb_cdpGetU16( bAttr & HB_GT_ATTR_BOX ? s_cdpBox : s_cdpHost,
+                             TRUE, ( UCHAR ) usChar );
+#else
+         s_pCharInfoScreen[ i ].Char.AsciiChar = ( CHAR ) s_charTrans[ usChar & 0xFF ];
+#endif
+         s_pCharInfoScreen[ i ].Attributes = ( WORD ) ( bColor & 0xFF );
          ++i;
       }
 
@@ -1785,13 +1833,9 @@ static void hb_gt_win_Refresh( PHB_GT pGT )
       if( iRow < 0 || iCol < 0 ||
           iRow >= ( int ) _GetScreenHeight() ||
           iCol >= ( int ) _GetScreenWidth() )
-      {
          s_usCursorStyle = SC_NONE;
-      }
       else
-      {
          s_usCursorStyle = ( USHORT ) iStyle;
-      }
 
       hb_gt_win_xScreenUpdate();
    }

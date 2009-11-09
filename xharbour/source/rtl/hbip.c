@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.6 2009/09/16 15:53:42 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.7 2009/09/30 16:20:04 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -65,7 +65,7 @@
 
 /* Compile in Unix mode under Cygwin */
 #ifdef OS_UNIX_COMPATIBLE
-  #undef HB_OS_WIN_32
+  #undef HB_OS_WIN
 #endif
 
 /* HB_INET_H_ */
@@ -75,12 +75,12 @@
    #define HB_ERR_FUNCNAME &hb_errFuncName
 #endif
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
    #define HB_SOCKET_T SOCKET
    #include <winsock2.h>
    #include <windows.h>
-   
+
    #define HB_IP_CLOSE( x )    closesocket( x )
 #else
 
@@ -104,7 +104,7 @@
 #define HB_SOCKET_ZERO_ERROR()   \
             do { errorCode = 0; errorDesc = ""; } while( 0 )
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
     #define HB_SOCKET_SET_ERROR()   \
             do { \
                errorCode = WSAGetLastError(); \
@@ -132,7 +132,7 @@
    #define MSG_WAITALL  0
 #endif
 
-#if !defined( HB_WINCE )
+#if !defined( HB_OS_WIN_CE )
    #include <fcntl.h>
    #include <errno.h>
 #endif
@@ -178,7 +178,7 @@ void hb_ipInit( void )
    }
    else
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
       #elif defined( HB_OS_LINUX )
@@ -192,7 +192,7 @@ void hb_ipCleanup( void )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
          WSACleanup();
       #endif
    }
@@ -279,7 +279,7 @@ static int hb_selectWriteSocket( HB_SOCKET_T hSocket, int timeout )
    return FD_ISSET( hSocket, &set );
 }
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 static int hb_selectWriteExceptSocket( HB_SOCKET_T hSocket, int timeout )
 {
    fd_set set, eset;
@@ -328,7 +328,7 @@ static ULONG hb_getAddr( char * name )
          return (*(UINT *)Host->h_addr_list[0]);
       else
       {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
          HB_SOCKET_SET_ERROR2( WSAGetLastError() , "Generic error in GetHostByName()" );
          WSASetLastError( 0 );
 #elif defined(HB_OS_OS2) || defined(HB_OS_HPUX) || defined(__WATCOMC__)
@@ -346,7 +346,7 @@ static ULONG hb_getAddr( char * name )
 
 static void hb_socketSetNonBlocking( HB_SOCKET_T hSocket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 1;
    ioctlsocket( hSocket, FIONBIO, &mode );
 
@@ -362,7 +362,7 @@ static void hb_socketSetNonBlocking( HB_SOCKET_T hSocket )
 
 static void hb_socketSetBlocking( HB_SOCKET_T hSocket )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    ULONG mode = 0;
    ioctlsocket( hSocket, FIONBIO, &mode );
 #else
@@ -378,7 +378,7 @@ static void hb_socketSetBlocking( HB_SOCKET_T hSocket )
 int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeout )
 {
    int iErr1;
-   #if ! defined(HB_OS_WIN_32)
+   #if ! defined(HB_OS_WIN)
       int iErrval;
       socklen_t iErrvalLen;
    #endif
@@ -392,7 +392,7 @@ int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeo
    iErr1 = connect( hSocket, (struct sockaddr *) remote, sizeof(*remote) );
    if( iErr1 != 0 )
    {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       if( WSAGetLastError() != WSAEWOULDBLOCK )
 #else
       if( errno != EINPROGRESS )
@@ -403,7 +403,7 @@ int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeo
       else
       {
          /* Now we wait for socket connection or timeout */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
          iErr1 = hb_selectWriteExceptSocket( hSocket,timeout );
          if( iErr1 == 2 )
          {
@@ -418,7 +418,7 @@ int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeo
          {
             /* Connection has been completed with a failure or a success */
             iErrvalLen = sizeof( iErrval );
-            iErr1 = getsockopt( hSocket, SOL_SOCKET, SO_ERROR, 
+            iErr1 = getsockopt( hSocket, SOL_SOCKET, SO_ERROR,
                            (SOCKOPT4) &iErrval, &iErrvalLen );
 
             if( iErr1 )
@@ -448,7 +448,7 @@ int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeo
 int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen )
 {
    int iLen;
-   
+
    HB_SOCKET_ZERO_ERROR();
 
    iLen = recv( hSocket, szBuffer, iBufferLen, MSG_NOSIGNAL );
@@ -473,7 +473,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
    int iLen = sizeof( iBufferMax );
 
    getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &iBufferMax, (int*) &iLen );
-   
+
    iSent = iLen = 0;
 
    HB_SOCKET_ZERO_ERROR();
@@ -497,7 +497,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
          {
             HB_SOCKET_SET_ERROR();
          }
-         break;         
+         break;
       }
 
       iSent += iLen;
@@ -526,7 +526,7 @@ HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
    if( ulAddr != INADDR_NONE )
    {
       /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       hSocket = socket( AF_INET, SOCK_STREAM, 0);
 #else
       hSocket = socket( PF_INET, SOCK_STREAM, 0);
@@ -564,7 +564,7 @@ HB_SOCKET_T hb_ipServer( int iPort, char * szAddress, int iListen )
    HB_SOCKET_ZERO_ERROR();
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    hSocket = socket( AF_INET, SOCK_STREAM, 0 );
 #else
    hSocket = socket( PF_INET, SOCK_STREAM, 0 );
@@ -611,7 +611,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    struct sockaddr_in si_remote;
 #if defined(_XOPEN_SOURCE_EXTENDED)
    socklen_t Len;
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    int Len;
 #else
    unsigned int Len;
@@ -638,7 +638,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
          incoming = accept( hSocket, (struct sockaddr *) &si_remote, &Len );
          if( incoming == ( HB_SOCKET_T ) -1 )
          {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
             iError = WSAGetLastError();
 #else
             iError = errno;
@@ -682,7 +682,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
 void hb_ipclose( HB_SOCKET_T hSocket )
 {
 
-   #if defined( HB_OS_WIN_32 )
+   #if defined( HB_OS_WIN )
       shutdown( hSocket, SD_BOTH );
    #elif defined(HB_OS_OS2)
       shutdown( hSocket, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -770,7 +770,7 @@ HB_FUNC( HB_IPACCEPT )
    if( incoming == -1 )
       hb_ret();
    else
-   {  
+   {
       PHB_ITEM temp, aInfo = hb_itemArrayNew( 3 );
 
       temp = hb_itemPutNL( NULL, incoming );
@@ -834,7 +834,7 @@ HB_FUNC( HB_IPERRORDESC )
 char * hb_ipErrorDesc( void )
 {
    return errorDesc;
-}   
+}
 
 HB_FUNC( HB_IPCLOSE )
 {

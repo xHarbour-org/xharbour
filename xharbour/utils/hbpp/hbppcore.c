@@ -1,5 +1,5 @@
 /*
- * $Id: hbppcore.c,v 1.6 2009/01/24 00:33:10 likewolf Exp $
+ * $Id: hbppcore.c,v 1.7 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -80,13 +80,13 @@
 // For hb_ppPlatform()
 #define INCL_DOSMISC
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbver.h"
 #include "hbexemem.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    #include <ctype.h>
    #include "hbwbase.h"
@@ -528,7 +528,7 @@ char * hb_ppPlatform( void )
       }
    }
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    {
       /* NOTE: Must be larger than 128, which is the maximum size of

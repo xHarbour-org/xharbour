@@ -1,5 +1,5 @@
 /*
- * $Id: fi_winfu.c,v 1.2 2008/04/30 13:20:31 andijahja Exp $
+ * $Id: fi_winfu.c,v 1.3 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -57,61 +57,54 @@
  */
 
 /* NOTE: we need this to prevent base types redefinition */
-#define _CLIPDEFS_H
-#if defined(HB_OS_WIN_32_USED)
-   #include <windows.h>
-#endif
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbstack.h"
 #include "hbapierr.h"
-#include "hbapifs.h"
-//#include "hrbdll.h"
-#include "hbvm.h"
+
+#if defined( HB_OS_WIN ) && ! ( defined( HB_OS_WIN_CE ) && defined( __POCC__ ) )
+
+#if !defined( _WINDOWS_ ) && ( defined( __GNUC__ ) || defined( __POCC__ ) || defined( __XCC__ ) ) || defined( __WATCOMC__ )
+   #define _WINDOWS_
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include "FreeImage.h"
 
-// --------------------------------------------------------------------------
-// Convert from FreeImage to HBITMAP ----------------------------------------
-// --------------------------------------------------------------------------
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+/* -------------------------------------------------------------------------- */
+/* Convert from FreeImage to HBITMAP ---------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-// implementation: HBITMAP bitmap = FI_FiToBitmap( FIBITMAP *dib );
+/* implementation: HBITMAP bitmap = FI_FiToBitmap( FIBITMAP *dib ); */
 HB_FUNC( FI_FITOBITMAP )
 {
-   if ( hb_pcount() == 1 &&
-        hb_parinfo( 1 ) & HB_IT_POINTER
-      )
+   if( hb_pcount() == 1 &&
+       hb_parinfo( 1 ) & HB_IT_POINTER
+     )
    {
       FIBITMAP *dib;
       HBITMAP bitmap;
       HDC hDC;
 
       /* Retrieve parameters */
-      dib = (FIBITMAP *) hb_parptr( 1 );
+      dib = ( FIBITMAP * ) hb_parptr( 1 );
 
       /* run function */
       hDC = GetDC( NULL );
       bitmap = CreateDIBitmap(hDC, FreeImage_GetInfoHeader(dib),
-	                                 CBM_INIT, FreeImage_GetBits(dib),
-	                                 FreeImage_GetInfo(dib), DIB_RGB_COLORS);
+                              CBM_INIT, FreeImage_GetBits(dib),
+                              FreeImage_GetInfo(dib), DIB_RGB_COLORS);
       ReleaseDC( NULL, hDC );
 
       /* return value */
-      if ( bitmap != NULL )
-      {
-         hb_retnl( (LONG) bitmap );
-      }
-
+      if( bitmap )
+         hb_retptr( bitmap );
    }
    else
    {
@@ -240,4 +233,4 @@ HB_FUNC( FI_WINDRAW )
 
 // --------------------------------------------------------------------------
 
-#endif // ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+#endif // ( defined(HB_OS_WIN) || defined(__WIN32__) )

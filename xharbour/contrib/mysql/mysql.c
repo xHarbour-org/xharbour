@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.12 2004/06/19 12:11:07 peterrees Exp $
+ * $Id: mysql.c,v 1.13 2006/02/21 19:37:06 druzus Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 /* NOTE: we need this to prevent base types redefinition */
 #define _CLIPDEFS_H
-#if defined(HB_OS_WIN_32_USED)
+#if defined(HB_OS_WIN_USED)
    #include <windows.h>
 #endif
 

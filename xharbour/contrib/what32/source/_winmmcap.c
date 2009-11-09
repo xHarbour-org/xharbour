@@ -1,5 +1,5 @@
 /*
- * $Id: _winmmcap.c,v 1.2 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: _winmmcap.c,v 1.3 2008/05/01 22:28:51 andijahja Exp $
  */
 
 /*
@@ -9,7 +9,7 @@
  * Copyright 2004 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #define _WIN32_WINNT   0x0400
 
 #include <hbapi.h>

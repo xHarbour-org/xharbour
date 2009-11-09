@@ -1,5 +1,5 @@
 /*
- * $Id: envparam.c,v 1.1 2007/11/23 18:50:39 ptsarenko Exp $
+ * $Id: envparam.c,v 1.2 2007/12/23 19:15:16 enricomaria Exp $
  */
 /*
  * Harbour Project source code:
@@ -51,7 +51,7 @@
 
 #include "hbapi.h"
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 #include <windows.h>
 #endif
 
@@ -91,7 +91,7 @@ HB_FUNC( ENVPARAM )
    hb_retclenAdopt(buffer, buffsize);
 
 }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 {
 
    char *buffer;

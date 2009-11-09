@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.48 2009/08/27 05:29:38 andijahja Exp $
+ * $Id: hbver.c,v 1.49 2009/09/16 15:53:42 marchuet Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbver.h"
@@ -77,7 +77,7 @@
 #include "hbmemory.ch"
 #include "hbexemem.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    #include <ctype.h>
    #include "hbwbase.h"
@@ -193,7 +193,7 @@ char * hb_verPlatform( void )
          hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "OS/2" );
    }
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 
    {
       OSVERSIONINFOA osVer;
@@ -399,7 +399,7 @@ char * hb_verPlatform( void )
 
 BOOL hb_iswinnt( void )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    static BOOL s_fWinNT = FALSE;
    static BOOL s_fInited = FALSE;
 
@@ -419,7 +419,7 @@ BOOL hb_iswinnt( void )
 
 BOOL hb_iswince( void )
 {
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
    return TRUE;
 #else
    return FALSE;

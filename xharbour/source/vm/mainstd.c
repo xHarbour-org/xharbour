@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.11 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: mainstd.c,v 1.12 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -54,11 +54,11 @@
 #include "hbvm.h"
 
 HB_EXTERN_BEGIN
-#if defined(__MINGW32__)
+#if defined( __MINGW32__ )
 int _CRT_glob = 0;
 #endif
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    #include "hbgtcore.h"
 
    // Save
@@ -78,7 +78,7 @@ int main( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
 
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       hb_gtSetDefault( "win" );
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cgiread.c,v 1.1 2004/01/17 22:12:23 andijahja Exp $
+ * $Id: cgiread.c,v 1.2 2004/02/23 10:01:43 andijahja Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 #include <windows.h>
 #endif
 
@@ -85,7 +85,7 @@ HB_FUNC(CGIREAD)
       {
         sscanf(getenv("CONTENT_LENGTH"),"%d",&n);
         cgistr = (char *) hb_xgrab(n);
-#ifdef HB_OS_WIN_32 //(WINDOWS.H must be included)
+#ifdef HB_OS_WIN //(WINDOWS.H must be included)
         ReadFile(GetStdHandle(STD_INPUT_HANDLE),cgistr,n,&cgilen,NULL);
 #else
         cgilen=fread(cgistr,sizeof(char),n,stdin);
@@ -108,7 +108,7 @@ HB_FUNC(CGIWRITE)
    ULONG len;
    PHB_ITEM phbstr = hb_param(1,HB_IT_STRING);
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    if (phbstr)
       WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),phbstr->item.asString.value,phbstr->item.asString.length,&len,NULL);
 #else

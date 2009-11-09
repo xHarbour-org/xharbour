@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.68 2009/08/04 09:50:23 marchuet Exp $
+ * $Id: hbapifs.h,v 1.69 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -365,7 +365,7 @@ HB_EXPORT ULONG      hb_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULON
 HB_EXPORT ULONG      hb_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount );
 
 /* xHarbour file functions with shared file handles and locks
- * throw sockets, connecting with remote  server filere.exe 
+ * throw sockets, connecting with remote  server filere.exe
  * Client side work with buffered locks
  * Server side work with buffered handles
  */
@@ -379,9 +379,9 @@ typedef struct
    ULONG       attr;
    HB_FOFFSET  size;
 } HB_NETFFIND, * PHB_NETFFIND;
- 
- 
-HB_EXPORT PHB_FILE   hb_fileNetExtOpen( const char * pFilename, const char * pDefExt, 
+
+
+HB_EXPORT PHB_FILE   hb_fileNetExtOpen( const char * pFilename, const char * pDefExt,
                                         USHORT uiExFlags, const char * pPaths,
                                         PHB_ITEM pError, BOOL fBufferLock );
 HB_EXPORT PHB_FILE   hb_fileNetCreateTemp( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszFileName );
@@ -428,7 +428,7 @@ extern HB_EXPORT BYTE *    hb_fileNameConv( char * str );
 
 /* extern HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet ); */
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    extern int WintoDosError( ULONG lError);
 #endif
 

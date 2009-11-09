@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.41 2009/09/16 04:34:16 andijahja Exp $
+* $Id: hbserv.c,v 1.42 2009/09/18 17:41:41 ronpinkas Exp $
 */
 
 /*
@@ -74,13 +74,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
 #include "windows.h"
 #endif
 
 //TODO:
 //we'll use hb_fsPopen for popening once we put it multiplatform. For now:
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    #define popen  _popen
    #define pclose _pclose
 #endif
@@ -360,7 +360,7 @@ static void * s_signalListener( void * my_stack )
 * HB_SERVICELOOP to receive user generated messages.
 *****************************************************************************/
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 static void s_serviceSetHBSig( void );
 
 //message filter hook for user generated signals
@@ -649,7 +649,7 @@ static void s_serviceSetHBSig( void )
    signal( SIGPIPE, SIG_IGN );
 #endif
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    //disable all os-level error boxes
    s_uiErrorMode = SetErrorMode(
          SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT | SEM_NOGPFAULTERRORBOX |
@@ -681,7 +681,7 @@ static void s_serviceSetDflSig( void )
    signal( SIGPIPE, SIG_DFL );
 #endif
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    SetUnhandledExceptionFilter( NULL );
    if ( s_hMsgHook != NULL )
    {
@@ -794,7 +794,7 @@ HB_FUNC( HB_STARTSERVICE )
    pHVMFuncService = (PHB_FUNC) hb_isService;
 
    // in windows, we just detach from console
-   #ifdef HB_OS_WIN_32
+   #ifdef HB_OS_WIN
    if ( hb_parl(1) )
    {
       FreeConsole();
@@ -854,7 +854,7 @@ HB_FUNC( HB_ISSERVICE )
 
 HB_FUNC( HB_SERVICELOOP )
 {
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    MSG msg;
    /* This is just here to trigger our internal hook routine, if the
       final application does not any message handling.
@@ -1026,7 +1026,7 @@ HB_FUNC( HB_SIGNALDESC )
    }
    #endif
 
-   #ifdef HB_OS_WIN_32
+   #ifdef HB_OS_WIN
    if (iSig == 0 ) // exception
    {
       switch( iSubSig )

@@ -1,5 +1,5 @@
 /*
- * $Id: _winmain.c,v 1.2 2002/09/04 09:37:19 andy_wos Exp $
+ * $Id: _winmain.c,v 1.3 2004/07/06 04:35:16 marcosgambeta Exp $
  */
 
 /*
@@ -50,12 +50,12 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbvm.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 int argc = 0;
 char * argv[ 20 ];

@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.14 2007/12/31 09:02:00 andijahja Exp $
+ * $Id: dynlibhb.c,v 1.15 2008/03/20 08:58:21 mauriliolongo Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -77,7 +77,7 @@ HB_FUNC( LIBLOAD )
 
    void * hDynLib = NULL;
 
-#if defined(HB_OS_WIN_32) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
 
    if( hb_parclen( 1 ) > 0 )
    {
@@ -96,7 +96,7 @@ HB_FUNC( LIBLOAD )
       /* use stack address as first level marker */
       hb_vmBeginSymbolGroup( ( void * ) &HB_VM_STACK, TRUE );
 
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
       hDynLib = ( void * ) LoadLibrary( hb_parc( 1 ) );
       #elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
       hDynLib = ( void * ) dlopen( hb_parc( 1 ), RTLD_LAZY | RTLD_GLOBAL );
@@ -122,7 +122,7 @@ HB_FUNC( LIBLOAD )
 
 HB_FUNC( LIBFREE )
 {
-#if defined(HB_OS_WIN_32) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
 
    void * hDynLib = hb_parptr( 1 );
 
@@ -130,7 +130,7 @@ HB_FUNC( LIBFREE )
    {
       hb_vmExitSymbolGroup( hDynLib );
 
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN)
       hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
       #elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
       hb_retl( dlclose( hDynLib ) == 0 );

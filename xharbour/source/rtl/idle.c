@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.29 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: idle.c,v 1.30 2009/09/16 18:16:49 enricomaria Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */
 #define INCL_DOSPROCESS
 #define INCL_NOPMAPI
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -101,7 +101,7 @@ static USHORT s_uiIdleMaxTask = 0;
 #if defined(HB_THREAD_SUPPORT) || defined(HB_OS_UNIX)
    #define HB_IDLE_MSEC_DEFAULT 10
 #else
-   #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
+   #if defined(HB_OS_WIN) || defined(__CYGWIN__)
       #define HB_IDLE_MSEC_DEFAULT 20
    #else
       #define HB_IDLE_MSEC_DEFAULT 1
@@ -117,7 +117,7 @@ BOOL hb_vm_bCollectGarbage = TRUE;
 
 void hb_releaseCPU( BOOL bIndefinite )
 {
-#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_WIN_32) || defined(__CYGWIN__)
+#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_WIN) || defined(__CYGWIN__)
    BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */
 #else
    HB_SYMBOL_UNUSED( bIndefinite );
@@ -131,7 +131,7 @@ void hb_releaseCPU( BOOL bIndefinite )
 
 #else
 
-   #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
+   #if defined(HB_OS_WIN) || defined(__CYGWIN__)
       /* Forfeit the remainder of the current time slice. */
       if ( bIdleWaitNoCpu )
       {
@@ -176,11 +176,11 @@ void hb_releaseCPU( BOOL bIndefinite )
       usleep( s_uiIdleSleepMsec );
    #elif defined(HB_OS_UNIX)
    {
-  
+
       struct timeval tv;
       tv.tv_sec = 0;
       tv.tv_usec = 1000;
-      select( 0, NULL, NULL, NULL, &tv );   
+      select( 0, NULL, NULL, NULL, &tv );
 
    }
    #else

@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.9 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: copyfile.c,v 1.10 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #if defined(HB_OS_UNIX_COMPATIBLE)
    #include <sys/stat.h>
    #include <unistd.h>
-#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
    #include <windows.h>
 #endif
 
@@ -103,7 +103,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 #if defined(HB_OS_UNIX_COMPATIBLE)
          struct stat struFileInfo;
          int iSuccess = fstat( fhndSource, &struFileInfo );
-#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
          BY_HANDLE_FILE_INFORMATION hFileInfo;
          BOOL bSuccess = GetFileInformationByHandle( (HANDLE) fhndSource, &hFileInfo);
 #endif
@@ -148,7 +148,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 #if defined(HB_OS_UNIX_COMPATIBLE)
          if( iSuccess == 0 )
             fchmod( fhndDest, struFileInfo.st_mode );
-#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
          if( bSuccess )
             SetFileTime( (HANDLE) fhndDest,
     &hFileInfo.ftCreationTime,
@@ -157,7 +157,7 @@ static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
 #endif
 
          hb_fsClose( fhndDest );
-#if ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
          if( bSuccess )
          {
             SetFileAttributes( (LPCSTR) szSource, hFileInfo.dwFileAttributes );

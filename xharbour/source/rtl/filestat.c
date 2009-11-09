@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.14 2008/12/03 11:09:45 marchuet Exp $
+ * $Id: filestat.c,v 1.15 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -64,7 +64,7 @@
    #include <time.h>
    #include <sys/types.h>
    #include <sys/stat.h>
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
    #if ( defined(__BORLANDC__) || defined(_MSC_VER) || defined(__LCC__) || defined( __DMC__ )) && ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES ((DWORD)(-1))
    #endif
@@ -178,7 +178,7 @@ static BOOL hb_fsFileStats(
       fResult = TRUE;
    }
 
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
 
    {
       DWORD dwAttribs;

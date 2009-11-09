@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.131 2009/09/12 18:01:43 likewolf Exp $
+* $Id: thread.h,v 1.132 2009/09/18 17:41:41 ronpinkas Exp $
 */
 
 /*
@@ -72,7 +72,7 @@ typedef struct _HB_STACKRDD_TLS
 
 #ifdef HB_THREAD_SUPPORT
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    /* This section should be above any #includes that may #include <windows.h> */
    #ifndef _WIN32_WINNT
       #define _WIN32_WINNT 0x0400
@@ -116,7 +116,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 /* Maximum number of cycles that can be completed by VM without stack unlock */
 #define HB_VM_UNLOCK_PERIOD 5000
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    typedef struct tag_HB_WINCOND_T
    {
       HANDLE semBlockLock;
@@ -567,10 +567,10 @@ typedef struct tag_HB_STACK
    USHORT uiBackgroundMaxTask;
    ULONG  ulBackgroundID;
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    HANDLE th_h;
 #endif
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    volatile BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
    volatile BOOL bCanCancel;
    /* Windows cleanup functions */
@@ -874,7 +874,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 void hb_threadCancelInternal( void );
 
 /* Win 32 specific functions */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
    void hb_threadCondDestroy( HB_WINCOND_T *cond );
    void hb_threadCondSignal( HB_WINCOND_T *cond );

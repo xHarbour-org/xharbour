@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.3 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: keyset.c,v 1.4 2005/03/19 00:30:55 andijahja Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ static void SetGet( char cKey )
 
 #endif /* #if defined (HB_OS_DOS) */
 
-#if defined (HB_OS_WIN_32)
+#if defined (HB_OS_WIN)
 /*
  The following function ONLY works with GTWVT/GTWVW/GTALLEG.
  They will NOT WORK on pure CONSOLE mode
@@ -196,4 +196,4 @@ HB_FUNC (KSETSCROLL)
    hb_retl(hb_SetKeyBoardState( HB_VK_SCROLL , hb_parl(1) ));
 }
 
-#endif /* #if defined (HB_OS_WIN_32) */
+#endif /* #if defined (HB_OS_WIN) */

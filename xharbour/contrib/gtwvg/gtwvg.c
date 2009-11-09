@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.c,v 1.11 2009/09/13 00:48:30 likewolf Exp $
+ * $Id: gtwvg.c,v 1.12 2009/09/13 01:41:23 likewolf Exp $
  */
 
 /*
@@ -83,8 +83,8 @@
  */
 //----------------------------------------------------------------------//
 
-#ifndef HB_OS_WIN_32_USED
-   #define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+   #define HB_OS_WIN_USED
 #endif
 
 #define _HB_API_INTERNAL_ /* for hb_stack_ready, should be eliminated later */
@@ -509,7 +509,7 @@ static void hb_gt_wvt_ResetWindowSize( PHB_GTWVT pWVT )
                     tm.tmAveCharWidth; /* For fixed FONT should == tm.tmMaxCharWidth */
    pWVT->PTEXTSIZE.y = tm.tmHeight;       /* but seems to be a problem on Win9X so */
                                        /* assume proportional fonts always for Win9X */
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
    pWVT->FixedFont = FALSE;
 #else
    pWVT->FixedFont = !pWVT->Win9X && pWVT->fontWidth >= 0 &&
@@ -623,7 +623,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
             pWVT->PTEXTSIZE.x = tm.tmAveCharWidth;
             pWVT->PTEXTSIZE.y = tm.tmHeight;
 
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
             pWVT->FixedFont = FALSE;
 #else
             pWVT->FixedFont = !pWVT->Win9X && pWVT->fontWidth >= 0 &&

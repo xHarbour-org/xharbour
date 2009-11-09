@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.26 2008/03/26 23:33:20 modalsist Exp $
+ * $Id: postgres.c,v 1.27 2009/01/24 00:33:08 likewolf Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -60,7 +60,7 @@
 #include "libpq-fe.h"
 
 #define _CLIPDEFS_H
-#if defined(HB_OS_WIN_32_USED)
+#if defined(HB_OS_WIN_USED)
    #include <windows.h>
 #endif
 
@@ -73,7 +73,7 @@
 #define OIDOID			26
 #define FLOAT4OID               700
 #define FLOAT8OID               701
-#define CASHOID                 790                                                                
+#define CASHOID                 790
 #define BPCHAROID		1042
 #define VARCHAROID		1043
 #define DATEOID			1082
@@ -96,8 +96,8 @@
 #  endif
 #endif
 
-/* 
- * Connection handling functions 
+/*
+ * Connection handling functions
  */
 
 HB_FUNC( PQCONNECT )
@@ -122,19 +122,19 @@ HB_FUNC( PQSETDBLOGIN )
     const char *dbName;
     const char *login;
     const char *pwd;
-                                         
-    pghost    = hb_parcx(1);   
-    pgport    = hb_parcx(2);   
+
+    pghost    = hb_parcx(1);
+    pgport    = hb_parcx(2);
     pgoptions = hb_parcx(3);
-    pgtty     = hb_parcx(4);    
-    dbName    = hb_parcx(5);   
-    login     = hb_parcx(6);    
-    pwd       = hb_parcx(8);      
-                                         
+    pgtty     = hb_parcx(4);
+    dbName    = hb_parcx(5);
+    login     = hb_parcx(6);
+    pwd       = hb_parcx(8);
+
     if (hb_pcount() == 7)
         hb_retptr( ( PGconn * ) PQsetdbLogin( pghost, pgport, pgoptions, pgtty, dbName, login, pwd) );
-}   
-                    
+}
+
 HB_FUNC(PQCLOSE)
 {
     if (hb_parinfo(1))
@@ -164,51 +164,51 @@ HB_FUNC(PQSETCLIENTENCODING)
     if (hb_pcount() == 2)
         hb_retni(PQsetClientEncoding(( PGconn * ) hb_parptr(1), hb_parcx(2)));
 }
-    
+
 HB_FUNC(PQDB)
-{   
+{
     if (hb_parinfo(1))
         hb_retc(PQdb( ( PGconn * ) hb_parptr(1) ));
 }
-        
+
 HB_FUNC(PQUSER)
 {
     if (hb_parinfo(1))
        hb_retc(PQuser( ( PGconn * ) hb_parptr(1) ));
 }
-            
+
 HB_FUNC(PQPASS)
 {
     if (hb_parinfo(1))
         hb_retc(PQpass( ( PGconn * ) hb_parptr(1) ));
 }
-            
+
 HB_FUNC(PQHOST)
 {
     if (hb_parinfo(1))
         hb_retc(PQhost( ( PGconn * ) hb_parptr(1) ));
 }
-            
+
 HB_FUNC(PQPORT)
 {
     if (hb_parinfo(1))
         hb_retc(PQport( ( PGconn * ) hb_parptr(1) ));
 }
-            
+
 HB_FUNC(PQTTY)
 {
     if (hb_parinfo(1))
         hb_retc(PQtty( ( PGconn * ) hb_parptr(1) ));
 }
-            
+
 HB_FUNC(PQOPTIONS)
 {
     if (hb_parinfo(1))
         hb_retc(PQoptions( ( PGconn * ) hb_parptr(1) ));
 }
 
-/* 
- * Query handling functions 
+/*
+ * Query handling functions
  */
 
 HB_FUNC(PQCLEAR)
@@ -224,7 +224,7 @@ HB_FUNC(PQEXEC)
     if (hb_pcount() == 2)
         res = PQexec(( PGconn * ) hb_parptr(1), hb_parcx(2));
 
-    hb_retptr( res );        
+    hb_retptr( res );
 }
 
 HB_FUNC(PQEXECPARAMS)
@@ -251,7 +251,7 @@ HB_FUNC(PQEXECPARAMS)
 
         hb_xfree(paramvalues);
     }
-    hb_retptr( res );        
+    hb_retptr( res );
 }
 
 HB_FUNC(PQFCOUNT)
@@ -460,7 +460,7 @@ HB_FUNC( PQRESULT2ARRAY )
          PHB_ITEM pResult = hb_itemArrayNew( nRows ), pRow;
 
          for( nRow = 0; nRow < nRows ; nRow++ )
-         {  
+         {
             pRow = hb_arrayGetItemPtr( pResult, nRow + 1 );
             hb_arrayNew ( pRow, nCols );
             for( nCol = 0; nCol < nCols ; nCol++ )
@@ -523,15 +523,15 @@ HB_FUNC(PQESCAPESTRING)
     char *source;
     char *dest;
     size_t size;
-        
+
     source = hb_parcx(1);
     dest = (char *) hb_xgrab( strlen(source) * 2 + 1);
     size = strlen(source);
-    
+
     PQescapeString(dest, source, size);
-    
+
     hb_retc(dest);
-    hb_xfree( (char *) dest);    
+    hb_xfree( (char *) dest);
 }
 
 
@@ -541,11 +541,11 @@ HB_FUNC(PQESCAPEBYTEA) /* deprecated */
     unsigned char *to;
     size_t from_length;
     size_t to_length;
-        
+
     from = ( BYTE * ) hb_parc(1);
     from_length = hb_parclen(1);
     to_length = from_length * 5 + 1;
-    
+
     to = PQescapeBytea(from, from_length, &to_length);
     hb_retc( ( char * ) to );
     PQfreemem(to);
@@ -555,8 +555,8 @@ HB_FUNC(PQESCAPEBYTEA) /* deprecated */
 HB_FUNC(PQUNESCAPEBYTEA)
 {
     unsigned char *from;
-    size_t to_length;        
-    
+    size_t to_length;
+
     from = PQunescapeBytea(( BYTE * ) hb_parcx(1), &to_length);
     hb_retclen( ( char * ) from, to_length);
     PQfreemem(from);
@@ -635,18 +635,18 @@ HB_FUNC(PQNFIELDS)
         hb_retnl( PQnfields(( PGresult * ) hb_parptr(1) ));
 }
 
-/* 
- * Asynchronous functions 
+/*
+ * Asynchronous functions
  */
 
 HB_FUNC(PQSENDQUERY)
 {
-    int res = 0;        
+    int res = 0;
 
     if (hb_pcount() == 2)
         res = PQsendQuery(( PGconn * ) hb_parptr(1), hb_parcx(2));
 
-    hb_retl( res );        
+    hb_retl( res );
 }
 
 HB_FUNC(PQGETRESULT)
@@ -658,37 +658,37 @@ HB_FUNC(PQGETRESULT)
 
     /* when null, no more result to catch */
     if (res)
-        hb_retptr( res );        
+        hb_retptr( res );
 }
 
 HB_FUNC(PQCONSUMEINPUT)
 {
-    int res = 0;        
+    int res = 0;
 
     if (hb_parinfo(1))
         res = PQconsumeInput(( PGconn * ) hb_parptr(1));
 
-    hb_retl( res );        
+    hb_retl( res );
 }
 
 HB_FUNC(PQISBUSY)
 {
-    int res = 0;        
+    int res = 0;
 
     if (hb_parinfo(1))
         res = PQisBusy(( PGconn * ) hb_parptr(1));
 
-    hb_retl( res );        
+    hb_retl( res );
 }
 
 HB_FUNC(PQREQUESTCANCEL) /* deprecated */
 {
-    int res = 0;        
+    int res = 0;
 
     if (hb_parinfo(1))
         res = PQrequestCancel(( PGconn * ) hb_parptr(1));
 
-    hb_retl( res );        
+    hb_retl( res );
 }
 
 
@@ -711,8 +711,8 @@ HB_FUNC(PQISNONBLOCKING)
         hb_retl( PQisnonblocking( ( PGconn * ) hb_parptr(1) ) );
 }
 
-/* 
- * Trace Connection handling functions 
+/*
+ * Trace Connection handling functions
  */
 
 HB_FUNC(PQCREATETRACE)
@@ -722,10 +722,10 @@ HB_FUNC(PQCREATETRACE)
     if (hb_parinfo(1))
     {
         pFile = fopen( hb_parcx(1), "w+b");
-    
+
         if (pFile != NULL)
             hb_retptr( ( FILE * ) pFile );
-    }            
+    }
 }
 
 HB_FUNC(PQCLOSETRACE)
@@ -752,55 +752,55 @@ HB_FUNC(PQSETERRORVERBOSITY)
        PQERRORS_DEFAULT 1
        PQERRORS_VERBOSE 2
     */
-    
+
     if (hb_pcount() == 2)
         hb_retni( ( PGVerbosity ) PQsetErrorVerbosity( ( PGconn * ) hb_parptr(1), ( PGVerbosity ) hb_parni(2) ) );
 }
 
 
-/* 
- * Large Object functions 
+/*
+ * Large Object functions
  */
 
 
 HB_FUNC(LO_IMPORT)
 {
-    int ret = 0; 
-    
+    int ret = 0;
+
     if (hb_pcount() == 2)
          ret = lo_import( ( PGconn * ) hb_parptr(1), hb_parcx(2) );
 
-    hb_retni(ret);         
+    hb_retni(ret);
 }
 
 HB_FUNC(LO_EXPORT)
 {
-    int ret = 0; 
-    
+    int ret = 0;
+
     if (hb_pcount() == 3)
     {
         ret = lo_export( ( PGconn * ) hb_parptr(1), ( Oid ) hb_parnl(2), hb_parcx(3) );
 
         if (ret != 1)
             ret = 0;
-    }            
+    }
 
-    hb_retl(ret);        
+    hb_retl(ret);
 }
 
 HB_FUNC(LO_UNLINK)
-{   
-    int ret = 0; 
-           
+{
+    int ret = 0;
+
     if (hb_pcount() == 2)
     {
-        ret = lo_unlink( ( PGconn * ) hb_parptr(1), ( Oid ) hb_parnl(2) );        
-        
+        ret = lo_unlink( ( PGconn * ) hb_parptr(1), ( Oid ) hb_parnl(2) );
+
         if (ret != 1)
             ret = 0;
-    }            
+    }
 
-    hb_retl(ret);        
+    hb_retl(ret);
 }
 
 
@@ -817,7 +817,7 @@ HB_FUNC(PQGETCANCEL)
 {
     if (hb_parinfo(1))
         hb_retptr( ( PGcancel * ) PQgetCancel( ( PGconn * ) hb_parptr(1) ) );
-}        
+}
 
 HB_FUNC(PQCANCEL)
 {
@@ -827,30 +827,30 @@ HB_FUNC(PQCANCEL)
     if (hb_parinfo(1))
         if (PQcancel( ( PGcancel * ) hb_parptr(1), errbuf, 255) == 1)
         {
-            ret = 1;                
+            ret = 1;
             hb_storc( errbuf, 2 );
-        }            
-        
-    hb_retl(ret);            
-}        
+        }
+
+    hb_retl(ret);
+}
 
 HB_FUNC(PQFREECANCEL)
 {
     if (hb_parinfo(1))
         PQfreeCancel( ( PGcancel * ) hb_parptr(1) ) ;
-}        
+}
 
-HB_FUNC(PQESCAPEBYTEACONN) 
+HB_FUNC(PQESCAPEBYTEACONN)
 {
     unsigned const char *from;
     unsigned char *to;
     size_t from_length;
     size_t to_length;
-        
+
     from = ( BYTE * ) hb_parc(2);
     from_length = hb_parclen(2);
     to_length = from_length * 5 + 1;
-    
+
     to = PQescapeByteaConn(( PGconn * ) hb_parptr(1), from, from_length, &to_length);
     hb_retc( ( char * ) to );
     PQfreemem(to);
@@ -877,8 +877,8 @@ PGresult *PQprepare(PGconn *conn,
                     const char *query,
                     int nParams,
                     const Oid *paramTypes);
-  
-  
+
+
 PGresult *PQexecPrepared(PGconn *conn,
                          const char *stmtName,
                          int nParams,
@@ -886,7 +886,7 @@ PGresult *PQexecPrepared(PGconn *conn,
                          const int *paramLengths,
                          const int *paramFormats,
                          int resultFormat);
-                         
+
 int PQsendQueryParams(PGconn *conn,
                       const char *command,
                       int nParams,
@@ -895,19 +895,19 @@ int PQsendQueryParams(PGconn *conn,
                       const int *paramLengths,
                       const int *paramFormats,
                       int resultFormat);
-                      
+
 int PQsendPrepare(PGconn *conn,
                   const char *stmtName,
                   const char *query,
                   int nParams,
                   const Oid *paramTypes);
-                  
+
 int PQsendQueryPrepared(PGconn *conn,
                         const char *stmtName,
                         int nParams,
                         const char * const *paramValues,
                         const int *paramLengths,
                         const int *paramFormats,
-                        int resultFormat);                                                                                     
-                                                
+                        int resultFormat);
+
 */

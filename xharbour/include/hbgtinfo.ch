@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtinfo.ch,v 1.1 2008/03/16 19:15:58 likewolf Exp $
+ * $Id: hbgtinfo.ch,v 1.2 2008/06/25 20:20:51 vouchcac Exp $
  */
 
 /*
@@ -127,6 +127,15 @@
 #define HB_GTI_SCREENSIZE       52  /* Get/Set height/width of application window in pixels */
 #define HB_GTI_PALETTE          53  /* Get/Set console colors 1 - 16 given an array of 16 elements containing RGB colors */
 
+#define HB_GTI_RESIZEMODE       54  /* Get/Set console resize mode : HB_GTI_RESIZEMODE_FONT | HB_GTI_RESIZEMODE_ROWS */
+#define HB_GTI_SETPOS_XY        55  /* Get/Set current top-left position coordinates of the window by pixels */
+#define HB_GTI_SETPOS_ROWCOL    56  /* Set current top-left position coordinates of the window by row/cols */
+
+#define HB_GTI_BOXCP            57  /* Codepage used for box drawing */
+
+#define HB_GTI_CARGO            58  /* Storage of any user defined value */
+#define HB_GTI_FONTSEL          59  /* X11 style font selecting */
+
 /* Font weights */
 #define HB_GTI_FONTW_THIN       1
 #define HB_GTI_FONTW_NORMAL     2
@@ -154,12 +163,23 @@
 #define HB_GTI_KBD_ACCENT3      16384
 #define HB_GTI_KBD_ACCENT4      32768
 
+#define HB_GTI_KBD_LSHIFT       65536
+#define HB_GTI_KBD_RSHIFT       131072
+#define HB_GTI_KBD_LCTRL        262144
+#define HB_GTI_KBD_RCTRL        524288
+#define HB_GTI_KBD_LALT         1048576
+#define HB_GTI_KBD_RALT         2097572
+
 /* Harbour GT callback events - WORK IN PROGRESS */
 #define HB_GTE_ACTIVATE         1
 #define HB_GTE_SETFOCUS         2
 #define HB_GTE_KILLFOCUS        3
 #define HB_GTE_CLOSE            4
 #define HB_GTE_RESIZED          5
+
+/* Harbour GT Reszing mode constants */
+#define HB_GTI_RESIZEMODE_FONT  0   /* Default */
+#define HB_GTI_RESIZEMODE_ROWS  1
 
 /* Compatibility #defines.
    These codes are deprecated, _don't use them_. Please upgrade to the above versions.

@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -320,14 +320,14 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    fout = hb_fopen( szVerFile, "w" );
    if( !fout )
    {
-#if !defined(__MINGW32CE__) && !defined(HB_WINCE)
+#if !defined(__MINGW32CE__) && !defined(HB_OS_WIN_CE)
       perror( szVerFile );
 #endif
       iResult = 1;
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.14 2009/04/16 14:57:35 likewolf Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"
@@ -415,7 +415,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
    {
          if( !fQuiet )
          {
-#if !defined(__MINGW32CE__) && !defined(HB_WINCE)
+#if !defined(__MINGW32CE__) && !defined(HB_OS_WIN_CE)
             perror( pszFile );
 #else
             fprintf( stderr, "Cannot open the %s file.\n", pszFile );
@@ -682,6 +682,6 @@ int main( int argc, char * argv[] )
    return iResult;
 }
 
-#if defined( HB_WINCE ) && !defined( __CEGCC__ )
+#if defined( HB_OS_WIN_CE ) && !defined( __CEGCC__ )
 #  include "hbwmain.c"
 #endif

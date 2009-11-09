@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.111 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: estack.c,v 1.112 2009/09/27 00:05:24 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -806,7 +806,7 @@ void hb_stackDispCall( void )
 
 #ifdef HB_INCLUDE_WINEXCHANDLER
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
 LONG WINAPI hb_UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionInfo )
 {

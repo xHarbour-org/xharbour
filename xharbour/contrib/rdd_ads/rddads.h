@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.25 2009/07/22 16:55:02 marchuet Exp $
+ * $Id: rddads.h,v 1.26 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #include "hbapirdd.h"
 
-#if defined( HB_OS_WIN_32 ) && !defined( WIN32 )
+#if defined( HB_OS_WIN ) && !defined( WIN32 )
    #define WIN32
 #endif
 #if !defined( unix ) && ( defined( __LINUX__ ) || defined( HB_OS_LINUX ) )
@@ -191,7 +191,7 @@ typedef ADSAREA * ADSAREAP;
 
 #define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 #  define ADS_USE_OEM_TRANSLATION
 #else
 #  undef ADS_USE_OEM_TRANSLATION

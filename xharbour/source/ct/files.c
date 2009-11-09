@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.21 2009/08/03 11:47:22 lculik Exp $
+ * $Id: files.c,v 1.22 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
  */
 
 /* W32 */
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -119,7 +119,7 @@
 
 #endif
 
-#if ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
    static       HANDLE hLastFind;
    static       WIN32_FIND_DATA  Lastff32;
    LPTSTR GetDate( FILETIME *rTime );
@@ -239,7 +239,7 @@ ULONG hb_fsGetFileAttributes( char * szFile )
       }
       #endif
 
-   #elif defined( HB_OS_WIN_32 )
+   #elif defined( HB_OS_WIN )
    {
       ULONG dAttr;
 
@@ -296,7 +296,7 @@ HB_FUNC( SETFATTR )
       }
       #endif
 
-   #elif defined( HB_OS_WIN_32 )
+   #elif defined( HB_OS_WIN )
    {
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
       DWORD dwLastError=ERROR_SUCCESS;
@@ -353,7 +353,7 @@ HB_FUNC( FILESEEK )
 {
    BOOL bFound = FALSE;
 
-   #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+   #if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
    {
       LPCTSTR szFile;
 
@@ -464,7 +464,7 @@ HB_FUNC( FILESEEK )
 HB_FUNC( FILESIZE )
 {
 
-   #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+   #if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
    {
       HB_LONG dwFileSize;
       LPCTSTR szFile;
@@ -620,7 +620,7 @@ HB_FUNC( FILESIZE )
 HB_FUNC( FILEDATE )
 {
 
-   #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+   #if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
    {
       LPCTSTR szFile;
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
@@ -744,7 +744,7 @@ HB_FUNC( FILEDATE )
 HB_FUNC( FILETIME )
 {
 
-#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
 {
    LPTSTR szDateString;
    LPCTSTR szFile;
@@ -862,7 +862,7 @@ HB_FUNC( FILETIME )
 
 }
 
-#if ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ ) && !defined( __RSXNT__ )
+#if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ ) && !defined( __RSXNT__ )
 
 #include <tchar.h>
 
@@ -944,7 +944,7 @@ HB_FUNC( SETFDATI )
       if( pTime )
          hb_timeStrGet( hb_itemGetCPtr( pTime ), &hour, &minute, &second, NULL );
 
-#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
       {
          FILETIME ft, local_ft;
          SYSTEMTIME st;
@@ -1048,7 +1048,7 @@ HB_FUNC( SETFDATI )
 
          if( pDate )
          {
-#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && !defined( __CYGWIN__ )
             new_value.tm_year = year;
             new_value.tm_mon = month;
 #else

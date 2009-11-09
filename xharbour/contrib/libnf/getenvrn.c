@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.4 2008/05/14 13:28:41 andijahja Exp $
+ * $Id: getenvrn.c,v 1.5 2008/05/24 21:25:30 enricomaria Exp $
  */
 
 /*
@@ -97,12 +97,12 @@
 
 //#include <extend.api>
 //#include <fm.api>
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbfast.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 #include "windows.h"
 #endif
 #define NORETURN   0
@@ -119,9 +119,9 @@ HB_FUNC(FT_GETE)
     /* INTERNALS WARNING: All references to 'environ', strlen(), ;
        strcpy(), and strcat() are undocumented Clipper 5.0 internals.
     */
-#if defined(HB_OS_DOS) 
+#if defined(HB_OS_DOS)
    {
-   
+
     extern char **_environ;
     char *buffer = NULL;
     int x;
@@ -182,9 +182,9 @@ HB_FUNC(FT_GETE)
     // return number of strings found
     hb_retni(x);
 }
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
 {
-   
+
 
     char *buffer = NULL;
     LPVOID lpEnviron=GetEnvironmentStrings();
@@ -201,8 +201,8 @@ HB_FUNC(FT_GETE)
     if (rettype == CHARTYPE)
         // scan strings first and add up total size
         {
-        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++) 
-        { 
+        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
+        {
 
             {
             if (! *sCurEnv)
@@ -226,10 +226,10 @@ HB_FUNC(FT_GETE)
      }
       x = 0;
 //    for (x = 0; ;x++)
-        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++) 
-        { 
+        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
+        {
 
-        
+
         if (! *sCurEnv)
             // null string, we're done
             break;

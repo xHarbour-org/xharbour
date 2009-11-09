@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.33 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: fstemp.c,v 1.34 2009/10/22 22:58:31 lculik Exp $
  */
 
 /*
@@ -51,8 +51,8 @@
  *
  */
 
-#ifndef HB_OS_WIN_32_USED
-   #define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+   #define HB_OS_WIN_USED
 #endif
 
 #include "hbapi.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.31 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: cmdarg.c,v 1.32 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -64,7 +64,7 @@ static char *argv = "";
 static int     s_argc = 0;
 static char ** s_argv = &argv;
 
-#if defined( HB_OS_WIN_32 ) && defined( HB_OS_WIN_32_USED )
+#if defined( HB_OS_WIN ) && defined( HB_OS_WIN_USED )
 
 HB_EXTERN_BEGIN
 

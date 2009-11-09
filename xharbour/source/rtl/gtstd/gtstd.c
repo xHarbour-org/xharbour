@@ -1,5 +1,5 @@
 /*
- * $Id: gtstd.c,v 1.32 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: gtstd.c,v 1.33 2009/02/20 12:48:35 marchuet Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
 #  if defined( HB_WIN32_IO )
 #     include <windows.h>
 #  endif
-#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_WINCE )
+#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_OS_WIN_CE )
 #     include <conio.h>
 #  endif
 #endif
@@ -279,7 +279,7 @@ static void hb_gt_std_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
       }
    }
 #endif
-#elif defined( HB_WIN32_IO ) && ! defined( HB_WINCE )
+#elif defined( HB_WIN32_IO ) && ! defined( HB_OS_WIN_CE )
    if( pGTSTD->fStdinConsole )
    {
       SetConsoleMode( ( HANDLE ) hb_fsGetOsHandle( pGTSTD->hStdin ), 0x0000 );
@@ -353,7 +353,7 @@ static int hb_gt_std_ReadKey( PHB_GT pGT, int iEventMask )
             ch = pGTSTD->keyTransTbl[ bChar ];
       }
    }
-#elif defined( _MSC_VER ) && !defined( HB_WINCE )
+#elif defined( _MSC_VER ) && !defined( HB_OS_WIN_CE )
    if( pGTSTD->fStdinConsole )
    {
       if( _kbhit() )

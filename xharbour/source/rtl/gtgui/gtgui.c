@@ -1,5 +1,5 @@
 /*
- * $Id: gtgui.c,v 1.6 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtgui.c,v 1.7 2008/11/26 22:25:27 andijahja Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 #define HB_GT_NAME   GUI
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include "hbgtcore.h"
 #include "hbinit.h"
 #include "hbapiitm.h"
@@ -88,7 +88,7 @@ static void hb_gt_gui_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_gui_Tone(%p,%lf,%lf)", pGT, dFrequency, dDuration));
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    HB_SYMBOL_UNUSED( pGT );
    hb_gt_w32_tone( dFrequency, dDuration );
 #else
@@ -104,7 +104,7 @@ static BOOL hb_gt_gui_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 
    switch( iType )
    {
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
       case HB_GTI_CLIPBOARDDATA:
          if( hb_itemType( pInfo->pNewVal ) & HB_IT_STRING )
          {
@@ -169,7 +169,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
+#elif defined( HB_MSC_STARTUP )
    #if defined( HB_OS_WIN_64 )
       #pragma section( HB_MSC_START_SEGMENT, long, read )
    #endif

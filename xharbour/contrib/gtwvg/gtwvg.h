@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.h,v 1.1 2008/06/25 22:19:18 vouchcac Exp $
+ * $Id: gtwvg.h,v 1.2 2008/12/23 20:33:21 likewolf Exp $
  */
 
 /*
@@ -106,7 +106,7 @@
 #define WVT_MAX_ROWS                256
 #define WVT_MAX_COLS                256
 #define WVT_MAX_WINDOWS             256
-#if defined( HB_WINCE )
+#if defined( HB_OS_WIN_CE )
 #  define WVT_DEFAULT_ROWS          15
 #  define WVT_DEFAULT_COLS          50
 #  define WVT_DEFAULT_FONT_HEIGHT   12
@@ -184,7 +184,7 @@
    #endif
 #endif
 
-#if defined( __cplusplus ) && !defined( _WIN64 ) && \
+#if defined( __cplusplus ) && !defined( HB_OS_WIN_64 ) && \
     ( defined( __BORLANDC__ ) || defined( _MSC_VER ) )
 #  define HB_ID_REF( type, id )     id
 #else

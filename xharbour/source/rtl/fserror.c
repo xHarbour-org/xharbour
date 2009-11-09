@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.13 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: fserror.c,v 1.14 2008/12/22 22:09:45 likewolf Exp $
  */
 
 /*
@@ -50,15 +50,15 @@
  *
  */
 
-#ifndef HB_OS_WIN_32_USED
-   #define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+   #define HB_OS_WIN_USED
 #endif
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbstack.h"
 #include "hb_io.h"
-#if !(defined(HB_WIN32_IO) || defined(HB_OS_WIN_32))
+#if !(defined(HB_WIN32_IO) || defined(HB_OS_WIN))
 #  include <errno.h>
 #endif
 
@@ -146,7 +146,7 @@ static int hb_errnoToDosError( int ErrCode )
 }
 #endif
 
-#if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
+#if defined(HB_WIN32_IO) || defined(HB_OS_WIN)
 static int hb_WinToDosError( ULONG ulError )
 {
    int iResult;
@@ -241,7 +241,7 @@ void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
    }
    else
    {
-#if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
+#if defined(HB_WIN32_IO) || defined(HB_OS_WIN)
       uiOsErrorLast = ( USHORT ) GetLastError();
       uiErrorLast = ( USHORT ) hb_WinToDosError( uiOsErrorLast );
 #elif defined(_MSC_VER) || defined(__DMC__)

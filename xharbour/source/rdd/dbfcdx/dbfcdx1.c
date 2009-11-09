@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.300 2009/10/05 14:41:41 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.301 2009/10/15 11:53:14 lculik Exp $
  */
 
 /*
@@ -6697,10 +6697,7 @@ static HB_ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo
       pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag->szName );
 
    if( pOrderInfo->itmOrder )
-   {
-      hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &(pArea->uiTag) );
-      /* TODO: RTerror if not found? */
-   }
+      hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &pArea->uiTag );
 
    return HB_SUCCESS;
 }
@@ -7944,8 +7941,9 @@ static HB_ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO
 /* ( DBENTRYP_V )     hb_cdxClearFilter */
 static HB_ERRCODE hb_cdxClearFilter( CDXAREAP pArea )
 {
+   HB_ERRCODE errCode = SUPER_CLEARFILTER( ( AREAP ) pArea );
    hb_cdxClearLogPosInfo( pArea );
-   return SUPER_CLEARFILTER( ( AREAP ) pArea );
+   return errCode;
 }
 
 /* ( DBENTRYP_V )     hb_cdxClearLocate     : NULL */

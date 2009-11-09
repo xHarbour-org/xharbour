@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.14 2008/04/04 15:20:46 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.15 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 
 #include "hbapiitm.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
 #include <windows.h>
 

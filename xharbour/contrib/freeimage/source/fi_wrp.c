@@ -1,5 +1,5 @@
 /*
- * $Id: fi_wrp.c,v 1.4 2008/05/27 16:04:31 ptsarenko Exp $
+ * $Id: fi_wrp.c,v 1.5 2008/08/03 11:08:28 enricomaria Exp $
  */
 
 /*
@@ -56,11 +56,7 @@
  *
  */
 
-/* NOTE: we need this to prevent base types redefinition */
-#define _CLIPDEFS_H
-#if defined(HB_OS_WIN_32_USED)
-   #include <windows.h>
-#endif
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -68,28 +64,29 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
-//#include "hrbdll.h"
+
 #include "hbvm.h"
+
+#if defined( HB_OS_WIN ) && !defined( _WINDOWS_ ) && ( defined( __GNUC__ ) || defined( __POCC__ ) || defined( __XCC__ ) ) || defined( __WATCOMC__ )
+   #define _WINDOWS_
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include "FreeImage.h"
 
 /* ************************* WRAPPED FUNCTIONS ****************************** */
 
-// static for error handler (see below FI_SETOUTPUTMESSAGE )
+/* static for error handler (see below FI_SETOUTPUTMESSAGE ) */
 static void *pErrorHandler = NULL;
 
-// --------------------------------------------------------------------------
-// Init / Error routines ----------------------------------------------------
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* Init / Error routines ---------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-// DLL_API void DLL_CALLCONV FreeImage_Initialise(BOOL load_local_plugins_only FI_DEFAULT(FALSE));
+/* DLL_API void DLL_CALLCONV FreeImage_Initialise(BOOL load_local_plugins_only FI_DEFAULT(FALSE)); */
 HB_FUNC( FI_INITIALISE )
 {
       BOOL bLoadPluginsOnly;
@@ -101,45 +98,45 @@ HB_FUNC( FI_INITIALISE )
       FreeImage_Initialise( bLoadPluginsOnly );
 }
 
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
 
-// DLL_API void DLL_CALLCONV FreeImage_DeInitialise(void);
+/* DLL_API void DLL_CALLCONV FreeImage_DeInitialise(void); */
 HB_FUNC( FI_DEINITIALISE )
 {
       /* Run function */
       FreeImage_DeInitialise();
 }
 
-// --------------------------------------------------------------------------
-// Version routines ---------------------------------------------------------
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* Version routines --------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-// DLL_API const char *DLL_CALLCONV FreeImage_GetVersion(void);
+/* DLL_API const char *DLL_CALLCONV FreeImage_GetVersion(void); */
 HB_FUNC( FI_GETVERSION )
 {
       /* Run function & return value */
       hb_retc( FreeImage_GetVersion() );
 }
 
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
 
-// DLL_API const char *DLL_CALLCONV FreeImage_GetCopyrightMessage(void);
+/* DLL_API const char *DLL_CALLCONV FreeImage_GetCopyrightMessage(void); */
 HB_FUNC( FI_GETCOPYRIGHTMESSAGE )
 {
       /* Run function & return value */
       hb_retc( FreeImage_GetCopyrightMessage() );
 }
 
-// --------------------------------------------------------------------------
-// Message output functions -------------------------------------------------
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* Message output functions ------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-// DLL_API void DLL_CALLCONV FreeImage_OutputMessageProc(int fif, const char *fmt, ...);
+/* DLL_API void DLL_CALLCONV FreeImage_OutputMessageProc(int fif, const char *fmt, ...); */
 
-// typedef void (*FreeImage_OutputMessageFunction)(FREE_IMAGE_FORMAT fif, const char *msg);
-// DLL_API void DLL_CALLCONV FreeImage_SetOutputMessage(FreeImage_OutputMessageFunction omf);
+/* typedef void (*FreeImage_OutputMessageFunction)(FREE_IMAGE_FORMAT fif, const char *msg); */
+/* DLL_API void DLL_CALLCONV FreeImage_SetOutputMessage(FreeImage_OutputMessageFunction omf); */
 
-// implementation: void FreeImage_SetOutputMessage( pFunctionPointer )
+/* implementation: void FreeImage_SetOutputMessage( pFunctionPointer ) */
 
 /**
 FreeImage error handler
@@ -151,17 +148,17 @@ void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message)
    const char *format;
    PHB_SYMB pSymbol;
 
-   if ( pErrorHandler == NULL )
+   if( ! pErrorHandler )
    {
-      // Do nothing
+      /* Do nothing */
       return;
    }
 
    pSymbol = (PHB_SYMB) pErrorHandler;
 
-   //TraceLog( NULL, "ErrorHandle %p\n\r", pErrorHandler );
+   /*TraceLog( NULL, "ErrorHandle %p\n\r", pErrorHandler );*/
 
-   if( pSymbol == NULL )
+   if( ! pSymbol )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, "FreeImageErrorHandler", 1, hb_paramError( 1 ) );
       return;

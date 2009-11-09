@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.26 2008/06/27 15:59:35 marchuet Exp $
+* $Id: inet.h,v 1.27 2009/01/24 00:33:08 likewolf Exp $
 */
 
 /*
@@ -61,7 +61,7 @@
    #if defined( HB_OS_DOS )
        #define HB_NO_DEFAULT_INET
    #else
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
@@ -113,7 +113,7 @@
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 
-      #if defined( HB_OS_WIN_32 )
+      #if defined( HB_OS_WIN )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
               s->errorDesc = strerror( s->errorCode );\

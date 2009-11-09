@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.55 2009/01/28 15:42:06 marchuet Exp $
+ * $Id: hbsetup.h,v 1.56 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -188,7 +188,7 @@
 
 
 /* ***********************************************************************
- * Use native Windows memory allocation functions (HB_OS_WIN_32)
+ * Use native Windows memory allocation functions (HB_OS_WIN)
  * This option can disable compiler memory allocation optimization
  * so you should really have a good reason to enable it
  */
@@ -339,20 +339,21 @@
    Visual Studio .NET 2003, version 7.1    1310
    Visual Studio 2005, version 8.0         1400
    Visual Studio 2008, version 9.0         1500
+   Visual Studio 2010, version 10.0        1600
 */
 
 /* ***********************************************************************
  * Platform detection
  */
 
-#if defined(__WATCOMC__)
-   #if defined(__OS2__)
+#if defined( __WATCOMC__ )
+   #if defined( __OS2__ )
       #define HB_OS_OS2
-   #elif defined(__NT__) || defined(__WINDOWS_386__) || defined(__WINDOWS__)
-      #define HB_OS_WIN_32
-   #elif defined(__LINUX__)
+   #elif defined( __NT__ ) || defined( __WINDOWS_386__ ) || defined( __WINDOWS__ )
+      #define HB_OS_WIN
+   #elif defined( __LINUX__ )
       #define HB_OS_LINUX
-   #elif defined(__386__)
+   #elif defined( __386__ )
       #define HB_OS_DOS
       #define HB_OS_DOS_32
    #else
@@ -362,9 +363,9 @@
 #endif
 
 #ifndef HB_OS_DOS
-   #if defined(DOS) || defined(_QC) || defined(__DOS__) || defined(MSDOS) || defined(__MSDOS__) || defined(__RSX32__)
+   #if defined( DOS ) || defined( _QC ) || defined( __DOS__ ) || defined( MSDOS ) || defined( __MSDOS__ ) || defined( __RSX32__ )
       #define HB_OS_DOS
-      #if defined(__386__) || defined(__DJGPP__)
+      #if defined( __386__ ) || defined( __DJGPP__ )
          #define HB_OS_DOS_32
       #else
          #define HB_OS_DOS_16
@@ -372,50 +373,50 @@
    #endif
 #endif
 
-#if defined(__EMX__) && ! defined(__RSXNT__)
+#if defined( __EMX__ ) && ! defined( __RSXNT__ )
    #define HB_OS_OS2_GCC
 #endif
 #ifndef HB_OS_OS2
-   #if defined(OS2) || defined(__OS2__) || defined(OS_2) || defined(HB_OS_OS2_GCC)
+   #if defined( OS2 ) || defined( __OS2__ ) || defined( OS_2 ) || defined( HB_OS_OS2_GCC )
       #define HB_OS_OS2
    #endif
 #endif
 
-#ifndef HB_OS_WIN_32
-   #if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) || defined(_WINDOWS_) || defined(__WINDOWS_386__) || defined(__WIN32__) || defined(_MSC_VER) || defined(__CYGWIN__)
-      #define HB_OS_WIN_32
+#ifndef HB_OS_WIN
+   #if defined( WINNT ) || defined( _Windows ) || defined( __NT__ ) || defined( _WIN32 ) || defined( _WINDOWS_ ) || defined( __WINDOWS_386__ ) || defined( __WIN32__ ) || defined( _MSC_VER ) || defined( __CYGWIN__ )
+      #define HB_OS_WIN
    #endif
 #endif
 
-/* Sub-option inside HB_OS_WIN_32 */
+/* Sub-option inside HB_OS_WIN */
 #ifndef HB_OS_WIN_64
-   #if defined(_WIN64)
+   #if defined( HB_OS_WIN_64 )
       #define HB_OS_WIN_64
    #endif
 #endif
 
-/* Sub-option inside HB_OS_WIN_32 */
-#ifndef HB_WINCE
-   #if defined(_WINCE) || defined(__CEGCC__) || defined(__MINGW32CE__) || (defined(__POCC_TARGET__) && __POCC_TARGET__ == 2)
-      #define HB_WINCE
+/* Sub-option inside HB_OS_WIN */
+#ifndef HB_OS_WIN_CE
+   #if defined( _WINCE ) || defined( __CEGCC__ ) || defined( __MINGW32CE__ ) || (defined( __POCC_TARGET__ ) && __POCC_TARGET__ == 2 )
+      #define HB_OS_WIN_CE
    #endif
 #endif
 
 #ifndef HB_OS_LINUX
-   #if defined(linux) || defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
+   #if defined( linux ) || defined( __linux ) || defined( __linux__ ) || defined( __gnu_linux__ )
       #define HB_OS_LINUX
    #endif
 #endif
 
 #ifndef HB_OS_SUNOS
-   #if defined(sun) || defined(__sun) || defined(__sun__)
+   #if defined( sun ) || defined( __sun ) || defined( __sun__ )
       #define HB_OS_SUNOS
    #endif
 #endif
 
 #ifndef HB_OS_HPUX
    /* HP cc in ANSI mode defines __hpux. GCC defines __hpux__ */
-   #if defined(__hpux) || defined(__hpux__)
+   #if defined( __hpux ) || defined( __hpux__ )
       #define HB_OS_HPUX
    #endif
 #endif
@@ -433,13 +434,20 @@
    #endif
 #endif
 
+#ifndef HB_OS_BEOS
+   #if defined( __HAIKU__ ) || defined( __BEOS__ )
+      #define HB_OS_BEOS
+   #endif
+#endif
+
 #ifndef HB_OS_UNIX
-   #if defined(HB_OS_UNIX_COMPATIBLE) || \
-       defined(HB_OS_LINUX) || \
-       defined(HB_OS_DARWIN) || \
-       defined(HB_OS_BSD) || \
-       defined(HB_OS_SUNOS) || \
-       defined(HB_OS_HPUX)
+   #if defined( HB_OS_UNIX_COMPATIBLE ) || \
+       defined( HB_OS_LINUX ) || \
+       defined( HB_OS_DARWIN ) || \
+       defined( HB_OS_BSD ) || \
+       defined( HB_OS_SUNOS ) || \
+       defined( HB_OS_HPUX ) || \
+       defined( HB_OS_BEOS )
       #define HB_OS_UNIX
    #endif
 #endif
@@ -461,7 +469,7 @@
    #define HB_OS_EOL_LEN 2
 #endif
 
-/* Compatibility #defines. These will be removed, so 
+/* Compatibility #defines. These will be removed, so
    please use the new names in your code. */
 #ifdef HB_LEGACY_LEVEL
    #define OS_PATH_DELIMITER            HB_OS_PATH_DELIM_CHR
@@ -470,7 +478,7 @@
    #endif
 #endif
 
-/* Compatibility #defines. These will be removed, so 
+/* Compatibility #defines. These will be removed, so
    please use the new names in your code. */
 #ifdef HB_LEGACY_LEVEL
    #undef HB_NO_PROFILER

@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.10 2007/04/20 09:41:31 marchuet Exp $
+ * $Id: oemansi.c,v 1.11 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 /* NOTE: These are Win32 specific, for other platforms it will return the
          passed parameter unchanged. */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -66,7 +66,7 @@ HB_FUNC( HB_ANSITOOEM )
    PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
 
    if( pString )
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       DWORD ulLen = pString->item.asString.length;
       char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );
@@ -89,7 +89,7 @@ HB_FUNC( HB_OEMTOANSI )
    PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
 
    if( pString )
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       DWORD ulLen = pString->item.asString.length;
       char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );

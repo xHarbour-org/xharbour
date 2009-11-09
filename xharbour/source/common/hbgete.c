@@ -1,5 +1,5 @@
 /*
- * $Id: hbgete.c,v 1.5 2008/03/27 10:26:45 likewolf Exp $
+ * $Id: hbgete.c,v 1.6 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 /* For OS/2 */
 #define INCL_DOSMISC
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbexemem.h"
@@ -70,7 +70,7 @@ char * hb_getenv( const char * szName )
 {
    char * pszBuffer = NULL;
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    {
       DWORD size = GetEnvironmentVariable( szName, NULL, 0 );

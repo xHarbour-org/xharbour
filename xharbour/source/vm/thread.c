@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.223 2009/09/18 17:41:41 ronpinkas Exp $
+* $Id: thread.c,v 1.224 2009/09/27 00:05:25 ronpinkas Exp $
 */
 
 /*
@@ -79,18 +79,18 @@
    #include <stdlib.h>
 #endif
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    #include <windows.h>
    #include <process.h>
 #endif
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
     #define extern
 #endif
 
 #include "thread.h"
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    #undef extern
 #endif
 
@@ -124,7 +124,7 @@ static BOOL s_hb_threadIsInit = FALSE;
 static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    DWORD hb_dwCurrentStack;
 #elif defined(HB_OS_OS2)
    PPVOID hb_dwCurrentStack;
@@ -194,13 +194,13 @@ void hb_threadInit( void )
       /* Idle fence is true by default */
       hb_bIdleFence = TRUE;
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
       HB_CRITICAL_INIT( hb_cancelMutex );
 #endif
 
 #if ! defined( HB_THREAD_TLS_KEYWORD )
       /* hb_thread_stack does not need initialization */
-      #ifdef HB_OS_WIN_32
+      #ifdef HB_OS_WIN
          hb_dwCurrentStack = TlsAlloc();
          TlsSetValue( hb_dwCurrentStack, (void *) hb_ht_stack );
 
@@ -235,12 +235,12 @@ void hb_threadExit( void )
       HB_CRITICAL_DESTROY( hb_dynsymMutex );
       HB_COND_DESTROY(hb_threadStackCond);
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
       HB_CRITICAL_DESTROY( hb_cancelMutex );
 #endif
 
 #if !defined( HB_THREAD_TLS_KEYWORD )
-      #ifdef HB_OS_WIN_32
+      #ifdef HB_OS_WIN
          TlsFree( hb_dwCurrentStack );
 
       #elif defined(HB_OS_OS2)
@@ -315,7 +315,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->th_id = th;
    tc->uiIdleInspect = 0;
    /* In unix, is the thread that sets up its data. */
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    tc->th_vm_id = hb_threadUniqueId();
    #endif
 
@@ -343,10 +343,10 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->uiBackgroundMaxTask = 0;
    tc->ulBackgroundID = 0;
 
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       tc->th_h = NULL;
    #endif
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
       tc->bCanceled = FALSE;
       tc->bCanCancel = FALSE;
 
@@ -551,7 +551,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->hMemvars );
 */
 
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
       hb_xfree( pStack->pCleanUp );
       hb_xfree( pStack->pCleanUpParam );
       pStack->iCleanCount = -1;
@@ -820,7 +820,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    stack with the data for the XHARBOUR function that has to
    be calleed, and calls it.
 */
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 //   DWORD WINAPI hb_create_a_thread( LPVOID Cargo )
    unsigned __stdcall hb_create_a_thread( void * Cargo )
 #else
@@ -832,7 +832,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       #ifdef HB_THREAD_TLS_KEYWORD
          hb_thread_stack = _pStack_;
       #else
@@ -873,7 +873,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
       hb_vmDo( HB_VM_STACK.uiParams - 1 );
    }
 
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
       hb_threadCancelInternal(); // never returns
       return 0;
    #else
@@ -898,7 +898,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    killer; It must be used by the target thread to cancel itself.
 */
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
 void hb_threadCancelInternal( )
 {
    HB_THREAD_STUB
@@ -982,7 +982,7 @@ void hb_threadTerminator( void *pData )
    HB_MUTEX_STRUCT *pMtx;
    PHB_THREAD_ID pThreadId;
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_STACK *_pStack_ = (HB_STACK *) pData;
 #else
    #ifdef HB_THREAD_TLS_KEYWORD
@@ -994,7 +994,7 @@ void hb_threadTerminator( void *pData )
 #endif
 
 
-#if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
+#if ! defined(HB_OS_WIN) && ! defined(HB_OS_OS2)
    {
       int oldstate;
 
@@ -1005,7 +1005,7 @@ void hb_threadTerminator( void *pData )
 
    HB_STACK_LOCK;
 
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN)
       CloseHandle( _pStack_->th_h );
 
    #elif defined(HB_OS_OS2)
@@ -1105,7 +1105,7 @@ void hb_threadKillAll()
          pStack = pStack->next;
          continue;
       }
-      #if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
+      #if ! defined(HB_OS_WIN) && ! defined(HB_OS_OS2)
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
          pStack = pStack->next;
@@ -1230,7 +1230,7 @@ void hb_threadIdleEnd( void )
    Condition variables needs a special handling to be omomorphic on
    various systems.
 */
-#if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
+#if ! defined(HB_OS_WIN) && ! defined(HB_OS_OS2)
 
 int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec )
 {
@@ -1245,7 +1245,7 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
 
 #endif
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
 /***************************************************
  Posix like condition variable for WIN32
  Based on the Terekhov - Thomas algorithm version 9
@@ -1602,7 +1602,7 @@ HB_FUNC( STARTTHREAD )
    PHB_THREAD_ID pThread;
    PHB_THREAD_READY pThreadReady;
 
-#ifdef HB_OS_WIN_32
+#ifdef HB_OS_WIN
    HANDLE th_h;
 #endif
 
@@ -1726,7 +1726,7 @@ HB_FUNC( STARTTHREAD )
    pStack->th_vm_id = hb_threadUniqueId();
    hb_threadLinkStack( pStack );
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 /*   #ifndef __BORLANDC__
       if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
    #else*/
@@ -1743,7 +1743,7 @@ HB_FUNC( STARTTHREAD )
       pStack->th_id = th_id;
 
       /* Under windows, we put the handle after creation */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
       pStack->th_h = th_h;
       ResumeThread( th_h );
 #endif
@@ -1804,7 +1804,7 @@ HB_FUNC( STOPTHREAD )
          HB_CRITICAL_UNLOCK( hb_cancelMutex );
 
          HB_TEST_CANCEL_ENABLE_ASYN;
-         #ifdef HB_OS_WIN_32
+         #ifdef HB_OS_WIN
          WaitForSingleObject( pThread->pStack->th_h, INFINITE );
          #else
          DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
@@ -1823,7 +1823,7 @@ HB_FUNC( STOPTHREAD )
 */
 HB_FUNC( KILLTHREAD )
 {
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -1893,7 +1893,7 @@ HB_FUNC( JOINTHREAD )
    {
       HB_STACK_UNLOCK;
 
-      #if ! defined( HB_OS_WIN_32 ) && ! defined(HB_OS_OS2)
+      #if ! defined( HB_OS_WIN ) && ! defined(HB_OS_OS2)
          if( pthread_join( pThread->threadId, NULL ) != 0 )
          {
             HB_STACK_LOCK;
@@ -1901,7 +1901,7 @@ HB_FUNC( JOINTHREAD )
             return;
          }
       #else
-         #ifdef HB_OS_WIN_32
+         #ifdef HB_OS_WIN
          WaitForSingleObject( pThread->pStack->th_h, INFINITE );
          #else
          DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
@@ -2408,7 +2408,7 @@ BOOL hb_threadMutexTimeOutLock( PHB_ITEM pItem, int iTimeOut, BOOL bError )
 {
    HB_THREAD_STUB
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    DWORD dwTimeOut = (DWORD) iTimeOut;
 #else
    int dwTimeOut = iTimeOut;
@@ -2752,7 +2752,7 @@ void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
 
    HB_STACK_UNLOCK;
 
-#if !defined(HB_OS_WIN_32)
+#if !defined(HB_OS_WIN)
     HB_SYMBOL_UNUSED( bIdleWaitNoCpu );
 #endif
 
@@ -2775,7 +2775,7 @@ void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
          }
       }
 
-   #elif defined(HB_OS_WIN_32)
+   #elif defined(HB_OS_WIN)
       HB_TEST_CANCEL_ENABLE_ASYN;
       if ( bIdleWaitNoCpu )
       {

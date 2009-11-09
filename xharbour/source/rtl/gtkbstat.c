@@ -1,5 +1,5 @@
 /*
- * $Id: gtkbstat.c 8236 2008-01-26 05:29:20Z vszakats $
+ * $Id: gtkbstat.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
  */
 
 /*
@@ -53,10 +53,10 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include "hbgtcore.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
 int hb_gt_w32_getKbdState( void )
 {
@@ -75,6 +75,13 @@ int hb_gt_w32_getKbdState( void )
    if( kbState[VK_NUMLOCK ] & 0x01 ) iKbdState |= HB_GTI_KBD_NUMLOCK;
    if( kbState[VK_CAPITAL ] & 0x01 ) iKbdState |= HB_GTI_KBD_CAPSLOCK;
    if( kbState[VK_INSERT  ] & 0x01 ) iKbdState |= HB_GTI_KBD_INSERT;
+
+   if( kbState[VK_LSHIFT  ] & 0x80 ) iKbdState |= HB_GTI_KBD_LSHIFT;
+   if( kbState[VK_RSHIFT  ] & 0x80 ) iKbdState |= HB_GTI_KBD_RSHIFT;
+   if( kbState[VK_LCONTROL] & 0x80 ) iKbdState |= HB_GTI_KBD_LCTRL;
+   if( kbState[VK_RCONTROL] & 0x80 ) iKbdState |= HB_GTI_KBD_RCTRL;
+   if( kbState[VK_LMENU   ] & 0x80 ) iKbdState |= HB_GTI_KBD_LALT;
+   if( kbState[VK_RMENU   ] & 0x80 ) iKbdState |= HB_GTI_KBD_RALT;
 
    return iKbdState;
 }
@@ -96,8 +103,15 @@ void hb_gt_w32_setKbdState( int iKbdState )
    kbState[VK_CAPITAL] = ( iKbdState & HB_GTI_KBD_CAPSLOCK ) ? 0x01 : 0;
    kbState[VK_INSERT ] = ( iKbdState & HB_GTI_KBD_INSERT   ) ? 0x01 : 0;
 
+   kbState[VK_LSHIFT  ] = ( iKbdState & HB_GTI_KBD_LSHIFT ) ? 0x80 : 0;
+   kbState[VK_RSHIFT  ] = ( iKbdState & HB_GTI_KBD_RSHIFT ) ? 0x80 : 0;
+   kbState[VK_LCONTROL] = ( iKbdState & HB_GTI_KBD_LCTRL  ) ? 0x80 : 0;
+   kbState[VK_RCONTROL] = ( iKbdState & HB_GTI_KBD_RCTRL  ) ? 0x80 : 0;
+   kbState[VK_LMENU   ] = ( iKbdState & HB_GTI_KBD_LALT   ) ? 0x80 : 0;
+   kbState[VK_RMENU   ] = ( iKbdState & HB_GTI_KBD_RALT   ) ? 0x80 : 0;
+
    SetKeyboardState( kbState );
 }
 
 
-#endif /* HB_OS_WIN_32 */
+#endif /* HB_OS_WIN */

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.12 2009/01/08 04:36:05 ronpinkas Exp $
+ * $Id: maindllh.c,v 1.13 2009/01/29 16:30:41 ronpinkas Exp $
  */
 
 /*
@@ -65,12 +65,12 @@
            by means of dllmain.lib!
 */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbtypes.h"
 
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
 HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )

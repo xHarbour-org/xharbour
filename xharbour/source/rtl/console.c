@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.78 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: console.c,v 1.79 2009/09/16 04:34:16 andijahja Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
 #ifndef _HB_API_INTERNAL_
@@ -241,7 +241,7 @@ void hb_conOutErr( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 
-   #ifdef HB_OS_WIN_32
+   #ifdef HB_OS_WIN
       OutputDebugString( pStr );
    #endif
 
@@ -436,7 +436,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
 
 HB_FUNC( QOUT )
 {
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -476,7 +476,7 @@ HB_FUNC( QOUT )
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -585,7 +585,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
    HB_CONSOLE_SAFE_LOCK
@@ -598,7 +598,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
-#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 

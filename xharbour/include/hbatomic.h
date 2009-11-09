@@ -1,5 +1,5 @@
 /*
- * $Id: hbatomic.h,v 1.1 2009/01/10 22:26:04 likewolf Exp $
+ * $Id: hbatomic.h,v 1.2 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 #include "hbdefs.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 #  include <windows.h>
 #elif defined( HB_OS_DARWIN )
 #  include <libkern/OSAtomic.h>
@@ -151,9 +151,9 @@ HB_EXTERN_BEGIN
             #ifdef HB_SPINLOCK_SLEEP
                if( !hb_spinlock_trylock( l ) )
                   return;
-               #if defined( HB_OS_WIN_32 )
+               #if defined( HB_OS_WIN )
                   Sleep( 0 );
-               #elif defined( HB_OS_OS2 ) 
+               #elif defined( HB_OS_OS2 )
                   DosSleep( 0 );
                #elif defined( __SVR4 )
                   thr_yield();
@@ -193,9 +193,9 @@ HB_EXTERN_BEGIN
             #ifdef HB_SPINLOCK_SLEEP
                if( !__sync_lock_test_and_set( l, 1 ) )
                   return;
-               #if defined( HB_OS_WIN_32 )
+               #if defined( HB_OS_WIN )
                   Sleep( 0 );
-               #elif defined( HB_OS_OS2 ) 
+               #elif defined( HB_OS_OS2 )
                   DosSleep( 0 );
                #elif defined( __SVR4 )
                   thr_yield();
@@ -261,7 +261,7 @@ HB_EXTERN_BEGIN
 #endif  /* __GNUC__ */
 
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
    /* Atomic operations on memory reference counters */
 #  if !defined( HB_ATOM_INC ) || !defined( HB_ATOM_DEC )

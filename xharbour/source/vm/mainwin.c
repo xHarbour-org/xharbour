@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.25 2008/03/24 23:23:15 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.26 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -50,13 +50,15 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbvm.h"
-#include "hbgtcore.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined( HB_OS_WIN )
+
+#define HB_GT_NAME GUI
+#include "hbgtcore.h"
 
 #define MAX_ARGS 128
 
@@ -164,7 +166,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    return iResult;
 }
 
-#if ( defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
+#if ( defined( __DMC__ ) || defined( __WATCOMC__ ) || defined( __MINGW32__ ) ) && !defined(__EXPORT__)
 HB_EXTERN_BEGIN
 void hb_forceLinkMainWin( void ) {}
 HB_EXTERN_END

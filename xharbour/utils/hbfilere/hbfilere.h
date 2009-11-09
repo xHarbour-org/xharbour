@@ -1,4 +1,4 @@
-/*  $Id: hbfilere.h,v 1.3 2009/09/30 16:20:23 marchuet Exp $  */
+/*  $Id: hbfilere.h,v 1.4 2009/11/09 01:13:05 lculik Exp $  */
 
 /*
  * xHarbour Project source code:
@@ -50,7 +50,7 @@
 #include "hbapirdd.h"
 #include "hbipapi.h"
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #include "ws2spi.h"
    #include "mswsock.h"
 #endif
@@ -68,7 +68,7 @@
 #endif
 #include "sys/stat.h"
 
-#if !defined( HB_OS_WIN_32 )
+#if !defined( HB_OS_WIN )
    #include <sys/types.h>
    #include <stdio.h>
    #include <stdlib.h>
@@ -84,7 +84,7 @@ BOOL hb_ip_rfd_isset( HB_SOCKET_T hSocket );
 int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen );
 void hb_ip_rfd_set( HB_SOCKET_T hSocket );
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
    #define HB_SOCKET_T SOCKET
 #else
    #define HB_SOCKET_T int
@@ -112,9 +112,9 @@ typedef struct
    BYTE *      pBuffer;
    ULONG       ulBufferLen;
    BYTE *      pBufAnswer;
-   ULONG       ulBufAnswerLen;   
+   ULONG       ulBufAnswerLen;
    BYTE *      pBufTemp;
-   ULONG       ulBufTempLen;      
+   ULONG       ulBufTempLen;
    BYTE *      pBufRead;
    ULONG       ulDataLen;
    ULONG       ulDataRead;

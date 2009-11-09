@@ -1,5 +1,5 @@
 /*
- * $Id: hb_io.h,v 1.3 2007/12/30 17:49:06 likewolf Exp $
+ * $Id: hb_io.h,v 1.4 2008/12/22 22:09:44 likewolf Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
    #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(__EMX__)
       #include <io.h>
    #endif
-#elif !defined(HB_WINCE)
+#elif !defined(HB_OS_WIN_CE)
    #include <io.h>
 #endif
 #if defined(HB_OS_DOS) && !defined(__RSX32__)

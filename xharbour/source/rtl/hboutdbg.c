@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.10 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: hboutdbg.c,v 1.11 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
    debug window.
 */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -229,7 +229,7 @@ void hb_OutDebug( const char * szMsg, ULONG ulMsgLen )
       }
    }
 
-#elif defined( HB_OS_WIN_32 )
+#elif defined( HB_OS_WIN )
 
    {
       LPTSTR lpMsg = HB_TCHAR_CONVTO( szMsg );

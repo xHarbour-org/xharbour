@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.27 2005/03/31 03:58:52 druzus Exp $
+ * $Id: isprint.c,v 1.28 2009/10/22 22:58:31 lculik Exp $
  */
 
 /*
@@ -61,14 +61,14 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbset.h"
 #include "hbapiitm.h"
 
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
    #include <stdio.h>
    #include <winspool.h>
@@ -121,7 +121,7 @@ BOOL hb_printerIsReady( char * pszPrinterName )
          bIsPrinter = FALSE;
    }
 
-#elif defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+#elif defined(HB_OS_WIN) && !defined(__RSXNT__)
 
    {
       HANDLE hPrinter;
@@ -163,7 +163,7 @@ BOOL hb_printerIsReady( char * pszPrinterName )
 
 HB_FUNC( ISPRINTER )
 {
-   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+   #if defined(HB_OS_WIN) && !defined(__RSXNT__)
    {
       char DefaultPrinter[MAXBUFFERSIZE];
       DWORD pdwBufferSize = MAXBUFFERSIZE;
@@ -177,7 +177,7 @@ HB_FUNC( ISPRINTER )
 
 /* The code below does the check for the printer under Win32 */
 
-#if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
+#if defined(HB_OS_WIN) && !defined(__RSXNT__) && !defined(__CYGWIN__)
 
 static DWORD IsPrinterError( HANDLE hPrinter ) {
   BOOL Result = -1 ;

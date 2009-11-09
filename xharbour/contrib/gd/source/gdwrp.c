@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.14 2008/05/01 10:49:39 andijahja Exp $
+ * $Id: gdwrp.c,v 1.15 2009/09/30 16:19:24 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 
 /* NOTE: we need this to prevent base types redefinition */
 #define _CLIPDEFS_H
-#if defined(HB_OS_WIN_32_USED)
+#if defined(HB_OS_WIN_USED)
    #include <windows.h>
 #endif
 
@@ -440,7 +440,7 @@ HB_FUNC( GDVERSION ) // gdImagePtr gdImageCreate(sx, sy)
    hb_retc( "GD Version 2.0.33" );
 #else
    hb_retc( "GD Version 2.0.28" );
-#endif   
+#endif
 }
 
 /* ---------------------------------------------------------------------------*/

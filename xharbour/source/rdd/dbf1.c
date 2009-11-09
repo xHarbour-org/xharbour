@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.213 2009/10/05 14:41:41 marchuet Exp $
+ * $Id: dbf1.c,v 1.214 2009/10/15 11:53:13 lculik Exp $
  */
 
 /*
@@ -3340,11 +3340,13 @@ static HB_ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_FILEHANDLE:
-         hb_itemPutNInt( pItem, ( HB_NHANDLE ) hb_fileHandle( pArea->pDataFile ) );
+         hb_itemPutNInt( pItem, pArea->pDataFile ?
+               ( HB_NHANDLE ) hb_fileHandle( pArea->pDataFile ) : FS_ERROR );
          break;
 
       case DBI_MEMOHANDLE:
-         hb_itemPutNInt( pItem, ( HB_NHANDLE ) hb_fileHandle( pArea->pMemoFile ) );
+         hb_itemPutNInt( pItem, pArea->pMemoFile ?
+               ( HB_NHANDLE ) hb_fileHandle( pArea->pMemoFile ) : FS_ERROR );
          break;
 
       case DBI_SHARED:

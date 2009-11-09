@@ -1,5 +1,5 @@
 /*
- * $Id: memio.c 12616 2009-09-24 12:15:16Z druzus $
+ * $Id: filemem.c,v 1.1 2009/10/05 14:41:55 marchuet Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ static ULONG memfsInodeFind( const char * szName, ULONG * pulPos )
 static PHB_MEMFS_INODE memfsInodeAlloc( const char* szName )
 {
    PHB_MEMFS_INODE  pInode = ( PHB_MEMFS_INODE ) hb_xgrab( sizeof( HB_MEMFS_INODE ) );
-   ULONG            ulInode;
+   ULONG            ulInode = 0;
 
    pInode->llSize = 0;
    pInode->llAlloc = HB_MEMFS_INITSIZE;
@@ -513,14 +513,14 @@ HB_MEMFS_EXPORT ULONG hb_memfsReadAt( HB_FHANDLE hFile, void * pBuff, ULONG ulCo
       return 0;
 
    HB_MEMFSMT_LOCK
-   if( pInode->llSize >= llOffset + ulCount )
+   if( pInode->llSize >= llOffset + ( HB_FOFFSET ) ulCount )
       ulRead = ulCount;
    else
       ulRead = ( ULONG ) ( pInode->llSize - llOffset );
 
    memcpy( pBuff, pInode->pData + ( ULONG ) llOffset, ulRead );
    HB_MEMFSMT_UNLOCK
-   pFile->llPos = llOffset + ulCount;
+   pFile->llPos = llOffset + ( HB_FOFFSET ) ulCount;
    return ulRead;
 }
 
@@ -543,12 +543,12 @@ HB_MEMFS_EXPORT ULONG hb_memfsWriteAt( HB_FHANDLE hFile, const void * pBuff, ULO
    HB_MEMFSMT_LOCK
 
    /* Reallocate if neccesary */
-   if( pInode->llAlloc < llOffset + ulCount )
+   if( pInode->llAlloc < llOffset + ( HB_FOFFSET ) ulCount )
    {
       HB_FOFFSET  llNewAlloc = pInode->llAlloc + ( pInode->llAlloc >> 1 );
 
-      if( llNewAlloc < llOffset + ulCount )
-         llNewAlloc = llOffset + ulCount;
+      if( llNewAlloc < llOffset + ( HB_FOFFSET ) ulCount )
+         llNewAlloc = llOffset + ( HB_FOFFSET ) ulCount;
 
       pInode->pData = ( char * ) hb_xrealloc( pInode->pData, ( ULONG ) llNewAlloc );
       memset( pInode->pData + ( ULONG ) pInode->llAlloc, 0, llNewAlloc - pInode->llAlloc );
@@ -556,11 +556,11 @@ HB_MEMFS_EXPORT ULONG hb_memfsWriteAt( HB_FHANDLE hFile, const void * pBuff, ULO
    }
    memcpy( pInode->pData + ( ULONG ) llOffset, pBuff, ulCount );
 
-   if( pInode->llSize < llOffset + ulCount )
-      pInode->llSize = llOffset + ulCount;
+   if( pInode->llSize < llOffset + ( HB_FOFFSET ) ulCount )
+      pInode->llSize = llOffset + ( HB_FOFFSET ) ulCount;
 
    HB_MEMFSMT_UNLOCK
-   pFile->llPos = llOffset + ulCount;
+   pFile->llPos = llOffset + ( HB_FOFFSET ) ulCount;
    return ulCount;
 }
 

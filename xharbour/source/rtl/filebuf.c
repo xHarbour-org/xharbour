@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.9 2009/10/06 00:59:28 ronpinkas Exp $
+ * $Id: filebuf.c,v 1.10 2009/10/08 06:29:20 guerra000 Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
-#if !defined( HB_WINCE )
+#if !defined( HB_OS_WIN_CE )
 #  include <sys/types.h>
 #  include <sys/stat.h>
 #endif
@@ -329,8 +329,8 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
    BOOL fShared, fReadonly;
    HB_FHANDLE hFile;
    char * pszFile;
-   
-   HB_SYMBOL_UNUSED( fBufferLock );   
+
+   HB_SYMBOL_UNUSED( fBufferLock );
 
    fShared = ( uiExFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0;
    fReadonly = ( uiExFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ;
@@ -553,7 +553,7 @@ static HB_FOFFSET s_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT u
 static ULONG s_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULONG ulCount )
 {
    return hb_fsWriteLarge( pFile->hFile, pBuff, ulCount );
-}   
+}
 
 static ULONG s_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
 {
@@ -723,7 +723,7 @@ HB_FOFFSET hb_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags
 ULONG hb_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULONG ulCount )
 {
    return pFile->pFuncs->WriteLarge( pFile, pBuff, ulCount );
-}   
+}
 
 ULONG hb_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
 {

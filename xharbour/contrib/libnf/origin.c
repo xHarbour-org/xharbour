@@ -1,5 +1,5 @@
 /*
- * $Id: origin.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: origin.c,v 1.2 2006/04/12 05:22:20 paultucker Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ HB_FUNC(FT_ORIGIN)
    time under certain conditions - the following is the preferred call - pt
  */
 
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
+#if defined(HB_OS_DOS) || defined(HB_OS_WIN)
 
    hb_retc( hb_cmdargARGV()[0] );
 

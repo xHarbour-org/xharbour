@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.11 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: net.c,v 1.12 2009/05/22 15:49:00 marchuet Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbfast.h"
@@ -142,13 +142,13 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
       }
    #endif
 
-#elif defined(HB_OS_WIN_32)
+#elif defined(HB_OS_WIN)
    {
       DWORD ulLen = MAX_COMPUTERNAME_LENGTH + 1;
 
       pszNetName[ 0 ] = '\0';
 
-      if( bGetUser ) 
+      if( bGetUser )
          GetUserName( pszNetName, &ulLen );
       else
          GetComputerName( pszNetName, &ulLen );
@@ -164,7 +164,7 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
          And it will be padded with spaces. Harbour does the same on the
          DOS platform.
          [vszakats] */
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 #define MAXGETHOSTNAME  MAX_COMPUTERNAME_LENGTH
 #endif
 #ifndef MAXGETHOSTNAME
@@ -173,8 +173,8 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
 HB_FUNC( NETNAME )
 {
    char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
-  
+
    hb_netname( pszValue, hb_parnl( 1 ) == 1 );
    hb_retcAdopt( pszValue );
-}   
-   
+}
+

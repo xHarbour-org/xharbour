@@ -1,5 +1,5 @@
 /*
- * $Id: hbole.h,v 1.000 2006/06/28 16:54:47 ptucker Exp $
+ * $Id: hbole.h,v 1.1 2006/07/03 19:47:05 paultucker Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #ifndef HB_OLE_H_
 #define HB_OLE_H_
 
-#if defined(_MSC_VER) && !defined(_WIN64) && \
+#if defined(_MSC_VER) && !defined(HB_OS_WIN_64) && \
     !defined(__LCC__) && !defined(__POCC__) && !defined(__XCC__)
 
 #ifndef CINTERFACE

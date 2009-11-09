@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.36 2008/09/11 05:32:36 guerra000 Exp $
+ * $Id: odbc.c,v 1.37 2009/04/13 20:42:35 likewolf Exp $
  */
 
 /*
@@ -76,7 +76,7 @@
 
 #include "hbapi.h"
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    #include <windows.h>
 #endif
 
@@ -96,7 +96,7 @@
 #endif
 
 #ifndef SQLLEN
-   #ifdef _WIN64
+   #ifdef HB_OS_WIN_64
       typedef INT64           SQLLEN;
    #else
       #define SQLLEN          SQLINTEGER
@@ -137,7 +137,7 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
    RETCODE ret;
 
    bBuffer1[ 0 ] = '\0';
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                             GetDesktopWindow(),
                             (unsigned char *) hb_parcx( 2 ), (SQLSMALLINT)hb_parclen( 2 ),

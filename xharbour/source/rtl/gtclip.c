@@ -1,5 +1,5 @@
 /*
- * $Id: gtclip.c,v 1.2 2008/11/26 17:13:16 marchuet Exp $
+ * $Id: gtclip.c,v 1.3 2009/07/04 06:24:43 ronpinkas Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 #include "hbgtcore.h"
 
 /* TODO: add protection for MT mode */
@@ -87,7 +87,7 @@ BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen )
    return s_ulClipboardLen != 0;
 }
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN )
 
 BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen )
 {
@@ -132,39 +132,48 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
 {
    *pulLen = 0;
    *pszClipData = NULL;
-
    if( IsClipboardFormatAvailable( uFormat ) && OpenClipboard( NULL ) )
    {
       HGLOBAL hglb = GetClipboardData( uFormat );
-
       if( hglb )
       {
          LPTSTR lptstr = ( LPTSTR ) GlobalLock( hglb );
-
          if( lptstr )
          {
-            *pulLen = GlobalSize( hglb );
-
-            if( uFormat == CF_TEXT || uFormat == CF_OEMTEXT )
+            switch( uFormat )
             {
-               *pulLen = strlen( lptstr );
+               case CF_UNICODETEXT:
+                  *pulLen = wcslen( ( LPWSTR ) lptstr );
+                  if( *pulLen )
+                     *pszClipData = hb_wctomb( ( LPWSTR ) lptstr );
+                  break;
+               case CF_OEMTEXT:
+               case CF_TEXT:
+                  *pulLen = strlen( ( char * ) lptstr );
+                  if( *pulLen )
+                  {
+                     *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
+                     HB_TCHAR_GETFROM( *pszClipData, lptstr, *pulLen );
+                     ( *pszClipData )[ *pulLen ] = '\0';
+                  }
+                  break;
+               default:
+                  *pulLen = GlobalSize( hglb );
+                  if( *pulLen )
+                  {
+                     *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
+                     memcpy( *pszClipData, lptstr, *pulLen );
+                     ( *pszClipData )[ *pulLen ] = '\0';
+                  }
+                  break;
             }
-
-            if( *pulLen )
-            {
-               *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-               HB_TCHAR_GETFROM( *pszClipData, lptstr, *pulLen );
-               ( *pszClipData )[ *pulLen ] = '\0';
-            }
-
             GlobalUnlock( hglb );
          }
       }
-
       CloseClipboard();
    }
 
    return *pulLen != 0;
 }
 
-#endif /* HB_OS_WIN_32 */
+#endif /* HB_OS_WIN */

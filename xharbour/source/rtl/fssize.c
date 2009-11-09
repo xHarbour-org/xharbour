@@ -1,6 +1,6 @@
 
 /*
- * $Id: fssize.c,v 1.9 2008/12/22 22:09:45 likewolf Exp $
+ * $Id: fssize.c,v 1.10 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#if !defined(HB_WINCE)
+#if !defined(HB_OS_WIN_CE)
 #  include <sys/types.h>
 #  include <sys/stat.h>
 #endif
@@ -82,7 +82,7 @@ HB_FOFFSET hb_fsFSize( const char * pszFileName, BOOL bUseDirEntry )
 {
    if( bUseDirEntry )
    {
-#if defined(HB_WINCE)
+#if defined(HB_OS_WIN_CE)
       char * pszFree;
       PHB_FFIND ffind;
       pszFileName = hb_fsNameConv( pszFileName, &pszFree );

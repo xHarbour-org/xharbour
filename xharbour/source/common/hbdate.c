@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.20 2009/05/25 14:14:00 marchuet Exp $
+ * $Id: hbdate.c,v 1.21 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -91,7 +91,7 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
+#define HB_OS_WIN_USED
 
 #include <time.h>
 
@@ -675,7 +675,7 @@ int hb_dateDOW( int iYear, int iMonth, int iDay )
 
 void hb_dateToday( int * piYear, int * piMonth, int * piDay )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
 
    SYSTEMTIME st;
    GetLocalTime( &st );
@@ -715,7 +715,7 @@ void hb_dateToday( int * piYear, int * piMonth, int * piDay )
 
 void hb_dateTimeStr( char * pszTime )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
@@ -749,7 +749,7 @@ void hb_dateTimeStr( char * pszTime )
 */
 void hb_dbaselockEncode( char * pszTimeDate )
 {
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
@@ -917,7 +917,7 @@ void hb_dateTime( int * piHour, int * piMinute, double * pdSeconds )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateTime(%p,%p,%p)", piHour, piMinute, pdSeconds ));
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN)
    {
       SYSTEMTIME st;
       GetLocalTime( &st );

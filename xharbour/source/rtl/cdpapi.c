@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.45 2009/08/19 22:40:47 likewolf Exp $
+ * $Id: cdpapi.c,v 1.46 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -135,10 +135,8 @@ static int utf8Size( USHORT uc )
 {
    if( uc < 0x0080 )
       return 1;
-
    else if( uc < 0x0800 )
       return 2;
-
    else                         /* if( uc <= 0xffff ) */
       return 3;
 }
