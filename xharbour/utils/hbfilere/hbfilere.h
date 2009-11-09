@@ -1,4 +1,4 @@
-/*  $Id: hbfilere.h,v 1.2 2009/09/16 15:53:42 marchuet Exp $  */
+/*  $Id: hbfilere.h,v 1.3 2009/09/30 16:20:23 marchuet Exp $  */
 
 /*
  * xHarbour Project source code:
@@ -88,6 +88,7 @@ void hb_ip_rfd_set( HB_SOCKET_T hSocket );
    #define HB_SOCKET_T SOCKET
 #else
    #define HB_SOCKET_T int
+   typedef void* HANDLE;
 #endif 
 
 #define USERS_REALLOC       20

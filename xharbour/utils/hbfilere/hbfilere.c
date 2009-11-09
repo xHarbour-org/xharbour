@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.7 2009/09/16 15:53:42 marchuet Exp $
+ * $Id: hbfilere.c,v 1.8 2009/09/30 16:20:23 marchuet Exp $
  */
 
 /*
@@ -56,8 +56,8 @@
  */
 /* this has to be declared before hbapifs.h is included */
 #define _HB_FILE_INTERNAL_
-struct _HB_FILE;
-typedef struct _HB_FILE * PHB_FILE;
+//struct _HB_FILE;
+//typedef struct _HB_FILE * PHB_FILE;
 
 #include "hbfilere.h"
 
@@ -491,7 +491,7 @@ static void fl_free( void * pHeapMem )
 #else
 int filere_Send( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
 {
-   return hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout );
+   return hb_ipSend(  hSocket, szBuffer,  iSend,  timeout );
 }      
 
 void signal_handler(int sig) {
