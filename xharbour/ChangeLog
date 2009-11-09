@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6634 2009/11/06 19:54:17 modalsist Exp $
+ * $Id: ChangeLog,v 1.6635 2009/11/09 01:40:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,194 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-09 09:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   * contrib\filemem\filemem.c
+   * contrib\firebird\firebird.c
+   * contrib\freeimage\source\fi_winfu.c
+   * contrib\freeimage\source\fi_wrp.c
+   * contrib\gd\include\gd.h
+   * contrib\gd\source\gdwrp.c
+   * contrib\gtwvg\gtwvg.c
+   * contrib\gtwvg\gtwvg.h
+   * contrib\gtwvg\wvtcore.c
+   * contrib\gtwvg\wvtutils.c
+   * contrib\gtwvw\samples\winapi.c
+   * contrib\hbmzip\hbmzip.c
+   * contrib\hbzlib\include\hbz.h
+   * contrib\hbzlib\include\hbzip2.h
+   * contrib\libnf\caplock.c
+   * contrib\libnf\descend.c
+   * contrib\libnf\getenvrn.c
+   * contrib\libnf\numlock.c
+   * contrib\libnf\origin.c
+   * contrib\mysql\mysql.c
+   * contrib\pgsql\postgres.c
+   * contrib\rdd_ads\ace32.c
+   * contrib\rdd_ads\ads1.c
+   * contrib\rdd_ads\adsfunc.c
+   * contrib\rdd_ads\adsmgmnt.c
+   * contrib\rdd_ads\rddads.h
+   * contrib\tipssl\inetssl.c
+   * contrib\tipssl\inetssl.h
+   * contrib\what32\_wintbar.c
+   * contrib\what32\source\_winbmp.c
+   * contrib\what32\source\_winbrsh.c
+   * contrib\what32\source\_winclpb.c
+   * contrib\what32\source\_wincret.c
+   * contrib\what32\source\_windate.c
+   * contrib\what32\source\_windc.c
+   * contrib\what32\source\_windir.c
+   * contrib\what32\source\_windlg.c
+   * contrib\what32\source\_windraw.c
+   * contrib\what32\source\_winfont.c
+   * contrib\what32\source\_wingdi.c
+   * contrib\what32\source\_winhead.c
+   * contrib\what32\source\_winilst.c
+   * contrib\what32\source\_winini.c
+   * contrib\what32\source\_winkbrd.c
+   * contrib\what32\source\_winmain.c
+   * contrib\what32\source\_winmeta.c
+   * contrib\what32\source\_winmmcap.c
+   * contrib\what32\source\_winmous.c
+   * contrib\what32\source\_winpen.c
+   * contrib\what32\source\_winrect.c
+   * contrib\what32\source\_winreg.c
+   * contrib\what32\source\_winrgn.c
+   * contrib\what32\source\_winsys.c
+   * contrib\what32\source\_wintbar.c
+   * contrib\what32\source\_wintext.c
+   * contrib\what32\source\_winview.c
+   * contrib\what32\source\_winwnd.c
+   * include\clipdefs.h
+   * include\hb_io.h
+   * include\hbapi.h
+   * include\hbapifs.h
+   * include\hbatomic.h
+   * include\hbdefs.h
+   * include\hbgtcore.h
+   * include\hbgtinfo.ch
+   * include\hbinit.h
+   * include\hbipapi.h
+   * include\hbole.h
+   * include\hbsetup.h
+   * include\hbwince.h
+   * include\inet.h
+   * include\thread.h
+   * source\common\hbdate.c
+   * source\common\hbfsapi.c
+   * source\common\hbgete.c
+   * source\common\hbver.c
+   * source\common\hbwince.c
+   * source\ct\ctnet.c
+   * source\ct\dattime3.c
+   * source\ct\disk.c
+   * source\ct\envparam.c
+   * source\ct\files.c
+   * source\ct\keyset.c
+   * source\ct\print.c
+   * source\ct\settime.c
+   * source\odbc\odbc.c
+   * source\pp\ppgen.c
+   * source\rdd\dbf1.c
+   * source\rdd\dbf1net.c
+   * source\rdd\dbfcdx\dbfcdx1.c
+   * source\rdd\dbfnsx\dbfnsx1.c
+   * source\rtl\bkgtsks.c
+   * source\rtl\cdpapi.c
+   * source\rtl\console.c
+   * source\rtl\copyfile.c
+   * source\rtl\diskspac.c
+   * source\rtl\disksphb.c
+   * source\rtl\dllcall.c
+   * source\rtl\file.c
+   * source\rtl\filebuf.c
+   * source\rtl\filenet.c
+   * source\rtl\filestat.c
+   * source\rtl\filesys.c
+   * source\rtl\fserror.c
+   * source\rtl\fssize.c
+   * source\rtl\fstemp.c
+   * source\rtl\gtalleg\ssf.h
+   * source\rtl\gtapi.c
+   * source\rtl\gtcgi\cgiread.c
+   * source\rtl\gtclip.c
+   * source\rtl\gtgui\gtdef.c
+   * source\rtl\gtgui\gtgui.c
+   * source\rtl\gtkbstat.c
+   * source\rtl\gtkeycod.c
+   * source\rtl\gtpca\gtpca.c
+   * source\rtl\gtstd\gtstd.c
+   * source\rtl\gtsys.c
+   * source\rtl\gttone.c
+   * source\rtl\gtwin\gtwin.c
+   * source\rtl\gtwvt\gtwvt.c
+   * source\rtl\gtwvt\gtwvt.h
+   * source\rtl\hbffind.c
+   * source\rtl\hbgtcore.c
+   * source\rtl\hbip.c
+   * source\rtl\hboutdbg.c
+   * source\rtl\hbrandom.c
+   * source\rtl\hbserv.c
+   * source\rtl\hbsyslog.c
+   * source\rtl\idle.c
+   * source\rtl\isprint.c
+   * source\rtl\net.c
+   * source\rtl\oemansi.c
+   * source\rtl\seconds.c
+   * source\rtl\set.c
+   * source\rtl\tprinter.c
+   * source\tip\utils.c
+   * source\vm\cmdarg.c
+   * source\vm\dynlibhb.c
+   * source\vm\errorapi.c
+   * source\vm\estack.c
+   * source\vm\fm.c
+   * source\vm\hvm.c
+   * source\vm\inet.c
+   * source\vm\maindll.c
+   * source\vm\maindlle.c
+   * source\vm\maindllh.c
+   * source\vm\maindllp.c
+   * source\vm\mainstd.c
+   * source\vm\mainwin.c
+   * source\vm\thread.c
+   * source\vm\usedll.c
+   * utils\hbfilere\hbfilere.c
+   * utils\hbfilere\hbfilere.h
+   * utils\hbmake\hbmlang.c
+   * utils\hbpp\hbppcore.c
+     * Added some missing castings.
+     * Changed HB_OS_WIN_32_USED by HB_OS_WIN_USED, for all common windows platforms 16,32,64,... versions.
+     * Changed _WIN64 by HB_OS_WIN_64 for especific 64 bits versions
+     * Changed HB_WINCE by HB_OS_WIN_CE for especific Windows versions.
+     * Cleaning code in general. (spaces after end of line for example).
+     * Preparing GT subsystem for ARM xharbour build actualiced from harbour.
+     + Added #define HB_GTI_KBD_LSHIFT       65536
+             #define HB_GTI_KBD_RSHIFT       131072
+             #define HB_GTI_KBD_LCTRL        262144
+             #define HB_GTI_KBD_RCTRL        524288
+             #define HB_GTI_KBD_LALT         1048576
+             #define HB_GTI_KBD_RALT         2097572
+             #define HB_GTI_RESIZEMODE_FONT  0   /* Default */
+             #define HB_GTI_RESIZEMODE_ROWS  1
+             #define HB_GTI_RESIZEMODE       54  /* Get/Set console resize mode : HB_GTI_RESIZEMODE_FONT | HB_GTI_RESIZEMODE_ROWS */
+             #define HB_GTI_SETPOS_XY        55  /* Get/Set current top-left position coordinates of the window by pixels */
+             #define HB_GTI_SETPOS_ROWCOL    56  /* Set current top-left position coordinates of the window by row/cols */
+             #define HB_GTI_BOXCP            57  /* Codepage used for box drawing */
+             #define HB_GTI_CARGO            58  /* Storage of any user defined value */
+             #define HB_GTI_FONTSEL          59  /* X11 style font selecting */
+     ! Fixed DBI_FILEHANDLE and DBI_MEMOHANDLE
+     ! resolve pending relations before clearing or setting WA filter
+       directly or indirectly by SUPER method call ( from harbour Przemyslaw Czerpak )
+     ! fixed bug reported by Jaroslav Janik (many thanks) - if index FOR
+       expression excluded all records from non empty table then root page
+       was not initialized and DBFNSX generated corruption RTE. ( from harbour Przemyslaw Czerpak )
+
+
 2009-11-08 23:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * include/Makefile
     ! added missing hbapises.h
-    
 
 2009-11-06 17:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * mdir.bat
