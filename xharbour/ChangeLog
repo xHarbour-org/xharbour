@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6635 2009/11/09 01:40:37 lculik Exp $
+ * $Id: ChangeLog,v 1.6636 2009/11/09 09:43:24 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-15 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include\hbxvm.h
+    * Added void as parameter to declaration of function hb_xvmExitProc()
 
 2009-11-09 09:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * contrib\filemem\filemem.c

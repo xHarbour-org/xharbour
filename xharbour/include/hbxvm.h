@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.13 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: hbxvm.h,v 1.14 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ HB_EXTERN_BEGIN
  * to check HVM state so they are simply declared as void.
  */
 
-extern HB_EXPORT void   hb_xvmExitProc();
+extern HB_EXPORT void   hb_xvmExitProc( void );
 extern HB_EXPORT void   hb_xvmSeqBegin( void );
 extern HB_EXPORT BOOL   hb_xvmSeqEnd( void );
 extern HB_EXPORT BOOL   hb_xvmSeqRecover( void );
