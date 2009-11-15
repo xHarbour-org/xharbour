@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.c,v 1.3 2009/09/13 21:12:27 likewolf Exp $
+* $Id: inetssl.c,v 1.4 2009/11/09 09:38:44 marchuet Exp $
 */
 
 /*
@@ -77,7 +77,7 @@
    #include <sys/ioctl.h>
 #endif
 
-#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN )
+#if defined( HB_OS_OS2 ) || defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
    /* NET_SIZE_T exists because of shortsightedness on the POSIX committee.  BSD
     * systems used "int *" as the parameter to accept(), getsockname(),
     * getpeername() et al.  Consequently many unixes took an int * for that
@@ -439,7 +439,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
    struct hostent *Host = NULL;
 
    /* let's see if name is an IP address; not necessary on linux */
-#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || defined(HB_OS_OS2) || defined(HB_OS_WIN_USED )
    ULONG ulAddr;
 
    ulAddr = inet_addr( name );
@@ -463,7 +463,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
 
    if( Host == NULL && Socket != NULL )
    {
-#if defined(HB_OS_WIN)
+#if defined(HB_OS_WIN) || defined(HB_OS_WIN_USED )
       HB_SOCKET_SET_ERROR2( Socket, WSAGetLastError() , "Generic error in GetHostByName()" );
       WSASetLastError( 0 );
 #elif defined(HB_OS_OS2) || defined(HB_OS_HPUX) || defined(__WATCOMC__)
@@ -480,7 +480,7 @@ static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetNonBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN
+#if defined( HB_OS_WIN  ) || defined(HB_OS_WIN_USED )
    ULONG mode = 1;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 
@@ -499,7 +499,7 @@ static void hb_socketSetNonBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 
 static void hb_socketSetBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 {
-#ifdef HB_OS_WIN
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
    ULONG mode = 0;
    ioctlsocket( Socket->com, FIONBIO, &mode );
 #else
@@ -517,7 +517,7 @@ static void hb_socketSetBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
 {
    int iErr1;
-   #if ! defined(HB_OS_WIN)
+   #if ! defined( HB_OS_WIN ) || ! defined( HB_OS_WIN_USED )
       int iErrval;
       socklen_t iErrvalLen;
    #endif
@@ -531,7 +531,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
    iErr1 = connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) );
    if( iErr1 != 0 )
    {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
       if( WSAGetLastError() != WSAEWOULDBLOCK )
 #else
       if( errno != EINPROGRESS )
@@ -543,7 +543,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
       {
          /* Now we wait for socket connection or timeout */
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
          iErr1 = hb_selectWriteExceptSocket( Socket );
          if( iErr1 == 2 )
          {
@@ -630,7 +630,7 @@ static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 
    if( Socket->com > 0 )
    {
-      #if defined( HB_OS_WIN )
+      #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -660,7 +660,7 @@ HB_FUNC( INETSSLINIT )
    }
    else
    {
-      #if defined(HB_OS_WIN)
+      #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
       #elif defined( HB_OS_LINUX )
@@ -674,7 +674,7 @@ HB_FUNC( INETSSLCLEANUP )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined(HB_OS_WIN)
+      #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
          WSACleanup();
       #endif
    }
@@ -730,7 +730,7 @@ HB_FUNC( INETSSLCLOSE )
       SSL_shutdown( Socket->pSSL );
       SSL_free(     Socket->pSSL );
       SSL_CTX_free( Socket->pCTX );
-      #if defined( HB_OS_WIN )
+      #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
@@ -1895,7 +1895,7 @@ HB_FUNC( INETSSLSERVER )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
    Socket->com = socket( AF_INET, SOCK_STREAM, 0 );
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0 );
@@ -1965,7 +1965,7 @@ HB_FUNC( INETSSLACCEPT )
    struct sockaddr_in si_remote;
 #if defined(_XOPEN_SOURCE_EXTENDED)
    socklen_t Len;
-#elif defined(HB_OS_WIN)
+#elif defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
    int Len;
 #else
    UINT Len;
@@ -2004,7 +2004,7 @@ HB_FUNC( INETSSLACCEPT )
 
          if(incoming == ( HB_SOCKET_T ) -1 )
          {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
             iError = WSAGetLastError();
 #else
             iError = errno;
@@ -2135,7 +2135,7 @@ HB_FUNC( INETSSLCONNECT )
    if( Host != NULL )
    {
       /* Creates comm socket */
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
       Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -2215,7 +2215,7 @@ HB_FUNC( INETSSLCONNECTIP )
    }
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
    Socket->com = socket( AF_INET, SOCK_STREAM, 0);
 #else
    Socket->com = socket( PF_INET, SOCK_STREAM, 0);
@@ -2269,7 +2269,7 @@ HB_FUNC( INETSSLDGRAMBIND )
    HB_SSL_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN)
+   #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2363,7 +2363,7 @@ HB_FUNC( INETSSLDGRAM )
    HB_SSL_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined(HB_OS_WIN)
+   #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
       Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
@@ -2459,7 +2459,7 @@ HB_FUNC( INETSSLDGRAMRECV )
    int iLen, iMaxLen;
    char *Buffer;
    BOOL fRepeat;
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
    int iDtLen = sizeof( struct sockaddr );
 #else
    socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );

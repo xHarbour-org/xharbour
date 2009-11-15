@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.h,v 1.1 2009/08/09 17:28:07 lculik Exp $
+* $Id: inetssl.h,v 1.2 2009/11/09 09:38:44 marchuet Exp $
 */
 
 /*
@@ -70,7 +70,7 @@
    #if defined( HB_OS_DOS )
        #define HB_NO_DEFAULT_INET
    #else
-      #if defined( HB_OS_WIN )
+      #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define _WINSOCK2_H
          #define HB_SOCKET_T SOCKET
@@ -127,7 +127,7 @@
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 
-      #if defined( HB_OS_WIN )
+      #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
               s->errorDesc = strerror( s->errorCode );\
