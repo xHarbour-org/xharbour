@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.36 2009/09/17 17:35:59 lculik Exp $
+ * $Id: zipnew.cpp,v 1.37 2009/09/30 16:19:24 marchuet Exp $
  */
 
 /*
@@ -953,8 +953,9 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
    return FALSE;
 }
 
-DWORD GetCurrentFileSize( LPCTSTR szFile )
+
 #if defined( HB_OS_WIN_32 ) || defined( __MINGW32__ )
+DWORD GetCurrentFileSize( LPCTSTR szFile )
 {
    DWORD dwFlags = FILE_ATTRIBUTE_ARCHIVE;
    HANDLE hFind;
@@ -984,6 +985,7 @@ DWORD GetCurrentFileSize( LPCTSTR szFile )
 
 }
 #elif defined( __GNUC__ )
+DWORD GetCurrentFileSize( LPCTSTR szFile )
 {
    USHORT   ushbMask   = 63;
    USHORT   usFileAttr = HB_FA_ARCHIVE;
