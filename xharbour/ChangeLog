@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6637 2009/11/15 18:54:37 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6638 2009/11/16 10:50:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,6 +12,12 @@
   * makefile.bc
     makefile.vc
     ! minor fix to last changes envolving HB_OS_WINxxx macros
+
+2009-11-15 20:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/tipssl/inetssl.c
+  * contrib/tipssl/inetssl.h
+    ! fixed compilation
 
 2009-11-15 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include\hbxvm.h
