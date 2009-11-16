@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.255 2009/08/28 01:24:25 ronpinkas Exp $
+# $Id: makefile.bc,v 1.256 2009/10/05 14:41:40 marchuet Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -569,7 +569,7 @@ OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"\include
 
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED
+CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED -DHB_OS_WIN_USED
 HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT

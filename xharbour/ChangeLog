@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6636 2009/11/09 09:43:24 marchuet Exp $
+ * $Id: ChangeLog,v 1.6637 2009/11/15 18:54:37 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-16 08:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * makefile.bc
+    makefile.vc
+    ! minor fix to last changes envolving HB_OS_WINxxx macros
 
 2009-11-15 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include\hbxvm.h
@@ -1296,6 +1301,8 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
+
+
 
 
 
