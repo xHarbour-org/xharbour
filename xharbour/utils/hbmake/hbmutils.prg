@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.46 2007/03/25 06:12:51 walito Exp $
+ * $Id: hbmutils.prg,v 1.47 2007/10/23 13:52:31 lculik Exp $
  */
 /*
  * xHarbour Project source code:
@@ -275,7 +275,9 @@ FUNCTION GetBccDir()
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv
-
+      IF cCurEnv[ -1] == "\"
+         cCurEnv := Substr( cCurEnv, 1, Len( cCurEnv) - 1 )
+      ENDIF
       IF FILE( cCurEnv + '\bcc32.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\BCC32.EXE' )
          cPath := cCurEnv
          cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
@@ -294,8 +296,12 @@ FUNCTION GetVccDir()
    LOCAL cEnv    := GETE( "PATH" )
    LOCAL aEnv    := HB_ATokens( cEnv, ";" )
    LOCAL cCurEnv := ""
+   tracelog(cEnv)
 
    FOR EACH cCurEnv IN aEnv
+      IF cCurEnv[ -1] == "\"
+         cCurEnv := Substr( cCurEnv, 1, Len( cCurEnv) - 1 )
+      ENDIF
 
       IF FILE( cCurEnv + '\cl.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\cl.EXE' )
          cPath := cCurEnv
@@ -317,6 +323,9 @@ FUNCTION GetPoccDir()
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv
+      IF cCurEnv[ -1] == "\"
+         cCurEnv := Substr( cCurEnv, 1, Len( cCurEnv) - 1 )
+      ENDIF
 
       IF FILE( cCurEnv + '\pocc.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\POCC.EXE' )
          cPath := cCurEnv

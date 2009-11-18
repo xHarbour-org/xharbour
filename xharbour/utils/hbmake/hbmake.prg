@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.201 2009/08/24 18:03:18 lculik Exp $
+ * $Id: hbmake.prg,v 1.202 2009/11/02 14:42:38 lculik Exp $
  */
 
 /*
@@ -2394,7 +2394,7 @@ Endif // Create and compile
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\bin\cl -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS) -go" + if(s_lGenCsource,"3","") + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS)  -go" + if(s_lGenCsource,"3","") + IIF( lMediator," -I$(MEDIATOR)\include ","")+ " -o$* $**" } )
       ELSE
          AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -o$* $**" } )
       ENDIF
@@ -3111,13 +3111,13 @@ Endif // Create and compile
       FWrite( nSFhandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL)  $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( nSFhandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
-      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib "  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + CRLF )
+      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib "  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )
       FWrite( nSFhandle, "LINKER = link" + CRLF )
       FWrite( nSFhandle, " " + CRLF )
       FWrite( nSFhandle, "ALLOBJ = " + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( nSFhandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( nSFhandle, "ALLLIB = $(USERLIBS) $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib " + CRLF )
+      FWrite( nSFhandle, "ALLLIB = $(USERLIBS) $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib ws2_32.lib " + CRLF )
 
    ELSEIF s_lPocc
 
