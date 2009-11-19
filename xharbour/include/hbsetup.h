@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.56 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbsetup.h,v 1.57 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -52,6 +52,8 @@
 
 #ifndef HB_SETUP_H_
 #define HB_SETUP_H_
+
+#define HB_LEGACY_LEVEL2
 
 #define HB_PCODE_VER 10
 #define HB_HRB_VER 3
@@ -281,47 +283,11 @@
 
 
 
-/* ***********************************************************************
- * Operating system specific definitions
- */
-#if ( defined(__GNUC__) && \
-      ! ( defined(__DJGPP__) || defined(__EMX__) || defined(__RSXNT__) || \
-          defined(_Windows) || defined(_WIN32) || defined(_WINCE) ) ) || \
-    ( defined(__WATCOMC__) && defined(__LINUX__) )
-   #define HOST_OS_UNIX_COMPATIBLE
-   #define HB_OS_UNIX_COMPATIBLE
-   #define HB_OS_PATH_LIST_SEP_CHR      ':'
-   #define HB_OS_PATH_DELIM_CHR         '/'
-   #define HB_OS_PATH_DELIM_CHR_STRING  "/"
-   #define HB_OS_PATH_DELIM_CHR_LIST    "/"
-   #define HB_OS_ALLFILE_MASK           "*"
-   #undef  HB_OS_DRIVE_DELIM_CHR
-   #undef  HB_OS_HAS_DRIVE_LETTER
-   #define HB_OS_EOL_LEN                1
-   #define HB_OS_OPT_DELIM_LIST         "-"
-   #define HB_ISOPTSEP( c )             ( ( c ) == '-' )
-#else
-   /* we are assuming here the DOS compatible OS */
-   #define HB_OS_DOS_COMPATIBLE
-   #define HB_OS_PATH_LIST_SEP_CHR      ';'
-   #define HB_OS_PATH_DELIM_CHR         '\\'
-   #define HB_OS_PATH_DELIM_CHR_STRING  "\\"
-   #define HB_OS_PATH_DELIM_CHR_LIST    "\\/:"
-   #define HB_OS_ALLFILE_MASK           "*.*"
-   #define HB_OS_DRIVE_DELIM_CHR        ':'
-   #define HB_OS_HAS_DRIVE_LETTER
-   #define HB_OS_EOL_LEN                2  /* # of bytes in End of Line marker */
-   #define HB_OS_OPT_DELIM_LIST         "/-"
-   #define HB_ISOPTSEP( c )             ( ( c ) == '-' || ( c ) == '/' )
-#endif
-
 #ifdef HB_LEGACY_LEVEL2
    #ifndef _POSIX_PATH_MAX
       #define _POSIX_PATH_MAX    255
    #endif
 #endif
-
-#define HB_PATH_MAX     264 /* with trailing 0 byte */
 
 /* NOTE:
    Compiler                                _MSC_VER value
@@ -385,12 +351,16 @@
 #ifndef HB_OS_WIN
    #if defined( WINNT ) || defined( _Windows ) || defined( __NT__ ) || defined( _WIN32 ) || defined( _WINDOWS_ ) || defined( __WINDOWS_386__ ) || defined( __WIN32__ ) || defined( _MSC_VER ) || defined( __CYGWIN__ )
       #define HB_OS_WIN
+      /* Compatibility. Do not use this. */
+      #ifdef HB_LEGACY_LEVEL2
+         #define HB_OS_WIN_32
+      #endif
    #endif
 #endif
 
 /* Sub-option inside HB_OS_WIN */
 #ifndef HB_OS_WIN_64
-   #if defined( HB_OS_WIN_64 )
+   #if defined( _WIN64 )
       #define HB_OS_WIN_64
    #endif
 #endif
@@ -399,6 +369,10 @@
 #ifndef HB_OS_WIN_CE
    #if defined( _WINCE ) || defined( __CEGCC__ ) || defined( __MINGW32CE__ ) || (defined( __POCC_TARGET__ ) && __POCC_TARGET__ == 2 )
       #define HB_OS_WIN_CE
+      /* Compatibility. Do not use this. */
+      #ifdef HB_LEGACY_LEVEL2
+         #define HB_WINCE
+      #endif
    #endif
 #endif
 
@@ -422,7 +396,7 @@
 #endif
 
 #ifndef HB_OS_DARWIN
-   #if defined(__APPLE__)
+   #if defined( __APPLE__ ) || defined( __DARWIN__ )
       #define HB_OS_DARWIN
    #endif
 #endif
@@ -441,16 +415,52 @@
 #endif
 
 #ifndef HB_OS_UNIX
-   #if defined( HB_OS_UNIX_COMPATIBLE ) || \
-       defined( HB_OS_LINUX ) || \
+   #if defined( HB_OS_LINUX ) || \
        defined( HB_OS_DARWIN ) || \
        defined( HB_OS_BSD ) || \
        defined( HB_OS_SUNOS ) || \
        defined( HB_OS_HPUX ) || \
        defined( HB_OS_BEOS )
       #define HB_OS_UNIX
+      /* Compatibility. Do not use this. */
+      #ifdef HB_LEGACY_LEVEL2
+         #define HB_OS_UNIX_COMPATIBLE
+      #endif
    #endif
 #endif
+
+/* ***********************************************************************
+ * Operating system specific definitions
+ */
+#if defined( HB_OS_UNIX )
+   #define HOST_OS_UNIX_COMPATIBLE
+   #define HB_OS_UNIX_COMPATIBLE
+   #define HB_OS_PATH_LIST_SEP_CHR      ':'
+   #define HB_OS_PATH_DELIM_CHR         '/'
+   #define HB_OS_PATH_DELIM_CHR_STRING  "/"
+   #define HB_OS_PATH_DELIM_CHR_LIST    "/"
+   #define HB_OS_ALLFILE_MASK           "*"
+   #undef  HB_OS_DRIVE_DELIM_CHR
+   #undef  HB_OS_HAS_DRIVE_LETTER
+   #define HB_OS_EOL_LEN                1
+   #define HB_OS_OPT_DELIM_LIST         "-"
+   #define HB_ISOPTSEP( c )             ( ( c ) == '-' )
+#else
+   /* we are assuming here the DOS compatible OS */
+   #define HB_OS_DOS_COMPATIBLE
+   #define HB_OS_PATH_LIST_SEP_CHR      ';'
+   #define HB_OS_PATH_DELIM_CHR         '\\'
+   #define HB_OS_PATH_DELIM_CHR_STRING  "\\"
+   #define HB_OS_PATH_DELIM_CHR_LIST    "\\/:"
+   #define HB_OS_ALLFILE_MASK           "*.*"
+   #define HB_OS_DRIVE_DELIM_CHR        ':'
+   #define HB_OS_HAS_DRIVE_LETTER
+   #define HB_OS_EOL_LEN                2  /* # of bytes in End of Line marker */
+   #define HB_OS_OPT_DELIM_LIST         "/-"
+   #define HB_ISOPTSEP( c )             ( ( c ) == '-' || ( c ) == '/' )
+#endif
+
+#define HB_PATH_MAX     264 /* with trailing 0 byte */
 
 #ifndef HB_OS_MAC
    #if defined(__MPW__)
@@ -510,11 +520,12 @@
  * Extern "C" detection
  */
 
-#if defined(__cplusplus) && !defined(__IBMCPP__)
-   #define HB_EXTERN_C
+#if defined( __cplusplus ) && !defined( __IBMCPP__ )
+   #define HB_EXTERN_C        extern "C"
    #define HB_EXTERN_BEGIN    extern "C" {
    #define HB_EXTERN_END      }
 #else
+   //#define HB_EXTERN_C
    #define HB_EXTERN_BEGIN
    #define HB_EXTERN_END
 #endif
@@ -522,30 +533,37 @@
 #if defined( __GNUC__ )
    #define HB_PRINTF_FORMAT( _nStr, _nParam ) \
                      __attribute__ (( format (printf, _nStr, _nParam)))
+#  if ( __GNUC__ >= 3 )
    #define HB_MALLOC_ATTR \
                      __attribute__ (( malloc ))
+#  else
+   #define HB_MALLOC_ATTR
+#  endif
    #define HB_HOT_ATTR \
                      __attribute__ (( hot ))
    #define HB_COLD_ATTR \
                      __attribute__ (( cold ))
-#if 0
+#  if 0
    #define HB_NORETURN_ATTR \
                      __attribute__ (( noreturn ))
 #  else
    #define HB_NORETURN_ATTR
 #  endif
-#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 1 ) )
+#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 1 ) ) && \
+      !defined( __ICC ) && !defined( HB_NO_FLATTEN ) && !defined( HB_CC_CLANG )
    #define HB_FLATTEN_ATTR \
                      __attribute__ (( flatten ))
 #  else
    #define HB_FLATTEN_ATTR
 #  endif
-#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 3 ) )
+#  if ( ( __GNUC__ > 4 ) || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 3 ) ) && \
+      !defined( __ICC )
    #define HB_ALLOC_SIZE_ATTR( _nParam ) \
                      __attribute__ (( alloc_size (_nParam)))
 #  else
    #define HB_ALLOC_SIZE_ATTR( _nParam )
 #  endif
+   #define HB_RESTRICT  __restrict
 #else
    #define HB_PRINTF_FORMAT( _nStr, _nParam )
    #define HB_MALLOC_ATTR
@@ -554,6 +572,7 @@
    #define HB_COLD_ATTR
    #define HB_FLATTEN_ATTR
    #define HB_ALLOC_SIZE_ATTR( _nParam )
+   #define HB_RESTRICT
 #endif
 
 /*

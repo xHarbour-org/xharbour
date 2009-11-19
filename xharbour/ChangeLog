@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6639 2009/11/16 10:51:42 lculik Exp $
+ * $Id: ChangeLog,v 1.6640 2009/11/18 11:54:23 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-20 00:02 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\hbsetup.h
+    * Added HB_LEGACY_LEVEL2 by default to admit HB_OS_WIN_32_USED, _WIN64 and HB_WINCE changed by
+      HB_OS_WIN_USED, HB_OS_WIN_64, HB_OS_WIN_CE on previous commit. Please don't use it any more.
+
+
 2009-11-18 10:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * utils/hbmake/hbmutils.prg
   * utils/hbmake/hbmake.prg
