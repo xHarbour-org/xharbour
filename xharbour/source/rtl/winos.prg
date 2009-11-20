@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.8 2007/02/11 20:00:50 peterrees Exp $
+ * $Id: winos.prg,v 1.9 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -268,6 +268,13 @@ HB_FUNC( OS_ISWINVISTA )
   OSVERSIONINFO osvi;
   getwinver( &osvi );
   hb_retl( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 );
+}
+
+HB_FUNC( OS_ISWIN7 )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 );
 }
 
 HB_FUNC( OS_ISWTSCLIENT )
