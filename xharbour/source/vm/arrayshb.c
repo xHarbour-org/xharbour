@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.80 2009/09/01 14:39:42 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.81 2009/10/21 15:24:46 marchuet Exp $
  */
 
 /*
@@ -286,15 +286,24 @@ HB_FUNC( AINS )
 
       if( ISNUM( 2 ) )
       {
-         hb_arrayIns( pArray, hb_parnl( 2 ) );
-      }
+         long lIndex = hb_parnl( 2 );
 
-    #ifndef HB_C52_STRICT
-      if( hb_pcount() >= 3 )
-      {
-         hb_arraySet( pArray, hb_parnl( 2 ), hb_param( 3, HB_IT_ANY ) );
+       #ifndef HB_C52_STRICT
+         if( lIndex < 0 )
+         {
+            lIndex += pArray->item.asArray.value->ulLen + 1;
+         }
+       #endif
+
+         hb_arrayIns( pArray, lIndex );
+
+       #ifndef HB_C52_STRICT
+         if( hb_pcount() >= 3 )
+         {
+            hb_arraySet( pArray, hb_parnl( 2 ), hb_param( 3, HB_IT_ANY ) );
+         }
+       #endif
       }
-    #endif
 
       /* AIns() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
@@ -321,9 +330,25 @@ HB_FUNC( ADEL )
    {
       if( pArray->item.asArray.value->ulLen )
       {
-         long lpos = ISNUM( 2 ) ? hb_parnl( 2 ) : 1;
-         lpos = lpos > 0 ? lpos : hb_arrayLen( pArray ) + lpos + 1;
-         if( hb_arrayDel( pArray, ( ULONG ) lpos ) )
+         long lIndex;
+
+         if( ISNUM( 2 ) )
+         {
+            lIndex = hb_parnl( 2 );
+
+            #ifndef HB_C52_STRICT
+              if( lIndex < 0 )
+              {
+                 lIndex += pArray->item.asArray.value->ulLen + 1;
+              }
+            #endif
+         }
+         else
+         {
+            lIndex = 1;
+         }
+
+         if( hb_arrayDel( pArray, lIndex ) )
          {
             #ifndef HB_C52_STRICT
                PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );

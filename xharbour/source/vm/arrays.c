@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.169 2009/09/01 14:39:42 ronpinkas Exp $
+ * $Id: arrays.c,v 1.170 2009/10/02 13:23:56 ronpinkas Exp $
  */
 
 /*
@@ -119,6 +119,7 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    }
 
    pBaseArray->pItems = NULL;
+
    if( ulLen > 0 )
    {
       pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * ulLen );
@@ -141,6 +142,7 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    if( ulLen )
    {
       register PHB_ITEM pItems = pBaseArray->pItems + ulLen;
+
       do
       {
          ( --pItems )->type = HB_IT_NIL;
@@ -434,21 +436,22 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
+      ULONG ulLen = pArray->item.asArray.value->ulLen;
 
       if( ulIndex > 0 && ulIndex < ulLen )
       {
+         PHB_ITEM pItems = pArray->item.asArray.value->pItems;
+
          for( ulIndex--; ulIndex < ulLen - 1; ulIndex++ )       /* move items */
          {
-            hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
+            hb_itemForwardValue( pItems + ulIndex, pItems + ( ulIndex + 1 ) );
          }
 
          return TRUE;
       }
       else if( ulIndex == ulLen )
       {
-         hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
+         hb_itemSetNil( pArray->item.asArray.value->pItems + ( ulLen - 1 ) );
 
          return TRUE;
       }
@@ -467,14 +470,14 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 
       if( ulIndex > 0 && ulIndex <= ulLen )
       {
-         PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
+         PHB_ITEM pItems = pArray->item.asArray.value->pItems;
 
          for( ulLen--; ulLen >= ulIndex; ulLen-- )          /* move items */
          {
-            hb_itemForwardValue( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
+            hb_itemForwardValue( pItems + ulLen, pItems + ( ulLen - 1 ) );
          }
 
-         hb_itemSetNil( pBaseArray->pItems + ulLen );
+         hb_itemSetNil( pItems + ulLen );
       }
 
       return TRUE;
@@ -500,7 +503,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       pItem->type &= ~HB_IT_MEMOFLAG;
       hb_itemCopy( pElement, pItem );
 
-	  return TRUE;
+      return TRUE;
    }
 
    return FALSE;
@@ -1090,13 +1093,14 @@ void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCoun
    PHB_BASEARRAY pBaseArray;
    PHB_ITEM pElement;
 
-   pBaseArray = pArray->item.asArray.value;
-   ulLen = pBaseArray->ulLen;
+   ulLen = pArray->item.asArray.value->ulLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFill(%p, %p, %i, %i)", pArray, pValue, ulStart, ulCount));
 
    if( ulStart <= ulLen )
    {
+      PHB_ITEM pItems = pArray->item.asArray.value->pItems;
+
       if( ulStart + ulCount > ulLen + 1 )
       {
          ulCount = ulLen - ulStart + 1;
@@ -1106,7 +1110,7 @@ void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCoun
 
       for( ; ulCount > 0; ulCount--, ulStart++ )
       {
-         pElement = pBaseArray->pItems + ulStart;
+         pElement = pItems + ulStart;
 
          if( HB_IS_BYREF( pElement ) )
          {
@@ -1378,6 +1382,8 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
 
          if( ulStart <= ulLen )
          {
+            PHB_ITEM pItems = pBaseArray->pItems;
+
             ulCount = ulLen - ulStart + 1;
 
             if( pulCount && ( *pulCount <= ulLen - ulStart ) )
@@ -1397,7 +1403,7 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( bBlock );
 
-               hb_vmPush( pBaseArray->pItems + ulStart );
+               hb_vmPush( pItems + ulStart );
                hb_vmPushLong( ulStart + 1 );
 
                hb_vmSend( 2 );
@@ -1656,10 +1662,8 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
 
    if( pSrcArray->type == HB_IT_ARRAY && pDstArray->type == HB_IT_ARRAY )
    {
-      PHB_BASEARRAY pSrcBaseArray = pSrcArray->item.asArray.value;
-      PHB_BASEARRAY pDstBaseArray = pDstArray->item.asArray.value;
-      ULONG ulSrcLen = pSrcBaseArray->ulLen;
-      ULONG ulDstLen = pDstBaseArray->ulLen;
+      ULONG ulSrcLen = pSrcArray->item.asArray.value->ulLen;
+      ULONG ulDstLen = pDstArray->item.asArray.value->ulLen;
       ULONG ulStart = 1;
       ULONG ulTarget = 1;
       ULONG ulCount;
@@ -1699,6 +1703,8 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
 #else
          if( ulDstLen > 0 )
          {
+            PHB_ITEM pDstItems = pDstArray->item.asArray.value->pItems, pSrcItems = pSrcArray->item.asArray.value->pItems;
+
             if( ulTarget > ulDstLen )
             {
                ulTarget = ulDstLen;
@@ -1711,7 +1717,7 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
 
             for( ulTarget--, ulStart--; ulCount > 0; ulCount--, ulStart++, ulTarget++ )
             {
-               hb_itemCopy( pDstBaseArray->pItems + ulTarget, pSrcBaseArray->pItems + ulStart );
+               hb_itemCopy( pDstItems + ulTarget, pSrcItems + ulStart );
             }
          }
       }
@@ -1743,6 +1749,7 @@ PHB_ITEM hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLO
       PHB_ITEM pSrcItem;
       PHB_NESTED_CLONED pCloned;
       BOOL bTop;
+      PHB_ITEM pSrcItems = pSrcBaseArray->pItems;
 
       hb_arrayNew( pDstArray, ulSrcLen );
 
@@ -1765,6 +1772,7 @@ PHB_ITEM hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLO
          pCloned->pNext = ( PHB_NESTED_CLONED ) hb_xgrab( sizeof( HB_NESTED_CLONED ) );
          pCloned = pCloned->pNext;
       }
+
       pCloned->pSrcBaseArray = pSrcBaseArray;
       pCloned->pDest         = pDstArray;
       pCloned->pNext         = NULL;
@@ -1774,7 +1782,7 @@ PHB_ITEM hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLO
 
       for( ulCount = 0; ulCount < ulSrcLen; ulCount++ )
       {
-         pSrcItem = pSrcBaseArray->pItems + ulCount;
+         pSrcItem = pSrcItems + ulCount;
 
          /* Clipper clones nested array ONLY if NOT an Object!!! */
          if( pSrcItem->type == HB_IT_ARRAY && pSrcItem->item.asArray.value->uiClass == 0 )
@@ -1982,10 +1990,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          {
             hb_itemReleaseString( pItem );
          }
+
          ++pItem;
       }
 
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
+
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
       pBaseArray->ulLen = 4171717171U; //Intentionally - debugging flag indicating array was released by GC.

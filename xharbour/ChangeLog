@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6641 2009/11/19 23:05:44 marchuet Exp $
+ * $Id: ChangeLog,v 1.6642 2009/11/20 10:42:53 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-21 16:14 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * makefile.vc
+    - Removed redundant and wrong defines: -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_USED -DHB_OS_WIN_32
+      /* I recommend same for all other make files. */
+
+  * include/hbapi.h
+    - Removed redundant declaraion of hb_arraySet()
+
+  * source/vm/arrays.c
+    % Minor optimizations
+
+  * source/vm/arrayshb.c
+    * Support negative argument in aIns() and aDel() protected by #ifndef HB_C52_STRICT
 
 2009-11-20 11:40 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source\rtl\winos.prg
@@ -282,12 +296,12 @@
 2009-10-23 06:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed Initkeys(), HitTest() methods and Tbmouse() function to work properly with mouse
-    events. 
+    events.
 
     ps: it seems threre is a bug
  with mouse wheel on console window, that is changing MCol()
     MRow() values, so if you use mouse wheel to change tbrowse rows, the behaviour can be unexpected.
- 
+
 2009-10-22 21:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/filenet.c
     ! added missing #include for htons under linux
