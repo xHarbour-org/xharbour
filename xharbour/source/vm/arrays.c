@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.170 2009/10/02 13:23:56 ronpinkas Exp $
+ * $Id: arrays.c,v 1.171 2009/11/21 20:54:56 ronpinkas Exp $
  */
 
 /*
@@ -1090,7 +1090,6 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount )
 {
    ULONG ulLen;
-   PHB_BASEARRAY pBaseArray;
    PHB_ITEM pElement;
 
    ulLen = pArray->item.asArray.value->ulLen;

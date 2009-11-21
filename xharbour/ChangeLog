@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6642 2009/11/20 10:42:53 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6643 2009/11/21 20:54:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-11-21 23:36 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\arrays.c
+    - Removed unused variable pBaseArray from function hb_arrayFill()
 
 2009-11-21 16:14 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * makefile.vc
