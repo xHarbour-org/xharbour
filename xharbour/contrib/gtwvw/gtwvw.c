@@ -1,5 +1,6 @@
+
 /*
-* $Id: gtwvw.c,v 1.59 2009/09/20 15:17:07 lculik Exp $
+* $Id: gtwvw.c,v 1.60 2009/09/23 16:48:21 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -2341,7 +2342,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             if( hb_vmRequestReenter() )
             {
                hb_vmPushDynSym( ( PHB_DYNS ) pFunc );
-            hb_vmPushNil();
+               hb_vmPushNil();
                hb_vmPushNumInt(( HB_LONG ) ( HB_PTRDIFF ) hDlg );
                hb_vmPushNumInt( message );
                hb_vmPushNumInt( wParam  );
@@ -2502,7 +2503,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
             {
                hb_vmPushDynSym( ( PHB_DYNS ) pFunc );
 
-            hb_vmPushNil();
+               hb_vmPushNil();
                hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hDlg    );
                hb_vmPushNumInt( message );
                hb_vmPushNumInt( wParam  );
@@ -3058,23 +3059,26 @@ static void xUserPaintNow( UINT usWinNum )
 
   s_pWvwData->s_pWindows[usWinNum]->bPaintPending = FALSE;
 
-  if( hb_vmRequestReenter() )
+  if (s_pWvwData->s_sApp->pSymWVW_PAINT )
   {
-     hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_PAINT );
-  hb_vmPushNil();
-  hb_vmPushInteger( ( int ) (usWinNum)  );
+     if( hb_vmRequestReenter() )
+     {
+        hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_PAINT );
+        hb_vmPushNil();
+        hb_vmPushInteger( ( int ) (usWinNum)  );
 
-  /* follow WVT convention to not passing coordinates anymore
-  hb_vmPushInteger( ( int ) (rpaint.top)  );
-  hb_vmPushInteger( ( int ) (rpaint.left)  );
-  hb_vmPushInteger( ( int ) (rpaint.bottom)  );
-  hb_vmPushInteger( ( int ) (rpaint.right)  );
-  hb_vmDo( 5 );
-  */
+        /* follow WVT convention to not passing coordinates anymore
+        hb_vmPushInteger( ( int ) (rpaint.top)  );
+        hb_vmPushInteger( ( int ) (rpaint.left)  );
+        hb_vmPushInteger( ( int ) (rpaint.bottom)  );
+        hb_vmPushInteger( ( int ) (rpaint.right)  );
+        hb_vmDo( 5 );
+        */
 
-  hb_vmDo( 1 );
+        hb_vmDo( 1 );
 
-     hb_vmRequestRestore();
+        hb_vmRequestRestore();
+     }
   }
 
   if ( !s_pWvwData->s_pWindows[usWinNum]->bPaintPending )
@@ -3099,18 +3103,21 @@ static void xUserTimerNow( UINT usWinNum, HWND hWnd, UINT message, WPARAM wParam
 
   bRunning = TRUE;
 
-  if( hb_vmRequestReenter() )
+  if ( s_pWvwData->s_sApp->pSymWVW_TIMER )
   {
-     hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_TIMER);
-     hb_vmPushNil();
-     hb_vmPushInteger( ( int ) (usWinNum)  );
-     hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd    );
-     hb_vmPushNumInt( message );
-     hb_vmPushNumInt( wParam  );
-     hb_vmPushNumInt( lParam  );
-     hb_vmDo( 5 );
-
-     hb_vmRequestRestore();
+     if( hb_vmRequestReenter() )
+     {
+        hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_TIMER);
+        hb_vmPushNil();
+        hb_vmPushInteger( ( int ) (usWinNum)  );
+        hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd    );
+        hb_vmPushNumInt( message );
+        hb_vmPushNumInt( wParam  );
+        hb_vmPushNumInt( lParam  );
+        hb_vmDo( 5 );
+   
+        hb_vmRequestRestore();
+     }
   }
 
   bRunning = FALSE;
@@ -3700,10 +3707,10 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
         if( hb_vmRequestReenter() )
         {
            hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_KILLFOCUS ) ;
-        hb_vmPushNil();
-        hb_vmPushInteger( ( int ) (usWinNum)  );
+           hb_vmPushNil();
+           hb_vmPushInteger( ( int ) (usWinNum)  );
            hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) hWnd );
-        hb_vmDo( 2 );
+           hb_vmDo( 2 );
            hb_vmRequestRestore();
         }
       }
@@ -5650,13 +5657,14 @@ static void hb_gt_wvwMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
     {
     
        hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_MOUSE );
-    hb_vmPushNil();
-    hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
-    hb_vmPushLong( ( SHORT ) keyCode );
-    hb_vmPushLong( ( SHORT ) colrow.y );
-    hb_vmPushLong( ( SHORT ) colrow.x );
-    hb_vmPushLong( ( SHORT ) keyState );
-    hb_vmDo( 5 );
+       hb_vmPushNil();
+       hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
+       hb_vmPushLong( ( SHORT ) keyCode );
+       hb_vmPushLong( ( SHORT ) colrow.y );
+       hb_vmPushLong( ( SHORT ) colrow.x );
+       hb_vmPushLong( ( SHORT ) keyState );
+       hb_vmDo( 5 );
+
        hb_vmRequestRestore();
     }
   }
@@ -5797,18 +5805,23 @@ static void hb_gt_wvwTBMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT messa
 
   if ( s_pWvwData->s_sApp->pSymWVW_TBMOUSE && keyCode != 0 )
   {
-    hb_vmPushState();
-    hb_vmPushSymbol( s_pWvwData->s_sApp->pSymWVW_TBMOUSE->pSymbol );
-    hb_vmPushNil();
-    hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
-    hb_vmPushLong( ( SHORT ) keyCode );
-    hb_vmPushLong( ( SHORT ) colrow.y );
-    hb_vmPushLong( ( SHORT ) colrow.x );
-    hb_vmPushLong( ( SHORT ) keyState );
-    hb_vmDo( 5 );
+    if( hb_vmRequestReenter() )
+    {
+       hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_TBMOUSE );
+       hb_vmPushNil();
+       hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
+       hb_vmPushLong( ( SHORT ) keyCode );
+       hb_vmPushLong( ( SHORT ) colrow.y );
+       hb_vmPushLong( ( SHORT ) colrow.x );
+       hb_vmPushLong( ( SHORT ) keyState );
+       hb_vmDo( 5 );
 
-    hb_vmPopState();
+       hb_vmRequestRestore();
+    }
+
   }
+
+
 
   hb_gt_wvwAddCharToInputQueue( keyCode );
 }
@@ -5977,6 +5990,7 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
     }
     else
     {
+
        iCmdShow = SW_SHOWNORMAL;
     }
 
@@ -6189,7 +6203,7 @@ static void hb_gt_wvwInputNotAllowed( UINT usWinNum, UINT message, WPARAM wParam
     if( hb_vmRequestReenter() )
     {
 
-       hb_vmPushSymbol( s_pWvwData->s_sApp->pSymWVW_INPUTFOCUS->pSymbol );
+       hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_INPUTFOCUS );
        hb_vmPushNil();
        hb_vmPushInteger( ( int ) (usWinNum)  );
        hb_vmPushNumInt( ( HB_LONG ) ( HB_PTRDIFF ) s_pWvwData->s_pWindows[ usWinNum ]->hWnd    );
