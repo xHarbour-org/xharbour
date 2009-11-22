@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.12 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: mainstd.c,v 1.13 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ HB_EXTERN_BEGIN
 int _CRT_glob = 0;
 #endif
 
-#if defined(HB_OS_WIN)
+#if defined(HB_OS_WIN) || defined(HB_OS_WIN_32_USED)
    #include "hbgtcore.h"
 
    // Save
