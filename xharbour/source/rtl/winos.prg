@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.9 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: winos.prg,v 1.10 2009/11/20 10:42:53 patrickmast Exp $
  */
 
 /*
@@ -321,5 +321,25 @@ HB_FUNC( OS_VERSIONINFO )
   hb_arraySetC( pArray, 5, osvi.szCSDVersion   );
   hb_itemRelease( hb_itemReturn( pArray) );
 }
+
+HB_FUNC( OS_ISUSERANADMIN )  // 24/11/09 11:43
+{
+  BOOL iResult = FALSE ;
+  typedef int (WINAPI *USERADMIN)( void );
+  HINSTANCE hLib;
+  USERADMIN ProcAdd;
+  hLib = LoadLibrary("shell32.dll");
+  if (hLib != NULL)
+  {
+    ProcAdd = ( USERADMIN ) GetProcAddress(hLib, "IsUserAnAdmin");
+    if (NULL != ProcAdd)
+    {
+      iResult = (ProcAdd)() ;
+    }
+    FreeLibrary( hLib );
+  }
+  hb_retl( iResult ) ;
+}
+
 
 #pragma ENDDUMP
