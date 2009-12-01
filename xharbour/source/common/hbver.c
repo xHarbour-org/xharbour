@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.49 2009/09/16 15:53:42 marchuet Exp $
+ * $Id: hbver.c,v 1.50 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -517,7 +517,11 @@ char * hb_verCompiler( void )
    iVerMinor = _MSC_VER % 100;
 
    #if defined(_MSC_FULL_VER)
-      iVerPatch = _MSC_FULL_VER - ( _MSC_VER * 10000 );
+      #if (_MSC_VER >= 1400)
+         iVerPatch = _MSC_FULL_VER - ( _MSC_VER * 100000 );
+      #else
+         iVerPatch = _MSC_FULL_VER - ( _MSC_VER * 10000 );
+      #endif
    #else
       iVerPatch = 0;
    #endif
@@ -638,7 +642,11 @@ char * hb_verCompiler( void )
       #else
       if( iVerPatch != 0 )
       #if defined(_MSC_VER)
-         hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+         #if defined(_MSC_BUILD)
+            hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd.%02d", pszName, szSub, iVerMajor, iVerMinor, iVerPatch, _MSC_BUILD );
+	 #else
+            hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+	 #endif
       #else
          hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%hd.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
       #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6646 2009/11/22 20:32:11 lculik Exp $
+ * $Id: ChangeLog,v 1.6647 2009/11/30 20:37:35 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-01 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+    ! fix wrong compiler version number for MSVS 2005 and newer.
+    + add compiler build number if _MSC_BUILD is defined
+
 2009-12-01 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\winos.prg
     + OS_ISUSERANADMIN() -> Returns .T. on Win2000 or later if logged in
