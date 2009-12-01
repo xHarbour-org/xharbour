@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6647 2009/11/30 20:37:35 peterrees Exp $
+ * $Id: ChangeLog,v 1.6648 2009/12/01 16:14:10 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-01 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
+  * source/rtl/gtclip.c
+    * added CF_LOCALE call in hb_gt_w32_setClipboard function. Its need
+      for applications, that paste from clipboard in CF_UNICODETEXT format
 
 2009-12-01 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c
