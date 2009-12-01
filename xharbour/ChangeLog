@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6648 2009/12/01 16:14:10 andijahja Exp $
+ * $Id: ChangeLog,v 1.6649 2009/12/01 18:04:37 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-01 01:37 UTC-0800 Brian Hays <bhays/at/abacuslaw.com>
+  * contrib\rdd_ads\ads1.c
+    + Added support for ordDescend's 3rd arg to dynamically change
+      the index direction between ascending / descending.
+      ONLY supported in ADS 9 and later.
 
 2009-12-01 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/rtl/gtclip.c

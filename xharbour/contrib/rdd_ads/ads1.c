@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.150 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: ads1.c,v 1.151 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -3935,9 +3935,35 @@ static HB_ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_ISDESC:
          if( hIndex )
+         {
             AdsIsIndexDescending( hIndex, &u16 );
+
+            if( pOrderInfo->itmNewVal && HB_IS_LOGICAL( pOrderInfo->itmNewVal ) )
+            {
+#if ADS_LIB_VERSION >= 900
+/*
+ ordDescend's 3rd arg (itmNewVal) uses .t. for descending, .f. for ascending.
+ BUT AdsSetIndexDirection takes an unusual flag that EITHER takes 0 to return
+ to the original state, or TRUE to "reverse the direction from the current state"
+ so we have to translate NewVal by comparing to "isDescending".
+ TODO: It would be nice to have a value to "return to native state" in xHarbour's syntax
+*/
+               BOOL bRequestedDescend = hb_itemGetL( pOrderInfo->itmNewVal ) ;
+               if( (BOOL) u16 != bRequestedDescend )  // if current direction is not the same as requested direction, flip it
+               {
+                  AdsSetIndexDirection( hIndex, TRUE );
+               }
+#else
+// TODO: if itmNewVal is passed in unsupported versions, should probably throw an error--but may anger users who have been failing
+//  silently for years and still have ads8 or earlier.  Do we have a "Unsupported Option in this version" error?
+               hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, "Dynamic descend not supported in this version", HB_ERR_FUNCNAME );
+#endif
+            }
+         }
          else
+         {
             u16 = 0;
+         }
          hb_itemPutL( pOrderInfo->itmResult, u16 != 0 );
          break;
 
