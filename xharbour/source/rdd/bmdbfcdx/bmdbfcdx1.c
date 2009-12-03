@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.69 2009/09/30 16:19:35 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.70 2009/10/05 14:41:41 marchuet Exp $
  */
 
 /*
@@ -4231,7 +4231,7 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
    {
       hb_fileClose( pIndex->pFile );
       if( pIndex->fDelete )
-         hb_fileDelete( pIndex->szRealName ? pIndex->szRealName : pIndex->szFileName, NULL );
+         hb_fileDelete( pIndex->szRealName ? pIndex->szRealName : pIndex->szFileName, (USHORT) 0 );
    }
 
 #ifdef HB_CDX_DBGCODE

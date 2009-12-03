@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.214 2009/10/15 11:53:13 lculik Exp $
+ * $Id: dbf1.c,v 1.215 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -2669,7 +2669,7 @@ static HB_ERRCODE hb_dbfClose( DBFAREAP pArea )
       pArea->pDataFile = NULL;
 
       if( pArea->fTemporary )
-         hb_fileDelete( ( const char * ) pArea->szDataFileName, NULL );
+         hb_fileDelete( ( const char * ) pArea->szDataFileName, 0 );
    }
 
    /* Close the memo file */
@@ -2679,7 +2679,7 @@ static HB_ERRCODE hb_dbfClose( DBFAREAP pArea )
       pArea->pMemoFile = NULL;
 
       if( pArea->fTemporary )
-         hb_fileDelete( ( const char * )  pArea->szMemoFileName, NULL );
+         hb_fileDelete( ( const char * )  pArea->szMemoFileName, 0 );
    }
 
    pArea->fTemporary = FALSE;
@@ -5661,7 +5661,7 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
    /* Use hb_fileExists first to locate table which can be in differ path */
    if( hb_fileExists( szFileName, szFileName ) )
    {
-      fResult = hb_fileDelete( ( const char * ) szFileName, NULL );
+      fResult = hb_fileDelete( ( const char * ) szFileName, 0 );
       if( fResult && fTable )
       {
          /*
@@ -5680,7 +5680,7 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
             {
                pFileName->szExtension = szExt;
                hb_fsFNameMerge( szFileName, pFileName );
-               hb_fileDelete( ( const char * ) szFileName, NULL );
+               hb_fileDelete( ( const char * ) szFileName, 0 );
             }
          }
          /*
@@ -5695,7 +5695,7 @@ static HB_ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pIte
             {
                pFileName->szExtension = szExt;
                hb_fsFNameMerge( szFileName, pFileName );
-               hb_fileDelete( ( const char * ) szFileName, NULL );
+               hb_fileDelete( ( const char * ) szFileName, 0 );
             }
          }
          hb_xfree( pFileName );

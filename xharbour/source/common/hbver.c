@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.50 2009/11/09 09:38:58 marchuet Exp $
+ * $Id: hbver.c,v 1.51 2009/12/01 16:14:10 andijahja Exp $
  */
 
 /*
@@ -645,7 +645,11 @@ char * hb_verCompiler( void )
          #if defined(_MSC_BUILD)
             hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd.%02d", pszName, szSub, iVerMajor, iVerMinor, iVerPatch, _MSC_BUILD );
 	 #else
-            hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+	    #if ( _MSC_VER == 1400 )
+               hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hu", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+	    #else
+               hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%02d.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+	    #endif
 	 #endif
       #else
          hb_snprintf( pszCompiler, COMPILER_BUF_SIZE, "%s%s %hd.%hd.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );

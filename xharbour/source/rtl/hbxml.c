@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.37 2009/08/19 23:19:52 likewolf Exp $
+ * $Id: hbxml.c,v 1.38 2009/11/05 00:15:26 modalsist Exp $
  */
 
 /*
@@ -1468,12 +1468,12 @@ static MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc,
          return MXML_STATUS_MALFORMED;
       }
       /* The xml document can have the utf-8 signature named BOM (Byte Order Mark),
-         composed by a sequence of 3 characters, like chr(239), chr(187) and chr(191) 
+         composed by a sequence of 3 characters, like chr(239), chr(187) and chr(191)
          or EF, BB and BF.
          This signature is always at the beginning of the file, before <?xml> tag and can
          cause unexpected results. So we need treat it.
          More detais at http://www.w3.org/International/questions/qa-utf8-bom */
-      if ( iStatus == 0 && chr == 239 || chr == 187 || chr == 191 )
+      if ( ( iStatus == 0 ) && ( chr == 239 || chr == 187 || chr == 191 ) )
       {
          continue;
       }

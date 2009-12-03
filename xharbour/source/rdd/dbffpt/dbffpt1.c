@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.107 2009/09/30 16:19:48 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.108 2009/10/05 14:41:41 marchuet Exp $
  */
 
 /*
@@ -4459,7 +4459,7 @@ static HB_ERRCODE hb_fptDoPack( FPTAREAP pArea, USHORT uiBlockSize,
                }
             }
             hb_fileClose( pArea->pMemoTmpFile );
-            hb_fileDelete( szFile, NULL );
+            hb_fileDelete( szFile, 0 );
             pArea->pMemoTmpFile = NULL;
          }
       }
@@ -4560,7 +4560,7 @@ static HB_ERRCODE hb_fptPack( FPTAREAP pArea )
             }
          }
          hb_fileClose( pArea->pMemoTmpFile );
-         hb_fileDelete( szFile, NULL );
+         hb_fileDelete( szFile, 0 );
          pArea->pMemoTmpFile = NULL;
          return errCode;
       }

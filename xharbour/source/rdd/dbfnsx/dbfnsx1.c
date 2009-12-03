@@ -1,5 +1,5 @@
 /*
- * $Id: dbfnsx1.c,v 1.13 2009/09/30 16:19:48 marchuet Exp $
+ * $Id: dbfnsx1.c,v 1.14 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -1987,7 +1987,7 @@ static void hb_nsxIndexFree( LPNSXINDEX pIndex )
       hb_fileClose( pIndex->pFile );
       if( pIndex->fDelete )
       {
-         hb_fileDelete( pIndex->RealName ? pIndex->RealName : pIndex->IndexName, NULL );
+         hb_fileDelete( pIndex->RealName ? pIndex->RealName : pIndex->IndexName, 0 );
       }
    }
    if( pIndex->IndexName )

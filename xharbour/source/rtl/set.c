@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.102 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: set.c,v 1.103 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -2330,7 +2330,14 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
             break;
 
          case HB_SET_INVALID_:
+         case HB_SET_ERRORLOG:
+         case HB_SET_MACROBLOCKVARS:
+         case HB_SET_PRINTERJOB:
+         case HB_SET_TRACE:
+         case HB_SET_TRACEFILE:
+         case HB_SET_TRACESTACK:
             break;
+
 #if 0
          /*
           * intentionally removed default: clause to enable C compiler warning
