@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.13 2005/02/17 12:22:30 andijahja Exp $
+ * $Id: hbdoc.prg,v 1.14 2009/02/13 16:12:24 ronpinkas Exp $
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2005/02/17 12:22:30 $
- * Revision..: $Revision: 1.13 $
+ * Date......: $Date: 2009/02/13 16:12:24 $
+ * Revision..: $Revision: 1.14 $
  * Log file..: $Logfile:     $
  *
  *
@@ -275,7 +275,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    IF cLinkName = NIL
       outstd( "xHarbour Doc Extractor"+ hb_osnewline() )
-      outstd( "Copyright 1999-2005, http://www.xharbour.org"+ hb_osnewline() )
+      outstd( "Copyright 1999-2010, http://www.xharbour.org"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
       outstd( "Syntax:  hbdoc [options] <linkname> [<ifile>]"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
@@ -1852,4 +1852,4 @@ for nCount:=1 to Len(aTemp)
          Endif
 next
 return nil
-    
+

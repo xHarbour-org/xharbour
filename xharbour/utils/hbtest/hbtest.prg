@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.15 2008/12/01 11:45:00 marchuet Exp $
+ * $Id: hbtest.prg,v 1.16 2008/12/27 09:48:13 andijahja Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ STATIC s_nEndTime
 PROCEDURE Main( cPar1, cPar2 )
 
    OutStd( "xHarbour Regression Test Suite" + HB_OSNewLine() +;
-           "Copyright 1999-2009, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
+           "Copyright 1999-2010, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
 
    IF cPar1 == NIL
       cPar1 := ""

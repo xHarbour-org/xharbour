@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.202 2009/11/02 14:42:38 lculik Exp $
+ * $Id: hbmake.prg,v 1.203 2009/11/18 11:54:24 lculik Exp $
  */
 
 /*
@@ -5925,7 +5925,7 @@ RETURN ( "HbMake v"+s_cHbMakeVersion+" - xHarbour Make Utility")
 *--------------------------
 FUNCTION HbMake_Copyright()
 *--------------------------
-RETURN ( "Copyright (C) 2000-2009 xHarbour project - http://www.xharbour.org")
+RETURN ( "Copyright (C) 2000-2010 xHarbour project - http://www.xharbour.org")
 
 *---------------------
 FUNCTION ShowCredits()
