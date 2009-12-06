@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.10 2009/11/20 10:42:53 patrickmast Exp $
+ * $Id: winos.prg,v 1.11 2009/11/30 20:37:35 peterrees Exp $
  */
 
 /*
@@ -65,58 +65,6 @@
  *  and if the correct patch file is found - run it.
 
 */
-#ifndef __PLATFORM__Windows
-
-FUNCTION OS_NETWORKOK()
-   RETURN( .T. )
-
-FUNCTION OS_VREDIROK()
-   RETURN( .T. )
-
-FUNCTION OS_ISWINNT()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN9X()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN95()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN98()
-  RETURN( .F. )
-
-FUNCTION OS_ISWINME()
-  RETURN( .F. )
-
-FUNCTION OS_ISWINNT351()
-  RETURN( .F. )
-
-FUNCTION OS_ISWINNT4()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN2000()
-  RETURN( .F. )
-
-FUNCTION OS_ISWINXP()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN2003()
-  RETURN( .F. )
-
-FUNCTION OS_ISWINVISTA()
-  RETURN( .F. )
-
-FUNCTION OS_ISWTSCLIENT()
-  RETURN( .F. )
-
-FUNCTION OS_ISWIN2000_OR_LATER()
-  RETURN( .F. )
-
-FUNCTION OS_VERSIONINFO()
-  RETURN( NIL )
-
-#else
-
 
 #include "directry.ch"
 
@@ -128,20 +76,24 @@ FUNCTION OS_NETREGOK( lSetIt, lDoVista )
   IF lDoVista == NIL
     lDoVista:= .T.
   ENDIF
-  IF !lDoVista .AND. OS_ISWINVISTA()
+  IF !lDoVista .AND. OS_ISWINVISTA_OR_LATER() // 06/12/09 changed from OS_ISWINVISTA()
     *
   ELSEIF OS_ISWIN9X()
     rVal:= QueryRegistry( 0,"System\CurrentControlSet\Services\VxD\VREDIR","DiscardCacheOnOpen",1, lSetIt )
   ELSE
     cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
     cKeyWks:="System\CurrentControlSet\Services\LanmanWorkStation\Parameters"
-
+    lSetIt:= lSetIt .AND. ( OS_ISWINNT() .OR. OS_ISUSERANADMIN() ) // 06/12/09 Only Try to set registry if Admin authority for Win2000 or later
     // Server settings
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "CachedOpenLimit", 0, lSetIt )
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocks", 0, lSetIt) // Q124916
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLockForceClose", 1, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationDelay", 0, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationRetries", 0, lSetIt)
+    IF OS_ISWINVISTA_OR_LATER()
+      // // 06/12/09 If SMB2 is enabled then turning off oplocks does not work so SMB2 is required to be turned off on Server
+      rVal:= rVal .AND. QueryRegistry( 0, cKeySrv,"SMB2",0, lSetIt )
+    ENDIF
 
     // Workstation settings
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseOpportunisticLocking", 0, lSetIt)
@@ -298,6 +250,13 @@ HB_FUNC( OS_ISWIN2000_OR_LATER )
   OSVERSIONINFO osvi;
   getwinver( &osvi );
   hb_retl( osvi.dwMajorVersion >= 5 );
+}
+
+HB_FUNC( OS_ISWINVISTA_OR_LATER )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion >= 6 );
 }
 
 HB_FUNC( OS_VERSIONINFO )

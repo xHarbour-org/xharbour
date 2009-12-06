@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6651 2009/12/03 03:00:01 andijahja Exp $
+ * $Id: ChangeLog,v 1.6652 2009/12/03 04:42:32 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2009-12-06 13:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rtl\winos.prg
+    + OS_ISWINVISTA_OR_LATER() - .t. if osvi.dwMajorVersion >= 6
+    * Update OS_NETREGOK() for Vista,Win2008 & Win7
+         SMB2 is required to be turned off on Server
 
 2009-12-03 11:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/hbusage.c
