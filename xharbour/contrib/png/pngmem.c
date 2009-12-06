@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.10 2009/08/15 14:12:55 andijahja Exp $
+ * $Id: png.c,v 1.11 2009/09/19 13:41:12 andijahja Exp $
  */
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.2.37 [June 4, 2009]
+ * Last changed in libpng 1.2.41 [December 3, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -21,6 +21,7 @@
  */
 
 #define PNG_INTERNAL
+#define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -117,6 +118,16 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
@@ -434,6 +445,16 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * have the ability to do that.
  */
 
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
@@ -541,7 +562,7 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #endif /* Not Borland DOS special memory handler */
 
-#if defined(PNG_1_0_X)
+#ifdef PNG_1_0_X
 #  define png_malloc_warn png_malloc
 #else
 /* This function was added at libpng version 1.2.3.  The png_malloc_warn()
