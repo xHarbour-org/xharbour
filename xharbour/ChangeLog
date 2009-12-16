@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6654 2009/12/06 22:46:02 andijahja Exp $
+ * $Id: ChangeLog,v 1.6655 2009/12/16 05:30:49 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-16 15:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapilng.h
+    ! missing from my previous commit on the changes on start-up procedure.
 
 2009-12-16 12:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbdefs.h

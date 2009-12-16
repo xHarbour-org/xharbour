@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.9 2007/04/20 09:41:30 marchuet Exp $
+ * $Id: hbapilng.h,v 1.10 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,8 @@ HB_EXTERN_BEGIN
                                         }
 
 /* Macro to publish a specific language module, for both C and Harbour level */
-#define HB_LANG_ANNOUNCE( id )          HB_FUNC( HB_LANG_##id ) {}
+#define HB_LANG_ANNOUNCE( id )          HB_LANG_ANNOUNCE_( id )
+#define HB_LANG_ANNOUNCE_( id )         HB_FUNC( HB_LANG_##id ) {}
 
 typedef struct _HB_LANG
 {
