@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.187 2009/05/06 15:57:41 andijahja Exp $
+ * $Id: genc.c,v 1.188 2009/12/16 05:31:40 andijahja Exp $
  */
 
 /*
@@ -53,7 +53,7 @@ static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
 static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals );
 static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL, const char * szModuleName );
-static void hb_compWritePragma( FILE *yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef );
+static void hb_compWritePragma( FILE *yyc, const char* szPrefix, const char* szModuleName );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
 {
@@ -1238,12 +1238,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
          fprintf( yyc, "   hb_vmExplicitStartup( symbols_table + %i );\n", iStartupOffset );
          fprintf( yyc, "}\n" );
 
-         hb_compWritePragma( yyc, "hb_auto_InitExplicitStartup", "", "", "hb_InitExplicitStartup" );
+         hb_compWritePragma( yyc, "", "" );
       }
 
       if( bCritical )
       {
-         hb_compWritePragma( yyc, "hb_auto_InitCritical", "", szModuleName, "hb_InitCritical" );
+         hb_compWritePragma( yyc, "", szModuleName );
       }
 
       /* Generate functions data
@@ -1688,7 +1688,7 @@ static void hb_writeEndInit( FILE* yyc, const char *szModuleName )
 #endif
                  "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n",
                  hb_comp_szPrefix, szModuleName );
-                 hb_compWritePragma( yyc, "hb_vm_auto_SymbolInit_", hb_comp_szPrefix, szModuleName, "hb_vm_SymbolInit_" );
+                 hb_compWritePragma( yyc, hb_comp_szPrefix, szModuleName );
 }
 
 /*
@@ -1888,20 +1888,20 @@ static void hb_compGenCInLine( FILE *yyc )
    }
 }
 
-static void hb_compWritePragma( FILE * yyc, const char* szFuncName, const char* szFuncMid, const char* szFuncEnd, const char* szFuncDef )
+static void hb_compWritePragma( FILE * yyc, const char* szPrefix, const char* szModuleName )
 {
    fprintf( yyc, "#if defined(__ICL)\n"
                  "   #pragma warning(disable:177)\n"
                  "#endif\n\n" );
 
    fprintf( yyc, "#if defined( HB_PRAGMA_STARTUP )\n"
-                 "   #pragma startup %s%s%s\n"
+                 "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                  "#elif defined( HB_DATASEG_STARTUP )\n"
-                 "   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( %s%s%s )\n"
+                 "   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_%s%s )\n"
                  "   #include \"hbiniseg.h\"\n"
                  "#endif\n\n",
-                 szFuncDef, szFuncMid, szFuncEnd,
-                 szFuncDef, szFuncMid, szFuncEnd );
+                 szPrefix, szModuleName,
+                 szPrefix, szModuleName );
 }
 
 static HB_GENC_FUNC( hb_p_and )

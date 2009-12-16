@@ -1,5 +1,5 @@
 /*
- * $Id: gtclip.c,v 1.4 2009/11/09 09:39:06 marchuet Exp $
+ * $Id: gtclip.c,v 1.5 2009/12/01 18:04:38 ptsarenko Exp $
  */
 
 /*
@@ -125,8 +125,12 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen 
          if( ( uFormat == CF_TEXT ) || ( uFormat == CF_OEMTEXT ) )
          {
             HGLOBAL hglbLocale = GlobalAlloc( GMEM_MOVEABLE, 4 );
+#if 1
+            GlobalLock( hglbLocale );
+#else
             DWORD lcid = (DWORD) GlobalLock( hglbLocale );
             lcid = LOCALE_USER_DEFAULT;
+#endif
             GlobalUnlock( hglbLocale );
             SetClipboardData( CF_LOCALE, hglbLocale );
          }
