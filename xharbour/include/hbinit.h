@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.32 2009/10/05 14:41:40 marchuet Exp $
+ * $Id: hbinit.h,v 1.33 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -143,12 +143,18 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
 
 #elif defined( HB_MSC_STARTUP )
 
+   #if defined( HB_PRAGMA_STARTUP )
+      #error Wrong macros set for startup code - clean your make/env settings.
+   #endif
+
+   #define HB_DATASEG_STARTUP
+
    typedef int (* HB_$INITSYM)( void );
 
    #if _MSC_VER >= 1010
-      #define HB_MSC_START_SEGMENT ".CRT$XIY"
+      #define HB_STARTUP_SEGMENT ".CRT$XIY"
    #else
-      #define HB_MSC_START_SEGMENT "XIY"
+      #define HB_STARTUP_SEGMENT "XIY"
    #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -175,6 +181,10 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
    #define HB_CALL_ON_STARTUP_END( func ) \
          return 0; \
       }
+
+   #define HB_DATASEG_FUNC( func )     HB_DATASEG_FUNC_( func )
+   #define HB_DATASEG_FUNC_( func ) \
+      static HB_$INITSYM _s_init_func_##func = func;
 
    /*  After each '_END' symbol, additional 'hooks' are required See the C
        output of a generated prg for example
@@ -257,6 +267,55 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
+#elif defined( __WATCOMC__ )
+
+   #if defined( HB_PRAGMA_STARTUP )
+      #error Wrong macros set for startup code - clean your make/env settings.
+   #endif
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn; \
+      static HB_SYMB symbols_table[] = {
+
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
+      static PHB_SYMB symbols; \
+      static void func( void ) \
+      { \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static void func( void ) \
+      {
+
+   #define HB_CALL_ON_STARTUP_END( func ) \
+      }
+
+   #define HB_DATASEG_STARTUP
+   #define HB_STARTUP_SEGMENT          "XI"
+
+   #define HB_WATCOM_STARTUP_ID        0x00
+   #define HB_WATCOM_STARTUP_PRIORITY  0x40  /* default "program" priority */
+
+   #pragma pack( __push, 1 )
+   struct _s_init_info_
+   {
+      unsigned char     id;
+      unsigned char     priority;
+      void ( * func ) ( void );
+   };
+   #pragma pack( __pop )
+
+   #define HB_DATASEG_FUNC( func )     HB_DATASEG_FUNC_( func )
+
+   #define HB_DATASEG_FUNC_( func ) \
+         static struct _s_init_info_ _s_init_info_##func = \
+                  { HB_WATCOM_STARTUP_ID, HB_WATCOM_STARTUP_PRIORITY, func };
 #else
    #error Unknown initialization method.
 #endif

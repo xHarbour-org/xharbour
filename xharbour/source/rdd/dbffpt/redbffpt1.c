@@ -1,5 +1,5 @@
 /*
- * $Id: redbffpt1.c,v 1.3 2009/09/30 16:19:48 marchuet Exp $
+ * $Id: redbffpt1.c,v 1.4 2009/10/05 14:41:41 marchuet Exp $
  */
 
 /*
@@ -5230,15 +5230,12 @@ HB_CALL_ON_STARTUP_BEGIN( _hb_redbffpt_rdd_init_ )
    hb_vmAtInit( hb_redbffptRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_redbffpt_rdd_init_ )
 
+
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup redbffpt1__InitSymbols
    #pragma startup _hb_redbffpt_rdd_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_redbffpt1__InitSymbols = redbffpt1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_redbffpt_rdd_init = _hb_redbffpt_rdd_init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( redbffpt1__InitSymbols ) \
+                              HB_DATASEG_FUNC( _hb_redbffpt_rdd_init_ )
+   #include "hbiniseg.h"
 #endif

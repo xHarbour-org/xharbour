@@ -1,5 +1,5 @@
 /*
- * $Id: cpsvwin.c,v 1.5 2009/01/24 16:53:10 likewolf Exp $
+ * $Id: cpsvwin.c,v 1.6 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -88,15 +88,5 @@ static HB_CODEPAGE s_codepage = { "SVWIN",
     "a~á~à~â~ãbc~çd~ðe~é~è~ê~ëfghi~í~ì~î~ïjklmn~ño~ó~ò~ô~õpqrstu~ú~ù~ûv~wxy~ý~ÿ~üzåä~æö~ø~œ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( SVWIN )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_SVWIN
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SVWIN = hb_codepage_Init_SVWIN;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID SVWIN
+#include "hbcdpreg.h"

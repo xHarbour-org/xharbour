@@ -1,5 +1,5 @@
 /*
- * $Id: msghr1250.c,v 1.5 2008/08/14 09:04:16 andijahja Exp $
+ * $Id: msghr1250.c,v 1.6 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.5 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
 
       /* Month names */
 
@@ -203,20 +203,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( HR1250 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_HR1250 )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_HR1250 )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_HR1250
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_HR1250 = hb_lang_Init_HR1250;
-   #pragma data_seg()
-#endif
-
+#define HB_LANG_ID  HR1250
+#include "hbmsgreg.h"

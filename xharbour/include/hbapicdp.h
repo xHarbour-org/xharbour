@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.30 2009/07/13 16:58:06 ptsarenko Exp $
+ * $Id: hbapicdp.h,v 1.31 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -69,13 +69,12 @@ HB_EXTERN_BEGIN
                                        { \
                                           HB_FUNC_EXEC( HB_CODEPAGE_##id ); \
                                        }
-#define HB_CODEPAGE_ANNOUNCE( id )     HB_FUNC( HB_CODEPAGE_##id ) {}
-
+#define HB_CODEPAGE_ANNOUNCE( id )     HB_CODEPAGE_ANNOUNCE_( id )
+#define HB_CODEPAGE_ANNOUNCE_( id )    HB_FUNC( HB_CODEPAGE_##id ) {}
 #define HB_CODEPAGE_INIT( id )         HB_CODEPAGE_ANNOUNCE( id ) \
                                        HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_##id ) \
                                        hb_cdpRegister( &s_codepage ); \
                                        HB_CALL_ON_STARTUP_END( hb_codepage_Init_##id )
-
 
 typedef struct _HB_UNITABLE
 {

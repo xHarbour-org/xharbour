@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.56 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: zip.c,v 1.57 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -452,14 +452,14 @@ HB_FUNC( HB_ZIPFILE )
             return;
          }
 
-         pCurDir = ( BYTE * ) hb_xstrcpy( NULL, HB_OS_PATH_DELIM_CHR_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
+         pCurDir = ( BYTE* ) hb_xstrcpy( NULL, HB_OS_PATH_DELIM_CHR_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          /* Always needs to create an array */
          ZipCreateExclude( pExclude );
 
          ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
-         hb_fsChDir( pCurDir ) ;
+         hb_fsChDir( (const char*) pCurDir ) ;
 
          if ( ! strchr( hb_parc( 1 ), HB_OS_PATH_DELIM_CHR ) )
          {
@@ -575,7 +575,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
          ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
-         hb_fsChDir( pCurDir );
+         hb_fsChDir( (const char*) pCurDir );
          /* by JGS, wait until adding the directory to the file name if not specified
          hb_xfree( pCurDir );
          */
@@ -648,7 +648,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
          ZipCreateArray( pParam, pCurDir, bFullPath );  /* bFullPath by JGS */
 
-         hb_fsChDir( pCurDir ) ;
+         hb_fsChDir( (const char*) pCurDir ) ;
          /* by JGS, wait until adding the directory to the file name if not specified
          hb_xfree( pCurDir ) ;
          strcpy( szFile, hb_parc( 1 ) );
@@ -757,7 +757,7 @@ HB_FUNC( HB_UNZIPFILE )
 
       hb_xfree( szZipFileName );
       hb_itemRelease( UnzipFiles );
-      hb_fsChDir( pCurDir ) ;
+      hb_fsChDir( (const char*) pCurDir ) ;
       hb_xfree( pCurDir ) ;
       hb_itemClear( ZipArray );
       hb_itemRelease( ZipArray );
@@ -1051,13 +1051,9 @@ HB_INIT_SYMBOLS_BEGIN( hbzip_CLEANUP )
 { (char*) "HBZIPCLEANUP$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HBZIPCLEANUP )}, &ModuleFakeDyn }
 HB_INIT_SYMBOLS_END( hbzip_CLEANUP )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hbzip_CLEANUP
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_SymbolInit_INIT = hbzip_CLEANUP;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hbzip_CLEANUP )
+   #include "hbiniseg.h"
 #endif

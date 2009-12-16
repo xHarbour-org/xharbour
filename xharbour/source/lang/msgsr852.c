@@ -1,5 +1,5 @@
 /*
- * $Id: msgsr852.c,v 1.8 2008/08/14 09:04:18 andijahja Exp $
+ * $Id: msgsr852.c,v 1.9 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Srpski",                   /* Name (in native language) */
       "SR",                       /* RFC ID */
       "852",                      /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/08/14 09:04:18 $",     /* Version */
+      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:52 $",     /* Version */
 
       /* Month names */
 
@@ -184,19 +184,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( SR852 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_SR852 )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_SR852 )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_SR852
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_SR852 = hb_lang_Init_SR852;
-   #pragma data_seg()
-#endif
+#define HB_LANG_ID  SR852
+#include "hbmsgreg.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: cpfr850.c,v 1.4 2009/01/24 16:53:10 likewolf Exp $
+ * $Id: cpfr850.c,v 1.5 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -90,15 +90,5 @@ static HB_CODEPAGE s_codepage = { "FR850",
     "a~†~Ö~É~Ñbcde~Ç~ä~à~âfghi~°~ç~å~ãjklmno~¢~ï~ì~îpqrstu~£~ó~ñ~Åvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( FR850 )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_FR850
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_FR850 = hb_codepage_Init_FR850;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID FR850
+#include "hbcdpreg.h"

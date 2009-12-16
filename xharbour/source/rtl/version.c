@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.16 2008/08/14 09:04:21 andijahja Exp $
+ * $Id: version.c,v 1.17 2008/11/19 05:25:03 andijahja Exp $
  */
 
 /*
@@ -215,13 +215,9 @@ HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
 { "HB_MULTITHREAD", {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_HBVER
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_SymbolInit_HBVER = hb_vm_SymbolInit_HBVER;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_HBVER )
+   #include "hbiniseg.h"
 #endif

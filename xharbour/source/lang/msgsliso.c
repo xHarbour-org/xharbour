@@ -1,5 +1,5 @@
 /*
- * $Id: msgsliso.c,v 1.6 2008/08/14 09:04:18 andijahja Exp $
+ * $Id: msgsliso.c,v 1.7 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Sloven¹èina",              /* Name (in native language) */
       "SL",                       /* RFC ID */
       "ISO-8859-2",               /* Codepage */
-      "$Revision: 1.6 $ $Date: 2008/08/14 09:04:18 $",     /* Version */
+      "$Revision: 1.7 $ $Date: 2008/11/19 05:24:52 $",     /* Version */
 
       /* Month names */
 
@@ -184,19 +184,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( SLISO );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_SLISO )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_SLISO )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_SLISO
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_SLISO = hb_lang_Init_SLISO;
-   #pragma data_seg()
-#endif
+#define HB_LANG_ID  SLISO
+#include "hbmsgreg.h"

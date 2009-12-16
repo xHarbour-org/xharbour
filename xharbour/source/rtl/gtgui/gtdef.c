@@ -1,5 +1,5 @@
 /*
- * $Id: gtdef.c,v 1.6 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtdef.c,v 1.7 2009/11/09 09:39:21 marchuet Exp $
  */
 
 /*
@@ -94,15 +94,10 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_hack_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_hack_
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto__hb_startup_gt_hack_ = _hb_startup_gt_hack_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_hack_ )
+   #include "hbiniseg.h"
 #endif
-
 
 #endif
 

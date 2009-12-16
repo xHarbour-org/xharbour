@@ -1,5 +1,5 @@
 /*
- * $Id: dbfmdx1.c,v 1.7 2009/09/30 16:19:48 marchuet Exp $
+ * $Id: dbfmdx1.c,v 1.8 2009/10/05 14:41:55 marchuet Exp $
  */
 
 /*
@@ -9546,12 +9546,8 @@ HB_CALL_ON_STARTUP_END( _hb_dbfmdx_rdd_init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup dbfmdx1__InitSymbols
    #pragma startup _hb_dbfmdx_rdd_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_dbfmdx1__InitSymbols = dbfmdx1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_dbfmdx_rdd_init = _hb_dbfmdx_rdd_init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( dbfmdx1__InitSymbols ) \
+                              HB_DATASEG_FUNC( _hb_dbfmdx_rdd_init_ )
+   #include "hbiniseg.h"
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgmik.c,v 1.2 2008/08/14 09:04:15 andijahja Exp $
+ * $Id: msgbgmik.c,v 1.3 2008/11/19 05:24:51 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Б║лга░▒ки",              /* Name (in native language) */
       "BG",                        /* RFC ID */
       "MIK",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2008/08/14 09:04:15 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
 
       /* Month names */
 
@@ -200,20 +200,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( BGMIK );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_BGMIK )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_BGMIK )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_BGMIK
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_BGMIK = hb_lang_Init_BGMIK;
-   #pragma data_seg()
-#endif
-
+#define HB_LANG_ID      BGMIK
+#include "hbmsgreg.h"

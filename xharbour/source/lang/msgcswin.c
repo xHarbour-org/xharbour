@@ -1,5 +1,5 @@
 /*
- * $Id: msgcswin.c,v 1.8 2008/08/14 09:04:16 andijahja Exp $
+ * $Id: msgcswin.c,v 1.9 2008/11/19 05:24:51 andijahja Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Èesky",             /* Name (in native language) */
       "CS",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
+      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
 
       /* Month names */
 
@@ -203,20 +203,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( CSWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_CSWIN )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_CSWIN )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_CSWIN
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_CSWIN = hb_lang_Init_CSWIN;
-   #pragma data_seg()
-#endif
-
+#define HB_LANG_ID  CSWIN
+#include "hbmsgreg.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.32 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: cmdarg.c,v 1.33 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -459,13 +459,9 @@ HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_CMDARG )
 { "HB_MULTITHREAD", {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_CMDARG
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_SymbolInit_CMDARG = hb_vm_SymbolInit_CMDARG;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_CMDARG )
+   #include "hbiniseg.h"
 #endif

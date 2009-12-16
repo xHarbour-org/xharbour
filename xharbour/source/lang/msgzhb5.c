@@ -1,5 +1,5 @@
 /*
- * $Id: msgzhb5.c,v 1.8 2008/08/14 09:04:19 andijahja Exp $
+ * $Id: msgzhb5.c,v 1.9 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "§§§Â¡c≈ÈBIG5",              /* Name (in native language) */
       "ZH",                        /* RFC ID */
       "950",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/08/14 09:04:19 $",         /* Version */
+      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
 
       /* Month names */
 
@@ -202,19 +202,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( ZHB5 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ZHB5 )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_ZHB5 )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_ZHB5
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_ZHB5 = hb_lang_Init_ZHB5;
-   #pragma data_seg()
-#endif
+#define HB_LANG_ID      ZHB5
+#include "hbmsgreg.h"

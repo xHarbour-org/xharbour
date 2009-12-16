@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.112 2009/03/26 15:15:01 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.113 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -1145,6 +1145,9 @@ typedef unsigned long HB_COUNTER;
 
 #define HB_MACRO2STRING( macro )    HB_MACRO2STRING_( macro )
 #define HB_MACRO2STRING_( macro )   #macro
+
+#define HB_MACRONAME_JOIN( m1, m2 )       HB_MACRONAME_JOIN_( m1, m2 )
+#define HB_MACRONAME_JOIN_( m1, m2 )      m1 ## m2
 
 #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
 

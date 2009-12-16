@@ -1,5 +1,5 @@
 /*
- * $Id: msgeo.c,v 1.9 2008/08/14 09:04:16 andijahja Exp $
+ * $Id: msgeo.c,v 1.10 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Esperanto",                 /* Name (in native language) */
       "EO",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
+      "$Revision: 1.10 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
 
       /* Month names */
 
@@ -203,19 +203,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( EO );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_EO )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_EO )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_EO
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_EO = hb_lang_Init_EO;
-   #pragma data_seg()
-#endif
+#define HB_LANG_ID  EO
+#include "hbmsgreg.h"

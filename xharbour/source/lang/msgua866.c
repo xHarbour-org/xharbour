@@ -1,5 +1,5 @@
 /*
- * $Id: msgua866.c,v 1.7 2009/07/15 17:14:56 ptsarenko Exp $
+ * $Id: msgua866.c,v 1.8 2009/07/16 18:15:04 ptsarenko Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Українська",                /* Name (in native language) */
       "UA",                        /* RFC ID */
       "866",                       /* Codepage */
-      "$Revision: 1.7 $ $Date: 2009/07/15 17:14:56 $",         /* Version */
+      "$Revision: 1.8 $ $Date: 2009/07/16 18:15:04 $",         /* Version */
 
       /* Month names */
 
@@ -202,20 +202,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( UA866 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_UA866 )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_UA866 )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_UA866
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_UA866 = hb_lang_Init_UA866;
-   #pragma data_seg()
-#endif
-
+#define HB_LANG_ID  UA866
+#include "hbmsgreg.h"

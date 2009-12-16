@@ -1,5 +1,5 @@
 /*
- * $Id: cpua1125.c,v 1.1 2009/07/13 16:58:06 ptsarenko Exp $
+ * $Id: cpua1125.c,v 1.2 2009/07/15 17:14:56 ptsarenko Exp $
  */
 
 /*
@@ -64,16 +64,5 @@ static HB_CODEPAGE s_codepage = { "UA1125",
     " ΅Ά£σ¤¥ρυ¦§¨χω©ª«¬­®―ΰαβγδεζηθικλμνξο",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_INIT( UA1125 )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_UA1125
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_UA1125 = hb_codepage_Init_UA1125;
-   #pragma data_seg()
-#endif
-
+#define HB_CP_ID UA1125
+#include "hbcdpreg.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: cprukoi.c,v 1.8 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cprukoi.c,v 1.9 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -63,15 +63,5 @@ static HB_CODEPAGE s_codepage = { "RUKOI8",
     "абвгдежзийклмнопрстуфхцчшщъыьэюяё≤⌡≈",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_INIT( RUKOI8 )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_RUKOI8
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_RUKOI8 = hb_codepage_Init_RUKOI8;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID RUKOI8
+#include "hbcdpreg.h"

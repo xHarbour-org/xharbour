@@ -1,5 +1,5 @@
 /*
- * $Id: msgeu.c,v 1.8 2008/08/14 09:04:16 andijahja Exp $
+ * $Id: msgeu.c,v 1.9 2008/11/19 05:24:52 andijahja Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "English",                   /* Name (in native language) */
       "EU",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/08/14 09:04:16 $",         /* Version */
+      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
 
       /* Month names */
 
@@ -184,19 +184,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( EU );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_EU )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_EU )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_EU
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_EU = hb_lang_Init_EU;
-   #pragma data_seg()
-#endif
+#define HB_LANG_ID  EU
+#include "hbmsgreg.h"

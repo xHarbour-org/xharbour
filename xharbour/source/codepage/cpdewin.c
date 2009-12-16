@@ -1,5 +1,5 @@
 /*
- * $Id: cpdewin.c,v 1.3 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cpdewin.c,v 1.4 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -89,15 +89,5 @@ static HB_CODEPAGE s_codepage = { "DEWIN",
     "aäbcdefghijklmnoöpqrsßtuüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( DEWIN )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_DEWIN
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_DEWIN = hb_codepage_Init_DEWIN;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID DEWIN
+#include "hbcdpreg.h"

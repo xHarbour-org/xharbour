@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.186 2009/05/04 11:44:23 andijahja Exp $
+ * $Id: genc.c,v 1.187 2009/05/06 15:57:41 andijahja Exp $
  */
 
 /*
@@ -1894,19 +1894,14 @@ static void hb_compWritePragma( FILE * yyc, const char* szFuncName, const char* 
                  "   #pragma warning(disable:177)\n"
                  "#endif\n\n" );
 
-   fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n"
+   fprintf( yyc, "#if defined( HB_PRAGMA_STARTUP )\n"
                  "   #pragma startup %s%s%s\n"
-                 "#elif defined(HB_MSC_STARTUP)\n"
-                 "   #if defined( HB_OS_WIN_64 )\n"
-                 "      #pragma section( HB_MSC_START_SEGMENT, long, read )\n"
-                 "   #endif\n"
-                 "   #pragma data_seg( HB_MSC_START_SEGMENT )\n"
-                 "   static HB_$INITSYM %s%s%s = %s%s%s;\n"
-                 "   #pragma data_seg()\n"
+                 "#elif defined( HB_DATASEG_STARTUP )\n"
+                 "   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( %s%s%s )\n"
+                 "   #include \"hbiniseg.h\"\n"
                  "#endif\n\n",
                  szFuncDef, szFuncMid, szFuncEnd,
-                 szFuncName, szFuncMid, szFuncEnd, szFuncDef, szFuncMid, szFuncEnd
-                 );
+                 szFuncDef, szFuncMid, szFuncEnd );
 }
 
 static HB_GENC_FUNC( hb_p_and )

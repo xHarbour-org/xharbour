@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.38 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: sdf1.c,v 1.39 2009/09/30 16:19:36 marchuet Exp $
  */
 
 /*
@@ -1331,12 +1331,8 @@ HB_CALL_ON_STARTUP_END( _hb_sdf_rdd_init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup sdf1__InitSymbols
    #pragma startup _hb_sdf_rdd_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_sdf1__InitSymbols = sdf1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_sdf_rdd_init = _hb_sdf_rdd_init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( sdf1__InitSymbols ) \
+                              HB_DATASEG_FUNC( _hb_sdf_rdd_init_ )
+   #include "hbiniseg.h"
 #endif

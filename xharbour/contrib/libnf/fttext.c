@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.16 2007/04/25 01:37:09 ronpinkas Exp $
+ * $Id: fttext.c,v 1.17 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -114,17 +114,11 @@ HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_FTEXT )
 { "FT_FEXIT$", {HB_FS_EXIT},   {HB_EXIT_FUNCNAME( FT_FEXIT )}, &ModuleFakeDyn }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_FTEXT )
 
-#if defined(HB_PRAGMA_STARTUP)
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_FTEXT
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_SymbolInit_FTEXT = hb_vm_SymbolInit_FTEXT;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_FTEXT )
+   #include "hbiniseg.h"
 #endif
 
 typedef struct _FT_FFILE

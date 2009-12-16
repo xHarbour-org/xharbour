@@ -1,14 +1,13 @@
 /*
- * $Id: cpitiso.c,v 1.13 2009/05/07 09:29:35 likewolf Exp $
+ * $Id: hbmsgreg.h 13185 2009-12-09 19:41:10Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Italian ISO-8859-1 )
+ *    code used to register new lang definition
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2009 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,43 +50,26 @@
  *
  */
 
-/* Language name: Italian */
-/* ISO language code (2 chars): IT */
-/* Codepage: ISO-8859-1 */
+#if defined( HB_LANG_ID )
 
-#include "hbapi.h"
-#include "hbapicdp.h"
+HB_LANG_ANNOUNCE( HB_LANG_ID )
 
-#define NUMBER_OF_CHARACTERS  40    /* The number of single characters in the
-                                       alphabet, two-as-one aren't considered
-                                       here, accented - are considered. */
-#define IS_LATIN               1    /* Should be 1, if the national alphabet
-                                       is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
-                                       has the same weight as appropriate
-                                       unaccented. */
-#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
-                                       sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
-                                       ( interleaving ) */
+#if defined( HB_PRAGMA_STARTUP )
+HB_CALL_ON_STARTUP_BEGIN( _hb_lang_Init_ )
+   hb_langRegister( &s_lang );
+HB_CALL_ON_STARTUP_END( _hb_lang_Init_ )
+#else
+HB_CALL_ON_STARTUP_BEGIN( HB_MACRONAME_JOIN( _hb_lang_Init_, HB_LANG_ID ) )
+   hb_langRegister( &s_lang );
+HB_CALL_ON_STARTUP_END( HB_MACRONAME_JOIN( _hb_lang_Init_, HB_LANG_ID ) )
+#endif
 
-/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
-   accented characters with the symbol '~' before each of them, for example:
-      a~«
-   If there is two-character sequence, which is considered as one, it should
-   be marked with '.' before and after it, for example:
-      ... h.ch.i ...
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_lang_Init_
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    \
+            HB_DATASEG_FUNC( HB_MACRONAME_JOIN( _hb_lang_Init_, HB_LANG_ID ) )
+   #include "hbiniseg.h"
+#endif
 
-   The Upper case string and the Lower case string should be absolutely the
-   same excepting the characters case, of course.
- */
-
-static HB_CODEPAGE s_codepage = { "ITISO",
-    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "A¿¡¬√ƒ≈BCDE»…FGHIÃÕJKLMNO“”PQRSTUŸ⁄VWXYZ",
-    "a‡·‚„‰ÂbcdeËÈfghiÏÌjklmnoÚÛpqrstu˘˙vwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
-
-#define HB_CP_ID ITISO
-#include "hbcdpreg.h"
+#endif /* HB_LANG_ID */

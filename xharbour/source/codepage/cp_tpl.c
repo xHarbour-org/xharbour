@@ -1,5 +1,5 @@
 /*
- * $Id: cp_tpl.c,v 1.7 2008/10/22 08:32:32 marchuet Exp $
+ * $Id: cp_tpl.c,v 1.8 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -88,21 +88,11 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "EN",
+static HB_CODEPAGE s_codepage = { "TPL",
     HB_CPID_437,HB_UNITB_437,NUMBER_OF_CHARACTERS,
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "abcdefghijklmnopqrstuvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( EN )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_EN
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_EN = hb_codepage_Init_EN;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID TPL
+#include "hbcdpreg.h"

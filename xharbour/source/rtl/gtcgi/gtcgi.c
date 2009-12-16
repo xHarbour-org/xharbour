@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.28 2009/02/20 12:48:31 marchuet Exp $
+ * $Id: gtcgi.c,v 1.29 2009/02/20 17:42:31 marchuet Exp $
  */
 
 /*
@@ -468,13 +468,9 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #include "hbiniseg.h"
 #endif
 
 /* *********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: cpsviso.c,v 1.1 2009/01/24 16:53:10 likewolf Exp $
+ * $Id: cpsviso.c,v 1.2 2009/05/07 09:29:35 likewolf Exp $
  */
 
 /*
@@ -89,15 +89,5 @@ static HB_CODEPAGE s_codepage = { "SVISO",
     "a~á~à~â~ãbc~çd~ðe~é~è~ê~ëfghi~í~ì~î~ïjklmn~ño~ó~ò~ô~õpqrstu~ú~ù~ûv~wxy~ý~ÿ~üzåä~æö~ø~œ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( SVISO )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_codepage_Init_SVISO
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SVISO = hb_codepage_Init_SVISO;
-   #pragma data_seg()
-#endif
+#define HB_CP_ID SVISO
+#include "hbcdpreg.h"

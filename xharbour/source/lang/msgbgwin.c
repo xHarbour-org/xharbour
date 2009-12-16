@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgwin.c,v 1.6 2008/08/14 09:04:15 andijahja Exp $
+ * $Id: msgbgwin.c,v 1.7 2008/11/19 05:24:51 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Български",                 /* Name (in native language) */
       "BG",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.6 $ $Date: 2008/08/14 09:04:15 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
 
       /* Month names */
 
@@ -201,20 +201,5 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( BGWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_BGWIN )
-   hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_BGWIN )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_BGWIN
-#elif defined(HB_MSC_STARTUP)
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_BGWIN = hb_lang_Init_BGWIN;
-   #pragma data_seg()
-#endif
-
+#define HB_LANG_ID      BGWIN
+#include "hbmsgreg.h"

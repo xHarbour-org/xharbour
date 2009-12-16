@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.49 2008/11/19 05:25:03 andijahja Exp $
+ * $Id: gtalleg.c,v 1.50 2009/03/11 10:40:29 likewolf Exp $
  */
 
 /*
@@ -1219,13 +1219,9 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #include "hbiniseg.h"
 #endif
 
 /* ******************************************************************* */
