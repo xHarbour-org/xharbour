@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6656 2009/12/16 08:24:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.6657 2009/12/16 10:18:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-16 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + include/hbextcdp.ch
+      ! all supported codepage to be linked as externals
+        (borrowed from Harbour, work of Viktor Szakats)
+
+  * include/set.ch
+      + add _SET_CODEPAGE to pptable.c (must rebuild this file)
+
+  * tests/cpinfo.prg
+      ! test program for set SET() value
+        (borrowed from Harbour, work of Przemyslaw Czerpak)
 
 2009-12-16 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/genc.c
