@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.36 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: proc.c,v 1.37 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          }
          else
          {
-            char *pPureName = strrchr( ( *pBase )->item.asSymbol.value->szName, '.' );
+            const char *pPureName = strrchr( ( *pBase )->item.asSymbol.value->szName, '.' );
 
             if( pPureName )
             {

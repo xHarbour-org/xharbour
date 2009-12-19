@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.242 2009/04/13 16:57:27 likewolf Exp $
+ * $Id: classes.c,v 1.243 2009/10/11 19:05:58 guerra000 Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ static USHORT   hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos );
 static void     hb_clsSaveMethod( PHB_DYNS pMsg, int iPivot, PCLASS pClass, USHORT uiAt );
 static void     hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt );
 
-static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym );
+static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, const char *szString, PHB_DYNS *ppDynSym );
 
 static void     hb_clsClear( PCLASS );
 static void     hb_clsRelease( PCLASS );
@@ -362,7 +362,7 @@ static void hb_clsRelease( PCLASS pClass )
    }
 
    if( pClass->szName )
-      hb_xfree( pClass->szName );
+      hb_xfree( (void*) pClass->szName );
    if( pClass->pMethods )
       hb_xfree( pClass->pMethods );
    if( pClass->uiFriendSyms )
@@ -660,8 +660,8 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          #else
             if( HB_IS_BLOCK( pCaller ) )
             {
-               char *szCaller;
-               char *pAt;
+               const char *szCaller;
+               const char *pAt;
 
                if( pCaller->item.asBlock.value->uiClass == 0 )
                {
@@ -719,7 +719,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
             // This is an Inherited Method
             if( uiScope & HB_OO_CLSTP_SUPER )
             {
-               char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
+               const char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
 
                #ifdef DEBUG_SCOPE
                   printf( "Object: %s, Message: %s, RealClass: %s, Caller: %s, CallerMessage: %s, CallerMessageClass: %s\n",
@@ -765,7 +765,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                   else
                   {
                      // If we got here, this MUST be a Derived NON HIDDEN, NON READONLY Message, thus a Derived PROTECTED Method.
-                     char *szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
+                     const char *szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
 
                      #ifdef DEBUG_SCOPE
                         printf( "Defined in: %s\n", szClassOfMessage );
@@ -789,7 +789,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                }
                else
                {
-                  char *szObjectClass = pClass->szName;
+                  const char *szObjectClass = pClass->szName;
 
                   // Is the Caller derived from the Object?
                   if( hb_clsIsParent( pCaller->item.asArray.value->uiClass, szObjectClass ) )
@@ -960,7 +960,7 @@ const char * hb_clsName( USHORT uiClass )
  * of inheritance.
  *
  */
-USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
+USHORT hb_objGetRealCls( PHB_ITEM pObject, const char * szName )
 {
    HB_THREAD_STUB
 
@@ -998,7 +998,7 @@ USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
    return uiClass;
 }
 
-char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
+const char * hb_objGetRealClsName( PHB_ITEM pObject, const char * szName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p, %s)", pObject, szName));
 
@@ -1346,7 +1346,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
    return NULL;
 }
 
-BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+BOOL hb_clsHasMsg( USHORT uiClass, const char *szMsg )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
 
@@ -1425,7 +1425,7 @@ PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  *
  * <uPtr> should be read as a boolean
  */
-PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
+PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, const char *szString )
 {
    return hb_objGetMessage( pObject, szString, NULL );
 }
@@ -1444,7 +1444,7 @@ BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
    return pFunc != NULL;
 }
 
-static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
+static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, const char *szString, PHB_DYNS *ppDynSym )
 {
    PHB_DYNS pDynSym;
 
@@ -2020,7 +2020,7 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
          {
             PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
             PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
-            char *szMsg = pMsg->szName;
+            const char *szMsg = pMsg->szName;
 
             memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
             pMsg->szName = szMsg;
@@ -3208,7 +3208,7 @@ HB_FUNC( __OBJCLONE )
    }
 }
 
-PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
+PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, const char *sMsg, ULONG ulArg, ... )
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pMsgSym;

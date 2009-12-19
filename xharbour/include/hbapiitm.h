@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.55 2009/08/19 22:40:47 likewolf Exp $
+ * $Id: hbapiitm.h,v 1.56 2009/10/16 05:44:25 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ extern HB_EXPORT BOOL       hb_evalPutParam ( PEVALINFO pEvalInfo, PHB_ITEM pIte
 extern HB_EXPORT BOOL       hb_evalRelease  ( PEVALINFO pEvalInfo );
 
 extern HB_EXPORT PHB_ITEM   hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
-extern HB_EXPORT PHB_ITEM   hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
+extern HB_EXPORT PHB_ITEM   hb_itemDoC      ( const char * szFunc, ULONG ulPCount, ... );
 extern HB_EXPORT PHB_ITEM   hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... );
 
 extern HB_EXPORT void hb_evalBlock0( PHB_ITEM pCodeBlock );
@@ -131,7 +131,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr    ( PHB_ITEM pItem, char * szText, U
 #endif
 
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRaw    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern HB_EXPORT PHB_ITEM   hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern HB_EXPORT PHB_ITEM   hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCL      ( PHB_ITEM pItem, const char * szText, ULONG ulLen );
 extern HB_EXPORT void       hb_itemSetCMemo   ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM   hb_itemPutD       ( PHB_ITEM pItem, int iYear, int iMonth, int iDay );

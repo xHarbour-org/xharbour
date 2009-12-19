@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.125 2008/11/22 11:22:19 andijahja Exp $
+ * $Id: fastitem.c,v 1.126 2008/11/23 03:23:13 andijahja Exp $
  */
 
 /*
@@ -775,7 +775,7 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -794,7 +794,7 @@ PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->type = HB_IT_STRING;
    pItem->item.asString.allocated = 0;
    pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = szText;
+   pItem->item.asString.value     = (char *) szText;
 
    return pItem;
 }

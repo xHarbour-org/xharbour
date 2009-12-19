@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.733 2009/10/11 19:05:58 guerra000 Exp $
+ * $Id: hvm.c,v 1.734 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -298,6 +298,9 @@ static HB_DBGENTRY_FUNC s_pFunDbgEntry;   /* C level debugger entry */
 static ULONG    s_ulProcLevel = 0;
 
 char *hb_vm_sNull = "";
+
+/* init GUI Error Message */
+BOOL b_GUIErrorMessage = FALSE;
 
 /* static, for now */
 BOOL hb_vm_bQuitRequest = FALSE;
@@ -608,6 +611,9 @@ void hb_vmInit( BOOL bStartMainProc )
 
    s_pDynsDbgEntry = hb_dynsymFind( "__DBGENTRY" );
 
+   if( hb_dynsymFind( "HB_GUIERRORMESSAGE" ) )
+      b_GUIErrorMessage = TRUE;
+
    /*
    Moved to hb_vmProcessSymbols() to avoid GPF trap.
    hb_xinit();
@@ -895,7 +901,7 @@ void hb_vmReleaseLocalSymbols( void )
                }
             }
 
-            hb_xfree( pSymbol->szName );
+            hb_xfree( (void*) pSymbol->szName );
          }
 
          hb_xfree( pDestroy->pSymbolTable );
@@ -2149,7 +2155,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                else if ( HB_IS_HASH( pSelf ) )
                {
                   ULONG ulPos = 0;
-                  char * szIndex = pMsg->item.asSymbol.value->szName;
+                  const char * szIndex = pMsg->item.asSymbol.value->szName;
 
                   /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
                   if( strcmp( szIndex, "CLASSNAME" ) == 0 )
@@ -2189,7 +2195,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             else if ( HB_IS_HASH( pSelf ) )
             {
                ULONG ulPos = 0;
-               char * szIndex = pMsg->item.asSymbol.value->szName;
+               const char * szIndex = pMsg->item.asSymbol.value->szName;
 
                /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
                if( strcmp( szIndex, "CLASSNAME" ) == 0 )
@@ -9939,7 +9945,7 @@ BOOL hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols,
    return FALSE;
 }
 
-static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, char * szModuleName )
+static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, const char * szModuleName )
 {
    PSYMBOLS pLastSymbols = s_pSymbols;
    PHB_SYMB pModuleSymbols;
@@ -10144,7 +10150,7 @@ void hb_vmExitSymbolGroup( void * hDynLib )
    }
 }
 
-PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM *pGlobals )
 {
    PSYMBOLS pNewSymbols = NULL;
    PHB_SYMB pSymbol;
@@ -10662,7 +10668,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    return pNewSymbols;
 }
 
-PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
@@ -10695,7 +10701,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *s
 }
 
 /* HVM & RTL in harbour.dll */
-PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSysDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -10734,7 +10740,7 @@ PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
    will be used to process the prg dll's symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
 */
-PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    PSYMBOLS pNewSymbols;
    PHB_SYMB pSymStart = s_pSymStart;
@@ -10781,7 +10787,7 @@ PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
    will be used to process the client exe symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
 */
-PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -11607,6 +11613,10 @@ HB_FUNC( HB_RESTOREBLOCK )
    }
 }
 
+HB_FUNC( HB_GUIERRORMESSAGE )
+{
+}
+
 HB_FUNC( HB_NOMOUSE )
 {
 }
@@ -12012,7 +12022,7 @@ BOOL hb_xvmIVarRef( void )
    }
    else if ( HB_IS_HASH( pSelf ) )
    {
-      char * szIndex = pMsg->item.asSymbol.value->szName;
+      const char * szIndex = pMsg->item.asSymbol.value->szName;
       ULONG ulPos;
 
       if( strcmp( szIndex, "CLASSNAME" ) == 0 )

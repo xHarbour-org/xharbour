@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.144 2009/09/12 18:01:44 likewolf Exp $
+ * $Id: memvars.c,v 1.145 2009/09/30 16:20:22 marchuet Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ static HB_VALUE_PTR s_globalTable = NULL;
 #define  s_globalLastFree    (HB_VM_STACK.globalLastFree)
 #define  s_globalTable       (HB_VM_STACK.globalTable)
 
-PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
+PHB_DYNS s_memvarThGetName( const char * szName, HB_STACK *pstack )
 {
    // Can NOT use HB_VM_STACK here!!!
    if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )

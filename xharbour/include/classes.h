@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.46 2009/04/13 14:24:26 likewolf Exp $
+ * $Id: classes.h,v 1.47 2009/10/11 19:05:58 guerra000 Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ typedef struct
 
 typedef struct
 {
-   char *   szName;           /* Class name */
+   const char * szName;       /* Class name */
    PHB_DYNS pClassSym;        /* Class symbolic name */
    PMETHOD  pMethods;         /* Class methods */
    PHB_SYMB pClassFuncSym;    /* Class function symbol */

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.61 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: dynsym.c,v 1.62 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -925,7 +925,7 @@ HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsInd
 {
    HB_THREAD_STUB_API
    LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
-   char * szRet = "";
+   const char * szRet = "";
 
    hb_dynsymLock();
 

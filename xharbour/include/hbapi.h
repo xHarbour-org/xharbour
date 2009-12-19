@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.265 2009/11/09 09:38:44 marchuet Exp $
+ * $Id: hbapi.h,v 1.266 2009/11/21 20:54:56 ronpinkas Exp $
  */
 
 /*
@@ -724,16 +724,16 @@ extern HB_EXPORT void      hb_put_le_uint64( BYTE * ptr, double d );
 
 /* class management */
 extern HB_EXPORT BOOL      hb_clsIsParent( USHORT uiClass, const char * szParentName ); /* is a class handle inherited from szParentName Class ? */
-extern HB_EXPORT BOOL      hb_clsHasMsg( USHORT uiClass, char *szMsg );
+extern HB_EXPORT BOOL      hb_clsHasMsg( USHORT uiClass, const char *szMsg );
 
 /* object management */
 extern HB_EXPORT const char * hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
-extern HB_EXPORT char *    hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
+extern HB_EXPORT const char * hb_objGetRealClsName( PHB_ITEM pObject, const char * szString  ); /* retrieves an object class name for a specific message */
 extern HB_EXPORT PHB_FUNC  hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
 extern HB_EXPORT PHB_FUNC  hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol );
-extern HB_EXPORT PHB_FUNC  hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
+extern HB_EXPORT PHB_FUNC  hb_objHasMsg( PHB_ITEM pObject, const char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT BOOL      hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage );
-extern HB_EXPORT PHB_ITEM  hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+extern HB_EXPORT PHB_ITEM  hb_objSendMsg( PHB_ITEM pObj, const char *cMsg, ULONG ulArg, ... );
 extern HB_EXPORT void      hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... );
 extern HB_EXPORT PHB_ITEM  hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... );
 extern HB_EXPORT USHORT    hb_objClassH( PHB_ITEM pObj );
@@ -741,7 +741,7 @@ extern HB_EXPORT USHORT    hb_objClassH( PHB_ITEM pObj );
    if ( pDestNullable == NULL ) \
    {\
 */
-extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
+extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, const char * szName );
 
 /* dynamic symbol table management */
 extern HB_EXPORT PHB_DYNS  hb_dynsymGet( const char * szName );    /* finds and creates a dynamic symbol if not found */

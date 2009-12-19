@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.38 2008/11/22 08:25:37 andijahja Exp $
+ * $Id: eval.c,v 1.39 2009/01/16 01:56:00 likewolf Exp $
  */
 
 /*
@@ -308,7 +308,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
 */
-PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDoC( const char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 

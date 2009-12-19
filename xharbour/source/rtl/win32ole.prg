@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.179 2009/09/18 17:41:41 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.180 2009/10/13 20:36:44 ronpinkas Exp $
  */
 
 /*
@@ -801,13 +801,14 @@ RETURN Self
 
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
-
-  HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
+  HB_EXTERN_BEGIN
+  HRESULT HB_EXPORT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
+  HB_EXTERN_END
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt );
 
   HB_EXTERN_BEGIN
   //---------------------------------------------------------------------------//
-  HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
+  HB_EXPORT BSTR hb_oleAnsiToSysString( LPCSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -2597,7 +2598,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  static HRESULT OleGetID( IDispatch *pDisp, char *szName, DISPID *pDispID, BOOL *pbSetFirst )
+  static HRESULT OleGetID( IDispatch *pDisp, const char *szName, DISPID *pDispID, BOOL *pbSetFirst )
   {
      BSTR bstrMessage;
 
@@ -2614,7 +2615,7 @@ RETURN Self
      }
      else*/ if( szName[0] == '_' && szName[1] && hb_pcount() >= 1 )
      {
-        bstrMessage = hb_oleAnsiToSysString( szName + 1 );
+        bstrMessage = hb_oleAnsiToSysString( (char*) szName + 1 );
 #if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID)  IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, pDispID );
 #else
@@ -2656,7 +2657,7 @@ RETURN Self
   HB_FUNC_STATIC( TOLEAUTO_INVOKE )
   {
      IDispatch *pDisp;
-     char *szName = hb_parc(1);
+     const char *szName = hb_parc(1);
      DISPID DispID;
      DISPPARAMS DispParams;
 
@@ -2683,7 +2684,7 @@ RETURN Self
   HB_FUNC_STATIC( TOLEAUTO_SET )
   {
      IDispatch *pDisp;
-     char *szName = hb_parc(1);
+     const char *szName = hb_parc(1);
      DISPID DispID;
      DISPPARAMS DispParams;
 
@@ -2709,7 +2710,7 @@ RETURN Self
   HB_FUNC_STATIC( TOLEAUTO_GET )
   {
      IDispatch *pDisp;
-     char *szName = hb_parc(1);
+     const char *szName = hb_parc(1);
      DISPID DispID;
      DISPPARAMS DispParams;
 

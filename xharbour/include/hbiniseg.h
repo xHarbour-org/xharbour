@@ -1,5 +1,5 @@
 /*
- * $Id: hbiniseg.h 13174 2009-12-09 14:33:48Z druzus $
+ * $Id: hbiniseg.h,v 1.1 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -56,7 +56,9 @@
 #if defined( HB_DATASEG_STARTUP )
 
    #if defined( __WATCOMC__ )
-      #pragma off (unreferenced)    /* disable unused variable warnings */
+      #pragma off (unreferenced)      /* disable unused variable warnings */
+   #elif defined( __ICL )
+      #pragma warning( disable: 177 ) /* disable unused variable warnings */
    #elif defined( _MSC_VER ) && defined( HB_OS_WIN_64 )
       #pragma section( HB_STARTUP_SEGMENT, long, read )
    #endif
@@ -69,7 +71,11 @@
    #pragma data_seg()
 
    #if defined( __WATCOMC__ )
-      #pragma on (unreferenced)     /* reenable unused variable warnings */
+      #pragma on (unreferenced)        /* reenable unused variable warnings */
+   #elif defined( __ICL )
+      /* #pragma warning( default: 177 )
+	 AJ: I'm lost why this pragma which is to restore warning #177 does not work.
+      */
    #endif
 
 #endif

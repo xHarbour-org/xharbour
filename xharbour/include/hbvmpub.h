@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.84 2009/01/22 11:28:10 likewolf Exp $
+ * $Id: hbvmpub.h,v 1.85 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,7 @@
    /* symbol support structure */
    typedef struct
    {
-      char *            szName;        /* the name of the symbol */
+      const char *         szName;     /* the name of the symbol */
       union
       {
          HB_SYMBOLSCOPE    value;      /* the scope of the symbol */
@@ -157,7 +157,7 @@
    extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
    extern PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
    extern void     hb_vmFreeSymbols( PSYMBOLS pSymbols );
-   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, UINT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, struct _HB_ITEM **pGlobals );
+   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, UINT uiSymbols, const char * szModuleName, BOOL fDynLib, BOOL fClone, struct _HB_ITEM **pGlobals );
    extern void     hb_vmBeginSymbolGroup( void * hDynLib, BOOL fClone );
    extern void     hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] );
    extern void     hb_vmExitSymbolGroup( void * hDynLib );

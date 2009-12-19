@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6657 2009/12/16 10:18:28 andijahja Exp $
+ * $Id: ChangeLog,v 1.6658 2009/12/16 16:16:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-18 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/classes.h
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * include/hbinit.h
+  * include/hbiniseg.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * source/rtl/win32ole.prg
+  * source/vm/usedll.c
+  * source/vm/maindllh.c
+  * source/vm/maindlle.c
+  * source/vm/classes.c
+  * source/vm/proc.c
+  * source/vm/fastitem.c
+  * source/vm/dynsym.c
+  * source/vm/memvars.c
+  * source/vm/hvm.c
+  * source/vm/eval.c
+    ! fix GCC 4.4.x complaints of using char* instead of const char*:
+      PSYMBOL->szName : char* -> const char*
+      PCLASS->szName  : char* -> const char*
+    ! along the way, also replaced char* -> const char* whereever applicable
+      in VM sub dir (more to follow)
+
+  * source/compiler/genc.c
+    - move explicit __ICL's pragma from generated C codes to hbiniseg.h
 
 2009-12-16 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + include/hbextcdp.ch
