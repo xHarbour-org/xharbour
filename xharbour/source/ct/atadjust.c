@@ -1,5 +1,5 @@
 /*
- * $Id: atadjust.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id: atadjust.c,v 1.3 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -64,9 +64,9 @@ HB_FUNC (ATADJUST)
       (ISNUM (3)))
   {
 
-    char *pcStringToMatch = hb_parc (1);
+    const char *pcStringToMatch = hb_parc (1);
     size_t sStrToMatchLen = (size_t)hb_parclen (1);
-    char *pcString = hb_parc (2);
+    const char *pcString = hb_parc (2);
     size_t sStrLen = (size_t)hb_parclen (2);
     size_t sAdjustPosition = hb_parnl (3);
 
@@ -75,10 +75,10 @@ HB_FUNC (ATADJUST)
     char cAtLike   = ct_getatlikechar();
     size_t sIgnore, sMatchStrLen;
     ULONG ulCounter;
-    char *pc = NULL;
+    const char *pc = NULL;
 
     char cFillChar;
-    char *pcRetStr, *pcCheckFill;
+    const char *pcRetStr, *pcCheckFill;
     size_t sRetStrLen;
 
     /* eventually ignore some characters */
@@ -130,7 +130,7 @@ HB_FUNC (ATADJUST)
     {
 
       /* find the <ulCounter>th match */
-      char *pcSubStr;
+      const char *pcSubStr;
       size_t sSubStrLen;
       ULONG ulMatchCounter = 0;
 
@@ -252,14 +252,14 @@ HB_FUNC (ATADJUST)
 
         /* copy first portion of string */
         if (sAdjustPosition > 0)
-          hb_xmemcpy (pcRetStr, pcString, sAdjustPosition);
+          hb_xmemcpy ((void*)pcRetStr, pcString, sAdjustPosition);
 
         /* copy second portion of string */
         if (sRetStrLen > sAdjustPosition)
-          hb_xmemcpy (pcRetStr+sAdjustPosition, pc, sRetStrLen-sAdjustPosition);
+          hb_xmemcpy ((void*)(pcRetStr+sAdjustPosition), pc, sRetStrLen-sAdjustPosition);
 
         hb_retclen (pcRetStr, sRetStrLen);
-        hb_xfree (pcRetStr);
+        hb_xfree ((void*)pcRetStr);
       }
       else
       {
@@ -269,17 +269,17 @@ HB_FUNC (ATADJUST)
 
         /* copy first portion of string */
         if (pc > pcString)
-          hb_xmemcpy (pcRetStr, pcString, pc-pcString);
+          hb_xmemcpy ((void*)pcRetStr, pcString, pc-pcString);
 
         /* fill characters */
-        hb_xmemset (pcRetStr+(pc-pcString), cFillChar, sAdjustPosition-(pc-pcString));
+        hb_xmemset ((void*)(pcRetStr+(pc-pcString)), cFillChar, sAdjustPosition-(pc-pcString));
 
         /* copy second portion of string */
         if (sRetStrLen > sAdjustPosition)
-          hb_xmemcpy (pcRetStr+sAdjustPosition, pc, sRetStrLen-sAdjustPosition);
+          hb_xmemcpy ((void*)(pcRetStr+sAdjustPosition), pc, sRetStrLen-sAdjustPosition);
 
         hb_retclen (pcRetStr, sRetStrLen);
-        hb_xfree (pcRetStr);
+        hb_xfree ((void*)pcRetStr);
 
       }
     }

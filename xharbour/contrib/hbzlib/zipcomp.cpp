@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.22 2009/09/17 17:35:59 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.23 2009/09/30 16:19:24 marchuet Exp $
  */
  
 /*
@@ -95,7 +95,7 @@ class SpanActionCallbackc : public CZipActionCallback
    }
 };
 
-int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
+int hb_CompressFile( const char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, const char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    ULONG ulCount = 0;
    const char *szDummy ;
@@ -220,7 +220,7 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 
 }
 
-int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
+int hb_CmpTdSpan( const char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, const char *szPassWord, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    ULONG ulCount = 0;
    const char *szDummy;

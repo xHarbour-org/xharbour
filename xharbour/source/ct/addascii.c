@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
+ * $Id: addascii.c,v 1.3 2006/09/30 18:40:16 ptsarenko Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ HB_FUNC (ADDASCII)
   if (ISCHAR (1))
   {
     
-    char *pcSource = hb_parc (1);
+    const char *pcSource = hb_parc (1);
     size_t sLen = hb_parclen (1);
     char *pcResult;
     size_t sPos;

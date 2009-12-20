@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.38 2009/11/15 13:55:54 lculik Exp $
+ * $Id: zipnew.cpp,v 1.39 2009/11/15 15:31:19 lculik Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ PHB_ITEM ZipArray;
 extern PHB_ITEM ChangeDiskBlock;
 extern PHB_ITEM pProgressInfo;
 
-int hb_CheckSpanMode( char * szFile );
+int hb_CheckSpanMode( const char * szFile );
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,7 +102,7 @@ class SpanActionCallback : public CZipActionCallback
    }
 };
 
-int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
+int hb_CmpPkSpan( const char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, const char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    ULONG ulCount = 0;
 
@@ -416,7 +416,7 @@ char *hb___CheckFile( char * szFile )
    return( szZipName );
 }
 
-BOOL hb_IsPassWord( char *szFile )
+BOOL hb_IsPassWord( const char *szFile )
 {
    BOOL bReturn = TRUE;
    CZipFileHeader fh;
@@ -557,7 +557,7 @@ int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
    return ( int ) iReturn;
 }
 
-int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, const char *pbyBuffer, PHB_ITEM pSelArray, PHB_ITEM pProgress )
+int hb_UnzipSel( const char *szFile, PHB_ITEM pBlock, BOOL lWithPath, const char *szPassWord, const char *pbyBuffer, PHB_ITEM pSelArray, PHB_ITEM pProgress )
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
@@ -726,7 +726,7 @@ void hb_SetZipBuff( int a, int b, int c )
    pZipI.iRead    = c > 32768 ? c : 32768;
 }
 
-void hb_SetZipComment( char *szComment )
+void hb_SetZipComment( const char *szComment )
 {
    int iLen = strlen( ( const char * ) szComment ) + 1;
    pZipI.szComment = ( char* ) hb_xgrab( iLen );
@@ -738,7 +738,7 @@ void hb_SetZipReadOnly(int iRead )
    pZipI.iReadOnly = iRead ;
 }
 
-const char * hb_GetZipComment( char *szFile )
+const char * hb_GetZipComment( const char *szFile )
 {
    const char *szReturn = "";
    char *szTempR;
@@ -788,7 +788,7 @@ const char * hb_GetZipComment( char *szFile )
 
 }
 
-int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, char *szPath, PHB_ITEM pSelArray, PHB_ITEM pProgress )
+int hb_UnzipSelIndex( const char *szFile, PHB_ITEM pBlock, BOOL lWithPath, const char *szPassWord, const char *szPath, PHB_ITEM pSelArray, PHB_ITEM pProgress )
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
@@ -886,7 +886,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    return (int) iReturn;
 }
 
-BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
+BOOL hb_TransferFilesFromzip( const char *szSource, const char *szDest, PHB_ITEM pArray )
 {
    CZipArchive szZSource;
    CZipArchive szZDest;
@@ -1002,7 +1002,7 @@ DWORD GetCurrentFileSize( LPCTSTR szFile )
 #endif
 
 
-int hb_UnzipAll(char *szFile,PHB_ITEM pBlock, BOOL bWithPath,char *szPassWord,char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress)
+int hb_UnzipAll( const char *szFile,PHB_ITEM pBlock, BOOL bWithPath, const char *szPassWord, const char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress)
 {
 bool iReturn=true;
 uLong uiCount=0;
@@ -1147,7 +1147,7 @@ return iReturn;
 }
 #endif
 
-int hb_CheckSpanMode( char * szFile )
+int hb_CheckSpanMode( const char * szFile )
 {
    int iReturn = 0;
 

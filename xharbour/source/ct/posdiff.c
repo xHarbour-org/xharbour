@@ -1,5 +1,5 @@
 /*
- * $Id: posdiff.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: posdiff.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -62,12 +62,12 @@ HB_FUNC (POSDIFF)
 
   if (ISCHAR (1) && ISCHAR (2))
   {
-    
-    char *pcString1 = hb_parc (1);
+
+    const char *pcString1 = hb_parc (1);
     size_t sStrLen1 = hb_parclen (1);
-    char *pcString2 = hb_parc (2);
+    const char *pcString2 = hb_parc (2);
     size_t sStrLen2 = hb_parclen (2);
-    char *pc1, *pc2;
+    const char *pc1, *pc2;
 
     size_t sIgnore;
 
@@ -90,11 +90,12 @@ HB_FUNC (POSDIFF)
       hb_retnl (0);
       return;
     }
-    
+
     pc1 = pcString1+sIgnore;
     pc2 = pcString2+sIgnore;
 
     while ((pc1 < pcString1+sStrLen1) && (pc2 < pcString2+sStrLen2))
+
     {
       if (*pc1 != *pc2)
       {
@@ -106,14 +107,22 @@ HB_FUNC (POSDIFF)
     }
 
     if (sStrLen1 != sStrLen2)
+
     {
+
       hb_retnl ((sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2)+1);
+
     }
+
     else
+
     {
+
     hb_retnl (0);
     }
+
     return;
+
   }
   else /* (ISCHAR (1) && ISCHAR (2)) */
   {
@@ -152,11 +161,11 @@ HB_FUNC (POSEQUAL)
   if (ISCHAR (1) && ISCHAR (2))
   {
     
-    char *pcString1 = hb_parc (1);
+    const char *pcString1 = hb_parc (1);
     size_t sStrLen1 = hb_parclen (1);
-    char *pcString2 = hb_parc (2);
+    const char *pcString2 = hb_parc (2);
     size_t sStrLen2 = hb_parclen (2);
-    char *pc1, *pc2;
+    const char *pc1, *pc2;
 
     size_t sIgnore, sCompare, sCompareCnt, sRet = 0;
 

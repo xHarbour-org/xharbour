@@ -1,5 +1,5 @@
 /*
- * $Id: charmirr.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charmirr.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -69,9 +69,10 @@ HB_FUNC (CHARMIRR)
   if (ISCHAR (1))
   {
 
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcRet, *pc1, *pc2;
+    const char *pc1;
+    char *pcRet, *pc2;
     int iDontMirrorSpaces;
 
     if (ISLOG (2))

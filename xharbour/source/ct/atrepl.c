@@ -1,5 +1,5 @@
 /*
- * $Id: atrepl.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: atrepl.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -62,19 +62,19 @@ HB_FUNC (ATREPL)
 
   if ((ISCHAR (1)) && (ISCHAR (2)))
   {
-    
-    char *pcStringToMatch = hb_parc (1);
+
+    const char *pcStringToMatch = hb_parc (1);
     size_t sStrToMatchLen = (size_t)hb_parclen (1);
-    char *pcString = hb_parc (2);
+    const char *pcString = hb_parc (2);
     size_t sStrLen = (size_t)hb_parclen (2);
     int iMultiPass = ct_getatmupa();
     int iAtLike    = ct_getatlike();
     char cAtLike   = ct_getatlikechar();
     size_t sIgnore, sMatchStrLen;
     ULONG ulCounter;
-    char *pc;
+    const char *pc;
 
-    char *pcReplacement;
+    const char *pcReplacement;
     size_t sReplaceLen;
     int iReplaceMode;
     char *pcRetStr;
@@ -112,7 +112,7 @@ HB_FUNC (ATREPL)
       pcReplacement = "";
       sReplaceLen = 0;
     }
-  
+
     /* replace mode */
     if (ISLOG (5))
       iReplaceMode = hb_parl (5);
@@ -131,19 +131,19 @@ HB_FUNC (ATREPL)
 
     if (ulCounter != 0)
     {
-     
+
       /* depending on iReplaceMode: replace all occurences including the nth one
          or only the nth occurence
          NOTE: if iReplaceMode = false and the nth occurence does not exist,
                all occurences are replaced */
 
-      char *pcRetSubStr;
+      const char *pcRetSubStr;
       size_t sRetSubStrLen;
       ULONG ulMatchCounter = 0;
 
       sRetStrLen = sStrLen;
       pcRetStr = ( char * ) hb_xgrab (sRetStrLen);
-      hb_xmemcpy (pcRetStr, pcString, sRetStrLen);
+      hb_xmemcpy ((void*)pcRetStr, pcString, sRetStrLen);
 
       pcRetSubStr = pcRetStr+sIgnore;
       sRetSubStrLen = sRetStrLen-sIgnore;
@@ -197,10 +197,10 @@ HB_FUNC (ATREPL)
           }
 
           if (sReplaceLen != sMatchStrLen)
-            memmove (pc+sReplaceLen, pc+sMatchStrLen,
+            memmove ((void*)(pc+sReplaceLen), pc+sMatchStrLen,
                      sRetStrLen-((pc+sMatchStrLen)-pcRetStr));
           if (sReplaceLen > 0)
-            hb_xmemcpy (pc, pcReplacement, sReplaceLen);
+            hb_xmemcpy ((void*)pc, pcReplacement, sReplaceLen);
 
           if (iMultiPass)
             pcRetSubStr = pc+1;
@@ -276,10 +276,10 @@ HB_FUNC (ATREPL)
       }
 
       if (sReplaceLen != sMatchStrLen)
-        memmove (pc+sReplaceLen, pc+sMatchStrLen,
+        memmove ((void*)(pc+sReplaceLen), pc+sMatchStrLen,
                  sRetStrLen-((pc+sMatchStrLen)-pcRetStr));
       if (sReplaceLen > 0)
-        hb_xmemcpy (pc, pcReplacement, sReplaceLen);
+        hb_xmemcpy ((void*)pc, pcReplacement, sReplaceLen);
 
       sRetStrLen += (sReplaceLen-sMatchStrLen);
 

@@ -1,9 +1,9 @@
 /*
- * $Id: charrepl.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charrepl.c 11616 2009-07-03 07:56:51Z vszakats $
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string function CHARREPL()
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -56,159 +56,191 @@
 #include "ct.h"
 
 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CHARREPL()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *      Replacement of characters
+ *  $SYNTAX$
+ *      CHARREPL (<cSearchString>, <[@]cString>,
+ *                <cReplaceString>, [<lMode>]) -> cString
+ *  $ARGUMENTS$
+ *      <cSearchString>    is a string of characters that should be replaced
+ *      <[@]cString>       is the processed string
+ *      <cReplaceString>   is a string of characters that replace the one
+ *                         of <cSearchString>
+ *      [<lMode>]          sets the replacement method (see description)
+ *                         Default: .F.
+ *  $RETURNS$
+ *      <cString>          the processed string
+ *  $DESCRIPTION$
+ *      The CHARREPL() function replaces certain characters in <cString>
+ *      with others depending on the setting of <lMode>.
+ *      If <lMode> is set to .F., the function takes the characters of
+ *      <cSearchString> one after the other, searches for them in <cString>
+ *      and, if successful, replaces them with the corresponding character
+ *      of <cReplaceString>. Be aware that if the same characters occur
+ *      in both <cSearchString> and <cReplaceString>, the character on a
+ *      certain position in <cString> can be replaced multiple times.
+ *      if <lMode> is set to .T., the function takes the characters in <cString>
+ *      one after the other, searches for them in <cSearchString> and, if
+ *      successful, replaces them with the corresponding character of
+ *      <cReplaceString>. Note that no multiple replacements are possible
+ *      in this mode.
+ *      If <cReplaceString> is shorter than <cSearchString>, the last
+ *      character of <cReplaceString> is used as corresponding character
+ *      for the the "rest" of <cSearchString>.
+ *      One can omit the return value by setting the CSETREF() switch to .T.,
+ *      but then one must pass <cString> by reference to get the result.
+ *  $EXAMPLES$
+ *      ? charrepl ("1234", "1x2y3z", "abcd")            // "axbycz"
+ *      ? charrepl ("abcdefghij", "jhfdb", "1234567890") // "08642"
+ *      ? charrepl ("abcdefghij", "jhfdb", "12345")      // "55542"
+ *      ? charrepl ("1234", "1234", "234A")              // "AAAA"
+ *      ? charrepl ("1234", "1234", "234A", .T.)         // "234A"
+ *  $TESTS$
+ *      charrepl ("1234", "1x2y3z", "abcd") == "axbycz"
+ *      charrepl ("abcdefghij", "jhfdb", "1234567890") == "08642"
+ *      charrepl ("abcdefghij", "jhfdb", "12345") == "55542"
+ *      charrepl ("1234", "1234", "234A") == "AAAA"
+ *      charrepl ("1234", "1234", "234A", .T.) == "234A"
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      CHARREPL() is compatible with CT3's CHARREPL().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is charrepl.c, library is ct3.
+ *  $SEEALSO$
+ *      WORDREPL()   POSREPL()   RANGEREPL()
+ *      CSETREF()
+ *  $END$
+ */
 
-HB_FUNC (CHARREPL)
+HB_FUNC( CHARREPL )
 {
+   int iNoRet;
+   size_t sSearchLen, sReplaceLen;
 
-  int iNoRet;
+   /* suppressing return value ? */
+   iNoRet = ct_getref() && ISBYREF( 2 );
 
-  size_t sSearchLen, sReplaceLen;
+   /* param check */
+   if( ( sSearchLen = ( size_t ) hb_parclen( 1 ) ) > 0 && ISCHAR( 2 ) &&
+       ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) > 0 )
+   {
+      /* get parameters */
+      const char *pcSearch = hb_parc( 1 );
+      const char *pcString = hb_parc( 2 );
+      size_t sStrLen = ( size_t ) hb_parclen( 2 );
+      const char *pcReplace = hb_parc( 3 );
+      int iMode;
+      char *pcRet;
+      size_t sIndex;
 
-  /* suppressing return value ? */
-  iNoRet = ct_getref() && ISBYREF( 2 );
-
-  /* param check */
-  if (((sSearchLen = (size_t)hb_parclen (1)) > 0) &&
-      (ISCHAR (2)) &&
-      ((sReplaceLen = (size_t)hb_parclen (3)) > 0))
-  {
-
-    /* get parameters */
-    char *pcSearch = hb_parc (1);
-    char *pcString = hb_parc (2);
-    size_t sStrLen = (size_t)hb_parclen (2);
-    char *pcReplace = hb_parc (3);
-    int iMode;
-    char *pcRet;
-    size_t sIndex;
-
-    /* if sStrLen == 0, we can return immediately */
-    if (sStrLen == 0)
-    {
-      if (iNoRet)
+      /* if sStrLen == 0, we can return immediately */
+      if( sStrLen == 0 )
       {
-        hb_retl (0);
+         if( iNoRet )
+         {
+            hb_retl( 0 );
+         }
+         else
+         {
+            hb_retc_null();
+         }
+         return;
+      }
+
+      if( ISLOG( 4 ) )
+      {
+         iMode = hb_parl( 4 );
       }
       else
       {
-        hb_retc ("");
-      }
-      return;
-    }
-
-    if (ISLOG (4))
-    {
-      iMode = hb_parl (4);
-    }
-    else
-    {
-      iMode = 0;
-    }
-
-    pcRet = ( char * ) hb_xgrab (sStrLen);
-    hb_xmemcpy (pcRet, pcString, sStrLen);
-
-    for (sIndex = 0; sIndex < sSearchLen; sIndex++)
-    {
-    
-      size_t sMatchStrLen;
-      char *pc;
-      size_t sReplIndex = sIndex;
-
-      if (sReplIndex > sReplaceLen-1)
-      {
-        sReplIndex = sReplaceLen-1;
+         iMode = 0;
       }
 
-      if (iMode)
-      {
-        /* no multiple replacements: searching in pcString,
-                                     replacing in pcRet     */
-        pc = pcString;
+      pcRet = ( char * ) hb_xgrab( sStrLen + 1 );
+      hb_xmemcpy( pcRet, pcString, sStrLen );
 
-        while ((pc = ct_at_exact_forward (pc, sStrLen-(pc-pcString),
-                                          pcSearch+sIndex, 1,
-                                          &sMatchStrLen)) != NULL)
-        {
-          *(pcRet+(pc-pcString)) = *(pcReplace+sReplIndex);
-          pc++;
-        }
+      for( sIndex = 0; sIndex < sSearchLen; sIndex++ )
+      {
+         size_t sMatchStrLen;
+         const char *pc;
+         size_t sReplIndex = sIndex;
+
+         if( sReplIndex > sReplaceLen - 1 )
+         {
+            sReplIndex = sReplaceLen - 1;
+         }
+
+         if( iMode )
+         {
+            /* no multiple replacements: searching in pcString,
+               replacing in pcRet     */
+            pc = pcString;
+
+            while( ( pc = ct_at_exact_forward( pc, sStrLen - ( pc - pcString ),
+                                               pcSearch + sIndex, 1,
+                                               &sMatchStrLen ) ) != NULL )
+            {
+               *( pcRet + ( pc - pcString ) ) = *( pcReplace + sReplIndex );
+               pc++;
+            }
+         }
+         else
+         {
+            /* multiple replacements: searching & replacing in pcRet */
+            char * pcw = pcRet;
+            while( ( pcw = ( char * ) ct_at_exact_forward( pcw, sStrLen - ( pcw - pcRet ),
+                                                           pcSearch + sIndex, 1,
+                                                           &sMatchStrLen ) ) != NULL )
+            {
+               *pcw++ = *( pcReplace + sReplIndex );
+            }
+         }
+      }
+
+      /* return string */
+      if( ISBYREF( 2 ) )
+      {
+         hb_storclen( pcRet, sStrLen, 2 );
+      }
+
+      if( iNoRet )
+      {
+         hb_retl( 0 );
+         hb_xfree( pcRet );
       }
       else
       {
-        /* multiple replacements: searching & replacing in pcRet */
-        pc = pcRet;
-        while ((pc = ct_at_exact_forward (pc, sStrLen-(pc-pcRet),
-                                          pcSearch+sIndex, 1,
-                                          &sMatchStrLen)) != NULL)
-        {
-          *pc = *(pcReplace+sReplIndex);
-          pc++;
-        }
+         hb_retclen_buffer( pcRet, sStrLen );
       }
+   }
+   else  /* ( ( sSearchLen = ( size_t ) hb_parclen( 1 ) ) > 0 && ISCHAR( 2 ) &&
+              ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) > 0 ) */
+   {
+      PHB_ITEM pSubst = NULL;
+      int iArgErrorMode = ct_getargerrormode();
 
-    }
-
-    /* return string */
-    if (ISBYREF (2))
-    {
-      hb_storclen (pcRet, sStrLen, 2);
-    }
-
-    if (iNoRet)
-    {
-      hb_retl (0);
-    }
-    else
-    {
-      hb_retclen (pcRet, sStrLen);
-    }
-
-    hb_xfree (pcRet);
-
-  }
-  else /* ((sSearchLen = (size_t)hb_parclen (1)) > 0) &&
-          (ISCHAR (2)) &&
-          ((sReplaceLen = (size_t)hb_parclen (3)) > 0))   */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CHARREPL,
-                               NULL, "CHARREPL", 0, EF_CANSUBSTITUTE, 4,
-                               hb_paramError (1), hb_paramError (2),
-                               hb_paramError (3), hb_paramError (4));
-    }
-
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      if (iNoRet)
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
-        hb_retl (0);
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
+                                  CT_ERROR_CHARREPL, NULL, HB_ERR_FUNCNAME, 0,
+                                  EF_CANSUBSTITUTE, HB_ERR_ARGS_BASEPARAMS );
       }
+
+      if( pSubst != NULL )
+         hb_itemReturnRelease( pSubst );
+      else if( iNoRet )
+         hb_retl( 0 );
+      else if( ISCHAR( 2 ) )
+         hb_retclen( hb_parc( 2 ), hb_parclen( 2 ) );
       else
-      {
-        if (ISCHAR (2))
-        {
-          hb_retclen (hb_parc (2), hb_parclen (2));
-        }
-        else
-        {
-          hb_retc ("");
-        }
-      }
-    }
-  }
-
-  return;
-
+         hb_retc_null();
+   }
 }
-
-
-
-

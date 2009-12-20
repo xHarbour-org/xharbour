@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.102 2009/10/28 22:52:34 what32 Exp $
+ * $Id: adsfunc.c,v 1.103 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -963,7 +963,7 @@ HB_FUNC( ADSGETFILTER )
 
 HB_FUNC( ADSENABLEENCRYPTION )
 {
-   char * pucPassword = hb_parcx( 1 );
+   const char * pucPassword = hb_parcx( 1 );
 
    if( strlen( pucPassword ) )
    {
@@ -1191,7 +1191,7 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
 
    if( /* hb_ads_hConnect && */ pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_parc( 1 );
+      const char * pucStmt = hb_parc( 1 );
       ADSHANDLE hCursor = 0;
 
       UNSIGNED32 ulRetVal = AdsExecuteSQLDirect( pArea->hStatement,
@@ -1238,7 +1238,7 @@ HB_FUNC( ADSPREPARESQL )
 
    if( /* hb_ads_hConnect && */ pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_parc( 1 );
+      const char * pucStmt = hb_parc( 1 );
 
       UNSIGNED32 ulRetVal = AdsPrepareSQL( pArea->hStatement,
                                            ( UNSIGNED8 * ) pucStmt );
@@ -1305,7 +1305,7 @@ HB_FUNC( ADSVERIFYSQL )
 
    if( pArea && pArea->hStatement && ISCHAR( 1 ) )
    {
-      char * pucStmt = hb_parc( 1 );
+      const char * pucStmt = hb_parc( 1 );
 
       hb_retl( AdsVerifySQL( pArea->hStatement, ( UNSIGNED8 * ) pucStmt ) == AE_SUCCESS );
    }
@@ -2104,8 +2104,8 @@ HB_FUNC( ADSDELETEFILE )
 
 HB_FUNC( ADSSTMTSETTABLEPASSWORD )
 {
-   char * pucTableName = hb_parcx( 1 );
-   char * pucPassword = hb_parcx( 2 );
+   const char * pucTableName = hb_parcx( 1 );
+   const char * pucPassword = hb_parcx( 2 );
 
    if( strlen( pucTableName ) &&
        strlen( pucPassword ) )

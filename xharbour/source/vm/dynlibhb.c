@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.15 2008/03/20 08:58:21 mauriliolongo Exp $
+ * $Id: dynlibhb.c,v 1.16 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_FUNC( LIBLOAD )
          argv = ( char** ) hb_xgrab( sizeof( char* ) * argc );
          for( i = 0; i < argc; ++i )
          {
-            argv[i] = hb_parcx( i + 2 );
+            argv[i] = (char*) hb_parcx( i + 2 );
          }
       }
 

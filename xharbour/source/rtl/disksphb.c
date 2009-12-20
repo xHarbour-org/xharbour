@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.15 2009/10/22 22:58:31 lculik Exp $
+ * $Id: disksphb.c,v 1.16 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
 HB_FUNC( HB_DISKSPACE )
 {
    char szPathBuf[ 4 ];
-   char * szPath = hb_parc( 1 );
+   const char * szPath = hb_parc( 1 );
    USHORT uiType = ISNUM( 2 ) ? ( USHORT ) hb_parni( 2 ) : HB_DISK_AVAIL;
    double dSpace = 0.0;
 

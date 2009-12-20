@@ -85,7 +85,7 @@ HB_FUNC( HB_SYSLOGMESSAGE )
       WORD logval;
       if ( s_IsWindowsNt() )
       {
-         char *szMsg = hb_parcx(1);
+         const char *szMsg = hb_parcx(1);
          switch( hb_parni(2) )
          {
             case HB_LOG_CRITICAL: logval = EVENTLOG_ERROR_TYPE; break;

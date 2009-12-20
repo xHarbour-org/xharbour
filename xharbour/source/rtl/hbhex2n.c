@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.18 2008/03/27 10:26:46 likewolf Exp $
+ * $Id: hbhex2n.c,v 1.19 2008/11/22 08:25:23 andijahja Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 
-HB_ULONG hb_hextonum(char *cHex)
+HB_ULONG hb_hextonum( const char *cHex )
 {
    HB_ULONG   ulNum = 0;
    char       c;
@@ -154,9 +154,9 @@ HB_FUNC( HEXTONUM )
 HB_FUNC( STRTOHEX )
 {
    char   *cOutBuf;
-   char   *cStr;
+   const char *cStr;
    char   *c;
-   char   *cSep = "";
+   const char *cSep = "";
    unsigned char  ucChar;
    ULONG  ul, ulLen, ulLenSep = 0;
    int    iDigit;

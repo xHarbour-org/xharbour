@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.13 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: hbtrace.c,v 1.14 2008/11/22 08:25:22 andijahja Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ int hb_tr_level( void )
    return s_level;
 }
 
-void hb_tr_trace( char * fmt, ... )
+void hb_tr_trace( const char * fmt, ... )
 {
    /*
     * If tracing is disabled, do nothing.

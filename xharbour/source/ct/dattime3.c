@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.c,v 1.3 2009/06/07 11:20:23 enricomaria Exp $
+ * $Id: dattime3.c,v 1.4 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -137,7 +137,7 @@ HB_FUNC( WAITPERIOD )
    hb_retl( d < s_dTimeCounter );
 }
 
-static BOOL _hb_timeValid( char * szTime, ULONG ulLen, int * piDecode )
+static BOOL _hb_timeValid( const char * szTime, ULONG ulLen, int * piDecode )
 {
    BOOL fValid = FALSE;
 

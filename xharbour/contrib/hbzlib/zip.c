@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.57 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: zip.c,v 1.58 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include <hbzip2.h>
+#include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbinit.h"
@@ -75,8 +76,8 @@ PHB_ITEM ChangeDiskBlock;
 #define FA_ARCH            32   /* A */
 #define FA_NORMAL         128
 
-extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
-extern void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
+extern int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
+extern void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 
 #if defined(HB_OS_LINUX)
 extern int GetFileAttributes( char *szEntry );

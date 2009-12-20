@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.3 2006/08/05 11:58:26 druzus Exp $
+ * $Id: charlist.c,v 1.4 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
 static void do_list (int iSwitch)
 {
 
-  char *pcString;
+  const char *pcString;
   size_t sStrLen;
 
   size_t asCharCnt[256];

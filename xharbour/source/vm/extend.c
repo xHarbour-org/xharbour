@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.73 2009/07/14 02:44:28 ronpinkas Exp $
+ * $Id: extend.c,v 1.74 2009/07/14 12:34:30 ronpinkas Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ BOOL hb_extIsObject( int iParam )
 /* NOTE: Caller should not modify the buffer returned by this function.
          [vszakats] */
 
-char * hb_parc( int iParam, ... )
+const char * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -227,7 +227,7 @@ char * hb_parc( int iParam, ... )
    return NULL;
 }
 
-char * hb_parcx( int iParam, ... )
+const char * hb_parcx( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -348,7 +348,7 @@ ULONG  hb_parcsiz( int iParam, ... )
 /* NOTE: Using HB_VM_STACK.szDate as a temporary date buffer guaranties
          good behavior when multithreading. */
 
-char  * hb_pards( int iParam, ... )
+const char * hb_pards( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 

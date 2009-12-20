@@ -1,5 +1,5 @@
 /*
- * $Id: hbapidbg.h,v 1.1 2007/08/06 20:30:22 likewolf Exp $
+ * $Id: hbapidbg.h,v 1.2 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -71,22 +71,22 @@ extern HB_EXPORT PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset );
 
 /* internal debugger function */
 extern HB_EXPORT void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
-extern HB_EXPORT void hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction );
-extern HB_EXPORT void hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace );
+extern HB_EXPORT void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, char *szFunction );
+extern HB_EXPORT void hb_dbgAddWatch( void *handle, const char *szExpr, BOOL bTrace );
 extern HB_EXPORT void hb_dbgDelBreak( void *handle, int nBreak );
 extern HB_EXPORT void hb_dbgDelWatch( void *handle, int nWatch );
-extern HB_EXPORT PHB_ITEM hb_dbgGetExpressionValue( void *handle, char *expression );
+extern HB_EXPORT PHB_ITEM hb_dbgGetExpressionValue( void *handle, const char *expression );
 extern HB_EXPORT PHB_ITEM hb_dbgGetSourceFiles( void *handle );
 extern HB_EXPORT PHB_ITEM hb_dbgGetWatchValue( void *handle, int nWatch );
-extern HB_EXPORT BOOL hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine );
+extern HB_EXPORT BOOL hb_dbgIsValidStopLine( void *handle, const char *szModule, int nLine );
 extern HB_EXPORT void hb_dbgSetCBTrace( void *handle, BOOL bCBTrace );
 extern HB_EXPORT void hb_dbgSetGo( void *handle );
 extern HB_EXPORT void hb_dbgSetInvoke( void *handle, BOOL ( *pFunInvoke )( void ) );
 extern HB_EXPORT void hb_dbgSetNextRoutine( void *handle );
 extern HB_EXPORT void hb_dbgSetQuit( void *handle );
-extern HB_EXPORT void hb_dbgSetToCursor( void *handle, char *szModule, int nLine );
+extern HB_EXPORT void hb_dbgSetToCursor( void *handle, const char *szModule, int nLine );
 extern HB_EXPORT void hb_dbgSetTrace( void *handle );
-extern HB_EXPORT void hb_dbgSetWatch( void *handle, int nWatch, char *szExpr, BOOL bTrace );
+extern HB_EXPORT void hb_dbgSetWatch( void *handle, int nWatch, const char *szExpr, BOOL bTrace );
 
 HB_EXTERN_END
 

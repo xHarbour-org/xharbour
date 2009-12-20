@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.193 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: filesys.c,v 1.194 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -887,7 +887,7 @@ On success, a valid FHandle is returned, and FError returns
 zero. On error, -1 is returned and FError() returns nonzero.
 */
 
-HB_FHANDLE hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin,
+HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
                              HB_FHANDLE *fhStdout, HB_FHANDLE *fhStderr,
                              BOOL bBackground, ULONG *ProcessID )
 {

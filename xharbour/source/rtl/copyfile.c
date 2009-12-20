@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.10 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: copyfile.c,v 1.11 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 
 static void blockeval( EVALINFO, PHB_ITEM, ULONG );
 
-static BOOL hb_fsCopy( char * szSource, char * szDest, PHB_ITEM block )
+static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM block )
 {
    BOOL bRetVal = FALSE;
    FHANDLE fhndSource;

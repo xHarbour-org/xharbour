@@ -2157,7 +2157,7 @@ HB_FUNC( __MVRESTORE )
 
       if( fhnd != FS_ERROR )
       {
-         char * pszMask = ISCHAR( 4 ) ? hb_parc( 4 ) : ( char * ) "*";
+         const char * pszMask = ISCHAR( 4 ) ? hb_parc( 4 ) : "*";
          BOOL bIncludeMask = ISLOG( 5 ) ? hb_parl( 5 ) : TRUE;
          BYTE *buffer = (BYTE *) hb_xgrab( uLen );
 

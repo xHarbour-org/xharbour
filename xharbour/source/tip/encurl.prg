@@ -1,5 +1,5 @@
 /*
- * $Id: encurl.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: encurl.prg,v 1.2 2007/02/27 15:59:41 druzus Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ RETURN Self
 
 HB_FUNC( TIPENCODERURL_ENCODE )
 {
-   char *cData = hb_parc(1);
+   const char *cData = hb_parc(1);
    int nLen = hb_parclen(1);
    BOOL bComplete = hb_parl(2);
    char *cRet;
@@ -146,7 +146,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
 #pragma BEGINDUMP
 HB_FUNC( TIPENCODERURL_DECODE )
 {
-   char *cData = hb_parc(1);
+   const char *cData = hb_parc(1);
    int nLen = hb_parclen(1);
    char *cRet;
    int nPos = 0, nPosRet = 0;

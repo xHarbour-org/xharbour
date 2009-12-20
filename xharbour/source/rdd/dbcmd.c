@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.235 2009/09/16 15:53:42 marchuet Exp $
+ * $Id: dbcmd.c,v 1.236 2009/09/30 16:19:35 marchuet Exp $
  */
 
 /*
@@ -2113,7 +2113,7 @@ HB_FUNC( __DBCOPY )
 
    if( pArea )
    {
-      char *szFile = hb_parcx( 1 );
+      const char *szFile = hb_parcx( 1 );
       char szPath[ HB_PATH_MAX ];
 
      #ifdef HB_OS_HAS_DRIVE_LETTER

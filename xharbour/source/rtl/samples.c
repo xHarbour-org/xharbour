@@ -1,5 +1,5 @@
 /*
- * $Id: samples.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: samples.c,v 1.3 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ static char * hb_SecToTimeStr( char * pszTime, ULONG ulTime )
    return pszTime;
 }
 
-static ULONG hb_TimeStrToSec( char * pszTime )
+static ULONG hb_TimeStrToSec( const char * pszTime )
 {
    ULONG ulLen;
    ULONG ulTime = 0;

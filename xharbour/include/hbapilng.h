@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.10 2007/12/21 12:12:21 likewolf Exp $
+ * $Id: hbapilng.h,v 1.11 2009/12/16 08:24:57 andijahja Exp $
  */
 
 /*
@@ -82,12 +82,12 @@ typedef struct _HB_LANG
 
 extern HB_EXPORT BOOL      hb_langRegister         ( PHB_LANG lang );
 extern HB_EXPORT BOOL      hb_langDeRegister       ( char * pszID );
-extern HB_EXPORT PHB_LANG  hb_langFind             ( char * pszID );
+extern HB_EXPORT PHB_LANG  hb_langFind             ( const char * pszID );
 
 /* Default language selection and data query */
 
 extern HB_EXPORT PHB_LANG  hb_langSelect           ( PHB_LANG lang );
-extern HB_EXPORT char *    hb_langSelectID         ( char * pszID );
+extern HB_EXPORT char *    hb_langSelectID         ( const char * pszID );
 extern HB_EXPORT char *    hb_langDGetItem         ( int iIndex );
 extern HB_EXPORT char *    hb_langID               ( void );
 extern HB_EXPORT char *    hb_langName             ( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.24 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: dateshb.c,v 1.25 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -379,7 +379,7 @@ HB_FUNC( CTOD )
 {
    if( ISCHAR( 1 ) )
    {
-      char * szDate = hb_parcx( 1 );
+      const char * szDate = hb_parcx( 1 );
       int d_value = 0, m_value = 0, y_value = 0;
 
       hb_datectod( szDate, &d_value, &m_value, &y_value );
@@ -429,7 +429,7 @@ HB_FUNC( STOD )
    else
    {
      char szDate[ 9 ] ;
-     char *pDate = hb_parcx( 1 ) ;
+     const char *pDate = hb_parcx( 1 ) ;
      memcpy( szDate, pDate, 8 ) ;
      szDate[ 8 ] = '\0' ;
      hb_retds( szDate );
@@ -636,7 +636,7 @@ HB_FUNC( CTOT )
 {
    if( ISCHAR( 1 ) )
    {
-      char * szDate = hb_parcx( 1 );
+      const char * szDate = hb_parcx( 1 );
       int len = hb_parclen( 1 );
       int d_value = 0, m_value = 0, y_value = 0;
       int h_value = 0, n_value = 0, fin;
@@ -676,7 +676,7 @@ HB_FUNC( STOT )
    int len = hb_parclen( 1 );
    if( ISCHAR( 1 ) && len >= 8 )
    {
-      char * szDate = hb_parcx( 1 );
+      const char * szDate = hb_parcx( 1 );
       LONG lDate = 0, lTime = 0;
       char szTime[ 19 ];
 

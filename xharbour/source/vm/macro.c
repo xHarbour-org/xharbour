@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.82 2009/02/04 00:11:38 likewolf Exp $
+ * $Id: macro.c,v 1.83 2009/09/30 16:20:22 marchuet Exp $
  */
 
 /*
@@ -878,7 +878,7 @@ HB_MACRO_PTR hb_macroCompile( const char * szString )
 
 HB_FUNC( HB_MACROCOMPILE )
 {
-   char *sString = hb_parc(1);
+   const char *sString = hb_parc(1);
 
    if( sString )
    {

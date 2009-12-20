@@ -1,5 +1,5 @@
 /*
- * $Id: mlcfunc.c,v 1.4 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: mlcfunc.c,v 1.5 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ static PHB_EOL_INFO hb_mlGetEOLs( int iParam, int * piEOLs )
    int iEOLs = 0;
 
 #ifdef HB_EXTENSION
-   char * szEOL;
+   const char * szEOL;
    ULONG ulLen, ul;
 
    szEOL = hb_parc( iParam );

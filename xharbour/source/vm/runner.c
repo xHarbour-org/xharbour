@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.61 2009/09/30 16:20:23 marchuet Exp $
+ * $Id: runner.c,v 1.62 2009/10/17 18:56:35 guerra000 Exp $
  */
 
 /*
@@ -103,15 +103,15 @@ static const BYTE szHead[] = { 192,'H','R','B' };
 #define SYM_NOT_FOUND 0xFFFFFFFFUL  /* Symbol not found.                 */
 
 HB_EXTERN_BEGIN
-PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb );
-PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
+PHRB_BODY hb_hrbLoad( const char* szHrbBody, ULONG ulBodySize, char* szHrb );
+PHRB_BODY hb_hrbLoadFromFile( const char* szHrb );
 void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 HB_EXTERN_END
 
-static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * pulBodyOffset )
+static int hb_hrbReadHead( const char * szBody, ULONG ulBodySize, ULONG * pulBodyOffset )
 {
-   char * pVersion;
+   const char * pVersion;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadHead(%p,%lu,%p)", szBody, ulBodySize, pulBodyOffset ));
 
@@ -126,7 +126,7 @@ static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * pulBodyOffse
    return HB_PCODE_MKSHORT( pVersion );
 }
 
-static BOOL hb_hrbReadValue( char * szBody, ULONG ulBodySize, ULONG * pulBodyOffset, ULONG * pulValue )
+static BOOL hb_hrbReadValue( const char * szBody, ULONG ulBodySize, ULONG * pulBodyOffset, ULONG * pulValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadValue(%p,%lu,%p,%p)", szBody, ulBodySize, pulBodyOffset, pulValue));
 
@@ -146,9 +146,9 @@ static BOOL hb_hrbReadValue( char * szBody, ULONG ulBodySize, ULONG * pulBodyOff
 
 /* ReadId
    Read the next (zero terminated) identifier */
-static char * hb_hrbReadId( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
+static char * hb_hrbReadId( const char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
-   char * szIdx;
+   const char * szIdx;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadId(%p,%lu,%p)", szBody, ulBodySize, ulBodyOffset));
 
@@ -183,7 +183,7 @@ static ULONG hb_hrbFindSymbol( const char * szName, PHB_DYNF pDynFunc, ULONG ulL
    return SYM_NOT_FOUND;
 }
 
-static char * hb_hrbReadNamespaces( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
+static char * hb_hrbReadNamespaces( const char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
    char *pNamespaces;
 
@@ -359,7 +359,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    hb_xfree( pHrbBody );
 }
 
-PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
+PHRB_BODY hb_hrbLoad( const char* szHrbBody, ULONG ulBodySize, char* szHrb )
 {
    PHRB_BODY pHrbBody = NULL;
 
@@ -395,7 +395,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       pHrbBody->pSymRead = NULL;
       pHrbBody->pDynFunc = NULL;
       pHrbBody->pModuleSymbols = NULL;
-      pHrbBody->pNamespaces = hb_hrbReadNamespaces( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );;
+      pHrbBody->pNamespaces = hb_hrbReadNamespaces( szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );;
       if( ! hb_hrbReadValue( szHrbBody, ulBodySize, &ulBodyOffset, &pHrbBody->ulSymbols ) ||
             pHrbBody->ulSymbols == 0 )
       {
@@ -560,7 +560,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
    return pHrbBody;
 }
 
-PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
+PHRB_BODY hb_hrbLoadFromFile( const char* szHrb )
 {
    char szFileName[ HB_PATH_MAX ];
    PHRB_BODY pHrbBody = NULL;
@@ -658,7 +658,7 @@ HB_FUNC( __HRBRUN )
 
    if( ulLen > 0 )
    {
-      char * fileOrBody = hb_parc( 1 );
+      const char * fileOrBody = hb_parc( 1 );
       PHRB_BODY pHrbBody;
 
       if( ulLen > 4 && memcmp( szHead, fileOrBody, 4 ) == 0 )
@@ -676,7 +676,7 @@ HB_FUNC( __HRBRUN )
             argv = (char**) hb_xgrab( sizeof(char*) * (argc-1) );
             for( i=0; i<argc-1; i++ )
             {
-               argv[i] = hb_parcx( i+2 );
+               argv[i] = (char*) hb_parcx( i+2 );
             }
          }
 
@@ -705,7 +705,7 @@ HB_FUNC( __HRBLOAD )
 
    if( ulLen > 0 )
    {
-      char * fileOrBody = hb_parc( 1 );
+      const char * fileOrBody = hb_parc( 1 );
       PHRB_BODY pHrbBody;
 
       /* If parameter string */
@@ -729,7 +729,7 @@ HB_FUNC( __HRBLOAD )
             argv = ( char ** ) hb_xgrab( sizeof( char * ) * ( argc - 1 ) );
 
             for( i = 0; i < argc - 1; i++ )
-               argv[i] = hb_parcx( i + 2 );
+               argv[i] = (char*) hb_parcx( i + 2 );
          }
 
          hb_hrbInit( pHrbBody, argc - 1, argv );
@@ -763,7 +763,7 @@ HB_FUNC( __HRBDO )
 
          for( i = 0; i < argc - 1; i++ )
          {
-            argv[i] = hb_parcx( i + 2 );
+            argv[i] = (char*) hb_parcx( i + 2 );
          }
       }
 

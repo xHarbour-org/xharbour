@@ -1,5 +1,5 @@
 /*
- * $Id: ftattr.c,v 1.3 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id: ftattr.c,v 1.4 2008/03/16 19:15:58 likewolf Exp $
  */
 
 /*
@@ -392,7 +392,7 @@ HB_FUNC( FT_RESTATT )
       USHORT uiMaxCol = hb_gtMaxCol();
       USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow();
       USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol();
-      char * pAttrib  = hb_parc( 5 );
+      const char * pAttrib  = hb_parc( 5 );
 
       if( uiBottom > uiMaxRow )
          uiBottom = uiMaxRow;

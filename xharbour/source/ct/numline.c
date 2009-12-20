@@ -1,5 +1,5 @@
 /*
- * $Id: numline.c,v 1.1 2004/11/29 23:30:00 ptsarenko Exp $
+ * $Id: numline.c,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
  */
 
 /*
@@ -59,8 +59,8 @@ HB_FUNC( NUMLINE )
 
    if( ISCHAR(1) )
    {
-      char *pcString = hb_parc(1);
-      char *pBuffer;
+      const char *pcString = hb_parc(1);
+      const char *pBuffer;
       LONG lStrLen = hb_parclen(1);
       LONG lLength = (ISNUM(2) ? hb_parnl(2) : 80);
 

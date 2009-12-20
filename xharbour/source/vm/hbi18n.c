@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.28 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbi18n.c,v 1.29 2009/09/30 16:20:22 marchuet Exp $
  */
 
 /*
@@ -922,8 +922,8 @@ HB_FUNC( HB_I18NGETBASELANGUAGENAME )
 
 HB_FUNC( HB_I18NSETBASELANGUAGE )
 {
-   char *szCode = hb_parc( 1 );
-   char *szName = hb_parc( 2 );
+   const char *szCode = hb_parc( 1 );
+   const char *szName = hb_parc( 2 );
    BOOL bChange = FALSE;
 
    if ( szCode == NULL || szName == NULL )

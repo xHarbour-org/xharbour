@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.40 2009/08/19 22:40:47 likewolf Exp $
+ * $Id: philes.c,v 1.41 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -444,7 +444,7 @@ HB_FUNC( HB_OSFILEMASK )
 
 HB_FUNC( HB_OPENPROCESS )
 {
-   char *szName = hb_parcx( 1 );
+   const char *szName = hb_parcx( 1 );
    PHB_ITEM pIn = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pOut = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pErr = hb_param( 4, HB_IT_BYREF );

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.22 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: files.c,v 1.23 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    #endif
 #endif
 
-ULONG hb_fsGetFileAttributes( char * szFile )
+ULONG hb_fsGetFileAttributes( const char * szFile )
 {
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
@@ -929,7 +929,7 @@ HB_FUNC( SETFDATI )
    if( hb_pcount() >= 1 )
    {
       PHB_ITEM pDate, pTime;
-      char *szFile = hb_parcx( 1 );
+      const char *szFile = hb_parcx( 1 );
       int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
 
       pDate = hb_param( 2, HB_IT_DATE );

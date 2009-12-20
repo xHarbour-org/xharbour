@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.7 2009/09/30 16:20:04 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.8 2009/11/09 09:39:06 marchuet Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -316,7 +316,7 @@ static int hb_selectWriteExceptSocket( HB_SOCKET_T hSocket, int timeout )
 }
 #endif
 
-static ULONG hb_getAddr( char * name )
+static ULONG hb_getAddr( const char * name )
 {
    ULONG ulAddr = inet_addr( name );
 
@@ -512,7 +512,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
    }
 }
 
-HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
+HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
 {
    HB_SOCKET_T hSocket = -1;
    ULONG ulAddr;
@@ -555,7 +555,7 @@ HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout )
    return hSocket;
 }
 
-HB_SOCKET_T hb_ipServer( int iPort, char * szAddress, int iListen )
+HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
 {
    HB_SOCKET_T hSocket;
    int iOpt = 1;
@@ -730,7 +730,7 @@ HB_FUNC( HB_IPSEND )
 HB_FUNC( HB_IPSERVER )
 {
    HB_SOCKET_T hSocket;
-   char * szAddress;
+   const char * szAddress;
    int iPort;
    int iListen;
 

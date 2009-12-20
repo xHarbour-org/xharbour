@@ -1,5 +1,5 @@
 /*
- * $Id: relation.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
+ * $Id: relation.c,v 1.3 2006/09/30 18:40:16 ptsarenko Exp $
  */
 
 /*
@@ -66,16 +66,16 @@ HB_FUNC (CHARRELA)
       ISCHAR (4))
   {  
 
-    char *pcStringToMatch1 = hb_parc (1);
+    const char *pcStringToMatch1 = hb_parc (1);
     size_t sStrToMatchLen1 = hb_parclen (1);
-    char *pcString1 = hb_parc (2);
+    const char *pcString1 = hb_parc (2);
     size_t sStrLen1 = hb_parclen (2);
-    char *pcStringToMatch2 = hb_parc (3);
+    const char *pcStringToMatch2 = hb_parc (3);
     size_t sStrToMatchLen2 = hb_parclen (3);
-    char *pcString2 = hb_parc (4);
+    const char *pcString2 = hb_parc (4);
     size_t sStrLen2 = hb_parclen (4);
 
-    char *pc1, *pc2;
+    const char *pc1, *pc2;
     size_t sOffset1, sOffset2;
     size_t sMatchStrLen;
 
@@ -177,20 +177,20 @@ HB_FUNC (CHARRELREP)
       ISCHAR (5))
   {  
 
-    char *pcStringToMatch1 = hb_parc (1);
+    const char *pcStringToMatch1 = hb_parc (1);
     size_t sStrToMatchLen1 = hb_parclen (1);
-    char *pcString1 = hb_parc (2);
+    const char *pcString1 = hb_parc (2);
     size_t sStrLen1 = hb_parclen (2);
-    char *pcStringToMatch2 = hb_parc (3);
+    const char *pcStringToMatch2 = hb_parc (3);
     size_t sStrToMatchLen2 = hb_parclen (3);
-    char *pcString2 = hb_parc (4);
+    const char *pcString2 = hb_parc (4);
     size_t sStrLen2 = hb_parclen (4);
-    char *pcReplace = hb_parc (5);
+    const char *pcReplace = hb_parc (5);
     size_t sReplaceLen = hb_parclen (5);
 
     char *pcRet;
 
-    char *pc1, *pc2;
+    const char *pc1, *pc2;
     size_t sOffset1, sOffset2;
     size_t sMatchStrLen;
 

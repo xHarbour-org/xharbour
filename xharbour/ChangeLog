@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6658 2009/12/16 16:16:22 andijahja Exp $
+ * $Id: ChangeLog,v 1.6659 2009/12/19 14:06:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,128 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-20 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/ctstr.h
+  * include/classes.h
+  * include/hbapidbg.h
+  * include/hbapilng.h
+  * include/hbipapi.h
+  * include/hbapi.h
+  * include/hbapifs.h
+  * include/hbtrace.h
+
+  * source/odbc/odbc.c
+
+  * source/common/hbtrace.c
+
+  * source/pp/pplib.c
+
+  * source/rtl/version.c
+  * source/rtl/ampm.c
+  * source/rtl/box.c
+  * source/rtl/set.c
+  * source/rtl/colorind.c
+  * source/rtl/copyfile.c
+  * source/rtl/dateshb.c
+  * source/rtl/direct.c
+  * source/rtl/disksphb.c
+  * source/rtl/fparse.c
+  * source/rtl/gtfunc.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/hbsyslog.c
+  * source/rtl/hbtoken.c
+  * source/rtl/is.c
+  * source/rtl/isprint.c
+  * source/rtl/langapi.c
+  * source/rtl/mlcfunc.c
+  * source/rtl/philes.c
+  * source/rtl/filesys.c
+  * source/rtl/regex.c
+  * source/rtl/replic.c
+  * source/rtl/samples.c
+  * source/rtl/tprinter.c
+  * source/rtl/trace.c
+  * source/rtl/strdel.c
+  * source/rtl/stuff.c
+  * source/rtl/txtline.c
+  * source/rtl/win32ole.prg
+  * source/rtl/win32prn.prg
+  * source/rtl/filenet.c
+  * source/rtl/hbip.c
+  * source/rtl/rat.c
+
+  * source/rdd/dbcmd.c
+  * source/rdd/dbcmdx.c
+  * source/rdd/dbcmd53.c
+
+  * source/vm/inet.c
+  * source/vm/extend.c
+  * source/vm/classes.c
+  * source/vm/dbgentry.c
+  * source/vm/dynlibhb.c
+  * source/vm/hbi18n.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+
+  * source/tip/base64x.c
+  * source/tip/encb64.prg
+  * source/tip/encqp.prg
+  * source/tip/encurl.prg
+
+  * source/ct/addascii.c
+  * source/ct/atadjust.c
+  * source/ct/ctstr.c
+  * source/ct/atrepl.c
+  * source/ct/bit1.c
+  * source/ct/charevod.c
+  * source/ct/charlist.c
+  * source/ct/charmirr.c
+  * source/ct/charmix.c
+  * source/ct/charone.c
+  * source/ct/charonly.c
+  * source/ct/charop.c
+  * source/ct/charrepl.c
+  * source/ct/charsort.c
+  * source/ct/charswap.c
+  * source/ct/count.c
+  * source/ct/dattime2.c
+  * source/ct/files.c
+  * source/ct/ftoc.c
+  * source/ct/justify.c
+  * source/ct/maxline.c
+  * source/ct/numat.c
+  * source/ct/numline.c
+  * source/ct/pos2.c
+  * source/ct/posdiff.c
+  * source/ct/print.c
+  * source/ct/relation.c
+  * source/ct/screen1.c
+  * source/ct/token1.c
+  * source/ct/token2.c
+  * source/ct/wordrepl.c
+  * source/ct/wordtoch.c
+  * source/ct/dattime3.c
+  * source/ct/asciisum.c
+  * source/ct/atnum.c
+
+  * contrib/rdd_ads/adsfunc.c
+
+  * contrib/libnf/color2n.c
+  * contrib/libnf/proper.c
+  * contrib/libnf/getver.c
+  * contrib/libnf/fttext.c
+  * contrib/libnf/ftattr.c
+
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/hbzlib/include/hbzip2.h
+  * contrib/hbzlib/zipcomp.cpp
+
+    ! char* ->const char* wherever applicable
+      (more to follow)
 
 2009-12-18 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/classes.h

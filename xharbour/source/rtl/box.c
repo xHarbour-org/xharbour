@@ -1,5 +1,5 @@
 /*
- * $Id: box.c,v 1.3 2004/07/10 01:44:21 guerra000 Exp $
+ * $Id: box.c,v 1.4 2008/12/10 00:47:31 likewolf Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC( DISPBOX )
 
    if( pTop && pLeft && pBottom && pRight )
    {
-      char * pszColor = ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL;
+      const char * pszColor = ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL;
       char szOldColor[ CLR_STRLEN ];
 
       if( pszColor )

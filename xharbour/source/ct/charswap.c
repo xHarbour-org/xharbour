@@ -1,5 +1,5 @@
 /*
- * $Id: charswap.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
+ * $Id: charswap.c,v 1.3 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -76,12 +76,12 @@ static void do_charswap (int iSwitch)
   if (ISCHAR (1))
   {
 
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
     char *pcRet;
     size_t sRetIndex = 0;
     int iShift, iMod;
-    char *pcSub;
+    const char *pcSub;
 
     if ( sStrLen == 0 )
     {

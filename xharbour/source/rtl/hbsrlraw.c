@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.32 2007/05/25 11:10:05 toninhofwi Exp $
+ * $Id: hbsrlraw.c,v 1.33 2009/08/19 22:40:47 likewolf Exp $
  */
 
 /*
@@ -325,7 +325,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
 }
 
 
-ULONG hb_serialNextRaw( char *cBuf )
+ULONG hb_serialNextRaw( const char *cBuf )
 {
    ULONG ulData, ulNext;
    ULONG ulCount;
@@ -457,7 +457,7 @@ HB_FUNC( HB_DESERIALBEGIN )
 
 HB_FUNC( HB_DESERIALIZEARRAY )
 {
-   char *cBuf;
+   const char *cBuf;
    PHB_ITEM pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
    PHB_DYNS pHB_Deserialize;
    LONG lLen, i, lArrayLen, lNext;

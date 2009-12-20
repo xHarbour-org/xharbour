@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c,v 1.5 2008/08/21 12:47:44 marchuet Exp $
+ * $Id: dbcmdx.c,v 1.6 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ HB_FUNC( ORDWILDSEEK )
 
    if( pArea )
    {
-      char * szPattern = hb_parc( 1 );
+      const char * szPattern = hb_parc( 1 );
 
       if( szPattern )
       {

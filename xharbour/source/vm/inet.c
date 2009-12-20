@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.78 2008/12/22 22:09:45 likewolf Exp $
+* $Id: inet.c,v 1.79 2009/11/09 09:39:22 marchuet Exp $
 */
 
 /*
@@ -210,7 +210,7 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT *Socket )
 
 
 /*** Utilty to access host DNS */
-static struct hostent * hb_getHosts( char * name, HB_SOCKET_STRUCT *Socket )
+static struct hostent * hb_getHosts( const char * name, HB_SOCKET_STRUCT *Socket )
 {
    struct hostent *Host = NULL;
 
@@ -1509,7 +1509,7 @@ HB_FUNC( INETSENDALL )
 
 HB_FUNC( INETGETHOSTS )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    struct hostent *Host;
    char ** cHosts;
    int iCount = 0;
@@ -1558,7 +1558,7 @@ HB_FUNC( INETGETHOSTS )
 
 HB_FUNC( INETGETALIAS )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    struct hostent *Host;
    char ** cHosts;
    int iCount = 0;
@@ -1796,7 +1796,7 @@ HB_FUNC( INETACCEPT )
 
 HB_FUNC( INETCONNECT )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 3 );
    PHB_ITEM pSocket = NULL;
    struct hostent *Host;
@@ -1867,7 +1867,7 @@ HB_FUNC( INETCONNECT )
 
 HB_FUNC( INETCONNECTIP )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 3 );
    PHB_ITEM pSocket = NULL;
    int iPort = hb_parni( 2 );
@@ -2065,7 +2065,7 @@ HB_FUNC( INETDGRAM )
 HB_FUNC( INETDGRAMSEND )
 {
    HB_SOCKET_STRUCT *Socket = HB_PARSOCKET( 1 );
-   char * szAddress = hb_parcx( 2 );
+   const char * szAddress = hb_parcx( 2 );
    int iPort = hb_parni( 3 );
    PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
    int iLen;

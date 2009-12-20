@@ -206,7 +206,7 @@ extern void * hb_mthRequested( void );
 
 extern void hb_clsFinalize( PHB_ITEM pObject );
 
-extern HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName );
+extern HB_EXPORT UINT hb_clsGetHandleFromName( const char *szClassName );
 extern HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 extern HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule );
 

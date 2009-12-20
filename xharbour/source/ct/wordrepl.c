@@ -1,5 +1,5 @@
 /*
- * $Id: wordrepl.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
+ * $Id: wordrepl.c,v 1.3 2006/09/30 18:40:16 ptsarenko Exp $
  */
 
 /*
@@ -76,10 +76,10 @@ HB_FUNC (WORDREPL)
   {
 
     /* get parameters */
-    char *pcSearch = hb_parc (1);
-    char *pcString = hb_parc (2);
+    const char *pcSearch = hb_parc (1);
+    const char *pcString = hb_parc (2);
     size_t sStrLen = (size_t)hb_parclen (2);
-    char *pcReplace = hb_parc (3);
+    const char *pcReplace = hb_parc (3);
     int iMode;
     char *pcRet;
     size_t sIndex;
@@ -100,7 +100,7 @@ HB_FUNC (WORDREPL)
     {
     
       size_t sMatchStrLen;
-      char *pc;
+      const char *pc;
       size_t sReplIndex = sIndex;
 
       if (sReplIndex > (sReplaceLen&0xFFFFFFFE))

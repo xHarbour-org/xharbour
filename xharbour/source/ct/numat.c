@@ -1,5 +1,5 @@
 /*
- * $Id: numat.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: numat.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ HB_FUNC(NUMAT)
 
   if ((ISCHAR (1)) && (ISCHAR (2)))
   {
-    
+
     char *pcStringToMatch = (char *)hb_parc (1);
     size_t sStrToMatchLen = (size_t)hb_parclen (1);
     char *pcString        = (char *)hb_parc (2);
@@ -72,7 +72,7 @@ HB_FUNC(NUMAT)
     char cAtLike          = ct_getatlikechar();
     size_t sIgnore, sMatchStrLen, sSubStrLen;
     ULONG ulCounter;
-    char *pc, *pcSubStr;
+    const char *pc, *pcSubStr;
 
     /* eventually ignore some characters */
     if (ISNUM (3))

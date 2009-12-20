@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.35 2009/02/24 14:28:41 ronpinkas Exp $
+ * $Id: dbgentry.c,v 1.36 2009/03/02 09:20:17 marchuet Exp $
  */
 
 /*
@@ -537,8 +537,7 @@ static char * hb_dbgStripModuleName( char * szName )
    return szName;
 }
 
-
-void hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction )
+void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, char *szFunction )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    HB_BREAKPOINT *pBreak;
@@ -764,7 +763,7 @@ static void hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cTy
 }
 
 
-void hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace )
+void hb_dbgAddWatch( void *handle, const char *szExpr, BOOL bTrace )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    HB_WATCHPOINT *pWatch;
@@ -1301,7 +1300,7 @@ static PHB_ITEM hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
 }
 
 
-PHB_ITEM hb_dbgGetExpressionValue( void *handle, char *expression )
+PHB_ITEM hb_dbgGetExpressionValue( void *handle, const char *expression )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    PHB_ITEM result;
@@ -1367,7 +1366,7 @@ static BOOL hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine )
 }
 
 
-BOOL hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine )
+BOOL hb_dbgIsValidStopLine( void *handle, const char *szModule, int nLine )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    int nModules = hb_itemSize( info->pStopLines );
@@ -1477,7 +1476,7 @@ void hb_dbgSetQuit( void *handle )
 }
 
 
-void hb_dbgSetToCursor( void *handle, char *szModule, int nLine )
+void hb_dbgSetToCursor( void *handle, const char *szModule, int nLine )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
 
@@ -1496,7 +1495,7 @@ void hb_dbgSetTrace( void *handle )
 }
 
 
-void hb_dbgSetWatch( void *handle, int nWatch, char *szExpr, BOOL bTrace )
+void hb_dbgSetWatch( void *handle, int nWatch, const char *szExpr, BOOL bTrace )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    HB_WATCHPOINT *pWatch = &info->aWatch[ nWatch ];

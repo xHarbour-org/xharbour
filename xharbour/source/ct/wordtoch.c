@@ -1,5 +1,5 @@
 /*
- * $Id: wordtoch.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: wordtoch.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -89,9 +89,9 @@ HB_FUNC (WORDTOCHAR)
     *pcRet = *pcString;  /* copy first char */
     do
     {
-      
+
       size_t sMatchStrLen;
-      char *pc;
+      const char *pc;
       size_t sReplIndex;
 
       *(pcRet+sRetIndex+1) = *(pcString+sIndex+1);

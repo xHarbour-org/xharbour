@@ -1,5 +1,5 @@
 /*
- * $Id: charonly.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charonly.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -74,14 +74,14 @@ static void do_charonly (int iSwitch)
   if (ISCHAR (1) && ISCHAR (2))
   {
 
-    char *pcString = hb_parc (2);
+    const char *pcString = hb_parc (2);
     size_t sStrLen = (size_t)hb_parclen (2);
-    char *pcOnlySet = hb_parc (1);
+    const char *pcOnlySet = hb_parc (1);
     size_t sOnlySetLen = (size_t)hb_parclen (1);
     char *pcRet;
     size_t sRetStrLen = 0;
     int iShift, iBool;
-    char *pcSub, *pc;
+    const char *pcSub, *pc;
 
     /* check for zero-length strings  */
     switch (iSwitch)

@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.13 2009/01/24 00:33:09 likewolf Exp $
+ * $Id: langapi.c,v 1.14 2009/01/24 16:53:10 likewolf Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_LANG_REQUEST( HB_LANG_DEFAULT );
 static PHB_LANG s_langList[ HB_LANG_MAX_ ];
 static PHB_LANG s_lang = NULL;
 
-static int hb_langFindPos( char * pszID )
+static int hb_langFindPos( const char * pszID )
 {
    int iPos;
 
@@ -133,7 +133,7 @@ BOOL hb_langDeRegister( char * pszID )
       return FALSE;
 }
 
-PHB_LANG hb_langFind( char * pszID )
+PHB_LANG hb_langFind( const char * pszID )
 {
    int iPos;
 
@@ -171,7 +171,7 @@ PHB_LANG hb_langSelect( PHB_LANG lang )
    return langOld;
 }
 
-char * hb_langSelectID( char * pszID )
+char * hb_langSelectID( const char * pszID )
 {
    char * pszIDOld = hb_langID();
 

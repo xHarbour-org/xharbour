@@ -1,5 +1,5 @@
 /*
- * $Id: print.c,v 1.4 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: print.c,v 1.5 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ HB_FUNC( PRINTSEND )
 #elif defined( HB_OS_WIN )
    char szChr[ 2 ] = { ' ', '\0' };
    char szPort[ 5 ] = { 'l', 'p', 't', '1', '\0' };
-   char *szStr = NULL;
+   const char *szStr = NULL;
    USHORT usLen = 0, usRet = 0;
 
    if( ISNUM( 1 ) )

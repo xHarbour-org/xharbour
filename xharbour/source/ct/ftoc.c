@@ -1,5 +1,5 @@
 /*
- *  $Id: ftoc.c,v 1.4 2004/06/01 13:41:33 likewolf Exp $
+ *  $Id: ftoc.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ HB_FUNC( CTOF )
       double value;
       char   string[ sizeof( double ) ];
    } xConvert;
-   char *pcString;
+   const char *pcString;
 
    if ( hb_parclen( 1 ) >= sizeof( double ) )
    {

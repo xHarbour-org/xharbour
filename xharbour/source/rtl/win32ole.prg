@@ -1228,11 +1228,11 @@ RETURN Self
   //---------------------------------------------------------------------------//
   HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
   {
-     char *cString = hb_parc( 1 );
+     const char *cString = hb_parc( 1 );
 
      if( cString )
      {
-        LPWSTR wString = hb_oleAnsiToWide( cString );
+        LPWSTR wString = hb_oleAnsiToWide( (LPSTR) cString );
 
         if( wString )
         {

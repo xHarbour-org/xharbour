@@ -1,5 +1,5 @@
 /*
- * $Id: base64x.c,v 1.4 2004/11/21 21:44:23 druzus Exp $
+ * $Id: base64x.c,v 1.5 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
  * string should be freed when not used anymore.
  */
 
-static char * base64enc( char *s, size_t s_len )
+static char * base64enc( const char *s, size_t s_len )
 {
    char b64chars[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -111,8 +111,8 @@ static char * base64enc( char *s, size_t s_len )
 HB_FUNC( BUILDUSERPASSSTRING )
 {
    char * s;
-   char * szUser = hb_parcx( 1 );
-   char * szPass = hb_parcx( 2 );
+   const char * szUser = hb_parcx( 1 );
+   const char * szPass = hb_parcx( 2 );
    size_t p_len = strlen( szPass );
    size_t u_len = strlen( szUser );
 
@@ -126,7 +126,7 @@ HB_FUNC( BUILDUSERPASSSTRING )
 
 HB_FUNC( HB_BASE64 )
 {
-   char * szItem = hb_parcx( 1 );
+   const char * szItem = hb_parcx( 1 );
    int nLen = hb_parni( 2 );
    char * szRet = base64enc( szItem, nLen );
 

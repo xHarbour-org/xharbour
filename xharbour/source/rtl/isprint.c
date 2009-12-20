@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.28 2009/10/22 22:58:31 lculik Exp $
+ * $Id: isprint.c,v 1.29 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -76,13 +76,13 @@
    static DWORD IsPrinterError(HANDLE hPrinter);
 
    static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs);
-          DWORD hb_printerIsReadyn( char * pszPrinterName );
+          DWORD hb_printerIsReadyn( const char * pszPrinterName );
    static DWORD IsPrinterErrorn(HANDLE hPrinter);
    extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 #endif
 #define MAXBUFFERSIZE 255    // 7/10/2003 12:51p.m.
 
-BOOL hb_printerIsReady( char * pszPrinterName )
+BOOL hb_printerIsReady( const char * pszPrinterName )
 {
    BOOL bIsPrinter;
 
@@ -127,7 +127,7 @@ BOOL hb_printerIsReady( char * pszPrinterName )
       HANDLE hPrinter;
 
       if (*pszPrinterName) {
-        bIsPrinter= OpenPrinter( pszPrinterName, &hPrinter, NULL ) ;
+        bIsPrinter= OpenPrinter( (LPSTR) pszPrinterName, &hPrinter, NULL ) ;
         if (bIsPrinter ) {
           bIsPrinter = (BOOL) !IsPrinterError( hPrinter );
           CloseHandle(hPrinter) ;
@@ -306,12 +306,12 @@ static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs) {
   return Result;
 }
 
-DWORD hb_printerIsReadyn( char * pszPrinterName )
+DWORD hb_printerIsReadyn( const char * pszPrinterName )
 {
   DWORD dwPrinter= -1;
   HANDLE hPrinter;
 
-  if (*pszPrinterName && OpenPrinter( pszPrinterName, &hPrinter, NULL )) {
+  if (*pszPrinterName && OpenPrinter( (LPSTR) pszPrinterName, &hPrinter, NULL )) {
     dwPrinter =  IsPrinterErrorn( hPrinter );
     CloseHandle(hPrinter) ;
   }
@@ -323,7 +323,7 @@ HB_FUNC( XISPRINTER )
   char DefaultPrinter[MAXBUFFERSIZE];
   DWORD pdwBufferSize = MAXBUFFERSIZE;
   hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : (char*)DefaultPrinter ) );
+  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : DefaultPrinter ) );
 }
 
 #endif

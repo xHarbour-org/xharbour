@@ -1,5 +1,5 @@
 /*
- * $Id: token2.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: token2.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -301,15 +301,15 @@ HB_FUNC (TOKENINIT)
   if (ISCHAR (1))
   {
 
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcSeparatorStr;
+    const char *pcSeparatorStr;
     size_t sSeparatorStrLen;
     ULONG ulSkipCnt, ulSkip;
 
-    char *pcSubStr, *pc;
+    const char *pcSubStr, *pc;
     size_t sSubStrLen;
-    
+
     TOKEN_ENVIRONMENT sTokenEnvironment;
     TOKEN_POSITION sTokenPosition;
 
@@ -490,7 +490,7 @@ HB_FUNC (TOKENNEXT)
 
   if (ISCHAR (1))
   {
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
 
     TOKEN_ENVIRONMENT sTokenEnvironment;
@@ -812,7 +812,7 @@ HB_FUNC (RESTTOKEN)
 
   if (ISCHAR (1))
   {
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
     
     TOKEN_ENVIRONMENT sTokenEnvironment;

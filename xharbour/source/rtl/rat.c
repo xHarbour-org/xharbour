@@ -1,5 +1,5 @@
 /*
- * $Id: rat.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: rat.c,v 1.4 2008/12/22 19:44:01 enricomaria Exp $
  */
 
 /*
@@ -62,8 +62,8 @@ HB_FUNC( RAT )
 
       if( lPos >= 0 )
       {
-         char * pszSub = hb_parcx( 1 );
-         char * pszText = hb_parcx( 2 );
+         const char * pszSub = hb_parcx( 1 );
+         const char * pszText = hb_parcx( 2 );
          LONG lEnd = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
          BOOL bFound = FALSE;
 

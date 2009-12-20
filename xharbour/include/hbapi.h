@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.266 2009/11/21 20:54:56 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.267 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -396,11 +396,11 @@ extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before
 extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
 
 /* Extend API */
-extern HB_FORCE_EXPORT char *     hb_parc( int iParam, ... );  /* retrieve a string parameter */
-extern HB_EXPORT       char *     hb_parcx( int iParam, ... );  /* retrieve a string parameter */
+extern HB_FORCE_EXPORT const char * hb_parc( int iParam, ... );  /* retrieve a string parameter */
+extern HB_EXPORT       const char * hb_parcx( int iParam, ... );  /* retrieve a string parameter */
 extern HB_FORCE_EXPORT ULONG      hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
 extern HB_FORCE_EXPORT ULONG      hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
-extern HB_FORCE_EXPORT char *     hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern HB_FORCE_EXPORT const char * hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
 extern HB_EXPORT       char *     hb_pardts( int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
 extern HB_FORCE_EXPORT char *     hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
 extern HB_EXPORT       char *     hb_pardtsbuff( char * szDateTime, int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
@@ -992,9 +992,9 @@ extern HB_EXPORT ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, con
 /* Misc */
 extern HB_EXPORT char *  hb_strLowerCopy( char * szText, ULONG ulLen );
 extern HB_EXPORT HB_LONG hb_strValInt( const char * szText, int * iOverflow );
-extern HB_EXPORT int     Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+extern HB_EXPORT int     Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
 extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
-extern HB_EXPORT HB_ULONG hb_hextonum(char *cHex);
+extern HB_EXPORT HB_ULONG hb_hextonum(const char *cHex);
 
 #include "local.h"
 

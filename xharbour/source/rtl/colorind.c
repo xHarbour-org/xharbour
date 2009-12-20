@@ -1,5 +1,5 @@
 /*
- * $Id: colorind.c,v 1.3 2004/03/18 03:58:36 ronpinkas Exp $
+ * $Id: colorind.c,v 1.4 2008/12/01 11:44:59 marchuet Exp $
  */
 
 /*
@@ -56,7 +56,7 @@ HB_FUNC( HB_COLORINDEX )
 {
    if( ISCHAR( 1 ) && ISNUM( 2 ) )
    {
-      char * pszColor = hb_parc( 1 );
+      const char * pszColor = hb_parc( 1 );
       ULONG ulColorPos;
       ULONG ulColorLen;
       USHORT uiColorIndex = ( USHORT ) hb_parni( 2 );

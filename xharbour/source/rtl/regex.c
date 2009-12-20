@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.64 2009/02/20 12:48:26 marchuet Exp $
+ * $Id: regex.c,v 1.65 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -566,7 +566,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
  Caller must allocate sRegEx with enough space for conversion.
  returns the length of the resulting RegEx.
  */
-int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
+int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 {
    char cChar;
    int iLen = strlen( sWild );

@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.17 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: fttext.c,v 1.18 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -141,11 +141,11 @@ static PFT_FFILE pCurFile = NULL;
 static PFT_FFILE pFT = NULL;
 static int iSelect = 0;
 static ULONG uBuffSize = 0;
-static char *szNewLine;
+static const char *szNewLine;
 
 static BOOL ft_fread ( FILE *, char * );
 static PFT_FFILE ft_fseekAlias ( int );
-static PFT_FFILE ft_fseekArea ( char * );
+static PFT_FFILE ft_fseekArea ( const char * );
 static BOOL ft_fseekActive( void );
 #ifdef __LINE_COUNT__
 static ULONG ft_flinecount ( FILE * );
@@ -763,7 +763,7 @@ HB_FUNC( FT_FAPPEND )
    {
       PHB_ITEM  Tmp = hb_itemNew( NULL );
       LONG lStart;
-      char *szAppend = ISCHAR(2) ? hb_parcx(2) : (char*) "";
+      const char *szAppend = ISCHAR(2) ? hb_parcx(2) : (char*) "";
 
       for( lStart = 1; lStart <= lAppend ; lStart ++ )
       {
@@ -1053,7 +1053,7 @@ HB_FUNC_EXIT( FT_FEXIT )
 }
 
 //------------------------------------------------------------------------------
-static PFT_FFILE ft_fseekArea( char *szSeek )
+static PFT_FFILE ft_fseekArea( const char *szSeek )
 {
    PFT_FFILE pTmp;
 

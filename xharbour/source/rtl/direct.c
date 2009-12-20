@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.67 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: direct.c,v 1.68 2009/09/30 16:20:04 marchuet Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    }
 }
 
-void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
+void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
    USHORT    uiMask, uiMaskNoLabel;
    const char *   szDirSpec;

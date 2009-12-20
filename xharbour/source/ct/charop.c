@@ -1,5 +1,5 @@
 /*
- * $Id: charop.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
+ * $Id: charop.c,v 1.3 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ static void do_charop (int iSwitch)
       {
         if (ISCHAR (2))
         {
-          char *pucString2 = hb_parc (2);
+          const char *pucString2 = hb_parc (2);
           size_t sStrLen2 = hb_parclen (2);
 
           for (sPos = 0; sPos < sStrLen; sPos++)
@@ -232,7 +232,7 @@ static void do_charop (int iSwitch)
       {
         if (ISCHAR (2))
         {
-          char *pucString2 = hb_parc (2);
+          const char *pucString2 = hb_parc (2);
           size_t sStrLen2 = hb_parclen (2);
 
           for (sPos = 0; sPos < sStrLen; sPos++)
@@ -257,7 +257,7 @@ static void do_charop (int iSwitch)
       {
         if (ISCHAR (2))
         {
-          char *pucString2 = hb_parc (2);
+          const char *pucString2 = hb_parc (2);
           size_t sStrLen2 = hb_parclen (2);
 
           for (sPos = 0; sPos < sStrLen; sPos++)
@@ -282,7 +282,7 @@ static void do_charop (int iSwitch)
       {
         if (ISCHAR (2))
         {
-          char *pucString2 = hb_parc (2);
+          const char *pucString2 = hb_parc (2);
           size_t sStrLen2 = hb_parclen (2);
 
           for (sPos = 0; sPos < sStrLen; sPos++)
@@ -307,7 +307,7 @@ static void do_charop (int iSwitch)
       {
         if (ISCHAR (2))
         {
-          char *pucString2 = hb_parc (2);
+          const char *pucString2 = hb_parc (2);
           size_t sStrLen2 = hb_parclen (2);
 
           for (sPos = 0; sPos < sStrLen; sPos++)

@@ -1,4 +1,4 @@
-/*  $Id: hbipapi.h,v 1.2 2009/07/29 17:15:54 marchuet Exp $  */
+/*  $Id: hbipapi.h,v 1.3 2009/11/09 09:38:44 marchuet Exp $  */
 
 /*
  * Harbour Project source code:
@@ -70,8 +70,8 @@
 extern int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout );
 extern int hb_ipRecv( HB_SOCKET_T hSocket, char *Buffer, int iMaxLen );
 extern int hb_ipSend( HB_SOCKET_T hSocket, char *Buffer, int iSend, int timeout );
-extern HB_SOCKET_T hb_ipConnect( char * szHost, int iPort, int timeout );
-extern HB_SOCKET_T hb_ipServer( int iPort, char * szAddress, int iListen );
+extern HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout );
+extern HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen );
 extern HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long int * lPort );
 extern void   hb_ipInit( void );
 extern void   hb_ipCleanup( void );

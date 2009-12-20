@@ -1,5 +1,5 @@
 /*
- * $Id: ctstr.c,v 1.1 2003/03/04 21:04:28 lculik Exp $
+ * $Id: ctstr.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -75,8 +75,8 @@ int ct_str_exit (void)
 /* -------------------------- */
 /* search for exact substring */
 /* -------------------------- */
-char *ct_at_exact_forward (char *pcString, size_t sStrLen,
-                           char *pcMatch, size_t sMatchLen,
+const char *ct_at_exact_forward (const char *pcString, size_t sStrLen,
+                           const char *pcMatch, size_t sMatchLen,
                            size_t *psMatchStrLen)
 {
 
@@ -101,25 +101,25 @@ char *ct_at_exact_forward (char *pcString, size_t sStrLen,
   }
 
 }
-  
+
 
 /* ------------------------------------------------ */
 /* search for exact substring in backward direction */
 /* ------------------------------------------------ */
-char *ct_at_exact_backward (char *pcString, size_t sStrLen,
-                            char *pcMatch, size_t sMatchLen,
+const char *ct_at_exact_backward (const char *pcString, size_t sStrLen,
+                            const char *pcMatch, size_t sMatchLen,
                             size_t *psMatchStrLen)
 {
 
   size_t sIndex;
-  char *pcRet;
+  const char *pcRet;
 
   HB_TRACE(HB_TR_DEBUG, ("ct_at_exact_backward (\"%s\", %u, \"%s\", %u, %p)",
                          pcString, sStrLen, pcMatch, sMatchLen, psMatchStrLen));
-  
+
   if ((sMatchLen == 0) || (sStrLen < sMatchLen))
     return (NULL);
-  
+
   for (pcRet = pcString+sStrLen-sMatchLen; pcRet >= pcString; pcRet--)
   {
     for (sIndex = 0; sIndex < sMatchLen; sIndex++)
@@ -142,13 +142,13 @@ char *ct_at_exact_backward (char *pcString, size_t sStrLen,
 /* ----------------------------------- */
 /* search for substring using wildcard */
 /* ----------------------------------- */
-char *ct_at_wildcard_forward (char *pcString, size_t sStrLen,
-                              char *pcMatch, size_t sMatchLen,
+const char *ct_at_wildcard_forward (const char *pcString, size_t sStrLen,
+                              const char *pcMatch, size_t sMatchLen,
                               char cWildCard, size_t *psMatchStrLen)
 {
 
   size_t sIndex;
-  char *pcRet, *pcStop;
+  const char *pcRet, *pcStop;
 
   HB_TRACE(HB_TR_DEBUG, ("ct_at_wildcard_forward (\"%s\", %u, \"%s\", %u, \'%c\', %p)",
                          pcString, sStrLen, pcMatch, sMatchLen, cWildCard, psMatchStrLen));
@@ -181,13 +181,13 @@ char *ct_at_wildcard_forward (char *pcString, size_t sStrLen,
 /* --------------------------------------------------------- */
 /* search for substring using wildcard in backward direction */
 /* --------------------------------------------------------- */
-char *ct_at_wildcard_backward (char *pcString, size_t sStrLen,
-                               char *pcMatch, size_t sMatchLen,
+const char *ct_at_wildcard_backward (const char *pcString, size_t sStrLen,
+                               const char *pcMatch, size_t sMatchLen,
                                char cWildCard, size_t *psMatchStrLen)
 {
 
   size_t sIndex;
-  char *pcRet;
+  const char *pcRet;
 
   HB_TRACE(HB_TR_DEBUG, ("ct_at_wildcard_backward (\"%s\", %u, \"%s\", %u, \'%c\', %p)",
                          pcString, sStrLen, pcMatch, sMatchLen, cWildCard, psMatchStrLen));
@@ -211,7 +211,7 @@ char *ct_at_wildcard_backward (char *pcString, size_t sStrLen,
       return (pcRet);
     }
   }
-  
+
   return (NULL);
 
 }
@@ -220,21 +220,21 @@ char *ct_at_wildcard_backward (char *pcString, size_t sStrLen,
 /* ------------------------------- */
 /* search for character from a set */
 /* ------------------------------- */
-char *ct_at_charset_forward (char *pcString, size_t sStrLen,
-                             char *pcCharSet, size_t sCharSetLen,
+const char *ct_at_charset_forward (const char *pcString, size_t sStrLen,
+                             const char *pcCharSet, size_t sCharSetLen,
                              size_t *psMatchedCharPos)
 {
-  
-  char *pcRet, *pcSet, *pcStop1, *pcStop2;
+
+  const char *pcRet, *pcSet, *pcStop1, *pcStop2;
 
   HB_TRACE(HB_TR_DEBUG, ("ct_at_charset_forward (\"%s\", %u, \"%s\", %u, %p)",
                           pcString, sStrLen, pcCharSet, sCharSetLen, psMatchedCharPos));
-  
+
   *(psMatchedCharPos) = sCharSetLen;
-                        
+
   if ((sCharSetLen == 0) || (sStrLen == 0))
     return (NULL);
-  
+
   pcStop1 = pcString+sStrLen;
   pcStop2 = pcCharSet+sCharSetLen;
   for (pcRet = pcString; pcRet < pcStop1; pcRet++)
@@ -247,7 +247,7 @@ char *ct_at_charset_forward (char *pcString, size_t sStrLen,
         return (pcRet);
       }
   }
-  
+
   return (NULL);
 
 }
@@ -256,21 +256,21 @@ char *ct_at_charset_forward (char *pcString, size_t sStrLen,
 /* ----------------------------------------------------- */
 /* search for character from a set in backward direction */
 /* ----------------------------------------------------- */
-char *ct_at_charset_backward (char *pcString, size_t sStrLen,
-                              char *pcCharSet, size_t sCharSetLen,
+const char *ct_at_charset_backward (const char *pcString, size_t sStrLen,
+                              const char *pcCharSet, size_t sCharSetLen,
                               size_t *psMatchedCharPos)
 {
 
-  char *pcRet, *pcSet, *pcStop;
+  const char *pcRet, *pcSet, *pcStop;
 
   HB_TRACE(HB_TR_DEBUG, ("ct_at_charset_backward (\"%s\", %u, \"%s\", %u, %p)",
                           pcString, sStrLen, pcCharSet, sCharSetLen, psMatchedCharPos));
-  
+
   *(psMatchedCharPos) = sCharSetLen;
 
   if ((sCharSetLen == 0) || (sStrLen == 0))
     return (NULL);
-  
+
   pcStop = pcCharSet+sCharSetLen;
   for (pcRet = pcString+sStrLen-1; pcRet >= pcString; pcRet--)
   {
@@ -282,13 +282,13 @@ char *ct_at_charset_backward (char *pcString, size_t sStrLen,
         return (pcRet);
       }
   }
-  
+
   return (NULL);
 
 }
 
 
-/*  
+/*
  *  CSETREF() stuff
  */
 
@@ -458,7 +458,7 @@ HB_FUNC (SETATLIKE)
     }
     else
     {
-      char *pcNewChar = hb_parc (2);
+      const char *pcNewChar = hb_parc (2);
       if (hb_parclen (2) > 0)
         ct_setatlikechar (*pcNewChar);
     }

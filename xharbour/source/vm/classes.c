@@ -2078,7 +2078,8 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
 HB_FUNC( __CLSADDMSG )
 {
    USHORT   uiClass, uiScope, wType, uiSprClass = 0, uiID;
-   char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN + 1 ];
+   const char *szMessage;
+   char  szAssign[ HB_SYMBOL_NAME_LEN + 1 ];
    void *   pFunc_or_BlockPointer;
    PHB_ITEM pInit = NULL;
    PHB_ITEM pMsgIs = NULL;
@@ -2569,7 +2570,7 @@ HB_FUNC( __CLSNEW )
 {
    HB_THREAD_STUB_API
 
-   char * szClassName;
+   const char * szClassName;
    PHB_ITEM pDatas, pMethods, pSuperArray, pBaseLevel;
 
    szClassName = hb_parc( 1 );
@@ -3398,7 +3399,7 @@ HB_FUNC( __CLSINSTSUPER )
 
    if( hb_pcount() >= 1 )
    {
-      char *szString = hb_parcx( 1 );
+      const char *szString = hb_parcx( 1 );
       PHB_DYNS pDynSym;
 
       pDynSym = hb_dynsymFind( szString );
@@ -4753,7 +4754,7 @@ HB_FUNC( HB_OBJMSGPTR )
  * Param: the name of the class
  * output: the position of the class in the array of classes, or nothing.
  */
-UINT hb_clsGetHandleFromName( char *szClassName )
+UINT hb_clsGetHandleFromName( const char *szClassName )
 {
    PCLASS start = s_pClasses;
    USHORT uPos = 0;
@@ -4781,7 +4782,7 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
    HB_THREAD_STUB_API
 
-   szClass = hb_strUpperCopy( hb_parcx(1), hb_parclen(1) );
+   szClass = hb_strUpperCopy( (char*) hb_parcx(1), hb_parclen(1) );
 
    uiClass = hb_clsGetHandleFromName( szClass );
 
@@ -4964,7 +4965,7 @@ HB_FUNC( __CLSFRIENDLY )
 HB_FUNC( __CLSASSOCTYPE )
 {
    USHORT uiClass = (USHORT) hb_parni( 1 );
-   char *szType = hb_parcx(2);
+   const char *szType = hb_parcx(2);
 
    if( __cls_CntMethods( uiClass, hb___msgGetData ) )
    {
@@ -5025,7 +5026,7 @@ HB_FUNC( __CLSINSTNAME )
 {
    HB_THREAD_STUB_STACK
 
-   char *szClassName = hb_parc( 1 );
+   const char *szClassName = hb_parc( 1 );
 
    if( szClassName )
    {

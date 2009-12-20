@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.6 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: hbtoken.c,v 1.7 2008/06/27 06:21:49 ronpinkas Exp $
  */
 
 /*
@@ -60,8 +60,8 @@
 
 /* This functionality will be activated on the next release */
 
-static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
-                            char * szDelim, ULONG ulDelim,
+static ULONG hb_tokenCount( const char * szLine, ULONG ulLen,
+                            const char * szDelim, ULONG ulDelim,
                             BOOL fSkipStrings, BOOL fDoubleQuoteOnly )
 {
    ULONG ul = 0, ulTokens = 1;
@@ -94,8 +94,8 @@ static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
    return ulTokens;
 }
 
-static char * hb_tokenGet( char * szLine, ULONG ulLen,
-                           char * szDelim, ULONG ulDelim,
+static const char * hb_tokenGet( const char * szLine, ULONG ulLen,
+                           const char * szDelim, ULONG ulDelim,
                            BOOL fSkipStrings, BOOL fDoubleQuoteOnly,
                            ULONG ulToken, ULONG * pulLen )
 {
@@ -137,8 +137,8 @@ static char * hb_tokenGet( char * szLine, ULONG ulLen,
    return NULL;
 }
 
-static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
-                               char * szDelim, ULONG ulDelim,
+static PHB_ITEM hb_tokenArray( const char * szLine, ULONG ulLen,
+                               const char * szDelim, ULONG ulDelim,
                                BOOL fSkipStrings, BOOL fDoubleQuoteOnly )
 {
    ULONG ulTokens = hb_tokenCount( szLine, ulLen, szDelim, ulDelim,
@@ -179,10 +179,10 @@ static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
 }
 
 static void hb_tokenParam( int iDelim, ULONG ulSkip,
-                           char ** pszLine, ULONG * pulLen,
-                           char ** pszDelim, ULONG * pulDelim )
+                           const char ** pszLine, ULONG * pulLen,
+                           const char ** pszDelim, ULONG * pulDelim )
 {
-   char * szLine = hb_parc( 1 ), * szDelim = NULL;
+   const char * szLine = hb_parc( 1 ), * szDelim = NULL;
    ULONG ulLen = hb_parclen( 1 ), ulDelim = 0;
 
    if( ulLen )
@@ -225,7 +225,7 @@ static void hb_tokenParam( int iDelim, ULONG ulSkip,
 
 HB_FUNC( HB_TOKENCOUNT )
 {
-   char * szLine, * szDelim;
+   const char * szLine, * szDelim;
    ULONG ulLen, ulDelim;
 
    hb_tokenParam( 2, 0, &szLine, &ulLen, &szDelim, &ulDelim );
@@ -239,7 +239,7 @@ HB_FUNC( HB_TOKENCOUNT )
 
 HB_FUNC( HB_TOKENGET )
 {
-   char * szLine, * szDelim;
+   const char * szLine, * szDelim;
    ULONG ulLen, ulDelim;
 
    hb_tokenParam( 3, 0, &szLine, &ulLen, &szDelim, &ulDelim );
@@ -261,7 +261,7 @@ HB_FUNC( HB_TOKENGET )
  */
 HB_FUNC( HB_TOKENPTR )
 {
-   char * szLine, * szDelim, * szToken;
+   const char * szLine, * szDelim, * szToken;
    ULONG ulLen, ulDelim, ulSkip, ulToken;
 
    hb_tokenParam( 3, hb_parnl( 2 ), &szLine, &ulLen, &szDelim, &ulDelim );
@@ -287,7 +287,7 @@ HB_FUNC( HB_TOKENPTR )
 
 HB_FUNC( HB_ATOKENS2 )
 {
-   char * szLine, * szDelim;
+   const char * szLine, * szDelim;
    ULONG ulLen, ulDelim;
 
    hb_tokenParam( 2, 0, &szLine, &ulLen, &szDelim, &ulDelim );
@@ -299,7 +299,7 @@ HB_FUNC( HB_ATOKENS2 )
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-static char * hb_strToken( char * szText, ULONG ulText,
+static const char * hb_strToken( const char * szText, ULONG ulText,
                            ULONG ulIndex,
                            char cDelimiter,
                            ULONG * pulLen )
@@ -355,7 +355,7 @@ static char * hb_strToken( char * szText, ULONG ulText,
  *
  * hb_strTokenCount returns the number of tokens inside the string
 */
-static ULONG hb_strTokenCount( char * szText, ULONG ulText,
+static ULONG hb_strTokenCount( const char * szText, ULONG ulText,
                                char cDelimiter )
 {
    ULONG ulStart;
@@ -400,7 +400,7 @@ static ULONG hb_strTokenCount( char * szText, ULONG ulText,
 /* returns the nth occurence of a substring within a token-delimited string */
 HB_FUNC( __STRTOKEN )
 {
-   char * pszText;
+   const char * pszText;
    ULONG ulLen;
 
    pszText = hb_strToken( hb_parcx( 1 ), hb_parclen( 1 ),
@@ -418,11 +418,11 @@ HB_FUNC( __STRTOKEN )
 */
 HB_FUNC( __STRTKPTR )
 {
-   char * pszString = hb_parcx( 1 );
+   const char * pszString = hb_parcx( 1 );
    ULONG ulStrLen = hb_parclen( 1 );
    ULONG ulLen;
    ULONG ulPos = hb_parnl( 2 );
-   char * pszText;
+   const char * pszText;
 
    /* move start of string past last returned token */
    pszString += ulPos;

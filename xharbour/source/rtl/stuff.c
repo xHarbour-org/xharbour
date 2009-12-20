@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: stuff.c,v 1.5 2006/08/10 04:18:08 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ HB_FUNC( STUFF )
 {
    if( ISCHAR( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) && ISCHAR( 4 ) )
    {
-      char * szText = hb_parcx( 1 );
+      const char * szText = hb_parcx( 1 );
       ULONG ulText = hb_parclen( 1 );
       ULONG ulPos = hb_parnl( 2 );
       ULONG ulDel = hb_parnl( 3 );

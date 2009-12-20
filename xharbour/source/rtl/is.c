@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.10 2009/02/20 12:48:25 marchuet Exp $
+ * $Id: is.c,v 1.11 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 
 HB_FUNC( ISALPHA )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -84,7 +84,7 @@ HB_FUNC( ISALPHA )
 
 HB_FUNC( ISDIGIT )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
       hb_retl( HB_ISDIGIT( ( BYTE ) * szString ) );
@@ -96,7 +96,7 @@ HB_FUNC( ISDIGIT )
 
 HB_FUNC( ISUPPER )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -117,7 +117,7 @@ HB_FUNC( ISUPPER )
 
 HB_FUNC( ISLOWER )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -138,7 +138,7 @@ HB_FUNC( ISLOWER )
 
 HB_FUNC( ISALNUM )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -154,7 +154,7 @@ HB_FUNC( ISALNUM )
 
 HB_FUNC( ISCNTRL )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -170,7 +170,7 @@ HB_FUNC( ISCNTRL )
 
 HB_FUNC( ISGRAPH )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -187,7 +187,7 @@ HB_FUNC( ISGRAPH )
 
 HB_FUNC( ISPRINT )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -204,7 +204,7 @@ HB_FUNC( ISPRINT )
 
 HB_FUNC( ISPUNCT )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -221,7 +221,7 @@ HB_FUNC( ISPUNCT )
 
 HB_FUNC( ISSPACE )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -237,7 +237,7 @@ HB_FUNC( ISSPACE )
 
 HB_FUNC( ISXDIGIT )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {
@@ -253,7 +253,7 @@ HB_FUNC( ISXDIGIT )
 
 HB_FUNC( ISASCII )
 {
-   char * szString = hb_parc( 1 );
+   const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
    {

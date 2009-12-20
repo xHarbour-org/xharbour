@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.69 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: hbapifs.h,v 1.70 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -206,7 +206,7 @@ extern HB_EXPORT ULONG      hb_fsWriteLarge  ( HB_FHANDLE hFileHandle, const voi
 extern HB_EXPORT ULONG      hb_fsWriteAt     ( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount, HB_FOFFSET llOffset ); /* write to an open file at given offset from a buffer (>64K) */
 extern HB_EXPORT HB_FHANDLE hb_fsPOpen       ( const char * pFilename, const char * pMode );
 extern HB_EXPORT HB_FHANDLE hb_fsGetOsHandle ( HB_FHANDLE hFileHandle );
-extern HB_EXPORT void       hb_fsDirectory   ( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
+extern HB_EXPORT void       hb_fsDirectory   ( PHB_ITEM Dir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 extern HB_EXPORT void       hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
 extern HB_EXPORT USHORT     hb_fsGetFError   ( void ); /* get FERROR() flag */
 extern HB_EXPORT void       hb_fsSetFError   ( USHORT uiError ); /* set FERROR() flag */
@@ -215,7 +215,7 @@ extern HB_EXPORT BOOL       hb_fsFileExists  ( const char * pszFileName ); /* ch
 extern HB_EXPORT BOOL       hb_fsDirExists   ( const char * pszDirName ); /* check if a directory exists (wildcard chars not accepted). */
 
 /* Open a child process */
-extern HB_EXPORT FHANDLE    hb_fsOpenProcess( char *pFilename, HB_FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground, ULONG *ProcID );
+extern HB_EXPORT FHANDLE    hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground, ULONG *ProcID );
 extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle );
        HB_EXPORT int        hb_fsProcessValue( HB_FHANDLE fhProc, BOOL bWait );
 
@@ -301,7 +301,7 @@ extern HB_EXPORT ULONG     hb_fsAttrEncode( const char * szAttr );
 extern HB_EXPORT char *    hb_fsAttrDecode( ULONG ulAttr, char * szAttr );
 extern HB_EXPORT const char * hb_fsNameConv( const char * szFileName, char ** pszFree );
 extern HB_EXPORT BOOL      hb_fsMaxFilesError( void );
-extern HB_EXPORT ULONG     hb_fsGetFileAttributes( char * szFile );
+extern HB_EXPORT ULONG     hb_fsGetFileAttributes( const char * szFile );
 
 /* Harbour file functions with shared file handles and locks
  * (buffers in the future)
@@ -413,13 +413,13 @@ HB_EXPORT PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAt
 HB_EXPORT BOOL       hb_FileNetFindNext( PHB_NETFFIND pffind );
 HB_EXPORT void       hb_FileNetFindClose( PHB_NETFFIND pffind );
 HB_EXPORT ULONG      hb_fileNetGetFileAttributes( char * pszFilename );
-HB_EXPORT void       hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
+HB_EXPORT void       hb_FileNetDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 HB_EXPORT BOOL       hb_fileNetMkDir( char * pPath );
 HB_EXPORT BOOL       hb_fileNetRmDir( char * pPath );
 HB_EXPORT USHORT     hb_fileNetRemote( PHB_FILE pFile );
 
 /* wrapper to fopen() which calls hb_fsNameConv() */
-extern FILE * hb_fopen( const char *path, const char *mode );
+extern HB_EXPORT FILE * hb_fopen( const char *path, const char *mode );
 
 #ifdef HB_LEGACY_LEVEL
 /* Compatibility. Obsolete. */

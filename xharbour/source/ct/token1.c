@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.9 2009/02/20 12:48:09 marchuet Exp $
+ * $Id: token1.c,v 1.10 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -134,21 +134,21 @@ static void do_token1 (int iSwitch)
   if (iParamCheck)
   {
 
-    char *pcString = hb_parc (1);
+    const char *pcString = hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcSeparatorStr;
+    const char *pcSeparatorStr;
     size_t sSeparatorStrLen;
     ULONG ulTokenCounter = 0;
     ULONG ulSkip;
 
-    char *pcSubStr;
+    const char *pcSubStr;
     char *pcRet = NULL;
     size_t sSubStrLen;
     size_t sRetStrLen = 0;
 
     ULONG ulToken = 0;
     ULONG ulSkipCnt;
-    char *pc;
+    const char *pc;
     
     /* separator string */
     if (ISCHAR (2) && ((sSeparatorStrLen = hb_parclen (2)) != 0))
@@ -337,9 +337,9 @@ static void do_token1 (int iSwitch)
       {
          if ( ulSkip == HB_MKULONG( 255, 255, 255, 255 ) )
 	 {
-	    char *t;
+	    const char *t;
 	    BOOL bLast = TRUE;
-	    
+
 	    for ( t = pc + 1; t < pcString + sStrLen; t++ )
 	    {
 	       if ( !memchr( pcSeparatorStr, *t, sSeparatorStrLen ) )

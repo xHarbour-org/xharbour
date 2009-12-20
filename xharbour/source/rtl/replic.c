@@ -1,5 +1,5 @@
 /*
- * $Id: replic.c,v 1.6 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: replic.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ HB_FUNC( REPLICATE )
 
          if( ( double ) ( ( double ) ulLen * ( double ) lTimes ) < ( double ) ULONG_MAX )
          {
-            char * szText = hb_parcx( 1 );
+            const char * szText = hb_parcx( 1 );
             char * szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
             char * szPtr = szResult;
             LONG i;

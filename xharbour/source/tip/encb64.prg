@@ -1,5 +1,5 @@
 /*
- * $Id: encb64.prg,v 1.4 2007/02/27 15:59:40 druzus Exp $
+ * $Id: encb64.prg,v 1.5 2009/02/27 11:09:55 enricomaria Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ RETURN Self
 HB_FUNC( TIPENCODERBASE64_ENCODE )
 {
    HB_THREAD_STUB
-   char *cData = hb_parc(1);
+   const char *cData = hb_parc(1);
    char *cRet;
    int nLen = hb_parclen(1);
    int nPos = 0, nPosRet = 0;
@@ -216,7 +216,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
 HB_FUNC( TIPENCODERBASE64_DECODE )
 {
    HB_THREAD_STUB
-   char *cData = hb_parc(1);
+   const char *cData = hb_parc(1);
    unsigned char *cRet;
    int nLen = hb_parclen(1);
    int nPos = 0, nPosRet = 0, nPosBlock = 0;

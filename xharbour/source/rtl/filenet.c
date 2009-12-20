@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.13 2009/11/09 09:39:06 marchuet Exp $
+ * $Id: filenet.c,v 1.14 2009/12/16 05:34:11 andijahja Exp $
  */
 
 /*
@@ -425,7 +425,7 @@ static long int hb_Net_Recv( HB_SOCKET_T hSocket )
    return ( long int ) ( ulDataLen );
 }
 
-static void hb_NetOpenConnection( char * szAddr, int iPort )
+static void hb_NetOpenConnection( const char * szAddr, int iPort )
 {
    hSocket = hb_ipConnect( szAddr, htons( iPort ), 5000 );
 
@@ -1583,7 +1583,7 @@ static void hb_FileNetGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHO
    }
 }
 
-void hb_FileNetDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
+void hb_FileNetDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
    USHORT    uiMask, uiMaskNoLabel;
    char      *szDirSpec;
@@ -1766,7 +1766,7 @@ static void blockeval( EVALINFO info, PHB_ITEM block, ULONG count )
    return;
 }
 
-static BOOL hb_FileNetCopyTo( char * szSource, char * szDest, PHB_ITEM block )
+static BOOL hb_FileNetCopyTo( const char * szSource, const char * szDest, PHB_ITEM block )
 {
    BOOL bRetVal = FALSE;
    FHANDLE fhndSource;
@@ -1884,7 +1884,7 @@ HB_FUNC( NET_COPYTO )
    }
 }
 
-static BOOL hb_FileNetCopyFrom( char * szSource, char * szDest, PHB_ITEM block )
+static BOOL hb_FileNetCopyFrom( const char * szSource, const char * szDest, PHB_ITEM block )
 {
    BOOL bRetVal = FALSE;
    PHB_FILE pfSource;
@@ -1986,7 +1986,7 @@ HB_FUNC( NET_COPYFROM )
    }
 }
 
-static BOOL hb_FileNetCopyFile( char * szSource, char * szDest, PHB_ITEM block )
+static BOOL hb_FileNetCopyFile( const char * szSource, const char * szDest, PHB_ITEM block )
 {
    BOOL bRetVal = FALSE;
    PHB_FILE pfSource;

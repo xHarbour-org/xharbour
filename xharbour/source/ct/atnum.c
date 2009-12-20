@@ -1,5 +1,5 @@
 /*
- * $Id: atnum.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: atnum.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -72,16 +72,16 @@ static void do_atnum (int iSwitch)
   if ((ISCHAR (1)) && (ISCHAR (2)))
   {
     
-    char *pcStringToMatch = hb_parc (1);
+    const char *pcStringToMatch = hb_parc (1);
     size_t sStrToMatchLen = (size_t)hb_parclen (1);
-    char *pcString = hb_parc (2);
+    const char *pcString = hb_parc (2);
     size_t sStrLen = (size_t)hb_parclen (2);
     int iMultiPass = ct_getatmupa();
     int iAtLike    = ct_getatlike();
     char cAtLike   = ct_getatlikechar();
     size_t sIgnore, sMatchStrLen;
     ULONG ulCounter;
-    char *pc = NULL;
+    const char *pc = NULL;
 
     /* eventually ignore some characters */
     if (ISNUM (4))
@@ -120,7 +120,7 @@ static void do_atnum (int iSwitch)
           };
           hb_retc ("");
         }; break;
-        
+
         case DO_ATNUM_ATNUM:
         {
           /* ATNUM */
@@ -135,7 +135,7 @@ static void do_atnum (int iSwitch)
           hb_retnl (0);
         }; break;
       }
-      
+
       return;
     }
     else
@@ -149,7 +149,7 @@ static void do_atnum (int iSwitch)
     {
 
       /* find the <ulCounter>th match */
-      char *pcSubStr;
+      const char *pcSubStr;
       size_t sSubStrLen;
       ULONG ulMatchCounter = 0;
 

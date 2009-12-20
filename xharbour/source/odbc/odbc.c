@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.37 2009/04/13 20:42:35 likewolf Exp $
+ * $Id: odbc.c,v 1.38 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -487,7 +487,7 @@ HB_FUNC( SQLSTOD )
 {
    if( hb_parclen( 1 ) >= 10 )
    {
-      char * szSqlDate = hb_parc( 1 );  /* YYYY-MM-DD */
+      const char * szSqlDate = hb_parc( 1 );  /* YYYY-MM-DD */
       char szHrbDate[ 9 ];              /* YYYYMMDD */
 
       szHrbDate[ 0 ] = szSqlDate[ 0 ];

@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.5 2008/04/06 11:33:17 likewolf Exp $
+ * $Id: dattime2.c,v 1.6 2009/01/24 00:33:09 likewolf Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ HB_FUNC( CTODOW )
 {
    if ( ISCHAR( 1 ) )
    {
-      char *szParam = hb_parc( 1 ), *szDow;
+      char *szParam = ( char *) hb_parc( 1 ), *szDow;
       int iDow, iEqual;
 
       hb_strupr( szParam );
@@ -217,7 +217,7 @@ HB_FUNC( CTOMONTH )
 {
    if ( ISCHAR( 1 ) )
    {
-      char *szParam = hb_parc( 1 ), *szMonth;
+      char *szParam = (char *) hb_parc( 1 ), *szMonth;
       int iMonth, iEqual;
 
       hb_strupr( szParam );

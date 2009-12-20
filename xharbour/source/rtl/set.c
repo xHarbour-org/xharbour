@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.103 2009/11/09 09:39:06 marchuet Exp $
+ * $Id: set.c,v 1.104 2009/12/03 03:00:02 andijahja Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ typedef struct
 
 #if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
-      extern LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocName ) ;
+      extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName ) ;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
       extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
 #endif

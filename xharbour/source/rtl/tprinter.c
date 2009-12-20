@@ -62,7 +62,7 @@
 
 BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 BOOL hb_SetDefaultPrinter(LPTSTR pPrinterName);
-BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName, BOOL bSubStr);
+BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize, const char* pPortName, BOOL bSubStr);
 
 #define MAXBUFFERSIZE 255
 
@@ -128,7 +128,7 @@ HB_FUNC( PRINTEREXISTS )
 
    if ISCHAR(1)
    {
-     Result = hb_PrinterExists(hb_parcx(1)) ;
+     Result = hb_PrinterExists((LPSTR)hb_parcx(1)) ;
    }
    hb_retl(Result) ;
 }
@@ -441,11 +441,11 @@ BOOL hb_SetDefaultPrinter(LPTSTR pPrinterName)
 
 HB_FUNC( SETDEFAULTPRINTER )
 {
-   hb_retl( hb_SetDefaultPrinter( hb_parc( 1 ) ) );
+   hb_retl( hb_SetDefaultPrinter( (LPSTR) hb_parc( 1 ) ) );
 }
 
 
-BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, LPTSTR pPortName, BOOL bSubStr )
+BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const char* pPortName, BOOL bSubStr )
 {
    BOOL Result = FALSE, bFound = FALSE ;
    ULONG needed, returned, a;
@@ -504,16 +504,16 @@ HB_FUNC( PRINTERPORTTONAME )
 }
 #define BIG_PRINT_BUFFER (1024*32)
 
-LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocName )
+LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName )
 {
    UCHAR  printBuffer[ BIG_PRINT_BUFFER ] ;
    HANDLE  hPrinter, hFile ;
    DOC_INFO_1 DocInfo ;
    DWORD nRead, nWritten, Result;
 
-   if ( OpenPrinter( cPrinterName, &hPrinter, NULL ) != 0 )
+   if ( OpenPrinter( (LPSTR) cPrinterName, &hPrinter, NULL ) != 0 )
    {
-      DocInfo.pDocName = cDocName ;
+      DocInfo.pDocName = (LPSTR) cDocName ;
       DocInfo.pOutputFile = NULL ;
       DocInfo.pDatatype = "RAW" ;
       if ( StartDocPrinter( hPrinter, 1, ( UCHAR * ) &DocInfo ) != 0 )
@@ -561,7 +561,7 @@ LONG hb_PrintFileRaw( char * cPrinterName, const char * cFileName, char * cDocNa
 
 HB_FUNC( PRINTFILERAW )
 {
-   char * cPrinterName, * cFileName, * cDocName ;
+   const char * cPrinterName, * cFileName, * cDocName ;
    DWORD Result = -1 ;
 
    if ( ISCHAR( 1 ) && ISCHAR( 2 ) )

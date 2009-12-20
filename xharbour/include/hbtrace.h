@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.16 2007/09/22 10:57:37 andijahja Exp $
+ * $Id: hbtrace.h,v 1.17 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -230,7 +230,7 @@ extern int  hb_tracestate( int new_state );
 extern int  hb_tracelevel( int new_level );
 
 extern HB_EXPORT int  hb_tr_level( void );
-extern HB_EXPORT void hb_tr_trace( char * fmt, ... );
+extern HB_EXPORT void hb_tr_trace( const char * fmt, ... );
 
 HB_EXTERN_END
 

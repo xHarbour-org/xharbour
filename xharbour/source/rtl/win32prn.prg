@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.29 2009/05/12 01:40:21 modalsist Exp $
+ * $Id: win32prn.prg,v 1.30 2009/08/10 05:52:28 peterrees Exp $
  */
 
 /*
@@ -753,7 +753,7 @@ HB_FUNC_STATIC( STARTDOC )
   if (hDC )
   {
     sDoc.cbSize= sizeof(DOCINFO) ;
-    sDoc.lpszDocName= hb_parc(2) ;
+    sDoc.lpszDocName= (char*) hb_parc(2) ;
     sDoc.lpszOutput = NULL ;
     sDoc.lpszDatatype= NULL ;
     sDoc.fwType      = 0 ;
@@ -827,7 +827,7 @@ HB_FUNC_STATIC(TEXTOUT)
     {
       int iRow   = (int) hb_parnl(2) ;
       int iCol   = (int) hb_parnl(3) ;
-      char *pszData = hb_parc(4) ;
+      char *pszData = (char*) hb_parc(4) ;
       int iWidth = ISNUM(6) ? (int) hb_parnl(6) : 0 ;
       SetTextAlign((HDC) hDC, uiAlignHori | uiAlignVert | TA_NOUPDATECP) ;
       if (iWidth < 0 && iLen < 1024 )
@@ -901,7 +901,7 @@ HB_FUNC_STATIC(GETTEXTSIZE)
   SIZE sSize ;
   if (hDC)
   {
-    char *pszData = hb_parc(2) ;
+    char *pszData = (char*) hb_parc(2) ;
     int iLen   = (int) hb_parnl(3) ;
     GetTextExtentPoint32(hDC,pszData, iLen , &sSize) ;  // Get the length of the text in device size
     if (ISLOG(4) && !hb_parl(4))
@@ -969,7 +969,7 @@ HB_FUNC_STATIC( CREATEFONT )
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
   HFONT hFont, hOldFont ;
-  char *pszFont = hb_parc(2) ;
+  char *pszFont = (char*) hb_parc(2) ;
   int iHeight = (int) hb_parnl(3) ;
   int iMul = (int) hb_parnl(4) ;
   int iDiv = (int) hb_parnl(5) ;
@@ -1046,7 +1046,7 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
   if (hDC)
   {
     HANDLE hPrinter ;
-    LPTSTR pszPrinterName = hb_parc(2) ;
+    LPTSTR pszPrinterName = (LPSTR) hb_parc(2) ;
 
     if (OpenPrinter(pszPrinterName, &hPrinter, NULL))
     {
@@ -1207,7 +1207,7 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
 
 HB_FUNC_STATIC( LOADBITMAPFILE )
 {
-  PTSTR pstrFileName = hb_parc(1) ;
+  PTSTR pstrFileName = (PTSTR) hb_parc(1) ;
   BOOL               bSuccess= FALSE ;
   DWORD              dwFileSize, dwHighSize, dwBytesRead ;
   HANDLE             hFile ;

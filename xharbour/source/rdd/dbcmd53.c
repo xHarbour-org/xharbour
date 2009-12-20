@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd53.c,v 1.3 2009/02/04 10:45:54 marchuet Exp $
+ * $Id: dbcmd53.c,v 1.4 2009/02/24 12:38:15 marchuet Exp $
  */
 
 /*
@@ -457,7 +457,7 @@ HB_FUNC( DBFILEGET )
    {
       USHORT uiFields, uiIndex;
       PHB_ITEM pMode;
-      char * szField = hb_parc( 1 );
+      const char * szField = hb_parc( 1 );
 
       if( szField )
          uiIndex = hb_rddFieldIndex( pArea, szField );
@@ -493,7 +493,7 @@ HB_FUNC( DBFILEPUT )
    if( pArea )
    {
       USHORT uiFields, uiIndex;
-      char * szField = hb_parc( 1 );
+      const char * szField = hb_parc( 1 );
 
       if( szField )
          uiIndex = hb_rddFieldIndex( pArea, szField );

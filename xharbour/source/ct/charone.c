@@ -1,5 +1,5 @@
 /*
- * $Id: charone.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id: charone.c,v 1.3 2005/10/04 20:06:34 druzus Exp $
  */
 
 /*
@@ -65,9 +65,9 @@
 /* helper function for the *one functions */
 static void do_charone( int iSwitch )
 {
-   char *pcString;
+   const char *pcString;
    size_t sStrLen;
-   char *pcDeleteSet;
+   const char *pcDeleteSet;
    size_t sDeleteSetLen;
 
    /* param check */
@@ -94,7 +94,7 @@ static void do_charone( int iSwitch )
          {
             if (sStrLen > 1)
             {
-               char *pcSub;
+               const char *pcSub;
                char *pcRet;
                size_t sRetStrLen = 0;
                char cCurrent = *pcString;
@@ -134,7 +134,7 @@ static void do_charone( int iSwitch )
          {
             if ( sStrLen > 3 && sDeleteSetLen >= 2 )
             {
-               char *pcSub;
+               const char *pcSub;
                char *pcRet;
                size_t sRetStrLen = 0;
                char cCurrent1 = pcString[0];
@@ -157,10 +157,10 @@ static void do_charone( int iSwitch )
 		  }
 		  else if ( pcDeleteSet != NULL )
 		  {
-		     char *pc = NULL;
-		     char *pStart = pcDeleteSet;
+		     const char *pc = NULL;
+		     const char *pStart = pcDeleteSet;
 		     size_t sLen = sDeleteSetLen;
-		     
+
 		     while ( sLen >= 2
 		             && ( pc = ct_at_exact_forward( pStart, sLen,
 		                                            pcSub, 2, NULL ) ) != 0

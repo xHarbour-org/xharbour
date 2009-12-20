@@ -1,5 +1,5 @@
 /*
- * $Id: screen1.c 8101 2007-11-30 18:57:51Z druzus $
+ * $Id: screen1.c,v 1.4 2008/03/16 19:15:59 likewolf Exp $
  */
 
 /*
@@ -148,7 +148,7 @@ HB_FUNC( SCREENMIX )
 
    if( ulLen )
    {
-      char * szText = hb_parc( 1 ), * szAttr;
+      const char * szText = hb_parc( 1 ), * szAttr;
       ULONG ulAttr = hb_parclen( 2 ), ul = 0;
       SHORT sRow, sCol;
       int iRow, iCol, i;
@@ -229,7 +229,7 @@ HB_FUNC( SAYSCREEN )
 
    if( ulLen )
    {
-      char * szText = hb_parc( 1 );
+      const char * szText = hb_parc( 1 );
       SHORT sRow, sCol;
       int iRow, iCol, i;
 

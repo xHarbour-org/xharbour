@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.16 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: fparse.c,v 1.17 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ FPARSE( cFile, cDelimiter ) -> array
 /* adjustable, but this should be sufficient in normal situation */
 #define MAX_READ 4096
 //----------------------------------------------------------------------------//
-void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord )
+void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord )
 {
    if ( szText )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtfunc.c,v 1.2 2008/06/25 20:20:52 vouchcac Exp $
+ * $Id: gtfunc.c,v 1.3 2008/12/01 11:45:00 marchuet Exp $
  */
 
 /*
@@ -143,12 +143,12 @@ HB_FUNC( HB_GFXPRIMITIVE )
 
 HB_FUNC( HB_GFXTEXT )
 {
-   PHB_ITEM pTop    = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pLeft   = hb_param( 2, HB_IT_NUMERIC );
-   char *cText      = hb_parc(3);
-   PHB_ITEM pColor  = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pSize   = hb_param( 5, HB_IT_NUMERIC );
-   PHB_ITEM pWidth  = hb_param( 6, HB_IT_NUMERIC );
+   PHB_ITEM pTop     = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pLeft    = hb_param( 2, HB_IT_NUMERIC );
+   const char *cText = hb_parc(3);
+   PHB_ITEM pColor   = hb_param( 4, HB_IT_NUMERIC );
+   PHB_ITEM pSize    = hb_param( 5, HB_IT_NUMERIC );
+   PHB_ITEM pWidth   = hb_param( 6, HB_IT_NUMERIC );
 
    hb_gtGfxText( hb_itemGetNI(pTop),
                  hb_itemGetNI(pLeft), cText, hb_itemGetNI(pColor),

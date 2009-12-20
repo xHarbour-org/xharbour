@@ -1,5 +1,5 @@
 /*
- * $Id: getver.c,v 1.3 2004/12/15 13:39:33 druzus Exp $
+ * $Id: getver.c,v 1.4 2009/01/24 00:33:08 likewolf Exp $
  */
 
 /*
@@ -149,7 +149,7 @@ HB_FUNC( _FT_TEMPFIL )
 {
    int nax;
    int iflags;
-   char * cPath;
+   const char * cPath;
 
 #if defined(HB_OS_DOS) && !defined(HB_OS_DOS_32)
    {

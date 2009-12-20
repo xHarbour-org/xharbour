@@ -1,5 +1,5 @@
 /*
- * $Id: charmix.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charmix.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -63,8 +63,9 @@ HB_FUNC (CHARMIX)
   
   if (ISCHAR (1))
   {
-    char *pcString1 = hb_parc (1);
-    char *pcString2, *pcResult;
+    const char *pcString1 = hb_parc (1);
+    const char *pcString2;
+    char *pcResult;
     size_t sLen1 = hb_parclen (1);
     size_t sLen2, sPos1, sPos2, sResultPos;
 
