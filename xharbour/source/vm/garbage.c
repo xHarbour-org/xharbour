@@ -448,7 +448,10 @@ void *hb_gcUnlock( void *pBlock )
    return pBlock;
 }
 
-#define SIMULATE_ITEMREF_RECURSION
+#if ( ( defined(_MSC_VER) && _MSC_VER <= 1200 && !defined( __POCC__ ) ) || defined( __DMC__ ) || defined( __ICL ) )
+#else
+   #define SIMULATE_ITEMREF_RECURSION
+#endif
 
 #ifdef SIMULATE_ITEMREF_RECURSION
 
@@ -519,7 +522,6 @@ void *hb_gcUnlock( void *pBlock )
                case 5: \
                   pResumeInfo[ iResumeCounter ].data.ResumePoint_5.pCBlock = pCBlock; \
                   pResumeInfo[ iResumeCounter ].data.ResumePoint_5.ui      = ui; \
-                  break; \
                \
                default: \
                   /* Unexpected case! */ \
@@ -598,12 +600,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
    FakedItem.type = HB_IT_ARRAY;
 
+#ifdef SIMULATE_ITEMREF_RECURSION
    ItemRef_Top:
+#endif
 
    while( HB_IS_BYREF( pItem ) )
    {
       if( HB_IS_EXTREF( pItem ) )
       {
+
          pItem->item.asExtRef.func->mark( pItem->item.asExtRef.value );
 
          RETURN_OR_RESUME_ITEMREF();
@@ -617,8 +622,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
             //hb_gcItemRef( &FakedItem );
             NESTED_ITEMREF( &FakedItem, 1 );
+#ifdef SIMULATE_ITEMREF_RECURSION
             ItemRef_ResumePoint_1:
-
+#endif
             // return;
             RETURN_OR_RESUME_ITEMREF();
          }
@@ -661,8 +667,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
             //hb_gcItemRef( pItem );
             NESTED_ITEMREF( pItem, 2 );
+#ifdef SIMULATE_ITEMREF_RECURSION
             ItemRef_ResumePoint_2:
-
+#endif
             ++pItem;
             --ulSize;
          }
@@ -692,12 +699,14 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
             //hb_gcItemRef( pKey );
             NESTED_ITEMREF( pKey, 3 );
+#ifdef SIMULATE_ITEMREF_RECURSION
             ItemRef_ResumePoint_3:
-
+#endif
             //hb_gcItemRef( pValue );
             NESTED_ITEMREF( pValue, 4 );
+#ifdef SIMULATE_ITEMREF_RECURSION
             ItemRef_ResumePoint_4:
-
+#endif
             ++pKey;
             ++pValue;
             --ulSize;
@@ -722,8 +731,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          {
             //hb_gcItemRef( &pCBlock->pLocals[ ui ] );
             NESTED_ITEMREF( &pCBlock->pLocals[ ui ] , 5 );
-           ItemRef_ResumePoint_5:
-
+#ifdef SIMULATE_ITEMREF_RECURSION
+            ItemRef_ResumePoint_5:
+#endif
             ++ui;
          }
       }

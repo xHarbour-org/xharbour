@@ -38,8 +38,7 @@ HB_FUNC( OEMKEYSCAN )
 
 HB_FUNC( VKKEYSCAN )
 {
-   char *Buffer ;
-   Buffer =hb_parcx( 1 );
+   char *Buffer = ( char* ) hb_parcx( 1 );
 
    hb_retni( VkKeyScan( *Buffer ) ) ;
 }
@@ -50,8 +49,7 @@ HB_FUNC( VKKEYSCAN )
 
 HB_FUNC( VKKEYSCANEX )
 {
-   char *Buffer ;
-   Buffer = hb_parcx( 1 ) ;
+   char *Buffer = ( char* ) hb_parcx( 1 ) ;
 
    hb_retni( VkKeyScanEx( *Buffer, (HKL) hb_parnl( 2 ) ) ) ;
 }

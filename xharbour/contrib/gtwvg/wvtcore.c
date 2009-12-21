@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.3 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: wvtcore.c,v 1.4 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ HB_EXPORT IPicture * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 
 //--------------------------------------------------------------------//
 
-HB_EXPORT IPicture * hb_wvt_gtLoadPicture( char * cImage )
+HB_EXPORT IPicture * hb_wvt_gtLoadPicture( const char * cImage )
 {
    IStream  *iStream;
    LPVOID   iPicture = NULL;
@@ -577,7 +577,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
 
 //-------------------------------------------------------------------//
 
-HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image )
+HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, const char * image )
 {
   HGLOBAL  hGlobal;
   HANDLE   hFile;

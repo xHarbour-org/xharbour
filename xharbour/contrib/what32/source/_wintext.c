@@ -73,7 +73,7 @@ HB_FUNC( EXTTEXTOUT )
    BOOL rcOk   ;
    UINT iCount ;
    UINT i      ;
-   char * cText = hb_parcx( 6 );
+   const char * cText = hb_parcx( 6 );
 
    rcOk = ( ISARRAY(5) && Array2Rect(hb_param(5, HB_IT_ARRAY), &rc) ) ;
 
@@ -110,7 +110,7 @@ HB_FUNC( EXTTEXTOUT )
 
 HB_FUNC( DRAWTEXT )
 {
-   char *cText = hb_parcx( 2 );
+   const char *cText = hb_parcx( 2 );
    RECT rc;
 
    if ( ISARRAY( 3 ) && Array2Rect( hb_param( 3, HB_IT_ARRAY ), &rc ) )
@@ -160,7 +160,7 @@ HB_FUNC( DRAWTEXTEX )
 
 HB_FUNC( TABBEDTEXTOUT )
 {
-   char *cText = hb_parcx( 4 );
+   const char *cText = hb_parcx( 4 );
    int iCount  ;
    int *aiTabs ;
    int i       ;
@@ -219,7 +219,7 @@ HB_FUNC( GETTEXTFACE )
 
 HB_FUNC( GETTABBEDTEXTEXTENT )
 {
-   char *cText ;
+   const char *cText ;
    int iCount  ;
    int *aiTabs ;
    int i       ;
@@ -287,7 +287,7 @@ HB_FUNC( GETOUTLINETEXTMETRICSA )
 
 HB_FUNC( GETTEXTEXTENTPOINT32 )
 {
-   char * pstr = hb_parcx(2);
+   const char * pstr = hb_parcx(2);
    SIZE sz;
    PHB_ITEM aMetr ;
 

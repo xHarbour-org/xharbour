@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvg.h,v 1.2 2008/12/23 20:33:21 likewolf Exp $
+ * $Id: gtwvg.h,v 1.3 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -414,11 +414,11 @@ typedef struct _tag_HB_GT_COLDEF
 //----------------------------------------------------------------------//
 
 POINT       HB_EXPORT   hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row );
-IPicture    HB_EXPORT * hb_wvt_gtLoadPicture( char * image );
+IPicture    HB_EXPORT * hb_wvt_gtLoadPicture( const char * image );
 IPicture    HB_EXPORT * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection );
 BOOL        HB_EXPORT   hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
 BOOL        HB_EXPORT   hb_wvt_gtDestroyPicture( IPicture * iPicture );
-BOOL        HB_EXPORT   hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image );
+BOOL        HB_EXPORT   hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, const char * image );
 
 LPWORD      HB_EXPORT   lpwAlign( LPWORD lpIn );
 int         HB_EXPORT   nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );

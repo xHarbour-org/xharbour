@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.31 2008/05/01 22:28:51 andijahja Exp $
+ * $Id: _winsys.c,v 1.32 2009/11/09 09:38:44 marchuet Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -798,7 +798,7 @@ HB_FUNC( SETCOMPUTERNAMEEX )
 HB_FUNC( GETUSERNAME )
 {
    DWORD nSize    ;
-   char *szUser = hb_parcx( 1 );
+   char *szUser = ( char* ) hb_parcx( 1 );
 
    hb_retl( GetUserNameA( szUser, &nSize ) ) ;
    hb_storc( szUser , 1 ) ;

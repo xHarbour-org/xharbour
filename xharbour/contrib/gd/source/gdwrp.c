@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.15 2009/09/30 16:19:24 marchuet Exp $
+ * $Id: gdwrp.c,v 1.16 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ static void * LoadImageFromHandle( FHANDLE fhandle, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void * LoadImageFromFile( char *szFile, int *sz )
+static void * LoadImageFromFile( const char *szFile, int *sz )
 {
    void *iptr;
    FHANDLE fhandle;
@@ -161,7 +161,7 @@ static void SaveImageToHandle( FHANDLE fhandle, void * iptr, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void SaveImageToFile( char * szFile, void * iptr, int sz )
+static void SaveImageToFile( const char * szFile, void * iptr, int sz )
 {
    FHANDLE fhandle;
 
@@ -177,7 +177,7 @@ static void SaveImageToFile( char * szFile, void * iptr, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
-static void AddImageToFile( char * szFile, void * iptr, int sz )
+static void AddImageToFile( const char * szFile, void * iptr, int sz )
 {
    FHANDLE fhandle;
 
@@ -199,7 +199,7 @@ static void AddImageToFile( char * szFile, void * iptr, int sz )
 static void GDImageCreateFrom( int nType )
 {
    gdImagePtr im = NULL;
-   char *szFile;
+   const char *szFile;
    int sz;
    void *iptr;
 
@@ -296,7 +296,7 @@ static void GDImageSaveTo( int nType )
       )
    {
       gdImagePtr im;
-      char *szFile;
+      const char *szFile;
       int sz;
       void *iptr = NULL;
       FHANDLE fhandle;
@@ -2494,7 +2494,7 @@ HB_FUNC( GDIMAGESTRINGFTEX )
       //TraceLog( NULL, "Forecolor: %i\n\r", fg );
 
       /* Retrieve fontname value */
-      fontname = hb_parc( 4 );
+      fontname = (char*) hb_parc( 4 );
       //TraceLog( NULL, "Font: %s\n\r", fontname );
 
       /* Retrieve point size value */
@@ -2511,7 +2511,7 @@ HB_FUNC( GDIMAGESTRINGFTEX )
       //TraceLog( NULL, "Pos: %i, %i\n\r", x, y );
 
       /* Retrieve string value */
-      string = hb_parcx( 9 );
+      string = (char*) hb_parcx( 9 );
       //TraceLog( NULL, "String: %s\n\r", string );
 
       /* EXTENDED FLAGS */
@@ -2629,16 +2629,16 @@ HB_FUNC( GDIMAGESTRINGFTCIRCLE ) // char *gdImageStringFTCircle(gdImagePtr im, i
       fillPortion = hb_parnd( 6 );
 
       /* Retrieve fontname value */
-      font = hb_parcx( 7 );
+      font = (char*) hb_parcx( 7 );
 
       /* Retrieve points value */
       points = hb_parnd( 8 );
 
       /* Retrieve top string value */
-      top = hb_parcx( 9 );
+      top = (char*) hb_parcx( 9 );
 
       /* Retrieve top string value */
-      bottom = hb_parcx( 10 );
+      bottom = (char*) hb_parcx( 10 );
 
       /* Retrieve foreground color value */
       fgcolor = hb_parni( 11 );
@@ -3806,7 +3806,7 @@ HB_FUNC( GDIMAGEGIFANIMBEGIN )
       /* Check if 2nd parameter is a file name or an handle */
       if ( hb_parinfo( 2 ) & HB_IT_STRING )
       {
-         char *szFile;
+         const char *szFile;
          szFile = hb_parcx( 2 );
 
          SaveImageToFile( szFile, iptr, size );
@@ -3873,7 +3873,7 @@ HB_FUNC( GDIMAGEGIFANIMADD )
       /* Check if 2nd parameter is a file name or an handle */
       if ( hb_parinfo( 2 ) & HB_IT_STRING )
       {
-         char *szFile;
+         const char *szFile;
          szFile = hb_parcx( 2 );
 
          AddImageToFile( szFile, iptr, size );
@@ -3923,7 +3923,7 @@ HB_FUNC( GDIMAGEGIFANIMEND )
       /* Check if 1st parameter is a file name or an handle */
       if ( hb_parinfo( 1 ) & HB_IT_STRING )
       {
-         char *szFile;
+         const char *szFile;
          szFile = hb_parcx( 1 );
 
          AddImageToFile( szFile, iptr, size );

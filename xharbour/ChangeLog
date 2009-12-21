@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6659 2009/12/19 14:06:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.6660 2009/12/20 14:07:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-21 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/gd/source/gdwrp.c
+
+  * contrib/gtwvg/gtwvg.h
+  * contrib/gtwvg/wvtcore.c
+  * contrib/gtwvg/wvtutils.c
+
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/wvwdraw.c
+  * contrib/gtwvw/wvwmenu.c
+  * contrib/gtwvw/wvwedit.c
+  * contrib/gtwvw/wvwfuncs.c
+
+  * contrib/tp_/telepath.PRG
+
+  * contrib/unicode/hbcc.prg
+
+  * contrib/hbmzip/hbmzip.c
+
+  * contrib/what32/source/_windir.c
+  * contrib/what32/source/_wininet.c
+  * contrib/what32/source/_winini.c
+  * contrib/what32/source/_winkbrd.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winmapi.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintext.c
+  * contrib/what32/source/_wintree.c
+  * contrib/what32/source/WinCore.prg
+
+  * contrib/xwt/include/xwt_api.h
+  * contrib/xwt/src/xwt_api.c
+  * contrib/xwt/src/xwt_win/xwt_win_msgbox.c
+
+    ! char* -> const char* ( more to follow )
+
+  * source/vm/garbage.c
+   - "SIMULATE_ITEMREF_RECURSION" has been put under ifdef/endif condition
+     because it does not work with MSVC6, DMC and ICL.
+
+  * contrib/png/pngwtran.c
+    ! pacify BCC warnings
 
 2009-12-20 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/ctstr.h

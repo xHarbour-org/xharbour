@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.11 2009/09/19 13:41:12 andijahja Exp $
+ * $Id: pngwtran.c,v 1.11 2009/12/06 22:46:03 andijahja Exp $
  */
 
 /* pngwtran.c - transforms the data in a row for PNG writers
@@ -341,7 +341,10 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 }
 #endif
 
-#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
+#ifdef __BORLANDC__
+   #pragma option push -w-aus
+#endif
 void /* PRIVATE */
 png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 {
@@ -518,6 +521,9 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
       }
    }
 }
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif
 #endif
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED

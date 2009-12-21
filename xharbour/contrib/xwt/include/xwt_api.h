@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.h,v 1.7 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_api.h,v 1.8 2004/01/26 20:30:08 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE - header
 */
@@ -83,15 +83,15 @@ typedef struct tag_xwt_property
       PXWT_WIDGET widget;
       const char *text;
       void *data;
-      char *font;
+      const char *font;
       XWT_STRING string;
    } value;
-   
+
    union {
-      char * fg;
-      char * bg;
-      char * base;
-      char * text;
+      const char * fg;
+      const char * bg;
+      const char * base;
+      const char * text;
    } color;
 
    long year;

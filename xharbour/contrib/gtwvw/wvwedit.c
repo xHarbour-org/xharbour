@@ -1,5 +1,5 @@
 /*
-* $Id: wvwedit.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
+* $Id: wvwedit.c,v 1.2 2009/09/07 21:36:20 lculik Exp $
  */
 /*
  * wvwedit.C
@@ -151,7 +151,7 @@ HB_FUNC( WVW_EBCREATE)
             usLeft   = ( USHORT )hb_parni( 3 ),
             usBottom = ( USHORT )hb_parni( 4 ),
             usRight  = ( USHORT )hb_parni( 5 );
-   LPTSTR   lpszText = hb_parcx( 6 );
+   LPTSTR   lpszText = (LPTSTR) hb_parcx( 6 );
 
    BOOL     bMultiline = (ISLOG(8) ? hb_parl(8) : FALSE);
    BYTE     bEBType = (BYTE) (bMultiline ? WVW_EB_MULTILINE : WVW_EB_SINGLELINE);
@@ -643,7 +643,7 @@ HB_FUNC( WVW_EBSETTEXT )
    WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );     
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_EDITBOX, NULL, uiEBid);
    BOOL bRetval;
-   LPTSTR   lpszText = hb_parcx( 3 );
+   LPTSTR   lpszText = (LPTSTR) hb_parcx( 3 );
    BOOL     bFromOEM = ( pWindowData->CodePage == OEM_CHARSET );
 
    if (pcd==NULL)

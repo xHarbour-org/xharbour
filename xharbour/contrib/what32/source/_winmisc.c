@@ -25,7 +25,7 @@
 
 HB_FUNC( STR2PTR )
 {
-   char *cStr = hb_parcx( 1 )    ;
+   const char *cStr = hb_parcx( 1 )    ;
    hb_retnl( ( LONG_PTR ) cStr ) ;
 }
 

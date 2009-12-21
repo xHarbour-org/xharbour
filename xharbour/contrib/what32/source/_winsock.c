@@ -32,7 +32,7 @@
 
 HB_FUNC( ACCEPT )
 {
-   char *addr  ;
+   const char *addr  ;
    int addrlen ;
 
    if ( ISNIL(2) )

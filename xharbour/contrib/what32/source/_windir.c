@@ -238,7 +238,7 @@ HB_FUNC( GETFULLPATHNAME )
 {
    char *szBuffRet = NULL ;
    char buffer[ MAX_PATH + 1 ] = {0};
-   char *szIn =hb_parcx( 1 );
+   const char *szIn =hb_parcx( 1 );
    //DWORD dwSize  = hb_parnl( 2 );
    DWORD dwReq;
    dwReq = GetFullPathName( (LPCSTR) szIn,

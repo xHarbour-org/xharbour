@@ -68,9 +68,9 @@ HB_FUNC( GETPROFILESTRING )
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection = ISNIL( 1 ) ? NULL : hb_parcx( 1 ) ;
-   char * lpEntry   = ISNIL( 2 ) ? NULL : hb_parcx( 2 ) ;
-   char * lpDefault = hb_parc ( 3 );
+   char * lpSection = ISNIL( 1 ) ? NULL : ( char* ) hb_parcx( 1 ) ;
+   char * lpEntry   = ISNIL( 2 ) ? NULL : ( char* ) hb_parcx( 2 ) ;
+   char * lpDefault = ( char* ) hb_parc ( 3 );
 
    while ( TRUE )
    {
@@ -101,10 +101,10 @@ HB_FUNC( GETPRIVATEPROFILESTRING )
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection  = ISNIL( 1 ) ? NULL : hb_parcx( 1 );
-   char * lpEntry    = ISNIL( 2 ) ? NULL : hb_parcx( 2 ) ;
-   char * lpDefault  = hb_parcx( 3 );
-   char * lpFileName = hb_parcx( 4 );
+   char * lpSection  = ISNIL( 1 ) ? NULL : ( char* ) hb_parcx( 1 );
+   char * lpEntry    = ISNIL( 2 ) ? NULL : ( char* ) hb_parcx( 2 ) ;
+   char * lpDefault  = ( char* ) hb_parcx( 3 );
+   char * lpFileName = ( char* ) hb_parcx( 4 );
 
    while ( TRUE )
    {
@@ -131,9 +131,9 @@ HB_FUNC( GETPRIVATEPROFILESTRING )
 //-----------------------------------------------------------------------------
 HB_FUNC( WRITEPROFILESTRING )
 {
-   char * lpSection = hb_parcx( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parcx( 2 ) : NULL ;
-   char * lpData = ISCHAR(3) ? hb_parcx( 3 ) : NULL ;
+   char * lpSection = ( char* ) hb_parcx( 1 );
+   char * lpEntry = ISCHAR(2) ? ( char* ) hb_parcx( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? ( char* ) hb_parcx( 3 ) : NULL ;
 
    if ( WriteProfileString( lpSection , lpEntry , lpData) )
       hb_retl( TRUE ) ;
@@ -144,10 +144,10 @@ HB_FUNC( WRITEPROFILESTRING )
 //-----------------------------------------------------------------------------
 HB_FUNC( WRITEPRIVATEPROFILESTRING )
 {
-   char * lpSection = hb_parcx( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parcx( 2 ) : NULL ;
-   char * lpData = ISCHAR(3) ? hb_parcx( 3 ) : NULL ;
-   char * lpFileName= hb_parcx( 4 );
+   char * lpSection = ( char* ) hb_parcx( 1 );
+   char * lpEntry = ISCHAR(2) ? ( char* ) hb_parcx( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? ( char* ) hb_parcx( 3 ) : NULL ;
+   char * lpFileName = ( char* ) hb_parcx( 4 );
 
    if ( WritePrivateProfileString( lpSection , lpEntry , lpData , lpFileName ) )
       hb_retl( TRUE ) ;

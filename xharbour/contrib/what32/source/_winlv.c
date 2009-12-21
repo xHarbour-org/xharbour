@@ -68,7 +68,7 @@ HB_FUNC( LISTVIEWNOTIFY )
                {
                pArray = hb_param( 3, HB_IT_ARRAY ) ;
                DArray = hb_param( 4, HB_IT_ARRAY ) ;
-               cAlias = hb_parcx(5);
+               cAlias = (LPSTR) hb_parcx(5);
                hb_vmPushSymbol( pSymTest->pSymbol );
                hb_vmPushNil();
                hb_vmPushLong( (LONG) lpdi->item.iItem );
@@ -93,7 +93,7 @@ HB_FUNC( LISTVIEWNOTIFY )
                {
                pArray = hb_param( 3, HB_IT_ARRAY ) ;
                DArray = hb_param( 4, HB_IT_ARRAY ) ;
-               cAlias = hb_parcx(5);
+               cAlias = ( LPSTR ) hb_parcx(5);
                hb_vmPushSymbol( pSymTest->pSymbol );
                hb_vmPushNil();
                hb_vmPushLong( (LONG) lpdi->item.iItem );

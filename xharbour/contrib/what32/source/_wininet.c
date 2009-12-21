@@ -85,7 +85,7 @@ InternetGetConnectedState(
 HB_FUNC( INTERNETDIAL )
 {
    HWND    hWnd   = ISNIL( 1 ) ? 0    : ( HWND ) hb_parnl( 1 ) ;
-   LPTSTR  lpszId = ISNIL( 2 ) ? NULL : hb_parcx( 2 ) ;
+   LPTSTR  lpszId = ISNIL( 2 ) ? NULL : ( LPTSTR ) hb_parcx( 2 ) ;
    DWORD   nFlags = INTERNET_AUTODIAL_FORCE_ONLINE ;
    DWORD   nRet   = 0;
 
@@ -614,7 +614,7 @@ HB_FUNC( FTPGETCURRENTDIRECTORY )
 HB_FUNC( FTPSETCURRENTDIRECTORY )
 {
    HINTERNET hInternet     = ( HINTERNET ) hb_parnl( 1 ) ;
-   LPTSTR    lpszDirectory = hb_parcx( 2 ) ;
+   LPTSTR    lpszDirectory = ( LPTSTR )hb_parcx( 2 ) ;
 
    hb_retl( FtpSetCurrentDirectoryA( hInternet, lpszDirectory ) ) ;
 }

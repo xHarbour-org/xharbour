@@ -1,6 +1,6 @@
 
 /*
-* $Id: gtwvw.c,v 1.61 2009/11/22 19:40:37 lculik Exp $
+* $Id: gtwvw.c,v 1.62 2009/12/16 05:30:50 andijahja Exp $
  */
 /*
  * GTWVW.C
@@ -236,12 +236,12 @@ static BOOL    hb_gt_wvwSetCodePage( UINT usWinNum, int iCodePage );
 static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static BOOL    hb_gt_wvwAllocSpBuffer( WIN_DATA * pWindowData, USHORT col, USHORT row );
 
-static void    hb_gt_wvwSetWindowTitle( UINT usWinNum, char * title );
+static void    hb_gt_wvwSetWindowTitle( UINT usWinNum, const char * title );
 static BOOL    hb_gt_wvw_GetWindowTitle( UINT usWinNum, char ** title );
 //static DWORD   hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName );
-static HICON   hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName );
+static HICON   hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, const char *lpIconName );
 //static DWORD   hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, char *icon );
-static HICON   hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, char *icon );
+static HICON   hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, const char *icon );
 
 
 static BOOL    hb_gt_wvwSetCentreWindow( UINT usWinNum, BOOL bCentre, BOOL bPaint );
@@ -344,12 +344,12 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib);
 
 
 /* picture caching function: */
-static IPicture * FindPictureHandle(char * szFileName, int * piWidth, int * piHeight);
-static void AddPictureHandle(char * szFileName, IPicture * iPicture, int iWidth, int iHeight);
+static IPicture * FindPictureHandle( const char * szFileName, int * piWidth, int * piHeight);
+static void AddPictureHandle( const char * szFileName, IPicture * iPicture, int iWidth, int iHeight);
 
 /* bitmap caching functions for user drawn bitmaps (wvw_drawimage) */
-static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHeight);
-static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight);
+static HBITMAP FindUserBitmapHandle(const char * szFileName, int * piWidth, int * piHeight);
+static void AddUserBitmapHandle(const char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight);
 
 
 
@@ -5058,7 +5058,7 @@ static int hb_gt_wvwJustTranslateKey( int key, int shiftkey, int altkey, int con
 /* use the standard fixed oem font, unless the caller has requested set size fonts
 */
 
-HFONT hb_gt_wvwGetFont( char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage )
+HFONT hb_gt_wvwGetFont( const char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage )
 {
   HFONT hFont;
   if ( iHeight > 0 )
@@ -5997,7 +5997,7 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
     ShowWindow( hWnd, iCmdShow );
     UpdateWindow( hWnd );
 
-    hb_gt_wvwSetWindowTitle( s_pWvwData->s_usNumWindows-1, (char*) lpszWinName );
+    hb_gt_wvwSetWindowTitle( s_pWvwData->s_usNumWindows-1, (const char*) lpszWinName );
 
     hb_gt_wvwCreateObjects(s_pWvwData->s_usNumWindows-1);
 
@@ -7173,7 +7173,7 @@ int HB_EXPORT hb_gt_wvwSetLastMenuEvent( UINT usWinNum, int iLastMenuEvent )
 
 /*-------------------------------------------------------------------*/
 
-static void hb_gt_wvwSetWindowTitle( UINT usWinNum, char * title )
+static void hb_gt_wvwSetWindowTitle( UINT usWinNum, const char * title )
 {
   LPTSTR text = HB_TCHAR_CONVTO( title );
   SetWindowText( s_pWvwData->s_pWindows[usWinNum]->hWnd, text );
@@ -7201,7 +7201,7 @@ static BOOL hb_gt_wvw_GetWindowTitle( UINT usWinNum, char ** title )
 /*-------------------------------------------------------------------*/
 
 //static DWORD hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName )
-static HICON hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName )
+static HICON hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, const char *lpIconName )
 {
 
   HICON hIcon;
@@ -7228,7 +7228,7 @@ static HICON hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, char *lpIconName )
 /*-------------------------------------------------------------------*/
 
 //static DWORD hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, char *icon )
-static HICON hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, char *icon )
+static HICON hb_gt_wvwSetWindowIconFromFile( UINT usWinNum, const char *icon )
 {
 
   HICON hIcon = (HICON) LoadImage( ( HINSTANCE ) NULL, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
@@ -7252,7 +7252,7 @@ int HB_EXPORT hb_gt_wvwGetWindowTitle( UINT usWinNum, char *title, int length )
 
 /*-------------------------------------------------------------------*/
 
-BOOL HB_EXPORT hb_gt_wvwSetFont( UINT usWinNum, char *fontFace, int height, int width, int Bold, int Quality )
+BOOL HB_EXPORT hb_gt_wvwSetFont( UINT usWinNum, const char *fontFace, int height, int width, int Bold, int Quality )
 {
   int   size;
   BOOL  bResult = FALSE ;
@@ -7379,7 +7379,7 @@ BOOL GetIPictDimension(IPicture * pPic, int * pWidth, int * pHeight)
   return TRUE;
 }
 
-BOOL GetImageDimension(char * image, int * pWidth, int * pHeight)
+BOOL GetImageDimension(const char * image, int * pWidth, int * pHeight)
 {
 
   HBITMAP hBitmap;
@@ -7504,7 +7504,7 @@ static void DrawTransparentBitmap(HDC hdc, HBITMAP hBitmap, short xStart,
    is never closed.
    TODO: make it an option.
  */
-BOOL HB_EXPORT hb_gt_wvwDrawImage( UINT usWinNum, int x1, int y1, int wd, int ht, char * image,
+BOOL HB_EXPORT hb_gt_wvwDrawImage( UINT usWinNum, int x1, int y1, int wd, int ht, const char * image,
                                    BOOL bTransparent )
 {
   HBITMAP hBitmap;
@@ -7604,7 +7604,7 @@ BOOL HB_EXPORT hb_gt_wvwDrawImage( UINT usWinNum, int x1, int y1, int wd, int ht
 
 /*-------------------------------------------------------------------*/
 
-IPicture * hb_gt_wvwLoadPicture( char * image )
+IPicture * hb_gt_wvwLoadPicture( const char * image )
 {
   IStream  *iStream;
 
@@ -9146,7 +9146,7 @@ HB_FUNC( WVW_SETCLIPBOARD )
 {
    LPTSTR  lptstrCopy;
    HGLOBAL hglbCopy;
-   char *  cText;
+   const char *  cText;
    int     nLen;
 
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
@@ -9630,7 +9630,7 @@ int nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn )
 
 
 
-HB_EXPORT IPicture * rr_LoadPictureFromResource(char * resname,UINT iresimage,LONG *lwidth,LONG *lheight)
+HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresimage,LONG *lwidth,LONG *lheight)
 {
  HBITMAP hbmpx;
  IPicture *iPicture = NULL;
@@ -9688,7 +9688,7 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource(char * resname,UINT iresimage,LO
     return iPicture;
 }
 
-HB_EXPORT IPicture * rr_LoadPicture(char * filename,LONG * lwidth,LONG * lheight)
+HB_EXPORT IPicture * rr_LoadPicture( const char * filename,LONG * lwidth,LONG * lheight)
 {
     IStream *iStream=NULL ;
     IPicture *iPicture=NULL;
@@ -9854,7 +9854,7 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib)
 
 /* FindBitmapHandle and AddBitmapHandle are for bitmaps associated with
    Windows controls such as toolbar, pushbutton, checkbox, etc */
-HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
+HBITMAP FindBitmapHandle( const char * szFileName, int * piWidth, int * piHeight)
 {
   BITMAP_HANDLE * pbh = s_pWvwData->s_sApp->pbhBitmapList;
 
@@ -9883,7 +9883,7 @@ HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
   return NULL;
 }
 
-void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
+void AddBitmapHandle( const char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
 {
   BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
   memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
@@ -9900,7 +9900,7 @@ void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight
 
 /* FindPictureHandle and AddPictureHandle are for bitmaps associated with
    Windows controls such as toolbar, pushbutton, checkbox, etc */
-static IPicture * FindPictureHandle(char * szFileName, int * piWidth, int * piHeight)
+static IPicture * FindPictureHandle( const char * szFileName, int * piWidth, int * piHeight)
 {
   PICTURE_HANDLE * pph = s_pWvwData->s_sApp->pphPictureList;
 
@@ -9929,7 +9929,7 @@ static IPicture * FindPictureHandle(char * szFileName, int * piWidth, int * piHe
   return NULL;
 }
 
-static void AddPictureHandle(char * szFileName, IPicture * iPicture, int iWidth, int iHeight)
+static void AddPictureHandle( const char * szFileName, IPicture * iPicture, int iWidth, int iHeight)
 {
   PICTURE_HANDLE * pphNew = (PICTURE_HANDLE *) hb_xgrab( sizeof( PICTURE_HANDLE ) );
   memset( pphNew, 0 ,sizeof( PICTURE_HANDLE ) );
@@ -9947,7 +9947,7 @@ static void AddPictureHandle(char * szFileName, IPicture * iPicture, int iWidth,
    Windows controls such as toolbar, pushbutton, checkbox, etc
    IOW, it is for user drawn images (wvw_drawimage)
  */
-static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
+static HBITMAP FindUserBitmapHandle( const char * szFileName, int * piWidth, int * piHeight)
 {
   BITMAP_HANDLE * pbh = s_pWvwData->s_sApp->pbhUserBitmap;
   BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
@@ -9977,7 +9977,7 @@ static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHe
   return NULL;
 }
 
-static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
+static void AddUserBitmapHandle( const char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
 {
   BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
   memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );

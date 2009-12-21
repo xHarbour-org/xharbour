@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.23 2009/09/13 12:45:39 likewolf Exp $
+   $Id: xwt_api.c,v 1.24 2009/09/13 21:12:28 likewolf Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -589,7 +589,7 @@ HB_FUNC( XWTINIT )
       argv = (char **) hb_xgrab( sizeof( char *) * (argc +1));
       for ( i = 0; i < argc; i ++ )
       {
-         argv[ i ] = hb_parcx( i );
+         argv[ i ] = (char*) hb_parcx( i );
       }
       argv[ argc ] = 0;
    }

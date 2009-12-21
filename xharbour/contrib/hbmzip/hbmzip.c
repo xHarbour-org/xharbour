@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.8 2009/09/30 16:19:24 marchuet Exp $
+ * $Id: hbmzip.c,v 1.9 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -1291,8 +1291,8 @@ static int hb_zipDeleteFile( const char* szZipFile, const char* szFileMask )
 /*  HB_ZipDeleteFile( cZipFile, cFileMask ) --> nError */
 HB_FUNC( HB_ZIPDELETEFILE )
 {
-   char * szZipFile  = hb_parc( 1 );
-   char * szFileMask = hb_parc( 2 );
+   const char * szZipFile  = hb_parc( 1 );
+   const char * szFileMask = hb_parc( 2 );
 
    if( szZipFile && szFileMask )
       hb_retni( hb_zipDeleteFile( szZipFile, szFileMask ) );

@@ -1299,7 +1299,7 @@ HB_FUNC( _MAKEDLGTEMPLATE )
     *p++ = (short)  0x00          ;  // Class also ignored
 
     if ( hb_parinfa(1,11) == HB_IT_STRING ) {
-        nchar = nCopyAnsiToWideChar( p, TEXT( hb_parc(1,11) ) ) ;
+        nchar = nCopyAnsiToWideChar( p, TEXT( (LPTSTR) hb_parc(1,11) ) ) ;
         p += nchar   ;
       }
     else
@@ -1312,7 +1312,7 @@ HB_FUNC( _MAKEDLGTEMPLATE )
       *p++ = (short) hb_parni(1,13) ;
       *p++ = (short) hb_parni(1,14) ;
 
-      nchar = nCopyAnsiToWideChar( p, TEXT( hb_parc(1,15) ) ) ;
+      nchar = nCopyAnsiToWideChar( p, TEXT( (LPTSTR) hb_parc(1,15) ) ) ;
       p += nchar ;
 
     } ;
@@ -1344,7 +1344,7 @@ HB_FUNC( _MAKEDLGTEMPLATE )
       *p++ = HIWORD ( hb_parnl(9,i) ) ;  // id   // 0;
 
       if ( hb_parinfa(10,i) == HB_IT_STRING ) {
-          nchar = nCopyAnsiToWideChar(p, TEXT ( hb_parc(10,i)) ) ; // class
+          nchar = nCopyAnsiToWideChar(p, TEXT ( (LPTSTR) hb_parc(10,i)) ) ; // class
           p += nchar ;
          }
       else

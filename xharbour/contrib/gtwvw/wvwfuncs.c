@@ -1,5 +1,5 @@
 /*
-* $Id: wvwfuncs.c,v 1.3 2009/09/07 21:36:20 lculik Exp $
+* $Id: wvwfuncs.c,v 1.4 2009/09/20 15:17:07 lculik Exp $
  */
 /*
  * WVWDRAW.C
@@ -928,7 +928,7 @@ HB_FUNC( LOADBITMAPEX )
 
 HB_FUNC( OPENIMAGE )
 {
-   char* cFileName = hb_parc(1);
+   const char* cFileName = hb_parc(1);
    BOOL  lString = (ISNIL(2))? 0 : hb_parl(2);
    int iFileSize;
    FILE* fp;
@@ -1694,7 +1694,7 @@ HB_FUNC( WVW_SETPOINTER )
 /*                                                                   */
 HB_FUNC( WVW_LOADPICTURE )
 {
-   WVW_DATA *  p = hb_getWvwData();	
+   WVW_DATA *  p = hb_getWvwData();
    IPicture * iPicture = hb_gt_wvwLoadPicture( hb_parcx( 2 ) );
    BOOL       bResult  = FALSE;
    int        iSlot    = hb_parni( 1 ) - 1 ;
@@ -2239,7 +2239,7 @@ HB_FUNC( WVW__MAKEDLGTEMPLATE )
 
     if ( hb_parinfa( 1,11 ) == HB_IT_STRING )
     {
-        nchar = nCopyAnsiToWideChar( p, TEXT( hb_parcx( 1,11 ) ) ) ;
+        nchar = nCopyAnsiToWideChar( p, TEXT( (char*) hb_parcx( 1,11 ) ) ) ;
         p += nchar   ;
     }
     else
@@ -2253,7 +2253,7 @@ HB_FUNC( WVW__MAKEDLGTEMPLATE )
       *p++ = (short) hb_parni(1,13) ;
       *p++ = (short) hb_parni(1,14) ;
 
-      nchar = nCopyAnsiToWideChar( p, TEXT( hb_parcx(1,15) ) ) ;
+      nchar = nCopyAnsiToWideChar( p, TEXT( (char*) hb_parcx(1,15) ) ) ;
       p += nchar ;
     } ;
 
@@ -2280,7 +2280,7 @@ HB_FUNC( WVW__MAKEDLGTEMPLATE )
 
       if ( hb_parinfa( 10,i ) == HB_IT_STRING )
          {
-         nchar = nCopyAnsiToWideChar( p, TEXT ( hb_parcx( 10,i ) ) ) ;
+         nchar = nCopyAnsiToWideChar( p, TEXT ( (char*) hb_parcx( 10,i ) ) ) ;
          p += nchar ;
          }
       else

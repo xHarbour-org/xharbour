@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.12 2005/10/24 14:39:26 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.13 2009/02/13 16:12:21 ronpinkas Exp $
  */
 
 /*
@@ -939,7 +939,7 @@ static unsigned short crctab[ 256 ] = {
 
 HB_FUNC( P_CRC16 ) {
 
-   char *ptr = _parc( 1 );
+   const char *ptr = _parc( 1 );
    int count = _parclen( 1 );
 
    register unsigned short crc = 0;
@@ -1009,7 +1009,7 @@ static ULONG crc32tbl[ 256 ] = {
 
 HB_FUNC( P_CRC32 ) {
 
-   char *ptr = _parc( 1 );
+   const char *ptr = _parc( 1 );
    int count = _parclen( 1 );
 
    register ULONG crc = CRC32INIT;
