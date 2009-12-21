@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.c,v 1.4 2009/11/09 09:38:44 marchuet Exp $
+* $Id: inetssl.c,v 1.5 2009/11/15 22:34:52 lculik Exp $
 */
 
 /*
@@ -434,7 +434,7 @@ int hb_selectWriteExceptSocket( HB_SSL_SOCKET_STRUCT *Socket )
 
 
 /*** Utilty to access host DNS */
-static struct hostent * hb_getHosts( char * name, HB_SSL_SOCKET_STRUCT *Socket )
+static struct hostent * hb_getHosts( const char * name, HB_SSL_SOCKET_STRUCT *Socket )
 {
    struct hostent *Host = NULL;
 
@@ -517,7 +517,7 @@ static void hb_socketSetBlocking( HB_SSL_SOCKET_STRUCT *Socket )
 static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
 {
    int iErr1;
-   #if ! defined( HB_OS_WIN ) || ! defined( HB_OS_WIN_USED )
+   #if ( ! defined( HB_OS_WIN ) && ! defined( HB_OS_WIN_USED ) )
       int iErrval;
       socklen_t iErrvalLen;
    #endif
@@ -689,8 +689,8 @@ HB_FUNC( INETSSLCREATE )
    PHB_ITEM pSocket = NULL;
    int iRet1;
    int iRet2;
-   char * szCAPath;
-   char * szCAFile;
+   const char * szCAPath;
+   const char * szCAFile;
    HB_SSL_SOCKET_STRUCT *Socket;
    HB_SSL_SOCKET_INIT( Socket, pSocket );
 
@@ -1249,9 +1249,10 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
    int iLen = 0;
    int iPos = 0, iTimeElapsed;
    ULONG ulPatPos;
+   /*
    int iRet;
    int r;
-
+   */
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -1670,10 +1671,12 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
    int iLen, iSent, iSend, iBufferLen;
+   /*
    unsigned int nwritten;
    int iRet;
    int r;
    fd_set  set;
+   */
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
@@ -1767,7 +1770,7 @@ HB_FUNC( INETSSLSENDALL )
 
 HB_FUNC( INETSSLGETHOSTS )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    struct hostent *Host;
    char ** cHosts;
    int iCount = 0;
@@ -1816,7 +1819,7 @@ HB_FUNC( INETSSLGETHOSTS )
 
 HB_FUNC( INETSSLGETALIAS )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    struct hostent *Host;
    char ** cHosts;
    int iCount = 0;
@@ -2097,7 +2100,7 @@ return can_read(Socket->com,Socket->timeout);
 
 HB_FUNC( INETSSLCONNECT )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET( 3 );
    PHB_ITEM pSocket = NULL;
    struct hostent *Host;
@@ -2194,7 +2197,7 @@ HB_FUNC( INETSSLCONNECT )
 
 HB_FUNC( INETSSLCONNECTIP )
 {
-   char * szHost = hb_parc( 1 );
+   const char * szHost = hb_parc( 1 );
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET( 3 );
    PHB_ITEM pSocket = NULL;
    int iPort = hb_parni( 2 );
@@ -2392,7 +2395,7 @@ HB_FUNC( INETSSLDGRAM )
 HB_FUNC( INETSSLDGRAMSEND )
 {
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET( 1 );
-   char * szAddress = hb_parcx( 2 );
+   const char * szAddress = hb_parcx( 2 );
    int iPort = hb_parni( 3 );
    PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
    int iLen;
