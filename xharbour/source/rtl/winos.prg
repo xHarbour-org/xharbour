@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.11 2009/11/30 20:37:35 peterrees Exp $
+ * $Id: winos.prg,v 1.12 2009/12/06 00:36:21 peterrees Exp $
  */
 
 /*
@@ -130,8 +130,10 @@ FUNCTION OS_NETVREDIROK( nResult )
 
 
 #pragma BEGINDUMP
+#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
 #include <windows.h>
+#define HB_OS_WIN_USED
 #include "hbapiitm.h"
 
 static void getwinver(  OSVERSIONINFO * pOSvi )
@@ -300,5 +302,5 @@ HB_FUNC( OS_ISUSERANADMIN )  // 24/11/09 11:43
   hb_retl( iResult ) ;
 }
 
-
+#endif
 #pragma ENDDUMP

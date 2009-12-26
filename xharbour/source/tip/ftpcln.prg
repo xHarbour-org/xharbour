@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.30 2009/08/17 01:20:42 lculik Exp $
+ * $Id: ftpcln.prg,v 1.31 2009/09/17 12:20:03 lculik Exp $
  */
 
 /*
@@ -901,6 +901,7 @@ METHOD listFiles( cFileSpec ) CLASS tIPClientFTP
          DO WHILE cEntry[++nStart] == " " ; ENDDO
          nEnd          := At( Chr(32), cEntry, nStart )
          cDay          := SubStr( cEntry, nStart, nEnd-nStart )
+         cDay          := PadL( Val( cDay), 2, "0" )
          nStart        := nEnd
 
          // year
