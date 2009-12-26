@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.12 2009/12/06 00:36:21 peterrees Exp $
+ * $Id: winos.prg,v 1.13 2009/12/26 13:47:54 lculik Exp $
  */
 
 /*
@@ -301,6 +301,89 @@ HB_FUNC( OS_ISUSERANADMIN )  // 24/11/09 11:43
   }
   hb_retl( iResult ) ;
 }
+#else
+HB_FUNC( OS_ISWINNT )
+{
+  hb_retl( 0 );
+}
 
+HB_FUNC( OS_ISWIN9X )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWIN95 )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWIN98 )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWINME )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWINNT351 )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWINNT4 )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWIN2000 )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWINXP )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWIN2003 )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWINVISTA )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWIN7 )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWTSCLIENT )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWIN2000_OR_LATER )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_ISWINVISTA_OR_LATER )
+{
+  hb_retl( 0);
+}
+
+HB_FUNC( OS_VERSIONINFO )
+{
+}
+
+HB_FUNC( OS_ISUSERANADMIN )  // 24/11/09 11:43
+{
+hb_retl( 0 ) ;
+}
 #endif
 #pragma ENDDUMP
