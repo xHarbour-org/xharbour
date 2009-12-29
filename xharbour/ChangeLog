@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6663 2009/12/26 13:47:54 lculik Exp $
+ * $Id: ChangeLog,v 1.6664 2009/12/29 15:08:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-29 23:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbinit.h
+  + include/pragma.h
+    + add ease for Windows Linker, ie to embed information on required import
+      libraries in object file so that when building an application, we are now
+      no longer required to explicitly list import libraries in link scripts.
+      Currently it is only applicable to MSVC, Openwatcom, DigitalMars, XCC and
+      Intel C++. (PellesC does not work - POCC bug?). Although the pragmas
+      already sufficient to cover common requirements, it does not mean it
+      represents a complete list. Additions can be added as required.
+      The use of this "hardcoded script" is guarded with HB_NO_PRAGMA define
+      constant.
 
 2009-12-29 10:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbapidbg.h

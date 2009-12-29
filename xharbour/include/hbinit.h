@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.34 2009/12/16 05:30:50 andijahja Exp $
+ * $Id: hbinit.h,v 1.35 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -318,6 +318,10 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
                   { HB_WATCOM_STARTUP_ID, HB_WATCOM_STARTUP_PRIORITY, func };
 #else
    #error Unknown initialization method.
+#endif
+
+#if defined( _MSC_VER ) || defined( __WATCOMC__ ) || defined( __DMC__ )
+   #include "pragma.h"
 #endif
 
 HB_EXTERN_END
