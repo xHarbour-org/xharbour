@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.36 2009/03/02 09:20:17 marchuet Exp $
+ * $Id: dbgentry.c,v 1.37 2009/12/20 14:08:05 andijahja Exp $
  */
 
 /*
@@ -537,7 +537,7 @@ static char * hb_dbgStripModuleName( char * szName )
    return szName;
 }
 
-void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, char *szFunction )
+void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, const char *szFunction )
 {
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    HB_BREAKPOINT *pBreak;

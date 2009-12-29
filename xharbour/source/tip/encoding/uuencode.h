@@ -7,8 +7,8 @@
 extern "C"{
 #endif
 
-char *UUEncode(unsigned char *pInput, unsigned int iInputLen);
-unsigned char *UUDecode(char *pszInput, unsigned int *pOutLen);
+char *UUEncode( const unsigned char *pInput, unsigned int iInputLen );
+unsigned char *UUDecode( const char *pszInput, unsigned int *pOutLen );
 
 #ifdef __cplusplus
 }

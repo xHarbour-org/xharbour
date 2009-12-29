@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.180 2009/10/13 20:36:44 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.182 2009/12/20 14:07:12 andijahja Exp $
  */
 
 /*
@@ -808,7 +808,7 @@ RETURN Self
 
   HB_EXTERN_BEGIN
   //---------------------------------------------------------------------------//
-  HB_EXPORT BSTR hb_oleAnsiToSysString( LPCSTR cString )
+  HB_EXPORT BSTR hb_oleAnsiToSysString( const char *cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -830,7 +830,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
+  HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -925,7 +925,7 @@ RETURN Self
 
           if( bByRef )
           {
-             hb_itemPutCRawStatic( pItem, (char *) hb_oleAnsiToSysString( sString ), ulLen * 2 + 1 );
+             hb_itemPutCRawStatic( pItem, (const char *) hb_oleAnsiToSysString( sString ), ulLen * 2 + 1 );
 
              pVariant->n1.n2.vt   = VT_BYREF | VT_BSTR;
              pVariant->n1.n2.n3.pbstrVal = (BSTR *) &( pItem->item.asString.value );
@@ -2615,7 +2615,7 @@ RETURN Self
      }
      else*/ if( szName[0] == '_' && szName[1] && hb_pcount() >= 1 )
      {
-        bstrMessage = hb_oleAnsiToSysString( (char*) szName + 1 );
+        bstrMessage = hb_oleAnsiToSysString( (const char *) szName + 1 );
 #if defined( __cplusplus ) && ( ( defined(__WATCOMC__) && ( __WATCOMC__ >= 1280 ) ) )
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID)  IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, pDispID );
 #else

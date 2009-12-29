@@ -1,5 +1,5 @@
 /*
- * $Id: time.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
+ * $Id: time.c,v 1.1 2005/10/13 12:01:10 lf_sfnet Exp $
  */
 
 /*
@@ -100,7 +100,7 @@ HB_FUNC( TIMEDIFF )
 */
 HB_FUNC( TIMEISVALID )
 {
-   char * pszTime = hb_parcx( 1 );
+   const char * pszTime = hb_parcx( 1 );
    BOOL bRet = FALSE;
 
    if( pszTime )

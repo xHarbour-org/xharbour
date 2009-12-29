@@ -144,7 +144,7 @@ static long filelength( int handle )
    return nEnd - nStart;
 }
 
-static char *filetoBuff(char *f,char *s)
+static char *filetoBuff( char *f, const char *s )
 {
 
    int i;
@@ -158,8 +158,8 @@ static char *filetoBuff(char *f,char *s)
 HB_FUNC( HB_BASE64ENCODEFILE )
 {
    HB_THREAD_STUB
-   char *szInFile = hb_parcx( 1 );
-   char *szOutFile = hb_parcx( 2 ) ;
+   const char *szInFile = hb_parcx( 1 );
+   const char *szOutFile = hb_parcx( 2 ) ;
    const char *pcCode ;
    char *FromBuffer;
    int fh;
@@ -182,8 +182,8 @@ HB_FUNC( HB_BASE64ENCODEFILE )
 HB_FUNC( HB_BASE64DECODEFILE )
 {
    HB_THREAD_STUB
-   char *szInFile = hb_parcx( 1 );
-   char *szOutFile = hb_parcx( 2 ) ;
+   const char *szInFile = hb_parcx( 1 );
+   const char *szOutFile = hb_parcx( 2 ) ;
    const char *pcCode ;
    char *FromBuffer;
    int fh;

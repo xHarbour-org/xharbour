@@ -1,5 +1,5 @@
 /*
- * $Id: hbapidbg.h,v 1.2 2007/12/21 12:12:21 likewolf Exp $
+ * $Id: hbapidbg.h,v 1.3 2009/12/20 14:07:11 andijahja Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ extern HB_EXPORT PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset );
 
 /* internal debugger function */
 extern HB_EXPORT void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
-extern HB_EXPORT void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, char *szFunction );
+extern HB_EXPORT void hb_dbgAddBreak( void *handle, const char *cModule, int nLine, const char *szFunction );
 extern HB_EXPORT void hb_dbgAddWatch( void *handle, const char *szExpr, BOOL bTrace );
 extern HB_EXPORT void hb_dbgDelBreak( void *handle, int nBreak );
 extern HB_EXPORT void hb_dbgDelWatch( void *handle, int nWatch );

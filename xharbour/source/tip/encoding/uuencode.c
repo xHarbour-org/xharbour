@@ -6,7 +6,7 @@
 #define HB_THREAD_OPTIMIZE_STACK
 
 //Assume pInput!=NULL, iInputLen>0.
-char *UUEncode(unsigned char *pInput, unsigned int iInputLen)
+char *UUEncode( const unsigned char *pInput, unsigned int iInputLen)
 {
    #define CODEOF(c) ((c)?((c)+' '):'`')
    int i,n;
@@ -38,7 +38,7 @@ char *UUEncode(unsigned char *pInput, unsigned int iInputLen)
    return pRet;
 }
 
-unsigned char* UUDecode(char *pszInput, unsigned int *pOutLen)
+unsigned char* UUDecode( const char *pszInput, unsigned int *pOutLen )
 {
    #define CHAROF(c) (((*c)=='`') ? 0 : ((*c)-' ')); c++;
    int i, n, last=0, iInputLen=strlen(pszInput);
@@ -73,18 +73,18 @@ unsigned char* UUDecode(char *pszInput, unsigned int *pOutLen)
 HB_FUNC( HB_UUENCODE )
 {
    HB_THREAD_STUB
-   unsigned char *pcCode = hb_parcx( 1 ) ;
+   const char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen = hb_parni( 2 );
    char * szUUEncode ;
 
-   szUUEncode = UUEncode( pcCode , uCodeLen );
+   szUUEncode = UUEncode( (const unsigned char *) pcCode , uCodeLen );
    hb_retc( szUUEncode );
 }
 
 HB_FUNC( HB_UUDECODE )
 {
    HB_THREAD_STUB
-   unsigned char *pcCode = hb_parcx( 1 ) ;
+   const char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen ;
    unsigned char * szUUEncode ;
 
@@ -103,7 +103,7 @@ static long filelength( int handle )
 }
 
 
-static char *filetoBuff(char *f,char *s)
+static char *filetoBuff( char *f, const char *s )
 {
    int i;
    int fh = hb_fsOpen( ( BYTE * ) s , 2 );
@@ -118,8 +118,8 @@ static char *filetoBuff(char *f,char *s)
 HB_FUNC( HB_UUENCODEFILE )
 {
    HB_THREAD_STUB
-   char *szInFile = hb_parcx( 1 );
-   char *szOutFile = hb_parcx( 2 ) ;
+   const char *szInFile = hb_parcx( 1 );
+   const char *szOutFile = hb_parcx( 2 ) ;
    char *pcCode ;
    char *FromBuffer;
    int fh;
@@ -131,7 +131,7 @@ HB_FUNC( HB_UUENCODEFILE )
    FromBuffer = ( char * ) hb_xgrab( iSize + 1 );
    hb_fsClose(fh);
    pcCode = (char*) filetoBuff( FromBuffer , szInFile ) ;
-   szUUEncode = UUEncode( pcCode , iSize );
+   szUUEncode = UUEncode( (const unsigned char *) pcCode , iSize );
    fh = hb_fsCreate( szOutFile,0) ;
    hb_fsWriteLarge( fh, szUUEncode, strlen( szUUEncode ));
    hb_fsClose( fh );
@@ -142,8 +142,8 @@ HB_FUNC( HB_UUENCODEFILE )
 HB_FUNC( HB_UUDECODEFILE )
 {
    HB_THREAD_STUB
-   char *szInFile = hb_parcx( 1 );
-   char *szOutFile = hb_parcx( 2 ) ;
+   const char *szInFile = hb_parcx( 1 );
+   const char *szOutFile = hb_parcx( 2 ) ;
    unsigned char *pcCode ;
    char *FromBuffer;
    int fh;
