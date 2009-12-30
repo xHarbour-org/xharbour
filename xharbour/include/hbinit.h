@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.35 2009/12/19 14:06:18 andijahja Exp $
+ * $Id: hbinit.h,v 1.36 2009/12/29 16:10:36 andijahja Exp $
  */
 
 /*
@@ -320,9 +320,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
    #error Unknown initialization method.
 #endif
 
-#if defined( _MSC_VER ) || defined( __WATCOMC__ ) || defined( __DMC__ )
-   #include "pragma.h"
-#endif
+#include "pragma.h"
 
 HB_EXTERN_END
 

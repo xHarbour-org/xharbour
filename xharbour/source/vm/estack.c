@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.112 2009/09/27 00:05:24 ronpinkas Exp $
+ * $Id: estack.c,v 1.113 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ void hb_stackPopReturn( void )
    if( --HB_VM_STACK.pPos <= HB_VM_STACK.pBase )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
-   hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos );
+   hb_itemRawMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos );
 }
 
 #undef hb_stackDec
@@ -292,7 +292,7 @@ void hb_stackPushReturn( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPushReturn()"));
 
-   hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return );
+   hb_itemRawMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return );
 
    /* enough room for another item ? */
    if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd )

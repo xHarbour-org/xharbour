@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6664 2009/12/29 15:08:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6665 2009/12/29 16:10:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-31 02:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/pragma.h
+  * include/hbinit.h
+    ! move conditional usage to pragma.h
+    + add bufferoverflowU.lib for MSVC 2003 (.NET)
+
+  * utils/hbpp.c
+  * source/pp/ppgen.c
+  * source/compiler/harbour.c
+    + include pragma.h
+
+  * makefile.dc
+  * makefile.vc
+  * makefile.wc
+    - remove no longer required COMPILERLIBS variables
+
+  * source/vm/estack.c
+  * source/vm/fastitem.c
+  * source/vm/memvars.c
+  * source/vm/codebloc.c
+  * source/vm/hvm.c
+  * include/hbapiitm.h
+    ! use inline codes for memcpy, hb_itemMove where applicable.
+      (This idea was first implemented in Harbour by Przemyslaw Czerpak)
 
 2009-12-29 23:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbinit.h

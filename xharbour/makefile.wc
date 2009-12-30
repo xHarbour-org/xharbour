@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.100 2009/07/29 17:15:53 marchuet Exp $
+# $Id: makefile.wc,v 1.101 2009/08/23 22:46:11 lculik Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -79,9 +79,9 @@ COMPILERLIBS=\
 	uuid.lib\
 	mpr.lib
 
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
-EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB)
+EXE_LIBS=$(HARBOUR_LIBS)
+CMN_LIBS=$(COMMON_LIB)
 
 #===============================================================================
 # Macro Definitions
@@ -292,22 +292,6 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# Compiler and 3rd Party libraries need to be linked
-#===============================================================================
-COMPILERLIBS=\
-	$(COMPILERLIBS)\
-	uuid.lib\
-	user32.lib\
-	advapi32.lib\
-	gdi32.lib\
-	winspool.lib\
-	ole32.lib\
-	oleaut32.lib\
-	ws2_32.lib\
-	mpr.lib\
-	winmm.lib
-
-#===============================================================================
 # Append your own build flags here
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
@@ -327,8 +311,8 @@ DLLFLAGS=\
 	/implib:$(HARBOUR_DLL_LIB)\
 	/nologo\
 	/subsystem:console\
-	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
-
+	$(HARBOUR_DLL_OBJS)
+	
 EXEFLAGS=\
 	/nologo\
 	/subsystem:console
@@ -345,7 +329,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project

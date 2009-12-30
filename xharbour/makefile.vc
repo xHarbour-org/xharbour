@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.248 2009/11/16 10:50:30 lculik Exp $
+# $Id: makefile.vc,v 1.249 2009/11/21 20:54:56 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -134,9 +134,9 @@ COMPILERLIBS=\
 	advapi32.lib\
 	winmm.lib\
 	mpr.lib
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
-EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB)
+EXE_LIBS=$(HARBOUR_LIBS)
+CMN_LIBS=$(COMMON_LIB)
 
 #===============================================================================
 # Library dependencies and build rules
@@ -315,21 +315,6 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# Compiler and 3rd Party libraries need to be linked
-#===============================================================================
-COMPILERLIBS=\
-	$(COMPILERLIBS)\
-	user32.lib\
-	advapi32.lib\
-	gdi32.lib\
-	winspool.lib\
-	ole32.lib\
-	oleaut32.lib\
-	ws2_32.lib\
-	mpr.lib\
-	winmm.lib
-
-#===============================================================================
 # Append your own build flags here
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
@@ -371,7 +356,7 @@ DLLFLAGS=\
 	/SUBSYSTEM:WINDOWS\
 	/OPT:WIN98\
 	$(LFLAGS)\
-	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
+	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
 	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB"\
@@ -387,7 +372,7 @@ HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1 =bison -v -d $** -o$@
 BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project

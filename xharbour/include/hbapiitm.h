@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.56 2009/10/16 05:44:25 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.57 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -202,9 +202,30 @@ extern HB_EXPORT PHB_ITEM   hb_itemClone    ( PHB_ITEM pItem );
                                                 (item)->type = HB_IT_NIL; \
                                           } while( 0 )
 
+#  define hb_itemRawCpy( dst, src )       do { *(dst) = *(src); } while( 0 )
+
+#  define hb_itemRawMove( dst, src )      do { \
+                                             hb_itemRawCpy( dst, src ); \
+                                             (src)->type = HB_IT_NIL; \
+                                          } while( 0 )
+
+   /* intentional low level hack to eliminate race condition in
+    * unprotected readonly access in few places in core code only.
+    * hb_item[Raw]Move() moves HB_ITEM structure members first coping
+    * 'type' and then 'item' parts of HB_ITEM. In this macro the order
+    * is reverted. [druzus]
+    */
+#  define hb_itemSafeMove( dst, src )  do { \
+                                             (dst)->item = (src)->item; \
+                                             (dst)->type = (src)->type; \
+                                             (src)->type = HB_IT_NIL; \
+                                          } while( 0 )
+
 #else
 
 #  define hb_itemSetNil( item )           hb_itemClear( (item) )
+
+#  define hb_itemRawMove( dst, src )      hb_itemMove( (dst), (src) )
 
 #endif
 

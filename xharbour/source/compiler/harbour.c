@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.220 2009/06/02 23:54:17 ronpinkas Exp $
+ * $Id: harbour.c,v 1.221 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 #include "hbdate.h"
 #include "hbverbld.h"
 #include "hbapierr.h"
+#include "pragma.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
@@ -228,7 +229,6 @@ extern int yyparse( void );    /* main yacc parsing function */
 extern void hb_compReleaseRTVars( void );
 extern void hb_compReleaseLoops( void );
 extern void hb_compReleaseElseIfs( void );
-
 /*
  The following two variables are for the purpose of
  creating Local Variable List (.var) file

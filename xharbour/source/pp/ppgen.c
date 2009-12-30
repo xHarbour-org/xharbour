@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: ppgen.c,v 1.16 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define  __PPGEN__
 #include "ppcore.c"
 
+#include "pragma.h"
 #include "hbset.h"
 
 
@@ -223,7 +224,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.16 2009/11/09 09:38:58 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -327,7 +328,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.15 2009/09/30 16:19:25 marchuet Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.16 2009/11/09 09:38:58 marchuet Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"

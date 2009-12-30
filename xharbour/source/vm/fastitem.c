@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.126 2008/11/23 03:23:13 andijahja Exp $
+ * $Id: fastitem.c,v 1.127 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -100,7 +100,7 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    /* Forward. */
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   hb_itemRawCpy( pDest, pSource );
 
    #ifndef HB_ARRAY_USE_COUNTER
       if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
@@ -153,7 +153,7 @@ void hb_itemReturnRelease( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemMove( hb_stackReturnItem(), pItem );
+      hb_itemRawMove( hb_stackReturnItem(), pItem );
       hb_itemRelease( pItem );
    }
 }
@@ -403,9 +403,9 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
       }
    #endif
 
-   memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
-   memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
-   memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
+   hb_itemRawCpy( &temp, pItem2 );
+   hb_itemRawCpy( pItem2, pItem1 );
+   hb_itemRawCpy( pItem1, &temp );
 }
 
 void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
@@ -422,7 +422,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       hb_itemClear( pDest );
    }
 
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   hb_itemRawCpy( pDest, pSource );
    pDest->type &= ~HB_IT_DEFAULT;
 
    if( HB_IS_COMPLEX( pSource ) )
@@ -541,7 +541,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
          {
             char *sCopy = (char *) hb_xgrab( ulLen + 1 );
 
-            hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+            hb_itemRawCpy( (void *) sCopy, (void *) szText );
 
             return hb_itemPutCPtr( pItem, sCopy, ulLen );
          }
@@ -551,7 +551,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
             __HB_STRING_REALLOC( pItem, ulLen );
 
             // Safe, no need to use memmove()
-            memcpy( pItem->item.asString.value, szText, ulLen );
+            hb_itemRawCpy( pItem->item.asString.value, szText );
 
             return pItem;
          }
@@ -591,7 +591,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
          pItem->item.asString.allocated       = ulLen + 1;
 
          // Alocation above already set the 'length and the terminator!
-         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
+         hb_itemRawCpy( (void *) pItem->item.asString.value, (void *) szText );
       }
    }
 

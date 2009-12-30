@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.17 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: pragma.h,v 1.1 2009/12/29 16:10:36 andijahja Exp $
  */
 
 /*
@@ -53,23 +53,28 @@
 #define _PRAGMA_H_INCLUDE
 
 #ifndef HB_NO_PRAGMA
-   #pragma comment( lib, "uuid" )
-   #pragma comment( lib, "psapi" )
-   #pragma comment( lib, "iphlpapi" )
-   #pragma comment( lib, "version" )
-   #pragma comment( lib, "shell32" )
-   #pragma comment( lib, "kernel32" )
-   #pragma comment( lib, "user32" )
-   #pragma comment( lib, "advapi32" )
-   #pragma comment( lib, "gdi32" )
-   #pragma comment( lib, "winspool" )
-   #pragma comment( lib, "ole32" )
-   #pragma comment( lib, "oleaut32" )
-   #pragma comment( lib, "ws2_32" )
-   #pragma comment( lib, "mpr" )
-   #pragma comment( lib, "winmm" )
-   #pragma comment( lib, "comctl32" )
-   #pragma comment( lib, "comdlg32" )
+   #if defined( _MSC_VER ) || defined( __WATCOMC__ ) || defined( __DMC__ )
+      #if ( defined(_MSC_FULL_VER) && (_MSC_FULL_VER==13104035) )
+         #pragma comment( lib, "bufferoverflowU" )
+      #endif
+      #pragma comment( lib, "uuid" )
+      #pragma comment( lib, "psapi" )
+      #pragma comment( lib, "iphlpapi" )
+      #pragma comment( lib, "version" )
+      #pragma comment( lib, "shell32" )
+      #pragma comment( lib, "kernel32" )
+      #pragma comment( lib, "user32" )
+      #pragma comment( lib, "advapi32" )
+      #pragma comment( lib, "gdi32" )
+      #pragma comment( lib, "winspool" )
+      #pragma comment( lib, "ole32" )
+      #pragma comment( lib, "oleaut32" )
+      #pragma comment( lib, "ws2_32" )
+      #pragma comment( lib, "mpr" )
+      #pragma comment( lib, "winmm" )
+      #pragma comment( lib, "comctl32" )
+      #pragma comment( lib, "comdlg32" )
+   #endif /* _MSC_VER */
 
 #endif /* _HB_NO_PRAGMA */
 #endif /* _PRAGMA_H_INCLUDE */

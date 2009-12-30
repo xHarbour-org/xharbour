@@ -378,7 +378,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    {
       pValue->hPrevMemvar = ( HB_HANDLE ) - 1;    /* detached variable */
 
-      memcpy( pValue->pVarItem, pSource, sizeof( HB_ITEM ) );
+      hb_itemRawCpy( pValue->pVarItem, pSource );
       pValue->pVarItem->type &= ~HB_IT_DEFAULT;
 
       #ifndef HB_ARRAY_USE_COUNTER

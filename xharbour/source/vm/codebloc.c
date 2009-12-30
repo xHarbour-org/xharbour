@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.59 2008/06/28 18:51:49 walito Exp $
+ * $Id: codebloc.c,v 1.60 2008/11/22 08:25:37 andijahja Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
          pLocalPosTable += 2;
 
          pLocal = hb_memvarDetachLocal( pLocal );
-         memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+         hb_itemRawCpy( pCBlock->pLocals + ui, pLocal );
          /* Increment the reference counter so this value will not be
           * released if other codeblock will be deleted
           */

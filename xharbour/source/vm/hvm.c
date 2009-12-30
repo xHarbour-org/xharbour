@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.734 2009/11/09 09:39:22 marchuet Exp $
+ * $Id: hvm.c,v 1.735 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -3643,7 +3643,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                for ( i = HB_VM_STACK.iExtraIndex - 1; i >= 0; i-- )
                {
                   ( aExtraItems + i )->type = HB_IT_NIL;
-                  hb_itemMove( aExtraItems + i, hb_stackItemFromTop(-1) );
+                  hb_itemRawMove( aExtraItems + i, hb_stackItemFromTop(-1) );
                   hb_stackPop();
                }
 
@@ -7128,7 +7128,7 @@ static HB_ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
 
                if( pSubstVal )
                {
-                  hb_itemMove( pAlias, pSubstVal );
+                  hb_itemRawMove( pAlias, pSubstVal );
                   hb_itemRelease( pSubstVal );
                   fRepeat = TRUE;
                }
@@ -7169,7 +7169,7 @@ static void hb_vmSwapAlias( void )
 
    hb_vmSelectWorkarea( pWorkArea, NULL );
 
-   hb_itemMove( pWorkArea, pItem );
+   hb_itemRawMove( pWorkArea, pItem );
    hb_stackDec();
 }
 
@@ -13360,7 +13360,7 @@ BOOL hb_xvmMacroPushIndex( BYTE bFlags )
       for ( i = HB_VM_STACK.iExtraIndex - 1; i >= 0; i-- )
       {
          ( aExtraItems + i )->type = HB_IT_NIL;
-         hb_itemMove( aExtraItems + i, hb_stackItemFromTop(-1) );
+         hb_itemRawMove( aExtraItems + i, hb_stackItemFromTop(-1) );
          hb_stackDec();
       }
 
