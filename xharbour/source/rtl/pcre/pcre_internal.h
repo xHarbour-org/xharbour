@@ -605,10 +605,10 @@ variable-length repeat, or a anything other than literal characters. */
 /* Miscellaneous definitions. The #ifndef is to pacify compiler warnings in
 environments where these macros are defined elsewhere. Unfortunately, there
 is no way to do the same for the typedef. */
-#if ! defined( HB_DEFS_H_ )
+
+#ifndef HB_APIEXT_H_
 typedef int BOOL;
 #endif
-
 
 #ifndef FALSE
 #define FALSE   0

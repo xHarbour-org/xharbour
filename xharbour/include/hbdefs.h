@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.114 2009/12/16 05:30:50 andijahja Exp $
+ * $Id: hbdefs.h,v 1.115 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -69,10 +69,18 @@
    #endif
 #endif
 
-#if defined( __XCC__ ) || defined( __MINGW32__ ) || \
+#if defined( __XCC__ ) || defined( __POCC__ ) || defined( __LCC__ ) || \
+    defined( __MINGW32__ ) || defined( __DMC__ ) || \
     ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
-    ( defined( __GNUC__ ) && \
-      ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
+    ( defined( __WATCOMC__ ) && __WATCOMC__ >= 1270 ) || \
+    ( ( defined( __GNUC__ ) || defined( __SUNPRO_C ) || defined( __SUNPRO_CC ) ) && \
+      ( defined( _ISOC99_SOURCE ) || \
+        ( defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 199901L ) || \
+        ( defined( __DJGPP__ ) && \
+          ( __DJGPP__ > 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ >= 4 ) ) ) || \
+        defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) || \
+        defined( HB_OS_BSD ) || defined( HB_OS_SUNOS ) || \
+        defined( HB_OS_BEOS ) ) )
    #include <stdint.h>
    /* workaround for BCC 5.8 bug */
    #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )

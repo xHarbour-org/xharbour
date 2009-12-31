@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.43 2009/05/06 15:57:41 andijahja Exp $
+ * $Id: hbstr.c,v 1.44 2009/12/31 00:15:47 andijahja Exp $
  */
 
 /*
@@ -1030,6 +1030,7 @@ char * hb_strRemEscSeq( char *str, ULONG *pLen )
    return str;
 }
 
+#if 0
 #undef _HB_SNPRINTF_ADD_EOS
 #undef hb_snprintf
 /* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
@@ -1064,6 +1065,7 @@ ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
 
    return result;
 }
+#endif
 
 /*
  * Simple routine to extract uncommented part of (read) buffer

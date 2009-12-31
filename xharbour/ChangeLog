@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6667 2009/12/31 00:15:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.6668 2009/12/31 02:55:04 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-31 11:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbdefs.h
+    ! update logic for inclusionof compiler's stdint.h
+      (borrowed fom Harbour, copyright: Przemyslaw Czerpak)
+
+  * include/hbapi.h
+    ! update function prototype of new hb_snprintf()
+
+  * source/common/hbstr.c
+    ! def out hb_snprintf() function
+
+  * source/rtl/pcre/pcre_internal.h
+    ! fix compilation of GCC due to inclusion of xHarbour API
 
 2009-12-31 09:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   The following changes were commited in order to pacify MSVC2005 and greater's
