@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6668 2009/12/31 02:55:04 andijahja Exp $
+ * $Id: ChangeLog,v 1.6669 2009/12/31 04:12:30 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-31 16:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! correction on my commit per ChangeLog 1.6669. It is not
+      source/rtl/pcre/pcre_internal.h which was altered, but
+      source/rtl/pcre/pcreposix.c.
+
+  * source/rtl/pcre/pcreposix.c
+    + define HB_DONT_DEFINE_BOOL to not redefine BOOL due to inclusion of
+      xHarbour API
 
 2009-12-31 11:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbdefs.h

@@ -1,5 +1,5 @@
 /*
- * $Id: pcreposix.c,v 1.12 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: pcreposix.c,v 1.13 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*************************************************
@@ -59,6 +59,7 @@ previously been set. */
 #  define PCREPOSIX_EXP_DEFN __declspec(dllexport)
 #endif
 
+#define HB_DONT_DEFINE_BOOL
 #include "pcre.h"
 #include "pcre_internal.h"
 #include "pcreposix.h"
