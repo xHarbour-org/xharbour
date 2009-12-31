@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.145 2009/09/30 16:20:22 marchuet Exp $
+ * $Id: memvars.c,v 1.148 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -1924,7 +1924,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
                   zeros, so they will look trashed. [vszakats] */
 
          memset( buffer, 0, uMLen );
-         strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, uMemLen );
+         hb_strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, uMemLen - 1 );
          buffer[ uMemLen ] = '\0';
 
          if( HB_IS_STRING( pItem ) && ( pItem->item.asString.length + 1 ) <= SHRT_MAX )

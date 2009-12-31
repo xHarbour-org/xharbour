@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.735 2009/12/19 14:06:18 andijahja Exp $
+ * $Id: hvm.c,v 1.736 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -6664,7 +6664,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
 
       szMessage[0] = '_';
       szMessage[1] = '\0';
-      strcat( szMessage, pIndex->item.asString.value );
+      hb_xstrcat( szMessage, pIndex->item.asString.value, 0 );
 
       // Optimized - recycling the parameters.
       #if 1
@@ -10668,6 +10668,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
    return pNewSymbols;
 }
 
+#ifndef __EXPORT__
 PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
@@ -10699,6 +10700,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const c
 
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
+#endif
 
 /* HVM & RTL in harbour.dll */
 PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.27 2009/01/24 00:33:08 likewolf Exp $
+* $Id: inet.h,v 1.28 2009/11/09 09:38:44 marchuet Exp $
 */
 
 /*
@@ -116,14 +116,14 @@
       #if defined( HB_OS_WIN )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
-              s->errorDesc = strerror( s->errorCode );\
+              s->errorDesc = hb_strerror( s->errorCode );\
               WSASetLastError( 0 );
 
       #else
-          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = hb_strerror( errno )
       #endif
 
-      #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
+      #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = hb_strerror( code );
       #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
 
       #define HB_SOCKET_INIT( s, p ) \

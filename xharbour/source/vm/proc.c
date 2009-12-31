@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.37 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: proc.c,v 1.38 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -137,12 +137,12 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
    {
       if( szName )
       {
-         strcpy( szName, "hb_vmQuit" );
+         hb_xstrcpy( szName, "hb_vmQuit", 0 );
       }
 
       if( szModuleName )
       {
-         strcpy( szModuleName, "hvm.c" );
+         hb_xstrcpy( szModuleName, "hvm.c", 0 );
       }
 
       return szName;
@@ -162,26 +162,24 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
             if( uiSuperClass && uiSuperClass <= hb_clsMaxClasses() )
             {
-               strcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.pCargo->uiSuperClass - 1 )->szName );
+               hb_xstrcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.pCargo->uiSuperClass - 1 )->szName, 0 );
             }
             else
             {
-               strcpy( szName, hb_objGetClsName( pSelf ) );
+               hb_xstrcpy( szName, hb_objGetClsName( pSelf ), 0 );
             }
 
-            strcat( szName, ":" );
-            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
+            hb_xstrcat( szName, ":", ( *pBase )->item.asSymbol.value->szName , 0 );
          }
          else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
          {
-            strcpy( szName, "(b)" );
+            hb_xstrcpy( szName, "(b)", 0 );
 
             if( pSelf->item.asBlock.value->uiClass )
             {
                if( pSelf->item.asBlock.value->uiClass <= hb_clsMaxClasses() )
                {
-                  strcat( szName, hb_clsName( pSelf->item.asBlock.value->uiClass ) );
-                  strcat( szName, ":" );
+                  hb_xstrcat( szName, hb_clsName( pSelf->item.asBlock.value->uiClass ), ":", 0 );
                }
                else
                {
@@ -189,7 +187,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
                }
             }
 
-            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
+            hb_xstrcat( szName, ( *pBase )->item.asSymbol.value->szName, 0 );
          }
          else
          {
@@ -197,11 +195,11 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
             if( pPureName )
             {
-               strncpy( szName, pPureName + 1, HB_SYMBOL_NAME_LEN + 1 );
+               hb_strncpy( szName, pPureName + 1, HB_SYMBOL_NAME_LEN );
             }
             else
             {
-               strncpy( szName, ( *pBase )->item.asSymbol.value->szName, HB_SYMBOL_NAME_LEN + 1 );
+               hb_strncpy( szName, ( *pBase )->item.asSymbol.value->szName, HB_SYMBOL_NAME_LEN );
             }
          }
       }
@@ -264,7 +262,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
                   if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
                   {
-                     strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+                     hb_xstrcpy( szModuleName, pClass->pModuleSymbols->szModuleName, 0 );
                   }
                }
                else
@@ -279,7 +277,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
                if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
                {
-                  strcpy( szModuleName, pBlockModuleSymbols->szModuleName );
+                  hb_xstrcpy( szModuleName, pBlockModuleSymbols->szModuleName, 0 );
                }
             }
             else
@@ -295,7 +293,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
                   if( pModuleSymbols && pModuleSymbols->szModuleName )
                   {
-                     strcpy( szModuleName, pModuleSymbols->szModuleName );
+                     hb_xstrcpy( szModuleName, pModuleSymbols->szModuleName, 0 );
                   }
                }
             }

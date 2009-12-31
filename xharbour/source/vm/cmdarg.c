@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.33 2009/11/09 09:39:22 marchuet Exp $
+ * $Id: cmdarg.c,v 1.34 2009/12/16 05:35:18 andijahja Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
                pszPos++;
 
             pszRetVal = ( char * ) hb_xgrab( strlen( pszPos ) + 1 );
-            strcpy( pszRetVal, pszPos );
+            hb_strncpy( pszRetVal, pszPos, strlen( pszPos ) );
 
             return pszRetVal;
          }
@@ -220,7 +220,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
                ulLen = pszEnd - pszPos;
 
                pszEnvVar = ( char * ) hb_xgrab( ulLen + 1 );
-               strncpy( pszEnvVar, pszPos, ulLen );
+               hb_strncpy( pszEnvVar, pszPos, ulLen );
                pszEnvVar[ ulLen ] = '\0';
             }
             hb_xfree( ( void * ) tmp );

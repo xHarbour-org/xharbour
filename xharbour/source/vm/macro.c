@@ -1476,8 +1476,8 @@ void hb_compGenMessageData( char * szMsg, HB_MACRO_DECL )
 
    szResult = ( char * ) hb_xgrab( strlen( szMsg ) + 2 );
 
-   strcpy( szResult, "_" );
-   strcat( szResult, szMsg );
+   hb_xstrcpy( szResult, "_", 0 );
+   hb_xstrcat( szResult, szMsg, 0 );
 
    hb_compGenMessage( szResult, HB_MACRO_PARAM );
    hb_xfree( szResult );

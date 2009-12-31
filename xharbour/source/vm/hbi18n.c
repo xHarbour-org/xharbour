@@ -96,32 +96,32 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
 
    // Supposing that the user strings are compiled in English;
    // this default can be changed later
-   strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
-   strcpy( s_base_language_name, HB_INTERNATIONAL_NAME );
+   hb_strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
+   hb_strncpy( s_base_language_name, HB_INTERNATIONAL_NAME, HB_I18N_NAMELEN - 1 );
 
    if ( language == NULL )
    {
-      language = getenv( "LANG" );
+      language = hb_getenv( "LANG" );
       if ( language == NULL )
       {
-         language = getenv( "LC_ALL" );
+         language = hb_getenv( "LC_ALL" );
       }
    }
 
    if ( i18n_dir == NULL )
    {
-      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, HB_PATH_MAX - 1 );
+      hb_strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, HB_PATH_MAX - 1 );
    }
    else
    {
-      strncpy( s_default_i18n_dir, i18n_dir, HB_PATH_MAX - 1 );
+      hb_strncpy( s_default_i18n_dir, i18n_dir, HB_PATH_MAX - 1 );
    }
 
    /* No automatic internationalization can be found */
    if ( language == NULL || ! hb_i18n_load_language( language ) )
    {
-      strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
-      strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
+      hb_strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
+      hb_strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
       // but we know that we don't want internationalization
       if ( language != NULL )
       {
@@ -293,11 +293,11 @@ BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader )
    int nWrite;
 
    // strncopy prevents gpf
-   strncpy( header.signature, hb_arrayGetCPtr( pHeader, 1 ), sizeof(header.signature));
-   strncpy( header.author, hb_arrayGetCPtr( pHeader, 2 ), sizeof(header.author));
-   strncpy( header.language, hb_arrayGetCPtr( pHeader, 3 ), sizeof(header.language));
-   strncpy( header.language_int, hb_arrayGetCPtr( pHeader, 4 ), sizeof(header.language_int));
-   strncpy( header.language_code, hb_arrayGetCPtr( pHeader, 5 ), sizeof(header.language_code));
+   hb_strncpy( header.signature, hb_arrayGetCPtr( pHeader, 1 ), sizeof(header.signature));
+   hb_strncpy( header.author, hb_arrayGetCPtr( pHeader, 2 ), sizeof(header.author));
+   hb_strncpy( header.language, hb_arrayGetCPtr( pHeader, 3 ), sizeof(header.language));
+   hb_strncpy( header.language_int, hb_arrayGetCPtr( pHeader, 4 ), sizeof(header.language_int));
+   hb_strncpy( header.language_code, hb_arrayGetCPtr( pHeader, 5 ), sizeof(header.language_code));
    header.entries = hb_arrayGetNI( pHeader, 6 );
 
    nWrite = hb_fsWrite( handle, (BYTE *) &header, sizeof( header ) );
@@ -573,8 +573,8 @@ BOOL hb_i18n_load_language( char *language )
 
       if( pTable != NULL )
       {
-         strncpy( s_current_language, language , HB_I18N_CODELEN );
-         strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
+         hb_strncpy( s_current_language, language , HB_I18N_CODELEN );
+         hb_strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
          if ( s_i18n_table != NULL )
          {
             hb_itemRelease( s_i18n_table );
@@ -603,8 +603,8 @@ BOOL hb_i18n_load_language( char *language )
 
    if( pTable != NULL )
    {
-      strncpy( s_current_language, language , HB_I18N_CODELEN );
-      strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
+      hb_strncpy( s_current_language, language , HB_I18N_CODELEN );
+      hb_strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
       if ( s_i18n_table != NULL )
       {
          hb_itemRelease( s_i18n_table );
@@ -851,7 +851,7 @@ HB_FUNC( HB_I18NSETPATH )
       return;
    }
 
-   strncpy( s_default_i18n_dir, hb_parc( 1 ), HB_PATH_MAX - 1 );
+   hb_strncpy( s_default_i18n_dir, hb_parc( 1 ), HB_PATH_MAX - 1 );
 }
 
 /* Gets default directory */
@@ -884,8 +884,8 @@ HB_FUNC( HB_I18NSETLANGUAGE )
       {
          hb_itemRelease( s_i18n_table );
          s_i18n_table = NULL;
-         strncpy( s_current_language, s_base_language , HB_I18N_CODELEN );
-         strncpy( s_current_language_name, s_base_language_name,
+         hb_strncpy( s_current_language, s_base_language , HB_I18N_CODELEN );
+         hb_strncpy( s_current_language_name, s_base_language_name,
                HB_I18N_NAMELEN - 1 );
       }
       hb_retl( TRUE );
@@ -937,13 +937,13 @@ HB_FUNC( HB_I18NSETBASELANGUAGE )
       bChange = TRUE;
    }
 
-   strncpy( s_base_language, szCode , HB_I18N_CODELEN );
-   strncpy( s_base_language_name, szName, HB_I18N_NAMELEN );
+   hb_strncpy( s_base_language, szCode , HB_I18N_CODELEN );
+   hb_strncpy( s_base_language_name, szName, HB_I18N_NAMELEN );
 
    if ( bChange )
    {
-      strncpy( s_current_language, szCode , HB_I18N_CODELEN );
-      strncpy( s_current_language_name, szName, HB_I18N_NAMELEN );
+      hb_strncpy( s_current_language, szCode , HB_I18N_CODELEN );
+      hb_strncpy( s_current_language_name, szName, HB_I18N_NAMELEN );
    }
 }
 

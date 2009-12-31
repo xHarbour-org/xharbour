@@ -824,21 +824,21 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
 
             szScope[0] = '\0';
 
-            strcat( szScope, "Scope Violation <" );
+            hb_xstrcat( szScope, "Scope Violation <", 0 );
 
             if( uiScope & HB_OO_CLSTP_HIDDEN )
             {
-               strcat( szScope, "HIDDEN+" );
+               hb_xstrcat( szScope, "HIDDEN+", 0 );
             }
 
             if( uiScope & HB_OO_CLSTP_PROTECTED )
             {
-               strcat( szScope, "PROTECTED+" );
+               hb_xstrcat( szScope, "PROTECTED+", 0 );
             }
 
             if( uiScope & HB_OO_CLSTP_READONLY )
             {
-               strcat( szScope, "READONLY+" );
+               hb_xstrcat( szScope, "READONLY+", 0 );
             }
 
             szScope[ strlen( szScope ) - 1 ] = '>';
@@ -2153,7 +2153,7 @@ HB_FUNC( __CLSADDMSG )
 
          szAssign[0] = '_';
          szAssign[1] = '\0';
-         strcat( (char*) szAssign, szMessage );
+         hb_xstrcat( (char*) szAssign, szMessage, 0 );
          szMessage = (char *) szAssign;
          bPersistent = FALSE;
          break;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6665 2009/12/29 16:10:36 andijahja Exp $
+ * $Id: ChangeLog,v 1.6666 2009/12/30 19:56:55 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-31 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  The following changes were commited in order to pacify MSVC2005 and greater's
+  warning on using "unsafe" functions.
+
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + hb_strerror(), safe function for MSVS2005 and newer
+
+  * include/inet.h
+    * strerror -> hb_strerror
+
+  * source/vm/cmdarg.c
+  * source/vm/hbi18n.c
+  * source/vm/proc.c
+  * source/vm/hvm.c
+  * source/vm/classes.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/fm.c
+    ! strcat  -> hb_xstrcat
+    ! strcpy  -> hb_xstrcpy
+    ! strncpy -> hb_strncpy
+    ! genenv  -> hb_getenv
 
 2009-12-31 02:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/pragma.h

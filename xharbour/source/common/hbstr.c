@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.41 2009/05/04 19:45:45 andijahja Exp $
+ * $Id: hbstr.c,v 1.43 2009/05/06 15:57:41 andijahja Exp $
  */
 
 /*
@@ -1139,4 +1139,19 @@ char * hb_stripOutComments( char * buffer, BOOL bStripString )
    {
      return ( NULL );
    }
+}
+
+/*
+   added 12-31-2009 to use safe function for MSVC2005 and greater
+*/
+char *hb_strerror( int errNum )
+{
+#if (defined(_MSC_VER) && (_MSC_VER>=1400))
+   static char sz[256];
+   int i = strerror_s( sz, 255, errNum );
+   (void) i; /* pacify unused variable q*/
+   return(sz) ;
+#else
+   return strerror( errNum );
+#endif
 }

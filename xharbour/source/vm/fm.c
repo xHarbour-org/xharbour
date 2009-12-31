@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.113 2009/01/28 15:42:06 marchuet Exp $
+ * $Id: fm.c,v 1.114 2009/11/09 09:39:22 marchuet Exp $
  */
 
 /*
@@ -308,7 +308,7 @@ void * hb_xalloc( ULONG ulSize )         /* allocates fixed memory, returns NULL
       * hb_xalloc/hb_xgrab
       */
       pMem->uiProcLine = hb_tr_line_; /* C line number */
-      strcpy( pMem->szProcName, hb_tr_file_ );
+      hb_xstrcpy( pMem->szProcName, hb_tr_file_, 0 );
    }
    else
    {
@@ -319,7 +319,7 @@ void * hb_xalloc( ULONG ulSize )         /* allocates fixed memory, returns NULL
           /* PRG line number */
          pMem->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.pCargo->lineno;
           /* PRG ProcName */
-         strcpy( pMem->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
+         hb_xstrcpy( pMem->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName, 0 );
       }
       else
       {
@@ -405,7 +405,7 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
       * hb_xalloc/hb_xgrab
       */
       pMem->uiProcLine = hb_tr_line_; /* C line number */
-      strcpy( pMem->szProcName, hb_tr_file_ );
+      hb_xstrcpy( pMem->szProcName, hb_tr_file_, 0 );
    }
    else
    {
@@ -416,7 +416,7 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
          /* PRG line number */
          pMem->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.pCargo->lineno;
          /* PRG ProcName */
-         strcpy( pMem->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
+         hb_xstrcpy( pMem->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName, 0 );
       }
       else
       {
