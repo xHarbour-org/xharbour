@@ -92,7 +92,7 @@ HB_FUNC( AMPM )
       bAM = ( uiHour != 12 );
    }
 
-   strcpy( pszResult + ulTimeLen, bAM ? " am" : " pm" );
+   hb_xstrcpy( pszResult + ulTimeLen, bAM ? " am" : " pm", 0 );
 
    hb_retclenAdopt( pszResult, ulTimeLen + 3 );
 }

@@ -2127,8 +2127,7 @@ HB_FUNC( __DBCOPY )
 
          hb_fsCurDirBuff( 0, szPath + 1, sizeof( szPath ) - 1 );
 
-         strcat( szPath, HB_OS_PATH_DELIM_CHR_STRING );
-         strcat( szPath, szFile );
+         hb_xstrcat( szPath, HB_OS_PATH_DELIM_CHR_STRING, szFile, 0 );
 
          szFile = szPath;
       }

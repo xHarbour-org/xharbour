@@ -412,12 +412,12 @@ HB_FUNC( DIRECTORYRECURSE )
       {
          if ( strpbrk( pAttribute->item.asString.value, "hH" ) != NULL )
          {
-            strcat( szAttributes, "H" );
+            hb_xstrcat( szAttributes, "H", 0 );
          }
 
          if ( strpbrk( pAttribute->item.asString.value, "sS" ) != NULL )
          {
-            strcat( szAttributes, "S" );
+            hb_xstrcat( szAttributes, "S", 0 );
          }
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.42 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: hbffind.c,v 1.43 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.42 2009/04/16 14:57:35 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.43 2009/11/09 09:39:06 marchuet Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -210,8 +210,8 @@ FILETIME GetOldesFile( const char * szPath)
 
    char * szf = (char*)hb_xgrab( 7 );
 
-   strcpy(szf,szPath);
-   strcat(szf,"*.*");
+   hb_xstrcpy(szf,szPath,0);
+   hb_xstrcat(szf,"*.*",0);
 
    hLastFind = FindFirstFile( szf,&Lastff32 );
 
@@ -707,7 +707,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
     {
       DWORD dwSysFlags;
       char szPath[ 4 ]  = {0};
-      strncpy( szPath, pszFileName, 3 );
+      hb_strncpy( szPath, pszFileName, 3 );
       info->hFindFile = INVALID_HANDLE_VALUE;
 
       if ( szPath[2] == '\0' )
@@ -736,10 +736,10 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
       bFound = FALSE ;
       if ( pFileName )
       {
-        strcpy(pFileName, pszFileName) ;
+        hb_xstrcpy(pFileName, pszFileName, 0 ) ;
         if ( pFileName[iNameLen-1] == HB_OS_PATH_DELIM_CHR )  //  '\\'
         {
-          strcat(pFileName,"*.*") ; // 26/01/2004: Clipper compatibility
+          hb_xstrcat(pFileName,"*.*",0) ; // 26/01/2004: Clipper compatibility
         }
         info->hFindFile = FindFirstFile( pFileName, &info->pFindFileData );
         info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( ulAttr );
@@ -819,7 +819,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
 
       if( ! *info->pattern )
       {
-         strcpy( info->pattern, "*" );
+         hb_xstrcpy( info->pattern, "*", 0 );
       }
 
       tzset();

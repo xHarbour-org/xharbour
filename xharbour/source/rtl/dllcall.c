@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.15 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: dllcall.c,v 1.16 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -214,7 +214,7 @@ HB_FUNC( DLLPREPARECALL )
       {
          // Not a typo - reserving space for possible Ansi 'A' suffix!
          xec->cProc = (char *) hb_xgrab( hb_parclen(3) + 2 );
-         strncpy( xec->cProc, hb_parc(3), hb_parclen(3) + 1 );
+         hb_strncpy( xec->cProc, hb_parc(3), hb_parclen(3) );
       }
       else if (ISNUM( 3 ) )
       {
@@ -320,8 +320,8 @@ HB_FUNC( GETPROCADDRESS )
       if ( ISCHAR( 2 ) )
       {
          // try ANSI flavour ?
-         strcpy(cFuncName, hb_parc(2));
-         strcat(cFuncName, "A");
+         hb_xstrcpy( cFuncName, hb_parc(2), 0);
+         hb_xstrcat( cFuncName, "A", 0);
          lpProcAddr = (LPVOID) GetProcAddress((HMODULE) hb_parnl(1), cFuncName);
       }
    }
@@ -718,8 +718,8 @@ HB_FUNC( DLLCALL )
       if ( ISCHAR( 3 ) )
       {
          // try forced ANSI flavour ?
-         strcpy((char *) cFuncName, hb_parc(3));
-         strcat((char *) cFuncName, "A");
+         hb_xstrcpy( (char *) cFuncName, hb_parc(3), 0 );
+         hb_xstrcat( (char *) cFuncName, "A", 0 );
          lpFunction = (LPVOID) GetProcAddress( (HMODULE) hInst, (const char *) cFuncName);
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.113 2009/11/09 09:38:44 marchuet Exp $
+ * $Id: hbdefs.h,v 1.114 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -540,8 +540,10 @@ typedef unsigned long HB_COUNTER;
 /* type for memory pointer diff */
 #if defined( HB_OS_WIN_64 )
    typedef LONGLONG HB_PTRDIFF;
+   typedef ULONGLONG HB_PTRUINT;
 #else
    typedef long HB_PTRDIFF;
+   typedef unsigned long HB_PTRUINT;
 #endif
 
 #ifdef HB_LONG_LONG_OFF

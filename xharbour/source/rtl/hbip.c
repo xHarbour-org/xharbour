@@ -108,17 +108,17 @@
     #define HB_SOCKET_SET_ERROR()   \
             do { \
                errorCode = WSAGetLastError(); \
-               errorDesc = strerror( errorCode );\
+               errorDesc = hb_strerror( errorCode );\
                WSASetLastError( 0 ); \
             } while( 0 )
 
 #else
     #define HB_SOCKET_SET_ERROR()      \
-            do { errorCode = errno; errorDesc = strerror( errno ); } while( 0 )
+            do { errorCode = errno; errorDesc = hb_strerror( errno ); } while( 0 )
 #endif
 
 #define HB_SOCKET_SET_ERROR1( code )   \
-            do { errorCode = code; errorDesc = strerror( code ); } while( 0 )
+            do { errorCode = code; errorDesc = hb_strerror( code ); } while( 0 )
 #define HB_SOCKET_SET_ERROR2( code, desc )   \
             do { errorCode = code; errorDesc = desc; } while( 0 )
 

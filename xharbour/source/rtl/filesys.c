@@ -1267,7 +1267,7 @@ HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
    if ( ulSize > 254 || *pos == '\\' )
    {
       // absolute path. We are ok
-      strncpy( fullCommand, pFilename, 1023);
+      hb_strncpy( fullCommand, pFilename, 1023 );
       fullCommand[1023] = '\0';
    }
    else
@@ -1277,7 +1277,7 @@ HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
       // find the command in the path
       if ( ! SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart ) )
       {
-         strcpy( fullCommand, cmdName );
+         hb_xstrcpy( fullCommand, cmdName, 0 );
       }
 
    }
@@ -1291,7 +1291,7 @@ HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
    else
    {
       completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + 1);
-      strcpy( completeCommand, fullCommand);
+      hb_xstrcpy( completeCommand, fullCommand, 0 );
    }
 
    memset( &si, 0, sizeof( si ) );
@@ -4292,7 +4292,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
      }
       else
      {
-         strcat( (char *) pbyBuffer, HB_OS_PATH_DELIM_CHR_STRING);
+         hb_xstrcat( (char *) pbyBuffer, HB_OS_PATH_DELIM_CHR_STRING, 0 );
      }
 
       return 0; // if it reaches here, it is right.

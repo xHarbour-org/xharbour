@@ -1,5 +1,5 @@
 /*
- * $Id: hbfopen.c,v 1.6 2009/09/16 08:47:59 andijahja Exp $
+ * $Id: hbfopen.c,v 1.7 2009/09/30 16:19:25 marchuet Exp $
  */
 
 /*
@@ -59,7 +59,11 @@ FILE * hb_fopen( const char *path, const char *mode )
    FILE * file;
 
    path = hb_fsNameConv( path, &pszFree );
+#if ( defined(_MSC_VER) && (_MSC_VER>=1400) )
+   fopen_s( &file, path, mode );
+#else
    file = fopen( path, mode );
+#endif
    if( pszFree )
       hb_xfree( pszFree );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: gzio.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /* gzio.c -- IO on .gz files
@@ -9,11 +9,13 @@
  * Compile this file with -DNO_GZCOMPRESS to avoid the compression code.
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: gzio.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $ */
 
 #include <stdio.h>
 
 #include "zutil.h"
+#include "hbapi.h"
+#include "hbapifs.h"
 
 #ifdef NO_DEFLATE       /* for compatibility with old definition */
 #  define NO_GZCOMPRESS
@@ -132,7 +134,7 @@ local gzFile gz_open (
     if (s->path == NULL) {
         return destroy(s), (gzFile)Z_NULL;
     }
-    strcpy(s->path, path); /* do this early for debugging */
+    hb_xstrcpy(s->path, path, 0); /* do this early for debugging */
 
     s->mode = '\0';
     do {
@@ -182,7 +184,7 @@ local gzFile gz_open (
     s->stream.avail_out = Z_BUFSIZE;
 
     errno = 0;
-    s->file = fd < 0 ? F_OPEN(path, fmode) : (FILE*)fdopen(fd, fmode);
+    s->file = fd < 0 ? hb_fopen(path, fmode) : (FILE*)fdopen(fd, fmode);
 
     if (s->file == NULL) {
         return destroy(s), (gzFile)Z_NULL;
@@ -227,7 +229,7 @@ gzFile ZEXPORT gzdopen (
     char name[46];      /* allow for up to 128-bit integers */
 
     if (fd < 0) return (gzFile)Z_NULL;
-    sprintf(name, "<fd:%d>", fd); /* for debugging */
+    hb_snprintf(name, 46, "<fd:%d>", fd); /* for debugging */
 
     return gz_open (name, mode, fd);
 }
@@ -628,7 +630,7 @@ int ZEXPORTVA gzprintf (gzFile file, const char *format, /* args */ ...)
     va_end(va);
     len = strlen(buf);
 #  else
-    len = vsnprintf(buf, sizeof(buf), format, va);
+    len = hb_vsnprintf(buf, sizeof(buf), format, va);
     va_end(va);
 #  endif
 #endif
@@ -1001,16 +1003,16 @@ const char * ZEXPORT gzerror (
     *errnum = s->z_err;
     if (*errnum == Z_OK) return (const char*)"";
 
-    m = (char*)(*errnum == Z_ERRNO ? zstrerror(errno) : s->stream.msg);
+    m = (char*)(*errnum == Z_ERRNO ? hb_strerror(errno) : s->stream.msg);
 
     if (m == NULL || *m == '\0') m = (char*)ERR_MSG(s->z_err);
 
     TRYFREE(s->msg);
     s->msg = (char*)ALLOC(strlen(s->path) + strlen(m) + 3);
     if (s->msg == Z_NULL) return (const char*)ERR_MSG(Z_MEM_ERROR);
-    strcpy(s->msg, s->path);
-    strcat(s->msg, ": ");
-    strcat(s->msg, m);
+    hb_xstrcpy(s->msg, s->path,0);
+    hb_xstrcat(s->msg, ": ",0);
+    hb_xstrcat(s->msg, m,0);
     return (const char*)s->msg;
 }
 

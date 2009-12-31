@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.57 2009/10/05 14:41:40 marchuet Exp $
+# $Id: common.mak,v 1.58 2009/10/05 15:11:43 marchuet Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -751,6 +751,7 @@ COMMON_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbgete$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbhash$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbstr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbprintf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbtrace$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbver$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)expropt1$(OBJEXT)\

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.62 2009/08/29 20:56:43 likewolf Exp $
+ * $Id: transfrm.c,v 1.63 2009/09/12 18:01:43 likewolf Exp $
  */
 
 /*
@@ -802,7 +802,7 @@ HB_FUNC( TRANSFORM )
            {
              szStr2[ i ] = szStr[ i+1 ];
            }
-           strcpy( szStr, szStr2 );
+           hb_xstrcpy( szStr, szStr2, 0 );
            hb_xfree( szStr2 );
          }
 
@@ -897,7 +897,7 @@ HB_FUNC( TRANSFORM )
                }
             else
             {
-               strcpy( szResult, szStr );
+               hb_xstrcpy( szResult, szStr, 0 );
 
                /* 2006/03/27 - Eduardo Fernandes <modalsist@yahoo.com.br>
                   ulPicLen = 0 ( @E only, without 9,#,$,* in picture) */

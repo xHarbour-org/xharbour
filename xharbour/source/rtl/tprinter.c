@@ -475,7 +475,7 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const 
             {
                if (*pdwBufferSize >= strlen(pPrinterEnum->pPrinterName)+1)
                {
-                  strcpy( pPrinterName , pPrinterEnum->pPrinterName ) ;
+                  hb_xstrcpy( pPrinterName , pPrinterEnum->pPrinterName, 0 ) ;
                   Result = TRUE;
                }
                // Store name length + \0 char for return

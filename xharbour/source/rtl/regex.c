@@ -574,11 +574,11 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 
    if( bMatchCase == FALSE )
    {
-      strncpy( sRegEx, "(?i)", 4 );
+      hb_strncpy( sRegEx, "(?i)", 4 );
       iLenResult = 4;
    }
 
-   strncpy( sRegEx + iLenResult, "\\b", 2 );
+   hb_strncpy( sRegEx + iLenResult, "\\b", 2 );
    iLenResult += 2;
 
    for( i = 0; i < iLen; i++ )
@@ -591,21 +591,21 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
             // Space NOT allowed as 1st. character.
             if( i == 0 )
             {
-               strncpy( sRegEx + iLenResult, "[^ ]", 4 );
+               hb_strncpy( sRegEx + iLenResult, "[^ ]", 4 );
                iLenResult += 4;
             }
 
-            strncpy( sRegEx + iLenResult, ".*", 2 );
+            hb_strncpy( sRegEx + iLenResult, ".*", 2 );
             iLenResult += 2;
             break;
 
          case '?':
-            strncpy( sRegEx + iLenResult, ".?", 2 );
+            hb_strncpy( sRegEx + iLenResult, ".?", 2 );
             iLenResult += 2;
             break;
 
          case '.':
-            strncpy( sRegEx + iLenResult, "\\.", 2 );
+            hb_strncpy( sRegEx + iLenResult, "\\.", 2 );
             iLenResult += 2;
             break;
 
@@ -614,7 +614,7 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
       }
    }
 
-   strncpy( sRegEx + iLenResult, "\\b", 2 );
+   hb_strncpy( sRegEx + iLenResult, "\\b", 2 );
    iLenResult += 2;
 
    sRegEx[ iLenResult ] = '\0';

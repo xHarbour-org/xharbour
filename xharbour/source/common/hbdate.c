@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.21 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: hbdate.c,v 1.22 2009/11/09 09:38:58 marchuet Exp $
  */
 
 /*
@@ -397,7 +397,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
    {
       /* Not a valid date string, so return a blank date with separators */
       format_count = size; /* size is either 8 or 10 */
-      strncpy( szFormattedDate, szDateFormat, size );
+      hb_strncpy( szFormattedDate, szDateFormat, size );
 
       for( digit_count = 0; digit_count < size; digit_count++ )
       {
@@ -610,7 +610,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
    {
       /* Not a valid time string, so return a 00:00:00 time with separators */
       format_count = size;
-      strncpy( szFormattedTime, szTimeFormat, size );
+      hb_strncpy( szFormattedTime, szTimeFormat, size );
 
       for( digit_count = 0; digit_count < size; digit_count++ )
       {

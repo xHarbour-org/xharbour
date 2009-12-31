@@ -218,7 +218,7 @@ char * hb_langName( void )
          ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAME ),
          ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAMENAT ) );
    else
-      strcpy( pszName, "Harbour Language: (not installed)" );
+      hb_xstrcpy( pszName, "Harbour Language: (not installed)", 0 );
 
    return pszName;
 }

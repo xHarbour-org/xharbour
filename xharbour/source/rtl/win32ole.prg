@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.182 2009/12/20 14:07:12 andijahja Exp $
+ * $Id: win32ole.prg,v 1.183 2009/12/29 15:08:04 ronpinkas Exp $
  */
 
 /*
@@ -2437,7 +2437,7 @@ RETURN Self
         // Intentional to avoid report of memory leak if fatal error.
         char *sTemp = hb_oleWideToAnsi( excep.bstrDescription );
         sDescription = (char *) malloc( strlen( sTemp ) + 1 );
-        strcpy( sDescription, sTemp );
+        hb_xstrcpy( sDescription, sTemp, 0 );
         hb_xfree( sTemp );
      }
      else
@@ -2820,9 +2820,9 @@ RETURN Self
 
            sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
 
-           strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );
+           hb_strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );
            sOleClassName[ iClassNameLen ] = ':';
-           strcpy( sOleClassName + iClassNameLen + 1, hb_stackBaseItem()->item.asSymbol.value->szName );
+           hb_xstrcpy( sOleClassName + iClassNameLen + 1, hb_stackBaseItem()->item.asSymbol.value->szName, 0 );
 
            //TraceLog( NULL, "Class: '%s'\n", sOleClassName );
 

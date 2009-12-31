@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6666 2009/12/30 19:56:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.6667 2009/12/31 00:15:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2009-12-31 09:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  The following changes were commited in order to pacify MSVC2005 and greater's
+  warning on using "unsafe" functions.
+
+  * include/hbapi.h
+  * include/hbdefs.h
+  + source/common/hbprintf.c
+  + include/hbfloat.h
+    ! hb_vsnprintf function borrowed from Harbour (copyright: Przemyslaw Czerpak)
+
+  * common.mak
+  * compile.mak
+    + hbprintf.obj dependency
+
+  * source/common/hbfopen.c
+    ! use secured fopen_s for MSVC2005 and greater
+
+  * source/rdd/dbcmd.c
+  * source/common/hbdate.c
+  * source/rtl/set.c
+  * source/rtl/ampm.c
+  * source/rtl/direct.c
+  * source/rtl/dllcall.c
+  * source/rtl/filesys.c
+  * source/rtl/hbffind.c
+  * source/rtl/langapi.c
+  * source/rtl/regex.c
+  * source/rtl/tprinter.c
+  * source/rtl/transfrm.c
+  * source/rtl/win32ole.prg
+  * source/rtl/filenet.c
+  * source/rtl/hbip.c
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/zlib/gzio.c
+    ! fopen      ->hb_fopen
+    ! strerror   -> hb_strerror
+    ! strncpy    -> hb_strncpy
+    ! strcpy     -> hb_xstrcpy
+    ! strcat     -> hb_xstrcat
+    ! _vsnprintf -> hb_vsnprintf
 
 2009-12-31 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   The following changes were commited in order to pacify MSVC2005 and greater's

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.104 2009/12/03 03:00:02 andijahja Exp $
+ * $Id: set.c,v 1.105 2009/12/20 14:07:12 andijahja Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
       hb_fsFNameMerge( path, pFilename );
       hb_xfree( pFilename );
 
-      strcpy(s_PrinterName, file_name) ;
+      hb_xstrcpy(s_PrinterName, file_name, 0) ;
 #if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( set_specifier == HB_SET_PRINTFILE )
       {
@@ -264,7 +264,7 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
             DWORD nSize = HB_PATH_MAX - 1;
             hb_GetDefaultPrinter( (LPTSTR) s_PrinterName, &nSize );
             if ( !s_PrinterName[0] )
-               strcpy( s_PrinterName, "lpt1" ) ;
+               hb_xstrcpy( s_PrinterName, "lpt1", 0 ) ;
          }
          pSet->hb_set_winprinter = hb_PrinterExists( s_PrinterName );
          if ( pSet->hb_set_winprinter )
@@ -1010,7 +1010,7 @@ HB_FUNC( SET )
              FILE *fpTrace;
              BOOL bAppend = FALSE;
 
-             strcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value );
+             hb_xstrcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value, 0 );
 
              /* Create trace.log for tracing. */
              if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
@@ -1251,7 +1251,7 @@ HB_FUNC( SET )
          if( args > 1 )
          {
             if( HB_IS_STRING( pArg2 ) )
-               strcpy( pSet->HB_SET_ERRORLOG, pArg2->item.asString.value );
+               hb_xstrcpy( pSet->HB_SET_ERRORLOG, pArg2->item.asString.value, 0 );
 
             if( pArg3 && HB_IS_LOGICAL( pArg3 ) )
                pSet->HB_SET_APPENDERROR = pArg3->item.asLogical.value;
@@ -1429,9 +1429,9 @@ void hb_setInitialize( PHB_SET_STRUCT pSet )
 
    pSet->HB_SET_TRACE = TRUE; /* Default Trace to ON */
 
-   strcpy( (char *) (pSet->HB_SET_TRACEFILE), "trace.log" );
+   hb_xstrcpy( (char *) (pSet->HB_SET_TRACEFILE), "trace.log", 0 );
 
-   strcpy( (char *) (pSet->HB_SET_ERRORLOG), "error.log" );
+   hb_xstrcpy( (char *) (pSet->HB_SET_ERRORLOG), "error.log", 0 );
    pSet->HB_SET_APPENDERROR = FALSE;
 
    pSet->HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;

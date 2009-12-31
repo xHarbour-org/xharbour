@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
+ * $Id: pcreposix.c,v 1.12 2009/10/20 05:37:22 andijahja Exp $
  */
 
 /*************************************************
@@ -62,7 +62,7 @@ previously been set. */
 #include "pcre.h"
 #include "pcre_internal.h"
 #include "pcreposix.h"
-
+#include "hbapi.h"
 
 /* Table to translate PCRE compile time error codes into POSIX error codes. */
 
@@ -195,10 +195,10 @@ addlength = (preg != NULL && (int)preg->re_erroffset != -1)?
 if (errbuf_size > 0)
   {
   if (addlength > 0 && errbuf_size >= length + addlength)
-    sprintf(errbuf, "%s%s%-6d", message, addmessage, (int)preg->re_erroffset);
+    hb_snprintf(errbuf, errbuf_size, "%s%s%-6d", message, addmessage, (int)preg->re_erroffset);
   else
     {
-    strncpy(errbuf, message, errbuf_size - 1);
+    hb_strncpy(errbuf, message, errbuf_size - 1);
     errbuf[errbuf_size-1] = 0;
     }
   }

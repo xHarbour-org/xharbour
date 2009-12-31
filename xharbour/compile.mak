@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.51 2009/10/01 07:48:41 marchuet Exp $
+# $Id: compile.mak,v 1.52 2009/10/05 14:41:40 marchuet Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -80,6 +80,9 @@ $(OBJ_DIR)$(DIR_SEP)hbhash$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbhash.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbstr$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbstr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbprintf$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbprintf.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbtrace$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbtrace.c
