@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6670 2009/12/31 09:05:32 andijahja Exp $
+ * $Id: ChangeLog,v 1.6671 2010/01/01 03:14:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-01-01 15:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.slx
+  * source/macro/macro.slx
+  * source/ct/envparam.c
+  * source/ct/numlohi.c
+    ! use secured function for MSVS2005 and greater
+
+  * makefile.vc
+    - remove -D_CRT_SECURE_NO_DEPRECATE flag
+      Now at least the compiler and core libs are free from deprecated
+      functions. Yet to be touched: contribs
 
 2010-01-01 10:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/cmdcheck.c

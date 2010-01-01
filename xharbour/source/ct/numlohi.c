@@ -1,5 +1,5 @@
 /*
- * $Id: numlohi.c,v 1.2 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: numlohi.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  *
  * xHarbour Project source code:
  * CT3 NUMLOW() and NUMHIGH() functions.
@@ -55,6 +55,9 @@
 
 #include "hbapi.h"
 
+#if (defined(_MSC_VER) && (_MSC_VER>=1400))
+#define sscanf sscanf_s
+#endif
 
 HB_FUNC( NUMLOW )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: envparam.c,v 1.2 2007/12/23 19:15:16 enricomaria Exp $
+ * $Id: envparam.c,v 1.3 2009/11/09 09:38:58 marchuet Exp $
  */
 /*
  * Harbour Project source code:
@@ -83,8 +83,7 @@ HB_FUNC( ENVPARAM )
       if (! _environ[x])
          break;
 
-      strcat( buffer, _environ[x] );
-      strcat( buffer, CRLF );
+      hb_xstrcat( buffer, _environ[x], CRLF, 0 );
    }
 
    buffer[ buffsize ] = 0;
@@ -113,8 +112,7 @@ HB_FUNC( ENVPARAM )
    for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
    {
 
-      strcat( buffer, (char*) sCurEnv );
-      strcat( buffer, CRLF );
+      hb_xstrcat( buffer, (char*) sCurEnv, CRLF, 0 );
 
       while (*sCurEnv)
          sCurEnv++;

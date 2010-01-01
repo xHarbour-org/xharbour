@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.37 2008/06/27 19:47:49 ronpinkas Exp $
+ * $Id: macro.slx,v 1.38 2009/03/25 21:33:54 ronpinkas Exp $
  */
 
 /*
@@ -210,7 +210,7 @@
                iPairAllocated = iLen + 1; \
             } \
             \
-            strncpy( sPair, szBuffer, iLen ); \
+            hb_strncpy( sPair, szBuffer, iLen ); \
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
             iSize -= s_szBuffer - szBuffer; \
