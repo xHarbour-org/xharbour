@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.221 2009/09/30 16:19:25 marchuet Exp $
+ * $Id: harbour.c,v 1.222 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -2420,7 +2420,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       int iLen = strlen( szFunName );
       char *sDecorated = ( char * ) hb_xgrab( iLen + 2 );
 
-      strcpy( sDecorated, szFunName );
+      hb_xstrcpy( sDecorated, szFunName, 0 );
       szFunName = sDecorated;
 
       szFunName[ iLen ] = '$';
@@ -3766,8 +3766,8 @@ void hb_compGenMessageData( char * szMsg ) /* generates an underscore-symbol nam
 {
    char * szResult = ( char * ) hb_xgrab( strlen( szMsg ) + 2 );
 
-   strcpy( szResult, "_" );
-   strcat( szResult, szMsg );
+   hb_xstrcpy( szResult, "_", 0 );
+   hb_xstrcat( szResult, szMsg, 0 );
 
    hb_compGenMessage( hb_compIdentifierNew( szResult, FALSE ) );
 }
@@ -6372,7 +6372,7 @@ static int hb_compCompile( char * szPrg )
          }
          else
          {
-            strcpy( szHILName, hb_comp_szHILout );
+            hb_xstrcpy( szHILName, hb_comp_szHILout, 0 );
          }
 
          // if the file already exists...

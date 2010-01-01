@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.20 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: gencobj.c,v 1.21 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -273,7 +273,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
       }
       else
       {
-         strcat( szCommandLine, HB_NULL_STR );
+         hb_xstrcat( szCommandLine, HB_NULL_STR, 0 );
       }
 
       /* Compile it! */

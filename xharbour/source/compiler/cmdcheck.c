@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.42 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: cmdcheck.c,v 1.43 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -45,6 +45,7 @@
  *
  */
 
+#define HB_OS_WIN_USED
 #include <time.h>
 
 #include "hbcomp.h"
@@ -77,6 +78,28 @@ static ULONG PackDateTime( void )
    BYTE szString[ 4 ];
    BYTE nValue;
 
+#if defined(HB_OS_WIN)
+   SYSTEMTIME t;
+   GetLocalTime( &t );
+
+   nValue = ( BYTE ) ( ( t.wYear - 1980 ) & ( 2 ^ 6 ) ) ; /* 6 bits */
+   szString[ 0 ]  = nValue << 2;
+   nValue = ( BYTE ) ( t.wMonth ); /* 4 bits */
+   szString[ 0 ] |= nValue >> 2;
+   szString[ 1 ]  = nValue << 6;
+   nValue = ( BYTE ) ( t.wDay ); /* 5 bits */
+   szString[ 1 ] |= nValue << 1;
+
+   nValue = ( BYTE ) t.wHour; /* 5 bits */
+   szString[ 1 ]  = nValue >> 4;
+   szString[ 2 ]  = nValue << 4;
+   nValue = ( BYTE ) t.wMinute; /* 6 bits */
+   szString[ 2 ] |= nValue >> 2;
+   szString[ 3 ]  = nValue << 6;
+   nValue = ( BYTE ) t.wSecond; /* 6 bits */
+   szString[ 3 ] |= nValue;
+
+#else
    time_t t;
    struct tm * oTime;
 
@@ -99,7 +122,7 @@ static ULONG PackDateTime( void )
    szString[ 3 ]  = nValue << 6;
    nValue = ( BYTE ) oTime->tm_sec; /* 6 bits */
    szString[ 3 ] |= nValue;
-
+#endif
    return HB_MKLONG( szString[ 3 ], szString[ 2 ], szString[ 1 ], szString[ 0 ] );
 }
 
@@ -279,7 +302,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                         if ( Args[i][2] )
                         {
                            hb_comp_szHILout = (char *) hb_xgrab( strlen( Args[i] ) );
-                           strcpy( hb_comp_szHILout, Args[i] +2);
+                           hb_xstrcpy( hb_comp_szHILout, Args[i] + 2, 0 );
                            j = strlen( Args[i] );
                         }
                         else
@@ -430,34 +453,39 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
       /* NOTE: CLIPPERCMD enviroment variable
                is overriden if HARBOURCMD exists
       */
-      char * szStrEnv = hb_getenv( "HARBOURCMD" );
+      char *szStrEnv = hb_getenv( "HARBOURCMD" );
 
-      if( !szStrEnv || szStrEnv[ 0 ] == '\0' )
+      if( !szStrEnv || szStrEnv[0] == '\0' )
       {
          if( szStrEnv )
-         {
             hb_xfree( ( void * ) szStrEnv );
-         }
 
          szStrEnv = hb_getenv( "CLIPPERCMD" );
       }
 
-      if( szStrEnv && szStrEnv[ 0 ] != '\0' )
-      {
-         char * szSwitch = strtok( szStrEnv, " " );
-
-         /* Check the environment var
-            while it isn't empty.
-         */
-         while( szSwitch != NULL )
-         {
-            hb_compChkEnvironVar( szSwitch );
-            szSwitch = strtok( NULL, " " );
-         }
-      }
-
       if( szStrEnv )
       {
+         char *szSwitch, *szPtr;
+
+         szPtr = szStrEnv;
+         while( *szPtr )
+         {
+            while( *szPtr == ' ' )
+               ++szPtr;
+            szSwitch = szPtr;
+            if( *szSwitch )
+            {
+               while( *++szPtr )
+               {
+                  if( *szPtr == ' ' )
+                  {
+                     *szPtr++ = '\0';
+                     break;
+                  }
+               }
+               hb_compChkEnvironVar( szSwitch );
+            }
+         }
          hb_xfree( ( void * ) szStrEnv );
       }
    }
@@ -710,7 +738,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 if ( s[2] )
                 {
                    hb_comp_szHILout = (char *) hb_xgrab( strlen( s ) );
-                   strcpy( hb_comp_szHILout, s + 1 );
+                   hb_xstrcpy( hb_comp_szHILout, s + 1, 0 );
                 }
                 else
                 {
@@ -1109,27 +1137,27 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'x':
              case 'X':
+             {
+                unsigned int i = 1;
+                while( s[i] && !HB_ISOPTSEP( s[i] ) &&
+                       i < sizeof( hb_comp_szPrefix ) - 1 )
                 {
-                   unsigned int i = 0;
-                   char * szPrefix = hb_strdup( s + 1 );
-                   while( i < strlen( szPrefix ) && !HB_ISOPTSEP( szPrefix[ i ] ) )
-                   {
-                      i++;
-                   }
-                   szPrefix[ i ] = '\0';
-
-                   if( strlen( szPrefix ) == 0 )
-                   {
-                      hb_snprintf( szPrefix, strlen( s + 1 ), "%08lX_", PackDateTime() );
-                   }
-
-                   strncpy( hb_comp_szPrefix, szPrefix, 16 );
-                   hb_comp_szPrefix[ 20 ] = '\0';
-                   strcat( hb_comp_szPrefix, "_" );
-
-                   hb_xfree( szPrefix );
+                   ++i;
+                }
+                if( i > 1 )
+                {
+                   memcpy( hb_comp_szPrefix, s + 1, i - 1 );
+                   hb_comp_szPrefix[ i - 1 ] = '_';
+                   hb_comp_szPrefix[ i ] = '\0';
+                }
+                else
+                {
+                   hb_snprintf( hb_comp_szPrefix,
+                             sizeof( hb_comp_szPrefix ),
+                             "%08lX_", PackDateTime() );
                 }
                 break;
+             }
 
 #ifdef YYDEBUG
              case 'y':
@@ -1219,36 +1247,43 @@ static void hb_compChkDefineSwitch( char * pszSwitch )
 
 void hb_compChkDefines( int iArg, char * Args[] )
 {
-   /* Chech the environment variables */
+   /* Check the environment variables */
    {
       /* NOTE: CLIPPERCMD enviroment variable is overriden
-               if HARBOURCMD exists */
-      char * szStrEnv = hb_getenv( "HARBOURCMD" );
+         if HARBOURCMD exists */
+      char *szStrEnv = hb_getenv( "HARBOURCMD" );
 
-      if( !szStrEnv || szStrEnv[ 0 ] == '\0' )
+      if( !szStrEnv || szStrEnv[0] == '\0' )
       {
          if( szStrEnv )
-         {
             hb_xfree( ( void * ) szStrEnv );
-         }
 
          szStrEnv = hb_getenv( "CLIPPERCMD" );
       }
 
-      if( szStrEnv && szStrEnv[ 0 ] != '\0' )
-      {
-         char * szSwitch = strtok( szStrEnv, " " );
-
-         /* Check the environment var while it isn't empty. */
-         while( szSwitch != NULL )
-         {
-            hb_compChkDefineSwitch( szSwitch );
-            szSwitch = strtok( NULL, " " );
-         }
-      }
-
       if( szStrEnv )
       {
+         char *szSwitch, *szPtr;
+
+         szPtr = szStrEnv;
+         while( *szPtr )
+         {
+            while( *szPtr == ' ' )
+               ++szPtr;
+            szSwitch = szPtr;
+            if( *szSwitch )
+            {
+               while( *++szPtr )
+               {
+                  if( *szPtr == ' ' )
+                  {
+                     *szPtr++ = '\0';
+                     break;
+                  }
+               }
+               hb_compChkDefineSwitch( szSwitch );
+            }
+         }
          hb_xfree( ( void * ) szStrEnv );
       }
    }
@@ -1260,8 +1295,6 @@ void hb_compChkDefines( int iArg, char * Args[] )
       /* Check all switches in command line They start with an OS_OPT_DELIMITER
          char */
       for( i = 1; i < iArg; i++ )
-      {
-         hb_compChkDefineSwitch( Args[ i ] );
-      }
+         hb_compChkDefineSwitch( Args[i] );
    }
 }

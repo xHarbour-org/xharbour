@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.189 2009/12/16 10:18:44 andijahja Exp $
+ * $Id: genc.c,v 1.190 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -25,6 +25,7 @@
  * their web site at http://www.gnu.org/).
  *
  */
+#define HB_OS_WIN_USED
 
 #include <assert.h>
 #include <time.h>
@@ -47,9 +48,9 @@ static void hb_compGenCAddProtos( FILE *yyc );
 // Routines to check C-In-Line static function declared in a PRG file
 // with #PRAGMA BEGINDUMP - ENDDUMP
 static void hb_compGenCInLineSymbol( void );
-static void hb_compGenCCheckInLineStatic( char * str );
-static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption );
-static BOOL hb_compSymbFound( char* szSymbol );
+static void hb_compGenCCheckInLineStatic( const char * str );
+static BOOL hb_compCStaticSymbolFound( const char* szSymbol, int iOption );
+static BOOL hb_compSymbFound( const char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
 static void hb_compWriteDeclareGlobal( FILE *yyc, short iLocalGlobals );
 static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL, const char * szModuleName );
@@ -429,12 +430,17 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
    {
       char *szComp = hb_verCompiler();
       char *szHrb  = hb_verHarbour();
+
+#if defined(HB_OS_WIN)
+      SYSTEMTIME t;
+      GetLocalTime( &t );
+#else
       time_t t;
       struct tm * oTime;
 
       time( &t );
       oTime = localtime( &t );
-
+#endif
       fprintf( yyc, "/*\n * %s\n", szHrb );
       /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
       fprintf( yyc, " * Generated C source code from %s%s%s\n", "<", hb_comp_PrgFileName, ">" );
@@ -442,8 +448,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
       {
          fprintf( yyc, " * Command: %s\n", hb_Command_Line );
       }
+#if defined(HB_OS_WIN)
+      fprintf( yyc, " * Created: %04d.%02d.%02d %02d:%02d:%02d (%s)\n */\n\n", t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, szComp );
+#else
       fprintf( yyc, " * Created: %04d.%02d.%02d %02d:%02d:%02d (%s)\n */\n\n", oTime->tm_year + 1900, oTime->tm_mon + 1, oTime->tm_mday, oTime->tm_hour, oTime->tm_min, oTime->tm_sec, szComp );
-
+#endif
       hb_xfree( szComp );
       hb_xfree( szHrb );
    }
@@ -1478,7 +1487,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
          if( bNewLine && !bBegin )
          {
             bBegin = TRUE;
-            strcat( szEntries, ",\n" );
+            hb_xstrcat( szEntries, ",\n", 0 );
          }
 
          if( ( ! bNewLine ) && ( ! bBegin ) )
@@ -1502,7 +1511,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
                if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc )
                {
                   bStartFunc = TRUE;
-                  strcat( szEntries, " | HB_FS_FIRST" );
+                  hb_xstrcat( szEntries, " | HB_FS_FIRST", 0 );
                }
 
                hb_xstrcat( szEntries, "}, {HB_FUNCNAME( ", pTemp->szName," )}, NULL },\n", NULL );
@@ -1513,9 +1522,8 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
             if( ! bSymFIRST && ! hb_comp_bNoStartUp && !bStartFunc  )
             {
                bStartFunc = TRUE;
-               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", {HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
-               strcat( szEntries, " | HB_FS_FIRST" );
-               hb_xstrcat( szEntries, "}, {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", {HB_FS_PUBLIC | HB_FS_LOCAL",
+                  " | HB_FS_FIRST", "}, {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
             }
          }
 
@@ -1694,7 +1702,7 @@ static void hb_writeEndInit( FILE* yyc, const char *szModuleName )
 /*
   Searching for function names in glocal symbol list
 */
-static BOOL hb_compSymbFound( char* szSymbol )
+static BOOL hb_compSymbFound( const char* szSymbol )
 {
    BOOL bStatSymFound = FALSE;
    PCOMSYMBOL pSym_ = hb_comp_symbols.pFirst;
@@ -1715,7 +1723,7 @@ static BOOL hb_compSymbFound( char* szSymbol )
 /*
   Searching for function names in in-line-c for writing prototypes
 */
-static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption )
+static BOOL hb_compCStaticSymbolFound( const char* szSymbol, int iOption )
 {
    BOOL bFound = FALSE;
    PSSYMLIST pTemp = pStatSymb;
@@ -1749,7 +1757,7 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
 
    pTemp = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
    pTemp->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
-   strcpy( pTemp->szName, statSymName );
+   hb_xstrcpy( pTemp->szName, statSymName, 0 );
    pTemp->Type = iOption;
    pTemp->pNext = NULL;
 
@@ -1775,7 +1783,7 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
 /*
   Parsing in-line-c codes to extract function names
 */
-static void hb_compGenCCheckInLineStatic( char *sInline )
+static void hb_compGenCCheckInLineStatic( const char *sInline )
 {
    char *szTmp, *szTmp2;
    ULONG uL;
@@ -1789,7 +1797,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
          continue;
       }
 
-      szTmp = strchr( sInline, '(' );
+      szTmp = strchr( (char*) sInline, '(' );
 
       if( szTmp == NULL )
       {
