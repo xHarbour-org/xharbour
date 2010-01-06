@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6671 2010/01/01 03:14:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.6672 2010/01/01 08:48:07 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-01-06 16:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\memvars.c
+    * Fix Andi typo: memvar file name was shortened by one.
 
 2010-01-01 15:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.slx
