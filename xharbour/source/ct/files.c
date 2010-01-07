@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.23 2009/11/09 09:38:58 marchuet Exp $
+ * $Id: files.c,v 1.24 2009/12/20 14:07:12 andijahja Exp $
  */
 
 /*
@@ -658,10 +658,13 @@ HB_FUNC( FILEDATE )
          hFind = FindFirstFile( szFile,&hFilesFind );
 
          if ( hFind != INVALID_HANDLE_VALUE )
+         {
             if ( dwFlags & hFilesFind.dwFileAttributes )
                hb_retds( GetDate( &hFilesFind.ftLastWriteTime ) );
             else
                hb_retds( GetDate( &hFilesFind.ftLastWriteTime ) );
+            FindClose( hFind );
+         }
          else
             hb_retds( "        " );
 
@@ -690,10 +693,13 @@ HB_FUNC( FILEDATE )
       iFind=findfirst( szFiles,&fsFiles,iAttr );
 
       if ( !iFind )
+      {
          if ( ( iAttr>0 ) & ( iAttr&fsFiles.ff_attrib ) )
             hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsFiles.ff_fdate & ~0xFFE0 );
          else
             hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsFiles.ff_fdate & ~0xFFE0 );
+         hb_fsFindClose( iFind );
+      }
       else
          hb_retds( "        " );
    }
@@ -780,10 +786,13 @@ HB_FUNC( FILETIME )
       hFind = FindFirstFile( szFile, &hFilesFind );
 
       if ( hFind != INVALID_HANDLE_VALUE )
+      {
          if ( dwFlags & hFilesFind.dwFileAttributes )
             hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );
          else
-            hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );
+            hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );       
+            FindClose( hFind );
+      }
       else
          hb_retc( "" );
 
@@ -822,6 +831,7 @@ HB_FUNC( FILETIME )
              ( fsFiles.ff_ftime >> 5 ) & 0x3f,
         ( fsFiles.ff_ftime & 0x1f ) << 1 );
          hb_retc( szTime );
+         hb_fsFindClose( iFind );
       }
       else
       {
