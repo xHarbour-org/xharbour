@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.152 2009/12/01 21:41:57 brianhays Exp $
+ * $Id: ads1.c,v 1.153 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#define HB_NEEDS_ACE
 
 #define HB_OS_WIN_USED
 

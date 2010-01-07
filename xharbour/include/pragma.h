@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.h,v 1.1 2009/12/29 16:10:36 andijahja Exp $
+ * $Id: pragma.h,v 1.2 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -74,6 +74,10 @@
       #pragma comment( lib, "winmm" )
       #pragma comment( lib, "comctl32" )
       #pragma comment( lib, "comdlg32" )
+
+      #ifdef HB_NEEDS_ACE
+         #pragma comment( lib, "ace32" )
+      #endif
    #endif /* _MSC_VER */
 
 #endif /* _HB_NO_PRAGMA */

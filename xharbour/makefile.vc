@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.250 2009/12/30 19:56:56 andijahja Exp $
+# $Id: makefile.vc,v 1.251 2010/01/01 08:48:07 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -85,7 +85,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(INCLUDE_DIR) 
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
@@ -298,6 +298,8 @@ DLL_MT=mt
 !else
 COMPILERLIBS=\
     "$(HB_DIR_ADS)\ace32.lib"
+ACE_LIBPATH=\
+    /LIBPATH:"$(HB_DIR_ADS)"
 !endif
 
 HARBOUR_DLL_OBJS=\
@@ -352,7 +354,7 @@ DLLFLAGS=\
 	/DLL\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/NOLOGO\
-	/LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR)\
+        /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) $(ACE_LIBPATH)\
 	/SUBSYSTEM:WINDOWS\
 	/OPT:WIN98\
 	$(LFLAGS)\

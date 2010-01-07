@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6672 2010/01/01 08:48:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.6673 2010/01/06 15:46:35 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-01-07 10:47 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * contrib/rdd_ads/ads1.c
+  * include/pragma.h
+    + Added support for auto requesting ace32.lib
+
+  * makefile.vc
+    ! Fixed harbour.dll generation to resolve ace32.lib
+    /* All other make files should be fixed too! */
 
 2010-01-06 16:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\memvars.c
