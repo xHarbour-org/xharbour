@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.127 2009/12/19 14:06:18 andijahja Exp $
+ * $Id: fastitem.c,v 1.128 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ void hb_itemReturnRelease( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemRawMove( hb_stackReturnItem(), pItem );
+      hb_itemMove( hb_stackReturnItem(), pItem );
       hb_itemRelease( pItem );
    }
 }
