@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2008/12/22 22:09:44 likewolf Exp $
+# $Id: Makefile,v 1.8 2009/03/07 13:48:14 likewolf Exp $
 #
 
 ROOT = ../../
@@ -13,6 +13,7 @@ C_SOURCES=\
 	hbwince.c \
 	hbhash.c \
 	hbstr.c \
+	hbprintf.c \
 	hbdate.c \
 	hbtrace.c \
 	hbver.c \
