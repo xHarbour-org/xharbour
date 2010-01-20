@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6678 2010/01/12 10:33:23 lculik Exp $
+ * $Id: ChangeLog,v 1.6679 2010/01/20 19:54:40 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2009-01-20 20:53 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+2010-01-20 20:53 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * includes/adordd.ch
     + added missing ado entries.
 
