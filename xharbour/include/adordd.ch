@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.ch,v 1.3 2007/05/16 10:36:51 marchuet Exp $
+ * $Id: adordd.ch,v 1.4 2008/03/28 10:23:15 marchuet Exp $
  */
 
 /*
@@ -186,6 +186,16 @@
 #define adSeek           0x200000  // Supports the Seek method to locate a row in a Recordset.
 #define adUpdate         0x1008000 // Supports the Update method to modify existing data.
 #define adUpdateBatch    0x10000
+
+// Command type
+#define adCmdUnspecified         -1
+#define adCmdUnknown              8
+#define adCmdText                 1
+#define adCmdTable                2
+#define adCmdStoredProc           4
+#define adCmdFile               256
+#define adCmdTableDirect        512
+
 
 #command USE <(db)> [VIA <rdd>] [ALIAS <a>] [<nw: NEW>] ;
             [<ex: EXCLUSIVE>] [<sh: SHARED>] [<ro: READONLY>] ;
