@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.81 2009/03/11 10:40:29 likewolf Exp $
+# $Id: hb-func.sh,v 1.82 2009/04/13 14:45:44 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -591,12 +591,12 @@ hb_lnk_request()
     if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         echo "#include \\"hbinit.h\\""
         echo "HB_EXTERN_BEGIN"
-        echo "extern \${HB_LNK_ATTR} char * s_defaultGT;"
+        echo "extern \${HB_LNK_ATTR} char * hb_gt_szNameDefault;"
         echo "extern \${HB_LNK_ATTR} char * s_pszLinkedMain;"
         echo "HB_EXTERN_END"
         echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
         if [ -n "\$gt" ]; then
-            echo "   s_defaultGT = \\"\$gt\\";"
+            echo "   hb_gt_szNameDefault  = \\"\$gt\\";"
         fi
         if [ -n "\${HB_MAIN_FUNC}" ]; then
             echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"

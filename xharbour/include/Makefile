@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.37 2009/01/16 01:56:00 likewolf Exp $
+# $Id: Makefile,v 1.38 2009/11/09 01:38:34 lculik Exp $
 #
 
 ROOT = ../
@@ -72,6 +72,7 @@ C_HEADERS=\
 	ctset.h      \
 	ctstr.h      \
 	hbapises.h   \
+        pragma.h     \
 
 PRG_HEADERS=\
 	achoice.ch   \
