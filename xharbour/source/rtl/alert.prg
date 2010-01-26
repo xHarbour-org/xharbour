@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.27 2008/03/16 19:15:59 likewolf Exp $
+ * $Id: alert.prg,v 1.28 2008/07/24 14:41:58 modalsist Exp $
  */
 
 /*
@@ -75,11 +75,11 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
 
    cMessage := ""
 
-   IF ISARRAY( xMessage )
+   IF HB_ISARRAY( xMessage )
 
       lFirst := .T.
       FOR nEval := 1 TO Len( xMessage )
-         IF ISCHARACTER( cLine := xMessage[ nEval ] )
+         IF HB_ISSTRING( cLine := xMessage[ nEval ] )
             cMessage += iif( lFirst, "", Chr( 10 ) ) + cLine
             lFirst := .F.
          ENDIF
@@ -87,22 +87,38 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
 
    ELSE
 
-      DO CASE
-      CASE ValType( xMessage ) $ "CM" ; cMessage := StrTran( xMessage, ";", Chr( 10 ) )
-      CASE ValType( xMessage ) == "N" ; cMessage := LTrim( Str( xMessage ) )
-      CASE ValType( xMessage ) == "D" ; cMessage := DToC( xMessage )
-      CASE ValType( xMessage ) == "L" ; cMessage := iif( xMessage, ".T.", ".F." )
-      CASE ValType( xMessage ) == "O" ; cMessage := xMessage:className + " Object"
-      CASE ValType( xMessage ) == "S" ; cMessage := "@" + xMessage:Name + "()"
-      CASE ValType( xMessage ) == "B" ; cMessage := "{||...}"
-      OTHERWISE                       ; cMessage := "NIL"
-      ENDCASE
+      SWITCH ValType( xMessage )
+         CASE "C"
+         CASE "M" 
+           cMessage := StrTran( xMessage, ";", Chr( 10 ) )
+           EXIT
+         CASE "N"
+           cMessage := LTrim( Str( xMessage ) )
+           EXIT
+         CASE "D"
+           cMessage := DToC( xMessage )
+           EXIT
+          CASE "L"
+           cMessage := iif( xMessage, ".T.", ".F." )
+           EXIT
+         CASE "O"
+           cMessage := xMessage:className + " Object"
+           EXIT
+         CASE "S"
+           cMessage := "@" + xMessage:Name + "()"
+           EXIT
+         CASE "B" 
+           cMessage := "{||...}"
+           EXIT
+         DEFAULT
+           cMessage := "NIL"
+      END
 
    ENDIF
 
 #else
 
-   IF !ISCHARACTER( xMessage )
+   IF ! HB_ISSTRING( xMessage )
       RETURN NIL
    ENDIF
 
@@ -110,12 +126,12 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
 
 #endif
 
-   IF ! ISARRAY( aOptions )
+   IF ! HB_ISARRAY( aOptions )
       aOptions := {}
    ENDIF
 
 
-   IF ! ISCHARACTER( cColor ) .or. EMPTY( cColor )
+   IF ! HB_ISSTRING( cColor ) .or. EMPTY( cColor )
       cColorBox    := "W+/R"  // first color pair:  (Box)
       cColorButton := "W+/B"  // second color pair: (Buttons)
    ELSE
@@ -141,13 +157,18 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
 
    ENDIF
 
-   IF nDelay == NIL
+   IF ! HB_ISNUMERIC( nDelay )
       nDelay := 0
    ENDIF
 
+   IF nDelay < 0
+      nDelay := 0
+   ENDIF
+   
    aOptionsOK := {}
+
    FOR nEval := 1 TO Len( aOptions )
-      IF ISCHARACTER( aOptions[ nEval ] ) .AND. !Empty( aOptions[ nEval ] )
+      IF HB_ISSTRING( aOptions[ nEval ] ) .AND. !Empty( aOptions[ nEval ] )
          AAdd( aOptionsOK, aOptions[ nEval ] )
       ENDIF
    NEXT

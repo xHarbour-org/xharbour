@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6680 2010/01/20 19:56:19 marchuet Exp $
+ * $Id: ChangeLog,v 1.6681 2010/01/21 08:27:55 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-01-26 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/alert.prg
+    * optimized to use switch/end instead case/endcase.
+
+  * source/rtl/right.c
+    ! fixed to return run time error if an argument is wrong or missing.
+    ps: under clipper, right() function doesn't return error, therefore this
+        bad behaviour is guarded under #ifdef HB_C52_STRICT.
+
+  * source/rtl/txml.prg
+    ! fixed TXmlDocument:New() method to open xml document with string
+      argument passed, at following order: first xml header declaration and
+      second file name.
 
 2010-01-21 02:24 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * bin/hb-func.sh

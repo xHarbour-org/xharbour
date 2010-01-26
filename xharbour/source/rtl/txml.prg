@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.19 2009/11/05 00:15:26 modalsist Exp $
+ * $Id: txml.prg,v 1.20 2009/11/06 19:54:18 modalsist Exp $
  */
 
 /*
@@ -472,7 +472,7 @@ Local nh, lNew
             ::Read( uXml, nStyle )
             EXIT
          CASE 'C'    /* xml file name or xml header */
-            if ! file( uXml )
+            if "<?xml" in lower( uXml )
                ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
                ::Read( uXml, nStyle )
             else

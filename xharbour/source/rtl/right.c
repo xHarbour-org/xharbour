@@ -1,5 +1,5 @@
 /*
- * $Id: right.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: right.c,v 1.5 2004/02/23 04:03:27 andijahja Exp $
  */
 
 /*
@@ -78,6 +78,10 @@ HB_FUNC( RIGHT )
    }
    else
    {
+#ifdef HB_C52_STRICT 
       hb_retc( "" ); /* Clipper doesn't error */
+#else
+      hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "RIGHT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+#endif
    }
 }
