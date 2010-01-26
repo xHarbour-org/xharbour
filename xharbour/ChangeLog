@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6681 2010/01/21 08:27:55 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6682 2010/01/26 13:49:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-01-26 1300 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/hbzlib/zip.c
+    contrib/hbzlib/zipcentraldir.cpp
+    ! Added conditional define to compile in hpux
+    
 2010-01-26 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/alert.prg
     * optimized to use switch/end instead case/endcase.

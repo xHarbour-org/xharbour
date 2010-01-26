@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.58 2009/12/16 05:30:50 andijahja Exp $
+ * $Id: zip.c,v 1.59 2009/12/20 14:07:11 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbinit.h"
-#if defined(HB_OS_LINUX)
+#if defined(HB_OS_LINUX) ||defined(HB_OS_HPUX)
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -79,7 +79,7 @@ PHB_ITEM ChangeDiskBlock;
 extern int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
 extern void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 
-#if defined(HB_OS_LINUX)
+#if defined(HB_OS_LINUX) || defined(HB_OS_HPUX)
 extern int GetFileAttributes( char *szEntry );
 extern void SetFileAttributes( char * szEntry, ULONG ulAttr );
 #endif
@@ -370,7 +370,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
                   Temp= hb_itemNew(NULL);
                   hb_arrayAddForward( FileAttribs, hb_itemPutNI( Temp, GetFileAttributes( szEntry ) ) );
                   hb_itemRelease( Temp ) ;
-                  #if defined(HB_OS_LINUX)
+                  #if defined(HB_OS_LINUX) ||defined(HB_OS_HPUX)
                   SetFileAttributes( szEntry, 0777 );
                   #else
                   SetFileAttributes( szEntry, FA_ARCH );
@@ -403,7 +403,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir, BOOL bFullPath )    
             hb_arrayAddForward( FileAttribs, Temp );
             hb_itemRelease( Temp ) ;
 
-                  #if defined(HB_OS_LINUX)
+                  #if defined(HB_OS_LINUX) ||defined(HB_OS_HPUX)
                   SetFileAttributes( szArrEntry, 0777 );
                   #else
                   SetFileAttributes( szArrEntry, FA_ARCH );
@@ -1028,7 +1028,7 @@ HB_FUNC_EXIT(HBZIPCLEANUP)
 }
 
 
-#if defined(HB_OS_LINUX)
+#if defined(HB_OS_LINUX) ||defined(HB_OS_HPUX)
 
 int GetFileAttributes( char *szEntry )
 {
