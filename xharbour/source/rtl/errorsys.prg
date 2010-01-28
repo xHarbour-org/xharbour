@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.59 2008/04/05 20:31:24 likewolf Exp $
+ * $Id: errorsys.prg,v 1.60 2009/02/23 21:00:20 ronpinkas Exp $
  */
 
 /*
@@ -326,7 +326,8 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, 'Multi Threading....: ' + If( Hb_MultiThread(),"YES","NO" ) )
         FWriteLine( nHandle, 'VM Optimization....: ' + strvalue( Hb_VmMode() ) )
 
-        IF Type( "Select()" ) == "UI"
+        IF Type( "Select()" ) == "UI" .or. Type( "Select()" )  == "N"
+        
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Current Area ......:' + strvalue( &("Select()") ) )
         ENDIF
@@ -433,7 +434,7 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
         FWriteLine( nHandle, "" )
 
-        IF Type( "Select()" ) == "UI"
+        IF Type( "Select()" ) == "UI" .or. Type( "Select()" )  == "N"
            For nCount := 1 To 600
               If !Empty( ( nCount )->( &("Alias()") ) )
                  ( nCount )->( FWriteLine( nHandle, "Work Area No ......: " + strvalue( &("Select()") ) ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6682 2010/01/26 13:49:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.6683 2010/01/26 15:03:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2010-01-26 1300 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+2010-01-28 16:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/errorsys.prg
+    ! fixed showing areas open when error occured
+        
+2010-01-26 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/hbzlib/zip.c
     contrib/hbzlib/zipcentraldir.cpp
     ! Added conditional define to compile in hpux
