@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.101 2008/12/16 03:44:53 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.102 2010/01/01 08:48:07 andijahja Exp $
  */
 
 /*
@@ -104,12 +104,12 @@ static char *sIdOnHold, *s_sLastBlock = NULL;
 
 char * hb_comp_SLX_LastBlock( BOOL bReset );
 
-static int        hb_comp_SLX_Str2Num( char* szNum, HB_LONG * lVal, double * dVal, int * iDec, int * iWidth );
-static int        hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
-static int        hb_comp_SLX_InterceptAction( int iRet );
-static int        hb_comp_SLX_CustomAction( int x );
+static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * lVal, double * dVal, int * iDec, int * iWidth, BOOL* pbError );
+static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
+static int hb_comp_SLX_InterceptAction( int iRet );
+static int hb_comp_SLX_CustomAction( int x );
 
-static void       hb_compCheckIllegalChar( char * szName );
+static void hb_compCheckIllegalChar( char * szName );
 
 /* -----------------------------------------------------  Language Definitions. ---------------------------------------------------- */
 
@@ -629,16 +629,11 @@ LANGUAGE_RULES_ARE {
    #define CUSTOM_ACTION(x) hb_comp_SLX_CustomAction( x )
 
 #undef STREAM_EXCEPTION
-/* See implementation of STREAM_APPEND below!
    #define STREAM_EXCEPTION( sPair, cChar ) \
               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
               aiHold[ iHold++ ] = '\n'; \
               yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
               aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ;
-*/
-
-// Not needed at all - save space.
-#define STREAM_EXCEPTION( sPair, cChar )
 
 #undef STREAM_APPEND
    #define STREAM_APPEND(x) \
@@ -1001,14 +996,15 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       HB_LONG lNumber;
       double dNumber;
       int iDec, iWidth;
+      BOOL bError = FALSE;
 
       //yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
       //yylval.string[0] = 0;
       yylval.string = NULL;
 
-      iElement = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth );
+      iElement = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth, &bError );
 
-      if( !isdigit( (BYTE) yytext[0] ) && !( yytext[0] == '.' && isdigit( (BYTE) yytext[1] ) ) )
+      if( bError )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, yytext, NULL );
          return yytext[0];
@@ -1039,11 +1035,11 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iElement;
 }
 
-static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
+static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
 {
    BOOL fDbl;
 
-   fDbl = hb_compStrToNum( szNum, strlen( szNum ), plVal, pdVal, piDec, piWidth );
+   fDbl = hb_compStrToNumErr( szNum, yyleng, plVal, pdVal, piDec, piWidth, pbError );
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
 

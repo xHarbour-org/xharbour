@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.270 2009/12/31 02:55:05 andijahja Exp $
+ * $Id: hbapi.h,v 1.271 2009/12/31 04:12:30 andijahja Exp $
  */
 
 /*
@@ -674,6 +674,7 @@ extern HB_EXPORT ULONG     hb_strnlen( const char * pszText, ULONG ulLen ); /* l
 extern HB_EXPORT char *    hb_xstrcat( char * dest, const char * src, ... ); /* Concatenates multiple strings into a single result */
 extern HB_EXPORT char *    hb_xstrcpy( char * szDest, const char * szSrc, ... ); /* Concatenates multiple strings into a single result */
 extern HB_EXPORT BOOL      hb_compStrToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
+extern HB_EXPORT BOOL      hb_compStrToNumErr( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
 extern HB_EXPORT BOOL      hb_valStrnToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by VAL() */
 extern HB_EXPORT BOOL      hb_strToNum( const char * szNum, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
 extern HB_EXPORT BOOL      hb_strnToNum( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */

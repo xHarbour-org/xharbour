@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.44 2009/12/31 00:15:47 andijahja Exp $
+ * $Id: hbstr.c,v 1.45 2009/12/31 04:12:30 andijahja Exp $
  */
 
 /*
@@ -561,13 +561,13 @@ double hb_numDecConv( double dNum, int iDec )
       return hb_numRound( dNum, 0 );
 }
 
-static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth )
+static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth, BOOL* pbError )
 {
    BOOL fDbl = FALSE, fDec = FALSE, fNeg, fHex = FALSE;
    ULONG ulPos = 0;
    int c, iWidth, iDec = 0, iDecR = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth, pbError ));
 
    while( ulPos < ulLen && isspace( ( BYTE ) szNum[ulPos] ) )
       ulPos++;
@@ -607,7 +607,14 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
          else if( c >= 'a' && c <= 'f' )
             c -= 'a' - 10;
          else
+         {
+            if( pbError )
+            {
+               *pbError = TRUE;
+            }
+
             break;
+         }
          *lVal = ( *lVal << 4 ) + c;
       }
    }
@@ -650,6 +657,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
          }
          else
          {
+           #if 0
             while( !fDec && ulPos < ulLen )
             {
                if( szNum[ ulPos++ ] == '.' )
@@ -659,6 +667,13 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
             }
             if( fDec )
                iDecR = ulLen - ulPos;
+           #else
+            if( pbError )
+            {
+               *pbError = TRUE;
+            }
+           #endif
+
             break;
          }
       }
@@ -729,25 +744,31 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
 BOOL hb_compStrToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ));
-   return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth );
+   return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth, NULL );
+}
+
+BOOL hb_compStrToNumErr( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_compStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth, pbError ));
+   return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth, pbError );
 }
 
 BOOL hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_valStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ));
-   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, piDec, piWidth );
+   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, piDec, piWidth, NULL );
 }
 
 BOOL hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %p, %p)", szNum, plVal, pdVal ));
-   return hb_str2number( FALSE, szNum, strlen( szNum ), plVal, pdVal, NULL, NULL );
+   return hb_str2number( FALSE, szNum, strlen( szNum ), plVal, pdVal, NULL, NULL, NULL );
 }
 
 BOOL hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %lu, %p, %p)", szNum, ulLen, plVal, pdVal ));
-   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, NULL, NULL );
+   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, NULL, NULL, NULL );
 }
 
 /* returns the numeric value of a character string representation of a number */
@@ -758,7 +779,7 @@ double hb_strVal( const char * szText, ULONG ulLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %lu)", szText, ulLen));
 
-   if( ! hb_str2number( FALSE, szText, ulLen, &lVal, &dVal, NULL, NULL ) )
+   if( ! hb_str2number( FALSE, szText, ulLen, &lVal, &dVal, NULL, NULL, NULL ) )
       dVal = ( double ) lVal;
    return dVal;
 }
@@ -770,7 +791,7 @@ HB_LONG hb_strValInt( const char * szText, int * iOverflow )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strValInt(%s)", szText));
 
-   if( hb_str2number( TRUE, szText, strlen( szText ), &lVal, &dVal, NULL, NULL ) )
+   if( hb_str2number( TRUE, szText, strlen( szText ), &lVal, &dVal, NULL, NULL, NULL ) )
    {
       *iOverflow = 1;
       return 0;

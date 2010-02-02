@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6683 2010/01/26 15:03:37 lculik Exp $
+ * $Id: ChangeLog,v 1.6684 2010/01/28 18:02:44 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-02-02 14:41 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + Added: hb_compStrToNumErr( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
+  * source/compiler/harbour.slx
+  * source/macro/macro.slx
+    + Added missing error detection for a literal string open folowed by nothing
+    ! Fixed hb_comp_SLX_Str2Num() to use hb_compStrToNumErr() to report invalid numeric tokens
+
 2010-01-28 16:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/errorsys.prg
     ! fixed showing areas open when error occured
-        
+
 2010-01-26 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/hbzlib/zip.c
     contrib/hbzlib/zipcentraldir.cpp
     ! Added conditional define to compile in hpux
-    
+
 2010-01-26 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/alert.prg
     * optimized to use switch/end instead case/endcase.
@@ -43,8 +52,8 @@
 
 2010-01-12 080 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/common/Makefile
-    ! added missing hbprintf.c dependencie    
-    
+    ! added missing hbprintf.c dependencie
+
 2010-01-12 13:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fastitem.c
     ! revert back hb_itemRawMove -> hb_itemMove
