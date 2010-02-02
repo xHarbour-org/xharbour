@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.45 2009/12/31 04:12:30 andijahja Exp $
+ * $Id: hbstr.c,v 1.46 2010/02/02 19:12:34 ronpinkas Exp $
  */
 
 /*
@@ -607,14 +607,8 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
          else if( c >= 'a' && c <= 'f' )
             c -= 'a' - 10;
          else
-         {
-            if( pbError )
-            {
-               *pbError = TRUE;
-            }
-
             break;
-         }
+
          *lVal = ( *lVal << 4 ) + c;
       }
    }
@@ -657,25 +651,79 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
          }
          else
          {
-           #if 0
-            while( !fDec && ulPos < ulLen )
+            if( pbError == NULL )
             {
-               if( szNum[ ulPos++ ] == '.' )
-                  fDec = TRUE;
-               else
-                  iWidth++;
+               while( !fDec && ulPos < ulLen )
+               {
+                  if( szNum[ ulPos++ ] == '.' )
+                     fDec = TRUE;
+                  else
+                     iWidth++;
+               }
+               if( fDec )
+                  iDecR = ulLen - ulPos;
             }
-            if( fDec )
-               iDecR = ulLen - ulPos;
-           #else
-            if( pbError )
-            {
-               *pbError = TRUE;
-            }
-           #endif
-
             break;
          }
+      }
+   }
+
+   if( pbError )
+   {
+      #if 1
+         while( szNum[ ulLen ] == ' ' )
+         {
+            ulLen--;
+         }
+      #endif
+
+      if( ulPos + 1 == ulLen )
+      {
+         switch( szNum[ ulPos ] )
+         {
+            case 'l' :
+            case 'L' :
+            case 'u' :
+            case 'U' :
+            case 'f' :
+            case 'F' :
+            {
+               ulPos++;
+               break;
+            }
+         }
+      }
+      else if( ulPos + 2 == ulLen )
+      {
+        char szSuffix[3];
+
+        szSuffix[0] = toupper( szNum[ ulPos ] );
+        szSuffix[1] = toupper( szNum[ ulPos + 1 ] );
+        szSuffix[2] = '\0';
+
+        if( strstr( "LULL", szSuffix ) ) //LU UL or LL
+        {
+           ulPos += 2;
+        }
+      }
+      else if( ulPos + 3 == ulLen )
+      {
+        char szSuffix[4];
+
+        szSuffix[0] = toupper( szNum[ ulPos ] );
+        szSuffix[1] = toupper( szNum[ ulPos + 1 ] );
+        szSuffix[2] = toupper( szNum[ ulPos + 2 ] );
+        szSuffix[3] = '\0';
+
+        if( strncmp( szSuffix, "LLU", 3 ) == 0 || strncmp( szSuffix, "ULL", 3 ) == 0 )
+        {
+           ulPos += 3;
+        }
+      }
+
+      if( ulPos < ulLen )
+      {
+         *pbError = TRUE;
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6684 2010/01/28 18:02:44 lculik Exp $
+ * $Id: ChangeLog,v 1.6685 2010/02/02 19:12:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-02-02 16:54 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/common/hbstr.c
+    ! Fixed format validation in hb_str2number() to support C style suffix (F L U LU UL LLU ULL)
+
 2010-02-02 14:41 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbapi.h
   * source/common/hbstr.c
     + Added: hb_compStrToNumErr( const char * szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
+    + Added support for detecting invalid format to hb_str2number()
   * source/compiler/harbour.slx
   * source/macro/macro.slx
     + Added missing error detection for a literal string open folowed by nothing
