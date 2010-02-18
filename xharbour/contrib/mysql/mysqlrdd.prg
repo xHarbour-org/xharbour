@@ -1,5 +1,5 @@
 /*
- * $Id: mysqlrdd.prg,v 1.3 2006/12/11 12:29:44 marceloanelli Exp $
+ * $Id: mysqlrdd.prg,v 1.4 2008/01/11 02:44:07 marceloanelli Exp $
  */
 
 /*
@@ -296,6 +296,7 @@ STATIC FUNCTION MYSQL_RECID( nWA, nRecNo )
 RETURN SUCCESS
 
 STATIC FUNCTION MYSQL_DELETED( nWA, lDeleted )
+(nWA)
    lDeleted := .F.
 RETURN SUCCESS
 
@@ -343,7 +344,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION MYSQL_APPEND( nWA, nRecords )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
-
+    (nRecords)
    aWAData[ AREA_ROW ] := aWAData[ AREA_QUERY ]:GetBlankRow()
 
    aWAData[ AREA_APPEND ] := .T.

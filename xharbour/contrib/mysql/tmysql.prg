@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.19 2009/11/04 19:51:49 lculik Exp $
+ * $Id: tmysql.prg,v 1.20 2009/11/06 11:16:36 lculik Exp $
  */
 
  /*
@@ -326,7 +326,7 @@ ENDCLASS
 
 METHOD New( nSocket, cQuery, loRow ) CLASS TMySQLQuery
 
-   local nI, aField, rc, bBlock
+   local  aField, rc, bBlock
 
    Default loRow to .t.
 
@@ -1096,7 +1096,7 @@ return !::lError
 // returns a WHERE x=y statement which uses primary key (if available)
 METHOD MakePrimaryKeyWhere() CLASS TMySQLTable
 
-   local ni, cWhere := " WHERE ", aField
+   local  cWhere := " WHERE ", aField
 
    for each aField in ::aFieldStruct
 

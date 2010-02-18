@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6685 2010/02/02 19:12:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6686 2010/02/02 21:26:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-02-18 15:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  ! contrib\mysql\mysqlrdd.prg
+    contrib\mysql\tmysql.prg
+    contrib\mysql\tsqlbrw.prg
+    ! fixed compilation warning
+    
 2010-02-02 16:54 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/common/hbstr.c
     ! Fixed format validation in hb_str2number() to support C style suffix (F L U LU UL LLU ULL)

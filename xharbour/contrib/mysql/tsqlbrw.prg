@@ -1,5 +1,5 @@
 /*
- * $Id: tsqlbrw.prg,v 1.1 2003/02/03 05:21:06 walito Exp $
+ * $Id: tsqlbrw.prg,v 1.2 2003/02/20 15:32:09 lculik Exp $
  */
 
 /*
@@ -163,6 +163,8 @@ ENDCLASS
 METHOD New(nTop, nLeft, nBottom, nRight, oServer, oQuery, cTable) CLASS TBrowseSQL
 
    local i, oCol
+   (oserver)
+   (ctable)
 
    super:New(nTop, nLeft, nBottom, nRight)
 
@@ -249,7 +251,6 @@ METHOD EditField() CLASS TBrowseSQL
    local oCol
    local aGetList
    local nKey
-   local xGetValue
    local cMemoBuff, cMemo
 
    // Get the current column object from the browse
@@ -430,7 +431,7 @@ return Self
 
 
 // Empty method to be subclassed
-METHOD KeyboardHook(nKey) CLASS TBrowseSQL
+METHOD KeyboardHook() CLASS TBrowseSQL
 
 
 return Self
