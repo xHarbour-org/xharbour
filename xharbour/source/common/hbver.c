@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.51 2009/12/01 16:14:10 andijahja Exp $
+ * $Id: hbver.c,v 1.52 2009/12/03 03:00:01 andijahja Exp $
  */
 
 /*
@@ -196,11 +196,15 @@ char * hb_verPlatform( void )
 #elif defined(HB_OS_WIN)
 
    {
-      OSVERSIONINFOA osVer;
+      OSVERSIONINFOEX osVer;
 
-      osVer.dwOSVersionInfoSize = sizeof( osVer );
+      osVer.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX);
 
-      if( GetVersionExA( &osVer ) )
+      ZeroMemory(&osVer , sizeof(OSVERSIONINFOEX));
+
+
+
+      if( GetVersionEx( (OSVERSIONINFO *) &osVer ) )
       {
          const char *szName = NULL;
          const char *szProduct = NULL;
@@ -226,9 +230,28 @@ char * hb_verPlatform( void )
 
             case VER_PLATFORM_WIN32_NT:
 
-               if( osVer.dwMajorVersion == 6 )
+               if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 0  )                  
                {
-                  szName = " Windows Vista";
+                  if (osVer.dwPlatformId == VER_NT_WORKSTATION )
+                  {
+                     szName = " Windows Vista";
+                  }
+                  else
+                  {
+                     szName = " Windows Server 2008";
+                  }
+               }
+               else if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 1 ) 
+               {    
+                  if (osVer.wProductType == VER_NT_WORKSTATION )
+                  {
+                     szName = " Windows 7";
+                  }
+                  else
+                  {
+                     szName = " Windows Server 2008 R2";
+                  }
+
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
