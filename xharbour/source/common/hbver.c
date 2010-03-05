@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.52 2009/12/03 03:00:01 andijahja Exp $
+ * $Id: hbver.c,v 1.53 2010/03/03 16:18:59 lculik Exp $
  */
 
 /*
@@ -198,11 +198,8 @@ char * hb_verPlatform( void )
    {
       OSVERSIONINFOEX osVer;
 
-      osVer.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX);
-
       ZeroMemory(&osVer , sizeof(OSVERSIONINFOEX));
-
-
+      osVer.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX);
 
       if( GetVersionEx( (OSVERSIONINFO *) &osVer ) )
       {
