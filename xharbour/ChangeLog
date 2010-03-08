@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6688 2010/03/03 16:18:59 lculik Exp $
+ * $Id: ChangeLog,v 1.6689 2010/03/05 15:50:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-03-08 00:17 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbclass.ch
+    ! Fixed typo (missing: ;;)
+    * Formatting
+
+  * source/vm/garbage.c
+    ! Critical typo (mising: break;)
+
+  * utils/xbscript/rp_run.src
+  * utils/xbscript/xbsclass.ch
+  * utils/xbscript/clsresults.ch
+    * Synched with hbclass.ch (also simplified using: #include "hbclass.ch")
+
+  * utils/xbscript/xbscript.prg
+    ! Fixed criticaly missing Upper() in CompileRule()
+    ! Fixed inconsistencies using PP__* vs. PP_* as well as capitalization of PP statement tokens which are also used as Functions
+    * Commented few TraceLog()s
+    * Minute optimization
+    * Exclude "xbscript.ch" from autoloading preburnt "hbclass.ch"
+    * Update preburnt rules.
 
 2010-03-05 12:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! source\common\hbver.c
@@ -21,7 +42,7 @@
     contrib\mysql\tmysql.prg
     contrib\mysql\tsqlbrw.prg
     ! fixed compilation warning
-    
+
 2010-02-02 16:54 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/common/hbstr.c
     ! Fixed format validation in hb_str2number() to support C style suffix (F L U LU UL LLU ULL)

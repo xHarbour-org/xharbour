@@ -1104,7 +1104,7 @@ RETURN
           TRY
          #endif
 
-           IF sLine = "PP__LOCALPARAMS"
+           IF sLine = "PP__LocalParams"
 
               IF Len( aProcedure[5][VAR_LOCALPARAM] ) > 0
                  Throw( ErrorNew( [PP], 0, 2034, [Parse], [Formal parameters already declared], { nLine, sLine } ) )
@@ -1119,7 +1119,7 @@ RETURN
                  SetParam( aProcedure, nLine, VAR_LOCALPARAM, cVar )
               NEXT
 
-           ELSEIF sLine = "PP__PARAMS"
+           ELSEIF sLine = "PP__Params"
 
               IF Len( aProcedure[5][VAR_LOCALPARAM] ) > 0
                  Throw( ErrorNew( [PP], 0, 2034, [Parse], [Formal parameters already declared], { nLine, sLine } ) )
@@ -1134,7 +1134,7 @@ RETURN
                  SetParam( aProcedure, nLine, VAR_PARAM, cVar )
               NEXT
 
-           ELSEIF sLine = "PP__LOCALS"
+           ELSEIF sLine = "PP__Locals"
 
               sLine := SubStr( sLine, 12 )
               cVars := Left( sLine, Len( sLine ) - 1 )
@@ -1145,7 +1145,7 @@ RETURN
                  SetVar( aProcedure, nLine, VAR_LOCAL, cVar )
               NEXT
 
-           ELSEIF sLine = "PP__STATICS"
+           ELSEIF sLine = "PP__Statics"
 
               sLine := SubStr( sLine, 13 )
               cVars := Left( sLine, Len( sLine ) - 1 )
@@ -1160,7 +1160,7 @@ RETURN
 
               aProcedure[6] := .T.
 
-              IF sLine = "PP__PRIVATES"
+              IF sLine = "PP__Privates"
 
                  sLine := SubStr( sLine, 14 )
                  cVars := Left( sLine, Len( sLine ) - 1 )
@@ -1171,7 +1171,7 @@ RETURN
                     SetVar( aProcedure, nLine, VAR_PRIVATE, cVar )
                  NEXT
 
-              ELSEIF sLine = "PP__PUBLICS"
+              ELSEIF sLine = "PP__Publics"
 
                  sLine := SubStr( sLine, 13 )
                  cVars := Left( sLine, Len( sLine ) - 1 )
@@ -1409,7 +1409,7 @@ RETURN
                     BREAK
                  ENDIF
 
-              ELSEIF sLine = "PP__RETURN"
+              ELSEIF sLine = "PP__Return"
 
                  IF aScan( aFlow, {|_1| ( _1[1] == "B" .AND. _1[4] == 0 ) .OR. ( _1[1] == "T" .AND. _1[4] == 0 .AND. _1[6] == .F. )  } ) > 0
                     Throw( ErrorNew( [PP], 0, 2086, [Parse], [RETURN violates enclosing SEQUENCE/TRY], { nLine, sLine } ) )
@@ -1481,7 +1481,7 @@ RETURN
 
               ELSE
 
-                 TraceLog( "Unexpected case!" )
+                 TraceLog( "Unexpected case!", sLine )
 
               ENDIF
 
@@ -4291,7 +4291,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                 CompileNestedBlocks( sBlock, @sBlock )
             #endif
 
-            IF ( nProcId == 0 .AND. sBlock = "PP_Statics" )
+            IF ( nProcId == 0 .AND. sBlock = "PP__Statics" )
                Dummy := &( sBlock )
                LOOP
             ENDIF
@@ -5538,16 +5538,18 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
             nNextLine := 0
 
             sSubSubLine := LTrim( sSubLine )
+
             IF sSubSubLine[1] == '#'
                //IF Upper( RTrim( NextToken( LTrim( SubStr( sSubSubLine, 2 ) ) ) ) ) == "PROCESS"
-                  TraceLog( sLine )
+                  //TraceLog( sLine )
                   RETURN
                //ENDIF
             ENDIF
 
             WHILE ( nNextLine := AtSkipStrings( ';', sSubLine, nNextLine + 1, .T. ) ) > 0
                sSubSubLine := LTrim( SubStr( sSubLine, nNextLine + 1 ) )
-               TraceLog( sLine, sSubLine, sSubsubLine, nNextLine )
+               //TraceLog( sLine, sSubLine, sSubsubLine, nNextLine )
+
                IF sSubSubLine[1] == '#'
                   //IF Upper( RTrim( NextToken( LTrim( SubStr( sSubSubLine, 2 ) ) ) ) ) == "PROCESS"
                      IF Len( sLine ) == 0
@@ -5559,7 +5561,7 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
                      // We consumed left already - FOR EACH makes it a BYREF!
                      sSubLine := SubStr( sSubLine, nNextLine + 1 )
 
-                     TraceLog( sLine )
+                     //TraceLog( sLine )
                      RETURN
                   //ENDIF
                ENDIF
@@ -5569,7 +5571,7 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
 
             IF sSubSubLine[1] == '#'
                //IF Upper( RTrim( NextToken( LTrim( SubStr( sSubSubLine, 2 ) ) ) ) ) == "PROCESS"
-                  EXIT
+                  RETURN
                //ENDIF
             ENDIF
 
@@ -5584,7 +5586,7 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
             // FOR EACH makes it a BYREF!
             sSubLine := NIL
          ELSE
-            EXIT
+            RETURN
          ENDIF
       NEXT
 
@@ -5602,7 +5604,7 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
                sSubSubLine := LTrim( SubStr( sSubLine, nNextLine + 1 ) )
 
                IF sSubSubLine[1] == '#'
-                  IF Upper( RTrim( NextToken( LTrim( SubStr( sSubSubLine, 2 ) ) ) ) ) == "PROCESS"
+                  //IF Upper( RTrim( NextToken( LTrim( SubStr( sSubSubLine, 2 ) ) ) ) ) == "PROCESS"
                      IF Len( sLine ) == 0
                         sLine := Left( sSubLine, nNextLine - 1 )
                      ELSE
@@ -5613,9 +5615,10 @@ STATIC PROCEDURE RecomposeRuleLine( sLine, aPendingLines, nPendingLines )
                      aPendingLines[ nPendLine ] := SubStr( sSubLine, nNextLine + 1 )
 
                      RETURN
-                  ENDIF
+                  //ENDIF
                ENDIF
             ENDDO
+
             IF Len( sLine ) == 0
                sLine := aPendingLines[ nPendLine ]
             ELSE
@@ -5681,7 +5684,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          nPendingLines := 1
          aPendingLines := { SubStr( sLine, nNewLineAt  + 1 ) }
 
-         TraceLog( "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[ 1 ] )
+         //TraceLog( "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[ 1 ] )
          sLine := Left( sLine, nNewLineAt - 1 )
       ENDIF
    ENDIF
@@ -5787,7 +5790,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                IF nIfDef > 0
                   nIfDef--
                ELSE
-                  Break( ErrorNew( [PP], 0, 2069, [Pre-Process], [#endif with no #ifdef in sight], { sLine, nLine, sSource } ) )
+                  Break( ErrorNew( [PP], 0, 2069, [Pre-Process], [#endif with no #ifdef in sight], { sDirective, nLine, sSource } ) )
                ENDIF
 
                sLine := ''
@@ -5928,7 +5931,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                IF Upper( sLine ) == "RP_RUN.CH" .AND. s_lRunLoaded
                   // already loaded.
-               ELSEIF Upper( sLine ) == "HBCLASS.CH"
+               ELSEIF Upper( sLine ) == "HBCLASS.CH" .AND. ! ( sSource == "xbsclass.ch" )
                   IF ! s_lClsLoaded
                      s_lClsLoaded := .T.
                      InitClsRules()
@@ -8510,7 +8513,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
    //? "=>" + sRule + "<="
 
-   //TraceLog( sRule )
+   //TraceLog( sRule, bX, bDelete )
 
    ExtractLeadingWS( @sRule )
 
@@ -8628,7 +8631,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
          //TraceLog( sTemp )
 
-         WHILE ( sToken := NextToken( @sTemp ), ! Empty( sTemp ) )
+         WHILE ( sToken := Upper( NextToken( @sTemp ) ), ! Empty( sTemp ) )
             //TraceLog( sToken )
             aMatch := { 0, nOptional, RTrim( sToken ), NIL, NIL }
             //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
@@ -8980,7 +8983,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
          cRuleExp := ValToPrgExp( aSize( aClone( aRule ), Len( aRule ) - 1 ) )
       ENDIF
 
-      nRules := Len( arules )
+      nRules := Len( aRules )
 
       FOR nRule := nRules TO 1 STEP -1
          aMatchRule := aRules[ nRule ]
@@ -11101,6 +11104,7 @@ STATIC FUNCTION InitClsRules()
  #ifdef __HARBOUR__
 
       /* Defines */
+      aAdd( aDefRules, { 'HB_CONSTRUCTOR_NO_DIVERT' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLASS_CH_' ,  , .T. } )
       aAdd( aDefRules, { 'HB_SETUP_CH_' ,  , .T. } )
       aAdd( aDefRules, { 'HB_EXTENSION' ,  , .T. } )
@@ -11108,6 +11112,8 @@ STATIC FUNCTION InitClsRules()
       aAdd( aDefRules, { 'HB_COMPAT_C53' ,  , .T. } )
       aAdd( aDefRules, { 'HB_COMPAT_XPP' ,  , .T. } )
       aAdd( aDefRules, { 'HB_COMPAT_FLAGSHIP' ,  , .T. } )
+      aAdd( aDefRules, { 'HB_COMPAT_FOXPRO' ,  , .T. } )
+      aAdd( aDefRules, { 'HB_EXT_INKEY' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CH_' ,  , .T. } )
       aAdd( aDefRules, { 'HB_MSGLISTALL' ,  , .T. } )
       aAdd( aDefRules, { 'HB_MSGLISTCLASS' ,  , .T. } )
@@ -11124,11 +11130,13 @@ STATIC FUNCTION InitClsRules()
       aAdd( aDefRules, { 'HB_OO_CLSTP_CLASSCTOR' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLSTP_SYNC' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLSTP_SYMBOL' ,  , .T. } )
+      aAdd( aDefRules, { 'HB_OO_CLSTP_PFUNC' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLS_INSTANCED' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLS_CLASSCTOR' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLS_ONERROR_SYMB' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLS_DESTRUC_SYMB' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_CLS_REALLOCINIT' ,  , .T. } )
+      aAdd( aDefRules, { 'HB_OO_CLS_ONERROR_SUPER' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_MSG_METHOD' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_MSG_DATA' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_MSG_CLASSDATA' ,  , .T. } )
@@ -11143,6 +11151,7 @@ STATIC FUNCTION InitClsRules()
       aAdd( aDefRules, { 'HB_OO_MSG_DELEGATE' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_DATA_SYMBOL' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_DATA_VALUE' ,  , .T. } )
+      aAdd( aDefRules, { 'HB_OO_DATA_SYMBOL_PTR' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_DATA_TYPE' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_DATA_SCOPE' ,  , .T. } )
       aAdd( aDefRules, { 'HB_OO_DATA_PERSISTENT' ,  , .T. } )
@@ -11164,20 +11173,33 @@ STATIC FUNCTION InitClsRules()
       aAdd( aDefRules, { 'FOREACH_BEGIN' ,  , .T. } )
       aAdd( aDefRules, { 'FOREACH_ENUMERATE' ,  , .T. } )
       aAdd( aDefRules, { 'FOREACH_END' ,  , .T. } )
-      aAdd( aDefRules, { '__HB_CLS_PAR' ,  , .T. } )
       aAdd( aDefRules, { '__HB_CLS_NOINI' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLS_FWO' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLS_CSY' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLS_VO' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLS_TOP' ,  , .T. } )
       aAdd( aDefRules, { 'HB_CLS_XB' ,  , .T. } )
+      aAdd( aDefRules, { '_AsName_' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
 
       /* Translates */
       aAdd( aTransRules, { '(' , { {    0,   0, '.', NIL, NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-      aAdd( aTransRules, { '__CLSSETMODULE' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { 'AS' , { {    0,   0, 'INTEGER', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { '__ERR' , { {    0,   0, '(', NIL, NIL }, { 1001,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { '@' , { {    1,   0, NIL, '!', NIL }, {    0,   0, '(', NIL, NIL }, {    2,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_INHERITFROM_' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_INHERITFROM_' , { {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASFUNC_' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASFUNC_' , { {    1,   0, '(', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASNAME_' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASNAME_' , { {    1,   0, '(', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASSTR_' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASSTR_' , { {    1,   0, '(', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASSTRLST_' , { {    1,   0, '(', '<', NIL }, { 1002,   1, ',', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASNAMEFROM_' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '_ASNAMEFROM_' , { {    1,   0, '(', ':', { 'ARRAY', 'BLOCK', 'CHARACTER', 'DATE', 'LOGICAL', 'NIL', 'NUMERIC', 'POINTER', 'HASH' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '__OPT__' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '__OPT__' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'HBCLSCHOICE' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { 'HBCLSCHOICE' , { {    0,   0, '(', NIL, NIL }, {    0,   0, '.T.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'HBCLSCHOICE' , { {    0,   0, '(', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.T.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'HBCLSCHOICE' , { {    0,   0, '(', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.T.', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'HBCLSCHOICE' , { {    0,   0, '(', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.T.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '.F.', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
@@ -11188,14 +11210,6 @@ STATIC FUNCTION InitClsRules()
       aAdd( aTransRules, { 'DECLMETH' , { {    1,   0, NIL, '<', NIL }, {    2,   0, NIL, '<', NIL } } , .T. } )
       aAdd( aTransRules, { ':' , { {    0,   0, 'CLASS', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { ':' , { {    0,   0, 'CLASS', NIL, NIL }, {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'EXPORTED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'EXPORT' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'VISIBLE' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'PUBLIC' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'HIDDEN' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'PRIVATE' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'PROTECTED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'PUBLISHED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { '(' , { {    1,   0, NIL, '!', NIL }, {    0,   0, '{', NIL, NIL }, {    2,   1, NIL, 'A', { '}' } }, {    0,   0, '}', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { '=' , { {    1,   0, NIL, '!', NIL }, {    0,   0, '{', NIL, NIL }, {    2,   1, NIL, 'A', { '}' } }, {    0,   0, '}', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { ',' , { {    1,   0, NIL, '!', NIL }, {    0,   0, '{', NIL, NIL }, {    2,   1, NIL, 'A', { '}' } }, {    0,   0, '}', NIL, NIL } } , .T. } )
@@ -11206,7 +11220,6 @@ STATIC FUNCTION InitClsRules()
       aAdd( aTransRules, { ':' , { {    0,   0, 'SUPER', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
 
       /* Commands */
-      aAdd( aCommRules, { '_HB_MEMBER' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, {    2,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL }, {    3,   1, NIL, '*', NIL } } , .T. } )
       aAdd( aCommRules, { 'OVERRIDE' , { {    1,   0, 'METHOD', '!', NIL }, {    0,   1, 'IN', NIL, NIL }, {    2,   0, 'CLASS', '!', NIL }, {    0,   0, 'WITH', NIL, NIL }, {    0,   1, 'METHOD', NIL, NIL }, {    3,   0, NIL, '!', NIL }, {    4,   1, 'SCOPE', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'EXTEND' , { {    1,   0, 'CLASS', '!', NIL }, {    2,   0, 'WITH', ':', { 'DATA', 'VAR' } }, {    3,   0, NIL, '<', NIL }, {    4,   1, 'SCOPE', '<', NIL }, {    5,   1, NIL, ':', { 'PERSISTENT' } }, {    6,   1, NIL, ':', { 'NOUPPER' } } } , .T. } )
       aAdd( aCommRules, { 'EXTEND' , { {    1,   0, 'CLASS', '!', NIL }, {    0,   0, 'WITH', NIL, NIL }, {    2,   0, 'METHOD', '!', NIL }, {    3,   1, 'SCOPE', '<', NIL }, {    4,   1, NIL, ':', { 'PERSISTENT' } }, {    5,   1, NIL, ':', { 'NOUPPER' } } } , .T. } )
@@ -11227,14 +11240,19 @@ STATIC FUNCTION InitClsRules()
       aAdd( aCommRules, { 'ENABLE' , { {    0,   0, 'TYPE', NIL, NIL }, {    0,   0, 'CLASS', NIL, NIL }, {    0,   0, 'ALL', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'ASSOCIATE' , { {    1,   0, 'CLASS', '<', NIL }, {    0,   0, 'WITH', NIL, NIL }, {    2,   0, 'TYPE', ':', { 'ARRAY', 'BLOCK', 'CHARACTER', 'DATE', 'LOGICAL', 'NIL', 'NUMERIC', 'POINTER', 'HASH' } } } , .T. } )
       aAdd( aCommRules, { 'EXTERNAL' , { {    1,   0, NIL, ':', { 'ARRAY', 'BLOCK', 'CHARACTER', 'DATE', 'LOGICAL', 'NIL', 'NUMERIC', 'POINTER', 'HASH' } }, { 1002,   1, ',', '*', NIL } } , .T. } )
-      aAdd( aCommRules, { 'CLASS' , { {    1,   0, NIL, '<', NIL }, {    2,   1, 'METACLASS', '<', NIL }, { 1003,   1, NIL, ':', { 'FROM', 'INHERIT' } }, { 1004,  -1, NIL, '<', NIL }, { 1005,   2, ',', '<', NIL }, {    6,   1, NIL, ':', { 'STATIC' } } } , .T. } )
-      aAdd( aCommRules, { 'CLASS' , { {    1,   0, NIL, '<', NIL }, {    2,   1, 'METACLASS', '<', NIL }, { 1003,   1, NIL, ':', { 'FROM', 'INHERIT' } }, { 1004,  -1, NIL, '<', NIL }, { 1005,   2, ',', '<', NIL }, {    6,   1, NIL, ':', { 'STATIC' } }, {    7,   0, 'FUNCTION', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'CLASS' , { {    1,   0, NIL, '<', NIL }, {    2,   1, 'METACLASS', '<', NIL }, { 1003,   1, NIL, ':', { 'FROM', 'INHERIT' } }, { 1004,  -1, NIL, '<', NIL }, { 1005,   2, ',', '<', NIL }, {    6,   1, NIL, ':', { 'STATIC' } }, { 1007,   1, 'FUNCTION', '<', NIL }, {    0,   1, 'IMPLEMENTS', NIL, NIL }, { 1008,  -1, 'NAMESPACE', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'DECLSUPER' ,  , .T. } )
+      aAdd( aCommRules, { 'DECLSUPER' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, ',', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'DECLSUPER' , { {    1,   0, NIL, '<', NIL }, {    2,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL }, { 1003,   1, ',', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'DECLSUPERN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'DECLSUPERN' , { {    1,   0, NIL, '<', NIL }, {    2,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, 'A', NIL }, { 1002,   1, 'TYPE', '<', NIL }, {    3,   1, 'ASSIGN', '<', NIL }, {    4,   1, NIL, ':', { 'PUBLISHED' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'READONLY', 'RO' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
       aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, 'A', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   1, 'INIT', '<', NIL }, {    4,   1, NIL, ':', { 'PUBLISHED' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'READONLY', 'RO' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
-      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, 'IS', '<', NIL }, {    3,   0, 'TO', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IN', '<', NIL }, {    4,   1, NIL, ':', { 'PUBLISHED' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'READONLY', 'RO' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'IN', '<', NIL }, {    5,   1, NIL, ':', { 'PUBLISHED' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'READONLY', 'RO' } }, {   10,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   1, NIL, ':', { 'PUBLISHED' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'READONLY', 'RO' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, NIL, ':', { 'PUBLISHED' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'READONLY', 'RO' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'VAR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'TO', '<', NIL }, {    5,   1, NIL, ':', { 'PUBLISHED' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'READONLY', 'RO' } }, {   10,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
       aAdd( aCommRules, { 'CLASS' , { {    1,   0, 'VAR', '*', NIL } } , .T. } )
       aAdd( aCommRules, { 'CLASS' , { {    1,   0, 'METHOD', '*', NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'DEFERRED', NIL, NIL } } , .T. } )
@@ -11258,48 +11276,41 @@ STATIC FUNCTION InitClsRules()
       aAdd( aCommRules, { 'CLASSMETHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    3,   1, NIL, ':', { 'CONSTRUCTOR' } }, { 1004,   1, 'AS', '<', NIL }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SHARED' } }, {    9,   1, NIL, ':', { 'SYNC' } }, {    0,   1, '_CLASS_DECLARATION_', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'BLOCK', '<', NIL }, { 1004,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, { 1010,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'EXTERN', '<', NIL }, { 1004,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, { 1010,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1003,   1, 'LOCAL', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    4,   0, NIL, 'A', NIL }, { 1005,   1, NIL, '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1004,   1, 'LOCAL', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    5,   0, NIL, 'A', NIL }, { 1006,   1, NIL, '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'INLINE', 'A', NIL }, { 1004,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } }, {    9,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, { 1010,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'INLINE', 'A', NIL }, { 1005,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'SYNC' } }, {   10,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, { 1011,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
-      aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1003,   1, 'Local', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    4,   0, NIL, 'A', NIL }, { 1005,   1, NIL, '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1004,   1, 'Local', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    5,   0, NIL, 'A', NIL }, { 1006,   1, NIL, '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'INLINE' , { {    1,   0, 'METHOD', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'INLINE' , { {    1,   0, 'METHOD', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
-      aAdd( aCommRules, { 'ENDMETHOD' ,  , .F. } )
+      aAdd( aCommRules, { 'ENDMETHOD' ,  , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, { 1003,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    0,   0, 'VIRTUAL', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, { 1003,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    0,   0, 'DYNAMIC', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'OPERATOR', '<', NIL }, {    4,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    5,   1, NIL, ':', { 'PROTECTED' } }, {    6,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    7,   1, NIL, ':', { 'SYNC' } }, { 1008,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'OPERATOR', '<', NIL }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } }, { 1009,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
       aAdd( aCommRules, { 'OPERATOR' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'ARG', '<', NIL }, {    3,   0, 'INLINE', 'A', NIL }, {    4,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    5,   1, NIL, ':', { 'PROTECTED' } }, {    6,   1, NIL, ':', { 'HIDDEN', 'PRIVARE' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'METHOD', '<', NIL }, { 1004,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'METHOD', '<', NIL }, { 1005,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'SYNC' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'METHOD', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1004,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1005,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'SYNC' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'METHOD', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1005,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1006,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    7,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    8,   1, NIL, ':', { 'PROTECTED' } }, {    9,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {   10,   1, NIL, ':', { 'SYNC' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'PROCEDURE', '<', NIL }, { 1004,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    8,   1, NIL, ':', { 'SYNC' } } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'PROCEDURE', '<', NIL }, { 1005,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'SYNC' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'PROCEDURE', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1004,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1005,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {    9,   1, NIL, ':', { 'SYNC' } } } , .T. } )
       aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'PROCEDURE', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1005,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1006,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    7,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    8,   1, NIL, ':', { 'PROTECTED' } }, {    9,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, {   10,   1, NIL, ':', { 'SYNC' } } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1004,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    5,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'IS', '<', NIL }, {    5,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'IS', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1005,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, {    6,   0, 'IN', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, { 1004,   1, NIL, 'A', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'TO', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'TO', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'DELEGATE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1008,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
-      aAdd( aCommRules, { 'DELEGATE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'TO', '<', NIL }, {    5,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1009,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
-      aAdd( aCommRules, { 'DELEGATE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'TO', '<', NIL }, {    5,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1009,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
-      aAdd( aCommRules, { 'DELEGATE' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   0, 'IS', '<', NIL }, {    5,   0, 'TO', '<', NIL }, {    6,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    7,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    8,   1, NIL, ':', { 'PROTECTED' } }, {    9,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1010,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1008,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1008,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IN', '<', NIL }, {    4,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1008,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'TO', '<', NIL }, {    5,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1009,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'MESSAGE' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, 'IS', '<', NIL }, {    4,   0, 'IN', '<', NIL }, {    5,   1, NIL, ':', { 'CONSTRUCTOR' } }, {    6,   1, NIL, ':', { 'EXPORTED', 'VISIBLE', 'PUBLIC' } }, {    7,   1, NIL, ':', { 'PROTECTED' } }, {    8,   1, NIL, ':', { 'HIDDEN', 'PRIVATE' } }, { 1009,   1, NIL, ':', { 'OVERRIDE' } } } , .T. } )
+      aAdd( aCommRules, { 'DELEGATE' , { {    1,   0, NIL, '*', NIL } } , .T. } )
+      aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, NIL, ':', { 'METHOD', 'IS' } }, {    4,   0, NIL, '<', NIL }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN' } }, {    8,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   0, NIL, ':', { 'METHOD', 'IS' } }, {    4,   0, NIL, '<', NIL }, {    5,   1, NIL, ':', { 'EXPORTED', 'VISIBLE' } }, {    6,   1, NIL, ':', { 'PROTECTED' } }, {    7,   1, NIL, ':', { 'HIDDEN' } }, {    8,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, {    0,   0, 'SETGET', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } }, {    0,   0, 'SETGET', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    3,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
       aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    4,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
-      aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1003,   1, 'Local', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    4,   0, NIL, 'A', NIL }, {    5,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
+      aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1003,   1, 'LOCAL', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    4,   0, NIL, 'A', NIL }, {    5,   1, NIL, ':', { 'PERSISTENT', 'PROPERTY' } } } , .T. } )
       aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL }, {    0,   0, 'DEFERRED', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, { 1002,   1, 'AS', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL } } , .T. } )
-      aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1004,   1, 'Local', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    5,   0, NIL, 'A', NIL } } , .T. } )
+      aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL }, { 1003,   1, 'AS', '<', NIL }, {    0,   0, 'INLINE', NIL, NIL }, { 1004,   1, 'LOCAL', '<', NIL }, {    0,  -1, ',', NIL, NIL }, {    5,   0, NIL, 'A', NIL } } , .T. } )
       aAdd( aCommRules, { 'ON' , { {    1,   0, 'ERROR', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'ERROR' , { {    1,   0, 'HANDLER', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'ERROR' , { {    1,   0, 'HANDLER', '<', NIL }, {    0,   0, '(', NIL, NIL }, { 1002,   1, NIL, 'A', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
@@ -11314,13 +11325,24 @@ STATIC FUNCTION InitClsRules()
       aAdd( aCommRules, { 'PROCEDURE' , { {    0,   1, 'FUNCTION', NIL, NIL }, {    1,   0, NIL, '<', NIL }, {    2,   0, 'CLASS', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'PROCEDURE' , { {    0,   1, 'FUNCTION', NIL, NIL }, {    0,   1, 'PROCEDURE', NIL, NIL }, {    1,   0, NIL, '<', NIL }, {    0,   0, '_CLASS_IMPLEMENTATION_', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'PROCEDURE' , { {    0,   1, 'FUNCTION', NIL, NIL }, {    0,   1, 'PROCEDURE', NIL, NIL }, {    1,   0, NIL, '<', NIL }, {    0,   1, 'CLASS', NIL, NIL }, {    2,   0, NIL, '<', NIL }, {    0,   0, '_CLASS_IMPLEMENTATION_', NIL, NIL } } , .T. } )
-      aAdd( aCommRules, { 'METHOD' , { {    0,   1, 'FUNCTION', NIL, NIL }, {    0,   1, 'PROCEDURE', NIL, NIL }, {    1,   0, NIL, '<', NIL }, {    2,   0, 'DECLCLASS', '<', NIL }, {    0,   0, '_CLASS_IMPLEMENTATION_', NIL, NIL } } , .T. } )
-      aAdd( aCommRules, { 'PROCEDURE' , { {    0,   1, 'FUNCTION', NIL, NIL }, {    0,   1, 'PROCEDURE', NIL, NIL }, {    1,   0, NIL, '<', NIL }, {    2,   0, 'DECLCLASS', '<', NIL }, {    0,   0, '_CLASS_IMPLEMENTATION_', NIL, NIL } } , .T. } )
       aAdd( aCommRules, { 'DECLARED' , { {    1,   0, 'METHOD', '<', NIL }, {    2,   0, NIL, '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'DECLARED' , { {    1,   0, 'PROCEDURE', '<', NIL }, {    2,   0, NIL, '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'ACCESS' , { {    1,   0, NIL, '<', NIL }, {    2,   0, 'CLASS', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'ASSIGN' , { {    1,   0, NIL, '<', NIL }, {    2,   0, 'CLASS', '<', NIL } } , .T. } )
       aAdd( aCommRules, { 'METHOD' , { {    1,   0, NIL, '!', NIL }, {    2,   0, ':', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'FRIEND' , { {    1,   0, 'CLASS', '<', NIL }, { 1002,   1, ',', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'FRIEND' , { {    1,   0, 'FUNCTION', '<', NIL }, { 1002,   1, ',', '<', NIL } } , .T. } )
+      aAdd( aCommRules, { 'EXPORTED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'EXPORT' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'VISIBLE' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'PUBLIC' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'HIDDEN' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'PRIVATE' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'PROTECTED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'PUBLISHED' , { {    0,   0, ':', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'INLINE' , { {    1,   0, 'METHOD', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'INLINE' , { {    1,   0, 'METHOD', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aCommRules, { 'ENDMETHOD' ,  , .F. } )
 
  #endif
 
@@ -11495,23 +11517,19 @@ STATIC FUNCTION InitRunRules()
 
    aAdd( aTransRules, { ':' , { {    0,   0, ':', NIL, NIL } } , .F. } )
    aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
-
-   #ifndef __HARBOUR__
-      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-
-      aAdd( aTransRules, { 'PROCNAME' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { 'PROCLINE' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
-   #endif
+   aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
 
    #ifndef __CONCILE_PCODE__
+      aAdd( aTransRules, { 'PROCNAME' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { 'PROCLINE' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'HB_ENUMINDEX' , { {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'ERRORBLOCK' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
       aAdd( aTransRules, { 'THROW' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
-      aAdd( aTransRules, { '__Quit' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+      aAdd( aTransRules, { '__QUIT' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    #endif
 
    aAdd( aTransRules, { 'IN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
+   aAdd( aTransRules, { 'IF' , { {    1,   0, '(', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    2,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
 
    #ifdef AX
       aAdd( aTransRules, { 'RESPONSE' , { {    0,   0, '.', NIL, NIL } } , .T. } )
@@ -11538,6 +11556,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, ':=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, '=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, 'EACH', '<', NIL }, {    2,   0, '$', '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDFOR' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'LOOP' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'EXIT' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'NEXT' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
@@ -11563,6 +11582,14 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'PROCEDURE' , { {    1,   0, NIL, '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'FUNCTION' , { {    1,   0, NIL, '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'FUNCTION' , { {    1,   0, NIL, '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    0,   0, 'STATIC', NIL, NIL }, {    1,   0, 'PROCEDURE', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    0,   0, 'STATIC', NIL, NIL }, {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    0,   0, 'STATIC', NIL, NIL }, {    1,   0, 'FUNCTION', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    0,   0, 'STATIC', NIL, NIL }, {    1,   0, 'FUNCTION', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    1,   0, 'FUNCTION', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'UTILITY' , { {    1,   0, 'FUNCTION', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'RETURN' , { {    1,   1, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'PARAMETERS' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'PRIVATE' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
@@ -11590,6 +11617,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { , , { NIL }  } )
    aAdd( aTransResults, { , , { NIL }  } )
    aAdd( aTransResults, { { {   0, ':=' } }, { -1} , { NIL }  } )
+
    #ifndef __CONCILE_PCODE__
       aAdd( aTransResults, { { {   0, 'PP_Qself()' } }, { -1} ,  } )
       aAdd( aTransResults, { { {   0, 'AddInLine( ' }, {   0,   1 }, {   0, ', {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| Eval( {|s| HB_SetWith( PP_QSelf(s) ) }, Self ), PP_ExecMethod( ' }, {   0,   2 }, {   0, ', p1,p2,p3,p4,p5,p6,p7,p8,p9 ), Eval( {|| PP_QSelf( HB_SetWith() ) } ) }, ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ' )' } }, { -1,  1, -1,  3, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL }  } )
@@ -11597,23 +11625,21 @@ STATIC FUNCTION InitRunResults()
 
    aAdd( aTransResults, { { {   0, 'Self:' } }, { -1} ,  } )
    aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
-
    #ifndef __HARBOUR__
       aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
-      aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
-
-      aAdd( aTransResults, { { {   0, 'PP_ProcName( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
-      aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    #endif
 
    #ifndef __CONCILE_PCODE__
+      aAdd( aTransResults, { { {   0, 'PP_ProcName( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+      aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
       aAdd( aTransResults, { { {   0, 'PP_EnumIndex()' } }, { -1} ,  } )
       aAdd( aTransResults, { { {   0, 'PP_ErrorBlock( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
-      aAdd( aTransResults, { { {   0, 'Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+      aAdd( aTransResults, { { {   0, 'PP__THROW( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
       aAdd( aTransResults, { { {   0, 'Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    #endif
 
    aAdd( aTransResults, { { {   0, '$ ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aTransResults, { { {   0, 'IIF( ' }, {   0,   1 }, {   0, ', ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL }  } )
 
    #ifdef AX
       aAdd( aTransResults, { { {   0, 'ReSpOnSe:' } }, { -1} ,  } )
@@ -11625,7 +11651,6 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { , , { NIL }  } )
    aAdd( aCommResults, { , , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, '()' } }, { -1,  1, -1} , { NIL }  } )
-
    aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, '( @' }, {   0,   2 }, {   0, '' }, {   3, ', @' }, {   3,   3 }, {   0, ' )' } }, { -1,  1, -1,  1, -1, -1,  1, -1} , { NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__IF ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__ELSEIF ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
@@ -11641,6 +11666,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__FOREACH ' }, {   0,   1 }, {   0, '~$~' }, {   0,   2 } }, { -1,  1, -1,  1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__NEXT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__LOOP ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__EXIT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__NEXT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
@@ -11658,21 +11684,29 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg", {' }, {   0,   2 }, {   0, '} )' } }, { -1,  2, -1,  1, -1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_INIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_EXIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LOCALPARAMS( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LOCALPARAMS( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LOCALPARAMS( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LOCALPARAMS( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__RETURN( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__PARAMS( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__PRIVATES( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__PRIVATES( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__PUBLICS( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__LOCALS( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__STATICS( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 }, {   0, ' ; PP__LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_PROC ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Return( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Params( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Privates( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Privates( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Publics( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Locals( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__Statics( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, ' ' }, {   0,   2 } }, { -1,  0, -1,  0} , { NIL, NIL }  } )
 
    IF aScan( aDefRules, {|aDefine| aDefine[1] == "WIN" } ) > 0
@@ -11690,8 +11724,8 @@ STATIC FUNCTION InitDotRules()
    aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
 
    #ifndef __HARBOUR__
-      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'Display', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GetList', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
    #endif
 
    /* Commands */

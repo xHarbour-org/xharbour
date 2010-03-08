@@ -44,8 +44,11 @@
 #COMMAND _HB_CLASS <x> =>
 #COMMAND _HB_MEMBER <x> =>
 
-#XTRANSLATE QSelf() => PP_Qself()
-#XTRANSLATE AddMethod( <MethodName>, @<!FunName!>(), <n>, <l> ) => AddInLine( <MethodName>, {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| Eval( {|s| HB_SetWith( PP_QSelf(s) ) }, Self ), PP_ExecMethod( <"FunName">, p1,p2,p3,p4,p5,p6,p7,p8,p9 ), Eval( {|| PP_QSelf( HB_SetWith() ) } ) }, <n>, <l> )
+#ifndef __CONCILE_PCODE__
+   #XTRANSLATE QSelf() => PP_Qself()
+   #XTRANSLATE AddMethod( <MethodName>, @<!FunName!>(), <n>, <l> ) => AddInLine( <MethodName>, {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| Eval( {|s| HB_SetWith( PP_QSelf(s) ) }, Self ), PP_ExecMethod( <"FunName">, p1,p2,p3,p4,p5,p6,p7,p8,p9 ), Eval( {|| PP_QSelf( HB_SetWith() ) } ) }, <n>, <l> )
+#endif
+
 #TRANSLATE :: => Self:
 
 #COMMAND MEMVAR [<x,...>] =>
@@ -81,7 +84,7 @@
 
 #COMMAND FOR <counter> := <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
 #COMMAND FOR <counter> =  <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
-#COMMAND FOR EACH <enumerator> $ <enumeration>          => PP__FOREACH <enumerator>~$~<enumeration>
+#COMMAND FOR EACH <enumerator> $ <enumeration>           => PP__FOREACH <enumerator>~$~<enumeration>
 #COMMAND ENDFOR [<x,...>]   => PP__NEXT [<-x->]
 
 #COMMAND LOOP [<x,...>]                                  => PP__LOOP [<-x->]
@@ -105,20 +108,31 @@
 #COMMAND DO <file>.PRG                                   => PP_Run( #<file> + ".prg" )
 #COMMAND DO <file>.PRG WITH <params,...>                 => PP_Run( #<file> + ".prg", {<params>} )
 
+
 #COMMAND INIT PROCEDURE <!name!>[()]            => PP_PROC_INIT <name>
 #COMMAND EXIT PROCEDURE <!name!>[()]            => PP_PROC_EXIT <name>
 
-#COMMAND STATIC PROCEDURE <!name!>( <par,...> ) => PP_PROC_PRG <name> ; PP_LocalParams( { <"par"> } )
+#COMMAND STATIC PROCEDURE <!name!>( <par,...> ) => PP_PROC_PRG <name> ; PP__LocalParams( { <"par"> } )
 #COMMAND STATIC PROCEDURE <!name!>[()]          => PP_PROC_PRG <name>
-#COMMAND STATIC FUNCTION <!name!>( <par,...> )  => PP_PROC_PRG <name> ; PP_LocalParams( { <"par"> } )
+#COMMAND STATIC FUNCTION <!name!>( <par,...> )  => PP_PROC_PRG <name> ; PP__LocalParams( { <"par"> } )
 #COMMAND STATIC FUNCTION <!name!>[()]           => PP_PROC_PRG <name>
 
-#COMMAND PROCEDURE <!name!>( <par,...> ) => PP_PROC <name> ; PP_LocalParams( { <"par"> } )
+#COMMAND PROCEDURE <!name!>( <par,...> ) => PP_PROC <name> ; PP__LocalParams( { <"par"> } )
 #COMMAND PROCEDURE <!name!>[()]          => PP_PROC <name>
-#COMMAND FUNCTION <!name!>( <par,...> )  => PP_PROC <name> ; PP_LocalParams( { <"par"> } )
+#COMMAND FUNCTION <!name!>( <par,...> )  => PP_PROC <name> ; PP__LocalParams( { <"par"> } )
 #COMMAND FUNCTION <!name!>[()]           => PP_PROC <name>
 
-#COMMAND RETURN [<retExp>]    => PP__RETURN( <retExp> )
+#COMMAND UTILITY STATIC PROCEDURE <!name!>( <par,...> ) => PP_PROC_PRG <name> ; PP__LocalParams( { <"par"> } )
+#COMMAND UTILITY STATIC PROCEDURE <!name!>[()]          => PP_PROC_PRG <name>
+#COMMAND UTILITY STATIC FUNCTION <!name!>( <par,...> )  => PP_PROC_PRG <name> ; PP__LocalParams( { <"par"> } )
+#COMMAND UTILITY STATIC FUNCTION <!name!>[()]           => PP_PROC_PRG <name>
+
+#COMMAND UTILITY PROCEDURE <!name!>( <par,...> ) => PP_PROC <name> ; PP__LocalParams( { <"par"> } )
+#COMMAND UTILITY PROCEDURE <!name!>[()]          => PP_PROC <name>
+#COMMAND UTILITY FUNCTION <!name!>( <par,...> )  => PP_PROC <name> ; PP__LocalParams( { <"par"> } )
+#COMMAND UTILITY FUNCTION <!name!>[()]           => PP_PROC <name>
+
+#COMMAND RETURN [<retExp>]    => PP__Return( <retExp> )
 
 #COMMAND PARAMETERS <par,...> => PP__Params( { <"par"> } )
 #COMMAND PRIVATE <var,...>    => PP__Privates( { <"var"> } )
@@ -141,6 +155,8 @@
 
 #XTRANSLATE IN <x> => $ <x>
 
+#TRANSLATE IF( <cond>, [<true>], [<false>] ) => IIF( <cond>, <true>, <false> )
+
 #ifdef AX
-   #xtranslate Response. => ReSpOnSe:
+   #XTRANSLATE Response. => ReSpOnSe:
 #endif

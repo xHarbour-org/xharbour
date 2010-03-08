@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.102 2009/01/26 22:24:08 ronpinkas Exp $
+ * $Id: garbage.c,v 1.104 2009/12/21 05:18:58 andijahja Exp $
  */
 
 /*
@@ -522,6 +522,7 @@ void *hb_gcUnlock( void *pBlock )
                case 5: \
                   pResumeInfo[ iResumeCounter ].data.ResumePoint_5.pCBlock = pCBlock; \
                   pResumeInfo[ iResumeCounter ].data.ResumePoint_5.ui      = ui; \
+                  break; \
                \
                default: \
                   /* Unexpected case! */ \
