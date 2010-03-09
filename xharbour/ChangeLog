@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6689 2010/03/05 15:50:15 lculik Exp $
+ * $Id: ChangeLog,v 1.6690 2010/03/08 04:48:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-03-08 19:28 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * utils/hbfilere/hbfilere.c
+    ! Added "const unsigned char sockaddr_size[AF_MAX];" declaration
+      for Pelles C 6 and up.
 
 2010-03-08 00:17 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbclass.ch

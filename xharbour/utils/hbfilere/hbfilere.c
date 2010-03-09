@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.9 2009/11/09 01:10:50 lculik Exp $
+ * $Id: hbfilere.c,v 1.10 2009/11/09 09:39:35 marchuet Exp $
  */
 
 /*
@@ -60,6 +60,12 @@
 //typedef struct _HB_FILE * PHB_FILE;
 
 #include "hbfilere.h"
+
+#ifdef __POCC__
+   #if __POCC__ >= 0600
+      const unsigned char sockaddr_size[AF_MAX];
+   #endif
+#endif
 
 /*
 #define MY_DBG_
