@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.129 2009/02/25 14:36:20 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.130 2009/04/14 09:14:06 likewolf Exp $
  */
 
 /*
@@ -879,6 +879,9 @@ static HB_EXPR_FUNC( hb_compExprUseFunRef )
       case HB_EA_STATEMENT:
          hb_compWarnMeaningless( pSelf );
       case HB_EA_DELETE:
+         #if defined( HB_MACRO_SUPPORT )
+             HB_XFREE( pSelf->value.asSymbol.szName );
+         #endif
          break;
    }
    return pSelf;
