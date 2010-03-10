@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6690 2010/03/08 04:48:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6691 2010/03/09 01:25:54 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-03-10 10:38 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * utils/xbscript/xbscript.prg
+    ! Fixed bad typo introduced in last commit
 
 2010-03-08 19:28 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * utils/hbfilere/hbfilere.c
@@ -19,7 +23,7 @@
     * Formatting
 
   * source/vm/garbage.c
-    ! Critical typo (mising: break;)
+    ! Critical typo (missing: break;)
 
   * utils/xbscript/rp_run.src
   * utils/xbscript/xbsclass.ch
@@ -27,7 +31,7 @@
     * Synched with hbclass.ch (also simplified using: #include "hbclass.ch")
 
   * utils/xbscript/xbscript.prg
-    ! Fixed criticaly missing Upper() in CompileRule()
+    ! Fixed critically missing Upper() in CompileRule()
     ! Fixed inconsistencies using PP__* vs. PP_* as well as capitalization of PP statement tokens which are also used as Functions
     * Commented few TraceLog()s
     * Minute optimization
