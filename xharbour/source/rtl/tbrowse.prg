@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.223 2009/10/04 16:02:15 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.224 2009/10/23 10:09:57 modalsist Exp $
  */
 
 /*
@@ -179,6 +179,7 @@ CLASS TDataCache STATIC
 
    METHOD   GetCellValue( nRow, nCol )   // Retrieves the content of nRow/nCol. 
    METHOD   GetCellColor( nRow, nCol )   // Retrieves the color   of nRow/nCol. 
+   METHOD   IsColorRect(nRow,nCol)
 
    METHOD   Invalidate(nRow)             // Invalidate the data cache.                
    METHOD   PerformInvalidation()        // Executes invalidation.
@@ -421,6 +422,27 @@ Local aColor, nColIndex
 
 RETURN aColor
 
+*--------------------------------------------------*
+METHOD IsColorRect( nRow, nCol ) CLASS TDataCache
+*--------------------------------------------------*
+Local aColor, nColIndex, lRet
+
+  if empty(nRow) .or. empty(nCol) .or. nRow > ::nLastRow
+     Return .f.
+  endif
+
+  lRet := .f.
+  nColIndex := ::ColIndex( nCol )
+
+  if CacheOK( ::aCache, nRow, nColIndex, "O" )
+
+     aColor := ::aCache[ nRow ][ nColIndex ]:ColorRect
+
+     lRet := ! empty( aColor )
+
+  endif
+
+RETURN lRet
 
 *--------------------------------------------------*
 METHOD GetCellValue( nRow, nCol ) CLASS TDataCache
@@ -916,7 +938,7 @@ PROTECTED:
 
 HIDDEN: 
 
-   METHOD PosCursor()                             // Positions the cursor to the beginning of the call, used only when autolite==.F.
+   METHOD PosCursor()                             // Positions the cursor to the beginning of the cell, used only when autolite = .F.
    METHOD LeftDetermine()                         // Determine leftmost unfrozen column in display
    METHOD DispCell( nRow, nCol, xValue, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
    METHOD HowManyCol()                            // Counts how many cols can be displayed
@@ -2575,10 +2597,12 @@ Local nMoveTo := ::nMoveTo
 
    endif
 
-   if ::lAutoLite .and. ! ::lRectPainted 
+
+   if ::lAutoLite .and. ! ::lRectPainted
       ::SetHilite(.t.)
    else
-      ::PosCursor()
+      // only sincronize data and repos cursor.
+      ::SetHilite(nil)
    endif
 
    SetCursor( nCursor )
@@ -2586,7 +2610,6 @@ Local nMoveTo := ::nMoveTo
    ::aPendingMovements := {}
    ::lRectPainted := .f.
   
-
    while ::nDispbegin > 0
      Dispend()
      ::nDispbegin --
@@ -2983,10 +3006,10 @@ METHOD PosCursor() CLASS TBrowse
 *------------------------------------------------------*
 LOCAL nScrRow, nScrCol, nCursor
 
-   nScrRow := ::nRowPos + ::nRowData
 
-   if ::nColPos > 0 .AND. ::nColPos <= ::nColCount
+   if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
 
+      nScrRow := ::nRowPos + ::nRowData
       nScrCol := ::aColsInfo[ ::nColPos, _TB_COLINFO_SCRCOLPOS ]
 
       Switch ::aColsInfo[ ::nColPos, _TB_COLINFO_TYPE ]
@@ -3019,43 +3042,33 @@ Return Self
 *------------------------------------------------------*
 METHOD SetHilite( lHilite ) CLASS TBrowse
 *------------------------------------------------------*
-LOCAL nScrRow     // Screen row
-LOCAL nScrCol     // Screen col
-LOCAL nNotLeftCol // Screen col position of first char of not left justified columns
 LOCAL xValue, nColor, nCursor
- 
 
-   if lHilite
-      nColor := _TB_COLOR_ENHANCED
-   else
-      nColor := _TB_COLOR_STANDARD
-   endif
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
 
-      nCurSor := SetCursor( SC_NONE )
-
-      nScrRow := ::nRowPos + ::nRowData 
-      nScrCol := ::aColsInfo[ ::nColPos, _TB_COLINFO_SCRCOLPOS ]
-
-      SetPos( nScrRow, nScrCol )
-
+      // it's for data sincronization.
       xValue := ::oCache:GetCellValue( ::nRowPos, ::nColPos )
 
-      if xValue == NIL
-         xValue := BlankValue( ::aColsInfo[ ::nColPos ] )
+      if ! hb_Isnil(lHilite)
+
+         if lHilite
+            nColor := _TB_COLOR_ENHANCED
+         else
+            nColor := _TB_COLOR_STANDARD
+         endif
+
+         ::PosCursor()
+
+         nCurSor := SetCursor( SC_NONE )
+
+         ::DispCell( ::nRowPos, ::nColPos, xValue, nColor )
+
+         SetCursor( nCursor )
+
+      else
+        ::PosCursor()
       endif
-
-      nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, xValue, nColor )
-
-      SetPos( nScrRow, iif( nNotLeftCol <> NIL, nNotLeftCol, nScrCol ) )
-
-#ifdef HB_COMPAT_C53
-      ::nRow := nScrRow
-      ::nCol := iif( nNotLeftCol <> NIL, nNotLeftCol, nScrCol )
-#endif
-
-      SetCursor( nCursor )
 
    endif
 
