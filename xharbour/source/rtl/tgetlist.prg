@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.48 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.49 2009/06/03 00:09:09 ronpinkas Exp $
  */
 
 /*
@@ -1080,8 +1080,9 @@ METHOD GuiReader( oGet, oMenu, oGetMsg ) CLASS HBGetList
 
          if     ::nLastExitState == GE_SHORTCUT  // Added.
          elseif ::nLastExitState == GE_MOUSEHIT  // Added.
-         elseif !::GetPostValidate( oGet, oGetMsg )
-         // IF ( !::GUIPostValidate( oGet, oGUI, oGetMsg ) ) // Old test.
+         elseif ! (valtype(oGet:Control) == "O") .and. !::GetPostValidate( oGet, oGetMsg )
+            oGet:exitState := GE_NOEXIT
+         elseif ( valtype(oGet:Control)=="O") .and. !::GUIPostValidate( oGUI, oGetMsg )
             oGet:exitState := GE_NOEXIT
          endif
       end
@@ -1386,7 +1387,7 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
       uOldData := oGet:VarGet()
 
       IF ( oGUI:ClassName() $ "LISTBOX_HBRADIOGROUP" .AND. ;
-         VALTYPE( oGet:VarGet() ) == "N" )
+           VALTYPE( oGet:VarGet() ) == "N" )
          uNewData := oGUI:Value
       ELSE
          uNewData := oGUI:Buffer
