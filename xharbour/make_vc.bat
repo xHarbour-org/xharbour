@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.26 2009/03/26 23:29:42 ronpinkas Exp $
+rem $Id: make_vc.bat,v 1.27 2009/03/27 02:51:29 ronpinkas Exp $
 rem
 rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
@@ -22,6 +22,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :SET_VC2008
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   IF "%VS90COMNTOOLS%"=="" SET VS90COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 9.0\Common7\Tools\
    GOTO FIND_BISON
 
 :SET_VC2005
@@ -56,7 +57,7 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
 IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
-SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%PATH%
+SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%VS90COMNTOOLS%;%PATH%
 
 rem ============================================================================
 rem The followings should never change
