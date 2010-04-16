@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.27 2009/03/27 02:51:29 ronpinkas Exp $
+rem $Id: make_vc.bat,v 1.28 2010/04/14 17:53:16 patrickmast Exp $
 rem
 rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
@@ -14,10 +14,16 @@ rem ============================================================================
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
  
 :FIND_VC
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
+   GOTO FIND_BISON
+
+:SET_VC2010
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
+   IF "%VS100COMNTOOLS%"=="" SET VS100COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 10.0\Common7\Tools\
    GOTO FIND_BISON
 
 :SET_VC2008
