@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.18 2008/10/22 08:32:52 marchuet Exp $
+ * $Id: adordd.prg,v 1.19 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -471,37 +471,39 @@ RETURN UR_SUPER_CLOSE( nWA )
 
 STATIC FUNCTION ADO_GETVALUE( nWA, nField, xValue )
 
-   LOCAL aWAData := USRRDD_AREADATA( nWA )
+   LOCAL aWAData := USRRDD_AREADATA( nWA ), oField, nType
 
    WITH OBJECT USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
+      oField := :Fields( nField - 1 )
+      nType := ADO_GETFIELDTYPE( oField:Type )
       IF aWAData[ WA_EOF ] .OR. :EOF .OR. :BOF
          xValue := nil
-         IF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_STRING
-            xValue := Space( :Fields( nField - 1 ):DefinedSize )
+         IF nType == HB_FT_STRING
+            xValue := Space( oField:DefinedSize )
          ENDIF
       ELSE
-         xValue := :Fields( nField - 1 ):Value
+         xValue := oField:Value
 
-         IF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_STRING
+         IF nType == HB_FT_STRING
             IF ValType( xValue ) == "U"
-                xValue := Space( :Fields( nField - 1 ):DefinedSize )
+                xValue := Space( oField:DefinedSize )
             ELSE
-                xValue := PadR( xValue, :Fields( nField - 1 ):DefinedSize )
+                xValue := PadR( xValue, oField:DefinedSize )
             ENDIF
-         ELSEIF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_DATE
+         ELSEIF nType == HB_FT_DATE
             // Null values
             IF ValType( xValue ) == "U"
                 xValue := cToD( "" )
             ENDIF
 #ifdef HB_FT_DATETIME
-         ELSEIF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_DATETIME
+         ELSEIF nType == HB_FT_DATETIME
             // Null values
             IF ValType( xValue ) == "U"
                 xValue := cToD( "" )
             ENDIF
 #endif
 #ifdef HB_FT_TIMESTAMP
-         ELSEIF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_TIMESTAMP
+         ELSEIF nType == HB_FT_TIMESTAMP
             // Null values
             IF ValType( xValue ) == "U"
                 xValue := cToD( "" )
@@ -1568,7 +1570,7 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFieldType )
 #endif
 
       CASE nADOFieldType == adBSTR
-		   nDBFFieldType := HB_FT_STRING
+	 nDBFFieldType := HB_FT_STRING
 
       CASE nADOFieldType == adChar
          nDBFFieldType := HB_FT_STRING
@@ -1577,7 +1579,7 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFieldType )
          nDBFFieldType := HB_FT_STRING
 
       CASE nADOFieldType == adLongVarChar
-         nDBFFieldType := HB_FT_STRING
+         nDBFFieldType := HB_FT_MEMO
 
       CASE nADOFieldType == adWChar
          nDBFFieldType := HB_FT_STRING

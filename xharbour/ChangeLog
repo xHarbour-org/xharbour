@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6697 2010/04/14 17:53:30 patrickmast Exp $
+ * $Id: ChangeLog,v 1.6698 2010/04/16 21:28:53 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-04-20 21:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
+  * source/rdd/usrrdd/rdds/adordd.prg
+    % small optimization in ADO_GETVALUE
+    * adLongVarChar changed from HB_FT_STRING to HB_FT_MEMO in ADO_GETFIELDTYPE
+      function, because of Field:DefinedSize method return 2147483647 value,
+      (f.e in firebird), and Padr() can't allocate 2GB memory
 
 2010-05-16 23:21 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * make_vc.bat
