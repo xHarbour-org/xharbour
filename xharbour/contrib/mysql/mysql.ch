@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.ch,v 1.0 2001/04/12 18:24:40 dholm Exp $
+ * $Id: mysql.ch,v 1.1 2003/02/03 05:19:18 walito Exp $
  */
 
 
@@ -80,6 +80,7 @@
 #define  MYSQL_BLOB_TYPE         252
 #define  MYSQL_VAR_STRING_TYPE   253
 #define  MYSQL_STRING_TYPE       254
+#define  MYSQL_TYPE_NEWDECIMAL   246
 
 
 

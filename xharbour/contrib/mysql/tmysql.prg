@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.20 2009/11/06 11:16:36 lculik Exp $
+ * $Id: tmysql.prg,v 1.21 2010/02/18 17:19:22 lculik Exp $
  */
 
  /*
@@ -1483,6 +1483,7 @@ METHOD TableStruct( cTable ) CLASS TMySQLServer
             case MYSQL_FLOAT_TYPE
             case MYSQL_DOUBLE_TYPE
             case MYSQL_DECIMAL_TYPE
+            case MYSQL_TYPE_NEWDECIMAL
                aSField[ DBS_TYPE ] := "N"
                aSField[ DBS_LEN ] := aField[ MYSQL_FS_LENGTH ]
                aSFIeld[ DBS_DEC ] := aField[ MYSQL_FS_DECIMALS ]
@@ -1618,6 +1619,7 @@ static function SQL2ClipType( nType )
       case MYSQL_FLOAT_TYPE
       case MYSQL_DOUBLE_TYPE
       case MYSQL_DECIMAL_TYPE
+      case MYSQL_TYPE_NEWDECIMAL
          Return "N"
 
       case MYSQL_DATE_TYPE
