@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6699 2010/04/20 17:57:23 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6700 2010/04/22 17:15:55 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-04-23 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/gtwvw/gtwvw.c
+    ! Fixed support for alert function
+  
 2010-04-22 14:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/mysql/mysql.ch
-    ! + define for MYSQL_TYPE_NEWDECIMAL
+    + define for MYSQL_TYPE_NEWDECIMAL
   * contrib/mysql/tmysql.prg
     ! added support for MYSQL_TYPE_NEWDECIMAL
        

@@ -1,6 +1,6 @@
 
 /*
-* $Id: gtwvw.c,v 1.62 2009/12/16 05:30:50 andijahja Exp $
+* $Id: gtwvw.c,v 1.63 2009/12/21 05:18:58 andijahja Exp $
  */
 /*
  * GTWVW.C
@@ -1704,6 +1704,17 @@ static void hb_gt_wvw_mouse_SetPos( PHB_GT pGT, int iRow, int iCol )
     hb_gt_wvwFUNCEpilogue( );
   }
 
+}
+
+static void hb_gt_wvw_mouse_GetPos( PHB_GT pGT, int * piRow, int * piCol )
+{
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_wvt_mouse_GetPos(%p,%p,%p)", pGT, piRow, piCol));
+
+   HB_SYMBOL_UNUSED( pGT );
+
+   *piRow = hb_gt_wvw_mouse_Row( pGT );
+   *piCol = hb_gt_wvw_mouse_Col( pGT );
 }
 
 /*-------------------------------------------------------------------*/
@@ -7972,6 +7983,7 @@ static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
     pFuncTable->MouseInit             = hb_gt_wvw_mouse_Init;
     pFuncTable->MouseExit             = hb_gt_wvw_mouse_Exit;
     pFuncTable->MouseIsPresent        = hb_gt_wvw_mouse_IsPresent;
+    pFuncTable->MouseGetPos           = hb_gt_wvw_mouse_GetPos;    
     pFuncTable->MouseCol              = hb_gt_wvw_mouse_Col;
     pFuncTable->MouseRow              = hb_gt_wvw_mouse_Row;
     pFuncTable->MouseSetPos           = hb_gt_wvw_mouse_SetPos;
