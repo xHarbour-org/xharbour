@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.9 2007/10/24 10:50:44 modalsist Exp $
+ * $Id: diskutil.prg,v 1.10 2009/04/18 22:44:01 modalsist Exp $
  */
 /*
  * xHarbour Project source code.
@@ -17,6 +17,9 @@
  * FloppyType()  - Return a floppy type.
  * RenameFile()  - Rename a file.
  *
+ * Copyright 2010 Pavel Tsarenko <tpe2@mail.ru>
+ * www.xharbour.org
+ * TEMPFILE()    - Creates a file for temporary use
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,6 +64,7 @@
 
 #include "fileio.ch"
 #include "common.ch"
+#include "set.ch"
 
 
 *----------------------------------------------------------------------------------------------------
@@ -510,6 +514,41 @@ FUNCTION RenameFile( cOldFileName , cNewFileName )
 *-------------------------------------------------
 // FileMove function source is in "xharbour/source/ct/disk.c"
 RETURN ( FileMove( cOldFileName , cNewFileName )  )
+
+
+Function TempFile(cDir, cExt, nAttr)
+LOCAL nFileHandle
+LOCAL cFileName, cNewName
+LOCAL nAt, cSep
+
+IF cDir == nil
+   cDir := CurDirX()
+ENDIF
+nFileHandle := HB_FTempCreate(cDir,, nAttr, @cFileName )
+IF nFileHandle > 0
+   FClose( nFileHandle )
+   nAt := Rat(".", cFileName)
+   cSep := Set(_SET_DIRSEPARATOR)
+   IF nAt != 0 .and. Rat(cSep, cFileName) > nAt
+      nAt := 0
+   ENDIF
+   IF cExt != nil
+      IF nAt == 0
+         cNewName := cFileName + "." + cExt
+      ELSEIF ! (Substr(cFileName, nAt + 1) == cExt)
+         cNewName := Left(cFileName, nAt - 1) + "." + cExt
+      ENDIF
+   ELSEIF nAt != 0
+      cNewName := Left(cFileName, nAt - 1)
+   ENDIF
+   IF ! Empty(cNewName) .and. FRENAME(cFileName, cNewName) != -1
+      cFileName := cNewName
+   ENDIF
+   IF (nAt := Rat(cSep, cFileName)) != 0
+      cFileName := Substr(cFileName, nAt + 1)
+   ENDIF
+ENDIF
+Return cFileName
 
 *--------------------------------*
 STATIC FUNCTION _Drive( cDsk )
