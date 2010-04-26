@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.224 2009/10/23 10:09:57 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.225 2010/03/27 13:15:36 modalsist Exp $
  */
 
 /*
@@ -939,6 +939,7 @@ PROTECTED:
 HIDDEN: 
 
    METHOD PosCursor()                             // Positions the cursor to the beginning of the cell, used only when autolite = .F.
+   METHOD SetPos(nScrRow,nScrCol)                 // Positions the cursor to the screen coordinates.
    METHOD LeftDetermine()                         // Determine leftmost unfrozen column in display
    METHOD DispCell( nRow, nCol, xValue, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
    METHOD HowManyCol()                            // Counts how many cols can be displayed
@@ -1580,7 +1581,8 @@ Return oCol
 *------------------------------------------------------*
 METHOD ColWidth( nColumn ) CLASS TBrowse
 *------------------------------------------------------*
-Return iif( 0 < nColumn .AND. nColumn <= ::nColCount, ::aColsInfo[ nColumn, _TB_COLINFO_WIDTH ], NIL )
+//Return iif( 0 < nColumn .AND. nColumn <= ::nColCount, ::aColsInfo[ nColumn, _TB_COLINFO_WIDTH ], NIL )
+Return iif( 0 < nColumn .AND. nColumn <= ::nColCount, ::aColsInfo[ nColumn, _TB_COLINFO_WIDTH ], 0 )
 
 *------------------------------------------------------*
 METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
@@ -1745,7 +1747,7 @@ METHOD MoveTo( nMove ) CLASS Tbrowse
 Local nTop, leftVis, nSkipped
 
  if ::lStable
-  
+
     // reset movements only after stabilize.
     ::ResetMove()
  else
@@ -2168,7 +2170,7 @@ LOCAL nLeftCol, tryLeftVisible, saveColsWidth
       tryLeftVisible++
       nColsWidth := saveColsWidth
 
-   enddo 
+   enddo
 
    ::nLeftVisible  := Max( 1, tryLeftVisible )
    ::nRightVisible := Max( 1, nColsVisible )
@@ -2184,7 +2186,7 @@ METHOD RedrawHeaders() CLASS TBrowse
 *----------------------------------------*
 LOCAL n, nTPos, nBPos, cBlankBox, nScreenRowT, nScreenRowB
 LOCAL nLCS, nScreenCol, nColFrom, chSep, cfSep, nLeftCol, ccSep, ncSepWidth
-LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters, nCursor
+LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters
 
    cBlankBox    := space( 9 )
    lDrawHeaders := ::lHeaders
@@ -2193,7 +2195,7 @@ LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters, nCursor
    lDrawFooters := ::lFooters
 
    nScreenCol := ::nwLeft + iif( ::nFrozenCols > 0, 0, ::nSpacePre )
-   nColFrom := if( ::nFrozenCols > 0, 1, ::nLeftVisible )
+   nColFrom := iif( ::nFrozenCols > 0, 1, ::nLeftVisible )
    ::aColumnsSep := {}
 
    for n := nColFrom to ::nRightVisible
@@ -2223,9 +2225,7 @@ LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters, nCursor
             n := ::nLeftVisible
          endif
 
-         nCursor := SetCursor(SC_NONE)
-         SetPos( ::nwTop, ::aColsInfo[ n, _TB_COLINFO_SCRCOLPOS ] )
-         SetCursor(nCursor)
+         ::SetPos( ::nwTop, ::aColsInfo[ n, _TB_COLINFO_SCRCOLPOS ] )
 
          ::WriteMLineText( ::aColsInfo[ n, _TB_COLINFO_HEADING ], ;
                            ::aColsInfo[ n, _TB_COLINFO_WIDTH ], .T., ;
@@ -2389,9 +2389,7 @@ LOCAL lDrawHeaders, lDrawHeadSep, lDrawFootSep, lDrawFooters, nCursor
             n := ::nLeftVisible
          endif
 
-         nCursor := SetCursor(SC_NONE)
-         SetPos( ::nwBottom, ::aColsInfo[ n, _TB_COLINFO_SCRCOLPOS ] )
-         SetCursor(nCursor)
+         ::SetPos( ::nwBottom, ::aColsInfo[ n, _TB_COLINFO_SCRCOLPOS ] )
 
          ::WriteMLineText( ::aColsInfo[ n, _TB_COLINFO_FOOTING ], ;
                            ::aColsInfo[ n, _TB_COLINFO_WIDTH ], .F., ;
@@ -2424,7 +2422,7 @@ Local nRow, aColorRect, lfullArea := .f.
       ! HB_IsNumeric( aRect[_TB_COLORRECT_BOTTOM] ) .or.;
       ! HB_IsNumeric( aRect[_TB_COLORRECT_RIGHT ] ) .or.;
       ! HB_IsNumeric( aColors[_TB_COLORRECT_STD ] ) .or.;
-      ! HB_IsNumeric( aColors[_TB_COLORRECT_ENH ] ) 
+      ! HB_IsNumeric( aColors[_TB_COLORRECT_ENH ] )
 
       return self
 
@@ -2435,7 +2433,7 @@ Local nRow, aColorRect, lfullArea := .f.
       aRect[_TB_COLORRECT_BOTTOM] < aRect[_TB_COLORRECT_TOP] .or.;
       aRect[_TB_COLORRECT_RIGHT ] < aRect[_TB_COLORRECT_LEFT] .or.;
       aRect[_TB_COLORRECT_BOTTOM] > ::nRowCount .or.;
-      aRect[_TB_COLORRECT_RIGHT ] > ::nColCount 
+      aRect[_TB_COLORRECT_RIGHT ] > ::nColCount
 
       ::oCache:ClearColRect()
 
@@ -2558,7 +2556,7 @@ Local nMoveTo := ::nMoveTo
       cCurColor := SetColor( ColorSpec )
 
       Scroll(::nWTop,::nWLeft,::nWBottom,::nWRight,0)
-      SetPos(0,0)
+      ::SetPos(0,0)
       SetColor( cCurColor )
 
       // How may columns fit on TBrowse width?
@@ -2609,7 +2607,7 @@ Local nMoveTo := ::nMoveTo
 
    ::aPendingMovements := {}
    ::lRectPainted := .f.
-  
+
    while ::nDispbegin > 0
      Dispend()
      ::nDispbegin --
@@ -2642,7 +2640,7 @@ Local nSkipped
       ::nRowsToSkip = 0 .and. ::nRowsSkipped = 0
 
       if ::nRowPos > ::oCache:LastRow
-         ::nNewRowPos := ::oCache:LastRow 
+         ::nNewRowPos := ::oCache:LastRow
          ::nRowPos := ::nNewRowPos
       endif
 
@@ -2775,7 +2773,7 @@ Local nTop, nBottom, nFirstRow
   nFirstRow := ::nRowData + 1
 
   // I'm at top or bottom of TBrowse so I can scroll
-  if nNewRowPos >= ::nRowCount  
+  if nNewRowPos >= ::nRowCount
      // Down
      nTop     := nFirstRow + ::nRowsSkipped - 1
      nBottom  := nFirstRow + ::nRowCount - ::nRowsSkipped
@@ -2798,7 +2796,7 @@ RETURN SELF
 *------------------------------------------------------*
 METHOD DrawRow( nRow ) CLASS TBrowse
 *------------------------------------------------------*
-LOCAL colorSpec, nColFrom, cColor, lDisplay, nCursor
+LOCAL colorSpec, nColFrom, cColor, lDisplay
 LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
 
 
@@ -2830,7 +2828,7 @@ LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
           endif
 
       next
-   
+
       if ::nColsVisible = 1 .and. ::aColsInfo[1,_TB_COLINFO_SCRCOLPOS] = ::nwLeft
          nGap := Max(0, ::nVisWidth - ::nColsWidth - ::nSpaceLast )
       endif
@@ -2856,7 +2854,7 @@ LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
 
          cColBlanks := Space( ::aColsInfo[ nCol, _TB_COLINFO_WIDTH ] )
 
-         // Empty rows have only standard browser color 
+         // Empty rows have only standard browser color
          cColor := hb_ColorIndex( ::cColorSpec, (( ::aColsInfo[ nCol, _TB_COLINFO_DEFCOLOR ])[ _TB_COLOR_STANDARD ]) - 1 )
 
          // Paint all remainig rows up to ::nRowCount
@@ -2867,9 +2865,7 @@ LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
                if nCol == nColFrom
                   DispOutAt( nRow2Fill + ::nRowData, nLeftColPos, space(::nSpacePre), ColorSpec )
                else
-                  nCursor := SetCursor(SC_NONE)
-                  SetPos(nRow2Fill + ::nRowData, nLeftColPos)
-                  SetCursor(nCursor)
+                  ::SetPos(nRow2Fill + ::nRowData, nLeftColPos)
                endif
 
                DispOut( cColBlanks, cColor )
@@ -2882,9 +2878,7 @@ LOCAL nCol, xCellValue, nGap, nRow2Fill, nLeftColPos, cColBlanks
                if nCol == ::nLeftVisible
                   DispOutAt( nRow2Fill + ::nRowData, nLeftColPos, space(::nSpacePre), ColorSpec )
                else
-                  nCursor := SetCursor(SC_NONE)
-                  SetPos( nRow2Fill + ::nRowData, nLeftColPos )
-                  SetCursor(nCursor)
+                  ::SetPos( nRow2Fill + ::nRowData, nLeftColPos )
                endif
 
                DispOut( cColBlanks, cColor )
@@ -2916,7 +2910,7 @@ Return Nil
 *-----------------------------------------------------------*
 METHOD DispCell( nRow, nCol, xValue, nColor ) CLASS TBrowse
 *-----------------------------------------------------------*
-LOCAL aColsInfo, oCol, nWidth, nLen, nScrCol, nNotLeftCol
+LOCAL aColsInfo, oCol, nWidth, nLen, nScrCol, nScrRow, nNotLeftCol
 LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
 
    aColsInfo := ::aColsInfo[ nCol ]
@@ -2930,14 +2924,14 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
    nWidth  := aColsInfo[ _TB_COLINFO_WIDTH ]
    nLen    := aColsInfo[ _TB_COLINFO_WIDTHCELL ]
    nScrCol := Max( ::nwLeft, aColsInfo[ _TB_COLINFO_SCRCOLPOS ] )
+   nScrRow := nRow + ::nRowData
+
+   nCursor := SetCursor(SC_NONE)
 
    // Fix the column screen cursor when it's out of range.
    if Col() != nScrCol
-      nCursor := SetCursor(SC_NONE)
-      SetPos( nRow + ::nRowData, nScrCol )
-      SetCursor( nCursor )
+      ::SetPos( nScrRow, nScrCol )
    endif
-
 
    if xValue == NIL
       xValue := BlankValue( aColsInfo )
@@ -2999,12 +2993,14 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
       DispOut( Space( nWidth ), cColor )
    end
 
+   SetCursor( nCursor )
+
 RETURN nNotLeftCol
 
 *------------------------------------------------------*
 METHOD PosCursor() CLASS TBrowse
 *------------------------------------------------------*
-LOCAL nScrRow, nScrCol, nCursor
+LOCAL nScrRow, nScrCol
 
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
@@ -3026,9 +3022,7 @@ LOCAL nScrRow, nScrCol, nCursor
 
       end
 
-      nCursor := SetCursor(SC_NONE)
-      SetPos( nScrRow, nScrCol )
-      SetCursor(nCursor)
+      ::SetPos( nScrRow, nScrCol )
 
 #ifdef HB_COMPAT_C53
       ::nRow := nScrRow
@@ -3037,12 +3031,22 @@ LOCAL nScrRow, nScrCol, nCursor
 
    endif
 
+Return nScrCol
+
+*------------------------------------------------------*
+METHOD SetPos(nScrRow, nScrCol) CLASS TBrowse
+*------------------------------------------------------*
+LOCAL nCursor := SetCursor(SC_NONE)
+
+  SetPos( nScrRow, nScrCol )
+  SetCursor(nCursor)
+
 Return Self
 
 *------------------------------------------------------*
 METHOD SetHilite( lHilite ) CLASS TBrowse
 *------------------------------------------------------*
-LOCAL xValue, nColor, nCursor
+LOCAL xValue, nColor, nScrRow, nScrCol
 
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
@@ -3058,13 +3062,10 @@ LOCAL xValue, nColor, nCursor
             nColor := _TB_COLOR_STANDARD
          endif
 
-         ::PosCursor()
-
-         nCurSor := SetCursor( SC_NONE )
-
+         nScrRow := ::nRowPos + ::nRowData
+         nScrCol := ::PosCursor()
          ::DispCell( ::nRowPos, ::nColPos, xValue, nColor )
-
-         SetCursor( nCursor )
+         ::SetPos( nScrRow, nScrCol )
 
       else
         ::PosCursor()
@@ -3157,11 +3158,11 @@ LOCAL n, cS, nCol, nRow, nTokens, nCursor
          cS := cStr
 
          for n := ::nHeaderHeight to 1 step -1
-            SetPos( nRow + n - 1, nCol )
+            ::SetPos( nRow + n - 1, nCol )
             DispOut( PadR( __StrToken( @cS, n, ";" ), nPadLen ), cColor )
          next
 
-         setPos( nRow, nCol + nPadLen )
+         ::SetPos( nRow, nCol + nPadLen )
 
       endif
 
@@ -3177,17 +3178,17 @@ LOCAL n, cS, nCol, nRow, nTokens, nCursor
          cS := cStr + ";"
 
          for n := 0 to ( ::nFooterHeight - 1 )
-            setPos( nRow - n, nCol )
+            ::SetPos( nRow - n, nCol )
             DispOut( PadR( __StrToken( @cS, ::nFooterHeight - n, ";" ), nPadLen ), cColor )
          next
 
-         setPos( nRow, nCol + nPadLen )
+         ::SetPos( nRow, nCol + nPadLen )
 
       endif
 
    endif
 
-   SetPos( nRow, nCol )
+   ::SetPos( nRow, nCol )
    SetCursor( nCursor )
 
 Return Self

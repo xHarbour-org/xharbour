@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6701 2010/04/24 01:43:35 lculik Exp $
+ * $Id: ChangeLog,v 1.6702 2010/04/26 17:26:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-04-26 18:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed cursor position at first char of cells in sethilite() and
+      poscursor() methods.
+    * created setpos() method to replace calls of setpos() function.
 
 2010-04-26 20:30 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/ct/diskutil.prg
