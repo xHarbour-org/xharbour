@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.53 2010/03/03 16:18:59 lculik Exp $
+ * $Id: hbver.c,v 1.54 2010/03/05 15:50:16 lculik Exp $
  */
 
 /*
@@ -227,32 +227,43 @@ char * hb_verPlatform( void )
 
             case VER_PLATFORM_WIN32_NT:
 
-               if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 0  )                  
+               if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 0  )
                {
                   if (osVer.dwPlatformId == VER_NT_WORKSTATION )
                   {
-                     szName = " Windows Vista";
+                     szName = " Vista";
                   }
                   else
                   {
-                     szName = " Windows Server 2008";
+                     szName = " 2008";
                   }
                }
-               else if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 1 ) 
-               {    
+               else if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 1 )
+               {
                   if (osVer.wProductType == VER_NT_WORKSTATION )
                   {
-                     szName = " Windows 7";
+                     szName = " 7";
                   }
                   else
                   {
-                     szName = " Windows Server 2008 R2";
+                     szName = " 2008 R2";
                   }
 
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
-                  szName = " Server 2003";
+                  #ifndef SM_SERVERR2
+                    #define SM_SERVERR2 98
+                  #endif
+
+                  if ( GetSystemMetrics(SM_SERVERR2) != 0 )
+                  {
+                     szName = " 2003 R2";
+                  }
+                  else
+                  {
+                     szName = " 2003";
+                  }
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
                {

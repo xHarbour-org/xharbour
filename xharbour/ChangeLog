@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6702 2010/04/26 17:26:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.6703 2010/04/26 21:45:15 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2010-12-29 17:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rtl\winos.prg
+    + added OS_ISWINXP_OR_LATER()
+  * source\common\hbver.c
+    * removed extra "Windows" & "Server" text and distinguish between "2003" & "2003 R2" versions
 
 2010-04-26 18:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
@@ -21,13 +26,13 @@
 2010-04-23 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/gtwvw/gtwvw.c
     ! Fixed support for alert function
-  
+
 2010-04-22 14:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/mysql/mysql.ch
     + define for MYSQL_TYPE_NEWDECIMAL
   * contrib/mysql/tmysql.prg
     ! added support for MYSQL_TYPE_NEWDECIMAL
-       
+
 2010-04-20 21:00 UTC+0300 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/rdd/usrrdd/rdds/adordd.prg
     % small optimization in ADO_GETVALUE
@@ -46,7 +51,7 @@
 2010-04-04 11:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! source\rtl\hbxml.c
     ! fixed memory leak reported by Eduardo Motta
-    
+
 2010-03-30 09:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   + make_deb5.sh
     * script to build xharbour .deb package for Debian 5.0 (Lenny),
@@ -54,7 +59,7 @@
 
   * source/rtl/tgetlist.prg
     ! fixed valid on get listbox control.
-    
+
 2010-03-27 10:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed cursor position on stabilize/poscursor/sethilite methods.

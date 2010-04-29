@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.13 2009/12/26 13:47:54 lculik Exp $
+ * $Id: winos.prg,v 1.14 2009/12/26 13:59:46 lculik Exp $
  */
 
 /*
@@ -254,6 +254,12 @@ HB_FUNC( OS_ISWIN2000_OR_LATER )
   hb_retl( osvi.dwMajorVersion >= 5 );
 }
 
+HB_FUNC( OS_ISWINXP_OR_LATER )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion==5 && osvi.dwMinorVersion >= 1) );
+}
 HB_FUNC( OS_ISWINVISTA_OR_LATER )
 {
   OSVERSIONINFO osvi;
@@ -372,6 +378,10 @@ HB_FUNC( OS_ISWIN2000_OR_LATER )
   hb_retl( 0);
 }
 
+HB_FUNC( OS_ISWINXP_OR_LATER )
+{
+  hb_retl( 0);
+}
 HB_FUNC( OS_ISWINVISTA_OR_LATER )
 {
   hb_retl( 0);
