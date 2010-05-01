@@ -1,5 +1,5 @@
 /*
- * $Id: ace32.c,v 1.3 2009/01/24 00:33:08 likewolf Exp $
+ * $Id: ace32.c,v 1.4 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ UNSIGNED32 ENTRYPOINT AdsConnect60( UNSIGNED8 *pucServerPath, UNSIGNED16 usServe
 
    return ( pFunc ? pFunc( pucServerPath, usServerTypes, pucUserName, pucPassword, ulOptions, phConnect ) : 0 );
 }
-
+#if ADS_LIB_VERSION >= 800
 UNSIGNED32 ENTRYPOINT AdsIsConnectionAlive( ADSHANDLE hConnect, UNSIGNED16 *pbConnectionIsAlive )
 {
    static ADSISCONNECTIONALIVE_PTR pFunc = NULL;
@@ -403,7 +403,7 @@ UNSIGNED32 ENTRYPOINT AdsIsConnectionAlive( ADSHANDLE hConnect, UNSIGNED16 *pbCo
 
    return ( pFunc ? pFunc( hConnect, pbConnectionIsAlive ) : 0 );
 }
-
+#endif
 UNSIGNED32 ENTRYPOINT AdsContinue( ADSHANDLE hTable, UNSIGNED16 *pbFound )
 {
    static ADSCONTINUE_PTR pFunc = NULL;

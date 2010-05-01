@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6703 2010/04/26 21:45:15 modalsist Exp $
+ * $Id: ChangeLog,v 1.6704 2010/04/29 05:55:39 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2010-12-29 17:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+
+2010-04-30 18:30 UTC-0700 Luis Krause <kaddath at shaw dot ca>
+  * contrib\rdd_ads\ace32.c
+  * contrib\rdd_ads\adsfunc.c
+    + Guarded AdsIsConnectionAlive inside ADS_LIB_VERSION >= 800
+      to allow to build rddads.lib for ADS 7.x
+  * Fixed entry date for last commit (read 2010-12-29).
+
+2010-04-29 17:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\winos.prg
     + added OS_ISWINXP_OR_LATER()
   * source\common\hbver.c
