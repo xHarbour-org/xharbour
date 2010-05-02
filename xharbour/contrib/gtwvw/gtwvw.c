@@ -1,6 +1,6 @@
 
 /*
-* $Id: gtwvw.c,v 1.63 2009/12/21 05:18:58 andijahja Exp $
+* $Id: gtwvw.c,v 1.64 2010/04/24 01:43:35 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -5394,8 +5394,8 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
   pWindowData->usSBHeight= 0;
 
   pWindowData->bSBPaint = FALSE;
-  pWindowData->cSBColorForeground = NULL;
-  pWindowData->cSBColorBackground = NULL;
+  pWindowData->cSBColorForeground = (COLORREF)NULL;
+  pWindowData->cSBColorBackground = (COLORREF)NULL;
 
   pWindowData->hToolBar = NULL;
   pWindowData->usTBHeight= 0;
@@ -7954,7 +7954,7 @@ static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
     pFuncTable->WriteAt               = hb_gt_wvw_WriteAt;
     pFuncTable->PutText               = hb_gt_wvw_PutText;
     pFuncTable->SetAttribute          = hb_gt_wvw_SetAttribute;
-    pFuncTable->Scroll                = hb_gt_wvw_Scroll;
+    //pFuncTable->Scroll                = hb_gt_wvw_Scroll;
     pFuncTable->SetMode               = hb_gt_wvw_SetMode;
     pFuncTable->GetBlink              = hb_gt_wvw_GetBlink;
     pFuncTable->SetBlink              = hb_gt_wvw_SetBlink;

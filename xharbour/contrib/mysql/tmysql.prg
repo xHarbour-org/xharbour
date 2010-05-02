@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.21 2010/02/18 17:19:22 lculik Exp $
+ * $Id: tmysql.prg,v 1.22 2010/04/22 17:15:55 lculik Exp $
  */
 
  /*
@@ -249,7 +249,14 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLRow
    next
 
    // remove last " AND "
-   cWhere := Left( cWhere, Len( cWhere ) - 5 )
+      if ( cWhere != " WHERE " )
+      // remove last " AND "
+      cWhere := Left( cWhere, Len( cWhere ) - 5 )
+   else
+      // sk
+      cWhere = ""
+   endif
+
 
 return cWhere
 
@@ -781,7 +788,7 @@ return nSkipRows
 
 
 /* Creates an update query for changed fields and submits it to server */
-METHOD Update( oRow ) CLASS TMySQLTable
+METHOD Update( oRow,cWhere ) CLASS TMySQLTable
 
    local cUpdateQuery := "UPDATE " + ::cTable + " SET "
    local xValue
@@ -805,7 +812,12 @@ METHOD Update( oRow ) CLASS TMySQLTable
          cUpdateQuery := Left(cUpdateQuery, Len(cUpdateQuery) -1)
 
 
-         cUpdateQuery += ::MakePrimaryKeyWhere()
+         if ( cWhere != nil )
+             cUpdateQuery += " WHERE " + cWhere
+         else
+             cUpdateQuery += ::MakePrimaryKeyWhere()
+         endif
+
 
 // alert( cUpdateQuery )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6704 2010/04/29 05:55:39 peterrees Exp $
+ * $Id: ChangeLog,v 1.6705 2010/05/01 01:31:40 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-05-02 20:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/gtwvw/gtwvw.c
+    ! fixed problem reported with scroll(Mario Simoes ) and alert (Claudio H) function
+  * contrib/mysql/tmysql.prg
+    ! fixed update method from TMySQLTable() when table dont have primary key( fix provided by Sergio Kondo)
+    ! fixed  MakePrimaryKeyWhere method from TMySQLRow class, to work correctly when table dont have primary key( fix provided by Sergio Kondo)
+    
+
 
 2010-04-30 18:30 UTC-0700 Luis Krause <kaddath at shaw dot ca>
   * contrib\rdd_ads\ace32.c
