@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.150 2009/11/06 19:54:18 modalsist Exp $
+ * $Id: tget.prg,v 1.151 2010/05/10 13:58:29 modalsist Exp $
  */
 
 /*
@@ -714,7 +714,7 @@ METHOD Display( lForced ) CLASS Get
        */
       IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') )
          nCol := ::Col + ::nMaxLen - 1
-         IF nCol < ::nMaxLen 
+         IF ::Col > 0 .AND. nCol < ::nMaxLen
             ::Left(.F.)
          ENDIF
       ENDIF
