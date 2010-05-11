@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.33 2009/11/09 09:39:22 marchuet Exp $
+ * $Id: maindllp.c,v 1.34 2010/01/12 06:55:01 andijahja Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
 /* extend API implementation for pcode DLLs */
 
-char * hb_parc( int iParam, ... )
+const char * hb_parc( int iParam, ... )
 {
    static FARPROC pParC = NULL;
 
@@ -624,7 +624,7 @@ ULONG hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter 
 }
 
 #undef hb_pards
-char * hb_pards( int iParam, ... ) /* retrieve a date as a string yyyymmdd */
+const char * hb_pards( int iParam, ... ) /* retrieve a date as a string yyyymmdd */
 {
    static FARPROC pParDs = NULL;
 
@@ -1514,7 +1514,7 @@ HB_EXTERN_END
 #undef _HB_SNPRINTF_ADD_EOS
 #undef hb_snprintf
 /* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
-ULONG hb_snprintf( char * buffer, ULONG nSize, const char * format, ... )
+int hb_snprintf( char * buffer, size_t nSize, const char * format, ... )
 {
    va_list arglist;
    ULONG result;

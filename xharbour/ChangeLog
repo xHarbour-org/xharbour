@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6707 2010/05/10 13:58:13 modalsist Exp $
+ * $Id: ChangeLog,v 1.6708 2010/05/11 11:58:47 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-05-11 16:35 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/vm/maindllp.c
+    ! fixed some castings from call at dll.
 
 2010-05-11 08:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -22,8 +26,6 @@
   * contrib/mysql/tmysql.prg
     ! fixed update method from TMySQLTable() when table dont have primary key( fix provided by Sergio Kondo)
     ! fixed  MakePrimaryKeyWhere method from TMySQLRow class, to work correctly when table dont have primary key( fix provided by Sergio Kondo)
-    
-
 
 2010-04-30 18:30 UTC-0700 Luis Krause <kaddath at shaw dot ca>
   * contrib\rdd_ads\ace32.c
