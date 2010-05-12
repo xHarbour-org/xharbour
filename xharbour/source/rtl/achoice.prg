@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.45 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id: achoice.prg,v 1.46 2009/08/10 13:26:23 modalsist Exp $
  */
 
 /*
@@ -371,7 +371,7 @@ LOCAL nPage := ::nSize + 1
             IF ::lUserFunc
                nUserMode := AC_EXCEPT
             ELSE
-               ::MoveCursor(1, -1, 1)
+               ::MoveCursor( - ( ::nOption - 1 ), -1, ::nFirstRow - 1 )
                nUserMode := AC_NO_USER_FUNCTION
             ENDIF
             EXIT
