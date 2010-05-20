@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.103 2009/11/09 09:39:22 marchuet Exp $
+ * $Id: errorapi.c,v 1.104 2010/05/20 07:48:41 marchuet Exp $
  */
 
 /*
@@ -206,6 +206,8 @@ HB_FUNC_STATIC( CARGO )
 
 HB_FUNC_STATIC( _CARGO )
 {
+   HB_THREAD_STUB
+   
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
    if( pItem )
