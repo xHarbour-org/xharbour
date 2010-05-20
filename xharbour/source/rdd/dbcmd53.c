@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd53.c,v 1.4 2009/02/24 12:38:15 marchuet Exp $
+ * $Id: dbcmd53.c,v 1.5 2009/12/20 14:07:12 andijahja Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ HB_FUNC( ORDKEYCOUNT )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -102,7 +102,7 @@ HB_FUNC( ORDKEYNO )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -124,7 +124,7 @@ HB_FUNC( ORDKEYGOTO )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
       SELF_ORDINFO( pArea, DBOI_POSITION, &pOrderInfo );
@@ -141,7 +141,7 @@ HB_FUNC( ORDKEYRELPOS )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
       pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
       SELF_ORDINFO( pArea, DBOI_RELKEYPOS, &pOrderInfo );
@@ -158,7 +158,7 @@ HB_FUNC( ORDFINDREC )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
       SELF_ORDINFO( pArea, ISLOG( 2 ) && hb_parl( 2 ) ? DBOI_FINDRECCONT :
@@ -186,7 +186,7 @@ HB_FUNC( ORDSKIPUNIQUE )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmNewVal = hb_param( 1, HB_IT_ANY );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
       SELF_ORDINFO( pArea, DBOI_SKIPUNIQUE, &pOrderInfo );
@@ -203,7 +203,7 @@ HB_FUNC( ORDKEYVAL )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmResult = hb_itemNew( NULL );
       SELF_ORDINFO( pArea, DBOI_KEYVAL, &pOrderInfo );
       hb_itemReturnRelease( pOrderInfo.itmResult );
@@ -219,7 +219,7 @@ HB_FUNC( ORDKEYADD )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -241,7 +241,7 @@ HB_FUNC( ORDKEYDEL )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -263,7 +263,7 @@ HB_FUNC( ORDDESCEND )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -285,7 +285,7 @@ HB_FUNC( ORDISUNIQUE )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -307,7 +307,7 @@ HB_FUNC( ORDCUSTOM )
    if( pArea )
    {
       DBORDERINFO pOrderInfo;
-      memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
+      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );

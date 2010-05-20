@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6709 2010/05/11 14:34:11 marchuet Exp $
+ * $Id: ChangeLog,v 1.6710 2010/05/12 06:06:31 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-05-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * contrib\filemem\filemem.c
+  * include\dbinfo.ch
+  * include\fileio.ch
+  * include\hbapierr.h
+  * include\hbapifs.h
+  * include\hbapirdd.h
+  * source\rdd\dbcmd.c
+  * source\rdd\dbcmd53.c
+  * source\rdd\dbf1.c
+  * source\rdd\dbf1net.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\hbdbsort.c
+  * source\rdd\wacore.c
+  * source\rdd\wafunc.c
+  * source\rdd\workarea.c
+  * source\rtl\filebuf.c
+  * source\rtl\filenet.c
+  * source\vm\errorapi.c
+    + Added flush method at file subsystem.
+    * changed Whitespaces to align code.
+    * changed USHORT or ULONG by HB_ERRCODE where nedded.
+    + added hb_dbfErrorRT to reduce repeated code.
+    + Added suport for dbf files with signature 0x32 Visual FoxPro, autoincrement enabled.
+  * include\blob.ch
+    ! fixed bug for bad type.    
+  ( the major part of this code is based on harbour code, but with little changes )
 
 2010-05-12 01:03 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/achoice.prg

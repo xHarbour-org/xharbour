@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.216 2009/12/03 03:00:01 andijahja Exp $
+ * $Id: dbf1.c,v 1.217 2009/12/16 05:32:21 andijahja Exp $
  */
 
 /*
@@ -93,6 +93,42 @@ static RDDFUNCS dbfSuper;
 #define HB_BLANK_SKIP         100
 #define HB_BLANK_AUTOINC      101
 
+/*
+ * generate Run-Time error
+ */
+static HB_ERRCODE hb_dbfErrorRT( DBFAREAP pArea,
+                                 HB_ERRCODE errGenCode, HB_ERRCODE errSubCode,
+                                 const char * szFileName, HB_ERRCODE errOsCode,
+                                 USHORT uiFlags, PHB_ITEM * pErrorPtr )
+{
+   PHB_ITEM pError;
+   HB_ERRCODE errCode = HB_FAILURE;
+
+   if( hb_vmRequestQuery() == 0 )
+   {
+      if( pErrorPtr )
+      {
+         if( ! *pErrorPtr )
+            *pErrorPtr = hb_errNew();
+         pError = *pErrorPtr;
+      }
+      else
+         pError = hb_errNew();
+      hb_errPutGenCode( pError, errGenCode );
+      hb_errPutSubCode( pError, errSubCode );
+      hb_errPutOsCode( pError, errOsCode );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( errGenCode ) );
+      if( szFileName )
+         hb_errPutFileName( pError, szFileName );
+      if( uiFlags )
+         hb_errPutFlags( pError, uiFlags );
+      errCode = SELF_ERROR( ( AREAP ) pArea, pError );
+      if( !pErrorPtr )
+         hb_errRelease( pError );
+   }
+   return errCode;
+}
+
 static HB_LONG hb_dbfGetRowVer( DBFAREAP pArea, USHORT uiField, HB_LONG * pValue )
 {
    DBFFIELD dbField;
@@ -161,13 +197,13 @@ static HB_LONG hb_dbfSetNextValue( DBFAREAP pArea, USHORT uiField, HB_LONG nNext
    return nPreviousValue;
 }
 
-/*      
+/*
 0-1  The first two bytes (binary integer) tell whether a user has changed the record. Every committed change
      is counted encreasing the count by one.
 2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
 5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
 8-24 The remaining 16 characters are optional. They tell the name of the user that placed the lock.
-*/    
+*/
 static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
 {
    if( pArea->uidbaselock && ulRecNo )
@@ -181,7 +217,7 @@ static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
                       ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                       ( HB_FOFFSET ) pArea->uiRecordLen ) == ( ULONG ) pArea->uiRecordLen )
       {
-      
+
          pPtr = pRecord + pArea->pFieldOffset[ pArea->uidbaselock ] + 2;
          hb_dbaselockEncode( ( char * ) pPtr );
          /* Login name of user who locked record or file */
@@ -192,8 +228,8 @@ static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
                          ( HB_FOFFSET ) pArea->uiHeaderLen +
                          ( HB_FOFFSET ) ( ( ulRecNo - 1 ) * pArea->uiRecordLen ) +
                          ( HB_FOFFSET ) ( pArea->pFieldOffset[ pArea->uidbaselock ] + 2 ) );
-      }                           
-      hb_xfree( pRecord );                                                   
+      }
+      hb_xfree( pRecord );
    }
 }
 
@@ -367,7 +403,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
       }
    }
    memset( pPtr, bFill, ulSize );
- 
+
    ulSize = pArea->pRecord - pPtr - ulSize;
    if( ulSize < ( ULONG ) pArea->uiRecordLen )
       memset( pPtr, '\0', ( ULONG ) pArea->uiRecordLen - ulSize );
@@ -481,15 +517,8 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
                       ( HB_FOFFSET ) pArea->uiRecordLen ) !=
        ( ULONG ) pArea->uiRecordLen )
    {
-      PHB_ITEM pError = hb_errNew();
-
-      hb_errPutGenCode( pError, EG_READ );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
-      hb_errPutSubCode( pError, EDBF_READ );
-      hb_errPutOsCode( pError, hb_fsError() );
-      hb_errPutFileName( pError, pArea->szDataFileName );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READ, EDBF_READ,
+                     pArea->szDataFileName, hb_fsError(), 0, NULL );
       return FALSE;
    }
 
@@ -679,7 +708,7 @@ static void hb_dbfTableCrypt( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fEncrypt )
  */
 static HB_ERRCODE hb_dbfUnlockAllRecords( DBFAREAP pArea )
 {
-   HB_ERRCODE uiError = HB_SUCCESS;
+   HB_ERRCODE errCode = HB_SUCCESS;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockAllRecords(%p)", pArea ));
 
@@ -687,14 +716,14 @@ static HB_ERRCODE hb_dbfUnlockAllRecords( DBFAREAP pArea )
    {
       ULONG ulCount;
 
-      uiError = SELF_GOCOLD( ( AREAP ) pArea );
+      errCode = SELF_GOCOLD( ( AREAP ) pArea );
       for( ulCount = 0; ulCount < pArea->ulNumLocksPos; ulCount++ )
          SELF_RAWLOCK( ( AREAP ) pArea, REC_UNLOCK, pArea->pLocksPos[ ulCount ] );
       hb_xfree( pArea->pLocksPos );
       pArea->pLocksPos = NULL;
    }
    pArea->ulNumLocksPos = 0;
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -702,7 +731,7 @@ static HB_ERRCODE hb_dbfUnlockAllRecords( DBFAREAP pArea )
  */
 static HB_ERRCODE hb_dbfUnlockRecord( DBFAREAP pArea, ULONG ulRecNo )
 {
-   HB_ERRCODE uiError = HB_SUCCESS;
+   HB_ERRCODE errCode = HB_SUCCESS;
    ULONG ulCount, * pList;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockRecord(%p, %lu)", pArea, ulRecNo));
@@ -713,7 +742,7 @@ static HB_ERRCODE hb_dbfUnlockRecord( DBFAREAP pArea, ULONG ulRecNo )
 
    if( ulCount < pArea->ulNumLocksPos )
    {
-      uiError = SELF_GOCOLD( ( AREAP ) pArea );
+      errCode = SELF_GOCOLD( ( AREAP ) pArea );
       SELF_RAWLOCK( ( AREAP ) pArea, REC_UNLOCK, ulRecNo );
       if( pArea->ulNumLocksPos == 1 )            /* Delete the list */
       {
@@ -732,7 +761,7 @@ static HB_ERRCODE hb_dbfUnlockRecord( DBFAREAP pArea, ULONG ulRecNo )
          pArea->ulNumLocksPos --;
       }
    }
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -852,16 +881,16 @@ static HB_ERRCODE hb_dbfLockFile( DBFAREAP pArea, USHORT * pResult )
  */
 static HB_ERRCODE hb_dbfUnlockFile( DBFAREAP pArea )
 {
-   HB_ERRCODE uiError = HB_SUCCESS;
+   HB_ERRCODE errCode = HB_SUCCESS;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockFile(%p)", pArea));
 
    if( pArea->fFLocked )
    {
-      uiError = SELF_GOCOLD( ( AREAP ) pArea );
+      errCode = SELF_GOCOLD( ( AREAP ) pArea );
       SELF_RAWLOCK( ( AREAP ) pArea, FILE_UNLOCK, 0 );
    }
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -1082,20 +1111,10 @@ HB_ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
             if( bByte >= '0' && bByte <= '9' )
                ulValue = ulValue * 10 + ( bByte - '0' );
             else if( bByte != ' ' || ulValue )
-            {
-               PHB_ITEM pError = hb_errNew();
-               HB_ERRCODE uiError;
-
-               hb_errPutGenCode( pError, EG_CORRUPTION );
-               hb_errPutSubCode( pError, EDBF_CORRUPT );
-               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-               hb_errPutFileName( pError, pArea->szDataFileName );
-               hb_errPutFlags( pError, EF_CANDEFAULT );
-               uiError = SELF_ERROR( ( AREAP ) pArea, pError );
-               hb_itemRelease( pError );
-
-               return uiError == E_DEFAULT ? HB_SUCCESS : HB_FAILURE;
-            }
+               return hb_dbfErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
+                                     pArea->szDataFileName, 0,
+                                     EF_CANDEFAULT, NULL ) == E_DEFAULT ?
+                      HB_SUCCESS : HB_FAILURE;
          }
          *pulBlock = ulValue;
       }
@@ -1458,20 +1477,13 @@ static HB_ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
  */
 static HB_ERRCODE hb_dbfGoToId( DBFAREAP pArea, PHB_ITEM pItem )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGoToId(%p, %p)", pArea, pItem));
 
    if( HB_IS_NUMERIC( pItem ) )
       return SELF_GOTO( ( AREAP ) pArea, hb_itemGetNL( pItem ) );
    else
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_DATATYPE );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_DATATYPE ) );
-      hb_errPutSubCode( pError, EDBF_DATATYPE );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_DATATYPE, EDBF_DATATYPE, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
 }
@@ -1499,7 +1511,7 @@ static HB_ERRCODE hb_dbfGoTop( DBFAREAP pArea )
  */
 static HB_ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSkip(%p, %ld)", pArea, lToSkip));
 
@@ -1515,15 +1527,15 @@ static HB_ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
        hb_setGetDeleted() )
       return SUPER_SKIP( ( AREAP ) pArea, lToSkip );
 
-   uiError = SELF_SKIPRAW( ( AREAP ) pArea, lToSkip );
+   errCode = SELF_SKIPRAW( ( AREAP ) pArea, lToSkip );
 
    /* TODO: remove this hack - it's not necessary if SKIPRAW works
       as it should, Druzus */
 
    /* Move first record and set Bof flag */
-   if( uiError == HB_SUCCESS && pArea->area.fBof && lToSkip < 0 )
+   if( errCode == HB_SUCCESS && pArea->area.fBof && lToSkip < 0 )
    {
-      uiError = SELF_GOTOP( ( AREAP ) pArea );
+      errCode = SELF_GOTOP( ( AREAP ) pArea );
       pArea->area.fBof = TRUE;
    }
 
@@ -1533,7 +1545,7 @@ static HB_ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
    else /* if( lToSkip > 0 ) */
       pArea->area.fBof = FALSE;
 
-   return uiError;
+   return errCode;
 }
 
 #define hb_dbfSkipFilter            NULL
@@ -1543,7 +1555,7 @@ static HB_ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
  */
 static HB_ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSkipRaw(%p, %ld)", pArea, lToSkip));
 
@@ -1561,7 +1573,7 @@ static HB_ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
       bBof = pArea->area.fBof;
       bEof = pArea->area.fEof;
 
-      uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
+      errCode = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
 
       /* Restore flags */
       pArea->area.fBof = bBof;
@@ -1569,15 +1581,15 @@ static HB_ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
    }
    else if( lToSkip < 0 && ( ULONG ) ( -lToSkip ) >= pArea->ulRecNo )
    {
-      uiError = SELF_GOTO( ( AREAP ) pArea, 1 );
+      errCode = SELF_GOTO( ( AREAP ) pArea, 1 );
       pArea->area.fBof = TRUE;
    }
    else
    {
-      uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip );
+      errCode = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip );
    }
 
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -1607,9 +1619,8 @@ static HB_ERRCODE hb_dbfAddField( DBFAREAP pArea, LPDBFIELDINFO pFieldInfo )
 static HB_ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
 {
    ULONG ulNewRecord;
-   PHB_ITEM pError;
    USHORT fLocked;
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfAppend(%p, %d)", pArea, (int) bUnLockAll));
 
@@ -1624,12 +1635,7 @@ static HB_ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
 
    if( pArea->fReadonly )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READONLY );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
-      hb_errPutSubCode( pError, EDBF_READONLY );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READONLY, EDBF_READONLY, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
 
@@ -1665,13 +1671,8 @@ static HB_ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
       if( !fLocked )
       {
          SELF_RAWLOCK( ( AREAP ) pArea, APPEND_UNLOCK, 0 );
-         pError = hb_errNew();
-         hb_errPutGenCode( pError, EG_APPENDLOCK );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_APPENDLOCK ) );
-         hb_errPutSubCode( pError, EDBF_APPENDLOCK );
-         hb_errPutFlags( pError, EF_CANDEFAULT );
-         SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_itemRelease( pError );
+         hb_dbfErrorRT( pArea, EG_APPENDLOCK, EDBF_APPENDLOCK, NULL, 0,
+                        EF_CANDEFAULT, NULL );
          return HB_FAILURE;
       }
    }
@@ -1689,9 +1690,9 @@ static HB_ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
 
    if( pArea->fShared )
    {
-      uiError = SELF_GOCOLD( ( AREAP ) pArea );
+      errCode = SELF_GOCOLD( ( AREAP ) pArea );
       SELF_RAWLOCK( ( AREAP ) pArea, APPEND_UNLOCK, 0 );
-      return uiError;
+      return errCode;
    }
    return HB_SUCCESS;
 }
@@ -1764,18 +1765,18 @@ static HB_ERRCODE hb_dbfDeleted( DBFAREAP pArea, BOOL * pDeleted )
  */
 static HB_ERRCODE hb_dbfFlush( DBFAREAP pArea )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfFlush(%p)", pArea));
 
-   uiError = SELF_GOCOLD( ( AREAP ) pArea );
-   if( uiError == HB_SUCCESS )
+   errCode = SELF_GOCOLD( ( AREAP ) pArea );
+   if( errCode == HB_SUCCESS )
    {
       if( pArea->fUpdateHeader )
-         uiError = SELF_WRITEDBHEADER( ( AREAP ) pArea );
+         errCode = SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
 
-   if( hb_setGetHardCommit() && uiError == HB_SUCCESS )
+   if( hb_setGetHardCommit() && errCode == HB_SUCCESS )
    {
       if( pArea->fDataFlush )
       {
@@ -1789,7 +1790,7 @@ static HB_ERRCODE hb_dbfFlush( DBFAREAP pArea )
       }
    }
 
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -2035,7 +2036,7 @@ static HB_ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          break;
 
       case HB_FT_MEMO:
-      case HB_FT_BINARY:      
+      case HB_FT_BINARY:
       case HB_FT_OLE:
       case HB_FT_PICTURE:
       case HB_FT_BLOB:
@@ -2131,29 +2132,17 @@ static HB_ERRCODE hb_dbfGoCold( DBFAREAP pArea )
  */
 static HB_ERRCODE hb_dbfGoHot( DBFAREAP pArea )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGoHot(%p)", pArea));
 
    if( pArea->fReadonly )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READONLY );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
-      hb_errPutSubCode( pError, EDBF_READONLY );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READONLY, EDBF_READONLY, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
    else if( pArea->fShared && !pArea->fFLocked &&
             !hb_dbfIsLocked( pArea, pArea->ulRecNo ) )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_UNLOCKED );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_UNLOCKED ) );
-      hb_errPutSubCode( pError, EDBF_UNLOCKED );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
    pArea->fRecordChanged = TRUE;
@@ -2229,15 +2218,8 @@ static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, const BYTE * pBuffer )
 
       if( uiWritten != pArea->uiRecordLen )
       {
-         PHB_ITEM pError = hb_errNew();
-
-         hb_errPutGenCode( pError, EG_WRITE );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
-         hb_errPutSubCode( pError, EDBF_WRITE );
-         hb_errPutOsCode( pError, hb_fsError() );
-         hb_errPutFileName( pError, pArea->szDataFileName );
-         SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_itemRelease( pError );
+         hb_dbfErrorRT( pArea, EG_WRITE, EDBF_WRITE, pArea->szDataFileName,
+                        hb_fsError(), 0, NULL );
          return HB_FAILURE;
       }
    }
@@ -2258,7 +2240,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
     */
    char szBuffer[ 256 ];
    PHB_ITEM pError;
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
@@ -2285,7 +2267,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
    if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == HB_FAILURE )
       return HB_FAILURE;
 
-   uiError = HB_SUCCESS;
+   errCode = HB_SUCCESS;
    uiIndex--;
    pField = pArea->area.lpFields + uiIndex;
    if( pField->uiType == HB_FT_MEMO ||
@@ -2293,7 +2275,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
        pField->uiType == HB_FT_PICTURE ||
        pField->uiType == HB_FT_BLOB ||
        pField->uiType == HB_FT_OLE )
-      uiError = EDBF_DATATYPE;
+      errCode = EDBF_DATATYPE;
    else
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
@@ -2313,7 +2295,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
                     ' ', pField->uiLen - uiSize );
          }
          else
-            uiError = EDBF_DATATYPE;
+            errCode = EDBF_DATATYPE;
       }
       /* Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC. (xHarbour) */
       else if( HB_IS_DATE( pItem ) )
@@ -2350,7 +2332,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
                        hb_itemGetDL( pItem ) );
          }
          else
-            uiError = EDBF_DATATYPE;
+            errCode = EDBF_DATATYPE;
       }
       else if( HB_IS_NUMBER( pItem ) )
       {
@@ -2363,7 +2345,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             }
             else
             {
-               uiError = EDBF_DATAWIDTH;
+               errCode = EDBF_DATAWIDTH;
                memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        '*', pField->uiLen );
             }
@@ -2426,7 +2408,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
 
             if( iSize > pField->uiLen )
             {
-               uiError = EDBF_DATAWIDTH;
+               errCode = EDBF_DATAWIDTH;
             }
             else
             {
@@ -2452,7 +2434,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
 #endif
                      break;
                   default:
-                     uiError = EDBF_DATATYPE;
+                     errCode = EDBF_DATATYPE;
                      break;
                }
             }
@@ -2472,12 +2454,12 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             }
             else
             {
-               uiError = EDBF_DATAWIDTH;
+               errCode = EDBF_DATAWIDTH;
             }
          }
          else
          {
-            uiError = EDBF_DATATYPE;
+            errCode = EDBF_DATATYPE;
          }
       }
       else if( HB_IS_LOGICAL( pItem ) )
@@ -2485,24 +2467,24 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          if( pField->uiType == HB_FT_LOGICAL )
             pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] = hb_itemGetL( pItem ) ? 'T' : 'F';
          else
-            uiError = EDBF_DATATYPE;
+            errCode = EDBF_DATATYPE;
       }
       else
-         uiError = EDBF_DATATYPE;
+         errCode = EDBF_DATATYPE;
    }
 
    /* Exit if any error */
-   if( uiError != HB_SUCCESS )
+   if( errCode != HB_SUCCESS )
    {
       pError = hb_errNew();
-      hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
+      hb_errPutGenCode( pError, hb_dbfGetEGcode( errCode ) );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( errCode ) ) );
       hb_errPutOperation( pError, hb_dynsymName( ( PHB_DYNS ) pField->sym ) );
-      hb_errPutSubCode( pError, uiError );
+      hb_errPutSubCode( pError, errCode );
       hb_errPutFlags( pError, EF_CANDEFAULT );
-      uiError = SELF_ERROR( ( AREAP ) pArea, pError );
+      errCode = SELF_ERROR( ( AREAP ) pArea, pError );
       hb_itemRelease( pError );
-      return uiError == E_DEFAULT ? HB_SUCCESS : HB_FAILURE;
+      return errCode == E_DEFAULT ? HB_SUCCESS : HB_FAILURE;
    }
 
    return HB_SUCCESS;
@@ -2735,7 +2717,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    HB_ERRCODE errCode = HB_SUCCESS;
    ULONG ulSize;
    USHORT uiCount;
-   BOOL fRetry, fError, fRawBlob;
+   BOOL fError, fRawBlob;
    DBFFIELD * pThisField;
    BYTE * pBuffer;
    PHB_FNAME pFileName;
@@ -2796,7 +2778,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    else if( pArea->bTableType == DB_DBF_IV )
    {
-      pArea->bMemoType = DB_MEMO_DBT;   
+      pArea->bMemoType = DB_MEMO_DBT;
    }
    else if( pArea->bMemoType == 0 )
    {
@@ -2819,13 +2801,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    if( pArea->area.uiFieldCount * sizeof( DBFFIELD ) + sizeof( DBFHEADER ) +
        ( pArea->bTableType == DB_DBF_VFP ? 1 : 2 ) > UINT16_MAX )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_CREATE );
-      hb_errPutSubCode( pError, EDBF_DATAWIDTH );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-      hb_errPutFileName( pError, pCreateInfo->abName );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_CREATE, EDBF_DATAWIDTH, pCreateInfo->abName, 0, 0, NULL );
       pArea->lpdbOpenInfo = NULL;
       return HB_FAILURE;
    }
@@ -2843,28 +2819,13 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
                                                FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
                                                FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
                                                NULL, pError, TRUE );
-         if( ! pArea->pDataFile )
-         {
-            if( !pError )
-            {
-               pError = hb_errNew();
-               hb_errPutGenCode( pError, EG_CREATE );
-               hb_errPutSubCode( pError, EDBF_CREATE_DBF );
-               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-               hb_errPutFileName( pError, szFileName );
-               hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-            }
-            hb_errPutOsCode( pError, hb_fsError() );
-            fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-         }
-         else
-            fRetry = FALSE;
-      } while( fRetry );
-
-      if( pError )
-      {
-         hb_itemRelease( pError );
+         if( pArea->pDataFile )
+            break;
       }
+      while( hb_dbfErrorRT( pArea, EG_CREATE, EDBF_CREATE_DBF, szFileName, hb_fsError(),
+                            EF_CANRETRY | EF_CANDEFAULT, &pError ) == E_RETRY );
+      if( pError )
+         hb_itemRelease( pError );
 
       if( ! pArea->pDataFile )
       {
@@ -2877,15 +2838,8 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    ulSize = ( ULONG ) pArea->area.uiFieldCount * sizeof( DBFFIELD ) +
             ( pArea->bTableType == DB_DBF_VFP ? 1 : 2 );
-   if( pArea->area.uiFieldCount )
-   {
-      pBuffer = ( BYTE * ) hb_xgrab( ulSize + 1 );
-      memset( pBuffer, 0, ulSize );
-   }
-   else
-   {
-      pBuffer = NULL;
-   }
+   pBuffer = ( BYTE * ) hb_xgrab( ulSize + sizeof( DBFFIELD ) + 1 );
+   memset( pBuffer, 0, ulSize + sizeof( DBFFIELD ) + 1 );
    pThisField = ( DBFFIELD * ) pBuffer;
 
    pArea->fHasMemo = fError = FALSE;
@@ -2921,14 +2875,14 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pThisField->bDec = ( BYTE ) ( pField->uiLen >> 8 );
             pArea->uiRecordLen += pField->uiLen;
             break;
-            
-         /* system fields */   
+
+         /* system fields */
          case HB_FT_NONE:
             pThisField->bType = '0';
             pThisField->bLen = ( BYTE ) pField->uiLen;
             pThisField->bFieldFlags |= HB_FF_HIDDEN;
             pArea->uiRecordLen += pField->uiLen;
-            break;            
+            break;
 
          case HB_FT_LOGICAL:
             pThisField->bType = 'L';
@@ -3133,14 +3087,8 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       {
          hb_xfree( pBuffer );
          SELF_CLOSE( ( AREAP ) pArea );
-
-         pError = hb_errNew();
-         hb_errPutGenCode( pError, EG_CREATE );
-         hb_errPutSubCode( pError, EDBF_DATATYPE );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-         hb_errPutFileName( pError, pCreateInfo->abName );
-         SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_itemRelease( pError );
+         hb_dbfErrorRT( pArea, EG_CREATE, fError ? EDBF_DATATYPE : EDBF_DATAWIDTH,
+                        pCreateInfo->abName, 0, 0, NULL );
          pArea->lpdbOpenInfo = NULL;
          return HB_FAILURE;
       }
@@ -3235,19 +3183,20 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          pBuffer[ ulSize - 2 ] = '\r';
          pBuffer[ ulSize - 1 ] = '\0';
       }
-      pBuffer[ ulSize ] = ' ';
+      pBuffer[ ulSize ] = '\032';
       if( hb_fileWriteAt( pArea->pDataFile, pBuffer, ulSize + 1,
                           sizeof( DBFHEADER ) ) != ulSize + 1 )
       {
-         /* TODO: add RT error */
          hb_xfree( pBuffer );
+         hb_dbfErrorRT( pArea, EG_WRITE, EDBF_WRITE, pArea->szDataFileName,
+                        hb_fsError(), 0, NULL );
          SELF_CLOSE( ( AREAP ) pArea );
          pArea->lpdbOpenInfo = NULL;
          return HB_FAILURE;
       }
       pArea->fDataFlush = TRUE;
-      hb_xfree( pBuffer );
    }
+   hb_xfree( pBuffer );
 
    /* Create memo file */
    if( pArea->fHasMemo )
@@ -3261,9 +3210,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    /* If successful call SUPER_CREATE to finish system jobs */
    if( errCode == HB_SUCCESS )
-   {
       errCode = SUPER_CREATE( ( AREAP ) pArea, pCreateInfo );
-   }
 
    if( errCode != HB_SUCCESS )
    {
@@ -3370,7 +3317,7 @@ static HB_ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutL( pItem, bTransaction );
          break;
       }
-     
+
       case DBI_ISFLOCK:
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
@@ -3652,13 +3599,13 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
             hb_itemPutNull( pInfo );
             break;
          }
-         /*      
+         /*
          0-1  The first two bytes (binary integer) tell whether a user has changed the record. Every committed change
               is counted encreasing the count by one.
          2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
          5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
          8-24 The remaining 16 characters are optional. They tell the name of the user that placed the lock.
-         */    
+         */
          if( pArea->uidbaselock )
          {
             BYTE * pPtr = pArea->pRecord + pArea->pFieldOffset[ pArea->uidbaselock ];
@@ -3669,7 +3616,7 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
                hb_itemPutNull( pInfo );
                break;
             }
-            
+
             switch( hb_itemGetNL( pInfo ) )
             {
                case 0: /* Time when lock was placed */
@@ -3700,7 +3647,7 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
          else
             hb_itemPutNull( pInfo );
          break;
-     
+
 
       default:
          errResult = SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
@@ -3746,10 +3693,10 @@ static HB_ERRCODE hb_dbfNewArea( DBFAREAP pArea )
  */
 static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   HB_ERRCODE errCode;
+   HB_ERRCODE errCode, errOsCode;
    USHORT uiFlags, uiFields, uiCount, uiSkip;
    ULONG ulSize;
-   BOOL fRetry, fRawBlob;
+   BOOL fRawBlob;
    PHB_ITEM pError, pItem;
    PHB_FNAME pFileName;
    BYTE * pBuffer;
@@ -3880,23 +3827,11 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          pArea->pDataFile = hb_fileExtOpen( szFileName, NULL, uiFlags |
                                             FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
                                             NULL, pError, TRUE );
-         if( !pArea->pDataFile )
-         {
-            if( !pError )
-            {
-               pError = hb_errNew();
-               hb_errPutGenCode( pError, EG_OPEN );
-               hb_errPutSubCode( pError, EDBF_OPEN_DBF );
-               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-               hb_errPutFileName( pError, szFileName );
-               hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-            }
-            hb_errPutOsCode( pError, hb_fsError() );
-            fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-         }
-         else
-            fRetry = FALSE;
-      } while( fRetry );
+         if( pArea->pDataFile )
+            break;
+      }
+      while( hb_dbfErrorRT( pArea, EG_OPEN, EDBF_OPEN_DBF, szFileName, hb_fsError(),
+                            EF_CANRETRY | EF_CANDEFAULT, &pError ) == E_RETRY );
 
       if( pError )
       {
@@ -3934,31 +3869,20 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       do
       {
          if( hb_fileReadAt( pArea->pDataFile, pBuffer, ulSize,
-                            sizeof( DBFHEADER ) ) != ulSize )
-         {
-            errCode = HB_FAILURE;
-            if( !pError )
-            {
-               pError = hb_errNew();
-               hb_errPutGenCode( pError, EG_CORRUPTION );
-               hb_errPutSubCode( pError, EDBF_CORRUPT );
-               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-               hb_errPutFileName( pError, pArea->szDataFileName );
-               hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-            }
-            fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-         }
-         else
+                            sizeof( DBFHEADER ) ) == ulSize )
          {
             errCode = HB_SUCCESS;
             break;
          }
-      } while( fRetry );
-
-      if( pError )
-      {
-         hb_itemRelease( pError );
+         errOsCode = hb_fsError();
+         errCode = HB_FAILURE;
       }
+      while( hb_dbfErrorRT( pArea, errOsCode == 0 ? EG_CORRUPTION : EG_READ,
+                                   errOsCode == 0 ? EDBF_CORRUPT : EDBF_READ,
+                            pArea->szDataFileName, errOsCode,
+                            EF_CANRETRY | EF_CANDEFAULT, &pError ) == E_RETRY );
+      if( pError )
+         hb_itemRelease( pError );
 
       /* Exit if error */
       if( errCode != HB_SUCCESS )
@@ -4095,16 +4019,16 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          case 'B':
             if( pArea->bTableType == DB_DBF_IV && dbFieldInfo.uiLen == 10 )
             {
-               dbFieldInfo.uiType = HB_FT_BINARY;            
-               pArea->fHasMemo = TRUE;               
-               dbFieldInfo.uiFlags |= HB_FF_BINARY;            
+               dbFieldInfo.uiType = HB_FT_BINARY;
+               pArea->fHasMemo = TRUE;
+               dbFieldInfo.uiFlags |= HB_FF_BINARY;
                break;
             }
          case 'O': /* dBase IV double */
          case '8':
             dbFieldInfo.uiType = HB_FT_DOUBLE;
             dbFieldInfo.uiDec = pField->bDec;
-            if( dbFieldInfo.uiLen != 8 ) 
+            if( dbFieldInfo.uiLen != 8 )
                errCode = HB_FAILURE;
             break;
 
@@ -4171,7 +4095,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             dbFieldInfo.uiType = HB_FT_MEMO;
             pArea->fHasMemo = TRUE;
             break;
-            
+
 #ifdef HB_COMPAT_FOXPRO
          case 'P':
             dbFieldInfo.uiType = HB_FT_PICTURE;
@@ -4254,17 +4178,8 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Exit if error */
    if( errCode != HB_SUCCESS )
    {
-      if( hb_vmRequestQuery() == 0 )
-      {
-         pError = hb_errNew();
-         hb_errPutGenCode( pError, EG_CORRUPTION );
-         hb_errPutSubCode( pError, EDBF_CORRUPT );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-         hb_errPutFileName( pError, pArea->szDataFileName );
-         hb_errPutFlags( pError, EF_CANDEFAULT );
-         SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_itemRelease( pError );
-      }
+      hb_dbfErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, pArea->szDataFileName,
+                     0, EF_CANDEFAULT, NULL );
       SELF_CLOSE( ( AREAP ) pArea );
       pArea->lpdbOpenInfo = NULL;
       return errCode;
@@ -4366,29 +4281,19 @@ static HB_ERRCODE hb_dbfPackRec( DBFAREAP pArea, ULONG ulRecNo, BOOL *fWritten )
 static HB_ERRCODE hb_dbfPack( DBFAREAP pArea )
 {
    ULONG ulRecIn, ulRecOut, ulEvery, ulUserEvery;
-   PHB_ITEM pError, pBlock;
+   PHB_ITEM pBlock;
    BOOL fWritten;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPack(%p)", pArea));
 
    if( pArea->fReadonly )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READONLY );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
-      hb_errPutSubCode( pError, EDBF_READONLY );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READONLY, EDBF_READONLY, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
    if( pArea->fShared )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_SHARED );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_SHARED ) );
-      hb_errPutSubCode( pError, EDBF_SHARED );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_SHARED, EDBF_SHARED, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
 
@@ -4528,7 +4433,7 @@ static HB_ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    ULONG ulRecNo;
    USHORT uiCount;
    BOOL bMoreRecords, bLimited, bValidRecord;
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
    DBQUICKSORT dbQuickSort;
    BYTE * pBuffer;
 
@@ -4540,13 +4445,13 @@ static HB_ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    if( !hb_dbQSortInit( &dbQuickSort, pSortInfo, pArea->uiRecordLen ) )
       return HB_FAILURE;
 
-   uiError = HB_SUCCESS;
+   errCode = HB_SUCCESS;
    uiCount = 0;
    pBuffer = dbQuickSort.pBuffer;
    ulRecNo = 1;
    if( pSortInfo->dbtri.dbsci.itmRecID )
    {
-      uiError = SELF_GOTOID( ( AREAP ) pArea, pSortInfo->dbtri.dbsci.itmRecID );
+      errCode = SELF_GOTOID( ( AREAP ) pArea, pSortInfo->dbtri.dbsci.itmRecID );
       bMoreRecords = bLimited = TRUE;
    }
    else if( pSortInfo->dbtri.dbsci.lNext )
@@ -4560,12 +4465,12 @@ static HB_ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
       if( !pSortInfo->dbtri.dbsci.itmCobWhile &&
           ( !pSortInfo->dbtri.dbsci.fRest ||
             !hb_itemGetL( pSortInfo->dbtri.dbsci.fRest ) ) )
-         uiError = SELF_GOTOP( ( AREAP ) pArea );
+         errCode = SELF_GOTOP( ( AREAP ) pArea );
       bMoreRecords = TRUE;
       bLimited = FALSE;
    }
 
-   while( uiError == HB_SUCCESS && !pArea->area.fEof && bMoreRecords )
+   while( errCode == HB_SUCCESS && !pArea->area.fEof && bMoreRecords )
    {
       if( pSortInfo->dbtri.dbsci.itmCobWhile )
       {
@@ -4624,7 +4529,7 @@ static HB_ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
       if( bMoreRecords && bLimited )
          bMoreRecords = ( --ulRecNo > 0 );
       if( bMoreRecords )
-         uiError = SELF_SKIP( ( AREAP ) pArea, 1 );
+         errCode = SELF_SKIP( ( AREAP ) pArea, 1 );
    }
 
    /* Copy last records */
@@ -4680,28 +4585,16 @@ static HB_ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo )
  */
 static HB_ERRCODE hb_dbfZap( DBFAREAP pArea )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfZap(%p)", pArea));
 
    if( pArea->fReadonly )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READONLY );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
-      hb_errPutSubCode( pError, EDBF_READONLY );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READONLY, EDBF_READONLY, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
    if( pArea->fShared )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_SHARED );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_SHARED ) );
-      hb_errPutSubCode( pError, EDBF_SHARED );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_SHARED, EDBF_SHARED, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
 
@@ -4749,16 +4642,16 @@ static HB_ERRCODE hb_dbfZap( DBFAREAP pArea )
  */
 static HB_ERRCODE hb_dbfChildEnd( DBFAREAP pArea, LPDBRELINFO pRelInfo )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfChildEnd(%p, %p)", pArea, pRelInfo));
 
    if( pArea->lpdbPendingRel == pRelInfo )
-      uiError = SELF_FORCEREL( ( AREAP ) pArea );
+      errCode = SELF_FORCEREL( ( AREAP ) pArea );
    else
-      uiError = HB_SUCCESS;
+      errCode = HB_SUCCESS;
    SUPER_CHILDEND( ( AREAP ) pArea, pRelInfo );
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -4945,7 +4838,7 @@ static HB_ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo 
             break;
 
          case REC_LOCK:
-         case REC_LOCK_TEST:         
+         case REC_LOCK_TEST:
             if( !pArea->fFLocked )
             {
                if( iDir < 0 )
@@ -5051,7 +4944,7 @@ static HB_ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo )
  */
 static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo )
 {
-   HB_ERRCODE uiError = HB_SUCCESS;
+   HB_ERRCODE errCode = HB_SUCCESS;
 
    HB_TRACE(HB_TR_DEBUG, ("dbfUnLock(%p, %p)", pArea, pRecNo));
 
@@ -5062,16 +4955,16 @@ static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo )
          ULONG ulRecNo = hb_itemGetNL( pRecNo );
          /* Unlock all records? */
          if( ulRecNo == 0 )
-            uiError = hb_dbfUnlockAllRecords( pArea );
+            errCode = hb_dbfUnlockAllRecords( pArea );
          else if( hb_dbfIsLocked( pArea, ulRecNo ) )
-            uiError = hb_dbfUnlockRecord( pArea, ulRecNo );
+            errCode = hb_dbfUnlockRecord( pArea, ulRecNo );
       }
       if( pArea->fFLocked )
       {
-         uiError = hb_dbfUnlockFile( pArea );
+         errCode = hb_dbfUnlockFile( pArea );
       }
    }
-   return uiError;
+   return errCode;
 }
 
 #define hb_dbfCloseMemFile          NULL
@@ -5081,21 +4974,13 @@ static HB_ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo )
  */
 static HB_ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCreateMemFile(%p, %p)", pArea, pCreateInfo));
 
    if( pCreateInfo )
-   {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_CREATE );
-      hb_errPutSubCode( pError, EDBF_DATATYPE );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-      hb_errPutFileName( pError, pCreateInfo->abName );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
-   }
+      hb_dbfErrorRT( pArea, EG_CREATE, EDBF_DATATYPE, pCreateInfo->abName, 0, 0, NULL );
+
    pArea->fHasMemo = FALSE;
+
    return HB_FAILURE;
 }
 
@@ -5104,7 +4989,7 @@ static HB_ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo 
  */
 static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode )
 {
-   USHORT uiError = HB_SUCCESS;
+   USHORT errCode = HB_SUCCESS;
    LPFIELD pField;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
@@ -5133,7 +5018,7 @@ static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, const char
                               NULL, NULL, TRUE );
       if( !pFile )
       {
-         uiError = uiMode != FILEGET_APPEND ? EDBF_CREATE : EDBF_OPEN_DBF;
+         errCode = uiMode != FILEGET_APPEND ? EDBF_CREATE : EDBF_OPEN_DBF;
       }
       else
       {
@@ -5141,31 +5026,23 @@ static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, const char
                              pField->uiLen, hb_fileSize( pFile ) ) !=
              ( ULONG ) pField->uiLen )
          {
-            uiError = EDBF_WRITE;
+            errCode = EDBF_WRITE;
          }
          hb_fileClose( pFile );
       }
    }
    else
    {
-      uiError = EDBF_DATATYPE;
+      errCode = EDBF_DATATYPE;
    }
 
    /* Exit if any error */
-   if( uiError != HB_SUCCESS )
+   if( errCode != HB_SUCCESS )
    {
-      PHB_ITEM pError = hb_errNew();
-      hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
-      hb_errPutSubCode( pError, uiError );
-      hb_errPutFlags( pError, EF_CANDEFAULT );
-      if( uiError != EDBF_DATATYPE )
-      {
-         hb_errPutOsCode( pError, hb_fsError() );
-         hb_errPutFileName( pError, szFile );
-      }
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, hb_dbfGetEGcode( errCode ), errCode,
+                     errCode != EDBF_DATATYPE ? szFile : NULL,
+                     errCode != EDBF_DATATYPE ? hb_fsError() : 0,
+                     EF_CANDEFAULT, NULL );
       return HB_FAILURE;
    }
    return HB_SUCCESS;
@@ -5176,17 +5053,10 @@ static HB_ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, const char
  */
 static HB_ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpenMemFile(%p, %p)", pArea, pOpenInfo));
 
-   pError = hb_errNew();
-   hb_errPutGenCode( pError, EG_OPEN );
-   hb_errPutSubCode( pError, EDBF_OPEN_DBF );
-   hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-   hb_errPutFileName( pError, pOpenInfo->abName );
-   SELF_ERROR( ( AREAP ) pArea, pError );
-   hb_itemRelease( pError );
+   hb_dbfErrorRT( pArea, EG_OPEN, EDBF_OPEN_DBF, pOpenInfo->abName, 0, 0, NULL );
+
    return HB_FAILURE;
 }
 
@@ -5195,7 +5065,8 @@ static HB_ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
  */
 static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, const char * szFile, USHORT uiMode )
 {
-   USHORT uiError = HB_SUCCESS, uiRead;
+   HB_ERRCODE errCode = HB_SUCCESS;
+   USHORT uiRead;
    LPFIELD pField;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
@@ -5231,7 +5102,7 @@ static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, const char
                               FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL, TRUE );
       if( !pFile )
       {
-         uiError = EDBF_OPEN_DBF;
+         errCode = EDBF_OPEN_DBF;
       }
       else
       {
@@ -5245,24 +5116,16 @@ static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, const char
    }
    else
    {
-      uiError = EDBF_DATATYPE;
+      errCode = EDBF_DATATYPE;
    }
 
    /* Exit if any error */
-   if( uiError != HB_SUCCESS )
+   if( errCode != HB_SUCCESS )
    {
-      PHB_ITEM pError = hb_errNew();
-      hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
-      hb_errPutSubCode( pError, uiError );
-      hb_errPutFlags( pError, EF_CANDEFAULT );
-      if( uiError != EDBF_DATATYPE )
-      {
-         hb_errPutOsCode( pError, hb_fsError() );
-         hb_errPutFileName( pError, szFile );
-      }
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, hb_dbfGetEGcode( errCode ), errCode,
+                     errCode != EDBF_DATATYPE ? szFile : NULL,
+                     errCode != EDBF_DATATYPE ? hb_fsError() : 0,
+                     EF_CANDEFAULT, NULL );
       return HB_FAILURE;
    }
    return HB_SUCCESS;
@@ -5273,21 +5136,20 @@ static HB_ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, const char
  */
 static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
 {
-   BOOL fRetry, fError;
+   HB_ERRCODE errCode;
    PHB_ITEM pError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfReadDBHeader(%p)", pArea));
 
    pError = NULL;
-   /* Try read */
    do
    {
-      fError = FALSE;
+      errCode = HB_SUCCESS;
 
       if( hb_fileReadAt( pArea->pDataFile, &pArea->dbfHeader,
                          sizeof( DBFHEADER ), 0 ) != sizeof( DBFHEADER ) )
       {
-         fError = TRUE;
+         errCode = EDBF_READ;
       }
       else
       {
@@ -5302,6 +5164,7 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
          switch( pArea->dbfHeader.bVersion )
          {
             case 0x31: /* Visual FoxPro w. AutoIncrement field */
+            case 0x32: /* Visual FoxPro, autoincrement enabled */
                pArea->fAutoInc = TRUE;
             case 0x30: /* Visual FoxPro w. DBC or Visual FoxPro */
                pArea->bTableType = DB_DBF_VFP;
@@ -5359,14 +5222,14 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
 
             case 0x04: /* dBASE IV w/o memo file */
             case 0x7B: /* dBASE IV with memo */
-            case 0x8B: /* dBASE IV w. memo */  
+            case 0x8B: /* dBASE IV w. memo */
                pArea->bTableType = DB_DBF_IV;
             case 0x83: /* dBASE III+ with memo file DBT*/
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_DBT;
                break;
 
-            case 0xE5: /* Clipper SIX driver w. SMT memo file. 
+            case 0xE5: /* Clipper SIX driver w. SMT memo file.
                           Note! Clipper SIX driver sets lowest 3 bytes to 110 in descriptor of crypted databases.
                           So, 3->6, 83h->86h, F5->F6, E5->E6 etc. */
                pArea->fHasMemo = TRUE;
@@ -5405,32 +5268,20 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                break;
 
             default:
-               fError = TRUE;
-         }
-      }
-      if( fError )
-      {
-         if( !pError )
-         {
-            pError = hb_errNew();
-            hb_errPutGenCode( pError, EG_CORRUPTION );
-            hb_errPutSubCode( pError, EDBF_CORRUPT );
-            hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-            hb_errPutFileName( pError, pArea->szDataFileName );
-            hb_errPutOsCode( pError, hb_fsError() );
-            hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-         }
-         fRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-      }
-      else
-         fRetry = FALSE;
-   } while( fRetry );
+               errCode = EDBF_CORRUPT;
 
+         }
+         if( errCode == HB_SUCCESS )
+            break;
+      }
+   }
+   while( hb_dbfErrorRT( pArea, hb_dbfGetEGcode( errCode ), errCode,
+                         pArea->szDataFileName, hb_fsError(),
+                         EF_CANRETRY | EF_CANDEFAULT, &pError ) == E_RETRY );
    if( pError )
       hb_itemRelease( pError );
 
-   /* Read error? */
-   if( fError )
+   if( errCode != HB_SUCCESS )
       return HB_FAILURE;
 
    pArea->uiHeaderLen = HB_GET_LE_UINT16( pArea->dbfHeader.uiHeaderLen );
@@ -5447,18 +5298,12 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    int iYear, iMonth, iDay;
    BOOL fLck = FALSE;
    HB_ERRCODE errCode;
-   PHB_ITEM pError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteDBHeader(%p)", pArea));
 
    if( pArea->fReadonly )
    {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READONLY );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
-      hb_errPutSubCode( pError, EDBF_READONLY );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+      hb_dbfErrorRT( pArea, EG_READONLY, EDBF_READONLY, NULL, 0, 0, NULL );
       return HB_FAILURE;
    }
 
@@ -5583,7 +5428,7 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
                             ( HB_FOFFSET ) pArea->ulRecCount;
       /* protection against file create */
       HB_FOFFSET llSize = hb_fileSize( pArea->pDataFile );
-      if( llSize > llOffset )                              
+      if( llSize > llOffset )
       {
          hb_fileWriteAt( pArea->pDataFile, "\032", 1, llOffset );
          hb_fileTruncAt( pArea->pDataFile, llOffset + 1 );
@@ -5612,17 +5457,9 @@ static HB_ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    }
 
    if( errCode != HB_SUCCESS )
-   {
-      pError = hb_errNew();
+      hb_dbfErrorRT( pArea, EG_WRITE, EDBF_WRITE, pArea->szDataFileName,
+                     hb_fsError(), 0, NULL );
 
-      hb_errPutGenCode( pError, EG_WRITE );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
-      hb_errPutSubCode( pError, EDBF_WRITE );
-      hb_errPutFileName( pError, pArea->szDataFileName );
-      hb_errPutOsCode( pError, hb_fsError() );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
-   }
    return errCode;
 }
 
@@ -5923,7 +5760,7 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
          {
             case DB_DBF_STD:        /* standard dBase/Clipper DBF file */
             case DB_DBF_VFP:        /* VFP DBF file */
-            case DB_DBF_IV:         /* dBase IV DBF file */                        
+            case DB_DBF_IV:         /* dBase IV DBF file */
                pData->bTableType = iType;
          }
          break;

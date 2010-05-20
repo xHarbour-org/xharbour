@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.14 2009/12/16 05:34:11 andijahja Exp $
+ * $Id: filenet.c,v 1.16 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -1196,6 +1196,13 @@ HB_FOFFSET hb_fileNetSize( PHB_FILE pFile )
    return hb_fileNetSeekLarge( pFile, 0, FS_END );
 }
 
+void hb_fileNetFlush( PHB_FILE pFile, BOOL fDirty )
+{
+   HB_SYMBOL_UNUSED( pFile );
+   HB_SYMBOL_UNUSED( fDirty );
+}
+
+
 void hb_fileNetCommit( PHB_FILE pFile )
 {
    if( pFile->hSocket )
@@ -2231,6 +2238,7 @@ static const HB_FILE_FUNCS * hb_fileNetMethods( void )
       hb_fileNetSeekLarge,
       hb_fileNetWriteLarge,
       hb_fileNetReadLarge,
+      hb_fileNetFlush,
       hb_fileNetCommit,
       hb_fileNetHandle
    };

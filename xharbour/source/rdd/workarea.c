@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.101 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: workarea.c,v 1.102 2009/09/30 16:19:36 marchuet Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ static HB_ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
 static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 {
    BOOL fBottom, fDeleted;
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", pArea, lUpDown));
 
@@ -220,20 +220,20 @@ static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
             are out of filter so I do not want to do that. I will prefer
             explicit add SELF_GOEOF() method
           */
-         uiError = SELF_GOTO( pArea, 0 );
+         errCode = SELF_GOTO( pArea, 0 );
       }
       else
       {
-         uiError = SELF_GOTOP( pArea );
+         errCode = SELF_GOTOP( pArea );
          pArea->fBof = TRUE;
       }
    }
    else
    {
-      uiError = HB_SUCCESS;
+      errCode = HB_SUCCESS;
    }
 
-   return uiError;
+   return errCode;
 }
 
 /*
@@ -1433,10 +1433,7 @@ static HB_ERRCODE hb_waRelArea( AREAP pArea, USHORT uiRelNo, USHORT * pRelArea )
  */
 static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 {
-   PHB_ITEM pResult;
-   DBORDERINFO pInfo;
    HB_ERRCODE errCode;
-   int iOrder;
    BOOL fEof;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waRelEval(%p, %p)", pArea, pRelInfo));
@@ -1451,18 +1448,21 @@ static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
          errCode = SELF_EVALBLOCK( pRelInfo->lpaParent, pRelInfo->itmCobExpr );
          if( errCode == HB_SUCCESS )
          {
+            PHB_ITEM pResult;
+            DBORDERINFO pInfo;
+
             /*
              *  Check the current order
              */
             pResult = pRelInfo->lpaParent->valResult;
             pRelInfo->lpaParent->valResult = NULL;
-            memset( &pInfo, 0, sizeof( DBORDERINFO ) );
+            memset( &pInfo, 0, sizeof( pInfo ) );
             pInfo.itmResult = hb_itemPutNI( NULL, 0 );
             errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
 
             if( errCode == HB_SUCCESS )
             {
-               iOrder = hb_itemGetNI( pInfo.itmResult );
+               int iOrder = hb_itemGetNI( pInfo.itmResult );
                if( iOrder != 0 )
                {
                   if( pRelInfo->isScoped )
@@ -2272,10 +2272,8 @@ HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNC
       hb_strncpyUpper( szSuperName, szDrvName, sizeof( szSuperName ) - 1 );
       pRddNode = hb_rddFindNode( szSuperName, NULL );
 
-      if( !pRddNode )
-      {
+      if( ! pRddNode )
          return HB_FAILURE;
-      }
 
       memcpy( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
       memcpy( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );

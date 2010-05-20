@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.303 2009/12/03 03:00:02 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.304 2009/12/16 05:32:41 andijahja Exp $
  */
 
 /*
@@ -149,12 +149,13 @@ static void hb_cdxErrInternal( const char * szMsg )
 /*
  * generate Run-Time error
  */
-static HB_ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
-                                 const char * filename, USHORT uiOsCode,
+static HB_ERRCODE hb_cdxErrorRT( CDXAREAP pArea,
+                                 HB_ERRCODE errGenCode, HB_ERRCODE errSubCode,
+                                 const char * szFileName, HB_ERRCODE errOsCode,
                                  USHORT uiFlags, PHB_ITEM * pErrorPtr )
 {
    PHB_ITEM pError;
-   HB_ERRCODE iRet = HB_FAILURE;
+   HB_ERRCODE errCode = HB_FAILURE;
 
    if( hb_vmRequestQuery() == 0 )
    {
@@ -166,19 +167,19 @@ static HB_ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubC
       }
       else
          pError = hb_errNew();
-      hb_errPutGenCode( pError, uiGenCode );
-      hb_errPutSubCode( pError, uiSubCode );
-      hb_errPutOsCode( pError, uiOsCode );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
-      if( filename )
-         hb_errPutFileName( pError, filename );
+      hb_errPutGenCode( pError, errGenCode );
+      hb_errPutSubCode( pError, errSubCode );
+      hb_errPutOsCode( pError, errOsCode );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( errGenCode ) );
+      if( szFileName )
+         hb_errPutFileName( pError, szFileName );
       if( uiFlags )
          hb_errPutFlags( pError, uiFlags );
-      iRet = SELF_ERROR( ( AREAP ) pArea, pError );
+      errCode = SELF_ERROR( ( AREAP ) pArea, pError );
       if( !pErrorPtr )
          hb_errRelease( pError );
    }
-   return iRet;
+   return errCode;
 }
 
 /*
@@ -269,7 +270,7 @@ static LPCDXKEY hb_cdxKeyCopy( LPCDXKEY pKeyDest, LPCDXKEY pKey )
       if( pKey->len )
       {
          if( !pKeyDest->val )
-            pKeyDest->val = (BYTE *) hb_xgrab( pKey->len + 1 );
+            pKeyDest->val = ( BYTE * ) hb_xgrab( pKey->len + 1 );
          memcpy( pKeyDest->val, pKey->val, pKey->len );
          pKeyDest->len = pKey->len;
          pKeyDest->val[ pKeyDest->len ] = '\0';
@@ -699,18 +700,18 @@ static BOOL hb_cdxTopScope( LPCDXTAG pTag )
       pKey = pTag->topScopeKey;
    else
       pKey = pTag->bottomScopeKey;
-      
+
    if( !pKey || !pKey->len )
       bRet = TRUE;
    else
    {
-      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
-                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
-                                pKey->mode ); 
+      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
+                                pKey->mode );
       bRet = pTag->UsrAscend ? i <= 0: i >= 0;
    }
 
-   return bRet;   
+   return bRet;
 }
 
 /*
@@ -725,16 +726,16 @@ static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
       pKey = pTag->bottomScopeKey;
    else
       pKey = pTag->topScopeKey;
-      
+
    if( !pKey || !pKey->len )
       bRet = TRUE;
    else
    {
-      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len, 
-                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len, 
-                                pKey->mode ); 
+      int i = hb_cdxValCompare( pTag, pKey->val, ( BYTE ) pKey->len,
+                                pTag->CurKey->val, ( BYTE ) pTag->CurKey->len,
+                                pKey->mode );
       bRet = pTag->UsrAscend ? i >= 0: i <= 0;
-   }                                
+   }
    return bRet;
 }
 
@@ -9150,7 +9151,7 @@ HB_FUNC( SIXCDX_GETFUNCTABLE )
       hb_retni( HB_FAILURE );
 }
 
-static void hb_dbfcdxRddInit( void * cargo )
+static void hb_sixcdxRddInit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
@@ -9167,10 +9168,23 @@ static void hb_dbfcdxRddInit( void * cargo )
    HB_FUNC_EXEC( _DBF );
 }
 
-HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
+HB_INIT_SYMBOLS_BEGIN( sixcdx1__InitSymbols )
 { "SIXCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX )}, NULL },
 { "SIXCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
+HB_INIT_SYMBOLS_END( sixcdx1__InitSymbols )
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_sixcdx_rdd_init_ )
+   hb_vmAtInit( hb_sixcdxRddInit, NULL );
+HB_CALL_ON_STARTUP_END( _hb_sixcdx_rdd_init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup sixcdx1__InitSymbols
+   #pragma startup _hb_sixcdx_rdd_init_
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( sixcdx1__InitSymbols ) \
+                              HB_DATASEG_FUNC( _hb_sixcdx_rdd_init_ )
+   #include "hbiniseg.h"
+#endif
 
 #else
 
@@ -9225,8 +9239,6 @@ HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "DBFCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
-#endif
-
 HB_CALL_ON_STARTUP_BEGIN( _hb_dbfcdx_rdd_init_ )
    hb_vmAtInit( hb_dbfcdxRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_dbfcdx_rdd_init_ )
@@ -9238,4 +9250,6 @@ HB_CALL_ON_STARTUP_END( _hb_dbfcdx_rdd_init_ )
    #define HB_DATASEG_BODY    HB_DATASEG_FUNC( dbfcdx1__InitSymbols ) \
                               HB_DATASEG_FUNC( _hb_dbfcdx_rdd_init_ )
    #include "hbiniseg.h"
+#endif
+
 #endif

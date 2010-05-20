@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.10 2009/10/08 06:29:20 guerra000 Exp $
+ * $Id: filebuf.c,v 1.11 2009/11/09 09:39:06 marchuet Exp $
  */
 
 /*
@@ -560,6 +560,12 @@ static ULONG s_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
    return hb_fsReadLarge( pFile->hFile, pBuff, ulCount );
 }
 
+static void s_fileFlush( PHB_FILE pFile, BOOL fDirty )
+{
+   HB_SYMBOL_UNUSED( pFile );
+   HB_SYMBOL_UNUSED( fDirty );
+}
+
 static void s_fileCommit( PHB_FILE pFile )
 {
    hb_fsCommit( pFile->hFile );
@@ -595,6 +601,7 @@ static const HB_FILE_FUNCS * s_fileMethods( void )
       s_fileSeekLarge,
       s_fileWriteLarge,
       s_fileReadLarge,
+      s_fileFlush,
       s_fileCommit,
       s_fileHandle
    };
@@ -728,6 +735,11 @@ ULONG hb_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULONG ulCount )
 ULONG hb_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
 {
    return pFile->pFuncs->ReadLarge( pFile, pBuff, ulCount );
+}
+
+void hb_fileFlush( PHB_FILE pFile, BOOL fDirty )
+{
+   pFile->pFuncs->Flush( pFile, fDirty );
 }
 
 void hb_fileCommit( PHB_FILE pFile )

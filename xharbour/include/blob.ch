@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: blob.ch,v 1.1 2004/08/29 00:26:22 druzus Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 #define HB_BLOB_CH_
 
 
-#ifndef HB_DBINFO_CH
+#ifndef HB_DBINFO_CH_
   #include "dbinfo.ch"
 #endif
 

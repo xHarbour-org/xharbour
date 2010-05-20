@@ -1,5 +1,5 @@
 /*
- * $Id: filemem.c,v 1.2 2009/11/09 09:38:44 marchuet Exp $
+ * $Id: filemem.c,v 1.3 2009/12/16 05:30:50 andijahja Exp $
  */
 
 /*
@@ -652,6 +652,14 @@ HB_MEMFS_EXPORT HB_FOFFSET hb_memfsSeek( HB_FHANDLE hFile, HB_FOFFSET llOffset, 
 }
 
 
+HB_MEMFS_EXPORT void hb_memfsFlush( HB_FHANDLE hFile, BOOL fDirty )
+{
+   HB_SYMBOL_UNUSED( hFile );
+   HB_SYMBOL_UNUSED( fDirty );
+   return;
+}
+
+
 HB_MEMFS_EXPORT void hb_memfsCommit( HB_FHANDLE hFile )
 {
    HB_SYMBOL_UNUSED( hFile );
@@ -836,6 +844,11 @@ static ULONG s_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
    return 0;
 }
 
+static void s_fileFlush( PHB_FILE pFile, BOOL fDirty )
+{
+   hb_memfsFlush( pFile->hFile, fDirty );
+}
+
 
 static void s_fileCommit( PHB_FILE pFile )
 {
@@ -849,7 +862,7 @@ static HB_FHANDLE s_fileHandle( PHB_FILE pFile )
 }
 
 
-const HB_FILE_FUNCS s_fileFuncs =
+static const HB_FILE_FUNCS s_fileFuncs =
 {
    s_fileAccept,
    s_fileExists,
@@ -865,6 +878,7 @@ const HB_FILE_FUNCS s_fileFuncs =
    s_fileSeekLarge,
    s_fileWriteLarge,
    s_fileReadLarge,
+   s_fileFlush,
    s_fileCommit,
    s_fileHandle
 };

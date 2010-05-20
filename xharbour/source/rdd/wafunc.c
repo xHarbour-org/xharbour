@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.24 2009/09/16 04:34:16 andijahja Exp $
+ * $Id: wafunc.c,v 1.25 2009/09/30 16:19:36 marchuet Exp $
  */
 
 /*
@@ -960,8 +960,8 @@ static const char * hb_dbTransFieldPos( PHB_ITEM pFields, USHORT uiField )
 }
 
 HB_ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
-                          LPDBTRANSINFO lpdbTransInfo,
-                          PHB_ITEM *pStruct, PHB_ITEM pFields )
+                             LPDBTRANSINFO lpdbTransInfo,
+                             PHB_ITEM *pStruct, PHB_ITEM pFields )
 {
    USHORT uiFields, uiSize, uiCount, uiPosSrc, uiPosDst, uiSizeSrc, uiSizeDst;
    HB_ERRCODE errCode;
@@ -1160,15 +1160,15 @@ HB_ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
 }
 
 HB_ERRCODE hb_rddTransRecords( AREAP pArea,
-                            const char *szFileName, const char *szDriver,
-                            ULONG ulConnection,
-                            PHB_ITEM pFields, BOOL fExport,
-                            PHB_ITEM pCobFor, PHB_ITEM pStrFor,
-                            PHB_ITEM pCobWhile, PHB_ITEM pStrWhile,
-                            PHB_ITEM pNext, PHB_ITEM pRecID,
-                            PHB_ITEM pRest,
-                            const char *szCpId,
-                            PHB_ITEM pDelim )
+                               const char *szFileName, const char *szDriver,
+                               ULONG ulConnection,
+                               PHB_ITEM pFields, BOOL fExport,
+                               PHB_ITEM pCobFor, PHB_ITEM pStrFor,
+                               PHB_ITEM pCobWhile, PHB_ITEM pStrWhile,
+                               PHB_ITEM pNext, PHB_ITEM pRecID,
+                               PHB_ITEM pRest,
+                               const char *szCpId,
+                               PHB_ITEM pDelim )
 {
    AREAP lpaClose = NULL;
    PHB_ITEM pStruct = NULL;

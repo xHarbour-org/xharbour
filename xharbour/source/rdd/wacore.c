@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.19 2009/09/12 18:01:43 likewolf Exp $
+ * $Id: wacore.c,v 1.20 2009/09/16 04:34:16 andijahja Exp $
  */
 
 /*
@@ -108,11 +108,11 @@ static void hb_waNodeInsert( PHB_STACKRDD pRddInfo, PHB_STACKRDD_TLS pRddTls, AR
 
       if( pRddInfo->uiWaNumMax == 0 )
       {
-         pRddInfo->waNums = (USHORT *) hb_xgrab( iSize * sizeof(USHORT) );
+         pRddInfo->waNums = ( USHORT * ) hb_xgrab( iSize * sizeof( USHORT ) );
       }
       else
       {
-         pRddInfo->waNums = (USHORT *) hb_xrealloc( pRddInfo->waNums, iSize * sizeof(USHORT) );
+         pRddInfo->waNums = ( USHORT * ) hb_xrealloc( pRddInfo->waNums, iSize * sizeof(USHORT) );
       }
       memset( &pRddInfo->waNums[ pRddInfo->uiWaNumMax ], 0, ( iSize - pRddInfo->uiWaNumMax ) * sizeof(USHORT) );
       pRddInfo->uiWaNumMax = iSize;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.70 2009/11/09 09:38:44 marchuet Exp $
+ * $Id: hbapifs.h,v 1.71 2009/12/20 14:07:11 andijahja Exp $
  */
 
 /*
@@ -329,6 +329,7 @@ extern HB_EXPORT ULONG     hb_fsGetFileAttributes( const char * szFile );
       HB_FOFFSET  (* SeekLarge ) ( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags );
       ULONG       (* WriteLarge ) ( PHB_FILE pFile, const void * pBuff, ULONG ulCount );
       ULONG       (* ReadLarge ) ( PHB_FILE pFile, void * pBuff, ULONG ulCount );
+      void        (* Flush ) ( PHB_FILE pFile, BOOL fDirty );
       void        (* Commit ) ( PHB_FILE pFile );
       HB_FHANDLE  (* Handle ) ( PHB_FILE pFile );
    }
@@ -358,6 +359,7 @@ HB_EXPORT ULONG      hb_fileReadAt( PHB_FILE pFile, void * buffer, ULONG ulSize,
 HB_EXPORT ULONG      hb_fileWriteAt( PHB_FILE pFile, const void * buffer, ULONG ulSize, HB_FOFFSET llOffset );
 HB_EXPORT BOOL       hb_fileTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset );
 HB_EXPORT HB_FOFFSET hb_fileSize( PHB_FILE pFile );
+HB_EXPORT void       hb_fileFlush( PHB_FILE pFile, BOOL fDirty );
 HB_EXPORT void       hb_fileCommit( PHB_FILE pFile );
 HB_EXPORT HB_FHANDLE hb_fileHandle( PHB_FILE pFile );
 HB_EXPORT HB_FOFFSET hb_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFlags );
