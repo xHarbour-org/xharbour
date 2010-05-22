@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.225 2010/03/27 13:15:36 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.226 2010/04/26 21:45:15 modalsist Exp $
  */
 
 /*
@@ -1237,7 +1237,7 @@ Default nMode to 0    // first configuration
 
           endif
 
-          if nMode = 0 .or. nMode = 2 
+          if nMode = 0 .or. nMode = 2
              aCol[ _TB_COLINFO_COLSEP ] := iif( aCol[ _TB_COLINFO_OBJ ]:ColSep != NIL, aCol[ _TB_COLINFO_OBJ ]:ColSep, ::cColSep )
           endif
 
@@ -1249,7 +1249,7 @@ Default nMode to 0    // first configuration
              if ! Empty( aCol[ _TB_COLINFO_FOOTING ] )
                 ::lFooters := .T.
              endif
-             // as soon as we find one, we stop testing aCol[_TB_COLINFO_OBJ]:XX to speed things up 
+             // as soon as we find one, we stop testing aCol[_TB_COLINFO_OBJ]:XX to speed things up
              if ! ::lColHeadSep .AND. ! Empty( aCol[ _TB_COLINFO_OBJ ]:HeadSep )
                 ::lColHeadSep := .T.
              endif
@@ -1284,7 +1284,7 @@ Default nMode to 0    // first configuration
 
       // Reduce footer, headers and separator if the data not fit in the
       // visible area. If it didn't fit, it generate error.
-      While .t. 
+      While .t.
 
          ::nVisWidth := ::nwRight - ::nwLeft + 1
 
@@ -1340,7 +1340,7 @@ Default nMode to 0    // first configuration
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
                            iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
 
-   if Len( ::aRedraw ) != ::nRowCount .and. ::nRowCount > 0 
+   if Len( ::aRedraw ) != ::nRowCount .and. ::nRowCount > 0
       ::aRedraw := Array( ::nRowCount )
       // I need a cache of different size
       ::oCache:InitCache()
@@ -3002,8 +3002,9 @@ METHOD PosCursor() CLASS TBrowse
 *------------------------------------------------------*
 LOCAL nScrRow, nScrCol
 
+   nScrCol := Col()
 
-   if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
+   if ::lConfigured .and. ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
 
       nScrRow := ::nRowPos + ::nRowData
       nScrCol := ::aColsInfo[ ::nColPos, _TB_COLINFO_SCRCOLPOS ]
