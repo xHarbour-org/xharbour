@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.55 2010/04/29 05:55:40 peterrees Exp $
+ * $Id: hbver.c,v 1.56 2010/05/25 20:54:36 peterrees Exp $
  */
 
 /*
@@ -372,7 +372,7 @@ char * hb_verPlatform( void )
                break;
          }
 
-         hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "Windows %s%s %lu.%02lu.%04d",
+         hb_snprintf( pszPlatform, PLATFORM_BUF_SIZE + 1, "Windows%s%s %lu.%02lu.%04d",
                    szName ? szName : NULL, szProduct ? szProduct : "",
                    ( ULONG ) osVer.dwMajorVersion,
                    ( ULONG ) osVer.dwMinorVersion,
