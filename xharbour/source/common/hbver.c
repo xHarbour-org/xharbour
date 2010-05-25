@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.54 2010/03/05 15:50:16 lculik Exp $
+ * $Id: hbver.c,v 1.55 2010/04/29 05:55:40 peterrees Exp $
  */
 
 /*
@@ -229,7 +229,7 @@ char * hb_verPlatform( void )
 
                if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion == 0  )
                {
-                  if (osVer.dwPlatformId == VER_NT_WORKSTATION )
+                  if (osVer.wProductType == VER_NT_WORKSTATION )
                   {
                      szName = " Vista";
                   }

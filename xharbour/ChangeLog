@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6711 2010/05/20 07:48:40 marchuet Exp $
+ * $Id: ChangeLog,v 1.6712 2010/05/22 12:30:51 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2010-05-26 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\common\hbver.c
+    * fix "vista" workstation detection reported by Grzegorz on comp.lang.xharbour
 
 2010-05-22 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! fixed poscursor method when called by dehilite before stabilize.  
+    ! fixed poscursor method when called by dehilite before stabilize.
 
 2010-05-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * contrib\filemem\filemem.c
@@ -37,7 +40,7 @@
     + added hb_dbfErrorRT to reduce repeated code.
     + Added suport for dbf files with signature 0x32 Visual FoxPro, autoincrement enabled.
   * include\blob.ch
-    ! fixed bug for bad type.    
+    ! fixed bug for bad type.
   ( the major part of this code is based on harbour code, but with little changes )
 
 2010-05-12 01:03 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
