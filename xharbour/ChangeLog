@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6713 2010/05/25 20:54:36 peterrees Exp $
+ * $Id: ChangeLog,v 1.6714 2010/05/25 21:02:39 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2010-06-02 14:05 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/hbzlib/zipnew.cpp
+    ! fixed problem on GetCurrentFileSize in windows Section( was not closing handle from find first)
+    
 2010-05-26 09:01 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\common\hbver.c
     * remove extra space on os() for Windows after "Windows" reported by Grzegorz on comp.lang.xharbour

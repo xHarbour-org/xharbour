@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.39 2009/11/15 15:31:19 lculik Exp $
+ * $Id: zipnew.cpp,v 1.40 2009/12/20 14:07:11 andijahja Exp $
  */
 
 /*
@@ -967,6 +967,7 @@ DWORD GetCurrentFileSize( LPCTSTR szFile )
    {
       if ( dwFlags & hFilesFind.dwFileAttributes )
       {
+         FindClose( hFind );
          if( hFilesFind.nFileSizeHigh>0 )
          {
             return ( ( hFilesFind.nFileSizeHigh*MAXDWORD )+hFilesFind.nFileSizeLow );
