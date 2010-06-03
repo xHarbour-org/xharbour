@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.30 2009/08/10 05:52:28 peterrees Exp $
+ * $Id: win32prn.prg,v 1.31 2009/12/20 14:07:12 andijahja Exp $
  */
 
 /*
@@ -141,6 +141,7 @@ CLASS WIN32PRN
   METHOD GetTextWidth(cString)
   METHOD GetTextHeight(cString)
   METHOD DrawBitMap(oBmp)
+  METHOD DrawText(nX1, nY1, nX2, nY2, cString, nAlign ) INLINE DrawText(::hPrinterDC, nX1, nY1, nX2, nY2, cString, nAlign )
 
 //  Clipper DOS compatible functions.
   METHOD SetPrc(nRow, nCol)        // Based on ::LineHeight and current ::CharWidth
@@ -1428,6 +1429,56 @@ HB_FUNC_STATIC( SETBKMODE )
   hb_retnl( SetBkMode( (HDC) hb_parnl( 1 ), hb_parnl( 2 ) ) ) ;
 }
 
-#pragma ENDDUMP
+HB_FUNC_STATIC ( DRAWTEXT )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
 
-#endif
+   RECT  rect;
+   UINT  uFormat = 0 ;
+
+   SIZE sSize ;
+   char *pszData = (char*) hb_parc(6) ;
+   int iLen = strlen(pszData) ;
+   int iStyle = hb_parni(7) ;
+   LONG w,h  ;
+
+   SetRect( &rect, x1, y1, x2, y2 );
+
+   GetTextExtentPoint32(hDC, pszData, iLen , &sSize) ;
+   w = (LONG) sSize.cx ;   // text width
+   h = (LONG) sSize.cy ;   // text height
+
+   // Center text vertically within rectangle.
+   if ( w < rect.right - rect.left )
+   {
+      rect.top = rect.top + ( rect.bottom - rect.top + (h/2) ) / 2 ;
+   }
+   else
+   {
+      rect.top = rect.top + ( rect.bottom - rect.top - (h/2) ) / 2 ;
+   }
+
+   uFormat = DT_NOCLIP | DT_NOPREFIX | DT_WORDBREAK | DT_END_ELLIPSIS ;
+
+   if ( iStyle == 0 )
+   {
+	 uFormat =  uFormat | DT_LEFT ;
+   }
+   else if ( iStyle == 2 )
+   {
+	 uFormat = uFormat | DT_RIGHT ;
+   }
+   else if ( iStyle == 1 )
+   {
+ 	 uFormat = uFormat | DT_CENTER ;
+   }
+
+   hb_retni( DrawText(hDC, pszData, -1, &rect, uFormat ) );
+
+}
+
+#pragma ENDDUMP
