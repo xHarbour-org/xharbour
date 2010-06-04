@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.31 2009/12/20 14:07:12 andijahja Exp $
+ * $Id: win32prn.prg,v 1.32 2010/06/03 13:41:08 modalsist Exp $
  */
 
 /*
@@ -1438,7 +1438,7 @@ HB_FUNC_STATIC ( DRAWTEXT )
    int y2 = hb_parni( 5 );
 
    RECT  rect;
-   UINT  uFormat = 0 ;
+   UINT  uFormat;
 
    SIZE sSize ;
    char *pszData = (char*) hb_parc(6) ;
