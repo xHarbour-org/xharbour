@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.256 2009/10/05 14:41:40 marchuet Exp $
+# $Id: makefile.bc,v 1.257 2009/11/16 10:50:30 lculik Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -70,6 +70,7 @@ HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
 
 CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
+CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=BCC32 $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
@@ -498,6 +499,7 @@ CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
 LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 
 CC_CMD      =BCC32 $(CLIBFLAGS) -o$@ $**
+CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
@@ -581,6 +583,7 @@ HARBOURFLAGS =$(HARBOURFLAGS) $(HB_MT_FLAGS)
 CLIBFLAGS    =$(CLIBFLAGS)  $(CFLAGS)
 HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
+CCC_CMD      =$(CC_CMD)
 CC_CMD_ZIP   =BCC32 -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
 
 #===============================================================================

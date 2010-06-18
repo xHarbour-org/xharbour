@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.101 2009/08/23 22:46:11 lculik Exp $
+# $Id: makefile.wc,v 1.102 2009/12/30 19:56:56 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -61,6 +61,7 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 
 LINKERFLAGS  =/nologo /subsystem:console
 CC_CMD       =WPP386 $(CLIBFLAGS) -fo$@ $**
+CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=WPP386 $(CLIBFLAGS) -DHB_FM_STATISTICS -fo$@ $**
 LIB_CMD      =LIB386 /nologo /out:$@ $**
 LINK_CMD     =LINK386 /nologo /out:$@ $** $(LINKERFLAGS)
@@ -324,6 +325,7 @@ INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d__EXPORT__
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
+CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
@@ -379,6 +381,7 @@ CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
 !endif
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
+CCC_CMD     =$(CC_CMD)
 CC_CMD_ZIP  =WPP386 $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
 LIB_CMD     =LIB386 /nologo /out:$@ $**
 

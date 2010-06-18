@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_vc.bat,v 1.28 2010/04/14 17:53:16 patrickmast Exp $
+rem $Id: make_vc.bat,v 1.29 2010/04/16 21:28:54 patrickmast Exp $
 rem
 rem FILE: make_vc.bat
 rem BATCH FILE FOR MSVC
@@ -14,11 +14,17 @@ rem ============================================================================
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
  
 :FIND_VC
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"       GOTO SET_VC2008
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
+   GOTO FIND_BISON
+
+:SET_VC2010X86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
+   IF "%VS100COMNTOOLS%"=="" SET VS100COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\Common7\Tools\
    GOTO FIND_BISON
 
 :SET_VC2010
@@ -45,8 +51,13 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
+   IF EXIST "%ProgramFiles(x86)%\GnuWin32\Bin" GOTO SET_BISONX86
+   IF EXIST "%ProgramFiles%\GnuWin32\Bin"      GOTO SET_BISON1
+   IF EXIST \GnuWin32\Bin                      GOTO SET_BISON2 
+   GOTO READY
+
+:SET_BISONX86
+   SET BISON_DIR=%ProgramFiles(x86)%\GnuWin32\Bin
    GOTO READY
 
 :SET_BISON1
@@ -63,7 +74,7 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
 IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
-SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%VS90COMNTOOLS%;%PATH%
+SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%VS100COMNTOOLS%;%VS90COMNTOOLS%;%PATH%
 
 rem ============================================================================
 rem The followings should never change

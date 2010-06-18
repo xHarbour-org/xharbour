@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.52 2009/10/05 14:41:40 marchuet Exp $
+# $Id: compile.mak,v 1.53 2009/12/31 02:55:04 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1401,7 +1401,7 @@ $(OBJ_DIR)$(DIR_SEP)win32ole.c : $(RTL_DIR)$(DIR_SEP)win32ole.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)win32ole$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)win32ole.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)win32prn.c : $(RTL_DIR)$(DIR_SEP)win32prn.prg
 	$(HB_CMD)
@@ -2086,7 +2086,7 @@ $(OBJ_DIR)$(DIR_SEP)gtwin$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwin$(DIR_SEP)gtwin.c
 # GTWVT.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # FILEMEM.LIB rules
@@ -2098,10 +2098,10 @@ $(OBJ_DIR)$(DIR_SEP)filemem$(OBJEXT) : $(FILEMEM_DIR)$(DIR_SEP)filemem.c
 # GTWVG.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)gtwvg.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtcore.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtutils.c
 	$(CC_CMD)

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.56 2009/07/29 17:15:53 marchuet Exp $
+# $Id: makefile.dc,v 1.57 2009/12/30 19:56:56 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -38,6 +38,7 @@ CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD 
 HB_CMD=$(HARBOUR_EXE) -iinclude -n1 -q0 -w2 -es2 -gc0 $** -o$@
 HB_CMD_MAIN=$(HARBOUR_EXE) -iinclude -n -q0 -w -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
+CCC_CMD=$(CC_CMD)
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
 BISON_CMD1=bison -v -d $** -o$@
@@ -265,6 +266,7 @@ EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
+CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
@@ -314,6 +316,7 @@ INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\i
 CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
 HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
+CCC_CMD=$(CC_CMD)
 LIB_CMD=LIB -c -n $@ $**
 
 #===============================================================================

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.83 2009/07/31 12:41:52 modalsist Exp $
+# $Id: makefile.pc,v 1.84 2009/08/11 13:31:05 modalsist Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -49,6 +49,7 @@ HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(HARBOURFLAGS) $** -o$@
 
 CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" 
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
+CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
 #--------------------------------------------------------
 # Pelles C v.5x need /alternatename flag. It seems a bug.

@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: descend.c,v 1.2 2009/11/09 09:38:44 marchuet Exp $
  */
 
 /*
@@ -54,12 +54,12 @@ HB_FUNC( FT_DESCEND)
 #if defined(HB_OS_DOS) || defined(HB_OS_WIN)
    {
 
-      auto PHB_ITEM iP   = hb_itemParam( 1 );
-      auto USHORT uiType = hb_itemType( iP );
+      PHB_ITEM iP   = hb_itemParam( 1 );
+      USHORT uiType = hb_itemType( iP );
 
-      auto PHB_ITEM iR   = NULL;
-      auto USHORT uiLen, n;
-      auto char * pDescend;
+      PHB_ITEM iR   = NULL;
+      USHORT uiLen, n;
+      char * pDescend;
 
       if ( ( uiType & HB_IT_NUMERIC ) && ( uiType & HB_IT_DOUBLE ) )
          iR = hb_itemPutND( 0, 0 - hb_itemGetND( iP ) );

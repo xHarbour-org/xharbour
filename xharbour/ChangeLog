@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6716 2010/06/03 13:41:07 modalsist Exp $
+ * $Id: ChangeLog,v 1.6717 2010/06/04 02:39:40 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-18 12:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * make_vc.bat
+    + added support for VS 2010
+	
+  * compile.mak
+    * Modified to compile win32ole.prg, gtwvt.c gtwvg.c, and wvtcore.c 
+	  using new $(CCC_CMD) instead of $(CC_CMD) to allow forcing C mode instead of CPP
+  * makefile.vc
+    + Added CCC_CMD macro which forces C mode by means of -TC switch
+	  
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.wc
+    + Added CCC_CMD set to mirror $(CC_CMD)
+	/* Not tested!!! */
+	
+  * contrib/libnf/descend.c
+    ! Remove superfluous auto storage qualifier
+	
 2010-06-03 23:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/win2prn.prg
     * fix initial uFormat value.
