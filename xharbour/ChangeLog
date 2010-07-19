@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6718 2010/06/18 16:36:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6719 2010/06/18 22:21:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,21 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2010-07-19 20:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rtl\winreg.prg
+    * added error checking to WinRegQueryValueEx()/GetRegistry()
 
 2010-06-18 17:48 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * makefile.bc
     + Added explicit refernces to C compiler lib folders as link command arguments
-    
+
 2010-06-18 12:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * make_vc.bat
     + added support for VS 2010
-	
+
   * compile.mak
-    * Modified to compile win32ole.prg, gtwvt.c gtwvg.c, and wvtcore.c 
+    * Modified to compile win32ole.prg, gtwvt.c gtwvg.c, and wvtcore.c
 	  using new $(CCC_CMD) instead of $(CC_CMD) to allow forcing C mode instead of CPP
   * makefile.vc
     + Added CCC_CMD macro which forces C mode by means of -TC switch
-	  
+
   * makefile.bc
   * makefile.dc
   * makefile.gc
@@ -29,10 +32,10 @@
   * makefile.wc
     + Added CCC_CMD set to mirror $(CC_CMD)
 	/* Not tested!!! */
-	
+
   * contrib/libnf/descend.c
     ! Remove superfluous auto storage qualifier
-	
+
 2010-06-03 23:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/win2prn.prg
     * fix initial uFormat value.
@@ -46,7 +49,7 @@
 2010-06-02 14:05 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/hbzlib/zipnew.cpp
     ! fixed problem on GetCurrentFileSize in windows Section( was not closing handle from find first)
-    
+
 2010-05-26 09:01 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\common\hbver.c
     * remove extra space on os() for Windows after "Windows" reported by Grzegorz on comp.lang.xharbour

@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg,v 1.4 2006/11/25 16:17:40 ptsarenko Exp $
+ * $Id: winreg.prg,v 1.5 2008/06/02 14:06:03 lculik Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ FUNCTION GetRegistry( nHKEYHandle, cKeyName, cEntryName )
         nValueType== REG_BINARY
         cName:= BIN2U(cName)
       ELSE
-        cName:= STRTRAN(cName,CHR(0))
+        cName:= STRTRAN(CSTR(cName),CHR(0))
       ENDIF
     ENDIF
     WinRegCloseKey( nKeyHandle)
@@ -261,14 +261,20 @@ HB_FUNC_STATIC( WINREGQUERYVALUEEX )
       cValue = ( BYTE *) hb_xgrab( nSize );
       if ( cValue )
       {
-        RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, ( BYTE *) cValue, &nSize );
-        if ( ISBYREF( 4 ) )
+        if ( RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, ( BYTE *) cValue, &nSize ) == ERROR_SUCCESS )
         {
-          hb_stornl( nType, 4 );
+          if ( ISBYREF( 4 ) )
+          {
+            hb_stornl( nType, 4 );
+          }
+          if ( ISBYREF( 5 ) )
+          {
+            hb_storclen( ( char *) cValue, nSize, 5 );
+          }
         }
-        if ( ISBYREF( 5 ) )
+        else
         {
-          hb_storclen( ( char *) cValue, nSize, 5 );
+          nSize = 0 ;
         }
         hb_xfree( cValue );
       }
@@ -277,6 +283,10 @@ HB_FUNC_STATIC( WINREGQUERYVALUEEX )
         nSize = 0;
       }
     }
+  }
+  else
+  {
+    nSize = 0 ;
   }
   hb_retnl( nSize);
 }
