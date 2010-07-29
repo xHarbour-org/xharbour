@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.271 2009/12/31 04:12:30 andijahja Exp $
+ * $Id: hbapi.h,v 1.272 2010/02/02 19:12:34 ronpinkas Exp $
  */
 
 /*
@@ -995,6 +995,7 @@ extern HB_EXPORT ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, con
 extern HB_EXPORT char *  hb_strLowerCopy( char * szText, ULONG ulLen );
 extern HB_EXPORT HB_LONG hb_strValInt( const char * szText, int * iOverflow );
 extern HB_EXPORT int     Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
+extern HB_EXPORT int     Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
 extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 extern HB_EXPORT HB_ULONG hb_hextonum(const char *cHex);
 

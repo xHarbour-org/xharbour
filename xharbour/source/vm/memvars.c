@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.149 2009/12/31 00:15:48 andijahja Exp $
+ * $Id: memvars.c,v 1.150 2010/01/06 15:46:36 enricomaria Exp $
  */
 
 /*
@@ -1177,7 +1177,7 @@ static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
       hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s'\n", szRegEx, NULL );
    }
 
-   while( ulBase > s_privateStackBase )
+   while( ulBase > hb_stackBaseItem()->item.asSymbol.pCargo->privatesbase )
    {
       --ulBase;
       pDynVar = s_privateStack[ ulBase ];
@@ -1192,7 +1192,7 @@ static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
 
          pRef = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
-         bMatch = hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE );
+         bMatch = hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, TRUE );
 
          if ( bInclude ? bMatch : !bMatch )
          {
@@ -1610,8 +1610,7 @@ HB_FUNC( __MVRELEASE )
             bIncludeVar = TRUE;   /* delete all memvar variables */
          }
 
-         Wild2RegEx( (char *) (pMask->item.asString.value), (char *) szRegEx, FALSE );
-
+         Mask2RegEx( (char *) (pMask->item.asString.value), (char *) szRegEx, FALSE );
          hb_memvarReleaseWithMask( szRegEx, bIncludeVar );
       }
    }
@@ -1911,7 +1910,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
    if( pDynSymbol->hMemvar )
    {
-      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->regEx ), pDynSymbol->pSymbol->szName, FALSE ) );
+      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->regEx ), pDynSymbol->pSymbol->szName, TRUE ) );
 
       PHB_ITEM pItem;
 
@@ -2061,7 +2060,7 @@ HB_FUNC( __MVSAVE )
          msc.buffer       = (BYTE *) hb_xgrab( uLen );
          msc.fhnd         = fhnd;
 
-         Wild2RegEx( (char *) (msc.pszMask), szRegEx, FALSE );
+         Mask2RegEx( (char *) (msc.pszMask), szRegEx, FALSE );
 
          if( !hb_regexCompile( &msc.regEx, szRegEx, 0, 0 ) )
          {
@@ -2171,7 +2170,7 @@ HB_FUNC( __MVRESTORE )
          Item.type = HB_IT_NIL;
          Name.type = HB_IT_NIL;
 
-         Wild2RegEx( (char *) pszMask, (char *) szRegEx, FALSE );
+         Mask2RegEx( (char *) pszMask, (char *) szRegEx, FALSE );
 
          if( !hb_regexCompile( &RegEx, szRegEx, 0, 0 ) )
          {
@@ -2282,7 +2281,7 @@ HB_FUNC( __MVRESTORE )
                }
             }
 
-            bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &RegEx, (&Name)->item.asString.value, FALSE ) );
+            bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &RegEx, (&Name)->item.asString.value, TRUE ) );
 
             /* Process it if it matches the passed mask */
             if( bIncludeMask ? bMatch : ! bMatch )

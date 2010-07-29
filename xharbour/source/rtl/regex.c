@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.65 2009/04/16 14:57:35 likewolf Exp $
+ * $Id: regex.c,v 1.67 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -616,6 +616,50 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 
    hb_strncpy( sRegEx + iLenResult, "\\b", 2 );
    iLenResult += 2;
+
+   sRegEx[ iLenResult ] = '\0';
+
+   return iLenResult;
+}
+
+/*
+ Converts Clipper Symbol Mask to an equivalent RegEx
+ Caller must allocate sRegEx with enough space for conversion.
+ returns the length of the resulting RegEx.
+ */
+int Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
+{
+   char cChar;
+   int iLen = strlen( sWild );
+   int i, iLenResult = 0;
+
+   if( bMatchCase == FALSE )
+   {
+      hb_strncpy( sRegEx, "(?i)", 4 );
+      iLenResult = 4;
+   }
+
+   for( i = 0; i < iLen; i++ )
+   {
+      cChar = sWild[i];
+
+      switch( cChar )
+      {
+         case '*':
+            hb_strncpy( sRegEx + iLenResult, ".*", 2 );
+            iLenResult += 2;
+            i = iLen; //Skip rest if any!
+            break;
+
+         case '?':
+            hb_strncpy( sRegEx + iLenResult, ".?", 2 );
+            iLenResult += 2;
+            break;
+
+         default:
+            sRegEx[ iLenResult++ ] = cChar;
+      }
+   }
 
    sRegEx[ iLenResult ] = '\0';
 

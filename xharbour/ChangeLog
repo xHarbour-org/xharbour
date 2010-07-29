@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6719 2010/06/18 22:21:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6720 2010/07/19 08:04:37 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-07-29 12:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbapi.h
+  * source/rtl/regex.c
+    + Added: int Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
+  * source/vm/memvars.c
+    ! Fixed hb_memvarReleaseWithMask() to process current procedure privates
+    * Changed all calls of Wild2RegEx() into new Mask2RegEx()
+
+  * source/rtl/at.c
+    + Added missing extended strings support, to hb_AtSkipStrings()
+
 2010-07-19 20:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\winreg.prg
     * added error checking to WinRegQueryValueEx()/GetRegistry()

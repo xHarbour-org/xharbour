@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.14 2008/11/22 08:25:23 andijahja Exp $
+ * $Id: at.c,v 1.15 2009/03/02 09:20:04 marchuet Exp $
  */
 
 /*
@@ -149,6 +149,20 @@ ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText,
 
       while( ulPos < ulLen && ulSubPos < ulSubLen )
       {
+         if( szText[ ulPos + 1 ] == '"' && ( szText[ ulPos ] == 'e' || szText[ ulPos ] == 'E' ) )
+         {
+            ulPos++;
+
+            while( ++ulPos < ulLen && ( szText[ ulPos ] != '"' || szText[ ulPos - 1 ] == '\\' ) )
+            {
+               // Skip.
+            }
+
+            ulPos++;
+            ulSubPos = 0;
+            continue;
+         }
+
          if( szText[ ulPos ] == '"' && szSub[0] != '"' )
          {
             while( ++ulPos < ulLen && szText[ ulPos ] != '"' )
