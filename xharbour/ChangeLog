@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6720 2010/07/19 08:04:37 peterrees Exp $
+ * $Id: ChangeLog,v 1.6721 2010/07/29 17:08:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-07-30 08:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/gtwvw/gtwvw.c
+    ! fixed problem when windows is moved bellow windows task bar
+  * contrib/gtwvw/hbgtwvw.h
+    ! added nome new fields to structure
+    
 2010-07-29 12:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbapi.h
   * source/rtl/regex.c

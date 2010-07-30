@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.18 2009/09/20 15:17:07 lculik Exp $
+ * $Id: hbgtwvw.h,v 1.19 2009/12/21 05:18:58 andijahja Exp $
  */
 
 /*
@@ -122,7 +122,7 @@
 #include "hbstack.h"
 
 /*-------------------------------------------------------------------*/
-
+#define SYS_EV_MARK                 1000
 #define WVW_MAXWINDOWS        40
 
 #define WVW_MAXWINNAMELENGTH  256
@@ -410,6 +410,7 @@ typedef struct app_data
 
 typedef struct win_data
 {
+  PHB_GT pGT  ;
   UINT      byWinId;                   /*x Window's Id, a number 0..WVWMAXWINDOWS            */
   TCHAR     szWinName[ WVW_MAXWINNAMELENGTH ];  /*x name of Window ~ szAppName for Window 0  */
 
@@ -508,11 +509,17 @@ typedef struct win_data
   HWND      hWndTT;                    /* Handle to hold tooltip information */
   BOOL      bToolTipActive;            /* Flag to set whether tooltip is active or not */
   HICON     hIcon;
+  BOOL      bMaximized;                   /* Flag is set when window has been maximized */
+  BOOL      bBeingMarked;                 /* Flag to control DOS window like copy operation */
+  BOOL      bBeginMarked;
+
+    
 
 } WIN_DATA;
 
 typedef struct wvw_data
 {
+ PHB_GT   pGT;                          /* core GT pointer */		
  UINT s_uiPaintRefresh ;     /* milliseconds between timer check */
 
  BOOL s_bMainCoordMode ;   /* in this mode, all HB_GT_FUNC() uses Main Window's coordinate */
