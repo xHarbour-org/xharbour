@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
+ * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
  */
 
 /*************************************************
@@ -66,6 +66,7 @@ extern "C" {
 #define REG_STARTEND  0x0080   /* BSD feature: pass subject string by so,eo */
 #define REG_NOTEMPTY  0x0100   /* NOT defined by POSIX; maps to PCRE_NOTEMPTY */
 #define REG_UNGREEDY  0x0200   /* NOT defined by POSIX; maps to PCRE_UNGREEDY */
+#define REG_UCP       0x0400   /* NOT defined by POSIX; maps to PCRE_UCP */
 
 /* This is not used by PCRE, but by defining it we make it easier
 to slot PCRE into existing programs that make POSIX calls. */

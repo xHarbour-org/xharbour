@@ -1,9 +1,10 @@
 /*
- * $Id: config.h,v 1.11 2008/09/05 19:41:18 andijahja Exp $
+ * $Id: config.h,v 1.12 2009/10/20 05:37:22 andijahja Exp $
  */
 #ifndef _CONFIG_H
    #define _CONFIG_H
 
+   #define SUPPORT_UTF8
    #define PCRE_STATIC
 
    #if defined( _MSC_VER )

@@ -1,5 +1,5 @@
 /*
- * $Id: pcreposix.c,v 1.13 2009/12/31 02:55:05 andijahja Exp $
+ * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2009 University of Cambridge
+           Copyright (c) 1997-2010 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -59,11 +59,15 @@ previously been set. */
 #  define PCREPOSIX_EXP_DEFN __declspec(dllexport)
 #endif
 
-#define HB_DONT_DEFINE_BOOL
+/* We include pcre.h before pcre_internal.h so that the PCRE library functions
+are declared as "import" for Windows by defining PCRE_EXP_DECL as "import".
+This is needed even though pcre_internal.h itself includes pcre.h, because it
+does so after it has set PCRE_EXP_DECL to "export" if it is not already set. */
+
 #include "pcre.h"
 #include "pcre_internal.h"
 #include "pcreposix.h"
-#include "hbapi.h"
+
 
 /* Table to translate PCRE compile time error codes into POSIX error codes. */
 
@@ -138,7 +142,7 @@ static const int eint[] = {
   REG_INVARG,  /* inconsistent NEWLINE options */
   REG_BADPAT,  /* \g is not followed followed by an (optionally braced) non-zero number */
   REG_BADPAT,  /* a numbered reference must not be zero */
-  REG_BADPAT,  /* (*VERB) with an argument is not supported */
+  REG_BADPAT,  /* an argument is not allowed for (*ACCEPT), (*FAIL), or (*COMMIT) */
   /* 60 */
   REG_BADPAT,  /* (*VERB) not recognized */
   REG_BADPAT,  /* number is too big */
@@ -146,7 +150,9 @@ static const int eint[] = {
   REG_BADPAT,  /* digit expected after (?+ */
   REG_BADPAT,  /* ] is an invalid data character in JavaScript compatibility mode */
   /* 65 */
-  REG_BADPAT   /* different names for subpatterns of the same number are not allowed */
+  REG_BADPAT,  /* different names for subpatterns of the same number are not allowed */
+  REG_BADPAT,  /* (*MARK) must have an argument */
+  REG_INVARG,  /* this version of PCRE is not compiled with PCRE_UCP support */
 };
 
 /* Table of texts corresponding to POSIX error codes */
@@ -196,10 +202,10 @@ addlength = (preg != NULL && (int)preg->re_erroffset != -1)?
 if (errbuf_size > 0)
   {
   if (addlength > 0 && errbuf_size >= length + addlength)
-    hb_snprintf(errbuf, errbuf_size, "%s%s%-6d", message, addmessage, (int)preg->re_erroffset);
+    sprintf(errbuf, "%s%s%-6d", message, addmessage, (int)preg->re_erroffset);
   else
     {
-    hb_strncpy(errbuf, message, errbuf_size - 1);
+    strncpy(errbuf, message, errbuf_size - 1);
     errbuf[errbuf_size-1] = 0;
     }
   }
@@ -250,6 +256,7 @@ if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_MULTILINE;
 if ((cflags & REG_DOTALL) != 0)   options |= PCRE_DOTALL;
 if ((cflags & REG_NOSUB) != 0)    options |= PCRE_NO_AUTO_CAPTURE;
 if ((cflags & REG_UTF8) != 0)     options |= PCRE_UTF8;
+if ((cflags & REG_UCP) != 0)      options |= PCRE_UCP;
 if ((cflags & REG_UNGREEDY) != 0) options |= PCRE_UNGREEDY;
 
 preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
@@ -298,7 +305,6 @@ int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
 BOOL allocated_ovector = FALSE;
 BOOL nosub =
   (((const pcre *)preg->re_pcre)->options & PCRE_NO_AUTO_CAPTURE) != 0;
-int iStartOffset; /* Ron Pinkas - added to support REG_STARTEND */
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
@@ -340,28 +346,15 @@ if ((eflags & REG_STARTEND) != 0)
 else
   {
   so = 0;
-  eo = strlen(string);
+  eo = (int)strlen(string);
   }
 
-/* Ron Pinkas added POSIX REG_STARTEND support.
 rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, (eo - so),
-  0, options, ovector, nmatch * 3);
-*/
-if ((eflags & REG_STARTEND) && pmatch && pmatch[0].rm_so >= 0 && pmatch[0].rm_eo > pmatch[0].rm_so && pmatch[0].rm_eo <= (int)strlen(string) )
-  {
+  0, options, ovector, (int)(nmatch * 3));
 
-  iStartOffset = pmatch[0].rm_so;
-  rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
+if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
 
-  }
-
-else
-  {
-  iStartOffset = 0;
-  rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
-  }
-
-if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
+/* Successful match */
 
 if (rc >= 0)
   {
@@ -372,13 +365,6 @@ if (rc >= 0)
       {
       pmatch[i].rm_so = ovector[i*2];
       pmatch[i].rm_eo = ovector[i*2+1];
-
-      /* Ron Pinkas - added to support REG_STARTEND */
-      if ( pmatch[i].rm_so >= 0 )
-        {
-        pmatch[i].rm_so += iStartOffset;
-        pmatch[i].rm_eo += iStartOffset;
-        }
       }
     if (allocated_ovector) free(ovector);
     for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
@@ -386,22 +372,33 @@ if (rc >= 0)
   return 0;
   }
 
-else
+/* Unsuccessful match */
+
+if (allocated_ovector) free(ovector);
+switch(rc)
   {
-  if (allocated_ovector) free(ovector);
-  switch(rc)
-    {
-    case PCRE_ERROR_NOMATCH: return REG_NOMATCH;
-    case PCRE_ERROR_NULL: return REG_INVARG;
-    case PCRE_ERROR_BADOPTION: return REG_INVARG;
-    case PCRE_ERROR_BADMAGIC: return REG_INVARG;
-    case PCRE_ERROR_UNKNOWN_NODE: return REG_ASSERT;
-    case PCRE_ERROR_NOMEMORY: return REG_ESPACE;
-    case PCRE_ERROR_MATCHLIMIT: return REG_ESPACE;
-    case PCRE_ERROR_BADUTF8: return REG_INVARG;
-    case PCRE_ERROR_BADUTF8_OFFSET: return REG_INVARG;
-    default: return REG_ASSERT;
-    }
+/* ========================================================================== */
+  /* These cases are never obeyed. This is a fudge that causes a compile-time
+  error if the vector eint, which is indexed by compile-time error number, is
+  not the correct length. It seems to be the only way to do such a check at
+  compile time, as the sizeof() operator does not work in the C preprocessor.
+  As all the PCRE_ERROR_xxx values are negative, we can use 0 and 1. */
+
+  case 0:
+  case (sizeof(eint)/sizeof(int) == ERRCOUNT):
+  return REG_ASSERT;
+/* ========================================================================== */
+
+  case PCRE_ERROR_NOMATCH: return REG_NOMATCH;
+  case PCRE_ERROR_NULL: return REG_INVARG;
+  case PCRE_ERROR_BADOPTION: return REG_INVARG;
+  case PCRE_ERROR_BADMAGIC: return REG_INVARG;
+  case PCRE_ERROR_UNKNOWN_NODE: return REG_ASSERT;
+  case PCRE_ERROR_NOMEMORY: return REG_ESPACE;
+  case PCRE_ERROR_MATCHLIMIT: return REG_ESPACE;
+  case PCRE_ERROR_BADUTF8: return REG_INVARG;
+  case PCRE_ERROR_BADUTF8_OFFSET: return REG_INVARG;
+  default: return REG_ASSERT;
   }
 }
 
