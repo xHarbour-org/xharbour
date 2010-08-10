@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.67 2009/12/31 02:55:05 andijahja Exp $
+ * $Id: regex.c,v 1.68 2010/07/29 17:08:09 ronpinkas Exp $
  */
 
 /*
@@ -835,6 +835,11 @@ HB_FUNC( HB_REGEXCOMP )
       "Regex subsystem",
       3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ));
    }
+}
+
+HB_FUNC( HB_PCRE_VERSION )
+{
+   hb_retc( pcre_version () );
 }
 
 HB_FUNC( HB_ISREGEXSTRING )
