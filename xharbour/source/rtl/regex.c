@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.68 2010/07/29 17:08:09 ronpinkas Exp $
+ * $Id: regex.c,v 1.69 2010/08/10 12:37:23 andijahja Exp $
  */
 
 /*
@@ -839,6 +839,7 @@ HB_FUNC( HB_REGEXCOMP )
 
 HB_FUNC( HB_PCRE_VERSION )
 {
+   HB_THREAD_STUB_API
    hb_retc( pcre_version () );
 }
 

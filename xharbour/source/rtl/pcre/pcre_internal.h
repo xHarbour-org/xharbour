@@ -1,5 +1,5 @@
 /*
- * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: pcre_internal.h,v 1.17 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /*************************************************
@@ -625,7 +625,9 @@ variable-length repeat, or a anything other than literal characters. */
 environments where these macros are defined elsewhere. Unfortunately, there
 is no way to do the same for the typedef. */
 
+#ifndef HB_APIEXT_H_
 typedef int BOOL;
+#endif
 
 #ifndef FALSE
 #define FALSE   0
