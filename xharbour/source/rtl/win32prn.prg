@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.32 2010/06/03 13:41:08 modalsist Exp $
+ * $Id: win32prn.prg,v 1.34 2010/08/17 11:32:55 modalsist Exp $
  */
 
 /*
@@ -1358,6 +1358,12 @@ HB_FUNC_STATIC( FILLRECT )
    int iStyle = hb_parni( 7 );  // brush style
    LONG lHatch = hb_parnl( 8 );  // brush hatch
    HBRUSH hBrush;
+   RECT rct;
+
+   rct.top    = y1;
+   rct.left   = x1;
+   rct.bottom = y2;
+   rct.right  = x2;
 
    if( iStyle != BS_SOLID )
    {
@@ -1371,13 +1377,6 @@ HB_FUNC_STATIC( FILLRECT )
    {
       hBrush = CreateSolidBrush( dColor );
    }
-
-   RECT rct;
-
-   rct.top    = y1;
-   rct.left   = x1;
-   rct.bottom = y2;
-   rct.right  = x2;
 
    FillRect( hDC, &rct, hBrush );
 
