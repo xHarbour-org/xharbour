@@ -135,7 +135,7 @@ CLASS WIN32PRN
   METHOD Box(nX1, nY1, nX2, nY2, nWidth, nHeight) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2, nWidth, nHeight)
   METHOD Arc(nX1, nY1, nX2, nY2) INLINE Arc(::hPrinterDC, nX1, nY1, nX2, nY2)
   METHOD Ellipse(nX1, nY1, nX2, nY2) INLINE Ellipse(::hPrinterDC, nX1, nY1, nX2, nY2)
-  METHOD FillRect(nX1, nY1, nX2, nY2, nColor) INLINE FillRect(::hPrinterDC, nX1, nY1, nX2, nY2, nColor)
+  METHOD FillRect(nX1, nY1, nX2, nY2, nColor, nStyle, nHatch ) INLINE FillRect(::hPrinterDC, nX1, nY1, nX2, nY2, nColor, nStyle, nHatch )
   METHOD GetCharWidth()
   METHOD GetCharHeight()
   METHOD GetTextWidth(cString)
@@ -229,7 +229,6 @@ CLASS WIN32PRN
   VAR PenStyle
   VAR PenWidth
   VAR PenColor
-
 
 
 ENDCLASS
@@ -1355,7 +1354,24 @@ HB_FUNC_STATIC( FILLRECT )
    int y1 = hb_parni( 3 );
    int x2 = hb_parni( 4 );
    int y2 = hb_parni( 5 );
-   HBRUSH hBrush = CreateSolidBrush( (COLORREF) hb_parnl( 6 ) );
+   DOUBLE dColor = (COLORREF) hb_parni( 6 );  // brush color
+   int iStyle = hb_parni( 7 );  // brush style
+   LONG lHatch = hb_parnl( 8 );  // brush hatch
+   HBRUSH hBrush;
+
+   if( iStyle != BS_SOLID )
+   {
+     LOGBRUSH br;
+     br.lbStyle = iStyle;
+     br.lbColor = dColor;
+     br.lbHatch = lHatch;
+     hBrush = CreateBrushIndirect( &br );
+   }
+   else
+   {
+      hBrush = CreateSolidBrush( dColor );
+   }
+
    RECT rct;
 
    rct.top    = y1;

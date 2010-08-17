@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.ch,v 1.1 2009/05/12 01:32:50 modalsist Exp $
+ * $Id: win32prn.ch,v 1.2 2010/06/03 13:41:08 modalsist Exp $
  */
 
 /*
@@ -182,14 +182,14 @@
 #define DMPAPER_A4SMALL                        10  
 #define DMPAPER_A5                             11  
 #define DMPAPER_B4                             12  
-#define DMPAPER_B5                             13  
+#define DMPAPER_B5                             13
 #define DMPAPER_FOLIO                          14  
 #define DMPAPER_QUARTO                         15  
-#define DMPAPER_10X14                          16  
+#define DMPAPER_10X14                          16
 #define DMPAPER_11X17                          17  
 #define DMPAPER_NOTE                           18  
 #define DMPAPER_ENV_9                          19  
-#define DMPAPER_ENV_10                         20  
+#define DMPAPER_ENV_10                         20
 #define DMPAPER_ENV_11                         21  
 #define DMPAPER_ENV_12                         22  
 #define DMPAPER_ENV_14                         23  
@@ -208,7 +208,7 @@
 #define DMPAPER_ENV_ITALY                      36  
 #define DMPAPER_ENV_MONARCH                    37  
 #define DMPAPER_ENV_PERSONAL                   38  
-#define DMPAPER_FANFOLD_US                     39  
+#define DMPAPER_FANFOLD_US                     39
 #define DMPAPER_FANFOLD_STD_GERMAN             40  
 #define DMPAPER_FANFOLD_LGL_GERMAN             41  
 #define DMPAPER_ISO_B4                         42  
@@ -228,14 +228,14 @@
 #define DMPAPER_LETTER_EXTRA_TRANSVERSE        56 
 #define DMPAPER_A_PLUS                         57  
 #define DMPAPER_B_PLUS                         58  
-#define DMPAPER_LETTER_PLUS                    59  
+#define DMPAPER_LETTER_PLUS                    59
 #define DMPAPER_A4_PLUS                        60  
 #define DMPAPER_A5_TRANSVERSE                  61  
-#define DMPAPER_B5_TRANSVERSE                  62  
+#define DMPAPER_B5_TRANSVERSE                  62
 #define DMPAPER_A3_EXTRA                       63  
 #define DMPAPER_A5_EXTRA                       64  
 #define DMPAPER_B5_EXTRA                       65  
-#define DMPAPER_A2                             66  
+#define DMPAPER_A2                             66
 #define DMPAPER_A3_TRANSVERSE                  67  
 #define DMPAPER_A3_EXTRA_TRANSVERSE            68  
 #define DMPAPER_DBL_JAPANESE_POSTCARD          69 
@@ -254,7 +254,7 @@
 #define DMPAPER_DBL_JAPANESE_POSTCARD_ROTATED  82 
 #define DMPAPER_A6_ROTATED                     83  
 #define DMPAPER_JENV_KAKU2_ROTATED             84  
-#define DMPAPER_JENV_KAKU3_ROTATED             85  
+#define DMPAPER_JENV_KAKU3_ROTATED             85
 #define DMPAPER_JENV_CHOU3_ROTATED             86  
 #define DMPAPER_JENV_CHOU4_ROTATED             87  
 #define DMPAPER_B6_JIS                         88  
@@ -274,14 +274,14 @@
 #define DMPAPER_PENV_7                         102 
 #define DMPAPER_PENV_8                         103 
 #define DMPAPER_PENV_9                         104 
-#define DMPAPER_PENV_10                        105 
+#define DMPAPER_PENV_10                        105
 #define DMPAPER_P16K_ROTATED                   106 
 #define DMPAPER_P32K_ROTATED                   107 
 #define DMPAPER_P32KBIG_ROTATED                108
 #define DMPAPER_PENV_1_ROTATED                 109 
 #define DMPAPER_PENV_2_ROTATED                 110 
 #define DMPAPER_PENV_3_ROTATED                 111 
-#define DMPAPER_PENV_4_ROTATED                 112 
+#define DMPAPER_PENV_4_ROTATED                 112
 #define DMPAPER_PENV_5_ROTATED                 113 
 #define DMPAPER_PENV_6_ROTATED                 114 
 #define DMPAPER_PENV_7_ROTATED                 115 
@@ -371,5 +371,23 @@
 #define DT_NOFULLWIDTHCHARBREAK     0x00080000
 #define DT_HIDEPREFIX               0x00100000
 #define DT_PREFIXONLY               0x00200000
+
+/* Color */
+#define BLACK     0x00000000
+#define BLUE      0x00FF0000
+#define BROWN     0x000A0A80
+#define CYAN      0x00FFFF00
+#define GRAY      0x00808080
+#define GREEN     0x0000FF00
+#define MAGENTA   0x00FF00FF
+#define ORANGE    0X000A80FF
+#define PINK  	  0x00CBC0FF
+#define PURPLE	  0x00800080
+#define RED       0x000000FF
+#define WHITE     0x00FFFFFF
+#define YELLOW    0x0000FFFF
+
+#define DARKGRAY  0x00A9A9A9
+#define LIGHTGRAY 0x00D3D3D3
 
 #endif

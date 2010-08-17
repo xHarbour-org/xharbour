@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6723 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.6724 2010/08/12 01:45:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-08-17 08:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/hbxml.c
+    * reverted to the previous version to avoid EXE hang up under Windows.
+
+  * source/rtl/txml.prg
+    ! fixed to not duplicate "<?xml" header after using of HBXML_TYPE_PI
+      type node named "xml" under root element.                   
+
+  * include/win2prn.ch
+    * added some color defines.
+
+  * source/rtl/win2prn.prg
+    * extended fillrect method to use hatched brush.
 
 2010-08-12 08:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/regex.c

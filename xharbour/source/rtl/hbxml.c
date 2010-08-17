@@ -214,7 +214,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
    int iStatus = 0;
    int iPosAmper = 0;
    int iLenName, iLenAttrib;
-   char * tmp;
 
    buf_name = mxml_sgs_new();
    buf_attrib = mxml_sgs_new();
@@ -246,16 +245,12 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                      {
                         hbxml_set_doc_status( ref, pDoc, pNode,
                            MXML_STATUS_MALFORMED, MXML_ERROR_NAMETOOLONG );
-			                  mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );   
                         return MXML_STATUS_MALFORMED;
                      }
                      iStatus = 1;
                   }
                   else {
                      hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_INVATT );
-		                       mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                      return MXML_STATUS_MALFORMED;
                   }
             }
@@ -269,8 +264,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                {
                   hbxml_set_doc_status( ref, pDoc, pNode,
                      MXML_STATUS_MALFORMED, MXML_ERROR_NAMETOOLONG );
-		                       mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                   return MXML_STATUS_MALFORMED;
                }
             }
@@ -289,8 +282,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
             }
             else {
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-	                         mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                return MXML_STATUS_MALFORMED;
             }
          break;
@@ -311,8 +302,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
             }
             else {
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-	                         mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                return MXML_STATUS_MALFORMED;
             }
          break;
@@ -334,8 +323,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
             }
             else {
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-	                         mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                return MXML_STATUS_MALFORMED;
             }
          break;
@@ -359,8 +346,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                {
                   hbxml_set_doc_status( ref, pDoc, pNode,
                      MXML_STATUS_MALFORMED, MXML_ERROR_ATTRIBTOOLONG );
-		                      mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib ); 
                   return MXML_STATUS_MALFORMED;
                }
             }
@@ -370,8 +355,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                if ( mxml_sgs_append_char( buf_attrib, chr ) != MXML_STATUS_OK )
                {
                   hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_ATTRIBTOOLONG );
-		                    mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                   return MXML_STATUS_MALFORMED;
                }
             }
@@ -388,8 +371,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                {
                   /* error! - we have "&;" */
                   hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
-		                    mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                   return MXML_STATUS_MALFORMED;
                }
 
@@ -416,8 +397,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
             {
                /* error - we have something like &amp &amp */
                hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
-	                         mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                return MXML_STATUS_MALFORMED;
             }
             else
@@ -425,8 +404,6 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
                if ( mxml_sgs_append_char( buf_attrib, chr ) != MXML_STATUS_OK )
                {
                   hbxml_set_doc_status( ref, pDoc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_ATTRIBTOOLONG );
-		                    mxml_sgs_destroy( buf_name );
-                  mxml_sgs_destroy( buf_attrib );
                   return MXML_STATUS_MALFORMED;
                }
             }
@@ -451,14 +428,10 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
    /* time to create the attribute */
    iLenName = buf_name->length;
    iLenAttrib = buf_attrib->length;
-   tmp =   mxml_sgs_extract( buf_name );
-   pDest->pName  = hb_itemPutCL( pDest->pName,  tmp,   iLenName );
-   if (tmp )
-      mxml_sgs_destroy( buf_name );
-   tmp =    mxml_sgs_extract( buf_attrib );
-   pDest->pValue = hb_itemPutCL( pDest->pValue,tmp, iLenAttrib );
-   if (tmp )
-     mxml_sgs_destroy( buf_attrib );
+
+   pDest->pName  = hb_itemPutCL( pDest->pName,  mxml_sgs_extract( buf_name ),   iLenName );
+   pDest->pValue = hb_itemPutCL( pDest->pValue, mxml_sgs_extract( buf_attrib ), iLenAttrib );
+
    return MXML_STATUS_OK;
 }
 
@@ -898,7 +871,6 @@ static void mxml_node_read_data( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, 
 
    hb_itemPutCL( pItem, buf, iPos );
    hb_objSendMsg( pNode,"_CDATA", 1, pItem );
-   MXML_DELETOR( buf );
    hb_itemRelease( pItem );
 }
 
@@ -984,7 +956,6 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
    }
    pItem = hb_itemPutCL( NULL, buf, iPos );
    hb_objSendMsg( pNode,"_CNAME", 1, pItem );
-   MXML_DELETOR( buf );
    hb_itemRelease( pItem );
 
    return MXML_STATUS_OK;
@@ -1141,7 +1112,6 @@ static void mxml_node_read_pi( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
          buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
       }
       hb_itemPutCL( pItem, buf, iPos );
-      MXML_DELETOR( buf );
       hb_objSendMsg( pNode,"_CDATA", 1, pItem );
       hb_itemRelease( pItem );
    }
@@ -2240,7 +2210,7 @@ static MXML_SGS *mxml_sgs_new()
       MXML_DELETOR( ret );
       return NULL;
    }
-   memset(ret->buffer,0,sizeof( ret->buffer ) );
+
    ret->allocated = MXML_ALLOC_BLOCK;
    ret->length = 0;
 
@@ -2249,7 +2219,7 @@ static MXML_SGS *mxml_sgs_new()
 
 static void mxml_sgs_destroy( MXML_SGS *sgs )
 {
-   if ( sgs->buffer )
+   if ( sgs->buffer != NULL )
       MXML_DELETOR( sgs->buffer );
 
    MXML_DELETOR( sgs );
@@ -2314,7 +2284,16 @@ static char * mxml_sgs_extract( MXML_SGS *sgs )
    char *ret;
    sgs->buffer[ sgs->length ] = 0;
 
-   ret = sgs->buffer;
+   if ( sgs->allocated > sgs->length + 1 )
+   {
+      ret = (char *) MXML_REALLOCATOR( sgs->buffer, sgs->length +1 );
+   }
+   else
+   {
+      ret = sgs->buffer;
+   }
+
+   MXML_DELETOR( sgs );
 
    return ret;
 }
@@ -2468,7 +2447,6 @@ HB_FUNC( HBXML_NODE_TO_STRING )
       int iLen = sgs->length;
       char *buffer = mxml_sgs_extract( sgs );
       hb_retclenAdoptRaw( buffer, iLen );
-      mxml_sgs_destroy( sgs );
    }
    else
    {

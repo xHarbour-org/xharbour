@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.20 2009/11/06 19:54:18 modalsist Exp $
+ * $Id: txml.prg,v 1.21 2010/01/26 13:44:13 modalsist Exp $
  */
 
 /*
@@ -421,9 +421,9 @@ CLASS TXmlDocument
    DATA oErrorNode
    DATA nNodeCount
    DATA cSignature
-   
+
    METHOD New( uXml, nStyle )         CONSTRUCTOR
-   METHOD Read( xData, nStyle )       
+   METHOD Read( xData, nStyle )
    METHOD ToString( nStyle )          INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oRoot:ToString( nStyle ) ,"")
    METHOD Write( cFileName, nStyle )
 
@@ -442,20 +442,21 @@ HIDDEN:
 
    DATA oIterator
    DATA cHeader
-   
+
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 METHOD New( uXml, nStyle ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
-Local nh, lNew
+Local nh, lNew, nAt, nAt2
 
    ::nStatus := HBXML_STATUS_OK
    ::nError := HBXML_ERROR_NONE
    ::nLine := 1
    ::nNodeCount := 0
    ::cSignature := ""
-     
+   nAt := nAt2 := 0
+
    lNew := .f.
 
    IF uXml == NIL
@@ -473,6 +474,14 @@ Local nh, lNew
             EXIT
          CASE 'C'    /* xml file name or xml header */
             if "<?xml" in lower( uXml )
+               nAt := At( "<?xml", uXml )
+               if nAt > 0
+                  nAt2 := At( "?>", uxml )
+               endif
+               if nAt > 0 .and. nAt2 > 0
+                  ::cHeader := Substr(uxml,nAt,nAt2+1)
+                  uxml := Stuff(uxml,nAt,nAt2+1,"")
+               endif
                ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
                ::Read( uXml, nStyle )
             else
@@ -514,7 +523,7 @@ Local oNode
       ::oIterator:lRegex := .f.
       oNode := ::oIterator:Find( cName, cAttrib, cValue, cData )
    endif
-   
+
 RETURN oNode
 
 
@@ -527,7 +536,7 @@ Local oNode
       ::oIterator:lRegex := .t.
       oNode := ::oIterator:Find( cName, cAttrib, cValue, cData )
    endif
-   
+
 RETURN oNode
 
 *-----------------------------------------------------------------------------*
@@ -539,7 +548,7 @@ METHOD GetContext() CLASS TXmlDocument
       oDoc := TXmlDocument():New()
       oDoc:oRoot := ::oIterator:GetNode()
    endif
-   
+
 RETURN oDoc
 
 *-----------------------------------------------------------------------------*
@@ -587,8 +596,13 @@ Local fHandle, cHeader, lOK := .f., cFileName
         lOK := ( FError() == 0 )
      endif
      if lOK .and. ! empty( cHeader )
-        FWrite( fHandle, cHeader, len(cHeader) )
-        lOK := ( FError() == 0 )
+        lOK := iif( ::oRoot:oChild != NIL .and. ::oRoot:oChild:cName == "xml", .f., .t.)
+        if lOK
+           FWrite( fHandle, cHeader, len(cHeader) )
+           lOK := ( FError() == 0 )
+        else
+           lOK := .t.
+        endif
      endif
      if lOK
         ::oRoot:Write( fHandle, nStyle )
@@ -611,7 +625,7 @@ METHOD Read( xData, nStyle ) CLASS TXmlDocument
 *-----------------------------------------------------------------------------*
 * Read a xml file through file handle or xml content <xData>.
 *-----------------------------------------------------------------------------*
-Local cBOM 
+Local cBOM
 
  if ValType( xData ) == "N"  // file handle
     FSeek( xData, 0, FS_SET )
@@ -624,17 +638,17 @@ Local cBOM
     ::nError := HBXML_ERROR_INVNODE
     Return Self
  endif
- 
+
  /* The xml document can have the utf-8 signature named BOM (Byte Order Mark),
-    composed by a sequence of 3 characters, like chr(239), chr(187) and chr(191) 
+    composed by a sequence of 3 characters, like chr(239), chr(187) and chr(191)
     or EF, BB and BF.
     This signature is always at the beginning of the file, before <?xml> tag and can
     cause unexpected results. So we need treat it.
     More detais at http://www.w3.org/International/questions/qa-utf8-bom */
  if Asc( cBOM[1] ) = 239 .and. Asc( cBOM[2] ) = 187 .and. Asc( cBOM[3] ) = 191
     ::cSignature := cBOM
- endif 
+ endif
 
- ::nStatus := HBXML_DATAREAD( Self, xData, nStyle ) 
+ ::nStatus := HBXML_DATAREAD( Self, xData, nStyle )
 
-Return Self    
+Return Self
