@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6725 2010/08/17 11:32:55 modalsist Exp $
+ * $Id: ChangeLog,v 1.6726 2010/08/17 14:14:03 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-08-28 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  ! contrib/hbzlib/zip.c
+    ! fixed hb_zipfilebytdspan
+    
 2010-08-17 11:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/win2prn.prg
     * fix compiling error.

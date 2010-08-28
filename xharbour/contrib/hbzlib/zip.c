@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.59 2009/12/20 14:07:11 andijahja Exp $
+ * $Id: zip.c,v 1.60 2010/01/26 15:03:37 lculik Exp $
  */
 
 /*
@@ -580,7 +580,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
          /* by JGS, wait until adding the directory to the file name if not specified
          hb_xfree( pCurDir );
          */
-         if ( ! strchr( szFile, HB_OS_PATH_DELIM_CHR ) )
+         if ( ! strchr( hb_parc( 1 ), HB_OS_PATH_DELIM_CHR ) )
          {
             strcpy( szFile, (char *) pCurDir );
             strcat( szFile, HB_OS_PATH_DELIM_CHR_STRING) ;
