@@ -1,5 +1,5 @@
 /*
- * $Id: hbregex.h,v 1.4 2007/05/20 03:26:22 ronpinkas Exp $
+ * $Id: hbregex.h,v 1.5 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -33,6 +33,8 @@
  */
 
 
+#include "hbapi.h"
+
 #if ( defined(__XCC__) || defined(__LCC__) )
    #include "source\rtl\pcre\config.h"
    #include "source\rtl\pcre\pcre_internal.h"
@@ -42,8 +44,6 @@
    #include "../source/rtl/pcre/pcre_internal.h"
    #include "../source/rtl/pcre/pcreposix.h"
 #endif
-
-#include "hbapi.h"
 
 HB_EXTERN_BEGIN
 

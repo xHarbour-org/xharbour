@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6726 2010/08/17 14:14:03 modalsist Exp $
+ * $Id: ChangeLog,v 1.6727 2010/08/28 15:57:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-08-31 08:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/config.h
+    + inclusion of hbsetup.h
+
+  * include/hbsetup.h
+    + logic for inclucion of stdint.h and/or inttypes.h
+
+  * include/hbregex.h
+    ! re-order inclusion of header files
 
 2010-08-28 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/hbzlib/zip.c

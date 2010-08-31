@@ -1,8 +1,10 @@
 /*
- * $Id: config.h,v 1.12 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: config.h,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 #ifndef _CONFIG_H
    #define _CONFIG_H
+   
+   #include "hbsetup.h"
 
    #define SUPPORT_UTF8
    #define PCRE_STATIC
@@ -18,6 +20,6 @@
       #pragma warn -aus
       #pragma warn -sig
    #endif
-   
+
    #include "config.h.generic"
 #endif

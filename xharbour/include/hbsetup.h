@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.57 2009/11/09 09:38:44 marchuet Exp $
+ * $Id: hbsetup.h,v 1.58 2009/11/19 23:05:45 marchuet Exp $
  */
 
 /*
@@ -65,6 +65,25 @@
 #define __STR(x) __STR__(x)
 
 #include <limits.h>
+
+/* ***********************************************************************
+ * Some compilers do not have stdint.h and/or inttypes.h
+ */
+
+#if (defined(__BORLANDC__)&&(__BORLANDC__ < 1410 ))
+   #define HAVE_STDINT_H      0
+   #define HAVE_INTTYPES_H    0
+   #undef  INT64_MAX
+#elif ( defined(_MSC_VER) && ( !defined(__POCC__) && !defined(__XCC__) ) )
+   #define HAVE_INTTYPES_H  0
+   #if (_MSC_VER) >= 1600
+      #if !defined( HAVE_STDINT_H )
+         #define HAVE_STDINT_H 1
+      #endif
+   #else
+      #define HAVE_STDINT_H    0
+   #endif
+#endif
 
 /* ***********************************************************************
  * Include settings common for .prg and .c files
