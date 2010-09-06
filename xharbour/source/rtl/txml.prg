@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.21 2010/01/26 13:44:13 modalsist Exp $
+ * $Id: txml.prg,v 1.22 2010/08/17 11:32:55 modalsist Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 #include "hbxml.ch"
 #include "hbclass.ch"
 #include "fileio.ch"
+#include "common.ch"
 
 /********************************************
    XML Node  class
@@ -421,10 +422,11 @@ CLASS TXmlDocument
    DATA oErrorNode
    DATA nNodeCount
    DATA cSignature
+   DATA nStyle
 
    METHOD New( uXml, nStyle )         CONSTRUCTOR
    METHOD Read( xData, nStyle )
-   METHOD ToString( nStyle )          INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oRoot:ToString( nStyle ) ,"")
+   METHOD ToString( nStyle )          INLINE iif( ::nStatus = HBXML_STATUS_OK, ::oRoot:ToString( iif( nStyle == NIL, ::nStyle, nStyle ) ) ,"")
    METHOD Write( cFileName, nStyle )
 
    METHOD FindFirst( cName, cAttrib, cValue, cData )
@@ -455,6 +457,8 @@ Local nh, lNew, nAt, nAt2
    ::nLine := 1
    ::nNodeCount := 0
    ::cSignature := ""
+   ::nStyle := nStyle
+   
    nAt := nAt2 := 0
 
    lNew := .f.
@@ -560,16 +564,14 @@ Local fHandle, cHeader, lOK := .f., cFileName
      return .f.
   endif
 
-  if nStyle = NIL
-     nStyle := HBXML_STYLE_INDENT
-  endif
+  default nStyle to ::nStyle
+  default nStyle to HBXML_STYLE_INDENT
 
   cHeader := ::cHeader
 
-  if nStyle != HBXML_STYLE_NONEWLINE  .and. ! empty( cHeader )
+  if ! empty( cHeader ) .and. nStyle < HBXML_STYLE_NONEWLINE
      cHeader += hb_osnewline()
   endif
-
 
   if hb_isString( xFile )
 
@@ -648,6 +650,8 @@ Local cBOM
  if Asc( cBOM[1] ) = 239 .and. Asc( cBOM[2] ) = 187 .and. Asc( cBOM[3] ) = 191
     ::cSignature := cBOM
  endif
+
+ default nStyle to ::nStyle
 
  ::nStatus := HBXML_DATAREAD( Self, xData, nStyle )
 
