@@ -1,6 +1,6 @@
 
 /*
-* $Id: gtwvw.c,v 1.65 2010/05/02 23:06:22 lculik Exp $
+* $Id: gtwvw.c,v 1.66 2010/07/30 11:34:17 lculik Exp $
  */
 /*
  * GTWVW.C
@@ -9429,12 +9429,15 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
     {
       sprintf( szResname, "?%u", iresimage );
 
-      hbmpx = FindBitmapHandle(szResname, &iWidth, &iHeight);
+      //hbmpx = FindBitmapHandle(szResname, &iWidth, &iHeight);
+      hbmpx = FindBitmapHandle( MAKEINTRESOURCE( iresimage ) , &iWidth, &iHeight);
 
       if (!hbmpx)
       {
         hbmpx = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance,(LPCTSTR) MAKEINTRESOURCE( (WORD) iresimage ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
-        AddBitmapHandle(szResname, hbmpx, iWidth, iHeight);
+
+        AddBitmapHandle( szResname, hbmpx, iWidth, iHeight);
+     //   AddBitmapHandle(iPicture, hbmpx, iWidth, iHeight);
       }
     }
     else
@@ -9452,7 +9455,7 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
 
     if (hbmpx!=NULL)
      {
-        iPicture = FindPictureHandle(resname, &iWidth, &iHeight);
+        iPicture = FindPictureHandle(resname != NULL ? resname : MAKEINTRESOURCE( iresimage ), &iWidth, &iHeight);
 
         if (iPicture==NULL)
         {
@@ -9460,7 +9463,7 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
           picd.picType=PICTYPE_BITMAP;
           picd.bmp.hbitmap=hbmpx;
           OleCreatePictureIndirect(&picd,&IID_IPicture,TRUE,(LPVOID*) &iPicture);
-          AddPictureHandle(resname, iPicture, iWidth, iHeight);
+          AddPictureHandle(resname != NULL ? resname : szResname, iPicture, iWidth, iHeight);
         }
      }
     if (iPicture!=NULL)
@@ -9668,7 +9671,10 @@ HBITMAP FindBitmapHandle( const char * szFileName, int * piWidth, int * piHeight
 
 void AddBitmapHandle( const char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
 {
-  BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
+  BITMAP_HANDLE * pbhNew;// = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
+//  memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
+
+  pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
   memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
 
   strcpy(pbhNew->szFilename, szFileName);

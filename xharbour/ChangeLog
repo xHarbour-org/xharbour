@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6728 2010/08/31 01:41:21 andijahja Exp $
+ * $Id: ChangeLog,v 1.6729 2010/09/06 02:02:26 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-09-14 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * contrib/gtwvw/gtwvw.c
+    ! fixed rr_LoadPictureFromResource to correct load image from resource
+  * contrib/gtwvw/wvwdraw.c
+    + function WVW_SETGRIDPEN provided by Fabio Nery
+    
 2010-09-05 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/txml.prg
     ! fix to read/write xml on same style used in new method.  

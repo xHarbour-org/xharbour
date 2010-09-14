@@ -1,5 +1,5 @@
 /*
-* $Id: wvwdraw.c,v 1.2 2009/09/07 21:36:20 lculik Exp $
+* $Id: wvwdraw.c,v 1.3 2009/09/20 15:17:07 lculik Exp $
  */
 /*
  * WVWDRAW.C
@@ -1491,10 +1491,12 @@ HB_FUNC( WVW_DRAWIMAGE_RESOURCE )
    lImgWidth  = 0;
    lImgHeight = 0;
    iImgWidth  = 0;
-   iImgHeight = 0;   
+   iImgHeight = 0;
+
 
    if ( !ISNUM( 6 ) )
    {
+
      pPic = rr_LoadPictureFromResource(hb_parcx(6), 0, &lImgWidth, &lImgHeight);
 
      if (pPic == NULL)
@@ -1502,7 +1504,9 @@ HB_FUNC( WVW_DRAWIMAGE_RESOURCE )
    }
    else
    {
-     pPic = rr_LoadPictureFromResource(NULL, hb_parni(6), &lImgWidth, &lImgHeight);
+
+      pPic = rr_LoadPictureFromResource(NULL, hb_parni(6), &lImgWidth, &lImgHeight);
+
    }
 
 //   lImgWidth  = iImgWidth;
@@ -2855,3 +2859,51 @@ HB_FUNC( WVW_DRAWOUTLINEEX )
 
    hb_gt_wvwDrawOutline( usWinNum, iTop, iLeft, iBottom, iRight );
 }
+
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   Wvw_SetGridPen( nPenStyle, nWidth, nColor )                         */
+/*                                                                   */
+
+/* IMPORTANT: in prev release this functions has nWinNum parameter
+              PENs are now application-wide.
+ */
+ 
+HB_FUNC( WVW_SETGRIDPEN )
+{
+
+   int      iPenWidth, iPenStyle;
+   COLORREF crColor;
+   HPEN     hPen;
+   WVW_DATA *  p = hb_getWvwData();
+
+   if ( ISNIL( 1 ) )
+   {
+      hb_retl( FALSE );
+   }
+
+   iPenStyle = hb_parni( 1 ) ;
+   iPenWidth = ISNIL( 2 ) ? 0 : hb_parni( 2 );
+   crColor   = ISNIL( 3 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 3 );
+
+   hPen = CreatePen( iPenStyle, iPenWidth, crColor );
+
+   if ( hPen )
+   {
+
+      if ( p->s_sApp->gridPen )
+      {
+         DeleteObject( (HPEN) p->s_sApp->gridPen );
+      }
+
+      p->s_sApp->gridPen = hPen;
+
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
