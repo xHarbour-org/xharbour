@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.8 2009/08/16 21:32:52 lculik Exp $
+ * $Id: smtpcln.prg,v 1.9 2009/08/17 01:20:42 lculik Exp $
  */
 
 /*
@@ -123,8 +123,8 @@ METHOD Open( cUrl ) CLASS tIPClientSMTP
    ENDIF
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   IF .not. Empty ( ::oUrl:cUserid )
-      ::InetSendall( ::SocketCon, "HELO " +  ::oUrl:cUserid + ::cCRLF )
+   IF .not. Empty ( ::oUrl:cServer )
+      ::InetSendall( ::SocketCon, "HELO " +  ::oUrl:cServer + ::cCRLF )
    ELSE
       ::InetSendall( ::SocketCon, "HELO tipClientSMTP" + ::cCRLF )
    ENDIF
@@ -192,9 +192,9 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
 
-   cUser := ::oUrl:cUserid
+   cUser := ::oUrl:cServer
 
-   IF .not. Empty ( ::oUrl:cUserid )
+   IF .not. Empty ( ::oUrl:cServer )
       ::InetSendall( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
    ELSE
       ::InetSendall( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )

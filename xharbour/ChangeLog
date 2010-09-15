@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6729 2010/09/06 02:02:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.6730 2010/09/14 17:06:05 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-09-15 15:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/tip/smtpcln.prg
+    contrib/tipssl/smtpcln.prg
+    ! fixed ehlo  and helo, should send only server name, and no @
 
 2010-09-14 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * contrib/gtwvw/gtwvw.c
