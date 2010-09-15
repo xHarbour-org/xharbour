@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6730 2010/09/14 17:06:05 lculik Exp $
+ * $Id: ChangeLog,v 1.6731 2010/09/15 18:41:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2010-09-15 15:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+2010-09-15 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/smtpcln.prg
     contrib/tipssl/smtpcln.prg
     ! fixed ehlo  and helo, should send only server name, and no @
 
-2010-09-14 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+2010-09-14 22:55 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/gtwvw/gtwvw.c
     ! fixed rr_LoadPictureFromResource to correct load image from resource
   * contrib/gtwvw/wvwdraw.c
