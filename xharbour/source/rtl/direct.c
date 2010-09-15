@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.68 2009/09/30 16:20:04 marchuet Exp $
+ * $Id: direct.c,v 1.70 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -427,7 +427,7 @@ HB_FUNC( DIRECTORYRECURSE )
          if( fDirSpec->szDrive == NULL )
          {
             char szDrive[1];
-            szDrive[ 0 ] = ( char ) ( hb_fsCurDrv() + 'A' );
+            szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
             fDirSpec->szDrive = ( char * ) hb_szAscii[(UCHAR)szDrive[0]];
          }
          else
