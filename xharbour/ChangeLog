@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6732 2010/09/15 20:06:23 lculik Exp $
+ * $Id: ChangeLog,v 1.6733 2010/09/15 21:34:49 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-09-27 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/rdd_ads/ace32.c
+    # refresh note:
+      ace32.c is an effort to replace import lib ace32.lib, to enable users
+      to use different version of driver (ace32.dll) without the needs to
+      compile rddads.lib to match a specific driver version. in order to use
+      functions in ace32.c, we have to undef HB_NEEDS_ACE and link ace32.obj
+      to application or incorporate ace32.obj into rddads.lib. in building
+      rddads.lib, we may either define ADS_LIB_VERSION or not because this
+      constant is now checked in ace32.c.
+
+      some versions of ace32.dll do not work with Borland Compiler + ace32.c due
+      to unclear ADS internal error 5178 ie. 5990, 6900, 7002, 7005, 7100, 8000
+      while all other compilers work fine with ace32.c.
+
+      simple tests were made with ace32.dll version 2.60 up to 10.0 with good
+      results (except for BCC as mentioned earlier). compilers used in testing
+      are Digital Mars, OpenWatcom, MSVS 6-10, BCC55-63, MinGW, XCC, Intel C
+      and PellesC.
+
+      feed backs would be much appreciated as regression is highly possible.
+
+    ! updated to version 10.0.0.3 (hence, when compiling, must point to
+      appropriate version of ace.h)
+
+  + tests/apitest.prg
+    ! testing program for ADS APIs.
+
+  * contrib/rdd_ads/ads1.c
+    ! in static HB_ERRCODE adsFlush( ADSAREAP pArea ):
+      AdsFlushFileBuffers() exists in version higher than 600, hence:
+      #if ADS_LIB_VERSION >= 600  -> #if ADS_LIB_VERSION > 600
 
 2010-09-15 23:23 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\direct.c

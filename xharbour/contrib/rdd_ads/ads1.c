@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.153 2009/12/16 05:30:50 andijahja Exp $
+ * $Id: ads1.c,v 1.154 2010/01/07 15:18:38 ronpinkas Exp $
  */
 
 /*
@@ -1937,7 +1937,7 @@ static HB_ERRCODE adsFlush( ADSAREAP pArea )
    if( !pArea->fReadonly )
    {
       AdsWriteRecord( pArea->hTable );
-#if ADS_LIB_VERSION >= 600
+#if ADS_LIB_VERSION > 600
       if( hb_setGetL( HB_SET_HARDCOMMIT ) )
          AdsFlushFileBuffers( pArea->hTable );
 #endif
