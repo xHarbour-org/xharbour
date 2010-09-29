@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.12 2009/12/06 22:46:03 andijahja Exp $
+ * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /* pngrio.c - functions for data input

@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.12 2009/12/06 22:46:03 andijahja Exp $
+ * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /* pngset.c - storage of image information into info struct
@@ -142,7 +142,6 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
       png_warning(png_ptr, "Setting gamma=0");
 }
 #endif
-
 #ifdef __BORLANDC__
    #pragma option push -w-ccc -w-rch
 #endif

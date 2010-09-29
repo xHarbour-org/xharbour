@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.12 2009/12/06 22:46:03 andijahja Exp $
+ * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /* pngwrite.c - general routines to write a PNG file
@@ -508,7 +508,8 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #else
-   if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
+   if (setjmp(png_ptr->jmpbuf))
+   // if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
 #endif
 #ifdef USE_FAR_KEYWORD
    png_memcpy(png_jmpbuf(png_ptr), jmpbuf, png_sizeof(jmp_buf));

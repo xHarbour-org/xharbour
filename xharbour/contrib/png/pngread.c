@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.12 2009/12/06 22:46:03 andijahja Exp $
+ * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /* pngread.c - read a PNG file
@@ -90,7 +90,8 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #else
-   if (setjmp(png_jmpbuf(png_ptr))) /* Sets longjmp to match setjmp */
+   if (setjmp(png_ptr->jmpbuf))
+   // if (setjmp(png_jmpbuf(png_ptr))) /* Sets longjmp to match setjmp */
 #endif
       PNG_ABORT();
 #ifdef USE_FAR_KEYWORD

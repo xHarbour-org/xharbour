@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.12 2009/12/06 22:46:03 andijahja Exp $
+ * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
  */
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
@@ -676,5 +676,5 @@ png_get_user_transform_ptr(png_structp png_ptr)
 #endif
 }
 #endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
-	  PNG_WRITE_USER_TRANSFORM_SUPPORTED */
+          PNG_WRITE_USER_TRANSFORM_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
