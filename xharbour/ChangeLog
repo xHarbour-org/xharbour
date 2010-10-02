@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6736 2010/10/02 00:21:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.6737 2010/10/02 15:33:03 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,41 +8,45 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-10-03 03:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! corrected some typo in log entries
+
 2010-10-02 22:24 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/compress.c
   * source/rtl/zlib.h
-    ! carried forward the mossing previous xHarbour-modified version of
+    ! carried forward the missing previous xHarbour-modified version of
       compress() ie. to override the default compression level with user
       defined level.
 
 2010-10-02 05:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
-  * source/rtl/adler32.c
-  * source/rtl/compress.c
-  * source/rtl/crc32.c
-  * source/rtl/crc32.h
-  * source/rtl/deflate.c
-  * source/rtl/deflate.h
-  * source/rtl/gzio.c
-  * source/rtl/infback.c
-  * source/rtl/inffast.c
-  * source/rtl/inffast.h
-  * source/rtl/inffixed.h
-  * source/rtl/inflate.c
-  * source/rtl/inflate.h
-  * source/rtl/inftrees.c
-  * source/rtl/inftrees.h
-  * source/rtl/trees.c
-  * source/rtl/trees.h
-  * source/rtl/uncompr.c
-  * source/rtl/zconf.h
-  * source/rtl/zconf.in.h
-  * source/rtl/zlib.h
-  * source/rtl/zutil.c
-  * source/rtl/zutil.h
+  * source/rtl/zlib/adler32.c
+  * source/rtl/zlib/compress.c
+  * source/rtl/zlib/crc32.c
+  * source/rtl/zlib/crc32.h
+  * source/rtl/zlib/deflate.c
+  * source/rtl/zlib/deflate.h
+  * source/rtl/zlib/gzio.c
+  * source/rtl/zlib/infback.c
+  * source/rtl/zlib/inffast.c
+  * source/rtl/zlib/inffast.h
+  * source/rtl/zlib/inffixed.h
+  * source/rtl/zlib/inflate.c
+  * source/rtl/zlib/inflate.h
+  * source/rtl/zlib/inftrees.c
+  * source/rtl/zlib/inftrees.h
+  * source/rtl/zlib/trees.c
+  * source/rtl/zlib/trees.h
+  * source/rtl/zlib/uncompr.c
+  * source/rtl/zlib/zconf.h
+  * source/rtl/zlib/zconf.in.h
+  * source/rtl/zlib/zlib.h
+  * source/rtl/zlib/zutil.c
+  * source/rtl/zlib/zutil.h
     ! updated to version 1.2.5
     WARNING: BCC 6.2 users may not be able to compile this version because
     BCC32 failed on its back end engine when compiling deflate.c. Hence,
-    BCC 6.2 users should either stay with version 1.2.3 or used the DLL version.
+    BCC 6.2 users should either stay with version 1.2.3 or use the DLL version.
 
 2010-09-29 07:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
@@ -63,7 +67,7 @@
   * contrib/png/pngwrite.c
   * contrib/png/pngwtran.c
   * contrib/png/pngwutil.c
-    ! updated toversion 1.4.4
+    ! updated to version 1.4.4
 
 2010-09-27 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/rdd_ads/ace32.c
