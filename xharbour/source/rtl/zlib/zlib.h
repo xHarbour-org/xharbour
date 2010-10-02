@@ -1,5 +1,5 @@
 /*
- * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: zlib.h,v 1.2 2010/10/02 00:21:56 andijahja Exp $
  */
 
 /* zlib.h -- interface of the 'zlib' general purpose compression library
@@ -1104,7 +1104,7 @@ ZEXTERN uLong ZEXPORT zlibCompileFlags OF((void));
 */
 
 ZEXTERN int ZEXPORT compress OF((Bytef *dest,   uLongf *destLen,
-                                 const Bytef *source, uLong sourceLen));
+                                 const Bytef *source, uLong sourceLen, int level ));
 /*
      Compresses the source buffer into the destination buffer.  sourceLen is
    the byte length of the source buffer.  Upon entry, destLen is the total size

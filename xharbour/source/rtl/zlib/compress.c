@@ -1,5 +1,5 @@
 /*
- * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: compress.c,v 1.2 2010/10/02 00:21:56 andijahja Exp $
  */
 
 /* compress.c -- compress a memory buffer
@@ -7,7 +7,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: compress.c,v 1.2 2010/10/02 00:21:56 andijahja Exp $ */
 
 #define ZLIB_INTERNAL
 #include "zlib.h"
@@ -67,9 +67,11 @@ int ZEXPORT compress (
     Bytef *dest,
     uLongf *destLen,
     const Bytef *source,
-    uLong sourceLen )
+    uLong sourceLen,
+    int iLevel )
 {
-    return compress2(dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION);
+    return compress2(dest, destLen, source, sourceLen, iLevel );
+    // return compress2(dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION);
 }
 
 /* ===========================================================================

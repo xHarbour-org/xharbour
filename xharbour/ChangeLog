@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6735 2010/09/29 00:27:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.6736 2010/10/02 00:21:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-10-02 22:24 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/compress.c
+  * source/rtl/zlib.h
+    ! carried forward the mossing previous xHarbour-modified version of
+      compress() ie. to override the default compression level with user
+      defined level.
 
 2010-10-02 05:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/adler32.c
