@@ -1,9 +1,9 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /* uncompr.c -- decompress a memory buffer
- * Copyright (C) 1995-2003 Jean-loup Gailly.
+ * Copyright (C) 1995-2003, 2010 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -20,8 +20,6 @@
    been saved previously by the compressor and transmitted to the decompressor
    by some mechanism outside the scope of this compression library.)
    Upon exit, destLen is the actual size of the compressed buffer.
-     This function can be used to decompress a whole file at once if the
-   input file is mmap'ed.
 
      uncompress returns Z_OK if success, Z_MEM_ERROR if there was not
    enough memory, Z_BUF_ERROR if there was not enough room in the output

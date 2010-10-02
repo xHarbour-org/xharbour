@@ -1,5 +1,9 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ */
+
+/*
+ * $Id: zconf.in.h,v 1.1 2008/04/14 06:06:23 andijahja Exp $
  */
 
 /* zconf.h -- configuration of the zlib compression library
@@ -7,7 +11,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: zconf.in.h,v 1.1 2008/04/14 06:06:23 andijahja Exp $ */
 
 #ifndef ZCONF_H
 #define ZCONF_H

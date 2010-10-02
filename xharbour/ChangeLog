@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6734 2010/09/27 11:44:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.6735 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-10-02 05:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/adler32.c
+  * source/rtl/compress.c
+  * source/rtl/crc32.c
+  * source/rtl/crc32.h
+  * source/rtl/deflate.c
+  * source/rtl/deflate.h
+  * source/rtl/gzio.c
+  * source/rtl/infback.c
+  * source/rtl/inffast.c
+  * source/rtl/inffast.h
+  * source/rtl/inffixed.h
+  * source/rtl/inflate.c
+  * source/rtl/inflate.h
+  * source/rtl/inftrees.c
+  * source/rtl/inftrees.h
+  * source/rtl/trees.c
+  * source/rtl/trees.h
+  * source/rtl/uncompr.c
+  * source/rtl/zconf.h
+  * source/rtl/zconf.in.h
+  * source/rtl/zlib.h
+  * source/rtl/zutil.c
+  * source/rtl/zutil.h
+    ! updated to version 1.2.5
+    WARNING: BCC 6.2 users may not be able to compile this version because
+    BCC32 failed on its back end engine when compiling deflate.c. Hence,
+    BCC 6.2 users should either stay with version 1.2.3 or used the DLL version.
 
 2010-09-29 07:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c

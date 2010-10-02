@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.c,v 1.0 2008/04/13 12:00:00 andijahja Exp $
+ * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
  */
 
 /* crc32.h -- tables for rapid CRC calculation
