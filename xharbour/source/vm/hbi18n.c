@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.29 2009/09/30 16:20:22 marchuet Exp $
+ * $Id: hbi18n.c,v 1.31 2009/12/31 00:15:48 andijahja Exp $
  */
 
 /*
@@ -259,7 +259,7 @@ PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
 {
    PHB_ITEM pRet;
    HB_I18N_TAB_HEADER header;
-   int nRead;
+   USHORT nRead;
 
    nRead = hb_fsRead( handle, (BYTE * ) &header, sizeof( header ) );
    if ( nRead != sizeof( header ) )
@@ -290,7 +290,7 @@ PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
 BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader )
 {
    HB_I18N_TAB_HEADER header;
-   int nWrite;
+   USHORT nWrite;
 
    // strncopy prevents gpf
    hb_strncpy( header.signature, hb_arrayGetCPtr( pHeader, 1 ), sizeof(header.signature));

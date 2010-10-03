@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.8 2009/11/09 09:39:06 marchuet Exp $  */
+/*  $Id: hbip.c,v 1.10 2009/12/31 02:55:05 andijahja Exp $  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support
@@ -746,7 +746,7 @@ HB_FUNC( HB_IPSERVER )
    iListen = ISNUM( 3 ) ? hb_parni( 3 ) : 10;
 
    hSocket = hb_ipServer( iPort, szAddress, iListen );
-   if( hSocket != -1 )
+   if( hSocket != ( HB_SOCKET_T ) -1 )
       hb_retnl( hSocket );
    else
       hb_ret();
@@ -767,7 +767,7 @@ HB_FUNC( HB_IPACCEPT )
    }
 
    incoming = hb_ipAccept( hSocket, timeout, szAddr, &lPort );
-   if( incoming == -1 )
+   if( incoming == ( HB_SOCKET_T ) -1 )
       hb_ret();
    else
    {
