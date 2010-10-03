@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.46 2010/02/02 19:12:34 ronpinkas Exp $
+ * $Id: hbstr.c,v 1.47 2010/02/02 21:26:50 ronpinkas Exp $
  */
 
 /*
@@ -697,8 +697,8 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       {
         char szSuffix[3];
 
-        szSuffix[0] = toupper( szNum[ ulPos ] );
-        szSuffix[1] = toupper( szNum[ ulPos + 1 ] );
+        szSuffix[0] = ( char ) toupper( szNum[ ulPos ] );
+        szSuffix[1] = ( char ) toupper( szNum[ ulPos + 1 ] );
         szSuffix[2] = '\0';
 
         if( strstr( "LULL", szSuffix ) ) //LU UL or LL
@@ -710,9 +710,9 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       {
         char szSuffix[4];
 
-        szSuffix[0] = toupper( szNum[ ulPos ] );
-        szSuffix[1] = toupper( szNum[ ulPos + 1 ] );
-        szSuffix[2] = toupper( szNum[ ulPos + 2 ] );
+        szSuffix[0] = ( char ) toupper( szNum[ ulPos ] );
+        szSuffix[1] = ( char ) toupper( szNum[ ulPos + 1 ] );
+        szSuffix[2] = ( char ) toupper( szNum[ ulPos + 2 ] );
         szSuffix[3] = '\0';
 
         if( strncmp( szSuffix, "LLU", 3 ) == 0 || strncmp( szSuffix, "ULL", 3 ) == 0 )

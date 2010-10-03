@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.22 2009/11/09 09:38:58 marchuet Exp $
+ * $Id: hbdate.c,v 1.23 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -314,7 +314,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 7 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_d = TRUE;
                break;
@@ -348,7 +348,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 5 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_m = TRUE;
                break;
@@ -383,13 +383,13 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 3 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_y = TRUE;
                break;
 
             default:
-               while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = digit;
+               while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
          }
       }
    }
@@ -486,7 +486,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 1 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_h = TRUE;
                break;
@@ -512,7 +512,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 3 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_m = TRUE;
                break;
@@ -533,7 +533,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 5 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_s = TRUE;
                break;
@@ -570,19 +570,19 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ digit_c ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
+                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_c = TRUE;
                break;
             }
 
             case 'P':
-               szFormattedTime[ format_count ] = digit;
+               szFormattedTime[ format_count ] = ( char ) digit;
                pos_pm = format_count++;
                break;
 
             default:
-               while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
+               while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
          }
       }
       if( used_pm && pos_h >= 0 )
