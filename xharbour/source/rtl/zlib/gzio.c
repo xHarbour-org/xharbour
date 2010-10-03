@@ -1,5 +1,5 @@
 /*
- * $Id: gzio.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id: gzio.c,v 1.2 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /* gzio.c -- IO on .gz files
@@ -9,9 +9,10 @@
  * Compile this file with -DNO_GZCOMPRESS to avoid the compression code.
  */
 
-/* @(#) $Id: gzio.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $ */
+/* @(#) $Id: gzio.c,v 1.2 2009/12/31 02:55:05 andijahja Exp $ */
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "zutil.h"
 #include "hbapi.h"
