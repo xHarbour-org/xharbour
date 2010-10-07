@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6741 2010/10/03 14:50:25 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6742 2010/10/07 13:36:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2010-10-07 23:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\errorapi.c
+    * Pacified warning unreachable code in function hb_errLaunch()
 
 2010-10-07 09:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/zlib/zutil.h

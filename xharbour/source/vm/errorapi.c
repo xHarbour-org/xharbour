@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.104 2010/05/20 07:48:41 marchuet Exp $
+ * $Id: errorapi.c,v 1.105 2010/05/20 14:20:58 marchuet Exp $
  */
 
 /*
@@ -984,6 +984,8 @@ USHORT hb_errLaunch( PHB_ITEM pError )
              hb_itemRelease( pResult );
          }
 
+         uiAction = E_BREAK;
+
          /* Allow other threads to go */
          #if defined( HB_THREAD_SUPPORT )
             hb_itemRelease( pError );
@@ -993,8 +995,6 @@ USHORT hb_errLaunch( PHB_ITEM pError )
             hb_threadIdleEnd();
             exit( hb_vmQuit() );
          #endif
-
-         uiAction = E_BREAK;
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
