@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6740 2010/10/03 13:02:26 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6741 2010/10/03 14:50:25 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2010-10-07 09:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rtl/zlib/zutil.h
+    * xCC does not support fdopen
 
 2010-10-03 15:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\hbi18n.c
@@ -131,10 +136,10 @@
     ! fixed rr_LoadPictureFromResource to correct load image from resource
   * contrib/gtwvw/wvwdraw.c
     + function WVW_SETGRIDPEN provided by Fabio Nery
-    
+
 2010-09-05 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/txml.prg
-    ! fix to read/write xml on same style used in new method.  
+    ! fix to read/write xml on same style used in new method.
 
 2010-08-31 08:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h
@@ -149,7 +154,7 @@
 2010-08-28 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/hbzlib/zip.c
     ! fixed hb_zipfilebytdspan
-    
+
 2010-08-17 11:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/win2prn.prg
     * fix compiling error.
@@ -160,7 +165,7 @@
 
   * source/rtl/txml.prg
     ! fixed to not duplicate "<?xml" header after using of HBXML_TYPE_PI
-      type node named "xml" under root element.                   
+      type node named "xml" under root element.
 
   * include/win2prn.ch
     * added some color defines.
@@ -241,7 +246,7 @@
     ! fixed problem when windows is moved bellow windows task bar
   * contrib/gtwvw/hbgtwvw.h
     ! added nome new fields to structure
-    
+
 2010-07-29 12:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbapi.h
   * source/rtl/regex.c
