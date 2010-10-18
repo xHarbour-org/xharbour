@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.43 2009/11/09 09:39:06 marchuet Exp $
+ * $Id: hbffind.c,v 1.44 2009/12/31 02:55:05 andijahja Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.43 2009/11/09 09:39:06 marchuet Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.44 2009/12/31 02:55:05 andijahja Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -458,6 +458,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    USHORT lSec;
 
    ULONG  raw_attr;
+   BOOL   bIsLink = FALSE;
 
    /* Set the default values in case some platforms don't
       support some of these, or they may fail on them. */
@@ -582,9 +583,9 @@ static void hb_fsFindFill( PHB_FFIND ffind )
 #elif defined(HB_OS_UNIX)
    {
 #if defined( HB_USE_LARGEFILE64 )
-            struct stat64 sStat;
+      struct stat64 sStat;
 #else
-            struct stat sStat;
+      struct stat sStat;
 #endif
 
       //struct stat sStat;
@@ -597,11 +598,19 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       hb_strncat( szFindFile, info->entry->d_name, sizeof( szFindFile ) - 1 );
 
 #if defined( HB_USE_LARGEFILE64 )
-
-      stat64( szFindFile, &sStat )  ;
+      lstat64( szFindFile, &sStat );
+      if( S_ISLNK( sStat.st_mode ) )
+      {
+         stat64( szFindFile, &sStat );
+         bIsLink = TRUE;
+      }
 #else
-
-      stat( szFindFile, &sStat );
+      lstat( szFindFile, &sStat );
+      if( S_ISLNK( sStat.st_mode ) )
+      {
+         stat( szFindFile, &sStat );
+         bIsLink = TRUE;
+      }
 #endif
 
       ffind->size = sStat.st_size;
@@ -643,6 +652,12 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    ffind->szName[ HB_PATH_MAX - 1 ] = '\0';
 
    ffind->attr = hb_fsAttrFromRaw( raw_attr );
+   if( bIsLink )
+   {
+      /* LINK attribute is missing since attributes are taken from
+         destination file. */
+      ffind->attr |= HB_FA_REPARSE;
+   }
 
    ffind->lDate = hb_dateEncode( lYear, lMonth, lDay );
    hb_dateStrPut( ffind->szDate, lYear, lMonth, lDay );

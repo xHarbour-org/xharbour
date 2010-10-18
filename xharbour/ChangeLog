@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6742 2010/10/07 13:36:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6743 2010/10/07 21:03:21 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-10-18 00:14 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/hbffind.c
+    * Added "L" attribute (under LINUX) to symlynk files
+      on DIRECTORY() function (it's overriden with destination
+      file's attributes).
 
 2010-10-07 23:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
