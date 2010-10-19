@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.8 2009/10/05 14:41:41 marchuet Exp $
+ * $Id: redbfcdx1.c,v 1.9 2009/12/16 05:32:21 andijahja Exp $
  */
 
 /*
@@ -8410,6 +8410,10 @@ static HB_ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO
         }
         hb_itemPutL( pInfo->itmResult, pTag->Template );
         break;
+
+      case DBOI_TEMPORARY:
+         pInfo->itmResult = hb_itemPutL( pInfo->itmResult, pTag && pTag->Temporary );
+         break;
 
       case DBOI_MULTIKEY:
         if( hb_itemGetL( pInfo->itmNewVal ) )

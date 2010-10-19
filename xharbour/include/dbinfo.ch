@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.32 2009/05/22 15:49:00 marchuet Exp $
+ * $Id: dbinfo.ch,v 1.33 2010/05/20 07:48:40 marchuet Exp $
  */
 
 /*
@@ -206,6 +206,7 @@
 #define DBOI_RELKEYPOS          130  /* get/set relative key position (in range 0 - 1) */
 #define DBOI_USECURRENT         131  /* get/set "use current index" flag */
 #define DBOI_INDEXTYPE          132  /* current index type */
+#define DBOI_TEMPORARY          133  /* is index open in temporary mode */
 
 /* return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

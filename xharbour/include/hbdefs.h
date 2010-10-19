@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.115 2009/12/31 02:55:05 andijahja Exp $
+ * $Id: hbdefs.h,v 1.116 2009/12/31 04:12:30 andijahja Exp $
  */
 
 /*
@@ -384,13 +384,13 @@
      typedef LONG          INT64;
 #  endif
 #  if !defined( UINT64_MAX )
-#    define UINT64_MAX    ULONG_MAX
+#     define UINT64_MAX    ULONG_MAX
 #  endif
 #  if !defined( INT64_MAX )
-#    define INT64_MAX     LONG_MAX
+#     define INT64_MAX     LONG_MAX
 #  endif
 #  if !defined( INT64_MIN )
-#    define INT64_MIN     LONG_MIN
+#     define INT64_MIN     LONG_MIN
 #  endif
 #elif !defined( HB_LONG_LONG_OFF )
 #  if !defined( UINT64 )
@@ -400,13 +400,13 @@
      typedef LONGLONG      INT64;
 #  endif
 #  if !defined( UINT64_MAX )
-#    define UINT64_MAX     ULONGLONG_MAX
+#     define UINT64_MAX     ULONGLONG_MAX
 #  endif
 #  if !defined( INT64_MAX )
-#    define INT64_MAX      LONGLONG_MAX
+#     define INT64_MAX      LONGLONG_MAX
 #  endif
 #  if !defined( INT64_MIN )
-#    define INT64_MIN      LONGLONG_MIN
+#     define INT64_MIN      LONGLONG_MIN
 #  endif
 #endif
 
@@ -636,7 +636,6 @@ typedef unsigned long HB_COUNTER;
 #  endif
 
 #endif
-
 
 #define HB_MAX( a, b )          ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
 #define HB_MIN( a, b )          ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )

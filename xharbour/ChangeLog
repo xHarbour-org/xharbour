@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6743 2010/10/07 21:03:21 enricomaria Exp $
+ * $Id: ChangeLog,v 1.6744 2010/10/18 05:20:03 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-10-19 13:24 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * include\dbinfo.ch
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\bmdbfcdx\redbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbffpt\dbffpt1.c
+  * source\rtl\filenet.c
+    * Added DBOI_TEMPORARY as 133  /* is index open in temporary mode */
+    * Undo hb_snprintf because don't work at the sme way as sprintf, and
+      client-server don't runs properly.
 
 2010-10-18 00:14 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/hbffind.c
