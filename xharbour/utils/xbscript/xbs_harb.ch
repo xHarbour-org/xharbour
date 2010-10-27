@@ -95,7 +95,7 @@
        METHOD LoadFiveWin()      INLINE PP_LoadFw()
      #endif
 
-     #if defined( __CONCILE_PCODE__ ) || defined( DYN )
+     #if defined( DYN ) /* defined( __CONCILE_PCODE__ ) */
         DESTRUCTOR Finalize()
      #endif
 
@@ -113,11 +113,13 @@
 
   //----------------------------------------------------------------------------//
   // Destructor!
-  #if defined( __CONCILE_PCODE__ ) || defined( DYN )
+  #if defined( DYN ) /* || defined( __CONCILE_PCODE__ ) */
+
+      // __CONCILE_PCODE__ has global release logic by means of s_hDynFuncLists
 
       PROCEDURE Finalize() CLASS TInterpreter
 
-         //TraceLog( ::nId, ::cName )
+         //TraceLog( ::nId, ::cName, ::pDynList )
 
          IF ::pDynList != NIL
             PP_ReleaseDynProcedures( 0, ::pDynList )
@@ -351,10 +353,17 @@
     RETURN xRet
 
     //----------------------------------------------------------------------------//
-    #ifdef DYN
+    #if defined( __CONCILE_PCODE__ ) /* || defined( DYN ) */
+
       EXIT PROCEDURE PP_Cleanup()
+         LOCAL ohDynFuncLists
+
          //TraceLog( "Exit" )
-         PP_ReleaseDynProcedures( 0 )
+
+         FOR EACH ohDynFuncLists IN s_hDynFuncLists
+            //TraceLog( ohDynFuncLists:Key, ohDynFuncLists:Value )
+            PP_ReleaseDynProcedures( 0, ohDynFuncLists:Value )
+         NEXT
       RETURN
     #endif
 
@@ -2021,6 +2030,7 @@
       {
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
          size_t iLeading = 0;
+         const char *szValue = pLine->item.asString.value;
 
          if( pLine == NULL || pLine->item.asString.length == 0 )
          {
@@ -2030,14 +2040,14 @@
             return;
          }
 
-         while( pLine->item.asString.value[iLeading] == ' ' )
+         while( szValue[iLeading] == ' ' )
          {
             iLeading++;
          }
 
          // MUST be FIRST, before manipulation below
          // The leading spaces.
-         hb_retclen( pLine->item.asString.value, iLeading );
+         hb_retclen( szValue, iLeading );
          //printf( "Returned EXTRACTed: '%s'\n", hb_parc(-1) );
 
          // MUST be SECOND, before manipulation below
@@ -2047,8 +2057,8 @@
          if( iLeading )
          {
             // The string following the spaces.
-            //printf( "BYREF Pure: '%s'\n", pLine->item.asString.value + iLeading );
-            hb_storclen( pLine->item.asString.value + iLeading, pLine->item.asString.length - iLeading, 1 );
+            //printf( "BYREF Pure: '%s'\n", szValue + iLeading );
+            hb_storclen( szValue + iLeading, pLine->item.asString.length - iLeading, 1 );
          }
       }
 

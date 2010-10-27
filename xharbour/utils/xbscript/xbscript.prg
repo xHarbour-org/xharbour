@@ -370,7 +370,9 @@
 
 #endif
 
-#ifndef __CONCILE_PCODE__
+#ifdef __CONCILE_PCODE__
+   STATIC s_hDynFuncLists := Hash()
+#else
    STATIC s_aProc
 #endif
 
@@ -488,7 +490,9 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #define PP_CONTEXT_bDbgPPO                64
 
 #ifdef __CONCILE_PCODE__
-   #define PP_CONTEXT_SIZE                   64
+   #define PP_CONTEXT_hDynFuncLists          65
+
+   #define PP_CONTEXT_SIZE                   65
 #else
    #define PP_CONTEXT_aProc                  65
 
@@ -923,6 +927,12 @@ STATIC FUNCTION PP_InitContext()
    aPPContext[ PP_CONTEXT_bDbgExp ] := .F.
    aPPContext[ PP_CONTEXT_bDbgPPO ] := .F.
 
+   #ifdef __CONCILE_PCODE__
+      aPPContext[ PP_CONTEXT_hDynFuncLists ] := Hash()
+   #else
+      aPPContext[ PP_CONTEXT_aProc ] := NIL
+   #endif
+
 RETURN aPPContext
 
 //--------------------------------------------------------------//
@@ -996,7 +1006,6 @@ RETURN
 
      STATIC s_aProcsContainer := {}
 
-     LOCAL s_hDynFuncLists := Hash()
      LOCAL aProcedure
      LOCAL cID := CStr( HB_ArrayID( aProcedures ) )
 
@@ -1024,6 +1033,8 @@ RETURN
      PP_GenDynProcedures( aProcedures, nDynOffset, @pDynFunctions )
 
      s_hDynFuncLists[ cID ] := pDynFunctions
+
+     //TraceLog( s_hDynFuncLists[ cID ], cID, pDynFunctions )
 
   RETURN pDynFunctions
 
@@ -1247,7 +1258,7 @@ RETURN
 
               ELSEIF sLine = "PP__OTHERWISE"
 
-                 IF aFlow[-1][1] == "C"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "C"
                     SetFlowDefault( aProcedure, nLine )
                  ELSE
                     Throw( ErrorNew( [PP], 0, 2031, [Parse], [OTHERWISE does not match DO CASE], { nLine, sLine } ) )
@@ -1258,7 +1269,7 @@ RETURN
 
               ELSEIF sLine = "PP__DEFAULT"
 
-                 IF aFlow[-1][1] == "S"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "S"
                     SetFlowDefault( aProcedure, nLine )
                  ELSE
                     Throw( ErrorNew( [PP], 0, 2031, [Parse], [DEFAULT does not match SWITCH], { nLine, sLine } ) )
@@ -1269,7 +1280,7 @@ RETURN
 
               ELSEIF sLine = "PP__ENDCASE"
 
-                 IF aFlow[-1][1] == "C"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "C"
                     FinalizeFlow( aProcedure, nLine )
                  ELSE
                     Throw( ErrorNew( [PP], 0, 2030, [Parse], [ENDCASE with no DO CASE in sight!], { nLine, sLine } ) )
@@ -1336,7 +1347,7 @@ RETURN
 
               ELSEIF sLine = "PP__NEXT"
 
-                 IF aFlow[-1][1] == "F"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "F"
                     FinalizeFor( aProcedure, nLine )
                  ELSEIF aFlow[-1][1] == "E"
                     FinalizeForEach( aProcedure, nLine )
@@ -1349,7 +1360,7 @@ RETURN
 
               ELSEIF sLine = "PP__ENDDO"
 
-                 IF aFlow[-1][1] == "W"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "W"
                     FinalizeWhile( aProcedure, nLine )
                  ELSE
                     Throw( ErrorNew( [PP], 0, 2028, [Parse], [ENDDO does not match WHILE], { nLine, sLine } ) )
@@ -1370,7 +1381,7 @@ RETURN
 
               ELSEIF sLine = "PP__RECOVER" //PP_RECOVER USING ...
 
-                 IF aFlow[-1][1] == "B"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "B"
                     sUsing  := LTrim( SubStr( sLine, 13 ) )
 
                     SetRecover( aProcedure, nLine, sUsing )
@@ -1387,7 +1398,7 @@ RETURN
 
               ELSEIF sLine = "PP__CATCH"
 
-                 IF aFlow[-1][1] == "T"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "T"
                     sCatcher := LTrim( SubStr( sLine, 11 ) )
 
                     SetCatch( aProcedure, nLine, sCatcher )
@@ -1400,7 +1411,7 @@ RETURN
 
               ELSEIF sLine = "PP__FINALLY"
 
-                 IF aFlow[-1][1] == "T"
+                 IF aFlow[-1] != NIL .AND. aFlow[-1][1] == "T"
                     SetFinally( aProcedure, nLine )
                  ELSE
                     Throw( ErrorNew( [PP], 0, 2046, [Parse], [FINALLY with no TRY in sight!], { nLine, sLine } ) )
@@ -4471,11 +4482,11 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
       BEGIN SEQUENCE
          PP_PreProFile( cFile, sPPOExt, bBlanks )
       RECOVER USING x
-         IF x:ClassName == "ERROR"
-            Eval( s_bRTEBlock, x )
-         ELSE
+         //IF x:ClassName == "ERROR"
+         //   Eval( s_bRTEBlock, x )
+         //ELSE
             Break( x )
-         ENDIF
+         //ENDIF
       END SEQUENCE
 
       ErrorBlock( bErrorHandler )
@@ -4897,7 +4908,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    LOCAL nLen, nMaxPos, cChar := '', nClose, nNext, nLine := 0
    LOCAL sRight, nPath := 0, nPaths := Len( s_asPaths ), nNewLine
    LOCAL sPath := "", oError, sPrevFile := s_sFile
-   LOCAL sTmp, nLastPosition := 0
+   LOCAL sTmp
    LOCAL lMaintainPending
 
    s_bRTEBlock := s_bDefRTEBlock
@@ -4981,24 +4992,25 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
          nPosition := 1
          nMaxPos   := nLen - 1
 
-         //TraceLog( "***", nLen, nMaxPos, sBuffer )
+         //TraceLog( "***", nLen, nMaxPos, Left( sBuffer, nLen ) )
 
          WHILE nPosition < nMaxPos .OR. SubStr( sBuffer, nPosition, 1 ) == Chr(10)
 
              cPrev := cChar
              cChar := SubStr( sBuffer, nPosition, 1 )
 
-             //TraceLog( nPosition, nMaxPos, sBuffer, cChar, cPrev )
+             //TraceLog( nPosition, nMaxPos, Left( sBuffer, nLen ), cChar, cPrev )
 
              DO CASE
                 CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '*' )
                    nPosition++
 
+                   sTmp := NIL
                    WHILE .T.
                       nClose := At( "*/", sBuffer, nPosition + 1 )
 
-                      IF nClose == 0
-                         nNext := nPosition + 2
+                      IF nClose == 0 .OR. nClose > nMaxPos
+                         nNext := nPosition + 1
                          WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0
                             nLine++
                             IF bCount
@@ -5013,17 +5025,20 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                             ENDIF
 
                             nNext++
+                            nPosition := nNext
                          ENDDO
 
-                         //FSeek( hSource, -1, 1 )
+                         sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
                             Break( ErrorNew( [PP], 0, 2083, [Pre-Process], [Unterminated /* */ comment], { sLine, nLine } ) )
                          ENDIF
 
+                         sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         //TraceLog( "***" )
-                         nPosition := 0
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nNext := nPosition + 1
@@ -5054,15 +5069,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0
-                         //FSeek( hSource, -1, 1 )
+                      IF nClose == 0 .OR. nClose > nMaxPos
+                         sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
                             BREAK "//"
                          ENDIF
+
+                         sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         //TraceLog( "***" )
-                         nPosition := 0
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose -= nPosition
@@ -5129,14 +5147,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0
-                         //FSeek( hSource, -1, 1 )
+                      IF nClose == 0 .OR. nClose > nMaxPos
+                         sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
                             BREAK "&&"
                          ENDIF
+
+                         sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         nPosition := 0
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose -= nPosition
@@ -5171,17 +5193,22 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
                 CASE ( cChar == '*' )
                    IF LTrim( sLine ) == ''
+                      sTmp := NIL
                       WHILE .T.
                          nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                         IF nClose == 0
-                            //FSeek( hSource, -1, 1 )
+                         IF nClose == 0 .OR. nClose > nMaxPos
+                            sTmp := SubStr( sBuffer, nPosition + 1 )
                             nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                             IF nLen < 2
                                BREAK "*"
                             ENDIF
+
+                            sBuffer   := sTmp + sBuffer
+                            nLen      += Len( sTmp )
                             nMaxPos   := nLen - 1
-                            nPosition := 1
+                            nPosition := Len( sTmp )
+
                             LOOP
                          ELSE
                             nClose -= nPosition
@@ -5195,7 +5222,17 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                                   aAdd( aPendingLines, "" )
                                ENDIF
                             ENDIF
-                            nPosition += ( nClose )
+
+                            /*
+                            IF sTmp == NIL
+                               sLine += SubStr( sBuffer, nPosition, nClose - 1 )
+                            ELSE
+                               sLine += Left( sBuffer, nClose - 1 )
+                            ENDIF
+                            TraceLog( "Dropped: '" + sLine + "'" )
+                            */
+
+                            nPosition += ( nClose - 1 )
                             sLine := ''
                             cChar := ''
                             EXIT
@@ -5208,14 +5245,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0
-                         //FSeek( hSource, -1, 1 )
+                      IF nClose == 0 .OR. nClose > nMaxPos
+                         sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
                             BREAK "#!"
                          ENDIF
+
+                         sBuffer   := sTmp + sBuffer
+                         nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         nPosition := 1
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose -= nPosition
@@ -5237,7 +5278,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    ENDDO
              #endif
 
-                CASE ( cChar == '"' )
+              CASE ( cChar == '"' )
+                   sTmp := NIL
                    WHILE .T.
                       nClose := At( '"', sBuffer, nPosition + 1 )
                       nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
@@ -5246,43 +5288,56 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          EXIT
                       ENDIF
 
-                      IF nClose == 0
+                      IF nClose == 0 .OR. nClose > nMaxPos
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         nPosition := 1
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose    -= nPosition
-                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         IF sTmp == NIL
+                            sLine += SubStr( sBuffer, nPosition, nClose )
+                         ELSE
+                            sLine += Left( sBuffer, nClose )
+                         ENDIF
                          nPosition += ( nClose )
+
                          EXIT
                       ENDIF
                    ENDDO
 
-                CASE ( cChar == "'" )
+              CASE ( cChar == "'" )
+                   sTmp := NIL
                    WHILE .T.
                       nClose   := At( "'", sBuffer, nPosition + 1 )
                       nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nMaxPos .OR. nClose > nNewLine )
                          EXIT
                       ENDIF
 
-                      IF nClose == 0
+                      IF nClose == 0 .OR. nClose > nMaxPos
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         nPosition := 1
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose    -= nPosition
-                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         IF sTmp == NIL
+                            sLine += SubStr( sBuffer, nPosition, nClose )
+                         ELSE
+                            sLine += Left( sBuffer, nClose )
+                         ENDIF
                          nPosition += ( nClose )
+
                          EXIT
                       ENDIF
                    ENDDO
@@ -5294,26 +5349,33 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       LOOP
                    ENDIF
 
+                   sTmp := NIL
                    WHILE .T.
                       nClose   := At( ']', sBuffer, nPosition + 1 )
                       nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nMaxPos .OR. nClose > nNewLine )
                          EXIT
                       ENDIF
 
-                      IF nClose == 0
+                      IF nClose == 0 .OR. nClose > nMaxPos
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
-                         nPosition := 1
+                         nPosition := Len( sTmp )
+
                          LOOP
                       ELSE
                          nClose    -= nPosition
-                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         IF sTmp == NIL
+                            sLine += SubStr( sBuffer, nPosition, nClose )
+                         ELSE
+                            sLine += Left( sBuffer, nClose )
+                         ENDIF
                          nPosition += ( nClose )
+
                          EXIT
                       ENDIF
                    ENDDO
@@ -6251,17 +6313,19 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    FOR Counter := 1 TO nLines
       //? Counter, asOutLines[Counter]
       //WAIT
-       sOut += asOutLines[Counter]
-       IF Counter < nLines
-          sOut += ' ;'
-       ENDIF
+      sOut += asOutLines[Counter]
+      IF Counter < nLines
+         sOut += ' ;'
+      ENDIF
    NEXT
 
+   /*
    IF ! Empty( sOut )
-      //? "Returning: " + sOut
-      //WAIT
-      //TraceLog( sOut )
+      ? "Returning: " + sOut
+      WAIT
+      TraceLog( sOut )
    ENDIF
+   */
 
    IF bCompile
       PP_CompileLine( sOut, nLine, s_aProcedures, s_aInitExit, @s_nProcId )

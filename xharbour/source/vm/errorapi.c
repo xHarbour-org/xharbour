@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.105 2010/05/20 14:20:58 marchuet Exp $
+ * $Id: errorapi.c,v 1.106 2010/10/07 21:03:21 enricomaria Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ HB_FUNC_STATIC( CARGO )
 HB_FUNC_STATIC( _CARGO )
 {
    HB_THREAD_STUB
-   
+
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
    if( pItem )
@@ -688,7 +688,7 @@ HB_FUNC( ERRORNEW )
    }
    if ( ISARRAY( 6 ) )
    {
-      hb_errPutArgsArray( pError, hb_itemParam( 6 ) );
+      hb_errPutArgsArray( pError, hb_param( 6, HB_IT_ARRAY ) );
    }
    if ( ISCHAR( 7 ) )
    {

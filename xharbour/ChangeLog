@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6744 2010/10/18 05:20:03 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6745 2010/10/19 11:28:07 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-10-27 13:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/vm/errorapi.c
+    ! Fixed memory leak in HB_FUNC( ERRORNEW ) when aArgs is passed
+
+  * utils/xbscript/xbscript.prg
+    ! Fixed memory leak related to dynamic procedures when __CONCILE_PCODE__ is defined
+    ! Fixed error in detection of invalid syntax in ParseLinePCode()
+    ! Fixed redundant error raising in PP_Run()
+    ! Fixed pre-processing of Strings and Comments which overlap the current file read buffer
+  * utils/xbscript/xbs_harb.ch
+    ! Fixed memory leak related to dynamic procedures when __CONCILE_PCODE__ is defined
+    % Minor optimization in HB_FUNC( EXTRACTLEADINGWS )
 
 2010-10-19 13:24 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * include\dbinfo.ch
