@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6745 2010/10/19 11:28:07 marchuet Exp $
+ * $Id: ChangeLog,v 1.6746 2010/10/27 18:37:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-11-03 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tgetlist.prg
+    ! fixed lValid to false on GetPostValidate() method when returned value by 
+    Eval() function is not logical.
 
 2010-10-27 13:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/vm/errorapi.c

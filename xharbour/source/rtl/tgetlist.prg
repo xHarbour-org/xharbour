@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.49 2009/06/03 00:09:09 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.50 2010/03/30 12:54:41 modalsist Exp $
  */
 
 /*
@@ -725,6 +725,10 @@ METHOD GetPostValidate() CLASS HBGetList
 #else
       lValid := Eval( oGet:PostBlock, oGet )
 #endif
+
+      if valtype(lValid ) != "L"
+         lValid := .f.
+      endif
 
       SetPos( oGet:Row, oGet:Col )
 
