@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.39 2009/09/30 16:19:36 marchuet Exp $
+ * $Id: sdf1.c,v 1.40 2009/12/16 05:32:21 andijahja Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ static HB_ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
       if( uiEolPos )
       {
          --uiEolPos;
-         if( uiRead == pArea->uiRecordLen + pArea->uiEolLen )
+         if( uiEolPos == pArea->uiRecordLen && uiRead == pArea->uiRecordLen + pArea->uiEolLen )
             pArea->ulNextOffset = ( HB_FOFFSET ) -1;
          else
             pArea->ulNextOffset = pArea->ulRecordOffset + uiEolPos + pArea->uiEolLen;
@@ -179,7 +179,7 @@ static HB_ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
             if( uiEolPos )
             {
                --uiEolPos;
-               if( uiRead == pArea->uiRecordLen + pArea->uiEolLen )
+               if( uiEolPos == pArea->uiRecordLen && uiRead == pArea->uiRecordLen + pArea->uiEolLen )
                   pArea->ulNextOffset = ( HB_FOFFSET ) -1;
                else
                   pArea->ulNextOffset = ulOffset + uiEolPos + pArea->uiEolLen;
