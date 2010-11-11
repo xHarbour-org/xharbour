@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.34 2009/05/18 10:29:46 marchuet Exp $
+ * $Id: std.ch,v 1.35 2009/10/22 16:29:28 enricomaria Exp $
  */
 
 /*
@@ -274,11 +274,12 @@
 #command RELEASE ALL LIKE <p>          => __MVRelease( #<p>, .t. )
 #command RELEASE ALL EXCEPT <p>        => __MVRelease( #<p>, .f. )
 #command RESTORE [FROM <(f)>] [<a:ADDITIVE>] [<b:EXTENDED>] => __MVRestore( <(f)>, <.a.> ,<.b.>)
-#command SAVE TO <(f)> [<b:EXTENDED>]   ALL LIKE <(p)>     => __MVSave( <(f)>, <(p)>, .t. ,<.b.>)
+#command SAVE TO <(f)> ALL LIKE <(p)>   [<b:EXTENDED>]   => __MVSave( <(f)>, <(p)>, .t. ,<.b.>)
+#command SAVE TO <(f)> [<b:EXTENDED>]   ALL LIKE <(p)>   => __MVSave( <(f)>, <(p)>, .t. ,<.b.>)
 #command SAVE ALL LIKE <(p)> TO <(f)>   [<b:EXTENDED>]   => __MVSave( <(f)>, <(p)>, .t. ,<.b.>)
-#command SAVE ALL EXCEPT <(p)> TO <(f)> [<b:EXTENDED>]  => __MVSave( <(f)>, <(p)>, .f. ,<.b.>)
-#command SAVE TO <(f)> [<b:EXTENDED>]  ALL EXCEPT <(p)>   => __MVSave( <(f)>, <(p)>, .f. ,<.b.>)
-#command SAVE [TO <(f)>] [ALL]      [<b:EXTENDED>]    => __MVSave( <(f)>, "*", .t. ,<.b.>)
+#command SAVE ALL EXCEPT <(p)> TO <(f)> [<b:EXTENDED>]   => __MVSave( <(f)>, <(p)>, .f. ,<.b.>)
+#command SAVE TO <(f)> [<b:EXTENDED>]   ALL EXCEPT <(p)> => __MVSave( <(f)>, <(p)>, .f. ,<.b.>)
+#command SAVE [TO <(f)>] [ALL]          [<b:EXTENDED>]   => __MVSave( <(f)>, "*", .t. ,<.b.>)
 
 #command ERASE <(f)>                   => FErase( <(f)> )
 #command DELETE FILE <(f)>             => FErase( <(f)> )

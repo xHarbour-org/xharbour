@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6747 2010/11/03 12:14:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.6748 2010/11/09 00:56:10 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-11-11 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/std.ch
+    + add command for:
+       SAVE TO memfile ALL LIKE "skleton*" EXTENDED
 
 2010-11-08 19:02 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rdd/sdf1.c
