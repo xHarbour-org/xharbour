@@ -4989,6 +4989,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    BEGIN SEQUENCE
 
       WHILE ( nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE ) ) > 2
+         sBuffer := Left( sBuffer, nLen )
          nPosition := 1
          nMaxPos   := nLen - 1
 
@@ -5009,7 +5010,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( "*/", sBuffer, nPosition + 1 )
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          nNext := nPosition + 1
                          WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0
                             nLine++
@@ -5030,6 +5031,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
                          sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          IF nLen < 2
                             Break( ErrorNew( [PP], 0, 2083, [Pre-Process], [Unterminated /* */ comment], { sLine, nLine } ) )
                          ENDIF
@@ -5069,9 +5072,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          IF nLen < 2
                             BREAK "//"
                          ENDIF
@@ -5134,9 +5139,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                                ENDIF
                             ENDIF
 
-                            nPosition += ( nClose )
+                            nPosition += nClose
                             sLine := ''
                             cChar := ''
+
                             EXIT
                          ENDIF
                       ENDIF
@@ -5147,9 +5153,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          IF nLen < 2
                             BREAK "&&"
                          ENDIF
@@ -5163,9 +5171,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       ELSE
                          nClose -= nPosition
                          nLine++
+
                          IF bCount
                             @ Row(), 0 SAY nLine
                          ENDIF
+
                          IF LTrim( sLine ) == ''
                             IF bBlanks
                                FWrite( hPP, CRLF )
@@ -5184,9 +5194,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                                ENDIF
                             ENDIF
                          ENDIF
-                         nPosition += ( nClose )
+
+                         nPosition += nClose
                          sLine := ''
                          cChar := ''
+
                          EXIT
                       ENDIF
                    ENDDO
@@ -5197,9 +5209,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       WHILE .T.
                          nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                         IF nClose == 0 .OR. nClose > nMaxPos
+                         IF nClose == 0
                             sTmp := SubStr( sBuffer, nPosition + 1 )
                             nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                            sBuffer := Left( sBuffer, nLen )
+
                             IF nLen < 2
                                BREAK "*"
                             ENDIF
@@ -5213,9 +5227,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          ELSE
                             nClose -= nPosition
                             nLine++
+
                             IF bCount
                                @ Row(), 0 SAY nLine
                             ENDIF
+
                             IF bBlanks
                                FWrite( hPP, CRLF )
                                IF lMaintainPending
@@ -5232,9 +5248,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                             TraceLog( "Dropped: '" + sLine + "'" )
                             */
 
-                            nPosition += ( nClose - 1 )
+                            nPosition += nClose
                             sLine := ''
                             cChar := ''
+
                             EXIT
                          ENDIF
                       ENDDO
@@ -5245,9 +5262,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp := SubStr( sBuffer, nPosition )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          IF nLen < 2
                             BREAK "#!"
                          ENDIF
@@ -5261,18 +5280,22 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       ELSE
                          nClose -= nPosition
                          nLine++
+
                          IF bCount
                             @ Row(), 0 SAY nLine
                          ENDIF
+
                          IF bBlanks
                             FWrite( hPP, CRLF )
                             IF lMaintainPending
                                aAdd( aPendingLines, "" )
                             ENDIF
                          ENDIF
-                         nPosition += ( nClose )
+
+                         nPosition += nClose
                          sLine := ''
                          cChar := ''
+
                          EXIT
                       ENDIF
                    ENDDO
@@ -5288,9 +5311,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          EXIT
                       ENDIF
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer   := Left( sBuffer, nLen )
+
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
@@ -5298,13 +5323,13 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
                          LOOP
                       ELSE
-                         nClose    -= nPosition
+                         nClose -= nPosition
                          IF sTmp == NIL
                             sLine += SubStr( sBuffer, nPosition, nClose )
                          ELSE
                             sLine += Left( sBuffer, nClose )
                          ENDIF
-                         nPosition += ( nClose )
+                         nPosition += nClose
 
                          EXIT
                       ENDIF
@@ -5316,13 +5341,15 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       nClose   := At( "'", sBuffer, nPosition + 1 )
                       nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nMaxPos .OR. nClose > nNewLine )
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
                          EXIT
                       ENDIF
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
@@ -5336,7 +5363,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          ELSE
                             sLine += Left( sBuffer, nClose )
                          ENDIF
-                         nPosition += ( nClose )
+                         nPosition += nClose
 
                          EXIT
                       ENDIF
@@ -5354,13 +5381,15 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                       nClose   := At( ']', sBuffer, nPosition + 1 )
                       nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nMaxPos .OR. nClose > nNewLine )
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
                          EXIT
                       ENDIF
 
-                      IF nClose == 0 .OR. nClose > nMaxPos
+                      IF nClose == 0
                          sTmp      := SubStr( sBuffer, nPosition )
                          nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer := Left( sBuffer, nLen )
+
                          sBuffer   := sTmp + sBuffer
                          nLen      += Len( sTmp )
                          nMaxPos   := nLen - 1
@@ -5368,13 +5397,13 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
                          LOOP
                       ELSE
-                         nClose    -= nPosition
+                         nClose -= nPosition
                          IF sTmp == NIL
                             sLine += SubStr( sBuffer, nPosition, nClose )
                          ELSE
                             sLine += Left( sBuffer, nClose )
                          ENDIF
-                         nPosition += ( nClose )
+                         nPosition += nClose
 
                          EXIT
                       ENDIF
@@ -5440,6 +5469,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                             ENDIF
                          ENDIF
                       ENDIF
+
                       sLine := ''
                       cChar := ''
                    ENDIF

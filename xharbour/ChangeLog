@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6748 2010/11/09 00:56:10 guerra000 Exp $
+ * $Id: ChangeLog,v 1.6749 2010/11/11 00:04:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-11-12 16:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+    * Corrected typo causing double line counting of lines commented with "*" (introduced in last commit).
+    * Refinment of last fix to searches extending beyond the current buffer.
 
 2010-11-11 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/std.ch
@@ -19,7 +23,7 @@
 
 2010-11-03 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tgetlist.prg
-    ! fixed lValid to false on GetPostValidate() method when returned value by 
+    ! fixed lValid to false on GetPostValidate() method when returned value by
     Eval() function is not logical.
 
 2010-10-27 13:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
