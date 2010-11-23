@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6750 2010/11/12 21:04:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6751 2010/11/23 01:29:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,8 +12,8 @@
 2010-11-22 20:50 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/regex.c
     ! Fixed long standing bug when nStart argument is specified (was not calculating the offset
-      when returning the found substring, and nStart
-    + Added support for negative values for nStart and nEnd for compatability with At()
+      when returning the found substring, and nStart)
+    + Added support for negative values for nStart and nEnd for compatibility with At()
 
 2010-11-12 16:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * utils/xbscript/xbscript.prg
