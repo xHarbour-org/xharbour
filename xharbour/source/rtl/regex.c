@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.69 2010/08/10 12:37:23 andijahja Exp $
+ * $Id: regex.c,v 1.70 2010/08/12 01:45:42 andijahja Exp $
  */
 
 /*
@@ -679,20 +679,86 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   ULONG ulStart = hb_parnl(4), ulEnd = hb_parnl(5);
+   LONG lStart = hb_parnl(4), lEnd = hb_parnl(5);
 
-   if( pRegEx && pString && ulStart <= pString->item.asString.length )
+   if( pRegEx && pString && lStart <= pString->item.asString.length )
    {
       pReg = hb_getregex( pRegEx,
                           pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
                           FALSE, &fFree );
       if( pReg )
       {
-         if( ulStart || ulEnd )
+         /* Validate and convert to ZERO based */
+         if( lStart > 0 )
+         {
+            lStart--;
+         }
+         else if( lStart < 0 )
+         {
+            lStart += pString->item.asString.length - 1;
+
+            if( lStart < 0 )
+            {
+               lStart = 0;
+            }
+         }
+
+         /* Validate and convert to ZERO based */
+         if( lEnd > 0 )
+         {
+            lEnd--;
+
+            if( lEnd > pString->item.asString.length )
+            {
+               lEnd = lStart ? pString->item.asString.length : 0;
+            }
+         }
+         else if( lEnd < 0 )
+         {
+            lEnd += pString->item.asString.length;
+
+            /* Let it fail for: lStart > lEnd
+            if( lEnd < 0 )
+            {
+               lEnd = lStart ? pString->item.asString.length : 0;
+            }
+            */
+         }
+         else
+         {
+            if( lStart )
+            {
+               lEnd = pString->item.asString.length;
+            }
+         }
+
+         if( lStart > lEnd )
+         {
+            if( fFree )
+            {
+              hb_freeregex( pReg );
+            }
+
+            if( hb_pcount() > 3 )
+            {
+               hb_stornl( 0, 4 );
+            }
+
+            if( hb_pcount() > 4 )
+            {
+               hb_stornl( 0, 5 );
+            }
+
+            return;
+         }
+
+         /* lEnd ALWAYS set if lStart is set*/
+         if( /*lStart ||*/ lEnd )
          {
             EFlags |= REG_STARTEND;
-            aMatches[0].rm_so = ulStart > 1 ? ulStart - 1 : 0;
-            aMatches[0].rm_eo = ulEnd > 0 && ulEnd < pString->item.asString.length ? ulEnd : pString->item.asString.length;
+
+            aMatches[0].rm_so = lStart;
+            aMatches[0].rm_eo = lEnd;
          }
 
          if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
@@ -701,7 +767,7 @@ HB_FUNC( HB_ATX )
 
             if( hb_pcount() > 3 )
             {
-               hb_stornl( aMatches[0].rm_so + 1, 4 );
+               hb_stornl( aMatches[0].rm_so + 1 + lStart, 4 );
             }
 
             if( hb_pcount() > 4 )
@@ -709,16 +775,20 @@ HB_FUNC( HB_ATX )
                hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
             }
 
-            hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
+            hb_retclen( pString->item.asString.value + aMatches[0].rm_so + lStart, ulLen );
 
             if( fFree )
+            {
                hb_freeregex( pReg );
+            }
 
             return;
          }
 
          if( fFree )
+         {
             hb_freeregex( pReg );
+         }
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6749 2010/11/11 00:04:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.6750 2010/11/12 21:04:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2010-11-22 20:50 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rtl/regex.c
+    ! Fixed long standing bug when nStart argument is specified (was not calculating the offset
+      when returning the found substring, and nStart
+    + Added support for negative values for nStart and nEnd for compatability with At()
+
 2010-11-12 16:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * utils/xbscript/xbscript.prg
     * Corrected typo causing double line counting of lines commented with "*" (introduced in last commit).
-    * Refinment of last fix to searches extending beyond the current buffer.
+    * Refinement of last fix to searches extending beyond the current buffer.
 
 2010-11-11 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/std.ch
