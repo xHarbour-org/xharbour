@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.22 2009/06/29 19:20:49 enricomaria Exp $
+ * $Id: client.prg,v 1.1 2009/08/09 17:28:07 lculik Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ METHOD New( oUrl, lTrace, oCredentials, lSSL, CAFile,CaPath ) CLASS tIPClient
       oUrl := tUrl():New( oUrl )
    ENDIF
 
-   IF .NOT. oURL:cProto IN "ftp,http,pop,smtp,https"
+   IF .NOT. oURL:cProto IN "ftp,http,pop,smtp,https,nntp,news,imap"
       oErr := ErrorNew()
       oErr:Args          := { Self, oURL:cProto }
       oErr:CanDefault    := .F.
@@ -215,8 +215,7 @@ METHOD New( oUrl, lTrace, oCredentials, lSSL, CAFile,CaPath ) CLASS tIPClient
    ::nLastRead    := 0
    ::bEof         := .F.
    ::lTrace       := lTrace
-   if oUrl:nPort == 995 .or.  oUrl:nPort == 465 .or.  oUrl:nPort == 587 .or. lower(oUrl:cProto) == "https" .or. lSSL
-      Tracelog("Estou Aqui")
+   if oUrl:nPort == 995 .or.  oUrl:nPort == 465 .or.  oUrl:nPort == 587 .or. lower(oUrl:cProto) == "https"  .or. lSSL .or. lower(oUrl:cProto) == "imap" .or. lower(oUrl:cProto) == "ftps"
       ::lSSL := .T.
       SSL_INIT()
       INITSSLRANDFILE()
@@ -651,15 +650,15 @@ Return Nil
 /* Methods to manage buffers */
 METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
    IF ! Empty( nSizeBuff )
-      InetSetRcvBufSize( SocketCon, nSizeBuff )
+      INETSSLSETRCVBUFSIZE( SocketCon, nSizeBuff )
    ENDIF
-RETURN InetGetRcvBufSize( SocketCon )
+RETURN INETSSLGETRCVBUFSIZE( SocketCon )
 
 METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
    IF ! Empty( nSizeBuff )
-      InetSetSndBufSize( SocketCon, nSizeBuff )
+      INETSSLSETSNDBUFSIZE( SocketCon, nSizeBuff )
    ENDIF
-RETURN InetGetSndBufSize( SocketCon )
+RETURN INETSSLGETSNDBUFSIZE( SocketCon )
 
 /* Called from another method with list of parameters and, as last parameter, return code
    of function being logged.
@@ -764,7 +763,7 @@ HB_SYMBOL_UNUSED( dwTimeout )
 WHILE bMoreDataToRead
   
    szResponse := space(1)
-   nData := inetRecv(::SocketCon,@szResponse, 1)
+   nData := ::inetRecv( ::SocketCon, @szResponse, 1)
    IF (nData == 0)
       throw(Errornew("INETCONNECTPROXY" ,0,4000,Procname(),"Disconnected"))
    ENDIF 

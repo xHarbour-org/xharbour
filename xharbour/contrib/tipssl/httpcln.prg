@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.10 2008/06/27 15:59:35 marchuet Exp $
+ * $Id: httpcln.prg,v 1.1 2009/08/09 17:28:07 lculik Exp $
  */
 
 /*
@@ -92,11 +92,11 @@ HIDDEN:
 
 ENDCLASS
 
-METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientHTTP
+METHOD New( oUrl,lTrace, oCredentials, CAFile,CaPath ) CLASS tIPClientHTTP
    local cFile := "httpcln"
    local n := 0
 
-   ::super:new( oUrl, lTrace, oCredentials )
+   ::super:new( oUrl, lTrace, oCredentials,, CAFile,CaPath  )
    if ::oUrl:cProto  == "https"
       ::nDefaultPort := 443
    else
