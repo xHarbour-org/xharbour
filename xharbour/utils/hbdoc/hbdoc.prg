@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.14 2009/02/13 16:12:24 ronpinkas Exp $
+ * $Id: hbdoc.prg,v 1.15 2009/12/03 04:42:32 andijahja Exp $
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2009/02/13 16:12:24 $
- * Revision..: $Revision: 1.14 $
+ * Date......: $Date: 2009/12/03 04:42:32 $
+ * Revision..: $Revision: 1.15 $
  * Log file..: $Logfile:     $
  *
  *
@@ -275,7 +275,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    IF cLinkName = NIL
       outstd( "xHarbour Doc Extractor"+ hb_osnewline() )
-      outstd( "Copyright 1999-2010, http://www.xharbour.org"+ hb_osnewline() )
+      outstd( "Copyright 1999-2011, http://www.xharbour.org"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
       outstd( "Syntax:  hbdoc [options] <linkname> [<ifile>]"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
