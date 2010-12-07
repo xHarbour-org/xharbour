@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.25 2009/09/30 16:20:23 marchuet Exp $
+ * $Id: hbpp.c,v 1.26 2009/12/03 04:42:33 andijahja Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 #include "hbppdef.h"
 #include "hbcomp.h"
 #include "hbset.h"
+#include "pragma.h"
 
 extern int hb_pp_ParseDefine( char * );
 
@@ -116,7 +117,7 @@ int main( int argc, char * argv[] )
 
   printf( "xHarbour Preprocessor %d.%d.%d\n",
      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION );
-  printf( "Copyright 1999-2010, http://www.xharbour.org\n" );
+  printf( "Copyright 1999-2011, http://www.xharbour.org\n" );
 
   hb_pp_Table();
   stdef = hb_pp_topDefine;
