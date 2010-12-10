@@ -1,7 +1,6 @@
 /*
- * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: config.h,v 1.14 2010/08/31 01:41:21 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -153,6 +152,7 @@ static const int eint[] = {
   REG_BADPAT,  /* different names for subpatterns of the same number are not allowed */
   REG_BADPAT,  /* (*MARK) must have an argument */
   REG_INVARG,  /* this version of PCRE is not compiled with PCRE_UCP support */
+  REG_BADPAT,  /* \c must be followed by an ASCII character */
 };
 
 /* Table of texts corresponding to POSIX error codes */

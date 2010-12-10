@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6752 2010/11/23 01:31:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.6753 2010/12/07 03:07:10 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-12-10 20:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/pcre_printint.src
+  * source/rtl/pcre/ucp.h
+  * source/rtl/pcre/config.h
+  * source/rtl/pcre/ucpinternal.h
+  * source/rtl/pcre/ucptable.h
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre.h
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/pcre.h.generic
+  * source/rtl/pcre/config.h.generic
+  * source/rtl/pcre/pcre_chartables.c.dist
+  * source/rtl/pcre/pcre_chartables.c
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_xclass.c
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_newline.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_ucd.c
+  * source/rtl/pcre/pcre_ucp_searchfuncs.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+    ! updated to version 8.11
+    WARNING: DMC users may not be able to use this version because the compiler
+    would fail upon compiling pcre_exec.c (out of memory error). Hence DMC users
+    should stay with version 8.10 until DMC developer fix the bug.
 
 2010-12-07 10:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/hbusage.c

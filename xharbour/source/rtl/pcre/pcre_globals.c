@@ -1,7 +1,6 @@
 /*
- * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: config.h,v 1.14 2010/08/31 01:41:21 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -57,7 +56,6 @@ Also, when compiling for Virtual Pascal, things are done differently, and
 global variables are not used. */
 
 #include "config.h"
-
 #include "pcre_internal.h"
 
 #if defined _MSC_VER || defined  __SYMBIAN32__

@@ -1,7 +1,6 @@
 /*
- * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: config.h,v 1.14 2010/08/31 01:41:21 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -47,7 +46,6 @@ supporting functions. */
 
 
 #include "config.h"
-
 #include "pcre_internal.h"
 
 #define SET_BIT(c) start_bits[c/8] |= (1 << (c&7))
@@ -421,8 +419,11 @@ for (;;)
     case OP_MARK:
     case OP_PRUNE_ARG:
     case OP_SKIP_ARG:
-    case OP_THEN_ARG:
     cc += _pcre_OP_lengths[op] + cc[1];
+    break;
+
+    case OP_THEN_ARG:
+    cc += _pcre_OP_lengths[op] + cc[1+LINK_SIZE];
     break;
 
     /* For the record, these are the opcodes that are matched by "default":

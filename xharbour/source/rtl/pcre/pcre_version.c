@@ -1,7 +1,6 @@
 /*
- * $Id: pcre_compile.c,v 1.11 2009/10/20 05:37:22 andijahja Exp $
+ * $Id: config.h,v 1.14 2010/08/31 01:41:21 andijahja Exp $
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -47,7 +46,6 @@ string that identifies the PCRE version that is in use. */
 
 
 #include "config.h"
-
 #include "pcre_internal.h"
 
 
