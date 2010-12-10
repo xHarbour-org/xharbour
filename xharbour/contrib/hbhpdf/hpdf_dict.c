@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_dict.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -147,7 +146,7 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
         if (dict->filter == HPDF_STREAM_FILTER_NONE)
             HPDF_Dict_RemoveElement (dict, "Filter");
         else {
-            HPDF_Array array = (HPDF_Array) HPDF_Dict_GetItem (dict, "Filter",
+            HPDF_Array array = (HPDF_Array)HPDF_Dict_GetItem (dict, "Filter",
                         HPDF_OCLASS_ARRAY);
 
             if (!array) {
@@ -162,10 +161,10 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
 
             HPDF_Array_Clear (array);
 
-#ifndef HPDF_NOZLIB
+#ifndef LIBHPDF_HAVE_NOZLIB
             if (dict->filter & HPDF_STREAM_FILTER_FLATE_DECODE)
                 HPDF_Array_AddName (array, "FlateDecode");
-#endif /* HPDF_NOZLIB */
+#endif /* LIBHPDF_HAVE_NOZLIB */
 
             if (dict->filter & HPDF_STREAM_FILTER_DCT_DECODE)
                 HPDF_Array_AddName (array, "DCTDecode");
@@ -227,7 +226,7 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
                     0);
         }
 
-        if ((ret = HPDF_Stream_WriteStr (stream, "\012stream\015\012"))
+        if ((ret = HPDF_Stream_WriteStr (stream, "\012stream\015\012")) /* Acrobat 8.15 requires both \r and \n here */
                 != HPDF_OK)
             return ret;
 
@@ -405,7 +404,7 @@ HPDF_Dict_GetItem  (HPDF_Dict        dict,
         HPDF_Obj_Header *header = (HPDF_Obj_Header *)element->value;
 
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = (HPDF_Proxy) element->value;
+            HPDF_Proxy p = (HPDF_Proxy)element->value;
             header = (HPDF_Obj_Header *)p->obj;
             obj = p->obj;
         } else
@@ -480,7 +479,7 @@ HPDF_Dict_GetKeyByObj (HPDF_Dict  dict,
 
         header = (HPDF_Obj_Header *)(element->value);
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = (HPDF_Proxy) element->value;
+            HPDF_Proxy p = (HPDF_Proxy)element->value;
 
             if (p->obj == obj)
                 return element->key;

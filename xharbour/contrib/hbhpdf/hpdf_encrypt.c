@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_encryor.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -193,6 +192,9 @@ HPDF_MD5Final  (HPDF_BYTE              digest[16],
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
+#if defined(__BORLANDC__) 
+#pragma option push -w-prc
+#endif 
 static void
 MD5Transform  (HPDF_UINT32       buf[4],
                const HPDF_UINT32 in[16])
@@ -278,7 +280,6 @@ MD5Transform  (HPDF_UINT32       buf[4],
     buf[3] += d;
 }
 
-
 static void
 MD5ByteReverse  (HPDF_BYTE    *buf,
                  HPDF_UINT32  longs)
@@ -293,6 +294,10 @@ MD5ByteReverse  (HPDF_BYTE    *buf,
     }
     while (--longs);
 }
+
+#if defined(__BORLANDC__) 
+#pragma option pop
+#endif
 
 /*----- encrypt-obj ---------------------------------------------------------*/
 
@@ -372,7 +377,7 @@ HPDF_Encrypt_CreateOwnerKey  (HPDF_Encrypt  attr)
         for (i = 0; i < 50; i++) {
             HPDF_MD5Init(&md5_ctx);
 
-            //HPDF_MD5Update (&md5_ctx, digest, HPDF_MD5_KEY_LEN);
+            /* HPDF_MD5Update (&md5_ctx, digest, HPDF_MD5_KEY_LEN); */
             HPDF_MD5Update (&md5_ctx, digest, attr->key_len);
             HPDF_MD5Final(digest, &md5_ctx);
 
@@ -521,7 +526,7 @@ HPDF_Encrypt_CreateUserKey  (HPDF_Encrypt  attr)
 }
 
 
-void
+static void
 ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
                         const HPDF_BYTE    *key,
                         HPDF_UINT          key_len)
@@ -553,7 +558,7 @@ ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
 }
 
 
-void
+static void
 ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
                            const HPDF_BYTE    *in,
                            HPDF_BYTE          *out,

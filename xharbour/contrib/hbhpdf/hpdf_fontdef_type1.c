@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_fontdef_type1.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -72,21 +71,18 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     if (!mmgr)
         return NULL;
 
-    fontdef = (HPDF_FontDef) HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
+    fontdef = (HPDF_FontDef)HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
     if (!fontdef)
         return NULL;
 
+    HPDF_MemSet (fontdef, 0, sizeof (HPDF_FontDef_Rec));
     fontdef->sig_bytes = HPDF_FONTDEF_SIG_BYTES;
-    fontdef->base_font[0] = 0;
     fontdef->mmgr = mmgr;
     fontdef->error = mmgr->error;
     fontdef->type = HPDF_FONTDEF_TYPE_TYPE1;
-    fontdef->clean_fn = NULL;
     fontdef->free_fn = FreeFunc;
-    fontdef->descriptor = NULL;
-    fontdef->valid = HPDF_FALSE;
 
-    fontdef_attr = (HPDF_Type1FontDefAttr) HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
+    fontdef_attr = (HPDF_Type1FontDefAttr)HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
     if (!fontdef_attr) {
         HPDF_FreeMem (fontdef->mmgr, fontdef);
         return NULL;
@@ -113,7 +109,7 @@ GetKeyword  (const char  *src,
 
     *keyword = 0;
 
-    while (len > 0) {
+    while (len > 1) {
         if (HPDF_IS_WHITE_SPACE(*src)) {
             *keyword = 0;
 
@@ -191,7 +187,7 @@ LoadAfm (HPDF_FontDef  fontdef,
             HPDF_UINT len = HPDF_StrLen (s, HPDF_LIMIT_MAX_STRING_LEN);
 
             if (len > 0) {
-                attr->char_set = (char *) HPDF_GetMem (fontdef->mmgr, len + 1);
+                attr->char_set = (char*)HPDF_GetMem (fontdef->mmgr, len + 1);
                 if (!attr->char_set)
                     return HPDF_Error_GetCode (fontdef->error);
 
@@ -431,8 +427,8 @@ HPDF_Type1FontDef_Duplicate  (HPDF_MMgr     mmgr,
     fontdef->type = src->type;
     fontdef->valid = src->valid;
 
-    // copy data of attr,widths
-    // attention to charset
+    /* copy data of attr,widths
+     attention to charset */
     return NULL;
 }
 

@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_font_cid.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -104,7 +103,7 @@ HPDF_Type0Font_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    attr = (HPDF_FontAttr) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -931,7 +930,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->code_space_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->code_space_range,
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec*)HPDF_List_ItemAt (attr->code_space_range,
                         i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
@@ -956,7 +955,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->notdef_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->notdef_range, i);
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec*)HPDF_List_ItemAt (attr->notdef_range, i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
         *pbuf++ = ' ';
@@ -987,7 +986,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->cmap_range->count; i++) {
-        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec *) HPDF_List_ItemAt (attr->cmap_range, i);
+        HPDF_CidRange_Rec *range = (HPDF_CidRange_Rec*)HPDF_List_ItemAt (attr->cmap_range, i);
 
         pbuf = UINT16ToHex (buf, range->from, eptr);
         *pbuf++ = ' ';

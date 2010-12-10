@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_font_tt.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -92,7 +91,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    attr = (HPDF_FontAttr) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -121,7 +120,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
      * initialized at 0, and set when the corresponding character was used
      * for the first time.
      */
-    attr->widths = (HPDF_INT16 *) HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
+    attr->widths = (HPDF_INT16*)HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
     if (!attr->widths) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -129,7 +128,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
 
     HPDF_MemSet (attr->widths, 0, sizeof(HPDF_INT16) * 256);
 
-    attr->used = (HPDF_BYTE *) HPDF_GetMem (mmgr, sizeof(HPDF_BYTE) * 256);
+    attr->used = (HPDF_BYTE*)HPDF_GetMem (mmgr, sizeof(HPDF_BYTE) * 256);
     if (!attr->used) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -251,7 +250,7 @@ CharWidth (HPDF_Font  font,
 }
 
 
-HPDF_TextWidth
+static HPDF_TextWidth
 TextWidth  (HPDF_Font         font,
             const HPDF_BYTE  *text,
             HPDF_UINT         len)
@@ -287,7 +286,7 @@ TextWidth  (HPDF_Font         font,
 }
 
 
-HPDF_UINT
+static HPDF_UINT
 MeasureText (HPDF_Font          font,
              const HPDF_BYTE   *text,
              HPDF_UINT          len,

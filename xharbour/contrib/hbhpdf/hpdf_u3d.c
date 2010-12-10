@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_u3d.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -24,21 +23,6 @@
 
 #include <string.h>
 
-#ifndef M_PI        
-#define M_PI        3.14159265358979323846
-#endif
-
-
-/* AJ: 2008-09-06
-   Some compilers eg Borland CPP, OpenWatcom 1.7e does not have sqrtf
-*/    
-#if ( defined(__BORLANDC__) || defined(__WATCOMC__) )
-static float sqrtf(float _X)
-{
-	 return ((float)sqrt((double)_X));
-}	  
-#endif
-
 HPDF_U3D
 HPDF_U3D_LoadU3D  (HPDF_MMgr        mmgr,
 				   HPDF_Stream      u3d_data,
@@ -46,6 +30,10 @@ HPDF_U3D_LoadU3D  (HPDF_MMgr        mmgr,
 
 static const char u3d[] = "U3D";
 static const char prc[] = "PRC";
+
+#ifndef M_PI
+#define M_PI       3.14159265358979323846
+#endif
 
 static HPDF_STATUS Get3DStreamType (HPDF_Stream  stream, const char **type)
 {
@@ -564,7 +552,7 @@ HPDF_EXPORT(HPDF_STATUS) HPDF_3DView_SetOrthogonalProjection(HPDF_Dict view, HPD
 #define normalize(x, y, z)		\
 {					\
 	HPDF_REAL modulo;			\
-	modulo = sqrtf(x*x + y*y + z*z);	\
+	modulo = (float)sqrt((float)(x*x) + (float)(y*y) + (float)(z*z));	\
 	if (modulo != 0.0)			\
 	{					\
 		x = x/modulo;			\
@@ -730,6 +718,52 @@ failed:
 		return ret;
 	}
 	return ret;
+}
+
+HPDF_Dict HPDF_3DView_New( HPDF_MMgr  mmgr, HPDF_Xref  xref, HPDF_U3D u3d, const char *name)
+{
+	HPDF_STATUS ret = HPDF_OK;
+	HPDF_Dict view;
+
+	HPDF_PTRACE ((" HPDF_3DView_New\n"));
+
+	if (name == NULL || name[0] == '\0') { 
+		return NULL;
+	}
+
+	view = HPDF_Dict_New (mmgr);
+	if (!view) {
+		return NULL;
+	}
+
+	if (HPDF_Xref_Add (xref, view) != HPDF_OK)
+        return NULL;
+
+	ret = HPDF_Dict_AddName (view, "TYPE", "3DView");
+	if (ret != HPDF_OK) {
+		HPDF_Dict_Free (view);
+		return NULL;
+	}
+	
+	ret = HPDF_Dict_Add (view, "XN", HPDF_String_New (mmgr, name, NULL));
+	if (ret != HPDF_OK) {
+		HPDF_Dict_Free (view);
+		return NULL;
+	}
+
+	ret = HPDF_Dict_Add (view, "IN", HPDF_String_New (mmgr, name, NULL));
+	if (ret != HPDF_OK) {
+		HPDF_Dict_Free (view);
+		return NULL;
+	}
+
+	ret = HPDF_U3D_Add3DView( u3d, view);
+	if (ret != HPDF_OK) {
+		HPDF_Dict_Free (view);
+		return NULL;
+	}
+
+	return view;
 }
 #undef normalize
 

@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_font_type1.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -88,7 +87,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
 
     font->header.obj_class |= HPDF_OSUBCLASS_FONT;
 
-    attr = (HPDF_FontAttr) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -112,7 +111,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
     /* singlebyte-font has a widths-array which is an array of 256 signed
      * short integer.
      */
-    attr->widths = (HPDF_INT16 *) HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
+    attr->widths = (HPDF_INT16*)HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
     if (!attr->widths) {
         HPDF_Dict_Free (font);
         return NULL;

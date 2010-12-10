@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_catalog.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -79,12 +78,29 @@ HPDF_Catalog_GetRoot  (HPDF_Catalog  catalog)
     if (!catalog)
         return NULL;
 
-    pages = (HPDF_Dict) HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
+    pages = (HPDF_Dict)HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
     if (!pages || pages->header.obj_class != (HPDF_OSUBCLASS_PAGES |
                 HPDF_OCLASS_DICT))
         HPDF_SetError (catalog->error, HPDF_PAGE_CANNOT_GET_ROOT_PAGES, 0);
 
     return pages;
+}
+
+
+HPDF_NameDict
+HPDF_Catalog_GetNames  (HPDF_Catalog catalog)
+{
+    if (!catalog)
+        return NULL;
+    return (HPDF_NameDict)HPDF_Dict_GetItem (catalog, "Names", HPDF_OCLASS_DICT);
+}
+
+
+HPDF_STATUS
+HPDF_Catalog_SetNames  (HPDF_Catalog catalog,
+                        HPDF_NameDict dict)
+{
+    return HPDF_Dict_Add (catalog, "Names", dict);
 }
 
 
@@ -185,7 +201,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
 {
     HPDF_STATUS ret;
     HPDF_Array nums;
-    HPDF_Dict labels = (HPDF_Dict) HPDF_Dict_GetItem (catalog, "PageLabels",
+    HPDF_Dict labels = (HPDF_Dict)HPDF_Dict_GetItem (catalog, "PageLabels",
         HPDF_OCLASS_DICT);
 
     HPDF_PTRACE ((" HPDF_Catalog_AddPageLabel\n"));
@@ -200,7 +216,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
             return ret;
     }
 
-    nums = (HPDF_Array) HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
+    nums = (HPDF_Array)HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
 
     if (!nums) {
         nums = HPDF_Array_New (catalog->mmgr);
@@ -296,6 +312,17 @@ HPDF_Catalog_SetViewerPreference  (HPDF_Catalog   catalog,
             return ret;
     } else {
         if ((ret = HPDF_Dict_RemoveElement (preferences, "CenterWindow")) !=
+                HPDF_OK)
+            if (ret != HPDF_DICT_ITEM_NOT_FOUND)
+                return ret;
+    }
+
+    if (value & HPDF_PRINT_SCALING_NONE) {
+        if ((ret = HPDF_Dict_AddName (preferences, "PrintScaling",
+                "None")) != HPDF_OK)
+            return ret;
+    } else {
+        if ((ret = HPDF_Dict_RemoveElement (preferences, "PrintScaling")) !=
                 HPDF_OK)
             if (ret != HPDF_DICT_ITEM_NOT_FOUND)
                 return ret;

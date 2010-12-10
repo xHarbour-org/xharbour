@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.53 2009/12/31 02:55:04 andijahja Exp $
+# $Id: compile.mak,v 1.54 2010/06/18 16:36:29 ronpinkas Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -4684,6 +4684,12 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_boolean$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_boolean.
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_number$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_number.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_namedict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_namedict.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_pdfa$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_pdfa.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_real$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_real.c

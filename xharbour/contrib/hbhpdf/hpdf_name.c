@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_name.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -28,7 +27,9 @@ HPDF_Name
 HPDF_Name_New  (HPDF_MMgr        mmgr,
                 const char  *value)
 {
-    HPDF_Name obj = (HPDF_Name) HPDF_GetMem (mmgr, sizeof(HPDF_Name_Rec));
+    HPDF_Name obj;
+
+    obj  = (HPDF_Name)HPDF_GetMem (mmgr, sizeof(HPDF_Name_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));

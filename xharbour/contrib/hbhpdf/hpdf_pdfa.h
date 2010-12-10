@@ -2,7 +2,7 @@
  * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 /*
- * << Haru Free PDF Library >> -- hpdf_null.c
+ * << Haru Free PDF Library >> -- hpdf_pdfa.h
  *
  * URL: http://libharu.org
  *
@@ -18,20 +18,26 @@
  *
  */
 
-#include "hpdf_utils.h"
+#ifndef _HPDF_PDFA_H
+#define _HPDF_PDFA_H
+
+#include "hpdf_doc.h"
 #include "hpdf_objects.h"
 
 
-HPDF_Null
-HPDF_Null_New  (HPDF_MMgr  mmgr)
-{
-    HPDF_Null obj = (HPDF_Null)HPDF_GetMem (mmgr, sizeof(HPDF_Null_Rec));
 
-    if (obj) {
-        HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));
-        obj->header.obj_class = HPDF_OCLASS_NULL;
-    }
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    return obj;
+HPDF_STATUS
+HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,
+			      HPDF_PDFAType pdfatype);
+			      
+HPDF_STATUS
+HPDF_PDFA_GenerateID(HPDF_Doc);
+#ifdef __cplusplus
 }
+#endif
 
+#endif

@@ -1,14 +1,13 @@
 /*
- * $Id: png.c,v 1.2 2008/09/02 05:19:37 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
-
 /*
  * << Haru Free PDF Library >> -- hpdf_encryptdict.c
  *
  * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
- * Copyright (c) 2007-2008 Antony Dovgal <tony@daylessday.org>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -42,7 +41,7 @@ HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
     dict->header.obj_class |= HPDF_OSUBCLASS_ENCRYPT;
     dict->free_fn = HPDF_EncryptDict_OnFree;
 
-    attr = (HPDF_Encrypt) HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
+    attr = (HPDF_Encrypt)HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
     if (!attr) {
         HPDF_Dict_Free (dict);
         return NULL;
@@ -69,13 +68,13 @@ HPDF_EncryptDict_CreateID  (HPDF_EncryptDict  dict,
     /* use the result of 'time' function to get random value.
      * when debugging, 'time' value is ignored.
      */
-#ifndef HPDF_DEBUG
+#ifndef LIBHPDF_DEBUG
     time_t t = HPDF_TIME (NULL);
-#endif /* HPDF_DEBUG */
+#endif /* LIBHPDF_DEBUG */
 
     HPDF_MD5Init (&ctx);
 
-#ifndef HPDF_DEBUG
+#ifndef LIBHPDF_DEBUG
     HPDF_MD5Update(&ctx, (HPDF_BYTE *)&t, sizeof(t));
 
     /* create File Identifier from elements of Into dictionary. */
