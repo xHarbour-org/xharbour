@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.10 2009/08/28 14:12:25 lculik Exp $
+ * $Id: sendmail.prg,v 1.11 2009/08/29 20:26:17 likewolf Exp $
  */
 
 /*
@@ -53,6 +53,10 @@
  */
 
 #include "common.ch"
+func main
+altd()
+HB_SendMail( 'jacques.telenet-ops.be',, 'nick.van.dyck@winfakt.com', {'luiz@xharbour.com.br'}, , , 'ody', 'cSubject', , 'nick.van.dyck@winfakt.be', , 'jacques.telenet-ops.be', , , .t., .f.,, ,  )
+
 
 FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth, lNoAuth, nTimeOut, cReplyTo )
    /*
