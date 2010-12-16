@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* png.c - location for general purpose libpng functions
@@ -20,11 +20,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_4 Your_png_h_is_not_version_1_4_4;
-
-/* Version information for C files.  This had better match the version
- * string defined in png.h.
- */
+typedef version_1_4_5 Your_png_h_is_not_version_1_4_5;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -554,13 +550,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.4 - September 23, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.4.5 - December 9, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.4 - September 23, 2010\
+      return ((png_charp) "libpng version 1.4.5 - December 9, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -681,7 +677,7 @@ png_convert_size(size_t size)
 */
 
 void /* PRIVATE */
-png_64bit_product (long v1, long v2, unsigned long *hi_product,
+png_64bit_product(long v1, long v2, unsigned long *hi_product,
    unsigned long *lo_product)
 {
    int a, b, c, d;

@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* pngget.c - retrieval of values from info struct
@@ -861,7 +861,7 @@ png_get_unknown_chunks(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 png_byte PNGAPI
-png_get_rgb_to_gray_status (png_structp png_ptr)
+png_get_rgb_to_gray_status(png_structp png_ptr)
 {
    return (png_byte)(png_ptr? png_ptr->rgb_to_gray_status : 0);
 }
@@ -886,24 +886,24 @@ png_get_compression_buffer_size(png_structp png_ptr)
 /* These functions were added to libpng 1.2.6 and were enabled
  * by default in libpng-1.4.0 */
 png_uint_32 PNGAPI
-png_get_user_width_max (png_structp png_ptr)
+png_get_user_width_max(png_structp png_ptr)
 {
     return (png_ptr? png_ptr->user_width_max : 0);
 }
 png_uint_32 PNGAPI
-png_get_user_height_max (png_structp png_ptr)
+png_get_user_height_max(png_structp png_ptr)
 {
     return (png_ptr? png_ptr->user_height_max : 0);
 }
 /* This function was added to libpng 1.4.0 */
 png_uint_32 PNGAPI
-png_get_chunk_cache_max (png_structp png_ptr)
+png_get_chunk_cache_max(png_structp png_ptr)
 {
     return (png_ptr? png_ptr->user_chunk_cache_max : 0);
 }
 /* This function was added to libpng 1.4.1 */
 png_alloc_size_t PNGAPI
-png_get_chunk_malloc_max (png_structp png_ptr)
+png_get_chunk_malloc_max(png_structp png_ptr)
 {
     return (png_ptr?
        png_ptr->user_chunk_malloc_max : 0);
@@ -913,13 +913,13 @@ png_get_chunk_malloc_max (png_structp png_ptr)
 /* These functions were added to libpng 1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
 png_uint_32 PNGAPI
-png_get_io_state (png_structp png_ptr)
+png_get_io_state(png_structp png_ptr)
 {
     return png_ptr->io_state;
 }
 
 png_bytep PNGAPI
-png_get_io_chunk_name (png_structp png_ptr)
+png_get_io_chunk_name(png_structp png_ptr)
 {
    return png_ptr->chunk_name;
 }

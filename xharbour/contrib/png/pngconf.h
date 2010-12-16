@@ -1,10 +1,10 @@
 /*
- * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.4 - September 23, 2010
+ * libpng version 1.4.5 - December 9, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)

@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* pngwtran.c - transforms the data in a row for PNG writers
@@ -198,6 +198,9 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
                *dp = (png_byte)v;
             break;
          }
+
+         default:
+            break;
       }
       row_info->bit_depth = (png_byte)bit_depth;
       row_info->pixel_depth = (png_byte)(bit_depth * row_info->channels);

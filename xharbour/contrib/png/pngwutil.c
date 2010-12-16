@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
  */
 
 /* pngwutil.c - utilities to write a PNG file
@@ -249,10 +249,12 @@ png_text_compress(png_structp png_ptr,
     */
 
    /* Set up the compression buffers */
+   /* TODO: the following cast hides a potential overflow problem. */
    png_ptr->zstream.avail_in = (uInt)text_len;
+   /* NOTE: assume zlib doesn't overwrite the input */
    png_ptr->zstream.next_in = (Bytef *)text;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-   png_ptr->zstream.next_out = (Bytef *)png_ptr->zbuf;
+   png_ptr->zstream.avail_out = png_ptr->zbuf_size;
+   png_ptr->zstream.next_out = png_ptr->zbuf;
 
    /* This is the same compression loop as in png_write_row() */
    do
