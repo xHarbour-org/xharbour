@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6755 2010/12/10 21:43:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.6756 2010/12/16 21:44:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2010-12-24 08:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/fieldbl.prg
+    ! fixed FieldBLock() and FieldWBLock() to be CA-Cl*pper compatible
+      (they should return NIL for field names which are not valid
+      identifiers and generate RTE during evaluation if field does
+      not exist) (copy/paste from Harbour-Przemyslaw Czerpak)
 
 2010-12-17 04:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
