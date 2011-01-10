@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.17 2008/11/28 05:17:45 andijahja Exp $
+ * $Id: gencc.c,v 1.18 2009/03/14 04:34:18 ronpinkas Exp $
  */
 
 /*
@@ -49,17 +49,15 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
 static void hb_gencc_string_put( FILE * yyc, BYTE * pText, USHORT usLen )
 {
-   USHORT usPos;
+   USHORT nPos;
 
    fputc( '"', yyc );
-   for( usPos = 0; usPos < usLen; usPos++ )
+   for( nPos = 0; nPos < usLen; nPos++ )
    {
-      BYTE uchr = ( BYTE ) pText[ usPos ];
+      BYTE uchr = ( BYTE ) pText[ nPos ];
       /*
        * NOTE: After optimization some CHR(n) can be converted
-       *    into a string containing nonprintable characters.
-       *
-       * TODO: add switch to use hexadecimal format "%#04x"
+       *       into a string containing nonprintable characters.
        *
        * ? is escaped to avoid conflicts with trigraph sequences which
        * are part of ANSI C standard
@@ -67,7 +65,14 @@ static void hb_gencc_string_put( FILE * yyc, BYTE * pText, USHORT usLen )
       if( uchr == '"' || uchr == '\\' || uchr == '?' )
          fprintf( yyc, "\\%c", uchr );
       else if( uchr < ( BYTE ) ' ' || uchr >= 127 )
-         fprintf( yyc, "\\%03o", uchr );
+      {
+         BYTE uchrnext = nPos < usLen - 1 ? pText[ nPos + 1 ] : 0;
+
+         fprintf( yyc, "\\x%02X%s", uchr,
+                  ( uchrnext >= ( BYTE ) '0' && uchrnext <= ( BYTE ) '9' ) ||
+                  ( uchrnext >= ( BYTE ) 'a' && uchrnext <= ( BYTE ) 'z' ) ||
+                  ( uchrnext >= ( BYTE ) 'A' && uchrnext <= ( BYTE ) 'Z' ) ? "\" \"" : "" );
+      }
       else
          fprintf( yyc, "%c", uchr );
    }
@@ -853,7 +858,10 @@ static HB_GENC_FUNC( hb_p_pushdouble )
     * This version keeps double calculation compatible with RT FL functions
     */
    fprintf( cargo->yyc, "\thb_xvmPushDouble( * ( double * ) " );
-   hb_gencc_string_put( cargo->yyc, &pFunc->pCode[ lPCodePos + 1 ], sizeof( double ) );
+   {
+      double d = HB_PCODE_MKDOUBLE( &pFunc->pCode[ lPCodePos + 1 ] );
+      hb_gencc_string_put( cargo->yyc, ( BYTE * ) &d, sizeof( double ) );
+   }
    fprintf( cargo->yyc, ", %d, %d );\n",
             pFunc->pCode[ lPCodePos + 1 + sizeof( double ) ],
             pFunc->pCode[ lPCodePos + 1 + sizeof( double ) + sizeof( BYTE ) ] );

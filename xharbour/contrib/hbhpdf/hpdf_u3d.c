@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
+ * $Id: hpdf_u3d.c,v 1.2 2010/12/10 21:43:56 andijahja Exp $
  */
 /*
  * << Haru Free PDF Library >> -- hpdf_u3d.c
@@ -17,9 +17,11 @@
  * It is provided "as is" without express or implied warranty.
  *
  */
+
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf.h"
+#include "hpdf_u3d.h"
 
 #include <string.h>
 

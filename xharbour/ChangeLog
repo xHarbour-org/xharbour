@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6756 2010/12/16 21:44:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.6757 2010/12/24 01:48:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-10 11:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_u3d.c
+    + include "hbpdf_u3d.h" (fixed C++ linking)
+
+  * contrib/hbhpdf/hpdf_destination.c
+    + include "hbpdf_destination.h" (fixed C++ linking)
+
+  * source/rtl/fieldbl.prg
+    ! fixed silent quit on accessing wrong fieldname (thanks to Przemek)
+
+  * source/ct/charop.c
+    ! formatting & fixed for PellesC 6 compilation
+
+  * source/compiler/gencc.c
+    ! fixed POCC warning on hb_xvmPushDouble() upon on using -gc3
+      (copied from Harbour)
 
 2010-12-24 08:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/fieldbl.prg

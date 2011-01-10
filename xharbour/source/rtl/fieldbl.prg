@@ -1,5 +1,5 @@
 /*
- * $Id: fieldbl.prg,v 1.1.1.1 2001/12/21 10:41:33 ronpinkas Exp $
+ * $Id: fieldbl.prg,v 1.2 2010/12/24 01:48:29 andijahja Exp $
  */
 
 /*
@@ -60,7 +60,6 @@ FUNCTION FIELDBLOCK( cFieldName )
       bField := &( "{|x| IIF( x == NIL, FIELD->" + cFieldName + ", " + ;
                                        "FIELD->" + cFieldName + " := x ) }" )
    CATCH
-      Break
    END
 
    RETURN bField
@@ -76,7 +75,6 @@ FUNCTION FIELDWBLOCK( cFieldName, nWorkArea )
                                              + cAlias + cFieldName + " := x ) }" )
       ENDIF
    CATCH
-      Break
    END
 
    RETURN bField

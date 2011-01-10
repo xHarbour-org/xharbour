@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
+ * $Id: hpdf_destination.c,v 1.3 2010/12/10 21:43:56 andijahja Exp $
  */
 /*
  * << Haru Free PDF Library >> -- hpdf_destination.c
@@ -17,7 +17,7 @@
  * It is provided "as is" without express or implied warranty.
  *
  */
-
+#include "hpdf_destination.h"
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf.h"
