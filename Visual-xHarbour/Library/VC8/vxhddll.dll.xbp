@@ -1,0 +1,41 @@
+CINI = xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\include;\xhb\include\w32;\xhb\include
+LAUTORUN = .F.
+LDEBUG = .T.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\vc8; $(XHB_VC8)\Lib\vc8
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;__EXPORT__ ;__IMPORT__ ; DEBUG ;VXH_ENTERPRISE
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\vxhddll.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN =
+TARGETFOLDER = \xhb\bin\vc8
+
+[..\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\sourceC\*.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xhb\lib\vc8\Ole.lib]
+
+[\xhb\lib\vc8\ActiveX.lib]
+

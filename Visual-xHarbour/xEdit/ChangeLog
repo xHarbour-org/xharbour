@@ -1,0 +1,22 @@
+2010-11-23 07:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     ! Fixed compilation error for unused cBuffer (when VXH not defined)
+ 
+2009-11-13 09:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     + Added logic to ProcessTextFile() to skip over \r at begin of line
+     + Added conversion of \r to "" of sText in :Load()
+     ! Fixed auto open of source in PopupEditor() of xBuild log file
+
+2009-08-24 20:31 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     ! Fixed compilation when VXH not defined (unused declared local)
+
+2009-07-23 00:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xedit.rc
+     * Fixed typo to allow compilation with Borland
+
+2009-06-02 14:04 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     * Added .T. and .F. to reserved words (for colorization).
+

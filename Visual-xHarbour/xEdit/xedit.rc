@@ -1,0 +1,160 @@
+#include <windows.h>
+
+#include "xedit.h"
+
+#ifdef XEDIT_APPLICATION
+   IDOK MANIFEST "xEdit.xml"
+   APPLICATION ICON "xEdit.ico"
+#endif
+
+PLUS     ICON "Plus.ico"
+MINUS    ICON "Minus.ico"
+BOOKMARK ICON "Checkmrk.ico"
+//MODIFIED ICON "Notes.ico"
+
+/*
+IDB_FILE_OPEN    BITMAP "Open.bmp"
+IDB_FILE_NEW     BITMAP "New.bmp"
+IDB_FILE_SAVE    BITMAP "Save.bmp"
+IDB_FILE_EXIT    BITMAP "Exit.bmp"
+
+IDB_EDIT_UNDO    BITMAP "Undo.bmp"
+IDB_EDIT_REDO    BITMAP "Redo.bmp"
+IDB_EDIT_CUT     BITMAP "Cut.bmp"
+IDB_EDIT_COPY    BITMAP "Copy.bmp"
+IDB_EDIT_PASTE   BITMAP "Paste.bmp"
+IDB_EDIT_GOTO    BITMAP "Goto.bmp"
+IDB_EDIT_FIND    BITMAP "Find.bmp"
+IDB_EDIT_REPLACE BITMAP "Replace.bmp"
+*/
+
+FIND_DIALOG DIALOGEX DISCARDABLE 0, 0, 285, 125
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+  CONTROL "&Find"              , -1           , "static"  , 0                                          ,   5,  10,  30,  10
+  CONTROL ""                   , ID_Find      , "combobox", CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_TABSTOP,  40,   8, 240, 100
+  CONTROL "&Replace"           , ID_RepLabel  , "static"  , 0                                          ,   5,  25,  50,  10
+  CONTROL ""                   , ID_Replace   , "combobox", CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_TABSTOP,  40,  23, 240, 100
+  CONTROL "Match"              , -1           , "button"  , BS_GROUPBOX                                ,   5,  40, 130,  55
+  CONTROL "&Case"              , ID_MatchCase , "button"  , BS_AUTOCHECKBOX | WS_GROUP |WS_TABSTOP     ,  10,  55,  45,  10
+  CONTROL "&Whole word"        , ID_WholeWord , "button"  , BS_AUTOCHECKBOX | WS_TABSTOP               ,  60,  55,  70,  10
+  CONTROL "Regular E&xpression", ID_RegEx     , "button"  , BS_AUTOCHECKBOX | WS_TABSTOP               ,  10,  75, 110,  10
+  CONTROL "From"               , -1           , "button"  , BS_GROUPBOX                                , 145,  40, 135,  55
+  CONTROL "&Top"               , ID_Top       , "button"  , BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP , 150,  55,  30,  10
+  CONTROL "&Next"              , ID_Next      , "button"  , BS_AUTORADIOBUTTON | WS_TABSTOP            , 188,  55,  30,  10
+  CONTROL "&Previous"          , ID_Previous  , "button"  , BS_AUTORADIOBUTTON | WS_TABSTOP            , 228,  55,  50,  10
+  CONTROL "&Selected Text"     , ID_Selected  , "button"  , BS_AUTOCHECKBOX | WS_TABSTOP               , 150,  75,  75,  10
+  CONTROL "&Global"            , ID_Global    , "button"  , BS_AUTOCHECKBOX | WS_TABSTOP               , 228,  75,  50,  10
+  CONTROL "Replace &Once"      , ID_Once      , "button"  , WS_TABSTOP | WS_GROUP                      ,   5, 105,  65,  15
+  CONTROL "Replace &All"       , ID_All       , "button"  , WS_TABSTOP                                 ,  75, 105,  65,  15
+  CONTROL "Find Next"          , IDOK         , "button"  , BS_DEFPUSHBUTTON | WS_TABSTOP              , 145, 105,  65,  15
+  CONTROL "Cancel"             , IDCANCEL     , "button"  , WS_TABSTOP                                 , 215, 105,  65,  15
+END
+
+GOTO_DIALOG DIALOGEX DISCARDABLE 0, 0, 285, 125
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+  CONTROL "&Line"             , -1            , "static"  , 0                                          ,   5,  17,  30,  10
+  CONTROL ""                  , ID_Line       , "edit"    , WS_BORDER | WS_TABSTOP                     ,  50,  15, 100,  13
+  CONTROL "&Column"           , -1            , "static"  , 0                                                      ,   5,  35,  30,  10
+  CONTROL ""                  , ID_Column     , "edit"    , WS_BORDER | WS_TABSTOP                     ,  50,  33, 100,  13
+  CONTROL "&Entities"         , -1            , "static"  , 0                                          ,   5,  57,  50,  10
+  CONTROL ""                  , ID_Entities   , "combobox", CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | CBS_SORT | WS_TABSTOP | WS_VSCROLL,  50,  55, 230, 100
+  CONTROL "&Bookmarks"        , -1            , "static"  , 0                                          ,   5,  77,  50,  10
+  CONTROL ""                  , ID_Bookmarks  , "combobox", CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_TABSTOP,  50,  75, 230, 100
+  CONTROL "Goto"              , IDOK          , "button"  , BS_DEFPUSHBUTTON | WS_TABSTOP              , 145, 105,  65,  15
+  CONTROL "Cancel"            , IDCANCEL      , "button"  , WS_TABSTOP                                 , 215, 105,  65,  15
+END
+
+XEDITCONTAINER MENU DISCARDABLE
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",                        IDM_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            IDM_FILE_OPEN
+        MENUITEM "Open &Workspace...",          IDM_FILE_OPEN_WORKSPACE
+        MENUITEM "&Close",                      IDM_FILE_CLOSE
+        MENUITEM "Close A&ll",                  IDM_FILE_CLOSE_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "Discard Changes",             IDM_FILE_DISCARD
+        MENUITEM "&Save\tCtrl+S",               IDM_FILE_SAVE
+        MENUITEM "Save All\tCtrl+L",            IDM_FILE_SAVE_ALL
+        MENUITEM "Save &As...",                 IDM_FILE_SAVE_AS
+        MENUITEM "Save Wor&kspace...",          IDM_FILE_SAVE_WORKSPACE
+        MENUITEM SEPARATOR
+        MENUITEM "&Print",                      IDM_FILE_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "Dummy Recent Files"           0
+        MENUITEM "Dummy Recent Workspaces"      0
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_FILE_EXIT
+    END
+
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               IDM_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               IDM_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              IDM_EDIT_PASTE
+        MENUITEM "De&lete\tDel",                IDM_EDIT_CLEAR
+        MENUITEM SEPARATOR
+        MENUITEM "&Select All\tCtrl+A",         IDM_EDIT_SELECT_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Find...\tCtrl+F",            IDM_EDIT_FIND
+        MENUITEM "R&eplace...\tCtrl+H",         IDM_EDIT_REPLACE
+        MENUITEM "&Go To...\tCtrl+G",           IDM_EDIT_GOTO
+    END
+
+    POPUP "F&ormat"
+    BEGIN
+        MENUITEM "&Font...\tF7",                IDM_FORMAT_FONT
+    END
+
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Entitities",                 IDM_VIEW_ENTITIES
+        MENUITEM "&Bookmarks",                  IDM_VIEW_BOOKMARKS
+        MENUITEM SEPARATOR
+        MENUITEM "&Normal",                     IDM_VIEW_NORMAL
+        MENUITEM "&Collapsed",                  IDM_VIEW_COLLAPSED
+    END
+
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Next\tF6",                   IDM_WINDOW_NEXT
+        MENUITEM "&Previous\tShift+F6",         IDM_WINDOW_PREVIOUS
+        MENUITEM SEPARATOR
+        MENUITEM "Dummy",                       0
+    END
+
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Help...",                    IDM_HELP_HELP
+        MENUITEM "&About xEdit...",             IDM_HELP_ABOUT
+    END
+END
+
+EDITCONTEXT MENU DISCARDABLE
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+    MENUITEM "&Undo\tCtrl+Z",               IDM_EDIT_UNDO
+    MENUITEM "&Redo\tCtrl+Y",               IDM_EDIT_REDO
+    MENUITEM SEPARATOR
+    MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
+    MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY
+    MENUITEM "&Paste\tCtrl+V",              IDM_EDIT_PASTE
+    MENUITEM "De&lete\tDel",                IDM_EDIT_CLEAR
+    MENUITEM SEPARATOR
+    MENUITEM "&Select All\tCtrl+A",         IDM_EDIT_SELECT_ALL
+    MENUITEM SEPARATOR
+    MENUITEM "&Find...\tCtrl+F",            IDM_EDIT_FIND
+    MENUITEM "R&eplace...\tCtrl+H",         IDM_EDIT_REPLACE
+    MENUITEM "&Go To...\tCtrl+G",           IDM_EDIT_GOTO
+    END
+END
+#define IMAGEMAN  1001

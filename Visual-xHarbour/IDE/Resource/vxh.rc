@@ -1,0 +1,3 @@
+#include "..\..\xedit\xedit.rc"
+#include "vxhres.rc"
+

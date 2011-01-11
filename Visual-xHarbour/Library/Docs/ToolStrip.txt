@@ -1,0 +1,22 @@
+Properties
+   Position
+   ImageList    
+   Border        
+   Dock 
+   Anchor      
+   Cursor      
+   SmallCaption 
+   ContextMenu 
+   BackColor        
+   ForeColor       
+   TabOrder         
+   ClientEdge       
+   ClipChildren     
+   ClipSiblings     
+   StaticEdge       
+   TabStop         
+   Transparent      
+   Visible          
+   HighLightCaption 
+   
+   

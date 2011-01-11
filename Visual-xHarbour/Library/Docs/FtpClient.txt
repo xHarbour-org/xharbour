@@ -1,0 +1,35 @@
+Properties
+   Operation
+   Service
+   OpenType  
+   Context
+   InternetStatus
+   StatusInformation
+   hHandle   
+   hFtp
+   Server 
+   UserName
+   Password 
+   Port      
+   Passive
+
+
+Methods
+   Connect()
+   DisConnect()
+   GetDirectory()
+   GetCurrentDirectory()
+   PutFile( cLocalFile, cRemoteFile )    
+   GetFile( cRemoteFile, cLocalFile )
+   DeleteFile( cRemoteFile )
+   RenameFile( cExistingFile, cNewFile )
+   CreateDirectory( cDirectory )
+   RemoveDirectory( cDirectory )
+   SetCurrentDirectory( cDirectory )
+   GetLastResponseInfo()
+   
+
+
+
+   
+

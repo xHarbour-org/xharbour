@@ -1,0 +1,22 @@
+Properties
+   ShowDragging
+   Position 
+   Weight 
+   Cursor
+   MinTop  
+   MaxBottom 
+   Owner 
+
+Methods
+   SplitOn()
+
+
+
+
+
+
+    
+
+
+   
+   

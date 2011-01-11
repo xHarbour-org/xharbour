@@ -1,0 +1,22 @@
+Properties
+   Group
+   Border             
+   InitialState  
+   Checked 
+   ImageIndex 
+
+
+Methods
+   GetState()
+   SetState(nState)
+   OnCtlColorStatic()
+   
+
+
+
+
+    
+
+
+   
+   

@@ -1,0 +1,46 @@
+Properties
+   FirstChild      
+   Parent          
+   Left            
+   Top             
+   Width           
+   Height          
+   Style            
+   ExStyle         
+   Name            
+   Center          
+   Tooltip         
+   TabStop        
+   Caption         
+   Enabled       
+   ForeColor       
+   ContextMenu     
+   BackColor      
+   ForeColor      
+   BkBrush          
+   Font             
+   StaticEdge 
+   Visible          
+   ClipChildren    
+   ClipSiblings 
+   Border         
+   ThickFrame     
+   MaximizeBox    
+   MinimizeBox    
+   CaptionBar     
+   SysMenu        
+   ClientEdge 
+   AlignLeft   
+   AlignTop   
+   AlignRight 
+   AlignBottom 
+   WindowsMenu 
+                            
+
+Methods
+   MoveWindow()
+   IsWindowVisible()     
+   Destroy()
+   SetBackColor()
+   SetExStyle()
+   GetActive()

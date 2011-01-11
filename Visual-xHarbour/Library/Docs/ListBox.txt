@@ -1,0 +1,77 @@
+Properties
+   ImageList  
+   CurSel  
+   VertScroll       
+   HorzScroll        
+   IntegralHeight  
+   ExtendedSel 
+   MultiColumn
+   NoRedraw
+   Notify
+   Sort
+   UseTabStops
+   WantKeyboardInput
+   DisableNoScroll
+   HasStrings  
+   Border
+   ClientEdge
+   OwnerDraw
+   OwnerDraw_Styles
+ 
+
+Methods
+   Create()
+   GetString()
+   GetItemRect()
+   GetSelItems()
+   SetDrawStyle()
+   AddItem( cText, lSel )           
+   SetCurSel(nLine)                 
+   SetSel(nLine,lSel)           
+   FindString(nStart,cStr)        
+   FindExact(nStart,cStr)         
+   GetCount()                       
+   GetCurSel()                     
+   Dir(nAttr, cFileSpec)           
+   GetSelCount()                 
+   SelItemRangeEx(nFirst, nLast)  
+   ResetContent()               
+   GetSel(nLine)               
+   GetText( nLine, cBuffer )  
+   GetTextLen( nLine )         
+   GetItemText()
+   SelectString( nLine, cText )    
+   GetTopIndex( nLine )       
+   SetTabStops( nTabs, abTabs ) 
+   GetHorizontalExtent()     
+   SetHorizontalExtent(nWidth)
+   SetColumnWidth( nWidth )
+   AddFile( cFile )
+   SetTopIndex( nLine ) 
+   GetItemData( nLine )
+   SetItemData( nLine, cData )
+   SelItemRange( nFrom, nTo, lSel )
+   SetAnchorIndex( nLine )
+   GetAnchorIndex()
+   SetCaretIndex( nLine, lScroll)
+   GetCaretIndex()
+   SetItemHeight( nLine, nHeight )
+   GetItemHeight( nLine )
+   SetLocale( nID )
+   GetLocale()
+   SetCount(nCount)
+   InitStorage( nItems, nBytes )
+   ItemFromPoint( x,y )
+   AddString()
+   InsertString(nLine,cText)
+   DeleteString(nLine)
+   SetIntegralHeight( n, lSet )
+
+   
+Events
+   OnChange 
+   OnSelChange()
+   OnDblClk() 
+   OnErrSpace()   
+   OnLBNKillFocus() 
+   OnLBNSetFocus() 

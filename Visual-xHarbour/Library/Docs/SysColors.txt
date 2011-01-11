@@ -1,0 +1,44 @@
+Properties
+   BtnFace                 
+   ScrollBars               
+   BackGround             
+   ActiveCaption         
+   InactiveCaption    
+   Menu                     
+   Window                   
+   WindowFrame              
+   MenuText                 
+   WindowText               
+   CaptionText              
+   ActiveBorder             
+   InactiveBorder           
+   AppWorkSpace             
+   Highlight                
+   HighlightText            
+   BtnHighlight             
+   BtnShadow                
+   GrayText                 
+   BtnText                  
+   InactiveCaptionText      
+   DkShadow3d               
+   Light3d                  
+   InfoText                 
+   InfoBk                   
+   HotLight                 
+   GradientActiveCaption    
+   GradientInactiveCaption  
+   DeskTop                  
+   Face3D                   
+   Shadow3D                 
+   Highlight3D           
+   HiLight3D                
+   BtnHiLight                         
+
+
+
+
+    
+
+
+   
+   

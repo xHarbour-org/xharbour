@@ -1,0 +1,25 @@
+Properties
+	
+	ImageName  
+	Sunken
+	CenterImage
+	Image_Type
+	ImageTypes
+	ImageType
+	LoadFromFile
+	RightAlign
+	Sunken
+	Simple
+	ImageHandle
+
+Methods
+
+	Create()
+	SetImage()
+OnSize()
+	
+
+
+
+	
+

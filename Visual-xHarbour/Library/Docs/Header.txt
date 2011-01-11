@@ -1,0 +1,35 @@
+Properties
+   ImageList
+   ImageMargin
+   AllowUnDock
+   AllowClose
+
+Methods
+   InsertItem()
+   DeleteItem( nPos )
+   SetItemWidth()
+   SetItemCaption()
+   OnParentNotify()
+   SetArrow()
+   DrawFrame()
+   GetItemRect()
+   SetImageList()
+   SetImageMargin()
+   
+Events
+   OnBeginTrack       
+   OnTrack            
+   OnBeginDrag        
+   OnEndDrag          
+   OnGetDispInfo      
+   OnItemChanging     
+   OnItemChanged      
+   OnCustomDraw       
+   OnItemClick        
+   OnItemDblClick     
+   OnFilterChange     
+
+
+
+   
+

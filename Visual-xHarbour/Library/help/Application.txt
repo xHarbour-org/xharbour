@@ -1,0 +1,89 @@
+Properties
+
+SetCentury         
+SetDeleted         
+SetDefault         
+SetExact           
+SetFixed           
+SetDecimals        
+SetDateFormat      
+SetEpoch           
+SetPath            
+SetExclusive       
+SetSoftseek        
+SetUnique          
+SetCancel          
+SetDebug           
+SetTypeahead       
+SetAlternate       
+SetAltfile         
+SetDevice          
+SetExtra           
+SetExtrafile       
+SetPrintfile       
+SetMargin          
+SetBell            
+SetConfirm         
+SetEscape          
+SetInsert          
+SetExit            
+SetWrap            
+SetMessage         
+SetMcenter         
+SetScrollbreak     
+SetEventmask       
+SetVideomode       
+SetMblocksize      
+SetMfileext        
+SetStrictread      
+SetOptimize        
+SetAutopen         
+SetAutorder        
+SetAutoshare       
+SetCount           
+SetLanguage        
+SetIdlerepeat      
+SetTrace           
+SetTracefile       
+SetTracestack      
+SetFilecase        
+SetDircase         
+SetDirseparator    
+SetErrorloop       
+SetOutputsafety    
+SetDbflockscheme   
+SetTrimfilename    
+SetPrinterjob      
+SetHardcommit      
+SetForceopt        
+SetEol             
+SetErrorlog        
+Version            Character  Set/Get Application version.
+Path               Character  Get     Retrieves the app's path.
+Name               Character  Get     Retrieves the app name.
+OsVersion          Object     Get     Holds information about the current operating system.
+ThemeActive        Logical    Get     Tests if a visual style for the current application is active.
+IniFile            Object     Get     IniFile Object holding the ini file assigned to the application.
+MainForm           Object     Get     Retrieves information about the main form object.
+bUserError         Codeblock  Set     Sets a codeblock to be evaluated and printed at every error message.  
+                                      example: ::Application:bUserError := {|| CRLF + "PDF DLL  Version: " + cPDFVersion +;
+                                                                               CRLF + "PDF File Version: " + cPDFFileVersion }
+TempDir            Character  Get     Retrieves the path of the directory designated for temporary files.
+Params             Array      Get     Holds the parameter array passed to the application.
+Running            Logical    Get     Retrieves whether another instance of the application is already running.
+GenerateMembers    Logical    Get/Set Decides whether or not the forms will generate properties.
+                                      example: Form1:Label1, Form1:Edit2
+
+-------------------------------------------------------------------------------------------------------------------------------
+Methods
+
+Close()            void       Forces Closing the application
+Exit()             void       Closes Application by exiting the main loop
+Yield()            void       Forces the application to process 1 pendiong message per call.
+DoEvents()         void       Forces the application to process ALL pending messages in the message queue
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+Events
+
+OnExit()          void        Excuted when exiting the app. The return value has no meaning.

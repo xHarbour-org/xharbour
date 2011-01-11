@@ -1,0 +1,22 @@
+Properties
+
+   ImageAlign    
+   Group         
+   OwnerDraw     
+   ImageIndex    
+   Border        
+   DefaultButton 
+   Enabled       
+   ShortCutKey
+   Checked
+
+Methods
+
+   GetState()
+   Click()
+   Push()              
+   Release()           
+   IsPushed()          
+   SetFocus()          
+   SetState()
+   Create()

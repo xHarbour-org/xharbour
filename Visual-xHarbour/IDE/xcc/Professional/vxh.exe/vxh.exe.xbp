@@ -1,0 +1,69 @@
+CINI = 
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = ..\..\..\include;\xHb\include\w32;..\..\..\..\xedit
+LAUTORUN = .T.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = 
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;VXH_PROFESSIONAL
+MYLINK_FLAGS = 
+MYPRG_FLAGS = -es2 -gc0 -n -p -q -w
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\professional\vxh-exe.exe
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = \xhb\bin\Professional
+
+[..\..\..\source\vxh1.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\..\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\..\resource\vxh.rc]
+MYDEFINES =
+MYRC_FLAGS =
+
+[\xhb\lib\professional\vxh.lib]
+
+[xEditVXH.lib]
+
+[vxhd.lib]
+
+[tproject.lib]
+
+[sql.lib]
+
+[rmdbfcdx.lib]
+
+[ads.lib]
+
+[ace32.lib]
+
+[Ole.lib]
+
+[ActiveX.lib]
+
+[libmysql.lib]
+
+[fbclient_ms.lib]
+
+[libpq.lib]
+
+[oci.lib]

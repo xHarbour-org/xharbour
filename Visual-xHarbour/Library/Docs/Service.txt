@@ -1,0 +1,31 @@
+Properties
+   ServiceName
+   File                
+   DisplayName         
+   Description         
+   StopServiceEvent    
+   EventBlock          
+   TimeOut             
+   Status 
+           
+
+
+Methods
+   Install()
+   Run()
+   Start()       
+   Stop( nTime )
+   Delete()
+   GetStatus()
+   QueryData()
+
+
+
+
+
+
+    
+
+
+   
+   

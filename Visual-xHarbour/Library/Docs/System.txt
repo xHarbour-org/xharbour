@@ -1,0 +1,37 @@
+Properties
+   OsVersion                  
+   Cursor                     
+   ImageList                  
+   ExplorerBar                
+   DateTimeFormat             
+   TextAlignment              
+   ListViewGroupAlign         
+   DropDownStyle              
+   Drivers                
+   Folders                    
+   OleVerb                    
+   Color                      
+   Colors                     
+   SockProtocol               
+   HandShake                  
+   Parity                     
+   StopBits                   
+   ProfessionalColorTable     
+   KeyboardList               
+   WindowAnimation            
+   FreeImageFormats           
+   CurrentScheme          
+   Time                  
+
+Methods
+   Update()
+   GetLocalTime()
+   UpdateColorSchemes()
+
+
+
+    
+
+
+   
+   

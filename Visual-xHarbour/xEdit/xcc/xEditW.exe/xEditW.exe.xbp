@@ -1,0 +1,42 @@
+CINI = 
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = 
+LAUTORUN = 
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = 
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS =  
+MYDEFINES = WIN; XEDIT_APPLICATION
+MYLINK_FLAGS = 
+MYPRG_FLAGS = -es2 -gc0 -m -n -p -q -w
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\xEditW-exe.exe
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\bin
+
+[..\..\xedit.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\..\xedit.rc]
+MYDEFINES = 
+MYRC_FLAGS = 
+
+[WinAPI.lib]
+
+[xEditWScript.lib]
+[xbScript.lib]
+
+[Ole.Lib]
+[ActiveX.lib]

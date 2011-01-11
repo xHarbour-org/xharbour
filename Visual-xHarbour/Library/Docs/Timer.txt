@@ -1,0 +1,17 @@
+Properties
+   Delay
+   AutoRun 
+   Id  
+   Events 
+
+Methods
+   SetDelay()
+   Start() 
+   Stop() 
+   TimeProc()
+   Destroy()   
+
+
+Events   
+   OnTimeOut()
+   

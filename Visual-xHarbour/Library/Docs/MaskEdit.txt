@@ -1,0 +1,25 @@
+Properties
+   ReadOnly.
+   lInValid
+   NoEdit
+   NoOverStrike
+   oGet EXPORTED
+   PreBlock
+   PostBlock
+   Picture
+   VarGet
+   Caption
+   
+
+Events
+   OnCharacter
+   OnKey
+   OnUndo()
+   OnKeyDown()
+   OnChar()
+   OnSetFocus()
+   OnKillFocus()
+   OnPaste()
+   OnCopy()
+   OnClear( nwParam, nlParam )
+   OnCut()

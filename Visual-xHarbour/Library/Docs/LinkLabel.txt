@@ -1,0 +1,31 @@
+Properties
+   Group        
+   OwnerDraw     
+   DefaultButton 
+   Cursor
+   ForeColor
+   AllowUnDock   
+   AllowClose    
+   LinkSysColor
+   LinkVisited
+   LinkColor
+   VisitedColor
+   AutoSize
+   ImageIndex
+   Alignment  
+   ActiveLinkColor
+   Url
+   FocusRect
+   SelBackColor
+
+
+Methods
+   SetLinkColor()
+   SetVisitedColor()
+   SetWindowText()
+   SetSelColor()
+
+
+
+   
+

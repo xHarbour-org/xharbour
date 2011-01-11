@@ -1,0 +1,9 @@
+Properties
+
+	OnNMReleasedCapture
+	
+
+Methods
+	
+	OnParentNotify()
+	OnEraseBkGnd()

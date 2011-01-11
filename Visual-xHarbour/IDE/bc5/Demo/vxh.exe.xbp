@@ -1,0 +1,61 @@
+CINI = ..\xbuild.bc5.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\..\include;\xHb\include\w32;..\..\..\xedit
+LAUTORUN = .F.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\bc5; $(XHB_BCC)\Lib
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;VXH_DEMO ;WINAPI_DEMO 
+MYLINK_FLAGS =
+MYPRG_FLAGS = 
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\bc5\demo\vxh-exe.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN =
+TARGETFOLDER = \xhb\bin\bc5\Demo
+
+[..\..\source\vxh1.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\Resource\vxh.rc]
+MYDEFINES =
+MYRC_FLAGS =
+
+[\xhb\lib\bc5\demo\vxh.lib]
+
+[xEditVXH.lib]
+
+[vxhd.lib]
+
+[tproject.lib]
+
+[sql.lib]
+
+[rmdbfcdx.lib]
+
+[ads.lib]
+
+[ace32.lib]
+
+[Ole.lib]
+
+[ActiveX.lib]

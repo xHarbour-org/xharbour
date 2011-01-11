@@ -1,0 +1,24 @@
+Properties
+   Handle          
+   RemoteHandle    
+   LocalIP         
+   RecData         
+   LocalPort       
+   RemoteIP        
+   RemotePort      
+   EnumProtocol    
+   Protocol        
+   Connected       
+
+
+Methods
+   SockControlProc()
+   Destroy()
+   Connect()
+   Send()
+   Close()     
+   Listen()
+   Disconnect()
+   SetTimeOut(n)
+
+   

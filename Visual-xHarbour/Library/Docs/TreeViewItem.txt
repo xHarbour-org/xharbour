@@ -1,0 +1,39 @@
+Properties
+   hItem          
+   Items          
+   Parent         
+   Expanded       
+   ColItems
+   Level          
+   Action         
+   HotImageIndex  
+   PointerItem    
+   InsertAfter    
+   Bold    
+   Caption                 
+   ImageIndex             
+
+
+Methods
+   AddItem()
+   Delete()
+   Toggle()              
+   Expand()              
+   ExpandAll()
+   SortChildren( lRec )  
+   Select(nFlag)         
+   EnsureVisible()       
+   EditLabel()           
+   SetFont( hFont )
+   GetItemState( nMask )
+   GetItemRect(lItem)    
+   SetItemState()
+   GetNextItem()         
+   GetChild()            
+   SetStyle()
+   SearchString()
+   CreateDragImage()     
+   SetItemText()
+   GetExpandedCount()
+   SetImageIndex()
+   SetOwner()

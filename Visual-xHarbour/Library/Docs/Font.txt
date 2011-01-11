@@ -1,0 +1,41 @@
+Properties
+   Handle
+   FaceName
+   Escapement
+   Orientation
+   Width
+   FileName
+   CharSet  
+   Height 
+   Weight
+   OutPrecision  
+   ClipPrecision 
+   Quality    
+   PitchAndFamily
+   Shared
+   Bold 
+   Italic
+   Underline
+   StrikeOut
+   PointSize
+
+
+Methods
+
+   Select( hDC )
+   Delete()
+   Choose()
+   Modify()
+   Set()
+   SetPointSize()
+   GetPointSize()
+   AddResource(c)
+   EnumFamilies()
+   EnumFamiliesProc()
+
+
+
+
+
+   
+

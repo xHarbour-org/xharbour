@@ -1,0 +1,13 @@
+Properties
+   ScrollUnits 
+   PageChild
+   ButtonHeight
+   Position     
+
+
+Methods
+   SetChild()
+   SetButtonHeight(n) 
+   RecalSize()  
+   Create()
+

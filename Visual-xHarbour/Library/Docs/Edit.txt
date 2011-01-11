@@ -1,0 +1,83 @@
+Properties
+   FullSelectOnClick
+   EnterNext
+   Layout
+   AutoVScroll
+   AutoHScroll
+   MultiLine  
+   Password
+   NoHideSel  
+   OemConvert
+   ReadOnly
+   WantReturn
+   HorzScroll 
+   VertScroll
+   Case 
+   Border  
+   Number       
+   ClientEdge    
+   ContextMenu  
+   ContextArrow   
+   ImageIndex
+   DataSource   
+   Transparent
+   DataSearchField 
+   DataSearchWidth   
+   DataSearchRecords
+   ImageList      
+   AllowUnDock  
+   AllowClose 
+   SelForeColor              
+   SelBackColor( n )
+   Alignment         
+   Modified 
+   LastKey  
+
+
+Methods
+   SetCase()
+   SetAlignment()
+   CanUndo()                   
+   CharFromPos(x,y)        
+   EmptyUndoBuffer()           
+   FmtLines(lSet)         
+   GetCueBanner()
+   GetFirstVisibleLine()      
+   GetHandle()                  
+   GetImeStatus(nType)       
+   GetLimitText()    
+   GetLine( n, c )
+   GetLineCount()           
+   GetMargins()              
+   GetModify()               
+   GetPasswordChar()            
+   GetEditRect(rc)
+   GetSel(x,y)
+   GetThumb()                   
+   GetWordBreakProc()          
+   HideBalloonTip()        
+   LimitText(n)               
+   LineFromChar(n)              
+   LineIndex(n)                 
+   LineLength(n)           
+   LineScroll(x, y )
+   PosFromChar(x,y)
+   ReplaceSel(l, c )
+   Scroll( nSB )
+   ScrollCaret()          
+   SetCueBanner(cText,lFocus)
+   SetHandle(h)
+   SetImeStatus(nType, nStatus)
+   SetLimitText(n)
+   SetMargins(ntype, nData)
+   SetModify(lSet) 
+   SetPasswordChar(nAsc)
+   SetReadOnly(lSet)        
+   SetSel(nStart,nEnd)
+   SetWordBreakProc(nProc)
+   Undo() 
+   SetRect(aRect, lRelative)
+   SetRectNP(aRect, lRelative)
+   SetTabStops( nTabs, aTabs )
+   ShowBalloonTip( EBT )
+   SetSelColor()

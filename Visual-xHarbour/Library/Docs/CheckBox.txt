@@ -1,0 +1,13 @@
+Properties
+   ImageList
+   Transparent
+   Group      
+   CheckStyle 
+   State      
+   Border     
+
+Methods
+   Checked()
+   Check()   
+   UnCheck() 
+   Indeterminate()

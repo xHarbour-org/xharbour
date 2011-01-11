@@ -1,0 +1,143 @@
+Properties
+   ContextMenu   
+   Left          
+   Top           
+   Width         
+   Height        
+   Cursor        
+   StaticEdge    
+   ClientEdge    
+   ControlParent 
+   Visible       
+   Enabled       
+   Border        
+   Center        
+   ClipChildren  
+   ClipSiblings  
+   TabOrder      
+   AcceptFiles   
+   AnimationStyle
+   NoActivate    
+   Caption
+   Font   
+   ToolTip
+   Animation
+   ClientWidth            
+   ClientHeight           
+   DisableParent          
+   VertScroll             
+   HorzScroll             
+   OriginalRect           
+   Msg                    
+   wParam                 
+   lParam                 
+   ShowMode               
+   Id                     
+   Drawing                
+   KeepParentActive       
+   KeepActive             
+   WindowPos              
+   DrawItemStruct         
+   MeasureItemStruct      
+   hdr                    
+   ScrollInfo             
+   BkBrush                
+   SelBkBrush             
+   MinLeft                
+   MinTop                 
+   MinWidth               
+   MinHeight              
+   MaxWidth               
+   MaxHeight              
+   Style        
+   ExStyle      
+   HelpId       
+   IsContainer  
+   MDIClient    
+   Alignment    
+   FilesDroped  
+   Anchor       
+   Modal        
+   Flat         
+   Dock         
+   HelpInfo     
+   HasFocus     
+   IsChild      
+   BackColor    
+   ForeColor    
+   BitmapMask   
+   BitmapMaskColor
+
+Methods
+   DragAcceptFiles(l)
+   CenterWindow()
+   Animate()
+   Destroy()
+   Disable()               
+   Enable()                
+   Close()
+   Hide()
+   Show()
+   MessageWait()
+   MessageBox( cText, cCaption, nFlags )
+   IsCovered()
+   LockWindowUpdate()      
+   UnlockWindowUpdate()    
+   HideCaret()             
+   ShowCaret()             
+   DestroyCaret()          
+   CreateCaret( hBmp, nWidth, nHeight )  
+   SetCapture()            
+   GetCapture()            
+   ReleaseCapture()        
+   OpenClipboard()         
+   IsWindow()              
+   IsWindowVisible()       
+   SetFocus()              
+   GetWindowRect()
+   SetParent()
+   ScrollWindow( x, y, rRect, rClip ) 
+   SetActiveWindow()       
+   GetClientRect()
+   SetWindowText(cText)    
+   BringWindowToTop()      
+   ScreenToClient( pt )    
+   ClientToScreen( pt )    
+   SetWindowPos( hAfter, x, y, w, h , n)             
+   DeferWindowPos( hDef, hAfter, x, y, w, h , n)     
+   SendMessage( nMsg, nwParam, nlParam )             
+   SendDlgItemMessage( nId, nMsg, nwParam, nlParam ) 
+   PostMessage( nMsg, nwParam, nlParam )             
+   GetWindowLong(n)        
+   SetWindowLong(n,nSt)    
+   RedrawWindow( rc, hRgn, nFlags )
+   TrackMouseEvent()
+   DefWindowProc( nMsg, nwParam, nlParam )
+   GetWindowTextLength()   
+   GetWindowPlacement()
+   GetWindowInfo()
+   GetFont()               
+   GetIcon( nIcon )        
+   SetIcon( nIcon, hIcon ) 
+   SetStyle()
+   GetStyle(n)             
+   SetExStyle()
+   SetRedraw(lRed)         
+   IsWindowEnabled()       
+   SetBackColor()
+   SetForeColor()
+   ValidateRect( rc )      
+   InvalidateRect( rc, lErase )
+   MapWindowPoints( hWndDest, pt, nPoint )
+   MoveWindow()
+   GetRectangle()
+   UpdateWindow()
+   Refresh()
+   DockIt()
+   UpdateLayout()
+   DockToParent()
+   GetChildFromPoint()
+   OpenThemeData()  
+   CloseThemeData() 
+   UpdateChildren() 
+

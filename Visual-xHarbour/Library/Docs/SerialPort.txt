@@ -1,0 +1,43 @@
+Properties
+   Events 
+   Handle                 
+   PortName              
+   BaudRate        
+   HandShake         
+   Parity            
+   StopBits       
+   Bits       
+   ReadBufferSize   
+   ReadTimeOut     
+   DtrEnabled
+   RtsEnabled 
+   Cts               
+   Dsr               
+   Ring                 
+   Rlsd                 
+   IsOpen                       
+
+
+Methods
+   Open()
+   Close()
+   Write()
+   Read()
+   Listen()
+   CountIn()
+   CountOut()
+   Properties()
+   GetStatus()
+   Clear()   
+   Escape(n)
+
+
+
+
+
+
+    
+
+
+   
+   

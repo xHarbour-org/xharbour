@@ -1,0 +1,28 @@
+Properties
+   Name
+
+
+Methods
+   Flush()
+   GetSections()
+   GetEntries()
+   GetSectionEntries()
+   DelSection()
+   DelEntry()
+   Read()
+   Write()
+   WriteString( cSection, cEntry, xValue ) 
+   WriteDate( cSection, cEntry, xValue )
+   WriteNumber( cSection, cEntry, xValue )
+   WriteInteger( cSection, cEntry, xValue )
+   WriteLogical( cSection, cEntry, xValue )
+   ReadString( cSection, cEntry, xDefault )
+   ReadDate( cSection, cEntry, xDefault )
+   ReadNumber( cSection, cEntry, xDefault )
+   ReadInteger( cSection, cEntry, xDefault )
+   ReadLogical( cSection, cEntry, xDefault )
+
+
+
+   
+

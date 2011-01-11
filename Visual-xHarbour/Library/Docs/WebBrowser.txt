@@ -1,0 +1,7 @@
+Properties
+   ProgID
+   ClsID
+
+Methods
+   WebNavigate()
+   OnGetDlgCode()

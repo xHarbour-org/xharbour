@@ -1,0 +1,38 @@
+Properties
+   Images      
+   IconWidth   
+   IconHeight  
+   Palette     
+   MaskColor   
+   Handle      
+   Events      
+   Count 
+
+Methods
+   Destroy()
+   Clean()
+   AddBitmap()
+   AddImage()
+   AddIcon()
+   Add( hImage, hMask )
+   RemoveImage(n)
+   ReplaceImage(n, hImage)
+   DrawDisabled()
+   DrawImage()
+   FromToolBar( oBar )
+   GetImage( nIndex )
+   GetImages()
+   BeginDrag(i,x,y)
+   EndDrag()
+   DragMove(x,y)
+   DragEnter(hWnd,x,y)
+   DragShowNolock(l)
+   RemoveAll()
+   ComboBox( oParent )
+   DrawIndirect()
+   SaveImage(n, cFile)
+
+
+
+   
+

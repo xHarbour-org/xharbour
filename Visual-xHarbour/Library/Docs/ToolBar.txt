@@ -1,0 +1,68 @@
+Properties
+   List
+   ToolTips
+   Flat    
+   Transparent
+   ImageList 
+   HotImageList
+   HorzPadding
+   VertPadding 
+   DrawArrows
+   MixedButtons
+   HideClippedButtons
+   Border
+   BitmapWidth
+   BitmapHeight     
+   Caption
+   TabStop 
+   Banner
+   NoThemeCheck 
+   Chevron     
+   ButtonCheckSolid
+   ButtonCheckColor
+   ExtStyle   
+   oMenu      
+   PrevMenuProc
+             
+   
+
+Methods
+   SetBanner()
+   IsButtonChecked( nId )
+   AddBitmap()
+   Disableall()
+   Enableall()
+   GetImageList()                     
+   SetDrawTextFlags( nFlag1, nFlag2 ) 
+   SetBitmapSize( nWidth, nHeight )   
+   SetButtonSize( nWidth, nHeight )   
+   SetButtonWidth( nMin, nMax )       
+   GetButtonSize()                    
+   GetButtonBitmap( nButton )         
+   DisableBtn( nBtn )      
+   EnableBtn( nBtn, lEnable ) 
+   GetButtonCount()        
+   SetImageList(oImg)      
+   SetHotImageList(oImg)   
+   CheckButton(nBtn,lFlag)
+   IsButtonClicked(nBtn) 
+   SetListStyle()     
+   Disable()           
+   Enable()               
+   SetPadding()
+   GetGapWidth()
+   SetButtonState()
+   GetButtonInfo()
+   GetButton()
+   SetColorScheme()
+   GetHeight() 
+   GetButtonsWidth()
+   OpenPopup()
+   MoveMenu()
+   UpdateMenu()
+   AddControl()
+   SetExtStyle()
+
+
+   
+   

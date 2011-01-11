@@ -1,0 +1,28 @@
+Properties
+   Bands               
+   ImageList     
+   BackColor         
+   Vertical                   
+
+
+Methods
+   GetBandInfo()
+   GetBandRect()
+   GetBkColor()  
+   SetTextColor(n)  
+   SetBkColor(n) 
+   GetHeight()    
+   BandFromhWnd()
+   UpdateSize()
+   FindRemoveBand()
+   
+   
+
+
+
+
+    
+
+
+   
+   

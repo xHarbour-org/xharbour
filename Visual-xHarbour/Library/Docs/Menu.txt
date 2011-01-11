@@ -1,0 +1,32 @@
+Properties
+   aItems     
+   hMenu       
+   Parent       
+   Left          
+   Top           
+   Style      
+   CoolBar      
+   ImageBkColor  
+   ImageBkBorder 
+   ThemeActive 
+   hWnd
+   ImageList
+   HotImageList
+   Property     
+                            
+
+Methods
+   Context()
+   Destroy()        
+   EnableItem()
+   DisableItem(nId )
+   GetSubMenu()
+   GetMenuByHandle()
+   GetMenuById()
+   AddMenuItem()
+   CheckItem()
+   DeleteItem()
+   GetItem()
+   Set()
+
+

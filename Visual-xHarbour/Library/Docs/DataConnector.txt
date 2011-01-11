@@ -1,0 +1,29 @@
+Properties
+   ConnectionString 
+   AutoConnect
+   Server
+   Sql
+   ConnectionID
+   Connected 
+ 
+
+Methods
+   Connect( cConnString )
+   Disconnect()
+   Commit()
+   RollBack()
+   Execute( cCommand )
+   Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate )
+   Fetch( aLine )
+   FieldGet( nField, aField, cFromWhere, nFieldJoin, nHandle, lTranslate )
+   Getline( aFields, lTranslate, nHandle, nStart )
+   GetStruct( cTable )
+   BuildString()
+
+
+
+
+
+
+   
+

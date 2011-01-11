@@ -1,0 +1,44 @@
+Properties
+   Structure          
+   Table              
+   Alias              
+   Fields             
+   Parent             
+   Tag                
+   Record             
+   bOnFileNameChanged
+   bOnFileClosed 
+   lEof
+   lBof  
+                            
+
+Methods
+   Deleted()          
+   Eof()      
+   Bof()           
+   RecCount()         
+   RecNo()            
+   OrdKeyRelPos()     
+   GoTop()
+   GoTo()
+   GoBottom()
+   Skip()
+   Delete()
+   Close()            
+   Append()
+   Insert()           
+   OrdSetFocus()
+   Seek()
+   Found()            
+   Zap()              
+   OrdKeyGoTo( nPos ) 
+   OrdKeyNo()        
+   OrdKeyCount()      
+   FieldPos()
+   RecLock()          
+   UnLock()           
+   FieldPut( nField, xVal ) 
+   FieldGet( nField, xVal ) 
+   IsOpen
+
+

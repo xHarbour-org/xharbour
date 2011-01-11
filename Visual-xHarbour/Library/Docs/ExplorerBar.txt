@@ -1,0 +1,4 @@
+Properties
+   BackColor
+   ForeColor
+   ImageList
