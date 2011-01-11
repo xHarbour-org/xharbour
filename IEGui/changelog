@@ -1,0 +1,17 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+
+2009-01-21 13:33 UTC-0800 Patrick Mast <Patrick.Mast@xHarbour.com>
++ Changelog
+- IEGui/iegui.lib.xbp
++ IEGui/vc8/xbuild.vc8.ini
++ IEGui/vc8/iegui.lib.xbp
++ IEGui/xcc/iegui.lib.xbp
