@@ -1,0 +1,40 @@
+CINI = xbuild.bc5.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = 
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS =  
+MYDEFINES = WIN32 ;__IMPORT__ ;__EXPORT__
+MYLINK_FLAGS = 
+MYPRG_FLAGS = -n1 -p -w -es2
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\bc5\OleServer.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\lib\bc5
+
+[\xHarbour.com\xHarbour-OLEServer\source\oleserver.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xHarbour.com\xHarbour-OLEServer\source\TypeLib.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xHarbour.com\xHarbour-OLEServer\source\OleWrap.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[\xHarbour.com\xHarbour-OLEServer\source\TypeInfo.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+

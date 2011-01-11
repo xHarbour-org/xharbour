@@ -1,0 +1,44 @@
+CINI = xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LAUTORUN = 
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = NODLLMAIN ;WIN32 ;__IMPORT__ ;__EXPORT__
+MYLINK_FLAGS =
+MYPRG_FLAGS = -n1 -p -w -es2
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\Ole.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\vc8
+
+[\xHarbour.com\xHarbour-OLEServer\source\oleserver.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xHarbour.com\xHarbour-OLEServer\source\TypeLib.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xHarbour.com\xHarbour-OLEServer\source\OleWrap.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[\xHarbour.com\xHarbour-OLEServer\source\TypeInfo.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+

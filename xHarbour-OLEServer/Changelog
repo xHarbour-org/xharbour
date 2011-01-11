@@ -1,0 +1,60 @@
+/*
+ * $Id:
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+
+2009-10-07 10:21 UTC-0450 Ron Pinkas <ron@xHarbour.com>
+  * source\olewrap.prg
+    * Support license when defferning to TOleAuto()
+    * Minute refinement to TraceLog()s
+
+  * source\oleserver.c
+    ! Fixed serious trap to hb_dynsymFind() resulting from broken sort due to replacement of
+      pDynSym->pSymbol->szName to reflect Event name instead of Function name.
+
+2009-07-09 21:13 UTC-0450 Ron Pinkas <ron@xHarbour.com>
+  ! Fixed hb_vmProcessSymbols() to only be compiled when #ifndef NODLLMAIN
+
+2009-07-09 19:43 UTC-0450 Ron Pinkas <ron@xHarbour.com>
+  + Added copy of hb_vmProcessSymbols() from maindlle.c, because d[ll]main.lib isn't inked with OleServer.lib
+
+2009-07-07 12:49 UTC-0450 Ron Pinkas <ron@xHarbour.com>
+  * Standardized #define and and #undef of _DEBUG
+
+2009-01-21 15:37 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+- xHarbour-OLEServer/xhbole.lib.xbp
+- xHarbour-OLEServer/xhbole-demo.lib.xbp
+- xHarbour-OLEServer/oleserver.lib.xbp
+- xHarbour-OLEServer/ole.lib.xbp
+- xHarbour-OLEServer/bc5/Build_All.bat
+- xHarbour-OLEServer/bc5/xhbole.lib.xbp
+- xHarbour-OLEServer/bc5/xhbole-demo.lib.xbp
+- xHarbour-OLEServer/vc8/Build_All.bat
+- xHarbour-OLEServer/vc8/xhbole.lib.xbp
+- xHarbour-OLEServer/vc8/xhbole-demo.lib.xbp
++ xHarbour-OLEServer/bc5/Demo/oleserver.lib.xbp
++ xHarbour-OLEServer/bc5/Demo/ole.lib.xbp
++ xHarbour-OLEServer/vc8/Demo/oleserver.lib.xbp
++ xHarbour-OLEServer/vc8/Demo/ole.lib.xbp
++ xHarbour-OLEServer/xcc/oleserver.lib.xbp
++ xHarbour-OLEServer/xcc/ole.lib.xbp
++ xHarbour-OLEServer/xcc/Demo/oleserver.lib.xbp
++ xHarbour-OLEServer/xcc/Demo/ole.lib.xbp
+* xHarbour-OLEServer/bc5/oleserver.lib.xbp
+* xHarbour-OLEServer/bc5/ole.lib.xbp
+  ! Fixed paths and defines
+* xHarbour-OLEServer/vc8/oleserver.lib.xbp
+* xHarbour-OLEServer/vc8/ole.lib.xbp
+  ! Fixed paths and defines
+
+
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  - xBuild.ini
+  * OleServer.lib.xbp
+    * finetuned
