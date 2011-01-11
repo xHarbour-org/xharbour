@@ -1,0 +1,544 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INIT_PORT
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Open an serial Port
+ *  $SYNTAX$
+ *      Init_Port( <cPort>,[ <nBaudrate>],[ <nDatabits>],[ <nParity>],[ <nStopbits>],[ <nBuffersize>]) --> pHandle
+ *  $ARGUMENTS$
+ *      <cPort>        Port Name, Default COM1
+ *
+ *      <nBaudrate>    Optional, Set the port speed, Default 9600
+ *
+ *      <nDatabits>    Optional, Set the number of databits, Default 8
+ *
+ *      <nParity>      Optional, Set the parity, Default 0(NOPARITY)
+ *
+ *      <nStopbits>    Optional, Set the stop bits, Default 0(ONESTOPBIT)
+ *
+ *      <nBuffersize>  Optional, Set the port speed, Default 4000 *
+ *  $RETURNS$
+ *      <nHandle> Handle of opened port
+ *  $DESCRIPTION$
+ *      This Function open an COMM port for serial communication on the settings passed
+ *      the Values for nParity can Be
+ *  <table>
+ *      nMode   tcomm.ch      
+ *
+ *      0       NOPARITY      
+ *      1       ODDPARITY     
+ *      2       MARKPARITY    
+ *      3       EVENPARITY          
+ *  </table>
+ *
+ *      the nBaudRate can be the follow values
+ *  <table>
+ *      tcomm.ch       Speed
+ *      CBR_110         110
+ *      CBR_300         300
+ *      CBR_600         600
+ *      CBR_1200        1200
+ *      CBR_2400        2400
+ *      CBR_4800        4800
+ *      CBR_9600        9600
+ *      CBR_14400       14400
+ *      CBR_19200       19200
+ *      CBR_38400       38400
+ *      CBR_56000       56000
+ *      CBR_57600       57600
+ *      CBR_115200      115200
+ *      CBR_128000      128000
+ *      CBR_256000      256000
+ *   </table>
+
+ *      the Values for nStopbits can Be
+ *  <table>
+ *      nMode   tcomm.ch      
+ *
+ *      0       NOPARITY
+ *      1       ODDPARITY     
+ *      2       MARKPARITY    
+ *      3       EVENPARITY          
+ *  </table>
+ *
+ *      When the comm  port is successfully open, it return an
+ *      Pointer  value which is the handles of the opened com port.
+ *      On error it will return empty pointer
+ *  $EXAMPLES$
+ *      nHandle := Init_Port ('COM1', 9600, 8, 1, 0, 4000,@x)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ISWORKING
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Check if comm port is open
+ *  $SYNTAX$
+ *      ISWORKING( <pHandle> ) --> lOpen
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *  $RETURNS$
+ *      lOpen     .T. if open otherwise .F.
+ *  $DESCRIPTION$
+ *      This function check is the comm port is open successfully and ready to use
+ *  $EXAMPLES$
+ *      nHandle := Init_Port ('COM1', 9600, 8, 1, 0, 4000,@x)
+ *      if !isWorking( nHandle)
+ *         quit
+ *      endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      UNINT_PORT
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Close an comm port if open
+ *  $SYNTAX$
+ *      UNINT_PORT( <nHandle> ) --> NIL
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *  $RETURNS$
+ *      This function return NIL
+ *  $DESCRIPTION$
+ *      This function close an open com port indentified by nHandle
+ *  $EXAMPLES$
+ *     UNINT_PORT(nHandle)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),ISWORKING(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OUTBUFSIZE
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Get number of bytes waiting to be sent to com port
+ *  $SYNTAX$
+ *      OUTBUFSIZE( <nHandle> ) --> nBytes
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *  $RETURNS$
+ *      <nBytes> Number of Bytes waiting to be send
+ *  $DESCRIPTION$
+ *      This function get the number of bytes waiting to be send
+ *  $EXAMPLES$
+ *      nBytes := OUTBUFSIZE(nHandle)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),ISWORKING(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INBUFSIZE
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Get number of bytes waiting to be read to com port
+ *  $SYNTAX$
+ *      INBUFSIZE( <nHandle> ) --> nBytes
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *  $RETURNS$
+ *      <nBytes> Number of Bytes waiting to be send
+ *  $DESCRIPTION$
+ *      This function get the number of bytes waiting to be read
+ *  $EXAMPLES$
+ *      nBytes := INBUFSIZE(nHandle)
+ *      if nBytes >0
+ *      inchr(nhandle,nbytes,@xdata)
+ *      endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),ISWORKING(),OUTBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OUTBUFCLR
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Clear all output buffer
+ *  $SYNTAX$
+ *      OUTBUFCLR( <nHandle> ) --> lSuccess
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *  $RETURNS$
+ *      lSuccess     .T. if open otherwise .F.
+ *  $DESCRIPTION$
+ *      This function clear all data on comm port output buffer
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INCHR()
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Read Data from com port
+ *  $SYNTAX$
+ *      INCHR( <nHandle>, <iSize>, @<cData> ) --> nRead
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <iSize>   Number of Bytes to read
+ *
+ *      <cData>   Variable passed by reference that get the read Data
+ *  $RETURNS$
+ *      <nRead>   Number of bytes readed from the com port
+ *  $DESCRIPTION$
+ *      This function read data from the comm port. it will read the <iSize>
+ *      bytes waiting on com  port.On error , this function return -1
+ *  $EXAMPLES$
+ *      nBytes := INBUFSIZE(nHandle)
+ *      if nBytes >0
+ *         inchr(nhandle,nbytes,@xdata)
+ *      endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OUTCHR()
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Read Data from com port
+ *  $SYNTAX$
+ *      OUTCHR( <nHandle>, <cData>, <iSize> ) --> nWrite
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <cData>   Data to write to com port
+ *
+ *      <iSize>   Optional Number of Bytes to write
+ *
+ *  $RETURNS$
+ *      <nWrite>  Number of bytes writen to the com port
+ *  $DESCRIPTION$
+ *      This function write data from the comm port. it will write the
+ *      full lenght of <cData> unless the <iSize> parameter is passed.
+ *      On error , this function return -1
+ *  $EXAMPLES$
+ *      nBytes := INBUFSIZE(nHandle)
+ *      if nBytes >0
+ *         inchr(nhandle,nbytes,@xdata)
+ *      endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      INIT_PORT(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INIT_PORT2(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INIT_PORT2
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Open an serial Port
+ *  $SYNTAX$
+ *      Init_Port2( <cPort>) -->pHandle
+ *  $ARGUMENTS$
+ *      <cPort>        Port Name, Default COM1
+ *
+ *  $RETURNS$
+ *      <nHandle> The pointer Handle of opened port
+ *  $DESCRIPTION$
+ *      This Function open an COMM port for serial communication.Insted of
+ *      passing the configuration setting that you need, this function will
+ *      open an dialog to you set the com port
+ *
+ *      When the comm  port is successfully open, it return an
+ *      pointer value which is the handles of the opened com port.
+ *      On error it will return empty pointer
+ *  $EXAMPLES$
+ *      nHandle := Init_Port2('COM1')
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETCOMOPTIONS(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETCOMOPTIONS
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Set options for com port
+ *  $SYNTAX$
+ *      SETCOMOPTIONS( <nHandle>, <nOption>) -->nil
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <nOption>  Option to set to com port
+ *  $RETURNS$
+ *      <nHandle> The pointer Handle of opened port
+ *  $DESCRIPTION$
+ *      This function set options for Comm Port
+ *      Options Are:
+ *  <table>
+ *      nMode   tcomm.ch      
+ *
+ *      1       SETRTS
+ *      2       CLRRTS
+ *      3       SETDTR
+ *      4       CLRDTR
+ *  </table>
+ *  $EXAMPLES$
+ *      SETCOMOPTIONS(nHandle,SETRTS)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETHANDSHAKE
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Set options for handshaking
+ *  $SYNTAX$
+ *      SETHANDSHAKE( <nHandle>, <nOption>) --> lSet
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <nOption> Option to set to com port
+ *  $RETURNS$
+ *      <lSet>  .T. if option was set , otherwise false
+ *  $DESCRIPTION$
+ *      This function set handshaking options for Comm Port
+ *      Options Are:
+ *  <table>
+ *      nMode   tcomm.ch      
+ *
+ *      0       EHANDSHAKEOFF
+ *      1       EHANDSHAKEHARDWARE
+ *      2       EHANDSHAKESOFTWARE
+ *  </table>
+ *  $EXAMPLES$
+ *      SETHANDSHAKE(nHandle,EHANDSHAKEHARDWARE)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GETMODEMSTATUS
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Get status of com Port
+ *  $SYNTAX$
+ *      GETMODEMSTATUS( <nHandle>, @<cts>,@<dsr>,@<ring>,@<rlsd>) -->lRet
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <cts>  Variable passed by reference to get cts status
+ *
+ *      <dsr>  Variable passed by reference to get dsr status
+ *
+ *      <ring> Variable passed by reference to get ring status
+ *
+ *      <rlsd> Variable passed by reference to get rlsd status
+ *  $RETURNS$
+ *      <nHandle> .t. if Status was retrived, otherwise .f.
+ *  $DESCRIPTION$
+ *      This function Get the status of modem
+ *  $EXAMPLES$
+ *      GETMODEMSTATUS(nHandle,@q,@w,@e,@r)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETHANDSHAKE
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Set options for handshaking
+ *  $SYNTAX$
+ *      SETHANDSHAKE( <nHandle>, <nOption>) --> lSet
+ *  $ARGUMENTS$
+ *      <nHandle> The pointer handle of an opened com port
+ *
+ *      <nOption> Option to set to com port
+ *  $RETURNS$
+ *      <lSet>  .T. if option was set , otherwise false
+ *  $DESCRIPTION$
+ *      This function set handshaking options for Comm Port
+ *      Options Are:
+ *  <table>
+ *      nMode   tcomm.ch      
+ *
+ *      0       EHANDSHAKEOFF
+ *      1       EHANDSHAKEHARDWARE
+ *      2       EHANDSHAKESOFTWARE
+ *  </table>
+ *  $EXAMPLES$
+ *      SETHANDSHAKE(nHandle,EHANDSHAKEHARDWARE)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GETNUMBEROFSERIALPORTS()
+ *  $CATEGORY$
+ *      Serial Communication
+ *  $ONELINER$
+ *      Get the Com Ports avaliable
+ *  $SYNTAX$
+ *      GETNUMBEROFSERIALPORTS() -> aPorts
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *      <aPort>  Array of com ports found
+ *  $DESCRIPTION$
+ *      This function return an array with all com ports found on the machine
+ *  $EXAMPLES$
+ *      aPort :=GETNUMBEROFSERIALPORTS()
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xHarbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Library is xhbcomm.lib and xhbcommdll.lib
+ *  $SEEALSO$
+ *      ISWORKING(),UNINT_PORT(),OUTBUFSIZE(),INBUFSIZE(),OUTBUFCLR(),INCHR(),OUTCHR(),SETHANDSHAKE(),GETMODEMSTATUS()
+ *  $END$
+ */
+
+

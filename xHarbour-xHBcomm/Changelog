@@ -1,0 +1,127 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+2009-01-07 08:40  UTC-0300 Luiz Rafael Culik
+  ! xhbcomm.c
+   ! Minor fixes
+     
+2009-01-21 16:02 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+- xHarbour-xHBComm/xhbcomm.lib.xbp
++ xHarbour-xHBComm/vc8/xhbComm.lib.xbp
++ xHarbour-xHBComm/vc8/xbuild.vc8.ini
++ xHarbour-xHBComm/xcc/xhbComm.lib.xbp
+* xHarbour-xHBComm/comm/comm.lib.xbp
+* xHarbour-xHBComm/xhbcommdll/xhbcommdll.dll.xbp
+  * Changed paths and settings
+
+
+2006-11-30 20:30  UTC-0300 Luiz Rafael Culik
+  ! xhbcomm.c
+   ! Fixed and small erro on inbufclr() function that was not clear properly the
+     serial port input buffer
+
+
+2006-06-06 14:00  UTC-0300 Luiz Rafael Culik
+  ! xhbcomm.c
+   ! Added new function SETDTR()
+   ! SETHANDSHAKE() now have two more modes 
+  ! xhbcommdll/xhbcomm.h
+    xhbcommdll/xhbcomm.h
+    comm/comm.cpp
+    comm.h
+    !Added code to suport new function
+    ! minor fix on 
+
+
+2006-03-10 18:00  UTC-0300 Luiz Rafael Culik
+  ! tcomm.prg   
+  ! tcomm.ch
+    ! minor changes
+  ! xhbcomm.c
+    ! new function GETNUMBEROFSERIALPORTS() this function return an array of all
+      avaliable com ports on the computer
+  ! commfunc.txt
+    ! Added document for GETNUMBEROFSERIALPORTS() function
+
+2006-02-25 18:00  UTC-0300 Luiz Rafael Culik
+  ! tcomm.prg
+    ! Added some new methods SETXOFF()/  SETXON()
+  ! tcomm.ch
+    ! added two missing defines
+  ! comm\comm.cpp
+    ! minor change on SetCommOption() function to handle XOFF/XON properly
+
+2006-01-31 00:02  UTC-0300 Luiz Rafael Culik
+  ! xhbcomm.c
+    ! added Missig INBUFCLR () function
+
+2005-12-27 11:20  UTC-0300 Luiz Rafael Culik
+  ! xhbcomm.c
+    ! added new functions for control CTS/DRS
+  ! tcomm.ch
+    ! added new defines for  DRS/CTS controls
+  ! tcomm.prg
+    ! Added some new methods for deal with DSR/CTS
+  ! xhbcommdll\xhbcomm.cpp
+  ! xhbcommdll\xhbcomm.h
+  ! comm\comm.cpp
+  ! comm\comm.h
+    ! updated to add new service functions
+  ! commfunc.txt
+    ! added doc for new functions
+  ! querycls.prg
+    ! added new functions calls
+ 
+2005-05-27 18:30  UTC-0300 Luiz Rafael Culik
+  ! querycls.prg
+    ! updated to open the passed port
+  ! xhbcomm.c
+    ! small change to inchr()
+
+
+2005-05-25 16:40  UTC-0300 Luiz Rafael Culik
+  + tcomm.ch
+    ! include Header for comm functions
+  + tcomm.prg
+    ! Tcomm class for communication
+  - Readme.txt
+  + CommFunc.txt
+     removed old File and started an new one following the  template for hbdoc processing
+  + querycls.prg
+    !example on how to query an modem
+  ! xhbcommdll\xhbcomm.cpp
+  ! xhbcommdll\xhbcomm.h
+  ! comm\comm.cpp
+  ! comm\comm.h
+  ! xhbcomm.c
+    ! updated to include code to support INIT_PORT2()
+  !xhbcomm.lib.xbp
+    ! added tcomm.prg
+
+
+2005-04-23 01:00  UTC-0300 Luiz Rafael Culik
+  * xhbcomm.c
+    ! minor fix to stop bits
+  !xhbcommdll\xhbcomm.cpp
+  !xhbcommdll\xhbcomm.h
+      Minor fix to Tcomm_SetStopBits(and updated header file)
+
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * .xbp
+    * finetuned all XBP files
+
+2004-09-07 22:24  UTC-0300 Luiz Rafael Culik
+   * xhbcomm.c
+     ! minor fix on hb_outclr() with make GPF
+
+2004-04-16 23:30 UTC-0300 Luiz Rafael Culik
+   * xhbcomm.c
+     ! minor fix
+2004-03-11 10:40 UTC-0300 Luiz Rafael Culik
+   * imported xhbcomm sources to cvs

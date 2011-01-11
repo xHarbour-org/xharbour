@@ -1,0 +1,23 @@
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = \xHarbour.com\xHarbour-xHBComm\xhbcommdll;\xHarbour.com\xHarbour-xHBComm\comm
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS =  
+MYDEFINES = 
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\xhbcomm.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour.com\xHarbour-xHBComm\xhbcomm.c]
+[\xHarbour.com\xHarbour-xHBComm\tcomm.prg]
