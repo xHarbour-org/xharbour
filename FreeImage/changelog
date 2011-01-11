@@ -1,0 +1,16 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+
+2009-01-21 13:30 UTC-0800 Patrick Mast <Patrick.Mast@xHarbour.com>
++ Changelog
+- FreeImage/FreeImage-xHB.lib.xbp
++ FreeImage/xcc/FreeImage-xHB.lib.xbp
++ FreeImage/vc8/FreeImage-xHB.lib.xbp
