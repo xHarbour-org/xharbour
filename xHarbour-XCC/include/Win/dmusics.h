@@ -1,0 +1,108 @@
+#ifndef _DMUSICS_H
+#define _DMUSICS_H
+
+/* DirectMusic software synth definitions */
+
+#include "dmusicc.h"
+
+#define REGSTR_PATH_SOFTWARESYNTHS  "Software\\Microsoft\\DirectMusic\\SoftwareSynths"
+
+#define REFRESH_F_LASTBUFFER  0x00000001
+
+DEFINE_GUID(IID_IDirectMusicSynth,0x9823661,0x5c85,0x11d2,0xaf,0xa6,0x0,0xaa,0x0,0x24,0xd8,0xb6);
+DEFINE_GUID(IID_IDirectMusicSynth8,0x53cab625,0x2711,0x4c9f,0x9d,0xe7,0x1b,0x7f,0x92,0x5f,0x6f,0xc8);
+DEFINE_GUID(IID_IDirectMusicSynthSink,0x9823663,0x5c85,0x11d2,0xaf,0xa6,0x0,0xaa,0x0,0x24,0xd8,0xb6);
+DEFINE_GUID(GUID_DMUS_PROP_SetSynthSink,0x0a3a5ba5,0x37b6,0x11d2,0xb9,0xf9,0x00,0x00,0xf8,0x75,0xac,0x12);
+DEFINE_GUID(GUID_DMUS_PROP_SinkUsesDSound,0xbe208857,0x8952,0x11d2,0xba,0x1c,0x00,0x00,0xf8,0x75,0xac,0x12);
+
+interface IDirectMusicSynth;
+interface IDirectMusicSynthSink;
+
+#ifndef __cplusplus
+typedef interface IDirectMusicSynth IDirectMusicSynth;
+typedef interface IDirectMusicSynthSink IDirectMusicSynthSink;
+#endif
+
+#ifndef _DMUS_VOICE_STATE_DEFINED
+#define _DMUS_VOICE_STATE_DEFINED
+typedef struct _DMUS_VOICE_STATE {
+    BOOL bExists;
+    SAMPLE_POSITION spPosition;
+} DMUS_VOICE_STATE;
+#endif /* _DMUS_VOICE_STATE_DEFINED */
+
+#undef INTERFACE
+#define INTERFACE IDirectMusicSynth
+DECLARE_INTERFACE_(IDirectMusicSynth,IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(Open)(THIS_ LPDMUS_PORTPARAMS) PURE;
+    STDMETHOD(Close)(THIS) PURE;
+    STDMETHOD(SetNumChannelGroups)(THIS_ DWORD) PURE;
+    STDMETHOD(Download)(THIS_ LPHANDLE,LPVOID,LPBOOL) PURE;
+    STDMETHOD(Unload)(THIS_ HANDLE,HRESULT(CALLBACK*)(HANDLE,HANDLE),HANDLE) PURE;
+    STDMETHOD(PlayBuffer)(THIS_ REFERENCE_TIME,LPBYTE,DWORD) PURE;
+    STDMETHOD(GetRunningStats)(THIS_ LPDMUS_SYNTHSTATS) PURE;
+    STDMETHOD(GetPortCaps)(THIS_ LPDMUS_PORTCAPS) PURE;
+    STDMETHOD(SetMasterClock)(THIS_ IReferenceClock*) PURE;
+    STDMETHOD(GetLatencyClock)(THIS_ IReferenceClock**) PURE;
+    STDMETHOD(Activate)(THIS_ BOOL) PURE;
+    STDMETHOD(SetSynthSink)(THIS_ IDirectMusicSynthSink*) PURE;
+    STDMETHOD(Render)(THIS_ short*,DWORD,LONGLONG) PURE;
+    STDMETHOD(SetChannelPriority)(THIS_ DWORD,DWORD,DWORD) PURE;
+    STDMETHOD(GetChannelPriority)(THIS_ DWORD,DWORD,LPDWORD) PURE;
+    STDMETHOD(GetFormat)(THIS_ LPWAVEFORMATEX,LPDWORD) PURE;
+    STDMETHOD(GetAppend)(THIS_ DWORD*) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IDirectMusicSynth8
+DECLARE_INTERFACE_(IDirectMusicSynth8,IDirectMusicSynth)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(Open)(THIS_ LPDMUS_PORTPARAMS) PURE;
+    STDMETHOD(Close)(THIS) PURE;
+    STDMETHOD(SetNumChannelGroups)(THIS_ DWORD) PURE;
+    STDMETHOD(Download)(THIS_ LPHANDLE,LPVOID,LPBOOL) PURE;
+    STDMETHOD(Unload)(THIS_ HANDLE,HRESULT(CALLBACK*)(HANDLE,HANDLE),HANDLE) PURE;
+    STDMETHOD(PlayBuffer)(THIS_ REFERENCE_TIME,LPBYTE,DWORD) PURE;
+    STDMETHOD(GetRunningStats)(THIS_ LPDMUS_SYNTHSTATS) PURE;
+    STDMETHOD(GetPortCaps)(THIS_ LPDMUS_PORTCAPS) PURE;
+    STDMETHOD(SetMasterClock)(THIS_ IReferenceClock*) PURE;
+    STDMETHOD(GetLatencyClock)(THIS_ IReferenceClock**) PURE;
+    STDMETHOD(Activate)(THIS_ BOOL) PURE;
+    STDMETHOD(SetSynthSink)(THIS_ IDirectMusicSynthSink*) PURE;
+    STDMETHOD(Render)(THIS_ short*,DWORD,LONGLONG) PURE;
+    STDMETHOD(SetChannelPriority)(THIS_ DWORD,DWORD,DWORD) PURE;
+    STDMETHOD(GetChannelPriority)(THIS_ DWORD,DWORD,LPDWORD) PURE;
+    STDMETHOD(GetFormat)(THIS_ LPWAVEFORMATEX,LPDWORD) PURE;
+    STDMETHOD(GetAppend)(THIS_ DWORD*) PURE;
+    STDMETHOD(PlayVoice)(THIS_ REFERENCE_TIME,DWORD,DWORD,DWORD,DWORD,long,long,SAMPLE_TIME,SAMPLE_TIME,SAMPLE_TIME) PURE;
+    STDMETHOD(StopVoice)(THIS_ REFERENCE_TIME,DWORD) PURE;
+    STDMETHOD(GetVoiceState)(THIS_ DWORD[],DWORD,DMUS_VOICE_STATE[]) PURE;
+    STDMETHOD(Refresh)(THIS_ DWORD,DWORD) PURE;
+    STDMETHOD(AssignChannelToBuses)(THIS_ DWORD,DWORD,LPDWORD,DWORD) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IDirectMusicSynthSink
+DECLARE_INTERFACE_(IDirectMusicSynthSink,IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(Init)(THIS_ IDirectMusicSynth*) PURE;
+    STDMETHOD(SetMasterClock)(THIS_ IReferenceClock*) PURE;
+    STDMETHOD(GetLatencyClock)(THIS_ IReferenceClock**) PURE;
+    STDMETHOD(Activate)(THIS_ BOOL) PURE;
+    STDMETHOD(SampleToRefTime)(THIS_ LONGLONG,REFERENCE_TIME*) PURE;
+    STDMETHOD(RefTimeToSample)(THIS_ REFERENCE_TIME,LONGLONG*) PURE;
+    STDMETHOD(SetDirectSound)(THIS_ LPDIRECTSOUND,LPDIRECTSOUNDBUFFER) PURE;
+    STDMETHOD(GetDesiredBufferSize)(THIS_ LPDWORD) PURE;
+};
+
+#endif /* _DMUSICS_H */

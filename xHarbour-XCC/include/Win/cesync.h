@@ -1,0 +1,349 @@
+#ifndef _CESYNC_H
+#define _CESYNC_H
+
+/* Synchronization module definitions (Windows CE) */
+
+#define MAX_OBJTYPE_NAME  100
+#define MAX_PACKET_SIZE  260000
+#define MAX_ACTIVE_VOL  16
+
+#define SZ_OUTSTORE_PROG_ID  TEXT("MS.WinCE.OutLook")
+#define SZ_SCDSTORE_PROG_ID  TEXT("MS.WinCE.SchedulePlus")
+
+#define SZ_APPT  TEXT("Appointment")
+#define SZ_CONTACT  TEXT("Contact")
+#define SZ_TASK  TEXT("Task")
+#define SZ_FILE  TEXT("File")
+#define SZ_INBOX  TEXT("Inbox")
+#define SZ_CHANNELS  TEXT("Channel")
+
+typedef struct _tagReplSetup *PREPLSETUP;
+
+typedef TCHAR OBJTYPENAME[MAX_OBJTYPE_NAME];
+typedef char OBJTYPENAMEA[MAX_OBJTYPE_NAME];
+typedef WCHAR OBJTYPENAMEW[MAX_OBJTYPE_NAME];
+
+#ifndef _WINCE
+typedef struct _REPLOBJ *HREPLOBJ;
+typedef struct _REPLITEM *HREPLITEM;
+typedef struct _REPLFLD *HREPLFLD;
+#endif /* _WINCE */
+
+#define FACILITY_CESYNC  0x14
+#define MAKE_RERR(code)  ((HRESULT)(MAKE_SCODE(SEVERITY_ERROR,FACILITY_CESYNC,code)))
+#define MAKE_RWRN(code)  ((HRESULT)(MAKE_SCODE(SEVERITY_SUCCESS,FACILITY_CESYNC,code)))
+
+#define RERR_SHUT_DOWN  MAKE_RERR(0x0001)
+#define RERR_STORE_REPLACED  MAKE_RERR(0x0002)
+#define RERR_CANCEL  MAKE_RERR(0x0003)
+#define RERR_RESTART  MAKE_RERR(0x0004)
+#define RERR_IGNORE  MAKE_RERR(0x0005)
+#define RERR_UNLOAD  MAKE_RERR(0x0006)
+#define RERR_OBJECT_DELETED  MAKE_RERR(0x0007)
+#define RERR_CORRUPT  MAKE_RERR(0x0008)
+#define RERR_NO_DEVICE  MAKE_RERR(0x0009)
+#define RERR_NO_ERR_PROMPT  MAKE_RERR(0x0010)
+#define RERR_DISCARD  MAKE_RERR(0x0011)
+#define RERR_DISCARD_LOCAL  MAKE_RERR(0x0012)
+#define RERR_VOL_INACTIVE  MAKE_RERR(0x0013)
+#define RERR_BIG_OBJ_TYPE  MAKE_RERR(0x0014)
+#define RERR_BIG_CODE  MAKE_RERR(0x0015)
+#define RERR_UNMATCHED  MAKE_RERR(0x0016)
+#define RERR_DEVICE_WIN  MAKE_RERR(0x0017)
+#define RERR_DESKTOP_WIN  MAKE_RERR(0x0018)
+#define RERR_SKIP_ALL_OBJ  MAKE_RERR(0x0019)
+
+#define RERR_SKIP_ALL  MAKE_RERR(0x0100)
+#define RERR_BAD_OBJECT  MAKE_RERR(0x0101)
+#define RERR_TRY_AGAIN  MAKE_RERR(0x0102)
+#define RERR_USER_SKIP  MAKE_RERR(0x0103)
+
+#define RWRN_LAST_PACKET  MAKE_RWRN(0x0001)
+
+#define BSF_AUTO_SYNC  ((UINT)0x00000001)
+#define BSF_REMOTE_SYNC  ((UINT)0x00000002)
+#define BSF_SHOW_FATAL_ERRORS  ((UINT)0x00000004)
+#define BSF_SHOW_RESOLVE_ERRORS  ((UINT)0x00000008)
+#define BSF_RESERVED  ((UINT)0x80000000)
+
+#define RSC_BEGIN_SYNC  ((UINT)1)
+#define RSC_END_SYNC  ((UINT)2)
+#define RSC_BEGIN_CHECK  ((UINT)3)
+#define RSC_END_CHECK  ((UINT)4)
+#define RSC_DATE_CHANGED  ((UINT)5)
+#define RSC_RELEASE  ((UINT)6)
+#define RSC_REMOTE_SYNC  ((UINT)7)
+#define RSC_INTERRUPT  ((UINT)8)
+#define RSC_BEGIN_SYNC_OBJ  ((UINT)9)
+#define RSC_END_SYNC_OBJ  ((UINT)10)
+#define RSC_OBJ_TYPE_ENABLED  ((UINT)11)
+#define RSC_OBJ_TYPE_DISABLED  ((UINT)12)
+#define RSC_BEGIN_BATCH_WRITE  ((UINT)13)
+#define RSC_END_BATCH_WRITE  ((UINT)14)
+#define RSC_CONNECTION_CHG  ((UINT)15)
+#define RSC_WRITE_OBJ_FAILED  ((UINT)16)
+#define RSC_DELETE_OBJ_FAILED  ((UINT)17)
+#define RSC_WRITE_OBJ_SUCCESS  ((UINT)18)
+#define RSC_DELETE_OBJ_SUCCESS  ((UINT)19)
+#define RSC_READ_OBJ_FAILED  ((UINT)20)
+#define RSC_TIME_CHANGED  ((UINT)21)
+#define RSC_BEGIN_BACKUP  ((UINT)22)
+#define RSC_END_BACKUP  ((UINT)23)
+#define RSC_BEGIN_RESTORE  ((UINT)24)
+#define RSC_PREPARE_SYNC_FLD  ((UINT)26)
+
+#define QDC_SEL_DEVICE      1
+#define QDC_CON_DEVICE      2
+#define QDC_SEL_DEVICE_KEY  3
+#define QDC_CON_DEVICE_KEY  4
+#define QDC_SYNC_DATA   5
+
+#define INF_OVERRIDE  ((UINT)0x0001000)
+
+#define RNC_CREATED  1
+#define RNC_MODIFIED  2
+#define RNC_DELETED  3
+#define RNC_SHUTDOWN  4
+#define RNC_IDLE  5
+
+#define RSF_CONFLICT_OBJECT  0x00000001
+#define RSF_NEW_OBJECT  0x00000002
+#define RSF_DUPLICATED_OBJECT  0x00000004
+#define RSF_COMBINE  0x00000008
+#define RSF_SYNC_DEVICE_ONLY  0x00000010
+#define RSF_SYNC_DESKTOP_ONLY  0x00000020
+#define RSF_UPDATED_HANDLE  0x00000040
+#define RSF_DISCARDED_OBJ  0x00000080
+#define RSF_NEW_VOLUME  0x00000100
+
+#define RSF_RESERVED1  0x00100000
+#define RSF_RESERVED2  0x00200000
+#define RSF_RESERVED3  0x00400000
+#define RSF_RESERVED4  0x00800000
+
+typedef struct tagDevInfo {
+    DWORD pid;
+    char szName[MAX_PATH];
+    char szType[80];
+    char szPath[MAX_PATH];
+} DEVINFO, *PDEVINFO;
+
+typedef struct SDREQUEST {
+    OBJTYPENAME szObjType;
+    BOOL fSet;
+    UINT uCode;
+    LPBYTE lpbData;
+    UINT cbData;
+} SDREQUEST, *PSDREQUEST;
+
+#undef INTERFACE
+#define INTERFACE IReplNotify
+DECLARE_INTERFACE_(IReplNotify, IUnknown)
+{
+#ifndef _WINCE
+    STDMETHOD(SetStatusText)(THIS_ LPSTR) PURE;
+    STDMETHOD_(HWND, GetWindow)(THIS_ UINT) PURE;
+    STDMETHOD(OnItemNotify)(THIS_ UINT,LPSTR,LPSTR,HREPLITEM,ULONG) PURE;
+    STDMETHOD(QueryDevice)(THIS_ UINT,LPVOID*) PURE;
+#endif /* _WINCE */
+    STDMETHOD(OnItemCompleted)(THIS_ PREPLSETUP) PURE;
+};
+
+typedef struct _tagReplSetup {
+    UINT cbStruct;
+    BOOL fRead;
+    DWORD dwFlags;
+    HRESULT hr;
+    OBJTYPENAME szObjType;
+    IReplNotify *pNotify;
+    DWORD oid;
+    DWORD oidNew;
+#ifndef _WINCE
+    IReplStore *pStore;
+    HREPLFLD hFolder;
+    HREPLITEM hItem;
+#endif /* _WINCE */
+    LPBYTE lpbVolumeID;
+    UINT cbVolumeID;
+} REPLSETUP, *PREPLSETUP;
+
+
+#undef INTERFACE
+#define INTERFACE IReplObjHandler
+DECLARE_INTERFACE_(IReplObjHandler, IUnknown)
+{
+    STDMETHOD(Setup)(THIS_ PREPLSETUP) PURE;
+    STDMETHOD(Reset)(THIS_ PREPLSETUP) PURE;
+    STDMETHOD(GetPacket)(THIS_ LPBYTE*,DWORD*,DWORD) PURE;
+    STDMETHOD(SetPacket)(THIS_ LPBYTE,DWORD) PURE;
+    STDMETHOD(DeleteObj)(THIS_ PREPLSETUP) PURE;
+};
+
+typedef struct tagObjTypeInfo {
+    UINT cbStruct;
+    OBJTYPENAMEW szObjType;
+    UINT uFlags;
+    WCHAR szName[80];
+    UINT cObjects;
+    UINT cbAllObj;
+    FILETIME ftLastModified;
+} OBJTYPEINFO, *POBJTYPEINFO;
+
+#ifndef _WINCE
+
+#define SCF_SINGLE_THREAD  ((UINT)0x00000001)
+#define SCF_SIMULATE_RTS  ((UINT)0x00000002)
+
+#define PSA_RESET_INTERRUPT  ((UINT)0x00000001)
+#define PSA_SYS_SHUTDOWN  ((UINT)0x00000002)
+
+#define RSTP_SETUP  ((WORD)0x0001)
+#define RSTP_CREATE  ((WORD)0x0002)
+#define RSTP_RENAME  ((WORD)0x0003)
+#define RSTP_DELETE  ((WORD)0x0004)
+
+#define ISF_SELECTED_DEVICE  ((UINT)0x00000001)
+#define ISF_REMOTE_CONNECTED  ((UINT)0x00000002)
+
+#define ONF_FILE  ((UINT)0x00000001)
+#define ONF_DIRECTORY  ((UINT)0x00000002)
+#define ONF_DATABASE  ((UINT)0x00000004)
+#define ONF_RECORD  ((UINT)0x00000008)
+#define ONF_CHANGED  ((UINT)0x00000010)
+#define ONF_DELETED  ((UINT)0x00000020)
+#define ONF_CLEAR_CHANGE  ((UINT)0x00000040)
+#define ONF_CALL_BACK  ((UINT)0x00000080)
+#define ONF_CALLING_BACK  ((UINT)0x00000100)
+
+#define FO_MORE_VOLUME  ((UINT)0x00000001)
+#define FO_DONE_ONE_VOL  ((UINT)0x00000002)
+
+DEFINE_GUID(IID_IEnumReplItem,0xa417bc0e,0x7be1,0x11ce,0xad,0x82,0x00,0xaa,0x00,0x6e,0xc5,0x59);
+DEFINE_GUID(IID_IReplSetup,0x60178ec0,0xc670,0x11d0,0x83,0x7a,0x00,0x00,0xf8,0x02,0x20,0xb9);
+DEFINE_GUID(IID_IReplStore,0xa417bc0f,0x7be1,0x11ce,0xad,0x82,0x00,0xaa,0x00,0x6e,0xc5,0x59);
+
+typedef struct tagStoreInfo {
+    UINT cbStruct;
+    UINT uFlags;
+    TCHAR szProgId[256];
+    TCHAR szStoreDesc[200];
+    UINT uTimerRes;
+    UINT cbMaxStoreId;
+    UINT cbStoreId;
+    LPBYTE lpbStoreId;
+} STOREINFO, *PSTOREINFO;
+
+typedef struct tagObjUIData {
+    UINT cbStruct;
+    HICON hIconLarge;
+    HICON hIconSmall;
+    char szName[MAX_PATH];
+    char szSyncText[MAX_PATH];
+    char szTypeText[80];
+    char szPlTypeText[80];
+} OBJUIDATA, *POBJUIDATA;
+
+enum ReplDialogs {
+    OPTIONS_DIALOG
+};
+
+#undef INTERFACE
+#define INTERFACE IEnumReplItem
+DECLARE_INTERFACE_(IEnumReplItem, IUnknown)
+{
+    STDMETHOD(Next)(THIS_ ULONG,HREPLITEM*,ULONG*) PURE;
+    STDMETHOD(Skip)(THIS_ ULONG) PURE;
+    STDMETHOD(Reset)(THIS) PURE;
+    STDMETHOD(Clone)(THIS_ IEnumReplItem**) PURE;
+    STDMETHOD_(HREPLFLD,GetFolderHandle)(THIS) PURE;
+};
+
+typedef struct tagConfInfo {
+    UINT cbStruct;
+    HREPLFLD hFolder;
+    HREPLITEM hLocalItem;
+    HREPLITEM hRemoteItem;
+    OBJTYPENAME szLocalName;
+    TCHAR szLocalDesc[512];
+    OBJTYPENAME szRemoteName;
+    TCHAR szRemoteDesc[512];
+} CONFINFO, *PCONFINFO;
+
+#undef INTERFACE
+#define INTERFACE IReplSetup
+DECLARE_INTERFACE_(IReplSetup, IUnknown)
+{
+    STDMETHOD(Setup)(THIS_ HWND,DWORD,WORD) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IReplStore
+DECLARE_INTERFACE_(IReplStore, IUnknown)
+{
+    STDMETHOD(Initialize)(THIS_ IReplNotify*,UINT) PURE;
+    STDMETHOD(GetStoreInfo)(THIS_ PSTOREINFO) PURE;
+    STDMETHOD(ReportStatus)(THIS_ HREPLFLD,HREPLITEM,UINT,UINT) PURE;
+    STDMETHOD_(int,CompareStoreIDs)(THIS_ LPBYTE,UINT,LPBYTE,UINT) PURE;
+    STDMETHOD_(int,CompareItem)(THIS_ HREPLITEM,HREPLITEM) PURE;
+    STDMETHOD_(BOOL,IsItemChanged)(THIS_ HREPLFLD,HREPLITEM,HREPLITEM) PURE;
+    STDMETHOD_(BOOL,IsItemReplicated)(THIS_ HREPLFLD,HREPLITEM) PURE;
+    STDMETHOD_(void,UpdateItem)(THIS_ HREPLFLD,HREPLITEM,HREPLITEM) PURE;
+    STDMETHOD(GetFolderInfo)(THIS_ LPSTR,HREPLFLD*,IUnknown**) PURE;
+    STDMETHOD(IsFolderChanged)(THIS_ HREPLFLD,BOOL*) PURE;
+    STDMETHOD(FindFirstItem)(THIS_ HREPLFLD,HREPLITEM*,BOOL*) PURE;
+    STDMETHOD(FindNextItem)(THIS_ HREPLFLD,HREPLITEM*,BOOL*) PURE;
+    STDMETHOD(FindItemClose)(THIS_ HREPLFLD) PURE;
+    STDMETHOD_(UINT,ObjectToBytes)(THIS_ HREPLOBJ,LPBYTE) PURE;
+    STDMETHOD_(HREPLOBJ,BytesToObject)(THIS_ LPBYTE,UINT) PURE;
+    STDMETHOD_(void,FreeObject)(THIS_ HREPLOBJ) PURE;
+    STDMETHOD_(BOOL,CopyObject)(THIS_ HREPLOBJ,HREPLOBJ) PURE;
+    STDMETHOD(IsValidObject)(THIS_ HREPLFLD,HREPLITEM,UINT) PURE;
+    STDMETHOD(ActivateDialog)(THIS_ UINT,HWND,HREPLFLD,IEnumReplItem*) PURE;
+    STDMETHOD(GetObjTypeUIData)(THIS_ HREPLFLD,POBJUIDATA) PURE;
+    STDMETHOD(GetConflictInfo)(THIS_ PCONFINFO) PURE;
+    STDMETHOD(RemoveDuplicates)(THIS_ LPSTR,UINT) PURE;
+};
+
+typedef struct tagObjNotify {
+    UINT cbStruct;
+    OBJTYPENAME szObjType;
+    UINT uFlags;
+    UINT uPartnerBit;
+    CEOID oidObject;
+    CEOIDINFO oidInfo;
+    UINT cOidChg;
+    UINT cOidDel;
+    UINT *poid;
+    LPBYTE lpbVolumeID;
+    UINT cbVolumeID;
+} OBJNOTIFY, *POBJNOTIFY;
+
+typedef struct tagFindObjInfo {
+    UINT uFlags;
+    OBJTYPENAME szObjType;
+    UINT *poid;
+    UINT cUnChg;
+    UINT cChg;
+    LPBYTE lpbVolumeID;
+    UINT cbVolumeID;
+    LPVOID lpvUser;
+} FINDOBJINFO, *PFINDOBJINFO;
+
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+typedef BOOL (*PINITOBJPROC)(LPWSTR,IReplObjHandler**,UINT);
+typedef BOOL (*POBJNOTIFYPROC)(POBJNOTIFY);
+typedef BOOL (*PGETOBJTYPEINFO)(POBJTYPEINFO);
+typedef BOOL (*PREPORTSTATUS)(LPWSTR,UINT,UINT);
+typedef HRESULT (*PFINDOBJECTS)(PFINDOBJINFO);
+typedef HRESULT (*PSYNCDATA)(PSDREQUEST);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _WINCE */
+
+#endif /* _CESYNC_H */

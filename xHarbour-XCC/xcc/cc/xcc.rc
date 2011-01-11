@@ -1,0 +1,60 @@
+/********************************************************
+ *                                                      *
+ * Win32 ISO C Compiler; resource script.               *
+ *                                                      *
+ ********************************************************/
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     2,60,2,0
+PRODUCTVERSION  2,60,0,0
+FILEOS          VOS_DOS_WINDOWS32
+FILETYPE        VFT_APP
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+#ifdef PODEBUG
+FILEFLAGS       VS_FF_DEBUG|VS_FF_PRERELEASE|VS_FF_PRIVATEBUILD
+#else
+FILEFLAGS       0  /* final version */
+#endif
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041d04b0"  /* Sweden; Unicode */
+        BEGIN
+            VALUE "CompanyName",      "Pelle Orinius\0"
+            VALUE "FileDescription",  "Pelles ISO C-kompilator\0"
+            VALUE "FileVersion",      "2.60.2\0"
+            VALUE "InternalName",     "xCC\0"
+            VALUE "LegalCopyright",   "Copyright © Pelle Orinius 1999-2003\0"
+            VALUE "OriginalFilename", "XCC.EXE\0"
+            VALUE "ProductName",      "Pelles C för Windows\0"
+            VALUE "ProductVersion",   "2.60\0"
+        END
+        BLOCK "040904b0"  /* USA; Unicode */
+        BEGIN
+            VALUE "CompanyName",      "Pelle Orinius\0"
+            VALUE "FileDescription",  "Pelles ISO C Compiler\0"
+            VALUE "FileVersion",      "2.60.2\0"
+            VALUE "InternalName",     "xCC\0"
+            VALUE "LegalCopyright",   "Copyright © Pelle Orinius 1999-2003\0"
+            VALUE "OriginalFilename", "XCC.EXE\0"
+            VALUE "ProductName",      "Pelles C for Windows\0"
+            VALUE "ProductVersion",   "2.60\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x41d, 0x4b0
+        VALUE "Translation", 0x409, 0x4b0
+    END
+END
+
+LANGUAGE LANG_SWEDISH, SUBLANG_SWEDISH
+1 MESSAGETABLE MSG00046.bin
+
+LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
+1 MESSAGETABLE MSG00001.bin
+

@@ -1,0 +1,123 @@
+#ifndef _ACLUI_H
+#define _ACLUI_H
+
+/* Windows ACLUI.DLL definitions */
+
+#include <objbase.h>
+#include <commctrl.h>
+
+#define ACLUIAPI  DECLSPEC_IMPORT WINAPI
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SI_EDIT_PERMS  0x00000000L
+#define SI_EDIT_OWNER  0x00000001L
+#define SI_EDIT_AUDITS  0x00000002L
+#define SI_CONTAINER  0x00000004L
+#define SI_READONLY  0x00000008L
+#define SI_ADVANCED  0x00000010L
+#define SI_RESET  0x00000020L
+#define SI_OWNER_READONLY  0x00000040L
+#define SI_EDIT_PROPERTIES  0x00000080L
+#define SI_OWNER_RECURSE  0x00000100L
+#define SI_NO_ACL_PROTECT  0x00000200L
+#define SI_NO_TREE_APPLY  0x00000400L
+#define SI_PAGE_TITLE  0x00000800L
+#define SI_SERVER_IS_DC  0x00001000L
+#define SI_RESET_DACL_TREE  0x00004000L
+#define SI_RESET_SACL_TREE  0x00008000L
+#define SI_OBJECT_GUID  0x00010000L
+#define SI_EDIT_ALL  (SI_EDIT_PERMS|SI_EDIT_OWNER|SI_EDIT_AUDITS)
+
+#define SI_ACCESS_SPECIFIC  0x00010000L
+#define SI_ACCESS_GENERAL  0x00020000L
+#define SI_ACCESS_CONTAINER  0x00040000L
+#define SI_ACCESS_PROPERTY  0x00080000L
+
+#define PSPCB_SI_INITDIALOG  (WM_USER+1)
+
+#define CFSTR_ACLUI_SID_INFO_LIST  TEXT("CFSTR_ACLUI_SID_INFO_LIST")
+
+typedef struct _SI_OBJECT_INFO {
+    DWORD dwFlags;
+    HINSTANCE hInstance;
+    LPWSTR pszServerName;
+    LPWSTR pszObjectName;
+    LPWSTR pszPageTitle;
+    GUID guidObjectType;
+} SI_OBJECT_INFO, *PSI_OBJECT_INFO;
+
+typedef struct _SI_ACCESS {
+    const GUID *pguid;
+    ACCESS_MASK mask;
+    LPCWSTR pszName;
+    DWORD dwFlags;
+} SI_ACCESS, *PSI_ACCESS;
+
+typedef struct _SI_INHERIT_TYPE {
+    const GUID *pguid;
+    ULONG dwFlags;
+    LPCWSTR pszName;
+} SI_INHERIT_TYPE, *PSI_INHERIT_TYPE;
+
+typedef enum _SI_PAGE_TYPE {
+    SI_PAGE_PERM=0,
+    SI_PAGE_ADVPERM,
+    SI_PAGE_AUDIT,
+    SI_PAGE_OWNER,
+} SI_PAGE_TYPE;
+
+#undef INTERFACE
+#define INTERFACE ISecurityInformation
+DECLARE_INTERFACE_(ISecurityInformation, IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(GetObjectInformation)(THIS_ PSI_OBJECT_INFO) PURE;
+    STDMETHOD(GetSecurity)(THIS_ SECURITY_INFORMATION,PSECURITY_DESCRIPTOR*,BOOL) PURE;
+    STDMETHOD(SetSecurity)(THIS_ SECURITY_INFORMATION,PSECURITY_DESCRIPTOR) PURE;
+    STDMETHOD(GetAccessRights)(THIS_ const GUID*,DWORD,PSI_ACCESS*,ULONG*,ULONG*) PURE;
+    STDMETHOD(MapGeneric) (THIS_ const GUID*,UCHAR*,ACCESS_MASK*) PURE;
+    STDMETHOD(GetInheritTypes)(THIS_ PSI_INHERIT_TYPE*,ULONG*) PURE;
+    STDMETHOD(PropertySheetPageCallback)(THIS_ HWND,UINT,SI_PAGE_TYPE) PURE;
+};
+typedef ISecurityInformation *LPSECURITYINFO;
+
+#undef INTERFACE
+#define INTERFACE ISecurityInformation2
+DECLARE_INTERFACE_(ISecurityInformation2, IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD_(BOOL,IsDaclCanonical)(THIS_ PACL) PURE;
+    STDMETHOD(LookupSids)(THIS_ ULONG,PSID*,LPDATAOBJECT*) PURE;
+};
+typedef ISecurityInformation2 *LPSECURITYINFO2;
+
+typedef struct _SID_INFO {
+    PSID pSid;
+    PWSTR pwzCommonName;
+    PWSTR pwzClass;
+    PWSTR pwzUPN;
+} SID_INFO, *PSID_INFO;
+
+typedef struct _SID_INFO_LIST {
+    ULONG cItems;
+    SID_INFO aSidInfo[ANYSIZE_ARRAY];
+} SID_INFO_LIST, *PSID_INFO_LIST;
+
+EXTERN_GUID(IID_ISecurityInformation,0x965fc360,0x16ff,0x11d0,0x91,0xcb,0x0,0xaa,0x0,0xbb,0xb7,0x23);
+EXTERN_GUID(IID_ISecurityInformation2,0xc3ccfdb4,0x6f88,0x11d2,0xa3,0xce,0x0,0xc0,0x4f,0xb1,0x78,0x2a);
+
+HPROPSHEETPAGE ACLUIAPI CreateSecurityPage(LPSECURITYINFO);
+BOOL ACLUIAPI EditSecurity(HWND,LPSECURITYINFO);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  /* _ACLUI_H */
