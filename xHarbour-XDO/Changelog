@@ -1,0 +1,27 @@
+/*
+ * $Id:
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2009-01-21 16:00 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+- xHarbour-XDO/xdo.dll.xbp
++ xHarbour-XDO/vc8/xdo.dll.xbp
++ xHarbour-XDO/vc8/xbuild.vc8.ini
++ xHarbour-XDO/xcc/xdo.dll.xbp
+  * Changed paths and settings
+
+
+2006-02-07 06:53 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   - SampleOleServer.prg
+     * Moved to xHarbour-Builder\Samples\Samples for PROF and ENT versions\
+
+
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  - xBuild.ini
+  * sampleoleserver.dll.xbp & xdo.dll
+    * finetuned
