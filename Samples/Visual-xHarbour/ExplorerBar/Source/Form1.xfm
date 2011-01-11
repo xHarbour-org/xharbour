@@ -1,0 +1,175 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD Button1_OnClick()
+   METHOD PictureBox1_OnClick()
+   METHOD PictureBox2_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 32
+      :Iconheight           := 32
+      :AddImage( "_TABLEICO", NIL, 4194304, NIL,1, "table.ico" )
+      :AddImage( "_COLUMNICO", NIL, 4194304, NIL,1, "column.ico" )
+      :Create()
+   END //ImageList1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 500
+   ::Height               := 500
+   ::Caption              := "Sample ExplorerBar"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( EXPLORERBAR( Self ) )
+      :Name                 := "ExplorerBar1"
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Bottom               := "Form1"
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 210
+      :Height               := 464
+      :Caption              := "ExplorerBar1"
+      :Create()
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando1"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 176
+         :Caption              := "Server"
+         :Paneheight           := 176
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label1"
+            :Left                 := 11
+            :Top                  := 33
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "User"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit1"
+            :Left                 := 11
+            :Top                  := 56
+            :Width                := 142
+            :Height               := 22
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label2"
+            :Left                 := 11
+            :Top                  := 84
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Password"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit2"
+            :Left                 := 11
+            :Top                  := 109
+            :Width                := 80
+            :Height               := 22
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "Button1"
+            :Left                 := 110
+            :Top                  := 137
+            :Width                := 60
+            :Height               := 30
+            :Caption              := "Connect"
+            :EventHandler[ "OnClick" ] := "Button1_OnClick"
+            :Create()
+         END //BUTTON
+
+      END //EXPANDO
+
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando2"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 160
+         :Caption              := "Database"
+         :ImageList            := ::Application:MainForm:ImageList1
+         :Paneheight           := 160
+         :Create()
+         WITH OBJECT ( LINKLABEL( :this ) )
+            :Name                 := "LinkLabel1"
+            :Left                 := 15
+            :Top                  := 47
+            :Width                := 103
+            :Height               := 32
+            :Caption              := "Show Tables"
+            :ImageIndex           := 1
+            :EventHandler[ "OnClick" ] := "PictureBox1_OnClick"
+            :Create()
+         END //LINKLABEL
+
+         WITH OBJECT ( LINKLABEL( :this ) )
+            :Name                 := "LinkLabel2"
+            :Left                 := 15
+            :Top                  := 93
+            :Width                := 117
+            :Height               := 32
+            :Caption              := "Show Columns"
+            :ImageIndex           := 2
+            :EventHandler[ "OnClick" ] := "PictureBox2_OnClick"
+            :Create()
+         END //LINKLABEL
+
+      END //EXPANDO
+
+   END //EXPLORERBAR
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TestLabel"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 240
+      :Top                  := 110
+      :Width                := 217
+      :Height               := 27
+      :Caption              := "Label3"
+      :Create()
+   END //LABEL
+
+   ::Show()
+
+RETURN Self

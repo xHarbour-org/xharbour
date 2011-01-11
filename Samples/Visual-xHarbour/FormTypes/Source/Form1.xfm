@@ -1,0 +1,180 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnClose()
+   METHOD Form1_OnSysCommand()
+   METHOD Form1_OnCreate()
+   METHOD Form1_OnDestroy()
+   METHOD Form1_OnLoad()
+   METHOD CreateModal_OnClick()
+   METHOD CreateModeless_OnClick()
+   METHOD ShowModeless_OnClick()
+   METHOD HideModeless_OnClick()
+   METHOD CountModeless_OnClick()
+   METHOD MinimizeModeless_OnClick()
+   METHOD RestoreModeless_OnClick()
+   METHOD CloseModeless_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "Form1_OnClose"
+   ::EventHandler[ "OnSysCommand" ] := "Form1_OnSysCommand"
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+   ::EventHandler[ "OnDestroy" ] := "Form1_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 700
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Application Form"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "CoolMenu1"
+      :Left                 := 12
+      :Top                  := 0
+      :Width                := 676
+      :Height               := 30
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "ModalForms"
+         :Caption              := "Modal Forms"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CreateModal"
+            :Caption              := "Create Modal Form"
+            :EventHandler[ "OnClick" ] := "CreateModal_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "ModelessForms"
+         :Caption              := "Modeless Forms"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CreateModeless"
+            :Caption              := "Create Modeless Form"
+            :EventHandler[ "OnClick" ] := "CreateModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "ShowModeless"
+            :Caption              := "Show Form"
+            :EventHandler[ "OnClick" ] := "ShowModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "HideModeless"
+            :Caption              := "Hide Form"
+            :EventHandler[ "OnClick" ] := "HideModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CountModeless"
+            :Caption              := "Update counter"
+            :EventHandler[ "OnClick" ] := "CountModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MinimizeModeless"
+            :Caption              := "Minimize"
+            :EventHandler[ "OnClick" ] := "MinimizeModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "RestoreModeless"
+            :Caption              := "Restore"
+            :EventHandler[ "OnClick" ] := "RestoreModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CloseModeless"
+            :Caption              := "Close Form"
+            :EventHandler[ "OnClick" ] := "CloseModeless_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 684
+      :Height               := 30
+      :Border               := .T.
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band1"
+         :MinWidth             := 60
+         :MinHeight            := 30
+         :BandChild            := ::CoolMenu1
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   WITH OBJECT ( STATUSBAR( Self ) )
+      :Name                 := "StatusApp"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Height               := 23
+      :Create()
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel1"
+         :Width                := 100
+         :ImageIndex           := -1
+         :Create()
+      END //STATUSBARPANEL
+
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel2"
+         :Width                := 100
+         :ImageIndex           := -1
+         :Create()
+      END //STATUSBARPANEL
+
+   END //STATUSBAR
+
+   ::Show()
+
+RETURN Self

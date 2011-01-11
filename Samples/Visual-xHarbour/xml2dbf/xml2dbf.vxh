@@ -1,0 +1,27 @@
+[Project]
+Name=xml2dbf
+Bin=Bin
+Obj=Obj
+Source=Source
+Resource=Resource
+Parameters=
+SourcePath=
+IncludePath=
+CompilerFlags=-es2 -gc0 -m -n -w -q
+Definitions=
+CleanBuild=1
+UseDLL=0
+ThemeActive=1
+TargetName=
+TargetType=1
+MultiThread=0
+GUI=1
+ClassID=
+[Files]
+FormXml2Dbf.xfm=
+FormXmlStru.xfm=
+FormXmlData.xfm=
+[Sources]
+[Binaries]
+[ExtImages]
+[Resources]

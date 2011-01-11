@@ -1,0 +1,40 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormSplash INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormSplash
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormSplash"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 400
+   ::Height               := 300
+   ::StaticEdge           := .T.
+   ::Center               := .T.
+   ::Caption              := "Form2"
+   WITH OBJECT ::BackgroundImage := FreeImageRenderer( Self )
+      :ImageName            := { "C:\Images\myapp.JPG","_MYAPPJPG" }
+   END
+
+   ::TopMost              := .T.
+   ::ThickFrame           := .F.
+   ::CaptionBar           := .F.
+   ::SysMenu              := .F.
+   ::FrameStyle           := 2
+
+   ::Create()
+
+   // Populate Children
+   ::Show()
+
+RETURN Self

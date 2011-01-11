@@ -1,0 +1,133 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormEmployees INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormEmployees_OnLoad()
+   METHOD ButtonAppend_OnClick()
+   METHOD ButtonUpdate_OnClick()
+   METHOD ButtonDelete_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormEmployees
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormEmployees_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable1"
+      :Alias                := "emp"
+      :FileName             := "employees.DBF"
+      :Create()
+   END //DataTable1
+
+   // Properties declaration
+   ::Name                 := "FormEmployees"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 475
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Employees"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormEmployees
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 19
+      :Top                  := 12
+      :Width                := 309
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::DataTable1
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Birthday"
+         :Data                 := "hb_QSelf():DataSource:Fields:BIRTHDAY"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Salary"
+         :Data                 := "hb_QSelf():DataSource:Fields:SALARY"
+         :Alignment            := 2
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonAppend"
+      :Left                 := 351
+      :Top                  := 33
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Append"
+      :EventHandler[ "OnClick" ] := "ButtonAppend_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonUpdate"
+      :Left                 := 351
+      :Top                  := 83
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Update"
+      :EventHandler[ "OnClick" ] := "ButtonUpdate_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonDelete"
+      :Left                 := 351
+      :Top                  := 130
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Delete"
+      :EventHandler[ "OnClick" ] := "ButtonDelete_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

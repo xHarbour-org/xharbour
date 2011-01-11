@@ -1,0 +1,328 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD File_Exit_OnClick()
+   METHOD Navigate_Back_OnClick()
+   METHOD Navigate_Forward_OnClick()
+   METHOD Navigate_Home_OnClick()
+   METHOD Main_Back_OnClick()
+   METHOD Main_Forward_OnClick()
+   METHOD Main_Home_OnClick()
+   METHOD Main_xHarbour_OnClick()
+   METHOD Button_Go_OnClick()
+   METHOD MyWebBrowser_BeforeNavigate2()
+   METHOD MyWebBrowser_DocumentComplete()
+   METHOD MyWebBrowser_ProgressChange()
+   METHOD Edit_Address_OnKeyUp()
+   METHOD Edit_Address_OnLButtonUp()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 720
+   ::Height               := 520
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "MyCoolMenu"
+      :Left                 := 11
+      :Top                  := 0
+      :Width                := 793
+      :Height               := 21
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Main_File"
+         :Caption              := "File"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Exit"
+            :Caption              := "Exit"
+            :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Main_Navigate"
+         :Caption              := "Navigate"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Navigate_Back"
+            :Caption              := "Back"
+            :EventHandler[ "OnClick" ] := "Navigate_Back_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Navigate_Forward"
+            :Caption              := "Forward"
+            :EventHandler[ "OnClick" ] := "Navigate_Forward_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Navigate_Line"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Navigate_Home"
+            :Caption              := "Home"
+            :EventHandler[ "OnClick" ] := "Navigate_Home_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "MyCoolBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 704
+      :Height               := 21
+      :Border               := .T.
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band1"
+         :MinWidth             := 60
+         :MinHeight            := 21
+         :BandChild            := ::MyCoolMenu
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "MyToolBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::MyCoolBar
+         :Right                := :Owner:Parent
+      END
+
+      :Left                 := 1
+      :Top                  := 22
+      :Width                := 702
+      :Height               := 37
+      :Tooltips             := .T.
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Main_Back"
+         :AutoSize             := .F.
+         :Width                := 54
+         :Caption              := "Back"
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "Main_Back_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Main_Forward"
+         :AutoSize             := .F.
+         :Width                := 54
+         :Caption              := "Forward"
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "Main_Forward_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Main_Home"
+         :AutoSize             := .F.
+         :Width                := 54
+         :Caption              := "Home"
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "Main_Home_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Main_Line"
+         :Width                := 7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 3
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Main_xHarbour"
+         :Width                := 112
+         :Caption              := "xHarbour.com Online"
+         :Position             := 4
+         :EventHandler[ "OnClick" ] := "Main_xHarbour_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_Go"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 653
+      :Top                  := 456
+      :Width                := 45
+      :Height               := 22
+      :Caption              := "Go"
+      :EventHandler[ "OnClick" ] := "Button_Go_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( WEBBROWSER( Self ) )
+      :Name                 := "MyWebBrowser"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::MyToolBar
+         :Right                := :Owner:Parent
+         :Bottom               := ::Button_Go
+         :Margin               := 6
+      END
+
+      :Left                 := 6
+      :Top                  := 65
+      :Width                := 692
+      :Height               := 385
+      :Url                  := "http://www.xharbour.com"
+      :EventHandler[ "BeforeNavigate2" ] := "MyWebBrowser_BeforeNavigate2"
+      :EventHandler[ "DocumentComplete" ] := "MyWebBrowser_DocumentComplete"
+      :EventHandler[ "ProgressChange" ] := "MyWebBrowser_ProgressChange"
+      :Create()
+      :AddressBar           := .F.
+      :Configure()
+   END //WEBBROWSER
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "MyProgressBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 6
+      :Top                  := 460
+      :Width                := 153
+      :Height               := 18
+      :Position             := 10
+      :Smooth               := .T.
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "Edit_Address"
+      WITH OBJECT :Dock
+         :Left                 := ::MyProgressBar
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 165
+      :Top                  := 456
+      :Width                := 533
+      :Height               := 22
+      :Caption              := "http://www.xHarbour.com"
+      :EventHandler[ "OnKeyUp" ] := "Edit_Address_OnKeyUp"
+      :EventHandler[ "OnLButtonUp" ] := "Edit_Address_OnLButtonUp"
+      :Create()
+   END //EDIT
+
+   ::Show()
+
+RETURN Self

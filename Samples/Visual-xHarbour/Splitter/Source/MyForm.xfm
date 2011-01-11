@@ -1,0 +1,128 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD LinkWebsite_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 716
+   ::Height               := 516
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 455
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( TREEVIEW( Self ) )
+      :Name                 := "MyTreeView"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Bottom               := ::LinkWebsite
+         :Margin               := 6
+      END
+
+      :Left                 := 6
+      :Top                  := 6
+      :Width                := 235
+      :Height               := 443
+      :Caption              := "Project Folders"
+      :SmallCaption         := .T.
+      :Create()
+   END //TREEVIEW
+
+   WITH OBJECT ( SPLITTER( Self ) )
+      :Owner                := ::MyTreeView
+      :Name                 := "MySplitter"
+      :MoveWhileDrag        := .T.
+      :Position             := 3
+      :Create()
+   END //SPLITTER
+
+   ::Show()
+
+RETURN Self

@@ -1,0 +1,134 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormScheduler INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormScheduler_OnLoad()
+   METHOD ListBox1_OnLButtonUp()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormScheduler
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormScheduler_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable1"
+      :Alias                := "DataTable1"
+      :FileName             := "projects.DBF"
+      :Create()
+   END //DataTable1
+
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable2"
+      :Alias                := "DataTable2"
+      :FileName             := "employees.DBF"
+      :Create()
+   END //DataTable2
+
+   // Properties declaration
+   ::Name                 := "FormScheduler"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 641
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Project Scheduler"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormScheduler
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 11
+      :Top                  := 12
+      :Width                := 441
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :FullRowSelect        := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::DataTable1
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Id"
+         :Data                 := "hb_QSelf():DataSource:Fields:ID"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Timeline"
+         :Data                 := "hb_QSelf():DataSource:Fields:TIMELINE"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Model"
+         :Data                 := "hb_QSelf():DataSource:Fields:MODEL"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Worker"
+         :Data                 := "hb_QSelf():DataSource:Fields:WORKER"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "ListBox1"
+      WITH OBJECT :Font
+         :Pointsize            := 12
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 473
+      :Top                  := 47
+      :Width                := 130
+      :Height               := 170
+      :Caption              := "Workers"
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :EventHandler[ "OnLButtonUp" ] := "ListBox1_OnLButtonUp"
+      :Create()
+   END //LISTBOX
+
+RETURN Self
+

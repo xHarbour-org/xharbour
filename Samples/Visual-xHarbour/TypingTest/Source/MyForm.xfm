@@ -1,0 +1,191 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD MyTimer_OnTimeOut()
+   METHOD LinkWebsite_OnClick()
+   METHOD ButtonStart_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "MyTimer"
+      :AutoRun              := .F.
+      :Delay                := 500
+      :EventHandler[ "OnTimeOut" ] := "MyTimer_OnTimeOut"
+      :Create()
+   END //MyTimer
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 674
+   ::Height               := 403
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 342
+      :Width                := 206
+      :Height               := 15
+      :Caption              := "http://www.xharbour.com/trainingcenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "BoxTextToType"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 10
+      :Width                := 638
+      :Height               := 126
+      :Caption              := "The xHarbour programming language is a superset of the well known xBase language, often referred to as Clipper. Though xHarbour is 100% backward compatible with the Clipper Language, xHarbour Builder adds many modern features and tools found in most modern compilers. Such features include Visual xHarbour, SQLRDD, xBuild Project Wizard, ActiveX, and many more."
+      :MultiLine            := .T.
+      :WantReturn           := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonStart"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 568
+      :Top                  := 327
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Start"
+      :EventHandler[ "OnClick" ] := "ButtonStart_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "BoxTextTyped"
+      :VertScroll           := .T.
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::BoxTextToType
+         :Right                := :Owner:Parent
+         :Bottom               := ::ButtonStart
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 146
+      :Width                := 638
+      :Height               := 171
+      :MultiLine            := .T.
+      :WantReturn           := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Theming              := .F.
+      :Name                 := "MyProgressBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::BoxTextTyped
+         :Right                := ::ButtonStart
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 327
+      :Width                := 548
+      :Height               := 10
+      :Visible              := .F.
+      :Smooth               := .T.
+      :Create()
+   END //PROGRESSBAR
+
+   ::Show()
+
+RETURN Self

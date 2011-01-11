@@ -1,0 +1,437 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR Subject, SpecChar, nTot, nBlock
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnSysCommand()
+   METHOD Form1_OnLoad()
+   METHOD MyDisplay()
+   METHOD ButtonReplace_OnClick()
+   METHOD ButtonColor_OnClick()
+   METHOD myEstimate()
+   METHOD GridColumn1_OnQueryBackColor()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnSysCommand" ] := "Form1_OnSysCommand"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyDisplay"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mt"
+      :Structure            := { { "POS", "C", 10, 0 }, { "CHR", "C", 10, 0 }, { "ASC", "C", 10, 0 }, { "HEX", "C", 10, 0 }, { "BIN", "C", 16, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mt
+
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "OpenFileDialog1"
+      :AddExtension         := .F.
+      :FileName             := ""
+      :Filter               := "All files (*.*)|*.*"
+      :Title                := "Select File..."
+      :MultiSelect          := .F.
+      :DeferenceLinks       := .F.
+      :Create()
+   END //OpenFileDialog1
+
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :AddImage( "_REPLACEICO", NIL, 4194304, NIL,1, "replace.ico" )
+      :AddImage( "_BRUSHICO", NIL, 4194304, NIL,1, "brush.ico" )
+      :Create()
+   END //ImageList1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 630
+   ::Height               := 540
+   ::Caption              := "BitViewer"
+   ::ThickFrame           := .F.
+   ::Icon                 := { ".\Resource\gear.ico","_1GEARICO" }
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( EXPLORERBAR( Self ) )
+      :Name                 := "ExplorerBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 210
+      :Height               := 514
+      :Caption              := "ExplorerBar1"
+      :ImageList            := ::ImageList1
+      :Create()
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando1"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 133
+         :Caption              := "Blocks"
+         :ImageList            := ::Application:MainForm:ImageList1
+         :Paneheight           := 133
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label3"
+            :Left                 := 7
+            :Top                  := 36
+            :Width                := 47
+            :Height               := 16
+            :Caption              := "Total:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label4"
+            :Left                 := 7
+            :Top                  := 71
+            :Width                := 47
+            :Height               := 16
+            :Caption              := "Current:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "LabelTotal"
+            WITH OBJECT :Font
+               :Pointsize            := 14
+            END
+
+            :Left                 := 70
+            :Top                  := 30
+            :Width                := 80
+            :Height               := 28
+            :Caption              := "0"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "EditBlock"
+            WITH OBJECT :Font
+               :Pointsize            := 14
+            END
+
+            :Left                 := 61
+            :Top                  := 65
+            :Width                := 80
+            :Height               := 28
+            :Caption              := "0"
+            :ForeColor            := 7451452
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonReplace"
+            :Left                 := 153
+            :Top                  := 67
+            :Width                := 24
+            :Height               := 24
+            :ImageIndex           := 1
+            :EventHandler[ "OnClick" ] := "ButtonReplace_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label1"
+            :Left                 := 8
+            :Top                  := 106
+            :Width                := 47
+            :Height               := 16
+            :Caption              := "Offset:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Lposition"
+            WITH OBJECT :Font
+               :Pointsize            := 14
+            END
+
+            :Left                 := 68
+            :Top                  := 100
+            :Width                := 80
+            :Height               := 28
+            :Caption              := "0"
+            :ForeColor            := 3937500
+            :Create()
+         END //LABEL
+
+      END //EXPANDO
+
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando2"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 262
+         :Caption              := "Show as..."
+         :Paneheight           := 262
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label2"
+            :Left                 := 33
+            :Top                  := 30
+            :Width                := 120
+            :Height               := 16
+            :Caption              := "16 bit unsigned integer:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Lbin2w"
+            WITH OBJECT :Font
+               :Pointsize            := 12
+            END
+
+            :Left                 := 39
+            :Top                  := 55
+            :Width                := 100
+            :Height               := 24
+            :Centertext           := .T.
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label7"
+            :Left                 := 35
+            :Top                  := 90
+            :Width                := 115
+            :Height               := 16
+            :Caption              := "16 bit signed integer:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Lbin2i"
+            WITH OBJECT :Font
+               :Pointsize            := 12
+            END
+
+            :Left                 := 37
+            :Top                  := 115
+            :Width                := 100
+            :Height               := 24
+            :Centertext           := .T.
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label8"
+            :Left                 := 30
+            :Top                  := 150
+            :Width                := 122
+            :Height               := 16
+            :Caption              := "32 bit unsigned integer:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Lbin2u"
+            WITH OBJECT :Font
+               :Pointsize            := 12
+            END
+
+            :Left                 := 18
+            :Top                  := 175
+            :Width                := 150
+            :Height               := 24
+            :Centertext           := .T.
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label9"
+            :Left                 := 32
+            :Top                  := 210
+            :Width                := 121
+            :Height               := 16
+            :Caption              := "32 bit signed integer:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Lbin2l"
+            WITH OBJECT :Font
+               :Pointsize            := 12
+            END
+
+            :Left                 := 18
+            :Top                  := 230
+            :Width                := 150
+            :Height               := 24
+            :Centertext           := .T.
+            :Create()
+         END //LABEL
+
+      END //EXPANDO
+
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando3"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 73
+         :Caption              := "Selection"
+         :ImageList            := ::Application:MainForm:ImageList1
+         :Paneheight           := 73
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label11"
+            :Left                 := 8
+            :Top                  := 41
+            :Width                := 59
+            :Height               := 16
+            :Caption              := "ASCII code:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "EditAsc"
+            WITH OBJECT :Font
+               :Bold                 := .T.
+               :Pointsize            := 14
+            END
+
+            :Left                 := 80
+            :Top                  := 35
+            :Width                := 53
+            :Height               := 28
+            :ForeColor            := 7451452
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonColor"
+            :Left                 := 150
+            :Top                  := 37
+            :Width                := 24
+            :Height               := 24
+            :ImageIndex           := 2
+            :EventHandler[ "OnClick" ] := "ButtonColor_OnClick"
+            :Create()
+         END //BUTTON
+
+      END //EXPANDO
+
+   END //EXPLORERBAR
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "dg"
+      WITH OBJECT :Font
+         :Pointsize            := 10
+      END
+
+      WITH OBJECT :Dock
+         :Left                 := ::ExplorerBar1
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 210
+      :Top                  := 0
+      :Width                := 409
+      :Height               := 509
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::mt
+      :EventHandler[ "OnLButtonUp" ] := "myEstimate"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Position"
+         :Data                 := "hb_QSelf():DataSource:Fields:POS"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :EventHandler[ "OnQueryBackColor" ] := "GridColumn1_OnQueryBackColor"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Chr"
+         :Data                 := "hb_QSelf():DataSource:Fields:CHR"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Ascii"
+         :Data                 := "hb_QSelf():DataSource:Fields:ASC"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Hexa"
+         :Data                 := "hb_QSelf():DataSource:Fields:HEX"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Binary"
+         :Data                 := "hb_QSelf():DataSource:Fields:BIN"
+         :Alignment            := 2
+         :Width                := 112
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self

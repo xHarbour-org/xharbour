@@ -1,0 +1,66 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormCursor INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormCursor_OnDestroy()
+   METHOD FormCursor_OnLoad()
+   METHOD dt_OnClose()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormCursor
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormCursor_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormCursor_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "dt"
+      :AutoOpen             := .F.
+      :EventHandler[ "OnClose" ] := "dt_OnClose"
+      :Create()
+   END //dt
+
+   // Properties declaration
+   ::Name                 := "FormCursor"
+   ::Left                 := 12
+   ::Top                  := 10
+   ::Width                := 700
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Current Result Set"
+   ::Icon                 := { ".\Resource\view.ico","_VIEWICO" }
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "grid"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 679
+      :Height               := 459
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self

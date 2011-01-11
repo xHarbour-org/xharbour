@@ -1,0 +1,156 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD LinkWebsite_OnClick()
+   METHOD ButtonChange_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 490
+   ::Height               := 281
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 220
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "BoxDesign"
+      :Left                 := 12
+      :Top                  := 12
+      :Width                := 454
+      :Height               := 77
+      :Caption              := "Captions at design time"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelOne"
+         :Left                 := 12
+         :Top                  := 24
+         :Width                := 426
+         :Height               := 29
+         :Caption              := "Most objects in VxH have a 'Caption' property. This property can be set at design time using the Object Manager."
+         :Create()
+      END //LABEL
+
+   END //GROUPBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "BoxRun"
+      :Left                 := 12
+      :Top                  := 108
+      :Width                := 454
+      :Height               := 75
+      :Caption              := "Captions at run time"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonChange"
+         :Left                 := 12
+         :Top                  := 24
+         :Width                := 80
+         :Height               := 30
+         :Caption              := "Click Me!"
+         :EventHandler[ "OnClick" ] := "ButtonChange_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelTwo"
+         :Left                 := 102
+         :Top                  := 30
+         :Width                := 188
+         :Height               := 16
+         :Caption              := "Click the button to change its caption."
+         :Create()
+      END //LABEL
+
+   END //GROUPBOX
+
+   ::Show()
+
+RETURN Self

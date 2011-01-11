@@ -1,0 +1,35 @@
+IDOK MANIFEST "TinyBrowser.XML"
+#include "Winver.h"
+
+1 VERSIONINFO
+FILEVERSION       1,0,0,0
+PRODUCTVERSION    1,0,0,0
+FILEFLAGS         0
+FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
+FILEOS            VOS__WINDOWS32
+FILETYPE          VFT_APP
+FILESUBTYPE       0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName",      ""
+         VALUE "FileDescription",  ""
+         VALUE "FileVersion",      "1.0.0.0\0"
+         VALUE "InternalName",     "TinyBrowser"
+         VALUE "LegalCopyright",   ""
+         VALUE "OriginalFilename", "TinyBrowser.exe"
+         VALUE "ProductName",      ""
+         VALUE "ProductVersion",   "1.0.0.0\0"
+      }
+   }
+   BLOCK "VarFileInfo"
+   {
+      // English language and the Windows ANSI codepage
+      VALUE "Translation", 0x409, 1252
+   }
+}
+_BOOKSICO ICON "books.ico"
+_DOCPREFICO ICON "docpref.ico"
+_PRINTICO ICON "print.ico"

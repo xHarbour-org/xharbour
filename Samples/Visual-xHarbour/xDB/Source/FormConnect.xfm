@@ -1,0 +1,274 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormConnect INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormConnect_OnLoad()
+   METHOD myRefreshEdits()
+   METHOD myRefreshBoxConString()
+   METHOD myReadConString()
+   METHOD myWriteConString()
+   METHOD RadioMySQL_OnClick()
+   METHOD RadioFB_OnClick()
+   METHOD ButtonConnect_OnClick()
+   METHOD ButtonCancel_OnClick()
+   METHOD BoxConString_OnCBNSelEndOk()
+   METHOD RadioMS_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormConnect
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormConnect_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myRefreshEdits"
+   ::EventHandler[ "UserMethod2" ] := "myRefreshBoxConString"
+   ::EventHandler[ "UserMethod3" ] := "myReadConString"
+   ::EventHandler[ "UserMethod4" ] := "myWriteConString"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormConnect"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 488
+   ::Height               := 488
+   ::Center               := .T.
+   ::Caption              := "Connect"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\plug.ico","_PLUGICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormConnect
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioMySQL"
+      :Left                 := 25
+      :Top                  := 24
+      :Width                := 65
+      :Height               := 15
+      :Caption              := "MySQL"
+      :EventHandler[ "OnClick" ] := "RadioMySQL_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioFB"
+      :Left                 := 122
+      :Top                  := 24
+      :Width                := 79
+      :Height               := 15
+      :Caption              := "FireBird"
+      :EventHandler[ "OnClick" ] := "RadioFB_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 25
+      :Top                  := 120
+      :Width                := 432
+      :Height               := 238
+      :Caption              := "Connection string parameters"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelHost"
+         :Left                 := 24
+         :Top                  := 28
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "Host:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 24
+         :Top                  := 62
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "User:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 24
+         :Top                  := 96
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "Password:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         :Left                 := 24
+         :Top                  := 130
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "Database (schema):"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label5"
+         :Left                 := 24
+         :Top                  := 164
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "Port:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditHST"
+         :Left                 := 168
+         :Top                  := 28
+         :Width                := 241
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditUID"
+         :Left                 := 168
+         :Top                  := 62
+         :Width                := 136
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditPWD"
+         :Left                 := 168
+         :Top                  := 96
+         :Width                := 136
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Password             := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditDTB"
+         :Left                 := 168
+         :Top                  := 130
+         :Width                := 203
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditPRT"
+         :Left                 := 168
+         :Top                  := 164
+         :Width                := 104
+         :Height               := 22
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label6"
+         :Left                 := 24
+         :Top                  := 198
+         :Width                := 123
+         :Height               := 16
+         :Caption              := "Character-set:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditCHARSET"
+         :Left                 := 168
+         :Top                  := 198
+         :Width                := 148
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Create()
+      END //EDIT
+
+   END //GROUPBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonConnect"
+      :Left                 := 267
+      :Top                  := 409
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Connect"
+      :EventHandler[ "OnClick" ] := "ButtonConnect_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 377
+      :Top                  := 409
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckKeep"
+      :Left                 := 25
+      :Top                  := 380
+      :Width                := 148
+      :Height               := 15
+      :Caption              := "Keep deleted records"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxConString"
+      :VertScroll           := .T.
+      :Left                 := 25
+      :Top                  := 87
+      :Width                := 432
+      :Height               := 191
+      :ItemHeight           := 15
+      :EventHandler[ "OnCBNSelEndOk" ] := "BoxConString_OnCBNSelEndOk"
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelCon"
+      :Left                 := 25
+      :Top                  := 57
+      :Width                := 123
+      :Height               := 20
+      :Caption              := "Connection string:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioMS"
+      :Left                 := 220
+      :Top                  := 24
+      :Width                := 100
+      :Height               := 15
+      :Caption              := "MS SQL Server"
+      :EventHandler[ "OnClick" ] := "RadioMS_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+RETURN Self
+

@@ -1,0 +1,331 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR nLimit, nFiles, nPages, nPagelen, nPage, cQueryUrl, cContent, cError, aResult, lWords
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD MyCleanup()
+   METHOD MyWorkup()
+   METHOD MySearch()
+   METHOD GridRes_OnLButtonUp()
+   METHOD GridColumn2_OnQueryBackColor()
+   METHOD ButtonWord_OnClick()
+   METHOD ButtonPhrase_OnClick()
+   METHOD ComboPagelen_OnCBNSelEndOk()
+   METHOD ButtonPrev_OnClick()
+   METHOD ButtonNext_OnClick()
+   METHOD ComboGoto_OnCBNSelEndOk()
+   METHOD MyWebBrowser_DocumentComplete()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyCleanup"
+   ::EventHandler[ "UserMethod10" ] := "MyWorkup"
+   ::EventHandler[ "UserMethod11" ] := "MySearch"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MemTabRes"
+      :Structure            := { { "CRT", "C", 7, 0 }, { "FILE", "C", 80, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MemTabRes
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 8
+   ::Top                  := 5
+   ::Width                := 800
+   ::Height               := 700
+   ::Caption              := "Google Desktop Search Implementation"
+   ::ThickFrame           := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "GridRes"
+      WITH OBJECT :Font
+         :Pointsize            := 11
+      END
+
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "PanelTop"
+         :Right                := "Form1"
+         :Bottom               := "Form1"
+      END
+
+      :Left                 := 0
+      :Top                  := 120
+      :Width                := 789
+      :Height               := 549
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::MemTabRes
+      :EventHandler[ "OnLButtonUp" ] := "GridRes_OnLButtonUp"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Crt"
+         :Data                 := "hb_QSelf():DataSource:Fields:CRT"
+         :Width                := 49
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "File"
+         :Data                 := "hb_QSelf():DataSource:Fields:FILE"
+         :Width                := 715
+         :ImageIndex           := 0
+         :EventHandler[ "OnQueryBackColor" ] := "GridColumn2_OnQueryBackColor"
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "PanelTop"
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Right                := "Form1"
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 794
+      :Height               := 120
+      :BackColor            := 16777215
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 19
+         :Top                  := 21
+         :Width                := 142
+         :Height               := 24
+         :Caption              := "Enter text to search:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditKeys"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 175
+         :Top                  := 21
+         :Width                := 306
+         :Height               := 24
+         :AutoVScroll          := .T.
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonWord"
+         :Left                 := 513
+         :Top                  := 20
+         :Width                := 92
+         :Height               := 25
+         :Caption              := "Search Words"
+         :EventHandler[ "OnClick" ] := "ButtonWord_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonPhrase"
+         :Left                 := 622
+         :Top                  := 20
+         :Width                := 92
+         :Height               := 25
+         :Caption              := "Search Phrase"
+         :EventHandler[ "OnClick" ] := "ButtonPhrase_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 19
+         :Top                  := 57
+         :Width                := 127
+         :Height               := 24
+         :Caption              := "Results per page"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "ComboPagelen"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 172
+         :Top                  := 57
+         :Width                := 67
+         :Height               := 100
+         :SelectionHeight      := 20
+         :ItemHeight           := 20
+         :EventHandler[ "OnCBNSelEndOk" ] := "ComboPagelen_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonPrev"
+         :Left                 := 622
+         :Top                  := 57
+         :Width                := 32
+         :Height               := 25
+         :Caption              := "<-"
+         :EventHandler[ "OnClick" ] := "ButtonPrev_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonNext"
+         :Left                 := 682
+         :Top                  := 57
+         :Width                := 32
+         :Height               := 25
+         :Caption              := "->"
+         :EventHandler[ "OnClick" ] := "ButtonNext_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "ComboGoto"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 513
+         :Top                  := 57
+         :Width                := 67
+         :Height               := 100
+         :SelectionHeight      := 20
+         :ItemHeight           := 20
+         :EventHandler[ "OnCBNSelEndOk" ] := "ComboGoto_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 402
+         :Top                  := 60
+         :Width                := 93
+         :Height               := 24
+         :Caption              := "Go to page:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( WEBBROWSER( :this ) )
+         :Name                 := "MyWebBrowser"
+         :Left                 := 737
+         :Top                  := 15
+         :Width                := 32
+         :Height               := 32
+         :Visible              := .F.
+         :EventHandler[ "DocumentComplete" ] := "MyWebBrowser_DocumentComplete"
+         :Create()
+         :Configure()
+      END //WEBBROWSER
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelGrand"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 19
+         :Top                  := 91
+         :Width                := 142
+         :Height               := 20
+         :Caption              := "Total results found:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelTotal"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+            :Pointsize            := 14
+         END
+
+         :Left                 := 176
+         :Top                  := 93
+         :Width                := 102
+         :Height               := 20
+         :Caption              := "0"
+         :ForeColor            := 255
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckRun"
+         WITH OBJECT :Font
+            :Pointsize            := 11
+         END
+
+         :Left                 := 258
+         :Top                  := 58
+         :Width                := 126
+         :Height               := 24
+         :Caption              := "Confirm Run..."
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         WITH OBJECT :Font
+            :Pointsize            := 16
+         END
+
+         WITH OBJECT :ToolTip
+            :Text                 := "Click result file name to open ..."
+            :Balloon              := .T.
+         END
+
+         :Left                 := 740
+         :Top                  := 89
+         :Width                := 20
+         :Height               := 24
+         :Caption              := "?"
+         :ForeColor            := 255
+         :Create()
+      END //LABEL
+
+   END //PANEL
+
+   ::Show()
+
+RETURN Self

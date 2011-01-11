@@ -1,0 +1,128 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormPrices INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormPrices_OnLoad()
+   METHOD GridColumn1_OnSave()
+   METHOD GridColumn2_OnSave()
+   METHOD ButtonAppend_OnClick()
+   METHOD ButtonApply_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormPrices
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormPrices_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MemoryTable1"
+      :Structure            := { { "A", "C", 10, 0 }, { "B", "N", 10, 2 }, { "C", "N", 10, 2 } }
+      :Table                := { { "BBBBBBBBBB", "888.88", "888.88" } }
+      :Create()
+   END //MemoryTable1
+
+   // Properties declaration
+   ::Name                 := "FormPrices"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 12
+   ::Width                := 300
+   ::Height               := 337
+   ::Center               := .T.
+   ::Caption              := "Prices"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormPrices
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 18
+      :Top                  := 17
+      :Width                := 248
+      :Height               := 229
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := ::MemoryTable1
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Model"
+         :Data                 := "hb_QSelf():DataSource:Fields:A"
+         :Autoedit             := .T.
+         :Width                := 76
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn1_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999.99"
+         :Caption              := "Price"
+         :Data                 := "hb_QSelf():DataSource:Fields:B"
+         :Autoedit             := .T.
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn2_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999.99"
+         :Caption              := "Urgency"
+         :Data                 := "hb_QSelf():DataSource:Fields:C"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonAppend"
+      :Left                 := 18
+      :Top                  := 262
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Append"
+      :EventHandler[ "OnClick" ] := "ButtonAppend_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonApply"
+      :Left                 := 186
+      :Top                  := 262
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Apply"
+      :EventHandler[ "OnClick" ] := "ButtonApply_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

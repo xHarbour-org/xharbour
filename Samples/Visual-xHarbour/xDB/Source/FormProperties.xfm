@@ -1,0 +1,338 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormProperties INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormProperties_OnLoad()
+   METHOD ButtonClose_OnClick()
+   METHOD ButtonStructure_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormProperties
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormProperties_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MTable"
+      :Structure            := { { "BAG", "C", 64, 0 }, { "TYPE", "C", 1, 0 }, { "NAME", "C", 10, 0 }, { "UNIQUE", "C", 5, 0 }, { "KEYEXPR", "C", 255, 0 }, { "FOREXPR", "C", 255, 0 }, { "WHOLEBAG", "C", 255, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MTable
+
+   // Properties declaration
+   ::Name                 := "FormProperties"
+   ::Modal                := .T.
+   ::Left                 := 12
+   ::Top                  := 9
+   ::Width                := 532
+   ::Height               := 505
+   ::Center               := .T.
+   ::Caption              := "Table Properties"
+   ::ThickFrame           := .F.
+   ::Icon                 := { ".\Resource\property.ico","_PROPERTYICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormProperties
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 20
+      :Top                  := 20
+      :Width                := 39
+      :Height               := 16
+      :Caption              := "Name:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label5"
+      :Left                 := 20
+      :Top                  := 120
+      :Width                := 84
+      :Height               := 16
+      :Caption              := "Last update:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label6"
+      :Left                 := 20
+      :Top                  := 145
+      :Width                := 84
+      :Height               := 16
+      :Caption              := "File size:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label7"
+      :Left                 := 20
+      :Top                  := 170
+      :Width                := 84
+      :Height               := 16
+      :Caption              := "Record size:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label8"
+      :Left                 := 320
+      :Top                  := 120
+      :Width                := 97
+      :Height               := 16
+      :Caption              := "Memo blocksize:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label9"
+      :Left                 := 320
+      :Top                  := 145
+      :Width                := 97
+      :Height               := 16
+      :Caption              := "Field count:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label10"
+      :Left                 := 320
+      :Top                  := 170
+      :Width                := 97
+      :Height               := 16
+      :Caption              := "Record count"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelLastUpdate"
+      :Left                 := 115
+      :Top                  := 120
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelFileSize"
+      :Left                 := 115
+      :Top                  := 145
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelRowLen"
+      :Left                 := 115
+      :Top                  := 170
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelMemoBlock"
+      :Left                 := 423
+      :Top                  := 120
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelColNr"
+      :Left                 := 423
+      :Top                  := 145
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelRowNr"
+      :Left                 := 423
+      :Top                  := 170
+      :Width                := 80
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonClose"
+      :Left                 := 423
+      :Top                  := 428
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "IGrid"
+      :Left                 := 20
+      :Top                  := 242
+      :Width                := 482
+      :Height               := 155
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::MTable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Index File"
+         :Data                 := "hb_QSelf():DataSource:Fields:BAG"
+         :Width                := 100
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Type"
+         :Data                 := "hb_QSelf():DataSource:Fields:TYPE"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 80
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Unique"
+         :Data                 := "hb_QSelf():DataSource:Fields:UNIQUE"
+         :Alignment            := 3
+         :Width                := 56
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Expression"
+         :Data                 := "hb_QSelf():DataSource:Fields:KEYEXPR"
+         :Width                := 280
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "For Condition"
+         :Data                 := "hb_QSelf():DataSource:Fields:FOREXPR"
+         :Width                := 280
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn7"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Complete Index File Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:WHOLEBAG"
+         :Width                := 280
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+         :Pointsize            := 12
+      END
+
+      :Left                 := 230
+      :Top                  := 203
+      :Width                := 63
+      :Height               := 20
+      :Caption              := "Indexes"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditName"
+      :Left                 := 115
+      :Top                  := 20
+      :Width                := 390
+      :Height               := 83
+      :BackColor            := 16711422
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :ReadOnly             := .T.
+      :SelForeColor         := 16711422
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonStructure"
+      :Left                 := 320
+      :Top                  := 428
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Structure"
+      :EventHandler[ "OnClick" ] := "ButtonStructure_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

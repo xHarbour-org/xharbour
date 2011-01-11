@@ -1,0 +1,376 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormXml2Dbf INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR FileXml, FileDbf, FileMax, HeadLen, FootLen, ChunkStruLen, ChunkDataLen, KeyLen, SampleCols, SampleRows, SampleCaps, RowTag, Cols, OrigCols, Error, Table, DateStyle, RexChunk, RexAttrAll, RexAttrTag, RexAttrAttr, RexBoolean, RexDateAnsi, RexDateGuess, Seconds, Status, EncType, EncFrom, EncTo, EncOk, EncError, DocType
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormXml2Dbf_OnSysCommand()
+   METHOD FormXml2Dbf_OnCreate()
+   METHOD FormXml2Dbf_OnLoad()
+   METHOD MySlimStru()
+   METHOD MySampling()
+   METHOD MyWorkup()
+   METHOD MyExplore()
+   METHOD MyInitStru()
+   METHOD MyWriteInDbf()
+   METHOD MyCheckDoc()
+   METHOD MyChunks()
+   METHOD MyCheckSel()
+   METHOD ProcessField()
+   METHOD ProcessDate()
+   METHOD MyInitData()
+   METHOD CnvUtf8String()
+   METHOD CnvAnsiOem()
+   METHOD FillMtSample()
+   METHOD DocErrorInspect()
+   METHOD ButtonXml_OnClick()
+   METHOD ButtonDbf_OnClick()
+   METHOD ButtonProceed_OnClick()
+   METHOD ButtonShow_OnClick()
+   METHOD ButtonNext_OnClick()
+   METHOD GridDbf_OnClick()
+   METHOD ButtonImport_OnClick()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormXml2Dbf
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnSysCommand" ] := "FormXml2Dbf_OnSysCommand"
+   ::EventHandler[ "OnCreate" ] := "FormXml2Dbf_OnCreate"
+   ::EventHandler[ "OnLoad" ] := "FormXml2Dbf_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MySlimStru"
+   ::EventHandler[ "UserMethod10" ] := "MySampling"
+   ::EventHandler[ "UserMethod11" ] := "MyWorkup"
+   ::EventHandler[ "UserMethod12" ] := "MyExplore"
+   ::EventHandler[ "UserMethod13" ] := "MyInitStru"
+   ::EventHandler[ "UserMethod14" ] := "MyWriteInDbf"
+   ::EventHandler[ "UserMethod15" ] := "MyCheckDoc"
+   ::EventHandler[ "UserMethod16" ] := "MyChunks"
+   ::EventHandler[ "UserMethod17" ] := "MyCheckSel"
+   ::EventHandler[ "UserMethod18" ] := "ProcessField"
+   ::EventHandler[ "UserMethod19" ] := "ProcessDate"
+   ::EventHandler[ "UserMethod2" ] := "MyInitData"
+   ::EventHandler[ "UserMethod3" ] := "CnvUtf8String"
+   ::EventHandler[ "UserMethod4" ] := "CnvAnsiOem"
+   ::EventHandler[ "UserMethod5" ] := "FillMtSample"
+   ::EventHandler[ "UserMethod6" ] := "DocErrorInspect"
+
+   // Populate Components
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "MyOpenFile"
+      :FileName             := ""
+      :MultiSelect          := .F.
+      :Create()
+   END //MyOpenFile
+
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MtXml"
+      :Structure            := { { "TAG", "C", 64, 0 }, { "ATTR", "C", 64, 0 }, { "SELECTION", "C", 64, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MtXml
+
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MtDbf"
+      :Structure            := { { "NAME", "C", 10, 0 }, { "TYPE", "C", 1, 0 }, { "LEN", "N", 4, 0 }, { "DEC", "N", 4, 0 }, { "TAG", "C", 64, 0 }, { "ATTR", "C", 64, 0 }, { "SELECTION", "C", 64, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MtDbf
+
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MtSample"
+      :Structure            := { { "C01", "C", 20, 0 }, { "C02", "C", 20, 0 }, { "C03", "C", 20, 0 }, { "C04", "C", 20, 0 }, { "C05", "C", 20, 0 }, { "C06", "C", 20, 0 }, { "C07", "C", 20, 0 }, { "C08", "C", 20, 0 }, { "C09", "C", 20, 0 }, { "C10", "C", 20, 0 }, { "C11", "C", 20, 0 }, { "C12", "C", 20, 0 }, { "C13", "C", 20, 0 }, { "C14", "C", 20, 0 }, { "C15", "C", 20, 0 }, { "C16", "C", 20, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MtSample
+
+   // Properties declaration
+   ::Name                 := "FormXml2Dbf"
+   ::Left                 := 10
+   ::Top                  := 8
+   ::Width                := 882
+   ::Height               := 714
+   ::Center               := .T.
+   ::Caption              := "xml2dbf"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 58
+      :Top                  := 15
+      :Width                := 763
+      :Height               := 195
+      :Caption              := "Files"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 34
+         :Top                  := 25
+         :Width                := 109
+         :Height               := 22
+         :Caption              := "XML file selection:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditXml"
+         :Left                 := 160
+         :Top                  := 25
+         :Width                := 527
+         :Height               := 22
+         :Enabled              := .F.
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonXml"
+         :Left                 := 705
+         :Top                  := 25
+         :Width                := 39
+         :Height               := 25
+         :Caption              := "..."
+         :EventHandler[ "OnClick" ] := "ButtonXml_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 34
+         :Top                  := 105
+         :Width                := 110
+         :Height               := 16
+         :Caption              := "DBF file selection:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditDbf"
+         :Left                 := 160
+         :Top                  := 105
+         :Width                := 527
+         :Height               := 22
+         :Enabled              := .F.
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonDbf"
+         :Left                 := 704
+         :Top                  := 105
+         :Width                := 40
+         :Height               := 25
+         :Caption              := "..."
+         :EventHandler[ "OnClick" ] := "ButtonDbf_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonProceed"
+         :Left                 := 455
+         :Top                  := 61
+         :Width                := 110
+         :Height               := 25
+         :Caption              := "Load XML data"
+         :EventHandler[ "OnClick" ] := "ButtonProceed_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelRow"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 170
+         :Top                  := 151
+         :Width                := 193
+         :Height               := 16
+         :ForeColor            := 3937500
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelTime"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 445
+         :Top                  := 152
+         :Width                := 91
+         :Height               := 16
+         :ForeColor            := 10526303
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonShow"
+         :Left                 := 577
+         :Top                  := 61
+         :Width                := 110
+         :Height               := 25
+         :Caption              := "Show XML data"
+         :EventHandler[ "OnClick" ] := "ButtonShow_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonNext"
+         :Left                 := 577
+         :Top                  := 148
+         :Width                := 110
+         :Height               := 25
+         :Caption              := "DBF columns"
+         :EventHandler[ "OnClick" ] := "ButtonNext_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 384
+         :Top                  := 151
+         :Width                := 59
+         :Height               := 16
+         :Caption              := "Seconds:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         :Left                 := 34
+         :Top                  := 151
+         :Width                := 59
+         :Height               := 16
+         :Caption              := "Row tag:"
+         :Create()
+      END //LABEL
+
+   END //GROUPBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox2"
+      :Left                 := 57
+      :Top                  := 267
+      :Width                := 763
+      :Height               := 395
+      :Caption              := "DBF columns"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( DATAGRID( :this ) )
+         :Name                 := "GridDbf"
+         :Left                 := 21
+         :Top                  := 36
+         :Width                := 715
+         :Height               := 304
+         :BackColor            := 16777215
+         :SmallCaption         := .T.
+         :GridColor            := 12632260
+         :HighlightColor       := 16750899
+         :HighlightTextColor   := 16777215
+         :DataSource           := "MtDbf"
+         :EventHandler[ "OnClick" ] := "GridDbf_OnClick"
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumn1"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Name"
+            :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+            :Width                := 78
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumn2"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Type"
+            :Data                 := "hb_QSelf():DataSource:Fields:TYPE"
+            :Width                := 42
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumn3"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Len"
+            :Data                 := "hb_QSelf():DataSource:Fields:LEN"
+            :Alignment            := 2
+            :Width                := 47
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumn4"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Dec"
+            :Data                 := "hb_QSelf():DataSource:Fields:DEC"
+            :Alignment            := 2
+            :Width                := 35
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumn7"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Corresponding XML Item: click on a cell for list, then chose by clicking the desired item"
+            :Data                 := "hb_QSelf():DataSource:Fields:SELECTION"
+            :Width                := 486
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         :Create()
+      END //DATAGRID
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonImport"
+         :Left                 := 626
+         :Top                  := 356
+         :Width                := 110
+         :Height               := 25
+         :Caption              := "Start Data Import"
+         :EventHandler[ "OnClick" ] := "ButtonImport_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonCancel"
+         :Left                 := 500
+         :Top                  := 356
+         :Width                := 110
+         :Height               := 25
+         :Caption              := "Go back to Files"
+         :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //GROUPBOX
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "ProggyBar"
+      :Left                 := 140
+      :Top                  := 233
+      :Width                := 595
+      :Height               := 20
+      :Step                 := 1
+      :Create()
+   END //PROGRESSBAR
+
+   ::Show()
+
+RETURN Self

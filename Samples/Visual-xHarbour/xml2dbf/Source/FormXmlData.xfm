@@ -1,0 +1,223 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormXmlData INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormXmlData_OnLoad()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormXmlData
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormXmlData_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormXmlData"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 854
+   ::Height               := 458
+   ::Center               := .T.
+   ::Caption              := "XML Sample Data"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 20
+      :Top                  := 29
+      :Width                := 799
+      :Height               := 364
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := "MtSample"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C01"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C02"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C03"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C04"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C05"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C06"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn7"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C07"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn8"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C08"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn9"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C09"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn10"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C10"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn11"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C11"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn12"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C12"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn13"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C13"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn14"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C14"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn15"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C15"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn16"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "."
+         :Data                 := "hb_QSelf():DataSource:Fields:C16"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self

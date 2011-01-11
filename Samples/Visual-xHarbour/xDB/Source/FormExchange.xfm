@@ -1,0 +1,233 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormExchange INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormExchange_OnLoad()
+   METHOD Timer1_OnTimeOut()
+   METHOD ButtonOK_OnClick()
+   METHOD ButtonCancel_OnClick()
+   METHOD ButtonSelect_OnClick()
+   METHOD RadioVIA_OnClick()
+   METHOD RadioBlank_OnClick()
+   METHOD RadioTab_OnClick()
+   METHOD RadioPipe_OnClick()
+   METHOD RadioSDF_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormExchange
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormExchange_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "FormExchange"
+   ::Modal                := .T.
+   ::Left                 := 11
+   ::Top                  := 10
+   ::Width                := 457
+   ::Height               := 450
+   ::Center               := .T.
+   ::Caption              := "Exchange"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\tables.ico","_TABLESICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormExchange
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonOK"
+      :Left                 := 250
+      :Top                  := 376
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 353
+      :Top                  := 376
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 33
+      :Top                  := 381
+      :Width                := 141
+      :Height               := 20
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSelect"
+      WITH OBJECT :Font
+         :Pointsize            := 10
+      END
+
+      :Left                 := 411
+      :Top                  := 59
+      :Width                := 22
+      :Height               := 22
+      :Caption              := "..."
+      :EventHandler[ "OnClick" ] := "ButtonSelect_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditName"
+      :VertScroll           := .T.
+      :Left                 := 20
+      :Top                  := 40
+      :Width                := 372
+      :Height               := 60
+      :BackColor            := 16711422
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :ReadOnly             := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelName"
+      :Left                 := 20
+      :Top                  := 19
+      :Width                := 221
+      :Height               := 16
+      :Caption              := "Filename:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 20
+      :Top                  := 108
+      :Width                := 113
+      :Height               := 16
+      :Caption              := "FOR  Condition:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditFOR"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 18
+      :Top                  := 128
+      :Width                := 372
+      :Height               := 60
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckFOR"
+      :Left                 := 18
+      :Top                  := 205
+      :Width                := 194
+      :Height               := 15
+      :Caption              := "Activate FOR condition"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioVIA"
+      :Left                 := 33
+      :Top                  := 240
+      :Width                := 80
+      :Height               := 15
+      :Caption              := "Table VIA"
+      :InitialState         := 1
+      :EventHandler[ "OnClick" ] := "RadioVIA_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxVIA"
+      :Left                 := 174
+      :Top                  := 236
+      :Width                := 100
+      :Height               := 108
+      :SelectionHeight      := 18
+      :ItemHeight           := 18
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioBlank"
+      :Left                 := 33
+      :Top                  := 264
+      :Width                := 141
+      :Height               := 15
+      :Caption              := "Delimited with BLANK"
+      :EventHandler[ "OnClick" ] := "RadioBlank_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioTab"
+      :Left                 := 33
+      :Top                  := 288
+      :Width                := 134
+      :Height               := 15
+      :Caption              := "Delimited with TAB"
+      :EventHandler[ "OnClick" ] := "RadioTab_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioPipe"
+      :Left                 := 33
+      :Top                  := 312
+      :Width                := 127
+      :Height               := 15
+      :Caption              := "Delimited with PIPE"
+      :EventHandler[ "OnClick" ] := "RadioPipe_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioSDF"
+      :Left                 := 33
+      :Top                  := 336
+      :Width                := 53
+      :Height               := 15
+      :Caption              := "SDF"
+      :EventHandler[ "OnClick" ] := "RadioSDF_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+RETURN Self
+

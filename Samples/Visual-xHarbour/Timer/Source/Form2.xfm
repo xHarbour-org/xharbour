@@ -1,0 +1,46 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form2 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form2_OnDestroy()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "Form2_OnDestroy"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form2"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 125
+   ::Center               := .T.
+   ::Caption              := "Sample ProgressBar"
+   ::TopMost              := .T.
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "ProgressBar1"
+      :Left                 := 46
+      :Top                  := 39
+      :Width                := 201
+      :Height               := 20
+      :MaxRange             := 50
+      :Step                 := 1
+      :Create()
+   END //PROGRESSBAR
+
+   ::Show()
+
+RETURN Self

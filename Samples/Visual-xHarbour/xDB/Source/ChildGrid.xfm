@@ -1,0 +1,83 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS ChildGrid INHERIT MDIChildWindow
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD ChildGrid_OnClose()
+   METHOD ChildGrid_OnLoad()
+   METHOD Grid_OnCreate()
+   METHOD myImageIndex()
+   METHOD myMarkerBack()
+   METHOD myMarkerFore()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS ChildGrid
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "ChildGrid_OnClose"
+   ::EventHandler[ "OnLoad" ] := "ChildGrid_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "Table"
+      :AutoOpen             := .F.
+      :Create()
+   END //Table
+
+   REQUEST ADS
+   WITH OBJECT ( AdsDataTable( Self ) )
+      :Name                 := "AdsFree"
+      :AutoOpen             := .F.
+      :Create()
+   END //AdsFree
+
+   // Properties declaration
+   ::Name                 := "ChildGrid"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 551
+   ::Height               := 464
+   ::Caption              := "ChildGrid"
+   ::BackColor            := 16777215
+   ::SysMenu              := .F.
+   ::FrameStyle           := 2
+   ::MDIChild             := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      :ContextMenu          := ::Application:MainForm:ContextMenu2
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 6
+      :Top                  := 6
+      :Width                := 524
+      :Height               := 417
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :ImageList            := ::Application:MainForm:ImageList2
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :EventHandler[ "OnCreate" ] := "Grid_OnCreate"
+      :EventHandler[ "UserMethod1" ] := "myImageIndex"
+      :EventHandler[ "UserMethod2" ] := "myMarkerBack"
+      :EventHandler[ "UserMethod3" ] := "myMarkerFore"
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self

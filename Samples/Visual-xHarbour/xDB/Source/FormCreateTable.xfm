@@ -1,0 +1,161 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormCreateTable INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormCreateTable_OnDestroy()
+   METHOD FormCreateTable_OnLoad()
+   METHOD ButtonCreate_OnClick()
+   METHOD ButtonCancel_OnClick()
+   METHOD ButtonStru_OnClick()
+   METHOD ButtonNew_OnClick()
+   METHOD ButtonNewStru_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormCreateTable
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormCreateTable_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormCreateTable_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormCreateTable"
+   ::Modal                := .T.
+   ::Left                 := 9
+   ::Top                  := 9
+   ::Width                := 514
+   ::Height               := 328
+   ::Center               := .T.
+   ::Caption              := "Create Table from Extended Structure"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\resource\new.ico","_NEWICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormCreateTable
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCreate"
+      :Left                 := 312
+      :Top                  := 250
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Create"
+      :EventHandler[ "OnClick" ] := "ButtonCreate_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 408
+      :Top                  := 250
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonStru"
+      WITH OBJECT :Font
+         :Pointsize            := 10
+      END
+
+      :Left                 := 448
+      :Top                  := 48
+      :Width                := 40
+      :Height               := 24
+      :Caption              := "..."
+      :EventHandler[ "OnClick" ] := "ButtonStru_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditStru"
+      :VertScroll           := .T.
+      :Left                 := 19
+      :Top                  := 48
+      :Width                := 403
+      :Height               := 72
+      :BackColor            := 16711422
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :ReadOnly             := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 19
+      :Top                  := 24
+      :Width                := 222
+      :Height               := 16
+      :Caption              := "Extended structure - complete filename:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 19
+      :Top                  := 133
+      :Width                := 181
+      :Height               := 16
+      :Caption              := "New table - complete filename:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditNew"
+      :VertScroll           := .T.
+      :Left                 := 19
+      :Top                  := 155
+      :Width                := 403
+      :Height               := 72
+      :BackColor            := 16711422
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :ReadOnly             := .T.
+      :SelForeColor         := 0
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonNew"
+      WITH OBJECT :Font
+         :Pointsize            := 10
+      END
+
+      :Left                 := 448
+      :Top                  := 179
+      :Width                := 40
+      :Height               := 24
+      :Caption              := "..."
+      :EventHandler[ "OnClick" ] := "ButtonNew_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonNewStru"
+      :Left                 := 448
+      :Top                  := 96
+      :Width                := 40
+      :Height               := 24
+      :Caption              := "New"
+      :EventHandler[ "OnClick" ] := "ButtonNewStru_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

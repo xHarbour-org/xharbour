@@ -1,0 +1,90 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR oOne, oTwo
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Button1_OnClick()
+   METHOD Button2_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form1"
+   WITH OBJECT ::MDIClient
+      :AlignLeft            := "ExplorerBar1"
+   END
+
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 700
+   ::Height               := 500
+   ::Caption              := "Main Form"
+   ::MDIContainer         := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( EXPLORERBAR( Self ) )
+      :Name                 := "ExplorerBar1"
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Bottom               := "Form1"
+      END
+
+      :Left                 := 4
+      :Top                  := 4
+      :Width                := 210
+      :Height               := 400
+      :Caption              := "ExplorerBar1"
+      :Create()
+      WITH OBJECT ( EXPANDO( :this ) )
+         :Name                 := "Expando1"
+         WITH OBJECT :Font
+            :FaceName             := "MS Shell Dlg"
+            :Bold                 := .T.
+            :Pointsize            := 8
+         END
+
+         :Height               := 136
+         :Caption              := "My Group"
+         :Paneheight           := 136
+         :Create()
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "Button1"
+            :Left                 := 79
+            :Top                  := 40
+            :Width                := 80
+            :Height               := 25
+            :Caption              := "First"
+            :EventHandler[ "OnClick" ] := "Button1_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "Button2"
+            :Left                 := 79
+            :Top                  := 89
+            :Width                := 80
+            :Height               := 25
+            :Caption              := "Second"
+            :EventHandler[ "OnClick" ] := "Button2_OnClick"
+            :Create()
+         END //BUTTON
+
+      END //EXPANDO
+
+   END //EXPLORERBAR
+
+   ::Show()
+
+RETURN Self

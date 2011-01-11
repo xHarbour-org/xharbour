@@ -1,0 +1,178 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MDIForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MDIForm_OnCreate()
+   METHOD File_New_OnClick()
+   METHOD File_Open_OnClick()
+   METHOD File_Close_OnClick()
+   METHOD File_CloseAll_OnClick()
+   METHOD File_Exit_OnClick()
+   METHOD About_Info_OnClick()
+   METHOD About_VisitOnline_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MDIForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "MDIForm_OnCreate"
+
+   // Populate Components
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "MyOpen"
+      :FileName             := ""
+      :MultiSelect          := .F.
+      :Create()
+   END //MyOpen
+
+   WITH OBJECT ( SaveFileDialog( Self ) )
+      :Name                 := "MySave"
+      :FileName             := ""
+      :Create()
+   END //MySave
+
+   // Properties declaration
+   ::Name                 := "MDIForm"
+   WITH OBJECT ::MDIClient
+      :AlignTop             := "MainBar"
+   END
+
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 812
+   ::Height               := 547
+   ::Center               := .T.
+   ::Caption              := "xPad"
+   ::MDIContainer         := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "MainBar"
+      :Left                 := 12
+      :Top                  := 0
+      :Width                := 865
+      :Height               := 20
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HorzPadding          := 7
+      :VertPadding          := 6
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MainBar_File"
+         :Caption              := "File"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_New"
+            :Caption              := "New"
+            :EventHandler[ "OnClick" ] := "File_New_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Open"
+            :Caption              := "Open"
+            :EventHandler[ "OnClick" ] := "File_Open_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Line1"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Close"
+            :Caption              := "Close"
+            :EventHandler[ "OnClick" ] := "File_Close_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_CloseAll"
+            :Caption              := "Close All"
+            :EventHandler[ "OnClick" ] := "File_CloseAll_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Line2"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "File_Exit"
+            :Caption              := "Exit"
+            :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MainBar_About"
+         :Caption              := "About"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "About_Info"
+            :Caption              := "Info"
+            :EventHandler[ "OnClick" ] := "About_Info_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "About_Line1"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "About_VisitOnline"
+            :Caption              := "Visit xHarbour.com"
+            :EventHandler[ "OnClick" ] := "About_VisitOnline_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 804
+      :Height               := 21
+      :TabStop              := .F.
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band1"
+         :MinWidth             := 60
+         :MinHeight            := 21
+         :BandChild            := ::MainBar
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   ::Show()
+
+RETURN Self

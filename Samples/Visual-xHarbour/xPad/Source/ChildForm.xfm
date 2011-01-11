@@ -1,0 +1,159 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS ChildForm INHERIT MDIChildWindow
+   // Components declaration
+   // User variables definitions
+   VAR doc_saved, doc_initial_save
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form_OnClose()
+   METHOD ChildForm_OnLoad()
+   METHOD MainBar_MainBar_Open_OnClick()
+   METHOD MainBar_MainBar_Close_OnClick()
+   METHOD MainBar_MainBar_Save_OnClick()
+   METHOD MainBar_MainBar_SaveAs_OnClick()
+   METHOD MainBar_MainBar_Font_OnClick()
+   METHOD FileContent_OnChar()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS ChildForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "Form_OnClose"
+   ::EventHandler[ "OnLoad" ] := "ChildForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "MyImageList"
+      :Create()
+   END //MyImageList
+
+   // Properties declaration
+   ::Name                 := "ChildForm"
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 739
+   ::Height               := 451
+   ::Center               := .T.
+   ::Caption              := "Untitled Document"
+   ::MDIChild             := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "MainBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+      END
+
+      :Left                 := 1
+      :Top                  := 1
+      :Width                := 729
+      :Height               := 37
+      :Tooltips             := .T.
+      :ImageList            := ::MyImageList
+      :HotImageList         := ::MyImageList
+      :HorzPadding          := 14
+      :VertPadding          := 8
+      :MixedButtons         := .T.
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Open"
+         :Width                := 47
+         :Caption              := "Open"
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "MainBar_MainBar_Open_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Close"
+         :Width                := 47
+         :Caption              := "Close"
+         :ImageIndex           := 1
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "MainBar_MainBar_Close_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Line1"
+         :Width                := 14
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 2
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Save"
+         :Width                := 42
+         :Caption              := "Save"
+         :ImageIndex           := 2
+         :Position             := 3
+         :EventHandler[ "OnClick" ] := "MainBar_MainBar_Save_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_SaveAs"
+         :Width                := 58
+         :Caption              := "Save As"
+         :ImageIndex           := 3
+         :Position             := 4
+         :EventHandler[ "OnClick" ] := "MainBar_MainBar_SaveAs_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Line2"
+         :Width                := 14
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 5
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "MainBar_Font"
+         :Width                := 42
+         :Caption              := "Font"
+         :ImageIndex           := 4
+         :Position             := 6
+         :EventHandler[ "OnClick" ] := "MainBar_MainBar_Font_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "FileContent"
+      :VertScroll           := .T.
+      :HorzScroll           := .T.
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::MainBar
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+      END
+
+      :Left                 := 1
+      :Top                  := 39
+      :Width                := 729
+      :Height               := 377
+      :AutoVScroll          := .T.
+      :AutoHScroll          := .T.
+      :MultiLine            := .T.
+      :WantReturn           := .T.
+      :EventHandler[ "OnChar" ] := "FileContent_OnChar"
+      :Create()
+   END //EDIT
+
+   ::Show()
+
+RETURN Self

@@ -1,0 +1,236 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD MyTimer_OnTimeOut()
+   METHOD LinkWebsite_OnClick()
+   METHOD ButtonSpin_OnClick()
+   METHOD ButtonLucky_OnClick()
+   METHOD ButtonSlot1_OnClick()
+   METHOD ButtonSlot2_OnClick()
+   METHOD ButtonSlot3_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "MyTimer"
+      :AutoRun              := .F.
+      :Delay                := 100
+      :EventHandler[ "OnTimeOut" ] := "MyTimer_OnTimeOut"
+      :Create()
+   END //MyTimer
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 327
+   ::Height               := 178
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 117
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelSlot1"
+      WITH OBJECT :Font
+         :Pointsize            := 20
+      END
+
+      :Left                 := 18
+      :Top                  := 12
+      :Width                := 26
+      :Height               := 34
+      :Caption              := "0"
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelSlot2"
+      WITH OBJECT :Font
+         :Pointsize            := 20
+      END
+
+      :Left                 := 78
+      :Top                  := 12
+      :Width                := 26
+      :Height               := 34
+      :Caption              := "0"
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelSlot3"
+      WITH OBJECT :Font
+         :Pointsize            := 20
+      END
+
+      :Left                 := 138
+      :Top                  := 12
+      :Width                := 26
+      :Height               := 34
+      :Caption              := "0"
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSpin"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 210
+      :Top                  := 18
+      :Width                := 95
+      :Height               := 30
+      :Caption              := "Spin!"
+      :EventHandler[ "OnClick" ] := "ButtonSpin_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonLucky"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 210
+      :Top                  := 60
+      :Width                := 95
+      :Height               := 30
+      :Caption              := "I Feel Lucky"
+      :EventHandler[ "OnClick" ] := "ButtonLucky_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSlot1"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 12
+      :Top                  := 60
+      :Width                := 34
+      :Height               := 30
+      :Caption              := "!"
+      :EventHandler[ "OnClick" ] := "ButtonSlot1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSlot2"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 72
+      :Top                  := 60
+      :Width                := 34
+      :Height               := 30
+      :Caption              := "!"
+      :EventHandler[ "OnClick" ] := "ButtonSlot2_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSlot3"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 132
+      :Top                  := 60
+      :Width                := 34
+      :Height               := 30
+      :Caption              := "!"
+      :EventHandler[ "OnClick" ] := "ButtonSlot3_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

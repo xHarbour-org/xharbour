@@ -1,0 +1,231 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD MyRefresh()
+   METHOD DataGrid1_OnClick()
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyRefresh"
+
+   // Populate Components
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable1"
+      :Alias                := "parent"
+      :FileName             := "ord.dbf"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //DataTable1
+
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable2"
+      :Alias                := "child"
+      :FileName             := "orddet.dbf"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //DataTable2
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 641
+   ::Height               := 388
+   ::Caption              := "Scope"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 12
+      :Top                  := 48
+      :Width                := 275
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::DataTable1
+      :EventHandler[ "OnClick" ] := "DataGrid1_OnClick"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Orderid"
+         :Data                 := "hb_QSelf():DataSource:Fields:ORDERID"
+         :Alignment            := 2
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Customerid"
+         :Data                 := "hb_QSelf():DataSource:Fields:CUSTOMERID"
+         :Width                := 84
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Orderdate"
+         :Data                 := "hb_QSelf():DataSource:Fields:ORDERDATE"
+         :Alignment            := 3
+         :Width                := 77
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Freight"
+         :Data                 := "hb_QSelf():DataSource:Fields:FREIGHT"
+         :Alignment            := 2
+         :Width                := 63
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Shipcity"
+         :Data                 := "hb_QSelf():DataSource:Fields:SHIPCITY"
+         :Width                := 105
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid2"
+      :Left                 := 311
+      :Top                  := 48
+      :Width                := 294
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::DataTable2
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Orderid"
+         :Data                 := "hb_QSelf():DataSource:Fields:ORDERID"
+         :Alignment            := 2
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn7"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Productid"
+         :Data                 := "hb_QSelf():DataSource:Fields:PRODUCTID"
+         :Alignment            := 2
+         :Width                := 77
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn8"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Unitprice"
+         :Data                 := "hb_QSelf():DataSource:Fields:UNITPRICE"
+         :Alignment            := 2
+         :Width                := 77
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn9"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Quantity"
+         :Data                 := "hb_QSelf():DataSource:Fields:QUANTITY"
+         :Alignment            := 2
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 311
+      :Top                  := 305
+      :Width                := 98
+      :Height               := 30
+      :Caption              := "Release Scope"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      WITH OBJECT :Font
+         :Pointsize            := 12
+      END
+
+      :Left                 := 12
+      :Top                  := 12
+      :Width                := 68
+      :Height               := 21
+      :Caption              := "Orders:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      WITH OBJECT :Font
+         :Pointsize            := 12
+      END
+
+      :Left                 := 311
+      :Top                  := 12
+      :Width                := 125
+      :Height               := 21
+      :Caption              := "Order Details:"
+      :Create()
+   END //LABEL
+
+   ::Show()
+
+RETURN Self

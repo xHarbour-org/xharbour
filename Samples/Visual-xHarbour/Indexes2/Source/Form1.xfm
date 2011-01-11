@@ -1,0 +1,66 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD ToolStripButton1_OnClick()
+   METHOD ToolStripButton2_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable1"
+      :Alias                := "PEOPLE"
+      :FileName             := "people.dbf"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //DataTable1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 300
+   ::Caption              := "Form1"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TOOLSTRIP( Self ) )
+      :Name                 := "ToolStrip1"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 1
+      :Top                  := 0
+      :Caption              := "ToolStrip1"
+      :Create()
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ToolStripButton1"
+         :Caption              := "File"
+         :EventHandler[ "OnClick" ] := "ToolStripButton1_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ToolStripButton2"
+         :Caption              := "Maintenance"
+         :EventHandler[ "OnClick" ] := "ToolStripButton2_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+   END //TOOLSTRIP
+
+   ::Show()
+
+RETURN Self

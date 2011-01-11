@@ -1,0 +1,71 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormXmlStru INHERIT Dialog
+   // Components declaration
+   // User variables definitions
+   VAR Row
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormXmlStru_OnCreate()
+   METHOD FormXmlStru_OnLoad()
+   METHOD GridXml_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormXmlStru
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "FormXmlStru_OnCreate"
+   ::EventHandler[ "OnLoad" ] := "FormXmlStru_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormXmlStru"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 539
+   ::Height               := 352
+   ::Center               := .T.
+   ::Caption              := "Select XML Item..."
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormXmlStru
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "GridXml"
+      :Left                 := 9
+      :Top                  := 10
+      :Width                := 498
+      :Height               := 290
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := "MtXml"
+      :EventHandler[ "OnClick" ] := "GridXml_OnClick"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Item List"
+         :Data                 := "hb_QSelf():DataSource:Fields:SELECTION"
+         :Width                := 448
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

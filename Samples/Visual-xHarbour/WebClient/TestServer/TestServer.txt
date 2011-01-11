@@ -1,0 +1,93 @@
+<?php
+
+
+function my_pickupfile()
+{
+   if ( isset( $_FILES['myfile'] ) == FALSE )
+   {
+      echo( 'Error - no file name' ) ;
+      return NULL ;
+   }
+   if ( $_FILES['myfile']['error'] > 0 )
+   {
+      echo( 'Error during upload' ) ;
+      echo( strval( $_FILES['myfile']['error'] ) ) ;
+      return NULL ;
+   }
+   
+   $file_from = $_FILES['myfile']['tmp_name'] ;
+   $file_to = getcwd().'\mysubfolder\mytest.txt' ;
+   $ok = move_uploaded_file( $file_from, $file_to ) ;
+   if ( $ok == TRUE ) echo( 'Upload completed successfully' ) ;
+   else echo( 'Error on server' ) ;
+   return NULL ;
+}
+
+
+function my_getrow( &$in )
+{
+   foreach ( $_REQUEST as $key => $val )
+   {
+      $in[ $key ] = my_hexpack( $val, FALSE ) ;
+   }
+   return NULL;
+}
+
+
+function my_putrow( &$in )
+{
+   foreach ( $in as $val )
+   {
+      echo( my_hexpack( $val, TRUE ).chr(44) ) ;
+   }
+   return NULL ;
+}
+
+
+function my_hexpack( $in, $pack )
+{
+   $n = strlen( $in ) ;
+   if ( $n < 1 ) return '' ;
+   $out = '';
+   
+   if ( $pack === TRUE )
+   {
+      for ( $i=0; $i<$n; $i++ )
+      {
+         $code = ord( $in[$i] ) ;
+         $out.= ( $code<16 ) ? '0'.dechex( $code ) : dechex( $code ) ;  
+      }
+   }
+   else
+   {
+      for ( $i=0; $i<$n; $i=$i+2 )
+      {
+         $code = substr( $in, $i, 2 ) ;
+   	 $out.= chr( hexdec( $code ) ) ;  
+      }
+   }
+   
+   return $out ;
+}
+
+
+// client request handling
+
+if ( count( $_FILES ) > 0 )
+{
+   my_pickupfile() ;
+}
+else
+{
+   if ( count($_REQUEST)>0 )
+   {
+      $info = array() ;
+      my_getrow( $info ) ;
+      echo( strval( count( $info ) ).chr(44) ) ;
+      my_putrow( $info ) ;
+   }
+   else echo( 'no input data' ) ;
+}
+
+
+?>

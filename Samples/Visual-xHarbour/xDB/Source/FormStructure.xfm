@@ -1,0 +1,180 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormStructure INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormStructure_OnClose()
+   METHOD FormStructure_OnDestroy()
+   METHOD FormStructure_OnLoad()
+   METHOD GridColumn1_OnSave()
+   METHOD GridColumn2_OnSave()
+   METHOD GridColumn3_OnSave()
+   METHOD GridColumn4_OnSave()
+   METHOD ButtonAdd_OnClick()
+   METHOD ButtonDelete_OnClick()
+   METHOD ButtonSave_OnClick()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormStructure
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "FormStructure_OnClose"
+   ::EventHandler[ "OnDestroy" ] := "FormStructure_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormStructure_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "STable"
+      :Structure            := { { "NAME", "C", 10, 0 }, { "TYPE", "C", 1, 0 }, { "LENGTH", "N", 3, 0 }, { "DECIMALS", "N", 3, 0 } }
+      :Table                := {  }
+      :Create()
+   END //STable
+
+   // Properties declaration
+   ::Name                 := "FormStructure"
+   ::Modal                := .T.
+   ::Left                 := 7
+   ::Top                  := 4
+   ::Width                := 453
+   ::Height               := 415
+   ::Center               := .T.
+   ::Caption              := "Structure"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\app.ico","_APPICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormStructure
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      :Left                 := 24
+      :Top                  := 24
+      :Width                := 300
+      :Height               := 293
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::STable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "!!!!!!!!!!"
+         :Caption              := "Field Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Autoedit             := .T.
+         :Width                := 110
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn1_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "!"
+         :Caption              := "Type"
+         :Data                 := "hb_QSelf():DataSource:Fields:TYPE"
+         :Autoedit             := .T.
+         :Alignment            := 3
+         :Width                := 42
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn2_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Length"
+         :Data                 := "hb_QSelf():DataSource:Fields:LENGTH"
+         :Autoedit             := .T.
+         :Alignment            := 2
+         :Width                := 56
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn3_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Decimals"
+         :Data                 := "hb_QSelf():DataSource:Fields:DECIMALS"
+         :Autoedit             := .T.
+         :Alignment            := 2
+         :Width                := 74
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn4_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonAdd"
+      :Left                 := 344
+      :Top                  := 44
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Add"
+      :EventHandler[ "OnClick" ] := "ButtonAdd_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonDelete"
+      :Left                 := 344
+      :Top                  := 96
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Delete"
+      :EventHandler[ "OnClick" ] := "ButtonDelete_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSave"
+      :Left                 := 243
+      :Top                  := 338
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Save"
+      :EventHandler[ "OnClick" ] := "ButtonSave_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 344
+      :Top                  := 338
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

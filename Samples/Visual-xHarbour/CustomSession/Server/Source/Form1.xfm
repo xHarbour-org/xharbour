@@ -1,0 +1,87 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR oSession, lManage
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnClose()
+   METHOD Form1_OnLoad()
+   METHOD MyOnTimeOut()
+   METHOD MenuManage_OnClick()
+   METHOD MenuStop_OnClick()
+   METHOD MyWebBrowser_DocumentComplete()
+   METHOD MyWebBrowser_NavigateError()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "Form1_OnClose"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "MyTimer"
+      :AutoRun              := .F.
+      :EventHandler[ "OnTimeOut" ] := "MyOnTimeOut"
+      :Create()
+   END //MyTimer
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextMenu1"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "MenuManage"
+         :Caption              := "Manage tasks"
+         :EventHandler[ "OnClick" ] := "MenuManage_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "MenuStop"
+         :Caption              := "Shutdown sample"
+         :EventHandler[ "OnClick" ] := "MenuStop_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //ContextMenu1
+
+   WITH OBJECT ( NotifyIcon( Self ) )
+      :Name                 := "MyNotifyIcon"
+      :Text                 := "Sample Task Scheduler"
+      :Icon                 := { ".\Resource\myts.ico","_MYTSICO" }
+      :ContextMenu          := ::ContextMenu1
+      :Create()
+   END //MyNotifyIcon
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 11
+   ::Top                  := 10
+   ::Width                := 613
+   ::Height               := 527
+   ::Caption              := "Sample Task Scheduler"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( WEBBROWSER( Self ) )
+      :Name                 := "MyWebBrowser"
+      :Left                 := 25
+      :Top                  := 28
+      :Width                := 547
+      :Height               := 436
+      :Url                  := "about:blank"
+      :EventHandler[ "DocumentComplete" ] := "MyWebBrowser_DocumentComplete"
+      :EventHandler[ "NavigateError" ] := "MyWebBrowser_NavigateError"
+      :Create()
+      :Configure()
+   END //WEBBROWSER
+
+   ::Show()
+
+RETURN Self

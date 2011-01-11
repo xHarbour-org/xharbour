@@ -1,0 +1,70 @@
+Q Who invented the A/C current?
+L 9
+R Charles Proteus Steinmetz
+F Leon Battista Alberti
+F Christopher Cockerell
+F George Eastman
+---
+Q Who invented Lego?
+L 11
+F Theodore Maiman
+R Godtfred Kirk Christiansen
+F Thaddeus Cahill
+F Edward Jenner
+---
+Q Who invented the typewriter?
+L 12
+F Barthelemy Thimonnier
+F Henry Brearley
+F Eugene Schueller
+R William A Burt
+---
+Q Who invented table tennis?
+L 12
+F Hans Lippershey
+F Richard Trevithick
+R James Gibb
+F Alva Fisher
+---
+Q Which Pope was head of the Catholic church from 1939 to 1958?
+L 15
+F John Paul I
+R Pius XII
+F Leo XII
+F Blessed John XXIII
+---
+Q Which Pope was head of the Catholic church in 1978 only?
+L 15
+R John Paul I
+F Pius XII
+F Leo XII
+F Blessed John XXIII
+---
+Q When was Harry S. Truman president of the United States of America?
+L 11
+F 1929-1933
+F 1933-1945
+R 1945-1953
+F 1963-1969
+---
+Q What is the frist name of Clinton, former president of the United States of America?
+L 5
+F Bill
+R William
+F Benjamin
+F James
+---
+Q During wich period of time did Margaret Thatcher take office in the UK?
+L 7
+F 1976-1979
+F 1979-1985
+R 1979-1990
+F 1982-1992
+---
+Q Which of the following is not one of the 7 wonders of the world?
+L 3
+F Statue Of Zeus
+F Mausoleum at Halicarnassus
+F Colossus at Rhodes
+R Stonehenge near Amesbury
+---

@@ -1,0 +1,174 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD HelperMethod()
+   METHOD GridColumn1_OnHeaderClick()
+   METHOD GridColumn2_OnHeaderClick()
+   METHOD ButtonNoOrd_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "HelperMethod"
+
+   // Populate Components
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "MyTable"
+      :Alias                := "PEOPLE"
+      :FileName             := "people.dbf"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //MyTable
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 4
+   ::Top                  := 4
+   ::Width                := 411
+   ::Height               := 300
+   ::Caption              := "People.dbf"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "MyGrid"
+      WITH OBJECT :Font
+         :Pointsize            := 11
+      END
+
+      :Left                 := 17
+      :Top                  := 13
+      :Width                := 243
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::MyTable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Id"
+         :Data                 := "hb_QSelf():DataSource:Fields:ID"
+         :Width                := 51
+         :ImageIndex           := 0
+         :EventHandler[ "OnHeaderClick" ] := "GridColumn1_OnHeaderClick"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 83
+         :ImageIndex           := 0
+         :EventHandler[ "OnHeaderClick" ] := "GridColumn2_OnHeaderClick"
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "9999999.999"
+         :Caption              := "Payment"
+         :Data                 := "hb_QSelf():DataSource:Fields:PAYMENT"
+         :Alignment            := 2
+         :Width                := 88
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonNoOrd"
+      :Left                 := 283
+      :Top                  := 223
+      :Width                := 98
+      :Height               := 30
+      :Caption              := "Physical Order"
+      :EventHandler[ "OnClick" ] := "ButtonNoOrd_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 283
+      :Top                  := 28
+      :Width                := 98
+      :Height               := 138
+      :Caption              := "Active Index"
+      :ForeColor            := 677017
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 15
+         :Top                  := 26
+         :Width                := 72
+         :Height               := 16
+         :Caption              := "Tag Number:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelNr"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+            :Pointsize            := 10
+         END
+
+         :Left                 := 15
+         :Top                  := 53
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Label2"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 15
+         :Top                  := 79
+         :Width                := 66
+         :Height               := 16
+         :Caption              := "Tag Name:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelName"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+            :Pointsize            := 10
+         END
+
+         :Left                 := 15
+         :Top                  := 105
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Label3"
+         :Create()
+      END //LABEL
+
+   END //GROUPBOX
+
+   ::Show()
+
+RETURN Self

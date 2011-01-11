@@ -1,0 +1,238 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD LinkWebsite_OnClick()
+   METHOD ButtonHide_OnClick()
+   METHOD ButtonShow_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   WITH OBJECT ( NotifyIcon( Self ) )
+      :Name                 := "MyNotifyIcon"
+      :Visible              := .F.
+      :Icon                 := { "a1.ico","_A1ICO" }
+      :Create()
+   END //MyNotifyIcon
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 590
+   ::Height               := 416
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 355
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelTitle"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 18
+      :Width                := 89
+      :Height               := 16
+      :Caption              := "1. Balloon title"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditTitle"
+      :Left                 := 18
+      :Top                  := 36
+      :Width                := 544
+      :Height               := 22
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelText"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 72
+      :Width                := 85
+      :Height               := 16
+      :Caption              := "2. Balloon text"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditText"
+      :Left                 := 18
+      :Top                  := 90
+      :Width                := 544
+      :Height               := 88
+      :MultiLine            := .T.
+      :WantReturn           := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelType"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 192
+      :Width                := 88
+      :Height               := 16
+      :Caption              := "3 Balloon Type"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "BoxTypes"
+      :Left                 := 18
+      :Top                  := 210
+      :Width                := 170
+      :Height               := 58
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :Create()
+   END //LISTBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelIcon"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 18
+      :Top                  := 282
+      :Width                := 80
+      :Height               := 16
+      :Caption              := "4. Icon Text"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditIcon"
+      :Left                 := 18
+      :Top                  := 300
+      :Width                := 544
+      :Height               := 22
+      :AutoHScroll          := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonHide"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 486
+      :Top                  := 352
+      :Width                := 80
+      :Height               := 26
+      :Caption              := "Hide"
+      :EventHandler[ "OnClick" ] := "ButtonHide_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonShow"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 396
+      :Top                  := 352
+      :Width                := 80
+      :Height               := 26
+      :Caption              := "Show"
+      :EventHandler[ "OnClick" ] := "ButtonShow_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

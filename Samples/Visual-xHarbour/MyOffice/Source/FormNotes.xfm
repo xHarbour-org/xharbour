@@ -1,0 +1,62 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormNotes INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormNotes_OnDestroy()
+   METHOD FormNotes_OnLoad()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormNotes
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormNotes_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormNotes_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormNotes"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Notes"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATETIMEPICKER( Self ) )
+      :Name                 := "DateTimePicker1"
+      :Left                 := 33
+      :Top                  := 29
+      :Width                := 90
+      :Height               := 20
+      :Create()
+   END //DATETIMEPICKER
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "Edit1"
+      :Left                 := 33
+      :Top                  := 73
+      :Width                := 215
+      :Height               := 111
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 168
+      :Top                  := 213
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Save"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

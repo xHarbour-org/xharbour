@@ -1,0 +1,394 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormAddIndex INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormAddIndex_OnLoad()
+   METHOD myCleanEdits()
+   METHOD Timer1_OnTimeOut()
+   METHOD RadioCreate_OnClick()
+   METHOD ButtonNew_OnClick()
+   METHOD RadioReindex_OnClick()
+   METHOD Grid_OnLButtonUp()
+   METHOD ButtonOK_OnClick()
+   METHOD ButtonCancel_OnClick()
+   METHOD Button1_OnClick()
+   METHOD RadioAdd_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormAddIndex
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormAddIndex_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myCleanEdits"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MTable"
+      :Structure            := { { "BAG", "C", 64, 0 }, { "TYPE", "C", 1, 0 }, { "NAME", "C", 10, 0 }, { "UNIQUE", "C", 5, 0 }, { "KEYEXPR", "C", 255, 0 }, { "FOREXPR", "C", 255, 0 }, { "WHOLEBAG", "C", 255, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MTable
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "FormAddIndex"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 634
+   ::Height               := 600
+   ::Center               := .T.
+   ::Caption              := "Manage Indexes"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\app.ico","_APPICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormAddIndex
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioCreate"
+      :Left                 := 24
+      :Top                  := 163
+      :Width                := 143
+      :Height               := 15
+      :Caption              := "Create New Index File"
+      :InitialState         := 1
+      :EventHandler[ "OnClick" ] := "RadioCreate_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 24
+      :Top                  := 194
+      :Width                := 579
+      :Height               := 315
+      :Caption              := "Options"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditFile"
+         :VertScroll           := .T.
+         :Left                 := 14
+         :Top                  := 40
+         :Width                := 496
+         :Height               := 46
+         :BackColor            := 16711422
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :ReadOnly             := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditKey"
+         :VertScroll           := .T.
+         :Left                 := 14
+         :Top                  := 156
+         :Width                := 496
+         :Height               := 46
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckUnique"
+         :Left                 := 14
+         :Top                  := 291
+         :Width                := 70
+         :Height               := 15
+         :Caption              := "Unique"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonNew"
+         :Left                 := 524
+         :Top                  := 48
+         :Width                := 40
+         :Height               := 30
+         :Caption              := "New"
+         :EventHandler[ "OnClick" ] := "ButtonNew_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 14
+         :Top                  := 19
+         :Width                := 179
+         :Height               := 16
+         :Caption              := "Index File location and name:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 14
+         :Top                  := 135
+         :Width                := 97
+         :Height               := 16
+         :Caption              := "Key Expression:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         :Left                 := 14
+         :Top                  := 209
+         :Width                := 108
+         :Height               := 16
+         :Caption              := "For Expression:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditFor"
+         WITH OBJECT :ToolTip
+            :Text                 := "Please use single quotes as string delimiters"
+            :Balloon              := .T.
+         END
+
+         :VertScroll           := .T.
+         :Left                 := 14
+         :Top                  := 231
+         :Width                := 496
+         :Height               := 46
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "LabelKey"
+         :Left                 := 14
+         :Top                  := 100
+         :Width                := 166
+         :Height               := 16
+         :Caption              := "Key Name to add or update:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditKeyName"
+         :Left                 := 192
+         :Top                  := 100
+         :Width                := 90
+         :Height               := 23
+         :BackColor            := 16711422
+         :Create()
+      END //EDIT
+
+   END //GROUPBOX
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioReindex"
+      :Left                 := 320
+      :Top                  := 163
+      :Width                := 169
+      :Height               := 15
+      :Caption              := "ReIndex all opened indexes"
+      :EventHandler[ "OnClick" ] := "RadioReindex_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 263
+      :Top                  := 7
+      :Width                := 102
+      :Height               := 16
+      :Caption              := "Opened Indexes"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      :Left                 := 24
+      :Top                  := 27
+      :Width                := 579
+      :Height               := 118
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::MTable
+      :EventHandler[ "OnLButtonUp" ] := "Grid_OnLButtonUp"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Index file"
+         :Data                 := "hb_QSelf():DataSource:Fields:BAG"
+         :Width                := 120
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Type"
+         :Data                 := "hb_QSelf():DataSource:Fields:TYPE"
+         :Alignment            := 3
+         :Width                := 64
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Unique"
+         :Data                 := "hb_QSelf():DataSource:Fields:UNIQUE"
+         :Alignment            := 3
+         :Width                := 56
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Key Expression"
+         :Data                 := "hb_QSelf():DataSource:Fields:KEYEXPR"
+         :Width                := 240
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "FOR Condition"
+         :Data                 := "hb_QSelf():DataSource:Fields:FOREXPR"
+         :Width                := 240
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn7"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Complete Index File Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:WHOLEBAG"
+         :Width                := 240
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonOK"
+      :Left                 := 424
+      :Top                  := 527
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 523
+      :Top                  := 527
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 39
+      :Top                  := 532
+      :Width                := 174
+      :Height               := 20
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 325
+      :Top                  := 527
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Structure"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioAdd"
+      WITH OBJECT :ToolTip
+         :Text                 := "Choose Index File from table"
+         :Balloon              := .T.
+      END
+
+      :Left                 := 179
+      :Top                  := 163
+      :Width                := 129
+      :Height               := 15
+      :Caption              := "Add or Update Key"
+      :EventHandler[ "OnClick" ] := "RadioAdd_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckPack"
+      :Left                 := 502
+      :Top                  := 163
+      :Width                := 57
+      :Height               := 15
+      :Caption              := "Pack"
+      :Create()
+   END //CHECKBOX
+
+RETURN Self
+

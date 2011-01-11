@@ -1,0 +1,138 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnSysCommand()
+   METHOD Form1_OnLoad()
+   METHOD MyCleanUp()
+   METHOD Dish_OnClick()
+   METHOD Sauce_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnSysCommand" ] := "Form1_OnSysCommand"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyCleanUp"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "tdish"
+      :AutoOpen             := .F.
+      :Create()
+   END //tdish
+
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "tsauce"
+      :AutoOpen             := .F.
+      :Create()
+   END //tsauce
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 386
+   ::Height               := 160
+   ::Caption              := "Current Offer"
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "CoolMenu1"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 12
+      :Top                  := 0
+      :Width                := 362
+      :Height               := 32
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Food"
+         :Caption              := "Food"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Dish"
+            :Caption              := "Dishes"
+            WITH OBJECT :Font
+               :Pointsize            := 14
+            END
+
+            :ForeColor            := 2763429
+            :EventHandler[ "OnClick" ] := "Dish_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "Sauce"
+            :Caption              := "Sauces"
+            WITH OBJECT :Font
+               :Pointsize            := 14
+            END
+
+            :ForeColor            := 9145088
+            :EventHandler[ "OnClick" ] := "Sauce_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Drink"
+         :Caption              := "Drink"
+         :Position             := 1
+         :Create()
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Misc"
+         :Caption              := "Misc"
+         :Position             := 2
+         :Create()
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 370
+      :Height               := 32
+      :Border               := .T.
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band1"
+         :MinWidth             := 60
+         :MinHeight            := 32
+         :BandChild            := ::CoolMenu1
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   ::Show()
+
+RETURN Self

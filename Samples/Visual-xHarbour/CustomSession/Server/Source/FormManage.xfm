@@ -1,0 +1,125 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormManage INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR aOld
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormManage_OnDestroy()
+   METHOD FormManage_OnLoad()
+   METHOD dg_OnClick()
+   METHOD ButtonApply_OnClick()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormManage
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormManage_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormManage_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mt"
+      :Structure            := { { "JOB", "C", 20, 0 }, { "STARTED", "L", 1, 0 }, { "NOTIFY", "L", 1, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mt
+
+   // Properties declaration
+   ::Name                 := "FormManage"
+   ::Left                 := 15
+   ::Top                  := 8
+   ::Width                := 376
+   ::Height               := 382
+   ::Center               := .T.
+   ::Caption              := "Manage Jobs"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "dg"
+      WITH OBJECT :Font
+         :Pointsize            := 12
+      END
+
+      :Left                 := 36
+      :Top                  := 26
+      :Width                := 289
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := ::mt
+      :EventHandler[ "OnClick" ] := "dg_OnClick"
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Job"
+         :Data                 := "hb_QSelf():DataSource:Fields:JOB"
+         :Width                := 140
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Started"
+         :Data                 := "hb_QSelf():DataSource:Fields:STARTED"
+         :Alignment            := 3
+         :Width                := 63
+         :ImageIndex           := 0
+         :Representation       := 3
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Notify"
+         :Data                 := "hb_QSelf():DataSource:Fields:NOTIFY"
+         :Alignment            := 3
+         :Width                := 56
+         :ImageIndex           := 0
+         :Representation       := 3
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonApply"
+      :Left                 := 143
+      :Top                  := 292
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Apply"
+      :EventHandler[ "OnClick" ] := "ButtonApply_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 245
+      :Top                  := 292
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

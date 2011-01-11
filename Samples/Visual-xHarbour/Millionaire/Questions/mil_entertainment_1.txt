@@ -1,0 +1,28 @@
+Q What is the real name of Alice Cooper?
+L 9
+R Vincent Damon Furnier
+F Terence Nelhams
+F William Perks
+F Harold Smith
+---
+Q What is the real name of David Copperfield?
+L 11
+F Gene Demetria Guynes
+F Earl Diane
+R David Kotkin
+F Harry Webb
+---
+Q What is the artist name of Georgios Panaylotou?
+L 12
+F David Bowie
+R George Michael
+F Moby
+F Nicolas Cage
+---
+Q What is the artist name of Calvin Broadus?
+L 12
+F Russ Abbot
+F Shakin Stevens
+F Sting
+R Snoop Doggy Dogg
+---

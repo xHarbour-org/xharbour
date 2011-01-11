@@ -1,0 +1,112 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormInfo INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormInfo_OnLoad()
+   METHOD DoRefresh()
+   METHOD RadioBrief_OnClick()
+   METHOD RadioDetailed_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormInfo
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormInfo_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "DoRefresh"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mt"
+      :Structure            := { { "SERVER", "C", 32, 0 }, { "NAME", "C", 32, 0 }, { "PORT", "C", 10, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mt
+
+   // Properties declaration
+   ::Name                 := "FormInfo"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 602
+   ::Height               := 365
+   ::Caption              := "Printer Informations"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioBrief"
+      :Left                 := 25
+      :Top                  := 18
+      :Width                := 70
+      :Height               := 15
+      :Caption              := "Brief"
+      :EventHandler[ "OnClick" ] := "RadioBrief_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioDetailed"
+      :Left                 := 110
+      :Top                  := 18
+      :Width                := 100
+      :Height               := 15
+      :Caption              := "Detailed"
+      :EventHandler[ "OnClick" ] := "RadioDetailed_OnClick"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "dg"
+      :Left                 := 22
+      :Top                  := 79
+      :Width                := 542
+      :Height               := 230
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := ::mt
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Server"
+         :Data                 := "hb_QSelf():DataSource:Fields:SERVER"
+         :Width                := 224
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 224
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Port"
+         :Data                 := "hb_QSelf():DataSource:Fields:PORT"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self

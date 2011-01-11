@@ -1,0 +1,373 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD LinkWebsite_OnClick()
+   METHOD ButtonExit_OnClick()
+   METHOD ButtonCheck_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Caption              := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Caption              := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Caption              := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Caption              := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //QuickMenu
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 592
+   ::Height               := 468
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 407
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion1a"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 12
+      :Width                := 117
+      :Height               := 16
+      :Caption              := "Question 1 (History)"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion1b"
+      :Left                 := 12
+      :Top                  := 30
+      :Width                := 510
+      :Height               := 16
+      :Caption              := "What was the name of the Pope who was head of the Catholic Church from 1939 to 1958?"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxQuestion1"
+      :Left                 := 12
+      :Top                  := 52
+      :Width                := 159
+      :Height               := 100
+      :ClientEdge           := .T.
+      :ItemHeight           := 13
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion2a"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 90
+      :Width                := 141
+      :Height               := 16
+      :Caption              := "Question 2 (Geography)"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion2b"
+      :Left                 := 12
+      :Top                  := 108
+      :Width                := 237
+      :Height               := 16
+      :Caption              := "Which city has the largest population?"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxQuestion2"
+      :Left                 := 12
+      :Top                  := 130
+      :Width                := 159
+      :Height               := 100
+      :ClientEdge           := .T.
+      :ItemHeight           := 13
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion3a"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 168
+      :Width                := 116
+      :Height               := 16
+      :Caption              := "Question 3 (Sience)"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion3b"
+      :Left                 := 12
+      :Top                  := 186
+      :Width                := 215
+      :Height               := 16
+      :Caption              := "How many moons does Jupiter have?"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxQuestion3"
+      :Left                 := 12
+      :Top                  := 208
+      :Width                := 159
+      :Height               := 100
+      :ClientEdge           := .T.
+      :ItemHeight           := 13
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion4a"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 18
+      :Top                  := 246
+      :Width                := 120
+      :Height               := 16
+      :Caption              := "Question 4 (People)"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion4b"
+      :Left                 := 18
+      :Top                  := 264
+      :Width                := 389
+      :Height               := 16
+      :Caption              := "In which year did James Doohan (actor who played Scotty in Star Trek) die?"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxQuestion4"
+      :Left                 := 12
+      :Top                  := 286
+      :Width                := 159
+      :Height               := 100
+      :ClientEdge           := .T.
+      :ItemHeight           := 13
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion5a"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 18
+      :Top                  := 324
+      :Width                := 119
+      :Height               := 16
+      :Caption              := "Question 5 (Games)"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelQuestion5b"
+      :Left                 := 18
+      :Top                  := 342
+      :Width                := 197
+      :Height               := 16
+      :Caption              := "Which is the highest poker hand?"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxQuestion5"
+      :Left                 := 12
+      :Top                  := 364
+      :Width                := 159
+      :Height               := 100
+      :ClientEdge           := .T.
+      :ItemHeight           := 13
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonExit"
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 12
+      END
+
+      :Left                 := 484
+      :Top                  := 390
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Exit"
+      :EventHandler[ "OnClick" ] := "ButtonExit_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCheck"
+      WITH OBJECT :Dock
+         :Right                := ::ButtonExit
+         :Bottom               := :Owner:Parent
+         :Margin               := 12
+      END
+
+      :Left                 := 356
+      :Top                  := 390
+      :Width                := 116
+      :Height               := 30
+      :Caption              := "Check my answers!"
+      :EventHandler[ "OnClick" ] := "ButtonCheck_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAnswer1"
+      :Left                 := 180
+      :Top                  := 54
+      :Width                := 394
+      :Height               := 16
+      :Visible              := .F.
+      :Caption              := "Pius XII"
+      :ForeColor            := 32768
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAnswer2"
+      :Left                 := 180
+      :Top                  := 132
+      :Width                := 396
+      :Height               := 16
+      :Visible              := .F.
+      :Caption              := "Shangai, China"
+      :ForeColor            := 32768
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAnswer3"
+      :Left                 := 180
+      :Top                  := 210
+      :Width                := 392
+      :Height               := 16
+      :Visible              := .F.
+      :Caption              := "Sixty-three"
+      :ForeColor            := 32768
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAnswer4"
+      :Left                 := 180
+      :Top                  := 288
+      :Width                := 395
+      :Height               := 16
+      :Visible              := .F.
+      :Caption              := "2005"
+      :ForeColor            := 32768
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAnswer5"
+      :Left                 := 180
+      :Top                  := 366
+      :Width                := 393
+      :Height               := 16
+      :Visible              := .F.
+      :Caption              := "Royal Flush"
+      :ForeColor            := 32768
+      :Create()
+   END //LABEL
+
+   ::Show()
+
+RETURN Self

@@ -1,0 +1,1028 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR aStartPos, aInitPos
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnClose()
+   METHOD Form1_OnCreate()
+   METHOD Form1_OnLoad()
+   METHOD myApplySettings()
+   METHOD myWriteSettings()
+   METHOD myStartPos()
+   METHOD myEndPos()
+   METHOD ContextHided_OnClick()
+   METHOD ContextShowd_OnClick()
+   METHOD ContextCopyTo_OnClick()
+   METHOD ContextAppendFrom_OnClick()
+   METHOD ContextShowStru_OnClick()
+   METHOD ContextCopyFile_OnClick()
+   METHOD ContextCopyStru_OnClick()
+   METHOD ContextIndex_OnClick()
+   METHOD ContextConnect_OnClick()
+   METHOD ContextInfo_OnClick()
+   METHOD ContextDisconnect_OnClick()
+   METHOD MenuNewTable_OnClick()
+   METHOD MenuOpenTable_OnClick()
+   METHOD MenuCloseTable_OnClick()
+   METHOD MenuView_OnClick()
+   METHOD MenuExport_OnClick()
+   METHOD MenuImport_OnClick()
+   METHOD MenuProperties_OnClick()
+   METHOD MenuSettings_OnClick()
+   METHOD MenuExit_OnClick()
+   METHOD MenuAppend_OnClick()
+   METHOD MenuUpdate_OnClick()
+   METHOD MenuDelete_OnClick()
+   METHOD MenuRecall_OnClick()
+   METHOD MenuHided_OnClick()
+   METHOD MenuShowd_OnClick()
+   METHOD MenuDBEval_OnClick()
+   METHOD MenuCount_OnClick()
+   METHOD MenuOpenIndex_OnClick()
+   METHOD MenuMarker_OnClick()
+   METHOD MenuIndex_OnClick()
+   METHOD MenuSaveStru_OnClick()
+   METHOD MenuSaveExStru_OnClick()
+   METHOD MenuCreateExStru_OnClick()
+   METHOD MenuUpdateExStru_OnClick()
+   METHOD MenuVisit_OnClick()
+   METHOD MenuBuy_OnClick()
+   METHOD MenuAbout_OnClick()
+   METHOD ToolOpen_OnClick()
+   METHOD ToolNew_OnClick()
+   METHOD ToolOpeni_OnClick()
+   METHOD ToolClose_OnClick()
+   METHOD ToolProperties_OnClick()
+   METHOD ToolView_OnClick()
+   METHOD ToolMarker_OnClick()
+   METHOD ToolImport_OnClick()
+   METHOD ToolQuery_OnClick()
+   METHOD ToolSettings_OnClick()
+   METHOD BoxIndex_OnCBNSelEndOk()
+   METHOD ButtonSeek_OnClick()
+   METHOD ButtonSkip_OnClick()
+   METHOD ButtonUp_OnClick()
+   METHOD ButtonDown_OnClick()
+   METHOD ButtonAppend_OnClick()
+   METHOD ButtonUpdate_OnClick()
+   METHOD ButtonDelete_OnClick()
+   METHOD ButtonRecall_OnClick()
+   METHOD ButtonDBEval_OnClick()
+   METHOD ButtonCount_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "Form1_OnClose"
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myApplySettings"
+   ::EventHandler[ "UserMethod2" ] := "myWriteSettings"
+   ::EventHandler[ "UserMethod3" ] := "myStartPos"
+   ::EventHandler[ "UserMethod4" ] := "myEndPos"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 32
+      :Iconheight           := 32
+      :AddImage( "_SETTINGSICO", NIL, 4194304, NIL,1, "settings.ico" )
+      :AddImage( "_NEWICO", NIL, 4194304, NIL,1, "new.ico" )
+      :AddImage( "_OPENICO", NIL, 4194304, NIL,1, "open.ico" )
+      :AddImage( "_OPENIICO", NIL, 4194304, NIL,1, "openi.ico" )
+      :AddImage( "_CLOSEICO", NIL, 4194304, NIL,1, "close.ico" )
+      :AddImage( "_PROPERTYICO", NIL, 4194304, NIL,1, "property.ico" )
+      :AddImage( "_VIEWICO", NIL, 4194304, NIL,1, "view.ico" )
+      :AddImage( "_MARKERICO", NIL, 4194304, NIL,1, "marker.ico" )
+      :AddImage( "_SHOWDICO", NIL, 4194304, NIL,1, "showd.ico" )
+      :AddImage( "_HIDEDICO", NIL, 4194304, NIL,1, "hided.ico" )
+      :AddImage( "_RDDICO", NIL, 4194304, NIL,1, "rdd.ico" )
+      :AddImage( "_EXCHANGEICO", NIL, 4194304, NIL,1, "exchange.ico" )
+      :AddImage( "_QUESTION_AND_ANSWERICO", NIL, 4194304, NIL,1, "question_and_answer.ico" )
+      :AddImage( "_QUERY_DBFICO", NIL, 4194304, NIL,1, "query_dbf.ico" )
+      :AddImage( "_IMPORT1ICO", NIL, 4194304, NIL,1, "import1.ico" )
+      :AddImage( "_STEPICO", NIL, 4194304, NIL,1, "step.ico" )
+      :AddImage( "_FINDICO", NIL, 4194304, NIL,1, "find.ico" )
+      :AddImage( "_PLUGICO", NIL, 4194304, NIL,1, "plug.ico" )
+      :AddImage( "_UNPLUGICO", NIL, 4194304, NIL,1, "unplug.ico" )
+      :AddImage( "_GEARS_VIEWICO", NIL, 4194304, NIL,1, "gears_view.ico" )
+      :AddImage( "_CHECK1ICO", NIL, 4194304, NIL,1, "check1.ico" )
+      :AddImage( "_DELETE2ICO", NIL, 4194304, NIL,1, "delete2.ico" )
+      :AddImage( "_DELETE1ICO", NIL, 4194304, NIL,1, "delete1.ico" )
+      :AddImage( "_UPICO", NIL, 4194304, NIL,1, "up.ico" )
+      :AddImage( "_DOWNICO", NIL, 4194304, NIL,1, "down.ico" )
+      :Create()
+   END //ImageList1
+
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList2"
+      :AddImage( "_DOCUMENTICO", NIL, 4194304, NIL,1, "document.ico" )
+      :AddImage( "_DELETE2ICO", NIL, 4194304, NIL,1, "delete2.ico" )
+      :Create()
+   END //ImageList2
+
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "OpenFile"
+      :AddExtension         := .F.
+      :FileName             := ""
+      :DefaultExt           := ""
+      :MultiSelect          := .F.
+      :DeferenceLinks       := .F.
+      :Create()
+   END //OpenFile
+
+   WITH OBJECT ( SaveFileDialog( Self ) )
+      :Name                 := "SaveFile"
+      :AddExtension         := .F.
+      :FileName             := "SaveFileDialog1"
+      :CheckFileExists      := .T.
+      :DeferenceLinks       := .F.
+      :Create()
+   END //SaveFile
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextMenu1"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextHided"
+         :Caption              := "Hide Deleted"
+         :EventHandler[ "OnClick" ] := "ContextHided_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextShowd"
+         :Caption              := "Show deleted"
+         :EventHandler[ "OnClick" ] := "ContextShowd_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //ContextMenu1
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextMenu2"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextCopyTo"
+         :Caption              := "Copy To..."
+         :EventHandler[ "OnClick" ] := "ContextCopyTo_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextAppendFrom"
+         :Caption              := "Append From..."
+         :Enabled              := .F.
+         :EventHandler[ "OnClick" ] := "ContextAppendFrom_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "CoolMenuItem1"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextShowStru"
+         :Caption              := "Show Structure"
+         :EventHandler[ "OnClick" ] := "ContextShowStru_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "CoolMenuItem4"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextCopyFile"
+         :Caption              := "Create Structure"
+         :EventHandler[ "OnClick" ] := "ContextCopyFile_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextCopyStru"
+         :Caption              := "Create Extended Structure"
+         :EventHandler[ "OnClick" ] := "ContextCopyStru_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "CoolMenuItem2"
+         :Caption              := "-"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextIndex"
+         :Caption              := "Manage Indexes"
+         :Enabled              := .F.
+         :EventHandler[ "OnClick" ] := "ContextIndex_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //ContextMenu2
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextMenu3"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextConnect"
+         :Caption              := "Connect"
+         :RadioCheck           := .T.
+         :EventHandler[ "OnClick" ] := "ContextConnect_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextInfo"
+         :Caption              := "Informations"
+         :RadioCheck           := .T.
+         :EventHandler[ "OnClick" ] := "ContextInfo_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextDisconnect"
+         :Caption              := "Disconnect"
+         :RadioCheck           := .T.
+         :EventHandler[ "OnClick" ] := "ContextDisconnect_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //ContextMenu3
+
+   WITH OBJECT ( ColorDialog( Self ) )
+      :Name                 := "ColorPick"
+      :Create()
+   END //ColorPick
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::ContextMenu          := ::Application:MainForm:ContextMenu2
+   ::MinWidth             := 800
+   ::MinHeight            := 600
+   WITH OBJECT ::MDIClient
+      :ClientEdge           := .F.
+      :BackColor            := 16777215
+      :AlignLeft            := "PanelBar"
+      :AlignTop             := "Tools"
+   END
+
+   ::Left                 := 3
+   ::Top                  := -2
+   ::Width                := 800
+   ::Height               := 600
+   ::Caption              := "xDB"
+   ::BackColor            := 16777215
+   ::Icon                 := { ".\resource\app.ico","_1APPICO" }
+   ::MDIContainer         := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "Menus"
+      :Left                 := 11
+      :Top                  := 0
+      :Width                := 773
+      :Height               := 24
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuTables"
+         :Caption              := "Tables"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuNewTable"
+            :Caption              := "Create table"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuNewTable_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuOpenTable"
+            :Caption              := "Open table"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuOpenTable_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuCloseTable"
+            :Caption              := "Close table"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuCloseTable_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem10"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuView"
+            :Caption              := "View"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuView_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuExchange"
+            :Caption              := "Data Exchange"
+            :Enabled              := .F.
+            :Create()
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuExport"
+               :Caption              := "Copy To..."
+               :EventHandler[ "OnClick" ] := "MenuExport_OnClick"
+               :Create()
+            END //CMENUITEM
+
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuImport"
+               :Caption              := "Append From..."
+               :Enabled              := .F.
+               :EventHandler[ "OnClick" ] := "MenuImport_OnClick"
+               :Create()
+            END //CMENUITEM
+
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem13"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuProperties"
+            :Caption              := "Properties"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuProperties_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuSettings"
+            :Caption              := "Settings"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuSettings_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuExit"
+            :Caption              := "Exit"
+            :EventHandler[ "OnClick" ] := "MenuExit_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuRows"
+         :Caption              := "Rows"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuAppend"
+            :Caption              := "Append"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuAppend_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuUpdate"
+            :Caption              := "Update"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuUpdate_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuDelete"
+            :Caption              := "Delete"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuDelete_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuRecall"
+            :Caption              := "Recall"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuRecall_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem23"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuHided"
+            :Caption              := "Hide Deleted"
+            :RadioCheck           := .T.
+            :EventHandler[ "OnClick" ] := "MenuHided_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuShowd"
+            :Caption              := "Show Deleted"
+            :RadioCheck           := .T.
+            :EventHandler[ "OnClick" ] := "MenuShowd_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem5"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuDBEval"
+            :Caption              := "DBEval..."
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuDBEval_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuCount"
+            :Caption              := "Count..."
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuCount_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuColumns"
+         :Caption              := "Columns"
+         :Position             := 2
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuOpenIndex"
+            :Caption              := "Set Index File"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuOpenIndex_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuMarker"
+            :Caption              := "Setup Marker"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuMarker_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem28"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuIndex"
+            :Caption              := "Manage Index files"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "MenuIndex_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuStructure"
+            :Caption              := "Manage structure files"
+            :Create()
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuSaveStru"
+               :Caption              := "Save current structure"
+               :Enabled              := .F.
+               :EventHandler[ "OnClick" ] := "MenuSaveStru_OnClick"
+               :Create()
+            END //CMENUITEM
+
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuSaveExStru"
+               :Caption              := "Save current extended structure"
+               :Enabled              := .F.
+               :EventHandler[ "OnClick" ] := "MenuSaveExStru_OnClick"
+               :Create()
+            END //CMENUITEM
+
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "CoolMenuItem3"
+               :Caption              := "-"
+               :Create()
+            END //CMENUITEM
+
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuCreateExStru"
+               :Caption              := "Create extended structure"
+               :EventHandler[ "OnClick" ] := "MenuCreateExStru_OnClick"
+               :Create()
+            END //CMENUITEM
+
+            WITH OBJECT ( CMENUITEM( :this ) )
+               :Name                 := "MenuUpdateExStru"
+               :Caption              := "Update extended structure"
+               :EventHandler[ "OnClick" ] := "MenuUpdateExStru_OnClick"
+               :Create()
+            END //CMENUITEM
+
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuSupport"
+         :Caption              := "Support"
+         :Position             := 3
+         :Create()
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuVisit"
+            :Caption              := "Visit xHarbour.com"
+            :EventHandler[ "OnClick" ] := "MenuVisit_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuBuy"
+            :Caption              := "Order Online"
+            :EventHandler[ "OnClick" ] := "MenuBuy_OnClick"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "CoolMenuItem39"
+            :Caption              := "-"
+            :Create()
+         END //CMENUITEM
+
+         WITH OBJECT ( CMENUITEM( :this ) )
+            :Name                 := "MenuAbout"
+            :Caption              := "About"
+            :EventHandler[ "OnClick" ] := "MenuAbout_OnClick"
+            :Create()
+         END //CMENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "Tools"
+      :Left                 := 11
+      :Top                  := 26
+      :Width                := 773
+      :Height               := 56
+      :Tooltips             := .T.
+      :ImageList            := ::ImageList1
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolOpen"
+         :ToolTip              := "Open free table"
+         :Width                := 40
+         :Caption              := "Open"
+         :ImageIndex           := 3
+         :Enabled              := .F.
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "ToolOpen_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolNew"
+         :ToolTip              := "Create free table from structure extended file"
+         :Width                := 45
+         :Caption              := "Create"
+         :ImageIndex           := 2
+         :Enabled              := .F.
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "ToolNew_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolOpeni"
+         :ToolTip              := "Open additional index for free table"
+         :Width                := 58
+         :Caption              := "Set index"
+         :ImageIndex           := 4
+         :Enabled              := .F.
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "ToolOpeni_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolClose"
+         :ToolTip              := "Close free table"
+         :Width                := 40
+         :Caption              := "Close"
+         :ImageIndex           := 5
+         :Enabled              := .F.
+         :Position             := 3
+         :EventHandler[ "OnClick" ] := "ToolClose_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButton7"
+         :Width                := 7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 4
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolProperties"
+         :ToolTip              := "Free table's properties"
+         :Width                := 64
+         :Caption              := "Properties"
+         :ImageIndex           := 6
+         :Enabled              := .F.
+         :Position             := 5
+         :EventHandler[ "OnClick" ] := "ToolProperties_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButton9"
+         :Width                := 7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 6
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolView"
+         :ToolTip              := "Displays only selected columns and rows from the free table"
+         :Width                := 39
+         :Caption              := "View"
+         :ImageIndex           := 7
+         :Enabled              := .F.
+         :Position             := 7
+         :EventHandler[ "OnClick" ] := "ToolView_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolMarker"
+         :ToolTip              := "Displays free table data in conditionally colorized cells"
+         :Width                := 48
+         :Caption              := "Marker"
+         :ImageIndex           := 8
+         :Enabled              := .F.
+         :Position             := 8
+         :EventHandler[ "OnClick" ] := "ToolMarker_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolShowd"
+         :ToolTip              := "Toggle 'set deleted' ON or OFF"
+         :ContextMenu          := ::ContextMenu1
+         :DropDown             := .T.
+         :Width                := 91
+         :Caption              := "Set Deleted"
+         :ImageIndex           := 10
+         :Position             := 9
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButton13"
+         :Width                := 7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 10
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolEngine"
+         :ToolTip              := "Connect, disconnect SQL engine, view metadata"
+         :ContextMenu          := ::ContextMenu3
+         :DropDown             := .T.
+         :Width                := 68
+         :Caption              := "Engine"
+         :ImageIndex           := 11
+         :Enabled              := .F.
+         :Position             := 11
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolImport"
+         :ToolTip              := "Import free table in SQL schema"
+         :Width                := 47
+         :Caption              := "Import"
+         :ImageIndex           := 15
+         :Enabled              := .F.
+         :Position             := 12
+         :EventHandler[ "OnClick" ] := "ToolImport_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolQuery"
+         :ToolTip              := "Edit, save run queries, export data in free tables"
+         :Width                := 43
+         :Caption              := "Query"
+         :ImageIndex           := 13
+         :Enabled              := .F.
+         :Position             := 13
+         :EventHandler[ "OnClick" ] := "ToolQuery_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButton2"
+         :Width                := 7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             := 14
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolSettings"
+         :ToolTip              := "Appearance and data handling options"
+         :Width                := 53
+         :Caption              := "Settings"
+         :ImageIndex           := 1
+         :Position             := 15
+         :EventHandler[ "OnClick" ] := "ToolSettings_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 792
+      :Height               := 82
+      :Border               := .T.
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band1"
+         :MinWidth             := 60
+         :MinHeight            := 24
+         :BandChild            := ::Menus
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :Name                 := "Band2"
+         :MinHeight            := 56
+         :BandChild            := ::Tools
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "PanelBar"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::CoolBar1
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 82
+      :Width                := 232
+      :Height               := 484
+      :ImageList            := ::ImageList2
+      :Create()
+      WITH OBJECT ( PANEL( :this ) )
+         :Name                 := "Holder"
+         :Left                 := 5
+         :Top                  := 5
+         :Width                := 222
+         :Height               := 472
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label1"
+            :Left                 := 10
+            :Top                  := 9
+            :Width                := 139
+            :Height               := 16
+            :Caption              := "Current index order:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :Name                 := "BoxIndex"
+            :VertScroll           := .T.
+            :Left                 := 10
+            :Top                  := 31
+            :Width                := 202
+            :Height               := 137
+            :SelectionHeight      := 16
+            :ItemHeight           := 16
+            :EventHandler[ "OnCBNSelEndOk" ] := "BoxIndex_OnCBNSelEndOk"
+            :Create()
+         END //COMBOBOX
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label2"
+            :Left                 := 10
+            :Top                  := 72
+            :Width                := 101
+            :Height               := 16
+            :Caption              := "Key expression:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "EditSeek"
+            WITH OBJECT :ToolTip
+               :Text                 := "Please use single quotes as string delimiters"
+               :Balloon              := .T.
+            END
+
+            :Left                 := 10
+            :Top                  := 94
+            :Width                := 152
+            :Height               := 20
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonSeek"
+            :Left                 := 171
+            :Top                  := 91
+            :Width                := 42
+            :Height               := 28
+            :Caption              := "Seek"
+            :EventHandler[ "OnClick" ] := "ButtonSeek_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label3"
+            :Left                 := 10
+            :Top                  := 121
+            :Width                := 101
+            :Height               := 16
+            :Caption              := "Skip expression:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "EditSkip"
+            :Left                 := 10
+            :Top                  := 143
+            :Width                := 152
+            :Height               := 20
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonSkip"
+            :Left                 := 171
+            :Top                  := 140
+            :Width                := 42
+            :Height               := 28
+            :Caption              := "Skip"
+            :EventHandler[ "OnClick" ] := "ButtonSkip_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonUp"
+            :Left                 := 10
+            :Top                  := 183
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Top"
+            :EventHandler[ "OnClick" ] := "ButtonUp_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonDown"
+            :Left                 := 10
+            :Top                  := 217
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Bottom"
+            :EventHandler[ "OnClick" ] := "ButtonDown_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonAppend"
+            :Left                 := 124
+            :Top                  := 251
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Append"
+            :EventHandler[ "OnClick" ] := "ButtonAppend_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonUpdate"
+            :Left                 := 124
+            :Top                  := 285
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Update"
+            :EventHandler[ "OnClick" ] := "ButtonUpdate_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonDelete"
+            :Left                 := 124
+            :Top                  := 319
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Delete"
+            :EventHandler[ "OnClick" ] := "ButtonDelete_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonRecall"
+            :Left                 := 124
+            :Top                  := 353
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Recall"
+            :EventHandler[ "OnClick" ] := "ButtonRecall_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonDBEval"
+            :Left                 := 10
+            :Top                  := 387
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "DBEval"
+            :EventHandler[ "OnClick" ] := "ButtonDBEval_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonCount"
+            :Left                 := 10
+            :Top                  := 421
+            :Width                := 84
+            :Height               := 28
+            :Caption              := "Count"
+            :EventHandler[ "OnClick" ] := "ButtonCount_OnClick"
+            :Create()
+         END //BUTTON
+
+      END //PANEL
+
+   END //PANEL
+
+   ::Show()
+
+RETURN Self

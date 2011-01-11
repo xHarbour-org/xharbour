@@ -1,0 +1,121 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS SecondForm INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD SecondForm_OnDestroy()
+   METHOD SecondForm_OnLoad()
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS SecondForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "SecondForm_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "SecondForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MyMemoryTable"
+      :Structure            := { { "CODE", "C", 6, 0 }, { "NAME", "C", 10, 0 }, { "ADDR", "C", 30, 0 } }
+      :Table                := { { "888888", "BBBBBBBBBB", "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" } }
+      :Create()
+   END //MyMemoryTable
+
+   // Properties declaration
+   ::Name                 := "SecondForm"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 555
+   ::Height               := 294
+   ::Center               := .T.
+   ::Caption              := "Query Result"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS SecondForm
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "MyDataGrid"
+      :Left                 := 18
+      :Top                  := 14
+      :Width                := 342
+      :Height               := 231
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::MyMemoryTable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Code"
+         :Data                 := "hb_QSelf():DataSource:Fields:CODE"
+         :Width                := 42
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Addr"
+         :Data                 := "hb_QSelf():DataSource:Fields:ADDR"
+         :Width                := 210
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "MyPictureBox"
+      :Left                 := 381
+      :Top                  := 14
+      :Width                := 140
+      :Height               := 140
+      :StaticEdge           := .T.
+      :Alignment            := 2
+      :BackColor            := 16777215
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 441
+      :Top                  := 215
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Show Image"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

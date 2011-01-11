@@ -1,0 +1,109 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable1"
+      :Alias                := "one"
+      :FileName             := "people.dbf"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //DataTable1
+
+   REQUEST DBFCDX, DBFFPT
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "DataTable2"
+      :Alias                := "two"
+      :FileName             := "peopleex.DBF"
+      :Driver               := "DBFCDX"
+      :Create()
+   END //DataTable2
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 382
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Relation"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      :Left                 := 15
+      :Top                  := 12
+      :Width                := 336
+      :Height               := 240
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::DataTable2
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Id"
+         :Data                 := "hb_QSelf():DataSource:Fields:ID"
+         :Width                := 38
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "State"
+         :Data                 := "hb_QSelf():DataSource:Fields:STATE"
+         :Width                := 49
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Picture              := "XXXXXXXXXX"
+         :Caption              := "Name"
+         :Data                 := "one->name"
+         :Width                := 116
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Picture              := "999999.99"
+         :Caption              := "Payment"
+         :Data                 := "one->payment"
+         :Alignment            := 3
+         :Width                := 110
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   ::Show()
+
+RETURN Self
