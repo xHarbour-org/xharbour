@@ -1,0 +1,137 @@
+#define CRLF HB_OsNewLine()
+
+PROCEDURE Build_html()
+
+   LOCAL cFile,cVersion,cRevision,cCompiler
+   LOCAL cDownload,cDownloadFor,cFolder,nSize
+   
+   IF Empty(HB_aParams())
+      cCompiler:="BC5"
+   ELSE
+      cCompiler:=HB_aParams()[1]
+   ENDIF   
+
+   cFile:=Memoread("C:\xHarbour\include\hbver.h")
+   cVersion:=AllTrim(SubStr(cFile,At("HB_VER_MAJOR"   ,cFile)+12,8))+"."
+   cVersion+=AllTrim(SubStr(cFile,At("HB_VER_MINOR"   ,cFile)+12,8))
+   cVersion+=AllTrim(SubStr(cFile,At("HB_VER_REVISION",cFile)+15,8))
+   
+   cFile:=Memoread("C:\xHarbour\include\hbverbld.h")
+   cRevision:=Left(LTrim(SubStr(cFile,At("HB_VER_CVSID",cFile)+12,8)),4)
+   
+
+   //----------------------------------------------------------------------------------------------------//
+   IF cCompiler="BC5"
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-BorlandC_v5.5.exe'
+      cDownloadFor:='Borland C v5.5'
+                   
+   //----------------------------------------------------------------------------------------------------//
+   ELSEIF cCompiler="PC5"
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-PellesC_v5.exe'
+      cDownloadFor:='PellesC v5'
+
+   //----------------------------------------------------------------------------------------------------//
+   ELSEIF cCompiler="PC6"
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-PellesC_v6.exe'
+      cDownloadFor:='PellesC v6'
+      
+   //----------------------------------------------------------------------------------------------------//
+   ELSEIF cCompiler="VC9"
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-Microsoft_VisualC_v9.exe'
+      cDownloadFor:='Microsoft Visual C v9'
+
+   ENDIF
+   
+   cFolder:='W:\free.xHarbour\downloads\v'+cVersion+'.'+cRevision+" build "+CMonth(Date())+' '+LTrim(Str(Day(Date())))+', '+LTrim(Str(Year(Date())))
+   MakeDir('W:\free.xHarbour\downloads')
+   MakeDir(cFolder)
+   
+             
+   nSize:=Round(FileSize('W:\free.xHarbour\'+cRevision+'\'+cDownload)/1024/1024,1)
+   
+   MemoWrite(cFolder+'\'+cCompiler+'Download.html',;
+             '<font face="Arial" style="font-size:12px">'+;
+             '<a href="http://trim.bekz.net/direct/xHarbour.kr/free/'+cRevision+'/'+cDownload+'" style="color:#0a31ff;">xHarbour for '+cDownloadFor+'</a>  ('+LTrim(Str(nSize))+'MB)<br>'+;
+             '<div style="margin-top:1px;">v'+cVersion+'.'+cRevision+' build on '+CMonth(Date())+' '+LTrim(Str(Day(Date())))+', '+LTrim(Str(Year(Date())))+'.</div>'+;
+             '</font>')
+
+             
+//   Alert("Done")          
+             
+            
+RETURN
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION HB_aParams()
+
+   LOCAL aArg:={},Arg
+
+   FOR EACH Arg IN WScript:Arguments
+      Aadd(aArg,Arg)
+   NEXT
+
+RETURN aArg
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION MemoWrite(cFile, cText)
+
+  LOCAL hFile
+  LOCAL lRet:=.F.
+  
+  hFile:=fCreate(cFile)
+  IF hFile > 0
+      IF fWrite(hFile, cText) == Len(cText)
+         lRet:=fClose(hFile)
+      ELSE
+         fClose(hFile)
+      ENDIF
+  ENDIF
+  
+RETURN lRet
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+
+FUNCTION FileSize( cFile ) // --> nFileSize
+
+   LOCAL aFiles := Directory( cFile )
+
+   IF Len( aFiles ) > 0
+      RETURN aFiles[ 1 ][ 2 ]
+   ENDIF
+
+RETURN 0
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+/*
+   MemoWrite('Z:\Programming\1\free\CurrentBuild-Date.html',;
+             '<center><font face="Arial" size="-1" color="red" class="paragraph_style_1">'+;
+             CMonth(Date())+' '+LTrim(Str(Day(Date())))+', '+LTrim(Str(Year(Date())))+'<br>'+;
+            'Build '+cVersion+'.'+cRevision+'</font></center>')
+*/
+ 
+/* 
+   MemoWrite(cFolder+'\'+cCompiler+'BuildDate.html',;
+             '<center><font face="Arial" size="-1" color="red" class="paragraph_style_1">'+;
+             CMonth(Date())+' '+LTrim(Str(Day(Date())))+', '+LTrim(Str(Year(Date())))+'<br>'+;
+             'Build '+cVersion+'.'+cRevision+'</font></center>')
+*/             
+
+/*
+   MemoWrite(cFolder+'\'+cCompiler+'Changelog.html',;
+             '<font face="Arial" style="font-size:12px">'+;
+             '<a href="http://www.xHarbour.kr/free/'+cRevision+'/'+cDownload+'" style="color:#0a31ff;">xHarbour for '+cDownloadFor+'</a><br>'+;
+             '<div style="margin-top:1px;">'+LTrim(Str(nSize))+'MB - v'+cVersion+'.'+cRevision+' build on '+CMonth(Date())+' '+LTrim(Str(Day(Date())))+', '+LTrim(Str(Year(Date())))+'.</div>'+;
+             '</font>')
+*/

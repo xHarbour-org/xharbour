@@ -1,0 +1,39 @@
+#define CRLF Chr(13)+Chr(10)
+
+PROCEDURE Main()
+/*
+   LOCAL cPcFolder:=""
+  
+   IF Len(HB_aParams())=0
+      Alert('Use cfgCCompiler.xbs "<PellesC_Folder>\pocc.exe"')
+      RETURN
+   ENDIF
+   
+   cPcFolder:=HB_aParams()[1]
+   cPcFolder:=Left(cPcFolder,Len(cPcFolder)-13)
+   
+   IF !File(cPcFolder+"\bin\pocc.exe")
+      Alert("Can not find "+cpcFolder+"\bin\pocc.exe")
+      RETURN
+   ENDIF
+*/   
+RETURN
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION HB_aParams()
+
+   LOCAL aArg:={},Arg
+
+   FOR EACH Arg IN WScript:Arguments
+      Aadd(aArg,Arg)
+   NEXT
+
+RETURN aArg
+
+
+//----------------------------------------------------------------------------------------------------//
+
+

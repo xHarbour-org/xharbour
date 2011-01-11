@@ -1,0 +1,299 @@
+#define CRLF HB_OsNewLine()
+#define cAI "w:\Program Files\Caphyon\Advanced Installer 7.7\bin\x86\"
+
+PROCEDURE Build_Setup()
+
+   LOCAL cFile,cVersion,cRevision,cCompiler,cBuild2,cAIP,cDownload
+   
+   IF Empty(HB_aParams())
+      cCompiler:="BC5"
+   ELSE
+      cCompiler:=HB_aParams()[1]
+   ENDIF   
+
+   cFile:=Memoread("C:\xHarbour\include\hbver.h")
+   cVersion:=AllTrim(SubStr(cFile,At("HB_VER_MAJOR"   ,cFile)+12,8))+"."
+   cVersion+=AllTrim(SubStr(cFile,At("HB_VER_MINOR"   ,cFile)+12,8))
+   cVersion+=AllTrim(SubStr(cFile,At("HB_VER_REVISION",cFile)+15,8))
+   
+   cFile:=Memoread("C:\xHarbour\include\hbverbld.h")
+   cRevision:=Left(LTrim(SubStr(cFile,At("HB_VER_CVSID",cFile)+12,8)),4)
+   
+   cAIP:='"C:\free.xHarbour.com.aip"'
+   
+   cBuild2:='COPY "W:\Clean CVS\xHarbour.com\Free\free.xHarbour.com.aip" '+cAIP+' /Y'+CRLF+CRLF
+   
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetVersion '+cVersion+"."+cRevision+CRLF+CRLF
+
+   //----------------------------------------------------------------------------------------------------//
+   IF cCompiler="BC5"
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewPrerequisite "Borland C"'+;
+               ' -prereq_type UrlBased'+;
+               ' -prereq_path http://altd.embarcadero.com/download/bcppbuilder/freecommandLinetools.exe'+;
+               ' -size 8935988'+;
+               ' -search_type FileVersion'+;
+               ' -search_path bcc32.exe'+;
+               ' -search_depth 3'+;
+               ' -minversion 5.0'+CRLF+CRLF
+               
+//             ' -prereq_path http://trim.bekz.net/free.xH.com/BC5Setup.exe'+;
+               
+               
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER="BC"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_BIN="bcc32.exe"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_NAME="BorlandC_v5.5"'+CRLF+CRLF
+      
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-BorlandC_v5.5.exe'
+
+   //----------------------------------------------------------------------------------------------------//
+   ELSEIF cCompiler="PC5"
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewPrerequisite "PellesC"'+;
+               ' -prereq_type UrlBased'+;
+               ' -prereq_path http://www.smorgasbordet.com/pellesc/500/setup.exe'+;
+               ' -size 8719688'+;
+               ' -search_type FileVersion'+;
+               ' -search_path pocc.exe'+;
+               ' -search_depth 3'+;
+               ' -minversion 5.0'+CRLF+CRLF
+               
+//             ' -prereq_path http://trim.bekz.net/free.xH.com/PC5Setup.exe'+;
+            
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER="PC"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_BIN="pocc.exe"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_NAME="PellesC_v5"'+CRLF+CRLF
+      
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-PellesC_v5.exe'
+
+   //----------------------------------------------------------------------------------------------------//
+   ELSEIF cCompiler="PC6"
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewPrerequisite "PellesC"'+;
+               ' -prereq_type UrlBased'+;
+               ' -prereq_path http://www.smorgasbordet.com/pellesc/600/setup.exe'+;
+               ' -size 9176648'+;
+               ' -search_type FileVersion'+;
+               ' -search_path pocc.exe'+;
+               ' -search_depth 3'+;
+               ' -minversion 6.0'+CRLF+CRLF
+
+//             ' -prereq_path http://trim.bekz.net/free.xH.com/PC6Setup.exe'+;
+            
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER="PC"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_BIN="pocc.exe"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_NAME="PellesC_v6"'+CRLF+CRLF
+      
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-PellesC_v6.exe'
+   //----------------------------------------------------------------------------------------------------//
+
+   ELSEIF cCompiler="VC9"
+    cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewPrerequisite "Visual Studio 2008"'+;
+               ' -prereq_type UrlBased'+;
+               ' -prereq_path http://go.microsoft.com/?linkid=7729279'+;
+               ' -size 2728440'+;
+               ' -search_type FileVersion'+;
+               ' -search_path cl.exe'+;
+               ' -search_depth 4'+;
+               ' -minversion 15'+CRLF+CRLF
+               
+//             ' -prereq_path http://trim.bekz.net/free.xH.com/VCSetup.exe'+;
+               
+            
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER="VC"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_BIN="cl.exe"'+CRLF+CRLF
+      cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty CCOMPILER_NAME="Microsoft_VisualC_v9"'+CRLF+CRLF
+      
+      cDownload   :='xHarbour-v'+cVersion+'.'+cRevision+'-for-Microsoft_VisualC_v9.exe'
+
+   ENDIF
+   
+   //----------------------------------------------------------------------------------------------------//
+
+   // Shortcuts in SHORTCUTDIR
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "free.xHarbour.com Web Page"'+;
+            ' -desc "free.xHarbour.com Web Page"'+;
+            ' -target "APPDIR\free.xHarbour.com.url"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR'+;
+            ' -icon "W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\url.ico"'+;
+            CRLF+CRLF
+
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xHarbour Builder Buttons"'+;
+            ' -desc "Spread the word! ;-)"'+;
+            ' -target "APPDIR\xHarbour Builder Buttons.url"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR'+;
+            ' -icon "W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\url.ico"'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xBuild Wizard"'+;
+            ' -desc "xHarbour.com'+"'"+'s xBuild Project Builder"'+;
+            ' -target "APPDIR\Bin\xBuildW.exe"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "Build '+"'"+'Hello World'+"'"+'"'+;
+            ' -desc "Build '+"'"+'Hello World'+"'"+'"'+;
+            ' -target "[APPDIR]samples\Hello.exe.xbp"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+            
+
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xEdit"'+;
+            ' -desc "xHarbour.com'+"'"+'s PRG code editor"'+;
+            ' -target "APPDIR\Bin\xEditW.exe"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+
+   
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xPrompt"'+;
+            ' -desc "xHarbour.com'+"'"+'s xPrompt DOT interface"'+;
+            ' -target "APPDIR\Bin\xPrompt.exe"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+
+
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "ReadMe"'+;
+            ' -desc "ReadMe"'+;
+            ' -target "APPDIR\ReadMe.rtf"'+;
+            ' -dir SHORTCUTDIR'+;
+            ' -wkdir APPDIR'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "Samples folder"'+;
+            ' -desc "Samples folder"'+;
+            ' -target [samples_DIR]'+;
+            ' -dir SHORTCUTDIR'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "Documentation folder"'+;
+            ' -desc "Documentation folder"'+;
+            ' -target [doc_DIR]'+;
+            ' -dir SHORTCUTDIR'+;
+            CRLF+CRLF
+   
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "Source folder"'+;
+            ' -desc "Source folder"'+;
+            ' -target [source_DIR]'+;
+            ' -dir SHORTCUTDIR'+;
+            CRLF+CRLF
+            
+
+   // Shortcuts on desktop
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xBuild Wizard"'+;
+            ' -desc "xHarbour.com'+"'"+'s xBuild Project Builder"'+;
+            ' -target "APPDIR\Bin\xBuildW.exe"'+;
+            ' -dir DesktopFolder'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xEdit"'+;
+            ' -desc "xHarbour.com'+"'"+'s PRG code editor"'+;
+            ' -target "APPDIR\Bin\xEditW.exe"'+;
+            ' -dir DesktopFolder'+;
+            ' -wkdir APPDIR\Bin'+;
+            CRLF+CRLF
+            
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+            ' -name "xHarbour Samples folder"'+;
+            ' -desc "free.xHarbour.com Samples folder"'+;
+            ' -target [samples_DIR]'+;
+            ' -dir DesktopFolder'+;
+            CRLF+CRLF
+
+   //----------------------------------------------------------------------------------------------------//
+            
+   
+   cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+;
+            ' /SetPackageName "W:\free.xHarbour\'+cRevision+'\'+cDownload+'"'+CRLF+CRLF
+            
+   //----------------------------------------------------------------------------------------------------//
+            
+            
+   MemoWrite("C:\Build2.bat",;
+             cBuild2+'"'+cAI+'AdvancedInstaller.com" /build '+cAIP+CRLF)
+            
+//   Alert("Done")          
+             
+            
+RETURN
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION HB_aParams()
+
+   LOCAL aArg:={},Arg
+
+   FOR EACH Arg IN WScript:Arguments
+      Aadd(aArg,Arg)
+   NEXT
+
+RETURN aArg
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION MemoWrite(cFile, cText)
+
+  LOCAL hFile
+  LOCAL lRet:=.F.
+  
+  hFile:=fCreate(cFile)
+  IF hFile > 0
+      IF fWrite(hFile, cText) == Len(cText)
+         lRet:=fClose(hFile)
+      ELSE
+         fClose(hFile)
+      ENDIF
+  ENDIF
+  
+RETURN lRet
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+
+
+/*               
+// http://www.advancedinstaller.com/user-guide/new-prerequisite.html
+/NewPrerequisite <display_name> -prereq_type <FileBased|UrlBased|OpenSite> -prereq_path <prereq_path>
+[-cmd_line <cmd_line>] [-extract_folder <extract_folder>] [-64bit] [-lzma_compresion]
+[-size <prereq_file_size>] [-md5 <prereq_file_md5>] [-target_os <Win9x|WinNT|Win64>] [-force_install]
+-search_type <FileVersion|RegSubKeyEnum|RegValue> -search_path <search_path> [-search_depth <search_depth>]
+[-minversion <minimum_version>] [-maxversion <maximum_version>] [-aditionalfiles <aditional_files>]
+[-builds <builds_list>]
+*/
+
+//    http://www.advancedinstaller.com/user-guide/add-file-search.html
+
+         
+/*
+cDesc  :="Compile 'Hello World'"
+cTarget:='APPDIR\Bin\xBuildW.exe "APPDIR\samples\Hello.xbp" -Wizard'
+cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
+         ' -name "Hello World"'+;
+         ' -desc "test"'+; //' -desc "'+cDesc+'"'+;
+         ' -target "APPDIR\Bin\xBuildW.exe"'+; //' -target "'+cTarget+'"'+;
+         ' -dir SHORTCUTDIR'+;
+         ' -wkdir APPDIR\Bin'+;
+         CRLF+CRLF
+
+*/
