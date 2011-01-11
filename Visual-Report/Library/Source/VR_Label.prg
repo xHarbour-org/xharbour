@@ -114,7 +114,8 @@ METHOD Draw( x, y, cx, cy ) CLASS VrLabel
 
       WITH OBJECT ::Parent:oPDF
          :CreateObject( acObjectTypeText, cName )
-         WITH OBJECT :GetObjectByName( cName )
+         ::PDFCtrl := :GetObjectByName( cName )
+         WITH OBJECT ::PDFCtrl
             :Attribute( "AutoResize", 1 )  // see above slowness note
             :Attribute( "Single Line", 1 )
             :Attribute( "Left",   x )
@@ -144,13 +145,15 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
    ::Parent:SetCapture()
    IF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      aRect := oCtrl:GetRectangle()
-      aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-      oCtrl:Parent:InvalidateRect( aRect, .F. )
-      aRect := ::GetRectangle()
-      aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-      ::Parent:InvalidateRect( aRect, .F. )
-      ::Parent:nDownPos := {x,y}
+      IF oCtrl != NIL
+         aRect := oCtrl:GetRectangle()
+         aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+         oCtrl:Parent:InvalidateRect( aRect, .F. )
+         aRect := ::GetRectangle()
+         aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+         ::Parent:InvalidateRect( aRect, .F. )
+         ::Parent:nDownPos := {x,y}
+      ENDIF
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL

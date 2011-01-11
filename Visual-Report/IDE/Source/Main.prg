@@ -536,17 +536,10 @@ METHOD Generate( oCtrl, cBuffer ) CLASS Report
       cBuffer += "   oCtrl:Height := " + XSTR( oCtrl:Height ) + CRLF
       cBuffer += "   oCtrl:Create()" + CRLF
  
-      cBuffer += "   SelectObject( hDC, oCtrl:Font:Handle )"                              + CRLF 
-      cBuffer += "   nHeight := MAX( "+XSTR( oCtrl:Top )+"+_GetTextExtentPoint32( hDC, 'X' )[2], nHeight )" + CRLF
-
-      cBuffer += "   nHeight := (1440/72) * nHeight" + CRLF
-   
-      RETURN oCtrl:Font:Height
+      //cBuffer += "   SelectObject( hDC, oCtrl:Font:Handle )"                              + CRLF 
+      cBuffer += "   nHeight := MAX( oCtrl:PDFCtrl:Attribute( 'Bottom' )-oCtrl:PDFCtrl:Attribute( 'Top' ), nHeight )" + CRLF
    ENDIF
-   //IF oCtrl:ClsName == "DataTable"
-   //   cBuffer += "   oCtrl:FromAlias( " + ValToPrgExp( oCtrl:Alias ) +")"+ CRLF
-   //ENDIF
-RETURN 0
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs ) CLASS Report
@@ -598,7 +591,7 @@ METHOD Save( lSaveAs ) CLASS Report
    //    NEXT
    //NEXT
 
-   cBuffer += "   hDC := GetDC(0)"                                                           + CRLF 
+   //cBuffer += "   hDC := GetDC(0)"                                                           + CRLF 
    cBuffer += "   // Generate First Page Header"                                             + CRLF
    cBuffer += "   " + ::GetName(,.F.) + "_PrintHeader( hDC )"                                + CRLF + CRLF
 //---------------------------------------------------------------------------------------------------------   
@@ -621,7 +614,7 @@ METHOD Save( lSaveAs ) CLASS Report
 //---------------------------------------------------------------------------------------------------------   
 
    cBuffer += "   oRep:End()"                                                                + CRLF
-   cBuffer += "   ReleaseDC(0, hDC)"                                                         + CRLF 
+   //cBuffer += "   ReleaseDC(0, hDC)"                                                         + CRLF 
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
@@ -633,7 +626,7 @@ METHOD Save( lSaveAs ) CLASS Report
           ::Generate( aCtrl[n], @cBuffer )
        ENDIF
    NEXT
-   cBuffer += "   oRep:nRow += nHeight" + CRLF
+   cBuffer += "   oRep:nRow += nHeight + ( 10*" + XSTR( oApp:Props:Header:Height ) + ")"+ CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   

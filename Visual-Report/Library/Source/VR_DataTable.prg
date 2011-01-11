@@ -52,7 +52,9 @@ METHOD Create() CLASS VrDataTable
 
    WITH OBJECT ::EditCtrl := DataTable( ::Parent )
       :FileName := ::FileName
-      :Alias    := ::Alias
+      IF !EMPTY( ::Alias )
+         :Alias := ::Alias
+      ENDIF
       :Create()
       IF ! EMPTY( ::bFilter )
          :SetFilter( ::bFilter )

@@ -27,6 +27,8 @@ CLASS VrReport INHERIT VrObject
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
    DATA nPage          PROTECTED INIT 0
    DATA nRow           EXPORTED  INIT 0
+   DATA HeaderHeight   EXPORTED  INIT 0
+   DATA FooterHeight   EXPORTED  INIT 0
    DATA DataSource     EXPORTED
    DATA Button         EXPORTED
    DATA Name           EXPORTED  INIT "Report"

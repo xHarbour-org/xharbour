@@ -42,6 +42,7 @@ CLASS VrObject
    ACCESS __xCtrlName INLINE ::ClsName
    
    DATA EditCtrl    EXPORTED
+   DATA PDFCtrl     EXPORTED
    
    DATA Report      EXPORTED
    METHOD Init() CONSTRUCTOR
