@@ -1,0 +1,31 @@
+CINI = 
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\libmisc.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour\source\misc\hb_f.c]
+
+# *** samples.lib ***
+[\xHarbour\tests\misc\date.c]
+[\xHarbour\tests\misc\dbf.c]
+[\xHarbour\tests\misc\environ.c]
+[\xHarbour\tests\misc\gauge.c]
+[\xHarbour\tests\misc\num.c]
+[\xHarbour\tests\misc\stack.c]
+[\xHarbour\tests\misc\status.c]
+[\xHarbour\tests\misc\time.c]

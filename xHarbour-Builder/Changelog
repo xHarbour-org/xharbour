@@ -1,0 +1,1381 @@
+/*
+ * $Id:
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-04-19 16:51 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+   * xbldfull.bat
+     ! Fixed path
+   * xbldfull2.bat
+     ! Fixed path
+     + Added builds for RMDBFCDX and REDBFCDX
+     ! Fixed building IEGUI
+   * xbldfull-BC5.bat
+   * xbldfull-VC8.bat
+   * xbldfull-XCC.bat
+     + Added define to build IEGUI or not
+   * \xHarbour.com\xHarbour-XCC\xlink\g.bat
+     + added %VS90COMNTOOLS%bin" to path
+
+2010-02-15 16:12 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull2.bat
+* xbldfull.bat
+* xbldfull-XCC.bat
++ /xcc/redbfcdx.lib.xbp
++ /xcc/bmdbfcdx.lib.xbp
+  + REDBFCDX.lib and BMDBFCDX.lib
+
+2009-12-03 15:30 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* stdlib.files.inc
+  * Reorganized CT3 source files.
+* stdbf.files.inc
+  + /xHarbour/contrib/Filemem.c
+
+2009-11-05 15:06 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull2.bat
+  * Only build WinApi.lib if winapi.lib.xbp exists in current forlder
+  * Only build VXH.lib if VXH.lib.xbp exists in current forlder
+  * Only build VXH.exe if VXH.exe.xbp exists in current forlder
+  - Don't build mySQLRDD.lib's. We only have SQLRDD+SQLEX for now.
+
+2009-11-03 14:25 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull2.bat
+  + Added the different editions of VXH to the build process
+* Build_0-CopyFiles.bat
+  * Copy VXH files per edition
+
+2009-09-02 13:07 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull2.bat
+  + Added wvw.lib to the build process
+* Wise Install Scripts/Build_0-CopyFiles.bat
+  + Added wvw.lib to the copy process
+* Wise Install Scripts/Serials.txt
+  + Added serials for September build
+* *.wse
+  * Updated for September release
+
+2009-08-24 13:07 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ XCC\WVW.lib.xbp
+* xbldfull.bat
+  + Copy freeimage .CH and .H files to xHB\Include folder
+
+2009-08-10 20:23 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ xHarbour-Builder/xcc/tipssl.xbp.lib
+* xHarbour-Builder/xbldfull2.bat
+  + Added TipSSL.xbp.lib
+* xHarbour-Builder/Wise Install Scripts/Serials.txt
+  + Added August keys
+
+
+2009-06-07 16:34 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xHarbour-Builder/vc8/mtdll.files.inc
+* xHarbour-Builder/vc8/stddll.files.inc
+* xHarbour-Builder/stdlib.files.inc
+* xHarbour-Builder/xcc/stddll.files.inc
+* xHarbour-Builder/xcc/mtdll.files.inc
+  + Added session.c
+* xHarbour-Builder/xbldfull-XCC.bat
+  * Build xPrompt as stand-alone EXE
+
+
+2009-02-02 13:55 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ Visual-xHarbour/Library/include/debug.ch
++ Visual-xHarbour/Library/include/wininet.ch
+  + Added missing files
+* xHarbour-XCC/xlink/makefile
+  * Changed xlink.exe to xLink.exe
+* xHarbour-Builder/xbldfull.bat
+  * Cleaned up "Copy files" section
+  + Added copying extend.api, fm.api and item.api as we need these
+    files to build xHarbour Builder
+* xHarbour-Builder/xbldfull2.bat
+  * Added MD \xHarbour\xbp\obj-vc
+  * Capitalised file names for .EXE's .DLL and .LIB's
+
+
+2009-02-01 19:11 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* Visual-xHarbour/Library/VC8/xbuild.vc8.ini
+  + Added include path
+* Visual-xHarbour/xEdit/vc8/xEditwScript.lib.xbp
+  ! Fixed include path
+* xHarbour-Builder/vc8/xpromptsql.exe.xbp
+  ! Fixed include path
+* xHarbour-Builder/xbldfull-VC8.bat
+  + VC8_XBUILD  (Setting for "Build xBuild.exe?")
+  + VC8_CT3COMM (Setting for "Build CT3Comm.lib?")
+  + VC8_APOLLORDD (Setting for "Build six.lib? + DLL's")
+* xHarbour-Builder/xbldfull-XCC.bat
+  + XCC_XBUILD  (Setting for "Build xBuild.exe?")
+  + XCC_CT3COMM (Setting for "Build CT3Comm.lib?")
+  + XCC_APOLLORDD (Setting for "Build six.lib? + DLL's")
+* xHarbour-Builder/xbldfull.bat
+  ! Fixed "Global delete" with -All
+    Note: I need to fine tune this more. Work in progress
+  ! Fix on XCOPY parameters for BGD and ApolloRDD DLL's
+* xHarbour-Builder/xbldfull2.bat
+  ! Fix to NOT copy msxlink.exe
+  * Changed setting to WHEN build xBuild.exe.
+  ! Fixed XCOPY path for ace32.lib for vc8
+  ! Build xHBZipDLL in DLL folder instead of BIN
+  * Only build ApolloRDD (Six.lib) if set
+  * Only build CT3Comm is set
+  ! Build comm.lib.xbp and xHBCommDll.dll.xbp always with msvc
+  + Cleaned up *.EXP files for VC8 builds
+* xHarbour-HBZlib/xhbzipdll/xhbzipdll.dll.xbp
+  * Output to \xharbour\xbp\obj-vc\xhbZipDll.dll instead of
+    \xharbour\xbp\obj\xhbZipDll.dll. Its always build with vc
+    and in-dependable per compiler.
+* xHarbour-SQLRDD/vc8/sql.lib.xbp
+* xHarbour-SQLRDD/vc8/sqlmt.lib.xbp
+  ! Fixed include path
+* xHarbour-XDO/vc8/xbuild.vc8.ini
+  ! added include path
+* xHarbour-XDO/vc8/xdo.dll.xbp
+  ! Fixed include path
+* xHarbour-xHBComm/xhbcommdll/xhbcommdll.dll.xbp
+* xHarbour-xHBComm/comm/comm.lib.xbp
+* ZipArchive/ZipArchive.lib.xbp
+* ZipArchive/zlib/zlib.lib.xbp
+  * Output to \xharbour\xbp\obj-vc instead of \xharbour\xbp\obj.
+    Its always build with vc and thus the output is in-dependable
+    per compiler.
+
+
+2009-01-31 13:21 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xHarbour-Builder/xbldfull.bat
+  * Added 'All" as clean up parameter
+  * Moved Copying SQLRDD LIB files to "Copy" section
+  + Added copying SQLRDD DLL files
+  + Added copying FreeImage DLL and LIB files
+  + Added copying ApolloRDD DLL and LIB files
+  + Added copying BGD DLL and LIB files
+* xHarbour-Builder/xbldfull2.bat
+  * Finetined building xBuild.exe / demo
+  + Added building BGD.LIB
+  ! Fixed typo in XCOPY for BC5 build
+  * Added building xHBZip and xHBComm for xcc builds.
+  * Finetuned building ApolloRDD LIB's from DLL's
+  - removed double building of xBuild.exe
+
+
+
+2009-01-29 11:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+   * xHarbour-Builder/xcc/stddll.files.inc
+   * xHarbour-Builder/vc8/stddll.files.inc
+   * xHarbour-Builder/vc8/mtdll.files.inc
+   * xHarbour-Builder/xcc/mtdll.files.inc
+     * Synched with .org codepage changes
+
+   * xHarbour-Builder/xcc/dmain.lib.xbp
+     - Removed mainstd and mainwin
+   + Harbour-Builder/xcc/usedll.lib.xbp
+     + Added .org new usedll.c
+
+   * xHarbour-xBuild/gui.c
+     - Removed commented GUI_SetFWH()
+   * xHarbour-xBuild/xbuild.prg
+     * Increased version to 4.7
+     - Removed commented old help Alert()
+     - Refactored handling of xHB_Exe
+     - Removed unused vars
+     - Refactored LoadProject()/LoadIni()/Set_xHB()/Set_*C()
+   * xHarbour-xBuild/tproject.prg
+     - Removed unused vars
+     * Matched lib search order to link order to avoid wrong date/time in :Reset()
+     - Removed support for old FWH24 folder
+     * Refactored support of DIR_SEPARATOR termination in in *_Root
+     * Synched support for .org dlllib.lib use_lib.lib
+     - Removed redundant :ValidateSettings() calls - now only called in :Make()
+     - Refactored LoadProject()/LoadIni()/Set_xHB()/Set_*C()
+     * Synched lib orders for Linux/GCC in EXE_Command
+     - Refactored lib oreders in linker commands, so that xhb and c libs are always last
+
+   * Visual-xHarbour/xEdit/xeditlib.prg
+     + Added ProcessTextFile()
+     + Added :LoadAddLine()
+     * Minor optimization of :AddLine()
+     * Enabled all hb_gcAll()
+     * Fixed xHDN support and updated to new xHDN address
+
+   * xHarbour-xHBComm/xhbcomm.c
+     * MSVC type casts
+
+   * xHarbour-ApolloRDD/sixfuncs.prg
+     - Unused vars and warnings
+
+   * xHarbour-ct3comm/ct3comm.prg
+     - Unused vars and warnings
+     * MSVC type cats
+
+   * xHarbour-Builder/xbldfull.bat
+     - Remove synch with \xharbour\lib and \xharbour\bin
+     + Release all EnvVars on finish
+   * xHarbour-Builder/xbldfull2.bat
+     - Remove synch with \xharbour\lib and \xharbour\bin
+     + Moved xLink from xbldfull-XCC.bat
+     * Refactored to use \xhb\bin\XBUILD.exe
+     * Refactored to use %_XB_Debug% inplace of -Debug, when found
+     - Don't try to build cpp projects under XCC
+   * xHarbour-Builder/xbldfull-XCC.bat
+     - Moved xLink to xbldfull2.bat
+
+   * IEGui/vc8/xbuild.vc8.ini
+   * Visual-xHarbour/IDE/vc8/xbuild.vc8.ini
+   * FreeImage/vc8/xbuild.vc8.ini
+   * Visual-xHarbour/Library/VC8/xbuild.vc8.ini
+   * Visual-xHarbour/xEdit/vc8/xbuild.vc8.ini
+   * xHarbour-ApolloRDD/vc8/xbuild.vc8.ini
+   * xHarbour-AxtiveX/vc8/xbuild.vc8.ini
+   * xHarbour-Builder/vc8/xbuild.vc8.ini
+   * xHarbour-DebugClient/vxhdebug/vc8/xbuild.vc8.ini
+   * xHarbour-DebugServer/server/vc8/xbuild.vc8.ini
+   * xHarbour-HBZlib/vc8/xbuild.vc8.ini
+   * xHarbour-OLEServer/vc8/xbuild.vc8.ini
+   * xHarbour-Rushmore/vc8/xbuild.vc8.ini
+   * xHarbour-SQLRDD/vc8/xbuild.vc8.ini
+   * xHarbour-XDO/vc8/xbuild.vc8.ini
+   * xHarbour-ct3comm/vc8/xbuild.vc8.ini
+   * xHarbour-xBuild/vc8/xbuild.vc8.ini
+   * xHarbour-xHBComm/vc8/xbuild.vc8.ini
+     * Clean conisistent VC8 ini file
+
+   * FreeImage/vc8/FreeImage-xHB.lib.xbp
+   * FreeImage/xcc/FreeImage-xHB.lib.xbp
+
+   * Visual-xHarbour/Library/VC8/vxhddll.dll.xbp
+   * Visual-xHarbour/Library/VC8/vxhdll.dll.xbp
+   * Visual-xHarbour/Library/xcc/vxhddll.dll.xbp
+   * Visual-xHarbour/Library/xcc/vxhdll.dll.xbp
+   * xHarbour-DebugClient/vxhdebug/vc8/xDebugW.exe.xbp
+     - Removed auto added d*main.lib
+
+   * Visual-xHarbour/xEdit/vc8/xEditw.lib.xbp
+   * Visual-xHarbour/xEdit/vc8/xEditwScript.lib.xbp
+     + WIN32; __IMPORT__; __EXPORT__
+
+   * Visual-xHarbour/xEdit/vc8/xeditw.exe.xbp
+     + \xhb\include\w32
+     + \xhb\lib\vc8
+
+   * Visual-xHarbour/xEdit/xcc/xEditW.lib.xbp
+   * Visual-xHarbour/xEdit/xcc/xEditWScript.lib.xbp
+     + WIN32; __IMPORT__; __EXPORT__
+
+   * xHarbour-Builder/vc8/xpromptsql.exe.xbp
+     + \xhb\lib\vc8; \xhb\lib
+     - Removed hard coded lib path
+
+   * xHarbour-Builder/xcc/xhb.exe.xbp
+     -\xHarbour\lib;\xHarbour\lib\win
+
+   - xHarbour-XCC/crt/include/sys/trace.log
+   - xHarbour-XCC/crt/src/trace.log
+   - xHarbour-XCC/crt/src/wince/trace.log
+
+   * xHarbour-XDO/vc8/xdo.dll.xbp
+     + \xhb\lib\vc8
+     - hard coded path
+
+   * xHarbour-ct3comm/vc8/ct3comm.lib.xbp
+     + \xhb\include\w32
+     - hard coded path
+
+
+2009-01-21 18:52 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-Builder\xbldfull_BCC.bat
+- xHarbour-Builder\xbldfull_VC8.bat
+- xHarbour-Builder\xbldfull_XCC.bat
+  * Removed because unused.
+
+
+
+2009-01-21 18:20 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ xHarbour-Builder/Dll2Lib.bat
+  * Needed to make a clean installation package.
+* xHarbour-Builder/xbldfull2.bat
+  ! Fixed building fts32.lib and sde61.lib for ApolloRDD
+* xHarbour-Builder/Wise Install Scripts/Build_0-CopyFiles.bat
+  ! Fixed copying dll2lib.bat
+  ! Fixed copying FreeImage.lib
+  + Copying nsxmt.lib and nsx.lib
+  + Copying sixcdxmt.lib and sixcdx.lib
+
+
+
+2009-01-21 16:11 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ xHarbour-Builder/xbldfull2.bat
+  * This is the actual BUILD script
++ xHarbour-Builder/xbldfull-XCC.bat
++ xHarbour-Builder/xbldfull-VC8.bat
++ xHarbour-Builder/xbldfull-BC5.bat
+  * These are the build script SETTINGS per compiler
++ xHarbour-Builder/vc8/stddll.files.inc
++ xHarbour-Builder/vc8/mtdll.files.inc
+  * These needs to be here because the OBJ folder is different per compiler.
++ xHarbour-Builder/vc8/ct3comm.lib.xbp
++ xHarbour-Builder/vc8/cdxmt.lib.xbp
++ xHarbour-Builder/xcc/xpromptsql.exe.xbp
++ xHarbour-Builder/xcc/xprompt.exe.xbp
++ xHarbour-Builder/xcc/xhbmtdll.dll.xbp
++ xHarbour-Builder/xcc/xhbmt.lib.xbp
++ xHarbour-Builder/xcc/xhbdmtdll.dll.xbp
++ xHarbour-Builder/xcc/xhbdll.dll.xbp
++ xHarbour-Builder/xcc/xhbddll.dll.xbp
++ xHarbour-Builder/xcc/xhbd.exe.xbp
++ xHarbour-Builder/xcc/xhb.lib.xbp
++ xHarbour-Builder/xcc/xhb.exe.xbp
++ xHarbour-Builder/xcc/xbscript.lib.xbp
++ xHarbour-Builder/xcc/wvt.lib.xbp
++ xHarbour-Builder/xcc/wvg.lib.xbp
++ xHarbour-Builder/xcc/wincore.lib.xbp
++ xHarbour-Builder/xcc/winapi.lib.xbp
++ xHarbour-Builder/xcc/stddll.files.inc
++ xHarbour-Builder/xcc/sixcdxMT.lib.xbp
++ xHarbour-Builder/xcc/sixcdx.lib.xbp
++ xHarbour-Builder/xcc/optgmt.lib.xbp
++ xHarbour-Builder/xcc/optg.lib.xbp
++ xHarbour-Builder/xcc/oldnames.lib.xbp
++ xHarbour-Builder/xcc/odbc.lib.xbp
++ xHarbour-Builder/xcc/ntxmt.lib.xbp
++ xHarbour-Builder/xcc/ntx.lib.xbp
++ xHarbour-Builder/xcc/nsxmt.lib.xbp
++ xHarbour-Builder/xcc/nsx.lib.xbp
++ xHarbour-Builder/xcc/nordd.lib.xbp
++ xHarbour-Builder/xcc/nanfor.lib.xbp
++ xHarbour-Builder/xcc/mtdll.files.inc
++ xHarbour-Builder/xcc/libmisc.lib.xbp
++ xHarbour-Builder/xcc/libct.lib.xbp
++ xHarbour-Builder/xcc/libc.lib.xbp
++ xHarbour-Builder/xcc/gd.lib.xbp
++ xHarbour-Builder/xcc/dmain.lib.xbp
++ xHarbour-Builder/xcc/dbfmt.lib.xbp
++ xHarbour-Builder/xcc/dbf.lib.xbp
++ xHarbour-Builder/xcc/ct3comm.lib.xbp
++ xHarbour-Builder/xcc/ct3.lib.xbp
++ xHarbour-Builder/xcc/cdxmt.lib.xbp
++ xHarbour-Builder/xcc/cdx.lib.xbp
++ xHarbour-Builder/xcc/ads.lib.xbp
++ xHarbour-Builder/xcc/Demo/xhb.lib.xbp
++ xHarbour-Builder/xcc/Demo/xhb.exe.xbp
+* xHarbour-Builder/stdbf.files.inc
+* xHarbour-Builder/stxhb.files.inc
+  ! Fixed paths
+* xHarbour-Builder/xbldfull.bat
+  * Rewrite of Build Script
+* xHarbour-Builder/vc8/xpromptsql.exe.xbp
+* xHarbour-Builder/vc8/xprompt.exe.xbp
+* xHarbour-Builder/vc8/xbscript.lib.xbp
+* xHarbour-Builder/vc8/ntx.lib.xbp
+* xHarbour-Builder/vc8/ads.lib.xbp
+* xHarbour-Builder/vc8/wincore.lib.xbp
+* xHarbour-Builder/vc8/optg.lib.xbp
+* xHarbour-Builder/vc8/ct3.lib.xbp
+  * Fixed paths and settings
+- xHarbour-Builder/xpromptsql.exe.xbp
+- xHarbour-Builder/xprompt.exe.xbp
+- xHarbour-Builder/xhbzipdll.dll.xbp
+- xHarbour-Builder/xhbmtdll.dll.xbp
+- xHarbour-Builder/xhbmt.lib.xbp
+- xHarbour-Builder/xhbdmtdll.dll.xbp
+- xHarbour-Builder/xhbdll.dll.xbp
+- xHarbour-Builder/xhbddll.dll.xbp
+- xHarbour-Builder/xhbd.exe.xbp
+- xHarbour-Builder/xhb.lib.xbp
+- xHarbour-Builder/xhb.exe.xbp
+- xHarbour-Builder/xhb-demo.lib.xbp
+- xHarbour-Builder/xhb-demo.exe.xbp
+- xHarbour-Builder/sixcdx.lib.xbp
+- xHarbour-Builder/oldnames.lib.xbp
+- xHarbour-Builder/ntxmt.lib.xbp
+- xHarbour-Builder/ntx.lib.xbp
+- xHarbour-Builder/nordd.lib.xbp
+- xHarbour-Builder/libmisc.lib.xbp
+- xHarbour-Builder/libct.lib.xbp
+- xHarbour-Builder/libc.lib.xbp
+- xHarbour-Builder/dbfmt.lib.xbp
+- xHarbour-Builder/dbf.lib.xbp
+- xHarbour-Builder/cdxmt.lib.xbp
+- xHarbour-Builder/cdx.lib.xbp
+- xHarbour-Builder/zlib.lib.xbp
+- xHarbour-Builder/ZipArchive.lib.xbp
+- xHarbour-Builder/xhbzip.lib.xbp
+- xHarbour-Builder/xbscript.lib.xbp
+- xHarbour-Builder/wvw.lib.xbp
+- xHarbour-Builder/wvtg.lib.xbp
+- xHarbour-Builder/wvt.lib.xbp
+- xHarbour-Builder/wvg.lib.xbp
+- xHarbour-Builder/wincore.lib.xbp
+- xHarbour-Builder/winapi.lib.xbp
+- xHarbour-Builder/stddll.files.inc
+- xHarbour-Builder/optgmt.lib.xbp
+- xHarbour-Builder/optg.lib.xbp
+- xHarbour-Builder/odbc.lib.xbp
+- xHarbour-Builder/nsxmt.lib.xbp
+- xHarbour-Builder/nsx.lib.xbp
+- xHarbour-Builder/nanfor.lib.xbp
+- xHarbour-Builder/mtdll.files.inc
+- xHarbour-Builder/gd.lib.xbp
+- xHarbour-Builder/dmain.lib.xbp
+- xHarbour-Builder/ct3comm.lib.xbp
+- xHarbour-Builder/ct3.lib.xbp
+- xHarbour-Builder/ct.lib.xbp
+- xHarbour-Builder/ads.lib.xbp
+
+
+2009-01-18 11:13 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  * Build rmdbfcdx first in vc8
+  * Build xDebugW.exe in VC* with debug info
+  + Added building vxhdll.exe in vc8
+  * Rem'ed out building xPromptsql.exe and xPrompt.exe (Still get error on xPromptsql.exe though)
+
+
+2009-01-17 13:54 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ vc8/dmain.lib.xbp
++ vc8/wincore.lib.xbp
+* xbldfull.bat
+  + dmain.lib.xbp for msvc
+  + wincore.lib.xbp for msvc
+  + vxhdll.dll.xbp for msvc
+  + vxhddll.dll.xbp for msvc
+  * Build xHBzip.lib.xbp with -Debug
+  ! Build rmdbfcdx.lib.xbp again for msvc
+
+
+2009-01-16 15:44 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  * Applied new xcc folders for DebugClient
+
+
+2009-01-16 15:44 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* Wise Install Scripts\Build_0-CopyFiles.bat
+  * Updated copy'ing new DEMO versions
++ wincore.lib.xbp
++ WinCallBack.c
+* mtdll.files.inc
+* stdll.files.inc
+* stlib.files.inc
+  - terror
+  + einstvar
+* xbldfull.bat
+  ! Fix for building fts32.lib for ApolloRDD
+  ! Fix for building sde61.lib for ApolloRDD
+  * Make sure all libs are build with "-Debug"
+  * Set ECHO ON after building the linker.
+  * Only try to XCopy dmain if the file exists
+  * New var: XBUILDER_MT
+    If you set this to "NO", no MT lib's wil be build
+    If you don't set it al all, MT libs will be build.
+    [ Just faster for me for test purpose ]
+  + Profiler libs (REM'ed out for now)
+    If Profiler libs don't take down speed, we can think of setting
+    profiler ON for standard.
+  * Build tProject.lib BEFORE any xBuild*.exe's
+  * Build xBuild.exe BEFORE all other xbuild*.exe's
+  * XCopy new build xBuild.exe to \xHarbour\Bin
+    This eliminates the need to build twice sometimes
+  * Applied new XCC build folders to all visual xharbour lib's,
+    DLL's and exe's
+
+2009-01-14 16:47 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  + Added building WinCore.lib
+  * Build xEditW before vxh.lib
+  * Build demo versions from new demo folder
+* Wise Install Scripts/Build_0-CopyFiles.bat
+  + Added wincore.lib to xhb\lib
+
+
+2009-01-12 18:50 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  * Cleaned up MAP and EXP files
+  * Reorganized building VXH with its LIB's and DLL's
+  * REM'ed out "XCOPY \xhb\dll\*.dll  %windir%\system32". For testing
+    purpose I found it better to NOT have all DLL's available in the
+    Windows System folder.
+* Wise Install Scripts/Build_0-CopyFiles.bat
+  * The demo version of vxh is now vxh-demo.exe
+  * A dummy version of OLE.LIB will be installed in xhb\lib for the demo
+    and personal version.
+  * Added vxhdll.dll and vxhdll.lib
+* Wise Install Scripts/xHB-End.wse
+  * Fixed LINK for vxh-demo.exe in the demo version
+  * Fixed VXH file association for the demo version of VXH
+
+
+2009-01-12 16:23 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  * Build xLink.exe as first
+  * copy dmain.lib to xHarbour\lib after it builds
+    ( xdo.dll needs dmain.lib )
+
+
+2009-01-12 15:22 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xbldfull.bat
+  * Changed MOVE to COPY for vxhdll*.LIB's
+    ( vxh.exe needs these libs to be in /BIN )
+
+
+2009-01-12 15:09 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
++ nsx.lib.xbp
++ nsxmt.lib.xbp
+* xbldfull.bat
+  * Build OLE.LIB before any xBuild*.exe
+  + Build vxhddll.dll.xbp
+  + Build vxh-exe.exe
+  + Move vxhdll*.LIB's from xhb\bin to xhb\lib
+
+
+2009-01-09 19:04 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* Wise Install Scripts\Build_0-CopyFiles.bat
+  + Added NSX.lib and NSXMT.lib
+* mtdll.files.inc
+* stddll.files.inc
+  + Added dbfnsx1.obj
+* xbldfull.bat
+  + Added building NSX.lib and NSXMT.lib
+
+
+2008-09-05 16:03 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+* xHarbour-Builder\mtdll.files.inc
+* xHarbour-Builder\stddll.files.inc
+  - mlctopos.obj
+  - mpostolc.obj
+  + mlcfunc.obj
+  - hbfhnd.obj
+* xHarbour-Builder\stdlib.files.inc
+  - mlctopos.c
+  - mpostolc.c
+  + mlcfunc.c
+  - hbfhnd.c
+* xHarbour-Builder\stxhb.files.inc
+  - hbfhnd.c
+
+
+2007-09-19 09:57 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  + FreeImage\vc8\xbuild.vc8.ini
+  + FreeImage\vc8\FreeImage-xHB.lib.xbp
+  + xHarbour-Builder\vc8\cdx.lib.xbp
+  + xHarbour-Builder\vc8\ct3.lib.xbp
+  + xHarbour-Builder\vc8\dbf.lib.xbp
+  + xHarbour-Builder\vc8\ntx.lib.xbp
+  + xHarbour-Builder\vc8\Optg.lib.xbp
+  * xHarbour-Builder\xbldfull.bat
+    + added Error messages for VC8 builds that give error
+    + Added dbf, cdx, ntx, ct3, freeImage-xhb and Optg LIB's for VC8
+  * xHarbour-Builder\mtdll.files.inc, stdll.files.inc, stlib.files.inc
+    - tEditor1.obj
+    + hbtoken.obj
+    + sendmail.obj
+  * xHarbour-Rushmore\rmap2.c
+    * Latest Przemek fixes
+
+2007-08-13 10:18 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * xHarbour-Builder\Samples\WinTest.prg
+    ! Fixed structure bug (Added #include "winstruc.ch")
+
+2007-08-12 21:40 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * Following sample .PRG files are available in ALL editions
+    Though .XBP build scripts only available from Professional edition on.
+    - DLL_One.prg
+    - DLL_Test.prg
+    - DLL_Two.prg
+    - IE_App.prg
+    - SampleOleServer.prg
+    - Test_ActiveX.prg
+    - Test_MultiThread.prg
+    - Test_PRG_Script.prg
+  - xHarbour-Builder\Samples\Build-OLEServer-Client.bat
+  + xHarbour-Builder\Samples\Samples for PROF and ENT versions\Build-OLEServer-Client.bat
+  * xBldFull.bat
+    + Added xBuild-demo.exe.xbp to build script (For demo version)
+  + xHarbour-xBuild\xbuild-demo.exe.xbp
+  * xHarbour-Builder\Wise Install Scripts\Build_0-CopyFiles
+    * UPX'ed all .EXE's and .DLL's for smaller size .EXE's and .DLL's
+      -> Demo installer went from 25Mb -> 23MB
+
+2007-08-12 21:03 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  + xHarbour-Build/xBuild-demo.exe.xbp
+  * xHarbour-Build/xBuild.prg
+    + Added demo message for xBuild-demo.exe
+    * Changed "Help" info. Used ?'s instead of Alert()
+
+2007-08-12 15:08 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+   * xHBrtl.c
+     * Changed demo message
+   * xBldfull.bat
+     * Cleaned up and refreshed DEMO-builds
+     * REM'ed out building of ACE32.lib
+       -> The ace32.lib used is from the original Advantage database setup
+     * Activated build script for xDebugW.exe for MSVC
+   - winapi-demo.lib.xbp
+   - vxh.exe.xbp
+   - vxh-demo.exe.xbp
+   - vxh.lib.xbp
+   - vxh-demo.lib.xbp
+   - xDebugW.exe.xbp
+   - xDebugW-Demo.exe.xbp
+   * xHarbour-Build/gui.c
+     * Changed demo message
+   + xHarbour-DebugClient\xDebugW-demo.exe.xbp
+   * xHarbour-DebugClient\xDebugW.exe.xbp
+     * Refreshed
+   * xHarbour-DebugClient\vxhdapp.prg
+     + Added demo message for xDebugW.exe in demo
+
+2006-06-20 13:17 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+   * *.WSE
+     Prepared for new release
+   * *.files.inc
+     + Added dbf2txt.obj
+     + Added decode.obj
+
+2006-01-17 14:21 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+   * Added source\ct\misc3.c to ct.lib
+
+2006-01-07 15:44 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   + Samples\GD\
+     + Added GD sample
+
+2006-01-05 18:01 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   + Build_bdg.lib
+   + bgd_XCC.def
+     -> Both to build bdg.lib from bdg.dll
+
+2006-01-05 14:05 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   * Samples\Samples for PROF and ENT versions\Test_ActiveX.prg
+     * Refined
+
+2006-01-02 10:06 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  + BuildTwice.bat
+  + gd.xbp.lib
+  * xbldfull.bat
+    + Added gd.lib and it's doc's to common installation
+  * *.wse
+    * Prepared for Jan2006 release
+
+2005-10-18 11:42 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * vxh.exe.xbp
+    * Added define VXH_DEMO to vxh1.prg.
+  * *.wse
+    * Finetuned installer scripts.
+
+2005-10-12 16:36 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Samples\Test_Six*.prg
+    ! Fixed
+
+2005-10-12 16:34 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts\*.wse
+    % Optimized
+  * Wise Install Scripts\Build_0-CopyFiles.bat
+    % Optimized + Fixed
+
+2005-10-11 17:12 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * ZipArchive/xbuild.windows.ini
+  * ZipArchive/zlib/xbuild.windows.ini
+  * xHarbour-Builder/xbldfull.bat
+  * xHarbour-HBZlib/vc/xbuild.windows.ini
+  * xHarbour-HBZlib/xhbzipdll/xbuild.windows.ini
+  * xHarbour-SQLRDD/vc/xbuild.windows.ini
+  * xHarbour-xHBComm/comm/xbuild.windows.ini
+  * xHarbour-xHBComm/xhbcommdll/xbuild.windows.ini
+    * Modified to use $(PRG_PATH) instead of hard coded "c:\Program Files"
+
+2005-10-04 11:53 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/*.wse
+    * Changed "Product key" textbox
+
+2005-10-04 11:10 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/Build_0-CopyFiles.bat
+    + Added demo files to install folders
+
+2005-10-03 22:47 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/ads.lib.xbp
+  * xHarbour-Builder/cdx.lib.xbp
+  * xHarbour-Builder/cdxmt.lib.xbp
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/ntx.lib.xbp
+  * xHarbour-Builder/ntxmt.lib.xbp
+  * xHarbour-Builder/sixcdx.lib.xbp
+  * xHarbour-Builder/stdbf.files.inc
+  * xHarbour-Builder/stddll.files.inc
+    * Synched with .org removal of RDDs *0.prg
+
+2005-10-03 16:01 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  +  xHarbour-Builder/vxh.exe.xbp
+  +  xHarbour-Builder/vxh.lib.xbp
+  +  xHarbour-Builder/winapi.lib.xbp
+  +  xHarbour-Builder/xDebugW.exe.xbp
+     + New demo projects for \xhb\bin\demo\ and \xhb\lib\demo
+  * Visual-xHarbour/Library/source/winapi.c
+  * xHarbour-Builder/xbldfull.bat
+    + Added demo versions for WinApI.lib VXH.exe|lib and xDebugW
+
+2005-09-29 14:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+    - Removed dbfdbt modules.
+
+2005-09-26 20:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/Samples/AssocArr.prg
+  * xHarbour-Builder/Samples/Associat.prg
+  * xHarbour-Builder/Samples/Inline_c.prg
+  * xHarbour-Builder/Samples/Scope1.prg
+  * xHarbour-Builder/Samples/TryCatch.prg
+    * Synched with \xharbour\test
+
+  /*
+     Patrick we need to remeber to do this before every release:
+
+        xcopy \xharbour\tests\*.prg \xharbour.com\xharbour-builder\samples /u /d
+   */
+
+2005-09-23 15:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+  * xHarbour-Builder/stdlib.files.inc
+    + Added dbgentry.c
+
+2005-09-23 11:20 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * nanfor.lib.xbp
+    + added missing fttext.c and dfile.prg
+
+2005-09-21 19:18 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * Visual-xHarbour/Library/source/FastWinAPI.c
+  * Visual-xHarbour/Library/source/Picture.prg
+  * xHarbour-ApolloRDD/sixfunc.c
+  * xHarbour-HBZlib/zip_xhb.c
+  * xHarbour-Rushmore/dbrmap/m6funcs.c
+  * xHarbour-Rushmore/dbrmap/rmap1.c
+  * xHarbour-SQLRDD/source/pgs.c
+  * xHarbour-SQLRDD/source/sqlact.c
+  * xHarbour-SQLRDD/source/sqlorax.c
+    * Synched with recent .org change to hb_itemReturn() -> hb_itemReturnForward()
+
+2005-09-21 17:18 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/*.wse
+  * Wise Install Scripts/Serials.txt
+    * prepared for Oct release
+  - Wise Install Scripts/Icons/xPrompt.ico
+  + Wise Install Scripts/Icons/xPrompt2.ico
+
+2005-09-21 14:00 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Samples\SampleOLEServer.prg
+    * updated SampleOLEServer.prg
+
+2005-09-19 19:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/ntx.lib.xbp
+  * xHarbour-Builder/ntxmt.lib.xbp
+    - Removed dbfdbt sources
+
+  * xHarbour-Builder/cdx.lib.xbp
+  * xHarbour-Builder/cdxmt.lib.xbp
+    - Removed dbffpt sources
+
+  * xHarbour-Builder/stdbf.files.inc
+  * xHarbour-Builder/stddll.files.inc
+    + Added dbffpt sources
+
+  * xHarbour-OLEServer/source/oleserver.c
+    + Few debug traces
+
+2005-09-16 13:17 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/stdbf.files.inc
+    + Merged HipSix into DBF.lib
+
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+    + Added HipSix sources
+
+  * xHarbour-Builder/xbldfull.bat
+    - Removed HipSix.lib.xbp
+
+  - Removed un-used debug libraries project files and HipSix
+
+2005-09-16 14:00 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts\Icons
+    * Updated icons
+
+2005-09-15 21:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stdbf.files.inc
+  * xHarbour-Builder/stddll.files.inc
+    + Added new hbsix support
+
+2005-09-08 14:29 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * xHarbour-Builder\Wise Install Scripts (SQLRDD)\*.wse
+    * prepared for Sept release
+  - Wise Install Scripts (SQLRDD)/SQLRDD-Serials.txt
+  * Wise Install Scripts (SQLRDD)/SideImage.*
+    * new logo
+
+2005-09-08 14:11 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts (VXH)/*.wse
+    * Prepared for new release
+  * Wise Install Scripts (VXH)/SideImage.*
+    * New Logo
+
+2005-09-08 12:07 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/Serials.txt
+  * Wise Install Scripts/*.WSE
+    * Prepared for Sept 2005 release
+
+2005-09-08 11:35 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+  - Wise Install Scripts/BuildWith-125x55.bmp
+  - Wise Install Scripts/BuildWith-129x55.png
+  * Wise Install Scripts/SideImage.*
+    * New Logo
+  * Wise Install Scripts/xHB-Start.wse
+  * Wise Install Scripts/xHB-End.wse
+    - Removed "Add path" dialog
+  * Wise Install Scripts/xHarbour.doc.url
+    * changed URL to xHDN
+  * Wise Install Scripts/Icons/xBuild.ico
+    * New logo
+
+2005-09-01 12:17 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+  * xHarbour-Builder/stdlib.files.inc
+    - Removed un-needed source\rtl\pcre\dftables.c
+
+2005-08-31 11:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+  * xHarbour-Builder/stdlib.files.inc
+  * xHarbour-Builder/stxhb.files.inc
+    * Synched with .org pcre change.
+
+2005-07-20 08:49 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+   * xbldfull.bat
+     * Added /Y to latest copieng files
+   * Wise Install Scripts (VXH)/*.wse
+     * Prepared for VXH 9.4
+
+2005-06-09 16:40 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   * Wise Install Scripts/*.wse
+     * Prepared for JULY2005 release
+   * Wise Install Scripts/Serials.txt
+     + Added JULY2005 serial nr's
+   * Wise Install Scripts (SQLRDD)/*.wse
+     * Prepared for JULY2005 release
+   * Wise Install Scripts (SQLRDD)/SQLRDD-Serials.txt
+     + Added JULY2005 serials
+
+2005-06-07 15:58 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/end.wse
+    * Added VXH acociation to VXH.EXE in the installers.
+  - Wise Install Scripts (SQLRDD)\Serials.txt
+  + Wise Install Scripts (SQLRDD)\SQLRDD-Serials.txt
+
+2005-06-06 19:47 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/CopyFiles.bat
+    + Added to copy xHarbour-xHBComm\CommFunc.txt and
+      xHarbour-xHBComm\querycls.prg to 0-Common folder
+  * Wise Install Scripts (SQLRDD)\*.wse
+    * Perpared for JUNE 2005 release
+  * Wise Install Scripts (SQLRDD)\Serial.txt
+    + Added new serials for MySQLRDD and SQLRDD add-ons.
+
+2005-05-31 14:23 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Wise Install Scripts/*.wse
+    * Prepared for JUNE 2005 Release
+  * Wise Install Scripts/Serials.txt
+    * New serials for June release
+
+2005-05-28 17:05 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * xbldfull.bat
+    * Added time start and stop output to log file
+  * Wise Install Scripts/Build_0-CopyFiles.bat
+    ! Fixed OleServer.lib and Apollo.ch copy
+  * Wise Install Scripts/xHB-End.wse
+    ! Fixed auto registering of DLL's in setup's
+
+2005-05-13 09:10 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * CVS Tagged as May2005
+  * Wise Install Scripts/Build_0-CopyFiles.bat
+    Added HipSix and xDebugW
+  + Wise Install Scripts/Changelog.May2005.txt
+  * Wise Install Scripts/WhatsNew.txt
+    * Added what's new for May2005
+  * Wise Install Scripts (SQLRDD)/*.wse
+    * Prepared for May2005 release
+  * Wise Install Scripts (VXH)/*.wse
+    * Prepared for May2005 release
+  * Wise Install Scripts (VXH)/Serials.txt
+    + Added serials for May2005 release
+
+2005-05-09 10:47 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  + HipSix.lib.xbp
+  * xbldfull.bat
+    + Added new HipSix.lib.xbp
+
+2005-04-25 10:47 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * mtdll.files.inc
+  * stddll.files.inc
+  * stdlib.files.inc
+    * Modified to HB_MULTI_GT mode
+
+2005-04-25 09:47 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * Wise Install Scripts/Build_0-CopyFiles.bat/xDebugW.exe
+    + Added xDebugW.exe to COMMON/Bin
+    + Added dbgserve.lib to COMMON/Lib
+  * Wise Install Scripts/*.wse
+    * Prepared for May2005 release
+  * Wise Install Scripts/Serials.txt
+    + Added serials for May2005 release
+
+2005-04-20 20:07 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xhb.c
+    + Added -Ot
+    - Removed -Ze
+
+2005-04-20 09:28 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * Wise Install Scripts (VXH)\*.wse
+    * Prepared for preview 9
+  * Serials.txt
+    + Added new serials for APRIL release
+
+2005-04-19 12:58 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * Build_0-CopyFiles.bat
+    + Added sixcdx.lib to 0-Common/lib
+
+2005-04-18 16:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  + SixCDX.lib.xbp
+  * xbldfull.bat
+    + Added new SixCDX.lib
+
+2005-04-17 16:22 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  + xHarbour-Builder/Wise Install Scripts (SQLRDD)
+    + Added automated install files scripts *SLQRDD distributions for Windows
+
+2005-04-13 08:18 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xHarbour-Builder/Wise Install Scripts/xHB-End.wse
+    * Added new icon for Help files
+  - xHarbour-Builder/Wise Install Scripts/Icons/help.ico
+  + xHarbour-Builder/Wise Install Scripts/Icons/xhelp.ico
+
+2005-04-12 22:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * *.files.inc
+    + Added missing filestat.c
+
+2005-04-12 09:01 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xHarbour-Builder\Wise Install Scripts\Build_0-CopyFiles.bat
+    - Removed OleServer.lib from DEMO
+  * xHarbour-Builder\Wise Install Scripts\Whatsnew.txt
+    * Added APRIL2005 whats new
+
+2005-04-11 10:13 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  + Added include/ado.ch
+  * xbldfull.bat
+    + Added to copy xHarbour.com\xHarbour-Builder\include\*.*
+    + Added mysql.lib.xbp and mysql-demo.lib.xbp to build process
+  - Removed xHarbour-Builder\Wise Install Scripts\xHBWise.ini
+  * xHarbour-Builder\Wise Install Scripts\Serials.txt
+    + New serials for April2005 release
+  * xHarbour-Builder\Wise Install Scripts\*.wse
+    + New serials for April2005 release
+    + Bumped version to April 2005
+
+2005-03-31 10:36 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  + Added new source\rtl\readins.c
+  + Added new source\rtl\readexit.c
+
+2005-03-13 12:38 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xbldfull.bat
+    + Added to build xHBzipVC.lib.xbp
+
+2005-03-11 09:26 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xbldfull.bat
+    * replaced all "xBuild" with "xBuild.exe"
+    - REMed out "xcopy \xHarbour\contrib\what32\include\*.ch \xHb\include\w32 /d /s /y /i"
+  - xcl.lib.xbp
+  + Archive\xcl.lib.xbp
+  * Wise Install Scripts (VXH)\WhatsNew.txt
+    * Added line for whatsnew for Preview 8
+  * Wise Install Scripts (VXH)\xHB-Start.wse
+    * Bumped version up to "Preview 8"
+
+2005-03-09 19:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/xbldfull.bat
+    - Removed harded coded -dDYN from xbScript.lib, xPrompt.exe and xPromptSQL.exe
+  * xHarbour-Builder/xbscript.lib.xbp
+    + Added FW to defines, so that PP_LoadFW and ::LoadFiveWin() are available.
+
+2005-03-08 11:45 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xHarbour-Builder/mtdll.files.inc
+  * xHarbour-Builder/stddll.files.inc
+  * xHarbour-Builder/stdlib.files.inc
+    + Added missing hbmd5
+
+2005-03-01 19:50 UTC-0800 Ron Pinkas <ron at xharbour.com>
+   * xHarbour-Builder/xbldfull.bat
+     + Added -DEBUG flag to RMDBFCDX and ActiveX.lib
+   * xHarbour-HBZlib/xbuild.ini
+   * xHarbour-xBuild/xbuild.ini
+   * xHarbour-xHBComm/xbuild.ini
+     * Touched by XBuild
+
+2005-02-25 11:10 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * Wise Install Scripts/Build_All.bat
+     * finetuned more
+    + Added Wise Install Scripts (VXH)/2-Personal.wse
+    + Added Wise Install Scripts (VXH)/3-Professional.wse
+    + Added Wise Install Scripts (VXH)/4-Enterprise.wse
+    + Added Wise Install Scripts (VXH)/Build_0-CopyFiles.bat
+    + Added Wise Install Scripts (VXH)/Build_2-Personal.bat
+    + Added Wise Install Scripts (VXH)/Build_3-Professional.bat
+    + Added Wise Install Scripts (VXH)/Build_4-Enterprise.bat
+    + Added Wise Install Scripts (VXH)/Build_9-Rename.bat
+    + Added Wise Install Scripts (VXH)/Build_All.bat
+    + Added Wise Install Scripts (VXH)/Serials.txt
+    + Added Wise Install Scripts (VXH)/SideImage.bmp
+    + Added Wise Install Scripts (VXH)/SideImage.png
+    + Added Wise Install Scripts (VXH)/WhatsNew-VXH.txt
+    + Added Wise Install Scripts (VXH)/xHB-Build.wse
+    + Added Wise Install Scripts (VXH)/xHB-End.wse
+    + Added Wise Install Scripts (VXH)/xHB-Start.wse
+
+2005-02-23 14:32 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added ct3.lib and wvtg.lib to CopyFiles.bat
+
+2005-02-22 19:50 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  + wvtg.lib.xbp
+  * xbldfull.bat
+    + Added support for wvtg.lib.xbp
+
+  /*
+     Patrick in my xbldfull.bat there WAS a wvtgui.lib.xbp, but was somehow removed.
+     This Lib is needed for WVT GUI applications.
+   */
+
+2005-02-22 17:40 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xprompt.exe.xbp
+   * xpromptsql.exe.xbp
+   * Wise Install Scripts/1-Demo.wse
+   * Wise Install Scripts/2-Personal.wse
+   * Wise Install Scripts/3-Professional.wse
+   * Wise Install Scripts/4-Enterprise.wse
+   * Wise Install Scripts/Build_0-CopyFiles.bat
+   * Wise Install Scripts/xHB-End.wse
+   * Wise Install Scripts/xHB-Start.wse
+
+2005-02-22 16:19 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Wise Install Scripts/Added Build_All.bat
+
+2005-02-19 19:53 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Wise Install Scripts/Added BuildWith-125x55.bmp
+   * xbldfull.bat
+     * changed path for Apollo-RDD DLL's
+   * Wise Install Scripts/Build_0-CopyFiles.bat
+     * Changed path for Apollo-RDD DLL's and LIB's
+
+2005-02-19 19:45 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * Wise Install Scripts/2-Personal.wse
+   * Wise Install Scripts/3-Professional.wse
+   * Wise Install Scripts/4-Enterprise.wse
+   * Wise Install Scripts/xHBWise.ini
+     * Changed so KEYS are read from xHBWise.ini
+
+2005-02-19 18:57 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added Wise Install Scripts/Build_9-Rename.bat
+
+2005-02-19 18:18 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * Wise Install Scripts/1-Demo.wse
+   * Wise Install Scripts/2-Personal.wse
+   * Wise Install Scripts/3-Professional.wse
+   * Wise Install Scripts/4-Enterprise.wse
+     * Chaged so they use build variable form xHBWise.ini
+   - Removed Wise Install Scripts/BuildRel.bat
+   + Added Wise Install Scripts/Build_0-CopyFiles.bat
+   + Added Wise Install Scripts/Build_1-Demo.bat
+   + Added Wise Install Scripts/Build_2-Personal.bat
+   + Added Wise Install Scripts/Build_3-Professional.bat
+   + Added Wise Install Scripts/Build_4-Enterprise.bat
+   - Removed Wise Install Scripts/xHB-Build.wse
+   * Wise Install Scripts/xHB-Start.wse
+   + Added Wise Install Scripts/xHBWise.ini
+
+2005-02-19 12:07 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added "Wise Install Scripts" dir
+   + Added "Wise Install Scripts/Icons" dir
+   + Added /Wise Install Scripts/1-Demo.wse
+   + Added /Wise Install Scripts/2-Personal.wse
+   + Added /Wise Install Scripts/3-Professional.wse
+   + Added /Wise Install Scripts/4-Enterprise.wse
+   + Added /Wise Install Scripts/BugReporter.url
+   + Added /Wise Install Scripts/BuildWith-129x55.png
+   + Added /Wise Install Scripts/COPYING
+   + Added /Wise Install Scripts/Serials.txt
+   + Added /Wise Install Scripts/SideImage.bmp
+   + Added /Wise Install Scripts/SideImage.png
+   + Added /Wise Install Scripts/Visual xHarbour.url
+   + Added /Wise Install Scripts/WhatsNew.txt
+   + Added /Wise Install Scripts/XBScript.lib License.txt
+   + Added /Wise Install Scripts/packing.lst
+   + Added /Wise Install Scripts/xHB-Build.wse
+   + Added /Wise Install Scripts/xHB-End.wse
+   + Added /Wise Install Scripts/xHB-Start.wse
+   + Added /Wise Install Scripts/xHarbour End-User License Agreement.doc
+   + Added /Wise Install Scripts/xHarbour.com.url
+   + Added /Wise Install Scripts/xHarbour.doc.url
+   + Added /Wise Install Scripts/xHarbour.org.url
+   + Added /Wise Install Scripts/Icons/bug.ico
+   + Added /Wise Install Scripts/Icons/help.ico
+   + Added /Wise Install Scripts/Icons/pdf.ico
+   + Added /Wise Install Scripts/Icons/samples.ico
+   + Added /Wise Install Scripts/Icons/url.ico
+   + Added /Wise Install Scripts/Icons/xBuild.ico
+   + Added /Wise Install Scripts/Icons/xPrompt.ico
+   - Removed xHarbour End-User License Agreement.doc
+   - removed CopyRel.bat
+   - Removed CopyToDemo.bat
+   - Removed vxhbld.bat
+   + Added /Wise Install Scripts/BuildRel.bat
+
+2005-02-19 11:51 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * CopyRel.bat
+     * Now it starts with deleting all from previous copyrel.bat
+   * xbldfull.bat
+     + Added /y to some xCopy commands
+
+2005-02-18 09:22 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xpromptsql.exe.xbp
+     * reinstated OUTPUTFOLDER to xbp\obj\xpromptsql
+     * cleaned up
+
+2005-02-16 18:50 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * CopyRel.bat
+     * Finished
+   + CopyToDemo.bat
+     * This makes a full xHb-Demo installation
+
+2005-02-16 16:48 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added "samples\Samples for PROF and ENT versions"
+   + Added Samples for PROF and ENT versions\DLL_One.dll.xbp
+   + Added Samples for PROF and ENT versions\DLL_One.prg
+   + Added Samples for PROF and ENT versions\DLL_Test.exe.xbp
+   + Added Samples for PROF and ENT versions\DLL_Test.prg
+   + Added Samples for PROF and ENT versions\DLL_Two.dll.xbp
+   + Added Samples for PROF and ENT versions\DLL_Two.prg
+   + Added Samples for PROF and ENT versions\Test_MultiThread.exe.xbp
+   + Added Samples for PROF and ENT versions\Test_MultiThread.prg
+
+2005-02-16 14:00 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added samples/test.dbf
+   + Added xHarbour End-User License Agreement.doc
+
+2005-02-16 13:08 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Added "samples/fivewin" folder
+   + Added samples/fivewin/fwTutor1.exe.xbp
+   + Added samples/fivewin/fwTutor1.prg
+   + Added samples/fivewin/fwTutor2.exe.xbp
+   + Added samples/fivewin/fwTutor2.prg
+   + Added samples/fivewin/fwTutor3.exe.xbp
+   + Added samples/fivewin/fwTutor3.prg
+
+2005-02-16 10:48 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xbldfull.bat
+     + Added commandline to build ACE32.LIB
+     + Added commandline to build FTS32.LIB
+     + Added commandline to build SDE61.LIB
+   * CopyRel.bat
+     + Added more files to copy
+   + Added "samples" folder
+   + Added samples/AssocArr.exe.xbp
+   + Added samples/AssocArr.prg
+   + Added samples/Associat.exe.xbp
+   + Added samples/Associat.prg
+   + Added samples/C_Struc.exe.xbp
+   + Added samples/C_Struc.prg
+   + Added samples/DLL_One.dll.xbp
+   + Added samples/DLL_One.prg
+   + Added samples/DLL_Test.exe.xbp
+   + Added samples/DLL_Test.prg
+   + Added samples/DLL_Two.dll.xbp
+   + Added samples/DLL_Two.prg
+   + Added samples/EnableType.exe.xbp
+   + Added samples/EnableType.prg
+   + Added samples/Extend.exe.xbp
+   + Added samples/Extend.prg
+   + Added samples/ExtendType.exe.xbp
+   + Added samples/ExtendType.prg
+   + Added samples/ForEach.exe.xbp
+   + Added samples/ForEach.prg
+   + Added samples/GT_wvt.prg
+   + Added samples/Global1.prg
+   + Added samples/Global2.prg
+   + Added samples/Globals.exe.xbp
+   + Added samples/Has_Like.exe.xbp
+   + Added samples/Has_Like.prg
+   + Added samples/Hello.exe.xbp
+   + Added samples/Hello.prg
+   + Added samples/Inline_c.exe.xbp
+   + Added samples/Inline_c.prg
+   + Added samples/Manifest.xml
+   + Added samples/OLEdb.exe.xbp
+   + Added samples/OLEdb.prg
+   + Added samples/Override.exe.xbp
+   + Added samples/Override.prg
+   + Added samples/RegEx.exe.xbp
+   + Added samples/RegEx.prg
+   + Added samples/SampleOLEServer.dll.xbp
+   + Added samples/SampleOLEServer.prg
+   + Added samples/Scope1.prg
+   + Added samples/Scope2.prg
+   + Added samples/String_as_Array.exe.xbp
+   + Added samples/String_as_Array.prg
+   + Added samples/Switch.exe.xbp
+   + Added samples/Switch.prg
+   + Added samples/Test_ActiveX.exe.xbp
+   + Added samples/Test_ActiveX.prg
+   + Added samples/Test_MultiThread.exe.xbp
+   + Added samples/Test_MultiThread.prg
+   + Added samples/Test_OLE.exe.xbp
+   + Added samples/Test_OLE.prg
+   + Added samples/Test_PRG_Script.exe.xbp
+   + Added samples/Test_PRG_Script.prg
+   + Added samples/Test_RegEx.exe.xbp
+   + Added samples/Test_RegEx.prg
+   + Added samples/Test_Sample_OLE.exe.xbp
+   + Added samples/Test_Sample_OLE.prg
+   + Added samples/Test_Scope.exe.xbp
+   + Added samples/Test_Scope.prg
+   + Added samples/Test_Six1.exe.xbp
+   + Added samples/Test_Six1.prg
+   + Added samples/Test_Six_CDX.exe.xbp
+   + Added samples/Test_Six_CDX.prg
+   + Added samples/TryCatch.exe.xbp
+   + Added samples/TryCatch.prg
+   + Added samples/Variable_Param.exe.xbp
+   + Added samples/Variable_Param.prg
+   + Added samples/WinTest.exe.xbp
+   + Added samples/WinTest.prg
+   + Added samples/With.exe.xbp
+   + Added samples/With.prg
+
+2005-02-15 17:31 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xbldfull.bat
+     - reverted last change
+   * CopyRel.bat
+     + Added more files to copy
+
+2005-02-15 10:13 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xbldfull.bat
+     - removed building vxh.exe and xeditw.exe
+       -> These are build in vxhbld.bat
+
+2005-02-14 18:10 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + vxhbld.bat
+     * BAT file to build all for Visual xHarbour
+
+2005-02-14 17:00 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * stdlib.files.inc
+   * stxhb.files.inc
+   * xbldfull.bat
+     * finetuned
+
+2005-02-11 20:47 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   - ActiveX.c
+   - TActiveX.prg
+   - TestActiveX.prg
+   - activex.lib.xbp
+   - hbtest.exe.xbp
+   - owners.lib.xbp
+   - ownersd.lib.xbp
+   - sbtest.exe.xbp
+   - six.lib.xbp
+   - testactivex.exe.xbp
+   - testbtn.exe.xbp
+   - tip.lib.xbp
+   - tsbrowse.lib.xbp
+   - tsbutton.lib.xbp
+   - w32.lib.xbp
+   - winapi.lib.xbp
+   - xbuild.dll.xbp
+   - xbuild.exe.xbp
+   - xbuildw-DEmo.exe.xbp
+   - xbuildw-Personal.exe.xbp
+   - xbuildw.exe.xbp
+   - xedit.exe.xbp
+   - xedit.lib.xbp
+   - xeditole.dll.xbp
+   - xeditw.exe.xbp
+   - xeditw.lib.xbp
+   - xeditwvt.exe.xbp
+   - xide.exe.xbp
+   - xided.exe.xbp
+   + Archive\hbtest.exe.xbp
+   + Archive\owners.lib.xbp
+   + Archive\ownersd.lib.xbp
+   + Archive\sbtest.exe.xbp
+   + Archive\testbtn.exe.xbp
+   + Archive\tip.lib.xbp
+   + Archive\tsbrowse.lib.xbp
+   + Archive\tsbutton.lib.xbp
+   + Archive\w32.lib.xbp
+   + Archive\xide.exe.xbp
+   + Archive\xided.exe.xbp
+   + CopyRel.bat
+   + ct3.lib.xbp
+   + stdbf.files.inc
+   + stxhb.files.inc
+   * ZipArchive.lib.xbp
+   * ads.lib.xbp
+   * cdx.lib.xbp
+   * cdxd.lib.xbp
+   * cdxdmt.lib.xbp
+   * cdxmt.lib.xbp
+   * ct.lib.xbp
+   * ct3comm.lib.xbp
+   * dbf.lib.xbp
+   * dbfd.lib.xbp
+   * dbfdmt.lib.xbp
+   * dbfmt.lib.xbp
+   * dllmain.lib.xbp
+   * dllmaind.lib.xbp
+   * libc.lib.xbp
+   * libct.lib.xbp
+   * libmisc.lib.xbp
+   * mtdll.files.inc
+   * nanfor.lib.xbp
+   * nordd.lib.xbp
+   * norddd.lib.xbp
+   * ntx.lib.xbp
+   * ntxd.lib.xbp
+   * ntxdmt.lib.xbp
+   * ntxmt.lib.xbp
+   * odbc.lib.xbp
+   * oldnames.lib.xbp
+   * oleserver.c
+   * optgui.lib.xbp
+   * optguimt.lib.xbp
+   * stddll.files.inc
+   * stdlib.files.inc
+   * wvt.lib.xbp
+   * wvw.lib.xbp
+   * xbldfull.bat
+   * xhb-demo.exe.xbp
+   * xhb-demo.lib.xbp
+   * xhb.exe.xbp
+   * xhb.lib.xbp
+   * xhbd.exe.xbp
+   * xhbd.lib.xbp
+   * xhbddll.dll.xbp
+   * xhbdll.dll.xbp
+   * xhbdmt.lib.xbp
+   * xhbdmtdll.dll.xbp
+   * xhbmt.lib.xbp
+   * xhbmtdll.dll.xbp
+   * xhbzip.lib.xbp
+   * xhbzipdll.dll.xbp
+   * xprompt.exe.xbp
+   * xpromptsql.exe.xbp
+   * zlib.lib.xbp
+     reorganised and finetuned

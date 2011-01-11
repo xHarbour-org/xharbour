@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="7.5.2" version="7.7" Modules="enterprise" RootPath="." Language="en">
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_APP_ARGS" Value="&quot;[Bin_DIR]&quot;"/>
+    <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="ALLUSERS" Value="2"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="BannerBitmap" MultiBuildValue="DefaultBuild:xHBBanner.jpg_1" Type="1"/>
+    <ROW Property="CTRLS" Value="2"/>
+    <ROW Property="DialogBitmap" MultiBuildValue="DefaultBuild:xHBImage.jpg_1" Type="1"/>
+    <ROW Property="Manufacturer" Value="xHarbour" ValueLocId="*"/>
+    <ROW Property="ProductCode" Value="1033:{B9D5EF5E-02B1-4D76-B610-4415928B62A8} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="Visual xHarbour Enterprise" ValueLocId="*"/>
+    <ROW Property="ProductVersion" Value="1.0.0"/>
+    <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
+    <ROW Property="UpgradeCode" Value="{E8B7D1C3-7714-472F-B6BD-58BC84A775AE}"/>
+    <ROW Property="wf_Edition" Value="Enterprise"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="Advanced_Slots_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Advanc~1|Advanced Slots"/>
+    <ROW Directory="Bin_1_DIR" Directory_Parent="Indexes1_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_2_DIR" Directory_Parent="Indexes2_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_3_DIR" Directory_Parent="mssql_blob_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_4_DIR" Directory_Parent="MyOffice_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_5_DIR" Directory_Parent="Relation_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_6_DIR" Directory_Parent="Scopes_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_7_DIR" Directory_Parent="xDB_DIR" DefaultDir="Bin"/>
+    <ROW Directory="Bin_DIR" Directory_Parent="APPDIR" DefaultDir="Bin"/>
+    <ROW Directory="BitViewer_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="BitVie~1|BitViewer"/>
+    <ROW Directory="Captions_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Captions"/>
+    <ROW Directory="ComboBox_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="ComboBox"/>
+    <ROW Directory="CoolMenu_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="CoolMenu"/>
+    <ROW Directory="DataGrid_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="DataGrid"/>
+    <ROW Directory="Debugger_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Debugger"/>
+    <ROW Directory="Doc_DIR" Directory_Parent="APPDIR" DefaultDir="Doc"/>
+    <ROW Directory="FormTypes_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="FormTy~1|FormTypes"/>
+    <ROW Directory="Getting_Started_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Gettin~1|Getting Started"/>
+    <ROW Directory="Images_1_DIR" Directory_Parent="Millionaire_DIR" DefaultDir="Images"/>
+    <ROW Directory="Images_DIR" Directory_Parent="Advanced_Slots_DIR" DefaultDir="Images"/>
+    <ROW Directory="Include_DIR" Directory_Parent="APPDIR" DefaultDir="Include"/>
+    <ROW Directory="Indexes1_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Indexes1"/>
+    <ROW Directory="Indexes2_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Indexes2"/>
+    <ROW Directory="Lib_DIR" Directory_Parent="APPDIR" DefaultDir="Lib"/>
+    <ROW Directory="Links_DIR" Directory_Parent="Doc_DIR" DefaultDir="Links"/>
+    <ROW Directory="ListBox_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="ListBox"/>
+    <ROW Directory="ListView_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="ListView"/>
+    <ROW Directory="MDI_Environment_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="MDIEnv~1|MDI Environment"/>
+    <ROW Directory="Millionaire_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Millio~1|Millionaire"/>
+    <ROW Directory="MyOffice_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="MyOffice"/>
+    <ROW Directory="NotifyIcon_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Notify~1|NotifyIcon"/>
+    <ROW Directory="Organigram_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Organi~1|Organigram"/>
+    <ROW Directory="PopUp_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="PopUp"/>
+    <ROW Directory="PrinterInfo_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Printe~1|PrinterInfo"/>
+    <ROW Directory="Questions_DIR" Directory_Parent="Millionaire_DIR" DefaultDir="Questi~1|Questions"/>
+    <ROW Directory="Registry_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Registry"/>
+    <ROW Directory="Relation_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Relation"/>
+    <ROW Directory="Resource_10_DIR" Directory_Parent="Indexes2_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_11_DIR" Directory_Parent="ListBox_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_12_DIR" Directory_Parent="ListView_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_13_DIR" Directory_Parent="MDI_Environment_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_14_DIR" Directory_Parent="Millionaire_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_15_DIR" Directory_Parent="mssql_blob_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_16_DIR" Directory_Parent="MyOffice_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_17_DIR" Directory_Parent="NotifyIcon_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_18_DIR" Directory_Parent="Organigram_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_19_DIR" Directory_Parent="PopUp_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_1_DIR" Directory_Parent="BitViewer_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_20_DIR" Directory_Parent="PrinterInfo_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_21_DIR" Directory_Parent="Registry_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_22_DIR" Directory_Parent="Relation_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_23_DIR" Directory_Parent="Scopes_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_24_DIR" Directory_Parent="SDImenu_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_25_DIR" Directory_Parent="Simple_Slots_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_26_DIR" Directory_Parent="Splitter_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_27_DIR" Directory_Parent="Timer_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_28_DIR" Directory_Parent="TinyBrowser_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_29_DIR" Directory_Parent="TypingTest_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_2_DIR" Directory_Parent="Captions_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_30_DIR" Directory_Parent="xBrowser_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_31_DIR" Directory_Parent="xDB_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_32_DIR" Directory_Parent="xMailer_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_33_DIR" Directory_Parent="xPad_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_3_DIR" Directory_Parent="ComboBox_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_4_DIR" Directory_Parent="CoolMenu_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_5_DIR" Directory_Parent="DataGrid_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_6_DIR" Directory_Parent="Debugger_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_7_DIR" Directory_Parent="FormTypes_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_8_DIR" Directory_Parent="Getting_Started_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_9_DIR" Directory_Parent="Indexes1_DIR" DefaultDir="Resource"/>
+    <ROW Directory="Resource_DIR" Directory_Parent="Advanced_Slots_DIR" DefaultDir="Resource"/>
+    <ROW Directory="SDImenu_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="SDImenu"/>
+    <ROW Directory="Samples_DIR" Directory_Parent="APPDIR" DefaultDir="Samples"/>
+    <ROW Directory="Scopes_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Scopes"/>
+    <ROW Directory="Simple_Slots_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Simple~1|Simple Slots"/>
+    <ROW Directory="Source_10_DIR" Directory_Parent="Indexes2_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_11_DIR" Directory_Parent="ListBox_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_12_DIR" Directory_Parent="ListView_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_13_DIR" Directory_Parent="MDI_Environment_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_14_DIR" Directory_Parent="Millionaire_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_15_DIR" Directory_Parent="mssql_blob_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_16_DIR" Directory_Parent="MyOffice_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_17_DIR" Directory_Parent="NotifyIcon_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_18_DIR" Directory_Parent="Organigram_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_19_DIR" Directory_Parent="PopUp_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_1_DIR" Directory_Parent="BitViewer_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_20_DIR" Directory_Parent="PrinterInfo_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_21_DIR" Directory_Parent="Registry_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_22_DIR" Directory_Parent="Relation_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_23_DIR" Directory_Parent="Scopes_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_24_DIR" Directory_Parent="SDImenu_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_25_DIR" Directory_Parent="Simple_Slots_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_26_DIR" Directory_Parent="Splitter_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_27_DIR" Directory_Parent="Timer_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_28_DIR" Directory_Parent="TinyBrowser_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_29_DIR" Directory_Parent="TypingTest_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_2_DIR" Directory_Parent="Captions_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_30_DIR" Directory_Parent="xBrowser_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_31_DIR" Directory_Parent="xDB_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_32_DIR" Directory_Parent="xMailer_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_33_DIR" Directory_Parent="xPad_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_3_DIR" Directory_Parent="ComboBox_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_4_DIR" Directory_Parent="CoolMenu_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_5_DIR" Directory_Parent="DataGrid_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_6_DIR" Directory_Parent="Debugger_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_7_DIR" Directory_Parent="FormTypes_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_8_DIR" Directory_Parent="Getting_Started_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_9_DIR" Directory_Parent="Indexes1_DIR" DefaultDir="Source"/>
+    <ROW Directory="Source_DIR" Directory_Parent="Advanced_Slots_DIR" DefaultDir="Source"/>
+    <ROW Directory="Splitter_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Splitter"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="Tables_DIR" Directory_Parent="SDImenu_DIR" DefaultDir="Tables"/>
+    <ROW Directory="Timer_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Timer"/>
+    <ROW Directory="TinyBrowser_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="TinyBr~1|TinyBrowser"/>
+    <ROW Directory="TypingTest_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="Typing~1|TypingTest"/>
+    <ROW Directory="Visual_xHarbour_DIR" Directory_Parent="Samples_DIR" DefaultDir="Visual~1|Visual-xHarbour"/>
+    <ROW Directory="mssql_blob_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="mssql_~1|mssql_blob"/>
+    <ROW Directory="w32_DIR" Directory_Parent="Include_DIR" DefaultDir="w32"/>
+    <ROW Directory="xBrowser_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="xBrowser"/>
+    <ROW Directory="xDB_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="xDB"/>
+    <ROW Directory="xMailer_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="xMailer"/>
+    <ROW Directory="xPad_DIR" Directory_Parent="Visual_xHarbour_DIR" DefaultDir="xPad"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="AI_ExePath" ComponentId="{AF2A3F4D-1327-4AC2-BD08-3C03AB1A4B41}" Directory_="APPDIR" Attributes="4" KeyPath="AI_ExePath"/>
+    <ROW Component="AdvancedSlots.prg" ComponentId="{B9008858-78CA-46AC-A59D-CBCE1561258B}" Directory_="Source_DIR" Attributes="0" KeyPath="AdvancedSlots.prg" Type="0"/>
+    <ROW Component="AdvancedSlots.rc" ComponentId="{E73AA2A9-D846-4FF1-B51E-16C0952429F6}" Directory_="Resource_DIR" Attributes="0" KeyPath="AdvancedSlots.rc" Type="0"/>
+    <ROW Component="AdvancedSlots.vxh" ComponentId="{B56C2508-F9C0-4B84-BB4C-A09A23CBC73C}" Directory_="Advanced_Slots_DIR" Attributes="0" KeyPath="AdvancedSlots.vxh" Type="0"/>
+    <ROW Component="BitViewer.prg" ComponentId="{CE803544-CDE5-4BD5-93BA-0D5B8416049B}" Directory_="Source_1_DIR" Attributes="0" KeyPath="BitViewer.prg" Type="0"/>
+    <ROW Component="BitViewer.rc" ComponentId="{E4A5DF5E-2365-478E-B105-BD8E48C669E0}" Directory_="Resource_1_DIR" Attributes="0" KeyPath="BitViewer.rc" Type="0"/>
+    <ROW Component="BitViewer.vxh" ComponentId="{9472CAE6-4F02-4042-AFB7-A136B82BCFB8}" Directory_="BitViewer_DIR" Attributes="0" KeyPath="BitViewer.vxh" Type="0"/>
+    <ROW Component="COPYING" ComponentId="{8576BB88-2470-485D-8DC3-BE4616846CFA}" Directory_="APPDIR" Attributes="0" KeyPath="OpenFolder.vbs" Type="0"/>
+    <ROW Component="Captions.prg" ComponentId="{DE05C04A-8E91-4EA4-A538-12179F998EA5}" Directory_="Source_2_DIR" Attributes="0" KeyPath="Captions.prg" Type="0"/>
+    <ROW Component="Captions.rc" ComponentId="{B5BE7B88-0231-4CBC-889F-EFB7E4CE6427}" Directory_="Resource_2_DIR" Attributes="0" KeyPath="Captions.rc" Type="0"/>
+    <ROW Component="Captions.vxh" ComponentId="{69FDA095-6440-4ED3-9080-D00E93B7D245}" Directory_="Captions_DIR" Attributes="0" KeyPath="Captions.vxh" Type="0"/>
+    <ROW Component="ChildForm.prg" ComponentId="{70FFC2DA-0B08-4044-8A93-296ECDF0EABA}" Directory_="Source_33_DIR" Attributes="0" KeyPath="ChildForm.prg" Type="0"/>
+    <ROW Component="ChildGrid.prg" ComponentId="{65F35084-6767-4CF3-8BD9-8A781B91B05B}" Directory_="Source_31_DIR" Attributes="0" KeyPath="ChildGrid.prg" Type="0"/>
+    <ROW Component="ComboBox.prg" ComponentId="{86831EEC-7EED-45F9-B7DE-AFEFA8A275FC}" Directory_="Source_3_DIR" Attributes="0" KeyPath="ComboBox.prg" Type="0"/>
+    <ROW Component="ComboBox.rc" ComponentId="{8F5E3B5F-994A-4F49-9722-F776D650924B}" Directory_="Resource_3_DIR" Attributes="0" KeyPath="ComboBox.rc" Type="0"/>
+    <ROW Component="ComboBox.vxh" ComponentId="{CEFF3D86-0CC0-4B49-B49E-BF3B83CD843B}" Directory_="ComboBox_DIR" Attributes="0" KeyPath="ComboBox.vxh" Type="0"/>
+    <ROW Component="CoolMenu.prg" ComponentId="{F316E2EE-E620-4BD3-94A9-6F611EE74D69}" Directory_="Source_4_DIR" Attributes="0" KeyPath="CoolMenu.prg" Type="0"/>
+    <ROW Component="CoolMenu.rc" ComponentId="{CAFA7251-0894-401C-A167-964BEB3CCB81}" Directory_="Resource_4_DIR" Attributes="0" KeyPath="CoolMenu.rc" Type="0"/>
+    <ROW Component="CoolMenu.vxh" ComponentId="{5A2CB52B-2B7F-4E17-B26C-9D2C066C284B}" Directory_="CoolMenu_DIR" Attributes="0" KeyPath="CoolMenu.vxh" Type="0"/>
+    <ROW Component="DataGrid.prg" ComponentId="{171033BD-2574-4981-A147-F07DF6280215}" Directory_="Source_5_DIR" Attributes="0" KeyPath="DataGrid.prg" Type="0"/>
+    <ROW Component="DataGrid.rc" ComponentId="{6A20DE61-7001-4AE8-8077-B711566D0E8D}" Directory_="Resource_5_DIR" Attributes="0" KeyPath="DataGrid.rc" Type="0"/>
+    <ROW Component="DataGrid.vxh" ComponentId="{EDC37839-A2CC-4A0E-8D8D-C8A351A9CC71}" Directory_="DataGrid_DIR" Attributes="0" KeyPath="DataGrid.vxh" Type="0"/>
+    <ROW Component="Debugger.prg" ComponentId="{39F1BF22-6531-4389-9059-1D3F73253ABD}" Directory_="Source_6_DIR" Attributes="0" KeyPath="Debugger.prg" Type="0"/>
+    <ROW Component="Debugger.rc" ComponentId="{2F46DD4F-CF67-434D-BD26-C18E40C38FA7}" Directory_="Resource_6_DIR" Attributes="0" KeyPath="Debugger.rc" Type="0"/>
+    <ROW Component="Debugger.vxh" ComponentId="{C7AFE245-3E4A-4841-9925-7170D91E77D6}" Directory_="Debugger_DIR" Attributes="0" KeyPath="Debugger.vxh" Type="0"/>
+    <ROW Component="FirstForm.prg" ComponentId="{E6AD4561-9AF6-43E3-B01F-78028094A207}" Directory_="Source_15_DIR" Attributes="0" KeyPath="FirstForm.prg" Type="0"/>
+    <ROW Component="Form1.prg" ComponentId="{3D7EFCFD-716D-48AC-A7C3-6CD81AB6604E}" Directory_="Source_7_DIR" Attributes="0" KeyPath="Form1.prg_1" Type="0"/>
+    <ROW Component="Form1.prg_1" ComponentId="{4C60FA75-9739-447B-9B06-7E449B7F3626}" Directory_="Source_9_DIR" Attributes="0" KeyPath="Form1.prg_2" Type="0"/>
+    <ROW Component="Form1.prg_2" ComponentId="{48803248-CE06-4224-816B-E78C73B0126E}" Directory_="Source_10_DIR" Attributes="0" KeyPath="Form1.prg_3" Type="0"/>
+    <ROW Component="Form1.prg_3" ComponentId="{82BCE0BE-94A0-4559-9DED-0547419F6A11}" Directory_="Source_16_DIR" Attributes="0" KeyPath="Form1.prg_4" Type="0"/>
+    <ROW Component="Form1.prg_4" ComponentId="{F8502187-15EC-4066-9ECD-726EC6DF8C9C}" Directory_="Source_18_DIR" Attributes="0" KeyPath="Form1.prg_5" Type="0"/>
+    <ROW Component="Form1.prg_5" ComponentId="{F03494C8-4F53-4437-98E1-F83B125E26BD}" Directory_="Source_22_DIR" Attributes="0" KeyPath="Form1.prg_6" Type="0"/>
+    <ROW Component="Form1.prg_6" ComponentId="{9B728B0F-6809-439D-9915-E68BAF3D1306}" Directory_="Source_23_DIR" Attributes="0" KeyPath="Form1.prg_7" Type="0"/>
+    <ROW Component="Form1.prg_7" ComponentId="{2C4FC74A-0C87-4B82-B6A6-28DC76549423}" Directory_="Source_24_DIR" Attributes="0" KeyPath="Form1.prg_8" Type="0"/>
+    <ROW Component="Form1.prg_8" ComponentId="{D2E66262-AC57-4C82-B8A0-579F81F0D21A}" Directory_="Source_27_DIR" Attributes="0" KeyPath="Form1.prg_9" Type="0"/>
+    <ROW Component="Form1.prg_9" ComponentId="{8ADEC53D-D4F7-4916-B935-7C39F88D555D}" Directory_="Source_28_DIR" Attributes="0" KeyPath="Form1.prg_10" Type="0"/>
+    <ROW Component="FormInfo.prg" ComponentId="{1B491D3D-DA40-49AC-8B80-B90B393EF406}" Directory_="Source_20_DIR" Attributes="0" KeyPath="FormInfo.prg" Type="0"/>
+    <ROW Component="FormTypes.rc" ComponentId="{F8DD30BA-C982-4429-96E4-499EEFF4BE31}" Directory_="Resource_7_DIR" Attributes="0" KeyPath="FormTypes.rc" Type="0"/>
+    <ROW Component="FormTypes.vxh" ComponentId="{2C5A4844-3033-4354-970F-34654D5EF4E5}" Directory_="FormTypes_DIR" Attributes="0" KeyPath="FormTypes.vxh" Type="0"/>
+    <ROW Component="Form_Main.prg" ComponentId="{95BBF09B-E95B-4830-884A-EEA745ABF8C7}" Directory_="Source_14_DIR" Attributes="0" KeyPath="Form_Main.prg" Type="0"/>
+    <ROW Component="FreeImage.dll" ComponentId="{24620D8A-8DD5-4E8D-A1FC-64C0B8B3E2E8}" Directory_="Bin_DIR" Attributes="0" KeyPath="FreeImage.dll"/>
+    <ROW Component="GettingStarted.prg" ComponentId="{CE060CA4-68C2-48E3-B45B-C28A4403CDB5}" Directory_="Source_8_DIR" Attributes="0" KeyPath="GettingStarted.prg" Type="0"/>
+    <ROW Component="GettingStarted.rc" ComponentId="{EAAB869C-6911-4507-81F3-7C1ADD9CE912}" Directory_="Resource_8_DIR" Attributes="0" KeyPath="GettingStarted.rc" Type="0"/>
+    <ROW Component="GettingStarted.vxh" ComponentId="{EB0BDB96-02B3-4054-B39F-8A1032209EEC}" Directory_="Getting_Started_DIR" Attributes="0" KeyPath="GettingStarted.vxh" Type="0"/>
+    <ROW Component="Getting_Started_with_Visual_xHarbour.lnk" ComponentId="{BF3F9836-7A44-42FE-824B-DB860691CAC6}" Directory_="Links_DIR" Attributes="0" KeyPath="Getting_Started_with_Visual_xHarbour.lnk" Type="0"/>
+    <ROW Component="Getting_Started_with_Visual_xHarbour.pdf" ComponentId="{9084B647-4322-46BB-AB9A-E39E05BE741E}" Directory_="Doc_DIR" Attributes="0" KeyPath="Getting_Started_with_Visual_xHarbour.pdf" Type="0"/>
+    <ROW Component="Indexes1.rc" ComponentId="{309E6057-D881-4529-9732-4FDD59342084}" Directory_="Resource_9_DIR" Attributes="0" KeyPath="Indexes1.rc" Type="0"/>
+    <ROW Component="Indexes1.vxh" ComponentId="{DDE8B0FB-5BC5-40E4-9B25-CA41701BECF8}" Directory_="Indexes1_DIR" Attributes="0" KeyPath="Indexes1.vxh" Type="0"/>
+    <ROW Component="Indexes2.rc" ComponentId="{3C5A307C-D9C1-475A-8433-87C154EE6660}" Directory_="Resource_10_DIR" Attributes="0" KeyPath="Indexes2.rc" Type="0"/>
+    <ROW Component="Indexes2.vxh" ComponentId="{38E8191E-935B-4C00-8AE0-C432291F93FE}" Directory_="Indexes2_DIR" Attributes="0" KeyPath="Indexes2.vxh" Type="0"/>
+    <ROW Component="ListBox.prg" ComponentId="{5C602D36-E037-4757-B844-BD146529120E}" Directory_="Source_11_DIR" Attributes="0" KeyPath="ListBox.prg" Type="0"/>
+    <ROW Component="ListBox.rc" ComponentId="{4E2E2556-A3B1-4D44-93AE-51CD9CB7515A}" Directory_="Resource_11_DIR" Attributes="0" KeyPath="ListBox.rc" Type="0"/>
+    <ROW Component="ListBox.vxh" ComponentId="{12AA2EF5-2DDE-4A93-8F19-0DB53161A5C8}" Directory_="ListBox_DIR" Attributes="0" KeyPath="ListBox.vxh" Type="0"/>
+    <ROW Component="ListView.prg" ComponentId="{0C6032FD-DD4D-4608-B72C-B0BD715B46DB}" Directory_="Source_12_DIR" Attributes="0" KeyPath="ListView.prg" Type="0"/>
+    <ROW Component="ListView.rc" ComponentId="{D07E3DB8-A452-4DC7-8EAA-518A1FFE3C73}" Directory_="Resource_12_DIR" Attributes="0" KeyPath="ListView.rc" Type="0"/>
+    <ROW Component="ListView.vxh" ComponentId="{810CCB7A-2BF5-4A4B-8B64-55A677F8218C}" Directory_="ListView_DIR" Attributes="0" KeyPath="ListView.vxh" Type="0"/>
+    <ROW Component="MDIEnvironment.prg" ComponentId="{3D80FAAB-5CBA-4557-8F2B-C18029E32467}" Directory_="Source_13_DIR" Attributes="0" KeyPath="MDIEnvironment.prg" Type="0"/>
+    <ROW Component="MDIEnvironment.rc" ComponentId="{B620B5A0-F83C-496B-9CD9-5C536AA9E6B0}" Directory_="Resource_13_DIR" Attributes="0" KeyPath="MDIEnvironment.rc" Type="0"/>
+    <ROW Component="MDIEnvironment.vxh" ComponentId="{E1C44D55-0698-4A35-A3B1-F6602EABF0D2}" Directory_="MDI_Environment_DIR" Attributes="0" KeyPath="MDIEnvironment.vxh" Type="0"/>
+    <ROW Component="Millionaire.rc" ComponentId="{3371E2E7-AB4C-4D96-A2A5-B6454EB3B636}" Directory_="Resource_14_DIR" Attributes="0" KeyPath="Millionaire.rc" Type="0"/>
+    <ROW Component="Millionaire.vxh" ComponentId="{2EDE8899-0610-4864-8B40-D4C733C10879}" Directory_="Millionaire_DIR" Attributes="0" KeyPath="Millionaire.vxh" Type="0"/>
+    <ROW Component="MyAttachments.prg" ComponentId="{6EE7FDE5-C9D3-4994-890B-C7068387B0DE}" Directory_="Source_32_DIR" Attributes="0" KeyPath="MyAttachments.prg" Type="0"/>
+    <ROW Component="MyForm.prg" ComponentId="{08C02294-2813-4805-A54F-2136C2747A5A}" Directory_="Source_17_DIR" Attributes="0" KeyPath="MyForm.prg_10" Type="0"/>
+    <ROW Component="MyForm.prg_1" ComponentId="{ED358BCC-225A-4DEA-AFFC-74838E06EA95}" Directory_="Source_19_DIR" Attributes="0" KeyPath="MyForm.prg_11" Type="0"/>
+    <ROW Component="MyForm.prg_2" ComponentId="{962B6344-137E-4578-9F65-74C91EB46C5E}" Directory_="Source_21_DIR" Attributes="0" KeyPath="MyForm.prg_12" Type="0"/>
+    <ROW Component="MyForm.prg_3" ComponentId="{951E66D4-78A8-402B-9C8A-B71E09818434}" Directory_="Source_25_DIR" Attributes="0" KeyPath="MyForm.prg_13" Type="0"/>
+    <ROW Component="MyForm.prg_4" ComponentId="{5FBABEFB-EEBA-4BFB-9903-0CDEA770A592}" Directory_="Source_26_DIR" Attributes="0" KeyPath="MyForm.prg_14" Type="0"/>
+    <ROW Component="MyForm.prg_5" ComponentId="{F4A4A7BB-B53A-49D3-BBCF-61E21DABA290}" Directory_="Source_29_DIR" Attributes="0" KeyPath="MyForm.prg_15" Type="0"/>
+    <ROW Component="MyForm.prg_6" ComponentId="{C5CD25F8-769D-48F6-B146-2F5B8B85B7A3}" Directory_="Source_30_DIR" Attributes="0" KeyPath="MyForm.prg_16" Type="0"/>
+    <ROW Component="MyOffice.vxh" ComponentId="{7BE23D18-E501-4E3A-80AB-4FD7D2CFB392}" Directory_="MyOffice_DIR" Attributes="0" KeyPath="MyOffice.vxh" Type="0"/>
+    <ROW Component="NotifyIcon.rc" ComponentId="{6ADDBC9D-C44F-4450-8110-EA5391A380EE}" Directory_="Resource_17_DIR" Attributes="0" KeyPath="NotifyIcon.rc" Type="0"/>
+    <ROW Component="Organigram.vxh" ComponentId="{A705CDFD-FA0C-49BC-89FE-9E9B227D0052}" Directory_="Organigram_DIR" Attributes="0" KeyPath="Organigram.vxh" Type="0"/>
+    <ROW Component="PopUp.rc" ComponentId="{ACB2A114-812B-4B0C-812F-86A567232182}" Directory_="Resource_19_DIR" Attributes="0" KeyPath="PopUp.rc" Type="0"/>
+    <ROW Component="PopUp.vxh" ComponentId="{B5B777E6-96E8-45F5-A364-430C045C77B8}" Directory_="PopUp_DIR" Attributes="0" KeyPath="PopUp.vxh" Type="0"/>
+    <ROW Component="PrinterInfo.rc" ComponentId="{612C93D3-936A-469F-8F11-018B1B0E4075}" Directory_="Resource_20_DIR" Attributes="0" KeyPath="PrinterInfo.rc" Type="0"/>
+    <ROW Component="PrinterInfo.vxh" ComponentId="{5C4FE47E-96BE-45F5-88FD-82FEFF050A9F}" Directory_="PrinterInfo_DIR" Attributes="0" KeyPath="PrinterInfo.vxh" Type="0"/>
+    <ROW Component="Registry.rc" ComponentId="{331AD551-6286-4274-B62B-ECEA7E5DFFBA}" Directory_="Resource_21_DIR" Attributes="0" KeyPath="Registry.rc" Type="0"/>
+    <ROW Component="Registry.vxh" ComponentId="{40ADF593-F20B-4E78-8EF5-27CF1ACB68AB}" Directory_="Registry_DIR" Attributes="0" KeyPath="Registry.vxh" Type="0"/>
+    <ROW Component="Relation.rc" ComponentId="{5E820E1C-3F27-4962-A956-84A724944CFC}" Directory_="Resource_22_DIR" Attributes="0" KeyPath="Relation.rc" Type="0"/>
+    <ROW Component="Relation.vxh" ComponentId="{D349E4DA-783B-4AFD-B7B0-1F7454CD6B68}" Directory_="Relation_DIR" Attributes="0" KeyPath="Relation.vxh" Type="0"/>
+    <ROW Component="SDImenu.rc" ComponentId="{E8F31666-7028-437D-8380-BFB575E67B0D}" Directory_="Resource_24_DIR" Attributes="0" KeyPath="SDImenu.rc" Type="0"/>
+    <ROW Component="SDImenu.vxh" ComponentId="{78285ECC-51A8-4DB1-8C80-F53600FC202A}" Directory_="SDImenu_DIR" Attributes="0" KeyPath="SDImenu.vxh" Type="0"/>
+    <ROW Component="Scopes.rc" ComponentId="{711BD5DA-CF7E-4388-BFFB-D401635449E6}" Directory_="Resource_23_DIR" Attributes="0" KeyPath="Scopes.rc" Type="0"/>
+    <ROW Component="Scopes.vxh" ComponentId="{4664C305-4A63-4AE3-8DF1-FD9870EA3096}" Directory_="Scopes_DIR" Attributes="0" KeyPath="Scopes.vxh" Type="0"/>
+    <ROW Component="SimpleSlots.rc" ComponentId="{042F6895-BAB1-43C0-BF36-436A5C7157D8}" Directory_="Resource_25_DIR" Attributes="0" KeyPath="SimpleSlots.rc" Type="0"/>
+    <ROW Component="SimpleSlots.vxh" ComponentId="{2C276532-E768-4A95-B981-E63DD0B15E16}" Directory_="Simple_Slots_DIR" Attributes="0" KeyPath="SimpleSlots.vxh" Type="0"/>
+    <ROW Component="Splitter.rc" ComponentId="{0CEACF9E-3BCA-4CC5-A8C7-1F6C9F718B89}" Directory_="Resource_26_DIR" Attributes="0" KeyPath="Splitter.rc" Type="0"/>
+    <ROW Component="Splitter.vxh" ComponentId="{09CE25A7-2C5F-40F6-99FD-0650EBFE7E27}" Directory_="Splitter_DIR" Attributes="0" KeyPath="Splitter.vxh" Type="0"/>
+    <ROW Component="Timer.vxh" ComponentId="{7C4DE77E-887A-41E4-86D5-4BD8C6B95CDA}" Directory_="Timer_DIR" Attributes="0" KeyPath="Timer.vxh" Type="0"/>
+    <ROW Component="TinyBrowser.vxh" ComponentId="{60B782A0-EBA9-4A07-A16E-C94C8C7C1953}" Directory_="TinyBrowser_DIR" Attributes="0" KeyPath="TinyBrowser.vxh" Type="0"/>
+    <ROW Component="TypingTest.rc" ComponentId="{10AE5883-7C90-480B-B00F-8A2904182633}" Directory_="Resource_29_DIR" Attributes="0" KeyPath="TypingTest.rc" Type="0"/>
+    <ROW Component="TypingTest.vxh" ComponentId="{F1EC5ECD-D21C-4395-8ADA-8C6914214FC5}" Directory_="TypingTest_DIR" Attributes="0" KeyPath="TypingTest.vxh" Type="0"/>
+    <ROW Component="UNWISE.EXE" ComponentId="{BCA0BB92-F2FC-4656-8656-0BAA7644DECB}" Directory_="APPDIR" Attributes="0" KeyPath="UNWISE.EXE"/>
+    <ROW Component="VXH.exe" ComponentId="{23B9CD1F-D26E-4E2A-8E31-A92DE1277E81}" Directory_="Bin_DIR" Attributes="0" KeyPath="VXH.exe"/>
+    <ROW Component="VXH.lib" ComponentId="{B0B8AE63-9545-4838-BECC-E2EC19047852}" Directory_="Lib_DIR" Attributes="0" KeyPath="VXH.lib" Type="0"/>
+    <ROW Component="VXHDdll.dll" ComponentId="{3BF6EE5E-B955-4A46-AA5A-8D94F3546445}" Directory_="Bin_DIR" Attributes="0" KeyPath="VXHDdll.dll"/>
+    <ROW Component="VXHdll.dll" ComponentId="{77706562-58FB-4E30-B150-38D8E4763BC1}" Directory_="Bin_DIR" Attributes="0" KeyPath="VXHdll.dll"/>
+    <ROW Component="a1.ico" ComponentId="{454EC848-C0E3-4653-890B-A6FE94682AF9}" Directory_="NotifyIcon_DIR" Attributes="0" KeyPath="a1.ico" Type="0"/>
+    <ROW Component="app.ico" ComponentId="{827030FD-6852-444D-8726-C31F4CE65DF5}" Directory_="Resource_31_DIR" Attributes="0" KeyPath="app.ico" Type="0"/>
+    <ROW Component="background_answers.bmp" ComponentId="{5AB58092-69E8-4067-9F43-F118D6366D1C}" Directory_="Images_1_DIR" Attributes="0" KeyPath="background_answers.bmp" Type="0"/>
+    <ROW Component="books.ico" ComponentId="{98E13474-4784-4C6A-A8C6-817C638667EC}" Directory_="Resource_28_DIR" Attributes="0" KeyPath="books.ico" Type="0"/>
+    <ROW Component="calendar.ico" ComponentId="{9C552F55-803E-46B7-A99E-4DB939B971DD}" Directory_="Resource_27_DIR" Attributes="0" KeyPath="calendar.ico" Type="0"/>
+    <ROW Component="colors.ch" ComponentId="{C4E99997-E77F-401A-A60E-013B3753E778}" Directory_="w32_DIR" Attributes="0" KeyPath="colors.ch" Type="0"/>
+    <ROW Component="comp.ico" ComponentId="{3B2020E6-C988-4E21-BF67-0499D8B77A7F}" Directory_="Resource_18_DIR" Attributes="0" KeyPath="comp.ico" Type="0"/>
+    <ROW Component="cubes.ico" ComponentId="{FC66B6D6-5A4B-4DDC-BCC8-286A65763DB5}" Directory_="Resource_16_DIR" Attributes="0" KeyPath="cubes.ico" Type="0"/>
+    <ROW Component="dishes.DBF" ComponentId="{A9C51D29-BDE9-4F01-B8C6-BB4B9F3A43E2}" Directory_="Tables_DIR" Attributes="0" KeyPath="dishes.DBF" Type="0"/>
+    <ROW Component="employees.DBF" ComponentId="{6E878ACB-8468-4FCD-81EF-B3EF282B225D}" Directory_="Bin_4_DIR" Attributes="0" KeyPath="employees.DBF" Type="0"/>
+    <ROW Component="jpg" ComponentId="{AA82BA89-07D4-4941-8867-4A6822CC57D5}" Directory_="Images_DIR" Attributes="0" KeyPath="jpg" Type="0"/>
+    <ROW Component="mil_entertainment_1.txt" ComponentId="{6BE95421-C5C4-4E48-9779-190D7F390B5E}" Directory_="Questions_DIR" Attributes="0" KeyPath="mil_entertainment_1.txt" Type="0"/>
+    <ROW Component="mssql_blob.rc" ComponentId="{15437E74-1B21-4A88-B673-A3F68FD9B8E1}" Directory_="Resource_15_DIR" Attributes="0" KeyPath="mssql_blob.rc" Type="0"/>
+    <ROW Component="mssql_blob.vxh" ComponentId="{548ED8F8-7277-4374-B0D6-88A2E9D1179C}" Directory_="mssql_blob_DIR" Attributes="0" KeyPath="mssql_blob.vxh" Type="0"/>
+    <ROW Component="ord.DBF" ComponentId="{6E69E343-3570-4452-BC87-DCED9C9EA9DE}" Directory_="Bin_6_DIR" Attributes="0" KeyPath="ord.DBF" Type="0"/>
+    <ROW Component="people.CDX" ComponentId="{D9EF229B-B8A7-471C-8680-B93484FE607F}" Directory_="Bin_1_DIR" Attributes="0" KeyPath="people.CDX" Type="0"/>
+    <ROW Component="people.CDX_1" ComponentId="{13A85205-BC9F-4AF4-B95C-C0EE2E717585}" Directory_="Bin_5_DIR" Attributes="0" KeyPath="people.CDX_1" Type="0"/>
+    <ROW Component="people.dbf" ComponentId="{BAB28AC0-AC66-45EA-B553-D52F7F0A6AE7}" Directory_="Bin_2_DIR" Attributes="0" KeyPath="people.dbf_1" Type="0"/>
+    <ROW Component="test.DBF" ComponentId="{5CE5150F-BA48-43CF-97E9-DB7ECA373182}" Directory_="Visual_xHarbour_DIR" Attributes="0" KeyPath="test.DBF" Type="0"/>
+    <ROW Component="u1.jpg" ComponentId="{B6FBA030-46CA-41F0-BE45-244E5F6EDD6D}" Directory_="Bin_3_DIR" Attributes="0" KeyPath="u1.jpg" Type="0"/>
+    <ROW Component="vxh.ini" ComponentId="{4160C586-7773-4004-8293-445491B9FDA9}" Directory_="Bin_DIR" Attributes="0" KeyPath="vxh.ini" Type="0"/>
+    <ROW Component="xBrowser.rc" ComponentId="{10367548-5124-4506-A42E-272171ECBCD5}" Directory_="Resource_30_DIR" Attributes="0" KeyPath="xBrowser.rc" Type="0"/>
+    <ROW Component="xBrowser.vxh" ComponentId="{D92E5E19-7C19-4B3E-AC10-CC210E37A2C7}" Directory_="xBrowser_DIR" Attributes="0" KeyPath="xBrowser.vxh" Type="0"/>
+    <ROW Component="xDB.ini" ComponentId="{F6A117D5-F7F1-470F-A00D-8F8FB14B567E}" Directory_="Bin_7_DIR" Attributes="0" KeyPath="xDB.ini" Type="0"/>
+    <ROW Component="xDB.vxh" ComponentId="{5CFA97D1-DED8-481A-A7BB-69F78B8A7574}" Directory_="xDB_DIR" Attributes="0" KeyPath="xDB.vxh" Type="0"/>
+    <ROW Component="xMailer.rc" ComponentId="{B1ECF909-1FF0-4BB3-BE3D-21271815A139}" Directory_="Resource_32_DIR" Attributes="0" KeyPath="xMailer.rc" Type="0"/>
+    <ROW Component="xMailer.vxh" ComponentId="{E75DCF8E-12ED-43A6-8456-C78C395A5E57}" Directory_="xMailer_DIR" Attributes="0" KeyPath="xMailer.vxh" Type="0"/>
+    <ROW Component="xPad.rc" ComponentId="{7622335B-F8F8-411C-B98F-52F25857507A}" Directory_="Resource_33_DIR" Attributes="0" KeyPath="xPad.rc" Type="0"/>
+    <ROW Component="xPad.vxh" ComponentId="{AD3479A0-0E12-494A-98B0-A16A8CB95524}" Directory_="xPad_DIR" Attributes="0" KeyPath="xPad.vxh" Type="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="0" Level="1" Directory_="APPDIR" Attributes="0" Components="AI_ExePath COPYING FreeImage.dll VXH.exe vxh.ini VXHDdll.dll VXHdll.dll Getting_Started_with_Visual_xHarbour.pdf Getting_Started_with_Visual_xHarbour.lnk colors.ch VXH.lib AdvancedSlots.vxh jpg AdvancedSlots.rc AdvancedSlots.prg BitViewer.vxh BitViewer.rc BitViewer.prg Captions.vxh Captions.rc Captions.prg ComboBox.vxh ComboBox.rc ComboBox.prg CoolMenu.vxh CoolMenu.rc CoolMenu.prg DataGrid.vxh DataGrid.rc DataGrid.prg Debugger.vxh Debugger.rc Debugger.prg FormTypes.vxh FormTypes.rc Form1.prg GettingStarted.vxh GettingStarted.rc GettingStarted.prg people.CDX Indexes1.vxh Indexes1.rc Form1.prg_1 people.dbf Indexes2.vxh Indexes2.rc Form1.prg_2 ListBox.vxh ListBox.rc ListBox.prg ListView.vxh ListView.rc ListView.prg MDIEnvironment.vxh MDIEnvironment.rc MDIEnvironment.prg background_answers.bmp Millionaire.vxh mil_entertainment_1.txt Millionaire.rc Form_Main.prg u1.jpg mssql_blob.vxh mssql_blob.rc FirstForm.prg employees.DBF MyOffice.vxh cubes.ico Form1.prg_3 a1.ico NotifyIcon.rc MyForm.prg Organigram.vxh comp.ico Form1.prg_4 PopUp.vxh PopUp.rc MyForm.prg_1 PrinterInfo.vxh PrinterInfo.rc FormInfo.prg Registry.vxh Registry.rc MyForm.prg_2 people.CDX_1 Relation.vxh Relation.rc Form1.prg_5 ord.DBF Scopes.rc Scopes.vxh Form1.prg_6 SDImenu.rc SDImenu.vxh Form1.prg_7 dishes.DBF SimpleSlots.rc SimpleSlots.vxh MyForm.prg_3 Splitter.rc MyForm.prg_4 Splitter.vxh test.DBF calendar.ico Form1.prg_8 Timer.vxh books.ico Form1.prg_9 TinyBrowser.vxh TypingTest.rc MyForm.prg_5 TypingTest.vxh xBrowser.rc MyForm.prg_6 xBrowser.vxh xDB.ini app.ico ChildGrid.prg xDB.vxh xMailer.rc MyAttachments.prg xMailer.vxh xPad.rc ChildForm.prg xPad.vxh UNWISE.EXE"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="AdvancedSlots.XML" Component_="AdvancedSlots.rc" FileName="Advanc~1.XML|AdvancedSlots.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Resource\AdvancedSlots.XML" SelfReg="false" Sequence="40"/>
+    <ROW File="AdvancedSlots.prg" Component_="AdvancedSlots.prg" FileName="Advanc~1.prg|AdvancedSlots.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Source\AdvancedSlots.prg" SelfReg="false" Sequence="41"/>
+    <ROW File="AdvancedSlots.rc" Component_="AdvancedSlots.rc" FileName="Advanc~1.rc|AdvancedSlots.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Resource\AdvancedSlots.rc" SelfReg="false" Sequence="39"/>
+    <ROW File="AdvancedSlots.vxh" Component_="AdvancedSlots.vxh" FileName="Advanc~1.vxh|AdvancedSlots.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\AdvancedSlots.vxh" SelfReg="false" Sequence="32"/>
+    <ROW File="AdvancedSlots_Main.prg" Component_="AdvancedSlots.prg" FileName="Advanc~2.prg|AdvancedSlots_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Source\AdvancedSlots_Main.prg" SelfReg="false" Sequence="42"/>
+    <ROW File="AdvancedSlots_XFM.prg" Component_="AdvancedSlots.prg" FileName="Advanc~3.prg|AdvancedSlots_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Source\AdvancedSlots_XFM.prg" SelfReg="false" Sequence="43"/>
+    <ROW File="BitViewer.XML" Component_="BitViewer.rc" FileName="BitVie~1.XML|BitViewer.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Resource\BitViewer.XML" SelfReg="false" Sequence="48"/>
+    <ROW File="BitViewer.prg" Component_="BitViewer.prg" FileName="BitVie~1.prg|BitViewer.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Source\BitViewer.prg" SelfReg="false" Sequence="52"/>
+    <ROW File="BitViewer.rc" Component_="BitViewer.rc" FileName="BitVie~1.rc|BitViewer.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Resource\BitViewer.rc" SelfReg="false" Sequence="47"/>
+    <ROW File="BitViewer.vxh" Component_="BitViewer.vxh" FileName="BitVie~1.vxh|BitViewer.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\BitViewer.vxh" SelfReg="false" Sequence="46"/>
+    <ROW File="BitViewer_Main.prg" Component_="BitViewer.prg" FileName="BitVie~2.prg|BitViewer_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Source\BitViewer_Main.prg" SelfReg="false" Sequence="53"/>
+    <ROW File="BitViewer_XFM.prg" Component_="BitViewer.prg" FileName="BitVie~3.prg|BitViewer_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Source\BitViewer_XFM.prg" SelfReg="false" Sequence="54"/>
+    <ROW File="Captions.XML" Component_="Captions.rc" FileName="Captions.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Resource\Captions.XML" SelfReg="false" Sequence="59"/>
+    <ROW File="Captions.prg" Component_="Captions.prg" FileName="Captions.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Source\Captions.prg" SelfReg="false" Sequence="60"/>
+    <ROW File="Captions.rc" Component_="Captions.rc" FileName="Captions.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Resource\Captions.rc" SelfReg="false" Sequence="58"/>
+    <ROW File="Captions.vxh" Component_="Captions.vxh" FileName="Captions.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Captions.vxh" SelfReg="false" Sequence="57"/>
+    <ROW File="Captions_Main.prg" Component_="Captions.prg" FileName="Captio~1.prg|Captions_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Source\Captions_Main.prg" SelfReg="false" Sequence="61"/>
+    <ROW File="Captions_XFM.prg" Component_="Captions.prg" FileName="Captio~2.prg|Captions_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Source\Captions_XFM.prg" SelfReg="false" Sequence="62"/>
+    <ROW File="ChildForm.prg" Component_="ChildForm.prg" FileName="ChildF~1.prg|ChildForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\ChildForm.prg" SelfReg="false" Sequence="463"/>
+    <ROW File="ChildForm.xfm" Component_="ChildForm.prg" FileName="ChildF~1.xfm|ChildForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\ChildForm.xfm" SelfReg="false" Sequence="464"/>
+    <ROW File="ChildGrid.prg" Component_="ChildGrid.prg" FileName="ChildG~1.prg|ChildGrid.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\ChildGrid.prg" SelfReg="false" Sequence="404"/>
+    <ROW File="ChildGrid.xfm" Component_="ChildGrid.prg" FileName="ChildG~1.xfm|ChildGrid.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\ChildGrid.xfm" SelfReg="false" Sequence="405"/>
+    <ROW File="ComboBox.XML" Component_="ComboBox.rc" FileName="ComboBox.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Resource\ComboBox.XML" SelfReg="false" Sequence="67"/>
+    <ROW File="ComboBox.prg" Component_="ComboBox.prg" FileName="ComboBox.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Source\ComboBox.prg" SelfReg="false" Sequence="68"/>
+    <ROW File="ComboBox.rc" Component_="ComboBox.rc" FileName="ComboBox.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Resource\ComboBox.rc" SelfReg="false" Sequence="66"/>
+    <ROW File="ComboBox.vxh" Component_="ComboBox.vxh" FileName="ComboBox.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\ComboBox.vxh" SelfReg="false" Sequence="65"/>
+    <ROW File="ComboBox_Main.prg" Component_="ComboBox.prg" FileName="ComboB~1.prg|ComboBox_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Source\ComboBox_Main.prg" SelfReg="false" Sequence="69"/>
+    <ROW File="ComboBox_XFM.prg" Component_="ComboBox.prg" FileName="ComboB~2.prg|ComboBox_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Source\ComboBox_XFM.prg" SelfReg="false" Sequence="70"/>
+    <ROW File="CoolMenu.XML" Component_="CoolMenu.rc" FileName="CoolMenu.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Resource\CoolMenu.XML" SelfReg="false" Sequence="75"/>
+    <ROW File="CoolMenu.prg" Component_="CoolMenu.prg" FileName="CoolMenu.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Source\CoolMenu.prg" SelfReg="false" Sequence="76"/>
+    <ROW File="CoolMenu.rc" Component_="CoolMenu.rc" FileName="CoolMenu.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Resource\CoolMenu.rc" SelfReg="false" Sequence="74"/>
+    <ROW File="CoolMenu.vxh" Component_="CoolMenu.vxh" FileName="CoolMenu.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\CoolMenu.vxh" SelfReg="false" Sequence="73"/>
+    <ROW File="CoolMenu_Main.prg" Component_="CoolMenu.prg" FileName="CoolMe~1.prg|CoolMenu_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Source\CoolMenu_Main.prg" SelfReg="false" Sequence="77"/>
+    <ROW File="CoolMenu_XFM.prg" Component_="CoolMenu.prg" FileName="CoolMe~2.prg|CoolMenu_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Source\CoolMenu_XFM.prg" SelfReg="false" Sequence="78"/>
+    <ROW File="DataGrid.XML" Component_="DataGrid.rc" FileName="DataGrid.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Resource\DataGrid.XML" SelfReg="false" Sequence="83"/>
+    <ROW File="DataGrid.prg" Component_="DataGrid.prg" FileName="DataGrid.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Source\DataGrid.prg" SelfReg="false" Sequence="84"/>
+    <ROW File="DataGrid.rc" Component_="DataGrid.rc" FileName="DataGrid.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Resource\DataGrid.rc" SelfReg="false" Sequence="82"/>
+    <ROW File="DataGrid.vxh" Component_="DataGrid.vxh" FileName="DataGrid.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\DataGrid.vxh" SelfReg="false" Sequence="81"/>
+    <ROW File="DataGrid_Main.prg" Component_="DataGrid.prg" FileName="DataGr~1.prg|DataGrid_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Source\DataGrid_Main.prg" SelfReg="false" Sequence="85"/>
+    <ROW File="DataGrid_XFM.prg" Component_="DataGrid.prg" FileName="DataGr~2.prg|DataGrid_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Source\DataGrid_XFM.prg" SelfReg="false" Sequence="86"/>
+    <ROW File="Debugger.XML" Component_="Debugger.rc" FileName="Debugger.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Resource\Debugger.XML" SelfReg="false" Sequence="91"/>
+    <ROW File="Debugger.prg" Component_="Debugger.prg" FileName="Debugger.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Source\Debugger.prg" SelfReg="false" Sequence="92"/>
+    <ROW File="Debugger.rc" Component_="Debugger.rc" FileName="Debugger.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Resource\Debugger.rc" SelfReg="false" Sequence="90"/>
+    <ROW File="Debugger.vxh" Component_="Debugger.vxh" FileName="Debugger.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Debugger.vxh" SelfReg="false" Sequence="89"/>
+    <ROW File="Debugger_Main.prg" Component_="Debugger.prg" FileName="Debugg~1.prg|Debugger_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Source\Debugger_Main.prg" SelfReg="false" Sequence="93"/>
+    <ROW File="Debugger_XFM.prg" Component_="Debugger.prg" FileName="Debugg~2.prg|Debugger_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Source\Debugger_XFM.prg" SelfReg="false" Sequence="94"/>
+    <ROW File="FiVxh.ch" Component_="colors.ch" FileName="FiVxh.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\FiVxh.ch" SelfReg="false" Sequence="14"/>
+    <ROW File="FirstForm.prg" Component_="FirstForm.prg" FileName="FirstF~1.prg|FirstForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\FirstForm.prg" SelfReg="false" Sequence="193"/>
+    <ROW File="FirstForm.xfm" Component_="FirstForm.prg" FileName="FirstF~1.xfm|FirstForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\FirstForm.xfm" SelfReg="false" Sequence="194"/>
+    <ROW File="Form1.prg" Component_="BitViewer.prg" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Source\Form1.prg" SelfReg="false" Sequence="55"/>
+    <ROW File="Form1.prg_1" Component_="Form1.prg" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\Form1.prg" SelfReg="false" Sequence="100"/>
+    <ROW File="Form1.prg_10" Component_="Form1.prg_9" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Source\Form1.prg" SelfReg="false" Sequence="343"/>
+    <ROW File="Form1.prg_11" Component_="ChildGrid.prg" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\Form1.prg" SelfReg="false" Sequence="406"/>
+    <ROW File="Form1.prg_2" Component_="Form1.prg_1" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Source\Form1.prg" SelfReg="false" Sequence="122"/>
+    <ROW File="Form1.prg_3" Component_="Form1.prg_2" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Form1.prg" SelfReg="false" Sequence="131"/>
+    <ROW File="Form1.prg_4" Component_="Form1.prg_3" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\Form1.prg" SelfReg="false" Sequence="210"/>
+    <ROW File="Form1.prg_5" Component_="Form1.prg_4" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Source\Form1.prg" SelfReg="false" Sequence="243"/>
+    <ROW File="Form1.prg_6" Component_="Form1.prg_5" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Source\Form1.prg" SelfReg="false" Sequence="280"/>
+    <ROW File="Form1.prg_7" Component_="Form1.prg_6" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Source\Form1.prg" SelfReg="false" Sequence="291"/>
+    <ROW File="Form1.prg_8" Component_="Form1.prg_7" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\Form1.prg" SelfReg="false" Sequence="298"/>
+    <ROW File="Form1.prg_9" Component_="Form1.prg_8" FileName="Form1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Form1.prg" SelfReg="false" Sequence="330"/>
+    <ROW File="Form1.xfm" Component_="BitViewer.prg" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Source\Form1.xfm" SelfReg="false" Sequence="56"/>
+    <ROW File="Form1.xfm_1" Component_="Form1.prg" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\Form1.xfm" SelfReg="false" Sequence="101"/>
+    <ROW File="Form1.xfm_10" Component_="Form1.prg_9" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Source\Form1.xfm" SelfReg="false" Sequence="344"/>
+    <ROW File="Form1.xfm_11" Component_="ChildGrid.prg" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\Form1.xfm" SelfReg="false" Sequence="407"/>
+    <ROW File="Form1.xfm_2" Component_="Form1.prg_1" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Source\Form1.xfm" SelfReg="false" Sequence="123"/>
+    <ROW File="Form1.xfm_3" Component_="Form1.prg_2" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Form1.xfm" SelfReg="false" Sequence="132"/>
+    <ROW File="Form1.xfm_4" Component_="Form1.prg_3" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\Form1.xfm" SelfReg="false" Sequence="211"/>
+    <ROW File="Form1.xfm_5" Component_="Form1.prg_4" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Source\Form1.xfm" SelfReg="false" Sequence="244"/>
+    <ROW File="Form1.xfm_6" Component_="Form1.prg_5" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Source\Form1.xfm" SelfReg="false" Sequence="281"/>
+    <ROW File="Form1.xfm_7" Component_="Form1.prg_6" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Source\Form1.xfm" SelfReg="false" Sequence="292"/>
+    <ROW File="Form1.xfm_8" Component_="Form1.prg_7" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\Form1.xfm" SelfReg="false" Sequence="299"/>
+    <ROW File="Form1.xfm_9" Component_="Form1.prg_8" FileName="Form1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Form1.xfm" SelfReg="false" Sequence="331"/>
+    <ROW File="Form2.prg" Component_="Form1.prg_2" FileName="Form2.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Form2.prg" SelfReg="false" Sequence="133"/>
+    <ROW File="Form2.prg_1" Component_="Form1.prg_8" FileName="Form2.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Form2.prg" SelfReg="false" Sequence="332"/>
+    <ROW File="Form2.xfm" Component_="Form1.prg_2" FileName="Form2.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Form2.xfm" SelfReg="false" Sequence="134"/>
+    <ROW File="Form2.xfm_1" Component_="Form1.prg_8" FileName="Form2.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Form2.xfm" SelfReg="false" Sequence="333"/>
+    <ROW File="FormAddIndex.prg" Component_="ChildGrid.prg" FileName="FormAd~1.prg|FormAddIndex.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormAddIndex.prg" SelfReg="false" Sequence="408"/>
+    <ROW File="FormAddIndex.xfm" Component_="ChildGrid.prg" FileName="FormAd~1.xfm|FormAddIndex.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormAddIndex.xfm" SelfReg="false" Sequence="409"/>
+    <ROW File="FormConnect.prg" Component_="ChildGrid.prg" FileName="FormCo~1.prg|FormConnect.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormConnect.prg" SelfReg="false" Sequence="410"/>
+    <ROW File="FormConnect.xfm" Component_="ChildGrid.prg" FileName="FormCo~1.xfm|FormConnect.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormConnect.xfm" SelfReg="false" Sequence="411"/>
+    <ROW File="FormCreateTable.prg" Component_="ChildGrid.prg" FileName="FormCr~1.prg|FormCreateTable.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCreateTable.prg" SelfReg="false" Sequence="412"/>
+    <ROW File="FormCreateTable.xfm" Component_="ChildGrid.prg" FileName="FormCr~1.xfm|FormCreateTable.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCreateTable.xfm" SelfReg="false" Sequence="413"/>
+    <ROW File="FormCurrentView.prg" Component_="ChildGrid.prg" FileName="FormCu~1.prg|FormCurrentView.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCurrentView.prg" SelfReg="false" Sequence="414"/>
+    <ROW File="FormCurrentView.xfm" Component_="ChildGrid.prg" FileName="FormCu~1.xfm|FormCurrentView.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCurrentView.xfm" SelfReg="false" Sequence="415"/>
+    <ROW File="FormCursor.prg" Component_="ChildGrid.prg" FileName="FormCu~2.prg|FormCursor.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCursor.prg" SelfReg="false" Sequence="416"/>
+    <ROW File="FormCursor.xfm" Component_="ChildGrid.prg" FileName="FormCu~2.xfm|FormCursor.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormCursor.xfm" SelfReg="false" Sequence="417"/>
+    <ROW File="FormDBEval.prg" Component_="ChildGrid.prg" FileName="FormDB~1.prg|FormDBEval.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormDBEval.prg" SelfReg="false" Sequence="418"/>
+    <ROW File="FormDBEval.xfm" Component_="ChildGrid.prg" FileName="FormDB~1.xfm|FormDBEval.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormDBEval.xfm" SelfReg="false" Sequence="419"/>
+    <ROW File="FormDish.prg" Component_="Form1.prg_7" FileName="FormDish.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\FormDish.prg" SelfReg="false" Sequence="300"/>
+    <ROW File="FormDish.xfm" Component_="Form1.prg_7" FileName="FormDish.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\FormDish.xfm" SelfReg="false" Sequence="301"/>
+    <ROW File="FormEmployees.prg" Component_="Form1.prg_3" FileName="FormEm~1.prg|FormEmployees.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormEmployees.prg" SelfReg="false" Sequence="212"/>
+    <ROW File="FormEmployees.xfm" Component_="Form1.prg_3" FileName="FormEm~1.xfm|FormEmployees.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormEmployees.xfm" SelfReg="false" Sequence="213"/>
+    <ROW File="FormEngineIndexes.prg" Component_="ChildGrid.prg" FileName="FormEn~1.prg|FormEngineIndexes.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormEngineIndexes.prg" SelfReg="false" Sequence="420"/>
+    <ROW File="FormEngineIndexes.xfm" Component_="ChildGrid.prg" FileName="FormEn~1.xfm|FormEngineIndexes.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormEngineIndexes.xfm" SelfReg="false" Sequence="421"/>
+    <ROW File="FormEngineInfo.prg" Component_="ChildGrid.prg" FileName="FormEn~2.prg|FormEngineInfo.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormEngineInfo.prg" SelfReg="false" Sequence="422"/>
+    <ROW File="FormEngineInfo.xfm" Component_="ChildGrid.prg" FileName="FormEn~2.xfm|FormEngineInfo.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormEngineInfo.xfm" SelfReg="false" Sequence="423"/>
+    <ROW File="FormExchange.prg" Component_="ChildGrid.prg" FileName="FormEx~1.prg|FormExchange.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormExchange.prg" SelfReg="false" Sequence="424"/>
+    <ROW File="FormExchange.xfm" Component_="ChildGrid.prg" FileName="FormEx~1.xfm|FormExchange.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormExchange.xfm" SelfReg="false" Sequence="425"/>
+    <ROW File="FormImportInEngine.prg" Component_="ChildGrid.prg" FileName="FormIm~1.prg|FormImportInEngine.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormImportInEngine.prg" SelfReg="false" Sequence="426"/>
+    <ROW File="FormImportInEngine.xfm" Component_="ChildGrid.prg" FileName="FormIm~1.xfm|FormImportInEngine.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormImportInEngine.xfm" SelfReg="false" Sequence="427"/>
+    <ROW File="FormInfo.prg" Component_="FormInfo.prg" FileName="FormInfo.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Source\FormInfo.prg" SelfReg="false" Sequence="261"/>
+    <ROW File="FormInfo.xfm" Component_="FormInfo.prg" FileName="FormInfo.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Source\FormInfo.xfm" SelfReg="false" Sequence="262"/>
+    <ROW File="FormInstantQuery.prg" Component_="ChildGrid.prg" FileName="FormIn~1.prg|FormInstantQuery.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormInstantQuery.prg" SelfReg="false" Sequence="428"/>
+    <ROW File="FormInstantQuery.xfm" Component_="ChildGrid.prg" FileName="FormIn~1.xfm|FormInstantQuery.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormInstantQuery.xfm" SelfReg="false" Sequence="429"/>
+    <ROW File="FormMarker.prg" Component_="ChildGrid.prg" FileName="FormMa~1.prg|FormMarker.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormMarker.prg" SelfReg="false" Sequence="430"/>
+    <ROW File="FormMarker.xfm" Component_="ChildGrid.prg" FileName="FormMa~1.xfm|FormMarker.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormMarker.xfm" SelfReg="false" Sequence="431"/>
+    <ROW File="FormNotes.prg" Component_="Form1.prg_3" FileName="FormNo~1.prg|FormNotes.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormNotes.prg" SelfReg="false" Sequence="214"/>
+    <ROW File="FormNotes.xfm" Component_="Form1.prg_3" FileName="FormNo~1.xfm|FormNotes.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormNotes.xfm" SelfReg="false" Sequence="215"/>
+    <ROW File="FormPerson.prg" Component_="Form1.prg_3" FileName="FormPe~1.prg|FormPerson.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormPerson.prg" SelfReg="false" Sequence="216"/>
+    <ROW File="FormPerson.xfm" Component_="Form1.prg_3" FileName="FormPe~1.xfm|FormPerson.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormPerson.xfm" SelfReg="false" Sequence="217"/>
+    <ROW File="FormPrices.prg" Component_="Form1.prg_3" FileName="FormPr~1.prg|FormPrices.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormPrices.prg" SelfReg="false" Sequence="218"/>
+    <ROW File="FormPrices.xfm" Component_="Form1.prg_3" FileName="FormPr~1.xfm|FormPrices.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormPrices.xfm" SelfReg="false" Sequence="219"/>
+    <ROW File="FormProjects.prg" Component_="Form1.prg_3" FileName="FormPr~2.prg|FormProjects.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormProjects.prg" SelfReg="false" Sequence="220"/>
+    <ROW File="FormProjects.xfm" Component_="Form1.prg_3" FileName="FormPr~2.xfm|FormProjects.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormProjects.xfm" SelfReg="false" Sequence="221"/>
+    <ROW File="FormProperties.prg" Component_="ChildGrid.prg" FileName="FormPr~1.prg|FormProperties.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormProperties.prg" SelfReg="false" Sequence="432"/>
+    <ROW File="FormProperties.xfm" Component_="ChildGrid.prg" FileName="FormPr~1.xfm|FormProperties.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormProperties.xfm" SelfReg="false" Sequence="433"/>
+    <ROW File="FormSauce.prg" Component_="Form1.prg_7" FileName="FormSa~1.prg|FormSauce.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\FormSauce.prg" SelfReg="false" Sequence="302"/>
+    <ROW File="FormSauce.xfm" Component_="Form1.prg_7" FileName="FormSa~1.xfm|FormSauce.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\FormSauce.xfm" SelfReg="false" Sequence="303"/>
+    <ROW File="FormScheduler.prg" Component_="Form1.prg_3" FileName="FormSc~1.prg|FormScheduler.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormScheduler.prg" SelfReg="false" Sequence="222"/>
+    <ROW File="FormScheduler.xfm" Component_="Form1.prg_3" FileName="FormSc~1.xfm|FormScheduler.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\FormScheduler.xfm" SelfReg="false" Sequence="223"/>
+    <ROW File="FormSettings.prg" Component_="ChildGrid.prg" FileName="FormSe~1.prg|FormSettings.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormSettings.prg" SelfReg="false" Sequence="434"/>
+    <ROW File="FormSettings.xfm" Component_="ChildGrid.prg" FileName="FormSe~1.xfm|FormSettings.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormSettings.xfm" SelfReg="false" Sequence="435"/>
+    <ROW File="FormShowStructure.prg" Component_="ChildGrid.prg" FileName="FormSh~1.prg|FormShowStructure.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormShowStructure.prg" SelfReg="false" Sequence="436"/>
+    <ROW File="FormShowStructure.xfm" Component_="ChildGrid.prg" FileName="FormSh~1.xfm|FormShowStructure.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormShowStructure.xfm" SelfReg="false" Sequence="437"/>
+    <ROW File="FormStructure.prg" Component_="ChildGrid.prg" FileName="FormSt~1.prg|FormStructure.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormStructure.prg" SelfReg="false" Sequence="438"/>
+    <ROW File="FormStructure.xfm" Component_="ChildGrid.prg" FileName="FormSt~1.xfm|FormStructure.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormStructure.xfm" SelfReg="false" Sequence="439"/>
+    <ROW File="FormTypes.XML" Component_="FormTypes.rc" FileName="FormTy~1.XML|FormTypes.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Resource\FormTypes.XML" SelfReg="false" Sequence="99"/>
+    <ROW File="FormTypes.prg" Component_="Form1.prg" FileName="FormTy~1.prg|FormTypes.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\FormTypes.prg" SelfReg="false" Sequence="102"/>
+    <ROW File="FormTypes.rc" Component_="FormTypes.rc" FileName="FormTy~1.rc|FormTypes.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Resource\FormTypes.rc" SelfReg="false" Sequence="98"/>
+    <ROW File="FormTypes.vxh" Component_="FormTypes.vxh" FileName="FormTy~1.vxh|FormTypes.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\FormTypes.vxh" SelfReg="false" Sequence="97"/>
+    <ROW File="FormTypes_Main.prg" Component_="Form1.prg" FileName="FormTy~2.prg|FormTypes_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\FormTypes_Main.prg" SelfReg="false" Sequence="103"/>
+    <ROW File="FormTypes_XFM.prg" Component_="Form1.prg" FileName="FormTy~3.prg|FormTypes_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\FormTypes_XFM.prg" SelfReg="false" Sequence="104"/>
+    <ROW File="FormUpdateRecord.prg" Component_="ChildGrid.prg" FileName="FormUp~1.prg|FormUpdateRecord.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormUpdateRecord.prg" SelfReg="false" Sequence="440"/>
+    <ROW File="FormUpdateRecord.xfm" Component_="ChildGrid.prg" FileName="FormUp~1.xfm|FormUpdateRecord.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormUpdateRecord.xfm" SelfReg="false" Sequence="441"/>
+    <ROW File="FormView.prg" Component_="ChildGrid.prg" FileName="FormView.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormView.prg" SelfReg="false" Sequence="442"/>
+    <ROW File="FormView.xfm" Component_="ChildGrid.prg" FileName="FormView.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\FormView.xfm" SelfReg="false" Sequence="443"/>
+    <ROW File="Form_Main.prg" Component_="Form_Main.prg" FileName="Form_M~1.prg|Form_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Source\Form_Main.prg" SelfReg="false" Sequence="181"/>
+    <ROW File="Form_Main.xfm" Component_="Form_Main.prg" FileName="Form_M~1.xfm|Form_Main.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Source\Form_Main.xfm" SelfReg="false" Sequence="182"/>
+    <ROW File="FreeImage.dll" Component_="FreeImage.dll" FileName="FreeIm~1.dll|FreeImage.dll" Attributes="0" SourcePath="xHB-Files\Bin\FreeImage.dll" SelfReg="false" Sequence="2"/>
+    <ROW File="FreeImage.h" Component_="colors.ch" FileName="FreeIm~1.h|FreeImage.h" Attributes="0" SourcePath="xHB-Files\Include\w32\FreeImage.h" SelfReg="false" Sequence="15"/>
+    <ROW File="GettingStarted.XML" Component_="GettingStarted.rc" FileName="Gettin~1.XML|GettingStarted.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Resource\GettingStarted.XML" SelfReg="false" Sequence="111"/>
+    <ROW File="GettingStarted.prg" Component_="GettingStarted.prg" FileName="Gettin~1.prg|GettingStarted.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Source\GettingStarted.prg" SelfReg="false" Sequence="112"/>
+    <ROW File="GettingStarted.rc" Component_="GettingStarted.rc" FileName="Gettin~1.rc|GettingStarted.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Resource\GettingStarted.rc" SelfReg="false" Sequence="110"/>
+    <ROW File="GettingStarted.vxh" Component_="GettingStarted.vxh" FileName="Gettin~1.vxh|GettingStarted.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\GettingStarted.vxh" SelfReg="false" Sequence="109"/>
+    <ROW File="GettingStarted_Main.prg" Component_="GettingStarted.prg" FileName="Gettin~2.prg|GettingStarted_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Source\GettingStarted_Main.prg" SelfReg="false" Sequence="113"/>
+    <ROW File="GettingStarted_XFM.prg" Component_="GettingStarted.prg" FileName="Gettin~3.prg|GettingStarted_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Source\GettingStarted_XFM.prg" SelfReg="false" Sequence="114"/>
+    <ROW File="Getting_Started_with_Visual_xHarbour.lnk" Component_="Getting_Started_with_Visual_xHarbour.lnk" FileName="Gettin~1.lnk|Getting Started with Visual xHarbour.lnk" Attributes="0" SourcePath="xHB-Files\Doc\Links\Getting Started with Visual xHarbour.lnk" SelfReg="false" Sequence="9"/>
+    <ROW File="Getting_Started_with_Visual_xHarbour.pdf" Component_="Getting_Started_with_Visual_xHarbour.pdf" FileName="Gettin~1.pdf|Getting Started with Visual xHarbour.pdf" Attributes="0" SourcePath="xHB-Files\Doc\Getting Started with Visual xHarbour.pdf" SelfReg="false" Sequence="8"/>
+    <ROW File="Indexes1.XML" Component_="Indexes1.rc" FileName="Indexes1.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Resource\Indexes1.XML" SelfReg="false" Sequence="121"/>
+    <ROW File="Indexes1.prg" Component_="Form1.prg_1" FileName="Indexes1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Source\Indexes1.prg" SelfReg="false" Sequence="124"/>
+    <ROW File="Indexes1.rc" Component_="Indexes1.rc" FileName="Indexes1.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Resource\Indexes1.rc" SelfReg="false" Sequence="120"/>
+    <ROW File="Indexes1.vxh" Component_="Indexes1.vxh" FileName="Indexes1.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Indexes1.vxh" SelfReg="false" Sequence="119"/>
+    <ROW File="Indexes1_Main.prg" Component_="Form1.prg_1" FileName="Indexe~1.prg|Indexes1_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Source\Indexes1_Main.prg" SelfReg="false" Sequence="125"/>
+    <ROW File="Indexes1_XFM.prg" Component_="Form1.prg_1" FileName="Indexe~2.prg|Indexes1_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Source\Indexes1_XFM.prg" SelfReg="false" Sequence="126"/>
+    <ROW File="Indexes2.XML" Component_="Indexes2.rc" FileName="Indexes2.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Resource\Indexes2.XML" SelfReg="false" Sequence="130"/>
+    <ROW File="Indexes2.prg" Component_="Form1.prg_2" FileName="Indexes2.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Indexes2.prg" SelfReg="false" Sequence="135"/>
+    <ROW File="Indexes2.rc" Component_="Indexes2.rc" FileName="Indexes2.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Resource\Indexes2.rc" SelfReg="false" Sequence="129"/>
+    <ROW File="Indexes2.vxh" Component_="Indexes2.vxh" FileName="Indexes2.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Indexes2.vxh" SelfReg="false" Sequence="128"/>
+    <ROW File="Indexes2_Main.prg" Component_="Form1.prg_2" FileName="Indexe~1.prg|Indexes2_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Indexes2_Main.prg" SelfReg="false" Sequence="136"/>
+    <ROW File="Indexes2_XFM.prg" Component_="Form1.prg_2" FileName="Indexe~2.prg|Indexes2_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Source\Indexes2_XFM.prg" SelfReg="false" Sequence="137"/>
+    <ROW File="ListBox.XML" Component_="ListBox.rc" FileName="ListBox.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Resource\ListBox.XML" SelfReg="false" Sequence="140"/>
+    <ROW File="ListBox.prg" Component_="ListBox.prg" FileName="ListBox.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Source\ListBox.prg" SelfReg="false" Sequence="141"/>
+    <ROW File="ListBox.rc" Component_="ListBox.rc" FileName="ListBox.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Resource\ListBox.rc" SelfReg="false" Sequence="139"/>
+    <ROW File="ListBox.vxh" Component_="ListBox.vxh" FileName="ListBox.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\ListBox.vxh" SelfReg="false" Sequence="138"/>
+    <ROW File="ListBox_Main.prg" Component_="ListBox.prg" FileName="ListBo~1.prg|ListBox_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Source\ListBox_Main.prg" SelfReg="false" Sequence="142"/>
+    <ROW File="ListBox_XFM.prg" Component_="ListBox.prg" FileName="ListBo~2.prg|ListBox_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Source\ListBox_XFM.prg" SelfReg="false" Sequence="143"/>
+    <ROW File="ListView.XML" Component_="ListView.rc" FileName="ListView.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Resource\ListView.XML" SelfReg="false" Sequence="148"/>
+    <ROW File="ListView.prg" Component_="ListView.prg" FileName="ListView.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Source\ListView.prg" SelfReg="false" Sequence="149"/>
+    <ROW File="ListView.rc" Component_="ListView.rc" FileName="ListView.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Resource\ListView.rc" SelfReg="false" Sequence="147"/>
+    <ROW File="ListView.vxh" Component_="ListView.vxh" FileName="ListView.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\ListView.vxh" SelfReg="false" Sequence="146"/>
+    <ROW File="ListView_Main.prg" Component_="ListView.prg" FileName="ListVi~1.prg|ListView_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Source\ListView_Main.prg" SelfReg="false" Sequence="150"/>
+    <ROW File="ListView_XFM.prg" Component_="ListView.prg" FileName="ListVi~2.prg|ListView_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Source\ListView_XFM.prg" SelfReg="false" Sequence="151"/>
+    <ROW File="MDIEnvironment.XML" Component_="MDIEnvironment.rc" FileName="MDIEnv~1.XML|MDIEnvironment.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Resource\MDIEnvironment.XML" SelfReg="false" Sequence="156"/>
+    <ROW File="MDIEnvironment.prg" Component_="MDIEnvironment.prg" FileName="MDIEnv~1.prg|MDIEnvironment.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MDIEnvironment.prg" SelfReg="false" Sequence="157"/>
+    <ROW File="MDIEnvironment.rc" Component_="MDIEnvironment.rc" FileName="MDIEnv~1.rc|MDIEnvironment.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Resource\MDIEnvironment.rc" SelfReg="false" Sequence="155"/>
+    <ROW File="MDIEnvironment.vxh" Component_="MDIEnvironment.vxh" FileName="MDIEnv~1.vxh|MDIEnvironment.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\MDIEnvironment.vxh" SelfReg="false" Sequence="154"/>
+    <ROW File="MDIEnvironment_Main.prg" Component_="MDIEnvironment.prg" FileName="MDIEnv~2.prg|MDIEnvironment_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MDIEnvironment_Main.prg" SelfReg="false" Sequence="158"/>
+    <ROW File="MDIEnvironment_XFM.prg" Component_="MDIEnvironment.prg" FileName="MDIEnv~3.prg|MDIEnvironment_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MDIEnvironment_XFM.prg" SelfReg="false" Sequence="159"/>
+    <ROW File="MDIForm.prg" Component_="ChildForm.prg" FileName="MDIForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\MDIForm.prg" SelfReg="false" Sequence="465"/>
+    <ROW File="MDIForm.xfm" Component_="ChildForm.prg" FileName="MDIForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\MDIForm.xfm" SelfReg="false" Sequence="466"/>
+    <ROW File="Millionaire.XML" Component_="Millionaire.rc" FileName="Millio~1.XML|Millionaire.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Resource\Millionaire.XML" SelfReg="false" Sequence="180"/>
+    <ROW File="Millionaire.prg" Component_="Form_Main.prg" FileName="Millio~1.prg|Millionaire.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Source\Millionaire.prg" SelfReg="false" Sequence="183"/>
+    <ROW File="Millionaire.rc" Component_="Millionaire.rc" FileName="Millio~1.rc|Millionaire.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Resource\Millionaire.rc" SelfReg="false" Sequence="179"/>
+    <ROW File="Millionaire.vxh" Component_="Millionaire.vxh" FileName="Millio~1.vxh|Millionaire.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Millionaire.vxh" SelfReg="false" Sequence="175"/>
+    <ROW File="Millionaire_Main.prg" Component_="Form_Main.prg" FileName="Millio~2.prg|Millionaire_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Source\Millionaire_Main.prg" SelfReg="false" Sequence="184"/>
+    <ROW File="Millionaire_XFM.prg" Component_="Form_Main.prg" FileName="Millio~3.prg|Millionaire_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Source\Millionaire_XFM.prg" SelfReg="false" Sequence="185"/>
+    <ROW File="MyAttachments.prg" Component_="MyAttachments.prg" FileName="MyAtta~1.prg|MyAttachments.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MyAttachments.prg" SelfReg="false" Sequence="450"/>
+    <ROW File="MyAttachments.xfm" Component_="MyAttachments.prg" FileName="MyAtta~1.xfm|MyAttachments.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MyAttachments.xfm" SelfReg="false" Sequence="451"/>
+    <ROW File="MyForm.prg" Component_="AdvancedSlots.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Source\MyForm.prg" SelfReg="false" Sequence="44"/>
+    <ROW File="MyForm.prg_1" Component_="Captions.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Source\MyForm.prg" SelfReg="false" Sequence="63"/>
+    <ROW File="MyForm.prg_10" Component_="MyForm.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Source\MyForm.prg" SelfReg="false" Sequence="231"/>
+    <ROW File="MyForm.prg_11" Component_="MyForm.prg_1" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\MyForm.prg" SelfReg="false" Sequence="251"/>
+    <ROW File="MyForm.prg_12" Component_="MyForm.prg_2" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Source\MyForm.prg" SelfReg="false" Sequence="268"/>
+    <ROW File="MyForm.prg_13" Component_="MyForm.prg_3" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Source\MyForm.prg" SelfReg="false" Sequence="312"/>
+    <ROW File="MyForm.prg_14" Component_="MyForm.prg_4" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Source\MyForm.prg" SelfReg="false" Sequence="319"/>
+    <ROW File="MyForm.prg_15" Component_="MyForm.prg_5" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Source\MyForm.prg" SelfReg="false" Sequence="351"/>
+    <ROW File="MyForm.prg_16" Component_="MyForm.prg_6" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Source\MyForm.prg" SelfReg="false" Sequence="359"/>
+    <ROW File="MyForm.prg_17" Component_="MyAttachments.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MyForm.prg" SelfReg="false" Sequence="452"/>
+    <ROW File="MyForm.prg_2" Component_="ComboBox.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Source\MyForm.prg" SelfReg="false" Sequence="71"/>
+    <ROW File="MyForm.prg_3" Component_="CoolMenu.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Source\MyForm.prg" SelfReg="false" Sequence="79"/>
+    <ROW File="MyForm.prg_4" Component_="DataGrid.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Source\MyForm.prg" SelfReg="false" Sequence="87"/>
+    <ROW File="MyForm.prg_5" Component_="Debugger.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Source\MyForm.prg" SelfReg="false" Sequence="95"/>
+    <ROW File="MyForm.prg_6" Component_="GettingStarted.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Source\MyForm.prg" SelfReg="false" Sequence="115"/>
+    <ROW File="MyForm.prg_7" Component_="ListBox.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Source\MyForm.prg" SelfReg="false" Sequence="144"/>
+    <ROW File="MyForm.prg_8" Component_="ListView.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Source\MyForm.prg" SelfReg="false" Sequence="152"/>
+    <ROW File="MyForm.prg_9" Component_="MDIEnvironment.prg" FileName="MyForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyForm.prg" SelfReg="false" Sequence="160"/>
+    <ROW File="MyForm.xfm" Component_="AdvancedSlots.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Source\MyForm.xfm" SelfReg="false" Sequence="45"/>
+    <ROW File="MyForm.xfm_1" Component_="Captions.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Captions\Source\MyForm.xfm" SelfReg="false" Sequence="64"/>
+    <ROW File="MyForm.xfm_10" Component_="MyForm.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Source\MyForm.xfm" SelfReg="false" Sequence="232"/>
+    <ROW File="MyForm.xfm_11" Component_="MyForm.prg_1" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\MyForm.xfm" SelfReg="false" Sequence="252"/>
+    <ROW File="MyForm.xfm_12" Component_="MyForm.prg_2" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Source\MyForm.xfm" SelfReg="false" Sequence="269"/>
+    <ROW File="MyForm.xfm_13" Component_="MyForm.prg_3" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Source\MyForm.xfm" SelfReg="false" Sequence="313"/>
+    <ROW File="MyForm.xfm_14" Component_="MyForm.prg_4" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Source\MyForm.xfm" SelfReg="false" Sequence="320"/>
+    <ROW File="MyForm.xfm_15" Component_="MyForm.prg_5" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Source\MyForm.xfm" SelfReg="false" Sequence="352"/>
+    <ROW File="MyForm.xfm_16" Component_="MyForm.prg_6" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Source\MyForm.xfm" SelfReg="false" Sequence="360"/>
+    <ROW File="MyForm.xfm_17" Component_="MyAttachments.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MyForm.xfm" SelfReg="false" Sequence="453"/>
+    <ROW File="MyForm.xfm_2" Component_="ComboBox.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ComboBox\Source\MyForm.xfm" SelfReg="false" Sequence="72"/>
+    <ROW File="MyForm.xfm_3" Component_="CoolMenu.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\CoolMenu\Source\MyForm.xfm" SelfReg="false" Sequence="80"/>
+    <ROW File="MyForm.xfm_4" Component_="DataGrid.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\DataGrid\Source\MyForm.xfm" SelfReg="false" Sequence="88"/>
+    <ROW File="MyForm.xfm_5" Component_="Debugger.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Debugger\Source\MyForm.xfm" SelfReg="false" Sequence="96"/>
+    <ROW File="MyForm.xfm_6" Component_="GettingStarted.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Getting Started\Source\MyForm.xfm" SelfReg="false" Sequence="116"/>
+    <ROW File="MyForm.xfm_7" Component_="ListBox.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListBox\Source\MyForm.xfm" SelfReg="false" Sequence="145"/>
+    <ROW File="MyForm.xfm_8" Component_="ListView.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\ListView\Source\MyForm.xfm" SelfReg="false" Sequence="153"/>
+    <ROW File="MyForm.xfm_9" Component_="MDIEnvironment.prg" FileName="MyForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyForm.xfm" SelfReg="false" Sequence="161"/>
+    <ROW File="MyMDI1.prg" Component_="MDIEnvironment.prg" FileName="MyMDI1.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyMDI1.prg" SelfReg="false" Sequence="162"/>
+    <ROW File="MyMDI1.xfm" Component_="MDIEnvironment.prg" FileName="MyMDI1.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyMDI1.xfm" SelfReg="false" Sequence="163"/>
+    <ROW File="MyMDI2.prg" Component_="MDIEnvironment.prg" FileName="MyMDI2.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyMDI2.prg" SelfReg="false" Sequence="164"/>
+    <ROW File="MyMDI2.xfm" Component_="MDIEnvironment.prg" FileName="MyMDI2.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MDI Environment\Source\MyMDI2.xfm" SelfReg="false" Sequence="165"/>
+    <ROW File="MyModal.prg" Component_="Form1.prg" FileName="MyModal.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\MyModal.prg" SelfReg="false" Sequence="105"/>
+    <ROW File="MyModal.xfm" Component_="Form1.prg" FileName="MyModal.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\MyModal.xfm" SelfReg="false" Sequence="106"/>
+    <ROW File="MyModeless.prg" Component_="Form1.prg" FileName="MyMode~1.prg|MyModeless.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\MyModeless.prg" SelfReg="false" Sequence="107"/>
+    <ROW File="MyModeless.xfm" Component_="Form1.prg" FileName="MyMode~1.xfm|MyModeless.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\FormTypes\Source\MyModeless.xfm" SelfReg="false" Sequence="108"/>
+    <ROW File="MyOffice.XML" Component_="cubes.ico" FileName="MyOffice.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\MyOffice.XML" SelfReg="false" Sequence="208"/>
+    <ROW File="MyOffice.prg" Component_="Form1.prg_3" FileName="MyOffice.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\MyOffice.prg" SelfReg="false" Sequence="224"/>
+    <ROW File="MyOffice.rc" Component_="cubes.ico" FileName="MyOffice.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\MyOffice.rc" SelfReg="false" Sequence="207"/>
+    <ROW File="MyOffice.vxh" Component_="MyOffice.vxh" FileName="MyOffice.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\MyOffice.vxh" SelfReg="false" Sequence="203"/>
+    <ROW File="MyOffice_Main.prg" Component_="Form1.prg_3" FileName="MyOffi~1.prg|MyOffice_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\MyOffice_Main.prg" SelfReg="false" Sequence="225"/>
+    <ROW File="MyOffice_XFM.prg" Component_="Form1.prg_3" FileName="MyOffi~2.prg|MyOffice_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Source\MyOffice_XFM.prg" SelfReg="false" Sequence="226"/>
+    <ROW File="MyPopUpForm.prg" Component_="MyForm.prg_1" FileName="MyPopU~1.prg|MyPopUpForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\MyPopUpForm.prg" SelfReg="false" Sequence="253"/>
+    <ROW File="MyPopUpForm.xfm" Component_="MyForm.prg_1" FileName="MyPopU~1.xfm|MyPopUpForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\MyPopUpForm.xfm" SelfReg="false" Sequence="254"/>
+    <ROW File="MySettings.prg" Component_="MyAttachments.prg" FileName="MySett~1.prg|MySettings.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MySettings.prg" SelfReg="false" Sequence="454"/>
+    <ROW File="MySettings.xfm" Component_="MyAttachments.prg" FileName="MySett~1.xfm|MySettings.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\MySettings.xfm" SelfReg="false" Sequence="455"/>
+    <ROW File="NotifyIcon.XML" Component_="NotifyIcon.rc" FileName="Notify~1.XML|NotifyIcon.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Resource\NotifyIcon.XML" SelfReg="false" Sequence="230"/>
+    <ROW File="NotifyIcon.prg" Component_="MyForm.prg" FileName="Notify~1.prg|NotifyIcon.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Source\NotifyIcon.prg" SelfReg="false" Sequence="233"/>
+    <ROW File="NotifyIcon.rc" Component_="NotifyIcon.rc" FileName="Notify~1.rc|NotifyIcon.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Resource\NotifyIcon.rc" SelfReg="false" Sequence="229"/>
+    <ROW File="NotifyIcon.vxh" Component_="a1.ico" FileName="Notify~1.vxh|NotifyIcon.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\NotifyIcon.vxh" SelfReg="false" Sequence="228"/>
+    <ROW File="NotifyIcon_Main.prg" Component_="MyForm.prg" FileName="Notify~2.prg|NotifyIcon_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Source\NotifyIcon_Main.prg" SelfReg="false" Sequence="234"/>
+    <ROW File="NotifyIcon_XFM.prg" Component_="MyForm.prg" FileName="Notify~3.prg|NotifyIcon_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\Source\NotifyIcon_XFM.prg" SelfReg="false" Sequence="235"/>
+    <ROW File="OpenFolder.vbs" Component_="COPYING" FileName="OpenFo~1.vbs|OpenFolder.vbs" Attributes="0" SourcePath="xHB-Files\OpenFolder.vbs" SelfReg="false" Sequence="1"/>
+    <ROW File="Organigram.XML" Component_="comp.ico" FileName="Organi~1.XML|Organigram.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\Organigram.XML" SelfReg="false" Sequence="240"/>
+    <ROW File="Organigram.prg" Component_="Form1.prg_4" FileName="Organi~1.prg|Organigram.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Source\Organigram.prg" SelfReg="false" Sequence="245"/>
+    <ROW File="Organigram.rc" Component_="comp.ico" FileName="Organi~1.rc|Organigram.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\Organigram.rc" SelfReg="false" Sequence="239"/>
+    <ROW File="Organigram.vxh" Component_="Organigram.vxh" FileName="Organi~1.vxh|Organigram.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Organigram.vxh" SelfReg="false" Sequence="236"/>
+    <ROW File="Organigram_Main.prg" Component_="Form1.prg_4" FileName="Organi~2.prg|Organigram_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Source\Organigram_Main.prg" SelfReg="false" Sequence="246"/>
+    <ROW File="Organigram_XFM.prg" Component_="Form1.prg_4" FileName="Organi~3.prg|Organigram_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Source\Organigram_XFM.prg" SelfReg="false" Sequence="247"/>
+    <ROW File="PopUp.XML" Component_="PopUp.rc" FileName="PopUp.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Resource\PopUp.XML" SelfReg="false" Sequence="250"/>
+    <ROW File="PopUp.prg" Component_="MyForm.prg_1" FileName="PopUp.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\PopUp.prg" SelfReg="false" Sequence="255"/>
+    <ROW File="PopUp.rc" Component_="PopUp.rc" FileName="PopUp.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Resource\PopUp.rc" SelfReg="false" Sequence="249"/>
+    <ROW File="PopUp.vxh" Component_="PopUp.vxh" FileName="PopUp.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\PopUp.vxh" SelfReg="false" Sequence="248"/>
+    <ROW File="PopUp_Main.prg" Component_="MyForm.prg_1" FileName="PopUp_~1.prg|PopUp_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\PopUp_Main.prg" SelfReg="false" Sequence="256"/>
+    <ROW File="PopUp_XFM.prg" Component_="MyForm.prg_1" FileName="PopUp_~2.prg|PopUp_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PopUp\Source\PopUp_XFM.prg" SelfReg="false" Sequence="257"/>
+    <ROW File="PrinterInfo.XML" Component_="PrinterInfo.rc" FileName="Printe~1.XML|PrinterInfo.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Resource\PrinterInfo.XML" SelfReg="false" Sequence="260"/>
+    <ROW File="PrinterInfo.rc" Component_="PrinterInfo.rc" FileName="Printe~1.rc|PrinterInfo.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Resource\PrinterInfo.rc" SelfReg="false" Sequence="259"/>
+    <ROW File="PrinterInfo.vxh" Component_="PrinterInfo.vxh" FileName="Printe~1.vxh|PrinterInfo.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\PrinterInfo.vxh" SelfReg="false" Sequence="258"/>
+    <ROW File="PrinterInfo_Main.prg" Component_="FormInfo.prg" FileName="Printe~1.prg|PrinterInfo_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Source\PrinterInfo_Main.prg" SelfReg="false" Sequence="263"/>
+    <ROW File="PrinterInfo_XFM.prg" Component_="FormInfo.prg" FileName="Printe~2.prg|PrinterInfo_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\PrinterInfo\Source\PrinterInfo_XFM.prg" SelfReg="false" Sequence="264"/>
+    <ROW File="Registry.XML" Component_="Registry.rc" FileName="Registry.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Resource\Registry.XML" SelfReg="false" Sequence="267"/>
+    <ROW File="Registry.prg" Component_="MyForm.prg_2" FileName="Registry.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Source\Registry.prg" SelfReg="false" Sequence="270"/>
+    <ROW File="Registry.rc" Component_="Registry.rc" FileName="Registry.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Resource\Registry.rc" SelfReg="false" Sequence="266"/>
+    <ROW File="Registry.vxh" Component_="Registry.vxh" FileName="Registry.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Registry.vxh" SelfReg="false" Sequence="265"/>
+    <ROW File="Registry_Main.prg" Component_="MyForm.prg_2" FileName="Regist~1.prg|Registry_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Source\Registry_Main.prg" SelfReg="false" Sequence="271"/>
+    <ROW File="Registry_XFM.prg" Component_="MyForm.prg_2" FileName="Regist~2.prg|Registry_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Registry\Source\Registry_XFM.prg" SelfReg="false" Sequence="272"/>
+    <ROW File="Relation.XML" Component_="Relation.rc" FileName="Relation.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Resource\Relation.XML" SelfReg="false" Sequence="279"/>
+    <ROW File="Relation.prg" Component_="Form1.prg_5" FileName="Relation.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Source\Relation.prg" SelfReg="false" Sequence="282"/>
+    <ROW File="Relation.rc" Component_="Relation.rc" FileName="Relation.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Resource\Relation.rc" SelfReg="false" Sequence="278"/>
+    <ROW File="Relation.vxh" Component_="Relation.vxh" FileName="Relation.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Relation.vxh" SelfReg="false" Sequence="277"/>
+    <ROW File="Relation_Main.prg" Component_="Form1.prg_5" FileName="Relati~1.prg|Relation_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Source\Relation_Main.prg" SelfReg="false" Sequence="283"/>
+    <ROW File="Relation_XFM.prg" Component_="Form1.prg_5" FileName="Relati~2.prg|Relation_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Source\Relation_XFM.prg" SelfReg="false" Sequence="284"/>
+    <ROW File="RichEdit.ch" Component_="colors.ch" FileName="RichEdit.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\RichEdit.ch" SelfReg="false" Sequence="16"/>
+    <ROW File="SDImenu.XML" Component_="SDImenu.rc" FileName="SDImenu.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Resource\SDImenu.XML" SelfReg="false" Sequence="296"/>
+    <ROW File="SDImenu.prg" Component_="Form1.prg_7" FileName="SDImenu.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\SDImenu.prg" SelfReg="false" Sequence="304"/>
+    <ROW File="SDImenu.rc" Component_="SDImenu.rc" FileName="SDImenu.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Resource\SDImenu.rc" SelfReg="false" Sequence="295"/>
+    <ROW File="SDImenu.vxh" Component_="SDImenu.vxh" FileName="SDImenu.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\SDImenu.vxh" SelfReg="false" Sequence="297"/>
+    <ROW File="SDImenu_Main.prg" Component_="Form1.prg_7" FileName="SDImen~1.prg|SDImenu_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\SDImenu_Main.prg" SelfReg="false" Sequence="305"/>
+    <ROW File="SDImenu_XFM.prg" Component_="Form1.prg_7" FileName="SDImen~2.prg|SDImenu_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Source\SDImenu_XFM.prg" SelfReg="false" Sequence="306"/>
+    <ROW File="Scopes.XML" Component_="Scopes.rc" FileName="Scopes.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Resource\Scopes.XML" SelfReg="false" Sequence="289"/>
+    <ROW File="Scopes.rc" Component_="Scopes.rc" FileName="Scopes.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Resource\Scopes.rc" SelfReg="false" Sequence="288"/>
+    <ROW File="Scopes.vxh" Component_="Scopes.vxh" FileName="Scopes.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Scopes.vxh" SelfReg="false" Sequence="290"/>
+    <ROW File="Scopes_Main.prg" Component_="Form1.prg_6" FileName="Scopes~1.prg|Scopes_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Source\Scopes_Main.prg" SelfReg="false" Sequence="293"/>
+    <ROW File="Scopes_XFM.prg" Component_="Form1.prg_6" FileName="Scopes~2.prg|Scopes_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Source\Scopes_XFM.prg" SelfReg="false" Sequence="294"/>
+    <ROW File="SecondForm.prg" Component_="FirstForm.prg" FileName="Second~1.prg|SecondForm.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\SecondForm.prg" SelfReg="false" Sequence="198"/>
+    <ROW File="SecondForm.xfm" Component_="FirstForm.prg" FileName="Second~1.xfm|SecondForm.xfm" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\SecondForm.xfm" SelfReg="false" Sequence="199"/>
+    <ROW File="Service.ch" Component_="colors.ch" FileName="Service.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\Service.ch" SelfReg="false" Sequence="17"/>
+    <ROW File="SimpleSlots.XML" Component_="SimpleSlots.rc" FileName="Simple~1.XML|SimpleSlots.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Resource\SimpleSlots.XML" SelfReg="false" Sequence="310"/>
+    <ROW File="SimpleSlots.prg" Component_="MyForm.prg_3" FileName="Simple~1.prg|SimpleSlots.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Source\SimpleSlots.prg" SelfReg="false" Sequence="314"/>
+    <ROW File="SimpleSlots.rc" Component_="SimpleSlots.rc" FileName="Simple~1.rc|SimpleSlots.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Resource\SimpleSlots.rc" SelfReg="false" Sequence="309"/>
+    <ROW File="SimpleSlots.vxh" Component_="SimpleSlots.vxh" FileName="Simple~1.vxh|SimpleSlots.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\SimpleSlots.vxh" SelfReg="false" Sequence="311"/>
+    <ROW File="SimpleSlots_Main.prg" Component_="MyForm.prg_3" FileName="Simple~2.prg|SimpleSlots_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Source\SimpleSlots_Main.prg" SelfReg="false" Sequence="315"/>
+    <ROW File="SimpleSlots_XFM.prg" Component_="MyForm.prg_3" FileName="Simple~3.prg|SimpleSlots_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Simple Slots\Source\SimpleSlots_XFM.prg" SelfReg="false" Sequence="316"/>
+    <ROW File="Splitter.XML" Component_="Splitter.rc" FileName="Splitter.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Resource\Splitter.XML" SelfReg="false" Sequence="318"/>
+    <ROW File="Splitter.prg" Component_="MyForm.prg_4" FileName="Splitter.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Source\Splitter.prg" SelfReg="false" Sequence="321"/>
+    <ROW File="Splitter.rc" Component_="Splitter.rc" FileName="Splitter.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Resource\Splitter.rc" SelfReg="false" Sequence="317"/>
+    <ROW File="Splitter.vxh" Component_="Splitter.vxh" FileName="Splitter.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Splitter.vxh" SelfReg="false" Sequence="324"/>
+    <ROW File="Splitter_Main.prg" Component_="MyForm.prg_4" FileName="Splitt~1.prg|Splitter_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Source\Splitter_Main.prg" SelfReg="false" Sequence="322"/>
+    <ROW File="Splitter_XFM.prg" Component_="MyForm.prg_4" FileName="Splitt~2.prg|Splitter_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Splitter\Source\Splitter_XFM.prg" SelfReg="false" Sequence="323"/>
+    <ROW File="Structures.ch" Component_="colors.ch" FileName="Struct~1.ch|Structures.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\Structures.ch" SelfReg="false" Sequence="18"/>
+    <ROW File="Timer.XML" Component_="calendar.ico" FileName="Timer.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Resource\Timer.XML" SelfReg="false" Sequence="329"/>
+    <ROW File="Timer.prg" Component_="Form1.prg_8" FileName="Timer.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Timer.prg" SelfReg="false" Sequence="334"/>
+    <ROW File="Timer.rc" Component_="calendar.ico" FileName="Timer.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Resource\Timer.rc" SelfReg="false" Sequence="328"/>
+    <ROW File="Timer.vxh" Component_="Timer.vxh" FileName="Timer.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Timer.vxh" SelfReg="false" Sequence="337"/>
+    <ROW File="Timer_Main.prg" Component_="Form1.prg_8" FileName="Timer_~1.prg|Timer_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Timer_Main.prg" SelfReg="false" Sequence="335"/>
+    <ROW File="Timer_XFM.prg" Component_="Form1.prg_8" FileName="Timer_~2.prg|Timer_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Source\Timer_XFM.prg" SelfReg="false" Sequence="336"/>
+    <ROW File="TinyBrowser.XML" Component_="books.ico" FileName="TinyBr~1.XML|TinyBrowser.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Resource\TinyBrowser.XML" SelfReg="false" Sequence="342"/>
+    <ROW File="TinyBrowser.prg" Component_="Form1.prg_9" FileName="TinyBr~1.prg|TinyBrowser.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Source\TinyBrowser.prg" SelfReg="false" Sequence="345"/>
+    <ROW File="TinyBrowser.rc" Component_="books.ico" FileName="TinyBr~1.rc|TinyBrowser.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Resource\TinyBrowser.rc" SelfReg="false" Sequence="341"/>
+    <ROW File="TinyBrowser.vxh" Component_="TinyBrowser.vxh" FileName="TinyBr~1.vxh|TinyBrowser.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\TinyBrowser.vxh" SelfReg="false" Sequence="348"/>
+    <ROW File="TinyBrowser_Main.prg" Component_="Form1.prg_9" FileName="TinyBr~2.prg|TinyBrowser_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Source\TinyBrowser_Main.prg" SelfReg="false" Sequence="346"/>
+    <ROW File="TinyBrowser_XFM.prg" Component_="Form1.prg_9" FileName="TinyBr~3.prg|TinyBrowser_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Source\TinyBrowser_XFM.prg" SelfReg="false" Sequence="347"/>
+    <ROW File="TipMail.prg" Component_="MyAttachments.prg" FileName="TipMail.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\TipMail.prg" SelfReg="false" Sequence="456"/>
+    <ROW File="TypingTest.XML" Component_="TypingTest.rc" FileName="Typing~1.XML|TypingTest.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Resource\TypingTest.XML" SelfReg="false" Sequence="350"/>
+    <ROW File="TypingTest.prg" Component_="MyForm.prg_5" FileName="Typing~1.prg|TypingTest.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Source\TypingTest.prg" SelfReg="false" Sequence="353"/>
+    <ROW File="TypingTest.rc" Component_="TypingTest.rc" FileName="Typing~1.rc|TypingTest.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Resource\TypingTest.rc" SelfReg="false" Sequence="349"/>
+    <ROW File="TypingTest.vxh" Component_="TypingTest.vxh" FileName="Typing~1.vxh|TypingTest.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\TypingTest.vxh" SelfReg="false" Sequence="356"/>
+    <ROW File="TypingTest_Main.prg" Component_="MyForm.prg_5" FileName="Typing~2.prg|TypingTest_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Source\TypingTest_Main.prg" SelfReg="false" Sequence="354"/>
+    <ROW File="TypingTest_XFM.prg" Component_="MyForm.prg_5" FileName="Typing~3.prg|TypingTest_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TypingTest\Source\TypingTest_XFM.prg" SelfReg="false" Sequence="355"/>
+    <ROW File="UNWISE.EXE" Component_="UNWISE.EXE" FileName="UNWISE.EXE" Attributes="0" SourcePath="xHB-Files\UNWISE.EXE" SelfReg="false" Sequence="471"/>
+    <ROW File="VXH.exe" Component_="VXH.exe" FileName="VXH.exe" Attributes="0" SourcePath="xHB-Files\Bin\VXH.exe" SelfReg="false" Sequence="3"/>
+    <ROW File="VXH.lib" Component_="VXH.lib" FileName="VXH.lib" Attributes="0" SourcePath="xHB-Files\Lib\VXH.lib" SelfReg="false" Sequence="26"/>
+    <ROW File="VXHDdll.dll" Component_="VXHDdll.dll" FileName="VXHDdll.dll" Attributes="0" SourcePath="xHB-Files\Bin\VXHDdll.dll" SelfReg="false" Sequence="5"/>
+    <ROW File="VXHDdll.lib" Component_="VXH.lib" FileName="VXHDdll.lib" Attributes="0" SourcePath="xHB-Files\Lib\VXHDdll.lib" SelfReg="false" Sequence="28"/>
+    <ROW File="VXHd.lib" Component_="VXH.lib" FileName="VXHd.lib" Attributes="0" SourcePath="xHB-Files\Lib\VXHd.lib" SelfReg="false" Sequence="27"/>
+    <ROW File="VXHdll.dll" Component_="VXHdll.dll" FileName="VXHdll.dll" Attributes="0" SourcePath="xHB-Files\Bin\VXHdll.dll" SelfReg="false" Sequence="6"/>
+    <ROW File="VXHdll.lib" Component_="VXH.lib" FileName="VXHdll.lib" Attributes="0" SourcePath="xHB-Files\Lib\VXHdll.lib" SelfReg="false" Sequence="29"/>
+    <ROW File="Visual_xHarbour.url" Component_="COPYING" FileName="Visual~1.url|Visual xHarbour.url" Attributes="0" SourcePath="xHB-Files\Visual xHarbour.url" SelfReg="false" Sequence="472"/>
+    <ROW File="VisualxHarbour_Enterprise_2.0.229.log" Component_="COPYING" FileName="Visual~1.log|VisualxHarbour-Enterprise-2.0.229.log" Attributes="0" SourcePath="xHB-Files\VisualxHarbour-Enterprise-2.0.229.log" SelfReg="false" Sequence="473"/>
+    <ROW File="WinApi.lib" Component_="VXH.lib" FileName="WinApi.lib" Attributes="0" SourcePath="xHB-Files\Lib\WinApi.lib" SelfReg="false" Sequence="30"/>
+    <ROW File="WinCore.lib" Component_="VXH.lib" FileName="WinCore.lib" Attributes="0" SourcePath="xHB-Files\Lib\WinCore.lib" SelfReg="false" Sequence="31"/>
+    <ROW File="a1.ico" Component_="a1.ico" FileName="a1.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\NotifyIcon\a1.ico" SelfReg="false" Sequence="227"/>
+    <ROW File="app.ico" Component_="app.ico" FileName="app.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\app.ico" SelfReg="false" Sequence="366"/>
+    <ROW File="background_answers.bmp" Component_="background_answers.bmp" FileName="backgr~1.bmp|background_answers.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\background_answers.bmp" SelfReg="false" Sequence="166"/>
+    <ROW File="background_main.bmp" Component_="background_answers.bmp" FileName="backgr~2.bmp|background_main.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\background_main.bmp" SelfReg="false" Sequence="167"/>
+    <ROW File="background_question.bmp" Component_="background_answers.bmp" FileName="backgr~3.bmp|background_question.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\background_question.bmp" SelfReg="false" Sequence="168"/>
+    <ROW File="books.ico" Component_="books.ico" FileName="books.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Resource\books.ico" SelfReg="false" Sequence="338"/>
+    <ROW File="brush.ico" Component_="BitViewer.rc" FileName="brush.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Resource\brush.ico" SelfReg="false" Sequence="49"/>
+    <ROW File="calendar.ico" Component_="calendar.ico" FileName="calendar.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Resource\calendar.ico" SelfReg="false" Sequence="326"/>
+    <ROW File="check1.ico" Component_="app.ico" FileName="check1.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\check1.ico" SelfReg="false" Sequence="367"/>
+    <ROW File="check2.ico" Component_="app.ico" FileName="check2.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\check2.ico" SelfReg="false" Sequence="368"/>
+    <ROW File="clock.ico" Component_="calendar.ico" FileName="clock.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Timer\Resource\clock.ico" SelfReg="false" Sequence="327"/>
+    <ROW File="close.ico" Component_="app.ico" FileName="close.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\close.ico" SelfReg="false" Sequence="369"/>
+    <ROW File="colors.ch" Component_="colors.ch" FileName="colors.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\colors.ch" SelfReg="false" Sequence="10"/>
+    <ROW File="column.ico" Component_="app.ico" FileName="column.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\column.ico" SelfReg="false" Sequence="370"/>
+    <ROW File="commctrl.ch" Component_="colors.ch" FileName="commctrl.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\commctrl.ch" SelfReg="false" Sequence="11"/>
+    <ROW File="commdlg.ch" Component_="colors.ch" FileName="commdlg.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\commdlg.ch" SelfReg="false" Sequence="12"/>
+    <ROW File="comp.ico" Component_="comp.ico" FileName="comp.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\comp.ico" SelfReg="false" Sequence="237"/>
+    <ROW File="cubes.ico" Component_="cubes.ico" FileName="cubes.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\cubes.ico" SelfReg="false" Sequence="204"/>
+    <ROW File="date_time.ico" Component_="cubes.ico" FileName="date-t~1.ico|date-time.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\date-time.ico" SelfReg="false" Sequence="205"/>
+    <ROW File="debug.ch" Component_="colors.ch" FileName="debug.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\debug.ch" SelfReg="false" Sequence="13"/>
+    <ROW File="delete1.ico" Component_="app.ico" FileName="delete1.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\delete1.ico" SelfReg="false" Sequence="371"/>
+    <ROW File="delete2.ico" Component_="app.ico" FileName="delete2.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\delete2.ico" SelfReg="false" Sequence="372"/>
+    <ROW File="desktop.ico" Component_="app.ico" FileName="desktop.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\desktop.ico" SelfReg="false" Sequence="373"/>
+    <ROW File="dishes.DBF" Component_="dishes.DBF" FileName="dishes.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Tables\dishes.DBF" SelfReg="false" Sequence="307"/>
+    <ROW File="disk_yellow.ico" Component_="app.ico" FileName="disk_y~1.ico|disk_yellow.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\disk_yellow.ico" SelfReg="false" Sequence="374"/>
+    <ROW File="docpref.ico" Component_="books.ico" FileName="docpref.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Resource\docpref.ico" SelfReg="false" Sequence="339"/>
+    <ROW File="document.ico" Component_="app.ico" FileName="document.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\document.ico" SelfReg="false" Sequence="375"/>
+    <ROW File="dollar.ico" Component_="cubes.ico" FileName="dollar.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\dollar.ico" SelfReg="false" Sequence="206"/>
+    <ROW File="down.ico" Component_="app.ico" FileName="down.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\down.ico" SelfReg="false" Sequence="376"/>
+    <ROW File="employees.DBF" Component_="employees.DBF" FileName="employ~1.DBF|employees.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Bin\employees.DBF" SelfReg="false" Sequence="200"/>
+    <ROW File="exchange.ico" Component_="app.ico" FileName="exchange.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\exchange.ico" SelfReg="false" Sequence="377"/>
+    <ROW File="export1.ico" Component_="app.ico" FileName="export1.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\export1.ico" SelfReg="false" Sequence="378"/>
+    <ROW File="find.ico" Component_="app.ico" FileName="find.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\find.ico" SelfReg="false" Sequence="379"/>
+    <ROW File="gear.ico" Component_="BitViewer.rc" FileName="gear.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Resource\gear.ico" SelfReg="false" Sequence="50"/>
+    <ROW File="gears_view.ico" Component_="app.ico" FileName="gears_~1.ico|gears_view.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\gears_view.ico" SelfReg="false" Sequence="380"/>
+    <ROW File="help_1.bmp" Component_="background_answers.bmp" FileName="help_1.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_1.bmp" SelfReg="false" Sequence="169"/>
+    <ROW File="help_1_off.bmp" Component_="background_answers.bmp" FileName="help_1~1.bmp|help_1_off.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_1_off.bmp" SelfReg="false" Sequence="170"/>
+    <ROW File="help_2.bmp" Component_="background_answers.bmp" FileName="help_2.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_2.bmp" SelfReg="false" Sequence="171"/>
+    <ROW File="help_2_off.bmp" Component_="background_answers.bmp" FileName="help_2~1.bmp|help_2_off.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_2_off.bmp" SelfReg="false" Sequence="172"/>
+    <ROW File="help_3.bmp" Component_="background_answers.bmp" FileName="help_3.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_3.bmp" SelfReg="false" Sequence="173"/>
+    <ROW File="help_3_off.bmp" Component_="background_answers.bmp" FileName="help_3~1.bmp|help_3_off.bmp" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Images\help_3_off.bmp" SelfReg="false" Sequence="174"/>
+    <ROW File="hided.ico" Component_="app.ico" FileName="hided.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\hided.ico" SelfReg="false" Sequence="381"/>
+    <ROW File="import1.ico" Component_="app.ico" FileName="import1.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\import1.ico" SelfReg="false" Sequence="382"/>
+    <ROW File="jpg" Component_="jpg" FileName="1.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\1.jpg" SelfReg="false" Sequence="33"/>
+    <ROW File="jpg_1" Component_="jpg" FileName="2.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\2.jpg" SelfReg="false" Sequence="34"/>
+    <ROW File="jpg_2" Component_="jpg" FileName="3.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\3.jpg" SelfReg="false" Sequence="35"/>
+    <ROW File="jpg_3" Component_="jpg" FileName="4.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\4.jpg" SelfReg="false" Sequence="36"/>
+    <ROW File="jpg_4" Component_="jpg" FileName="5.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\5.jpg" SelfReg="false" Sequence="37"/>
+    <ROW File="jpg_5" Component_="jpg" FileName="6.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Advanced Slots\Images\6.jpg" SelfReg="false" Sequence="38"/>
+    <ROW File="key.ico" Component_="comp.ico" FileName="key.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\key.ico" SelfReg="false" Sequence="238"/>
+    <ROW File="marker.ico" Component_="app.ico" FileName="marker.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\marker.ico" SelfReg="false" Sequence="383"/>
+    <ROW File="mil_entertainment_1.txt" Component_="mil_entertainment_1.txt" FileName="mil_en~1.txt|mil_entertainment_1.txt" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Questions\mil_entertainment_1.txt" SelfReg="false" Sequence="176"/>
+    <ROW File="mil_history_1.txt" Component_="mil_entertainment_1.txt" FileName="mil_hi~1.txt|mil_history_1.txt" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Questions\mil_history_1.txt" SelfReg="false" Sequence="177"/>
+    <ROW File="mil_science_1.txt" Component_="mil_entertainment_1.txt" FileName="mil_sc~1.txt|mil_science_1.txt" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Millionaire\Questions\mil_science_1.txt" SelfReg="false" Sequence="178"/>
+    <ROW File="mssql_blob.XML" Component_="mssql_blob.rc" FileName="mssql_~1.XML|mssql_blob.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Resource\mssql_blob.XML" SelfReg="false" Sequence="192"/>
+    <ROW File="mssql_blob.prg" Component_="FirstForm.prg" FileName="mssql_~1.prg|mssql_blob.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\mssql_blob.prg" SelfReg="false" Sequence="195"/>
+    <ROW File="mssql_blob.rc" Component_="mssql_blob.rc" FileName="mssql_~1.rc|mssql_blob.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Resource\mssql_blob.rc" SelfReg="false" Sequence="191"/>
+    <ROW File="mssql_blob.vxh" Component_="mssql_blob.vxh" FileName="mssql_~1.vxh|mssql_blob.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\mssql_blob.vxh" SelfReg="false" Sequence="190"/>
+    <ROW File="mssql_blob_Main.prg" Component_="FirstForm.prg" FileName="mssql_~2.prg|mssql_blob_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\mssql_blob_Main.prg" SelfReg="false" Sequence="196"/>
+    <ROW File="mssql_blob_XFM.prg" Component_="FirstForm.prg" FileName="mssql_~3.prg|mssql_blob_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Source\mssql_blob_XFM.prg" SelfReg="false" Sequence="197"/>
+    <ROW File="myoffice.ini" Component_="employees.DBF" FileName="myoffice.ini" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Bin\myoffice.ini" SelfReg="false" Sequence="201"/>
+    <ROW File="new.ico" Component_="app.ico" FileName="new.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\new.ico" SelfReg="false" Sequence="384"/>
+    <ROW File="open.ico" Component_="app.ico" FileName="open.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\open.ico" SelfReg="false" Sequence="385"/>
+    <ROW File="openi.ico" Component_="app.ico" FileName="openi.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\openi.ico" SelfReg="false" Sequence="386"/>
+    <ROW File="ord.DBF" Component_="ord.DBF" FileName="ord.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Bin\ord.DBF" SelfReg="false" Sequence="285"/>
+    <ROW File="orddet.CDX" Component_="ord.DBF" FileName="orddet.CDX" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Bin\orddet.CDX" SelfReg="false" Sequence="286"/>
+    <ROW File="orddet.DBF" Component_="ord.DBF" FileName="orddet.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Scopes\Bin\orddet.DBF" SelfReg="false" Sequence="287"/>
+    <ROW File="part.ico" Component_="cubes.ico" FileName="part.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Resource\part.ico" SelfReg="false" Sequence="209"/>
+    <ROW File="people.CDX" Component_="people.CDX" FileName="people.CDX" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Bin\people.CDX" SelfReg="false" Sequence="117"/>
+    <ROW File="people.CDX_1" Component_="people.CDX_1" FileName="people.CDX" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Bin\people.CDX" SelfReg="false" Sequence="273"/>
+    <ROW File="people.dbf" Component_="people.CDX" FileName="people.dbf" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes1\Bin\people.dbf" SelfReg="false" Sequence="118"/>
+    <ROW File="people.dbf_1" Component_="people.dbf" FileName="people.dbf" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Indexes2\Bin\people.dbf" SelfReg="false" Sequence="127"/>
+    <ROW File="people.dbf_2" Component_="people.CDX_1" FileName="people.dbf" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Bin\people.dbf" SelfReg="false" Sequence="274"/>
+    <ROW File="peopleex.CDX" Component_="people.CDX_1" FileName="peopleex.CDX" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Bin\peopleex.CDX" SelfReg="false" Sequence="275"/>
+    <ROW File="peopleex.DBF" Component_="people.CDX_1" FileName="peopleex.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Relation\Bin\peopleex.DBF" SelfReg="false" Sequence="276"/>
+    <ROW File="plug.ico" Component_="app.ico" FileName="plug.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\plug.ico" SelfReg="false" Sequence="387"/>
+    <ROW File="print.ico" Component_="books.ico" FileName="print.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\TinyBrowser\Resource\print.ico" SelfReg="false" Sequence="340"/>
+    <ROW File="projects.DBF" Component_="employees.DBF" FileName="projects.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\MyOffice\Bin\projects.DBF" SelfReg="false" Sequence="202"/>
+    <ROW File="property.ico" Component_="app.ico" FileName="property.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\property.ico" SelfReg="false" Sequence="388"/>
+    <ROW File="query_dbf.ico" Component_="app.ico" FileName="query_~1.ico|query_dbf.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\query_dbf.ico" SelfReg="false" Sequence="389"/>
+    <ROW File="question_and_answer.ico" Component_="app.ico" FileName="questi~1.ico|question_and_answer.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\question_and_answer.ico" SelfReg="false" Sequence="390"/>
+    <ROW File="rdd.ico" Component_="app.ico" FileName="rdd.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\rdd.ico" SelfReg="false" Sequence="391"/>
+    <ROW File="refresh.gif" Component_="comp.ico" FileName="refresh.gif" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\refresh.gif" SelfReg="false" Sequence="241"/>
+    <ROW File="replace.ico" Component_="BitViewer.rc" FileName="replace.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\BitViewer\Resource\replace.ico" SelfReg="false" Sequence="51"/>
+    <ROW File="replace.ico_1" Component_="app.ico" FileName="replace.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\replace.ico" SelfReg="false" Sequence="392"/>
+    <ROW File="run.ico" Component_="app.ico" FileName="run.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\run.ico" SelfReg="false" Sequence="393"/>
+    <ROW File="sauces.DBF" Component_="dishes.DBF" FileName="sauces.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\SDImenu\Tables\sauces.DBF" SelfReg="false" Sequence="308"/>
+    <ROW File="settings.ico" Component_="app.ico" FileName="settings.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\settings.ico" SelfReg="false" Sequence="394"/>
+    <ROW File="showd.ico" Component_="app.ico" FileName="showd.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\showd.ico" SelfReg="false" Sequence="395"/>
+    <ROW File="sort_az_ascending.ico" Component_="app.ico" FileName="sort_a~1.ico|sort_az_ascending.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\sort_az_ascending.ico" SelfReg="false" Sequence="396"/>
+    <ROW File="stamp.ico" Component_="comp.ico" FileName="stamp.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\Organigram\Resource\stamp.ico" SelfReg="false" Sequence="242"/>
+    <ROW File="step.ico" Component_="app.ico" FileName="step.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\step.ico" SelfReg="false" Sequence="397"/>
+    <ROW File="tables.ico" Component_="app.ico" FileName="tables.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\tables.ico" SelfReg="false" Sequence="398"/>
+    <ROW File="test.DBF" Component_="test.DBF" FileName="test.DBF" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\test.DBF" SelfReg="false" Sequence="325"/>
+    <ROW File="u1.jpg" Component_="u1.jpg" FileName="u1.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Bin\u1.jpg" SelfReg="false" Sequence="186"/>
+    <ROW File="u2.jpg" Component_="u1.jpg" FileName="u2.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Bin\u2.jpg" SelfReg="false" Sequence="187"/>
+    <ROW File="u3.jpg" Component_="u1.jpg" FileName="u3.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Bin\u3.jpg" SelfReg="false" Sequence="188"/>
+    <ROW File="u4.jpg" Component_="u1.jpg" FileName="u4.jpg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\mssql_blob\Bin\u4.jpg" SelfReg="false" Sequence="189"/>
+    <ROW File="unplug.ico" Component_="app.ico" FileName="unplug.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\unplug.ico" SelfReg="false" Sequence="399"/>
+    <ROW File="up.ico" Component_="app.ico" FileName="up.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\up.ico" SelfReg="false" Sequence="400"/>
+    <ROW File="uxtheme.ch" Component_="colors.ch" FileName="uxtheme.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\uxtheme.ch" SelfReg="false" Sequence="19"/>
+    <ROW File="view.ico" Component_="app.ico" FileName="view.ico" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\view.ico" SelfReg="false" Sequence="401"/>
+    <ROW File="vxh.ch" Component_="colors.ch" FileName="vxh.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\vxh.ch" SelfReg="false" Sequence="20"/>
+    <ROW File="vxh.ini" Component_="vxh.ini" FileName="vxh.ini" Attributes="0" SourcePath="xHB-Files\Bin\vxh.ini" SelfReg="false" Sequence="4"/>
+    <ROW File="winapi.ch" Component_="colors.ch" FileName="winapi.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\winapi.ch" SelfReg="false" Sequence="21"/>
+    <ROW File="wingdi.ch" Component_="colors.ch" FileName="wingdi.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\wingdi.ch" SelfReg="false" Sequence="22"/>
+    <ROW File="wininet.ch" Component_="colors.ch" FileName="wininet.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\wininet.ch" SelfReg="false" Sequence="23"/>
+    <ROW File="winreg.ch" Component_="colors.ch" FileName="winreg.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\winreg.ch" SelfReg="false" Sequence="24"/>
+    <ROW File="winuser.ch" Component_="colors.ch" FileName="winuser.ch" Attributes="0" SourcePath="xHB-Files\Include\w32\winuser.ch" SelfReg="false" Sequence="25"/>
+    <ROW File="xBrowser.XML" Component_="xBrowser.rc" FileName="xBrowser.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Resource\xBrowser.XML" SelfReg="false" Sequence="358"/>
+    <ROW File="xBrowser.prg" Component_="MyForm.prg_6" FileName="xBrowser.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Source\xBrowser.prg" SelfReg="false" Sequence="361"/>
+    <ROW File="xBrowser.rc" Component_="xBrowser.rc" FileName="xBrowser.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Resource\xBrowser.rc" SelfReg="false" Sequence="357"/>
+    <ROW File="xBrowser.vxh" Component_="xBrowser.vxh" FileName="xBrowser.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\xBrowser.vxh" SelfReg="false" Sequence="364"/>
+    <ROW File="xBrowser_Main.prg" Component_="MyForm.prg_6" FileName="xBrows~1.prg|xBrowser_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Source\xBrowser_Main.prg" SelfReg="false" Sequence="362"/>
+    <ROW File="xBrowser_XFM.prg" Component_="MyForm.prg_6" FileName="xBrows~2.prg|xBrowser_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xBrowser\Source\xBrowser_XFM.prg" SelfReg="false" Sequence="363"/>
+    <ROW File="xDB.XML" Component_="app.ico" FileName="xDB.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\xDB.XML" SelfReg="false" Sequence="403"/>
+    <ROW File="xDB.ini" Component_="xDB.ini" FileName="xDB.ini" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Bin\xDB.ini" SelfReg="false" Sequence="365"/>
+    <ROW File="xDB.prg" Component_="ChildGrid.prg" FileName="xDB.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\xDB.prg" SelfReg="false" Sequence="444"/>
+    <ROW File="xDB.rc" Component_="app.ico" FileName="xDB.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Resource\xDB.rc" SelfReg="false" Sequence="402"/>
+    <ROW File="xDB.vxh" Component_="xDB.vxh" FileName="xDB.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\xDB.vxh" SelfReg="false" Sequence="447"/>
+    <ROW File="xDB_Main.prg" Component_="ChildGrid.prg" FileName="xDB_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\xDB_Main.prg" SelfReg="false" Sequence="445"/>
+    <ROW File="xDB_XFM.prg" Component_="ChildGrid.prg" FileName="xDB_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xDB\Source\xDB_XFM.prg" SelfReg="false" Sequence="446"/>
+    <ROW File="xEdit.ini" Component_="vxh.ini" FileName="xEdit.ini" Attributes="0" SourcePath="xHB-Files\Bin\xEdit.ini" SelfReg="false" Sequence="7"/>
+    <ROW File="xMailer.XML" Component_="xMailer.rc" FileName="xMailer.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Resource\xMailer.XML" SelfReg="false" Sequence="449"/>
+    <ROW File="xMailer.prg" Component_="MyAttachments.prg" FileName="xMailer.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\xMailer.prg" SelfReg="false" Sequence="457"/>
+    <ROW File="xMailer.rc" Component_="xMailer.rc" FileName="xMailer.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Resource\xMailer.rc" SelfReg="false" Sequence="448"/>
+    <ROW File="xMailer.vxh" Component_="xMailer.vxh" FileName="xMailer.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\xMailer.vxh" SelfReg="false" Sequence="460"/>
+    <ROW File="xMailer_Main.prg" Component_="MyAttachments.prg" FileName="xMaile~1.prg|xMailer_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\xMailer_Main.prg" SelfReg="false" Sequence="458"/>
+    <ROW File="xMailer_XFM.prg" Component_="MyAttachments.prg" FileName="xMaile~2.prg|xMailer_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xMailer\Source\xMailer_XFM.prg" SelfReg="false" Sequence="459"/>
+    <ROW File="xPad.XML" Component_="xPad.rc" FileName="xPad.XML" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Resource\xPad.XML" SelfReg="false" Sequence="462"/>
+    <ROW File="xPad.prg" Component_="ChildForm.prg" FileName="xPad.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\xPad.prg" SelfReg="false" Sequence="467"/>
+    <ROW File="xPad.rc" Component_="xPad.rc" FileName="xPad.rc" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Resource\xPad.rc" SelfReg="false" Sequence="461"/>
+    <ROW File="xPad.vxh" Component_="xPad.vxh" FileName="xPad.vxh" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\xPad.vxh" SelfReg="false" Sequence="470"/>
+    <ROW File="xPad_Main.prg" Component_="ChildForm.prg" FileName="xPad_M~1.prg|xPad_Main.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\xPad_Main.prg" SelfReg="false" Sequence="468"/>
+    <ROW File="xPad_XFM.prg" Component_="ChildForm.prg" FileName="xPad_XFM.prg" Attributes="0" SourcePath="xHB-Files\Samples\Visual-xHarbour\xPad\Source\xPad_XFM.prg" SelfReg="false" Sequence="469"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="Setups" PackageFileName="setup" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\install" ExtUI="true" ExeName="xHarbour Builder Enterprise Build 1.0"/>
+    <ATTRIBUTE name="CurrentBuild" value="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="LicenseAgreementDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\LicenseAgreementDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
+    <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
+    <ROW Name="xHBBanner.jpg_1" SourcePath="Resources\xHBBanner.jpg"/>
+    <ROW Name="xHBImage.jpg_1" SourcePath="Resources\xHBImage.jpg"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
+    <ROW Dialog_="ExitDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Control_Next="ViewReadmeCheckBox" TextLocId="-" MsiKey="ExitDialog#Back"/>
+    <ROW Dialog_="ExitDialog" Control="LaunchProdCheckBox" Type="CheckBox" X="135" Y="170" Width="10" Height="10" Attributes="3" Property="RUNAPPLICATION" Control_Next="Description" MsiKey="ExitDialog#LaunchProdCheckBox"/>
+    <ROW Dialog_="ExitDialog" Control="LaunchProdText" Type="Text" X="148" Y="170" Width="220" Height="20" Attributes="65539" Text="Open the Visual xHarbour folder" Control_Next="LaunchProdCheckBox" TextLocId="Control.Text.ExitDialog#LaunchProdText" MsiKey="ExitDialog#LaunchProdText"/>
+    <ROW Dialog_="ExitDialog" Control="ViewReadmeCheckBox" Type="CheckBox" X="135" Y="170" Width="10" Height="10" Attributes="3" Property="VIEWREADME" Control_Next="Title" MsiKey="ExitDialog#ViewReadmeCheckBox"/>
+    <ROW Dialog_="OutOfDiskDlg" Control="Description" Type="Text" X="20" Y="20" Width="173" Height="20" Attributes="196611" Text="Disk space required for the installation exceeds available disk space." Control_Next="BannerLine" TextLocId="Control.Text.OutOfDiskDlg#Description" MsiKey="OutOfDiskDlg#Description"/>
+    <ROW Dialog_="OutOfRbDiskDlg" Control="Description" Type="Text" X="20" Y="20" Width="171" Height="20" Attributes="196611" Text="Disk space required for the installation exceeds available disk space." Control_Next="BannerLine" TextLocId="Control.Text.OutOfRbDiskDlg#Description" MsiKey="OutOfRbDiskDlg#Description"/>
+    <ROW Dialog_="PrepareDlg" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Control_Next="Title" MsiKey="PrepareDlg#Bitmap"/>
+    <ROW Dialog_="VerifyReadyDlg" Control="Description" Type="Text" X="25" Y="21" Width="155" Height="23" Attributes="196611" Text="The [Wizard] is ready to begin the [ProductName] installation" Control_Next="BannerLine" TextLocId="Control.Text.VerifyReadyDlg#Description" MsiKey="VerifyReadyDlg#Description"/>
+    <ROW Dialog_="WelcomeDlg" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Control_Next="Back" MsiKey="WelcomeDlg#Bitmap"/>
+    <ROW Dialog_="BrowseDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="OK" MsiKey="BrowseDlg#BottomLine"/>
+    <ROW Dialog_="ProgressDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="Back" MsiKey="ProgressDlg#BottomLine"/>
+    <ROW Dialog_="VerifyReadyDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="Back" MsiKey="VerifyReadyDlg#BottomLine"/>
+    <ROW Dialog_="VerifyReadyDlg" Control="Text" Type="Text" X="15" Y="86" Width="320" Height="40" Attributes="3" Text="Click &quot;Install&quot; to begin the installation.  If you want to review or change any of your installation settings, click &quot;Back&quot;.  Click &quot;Cancel&quot; to exit the wizard." Control_Next="Description" TextLocId="Control.Text.VerifyReadyDlg#Text" MsiKey="VerifyReadyDlg#Text"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="Back" MsiKey="LicenseAgreementDlg#BottomLine"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control="AgreementText" Type="FileScrollableText" X="20" Y="60" Width="330" Height="120" Attributes="7" Text="Resources\License.rtf" Control_Next="Buttons" TextLocId="Control.Text.LicenseAgreementDlg#AgreementText" MsiKey="LicenseAgreementDlg#AgreementText"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="Description" MsiKey="MaintenanceTypeDlg#BottomLine"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="20" Attributes="196611" Text="Select the operation you wish to perform." Control_Next="BannerLine" TextLocId="Control.Text.MaintenanceTypeDlg#Description" MsiKey="MaintenanceTypeDlg#Description"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="RemoveButton" Type="PushButton" X="50" Y="113" Width="38" Height="38" Attributes="5767171" Text="[RemoveIcon]" Control_Next="Back" Help="Remove Installation|" HelpLocId="Control.Help.MaintenanceTypeDlg#RemoveButton" MsiKey="MaintenanceTypeDlg#RemoveButton"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="RemoveLabel" Type="Text" X="105" Y="103" Width="100" Height="10" Attributes="3" Text="&amp;Remove" TextStyle="[DlgTitleFont]" Control_Next="RemoveButton" TextLocId="Control.Text.MaintenanceTypeDlg#RemoveLabel" MsiKey="MaintenanceTypeDlg#RemoveLabel"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="RemoveText" Type="Text" X="105" Y="119" Width="230" Height="20" Attributes="3" Text="Removes [ProductName] from your computer." Control_Next="RemoveLabel" TextLocId="Control.Text.MaintenanceTypeDlg#RemoveText" MsiKey="MaintenanceTypeDlg#RemoveText"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="Title" Type="Text" X="15" Y="6" Width="240" Height="15" Attributes="196611" Text="Remove installation" TextStyle="[DlgTitleFont]" Control_Next="RemoveText" TextLocId="Control.Text.MaintenanceTypeDlg#Title" MsiKey="MaintenanceTypeDlg#Title"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Control_Next="Title" MsiKey="VerifyRemoveDlg#BottomLine"/>
+    <ROW Dialog_="FolderDlg" Control="Description" Type="Text" X="25" Y="21" Width="205" Height="29" Attributes="196611" Text="This is the folder where [ProductName] will be installed." Control_Next="BannerLine" TextLocId="Control.Text.FolderDlg#Description" MsiKey="FolderDlg#Description"/>
+    <ATTRIBUTE name="DeletedRows" value="BrowseDlg#Logo@LicenseAgreementDlg#Logo@VerifyRemoveDlg#Logo@MaintenanceTypeDlg#ChangeButton@MaintenanceTypeDlg#ChangeLabel@MaintenanceTypeDlg#ChangeText@MaintenanceTypeDlg#RepairText@ProgressDlg#Logo@VerifyReadyDlg#Logo@ExitDialog#ViewReadmeText@MaintenanceTypeDlg#RepairButton@MaintenanceTypeDlg#Logo@MaintenanceTypeDlg#RepairLabel"/>
+    <ATTRIBUTE name="FixedSizeBitmaps" value="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlConditionComponent">
+    <ATTRIBUTE name="DeletedRows" value="ExitDialog#ViewReadmeText#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 1) AND (CTRLS &lt;&gt; 3))"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="2"/>
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="2"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="3"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="3"/>
+    <ATTRIBUTE name="DeletedRows" value="MaintenanceTypeDlg#ChangeButton#NewDialog#CustomizeDlg#1@MaintenanceTypeDlg#RepairButton#[InstallMode]#Repair#1@MaintenanceTypeDlg#ChangeButton#[InstallMode]#Change#1@MaintenanceTypeDlg#ChangeButton#[Progress1]#[CtrlEvtChanging]#1@MaintenanceTypeDlg#RepairButton#[Progress2]#[CtrlEvtrepairs]#1@MaintenanceTypeDlg#ChangeButton#[Progress2]#[CtrlEvtchanges]#1@MaintenanceTypeDlg#RepairButton#NewDialog#VerifyRepairDlg#1@MaintenanceTypeDlg#RepairButton#[Progress1]#[CtrlEvtRepairing]#1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DeleteCadLzma" Type="51" Source="AI_DeleteLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
+    <ROW Action="AI_LaunchApp" Type="1" Source="aicustact.dll" Target="[#OpenFolder.vbs]"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[WindowsVolume]xHB"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDialogComponent">
+    <ROW Dialog="MaintenanceTypeDlg" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_First="RemoveLabel" Control_Default="RemoveButton" Control_Cancel="Cancel" TitleLocId="Dialog.MaintenanceTypeDlg" MsiKey="MaintenanceTypeDlg"/>
+    <ROW Dialog="PrepareDlg" HCentering="50" VCentering="50" Width="370" Height="271" Attributes="1" Title="[ProductName] [Setup]" Control_First="Cancel" Control_Default="Cancel" Control_Cancel="Cancel" TitleLocId="Dialog.PrepareDlg" MsiKey="PrepareDlg"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="187"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="Not Installed" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="51"/>
+    <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="198" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="197" Builds="DefaultBuild"/>
+    <ROW Action="AI_FindExeLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="196" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="1549" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="1548" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
+    <ATTRIBUTE name="RegisterProduct" value="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMax="[|ProductVersion]" Attributes="1025" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
+    <ROW Directory_="APPDIR" SourcePath="xHB-Files" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6"/>
+  </COMPONENT>
+</DOCUMENT>

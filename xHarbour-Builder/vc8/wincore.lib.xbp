@@ -1,0 +1,32 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = \xhb\include\w32
+LAUTORUN = .F.
+LDEBUG = .T.
+LGUI = .F.
+INCLUDEFOLDERS = \xbp\vc8\wincore.lib
+LIBFOLDERS = 
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;__EXPORT__ 
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\vc8\WinCore.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = \xhb\lib\vc8
+
+[\xHarbour.com\xHarbour-Builder\WinCallBack.c]
+MYC_FLAGS = 
+MYDEFINES = 

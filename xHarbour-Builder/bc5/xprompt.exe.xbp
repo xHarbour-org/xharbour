@@ -1,0 +1,25 @@
+CINI = \xHarbour.com\xHarbour-Builder\bc5\xbuild.bc5.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = 
+LAUTORUN = 
+LDEBUG = .F.
+LGUI = .F.
+LIBFOLDERS = \xhb\lib\bc5; $(XHB_BCC)\Lib
+LMT = .F.
+LUSEDLL = .T.
+MAPFILE = 
+MYC_FLAGS =  
+MYDEFINES = DYN; AUTODYN ;__EXPORT__ ;__IMPORT__
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\bc5\xprompt.exe
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\bin\bc5
+
+[\xharbour\utils\xbscript\xbscript.prg]

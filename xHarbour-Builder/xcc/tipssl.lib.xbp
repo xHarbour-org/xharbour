@@ -1,0 +1,29 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = \openssl\include
+INCLUDEFOLDERS =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\tipssl.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour\contrib\tipssl\client.prg]
+[\xHarbour\contrib\tipssl\httpcln.prg]
+[\xHarbour\contrib\tipssl\mail.prg]
+[\xHarbour\contrib\tipssl\popcln.prg]
+[\xHarbour\contrib\tipssl\sendmail.prg]
+[\xHarbour\contrib\tipssl\smtpcln.prg]
+[\xHarbour\contrib\tipssl\inetssl.c]

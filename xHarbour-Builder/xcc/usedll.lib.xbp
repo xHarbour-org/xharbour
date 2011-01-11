@@ -1,0 +1,33 @@
+CINI = 
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = 
+INCLUDEFOLDERS =
+LDEBUG = .T.
+LGUI = .F.
+INCLUDEFOLDERS = \xbp\xcc\useddll.lib
+LIBFOLDERS =
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = 
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\usedll.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER =
+STARTIN = 
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour\source\vm\mainstd.c]
+
+[\xHarbour\source\vm\mainwin.c]
+
+[\xHarbour\source\vm\usedll.c]

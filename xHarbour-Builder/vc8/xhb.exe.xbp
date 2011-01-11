@@ -1,0 +1,22 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+DEFINES =
+GUI_LIBFOLDERS =
+GUI_PRGFLAGS =
+GUI_ROOT =
+INCLUDEFOLDERS = \xbp\vc8\xhb.exe
+LIBFOLDERS = \xHarbour\lib;\xHarbour\lib\win
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\xhb.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\bin\vc8
+
+#include "stxhb.files.inc"

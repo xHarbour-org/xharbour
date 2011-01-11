@@ -1,0 +1,26 @@
+CINI = 
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = 
+LAUTORUN = 
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS =  
+MYDEFINES = 
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\gd.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour\contrib\gd\source\*.c]
+[\xHarbour\contrib\gd\source\*.prg]

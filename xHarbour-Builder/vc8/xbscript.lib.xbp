@@ -1,0 +1,26 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = \xharbour.com\xharbour-builder
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = DYN
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\xbScript.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\vc8
+
+[\xharbour\utils\xbscript\xbscript.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =

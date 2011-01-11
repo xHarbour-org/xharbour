@@ -1,0 +1,26 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+GUI_LIBFOLDERS =
+GUI_PRGFLAGS =
+GUI_ROOT =
+INCLUDEFOLDERS =
+LIBFOLDERS =
+LMT = .T.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = HB_THREAD_SUPPORT;__EXPORT__;WIN32
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\ntxmt.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\vc8
+
+[source\rdd\dbfntx\dbfntx1.c]
+# fake flag to disable default flag (avoiding Optimization because of spille error).
+MYC_FLAGS = -Ze -MT
+MYDEFINES =

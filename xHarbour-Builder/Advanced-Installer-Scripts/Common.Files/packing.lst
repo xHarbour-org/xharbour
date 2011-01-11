@@ -1,0 +1,106 @@
+This file should contain a listing of all available files
+included in this commercial distribution of xHarbour from
+xHarbour.com Inc. ( http://www.xHarbour.com )
+
+Should your distribution include additional files not
+listed in this document, please contact:
+
+ licenseinfo@xHarbour.com
+
+for licensing information concerning those files.
+
+
+*** NON *** GPL Software:
+-------------------------
+
+The following utilities are PROPRIETARY software, 
+protected under COPYRIGHT law, and are the property of
+xHarbour.com Inc., or their respective copyright holder.
+       
+ - xcc.exe       (Proprietary C Compiler.)
+ - xcc.dll       (Proprietary C Compiler.)
+ - xlink.exe     (Proprietary Linker.)
+ - xlib.exe      (Proprietary Librarian.)
+ - xrc.exe       (Proprietary Resource Compiler.)
+ - xrc.dll       (Proprietary Resource Compiler support.)
+ - c_include\*.* (Proprietary Include files of C Compiler)
+ - c_Lib\*.*     (Proprietary R/T Libraries of C Compiler.)
+
+ - xbuild.exe  (Proprietary Project Build Utility 
+                console mode.)
+ - xbuildw.exe (Proprietary Project Build Utility
+                for Window.)
+
+ - six.lib (Proprietary ApolloRDD for xHarbour.)
+ - fts32.lib (Proprietary Fast Text Search for xHarbour.)
+ - sql.lib (Proprietary SQL RDD for xHarbour.)
+
+ - xbscript.dll
+ - xbscript.lib
+
+
+Following files are copyright of Vista Software and used
+by permission. ( http://www.VistaSoftware.com )
+
+ - apollopi6.chm (Help file for Apollo SDE.)
+ - six***.dll (Proprietary Apollo Engine.)
+ - fts32.dll (Proprietary Fast Text Search Engine.)
+
+
+Following files are copyright of Extended Systems and used
+by permission. ( http://www.advantagedatabase.com )
+ - ace32.dll (Proprietary ADS Engine.)
+ - adsloc32.dll (Proprietary ADS Engine.)
+ - axcws32.dll (Proprietary ADS Engine.)
+
+
+GPL Software:
+-------------
+
+The following utilities are FREE Software subject to
+the terms of the GPL:
+
+ - xhb.exe       (xHarbour compiler.)
+ - xhbd.exe      (debug build of the xHarbour compiler)
+ - include\*.h   (xHarbour include files.)
+  
+ - xPrompt.exe   (Dot Prompt console, Pre-Processor
+                  and Script Interpreter.)    
+ - hbdoc.exe     ( Documentation Generator.)
+  
+The following R/T support files are FREE software 
+subject to the terms of the GPL plus the [x]Harbour
+exception: 
+
+ - include\*.api (xHarbour R/T include files.)
+ - include\*.ch  (xHarbour R/T include files.)
+
+ - xhb.lib   (Run time libraries of xHarbour.)
+ - nordd.lib (Empty stub of RDD.)
+ - dbf.lib   (DBF RDD for xHarbour.) 
+ - ntx.lib   (NTX RDD for xHarbour.)
+ - cdx.lib   (CDX RDD for xHarbour.)
+
+ - ads.lib   (Advantage DBF/NTX/CDX/ADX RDD
+              for xHarbour.)
+
+ - xcl.lib   (xHarbour Components Library AKA
+              Whoo.)
+
+
+PUBLIC DOMAIN Software:
+-----------------------
+The following R/T support files are FREE software
+and are considered at the PUBLIC DOMAIN:
+
+   w32.lib   (Windows 32bit API interface AKA
+              What32.)  
+
+   
+All trademarks and trade names are the property of their respective
+owners and are used here for identification purposes only. 
+
+For any questions about licensing, and or to report
+any omission in this list, please contact:
+
+licenseinfo@xHarbour.com
