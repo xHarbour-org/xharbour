@@ -1,0 +1,47 @@
+CINI = ..\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\..\..\..\Visual-xHarbour\library\include;..\..\..\..\Visual-xHarbour\xedit;\xhb\include\w32
+LAUTORUN = .T.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\vc8; $(XHB_VC8)\Lib
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN;WIN32;__IMPORT__;__EXPORT__
+MYLINK_FLAGS =
+MYPRG_FLAGS = 
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\xDebugW-exe.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN = 
+TARGETFOLDER = \xhb\bin\vc8
+
+[..\..\source\vxhdapp.prg]
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\..\resource\vxhd.rc]
+MYDEFINES = 
+MYRC_FLAGS = 
+
+[\xhb\lib\vc8\vxhd.lib]
+
+[\xhb\lib\vc8\vxh.lib]
+
+[\xhb\lib\vc8\tproject.lib]
+
+[\xhb\lib\vc8\xEditVXH.lib]
+
+[\xhb\lib\vc8\ActiveX.lib]
+
+[\xhb\lib\vc8\Ole.Lib]

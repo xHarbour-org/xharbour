@@ -1,0 +1,38 @@
+CINI = xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS=..\include;\xhb\include\w32
+LAUTORUN =
+LDEBUG=.F.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN;WIN32;__EXPORT__;__IMPORT__
+MYLINK_FLAGS =
+MYPRG_FLAGS = 
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\vxhd.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN =
+TARGETFOLDER = \xhb\lib\vc8
+
+[..\source\vxhdarea.prg]
+[..\source\vxhdcall.prg]
+[..\source\vxhdcon.prg]
+[..\source\vxhdebug.prg]
+[..\source\vxhdgui.prg]
+[..\source\vxhdlist.prg]
+[..\source\vxhdmon.prg]
+[..\source\vxhdset.prg]
+[..\source\vxhdtab.prg]
+[..\source\vxhdtime.prg]
+[..\source\vxhdwatch.prg]

@@ -1,0 +1,555 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-07-13 11:42 UTC-0300 Luiz Rafael Culik Guimaraes < luiz at xharbour.com.br
+  * vxhdebug/source/vxhdapp.prg
+    ! fixed opensource() method to not open file dialog if the file exist on sourcepath
+
+2009-07-06 11:13 UTC+0100 Patrick Mast <patrick.mast at xharbour.com>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/gtkdapp.prg
+    * Version bump to 1.71.
+
+2009-07-05 00:00 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * vxhdebug\source\vxhdebug.prg
+    ! Fixed Watch edit box to dock to "AAdd watchpoint" button instead of "Add tracepoint"
+    + Added fixes for last VXH OnError fix to call the objects from Form instead of parent
+  * vxhdebug\source\vxhdwatch.prg
+    ! Fixed METHOD ReadSets() CLASS XHDebugger
+      Phil: aSets returns an array of 111 elements (up to _SET_TRIMFILENAME) and these values are beyond 200
+      commented out following lines:
+            //{ _SET_BACKGROUNDTASKS, "BackgroundTasks", aSets[ _SET_BACKGROUNDTASKS ] }, ;
+            //{ _SET_BACKGROUNDTICK, "BackgroundTick", aSets[ _SET_BACKGROUNDTICK ] }, ;
+            //{ _SET_ERRORLOG, "ErrorLog", aSets[ _SET_ERRORLOG ] },;
+            //{ _SET_ERRORLOOP, "ErrorLoop", aSets[ _SET_ERRORLOOP ] }, ;
+            //{ _SET_OUTPUTSAFETY, "OutputSafety", aSets[ _SET_OUTPUTSAFETY ] }, ;
+            //{ _SET_PRINTERJOB, "PrinterJob", aSets[ _SET_PRINTERJOB ] }, ;
+            //{ _SET_TRACE, "Trace", aSets[ _SET_TRACE ] }, ;
+            //{ _SET_TRACEFILE, "TraceFile", aSets[ _SET_TRACEFILE ] }, ;
+            //{ _SET_TRACESTACK, "TraceStack", aSets[ _SET_TRACESTACK ] }, ;
+      I suppose the real fix is up to you. I just patched it
+
+2009-06-06 00:00 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
+  * vxhdebug/source/vxhdapp.prg
+    + Added missing property "oButtonOpen"
+    
+2009-01-21 15:09 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-DebugClient/vxhdebug/vc8/xbuild.msvc8.ini
+- xHarbour-DebugClient/vxhdebug/xcc/vxhd.lib/vxhd.lib.xbp
+- xHarbour-DebugClient/vxhdebug/xcc/xdebugw.exe/xDebugW.exe.xbp
+- xHarbour-DebugClient/vxhdebug/xcc/xdebugw.exe-Demo/xDebugW.exe.xbp
++ xHarbour-DebugClient/vxhdebug/vc8/xDebugW-EXE.exe.xbp
+  * This builds xDebugW.exe that does NOT use VXHDLL.DLL
++ xHarbour-DebugClient/vxhdebug/vc8/Demo/xDebugW.exe.xbp
++ xHarbour-DebugClient/vxhdebug/xcc/xDebugW.exe.xbp
+  * This builds xDebugW.exe that uses VXHDLL.DLL
++ xHarbour-DebugClient/vxhdebug/xcc/xDebugW-EXE.exe.xbp
+* This builds xDebugW.exe that does NOT use VXHDLL.DLL
++ xHarbour-DebugClient/vxhdebug/xcc/vxhd.lib.xbp
++ xHarbour-DebugClient/vxhdebug/xcc/Demo/xDebugW.exe.xbp
+* xHarbour-DebugClient/vxhdebug/vc8/vxhd.lib.xbp
+  * Fixed paths in source and include folders
+* xHarbour-DebugClient/vxhdebug/vc8/xDebugW.exe.xbp
+  * Fixed paths and builds using LUSEDDLL now
+
+
+2009-01-16 16:45 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
+- vxhdebug\vxhd.lib.xbp
+- vxhdebug\xDebugW.exe.xbp
+- vxhdebug\xDebugW-demo.exe.xbp
++ vxhdebug\xcc\vxhd.lib\vxhd.lib.xbp
++ vxhdebug\xcc\xdebugw.exe\xDebugW.exe.xbp
++ vxhdebug\xcc\xdebugw.exe-Demo\xDebugW.exe.xbp
+
+2008-12-22 12:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    ! Fixed editor invisibility after recent vxh.lib changes.
+    * Version bump to Preview Release 1.7.
+
+2007-10-26 03:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/gtkdedit.prg
+    * Insignificant typo fix.
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdgui.prg
+    ! Don't allow opening nonexistent files in file open dialog.
+    ! Don't crash when user clicks Cancel in file open dialog.
+    * Version bump to Preview Release 1.6.
+
+2007-08-30 16:45 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+  * vxhdebug/source/vxhdgui.prg
+    * Added lAutoFind in METHOD Sync() in Class XHDebuggerGUI. For now, it's set to .F.
+      Maybe we can make a setting for it? -autofindsourcefile ?
+      Note: I think we can start using a INI file to save the position of
+            the xDebugw.exe. This way we can also have more settings saved in
+            the INI file. We can start the xDebugW.xe with -INI:<cIniPath>
+      Note: The sourcepath: parameter is to short to be used in windows.
+            I have a sourcepath of +400 chars. because my source is in several
+            different folders. So, "sourcepath" is also a candidate to be in the
+            INI file
+  * vxhdebug/xDebugW.exe.xbp and xDebugW-demo.exe.xbp
+    + Added vxhd.lib.xbp (instead of vxhd.lib) 
+
+2007-08-22 00:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/gtkdapp.prg
+    * Version bump to Linux Preview Release 1.1.
+  * vxhdebug/source/gtkdgui.prg
+    ! Work around GTK+ bug #56070, "button under cursor does not work after 
+      becoming sensitive".
+
+2007-08-12 22:28 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * ChangeLog
+    + Added my missing changelog for changes committed by Patrick.
+
+2007-08-12 21:58 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdarea.prg
+    ! Proper fix for work area display.
+  * ChangeLog
+    + Added previous Paul Tucker's change log.
+
+2007-08-12 12:45 UTC-0500 Paul Tucker <ptucker a t sympatico.ca>
+  * vxhdebug/source/vxhdarea.prg
+    * METHOD UpdateInfo()
+      ! Keep nArea within range of ::aAreas list
+    * METHOD Create()
+      ! Modified calculation from '* 3' to '* 5'
+        :Width := (12 + 6 + 8 + 10) * 7 + 4 * 5
+      * This eliminates the horizontal scrollbar if there was a
+      * vertical scrollbar.
+      * I would need to see the rational behind these numbers to
+      * know if this is even close to a proper fix.
+
+2007-08-09 12:52 UTC+0000 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    * Version bump to Preview Release 1.5
+    + Added SetEditorPos() method recently needed by xEdit.
+  * vxhdebug/source/vxhdcall.prg
+    ! Adjust ListBox:GetCurSel() values to be 0-based as per WinAPI.
+  * vxhdebug/source/vxhdebug.prg
+    ! Use the dbgserve.lib's XHD_VAL_TO_STR() instead of ValToPrgExp()
+      which became harder to parse recently.
+  * vxhdebug/source/vxhdset.prg
+    ! A small fix for Set() list.
+
+2006-11-03 12:36 UTC-0800 Augusto Infante <augusto@visualxHarbour.com>
+  * vxhdebug/source/vxhdgui.prg
+    * METHOD Start()
+       ! Fixed call to Application:Start() ONLY if Application:ClassName == "DEBUGGER"
+    * METHOD Stop()
+       !Moved below ONLY if Application:ClassName == "DEBUGGER"
+       ::oTab:TabPage1:Select()
+       ::btnGo:Caption := "Start"
+       ::btnGo:Tooltip := "Start <F5>"
+   
+       AEval( { ::btnBreak, ::btnStop, ::btnInto, ::btnOver, ::btnOut, ::btnCursor, ::btnToggle }, {|o| o:Disable() } )
+
+
+2006-10-16 04:24 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    ! Restart the program after stopping it and pressing Start.
+  * vxhdebug/source/vxhdcon.prg
+    ! Enable the command entry.
+  * vxhdebug/source/vxhdwatch.prg
+    ! Enable the Add buttons.
+  * vxhdebug/source/vxhdcall.prg
+    ! Update other info on stack frame change.
+  * vxhdebug/source/vxhdarea.prg
+    ! Enable work area selection.
+    ! Update work area info on work area change.
+
+2006-04-24 15:35 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    * Changed all TRY/END into TRY/CATCH/END
+
+2006-03-28 15:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/gtkdapp.prg
+  * vxhdebug/source/gtkdgui.prg
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    + Added option -sourcepath:"<semicolon-separated path list>" to specify
+      the default paths of source files.
+    + Allow user to open a source file by selecting it from a list of known
+      source files.
+
+2006-03-22 22:46 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/gtkdapp.prg
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+    + Support the following command line syntaxes both under Windows and Unix:
+      xdebug<l|w> [-port:<port>] [-sources:<sources>] <executable> [<cmdline>]
+          Starts the executable, using TCP/IP port <port> (10000 by default)
+     for communication.
+      xdebug<l|w> -host:<hostname>[:<port>] [-port:<port>] [-sources:<sources>]
+          Connects to an executable already listening on host <hostname>,
+     TCP/IP port <port>.
+      <hostname> - a hostname or an IP address.
+      <sources> - a semicolon-separated list of source files to be opened.
+      <cmdline> - optional command line arguments for the executable.
+
+2006-03-22 03:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/gtkdgui.prg
+  * vxhdebug/source/vxhdgui.prg
+    ! Allow setting breakpoints and running to cursor only for valid stop
+      lines.
+
+2006-03-21 23:57 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/gtkdmon.prg
+  * vxhdebug/source/vxhdmon.prg
+    + By default, display only GLOBAL and GLOBAL EXTERNAL variables declared
+      in current module. Added an option to display all GLOBAL variables.
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdtime.prg
+  * vxhdebug/source/gtkdtime.prg
+    * Improved debugger responsiveness a little.
+
+2006-03-12 19:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/gtkdapp.prg
+    * Some changes in the About dialog.
+  * vxhdebug/source/gtkdedit.prg
+  * vxhdebug/source/gtkdgui.prg
+  * vxhdebug/source/vxhdgui.prg
+    ! Dehighlight current source line after Stop.
+
+2006-03-12 05:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + vxhdebug/source/gtkdapp.prg
+  + vxhdebug/source/gtkdarea.prg
+  + vxhdebug/source/gtkdcall.prg
+  + vxhdebug/source/gtkdcon.prg
+  + vxhdebug/source/gtkdedit.prg
+  + vxhdebug/source/gtkdgui.prg
+  + vxhdebug/source/gtkdmon.prg
+  + vxhdebug/source/gtkdset.prg
+  + vxhdebug/source/gtkdtime.prg
+  + vxhdebug/source/gtkdwatch.prg
+  + vxhdebug/Makefile
+    + Initial implementation of xHarbour Visual Debugger for Linux.
+      It uses the xbgtk library (http://xbgtk.sourceforge.net).
+      I don't have any recent version of xHarbour Builder for Linux,
+      and so I did not make an .xbp file, only a GNU Makefile.
+
+2006-03-12 05:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdarea.prg
+  * vxhdebug/source/vxhdcall.prg
+  * vxhdebug/source/vxhdcon.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+    * Moved some common code to the base XHDebugger class.
+
+2006-01-19 17:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+    ! Allow entering long values in variable editing boxes.
+    + Added support for hashes.
+
+2006-01-19 15:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdebug.prg
+    + Added support for GLOBAL variables.
+
+2006-01-18 23:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdwatch.prg
+    ! Fixed wrong calculation of the activated row in DataGrids.
+
+2006-01-18 22:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdmon.prg
+    ! Fixed PUBLIC variable monitoring.
+  * vxhdebug/source/vxhdapp.prg
+    * Changed copyright to year 2006.
+
+2006-01-17 17:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+    ! Fixed RTE when trying to remove a breakpoint.
+
+2006-01-06 04:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdwatch.prg
+    ! Fixed RTE when leaving a text entry box inside various DataGrids.
+
+2005-11-14 16:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    + Added -sources:"...;..." command line argument to allow direct
+      specification of source files. This argument must be specified before
+      .exe file name.
+    * Version changed to "Preview Release 1.3".
+
+2005-11-14 01:39 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    ! Fixed a copy&paste RTE.
+  * vxhdebug/vxhd.lib.xbp
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+  + vxhdebug/source/vxhdset.prg
+    + Added a Set() inspector.
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdwatch.prg
+    ! Updated to use the new DataGrid APIs.
+
+2005-10-26 21:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * xHarbour-DebugClient/vxhdebug/source/vxhdapp.prg
+    ! Fixed missing mouse cursor bug.
+
+2005-09-05 07:36 UTC-0800 Augusto Infante <august@xHarbour.com>
+  * xHarbour-DebugClient/vxhdebug/source/vxhdgui.prg
+    + Added call to METHOD EnableBars when Application:IdeActive is TRUE
+    + Added UnhookWindowsHookEx to METHOD Stop when Application:IdeActive is TRUE
+      Stopping HOOKS is MANDATORY, I really didn't follow stand alone version but I couldn't find
+      the call to UnhookWindowsHookEx() ANYWHERE
+      
+2005-08-17 07:36 UTC-0800 Augusto Infante <august@xHarbour.com>
+  * xHarbour-DebugClient\vxhdebug\source\vxhdmon.prg
+    !Fixed Controls creation to send only Parent as a constructor parameter
+     i.e.
+        Before
+          WITH OBJECT CheckBox( Self , "Local" )
+
+       Now
+          WITH OBJECT CheckBox( Self )
+              :Caption := "Local"
+
+2005-07-02 08:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    * Version bump.
+    ! Fixed display of the bottom of the debugger panel.
+    + Added restart capability.
+  * vxhdebug/vxhd.lib.xbp
+  + vxhdebug/source/vxhdarea.prg
+  * vxhdebug/source/vxhdebug.ch
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdcall.prg
+  * vxhdebug/source/vxhdcon.prg
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdwatch.prg
+    + Added workarea inspector.
+    * Added lDirty flag to increase debugger speed.
+
+2005-06-17 02:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdgui.prg
+    ! Fixed a typo which caused RTE in object inspector.
+
+2005-06-13 12:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdcon.prg
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdwatch.prg
+    + Added capability to change values in Monitor, Watch and inspectors.
+
+2005-06-09 17:55 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdgui.prg
+    + Added support for Ctrl+Al+Break => Break into
+    * F12 => F10 MSVC compatability, now that F10 can be used.
+    + Added ::oEditor:HighLight() in ::Synch()
+
+2005-06-09 15:15 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    + Added direct keyboard hook support.
+
+2005-06-09 02:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    ! Fixed File->Exit menu item.
+    * Incremented version number to 1.1.
+  * vxhdebug/source/vxhdebug.prg
+    ! Fixed remove watchpoint implementation.
+  * vxhdebug/source/vxhdmon.prg
+    * Use DataGrid instead of ListBox for monitor.
+  * vxhdebug/source/vxhdwatch.prg
+    ! Fixed watchpoint inspection.
+
+2005-06-09 00:14 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+    ! Fixed step over implementation.
+  * vxhdebug/source/vxhdgui.prg
+    * Moved Step Over from F10 to F12.
+
+2005-06-07 22:08 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    ! Fixed Enable/Disable of debug buttons.
+    + Added ::OnStop()
+
+2005-06-07 17:23 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    + Added:
+        DATA btnGo, btnBreak, btnStop, btnInto, btnOver, btnOut, btnCursor, btnToggle
+    * Revised Fn Key assignments to be MSVC compatabile.
+
+  /*
+    NOTE: F10 should be fixed, as it's a SYS KEY.
+   */
+
+2005-06-07 19:17 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdebug.ch
+  * vxhdebug/source/vxhdwatch.prg
+  * vxhdebug/source/vxhdapp.prg
+    + Fixed watchpoint setting.
+    + Added recursive monitor and watchpoint inspector.
+    + Added function key bindings.
+    + Added "Run to cursor" action.
+    + Added '??' command inspection support.
+    ! Fixed miscellaneous bugs.
+
+2005-06-04 21:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdapp.prg
+    ! Fixed :AddMenuItem() syntax.
+
+2005-06-04 18:08 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdcon.prg
+  * vxhdebug/source/vxhdgui.prg
+    + Added support for clipboard and history in command console, and
+      fixed some other issues.
+
+2005-06-04 11:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/vxhd.lib.xbp
+  * vxhdebug/source/vxhdebug.ch
+  + vxhdebug/source/vxhdwatch.prg
+    + Added a page for watchpoint and tracepoint setting.
+  * vxhdebug/source/vxhdcon.prg
+    ! Fixed visual issues.
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+    + Added array and object inspection for monitored variables.
+
+2005-05-10 04:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/vxhd.lib.xbp
+  * vxhdebug/source/vxhdapp.prg
+  + vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdmon.prg
+  * vxhdebug/source/vxhdtime.prg
+    + Initial GUI separation.
+    + Added Monitor configuration checkboxes.
+    + Added Break and Step Out buttons.
+
+2005-05-09 10:37 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+    * Fixes tio synch with VXH changes
+
+2005-04-23 17:42 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdapp.prg
+    * Implemented Open Application, Open Source, Close Source, Close Application
+      /* TOTO Enable/Disable of menu options as appropriate. */
+
+2005-04-23 11:44 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdapp.prg
+    + Added support for command line arguments to debugee
+    * Fixed ::OpenSource() to not change current folder.
+
+2005-04-23 4:40 UTC-0800 Augusto Infante <august _at_ xharbour.com>
+  * vxhdebug/vxhd.exe.xbp
+    + Added Resource\vxh.rc to project !!!!
+      this was causing DIALOGS in xeditlib.prg to fail creation causing a problem in function Stretch()
+      Dialogs handles were ZERO ( same as DESKTOP handle ) causing ALL children to Stretch.
+      If handle is 0 (desktop), all it's children are moved.
+
+  + Added vxhdebug\Resource\vxhd.xml
+    Activates XP Themes
+
+  * vxhdebug\Resource\vxhd.rc
+    * modified path to xedit.rc
+    - removed reference to vxh.rc
+
+  * vxhdebug\source\vxhdapp.prg
+    !Fixed bug in CoolbarBand1 to hold CoolMenu1 instead of ToolBar1, ToolBar1 gets held in Band2
+
+
+2005-04-22 22:17 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+ * vxhdebug/source/vxhdapp.prg
+ * vxhdebug/source/vxhdebug.prg
+   * Practically functional.
+
+2005-04-22 19:20 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * xhdebug/vxhd.exe.xbp
+  * xhdebug/source/vxhdapp.prg
+  * xhdebug/source/vxhdebug.prg
+    * Fixes to make initial working model.
+
+2005-04-22 23:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdcon.prg
+    ! Removed keypress debugging messages.
+  * vxhdebug/source/vxhdebug.prg
+  + vxhdebug/vxhd.exe.xbp
+  + vxhdebug/source/vxhdapp.prg
+    * An attempt to build a standalone debugger. This is not going
+      to work yet.
+
+2005-04-21 20:37 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdebug.prg
+    * Corrected ::ToggleBreak() to first rest ::oEditor
+    + Added SetForgroundWindow( ::oApp:Mainwindow:hWnd ) to ::Sync()
+
+2005-04-22 04:20 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/vxhd.lib.xbp
+  + vxhdebug/source/vxhdcon.prg
+  + vxhdebug/source/vxhdlist.prg
+  + vxhdebug/source/vxhdtab.prg
+    + Added new files.
+  * vxhdebug/source/vxhdebug.prg
+    * User interface updates.
+    + Added command console window.
+  * vxhdebug/source/vxhdcall.prg
+  * vxhdebug/source/vxhdmon.prg
+    * Inherit from XHDebugList instead of DebugBuild.
+
+2005-04-02 02:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/TODO
+    * Updated.
+  * vxhdebug/vxhd.lib.xbp
+  + vxhdebug/source/vxhdcall.prg
+  * vxhdebug/source/vxhdebug.ch
+  * vxhdebug/source/vxhdebug.prg
+    + Added call stack walking capability.
+  * vxhdebug/source/vxhdtime.prg
+    * Decreased timer delay to 250 ms to improve visual performance.
+
+2005-04-01 03:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+    ! Handle oEditor correctly.
+    ! Fixed crash on connection loss.
+
+2005-03-30 21:10 UTC-0800 Ron Pinkas <ron _at_ xharbnour.com>
+  * vxhdebug/source/vxhdebug.prg
+    + Added call to oEditor:ToggleBookmark in ::ToggleBreak()
+
+2005-03-31 03:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * vxhdebug/source/vxhdebug.prg
+    * Fixed crash on loss of connection.
+    + Added breakpoint setting (so far only in the current file).
+
+2005-03-31 00:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + vxhdebug/
+  + vxhdebug/resource/
+  + vxhdebug/resource/vxhd.rc
+  + vxhdebug/source/
+  + vxhdebug/source/vxhdebug.ch
+  + vxhdebug/source/vxhdebug.prg
+  + vxhdebug/source/vxhdmon.prg
+  + vxhdebug/source/vxhdtime.prg
+  + vxhdebug/TODO
+  + vxhdebug/vxhd.lib.xbp
+    + Initial upload of the client GUI for the xHarbour-DebugServer.
+      The TODO file contains a brief summary of what needs to be done.
+
+2005-03-06 10:39 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+    + Initial upload

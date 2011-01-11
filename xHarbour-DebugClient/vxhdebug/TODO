@@ -1,0 +1,36 @@
+Lots of Visual xHarbour debugger TODOs:
+
+EXECUTION:
+- Animate
+- Run to cursor
+- Watchpoints / Tracepoints
+
+MONITOR:
+- Change variable values from Monitor
++ MEMVAR monitoring
+- GLOBAL monitoring
+- Array monitoring
+- Hash monitoring
+- Object monitoring
+
+MISC:
+- Expression evaluation
++ Callstack walking
+- Set() browsing
+- Work area browsing
+- GUI humanization
+- Command window
+- CLD command set compatibility?
+
+VXH ITSELF:
+- Force rebuilding clean with debug info switched on/off
+- Save "Build with debugging info" property
+- Kill the program being debugged on exit
++ Set breakpoints in the editor (file name retrieval)
++ Set breakpoints in the editor (visual breakpoint mark)
+- Set breakpoints only on valid breakpoint lines
+- Make VXH work as a debugging client for non-VXH / remote programs?
+- Work as a standalone debugger (VXH separation)
+
+WHAT ELSE?
+

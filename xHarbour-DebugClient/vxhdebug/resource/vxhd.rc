@@ -1,0 +1,4 @@
+#include "..\..\..\Visual-xHarbour\xedit\xedit.rc"
+
+1 MANIFEST "vxhd.XML"
+
