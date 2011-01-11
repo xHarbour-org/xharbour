@@ -1,0 +1,11 @@
+; XBScript.def : Declares the module parameters for the DLL.
+
+LIBRARY      "XBScript"
+;DESCRIPTION  'XBScript Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here
+	DllRegisterServer	 PRIVATE
+	DllUnregisterServer	 PRIVATE
+	DllCanUnloadNow		 PRIVATE
+	DllGetClassObject	 PRIVATE

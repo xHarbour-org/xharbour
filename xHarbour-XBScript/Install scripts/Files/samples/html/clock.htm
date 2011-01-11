@@ -1,0 +1,202 @@
+<HTML>
+
+<OBJECT ID="XBScript" WIDTH=0 HEIGHT=0
+   CLASSID="CLSID:ADB21CAC-9B03-4D64-9097-83B05741FDAF"
+   CODEBASE="http://www.xharbour.com/ondemand/xbscript.cab#Version=2,0,3,0">
+</OBJECT>
+
+<SCRIPT language=XBScript>
+
+#define PI 3.14159265
+
+#define DATE_COLOR    "7F7F7F"
+#define FACE_COLOR    "000000"
+#define SECONDS_COLOR "00FFFF"
+#define MINUTES_COLOR "FF0000"
+#define HOURS_COLOR   "FF0000"
+
+#define HEIGHT 36
+#define WIDTH  36
+
+#define HAND_HEIGHT 7 
+#define HAND_WIDTH  7 
+
+#define LEN_H 3
+#define LEN_M 4
+#define LEN_S 5
+
+#define HAND_Y_OFFSET -7
+#define HAND_X_OFFSET -2.5
+
+#define X_OFFSET 100
+
+#define FONT "Arial"
+#define FONT_SIZE "10"
+
+#define SPEED 0.9
+
+#define SPLIT 30 // ( 360 / 12 )
+
+#define STEP 0.2
+
+PROCEDURE Clock()
+      
+   LOCAL dDate := Date()
+   LOCAL Face  := { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "1" }
+   LOCAL cDoc
+
+   PUBLIC cDateString := " " + cDow( dDate ) + " " + Str( Day( dDate ), 2 ) + " " + CMonth( dDate ) + " " + Str( Year( dDate ), 4 ) + " "
+   PUBLIC nDateString := Len( cDateString )
+   
+   PUBLIC H := Replicate( '.', LEN_H )
+   PUBLIC M := Replicate( '.', LEN_M )
+   PUBLIC S := Replicate( '.', LEN_S )
+               
+   PUBLIC ymouse := 0
+   PUBLIC xmouse := 0
+      
+   PUBLIC DSplit := 360 / nDateString
+         
+   PUBLIC currStep := 0
+   
+   PUBLIC y := Array( 12 ), x := Array( 12 ), Y2 := Array( 12 ), X2 := Array( 12 )
+   
+   aFill( y, 0 )
+   aFill( x, 0 )
+   aFill( Y2, 0 )
+   aFill( X2, 0 )
+   
+   PUBLIC Dy := Array( nDateString ), Dx := Array( nDateString ), DY2 := Array( nDateString ), DX2 := Array( nDateString )
+   
+   aFill( Dy, 0 )
+   aFill( Dx, 0 )
+   aFill( DY2, 0 )
+   aFill( DX2, 0 )
+
+   cDoc := '<div id="divDate" style="position:absolute;top:0px;left:0px"><div style="position:relative">'
+   FOR i := 1 TO nDateString
+      cDoc += '<div id="ieDate" style="position:absolute;top:0px;left:0;height:' + FONT_SIZE + ';width:' + FONT_SIZE + ';text-align:center"><font face=' + FONT + ' size=1 color=' + DATE_COLOR + '><B>' + cDateString[i] + '</B></font></div>'
+   NEXT
+   cDoc += '</div></div>'
+   
+   cDoc += '<div id="DivFace" style="position:absolute;top:0px;left:0px"><div style="position:relative">'
+   FOR i := 1 TO 12
+      cDoc += '<div id="ieFace" style="position:absolute;top:0px;left:0;height:' + FONT_SIZE + ';width:' + FONT_SIZE + ';text-align:center"><font face=' + FONT + ' size=1 color=' + FACE_COLOR + '><B>' + Face[i] + '</B></font></div>'
+   NEXT
+   cDoc += '</div></div>'
+   
+   cDoc +='<div id="DivHr" style="position:absolute;top:0px;left:0px"><div style="position:relative">'
+   FOR i := 1 TO LEN_H
+      cDoc +='<div id="ieHours" style="position:absolute;width:16px;height:16px;font-family:Arial;font-size:16px;color:' + HOURS_COLOR +';text-align:center;font-weight:bold">' + H[i] + '</div>'
+   NEXT
+   cDoc +='</div></div>'
+   
+   cDoc +='<div id="DivMin" style="position:absolute;top:0px;left:0px"><div style="position:relative">'
+   FOR i := 1 TO LEN_M
+      cDoc +='<div id="ieMinutes" style="position:absolute;width:16px;height:16px;font-family:Arial;font-size:16px;color:' + MINUTES_COLOR + ';text-align:center;font-weight:bold">'+ M[i]+'</div>'
+   NEXT
+   cDoc += '</div></div>'
+   
+   cDoc += '<div id="DivSec" style="position:absolute;top:0px;left:0px"><div style="position:relative">'
+   FOR i := 1 TO Len( S )
+      cDoc += '<div id="ieSeconds" style="position:absolute;width:16px;height:16px;font-family:Arial;font-size:16px;color:' + SECONDS_COLOR + ';text-align:center;font-weight:bold">'+S[i]+'</div>'
+   NEXT
+   cDoc += '</div></div>'
+   
+   //Alert( cDoc )
+   document:write( cDoc )
+
+   OnInterval() 
+RETURN
+
+PROCEDURE OnMouseMove( evnt )
+
+   ymouse = event:y 
+   xmouse = event:x + X_OFFSET
+
+RETURN
+   
+PROCEDURE OnInterval()
+   
+   LOCAL secs, sec, mins, min, hrs, hr, i
+
+   Dy[1] := Round( DY2[1] += ( (ymouse) - DY2[1] ) * SPEED, 0 )
+   Dx[1] := Round( DX2[1] += ( (xmouse) - DX2[1] ) * SPEED, 0 )   
+   
+   FOR i := 2 TO Len( cDateString )
+      Dy[i] := Round( DY2[i] += (Dy[ i-1 ] - DY2[i]) * SPEED, 0 )
+      Dx[i] := Round( DX2[i] += (Dx[ i-1 ] - DX2[i]) * SPEED, 0 )
+   NEXT
+   
+   y[1] := Round( Y2[1] += ( (ymouse) - Y2[1] ) * SPEED, 0 )
+   x[1] := Round( X2[1] += ( (xmouse) - X2[1] ) * SPEED, 0 )
+   
+   FOR i := 2 TO 12
+      y[i] := Round( Y2[i] += ( y[i-1] - Y2[i]) * SPEED, 0 )
+      x[i] := Round( X2[i] += ( x[i-1] - X2[i]) * SPEED, 0 )
+   NEXT
+
+   time := Time()
+   
+   secs := Val( Right( Time, 2 ) )
+   sec  := -1.57 + PI * secs / 30
+   
+   mins := Val( SubStr( time, 4, 2 ) )
+   min  := -1.57 + PI * mins / 30
+   
+   hrs   := Val( Left( time, 2 ) )
+   hr  := -1.575 + PI * hrs / 6 + PI * mins / 360
+
+   Window:DivDate:style:top := window:document:body:scrollTop
+   Window:DivFace:style:top := window:document:body:scrollTop
+   Window:DivHr:style:top   := window:document:body:scrollTop
+   Window:DivMin:style:top  := window:document:body:scrollTop
+   Window:DivSec:style:top  := window:document:body:scrollTop
+   
+   FOR i := 1 TO 12
+      F := ieFace[i - 1]:style
+   
+      F:top  := y[i] + HEIGHT * Sin( -1.0471 + i * SPLIT * PI / 180 )
+      F:left := x[i] + WIDTH  * Cos( -1.0471 + i * SPLIT * PI / 180 )
+   NEXT
+   
+   FOR i := 1 TO LEN_H
+      HL := ieHours[i - 1]:style
+   
+      HL:top  := y[i] + HAND_Y_OFFSET + (i * HAND_HEIGHT) * Sin( hr )
+      HL:left := x[i] + HAND_X_OFFSET + (i * HAND_WIDTH ) * Cos( hr )
+   NEXT
+   
+   FOR i := 1 TO LEN_M
+      ML := ieMinutes[i - 1]:style
+   
+      ML:top  := y[i] + HAND_Y_OFFSET + ( i * HAND_HEIGHT ) * Sin( min )
+      ML:left := x[i] + HAND_X_OFFSET + ( i * HAND_WIDTH )  * Cos( min )
+   NEXT
+   
+   FOR i := 1 TO LEN_S
+      SL := ieSeconds[i - 1]:style
+   
+      SL:top  := y[i] + HAND_Y_OFFSET + ( i * HAND_HEIGHT ) * Sin( sec )
+      SL:left := x[i] + HAND_X_OFFSET + ( i * HAND_WIDTH )  * Cos( sec )
+   NEXT
+   
+   FOR i := 1 TO nDateString
+      DL := ieDate[i - 1]:style
+   
+      DL:top  := Dy[i] + HEIGHT * 1.5 * Sin( currStep + i * DSplit * PI / 180 )
+      DL:left := Dx[i] + WIDTH  * 1.5 * Cos( currStep + i * DSplit * PI / 180 )
+   NEXT
+   
+   currStep -= STEP
+   
+   Window:SetTimeOut( "OnInterval()", 50 )
+   
+RETURN
+
+</script>
+
+<BODY OnMouseMove="OnMouseMove()">
+</body>
+
+</html>

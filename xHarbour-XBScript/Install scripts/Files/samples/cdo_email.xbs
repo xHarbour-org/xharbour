@@ -1,0 +1,61 @@
+#define CdoFileData         1  // Attachment is the contents of a file. (Default value.)
+#define CdoFileLink         2  // Attachment is a link to a file.
+#define CdoOLE              3  // Attachment is an OLE object.
+#define CdoEmbeddedMessage  4  // Attachment is an embedded message
+
+PROCEDURE Main()
+
+   LOCAL Session, Message, SendTo, Attachment, oErr
+   LOCAL cPath := "\" + CurDir()
+
+   TRY
+      Session := CreateObject( "mapi.session" )        // Create the MAPI object.
+   CATCH
+      Alert( "Sorry Mapi not avilable!" )
+      RETURN
+   END
+
+   TRY
+      Session:LogOn( "", "", .T. ) // Parametr 1 = Optional Profile Name
+                                   //          2 = Optional Password                                           
+                                   //          3 = Optional Show Dialog
+                                   //          4 = Optional NewSession
+                                   //          5 = Optional ParentWindow
+
+
+
+      Message := Session:OutBox:Messages:Add() // Create a Message message.
+
+      Message:Subject := "Test Mail with OLE Messaging"             // Add a message subject.
+      Message:Text    :="Mail System Test" + CHR(13) + "using OLE!" // Actual message text.
+
+
+      TRY
+         // Local Path was changed by one of the above methods!
+         //cPath := Left( WScript:ScriptFullName, RAt( '\', WScript:ScriptFullName ) )
+         DirChange( cPath )  
+
+         Attachment := Message:Attachments:Add()
+
+         Attachment:Type     := CdoFileData
+         Attachment:Position := 0
+         Attachment:Source   := "test.xbs" //WScript:ScriptFullName
+      CATCH oErr
+         Alert( "Error: " + oErr:Operation + " -> " + oErr:Description )
+      END
+
+      SendTo := Message:Recipients:Add()     // Add a recipient object
+
+      SendTo:Name := "xbscript@xharbour.com" // Email address to mail message to
+      SendTo:Type := 1                       // 1= "TO:"; 2="CC:"; 3="BCC:"
+
+      Message:Send( .T., .T., 0 )            // Parameter 1 = save copy in "Sent Mail" folder.
+                                             //           2 = Show eMail before sending
+                                             //           3 = ParentWindow  
+  
+      Session:LogOff() // Release the MAPI object.
+   CATCH oErr
+      Alert( "Error: " + oErr:Operation + " -> " + oErr:Description )
+   END
+
+RETURN

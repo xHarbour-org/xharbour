@@ -1,0 +1,27 @@
+PROCEDURE Main()
+
+   oIE := CreateObject( "InternetExplorer.Application" )
+   oIE:Navigate( "http://www.google.com" )
+
+   FOR i := 1 TO 50
+     nReady := oIE:ReadyState
+
+     IF nReady == 4
+        EXIT
+     ENDIF
+
+     WScript:Sleep( 100 )
+   NEXT
+     
+   oIE:Quit()
+
+   IF nReady == 4
+      Alert( "Internet running." )
+      WScript:Quit( 0 )
+      Alert( "OOps!" )
+   ELSE
+      Alert( "Internet not available." )
+      WScript:Quit( 1 )
+   ENDIF
+
+RETURN

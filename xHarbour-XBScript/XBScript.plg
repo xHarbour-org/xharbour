@@ -1,0 +1,54 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: XBScript - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\RON\LOCALS~1\Temp\RSPD93.tmp" with contents
+[
+/nologo /MT /W3 /GX /Zi /O1 /I "Scripting" /I "Interpreter" /I "Active Script Engine" /I "\xharbour\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/XBScript.pch" /YX /Fo"Release/" /Fd"Release/" /FD /TP /c 
+"C:\Program Files\Microsoft Visual Studio\MyProjects\ASXBScript\Active Script Engine\CASInterpreter.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\RON\LOCALS~1\Temp\RSPD93.tmp" 
+Creating temporary file "C:\DOCUME~1\RON\LOCALS~1\Temp\RSPD94.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ad1.lib vm.lib rtl.lib common.lib macro.lib pp.lib lang.lib rdd.lib dbfntx.lib dbfdbt.lib dbfcdx.lib dbffpt.lib what32.lib  g:\sqlrdd\lib\sql.lib /nologo /version:1.7 /subsystem:windows /dll /incremental:no /pdb:"Release/XBScript.pdb" /map:"Release/XBScript.map" /debug /machine:I386 /nodefaultlib:"libc.lib" /def:".\XBScript.def" /out:"Release/XBScript.dll" /implib:"Release/XBScript.lib" /libpath:"c:\xharbour\lib" /libpath:"Scripting" /FORCE:MULTIPLE 
+".\Release\CASErrorHandler.obj"
+".\Release\CASInterpreter.obj"
+".\Release\CEventHandler.obj"
+".\Release\ClassFactory.obj"
+".\Release\NamedItem.obj"
+".\Release\XBScript.obj"
+".\Release\DLLFunctions.obj"
+".\Release\gt_nul.obj"
+".\Release\misc.obj"
+".\Release\mousenul.obj"
+".\Release\pp.obj"
+]
+Creating command line "link.exe @C:\DOCUME~1\RON\LOCALS~1\Temp\RSPD94.tmp"
+<h3>Output Window</h3>
+Compiling...
+CASInterpreter.cpp
+Linking...
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarSetValue already defined in CASInterpreter.obj; second definition ignored
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarGet already defined in CASInterpreter.obj; second definition ignored
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarGetValue already defined in CASInterpreter.obj; second definition ignored
+rtl.lib(trace.obj) : warning LNK4006: _TraceLog already defined in XBScript.obj; second definition ignored
+rtl.lib(alert.obj) : warning LNK4006: "void __cdecl HB_FUN_ALERT(void)" (?HB_FUN_ALERT@@YAXXZ) already defined in pp.obj; second definition ignored
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarSetValue already defined in CASInterpreter.obj; second definition ignored
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarGet already defined in CASInterpreter.obj; second definition ignored
+vm.lib(memvars.obj) : warning LNK4006: _hb_memvarGetValue already defined in CASInterpreter.obj; second definition ignored
+rtl.lib(trace.obj) : warning LNK4006: _TraceLog already defined in XBScript.obj; second definition ignored
+rtl.lib(alert.obj) : warning LNK4006: "void __cdecl HB_FUN_ALERT(void)" (?HB_FUN_ALERT@@YAXXZ) already defined in pp.obj; second definition ignored
+   Creating library Release/XBScript.lib and object Release/XBScript.exp
+Release/XBScript.dll : warning LNK4088: image being generated due to /FORCE option; image may not run
+
+
+
+<h3>Results</h3>
+XBScript.dll - 0 error(s), 11 warning(s)
+</pre>
+</body>
+</html>

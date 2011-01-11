@@ -1,0 +1,17 @@
+[version]
+signature="$CHICAGO$"
+AdvancedINF=2.2.0
+
+[Add.Code]
+XBScriptEnt.dll=XBScriptEnt.dll
+
+[XBScript.dll]
+file-win32-x86=thiscab
+clsid={ADB21CAC-9B03-4D64-9097-83B05741FDAF}
+; Note that the {}s are required when entering a <tla rid="tla_clsid"/> in the INF file.
+; This is slightly different from the HTML syntax for inserting CLSIDs 
+; in an <OBJECT> tag.
+FileVersion=2,2,0,0
+RegisterServer=yes
+;DestDir=
+

@@ -1,0 +1,26 @@
+<HTML>
+   <OBJECT ID="XBScript" WIDTH=0 HEIGHT=0
+      CLASSID="CLSID:ADB21CAC-9B03-4D64-9097-83B05741FDAF"
+      CODEBASE="http://www.xharbour.com/ondemand/xbscript.cab#Version=2,0,3,0">
+   </OBJECT>
+
+   <SCRIPT language=XBScript></script>
+   <HEAD>
+      <P>xbScript Sample 2</p>
+   </head>
+
+   <BODY>
+      <PRE ID="DynBody"></pre>
+
+<SCRIPT language=XBScript>
+   PROCEDURE Main()
+      Window:DynBody:innerHTML := "<P>Client Side - Dynamic content.</p>" + ;
+                           "<P>Today is: " + dToC( Date() ) + "</p>"
+
+      // Also without Window specifier (slightly slower)
+      DynBody:innerHTML += "<P>xbSCript Version: " + PP_Version + "</p>"
+   RETURN
+</script>
+
+   </body>
+</html>

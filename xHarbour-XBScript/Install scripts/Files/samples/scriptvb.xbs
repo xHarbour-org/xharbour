@@ -1,0 +1,15 @@
+MyVar := "Outer"
+
+// First we create the script control.
+oSE := CreateObject( "ScriptControl" )
+oSE:AllowUI := .T.
+ 
+// Now execute some VBScript.
+oSE:Language := "VBScript"
+oSE:ExecuteStatement( 'MsgBox "VBScript from XBScript!"' )
+
+// Now execute some XBScript
+oSE:Language := "XBScript"
+oSE:executeStatement( 'Alert( "Nested XBScript" )' )
+
+Alert( "Back to main: " + MyVar )

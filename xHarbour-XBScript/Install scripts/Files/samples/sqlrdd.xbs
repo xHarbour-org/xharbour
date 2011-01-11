@@ -1,0 +1,93 @@
+#include "sqlrdd.ch"
+#include "mysql.ch"
+
+#define CRLF  Chr(13)+Chr(10)
+
+#ifdef __PP__
+ #include "wsh.ch" 
+#else
+ REQUEST SQLRDD             // SQLRDD should be linked in
+ REQUEST SR_MYSQL           // Needed if you plan to use native connection to MySQL
+#endif
+
+
+PROCEDURE Main()
+
+LOCAL nCnn,oErr
+LOCAL cTable:="TestTable"
+LOCAL aStruct := {{"CUST_ID","C", 8,0}  ,;
+                  {"NAME"   ,"C",50,0}  ,;
+                  {"ZIP"    ,"N", 5,0}  ,;
+                  {"STATE"  ,"C",30,0}}
+                  
+Alert( "Alert: The database and table used in this sample are READ ONLY" )
+
+TRY
+   ? "Connecting to database"
+   nCnn := SR_AddConnection( 3, "HST=mysql.bekz.be;UID=xbscriptsample;PWD=testpasw;DTB=SampleDatabase")
+CATCH oErr
+   ? "Connection error! " + CRLF + oErr : Operation + CRLF + oErr : Description
+   RETURN
+END
+
+IF nCnn < 0
+   ? "Connection error. See SQL1.LOG for details."
+   RETURN
+ENDIF
+
+? "Connected!"
+
+SR_SetActiveConnection( nCnn )
+
+// ? "Creating table"
+
+// dbCreate( cTable, aStruct, "SQLRDD" )
+
+? "Opening table"
+
+USE (cTable) NEW VIA "SQLRDD"
+
+// ? "Appending records to table"
+
+// APPEND BLANK
+
+// field->CUST_ID:="100"
+// field->NAME   :="John Doe"
+// field->ZIP    :=51240
+// field->STATE  :="Texas"
+
+// APPEND BLANK
+
+// field->CUST_ID:="101"
+// field->NAME   :="Eva Adams"
+// field->ZIP    :=72310
+// field->STATE  :="New York"
+
+// COMMIT
+
+? "Listing table's content"
+
+GO TOP
+
+// ? "CUST_ID  NAME            ZIP   STATE"
+// *  12345678 123456789012345 12345 123456789012345
+
+WHILE !Eof()
+   ? field->CUST_ID         + " " + ;
+     Left(field->NAME,15)   + " " + ;
+     Str(field->ZIP)        + " " + ;
+     Left(field->STATE,15)
+   SKIP
+ENDDO
+
+? "Closing table"
+
+USE
+
+// ? "Dropping table"
+
+//SR_DropTable( cTable )
+
+? "End of SQLRDD test"
+
+RETURN

@@ -1,0 +1,21 @@
+<SCRIPTLET>
+   <REGISTRATION PROGID="XBControl.wsc" 
+                 DESCRIPTION="Sample XBScript Control">
+   </REGISTRATION>
+
+   <IMPLEMENTS ID=Automation TYPE=Automation>
+      <PROPERTY NAME="SampleProperty"/>
+      <METHOD NAME="SampleMethod"/>
+   </IMPLEMENTS>
+
+   <SCRIPT LANGUAGE="XBScript">
+       PUBLIC SampleProperty := "Value of SampleProperty"
+ 
+       FUNCTION SampleMethod( x )
+
+          Alert( "In XBControl.SampleMethod()" )
+
+       RETURN "Param was: " + CStr( x )
+   </SCRIPT>
+</SCRIPTLET>
+   
