@@ -1,0 +1,25 @@
+/*
+ * $Id:
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2009-01-21 14:48 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+- xHarbour-AxtiveX/activex.lib.xbp
++ xHarbour-AxtiveX/xcc/activex.lib.xbp
+* xHarbour-AxtiveX/vc8/activex.lib.xbp
+  * Fixed paths
+
+
+2005-01-05 12:00 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  - Moved TestActiveX.prg to 
+    \xHarbour.com\xHarbour-Builder\Samples\Samples for PROF and ENT versions\Test_ActiveX.prg
+
+
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * activex.lib.xbp & testactivex.exe.xbp
+    * finetuned
