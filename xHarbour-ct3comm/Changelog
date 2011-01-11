@@ -1,0 +1,30 @@
+/*
+ * $Id: Pritpal Bedi <pritpal@vouchcac.com>
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2009-01-21 15:046 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-ct3comm/ct3comm.lib.xbp
++ xHarbour-ct3comm/vc8/xbuild.vc8.ini
++ xHarbour-ct3comm/vc8/ct3comm.lib.xbp
++ xHarbour-ct3comm/xcc/ct3comm.lib.xbp
+
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * ct3comm.lib.xbp
+    * finetuned
+
+2004-10-08 17:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + ct3comm.prg
+    Initial release of CA-Tools-III Compatible communications library.
+    This library is much more advanced than CA-Tools-III. At this stage
+    no documentation is there but Clipper documentation holds good in toto.
+    Hope to include documentation really soon.
+
+2004-10-08 17:35 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + ct3comm.prg.xbp
+    xBuild Project File.
