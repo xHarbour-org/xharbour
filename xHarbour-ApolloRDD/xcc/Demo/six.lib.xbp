@@ -1,0 +1,24 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = SDEAPI;DEMO
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\demo\six.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\demo
+
+[..\..\sixfuncs.prg]
+[..\..\ftsfunc.c]
+[..\..\six1.c]
+[..\..\sixfunc.c]
+

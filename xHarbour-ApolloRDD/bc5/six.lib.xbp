@@ -1,0 +1,25 @@
+CINI = xbuild.bc5.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = SDEAPI
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\bc5\six.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\bc5
+
+[..\sixfuncs.prg]
+[..\ftsfunc.c]
+[..\six1.c]
+[..\sixfunc.c]
+

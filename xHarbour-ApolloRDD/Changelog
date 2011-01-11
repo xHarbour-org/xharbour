@@ -1,0 +1,466 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-06-15 15:40 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+  ! rddsix.h
+    six1.c
+    ! changes to use Apollo version 7 
+      
+2010-06-08 14:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+  * xHarbour-ApolloRDD/six1.c
+    ! fixed found flag after record position change. problem reported by Marcelo Santana 
+    
+2010-01-06 09:40 UTC-0450 Ron Pinkas <ron@xHarbour.com>
+  * xHarbour-ApolloRDD/ftsfunc.c
+    * Synched with char* -> const char*
+
+2009-10-07 17:54 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * Sde61.h
+  * rddsix.h
+  * six1.c
+    * Adapted to new rdd structure, and solved some warnings.
+
+2009-07-22 21:29 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * xHarbour-ApolloRDD/rddsix.h
+    + Added HBDBSESSION info at the next future it will be used to save connection, and local
+      TTS transactions for all rdds by session.
+
+2009-01-21 14:35 GMT+1 Patrick Mast <patrick.mast@xHarbour.com>
++ xHarbour-ApolloRDD/vc8/Demo/six.lib.xbp
++ xHarbour-ApolloRDD/xcc/six.lib.xbp
++ xHarbour-ApolloRDD/xcc/Demo/six.lib.xbp
+- xHarbour-ApolloRDD/six.lib.xbp
+- xHarbour-ApolloRDD/six-demo.lib.xbp
+- xHarbour-ApolloRDD/Build_All.bat
+- xHarbour-ApolloRDD/vc8/six-demo.lib.xbp
+ -xHarbour-ApolloRDD/vc8/Build_All.bat
+
+2008-05-21 17:20 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+   * six1.c
+     ! fix sixopen to correct set neterror, when file was not open
+   * rddsix.h
+     ! synch with new workarea structure
+
+2007-12-13 13:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * six.c
+     ! touched
+   * rddsix.h
+     ! synch with new workarea structure
+
+2006-07-11 23:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/six1.c
+    * updated to recent core code modifications
+    ! fixed storing arrays in memo fields for strings longer then 32KB
+
+2005-11-16 14:26 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/six1.c
+    * synced with recent core changes
+
+2005-11-13 12:51 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/ftsfunc.c
+  * xHarbour-ApolloRDD/rddsix.h
+  * xHarbour-ApolloRDD/six1.c
+  * xHarbour-ApolloRDD/sixfunc.c
+    * synced with recent core changes
+    ! fixed clearing order conditions
+
+2005-10-05 04:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/six-demo.lib.xbp
+  * xHarbour-ApolloRDD/six.lib.xbp
+  - xHarbour-ApolloRDD/six0.prg
+  * xHarbour-ApolloRDD/six1.c
+  * xHarbour-ApolloRDD/sixfunc.c
+    * updated to recent core RDD code in xHarbour CVS
+    ! fixed scope setting - scopes in SDE does not works like in
+      Clipper - current implementations tries to be as close as possible
+
+2005-09-12 09:52 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/six1.c
+   * pass the 4-th parameter to trigger function by reference
+   * updated for recent RDD modification in xHarbour core code
+
+2005-08-24 04:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/Apollo.ch
+    * indenting
+
+  * xHarbour-ApolloRDD/Sde61.h
+    + added missing #define EVAL_DATE 4
+
+  * xHarbour-ApolloRDD/rddsix.h
+    * removed some unused WA members
+    + added lpdbPendingRel to WA
+
+  * xHarbour-ApolloRDD/six1.c
+    * updated for recent RDD modifications
+    + added synchronized SET setting in SDE for:
+         HB_SET_DELETED, HB_SET_CEUNTURY, HB_SET_EPOCH, HB_SET_EXACT,
+         HB_SET_AUTOPEN
+      HB_SET_DATEFORMAT should be added yet with small parser which
+      will try to convert xHarbour DATEFORMAT to SDE types
+    * some small fixed in trigger mechanism for better Clipper compatibility
+    ! fixed BOF/EOF/FOUND flag updating when relations are set
+    * implemented relations between other RDDs' WA
+    * implemented relations for expressions which are not recognized
+      by SDE and can be evaluated only on xHarbour side
+    + added dbRlockList() support
+    + added support for basic DBI_RM_* actions - now Apollo RDD can be
+      used with xHarbour HSX library
+    * fixed some RT errors and added some missing ones
+
+  * xHarbour-ApolloRDD/sixfunc.c
+    * updated for modifications in Apollo WA
+
+2005-08-07 23:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-ApolloRDD/six1.c
+    * updated to recent xHarbour RDD modification
+    * updated to other xHarbour base modifications done in the past
+    * use xHarbour hb_sp* file API to locate tables not Windows one
+    ! some small fixes
+    * reimplemented DROP() and EXISTS() RDDNODE methods
+    + added RDDINFO() method with some basic actions
+
+2005-02-19 20:02 GMT+1 Patrick Mast <patrick@xHarbour.com>
+   + Added dll folder
+   + Added DLL's for DLL folder
+
+2005-02-15 18:17 GMT+1 Patrick Mast <patrick@xHarbour.com>
+   + ApolloAPI.chm
+     * Initial upload
+
+2005-02-11 18:17 GMT+1 Patrick Mast <patrick@xHarbour.com>
+   * *.XBP
+     finetuned .XBP files
+
+2005-02-09 21:19 GMT+1 Patrick Mast <patrick@xHarbour.com>
+   * *.XBP
+     finetuned .XBP files
+
+2004-07-31 20:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   *six1.c
+     ! changes direct hb_set. to HB_SET_STACK macro
+
+2004-07-17 09:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   * six1.c
+     ! changes direct call to &hb_stack   with &(HB_VM_STACK)
+
+2004-07-14 11:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * six.c
+     ! Fixed sixOpen() to raise run time error when file does not exist
+       (Open error, DOS error 2)
+     ! Fixed sixClose() to correct workarea cleanup on error. It fixes
+       problem when EXCLUSIVE open fails and you try to open the file
+       again (was reporting ALIAS ALREADY IN USE).
+
+2004-07-09 08:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * Apollo.ch
+     ! Fixed wrong function name in SET EXACT (<x>)
+
+2004-03-23 16:48 GMT+1 Patrick Mast <patrick@xHarbour.com>
+   * six.c
+   ! Fix: Changed "hb_errRelease( pError );" into "hb_itemRelease( pError );"
+   + Added xBuild Project files
+
+2003-06-28 17:08 GMT+1 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+   * six.c
+   ! Fix: if an file was already open exclusive, Six driver was calling an msg box to
+          return the error i´ve set the sx_errorlevel(0) before calling sx_use() so all
+          errors can be caught  properly by neterr()
+
+2003-06-28 17:08 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * sx_Version(4) returns ApolloRDD version now.
+     sx_Version() returns Apollo SDE version
+   ! some fixes all around
+
+2003-05-05 20:56 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * Released BETA 13
+
+2003-05-05 15:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! GPF fixed, which appeared while closing a dbf, which had more than
+       one child dbfs ( with SET RELATION ).
+
+2003-05-05 11:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+   * sixfunc.c
+   * rddsix.h
+   * Apollo.ch
+     + New function added:
+         SetMemoBinary()
+       and appropriate command:
+         SET MEMOBINARY ON/OFF ( ON is default state ).
+       MEMOBINARY ON allows to have embedded 0 in the memo string,
+       MEMOBINARY OFF should be used if you need to have FPT compatible with
+       Clipper and Fox.
+
+2003-04-16 12:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+   * sixfunc.c
+     ! Some fixes, related to RYO filters
+
+2003-04-01 12:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * sixfunc.c
+     + sx_SetTag() function added.
+
+2003-03-24 12:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * sixfunc.c
+     ! sx_TagInfo() fixed
+
+2003-03-17 18:48 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * Released BETA 12
+
+2003-03-17 16:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     * Support of VarChar data type addded.
+
+2003-03-17 09:30 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! String with embedded 0 couldn't be saved in memo - fixed.
+
+2003-03-14 18:40 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Fixed a problem with GPF after closing a child ( in relation ) database.
+
+2003-02-28 21:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Fixed a problem with closing databases when SET RELATION was used
+     * ordDestroy() implemented, but it doesn't work yet because of Apollo's
+       sx_IndexClose() doesn't work properly.
+
+2003-01-23 21:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! OrdScope( nScope,"" ) now clears the designated scope
+   * sixfuncs.prg
+     * Some functions added
+
+2003-01-12 21:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Fixed a bug in sixSetScope() - appropriate Apollo's function, sx_SetScope()
+       causes record reposition, while this is wrong in Clipper.
+
+2003-01-12 17:55 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * sixfunc.c
+   * sixfuncs.prg
+     Few new functions added, m6_dbEval() is extended.
+
+2003-01-05 21:55 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * six1.c
+     ! fix for memo field. It returned 1 character too many.
+   * sixfuncs.c
+     + Added sx_Pack()
+     ! Fixed + renamed M6_SETFILTDROPREC() to M6_FILTDROPREC()
+     ! Fixed + renamed M6_SETFILTADDREC() to M6_FILTADDREC()
+   * sixfuncs.prg
+     ! fixed Sx_MemoPack to use sx_Pack(). Now PACK works as expected.
+   * Released BETA 9.3
+
+2002-12-27 21:55 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * apollo.ch
+     - deleted SetRDD() xtranslate
+   * \test\browsesix\browsesix.prg
+     Little fixes
+   * \xHarbour\Lib\rddsix.lib
+     build with Andi's binaries version 2.28
+     To get these xHarbour binaries, goto:
+      http://www.harbour-id.net/xharbour_228_bcc.zip
+     These xHarbour binaries does not have the Unresolved
+     external '_hb_getCurrentStack'
+   * Released BETA 9.1
+
+2002-12-27 12:57 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * apollo.ch
+     + Added as command:
+       sx_SetTag(), "SET DIRTYREAD", "PACK", "WILDSEEK"
+       "WILDSEEKNEXT", "SET FILTER TO"
+     + Added as xtranslate:
+       Sx_SetTagNo(), Sx_TagOrder(), Sx_SetTagOrder(), Sx_SetTagOrd()
+       Sx_IndexFilter(), SetRDD(), Sx_SetDirty()
+     + Added PACK as command
+   * SixAPI.txt
+     * changed sx_SetTag(), sx_TagNo(), sx_SetTagNo(), sx_TagOrder(),
+       Sx_SetTagOrder() from "Obsolete" to "Finished"
+     + Added Sx_SetTagOrd, SetRDD(), Sx_SetDirty() as "Finished"
+     + Changed Sx_IndexFilter() to "Finished"
+     + Added commands "SET DIRTYREAD", "PACK", "WILDSEEK", "WILDSEEKNEXT"
+       "SET FILTER TO", "REFRESH FILTER"
+     + Added m6_Set() as "not finished"
+     * changed M6_INIT() from "Finished" to "Not finished"
+   * Released BETA 9
+
+2002-12-27 10:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Some fixes with scopes
+     ! softseek is fixed
+   * sixfunc.c
+   * apollo.ch
+     new functions and commands are added, see sixapi.txt
+
+2002-12-25 09:53 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * make_b32.bat
+     * added ftsfunc.obj to the :CLEAN clause
+   ! hs_* functions where not in rddsix.lib
+   * Released BETA 8.1 with hs_* function in rddsix.lib
+
+2002-12-24 16:13 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * SixAPI.txt
+     + Added SX_SETDATEFORMAT()
+   * SixFuncs.prg
+     * Changed include files for xHarbour
+   * make_b32.bat
+     * changed SET HRB_DIR=\harbour to:
+       IF '%HRB_DIR%'=='' SET HRB_DIR=\harbour
+   * Added fts32.lib to the Harbour and xHarbour lib dir
+   * Released BETA 8
+
+2002-12-24 15:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     * Added support of LUpdate() function
+   * sixfunc.c
+   * sixfuncs.prg
+     + sxIndexCount() added, sx_SetScope() fixed.
+   + ftsfunc.c
+     + Added set of fast text search commands ( excepting hs_Filter() ).
+     Note: to use them you need to include the fts32.lib to the link script.
+            fts32.lib can be built with:
+            implib fts32.lib fts32.dll
+
+2002-12-21 21:47 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * apollo.ch
+     + added SET MEMOBLOCK command
+   * /test/browsesix/browsesix.prg
+     replaced with a new sample browse testapp
+   * Released BETA 7 + Opened up the BETA
+
+2002-12-21 23:10 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Few fixes, related to Bof()/Eof() and  SET AUTOPEN
+
+2002-12-21 15:35 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * sixfunc.c
+     ! Some fixes.
+
+2002-12-21 14:20 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Scopes fixed
+     * support of SET PATH TO and SET DEFAULT TO is implemented
+   * sixfunc.c
+     New functions are added:
+      SX_DBFDECRYPT(), SX_DBFENCRYPT(), SX_SETPASS(),
+      SX_DECRYPT(), SX_ENCRYPT()
+
+2002-12-19 09:30 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * Released BETA 6
+
+2002-12-18 22:00 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+   * sixfunc.c
+   * apollo.ch
+     * Triggers are implemented:
+       New function sx_SetTrigger() and new clause TRIGGER in USE command.
+       sx_MemoPack() added.
+
+2002-12-18 14:55 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Bug fixed
+     * Added startup message
+   * sixfunc.c
+   * sixfuncs.prg
+     + New functions added:
+       M6_FILTINFO(), M6_FILTJOIN(), M6_REFRESHFILTER(), M6_ORDCONDSET(),
+       M6_ORDCREATE()
+     * sx_TurboRead() is renamed to sx_Turbo(), as it is in Clipper's Six.
+
+2002-12-17 09:30 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * Released BETA 5
+
+2002-12-16 22:25 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     * Arrays save/restore in .smt memos is implemented
+   * sixfunc.c
+     + New functions:
+       Sx_SetUdfPath(), Sx_GetUdfPath(), Sx_SetWriteBlobHdr()
+
+2002-12-16 09:30 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * Released BETA 4
+
+2002-12-15 22:05 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! sixLock() virtual method fixed.
+   * sixfunc.c
+     + Sx_File2Blob() function added.
+
+2002-12-15 18:39 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * sixapi.txt
+     * added SX_EVALTEST() to the list
+   * Released BETA 3
+
+2002-12-15 19:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Few fixes.
+   * sixfuncs.prg
+   * sixfunc.c
+     + New functions added:
+        Sx_Wildmatch(), Sx_Wildseek(), sx_Descend()
+     + Sx_Filttop(), Sx_FiltBott(), Sx_FiltGorec() are introduced
+       as empty functions.
+
+2002-12-14 12:41 GMT+1 Patrick Mast <patrick@winfakt.com>
+   * sixfuncs.prg
+     ! Added __XHARBOUR__ define to include "ord.ch" instead
+       of "dbinfo.ch"
+     ! added DBI_MEMOEXT and DBI_FULLPATH defines as they are
+       not defined in dbinfo.ch
+   * sixapi.txt
+     * added some more functions that are available now
+   * Released BETA 2
+
+2002-12-14 13:150 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Some fixes, including closing indexes ( Apollo closes production
+       indexes, too - so some tricks are implemented to reopen production
+       index.
+     + hb_sxBag() function is added to provide support of functions, which
+       uses bagName.
+   * sixfuncs.prg
+   * sixfunc.c
+     ! Some fixes
+     + Many functions added, see SixApi.txt for a list of currently
+       supported functions.
+
+2002-12-10 21:10 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     * Added support of DBOI_FULLPATH, DBOI_SCOPE*
+     * Scopes virtual methods are implemented, though not tested yet
+     ! Fixed support of DBOI_KEYTYPE, DBOI_KEYSIZE, DBOI_KEYDEC, DBOI_BAGNAME
+     ! Some other fixes
+   * sixfuncs.prg
+     + Functions added:
+         Sx_TagNo(), Sx_TagName(), Sx_IsFilter(), Sx_SetFilter()
+   * sixfunc.c
+     + Functions added:
+         m6_IsOptimize(), sx_SetDeleted(), sx_Query()
+
+2002-12-10 10:55 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Bug fixed in sixOrderListAdd(), which caused the GPF
+
+2002-12-09 21:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     * Support of new items added to sixOrderInfo():
+         DBOI_FULLPATH, DBOI_ISDESC, DBOI_KEYTYPE, DBOI_KEYVAL, DBOI_KEYSIZE,
+         DBOI_KEYDEC, DBOI_AUTOOPEN
+     * sixSetFilter(), sixClearFiler() are implemented, so
+       support of SET FILTER TO is done.
+   * sixfunc.c
+     + New functions added:
+       sx_Autoopen(), sx_GetBlobLength(), sx_Blob2file(), sx_Version()
+
+2002-12-09 10:45 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+   * six1.c
+     ! Minor fix in sixGetValue(): strlen() call is replaced by lstrlen()
