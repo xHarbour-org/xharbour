@@ -1,0 +1,381 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2009-12-21 15:50 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    + Added OleDialog.lib and version.lib to ::C_Libs
+
+2009-10-10 13:00 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    * Minor fix to recent change to Ignore "missing" lib files in :Reset()
+
+2009-10-09 14:20 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
+  * tproject.prg
+    ! added missing codepage.lib to ST_Libs ,  MT_Libs   datas
+
+2009-10-06 10:42 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    * Ignore "missing" lib files in :Reset() (as it may very likely be found using Linker path switches
+    ! Fixed support for explicit link flags in INI files in :Dll_Command()
+    * Auto-remove -NOEXPOBJ and auto-add -DLL in :Dll_Command() to overcome same ini file used for exe and dll targets
+
+2009-09-02 13:16 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * tproject.prg
+    * Let MemoWrit() NOT add a EOF at the end of the file.
+    - Removed showing up of NotePad in xBuildW.exe
+
+2009-07-11 22:42 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    - Reverted change 1.136
+      (! Fixed :Reset() to forward pending :Catchup() or :Refresh() to new C dependant if created.)
+
+2009-07-07 08:06 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    ! Don't link d[ll]main.lib when building dll and OleServer.lib is used.
+
+2009-06-15 08:06 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    * Standardized support for %ProgramFiles% into s_sProframsFolder
+
+2009-06-11 14:46 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  ! Fixed POCC support in GenerateIni()
+
+2009-06-10 17:21 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    + Added PellesC support
+  * tproject.prg
+    + Added PellesC support
+    * Cleanup search in "Program Files" and use GetEnv()
+    - Removed legacy support for xbuild.ini
+    + Added support for default ini file in xBuild application folder
+    + Added empty (work in progress) Find_<C Compiler name>() to centralize C compiler search & setup
+  * gui.c
+    + Added PellesC support
+    * Cleanup search in "Program Files" and use GetEnv()
+
+2009-06-05 11:12 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * xBuildWizard.bmp
+  * xBuildWizard.png
+    * Updated copyright year.
+
+2009-06-05 11:08 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    ! Fix recursive error in error handler (oProject:cFile) when oProject is NIL
+    ! Fix against arguments which are only swiches (no real argument, like xBuild -Wizard)
+
+2009-01-16 16:50 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-xBuild/xbuild.exe.xbp
+- xHarbour-xBuild/xbuildw.exe.xbp
+- xHarbour-xBuild/xBuildW-Personal.exe.xbp
+- xHarbour-xBuild/tproject.lib.xbp
+- xHarbour-xBuild/xcc/xbuild.exe-Demo/xbuild.exe.xbp
+- xHarbour-xBuild/xcc/xbuildw.exe-Demo/xBuildW.exe.xbp
++ xHarbour-xBuild/vc8/xbuild.exe.xbp
++ xHarbour-xBuild/vc8/Demo/xbuildw.exe.xbp
++ xHarbour-xBuild/vc8/Demo/xbuild.exe.xbp
++ xHarbour-xBuild/vc8/Personal/xbuildw.exe.xbp
++ xHarbour-xBuild/xcc/xBuildW.exe.xbp
++ xHarbour-xBuild/xcc/xBuild.exe.xbp
++ xHarbour-xBuild/xcc/xbuild.exe
++ xHarbour-xBuild/xcc/TProject.lib.xbp
++ xHarbour-xBuild/xcc/Demo/xbuildw.exe.xbp
++ xHarbour-xBuild/xcc/Demo/xbuild.exe.xbp
++ xHarbour-xBuild/xcc/Personal/xbuildw.exe.xbp
+* xHarbour-xBuild/vc8/tproject.lib.xbp
+* xHarbour-xBuild/vc8/xbuildw.exe.xbp
+  * Fixed paths and settings
+
+
+2009-01-16 16:50 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+- xbuild-demo.exe.xbp
+- xBuildW-demo.exe.xbp
++ xcc\xbuild.exe-Demo\xbuild.exe.xbp
++ xcc\xbuildw.exe-Demo\xBuildW.exe.xbp
+
+
+2009-01-09 19:22 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+* xHarbour-xBuild\TProject.prg
+  + Added NSX lib's
+
+
+2008-10-14 10:36 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+* xBuildW*.exe.xbp
+  * Changed dependancy from tproject.lib to tproject.lib.xbp
+
+2008-10-08 13:18 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+* TProject.prg
+  * In xBuildW.exe, the error log file will also be opened with the
+    standard application set in windows to open ".log" files.
+
+2008-09-20 17:14 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+* TProject.prg
+  ! TARGETFOLDER entry was always written in lower case in the XBP file.
+    This did not work if the targetfolder resides on a case
+    sensitive networkdrive in Windows.
+
+
+2007-07-22 10:25 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   * Bumped version to 4.5
+   * tproject.prg
+     ! Fixed long file name support in Library files withing .XBP file
+       ( Fix in METHOD LibList() CLASS TMakeProject )
+   * xBuild.prg
+     + Added _BUILD_ define
+     + Added -v parameter to xBuild.exe which shows version number
+
+2006-05-09 20:59 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   * tproject.prg
+     ! Fixed handling of non windows (Non CTRLF) type of xbp files.
+
+2006-02-09 18:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * tproject.prg
+    ! Added lib odbccp32.lib to work with newest SQLRDD features
+
+2005-10-11 19:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    + Added support for Environment Variables $(VARNAME) in INCLUDE and LIB folders
+  * xbldfull.bat
+    + Added removal of envvars
+
+2005-10-11 17:12 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    + Added support for Environment Variables $(VARNAME) in xBuild.*.ini files
+
+2005-10-02 21:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+    ! Fixed missing reset of s_sCurrentDir in ValidateRoot() (for manual entry)
+
+2005-09-16 12:13 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * xBuild.ico
+    * Updated icon
+
+2005-09-08 09:51 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xBuild.ico
+    * Cleaner program Icon
+  * xBuildW*.xbp
+    + Added "xbuild.ico" and "xharbour320.avi" as dependancies
+
+2005-09-07 13:22 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xBuild.ico
+  * xBuildWizard.bmp
+  * xBuildWizard.png
+  * xharbour320.avi
+    * New logo
+
+2005-08-31 20:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    + Added NetApi32.lib to xLink GUI added Libs.
+
+2005-08-29 22:22 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+    + Set caption to xBuild - <project file>
+
+2005-06-30 20:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    ! Fixed bug - using aSize() to reduce an array used by FOR EACH
+
+2005-06-06 09:32 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+    ! Fixed folder selecetion of library path of xHarbour.
+
+2005-06-03 17:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+  * tproject.prg
+  * xbuild.rc
+    + Added support for CLASSIC debugger.
+  * xbuild.prg
+    + Added support for -Classic to indicate classic debugger requested.
+
+2005-06-03 16:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+  * tproject.prg
+  * xbuild.prg
+    + Added support for xbuild.<platform>.ini
+    + added support for custom INI file using -INI:<filename>
+
+2005-05-13 09:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    ! Fixed calulation of cTarget when first argument is a source file with extension.
+
+2005-04-28 13:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    ! Fixed calulation of cTargetFolder for NON xbp targets.
+
+2005-04-23 15:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+    * added reset of Checkboxes if loading a project where respective flag is .F.
+  * tproject.prg
+    + Added new lPRG_Debug property to Project class.
+      + Auto add -B, in ::xHB_Command(), if ::Project:lPRG_Debug
+      + Auto add DbgServe.lib in ::EXE_Command() if ::Project:lPRG_Debug and xLink is the linker.
+  * xbuild.prg
+    + Added support for new -B switch to compile with PRG debug info.
+
+2005-04-23 09:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    * Fixed to never calculate TargetFolder, unless explcitly specified.
+
+2005-04-21 16:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xbuild.prg
+    + Add support for -New command line switch to ignore existing XBP if any.
+    ! Fixed and optimized support for -T (target folder) command line switch.
+    ! Fixed redundant DIR_SEPERATOR in cTarget in console Wizard.
+    * Added missing return after call to Wizard, to avoid redunnt :Make() call.
+  * tproject.prg
+    ! Fixed to use TRY/CATCH instead of ErrorBlock() in ::Make()
+
+2005-04-15 14:16 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+     * Removed redundant shlwapi.lib addition to lib list for xLink of GUI apps.
+   * gui.c
+     + Added subclass logic for ID_Main edit control to support WM_LBUTTONDBLCLK to
+       activate PopupEditor() for Main Module.
+
+2005-04-15 08:56 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * xbuild.prg
+     * Corrected -CON to STOP build on build erros.
+     ! Fixed bug added by Luiz for Linux
+     * Protected Linux specifc code added by Luiz, with:
+       #ifndef __PLATFORM__Windows
+
+2005-03-08 20:21 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+     + Added auto removal of -DHB_STATIC_STARTUP in LoadIni() for xCC.
+   * xbuild.prg
+     + Added auto promotion of .exe/.lib/.dll/.a targets to respective .xbp if exists.
+     + Added auto promotion of bare target to .exe.xbp/.lib.xbp/.dll.xbp/.a.xbp if exists.
+  * gui.c
+    ! Fixed paint of Cancel Button in WM_PAINT
+
+2005-02-28 10:53 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+   * xhb.c
+   *.xbp
+   *.inc
+   *.ini
+     * Synched with hbinit.h changes in xHarbour.org
+
+2005-02-24 17:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+     ! Fixed CreateProcessWait() to use PeekMessage() instead of GetMessage() to avoid apparent freeze on non XP ssystems.
+
+2005-02-24 13:22 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   + Cancel_Build.PSD
+     + Source for * Cancel_Build.bmp
+   * Cancel_Build.bmp
+     * New design
+
+2005-02-23 20:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xHarbour-Builder/wvt.lib.xbp
+  * xHarbour-Builder/wvw.lib.xbp
+    ! Fixed compilation flags.
+
+  * xHarbour-Builder/xbldfull.bat
+    * Added synch with xharbour\bin
+
+  * tproject.prg
+    + Added support for s_bWaitContinue flag.
+  * gui.c
+    + Added support for Cancel Build.
+  * xbuild.rc
+    + Added Cancel_Build.bmp
+  + Cancel_build.bmp
+    + New bimtmap for Cancel Build Button. (Patrick!)
+
+2005-02-22 21:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * gui.c
+      ! Fixed wrong usage of hb_itemPushString() to hb_vmPushString() was causing corrupted string in file name of PopupEditor().
+   * tproject.prg
+     + Added support for wvtg.lib
+
+2005-02-21 12:21 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+     ! Corrected invalid conversion of libmysql.lib to libmysqlmt.lib
+
+2005-02-18 12:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * tproject.prg
+     * Generalized CreateProcessWait() to use generic event processing rather then call WizardEvents()
+     + Added Alert() messages in GUI build to report error conditions in LoadProject()
+
+   * gui.c
+     * Generalized WizardEvents()
+
+2005-02-15 16:37 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  + Readme.txt
+    * Initial upload
+
+2005-02-09 21:14 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * *.XBP
+   Finetuned .XBP files
+
+2005-02-01 19:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * tproject.prg
+    + Added "firebird.ch" recognization to auto include correct libs
+      for SQLRDD Firebird Native support
+
+2004-10-12 10:20 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xBuildWizard.bmp
+    * Changed to new logo and Copyright date
+  + xBuildWizard.png
+    * Source for xBuildWizard.bmp (FireWorks MX file)
+
+2004-10-12 10:20 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * gui.c
+    * Changed x,y coordinates for the main xBuild window
+  + xBuildW-Demo.exe.xbp
+  + xBuildW-Personal.exe.xbp
+
+2004-09-22 05:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * tproject.prg
+  * xbuild.prg
+    * some small modifications for Linux build to add support for
+      MS-Windows *.xbp files with backslashes and CRLF EOL
+    * changed xhblrlnk to xblnk
+  still a lot of things has to be checked to add real *nixes support
+
+2004-06-10 17:40 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
+  * xBuild.prg
+    ! when using Wizard to create makefile Trim all blank spaces from mask
+      Also is an linux is on mask. add lib prefix to name
+  ! tProject.prg
+    ! Finished (almost ) support for linux
+      Apps is build properly
+      when used from command line (xbuild test test.prg zzz.a.xbp) lib is linked properly
+
+2004-06-10 14:00 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
+  * xBuild.prg
+    ! minor Changes when creating an linux lib from command line
+  ! tProject.prg
+    ! Started the ajust to linux
+      Linux lib are being proper created
+      Added code to install linux lib on xbuilder lib folder
+      Added detection of Sqlrdd modules(postgres/mysql) to add the lib when need
+      Added detection of html library
+      Ajusted several methods to work on linux( code protected by #ifdef __PLATFORM__xxxx
+      this an work on progress
+
+
+
+2004-06-09 17:40 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
+  * xBuild.prg
+    ! Changes to Allow Linux usage( when need protect by #ifndef __PLATFORM__Windows
+      In  FUNCTION ValidateModules( acMasks, nIndex )
+      Added Validation to Linux lib( insted of user pass /usr/lib/xbuilder/libuser.[so|a] ) pass only user.[so|a]
+      Changes also to prepare to build linux apps/libs (on linux executable dont has extension, so app project is
+      app.xbp and library project is libname.a.xbp)
+      Added Question to Ron on line 569
+
+2004-04-05 11:34 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xBuild.prg
+  * tprpject.prg
+    + Added detection of project changes, and save XBP only if change detected.
+    + Added AutoClean if project file changed.
+    + Added support fot #include directive
+
