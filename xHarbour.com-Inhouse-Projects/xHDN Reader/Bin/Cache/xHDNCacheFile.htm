@@ -1,0 +1,88 @@
+<html>
+<head>
+<link href='stylesheet.css' rel='stylesheet' type='text/css'>
+<script language='JavaScript' src='javascript.js'></script>
+</head>
+<body>
+<table align='center' border='0' cellpadding='0' cellspacing='0' width='850' style='background-color:#fafafa;'>
+<tr><td class='corner_sub_01' width='20' style='padding-top:6px;'>&nbsp;</td><td class='border_sub_top'></td><td class='corner_sub_11' width='20'></td></tr>
+<tr><td class='border_sub_left' width='20'>&nbsp;</td><td class='xhdn_text'>
+<strong style='font-size:15px;'>BlobRootDelete()</strong>
+<div style='font-size:11px;'>Deleted the root area of a BLOB file.</div>
+<div style='margin-top:6px;padding-top:4px;padding-bottom:4px;padding-left:3px;padding-right:3px;border-top:1px dotted #666666;border-bottom:1px dotted #666666;'>
+<strong>Category:</strong> Blob functions, Database functions
+</div>
+<div style='margin-top:12px;margin-bottom:12px;margin-left:5px;'>
+<span onclick="ToggleDiv('syntax');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Syntax</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='syntax' style='font-family:courier new;font-size:12px;border:1px solid #b0b0b0;background-color:#e0e0e0;padding:3px;'>
+BlobRootDelete()&nbsp;-->&nbsp;lSuccess
+</div>
+</div>
+<span onclick="ToggleDiv('arguments');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Arguments</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='arguments' style='font-family:verdana;font-size:11px;border:1px solid #eaeaea;background-color:#f8f8f8;padding:3px;'>
+No arguments required.
+</div>
+</div>
+<span onclick="ToggleDiv('return');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Return value</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='return' style='font-family:verdana;font-size:11px;border:1px solid #eaeaea;background-color:#f8f8f8;padding:3px;'>
+The return value is .T. (true) if the root area is successfully deleted, otherwise<br />.F. (false) is returned.
+</div>
+</div>
+<span onclick="ToggleDiv('description');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Description</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='description' style='font-family:verdana;font-size:11px;border:1px solid #eaeaea;background-color:#f8f8f8;padding:3px;'>
+BlobRootDelete() removes the data stored in the root area of a BLOB file. This data is written by BlobRootPut() .<br /><br /><div style='margin-top:0px;margin-bottom:0px;'> <i>Note:</i><br /> the file Blob.ch must be #included for BlobRootDelete() to work.</div>
+</div>
+</div>
+<span onclick="ToggleDiv('examples');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Examples</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='examples' style='font-family:courier new;font-size:12px;border:1px solid #b0b0b0;background-color:#e0e0e0;padding:3px;'>
+//&nbsp;The&nbsp;example&nbsp;demonstrates&nbsp;the&nbsp;coding&nbsp;pattern&nbsp;that&nbsp;must&nbsp;be&nbsp;used&nbsp;to<br />//&nbsp;remove&nbsp;the&nbsp;root&nbsp;area&nbsp;of&nbsp;a&nbsp;BLOB&nbsp;file.<br /><br />&nbsp;&nbsp;&nbsp;#include&nbsp;"Blob.ch"<br /><br />&nbsp;&nbsp;&nbsp;REQUEST&nbsp;DBFCDX<br /><br />&nbsp;&nbsp;&nbsp;PROCEDURE&nbsp;Main<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USE&nbsp;PhotoArchive&nbsp;ALIAS&nbsp;Photos&nbsp;VIA&nbsp;"DBFCDX"<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;BlobRootLock()<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BlobRootDelete()<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BlobRootUnlock()<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alert(&nbsp;"Unable&nbsp;to&nbsp;lock&nbsp;the&nbsp;root&nbsp;area"&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USE<br />&nbsp;&nbsp;&nbsp;RETURN
+</div>
+</div>
+<span onclick="ToggleDiv('files');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>File information</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='files' style='font-family:verdana;font-size:11px;border:1px solid #eaeaea;background-color:#f8f8f8;padding:3px;'>
+<div style='margin-bottom:2px;margin-top:2px;'>&bull; <strong>Library:</strong> 
+xhb.lib
+</div>
+<div style='margin-bottom:2px;margin-top:2px;'>&bull; <strong>DLL:</strong> 
+xhbdll.dll
+</div>
+<div style='margin-bottom:2px;margin-top:2px;'>&bull; <strong>Source:</strong> 
+rdd\dbcmd.c, rdd\dbffpt\dbffpt1.c
+</div>
+<div style='margin-bottom:2px;margin-top:2px;'>&bull; <strong>Other files required:</strong> 
+blob.ch
+</div>
+</div>
+</div>
+<span onclick="ToggleDiv('seealso');" style='cursor:pointer;'>
+<strong style='font-family:arial;font-size:18px;'>&rsaquo;</strong>&nbsp; <strong style='font-family:tahoma;font-size:12px;'>Related topics</strong>
+</span>
+<div style='margin-bottom:12px;margin-top:2px;margin-left:9px;'>
+<div id='seealso' style='font-family:verdana;font-size:11px;border:1px solid #eaeaea;background-color:#f8f8f8;padding:3px;'>
+BlobRootGet(),  BlobRootPut(),  BlobRootLock()
+</div>
+</div>
+</div>
+</td><td class='border_sub_right' width='20'>&nbsp;</td></tr>
+<tr><td class='corner_sub_00' width='20' style='padding-bottom:6px;'>&nbsp;</td><td class='border_sub_bottom'>&nbsp;</td><td class='corner_sub_10' width='20'>&nbsp;</td></tr>
+</table>
+</body>
+</html>

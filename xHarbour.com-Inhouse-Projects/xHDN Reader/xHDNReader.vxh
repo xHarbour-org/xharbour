@@ -1,0 +1,12 @@
+[Project]
+Name=xHDNReader
+Version=1.00.00
+Bin=Bin
+Obj=Obj
+Source=Source
+Resource=Resource
+[Files]
+Form1.xfm=
+Form2.xfm=
+[Sources]
+[Binaries]

@@ -1,0 +1,527 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form_Settings INHERIT Dialog
+   // Components declaration
+   DATA Button_Browse EXPORTED
+   DATA Button_Cancel EXPORTED
+   DATA Button_OK EXPORTED
+   DATA Check_ConfirmExit EXPORTED
+   DATA Check_ConnectionString EXPORTED
+   DATA Check_Credentials EXPORTED
+   DATA Check_ExpandTree EXPORTED
+   DATA Check_FilterFiles EXPORTED
+   DATA Check_OpenRecursive EXPORTED
+   DATA Check_PersonalizedStamp EXPORTED
+   DATA Check_SaveDefault EXPORTED
+   DATA Check_SavePositions EXPORTED
+   DATA Combo_Timezone EXPORTED
+   DATA Edit_ConnectionString EXPORTED
+   DATA Edit_DBName EXPORTED
+   DATA Edit_DBPassword EXPORTED
+   DATA Edit_DBServer EXPORTED
+   DATA Edit_DBUsername EXPORTED
+   DATA Edit_DefaultPath EXPORTED
+   DATA Edit_Name EXPORTED
+   DATA Edit_PersonalizedStamp EXPORTED
+   DATA Group_Database EXPORTED
+   DATA Group_Paths EXPORTED
+   DATA Label_DBName EXPORTED
+   DATA Label_DBPassword EXPORTED
+   DATA Label_DBServer EXPORTED
+   DATA Label_DefaultPath EXPORTED
+   DATA Label_Username EXPORTED
+   DATA MyFolderBrowserDialog EXPORTED
+   DATA Tab_Preferences EXPORTED
+   DATA Tab_Settings EXPORTED
+   DATA Tab_Settings_Main EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD Form_Settings_OnLoad()
+   METHOD Form_Settings_OnShowWindow()
+   METHOD Button_Cancel_OnClick()
+   METHOD Button_OK_OnClick()
+   METHOD Button_Browse_OnClick()
+   METHOD Check_ConnectionString_OnClick()
+   METHOD Check_Credentials_OnClick()
+   METHOD Combo_Timezone_OnCBNSelEndOk()
+   METHOD Combo_Timezone_OnCreate()
+   METHOD Edit_Name_OnEn_Update()
+
+ENDCLASS
+
+METHOD Init( oParent ) CLASS Form_Settings
+   ::Super:Init( oParent )
+
+   ::EventHandler[ "OnLoad" ] := "Form_Settings_OnLoad"
+   ::EventHandler[ "OnShowWindow" ] := "Form_Settings_OnShowWindow"
+
+   // Populate Components
+   WITH OBJECT ( ::MyFolderBrowserDialog := FolderBrowserDialog( Self ) )
+      :Name                 := "MyFolderBrowserDialog"
+      :Create()
+   END //MyFolderBrowserDialog
+
+   // Properties declaration
+   ::MinWidth             :=        656
+   ::MinHeight            :=        432
+   ::MaxWidth             :=        656
+   ::MaxHeight            :=        432
+   ::Name                 := "Form_Settings"
+   ::Modal                := .T.
+   ::Left                 :=         10
+   ::Top                  :=          9
+   ::Width                :=        656
+   ::Height               :=        432
+   ::Center               := .T.
+   ::ClipChildren         := .T.
+   ::ClipSiblings         := .T.
+   ::Caption              := "xHDN Manager"
+   ::BackColor            :=   16777215
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS Form_Settings
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( ::Button_Cancel := BUTTON( Self ) )
+      :Name                 := "Button_Cancel"
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               :=         10
+      END
+
+      :Left                 :=        558
+      :Top                  :=        366
+      :Width                :=         80
+      :Height               :=         27
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Caption              := "Cancel"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :EventHandler[ "OnClick" ] := "Button_Cancel_OnClick"
+      :Create()
+   END //Button_Cancel
+
+   WITH OBJECT ( ::Button_OK := BUTTON( Self ) )
+      :Name                 := "Button_OK"
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent:Button_Cancel
+         :Bottom               := :Owner:Parent
+         :Margin               :=         10
+      END
+
+      :Left                 :=        468
+      :Top                  :=        366
+      :Width                :=         80
+      :Height               :=         27
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Caption              := "OK"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :EventHandler[ "OnClick" ] := "Button_OK_OnClick"
+      :Create()
+   END //Button_OK
+
+   WITH OBJECT ( ::Tab_Settings_Main := TABCONTROL( Self ) )
+      :Name                 := "Tab_Settings_Main"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent:Button_OK
+         :Margin               :=         10
+      END
+
+      :Left                 :=         10
+      :Top                  :=         10
+      :Width                :=        628
+      :Height               :=        346
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Caption              := "TabControl1"
+      :Create()
+      WITH OBJECT ( :Form:Tab_Settings := TABPAGE( :this ) )
+         :Name                 := "Tab_Settings"
+         :Caption              := "Settings"
+         :ImageIndex           :=         -1
+         :Create()
+         WITH OBJECT ( :Form:Group_Paths := GROUPBOX( :this ) )
+            :Name                 := "Group_Paths"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent
+               :Right                := :Owner:Parent
+               :Margin               :=         10
+            END
+
+            :Left                 :=         10
+            :Top                  :=         10
+            :Width                :=        604
+            :Height               :=         96
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Source Files"
+            :Create()
+            WITH OBJECT ( :Form:Button_Browse := BUTTON( :this ) )
+               :Name                 := "Button_Browse"
+               WITH OBJECT :Dock
+                  :Right                := :Owner:Parent
+                  :Margin               :=          8
+               END
+
+               :Left                 :=        536
+               :Top                  :=         38
+               :Width                :=         60
+               :Height               :=         22
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Browse"
+               WITH OBJECT :Font
+                  :Bold                 := .T.
+               END
+
+               :EventHandler[ "OnClick" ] := "Button_Browse_OnClick"
+               :Create()
+            END //Button_Browse
+
+            WITH OBJECT ( :Form:Edit_DefaultPath := EDIT( :this ) )
+               :Name                 := "Edit_DefaultPath"
+               WITH OBJECT :Dock
+                  :Left                 := :Owner:Parent
+                  :Right                := :Owner:Parent:Button_Browse
+                  :Margin               :=          8
+               END
+
+               :Left                 :=          8
+               :Top                  :=         39
+               :Width                :=        520
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :AutoHScroll          := .T.
+               :Create()
+            END //Edit_DefaultPath
+
+            WITH OBJECT ( :Form:Label_DefaultPath := LABEL( :this ) )
+               :Name                 := "Label_DefaultPath"
+               :Left                 :=         10
+               :Top                  :=         21
+               :Width                :=        136
+               :Height               :=         16
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Default source file location:"
+               :Create()
+            END //Label_DefaultPath
+
+            WITH OBJECT ( :Form:Check_SaveDefault := CHECKBOX( :this ) )
+               :Name                 := "Check_SaveDefault"
+               :Left                 :=          8
+               :Top                  :=         70
+               :Width                :=        196
+               :Height               :=         15
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Save last opened location as default"
+               :Create()
+            END //Check_SaveDefault
+
+         END //Group_Paths
+
+         WITH OBJECT ( :Form:Group_Database := GROUPBOX( :this ) )
+            :Name                 := "Group_Database"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent
+               :Top                  := :Owner:Parent:Group_Paths
+               :Right                := :Owner:Parent
+               :Bottom               := :Owner:Parent
+               :Margin               :=         10
+            END
+
+            :Left                 :=         10
+            :Top                  :=        116
+            :Width                :=        604
+            :Height               :=        196
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Database Settings"
+            :Create()
+            WITH OBJECT ( :Form:Check_ConnectionString := CHECKBOX( :this ) )
+               :Name                 := "Check_ConnectionString"
+               :Left                 :=          8
+               :Top                  :=         22
+               :Width                :=        171
+               :Height               :=         15
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Use database connectionstring:"
+               :EventHandler[ "OnClick" ] := "Check_ConnectionString_OnClick"
+               :Create()
+            END //Check_ConnectionString
+
+            WITH OBJECT ( :Form:Edit_ConnectionString := EDIT( :this ) )
+               :Name                 := "Edit_ConnectionString"
+               WITH OBJECT :Dock
+                  :Left                 := :Owner:Parent
+                  :Right                := :Owner:Parent
+                  :Margin               :=          8
+               END
+
+               :Left                 :=          8
+               :Top                  :=         43
+               :Width                :=        588
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Create()
+            END //Edit_ConnectionString
+
+            WITH OBJECT ( :Form:Check_Credentials := CHECKBOX( :this ) )
+               :Name                 := "Check_Credentials"
+               :Left                 :=          8
+               :Top                  :=         72
+               :Width                :=        123
+               :Height               :=         15
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Database credentials:"
+               :EventHandler[ "OnClick" ] := "Check_Credentials_OnClick"
+               :Create()
+            END //Check_Credentials
+
+            WITH OBJECT ( :Form:Edit_DBServer := EDIT( :this ) )
+               :Name                 := "Edit_DBServer"
+               :Left                 :=        101
+               :Top                  :=         93
+               :Width                :=        373
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Create()
+            END //Edit_DBServer
+
+            WITH OBJECT ( :Form:Label_DBServer := LABEL( :this ) )
+               :Name                 := "Label_DBServer"
+               :Left                 :=         10
+               :Top                  :=         96
+               :Width                :=         88
+               :Height               :=         16
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Database server:"
+               :Create()
+            END //Label_DBServer
+
+            WITH OBJECT ( :Form:Edit_DBUsername := EDIT( :this ) )
+               :Name                 := "Edit_DBUsername"
+               :Left                 :=        101
+               :Top                  :=        142
+               :Width                :=        192
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Create()
+            END //Edit_DBUsername
+
+            WITH OBJECT ( :Form:Label_DBName := LABEL( :this ) )
+               :Name                 := "Label_DBName"
+               :Left                 :=         10
+               :Top                  :=        120
+               :Width                :=         80
+               :Height               :=         16
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Database name:"
+               :Create()
+            END //Label_DBName
+
+            WITH OBJECT ( :Form:Edit_DBName := EDIT( :this ) )
+               :Name                 := "Edit_DBName"
+               :Left                 :=        101
+               :Top                  :=        117
+               :Width                :=        192
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Create()
+            END //Edit_DBName
+
+            WITH OBJECT ( :Form:Label_Username := LABEL( :this ) )
+               :Name                 := "Label_Username"
+               :Left                 :=         10
+               :Top                  :=        145
+               :Width                :=         88
+               :Height               :=         16
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Username:"
+               :Create()
+            END //Label_Username
+
+            WITH OBJECT ( :Form:Edit_DBPassword := EDIT( :this ) )
+               :Name                 := "Edit_DBPassword"
+               :Left                 :=        101
+               :Top                  :=        166
+               :Width                :=        192
+               :Height               :=         20
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Password             := .T.
+               :Create()
+            END //Edit_DBPassword
+
+            WITH OBJECT ( :Form:Label_DBPassword := LABEL( :this ) )
+               :Name                 := "Label_DBPassword"
+               :Left                 :=         10
+               :Top                  :=        168
+               :Width                :=         80
+               :Height               :=         16
+               :ClipChildren         := .T.
+               :ClipSiblings         := .T.
+               :Caption              := "Password:"
+               :Create()
+            END //Label_DBPassword
+
+         END //Group_Database
+
+      END //Tab_Settings
+
+      WITH OBJECT ( :Form:Tab_Preferences := TABPAGE( :this ) )
+         :Name                 := "Tab_Preferences"
+         :Caption              := "Preferences"
+         :ImageIndex           :=         -1
+         :Create()
+         WITH OBJECT ( :Form:Check_OpenRecursive := CHECKBOX( :this ) )
+            :Name                 := "Check_OpenRecursive"
+            :Left                 :=         11
+            :Top                  :=         13
+            :Width                :=        139
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Open locations recursive"
+            :Create()
+         END //Check_OpenRecursive
+
+         WITH OBJECT ( :Form:Check_FilterFiles := CHECKBOX( :this ) )
+            :Name                 := "Check_FilterFiles"
+            :Left                 :=         11
+            :Top                  :=         35
+            :Width                :=        219
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Automatically filter files on .txt extension"
+            :Create()
+         END //Check_FilterFiles
+
+         WITH OBJECT ( :Form:Check_PersonalizedStamp := CHECKBOX( :this ) )
+            :Name                 := "Check_PersonalizedStamp"
+            :Left                 :=         11
+            :Top                  :=         57
+            :Width                :=        296
+            :Height               :=         15
+            :Enabled              := .F.
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Automatically add personalized stamp when changing files:"
+            :State                :=          1
+            :Create()
+         END //Check_PersonalizedStamp
+
+         WITH OBJECT ( :Form:Edit_PersonalizedStamp := EDIT( :this ) )
+            :Name                 := "Edit_PersonalizedStamp"
+            :Left                 :=         27
+            :Top                  :=         77
+            :Width                :=        587
+            :Height               :=         20
+            :Enabled              := .F.
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Create()
+         END //Edit_PersonalizedStamp
+
+         WITH OBJECT ( :Form:Combo_Timezone := COMBOBOX( :this ) )
+            :VertScroll           := .T.
+            :Name                 := "Combo_Timezone"
+            :Left                 :=         27
+            :Top                  :=        124
+            :Width                :=        385
+            :Height               :=        100
+            :ClientEdge           := .T.
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :ItemHeight           :=         13
+            :EventHandler[ "OnCBNSelEndOk" ] := "Combo_Timezone_OnCBNSelEndOk"
+            :EventHandler[ "OnCreate" ] := "Combo_Timezone_OnCreate"
+            :Create()
+         END //Combo_Timezone
+
+         WITH OBJECT ( :Form:Edit_Name := EDIT( :this ) )
+            :Name                 := "Edit_Name"
+            :Left                 :=         27
+            :Top                  :=        101
+            :Width                :=        192
+            :Height               :=         20
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :EventHandler[ "OnEn_Update" ] := "Edit_Name_OnEn_Update"
+            :Create()
+         END //Edit_Name
+
+         WITH OBJECT ( :Form:Check_ExpandTree := CHECKBOX( :this ) )
+            :Name                 := "Check_ExpandTree"
+            :Left                 :=         11
+            :Top                  :=        153
+            :Width                :=        130
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Expand tree by default"
+            :Create()
+         END //Check_ExpandTree
+
+         WITH OBJECT ( :Form:Check_ConfirmExit := CHECKBOX( :this ) )
+            :Name                 := "Check_ConfirmExit"
+            :Left                 :=         11
+            :Top                  :=        175
+            :Width                :=        100
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Confirm on exit"
+            :Create()
+         END //Check_ConfirmExit
+
+         WITH OBJECT ( :Form:Check_SavePositions := CHECKBOX( :this ) )
+            :Name                 := "Check_SavePositions"
+            :Left                 :=         11
+            :Top                  :=        197
+            :Width                :=        201
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Save window position and size on exit"
+            :Create()
+         END //Check_SavePositions
+
+      END //Tab_Preferences
+
+   END //Tab_Settings_Main
+
+RETURN Self
+

@@ -1,0 +1,19 @@
+[Project]
+Name=xHDNManager
+Version=1.00.00
+Bin=Bin
+Obj=Obj
+Source=Source
+Resource=Resource
+Parameters=
+SourcePath=
+IncludePath=
+CompilerFlags=-es2 -gc0 -m -n -w -q
+CleanBuild=0
+ThemeActive=1
+TargetName=
+[Files]
+Form_Main.xfm=
+Form_Settings.xfm=
+[Sources]
+[Binaries]

@@ -1,0 +1,53 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2005-06-15 11:37 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * sqlrdd.ini
+    + new version of sourcescanner can now handle our new database structure.
+
+2005-04-26 10:08 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * sqlrdd.ini
+    + fixed minor problem with connectionstring.
+    + added readme.txt file with directions on how to use the Source Scanner.
+
+2005-04-25 15:46 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * scanner.prg
+    + added extra argument to the scan utilitiy. The value of this argument is placed in the 
+      database as a memo field.
+
+2005-03-22 15:46 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * txttohtm.prg
+    + added recursive file processing
+
+2005-03-22 12:49 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * txttohtm.prg
+    + fixed minor bug in txt to html transformation
+
+2005-03-18 11:48 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * txttohtm.prg
+    + added comment and fixed a bug
+
+2005-03-17 17:04 UTC+0100 Nick Van Dyck <nick.van.dyck@xharbour.com>
+  * outputtxt.prg
+    + completed source
+  * scanner.prg
+    + modified to scan files without applying uppercase functions
+  * html.prg
+  * txttohtm.prg
+  * txttohtm.ini
+    + initial upload
+
+2005-03-08 00:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * connect.prg
+  * outputTxt.prg
+  * scanner.exe.xbp
+  * scanner.prg
+  * outputtxt.exe.xbp
+    + Initial Commit
