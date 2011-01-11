@@ -1,0 +1,152 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-06-02 15:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * zip_xhb.c
+    ! fixed problem on GetCurrentFileSize in windows Section( was not closing handle from find first)
+
+2010-01-11 09:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * zip_xhb.c
+    ! typecast to make msvc happy
+     
+2010-01-11 08:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * zip_xhb.c
+    hbzip.h 
+    !minor fix on parameters type ( char * -> const char *)
+    
+2010-01-07 08:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  
+  * xhbzipdll\zip_c.h  
+    ! minor fix on declaration of  ZipHandle_SetExtractPath
+
+2010-01-05 08:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * zip_xhbh.c
+   ! xhbzipdll\zip_c.cpp
+     xhbzipdll\zip_c.h  
+    ! fixed due changes on api( type casts)
+
+2009-11-16 13:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * zip_xhb.c
+    !minor fix
+
+2009-11-01 12:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * xhbzipdll/zip_c.cpp
+     * fixed ziptestpk to correct catch corrupt file
+
+2009-04-20 10:42 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   * zip_xhb.c
+     * _POSIX_PATH_MAX + 1 -> HB_PATH_MAX
+     * _POSIX_PATH_MAX -> HB_PATH_MAX - 1
+
+2009-01-21 15:25 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-HBZlib/xhbzip.lib.xbp
++ xHarbour-HBZlib/xcc/xhbZip.lib.xbp
+* xHarbour-HBZlib/vc8/xhbzip.lib.xbp
+* xHarbour-HBZlib/xhbzipdll/xhbzipdll.dll.xbp
+  * Changed paths
+
+
+2009-01-01 14:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+     ! changed OS_PATH_LIST_SEPARATOR  to HB_OS_PATH_LIST_SEP_CHR
+
+2008-11-16 14:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhbh.c
+     ! minor fix on zipgetbuffer()
+
+2008-04-04 10:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+     ! Code Cleanup and remove of direct HB_ITEM usage
+
+2007-06-25 21:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! xhbzipdll\zip_c.cpp
+     xhbzipdll\zip_c1.h
+     ! fixed ZipGetGlobalComment() 
+     
+2006-03-07 08:20 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhbh.c
+     ! Changed ZIPADDFILES() to return an array of status of the operation
+      for each file added to .zip
+
+2006-02-07 21:20 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+   ! xhbzipdll/zip_c.cpp
+     ! minor fix on return code for ZipAddFile(). was returing 0 insted of
+       -2 if file was not added to .zip file
+
+2006-02-04 20:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+     ! fix to HB_GETFILESINZIP() function what was not returning
+      the proper array of files. Thanks for Evans Bartzokas For bug report
+
+2005-09-27 15:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+   ! zip_xhbh.c
+     ! Some code Cleanup
+     ! some function optimed (especialy the oned used on callback)
+     ! removed calls hb_gcLock() ; using hb_itemNew() for creating the saved codeblock with later release with hb_itemRelease
+
+
+2005-09-18 19:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * xhbzipdll\zip_c.cpp
+     ! minor fix to correct detect corrupt zip file
+
+2005-05-28 18:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * hbzip.h
+     xhbzipdll\zip_c.h
+     xhbzipdll\zip_c1.h
+     xhbzipdll\zip_c.cpp
+     ! minor updates on defines(and also some defines protection for gcc)
+
+2005-05-08 21:00 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * zip_xhb.c
+   * zip_c.cpp
+     ! when unzip restore the current dir correctly
+      
+2005-04-22 15:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * zip_xhb.c
+     ! added missing functions HB_UNZIPALLFILE(),HB_GETZIPCOMMENT(),HB_SETZIPCOMMENT(),HB_UNZIPFILEINDEX
+
+2005-03-01 10:32 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+   * xhbzipst.prg
+     * Changed DEMO message
+   
+2005-02-27 22:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   *xhbzipst.prg
+     ! .prg for demo info
+   * xhbzip.lib.xbp
+     + xhbzipst.prg
+
+2005-02-24 22:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+   ! zip_xhbh.c
+   xhbzipdll/zip_c.cpp
+     ! Fixes to unzip/getfilearray when file is readonly
+       since the one internal function was unable to open file, becouse file was read only, the result for other functions was wrong
+
+2005-02-11 10:40 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * xhbzip.lib.xbp & /xhbzipdll/xhbzipdll.dll.xbp
+    * finetuned
+
+2005-02-10 22:30 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+   * fixes to HB_GETFILESINZIP now the array come with proper filename with out trailing trash
+          
+2004-06-13 13:35 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   ! zip_xhb.c
+   * Some optimizations(from PHB_ITEM pFilename to HB_ITEM ...
+
+2004-03-14 8:39 UTC-0500 Sylvain Robert <s.robert@videotron.ca>
+   * added dir test
+   * import Testzip.prg and Testunzip.prg into cvs
+
+2004-03-09 11:04 UTC-0300 Luiz Rafael Culik<luiz@xharbour.com.br>
+   * imported xhbzip sources into cvs
+

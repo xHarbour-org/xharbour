@@ -1,0 +1,25 @@
+CINI = 
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = \xHarbour.com\xHarbour-HBZlib\xHBZipDll;\xHarbour.com\ZipArchive
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = HB_OS_WIN; HB_OS_WIN_USED
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\xhbZip.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+SLY_OUTPUTFOLDER = 
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour.com\xHarbour-HBZlib\zip_xhbh.c]
+[\xHarbour.com\xHarbour-HBZlib\zip_xhb.c]
+[\xHarbour.com\xHarbour-HBZlib\xhbzipst.prg]
