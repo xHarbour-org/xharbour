@@ -1,0 +1,34 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = NDEBUG; _MBCS; WIN32; _WINDOWS; ZLIB_DLL; ZIP_ARCHIVE_STL_PROJ; PKZIP_BUG_WORKAROUND;
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\ZipArchive.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER =
+
+[ZipArchive.cpp]
+[ZipAutoBuffer.cpp]
+[ZipCentralDir.cpp]
+[ZipCompatibility.cpp]
+[ZipException.cpp]
+[ZipFile.cpp]
+[ZipFileHeader.cpp]
+[ZipMemFile.cpp]
+[ZipPathComponent.cpp]
+[ZipPlatform.cpp]
+[ZipPlatformComm.cpp]
+[ZipStorage.cpp]
+[ZipString.cpp]
