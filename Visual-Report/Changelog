@@ -1,0 +1,97 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-12-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Component holder to allow selecting non UI components
+   + Added DataTable component to ToolBox
+
+2010-12-04 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Started to work on Print Preview via PDF field generation
+   + Started to work on database component
+
+2010-12-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added new VrReport class to hold the PDF activex that will preview/print the report
+     and will also hold properties like PaperSize, Landscape, etc...
+   + Added Label:Draw() that will create the corresponding control on the PDF
+   + Added Image:Draw() to ADD the image filename to the PDF
+
+   
+2010-12-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Started to generate the report
+      #include 'vxh.ch'
+      FUNCTION test( lDesign )
+         LOCAL oCtrl
+         DEFAULT lDesign TO .F.
+         // Generate Header area
+         IF !lDesign
+            vrlabel():Draw( hDC,146,35,150,150, "Tahoma" )
+          ELSE
+            oCtrl := vrlabel( oApp:Props:Header )
+            oCtrl:Font:FaceName := "Tahoma"
+            oCtrl:Left   := 146
+            oCtrl:Top    := 35
+            oCtrl:Width  := 150
+            oCtrl:Height := 150
+            oCtrl:Create()
+         ENDIF
+      RETURN NIL
+
+2010-11-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Toolbar Close Button
+   + Added Save and SaveAs methods and corresponding logic to show
+     SaveFile dialog, main window caption with current report name stripping out 
+     the path.
+   ! Fixed Method Close() to clear up design area and disable toolbars
+   ! Fixed Main window's OnClose event to detect Report:Modified and prompt
+     for saving.
+     
+2010-11-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Image component
+   ! Fixed changing size to refresh selection rectangle
+
+2010-11-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Color selection
+   * Changed Label to automatically adjust width and height based on font 
+     size and Text length
+   ! Finished character edition
+
+2010-11-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Font:FaceName combobox
+   ! Fixed setting up values from Property Editor
+
+2010-11-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Font object to VR_Label
+   ! Finished property value display in Property Editor
+   + Added logical values combobox.
+
+2010-10-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Editor Grid
+   + Added selection masked rectangle
+   + Finished control selection
+   + Adding selection sizer and Font/Color properties
+
+2010-10-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Save/Restore position and size for MainForm, ToolBox and PropEditor
+   ! Fixed current cursor after dropping an object on the paper
+
+2010-10-18 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Object generation
+   + Added Object Link to ToolBox
+   + Added Property Manager object
+
+2010-10-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added first Icon
+   ! Fixed StatusBar text
+   + Added ImageList to main toolbar
+   + Started RepEdit.prg which will host report pages
+   
+2010-10-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Replaced ExplorerBar with a real ToolBox VXH style.
+   + Added paste and drag cursors
