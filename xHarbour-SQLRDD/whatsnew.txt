@@ -1,0 +1,403 @@
+--- 2009-10-07
+
+  * Adjusted for xHarbour 1.2.1
+  * Fixed COPY TO related functions to work with xHarbour 1.2
+
+--- 2009-05-10
+
+  * Bug fixes in SEEK with Synthetic Indexes and keys with left side blanks
+  * Fixes in optimizer around GOBOTTOM and SKIP-1 from phantom record
+  * Fixed PACK when there are no deleted records
+
+--- 2009-02-27
+
+  * Added support for codepage translation
+  * Fixed bug in bof() when dbGoTo( nInvalidRecord )
+  * Fixed SR_DropRuleNotNull() and SR_AddRuleNotNull() that was not cleaning workarea table info cache
+
+--- 2009-02-05
+
+  * Fixed bug in field read - under some specific circunstances it used to return NIL
+  * Fixed GPF at app startup or finish with Borland C
+  * Fixed SEEK bug with deleted records in sight
+  * Added extended support to xBase filters translated to SQL, thanks to Maxime Adriguetto
+
+--- 2008-04-07
+
+  * Fixed connection in Postgres withou port #
+  * Added support for Postgres 8.3
+  * Added support for xHarbour 1.1
+
+--- 2008-02-06
+
+  * Changed Postgres default collating to ASCII, it may solve many ordering issues
+  * Support for Oracle RAC (Failover Clustering) by adding in connection string: CLUSTER=TRUE
+  * Support for new xHarbour workarea internal structure (this fixes GPFs and bof() bug in december/2007 Beta Build)
+  * Fixed BOF() flag in workareas resulting from queries
+  * Fixed BOF() and EOF flags behavior if issuing dbgoto(recno()) when pointer is in lastrec()+1
+  * Fixed DELETED()/DBSKIP() when reaching BOF()
+  * Fixed GPF when exiting application under special circunstances
+  * Added new functionality to SET FILTER: Now SQLRDD tries to interpret filter expression and translate to its SQL equivalent, so it can be executed in database server (much faster!). The dbFilter() filter will return translated SQL filter expression.
+  * Fixed dbRLock() when issued just after dbUseArea()
+  * Performance increased in long SKIPPing loops reading information from database
+  * Fixed array error when creating indexes under special circusntances
+  * Added support for MySQL Catalogs when in TopConnect compatible mode
+  * Added support for coexistence of SQLRDD and TopConnect tables in same connection
+  * Performance increased in GO TOP and GO BOTTOM after long SKIP loops
+  * Fixed partial dbSeek() on reverse indexes
+  * Added support for Firebird 2.0
+  * Great performance increase when dealing with large tables in Firebird (indexes must be rebuilt)
+  * Added function SR_SetALockWait( [nCnn], nSeconds ) to setup lock wait times (valid under Oracle only at this time)
+  * Minor fix to SR_ChangeStruct()
+  * New working method: SR_GetConnection():GetConnectionID() to retrieve current database connection ID
+  * Removed unsupported database error message when connecting for queries only (see sqlrdd.ch - QUERY_ONLY)
+  * Implemented server version detection at connect time in FireBird
+  * Fixed invalid pointer release at Oracle disconnection
+  * Fixed SR_SetFilter() to remove filter if issued SR_SetFilter("")
+  * Added new method SR_GetConnection():SR_GetnConnection() to retrieve the SQLRDD connection number returnd by SR_AddConnection()
+  * New function SR_SetAppUser( [nCnn], cUsername ) used to setup the application username in order to have it filled in log files (like long_qry.dbf) and LogChanges (see below)
+  * New function SR_SetAppSite( [nCnn], cSite ) used to setup the application site in order to have it filled in LogChanges table (see below)
+  * New function SR_SetConnectionLogChanges( [nCnn], nOpt ) to setup how SQLRDD will log all changes to database to a catalog table.
+    Changes are stored in SR_MGMNTLOGCHG table that will be automatically created in your database. The purpose is to keep track of all changes in database so we can push a replicance application or for troublesoting.
+    You can find in sqlrdd.ch the options for nOpt parameter:
+
+   #define SQLLOGCHANGES_NOLOG                           0     /* Does not log */
+   #define SQLLOGCHANGES_BEFORE_COMMAND                  1     /* May log wrong statements */
+   #define SQLLOGCHANGES_AFTER_COMMAND                  10     /* Logs only if command was succefull */
+   #define SQLLOGCHANGES_IN_TRANSACTION                100     /* Otherwise log goes by second connection, outside
+                                                                  transaction control */
+   #define SQLLOGCHANGES_LOCKS                        1000     /* Log Line LOCKS */
+   #define SQLLOGCHANGES_DELETE_AFTER_TRANSACTION    10000     /* Delete all previous ocourrences from current
+                                                                  database connection when transaction is finished */
+   #define SQLLOGCHANGES_LOG_CALLSTACK              100000     /* Log Call Stack - good when looking for locked peers */
+
+   Examples:
+
+   This will log all statements that changes data in your database, doens't matter if it is made via workarea or direct SQL command:
+   SR_SetConnectionLogChanges( , SQLLOGCHANGES_AFTER_COMMAND )
+
+   This will log all statements that handles table/record locks, and also log the application call stack, so you may know from what point the lock came from:
+   SR_SetConnectionLogChanges( , SQLLOGCHANGES_LOCKS + SQLLOGCHANGES_LOG_CALLSTACK )
+
+--- 2007-09-11
+
+  * Fixed GPF when table opening fails under some circunstances
+  * Fixed dbRLock() when user tries to lock lastrec()+1
+  * Fixed error in dbDelete() when cache is clean (very rare, but it could happen)
+  * Fixed key record count with deleted flag off and no sr_deleted field
+  * Fixed error in several SR_* functions with no alias in sight
+  * Added new methods GetConnectionID() and KillConnectionID( nID ) to MySQL connection class
+  * Added function SR_GetnConnection() to retrieve internal SQLRDD Connection ID from current workarea. It returns same handle as SR_AddConnection()
+  * Added new functions and methods in sample info.prg
+
+--- 2008-08-08
+
+  * Sql trace file now can be assigned by connection
+  * Reverted last change so it recognizes again SR_RECNO, NRECNO or R_E_C_N_O_ as recno() in Oracle
+  * Fixed support to DB2 SQL/DS database (mainframe)
+  * Fixed bug in Indexkey() with similar field names
+  * Fixed bug in dbDelete() when deleting a record in an empty table
+  * Added support to SOFTSEEK to use Virtual Synthetic Index in Oracle (much faster!)
+  * Fixed focused order when opening an index bag with many TAGs
+  * Fixed SKIP bug in Postgres with empty dates in index key
+  * Function SR_SetFilter() now returns previous filter expression, or current filter in parameter is NIL
+
+--- 2007-05-26 21:10
+
+  * Fixed create table under Postgres (was rolling back last transaction)
+
+
+--- 2007-05-21
+  * Added timeout parameter to function sr_AddConnection(). Now it is:
+    SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAutoCommit, lNoSetEnv, nTimeout )
+    Note: this works in MySQL only.
+  * Fixed full table scan under some circunstances, with Oracle 10g.
+  * Fixed changeStruct with multilang fields
+  * Added function SR_SetReverseIndex( nIndex, lSet ) so you can change index ordering in run time
+
+--- 2007-05-17
+  * Fixed queries with SUM() under Postgres
+  * Fixed dbUseArea( , cQuery )
+  * Fixed dbseek with empty dates in Postgres
+
+--- 2008-03-27
+
+* Fixed few issues introduced in last changelog (feb/2007)
+
+--- 2007-02-03
+
+* New release of SQLRDD targeting better performance. Applications may be 10%-80% faster, just upgrading.
+* Support to Pervasine and Oterro databases, for query only.
+* Added support to aliased expressions in DELETE and UPDATE commands in SQL Parser
+
+--- 2007-01-10
+
+* Updated reference guide (Portuguese)
+* Fixed SKIP in Oracle with Virtual Synthetic Index when column content is "'"
+* Fixed dead lock with Postgres when reindexing
+
+-- 2006-12-01
+
+* Fixed memory leak in DBOI_KEYVAL
+* Added new reference guide in Brazilian Portuguese language
+* English manual updated
+* Samples improved and fixed
+* Many security changes in connection classes, to hide username and password class instances
+* Added support to TopConnect RDD compatibility mode
+* Added SR_SetExclusiveManagement( lSet )
+* Added support to TopConnect RDD compatibility mode
+* Added function SR_SetlUseDBCatalogs( lSet ) to enable using database catalog index in addition to SR_MGMNTINDEXES
+* Added ability to detect primary key and use it as Recno() if SR_RECNO column in not found (Just for MSSQL at this time)
+* Added ability to handle non numeric recno()
+* Fixed recall() function
+* Fixed partial date seek. Example: SEEK 200612 (only year and month)
+* Fixed Oracle Synthetic index SKIP when order is set to zero
+* Fixed dropping old indexes when creating new indexes with same name in DB2
+* Added function SR_ResetStatistics() to reset workarea usage statistics
+
+--- 2006-10-05
+
+* Added support to LIMIT clause in SqlParser to MySQL, Postgres and DB2
+* Fixed index owner when creating indexes in DB2
+* Fixed exclusive table open under MSSQL Server
+* Reverted change: Timestamp columns are read as string and not date in MSSQL Server
+
+--- 2006-09-06
+
+* Changed SR_ChangeStruct() to avoid GPF when adding or dropping columns
+* Fixed TRIM() function with MSSQL
+
+--- 2006-09-05
+
+* Added sample for Fetch Method (retrieving result set row by row) in query.prg sample
+* Added NEWDECIMAL data type support in MySQL
+* Timestamp columns are read as string and not date in MSSQL Server
+* Fixed exclusive lock in MSSQL
+* Fixed handling big recno() numbers
+* Fixed OrdDesc() function
+* Fixed error in OrdKeyCount() in ALL_IN_CACHE workareas
+* Fixed empty arrays and hashes stored in memo fields
+* Fixed optimization hints in SQL/DS (DB2/mainframe)
+* Added SR_SetMySQLNumericDataType() function to change the default numeric data type when creating tables in MySQL
+* Fixed ODBC support to not open driver dialog if connection fails
+* Fixed sr_dbRefresh() function when cursor is in lastrec()+1
+* Fixed logging functions error report
+
+--- 2006-08-11
+
+* Fixed Oracle memory leak with intensive memo field usage
+
+--- 2006-08-08
+
+* Fixed column lenght in Oracle queries
+
+--- 2006-06-13
+
+* Added support to OIDOID, TIMESTAMPOID and TIMESTAMPTZOID data types in Postgres
+* Added support to LIMIT clause in Cache, Informix and Firebird in SQL Parser
+* Fixed SR_FILE() with Postgres after second call
+* Index FOR clause is no more affected by SR_FilterStatus(lEnable)
+* Fixed memory leak with ALL_IN_CACHE workareas under MySQL
+
+--- 2006-05-18
+
+* Many minor fixes in new MySQL and Postgres native support
+* Added new function SR_AllInCache([<lSet>]) to setup whether workareas are opened as ALL_IN_CACHE or not. Default is FALSE
+
+--- 2006-05-16
+
+* Complete rework of Postgres native support, more robust and reliable
+* Fixed soft seek bug introduced in last version
+* Fixed GPF in MySQL native support introduced in last version
+* Fixed memory release when disconnecting from Oracle
+* Sample updated: runscript.prg
+
+--- 2006-05-04
+
+* Removed soft seek limitation when more than few columns are involved
+* Fixed soft seek in ALL_IN_CACHE workareas
+* Complete rework of MySQL native support, more robust and featuring performance improvements
+* Added DSN-Less Connection in ODBC (see samples\sqlrdd\sqlrdd.ini)
+* Restored INFORMIX support
+* Added IBM DB2 Query optimizer hints for better performance in very large tables
+* Fixed eventual error in SR_WriteTimeLog() and SR_WriteDbLog()
+* Added SR_GoPhantom() function as an optimized way to move to lastrec() + 1
+
+--- 2006-04-20
+
+* Optimized Postgres native support
+* Added new samples to RecSize(), RecCount() and OrdKeyCOunt() in samples\sqlrdd\info.prg
+* Added RecSize() support
+* Added support to TIME and TIMESTAMP datatypes in Firebird
+* Added support to scientific notation numers stored as DOUBLE in database
+* Added function SR_AutoCommit( <nSet> ) to set up automatic commit every <nSet> INSERTs, UPDATEs or DELETEs, if NOT under transaction. It fixes LARGE APPEND FROM or COPY TO operations with some databases.
+* Fixed memory consume and performance improve in Oracle native support
+* Fixed FOUND() status after LOCATE command
+* Many small fixes in RDD layer, mainly for IBM DB2
+* Fixed memory leak in OrdListAdd() with declarative indexes
+* Fixed constraints under DB2
+* Fixed Caché transaction control
+
+--- 2006-03-17
+
+* Fixed Firebird support to replace NULLs by spaces in strings
+* Fixed SR_FILE() function in Postgres, when using schema names
+* Fixed problem in EOF() after APPEND BLANK in empty tables
+* Fixed KeyCount when DELETED() is disabled
+* Added support to SQL_GUID data type in MS SQL Server
+* Fixed SEEK with ALL_IN_CHACHE workareas and DATE index key
+* Many small fixes in Oracle when using Virtual Synthetic Index
+* Fixed character data type limit in DB2
+* Improved INDEX CONSTRAINT so it can receive an array as column key list
+* Fixed creating and dropping indexes with FOR clause
+* Added support for "DELETED()" and ".NOT." recognization by index FOR clause parser
+* Added functions SR_CreateConstraint() and SR_DropConstraint()
+* Fixed Recno and Deleted column names dynamic assign
+
+--- 2006-02-16
+
+* Added DTB=... parameter to DSN when connecting to ODBC, so we can have just one DSN to many databases in same server
+* Added new function SR_UninstallDSN( <cDriver>, <cAtributes> )
+* Fixed record navigation in tables with no active index and relation established with sr_SetJoin()
+
+--- 2006-02-07
+
+* Added function SR_InstallDSN( <cDriver>, <cAtributes> ) to create an ODBC DSN from source code
+* Added sample to demonstrate above feature
+* Changed all ODBC internal function names to avoid conflicts with FiveWin
+
+--- 2006-02-07
+
+* Postgres for Windows client updated to version 8.1.2
+* Added support for PK and FK constraints in Postgres
+* Added support for PK constraints in Firebird
+* Fixed potential GPF with long table names in Postgres
+* Fixed DBOI_KEYCOUNTRAW and DBOI_KEYCOUNT in dbInfo()
+* Fixed bug with Schemas in Postgres
+* Fixed support to keep workarea opened in dbCreate() (undocumented dbCreate() Clipper paramaters)
+* Fixed GPF in COPY TO
+* Added function SR_SetMySQLMemoDataType( cDataTypeName )
+* Fixed database's physical index drop when recreating the index
+* Fixed bug in SEEK with Postgres database (side effect of new server side filters implementation)
+* Added function SR_DropRuleNotNull( cColumn )
+* Default index key column count limit to auto switch to Synthetic index raised to 10
+* Fixed ALL_IN_CACHE workarea seek with numeric keys
+* Fixed SKIP with server side filters
+* Minor fix in constraint cataolg owner
+* Constraint KEY can be a field list or array of fields in INDEX ON command
+
+--- 2006-01-01
+
+* Added support to MySQL 5.0
+* Added support to Postgres 8.1
+* Added constraint management to primary and foreign keys in Oracle, SQL Server and MySQL. Now we will start using it like a REAL DATABASE.
+* Added sample to demonstrate NEW PRIMARY & FOREIGN KEY functionalities (see samples/constraint.prg)
+* Fixed query result set column lenght in Postgres
+* Fixed sr_ListTables() function in MySQL and Postgres
+* Fixed DROP table in dbCreate() with MySQL/Linux
+* Added SQLDS/VM (Old mainframe database) recognization as IBM DB2/400
+* If connection is *_QUERY_ONLY, Smallint data type returns as numeric and not as logical in ODBC connections
+* Fixed error in dbCLoseAll() when there is a remaining relation to a non-SQLRDD workarea
+* Fixed server side filter removal
+* Fixed MySQL escape strings in LIKE clause
+* Added new function SR_FilterStatus([<lEnable>]) to check, enable or disable current workareas server side filters, like sr_SetFilter(), Historic, Conditional Index, etc.
+* Fixed log functions when user REPLACES original xHarbour file() function
+* Added SR_PhFile(<cFileName>) to act as xHarbour's original file() function
+* added functions to support Oracle stored procedures binding output variables
+* Fixed SELECT SUM() in Oracle when operating with numbers over 99 million
+* Added support to DBOI_KEYCOUNTRAW in dbInfo()
+* Record navigation in Oracle with compound key expression in very large tables greatly optimized (needs to recreate the indexes to apply). Under Oracle, SQLRDD will no more create Synthetic Indexes if index expression has no UDF. New feature was named SyntheticVirtualIndex.
+* Added functions to SET/GET Sythetic Virtual Index support (Oracle)
+* Fixed index/table drop before table creation in MySQL Linux
+* Fixed index drop before index creation
+* Added 3rd parameter to Function SR_LogFile( cFileName, aInfo, lAddDateTime )
+* Fixed "SHOW" command in queries with MySQL
+* Fixed loop with DELETE/SKIP when not using SR_DELETED column
+* Added few Firebird optimizations in queries
+* Fixed confitional index with CACHE_WORKAREA (memory table)
+* Added support to " ... NOT LIKE ... " in SQLParser
+* Fixed "NOT LIKE", "NOT IN ( SELECT ... )" and "NOT IN ( list )" in SQL Parser
+* Fixed bug when generating SQL statements with complex multiple JOINs in Sql Parser
+* Added SR_Version() function
+* Fixed synthetic index rebuild
+* Fixed fetch method error report
+
+--- 2005-09-20
+
+* Added new methodology guide to manual set
+* Added revisions in SQLRDD manual
+* Added support to MS SQL Server 2005 and Firebird 2.0
+* Tested with Oracle 10g and MS SQL Server Express 2005
+* Added support to date() function in SQL Parser to use the server date in queries
+* Added support to lowercase table names in MySQL Linux
+* Added table na qualification, so database's reserved words can be used as table names
+* Added Firebird 2.0 line lock support
+* Added CONNECTION support to dbUseArea() (8th paramenetr)
+* Added option to connect to database WITHOUT EXC LOCK extra connection (see sqlrdd.ch)
+* Added automatic workarea cleanup when adding server side filter - SR_SETFILTER()
+* Added function SR_Version() to get SQLRDD internal version/build info
+* Fixed column lenght bug in Firebird
+* Fixed SR_CommitTransaction() - it was not reseting transaction internal counter
+* Fixed SEEK bug in Postgres
+* Fixed primary key creation with Postgres
+* Fixed SR_DROPINDEX()
+* Fixed column alias name in SELECT with Firebird
+* Fixed bug when updating a record that was just inserted
+* Changed maximun query column count to 620 in Firebird
+* Don't change current active connection when a new connection is established
+* Prevent of connection ID change if closing previous connection
+* Extended maximun connection count in Oracle
+* Fixed AVERAGE() function in SQL Parser with Oracle and MSSQL Server
+* Removed "USE ... CONNECTION ..." from sqlrdd.ch, since now dbUseArea has its proper connection parameter
+* Fixed handling of SQL_NO_DATA returned by query evaluation methods (cases no more RT error)
+
+--- 2005-07-02
+
+* Added support to conditional indexes (INDEX ON .... FOR <expression>)
+* Added descend index support (INDEX ON COL1, COL2 DESCEND)
+* Added ListCatTables( cOwner ) method to list all user tables in RDBMS catalog
+* Added SR_ListCreatedTables() to list tables created via SQLRDD
+* Added support to SELECT .... WHERE COL IN ( ? ) in Sql Parser
+* Added support to SELECT .... WHERE COL IN ( :BINDVAR ) in Sql Parser
+* Added charset support for Oracle in Connection String
+* Added full column qualifying to avoid problems with any database protected word used as field name
+* Added Function SR_SetNextQuery( cSql ) to bypass dbUseArea() filename lenght limit
+* Fixed connection PORT setup to MySQL (when you want to use a non-default port)
+* Fixed Caché min. date
+* Added version recognization to avoid connection to OLD Postgres versions that does not run some very basic stuff
+* Many fixes to SR_ChangeStruct(), and changestruct.log greatly improved
+* Fixed missing OWNER to Historic clauses
+* Reset Caché sequence controler when dbCreate() overwrites an existing table
+* Fixed empty date conversion in Oracle
+* Fixed minor bug in Oracle OCI handle allocation
+* Fixed DATE structure report under MSSQL (was reporting 03 decimals)
+* Fixed minor fetch bug when OCI returns additional query info
+* Fixed owner in SR_DropIndex(), SR_DropTable() and SR_RenameTable()
+* Fixed proper column removal when dropping Synthetic or conditional indexes
+* Removing chr(0) from strings in Caché
+* Optmizations
+
+--- 2005-05-10
+
+* Append records to table optimizaed when tables is opened in EXCLUSIVE mode (20-40% faster)
+* Oracle native access 100% rewrote. Now it's about 30% faster
+* Support to DB2 database on IBM iSeries (AS/400) (with or without journal)
+* Added PK creation under Oracle at dbCreate()
+* Added SR_SetGlobalOwner( cOwner ) so we can setup a global schema/owner name to all tbles opened by SQLRDD (except support tables, wich still uses SR_SetToolsOwner( cOwner )). It has meaning with Oracle, MSSQL, MySQL, DB2 and Postgres
+* Added functions to set global tablespace name to Oracle: SR_SetTblSpaceData(cSet) e SR_SetTblSpaceIndx(cSet). This is used when creating tables, indexes and constraints
+* Changed samples demo01.prg and dbf2sql.prg to open tables in exclusive mode
+* Now you can use TNS=.... or DTB=... to connect to Oracle, since TNS Name is more intuitive to Oracle users.
+* Minor fix to historic behavior
+* Fixed DB2/AS400 detection to old win98 ODBC drivers
+* Added DATE and TIMESTAMP formats to Oracle database
+* Fixed memory leak when connection to Firebird fails
+* Fixed SOFT SEEK with character keys with blank spaces in right side
+* Fixed ZAP() on empty tables error message
+* Fixes to support SCOPE behavior via DBOI_*
+* Fixed reverse order index under Oracle and Firebird (missing "NULLS LAST")
+* Removed wong ODBC lib dependence from native Firebird support
+* Fixes to multi language fields
+* Fixed to APPEND FROM with multilanguage memo fields
+* Fixed dbSeek (softseek) with ALL_IN_CACHE table
+* Fixed SET SCOPE with numeric index keys, when TOP and BOTTOM limits are the same
+* Fixed dbUseArea( ,, <cSqlCommand> ) with Postgres

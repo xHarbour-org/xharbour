@@ -1,0 +1,22 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = source;xbp\obj
+LDEBUG = .F.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = SQLRDD_DEMO;SQLRDD_TOPCONN
+MYLINK_FLAGS = -L/usr/lib/xbuilder -fullstatic -gtcrs
+MYPRG_FLAGS = -wb-
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\obj\demo\sql.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\demo
+
+#include "sql.files.inc"

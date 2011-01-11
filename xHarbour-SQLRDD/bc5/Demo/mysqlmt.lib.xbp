@@ -1,0 +1,23 @@
+CINI = xbuild.bc5.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\..\source;\xbp\bc5\demo\mysqlmt.lib
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .T.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = SQLRDD_DEMO; MYSQLRDD; HB_THREAD_SUPPORT
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\bc5\demo\mysqlmt.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\bc5\demo
+
+#include "..\..\mysql.files.inc"

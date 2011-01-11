@@ -1,0 +1,4538 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-01-16 07:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlex3.c
+    ! fixed getSeekWhereExpression(),BindSeekStmt(),CreateSeekStmt(),getPreparedSeek() functions. they was generating wrong seek command
+
+2010-01-05 21:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! fixed convtype method, was returning wrong value for logical values
+    
+2009-11-16 13:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlsrodbc.c
+    !minor fix
+
+2009-11-16 09:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlsrodbc.c
+    source\sqlex1.c
+    source\sqlex2.c
+    source\sqlex3.c
+    ! fixed windows version macros
+
+2009-10-27 23:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlrdd0.prg
+    ! fixed sr_dropindex to also look for an tag name to remove
+
+2009-10-08 13:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  + bc5\Instrucoes.txt
+  + bc5\Instructions.txt
+    * These files must be placed in <SQLRDD BCC Install root folder>
+  + bc5\build.bat
+  + bc5\clean.bat
+  + bc5\make.bat
+    * These files must be placed in <SQLRDD BCC Install root folder>\SAMPLES\SQLRDD
+
+2009-10-07 17:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\tstrdd.prg
+    ! Sample updated
+  * source\sqlex1.c
+  * source\sqlex2.c
+  * source\sqlex3.c
+    ! Fixes for BCC
+  * source\sqlgen1.prg
+    ! Fixes for xHB 1.2 COPY TO related
+  * source\sqlrdd1.c
+    ! Fixes for xHB 1.2 browse()
+  * source\sqlrdd2.prg
+    ! touched
+  * whatsnew.txt
+    ! Updated
+  * bc5.0997\Build_0997.bat
+  * bc5.0997\sql0997.lib.xbp
+  * bc5.0997\xBuild0997.bc5.ini
+  * bc5\Samples\info.prg
+  * bc5\Samples\make_9970.bat
+    - Removed files from CVS
+
+2009-10-05 12:22 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\sqlex1.c
+  * source\sqlrdd1.c
+    ! changed function parameters of rdd structure, and added rename method.
+
+2009-10-04 21:29 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+    * Actualize to currend rdd subsystem, area part of structure is aceded as ->area., in this way
+      changes in the future in its structure don't take efect at sql rdd.
+  * source\utils.prg
+    * Added undeclared define.
+  * source\sqlodbc.prg
+    * removed unused variables.
+
+2009-09-05 21:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\dbf2sql.prg
+  * samples\info.prg
+  * samples\tstrdd.prg
+    ! Minor change in samples
+  * source\sqlex1.c
+  * source\sqlex3.c
+    ! Added missing reverse index support in SQLEX
+
+2009-08-31 18:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed COPY TO with no codepage definition
+  * source\sqlrdd2.prg
+  * source\sqlex1.c
+  * source\sqlex2.c
+    ! Fixes to SQLEX
+
+2009-07-22 21:29 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * xHarbour-SQLRDD\source\sqlex.h
+  * xHarbour-SQLRDD\source\sqlrdd.h
+    + Added HBDBSESSION info at the next future it will be used to save connection, and local
+      TTS transactions for all rdds by session.
+
+2009-06-30 10:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlpgs.prg
+    ! added support for postgresql 8.4
+
+2009-06-10 05:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex1.c
+    ! Fixed some GPF traps
+    ! Fixed WHERE clause syntax error with filters and error report
+    ! Fixed SKIP from last record in small tables
+  * source\sqlex.h
+    ! Work in progress to add missing REVERSE (descend) index support
+  * source\sqlrdd2.prg
+    ! Fixed synthetic index creation under SQLEX (special column was
+      not being filled)
+    ! Fixed "FOR CLAUSE" index creation under SQLEX (special column was
+      not being filled)
+
+2009-06-05 12:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\firebird.c
+  * source\mysql.c
+  * source\pgs.c
+  * source\sqlex1.c
+  * source\sqlex2.c
+  * source\sqlex3.c
+  * source\sqlorax.c
+  * source\sqlprototypes.h
+  * source\sqlrdd0.prg
+  * source\sqlsrodbc.c
+  * source\utilslang.prg
+    ! Cleared all XCC, BCC and MSVC warnings and fixed
+      potential bugs
+
+2009-06-04 04:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex1.c
+    ! Added workaround for IndKeyNo()
+  + doc\SQLEX Beta program.docx
+  + doc\SQLEX Beta program.pdf
+    + Added Beta docs to CVS
+
+2009-06-03 22:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex.h
+  * source\sqlex1.c
+    ! Bugs fixed in SKIP with 25 records table
+    ! Bugs fixed in SKIP with repetitive index keys in table
+  * source\sqlex3.c
+    ! Added optimizer hints to Oracle - Now SEEK runs much much faster in Oracle
+    ! Fixed rebuild SEEK query if argument changes to/from NULL
+  * source\sqlrdd2.prg
+    + Added index phisical name to ::aIndex vector
+  * source\sqlrddsetup.ch
+
+2009-05-27 13:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex1.c
+    ! Fixed LOCK/UNLOCK if table was just opened but pointer
+      not moved
+
+2009-05-27 13:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex1.c
+    ! Fixed GPF trap with Synthetic Indexes
+    ! Fixed BOF/EOF issues
+  * source\sqlrdd1.c
+    ! Fixed recent introduced bug in latest fix in SEEK with Synthetic Indexes
+      in SQLRDD
+
+2009-05-20 20:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex2.c
+    ! Fixed Firebird INSERT
+
+2009-05-20 20:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\chgStruct.prg
+  * samples\connect.prg
+  * samples\dbf2sql.prg
+  * samples\demo01.prg
+  * samples\info.prg
+  * samples\memo.prg
+  * samples\namespacesql.prg
+  * samples\query.prg
+  * samples\relation.prg
+  * samples\tstrdd.prg
+    ! Minor changes for better user experience when evaluating
+  * samples\sqlrdd.ini
+    ! Added more connection string examples
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlrdd.ch
+  * source\sqlrdd2.prg
+    ! Added logic to create RT error if SQLEX connection is not ODBC
+     (far better than GPF)
+
+2009-05-20 18:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlex2.c
+  * source\sqlex3.c
+  * source\sqlrdd0.prg
+    ! SQLEX Fully working with Oracle, but I'm very disappointed on how
+      Oracle's ODBC is inneficient. SQLRDD Native is still better.
+    ! SQLEX Working with Firebird, I experienced a 10X performance improvment
+      over SQLRDD Native connection to Firebird!!
+
+2009-05-19 19:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\demo01.prg
+  * samples\relation.prg
+    ! Fixed and improved samples to work with both RDDs (SQLRDD and SQLEX)
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlex2.c
+  * source\sqlex3.c
+    ! Fixed recent inserted line recno in Postgres and MySQL ODBC
+    ! Fixed relations
+    ! Fixed GPF after synthetic indexes creation
+    ! Fixed DELETED with MySQL
+    ! Fixed Lastrec()
+    ! Fixed SEEK when it finds a deleted record and SET DELE is ON
+    ! Fixed TOP / BOTTOM optimizers when TOP/BOTTOM record is deleted
+    ! Fixed LOCK / UNLOCK
+  * source\sqlodbc.prg
+    ! Commented out call to buggy function is Postgres ODBC - SQLColAttribute()
+      Need to find a workaround...
+  * source\sqlrdd0.prg
+    ! Fixed ODBC connection with Oracle (was dead from a long
+      time in SQLRDD and now it's needed in SQLEX)
+  * source\sqlrdd2.prg
+    ! Fixed harmless bug with large name tables in Oracle
+
+2009-05-18 18:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\connect.prg
+  * samples\dbf2sql.prg
+  * samples\demo01.prg
+  * samples\tstrdd.prg
+    ! Fixed samples to work with both RDDs (SQLRDD and SQLEX)
+  * source\sqlex1.c
+  * source\sqlex3.c
+  * source\sqlrddsetup.ch
+    ! Fixed detected bugs with SCOPE
+    ! Fixed bugs in SKIP/SEEK with NULL columns in index key
+
+2009-05-18 14:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlex3.c
+  * source\sqlprototypes.h
+  * source\sqlrdd0.prg
+    ! Deleting records rewrited from SQLRDD
+    ! Fixed BOF() bug skipping backwards
+    ! Minor fixes
+
+2009-05-16 14:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlex.h
+  * source\sqlex1.c
+  * source\sqlex2.c
+  * source\sqlrdd1.c
+    ! Finished coding UPDATE, so all core RDD is now done!
+      Just need to test & fix and implement small missing things
+
+2009-05-14 21:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\tstrdd.prg
+  * sql.files.inc
+  + source\sqlex.h
+  + source\sqlex1.c
+  + source\sqlex2.c
+  + source\sqlex3.c
+    ! ODBCRDD rebranded to SQLRDD Extreme Edition (SQLEX)
+  - source\odbcrdd.h
+  - source\odbcrdd1.c
+  - source\odbcrdd2.c
+  - source\odbcrdd3.c
+    - Files removed from CVS (our CVS does not support rename)
+
+2009-05-14 19:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+  * source\odbcrdd2.c
+  * source\sqlrdd1.c
+  * source\sqlrdd.h
+    ! Few bugs fixed
+    ! Started writing UPDATE code in ODBCRDD
+  * source\sqlrdd.ch
+    ! Tagged build #7
+  * source\sqlrdd2.prg
+    ! Fixed bug when writing to tables with Sythetic Indexes
+
+2009-05-12 14:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\tstrdd.prg
+    + Added new tests
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    - Removed all SEEK related functions from this file
+      (a C source file with more than 4500 lines is not good)
+    ! SEEK completely reworked (again) - now much simpler
+      and even faster!
+  * source\odbcrdd2.c
+    ! Fixes in APPEND new record
+  * sql.files.inc
+  + source\odbcrdd3.c
+    + Added new source to hold all SEEK related functions
+    ! SEEK completely reworked (again) - now much simpler
+      and even faster!
+
+2009-05-10 14:28 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbcrdd.h
+    ! CHECK_SQL_OK macros are now CHECK_SQL_N_OK (more meaningful)
+  * source\odbcrdd1.c
+    ! Made it compatible with **Postgres** and **MySQL** ODBC
+    ! Many fixes to bind NULL values to columns
+    ! Fixed GPF trap in SQLBindParameter()
+  * source\odbcrdd2.c
+    ! Finished APPEND records in ODBCRDD, now 4X faster than SQLRDD
+    ! Made it compatible with **Postgres** and **MySQL** ODBC
+  * source\sqlconnection.prg
+    ! Fixes to work like ODBC 3.0
+  * source\sqlodbc.ch
+  * source\sqlodbc.prg
+    ! Touched
+  * source\sqlprototypes.h
+    + Added more prototypes
+  * source\sqlrdd0.prg
+    ! Added inShutDownProcess global to avoid recursive RT errors
+  * source\sqlrdd1.c
+    ! Fixed SEEK in SQLRDD with Sythetic Indexes and SET DELETED ON
+      when searching for strings with blanks on left side
+    ! More fixes to SKIP -1 from phantom record
+    ! Fixed SQL_INIT and SQL_EXIT execution from C code
+  * source\sqlrdd2.prg
+    ! Removed optimizer to transform a GoBottom from phantom record
+      into a SKIP -1, it cannot coexist with SKIP-1 from pahntom optimizer
+    ! Fixed PACK when there are no deleted records in table
+  * source\sqlsrodbc.c
+    ! Run time error routines 100% reworked
+    ! ODBC engine setted to work as ODBC 3.0 in both SQLRDD and ODBCRDD
+
+2009-04-25 14:28 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+  * source\odbcrdd2.c
+  * source\sqlrdd2.prg
+  * source\sqlrddsetup.ch
+    ! Coding INSERT, too much code added, this commit is
+      more likely a backup copy
+
+2009-04-24 11:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    ! Moved most of prototypes and defines to header
+    + Added all updateBuffer logic in odbcrddGoCold()
+    ! Minor fixes
+    ! Fixed compilation with BCC
+  * source\sqlrdd2.prg
+    ! touched
+  + source\odbcrdd2.c
+  * sql.files.inc
+    + Added new file to hold all updateBuffer auxiliar functions
+      (this is a work in progress, UPDATE and INSERT still not
+      working in ODBCRDD, but all main design is done)
+
+2009-04-23 07:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed nasty bug dbskip(-1) when positioned in lastrec()+1
+      Wasn't it previously fixed ?
+  * source\odbcrdd1.c
+    * dbSeek improved
+    * started writing writebuffer (at this moment, ODBCRDD does
+      not write anything to database yet)
+
+2009-04-22 10:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\tstrdd.prg
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    * dbSeek almost done, working
+
+2009-04-20 09:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged build #6
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    ! Backup commit, STILL NOT WORKING (WIP)
+  * source\utils.prg
+    ! Changed to use API instead of direct item structure
+
+2009-04-20 10:24 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\util.prg
+    * _POSIX_PATH_MAX + 1 -> HB_PATH_MAX
+    * _POSIX_PATH_MAX -> HB_PATH_MAX - 1
+
+2009-04-17 17:43 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! pacified warnings, for unrecheable code and missing casting.
+
+2009-04-15 21:49 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd2.prg
+    * desactivated new parser, only will be used using define NG_DEVELOPMENT
+
+2009-04-15 10:06 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+    ! Fixed Dbseek using synthetic indexes, when skip records was necessary.
+    ! Fixed Comparison when key skipped is completely different.
+
+2009-04-14 10:06 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed FieldGet (internal GetValue) to respect codepage.
+
+2009-03-28 09:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  ! source/exprobjs.prg
+  ! source/exprparser.prg
+  ! source/exprrelation.prg
+  ! source/exprsimpl.prg
+  ! source/exprtransl.prg
+  ! source/exprudf.prg
+    !include file names all in lower case
+
+2009-03-24 21:30 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  + samples\codepage.prg
+    + Added sample of codepage use with sqlrdd.
+
+2009-03-18 10:29 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * mysql.files.inc
+    + Added missing Expr* files with new parser subsystem.
+
+2009-03-17 21:05 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed DbSeek with SET DELETED ON, was comparing incorrectly strings of the same size.
+
+2009-03-11 21:07 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * samples\tstrdd.c
+    * Modified to test dbskip( -1 ) from eof (DbGoto( RecCount() + 1 )).
+      Now is working fine, in the same way as dbfcdx, dbfntx or dbfnsx.
+      this are the tests:
+      Connected to        : MICROSOFT SQL SERVER 08.00.0194
+      Current RDD: ODBCRDD   performing in            75.07
+
+      Connected to        : MICROSOFT SQL SERVER 08.00.0194
+      Current RDD: SQLRDD     performing in          211.81
+      Erro posicao / recno()      10001      10000
+      Erro posicao / recno()      10001
+      Erro - nao deveria estar em BOF()      10001
+
+      Current RDD: DBFNTX     performing in            5.06
+      Current RDD: DBFCDX     performing in            4.35
+      Current RDD: DBFNSX     performing in            4.59
+
+2009-03-10 22:12 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    ! Fixed DbSkip(-1) from EOF.
+    ! Fixed variables declaration, situated post code.
+
+2009-03-06 10:29 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    ! Fixed casting DOUBLE to SQLDOUBLE.
+    ! removed unreferenced variables.
+
+2009-03-05 12:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * Include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged build #5
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    ! Added a LOT OF CODE for ODBCRDD. SKIP works FWD and BWD, over
+      index or natural order.
+      ODBCRDD than SQLRDD.
+  * source\sqlrdd1.c
+    ! Fixed bug in OrdSetFocus()
+  * whatsnew.txt
+    ! Typo
+  + samples\tstrdd.prg
+    + Added new sample to speed test RDDs. Fully working with ODBCRDD.
+
+2009-03-02 23:37 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * samples\filter.prg
+    + Added the use of codepage to filter sample.
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    ! Fixed skipraw when phantom record is positioned. Its very dangerous to initialize fEof previous
+      to call GetCurrentRecordNum(), because this function works over this flag to infor phantom record.
+
+2009-03-02 11:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    + More ODBCRDD code
+    ! Uncommented odbcrddOrderListClear(), code in this function seems complete,
+      but needs to be tested and warnings cleared.
+
+2009-03-01 22:06 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    + Added modifications to build it for oldes versions of xharbour previous 0.997 and 1.000.
+    * commented unfinished code at odbcrddOrderListClear( ODBCAREAP thiswa ) to build without warnings.
+    * changed the use of hb_set for setGet functions.
+
+2009-02-27 13:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\firebird.c
+  * source\mysql.c
+  * source\pgs.c
+  * source\sqlact.c
+  * source\sqlmy.prg
+  * source\sqlorax.c
+  * source\sqlprototypes.h
+  * source\sqlrdd.ch
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+  * source\sqlrddsetup.ch
+  * source\sqlsrodbc.c
+  * include\sqlrdd.ch
+    * Replaced constants by defines, so now I understand myself
+    ! Fixed some defined constant names
+  * source\utils.prg
+    ! Fixed SR_DropRuleNotNull() and SR_AddRuleNotNull() that was not cleaning
+      workarea table info cache
+  * sql.files.inc
+  + source\odbcrdd.h
+  + source\odbcrdd1.c
+    + Added new ODBCRDD, now about 70% complete. Up to now, average 60% faster
+      than SQLRDD
+  * whatsnew.txt
+    * Updated
+
+2009-02-26 17:47 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * xHarbour-SQLRDD\bc5.0997\xBuild0997.bc5.ini
+  * xHarbour-SQLRDD\source\sqlact.c
+  * xHarbour-SQLRDD\source\sqlrdd1.c
+    * modification to support older versions of xharbour 0.997
+
+2009-02-25 10:45 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * xHarbour-SQLRDD\source\ExprParser.prg
+  * xHarbour-SQLRDD\source\ExprRelation.prg
+  * xHarbour-SQLRDD\source\ExprSimpl.prg
+  * xHarbour-SQLRDD\source\ExprTransl.prg
+  * xHarbour-SQLRDD\source\ExprUDF.prg
+  * xHarbour-SQLRDD\source\sqlfirebird.prg
+  * xHarbour-SQLRDD\source\sqlgen1.prg
+  * xHarbour-SQLRDD\source\sqlmy.prg
+  * xHarbour-SQLRDD\source\sqloracle.prg
+  * xHarbour-SQLRDD\source\sqlpgs.prg
+  * xHarbour-SQLRDD\source\sqlrdd1.c
+  * xHarbour-SQLRDD\source\utils.prg
+    - removed and cleaned full code from unused variables and unreacheble code.
+    ! fixed renamed HB_ERRCODE, there was some errCode muted too.
+
+2009-02-25 09:14 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Source\sqlrdd1.c
+    * Changed SUCCESS by HB_SUCCESS, FAILURE by HB_FAILURE & ERRCODE by HB_ERRCODE.
+
+2009-02-20 12:54 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+    * used cdp api instead of external statics to avoid conflicts with dll.
+    * used setGet api instead of hbset. to avoid conflicts with dll.
+    + readded charset support
+
+2009-02-20 12:42 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+   * source/sqlrdd2.prg
+      - removed unused variables.
+
+2009-02-18 09:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    - Tagged build #3
+
+2009-02-18 12:52 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * Build_All.bat
+  * bc5\mysql-demo.lib.xbp
+  * bc5\mysql.lib.xbp
+  * bc5\mysqlmt-demo.lib.xbp
+  * bc5\mysqlmt.lib.xbp
+  * bc5\sql-demo.lib.xbp
+  * bc5\sql.lib.xbp
+  * bc5\sqlmt-demo.lib.xbp
+  * bc5\sqlmt.lib.xbp
+  * bc5\xBuild.bc5.ini
+  * libsqlrdd.a.xbp
+  * source\sqlrdd.ch
+  * source\sqlrdd.h
+  * source\sqlrdd0.prg
+  * source\sqlrdd1.c
+  * sql-demo.a.xbp
+  * vc8\mysql.lib.xbp
+  * vc8\mysqlmt.lib.xbp
+  * vc8\sql.lib.xbp
+  * vc8\sqlmt.lib.xbp
+  * vc8\xbuild.vc8.ini
+  * xcc\mysql.lib.xbp
+  * xcc\mysqlmt.lib.xbp
+  * xcc\sql.lib.xbp
+  * xcc\sqlmt.lib.xbp
+    + Added -wb- flag to avoid this kind of warnnings stop building.
+    - adaptes linux build.
+    + Added support to codepage to scopes and dbseek. I think support for codepage no multibyte
+      char is finished and compatible with other rdd.
+    * Finished implementation of codepage/collation at sqlrdd and odbcrdd.
+      Now is posible USE "TEST_FILTER" EXCLUSIVE VIA "SQLRDD" CODEPAGE "ES850" this automatically
+      converts es850<->aplication cpcode. r is posible to use DbInfo( DBI_CPCONVERTTO, "ESWIN" )
+      to force conversion to eswin instead of aplication cppage.
+    + Added new DbInfo to set database codepage and codepage translation to.
+      This example forces translations OEM to ANSI
+      DbInfo( DBI_CPCONVERTTO, "ESWIN" ) // 1252 ansi
+      Remain TODO FieldPut, by the moment only FieldGet works.
+      If HB_CDP_SUPPORT_OFF will be defined it doesn't works.
+
+2009-02-15 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  - source/ExprObjs.prg
+  - source/ExprParser.prg
+  - source/ExprRelation.prg
+  - source/ExprSimpl.prg
+  - source/ExprTransl.prg
+  - source/ExprUDF.prg
+    Removed due wrong file case
+
+  + source/exprobjs.prg
+  + source/exprparser.prg
+  + source/exprrelation.prg
+  + source/exprsimpl.prg
+  + source/exprtransl.prg
+  + source/exprudf.prg
+    Readded all as lower case names due linux
+
+2009-02-16 00:05 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+    + Added define to build older versions previous 1.1.
+    - removed unused variables.
+    + Added missing structure item.
+
+2009-02-05 12:55 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+    ! Fixed useless redefinition of strdup() under Windows, that caused
+      GPF at startup or end of aplication with Borland compiler and
+      was always forcing Oracle libraries to be linked in final .exe
+
+2009-02-03 17:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed nasty bug on reading optimization, that caused
+      invalid data type in workarea field under specific situations
+    ! Handling of ::aIndexMgmnt is now oriented by constants so
+      source is far more readable
+    + Added index key codeblock to Opened indexes array
+  * source\sqlrddsetup.ch
+    + Added aIndexMgmnt constants
+  * source\sqlrdd1.c
+    ! Replaced Macro evaluation by CodeBlock evaluation
+      in sqlKeyCompare - Seeks faster now.
+
+2009-02-03 00:05 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed DBSEEK of number, data or logical values. Now are automatically converted to dtos
+      str or TF as the same way as index is converted too.
+
+2009-01-28 20:45 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd.h
+  * source\odbcrdd.h
+    + Added missing field to workarea structures.
+  * source\sqlrdd1.c
+  * source\odbcrdd1.c
+  * source\oratypes.h
+  * source\sqlora.c
+    - removed unused variables.
+
+2009-01-23 17:06 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+  * source\sqlorax.c
+  * source\sqlrdd1.c
+    * removed some memory leaks, some PHB_ITEMS was cleared instead of relesed. Removed unused
+      variables.
+
+2009-01-21 17:16 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+  * source\sqlrdd1.c
+    * Cleaning warnings and unused variables, standarized the use of itemapi.
+  + samples\bc5.bat
+    + Added to build samples with borland compiler
+
+2009-01-15 16:49 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+    + Added define to build older versions previous 1.1.
+
+2009-01-14 11:55 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * samples\filter.prg
+  * source\odbcrdd1.c
+    + Impemented OrdKeyNo(), DBOI_POSITION and DBOI_KEYNORAW, needs more test to finish, but
+      it will works more quick than dbfcdx one.
+
+2009-01-12 23:46 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    * Partialy implemented DbDelete at c level but works perfectly.
+
+2009-01-12 23:22 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    ! Implemented OrdKeyCount at c level for ODBCRDD.
+
+2009-01-10 02:28 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    ! Fixed GPF reading Deleted() from incorrect buffer.
+
+2009-01-06 20:22 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd.h
+  * source\odbcrdd1.c
+    ! Fixed Deleted() at ODBCRDD, SQLGetData always returns an extra char \0 to end array. then
+      the next operation really writes 2 chars instead of 1.
+      res = SQLGetData( thiswa->hStmt, 2, SQL_C_CHAR, szValue, 1, NULL ); -> " \0"
+
+2009-01-02 21:15 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\odbcrdd1.c
+    + implemented SET SCOPE TO at c level, there some remaining questions about skip -1.
+
+2009-01-01 18:44 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * samples\filter.prg
+    + Added 3rd parameter to inform rdd SQLRDD or ODBCRDD
+  * source\odbcrdd1.c
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+    + Added sqlfilter implementation at where expressions at c level (ODBCRDD)
+  - vc\xBuild.msvc8.ini
+  - vc\xbuild.windows.ini
+    - removed as binary cvs.
+
+2008-12-24 13:24 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * samples\vc8.bat
+    ! Fixed to use it with all windows systems
+  * source\sqlodbc.ch
+    * modifications nedded to build with xHB.
+  * sql.lib.xbp
+    * used include sql.files.inc instead of files directly.
+
+2008-12-19 22:27 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+    ! Fixed DbSeek conrrecting sqlKeyCompare and implementing it at c level. This function
+    now works with len strings when compare.
+    int sqlKeyCompare( SQLAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
+
+2008-10-28 22:48 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source\ExprParser.prg
+  * source\ExprSimpl.prg
+  * source\ExprTransl.prg
+  * source\odbcrdd1.c
+  * source\sqlrdd2.prg
+  * sql.files.inc
+  + source\ExprObjs.prg
+  + source\ExprRelation.prg
+  + source\ExprUDF.prg
+    * Added Maxime parser, his code don't have enoght quality but is the begining of a good
+      parser to convert xharbour expresions to sql expressions.
+    * Corrected some undefined variables and return values, to compile it without warnings.
+
+2008-10-27 21:40 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  + source\ExprParser.prg
+  + source\ExprSimpl.prg
+  + source\ExprTransl.prg
+    + Added contribution from Maxime Adriguetto (Expresion parser), it will be used at next
+      upload.
+
+2008-09-23 21:20 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source/sqlrdd1.c
+    ! synchronize with the current version of xHarbour changing HARBOUR_MAX_RDD_ALIAS_LENGTH
+      with HB_RDD_MAX_ALIAS_LEN.
+
+2009-02-03 11:26 UTC+0100 Miguel Angel Marchuet Frutos <miguel.angel@newage-software.com.br>
+  * source/sqlrdd.h
+  * source/sqlrdd1.c
+    + Added missing field to workarea structures.
+    * Cleaning warnings and unused variables, standarized the use of itemapi.
+    + Add support to msvc 64 bits startup
+
+2009-01-21 15:44 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+- xHarbour-SQLRDD/sqlmt.lib.xbp
+- xHarbour-SQLRDD/sqlmt-demo.lib.xbp
+- xHarbour-SQLRDD/sql.lib.xbp
+- xHarbour-SQLRDD/sql-demo.lib.xbp
+- xHarbour-SQLRDD/mysqlmt.lib.xbp
+- xHarbour-SQLRDD/mysqlmt-demo.lib.xbp
+- xHarbour-SQLRDD/mysql.lib.xbp
+- xHarbour-SQLRDD/mysql-demo.lib.xbp
+- xHarbour-SQLRDD/vc8/Build_All.bat
+- xHarbour-SQLRDD/vc8/sqlmt-demo.lib.xbp
+- xHarbour-SQLRDD/vc8/sql-demo.lib.xbp
+- xHarbour-SQLRDD/vc8/mysqlmt-demo.lib.xbp
++ xHarbour-SQLRDD/vc8/Demo/sqlmt.lib.xbp
++ xHarbour-SQLRDD/vc8/Demo/sql.lib.xbp
++ xHarbour-SQLRDD/vc8/Demo/mysqlmt.lib.xbp
++ xHarbour-SQLRDD/vc8/Demo/mysql.lib.xbp
++ xHarbour-SQLRDD/xcc/sqlmt.lib.xbp
++ xHarbour-SQLRDD/xcc/sql.lib.xbp
++ xHarbour-SQLRDD/xcc/mysqlmt.lib.xbp
++ xHarbour-SQLRDD/xcc/mysql.lib.xbp
++ xHarbour-SQLRDD/xcc/Demo/sqlmt.lib.xbp
++ xHarbour-SQLRDD/xcc/Demo/sql.lib.xbp
++ xHarbour-SQLRDD/xcc/Demo/mysqlmt.lib.xbp
++ xHarbour-SQLRDD/xcc/Demo/mysql.lib.xbp
+* xHarbour-SQLRDD/vc8/sqlmt.lib.xbp
+* xHarbour-SQLRDD/vc8/sql.lib.xbp
+* xHarbour-SQLRDD/vc8/mysqlmt.lib.xbp
+  * Fixed source and output paths
+
+
+>>>>>>> 1.316
+2008-05-29 13:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  + samples/oraclebi.prg
+    ! sample to demostrate usage of oracle bind parameters
+  * source/sqlorax.c
+    ! enhace of bind parameters funcions
+      now accept an 6th parameter for in/out parameter argument bind
+      ORACLEGETBINDDATA() now return the correct data type according to
+      3rd parameter passed to ORACLEINBINDPARAM()
+      which is
+      4 = DOUBLE Values
+      2 = Numeric Values
+      -1 = Character/Date Values
+
+2008-05-29 09:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlorax.c
+   Added missing return to ORACLEGETBINDDATA()
+
+2008-04-07 16:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged new build #
+  * source\sqlact.c
+  * source\sqlconnection.prg
+  * source\sqlprototypes.h
+  * source\sqlrdd1.c
+    ! Fixed xHB 1.1 support
+    + Added SQLRDD_COMPAT_PRE_1_1 compile directive
+      to support old RDD API
+    ! Cleared few warnings
+
+2008-03-31 09:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlpgs.prg
+    ! Fixed connection with specific TCP port number (was generating RTE if PRT was not in connection string)
+
+2008-03-18 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlpgs.prg
+    ! added version 8.3 to list
+
+2008-02-20 16:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlpgs.prg
+    ! Fixed connection with specific TCP port number
+  * source\sqlrdd1.c
+    ! Fixed dbStruct() with new xHarbour API
+
+2008-02-08 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlnames.prg
+  * source\sqlrdd.h
+    ! Protected with SQLRDD_COMPAT_2007
+  * source\sqlrdd12.prg
+    ! Optimized dbSetOrder( indexord() ) - looks silly, but it is NOT.
+
+2008-02-06 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  + source\sqlnames.prg
+    + SQLRDD namespaces
+  + samples\namespacesql.prg
+    + Added new sample to demonstrate SQLRDD namespace
+  + include\sqlrdd.xns
+    + Added SQLRDD namespace include that should be added to
+      xBh includes folder
+  ! sql.files.inc
+    + Added new source sqlnames.prg
+
+2008-02-06 11:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+    ! Changed Postgres collating to ASCII in connection
+    ! Using connection ID from connection class instance
+    ! Changes to catalog structure to support logging options
+    ! Changed Oracle Views to support RAC (Clustering)
+  * source\sqlrdd1.c
+    ! Fixed BOF() flag in workareas resulting from queries
+    ! Fixed BOF() and EOF flags behavior if issuing
+      dbgoto(recno()) when pointer is in lastrec()+1
+    ! Fixed DELETED()/DBSKIP() when reaching BOF()
+    ! Fixed GPF when exiting application
+    ! Added support for SET FILTER SQL Translation
+    ! Fixed dbRLock() when issued just after dbUseArea()
+  * source\sqlrdd2.prg
+    ! Performance increased in long SKIPPing loops reading
+      information from database
+    ! Added support for SET FILTER SQL Translation
+    ! Fixed array error when creating indexes under special
+      circusntances
+    ! Added support for MySQL Catalogs when in TopConnect
+      compatible mode
+    ! Added support for coexistence of SQLRDD and TopConnect
+      tables in same connection
+    ! Performance increased in GO TOP and GO BOTTOM after
+      long SKIP loops
+    ! Fixed partial dbSeek() on reverse indexes
+    ! Added support for Firebird 2.0
+    ! Great performance increase when dealing with large
+      tables in Firebird (indexes must be rebuilt)
+    ! Added support for LockWaitTime
+    ! Minor fix in AlterColumns() method
+  * source\sqlrdd.h
+    ! Added support for new workarea structure. Please define
+      SQLRDD_COMPAT_2007 in compile time to build backward
+      compatible lib
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged version 8.0 build 0001
+    ! Added LogChanges constants
+  * source\sqloracle.prg
+    ! Added LogChanges Support
+    ! Added support for RAC
+    ! Added SID detection at logon
+  * source\sqlconnection.prg
+    ! Added LogChanges capability
+    ! Fixed method GetConnectionID()
+    ! Removed unsupported database error message when connecting for queries only
+    ! Added support for Oracle RAC
+  * source\firebird.c
+  * source\sqlfirbird.prg
+    + Implemented server version detection at connect time
+  * source\sqlora.c
+    ! Fixed invalid pointer release at disconnection
+  * source\sql.y
+    ! Changed token ISNULL to not conflict with new hbapi constant
+  * source\sqlmy.prg
+  * source\sqlpgs.prg
+  * source\sqlodbc.prg
+    ! Changed connection ID to be detected in connection time
+    ! Added support for LogChanges
+  * source\sqlrddsetup.ch
+    + New constants
+  * source\sqlgen1.prg
+    ! Workaround for some new pp bugs
+  * source\utils.prg
+    ! Fixed SR_SetFilter() to remove filter if issued SR_SetFilter("")
+    ! New method SR_GetnConnection()
+    + New function SR_SetAppUser( nCnn, cUsername )
+    + New function SR_SetConnectionLogChanges( [nCnn], nOpt )
+    + New function SR_SetAppSite( [nCnn], cSite )
+
+2007-09-11 09:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged build 122
+  * source\sqlconnection.prg
+    ! Small fix to work correctly with last xHB CVS (hb_atokens)
+  * source\sqlrdd1.c
+    ! Fixed nasty GPF when table opening fails
+    ! Fixed dbRLock() when user tries to lock lastrec()+1
+  * source\sqlrdd2.prg
+    ! Fixed error in dbDelete() when cache is clean
+  * whatsnew.txt
+    ! Updated
+
+2007-09-05 16:48 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * samples/constraint.prg
+  * samples/demo01.prg
+    * Minor changes.
+  + bc5/samples/build.bat
+  + bc5/samples/clean.bat
+  + bc5/samples/make.bat
+  + bc5/samples/make_9970.bat
+  + bc5/samples/info.prg
+  + doc/bc5-instructoes.txt
+  + doc/bc5-instructions.txt
+
+2007-09-03 09:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd2.prg
+    ! Fixed key record count with deleted flag off and no
+      sr_deleted field
+
+2007-08-28 16:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Fixed error in several SR_* functions with no alias in sight
+
+2007-08-28 15:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\utils.prg
+    ! Function SR_GetConnection() renamed to SR_GetnConnection()
+
+2007-08-28 12:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged build 121
+  * source\mysql.c
+    ! Added low level funcs to handle server threads
+  * source\sqlconnection.prg
+    ! Added generic methods for handling server sessions
+  * source\sqlmy.prg
+    ! Added generic methods GetConnectionID() and KillConnectionID( nID )
+      (same should be done to other datbases!)
+  * source\sqlrdd0.prg
+  * source\utils.prg
+    ! Added function SR_GetConnection() to retrieve internal SQLRDD
+      Connection ID from current workarea. It returns same handle as
+      SR_AddConnection()
+  * samples\info.prg
+    ! Added new functions and methods sample
+
+2007-08-08 18:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * Include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged new build and new version (7.1)
+  * source\sqlconnection.prg
+    ! sql trace file now can be assigned by connection
+  * source\sqloracle.prg
+    ! Reverted last change so it recognizes SR_RECNO,
+      NRECNO and R_E_C_N_O_
+  * source\sqlrdd2.prg
+    ! Fixed support to DB2 SQL/DS database (mainframe)
+    ! Fixed bug in Indexkey() with similar field names
+    ! Fixed bug in dbDelete() when deleting a record in an
+      empty table
+    + Added support to SOFTSEEK to use Virtual Synthetic Index
+      in Oracle (much faster!)
+    ! Fixed focused order when opening an index bag with
+      many TAGs
+    ! Fixed SKIP bug in Postgres with empty dates in index key
+  * source\sqlsrodbc.c
+    + Added missing defines to Linux
+  * source\utils.prg
+    ! SR_SetFilter() now returns previous filter expression, or
+      current in parameter is NIL
+  * whatsnew.txt
+    ! Updated
+
+2007-05-26 21:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed create table under Postgres (was rolling back last
+      transaction)
+
+2007-05-21 16:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\mysql.c
+  * source\sqlconnection.prg
+  * source\sqlmy.prg
+  * source\sqlrdd0.prg
+    + Added timeout parameter in sr_AddConnection, and implemented
+      in MySQL connection class.
+  * source\pgs.c
+    ! Missed in previous commit
+  * source\sqloracle.prg
+    ! Fixed full table scan under some circunstances, with
+      Oracle 10g.
+  * source\sqlrdd2.prg
+    ! Fixed changeStruct with multilang fields
+  * source\utils.prg
+    + Added function SR_SetReverseIndex( nIndex, lSet ) so you can
+      change index ordering in run time
+
+2007-05-17 03:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\pgs.c
+    ! Fixed queries with SUM()
+  * source\sqlrdd2.prg
+    ! Fixed dbUseArea( , cQuery )
+    ! Fixed dbseek with empty dates in Postgres
+
+2007-03-27 02:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * Include\firebird.ch
+  * Include\msg.ch
+  * Include\mysql.h
+  * Include\sqlextern.ch
+  * Include\sqlodbc.ch
+  * Include\sqlora.ch
+  * Include\sqlrdd.ch
+  * source\firebird.ch
+  * source\firebird.h
+  * source\hbsql.ch
+  * source\m_ctype.h
+  * source\m_string.h
+  * source\msg.ch
+  * source\my_alloc.h
+  * source\my_dbug.h
+  * source\my_getopt.h
+  * source\my_global.h
+  * source\my_list.h
+  * source\my_pthread.h
+  * source\my_sys.h
+  * source\typelib.h
+    ! Touched
+    ! Synch with source folder
+  * source\linux.sh
+  * source\linux64.sh
+  * source\Makefile
+    ? Luiz, what is this doing here ?
+  * SqlRDD-BCC\sql-demo.lib.xbp
+  * SqlRDD-BCC\xBuild.bcc.ini
+  * SqlRDD-BCC\xbp\distribution\lib\fbclient_bor.lib
+  * SqlRDD-BCC\xbp\distribution\lib\fbclient_ms.lib
+  * SqlRDD-BCC\xbp\distribution\lib\oci.lib
+  * SqlRDD-BCC\sql.lib.xbp
+    ! Fixed BCC build (assuming xhb in xharbour.bcc folder)
+    ! All libs in this folder SHOULD be aded to BCC
+      distribution packcage
+  * SqlRDD-VC8\xBuild.msvc8.ini
+  * SqlRDD-VC8\sqlvc-demo.lib.xbp
+  * SqlRDD-VC8\sqlvc.lib.xbp
+    ! Fixed VC8 build (assuming xhb in xharbour.vc8 folder)
+  * ToDo.txt
+  * doc\SQLRDD Manual - EN.doc
+  * doc\SQLRDD Manual - EN.pdf
+  * doc\SQLRDD Reference - EN.pdf
+  * doc\SQLRDD_Reference_br.chm
+  * doc\SQLRDD_methodology_en.pdf
+  * doc\SQLRDD_metodologia_br.pdf
+  * doc\SQLRDD_metodologia_br.ppt
+    ! Many fixes, please add all files, except *.DOC
+      to distribution packcage, all compilers
+  * lib\fbclient_ms.lib
+  * lib\libmysql.lib
+  * lib\libpq.lib
+    ! Touched
+  * samples\connect.prg
+  * samples\constraint.prg
+  * samples\createdsn.prg
+  * samples\dbf2sql.prg
+  * samples\info.prg
+  * samples\memo.prg
+  * samples\mlang.prg
+  * samples\query.prg
+  * samples\relation.prg
+  * samples\sqlrdd.ini
+  * samples\topconn.prg
+  * source\mysql.h
+  * source\mysql_com.h
+  * source\mysql_embed.h
+  * source\mysql_time.h
+  * source\mysql_version.h
+  * source\mysqld_ername.h
+  * source\mysqld_error.h
+  * source\config-netware.h
+  * source\config-os2.h
+  * source\config-win.h
+  * source\errmsg.h
+  * source\raid.h
+    ! Touched (maybe CVS is out of sync)
+  * source\firebird.c
+  * source\mysql.c
+  * source\pgs.c
+  * source\sql.y
+  * source\sqlact.c
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqlgen1.prg
+  * source\sqllex.c
+  * source\sqlmy.prg
+  * source\sqlodbc.ch
+  * source\sqlodbc.prg
+  * source\sqlora.c
+  * source\sqlora.ch
+  * source\sqloracle.prg
+  * source\sqlorax.c
+  * source\sqlpgs.prg
+  * source\sqlprototypes.h
+  * source\sqlrdd.ch
+  * source\sqlrdd.h
+  * source\sqlrddsetup.ch
+  * source\sqlrdd0.prg
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+  * source\sqlsrodbc.c
+  * source\utils.prg
+  * source\utilslang.prg
+    ! Fixed several bugs
+  * whatsnew.txt
+    ! Updated
+  * SqlRDD-VC7\sqlvc-demo.lib.xbp
+  * SqlRDD-VC7\sqlvc.lib.xbp
+  * SqlRDD-VC7\xBuild.msvc7.ini
+    ! Fixed VC7 build (assuming xhb in xharbour.vc7 folder)
+  - vc\.cvsignore
+  - vc\xBuild.msvc7.ini
+  - vc\xBuild.msvc8.ini
+  - vc\xbuild.msvc.ini
+    - Removed from CVS
+
+2007-02-03 09:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    + Added support to Pervasive and Oterro databases,
+      ONLY for queries, not workareas.
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    - Removed useless entries
+  * source\firebird.c
+  * source\mysql.c
+  * source\pgs.c
+  * source\sqlsrodbc.c
+  * source\sqlorax.c
+  * source\sqlora.c
+  * source\sqlfirebird.prg
+  * source\sqlgen1.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+    + Added full record reading functions instead of
+      field-by-field reading (much faster!)
+  * source\sqlrdd0.prg
+    ! Minor changes in SQLRDD initialization
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+    ! SKIP is now written in C
+  * source\sqlrdd2.prg
+    - New Logic to issue SQL statements with used columns only.
+      It means no more "SELECT *" unless really needed.
+  * source\sqlact.c
+  * source\utils.prg
+    + Added helper functions
+  * source\sql.y
+    + Added support to aliased expressions in DELETE
+      and UPDATE commands
+  * whatsnew.txt
+    ! Updated
+  + source\sqlprototypes.h
+  + source\sqlrddsetup.ch
+    + Added new headers
+  * vc\sqlvc.lib.xbp
+  * vc\xbuild.msvc.ini
+  * vc\xBuild.msvc7.ini
+  * vc\xBuild.msvc8.ini
+    ! Updated to built with both MSVC 7/8
+  - samples\Apollo2sql.prg
+  - samples\join.prg
+    - Samples removed
+  * vc\xbuild.windows.ini
+
+2007-01-13 16:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlmy.prg
+    source/sqlfirebird.prg
+    source/sqlodbc.prg
+    source/sqlpgs.prg
+    source/sqloracle.prg
+    ! when reading memo, change to only trim right spaces
+
+2007-01-10 13:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * doc\SQLRDD_Reference_br.chm
+    ! Updated reference guide (Portuguese)
+  * source\sqlrdd2.prg
+    ! Fixed SKIP in Oracle with Virtual Synthetic Index
+      when column contents is "'"
+    ! Fixed dead lock with Postgres when reindexing
+  * whatsnew.txt
+    ! Updated
+
+2006-12-19 10:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * SqlRDD-BCC\sql-demo.lib.xbp
+  * SqlRDD-BCC\xBuild.bcc.ini
+    ! Fixes to BCC demo build
+  * libsqlrdd.a.xbp
+  * sql-demo.a.xbp
+  * sql-demo.lib.xbp
+  * sql.lib.xbp
+  * vc\sqlvc.lib.xbp
+    ! Fixed build directives
+  * source\sqlconnection.prg
+    ! Missed in previous commit
+  * source\utils.prg
+    ! Removed useless function __NONOALERT()
+  * SqlRDD-BCC\xbp\distribution\lib\fbclient_bor.lib
+  * SqlRDD-BCC\xbp\distribution\lib\fbclient_ms.lib
+  * SqlRDD-BCC\xbp\distribution\lib\libmysql.lib
+  * SqlRDD-BCC\xbp\distribution\lib\libpq.lib
+  * SqlRDD-BCC\xbp\distribution\lib\oci.lib
+  * SqlRDD-BCC\xbp\distribution\lib\odbccp32.lib
+    ! Added new files to be distributed with SQLRDD Sample
+      for BCC
+  * samples\topconn.prg
+    ! Added sample to demonstrate TopConnect compatibility
+
+2006-12-17 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    ! Added stack call in SQL error block
+  * source\sqlpgs.prg
+    ! Added Postgres 8.2 support
+  * source\sqlrdd2.prg
+    ! Fixed database catalog index detection
+    ! Fixed query workareas and ALL_IN_CACHE workareas
+
+2006-12-01 13:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    + Added new parameter to execute() method for ignoring
+      error message in SQL statement
+  * source\sqlfirebird.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd2.prg
+  * source\utilslang.prg
+    ! Fixed "File not found" error message when table does not
+      exist in database (side effect from last commit)
+  * source\sqlrdd1.c
+    ! Fixed memory leak in DBOI_KEYVAL
+  + doc\SQLRDD_Reference_br.chm
+    + Added Reference guide, Portuguese language version
+  * doc\SQLRDD Manual - EN.pdf
+    ! .PDF now reflects latest changes in .DOC
+  * whatsnew.txt
+    ! Updated
+
+2006-11-14 07:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlodbc.ch
+  * include\sqlrdd.ch
+  * source\sqlodbc.ch
+  * source\sqlrdd.ch
+    ! Tagged build #99
+    ! Added sqlodbc.ch included from sqlrdd.ch
+  * doc\SQLRDD Manual - EN.doc
+    ! Few fixes
+  * samples\connect.prg
+    ! Added SetMode() call to avoid window scrolling
+  * samples\dbf2sql.prg
+    ! Fixed to newest RDD API changes in APPEND FROM
+  * samples\query.prg
+    ! Fixed fetch sample
+  * source\firebird.c
+  * source\mysql.c
+  * source\pgs.c
+  * source\sqlora.c
+  * source\sqlorax.c
+  * source\sqlsrodbc.c
+  * source\sqlfirebird.prg
+  * source\sqlmy.prg
+    ! Fixed header to make SourceScan happy
+  * source\sqlrdd1.c
+    * Many changes to support non-numeric Recno(), for
+      further use with rowid columns
+  * source\sqlconnection.prg
+    ! Many security changes to hide username, password and
+      other possible dangerous instances
+    + Added support to TopConnect compatibility mode
+    ! lUseSequences is now connection dependent
+    ! Query tracing to txt file may be controlled by env vars
+      QUERYDEBUG and QUERYDEBUGCOUNTER (just make then exist
+      for tracing)
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+    + Added support to TopConnect compatibility mode
+  * source\sqlrdd0.prg
+    ! Default lErrorOnGotoToInvalidRecord changed to .F.
+    ! Few minor fixes
+    + Added SR_SetExclusiveManagement( lSet )
+    + Added support to TopConnect compatibility mode
+  * source\sqlrdd2.prg
+    + Added function SR_SetlUseDBCatalogs( lSet ) to enable
+      using database catalog index in addition to SR_MGMNTINDEXES
+    + Added ability to detect primary key and use it as Recno()
+      if SR_RECNO column in not found (Just for MSSQL at this time)
+    + Added ability to handle non numeric recno()
+    ! Fixed recall() function
+    ! Fixed partial date seek. Example: SEEK 200612 (only year
+      and month)
+    ! Fixed Oracle Synthetic index SKIP when order is set to
+      zero
+    ! Fixed dropping old indexes when creating new indexes
+      with same name in DB2
+  * source\utils.prg
+    + Added function SR_ResetStatistics() to reset workarea
+      usage statistics
+    ! Minor formatting
+
+2006-10-05 07:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed index owner when creating indexes in DB2
+
+2006-09-14 09:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+    ! Improved demo message and added portuguese text.
+
+2006-09-12 20:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlgen1.prg
+    + Added support to LIMIT clause in SqlParser to MySQL, Postgres and DB2.
+
+2006-09-09 01:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+  * source\sqlrdd0.prg
+    ! Fixed exclusive table open under MSSQL Server
+      (side effect from previous commit and reversion below)
+  * source\sqlodbc.prg
+    ! Reverted latest changes
+
+2006-09-06 16:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * whatsnew.txt
+    ! Updated
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Catalog version updated to 1.66
+    ! Tagged build #99
+  * samples\chgStruct.prg
+    ! Updated with new features
+  * source\sqlgen1.prg
+  * source\sqlrdd0.prg
+    ! Fixed trim() function in MSSQL Server
+  * source\sqlrdd2.prg
+  * source\utils.prg
+    ! Fixed SR_ChageStruct() to reopen the workarea. This should avoid some
+      GPFs when columns are added or dropped in run time
+
+2006-09-05 16:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * whatsnew.txt
+    ! Updated from 2006-05-18 to 2006-09-05
+  * samples\query.prg
+    + Added sample for Fetch Method (retrieving result set row by row)
+  * source\mysql.c
+  * source\mysql.ch
+  * include\mysql.ch
+    + Added NEWDECIMAL data type support
+  * source\sqlconnection.prg
+    ! Fixed numeric columns lenght in result set to local file
+  * source\sqlgen1.prg
+    ! Added explicit char to date conversion
+  * source\sqlodbc.prg
+    ! Timestamp columns are translated as string and not date in MSSQL Server
+  * source\sqlora.c
+    ! Previous commit did not work... doing it again.
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    ! Catalog version updated to 1.65
+    ! Tagged build #98
+  * source\sqlrdd0.prg
+    ! Fixed exclusive lock in MSSQL
+  * source\sqlrdd1.c
+    ! Fixed BIG recno() numbers
+    ! Fixed OrdDesc()
+  * source\sqlrdd2.prg
+    ! Fixed error in OrdKeyCount() in ALL_IN_CACHE workareas
+    ! Fixed empty arrays and hashes stored in memo fields
+    ! Fixed optimization hints in SQL/DS (DB2/mainframe)
+    ! Fixed AddRuleNotNull() method in MySQL
+    + Added SR_SetMySQLNumericDataType() function to change the default
+      numeric data type when creating tables in MySQL
+  * source\sqlsrodbc.c
+    ! Fixed SR_DRIVERC() to not open driver dialog if connection fails
+  * source\utils.prg
+    ! Fixed sr_dbRefresh() function when cursor is in lastrec()+1
+    ! Fixed logging functions error report
+
+2006-08-11 11:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+    ! Fixed OCI internal memory leak bug in OCIDescriptorAlloc() /
+      OCIDescriptorFree(), creating a LOB descriptors pool
+
+2006-08-08 19:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    + Added sequences control flag in class
+    ! Fixed column lenght in Oracle queries
+  * source\sqlrdd2.prg
+    ! Fixed AddRuleNotNull in MySQL
+    ! Fixed sequences flag handling to be connection oriented
+
+2006-06-13 14:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\pgs.c
+    + Added support to OIDOID, TIMESTAMPOID and TIMESTAMPTZOID
+      data types
+  * source\sqlgen1.prg
+    + Added support to LIMIT clause in Cache, Informix and Firebird
+  * source\sqlrdd0.prg
+    ! Fixed SR_FILE() with Postgres after failed call to same function
+  * source\sqlrdd2.prg
+    ! Index FOR clause is no more affected by SR_FilterStatus(lEnable)
+    ! Fixed memory leak with ALL_IN_CACHE workareas under MySQL
+
+2006-05-18 09:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * Include\sqlextern.ch
+    + Added new function SR_AllInCache
+  * source\mysql.c
+  * source\pgs.c
+  * source\sqlmy.prg
+    ! Fixed to work with ALL_IN_CACHE workareas after rewrote
+  * source\sqlgen1.prg
+  * source\sqlconnection.prg
+  * source\sqlrdd2.prg
+    + Added new function SR_AllInCache([<lSet>]) to setup whether
+      workareas are opened as ALL_IN_CACHE or not. Default is FALSE
+  * whatsnew.txt
+    ! Updated
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    ! Tagged build #97
+
+2006-05-16 12:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\pgs.c
+    ! Fixed BCC compiling
+
+2006-05-16 10:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\runscript.prg
+    ! Sample updated to use connect.prg
+  * source\mysql.c
+    ! Fixed GPF trap in statement handle release
+  * source\pgs.c
+    ! Complete recode of ALL functions to use a connection structure
+      instead of static variables
+  * source\sqlact.c
+    ! Escape function optimized
+  * source\sqlconnection.prg
+    ! Fixed maximum numeric field lenght
+  * source\sqlpgs.prg
+    ! Fixed to use new native functions
+  * source\sqlrdd1.c
+    ! Fixed GPF trap in LOCATE command
+  * source\sqlrdd2.prg
+    ! Fixed soft seek bug introduced in last commit
+  * whatsnew.txt
+    ! Updated
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    ! Tagged build #95
+
+2006-05-04 18:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlora.c
+    ! Fixed an memory leak on _db_release() function. The memory was allocated on other
+       function but never free( on total size +- 6Mb of memory/Per connection  )
+
+2006-05-04 15:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * whatsnew.txt
+    ! Updated
+
+2006-05-04 08:48 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Removed soft seek limitation when more than two columns
+      are involved
+
+2006-05-03 23:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed soft seek in ALL_IN_CACHE workareas
+  * source\mysql.c
+    ! Formatting
+
+2006-05-03 23:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlgen1.prg
+    ! Restored INFORMIX support in SQL Parser
+
+2006-05-03 22:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\sqlrdd.ini
+    + Added connection string samples to DSN-less ODBC and Informix
+  * source\mysql.c
+    ! Fixed data retrieving to use string lenght supplied
+      by database client, not NULL terminated string - It
+      was breaking some LOBs with binary information
+    ! Complete recode of ALL functions to use a connection structure
+      instead of static variables
+    ! Speed improvement in database reading (now it reads LINES,
+      not single columns)
+    ! Fixed for better use of ITEM API instead of direct ITEM
+      access
+  * source\pgs.c
+    ! Fixed latest Luiz fix. Luiz, please note hb_arraySetForward()
+      moves the item contents, not the item itself, so you do not
+      need to release and initialize item on every loop pass
+  * source\sqlact.c
+    ! Restored INFORMIX support
+  * source\sqlconnection.prg
+    ! Fixed DSN-Less ODBC connection to not issue error messages
+  * source\sqlmy.prg
+    ! Fully optimized to use new native access
+    ! Speed improvement in database reading (now it reads LINES,
+      not single columns)
+  * source\sqlrdd0.prg
+    ! Fixed SR_DetectDBFromDSN() to detect DSN-Less Connections
+  * source\sqlrdd2.prg
+    + Added sqlGoPhantom() method as an optimized way to move
+      to lastrec() + 1
+    ! Restored INFORMIX support
+    + Added IBM DB2 Query optimizer hints
+  * source\utils.prg
+    ! Fixed SR_WriteTimeLog() and SR_WriteDbLog() to check for
+      correct file open
+    + Added SR_GoPhantom() function as an optimized way to move
+      to lastrec() + 1
+  + source\mysqld_ername.h
+    + Added missing file to CVS
+
+2006-04-22 15:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/pgs.c
+    ! Optimized to use Full xharbour item API ,
+      insted of HB_ITEM a; a.type= HB_IT_NIL, using a = hb_itemNew( NULL ); use item ; hb_itemRelease( a ) ;
+
+2006-04-20 18:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\info.prg
+    + Added samples to RecSize(), RecCount() and OrdKeyCOunt()
+  * source\sqlodbc.prg
+    ! Issue RTE when FetchRaw() fails
+  * source\sqlrdd1.c
+    + Added RecSize() support
+    ! KeyCount method renamed to sqlKeyCount
+    ! KeyCount should return INT and not DOUBLE
+  * source\sqlrdd2.prg
+    + Added RecSize() support
+    ! KeyCount method renamed to sqlKeyCount
+    ! NTX behavior support fixed when opening indexes
+    ! Fixed RTE in index keys with 9 columns + FOR clause
+    ! Fetch error should raise RTE when reading database page
+    ! Fixed Zap to COMMIT if not in formal transaction
+    ! Fixed compile warnings
+  * source\utils.prg
+    ! Fixed compile warnings
+
+2006-04-13 15:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlextern.ch
+    + Updated with new functions
+  * source\firebird.c
+    + Added support to TIME and TIMESTAMP datatypes
+  * source\sqlact.c
+    + Added support to scientific notation numers stored
+      as DOUBLE in database
+  * source\sqlconnection.prg
+    + Added new autocimmit feature
+    ! Fxied DB2 V8.2 support to empty tables or result sets
+    + Added SR_AutoCommit( <nSet> ) to set up automatic commit
+      every <nSet> INSERTs, UPDATEs or DELETEs, if NOT under
+      transaction. It improves LARGE APPEND FROM or COPY TO.
+  * source\sqlgen1.prg
+    + Added table alias qualifier
+  * source\sqlodbc.prg
+    ! Fixed support to LOB in DB2
+  * source\sqlora.c
+    ! Reworked all rowset control to avoid memory reallocation
+    ! Fixed nasty GPF trap
+  * source\sqlorax.c
+    ! Fixed memory leak
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    ! Tagged build #95
+  * source\sqlrdd0.prg
+    ! Fixed SR_ExistTable() with DB2
+  * source\sqlrdd1.c
+    ! Fixed LOCATE/FOUND
+    ! Fixed compilation with latest API headers
+  * source\sqlrdd2.prg
+    ! Fixed DB2 LOB support
+    + Added MSSQL SQL_GUID data taype support
+    ! Fixed nasty bug in sequence: SEEK/DELETE/SKIP-1/SKIP+1
+    ! Fixed SEEK with DATE data type in ALL_IN_CACHE workareas
+    ! Fixed DB2 char limit (should turn in varchar)
+    ! Fixed ZAP with DB2
+    ! Fixed memory leak in OrdListAdd() with declarative
+      indexes
+    ! Fixed ordering of empty values in DB2 version > V8.1
+    ! Fixed constraints under DB2
+  * source\sqlsrodbc.c
+    ! Fomatting
+  * source\utils.prg
+    ! Fixed Caché transaction control
+
+2006-03-17 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlact.c
+    ! Fixed Firebird support to replace NULLs by spaces in string
+    ! Added scape_string support to DB2
+    ! Started code to recognize scientific notation in numbers
+  * source\sqlconnection.prg
+    ! Removed data/time from SQL Trace file
+    ! Added support to SQL_GUID data type
+  * source\sqlodbc.ch
+  * source\sqlodbc.prg
+    ! Added support to SQL_GUID data type
+  * source\sqlrdd0.prg
+    ! Fixed SR_FILE() with Postgres when schema is selected
+  * source\sqlrdd1.c
+    ! Fixed problem in EOF() after APPEND BLANK in empty tables
+  * source\sqlrdd2.prg
+    ! Fixed KeyCount when DELETED() is disabled
+    ! Added support to SQL_GUID data type
+    ! Fixed SEEK with ALL_IN_CHACHE workareas and DATE index key
+    ! Fixed SKIP with no index in Oracle when using Virtual
+      Synthetic Index
+    ! Fixed character data type limit in DB2
+    ! Fixed Historic in tables just created
+    ! Fixed INDEX CONSTRAINT so it can receive an array
+      as column key list
+    ! Fixed creating and dropping indexes with FOR clause
+    ! Fixed creating and dropping indexes with Virtual
+      Synthetic Index
+    ! Added support for DELETED() and .NOT. recognization in index
+      FOR clause
+  * source\sqlsrodbc.c
+    ! Minor CAST
+  * source\utils.prg
+    + Added functions  SR_CreateConstraint and SR_DropConstraint
+    ! Removed """ from character logs
+
+2006-02-22 12:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed stupid bug in dbCreate() - side effect from
+      yesterday's commit.
+
+2006-02-21 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed Recno Name and Deleted Name dynamic assign
+
+2006-02-16 12:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed SKIP in tables with no index and relations via SR_SetJoin() under
+      MSSQL Server
+  * source\sqlsrodbc.c
+    + Added new function SR_SETCONNECTATTR()
+    + Added new function SR_UNINSTALLDSN( <cDriver>, <cAtributes> )
+  * source\sqlodbc.ch
+    + Added SQL_ATTR_CURRENT_CATALOG constant
+  * source\sqlodbc.prg
+    ! Now ODBC supports DTB=... in connection string so we can have a generic
+      DSN that can be directed to any database in connected server
+
+2006-02-10 15:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  + source\sqlsrodbc.c
+    ! odbc.c renamed to sqlsrodbc.c to avoid module name conflicts
+      (odbc.c will be still in CVS to keep historic..)
+    ! odbcwritememo() renamed to sr_odbcwritememo()
+  * include\sqlextern.ch
+  * source\sqlodbc.prg
+    ! odbcwritememo() renamed to sr_odbcwritememo()
+  * sql.files.inc
+  * mysql.files.inc
+    ! odbc.c renamed to sqlsrodbc.c to avoid module name conflicts
+
+2006-02-09 07:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+    ! Fixed renamed function call
+
+2006-02-09 18:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbc.c
+    + Added function SR_InstallDSN( <cDriver>, <cAtributes> ) to
+      create an ODBC DSN from source code
+    + Added function SR_InstallError( [<nErrLevel>] )
+    ! Changed namespace of all ODBC functions to avoid conflicts
+      with FiveWin
+  * source\sqlfirebird.prg
+    ! Removed wrong ODBC dependencies
+  * source\sqlodbc.prg
+    ! Changed namespace of all ODBC functions to avoid conflicts
+      with FiveWin
+  * include\sqlextern.ch
+    ! Updated with ODBC externals
+  * whatsnew.txt
+    ! Updated
+  + samples\createdsn.prg
+    + Added new sample to demonstrate SR_InstallDSN()
+
+2006-02-07 10:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+  * source\sqlrdd.ch
+    ! Tagged as build #92
+  * dll\fbclient.dll
+  * dll\libpq.dll
+  * lib\fbclient_ms.lib
+  * lib\libpq.lib
+  * dll\comerr32.dll
+  * dll\krb5_32.dll
+  * dll\libeay32.dll
+  * dll\libiconv-2.dll
+  * dll\libintl-2.dll
+  * dll\ssleay32.dll
+    ! New libs and dlls to Postgres and Firebird
+  * samples\constraint.prg
+    ! Now supports Postgres
+  * source\sqlrdd2.prg
+    ! AddRuleNotNull now works for Firebird
+
+2006-02-04 18:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlorax.c
+    ! Minor fix to OraclePrepare and ORACLEEXECDIR()
+
+2006-02-02 10:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\pgs.c
+    ! Fixed potential GPF in PGSTABLEATTR()
+    ! Fixed bug with Schemas in PGSTABLEATTR()
+  * source\sqlpgs.prg
+    ! Fixed bug with Schemas in PGSTABLEATTR()
+  * vc\sqlvc.lib.xbp
+  * vc\xbuild.windows.ini
+    ! Touched
+
+2006-02-01 18:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd1.c
+    ! Fixed memory leak from previous commit
+    ! Fixed DBOI_KEYCOUNTRAW and DBOI_KEYCOUNT
+  * source\sqlrdd2.prg
+    ! Fixed KeyCount() method to support DELETED status
+      and new server side filters
+
+2006-01-31 15:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd.h
+  * source\sqlrdd1.c
+    + Fixed support to keep workarea opened in dbCreate()
+      using Clipper undocumented parameters
+      This fixes a nasty GPF in COPY TO
+  * source\sqlrdd2.prg
+    + Added function SR_SetMySQLMemoDataType( cDataTypeName )
+    ! Fixed support to keep workarea opened in dbCreate()
+    ! Fixed database's physical index drop when recreating
+      the index
+
+2006-01-26 14:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed bug in SEEK with Postgres database (side effect of new server side
+      filters implementation)
+
+2006-01-25 14:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+    ! Removed HB_ prefix from demo banner
+
+2006-01-23 17:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sqlrdd2.prg
+    + Added new method DropRuleNotNull( cColumn )
+  * source/utils.prg
+    ! Implemented support to NULL/NOT NULL in SR_ChangeStruct()
+    ! Added function SR_DropRuleNotNull( cColumn )
+  + includes/sqlextern.ch
+    + Added external definitions to SQLRDD classes and functions
+      (committed previously without changelog...)
+
+2006-01-19 18:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+  * source\utils.prg
+    ! FIxed RollBack when workarea buffer is HOT
+  * source\sqlrdd0.prg
+    ! Default index key column count limit to auto switch to
+      Synthetic index raised to 10
+
+2006-01-03 19:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlorax.c
+    ! minor fix
+
+2006-01-02 11:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed ALL_IN_CACHE seek with numeric keys
+    ! Fixed SKIP with server side filters (side effect of last commit)
+
+2006-01-02 11:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Minor fix in constraint cataolg owner
+    ! Constraint KEY can be a field list or array of fields
+
+2006-01-01 23:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlconnection.prg
+  * source\sqlrdd2.prg
+    ! Minor fix on variable names typo cCol to cColname and lqueryonly to ::lqueryonly.
+      this fix compilation under linux
+
+2006-01-01 22:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * dll\libmysql.dll
+  * lib\libmysql.lib
+  * source\config-netware.h
+  * source\config-os2.h
+  * source\config-win.h
+  * source\errmsg.h
+  * source\m_ctype.h
+  * source\m_string.h
+  * source\my_alloc.h
+  * source\my_dbug.h
+  * source\my_getopt.h
+  * source\my_global.h
+  * source\my_list.h
+  * source\my_pthread.h
+  * source\my_sys.h
+  * source\mysql.h
+  * source\mysql_com.h
+  * source\mysql_embed.h
+  * source\mysql_time.h
+  * source\mysql_version.h
+  * source\mysqld_error.h
+  * source\raid.h
+  * source\typelib.h
+  * source\sqlrdd2.prg
+    + Added MySQL 5.0 support
+  * whatsnew.txt
+    ! Updated with latest changes
+
+2006-01-01 19:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * whatsnew.txt
+    ! Updated
+
+2006-01-01 16:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\firebird.h
+    ! Minor changes to make gcc happy
+  + include/sqlora.ch
+    + Added file to INCLUDES folder (strange it was not there!)
+  * source\sqlora.ch
+  * source\sqlodbc.ch
+    + Added support to old NWG versions
+  * source\sqlconnection.prg
+    ! SQL Tracing functions reworked
+    + Added SQLDS/VM recognization as IBM DB2/400
+  * source\sqlfirebird.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+    ! SQL Tracing functions reworked
+    ! If connection is *_QUERY_ONLY, Smallint data type returns as
+      numeric and not as logical
+  * source\sqlrdd.ch
+    ! Build # tagged as 91
+  * source\sqlrdd0.prg
+    + Added functions to SET/GET Sythetic Virtual Index support
+    ! Fixed EXC Lock cleanup
+  * source\sqlrdd1.c
+    ! Fixed error in dbCLoseAll() when there is a remaining relation
+      to a non-SQLRDD workarea
+  * source\sqlrdd2.prg
+    + Added new method SolveRestrictors() to centralize all server
+      side filters handling
+    ! Function ConvType() converted to method
+    ! Fixed fetch error report
+    ! Fixed server side filter removal
+    ! Fixed MySQL escape strings in LIKE clause
+    ! Minor fixes to CreateCOnstraint()
+  * source\utils.prg
+    + Added new function SR_FilterStatus([<lEnable>]) to check,
+      enable or disable current workarea server side filters, like
+      sr_SetFilter(), Historic, Conditional Index, etc.
+    - Removed functions SR_cSQLType() and SR_nSQLLen() - now they
+      are workarea methods
+    ! Fixed log functions when user REPLACES original xHarbour
+      file() function
+    + Added SR_PhFile(<cFileName>) to act as original file()
+      function
+  + samples/constraint.prg
+    + Added sample to demonstrate NEW PRIMARY & FOREIGN KEY
+      functionalities
+
+2005-12-24 15:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlora.c
+    ! minor fix for linux compile( Linux have the strdup function)
+  * source/sqlorax.c
+    ! added functions to support Oracle stored procedures binding output variables
+
+2005-12-10 09:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlrdd0.prg
+    ! fix variable name on SR_DROPINDEX() function
+  * source\sqlrdd2.prg
+    ! fix variable name on METHOD CreateConstraint() : ConstraintName  -> cConstraintName + Local lPk
+    ! fix variable name on method GetSyntheticVirtualExpr() cCol -> cColName
+    Now sqlrdd can be compiled on linux again
+
+2005-12-08 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    ! Fixed SELECT SUM() in Oracle when operating with numbers
+      above 99 million
+  * source\sqlgen1.prg
+    ! Fixed horrible bug when generating SQL statements with complex
+      multiple JOINs - Thanks to Sandro Freire from NewAge Software
+  * source\sqlpgs.prg
+    * Touched
+  * source\sqlrdd.ch
+  * Include\sqlrdd.ch
+    ! SQLRDD repository tagged as version 1.6
+    ! SQLRDD Build tagged as #90
+  * source\sqlrdd0.prg
+    + Added constraint catalog support tables
+    ! Fixed DROP INDEX with MySQL and Sybase
+  * source\sqlrdd1.c
+    + New KeyCount workarea method
+    + Added support to DBOI_KEYCOUNTRAW in dbInfo()
+  * source\sqlrdd2.prg
+    ! Record navigation in Oracle with compound key expression
+      in very large tables greatly optimized (needs to recreate
+      the indexes to apply)
+    ! Under Oracle, SQLRDD will no more create Synthetic Indexes
+      if index expression has no UDF. New feature was named
+      SyntheticVirtualIndex :-P
+    + New Methods: CreateConstraint() and DropConstrain()
+    * Completed full constraint management to primary and foreign
+      keys in Oracle, SQL Server and MySQL. Now we will start using
+      it like a REAL DATABASE :-) - Thanks a lot to Rafael Olmos
+      from NewAge Software.
+    + New KeyCount() method in workarea to count records with or
+      without server side filters and index FOR clause.
+    ! Fixed index/table drop before table creation in MySQL Linux
+    ! Fixed index drop before index creation
+    ! Fixed DropColRules() to remove dropped indexes from SQLRDD
+      catalog
+  * source\utils.prg
+    ! dbCount() now uses KeyCount() workarea method
+    ! Added 3rd parameter to Function
+      SR_LogFile( cFileName, aInfo, lAddDateTime )
+  * source\utilslang.prg
+
+2005-12-07 20:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! minor fix on static void hb_sqlrddRddInit() so file cam be compiled on gcc 2.95
+
+2005-12-04 15:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/utils.prg
+    ! added missing variable declaration on SR_SetFilter() function
+  * source/sqlpgs.prg
+    ! added postgresql 8.1 version check
+
+2005-11-25 15:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\mysql.c
+    ! Added missing header
+  * source\pgs.c
+    ! Fixed query result set column lenght
+      This files sr_ListTables()
+  * source\sql.y
+    ! Fixed "NOT LIKE"
+    ! Fixed "NOT IN ( SELECT ... )"
+    ! Fixed "NOT IN ( list )"
+    *** Note: Bison should be upgraded to 1.875
+  * source\sqlgen1.prg
+    ! Fixed init procedure
+  * source\sqllex.c
+    + Added token TABLE
+  * source\sqlmy.prg
+    ! Fixed "SHOW" command
+      This files sr_ListTables()
+  * source\sqlrdd.h
+    + Added aScope member item to workarea structure
+  * source\sqlrdd1.c
+    ! Fixed memory leak in dbUseArea()
+    ! Fixed module start function call
+    ! Added constraint handling stuff
+  * source\sqlrdd2.prg
+    ! Fixed loop with DELETE/SKIP when not using
+      SR_DELETED column
+    ! Fixed DROP table in dbCreate() with MySQL/Linux
+  * vc\sqlvc.lib.xbp
+  * vc\xbuild.windows.ini
+  * vc\sql.files.inc
+
+2005-10-21 20:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sqlrdd1.c
+    ! Fixed error when table name has "/\"
+  * source/sqlrdd2.prg
+    ! Added Firebird optimizations
+
+2005-10-21 18:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sql.y
+    ! Shift/reduce %expect 1
+  * source/sqlrdd2.prg
+    ! Fixed confitional index with CACHE_WORKAREA (memory table)
+
+2005-10-21 18:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/hbsql.ch
+  * source/sql.y
+  * source/sqlgen1.prg
+  * source/sqllex.c
+    ! Added support to " ... NOT LIKE ... " in SQLParser
+
+2005-10-20 23:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlfirebird.prg
+    ! minor fix on IniFields Method
+
+2005-10-10 23:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd.ch
+    ! Tagged version 6.0, build 82
+  * source\sqlrdd.h
+    ! Changed workarea attributes from HB_ITEM to PHB_ITEM
+  * source\sqlrdd0.prg
+    ! Removed stupid EXIT PROCEDURE and left disconnection to
+      regular RDD destructor
+  * source\sqlrdd1.c
+    ! Added RDD destructor
+    ! Fixed HB_ITEM_LOCK()/UNLOCK() issues
+  * source\sqlrdd2.prg
+    ! Fixed nasty bug in record navigation when a record is
+      deleted and SR_UseDeleteds() is FALSE
+
+2005-10-05 16:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * samples\sqlrdd.ini
+    ! updated with more sample options
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+    ! Low level SQL trace filename can be changed in
+      run time
+  * source\sqlrdd.ch
+    ! Tagged build #81
+  * source\sqlrdd0.prg
+  * source\sqlrdd1.c
+    ! Adjusted to work with last RDD API
+    + Added SR_Version() function
+
+2005-09-23 10:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlgen1.prg
+  * source\sqlorax.c
+  * source\pgs.c
+  * source\sqlact.c
+    ! Synch with hb_itemReturn() changes
+  * source\sqlrdd1.c
+    ! Fixed GPF trap in multi language routines
+  * source\sqlconnection.prg
+  * source\sqlrdd0.prg
+    ! Fixed column drop when dropping synthetic index
+    ! Changed table reistration hash table to be a connection
+      property. This was a big problem in MT, now fixed
+  * source\sqlrdd2.prg
+    ! Fixed synthetic index rebuild
+
+2005-09-20 13:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * whatsnew.txt
+    ! Updated
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    - Removed USE ... CONNECTION
+
+2005-09-20 12:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * include\sqlrdd.ch
+    ! Tagged build #80
+  * lib\fbclient_ms.lib
+    ! Updated Firebird 2.0 lib
+  * source\firebird.c
+    ! Changed maximun query column count to 620
+  * source\sqlconnection.prg
+    ! Support to MSSQL Server 2005
+    ! Support to connection oriented workarea info cache
+  * source\sqlgen1.prg
+    ! Fixed AVERAGE function in MSSQL
+    ! Fixed default database connection in SQL Parser
+  * source\sqlmy.prg
+    ! Fix to support both Windows and Linux version
+      of MySQL
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+    ! Fixed SR_DROPINDEX()
+  * source\sqlrdd1.c
+    ! Fixed to be compatible with recente changes
+      in xHarbour workarea structure
+  * source\sqlrdd2.prg
+    ! Table cache is isolated in each connection
+    ! Many fixes to support MySQL Linux
+    ! Fixed soft seek when searching empty keys
+    ! Changed MEMO data type in MySQL from TEXT to
+      MEDIUMBLOB
+    ! Fixed primary key creation with Postgres
+    ! Handling connection ID in dbUseArea()
+    ! Trimming index key in indexkey()
+  * source\utils.prg
+    ! Added automatic workarea cleanup when adding server
+      side filter - SR_SETFILTER()
+  * whatsnew.txt
+    ! Updated
+  * doc\SQLRDD Reference - EN.pdf
+  + doc\SQLRDD_methodology_en.pdf
+  + doc\SQLRDD_methodology_en.ppt
+  + doc\SQLRDD_metodologia_br.pdf
+  + doc\SQLRDD_metodologia_br.ppt
+    + Added English and Portuguese methodology guide
+  * doc\SQLRDD Manual - EN.doc
+  * doc\SQLRDD Manual - EN.pdf
+    + Minor revision
+
+2005-08-24 23:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\firebird.c
+    ! Fixed Lock wait option
+    + Added FBVERSION() to return Firebird API Version
+    ! Adapted to Firebird 2.0 native API
+    ! Fixed MSVC warnings
+  * source\firebird.h
+  * source\ib_util.h
+  * source\ibase.h
+  * source\iberror.h
+  * lib\fbclient_ms.lib
+    ! Firebird 2.0 stuff
+  * source\mysql.c
+    ! Fixed MSVC warnings
+    - Removed useless MYSSTATUS2()
+  * source\sqlconnection.prg
+    ! Do no treat return code 100 in UPDATE or DELETE as error
+  * source\sqlfirebird.prg
+    ! Reports correct API version
+  * source\sqlmy.prg
+    ! Do not use MYSSTATUS2() anymore
+  * source\sqlora.c
+    ! Fixed MSVC warnings
+  * source\sqlpgs.prg
+    ! Fixed table qualification side effects
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+    + Added ability to connect to database WITHOUT EXC LOCK
+      extra connection
+  * source\sqlrdd1.c
+    ! Sync with latest changes in RDD structure
+    + Added CONNECTION support to dbUseArea()
+    + Added sqlRecId method
+  * source\sqlrdd2.prg
+    + Added CONNECTION support to dbUseArea()
+    + Added Firebird 2.0 line lock support
+  * source\utilslang.prg
+    ! SR_INIT() renamed to SR_INIT2() to not conflict
+      with sqlrdd0.prg function
+
+2005-08-07 22:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\firebird.c
+    ! Fixed column alias name in SELECT
+  * source\sqlact.c
+    ! SR_DBQUALIFY() should lowercase MySQL table
+      names for Linux
+  * source\sqlconnection.prg
+    ! Minor token fix in connection string
+  * source\sqlgen1.prg
+    ! Fixed AVERAGE function under Oracle (should be
+      AVG instead)
+  * source\sqloracle.prg
+    + Added COMMIT and ROLLBACK to low level trace
+  * source\sqlorax.c
+    ! Fixed max connection count
+  * source\sqlrdd.ch
+    ! Added TABLE_INFO_NO_TRANSAC option (NewAge stuff..)
+  * source\sqlrdd0.prg
+    ! Prevent of connection ID change if closing
+      previous connection
+    ! Don't change current active connection when
+      a new connection is stablished
+  * source\sqlrdd1.c
+    ! Adjusted to new RDD internal structures
+  * source\sqlrdd2.prg
+    + Added RECNO column and TABLE NAME qualifying
+    ! Fixed silly bug when updating a record that was
+      just inserted
+    ! Fixed SEEK bug in Postgres
+  * source\utils.prg
+    ! Fixed silly bug in SR_CommitTransaction() - it was
+      not reseting transaction internal counter
+    ! Fixed some NewAge compatibility issues
+
+2005-07-11 07:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * hbsql.ch
+  * sql.y
+  * sqlgen1.prg
+  * sqllex.c
+    + Added support to date() function in SQL Parser to use the
+      server date in queries
+  * sqlfirebird.prg
+    ! Fixed column lenght bug
+  * sqlmy.prg
+  * sqlpgs.prg
+    ! Added protection to attempt to retrieve result set from
+      non-select statement
+  * sqlodbc.prg
+    ! Fixed disconnect potential bug
+
+2005-07-02 10:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * sqlora.c
+    ! Removed compiling warning (potential bug)
+  * ToDo.txt
+    ! Updated todo list
+  + whatsnew.txt
+    + File added
+
+2005-07-01 22:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * sql.y
+    ! Fixed build error
+  * sqlfirebird.prg
+    ! Fixed column lenght
+  * sqlora.c
+    ! Fixed statement unalloc in direct queries
+  * sqlrdd2.prg
+    ! Fixes to be NewAge SQLRDD backwards compatible.
+
+2005-06-28 20:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sql.y
+    + Added support to SELECT .... WHERE COL INTO ( ? )
+    + Added support to SELECT .... WHERE COL INTO ( :BINDVAR )
+  * source\sqlact.c
+    ! Removing chr(0) from Caché instrings
+  * source\sqlconnection.prg
+    + Added cNextQuery support
+    ! Fixed connection PORT setup when it is no database default
+  * source\sqlrdd0.prg
+    + Added Function SR_SetNextQuery( cSql ) to bypass dbUseArea() filename
+      lenght limit
+    + Added charset support for Oracle
+    + Added JOBLIST function to Caché
+  * source\sqlrdd2.prg
+    ! Fixed Caché min. date
+    + Added cNextQuery support
+  * source\sqlgen1.prg
+  * source\utils.prg
+    ! Fixed Caché min. date
+
+2005-06-20 22:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlpgs.prg
+    ! Added version recognization to avoid connection to OLD
+      Postgres versions that does not run some very basic
+      stuff
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+    ! Fixed missing column qualifying
+    ! Caché LOB finally fixed by Intersystems. ODBC binding removed
+      THANKS to Intersystems support team at Sao Paulo and Cambridge - USA
+    ! Added DESCEND index support
+
+2005-06-18 13:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlact.c
+    + Added SR_DBQUALIFY() fast function to satisfy each database's
+      column qualifying needs.
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqlgen1.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd2.prg
+    ! Optimized to use SR_DBQUALIFY() instead of:
+      ::oSql:cLeft + if( database = 1, upper(cColumn), lower(cCOlumn)) + ::oSql:cRight
+
+2005-06-17 11:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+    ! Minor change to make gcc happy
+  * source\sqlpgs.prg
+    ! Refresh
+  * source\sqlrdd.ch
+    ! Added rever order option to index definition array
+  * source\sqlrdd0.prg
+    ! Fixed Postgres startup if SR_MGMNTLANG was manually dropped
+  * source\sqlrdd2.prg
+    ! Starting reverse index work
+
+2005-06-16 17:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    +- Method OrdSetForClause renamed to ParseForClause
+    ! Method OrdSetForClause recalled from backup, so we keep both
+      for compatible reasons
+    ! Added missing OWNER to Historic clauses
+    ! Fixed TYPO in method sqlOrderListAdd()
+    ! Reset Caché sequence controler when dbCreate() overwrites an
+      existing table
+  * source\utils.prg
+    - Reverted removal of function SR_OrdCondSet() to keep NewAge compatible
+  * source\sqlconnection.prg
+    + Added ListCatTables( cOwner ) method to list all user tables in
+      RDBMS catalog
+  * source\sqlodbc.prg
+    + Added DriverCatTables() method do retrieve tables list from
+      ODBC API.
+  * source\odbc.c
+    + Added SQLTABLES() function
+  * source\sqlrdd.ch
+    + Added ARRAY_BLOCK* definitions
+  * source\sqlrdd0.prg
+    + Added SR_ListCreatedTables() to list tables created via SQLRDD
+      only
+    + Added procedure to RESET recno() counter in Caché database
+  * source\sqlrdd1.c
+    + Added support to dbInfo( DBI_ISFLOCK )
+
+2005-06-15 10:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    ! Minor optimization
+  * source\sqlgen1.prg
+    ! Added support to Owner/Schema name in generated SQL code, considering
+      SR_SetGlobalOwner()
+    ! Fixed empty date conversion in Oracle
+  * source\sqlodbc.prg
+    ! Fixed DATE structure report under MSSQL (was reporting
+      03 decimals)
+  * source\sqlora.c
+  * source\sqlorax.c
+    ! Fixed minor fetch bug when OCI returns additional query info
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+    ! Optimizations
+    ! Fixed owner in SR_DropIndex(), SR_DropTable() and
+      SR_RenameTable()
+    ! Drop proper column when Synthetic index is dropped
+    ! Drop proper column when conditional index is dropped
+  * source\sqlrdd1.c
+    ! Support to sqlOrderCondition()
+  * source\sqlrdd2.prg
+    ! Added complete support to conditional Indexes
+    ! Fixed proper column removal when dropping Synthetic or
+      conditional indexes
+    ! Method DropColumnRules renamed to DropColRules
+    ! Fixed empty date conversion in Oracle
+    ! Minor optimizations
+  * source\utils.prg
+    ! Many fixed to SR_ChangeStruct()
+    ! changestruct.log greatly improved
+    - Removed function SR_OrdCondSet()
+
+2005-06-07 10:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlfirebird.prg
+  * source\sqlodbc.prg
+  * source\sqlpgs.prg
+    + Added missing ::lLowLevSqlDbg option
+  * source\sqlrdd2.prg
+    ! Fixed silly bug in SR_ChangeStruct() with Firebird
+
+2005-06-07 03:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+  * source\utils.prg
+    ! Fixes to new SR_ChangeStruct()
+    ! Synthetical index minimal column count default raised to 10
+  * source\sqlrdd1.c
+    ! Fixed GPF with MEMO Multi Language columns
+
+2005-06-06 11:45 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlgen1.prg
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+    ! Added SR_SetIndexInfoBlock( b ) that acts like SR_SetTableInfoBlock( b ),
+      but now for Indexes. This is a improvment of last commits.
+
+2005-06-06 08:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+    ! Fixed: No need to be connected to database to setup GlobalOwner.
+  * samples\parser1.prg
+    ! Reverted yesterday's commit.
+
+2005-06-06 07:20 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\utils.prg
+    ! Removed useless param in SR_ChangeStruct()
+  * source\sqlrdd2.prg
+  * source\sqlrdd0.prg
+    ! Fixed index name with directory information in filename.
+      This was causing SR_ExistIndex() not work is this case.
+
+2005-06-05 09:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed index keys like this: dtos(stod(Left(...)))
+  * source\utils.prg
+    ! Added dbSetOrder(0) before change any structure
+
+2005-06-05 02:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\odbc.c
+    ! Added ODBCWRITEMEMO() and odbcErrorDiag() functions to write LOB
+      fields via OBDC.
+  * source\sqlact.c
+    ! Fixed Sybase and ADABAS-D support
+  * source\sqlconnection.prg
+    + Added option to set tablespace in connection string
+    ! Fixed Sybase and ADABAS-D startup routines
+  * source\sqlfirebird.prg
+  * source\sqlmy.prg
+  * source\sqlpgs.prg
+  * source\sqloracle.prg
+    ! Removed password from error log file (security issue)
+  * source\sqlora.c
+    ! Fixed GPF at termination when playing with many connections
+  * source\sqlorax.c
+    ! Function OracleWriteMemo has return value now
+  * source\sqlodbc.prg
+    ! Added method WriteMemo()
+  * source\sqlgen1.prg
+    ! Fixed Sybase delimiters
+    ! Fixed Oracle Left Outer Join with multiple indirect relations
+  * source\sqlrdd0.prg
+    ! Tablespaces can be defined in connection string
+    ! Fixed to Sybase
+    ! SR_ExistTable now uses connection Owner, Global Onwer or owner
+      parameter
+  * source\sqlrdd2.prg
+    ! Method CreateColumn renamed to AlterColumn and extended to
+      add or modify a column
+    ! Caché optimization
+    ! Minor fixes to Sybase, ADABAS and Ingres
+    ! Fixed dbSeek with partial key
+    ! Oracle DROP INDEX fixed
+    + Added Drop Column method
+    + Added function SR_GetGlobalOwner()
+  * source\utils.prg
+    + Added function SR_ChangeStruct( cTableName, aNewStruct, [cOwner] )
+  * source\utilslang.prg
+    ! TYPOs
+  * samples\parser1.prg
+    ! Now it needs db connection. Added.
+  * samples\chgStruct.prg
+    + Added new sample - COOL NEW FEATURE: CHANGESTRUCT
+
+2005-05-27 19:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd2.prg
+  * source\sqlconnection.prg
+    + Added ability to inform Owner and Tablespaces (Data, Index and Lob) in
+      connection string. Example:
+      OCI=localhost;UID=marcelo;PWD=1234;OWNER=DESENV;TABLESPACE_DATA=DATA;TABLESPACE_INDEX=INDX;TABLESPACE_LOB=LOB;
+
+2005-05-28 20:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! fixed some compilation Error lines(variable declared without local)
+
+2005-05-27 19:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+  * source\sqloracle.prg
+  * source\sqlorax.c
+    ! Fixed cursor consume - now it works with only 01 cursor per connection!!
+  * source\sqlrdd0.prg
+    ! Fixed SR_ExistIndex()
+    + Added SR_SetTblSpaceLob( cSet )
+  * source\sqlrdd2.prg
+    ! Fixed cache sort in ALL_IN_CACHE workareas
+    + Added support to specific LOB tablespace when creating tables
+      with Oracle database
+    ! Many fixes to support Intersystem´s Caché RDBMS
+    + Added RECNO() support to Caché (now it´s 99% COMPLETE!!)
+    ! Fixed creation of multiple Synthetic indexes
+  * source\utils.prg
+  * source\sqlrdd.ch
+  * source\sqlgen1.prg
+    ! Support to Caché database
+
+2005-05-20 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\sqlconnection.prg
+    ! fixed alias name on exec() method( if cFile parameter passed is /dir/file.dbf,
+      alias was assuming /dir/file.dbf and generate the invalid chars on alias)
+
+2005-05-17 17:50 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\mysql.c
+    ! Fixed NUL/NOT NULL logic (it was inverted)
+  * source\sqlmy.prg
+    + Added low level SQL debug
+  * source\sqlorax.c
+    ! Open cursors limit raised to 256
+    ! Fixed memory leak when connection fails
+  * source\sqlora.c
+    ! Added lob column initial allocation
+  * source\sqlrdd1.c
+    ! Formatting
+  * source\sqlrdd2.prg
+    + Added METHOD AddRuleNotNull( cColumn )
+  * source\utils.prg
+    + Added wrapper to AddRuleNotNull(): Function
+      SR_AddRuleNotNull( cCol )
+
+2005-05-16 09:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    ! Added low level SQL debug option (now disabled)
+  * source\sqlfirebird.prg
+    ! Fixed direct query with large numeric columns
+  * source\sqlmy.prg
+    ! touched
+  * source\sqlora.c
+  * source\sqlora.h
+  * source\sqloracle.prg
+  * source\sqlorax.c
+    ! Fixed few memory leaks
+    + Added support to VERY LARGE lob columns (max 4GB)
+      (I guess Oracle is now bullet-proof)
+  * source\sqlrdd0.prg
+    ! Added setup to query only connections
+  * source\sqlrdd1.c
+    ! Fixed memory leak with ARRAY stored in memo fields
+    ! Fixed memory leak with empty multilang columns
+  * source\sqlrdd2.prg
+    ! Removed LOB column auto creation to char fields > 240 bytes
+    ! Fixed recno() trigger name maximum lenght to Oracle
+  * source\utilslang.prg
+    ! Fixed TYPO
+
+2005-05-10 23:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlmy.prg
+    ! Fixed connection error return value when MySQL service is dead
+
+2005-05-09 22:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\firebird.c
+    ! Fixed memory leak when connection fails
+  * samples\demo01.prg
+  * samples\dbf2sql.prg
+    ! Opening table in exclusive mode
+
+2005-05-09 21:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlact.c
+  * source\sqlconnection.prg
+  * source\sqlgen1.prg
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+    ! Started support to InterSystems Caché pos relation database server
+      (please does not unclose this right now)
+
+2005-05-09 16:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlpgs.prg
+    ! Fixed dbUseArea( ,, <cSqlCommand> )
+  * source\sqlora.c
+    ! Fixed memory leaks detected by Luiz
+  * source\sqlorax.c
+    - Removed useless check for session->stmt
+  * source\sqlrdd2.prg
+    ! Minor fix to historic behavior
+
+2005-05-05 12:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+    ! Minor fix to Oracle/MS owner/schema names
+  * source\sqlrdd2.prg
+    -+ Function SR_UseSequences() moved from sqlrdd0.prg to sqlrdd2.prg
+    + Automatic SR_QuickAppend(.T.) if table is opened in EXCLUSIVE
+      mode
+    ! Added multiple schema support to Postgres
+    ! Minor fix to Historic (saving record version)
+  * source\utils.prg
+    + Added SR_QuickAppend( lSet ) to speed up inserts
+  * source\sqlmy.prg
+    ! Added multiple schema support to MySQL
+
+2005-05-04 12:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+    ! More fixes to Onwer/Schema to Oracle/MSSQL
+    ! Fixes to maximun table name lenght (30)
+  * source\sqlconnection.prg
+    ! Fixed DB2/AS400 detection to old win98 ODBC drivers
+
+2005-05-03 19:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+    ! Fixed minor memory leak when playing with many connections
+
+2005-05-02 22:10 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlgen1.prg
+  * source\sqlrdd0.prg
+  * source\sqlrdd2.prg
+  * source\utils.prg
+    ! Fixed multiple owner/schema for management tables and user tables
+      with Oracle and MSSQL Server
+
+2005-05-01 14:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sqlrdd1.c
+    ! Changes to make it compatible to OLD and NEW workarea structures, controlled
+      by SQLRDD_BEFORE_MAY_2005 define.
+  * source/sqlrdd2.prg
+    ! Optimization in APPEND BLANK to DB2 database
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    Tagged version 5.5, build 71
+
+2005-04-30 14:40 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlconnection.prg
+    + Added instance ::lResultSet to not allow retrieving of a result set if
+      query has no result set
+  * source\sqlfirebird.prg
+    + Use of ::lResultSet
+  * source\sqlora.c
+    ! Formatting
+  * source\sqloracle.prg
+    ! Fixed DATE data type retrieving
+    - Removed FLOAT type handling (passed to sqlorax.c)
+    + Use of ::lResultSet
+  * source\sqlorax.c
+    ! FLOAT handling
+  * source\sqlrdd0.prg
+    + Added DATE and TIMESTAMP formats to Oracle database
+  * source\sqlrdd2.prg
+    ! Fixed SOFT SEEK with character keys with blank spaces in right side
+    ! Fixed ZAP() on empty tables error
+    ! Removed trace mesages from previous commit
+  * source\utils.prg
+    ! Old RDD compatible mode fixed
+
+2005-04-29 12:00 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source\sqlora.c
+  * source\sqlora.h
+  * source\sqlorax.c
+    ! Minor fixes
+    ! Fixed memory leaks
+  * source\sqlrdd1.c
+    ! Fixes to support SCOPE behavior via DBOI_*
+  * source\sqlrdd2.prg
+    ! Fixed reverse order index under Oracle and Firebird (missing "NULLS LAST")
+
+2005-04-26 23:30 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * source/sqlrdd2.prg
+    + Added SR_SetGlobalOwner( cOwner ) so we can setup a global schema name to all
+      tbles opened by SQLRDD (except support tables, wich still uses
+      SR_SetToolsOwner( cOwner ))
+  * source/sqlrdd0.prg
+    ! Minor fix to SR_SetToolsOwner()
+  * source/utils.prg
+    ! Fixed field recognization to varchar(4000) - was wrongly assuming MEMO (my old
+      Clipper RDD defective behavior)
+  * source/sqlconnection.prg
+    + Now you can use TNS=.... or DTB=... to connect to Oracle, since TNS
+      Name is more intuitive to Oracle users.
+
+2005-04-26 07:35 UTC-0300 Marcelo Lombardo <marcelo.lombardo@newage-software.com.br>
+  * sqlora.h
+    + Added build info
+  - libsqlora8-config.h
+    - Removed from CVS
+  - samples/Oracle_Stored_Procedure.prg
+    - Sample removed from CVS
+
+2005-04-25 19:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * lib\oci.lib
+    +- file replaced by version shipped with Oracle
+  * source\firebird.c
+    - Removed wrong ODBC dependence
+    * Changed includes order to make GCC happy
+  * source\firebird.h
+    * commented definitions to make GCC happy
+  * source\sqlora.c
+  * source\sqlora.h
+  * source\libsqlora8-config.h
+  * source\sqlorax.c
+    + Added NEW Oracle native support (rewrote from scratch)
+  * source\sql.y
+    + touched
+  * source\sqlconnection.prg
+  * source\sqlodbc.prg
+    ! Formatting
+  * source\sqlfirebird.prg
+    ! Removed wong dependence from ODBC
+  * source\sqloracle.prg
+    ! Changes to support NEW Oracle native routines
+  * source\sqlrdd0.prg
+    + Added functions to set global tablespace name to
+    Oracle: SR_SetTblSpaceData(cSet) e SR_SetTblSpaceIndx(cSet)
+  * source\sqlrdd2.prg
+    ! Fixes to multi language fields
+    + Optional Oracle tablespace when creating table or index
+    ! Fixes to support DB2/400
+    + Added PK creation under Oracle at dbCreate()
+  * sql.files.inc
+  * vc\sql.files.inc
+  * vc\xbuild.ini
+    ! Changed to support new Oracle native
+  * source\libpq.dll
+    - File removed (should be in DLL folder)
+  * source\oracle.c
+  * source\orautils2.c
+  * source\orautils.c
+    - Old Oracle native support REMOVED from CVS
+
+2005-04-16 22:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed to APPEND FROM with multilanguage memo fields
+    ! Hash search algorithm (ALL_IN_CACHE workareas) fixed to find FIRST
+      occurrence of search key (missed in previous commit)
+  - source.libmysql.dll
+    - Removed. Why was it here ?
+
+2005-04-16 16:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Minor fix to compile with gcc
+  * source/sqlrdd2.prg
+    ! Hash search algorithm (ALL_IN_CACHE workareas) fixed to find FIRST
+      occurrence of search key
+    ! Fixed SET SCOPE with numeric index keys, when TOP and BOTTOM limits
+      are the same
+    ! Minor fix to Oracle large memo fields
+    ! Fixes to work with DB2 on IBM iSeries (AS/400)
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged version 5.4 build 0003
+  * source/sqlrdd0.prg
+    ! Fixes to work with DB2 on IBM iSeries (AS/400) with journal
+      disabled
+    ! Fixed system startup if multilang management table was
+      dropped
+
+2005-04-11 01:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  + sql-demo.lib.xbp
+  + mysql-demo.lib.xbp
+  + mysql.files.inc
+  + mysql.lib.xbp
+    + Added MySQLRDD projects
+  ! source\sqlrdd0.prg
+    + Changes to MySQLRDD
+  ! source\sqlrdd1.c
+  ! source\sqlrdd2.prg
+    + Ficed MultiLang memo fields
+
+2005-04-08 07:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/orautils.c
+    ! minor fix on oracle_connect_internal
+  * source/oratuils2.c
+    ! minor fix i  OracleBindParams()
+
+2005-04-07 15:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlmy.prg
+    + Added missing column quoting to avoid conflicts with MySQL
+      protect words in column names (same is ok in other DBs, except FB)
+  * source/sqlrdd2.prg
+    + Added tag in index phisical name to avoid problems with databases
+      that cannot handle an index with same phisical name of a table
+  * source/sqlrdd1.c
+    ! Fixed RLOCK after DBAPPEND() - INSERT goes on commit and no blank
+      record is added.
+
+2005-03-23 15:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/firebird.c
+    ! Fixed connection refused error
+  * source/sqlrdd2.prg
+    ! Fixed dbSeek( "", .t. )
+    ! Fixed dbSkip() after dbDelete() WHEN sr_UseDeleted() is FALSE
+  * source/sqlgen1.prg
+    ! Fixed starting record # when NOT using automatic counters
+
+2005-03-17 10:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * source/sqlact.c
+     + escape_oci function to remove chr(0) from oracle queries
+   * source/oracle.c
+     changed OracleExecDir() return (if error on prepareStatement,
+     return this error),otherwise(prepatestatement ok) execute the query
+
+2005-03-16 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * source/sqloracle.prg
+     ! minor fix(remove parseparam from executeraq method)
+
+2005-03-15 18:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd0.prg
+   * source/sqlconnection.prg
+     + Added SR_SetRDDTemp( cRDD ) to choose RDD to be used in temp
+       workareas
+     ! Minor fixes in query output to text variable
+   * source/sqlrdd2.prg
+     ! Minor fix in NWG compat ::cRights
+
+2005-03-14 08:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlmy.prg
+    ! Fixed header name in eror message
+
+2005-03-11 18:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * orautils.c
+  * sqloracle.prg
+  * sqlrdd0.prg
+  * sqlrdd1.c
+  * sqlrdd2.prg
+    ! Fixes to Oracle Native
+    ! Compat fixes to NWG
+  * oracle.h
+    ! Ron fixes to MSVC
+
+2005-03-08 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * mysql.c
+  * sqlmy.prg
+    + Added MySQL version detection in native connection
+  * sqlrdd.ch
+  * sqlrdd2.prg
+    ! Fixes to Postgres Quoting (work in progress)
+
+2005-03-08 19:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Changed AUTO_INCREMENT column from PRIMARY KEY to UNIQUE in MySQL
+      (non documented feature) - This allow us to create constraints in
+      MySQL now. Primary Key definition in dbCreate() is now working in
+      MySQL.
+
+2005-03-07 21:14 UTC-0300 Ron Pinkas <ron@xharbour.com>
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/odbc.c
+    * MSVC corrections.
+  * xHarbour-SQLRDD/source/orautils.c
+    * Replaced this with This (MSVC)
+      /* Still many erros */
+
+  * xHarbour-SQLRDD/source/utilslang.prg
+    * split static initialization of aMsg (too long)
+    + Added INIT PROCEDURE sr_Init() to init aMSg with aMSg1-7
+
+2005-03-07 22:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Changed uiMaxFieldNameLength to support up to 64 bytes field name lenght
+      This fixes bug in FieldPos() when testing for long filed names
+
+2005-03-07 13:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! Fixed default maximun non - Synthetic Index column lenght constraint
+  * source/sqlrdd2.prg
+    ! Force lGoTopOnFirstInteract always .T. when ALL_IN_CACHE workarea
+    ! Fixes in SCOPE refresh
+  * source/sqlrdd1.c
+    ! Fixes in SCOPE refresh
+
+2005-03-06 16:20 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   * source/orautils.c
+   * source/oracle.c
+     ! minimal fix on initialization of variable on ORACLEERROR() and  on OracleFreeHandleInternaldbc()
+       Release Stmt structure, if still valid
+   * source/sqlrdd2.prg
+     ! when create field on postgres default numeric field to 0 (for maximun optimize of stored procedures
+      for postgres, if other database has default on create , it should be set to 0) imagine an table with
+      1000 field, and only need to insert only 3 values,all others numeric field should ebe specified on
+      the stored procedure , with this not) this is usefull for stored that updated /insert values in
+      more then 2 tables on same stored
+
+2005-02-27 19:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   * source/orautils.c
+    ! removed some comments
+    ! on prepare statemente changed to make two calls to OciAllocHandle() to allocate
+      the oracle STMT handle, if the first one fail, calls the second one to
+      garanty the stamente allocation
+
+2005-02-27 18:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed side effect ofoptimization in dbUseArea( "SELECT * FROM..." )
+  * source\sqlmy.prg
+    - Removed tracelgs
+  * source\sqlrdd0.prg
+    ! Fixed default maximun non - Synthetic Index column lenght constraint
+
+2005-02-22 10:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\firebird.c
+    ! Fixed NULL transaction pointer
+  * source\sqlrdd2.prg
+    ! Fixed ALL_IN_CACHE workarea without SR_RECNO column (again)
+  * source\mysql.c
+  * source\odbc.c
+  * source\oracle.c
+  * source\orautils.c
+  * source\orautils2.c
+  * source\pgs.c
+  * source\sqlact.c
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqlgen1.prg
+  * source\sqllex.c
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd0.prg
+  * source\sqlrdd1.c
+  * source\utils.prg
+  * source\utilslang.prg
+    + Added source code scanner marks to top of all above files
+
+2005-02-21 15:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+    ! Tagged version 5.4 build 0001
+  * source\sqlconnection.prg
+  * source\sqlmy.prg
+    ! Fixed dbUseArea(...query...) with MySQL
+  * todo.txt
+    ! Updated todo list
+
+2005-02-20 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Few fixes in Historic
+    + Added helper functions to historic
+    + Added CASCADE in Postgre's DROP TABLE
+  * source\utils
+    + Added helper functions to historic
+  - samples\parser2.prg
+  + samples\query.prg
+    -+ File changed and sample enhanced
+  + samples\historic
+    + Added historic sample, finally!!
+
+2005-02-19 23:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Changed dbUseArea( .f., "SELECT * FROM..." ) to support queries
+      with or without SR_RECNO column in result set.
+    ! Performance improved when loading ALL_IN_CACHE workareas
+
+2005-02-19 22:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\oracle.c
+    ! Added parameter is OracleWriteMemo() to receive "recno" column
+      name as parameter
+  * source\sqlconnection.prg
+  * source\sqloracle.prg
+  * source\sqlrdd2.prg
+    ! Fixed silly bug that was forcing Oracle lib (OCI) to e linked
+      in executable, introduced in last commit.
+    ! Fixed SEEK to make exact query if right(cSeekExpr,1) is blank.
+      This makes SEEK more DBFCDX compatible
+
+2005-02-17 17:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Removed useless ORACLE entry in :sqlCreate()
+    ! Added support for special memo writing function to Oracle BLOB
+  * source\sqloracle.c
+  * source\oracle.c
+  * source\orautils.c
+  * source\orautils2.c
+  * source\sqlconnection.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+    + Added (and fixed) ORACLEWRITEMEMO function by Luiz Culik
+    + added ::lNative instance for Connection Classes
+    + Added ability to write VERY LONG streams into memo fields under
+      Oracle - VARCHAR2(4000) empire is down!
+    + Many fixes in OCI reading functions
+  * samples\dbf2sql.prg
+  * samples\mlang.prg
+    ! Samples adapted to use new connect.prg
+
+2005-02-16 20:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlact.c
+    + Added escape_firebird( ToBuffer, FromBuffer, iSize )
+  * source\firebird.c
+    ! Forced isc_rollback_transaction on ANY sql error
+  * source\sqlfirebird.prg
+    ! Touched
+  * source\sqlrdd1.c
+    ! Fixes for LOCKing in table with multilang columns
+  * source\sqlrdd2.prg
+    ! Fixes in GetLine method (SetJoin() now working with Firebird)
+    ! Many changes to support SetJoin in Postgres, since it DOES NOT
+      resolve ambiguous columns when sorting the query result set
+
+2005-02-15 10:15 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source\sqloracle.prg
+   Fixed line  65
+   was
+   local nLen      := ::Oraclegetfieldlen( aField, nFieldJoin )
+   to
+   local nLen      := ::Oraclegetfieldlen( aField, nField )
+   (Marcleo  nFieldJoin being 0 will sure gpf)
+
+2005-02-14 xx:xx  UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source\oracle.c
+    source\orautils.c
+    source\orautils2.c
+     ! changef handling of memo fields and  character field with len >64
+       now text return full lenght
+
+2005-02-15 07:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqloracle.prg
+    ! Fixed RT error due to absolutely no tests before commit :-(
+      Liz, it now GPFs.
+
+2005-02-15 07:15 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source\oracle.c
+  * source\orautils.c
+  * source\orautils2.c
+    ! changef handling of memo fields and character field with len >64
+      now text return full lenght
+  * source\sqloracle.prg
+    ! changef handling of memo fields and character field with len >64
+
+2005-02-15 07:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\firebird.c
+    ! Fixed massive procesing database error (wrong FB API docs...)
+  * source\sqlrdd2.prg
+    ! fixed default error.log file to sqlerror.log and <database>.log
+      (missing fix in latest commit)
+  * source\utils.prg
+    ! fixed SR_dbRefresh() function to perform dbgoto(nCurrentRecord)
+      itself, not using SR_WORKAREA Refresh() method.
+
+2005-02-14 20:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Added optimizers:
+      + SR_SetlGoTopOnFirstInteract( lOpt ) => lOld
+      + SR_SetnLineCountResult( lOpt ) => lOld
+      + SR_CleanTabInfoCache()
+  * source\utils.prg
+    ! fixed default error.log file to sqlerror.log and <database>.log
+  * firebird.c
+  * sqlfirebird.prg
+    ! Speed improved
+    ! Bugs fixed
+    + Added FBCreateDB( cDatabase, cUser, cPasswd, [<nPageSize>], [<cChrset>], [<nDialect>] )
+  * source\slrdd1.c
+    + Added new optimizer's support
+  * source\sqlrdd.ch
+    ! Constants added
+  * source\orautils2.c
+    ! Minor fix
+
+2005-02-11 00:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed NOT NULL fields creation in Firebird
+    ! Fixes to Historic
+    ! Fixes to MLang
+    ! Optimization on repeated table open
+
+2005-02-11 00:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed bug when index expression has "->" (VERY bad practice, but...)
+    ! Index phisycal name lenght limited to 30 bytes
+
+2005-02-10 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Many fixes to historic functionality
+    ! Minor fix to SetJoin()
+  * source\sqlrdd0.prg
+    ! Changed SR_SetHideRecno( lOpt ) default to .F.
+  * source\mysql.c
+    ! Changed header order to build correctly in MT (Ron)
+  * source\oracle.h
+  * source\orautils2.c
+    ! Fixed Casts (Luiz)
+
+2005-02-10 17:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed index column name to exact match
+  * source\sqlrdd0.prg
+    + Added functions SR_SetHideHistoric( lOpt ) and SR_SetHideRecno( lOpt )
+      to setup if SR_RECNO and DT__HIST columns are visible as workarea's
+      fields or not (default is NOT).
+
+2005-02-10 14:20  UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+ * source/sqloracle.prg
+    ! changes on functions
+      now all functions use the dbc (connection handle) as parameter
+  * Source/oracle.c
+    !changed all functions to use the connection handle as parameter
+  * source/orautils.c
+  * source/orautils2.c
+    ! many code clean up
+       on functions that release memory, test to all memory variable that are
+       pointer to see if valid before release then
+    !changes all internal functions to use then PORACLE_CONN structure insted of PORACLE_STMT
+    ! connection function now use an OCILogon and disconection use OCILogOff()
+      which is faster and autoalocate necessary handles
+    ! many casts (this has make gcc and xcc happy and functions to work) with out the cast, gpf
+
+  * source/oracle.h
+      ! changed prototypes of all functions to use as parameter PORACLE_CONN
+       insted of PORACLE_STMT
+2005-02-10 15:16 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  + Added sql.files.inc
+  * finetuned XBP files more
+
+2005-02-09 18:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * ToDo.txt
+    ! Updated list
+  * source\sqlfirebird.prg
+    ! Wrong file in previous commit, now corrected
+  * source\sqlrdd2.prg
+    ! Fixed minor DB2 error
+  + lib\fbclient_ms.lib
+  + dll\fbclient.dll
+    + Strange, I can bet I had already uploaded these files...
+  * source\sqlrdd.ch
+  * include\sqlrdd.cg
+    ! Tagged build #30
+  * samples\connect.prg
+  + samples\sqlrdd.ini
+    + New samples structure, part II:
+      connect.prg now reads connection string from sqlrdd.ini
+      All connection options present in ini file are shown in
+      menu when running any sample. Ppl will like it ;-)
+
+2005-02-09 14:25 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  + Added sql.files.inc
+  * finetuned XBP files
+
+2005-02-09 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Few SetJoin() optimizations
+    + Added Firebird charset setup support
+  * source\sqlconnection.prg
+    + Added Firebird charset setup support
+    ! Chnged Fetch() method to use FetchRaw() from derived class
+    + Added FetStruct() method
+  * source\sqlpgs.prg
+  * source\sqloracle.prg
+  * source\sqlfirebird.prg
+  * source\sqlodbc.prg
+  * source\sqlmy.prg
+    + Added FetchRaw() method
+  * source\firebird.c
+    + Added charset setup support
+  * source\sqlgen1.prg
+    ! Fixed IsNull() with MySQL
+
+2005-02-04 13:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlconnection.prg
+    ! Fixed temp dbfs to force DBFCDX driver even if default RDD
+      is SQLRDD
+    ! Fixed memory consume in queries returning to array
+  * source\sqlpgs.prg
+    ! Changed Postgres LOCK to hold forever instead of timeout. Sorry,
+      it hurts but this is needed to not have corrupt transactions
+  * source\sqlrdd.ch
+  * include\sqlrdd.ch
+  * source\sqlrdd2.prg
+    + Added new option to OrdScope: TOP_BOTTOM_SCOPE - use it when TOP
+      and BOTTOM limits are the same to have a faster experience
+    ! Many fixes to SR_SetJoin()
+    ! Many fixes to OrdSetForClause() method
+  * source\sqlrdd0.prg
+    + Added function SR_CheckMgmntInd(lSet) to tell SQLRDD to NOT look
+      for indexes in its internal catalogs (used when application has
+      its own data dictonary)
+  * source\utils.prg
+    + Added new option to function SR_OrdCondSet( cForSql, cForxBase ):
+      cForxBase is a xBase expression to be added as FOR clause in
+      ALL_IN_CACHE tables
+
+2005-02-02 14:07 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+    ! Fixed some DBOI_* return values
+    + Added support to SR_OrdCondSet()
+  * source\utils.prg
+    + Introducing SR_OrdCondSet() - Set a FOR CLAUSE to current
+      index in run time
+    + Introducing SR_HasFilters() - to know if current workarea
+      has nay kind of active filter (FOR clause, Filter, Historic..)
+    + Introducing SR_SetFilter() - to add a server-side filter (sql
+      expresion) to current workarea
+    * Introducing SR_IsWAHist() - to know if current workarea has
+      historic control
+
+2005-02-01 15:07 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * Include\mysql.h
+  * Include\sqlodbc.ch
+  * Include\sqlrdd.ch
+    ! Refreshed include files from source dir
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd0.prg
+    ! Connection functions redesigned to allow connection class detection
+      from DSN string
+  * samples\dbf2sql.prg
+  * samples\info.prg
+  * samples\parser2.prg
+  * samples\relation.prg
+    ! Samples remanufactured to use new connection class detection
+      Now we do not need demo_odbc, demo_oracle, demo_pgs, etc.. -
+      all samples will run with any database!
+  - samples\tstmemo.prg
+  + samples\memo.prg
+    -+ memo sample renamed from tstmemo.prg to memo.prg
+  + connect.prg
+    + Added gereric connect function to all samples
+  + samples\demo01.prg
+    + Added demo similar to demo_*.prg to all databases
+  + samples\join.prg
+    + New SetJoin() function demo
+  + samples\mlang.prg
+    + New sample for multilanguage support in SQLRDD
+  - demo_mysql_native.prg
+  - demo_odbc.prg
+  - demo_oracle_native.prg
+  - demo_pgs_native.prg
+    - Old samples removed from CVS
+  * source\utils.prg
+  * source\sqlrdd2.prg
+    + Added new SR_SetJoin() function
+  * source\sqlgen1.prg
+    ! Fixed LEFT OUTER JOIN
+    + Added missing RIGHT OUTER JOIN
+  * source\sqlrdd.ch
+    ! Tagged build # 28, version 5.2
+
+2005-01-29 02:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd1.c
+    ! Fixed nasty bug that crashes application if SR_RECNO is
+      not the last column in table
+  * source\sqlconnection.prg
+  * source\sqlrdd2.prg
+    ! Formatting
+  * source\firebird.c
+    ! Fixed char and varchar support
+
+2005-01-28 19:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd.ch
+  * source\sqlrdd2.prg
+    + Added connection handle as a workarea callback block option
+      Now we can handle multiple connections is a pretty fashion
+  * source\utils.prg
+    ! Transaction related functions (sr_BeginTrasaction, etc..) can
+      receive connection parameter as connection object or connection
+      handle
+
+2005-01-28 12:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\firebird.c
+    ! Few castings to gcc
+  * source\hbsql.ch
+    ! Added previous declaration detection
+  * source\sqlconnection.prg
+  * source\sqlfirebird.prg
+  * source\sqlgen1.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd.ch
+  * source\utils.prg
+    ! Error reports now output to sqlerr.log and not to sql1.log
+    ! Removed "succefull connection" from logfiles.
+  * source\sqlrdd0.prg
+    + Added function DetectDBFromDSN() => CONNECTION_CONSTANT to detect
+      if DSN string is OCI=, MYSQL=, FB=, PGS=
+    ! SR_AddConnection() recognizes "OCI=, MYSQL=, FB=, PGS=" like HST=
+      in DSN string
+    ! Demo banner is now protected
+  * source\sqlrdd2.prg
+    ! Fixed Multilang with Postgres
+  * sql-demo.lib.xbp
+    ! Added Firebird to demo
+
+2005-01-26 15:07 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlfirebird.prg
+    ! Fixed numeric fields length reported by Interbase API
+
+2005-01-26 01:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * Include\msg.ch
+  * Include\sqlrdd.ch
+  * source\msg.ch
+  * source\sqlconnection.prg
+  * source\sqlmy.prg
+  * source\sqlodbc.ch
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd.ch
+  * source\sqlrdd0.prg
+  * source\sqlrdd1.c
+  * source\sqlrdd2.prg
+  * source\utilslang.prg
+  * Include\firebird.ch
+  * source\firebird.c
+  * source\firebird.ch
+  * source\firebird.h
+  * source\sqlfirebird.prg
+  * sql.lib.xbp
+    + Added multi language support
+    + Added native firebird support
+
+2005-01-22 19:40  UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source/orautils.c
+  * source/oracle.h
+      ! added missing prototypes
+
+2005-01-12 22:30  UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source/sqlrdd2.prg
+     ! added missing data (clastcomm)
+
+2005-01-11 20:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sql.y
+    + Added ability to parse complex expressions in select list, like:
+      sum(isnull(b.quan,0)*isnull(b.valor_uni,0)) as "total"
+
+2005-01-10 10:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/utils.prg
+    ! Formatting
+  * source/sql.y
+    + Added ability to handle STRINGVAL in column identifier:
+      "SELECT SUM( VALUE ) AS 'BALANCE' FROM TABLE"
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # 24
+
+2004-12-23 10:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlodbc.prg
+  * source/sqlrdd2.prg
+    ! Fixed SET SCOPE with multiple column indexes with Firebird
+  * source/Makefile
+  * source/linux.sh
+  * source/linux64.sh
+    ! Added GNU make files (for those times you don't have xBuild
+      ported to current Unix)
+
+2004-12-16 9:35  UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  ! oracle.c
+    ! fix problem on oraclequeryattr and oracletableattr when returned lenght is 0
+
+2004-12-14 08:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * sqlconnection.prg
+  * sqlrdd0.prg
+    + Added SQL screen trace support SR_StartTrace() and SR_StopTrace()
+      functions
+  * sqlrdd2.prg
+    ! SET SCOPE should reset SKIP optimizers. This change fixes some
+      bugs using SET SCOPE.
+
+2004-12-13 01:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd1.c
+    ! Fixed dbDelete() when executed after dbAppend(). Now you can
+      'append from' whith SET DELETED OFF.
+  * source\sqlrdd2.prg
+    ! Fixed ZAP to reset RECNO() counter in Firebird
+    ! Optimizaed Firebird table open with larget databases
+
+2004-12-08 19:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    ! Fixed optimization bug in dbGoTo()
+  * source\sqlmy.prg
+    ! Fixed table descriptor gpf under Linux
+  * source\sqlrdd1.c
+    ! Added protection to wrong workarea buffer
+
+2004-11-25 19:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\mysql.c
+    ! Changed INT2OID contant to be MYSQL_SHORT_TYPE. Luiz, why did you
+      merged Postgres and MySQL defines ? :-|
+
+2004-11-25 19:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source\sqlrdd2.prg
+    + Added ability to have a workarea from a SQL atatement, like this:
+      dbUseArea(.F.,"SQLRDD","SELECT * FROM TEST_TABLE")
+
+2004-11-25 09:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * Include\sqlrdd.ch
+    ! File synch with source folder
+  * source\sqlmy.prg
+  * source\sqlodbc.prg
+  * source\sqloracle.prg
+  * source\sqlpgs.prg
+  * source\sqlrdd2.prg
+    ! Fixed ALL_IN_CACHE workareas.
+    + Added SCOPE, FILTER, FOR support to ALL_IN_CACHE workareas
+
+2004-11-24 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * sqlrdd.ch
+    ! Tagged build #23
+  * sqlrdd2.prg
+    ! Start fixing "ALL_IN_CACHE" workareas (WIP).
+  * sqloracle.prg
+    ! Fixed Oracle native support. Finally working again.
+
+2004-11-23 20:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * sqlconnection.prg
+  * sqlrdd.ch
+  * sqlrdd0.prg
+  * sqlrdd2.prg
+    ! Added one sequence per table in Oracle and Postgres instead of
+      one sequence per database. Now Recno() has correct behavior.
+    ! Fixed Firebird record generator to start at 0, so firts appended
+      record is 1
+
+2004-11-22 19:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqloracle.prg
+    ! Missing commit
+
+2004-11-22 16:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlpgs.prg
+  * source/sqloracle.prg
+    ! Reformatted to support Super Class SR_CONNECTION
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # 22
+  + config-netware.h
+  + config-os2.h
+  + my_dbug.h
+  + mysql_embed.h
+  + mysql_time.h
+  + sqlconnection.prg
+  + typelib.h
+    + Added new MySQL headers
+  * Include\mysql.ch
+  * Include\sqlrdd.ch
+  * dll\libmysql.dll
+  * lib\libmysql.lib
+  * source\config-win.h
+  * source\errmsg.h
+  * source\libmysql.dll
+  * source\m_ctype.h
+  * source\m_string.h
+  * source\my_alloc.h
+  * source\my_getopt.h
+  * source\my_global.h
+  * source\my_list.h
+  * source\my_pthread.h
+  * source\my_sys.h
+  * source\mysql.ch
+  * source\mysql.h
+  * source\mysql_com.h
+  * source\mysql_version.h
+  * source\mysqld_error.h
+    ! Updated MySQL Headers, library and DLL
+  * source\oracle.c
+  * source\oracle.h
+  * source\oratypes.h
+  * source\orautils.c
+  * source\orautils2.c
+  * source\sqlora.ch
+    ! Oracle Native update by Luiz Rafael Culik (not working yet)
+
+2004-11-18 12:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * ToDo.txt
+    ! Updated
+  + source/sqlconnection.prg
+    + Added main connection class SR_CONNECTION
+  * source/sqlmy.prg
+  * source/sqlodbc.prg
+  * source/sqlpgs.prg
+    ! Reformatted to support Super Class SR_CONNECTION
+  * source/sqlrdd2.prg
+    ! Fixed soft seek under Postgres containinng index key like "str(field)"
+  * sql-demo.a.xbp
+  * sql-demo.lib.xbp
+  * sqlmt-demo.lib.xbp
+  * sql.lib.xbp
+  * sqlmt.lib.xbp
+  * libsqlrdd.a.xbp
+    + Added compilation to sqlconnection.prg
+
+2004-11-17 12:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SEEK bug when combining some datatypes (more few missing
+      combinations..)
+
+2004-11-17 12:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SEEK bug when combining some datatypes (non Postgres)
+    ! Fixed SET EXACT influence on SEEK
+  * source/sqlrdd1.c
+    ! Fixed loadTagDefault() to return correct tag
+  * source/sqlmy.c
+    ! Fixed MYSTABLEATTR to not run full table scan
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # 21
+
+2004-11-16 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SEEK bug when combining some datatypes
+
+2004-11-08 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed Synthetic Index when SET EXACT is ON
+  * source/sqlodbc.prg
+  * source/sqlodbc.ch
+    + Added MSSQL Server Unicode Support
+
+2004-11-04 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+  * source/utilslang.prg
+    ! Fixed recent introduced bug in SqlOrderInfo
+    ! Fixed and improved run time error messages
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # 20
+
+2004-10-28 21:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Added optimizer hints to MySQL
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # 19
+
+2004-10-27 14:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Added SR_ESCAPESTRING() call when creating Synthetic Indexes
+  * source/sqlodbc.ch
+    ! Minor formatting
+
+2004-10-19 13:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! internal build # updated
+  * sql-demo.lib.xbp
+    ! Build fixed
+
+2004-10-19 12:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    + Added NULLS FIRST logic to Oracle and Firebird indexes
+      (Oracle users should apply ALL correction patches available
+      to current version)
+    ! Code optimizations
+  * source/sqlodbc.prg
+  * source/sqloracle.prg
+  * source/sqlpgs.prg
+  * source/sqlmy.prg
+    ! Code optimizations
+
+2004-10-18 14:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! Fixed TYPO in SR_SetSyntheticIndexMinimun(nSet)
+    ! Fixed bug in SR_DropIndex(). It was dropping only first TAG of
+      index. Correct is drop ALL TAGs.
+  * source/sqlodbc.prg
+    ! Minor fix to report errors with very long queries
+  * source/odbc.c
+    ! Touched
+
+2004-10-11 14:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+  * source/sqlrdd2.prg
+    + Added automatic SyntheticIndex behavior: It automatically switches
+      ON if database is Oracle or Postgres, and if index has more than
+      3 columns
+
+2004-10-09 00:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * doc/SQLRDD Manual - EN.doc
+    + Added references to CA-Ingres R3
+
+2004-10-08 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlact.c
+    + Added escape to Ingres R3 strings
+  * source/sqlrdd2.prg
+    + Added Ingres R3 support
+
+2004-10-07 11:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    - Fixed dbAppend to allow empty records in table (No sense, but DBF
+      compatible)
+    - Recerted change from HB_IT_LONG to HB_IT_NUMERIC
+
+2004-10-07 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/oracle.c
+  * source/orautils.c
+  * source/orautils2.c
+  * source/sqloracle.prg
+    - Reverted last Luiz's changes
+  * source/sqlrdd.ch
+    ! Tagged build # 17
+
+2004-10-07 08:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * doc/SQLRDD Manual - EN.doc
+  * doc/SQLRDD Reference - EN.doc
+    ! Docs updated
+
+2004-10-06 09:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    + Added SR_SetSyntheticIndex(lSet) ==> lOld
+      Synthetic indexes are those created by adding a hidden column in table
+      to hold index key expression return value. Setting synthetic index on,
+      all orders are created this way. Benefits are best SKIP, SEEK, GOTOP
+      and GOBOTTOM performance with very large tables. Disadvantages are
+      waste of physical space and prohibition to UPDATE or INSERT in table
+      from outside xHb application. Anyway, it feels great to browse a
+      TWO MILLION RECORDS table as fast as a 200 records table!
+      This idea was used in previous SQLRDD versions to support propertary
+      index key expressions like 'subStr(filed1,3,5) + MyFunc( value )'
+  * source/sqlrdd2.prg
+  * source/sqlrdd.ch
+    + Support for SR_SetSyntheticIndex() settings
+    ! Several fixes in synthetic indexes
+  * source/sqlrdd1.c
+    ! Fixed: force item lenght and decimal precision when a numeric value is
+      pushed in a field, like: FIELD->NUMVAL := nNumericValue
+    ! Changed ProcessFields() to apply HB_IT_NUMERIC to numeric fields instead of
+      HB_IT_LONG
+  * samples/demo_odbc.prg
+  * samples/demo_pgs_native.prg
+  * samples/demo_mysql_native.prg
+  * samples/demo_oracle_native.prg
+    ! Few fixes in demo
+
+2004-10-05 08:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed recno() after dbAppend() to reflect correct line number to be inserted
+      under Postgres, Oracle and Firebird. It was previously correct case nobody was
+      adding records to table at same time.
+  * source.sqlrdd1.c
+    ! Minor formatting
+
+2004-10-02 15:00 UTC-0300 Luiz Rafael Culik Guimaraes< culikr at xharbour.com.br>
+  * source/orautils.c
+  * source/oratuils2.c
+  * source/oracle.c
+    ! small changes to avoid potential GPF
+  * source/sql.y
+    ! minor change to compile in mt mode
+  + sqlmt-demo.lib.xbp
+    sqlmt.lib.xbp
+    + projects to build sqlrdd in mt mode(need on mt apps such as an rpcserver)
+
+2004-09-28 20:50 UTC-0300 Luiz Rafael Culik Guimaraes< culikr at xharbour.com.br>
+  * source/orautils.c
+  * source/oratuils2.c
+  * source/oracle.c
+    ! minor formatting
+  * source/sqloracle.prg
+    ! added call to oraclefreeenv on method end
+
+2004-09-28 16:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed errors in last commit (Now I disabled xEdit autosave...)
+
+2004-09-22 19:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed OrdListAdd() to keep the controlling index
+    ! Fixed SKIP error in Postgres when index key includes an empty date
+    ! Added syntetic index key recycle logic
+
+2004-09-20 08:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * include/sqlrdd.ch
+  * source/sqlrdd.ch
+  * source/sqlrdd0.prg
+    ! Changed const name CONNECT_ORA_QUERY_ONLY to CONNECT_ORACLE_QUERY_ONLY
+    + Added CONNECT_QUERY_ONLY constant
+    ! Tagged HB_SQLRDD_BUILD #10
+  * source/sqlrdd1.c
+    ! Minor fixes in trace routines
+  * source/sqlrdd2.prg
+    ! Fixed char escape when using LIKE operator in MSSQL
+  * todo.txt
+    ! Updated
+
+2004-09-18 15:11 UTC-0300 Luiz Rafael Culik Guimaraes< culikr at xharbour.com.br>
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    source/sqlrdd0.prg
+    ! Added support to Oracle Native Query only mode
+  * source/orautils.c
+    source/oratuils2.c
+    ! minor formatting and an fix to OraclePrepateSt
+  * source/oracle.c
+    ! fix to OracleTableAttr()
+  - sql.a.xbp
+    Renamed to libsqlrdd.a.xbp (this to generate correct linux lib name)
+
+2004-09-09 07:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sql.y
+    + Added suport to SUBSTR and TRIM in ORDER BY clause
+  * source/sqlgen1.prg
+    ! SUBSTR should be SUBSTRING under Syabse and MSSQL Server
+
+2004-09-07 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Tagged version 5.0 build #6
+
+2004-09-07 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqloracle.prg
+    - Removed debug inkey() from source
+  + source/oci.h
+  + source/ori.h
+  + source/orl.h
+  + source/ort.h
+  + source/oro.h
+    + Added missing Oracle Call Interface (OCI) include files
+  + source/sqlora.ch
+    + Added missing SQLRDD Oracle header
+  + ib_util.h
+  + ibase.h
+  + iberror.h
+    + Added Firebird include files (native support is comming soon)
+  + include/oracle.ch
+    + Added header file to be recognized by xBuild further versions
+  * samples/dbf2sql.prg
+    + Added support to Oracle native connection
+  + samples/demo_oracle_native.prg
+    + Added Oracle sample
+  + lib/oci.lib
+    + Added missing Oracle export lib
+  + dll/oci.dll
+    + Added missing Oracle Call Interface (OCI) DLL
+
+2004-09-06 23:10 UTC-0300 Luiz Rafael Culik Guimaraes< culikr at xharbour.com.br>
+  * source/sqlrdd.ch
+  * source/sqlrdd0.prg
+     !enable support for oracle native
+  * sql-demo.a.xbp
+  * sql-demo.lib.xbp
+  * sql.a.xbp
+  * sql.lib.xbp
+    ! updated makefiles to support oracle  native
+  + source/nzerror.h
+  + source/nzt.h
+  + oci1.h
+  + oci8dp.h
+  + ociap.h
+  + ociapr.h
+  + ocidef.h
+  + ocidem.h
+  + ocidfn.h
+  + ociextp.h
+  + ocikp.h
+  + ocikpr.h
+  + ocixad.h
+  + oracle.c
+  + oracle.h
+  + oratypes.h
+  + orautils.c
+  + orautils2.c
+  + sqloracle.prg
+    ! xharbour native oracle support files(.c and oci headers)
+
+2004-09-06 14:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Reset pending relations BEFORE dbSeek /* NASTY bug! */
+  * source/sqlact.c
+    + Added C-level sr_escapeNumber()
+  * source/sqlrdd2.prg
+    ! Fixed date seek with non-britsh date format /* NASTY bug! */
+  * source/pgs.c
+    + Stared line retrieve optimization
+    ! Changed long => LONG
+    ! Fixed return on error
+  * source/sqlrdd2.prg
+    ! SoftSeek under Postgres greatly optimized!
+    - Removed useless function ConvTypeDT()
+
+2004-09-06 14:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Changed dbCreate() under Postgres to use VARCHAR instead of CHAR
+
+2004-08-28 16:35 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! Fixed SR_FILE() when used inside a Postgres Transaction
+  * source/sqlrdd2.prg
+  * source/sqlodbc.prg
+  * source/sqlact.c
+  * source/sqlgen1.prg
+    + More Firebird (running ok via ODBC)
+  * source/sqlrdd.ch
+    ! Tagged build 3
+
+2004-08-14 14:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlodbc.prg
+  * source/sqlrdd2.prg
+  * source/sqlrdd0.prg
+    + Added Firebird/Interbase support
+  * source/sqlpgs.prg
+    ! Added missing ROW LOCK timeout
+
+2004-08-10 19:32 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc.c
+    + Added SQLBINDOUTPARAMX() by Luiz Culik - thanks!
+  * source/sqlodbc.prg
+  * source/sqlmy.prg
+  * source/sqlpgs.prg
+    ! Changed direct query to use DEFAULT RDD when creating temp table
+    ! NUMERIC(38) is not recognized as "L" data type in Oracle with
+      direct queries - reported by Thomas Harlen
+    ! Added aFields instance to hold last read structure
+
+2004-08-10 16:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * sql.a.xbp
+  * sql-demo.a.xbp
+    ! Linux builds updated
+  * source/sql.y
+    ! dos2unix, now it runs under Linux
+
+2004-08-10 14:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+  * source/sqlrdd0.prg
+    ! Introducing new cache management. Very simpler and faster.
+    ! Record body optimizer removed
+    - Cache class references removed
+    ! Class variables clean up
+    + Introducing intelligent optimization hints
+    + Introducing Intelligent paging cache optimizor
+    + Added SR_FetchSize() and SR_MaxRowCache() tuning functions
+  * source/sqlcache.prg
+  * sql.lib.xbp
+    - File removed: sqlcache.prg
+  * include/sqlrdd.ch
+    ! Tagged build # to 1
+    ! Tagged version 5.0
+    - Removed optimizer hints constants
+    - Removed MSSQL NOLOCK hint (added to connection parameters)
+  * source/utils.prg
+    ! Minor change to sr_val2char()
+  * source/pgs.c
+    ! Formatting
+  * source/sqlodbc.prg
+  * source/sqlpgs.prg
+  * source/sqlmy.prg
+    ! Added GetLine() Method
+
+2004-08-05 12:22 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    ! Fixed ORDSETFOCUS() with no params after index creation
+
+2004-08-05 07:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sql.y
+    ! Added missing support to following syntax:
+      SELECT ... FROM ... WHERE COLUMN [=|>|<|>=|<=|!=|LIKE] ( SELECT EXPRESSION .... )
+
+2004-08-04 22:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed recent introduced bug on BOF Flag after dbGoto( nCurrentRecord )
+    ! Fixed dbGoTo( Recno() ) in empty tables to be 100% DBF compatible
+    ! Added ESCAPE_STRING to complex index key expression
+  * source/sqlrdd1.c
+    ! Touched
+  * include/sqlrdd.ch
+    ! Tagged build # to 169
+
+2004-08-03 07:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed recent introduced bug when opening empty tables in Postgres
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    ! Tagged build # to 167
+
+2004-08-02 22:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed bug in dbGoTo, reported by Pritpal
+  * source/sqlact.c
+    ! Fixed error report message ins STR2HEX
+
+2004-07-28 22:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed sr_dbRefresh() to refresh current record buffer also.
+
+2004-07-27 18:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Minor optimizations to SKIP under ORACLE
+
+2004-07-26 14:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed NULL seek with Postgres
+
+2004-07-26 01:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed RECNO column declared by user in bInfoBlock (when column
+      name isn't the default one, it should NOT be oculted from workarea)
+  * source/sqlodbc.prg
+    ! Formatting
+
+2004-07-23 02:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SKIP bug when INDEX KEY has NULL columns
+    ! Fixed error report when table does not exist in dbUseArea()
+  * source/utilslang.prg
+    + Added "Open Error" message
+  * source/sqlodbc.prg
+  * source/sqlmy.prg
+  * source/sqlpgs.prg
+    ! Removed 10 bytes field name lenght limitation (HIGHLY EXPERIMENTAL!)
+
+2004-07-19 16:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+  * include/sqlrdd.ch
+    + Added new connection type: CONNECT_ODBC_QUERY_ONLY
+  * source/sqlrdd0.prg
+    + Support to CONNECT_ODBC_QUERY_ONLY. Use this with SR_AddConnection
+      to create connections that can be used only to perform queries in
+      target database
+  * source/odbc.c
+    ! Sync with xHarbour ODBC
+
+2004-07-13 21:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc.c
+    + Added SqlBindOutParam() function
+  * samples/Oracle_Stored_Procedure.prg
+    + Added new sample to run a stored procedure and return output values
+      with Oracle Databse
+  * source/sqlrdd0.prg
+    ! Changed sr_ListIndex() function to return RTrimm'ed index names
+
+2004-07-09 16:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SOFT SEEK with numeric values
+
+2004-07-09 09:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlact.c
+    ! Postgres string escape function now removes NULL char from string
+
+2004-07-08 12:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed SEEK method under Postgres (bug introduced by latest optimizations)
+  * source/sqlrdd.ch
+    ! Tagged build # to 165
+
+2004-07-06 15:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlmy.prg
+    ! Fixed FieldGet Method. There is no meaning on calling MYSResultStatus()
+      under MySQL native API at this point.
+    ! Changed MYSRESULTSTATUS() data type from int to UINT to be compliant with
+      MySQL client library return value.
+
+2004-07-05 23:10 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed dbGoTo() problem when positioned at lastrec() + 1
+      /* Reported by Pritpal */
+    - Removed useless lIsOnGhost class member.
+
+2004-07-02 12:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Reset cache information when OrdSetFocus(0) is issued to avoid
+      wrong SKIP navegation /* Reported by Pritpal */
+
+2004-07-01 19:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed positioning bug in OrdSetFocus(0) /* Reported by Pritpal */
+
+2004-06-30 18:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed TYPO ::Sql: ==> ::oSql:
+
+2004-06-27 01:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Tagged build # to 162   // this is really useful in release time
+  * source/sqlrdd1.c
+    ! Fixed bug in OrdeListFocus() - it was not returning correctly
+      previous order name
+
+2004-06-25 16:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Tagged build # to 161   // this is really useful in release time
+  * source/sqlrdd2.prg
+    + Added dbCount() method
+  * source/utils.prg
+    + Added dbCount() function. Now you can count how many records you
+      have in a table, and this is sensitive to SET DELETED. Runs like
+      a rocket, no similar in dbf :-)
+
+2004-06-25 12:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+
+2004-06-25 12:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Changed build # to 160
+  * source/sqlrdd0.prg
+    ! Fixed catalog tables creation, reported by Pritpal
+  * source/sqlrdd2.prg
+    + Enabled initial FOR CLAUSE support (not fully functional yet)
+
+2004-06-24 17:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Changed build # to 159
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    ! Fixed bug when skipping with SET DELETED OFF
+  * samples/dbf2sql.prg
+    ! Reverted to version BEFORE Apollo (must run under Linux)
+  + samples/Apollo2sql.prg
+    + File added
+
+2004-06-24 13:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd.ch
+    ! Changed build # to 158
+  * source/sqlrdd1.c
+    ! Fixed serialized memo fields to aClone array before returning it
+      in sqlGetValue method.
+  * samples/dbf2sql.prg
+    ! Minor fixes
+
+2004-06-23 21:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    ! Fixed sqlExists and sqlDrop methods
+  * source/sqlrdd0.prg
+    ! Fixed owner resolution in SR_File(), SR_Drop*(), SR_Rename()
+      SR_Exist*() functions. Now it can be inherited from bInfoBlock
+      returning array.
+  * source/sqlgen1.prg
+    ! Changed SQL code generator to use new string escape functions
+  * source/odbc.c
+    ! Fixed GPF trap in SqlGetData()
+  * source/sqlact.c
+    ! Fixed memory leaks in SRTTOHEX and HEXTOSTR functions
+
+2004-06-23 19:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/pgs.c
+  * source/mysql.c
+    - Removed escape string functions added by Luiz
+  * source/sqlact.c
+    + Added new, generic escape string function SR_ESCAPESTRING()
+    + Added database-dependent escape string functions to MySQL, Postgres,
+      MSSQL Server and Oracle
+  * source/sqlrdd2.prg
+    ! Changed ::Quoted*() methods to use new escape string functions
+  * source/sqlmy.prg
+    ! Removed method to parse SQL data strings
+
+2004-06-22 18:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/pgs.c
+    + Added function to parse SQL data strings under Postgres by Luiz Culik
+  * source/sqlact.c
+    + Fixed serialization GPF trap
+  * include/sqlrdd.ch
+  * source/sqlrdd.ch
+    ! Formatting and minor fixes by Paul Tucker
+  * source/sqlcache.prg
+  * source/sqlrdd2.prg
+    ! Formatting
+
+2004-06-20 21:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Removed "OPTION FAST 170" hint from SQL Server and added "TOP 170"
+      optimization hint
+  * source/sqlrdd.ch
+    ! Increment build # to 55
+
+2004-06-20 18:36 UTC+0100 Patrick Mast <patrick@xHarbour.com>
+  * doc/SQLRDD Manual - EN.doc
+    ! Changed copyright year
+    ! .."for xHarbour" changed to .."for xHarbour Builder"
+  * doc/SQLRDD Reference - EN.doc
+    ! Changed copyright year
+    ! .."for xHarbour" changed to .."for xHarbour Builder"
+
+2004-06-20 03:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Changed sqlDeleteRec() method to not append a blank line when
+      you issue a "APPEND BLANK; DBDELETE()" sequence, requested by
+      Paul Tucker
+    ! Fixed OrdName(n) to return "" on order not found instead of NIL,
+      /* Bug reported by Paul Tucker */
+  * source/mysql.c
+    + Added function to parse SQL data strings under MySQL by Luiz Culik
+    + Fixed numeric data types by Luiz Culik
+  * source/sqlmy.prg
+    + Added method to parse SQL data strings
+  * source/sqlrdd2.prg
+    ! Changed Quoted* methods to use new ::oSql:EscapeChar() method to
+      parse SQL data strings
+    ! Fixed fLock() to be 100% Clipper compatible (only when
+      SR_SetFastOpen(.f.)
+    ! Created UnlockTable() method in SR_WORKAREA class
+    ! Minor fixes in EXCLUSIVE workareas
+  * source/sqlrdd0.prg
+    ! Fixed minor bug in SR_SetLocks() function
+  * include/sqlrdd.ch
+    + Added fLock constant
+  * include/pgs.ch
+  * include/mysql.ch
+    ! Touched to get updated
+
+2004-06-17 19:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Added __GNUC__ section of #pragma startup
+    ! Fixed Scoping with latest optimizations
+  * source/sqlrdd2.prg
+    ! Fixed Scoping with latest optimizations
+
+2004-06-16 14:15 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    ! Corrected bugs from previous optimizations
+    ! dbGoTop(), dbGoBottom(), dbGoTo() => more optimizations
+    ! Starting dbSkip() optimization
+    ! General buffer and cache optimization
+  * samples/info.prg
+    + Added demonstration of new features
+  * samples/dbf2sql.prg
+    + Added auto index creation by Paul Tucker
+
+2004-06-14 08:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! dbAppend() fully optimized and rewrote in C
+    ! dbGoTop() optimized
+    ! dbGoBottom() optimized
+    ! dbGoTo() optimized
+    ! Minor optimizations
+  * source/sqlrdd2.c
+    - Removed dbAppend from PRG code
+    ! dbGoTop() optimized
+    ! dbGoBottom() optimized
+    ! dbGoTo() optimized
+  * source/sqlodbc.prg
+    ! Minor optimizations
+  * source/sqlcache.prg
+    + Added ExistInCache() method
+  * include/sqlrdd.ch
+    + Added more aInfo contants
+
+2004-06-08 22:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+  * include/sqlrdd.ch
+    + Added new DBI_RDD_BUILD information to retrieve the RDD internal
+      Build #.
+    + Added HB_SQLRDD_BUILD to store Build #.
+  * source/pgs.c
+    ! Fixed NASTY Postgres BUG when 'sum()' function is used in any
+      query. Fact is libpq.lib is BUGGY and returns -1 in data type
+      modifier structure when we have a column like 'count()'
+  * samples/info.prg
+    + Added demonstration of new DBI_RDD_BUILD information
+  * doc/SQLRDD Manual - EN.doc
+    - Removed SR_SetNoGoTopOnOpen() function family reference in
+      performance tuning tips.
+
+2004-06-08 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    - Removed useless RELATION update in sqlGoBottom()
+    - Removed useless RELATION update in sqlGoTop()
+    ! Removed "lNoGoTopOnOpen" static var and added "firstinteract"
+      as automatic optimizer - now dbUseArea() is ALWAYS FAST!
+    - Removed useless datatype verification at each method call
+  * source/sqlrdd2.prg
+    ! Fixed record positioning after DELETE when SR_UseDeleteds(.F.)
+      Record will remain in cache (as deleted() == .T.) until next
+      buffer refresh, but line is physically excluded.
+    ! Added 'aTableInfo' instance hash table to hold table info cache
+
+2004-06-08 10:30 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! minor fix on conditional compile(one messagebox not protectec)
+
+2004-06-08 01:22 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc.c
+    + Added SQLMoreResults() function
+  * source/sqlrdd1.c
+    ! Minor fixes
+  * source/sqlrdd2.prg
+    ! More fixes to OrdScope()
+    ! Optimized @@IDENTITY retrievel with MSSQL Server
+    ! Removed COMMIT instruction from dbUnlock()
+    ! ::aLocked mgmnt improved
+    ! Fixed dbSeek( lValue ) on indexes with "deleted()" key
+    ! SR_UseDeleteds() is now a run time set, not only a create-time
+      parameter. In other words if you SR_UseDeleteds(.F.), DELETE
+      becomes a REAL delete and you cannot RECALL it anymore.
+  * source/sqlodbc.prg
+  * source/sqlmy.prg
+  * source/sqlpgs.prg
+    + Added MoreResults() Method
+  * doc/SQLRDD Reference - EN.doc
+    Adjusted SR_UseDeleteds() documentation to fit new features
+
+2004-06-03 13:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Minor fixes to OrdScope()
+
+2004-06-03 00:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed OrdScope( n, "" ) to be show all records (Clipper compatible)
+    ! Fixed Scope bottom limit SQL expression
+    ! Fixed index column with "deleted()" function
+  * source/sqlrdd1.c
+    ! Fixed OrdName() with no params
+    + Added support to OrdKeyVal()
+    /* Bugs reported by Paul Tucker */
+
+2004-06-01 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+  * source/sqlrdd2.prg
+    - Removed SR_SetOpenExclusive(lOpt) and SR_OpenExclusive() functions.
+      Now SQLRDD will behave 100% Clipper compatible with EXCLUSIVE/SHARED
+      table open only when SR_SetFastOpen( .F. ) is issued. Default is to
+      avoid EXCLUSIVE/SHARED behavior overhead (all files are opened in
+      SHARED mode - the fastest possible mode)
+    ! Changed EXCLUSIVE Open and fLock() support to use new SR_SetLocks()
+      related functions instead of propietary semaphor tables.
+    + Added Lock housekeeping routine at session startup
+    ! Fixed SR_SetLocks() function
+    - Removed table SR_MGMNTLTABLES from SQLRDD catalog (not needed anymore)
+    ! Changed SR_ListLocks() to perform housekeeping before query for locks
+  * source/sqlodbc.prg
+  * source/sqlpgs.prg
+  * source/sqlmy.prg
+    - Removed "oSqlMnt" class instance (former 3rd connection)
+  * source/sqlpgs.prg
+    ! Method Commit() now issues "commit" and "begin" in a single command
+  * doc/SQLRDD Manual - EN.doc
+    - Removed "VERY IMPORTANT notes for ORACLE" section, since it is no
+      longer necessary with new locking schema
+    + Added "Compatibility and Limitations" section
+    ! Minor revision and "Table of Contents" fix
+  * doc/SQLRDD Reference - EN.doc
+    + Added "SR_SetFastOpen()"
+
+2004-05-24 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd1.c
+    ! Fixed FOUND() flag when record position is changed by SET DELETED
+      or SET FILETR in dbcmd.c
+
+2004-05-18 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+  * source/sqlrdd0.prg
+    ! Now SQLRDD opens only 2 connections to RDBMS, not 3.
+
+2004-05-18 00:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * doc/SQLRDD Manual - EN.doc
+    + Added more performance tuning tips
+    + Added "Transactional Control and Locking" section
+    + Added "VERY IMPORTANT notes for ORACLE" section
+
+2004-05-12 12:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed Postgres optimization side effects
+    + Introducing Luiz's changes to Firebird support
+  * source/sqlrdd0.prg
+    + Introducing SR_SetLocks, SR_ReleaseLocks and SR_ListLocks functions
+      (not functional yet)
+  * source/sqlodbc.prg
+    + Introducing Luiz's changes to Firebird support
+
+2004-05-12 10:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed recent introduced SKIP bug under Postgres
+  * source/sqlrdd0.prg
+    ! Fixed new catalog tables creation
+
+2004-05-12 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Oracle lock timeout implemented
+    ! Fixed table exclusive lock under Oracle, Postgres and MS SQL Server
+    ! Fixed recent introduced bug to dbSkip(-1) with IBM DB2
+
+2004-05-06 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    + Added SR_GetToolsOwner() and SR_SetToolsOwner(cOwner) functions
+    ! Code changed to respect catalog tables owner
+  * source/sqlrdd2.prg
+    ! Code changed to respect catalog tables owner
+  * source/doc/SQLRDD Reference - EN.doc
+    + Added documentation to SR_GetToolsOwner()
+      and SR_SetToolsOwner(cOwner)
+
+2004-05-04 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! Fixed Postgres transactional settings
+  * source/sqlrdd2.prg
+    ! Fixed Postgres transactional control
+    ! Fixed Postgres locking schema
+  * source/sqlgen1.prg
+    ! Fixed recent introduced bug when generating queries with UNION
+      and UNION ALL keywords
+  * source/pgs.c
+    ! Commit and Rollback always starts a new transaction to avoid
+      Postgres autocommit BUGGY behavior
+  * source/util.prg
+    * Changed SR_RollBackTransaction() to clean up all workarea
+      pending messages and cache data BEFORE issue ROLLBACK to
+      database server
+  * source/sqlpgs.prg
+  * source/sqlmy.prg
+    * Fixed methods commit and rollback to follow trace behavior
+
+2004-05-01 23:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlpgs.prg
+    ! Fixed Postgres query timeout to behave correct in LOCKS
+
+2004-05-01 09:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/mysql.c
+    ! Fixed TIMESTAMP data type handling with MySQL
+
+2004-05-01 09:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/mysql.c
+    ! Fixed DECIMAL data type handling with MySQL
+    ! Removed debug Tracelogs.
+
+2004-04-27 21:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed horrible bug when creating an index countaining str(n,p1,p2)
+
+2004-04-27 13:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Removed debug messages
+    ! Fixed recent introduced bug when seeking with date fields
+  * source/sqlmy.prg
+    ! Removed debug messages
+
+2004-04-27 13:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! Fixed SR_StartLog() and SR_StopLog()
+  * source/sqlrdd2.prg
+    ! Fixed horrible bug when creating an index that starts with dtos()
+    ! More Postgres optimizations
+
+2004-04-24 13:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed recent introduced bug when writing dates to Postgres
+
+2004-04-24 12:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/pgs.c
+    ! Nullable fields are now DISABLED under Postgres, since its "optimizator"
+      always choose full table scan as NULL field behavior for queries
+  * source/utils.prg
+    ! Changed logfiles to lowercase (Linux)
+  * source/sqlrdd2.prg
+    ! Fixed dbGoBottom() with no active index
+    ! Navigation FWD, BWD and softseek optimized under Postgres (now it's FLYING!)
+    ! Record count optimized with specific Postgres syntax
+
+2004-04-23 13:13 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source/sql.y
+    ! removed one of double declated type select_final, otherwise sqlrdd dont build on linux
+
+2004-04-23 12:55 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+  * source/sqlrdd0.prg
+    ! minor fix to variable name on sr_droptable
+
+2004-04-23 09:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+  * source/sqlrdd0.prg
+    ! Fixed bug related to index name with Postgres
+
+2004-04-21 09:52 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlpgs.prg
+    ! Fixed logical field behavior on native Postgres
+  * doc/SQLRDD Manual - EN.doc
+    + Added "SQLRDD requirements" text
+  * source/sqlrdd0.prg
+    + Added time bomb demo feature
+
+2004-04-19 12:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed some UDF index expression bugs
+
+2004-04-19 12:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+  * source/utils.prg
+    ! Fixed '\' inside strings with Postgres (should be changed to '\\')
+
+2004-04-19 11:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed LOCK to ignore row lock after APPEND BLANK
+
+2004-04-19 09:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    + Added missing SR_RenameTable() support for Oracle, MySQL and
+      Postgres
+
+2004-04-19 07:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd0.prg
+    + Added SR_ListTables() function
+  * source/sqlrdd1.c
+  * source/sqlact.c
+    ! Functions SR_STRTOHEX() and SR_HEXTOSTR() moved from sqlrdd1.c
+      to sqlact.c
+
+2004-04-03 18:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlgen1.prg
+  * source/sqlmy.prg
+  * source/sqlodbc.prg
+  * source/sqlpgs.prg
+  * source/sqlrdd.ch
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    ! SR_MakeBinary() and SR_MakeString() replaced with C optimized
+      functions SR_HEXTOSTR() and SR_STRTOHEX()
+
+2004-03-29 22:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd0.prg
+     ! Added global lock hint to MSSQL Server
+   * source/sqlgen1.prg
+     ! Removed local lock hint to MSSQL Server
+   * source/sqlrdd1.c
+     ! Removed stupid comments
+
+2004-03-27 22:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd0.prg
+     + Added function:
+       SR_RenameTable( cTable, cNewName, cOwner ) - MSSQL Server only.
+
+2004-03-27 23:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd2.prg
+     ! Changed OrdCreate() to support deleted() as a NON-UDF function.
+
+2004-03-27 22:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd0.prg
+     + Added functions:
+       SR_DropIndex( cIndexName, [cOwner] )
+       SR_DropTable( cFileName, [cOwner] )
+       SR_ListIndex( cFilename )
+
+2004-03-26 13:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   + sql.a.xbp
+   + sql-demo.a.xbp
+     + linux xbuild makefiles
+
+2004-03-25 18:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   * source/sqlrdd0.prg
+     + Ajusted SQLRDD_DEMO to be multi platform
+
+2004-03-25 17:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * doc/SQLRDD Manual - EN.doc
+   * doc/SQLRDD Reference - EN.doc
+      + Docs updated, added MySQL native and Postgres native connection
+        parameters, and "Data Types Serialization" chapter
+
+2004-03-25 15:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Oracle TRIGGER should be created only if SR_UseSequences() is
+      TRUE (default).
+
+2004-03-25 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+    ! Fixed OrdScope() bug
+    ! FIxed ORACLE Trigger to use relative SR_RECNO name
+  * source/sqlgen1.prg
+    ! Fixed CONTEXT by reference in recursive SR_GenCode() calls
+      Now subqueires with subqueries works fine under SQL Parser ;-)
+
+2004-03-24 13:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc.c
+  * source/sqlgen1.prg
+  * source/sqlmy.prg
+  * source/sqlodbc.prg
+  * source/sqlpgs.prg
+  * source/sqlrdd.ch
+  * source/sqlrdd1.c
+  * source/sqlrdd2.prg
+    + Added support to store ARRAY, OBJECT, DATE, NUMBER and HASHES in
+      MEMO fields, using standard xHarbour serialization
+  * source/utils.prg
+    + Added functions SR_MakeBinary( cStr ) and SR_MakeString( cBin ) to
+      convert binary to HEX representation - chr(10) + chr(0) == "0A00"
+
+2004-03-23 13:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sqlrdd2.prg
+     + Added SR_RECNO index creation under Postgres
+
+2004-03-18 19:25 UTC-0300 Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
+   * source/mysql.c
+      ! protected inclusion of "windows.h"
+
+2004-03-22 14:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/sql.y
+    ! Fixed SUM( ISNULL( ) ) pCode creation
+    ! Fixed SUBSTR( ) pCode creation
+  * source/sqlgen1.prg
+    ! Fixed several bugs when creating left outer joins
+  * source/sqlrdd2.prg
+    ! Fixed Oracle stored procedure to run counter only when SR_RECNO is NULL
+  * doc/SQLRDD Manual - EN.doc
+    ! Removed "under developement" from MySQL native (still some work to do in DOCs!)
+
+2004-03-16 08:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd0.prg
+   * source/sqlrdd2.prg
+      + Added MS SQL Server Collation option: SR_SetCollation( cName )
+        Default value is database install time option.
+
+2004-03-15 20:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+   * source/sqlrdd1.c
+      ! Symbol optimization
+      ! Fixed memory leaks
+      - Removed proper FIELD structure to improve compatibility
+      ! Fixed sqlCreate() method
+      ! Fixed GPF in OrdFor()
+      - Removed wrong support to DBOI_POSITION
+      ! Fixed Order BAG/TAG management
+      + Added support to SET SCOPE
+      ! SR_RECNO, SR_DELETED and INDKEY_* fields filtered out from
+        workarea structure, remaing as internal fields.
+
+   * source/mysql.c
+   * source/mysql.ch
+   * source/sqlmy.prg
+      + Added MySQL native support
+
+   * source/pgs.c
+   * source/sql.y
+   * source/sqllex.c
+      ! Optimizations and fixed few memory leaks
+
+   * source/sqlact.c
+      ! Optimizations and fixed few memory leaks
+      ! Fixed GPF in SR_SQLParse()
+
+   * source/sqlgen1.prg
+      ! Fixed OUTER JOIN code generation
+      ! Fixed DESCEND ORDER queries
+      ! Fixed subqueries support and recursive call
+
+   * source/odbc.c
+      ! Fixed SqlExecDirect() to allow strings with NULLs inside
+
+   * source/sqlodbc.prg
+      ! Fixed support to Oracle MEMO fields with CLOB
+
+   * source/sqlrdd.ch
+      + Added command USE ... CONNECTION ...
+      ! Fixed Query Optimizers
+
+   * source/sqlrdd2.prg
+      + Added support to DTOS() in index expression as a regular function
+      ! Fixed error message when using SQLRDD without a valid database connection
+      + Added TRIGGER to get default Record # with Oracle
+      ! Fixed dbSeek() with SOFTSEEK
+
+   * source/sqlrdd0.prg
+      ! Fixed error message when using SQLRDD without a valid database connection
+      ! Optimized to use HASH to register workareas
+      + Added SR_SetTimeTrace( nConnection, nMilisseconds )
+
+   * source/sqlcache.prg
+      ! Optimized to use HASHES
+      ! Fixed extreme memory consume
+
+   * source/sql.lib.xbp
+   * source/sql-demo.lib.xbp
+      + Added MySQL native compilation
+
+   * doc/SQLRDD Manual - EN.doc
+   * doc/SQLRDD Reference - EN.doc
+      + Docs updated
+      + Added new chapter "Performance Tuning Tips"
+

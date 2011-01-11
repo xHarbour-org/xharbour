@@ -1,0 +1,97 @@
+Welcome to xHarbour.com SQLRDD for Borland compiler!
+----------------------------------------------------
+
+Please read whole file before starting.
+
+We strongly suggest you to try the samples shipped with this package before
+introduce SQLRDD to your applications. Doing this, you will be familiar with
+database connection issues.
+
+We also recommend you to read SQLRDD manual and metodology files, located
+in \SQLRDD\doc folder.
+
+
+
+Building the samples
+--------------------
+
+
+The supplied bat files to build the samples are:
+
+\SQLRDD\samples\SQLRDD\make_9770.bat  ---> Use this if xHarbour version is 0.9.770
+
+\SQLRDD\samples\SQLRDD\make.bat       ---> Use this if xHarbour version is 0.9.771
+
+To be sure of what xHarbour version do you have, please execute:
+
+\xHarbour\bin\harbour /build
+
+If your xHarbour version is older than 0.9.770 you should upgrade to newest one.
+
+The build bat files assume your xHarbour installation is located in \xHarbour
+folder, in the same disk drive you installed SQLRDD. If your xHarbour folder is
+in a different location, please edit the build.bat file and change it to correct
+place.
+
+You also have to edit sqlrdd.ini and change the connection parameters to your
+database(s).
+
+We recommend you to start with demo01. This sample shows how regular xBase
+commands and functions (like dbCreate(), INDEX, GoTop(), Seek(), SKIP, eof(), etc.,
+can work with SQL databases in same fashion of plain DBF files!
+
+
+Building your application with SQLRDD
+-------------------------------------
+
+
+It's very easy to build your applications with SQLRDD, following these steps:
+
+1 - Add \SQLRDD\include folder to your include folders list
+
+2 - Add \SQLRDD\lib and/or \SQLRDD\lib\0.99.71 to your lib folders list,
+    depending on xHarbour version you are currently using: .99.70 or .99.71.
+    To be sure what's your current xHarbour version, execute
+    \xharbour\bin\harbour.exe /build
+
+3 - Add sql.lib to your project, as well as the target database libs that can 
+    be found in \SQLRDD\lib
+
+
+Changes required in your source code:
+
+If your application already runs in xHarbour with DBF files, you will need to
+make the following changes:
+
+1 - Add database connection instructions. You can use the ones in
+    samples\SQLRDD folder. See samples\SQLRDD\connect.prg.
+
+2 - Upload your DBF files to database. You may use samples\SQLRDD\dbf2sql.prg
+    for this.
+
+3 - Add needed REQUESTs and include files in your main PRG:
+
+#include "sqlrdd.ch"       // SQLRDD Main include
+#include "pgs.ch"          // Needed if you plan to use native connection to Postgres
+#include "mysql.ch"        // Needed if you plan to use native connection to MySQL
+#include "oracle.ch"       // Needed if you plan to use native connection to Oracle
+#include "firebird.ch"     // Needed if you plan to use native connection to Firebird
+
+REQUEST SQLRDD             // SQLRDD should be linked in
+REQUEST SR_ODBC            // Needed if you plan to connect with ODBC
+REQUEST SR_PGS             // Needed if you plan to use native connection to Postgres
+REQUEST SR_MYSQL           // Needed if you plan to use native connection to MySQL
+REQUEST SR_ORACLE          // Needed if you plan to use native connection to Oracle
+REQUEST SR_FIREBIRD        // Needed if you plan to use native connection to Firebird
+
+
+
+Support
+-------
+
+Please visit www.xHarbour.com and click in support to learn about support options
+
+
+All the best,
+
+Your xHarbour.com team
