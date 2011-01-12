@@ -545,11 +545,6 @@ METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    DEFAULT lSaveAs TO .F.
 
-   //IF ::VrReport:DataSource == NIL
-   //   oApp:MainForm:MessageBox( "A DataSource must be assigned to the Report object" )
-   //   RETURN .F.
-   //ENDIF
-
    IF ::FileName == "Untitled.vrt" .OR. lSaveAs
       IF ( cName := ::SaveAs() ) == NIL
          RETURN .F.
@@ -621,6 +616,7 @@ METHOD Save( lSaveAs ) CLASS Report
                IF ::VrReport:DataSource != NIL
    cBuffer += "   oRep:DataSource:EditCtrl:Close()"                                       + CRLF
                ENDIF
+   cBuffer += "   oRep:Preview()"                                                            + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
@@ -658,7 +654,7 @@ METHOD Save( lSaveAs ) CLASS Report
        ENDIF
    NEXT
    cBuffer += "   oRep:nRow += nHeight" + CRLF
-   cBuffer += "RETURN oCtrl" + CRLF
+   cBuffer += "RETURN NIL" + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
    MEMOWRIT( ::FileName, cBuffer, .F. )
@@ -669,15 +665,13 @@ METHOD Save( lSaveAs ) CLASS Report
 
       cHrb := STRTRAN( ::FileName, ".vrt", ".hrb" )
       
-      //FERASE( ::FileName )
-      //FRENAME( cHrb, ::FileName )
+      FERASE( ::FileName )
+      FRENAME( cHrb, ::FileName )
       
-      IF FILE( cHrb )
-         pHrb := __hrbLoad( cHrb )//::FileName )
+      IF FILE( ::FileName )
+         pHrb := __hrbLoad( ::FileName )
          __hrbDo( pHrb, .F. )
          __hrbUnload( pHrb )
-
-         FERASE( cHrb )
       ENDIF
    ENDIF
 
