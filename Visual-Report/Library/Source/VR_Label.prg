@@ -14,8 +14,6 @@
 
 #define  acObjectTypeText           5
 
-#define PIX_PER_INCH   1440
-
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text     READ xText WRITE SetText
    DATA ClsName      EXPORTED  INIT "Label"
@@ -28,8 +26,7 @@ CLASS VrLabel INHERIT VrObject
    METHOD Create()
    METHOD SetText()
    METHOD Draw()
-   METHOD nLogPixelX()    INLINE PIX_PER_INCH
-   METHOD nLogPixelY()    INLINE PIX_PER_INCH
+   METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -91,24 +88,26 @@ METHOD SetText( cText ) CLASS VrLabel
    ENDIF
 RETURN Self
 
-METHOD Draw( x, y, cx, cy ) CLASS VrLabel
-   LOCAL cUnderline, cItalic, cName := "Text" + AllTrim( Str( ::nText++ ) )
-   DEFAULT x TO ::Left
-   DEFAULT y TO ::Top
-   DEFAULT cx TO ::Width
-   DEFAULT cy TO ::Height
+METHOD WriteProps( cBuffer ) CLASS VrLabel
+   cBuffer += "   oCtrl:Text           := " + ValToPrgExp( ::Text )           + CRLF
+   cBuffer += "   oCtrl:ForeColor      := " + ValToPrgExp( ::ForeColor )      + CRLF
+   cBuffer += "   oCtrl:BackColor      := " + ValToPrgExp( ::BackColor )      + CRLF
+   cBuffer += "   oCtrl:Font:FaceName  := " + ValToPrgExp( ::Font:FaceName )  + CRLF
+   cBuffer += "   oCtrl:Font:PointSize := " + ValToPrgExp( ::Font:PointSize ) + CRLF
+   cBuffer += "   oCtrl:Font:Italic    := " + ValToPrgExp( ::Font:Italic )    + CRLF
+   cBuffer += "   oCtrl:Font:Underline := " + ValToPrgExp( ::Font:Underline ) + CRLF
+   cBuffer += "   oCtrl:Font:Weight    := " + ValToPrgExp( ::Font:Weight )    + CRLF
+   cBuffer += "   oCtrl:Left           := " + XSTR( ::Left ) + CRLF
+   cBuffer += "   oCtrl:Top            := " + XSTR( ::Top ) + CRLF
+RETURN Self
 
-   x  := ( ::nLogPixelX() / 72 ) * x
-   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * y )
-   cx := 0//( ::nLogPixelX() / 72 ) * cx
-   cy := 0//( ::nLogPixelY() / 72 ) * cy
+METHOD Draw() CLASS VrLabel
+   LOCAL x, y, cUnderline, cItalic, cName := "Text" + AllTrim( Str( ::nText++ ) )
+
+   x  := ( ::nLogPixelX() / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
  
-
    IF ::Text != NIL
-      //IF ::BackColor != ::SysBackColor
-      //   ::FillRect( { x, y-30, x + cx, y + cy + 30}, PADL( DecToHexa( ::BackColor ), 6, "0" ) ) //"FFFFFF" )
-      //ENDIF
-
       cItalic    := IIF( ::Font:Italic, "1", "0" )
       cUnderline := IIF( ::Font:Underline, "1", "0" )
 
@@ -116,12 +115,10 @@ METHOD Draw( x, y, cx, cy ) CLASS VrLabel
          :CreateObject( acObjectTypeText, cName )
          ::PDFCtrl := :GetObjectByName( cName )
          WITH OBJECT ::PDFCtrl
-            :Attribute( "AutoResize", 1 )  // see above slowness note
+            :Attribute( "AutoResize", 1 )
             :Attribute( "Single Line", 1 )
             :Attribute( "Left",   x )
             :Attribute( "Top",    y )
-            :Attribute( "Right",  x+cx )
-            :Attribute( "Bottom", y+cy )
             :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
             :Attribute( "Text",   ::Text )
             IF ::ForeColor != ::SysForeColor

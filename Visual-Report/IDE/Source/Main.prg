@@ -469,9 +469,15 @@ METHOD Close() CLASS Report
    ENDIF
    
    WITH OBJECT oApp
-      AEVAL( :Props[ "Header" ]:Objects, {|o|o:EditCtrl:Destroy()} )
-      AEVAL( :Props[ "Body"   ]:Objects, {|o|o:EditCtrl:Destroy()} )
-      AEVAL( :Props[ "Footer" ]:Objects, {|o|o:EditCtrl:Destroy()} )
+      ::VrReport := NIL
+      :Props:Components:Reset()
+
+      AEVAL( :Props:Header:Objects, {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:Body:Objects, {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:Footer:Objects, {|o|o:EditCtrl:Destroy()} )
+      :Props:Header:Objects := {}
+      :Props:Body:Objects   := {}
+      :Props:Footer:Objects := {}
 
       :Props:PropEditor:ActiveObject := NIL
 
@@ -492,7 +498,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
-   LOCAL oFile
+   LOCAL oFile, pHrb
    IF cReport == NIL
       oFile := OpenFileDialog( oApp:MainForm )
       oFile:Multiselect := .F.
@@ -503,6 +509,12 @@ METHOD Open( cReport ) CLASS Report
       cReport := oFile:FileName
    ENDIF
 
+   ::Close()
+
+   pHrb := __hrbLoad( cReport )
+   __hrbDo( pHrb, .T. )
+   __hrbUnload( pHrb )
+
    oApp:Props:ToolBox:Enabled    := .T.
    oApp:Props:SaveMenu:Enabled   := .T.
    oApp:Props:SaveBttn:Enabled   := .T.
@@ -511,32 +523,16 @@ METHOD Open( cReport ) CLASS Report
    oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
    ::FileName := cReport
    ::ResetQuickOpen( cReport )
+
 RETURN Self
 
 METHOD Generate( oCtrl, cBuffer ) CLASS Report
    cBuffer += "   // ---- " + lower(oCtrl:Name) + " ---------"+ CRLF
    cBuffer += "   oCtrl := " + lower(oCtrl:ClassName) + "( NIL )" + CRLF
    cBuffer += "   oCtrl:Parent := oRep" + CRLF
-   IF oCtrl:ClsName == "Label"
-      cBuffer += "   oCtrl:Text   := " + ValToPrgExp( oCtrl:Text ) + CRLF
-   ENDIF
+   oCtrl:WriteProps( @cBuffer )
    IF oCtrl:lUI
-      cBuffer += "   oCtrl:ForeColor      := " + ValToPrgExp( oCtrl:ForeColor ) + CRLF
-      cBuffer += "   oCtrl:BackColor      := " + ValToPrgExp( oCtrl:BackColor ) + CRLF
-
-      cBuffer += "   oCtrl:Font:FaceName  := " + ValToPrgExp( oCtrl:Font:FaceName ) + CRLF
-      cBuffer += "   oCtrl:Font:PointSize := " + ValToPrgExp( oCtrl:Font:PointSize ) + CRLF
-      cBuffer += "   oCtrl:Font:Italic    := " + ValToPrgExp( oCtrl:Font:Italic ) + CRLF
-      cBuffer += "   oCtrl:Font:Underline := " + ValToPrgExp( oCtrl:Font:Underline ) + CRLF
-      cBuffer += "   oCtrl:Font:Weight    := " + ValToPrgExp( oCtrl:Font:Weight ) + CRLF
-
-      cBuffer += "   oCtrl:Left   := " + XSTR( oCtrl:Left ) + CRLF
-      cBuffer += "   oCtrl:Top    := " + XSTR( oCtrl:Top ) + CRLF
-      cBuffer += "   oCtrl:Width  := " + XSTR( oCtrl:Width ) + CRLF
-      cBuffer += "   oCtrl:Height := " + XSTR( oCtrl:Height ) + CRLF
       cBuffer += "   oCtrl:Create()" + CRLF
- 
-      cBuffer += "   nHeight := MAX( oCtrl:PDFCtrl:Attribute( 'Bottom' )-oCtrl:PDFCtrl:Attribute( 'Top' ), nHeight )" + CRLF
    ENDIF
 RETURN Self
 
@@ -560,6 +556,7 @@ METHOD Save( lSaveAs ) CLASS Report
               "FUNCTION " + ::GetName(,.F.) + "( lDesign )"                                  + CRLF +;
               "   LOCAL oCtrl"                                                               + CRLF +;
               "   DEFAULT lDesign TO .F."                                                    + CRLF +;
+              "   OutputDebugString( XSTR( lDesign ) )"                                      + CRLF +;
               "   oRep := VrReport():Create()"                                               + CRLF +;
               "   IF oRep == NIL"                                                            + CRLF +;
               "      RETURN NIL"                                                             + CRLF +;
@@ -595,62 +592,66 @@ METHOD Save( lSaveAs ) CLASS Report
 
    cBuffer += "   // Generate body area"                                                     + CRLF
                IF ::VrReport:DataSource != NIL
-   cBuffer += "   oRep:DataSource:EditCtrl:Select()"                                         + CRLF
-   cBuffer += "   WHILE ! oRep:DataSource:EditCtrl:Eof()"                                    + CRLF
+   cBuffer += "   IF oRep:DataSource:EditCtrl:IsOpen"                                        + CRLF
+   cBuffer += "      oRep:DataSource:EditCtrl:Select()"                                      + CRLF
+   cBuffer += "      WHILE ! oRep:DataSource:EditCtrl:Eof()"                                 + CRLF
+   cBuffer += "         " + ::GetName(,.F.) + "_PrintBody()"                                 + CRLF 
+   cBuffer += "         IF oRep:nRow >= ( oRep:oPDF:PageLength - oRep:FooterHeight )"        + CRLF
+   cBuffer += "            " + ::GetName(,.F.) + "_PrintFooter()"                            + CRLF
+   cBuffer += "            oRep:EndPage()"                                                   + CRLF
+   cBuffer += "            oRep:StartPage()"                                                 + CRLF
+   cBuffer += "            " + ::GetName(,.F.) + "_PrintHeader()"                            + CRLF
+   cBuffer += "         ENDIF"                                                               + CRLF
+   cBuffer += "         oRep:DataSource:EditCtrl:Skip()"                                     + CRLF
+   cBuffer += "      ENDDO"                                                                  + CRLF
+   cBuffer += "    ELSE"                                                                     + CRLF
    cBuffer += "      " + ::GetName(,.F.) + "_PrintBody()"                                    + CRLF 
-   cBuffer += "      IF oRep:nRow >= ( oRep:oPDF:PageLength - oRep:FooterHeight )"           + CRLF
-   cBuffer += "         " + ::GetName(,.F.) + "_PrintFooter()"                               + CRLF
-   cBuffer += "         oRep:EndPage()"                                                      + CRLF
-   cBuffer += "         oRep:StartPage()"                                                    + CRLF
-   cBuffer += "         " + ::GetName(,.F.) + "_PrintHeader()"                               + CRLF
-   cBuffer += "      ENDIF"                                                                  + CRLF
-   cBuffer += "      oRep:DataSource:EditCtrl:Skip()"                                        + CRLF
-   cBuffer += "   ENDDO"                                                                     + CRLF
+   cBuffer += "      " + ::GetName(,.F.) + "_PrintFooter()"                                  + CRLF
+   cBuffer += "   ENDIF"                                                                     + CRLF
                 ELSE
    cBuffer += "   " + ::GetName(,.F.) + "_PrintBody()"                                       + CRLF 
    cBuffer += "   " + ::GetName(,.F.) + "_PrintFooter()"                                     + CRLF
                ENDIF
 //---------------------------------------------------------------------------------------------------------   
-
+   cBuffer += "   oRep:EndPage()"                                                            + CRLF
    cBuffer += "   oRep:End()"                                                                + CRLF
                IF ::VrReport:DataSource != NIL
-   cBuffer += "   oRep:DataSource:EditCtrl:Close()"                                       + CRLF
+   cBuffer += "   oRep:DataSource:EditCtrl:Close()"                                          + CRLF
                ENDIF
    cBuffer += "   oRep:Preview()"                                                            + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
    cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintHeader()"                        + CRLF
-   cBuffer += "   local nHeight := 0" + CRLF
    aCtrl := oApp:Props:Header:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
           ::Generate( aCtrl[n], @cBuffer )
        ENDIF
    NEXT
-   cBuffer += "   oRep:nRow += nHeight + ( 10*" + XSTR( oApp:Props:Header:Height ) + ")"     + CRLF
+   cBuffer += "   oRep:nRow := ( 20*" + XSTR( oApp:Props:Header:Height ) + ")" + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
    cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintFooter()"                        + CRLF
-   cBuffer += "   local nHeight := 0" + CRLF
    aCtrl := oApp:Props:Footer:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
           ::Generate( aCtrl[n], @cBuffer )
        ENDIF
    NEXT
-   cBuffer += "   oRep:nRow += nHeight" + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
-
+// This is executed per RECORD oRep:nRow needs updating per RECORD not per field
+//---------------------------------------------------------------------------------------------------------   
    cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintBody()"                          + CRLF
    cBuffer += "   local nHeight := 0" + CRLF
    aCtrl := oApp:Props:Body:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
           ::Generate( aCtrl[n], @cBuffer )
+          cBuffer += "   nHeight := MAX( oCtrl:PDFCtrl:Attribute( 'Bottom' )-oCtrl:PDFCtrl:Attribute( 'Top' ), nHeight )" + CRLF
        ENDIF
    NEXT
    cBuffer += "   oRep:nRow += nHeight" + CRLF
@@ -665,11 +666,11 @@ METHOD Save( lSaveAs ) CLASS Report
 
       cHrb := STRTRAN( ::FileName, ".vrt", ".hrb" )
       
-      FERASE( ::FileName )
-      FRENAME( cHrb, ::FileName )
-      
-      IF FILE( ::FileName )
-         pHrb := __hrbLoad( ::FileName )
+      IF FILE( cHrb )
+         //FERASE( ::FileName )
+         //FRENAME( cHrb, ::FileName )
+
+         pHrb := __hrbLoad( cHrb /*::FileName*/ )
          __hrbDo( pHrb, .F. )
          __hrbUnload( pHrb )
       ENDIF

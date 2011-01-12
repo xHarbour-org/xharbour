@@ -68,11 +68,9 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
          _DrawFocusRect( hDC, aRect )
          ReleaseDC( ::hWnd, hDC )
        ELSEIF ::nDownPos != NIL
-         oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-         
-         oCtrl:xLeft := Snap( x-::nDownPos[1], ::xGrid )
-         oCtrl:xTop  := Snap( y-::nDownPos[2], ::xGrid )
-         
+         oCtrl := ::Application:Props:PropEditor:ActiveObject
+         oCtrl:Left := Snap( x-::nDownPos[1], ::xGrid )
+         oCtrl:Top  := Snap( y-::nDownPos[2], ::xGrid )
          oCtrl:MoveWindow()
       ENDIF
    ENDIF
@@ -118,6 +116,13 @@ METHOD OnLButtonUp( nwParam, x, y ) CLASS RepEdit
    ::nDownPos := NIL
    ::InvalidateRect(, .F. )
    ::ReleaseCapture()
+   TRY
+      WITH OBJECT ::Application:Props:PropEditor
+         :CheckValue( "Left",   "Position", :ActiveObject:Left )
+         :CheckValue( "Top",    "Position", :ActiveObject:Top )
+      END
+   CATCH
+   END
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------

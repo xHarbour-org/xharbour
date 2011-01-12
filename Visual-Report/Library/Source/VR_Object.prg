@@ -11,6 +11,8 @@
 
 #include "debug.ch"
 #include "vxh.ch"
+#define PIX_PER_INCH   1440
+
 
 #define  acObjectTypeText           5
 
@@ -30,6 +32,8 @@ CLASS VrObject
 
    DATA Width       EXPORTED INIT 150
    DATA Height      EXPORTED INIT 150
+   DATA Alignment   EXPORTED INIT 0
+   DATA EnumAlignment EXPORTED INIT { { "No Alignment", "Left", "Center", "Right" }, {0,1,2,3} }
 
    DATA Application EXPORTED
    DATA System      EXPORTED
@@ -37,7 +41,8 @@ CLASS VrObject
    DATA ClsName     EXPORTED
    DATA __ClsInst   EXPORTED
    DATA aProperties INIT { { "Left", "Position" },;
-                           { "Top",  "Position" } }
+                           { "Top",  "Position" },;
+                           { "Alignment",  "Position" } }
    ACCESS EditMode  INLINE ::__ClsInst != NIL
    ACCESS __xCtrlName INLINE ::ClsName
    
@@ -50,8 +55,12 @@ CLASS VrObject
    METHOD SetControlName()
    METHOD Create()
    METHOD SetSize()
-   METHOD Draw()     VIRTUAL
+   METHOD Draw()           VIRTUAL
    METHOD FillRect()
+   METHOD MoveWindow()     INLINE ::EditCtrl:MoveWindow( ::Left, ::Top )
+   METHOD nLogPixelX()     INLINE PIX_PER_INCH
+   METHOD nLogPixelY()     INLINE PIX_PER_INCH
+   METHOD WriteProps()     VIRTUAL
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject

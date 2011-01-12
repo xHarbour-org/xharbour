@@ -54,7 +54,35 @@ CLASS PropEditor INHERIT TreeView
    METHOD OnVertScroll()       INLINE IIF( ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow(),;
                                            ( ::ActiveControl:Destroy(), ::ActiveControl := NIL ), ), NIL
    METHOD GetPropertiesAndValues( oObj ) INLINE __ClsGetPropertiesAndValues( oObj )
+   METHOD CheckValue()
 ENDCLASS
+
+//---------------------------------------------------------------------------------------------------
+
+METHOD CheckValue( cProp, cRoot, xValue ) CLASS PropEditor
+   LOCAL xVal, lDiff, oItem := ::SearchString( cProp, cRoot )
+   IF oItem != NIL
+      xVal := oItem:ColItems[1]:Value
+      IF !( VALTYPE( xVal ) == VALTYPE( xValue ) )
+         xVal := oItem:ColItems[1]:SetValue
+      ENDIF
+      IF ! ( xValue == xVal ) .AND. VALTYPE( xVal ) == VALTYPE( xValue )
+         IF UPPER( cProp ) == "LEFT" .AND. __ObjHasMsg( ::ActiveObject:Parent, "HorzScrollPos" )
+            xValue := ::ActiveObject:Left + ::ActiveObject:Parent:HorzScrollPos
+          ELSEIF UPPER( cProp ) == "TOP" .AND. __ObjHasMsg( ::ActiveObject:Parent, "VertScrollPos" )
+            xValue := ::ActiveObject:Top + ::ActiveObject:Parent:VertScrollPos
+         ENDIF
+
+         IF ( VALTYPE( oItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
+            oItem:ColItems[1]:Value := xValue
+          ELSE
+            oItem:ColItems[1]:SetValue := xValue
+         ENDIF
+         ::InvalidateRect(,.F.)
+         RETURN .F.
+      ENDIF
+   ENDIF
+RETURN .T.
 
 //------------------------------------------------------------------------------------------
 
@@ -177,15 +205,16 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS PropEditor
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
 
       IF ::ActiveObject:lUI
-         __objSendMsg( ::ActiveObject:EditCtrl, "_" + UPPER( xProp ), xValue )
+         TRY
+            __objSendMsg( ::ActiveObject:EditCtrl, "_" + UPPER( xProp ), xValue )
+         CATCH
+         END
          ::ActiveObject:Parent:InvalidateRect( , .F. )
       ENDIF
 
    ENDIF
    IF ( VALTYPE( ::ActiveItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
       ::ActiveItem:ColItems[1]:Value := xValue
-    ELSE
-      ::ActiveItem:ColItems[1]:SetValue := xValue
    ENDIF
    
    IF cProp == "BackColor" .OR. cProp == "ForeColor"
@@ -319,6 +348,10 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
  
           cText   := oItem:ColItems[n]:Value
 
+          IF oItem:ColItems[n]:ColType == "ENUM"
+             cText := cText[ oItem:ColItems[n]:SetValue ]
+          ENDIF
+          
           IF oItem:ColItems[n]:ColType == "DATASOURCE"
              //cText := cText[ oItem:ColItems[n]:SetValue ]:Name
              //VIEW cText
@@ -501,7 +534,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
               cProp := ::ActiveItem:Caption
               ::CurCol := nCol
               _InvalidateRect( ::hWnd, ::ActiveItem:GetItemRect():Array() ,.F.)
-
+              oItem := ::ActiveItem
               IF ::CurCol > 1 .AND. ::ActiveItem:ColItems != NIL .AND. LEN( ::ActiveItem:ColItems ) >= nCol-1
                  cType := ::ActiveItem:ColItems[nCol-1]:ColType
                  IF ::ActiveItem:ColItems[nCol-1]:ReadOnly

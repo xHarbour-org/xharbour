@@ -94,15 +94,9 @@ RETURN oBtn
 
 //------------------------------------------------------------------------------------------
 
-METHOD Reset( oOwner ) CLASS ComponentPanel
+METHOD Reset() CLASS ComponentPanel
    LOCAL n, Component, Btn, aChildren, lUpdate := .T.
    
-   DEFAULT oOwner TO ::Application:Report:CurrentForm
-   
-   IF EMPTY( oOwner:Components )
-      ::Hide()
-   ENDIF
-
    aChildren := {}
    FOR n := 1 TO LEN( ::Children )
        IF ::Children[n]:ClsName == "Button"
@@ -112,16 +106,6 @@ METHOD Reset( oOwner ) CLASS ComponentPanel
    AEVAL( aChildren, {|o| o:Destroy() } )
 
    ::LeftMargin := 10
-
-   FOR EACH Component IN ::Application:Report:AppObject:Components
-       ::AddButton( Component )
-   NEXT
-   FOR EACH Component IN oOwner:Components
-       ::AddButton( Component )
-   NEXT
-   IF !::IsWindowVisible() .AND. !EMPTY( ::Children )
-      ::Show()
-   ENDIF
 RETURN Self
 
 METHOD Refresh() CLASS ComponentPanel

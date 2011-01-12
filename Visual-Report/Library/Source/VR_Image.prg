@@ -28,6 +28,7 @@ CLASS VrImage INHERIT VrObject
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD Draw()
+   METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -62,15 +63,30 @@ METHOD Create() CLASS VrImage
    Super:Create()
 RETURN Self
 
-METHOD Draw( x, y, cx, cy ) CLASS VrImage
-   local cName := "Image" + AllTrim( Str( ::nImage++ ) )
-   WITH OBJECT ::Report:oPDF
+METHOD WriteProps( cBuffer ) CLASS VrImage
+   cBuffer += "   oCtrl:FileName    := " + ValToPrgExp( ::FileName ) + CRLF
+   cBuffer += "   oCtrl:Left        := " + XSTR( ::Left ) + CRLF
+   cBuffer += "   oCtrl:Top         := " + XSTR( ::Top ) + CRLF
+   cBuffer += "   oCtrl:Width       := " + XSTR( ::Width ) + CRLF
+   cBuffer += "   oCtrl:Height      := " + XSTR( ::Height ) + CRLF
+RETURN Self
+
+METHOD Draw() CLASS VrImage
+   local x, y, cx, cy, cName := "Image" + AllTrim( Str( ::nImage++ ) )
+   x  := ( ::nLogPixelX() / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
+   cx := ( ::nLogPixelX() / 72 ) * ::Width
+   cy := ( ::nLogPixelY() / 72 ) * ::Height
+   WITH OBJECT ::Parent:oPDF
       :CreateObject( acObjectTypePicture,  cName )
-      :ObjectAttribute( cName, "FileName", ::FileName )
-      :ObjectAttribute( cName, "Left",     x )
-      :ObjectAttribute( cName, "Top",      y )
-      :ObjectAttribute( cName, "Right",    x + cx )
-      :ObjectAttribute( cName, "Bottom",   y + cy )
+      ::PDFCtrl := :GetObjectByName( cName )
+      WITH OBJECT ::PDFCtrl
+         :Attribute( "FileName", ::FileName )
+         :Attribute( "Left",     x )
+         :Attribute( "Top",      y )
+         :Attribute( "Right",    x + cx )
+         :Attribute( "Bottom",   y + cy )
+      END
    END
 RETURN NIL
 
