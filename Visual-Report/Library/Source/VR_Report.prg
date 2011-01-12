@@ -21,8 +21,6 @@
 #define  acScaleVertical        2
 #define  acCommandToolPageHome  53773
 
-#define  LARGEPDF
-
 CLASS VrReport INHERIT VrObject
    DATA FileName       EXPORTED  INIT "Preview"
    DATA LandScape      EXPORTED  INIT .F.
@@ -57,22 +55,12 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS VrReport
-   #ifdef LARGEPDF
-      ::oPDF := ActiveX( __GetApplication():MainForm )
-      ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
-      ::oPDF:Width  := 0
-      ::oPDF:Height := 0
-      ::oPDF:Create()
-   #else
-      TRY
-         ::oPDF := GetActiveObject( "PDFCreactiveX.PDFCreactiveX" )
-      CATCH
-         TRY
-            ::oPDF := CreateObject( "PDFCreactiveX.PDFCreactiveX" )
-         CATCH
-         END
-      END
-   #endif
+   ::oPDF := ActiveX( __GetApplication():MainForm )
+   ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
+   ::oPDF:Width  := 0
+   ::oPDF:Height := 0
+   ::oPDF:Create()
+
    IF ::oPDF == NIL
       MessageBox( 0, "Error loading report generator" )
       RETURN NIL
@@ -85,21 +73,13 @@ METHOD Create() CLASS VrReport
    ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::LandScape )
 
    ::oPDF:ObjectAttributeSTR( "Document", "DefaultFont", "Courier New,12,400,0,0" )
-   #ifdef LARGEPDF
-      ::oPDF:StartSave( ::FileName + ".pdf", acFileSaveView )
-   #endif
+
+   ::oPDF:StartSave( ::FileName + ".pdf", acFileSaveView )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD End() CLASS VrReport
-   #ifdef LARGEPDF
-      ::oPDF:EndSave()
-      IF ::nPage == 0
-         ::oPDF:End()
-      ENDIF
-   #else
-      ::oPDF:Save( ::FileName + ".pdf", acFileSaveAll )
-   #endif
+   ::oPDF:EndSave()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -113,10 +93,8 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD EndPage() CLASS VrReport
-   #ifdef LARGEPDF
-      ::oPDF:SavePage( ::oPDF:CurrentPage )
-      ::oPDF:ClearPage( ::oPDF:CurrentPage )
-   #endif
+   ::oPDF:SavePage( ::oPDF:CurrentPage )
+   ::oPDF:ClearPage( ::oPDF:CurrentPage )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -200,16 +178,6 @@ METHOD OnInitDialog() CLASS VrPreview
       ENDIF
       :Show()
    END
-   #ifndef LARGEPDF
-      WITH OBJECT ActiveX( Self )
-         :Dock:Left   := Self
-         :Dock:Top    := Self
-         :Dock:Right  := Self
-         :Dock:Bottom := ::StatusBar1
-         :ProgID      := "PDFCreactiveX.PDFCreactiveX"
-         :Create()
-      END
-   #endif
    ::CenterWindow( .T. )
 RETURN NIL
 
