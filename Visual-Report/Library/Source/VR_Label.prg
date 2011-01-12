@@ -145,15 +145,18 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
    ::Parent:SetCapture()
    IF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      IF oCtrl != NIL
-         aRect := oCtrl:GetRectangle()
-         aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-         oCtrl:Parent:InvalidateRect( aRect, .F. )
-         aRect := ::GetRectangle()
-         aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-         ::Parent:InvalidateRect( aRect, .F. )
-         ::Parent:nDownPos := {x,y}
-      ENDIF
+      TRY
+         IF oCtrl != NIL
+            aRect := oCtrl:GetRectangle()
+            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+            oCtrl:Parent:InvalidateRect( aRect, .F. )
+            aRect := ::GetRectangle()
+            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+            ::Parent:InvalidateRect( aRect, .F. )
+            ::Parent:nDownPos := {x,y}
+         ENDIF
+      CATCH
+      END
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL
