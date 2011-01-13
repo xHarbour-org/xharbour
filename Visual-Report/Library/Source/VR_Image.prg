@@ -32,17 +32,31 @@ CLASS VrImage INHERIT VrObject
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
-METHOD Init( oParent ) CLASS VrImage
-   Super:Init( oParent )
-   AADD( ::aProperties, { "Name",     "Object"  } )
-   AADD( ::aProperties, { "FileName", "General" } )
+METHOD Init( oParent, lDesign, nPanel ) CLASS VrImage
+   DEFAULT lDesign TO .T.
+   IF lDesign .AND. oParent == NIL // LOADING!
+      SWITCH nPanel
+         CASE 1
+              oParent := ::Application:Props:Header
+         CASE 2
+              oParent := ::Application:Props:Body
+         CASE 3
+              oParent := ::Application:Props:Footer
+      END
+      ::__ClsInst := __ClsInst( ::ClassH )
+   ENDIF
+   IF oParent != NIL
+      Super:Init( oParent )
+      AADD( ::aProperties, { "Name",     "Object"  } )
+      AADD( ::aProperties, { "FileName", "General" } )
 
-   AADD( ::aProperties, { "Opacity", "General" } )
-   AADD( ::aProperties, { "Alignment", "General" } )
-   AADD( ::aProperties, { "KeepAspectRatio", "General" } )
+      AADD( ::aProperties, { "Opacity", "General" } )
+      AADD( ::aProperties, { "Alignment", "General" } )
+      AADD( ::aProperties, { "KeepAspectRatio", "General" } )
 
-   AADD( ::aProperties, { "Width",  "Size"  } )
-   AADD( ::aProperties, { "Height", "Size" } )
+      AADD( ::aProperties, { "Width",  "Size"  } )
+      AADD( ::aProperties, { "Height", "Size" } )
+   ENDIF
 RETURN Self
 
 METHOD Create() CLASS VrImage

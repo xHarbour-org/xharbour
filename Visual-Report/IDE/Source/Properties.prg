@@ -164,10 +164,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PropEditor
 RETURN 0
 
 //------------------------------------------------------------------------------------------
-METHOD SetValue( xValue, cCaption, oItem ) CLASS PropEditor
-   LOCAL oObj, cProp, cProp2, xVal, n, xProp
+METHOD SetValue( xValue, cCaption ) CLASS PropEditor
+   LOCAL oObj, cProp, cProp2, xVal, n, xProp, oItem
    
-   DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
+   oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    IF oItem == NIL
       RETURN Self
    ENDIF
@@ -180,8 +180,19 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS PropEditor
    cProp2:= oItem:ColItems[1]:Prop2
 
    IF cProp IN {"DataSource"}
-      xValue := oItem:ColItems[1]:Value[2][ xValue ]
-      oItem:ColItems[1]:Value[1] := xValue:Name
+      IF xValue != NIL
+         xValue := oItem:ColItems[1]:Value[2][ xValue ]
+         IF cCaption != NIL
+            oItem:ColItems[1]:Value[1] := cCaption
+          ELSE
+            oItem:ColItems[1]:Value[1] := xValue:Name
+         ENDIF
+       ELSE
+         oItem:ColItems[1]:Value[1] := ""
+         oItem:ColItems[1]:Value[2][1] := NIL
+      ENDIF
+      __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
+      RETURN NIL
    ENDIF
    
    IF !EMPTY( cProp2 )
@@ -213,15 +224,15 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS PropEditor
       ENDIF
 
    ENDIF
-   IF ( VALTYPE( ::ActiveItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
-      ::ActiveItem:ColItems[1]:Value := xValue
+   IF ( VALTYPE( oItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
+      oItem:ColItems[1]:Value := xValue
    ENDIF
    
    IF cProp == "BackColor" .OR. cProp == "ForeColor"
-      ::ActiveItem:ColItems[1]:Color := xValue
+      oItem:ColItems[1]:Color := xValue
       n := hScan( ::System:Color, xValue )
-      ::ActiveItem:ColItems[1]:Value := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
-      _InvalidateRect( ::hWnd, ::ActiveItem:GetItemRect():Array() ,.F.)
+      oItem:ColItems[1]:Value := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
+      _InvalidateRect( ::hWnd, oItem:GetItemRect():Array() ,.F.)
    ENDIF
 
 RETURN Self
@@ -351,15 +362,6 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
           IF oItem:ColItems[n]:ColType == "ENUM"
              cText := cText[ oItem:ColItems[n]:SetValue ]
           ENDIF
-          
-          IF oItem:ColItems[n]:ColType == "DATASOURCE"
-             //cText := cText[ oItem:ColItems[n]:SetValue ]:Name
-             //VIEW cText
-             //IF cText[2][1] != NIL
-             //   cText := cText[2][1]:Name
-             //   VIEW cText
-             //ENDIF
-          ENDIF
 
           cType   := VALTYPE( cText )
 
@@ -369,7 +371,11 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                   EXIT
 
              CASE "A"
+                  // DataSource falls here
                   cText  := cText[1]
+                  IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. ::ActiveObject:DataSource != NIL
+                     cText := ::ActiveObject:DataSource:Name
+                  ENDIF
                   EXIT
 
              CASE "N"
@@ -827,16 +833,17 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                  AADD( aCol[1]:Value[2], Child:Component )
               ENDIF
           NEXT
+          xValue := NIL
         
         ELSEIF UPPER(cProp) == "BACKCOLOR" .OR. UPPER(cProp) == "FORECOLOR"
           xValue := ::ActiveObject:&cProp
           n := hScan( ::System:Color, xValue )
           aCol[1]:Color   := xValue
           aCol[1]:Value   := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
-
           aCol[1]:ColType := "COLORREF"
 
         ELSEIF UPPER(cProp) == "FILENAME" .AND. UPPER(::ActiveObject:ClsName) == "IMAGE"
+          xValue := NIL
           aCol[1]:Value   := ::ActiveObject:FileName
           aCol[1]:ColType := "IMAGENAME"
         ELSE

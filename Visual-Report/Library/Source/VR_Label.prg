@@ -31,7 +31,19 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD Init( oParent ) CLASS VrLabel
+METHOD Init( oParent, lDesign, nPanel ) CLASS VrLabel
+   DEFAULT lDesign TO .T.
+   IF lDesign .AND. oParent == NIL // LOADING!
+      SWITCH nPanel
+         CASE 1
+              oParent := ::Application:Props:Header
+         CASE 2
+              oParent := ::Application:Props:Body
+         CASE 3
+              oParent := ::Application:Props:Footer
+      END
+      ::__ClsInst := __ClsInst( ::ClassH )
+   ENDIF
    IF oParent != NIL
       Super:Init( oParent )
       AADD( ::aProperties, { "Name",      "Object"  } )

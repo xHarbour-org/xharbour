@@ -620,15 +620,13 @@ METHOD Save( lSaveAs ) CLASS Report
    cBuffer += "   IF !lDesign"                                                               + CRLF
    cBuffer += "      oRep:EndPage()"                                                         + CRLF
    cBuffer += "      oRep:End()"                                                             + CRLF
-               IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
+                  IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
    cBuffer += "      IF oRep:DataSource:EditCtrl:IsOpen"                                     + CRLF
    cBuffer += "         oRep:DataSource:EditCtrl:Close()"                                    + CRLF
    cBuffer += "      ENDIF"                                                                  + CRLF
-               ENDIF
+                  ENDIF
    cBuffer += "      oRep:Preview()"                                                         + CRLF
    cBuffer += "   ENDIF"                                                                     + CRLF
-   //cBuffer += "   CATCH"                         + CRLF
-   //cBuffer += "   END"                         + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
@@ -674,16 +672,15 @@ METHOD Save( lSaveAs ) CLASS Report
 
    xhbPath := oApp:IniFile:Read( "Compiler", "Path", "c:\xHB" )
    IF FILE( "c:\xhb\bin\xHB.exe" )
-      view STRTRAN( ::FileName, ".vrt", ".hrb" )
       WaitExecute( xhbPath + "\bin\xHB.exe", ::FileName + " -o" + STRTRAN( ::FileName, ".vrt", ".hrb" ) + " -i"+xhbPath+"\include\w32;"+xhbPath+"\include /gh /n" , , SW_HIDE )
 
       cHrb := STRTRAN( ::FileName, ".vrt", ".hrb" )
       
       IF FILE( cHrb )
-         //FERASE( ::FileName )
-         //FRENAME( cHrb, ::FileName )
+         FERASE( ::FileName )
+         FRENAME( cHrb, ::FileName )
 
-         pHrb := __hrbLoad( cHrb /*::FileName*/ )
+         pHrb := __hrbLoad( ::FileName )
          __hrbDo( pHrb, .F. )
          __hrbUnload( pHrb )
       ENDIF
