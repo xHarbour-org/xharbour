@@ -526,19 +526,23 @@ METHOD Open( cReport ) CLASS Report
 
 RETURN Self
 
-METHOD Generate( oCtrl, cBuffer ) CLASS Report
-   cBuffer += "   // ---- " + lower(oCtrl:Name) + " ---------"+ CRLF
-   cBuffer += "   oCtrl := " + lower(oCtrl:ClassName) + "( NIL )" + CRLF
-   cBuffer += "   oCtrl:Parent := oRep" + CRLF
+METHOD Generate( oCtrl, cBuffer, nPanel ) CLASS Report
+   cBuffer += "   // -------------------------- " + lower(oCtrl:Name) + " --------------------------"+ CRLF
+   cBuffer += "   oCtrl := " + lower(oCtrl:ClassName) + "( NIL, lDesign, "+XSTR(nPanel)+" )" + CRLF
+   cBuffer += "   IF ! lDesign"                                   + CRLF
+   cBuffer += "      oCtrl:Parent := oRep"                        + CRLF
+   cBuffer += "   ENDIF"                                          + CRLF
    oCtrl:WriteProps( @cBuffer )
    IF oCtrl:lUI
-      cBuffer += "   oCtrl:Create()" + CRLF
+      cBuffer += "   oCtrl:Create()"                              + CRLF
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
+   LOCAL oFile
+   
    DEFAULT lSaveAs TO .F.
 
    IF ::FileName == "Untitled.vrt" .OR. lSaveAs
@@ -547,36 +551,38 @@ METHOD Save( lSaveAs ) CLASS Report
       ENDIF
       ::FileName := cName
    ENDIF
+
    ::Modified := .F.
+
 
    aCtrls := {oApp:Props:Header:Objects, oApp:Props:Body:Objects, oApp:Props:Footer:Objects}
    
-   cBuffer := "#include 'vxh.ch'"                                                            + CRLF +;
-              "static nHeight, oRep"                                                         + CRLF + CRLF +;
-              "FUNCTION " + ::GetName(,.F.) + "( lDesign )"                                  + CRLF +;
-              "   LOCAL oCtrl"                                                               + CRLF +;
-              "   DEFAULT lDesign TO .F."                                                    + CRLF +;
-              "   OutputDebugString( XSTR( lDesign ) )"                                      + CRLF +;
-              "   oRep := VrReport():Create()"                                               + CRLF +;
-              "   IF oRep == NIL"                                                            + CRLF +;
-              "      RETURN NIL"                                                             + CRLF +;
-              "   ENDIF"                                                                     + CRLF
-              IF ::VrReport:DataSource != NIL
-   cBuffer += "   WITH OBJECT oRep:DataSource := " + ::VrReport:DataSource:ClassName + "( NIL )" + CRLF
-                  IF ! EMPTY( ::VrReport:DataSource:FileName )
-   cBuffer += "      :FileName := " + ValToPrgExp(::VrReport:DataSource:FileName)            + CRLF
-   cBuffer += "      :Alias    := " + ValToPrgExp(::VrReport:DataSource:Alias)               + CRLF
-                     IF ! EMPTY( ::VrReport:DataSource:bFilter )
-   cBuffer += "      :bFilter  := " + ::VrReport:DataSource:bFilter                          + CRLF
-                     ENDIF
-   cBuffer += "      :Create()"                                                              + CRLF
+   cBuffer := "#include 'vxh.ch'"                                                               + CRLF
+   cBuffer += "static nHeight, oRep"                                                            + CRLF + CRLF
+   cBuffer += "FUNCTION " + ::GetName(,.F.) + "( lDesign )"                                     + CRLF
+   cBuffer += "   LOCAL oCtrl"                                                                  + CRLF
+   cBuffer += "   DEFAULT lDesign TO .F."                                                       + CRLF
+   //cBuffer += "   TRY"                         + CRLF
+   cBuffer += "   IF !lDesign"                                                                  + CRLF
+   cBuffer += "      oRep := VrReport():Create()"                                               + CRLF
+   cBuffer += "      IF oRep == NIL"                                                            + CRLF
+   cBuffer += "         RETURN NIL"                                                             + CRLF
+   cBuffer += "      ENDIF"                                                                     + CRLF
+                  IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
+   cBuffer += "      WITH OBJECT oRep:DataSource := " + ::VrReport:DataSource:ClassName + "( NIL )" + CRLF
+   cBuffer += "         :FileName := " + ValToPrgExp(::VrReport:DataSource:FileName)            + CRLF
+   cBuffer += "         :Alias    := " + ValToPrgExp(::VrReport:DataSource:Alias)               + CRLF
+                        IF ! EMPTY( ::VrReport:DataSource:bFilter )
+   cBuffer += "         :bFilter  := " + ::VrReport:DataSource:bFilter                          + CRLF
+                        ENDIF
+   cBuffer += "         :Create()"                                                              + CRLF
+   cBuffer += "      END"                                                                       + CRLF
                   ENDIF
-   cBuffer += "   END"                                                                       + CRLF
-              ENDIF
-   cBuffer += "   oRep:HeaderHeight := " + XSTR( oApp:Props:Header:Height ) + " * 20"        + CRLF
-   cBuffer += "   oRep:FooterHeight := " + XSTR( oApp:Props:Footer:Height ) + " * 20"        + CRLF
-   cBuffer += "   oRep:StartPage()"                                                          + CRLF + CRLF
-              ;
+   cBuffer += "      oRep:HeaderHeight := " + XSTR( oApp:Props:Header:Height ) + " * 20"        + CRLF
+   cBuffer += "      oRep:FooterHeight := " + XSTR( oApp:Props:Footer:Height ) + " * 20"        + CRLF
+   cBuffer += "      oRep:StartPage()"                                                          + CRLF
+   cBuffer += "   ENDIF"                                                                        + CRLF + CRLF
+
    //cBuffer += "   // Generate non UI components"                                             + CRLF
    //FOR i := 1 TO LEN( aCtrls )
    //    FOR n := 1 TO LEN( aCtrls[i] )
@@ -586,58 +592,62 @@ METHOD Save( lSaveAs ) CLASS Report
    //    NEXT
    //NEXT
 
-   cBuffer += "   // Generate First Page Header"                                             + CRLF
-   cBuffer += "   " + ::GetName(,.F.) + "_PrintHeader()"                                     + CRLF + CRLF
+   cBuffer += "   " + ::GetName(,.F.) + "_PrintHeader( lDesign )"                            + CRLF
 //---------------------------------------------------------------------------------------------------------   
 
-   cBuffer += "   // Generate body area"                                                     + CRLF
-               IF ::VrReport:DataSource != NIL
-   cBuffer += "   IF oRep:DataSource:EditCtrl:IsOpen"                                        + CRLF
+               IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
+   cBuffer += "   IF !lDesign .AND. oRep:DataSource:EditCtrl:IsOpen"                         + CRLF
    cBuffer += "      oRep:DataSource:EditCtrl:Select()"                                      + CRLF
    cBuffer += "      WHILE ! oRep:DataSource:EditCtrl:Eof()"                                 + CRLF
-   cBuffer += "         " + ::GetName(,.F.) + "_PrintBody()"                                 + CRLF 
+   cBuffer += "         " + ::GetName(,.F.) + "_PrintBody( lDesign )"                        + CRLF 
    cBuffer += "         IF oRep:nRow >= ( oRep:oPDF:PageLength - oRep:FooterHeight )"        + CRLF
-   cBuffer += "            " + ::GetName(,.F.) + "_PrintFooter()"                            + CRLF
+   cBuffer += "            " + ::GetName(,.F.) + "_PrintFooter( lDesign )"                   + CRLF
    cBuffer += "            oRep:EndPage()"                                                   + CRLF
    cBuffer += "            oRep:StartPage()"                                                 + CRLF
-   cBuffer += "            " + ::GetName(,.F.) + "_PrintHeader()"                            + CRLF
+   cBuffer += "            " + ::GetName(,.F.) + "_PrintHeader( lDesign )"                   + CRLF
    cBuffer += "         ENDIF"                                                               + CRLF
    cBuffer += "         oRep:DataSource:EditCtrl:Skip()"                                     + CRLF
    cBuffer += "      ENDDO"                                                                  + CRLF
    cBuffer += "    ELSE"                                                                     + CRLF
-   cBuffer += "      " + ::GetName(,.F.) + "_PrintBody()"                                    + CRLF 
-   cBuffer += "      " + ::GetName(,.F.) + "_PrintFooter()"                                  + CRLF
-   cBuffer += "   ENDIF"                                                                     + CRLF
+   cBuffer += "      " + ::GetName(,.F.) + "_PrintBody( lDesign )"                           + CRLF 
+   cBuffer += "      " + ::GetName(,.F.) + "_PrintFooter( lDesign )"                         + CRLF
+   cBuffer += "   ENDIF"                                                                     + CRLF + CRLF
                 ELSE
-   cBuffer += "   " + ::GetName(,.F.) + "_PrintBody()"                                       + CRLF 
-   cBuffer += "   " + ::GetName(,.F.) + "_PrintFooter()"                                     + CRLF
+   cBuffer += "   " + ::GetName(,.F.) + "_PrintBody( lDesign )"                              + CRLF 
+   cBuffer += "   " + ::GetName(,.F.) + "_PrintFooter( lDesign )"                            + CRLF + CRLF
                ENDIF
 //---------------------------------------------------------------------------------------------------------   
-   cBuffer += "   oRep:EndPage()"                                                            + CRLF
-   cBuffer += "   oRep:End()"                                                                + CRLF
-               IF ::VrReport:DataSource != NIL
-   cBuffer += "   oRep:DataSource:EditCtrl:Close()"                                          + CRLF
+   cBuffer += "   IF !lDesign"                                                               + CRLF
+   cBuffer += "      oRep:EndPage()"                                                         + CRLF
+   cBuffer += "      oRep:End()"                                                             + CRLF
+               IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
+   cBuffer += "      IF oRep:DataSource:EditCtrl:IsOpen"                                     + CRLF
+   cBuffer += "         oRep:DataSource:EditCtrl:Close()"                                    + CRLF
+   cBuffer += "      ENDIF"                                                                  + CRLF
                ENDIF
-   cBuffer += "   oRep:Preview()"                                                            + CRLF
+   cBuffer += "      oRep:Preview()"                                                         + CRLF
+   cBuffer += "   ENDIF"                                                                     + CRLF
+   //cBuffer += "   CATCH"                         + CRLF
+   //cBuffer += "   END"                         + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
-   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintHeader()"                        + CRLF
+   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintHeader( lDesign )"               + CRLF
    aCtrl := oApp:Props:Header:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
-          ::Generate( aCtrl[n], @cBuffer )
+          ::Generate( aCtrl[n], @cBuffer, 1 )
        ENDIF
    NEXT
    cBuffer += "   oRep:nRow := ( 20*" + XSTR( oApp:Props:Header:Height ) + ")" + CRLF
    cBuffer += "RETURN NIL" + CRLF + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
-   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintFooter()"                        + CRLF
+   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintFooter( lDesign )"               + CRLF
    aCtrl := oApp:Props:Footer:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
-          ::Generate( aCtrl[n], @cBuffer )
+          ::Generate( aCtrl[n], @cBuffer, 3 )
        ENDIF
    NEXT
    cBuffer += "RETURN NIL" + CRLF + CRLF
@@ -645,12 +655,12 @@ METHOD Save( lSaveAs ) CLASS Report
 //---------------------------------------------------------------------------------------------------------   
 // This is executed per RECORD oRep:nRow needs updating per RECORD not per field
 //---------------------------------------------------------------------------------------------------------   
-   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintBody()"                          + CRLF
+   cBuffer += "STATIC FUNCTION " + ::GetName(,.F.) + "_PrintBody( lDesign )"                 + CRLF
    cBuffer += "   local nHeight := 0" + CRLF
    aCtrl := oApp:Props:Body:Objects
    FOR n := 1 TO LEN( aCtrl )
        IF aCtrl[n]:lUI
-          ::Generate( aCtrl[n], @cBuffer )
+          ::Generate( aCtrl[n], @cBuffer, 2 )
           cBuffer += "   nHeight := MAX( oCtrl:PDFCtrl:Attribute( 'Bottom' )-oCtrl:PDFCtrl:Attribute( 'Top' ), nHeight )" + CRLF
        ENDIF
    NEXT
@@ -658,11 +668,14 @@ METHOD Save( lSaveAs ) CLASS Report
    cBuffer += "RETURN NIL" + CRLF
 
 //---------------------------------------------------------------------------------------------------------   
-   MEMOWRIT( ::FileName, cBuffer, .F. )
-   
+   oFile := CFile( ::FileName )
+   oFile:FileBuffer := cBuffer
+   oFile:Save()
+
    xhbPath := oApp:IniFile:Read( "Compiler", "Path", "c:\xHB" )
-   IF FILE( xhbPath + "\bin\xHB.exe" )
-      WaitExecute( xhbPath + "\bin\xHB.exe", ::FileName + " -i"+xhbPath+"\include\w32;"+xhbPath+"\include /gh /n" , , SW_HIDE )
+   IF FILE( "c:\xhb\bin\xHB.exe" )
+      view STRTRAN( ::FileName, ".vrt", ".hrb" )
+      WaitExecute( xhbPath + "\bin\xHB.exe", ::FileName + " -o" + STRTRAN( ::FileName, ".vrt", ".hrb" ) + " -i"+xhbPath+"\include\w32;"+xhbPath+"\include /gh /n" , , SW_HIDE )
 
       cHrb := STRTRAN( ::FileName, ".vrt", ".hrb" )
       
