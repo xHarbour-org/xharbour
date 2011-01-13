@@ -160,7 +160,8 @@ METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLAS
    DEFAULT nType TO IMAGE_ICON
    DEFAULT lParser TO .F.
 
-   DEFAULT hInst TO ::AppInstance
+   hInst := ::AppInstance
+   
    IF lParser
       cImage := cFile
       nLoad  := LR_LOADFROMFILE //| LR_CREATEDIBSECTION
@@ -233,7 +234,7 @@ RETURN nRet
 
 METHOD AddBitmap( cImage, nMask, hInst, nLoad ) CLASS ImageList
    LOCAL hBmp
-   DEFAULT hInst TO ::AppInstance
+   hInst := ::AppInstance
    hBmp := LoadImage( hInst, cImage, IMAGE_BITMAP,,, nLoad )
    DEFAULT nMask TO ::MaskColor
    //IF nMask == NIL
@@ -252,7 +253,7 @@ RETURN SELF
 
 METHOD AddIcon( hIcon, hInst ) CLASS ImageList
    IF VALTYPE( hIcon ) == "C"
-      DEFAULT hInst TO ::AppInstance
+      hInst := ::AppInstance
       hIcon := LoadIcon( hInst, hIcon )
       //hIcon := LoadImage( hInst, hIcon, IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION | LR_LOADTRANSPARENT )
    ENDIF
