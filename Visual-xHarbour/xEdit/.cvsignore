@@ -1,0 +1,8 @@
+obj
+xbp
+*.log
+*.ppo
+*.prg.bak
+._xedit.prg
+._xeditlib.prg
+._*
