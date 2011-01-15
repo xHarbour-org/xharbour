@@ -39,3 +39,4 @@ MYDEFINES =
 
 [ActiveX.lib]
 
+[libpq.lib]
