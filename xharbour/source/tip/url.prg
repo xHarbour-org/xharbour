@@ -1,5 +1,5 @@
 /*
- * $Id: url.prg,v 1.2 2005/09/23 13:31:36 gdrouillard Exp $
+ * $Id: url.prg,v 1.3 2005/10/05 15:15:13 lf_sfnet Exp $
  */
 
 /*
@@ -215,7 +215,8 @@ METHOD AddGetForm( cPostData )
          cTmp := TipEncoderUrl_Encode( cTmp )
          cData += cTmp + "&"
       NEXT
-      cData[-1] = ""
+      //cData[-1] = ""
+      cData := Left( cData, len( cData) -1 )
    elseIF HB_IsArray( cPostData )
       y:=Len(cPostData)
       FOR nI := 1 TO y

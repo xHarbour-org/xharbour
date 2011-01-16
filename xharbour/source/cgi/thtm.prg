@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.10 2009/07/26 17:01:48 lculik Exp $
+ * $Id: thtm.prg,v 1.11 2009/08/05 20:11:12 marchuet Exp $
  */
 
 /*
@@ -112,24 +112,24 @@ CLASS THtml
 
    METHOD SAY( str, font, size, type, color, style )
 
-   METHOD Qqout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c 
+   METHOD Qqout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
-   METHOD Qout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() 
+   METHOD Qout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
-   METHOD Write( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c 
+   METHOD Write( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
-   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() 
+   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
    METHOD SayColor( t, c ) INLINE DEFAULT( t, "" ), DEFAULT( c, "black" ),;
                     ::cStr +=  '<FONT COLOR="' + c + '">' + t + '</FONT>' 
 
-   METHOD Space( n ) INLINE DEFAULT( n, 1 ), ::cStr +=  Replicate( "&nbsp;", n  )
+   METHOD Space( n ) INLINE DEFAULT( n, 1 ), ::cStr +=  Replicate( "&nbsp;", n  ),if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
    METHOD PutImage( cImage, nBorder, nHeight, cOnclick, cOnMsOver, cOnMsOut, ;
                     cName, cAlt, cTarget, nWidth, lBreak, ID, MAP, ALING, HSPACE )
 
    METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. ), DEFAULT( nCols, 80 ),;
-              ::cStr +=  "<PRE" + IIF( nCols != NIL, ' COLS="' + NTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() 
+              ::cStr +=  "<PRE" + IIF( nCols != NIL, ' COLS="' + NTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF(),if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
    METHOD MultiCol( txt, cols, gutter, width ) INLINE DEFAULT( txt, "" ),;
                     DEFAULT( cols, 2 ),;
@@ -143,7 +143,7 @@ CLASS THtml
 
    METHOD HLine( nSize, nWidth, lShade, cColor )
 
-   METHOD PutParagraph() INLINE ::cStr +=  "<P> </P>" + CRLF() 
+   METHOD PutParagraph() INLINE ::cStr +=  "<P> </P>" + CRLF() ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
    METHOD Paragraph( l, c, style )
 
@@ -244,7 +244,7 @@ CLASS THtml
 
 
    METHOD MapArea( Shape, Alt, Coord, Url ) INLINE ;
-          ::cStr +=  "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() 
+          ::cStr +=  "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() ,if( len( ::cStr) >= 2048,( FWrite( ::nh, ::cStr ),::cstr:=""),)
 
    METHOD EndMap() INLINE ::cStr +=  "</MAP>" 
 
@@ -481,7 +481,11 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    ::cStr +=  '>' 
 
    ::cStr +=  CRLF() 
+   IF Len( ::cStr) >= 2048
 
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
    snHtm := ::nH
 
    soPage := Self
@@ -559,6 +563,12 @@ METHOD SetFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet ) CLASS THtml
 
    cStr += '</FONT>'
    ::cStr +=  cStr + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
+   
    RETURN Self
 
 /****
@@ -626,6 +636,11 @@ METHOD StartFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet, lPut ) CLA
    ENDIF
 
    ::cStr +=  cStr + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -680,6 +695,11 @@ METHOD DefineFont( cFont, cType, nSize, cColor, lSet ) CLASS THtml
    ENDIF
 
    ::cStr +=  cStr + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -789,6 +809,11 @@ METHOD SAY( str, font, size, type, color, style ) CLASS THtml
    ENDIF
 
    ::cStr +=  cOut + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -821,6 +846,12 @@ METHOD Paragraph( lStart, cAlign, cStyle ) CLASS THtml
 
    cStr += CRLF()
    ::cStr +=  cStr 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
+   
    RETURN Self
 
 /****
@@ -845,6 +876,11 @@ METHOD HLine( nSize, nWidth, lShade, cColor ) CLASS THtml
               '<HR NOSHADE SIZE = ' + NTRIM( nSize ) + IIF( cColor != NIL, " COLOR  " + cColor, "" ) + ' WIDTH = ' + NTRIM( nWidth ) + '%>' + ;
               CRLF() 
    ENDIF
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -869,6 +905,11 @@ METHOD PutHeading( cText, nWeight, lCentered ) CLASS THtml
    IF lCentered
       ::cStr +=  "</CENTER>" 
    ENDIF
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -958,6 +999,11 @@ METHOD PutTextUrl( cText, cUrl, cOnClick, cOnMsOver, cOnMsout, cTarget, font, cl
 
    ::cStr +=  ;
            '</A>' + IIF( lBreak, '<br>' + CRLF(), CRLF() ) 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1029,6 +1075,11 @@ METHOD PutImageUrl( cImage, nBorder, nHeight, cUrl, ;
    ::cStr +=  ;
            '<A HREF=' + cUrl + IIF( cClass != NIL, ' class="' + cClass + '"', "" ) + '><IMG SRC="' + cImage + '"' + ;
            cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1079,6 +1130,11 @@ METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, ;
    ::cStr +=  ;
            '<A HREF=' + cUrl + IIF( cClass != NIL, ' class="' + cClass + '"', "" ) + '>' + cText + '<IMG SRC="' + cImage + '"' + ;
            cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1156,6 +1212,11 @@ METHOD PutImage( cImage, nBorder, nHeight, ;
    ::cStr +=  ;
            '<IMG SRC="' + cImage + '"' + ;
            cStr + '>' + IIF( lBreak, "<br>" + CRLF(), "" ) 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1297,6 +1358,11 @@ METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, ;
    cStr += ">" + CRLF()
 
    ::cStr +=  cStr + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1352,6 +1418,11 @@ METHOD TableHead( cHead, cColor, cAlign, ;
    cStr += cHead + IIF( cFont != NIL, '</font>', "" ) + "</th>" + CRLF()
 
    ::cStr +=  cStr 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1381,6 +1452,12 @@ METHOD NewTableRow( cColor, vAling, aLing ) CLASS THtml
 
    cStr += ">" + CRLF()
    ::cStr +=  cStr 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
+   
    RETURN Self
 
 /****
@@ -1501,6 +1578,12 @@ METHOD NewTableCell( cAlign, cColor, ;
    ENDIF
 
    ::cStr +=  cStr 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
+   
    RETURN Self
 
 /****
@@ -1564,6 +1647,11 @@ METHOD NewForm( cMethod, cAction, cName ) CLASS THtml
    ENDIF
 
    ::cStr +=  '>' + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    scForm := cName
 
@@ -1596,6 +1684,11 @@ METHOD FormEdit( cType, cName, xValue, nSize ) CLASS THtml
    ENDIF
 
    ::cStr +=  ">" 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1704,6 +1797,11 @@ METHOD Pushbutton( cName, cCaption, ;
    ENDIF
 
    ::cStr +=  cStr + ">" 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1759,6 +1857,11 @@ METHOD Button( cName, cCaption, ;
    ENDIF
 
    ::cStr +=  cStr + ">" + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1825,6 +1928,11 @@ METHOD Marquee( cText, cFont, cFntColor, nFntSize, ;
 
    ::cStr +=  "</MARQUEE>" + CRLF() 
    ::EndFont()
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1876,6 +1984,11 @@ METHOD StartMarquee( cFont, cFntColor, nFntSize, ;
 
    ::cStr +=  cStr 
    ::EndFont()
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 
@@ -1950,6 +2063,11 @@ METHOD iFrame( name, src, border, marginwidth, marginheight, ;
    cStr += "</IFRAME>" + CRLF()
 
    ::cStr +=  cStr 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 /*   New    Methods   */
@@ -2016,6 +2134,11 @@ METHOD AddObject( cType, cClassid, cAling, cCode, lDisable, cCodeBase, cName, nW
 
    cStr += " >"
    ::cStr +=  cStr + CRLF() 
+   IF Len( ::cStr) >= 2048
+
+      FWrite( ::nh, ::cStr )
+      ::cstr := ""
+   ENDIF 
 
    RETURN Self
 

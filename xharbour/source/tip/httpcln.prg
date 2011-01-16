@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: httpcln.prg,v 1.10 2008/06/27 15:59:35 marchuet Exp $
  */
 
 /*
@@ -70,8 +70,10 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA hFields      INIT  {=>}
    DATA cUserAgent   INIT  "Mozilla/3.0 compatible"
    DATA cAuthMode    INIT ""
+   DATA cConnetion   INIT "close"
    DATA cBoundary
    DATA aAttachments init {}
+   DATA cLogFile
 
    METHOD New( oUrl,lTrace, oCredentials)
    METHOD Get( cQuery )
@@ -86,17 +88,42 @@ CLASS tIPClientHTTP FROM tIPClient
    METHOD Attach(cName,cFileName,cType)
    Method PostMultiPart
    Method WriteAll( cFile )
-
+   DESTRUCTOR httpClnDesTructor
 HIDDEN:
    METHOD StandardFields()
 
+
+
+
 ENDCLASS
 
+PROCEDURE httpClnDesTructor CLASS  tIPClienthttp
+
+   IF ::lTrace .and. ::nHandle > 0
+      fClose( ::nHandle )
+      ::nHandle := -1
+   ENDIF
+Return
+
 METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientHTTP
+   local cFile :="http"
+   local n := 0
+
    ::super:new( oUrl, lTrace, oCredentials )
    ::nDefaultPort := 80
    ::nConnTimeout := 5000
    ::bChunked     := .F.
+   if ::ltrace
+      if !file("http.log")
+         ::nHandle := fcreate("http.log")
+      else
+         while file(cFile+LTrim(str(Int(n)))+".log")
+           n++
+         enddo
+         ::cLogFile:= cFile+LTrim(str(Int(n)))+".log"
+         ::nHandle := fcreate(::cLogFile)
+      endif
+   endif
 
    HSetCaseMatch( ::hHeaders, .F. )
 RETURN Self
@@ -190,7 +217,7 @@ METHOD StandardFields() CLASS tIPClientHTTP
 
    ::InetSendall( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    ::InetSendall( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
-   ::InetSendall( ::SocketCon, "Connection: close" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "Connection: " + ::cConnetion+::cCRLF )
 
    // Perform a basic authentication request
    IF ::cAuthMode == "Basic" .and. .not. ("Authorization" in ::hFields)

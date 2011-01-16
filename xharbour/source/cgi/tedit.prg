@@ -1,5 +1,5 @@
 /*
- * $Id: tedit.prg,v 1.5 2006/06/22 03:50:13 lculik Exp $
+ * $Id: tedit.prg,v 1.6 2009/03/07 13:45:33 likewolf Exp $
  */
 
 /*
@@ -111,6 +111,8 @@ CLASS THtmlControl
    DATA onKeyDown
    DATA onKeyUp
    DATA onSelect
+   DATA cLink
+   Data cImage
 
    METHOD SetName( c ) INLINE ::Name := c
 
@@ -173,6 +175,9 @@ CLASS THtmlControl
    METHOD SetOnSelect( c ) INLINE ::onSelect := c
 
    METHOD SetLabel( l ) INLINE ::lLabel := l
+   METHOD SetLink( l )  INLINE ::cLink := l
+   METHOD SetImage( l ) INLINE ::cImage := l
+   
 
    METHOD Put()
 
@@ -367,6 +372,15 @@ METHOD Put() CLASS THtmlControl
       //Fwrite( ::nH, "</SELECT>" )
       ::oHtm:cStr += "</SELECT>" 
    ENDIF
+   
+   if ! empty ( ::cLink ) .and. ! emptY(::cImage )
+      cStr :=  ;
+           '<A HREF="' + ::cLink + '"><IMG SRC="' + ::cImage+ '"' + ;
+             '></A>' 
+      ::oHtm:cStr += cStr           
+   endif
+
+   
 
 RETURN Self
 

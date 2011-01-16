@@ -1,5 +1,5 @@
 /*
- * $Id: htmlform.ch,v 1.2 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: htmlform.ch,v 1.3 2006/05/13 16:46:08 lculik Exp $
  */
 
 /*
@@ -118,6 +118,8 @@
           [STYLE <style>]                     ;
           [ID <id>]                           ;
           [<l:LABEL>]                         ;
+          [ LINK <clink>];
+          [IMAGE <cimage>] ; 
           IN <oForm>                          ;
           =>                                  ;
           <oForm>:addControl( ;
@@ -132,7 +134,7 @@
                   __ALIGN__ [<aln>], ;
                   __WRAP__ [<wrap>], ;
                   __TYPE__ [<typ>],;
-                  <style>, <id> ,<.l.>) )
+                  <style>, <id> ,<.l.>),<clink>,<cimage> )
 
 
 #xCommand DEFINE <typ:EDIT,TEXT,TEXTAREA,PASSWORD,BUTTON,IMAGE,CHECKBOX,CHECK,HIDDEN,RADIO,FILE,RESET,SUBMIT,SELECT,LISTBOX> <oCtr>;
@@ -164,6 +166,8 @@
           [STYLE <style>]                          ;
           [ID <id>]                                ;
           [<l:LABEL>]                         ;
+          [ LINK <clink>];
+          [IMAGE <cimage>] ;           
           IN <oForm>                               ;
           =>                                       ;
           <oCtr> := THtmlControl()                 ;;
@@ -195,6 +199,8 @@
           [<oCtr>:SetDisabled(<.dis.>);]           ;
           [<oCtr>:SetReadonly(<.ro.>);]            ;
           [<oCtr>:SetLabel(<.l.>);]            ;
+          [<oCtr>:SetLink(<clink>);]            ;
+          [<oCtr>:SetImage(<cimage>);]            ;
           <oCtr>:Type := __TYPE__ <typ>           ;;
           <oForm>:AddControl( <oCtr> )
 
