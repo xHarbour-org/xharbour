@@ -686,6 +686,47 @@ METHOD Save( lSaveAs ) CLASS Report
       ENDIF
    ENDIF
 
+/*
+   oXmlDoc  := TXmlDocument():new( '<?xml version="1.0"?>' )
+
+   // Create main XML node
+   oXmlReport := TXmlNode():new( , "Report", { "name" => cReport } )
+   oXmlDoc:oRoot:addBelow( Report )
+
+   // copy structure information to XML
+   oXmlStruct := TXmlNode():new( , "structure" )
+   oXmlDataBase:addBelow( oXmlStruct )
+
+   hAttr := { "HeaderHeight" => XSTR( oApp:Props:Header:Height ), ;
+              "FooterHeight" => XSTR( oApp:Props:Footer:Height )  }
+
+   oXmlData := TXmlNode():new(, "Data", hAttr )
+   oXmlStruct:addBelow( oXmlData )
+
+   // copy all records to XML
+   oXmlNode := TXmlNode():new( , "records" )
+   oXmlDataBase:addBelow( oXmlNode )
+
+         hAttr      := { "no" => LTrim( Str( Recno() ) ) } // clash with field ID?
+         oXmlRecord := TXmlNode():new( , "record", hAttr )
+
+         FOR EACH aField IN aStruct
+            cData := Alltrim( Cast( FieldGet( FieldPos( aField[1] ) ),,, .T.  ) )
+            IF aField[2] == "M"
+               // Memo fields are written as CDATA
+               oXmlField := TXmlNode():new( HBXML_TYPE_CDATA, aField[1], NIL, cData )
+            ELSE
+               // other fields are written as normal tags
+               oXmlField := TXmlNode():new( HBXML_TYPE_TAG, aField[1], NIL, cData )
+            ENDIF
+            // add field node to record
+            oXmlRecord:addBelow( oXmlField )
+         NEXT
+
+         // add record node to records
+         oXmlNode:addBelow( oXmlRecord )
+         SKIP
+*/
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
