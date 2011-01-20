@@ -10,6 +10,7 @@
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "debug.ch"
+#include "hbxml.ch"
 
 static oApp
 
@@ -542,6 +543,7 @@ RETURN Self
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile
+   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue
    
    DEFAULT lSaveAs TO .F.
 
@@ -554,7 +556,7 @@ METHOD Save( lSaveAs ) CLASS Report
 
    ::Modified := .F.
 
-
+/*
    aCtrls := {oApp:Props:Header:Objects, oApp:Props:Body:Objects, oApp:Props:Footer:Objects}
    
    cBuffer := "#include 'vxh.ch'"                                                               + CRLF
@@ -685,28 +687,36 @@ METHOD Save( lSaveAs ) CLASS Report
          __hrbUnload( pHrb )
       ENDIF
    ENDIF
+*/
+
+   oXmlDoc  := TXmlDocument():new()
+
+   oXmlReport := TXmlNode():new( , "Report", { "name" => ::GetName() } )
+   oXmlDoc:oRoot:addBelow( oXmlReport )
+
+   oXmlProp := TXmlNode():new( , "Properties" )
+   oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:Height ) )
+   oXmlProp:addBelow( oXmlSource )
+   oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:Height ) )
+   oXmlProp:addBelow( oXmlSource )
+   oXmlReport:addBelow( oXmlProp )
+
+   oXmlData := TXmlNode():new( , "DataSource" )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, ::VrReport:DataSource:ClassName )
+   oXmlData:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
+   oXmlData:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
+   oXmlData:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, ::VrReport:DataSource:bFilter )
+   oXmlData:addBelow( oXmlValue )
+   oXmlReport:addBelow( oXmlData )
+
+   oXmlDoc:Write( ::FileName )
+
+
 
 /*
-   oXmlDoc  := TXmlDocument():new( '<?xml version="1.0"?>' )
-
-   // Create main XML node
-   oXmlReport := TXmlNode():new( , "Report", { "name" => cReport } )
-   oXmlDoc:oRoot:addBelow( Report )
-
-   // copy structure information to XML
-   oXmlStruct := TXmlNode():new( , "structure" )
-   oXmlDataBase:addBelow( oXmlStruct )
-
-   hAttr := { "HeaderHeight" => XSTR( oApp:Props:Header:Height ), ;
-              "FooterHeight" => XSTR( oApp:Props:Footer:Height )  }
-
-   oXmlData := TXmlNode():new(, "Data", hAttr )
-   oXmlStruct:addBelow( oXmlData )
-
-   // copy all records to XML
-   oXmlNode := TXmlNode():new( , "records" )
-   oXmlDataBase:addBelow( oXmlNode )
-
          hAttr      := { "no" => LTrim( Str( Recno() ) ) } // clash with field ID?
          oXmlRecord := TXmlNode():new( , "record", hAttr )
 
