@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.54 2010/06/18 16:36:29 ronpinkas Exp $
+# $Id: compile.mak,v 1.55 2010/12/10 21:43:56 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -21,45 +21,59 @@ CMN_LINK_CMD=$(LINK_CMD) $(CMN_LIBS)
 #===============================================================================
 $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
 	$(HRB_LINK_CMD)
+	$(MT_CMD)
 
 $(PPGEN_EXE) : $(PPGEN_EXE_OBJS)
 	$(CMN_LINK_CMD)
+	$(MT_CMD)
 
 $(HBFILERE_EXE) : $(HBFILERE_EXE_OBJS)
-	$(EXE_LINK_CMD) Ws2_32.lib
+	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBPP_EXE) : $(HBPP_EXE_OBJS)
 	$(CMN_LINK_CMD)
+	$(MT_CMD)
 
 $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
 	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
 	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
 	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
 	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
 	$(EXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
+	$(MT_CMD)
 
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
+	$(MT_CMD)
 
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
+	$(MT_CMD)
 
 #===============================================================================
 # COMMON.LIB rules
@@ -207,6 +221,9 @@ $(OBJ_DIR)$(DIR_SEP)hbfunchk$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbfunchk.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)gencc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gencc1$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc1.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbpcstat$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcstat.c

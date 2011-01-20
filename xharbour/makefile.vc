@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.252 2010/01/07 15:18:38 ronpinkas Exp $
+# $Id: makefile.vc,v 1.253 2010/06/18 16:36:30 ronpinkas Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -81,21 +81,20 @@ INCLUDE_DIR =include
 INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
+!else
+CLIBFLAGS=$(CLIBFLAGS) -MT
 !endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(INCLUDE_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
-!if !("$(USE_MSVCRT)"=="1")
-CLIBFLAGS   =$(CLIBFLAGS) -MT
-!endif
 !endif
 
-LINKERFLAGS=\
+LINKERFLAGS=$(LINKERFLAGS)\
 	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) /SUBSYSTEM:CONSOLE
 
 !if ("$(USE_MSVCRT)"=="")
@@ -115,14 +114,22 @@ LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.
 #-------------------------------------------------------------------------------
+MT_CMD       =@ECHO>NUL
 HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
-
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
+!if ("$(USE_MSVCRT)"=="1")
+MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
+MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@
+!else
+MANIFESTFLAGS=/MANIFEST:NO
+!endif
+!endif
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD      =CL $(CLIBFLAGS) -TC -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
 LIB_CMD      =LIB /NOLOGO /OUT:$@ $**
-LINK_CMD     =LINK /NOLOGO /OUT:$@ $** $(LINKERFLAGS)
+LINK_CMD     =LINK /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
@@ -365,7 +372,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -FD -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
@@ -499,7 +506,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -FD -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED
+CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.34 2010/01/12 06:55:01 andijahja Exp $
+ * $Id: maindllp.c,v 1.35 2010/05/11 14:34:11 marchuet Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
  *
  */
 
-#define __NO_EXPORT__
 #define HB_OS_WIN_USED
 #include "hbtypes.h"
 

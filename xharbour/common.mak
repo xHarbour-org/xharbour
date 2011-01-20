@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.59 2009/12/31 02:55:04 andijahja Exp $
+# $Id: common.mak,v 1.60 2010/12/10 21:43:56 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -1175,6 +1175,7 @@ HARBOUR_EXE_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)exproptc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbfunchk$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gencc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gencc1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbpcstat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbdbginf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT)\

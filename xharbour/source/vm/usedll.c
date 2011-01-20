@@ -1,5 +1,5 @@
 /*
- * $Id: usedll.c,v 1.2 2009/11/09 09:39:22 marchuet Exp $
+ * $Id: usedll.c,v 1.3 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 #if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
 
-HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    return hb_vmProcessExeUsesDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }

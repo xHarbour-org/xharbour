@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6758 2011/01/10 04:26:54 andijahja Exp $
+ * $Id: ChangeLog,v 1.6759 2011/01/16 20:31:05 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,58 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-20 11:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/genhrb.c
+  * source/vm/memvars.c
+    ! avoid dereferencing type-punned pointers
+
+  * include/hbapi.h
+  * include/hbapifs.h
+  * include/hbdefs.h
+  * include/hbinit.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * source/vm/maindlle.c
+  * source/vm/maindllh.c
+  * source/vm/maindllp.c
+  * source/vm/usedll.c
+    - remove HB_FORCE_EXPORT
+
+  * source/compiler/genc.c
+  + source/compiler/gencc1.c
+    ! split pCode generator sections into separate file (gencc1.c)
+    ! automatically define HB_STATIC_STARTUP when using -vd
+    ! revise *.ext file content to be included in PRG module when not using -vd
+      in pCode DLL. File extension changed to dyn to be more readable.
+    ; Note: in this context, pCode programs are referred to programs using pCode
+      DLL which are not linked to harbour.lib (of harbour.dll).
+      Please refer to test programs in tests directory.
+
+  * common.mak
+  * compile.mak
+    ! changes to reflect spliting of source/compiler/genc.c
+
+  * makefile.vc
+    - remove default undocumented -FD flag
+    ! defaulting builds to use MT libraries
+    + MSVC version and related flags, if not defined, default flags are used:
+      SET __MSC__=6  -> MSVC 6  Visual Studio 2000 (_MSC_VER=1200)
+      SET __MSC__=7  -> MSVC 7  Visual Studio 2003 (_MSC_VER=1300)
+      SET __MSC__=71 -> MSVC 71 MS Driver Tool Kit (_MSC_VER=1310)
+      SET __MSC__=8  -> MSVC 8  Visual Studio 2005 (_MSC_VER=1400)
+      SET __MSC__=9  -> MSVC 9  Visual Studio 2008 (_MSC_VER=1500)
+      SET __MSC__=10 -> MSVC 10 Visual Studio 2010 (_MSC_VER=1600)
+    + bind manifest file to executable and dll for MSVC 8 and greater when
+      compiling with -MD ("USE_MSVCRT" set to 1)
+
+  * makefile.gc
+    ! minor optimization and add some missing rules
+
+  * make_dc.bat
+  * makefile.dc
+    ! enable MT build
+
 2011-01-16 18:20 UTC -0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/url.prg
     ! fixed AddGetForm() that was adding an null char on string generated when postdata was an hash

@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.9 2008/05/07 04:58:33 andijahja Exp $
+rem $Id: make_dc.bat,v 1.10 2008/07/14 02:50:56 kaddath Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -11,8 +11,8 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET CC_DIR=C:\DM
-SET BISON_DIR=C:\BISON\BIN
+SET CC_DIR=D:\DM
+SET BISON_DIR=D:\BISON\BIN
 SET SUB_DIR=dc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
@@ -24,7 +24,7 @@ rem process the make script. For a solution, the free Borland make.exe is used.
 rem If you have found a way to make DMC's (s)make.exe works, please modify this
 rem file accordingly.(AJ:2008-04-26)
 rem ============================================================================
-SET MAKE_EXE=C:\BORLAND\BCC551\BIN\MAKE.EXE
+SET MAKE_EXE=D:\BORLAND\BCC55\BIN\MAKE.EXE
 
 rem ============================================================================
 rem The followings should never change
@@ -61,8 +61,15 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL MDIR.BAT
-   %MAKE_EXE% -s -l -fmakefile.dc >make_%SUB_DIR%.log
+   %MAKE_EXE% -l -fmakefile.dc
    if errorlevel 1 goto BUILD_ERR
+
+   SET HB_MT=mt
+   SET HB_MT_DIR=\mt
+   @CALL MDIR.BAT
+   %MAKE_EXE% -l -fmakefile.dc
+   if errorlevel 1 goto BUILD_ERR
+
    goto BUILD_OK
 
 rem=============================================================================
@@ -98,7 +105,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=\dll
    @CALL mdir.bat dllcreate
-   %MAKE_EXE% -s -fmakefile.dc  >dll_%SUB_DIR%.log
+   %MAKE_EXE% -s -fmakefile.dc
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -127,7 +134,7 @@ rem=============================================================================
    SET HB_MT_DIR=
    SET HB_MT=
    @CALL MDIR.BAT
-   %MAKE_EXE% -s -l -fmakefile.dc >cont_%SUB_DIR%.log
+   %MAKE_EXE% -s -l -fmakefile.dc
    if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================

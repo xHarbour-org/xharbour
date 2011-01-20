@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.15 2008/12/23 16:37:05 likewolf Exp $
+ * $Id: genhrb.c,v 1.16 2009/04/16 14:57:35 likewolf Exp $
  */
 
 /*
@@ -42,7 +42,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    LONG lSymbols;
    ULONG ulCodeLength;
    FILE * yyc;             /* file handle for C output */
-   char cInt[ 2 ];
+   // char cInt[ 2 ];
+   char *cInt = (char*) hb_xgrab( 2 );
 
    if( ! pFileName->szExtension )
    {
@@ -56,6 +57,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    if( ! yyc )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
+      hb_xfree( cInt );
       return;
    }
 
@@ -315,5 +317,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    {
       printf( "Done.\n" );
    }
+
+   hb_xfree( cInt );
 }
 

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.57 2009/12/30 19:56:56 andijahja Exp $
+# $Id: makefile.dc,v 1.58 2010/06/18 16:36:30 ronpinkas Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -34,9 +34,15 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
-CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
-HB_CMD=$(HARBOUR_EXE) -iinclude -n1 -q0 -w2 -es2 -gc0 $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -iinclude -n -q0 -w -es2 -gc0 $** -o$@
+
+!if ("$(HB_MT)"=="mt")
+HARBOURFLAGS=-DHB_THREAD_SUPPORT
+CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
+!endif
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
+HB_CMD=$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=$(CC_CMD)
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
@@ -54,7 +60,7 @@ COMPILERLIBS=\
 	$(CC_DIR)\LIB\mpr.lib\
 	$(CC_DIR)\LIB\winmm.lib\
 	$(CC_DIR)\LIB\oleaut32.lib
-LINK_CMD=LINK $**,$@,,
+LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $**,$@,,
 HRB_LIBS=$(COMMON_LIB) $(PP_LIB)
 EXE_LIBS=$(HARBOUR_LIBS)
 CMN_LIBS=$(COMMON_LIB)
@@ -63,6 +69,8 @@ CMN_LIBS=$(COMMON_LIB)
 # Macro Definitions
 #===============================================================================
 !include common.mak
+
+ODBC_LIB=
 
 !if $d(HB_DOC_PDF)
 HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
@@ -84,7 +92,13 @@ HB_GT_LIBS=\
 #===============================================================================
 # The Project
 #===============================================================================
-ALL: $(ST_PROJECT)
+!if ("$(HB_MT)"=="mt")
+PROJECT=$(MT_PROJECT)
+!else
+PROJECT=$(ST_PROJECT)
+!endif
+
+ALL: $(PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules
@@ -115,6 +129,12 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
@@ -198,8 +218,10 @@ $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 	$(LIB_CMD)
 
+!if !("$(ODBC_LIB)"=="")
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
 	$(LIB_CMD)
+!endif
 
 $(MISC_LIB) : $(MISC_LIB_OBJS)
 	$(LIB_CMD)
@@ -263,7 +285,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
+CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)
@@ -313,7 +335,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win;$(ZLIB_DIR);$(PNG_DIR)
-CLIBFLAGS=$(CLIBFLAGS) -Jm -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
 HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=$(CC_CMD)

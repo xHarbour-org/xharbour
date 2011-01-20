@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.85 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.86 2009/12/19 14:06:18 andijahja Exp $
  */
 
 /*
@@ -468,7 +468,7 @@
    #define HB_ISINIT( scope )     ( ( ( ( scope ) | HB_FS_STATIC ) & HB_FS_INITEXIT ) == HB_FS_INIT )
    #define HB_ISEXIT( scope )     ( ( ( ( scope ) | HB_FS_STATIC ) & HB_FS_INITEXIT ) == HB_FS_EXIT )
 
-   extern HB_FORCE_EXPORT void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols );  /* invokes the virtual machine */
+   extern HB_EXPORT void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols );  /* invokes the virtual machine */
 
    HB_EXTERN_END
 

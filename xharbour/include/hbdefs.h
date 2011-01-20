@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.116 2009/12/31 04:12:30 andijahja Exp $
+ * $Id: hbdefs.h,v 1.117 2010/10/19 11:28:07 marchuet Exp $
  */
 
 /*
@@ -1204,42 +1204,7 @@ typedef unsigned long HB_COUNTER;
 typedef HARBOUR ( * PHB_FUNC )( void );
 typedef PHB_FUNC HB_FUNC_PTR;
 
-#if !defined( __NO_EXPORT__ )
-   #if defined( __RSXNT__ )
-      /* RSXNT does not support any type of export keyword.
-         Exported (i.e., public) names can be obtained via
-         the emxexp utility and the output can be used for
-         input to a module definition file. See emxdev.doc
-         in the RSXNT doc/ directory for more information. */
-      #define HB_FORCE_EXPORT
-
-   #elif defined( __GNUC__ ) && defined( HB_OS_WIN )
-      #define HB_FORCE_EXPORT __attribute__ (( dllexport ))
-
-   #elif defined( __GNUC__ ) && defined( HB_OS_LINUX )
-      #define HB_FORCE_EXPORT __attribute__ ((visibility ("default")))
-
-   #elif defined( __BORLANDC__ )
-      #define HB_FORCE_EXPORT __declspec( dllexport )
-
-   #elif defined( __WATCOMC__ )
-      #define HB_FORCE_EXPORT __declspec( dllexport )
-
-   #elif defined( ASANLM ) || defined( ASANT )
-      #define HB_FORCE_EXPORT
-
-   #elif defined( WIN32 )
-      #define HB_FORCE_EXPORT _declspec( dllexport )
-
-   #else
-      #define HB_FORCE_EXPORT
-
-   #endif
-#else
-   #define HB_FORCE_EXPORT
-#endif
-
-#if ( defined( __EXPORT__ ) && !defined( __NO_EXPORT__ ) )
+#if defined( __EXPORT__ )
    #if defined( __RSXNT__ )
       /* RSXNT does not support any type of export keyword.
          Exported (i.e., public) names can be obtained via
@@ -1272,16 +1237,6 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #endif
 #else
    #define HB_EXPORT
-#endif
-
-#if ( defined( __MINGW32__ ) && !defined( NO_DISABLE_FORCE_EXPORT ) )
-   /* using at least one function with dllexport attribute causes that
-    * automatic conversion to import library is disabled in linker so
-    * you cannot longer use standard xharbour.dll to link in shared
-    * mode.
-    */
-   #undef HB_FORCE_EXPORT
-   #define HB_FORCE_EXPORT HB_EXPORT
 #endif
 
 #if defined( __IMPORT__ )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.36 2009/12/29 16:10:36 andijahja Exp $
+ * $Id: hbinit.h,v 1.37 2009/12/30 19:56:56 andijahja Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 HB_EXTERN_BEGIN
 
-extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
+extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 
 #if defined( _MSC_VER ) && !defined(HB_OS_WIN_64) && \
     !defined( __LCC__ ) && !defined( __POCC__ ) && !defined( __XCC__ ) && \

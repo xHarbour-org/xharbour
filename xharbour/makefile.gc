@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.58 2009/08/23 22:46:11 lculik Exp $
+# $Id: makefile.gc,v 1.59 2010/06/18 16:36:30 ronpinkas Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -19,6 +19,8 @@ ifeq ($(__BLD__),CORE_BLD)
 # Macro Definitions
 #===============================================================================
 include common.mak
+
+HBFILERE_EXE=
 
 ifeq ($(HB_DOC_PDF),yes)
 HARBOURFLAGS+=-dPDF
@@ -45,7 +47,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
@@ -78,17 +80,13 @@ LIB_CMD      =\
 		STRIP -g $@
 HARBOUR_LIBS=\
 	-L$(LIB_DIR)\
+	-Wl,--start-group\
 	-lvm$(HB_MT)\
 	-lrtl$(HB_MT)\
-	-lvm$(HB_MT)\
 	-lrdd$(HB_MT)\
-	-lrtl$(HB_MT)\
 	-lct$(HB_MT)\
 	-lzlib\
-	-lvm$(HB_MT)\
-	-lrtl$(HB_MT)\
 	-lgtwin\
-	-lrtl$(HB_MT)\
 	-llibmisc\
 	-lcodepage\
 	-lmacro$(HB_MT)\
@@ -97,14 +95,14 @@ HARBOUR_LIBS=\
 	-lsixcdx$(HB_MT)\
 	-ldbfntx$(HB_MT)\
 	-ldbfnsx$(HB_MT)\
-	-lrtl$(HB_MT)\
 	-ldbffpt$(HB_MT)\
 	-lhbsix$(HB_MT)\
 	-lhsx$(HB_MT)\
 	-lpcrepos\
 	-lcommon\
 	-lpp$(HB_MT)\
-	-llang
+	-llang\
+	-Wl,--end-group
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
@@ -204,6 +202,12 @@ $(MACRO_LIB) : $(MACRO_LIB_OBJS)
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
 	$(LIB_CMD)
 
+$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
+	$(LIB_CMD)
+
 $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -244,6 +248,9 @@ $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
+	$(LIB_CMD)
+
+$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
 #*******************************************************************************
@@ -326,7 +333,7 @@ ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
-CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
@@ -377,7 +384,7 @@ ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fno-strict-aliasing
+CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
