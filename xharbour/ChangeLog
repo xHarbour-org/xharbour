@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6759 2011/01/16 20:31:05 lculik Exp $
+ * $Id: ChangeLog,v 1.6760 2011/01/20 04:55:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-20 18:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + tests/pdllbc.bat
+  + tests/pexec.prg
+  + tests/pcode.prg
+  + tests/pcode1.prg
+  + source/vm/bcc.def
+  + source/vm/export.def
+    ! test program for EXE pCode programs (BCC) -> 1 EXE + 2 DLLs
+    ; just run pdllbc.bat and pexec.exe thereafter. BAT files for other compilers
+      are to follow.
 
 2011-01-20 11:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/genhrb.c
