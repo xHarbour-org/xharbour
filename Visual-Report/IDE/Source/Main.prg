@@ -527,23 +527,22 @@ METHOD Open( cReport ) CLASS Report
 
 RETURN Self
 
-METHOD Generate( oCtrl, cBuffer, nPanel ) CLASS Report
-   cBuffer += "   // -------------------------- " + lower(oCtrl:Name) + " --------------------------"+ CRLF
-   cBuffer += "   oCtrl := " + lower(oCtrl:ClassName) + "( NIL, lDesign, "+XSTR(nPanel)+" )" + CRLF
-   cBuffer += "   IF ! lDesign"                                   + CRLF
-   cBuffer += "      oCtrl:Parent := oRep"                        + CRLF
-   cBuffer += "   ENDIF"                                          + CRLF
-   oCtrl:WriteProps( @cBuffer )
-   IF oCtrl:lUI
-      cBuffer += "   oCtrl:Create()"                              + CRLF
-   ENDIF
+METHOD Generate( oCtrl, oXmlNode ) CLASS Report
+   LOCAL aProps, oXmlValue, oXmlControl
+   oXmlControl := TXmlNode():new( , "Control" )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, oCtrl:ClassName )
+      oXmlControl:addBelow( oXmlValue )
+      
+      oCtrl:WriteProps( @oXmlControl )
+
+   oXmlNode:addBelow( oXmlControl )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile
-   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue
+   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter
    
    DEFAULT lSaveAs TO .F.
 
@@ -701,42 +700,51 @@ METHOD Save( lSaveAs ) CLASS Report
    oXmlProp:addBelow( oXmlSource )
    oXmlReport:addBelow( oXmlProp )
 
-   oXmlData := TXmlNode():new( , "DataSource" )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, ::VrReport:DataSource:ClassName )
-   oXmlData:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
-   oXmlData:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
-   oXmlData:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, ::VrReport:DataSource:bFilter )
-   oXmlData:addBelow( oXmlValue )
-   oXmlReport:addBelow( oXmlData )
+   IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
+      oXmlData := TXmlNode():new( , "DataSource" )
+         oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, ::VrReport:DataSource:ClassName )
+         oXmlData:addBelow( oXmlValue )
+         oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
+         oXmlData:addBelow( oXmlValue )
+         oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
+         oXmlData:addBelow( oXmlValue )
+         oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, ::VrReport:DataSource:bFilter )
+         oXmlData:addBelow( oXmlValue )
+      oXmlReport:addBelow( oXmlData )
+   ENDIF
 
-   oXmlDoc:Write( ::FileName )
-
-
-
-/*
-         hAttr      := { "no" => LTrim( Str( Recno() ) ) } // clash with field ID?
-         oXmlRecord := TXmlNode():new( , "record", hAttr )
-
-         FOR EACH aField IN aStruct
-            cData := Alltrim( Cast( FieldGet( FieldPos( aField[1] ) ),,, .T.  ) )
-            IF aField[2] == "M"
-               // Memo fields are written as CDATA
-               oXmlField := TXmlNode():new( HBXML_TYPE_CDATA, aField[1], NIL, cData )
-            ELSE
-               // other fields are written as normal tags
-               oXmlField := TXmlNode():new( HBXML_TYPE_TAG, aField[1], NIL, cData )
-            ENDIF
-            // add field node to record
-            oXmlRecord:addBelow( oXmlField )
+   IF !EMPTY( aCtrl := oApp:Props:Header:Objects )
+      oXmlHeader := TXmlNode():new( , "Header" )
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlHeader )
+             ENDIF
          NEXT
-
-         // add record node to records
-         oXmlNode:addBelow( oXmlRecord )
-         SKIP
-*/
+      oXmlReport:addBelow( oXmlHeader )
+   ENDIF
+   
+   IF !EMPTY( aCtrl := oApp:Props:Footer:Objects )
+      oXmlFooter := TXmlNode():new( , "Footer" )
+         aCtrl := oApp:Props:Footer:Objects
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlFooter )
+             ENDIF
+         NEXT
+      oXmlReport:addBelow( oXmlFooter )
+   ENDIF
+   
+   IF !EMPTY( aCtrl := oApp:Props:Body:Objects )
+      oXmlBody := TXmlNode():new( , "Body" )
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlBody )
+             ENDIF
+         NEXT
+      oXmlReport:addBelow( oXmlBody )
+   ENDIF
+   
+   oXmlDoc:Write( ::FileName )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------

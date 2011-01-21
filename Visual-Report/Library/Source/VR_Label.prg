@@ -11,6 +11,7 @@
 
 #include "debug.ch"
 #include "vxh.ch"
+#include "hbxml.ch"
 
 #define  acObjectTypeText           5
 
@@ -100,17 +101,31 @@ METHOD SetText( cText ) CLASS VrLabel
    ENDIF
 RETURN Self
 
-METHOD WriteProps( cBuffer ) CLASS VrLabel
-   cBuffer += "   oCtrl:Text           := " + ValToPrgExp( ::Text )           + CRLF
-   cBuffer += "   oCtrl:ForeColor      := " + ValToPrgExp( ::ForeColor )      + CRLF
-   cBuffer += "   oCtrl:BackColor      := " + ValToPrgExp( ::BackColor )      + CRLF
-   cBuffer += "   oCtrl:Font:FaceName  := " + ValToPrgExp( ::Font:FaceName )  + CRLF
-   cBuffer += "   oCtrl:Font:PointSize := " + ValToPrgExp( ::Font:PointSize ) + CRLF
-   cBuffer += "   oCtrl:Font:Italic    := " + ValToPrgExp( ::Font:Italic )    + CRLF
-   cBuffer += "   oCtrl:Font:Underline := " + ValToPrgExp( ::Font:Underline ) + CRLF
-   cBuffer += "   oCtrl:Font:Weight    := " + ValToPrgExp( ::Font:Weight )    + CRLF
-   cBuffer += "   oCtrl:Left           := " + XSTR( ::Left ) + CRLF
-   cBuffer += "   oCtrl:Top            := " + XSTR( ::Top ) + CRLF
+METHOD WriteProps( oXmlControl ) CLASS VrLabel
+   LOCAL oXmlValue, oXmlFont
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Text", NIL, ::Text )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ForeColor", NIL, XSTR( ::ForeColor ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "BackColor", NIL, XSTR( ::BackColor ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
+   oXmlControl:addBelow( oXmlValue )
+
+   oXmlFont := TXmlNode():new( , "Font" )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
+      oXmlFont:addBelow( oXmlValue )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "PointSize", NIL, XSTR( ::Font:PointSize ) )
+      oXmlFont:addBelow( oXmlValue )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Italic", NIL, IIF( ::Font:Italic, "True", "False" ) )
+      oXmlFont:addBelow( oXmlValue )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Underline", NIL, IIF( ::Font:Underline, "True", "False" ) )
+      oXmlFont:addBelow( oXmlValue )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Weight", NIL, XSTR( ::Font:Weight ) )
+      oXmlFont:addBelow( oXmlValue )
+   oXmlControl:addBelow( oXmlFont )
 RETURN Self
 
 METHOD Draw() CLASS VrLabel

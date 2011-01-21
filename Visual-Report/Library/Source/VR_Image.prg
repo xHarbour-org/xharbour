@@ -11,6 +11,7 @@
 
 #include "debug.ch"
 #include "vxh.ch"
+#include "hbxml.ch"
 
 #define  acObjectTypePicture        7
 
@@ -77,12 +78,18 @@ METHOD Create() CLASS VrImage
    Super:Create()
 RETURN Self
 
-METHOD WriteProps( cBuffer ) CLASS VrImage
-   cBuffer += "   oCtrl:FileName    := " + ValToPrgExp( ::FileName ) + CRLF
-   cBuffer += "   oCtrl:Left        := " + XSTR( ::Left ) + CRLF
-   cBuffer += "   oCtrl:Top         := " + XSTR( ::Top ) + CRLF
-   cBuffer += "   oCtrl:Width       := " + XSTR( ::Width ) + CRLF
-   cBuffer += "   oCtrl:Height      := " + XSTR( ::Height ) + CRLF
+METHOD WriteProps( oXmlControl ) CLASS VrImage
+   LOCAL oXmlValue, oXmlFont
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Width ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
+   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
 METHOD Draw() CLASS VrImage
