@@ -9,6 +9,7 @@
 // You may NOT forward or share this file under any conditions!
 //-----------------------------------------------------------------------------------------------
 
+#include "debug.ch"
 #include "vxh.ch"
 
 //-----------------------------------------------------------------------------------------------
@@ -44,6 +45,7 @@ CLASS VrReport INHERIT VrObject
    METHOD End()
    METHOD StartPage()
    METHOD EndPage()
+   METHOD Run()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -118,6 +120,37 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Preview() CLASS VrReport
    VrPreview( Self )
+RETURN Self
+
+METHOD Run( oDoc, oParent ) CLASS VrReport
+   LOCAL oNode, hPointer, aNode, oCurControl, n, cProp
+   oNode := oDoc:FindFirstRegex( "Report" )
+   WHILE oNode != NIL
+      DO CASE
+         CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
+              // Load Report properties
+              VIEW  oNode:cName, oNode:cData
+         CASE oNode:oParent:cName == "Control" .AND. oNode:oParent:oParent:cName == "Header"
+              // Load Header controls
+
+              cProp := oNode:cName
+              IF lower(cProp) == "classname"
+                 hPointer := HB_FuncPtr( oNode:cData )
+                 IF hPointer != NIL
+                    oCurControl := HB_Exec( hPointer,, oParent, .F. )
+                    oCurControl:Create()
+                 ENDIF
+               ELSE
+                 oCurControl:&cProp := oNode:cData
+              ENDIF
+
+         CASE oNode:oParent:cName == "Font" .AND. oNode:oParent:oParent:cName == "Control"
+              VIEW oCurControl:Name, oNode:cName, oNode:cData
+              
+      ENDCASE
+      oNode := oDoc:Next()
+   ENDDO
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
