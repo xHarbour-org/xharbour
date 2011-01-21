@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.253 2010/06/18 16:36:30 ronpinkas Exp $
+# $Id: makefile.vc,v 1.254 2011/01/20 04:55:53 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -19,6 +19,10 @@ COPY=copy
 
 !ifndef TYPE
 TYPE=type
+!endif
+
+!ifndef HB_HAS_LINENO
+LINEFLAGS=-l
 !endif
 
 #*******************************************************************************
@@ -77,6 +81,11 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
+!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
+OPTFLAGS=-Ogt2yb1p
+!else
+OPTFLAGS=-Otyb1
+!endif
 INCLUDE_DIR =include
 INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
@@ -87,10 +96,9 @@ CLIBFLAGS=$(CLIBFLAGS) -MT
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -GA -Gs -W3 -nologo $(INCLUDE_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
-HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 !endif
 
@@ -114,13 +122,12 @@ LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.
 #-------------------------------------------------------------------------------
-MT_CMD       =@ECHO>NUL
-HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
+HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 !if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
 !if ("$(USE_MSVCRT)"=="1")
 MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
-MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@
+MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
 !else
 MANIFESTFLAGS=/MANIFEST:NO
 !endif
@@ -333,14 +340,23 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
+OPTFLAGS=-Ogt2yb1p
+!else
+OPTFLAGS=-Otyb1
+!endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 !if ("$(DLL_MT)"=="mt")
-HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
+MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
+MT_CMD_DLL  =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;2
+MT_CMD      =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
+!endif
 !else
 CLIBFLAGS=$(CLIBFLAGS) -MT
 !endif
@@ -364,7 +380,7 @@ DLLFLAGS=\
 	/NOLOGO\
         /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) $(ACE_LIBPATH)\
 	/SUBSYSTEM:WINDOWS\
-	$(LFLAGS)\
+	$(LFLAGS) $(MANIFESTFLAGS)\
 	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
@@ -372,13 +388,13 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ -Oty1 -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
-HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD    =CL $(CLIBFLAGS) -TC -Fo$@ $**
-HB_CMD     =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
+HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1 =bison -v -d $** -o$@
 BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK $(DLLFLAGS)
@@ -394,6 +410,7 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
+	$(MT_CMD_DLL)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
@@ -491,6 +508,12 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
+!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
+OPTFLAGS=-Ogt2yb1p
+!else
+OPTFLAGS=-Otyb1
+!endif
+
 !ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
@@ -506,12 +529,11 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c -Oty1 -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED
+CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
-HARBOURFLAGS=$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 !if !("$(USE_MSVCRT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -MT
@@ -519,11 +541,12 @@ CLIBFLAGS   =$(CLIBFLAGS) -MT
 !endif
 
 CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
-HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD     =CL $(CLIBFLAGS) -TC -Fo$@ $**
+
 CC_CMD_ZIP  =CL\
-	/Otyb1 /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
+	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
 	/DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
 	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
 	/FD /c /Fo$@ $**

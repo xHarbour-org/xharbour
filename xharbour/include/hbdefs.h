@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.117 2010/10/19 11:28:07 marchuet Exp $
+ * $Id: hbdefs.h,v 1.118 2011/01/20 04:55:53 andijahja Exp $
  */
 
 /*
@@ -69,21 +69,10 @@
    #endif
 #endif
 
-#if defined( __XCC__ ) || defined( __POCC__ ) || defined( __LCC__ ) || \
-    defined( __MINGW32__ ) || defined( __DMC__ ) || \
-    ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
-    ( defined( __WATCOMC__ ) && __WATCOMC__ >= 1270 ) || \
-    ( ( defined( __GNUC__ ) || defined( __SUNPRO_C ) || defined( __SUNPRO_CC ) ) && \
-      ( defined( _ISOC99_SOURCE ) || \
-        ( defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 199901L ) || \
-        ( defined( __DJGPP__ ) && \
-          ( __DJGPP__ > 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ >= 4 ) ) ) || \
-        defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) || \
-        defined( HB_OS_BSD ) || defined( HB_OS_SUNOS ) || \
-        defined( HB_OS_BEOS ) ) )
+#if HAVE_STDINT_H
    #include <stdint.h>
    /* workaround for BCC 5.8 bug */
-   #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
+   #if defined( __BORLANDC__ )
       #undef INT32_MIN
       #define INT32_MIN ((int32_t) (-INT32_MAX-1))
       #undef INT64_MIN
@@ -1220,7 +1209,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
       #define HB_EXPORT __attribute__ ((visibility ("default")))
 
    #elif defined( __BORLANDC__ )
-      #define HB_EXPORT _declspec( dllexport )
+      #define HB_EXPORT __declspec( dllexport )
 
    #elif defined( __WATCOMC__ )
       #define HB_EXPORT __declspec( dllexport )
@@ -1252,7 +1241,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_IMPORT __attribute__ (( dllimport ))
 
 #elif defined( __BORLANDC__ )
-   #define HB_IMPORT _declspec( dllimport )
+   #define HB_IMPORT __declspec( dllimport )
 
 #elif defined( __WATCOMC__ )
    #define HB_IMPORT __declspec( dllimport )

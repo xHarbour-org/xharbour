@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.59 2010/06/18 16:36:30 ronpinkas Exp $
+# $Id: makefile.gc,v 1.60 2011/01/20 04:55:53 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -11,6 +11,10 @@
 TYPE=cat
 DEL=RM -f
 COPY=cp
+
+ifneq ($(HB_HAS_LINENO),1)
+LINEFLAGS=-l
+endif
 
 #*******************************************************************************
 ifeq ($(__BLD__),CORE_BLD)
@@ -50,7 +54,6 @@ HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
-	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
 endif
 
@@ -62,8 +65,8 @@ endif
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.(AJ: 2008-04-26)
 #===============================================================================
-HB_CMD     =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN=$(HARBOUR_EXE) -n0 -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
+HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
@@ -325,7 +328,6 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 ifeq ($(DLL_MT),mt)
-HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
 endif
 
@@ -334,11 +336,11 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
 CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-HARBOURFLAGS+=-d__EXPORT__ -i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
-HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN =$(HARBOUR_EXE) -n0 -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
+HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
 DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
@@ -388,11 +390,10 @@ CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -fomit-frame-pointer -march=i586
 CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
-	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
 endif
 
-HB_CMD =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD =$(CC_CMD)
 CC_CMD_ZIP=G++ $(CLIBFLAGS) -I$(HBZIP_DIR)\include -DWIN32 -D_WIN32 -DNDEBUG -o $@ $^

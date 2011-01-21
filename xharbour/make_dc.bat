@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.10 2008/07/14 02:50:56 kaddath Exp $
+rem $Id: make_dc.bat,v 1.11 2011/01/20 04:55:53 andijahja Exp $
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS
@@ -96,16 +96,11 @@ rem=============================================================================
    rem
    rem We use HB_MT_DIR envar for DLL object folder here
    rem
-   ECHO LIBRARY "harbour.dll" > dmcdll.def
-   ECHO EXETYPE NT >> dmcdll.def
-   ECHO SUBSYSTEM CONSOLE >> dmcdll.def
-   ECHO CODE SHARED EXECUTE >> dmcdll.def
-   ECHO DATA WRITE >> dmcdll.def
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
    @CALL mdir.bat dllcreate
-   %MAKE_EXE% -s -fmakefile.dc
+   %MAKE_EXE% -fmakefile.dc
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -180,4 +175,3 @@ rem=============================================================================
 rem=============================================================================
    @CALL mdir.bat resetenvar
    if exist *.map del *.map > NUL
-   if exist dmcdll.def del dmcdll.def >NUL

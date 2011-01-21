@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.58 2010/06/18 16:36:30 ronpinkas Exp $
+# $Id: makefile.dc,v 1.59 2011/01/20 04:55:53 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -21,6 +21,10 @@ COPY=copy
 TYPE=type
 !endif
 
+!ifndef HB_HAS_LINENO
+LINEFLAGS=-l
+!endif
+
 #*******************************************************************************
 !if ("$(__BLD__)"=="CORE_BLD")
 #*******************************************************************************
@@ -36,13 +40,12 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
 
 !if ("$(HB_MT)"=="mt")
-HARBOURFLAGS=-DHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
-HB_CMD=$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -n $(HARBOURFLAGS) $** -o$@
+HB_CMD=$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=$(CC_CMD)
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
@@ -286,15 +289,14 @@ INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
-HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLLEXE_LINK_CMD=LINK $**,$@,,$(USE_DLL_LIB)+$(HARBOUR_DLL_LIB)/noi;
-
+DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(HARBOUR_DLL_LIB)
 #===============================================================================
 # The Project
 #===============================================================================
@@ -303,11 +305,32 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	LINK /IMPLIB:$(HARBOUR_DLL_LIB) @&&!
-$**,$@,,,"DMCDLL.DEF"
-!
+$(OBJ_DIR)\dummyDLL.obj : $(OBJ_DIR)\dummyDLL.c
+	$(CC_CMD)
 
+$(OBJ_DIR)\dummyDLL.c : $(OBJ_DIR)\dummyDLL.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\dummyDLL.prg :
+	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummyDLL.prg
+	@ECHO PROCEDURE DMCGT >>$(OBJ_DIR)\dummyDLL.prg
+
+$(OBJ_DIR)\dmcdll.def :
+	@ECHO LIBRARY "harbour.dll" > $(OBJ_DIR)\dmcdll.def
+	@ECHO EXETYPE NT >> $(OBJ_DIR)\dmcdll.def
+	@ECHO SUBSYSTEM CONSOLE >> $(OBJ_DIR)\dmcdll.def
+	@ECHO CODE SHARED EXECUTE >> $(OBJ_DIR)\dmcdll.def
+	@ECHO DATA WRITE >> $(OBJ_DIR)\dmcdll.def
+
+$(HARBOUR_DLL) :\
+	$(HARBOUR_DLL_OBJS)\
+	$(OBJ_DIR)\mainwin.obj\
+	$(OBJ_DIR)\dummyDLL.obj\
+	$(OBJ_DIR)\dmcdll.def
+	LINK @&&!
+$(HARBOUR_DLL_OBJS),$@,,,$(OBJ_DIR)\dmcdll.def
+!
+	IMPLIB $(HARBOUR_DLL_LIB) $(HARBOUR_DLL) /system /noi
 #*******************************************************************************
 !elif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
@@ -336,7 +359,7 @@ ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win;$(ZLIB_DIR);$(PNG_DIR)
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
-HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2 $** -o$@
+HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=$(CC_CMD)
 LIB_CMD=LIB -c -n $@ $**
@@ -464,3 +487,4 @@ $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 # Building rules of Object files
 #===============================================================================
 !include compile.mak
+

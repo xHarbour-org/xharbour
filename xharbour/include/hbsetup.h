@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.58 2009/11/19 23:05:45 marchuet Exp $
+ * $Id: hbsetup.h,v 1.59 2010/08/31 01:41:21 andijahja Exp $
  */
 
 /*
@@ -70,19 +70,41 @@
  * Some compilers do not have stdint.h and/or inttypes.h
  */
 
-#if (defined(__BORLANDC__)&&(__BORLANDC__ < 1410 ))
-   #define HAVE_STDINT_H      0
-   #define HAVE_INTTYPES_H    0
-   #undef  INT64_MAX
-#elif ( defined(_MSC_VER) && ( !defined(__POCC__) && !defined(__XCC__) ) )
-   #define HAVE_INTTYPES_H  0
-   #if (_MSC_VER) >= 1600
-      #if !defined( HAVE_STDINT_H )
-         #define HAVE_STDINT_H 1
-      #endif
+#if defined( __XCC__ ) || defined( __POCC__ ) || defined( __LCC__ ) || \
+    defined( __MINGW32__ ) || defined( __DMC__ ) || \
+    ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
+    ( defined( __WATCOMC__ ) && __WATCOMC__ >= 1270 ) || \
+    ( ( defined( __GNUC__ ) || defined( __SUNPRO_C ) || defined( __SUNPRO_CC ) ) && \
+      ( defined( _ISOC99_SOURCE ) || \
+        ( defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 199901L ) || \
+        ( defined( __DJGPP__ ) && \
+          ( __DJGPP__ > 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ >= 4 ) ) ) || \
+        defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) || \
+        defined( HB_OS_BSD ) || defined( HB_OS_SUNOS ) || \
+        defined( HB_OS_BEOS ) ) )
+
+   #undef  HAVE_INTTYPES_H
+   #define HAVE_INTTYPES_H     1
+   #undef  HAVE_STDINT_H
+   #define HAVE_STDINT_H       1
+
+#elif defined( _MSC_VER )
+   #undef  HAVE_INTTYPES_H
+   #define HAVE_INTTYPES_H     0
+   #if ( _MSC_VER >= 1600 )
+      #undef  HAVE_STDINT_H
+      #define HAVE_STDINT_H    1
    #else
+      #undef  HAVE_STDINT_H
       #define HAVE_STDINT_H    0
    #endif
+
+#else
+   #undef  HAVE_STDINT_H
+   #define HAVE_STDINT_H       0
+   #undef  HAVE_INTTYPES_H
+   #define HAVE_INTTYPES_H     0
+   #undef  INT64_MAX
 #endif
 
 /* ***********************************************************************
