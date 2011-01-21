@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.pc,v 1.58 2008/11/24 12:56:46 modalsist Exp $
+# $Id: hrbdll.pc,v 1.59 2009/03/27 02:57:04 ronpinkas Exp $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -64,6 +64,7 @@ EXEFLAGS=\
 CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"__EXPORT__"
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iINCLUDE -q0 -w2 -po$(OBJ_DIR)\ -es2 -gc2
 CC_CMD      =POCC $(CLIBFLAGS) /Fo$@ $**
+CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@

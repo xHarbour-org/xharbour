@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6762 2011/01/20 23:32:36 andijahja Exp $
+ * $Id: ChangeLog,v 1.6763 2011/01/21 06:06:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-21 20:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * hrbdll.pc
+    + missing CCC_CMD macro
+
+  * make_pc.bat
+    + option to use other compiler make utility.
+    ; NOTE: POMAKE of v. 6.50 RC3 is buggy. It stopped building because
+      internal error. MS's NMAKE is a good alternative.
 
 2011-01-21 13:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbdefs.h

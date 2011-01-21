@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.32 2008/11/24 12:56:46 modalsist Exp $
+rem $Id: make_pc.bat,v 1.33 2009/03/27 02:57:04 ronpinkas Exp $
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC
@@ -10,7 +10,10 @@ rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
+REM SET __MAKE__=D:\VC9\BIN\NMAKE.EXE
+REM NOTE: POMAKE 6.50 is buggy. In this case, please use NMAKE.EXE of MSVC.
 
+IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
 IF "%SUB_DIR%"=="" SET SUB_DIR=pc
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 
@@ -85,7 +88,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET PROJECT=$(ST_PROJECT)
    @CALL MDIR.BAT
-   POMAKE /F makefile.pc >make_%SUB_DIR%.log
+   %__MAKE__% /F makefile.pc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -98,7 +101,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
    SET PROJECT=$(MT_PROJECT)
    @CALL MDIR.BAT
-   POMAKE /F makefile.pc >>make_%SUB_DIR%.log
+   %__MAKE__% /F makefile.pc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -132,7 +135,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
    @CALL mdir.bat dllcreate
-   pomake /F hrbdll.pc  >dll_%SUB_DIR%.log
+   %__MAKE__% /F hrbdll.pc  >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -163,7 +166,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=
    @CALL MDIR.BAT
-   POMAKE /F contrib.pc  >cont_%SUB_DIR%.log
+   %__MAKE__% /F contrib.pc  >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
    goto CONTRIBS_OK
 
