@@ -182,6 +182,7 @@ METHOD Run( oDoc ) CLASS VrReport
       oCurControl:Create()
       oCurControl := NIL
    ENDIF
+   ::End()
    ::Preview()
 RETURN Self
 

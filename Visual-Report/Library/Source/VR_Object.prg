@@ -85,7 +85,7 @@ RETURN Self
 
 METHOD SetControlName() CLASS VrObject
    LOCAL cProp, n := 1
-   IF ::__ClsInst != NIL
+   IF UPPER( ::Parent:ClassName ) != "VRREPORT"
       WHILE .T.
          cProp := ::ClsName + XSTR( n )
          IF ASCAN( ::Parent:Objects, {|o| UPPER(o:Name) == UPPER(cProp) } ) == 0

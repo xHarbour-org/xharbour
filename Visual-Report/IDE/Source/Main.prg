@@ -541,7 +541,7 @@ RETURN Self
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile
-   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter
+   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter, oRep
    
    DEFAULT lSaveAs TO .F.
 
@@ -611,7 +611,8 @@ METHOD Save( lSaveAs ) CLASS Report
    oXmlDoc:oRoot:addBelow( oXmlReport )
    oXmlDoc:Write( ::FileName )
 
-   ::VrReport:Run( oXmlDoc )
+   oRep := VrReport():Create()
+   oRep:Run( oXmlDoc )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
