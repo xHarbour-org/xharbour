@@ -611,7 +611,7 @@ METHOD Save( lSaveAs ) CLASS Report
    oXmlDoc:oRoot:addBelow( oXmlReport )
    oXmlDoc:Write( ::FileName )
 
-   ::VrReport:Run( oXmlDoc, Self )
+   ::VrReport:Run( oXmlDoc )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------

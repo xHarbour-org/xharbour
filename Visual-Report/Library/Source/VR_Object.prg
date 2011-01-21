@@ -27,11 +27,12 @@ CLASS VrObject
    DATA lUI         EXPORTED INIT .T.
    DATA Name        EXPORTED
    DATA Text        EXPORTED
+
    DATA Left        EXPORTED INIT 0
    DATA Top         EXPORTED INIT 0
-
    DATA Width       EXPORTED INIT 150
    DATA Height      EXPORTED INIT 150
+
    DATA Alignment   EXPORTED INIT 0
    DATA EnumAlignment EXPORTED INIT { { "No Alignment", "Left", "Center", "Right" }, {0,1,2,3} }
 
@@ -84,15 +85,17 @@ RETURN Self
 
 METHOD SetControlName() CLASS VrObject
    LOCAL cProp, n := 1
-   WHILE .T.
-      cProp := ::ClsName + XSTR( n )
-      IF ASCAN( ::Parent:Objects, {|o| UPPER(o:Name) == UPPER(cProp) } ) == 0
-         EXIT
-      ENDIF
-      n ++
-   ENDDO
-   ::Name := cProp
-   ::Text := cProp
+   IF ::__ClsInst != NIL
+      WHILE .T.
+         cProp := ::ClsName + XSTR( n )
+         IF ASCAN( ::Parent:Objects, {|o| UPPER(o:Name) == UPPER(cProp) } ) == 0
+            EXIT
+         ENDIF
+         n ++
+      ENDDO
+      ::Name := cProp
+      ::Text := cProp
+   ENDIF
 RETURN n
 
 METHOD SetSize( cx, cy ) CLASS VrObject

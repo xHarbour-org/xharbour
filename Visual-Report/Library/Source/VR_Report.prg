@@ -122,35 +122,67 @@ METHOD Preview() CLASS VrReport
    VrPreview( Self )
 RETURN Self
 
-METHOD Run( oDoc, oParent ) CLASS VrReport
-   LOCAL oNode, hPointer, aNode, oCurControl, n, cProp
+METHOD Run( oDoc ) CLASS VrReport
+   LOCAL oNode, hPointer, cData, oCurControl, n, cProp, oControl
+   IF ::oPDF != NIL
+      ::oPDF:Destroy()
+   ENDIF
+   ::Create()
+   
    oNode := oDoc:FindFirstRegex( "Report" )
    WHILE oNode != NIL
       DO CASE
+         CASE oNode:cName == "Body"
+              ::nRow += ::HeaderHeight
+
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
+              cData := oNode:cData
+              IF cProp IN {"HeaderHeight", "FooterHeight" }
+                 cData := VAL( cData )
+                 ::&cProp := cData
+              ENDIF
+
               // Load Report properties
-              VIEW  oNode:cName, oNode:cData
-         CASE oNode:oParent:cName == "Control" .AND. oNode:oParent:oParent:cName == "Header"
+
+         CASE oNode:oParent:cName == "Control" //.AND. oNode:oParent:oParent:cName == "Header"
               // Load Header controls
 
               cProp := oNode:cName
-              IF lower(cProp) == "classname"
+              IF cProp == "ClassName"
+                 IF oCurControl != NIL
+                    VIEW oCurControl:Text
+                    oCurControl:Create()
+                    oCurControl := NIL
+                 ENDIF
+
                  hPointer := HB_FuncPtr( oNode:cData )
                  IF hPointer != NIL
-                    oCurControl := HB_Exec( hPointer,, oParent, .F. )
-                    oCurControl:Create()
+                    oCurControl := HB_Exec( hPointer,, , .F. )
+                    oCurControl:Parent := Self
                  ENDIF
-               ELSE
-                 oCurControl:&cProp := oNode:cData
+               ELSEIF cProp != "Font"
+                 cData := oNode:cData
+                 IF cProp IN {"Left", "Top", "Width", "Height", "ForeColor", "BackColor" }
+                    cData := VAL( cData )
+                 ENDIF
+                 __objSendMsg( oCurControl, "_"+cProp, cData )
               ENDIF
 
          CASE oNode:oParent:cName == "Font" .AND. oNode:oParent:oParent:cName == "Control"
-              VIEW oCurControl:Name, oNode:cName, oNode:cData
+              cData := oNode:cData
+              IF cProp IN {"PointSize", "Weight"}
+                 cData := VAL( cData )
+              ENDIF
+              oCurControl:Font:&cProp := cData
               
       ENDCASE
       oNode := oDoc:Next()
    ENDDO
-
+   IF oCurControl != NIL
+      oCurControl:Create()
+      oCurControl := NIL
+   ENDIF
+   ::Preview()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
