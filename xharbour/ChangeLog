@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6765 2011/01/22 04:05:10 andijahja Exp $
+ * $Id: ChangeLog,v 1.6766 2011/01/22 04:11:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-22 17:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/hvm.c
+    + option to not using function hb_vmProcessSymbols() of hvm.c if
+      HB_NO_DUPLICATE_HVMPROCESSSYMBOL is defined.
+      ; Note: This option is required when creating Harbour DLL. It is known
+      that most linkers have option to allow duplicate symbols, but there is
+      also linker which does not compromise with dups, particularly when
+      linking a shared library/DLL (fe. DMC). Moreover, avoiding dups in
+      creating DLL is a not bad choice.
+
+  * makefile.*
+  * hrbdll.pc
+    + -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL switch when creating Harbiur DLL
 
 2011-01-22 11:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h

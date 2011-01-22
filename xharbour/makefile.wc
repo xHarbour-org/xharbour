@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.104 2011/01/21 06:06:42 andijahja Exp $
+# $Id: makefile.wc,v 1.105 2011/01/22 04:05:10 andijahja Exp $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -331,8 +331,8 @@ EXEFLAGS=\
 ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d__EXPORT__ -dHAVE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
 CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -383,7 +383,7 @@ ACEH_DIR    =-i=$(HB_DIR_ADS)"
 INCLUDE_DIR =include
 INCLUDE_DIR =$(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -DHB_OS_WIN_32_USED
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 !ifdef HB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
 !endif

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.260 2011/01/21 06:06:41 andijahja Exp $
+# $Id: makefile.bc,v 1.261 2011/01/22 04:05:10 andijahja Exp $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -491,7 +491,7 @@ OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 INCLUDE_DIR =$(INCLUDE_DIR);include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED
+CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
 
 # User flags should be able to override everything!
@@ -574,7 +574,7 @@ OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)"\include
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DHB_OS_WIN_32_USED -DOPENSSL_NO_DEPRECATED -DHB_OS_WIN_USED
-HARBOURFLAGS =$(HARBOURFLAGS) -po$(OBJ_DIR)\ -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
+HARBOURFLAGS =$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT

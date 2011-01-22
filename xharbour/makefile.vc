@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.255 2011/01/21 06:06:42 andijahja Exp $
+# $Id: makefile.vc,v 1.256 2011/01/22 04:05:10 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -388,7 +388,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**

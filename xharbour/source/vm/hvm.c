@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.737 2009/12/31 00:15:48 andijahja Exp $
+ * $Id: hvm.c,v 1.738 2010/01/10 19:51:12 andijahja Exp $
  */
 
 /*
@@ -10668,6 +10668,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
    return pNewSymbols;
 }
 
+#if !defined( HB_NO_DUPLICATE_HVMPROCESSSYMBOL )
 PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
@@ -10699,6 +10700,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const c
 
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
+#endif
 
 /* HVM & RTL in harbour.dll */
 PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals )
