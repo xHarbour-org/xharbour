@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6763 2011/01/21 06:06:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.6764 2011/01/21 13:09:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-01-22 11:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/rtl/pcre/pcre_ucp_searchfuncs.c
+  - source/rtl/pcre/ucpinternal.h
+  - source/rtl/pcre/ucptable.h
+  * common.mak
+  * compile.mak
+    ! updating pcre library to v. 8.12 and deleted no longer required files.
+
+  * common.mak
+    - hbfilere.exe is excluded from default build
+
+  * makefile.*
+  * hrbdll.pc
+    + add default flag -DHAVE_CONFIG_H for pcre library
 
 2011-01-21 20:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * hrbdll.pc

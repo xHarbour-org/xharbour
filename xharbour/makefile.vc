@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.vc,v 1.254 2011/01/20 04:55:53 andijahja Exp $
+# $Id: makefile.vc,v 1.255 2011/01/21 06:06:42 andijahja Exp $
 #
 # MAKEFILE FOR MSVC
 #
@@ -96,7 +96,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MT
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(INCLUDE_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
@@ -388,7 +388,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**

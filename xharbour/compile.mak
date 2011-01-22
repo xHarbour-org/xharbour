@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: compile.mak,v 1.55 2010/12/10 21:43:56 andijahja Exp $
+# $Id: compile.mak,v 1.56 2011/01/20 04:55:53 andijahja Exp $
 #
 # FILE  : compile.mak
 # NOTES : please DO NOT convert TABS to SPACES of entries in this file.
@@ -1550,9 +1550,6 @@ $(OBJ_DIR)$(DIR_SEP)pcre_tables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_tables.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_try_flipped$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_try_flipped.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pcre_ucp_searchfuncs$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_ucp_searchfuncs.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_valid_utf8.c

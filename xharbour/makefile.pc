@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.pc,v 1.85 2010/06/18 16:36:30 ronpinkas Exp $
+# $Id: makefile.pc,v 1.86 2011/01/21 06:06:42 andijahja Exp $
 #
 # MAKEFILE FOR PELLESC
 #
@@ -51,7 +51,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 HB_CMD       =$(HARBOUR_EXE) /n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 
-CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" 
+CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"HAVE_CONFIG_H"
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**

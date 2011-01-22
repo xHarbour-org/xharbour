@@ -45,7 +45,10 @@ POSSIBILITY OF SUCH DAMAGE.
 information about a compiled pattern. */
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
 #include "pcre_internal.h"
 
 

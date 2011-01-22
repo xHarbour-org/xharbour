@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.60 2010/12/10 21:43:56 andijahja Exp $
+# $Id: common.mak,v 1.61 2011/01/20 04:55:53 andijahja Exp $
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose
@@ -453,10 +453,9 @@ PCREPOS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pcre_study$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_tables$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_try_flipped$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pcre_ucp_searchfuncs$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_version$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_xclass$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcreposix$(OBJEXT)
 
@@ -1855,7 +1854,6 @@ ST_PROJECT=\
 	$(HBMAKE_EXE)\
 	$(XBSCRIPT_EXE)\
 	$(HBTEST_EXE)\
-	$(HBFILERE_EXE)\
 	$(HBRUN_EXE)
 
 MT_PROJECT=\

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.gc,v 1.60 2011/01/20 04:55:53 andijahja Exp $
+# $Id: makefile.gc,v 1.61 2011/01/21 06:06:41 andijahja Exp $
 #
 # MAKEFILE FOR MINGW32
 #
@@ -51,7 +51,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -335,7 +335,7 @@ ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
-CLIBFLAGS   +=-D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
@@ -343,8 +343,8 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
-DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(COMPILERLIBS)
+DLL_LINK_CMD=GCC -shared -Wl,--allow-multiple-definition -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+DLLEXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project

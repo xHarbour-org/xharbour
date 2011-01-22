@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.dc,v 1.59 2011/01/20 04:55:53 andijahja Exp $
+# $Id: makefile.dc,v 1.60 2011/01/21 06:06:41 andijahja Exp $
 #
 # MAKEFILE FOR DIGITALMARS
 #
@@ -43,7 +43,7 @@ INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT"
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT" -D"HAVE_CONFIG_H"
 HB_CMD=$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN=$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
@@ -288,7 +288,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
+CLIBFLAGS   =$(CLIBFLAGS) -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)

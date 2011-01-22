@@ -45,7 +45,10 @@ POSSIBILITY OF SUCH DAMAGE.
 supporting functions. */
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
 #include "pcre_internal.h"
 
 #define SET_BIT(c) start_bits[c/8] |= (1 << (c&7))
