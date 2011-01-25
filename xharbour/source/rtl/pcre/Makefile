@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2008/10/24 19:36:34 lculik Exp $
+# $Id: Makefile,v 1.5 2008/12/23 18:06:33 likewolf Exp $
 #
 
 ROOT = ../../../
@@ -21,7 +21,6 @@ C_SOURCES=\
 	pcre_study.c \
 	pcre_tables.c \
 	pcre_try_flipped.c \
-	pcre_ucp_searchfuncs.c \
 	pcre_valid_utf8.c \
 	pcre_version.c \
 	pcre_xclass.c \
@@ -31,6 +30,8 @@ C_SOURCES=\
 LIBNAME=pcrepos
 
 include $(TOP)$(ROOT)config/lib.cf
+
+CFLAGS += -DHAVE_CONFIG_H
 
 # it's necessary for POCC/XCC compilers
 CFLAGS += -I../../

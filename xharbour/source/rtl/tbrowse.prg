@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.226 2010/04/26 21:45:15 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.227 2010/05/22 12:30:52 modalsist Exp $
  */
 
 /*
@@ -207,9 +207,7 @@ HIDDEN:
    DATA  oBrowse                         // TBrowse object I'm caching
    DATA  aRect                           // Array with pending color-rects
 
-   DATA  lInvalid                        // if true all rows will be invalidated. 
-   DATA  lNewRow                         // if true indicate that browse is in append mode.
-
+   DATA  lInvalid                        // if true all rows will be invalidated.
 
    METHOD  FillRow( nRow )               // Fills a row of aCache with data from datasource
    METHOD  ColIndex()                    // Determine the relative column index into ::aCache array.
@@ -226,7 +224,6 @@ METHOD New( oBrowse ) CLASS TDataCache
    ::oBrowse     := oBrowse
    ::aRect       := {}
    ::nCurRow     := 1
-   ::lNewRow     := .f.
 
    ::InitCache()
 
@@ -249,10 +246,9 @@ RETURN NIL
 *--------------------------------------------*
 METHOD Skip( nRowsToSkip ) CLASS TDataCache
 *--------------------------------------------*
-LOCAL nSkipped, nNewRow, lEof 
+LOCAL nSkipped, nNewRow
 
    if ! hb_IsBlock( ::oBrowse:SkipBlock )
-      ::lNewRow := .f.
       Return 0
    endif
 
@@ -262,24 +258,11 @@ LOCAL nSkipped, nNewRow, lEof
       Return 0
    endif
 
-   lEof := eof()
-
-   if ! ::lNewRow .or. nRowsToSkip < 0 
-      nSkipped := Eval( ::oBrowse:SkipBlock, nRowsToSkip )
-      ::lNewRow := ( !lEof .and. eof() )
-      if ::oBrowse:GoBottomBlock == NIL
-         ::lNewRow := .F.
-      endif
-   else
-      nSkipped := 0
-   endif
+   nSkipped := Eval( ::oBrowse:SkipBlock, nRowsToSkip )
 
    nNewRow := ::nCurRow + nSkipped
 
-   if Empty( nSkipped ) // can be nil also.
-      nSkipped := 0
-
-   elseif nSkipped == nRowsToSkip
+   if nSkipped == nRowsToSkip
 
       if  nNewRow >= 1 .and. nNewRow <= ::nMaxRow
          ::nCurRow += nSkipped
@@ -354,8 +337,6 @@ RETURN nSkipped
 METHOD GoTop() CLASS TDataCache
 *--------------------------------------------*
 
-   ::lNewRow := .f.
-
    if hb_IsBlock( ::oBrowse:GoTopBlock )
       Eval( ::oBrowse:GoTopBlock )
    endif
@@ -369,8 +350,6 @@ RETURN NIL
 METHOD GoBottom() CLASS TDataCache
 *--------------------------------------------*
 Local nToTop, lBottomBlock
-
-   ::lNewRow := .f.
 
    lBottomBlock := hb_IsBlock( ::oBrowse:GoBottomBlock )
 
