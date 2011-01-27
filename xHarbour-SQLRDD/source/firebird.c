@@ -915,6 +915,12 @@ HB_FUNC( FBCREATEDB )
    }
    else
    {
+	 if ( isc_detach_database ( status, &newdb ) )
+	 {
+		 hb_retni( SQL_ERROR );
+		 return ;
+     }	 
+  
       hb_retni( SQL_SUCCESS );
    }
 }
