@@ -219,9 +219,19 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
                aadd( aToFix, aClone( aNewStruct[i] ) )
                SR_LogFile( "changestruct.log", { oWA:cFileName, "Warning: Possible data loss changing data type:", aNewStruct[i,1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]} )
             ElseIf aNewStruct[i, 2] != oWA:aFields[n, 2]
-               SR_LogFile( "changestruct.log", { oWA:cFileName, "ERROR: Cannot convert data type of field:", aNewStruct[i,1], " from", oWA:aFields[n, 2], "to", aNewStruct[i, 2] } )
-            ElseIf aNewStruct[i, 3] >= oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"
-               aadd( aToFix, aClone( aNewStruct[i] ) )
+               IF aNewStruct[i, 2] $"CN" .and. oWA:aFields[n, 2] $"CN" .and. oWA:oSql:nSystemID == SYSTEMID_POSTGR               
+
+                  IF "8.4" $ oWA:oSql:cSystemVers .or. "9.0" $ oWA:oSql:cSystemVers
+                     aadd( aDirect, aClone( aNewStruct[i] ) )
+                  else
+                     aadd( aToFix, aClone( aNewStruct[i] ) )
+                  ENDIF
+                  SR_LogFile( "changestruct.log", { oWA:cFileName, "Warning: Possible data loss changing field types:", aNewStruct[i,1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]} )
+               ELSE 
+                  SR_LogFile( "changestruct.log", { oWA:cFileName, "ERROR: Cannot convert data type of field:", aNewStruct[i,1], " from", oWA:aFields[n, 2], "to", aNewStruct[i, 2] } )
+               ENDIF
+            ElseIf aNewStruct[i, 3] >= oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"              
+               
                aadd( aDirect, aClone( aNewStruct[i] ) )
                SR_LogFile( "changestruct.log", { oWA:cFileName, "Will Change field size:", aNewStruct[i,1], "from", oWA:aFields[n, 3], "to", aNewStruct[i, 3] } )
             ElseIf aNewStruct[i, 3] < oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"

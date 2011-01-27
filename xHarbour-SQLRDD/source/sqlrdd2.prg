@@ -5075,9 +5075,16 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
 
    cSql += " )"
 
-   If ::oSql:nSystemID == SYSTEMID_MYSQL
-        cSql += " Type=InnoDb "
-   ENDIF
+   //If ::oSql:nSystemID == SYSTEMID_MYSQL
+        //cSql += " Type=InnoDb "
+   //ENDIF
+   IF ::oSql:nSystemID == SYSTEMID_MYSQL
+        if Val( Substr( ::oSql:cSystemVers, 1, 1 ) ) == 5 .and. val(Substr( ::oSql:cSystemVers, 2, 2 ) ) < 5
+           cSql += " Type=InnoDb "
+        else
+           cSql += " Engine=InnoDb "
+        Endif
+   ENDIF   
 
    If ::oSql:nSystemID == SYSTEMID_ORACLE .and. !Empty( SR_SetTblSpaceData() )
         cSql += " TABLESPACE " + SR_SetTblSpaceData()
@@ -8429,7 +8436,15 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
          If ::oSql:nSystemID == SYSTEMID_ORACLE .and. ::aFields[nPos_, 2] $ "CM"
             ::oSql:exec( "UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY( ::aFields[nPos_,1], ::oSql:nSystemID ) + " = RTRIM( BACKUP_ )", lDisplayErrorMessage )
          Else
+            if ::oSql:nSystemID == SYSTEMID_POSTGR  .AND. ::aFields[nPos_, 2] != aBack[ 1, 2 ]
+               IF ::aFields[nPos_, 2] =="N" .AND. aBack[ 1, 2 ] == "C"
+                  ::oSql:exec( "UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY( ::aFields[nPos_,1], ::oSql:nSystemID ) + " = BACKUP_::text::numeric::integer", lDisplayErrorMessage )
+               ELSE
+                  ::oSql:exec( "UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY( ::aFields[nPos_,1], ::oSql:nSystemID ) + " = BACKUP_::numeric::integer::text", lDisplayErrorMessage )
+               ENDIF
+            ELSE
             ::oSql:exec( "UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY( ::aFields[nPos_,1], ::oSql:nSystemID ) + " = BACKUP_", lDisplayErrorMessage )
+            ENDIF
          EndIf
          ::oSql:Commit()
          // Drop backup
@@ -8657,7 +8672,14 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
          Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_POSTGR .and. cField == ::cRecnoName
             cSql := cSql + "NUMERIC (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str(aCreate[i,FIELD_DEC],9,0)) + ") default (nextval('" + ::cOwner + LimitLen(::cFileName,3) + "_SQ')) NOT NULL UNIQUE"
          Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_POSTGR
-            cSql := cSql + "NUMERIC (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ")"
+            
+            cSql := cSql + "NUMERIC (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ")" //
+            nPos := ascan( ::aFields, {|x| Alltrim( UPPER( x[1] ))  == allTrim( UPPER(cField) )})
+            if nPos >0
+               if ::aFields[nPos,FIELD_TYPE] == "C"
+                  cSql += " using "+cField+"::numeric "
+               ENDIF
+            ENDIF	                   
             cSql2 := "ALTER TABLE " + ::cQualifiedTableName                        
             cSql2 := cSql2 + " ALTER " + SR_DBQUALIFY( alltrim( cField  ), ::oSql:nSystemID ) + " SET DEFAULT 0"
             

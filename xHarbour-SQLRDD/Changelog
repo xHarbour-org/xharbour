@@ -10,7 +10,11 @@
 2011-01-27 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! in createtable method added logic to detect mysql 5.5 since it use engine=innodb insted of type=innodb
-   !
+     ! added logic in AlterColumnsDirect method to allow convertion from char to numeric field 
+   ! source/firebird.c
+     ! changed FBCREATEDB to dont lock database upon created is success fully created . Sugested by marson de paula
+   ! source/utils.prg
+     ! added logic in sr_changestruct method to allow convertion from char to numeric field 
 
 2010-10-11 14:25  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/pgs.c
