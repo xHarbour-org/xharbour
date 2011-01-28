@@ -180,7 +180,7 @@ METHOD CreateFooter() CLASS VrReport
 RETURN Self
 
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL aKeys, aFont, oPrev, oNode, hPointer, cData, oCurControl, n, oControl, aControl, cParent
+   LOCAL aFont, oPrev, oNode, hPointer, cData, n, aControl, cParent
    oNode := oDoc:FindFirstRegEx( "Report" )
    WHILE oNode != NIL
       DO CASE
@@ -214,18 +214,20 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 RETURN Self
 
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL hPointer, aKeys, aFont, oNode, hPointer, cData, oCurControl, n, cProp, oControl, aControl, cParent
+   LOCAL hPointer, oNode
    IF ::oPDF != NIL
       ::oPDF:Destroy()
    ENDIF
    ::Create()
+   HSetCaseMatch( ::aData, .F. )
+   HSetCaseMatch( ::aProps, .F. )
 
    ::PrepareArrays( oDoc )
    
    ::HeaderHeight := VAL( ::aProps:HeaderHeight )
    ::FooterHeight := VAL( ::aProps:FooterHeight )
    
-   IF !EMPTY( ::aData:FileName )
+   IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
       hPointer := HB_FuncPtr( ::aData:ClassName )
       IF hPointer != NIL
          WITH OBJECT ::DataSource := HB_Exec( hPointer )
