@@ -5079,7 +5079,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
         //cSql += " Type=InnoDb "
    //ENDIF
    IF ::oSql:nSystemID == SYSTEMID_MYSQL
-        if Val( Substr( ::oSql:cSystemVers, 1, 1 ) ) == 5 .and. val(Substr( ::oSql:cSystemVers, 2, 2 ) ) < 5
+        if Val( Substr( ::oSql:cSystemVers, 1, 3 ) ) < 505
            cSql += " Type=InnoDb "
         else
            cSql += " Engine=InnoDb "
