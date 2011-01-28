@@ -38,10 +38,12 @@ CLASS VrReport INHERIT VrObject
    DATA lUI            EXPORTED  INIT .F.
    DATA hReport        EXPORTED  INIT {=>}
 
-   DATA aProps         EXPORTED  INIT {}
+   DATA aProps         EXPORTED  INIT {=>}
    DATA aHeader        EXPORTED  INIT {}
    DATA aBody          EXPORTED  INIT {}
    DATA aFooter        EXPORTED  INIT {}
+   DATA aData          EXPORTED  INIT {=>}
+
 
    METHOD Init()       CONSTRUCTOR
    METHOD Create()
@@ -182,10 +184,11 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    oNode := oDoc:FindFirstRegEx( "Report" )
    WHILE oNode != NIL
       DO CASE
+         CASE oNode:oParent:cName == "DataSource" .AND. oNode:oParent:oParent:cName == "Report"
+              ::aData[ oNode:cName ] := oNode:cData
+              
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
-              IF oNode:cName IN {"HeaderHeight", "FooterHeight" }
-                 AADD( ::aProps, { oNode:cName, VAL( oNode:cData ) } )
-              ENDIF
+              ::aProps[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
               aControl := {}
@@ -211,70 +214,53 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 RETURN Self
 
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL aKeys, aFont, oNode, hPointer, cData, oCurControl, n, cProp, oControl, aControl, cParent
+   LOCAL hPointer, aKeys, aFont, oNode, hPointer, cData, oCurControl, n, cProp, oControl, aControl, cParent
    IF ::oPDF != NIL
       ::oPDF:Destroy()
    ENDIF
    ::Create()
-   ::nRow := 0
 
    ::PrepareArrays( oDoc )
-
+   
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight )
+   ::FooterHeight := VAL( ::aProps:FooterHeight )
+   
+   IF !EMPTY( ::aData:FileName )
+      hPointer := HB_FuncPtr( ::aData:ClassName )
+      IF hPointer != NIL
+         WITH OBJECT ::DataSource := HB_Exec( hPointer )
+            :FileName := ::aData:FileName
+            :Alias    := ::aData:Alias
+            :bFilter  := ::aData:bFilter
+            :Create()
+         END
+      ENDIF
+   ENDIF
    ::CreateHeader()
    ::CreateBody()
    ::CreateFooter()
-//              ::nRow += ::HeaderHeight
-/*              
-              IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
-                 ::DataSource:Create()
-                 ::DataSource:EditCtrl:Select()
-                 WHILE ! oRep:DataSource:EditCtrl:Eof()
-                    ::PrintBody( oNode )
-                    IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight )
-                       ::PrintFooter( oNode )
-                       ::EndPage()
-                       ::StartPage()
-                       ::PrintHeader( oNode )
-                    ENDIF
-                    ::DataSource:EditCtrl:Skip()
-                 ENDDO
-              ENDIF
-*/
-/*
-              cProp := oNode:cName
-              IF cProp == "ClassName"
-                 IF oCurControl != NIL
-                    oCurControl:Create()
-                    oCurControl := NIL
-                 ENDIF
 
-                 hPointer := HB_FuncPtr( oNode:cData )
-                 IF hPointer != NIL
-                    oCurControl := HB_Exec( hPointer,, , .F. )
-                    oCurControl:Parent := Self
-                 ENDIF
-               ELSEIF cProp != "Font"
-                 cData := oNode:cData
-                 IF cProp IN {"Left", "Top", "Width", "Height", "ForeColor", "BackColor" }
-                    cData := VAL( cData )
-                 ENDIF
-                 __objSendMsg( oCurControl, "_"+cProp, cData )
-              ENDIF
-*/                            
-//         CASE oNode:oParent:cName == "Font" .AND. oNode:oParent:oParent:cName == "Control"
-//              cData := oNode:cData
-//              IF cProp IN {"PointSize", "Weight"}
-//                 cData := VAL( cData )
-//              ENDIF
-//              oCurControl:Font:&cProp := cData
-              
+   IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
+      ::DataSource:EditCtrl:Select()
+      WHILE ! ::DataSource:EditCtrl:Eof()
+         ::CreateBody()
+         IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight )
+            ::CreateFooter()
+            ::EndPage()
+            ::StartPage()
+            ::CreateHeader()
+         ENDIF
+         ::DataSource:EditCtrl:Skip()
+      ENDDO
+      ::CreateFooter()
+   ENDIF
    ::EndPage()
    ::End()
-//   IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
-//      IF ::DataSource:EditCtrl:IsOpen
-//         ::DataSource:EditCtrl:Close()
-//      ENDIF
-//   ENDIF
+   IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
+      IF ::DataSource:EditCtrl:IsOpen
+         ::DataSource:EditCtrl:Close()
+      ENDIF
+   ENDIF
    ::Preview()
 RETURN Self
 /*

@@ -569,6 +569,8 @@ METHOD Save( lSaveAs ) CLASS Report
 
       IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
          oXmlData := TXmlNode():new( , "DataSource" )
+            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, ::VrReport:DataSource:ClassName )
+            oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
             oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
