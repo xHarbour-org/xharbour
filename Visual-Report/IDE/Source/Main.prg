@@ -529,7 +529,7 @@ RETURN Self
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
    LOCAL aProps, oXmlValue, oXmlControl
    oXmlControl := TXmlNode():new( , "Control" )
-      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, oCtrl:ClassName )
+      oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, oCtrl:ClassName )
       oXmlControl:addBelow( oXmlValue )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Name", NIL, oCtrl:Name )
       oXmlControl:addBelow( oXmlValue )
@@ -569,7 +569,7 @@ METHOD Save( lSaveAs ) CLASS Report
 
       IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
          oXmlData := TXmlNode():new( , "DataSource" )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClassName", NIL, ::VrReport:DataSource:ClassName )
+            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, ::VrReport:DataSource:ClassName )
             oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
             oXmlData:addBelow( oXmlValue )
