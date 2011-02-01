@@ -261,7 +261,7 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:EditCtrl:Select()
       WHILE ! ::DataSource:EditCtrl:Eof()
          ::CreateBody()
-         IF ::nRow >= ( ::oPDF:PageLength - ( ( ::FooterHeight + ::HeaderHeight ) * ( PIX_PER_INCH / 72 ) )    )
+         IF ::nRow >= ( ::oPDF:PageLength - ( ( ::FooterHeight ) * ( PIX_PER_INCH / 72 ) )    )
             ::CreateFooter()
             ::EndPage()
             ::StartPage()
