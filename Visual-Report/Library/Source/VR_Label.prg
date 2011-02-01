@@ -32,19 +32,7 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD Init( oParent, lDesign, nPanel ) CLASS VrLabel
-   DEFAULT lDesign TO .T.
-   IF lDesign .AND. oParent == NIL // LOADING!
-      SWITCH nPanel
-         CASE 1
-              oParent := ::Application:Props:Header
-         CASE 2
-              oParent := ::Application:Props:Body
-         CASE 3
-              oParent := ::Application:Props:Footer
-      END
-      ::__ClsInst := __ClsInst( ::ClassH )
-   ENDIF
+METHOD Init( oParent ) CLASS VrLabel
    IF oParent != NIL
       Super:Init( oParent )
       AADD( ::aProperties, { "Name",      "Object"  } )
@@ -88,7 +76,8 @@ METHOD SetText( cText ) CLASS VrLabel
             IF VALTYPE( cText ) == "C"
                SetWindowText( :hWnd, cText )
             ENDIF
-            aSize := :Drawing:GetTextExtentPoint32( ::Text )
+            
+            aSize := :Drawing:GetTextExtentPoint32( cText )
             :xWidth := aSize[1]+4
             :xHeight := aSize[2]+2
             :MoveWindow()

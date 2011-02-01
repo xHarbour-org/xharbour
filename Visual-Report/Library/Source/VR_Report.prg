@@ -45,6 +45,7 @@ CLASS VrReport INHERIT VrObject
    DATA aFooter        EXPORTED  INIT {}
    DATA aData          EXPORTED  INIT {=>}
 
+   ACCESS Application  INLINE __GetApplication()
 
    METHOD Init()       CONSTRUCTOR
    METHOD Create()
@@ -72,7 +73,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS VrReport
-   ::oPDF := ActiveX( __GetApplication():MainForm )
+   ::oPDF := ActiveX( ::Application:MainForm )
    ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
    ::oPDF:Width  := 0
    ::oPDF:Height := 0
@@ -137,25 +138,34 @@ METHOD Preview() CLASS VrReport
    VrPreview( Self )
 RETURN Self
 
-METHOD CreateControl( aCtrl, nHeight ) CLASS VrReport
+METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    LOCAL hPointer, oControl
-   hPointer := HB_FuncPtr( aCtrl[1][2] )
-   IF hPointer != NIL
-      oControl := HB_Exec( hPointer,, , .F. )
-      oControl:Parent    := Self
-      oControl:Text      := aCtrl[3][2]
-      oControl:ForeColor := VAL( aCtrl[4][2] )
-      oControl:BackColor := VAL( aCtrl[5][2] )
+   IF oPanel == NIL
+      hPointer := HB_FuncPtr( aCtrl[1][2] )
+      IF hPointer != NIL
+         oControl := HB_Exec( hPointer,, , .F. )
+         oControl:Parent    := Self
+      ENDIF
       oControl:Left      := VAL( aCtrl[6][2] )
       oControl:Top       := VAL( aCtrl[7][2] )
-      oControl:Font:FaceName  := aCtrl[8][2][1][2]
-      oControl:Font:PointSize := VAL( aCtrl[8][2][2][2] )
-      oControl:Font:Italic    := IIF( aCtrl[8][2][3][2]=="True", .T., .F. )
-      oControl:Font:Underline := IIF( aCtrl[8][2][4][2]=="True", .T., .F. )
-      oControl:Font:Weight    := VAL( aCtrl[8][2][5][2] )
+    ELSE
+      oControl := oPanel:CreateControl( aCtrl[1][2], VAL( aCtrl[6][2] ), VAL( aCtrl[7][2] ) )
+   ENDIF
+
+   oControl:Text      := aCtrl[3][2]
+   oControl:ForeColor := VAL( aCtrl[4][2] )
+   oControl:BackColor := VAL( aCtrl[5][2] )
+   oControl:Font:FaceName  := aCtrl[8][2][1][2]
+   oControl:Font:PointSize := VAL( aCtrl[8][2][2][2] )
+   oControl:Font:Italic    := IIF( aCtrl[8][2][3][2]=="True", .T., .F. )
+   oControl:Font:Underline := IIF( aCtrl[8][2][4][2]=="True", .T., .F. )
+   oControl:Font:Weight    := VAL( aCtrl[8][2][5][2] )
+
+   IF oPanel == NIL
       oControl:Create()
       nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
    ENDIF
+
 RETURN Self
 
 METHOD CreateBody() CLASS VrReport
@@ -222,11 +232,37 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    ENDDO
 RETURN Self
 
-METHOD Load( oDoc ) CLASS VrReport
+METHOD Load( cReport ) CLASS VrReport
+   LOCAL aCtrl, oDoc := TXmlDocument():New( cReport )
+   ::aData  := {=>}
+   ::aProps := {=>}
+   HSetCaseMatch( ::aData, .F. )
+   HSetCaseMatch( ::aProps, .F. )
+
    ::PrepareArrays( oDoc )
    
    ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
    ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
+
+   IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
+      WITH OBJECT ::DataSource := ::Application:Props[ "Body" ]:CreateControl( ::aData:ClsName )
+         :FileName := ::aData:FileName
+         :Alias    := ::aData:Alias
+         :bFilter  := ::aData:bFilter
+      END
+      ::Application:Props:PropEditor:ResetProperties( {{ ::DataSource }} )
+   ENDIF
+
+   FOR EACH aCtrl IN ::aHeader
+       ::CreateControl( aCtrl,, ::Application:Props[ "Header" ] )
+   NEXT
+   FOR EACH aCtrl IN ::aBody
+       ::CreateControl( aCtrl,, ::Application:Props[ "Body" ] )
+   NEXT
+   FOR EACH aCtrl IN ::aFooter
+       ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
+   NEXT
+
 RETURN Self
 
 METHOD Run( oDoc ) CLASS VrReport
@@ -235,10 +271,12 @@ METHOD Run( oDoc ) CLASS VrReport
       ::oPDF:Destroy()
    ENDIF
    ::Create()
-   HSetCaseMatch( ::aData, .F. )
-   HSetCaseMatch( ::aProps, .F. )
-
+   
    IF oDoc != NIL
+      ::aData  := {=>}
+      ::aProps := {=>}
+      HSetCaseMatch( ::aData, .F. )
+      HSetCaseMatch( ::aProps, .F. )
       ::PrepareArrays( oDoc )
    ENDIF
    

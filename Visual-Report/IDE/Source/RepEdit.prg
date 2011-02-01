@@ -32,6 +32,7 @@ CLASS RepEdit INHERIT Panel
    METHOD Create()
    METHOD OnMouseMove()
    METHOD OnDestroy() INLINE DeleteObject( ::hBmpGrid ), NIL
+   METHOD CreateControl()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -77,29 +78,36 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
+METHOD CreateControl( cControl, x, y ) CLASS RepEdit
    EXTERN VrLabel, VrLine, VrImage, VrDataTable
-   LOCAL hPointer, oControl, pt, cControl
+   LOCAL oControl, hPointer := HB_FuncPtr( cControl )
+   IF hPointer != NIL
+      DEFAULT x TO 0
+      DEFAULT y TO 0
+      oControl := HB_Exec( hPointer,, Self )
+      oControl:__ClsInst := __ClsInst( oControl:ClassH )
+      oControl:Left := x 
+      oControl:Top  := y 
+      oControl:Create()
+      
+      IF ::Application:Props:ToolBox:ActiveItem != NIL
+         ::Application:Props:ToolBox:ActiveItem:PointerItem:Select()
+         ::Application:Report:Modified := .T.
+         ::Application:Props:PropEditor:ResetProperties( {{ oControl }} )
+      ENDIF
+      
+      IF !oControl:lUI
+         ::Application:Props:Components:AddButton( oControl )
+      ENDIF
+   ENDIF
+RETURN oControl
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
+   LOCAL pt
    ::SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
-      cControl := ::Application:Props:ToolBox:ActiveItem:Caption
-      hPointer      := HB_FuncPtr( "Vr"+cControl )
-      IF hPointer != NIL
-         oControl := HB_Exec( hPointer,, Self )
-         oControl:__ClsInst := __ClsInst( oControl:ClassH )
-         oControl:Left := x 
-         oControl:Top  := y 
-         oControl:Create()
-         
-         ::Application:Props:ToolBox:ActiveItem:PointerItem:Select()
-
-         ::Application:Props:PropEditor:ResetProperties( {{ oControl }} )
-         ::Application:Report:Modified := .T.
-         
-         IF !oControl:lUI
-            ::Application:Props:Components:AddButton( oControl )
-         ENDIF
-      ENDIF
+      ::CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y )
     ELSE
       pt := (struct POINT)
       pt:x := x

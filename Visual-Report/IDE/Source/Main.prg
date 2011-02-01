@@ -522,8 +522,8 @@ METHOD Open( cReport ) CLASS Report
    ::ResetQuickOpen( cReport )
 
    ::VrReport := VrReport( NIL )
-   ::VrReport:Load( TXmlDocument():New( cReport ) )
-   ::VrReport:Run()
+   oApp:Props:Components:AddButton( ::VrReport )
+   ::VrReport:Load( cReport )
 RETURN Self
 
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
