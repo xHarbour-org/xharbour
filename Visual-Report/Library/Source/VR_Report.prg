@@ -24,6 +24,11 @@
 #define  acCommandToolPageHome  53773
 
 CLASS VrReport INHERIT VrObject
+   DATA nImage         EXPORTED  INIT 0
+   DATA nText          EXPORTED  INIT 0
+   DATA nLine          EXPORTED  INIT 0
+   DATA nBox           EXPORTED  INIT 0
+   
    DATA FileName       EXPORTED  INIT "Preview"
    DATA LandScape      EXPORTED  INIT .F.
    DATA PaperSize      EXPORTED  INIT 1
@@ -39,11 +44,11 @@ CLASS VrReport INHERIT VrObject
    DATA lUI            EXPORTED  INIT .F.
    DATA hReport        EXPORTED  INIT {=>}
 
-   DATA aProps         EXPORTED  INIT {=>}
    DATA aHeader        EXPORTED  INIT {}
    DATA aBody          EXPORTED  INIT {}
    DATA aFooter        EXPORTED  INIT {}
-   DATA aData          EXPORTED  INIT {=>}
+   DATA aData          EXPORTED
+   DATA aProps         EXPORTED
 
    ACCESS Application  INLINE __GetApplication()
 
@@ -74,6 +79,8 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS VrReport
    ::oPDF := ActiveX( ::Application:MainForm )
+   ::oPDF:SetChildren := .F.
+   
    ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
    ::oPDF:Width  := 0
    ::oPDF:Height := 0
@@ -89,8 +96,6 @@ METHOD Create() CLASS VrReport
    ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
    ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
    ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::LandScape )
-
-   ::oPDF:ObjectAttributeSTR( "Document", "DefaultFont", "Courier New,12,400,0,0" )
 
    ::oPDF:StartSave( ::FileName + ".pdf", acFileSaveView )
 RETURN Self
@@ -135,7 +140,9 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Preview() CLASS VrReport
-   VrPreview( Self )
+   LOCAL oPv := VrPreview( Self )
+   oPv:Create()
+   ::oPDF:Destroy()
 RETURN Self
 
 METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
@@ -144,10 +151,10 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
       hPointer := HB_FuncPtr( aCtrl[1][2] )
       IF hPointer != NIL
          oControl := HB_Exec( hPointer,, , .F. )
-         oControl:Parent    := Self
+         oControl:Parent := Self
       ENDIF
-      oControl:Left      := VAL( aCtrl[6][2] )
-      oControl:Top       := VAL( aCtrl[7][2] )
+      oControl:Left := VAL( aCtrl[6][2] )
+      oControl:Top  := VAL( aCtrl[7][2] )
     ELSE
       oControl := oPanel:CreateControl( aCtrl[1][2], VAL( aCtrl[6][2] ), VAL( aCtrl[7][2] ) )
    ENDIF
@@ -178,7 +185,6 @@ RETURN nHeight
 
 METHOD CreateHeader() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   ::nRow := 0
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
@@ -191,15 +197,17 @@ METHOD CreateFooter() CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow += nHeight
 RETURN Self
 
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL aFont, oPrev, oNode, hPointer, cData, n, aControl, cParent
-   oNode := oDoc:FindFirstRegEx( "Report" )
 
-   HSetCaseMatch( ::aProps, .F. )
+   ::aData  := {=>}
+   ::aProps := {=>}
    HSetCaseMatch( ::aData, .F. )
+   HSetCaseMatch( ::aProps, .F. )
+
+   oNode := oDoc:FindFirstRegEx( "Report" )
 
    WHILE oNode != NIL
       DO CASE
@@ -230,20 +238,16 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       ENDCASE
       oNode := oDoc:Next()
    ENDDO
+
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
+   ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
 RETURN Self
 
 METHOD Load( cReport ) CLASS VrReport
    LOCAL aCtrl, oDoc := TXmlDocument():New( cReport )
-   ::aData  := {=>}
-   ::aProps := {=>}
-   HSetCaseMatch( ::aData, .F. )
-   HSetCaseMatch( ::aProps, .F. )
 
    ::PrepareArrays( oDoc )
    
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
-   ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
-
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
       WITH OBJECT ::DataSource := ::Application:Props[ "Body" ]:CreateControl( ::aData:ClsName )
          :FileName := ::aData:FileName
@@ -267,19 +271,13 @@ RETURN Self
 
 METHOD Run( oDoc ) CLASS VrReport
    LOCAL hPointer, oNode, nHeight
-   IF ::oPDF != NIL
-      ::oPDF:Destroy()
-   ENDIF
+   
    ::Create()
    
    IF oDoc != NIL
-      ::aData  := {=>}
-      ::aProps := {=>}
-      HSetCaseMatch( ::aData, .F. )
-      HSetCaseMatch( ::aProps, .F. )
       ::PrepareArrays( oDoc )
    ENDIF
-   
+
    ::StartPage()
 
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
@@ -295,6 +293,7 @@ METHOD Run( oDoc ) CLASS VrReport
    ENDIF
 
    ::CreateHeader()
+
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
       WHILE ! ::DataSource:EditCtrl:Eof()
@@ -310,16 +309,17 @@ METHOD Run( oDoc ) CLASS VrReport
     ELSE
       ::CreateBody()
    ENDIF
-   ::CreateFooter()
 
+   ::CreateFooter()
    ::EndPage()
+
    ::End()
+   
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       IF ::DataSource:EditCtrl:IsOpen
          ::DataSource:EditCtrl:Close()
       ENDIF
    ENDIF
-   ::Preview()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -344,7 +344,6 @@ METHOD Init( oReport ) CLASS VrPreview
    ::Height     := 600
 //   ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::DlgModalFrame := .T.
-   ::Create()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -360,6 +359,7 @@ METHOD OnInitDialog() CLASS VrPreview
       :Create()
       :DockIt()
    END
+
    WITH OBJECT ::Report:oPDF
       :SetParent( Self )
       :Dock:Left   := Self
@@ -380,8 +380,9 @@ METHOD OnInitDialog() CLASS VrPreview
       ENDIF
       :Show()
    END
+
    ::CenterWindow( .T. )
-RETURN NIL
+RETURN Self
 
 
 

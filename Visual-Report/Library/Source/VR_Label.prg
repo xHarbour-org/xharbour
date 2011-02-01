@@ -118,7 +118,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
 RETURN Self
 
 METHOD Draw() CLASS VrLabel
-   LOCAL x, y, cUnderline, cItalic, cName := "Text" + AllTrim( Str( ::nText++ ) )
+   LOCAL x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
 
    x  := ( ::nLogPixelX() / 72 ) * ::Left
    y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
@@ -136,7 +136,12 @@ METHOD Draw() CLASS VrLabel
             :Attribute( "Left",   x )
             :Attribute( "Top",    y )
             :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
-            :Attribute( "Text",   ::Text )
+            TRY
+               cText := &(::Text)
+            catch
+               cText := ::Text
+            END
+            :Attribute( "Text", cText )
             IF ::ForeColor != ::SysForeColor
                :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
             ENDIF

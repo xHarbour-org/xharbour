@@ -500,30 +500,31 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
    LOCAL oFile, pHrb
-   IF cReport == NIL
-      oFile := OpenFileDialog( oApp:MainForm )
-      oFile:Multiselect := .F.
-      oFile:Filter := "Visual Report Files (*.vrt)|*.vrt"
-      IF !oFile:Show()
-         RETURN NIL
+
+   IF ::Close() == NIL
+      IF cReport == NIL
+         oFile := OpenFileDialog( oApp:MainForm )
+         oFile:Multiselect := .F.
+         oFile:Filter := "Visual Report Files (*.vrt)|*.vrt"
+         IF !oFile:Show()
+            RETURN NIL
+         ENDIF
+         cReport := oFile:FileName
       ENDIF
-      cReport := oFile:FileName
+
+      oApp:Props:ToolBox:Enabled    := .T.
+      oApp:Props:SaveMenu:Enabled   := .T.
+      oApp:Props:SaveBttn:Enabled   := .T.
+      oApp:Props:SaveAsMenu:Enabled := .T.
+      oApp:Props:CloseBttn:Enabled  := .T.
+      oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+      ::FileName := cReport
+      ::ResetQuickOpen( cReport )
+
+      ::VrReport := VrReport( NIL )
+      oApp:Props:Components:AddButton( ::VrReport )
+      ::VrReport:Load( cReport )
    ENDIF
-
-   ::Close()
-
-   oApp:Props:ToolBox:Enabled    := .T.
-   oApp:Props:SaveMenu:Enabled   := .T.
-   oApp:Props:SaveBttn:Enabled   := .T.
-   oApp:Props:SaveAsMenu:Enabled := .T.
-   oApp:Props:CloseBttn:Enabled  := .T.
-   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
-   ::FileName := cReport
-   ::ResetQuickOpen( cReport )
-
-   ::VrReport := VrReport( NIL )
-   oApp:Props:Components:AddButton( ::VrReport )
-   ::VrReport:Load( cReport )
 RETURN Self
 
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
@@ -542,11 +543,12 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
-   LOCAL oFile
+   LOCAL oFile, oWait
    LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter, oRep
    
    DEFAULT lSaveAs TO .F.
-
+   
+   oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait..." )
    IF ::FileName == "Untitled.vrt" .OR. lSaveAs
       IF ( cName := ::SaveAs() ) == NIL
          RETURN .F.
@@ -615,6 +617,12 @@ METHOD Save( lSaveAs ) CLASS Report
 
    oRep := VrReport()
    oRep:Run( oXmlDoc )
+   
+   oWait:Destroy()
+   
+   oRep:Preview()
+   
+   hb_gcall(.t.)
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------

@@ -19,11 +19,6 @@
 CLASS VrObject
    DATA Font        PUBLISHED
 
-   DATA nImage      PROTECTED INIT 1
-   DATA nText       PROTECTED INIT 1
-   DATA nLine       PROTECTED INIT 1
-   DATA nBox        PROTECTED INIT 1
-   
    DATA lUI         EXPORTED INIT .T.
    DATA Name        EXPORTED
    DATA Text        EXPORTED

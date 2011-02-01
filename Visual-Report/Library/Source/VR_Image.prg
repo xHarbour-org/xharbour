@@ -33,19 +33,7 @@ CLASS VrImage INHERIT VrObject
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
-METHOD Init( oParent, lDesign, nPanel ) CLASS VrImage
-   DEFAULT lDesign TO .T.
-   IF lDesign .AND. oParent == NIL // LOADING!
-      SWITCH nPanel
-         CASE 1
-              oParent := ::Application:Props:Header
-         CASE 2
-              oParent := ::Application:Props:Body
-         CASE 3
-              oParent := ::Application:Props:Footer
-      END
-      ::__ClsInst := __ClsInst( ::ClassH )
-   ENDIF
+METHOD Init( oParent ) CLASS VrImage
    IF oParent != NIL
       Super:Init( oParent )
       AADD( ::aProperties, { "Name",     "Object"  } )
@@ -93,7 +81,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrImage
 RETURN Self
 
 METHOD Draw() CLASS VrImage
-   local x, y, cx, cy, cName := "Image" + AllTrim( Str( ::nImage++ ) )
+   local x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
    x  := ( ::nLogPixelX() / 72 ) * ::Left
    y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
    cx := ( ::nLogPixelX() / 72 ) * ::Width
