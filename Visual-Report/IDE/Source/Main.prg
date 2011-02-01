@@ -522,8 +522,8 @@ METHOD Open( cReport ) CLASS Report
    ::ResetQuickOpen( cReport )
 
    ::VrReport := VrReport( NIL )
-   
-   ::VrReport:Run( TXmlDocument():New( cReport ) )
+   ::VrReport:Load( TXmlDocument():New( cReport ) )
+   ::VrReport:Run()
 RETURN Self
 
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
@@ -613,7 +613,7 @@ METHOD Save( lSaveAs ) CLASS Report
    oXmlDoc:oRoot:addBelow( oXmlReport )
    oXmlDoc:Write( ::FileName )
 
-   oRep := VrReport():Create()
+   oRep := VrReport()
    oRep:Run( oXmlDoc )
 RETURN .T.
 

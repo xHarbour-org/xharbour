@@ -60,6 +60,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD PrepareArrays()
+   METHOD Load()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -171,12 +172,12 @@ METHOD CreateHeader() CLASS VrReport
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow := ::HeaderHeight
+   ::nRow := ::HeaderHeight * ( PIX_PER_INCH / 72 )
 RETURN Self
 
 METHOD CreateFooter() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   ::nRow := ::oPDF:PageLength - ::FooterHeight
+   ::nRow := ::oPDF:PageLength - ( ::FooterHeight  * ( PIX_PER_INCH / 72 ) )
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl, @nHeight )
    NEXT
@@ -186,11 +187,15 @@ RETURN Self
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL aFont, oPrev, oNode, hPointer, cData, n, aControl, cParent
    oNode := oDoc:FindFirstRegEx( "Report" )
+
+   HSetCaseMatch( ::aProps, .F. )
+   HSetCaseMatch( ::aData, .F. )
+
    WHILE oNode != NIL
       DO CASE
          CASE oNode:oParent:cName == "DataSource" .AND. oNode:oParent:oParent:cName == "Report"
               ::aData[ oNode:cName ] := oNode:cData
-              
+
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
               ::aProps[ oNode:cName ] := oNode:cData
 
@@ -217,6 +222,13 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    ENDDO
 RETURN Self
 
+METHOD Load( oDoc ) CLASS VrReport
+   ::PrepareArrays( oDoc )
+   
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight )
+   ::FooterHeight := VAL( ::aProps:FooterHeight )
+RETURN Self
+
 METHOD Run( oDoc ) CLASS VrReport
    LOCAL hPointer, oNode
    IF ::oPDF != NIL
@@ -226,11 +238,10 @@ METHOD Run( oDoc ) CLASS VrReport
    HSetCaseMatch( ::aData, .F. )
    HSetCaseMatch( ::aProps, .F. )
 
-   ::PrepareArrays( oDoc )
+   IF oDoc != NIL
+      ::PrepareArrays( oDoc )
+   ENDIF
    
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
-   ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
-
    ::StartPage()
 
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
@@ -250,7 +261,7 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:EditCtrl:Select()
       WHILE ! ::DataSource:EditCtrl:Eof()
          ::CreateBody()
-         IF ::nRow >= ( ::oPDF:PageLength - ( ::FooterHeight + ::HeaderHeight ) )
+         IF ::nRow >= ( ::oPDF:PageLength - ( ( ::FooterHeight + ::HeaderHeight ) * ( PIX_PER_INCH / 72 ) )    )
             ::CreateFooter()
             ::EndPage()
             ::StartPage()
