@@ -164,7 +164,7 @@ METHOD CreateBody() CLASS VrReport
        ::CreateControl( aCtrl, @nHeight )
    NEXT
    ::nRow += nHeight
-RETURN Self
+RETURN nHeight
 
 METHOD CreateHeader() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
@@ -172,12 +172,12 @@ METHOD CreateHeader() CLASS VrReport
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow := ::HeaderHeight * ( PIX_PER_INCH / 72 )
+   ::nRow := ::HeaderHeight
 RETURN Self
 
 METHOD CreateFooter() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   ::nRow := ::oPDF:PageLength - ( ::FooterHeight  * ( PIX_PER_INCH / 72 ) )
+   ::nRow := ::oPDF:PageLength - ( ::FooterHeight )
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl, @nHeight )
    NEXT
@@ -225,12 +225,12 @@ RETURN Self
 METHOD Load( oDoc ) CLASS VrReport
    ::PrepareArrays( oDoc )
    
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight )
-   ::FooterHeight := VAL( ::aProps:FooterHeight )
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
+   ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
 RETURN Self
 
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL hPointer, oNode
+   LOCAL hPointer, oNode, nHeight
    IF ::oPDF != NIL
       ::oPDF:Destroy()
    ENDIF
@@ -260,8 +260,8 @@ METHOD Run( oDoc ) CLASS VrReport
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
       WHILE ! ::DataSource:EditCtrl:Eof()
-         ::CreateBody()
-         IF ::nRow >= ( ::oPDF:PageLength - ( ( ::FooterHeight ) * ( PIX_PER_INCH / 72 ) )    )
+         nHeight := ::CreateBody()
+         IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
             ::CreateFooter()
             ::EndPage()
             ::StartPage()
