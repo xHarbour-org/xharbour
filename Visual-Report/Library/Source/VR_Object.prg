@@ -57,6 +57,7 @@ CLASS VrObject
    METHOD nLogPixelX()     INLINE PIX_PER_INCH
    METHOD nLogPixelY()     INLINE PIX_PER_INCH
    METHOD WriteProps()     VIRTUAL
+   METHOD Configure()      VIRTUAL
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject

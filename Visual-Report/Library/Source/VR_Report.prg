@@ -96,7 +96,8 @@ METHOD Create() CLASS VrReport
    ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
    ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
    ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::LandScape )
-
+   
+   FERASE( ::FileName + ".pdf" )
    ::oPDF:StartSave( ::FileName + ".pdf", acFileSaveView )
 RETURN Self
 
@@ -171,6 +172,8 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    IF oPanel == NIL
       oControl:Create()
       nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
+    ELSE
+      oControl:Configure()
    ENDIF
 
 RETURN Self

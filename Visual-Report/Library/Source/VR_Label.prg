@@ -28,6 +28,7 @@ CLASS VrLabel INHERIT VrObject
    METHOD SetText()
    METHOD Draw()
    METHOD WriteProps()
+   METHOD Configure()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -61,6 +62,20 @@ METHOD Create() CLASS VrLabel
    ::Font:Set( ::EditCtrl )
 
    Super:Create()
+   ::SetText( ::xText )
+RETURN Self
+
+METHOD Configure() CLASS VrLabel
+   WITH OBJECT ::EditCtrl
+      :Caption        := ::Text
+      :ForeColor      := ::ForeColor     
+      :BackColor      := ::BackColor     
+      :Font:FaceName  := ::Font:FaceName 
+      :Font:PointSize := ::Font:PointSize
+      :Font:Italic    := ::Font:Italic   
+      :Font:Underline := ::Font:Underline
+      :Font:Weight    := ::Font:Weight   
+   END
    ::SetText( ::xText )
 RETURN Self
 
