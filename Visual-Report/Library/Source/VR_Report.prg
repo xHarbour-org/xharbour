@@ -67,6 +67,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateFooter()
    METHOD PrepareArrays()
    METHOD Load()
+   METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ RETURN Self
 METHOD Create() CLASS VrReport
    ::oPDF := ActiveX( ::Application:MainForm )
    ::oPDF:SetChildren := .F.
-   
+
    ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
    ::oPDF:Width  := 0
    ::oPDF:Height := 0
@@ -96,9 +97,9 @@ METHOD Create() CLASS VrReport
    ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
    ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
    ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::LandScape )
-   
-   FERASE( ::FileName + ".pdf" )
-   ::oPDF:StartSave( ::FileName + ".pdf", acFileSaveView )
+
+   FERASE( GetTempPath() + "\vr.tmp" )
+   ::oPDF:StartSave( GetTempPath() + "\vr.tmp", acFileSaveView )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -146,14 +147,16 @@ METHOD Preview() CLASS VrReport
    ::oPDF:Destroy()
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    LOCAL hPointer, oControl
    IF oPanel == NIL
       hPointer := HB_FuncPtr( aCtrl[1][2] )
-      IF hPointer != NIL
-         oControl := HB_Exec( hPointer,, , .F. )
-         oControl:Parent := Self
+      IF hPointer == NIL
+         RETURN NIL
       ENDIF
+      oControl := HB_Exec( hPointer,, , .F. )
+      oControl:Parent := Self
       oControl:Left := VAL( aCtrl[6][2] )
       oControl:Top  := VAL( aCtrl[7][2] )
     ELSE
@@ -178,6 +181,7 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
 
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD CreateBody() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
@@ -186,6 +190,7 @@ METHOD CreateBody() CLASS VrReport
    ::nRow += nHeight
 RETURN nHeight
 
+//-----------------------------------------------------------------------------------------------
 METHOD CreateHeader() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aHeader
@@ -194,6 +199,7 @@ METHOD CreateHeader() CLASS VrReport
    ::nRow := ::HeaderHeight
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD CreateFooter() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    ::nRow := ::oPDF:PageLength - ( ::FooterHeight )
@@ -202,6 +208,7 @@ METHOD CreateFooter() CLASS VrReport
    NEXT
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL aFont, oPrev, oNode, hPointer, cData, n, aControl, cParent
 
@@ -246,6 +253,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD Load( cReport ) CLASS VrReport
    LOCAL aCtrl, oDoc := TXmlDocument():New( cReport )
 
@@ -269,9 +277,9 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
-
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport
    LOCAL hPointer, oNode, nHeight
    
@@ -315,7 +323,6 @@ METHOD Run( oDoc ) CLASS VrReport
 
    ::CreateFooter()
    ::EndPage()
-
    ::End()
    
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
@@ -387,14 +394,3 @@ METHOD OnInitDialog() CLASS VrPreview
    ::CenterWindow( .T. )
 RETURN Self
 
-
-
-FUNCTION DecToHexa(nNumber)
-   local cNewString:=''
-   local nTemp:=0
-   WHILE(nNumber > 0)
-      nTemp:=(nNumber%16)
-      cNewString:=SubStr('0123456789ABCDEF',(nTemp+1),1)+cNewString
-      nNumber:=Int((nNumber-nTemp)/16)
-   ENDDO
-RETURN(cNewString)

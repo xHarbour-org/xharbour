@@ -617,11 +617,11 @@ METHOD Save( lSaveAs ) CLASS Report
 
    oRep := VrReport()
    oRep:Run( oXmlDoc )
-   
+
    oWait:Destroy()
-   
+
    oRep:Preview()
-   
+
    hb_gcall(.t.)
 RETURN .T.
 

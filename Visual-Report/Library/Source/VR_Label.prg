@@ -156,14 +156,13 @@ METHOD Draw() CLASS VrLabel
             catch
                cText := ::Text
             END
-            :Attribute( "Text", cText )
+            :Attribute( "Text", ALLTRIM( cText ) )
             IF ::ForeColor != ::SysForeColor
                :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
             ENDIF
             IF ::BackColor != ::SysBackColor
                :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
             ENDIF
-            :Refresh()
          END
       END
    ENDIF
@@ -193,3 +192,13 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL
+
+FUNCTION DecToHexa(nNumber)
+   local cNewString := ""
+   local nTemp := 0
+   WHILE nNumber > 0
+      nTemp      := nNumber % 16
+      cNewString := SubStr( "0123456789ABCDEF", (nTemp+1), 1 ) + cNewString
+      nNumber    := Int( (nNumber-nTemp)/16 )
+   ENDDO
+RETURN cNewString
