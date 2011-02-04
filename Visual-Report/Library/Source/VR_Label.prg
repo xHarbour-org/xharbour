@@ -43,16 +43,17 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "ForeColor", "Color"   } )
    ENDIF
    DEFAULT ::Font TO Font()
+   ::Font:AllowHandle := oParent != NIL
 RETURN Self
 
 METHOD Create() CLASS VrLabel
    DEFAULT ::Font TO Font()
-   ::Font:Create()
-
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
    
+   ::Font:Create()
+
    WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
       :Caption := ::Text
       :Left    := ::Left
@@ -142,28 +143,26 @@ METHOD Draw() CLASS VrLabel
       cItalic    := IIF( ::Font:Italic, "1", "0" )
       cUnderline := IIF( ::Font:Underline, "1", "0" )
 
-      WITH OBJECT ::Parent:oPDF
-         :CreateObject( acObjectTypeText, cName )
-         ::PDFCtrl := :GetObjectByName( cName )
-         WITH OBJECT ::PDFCtrl
-            :Attribute( "AutoResize", 1 )
-            :Attribute( "Single Line", 1 )
-            :Attribute( "Left",   x )
-            :Attribute( "Top",    y )
-            :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
-            TRY
-               cText := &(::Text)
-            catch
-               cText := ::Text
-            END
-            :Attribute( "Text", ALLTRIM( cText ) )
-            IF ::ForeColor != ::SysForeColor
-               :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
-            ENDIF
-            IF ::BackColor != ::SysBackColor
-               :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
-            ENDIF
+      ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
+      ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
+      WITH OBJECT ::PDFCtrl
+         :Attribute( "AutoResize", 1 )
+         :Attribute( "Single Line", 1 )
+         :Attribute( "Left",   x )
+         :Attribute( "Top",    y )
+         :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
+         TRY
+            cText := &(::Text)
+         catch
+            cText := ::Text
          END
+         :Attribute( "Text", ALLTRIM( cText ) )
+         IF ::ForeColor != ::SysForeColor
+            :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
+         ENDIF
+         IF ::BackColor != ::SysBackColor
+            :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
+         ENDIF
       END
    ENDIF
 RETURN Self

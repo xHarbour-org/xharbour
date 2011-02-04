@@ -34,7 +34,7 @@ CLASS VrReport INHERIT VrObject
    DATA PaperSize      EXPORTED  INIT 1
    DATA oPDF           EXPORTED
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
-   DATA nPage          PROTECTED INIT 0
+   DATA nPage          EXPORTED  INIT 0
    DATA nRow           EXPORTED  INIT 0
    DATA HeaderHeight   EXPORTED  INIT 0
    DATA FooterHeight   EXPORTED  INIT 0
@@ -54,8 +54,6 @@ CLASS VrReport INHERIT VrObject
 
    METHOD Init()       CONSTRUCTOR
    METHOD Create()
-   METHOD SetPortrait()
-   METHOD SetLandscape()
    METHOD Preview()
    METHOD End()
    METHOD StartPage()
@@ -93,10 +91,7 @@ METHOD Create() CLASS VrReport
    ENDIF
 
    ::nPage := 0
-
    ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
-   ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
-   ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::LandScape )
 
    FERASE( GetTempPath() + "\vr.tmp" )
    ::oPDF:StartSave( GetTempPath() + "\vr.tmp", acFileSaveView )
@@ -114,6 +109,8 @@ METHOD StartPage() CLASS VrReport
       ::oPDF:AddPage( ::nPage )
    ENDIF
    ::nPage++
+   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "PaperSize", ::PaperSize )
+   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "Landscape", ::LandScape )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -121,24 +118,6 @@ METHOD EndPage() CLASS VrReport
    ::oPDF:SavePage( ::oPDF:CurrentPage )
    ::oPDF:ClearPage( ::oPDF:CurrentPage )
 RETURN NIL
-
-//-----------------------------------------------------------------------------------------------
-METHOD SetLandscape() CLASS VrReport
-   LOCAL nPage
-   ::LandScape := .T.
-   FOR nPage := 1 TO ::oPDF:PageCount
-      ::oPDF:ObjectAttribute( "Pages["+Alltrim(Str(nPage))+"]", "Landscape", ::LandScape )
-   NEXT
-RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-METHOD SetPortrait() CLASS VrReport
-   LOCAL nPage
-   ::LandScape := .F.
-   FOR nPage := 1 TO ::oPDF:PageCount
-      ::oPDF:ObjectAttribute( "Pages["+Alltrim(Str(nPage))+"]", "Landscape", ::LandScape )
-   NEXT
-RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Preview() CLASS VrReport
@@ -149,13 +128,9 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
-   LOCAL hPointer, oControl
+   LOCAL oControl
    IF oPanel == NIL
-      hPointer := HB_FuncPtr( aCtrl[1][2] )
-      IF hPointer == NIL
-         RETURN NIL
-      ENDIF
-      oControl := HB_Exec( hPointer,, , .F. )
+      oControl := hb_ExecFromArray( aCtrl[1][2], {,.F.} )
       oControl:Parent := Self
       oControl:Left := VAL( aCtrl[6][2] )
       oControl:Top  := VAL( aCtrl[7][2] )
@@ -173,7 +148,7 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    oControl:Font:Weight    := VAL( aCtrl[8][2][5][2] )
 
    IF oPanel == NIL
-      oControl:Create()
+      oControl:Draw()
       nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
     ELSE
       oControl:Configure()
@@ -210,7 +185,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL aFont, oPrev, oNode, hPointer, cData, n, aControl, cParent
+   LOCAL aFont, oPrev, oNode, cData, n, aControl, cParent
 
    ::aData  := {=>}
    ::aProps := {=>}
@@ -222,9 +197,11 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    WHILE oNode != NIL
       DO CASE
          CASE oNode:oParent:cName == "DataSource" .AND. oNode:oParent:oParent:cName == "Report"
+              DEFAULT oNode:cData TO ""
               ::aData[ oNode:cName ] := oNode:cData
 
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
+              DEFAULT oNode:cData TO ""
               ::aProps[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
@@ -233,6 +210,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               oNode := oDoc:Next()
               WHILE oNode:oParent:cName == "Control"
                  IF oNode:cName != "Font"
+                    DEFAULT oNode:cData TO ""
                     AADD( aControl, { oNode:cName, oNode:cData } )
                     oNode := oDoc:Next()
                   ELSE
@@ -240,6 +218,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                     aFont := {}
                     FOR n := 1 TO 5
                         oNode := oDoc:Next()
+                        DEFAULT oNode:cData TO ""
                         AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
                     NEXT
                  ENDIF
@@ -281,7 +260,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL hPointer, oNode, nHeight
+   LOCAL nHeight, n
    
    ::Create()
    
@@ -292,21 +271,18 @@ METHOD Run( oDoc ) CLASS VrReport
    ::StartPage()
 
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
-      hPointer := HB_FuncPtr( ::aData:ClsName )
-      IF hPointer != NIL
-         WITH OBJECT ::DataSource := HB_Exec( hPointer )
-            :FileName := ::aData:FileName
-            :Alias    := ::aData:Alias
-            :bFilter  := ::aData:bFilter
-            :Create()
-         END
-      ENDIF
+      ::DataSource := hb_ExecFromArray( ::aData:ClsName )
+      ::DataSource:FileName := ::aData:FileName
+      ::DataSource:Alias    := ::aData:Alias
+      ::DataSource:bFilter  := ::aData:bFilter
+      ::DataSource:Create()
    ENDIF
 
    ::CreateHeader()
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
+      ::DataSource:EditCtrl:GoTop()
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody()
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
@@ -324,7 +300,7 @@ METHOD Run( oDoc ) CLASS VrReport
    ::CreateFooter()
    ::EndPage()
    ::End()
-   
+   hb_gcall(.t.)
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       IF ::DataSource:EditCtrl:IsOpen
          ::DataSource:EditCtrl:Close()
