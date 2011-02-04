@@ -11,12 +11,14 @@
 
 #include "debug.ch"
 #include "vxh.ch"
+#include "hbxml.ch"
 //-----------------------------------------------------------------------------------------------
 
 CLASS VrLine INHERIT VrObject
    DATA ClsName EXPORTED INIT "Line"
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
+   METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -43,3 +45,14 @@ METHOD Create() CLASS VrLine
    END
    Super:Create()
 RETURN Self
+
+METHOD WriteProps( oXmlControl ) CLASS VrLine
+   LOCAL oXmlValue, oXmlFont
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Left ) )
+   oXmlControl:addBelow( oXmlValue )
+RETURN Self
+

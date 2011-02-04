@@ -130,25 +130,40 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
-   LOCAL oControl
+   LOCAL oControl, nFont, x := 0, y := 0, n
+   IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+      x := VAL( aCtrl[x][2] )
+   ENDIF
+   IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+      y := VAL( aCtrl[y][2] )
+   ENDIF
+
    IF oPanel == NIL
       oControl := hb_ExecFromArray( aCtrl[1][2], {,.F.} )
       oControl:Parent := Self
-      oControl:Left := VAL( aCtrl[6][2] )
-      oControl:Top  := VAL( aCtrl[7][2] )
+      oControl:Left := x
+      oControl:Top  := y
     ELSE
-      oControl := oPanel:CreateControl( aCtrl[1][2], VAL( aCtrl[6][2] ), VAL( aCtrl[7][2] ) )
+      oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
 
-   oControl:Text      := aCtrl[3][2]
-   oControl:ForeColor := VAL( aCtrl[4][2] )
-   oControl:BackColor := VAL( aCtrl[5][2] )
-   oControl:Font:FaceName  := aCtrl[8][2][1][2]
-   oControl:Font:PointSize := VAL( aCtrl[8][2][2][2] )
-   oControl:Font:Italic    := IIF( aCtrl[8][2][3][2]=="True", .T., .F. )
-   oControl:Font:Underline := IIF( aCtrl[8][2][4][2]=="True", .T., .F. )
-   oControl:Font:Weight    := VAL( aCtrl[8][2][5][2] )
-
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
+      oControl:Text   := aCtrl[n][2]
+   ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORECOLOR"} ) ) > 0
+      oControl:ForeColor := VAL( aCtrl[n][2] )
+   ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "BACKCOLOR"} ) ) > 0
+      oControl:BackColor := VAL( aCtrl[n][2] )
+   ENDIF
+   IF ( nFont := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+      oControl:Font:FaceName  := aCtrl[nFont][2][1][2]
+      oControl:Font:PointSize := VAL( aCtrl[nFont][2][2][2] )
+      oControl:Font:Italic    := IIF( aCtrl[nFont][2][3][2]=="True", .T., .F. )
+      oControl:Font:Underline := IIF( aCtrl[nFont][2][4][2]=="True", .T., .F. )
+      oControl:Font:Weight    := VAL( aCtrl[nFont][2][5][2] )
+   ENDIF
+   
    IF oPanel == NIL
       oControl:Draw()
       nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
