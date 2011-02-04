@@ -20,7 +20,8 @@
 
 CLASS Font
    DATA Handle         EXPORTED
-
+   
+   DATA AllowHandle    EXPORTED INIT .T.
    PROPERTY FaceName     READ xFaceName    WRITE Modify
    PROPERTY Escapement   READ xEscapement  WRITE Modify
    PROPERTY Orientation  READ xOrientation WRITE Modify
@@ -126,9 +127,12 @@ METHOD Create() CLASS Font
    ::ncm:lfMessageFont:lfClipPrecision  := IFNIL( ::ClipPrecision , CLIP_DEFAULT_PRECIS                 , ::ClipPrecision  )
    ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
-
-   ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
-
+   
+   ::Delete()
+   IF ::AllowHandle
+      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
+   ENDIF
+   
    ::xFaceName     := cFont
 
    ::xHeight       := ::ncm:lfMessageFont:lfHeight
@@ -279,7 +283,9 @@ METHOD Modify() CLASS Font
       lf:lfPitchAndFamily := ::PitchAndFamily
 
       ::Delete()
-      ::Handle := CreateFontIndirect( lf )
+      IF ::AllowHandle
+         ::Handle := CreateFontIndirect( lf )
+      ENDIF
       IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
          ::Set( ::Parent )
       ENDIF

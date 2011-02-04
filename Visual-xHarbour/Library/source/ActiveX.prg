@@ -225,8 +225,9 @@ METHOD Create() CLASS ActiveX
 
    ::cClassName := ::ClsID
 
-   ::__GetEventList(.T.)
-
+   IF ::__ClassInst != NIL
+      ::__GetEventList(.T.)
+   ENDIF
    IF ::__ClassInst == NIL
       FOR EACH cHandle IN ::EventHandler:Keys
           cEvent := ::EventHandler[ cHandle ]
@@ -242,8 +243,8 @@ METHOD Create() CLASS ActiveX
 
     ELSE
       ::__IdeContextMenuItems := { { "Properties", {|| ::ShowPropertiesDialog( GetActiveWindow() ) } } }
+      __DeleteEvents( ::Events,{ "OnLoad" } )
    ENDIF
-   __DeleteEvents( ::Events,{ "OnLoad" } )
    
    IF ( nStatus := __AxGetMiscStatus( ::hObj, DVASPECT_CONTENT ) ) != NIL
       ::InvisibleAtRuntime := ( nStatus & OLEMISC_INVISIBLEATRUNTIME ) == OLEMISC_INVISIBLEATRUNTIME
