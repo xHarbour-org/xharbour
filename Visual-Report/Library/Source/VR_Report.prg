@@ -21,7 +21,9 @@
 #define  acFileSaveDesign       2
 
 #define  acScaleVertical        2
-#define  acCommandToolPageHome  53773
+#define  acCommandToolZoomIn           53541
+#define  acCommandToolZoomOut          53542
+#define  acCommandToolPageHome         53773
 
 CLASS VrReport INHERIT VrObject
    DATA nImage         EXPORTED  INIT 0
@@ -339,13 +341,36 @@ METHOD OnInitDialog() CLASS VrPreview
    ::Caption := ::Report:PreviewCaption
 
    WITH OBJECT ToolStrip( Self )
-      :ImageList := ImageList( :this, 16, 16 ):Create()
-      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+      :ShowChevron := .F.
+      :ShowGrip    := .F.
+      :ImageList   := ImageList( :this, 32, 32 ):Create()
+      :Height      := 38
+      :ImageList:AddImage( "ICO_ZOOMIN" )
+      :ImageList:AddImage( "ICO_ZOOMOUT" )
+      :ImageList:AddImage( "ICO_PRINT" )
       :Create()
       WITH OBJECT ToolStripButton( :this )
+         :Caption           := "Zoom-In"
+         :ImageIndex        := 1
+         :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomIn )}
+         :Create()
+      END
+      WITH OBJECT ToolStripButton( :this )
+         :Caption           := "Zoom-Out"
+         :ImageIndex        := 2
+         :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomOut )}
+         :Create()
+      END
+      WITH OBJECT ToolStripButton( :this )
          :Caption           := "Print"
-         :ImageIndex        := ::System:StdIcons:Print
-         :Action            := {|o| ::Report:oPDF:Print( "", .T. ) }
+         :Begingroup        := .T.
+         :ImageIndex        := 3
+         :Action            := <|o| 
+                                TRY
+                                  ::Report:oPDF:Print( "", .T. )
+                                CATCH
+                                END
+                                >
          :Create()
       END
    END

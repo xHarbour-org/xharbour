@@ -11,9 +11,11 @@ LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 
 IDOK MANIFEST "vr.XML"
 
-__VR ICON "vr.ico"
+VR ICON "vr.ico"
 CUR_PASTE CURSOR "paste.cur"
 CUR_DRAGGING CURSOR "Dragging.cur"
 ICO_POINTER ICON "Pointer.ico"
-
+ICO_ZOOMIN ICON "Zoom-In.ico"
+ICO_ZOOMOUT ICON "Zoom-Out.ico"
+ICO_PRINT ICON "Print.ico"
 TBEXTRA BITMAP "ToolBarExtra.bmp"
