@@ -147,6 +147,9 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
       oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
 
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "WIDTH"} ) ) > 0
+      oControl:Width  := aCtrl[n][2]
+   ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
       oControl:Text   := aCtrl[n][2]
    ENDIF
