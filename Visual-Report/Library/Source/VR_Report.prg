@@ -130,7 +130,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
-   LOCAL oControl, nFont, x := 0, y := 0, n
+   LOCAL oControl, x := 0, y := 0, n
    IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
       x := VAL( aCtrl[x][2] )
    ENDIF
@@ -156,12 +156,12 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "BACKCOLOR"} ) ) > 0
       oControl:BackColor := VAL( aCtrl[n][2] )
    ENDIF
-   IF ( nFont := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-      oControl:Font:FaceName  := aCtrl[nFont][2][1][2]
-      oControl:Font:PointSize := VAL( aCtrl[nFont][2][2][2] )
-      oControl:Font:Italic    := IIF( aCtrl[nFont][2][3][2]=="True", .T., .F. )
-      oControl:Font:Underline := IIF( aCtrl[nFont][2][4][2]=="True", .T., .F. )
-      oControl:Font:Weight    := VAL( aCtrl[nFont][2][5][2] )
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+      oControl:Font:FaceName  := aCtrl[n][2][1][2]
+      oControl:Font:PointSize := VAL( aCtrl[n][2][2][2] )
+      oControl:Font:Italic    := IIF( aCtrl[n][2][3][2]=="True", .T., .F. )
+      oControl:Font:Underline := IIF( aCtrl[n][2][4][2]=="True", .T., .F. )
+      oControl:Font:Weight    := VAL( aCtrl[n][2][5][2] )
    ENDIF
    
    IF oPanel == NIL
