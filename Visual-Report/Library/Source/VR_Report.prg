@@ -258,7 +258,7 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
-RETURN Self
+RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport

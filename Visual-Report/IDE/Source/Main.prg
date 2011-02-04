@@ -265,6 +265,26 @@ METHOD Init() CLASS MainForm
       END
    END
 
+   WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+      :Row := 2
+      :Caption := "Build"
+      :ImageList := ImageList( :this, 16, 16 ):Create()
+      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+      :ImageList:MaskColor := ::System:Color:Cyan
+      :ImageList:AddBitmap( "TBEXTRA" )
+      :Create()
+
+      WITH OBJECT ::Application:Props[ "RunBttn" ] := ToolStripButton( :this )
+         :ImageIndex      := 18
+         :ToolTip:Text    := "Run report (F5)"
+         :ShortCutKey:Key := VK_F5
+         :Action          := {|o|::Application:Report:Run() }
+         :Enabled         := .F.
+         :Create()
+      END
+   END
+
+
    WITH OBJECT ::Application:Props[ "ToolBox" ] := ToolBox( Self )
       :Dock:Top     := ::ToolStripContainer1
       :Dock:Bottom  := ::StatusBar1
@@ -408,6 +428,7 @@ CLASS Report
    DATA VrReport      EXPORTED
    DATA xModified     EXPORTED INIT .F.
    DATA xFileName     EXPORTED INIT ""
+   DATA oXMLDoc       EXPORTED
    
    ACCESS Modified    INLINE ::xModified
    ASSIGN Modified(l) INLINE oApp:MainForm:Caption := "Visual Report [" + ::GetName() + "]" + IIF( l, " *", "" ), ::xModified := l
@@ -425,6 +446,7 @@ CLASS Report
    METHOD GetRectangle() INLINE {0,0,0,0}
    METHOD EditReset() INLINE NIL
    METHOD Generate()
+   METHOD Run()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -468,9 +490,9 @@ METHOD Close() CLASS Report
                RETURN 0
       END
    ENDIF
-   
+   ::oXMLDoc  := NIL
+   ::VrReport := NIL
    WITH OBJECT oApp
-      ::VrReport := NIL
       :Props:Components:Reset()
 
       AEVAL( :Props:Header:Objects, {|o|o:EditCtrl:Destroy()} )
@@ -491,6 +513,7 @@ METHOD Close() CLASS Report
       :Props:SaveBttn:Enabled   := .F.
       :Props:SaveAsMenu:Enabled := .F.
       :Props:CloseBttn:Enabled  := .F.
+      :Props:RunBttn:Enabled    := .F.
       :Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       :MainForm:Caption := "Visual Report"
       :Props:PropEditor:ResetProperties( {{ NIL }} )
@@ -517,16 +540,19 @@ METHOD Open( cReport ) CLASS Report
       oApp:Props:SaveBttn:Enabled   := .T.
       oApp:Props:SaveAsMenu:Enabled := .T.
       oApp:Props:CloseBttn:Enabled  := .T.
+      oApp:Props:RunBttn:Enabled    := .T.
+
       oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       ::FileName := cReport
       ::ResetQuickOpen( cReport )
 
       ::VrReport := VrReport( NIL )
       oApp:Props:Components:AddButton( ::VrReport )
-      ::VrReport:Load( cReport )
+      ::oXMLDoc := ::VrReport:Load( cReport )
    ENDIF
 RETURN Self
 
+//-------------------------------------------------------------------------------------------------------
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
    LOCAL aProps, oXmlValue, oXmlControl
    oXmlControl := TXmlNode():new( , "Control" )
@@ -543,12 +569,11 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
-   LOCAL oFile, oWait
-   LOCAL oXmlDoc, oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter, oRep
+   LOCAL oFile
+   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter, oRep
    
    DEFAULT lSaveAs TO .F.
    
-   oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait..." )
    IF ::FileName == "Untitled.vrt" .OR. lSaveAs
       IF ( cName := ::SaveAs() ) == NIL
          RETURN .F.
@@ -558,7 +583,7 @@ METHOD Save( lSaveAs ) CLASS Report
 
    ::Modified := .F.
 
-   oXmlDoc  := TXmlDocument():new()
+   ::oXMLDoc := TXmlDocument():new()
       oXmlReport := TXmlNode():new( , "Report" )
          oXmlProp := TXmlNode():new( , "Properties" )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
@@ -612,18 +637,19 @@ METHOD Save( lSaveAs ) CLASS Report
             NEXT
          oXmlReport:addBelow( oXmlBody )
       ENDIF
-   oXmlDoc:oRoot:addBelow( oXmlReport )
-   oXmlDoc:Write( ::FileName )
-
-   oRep := VrReport()
-   oRep:Run( oXmlDoc )
-
-   oWait:Destroy()
-
-   oRep:Preview()
-
-   hb_gcall(.t.)
+   ::oXMLDoc:oRoot:addBelow( oXmlReport )
+   ::oXMLDoc:Write( ::FileName )
+   oApp:Props:RunBttn:Enabled    := .T.
 RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Run() CLASS Report
+   LOCAL oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait..." )
+   LOCAL oRep := VrReport()
+   oRep:Run( ::oXMLDoc )
+   oWait:Destroy()
+   oRep:Preview()
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SaveAs() CLASS Report
