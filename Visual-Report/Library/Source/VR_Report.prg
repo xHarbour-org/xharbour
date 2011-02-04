@@ -166,11 +166,13 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    
    IF oPanel == NIL
       oControl:Draw()
-      nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
+      TRY
+         nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
+      CATCH
+      END
     ELSE
       oControl:Configure()
    ENDIF
-
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
