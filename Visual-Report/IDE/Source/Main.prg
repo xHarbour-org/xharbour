@@ -55,7 +55,7 @@ METHOD Init() CLASS MainForm
    ::Super:Init()
    
    ::Caption := "Visual Report"
-   ::Icon    := "__VR"
+   ::Icon    := "AVR"
    ::xName   := "VR"
    
    ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
