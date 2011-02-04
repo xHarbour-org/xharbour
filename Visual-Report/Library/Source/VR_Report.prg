@@ -260,10 +260,10 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL nHeight, n
-   
+   LOCAL nHeight
+
    ::Create()
-   
+
    IF oDoc != NIL
       ::PrepareArrays( oDoc )
    ENDIF
@@ -325,9 +325,9 @@ METHOD Init( oReport ) CLASS VrPreview
    ::Report := oReport
    ::Super:Init( __GetApplication():MainForm )
    ::Modal      := .T.
-   ::Top        := 400
-   ::Width      := 500
-   ::Height     := 600
+   ::Top        := 300
+   ::Width      := 800
+   ::Height     := 900
 //   ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::DlgModalFrame := .T.
 RETURN Self
@@ -337,6 +337,18 @@ RETURN Self
 METHOD OnInitDialog() CLASS VrPreview
    LOCAL oItem, oSub, nZoom
    ::Caption := ::Report:PreviewCaption
+
+   WITH OBJECT ToolStrip( Self )
+      :ImageList := ImageList( :this, 16, 16 ):Create()
+      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+      :Create()
+      WITH OBJECT ToolStripButton( :this )
+         :Caption           := "Print"
+         :ImageIndex        := ::System:StdIcons:Print
+         :Action            := {|o| ::Report:oPDF:Print( "", .T. ) }
+         :Create()
+      END
+   END
    
    WITH OBJECT StatusBar( Self )
       StatusBarPanel( ::StatusBar1, , 120 )
@@ -349,7 +361,7 @@ METHOD OnInitDialog() CLASS VrPreview
    WITH OBJECT ::Report:oPDF
       :SetParent( Self )
       :Dock:Left   := Self
-      :Dock:Top    := Self
+      :Dock:Top    := ::ToolStrip1
       :Dock:Right  := Self
       :Dock:Bottom := ::StatusBar1
       :DockIt()
