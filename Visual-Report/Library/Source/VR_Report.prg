@@ -42,6 +42,7 @@ CLASS VrReport INHERIT VrObject
    DATA FooterHeight   EXPORTED  INIT 0
    DATA DataSource     EXPORTED
    DATA Button         EXPORTED
+   DATA ClsName        EXPORTED  INIT "Report"
    DATA Name           EXPORTED  INIT "Report"
    DATA lUI            EXPORTED  INIT .F.
    DATA hReport        EXPORTED  INIT {=>}

@@ -140,6 +140,8 @@ METHOD Create() CLASS ToolBox
        NEXT
    NEXT
 
+   ::ImageList:AddImage( "ICO_REPORT" )
+
    ::SetImageList()
    ::ExpandAll()
    ::Items[1]:Toggle()

@@ -43,7 +43,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD AddButton( oComponent ) CLASS ComponentPanel
-   LOCAL n, x, lExit, nBtn, aButtons, oItem, aSize, oBtn := CompButton( Self )
+   LOCAL n, x, lExit, nBtn, aButtons, hIcon, oItem, aSize, oBtn := CompButton( Self )
    oComponent:Button := oBtn
    WITH OBJECT oBtn
       :Component   := oComponent
@@ -60,18 +60,20 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
      
       FOR n := 1 TO LEN( aButtons )
           FOR x := 1 TO LEN( aButtons[n][2] )
-              IF LoadImage( ::Application:Instance, "ICO_" + UPPER( aButtons[n][2][x][1] ), IMAGE_ICON ) != 0
+              //IF ( hIcon := LoadImage( ::Application:Instance, "ICO_" + UPPER( aButtons[n][2][x][1] ), IMAGE_ICON ) ) != 0
+              //   DestroyIcon( hIcon )
                  nBtn ++
-              ENDIF
+              //ENDIF
               IF aButtons[n][2][x][1] == oComponent:__xCtrlName
-                 lExit := .T.
+                 n := LEN( aButtons )+1 // force exit first loop
                  EXIT
               ENDIF
           NEXT
-          IF lExit
-             EXIT
-          ENDIF
       NEXT
+
+      IF oComponent:__xCtrlName == "Report"
+         nBtn := ::Application:MainForm:ToolBox1:ImageList:Count
+      ENDIF
 
       :ImageIndex  := nBtn //oComponent:ImageIndex
 
