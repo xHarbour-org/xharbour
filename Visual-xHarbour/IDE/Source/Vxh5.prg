@@ -168,7 +168,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD AddButton( oComponent ) CLASS ComponentPanel
-   LOCAL n, x, lExit, nBtn, aButtons, oItem, aSize, oBtn := CompButton( Self )
+   LOCAL hIcon, n, x, lExit, nBtn, aButtons, oItem, aSize, oBtn := CompButton( Self )
    oComponent:Button := oBtn
    WITH OBJECT oBtn
       :Component   := oComponent
@@ -185,17 +185,12 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
      
       FOR n := 1 TO LEN( aButtons )
           FOR x := 1 TO LEN( aButtons[n][2] )
-              IF LoadImage( ::Application:Instance, "ICO_" + UPPER( aButtons[n][2][x][1] ), IMAGE_ICON ) != 0
-                 nBtn ++
-              ENDIF
+              nBtn ++
               IF aButtons[n][2][x][1] == oComponent:__xCtrlName
-                 lExit := .T.
+                 n := LEN( aButtons )+1 // force exit first loop
                  EXIT
               ENDIF
           NEXT
-          IF lExit
-             EXIT
-          ENDIF
       NEXT
 
       :ImageIndex  := nBtn //oComponent:ImageIndex
