@@ -60,10 +60,7 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
      
       FOR n := 1 TO LEN( aButtons )
           FOR x := 1 TO LEN( aButtons[n][2] )
-              //IF ( hIcon := LoadImage( ::Application:Instance, "ICO_" + UPPER( aButtons[n][2][x][1] ), IMAGE_ICON ) ) != 0
-              //   DestroyIcon( hIcon )
-                 nBtn ++
-              //ENDIF
+              nBtn ++
               IF aButtons[n][2][x][1] == oComponent:__xCtrlName
                  n := LEN( aButtons )+1 // force exit first loop
                  EXIT
