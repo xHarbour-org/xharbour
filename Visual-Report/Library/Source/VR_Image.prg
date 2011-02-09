@@ -82,10 +82,10 @@ RETURN Self
 
 METHOD Draw() CLASS VrImage
    local x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
-   x  := ( ::nLogPixelX() / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
-   cx := ( ::nLogPixelX() / 72 ) * ::Width
-   cy := ( ::nLogPixelY() / 72 ) * ::Height
+   x  := ( ::nPixPerInch / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
+   cx := ( ::nPixPerInch / 72 ) * ::Width
+   cy := ( ::nPixPerInch / 72 ) * ::Height
    WITH OBJECT ::Parent:oPDF
       :CreateObject( acObjectTypePicture,  cName )
       ::PDFCtrl := :GetObjectByName( cName )

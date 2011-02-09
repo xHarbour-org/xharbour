@@ -17,6 +17,7 @@
 
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text     READ xText WRITE SetText
+   DATA AutoResize   EXPORTED  INIT .F.
    DATA ClsName      EXPORTED  INIT "Label"
    DATA SysBackColor EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
@@ -40,6 +41,8 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "Text",      "General" } )
       AADD( ::aProperties, { "BackColor", "Color"   } )
       AADD( ::aProperties, { "ForeColor", "Color"   } )
+      AADD( ::aProperties, { "Width",     "Size"   } )
+      AADD( ::aProperties, { "AutoResize","Size"   } )
    ENDIF
    DEFAULT ::Font TO Font()
    ::Font:AllowHandle := oParent != NIL
@@ -117,6 +120,12 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Width ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alignment", NIL, XSTR( ::Alignment ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
+   oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
@@ -133,11 +142,14 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
 RETURN Self
 
 METHOD Draw() CLASS VrLabel
-   LOCAL x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
-
-   x  := ( ::nLogPixelX() / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
- 
+   LOCAL hFont, hPrevFont, hDC, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
+   LOCAL lAuto, lf := (struct LOGFONT), aTxSize
+   
+   lAuto := ::AutoResize
+   
+   x  := ( ::nPixPerInch / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
+   
    IF ::Text != NIL
       cItalic    := IIF( ::Font:Italic, "1", "0" )
       cUnderline := IIF( ::Font:Underline, "1", "0" )
@@ -145,17 +157,57 @@ METHOD Draw() CLASS VrLabel
       ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
       ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         :Attribute( "AutoResize", 1 )
+         IF VAL( ::Text ) == 0
+            TRY
+               cText := &(::Text)
+            catch
+               cText := ::Text
+            END
+          ELSE
+            cText := ::Text
+         ENDIF
+         cText := ALLTRIM( xStr( cText ) )
+
+         IF ::Alignment > 1
+            :Attribute( "HorzAlign", ::Alignment )
+            lAuto := .F.
+         ENDIF
+         IF ! lAuto
+            hDC := CreateCompatibleDC()
+            lf:lfFaceName:Buffer( Alltrim( ::Font:FaceName ) )
+            lf:lfHeight         := -MulDiv( ::Font:PointSize, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
+            lf:lfWeight         := IIF( ::Font:Bold, 700, 400 )
+            lf:lfItalic         := IIF( ::Font:Italic, 1, 0 )
+            lf:lfUnderline      := IIF( ::Font:Underline, 1, 0 )
+            lf:lfStrikeOut      := IIF( ::Font:StrikeOut, 1, 0 )
+            hFont     := CreateFontIndirect( lf )
+            hPrevFont := SelectObject( hDC, hFont )
+            
+            aTxSize := _GetTextExtentPoint32( hDC, cText )
+            IF aTxSize[1] > ::Width
+               WHILE aTxSize[1] > ::Width
+                  cText := LEFT( cText, LEN(cText)-1 )
+                  aTxSize := _GetTextExtentPoint32( hDC, cText + "..." )
+               ENDDO
+               cText += "..."
+            ENDIF
+            
+            SelectObject( hDC, hPrevFont )
+            DeleteObject( hFont )
+            DeleteDC( hDC )
+            :Attribute( "Right",   x + ( (::nPixPerInch / 72) * ::Width ) )
+            :Attribute( "Bottom",  y + ( (::nPixPerInch / 72) * aTxSize[2]-3 ) )
+
+          ELSE
+            :Attribute( "AutoResize", 1 )
+         ENDIF
          :Attribute( "Single Line", 1 )
          :Attribute( "Left",   x )
          :Attribute( "Top",    y )
          :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
-         TRY
-            cText := &(::Text)
-         catch
-            cText := ::Text
-         END
-         :Attribute( "Text", ALLTRIM( cText ) )
+         
+
+         :Attribute( "Text", cText )
          IF ::ForeColor != ::SysForeColor
             :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
          ENDIF

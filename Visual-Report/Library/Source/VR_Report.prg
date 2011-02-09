@@ -150,14 +150,20 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
       oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
 
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
+      oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
+   ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ALIGNMENT"} ) ) > 0
+      oControl:Alignment := VAL( aCtrl[n][2] )
+   ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "WIDTH"} ) ) > 0
-      oControl:Width  := VAL( aCtrl[n][2] )
+      oControl:Width     := VAL( aCtrl[n][2] )
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "HEIGHT"} ) ) > 0
-      oControl:Height  := VAL( aCtrl[n][2] )
+      oControl:Height    := VAL( aCtrl[n][2] )
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
-      oControl:Text   := aCtrl[n][2]
+      oControl:Text      := aCtrl[n][2]
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORECOLOR"} ) ) > 0
       oControl:ForeColor := VAL( aCtrl[n][2] )

@@ -46,6 +46,9 @@ CLASS VrObject
    DATA PDFCtrl     EXPORTED
    
    DATA Report      EXPORTED
+   
+   DATA nPixPerInch EXPORTED INIT PIX_PER_INCH
+   
    METHOD Init() CONSTRUCTOR
    METHOD GetValue( cVal ) INLINE ::&cVal
    METHOD SetControlName()
@@ -54,10 +57,9 @@ CLASS VrObject
    METHOD Draw()           VIRTUAL
    METHOD FillRect()
    METHOD MoveWindow()     INLINE ::EditCtrl:MoveWindow( ::Left, ::Top )
-   METHOD nLogPixelX()     INLINE PIX_PER_INCH
-   METHOD nLogPixelY()     INLINE PIX_PER_INCH
    METHOD WriteProps()     VIRTUAL
    METHOD Configure()      VIRTUAL
+   METHOD Delete()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject
@@ -76,6 +78,16 @@ METHOD Create() CLASS VrObject
       IF ::lUI
          ::EditCtrl:OnWMLButtonDown := {|| ::Application:Props:PropEditor:ResetProperties( {{ Self }} ) }
       ENDIF
+   ENDIF
+RETURN Self
+
+METHOD Delete() CLASS VrObject
+   LOCAL n := ASCAN( ::Parent:Objects, Self,,, .T. )
+   IF n > 0
+      ADEL( ::Parent:Objects, n, .T. )
+      ::EditCtrl:Destroy()
+      ::Application:Props:Components:Children[1]:Select():SelectComponent()
+      ::Parent:InvalidateRect()
    ENDIF
 RETURN Self
 

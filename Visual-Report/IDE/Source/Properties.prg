@@ -216,10 +216,12 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
 
       IF ::ActiveObject:lUI
-         TRY
-            __objSendMsg( ::ActiveObject:EditCtrl, "_" + UPPER( xProp ), xValue )
-         CATCH
-         END
+         IF ! ( UPPER( xProp ) == "WIDTH" .AND. UPPER( ::ActiveObject:ClassName ) == "VRLABEL" )
+            TRY
+               __objSendMsg( ::ActiveObject:EditCtrl, "_" + UPPER( xProp ), xValue )
+            CATCH
+            END
+         ENDIF
          ::ActiveObject:Parent:InvalidateRect( , .F. )
       ENDIF
 

@@ -65,9 +65,9 @@ RETURN Self
 METHOD Draw() CLASS VrLine
    LOCAL x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
 
-   x  := ( ::nLogPixelX() / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
-   cx := ( ::nLogPixelX() / 72 ) * ::Width
+   x  := ( ::nPixPerInch / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
+   cx := ( ::nPixPerInch / 72 ) * ::Width
  
    ::Parent:oPDF:CreateObject( acObjectTypeLine, cName )
    ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )

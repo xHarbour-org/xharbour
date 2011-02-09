@@ -70,7 +70,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
          ReleaseDC( ::hWnd, hDC )
        ELSEIF ::nDownPos != NIL
          oCtrl := ::Application:Props:PropEditor:ActiveObject
-         IF ::Type == "Body"
+         IF ::Application:Props[ "ViewMenuGrid" ]:Checked
             oCtrl:Left := Snap( x-::nDownPos[1], ::xGrid )
             oCtrl:Top  := Snap( y-::nDownPos[2], ::xGrid )
           ELSE
@@ -144,7 +144,7 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    LOCAL nBColor := SetBkColor( hDC, ::BackColor )
    LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
    SetBkMode( hDC, TRANSPARENT )
-   IF ::Type == "Body"
+   IF ::Application:Props[ "ViewMenuGrid" ]:Checked
       DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
     ELSE
       _Fillrect( hDC, {0,0,::Width, ::Height}, ::BkBrush )

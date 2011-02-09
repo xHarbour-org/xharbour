@@ -146,31 +146,43 @@ METHOD Init() CLASS MainForm
          :Create()
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Copy
+            :Enabled := .F.
             :Caption := "&Copy"
             :Create()
          END
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Cut
+            :Enabled := .F.
             :Caption := "&Cut"
             :Create()
          END
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Paste
+            :Enabled := .F.
             :Caption := "&Paste"
             :Create()
          END
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Delete
             :Caption := "&Delete"
+            :Action  := {||oApp:Props:PropEditor:ActiveObject:Delete()}
             :Create()
          END
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Undo
+            :Enabled := .F.
             :Caption := "&Undo"
             :Create()
          END
 
          WITH OBJECT MenuStripItem( :this )
+            :ImageIndex := ::System:StdIcons:Redo
+            :Enabled := .F.
             :Caption := "&Redo"
             :Create()
          END
@@ -190,6 +202,15 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "ViewMenuFooter" ] := MenuStripItem( :this )
             :Caption := "&Footer"
             :Action  := {|o| o:Checked := !o:Checked, ::Application:Props[ "Footer" ]:Visible := o:Checked }
+            :Create()
+         END
+
+         WITH OBJECT ::Application:Props[ "ViewMenuGrid" ] := MenuStripItem( :this )
+            :Caption := "&Grid"
+            :Action  := {|o| o:Checked := !o:Checked, ( ::Application:Props[ "Header" ]:InvalidateRect(),;
+                                                        ::Application:Props[ "Body"   ]:InvalidateRect(),;
+                                                        ::Application:Props[ "Footer" ]:InvalidateRect() )}
+            :Checked := ::Application:IniFile:ReadInteger( "View", "Grid", 1 )==1
             :Create()
          END
       END
@@ -429,6 +450,7 @@ METHOD OnClose() CLASS MainForm
    ::Application:Props[ "PropEditor" ]:SaveLayout(, "Layout")
    ::Application:IniFile:Write( "View", "Header", IIF( ::Application:Props[ "ViewMenuHeader" ]:Checked, 1, 0 ) )
    ::Application:IniFile:Write( "View", "Footer", IIF( ::Application:Props[ "ViewMenuFooter" ]:Checked, 1, 0 ) )
+   ::Application:IniFile:Write( "View", "Grid",   IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked,   1, 0 ) )
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
