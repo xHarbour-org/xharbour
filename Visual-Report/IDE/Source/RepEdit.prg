@@ -70,8 +70,13 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
          ReleaseDC( ::hWnd, hDC )
        ELSEIF ::nDownPos != NIL
          oCtrl := ::Application:Props:PropEditor:ActiveObject
-         oCtrl:Left := Snap( x-::nDownPos[1], ::xGrid )
-         oCtrl:Top  := Snap( y-::nDownPos[2], ::xGrid )
+         IF ::Type == "Body"
+            oCtrl:Left := Snap( x-::nDownPos[1], ::xGrid )
+            oCtrl:Top  := Snap( y-::nDownPos[2], ::xGrid )
+          ELSE
+            oCtrl:Left := x-::nDownPos[1]
+            oCtrl:Top  := y-::nDownPos[2]
+         ENDIF
          oCtrl:MoveWindow()
       ENDIF
    ENDIF
@@ -139,7 +144,11 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    LOCAL nBColor := SetBkColor( hDC, ::BackColor )
    LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
    SetBkMode( hDC, TRANSPARENT )
-   DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
+   IF ::Type == "Body"
+      DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
+    ELSE
+      _Fillrect( hDC, {0,0,::Width, ::Height}, ::BkBrush )
+   ENDIF
    SetTextColor( hDC, nFColor )
    SetBkColor( hDC, nBColor )
    

@@ -370,12 +370,18 @@ METHOD Init() CLASS MainForm
       :Create()
    END
 
+   WITH OBJECT Splitter( Self )
+      :Owner := ::Application:Props[ "Header" ]
+      :Position := 4
+      :Create()
+   END
+
    WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( Self )
       :Caption        := "Footer"
       :BackColor      := ::System:Color:White
       :Border         := .T.
       :Height         := 100
-      :Dock:Margins   := "0,2,0,3"
+      :Dock:Margins   := "0,0,0,3"
       :Dock:Left      := ::Application:Props:ToolBox
       :Dock:Right     := ::Application:Props:PropEditor
       :Dock:Bottom    := ::Application:Props:Components
@@ -384,9 +390,15 @@ METHOD Init() CLASS MainForm
       :Create()
    END
 
+   WITH OBJECT Splitter( Self )
+      :Owner := ::Application:Props[ "Footer" ]
+      :Position := 2
+      :Create()
+   END
+
    WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( Self )
       :BackColor      := ::System:Color:White
-      :Dock:Margins   := "0,3,0,3"
+      :Dock:Margins   := "0,0,0,0"
       :Dock:Left      := ::Application:Props[ "ToolBox" ]
       :Dock:Right     := ::Application:Props[ "PropEditor" ]
       :Dock:Top       := ::Application:Props[ "Header" ]
@@ -644,11 +656,14 @@ RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Run() CLASS Report
-   LOCAL oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait..." )
-   LOCAL oRep := VrReport()
-   oRep:Run( ::oXMLDoc )
-   oWait:Destroy()
-   oRep:Preview()
+   LOCAL oWait, oRep
+   IF ::Save()
+      oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait..." )
+      oRep  := VrReport()
+      oRep:Run( ::oXMLDoc )
+      oWait:Destroy()
+      oRep:Preview()
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

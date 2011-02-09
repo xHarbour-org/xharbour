@@ -138,8 +138,10 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
       y := VAL( aCtrl[y][2] )
    ENDIF
-
    IF oPanel == NIL
+      //IF ::nRow + ( ( PIX_PER_INCH / 72 ) * y ) + nHeight > ( ::oPDF:PageLength - ::FooterHeight )
+      //   RETURN NIL
+      //ENDIF
       oControl := hb_ExecFromArray( aCtrl[1][2], {,.F.} )
       oControl:Parent := Self
       oControl:Left := x
@@ -149,7 +151,10 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    ENDIF
 
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "WIDTH"} ) ) > 0
-      oControl:Width  := aCtrl[n][2]
+      oControl:Width  := VAL( aCtrl[n][2] )
+   ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "HEIGHT"} ) ) > 0
+      oControl:Height  := VAL( aCtrl[n][2] )
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
       oControl:Text   := aCtrl[n][2]
@@ -194,13 +199,13 @@ METHOD CreateHeader() CLASS VrReport
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow := ::HeaderHeight
+   ::nRow := ::HeaderHeight - 450
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateFooter() CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   ::nRow := ::oPDF:PageLength - ( ::FooterHeight )
+   ::nRow := ::oPDF:PageLength - ::FooterHeight
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl, @nHeight )
    NEXT
@@ -208,7 +213,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL aFont, oPrev, oNode, cData, n, aControl, cParent
+   LOCAL oPrev, oNode, cData, n, aControl, cParent
 
    ::aData  := {=>}
    ::aProps := {=>}
@@ -228,29 +233,32 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               ::aProps[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
-              aControl := {}
+              IF !EMPTY( aControl )
+                 AADD( ::&cParent, aControl )
+              ENDIF
               cParent := "a" + oNode:oParent:cName
-              oNode := oDoc:Next()
-              WHILE oNode:oParent:cName == "Control"
-                 IF oNode:cName != "Font"
-                    DEFAULT oNode:cData TO ""
-                    AADD( aControl, { oNode:cName, oNode:cData } )
-                    oNode := oDoc:Next()
-                  ELSE
-                    AADD( aControl, { oNode:cName, {} } )
-                    aFont := {}
-                    FOR n := 1 TO 5
-                        oNode := oDoc:Next()
-                        DEFAULT oNode:cData TO ""
-                        AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
-                    NEXT
-                 ENDIF
-              ENDDO
-              AADD( ::&cParent, aControl )
+              aControl := {}
+
+         CASE oNode:cName == "Font" 
+              AADD( aControl, { oNode:cName, {} } )
+
+         CASE oNode:oParent:cName == "Control"
+              DEFAULT oNode:cData TO ""
+              AADD( aControl, { oNode:cName, oNode:cData } )
+
+         CASE oNode:oParent:cName == "Font"
+              DEFAULT oNode:cData TO ""
+              AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
       ENDCASE
       oNode := oDoc:Next()
    ENDDO
-
+   IF !EMPTY( aControl )
+      AADD( ::&cParent, aControl )
+   ENDIF
+   ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )
+   ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )
+   ::Application:Props[ "Footer" ]:Dockit()
+   ::Application:Props[ "Body" ]:Dockit()
    ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
    ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
 RETURN Self

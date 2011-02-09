@@ -12,21 +12,27 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "hbxml.ch"
+#define  acObjectTypeLine           1
 //-----------------------------------------------------------------------------------------------
 
 CLASS VrLine INHERIT VrObject
+   DATA SysForeColor EXPORTED  INIT RGB(0,0,0)
+   DATA ForeColor    PUBLISHED INIT RGB(0,0,0)
    DATA ClsName EXPORTED INIT "Line"
+   
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
+   METHOD Draw()
+   METHOD Configure()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS VrLine
-   ::Width := 200
    Super:Init( oParent )
-   AADD( ::aProperties, { "Name",   "Object" } )
-   AADD( ::aProperties, { "Width",  "Size"   } )
+   AADD( ::aProperties, { "Name",      "Object" } )
+   AADD( ::aProperties, { "Width",     "Size"   } )
+   AADD( ::aProperties, { "ForeColor", "Color"  } )
 RETURN Self
 
 METHOD Create() CLASS VrLine
@@ -52,7 +58,37 @@ METHOD WriteProps( oXmlControl ) CLASS VrLine
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Left ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Width ) )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
+METHOD Draw() CLASS VrLine
+   LOCAL x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
+
+   x  := ( ::nLogPixelX() / 72 ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nLogPixelY() / 72 ) * ::Top )
+   cx := ( ::nLogPixelX() / 72 ) * ::Width
+ 
+   ::Parent:oPDF:CreateObject( acObjectTypeLine, cName )
+   ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
+   WITH OBJECT ::PDFCtrl
+      :Attribute( "Left",   x )
+      :Attribute( "Top",    y )
+      :Attribute( "Right",  x + cx )
+      :Attribute( "Bottom", y + 2 )
+      IF ::ForeColor != ::SysForeColor
+         :Attribute( "StrokeColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
+      ENDIF
+   END
+RETURN Self
+
+METHOD Configure() CLASS VrLine
+   WITH OBJECT ::EditCtrl
+      :ForeColor      := ::ForeColor     
+      :xLeft          := ::Left
+      :xTop           := ::Top
+      :xWidth         := ::Width
+      :xHeight        := 2
+      :MoveWindow()
+   END
+RETURN Self

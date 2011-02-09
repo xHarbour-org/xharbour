@@ -20,7 +20,6 @@ CLASS VrLabel INHERIT VrObject
    DATA ClsName      EXPORTED  INIT "Label"
    DATA SysBackColor EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Data         EXPORTED  INIT ""
    DATA BackColor    PUBLISHED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor    PUBLISHED INIT GetSysColor( COLOR_BTNTEXT )
    METHOD Init()  CONSTRUCTOR
