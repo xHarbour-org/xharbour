@@ -32,7 +32,7 @@ CLASS VrReport INHERIT VrObject
    DATA nBox           EXPORTED  INIT 0
    
    DATA FileName       EXPORTED  INIT "Preview"
-   DATA LandScape      EXPORTED  INIT .F.
+   DATA Orientation    EXPORTED
    DATA PaperSize      EXPORTED  INIT 1
    DATA oPDF           EXPORTED
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
@@ -74,6 +74,7 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 METHOD Init() CLASS VrReport
    ::aProperties := {}
+   ::Orientation := __GetSystem():PageSetup:Portrait
    AADD( ::aProperties, { "Name",       "Object"  } )
    AADD( ::aProperties, { "DataSource", "Data"  } )
 RETURN Self
@@ -113,7 +114,7 @@ METHOD StartPage() CLASS VrReport
    ENDIF
    ::nPage++
    ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "PaperSize", ::PaperSize )
-   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "Landscape", ::LandScape )
+   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "Landscape", ::Orientation == __GetSystem():PageSetup:Landscape )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -265,6 +266,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )
    ::Application:Props[ "Footer" ]:Dockit()
    ::Application:Props[ "Body" ]:Dockit()
+   TRY
+      ::Orientation  := VAL( ::aProps:Orientation )
+   CATCH
+   END
    ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
    ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
 RETURN Self

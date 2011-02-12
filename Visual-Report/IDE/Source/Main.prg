@@ -132,6 +132,14 @@ METHOD Init() CLASS MainForm
 
          WITH OBJECT MenuStripItem( :this )
             :Begingroup := .T.
+            :Caption    := "&Page Setup"
+            :ImageIndex := 0
+            :Action     := {|o|::Application:Report:PageStup() }
+            :Create()
+         END
+
+         WITH OBJECT MenuStripItem( :this )
+            :Begingroup := .T.
             :Caption    := "&Exit"
             :ImageIndex := 0
             :Action     := {|o|::Application:MainForm:Close() }
@@ -481,6 +489,7 @@ CLASS Report
    METHOD EditReset() INLINE NIL
    METHOD Generate()
    METHOD Run()
+   METHOD PageStup()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -495,6 +504,14 @@ METHOD New() CLASS Report
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
    ::VrReport := VrReport( NIL )
    oApp:Props:Components:AddButton( ::VrReport )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD PageStup() CLASS Report
+   LOCAL oPs := PageSetup( oApp:MainForm )
+   oPs:Orientation := ::VrReport:Orientation
+   oPs:Show()
+   ::VrReport:Orientation := oPs:Orientation
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -625,6 +642,8 @@ METHOD Save( lSaveAs ) CLASS Report
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:Height ) )
          oXmlProp:addBelow( oXmlSource )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:Height ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "Orientation", NIL, XSTR( ::VrReport:Orientation ) )
          oXmlProp:addBelow( oXmlSource )
       oXmlReport:addBelow( oXmlProp )
 
