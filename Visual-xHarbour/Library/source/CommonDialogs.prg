@@ -448,3 +448,75 @@ METHOD Init( oOwner ) CLASS FontDialogFont
 RETURN Self
 
 //------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+CLASS PageSetup INHERIT CommonDialogs
+   DATA Orientation     PUBLISHED INIT DMORIENT_PORTRAIT
+   DATA EnumOrientation EXPORTED INIT { { "Portrait", "Landscape" }, {__GetSystem():PageSetup:Portrait, __GetSystem():PageSetup:Landscape} }
+
+   DATA PrinterName  EXPORTED
+   DATA Default      EXPORTED INIT .F.
+   DATA DriverName   EXPORTED
+   DATA Port         EXPORTED
+   
+   DATA PageWidth    EXPORTED
+   DATA PageHeight   EXPORTED
+
+   DATA LeftMargin   EXPORTED INIT 0
+   DATA TopMargin    EXPORTED INIT 0
+   DATA RightMargin  EXPORTED INIT 0
+   DATA BottomMargin EXPORTED INIT 0
+
+   METHOD Init() CONSTRUCTOR
+   METHOD Show()
+   METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
+ENDCLASS
+
+METHOD Init( oParent ) CLASS PageSetup
+   ::Style := 0
+   ::__xCtrlName := "PageSetup"
+   ::ClsName     := "PageSetup"
+   ::ComponentType := "CommonDialog"
+   Super:Init( oParent )
+RETURN Self
+
+METHOD Show() CLASS PageSetup
+   LOCAL pd, nPtr, advnm, dn, nOrientation
+   nOrientation := ::Orientation
+   pd := (struct PAGESETUPDLG)
+   pd:hwndOwner     := ::Owner:hWnd
+   pd:Flags         := ::Style
+   pd:ptPaperSize:x := ::PageWidth
+   pd:ptPaperSize:y := ::PageHeight
+
+//   pd:rtMargin:x    := ::LeftMargin
+//   pd:rtMargin:y    := ::TopMargin
+//   pd:rtMargin:cx   := ::RightMargin
+//   pd:rtMargin:cy   := ::BottomMargin
+
+   IF PageSetupDlg( @pd, @nOrientation )
+      IF ! EMPTY( pd:hDevNames )
+         IF ( nPtr  := GlobalLock( pd:hDevNames ) ) <> 0
+            dn := (struct DEVNAMES)
+            dn:Buffer( Peek( nPtr, dn:sizeof ) )
+            advnm := Array( 4 )
+            ::DriverName  := Peek( nPtr + dn:wDriverOffset )
+            ::PrinterName := Peek( nPtr + dn:wDeviceOffset )
+            ::Port        := Peek( nPtr + dn:wOutputOffset )
+            ::Default     := dn:wDefault == 1
+            GlobalUnlock( pd:hDevNames )
+         ENDIF
+         GlobalFree( pd:hDevNames )
+      ENDIF
+      ::Orientation  := nOrientation
+//      ::LeftMargin   := pd:rtMargin:x
+//      ::TopMargin    := pd:rtMargin:y
+//      ::RightMargin  := pd:rtMargin:cx
+//      ::BottomMargin := pd:rtMargin:cy
+      ::PageWidth    := pd:ptPaperSize:x
+      ::PageHeight   := pd:ptPaperSize:y
+      RETURN .T.
+   ENDIF
+RETURN .F.
+

@@ -7716,6 +7716,57 @@ HB_FUNC( PRINTDLG )
 }
 
 //------------------------------------------------------------------------------------------------
+HB_FUNC( PAGESETUPDLG )
+{
+   PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
+   if( pStructure && HB_IS_OBJECT( pStructure ) )
+   {
+      HGLOBAL hDevMode;
+      DEVMODE * pDevMode;
+      PAGESETUPDLG *pPd;
+
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_vmPush( pStructure );
+      hb_vmSend(0);
+
+      pPd = (PAGESETUPDLG *) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
+      pPd->lStructSize = sizeof( PAGESETUPDLG );
+
+      hDevMode = GlobalAlloc(GHND, sizeof(DEVMODE));
+      if ( hDevMode ) {
+         pDevMode = (DEVMODE *) GlobalLock(hDevMode);
+         if ( pDevMode ) {
+            pDevMode->dmSize = sizeof(DEVMODE);
+            pDevMode->dmFields = DM_ORIENTATION;
+            pDevMode->dmOrientation = hb_parnl(2); //DMORIENT_LANDSCAPE;
+         }
+         GlobalUnlock(hDevMode); // unlock the memory for other functions to use this
+         pPd->hDevMode = hDevMode;
+      }
+
+      if( PageSetupDlg( pPd ) )
+      {
+         DEVMODE *pDevMode = (DEVMODE*) GlobalLock( pPd->hDevMode );
+         hb_stornl( (ULONG) pDevMode->dmOrientation, 2 );
+         GlobalUnlock( pPd->hDevMode );
+         
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "PAGESETUPDLG", 1, hb_paramError(1) );
+   }
+}
+
+//------------------------------------------------------------------------------------------------
 HB_FUNC( COMMDLGEXTENDEDERROR )
 {
    hb_retnl( (long) CommDlgExtendedError() );

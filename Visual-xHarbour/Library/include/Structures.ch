@@ -1561,3 +1561,28 @@ typedef struct tagNMTVDISPINFO {;
     NMHDR hdr;
     TVITEM item;
 } NMTVDISPINFO, *LPNMTVDISPINFO;
+
+typedef struct tagPSD {;
+   DWORD           lStructSize;
+   HWND            hwndOwner;
+   HGLOBAL         hDevMode;
+   HGLOBAL         hDevNames;
+   DWORD           Flags;
+   POINT           ptPaperSize;
+   RECT            rtMinMargin;
+   RECT            rtMargin;
+   HINSTANCE       hInstance;
+   LPARAM          lCustData;
+   LPPAGESETUPHOOK lpfnPageSetupHook;
+   LPPAGEPAINTHOOK lpfnPagePaintHook;
+   LPCTSTR         lpPageSetupTemplateName;
+   HGLOBAL         hPageSetupTemplate;
+} PAGESETUPDLG, *LPPAGESETUPDLG;
+
+typedef struct tagDEVMODE {;
+    WORD wDriverOffset;
+    WORD wDeviceOffset;
+    WORD wOutputOffset;
+    WORD wDefault;
+} DEVMODE
+

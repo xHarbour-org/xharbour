@@ -65,6 +65,7 @@ CLASS System
    DATA CurrentScheme          EXPORTED
    DATA Time                   EXPORTED
    DATA xLocalTime             PROTECTED
+   DATA PageSetup              EXPORTED
    
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -506,6 +507,11 @@ METHOD Init() CLASS System
    HSetCaseMatch( ::ListBox, .F. )
    ::ListBox[ "OwnerDrawFixed" ]     := 2
    ::ListBox[ "OwnerDrawVariable" ]  := 3
+
+   ::PageSetup := Hash()
+   HSetCaseMatch( ::PageSetup, .F. )
+   ::PageSetup[ "Portrait" ]   := DMORIENT_PORTRAIT
+   ::PageSetup[ "Landscape" ]  := DMORIENT_LANDSCAPE
 
    ::Cursor := Hash()
    HSetCaseMatch( ::Cursor, .F. )
