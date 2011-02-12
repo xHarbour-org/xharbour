@@ -130,11 +130,12 @@ METHOD Init() CLASS MainForm
             :Create()
          END
 
-         WITH OBJECT MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "PageSetupMenu" ] := MenuStripItem( :this )
             :Begingroup := .T.
             :Caption    := "&Page Setup"
             :ImageIndex := 0
-            :Action     := {|o|::Application:Report:PageStup() }
+            :Enabled    := .F.
+            :Action     := {|o|::Application:Report:PageSetup() }
             :Create()
          END
 
@@ -489,16 +490,18 @@ CLASS Report
    METHOD EditReset() INLINE NIL
    METHOD Generate()
    METHOD Run()
-   METHOD PageStup()
+   METHOD PageSetup()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD New() CLASS Report
-   oApp:Props:ToolBox:Enabled    := .T.
-   oApp:Props:SaveMenu:Enabled   := .T.
-   oApp:Props:SaveAsMenu:Enabled := .T.
-   oApp:Props:CloseBttn:Enabled  := .T.
-   oApp:Props:SaveBttn:Enabled   := .T.
+   oApp:Props:ToolBox:Enabled       := .T.
+   oApp:Props:SaveMenu:Enabled      := .T.
+   oApp:Props:SaveAsMenu:Enabled    := .T.
+   oApp:Props:CloseBttn:Enabled     := .T.
+   oApp:Props:SaveBttn:Enabled      := .T.
+   oApp:Props:PageSetupMenu:Enabled := .T.
+   
    oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
    ::FileName := "Untitled.vrt"
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
@@ -507,7 +510,7 @@ METHOD New() CLASS Report
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD PageStup() CLASS Report
+METHOD PageSetup() CLASS Report
    LOCAL oPs := PageSetup( oApp:MainForm )
    oPs:Orientation := ::VrReport:Orientation
    oPs:Show()
@@ -559,12 +562,14 @@ METHOD Close() CLASS Report
       :Props:Body:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       :Props:Footer:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
 
-      :Props:ToolBox:Enabled    := .F.
-      :Props:SaveMenu:Enabled   := .F.
-      :Props:SaveBttn:Enabled   := .F.
-      :Props:SaveAsMenu:Enabled := .F.
-      :Props:CloseBttn:Enabled  := .F.
-      :Props:RunBttn:Enabled    := .F.
+      :Props:ToolBox:Enabled       := .F.
+      :Props:SaveMenu:Enabled      := .F.
+      :Props:SaveBttn:Enabled      := .F.
+      :Props:SaveAsMenu:Enabled    := .F.
+      :Props:CloseBttn:Enabled     := .F.
+      :Props:RunBttn:Enabled       := .F.
+      :Props:PageSetupMenu:Enabled := .F.
+
       :Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       :MainForm:Caption := "Visual Report"
       :Props:PropEditor:ResetProperties( {{ NIL }} )
@@ -592,6 +597,7 @@ METHOD Open( cReport ) CLASS Report
       oApp:Props:SaveAsMenu:Enabled := .T.
       oApp:Props:CloseBttn:Enabled  := .T.
       oApp:Props:RunBttn:Enabled    := .T.
+      oApp:Props:PageSetupMenu:Enabled := .T.
 
       oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       ::FileName := cReport
