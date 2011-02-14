@@ -16,6 +16,78 @@
     * Removed file pcre_ucp_searchfuncs.c .
   * source/rtl/tbrowse.prg
 
+2011-02-14 19:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/debian/rules
+  * xharbour/make_b32.bat
+  * xharbour/make_dc.bat
+  * xharbour/make_pc.bat
+  * xharbour/doc/genhtm.cmd
+  * xharbour/doc/genhtm.bat
+  * xharbour/doc/gendoc.bat
+  * xharbour/make_gnu.bat
+  * xharbour/source/tip/cgi.prg
+  * xharbour/source/rtl/mlcfunc.c
+  * xharbour/source/rtl/gtalleg/make_b32.bat
+  * xharbour/source/rtl/gtalleg/make_vc.bat
+  * xharbour/source/rdd/usrrdd/rdds/adordd/make_b32.bat
+  * xharbour/contrib/tp_/linux.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_progressbar.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_fontselect.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_colorselect.c
+  * xharbour/contrib/xwt/make_b32.bat
+  * xharbour/contrib/xwt/doc/es/XwtMsgBox.txt
+  * xharbour/contrib/xwt/make_vc.bat
+  * xharbour/contrib/firebird/make_b32.bat
+  * xharbour/contrib/unicode/make_b32.bat
+  * xharbour/contrib/unicode/make_vc.bat
+  * xharbour/contrib/libnf/make_b32.bat
+  * xharbour/contrib/libnf/make_vc.bat
+  * xharbour/contrib/hbhpdf/tests/make_pc.bat
+  * xharbour/contrib/hbhpdf/tests/make_bc.bat
+  * xharbour/contrib/hbhpdf/tests/make_dc.bat
+  * xharbour/contrib/hbhpdf/tests/make_vc.bat
+  * xharbour/contrib/hbhpdf/tests/make_gc.bat
+  * xharbour/contrib/hbhpdf/tests/make_wc.bat
+  * xharbour/contrib/rdd_ads/make_b32.bat
+  * xharbour/contrib/rdd_ads/doc/gendoc.bat
+  * xharbour/contrib/rdd_ads/make_vc.bat
+  * xharbour/contrib/xwt2/tests/xwt_test1.prg
+  * xharbour/contrib/mysql/make_b32.bat
+  * xharbour/contrib/mysql/make_vc.bat
+  * xharbour/contrib/what32/make_b32.bat
+  * xharbour/contrib/what32/make_vc.bat
+  * xharbour/contrib/hbzlib/make_b32.bat
+  * xharbour/contrib/hbzlib/make_vc.bat
+  * xharbour/contrib/gtwvw/make_b32.bat
+  * xharbour/contrib/gtwvw/samples/wvwtest9.bat
+  * xharbour/contrib/gtwvw/samples/bldwvw.bat
+  * xharbour/contrib/gtwvw/Makefile
+  * xharbour/tests/vcdll.bat
+  * xharbour/tests/pdll55.bat
+  * xharbour/tests/pdllvc.bat
+  * xharbour/tests/dll_b32.bat
+  * xharbour/tests/pdllbc.bat
+  * xharbour/bin/bld.bat
+  * xharbour/bin/bld_b32.bat
+  * xharbour/bin/bld_b16.bat
+  * xharbour/bin/bld_vc.bat
+  * xharbour/make_vc.bat
+  * xharbour/make_w32.bat
+  * xharbour/make_gnu.cmd
+  * xharbour/make_gc.bat
+  * xharbour/utils/hbextern/make_c5x.bat
+  * xharbour/utils/hbtest/make_c5x.bat
+  * xharbour/utils/hbtest/make_xpp.cmd
+  * xharbour/utils/hbtest/make_xpp.bat
+  * xharbour/utils/hbdict/i18n/hbdict_it_IT.hit
+  * xharbour/mdir.bat
+  * xharbour/samples/sitesvr/bldsvr.bat
+  * xharbour/samples/guestbk/bld_b32.bat
+  * xharbour/samples/hscript/makehtm.bat
+  * xharbour/samples/hscript/bld_b32.bat
+    ! removed svn:executable attribute inherited from files wrongly
+      committed with executable attribute to previous CVS repository
+
 2011-02-14 17:48 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/debian/harb.sh
   * xharbour/make_dc.bat
