@@ -1,5 +1,5 @@
 //
-// $Id:$
+// $Id$
 //
 // Sample program to extract uncommented part of read buffer
 //

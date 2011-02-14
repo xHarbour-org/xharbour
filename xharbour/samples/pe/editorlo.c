@@ -1,5 +1,5 @@
 /*
- * $Id: editorlo.c,v 1.2 2001/06/04 20:19:14 dholm Exp $
+ * $Id$
 */
 #include <stdio.h>
 #include <io.h>

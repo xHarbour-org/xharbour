@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: lnlenli1.prg,v 1.3 2001/05/15 13:02:07 vszakats Exp $
+// $Id$
 //
 
 // ; Pushing Harbour preprocessor to the line length limit.

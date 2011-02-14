@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.1 2006/10/13 16:47:37 ptsarenko Exp $
+REM $Id$
 REM
 REM
 

@@ -1,5 +1,5 @@
 /*
- * $Id: showtime.prg 7637 2007-08-05 09:55:33Z druzus $
+ * $Id$
  */
 
 /*

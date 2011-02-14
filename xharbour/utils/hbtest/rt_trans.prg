@@ -1,5 +1,5 @@
 /*
- * $Id: rt_trans.prg,v 1.3 2005/05/16 21:45:42 andijahja Exp $
+ * $Id$
  */
 
 /*

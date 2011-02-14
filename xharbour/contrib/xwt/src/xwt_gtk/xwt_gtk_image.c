@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_image.c,v 1.6 2005/10/24 04:01:52 druzus Exp $
+   $Id$
 
    GTK interface - Clickable image widget
 */

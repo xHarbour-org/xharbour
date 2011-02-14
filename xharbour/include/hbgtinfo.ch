@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtinfo.ch,v 1.2 2008/06/25 20:20:51 vouchcac Exp $
+ * $Id$
  */
 
 /*

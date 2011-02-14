@@ -1,5 +1,5 @@
 /*
- * $Id: tstchbx.prg,v 1.3 2004/02/15 19:11:55 jonnymind Exp $
+ * $Id$
  */
 
 #include "inkey.ch"

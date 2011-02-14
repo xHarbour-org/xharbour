@@ -8,7 +8,7 @@
                                     gian@nccolai.ws
 
 
-$Id: xhbt_internals.txt,v 1.2 2004/02/28 20:37:21 lculik Exp $
+$Id$
 
 /*  $DOC$
  *  $FUNCNAME$

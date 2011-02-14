@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.25 2004/02/08 12:58:18 lculik Exp $
+   $Id$
 
    Definitions
 */

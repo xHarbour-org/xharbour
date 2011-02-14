@@ -8,7 +8,7 @@
                                   gian@nccolai.ws
 
 
-$Id: hbi18n.txt,v 1.6 2004/12/12 06:04:17 brianhays Exp $
+$Id$
 
 
 /*  $DOC$

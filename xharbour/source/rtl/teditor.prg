@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.88 2008/08/28 03:39:17 peterrees Exp $
+/* $Id$
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.88 2008/08/28 03:39:17 peterrees Exp $
+/* $Id$
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *

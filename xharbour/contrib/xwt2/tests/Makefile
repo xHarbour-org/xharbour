@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.6 2004/08/21 17:27:14 lf_sfnet Exp $
+# $Id$
 #
 # Makefile for XWT Test program
 #

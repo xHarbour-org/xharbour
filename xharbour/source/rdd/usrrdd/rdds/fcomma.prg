@@ -1,5 +1,5 @@
 /*
- * $Id: fcomma.prg,v 1.2 2008/10/18 17:08:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*

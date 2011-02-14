@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.2 2004/05/24 22:53:00 lculik Exp $
+   $Id$
 
    Label - Basic text label to draw on the screen
 */

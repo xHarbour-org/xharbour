@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.1 2005/10/25 00:51:25 fsgiudice Exp $
+rem * $Id$
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *

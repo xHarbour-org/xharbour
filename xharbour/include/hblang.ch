@@ -1,5 +1,5 @@
 /*
- * $Id: hblang.ch,v 1.4 2003/06/23 22:43:19 ronpinkas Exp $
+ * $Id$
  */
 
 /*

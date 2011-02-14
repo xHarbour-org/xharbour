@@ -1,5 +1,5 @@
 /*
- * $Id: msgca.c,v 1.10 2009/01/08 09:11:13 marchuet Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Catal n",                   /* Name (in native language) */
       "CA",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.10 $ $Date: 2009/01/08 09:11:13 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

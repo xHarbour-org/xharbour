@@ -1,5 +1,5 @@
 /*
- * $Id: tracing.txt,v 1.7 2000/02/17 11:11:52 lculik Exp $
+ * $Id$
  */
 
 /*

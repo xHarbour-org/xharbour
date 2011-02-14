@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.9 2005/08/07 02:40:38 mlombardo Exp $
+ * $Id$
  */
 
 /*

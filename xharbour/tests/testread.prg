@@ -1,5 +1,5 @@
 /*
- * $Id: testread.prg,v 1.5 2000/11/04 19:21:14 ronpinkas Exp $
+ * $Id$
  */
 
 // Harbour Get System sample

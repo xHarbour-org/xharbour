@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_menuitem.c,v 1.1 2003/10/14 23:12:13 jonnymind Exp $
+   $Id$
 
    Menu management
 */

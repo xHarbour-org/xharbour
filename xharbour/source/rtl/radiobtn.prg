@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.7 2004/07/16 01:00:15 paultucker Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.15 2009/12/03 04:42:32 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2009/12/03 04:42:32 $
- * Revision..: $Revision: 1.15 $
+ * Date......: $Date$
+ * Revision..: $Revision$
  * Log file..: $Logfile:     $
  *
  *

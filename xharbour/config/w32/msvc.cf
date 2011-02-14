@@ -1,5 +1,5 @@
 #
-# $Id: msvc.cf,v 1.7 2007/12/30 17:49:06 likewolf Exp $
+# $Id$
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf

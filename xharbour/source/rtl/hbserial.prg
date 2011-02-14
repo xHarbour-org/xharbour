@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.15 2007/05/02 06:19:56 walito Exp $
+ * $Id$
  */
 
 /*

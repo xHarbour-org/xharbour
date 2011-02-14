@@ -1,5 +1,5 @@
 //
-// $Id: set_num.prg,v 1.2 1999/10/16 03:28:56 dholm Exp $
+// $Id$
 //
 
 // Testing SET

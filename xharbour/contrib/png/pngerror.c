@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
+ * $Id$
  */
 
 /* pngerror.c - stub functions for i/o and memory allocation

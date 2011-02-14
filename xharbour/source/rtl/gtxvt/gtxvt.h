@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.14 2004/10/21 14:26:42 jonnymind Exp $
+ * $Id$
  */
 
 /*

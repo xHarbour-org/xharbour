@@ -1,5 +1,5 @@
 /*
- * $Id: dbstruxx.prg,v 1.1 2007/10/31 08:26:50 marchuet Exp $
+ * $Id$
  */
 
 /*

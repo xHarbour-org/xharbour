@@ -1,5 +1,5 @@
 /*
- *  $Id: util.prg,v 1.3 2004/12/17 01:26:00 modalsist Exp $
+ *  $Id$
  */
 
 /*

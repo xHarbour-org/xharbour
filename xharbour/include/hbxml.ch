@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.ch,v 1.1 2009/05/12 01:31:08 modalsist Exp $
+ * $Id$
  */
 
 /*

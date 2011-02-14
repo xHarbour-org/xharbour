@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+# $Id$
 #
 # Makefile for XWT GTK interface
 #

@@ -1,5 +1,5 @@
 /*
- * $Id: simpleio.ch,v 1.5 2001/04/27 19:03:46 dholm Exp $
+ * $Id$
  */
 
 /*

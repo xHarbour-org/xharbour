@@ -1,5 +1,5 @@
 //
-// $Id: exittest.prg,v 1.1 1999/10/04 18:46:28 vszel Exp $
+// $Id$
 //
 
 // quick exit test

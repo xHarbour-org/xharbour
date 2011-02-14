@@ -1,5 +1,5 @@
 /*
- * $Id: vfpcdx.prg,v 1.4 2008/01/10 11:18:03 marchuet Exp $
+ * $Id$
  */
 
 /*

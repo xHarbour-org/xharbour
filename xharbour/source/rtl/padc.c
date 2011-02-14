@@ -1,5 +1,5 @@
 /*
- * $Id: padc.c,v 1.6 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id$
  */
 
 /*

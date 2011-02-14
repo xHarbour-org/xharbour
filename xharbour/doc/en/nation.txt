@@ -1,5 +1,5 @@
 /*
- * $Id: nation.txt,v 1.7 2000/06/20 02:21:06 lculik Exp $
+ * $Id$
  */
 
 /*

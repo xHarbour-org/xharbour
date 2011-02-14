@@ -1,5 +1,5 @@
 /*
- * $Id: hpdf_u3d.c,v 1.2 2010/12/10 21:43:56 andijahja Exp $
+ * $Id$
  */
 /*
  * << Haru Free PDF Library >> -- hpdf_u3d.c

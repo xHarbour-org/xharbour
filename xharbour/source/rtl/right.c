@@ -1,5 +1,5 @@
 /*
- * $Id: right.c,v 1.5 2004/02/23 04:03:27 andijahja Exp $
+ * $Id$
  */
 
 /*

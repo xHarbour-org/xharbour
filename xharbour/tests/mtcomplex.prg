@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.16 2003/12/11 14:44:52 jonnymind Exp $
+* $Id$
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).

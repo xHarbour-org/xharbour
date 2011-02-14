@@ -1,5 +1,5 @@
 /*
- * $Id: rat.c,v 1.4 2008/12/22 19:44:01 enricomaria Exp $
+ * $Id$
  */
 
 /*

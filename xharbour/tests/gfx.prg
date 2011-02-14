@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.prg,v 1.2 2004/08/06 02:25:56 maurifull Exp $
+ * $Id$
  *
  */
 

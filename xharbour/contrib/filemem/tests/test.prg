@@ -1,5 +1,5 @@
 /*
- * $Id: test.prg 12600 2009-09-22 12:57:36Z vszakats $
+ * $Id$
  */
 
 REQUEST HB_MEMIO

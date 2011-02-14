@@ -1,5 +1,5 @@
 /*
-* $Id: wvwstbar.c,v 1.1 2009/08/23 22:46:12 lculik Exp $
+* $Id$
  */
 /*
  * WVWstbar.C

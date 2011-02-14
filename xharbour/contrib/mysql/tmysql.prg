@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.22 2010/04/22 17:15:55 lculik Exp $
+ * $Id$
  */
 
  /*

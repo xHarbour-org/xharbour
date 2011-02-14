@@ -1,5 +1,5 @@
 /*
- * $Id: valtostr.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id$
  */
 
 /*

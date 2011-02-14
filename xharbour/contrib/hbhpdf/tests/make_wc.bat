@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+rem $Id$
 rem
 SET _MYLIB=common.lib dbffpt.lib dbfcdx.lib dbfntx.lib hbsix.lib debug.lib gtwin.lib macro.lib pp.lib rdd.lib rtl.lib vm.lib lang.lib pcrepos.lib ct.lib hbhpdf.lib png.lib zlib.lib
 SET CC_DIR=C:\WATCOM

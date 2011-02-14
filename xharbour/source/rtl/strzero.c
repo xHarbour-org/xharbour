@@ -1,5 +1,5 @@
 /*
- * $Id: strzero.c,v 1.4 2003/07/13 22:21:25 andijahja Exp $
+ * $Id$
  */
 
 /*

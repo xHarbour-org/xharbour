@@ -1,5 +1,5 @@
 /*
- * $Id: ansirdd.prg,v 1.5 2009/10/01 15:19:30 marchuet Exp $
+ * $Id$
  */
 
 /*

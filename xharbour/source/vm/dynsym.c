@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.62 2009/01/16 01:56:00 likewolf Exp $
+ * $Id$
  */
 
 /*

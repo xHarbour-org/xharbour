@@ -1,5 +1,5 @@
 /*
- * $Id: classex.ch,v 1.4 2007/05/11 15:35:53 ronpinkas Exp $
+ * $Id$
  */
 
 /*

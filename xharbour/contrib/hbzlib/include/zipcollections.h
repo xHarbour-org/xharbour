@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $RCSfile: ZipCollections.h,v $
-// $Revision: 1.1.2.4 $ $Name:  $
-// $Date: 2005/03/26 07:31:09 $ $Author: Tadeusz Dracz $
+// $Revision$ $Name:  $
+// $Date$ $Author$
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)

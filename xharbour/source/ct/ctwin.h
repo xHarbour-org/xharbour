@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.h,v 1.1 2008/03/16 19:15:59 likewolf Exp $
+ * $Id$
  */
 
 /*

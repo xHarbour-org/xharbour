@@ -1,5 +1,5 @@
 /*
- * $Id: msgdewin.c,v 1.7 2008/11/19 05:24:51 andijahja Exp $
+ * $Id$
  * modified 2003 Guenther Steiner <byte-one@aon.at>
  */
 
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Deutsch ANSI",                   /* Name (in native language) */
       "DEWIN",                        /* RFC ID */
       "ANSI",                       /* Codepage */
-      "$Revision: 1.7 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

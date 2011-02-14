@@ -1,5 +1,5 @@
 /*
- * $Id: n2color.c,v 1.3 2004/04/05 10:03:19 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: ord.ch,v 1.3 2002/12/28 12:11:13 horacioroldan Exp $
+ * $Id$
  */
 
 /*

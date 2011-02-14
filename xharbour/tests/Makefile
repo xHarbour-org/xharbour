@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.26 2004/06/28 14:16:34 jonnymind Exp $
+# $Id$
 #
 # Copyright 2003 Giancarlo Niccolai
 #

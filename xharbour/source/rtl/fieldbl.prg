@@ -1,5 +1,5 @@
 /*
- * $Id: fieldbl.prg,v 1.2 2010/12/24 01:48:29 andijahja Exp $
+ * $Id$
  */
 
 /*

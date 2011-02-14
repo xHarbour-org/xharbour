@@ -1,5 +1,5 @@
 /*
- * $Id: binnumx.c,v 1.4 2007/03/08 15:01:27 ronpinkas Exp $
+ * $Id$
  */
 
 /*

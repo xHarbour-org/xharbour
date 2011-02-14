@@ -1,5 +1,5 @@
 /*
- * $Id: hardcr.c,v 1.5 2004/02/23 04:31:21 andijahja Exp $
+ * $Id$
  */
 
 /*

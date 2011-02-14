@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.5 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id$
  */
 
 /*

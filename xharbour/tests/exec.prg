@@ -1,6 +1,6 @@
 ***********************************************************
 * exec.prg
-* $Id: exec.prg,v 1.3 2003/08/14 23:49:47 jonnymind Exp $
+* $Id$
 *
 * Test for indirect execution of functions and methods
 * using arrays as parameter lists

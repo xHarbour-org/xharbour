@@ -1,5 +1,5 @@
 /*
- * $Id: gtclip.c,v 1.5 2009/12/01 18:04:38 ptsarenko Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg 8735 2008-06-15 22:28:36Z vouchcac $
+ * $Id$
  */
 
 /*

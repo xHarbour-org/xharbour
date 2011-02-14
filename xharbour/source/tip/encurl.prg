@@ -1,5 +1,5 @@
 /*
- * $Id: encurl.prg,v 1.2 2007/02/27 15:59:41 druzus Exp $
+ * $Id$
  */
 
 /*

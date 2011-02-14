@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.8 2005/11/11 21:36:24 ronpinkas Exp $
+ * $Id$
  */
 
 /*

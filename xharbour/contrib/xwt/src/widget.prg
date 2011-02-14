@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.8 2003/11/11 12:44:22 jonnymind Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

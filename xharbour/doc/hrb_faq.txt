@@ -1,5 +1,5 @@
 /*
- * $Id: hrb_faq.txt,v 1.2 2000/02/13 11:13:27 vszel Exp $
+ * $Id$
  */
 
 .HRB FAQ list 1999/05/19:

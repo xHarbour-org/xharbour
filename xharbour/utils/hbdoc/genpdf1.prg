@@ -1,5 +1,5 @@
 /*
- * $Id: genpdf1.prg,v 1.1.1.1 2001/12/21 10:45:30 ronpinkas Exp $
+ * $Id$
  */
 
 /*

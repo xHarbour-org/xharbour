@@ -1,7 +1,7 @@
 @ECHO OFF
 
 REM
-REM $Id: vcdll.bat,v 1.1 2002/01/07 04:08:11 andijahja Exp $
+REM $Id$
 REM
 REM  旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
 REM  � This is a template for building application with MsVC   넴

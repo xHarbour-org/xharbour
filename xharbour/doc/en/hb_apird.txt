@@ -1,5 +1,5 @@
 /*
- * $Id: hb_apird.txt,v 1.2 2001/03/12 04:19:56 april Exp $
+ * $Id$
  */
 
 /*

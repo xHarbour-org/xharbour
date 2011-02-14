@@ -1,5 +1,5 @@
 #
-# $Id: dir.cf,v 1.2 2003/12/13 17:55:11 druzus Exp $
+# $Id$
 #
 
 ifneq ($(HB_ARCHITECTURE),)

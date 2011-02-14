@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.9 2008/03/16 19:16:01 likewolf Exp $
+ * $Id$
  */
 
 /*

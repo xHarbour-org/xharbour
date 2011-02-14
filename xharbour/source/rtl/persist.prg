@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.30 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id$
  */
 
 /*

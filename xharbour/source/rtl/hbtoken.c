@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.7 2008/06/27 06:21:49 ronpinkas Exp $
+ * $Id$
  */
 
 /*

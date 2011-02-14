@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.10 2005/10/10 08:19:05 brianhays Exp $
+$Id$
 
 
 STATUS OF THIS DOCUMENT

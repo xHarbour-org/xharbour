@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.7 2008/03/13 10:49:43 likewolf Exp $
+ * $Id$
  */
 
 /*

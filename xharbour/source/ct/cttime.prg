@@ -1,5 +1,5 @@
 /*
- * $Id: cttime.prg,v 1.2 2007/11/14 12:10:11 lculik Exp $
+ * $Id$
  */
 
 /*

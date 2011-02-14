@@ -1,5 +1,5 @@
 /*
- * $Id: genrtf.prg,v 1.5 2005/02/04 09:11:30 patrickmast Exp $
+ * $Id$
  */
 
 /*

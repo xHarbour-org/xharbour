@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_pc.bat,v 1.33 2009/03/27 02:57:04 ronpinkas Exp $
+rem $Id$
 rem
 rem FILE: make_pc.bat
 rem BATCH FILE FOR PELLESC

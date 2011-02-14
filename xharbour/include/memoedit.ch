@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.ch,v 1.6 2001/04/27 19:03:46 dholm Exp $
+ * $Id$
  */
 
 /*

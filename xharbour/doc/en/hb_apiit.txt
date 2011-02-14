@@ -1,5 +1,5 @@
 /*
- * $Id: hb_apiit.txt,v 1.2 2001/01/23 01:58:40 brianhays Exp $
+ * $Id$
  */
 
 /*

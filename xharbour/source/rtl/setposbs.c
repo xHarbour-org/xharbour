@@ -1,5 +1,5 @@
 /*
- * $Id: setposbs.c,v 1.2 2008/03/16 19:16:01 likewolf Exp $
+ * $Id$
  */
 
 /*

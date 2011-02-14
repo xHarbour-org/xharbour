@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.72 2009/12/16 05:32:21 andijahja Exp $
+ * $Id$
  */
 
 /*

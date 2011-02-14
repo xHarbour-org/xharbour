@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.txt,v 1.1.1.1 2001/12/21 10:48:03 ronpinkas Exp $
+ * $Id$
  */
 
 /*  $DOC$

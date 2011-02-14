@@ -1,5 +1,5 @@
 /*
- * $Id: arrayrdd.prg,v 1.8 2009/04/21 22:05:51 lculik Exp $
+ * $Id$
  */
 
 /*

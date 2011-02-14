@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: button.prg,v 1.5 2003/08/31 19:02:19 xthefull Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

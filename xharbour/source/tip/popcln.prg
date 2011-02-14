@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.10 2009/08/16 14:39:15 lculik Exp $
+ * $Id$
  */
 
 /*

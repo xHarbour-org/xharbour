@@ -1,5 +1,5 @@
 /*
- * $Id: harupdf.ch 8437 2008-05-18 07:01:45Z vszakats $
+ * $Id$
  */
 
 /*

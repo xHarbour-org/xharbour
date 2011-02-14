@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.14 2009/01/24 16:53:10 likewolf Exp $
+ * $Id$
  */
 
 /*

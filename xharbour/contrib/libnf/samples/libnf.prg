@@ -1,5 +1,5 @@
 /*
- * $Id: libnf.prg,v 1.5 2005/11/14 13:41:20 marceloanelli Exp $
+ * $Id$
  */
 /*
    LIBNF.PRG

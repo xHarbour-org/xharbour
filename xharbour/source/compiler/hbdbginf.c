@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbginf.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
+ * $Id$
  */
 
 /*

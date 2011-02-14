@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: lnlenli2.prg,v 1.3 2001/05/15 13:02:07 vszakats Exp $
+// $Id$
 //
 
 // ; Pushing Harbour to the line length limit.

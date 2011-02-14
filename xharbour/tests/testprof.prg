@@ -1,5 +1,5 @@
 /*
- * $Id: testprof.prg,v 1.1.1.1 2001/12/21 10:46:32 ronpinkas Exp $
+ * $Id$
  */
 
 /* Test code for the harbour profiler API and the profile reporting classes */

@@ -1,5 +1,5 @@
 /*
- * $Id: mankala.prg,v 1.1 1999/10/09 10:07:22 vszel Exp $
+ * $Id$
  */
 
 //

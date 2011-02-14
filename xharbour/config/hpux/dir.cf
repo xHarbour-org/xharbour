@@ -1,5 +1,5 @@
 #
-# $Id: dir.cf,v 1.1.1.1 2001/12/21 10:47:59 ronpinkas Exp $
+# $Id$
 #
 
 ifeq ($(PM),) # Only traverse directories if not compiling a specific module

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.15 2008/04/14 06:06:22 andijahja Exp $
+ * $Id$
  */
 
 /*

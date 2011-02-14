@@ -1,5 +1,5 @@
 /*
- * $Id: testes.prg,v 1.0 2001/04/12 18:24:40 dholm Exp $
+ * $Id$
  */
 
 /*

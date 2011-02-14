@@ -1,5 +1,5 @@
 /*
- * $Id: testcls.prg,v 1.6 2000/02/14 08:11:56 vszel Exp $
+ * $Id$
  */
 
 // Testing Harbour classes ON ERROR feature

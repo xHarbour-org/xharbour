@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.1 2005/01/14 20:00:00 ptsarenko Exp $
+ * $Id$
  */
 
 /*

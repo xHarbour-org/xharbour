@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.txt,v 1.4 2000/04/25 06:27:22 brianhays Exp $
+ * $Id$
  */
 
 

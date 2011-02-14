@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.11 2006/03/29 11:55:28 druzus Exp $
+ * $Id$
  */
 
 /*

@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: keywords.prg,v 1.9 2001/05/03 17:21:12 rglab Exp $
+// $Id$
 //
 
 //DO NOT RUN THIS PROGRAM - ITS PURPOSE IS THE SYNTAX CHECK ONLY!

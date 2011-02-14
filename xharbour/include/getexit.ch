@@ -1,5 +1,5 @@
 /*
- * $Id: getexit.ch,v 1.3 2002/03/19 01:07:58 ronpinkas Exp $
+ * $Id$
  */
 
 /*

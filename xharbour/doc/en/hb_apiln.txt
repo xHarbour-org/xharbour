@@ -1,5 +1,5 @@
 /*
- * $Id: hb_apiln.txt,v 1.2 2001/05/15 13:02:05 vszakats Exp $
+ * $Id$
  */
 
 /*

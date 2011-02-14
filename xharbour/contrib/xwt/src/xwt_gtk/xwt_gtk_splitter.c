@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_splitter.c,v 1.3 2003/07/23 15:58:10 lculik Exp $
+   $Id$
 
    Splitter window
 */

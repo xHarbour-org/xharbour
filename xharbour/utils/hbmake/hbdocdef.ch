@@ -1,5 +1,5 @@
 /*
- * $Id: hbdocdef.ch,v 1.2 2001/06/06 19:34:44 dholm Exp $
+ * $Id$
  */
 
 /*

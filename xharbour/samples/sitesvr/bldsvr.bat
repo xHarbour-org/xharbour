@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bldsvr.bat,v 1.4 2003/01/11 02:18:09 fsgiudice Exp $
+rem $Id$
 rem
 
 rem ---------------------------------------------------------------

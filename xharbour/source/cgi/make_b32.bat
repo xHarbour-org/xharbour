@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+rem $Id$
 rem
 
 if not exist .\obj md .\obj

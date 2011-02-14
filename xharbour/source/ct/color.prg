@@ -1,5 +1,5 @@
 /*
- * $Id: color.prg,v 1.2 2006/12/11 20:44:40 ptsarenko Exp $
+ * $Id$
  */
 
 /*

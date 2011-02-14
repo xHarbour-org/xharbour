@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.15 2009/12/19 14:06:18 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_bin.bat,v 1.15 2009/03/27 02:57:30 ronpinkas Exp $
+rem $Id$
 rem
 
 rem RDDADS separate from this, include headers and readme

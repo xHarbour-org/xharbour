@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.txt,v 1.8 2000/04/23 23:15:41 lculik Exp $
+ * $Id$
  */
 
 /*

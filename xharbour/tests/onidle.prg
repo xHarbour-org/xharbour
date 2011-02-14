@@ -1,5 +1,5 @@
 //
-// $Id: onidle.prg,v 1.8 2004/04/17 10:58:20 rglab Exp $
+// $Id$
 //
 
 #include "hbmemory.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.73 2008/12/23 16:37:05 likewolf Exp $
+ * $Id$
  */
 
 /*

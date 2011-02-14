@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.102 2009/09/30 16:19:36 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $RCSfile: zipstring.h,v $
-// $Revision: 1.7 $ $Name:  $
-// $Date: 2009/09/13 13:03:32 $ $Author: likewolf $
+// $Revision$ $Name:  $
+// $Date$ $Author$
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)

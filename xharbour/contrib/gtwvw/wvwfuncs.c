@@ -1,5 +1,5 @@
 /*
-* $Id: wvwfuncs.c,v 1.4 2009/09/20 15:17:07 lculik Exp $
+* $Id$
  */
 /*
  * WVWDRAW.C

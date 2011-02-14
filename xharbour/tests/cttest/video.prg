@@ -1,5 +1,5 @@
 /*
- * $Id: video.prg,v 1.1 2004/03/04 00:27:39 likewolf Exp $
+ * $Id$
  */
 
 /*

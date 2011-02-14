@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.10 2009/09/13 20:03:57 likewolf Exp $
+   $Id$
 
    MS-Windows interface - Frame window
 */

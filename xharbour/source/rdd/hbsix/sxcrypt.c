@@ -1,5 +1,5 @@
 /*
- * $Id: sxcrypt.c,v 1.7 2009/02/24 12:38:32 marchuet Exp $
+ * $Id$
  */
 
 /*

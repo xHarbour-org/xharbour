@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.6 2008/05/01 03:36:58 andijahja Exp $
+   $Id$
 
    Global declarations, common functions
 

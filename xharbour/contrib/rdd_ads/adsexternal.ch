@@ -1,5 +1,5 @@
 /*
- * $Id: adsexternal.ch,v 1.3 2008/06/03 23:12:56 kaddath Exp $
+ * $Id$
  */
 
 /*

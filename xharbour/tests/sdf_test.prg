@@ -1,5 +1,5 @@
 //NOTEST
-// $Id: sdf_test.prg,v 1.2 2001/05/18 17:22:06 dholm Exp $
+// $Id$
 //
 
 // Test program for COPY TO SDF and APPEND FROM SDF 

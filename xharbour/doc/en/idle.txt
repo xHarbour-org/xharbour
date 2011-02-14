@@ -1,5 +1,5 @@
 /*
- * $Id: idle.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
+ * $Id$
 */
 
 /*  $DOC$

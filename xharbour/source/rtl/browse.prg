@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.19 2008/08/26 20:18:20 andijahja Exp $
+ * $Id$
  */
 
 /*

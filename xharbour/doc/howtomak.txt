@@ -1,5 +1,5 @@
 /*
- * $Id: howtomak.txt,v 1.6 2001/12/15 11:29:02 vszakats Exp $
+ * $Id$
  */
 
 HOW TO BUILD HARBOUR FROM THE SOURCE

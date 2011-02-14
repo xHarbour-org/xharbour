@@ -1,5 +1,5 @@
 /*
- * $Id: hbiniseg.h,v 1.1 2009/12/16 05:30:50 andijahja Exp $
+ * $Id$
  */
 
 /*

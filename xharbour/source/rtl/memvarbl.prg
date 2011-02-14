@@ -1,5 +1,5 @@
 /* 
- * $Id: memvarbl.prg,v 1.15 2001/06/14 21:20:43 dholm Exp $
+ * $Id$
  */
 
 /*

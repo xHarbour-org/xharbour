@@ -1,5 +1,5 @@
 /*
- * $Id: encoder.prg,v 1.2 2007/02/05 21:12:29 gdrouillard Exp $
+ * $Id$
  */
 
 /*

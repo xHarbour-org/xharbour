@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.25 2009/09/16 08:40:38 andijahja Exp $
+ * $Id$
  */
 
 /*

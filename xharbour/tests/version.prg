@@ -1,5 +1,5 @@
 //
-// $Id: version.prg,v 1.2 2005/03/04 22:23:45 andijahja Exp $
+// $Id$
 //
 
 // Testing the VERSION function

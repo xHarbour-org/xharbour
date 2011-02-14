@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.3 2005/03/04 02:25:48 kaddath Exp $
+rem $Id$
 rem
 
 if not "%HB_DIR_ADS%" == "" goto DIR_OK

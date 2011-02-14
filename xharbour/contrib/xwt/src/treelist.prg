@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: treelist.prg,v 1.1 2003/06/05 17:06:22 jonnymind Exp $
+   $Id$
 
    TreeList - A flexible list of items or tree of items.
 

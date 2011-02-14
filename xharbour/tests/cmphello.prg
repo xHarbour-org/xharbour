@@ -1,5 +1,5 @@
 //
-// $Id: cmphello.prg,v 1.2 1999/10/22 11:32:49 vszel Exp $
+// $Id$
 //
 
 //

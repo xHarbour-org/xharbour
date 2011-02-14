@@ -1,5 +1,5 @@
 /*
- * $Id: sxord.c,v 1.3 2009/02/24 12:38:32 marchuet Exp $
+ * $Id$
  */
 
 /*

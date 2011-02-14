@@ -1,5 +1,5 @@
 /*
- * $Id: html.prg,v 1.1.1.1 2001/12/21 10:45:37 ronpinkas Exp $
+ * $Id$
  */
 
 /*

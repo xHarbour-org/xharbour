@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.21 2008/03/13 10:49:42 likewolf Exp $
+ * $Id$
  */
 
 /*

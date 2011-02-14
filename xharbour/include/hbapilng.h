@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.11 2009/12/16 08:24:57 andijahja Exp $
+ * $Id$
  */
 
 /*

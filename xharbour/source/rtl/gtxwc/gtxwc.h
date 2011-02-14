@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.h,v 1.6 2008/03/16 19:16:04 likewolf Exp $
+ * $Id$
  */
 
 /*

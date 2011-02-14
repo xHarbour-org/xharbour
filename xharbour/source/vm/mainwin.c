@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.26 2008/11/22 08:25:37 andijahja Exp $
+ * $Id$
  */
 
 /*

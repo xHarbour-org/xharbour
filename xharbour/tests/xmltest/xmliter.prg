@@ -1,6 +1,6 @@
 ************************************************************
 * xmliter.prg
-* $Id: xmliter.prg,v 1.1 2004/04/02 21:28:37 jonnymind Exp $
+* $Id$
 *
 * Test for XML ITERATOR routines of Xharbour rtl (MXML/HBXML)
 *

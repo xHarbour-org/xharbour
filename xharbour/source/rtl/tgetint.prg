@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.8 2008/11/18 17:55:45 marchuet Exp $
+ * $Id$
  */
 
 /*

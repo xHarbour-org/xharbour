@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.txt,v 1.5 2001/09/11 10:15:24 vszakats Exp $
+ * $Id$
  */
 
 /*

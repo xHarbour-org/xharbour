@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: framewindow.prg,v 1.4 2003/10/09 23:18:33 jonnymind Exp $
+   $Id$
 
    Connector class. Special widgets that have just one child.
 */

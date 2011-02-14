@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbferr.h,v 1.6 2006/04/15 18:52:23 druzus Exp $
+ * $Id$
  */
 
 /*

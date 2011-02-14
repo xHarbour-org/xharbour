@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: genhtm.bat,v 1.4 2003/10/13 03:49:04 lculik Exp $
+rem $Id$
 rem 
 
 if "%1" =="/OS2" goto OS2

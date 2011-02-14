@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.2 2004/01/17 22:01:02 andijahja Exp $
+rem $Id$
 rem
 
 if "%1" == "clean" goto CLEAN

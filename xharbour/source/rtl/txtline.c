@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.17 2009/08/29 20:56:43 likewolf Exp $
+ * $Id$
  */
 
 /*

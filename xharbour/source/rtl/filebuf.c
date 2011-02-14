@@ -1,5 +1,5 @@
 /*
- * $Id: filebuf.c,v 1.11 2009/11/09 09:39:06 marchuet Exp $
+ * $Id$
  */
 
 /*

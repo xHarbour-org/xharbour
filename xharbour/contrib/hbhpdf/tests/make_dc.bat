@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+rem $Id$
 rem
 SET CC_DIR=C:\DM
 SET HARBOURDIR=..\..\..

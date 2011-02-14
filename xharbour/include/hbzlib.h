@@ -1,5 +1,5 @@
 /*
- * $Id: hbzlib.h,v 1.5 2007/12/21 12:12:21 likewolf Exp $
+ * $Id$
  */
 
 /*

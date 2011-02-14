@@ -1,5 +1,5 @@
 /*
- * $Id: ampm.c,v 1.4 2004/03/18 03:58:36 ronpinkas Exp $
+ * $Id$
  */
 
 /*

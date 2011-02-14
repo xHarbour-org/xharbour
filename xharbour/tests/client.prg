@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo client program
-* $Id: client.prg,v 1.10 2003/01/14 23:46:42 jonnymind Exp $
+* $Id$
 *
 * Giancarlo Niccolai
 *

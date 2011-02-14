@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.35 2009/10/22 16:29:28 enricomaria Exp $
+ * $Id$
  */
 
 /*

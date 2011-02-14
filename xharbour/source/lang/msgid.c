@@ -1,5 +1,5 @@
 /*
- * $Id: msgid.c,v 1.9 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Bahasa Indonesia",          /* Name (in native language) */
       "ID",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

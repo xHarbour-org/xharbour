@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.38 2011/01/20 04:55:53 andijahja Exp $
+ * $Id$
  */
 
 /*

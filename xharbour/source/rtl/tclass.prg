@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.32 2009/01/24 14:49:03 ronpinkas Exp $
+ * $Id$
  */
 
 /*

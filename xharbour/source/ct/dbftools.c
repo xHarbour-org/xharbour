@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.2 2005/10/24 01:04:25 druzus Exp $
+ * $Id$
  */
 
 /*

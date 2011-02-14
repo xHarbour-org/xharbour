@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.183 2009/12/29 15:08:04 ronpinkas Exp $
+ * $Id$
  */
 
 /*

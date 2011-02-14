@@ -1,5 +1,5 @@
 /*
- * $Id: ascpos.prg,v 1.2 2004/07/24 09:19:55 likewolf Exp $
+ * $Id$
  */
 
 /*

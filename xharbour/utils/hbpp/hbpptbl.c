@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.69 2006/09/17 16:13:23 ronpinkas Exp $
+ * $Id$
  */
 
 /*

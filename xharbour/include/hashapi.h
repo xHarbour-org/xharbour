@@ -1,5 +1,5 @@
 /*
- * $Id: hashapi.h,v 1.6 2005/11/12 22:49:30 walito Exp $
+ * $Id$
  */
 
 /*

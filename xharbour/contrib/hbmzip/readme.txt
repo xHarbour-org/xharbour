@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt,v 1.1 2008/07/30 10:15:56 marchuet Exp $
+ * $Id$
  */
 
 

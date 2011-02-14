@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.13 2009/06/12 19:05:31 ronpinkas Exp $
+ * $Id$
  */
 
 /*

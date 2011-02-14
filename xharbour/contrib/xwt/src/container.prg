@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: container.prg,v 1.4 2003/04/07 22:06:39 jonnymind Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

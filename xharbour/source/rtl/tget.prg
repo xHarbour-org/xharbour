@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.151 2010/05/10 13:58:29 modalsist Exp $
+ * $Id$
  */
 
 /*

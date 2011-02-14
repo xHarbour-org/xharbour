@@ -1,5 +1,5 @@
 /*
- * $Id: msgcs852.c,v 1.9 2008/11/19 05:24:51 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "¬esky",                     /* Name (in native language) */
       "CS",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

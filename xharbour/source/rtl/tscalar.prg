@@ -1,5 +1,5 @@
 /*
- * $Id: tscalar.prg,v 1.3 2007/05/08 13:36:40 andresreyesh Exp $
+ * $Id$
  */
 
 /*

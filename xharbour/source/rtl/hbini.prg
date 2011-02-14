@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.10 2009/04/24 02:41:08 ronpinkas Exp $
+* $Id$
 */
 
 /*

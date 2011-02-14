@@ -1,5 +1,5 @@
 /*
- * $Id: speedtst.prg,v 1.9 2009/01/08 20:28:04 likewolf Exp $
+ * $Id$
  */
 
 /*

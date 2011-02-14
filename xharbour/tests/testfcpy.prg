@@ -1,5 +1,5 @@
 /*
- * $Id: testfcpy.prg,v 1.0 2008/06/18 18:42:26 toninhofwi Exp $
+ * $Id$
  */
 
 /* test program for copyfile with codeblock

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.45 2009/02/24 12:38:16 marchuet Exp $
+ * $Id$
  */
 
 /*

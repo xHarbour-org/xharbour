@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.17 2009/12/30 19:56:56 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -224,7 +224,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.17 2009/12/30 19:56:56 andijahja Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id$\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -328,7 +328,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char* szCVSID, char * szChan
    }
    else
    {
-      fprintf( fout, "/*\n * $Id: ppgen.c,v 1.17 2009/12/30 19:56:56 andijahja Exp $\n */\n\n/*\n"
+      fprintf( fout, "/*\n * $Id$\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Version information and build time switches.\n"
          " *\n"

@@ -1,5 +1,5 @@
 /*
- * $Id: cache.prg,v 1.3 2004/07/13 14:34:25 rodrigo_moreno Exp $
+ * $Id$
  *
  * This samples show how to use dbf to cache postgres records.
  *

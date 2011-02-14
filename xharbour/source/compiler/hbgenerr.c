@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.31 2008/02/04 17:06:28 ronpinkas Exp $
+ * $Id$
  */
 
 /*

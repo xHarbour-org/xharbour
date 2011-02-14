@@ -1,5 +1,5 @@
 /*
- * $Id: dbupdat.prg,v 1.3 2006/07/17 12:56:18 druzus Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.18 2009/02/24 12:38:32 marchuet Exp $
+ * $Id$
  */
 
 /*

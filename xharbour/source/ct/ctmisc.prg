@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.7 2007/02/13 19:02:24 druzus Exp $
+ * $Id$
  */
 
 /*

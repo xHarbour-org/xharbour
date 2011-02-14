@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.104 2009/12/20 14:07:11 andijahja Exp $
+ * $Id$
  */
 
 /*

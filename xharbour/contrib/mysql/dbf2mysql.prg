@@ -1,5 +1,5 @@
 /*
- * $Id: dbf2mysql.prg,v 1.1 2003/02/03 05:19:18 walito Exp $
+ * $Id$
  */
 
 /*

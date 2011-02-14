@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.ch,v 1.4 2008/03/28 10:23:15 marchuet Exp $
+ * $Id$
  */
 
 /*

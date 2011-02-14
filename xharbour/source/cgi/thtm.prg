@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.11 2009/08/05 20:11:12 marchuet Exp $
+ * $Id$
  */
 
 /*

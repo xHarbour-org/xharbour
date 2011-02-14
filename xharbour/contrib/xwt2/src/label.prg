@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: label.prg,v 1.7 2003/08/31 19:02:19 xthefull Exp $
+   $Id$
 
    Label class. Just a concrete widget implementation
 */

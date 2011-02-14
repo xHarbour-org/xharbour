@@ -1,6 +1,6 @@
 /*
  *
- * $Id: simple.prg,v 1.4 2004/04/30 18:23:35 rodrigo_moreno Exp $
+ * $Id$
  *
  */
 

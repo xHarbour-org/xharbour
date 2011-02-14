@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.10 2009/04/18 22:44:01 modalsist Exp $
+ * $Id$
  */
 /*
  * xHarbour Project source code.

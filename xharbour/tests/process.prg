@@ -1,6 +1,6 @@
 ***********************************************************
 * process.prg
-* $Id: process.prg,v 1.2 2003/08/27 10:29:14 jonnymind Exp $
+* $Id$
 * Test for process oriented functions
 * Read from streams and manage sub processes.
 *

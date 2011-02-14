@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.34 2005/10/24 04:01:52 druzus Exp $
+   $Id$
 
    Global declarations, common functions
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: radiobutton.prg,v 1.3 2003/08/30 21:37:52 lculik Exp $
+   $Id$
 
    Radio box - A certain cooperation of the container widget is needed
 */

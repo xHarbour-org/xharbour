@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.29 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*

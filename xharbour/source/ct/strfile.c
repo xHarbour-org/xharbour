@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.6 2008/03/16 19:15:59 likewolf Exp $
+ * $Id$
  */
 
 /*

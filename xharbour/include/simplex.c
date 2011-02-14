@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.35 2009/02/26 02:55:47 ronpinkas Exp $
+ * $Id$
  */
 
 /*

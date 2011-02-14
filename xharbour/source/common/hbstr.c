@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.47 2010/02/02 21:26:50 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: cpuakoi.c,v 1.10 2009/07/15 17:14:56 ptsarenko Exp $
+ * $Id$
  */
 
 /*

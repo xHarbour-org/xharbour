@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: browse.prg,v 1.1 2003/11/08 00:45:56 jonnymind Exp $
+   $Id$
 
    XWT Browse - A tbrowse like class for XWT.
 

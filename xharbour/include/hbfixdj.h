@@ -1,5 +1,5 @@
 /*
- * $Id: hbfixdj.h,v 1.1 2002/11/13 15:02:42 walito Exp $
+ * $Id$
  */
 
 

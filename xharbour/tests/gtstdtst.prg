@@ -1,5 +1,5 @@
 //
-// $Id: gtstdtst.prg,v 1.2 2001/08/17 20:13:27 dholm Exp $
+// $Id$
 //
 
 /* gtstd test */

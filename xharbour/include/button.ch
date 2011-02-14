@@ -1,5 +1,5 @@
 /*
- * $Id: button.ch,v 1.2 2002/03/18 22:32:37 lculik Exp $
+ * $Id$
  */
 
 /*

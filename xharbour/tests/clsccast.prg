@@ -1,5 +1,5 @@
 /*
- * $Id: clsccast.prg 6860 2006-09-18 01:13:18Z druzus $
+ * $Id$
  */
 
 /*

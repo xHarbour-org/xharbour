@@ -1,5 +1,5 @@
 /*
-* $Id: inetssl.c,v 1.5 2009/11/15 22:34:52 lculik Exp $
+* $Id$
 */
 
 /*

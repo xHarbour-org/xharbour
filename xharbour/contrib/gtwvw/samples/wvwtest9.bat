@@ -1,5 +1,5 @@
 @echo off
-REM $Id: wvwtest9.bat $
+REM $Id$
 
 
 SET _BCC55=%BCC55%

@@ -1,5 +1,5 @@
 /*
- * $Id: numconv.prg,v 1.3 2006/09/25 18:21:30 ptsarenko Exp $
+ * $Id$
  */
 
 /*

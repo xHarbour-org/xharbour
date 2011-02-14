@@ -1,5 +1,5 @@
 /*
- * $Id: getlist.prg,v 1.2 2002/04/30 04:37:03 walito Exp $
+ * $Id$
  */
 
 /*

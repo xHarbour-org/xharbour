@@ -1,5 +1,5 @@
 /*
- * $Id: testtp.prg,v 1.3 2004/08/16 14:49:44 mauriliolongo Exp $
+ * $Id$
  */
 
 /*

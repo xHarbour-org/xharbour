@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.5 2004/04/05 00:16:03 andijahja Exp $
+ * $Id$
  */
 
 /*

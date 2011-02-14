@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+# $Id$
 #
 # Makefile for GD library
 #

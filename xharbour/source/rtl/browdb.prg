@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.10 2007/08/20 19:32:38 marchuet Exp $
+ * $Id$
  */
 
 /*

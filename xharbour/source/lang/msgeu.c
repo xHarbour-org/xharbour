@@ -1,5 +1,5 @@
 /*
- * $Id: msgeu.c,v 1.9 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "English",                   /* Name (in native language) */
       "EU",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

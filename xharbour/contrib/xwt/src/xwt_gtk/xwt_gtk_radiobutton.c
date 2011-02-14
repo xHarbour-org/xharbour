@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_radiobutton.c,v 1.3 2003/06/08 14:05:36 jonnymind Exp $
+   $Id$
 
    GTK interface - management of radio button widget
 */

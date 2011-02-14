@@ -1,5 +1,5 @@
 /*
- * $Id: msgde.c,v 1.9 2008/11/19 05:24:51 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "deutsch",                   /* Name (in native language) */
       "DE",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

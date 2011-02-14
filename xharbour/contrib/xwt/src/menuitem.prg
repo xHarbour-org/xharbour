@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.5 2003/08/27 20:53:07 lculik Exp $
+   $Id$
 
    Menuitem class.
 */

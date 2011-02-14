@@ -1,5 +1,5 @@
 /*
- * $Id: hbident.c,v 1.2 2005/03/31 14:34:06 andijahja Exp $
+ * $Id$
  */
 
 /*

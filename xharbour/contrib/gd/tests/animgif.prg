@@ -1,5 +1,5 @@
 /*
- * $Id: antialiased.prg,v 1.1 2005/11/06 15:49:36 fsgiudice Exp $
+ * $Id$
  */
 
 /*

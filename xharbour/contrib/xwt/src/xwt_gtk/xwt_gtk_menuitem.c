@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menuitem.c,v 1.4 2003/07/23 15:58:10 lculik Exp $
+   $Id$
 
    Menu item managemetn
 */

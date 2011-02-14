@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.8 2005/02/15 09:53:45 patrickmast Exp $
+ * $Id$
  */
 
 /*

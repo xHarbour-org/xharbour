@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.16 2009/04/16 14:57:35 likewolf Exp $
+ * $Id$
  */
 
 /*

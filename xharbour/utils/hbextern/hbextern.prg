@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.prg,v 1.7 2001/06/14 21:20:43 dholm Exp $
+ * $Id$
  */
 
 /*

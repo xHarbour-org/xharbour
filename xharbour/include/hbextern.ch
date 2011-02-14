@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.52 2009/01/24 16:53:10 likewolf Exp $
+ * $Id$
  */
 
 /*

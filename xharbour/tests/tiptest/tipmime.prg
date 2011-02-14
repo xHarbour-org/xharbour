@@ -7,7 +7,7 @@
 * Usage:
 * mimetest filename
 *
-* $Id: mimetest.prg,v 1.1 2004/05/17 15:18:15 jonnymind Exp $
+* $Id$
 *****/
 
 PROCEDURE MAIN( cFileName )

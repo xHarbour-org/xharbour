@@ -1,5 +1,5 @@
 /*
- * $Id: external.prg,v 1.2 2001/06/14 21:20:43 dholm Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.18 2009/03/14 04:34:18 ronpinkas Exp $
+ * $Id$
  */
 
 /*

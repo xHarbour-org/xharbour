@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.1 2004/05/11 14:55:47 jonnymind Exp $
+   $Id$
 
    Definitions
 */

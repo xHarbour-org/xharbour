@@ -3,7 +3,7 @@
 
    (C) 2004 Lorenzo Fiorini
 
-   $Id: xwt_gtk_notebook.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id$
 
    notebook - a col/row layout adapter
 */

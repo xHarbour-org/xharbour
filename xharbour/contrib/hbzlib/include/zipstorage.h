@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipStorage.h $
 // $Archive: /ZipArchive/ZipStorage.h $
-// $Date: 2008/05/01 10:49:39 $ $Author: andijahja $.
+// $Date$ $Author$.
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)

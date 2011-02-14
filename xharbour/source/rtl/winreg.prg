@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg,v 1.5 2008/06/02 14:06:03 lculik Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.txt,v 1.2 2007/08/23 12:08:03 paultucker Exp $
+ * $Id$
  */
 
 /*

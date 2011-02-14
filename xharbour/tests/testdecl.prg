@@ -1,5 +1,5 @@
 // Test for DECLARE statement
-// $Id: testdecl.prg,v 1.9 2000/09/18 07:04:53 ronpinkas Exp $
+// $Id$
 //
 #include "hbclass.ch"
 

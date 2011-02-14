@@ -1,5 +1,5 @@
 /*
- * $Id: token.prg,v 1.2 2004/07/30 07:16:04 likewolf Exp $
+ * $Id$
  */
 
 /*

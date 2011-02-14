@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.6 2009/01/24 00:33:09 likewolf Exp $
+ * $Id$
  */
 
 /*

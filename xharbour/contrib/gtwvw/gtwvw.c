@@ -1,6 +1,6 @@
 
 /*
-* $Id: gtwvw.c,v 1.66 2010/07/30 11:34:17 lculik Exp $
+* $Id$
  */
 /*
  * GTWVW.C

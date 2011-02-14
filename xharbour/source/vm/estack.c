@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.113 2009/11/09 09:39:22 marchuet Exp $
+ * $Id$
  */
 
 /*

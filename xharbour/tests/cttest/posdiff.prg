@@ -1,5 +1,5 @@
 /*
- * $Id: posdiff.prg,v 1.1 2004/07/31 08:05:45 likewolf Exp $
+ * $Id$
  */
 
 /*

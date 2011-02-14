@@ -1,5 +1,5 @@
 //
-// $Id: testwarn.prg,v 1.45 2000/08/08 21:19:35 dholm Exp $
+// $Id$
 //
 
 // This file is OK to have warnings.

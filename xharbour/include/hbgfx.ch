@@ -1,5 +1,5 @@
 /*
- * $Id: hbgfx.ch,v 1.1 2008/03/16 19:15:58 likewolf Exp $
+ * $Id$
  */
 
 /*

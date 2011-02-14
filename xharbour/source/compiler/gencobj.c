@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.21 2009/04/16 14:57:35 likewolf Exp $
+ * $Id$
  */
 
 /*

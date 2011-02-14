@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.5 2006/08/10 04:18:08 ronpinkas Exp $
+ * $Id$
  */
 
 /*

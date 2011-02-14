@@ -1,5 +1,5 @@
 /*
- * $Id: exproptb.c,v 1.32 2008/02/09 02:53:18 ronpinkas Exp $
+ * $Id$
  */
 
 /* hbexprb.c is also included from ../macro/macro.c

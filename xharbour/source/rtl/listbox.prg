@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.24 2007/11/14 18:00:24 lculik Exp $
+ * $Id$
  */
 
 /*

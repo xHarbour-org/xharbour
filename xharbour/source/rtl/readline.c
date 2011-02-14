@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.15 2005/08/07 02:40:38 mlombardo Exp $
+ * $Id$
  */
 
 /*

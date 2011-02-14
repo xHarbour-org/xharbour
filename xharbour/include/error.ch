@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.11 2009/01/24 00:33:08 likewolf Exp $
+ * $Id$
  */
 
 /*

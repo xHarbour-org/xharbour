@@ -1,5 +1,5 @@
 /*
- * $Id: rddmisc.txt,v 1.1.1.1 2001/12/21 10:48:59 ronpinkas Exp $
+ * $Id$
  */
 
 /*
@@ -12,4 +12,4 @@
  *    RDD*() documentation
  * Copyright 2003 Luiz Rafael Culik <culik@sl.conex.net>
  *    Use and inde Command Documentation
- * See doc/license.txt for licensing terms.
+ * See doc/license.txt for licensing terms.

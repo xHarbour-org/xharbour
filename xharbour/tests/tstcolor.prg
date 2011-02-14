@@ -1,5 +1,5 @@
 //
-// $Id: tstcolor.prg,v 1.3 1999/10/25 11:25:54 vszel Exp $
+// $Id$
 //
 
 //

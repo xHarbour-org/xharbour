@@ -1,5 +1,5 @@
 /*
- * $Id: count.c,v 1.3 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id$
  */
 
 /*

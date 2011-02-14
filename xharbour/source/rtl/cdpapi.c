@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.46 2009/09/30 16:20:04 marchuet Exp $
+ * $Id$
  */
 
 /*

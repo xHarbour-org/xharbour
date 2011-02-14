@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.17 2008/12/22 22:09:45 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompress.ch,v 1.1 2003/02/12 01:13:04 jonnymind Exp $
+ * $Id$
  */
 
 /*

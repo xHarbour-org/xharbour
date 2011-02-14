@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_align.c,v 1.3 2004/05/21 12:21:34 jonnymind Exp $
+   $Id$
 
   Align widget - block over unaligned widgets to provide them with alignment ability.
 */

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bldtest.bat,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
+rem $Id$
 rem
 
 if "%1" == "clean" goto CLEAN

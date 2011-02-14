@@ -1,5 +1,5 @@
 /*
- * $Id: hbapidbg.h,v 1.3 2009/12/20 14:07:11 andijahja Exp $
+ * $Id$
  */
 
 /*

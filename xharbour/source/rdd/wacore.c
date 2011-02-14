@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.20 2009/09/16 04:34:16 andijahja Exp $
+ * $Id$
  */
 
 /*

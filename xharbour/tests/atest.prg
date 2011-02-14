@@ -1,5 +1,5 @@
 //
-// $Id: atest.prg,v 1.1 1999/10/04 18:46:26 vszel Exp $
+// $Id$
 //
 
 // releasing arrays test

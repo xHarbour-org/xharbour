@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.33 2009/08/19 22:40:47 likewolf Exp $
+ * $Id$
  */
 
 /*

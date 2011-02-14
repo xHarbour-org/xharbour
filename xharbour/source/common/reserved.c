@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.c,v 1.4 2006/04/24 22:24:38 ronpinkas Exp $
+ * $Id$
  */
 
 /*

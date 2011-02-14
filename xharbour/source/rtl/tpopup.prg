@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.10 2004/07/15 23:57:16 paultucker Exp $
+ * $Id$
  */
 
 /*

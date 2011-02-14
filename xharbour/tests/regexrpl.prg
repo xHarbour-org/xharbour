@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.29 2006/03/11 12:35:24 likewolf Exp $
+ * $Id$
  */
 
 /*

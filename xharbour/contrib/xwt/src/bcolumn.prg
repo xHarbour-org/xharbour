@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: treelist.prg,v 1.2 2003/06/08 14:05:33 jonnymind Exp $
+   $Id$
 
    XWT bColumn - A tbrowse like class for XWT (single column control).
 

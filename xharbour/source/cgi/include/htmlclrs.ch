@@ -1,5 +1,5 @@
 /*
- * $Id: colors.ch,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

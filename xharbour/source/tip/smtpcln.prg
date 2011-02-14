@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.10 2010/09/15 18:41:53 lculik Exp $
+ * $Id$
  */
 
 /*

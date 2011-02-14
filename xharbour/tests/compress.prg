@@ -3,7 +3,7 @@
 *
 * Giancarlo Niccolai
 *
-* $Id: compress.prg,v 1.2 2003/02/12 10:35:19 jonnymind Exp $
+* $Id$
 *
 
 #include "hbcomprs.ch"

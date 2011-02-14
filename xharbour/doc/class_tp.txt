@@ -1,5 +1,5 @@
 /*
- * $Id: class_tp.txt,v 1.2 2001/06/18 18:41:11 dholm Exp $
+ * $Id$
  */
 
 /* NOTE: - Please use these template for your new files, replace parts

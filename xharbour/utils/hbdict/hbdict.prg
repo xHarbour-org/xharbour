@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.13 2004/08/19 00:51:48 druzus Exp $
+* $Id$
 *
 * Usage: hbdict <infile> <outfile>
 *

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.70 2009/12/31 02:55:05 andijahja Exp $
+ * $Id$
  */
 
 /*

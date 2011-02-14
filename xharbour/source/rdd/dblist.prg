@@ -1,5 +1,5 @@
 /*
- * $Id: dblist.prg,v 1.4 2008/04/05 20:31:20 likewolf Exp $
+ * $Id$
  */
 
 /*

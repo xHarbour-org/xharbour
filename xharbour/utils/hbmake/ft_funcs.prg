@@ -1,5 +1,5 @@
 /*
- * $Id: ft_funcs.prg,v 1.3 2005/01/17 20:54:00 modalsist Exp $
+ * $Id$
  */
 
 /*

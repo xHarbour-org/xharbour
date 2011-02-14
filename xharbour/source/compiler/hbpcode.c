@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.49 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id$
  */
 
 /*

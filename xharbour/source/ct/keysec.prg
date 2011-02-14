@@ -1,5 +1,5 @@
 /*
- *  $Id: keysec.prg,v 1.2 2006/01/18 22:30:19 ptsarenko Exp $
+ *  $Id$
  */
 
 /*

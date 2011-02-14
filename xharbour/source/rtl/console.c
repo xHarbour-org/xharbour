@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.79 2009/09/16 04:34:16 andijahja Exp $
+ * $Id$
  */
 
 /*

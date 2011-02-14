@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.17 2005/11/15 20:17:13 ronpinkas Exp $
+ * $Id$
  */
 
 /*

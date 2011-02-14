@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: test_all.prg,v 1.3 1999/10/05 13:00:09 vszel Exp $
+// $Id$
 //
 
 // AutoMatic Test Bank

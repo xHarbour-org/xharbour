@@ -1,5 +1,5 @@
 /*
- * $Id: trapkey.prg,v 1.1 2007/11/23 18:50:39 ptsarenko Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:

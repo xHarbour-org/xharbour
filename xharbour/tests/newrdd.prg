@@ -1,5 +1,5 @@
 //
-// $Id: newrdd.prg,v 1.1.1.1 2001/12/21 10:46:02 ronpinkas Exp $
+// $Id$
 //
 
 #define TESTED_RDD "DBFDBT"

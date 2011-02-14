@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.2 2004/08/21 17:27:13 lf_sfnet Exp $
+# $Id$
 #
 # Toplevel XWT makefile
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: event.prg,v 1.2 2003/04/12 23:47:15 jonnymind Exp $
+   $Id$
 
    Event class
 */

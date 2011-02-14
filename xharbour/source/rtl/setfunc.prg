@@ -1,5 +1,5 @@
 /*
- * $Id: setfunc.prg,v 1.2 2003/01/27 03:40:53 walito Exp $
+ * $Id$
  */
 
 /*

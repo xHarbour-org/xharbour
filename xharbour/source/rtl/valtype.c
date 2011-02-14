@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.14 2009/04/23 14:31:48 marchuet Exp $
+ * $Id$
  */
 
 /*

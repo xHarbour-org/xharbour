@@ -1,5 +1,5 @@
 //
-// $Id: longdev.prg,v 1.2 2001/03/08 17:58:18 dholm Exp $
+// $Id$
 //
 
 // Testing Harbour long string handling with device output.

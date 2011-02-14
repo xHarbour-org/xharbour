@@ -1,5 +1,5 @@
 /*
- * $Id: hbexemem.h,v 1.1 2005/02/25 10:43:46 andijahja Exp $
+ * $Id$
  */
 
 /*

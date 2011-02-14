@@ -1,5 +1,5 @@
 /*
- * $Id: hbpplib.txt,v 1.2 2000/02/13 11:13:27 vszel Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.17 2008/03/07 20:27:19 likewolf Exp $
+ * $Id$
  */
 
 /*

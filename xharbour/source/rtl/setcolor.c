@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.7 2008/12/03 11:09:45 marchuet Exp $
+ * $Id$
  */
 
 /*

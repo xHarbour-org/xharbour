@@ -1,5 +1,5 @@
 /*
- * $Id: print.c,v 1.5 2009/11/09 09:38:58 marchuet Exp $
+ * $Id$
  */
 
 /*

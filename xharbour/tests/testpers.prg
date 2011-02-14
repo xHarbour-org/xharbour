@@ -1,5 +1,5 @@
 //
-// $Id: testpers.prg,v 1.6 2006/09/06 22:26:32 ronpinkas Exp $
+// $Id$
 //
 // Class HBPersistent test
 

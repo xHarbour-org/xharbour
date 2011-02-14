@@ -1,5 +1,5 @@
 /*
- * $Id: hblog.ch,v 1.5 2003/12/12 05:31:20 jonnymind Exp $
+ * $Id$
  */
 
 /*

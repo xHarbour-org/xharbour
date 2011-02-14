@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.23 2008/10/22 08:32:32 marchuet Exp $
+ * $Id$
  */
 
 /*

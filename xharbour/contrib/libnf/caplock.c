@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.6 2008/05/01 10:49:39 andijahja Exp $
+ * $Id$
  */
 
 /*

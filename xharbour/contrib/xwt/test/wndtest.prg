@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: wndtest.prg,v 1.2 2003/10/13 11:54:08 jonnymind Exp $
+* $Id$
 *
 
 #include "xwt.ch"

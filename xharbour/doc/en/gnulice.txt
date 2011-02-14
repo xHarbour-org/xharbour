@@ -1,5 +1,5 @@
 /*
- * $Id: gnulice.txt,v 1.1 2000/04/23 03:12:06 vszel Exp $
+ * $Id$
  */
 
 /*  $DOC$

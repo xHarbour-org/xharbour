@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.171 2009/11/21 20:54:56 ronpinkas Exp $
+ * $Id$
  */
 
 /*

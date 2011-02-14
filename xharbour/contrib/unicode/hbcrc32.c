@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrc32.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id$
  */
 
 /*

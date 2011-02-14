@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.22 2009/06/29 19:20:49 enricomaria Exp $
+ * $Id$
  */
 
 /*

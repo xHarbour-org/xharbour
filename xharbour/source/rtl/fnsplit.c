@@ -1,5 +1,5 @@
 /*
- * $Id: fnsplit.c,v 1.5 2008/12/23 16:37:06 likewolf Exp $
+ * $Id$
  */
 
 /*

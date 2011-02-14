@@ -1,5 +1,5 @@
 /*
- * $Id: hbmemory.ch,v 1.2 2003/08/25 22:25:03 ronpinkas Exp $
+ * $Id$
  */
 
 /*

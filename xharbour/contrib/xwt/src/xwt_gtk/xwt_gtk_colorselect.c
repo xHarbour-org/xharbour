@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_colorselect.c,v 1.3 2009/01/24 00:33:08 likewolf Exp $
+   $Id$
 
    GTK interface - File Selection Box 
 */

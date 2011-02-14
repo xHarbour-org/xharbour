@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFileMapping.h $
 // $Archive: /ZipArchive_Linux/ZipFileMapping.h $
-// $Date: 02-01-19 17:28 $ $Author: Tadeusz Dracz $
+// $Date$ $Author$
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)

@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.13 2009/09/12 18:01:43 likewolf Exp $
+ * $Id$
  */
 
 /*

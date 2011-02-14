@@ -1,5 +1,5 @@
 /*
- * $Id: hbdecode.prg,v 1.3 2004/02/03 22:11:43 andijahja Exp $
+ * $Id$
  */
 
 /*

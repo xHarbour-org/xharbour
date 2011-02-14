@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.h,v 1.4 2004/06/28 18:10:17 paultucker Exp $
+   $Id$
 
    GTK interface
 */

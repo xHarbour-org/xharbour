@@ -3,7 +3,7 @@
 
    (C) 2004 Lorenzo Fiorini
 
-   $Id: xwt_gtk_editbox.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
+   $Id$
 
    Text box - basic input field
 */

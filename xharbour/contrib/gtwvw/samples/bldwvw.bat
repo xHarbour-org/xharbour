@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldwvw.bat
 rem *
-rem * $Id: bldwvw.bat,v 1.1 2004/10/28 07:48:17 bdj Exp $
+rem * $Id$
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *

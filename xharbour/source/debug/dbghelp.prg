@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.7 2007/12/04 22:52:49 likewolf Exp $
+ * $Id$
  */
 
 /*

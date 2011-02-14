@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt $
+ * $Id$
  */
 
 To run samples:

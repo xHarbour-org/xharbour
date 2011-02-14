@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: msgbox.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id$
 
    Message Box
    

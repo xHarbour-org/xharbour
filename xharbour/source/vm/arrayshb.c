@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.81 2009/10/21 15:24:46 marchuet Exp $
+ * $Id$
  */
 
 /*

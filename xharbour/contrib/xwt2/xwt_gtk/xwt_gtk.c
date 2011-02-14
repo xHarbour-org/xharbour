@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.4 2004/12/01 00:50:26 peterrees Exp $
+   $Id$
 
    Global declarations, common functions
 

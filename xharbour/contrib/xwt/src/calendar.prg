@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: calendar.prg,v 1.1 2004/01/25 02:44:16 lculik Exp $
+   $Id$
 
    Text box Control. 
 */

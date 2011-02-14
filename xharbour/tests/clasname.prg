@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: clasname.prg,v 1.2 2001/01/25 20:10:03 ronpinkas Exp $
+// $Id$
 //
 
 // The following code tests the application of the className message

@@ -1,5 +1,5 @@
 /*
- * $Id: gtkeycod.c,v 1.1 2008/03/18 11:05:37 likewolf Exp $
+ * $Id$
  */
 
 /*

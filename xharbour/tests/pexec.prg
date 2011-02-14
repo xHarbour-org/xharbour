@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.172 2009/11/21 22:36:13 enricomaria Exp $
+ * $Id$
  * Test Program FOr xHarbour pCode Using Deferred Functions
  * Andi Jahja
  */

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.104 2009/12/21 05:18:58 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: perfuncs.prg,v 1.2 2001/12/15 11:22:29 vszakats Exp $
+ * $Id$
  */
 
 /*

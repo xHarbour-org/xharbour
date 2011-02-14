@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.30 2008/11/22 08:25:37 andijahja Exp $
+ * $Id$
  */
 
 /*

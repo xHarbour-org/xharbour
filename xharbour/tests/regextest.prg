@@ -1,6 +1,6 @@
 ***********************************************************
 * regextest.prg
-* $Id: regextest.prg,v 1.4 2004/01/28 16:42:19 jonnymind Exp $
+* $Id$
 * Test for regular expression functions -
 * This allows to use a finetune regex to use them in programs
 *

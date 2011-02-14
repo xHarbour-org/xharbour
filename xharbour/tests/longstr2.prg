@@ -1,6 +1,6 @@
 //NOTEST - You'll want to test this with the output redirected to a file!
 //
-// $Id: longstr2.prg,v 1.1 1999/10/04 18:46:30 vszel Exp $
+// $Id$
 //
 
 

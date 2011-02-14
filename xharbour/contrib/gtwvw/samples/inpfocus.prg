@@ -1,5 +1,5 @@
 /*
- * $Id: inpfocus.prg $
+ * $Id$
  */
 /*
  * INPFOCUS.PRG

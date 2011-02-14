@@ -1,5 +1,5 @@
 /*
- * $Id: testmg.prg,v 1.5 2002/04/02 14:55:54 alkresin Exp $
+ * $Id$
  */
 
 /*

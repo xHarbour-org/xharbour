@@ -1,5 +1,5 @@
 /*
- * $Id: macroc.c,v 1.2 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id$
  */
 
 /* hbexprc.c is also included from ../compiler/exproptc.c

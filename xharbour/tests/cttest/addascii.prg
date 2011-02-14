@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.prg,v 1.1 2004/08/25 17:03:01 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

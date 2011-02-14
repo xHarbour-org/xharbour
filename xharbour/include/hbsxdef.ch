@@ -1,5 +1,5 @@
 /*
- * $Id: hbsxdef.ch,v 1.1 2007/09/25 07:28:36 marchuet Exp $
+ * $Id$
  */
 
 /*

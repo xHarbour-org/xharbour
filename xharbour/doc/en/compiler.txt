@@ -1,5 +1,5 @@
 /*
- * $Id: compiler.txt,v 1.9 2001/08/17 18:26:36 rglab Exp $
+ * $Id$
  */
 
 /*  $DOC$

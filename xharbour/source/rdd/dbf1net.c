@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1net.c,v 1.6 2009/12/16 05:32:21 andijahja Exp $
+ * $Id$
  */
 
 /*

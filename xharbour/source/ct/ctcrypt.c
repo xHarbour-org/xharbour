@@ -1,5 +1,5 @@
 /*
- * $Id: ctcrypt.c,v 1.2 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id$
  */
 
 /*

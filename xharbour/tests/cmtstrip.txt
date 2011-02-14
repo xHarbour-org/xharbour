@@ -1,5 +1,5 @@
 //
-// $Id:$
+// $Id$
 //
 // This is a sample file for cmtstrip.prg
 //

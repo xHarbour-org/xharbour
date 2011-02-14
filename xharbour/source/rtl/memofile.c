@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.10 2008/08/30 01:24:30 modalsist Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.22 2009/09/30 16:19:25 marchuet Exp $
+ * $Id$
  */
 
 /*

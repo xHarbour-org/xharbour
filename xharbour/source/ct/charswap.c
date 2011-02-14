@@ -1,5 +1,5 @@
 /*
- * $Id: charswap.c,v 1.3 2005/09/22 01:11:59 druzus Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: environ.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

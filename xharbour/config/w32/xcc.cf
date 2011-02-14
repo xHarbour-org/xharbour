@@ -1,5 +1,5 @@
 #
-# $Id: xcc.cf,v 1.5 2008/03/09 18:44:26 likewolf Exp $
+# $Id$
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf

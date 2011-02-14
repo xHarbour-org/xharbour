@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pdll55.bat,v 1.1 2008/01/03 05:43:01 andijahja Exp $
+rem $Id$
 rem
 rem 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
 rem � * this is a batch file for creating pCode DLL 넴

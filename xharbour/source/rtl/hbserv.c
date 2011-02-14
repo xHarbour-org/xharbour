@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.42 2009/09/18 17:41:41 ronpinkas Exp $
+* $Id$
 */
 
 /*

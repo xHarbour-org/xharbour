@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.19 2009/11/04 13:41:43 lculik Exp $
+ * $Id$
  */
 /*
  * xHarbour Project source code:

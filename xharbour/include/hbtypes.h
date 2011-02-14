@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.9 2008/10/13 20:47:33 kaddath Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: htmbrows.prg,v 1.2 2005/10/13 16:29:45 lculik Exp $
+ * $Id$
  */
 
 /*

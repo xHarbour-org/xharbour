@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.12 2008/10/22 08:32:52 marchuet Exp $
+ * $Id$
  */
 
 /*

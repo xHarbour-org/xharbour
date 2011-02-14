@@ -1,5 +1,5 @@
 /*
- * $Id: tlabel.prg,v 1.4 2008/03/13 10:49:43 likewolf Exp $
+ * $Id$
  */
 
 /*

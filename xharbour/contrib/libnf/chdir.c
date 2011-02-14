@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.10 2009/09/30 16:19:25 marchuet Exp $
+ * $Id$
  */
 
 /* File......: CHDIR.ASM

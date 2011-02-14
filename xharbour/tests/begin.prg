@@ -1,5 +1,5 @@
 //
-// $Id: begin.prg,v 1.1.1.1 2001/12/21 10:45:41 ronpinkas Exp $
+// $Id$
 //
 // This files demonstrates the use of BEGIN/RECOVER/END SEQUENCE
 // and BREAK statement

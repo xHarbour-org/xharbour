@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.22 2004/08/21 17:27:14 lf_sfnet Exp $
+   $Id$
 
    GTK interface
 */

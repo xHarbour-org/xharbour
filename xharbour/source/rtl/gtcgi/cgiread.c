@@ -1,5 +1,5 @@
 /*
- * $Id: cgiread.c,v 1.2 2004/02/23 10:01:43 andijahja Exp $
+ * $Id$
  */
 
 /*

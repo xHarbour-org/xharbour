@@ -1,5 +1,5 @@
 /*
- * $Id: typefile.prg,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id$
  */
 
 /*

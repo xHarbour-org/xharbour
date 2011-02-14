@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/11/23 17:04:20 lf_sfnet Exp $
+# $Id$
 #
 
 ROOT = ../../

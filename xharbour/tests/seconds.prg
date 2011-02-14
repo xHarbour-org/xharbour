@@ -1,5 +1,5 @@
 //
-// $Id: seconds.prg,v 1.2 2001/03/08 17:58:18 dholm Exp $
+// $Id$
 //
 
 /* Test SECONDS() */

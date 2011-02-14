@@ -1,5 +1,5 @@
 /*
- * $Id: random.prg,v 1.1 2007/11/23 20:00:00 ptsarenko Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:

@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt,v 1.8 2001/09/07 09:16:52 davep Exp $
+ * $Id$
  */
 
                              Welcome to Harbour

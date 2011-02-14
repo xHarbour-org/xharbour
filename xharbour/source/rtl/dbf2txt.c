@@ -1,5 +1,5 @@
 /*
- * $Id: dbf2txt.c,v 1.2 2009/02/20 12:48:24 marchuet Exp $
+ * $Id$
  */
 
 /*

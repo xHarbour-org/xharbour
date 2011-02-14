@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
+ * $Id$
  */
 #ifndef _INCLUDE_HPDF_CONFIG_H
 #define _INCLUDE_HPDF_CONFIG_H 1

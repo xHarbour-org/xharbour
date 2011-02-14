@@ -1,5 +1,5 @@
 /*
- * $Id: c_test.prg.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id$
  *
  * Test program for unicode support
  */

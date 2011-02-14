@@ -1,5 +1,5 @@
 /*
- * $Id: xhelp.c,v 1.2 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id$
  */
 
 /*

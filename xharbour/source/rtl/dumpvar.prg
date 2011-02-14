@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.7 2008/12/20 16:32:39 fsgiudice Exp $
+ * $Id$
  */
 
 /*

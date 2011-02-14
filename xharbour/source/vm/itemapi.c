@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.166 2009/09/12 18:01:44 likewolf Exp $
+ * $Id$
  */
 
 /*

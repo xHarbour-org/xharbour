@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.7 2008/03/13 10:49:39 likewolf Exp $
+ * $Id$
  */
 
 /*

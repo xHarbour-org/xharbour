@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.90 2008/12/10 00:47:31 likewolf Exp $
+ * $Id$
  */
 
 /*

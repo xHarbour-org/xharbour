@@ -1,5 +1,5 @@
 /*
- * $Id: hbwince.h,v 1.2 2008/12/22 22:09:44 likewolf Exp $
+ * $Id$
  */
 
 /*

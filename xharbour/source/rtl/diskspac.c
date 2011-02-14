@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.10 2005/03/31 03:58:51 druzus Exp $
+ * $Id$
  */
 
 /*

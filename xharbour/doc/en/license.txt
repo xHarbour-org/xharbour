@@ -1,5 +1,5 @@
 /*
- * $Id: license.txt,v 1.6 2001/06/20 16:39:02 dholm Exp $
+ * $Id$
  */
 
 /*  $DOC$

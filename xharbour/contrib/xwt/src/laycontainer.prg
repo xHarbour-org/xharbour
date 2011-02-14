@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.2 2003/04/07 15:41:06 jonnymind Exp $
+   $Id$
 
    Layer container class is an "abstract class that should be
    used to create leaf container classes.

@@ -1,6 +1,6 @@
 
 /*
- * $Id: fssize.c,v 1.10 2009/09/30 16:20:04 marchuet Exp $
+ * $Id$
  */
 
 /*

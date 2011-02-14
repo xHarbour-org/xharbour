@@ -1,5 +1,5 @@
 /*
- * $Id: ctcolton.c,v 1.2 2004/03/18 03:41:09 ronpinkas Exp $
+ * $Id$
  */
 
 /*

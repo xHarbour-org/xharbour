@@ -1,5 +1,5 @@
 //
-// $Id: dates.prg,v 1.2 2000/03/06 21:18:43 vszel Exp $
+// $Id$
 //
 
 // Testing Harbour dates management.

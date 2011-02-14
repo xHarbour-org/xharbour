@@ -1,5 +1,5 @@
 /*
- * $Id: arrayblk.prg,v 1.0 2003/01/16 16:40:55 walito Exp $
+ * $Id$
  */
 
 /*

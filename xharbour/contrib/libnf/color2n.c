@@ -1,5 +1,5 @@
 /*
- * $Id: color2n.c,v 1.5 2005/02/28 11:56:28 andijahja Exp $
+ * $Id$
  */
 
 /*

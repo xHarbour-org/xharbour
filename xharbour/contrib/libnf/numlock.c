@@ -1,5 +1,5 @@
 /*
- * $Id: numlock.c,v 1.5 2006/04/07 09:47:19 lculik Exp $
+ * $Id$
  */
 
 /*

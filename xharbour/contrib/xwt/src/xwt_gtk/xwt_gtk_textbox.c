@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.3 2004/08/21 17:27:14 lf_sfnet Exp $
+   $Id$
 
    Text box - basic input field
 */

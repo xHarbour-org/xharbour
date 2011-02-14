@@ -1,5 +1,5 @@
 /*
- * $Id: harupdf.prg 8441 2008-05-18 17:10:49Z vszakats $
+ * $Id$
  */
 
 /*

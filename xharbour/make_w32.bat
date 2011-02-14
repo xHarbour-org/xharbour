@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_w32.bat,v 1.10 2008/05/07 04:58:33 andijahja Exp $
+rem $Id$
 rem
 rem FILE: make_w32.bat
 rem BATCH FILE FOR OPENWATCOM

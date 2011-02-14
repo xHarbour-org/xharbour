@@ -1,5 +1,5 @@
 /*
- * $Id: charone.c,v 1.3 2005/10/04 20:06:34 druzus Exp $
+ * $Id$
  */
 
 /*

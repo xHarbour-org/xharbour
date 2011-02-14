@@ -1,5 +1,5 @@
 /*
- * $Id: rt_vars.ch,v 1.1.1.1 2001/12/21 10:44:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*

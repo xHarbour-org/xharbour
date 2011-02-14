@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.4 2008/03/16 19:15:57 likewolf Exp $
+# $Id$
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf

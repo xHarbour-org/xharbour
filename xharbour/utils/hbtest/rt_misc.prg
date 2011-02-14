@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.12 2008/11/27 15:54:02 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: combobox.prg,v 1.2 2004/01/26 20:30:11 lculik Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

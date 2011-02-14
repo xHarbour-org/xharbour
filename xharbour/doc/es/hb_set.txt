@@ -1,5 +1,5 @@
 /*
- * $Id: hb_set.txt,v 1.1 2000/10/07 02:02:05 lculik Exp $
+ * $Id$
  */
 
 

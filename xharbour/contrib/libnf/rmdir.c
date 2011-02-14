@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.7 2009/09/30 16:19:25 marchuet Exp $
+ * $Id$
  */
 
 /* File......: RMDIR.ASM

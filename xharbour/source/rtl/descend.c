@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.7 2007/03/25 06:12:50 walito Exp $
+ * $Id$
  */
 
 /*

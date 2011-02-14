@@ -1,5 +1,5 @@
 *
-* $Id: fparse.prg,v 1.1 2004/02/15 03:12:50 andijahja Exp $
+* $Id$
 *
 * testing program for parsing delimited text file
 *

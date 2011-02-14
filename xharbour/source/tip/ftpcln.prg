@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.31 2009/09/17 12:20:03 lculik Exp $
+ * $Id$
  */
 
 /*

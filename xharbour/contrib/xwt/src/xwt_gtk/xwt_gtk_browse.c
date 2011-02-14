@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_browse.c,v 1.4 2004/12/31 11:55:49 druzus Exp $
+   $Id$
 
    GTK interface - browse widget
 */

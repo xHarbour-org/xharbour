@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.37 2009/12/20 14:08:05 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.10 2008/04/16 21:36:27 ronpinkas Exp $
+ * $Id$
  */
 
 /*

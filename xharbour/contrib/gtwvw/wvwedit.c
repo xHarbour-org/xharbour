@@ -1,5 +1,5 @@
 /*
-* $Id: wvwedit.c,v 1.2 2009/09/07 21:36:20 lculik Exp $
+* $Id$
  */
 /*
  * wvwedit.C

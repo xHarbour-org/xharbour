@@ -1,5 +1,5 @@
 /*
- * $Id: encb64.prg,v 1.5 2009/02/27 11:09:55 enricomaria Exp $
+ * $Id$
  */
 
 /*

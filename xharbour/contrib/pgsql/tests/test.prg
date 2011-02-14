@@ -1,6 +1,6 @@
 /*
  *
- * $Id: test.prg,v 1.6 2004/06/21 18:43:38 rodrigo_moreno Exp $
+ * $Id$
  *
  */
 

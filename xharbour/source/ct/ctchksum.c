@@ -1,5 +1,5 @@
 /*
- * $Id: ctchksum.c,v 1.2 2005/12/15 17:03:00 ptsarenko Exp $
+ * $Id$
  */
 
 /*

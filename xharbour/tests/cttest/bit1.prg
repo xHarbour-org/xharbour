@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.prg,v 1.1 2006/10/18 17:31:44 ptsarenko Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.38 2007/09/24 01:56:06 ronpinkas Exp $
+ * $Id$
  */
 
 /*

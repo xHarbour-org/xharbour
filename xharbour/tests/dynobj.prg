@@ -1,5 +1,5 @@
 //
-// $Id: dynobj.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+// $Id$
 //
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: dispmsg.prg 7850 2007-10-23 11:32:22Z vszakats $
+ * $Id$
  */
 
 /*

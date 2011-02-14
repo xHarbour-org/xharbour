@@ -1,5 +1,5 @@
 /*
- * $Id: gtQTc.h,v 1.1 2003/01/30 00:46:25 jonnymind Exp $
+ * $Id$
  */
 
 /*

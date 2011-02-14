@@ -1,5 +1,5 @@
 /*
- * $Id: pack.c,v 1.6 2004/03/21 12:20:04 likewolf Exp $
+ * $Id$
  *
  * xHarbour Project source code:
  * CT3 CHARPACK() and CHARUNPACK() functions.

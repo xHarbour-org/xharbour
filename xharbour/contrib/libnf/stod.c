@@ -1,5 +1,5 @@
 /*
- * $Id: stod.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id$
  */
 
 /*

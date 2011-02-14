@@ -1,5 +1,5 @@
 /*
- * $Id: fdati.prg,v 1.1 2004/02/01 22:52:07 likewolf Exp $
+ * $Id$
  */
 
 /*

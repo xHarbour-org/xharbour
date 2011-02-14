@@ -1,5 +1,5 @@
 //
-// $Id: inkeytst.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
+// $Id$
 //
 
 // Testing Harbour keyboard input.

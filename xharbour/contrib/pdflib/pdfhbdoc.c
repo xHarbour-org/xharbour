@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdoc.c,v 1.1 2004/07/02 04:32:29 lculik Exp $
+ * $Id$
  */
 
 /*

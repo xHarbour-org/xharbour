@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: checkbox.prg,v 1.4 2003/08/29 18:28:28 lculik Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

@@ -3,7 +3,7 @@
 *
 * Giancarlo Niccolai et al.:
 *
-* $Id: xwt_test.prg,v 1.24 2003/10/09 23:18:34 jonnymind Exp $
+* $Id$
 *
 
 #include "xwt.ch"

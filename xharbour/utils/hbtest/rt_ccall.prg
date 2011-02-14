@@ -1,5 +1,5 @@
 /*
- * $Id: rt_ccall.prg,v 1.7 2005/02/24 10:44:15 andijahja Exp $
+ * $Id$
  */
 
 /*

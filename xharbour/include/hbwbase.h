@@ -1,5 +1,5 @@
 /*
- * $Id: hbwbase.c,v 1.1 2004/01/16 21:37:43 paultucker Exp $
+ * $Id$
  */
 
 /*

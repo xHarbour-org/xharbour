@@ -1,5 +1,5 @@
 /*
- * $Id: mouseQTc.c,v 1.4 2003/08/25 23:56:45 druzus Exp $
+ * $Id$
  */
 
 /*

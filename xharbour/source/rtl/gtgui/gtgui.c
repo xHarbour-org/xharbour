@@ -1,5 +1,5 @@
 /*
- * $Id: gtgui.c,v 1.8 2009/11/09 09:39:21 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -1,4 +1,4 @@
-/*  $Id: hbipapi.h,v 1.3 2009/11/09 09:38:44 marchuet Exp $  */
+/*  $Id$  */
 
 /*
  * Harbour Project source code:

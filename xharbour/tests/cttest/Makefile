@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005/01/17 04:24:39 aleytys Exp $
+# $Id$
 #
 
 ifeq ($(HB_MAIN),)

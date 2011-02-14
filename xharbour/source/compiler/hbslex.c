@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.17 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id$
  */
 
 /* harbour.slx version: 1.96 */

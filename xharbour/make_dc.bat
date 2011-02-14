@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_dc.bat,v 1.11 2011/01/20 04:55:53 andijahja Exp $
+rem $Id$
 rem
 rem FILE: make_dc.bat
 rem BATCH FILE FOR DIGITALMARS

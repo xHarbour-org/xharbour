@@ -1,5 +1,5 @@
 /*
- * $Id: inline_c.prg,v 1.5 2005/04/06 21:12:50 andijahja Exp $
+ * $Id$
  */
 PROCEDURE MAIN( cLine, cDelim )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.22 2010/08/17 11:32:55 modalsist Exp $
+ * $Id$
  */
 
 /*

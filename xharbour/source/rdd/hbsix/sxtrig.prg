@@ -1,5 +1,5 @@
 /*
- * $Id: sxtrig.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: envparam.c,v 1.3 2009/11/09 09:38:58 marchuet Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:

@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.ch,v 1.6 2008/01/10 11:18:00 marchuet Exp $
+ * $Id$
  */
 
 /*

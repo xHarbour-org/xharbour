@@ -1,6 +1,6 @@
 
 /*
- * $Id: regexrpl.prg,v 1.1 2006/03/17 01:18:51 fsgiudice Exp $
+ * $Id$
  */
 
 /*

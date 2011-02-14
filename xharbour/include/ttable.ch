@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.ch,v 1.2 2003/07/24 11:02:19 toninhofwi Exp $
+ * $Id$
  */
 
 /*

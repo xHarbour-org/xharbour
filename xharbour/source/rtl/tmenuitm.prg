@@ -1,5 +1,5 @@
 /*
- * $Id: tmenuitm.prg,v 1.2 2003/01/27 04:03:12 walito Exp $
+ * $Id$
  */
 
 /*

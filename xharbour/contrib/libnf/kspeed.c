@@ -1,5 +1,5 @@
 /*
- * $Id: kspeed.c,v 1.1 2006/12/14 16:13:36 sirep Exp $
+ * $Id$
  */
 
 /* File......: KSPEED.ASM

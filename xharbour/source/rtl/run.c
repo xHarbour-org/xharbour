@@ -1,5 +1,5 @@
 /*
- * $Id: run.c,v 1.5 2004/12/28 15:30:41 mauriliolongo Exp $
+ * $Id$
  */
 
 /*

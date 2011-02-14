@@ -1,5 +1,5 @@
 /*
- * $Id: clipdefs.h,v 1.7 2009/02/24 12:38:15 marchuet Exp $
+ * $Id$
  */
 
 /*

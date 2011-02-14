@@ -1,5 +1,5 @@
 //
-// $Id: testcdx.prg,v 1.1.1.1 2001/12/21 10:46:30 ronpinkas Exp $
+// $Id$
 //
 
 request DBFCDX

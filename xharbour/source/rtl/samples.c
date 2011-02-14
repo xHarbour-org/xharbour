@@ -1,5 +1,5 @@
 /*
- * $Id: samples.c,v 1.3 2007/03/25 06:12:50 walito Exp $
+ * $Id$
  */
 
 /*

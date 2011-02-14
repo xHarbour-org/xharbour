@@ -1,5 +1,5 @@
 /*
- * $Id: hbstdgen.ch,v 1.1 2007/02/27 19:40:17 druzus Exp $
+ * $Id$
  */
 
 /*

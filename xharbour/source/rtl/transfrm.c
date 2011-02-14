@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.63 2009/09/12 18:01:43 likewolf Exp $
+ * $Id$
  */
 
 /*

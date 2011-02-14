@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.20 2008/03/13 10:49:44 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 //
-// $Id: delegate.prg,v 1.0 2004/03/06 13:20:32 jonnymind Exp $
+// $Id$
 //
 
 ***********

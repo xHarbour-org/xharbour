@@ -1,5 +1,5 @@
 /*
- * $Id: pgrdd.prg,v 1.1 2006/09/25 13:43:45 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: cpinfo.prg 12872 2009-11-14 15:00:50Z druzus $
+ * $Id$
  */
 
 /*
@@ -392,7 +392,7 @@ static function genCPfile( id, info, unicode, flags, upper, lower, sort, ;
    local cDef
 
    cDef := ;
-      '/*' + EOL + ' * $Id: cpinfo.prg 12872 2009-11-14 15:00:50Z druzus $' + EOL + ' */' + EOL + EOL + ;
+      '/*' + EOL + ' * $Id$' + EOL + ' */' + EOL + EOL + ;
       '/*' + EOL + ;
       ' * Harbour Project source code:' + EOL + ;
       ' * National Collation Support Module ( $1 )' + EOL + ;

@@ -1,5 +1,5 @@
 /*
- * $Id: boxtst2.prg,v 1.1 2001/08/22 17:41:10 dholm Exp $
+ * $Id$
  */
 
 // Test program for box and line drawing functions.

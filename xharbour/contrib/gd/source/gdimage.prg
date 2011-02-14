@@ -1,5 +1,5 @@
 /*
- * $Id: gdimage.prg,v 1.5 2006/01/21 00:46:35 fsgiudice Exp $
+ * $Id$
  */
 
 /*

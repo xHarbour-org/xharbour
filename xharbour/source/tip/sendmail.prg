@@ -1,5 +1,5 @@
 /*
- * $Id: sendmail.prg,v 1.12 2010/12/14 13:03:40 lculik Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbatomic.h,v 1.2 2009/01/24 00:33:08 likewolf Exp $
+ * $Id$
  */
 
 /*

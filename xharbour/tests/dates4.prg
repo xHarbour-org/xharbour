@@ -1,5 +1,5 @@
 /*
- * $Id: dates4.prg,v 1.1 1999/10/04 18:46:28 vszel Exp $
+ * $Id$
  */
 
 // Testing Harbour dates management.

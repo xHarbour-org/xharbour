@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip.h,v 1.1 2003/09/12 20:12:35 paultucker Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: _winmain.c,v 1.3 2004/07/06 04:35:16 marcosgambeta Exp $
+ * $Id$
  */
 
 /*

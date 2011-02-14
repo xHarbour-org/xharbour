@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.14 2008/12/22 22:09:45 likewolf Exp $
+ * $Id$
  */
 
 /*

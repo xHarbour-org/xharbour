@@ -1,5 +1,5 @@
 /*
- * $Id: pplib3.c,v 1.5 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*

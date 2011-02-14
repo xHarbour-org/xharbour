@@ -1,5 +1,5 @@
 /*
- * $Id: type.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id$
  */
 
 /*

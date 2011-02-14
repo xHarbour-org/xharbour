@@ -1,5 +1,5 @@
 //
-// $Id: scroll.prg,v 1.3 2001/03/08 17:58:18 dholm Exp $
+// $Id$
 //
 
 // Testing Harbour screen scrolling (requires the GT API)

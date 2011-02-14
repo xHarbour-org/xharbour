@@ -1,5 +1,5 @@
 /*
- * $Id: hbmzip.c,v 1.9 2009/11/09 09:38:44 marchuet Exp $
+ * $Id$
  */
 
 /*

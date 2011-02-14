@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg 8496 2008-05-27 01:08:45Z druzus $
+ * $Id$
  */
 
 /*
@@ -2778,7 +2778,7 @@ FUNCTION TBMouse( oBrw, nMRow, nMCol )
 #endif
 
 /*
- * $Id: tbcolumn.prg 8356 2008-04-21 13:14:35Z vszakats $
+ * $Id$
  */
 
 /*

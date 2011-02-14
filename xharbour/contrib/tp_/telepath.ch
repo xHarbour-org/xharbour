@@ -1,5 +1,5 @@
 /*
- * $Id: TELEPATH.CH,v 1.3 2004/08/26 16:18:35 mauriliolongo Exp $
+ * $Id$
  */
 
 /*

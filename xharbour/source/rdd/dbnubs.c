@@ -1,5 +1,5 @@
 /*
- * $Id: dbnubs.c,v 1.2 2004/04/01 09:35:36 andijahja Exp $
+ * $Id$
  */
 
 /*

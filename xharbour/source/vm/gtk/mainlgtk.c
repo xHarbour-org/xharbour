@@ -1,5 +1,5 @@
 /*
- * $Id: mainlgtk.c,v 1.1 2003/04/03 04:15:16 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+# $Id$
 #
 # Toplevel FreeImage makefile
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.16 2009/11/09 09:39:06 marchuet Exp $
+ * $Id$
  */
 
 /*

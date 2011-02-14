@@ -1,5 +1,5 @@
 /*
- * $Id: dbstruct.ch,v 1.3 2007/10/31 08:34:22 marchuet Exp $
+ * $Id$
  */
 
 /*

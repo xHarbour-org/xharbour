@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.ch,v 1.1 2001/12/15 22:54:07 vszakats Exp $
+ * $Id$
  */
 
 /*

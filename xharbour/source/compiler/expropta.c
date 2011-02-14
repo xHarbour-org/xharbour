@@ -1,5 +1,5 @@
 /*
- * $Id: expropta.c,v 1.12 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id$
  */
 
 /* hbexpra.c is also included from ../macro/macro.c

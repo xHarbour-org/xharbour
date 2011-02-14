@@ -1,5 +1,5 @@
 /*
- * $Id: compress.c,v 1.2 2010/10/02 00:21:56 andijahja Exp $
+ * $Id$
  */
 
 /* compress.c -- compress a memory buffer
@@ -7,7 +7,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: compress.c,v 1.2 2010/10/02 00:21:56 andijahja Exp $ */
+/* @(#) $Id$ */
 
 #define ZLIB_INTERNAL
 #include "zlib.h"

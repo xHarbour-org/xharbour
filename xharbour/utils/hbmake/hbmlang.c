@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.7 2009/01/24 00:33:10 likewolf Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:
@@ -132,7 +132,7 @@ HB_FUNC(GETUSERLANG)
 }
 
 /*
- * $Id: hbmlang.c,v 1.7 2009/01/24 00:33:10 likewolf Exp $
+ * $Id$
  */
 
 /*

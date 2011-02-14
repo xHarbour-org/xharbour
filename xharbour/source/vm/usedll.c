@@ -1,5 +1,5 @@
 /*
- * $Id: usedll.c,v 1.3 2009/12/19 14:06:18 andijahja Exp $
+ * $Id$
  */
 
 /*

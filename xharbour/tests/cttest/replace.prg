@@ -1,5 +1,5 @@
 /*
- * $Id: replace.prg,v 1.1 2004/07/29 10:58:43 likewolf Exp $
+ * $Id$
  */
 
 /*

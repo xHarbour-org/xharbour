@@ -1,5 +1,5 @@
 /*
- * $Id: sound.prg,v 1.2 2004/01/06 21:29:11 paultucker Exp $
+ * $Id$
  */
 
 function main()

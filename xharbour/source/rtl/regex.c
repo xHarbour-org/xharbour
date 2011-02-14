@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.70 2010/08/12 01:45:42 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: break.c,v 1.3 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id$
  */
 
 /*

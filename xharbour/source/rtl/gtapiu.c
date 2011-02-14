@@ -1,5 +1,5 @@
 /*
- * $Id: gtapiu.c,v 1.2 2008/03/16 19:16:00 likewolf Exp $
+ * $Id$
  */
 
 /*

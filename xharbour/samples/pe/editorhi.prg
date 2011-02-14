@@ -1,5 +1,5 @@
 /*
- * $Id: editorhi.prg,v 1.2 2000/08/15 01:31:36 vszel Exp $
+ * $Id$
 */
 //#include "expand.ch"
 //#include "windows.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: strdel.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id$
  */
 
 /*

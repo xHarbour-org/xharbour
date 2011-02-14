@@ -1,5 +1,5 @@
 /*
- * $Id: boxtest.prg,v 1.3 2000/11/28 22:07:05 dholm Exp $
+ * $Id$
  */
 
 function main()

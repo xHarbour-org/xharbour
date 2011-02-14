@@ -1,5 +1,5 @@
 @echo off
-REM $Id: make_pc.bat,v 1.0 0000/00/00 00:00:00 modalsist Exp $
+REM $Id$
 REM
 REM Batch file for libnf on Pelles C compiler.
 REM

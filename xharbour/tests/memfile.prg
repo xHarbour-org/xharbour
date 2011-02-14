@@ -1,5 +1,5 @@
 /*
- * $Id: memfile.prg,v 1.1.1.1 2001/12/21 10:45:56 ronpinkas Exp $
+ * $Id$
  */
 
 // ; Donated to the public domain by

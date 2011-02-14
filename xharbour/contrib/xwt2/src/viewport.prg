@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: viewport.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
+   $Id$
 
    View port class. Should contain a single widget, most likely
    a container, but also html panes etc.

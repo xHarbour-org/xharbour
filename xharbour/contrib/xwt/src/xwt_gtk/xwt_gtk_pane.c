@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_pane.c,v 1.6 2003/07/23 15:58:10 lculik Exp $
+   $Id$
 
    Pane - basic container with no layout capability
 */

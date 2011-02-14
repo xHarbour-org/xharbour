@@ -1,5 +1,5 @@
 /*
- * $Id: strtfile.prg,v 1.1 2004/11/28 18:00:00 ptsarenko Exp $
+ * $Id$
  */
 
 /*

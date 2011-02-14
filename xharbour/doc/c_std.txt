@@ -1,5 +1,5 @@
 /*
- * $Id: c_std.txt,v 1.1 2000/03/28 01:35:23 vszel Exp $
+ * $Id$
  */
 
 +++Date last modified: 05-Jul-1997

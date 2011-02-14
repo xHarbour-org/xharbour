@@ -1,7 +1,7 @@
 ******************************************************************
 * parseini.prg
 *
-* $Id: parseini.prg,v 1.3 2003/11/14 19:46:20 jonnymind Exp $
+* $Id$
 * Test for Ini file reading/writing
 *
 * Giancarlo Niccolai

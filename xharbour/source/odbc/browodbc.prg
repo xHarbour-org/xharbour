@@ -1,5 +1,5 @@
 /*
- * $Id: browodbc.prg,v 1.3 2002/11/26 20:31:52 tomazzupan Exp $
+ * $Id$
  */
 
 /*

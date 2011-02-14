@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.5 2009/08/17 17:32:34 likewolf Exp $
+ * $Id$
  */
 
 /*

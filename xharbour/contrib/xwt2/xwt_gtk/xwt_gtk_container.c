@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_container.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id$
 
    Abstract container management.
 */

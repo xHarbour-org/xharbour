@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.8 2005/10/04 02:05:33 druzus Exp $
+ * $Id$
  */
 
 /*

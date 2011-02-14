@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.txt,v 1.1.1.1 2001/12/21 10:48:04 ronpinkas Exp $
+ * $Id$
  */
 
 Addendum Clipper documentation. Original transform docs are too limited :

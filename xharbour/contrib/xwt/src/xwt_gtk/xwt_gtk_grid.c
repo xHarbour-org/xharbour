@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_grid.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id$
 
    Grid - a col/row layout adapter
 */

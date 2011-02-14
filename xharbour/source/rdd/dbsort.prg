@@ -1,5 +1,5 @@
 /*
- * $Id: dbsort.prg,v 1.7 2006/07/21 00:56:40 druzus Exp $
+ * $Id$
  */
 
 /*

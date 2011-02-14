@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_window.c,v 1.4 2003/08/27 20:09:24 xthefull Exp $
+   $Id$
 
    GTK interface - Window widget specifics
 */

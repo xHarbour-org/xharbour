@@ -1,6 +1,6 @@
 /*
  *
- * $Id: dbf2pg.prg,v 1.7 2004/07/16 20:52:04 rodrigo_moreno Exp $
+ * $Id$
  *
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table

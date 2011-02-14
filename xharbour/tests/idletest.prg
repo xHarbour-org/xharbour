@@ -1,7 +1,7 @@
 ***********************************************************
 * idletest.prg
 *
-* $Id: regextest.prg,v 1.3 2003/08/23 10:48:21 jonnymind Exp $
+* $Id$
 *
 * This test demonstrates usage of IDLE functions;
 * XHarbour allows to use both codeblocks and executable arrays.

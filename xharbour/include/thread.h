@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.132 2009/09/18 17:41:41 ronpinkas Exp $
+* $Id$
 */
 
 /*

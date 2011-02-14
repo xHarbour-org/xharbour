@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt,v 1.1 2003/06/01 14:00:31 lculik Exp $
+ * $Id$
  */
 /*
  * $DOC$

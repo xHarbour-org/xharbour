@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.31 2008/03/13 10:49:43 likewolf Exp $
+ * $Id$
  */
 
 /*

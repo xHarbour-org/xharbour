@@ -1,6 +1,6 @@
 /*
 
- $Id: tstdspac.prg,v 1.1.1.1 2001/12/21 10:46:34 ronpinkas Exp $
+ $Id$
 
  tstdspac
 

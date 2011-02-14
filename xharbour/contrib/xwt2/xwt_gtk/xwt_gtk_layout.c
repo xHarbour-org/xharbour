@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.3 2004/06/16 13:48:04 lculik Exp $
+   $Id$
 
    Layout - Horizontal or vertical layout manager
 */

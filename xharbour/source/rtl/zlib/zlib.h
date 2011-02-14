@@ -1,5 +1,5 @@
 /*
- * $Id: zlib.h,v 1.2 2010/10/02 00:21:56 andijahja Exp $
+ * $Id$
  */
 
 /* zlib.h -- interface of the 'zlib' general purpose compression library

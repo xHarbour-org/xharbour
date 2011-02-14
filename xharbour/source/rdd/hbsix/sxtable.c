@@ -1,5 +1,5 @@
 /*
- * $Id: sxtable.c,v 1.4 2009/02/24 12:38:32 marchuet Exp $
+ * $Id$
  */
 
 /*

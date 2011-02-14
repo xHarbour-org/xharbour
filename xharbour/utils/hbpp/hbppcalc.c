@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.11 2005/12/13 20:42:01 ronpinkas Exp $
+ * $Id$
  */
 
 /*

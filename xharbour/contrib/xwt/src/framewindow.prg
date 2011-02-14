@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: framewindow.prg,v 1.3 2003/08/31 20:02:35 xthefull Exp $
+   $Id$
 
    Frame window class. A window with a menu, a central area and a statusbar
 */

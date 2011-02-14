@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile,v 1.2 2009/09/13 12:45:39 likewolf Exp $
+# $Id$
 #
 # Makefile for XWT library
 #

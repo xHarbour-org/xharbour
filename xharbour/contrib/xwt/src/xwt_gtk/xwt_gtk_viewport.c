@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.5 2005/10/24 04:01:52 druzus Exp $
+   $Id$
 
    Viewport - an infinite scroller container & drawing area
 */

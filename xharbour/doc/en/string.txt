@@ -1,5 +1,5 @@
 /*
- * $Id: string.txt,v 1.9 2000/06/20 02:21:06 lculik Exp $
+ * $Id$
  */
 
 /*

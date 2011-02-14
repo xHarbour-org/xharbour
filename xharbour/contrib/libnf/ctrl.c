@@ -1,5 +1,5 @@
 /*
- * $Id: ctrl.c,v 1.3 2008/01/16 21:07:35 ptsarenko Exp $
+ * $Id$
  */
 
 /*

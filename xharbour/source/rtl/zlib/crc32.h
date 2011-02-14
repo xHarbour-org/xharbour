@@ -1,5 +1,5 @@
 /*
- * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id$
  */
 
 /* crc32.h -- tables for rapid CRC calculation

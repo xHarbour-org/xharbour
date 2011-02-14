@@ -1,5 +1,5 @@
 /*
- * $Id: math.txt,v 1.8 2001/07/15 18:18:45 mbirdyg Exp $
+ * $Id$
  */
 
 /*

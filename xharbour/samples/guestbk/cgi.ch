@@ -1,5 +1,5 @@
 /*
- * $Id: cgi.ch,v 1.1 1999/10/09 10:07:21 vszel Exp $
+ * $Id$
  */
 
 //      CGI.ch

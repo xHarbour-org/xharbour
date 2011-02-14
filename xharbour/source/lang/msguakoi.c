@@ -1,5 +1,5 @@
 /*
- * $Id: msguakoi.c,v 1.8 2009/07/16 18:15:04 ptsarenko Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Укра╓нська",                /* Name (in native language) */
       "UA",                        /* RFC ID */
       "KOI8U",                     /* Codepage */
-      "$Revision: 1.8 $ $Date: 2009/07/16 18:15:04 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

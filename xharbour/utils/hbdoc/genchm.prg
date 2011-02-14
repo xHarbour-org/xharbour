@@ -1,5 +1,5 @@
 /*
- * $Id: genchm.prg,v 1.4 2009/02/13 16:12:24 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 //
-// $Id: testzip.prg,v 1.5 2003/09/14 22:09:10 lculik Exp $
+// $Id$
 //
 
 // Requires samples.lib for gauge support

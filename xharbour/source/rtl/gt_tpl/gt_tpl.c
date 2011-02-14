@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.15 2008/11/19 05:25:03 andijahja Exp $
+ * $Id$
  */
 
 /*

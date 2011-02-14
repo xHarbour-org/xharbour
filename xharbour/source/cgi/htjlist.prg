@@ -1,5 +1,5 @@
 /*
- * $Id: htjlist.prg,v 1.2 2005/10/14 07:25:11 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

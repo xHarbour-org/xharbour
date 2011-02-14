@@ -1,5 +1,5 @@
 /*
- * $Id: logrdd.prg,v 1.2 2009/01/17 23:09:48 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_listbox.c,v 1.1 2004/01/30 18:34:12 lculik Exp $
+   $Id$
 
    GTK interface - management of combobox
 */

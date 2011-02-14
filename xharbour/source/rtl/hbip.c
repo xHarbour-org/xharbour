@@ -1,4 +1,4 @@
-/*  $Id: hbip.c,v 1.10 2009/12/31 02:55:05 andijahja Exp $  */
+/*  $Id$  */
 /*
  * xHarbour Project source code:
  *    The internet protocol / TCP support

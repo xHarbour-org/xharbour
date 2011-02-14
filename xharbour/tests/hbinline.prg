@@ -1,5 +1,5 @@
 /*
- * $Id: hbinline.prg,v 1.2 2007/01/09 14:10:22 druzus Exp $
+ * $Id$
  */
 
 /*

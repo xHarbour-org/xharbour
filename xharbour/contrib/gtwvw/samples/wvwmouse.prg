@@ -1,5 +1,5 @@
 /*
- * $Id: wvwmouse.prg $
+ * $Id$
  */
 /*
   WVWMOUSE.PRG

@@ -8,7 +8,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.17 2003/11/26 05:44:04 jonnymind Exp $
+* $Id$
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread

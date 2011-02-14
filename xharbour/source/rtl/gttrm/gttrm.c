@@ -1,5 +1,5 @@
 /*
- * $Id: gttrm.c,v 1.7 2009/02/20 12:48:35 marchuet Exp $
+ * $Id$
  */
 
 /*

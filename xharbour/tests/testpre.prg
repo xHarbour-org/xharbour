@@ -1,5 +1,5 @@
 /*
- * $Id: testpre.prg,v 1.2 2001/06/07 06:18:10 alkresin Exp $
+ * $Id$
  */
 
 FUNCTION Main()

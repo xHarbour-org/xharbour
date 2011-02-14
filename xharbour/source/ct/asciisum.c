@@ -1,5 +1,5 @@
 /*
- * $Id: asciisum.c,v 1.3 2009/11/05 00:15:26 modalsist Exp $
+ * $Id$
  */
 
 /*

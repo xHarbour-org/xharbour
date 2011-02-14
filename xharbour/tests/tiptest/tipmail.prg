@@ -9,7 +9,7 @@
 * This test writes data to standard output, and is
 * compiled only under GTCGI;
 *
-* $Id: testmail.prg,v 1.1 2003/12/02 04:08:17 jonnymind Exp $
+* $Id$
 *****/
 
 PROCEDURE MAIN( cFileName )

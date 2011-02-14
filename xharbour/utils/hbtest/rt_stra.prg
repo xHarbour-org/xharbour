@@ -1,5 +1,5 @@
 /*
- * $Id: rt_stra.prg,v 1.4 2004/03/02 21:55:24 andijahja Exp $
+ * $Id$
  */
 
 /*

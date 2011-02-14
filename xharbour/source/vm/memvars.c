@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.151 2010/07/29 17:08:10 ronpinkas Exp $
+ * $Id$
  */
 
 /*

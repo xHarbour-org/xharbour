@@ -1,5 +1,5 @@
 /*
- * $Id: maincoor.prg $
+ * $Id$
  */
 /*
    MAINCOOR.PRG

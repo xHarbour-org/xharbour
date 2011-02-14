@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.26 2009/09/16 04:34:16 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fontselect.c,v 1.3 2005/10/24 04:01:52 druzus Exp $
+   $Id$
 
    GTK interface - File Selection Box 
 */

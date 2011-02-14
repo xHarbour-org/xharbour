@@ -1,5 +1,5 @@
 /*
- * $Id: gtfunc.c,v 1.3 2008/12/01 11:45:00 marchuet Exp $
+ * $Id$
  */
 
 /*

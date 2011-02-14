@@ -1,5 +1,5 @@
 /*
- * $Id: msgpt.c,v 1.10 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -78,7 +78,7 @@ static HB_LANG s_lang =
       "Portugues",                 /* Name (in native language) */
       "PT",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.10 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

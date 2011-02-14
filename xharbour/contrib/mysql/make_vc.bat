@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_vc.bat,v 1.1 2003/03/04 21:04:38 lculik Exp $
+rem $Id$
 rem
 
 :BUILD

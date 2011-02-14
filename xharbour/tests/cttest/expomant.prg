@@ -1,5 +1,5 @@
 /*
- * $Id: expomant.prg,v 1.1 2003/03/04 21:06:08 lculik Exp $
+ * $Id$
  */
 
 /*

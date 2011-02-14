@@ -1,5 +1,5 @@
 /*
- * $Id: setmode.txt,v 1.1 2000/05/24 14:38:37 dholm Exp $
+ * $Id$
  */
 /*
  * Copyright 2000 Alejandro de Garate <alex_degarate@hotmail.com>

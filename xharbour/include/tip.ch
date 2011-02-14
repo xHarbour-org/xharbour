@@ -5,7 +5,7 @@
 * Base definitions
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tip.ch,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id$
 ************************************************/
 
 #ifndef TIP_H

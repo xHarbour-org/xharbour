@@ -1,5 +1,5 @@
 /*
- * $Id: sprintf.prg,v 1.2 2003/12/20 03:13:50 maurifull Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: splitter.prg,v 1.3 2003/05/11 15:14:43 jonnymind Exp $
+   $Id$
 
    Splitter - a container with two resizable area;
    It is not really implemented as a container (in fact is a

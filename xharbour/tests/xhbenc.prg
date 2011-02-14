@@ -1,6 +1,6 @@
 **************************************************
 * xhbenc.prg
-* $Id: xhbenc.prg,v 1.5 2005/03/17 04:56:31 andijahja Exp $
+* $Id$
 * Test program for file encoding and decoding
 * UUEncode, Base64, YYEncode and XXEncode
 *

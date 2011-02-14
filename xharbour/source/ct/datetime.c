@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.c,v 1.4 2006/08/05 11:58:26 druzus Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcu.c,v 1.10 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id$
  */
 
 /*

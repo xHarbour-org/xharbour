@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompat.ch,v 1.8 2009/04/13 14:45:44 likewolf Exp $
+ * $Id$
  */
 
 /*

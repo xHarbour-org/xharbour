@@ -2,7 +2,7 @@
 * Demonstration of error conditions and cancelations in MT
 *
 * Giancarlo Niccolai
-* $Id: mterror.prg,v 1.1 2003/10/19 00:17:36 jonnymind Exp $
+* $Id$
 *
 * There are several threads endlessy counting. Pressing F2 cause
 * an error randomly in a thread. This test works if error is

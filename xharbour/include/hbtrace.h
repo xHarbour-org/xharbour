@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.17 2008/01/10 11:18:00 marchuet Exp $
+ * $Id$
  */
 
 /*

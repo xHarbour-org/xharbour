@@ -1,5 +1,5 @@
 /*
- * $Id: shadow.c,v 1.3 2008/03/16 19:16:01 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: msgslwin.c,v 1.7 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Slovenšèina",              /* Name (in native language) */
       "SL",                       /* RFC ID */
       "1250",                     /* Codepage */
-      "$Revision: 1.7 $ $Date: 2008/11/19 05:24:52 $",     /* Version */
+      "$Revision$ $Date$",     /* Version */
 
       /* Month names */
 

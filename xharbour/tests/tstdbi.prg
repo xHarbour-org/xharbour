@@ -1,5 +1,5 @@
 /*
- * $Id: tstdbi.prg,v 1.2 2000/11/08 17:28:24 rglab Exp $
+ * $Id$
  */
 
 #ifdef __HARBOUR__

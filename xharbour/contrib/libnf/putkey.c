@@ -1,5 +1,5 @@
 /*
- * $Id: putkey.c,v 1.2 2006/12/14 16:13:36 sirep Exp $
+ * $Id$
  */
 
 /* File......: PUTKEY.ASM

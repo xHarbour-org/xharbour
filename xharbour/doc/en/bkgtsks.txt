@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.txt,v 1.2 2004/03/04 01:08:50 mlombardo Exp $
+ * $Id$
 */
 
 /*

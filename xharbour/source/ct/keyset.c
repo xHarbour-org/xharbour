@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.4 2005/03/19 00:30:55 andijahja Exp $
+ * $Id$
  */
 
 /*

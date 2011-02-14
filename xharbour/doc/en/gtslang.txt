@@ -1,5 +1,5 @@
 /*
- * $Id: gtslang.txt,v 1.2 2002/04/16 16:12:18 map Exp $
+ * $Id$
  */
 
                         Gt Slang driver

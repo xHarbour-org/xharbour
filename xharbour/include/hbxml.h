@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.11 2009/06/22 11:42:29 jfgimenez Exp $
+ * $Id$
  */
 
 /*

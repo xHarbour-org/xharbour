@@ -1,5 +1,5 @@
 /*
- * $Id: hbmemvar.ch,v 1.4 2001/06/14 21:20:43 dholm Exp $
+ * $Id$
  */
 
 /*

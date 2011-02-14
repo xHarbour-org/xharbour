@@ -1,5 +1,5 @@
 /*
- * $Id: ft_funcs.prg,v 1.9 2001/04/15 03:03:59 lculik Exp $
+ * $Id$
  */
 
 /*

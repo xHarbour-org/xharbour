@@ -1,5 +1,5 @@
 /*
- * $Id: dircmd.prg,v 1.3 2005/10/29 18:53:39 likewolf Exp $
+ * $Id$
  */
 
 /*

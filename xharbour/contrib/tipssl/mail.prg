@@ -1,5 +1,5 @@
 /*
- * $Id: mail.prg,v 1.6 2008/06/27 15:59:35 marchuet Exp $
+ * $Id$
  */
 
 /*

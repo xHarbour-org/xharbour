@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.6 2005/02/18 21:20:04 druzus Exp $
+# $Id$
 #
 
 ifeq ($(INSTALL_OBJS),) # Empty install list

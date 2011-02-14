@@ -1,6 +1,6 @@
 // Basic test for memvars handling
 //
-// $Id: memvar.prg,v 1.3 2000/04/03 00:09:34 vszel Exp $
+// $Id$
 //
 
 MEMVAR memvar

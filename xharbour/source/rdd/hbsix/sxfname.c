@@ -1,5 +1,5 @@
 /*
- * $Id: sxfname.c,v 1.4 2009/08/29 20:56:43 likewolf Exp $
+ * $Id$
  */
 
 /*

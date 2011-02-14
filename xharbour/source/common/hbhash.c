@@ -1,5 +1,5 @@
 /*
- * $Id: hbhash.c,v 1.1.1.1 2001/12/21 10:44:33 ronpinkas Exp $
+ * $Id$
  */
 
 /*

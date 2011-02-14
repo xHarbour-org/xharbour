@@ -1,6 +1,6 @@
 rem @echo off
 rem
-rem $Id: make_c5x.bat,v 1.5 2000/04/05 13:29:47 vszel Exp $
+rem $Id$
 rem
 
 if not exist ..\..\contrib\hbclip\hbclip.lib goto NO_HBCLIP

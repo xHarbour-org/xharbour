@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.46 2009/08/10 13:26:23 modalsist Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_msgbox.c,v 1.2 2003/10/13 11:54:08 jonnymind Exp $
+   $Id$
 
    Message box implementation
 */

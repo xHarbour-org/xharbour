@@ -1,5 +1,5 @@
 /*
- * $Id: tsqlbrw.prg,v 1.2 2003/02/20 15:32:09 lculik Exp $
+ * $Id$
  */
 
 /*

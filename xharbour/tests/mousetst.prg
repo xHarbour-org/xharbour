@@ -1,5 +1,5 @@
 //
-// $Id: mousetst.prg,v 1.3 2004/01/28 16:42:19 jonnymind Exp $
+// $Id$
 //
 /*
  * Copyright 2000 Alejandro de Garate <alex_degarate@hotmail.com>

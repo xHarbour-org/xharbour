@@ -1,5 +1,5 @@
 /*
- * $Id: hbole.h,v 1.1 2006/07/03 19:47:05 paultucker Exp $
+ * $Id$
  */
 
 /*

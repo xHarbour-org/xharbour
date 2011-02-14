@@ -1,5 +1,5 @@
 /*
- * $Id: tempfile.prg,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id$
  */
 
 /*

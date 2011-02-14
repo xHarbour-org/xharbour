@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.118 2011/01/20 04:55:53 andijahja Exp $
+ * $Id$
  */
 
 /*

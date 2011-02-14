@@ -1,5 +1,5 @@
 /*
- * $Id: str2ptr.c,v 1.5 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id$
  */
 
 /*

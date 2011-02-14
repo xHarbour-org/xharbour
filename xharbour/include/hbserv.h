@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.h,v 1.4 2004/04/04 09:24:47 andijahja Exp $
+* $Id$
 */
 
 /*

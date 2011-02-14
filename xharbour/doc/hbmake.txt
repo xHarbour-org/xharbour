@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.txt,v 1.2 2001/10/20 22:13:07 lculik Exp $
+ * $Id$
  */
 
 Hbmake Readme

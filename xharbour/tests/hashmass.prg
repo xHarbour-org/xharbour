@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.7 2003/11/26 23:12:42 jonnymind Exp $
+* $Id$
 *
 
 PROCEDURE Main()

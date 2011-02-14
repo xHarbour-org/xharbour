@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.5 2004/01/29 17:28:45 lculik Exp $
+ * $Id$
  */
 
 /*

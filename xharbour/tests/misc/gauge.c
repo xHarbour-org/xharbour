@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.2 2008/03/19 00:17:34 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.7 2003/08/08 22:31:50 walito Exp $
+ * $Id$
  */
 
 /*

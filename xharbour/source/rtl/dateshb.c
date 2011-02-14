@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.25 2009/09/12 18:01:43 likewolf Exp $
+ * $Id$
  */
 
 /*

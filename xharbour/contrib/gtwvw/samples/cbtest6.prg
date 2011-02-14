@@ -1,5 +1,5 @@
 /*
- * $Id: cbtest6.prg $
+ * $Id$
  */
 
 /*

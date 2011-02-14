@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.20 2009/10/05 14:41:40 marchuet Exp $
+ * $Id$
  */
 
 /*

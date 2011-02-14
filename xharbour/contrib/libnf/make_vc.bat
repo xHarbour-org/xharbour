@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_vc.bat,v 1.2 2003/09/23 21:23:56 paultucker Exp $
+rem $Id$
 rem
 
 if not exist obj md obj

@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.5 2008/03/18 01:03:28 likewolf Exp $
+ * $Id$
  */
 * VIDEOTST.PRG
 *

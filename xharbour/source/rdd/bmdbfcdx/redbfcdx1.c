@@ -1,5 +1,5 @@
 /*
- * $Id: redbfcdx1.c,v 1.9 2009/12/16 05:32:21 andijahja Exp $
+ * $Id$
  */
 
 /*

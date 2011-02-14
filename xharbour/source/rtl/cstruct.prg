@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.45 2007/08/23 09:22:32 ronpinkas Exp $
+ * $Id$
  */
 
 /*

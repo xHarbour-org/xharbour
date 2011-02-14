@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.txt,v 1.2 2001/07/30 13:39:30 ckedem Exp $
+ * $Id$
  */
 
 /*

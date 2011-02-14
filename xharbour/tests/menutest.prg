@@ -1,5 +1,5 @@
 //
-// $Id: menutest.prg,v 1.2 2002/11/20 23:45:34 lculik Exp $
+// $Id$
 //
 
 #include "inkey.ch"

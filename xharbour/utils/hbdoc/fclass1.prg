@@ -1,5 +1,5 @@
 /*
- * $Id: fclass1.prg,v 1.3 2001/04/15 03:03:59 lculik Exp $
+ * $Id$
  */
 
 /*

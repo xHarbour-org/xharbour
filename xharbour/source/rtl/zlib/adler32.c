@@ -1,5 +1,5 @@
 /*
- * $Id: adler32.c,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+ * $Id$
  */
 
 /* adler32.c -- compute the Adler-32 checksum of a data stream

@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.13 2009/04/16 14:57:35 likewolf Exp $
+ * $Id$
  */
 
 /*

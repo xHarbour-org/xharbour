@@ -1,5 +1,5 @@
 //
-// $Id: vmasort.prg,v 1.1 2000/04/18 23:30:42 vszel Exp $
+// $Id$
 //
 
 function Main( nPass )

@@ -1,5 +1,5 @@
 /*
- * $Id: fcopy.prg,v 1.4 2008/03/31 12:09:53 modalsist Exp $
+ * $Id$
  */
 
 /*

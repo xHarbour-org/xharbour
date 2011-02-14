@@ -1,5 +1,5 @@
 /*
- * $Id: ttextlin.prg,v 1.3 2004/06/06 03:10:42 modalsist Exp $
+ * $Id$
  */
 
 /*

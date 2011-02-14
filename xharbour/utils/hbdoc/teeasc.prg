@@ -1,5 +1,5 @@
 /*
- * $Id: teeasc.prg,v 1.1 2004/08/25 17:02:57 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: image.prg,v 1.3 2003/05/11 15:14:43 jonnymind Exp $
+   $Id$
 
    Pane class. A basic void container.
    (Container is an abstract class, and have not a DRV method)

@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.28 2008/07/24 14:41:58 modalsist Exp $
+ * $Id$
  */
 
 /*

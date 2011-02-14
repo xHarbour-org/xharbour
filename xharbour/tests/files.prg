@@ -1,5 +1,5 @@
 /*
- * $Id: files.prg,v 1.1.1.1 2001/12/21 10:45:46 ronpinkas Exp $
+ * $Id$
  */
 
 // This test was written by Jose Gimenez (JFG) <jfgimenez@wanadoo.es>

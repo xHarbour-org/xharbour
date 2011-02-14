@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.6 2006/06/04 18:30:07 druzus Exp $
+ * $Id$
  */
 
 /*

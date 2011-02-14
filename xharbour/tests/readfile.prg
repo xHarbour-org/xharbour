@@ -1,5 +1,5 @@
 //
-// $Id: readfile.prg,v 1.2 2001/03/08 17:58:18 dholm Exp $
+// $Id$
 //
 
 // Test program for new class that reads a file one line at a time

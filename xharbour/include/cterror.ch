@@ -1,5 +1,5 @@
 /*
- * $Id: cterror.ch,v 1.1 2003/09/23 21:23:56 paultucker Exp $
+ * $Id$
  */
 
 /*

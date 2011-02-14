@@ -1,5 +1,5 @@
 /*
- * $Id: msgbywin.c,v 1.6 2008/11/19 05:24:51 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Беларуская ",               /* Name (in native language) */
       "BY",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.6 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

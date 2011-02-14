@@ -1,6 +1,6 @@
 ************************************************************
 * outdebug.prg
-* $Id: xmltest.prg,v 1.5 2003/06/30 23:06:27 jonnymind Exp $
+* $Id$
 *
 * Test for HB_OutDebug() routine
 *

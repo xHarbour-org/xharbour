@@ -9,7 +9,7 @@
 *
 * (C) 2003 Francesco Saverio Giudice
 *
-* $Id: tstclsdbg.prg,v 1.3 2003/11/14 23:17:31 ronpinkas Exp $
+* $Id$
 *
 
 #include "common.ch"

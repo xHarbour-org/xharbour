@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmenu.prg,v 1.6 2007/09/21 18:33:26 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: vidtest.prg,v 1.2 2004/01/28 16:42:19 jonnymind Exp $
+ * $Id$
  */
 
 /*

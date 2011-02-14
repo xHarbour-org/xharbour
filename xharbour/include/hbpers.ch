@@ -1,5 +1,5 @@
 /*
- * $Id: hbpers.ch,v 1.1 2001/09/05 06:48:16 antoniolinares Exp $
+ * $Id$
  */
 
 /*

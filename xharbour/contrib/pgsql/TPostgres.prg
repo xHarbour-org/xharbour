@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.39 2006/09/23 18:03:05 lf_sfnet Exp $
+ * $Id$
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.

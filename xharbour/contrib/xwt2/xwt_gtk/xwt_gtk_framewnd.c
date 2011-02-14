@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.3 2004/06/14 18:03:38 lculik Exp $
+   $Id$
 
    GTK interface - Frame window
 */

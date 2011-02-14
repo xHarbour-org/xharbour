@@ -1,5 +1,5 @@
 /*
- * $Id: defpath.c,v 1.4 2009/04/16 14:57:35 likewolf Exp $
+ * $Id$
  */
 
 /*

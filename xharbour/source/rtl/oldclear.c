@@ -1,5 +1,5 @@
 /*
- * $Id: oldclear.c,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*

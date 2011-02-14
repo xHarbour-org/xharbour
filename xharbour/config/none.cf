@@ -1,5 +1,5 @@
 #
-# $Id: none.cf 10153 2009-02-03 02:05:45Z druzus $
+# $Id$
 #
 
 ifneq ($(HB_ARCHITECTURE),)

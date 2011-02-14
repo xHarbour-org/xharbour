@@ -1,5 +1,5 @@
 /*
- * $Id: testbrdb.prg,v 1.3 2000/11/08 17:28:24 rglab Exp $
+ * $Id$
  */
 
 // Testing Browse()

@@ -1,5 +1,5 @@
 /*
- * $Id: inhprob.prg,v 1.2 2000/02/14 08:11:56 vszel Exp $
+ * $Id$
  */
 
 #include "hbclass.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.1 2006/07/17 12:56:18 druzus Exp $
+ * $Id$
  */
 
 /*

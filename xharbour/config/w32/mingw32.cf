@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.32 2008/03/16 19:15:57 likewolf Exp $
+# $Id$
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf

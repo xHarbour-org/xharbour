@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.9 2006/09/23 18:03:05 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

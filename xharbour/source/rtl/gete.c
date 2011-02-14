@@ -1,5 +1,5 @@
 /*
- * $Id: gete.c,v 1.5 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id$
  */
 
 /*

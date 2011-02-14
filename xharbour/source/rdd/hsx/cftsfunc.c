@@ -1,5 +1,5 @@
 /*
- * $Id: cftsfunc.c,v 1.1 2005/04/19 21:43:30 druzus Exp $
+ * $Id$
  */
 
 /*

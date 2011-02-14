@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.txt,v 1.8 2001/03/16 15:01:20 rglab Exp $
+ * $Id$
 */
 
 /*  $DOC$

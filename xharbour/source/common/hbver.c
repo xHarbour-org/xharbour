@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.56 2010/05/25 20:54:36 peterrees Exp $
+ * $Id$
  */
 
 /*

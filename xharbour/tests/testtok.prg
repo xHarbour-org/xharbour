@@ -1,5 +1,5 @@
 //
-// $Id: testtok.prg,v 1.1 1999/10/04 18:46:33 vszel Exp $
+// $Id$
 //
 
 #include "set.ch"

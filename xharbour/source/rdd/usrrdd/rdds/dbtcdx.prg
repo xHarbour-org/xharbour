@@ -1,5 +1,5 @@
 /*
- * $Id: dbtcdx.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
+ * $Id$
  */
 
 /*

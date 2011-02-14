@@ -1,5 +1,5 @@
 /*
- * $Id: filenet.c,v 1.17 2010/05/20 07:48:41 marchuet Exp $
+ * $Id$
  */
 
 /*

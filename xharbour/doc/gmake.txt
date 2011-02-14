@@ -1,5 +1,5 @@
 /*
- * $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
+ * $Id$
  */
 
 INTRODUCTION
@@ -28,7 +28,7 @@ of the VM library:
 
 --  Cut here  ---------------------------------------
 #
-# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
+# $Id$
 #
 
 ROOT = ../../
@@ -59,7 +59,7 @@ Let's look at another Makefile, this one for the Harbour compiler:
 
 --  Cut here  ---------------------------------------
 #
-# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
+# $Id$
 #
 
 ROOT = ../../
@@ -85,7 +85,7 @@ in this Makefile are those appropriate to build a stand-alone binary.
 One final Makefile, this one from the source directory:
 
 #
-# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
+# $Id$
 #
 
 --  Cut here  ---------------------------------------

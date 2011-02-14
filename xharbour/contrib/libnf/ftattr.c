@@ -1,5 +1,5 @@
 /*
- * $Id: ftattr.c,v 1.4 2008/03/16 19:15:58 likewolf Exp $
+ * $Id$
  */
 
 /*

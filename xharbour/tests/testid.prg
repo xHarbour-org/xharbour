@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: testid.prg,v 1.2 2001/02/05 21:20:06 dholm Exp $
+// $Id$
 //
 
 // Warning: This sample must be tested using /dTEST compiler flag

@@ -1,5 +1,5 @@
 /*
- * $Id: fitest.prg,v 1.3 2006/05/12 22:55:51 lculik Exp $
+ * $Id$
  */
 
 /*

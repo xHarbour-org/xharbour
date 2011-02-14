@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo server program
-* $Id: server.prg,v 1.9 2003/04/20 23:07:13 jonnymind Exp $
+* $Id$
 *
 * Giancarlo Niccolai
 *

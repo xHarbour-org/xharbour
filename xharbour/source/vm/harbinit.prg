@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.8 2007/03/16 03:37:16 ronpinkas Exp $
+ * $Id$
  */
 
 /*

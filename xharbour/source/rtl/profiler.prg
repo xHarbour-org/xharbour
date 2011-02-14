@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.8 2006/12/30 10:26:17 brianhays Exp $
+ * $Id$
  */
 
 /*

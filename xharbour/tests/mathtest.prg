@@ -1,5 +1,5 @@
 //
-// $Id: mathtest.prg,v 1.3 2002/07/07 20:45:38 mbirdyg Exp $
+// $Id$
 //
 
 #include "math.ch"

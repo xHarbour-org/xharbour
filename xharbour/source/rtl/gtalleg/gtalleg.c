@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.50 2009/03/11 10:40:29 likewolf Exp $
+ * $Id$
  */
 
 /*

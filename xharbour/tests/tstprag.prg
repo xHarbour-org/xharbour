@@ -1,6 +1,6 @@
 //NOTEST
 /*
- * $Id: tstprag.prg,v 1.1.1.2 2005/04/22 21:30:00 ptsarenko Exp $
+ * $Id$
  */
 
 #pragma TracePragmas=On

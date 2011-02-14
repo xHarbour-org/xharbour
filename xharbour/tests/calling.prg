@@ -1,5 +1,5 @@
 //
-// $Id: calling.prg,v 1.1 1999/10/04 18:46:27 vszel Exp $
+// $Id$
 //
 
 // Calling different PRG functions

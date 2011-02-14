@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld_vc.bat,v 1.3 2009/02/23 21:00:20 ronpinkas Exp $
+rem $Id$
 rem
 
 rem ---------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: dbstruxu.prg 8386 2008-04-29 11:08:12Z vszakats $
+ * $Id$
  */
 
 /*

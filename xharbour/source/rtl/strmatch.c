@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.13 2008/11/22 08:25:23 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 #
-# $Id: common.mak,v 1.2 2008/07/30 11:29:09 marchuet Exp $
+# $Id$
 #
 
 LIBNAME = $(LIBPREF)hbmzip

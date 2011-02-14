@@ -1,5 +1,5 @@
 /*
- * $Id: wordtoch.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id$
  */
 
 /*

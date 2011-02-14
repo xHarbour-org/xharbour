@@ -1,5 +1,5 @@
 /*
- * $Id: sxutil.c,v 1.1 2007/10/31 08:30:33 marchuet Exp $
+ * $Id$
  */
 
 /*

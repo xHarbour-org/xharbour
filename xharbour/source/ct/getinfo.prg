@@ -1,5 +1,5 @@
 /*
- * $Id: getinfo.prg,v 1.4 2006/11/18 21:32:25 oh1 Exp $
+ * $Id$
  */
 /*
  * xHarbour Project source code:

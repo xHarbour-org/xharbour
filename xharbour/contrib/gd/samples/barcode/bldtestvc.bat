@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldvc.bat
 rem *
-rem * $Id: bldvc.bat,v 1.1 2005/12/09 00:51:25 lespindola Exp $
+rem * $Id$
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *

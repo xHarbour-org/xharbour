@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.14 2010/08/31 01:41:21 andijahja Exp $
+ * $Id$
  */
 // Copyright (c) 2005, Google Inc.
 // All rights reserved.

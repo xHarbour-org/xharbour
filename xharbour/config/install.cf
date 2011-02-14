@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.2 2003/12/07 19:36:18 druzus Exp $
+# $Id$
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/install.cf

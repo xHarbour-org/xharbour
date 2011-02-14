@@ -1,6 +1,6 @@
 **************************************************
 * gtgraph.prg
-* $Id: gtgraph.prg,v 1.4 2004/02/14 22:57:16 druzus Exp $
+* $Id$
 * Test for GT based graphical functions.
 *
 * Giancarlo Niccolai

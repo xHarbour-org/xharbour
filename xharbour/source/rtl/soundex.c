@@ -1,5 +1,5 @@
 /*
- * $Id: soundex.c,v 1.4 2009/02/28 08:44:30 lculik Exp $
+ * $Id$
  */
 
 /*

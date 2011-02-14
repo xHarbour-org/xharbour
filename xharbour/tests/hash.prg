@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.8 2003/11/23 03:13:54 jonnymind Exp $
+* $Id$
 *
 
 PROCEDURE Main()

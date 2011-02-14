@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: grid.prg,v 1.5 2003/05/11 15:14:43 jonnymind Exp $
+   $Id$
 
    Grid Pane class.
    The child objects are arranged in a fixed size grid,

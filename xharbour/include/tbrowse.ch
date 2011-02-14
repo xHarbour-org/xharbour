@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.ch,v 1.0 Exp $
+ * $Id$
  */
 
 /*

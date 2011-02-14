@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.8 2008/04/29 22:05:13 ronpinkas Exp $
+ * $Id$
  */
 
 /*

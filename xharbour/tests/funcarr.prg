@@ -1,5 +1,5 @@
 //
-// $Id: funcarr.prg,v 1.1.1.1 2001/12/21 10:45:47 ronpinkas Exp $
+// $Id$
 //
 
 //

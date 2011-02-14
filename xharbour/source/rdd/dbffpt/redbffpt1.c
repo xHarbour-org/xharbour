@@ -1,5 +1,5 @@
 /*
- * $Id: redbffpt1.c,v 1.4 2009/10/05 14:41:41 marchuet Exp $
+ * $Id$
  */
 
 /*

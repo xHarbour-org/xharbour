@@ -1,5 +1,5 @@
 /*
- * $Id: hbstruct.ch,v 1.4 2003/12/26 15:56:03 toninhofwi Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 //
-// $Id: db_brows.prg,v 1.8 2001/12/19 12:32:07 alkresin Exp $
+// $Id$
 //
 *+께께께께께께께께께께께께께께께께께께께께께께께께께께께께께께께께께께
 *+ Browse function

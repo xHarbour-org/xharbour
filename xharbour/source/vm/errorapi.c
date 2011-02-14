@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.106 2010/10/07 21:03:21 enricomaria Exp $
+ * $Id$
  */
 
 /*

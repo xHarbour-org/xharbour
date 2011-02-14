@@ -1,5 +1,5 @@
 /*
- * $Id: hbgete.c,v 1.6 2008/11/22 08:25:22 andijahja Exp $
+ * $Id$
  */
 
 /*

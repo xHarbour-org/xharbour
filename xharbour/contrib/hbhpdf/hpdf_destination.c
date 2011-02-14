@@ -1,5 +1,5 @@
 /*
- * $Id: hpdf_destination.c,v 1.3 2010/12/10 21:43:56 andijahja Exp $
+ * $Id$
  */
 /*
  * << Haru Free PDF Library >> -- hpdf_destination.c

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.24 2009/09/13 21:12:28 likewolf Exp $
+   $Id$
 
    XWT DRIVER PROGRAMMING INTERFACE
 */

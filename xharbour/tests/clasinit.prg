@@ -1,5 +1,5 @@
 //
-// $Id: clasinit.prg,v 1.2 2001/09/10 22:04:29 vszakats Exp $
+// $Id$
 //
 
 // Using Harbour Class HBClass

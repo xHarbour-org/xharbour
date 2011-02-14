@@ -1,5 +1,5 @@
 /*
- * $Id: video.c,v 1.3 2004/06/30 10:05:13 likewolf Exp $
+ * $Id$
  *
  * xHarbour Project source code:
  *

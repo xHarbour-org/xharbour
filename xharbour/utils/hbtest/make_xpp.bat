@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_xpp.bat,v 1.5 2000/06/02 17:53:00 vszel Exp $
+rem $Id$
 rem
 
 xpp hbtest.prg   /w /n

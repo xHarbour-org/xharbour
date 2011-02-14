@@ -1,5 +1,5 @@
 /*
- * $Id: hbdebug.ch,v 1.2 2005/09/23 21:55:06 likewolf Exp $
+ * $Id$
  */
 
 /*

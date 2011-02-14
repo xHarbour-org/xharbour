@@ -1,5 +1,5 @@
 /*
- * $Id: memory.prg,v 1.5 2001/05/15 13:02:07 vszakats Exp $
+ * $Id$
  */
 
 // ; Donated to the public domain by

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.20 2009/03/26 16:33:20 ronpinkas Exp $
+rem $Id$
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.

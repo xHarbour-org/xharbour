@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.4 2008/03/07 20:27:19 likewolf Exp $
+ * $Id$
  */
 
 /*

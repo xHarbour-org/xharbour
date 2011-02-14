@@ -1,5 +1,5 @@
 /*
- * $Id: fileio.ch,v 1.5 2006/11/15 12:41:05 marchuet Exp $
+ * $Id$
  */
 
 /*

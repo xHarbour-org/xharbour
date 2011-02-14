@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.7 2009/07/22 16:55:13 marchuet Exp $
+ * $Id$
  */
 
 /*

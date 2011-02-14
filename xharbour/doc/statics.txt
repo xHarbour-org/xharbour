@@ -1,5 +1,5 @@
 /*
- * $Id: statics.txt,v 1.5 2000/02/17 11:11:52 lculik Exp $
+ * $Id$
  */
 
   I just started implementing Classes and objects creation when I realized

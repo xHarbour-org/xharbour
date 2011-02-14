@@ -1,5 +1,5 @@
 #
-# $Id: header.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
+# $Id$
 #
 
 ifneq ($(HB_ARCHITECTURE),)

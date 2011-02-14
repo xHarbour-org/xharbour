@@ -1,5 +1,5 @@
 /*
- * $Id: genos2.prg,v 1.2 2005/02/04 09:11:30 patrickmast Exp $
+ * $Id$
  */
 
 /*

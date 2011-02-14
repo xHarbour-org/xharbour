@@ -1,5 +1,5 @@
 /*
- * $Id: tedit.prg,v 1.6 2009/03/07 13:45:33 likewolf Exp $
+ * $Id$
  */
 
 /*

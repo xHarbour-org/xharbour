@@ -1,6 +1,6 @@
 ************************************************************
 * i18ntest.prg
-* $Id: i18ntest.prg,v 1.5 2004/08/23 22:41:32 druzus Exp $
+* $Id$
 *
 * Test for internationalization system
 *

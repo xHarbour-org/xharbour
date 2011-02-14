@@ -1,5 +1,5 @@
 //
-// $Id: debugtst.prg,v 1.1.1.1 2001/12/21 10:45:44 ronpinkas Exp $
+// $Id$
 //
 
 /*
@@ -9,7 +9,7 @@
  * $Requirement$  source\tools\stringp.prg
  *                source\rtl\objfunc.prg
  *                source\rtl\asort.prg
- * $Date: 2001/12/21 10:45:44 $
+ * $Date$
  * $End$
  *
  * Written by Eddie Runia <eddie@runia.com>

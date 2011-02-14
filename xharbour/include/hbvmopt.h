@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmopt.h,v 1.1 2005/10/24 01:04:25 druzus Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: guestbk.prg,v 1.2 2001/05/30 18:16:44 dholm Exp $
+ * $Id$
  */
 
 /*

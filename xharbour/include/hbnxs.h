@@ -1,5 +1,5 @@
 /*
- * $Id: hbnxs.h,v 1.2 2003/05/27 20:41:42 paultucker Exp $
+ * $Id$
  */
 
 /*

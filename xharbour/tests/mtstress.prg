@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.12 2003/12/05 18:04:40 jonnymind Exp $
+* $Id$
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:

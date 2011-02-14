@@ -1,6 +1,6 @@
 ************************************************************
 * macrovars.prg
-* $Id: mtstress.prg,v 1.12 2003/12/05 18:04:40 jonnymind Exp $
+* $Id$
 *
 * Test of SET MACRO BLOCK VARS [ON|OFF|XHARBOUR|CLIPPER]
 * This SET set the behavior of codeblock to share the PRIVATE memvars level

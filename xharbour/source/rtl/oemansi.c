@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.11 2009/09/12 18:01:43 likewolf Exp $
+ * $Id$
  */
 
 /*

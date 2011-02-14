@@ -1,5 +1,5 @@
 //
-// $Id: fortest.prg,v 1.4 2001/05/15 13:02:07 vszakats Exp $
+// $Id$
 //
 
 // Testing Harbour For Next loops for Clipper compatibility

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael
 
-   $Id: filesel.prg,v 1.3 2003/04/18 13:28:49 jonnymind Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

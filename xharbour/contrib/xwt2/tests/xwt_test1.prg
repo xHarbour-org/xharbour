@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: xwt_test1.prg,v 1.1 2004/05/24 22:54:22 lculik Exp $
+* $Id$
 *
 
 

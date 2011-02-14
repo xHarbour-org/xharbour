@@ -1,5 +1,5 @@
 /*
- * $Id: hscript.prg,v 1.3 2001/05/30 18:16:44 dholm Exp $
+ * $Id$
  */
 
 /*

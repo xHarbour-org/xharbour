@@ -1,5 +1,5 @@
 /*
- * $Id: testdbf.prg,v 1.7 1999/11/10 10:17:19 bcantero Exp $
+ * $Id$
  */
 
 function main()

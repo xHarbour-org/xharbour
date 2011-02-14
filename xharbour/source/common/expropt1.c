@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.24 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*

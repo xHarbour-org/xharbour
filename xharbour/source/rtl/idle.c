@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.30 2009/09/16 18:16:49 enricomaria Exp $
+ * $Id$
  */
 
 /*

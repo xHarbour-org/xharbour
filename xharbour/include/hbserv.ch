@@ -1,5 +1,5 @@
 /*
-* $Id: hbservice.ch,v 1.1 2003/09/11 12:08:28 jonnymind Exp $
+* $Id$
 */
 
 /*

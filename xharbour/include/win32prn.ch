@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.ch,v 1.2 2010/06/03 13:41:08 modalsist Exp $
+ * $Id$
  */
 
 /*

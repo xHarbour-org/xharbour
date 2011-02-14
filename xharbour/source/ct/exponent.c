@@ -1,5 +1,5 @@
 /*
- * $Id: exponent.c,v 1.1 2003/03/04 21:04:33 lculik Exp $
+ * $Id$
  */
 
 /*

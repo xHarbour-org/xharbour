@@ -1,5 +1,5 @@
 /*
- * $Id: strings.c,v 1.4 2006/11/11 03:48:21 druzus Exp $
+ * $Id$
  */
 
 /*

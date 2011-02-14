@@ -1,7 +1,7 @@
 *************************************************************************************
 * Clipboard test
 *
-* $Id: clipbrd.prg,v 1.2 2004/02/06 18:13:01 jonnymind Exp $
+* $Id$
 *
 * Test for clipboard functions:
 * hb_gtInfo( GTI_CLIPBOARDDATA, <x> ) - set the clipboard value

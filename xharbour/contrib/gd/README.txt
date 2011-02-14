@@ -1,5 +1,5 @@
 /*
- * $Id: README.txt,v 1.5 2005/11/07 00:39:04 fsgiudice Exp $
+ * $Id$
  */
 
 /*

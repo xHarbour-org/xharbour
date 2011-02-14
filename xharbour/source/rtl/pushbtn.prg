@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.9 2004/07/15 23:57:16 paultucker Exp $
+ * $Id$
  */
 
 /*

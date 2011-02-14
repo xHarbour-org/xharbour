@@ -1,5 +1,5 @@
 //NOTEST
-// $Id: alias.prg,v 1.1 1999/10/04 18:46:26 vszel Exp $
+// $Id$
 //
 //It is used to check if pcode is generated correctly for aliased expressions
 //(you must check it visually :)

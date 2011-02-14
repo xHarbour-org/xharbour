@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.ch,v 1.3 2001/04/27 19:03:46 dholm Exp $
+ * $Id$
  */
 
 /*

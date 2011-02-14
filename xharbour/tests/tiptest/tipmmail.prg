@@ -20,7 +20,7 @@
 * This test writes data to standard output, and is
 * compiled only under GTCGI;
 *
-* $Id: tipmmail.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
+* $Id$
 *****/
 
 PROCEDURE MAIN( ... )

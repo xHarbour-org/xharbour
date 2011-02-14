@@ -1,6 +1,6 @@
 //NOTEST
 //
-// $Id: test10.prg,v 1.1 1999/10/04 18:46:32 vszel Exp $
+// $Id$
 //
 
 // compile this using Harbour /10 flag

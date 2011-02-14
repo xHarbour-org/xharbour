@@ -1,4 +1,4 @@
-/* $Id: scope1.prg,v 1.3 2009/04/13 13:50:08 likewolf Exp $ */
+/* $Id$ */
 
 /*
    This file is to be used as a secondary linked module along with tstscope.prg and scope2.prg.

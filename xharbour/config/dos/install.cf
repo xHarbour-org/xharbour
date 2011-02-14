@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.7 2008/03/16 19:15:57 likewolf Exp $
+# $Id$
 #
 
 ifeq ($(INSTALL_OBJS),) # Empty install list

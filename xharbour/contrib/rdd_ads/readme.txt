@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt,v 1.2 2008/06/03 23:12:56 kaddath Exp $
+ * $Id$
  */
 
  RDD for Advantage Database Server

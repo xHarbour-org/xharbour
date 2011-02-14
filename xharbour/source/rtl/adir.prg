@@ -1,5 +1,5 @@
 /*
- * $Id: adir.prg,v 1.17 2001/05/15 13:02:06 vszakats Exp $
+ * $Id$
  */
 
 /*

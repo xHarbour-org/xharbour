@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.13 2009/02/13 16:12:21 ronpinkas Exp $
+ * $Id$
  */
 
 /*

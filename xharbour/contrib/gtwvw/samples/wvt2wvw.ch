@@ -1,5 +1,5 @@
 /*
- * $Id: wvt2wvw.ch $
+ * $Id$
  */
 /* wvt2wvw.ch
    Copyright 2004 Budyanto Dj. <budyanto@centrin.net.id>

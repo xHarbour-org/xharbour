@@ -1,5 +1,5 @@
 /*
- * $Id: uckam.c,v 1.2 2007/11/07 23:34:28 likewolf Exp $
+ * $Id$
  */
 
 /*

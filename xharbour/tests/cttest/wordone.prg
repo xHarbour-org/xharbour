@@ -1,5 +1,5 @@
 /*
- * $Id: wordone.prg,v 1.2 2004/07/23 08:53:07 likewolf Exp $
+ * $Id$
  */
 
 /*

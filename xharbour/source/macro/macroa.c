@@ -1,5 +1,5 @@
 /*
- * $Id: macroa.c,v 1.6 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id$
  */
 
 /* hbexpra.c is also included from ../compiler/expropta.c

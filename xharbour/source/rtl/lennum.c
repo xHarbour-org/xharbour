@@ -1,5 +1,5 @@
 /*
- * $Id: lennum.c,v 1.4 2001/05/15 13:02:06 vszakats Exp $
+ * $Id$
  */
 
 /*

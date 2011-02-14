@@ -1,5 +1,5 @@
 /*
- * $Id: gentrf.prg,v 1.4 2001/04/15 03:04:00 lculik Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hterrsys.prg,v 1.4 2005/10/14 06:31:47 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

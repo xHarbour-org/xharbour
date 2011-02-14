@@ -1,5 +1,5 @@
 /*
- * $Id: initsymb.c,v 1.8 2005/11/16 12:16:46 druzus Exp $
+ * $Id$
  */
 
 /*

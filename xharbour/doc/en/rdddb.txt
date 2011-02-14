@@ -1,5 +1,5 @@
 /*
- * $Id: rdddb.txt,v 1.6 2000/11/02 02:07:59 lculik Exp $
+ * $Id$
  */
 
 

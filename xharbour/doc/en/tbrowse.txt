@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.txt,v 1.3 2000/11/02 22:33:00 lculik Exp $
+ * $Id$
  */
 
 /*  $CLASSDOC$

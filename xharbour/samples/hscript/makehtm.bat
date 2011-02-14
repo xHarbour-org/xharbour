@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makehtm.bat,v 1.2 1999/10/09 10:07:22 vszel Exp $
+rem $Id$
 rem
 
 IF NOT EXIST hscript.exe GOTO :missing

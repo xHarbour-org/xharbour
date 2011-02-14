@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.2 2003/04/12 23:47:15 jonnymind Exp $
+   $Id$
 
    GTK interface - management of button widget
 */

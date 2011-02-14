@@ -1,5 +1,5 @@
 /*
- * $Id: rt_main.ch,v 1.6 2001/05/15 13:02:07 vszakats Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrpc.ch,v 1.1 2003/04/17 21:22:23 jonnymind Exp $
+ * $Id$
  */
 
 /*

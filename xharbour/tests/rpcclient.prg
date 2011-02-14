@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.10 2003/04/22 13:46:10 jonnymind Exp $
+* $Id$
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS

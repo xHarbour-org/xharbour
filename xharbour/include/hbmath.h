@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.14 2007/12/01 22:33:22 andijahja Exp $
+ * $Id$
  */
 
 /*

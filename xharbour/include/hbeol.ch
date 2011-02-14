@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.ch,v 1.1.1.1 2001/12/21 10:47:11 ronpinkas Exp $
+ * $Id$
  */
 
 /*

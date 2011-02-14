@@ -1,5 +1,5 @@
 /*
- * $Id: msgru866.c,v 1.11 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Русский",                   /* Name (in native language) */
       "RU",                        /* RFC ID */
       "866",                       /* Codepage */
-      "$Revision: 1.11 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: msgfr.c,v 1.11 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "fran‡ais",                  /* Name (in native language) */
       "FR",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.11 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

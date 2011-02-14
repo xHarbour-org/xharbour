@@ -1,5 +1,5 @@
 /*
- * $Id: mlcfunc.c,v 1.5 2009/09/12 18:01:43 likewolf Exp $
+ * $Id$
  */
 
 /*

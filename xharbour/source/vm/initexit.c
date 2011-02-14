@@ -1,5 +1,5 @@
 /*
- * $Id: initexit.c,v 1.3 2009/09/12 18:01:44 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: mssgline.prg,v 1.2 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id$
  */
 
 /*

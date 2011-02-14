@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.11 2008/11/22 08:25:37 andijahja Exp $
+ * $Id$
  */
 
 /*

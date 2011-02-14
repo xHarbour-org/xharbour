@@ -1,5 +1,5 @@
 #
-# $Id: prg.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
+# $Id$
 #
 
 PRG_C_SOURCES = $(PRG_SOURCES:.prg=.c)

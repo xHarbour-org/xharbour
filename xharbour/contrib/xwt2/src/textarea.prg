@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: connector.prg,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
+   $Id$
 
    Textarea class; a (not so basic) text editor interface
 */

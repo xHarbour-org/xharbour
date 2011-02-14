@@ -1,5 +1,5 @@
 /*
- * $Id: msghr852.c,v 1.10 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.10 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

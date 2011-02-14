@@ -1,5 +1,5 @@
 //
-// $Id: testfor.prg,v 1.1 1999/10/04 18:46:32 vszel Exp $
+// $Id$
 //
 
 FUNCTION MAIN

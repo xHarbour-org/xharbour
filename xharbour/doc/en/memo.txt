@@ -1,5 +1,5 @@
 /*
- * $Id: memo.txt,v 1.6 2000/04/29 09:31:12 brianhays Exp $
+ * $Id$
  */
 
 /*

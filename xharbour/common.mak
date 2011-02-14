@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: common.mak,v 1.61 2011/01/20 04:55:53 andijahja Exp $
+# $Id$
 #
 # FILE : common.mak
 # NOTES: This file is used by all C/C++ compilers under Windows Platform whose

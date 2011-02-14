@@ -1,5 +1,5 @@
 /*
- * $Id: keywords.ch,v 1.1 1999/10/04 18:46:29 vszel Exp $
+ * $Id$
  */
 
 //This is test file for KEYWORDS.PRG

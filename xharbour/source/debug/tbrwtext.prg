@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.23 2009/08/17 16:12:52 likewolf Exp $
+ * $Id$
  */
 
 /*

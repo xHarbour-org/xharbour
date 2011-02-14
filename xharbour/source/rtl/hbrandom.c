@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.17 2008/11/22 08:25:23 andijahja Exp $
+ * $Id$
  */
 
 /*

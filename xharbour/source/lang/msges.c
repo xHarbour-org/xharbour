@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.14 2008/11/18 17:55:45 marchuet Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.14 $ $Date: 2008/11/18 17:55:45 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.238 2009/12/31 02:55:05 andijahja Exp $
+ * $Id$
  */
 
 /*

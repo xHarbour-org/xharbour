@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.23 2009/12/31 02:55:05 andijahja Exp $
+ * $Id$
  */
 
 /*

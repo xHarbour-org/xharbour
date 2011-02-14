@@ -1,5 +1,5 @@
 /*
- * $Id: pe.prg,v 1.1 1999/10/12 08:43:53 rglab Exp $
+ * $Id$
  */
 #define EDIT_EDIT .T.
 #define EDIT_VIEW .F.

@@ -1,5 +1,5 @@
 /*
-* $Id: version.prg,v 1.3 2005/03/06 00:53:05 andijahja Exp $
+* $Id$
 * Test program for HB_BUILDINDO( [ nInfo ] )
 * Retrieve information on xHarbour Build Info
 * Please refer to include/hbver.ch for more information on nInfo

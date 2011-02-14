@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2003/02/19 10:16:31 jonnymind Exp $
+# $Id$
 #
 
 ROOT = ../../

@@ -1,5 +1,5 @@
 /*
- * $Id: todbc.prg,v 1.5 2005/01/08 11:26:50 ptsarenko Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:

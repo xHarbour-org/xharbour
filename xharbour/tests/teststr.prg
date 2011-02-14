@@ -1,5 +1,5 @@
 //
-// $Id: teststr.prg,v 1.2 2000/05/02 05:46:45 dholm Exp $
+// $Id$
 //
 
 STATIC cNewLine

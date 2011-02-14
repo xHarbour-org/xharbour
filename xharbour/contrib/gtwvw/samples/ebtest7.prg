@@ -1,6 +1,6 @@
 /*
   EBTEST7.PRG
-  $Id: ebtest7.prg $
+  $Id$
 
   copyright (c) Budyanto Dj. <budyanto@centrin.net.id>
 

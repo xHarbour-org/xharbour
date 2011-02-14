@@ -1,4 +1,4 @@
-/*  $Id: hbfilere.h,v 1.4 2009/11/09 01:13:05 lculik Exp $  */
+/*  $Id$  */
 
 /*
  * xHarbour Project source code:

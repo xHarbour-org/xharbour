@@ -1,5 +1,5 @@
 /*
- * $Id: strpeek.c,v 1.6 2006/03/25 02:22:40 druzus Exp $
+ * $Id$
  */
 
 /*

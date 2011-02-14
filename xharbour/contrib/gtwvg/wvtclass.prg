@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg 8733 2008-06-14 19:03:07Z vouchcac $
+ * $Id$
  */
 
 /*

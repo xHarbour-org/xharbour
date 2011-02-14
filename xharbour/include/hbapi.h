@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.273 2010/07/29 17:08:09 ronpinkas Exp $
+ * $Id$
  */
 
 /*

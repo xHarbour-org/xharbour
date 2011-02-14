@@ -1,5 +1,5 @@
 /*
- * $Id: tframe.prg,v 1.4 2006/06/22 03:50:13 lculik Exp $
+ * $Id$
  */
 
 /*

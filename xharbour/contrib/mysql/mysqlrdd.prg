@@ -1,5 +1,5 @@
 /*
- * $Id: mysqlrdd.prg,v 1.4 2008/01/11 02:44:07 marceloanelli Exp $
+ * $Id$
  */
 
 /*

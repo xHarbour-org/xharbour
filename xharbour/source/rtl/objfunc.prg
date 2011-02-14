@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.20 2004/07/26 10:38:07 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: linux.c,v 1.1 2005/10/13 08:05:24 mauriliolongo Exp $
+ * $Id$
  */
 
 /*

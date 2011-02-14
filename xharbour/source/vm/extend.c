@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.74 2009/07/14 12:34:30 ronpinkas Exp $
+ * $Id$
  */
 
 /*

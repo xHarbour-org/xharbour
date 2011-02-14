@@ -1,5 +1,5 @@
 /*
- * $Id: png.c,v 1.14 2010/09/29 00:27:39 andijahja Exp $
+ * $Id$
  */
 
 /* pngwrite.c - general routines to write a PNG file

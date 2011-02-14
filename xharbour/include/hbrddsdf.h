@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.11 2009/07/22 16:55:02 marchuet Exp $
+ * $Id$
  */
 
 /*

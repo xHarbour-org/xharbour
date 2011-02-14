@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.72 2010/05/20 07:48:40 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.8 2005/10/29 18:53:39 likewolf Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: numlohi.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id$
  *
  * xHarbour Project source code:
  * CT3 NUMLOW() and NUMHIGH() functions.

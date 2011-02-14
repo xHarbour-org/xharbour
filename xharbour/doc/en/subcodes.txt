@@ -1,5 +1,5 @@
 /*
- * $Id: subcodes.txt,v 1.2 2000/08/12 23:39:20 lculik Exp $
+ * $Id$
  */
 /*
  Proposition:

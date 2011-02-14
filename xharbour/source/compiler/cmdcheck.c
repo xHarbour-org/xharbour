@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.43 2009/03/02 09:20:04 marchuet Exp $
+ * $Id$
  */
 
 /*

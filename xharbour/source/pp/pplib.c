@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.4 2009/01/24 00:33:09 likewolf Exp $
+ * $Id$
  */
 
 /*

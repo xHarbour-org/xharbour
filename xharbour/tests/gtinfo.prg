@@ -2,7 +2,7 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id: gtinfo.prg,v 1.8 2004/10/21 14:26:42 jonnymind Exp $
+ * $Id$
  */
 
 #include "hbgtinfo.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: apitest.prg,v 1.3 2004/01/15 13:48:27 jonnymind Exp $
+ * $Id$
  */
 /*
    Program for:

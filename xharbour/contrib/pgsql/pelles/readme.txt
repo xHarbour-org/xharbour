@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.1 2007/12/28 00:31:59 modalsist Exp $
+$Id$
 
 How to build libpq.lib from postgresql sources with Pelles C compiler.
 How to build libhbpg.lib from xharbour contrib source with Pelles C compiler.

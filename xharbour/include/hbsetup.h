@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.59 2010/08/31 01:41:21 andijahja Exp $
+ * $Id$
  */
 
 /*

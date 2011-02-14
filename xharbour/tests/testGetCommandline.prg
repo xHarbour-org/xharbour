@@ -1,5 +1,5 @@
 /*
- * $Id: testGetCommandline.prg,v 1.0 2003/06/08 10:45:39 patrickmast Exp $
+ * $Id$
  */
 
 

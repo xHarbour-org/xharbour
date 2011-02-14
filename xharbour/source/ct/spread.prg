@@ -1,5 +1,5 @@
 /*
- * $Id: spread.prg,v 1.3 2005/01/21 20:00:00 ptsarenko Exp $
+ * $Id$
  */
 
 /*

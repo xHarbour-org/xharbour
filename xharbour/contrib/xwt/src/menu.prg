@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menu.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
+   $Id$
 
    Menu class
 */

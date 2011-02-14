@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: textbox.prg,v 1.3 2003/07/21 18:14:40 xthefull Exp $
+   $Id$
 
    Text box Control. 
 */

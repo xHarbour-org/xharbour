@@ -1,5 +1,5 @@
 /*
-* $Id: gtQTc.cpp,v 1.8 2004/10/22 11:26:43 paultucker Exp $
+* $Id$
 */
 
 /*

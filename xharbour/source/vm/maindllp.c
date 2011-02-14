@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.36 2011/01/20 04:55:53 andijahja Exp $
+ * $Id$
  */
 
 /*

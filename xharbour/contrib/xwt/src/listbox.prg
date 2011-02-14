@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: listbox.prg,v 1.1 2004/01/30 18:34:12 lculik Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

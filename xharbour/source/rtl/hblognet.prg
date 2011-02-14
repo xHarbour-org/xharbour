@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.8 2009/01/17 15:57:14 fsgiudice Exp $
+* $Id$
 */
 
 /*

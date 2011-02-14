@@ -1,5 +1,5 @@
 /*
- * $Id: cpelwin.c,v 1.8 2009/05/07 09:29:35 likewolf Exp $
+ * $Id$
  */
 
 /*

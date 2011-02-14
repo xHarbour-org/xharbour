@@ -1,5 +1,5 @@
 /*
- * $Id: hbfilere.c,v 1.10 2009/11/09 09:39:35 marchuet Exp $
+ * $Id$
  */
 
 /*

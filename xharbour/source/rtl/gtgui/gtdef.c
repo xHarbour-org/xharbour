@@ -1,5 +1,5 @@
 /*
- * $Id: gtdef.c,v 1.7 2009/11/09 09:39:21 marchuet Exp $
+ * $Id$
  */
 
 /*

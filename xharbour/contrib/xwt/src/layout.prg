@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.6 2003/07/20 20:47:05 xthefull Exp $
+   $Id$
 
    Pane class. Each widget is arranged below the
    previous one.

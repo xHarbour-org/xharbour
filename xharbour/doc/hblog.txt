@@ -8,7 +8,7 @@
                               antispam@nccolai.ws
 
 
-$Id: hblog.txt,v 1.4 2004/03/19 21:45:11 jonnymind Exp $
+$Id$
 
 /*  $DOC$
  *  $FUNCNAME$

@@ -1,5 +1,5 @@
 /*
- * $Id: htmutil.prg,v 1.5 2006/06/28 20:56:31 lculik Exp $
+ * $Id$
  */
 
 /*

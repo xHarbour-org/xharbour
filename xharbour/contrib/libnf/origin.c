@@ -1,5 +1,5 @@
 /*
- * $Id: origin.c,v 1.2 2006/04/12 05:22:20 paultucker Exp $
+ * $Id$
  */
 
 /*

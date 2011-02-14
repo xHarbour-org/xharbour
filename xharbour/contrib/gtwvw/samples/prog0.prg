@@ -1,5 +1,5 @@
 /*
- * $Id: prog0.prg $
+ * $Id$
  */
 /*
    PROG0.PRG

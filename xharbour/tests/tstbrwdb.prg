@@ -1,5 +1,5 @@
 /*
- * $Id: testbrw.prg,v 1.2 2003/11/12 12:58:45 andijahja Exp $
+ * $Id$
  */
 
 // Harbour Class TBrowse and TBColumn sample

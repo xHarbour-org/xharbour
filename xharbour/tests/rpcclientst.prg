@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclientst.prg
-* $Id: rpcclientst.prg,v 1.2 2003/04/17 21:22:23 jonnymind Exp $
+* $Id$
 * Test for tRpcClient class
 *
 * SINGLE THREAD MODE

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcommon.ch,v 1.1 2001/12/18 20:51:20 vszakats Exp $
+ * $Id$
  */
 
 /*

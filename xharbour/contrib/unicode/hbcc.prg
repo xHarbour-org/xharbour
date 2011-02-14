@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.16 2009/09/30 16:19:25 marchuet Exp $
+ * $Id$
  */
 
 /*

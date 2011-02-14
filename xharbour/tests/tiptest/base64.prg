@@ -12,7 +12,7 @@
 * base64test -q [-d]  to use quoted printable encoding/decoding.
 * base64test -u [-d]  to use url encoding/decoding.
 *
-* $Id: base64.prg,v 1.2 2005/03/17 00:55:42 ath1 Exp $
+* $Id$
 *****/
 
 #Define hSTDIN 0

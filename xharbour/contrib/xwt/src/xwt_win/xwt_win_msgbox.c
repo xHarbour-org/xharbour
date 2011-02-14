@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_msgbox.c,v 1.5 2008/05/01 03:36:58 andijahja Exp $
+   $Id$
 
    Message box implementation
 */

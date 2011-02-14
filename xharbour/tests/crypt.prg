@@ -3,7 +3,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: crypt.prg,v 1.1 2003/02/23 20:13:39 jonnymind Exp $
+* $Id$
 *
 * Cryptography usin NXS algorithm.
 * 

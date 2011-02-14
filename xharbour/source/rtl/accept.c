@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.5 2007/04/20 09:41:30 marchuet Exp $
+ * $Id$
  */
 
 /*

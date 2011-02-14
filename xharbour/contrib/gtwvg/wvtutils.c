@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.2 2008/12/23 18:06:33 likewolf Exp $
+ * $Id$
  */
 
 /*

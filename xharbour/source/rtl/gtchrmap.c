@@ -1,5 +1,5 @@
 /*
- * $Id: gtchrmap.c,v 1.1 2008/03/16 19:16:00 likewolf Exp $
+ * $Id$
  */
 
 /*

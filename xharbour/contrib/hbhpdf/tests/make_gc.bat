@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: crc32.h,v 1.1 2008/04/14 06:06:22 andijahja Exp $
+rem $Id$
 rem
 SET CC_DIR=C:\MINGW
 SET _MYLIB=-lhbhpdf -lpng -lhbzip -lzlib -lvm -lrtl -lrdd -lvm -lct -lvm -lrtl -lgtwin -lmacro -ldbfcdx -lbmdbfcdx -lsixcdx -ldbfntx -lrtl -ldbffpt -lhbsix -lhsx -lpcrepos -lcommon -lpp -llang -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr -lole32 -luuid -loleaut32

@@ -1,5 +1,5 @@
 /*
- * $Id: fi_winfu.c,v 1.3 2008/05/24 21:25:30 enricomaria Exp $
+ * $Id$
  */
 
 /*

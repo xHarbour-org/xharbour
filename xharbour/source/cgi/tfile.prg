@@ -1,5 +1,5 @@
 /*
- * $Id: tfile.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

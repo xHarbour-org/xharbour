@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.10 2008/03/13 10:49:39 likewolf Exp $
+ * $Id$
  */
 
 /*

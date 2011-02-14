@@ -1,5 +1,5 @@
 /*
- * $Id: msgplwin.c,v 1.8 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Polski",                    /* Name (in native language) */
       "PL",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: setcurs.ch,v 1.1.1.1 2001/12/21 10:47:27 ronpinkas Exp $
+ * $Id$
  */
 
 /*

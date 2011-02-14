@@ -1,5 +1,5 @@
 * regex.prg
-* $Id: regex.prg,v 1.3 2003/03/18 20:30:14 jonnymind Exp $
+* $Id$
 * Test for regular expression functions
 *
 * Giancarlo Niccolai

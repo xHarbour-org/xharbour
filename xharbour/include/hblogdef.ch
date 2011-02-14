@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.9 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id$
  */
 
 /*

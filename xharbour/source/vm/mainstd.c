@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.13 2009/11/09 09:39:22 marchuet Exp $
+ * $Id$
  */
 
 /*

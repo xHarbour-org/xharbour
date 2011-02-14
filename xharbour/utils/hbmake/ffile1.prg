@@ -1,5 +1,5 @@
 /*
- * $Id: ffile1.prg,v 1.6 2001/12/27 22:37:42 andijahja Exp $
+ * $Id$
  */
 
 /*

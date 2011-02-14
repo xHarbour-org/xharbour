@@ -1,5 +1,5 @@
 /*
- * $Id: hbextcdp.ch 12858 2009-11-10 15:55:33Z vszakats $
+ * $Id$
  */
 
 /*

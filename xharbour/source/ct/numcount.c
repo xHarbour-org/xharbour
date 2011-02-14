@@ -1,5 +1,5 @@
 /*
- * $Id: numcount.c,v 1.1 2004/11/29 23:30:00 ptsarenko Exp $
+ * $Id$
  */
 
 /*

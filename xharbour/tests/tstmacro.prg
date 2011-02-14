@@ -1,5 +1,5 @@
 /*
- * $Id: tstmacro.prg,v 1.10 2001/09/10 22:04:29 vszakats Exp $
+ * $Id$
  */
 
 #include "hbclass.ch"

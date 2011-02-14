@@ -1,5 +1,5 @@
 /*
- * $Id: substr.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
+ * $Id$
  */
 
 /*

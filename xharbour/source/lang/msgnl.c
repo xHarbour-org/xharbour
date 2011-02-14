@@ -1,5 +1,5 @@
 /*
- * $Id: msgnl.c,v 1.8 2008/11/19 05:24:52 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Dutch",                   /* Name (in native language) */
       "NL",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

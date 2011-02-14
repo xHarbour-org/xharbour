@@ -3,7 +3,7 @@
 
    (C) 2003 Rafa Carmona ( Thefull )
 
-   $Id: togglebutton.prg,v 1.3 2003/08/29 18:28:28 lculik Exp $
+   $Id$
 
    Widget class - basic widget & event management
 */

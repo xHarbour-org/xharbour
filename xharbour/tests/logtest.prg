@@ -1,6 +1,6 @@
 ************************************************************
 * logtest.prg
-* $Id: logtest.prg,v 1.5 2003/07/22 11:35:11 jonnymind Exp $
+* $Id$
 *
 * Demonstrates the standard log system
 * See inline help strings to know how to use this

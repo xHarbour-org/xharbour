@@ -1,5 +1,5 @@
 /*
- * $Id: howtobsd.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
+ * $Id$
  */
 
 HOW TO CONFIGURE BSD TO BUILD HARBOUR

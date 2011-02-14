@@ -1,5 +1,5 @@
 //
-// $Id: returns.prg,v 1.1 1999/10/04 18:46:31 vszel Exp $
+// $Id$
 //
 
 // Testing multiple returns into a function

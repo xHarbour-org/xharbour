@@ -1,5 +1,5 @@
 /* 
- * $Id: async.prg,v 1.3 2004/05/02 22:41:11 rodrigo_moreno Exp $
+ * $Id$
  *
  * This sample show howto use asynchronous/nonblocking queries
  *

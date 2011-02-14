@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.c,v 1.18 2009/08/29 20:56:43 likewolf Exp $
+ * $Id$
  */
 
 /*

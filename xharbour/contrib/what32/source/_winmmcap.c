@@ -1,5 +1,5 @@
 /*
- * $Id: _winmmcap.c,v 1.3 2008/05/01 22:28:51 andijahja Exp $
+ * $Id$
  */
 
 /*

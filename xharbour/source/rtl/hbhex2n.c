@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.19 2008/11/22 08:25:23 andijahja Exp $
+ * $Id$
  */
 
 /*

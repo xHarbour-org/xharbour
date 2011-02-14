@@ -64,7 +64,7 @@ static HB_LANG s_lang =
       "svensk ANSI",                  /* Name (in native language) */
       "SVWIN",                        /* RFC ID */
       "ANSI",                         /* Codepage */
-      "$Revision: 1.3 $ $Date: 2008/11/19 05:24:52 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

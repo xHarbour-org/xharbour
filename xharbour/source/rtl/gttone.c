@@ -1,5 +1,5 @@
 /*
- * $Id: gttone.c,v 1.2 2008/12/01 11:45:00 marchuet Exp $
+ * $Id$
  */
 
 /*

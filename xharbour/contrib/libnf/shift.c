@@ -1,5 +1,5 @@
 /*
- * $Id: shift.c,v 1.4 2008/01/16 21:07:35 ptsarenko Exp $
+ * $Id$
  */
 
 /*

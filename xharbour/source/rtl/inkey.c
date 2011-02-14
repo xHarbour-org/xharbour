@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.59 2008/04/04 15:20:46 ronpinkas Exp $
+ * $Id$
  */
 
 /*

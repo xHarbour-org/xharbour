@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.7 2008/12/23 16:37:06 likewolf Exp $
+ * $Id$
  */
 
 /*

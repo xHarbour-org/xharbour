@@ -1,6 +1,6 @@
 
 /*
- * $Id: tcgi.prg,v 1.5 2007/05/04 12:49:15 andresreyesh Exp $
+ * $Id$
  */
 
 /*

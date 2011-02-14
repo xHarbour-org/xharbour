@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.10 2008/06/27 15:59:35 marchuet Exp $
+ * $Id$
  */
 
 /*

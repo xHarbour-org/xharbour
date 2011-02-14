@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.15 2007/04/14 21:47:21 ronpinkas Exp $
+ * $Id$
  */
 
 /*

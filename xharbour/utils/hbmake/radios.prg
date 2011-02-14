@@ -1,5 +1,5 @@
 /*
- * $Id: radios.prg,v 1.3 2008/03/13 10:49:44 likewolf Exp $
+ * $Id$
  */
 /*
  * Harbour Project source code:

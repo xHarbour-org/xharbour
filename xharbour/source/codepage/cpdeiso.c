@@ -1,5 +1,5 @@
 /*
- * $Id: cpdeiso.c,v 1.4 2009/05/07 09:29:35 likewolf Exp $
+ * $Id$
  */
 
 /*

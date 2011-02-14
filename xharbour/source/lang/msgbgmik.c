@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgmik.c,v 1.3 2008/11/19 05:24:51 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Б║лга░▒ки",              /* Name (in native language) */
       "BG",                        /* RFC ID */
       "MIK",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2008/11/19 05:24:51 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

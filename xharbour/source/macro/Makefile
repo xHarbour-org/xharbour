@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2002/01/29 08:00:26 ronpinkas Exp $
+# $Id$
 #
 
 HB_LEX := SIMPLEX

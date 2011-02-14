@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.8 2007/12/22 19:07:44 likewolf Exp $
+ * $Id$
  */
 
 /*

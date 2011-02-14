@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.27 2007/05/08 13:36:40 andresreyesh Exp $
+ * $Id$
  */
 
 /*

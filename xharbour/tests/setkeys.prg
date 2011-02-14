@@ -1,5 +1,5 @@
 /*
- * $Id: setkeys.prg,v 1.5 2001/06/18 18:41:11 dholm Exp $
+ * $Id$
 
    Harbour Project source code - http://www.Harbour-Project.org
 

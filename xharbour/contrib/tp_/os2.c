@@ -1,5 +1,5 @@
 /*
- * $Id: os2.c,v 1.4 2005/01/14 15:39:06 mauriliolongo Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.15 2008/12/22 22:09:45 likewolf Exp $
+ * $Id$
  */
 
 /*

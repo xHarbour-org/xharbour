@@ -1,5 +1,5 @@
 //
-// $Id: inherit.prg,v 1.2 2004/01/29 14:26:00 likewolf Exp $
+// $Id$
 //
 
 #include "set.ch"

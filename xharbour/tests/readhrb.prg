@@ -1,5 +1,5 @@
 //
-// $Id: readhrb.prg,v 1.3 2008/02/10 07:55:52 ronpinkas Exp $
+// $Id$
 //
 
 /*

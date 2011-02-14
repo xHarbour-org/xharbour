@@ -1,5 +1,5 @@
 /*
- * $Id: numtxthu.prg,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
+ * $Id$
  */
 
 /*

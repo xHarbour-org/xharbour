@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.47 2007/10/23 13:52:31 lculik Exp $
+ * $Id$
  */
 /*
  * xHarbour Project source code:

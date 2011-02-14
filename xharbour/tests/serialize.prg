@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.9 2003/11/14 23:17:31 ronpinkas Exp $
+* $Id$
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any

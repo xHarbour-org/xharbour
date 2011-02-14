@@ -1,5 +1,5 @@
 /*
- * $Id: gdtestcls.prg,v 1.3 2005/10/25 00:51:25 fsgiudice Exp $
+ * $Id$
  */
 
 /*

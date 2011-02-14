@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2004/08/02 21:05:50 lf_sfnet Exp $
+# $Id$
 #
 
 vpath %.c ../

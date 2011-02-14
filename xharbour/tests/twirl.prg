@@ -1,5 +1,5 @@
 //
-// $Id: twirl.prg,v 1.1 2001/03/15 22:00:45 dholm Exp $
+// $Id$
 //
 
 // Test program for new libmisc twirler class

@@ -1,5 +1,5 @@
 /*
- * $Id: decode.prg,v 1.4 2006/06/26 14:26:25 fsgiudice Exp $
+ * $Id$
  */
 
 /*

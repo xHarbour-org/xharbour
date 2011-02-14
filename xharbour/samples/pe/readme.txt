@@ -1,5 +1,5 @@
 /*
- * $Id: readme.txt,v 1.1 1999/10/12 08:43:53 rglab Exp $
+ * $Id$
 */
 Known bugs:
 ----------

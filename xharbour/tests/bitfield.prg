@@ -3,7 +3,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: bitfield.prg,v 1.1 2003/07/08 06:05:40 jonnymind Exp $
+* $Id$
 *
 
 PROCEDURE Main()

@@ -1,5 +1,5 @@
 /*
- * $Id: readvar.prg,v 1.16 2001/05/15 13:02:06 vszakats Exp $
+ * $Id$
  */
 
 /*

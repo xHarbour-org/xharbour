@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.9 2008/08/21 12:47:43 marchuet Exp $
+ * $Id$
  */
 
 /*

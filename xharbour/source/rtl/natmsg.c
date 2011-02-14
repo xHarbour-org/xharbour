@@ -1,5 +1,5 @@
 /*
- * $Id: natmsg.c,v 1.4 2009/03/02 09:20:04 marchuet Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_math.prg,v 1.6 2004/02/15 20:21:40 andijahja Exp $
+ * $Id$
  */
 
 /*

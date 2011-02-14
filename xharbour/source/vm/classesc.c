@@ -1,5 +1,5 @@
 /*
- * $Id: classesc.c,v 1.5 2007/09/25 02:55:30 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: xsavescr.c,v 1.2 2002/10/22 02:08:33 paultucker Exp $
+ * $Id$
  */
 
 /*

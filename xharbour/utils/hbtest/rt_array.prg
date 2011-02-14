@@ -1,5 +1,5 @@
 /*
- * $Id: rt_array.prg,v 1.5 2007/02/27 15:59:43 druzus Exp $
+ * $Id$
  */
 
 /*

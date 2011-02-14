@@ -19,7 +19,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.12 2005/12/01 13:41:14 snaiperis Exp $
+* $Id$
 *
 
 #include "hbserv.ch"

@@ -1,5 +1,5 @@
 @echo off
-rem $Id: make_pc.bat,v 1.0 0000/00/00 00:00:00 modalsist Exp $
+rem $Id$
 rem
 rem Make file for Pelles C compiler.
 rem

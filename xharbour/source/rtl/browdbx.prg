@@ -1,5 +1,5 @@
 /*
- * $Id: browdbx.prg,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
+ * $Id$
  */
 
 /*

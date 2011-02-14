@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.50 2007/07/02 04:27:32 peterrees Exp $
+ * $Id$
  */
 
 /*

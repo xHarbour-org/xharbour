@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.5 2006/01/17 03:07:56 lculik Exp $
+* $Id$
 *
 * Usage: This file is similar to a wget command
 *

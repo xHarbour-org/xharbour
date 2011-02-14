@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.h,v 1.2 2009/12/30 19:56:56 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: htmlform.ch,v 1.3 2006/05/13 16:46:08 lculik Exp $
+ * $Id$
  */
 
 /*

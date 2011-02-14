@@ -1,5 +1,5 @@
 /*
- * $Id: config.h,v 1.13 2010/08/10 12:18:49 andijahja Exp $
+ * $Id$
  */
 #ifndef _CONFIG_H
    #define _CONFIG_H

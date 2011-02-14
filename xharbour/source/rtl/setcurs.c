@@ -1,5 +1,5 @@
 /*
- * $Id: setcurs.c,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
+ * $Id$
  */
 
 /*

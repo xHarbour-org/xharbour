@@ -1,5 +1,5 @@
 /*
- * $Id: extend.h,v 1.135 2001/05/15 13:02:06 vszakats Exp $
+ * $Id$
  */
 
 /*

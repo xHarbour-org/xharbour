@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.18 2009/12/16 05:34:11 andijahja Exp $
+ * $Id$
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: devoutp.prg,v 1.5 2003/10/18 01:15:19 jonnymind Exp $
+ * $Id$
  */
 
 /*

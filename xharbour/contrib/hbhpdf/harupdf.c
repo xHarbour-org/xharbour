@@ -1,5 +1,5 @@
 /*
- * $Id: harupdf.c,v 1.2 2008/09/06 06:20:56 andijahja Exp $
+ * $Id$
  */
 
 /*

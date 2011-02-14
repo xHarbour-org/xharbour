@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.280 2009/01/24 00:33:09 likewolf Exp $
+ * $Id$
  */
 
 /*

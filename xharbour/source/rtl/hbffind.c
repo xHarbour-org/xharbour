@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.44 2009/12/31 02:55:05 andijahja Exp $
+ * $Id$
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.44 2009/12/31 02:55:05 andijahja Exp $" )
+HB_FILE_VER( "$Id$" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040

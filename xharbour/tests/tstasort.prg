@@ -1,5 +1,5 @@
 //
-// $Id: tstasort.prg,v 1.2 2001/07/19 08:58:53 ronpinkas Exp $
+// $Id$
 //
 
 function main()

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtcore.h,v 1.10 2008/12/01 11:44:59 marchuet Exp $
+ * $Id$
  */
 
 /*

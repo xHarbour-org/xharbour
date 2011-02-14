@@ -1,5 +1,5 @@
 /*
- * $Id: gtsys.c,v 1.2 2008/03/20 00:01:05 ronpinkas Exp $
+ * $Id$
  */
 
 /*

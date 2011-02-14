@@ -1,6 +1,6 @@
 //NOTEST             // It is very frustrating if this one is auto-tested
 //
-// $Id: dosshell.prg,v 1.1 1999/10/04 18:46:28 vszel Exp $
+// $Id$
 //
 
 //

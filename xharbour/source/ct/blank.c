@@ -1,5 +1,5 @@
 /*
- * $Id: blank.c,v 1.1 2009/07/12 21:08:58 ptsarenko Exp $
+ * $Id$
  */
 
 /*

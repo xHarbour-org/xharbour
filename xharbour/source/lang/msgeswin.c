@@ -1,5 +1,5 @@
 /*
- * $Id: msgeswin.c,v 1.9 2008/11/18 17:55:45 marchuet Exp $
+ * $Id$
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Español ANSI",              /* Name (in native language) */
       "ESWIN",                     /* RFC ID */
       "ANSI",                      /* Codepage */
-      "$Revision: 1.9 $ $Date: 2008/11/18 17:55:45 $",         /* Version */
+      "$Revision$ $Date$",         /* Version */
 
       /* Month names */
 

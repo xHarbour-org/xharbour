@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.c,v 1.3 2006/09/30 18:40:16 ptsarenko Exp $
+ * $Id$
  */
 
 /*

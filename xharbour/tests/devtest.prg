@@ -1,5 +1,5 @@
 /*
- * $Id: devtest.prg,v 1.1 1999/10/06 15:30:38 dholm Exp $
+ * $Id$
  */
 
 // Test program for DEVPOS() and DEVOUT() Clipper compatibility

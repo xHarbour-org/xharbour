@@ -1,5 +1,5 @@
 //
-// $Id: inifiles.prg,v 1.2 2001/09/10 22:04:29 vszakats Exp $
+// $Id$
 //
 #define CRLF (Chr(13) + Chr(10))
 

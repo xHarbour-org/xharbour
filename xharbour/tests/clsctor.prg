@@ -1,6 +1,6 @@
 ***********************************************************
 * clsctor.prg
-* $Id: exec.prg,v 1.1 2003/02/18 23:54:57 jonnymind Exp $
+* $Id$
 *
 * Test for class contructor
 *
