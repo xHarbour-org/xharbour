@@ -21,7 +21,7 @@ PROCEDURE MAIN()
    LOCAL nError
    LOCAL nFault := 0
    LOCAL nStart
-
+   LOCAL nOldRow := Row(), nOldCol := Col()
    cScr := savescreen(0,0,maxrow(),maxcol())
 
    BEGIN SEQUENCE
@@ -139,6 +139,8 @@ PROCEDURE MAIN()
    END SEQUENCE
 
    restscreen(0,0,maxrow(),maxcol(),cScr)
+   SET CURSOR ON
+   SetPos( nOldRow, nOldCol )
 
    RETURN
 
@@ -240,7 +242,7 @@ STATIC PROCEDURE View( aFile )
 
    o:lWordWrap := .F.
    o:Loadfile( aFile[F_NAME] )
-   o:MoveCursor(K_DOWN)
+   o:RefreshWindow()
 
    WHILE ( ( nKey := inkey() ) != K_ESC )
       o:MoveCursor(nKey)

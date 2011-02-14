@@ -9,7 +9,7 @@ rem ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 rem  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 SET SUB_DIR=VC6
 SET CC_DIR=..\..\%SUB_DIR%
-SET _MYLIB=codepage.lib sixapi.lib rddads.lib zlib.lib common.lib dbffpt.lib dbfcdx.lib dbfntx.lib hbsix.lib debug.lib gtwin.lib macro.lib pp.lib rdd.lib rtl.lib vm.lib lang.lib pcrepos.lib ct.lib
+SET _MYLIB=codepage.lib rddads.lib zlib.lib common.lib dbffpt.lib dbfcdx.lib dbfntx.lib hbsix.lib debug.lib gtwin.lib macro.lib pp.lib rdd.lib rtl.lib vm.lib lang.lib pcrepos.lib ct.lib
 SET HARBOURDIR=..
 SET HARBOURLIB=%HARBOURDIR%\lib\%SUB_DIR%
 SET HARBOUREXE=%HARBOURDIR%\bin\%SUB_DIR%\harbour.exe
