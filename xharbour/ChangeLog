@@ -8,6 +8,141 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-15 04:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/unicode/hbcctool.c
+    ! use native xHarbour file functions
+    ! some public variables are now static
+
+  - contrib/unicode/util
+    ! moved txt2cst routine to hbcctool.c
+
+  - contrib/unicode/hbdecode.prg
+  + contrib/unicode/hbcctool.c
+    ! removed PRG section from hbdecode.prg
+    ! renamed hbdecode.prg -> hbcctool.c
+
+  + contrib/unicode/hbcc.h
+    ! function prototypes used in hbcc lib
+
+  * contrib/unicode/*.c
+    + include "hbcc.h"
+
+  * unicode/makefile.bc
+  * unicode/makefile.vc
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! fixed to reflect the above changes
+
+  + winmake/*.*
+    ! commited missing files
+
+  - contrib/unicode/hbcc.prg
+  + contrib/unicode/hbcc.c
+    ! removed PRG section and renamed hbcc.prg -> hbcc.c
+
+  * winmake/compile.mak
+    ! fixed to reflect above changes
+
+  * tests/xhbenc.prg
+    ! call :RefreshWindow() before navigating
+
+  + contrib/png/pnginfo.h
+  + contrib/png/pngstruct.h
+  + contrib/png/pngdebug.h
+    ! missing files in previous commit
+
+  + contrib/png/pnglibconf.h
+    ! missing file in previous commit
+
+  * source/misc/hb_f.c
+    + chr(141) + chr(10) is EOL
+    ! reformatting
+
+  * contrib/png/png.c
+  * contrib/png/png.h
+  * contrib/png/pngconf.h
+  * contrib/png/pngerror.c
+  * contrib/png/pngget.c
+  * contrib/png/pngmem.c
+  * contrib/png/pngpread.c
+  * contrib/png/pngpriv.h
+  * contrib/png/pngread.c
+  * contrib/png/pngrio.c
+  * contrib/png/pngrtran.c
+  * contrib/png/pngrutil.c
+  * contrib/png/pngset.c
+  * contrib/png/pngtrans.c
+  * contrib/png/pngwio.c
+  * contrib/png/pngwrite.c
+  * contrib/png/pngwtran.c
+  * contrib/png/pngwutil.c
+    ! updated to version 1.5.1
+
+  * contrib/hbhpdf/hpdf_image_png.c
+    ! synchronized with libpng 1.5.1
+
+    ; WARNINGS:
+      libpng 1.5.1 does not support the following compilers:
+         - MSVC 6.0, 7.0 and 7.1
+         - PellesC 6.50
+         - XCC 2.70
+      therefore, users of the above compilers shall stay with SVN version before
+      these changes if she wishes to work with png.lib and hbhpdf.lib, or
+      use the DLL versions available from respective sites. However, hbhpdf.lib
+      can still be built without PNG support by adding -DLIBHPDF_HAVE_NOPNGLIB
+      flags when building hbhpdf.lib
+
+  * winmake/makefile.wc
+    ! OpenWatcom default build is now in C-Mode
+
+  * source/compiler/genhrb.c
+  * source/vm/memvars.c
+    ! reverted changes of 2011-01-20
+
+  * source/misc/hb_f.c
+    ! fixed bytes skipped when CHR(10) is found
+
+  * source/misc/hb_f.c
+    ! fixed to recognize CHR(10) as EOL
+
+  * source/rtl/fieldbl.prg
+    ! Reverted prior fix sync it didn't make it CA-Cl*pper compatible
+      This fixed caused an RTE when evaluating a Field?Block for a non
+      existent field, instead of returning a NIL like v. 1.1.1.1 did.
+
+  * source/rtl/win32ole.prg
+    ! deffed out unused variable
+
+  * source/rtl/win32ole.prg
+  + source/rtl/hbwinole.c
+    ! detach C codes from win32ole.prg to a separate file, hbwinole.c
+    ; NOTE: This configuration is required for compilers who do not have (yet)
+      start-up features in C-mode (f.e. Digital Mars).
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! add hbwinole.obj dependency
+
+  * winmake/makefile.dc
+  * winmake/makefile.wc
+    ! modified flags for CCC_CMD macro
+
+  + winmake/*.*
+  - makefile.*
+  - *.mak
+  - mdir.bat
+    ! move Windows makefiles to winmake
+
+  + oldlogs/*.*
+  - ChangeLog.*
+    ! move old ChangeLog to oldlogs
+
+  * source/pp/ppgen.c
+    * synched Rev Id to current SVN format.
+    ; NOTE: Rev Id have been restarted. The latest Rev Id per CVS is 6768.
+     This new numbering may have effects for programs using __XHARBOUR__ value
+     as references.
+
 2011-02-14 19:46 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/ChangeLog
   * xharbour/ChangeLog.001
