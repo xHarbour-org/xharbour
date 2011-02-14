@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.6 2005/03/06 19:22:09 paultucker Exp $
+# $Id: makefile.vc 81 2011-02-14 00:46:56Z andijahja $
 #
 
 #
@@ -46,6 +46,7 @@ HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
 
 HBCC_LIB_OBJS = \
    $(OBJ_DIR)\hbcc.obj \
+   $(OBJ_DIR)\hbcctool.obj \
    $(OBJ_DIR)\hbc7.obj \
    $(OBJ_DIR)\hbcu.obj \
    $(OBJ_DIR)\hbcx.obj \
@@ -92,12 +93,13 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 # HBCC dependencies
 #
 
-$(OBJ_DIR)\hbcc.obj : hbcc.prg
-    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+$(OBJ_DIR)\hbcc.obj : hbcc.c
     $(CC) $(CLIBFLAGS) -Fo$@ $*.c
 
-$(OBJ_DIR)\hbdecode.obj : hbdecode.prg
-    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+$(OBJ_DIR)\hbcctool.obj : hbcctool.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\hbdecode.obj : hbdecode.c
     $(CC) $(CLIBFLAGS) -Fo$@ $*.c
 
 $(OBJ_DIR)\hbc7.obj : hbc7.c

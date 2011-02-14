@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.3 2004/02/02 10:12:40 andijahja Exp $
+# $Id: makefile.bc 81 2011-02-14 00:46:56Z andijahja $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -13,6 +13,7 @@ LIB_DIR = ..\..\lib\b32
 
 $(LIB_DIR)\hbcc.lib :   \
    $(OBJ_DIR)\hbcc.obj \
+   $(OBJ_DIR)\hbcctool.obj \
    $(OBJ_DIR)\hbc7.obj \
    $(OBJ_DIR)\hbcu.obj \
    $(OBJ_DIR)\hbcx.obj \
@@ -25,8 +26,8 @@ $(LIB_DIR)\hbcc.lib :   \
    $(OBJ_DIR)\hbencode.obj \
    $(OBJ_DIR)\hbdecode.obj
 
-$(OBJ_DIR)\hbcc.c        : hbcc.prg
-$(OBJ_DIR)\hbcc.obj      : $(OBJ_DIR)\hbcc.c
+$(OBJ_DIR)\hbcc.obj      : hbcc.c
+$(OBJ_DIR)\hbcctool.obj  : hbcctool.c
 $(OBJ_DIR)\hbc7.obj      : hbc7.c
 $(OBJ_DIR)\hbcu.obj      : hbcu.c
 $(OBJ_DIR)\hbcx.obj      : hbcx.c
@@ -37,12 +38,8 @@ $(OBJ_DIR)\hbcrc32.obj   : hbcrc32.c
 $(OBJ_DIR)\hbcrpt32.obj  : hbcrpt32.c
 $(OBJ_DIR)\hbcrpt128.obj : hbcrpt128.c
 $(OBJ_DIR)\hbencode.obj  : hbencode.c
-$(OBJ_DIR)\hbdecode.c    : hbdecode.prg
-$(OBJ_DIR)\hbdecode.obj  : $(OBJ_DIR)\hbdecode.c
+$(OBJ_DIR)\hbdecode.obj  : hbdecode.c
 
 .c.obj:
   bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
   tlib $(LIB_DIR)\hbcc.lib -+$@,,
-
-.prg.c:
-  $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@

@@ -72,15 +72,13 @@ HB_YYDECODE(xx_string) -> string
       decoded string
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 static BYTE *yy_tomask=(BYTE*) "\t\n\r.=\0";
 static ULONG yy_len=128;
 
 static ULONG str2yye(BYTE *,ULONG,BYTE *);
 static ULONG yye2str(BYTE *,ULONG,BYTE *);
-extern BOOL hbcc_file_read ( FILE *, char * );
 
 HB_FUNC( YYDECODE_FILE )
 {
@@ -170,7 +168,7 @@ HB_FUNC( YYDECODE_FILE )
          return;
       }
 
-      inFile = fopen( szFileName, "rb" );
+      inFile = hb_fopen( szFileName, "rb" );
 
       if ( !inFile )
       {
@@ -209,7 +207,7 @@ HB_FUNC( YYDECODE_FILE )
                  {
                     if ( strstr ( string ,"=ybegin" ) != NULL )
                     {
-                       outFile = fopen( poutFile->item.asString.value, "wb" );
+                       outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
                        if ( !outFile )
                        {
@@ -237,7 +235,7 @@ HB_FUNC( YYDECODE_FILE )
 
                        if( szFile )
                        {
-                          outFile = fopen( szFile, "wb" );
+                          outFile = hb_fopen( szFile, "wb" );
 
                           if ( outFile )
                           {

@@ -90,8 +90,7 @@ HB_QPDECODE(qp_string) -> string
       decoded string
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 #define CHR_ENC_UE  '%'
 #define CHR_ENC_QP  '='

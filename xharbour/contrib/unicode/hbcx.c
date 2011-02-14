@@ -83,9 +83,7 @@ XXDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
 */
-#include "hbapi.h"
-#include "hbapiitm.h"
-#include "hbapifs.h"
+#include "hbcc.h"
 #define UU_STR_LEN 60
 #define UE_STR_LEN 45
 
@@ -95,8 +93,6 @@ static ULONG int_xxenc(BYTE *,ULONG,BYTE *);
 static ULONG int_xxdec(BYTE *,ULONG,BYTE *);
 static BYTE int_xxbyte(BYTE);
 static BYTE int_xxbval(BYTE);
-extern BYTE *hbcc_getfilename ( BYTE *strFullPath );
-extern BOOL hbcc_file_read ( FILE *, char * );
 
 HB_FUNC( XXDECODE_FILE )
 {
@@ -186,7 +182,7 @@ HB_FUNC( XXDECODE_FILE )
          return;
       }
 
-      inFile = fopen( szFileName, "rb" );
+      inFile = hb_fopen( szFileName, "rb" );
 
       if ( !inFile )
       {
@@ -212,7 +208,7 @@ HB_FUNC( XXDECODE_FILE )
                {
                   if ( strstr ( string ,"begin 6" ) != NULL )
                   {
-                     outFile = fopen( poutFile->item.asString.value, "wb" );
+                     outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
                      if ( !outFile )
                      {
@@ -236,7 +232,7 @@ HB_FUNC( XXDECODE_FILE )
 
                      if( szFile )
                      {
-                        outFile = fopen( szFile, "wb" );
+                        outFile = hb_fopen( szFile, "wb" );
 
                         if ( outFile )
                         {
@@ -314,7 +310,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
       return;
    }
 
-   infile = fopen( pInFile->item.asString.value, "rb" );
+   infile = hb_fopen( pInFile->item.asString.value, "rb" );
 
    if ( !infile )
    {
@@ -361,7 +357,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
 
    hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
 
-   OutFile = fopen( szDestFile, "wb" );
+   OutFile = hb_fopen( szDestFile, "wb" );
 
    if ( !OutFile )
    {
@@ -391,7 +387,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
             ulDecoded = 0;
             fclose( OutFile );
             hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
-            OutFile = fopen( szDestFile, "wb" );
+            OutFile = hb_fopen( szDestFile, "wb" );
             if ( (nSize-i) > UE_STR_LEN )
             {
                putc(int_xxbyte(UE_STR_LEN),OutFile);
@@ -487,7 +483,7 @@ HB_FUNC ( XXENCODE_FILE )
       return;
    }
 
-   infile = fopen( pInFile->item.asString.value, "rb" );
+   infile = hb_fopen( pInFile->item.asString.value, "rb" );
 
    if ( !infile )
    {
@@ -506,14 +502,14 @@ HB_FUNC ( XXENCODE_FILE )
          hb_retni( -2 );
          return;
       }
-      OutFile = fopen( pOutFile->item.asString.value, "wb" );
+      OutFile = hb_fopen( pOutFile->item.asString.value, "wb" );
    }
    else
    {
       pFileName = hb_fsFNameSplit(pInFile->item.asString.value);
       pFileName->szExtension = ".yye";
       hb_fsFNameMerge( szDestFile, pFileName );
-      OutFile = fopen( szDestFile, "wb" );
+      OutFile = hb_fopen( szDestFile, "wb" );
    }
 
    if ( !OutFile )

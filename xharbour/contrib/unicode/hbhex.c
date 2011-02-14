@@ -70,8 +70,7 @@ HB_HXTONL(c) -> n
       numeric value (0-4294967295)
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 HB_FUNC(HB_NLTOHX)
 {

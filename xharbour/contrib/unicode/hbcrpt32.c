@@ -72,15 +72,13 @@ HB_DECRYPT32(enc_string,pass) -> string
       Decrypted string
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 static BYTE tbl[64];
 
 static void int_encrypt(BYTE *,ULONG);
 static void int_decrypt(BYTE *,ULONG);
 static void int_cryptbl(BYTE *,ULONG);
-ULONG hbcc_crc32(BYTE *,ULONG,ULONG);
 
 HB_FUNC(HB_ENCRYPT32) //(cStr)->cEnc
 {

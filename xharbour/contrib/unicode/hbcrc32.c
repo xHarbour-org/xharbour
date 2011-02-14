@@ -74,8 +74,7 @@ HB_NCRC32(string,intermed32) -> nCrc32
       nCrc32 as an integer (0-4294967295)
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 #define CRC32INIT      (0xFFFFFFFFL)
 

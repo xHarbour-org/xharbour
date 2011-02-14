@@ -75,8 +75,7 @@ HB_NCRC16(string,intermed16) -> nCrc16
 
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 #define CRC16INIT (0xFFFF)
 

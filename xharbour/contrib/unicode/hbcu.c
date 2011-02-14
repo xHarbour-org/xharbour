@@ -84,8 +84,7 @@ UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       Upon succesful decoding the function returns numnber of bytes written
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 #define UU_STR_LEN 60
 #define UE_STR_LEN 45
 
@@ -95,7 +94,6 @@ static ULONG int_uuenc(BYTE *,ULONG,BYTE *);
 static ULONG int_uudec(BYTE *,ULONG,BYTE *);
 static BYTE int_uubyte(BYTE);
 static BYTE int_uubval(BYTE);
-extern BOOL hbcc_file_read ( FILE *, char * );
 
 HB_FUNC( UUDECODE_FILE )
 {
@@ -185,7 +183,7 @@ HB_FUNC( UUDECODE_FILE )
          return;
       }
 
-      inFile = fopen( szFileName, "rb" );
+      inFile = hb_fopen( szFileName, "rb" );
 
       if ( !inFile )
       {
@@ -206,7 +204,7 @@ HB_FUNC( UUDECODE_FILE )
                {
                   if ( strstr ( string ,"begin 6" ) != NULL )
                   {
-                     outFile = fopen( poutFile->item.asString.value, "wb" );
+                     outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
                      if ( !outFile )
                      {
@@ -227,7 +225,7 @@ HB_FUNC( UUDECODE_FILE )
 
                      if( szFile )
                      {
-                        outFile = fopen( szFile, "wb" );
+                        outFile = hb_fopen( szFile, "wb" );
 
                         if ( outFile )
                         {

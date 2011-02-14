@@ -82,12 +82,10 @@ DECRYPT128(enc_string) -> string
      decrypted string
 */
 
-#include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbcc.h"
 
 static void int_encrypt(BYTE *,ULONG);
 static void int_decrypt(BYTE *,ULONG);
-ULONG hbcc_crc32(BYTE *,ULONG,ULONG);
 
 static ULONG tbl[512];
 // static ULONG tmpKey[4];

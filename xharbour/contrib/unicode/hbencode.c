@@ -147,9 +147,7 @@ YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>], [<nCharPerL
         Feel free to change them if so needed
 */
 
-#include "hbapi.h"
-#include "hbapifs.h"
-#include "hbapierr.h"
+#include "hbcc.h"
 
 static char basis_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static int crc_val;
@@ -328,34 +326,6 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
 }
 
 //----------------------------------------------------------------------------//
-BYTE *hbcc_getfilename ( BYTE *strFullPath )
-{
-   USHORT iLen;
-   BYTE *strTmp;
-
-   iLen = strlen ( (char*) strFullPath);
-   strTmp = (strFullPath + iLen);
-
-   while ( TRUE )
-   {
-     if (*strTmp == '\\' || !iLen)
-     {
-        break;
-     }
-
-     strTmp--;
-     iLen--;
-   }
-
-   if (*strTmp == '\\' )
-   {
-      strTmp++;
-   }
-
-   return ( (BYTE*) strTmp ) ;
-}
-
-//----------------------------------------------------------------------------//
 static void output64chunk( int c1, int c2, int c3, int pads, FILE *outfile)
 {
     putc(basis_64[c1>>2], outfile);
@@ -401,14 +371,14 @@ static int b64encode_file( BYTE *strIn, BYTE *strOut )
    FILE *infile, *outfile;
    int c1, c2, c3, ct = 0;
 
-   infile = fopen( (char*) strIn, "rb");
+   infile = hb_fopen( (const char*) strIn, "rb");
 
    if ( !infile )
    {
       return -1;
    }
 
-   outfile = fopen ( (char*) strOut, "wb");
+   outfile = hb_fopen ( (const char*) strOut, "wb");
 
    if ( !outfile )
    {
@@ -476,14 +446,14 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
 
    hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
 
-   infile = fopen( (char*) strIn, "rb");
+   infile = hb_fopen( (const char*) strIn, "rb");
 
    if ( !infile )
    {
       return -1;
    }
 
-   outfile = fopen ( (char*) cfile, "wb");
+   outfile = hb_fopen ( (const char*) cfile, "wb");
 
    if ( !outfile )
    {
@@ -532,7 +502,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
             filenumber ++;
             *cfile = '\0';
             hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
-            outfile = fopen ( cfile, "wb");
+            outfile = hb_fopen ( (const char*) cfile, "wb");
 
             if ( !outfile )
             {
@@ -582,14 +552,14 @@ static int uuencode_file ( BYTE *strIn, BYTE *strOut )
    USHORT iCnt, iLineLen;
    FILE *fpin, *fpOutFile;
 
-   fpin = fopen( (char*) strIn, "rb" );
+   fpin = hb_fopen( (const char*) strIn, "rb" );
 
    if (!fpin)
    {
       return -1;
    }
 
-   fpOutFile = fopen ( (char*) strOut, "wb" );
+   fpOutFile = hb_fopen ( (const char*) strOut, "wb" );
 
    if (!fpOutFile)
    {
@@ -640,7 +610,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
       return -3;
    }
 
-   fpin = fopen ( (char*) strIn, "rb" );
+   fpin = hb_fopen ( (const char*) strIn, "rb" );
 
    if ( !fpin )
    {
@@ -649,7 +619,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
    hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
-   fpOutFile = fopen ( cfile, "wb" );
+   fpOutFile = hb_fopen ( (const char*) cfile, "wb" );
 
    if ( !fpOutFile )
    {
@@ -684,7 +654,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
         hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
-        fpOutFile = fopen ( cfile, "wb");
+        fpOutFile = hb_fopen ( (const char*) cfile, "wb");
 
         if ( !fpOutFile )
         {
@@ -731,7 +701,7 @@ HB_FUNC( UUENCODE_FILE )
    }
    else
    {
-      strcpy( szUUEFileName, pOut->item.asString.value );
+      hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
    hb_retni( uuencode_file( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName ) );
@@ -777,7 +747,7 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
    }
    else
    {
-      strcpy( szUUEFileName, pOut->item.asString.value );
+      hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
    hb_retni( uuencode_file_by_chunk( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName , ulLine ) );
@@ -809,7 +779,7 @@ HB_FUNC( B64ENCODE_FILE )
    }
    else
    {
-      strcpy( szUUEFileName, pOut->item.asString.value );
+      hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
    hb_retni( b64encode_file( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName ) );
@@ -855,7 +825,7 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
    }
    else
    {
-      strcpy( szUUEFileName, pOut->item.asString.value );
+      hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
    hb_retni( b64encode_file_by_chunk ( (BYTE *) pIn->item.asString.value, (BYTE *) szUUEFileName, ulLine ) );
@@ -871,7 +841,7 @@ HB_FUNC( YYENCODE_FILE )
 {
    FILE * fDes;
    FILE * fSrc;
-   LONG filelen;
+   ULONG filelen;
    PHB_FNAME pFileName;
    PHB_ITEM pIn  = hb_param(1,HB_IT_STRING);
    PHB_ITEM pOut = hb_param(2,HB_IT_STRING);
@@ -887,7 +857,7 @@ HB_FUNC( YYENCODE_FILE )
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
    hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = hb_fsFSize( pIn->item.asString.value, TRUE );
+   filelen = (ULONG) hb_fsFSize( (const char *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {
@@ -896,10 +866,10 @@ HB_FUNC( YYENCODE_FILE )
    }
    else
    {
-      strcpy( szYYEFileName, pOut->item.asString.value );
+      hb_xstrcpy( szYYEFileName, pOut->item.asString.value, 0 );
    }
 
-   fSrc = fopen( pIn->item.asString.value, "rb" );
+   fSrc = hb_fopen( (const char*) pIn->item.asString.value, "rb" );
 
    if ( !fSrc )
    {
@@ -907,7 +877,7 @@ HB_FUNC( YYENCODE_FILE )
       return;
    }
 
-   fDes = fopen( szYYEFileName, "wb" );
+   fDes = hb_fopen( (const char*) szYYEFileName, "wb" );
 
    if ( !fDes )
    {
@@ -943,9 +913,9 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 {
    FILE * fDes;
    FILE * fSrc;
-   LONG filelen;
-   LONG nBytes = 0;
-   LONG nTotalEncoded = 0;
+   ULONG filelen;
+   ULONG nBytes = 0;
+   ULONG nTotalEncoded = 0;
    PHB_FNAME pFileName;
    PHB_ITEM pIn   = hb_param(1,HB_IT_STRING);
    PHB_ITEM pLine = hb_param(2,HB_IT_NUMERIC);
@@ -978,8 +948,8 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s", pFileName->szName, pFileName->szExtension );
-   filelen = hb_fsFSize( pIn->item.asString.value, TRUE );
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
+   filelen = (ULONG) hb_fsFSize( (const char *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {
@@ -990,7 +960,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       cMask = pOut->item.asString.value;
    }
 
-   fSrc = fopen( pIn->item.asString.value, "rb" );
+   fSrc = hb_fopen( (const char*) pIn->item.asString.value, "rb" );
 
    if ( !fSrc )
    {
@@ -1033,7 +1003,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       if ( nBytes )
       {
          hb_snprintf( szYYEFileName, sizeof( szYYEFileName ), "%s%02d%s", cMask, iPart, ".yye" );
-         fDes = fopen( szYYEFileName, "wb");
+         fDes = hb_fopen( (const char*) szYYEFileName, "wb");
 
          if ( fDes )
          {
