@@ -54,27 +54,18 @@
 
 FUNCTION FIELDBLOCK( cFieldName )
 
-   LOCAL bField
+   IF ISCHARACTER( cFieldName )
+      RETURN {| x | iif( x == NIL, FieldGet( FieldPos( cFieldName ) ),;
+                                   FieldPut( FieldPos( cFieldName ), x ) ) }
+   ENDIF
 
-   TRY
-      bField := &( "{|x| IIF( x == NIL, FIELD->" + cFieldName + ", " + ;
-                                       "FIELD->" + cFieldName + " := x ) }" )
-   CATCH
-   END
-
-   RETURN bField
+   RETURN NIL
 
 FUNCTION FIELDWBLOCK( cFieldName, nWorkArea )
 
-   LOCAL bField, cAlias
+   IF ISCHARACTER( cFieldName ) .AND. ISNUMBER( nWorkArea )
+      RETURN {| x | iif( x == NIL, ( nWorkArea )->( FieldGet( FieldPos( cFieldName ) ) ),;
+                                   ( nWorkArea )->( FieldPut( FieldPos( cFieldName ), x ) ) ) }
+   ENDIF
 
-   TRY
-      IF Int( nWorkArea ) != 0
-         cAlias := "(" + HB_NToS( Int( nWorkArea ) ) + ")->"
-         bField := &( "{|x| IIF( x == NIL, " + cAlias + cFieldName + ", " + ;
-                                             + cAlias + cFieldName + " := x ) }" )
-      ENDIF
-   CATCH
-   END
-
-   RETURN bField
+   RETURN NIL

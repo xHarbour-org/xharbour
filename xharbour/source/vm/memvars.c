@@ -1940,7 +1940,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
          }
          else if( HB_IS_DATETIME( pItem ) )
          {
-            BYTE *byNum = (BYTE *) hb_xgrab( sizeof( double ) );
+            BYTE byNum[ sizeof( double ) ];
 
             buffer[ uMemLen + 1 ] = 'T' + 128;
             buffer[ uMemLen + 6 ] = 1;
@@ -1950,11 +1950,10 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
-	    hb_xfree( byNum );
          }
          else if( HB_IS_DATE( pItem ) )
          {
-            BYTE *byNum = (BYTE *) hb_xgrab( sizeof( double ) );
+            BYTE byNum[ sizeof( double ) ];
 
             buffer[ uMemLen + 1 ] = 'D' + 128;
             buffer[ uMemLen + 6 ] = 1;
@@ -1964,11 +1963,10 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
-	    hb_xfree( byNum );
          }
          else if( HB_IS_NUMERIC( pItem ) )
          {
-            BYTE *byNum = (BYTE *) hb_xgrab( sizeof( double ) );
+            BYTE byNum[ sizeof( double ) ];
             int iWidth;
             int iDec;
 
@@ -1988,7 +1986,6 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
-	    hb_xfree( byNum );
          }
          else if( HB_IS_LOGICAL( pItem ) )
          {
@@ -2212,7 +2209,7 @@ HB_FUNC( __MVRESTORE )
 
                case 'N':
                {
-                  BYTE *pbyNumber = (BYTE *) hb_xgrab( HB_MEM_NUM_LEN );
+                  BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
@@ -2222,13 +2219,13 @@ HB_FUNC( __MVRESTORE )
                   {
                      hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
                   }
-		  hb_xfree( pbyNumber );
+
                   break;
                }
 
                case 'D':
                {
-                  BYTE *pbyNumber = (BYTE *) hb_xgrab( HB_MEM_NUM_LEN );
+                  BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
@@ -2239,13 +2236,12 @@ HB_FUNC( __MVRESTORE )
                      hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
                   }
 
-		  hb_xfree( pbyNumber );
                   break;
                }
 
                case 'T':
                {
-                  BYTE *pbyNumber = (BYTE *) hb_xgrab( HB_MEM_NUM_LEN );
+                  BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
@@ -2256,7 +2252,6 @@ HB_FUNC( __MVRESTORE )
                      hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
                   }
 
-                  hb_xfree( pbyNumber );
                   break;
                }
 
