@@ -501,26 +501,27 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
          szFrom = strchr( szLine, ' ' );
          if( szFrom )
          {
-	    BOOL bDot = FALSE;
-
             while( *szFrom == ' ' )
                ++szFrom;
             iLen = 0;
             while( !HB_ISSPACE( szFrom[ iLen ] ) )
 	    {
-	       if ( szFrom[ iLen ] == '.' )
-	       {
-	          bDot = TRUE;
-                  ++iLen;
-		  continue;
-	       }
-	       if ( bDot )
-	          _szId[ u++ ] = szFrom[ iLen ];
+	       _szId[ u++ ] = szFrom[ iLen ];
                ++iLen;
 	    }
+	    /*
+	       Latest CVS version before migration to SVN:
+               ChangeLog,v 1.6768 2011/01/25 18:50:35 guerra000
+	    */
             if( iLen )
 	    {
+#if 0
+	       int iCurrentVersion = atoi( _szId ) + 6768;
+               sprintf( _szId, "%i", iCurrentVersion );
+               hb_strncpy( piSVNID, _szId, strlen( _szId ) );
+#else
                hb_strncpy( piSVNID, _szId, u );
+#endif
 	    }
             else
                _szId[0] = 0;
