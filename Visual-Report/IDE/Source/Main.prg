@@ -512,9 +512,22 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD PageSetup() CLASS Report
    LOCAL oPs := PageSetup( oApp:MainForm )
-   oPs:Orientation := ::VrReport:Orientation
+   oPs:Orientation  := ::VrReport:Orientation
+   oPs:PaperSize    := ::VrReport:PaperSize
+
+   oPs:LeftMargin   := ::VrReport:LeftMargin  
+   oPs:TopMargin    := ::VrReport:TopMargin   
+   oPs:RightMargin  := ::VrReport:RightMargin 
+   oPs:BottomMargin := ::VrReport:BottomMargin
+
    oPs:Show()
-   ::VrReport:Orientation := oPs:Orientation
+   ::VrReport:Orientation  := oPs:Orientation
+   ::VrReport:PaperSize    := oPs:PaperSize
+
+   ::VrReport:LeftMargin   := oPs:LeftMargin
+   ::VrReport:TopMargin    := oPs:TopMargin
+   ::VrReport:RightMargin  := oPs:RightMargin
+   ::VrReport:BottomMargin := oPs:BottomMargin
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -650,6 +663,17 @@ METHOD Save( lSaveAs ) CLASS Report
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:Height ) )
          oXmlProp:addBelow( oXmlSource )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "Orientation", NIL, XSTR( ::VrReport:Orientation ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PaperSize", NIL, XSTR( ::VrReport:PaperSize ) )
+         oXmlProp:addBelow( oXmlSource )
+
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "LeftMargin", NIL, XSTR( ::VrReport:LeftMargin ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "TopMargin", NIL, XSTR( ::VrReport:TopMargin ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RightMargin", NIL, XSTR( ::VrReport:RightMargin ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "BottomMargin", NIL, XSTR( ::VrReport:BottomMargin ) )
          oXmlProp:addBelow( oXmlSource )
       oXmlReport:addBelow( oXmlProp )
 

@@ -33,7 +33,13 @@ CLASS VrReport INHERIT VrObject
    
    DATA FileName       EXPORTED  INIT "Preview"
    DATA Orientation    EXPORTED
-   DATA PaperSize      EXPORTED  INIT 1
+   DATA PaperSize      EXPORTED  INIT DMPAPER_LETTER
+   
+   DATA LeftMargin     EXPORTED  INIT 1000
+   DATA TopMargin      EXPORTED  INIT 1000
+   DATA RightMargin    EXPORTED  INIT 1000
+   DATA BottomMargin   EXPORTED  INIT 1000
+   
    DATA oPDF           EXPORTED
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
    DATA nPage          EXPORTED  INIT 0
@@ -96,6 +102,7 @@ METHOD Create() CLASS VrReport
 
    ::nPage := 0
    ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
+   ::oPDF:ShowMargins := .T.
 
    FERASE( GetTempPath() + "\vr.tmp" )
    ::oPDF:StartSave( GetTempPath() + "\vr.tmp", acFileSaveView )
@@ -115,6 +122,11 @@ METHOD StartPage() CLASS VrReport
    ::nPage++
    ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "PaperSize", ::PaperSize )
    ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "Landscape", ::Orientation == __GetSystem():PageSetup:Landscape )
+
+//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "LeftMargin",   Int( (::LeftMargin/1000) * PIX_PER_INCH ) )
+//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "TopMargin",    Int( (::TopMargin/1000) * PIX_PER_INCH ) )
+//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "RightMargin",  Int( (::RightMargin/1000) * PIX_PER_INCH ) )
+//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "BottomMargin", Int( (::BottomMargin/1000) * PIX_PER_INCH ) )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -268,6 +280,15 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    ::Application:Props[ "Body" ]:Dockit()
    TRY
       ::Orientation  := VAL( ::aProps:Orientation )
+   CATCH
+   END
+   TRY
+      ::PaperSize   := VAL( ::aProps:PaperSize )
+
+      ::LeftMargin  := VAL( ::aProps:LeftMargin )
+      ::TopMargin   := VAL( ::aProps:TopMargin )
+      ::RightMargin := VAL( ::aProps:RightMargin )
+      ::BottomMargin:= VAL( ::aProps:BottomMargin )
    CATCH
    END
    ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
