@@ -199,6 +199,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[6][2], { "SaveFileDialog", .T. } )
    AADD( ::aButtons[6][2], { "PrintDialog", .T. } )
    AADD( ::aButtons[6][2], { "FontDialog", .T. } )
+   AADD( ::aButtons[6][2], { "PageSetup", .T. } )
 
    //COM
    FOR n := 1 TO LEN( ::ComObjects )
@@ -638,7 +639,8 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN SaveFileDialog
    EXTERN PrintDialog
    EXTERN FontDialog
-
+   EXTERN PageSetup
+   
    LOCAL hPointer, aPt, oControl, oErr, oBand, oCoolMenu, n, aCtrl, cCC, hFile, nLine, aChildren, cLine, cFile, aErrors, aEditors
    IF EMPTY( cName )
       RETURN .F.

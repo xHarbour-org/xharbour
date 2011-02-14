@@ -7722,7 +7722,7 @@ HB_FUNC( PAGESETUPDLG )
    if( pStructure && HB_IS_OBJECT( pStructure ) )
    {
       HGLOBAL hDevMode;
-      DEVMODE * pDevMode;
+      DEVMODE *pDevMode;
       PAGESETUPDLG *pPd;
 
       hb_vmPushSymbol( pVALUE->pSymbol );
@@ -7737,22 +7737,25 @@ HB_FUNC( PAGESETUPDLG )
          pDevMode = (DEVMODE *) GlobalLock(hDevMode);
          if ( pDevMode ) {
             pDevMode->dmSize = sizeof(DEVMODE);
-            pDevMode->dmFields = DM_ORIENTATION;
+            pDevMode->dmFields = DM_ORIENTATION | DM_PAPERSIZE;
             pDevMode->dmOrientation = hb_parnl(2); //DMORIENT_LANDSCAPE;
+            pDevMode->dmPaperSize = hb_parnl(3);   //DMPAPER_LETTER;
          }
-         GlobalUnlock(hDevMode); // unlock the memory for other functions to use this
+         GlobalUnlock(hDevMode);
          pPd->hDevMode = hDevMode;
       }
 
       if( PageSetupDlg( pPd ) )
       {
-         DEVMODE *pDevMode = (DEVMODE*) GlobalLock( pPd->hDevMode );
-         hb_stornl( (ULONG) pDevMode->dmOrientation, 2 );
-         GlobalUnlock( pPd->hDevMode );
-         
          hb_vmPushSymbol( pDEVALUE->pSymbol );
          hb_vmPush( pStructure );
          hb_vmSend(0);
+
+         pDevMode = (DEVMODE*) GlobalLock( pPd->hDevMode );
+         hb_stornl( (ULONG) pDevMode->dmOrientation, 2 );
+         hb_stornl( (ULONG) pDevMode->dmPaperSize, 3 );
+         GlobalUnlock( pPd->hDevMode );
+         
          hb_retl( TRUE );
       }
       else

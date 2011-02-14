@@ -3699,6 +3699,7 @@ STATIC FUNCTION GetPropArray()
                     { "ShowSelectionBorder",     "Appearance", },;
                     { "Striping",                "Appearance", },;
                     { "TabStripStyle",           "Appearance", },;
+                    { "PaperSize",               "Appearance", },;
                     { "AllowCurrentPage",        "Behavior", },;
                     { "AllowPrintFile",          "Behavior", },;
                     { "AllowSelection",          "Behavior", },;
