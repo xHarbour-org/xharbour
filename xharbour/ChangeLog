@@ -16,6 +16,19 @@
     * Removed file pcre_ucp_searchfuncs.c .
   * source/rtl/tbrowse.prg
 
+2011-02-14 19:27 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_hp.sh
+  * xharbour/contrib/freeimage/tests/bldtest.sh
+  * xharbour/contrib/hbmzip/make_gcc.sh
+  * xharbour/contrib/gd/tests/bldtest.sh
+  * xharbour/contrib/gd/samples/counter/bldtest.sh
+  * xharbour/make_mingw.sh
+  * xharbour/make_macosx.sh
+  * xharbour/bin/xprompt.sh
+  * xharbour/make_deb5.sh
+  * xharbour/make_gnu.sh
+    + added missing svn:executable attribute
+
 2011-02-14 19:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/debian/rules
   * xharbour/make_b32.bat
