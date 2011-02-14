@@ -48,16 +48,16 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
    IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
+   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2
    GOTO READY
- 
+
 :SET_BISON1
    SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
    GOTO READY
 
 :SET_BISON2
    SET BISON_DIR=\GnuWin32\Bin
-   GOTO READY 
+   GOTO READY
 
 :READY
 
@@ -98,8 +98,8 @@ rem=============================================================================
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   make -s -l -fmakefile.bc >make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   make -s -l -fwinmake\makefile.bc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -108,15 +108,15 @@ rem=============================================================================
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   @CALL MDIR.BAT
-   make -s -l -DHB_THREAD_SUPPORT -fmakefile.bc >>make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
 rem=============================================================================
 :BUILD_OK
 rem=============================================================================
-   @CALL mdir.bat copytobin
+   @CALL winmake\mdir.bat copytobin
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    if "%MAKEALL%"=="" goto EXIT
    if "%1"=="CORE" @ECHO ****** End of Job *****
@@ -140,15 +140,15 @@ rem=============================================================================
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
-   @CALL mdir.bat dllcreate
-   make -s -l -fmakefile.bc >dll_%SUB_DIR%.log
+   @CALL winmake\mdir.bat dllcreate
+   make -s -l -fwinmake\makefile.bc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
 :DLL_OK
 rem=============================================================================
-   @CALL mdir.bat dllcopy
+   @CALL winmake\mdir.bat dllcopy
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    IF "%MAKEALL%"=="" goto EXIT
    IF "%1"=="DLL" @ECHO ****** End of Job *****
@@ -169,19 +169,19 @@ rem=============================================================================
    SET __BLD__=CONTRIB_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   make -s -l -fmakefile.bc >cont_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   make -s -l -fwinmake\makefile.bc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=\mt
-   REM make -s -l -DHB_THREAD_SUPPORT -fmakefile.bc >>cont_%SUB_DIR%.log
+   REM make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
 rem=============================================================================
-   @CALL mdir.bat copycontrib
+   @CALL winmake\mdir.bat copycontrib
    @ECHO ****** End of Job *****
    goto EXIT
 
@@ -204,13 +204,13 @@ rem=============================================================================
    ECHO. ------------------------------
    ECHO. Make Utility for Borland C/C++
    ECHO. ------------------------------
-   @CALL mdir.bat howto
+   @CALL winmake\mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
-   @CALL mdir.bat clean
+   @CALL winmake\mdir.bat clean
    IF EXIST "%HB_DIR_ADS%\ace32.dll" implib -c lib\b32\ace32.lib "%HB_DIR_ADS%\ace32.dll"
    IF EXIST lib\b32\ace32.lib copy lib\b32\ace32.lib lib
    IF "%2"=="BUILD" goto BUILD_ALL
@@ -221,4 +221,4 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   @CALL mdir.bat resetenvar
+   @CALL winmake\mdir.bat resetenvar

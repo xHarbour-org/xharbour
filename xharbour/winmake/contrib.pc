@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: contrib.pc,v 1.5 2009/08/10 18:41:05 lculik Exp $
+# $Id: contrib.pc 79 2011-02-13 08:55:39Z andijahja $
 #
 # MAKEFILE FOR PELLESC (CONTRIBS)
 #
@@ -41,7 +41,7 @@ LIB_CMD     =POLIB /OUT:$@ $**
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
@@ -152,5 +152,5 @@ $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-!include compile.mak
+!include winmake\compile.mak
 

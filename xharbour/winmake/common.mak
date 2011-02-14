@@ -429,6 +429,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)typefile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wait$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)win32ole$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbwinole$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)win32prn$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winreg$(OBJEXT)
@@ -1602,7 +1603,7 @@ HBCC_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbcrpt32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbdecode$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT)
 
 #===============================================================================
 # WHAT32.LIB dependencies

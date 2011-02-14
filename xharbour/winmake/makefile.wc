@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.wc,v 1.105 2011/01/22 04:05:10 andijahja Exp $
+# $Id: makefile.wc 79 2011-02-13 08:55:39Z andijahja $
 #
 # MAKEFILE FOR OPENWATCOM
 #
@@ -63,9 +63,9 @@ HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 
 LINKERFLAGS  =/nologo /subsystem:console
-CC_CMD       =WPP386 $(CLIBFLAGS) -fo$@ $**
+CC_CMD       =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD      =$(CC_CMD)
-CC_CMD_FMSTAT=WPP386 $(CLIBFLAGS) -DHB_FM_STATISTICS -fo$@ $**
+CC_CMD_FMSTAT=WCC386 $(CLIBFLAGS) -DHB_FM_STATISTICS -fo$@ $**
 LIB_CMD      =LIB386 /nologo /out:$@ $**
 LINK_CMD     =LINK386 /nologo /out:$@ $** $(LINKERFLAGS)
 
@@ -90,7 +90,7 @@ CMN_LIBS=$(COMMON_LIB)
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 
 !ifdef HB_DOC_PDF
@@ -267,7 +267,7 @@ DLL_MT=mt
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 #===============================================================================
 # RDDADS
@@ -333,7 +333,7 @@ ACEH_DIR    =-i="$(HB_DIR_ADS)"
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
-CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
+CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -388,15 +388,15 @@ HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\includ
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
 !endif
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-CC_CMD      =WPP386 $(CLIBFLAGS) -fo$@ $**
+CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
-CC_CMD_ZIP  =WPP386 $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
+CC_CMD_ZIP  =WCC386 $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
 LIB_CMD     =LIB386 /nologo /out:$@ $**
 
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
@@ -503,4 +503,4 @@ $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-!include compile.mak
+!include winmake\compile.mak

@@ -1418,6 +1418,9 @@ $(OBJ_DIR)$(DIR_SEP)win32ole.c : $(RTL_DIR)$(DIR_SEP)win32ole.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)win32ole$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)win32ole.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbwinole$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbwinole.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)win32prn.c : $(RTL_DIR)$(DIR_SEP)win32prn.prg
@@ -4178,11 +4181,8 @@ $(OBJ_DIR)$(DIR_SEP)telepath.C : $(TELEPATH_DIR)$(DIR_SEP)telepath.PRG
 #===============================================================================
 # HBCC.LIB dependencies
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)hbcc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbcc.c
+$(OBJ_DIR)$(DIR_SEP)hbcc$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcc.c
 	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbcc.c : $(HBCC_DIR)$(DIR_SEP)hbcc.prg
-	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbc7$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbc7.c
 	$(CC_CMD)
@@ -4214,11 +4214,8 @@ $(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcrpt128.c
 $(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbencode.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbdecode$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbdecode.c
+$(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcctool.c
 	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbdecode.c : $(HBCC_DIR)$(DIR_SEP)hbdecode.prg
-	$(HB_CMD)
 
 #===============================================================================
 # WHAT32.LIB dependencies

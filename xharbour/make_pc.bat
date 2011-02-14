@@ -44,7 +44,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :SET_BISON2
    SET BISON_DIR=\GnuWin32\Bin
-   GOTO READY 
+   GOTO READY
 
 :READY   
 SET _PATH=%PATH%
@@ -87,8 +87,8 @@ rem=============================================================================
    SET __MT__=
    SET HB_MT_FLAGS=
    SET PROJECT=$(ST_PROJECT)
-   @CALL MDIR.BAT
-   %__MAKE__% /F makefile.pc >make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   %__MAKE__% /F winmake\makefile.pc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -100,15 +100,15 @@ rem=============================================================================
    SET __MT__=-MT -DHB_THREAD_SUPPORT
    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
    SET PROJECT=$(MT_PROJECT)
-   @CALL MDIR.BAT
-   %__MAKE__% /F makefile.pc >>make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   %__MAKE__% /F winmake\makefile.pc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
 rem=============================================================================
 :BUILD_OK
 rem=============================================================================
-   @CALL mdir.bat copytobin
+   @CALL winmake\mdir.bat copytobin
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    if "%MAKEALL%"=="" goto EXIT
    if "%1"=="CORE" @ECHO ****** End of Job *****
@@ -134,15 +134,15 @@ rem=============================================================================
    SET __MT__=
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
-   @CALL mdir.bat dllcreate
-   %__MAKE__% /F hrbdll.pc  >dll_%SUB_DIR%.log
+   @CALL winmake\mdir.bat dllcreate
+   %__MAKE__% /F winmake\hrbdll.pc  >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
 :DLL_OK
 rem=============================================================================
-   @CALL mdir.bat dllcopy
+   @CALL winmake\mdir.bat dllcopy
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    IF "%MAKEALL%"=="" goto EXIT
    IF "%1"=="DLL" @ECHO ****** End of Job *****
@@ -165,15 +165,15 @@ rem=============================================================================
    SET __MT__=
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   %__MAKE__% /F contrib.pc  >cont_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   %__MAKE__% /F winmake\contrib.pc  >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
    goto CONTRIBS_OK
 
 rem=============================================================================
 :CONTRIBS_OK
 rem=============================================================================
-   @CALL mdir.bat copycontrib
+   @CALL winmake\mdir.bat copycontrib
    @ECHO ****** End of Job *****
    goto EXIT
 
@@ -196,13 +196,13 @@ rem=============================================================================
    ECHO. ------------------------
    ECHO. Make Utility for PellesC
    ECHO. ------------------------
-   @CALL mdir.bat howto
+   @CALL winmake\mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
-   @CALL mdir.bat clean
+   @CALL winmake\mdir.bat clean
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****
@@ -215,4 +215,4 @@ rem=============================================================================
    SET PROJECT=
    SET HB_MT=
    SET __MT__=
-   @CALL mdir.bat resetenvar
+   @CALL winmake\mdir.bat resetenvar

@@ -53,8 +53,8 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   mingw32-make.exe -fmakefile.gc 1>make0_%SUB_DIR%.log 2>make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   mingw32-make.exe -f winmake\makefile.gc 1>make0_%SUB_DIR%.log 2>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -64,15 +64,15 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=/mt
-   @CALL MDIR.BAT
-   mingw32-make.exe -f makefile.gc 1>>make0_%SUB_DIR%.log 2>>make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   mingw32-make.exe -f winmake\ makefile.gc 1>>make0_%SUB_DIR%.log 2>>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
 rem=============================================================================
 :BUILD_OK
 rem=============================================================================
-   @CALL mdir.bat copytobin
+   @CALL winmake\mdir.bat copytobin
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    if "%MAKEALL%"=="" goto EXIT
    if "%1"=="CORE" @ECHO ****** End of Job *****
@@ -97,15 +97,15 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=/dll
-   @CALL mdir.bat dllcreate
-   mingw32-make.exe -fmakefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
+   @CALL winmake\mdir.bat dllcreate
+   mingw32-make.exe -f winmake\makefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto DLL_OK
 
 rem=============================================================================
 :DLL_OK
 rem=============================================================================
-   @CALL mdir.bat dllcopy
+   @CALL winmake\mdir.bat dllcopy
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    IF "%MAKEALL%"=="" goto EXIT
    IF "%1"=="DLL" @ECHO ****** End of Job *****
@@ -127,20 +127,20 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   mingw32-make.exe -fmakefile.gc  1>cont0_%SUB_DIR%.log 2>cont_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   mingw32-make.exe -f winmake\makefile.gc  1>cont0_%SUB_DIR%.log 2>cont_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
 
    REM SET HB_THREAD_SUPPORT=1
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=/mt
-   REM mingw32-make.exe -f makefile.gc  1>>cont0_%SUB_DIR%.log 2>>cont_%SUB_DIR%.log
+   REM mingw32-make.exe -f winmake\ makefile.gc  1>>cont0_%SUB_DIR%.log 2>>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto BUILD_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
 rem=============================================================================
-   @CALL mdir.bat copycontrib
+   @CALL winmake\mdir.bat copycontrib
    @ECHO ****** End of Job *****
    goto EXIT
 
@@ -163,13 +163,13 @@ rem=============================================================================
    ECHO. ------------------------
    ECHO. Make Utility for MinGW32
    ECHO. ------------------------
-   @CALL mdir.bat howto
+   @CALL winmake\mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
-   @CALL mdir.bat clean
+   @CALL winmake\mdir.bat clean
    IF EXIST make0_%SUB_DIR%.log	DEL make0_%SUB_DIR%.log
    IF EXIST cont0_%SUB_DIR%.log	DEL cont0_%SUB_DIR%.log
    IF EXIST dll0_%SUB_DIR%.log	DEL dll0_%SUB_DIR%.log
@@ -181,4 +181,4 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   @CALL mdir.bat resetenvar
+   @CALL winmake\mdir.bat resetenvar

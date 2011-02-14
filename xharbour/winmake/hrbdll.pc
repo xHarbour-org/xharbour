@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: hrbdll.pc,v 1.61 2011/01/22 04:05:10 andijahja Exp $
+# $Id: hrbdll.pc 79 2011-02-13 08:55:39Z andijahja $
 #
 # DLL MAKEFILE FOR PELLESC
 #
@@ -15,7 +15,7 @@
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -83,4 +83,4 @@ ALL: $(DLL_PROJECT)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 
-!include compile.mak
+!include winmake\compile.mak

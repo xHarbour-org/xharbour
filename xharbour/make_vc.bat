@@ -110,8 +110,8 @@ rem=============================================================================
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   nmake /NOLOGO -fmakefile.vc >make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   nmake /NOLOGO -f winmake\makefile.vc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -120,15 +120,15 @@ rem=============================================================================
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   @CALL MDIR.BAT
-   nmake /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc >>make_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   nmake /NOLOGO HB_THREAD_SUPPORT=1 -f winmake\makefile.vc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
 rem=============================================================================
 :BUILD_OK
 rem=============================================================================
-   @CALL mdir.bat copytobin
+   @CALL winmake\mdir.bat copytobin
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    if "%MAKEALL%"=="" goto EXIT
    if "%1"=="CORE" @ECHO ****** End of Job *****
@@ -152,15 +152,15 @@ rem=============================================================================
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
-   @CALL mdir.bat dllcreate
-   nmake /NOLOGO -f makefile.vc >dll_%SUB_DIR%.log
+   @CALL winmake\mdir.bat dllcreate
+   nmake /NOLOGO -f winmake\makefile.vc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
 :DLL_OK
 rem=============================================================================
-   @CALL mdir.bat dllcopy
+   @CALL winmake\mdir.bat dllcopy
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    IF "%MAKEALL%"=="" goto EXIT
    IF "%1"=="DLL" @ECHO ****** End of Job *****
@@ -181,19 +181,19 @@ rem=============================================================================
    SET __BLD__=CONTRIB_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   nmake /NOLOGO -f makefile.vc >cont_%SUB_DIR%.log
+   @CALL winmake\mdir.bat
+   nmake /NOLOGO -f winmake\makefile.vc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=\mt
-   REM nmake  /NOLOGO HB_THREAD_SUPPORT=1 -fmakefile.vc >>cont_%SUB_DIR%.log
+   REM nmake  /NOLOGO HB_THREAD_SUPPORT=1 -f winmake\makefile.vc >>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
 rem=============================================================================
-   @CALL mdir.bat copycontrib
+   @CALL winmake\mdir.bat copycontrib
    @ECHO ****** End of Job *****
    goto EXIT
 
@@ -216,13 +216,13 @@ rem=============================================================================
    ECHO. ---------------------------------------
    ECHO. Make Utility for Miscosoft Visual C/C++
    ECHO. ---------------------------------------
-   @CALL mdir.bat howto
+   @CALL winmake\mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
-   @CALL mdir.bat clean
+   @CALL winmake\mdir.bat clean
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****
@@ -231,4 +231,4 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   @CALL mdir.bat resetenvar
+   @CALL winmake\mdir.bat resetenvar

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# $Id: makefile.bc,v 1.261 2011/01/22 04:05:10 andijahja Exp $
+# $Id: makefile.bc 79 2011-02-13 08:55:39Z andijahja $
 #
 # MAKEFILE FOR BORLAND C++
 #
@@ -95,7 +95,7 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 !if $d(HB_DOC_PDF)
 HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
@@ -432,7 +432,7 @@ DLL_MT=mt
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 #===============================================================================
 # RDDADS
@@ -590,7 +590,7 @@ CC_CMD_ZIP   =BCC32 -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -
 #===============================================================================
 # Macro Definitions
 #===============================================================================
-!include common.mak
+!include winmake\common.mak
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
@@ -793,4 +793,4 @@ $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-!include compile.mak
+!include winmake\compile.mak

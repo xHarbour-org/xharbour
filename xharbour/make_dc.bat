@@ -60,14 +60,14 @@ rem=============================================================================
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   @CALL MDIR.BAT
-   %MAKE_EXE% -l -fmakefile.dc
+   @CALL winmake\mdir.bat
+   %MAKE_EXE% -l -f winmake\makefile.dc
    if errorlevel 1 goto BUILD_ERR
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
-   @CALL MDIR.BAT
-   %MAKE_EXE% -l -fmakefile.dc
+   @CALL winmake\mdir.bat
+   %MAKE_EXE% -l -f winmake\makefile.dc
    if errorlevel 1 goto BUILD_ERR
 
    goto BUILD_OK
@@ -75,7 +75,7 @@ rem=============================================================================
 rem=============================================================================
 :BUILD_OK
 rem=============================================================================
-   @CALL mdir.bat copytobin
+   @CALL winmake\mdir.bat copytobin
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    if "%MAKEALL%"=="" goto EXIT
    if "%1"=="CORE" @ECHO ****** End of Job *****
@@ -99,15 +99,15 @@ rem=============================================================================
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET HB_MT_DIR=\dll
-   @CALL mdir.bat dllcreate
-   %MAKE_EXE% -fmakefile.dc
+   @CALL winmake\mdir.bat dllcreate
+   %MAKE_EXE% -f winmake\makefile.dc
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
 :DLL_OK
 rem=============================================================================
-   @CALL mdir.bat dllcopy
+   @CALL winmake\mdir.bat dllcopy
    if "%MAKEALL%"=="" @ECHO ****** End of Job *****
    IF "%MAKEALL%"=="" goto EXIT
    IF "%1"=="DLL" @ECHO ****** End of Job *****
@@ -128,14 +128,14 @@ rem=============================================================================
    SET __BLD__=CONTRIB_BLD
    SET HB_MT_DIR=
    SET HB_MT=
-   @CALL MDIR.BAT
-   %MAKE_EXE% -s -l -fmakefile.dc
+   @CALL winmake\mdir.bat
+   %MAKE_EXE% -s -l -f winmake\makefile.dc
    if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
 rem=============================================================================
-   @CALL mdir.bat copycontrib
+   @CALL winmake\mdir.bat copycontrib
    @ECHO ****** End of Job *****
    goto EXIT
 
@@ -158,13 +158,13 @@ rem=============================================================================
    ECHO. ----------------------------------
    ECHO. Make Utility for DigitalMars C/C++
    ECHO. ----------------------------------
-   @CALL mdir.bat howto
+   @CALL winmake\mdir.bat howto
    goto EXIT
 
 rem=============================================================================
 :CLEAN
 rem=============================================================================
-   @CALL mdir.bat clean
+   @CALL winmake\mdir.bat clean
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****
@@ -173,5 +173,5 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   @CALL mdir.bat resetenvar
+   @CALL winmake\mdir.bat resetenvar
    if exist *.map del *.map > NUL
