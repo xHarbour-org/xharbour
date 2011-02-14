@@ -3125,7 +3125,7 @@ Mon Jun 07 12:58:17 1999  Gonzalo A. Diethelm  <Gonzalo.Diethelm@jda.cl>
   * include/ctoharb.h
     - Added word wDec parameter to PushDouble prototype (needed by C++ compilers)
   * include/gtapi.h
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Added gtWhereX()
     - Added gtWhereY()
   * source/rtl/console.c
@@ -3137,7 +3137,7 @@ Mon Jun 07 12:58:17 1999  Gonzalo A. Diethelm  <Gonzalo.Diethelm@jda.cl>
     - Borland support now takes into account that older compiler versions
       don't have the POSIX S_ flags.
   * source/rtl/gtapi.c
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Changed #include <types.h> to #include <extend.h>
     - Modified _gtWriteCon() to process control characters
   * source/rtl/set.c
@@ -3146,27 +3146,27 @@ Mon Jun 07 12:58:17 1999  Gonzalo A. Diethelm  <Gonzalo.Diethelm@jda.cl>
   * source/rtl/transfrm.c
     - Added use of wDec parameter in calls to PushDouble()
   * source/rtl/gt/gtdos.c
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Added gtWhereX()
     - Added gtWhereY()
     - Removed screen coordinate adjustments (i.e., - 1), because
       Clipper (and therefore Harbour) screen origin is (0,0)
   * source/rtl/gt/gtos2.c
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Added gtWhereX()
     - Added gtWhereY()
     - Removed screen coordinate adjustments (i.e., - 1), because
       Clipper (and therefore Harbour) screen origin is (0,0)
     - Note: Still needs some work - doesn't match output from gtdos.c
   * source/rtl/gt/gtwin.c
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Added gtWhereX()
     - Added gtWhereY()
     - Removed screen coordinate adjustments (i.e., - 1), because
       Clipper (and therefore Harbour) screen origin is (0,0)
     - Note: Needs to be tested, because I don't have a Windows compiler
   * source/rtl/gt/gtxxx.c
-    - Added $Id: ChangeLog.001,v 1.1 1999/07/10 20:40:07 akressin Exp $ block at top
+    - Added $Id$ block at top
     - Added gtWhereX()
     - Added gtWhereY()
   * source/vm/hvm.c

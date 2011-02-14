@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6767 2011/01/22 10:47:59 andijahja Exp $
+ * $Id$
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,57 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2011-01-25 12:54 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
-  * source/compiler/Makefile
-    * Added missing gencc1.c .
-  * source/rtl/pcre/Makefile
-    * Added missing -DHAVE_CONFIG_H .
-    * Removed file pcre_ucp_searchfuncs.c .
-  * source/rtl/tbrowse.prg
+2011-02-14 19:46 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/ChangeLog
+  * xharbour/ChangeLog.001
+  * xharbour/ChangeLog.002
+  * xharbour/ChangeLog.003
+  * xharbour/ChangeLog.004
+  * xharbour/ChangeLog.005
+  * xharbour/ChangeLog.006
+  * xharbour/ChangeLog.007
+  * xharbour/ChangeLog.008
+  * xharbour/ChangeLog.009
+  * xharbour/ChangeLog.010
+  * xharbour/ChangeLog.011
+  * xharbour/ChangeLog.012
+  * xharbour/ChangeLog.013
+  * xharbour/ChangeLog.014
+  * xharbour/ChangeLog.015
+  * xharbour/ChangeLog.016
+  * xharbour/ChangeLog.017
+  * xharbour/ChangeLog.018
+  * xharbour/ChangeLog.019
+  * xharbour/ChangeLog.020
+  * xharbour/ChangeLog.021
+  * xharbour/ChangeLog.022
+  * xharbour/ChangeLog.023
+  * xharbour/ChangeLog.024
+  * xharbour/ChangeLog.025
+  * xharbour/ChangeLog.026
+  * xharbour/ChangeLog.027
+  * xharbour/ChangeLog.028
+  * xharbour/ChangeLog.029
+  * xharbour/debian/changelog
+  * xharbour/source/tip/Changelog
+  * xharbour/source/rtl/pcre/ChangeLog
+  * xharbour/contrib/hbcurl/ChangeLog
+  * xharbour/contrib/tp_/ChangeLog
+  * xharbour/contrib/xwt/Changelog
+  * xharbour/contrib/freeimage/ChangeLog
+  * xharbour/contrib/pgsql/Changelog
+  * xharbour/contrib/unicode/ChangeLog
+  * xharbour/contrib/gd/ChangeLog
+  * xharbour/contrib/xwt2/ChangeLog
+  * xharbour/contrib/what32/ChangeLog
+  * xharbour/samples/pegged/ChangeLog
+    * set SVN attributes:
+         svn:keywords=Author Date Id Revision
+         svn:eol-style=native
+
+  * xharbour/ChangeLog.027
+    ! fixed wrong S&R modification - someone made
+      replace "m " with "   * " for this whole file
 
 2011-02-14 19:27 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_hp.sh
@@ -2939,6 +2983,14 @@
       svn:keywords=Author Date Id Revision
     * set svn:eol-style to LF, CRLF or native depending on
       filename extension
+
+2011-01-25 12:54 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/compiler/Makefile
+    * Added missing gencc1.c .
+  * source/rtl/pcre/Makefile
+    * Added missing -DHAVE_CONFIG_H .
+    * Removed file pcre_ucp_searchfuncs.c .
+  * source/rtl/tbrowse.prg
     * Removed ::lNewRow property.
 
 2011-01-22 17:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
