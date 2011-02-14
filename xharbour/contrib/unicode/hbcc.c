@@ -144,11 +144,7 @@ B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       Upon succesful decoding the function returns numnber of bytes written
 
 */
-#pragma BEGINDUMP
-
-#include "hbapi.h"
-#include "hbapiitm.h"
-#include "hbapifs.h"
+#include "hbcc.h"
 
 #define HB_CSFEXT ".cst"
 
@@ -212,11 +208,12 @@ static ULONG uni2chr(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG chr2uni(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG uni2uni(BYTE *,ULONG,BYTE *);
 
-extern BOOL hbcc_file_read ( FILE *, char * );
+HB_FUNC_INIT( HB_INT_CSINIT );
+HB_FUNC_EXIT( HB_INT_CSEXIT );
 
 //Harbour callable
 
-HB_FUNC_STATIC( HB_INT_CSINIT )
+HB_FUNC_INIT( HB_INT_CSINIT )
 {
    ULONG i;
 
@@ -252,7 +249,7 @@ HB_FUNC_STATIC( HB_INT_CSINIT )
    }
 }
 
-HB_FUNC_STATIC( HB_INT_CSEXIT )
+HB_FUNC_EXIT( HB_INT_CSEXIT )
 {
    ULONG i;
 
@@ -317,9 +314,8 @@ HB_FUNC( HB_CSREG )
 
       csname = ( char * ) hb_parc( 1 );
       filepath = ( char * ) hb_xgrab( HB_PATH_MAX );
-      strcpy( filepath, cspath );
-      strcat( filepath, csname );
-      strcat( filepath, (char *) HB_CSFEXT);
+      hb_xstrcpy( filepath, cspath, 0 );
+      hb_xstrcat( filepath, csname, (char *) HB_CSFEXT, 0 );
 
       if ( hb_spFile( filepath, NULL ) == FALSE )
       {
@@ -570,9 +566,8 @@ HB_FUNC( HB_CSAVAIL )
    if (ISCHAR(1))
    {
       filepath = ( char * ) hb_xgrab(HB_PATH_MAX);
-      strcpy( filepath, cspath );
-      strcat( filepath, hb_parc(1) );
-      strcat( filepath, HB_CSFEXT );
+      hb_xstrcpy( filepath, cspath, 0 );
+      hb_xstrcat( filepath, hb_parc(1), HB_CSFEXT, 0 );
       x = hb_spFile( filepath, NULL );
       hb_xfree( filepath );
 
@@ -606,8 +601,7 @@ HB_FUNC( HB_CSLIST )
    for (i=0;i<lcs;i++)
    {
       cslist = ( char * ) hb_xrealloc( cslist, strlen( cslist ) + strlen( ( char * ) pcs[i]->name ) + 2 );
-      strcat( cslist, ( char * ) "," );
-      strcat( cslist, ( char * ) pcs[i]->name );
+      hb_xstrcat( cslist, ( char * ) ",", ( char * ) pcs[i]->name, 0  );
    }
 
    hb_retc( cslist + 1 );
@@ -1549,7 +1543,7 @@ HB_FUNC( B64DECODE_FILE )
          return;
       }
 
-      inFile = fopen( szFileName, "rb" );
+      inFile = hb_fopen( szFileName, "rb" );
 
       if ( !inFile )
       {
@@ -1575,7 +1569,7 @@ HB_FUNC( B64DECODE_FILE )
                {
                   if ( poutFile )
                   {
-                     outFile = fopen( poutFile->item.asString.value, "wb" );
+                     outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
                      if ( !outFile )
                      {
@@ -1594,7 +1588,7 @@ HB_FUNC( B64DECODE_FILE )
 
                      if( szFile )
                      {
-                        outFile = fopen( szFile, "wb" );
+                        outFile = hb_fopen( szFile, "wb" );
 
                         if ( !outFile )
                         {
@@ -1680,14 +1674,21 @@ HB_FUNC( B64DECODE_FILE )
    hb_itemClear( &Struct );
 
 }
-#pragma ENDDUMP
 
-//Harbour specific
+#define __PRG_SOURCE__ "hbcc.c"
+#ifdef HB_PCODE_VER
+#  undef HB_PRG_PCODE_VER
+#  define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
 
-INIT Procedure HB_CSINIT()
-   HB_INT_CSINIT()
-   Return
+HB_INIT_SYMBOLS_BEGIN( hbcc_InitExit )
+{ "HB_INT_CSINIT$", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( HB_INT_CSINIT )}, &ModuleFakeDyn },
+{ "HB_INT_CSEXIT$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HB_INT_CSEXIT )}, &ModuleFakeDyn }
+HB_INIT_SYMBOLS_END( hbcc_InitExit )
 
-Exit Procedure HB_CSEXIT()
-   HB_INT_CSEXIT()
-   Return
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup hbcc_InitExit
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hbcc_InitExit )
+   #include "hbiniseg.h"
+#endif
