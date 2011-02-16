@@ -150,12 +150,6 @@ $(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DI
 $(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)harbour.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)harboury.c : $(COMPILER_DIR)$(DIR_SEP)harbour.sly
-	$(BISON_CMD1)
-
-$(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
-	$(CC_CMD)
-
 $(COMPILER_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
 	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp
 	$(COPY) $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp $(COMPILER_DIR)$(DIR_SEP)expropta.c
@@ -1744,13 +1738,6 @@ $(OBJ_DIR)$(DIR_SEP)msgzhgb$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msgzhgb.c
 #===============================================================================
 # MACRO.LIB rules
 #===============================================================================
-
-$(OBJ_DIR)$(DIR_SEP)macroy.c : $(MACRO_DIR)$(DIR_SEP)macro.y
-	$(BISON_CMD2)
-
-$(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
-	$(CC_CMD)
-
 $(MACRO_DIR)$(DIR_SEP)macroslx.c : $(MACRO_DIR)$(DIR_SEP)macro.slx
 	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp
 	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp $(MACRO_DIR)$(DIR_SEP)macroslx.c

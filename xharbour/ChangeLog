@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-16 15:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/compiler/harboury.c
+  + source/macro/macroy.c
+  + include/harboury.h
+  + include/macroy.h
+    ! these files were added to reduce complexity of building harbour, so that
+    the use of bison parser can be eliminated. these files must be updated
+    accordingly when harbour.sly or marco.y modified. to facilitate most
+    users, the default build will use these files. those who wish to generate
+    the files themselves can set an envar: SET HB_USE_BISON=1
+
+  * winmake/makefile.*
+  * winmake/hrbdll.pc
+  * winmake/compile.mak
+    ! modified to reflect the above configuration
+
 2011-02-15 04:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/unicode/hbcctool.c
     ! use native xHarbour file functions
