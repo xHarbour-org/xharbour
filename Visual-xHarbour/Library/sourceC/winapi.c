@@ -7722,7 +7722,6 @@ HB_FUNC( PAGESETUPDLG )
    if( pStructure && HB_IS_OBJECT( pStructure ) )
    {
       HGLOBAL hDevMode;
-      DEVMODE *pDevMode;
       PAGESETUPDLG *pPd;
 
       hb_vmPushSymbol( pVALUE->pSymbol );
@@ -7731,22 +7730,33 @@ HB_FUNC( PAGESETUPDLG )
 
       pPd = (PAGESETUPDLG *) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
       pPd->lStructSize = sizeof( PAGESETUPDLG );
-
-      hDevMode = GlobalAlloc(GHND, sizeof(DEVMODE));
-      if ( hDevMode ) {
-         pDevMode = (DEVMODE *) GlobalLock(hDevMode);
-         if ( pDevMode ) {
-            pDevMode->dmSize = sizeof(DEVMODE);
-            pDevMode->dmFields = DM_ORIENTATION | DM_PAPERSIZE;
-            pDevMode->dmOrientation = hb_parnl(2); //DMORIENT_LANDSCAPE;
-            pDevMode->dmPaperSize = hb_parnl(3);   //DMPAPER_LETTER;
+      
+      if( pPd->Flags & PSD_RETURNDEFAULT )
+      {
+         pPd->hDevMode = NULL;
+         pPd->hDevNames = NULL;
+      }
+      else
+      {
+         hDevMode = GlobalAlloc(GHND, sizeof(DEVMODE));
+         if ( hDevMode ) {
+            DEVMODE *pDevMode = (DEVMODE *) GlobalLock(hDevMode);
+            if ( pDevMode ) {
+               pDevMode->dmSize = sizeof(DEVMODE);
+               pDevMode->dmFields = DM_ORIENTATION | DM_PAPERSIZE | DM_PAPERWIDTH | DM_PAPERLENGTH;
+               pDevMode->dmOrientation = hb_parnl(2); //DMORIENT_LANDSCAPE;
+               pDevMode->dmPaperSize = hb_parnl(3);   //DMPAPER_LETTER;
+               pDevMode->dmPaperWidth = hb_parnl(4);
+               pDevMode->dmPaperLength = hb_parnl(5);
+            }
+            GlobalUnlock(hDevMode);
+            pPd->hDevMode = hDevMode;
          }
-         GlobalUnlock(hDevMode);
-         pPd->hDevMode = hDevMode;
       }
 
       if( PageSetupDlg( pPd ) )
       {
+         DEVMODE *pDevMode;
          hb_vmPushSymbol( pDEVALUE->pSymbol );
          hb_vmPush( pStructure );
          hb_vmSend(0);
@@ -7754,6 +7764,8 @@ HB_FUNC( PAGESETUPDLG )
          pDevMode = (DEVMODE*) GlobalLock( pPd->hDevMode );
          hb_stornl( (ULONG) pDevMode->dmOrientation, 2 );
          hb_stornl( (ULONG) pDevMode->dmPaperSize, 3 );
+         hb_stornl( (ULONG) pDevMode->dmPaperWidth, 4 );
+         hb_stornl( (ULONG) pDevMode->dmPaperLength, 5 );
          GlobalUnlock( pPd->hDevMode );
          
          hb_retl( TRUE );

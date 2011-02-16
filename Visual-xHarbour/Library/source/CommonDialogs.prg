@@ -481,7 +481,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS PageSetup
    LOCAL n
-   ::Style := PSD_DEFAULTMINMARGINS// | PSD_MARGINS
+   ::Style := PSD_DEFAULTMINMARGINS | PSD_MARGINS
    ::__xCtrlName := "PageSetup"
    ::ClsName     := "PageSetup"
    ::ComponentType := "CommonDialog"
@@ -497,9 +497,11 @@ METHOD Init( oParent ) CLASS PageSetup
 RETURN Self
 
 METHOD Show() CLASS PageSetup
-   LOCAL pd, nPtr, advnm, dn, nOrientation, nPaperSize
+   LOCAL pd, nPtr, advnm, dn, nOrientation, nPaperSize, nWidth, nLenght
    nOrientation := ::Orientation
    nPaperSize   := ::PaperSize
+   nLenght      := ::PageHeight
+   nWidth       := ::PageWidth
    
    ::psd:hwndOwner       := ::Owner:hWnd
    ::psd:Flags           := ::Style
@@ -511,7 +513,7 @@ METHOD Show() CLASS PageSetup
    ::psd:rtMargin:Right  := ::RightMargin
    ::psd:rtMargin:Bottom := ::BottomMargin
 
-   IF PageSetupDlg( @::psd, @nOrientation, @nPaperSize )
+   IF PageSetupDlg( @::psd, @nOrientation, @nPaperSize, @nWidth, @nLenght )
       IF ! EMPTY( ::psd:hDevNames )
          IF ( nPtr  := GlobalLock( ::psd:hDevNames ) ) <> 0
             dn := (struct DEVNAMES)
@@ -533,8 +535,8 @@ METHOD Show() CLASS PageSetup
       ::RightMargin  := ::psd:rtMargin:Right
       ::BottomMargin := ::psd:rtMargin:Bottom
       
-      ::PageWidth    := ::psd:ptPaperSize:x
-      ::PageHeight   := ::psd:ptPaperSize:y
+      ::PageWidth    := nWidth
+      ::PageHeight   := nLenght
       RETURN .T.
    ENDIF
 RETURN .F.
