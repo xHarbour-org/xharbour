@@ -25,6 +25,7 @@ CLASS RepEdit INHERIT Panel
    DATA aSelect      EXPORTED 
    DATA aPrevSel     EXPORTED 
    DATA nDownPos     EXPORTED
+   DATA oPs          EXPORTED
    
    METHOD OnLButtonDown()
    METHOD OnLButtonUp()
@@ -47,6 +48,11 @@ METHOD Create() CLASS RepEdit
    ::hBmpGrid := CreateBitmap( xSize, ySize, 1, 1, cBits )
    ::xBmpSize := xSize
    ::yBmpSize := ySize
+   
+   ::oPs := PageSetup( ::Application:MainForm )
+   ::oPs:ReturnDefault := .T.
+   ::oPs:Show()
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -140,18 +146,15 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC ) CLASS RepEdit
-   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, oPs
+   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy
    LOCAL nBColor := SetBkColor( hDC, ::BackColor )
    LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
    SetBkMode( hDC, TRANSPARENT )
    
    cx := ::Width
    
-   oPs := PageSetup( ::Application:MainForm )
-   oPs:ReturnDefault := .T.
-   oPs:Show()
    
-   view oPs:psd:ptPaperSize:x
+   view ::oPs:PageWidth
    /*
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
       cx := MulDiv(  ::Application:Report:VrReport:oPDF:PageWidth, 1440, 72 )
