@@ -152,16 +152,13 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    SetBkMode( hDC, TRANSPARENT )
    
    cx := ::Width
-   
-   
-   view ::oPs:PageWidth
-   /*
-   IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
-      cx := MulDiv(  ::Application:Report:VrReport:oPDF:PageWidth, 1440, 72 )
-      VIEW cx
-   ENDIF
-   */
    cy := ::Height
+   
+   IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
+      cx := ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * 72
+      cy := ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * 72
+   ENDIF
+
    
    IF ::Application:Props[ "ViewMenuGrid" ]:Checked
       DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, cx, cy, SRCCOPY )

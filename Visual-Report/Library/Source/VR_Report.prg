@@ -75,6 +75,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateFooter()
    METHOD PrepareArrays()
    METHOD Load()
+   METHOD InitPDF()
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
 ENDCLASS
 
@@ -84,27 +85,34 @@ METHOD Init() CLASS VrReport
    ::Orientation := __GetSystem():PageSetup:Portrait
    AADD( ::aProperties, { "Name",       "Object"  } )
    AADD( ::aProperties, { "DataSource", "Data"  } )
+   ::InitPDF()
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD InitPDF() CLASS VrReport
+   IF ::oPDF == NIL
+      ::oPDF := ActiveX( ::Application:MainForm )
+      ::oPDF:SetChildren := .F.
+
+      ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
+      ::oPDF:Width  := 0
+      ::oPDF:Height := 0
+      ::oPDF:Create()
+
+      IF ::oPDF == NIL
+         MessageBox( 0, "Error loading report generator" )
+         RETURN NIL
+      ENDIF
+
+      ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
+      //::oPDF:ShowMargins := .T.
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS VrReport
-   ::oPDF := ActiveX( ::Application:MainForm )
-   ::oPDF:SetChildren := .F.
-
-   ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
-   ::oPDF:Width  := 0
-   ::oPDF:Height := 0
-   ::oPDF:Create()
-
-   IF ::oPDF == NIL
-      MessageBox( 0, "Error loading report generator" )
-      RETURN NIL
-   ENDIF
-
+   ::InitPDF()
    ::nPage := 0
-   ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
-   ::oPDF:ShowMargins := .T.
-
    FERASE( GetTempPath() + "\vr.tmp" )
    ::oPDF:StartSave( GetTempPath() + "\vr.tmp", acFileSaveView )
 RETURN Self
