@@ -452,6 +452,9 @@ RETURN Self
 //------------------------------------------------------------------------------------------------
 
 CLASS PageSetup INHERIT CommonDialogs
+   PROPERTY ReturnDefault  INDEX PSD_RETURNDEFAULT  READ xReturnDefault  WRITE SetStyle DEFAULT .F. PROTECTED
+   PROPERTY DisableMargins INDEX PSD_DISABLEMARGINS READ xDisableMargins WRITE SetStyle DEFAULT .T. PROTECTED
+
    DATA PaperSize       PUBLISHED INIT DMPAPER_LETTER
    DATA Orientation     PUBLISHED INIT DMORIENT_PORTRAIT
    DATA EnumPaperSize   EXPORTED
@@ -470,6 +473,7 @@ CLASS PageSetup INHERIT CommonDialogs
    DATA RightMargin  EXPORTED INIT 1000
    DATA BottomMargin EXPORTED INIT 1000
 
+   DATA psd          EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
@@ -477,11 +481,12 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS PageSetup
    LOCAL n
-   ::Style := PSD_DEFAULTMINMARGINS | PSD_MARGINS
+   ::Style := PSD_DEFAULTMINMARGINS// | PSD_MARGINS
    ::__xCtrlName := "PageSetup"
    ::ClsName     := "PageSetup"
    ::ComponentType := "CommonDialog"
    ::EnumPaperSize := {{},{}}
+   ::psd := (struct PAGESETUPDLG)
    
    FOR n := 1 TO LEN( ::System:PaperSize )
        AADD( ::EnumPaperSize[1], ::System:PaperSize[n][1] )
@@ -496,20 +501,19 @@ METHOD Show() CLASS PageSetup
    nOrientation := ::Orientation
    nPaperSize   := ::PaperSize
    
-   pd := (struct PAGESETUPDLG)
-   pd:hwndOwner       := ::Owner:hWnd
-   pd:Flags           := ::Style
-   pd:ptPaperSize:x   := ::PageWidth
-   pd:ptPaperSize:y   := ::PageHeight
+   ::psd:hwndOwner       := ::Owner:hWnd
+   ::psd:Flags           := ::Style
+   ::psd:ptPaperSize:x   := ::PageWidth
+   ::psd:ptPaperSize:y   := ::PageHeight
 
-   pd:rtMargin:Left   := ::LeftMargin
-   pd:rtMargin:Top    := ::TopMargin
-   pd:rtMargin:Right  := ::RightMargin
-   pd:rtMargin:Bottom := ::BottomMargin
+   ::psd:rtMargin:Left   := ::LeftMargin
+   ::psd:rtMargin:Top    := ::TopMargin
+   ::psd:rtMargin:Right  := ::RightMargin
+   ::psd:rtMargin:Bottom := ::BottomMargin
 
-   IF PageSetupDlg( @pd, @nOrientation, @nPaperSize )
-      IF ! EMPTY( pd:hDevNames )
-         IF ( nPtr  := GlobalLock( pd:hDevNames ) ) <> 0
+   IF PageSetupDlg( @::psd, @nOrientation, @nPaperSize )
+      IF ! EMPTY( ::psd:hDevNames )
+         IF ( nPtr  := GlobalLock( ::psd:hDevNames ) ) <> 0
             dn := (struct DEVNAMES)
             dn:Buffer( Peek( nPtr, dn:sizeof ) )
             advnm := Array( 4 )
@@ -517,20 +521,20 @@ METHOD Show() CLASS PageSetup
             ::PrinterName := Peek( nPtr + dn:wDeviceOffset )
             ::Port        := Peek( nPtr + dn:wOutputOffset )
             ::Default     := dn:wDefault == 1
-            GlobalUnlock( pd:hDevNames )
+            GlobalUnlock( ::psd:hDevNames )
          ENDIF
-         GlobalFree( pd:hDevNames )
+         GlobalFree( ::psd:hDevNames )
       ENDIF
       ::Orientation  := nOrientation
       ::PaperSize    := nPaperSize
       
-      ::LeftMargin   := pd:rtMargin:Left
-      ::TopMargin    := pd:rtMargin:Top
-      ::RightMargin  := pd:rtMargin:Right
-      ::BottomMargin := pd:rtMargin:Bottom
+      ::LeftMargin   := ::psd:rtMargin:Left
+      ::TopMargin    := ::psd:rtMargin:Top
+      ::RightMargin  := ::psd:rtMargin:Right
+      ::BottomMargin := ::psd:rtMargin:Bottom
       
-      ::PageWidth    := pd:ptPaperSize:x
-      ::PageHeight   := pd:ptPaperSize:y
+      ::PageWidth    := ::psd:ptPaperSize:x
+      ::PageHeight   := ::psd:ptPaperSize:y
       RETURN .T.
    ENDIF
 RETURN .F.
