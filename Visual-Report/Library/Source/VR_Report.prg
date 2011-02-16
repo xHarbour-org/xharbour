@@ -26,6 +26,9 @@
 #define  acCommandToolPageHome         53773
 
 CLASS VrReport INHERIT VrObject
+   DATA ClsName        EXPORTED  INIT "Report"
+   DATA Name           EXPORTED  INIT "Report"
+
    DATA nImage         EXPORTED  INIT 0
    DATA nText          EXPORTED  INIT 0
    DATA nLine          EXPORTED  INIT 0
@@ -44,14 +47,12 @@ CLASS VrReport INHERIT VrObject
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
    DATA nPage          EXPORTED  INIT 0
    DATA nRow           EXPORTED  INIT 0
-   DATA HeaderHeight   EXPORTED  INIT 0
-   DATA FooterHeight   EXPORTED  INIT 0
    DATA DataSource     EXPORTED
    DATA Button         EXPORTED
-   DATA ClsName        EXPORTED  INIT "Report"
-   DATA Name           EXPORTED  INIT "Report"
    DATA lUI            EXPORTED  INIT .F.
-   DATA hReport        EXPORTED  INIT {=>}
+
+   DATA HeaderHeight   EXPORTED  INIT 0
+   DATA FooterHeight   EXPORTED  INIT 0
 
    DATA aHeader        EXPORTED  INIT {}
    DATA aBody          EXPORTED  INIT {}

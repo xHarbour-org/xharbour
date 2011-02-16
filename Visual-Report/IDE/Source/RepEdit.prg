@@ -140,14 +140,30 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC ) CLASS RepEdit
-   LOCAL hOldBrush, hOldPen, aRect, oCtrl
+   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, oPs
    LOCAL nBColor := SetBkColor( hDC, ::BackColor )
    LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
    SetBkMode( hDC, TRANSPARENT )
+   
+   cx := ::Width
+   
+   oPs := PageSetup( ::Application:MainForm )
+   oPs:ReturnDefault := .T.
+   oPs:Show()
+   
+   view oPs:psd:ptPaperSize:x
+   /*
+   IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
+      cx := MulDiv(  ::Application:Report:VrReport:oPDF:PageWidth, 1440, 72 )
+      VIEW cx
+   ENDIF
+   */
+   cy := ::Height
+   
    IF ::Application:Props[ "ViewMenuGrid" ]:Checked
-      DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
+      DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, cx, cy, SRCCOPY )
     ELSE
-      _Fillrect( hDC, {0,0,::Width, ::Height}, ::BkBrush )
+      _Fillrect( hDC, {0,0,cx, cy}, ::BkBrush )
    ENDIF
    SetTextColor( hDC, nFColor )
    SetBkColor( hDC, nBColor )
