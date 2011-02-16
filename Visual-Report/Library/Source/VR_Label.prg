@@ -142,15 +142,20 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
 RETURN Self
 
 METHOD Draw() CLASS VrLabel
-   LOCAL hFont, hPrevFont, hDC, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
+   LOCAL nX, nY, hFont, hPrevFont, hDC, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize
    
    lAuto := ::AutoResize
    
-   x  := ( ::nPixPerInch / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
-   
    IF ::Text != NIL
+      hDC := GetDC(0)
+
+      nX := GetDeviceCaps( hDC, LOGPIXELSX )
+      nY := GetDeviceCaps( hDC, LOGPIXELSY )
+
+      x  := ( ::nPixPerInch / nX ) * ::Left
+      y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+      
       cItalic    := IIF( ::Font:Italic, "1", "0" )
       cUnderline := IIF( ::Font:Underline, "1", "0" )
 
@@ -173,7 +178,6 @@ METHOD Draw() CLASS VrLabel
             lAuto := .F.
          ENDIF
          IF ! lAuto
-            hDC := CreateCompatibleDC()
             lf:lfFaceName:Buffer( Alltrim( ::Font:FaceName ) )
             lf:lfHeight         := -MulDiv( ::Font:PointSize, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
             lf:lfWeight         := IIF( ::Font:Bold, 700, 400 )
@@ -194,7 +198,6 @@ METHOD Draw() CLASS VrLabel
             
             SelectObject( hDC, hPrevFont )
             DeleteObject( hFont )
-            DeleteDC( hDC )
             :Attribute( "Right",   x + ( (::nPixPerInch / 72) * ::Width ) )
             :Attribute( "Bottom",  y + ( (::nPixPerInch / 72) * aTxSize[2]-3 ) )
 
@@ -215,6 +218,7 @@ METHOD Draw() CLASS VrLabel
             :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
          ENDIF
       END
+      ReleaseDC(0, hDC)
    ENDIF
 RETURN Self
 

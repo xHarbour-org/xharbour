@@ -63,11 +63,16 @@ METHOD WriteProps( oXmlControl ) CLASS VrLine
 RETURN Self
 
 METHOD Draw() CLASS VrLine
-   LOCAL x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
+   LOCAL hDC, nX, nY, x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
 
-   x  := ( ::nPixPerInch / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
-   cx := ( ::nPixPerInch / 72 ) * ::Width
+   hDC := GetDC(0)
+
+   nX := GetDeviceCaps( hDC, LOGPIXELSX )
+   nY := GetDeviceCaps( hDC, LOGPIXELSY )
+
+   x  := ( ::nPixPerInch / nX ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+   cx := ( ::nPixPerInch / nX ) * ::Width
  
    ::Parent:oPDF:CreateObject( acObjectTypeLine, cName )
    ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
@@ -80,6 +85,7 @@ METHOD Draw() CLASS VrLine
          :Attribute( "StrokeColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
       ENDIF
    END
+   ReleaseDC(0, hDC)
 RETURN Self
 
 METHOD Configure() CLASS VrLine

@@ -146,7 +146,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC ) CLASS RepEdit
-   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy
+   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY
    LOCAL nBColor := SetBkColor( hDC, ::BackColor )
    LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
    SetBkMode( hDC, TRANSPARENT )
@@ -155,8 +155,11 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    cy := ::Height
    
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
-      cx := ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * 72
-      cy := ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * 72
+      nX := 72//GetDeviceCaps( hDC, LOGPIXELSX )
+      nY := 72//GetDeviceCaps( hDC, LOGPIXELSY )
+
+      cx := ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX
+      cy := ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY
    ENDIF
 
    
