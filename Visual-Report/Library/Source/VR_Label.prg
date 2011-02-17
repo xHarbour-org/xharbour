@@ -179,7 +179,7 @@ METHOD Draw() CLASS VrLabel
          ENDIF
          IF ! lAuto
             lf:lfFaceName:Buffer( Alltrim( ::Font:FaceName ) )
-            lf:lfHeight         := -MulDiv( ::Font:PointSize, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
+            lf:lfHeight         := -MulDiv( ::Font:PointSize, nY, 72 )
             lf:lfWeight         := IIF( ::Font:Bold, 700, 400 )
             lf:lfItalic         := IIF( ::Font:Italic, 1, 0 )
             lf:lfUnderline      := IIF( ::Font:Underline, 1, 0 )
@@ -198,8 +198,8 @@ METHOD Draw() CLASS VrLabel
             
             SelectObject( hDC, hPrevFont )
             DeleteObject( hFont )
-            :Attribute( "Right",   x + ( (::nPixPerInch / 72) * ::Width ) )
-            :Attribute( "Bottom",  y + ( (::nPixPerInch / 72) * aTxSize[2]-3 ) )
+            :Attribute( "Right",   x + ( (::nPixPerInch / nX) * ::Width ) )
+            :Attribute( "Bottom",  y + ( (::nPixPerInch / nY) * (aTxSize[2]+2) ) )
 
           ELSE
             :Attribute( "AutoResize", 1 )

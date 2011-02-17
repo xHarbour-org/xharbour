@@ -155,13 +155,15 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    cy := ::Height
    
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
-      nX := 72//GetDeviceCaps( hDC, LOGPIXELSX )
-      nY := 72//GetDeviceCaps( hDC, LOGPIXELSY )
+      nX := 72 //GetDeviceCaps( hDC, LOGPIXELSX )
+      nY := 72 //GetDeviceCaps( hDC, LOGPIXELSY )
 
-      cx := ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX
-      cy := ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY
-
-      _Fillrect( hDC, {cx,0,::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
+      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )
+      cy := Int( ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY )
+      
+      cx += 100
+      
+      _Fillrect( hDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
    ENDIF
 
    
