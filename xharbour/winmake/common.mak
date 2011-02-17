@@ -23,7 +23,6 @@ OBJ_DIR       =obj$(DIR_SEP)$(SUB_DIR)$(HB_MT_DIR)
 
 COMMON_DIR    =source$(DIR_SEP)common
 COMPILER_DIR  =source$(DIR_SEP)compiler
-CT_DIR        =source$(DIR_SEP)ct
 DEBUG_DIR     =source$(DIR_SEP)debug
 LANG_DIR      =source$(DIR_SEP)lang
 MACRO_DIR     =source$(DIR_SEP)macro
@@ -32,10 +31,7 @@ RDD_DIR       =source$(DIR_SEP)rdd
 RTL_DIR       =source$(DIR_SEP)rtl
 PCREPOS_DIR   =source$(DIR_SEP)rtl$(DIR_SEP)pcre
 ZLIB_DIR      =source$(DIR_SEP)rtl$(DIR_SEP)zlib
-MISC_DIR      =source$(DIR_SEP)misc
-TIP_DIR       =source$(DIR_SEP)tip
 VM_DIR        =source$(DIR_SEP)vm
-ODBC_DIR      =source$(DIR_SEP)odbc
 CODEPAGE_DIR  =source$(DIR_SEP)codepage
 
 HBRUN_DIR     =utils$(DIR_SEP)hbrun
@@ -46,6 +42,10 @@ HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 
+CT_DIR        =contrib$(DIR_SEP)ct
+MISC_DIR      =contrib$(DIR_SEP)misc
+TIP_DIR       =contrib$(DIR_SEP)tip
+ODBC_DIR      =contrib$(DIR_SEP)odbc
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib

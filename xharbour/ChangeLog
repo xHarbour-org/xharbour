@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-17 18:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/ct
+  - source/cgi
+  - source/misc
+  - source/odbc
+  - source/tip
+  + contrib/ct
+  + contrib/cgi
+  + contrib/misc
+  + contrib/odbc
+  + contrib/tip
+  * winmake/common.mak
+    ! source directory is now only for core files
+
 2011-02-16 21:42 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/hbwinole.c
     * LPSTR -> char *
