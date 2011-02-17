@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-17 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/odbc/odbc.c
+    ! fixed to compile under DigitalMars
+
 2011-02-17 09:40 Luiz Rafael Culik <luiz at xharbour.com.br>
    ! contrib/tipssl/mail.prg
      contrib/tipssl/sendmail.prg
