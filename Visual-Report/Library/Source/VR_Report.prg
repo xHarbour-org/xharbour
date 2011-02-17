@@ -227,7 +227,7 @@ METHOD CreateHeader() CLASS VrReport
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow := ::HeaderHeight - 450
+   ::nRow := ::HeaderHeight - 300
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, aControl, cParent
+   LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC
 
    ::aData  := {=>}
    ::aProps := {=>}
@@ -300,8 +300,11 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       ::BottomMargin:= VAL( ::aProps:BottomMargin )
    CATCH
    END
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * ( PIX_PER_INCH / 72 )
-   ::FooterHeight := VAL( ::aProps:FooterHeight ) * ( PIX_PER_INCH / 72 )
+
+   hDC := GetDC(0)
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSX )
+   ::FooterHeight := VAL( ::aProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+   ReleaseDC(0, hDC)
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

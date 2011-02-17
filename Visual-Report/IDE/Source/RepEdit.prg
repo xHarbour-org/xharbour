@@ -160,6 +160,8 @@ METHOD OnPaint( hDC ) CLASS RepEdit
 
       cx := ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX
       cy := ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY
+
+      _Fillrect( hDC, {cx,0,::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
    ENDIF
 
    
