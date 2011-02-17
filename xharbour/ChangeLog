@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-17 21:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - tests/misc
+  + contrib/misc/date.c
+  + contrib/misc/dates2.c
+  + contrib/misc/dbf.c
+  + contrib/misc/environ.c
+  + contrib/misc/fileread.prg
+  + contrib/misc/gauge.c
+  + contrib/misc/mathx.c
+  + contrib/misc/nconvert.prg
+  + contrib/misc/num.c
+  + contrib/misc/numtxten.prg
+  + contrib/misc/numtxthu.prg
+  + contrib/misc/stack.c
+  + contrib/misc/status.c
+  + contrib/misc/strfmt.c
+  + contrib/misc/stringp.prg
+  + contrib/misc/stringsx.c
+  + contrib/misc/time.c
+  + contrib/misc/twirler.prg
+    ! move tests/misc/*.* to contrib/misc
+
 2011-02-17 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/odbc/odbc.c
     ! fixed to compile under DigitalMars
