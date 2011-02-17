@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-17 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/stringsx.c
+  * contrib/misc/strfmt.c
+    ! casting
+
+  * contrib/misc/num.c
+    - deffed-out FLOOR function, it is defined in mathx.c
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + added object file dependencies for files moved from tests/misc
+
 2011-02-17 21:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - tests/misc
   + contrib/misc/date.c

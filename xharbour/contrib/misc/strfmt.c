@@ -56,12 +56,12 @@
 
 HB_FUNC( STRFORMAT )
 {
-   char* pszMask = hb_parcx(1);
+   const char* pszMask = hb_parcx(1);
    ULONG nMaskLen = hb_parclen(1);
    ULONG nMaskPos;
    ULONG nParNum = hb_pcount();
    ULONG nLenTable [HB_STRFORMAT_PARNUM_MAX_];
-   char* pszVarTable [HB_STRFORMAT_PARNUM_MAX_];
+   const char* pszVarTable [HB_STRFORMAT_PARNUM_MAX_];
 
    ULONG nRetValLen;
    char* pszRetVal;

@@ -67,7 +67,7 @@ HB_FUNC( STRTOKEN )
   if( !cDelimiter )
     cDelimiter = ' ';
 
-  szText = hb_strtoken(hb_parcx(1), hb_parclen(1), lIndex, cDelimiter, &lLen);
+  szText = hb_strtoken((char*) hb_parcx(1), hb_parclen(1), lIndex, cDelimiter, &lLen);
 
   hb_stornl(lLen, 4);
   hb_retclen(szText, lLen);
@@ -76,7 +76,7 @@ HB_FUNC( STRTOKEN )
 /* debug function to dump the ASCII values of an entire string */
 HB_FUNC( STRDUMP )
 {
-  char *szText = hb_parcx(1);
+  const char *szText = hb_parcx(1);
   long i, lLength = hb_parclen(1);
   for( i = 0; i < lLength; i++ )
     printf("%d ", szText[i]);
@@ -87,7 +87,7 @@ HB_FUNC( ROT13 )
 {
   if( ISCHAR(1) )
     {
-      char *szText = hb_parcx( 1 );
+      const char *szText = hb_parcx( 1 );
       ULONG i, lLen = hb_parclen( 1 );
       char *szResult = (char*)hb_xgrab(lLen + 1);
 

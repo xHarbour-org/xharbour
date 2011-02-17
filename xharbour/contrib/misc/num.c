@@ -77,6 +77,10 @@ HB_FUNC( DTOR )
    hb_retndlen( ( hb_parnd( 1 ) / 180 ) * PI, 10, 9 );
 }
 
+#if 0
+/*
+  This is deffed-out because FLOOR already defined tin mathx.c
+*/
 /* Floor( <nNumber> ) --> nInteger
    Return the largest integer that is less than or equal to <nNumber>
 */
@@ -84,6 +88,7 @@ HB_FUNC( FLOOR )
 {
    hb_retnl( ( LONG ) floor( hb_parnd( 1 ) ) );
 }
+#endif
 
 /* NumAsLog10( <nNumber> ) --> nLog10
    Convert a positive number to log base 10

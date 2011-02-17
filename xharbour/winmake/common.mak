@@ -1265,7 +1265,26 @@ ODBC_LIB_OBJS=\
 # LIBMISC.LIB rules
 #===============================================================================
 MISC_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)date$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dates2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)environ$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stringsx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mathx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strfmt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)num$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)status$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stack$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)time$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)nconvert$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stringp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fileread$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numtxten$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numtxthu$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)twirler$(OBJEXT)
 
 #===============================================================================
 # DLLMAIN.LIB rules
