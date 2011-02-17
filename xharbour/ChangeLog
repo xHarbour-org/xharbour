@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-16 21:42 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rtl/hbwinole.c
+    * LPSTR -> char *
+
 2011-02-16 15:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harboury.c
   * source/macro/macroy.c
@@ -3335,8 +3339,8 @@
     ! fixed AddGetForm() that was adding an null char on string generated when postdata was an hash
   * source/cgi/tedit.prg
     source/cgi/thtml.prg
-    ! minor fix   
-    
+    ! minor fix
+
 2011-01-10 11:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_u3d.c
     + include "hbpdf_u3d.h" (fixed C++ linking)

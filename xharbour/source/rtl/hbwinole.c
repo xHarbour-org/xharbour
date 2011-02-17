@@ -138,7 +138,7 @@ HB_EXTERN_BEGIN
 HB_EXPORT HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
 HB_EXPORT BSTR hb_oleAnsiToSysString( const char *cString );
 HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString );
-HB_EXPORT LPSTR hb_oleWideToAnsi( LPWSTR wString );
+HB_EXPORT char * hb_oleWideToAnsi( LPWSTR wString );
 HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem );
 HB_EXTERN_END
 
@@ -245,7 +245,7 @@ HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString )
 }
 
 //---------------------------------------------------------------------------//
-HB_EXPORT LPSTR hb_oleWideToAnsi( LPWSTR wString )
+HB_EXPORT char * hb_oleWideToAnsi( LPWSTR wString )
 {
    int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
@@ -620,7 +620,7 @@ HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
 
    if( cString )
    {
-      LPWSTR wString = hb_oleAnsiToWide( (LPSTR) cString );
+      LPWSTR wString = hb_oleAnsiToWide( cString );
 
       if( wString )
       {
@@ -1351,7 +1351,7 @@ HB_FUNC( OLESHOWEXCEPTION )
 {
    if( (LONG) s_nOleError == DISP_E_EXCEPTION )
    {
-      LPSTR source, description;
+      char *source, *description;
 
       source = hb_oleWideToAnsi( excep.bstrSource );
       description = hb_oleWideToAnsi( excep.bstrDescription );
@@ -1368,7 +1368,7 @@ HB_FUNC( OLEEXCEPTIONSOURCE )
 {
    if( (LONG) s_nOleError == DISP_E_EXCEPTION )
    {
-      LPSTR source;
+      char *source;
 
       source = hb_oleWideToAnsi( excep.bstrSource );
       hb_retcAdopt( source );
@@ -1380,7 +1380,7 @@ HB_FUNC( OLEEXCEPTIONDESCRIPTION )
 {
    if( (LONG) s_nOleError == DISP_E_EXCEPTION )
    {
-      LPSTR description;
+      char *description;
 
       description = hb_oleWideToAnsi( excep.bstrDescription );
       hb_retcAdopt( description );
