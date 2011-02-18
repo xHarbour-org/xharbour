@@ -163,7 +163,7 @@ CLASS Window INHERIT Object
    DATA VertScroll             EXPORTED INIT .F.
    DATA HorzScroll             EXPORTED INIT .F.
 
-   DATA OriginalRect           PROTECTED
+   DATA OriginalRect           EXPORTED
    DATA Msg                    EXPORTED
    DATA wParam                 EXPORTED
    DATA lParam                 EXPORTED
