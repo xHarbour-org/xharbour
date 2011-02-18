@@ -227,7 +227,7 @@ METHOD CreateHeader() CLASS VrReport
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl, @nHeight )
    NEXT
-   ::nRow := ::HeaderHeight - 300
+   ::nRow := ::HeaderHeight
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -283,8 +283,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    IF !EMPTY( aControl )
       AADD( ::&cParent, aControl )
    ENDIF
-   ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )
-   ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )
+   n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
+   ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )+n
+   n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
+   ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )+n
    ::Application:Props[ "Footer" ]:Dockit()
    ::Application:Props[ "Body" ]:Dockit()
    TRY
@@ -331,6 +333,13 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
+
+   ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
+   ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::Orientation == __GetSystem():PageSetup:Landscape )
+   ::Application:Props:Header:InvalidateRect()
+   ::Application:Props:Body:InvalidateRect()
+   ::Application:Props:Footer:InvalidateRect()
+
 RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------

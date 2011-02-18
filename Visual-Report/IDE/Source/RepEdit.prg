@@ -38,8 +38,14 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS RepEdit
-   LOCAL cBits, xSize, ySize
+   LOCAL cBits, xSize, ySize, aSize
+   aSize := {::Width,::Height}
+   ::HorzScroll    := .T.
+   ::Width  := GetSystemMetrics( SM_CXSCREEN ) * 2
+   ::Height := GetSystemMetrics( SM_CYSCREEN ) * 2
    Super:Create()
+   ::Width  := aSize[1]
+   ::Height := aSize[2]
    ::ForeColor := ::System:Color:LightGray
    cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
    IF !Empty(::hBmpGrid)
@@ -49,9 +55,9 @@ METHOD Create() CLASS RepEdit
    ::xBmpSize := xSize
    ::yBmpSize := ySize
    
-   ::oPs := PageSetup( ::Application:MainForm )
-   ::oPs:ReturnDefault := .T.
-   ::oPs:Show()
+//   ::oPs := PageSetup( ::Application:MainForm )
+//   ::oPs:ReturnDefault := .T.
+//   ::oPs:Show()
 
 RETURN Self
 
@@ -147,41 +153,45 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC ) CLASS RepEdit
    LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY
-   LOCAL nBColor := SetBkColor( hDC, ::BackColor )
-   LOCAL nFColor := SetTextColor( hDC, ::ForeColor )
-   SetBkMode( hDC, TRANSPARENT )
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor
+    
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   nBColor := SetBkColor( hMemDC, ::BackColor )
+   nFColor := SetTextColor( hMemDC, ::ForeColor )
+   SetBkMode( hMemDC, TRANSPARENT )
+   IF ::Application:Props[ "ViewMenuGrid" ]:Checked
+      DrawGrid( hMemDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
+    ELSE
+      _Fillrect( hMemDC, {0,0,::Width,::Height}, ::BkBrush )
+   ENDIF
+   SetTextColor( hMemDC, nFColor )
+   SetBkColor( hMemDC, nBColor )
    
    cx := ::Width
    cy := ::Height
    
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
-      nX := 72 //GetDeviceCaps( hDC, LOGPIXELSX )
-      nY := 72 //GetDeviceCaps( hDC, LOGPIXELSY )
-
-      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )
+      nX := GetDeviceCaps( hDC, LOGPIXELSX )
+      nY := GetDeviceCaps( hDC, LOGPIXELSY )
+      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )//-21
       cy := Int( ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY )
-      
-      cx += 100
-      
-      _Fillrect( hDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
+      _Fillrect( hMemDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
    ENDIF
-
-   
-   IF ::Application:Props[ "ViewMenuGrid" ]:Checked
-      DrawGrid( hDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, cx, cy, SRCCOPY )
-    ELSE
-      _Fillrect( hDC, {0,0,cx, cy}, ::BkBrush )
-   ENDIF
-   SetTextColor( hDC, nFColor )
-   SetBkColor( hDC, nBColor )
    
    IF ::Application:Props:PropEditor:ActiveObject != NIL  .AND. ::nDownPos == NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
       IF ::Application:Props:PropEditor:ActiveObject:lUI .AND. oCtrl:Parent:hWnd == ::hWnd
          aRect := oCtrl:GetRectangle()
-         _DrawFocusRect( hDC, {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1} )
+         _DrawFocusRect( hMemDC, {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1} )
       ENDIF
    ENDIF
+   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
 RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------------

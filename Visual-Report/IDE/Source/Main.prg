@@ -507,6 +507,9 @@ METHOD New() CLASS Report
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
    ::VrReport := VrReport( NIL )
    oApp:Props:Components:AddButton( ::VrReport )
+   oApp:Props:Header:InvalidateRect()
+   oApp:Props:Body:InvalidateRect()
+   oApp:Props:Footer:InvalidateRect()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -520,14 +523,21 @@ METHOD PageSetup() CLASS Report
    oPs:RightMargin  := ::VrReport:RightMargin 
    oPs:BottomMargin := ::VrReport:BottomMargin
 
-   oPs:Show()
-   ::VrReport:Orientation  := oPs:Orientation
-   ::VrReport:PaperSize    := oPs:PaperSize
+   IF oPs:Show()
+      ::VrReport:Orientation  := oPs:Orientation
+      ::VrReport:PaperSize    := oPs:PaperSize
 
-   ::VrReport:LeftMargin   := oPs:LeftMargin
-   ::VrReport:TopMargin    := oPs:TopMargin
-   ::VrReport:RightMargin  := oPs:RightMargin
-   ::VrReport:BottomMargin := oPs:BottomMargin
+      ::VrReport:LeftMargin   := oPs:LeftMargin
+      ::VrReport:TopMargin    := oPs:TopMargin
+      ::VrReport:RightMargin  := oPs:RightMargin
+      ::VrReport:BottomMargin := oPs:BottomMargin
+
+      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", oPs:PaperSize )
+      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", oPs:Orientation == __GetSystem():PageSetup:Landscape )
+      oApp:Props:Header:InvalidateRect()
+      oApp:Props:Body:InvalidateRect()
+      oApp:Props:Footer:InvalidateRect()
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -619,6 +629,11 @@ METHOD Open( cReport ) CLASS Report
       ::VrReport := VrReport( NIL )
       oApp:Props:Components:AddButton( ::VrReport )
       ::oXMLDoc := ::VrReport:Load( cReport )
+
+      oApp:Props:Header:InvalidateRect()
+      oApp:Props:Body:InvalidateRect()
+      oApp:Props:Footer:InvalidateRect()
+
    ENDIF
 RETURN Self
 
@@ -658,9 +673,9 @@ METHOD Save( lSaveAs ) CLASS Report
          oXmlProp := TXmlNode():new( , "Properties" )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
          oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:Height ) )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:ClientHeight ) )
          oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:Height ) )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:ClientHeight ) )
          oXmlProp:addBelow( oXmlSource )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "Orientation", NIL, XSTR( ::VrReport:Orientation ) )
          oXmlProp:addBelow( oXmlSource )
