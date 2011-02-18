@@ -491,6 +491,7 @@ CLASS Report
    METHOD Generate()
    METHOD Run()
    METHOD PageSetup()
+   METHOD SetScrollArea()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -538,6 +539,9 @@ METHOD PageSetup() CLASS Report
 
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", oPs:PaperSize )
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", oPs:Orientation == __GetSystem():PageSetup:Landscape )
+      
+      ::SetScrollArea()
+      
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()
       oApp:Props:Footer:InvalidateRect()
@@ -604,8 +608,20 @@ METHOD Close() CLASS Report
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
+METHOD SetScrollArea() CLASS Report
+   LOCAL nX, hDC := GetDC(0)
+   nX := GetDeviceCaps( hDC, LOGPIXELSX )
+   oApp:Props:Header:OriginalRect[3] := oApp:Props:Body:OriginalRect[3] := oApp:Props:Footer:OriginalRect[3] := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
+   ReleaseDC( 0, hDC )
+
+   oApp:Props:Header:__SetScrollBars()
+   oApp:Props:Body:__SetScrollBars()
+   oApp:Props:Footer:__SetScrollBars()
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
-   LOCAL oFile, pHrb
+   LOCAL oFile, pHrb, nX
 
    IF ::Close() == NIL
       IF cReport == NIL
@@ -636,6 +652,8 @@ METHOD Open( cReport ) CLASS Report
 
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
+
+      ::SetScrollArea()
 
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()

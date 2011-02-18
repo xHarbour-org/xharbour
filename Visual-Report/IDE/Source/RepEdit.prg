@@ -176,7 +176,7 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
       nX := GetDeviceCaps( hDC, LOGPIXELSX )
       nY := GetDeviceCaps( hDC, LOGPIXELSY )
-      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )//-21
+      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )
       cy := Int( ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY )
       _Fillrect( hMemDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
    ENDIF
