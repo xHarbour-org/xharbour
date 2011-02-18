@@ -495,6 +495,7 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD New() CLASS Report
+   LOCAL oPs
    oApp:Props:ToolBox:Enabled       := .T.
    oApp:Props:SaveMenu:Enabled      := .T.
    oApp:Props:SaveAsMenu:Enabled    := .T.
@@ -507,6 +508,9 @@ METHOD New() CLASS Report
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
    ::VrReport := VrReport( NIL )
    oApp:Props:Components:AddButton( ::VrReport )
+
+   ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
+   ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
    oApp:Props:Header:InvalidateRect()
    oApp:Props:Body:InvalidateRect()
    oApp:Props:Footer:InvalidateRect()
@@ -629,6 +633,9 @@ METHOD Open( cReport ) CLASS Report
       ::VrReport := VrReport( NIL )
       oApp:Props:Components:AddButton( ::VrReport )
       ::oXMLDoc := ::VrReport:Load( cReport )
+
+      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
+      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
 
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()

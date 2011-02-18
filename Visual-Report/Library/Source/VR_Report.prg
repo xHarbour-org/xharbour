@@ -333,13 +333,6 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
-
-   ::oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::PaperSize )
-   ::oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::Orientation == __GetSystem():PageSetup:Landscape )
-   ::Application:Props:Header:InvalidateRect()
-   ::Application:Props:Body:InvalidateRect()
-   ::Application:Props:Footer:InvalidateRect()
-
 RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
