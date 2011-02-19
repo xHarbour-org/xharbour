@@ -209,6 +209,15 @@ CLASS FooterEdit INHERIT RepEdit
    DATA Type INIT "Footer"
 ENDCLASS
 
+//--------------------------------------------------------------------------------------------------------------------------------------
+CLASS RepHeaderEdit INHERIT RepEdit
+   DATA Type INIT "RepHeader"
+ENDCLASS
+
+//--------------------------------------------------------------------------------------------------------------------------------------
+CLASS RepFooterEdit INHERIT RepEdit
+   DATA Type INIT "RepFooter"
+ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION MakeGridTile( nxGrid, nyGrid, Width, Height)

@@ -133,6 +133,9 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "PageSetupMenu" ] := MenuStripItem( :this )
             :Begingroup := .T.
             :Caption    := "&Page Setup"
+            :ShortCutText     := "Ctrl+P"
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "P" )
             :ImageIndex := 0
             :Enabled    := .F.
             :Action     := {|o|::Application:Report:PageSetup() }
@@ -214,7 +217,21 @@ METHOD Init() CLASS MainForm
             :Create()
          END
 
+         WITH OBJECT ::Application:Props[ "ViewMenuRepHeader" ] := MenuStripItem( :this )
+            :BeginGroup := .T.
+            :Caption := "&Report Header"
+            :Action  := {|o| o:Checked := !o:Checked, ::Application:Props[ "RepHeader" ]:Visible := o:Checked }
+            :Create()
+         END
+
+         WITH OBJECT ::Application:Props[ "ViewMenuRepFooter" ] := MenuStripItem( :this )
+            :Caption := "Report F&ooter"
+            :Action  := {|o| o:Checked := !o:Checked, ::Application:Props[ "RepFooter" ]:Visible := o:Checked }
+            :Create()
+         END
+
          WITH OBJECT ::Application:Props[ "ViewMenuGrid" ] := MenuStripItem( :this )
+            :BeginGroup := .T.
             :Caption := "&Grid"
             :Action  := {|o| o:Checked := !o:Checked, ( ::Application:Props[ "Header" ]:InvalidateRect(),;
                                                         ::Application:Props[ "Body"   ]:InvalidateRect(),;
@@ -387,14 +404,33 @@ METHOD Init() CLASS MainForm
    END
 
 
-   WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( Self )
-      :Caption        := "Header"
+   WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( Self )
+      :Caption        := "Report Header"
       :BackColor      := ::System:Color:White
       :Height         := 100
       :Dock:Margins   := "0,2,0,2"
       :Dock:Left      := ::Application:Props[ "ToolBox" ]
       :Dock:Right     := ::Application:Props[ "PropEditor" ]
       :Dock:Top       := ::ToolStripContainer1
+      :Visible        := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+      :Application:Props[ "ViewMenuRepHeader" ]:Checked := :Visible
+      :Create()
+   END
+
+   WITH OBJECT Splitter( Self )
+      :Owner := ::Application:Props[ "RepHeader" ]
+      :Position := 4
+      :Create()
+   END
+
+   WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( Self )
+      :Caption        := "Header"
+      :BackColor      := ::System:Color:White
+      :Height         := 100
+      :Dock:Margins   := "0,0,0,2"
+      :Dock:Left      := ::Application:Props[ "ToolBox" ]
+      :Dock:Right     := ::Application:Props[ "PropEditor" ]
+      :Dock:Top       := ::Application:Props[ "RepHeader" ]
       :Visible        := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
       :Application:Props[ "ViewMenuHeader" ]:Checked := :Visible
       :Create()
@@ -406,8 +442,8 @@ METHOD Init() CLASS MainForm
       :Create()
    END
 
-   WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( Self )
-      :Caption        := "Footer"
+   WITH OBJECT ::Application:Props[ "RepFooter" ] := RepFooterEdit( Self )
+      :Caption        := "Report Footer"
       :BackColor      := ::System:Color:White
       :Border         := .T.
       :Height         := 100
@@ -415,6 +451,26 @@ METHOD Init() CLASS MainForm
       :Dock:Left      := ::Application:Props:ToolBox
       :Dock:Right     := ::Application:Props:PropEditor
       :Dock:Bottom    := ::Application:Props:Components
+      :Visible        := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
+      :Application:Props[ "ViewMenuRepFooter" ]:Checked := :Visible
+      :Create()
+   END
+
+   WITH OBJECT Splitter( Self )
+      :Owner := ::Application:Props[ "RepFooter" ]
+      :Position := 2
+      :Create()
+   END
+
+   WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( Self )
+      :Caption        := "Footer"
+      :BackColor      := ::System:Color:White
+      :Border         := .T.
+      :Height         := 100
+      :Dock:Margins   := "0,0,0,0"
+      :Dock:Left      := ::Application:Props:ToolBox
+      :Dock:Right     := ::Application:Props:PropEditor
+      :Dock:Bottom    := ::Application:Props:RepFooter
       :Visible        := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
       :Application:Props[ "ViewMenuFooter" ]:Checked := :Visible
       :Create()
@@ -457,9 +513,11 @@ METHOD OnClose() CLASS MainForm
    ::SaveLayout(, "Layout")
    ::Application:Props[ "ToolBox" ]:SaveLayout(, "Layout")
    ::Application:Props[ "PropEditor" ]:SaveLayout(, "Layout")
-   ::Application:IniFile:Write( "View", "Header", IIF( ::Application:Props[ "ViewMenuHeader" ]:Checked, 1, 0 ) )
-   ::Application:IniFile:Write( "View", "Footer", IIF( ::Application:Props[ "ViewMenuFooter" ]:Checked, 1, 0 ) )
-   ::Application:IniFile:Write( "View", "Grid",   IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked,   1, 0 ) )
+   ::Application:IniFile:Write( "View", "Header",    IIF( ::Application:Props[ "ViewMenuHeader" ]:Checked, 1, 0 ) )
+   ::Application:IniFile:Write( "View", "Footer",    IIF( ::Application:Props[ "ViewMenuFooter" ]:Checked, 1, 0 ) )
+   ::Application:IniFile:Write( "View", "Grid",      IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked,   1, 0 ) )
+   ::Application:IniFile:Write( "View", "RepHeader", IIF( ::Application:Props[ "ViewMenuRepHeader" ]:Checked, 1, 0 ) )
+   ::Application:IniFile:Write( "View", "RepFooter", IIF( ::Application:Props[ "ViewMenuRepFooter" ]:Checked, 1, 0 ) )
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------

@@ -81,11 +81,16 @@ METHOD WriteProps( oXmlControl ) CLASS VrImage
 RETURN Self
 
 METHOD Draw() CLASS VrImage
-   local x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
-   x  := ( ::nPixPerInch / 72 ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nPixPerInch / 72 ) * ::Top )
-   cx := ( ::nPixPerInch / 72 ) * ::Width
-   cy := ( ::nPixPerInch / 72 ) * ::Height
+   local hDC, nX, nY, x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
+   hDC := GetDC(0)
+
+   nX := GetDeviceCaps( hDC, LOGPIXELSX )
+   nY := GetDeviceCaps( hDC, LOGPIXELSY )
+
+   x  := ( ::nPixPerInch / nX ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+   cx := ( ::nPixPerInch / nX ) * ::Width
+   cy := ( ::nPixPerInch / nY ) * ::Height
    WITH OBJECT ::Parent:oPDF
       :CreateObject( acObjectTypePicture,  cName )
       ::PDFCtrl := :GetObjectByName( cName )
