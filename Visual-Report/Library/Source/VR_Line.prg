@@ -62,10 +62,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLine
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-METHOD Draw() CLASS VrLine
-   LOCAL hDC, nX, nY, x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
-
-   hDC := GetDC(0)
+METHOD Draw( hDC ) CLASS VrLine
+   LOCAL nX, nY, x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
 
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
    nY := GetDeviceCaps( hDC, LOGPIXELSY )
@@ -85,7 +83,6 @@ METHOD Draw() CLASS VrLine
          :Attribute( "StrokeColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
       ENDIF
    END
-   ReleaseDC(0, hDC)
 RETURN Self
 
 METHOD Configure() CLASS VrLine

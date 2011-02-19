@@ -141,15 +141,13 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlFont )
 RETURN Self
 
-METHOD Draw() CLASS VrLabel
-   LOCAL nX, nY, hFont, hPrevFont, hDC, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
+METHOD Draw( hDC ) CLASS VrLabel
+   LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize
    
    lAuto := ::AutoResize
    
    IF ::Text != NIL
-      hDC := GetDC(0)
-
       nX := GetDeviceCaps( hDC, LOGPIXELSX )
       nY := GetDeviceCaps( hDC, LOGPIXELSY )
 
@@ -218,7 +216,6 @@ METHOD Draw() CLASS VrLabel
             :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
          ENDIF
       END
-      ReleaseDC(0, hDC)
    ENDIF
 RETURN Self
 

@@ -152,7 +152,7 @@ METHOD Preview() CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
+METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
    LOCAL oControl, x := 0, y := 0, n
    IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
       x := VAL( aCtrl[x][2] )
@@ -202,7 +202,7 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
    ENDIF
    
    IF oPanel == NIL
-      oControl:Draw()
+      oControl:Draw( hDC )
       TRY
          nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
       CATCH
@@ -213,29 +213,29 @@ METHOD CreateControl( aCtrl, nHeight, oPanel ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateBody() CLASS VrReport
+METHOD CreateBody( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
-       ::CreateControl( aCtrl, @nHeight )
+       ::CreateControl( aCtrl, @nHeight,, hDC )
    NEXT
    ::nRow += nHeight
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateHeader() CLASS VrReport
+METHOD CreateHeader( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aHeader
-       ::CreateControl( aCtrl, @nHeight )
+       ::CreateControl( aCtrl, @nHeight,, hDC )
    NEXT
    ::nRow := ::HeaderHeight
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateFooter() CLASS VrReport
+METHOD CreateFooter( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    ::nRow := ::oPDF:PageLength - ::FooterHeight
    FOR EACH aCtrl IN ::aFooter
-       ::CreateControl( aCtrl, @nHeight )
+       ::CreateControl( aCtrl, @nHeight,, hDC )
    NEXT
 RETURN Self
 
@@ -337,7 +337,7 @@ RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL nHeight
+   LOCAL nHeight, hDC
 
    ::Create()
 
@@ -355,26 +355,30 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:Create()
    ENDIF
 
-   ::CreateHeader()
+   hDC := GetDC(0)
 
+   ::CreateHeader( hDC )
+   
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
       ::DataSource:EditCtrl:GoTop()
       WHILE ! ::DataSource:EditCtrl:Eof()
-         nHeight := ::CreateBody()
+         nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
-            ::CreateFooter()
+            ::CreateFooter( hDC )
             ::EndPage()
             ::StartPage()
-            ::CreateHeader()
+            ::CreateHeader( hDC )
          ENDIF
          ::DataSource:EditCtrl:Skip()
       ENDDO
     ELSE
-      ::CreateBody()
+      ::CreateBody( hDC )
    ENDIF
+   ::CreateFooter( hDC )
 
-   ::CreateFooter()
+   ReleaseDC(0, hDC)
+
    ::EndPage()
    ::End()
    hb_gcall(.t.)

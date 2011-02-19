@@ -80,10 +80,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrImage
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-METHOD Draw() CLASS VrImage
-   local hDC, nX, nY, x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
-   hDC := GetDC(0)
-
+METHOD Draw( hDC ) CLASS VrImage
+   local nX, nY, x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
    nY := GetDeviceCaps( hDC, LOGPIXELSY )
 
