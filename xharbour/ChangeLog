@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-20 18:34 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/misc
+    ! add back misc dir (missed while restore in my prevoius commit)
+
 2011-02-20 16:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/ct
   + source/cgi
