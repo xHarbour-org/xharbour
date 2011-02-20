@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-20 16:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/ct
+  + source/cgi
+  + source/misc
+  + source/odbc
+  + source/tip
+  - contrib/ct
+  - contrib/cgi
+  - contrib/misc
+  - contrib/odbc
+  - contrib/tip
+    ! previous reclassification was considered wrong, hence restored.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! reinstate core libraries
+
 2011-02-17 23:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/stringsx.c
   * contrib/misc/strfmt.c

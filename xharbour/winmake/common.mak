@@ -42,10 +42,11 @@ HBMAKE_DIR    =utils$(DIR_SEP)hbmake
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 
-CT_DIR        =contrib$(DIR_SEP)ct
-MISC_DIR      =contrib$(DIR_SEP)misc
-TIP_DIR       =contrib$(DIR_SEP)tip
-ODBC_DIR      =contrib$(DIR_SEP)odbc
+CT_DIR        =source$(DIR_SEP)ct
+MISC_DIR      =source$(DIR_SEP)misc
+TIP_DIR       =source$(DIR_SEP)tip
+ODBC_DIR      =source$(DIR_SEP)odbc
+
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
@@ -1265,26 +1266,7 @@ ODBC_LIB_OBJS=\
 # LIBMISC.LIB rules
 #===============================================================================
 MISC_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)date$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dates2$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dbf$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)environ$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)stringsx$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)mathx$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)strfmt$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)num$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)status$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)stack$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)time$(OBJEXT)\
-	\
-	$(OBJ_DIR)$(DIR_SEP)nconvert$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)stringp$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)fileread$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)numtxten$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)numtxthu$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)twirler$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT)
 
 #===============================================================================
 # DLLMAIN.LIB rules
