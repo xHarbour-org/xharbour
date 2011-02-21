@@ -3799,23 +3799,11 @@ HB_FUNC( CHOOSEFONT )
 
    if( pStructure )
    {
-      if( HB_IS_OBJECT( pStructure ) )
-      {
-         hb_vmPushSymbol( pVALUE->pSymbol );
-         hb_vmPush( pStructure );
-         hb_vmSend(0);
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_vmPush( pStructure );
+      hb_vmSend(0);
 
-         pCf = (LPCHOOSEFONT) hb_parc(-1);
-      }
-      else
-      {
-         pCf = (LPCHOOSEFONT) hb_xgrab( sizeof( CHOOSEFONT ) );
-         ZeroMemory( pCf, sizeof( CHOOSEFONT ) );
-
-         pCf->lStructSize = sizeof( CHOOSEFONT );
-         pCf->lpLogFont   = (LPLOGFONT) hb_xgrab( sizeof( LOGFONT ) );
-         pCf->Flags       = CF_SCREENFONTS;
-      }
+      pCf = (LPCHOOSEFONT) hb_parc(-1);
 
       if( ChooseFont( pCf ) )
       {
@@ -3851,8 +3839,6 @@ HB_FUNC( CHOOSEFONT )
       }
       else
       {
-         hb_xfree( (void *) pCf->lpLogFont );
-         hb_xfree( (void *) pCf );
          hb_retl( FALSE );
       }
    }
