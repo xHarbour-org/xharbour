@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-21 19:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * contrib/tipssl/sendmail.prg
+    ! Unused variables cFName and cFExt
+
 2011-02-20 18:34 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/misc
     ! add back misc dir (missed while restore in my prevoius commit)
@@ -71,7 +75,7 @@
    ! contrib/tipssl/mail.prg
      contrib/tipssl/sendmail.prg
      ! fixed email attachment
-      
+
 2011-02-17 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - CVSROOT
     ! remove garbage directory
