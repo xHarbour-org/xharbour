@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-22 16:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/export.def
+  * source/vm/bcc.def
+    + assigning SVN file properties
+
 2011-02-22 16:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/export.def
   * source/vm/bcc.def
