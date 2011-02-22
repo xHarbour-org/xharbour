@@ -80,8 +80,9 @@ BOOL GetName(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi, DWORD dwFlags, LPSTR lpFriend
 #define EM_SETCUEBANNER    (ECM_FIRST + 1)
 
 HB_EXTERN_BEGIN
-BSTR hb_oleAnsiToSysString( const char *cString );
-extern HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString );
+extern BSTR hb_oleAnsiToSysString( const char *cString );
+extern LPWSTR hb_oleAnsiToWide( const char *cString );
+extern char * hb_oleWideToAnsi( LPWSTR wString );
 HB_EXTERN_END
 
 static IDispatch *pDispPtr;
@@ -2354,34 +2355,31 @@ int CALLBACK ListViewCompareProc( LPARAM lParam1, LPARAM lParam2, LPARAM lParamS
    }
 }
 
-int CALLBACK ListViewCompareProc2(LPARAM lParam1,    
-                                 LPARAM lParam2,   
-                                 LPARAM lParamSort)   
-{   
-    LPLVITEMDATA lplvid1 = (LPLVITEMDATA)lParam1;   
-    LPLVITEMDATA lplvid2 = (LPLVITEMDATA)lParam2;   
-    int  iResult = 1;   
+int CALLBACK ListViewCompareProc2(LPARAM lParam1,
+                                 LPARAM lParam2,
+                                 LPARAM lParamSort)
+{
+    LPLVITEMDATA lplvid1 = (LPLVITEMDATA)lParam1;
+    LPLVITEMDATA lplvid2 = (LPLVITEMDATA)lParam2;
+    int  iResult = 1;
 
-    if( lplvid1 && lplvid2)   
-    {   
-       char szTemp1[MAX_PATH];   
-       char szTemp2[MAX_PATH];   
-
-       if( (lplvid1->ulAttribs & SFGAO_FOLDER) && !( lplvid2->ulAttribs & SFGAO_FOLDER) )   
+    if( lplvid1 && lplvid2)
+    {
+       if( (lplvid1->ulAttribs & SFGAO_FOLDER) && !( lplvid2->ulAttribs & SFGAO_FOLDER) )
        {
-            return -1;   
+            return -1;
        }
-       if( !(lplvid1->ulAttribs & SFGAO_FOLDER) &&  (lplvid2->ulAttribs & SFGAO_FOLDER) )   
-            return 1;   
-   
-       //GetName( lplvid1->lpsfParent, lplvid1->lpi, SHGDN_NORMAL, szTemp1 );   
-       //GetName( lplvid2->lpsfParent, lplvid2->lpi, SHGDN_NORMAL, szTemp2 );   
-   
-       //iResult = lstrcmpi(szTemp1, szTemp2) ;   
-    }   
+       if( !(lplvid1->ulAttribs & SFGAO_FOLDER) &&  (lplvid2->ulAttribs & SFGAO_FOLDER) )
+            return 1;
 
-    return iResult;   
-}   
+       //GetName( lplvid1->lpsfParent, lplvid1->lpi, SHGDN_NORMAL, szTemp1 );
+       //GetName( lplvid2->lpsfParent, lplvid2->lpi, SHGDN_NORMAL, szTemp2 );
+
+       //iResult = lstrcmpi(szTemp1, szTemp2) ;
+    }
+
+    return iResult;
+}
 
 HB_FUNC( __LISTVIEWSORTCOLUMN )
 {
@@ -4104,7 +4102,7 @@ HB_FUNC( ENUMREGDLL )
 
          cProgID = hb_oleWideToAnsi(wProgID);
          cClsID = hb_oleWideToAnsi(wClsID);
-         
+
          if( cProgID )
          {
             TCHAR cPath[MAX_PATH];
@@ -4156,7 +4154,7 @@ HB_FUNC( ENUMREGDLL )
          }
       }
    }
-   
+
    hb_itemReturnForward( &Array );
 
    pCatInfo->lpVtbl->Release(pCatInfo);
