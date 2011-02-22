@@ -278,6 +278,8 @@
 [\xbp\xcc\xhbmt.lib\bkgtsks.obj]
 [\xbp\xcc\xhbmt.lib\throw.obj]
 
+[\xbp\xcc\xhbmt.lib\hbwinole.obj]
+
 # DBF
 [\xbp\xcc\dbfmt.lib\dbcmd.obj]
 [\xbp\xcc\dbfmt.lib\dbtotal.obj]
@@ -680,7 +682,7 @@
 [\xbp\xcc\xhbmt.lib\pcre_valid_utf8.obj]
 [\xbp\xcc\xhbmt.lib\pcre_version.obj]
 [\xbp\xcc\xhbmt.lib\pcre_xclass.obj]
-[\xbp\xcc\xhbmt.lib\pcre_ucp_searchfuncs.obj]
+#[\xbp\xcc\xhbmt.lib\pcre_ucp_searchfuncs.obj]
 [\xbp\xcc\xhbmt.lib\pcre_chartables.obj]
 [\xbp\xcc\xhbmt.lib\pcre_newline.obj]
 

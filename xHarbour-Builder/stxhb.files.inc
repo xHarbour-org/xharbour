@@ -42,6 +42,7 @@ MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName)
 [source\pp\pptable.c]
 
 [source\compiler\gencc.c]
+[source\compiler\gencc1.c]
 [source\compiler\hbpcstat.c]
 [source\compiler\hbdbginf.c]
 [source\compiler\hblbl.c]

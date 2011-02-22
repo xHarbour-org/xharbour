@@ -368,6 +368,8 @@
 
 [source\common\hbprintf.c]
 
+[source\rtl\hbwinole.c]
+
 [source\rtl\browdb.prg]
 [source\rtl\tpopup.prg]
 [source\rtl\ttextlin.prg]
@@ -660,26 +662,46 @@
 
 # *** pcre.lib ***
 [source\rtl\pcre\pcreposix.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_compile.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_config.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_dfa_exec.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_exec.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_fullinfo.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_get.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_globals.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_info.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_maketables.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_ord2utf8.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_refcount.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_study.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_tables.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_try_flipped.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_valid_utf8.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_version.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_xclass.c]
-[source\rtl\pcre\pcre_ucp_searchfuncs.c]
+MYDEFINES = HAVE_CONFIG_H
+#[source\rtl\pcre\pcre_ucp_searchfuncs.c]
 [source\rtl\pcre\pcre_newline.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_chartables.c]
+MYDEFINES = HAVE_CONFIG_H
 
 # *** zlib.lib ***
 [source\rtl\zlib\adler32.c]
