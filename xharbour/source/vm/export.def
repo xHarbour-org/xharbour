@@ -1,5 +1,5 @@
 ; -----------------------------------------------------------------------------
-; $Id: break.c,v 1.4 2005/10/24 01:04:36 druzus Exp $
+; $Id$
 ; Functions to be exported from EXE when creating EXE pCode programs
 ; See tests: pdllvc.bat, pexec.prg, pcode.prg and pcode1.prg for samples
 ; -----------------------------------------------------------------------------
