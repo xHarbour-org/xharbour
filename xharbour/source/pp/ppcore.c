@@ -66,6 +66,10 @@
 #include "hbver.h"
 #include "hbdate.h"
 
+HB_EXTERN_BEGIN
+extern void hb_setDeferredFlagOn( void );
+HB_EXTERN_END
+
 #ifdef __XHARBOUR__
 #ifndef  __PPGEN__
 #include "hbverbld.h"
@@ -2591,6 +2595,10 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
             fError = hb_pp_setCompilerSwitch( pState, "z", fValue );
          else
             fError = TRUE;
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "DEFERRED", HB_PP_CMP_DBASE ) )
+      {
+         hb_setDeferredFlagOn();
       }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {

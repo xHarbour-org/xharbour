@@ -56,3 +56,13 @@
 
 /* NOTE: Internal functions */
 FUNCTION __dbFList()       ; RETURN {}
+
+#PRAGMA BEGINDUMP
+#include "hbapi.h"
+HB_EXTERN_BEGIN
+/* NOTE: Used in compiler only forcing -vd flag.
+   Defined here to resolve 'unresolved external' when linking pp.lib to application
+*/
+void hb_setDeferredFlagOn( void ) {;}
+HB_EXTERN_END
+#PRAGMA ENDDUMP

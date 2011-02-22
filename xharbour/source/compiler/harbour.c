@@ -7294,3 +7294,8 @@ const char * hb_verFlagsPRG( void )
 #endif
 }
 
+/* set deferred flag via pragma in prg file */
+void hb_setDeferredFlagOn( void )
+{
+   hb_comp_autoDeferred = TRUE;
+}

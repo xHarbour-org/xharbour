@@ -5,6 +5,8 @@
  * TO DO: To include Callable Dumped C Codes
  */
 
+#pragma DEFERRED
+
 FUNCTION MYNUM( n )
 
    ? "PROCNAME(0)=" + PROCNAME(0) +"()"

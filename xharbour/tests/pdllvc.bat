@@ -19,8 +19,8 @@ SET PATH=%CC_DIR%\BIN;%PATH%
 SET DEFFILE=%HARBOURDIR%\source\vm\export.def
 
 %HARBOUREXE% pexec.prg  /n0 /i%HARBOURDIR%\include /gc2 /es2 /w
-%HARBOUREXE% pcode.prg  /n1 /i%HARBOURDIR%\include /gc2 /es2 /w /vd
-%HARBOUREXE% pcode1.prg /n1 /i%HARBOURDIR%\include /gc2 /es2 /w /vd
+%HARBOUREXE% pcode.prg  /n1 /i%HARBOURDIR%\include /gc2 /es2 /w
+%HARBOUREXE% pcode1.prg /n1 /i%HARBOURDIR%\include /gc2 /es2 /w
 CL %____CFL% pexec.c
 CL -D__EXPORT__ %____CFL% pcode.c
 CL -D__EXPORT__ %____CFL% pcode1.c

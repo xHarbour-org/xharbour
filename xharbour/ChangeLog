@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-22 14:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/pp/ppcore.c
+    + function hb_setDeferredFlagOn() to set auto-deferred on
+    + 'pragma deferred' to automatically set compiler flag when creating EXE
+      pCode dll (thus eliminating use of -vd flag during compiling, more handy
+      and more informative, IMO)
+
+  * source/rtl/dummy.prg
+    + dummy function hb_setDeferredFlagOn(), which only used during compiling.
+
+  * tests/pdllbc.bat
+  * tests/pdllvc.bat
+    - remove -vd compiler flag
+
+  * tests/pcode.prg
+  * tests/pcode1.prg
+    + add 'pragma deferred' in place of -vd compiler switch
+
 2011-02-21 19:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * contrib/tipssl/sendmail.prg
     ! Unused variables cFName and cFExt
