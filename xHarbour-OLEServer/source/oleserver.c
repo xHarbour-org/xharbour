@@ -3237,7 +3237,7 @@ DLLEXP STDAPI DllGetClassObject( REFCLSID ClassiD, REFIID riid, void **ppvObj )
   }
 
 #ifndef NODLLMAIN
-  HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+  PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
   {
      return hb_vmProcessPrgDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
   }
