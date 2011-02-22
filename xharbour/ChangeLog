@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-22 14:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/pp/ppcore.c
+  * source/rtl/dummy.prg
+    + rename: hb_setDeferredFlagOn() -> hb_compsetDeferredFlagOn()
+
 2011-02-22 14:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
   * source/compiler/harbour.c

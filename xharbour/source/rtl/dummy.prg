@@ -63,6 +63,6 @@ HB_EXTERN_BEGIN
 /* NOTE: Used in compiler only forcing -vd flag.
    Defined here to resolve 'unresolved external' when linking pp.lib to application
 */
-void hb_setDeferredFlagOn( void ) {;}
+void hb_compSetDeferredFlagOn( void ) {;}
 HB_EXTERN_END
 #PRAGMA ENDDUMP

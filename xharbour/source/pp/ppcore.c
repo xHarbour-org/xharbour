@@ -67,7 +67,7 @@
 #include "hbdate.h"
 
 HB_EXTERN_BEGIN
-extern void hb_setDeferredFlagOn( void );
+extern void hb_compSetDeferredFlagOn( void );
 HB_EXTERN_END
 
 #ifdef __XHARBOUR__
@@ -2598,7 +2598,7 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "DEFERRED", HB_PP_CMP_DBASE ) )
       {
-         hb_setDeferredFlagOn();
+         hb_compSetDeferredFlagOn();
       }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {
