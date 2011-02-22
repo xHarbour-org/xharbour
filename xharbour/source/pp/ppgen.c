@@ -84,6 +84,7 @@ const char * hb_verCvsLastEntry( void ) { return NULL; }
 const char * hb_verFlagsC( void ) { return NULL; }
 const char * hb_verFlagsL( void ) { return NULL; }
 const char * hb_verFlagsPRG( void ) { return NULL; }
+void hb_compSetDeferredFlagOn( void ) {;}
 
 /*
  * functions to create .c files with rules defined in given PP context
