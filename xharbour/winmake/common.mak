@@ -1159,6 +1159,7 @@ HBFILERE_EXE_OBJS=\
 #===============================================================================
 HARBOUR_EXE_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cmdcheck$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbusage$(OBJEXT)\

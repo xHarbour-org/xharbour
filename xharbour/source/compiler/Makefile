@@ -40,6 +40,7 @@ endif
 
 C_SOURCES=\
 	cmdcheck.c \
+	comptool.c \
 	genc.c \
 	gencc.c \
 	gencc1.c \

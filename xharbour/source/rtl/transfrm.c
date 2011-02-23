@@ -634,7 +634,7 @@ HB_FUNC( TRANSFORM )
 
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
-         BOOL     bPDec  = FALSE;
+         /* BOOL     bPDec  = FALSE; */
          BOOL     bTrueDec = FALSE;
 
          BOOL     bAdjust = FALSE;
@@ -839,7 +839,7 @@ HB_FUNC( TRANSFORM )
                      }
                      else if( cPic == '.' && bInit )
                      {
-                       bPDec = TRUE;
+                       /* bPDec = TRUE; */
 
                        if( uiPicFlags & PF_EXCHANG )  /* Exchange . and ,         */
                        {
@@ -848,7 +848,7 @@ HB_FUNC( TRANSFORM )
                        }
                        else
                        {
-                         if( uiPicFlags & PF_NUMDATE || bPDec )    /* Dot in date              */
+                         if( uiPicFlags & PF_NUMDATE /* || bPDec */ )    /* Dot in date              */
                          {
                            szResult[ i ] = cPic;
                            iCount++;

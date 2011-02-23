@@ -819,7 +819,7 @@ char *hb_verBuildInfo( BOOL bOut )
    hb_xstrcat( szBuildInfo, hb_verCvsLastEntry(), "\t", NULL );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "ChangeLog CVS version: ", 0, bOut );
+   hb_conOutErr_( "ChangeLog SVN version: ", 0, bOut );
    hb_conOutErr_( hb_verCvsChangeLogID(), 0, bOut );
    hb_xstrcat( szBuildInfo, hb_verCvsChangeLogID(), "\t", NULL );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );

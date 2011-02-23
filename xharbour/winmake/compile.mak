@@ -187,6 +187,9 @@ $(OBJ_DIR)$(DIR_SEP)hbpcode$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcode.c
 $(OBJ_DIR)$(DIR_SEP)hbdead$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbdead.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)comptool.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbstripl$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbstripl.c
 	$(CC_CMD)
 
