@@ -39,13 +39,7 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS RepEdit
    LOCAL cBits, xSize, ySize, aSize
-   aSize := {::Width,::Height}
-   ::HorzScroll    := .T.
-   ::Width  := GetSystemMetrics( SM_CXSCREEN ) * 2
-   ::Height := GetSystemMetrics( SM_CYSCREEN ) * 2
    Super:Create()
-   ::Width  := aSize[1]
-   ::Height := aSize[2]
    ::ForeColor := ::System:Color:LightGray
    cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
    IF !Empty(::hBmpGrid)
@@ -172,7 +166,7 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    
    cx := ::Width
    cy := ::Height
-   
+   /*
    IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
       nX := GetDeviceCaps( hDC, LOGPIXELSX )
       nY := GetDeviceCaps( hDC, LOGPIXELSY )
@@ -180,7 +174,7 @@ METHOD OnPaint( hDC ) CLASS RepEdit
       cy := Int( ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY )
       _Fillrect( hMemDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
    ENDIF
-   
+   */
    IF ::Application:Props:PropEditor:ActiveObject != NIL  .AND. ::nDownPos == NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
       IF ::Application:Props:PropEditor:ActiveObject:lUI .AND. oCtrl:Parent:hWnd == ::hWnd

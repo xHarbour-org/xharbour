@@ -51,7 +51,7 @@ CLASS MainForm FROM WinForm
 ENDCLASS
 
 METHOD Init() CLASS MainForm
-   LOCAL aEntries, cReport, oItem, aComp, n, i
+   LOCAL aSize, aEntries, cReport, oItem, aComp, n, i
    ::Super:Init()
    
    ::Caption := "Visual Report"
@@ -403,7 +403,7 @@ METHOD Init() CLASS MainForm
       :Create()
    END
 
-
+/*
    WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( Self )
       :Caption        := "Report Header"
       :BackColor      := ::System:Color:White
@@ -490,6 +490,114 @@ METHOD Init() CLASS MainForm
       :Dock:Top       := ::Application:Props[ "Header" ]
       :Dock:Bottom    := ::Application:Props[ "Footer" ]
       :Create()
+   END
+*/
+   WITH OBJECT ::Application:Props[ "ReportPanel" ] := Panel( Self )
+      aSize         := {::Width,::Height}
+      :BackColor    := ::System:Color:White
+      :HorzScroll   := .T.
+      :Dock:Margins := "2,2,2,2"
+      :Width        := GetSystemMetrics( SM_CXSCREEN ) * 2
+      :Height       := GetSystemMetrics( SM_CYSCREEN ) * 2
+      :Dock:Left    := ::Application:Props[ "ToolBox" ]
+      :Dock:Right   := ::Application:Props[ "PropEditor" ]
+      :Dock:Top     := ::ToolStripContainer1
+      :Dock:Bottom  := ::Application:Props:Components
+      :BackColor    := ::System:Color:Gray
+      :Create()
+      :Width        := aSize[1]
+      :Height       := aSize[2]
+      WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
+         :Caption   := "Report Header"
+         :BackColor := ::System:Color:White
+         :Left      := 3
+         :Top       := 3
+         :Height    := 100
+         :Width     := aSize[1]
+         :Visible   := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+         :Application:Props[ "ViewMenuRepHeader" ]:Checked := :Visible
+         :Create()
+      END
+
+      WITH OBJECT Splitter( :this )
+         :Owner := ::Application:Props[ "RepHeader" ]
+         :Position := 4
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
+         :Caption      := "Header"
+         :BackColor    := ::System:Color:White
+         :Left         := 3
+         :Top          := 3
+         :Width        := aSize[1]
+         :Height       := 100
+         :Dock:Margins := "0,0,0,0"
+         :Dock:Top     := ::Application:Props[ "RepHeader" ]
+         :Visible      := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
+         :Application:Props[ "ViewMenuHeader" ]:Checked := :Visible
+         :Create()
+      END
+      WITH OBJECT Splitter( :this )
+         :Owner := ::Application:Props[ "Header" ]
+         :Position := 4
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "RepFooter" ] := RepFooterEdit( :this )
+         :Caption      := "Report Footer"
+         :BackColor    := ::System:Color:White
+         :Border       := .T.
+         :Left         := 3
+         :Top          := 3
+         :Height       := 100
+         :Width        := aSize[1]
+         :Dock:Margins := "0,0,0,3"
+         :Dock:Bottom  := :Parent
+         :Visible      := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
+         :Application:Props[ "ViewMenuRepFooter" ]:Checked := :Visible
+         :Create()
+      END
+
+      WITH OBJECT Splitter( :this )
+         :Owner := ::Application:Props[ "RepFooter" ]
+         :Position := 2
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( :this )
+         :Caption      := "Footer"
+         :BackColor    := ::System:Color:White
+         :Border       := .T.
+         :Left         := 3
+         :Top          := 3
+         :Height       := 100
+         :Width        := aSize[1]
+         :Dock:Margins := "0,0,0,0"
+         :Dock:Bottom  := ::Application:Props:RepFooter
+         :Visible      := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
+         :Application:Props[ "ViewMenuFooter" ]:Checked := :Visible
+         :Create()
+      END
+
+      WITH OBJECT Splitter( :this )
+         :Owner := ::Application:Props[ "Footer" ]
+         :Position := 2
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( :this )
+         :BackColor    := ::System:Color:White
+         :Dock:Margins := "0,0,0,0"
+         :Left         := 3
+         :Top          := 3
+         :Height       := 100
+         :Width        := aSize[1]
+         :Dock:Top     := ::Application:Props:Header
+         :Dock:Bottom  := ::Application:Props:Footer
+         :Create()
+      END
+
    END
 
    ::RestoreLayout(, "Layout")
