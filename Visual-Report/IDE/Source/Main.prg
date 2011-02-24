@@ -514,8 +514,8 @@ METHOD Init() CLASS MainForm
          :Top       := 3
          :Height    := 100
          :Width     := aSize[1]
-         :Visible   := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
-         :Application:Props[ "ViewMenuRepHeader" ]:Checked := :Visible
+         :Visible   := .F.
+         :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
          :Create()
       END
 
@@ -534,8 +534,8 @@ METHOD Init() CLASS MainForm
          :Height       := 100
          :Dock:Margins := "0,0,0,0"
          :Dock:Top     := ::Application:Props[ "RepHeader" ]
-         :Visible      := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
-         :Application:Props[ "ViewMenuHeader" ]:Checked := :Visible
+         :Visible      := .F.
+         :Application:Props[ "ViewMenuHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
          :Create()
       END
       WITH OBJECT Splitter( :this )
@@ -554,8 +554,8 @@ METHOD Init() CLASS MainForm
          :Width        := aSize[1]
          :Dock:Margins := "0,0,0,3"
          :Dock:Bottom  := :Parent
-         :Visible      := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
-         :Application:Props[ "ViewMenuRepFooter" ]:Checked := :Visible
+         :Visible      := .F.
+         :Application:Props[ "ViewMenuRepFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
          :Create()
       END
 
@@ -575,8 +575,8 @@ METHOD Init() CLASS MainForm
          :Width        := aSize[1]
          :Dock:Margins := "0,0,0,0"
          :Dock:Bottom  := ::Application:Props:RepFooter
-         :Visible      := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
-         :Application:Props[ "ViewMenuFooter" ]:Checked := :Visible
+         :Visible      := .F.
+         :Application:Props[ "ViewMenuFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
          :Create()
       END
 
@@ -595,6 +595,7 @@ METHOD Init() CLASS MainForm
          :Width        := aSize[1]
          :Dock:Top     := ::Application:Props:Header
          :Dock:Bottom  := ::Application:Props:Footer
+         :Visible      := .F.
          :Create()
       END
 
@@ -678,9 +679,14 @@ METHOD New() CLASS Report
 
    ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
    ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
+
+   ::SetScrollArea()
+
+   oApp:Props:RepHeader:InvalidateRect()
    oApp:Props:Header:InvalidateRect()
    oApp:Props:Body:InvalidateRect()
    oApp:Props:Footer:InvalidateRect()
+   oApp:Props:RepFooter:InvalidateRect()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -708,9 +714,11 @@ METHOD PageSetup() CLASS Report
       
       ::SetScrollArea()
       
+      oApp:Props:RepHeader:InvalidateRect()
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()
       oApp:Props:Footer:InvalidateRect()
+      oApp:Props:RepFooter:InvalidateRect()
    ENDIF
 RETURN Self
 
@@ -746,18 +754,24 @@ METHOD Close() CLASS Report
    WITH OBJECT oApp
       :Props:Components:Reset()
 
-      AEVAL( :Props:Header:Objects, {|o|o:EditCtrl:Destroy()} )
-      AEVAL( :Props:Body:Objects, {|o|o:EditCtrl:Destroy()} )
-      AEVAL( :Props:Footer:Objects, {|o|o:EditCtrl:Destroy()} )
-      :Props:Header:Objects := {}
-      :Props:Body:Objects   := {}
-      :Props:Footer:Objects := {}
+      AEVAL( :Props:RepHeader:Objects, {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:RepFooter:Objects, {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:Header:Objects,    {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:Body:Objects,      {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:Footer:Objects,    {|o|o:EditCtrl:Destroy()} )
+      :Props:RepHeader:Objects := {}
+      :Props:RepFooter:Objects := {}
+      :Props:Header:Objects    := {}
+      :Props:Body:Objects      := {}
+      :Props:Footer:Objects    := {}
 
       :Props:PropEditor:ActiveObject := NIL
 
-      :Props:Header:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
-      :Props:Body:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
-      :Props:Footer:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+      :Props:RepHeader:Visible := .F.
+      :Props:Header:Visible    := .F.
+      :Props:Body:Visible      := .F.
+      :Props:Footer:Visible    := .F.
+      :Props:RepFooter:Visible := .F.
 
       :Props:ToolBox:Enabled       := .F.
       :Props:SaveMenu:Enabled      := .F.
@@ -775,14 +789,25 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SetScrollArea() CLASS Report
-   LOCAL nX, hDC := GetDC(0)
+   LOCAL n, nX, hDC := GetDC(0)
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
-   oApp:Props:Header:OriginalRect[3] := oApp:Props:Body:OriginalRect[3] := oApp:Props:Footer:OriginalRect[3] := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
    ReleaseDC( 0, hDC )
-
-   oApp:Props:Header:__SetScrollBars()
-   oApp:Props:Body:__SetScrollBars()
-   oApp:Props:Footer:__SetScrollBars()
+   
+   n := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
+   
+   oApp:Props:Header:Width    := n
+   oApp:Props:Body:Width      := n
+   oApp:Props:Footer:Width    := n
+   oApp:Props:RepHeader:Width := n
+   oApp:Props:RepFooter:Width := n
+   
+   oApp:Props:Header:Parent:OriginalRect[3] := n + 6
+   
+   oApp:Props:RepHeader:Visible := .T.
+   oApp:Props:Header:Visible    := .T.
+   oApp:Props:Body:Visible      := .T.
+   oApp:Props:Footer:Visible    := .T.
+   oApp:Props:RepFooter:Visible := .T.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -821,9 +846,11 @@ METHOD Open( cReport ) CLASS Report
 
       ::SetScrollArea()
 
+      oApp:Props:RepHeader:InvalidateRect()
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()
       oApp:Props:Footer:InvalidateRect()
+      oApp:Props:RepFooter:InvalidateRect()
 
    ENDIF
 RETURN Self

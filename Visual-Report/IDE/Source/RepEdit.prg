@@ -38,7 +38,16 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS RepEdit
-   LOCAL cBits, xSize, ySize, aSize
+   LOCAL cBits, xSize, ySize, aSize, hDC, n
+   ::oPs := PageSetup( ::Application:MainForm )
+   ::oPs:ReturnDefault := .T.
+   ::oPs:Show()
+   
+   n := ( ::Parent:ClientWidth / ::oPs:PageWidth ) * 100
+   
+   ::Width := ::oPs:PageWidth - ( ( ::oPs:PageWidth * n ) / 100 )
+   ::Parent:OriginalRect[3] := ::Width + 6
+   
    Super:Create()
    ::ForeColor := ::System:Color:LightGray
    cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
@@ -48,11 +57,6 @@ METHOD Create() CLASS RepEdit
    ::hBmpGrid := CreateBitmap( xSize, ySize, 1, 1, cBits )
    ::xBmpSize := xSize
    ::yBmpSize := ySize
-   
-//   ::oPs := PageSetup( ::Application:MainForm )
-//   ::oPs:ReturnDefault := .T.
-//   ::oPs:Show()
-
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------------
