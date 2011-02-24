@@ -147,6 +147,9 @@ $(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DI
 #===============================================================================
 # HARBOUR.EXE rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbmain$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbmain.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)harbour.c
 	$(CC_CMD)
 
