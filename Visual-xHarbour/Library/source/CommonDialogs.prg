@@ -23,7 +23,7 @@
 
 
 CLASS CommonDialogs INHERIT Component
-   DATA Style PROTECTED
+   DATA Style EXPORTED
    METHOD SetStyle()
 ENDCLASS
 
