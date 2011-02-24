@@ -269,6 +269,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbhex2n$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbip$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbjson$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbmd5$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbntos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT)\

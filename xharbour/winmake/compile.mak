@@ -875,7 +875,10 @@ $(OBJ_DIR)$(DIR_SEP)hbgtcore$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbgtcore.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbip$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbip.c
-	$(CC_CMD)   
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbjson$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbjson.c
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hboutdbg.c
 	$(CC_CMD)
