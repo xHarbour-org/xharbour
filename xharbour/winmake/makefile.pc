@@ -78,7 +78,7 @@ COMPILERLIBS=\
 	winmm.lib\
         mpr.lib \
         comctl32.lib
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILERLIBS)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB) $(COMPILERLIBS)
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
 CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 
@@ -97,6 +97,9 @@ ALL: $(PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
+	$(LIB_CMD)
+
 $(RTL_LIB) : $(RTL_LIB_OBJS)
 	$(LIB_CMD)
 

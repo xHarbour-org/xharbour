@@ -149,13 +149,16 @@ COMPILERLIBS=\
 	advapi32.lib\
 	winmm.lib\
 	mpr.lib
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB)
+HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB)
 EXE_LIBS=$(HARBOUR_LIBS)
 CMN_LIBS=$(COMMON_LIB)
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
+	$(LIB_CMD)
+
 $(RTL_LIB) : $(RTL_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -432,6 +435,7 @@ HB_FILEMEM=1
 # HB_WHAT32=1
 # TIPSSL=1
 
+HB_LIBHARU=1
 HB_XWT=1
 HB_MZIP=1
 HB_ZIP=1
@@ -491,6 +495,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
 
 !ifdef HB_DIR_OPENSSL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
+!endif
+
+!ifdef HB_LIBHARU
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
 !endif
 
 ALL: $(CONTRIB_PROJECT)
@@ -615,6 +623,9 @@ $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
 	$(LIB_CMD)
 
 $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)

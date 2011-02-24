@@ -116,6 +116,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%    lib >NUL
 
 ECHO Done ...
 ECHO.
@@ -258,6 +259,8 @@ if exist lib\%LIBPREFIX%vmmt%LIBEXT%                 del lib\%LIBPREFIX%vmmt%LIB
 if exist lib\%LIBPREFIX%zlib%LIBEXT%                 del lib\%LIBPREFIX%zlib%LIBEXT%
 if exist lib\%LIBPREFIX%png%LIBEXT%                  del lib\%LIBPREFIX%png%LIBEXT%
 if exist lib\%LIBPREFIX%hbhpdf%LIBEXT%               del lib\%LIBPREFIX%hbhpdf%LIBEXT%
+if exist lib\%LIBPREFIX%compiler%LIBEXT%             del lib\%LIBPREFIX%compiler%LIBEXT%
+if exist lib\%LIBPREFIX%libharu%LIBEXT%              del lib\%LIBPREFIX%libharu%LIBEXT%
 if exist lib\%LIBPREFIX%*.bak                        del lib\%LIBPREFIX%*.bak
 if exist lib\%LIBPREFIX%*%OBJEXT%                    del lib\%LIBPREFIX%*%OBJEXT%
 

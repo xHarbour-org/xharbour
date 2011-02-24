@@ -24,6 +24,7 @@ HB_GTWVW=1
 #HB_ZIP=1
 #HB_XWT=1
 #TIPSSL=1
+#HB_LIBHARU=1
 
 #===============================================================================
 # Append your own build flags here
@@ -85,6 +86,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
 
 !ifdef TIPSSL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL)
+!endif
+
+!ifdef LIBHARU
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU)
 !endif
 
 ALL: $(CONTRIB_PROJECT)
@@ -149,6 +154,8 @@ $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 	$(LIB_CMD)
 
+$(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
+	$(LIB_CMD)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================

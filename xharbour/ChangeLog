@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-24 10:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/compiler/hbmain.c
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compiler.mak
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+  * winmake/makefile.wc
+  * winmake/makefile.wc
+  * winmake/contrib.pc
+    ! compiler related functions are pooled as compiler.lib
+    ! moved libharu functions from hbhpdf.lib to libharu.lib because some
+      compilers cannot (yet) compile the current version (PNG related)
+    + option to create libharu.lib -> SET HB_LIBHARU=1 -> create libharu.lib
+
+  * source/compiler/Makefile
+    + add hbmain.c dependency
+
 2011-02-23 07:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c
     ! "CVS version" -> "SVN version"

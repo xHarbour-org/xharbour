@@ -255,7 +255,7 @@ char **ArgV;
 
 extern HB_COMP_IDS hb_compExpr_IDs;
 
-int main( int argc, char * argv[] )
+int hb_compMain( int argc, char * argv[] )
 {
    int iStatus = EXIT_SUCCESS;
    int i;
@@ -390,7 +390,7 @@ int main( int argc, char * argv[] )
       fclose( hb_comp_VariableList );
    }
 
-   hb_xexit();
+   /* hb_xexit(); */
 
    return iStatus;
 }

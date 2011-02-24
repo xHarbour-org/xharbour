@@ -39,6 +39,7 @@ LEX_HEADERS=\
 endif
 
 C_SOURCES=\
+	harbour.c \
 	cmdcheck.c \
 	comptool.c \
 	genc.c \
@@ -64,7 +65,7 @@ C_SOURCES=\
 	exproptc.c \
 	$(C_EXTRA)
 
-C_MAIN=harbour.c
+C_MAIN=hbmain.c
 
 LIBS=\
 	pp \

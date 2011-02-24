@@ -75,6 +75,7 @@ INCLUDE_DIR2  =include
 #===============================================================================
 # Macros For Standard Libraries
 #===============================================================================
+COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
 CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(HB_MT)$(LIBEXT)
@@ -143,6 +144,7 @@ XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
 XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
 HBHPDF_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbhpdf$(LIBEXT)
+LIBHARU_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libharu$(LIBEXT)
 TIPSSL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tipssl$(HB_MT)$(LIBEXT)
 
 #===============================================================================
@@ -1158,6 +1160,9 @@ HBFILERE_EXE_OBJS=\
 # HARBOUR.EXE rules
 #===============================================================================
 HARBOUR_EXE_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbmain$(OBJEXT)
+
+COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT)\
@@ -1743,7 +1748,9 @@ PNG_LIB_OBJS=\
 # HBHPDF.LIB dependencies
 #===============================================================================
 HBHPDF_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)harupdf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harupdf$(OBJEXT)
+
+LIBHARU_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_utils$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_error$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_mmgr$(OBJEXT)\
@@ -1819,6 +1826,7 @@ ST_PROJECT=\
 	$(COMMON_LIB)\
 	$(PPGEN_EXE)\
 	$(PP_LIB)\
+	$(COMPILER_LIB)\
 	$(HARBOUR_EXE)\
 	$(VM_LIB)\
 	$(FMSTAT_LIB)\
