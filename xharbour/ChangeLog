@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-24 10:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/mdir.bat
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+  * winmake/makefile.wc
+  * winmake/contrib.pc
+    ! assigning SVN file properties
+
 2011-02-24 10:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.gc
     ! assigning SVN file properties
