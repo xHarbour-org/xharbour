@@ -8,18 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-24 10:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.gc
+    ! missing libharu make rule
+
+  * ChangeLog
+    ! corrected some typos
+
 2011-02-24 10:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/compiler/hbmain.c
   * include/hbcomp.h
   * source/compiler/harbour.c
   * winmake/mdir.bat
   * winmake/common.mak
-  * winmake/compiler.mak
+  * winmake/compile.mak
   * winmake/makefile.bc
   * winmake/makefile.vc
   * winmake/makefile.pc
   * winmake/makefile.dc
-  * winmake/makefile.wc
   * winmake/makefile.wc
   * winmake/contrib.pc
     ! compiler related functions are pooled as compiler.lib
@@ -46,7 +52,7 @@
 
 2011-02-22 18:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/pp/ppgen.c
-    + dummy function hb_compsetDeferredFlagOn()
+    + dummy function hb_compSetDeferredFlagOn()
 
 2011-02-22 16:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/export.def
@@ -63,7 +69,7 @@
   * source/compiler/harbour.c
   * source/pp/ppcore.c
   * source/rtl/dummy.prg
-    + rename: hb_setDeferredFlagOn() -> hb_compsetDeferredFlagOn()
+    + rename: hb_setDeferredFlagOn() -> hb_compSetDeferredFlagOn()
 
 2011-02-22 14:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
@@ -91,7 +97,7 @@
 
 2011-02-20 18:34 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/misc
-    ! add back misc dir (missed while restore in my prevoius commit)
+    ! add back misc dir (missed while restore in my previous commit)
 
 2011-02-20 16:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/ct

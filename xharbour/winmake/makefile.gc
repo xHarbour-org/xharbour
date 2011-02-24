@@ -369,6 +369,7 @@ HB_GTWVW=1
 HB_MZIP=1
 HB_ZIP=1
 
+HB_LIBHARU=1
 HB_FREEIMAGE=1
 HB_WHAT32=1
 HB_XWT=1
@@ -444,6 +445,10 @@ ifeq ($(HB_PGSQL), 1)
 CONTRIB_PROJECT+=$(PGSQL_LIB)
 endif
 
+ifeq ($(HB_LIBHARU), 1)
+CONTRIB_PROJECT+=$(LIBHARU_LIB)
+endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -509,6 +514,9 @@ $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HB_LIBHARU_LIB) : $(HB_LIBHARU_LIB_OBJS)
 	$(LIB_CMD)
 
 endif
