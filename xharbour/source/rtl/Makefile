@@ -64,6 +64,7 @@ C_SOURCES=\
 	hbgtcore.c   \
 	hbhex2n.c    \
 	hbip.c       \
+	hbjson.c     \
 	hbmd5.c      \
 	hbntos.c     \
 	hboutdbg.c   \

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-25 08:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/Makefile
+    + hbjson.c file dependency
+
 2011-02-25 06:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapi.h
     ! removed unused __NO_EXPORT__ condition
