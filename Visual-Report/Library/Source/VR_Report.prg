@@ -172,6 +172,9 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
       oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
 
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FILENAME"} ) ) > 0
+      oControl:FileName := aCtrl[n][2]
+   ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
       oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
    ENDIF
@@ -203,10 +206,12 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
    
    IF oPanel == NIL
       oControl:Draw( hDC )
-      TRY
-         nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
-      CATCH
-      END
+      IF oControl:ClsName != "Image"
+         TRY
+            nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
+         CATCH
+         END
+      ENDIF
     ELSE
       oControl:Configure()
    ENDIF
