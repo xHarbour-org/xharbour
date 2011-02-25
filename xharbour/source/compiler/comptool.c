@@ -33,6 +33,11 @@
 #include "hbapierr.h"
 #include "hbmemory.ch"
 
+static int  s_iFileCase = HB_SET_CASE_MIXED;
+static int  s_iDirCase  = HB_SET_CASE_MIXED;
+static BOOL s_fFnTrim   = FALSE;
+static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
+
 /* ------------------------------------------------------------------------- */
 /* FM statistic module */
 /* ------------------------------------------------------------------------- */
@@ -362,12 +367,6 @@ char * hb_conNewLine( void )
 {
    return ( char * ) "\n";
 }
-
-static int  s_iFileCase = HB_SET_CASE_MIXED;
-static int  s_iDirCase  = HB_SET_CASE_MIXED;
-static BOOL s_fFnTrim   = FALSE;
-static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
-
 
 const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
 {

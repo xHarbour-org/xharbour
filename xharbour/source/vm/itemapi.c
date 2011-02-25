@@ -1037,7 +1037,6 @@ PHB_ITEM hb_itemPutNLLen( PHB_ITEM pItem, LONG lNumber, int iWidth )
    return pItem;
 }
 
-
 PHB_ITEM hb_itemPutSymbol( PHB_ITEM pItem, PHB_SYMB pSym )
 {
    PHB_SYMBCARGO pSymCargo;
@@ -1273,7 +1272,6 @@ PHB_ITEM hb_itemUnRef( PHB_ITEM pItem )
    return pItem;
 }
 
-
 /* Internal API, not standard Clipper */
 /* De-references item passed by the reference */
 
@@ -1433,7 +1431,6 @@ PHB_ITEM hb_itemClone( PHB_ITEM pItem )
 
    return hb_itemNew( pItem );
 }
-
 
 /* Internal API, not standard Clipper */
 
@@ -1960,10 +1957,6 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
          hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
          hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
-
-
-
-
 
          * ulLen = strlen( buffer );
          * bFreeReq = TRUE;

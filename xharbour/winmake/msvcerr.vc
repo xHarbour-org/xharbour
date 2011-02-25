@@ -1,0 +1,18 @@
+#===============================================================================
+# $Id$
+# MSVC MEKFEILE ERROR CHECKER
+#===============================================================================
+!if ("$(__MSC__)"=="")
+!message ERROR: __MSC__ is not defined
+!if ("$(USE_MSVCRT)"=="1")
+!message Compiling with -MD required __MSC__ defined
+!message __MSC__ must be set as follows:
+!message __MSC__=6  -> MSVC 6  Visual Studio 2000 (_MSC_VER=1200)
+!message __MSC__=7  -> MSVC 7  Visual Studio 2003 (_MSC_VER=1300)
+!message __MSC__=71 -> MSVC 71 MS Driver Tool Kit (_MSC_VER=1310)
+!message __MSC__=8  -> MSVC 8  Visual Studio 2005 (_MSC_VER=1400)
+!message __MSC__=9  -> MSVC 9  Visual Studio 2008 (_MSC_VER=1500)
+!message __MSC__=10 -> MSVC 10 Visual Studio 2010 (_MSC_VER=1600)
+!error
+!endif
+!endif

@@ -29,8 +29,10 @@ LINEFLAGS=-l
 !if ("$(__BLD__)"=="CORE_BLD")
 #*******************************************************************************
 
-# Comment this line if use of LIBC* is preferred
+# Uncomment this line if linking with MSVCRT is preferred
 # USE_MSVCRT=1
+
+!include winmake\msvcerr.vc
 
 # Comment this line if use of C-Mode is preferred
 CPLUSPLUS=1
@@ -291,8 +293,10 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 !elseif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
 
-# Comment this line if use of LIBC* is preferred
+# Uncomment this line if linking with MSVCRT is preferred
 # USE_MSVCRT=1
+
+!include winmake\msvcerr.vc
 
 # Comment this line if use of C-Mode is preferred
 CPLUSPLUS=1
@@ -418,8 +422,10 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
-# Comment this line if use of LIBC* is preferred
+# Uncomment this line if linking with MSVCRT is preferred
 # USE_MSVCRT=1
+
+!include winmake\msvcerr.vc
 
 # Comment this line if use of C-Mode is preferred
 CPLUSPLUS=1

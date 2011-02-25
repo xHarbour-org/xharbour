@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-25 06:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+    ! removed unused __NO_EXPORT__ condition
+
+  * source/vm/itemapi.c
+    ! removed empty lines
+
+  * source/compiler/comptool.c
+    ! static vars declaration moved to top of file
+
+  * winmake/makefile.vc
+  + winmake/msvcerr.vc
+    + error checker when compiling with MSVC Runtime (-MD)
+
 2011-02-24 23:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + include/hbjson.h
   + source/rtl/hbjson.c
