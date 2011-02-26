@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-27 02:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbjson.c
+    ! missing parameter 2 handler
+
 2011-02-25 08:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/Makefile
     + hbjson.c file dependency
