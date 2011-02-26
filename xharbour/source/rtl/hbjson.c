@@ -692,7 +692,7 @@ HB_FUNC( HB_JSONENCODE )
 HB_FUNC( HB_JSONDECODE )
 {
    PHB_ITEM pItem = hb_itemNew( NULL );
-   PHB_ITEM pRef = hb_param( 2, HB_IT_ANY );
+   PHB_ITEM pRef = hb_param( 2, HB_IT_BYREF );
 
    hb_retnl( ( LONG ) hb_jsonDecode( hb_parc( 1 ), pItem ) );
 
