@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-17 14:00 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/mysql/mysql.c
+    ! fix to allow -DHB_OS_WIN32_USED
+  * contrib/firebird/firebird.c
+    ! added functions  FBBACKUPDB,FBRESTOREDB,FBDROPDB, changes provided by Marson de  Paula
+    ! changed FBCREATEDB to not keep database open  , changes provided by Marson de  Paula
+    
 2011-02-27 21:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/direct.c
     ! Exact logic if "*.*" param is passed in DirectoryRecurse("*.*")

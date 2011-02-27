@@ -67,6 +67,7 @@
 #define MAX_FIELDS             5
 #define MAX_LEN              256
 #define MAX_BUFFER          1024
+#define DEF_LENGTH_SERVICE  11
 
 #define ERREXIT(status) { _retnl(isc_sqlcode(status)); return; }
 
@@ -78,6 +79,10 @@
 #define	ISC_INT64_FORMAT	"ll"
 #endif
 #endif
+
+HB_EXTERN_BEGIN
+   static UINT ConnectService( const char * cConnectioService, FB_API_HANDLE * svc_handle, const char * cUser, const char * cPassWord );
+HB_EXTERN_END
 
 HB_FUNC(FBCREATEDB)
 {
@@ -113,9 +118,63 @@ HB_FUNC(FBCREATEDB)
     if (isc_dsql_execute_immediate(status, &newdb, &trans, 0, create_db, dialect, NULL))
         ERREXIT(status);
 
+	// (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 19/Jan/2011
+	// Detach DB File after your creation
+	if ( isc_detach_database ( status, &newdb ) )
+ 	   ERREXIT(status);
+		   
     _retni(1);
 }
 
+// (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 19/Jan/2011
+// Created to drop the DB File
+HB_FUNC(FBDROPDB)
+{
+  char        dbp_buffer[256], 
+				  *dbp, 
+				  *p;
+  isc_db_handle   db;
+  char            *dbname;
+  char            *user;
+  char            *passw;
+  ISC_STATUS      status[20];
+  short           dbp_lenght;
+  
+  db     = 0L;
+  dbname = hb_parcx(1);
+  user   = hb_parcx(2);
+  passw  = hb_parcx(3);
+  
+  // make DBP string with USER and PASSWORD
+  dbp = dbp_buffer;
+  *dbp++ = isc_dpb_version1;
+  
+  *dbp++ = isc_dpb_user_name;
+  *dbp++ = strlen(user);
+  for (p = user; *p;)
+	 *dbp++ = *p++;
+	 
+  *dbp++ = isc_dpb_password;
+  *dbp++ = strlen(passw);
+  for (p = passw; *p;)
+	 *dbp++ = *p++;
+	 
+  dbp_lenght = dbp - dbp_buffer;
+  
+  // Connect to DB
+  isc_attach_database(status, strlen(dbname), dbname, &db, dbp_lenght, dbp_buffer);
+  
+  if (status[0] == 1 && status[1])
+	 ERREXIT(status);
+  
+  // Drop DB
+  isc_drop_database(status,&db);
+
+  if (status[0] == 1 && status[1])
+	 ERREXIT(status);
+
+  _retni(1);
+}
 
 HB_FUNC(FBCONNECT)
 {
@@ -733,3 +792,203 @@ HB_FUNC(FBGETBLOB)
     _itemRelease(aNew);
 }
 
+/*
+   FBBACKUPDB( cConnection, cIBFileName, cBkpFileNameTarget, cUser, cPassWord )
+   (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 15/Fev/2011
+   Make BACKUP remotely
+*/
+HB_FUNC(FBBACKUPDB)
+{
+   char           *user;
+   char           *password;
+   char           *service_name;
+   
+   char           *cdbname;
+   char           *cbkpname;
+        
+   isc_svc_handle service_handle;
+   
+   ISC_STATUS     status[20];
+   
+   char           request[100];
+   char           *x;
+   char           *p = request;
+
+   long *retorno;
+   unsigned       long options;
+   
+   service_handle = NULL;
+
+   service_name        = hb_parcx(1);
+   user                = hb_parcx(4);
+   password            = hb_parcx(5);
+
+   cdbname             = hb_parcx(2);
+   cbkpname            = hb_parcx(3);
+   
+   retorno = ConnectService(service_name, &service_handle, user, password);
+   
+   if( retorno != 1 )
+      ERREXIT(retorno);
+      
+   /* Identify the Backup Service */
+   *p++ = isc_action_svc_backup;
+   
+   /* Source DB filename */
+   *p++ = isc_spb_dbname;
+   ADD_SPB_LENGTH(p, strlen(cdbname));
+   for (x = cdbname; *x; ) *p++ = *x++;
+   
+   /* Target Backup DB filename */
+   *p++ = isc_spb_bkp_file;
+   ADD_SPB_LENGTH(p, strlen(cbkpname));
+   for (x = cbkpname; *x; ) *p++ = *x++;
+   
+   /* Argument to request verbose output */
+   *p++ = isc_spb_verbose;
+   
+   isc_service_start(status, &service_handle, NULL, p - request, request);
+
+   if (status[0] == 1 && status[1])
+      ERREXIT(status);
+   
+   // Detach from DB
+   isc_service_detach(status, &service_handle);
+   
+   if (status[0] == 1 && status[1])
+      ERREXIT(status);
+      
+   _retni(1);
+      
+}
+
+
+/*
+   FBRESTOREDB( cConnection, cIBBkpFileName, cIBFileNameTarget, cUser, cPassWord )
+   (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 15/Fev/2011
+   Make RESTORE remotely
+*/
+HB_FUNC(FBRESTOREDB)
+{
+   char           *user;
+   char           *password;
+   char           *service_name;
+   char           *cdbname;
+   char           *cbkpname;
+         
+   ISC_STATUS     status[20];
+   isc_svc_handle service_handle;
+   
+   char           spb_buffer[128];
+   char           *spb = spb_buffer;
+   char           request[100];
+   char           *x;
+   char           *p = request;
+   
+   long *retorno;
+                  
+   unsigned       short spb_length;
+   unsigned       long options;
+    
+   service_handle = NULL;
+   
+   service_name   = hb_parcx(1);
+   cbkpname       = hb_parcx(2);    
+   cdbname        = hb_parcx(3);     
+   user           = hb_parcx(4);        
+   password       = hb_parcx(5);    
+   
+   retorno = ConnectService(service_name, &service_handle, user, password);
+   
+   if( retorno != 1 )
+      ERREXIT(retorno);
+   
+   /* Identify the Restore Service*/
+   *p++ = isc_action_svc_restore;
+
+   /* Arguments for backup filenames */
+   *p++ = isc_spb_bkp_file;
+   ADD_SPB_LENGTH(p, strlen(cbkpname));
+   for (x = cbkpname; *x; ) *p++ = *x++;
+   
+   /* Argument for database filename */
+   *p++ = isc_spb_dbname;
+   ADD_SPB_LENGTH(p, strlen(cdbname));
+   for (x = cdbname; *x; ) *p++ = *x++;
+   
+   /* Argument to request verbose output */
+   *p++ = isc_spb_verbose;
+   
+   /* Argument to specify restore options */
+   *p++ = isc_spb_options;
+   
+   options = isc_spb_res_create;
+   ADD_SPB_NUMERIC(p, options);
+   
+   isc_service_start(status, &service_handle, NULL, p - request, request);
+
+   if (status[0] == 1 && status[1])
+      ERREXIT(status);
+   
+   // Detach from DB   
+   isc_service_detach(status, &service_handle);
+   
+   if (status[0] == 1 && status[1])
+      ERREXIT(status);
+
+   _retni(1);
+   
+}   
+
+//   (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 19/Jan/2011
+//   Connect/Attach to service
+static UINT ConnectService( const char * cConnectioService, FB_API_HANDLE * svc_handle, const char * cUser, const char * cPassWord )
+{
+   char           spb_buffer[128];
+   char           *spb = spb_buffer;
+   char           *service_name;
+   char           *servico[DEF_LENGTH_SERVICE];
+   char           *srv_connection;
+   
+   ISC_STATUS     status[20];
+   isc_svc_handle local_srv_hnd;
+   
+   unsigned       short spb_length;
+   
+   local_srv_hnd = NULL;
+
+   service_name = (char *) hb_xgrab(strlen(cConnectioService));
+   srv_connection = (char *) hb_xgrab(strlen(cConnectioService)+DEF_LENGTH_SERVICE+1);
+   
+   sprintf(service_name,"%s",cConnectioService);
+   sprintf(servico,"%s","service_mgr");
+   sprintf(srv_connection,"%s:%s",service_name,servico);
+   
+   // SPB Header
+   *spb++ = isc_spb_version;
+   *spb++ = isc_spb_current_version;
+   
+   // User
+   *spb++ = isc_spb_user_name;
+   *spb++ = strlen(cUser);
+   strcpy(spb, cUser);
+   spb += strlen(cUser);
+   
+   // Password
+   *spb++ = isc_spb_password;
+   *spb++ = strlen(cPassWord);
+   strcpy(spb, cPassWord);
+   spb += strlen(cPassWord);
+   
+   spb_length = spb - spb_buffer;
+   
+   // Attach to DB
+   isc_service_attach(status, 0, srv_connection, &local_srv_hnd, spb_length, spb_buffer);
+
+   if (status[0] == 1 && status[1])
+      return((int) status);
+
+   *svc_handle = ( isc_svc_handle * ) local_srv_hnd;
+      
+   return(1);
+}

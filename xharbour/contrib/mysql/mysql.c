@@ -64,7 +64,7 @@
 
 /* NOTE: we need this to prevent base types redefinition */
 #define _CLIPDEFS_H
-#if defined(HB_OS_WIN_USED)
+#if defined(HB_OS_WIN_USED) || defined(HB_OS_WIN_32_USED)
    #include <windows.h>
 #endif
 
