@@ -469,7 +469,14 @@ HB_FUNC( DIRECTORYRECURSE )
 #endif
             szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, HB_OS_ALLFILE_MASK, NULL );
          }
-
+         /*
+           AJ: 2011-02-27
+           Fixing *.* not pulling file with no extension
+         */
+         if ( ( hb_strnicmp( fDirSpec->szName, "*", 1 ) == 0 ) && ( hb_strnicmp( fDirSpec->szExtension, ".*", 2 ) == 0 ) )
+         {
+            ( (char*) fDirSpec->szExtension ) [0] = 0;
+         }
          szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );
       }
 
