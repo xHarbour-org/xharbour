@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-27 21:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/direct.c
+    ! Exact logic if "*.*" param is passed in DirectoryRecurse("*.*")
+      (Previous fix returns incorrect value if f.e "*.*x" passed )
+
 2011-02-27 20:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/direct.c
     ! DirectoryRecurse("*.*") not returning file without extension. Fixed.

@@ -473,7 +473,8 @@ HB_FUNC( DIRECTORYRECURSE )
            AJ: 2011-02-27
            Fixing *.* not pulling file with no extension
          */
-         if ( ( hb_strnicmp( fDirSpec->szName, "*", 1 ) == 0 ) && ( hb_strnicmp( fDirSpec->szExtension, ".*", 2 ) == 0 ) )
+         if ( ( strlen( fDirSpec->szName ) == 1 ) && ( hb_strnicmp( fDirSpec->szName, "*", 1 ) == 0 ) &&
+              ( strlen( fDirSpec->szExtension ) == 2 ) && ( hb_strnicmp( fDirSpec->szExtension, ".*", 2 ) == 0 ) )
          {
             ( (char*) fDirSpec->szExtension ) [0] = 0;
          }
