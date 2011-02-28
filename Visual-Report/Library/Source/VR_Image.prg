@@ -18,6 +18,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS VrImage INHERIT VrObject
+   DATA OnePerPage       EXPORTED INIT .F.
    DATA ClsName          EXPORTED INIT "Image"
    DATA FileName         EXPORTED INIT ""
 
@@ -111,18 +112,23 @@ CLASS __VrImage INHERIT FreeImage
    METHOD OnLButtonDown()
 ENDCLASS
 
-METHOD OnLButtonDown(n,x,y) CLASS __VrImage
+METHOD OnLButtonDown(n,x,y) CLASS __VrImage 
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
    IF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      aRect := oCtrl:GetRectangle()
-      aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-      oCtrl:Parent:InvalidateRect( aRect, .F. )
-      aRect := ::GetRectangle()
-      aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-      ::Parent:InvalidateRect( aRect, .F. )
-      ::Parent:nDownPos := {x,y}
+      TRY
+         IF oCtrl != NIL
+            aRect := oCtrl:GetRectangle()
+            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+            oCtrl:Parent:InvalidateRect( aRect, .F. )
+            aRect := ::GetRectangle()
+            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+            ::Parent:InvalidateRect( aRect, .F. )
+            ::Parent:nDownPos := {x,y}
+         ENDIF
+      CATCH
+      END
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL

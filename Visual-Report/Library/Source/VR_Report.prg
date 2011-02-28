@@ -206,12 +206,12 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
    
    IF oPanel == NIL
       oControl:Draw( hDC )
-      IF oControl:ClsName != "Image"
-         TRY
+      TRY
+         IF oControl:ClsName != "Image" .OR. ! oControl:OnePerPage
             nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
-         CATCH
-         END
-      ENDIF
+         ENDIF
+      CATCH
+      END
     ELSE
       oControl:Configure()
    ENDIF
