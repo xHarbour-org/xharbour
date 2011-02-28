@@ -85,7 +85,7 @@
 #include "hbmemory.ch"
 #include "hbinit.h"
 
-#if defined( HB_FM_DL_ALLOC ) && ( defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32__ ) )
+#if defined( HB_FM_DL_ALLOC ) && defined( HB_OS_WIN )
    #undef HB_FM_STD_ALLOC
    #undef HB_FM_WIN32_ALLOC
 #elif defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )
@@ -119,7 +119,7 @@
 #     pragma warn -ngu
 #     pragma warn -prc
 #     pragma warn -rch
-#  elif defined( _MSC_VER )
+#  elif defined( _MSC_VER ) || defined( __WATCOMC__ )
 #     define USE_DL_PREFIX
 #  endif
 #  include "dlmalloc.c"
