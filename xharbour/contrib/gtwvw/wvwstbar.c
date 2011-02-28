@@ -132,6 +132,7 @@ HB_FUNC( WVW_SBCREATE)
      {
         pWindowData->hSBfont = CreateFontIndirect( &pData->s_lfSB );
      }
+     SendMessage( hWndSB, WM_SETFONT, (WPARAM) pWindowData->hSBfont, (LPARAM) TRUE);     
      if (GetClientRect(hWndSB, &rSB))
      {
        pWindowData->usSBHeight = (USHORT) rSB.bottom;
@@ -140,8 +141,7 @@ HB_FUNC( WVW_SBCREATE)
 
      hb_gt_wvwResetWindow( usWinNum );
 
-     ptArray[0] = rSB.right;
-     SendMessage( hWndSB, WM_SETFONT, (WPARAM) pWindowData->hSBfont, (LPARAM) TRUE);
+     ptArray[0] = rSB.right;   
 
      SendMessage(hWndSB, SB_SETPARTS, 1, (LPARAM)(LPINT)ptArray);
 

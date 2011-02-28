@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-02-28 13:00 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/gtwvw/wvwstbar.c
+    ! fix for setting font on WVW_SBCREATE.  reported by Anatole  on comp.lang.xharbour
+    
 2011-02-28 15:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c
     ! enable use of DL malloc to Windows OS
@@ -27,7 +31,7 @@
   + source/vm/dlmalloc_version_284.c
     ! new version of dlmalloc uploaded just for library (please read above note)
 
-2011-02-17 14:00 Luiz Rafael Culik <luiz at xharbour.com.br>
+2011-02-27 14:00 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/mysql/mysql.c
     ! fix to allow -DHB_OS_WIN32_USED
   * contrib/firebird/firebird.c
