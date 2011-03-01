@@ -85,7 +85,7 @@
 #include "hbmemory.ch"
 #include "hbinit.h"
 
-#if defined( HB_FM_DL_ALLOC ) && defined( HB_OS_WIN )
+#if defined( HB_FM_DL_ALLOC )
    #undef HB_FM_STD_ALLOC
    #undef HB_FM_WIN32_ALLOC
 #elif defined( __EXPORT__ ) && !defined( HB_FM_WIN32_ALLOC )

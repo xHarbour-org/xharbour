@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-01 19:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbjson.c
+    ! fixed typo which caused that \uNNNN in strings were ignored
+      instead of being decoded (synched to Harbour code)
+
+  * source/vm/fm.c
+    ! changed: HB_MT_VM -> HB_THREAD_SUPPORT
+    ! allow DL malloc to be used by all OS's
+
+  * NOTE ON: source/vm/dlmalloc_version_284.c
+    ; this file was borrowed from Harbour.
+    ; so far, I have not found any problem using version 2.8.3, so my notes
+      about this version remains valid. If any one find any, please report.
+    ; TODO: retest version 2.8.4
+    ; Thanks to Przemek for notifying.
+
 2011-02-28 13:00 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/gtwvw/wvwstbar.c
     ! fix for setting font on WVW_SBCREATE.  reported by Anatole  on comp.lang.xharbour
