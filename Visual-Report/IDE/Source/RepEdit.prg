@@ -218,6 +218,11 @@ CLASS RepFooterEdit INHERIT RepEdit
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------------
+CLASS ExtraPageEdit INHERIT RepEdit
+   DATA Type INIT "ExtraPage"
+ENDCLASS
+
+//--------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION MakeGridTile( nxGrid, nyGrid, Width, Height)
 
    LOCAL nWidth   := 256 - 256 % nxGrid

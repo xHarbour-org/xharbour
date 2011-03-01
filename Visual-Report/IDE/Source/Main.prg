@@ -403,202 +403,137 @@ METHOD Init() CLASS MainForm
       :Create()
    END
 
-/*
-   WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( Self )
-      :Caption        := "Report Header"
-      :BackColor      := ::System:Color:White
-      :Height         := 100
-      :Dock:Margins   := "0,2,0,2"
-      :Dock:Left      := ::Application:Props[ "ToolBox" ]
-      :Dock:Right     := ::Application:Props[ "PropEditor" ]
-      :Dock:Top       := ::ToolStripContainer1
-      :Visible        := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
-      :Application:Props[ "ViewMenuRepHeader" ]:Checked := :Visible
-      :Create()
-   END
-
-   WITH OBJECT Splitter( Self )
-      :Owner := ::Application:Props[ "RepHeader" ]
-      :Position := 4
-      :Create()
-   END
-
-   WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( Self )
-      :Caption        := "Header"
-      :BackColor      := ::System:Color:White
-      :Height         := 100
-      :Dock:Margins   := "0,0,0,2"
-      :Dock:Left      := ::Application:Props[ "ToolBox" ]
-      :Dock:Right     := ::Application:Props[ "PropEditor" ]
-      :Dock:Top       := ::Application:Props[ "RepHeader" ]
-      :Visible        := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
-      :Application:Props[ "ViewMenuHeader" ]:Checked := :Visible
-      :Create()
-   END
-
-   WITH OBJECT Splitter( Self )
-      :Owner := ::Application:Props[ "Header" ]
-      :Position := 4
-      :Create()
-   END
-
-   WITH OBJECT ::Application:Props[ "RepFooter" ] := RepFooterEdit( Self )
-      :Caption        := "Report Footer"
-      :BackColor      := ::System:Color:White
-      :Border         := .T.
-      :Height         := 100
-      :Dock:Margins   := "0,0,0,3"
-      :Dock:Left      := ::Application:Props:ToolBox
-      :Dock:Right     := ::Application:Props:PropEditor
-      :Dock:Bottom    := ::Application:Props:Components
-      :Visible        := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
-      :Application:Props[ "ViewMenuRepFooter" ]:Checked := :Visible
-      :Create()
-   END
-
-   WITH OBJECT Splitter( Self )
-      :Owner := ::Application:Props[ "RepFooter" ]
-      :Position := 2
-      :Create()
-   END
-
-   WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( Self )
-      :Caption        := "Footer"
-      :BackColor      := ::System:Color:White
-      :Border         := .T.
-      :Height         := 100
-      :Dock:Margins   := "0,0,0,0"
-      :Dock:Left      := ::Application:Props:ToolBox
-      :Dock:Right     := ::Application:Props:PropEditor
-      :Dock:Bottom    := ::Application:Props:RepFooter
-      :Visible        := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
-      :Application:Props[ "ViewMenuFooter" ]:Checked := :Visible
-      :Create()
-   END
-
-   WITH OBJECT Splitter( Self )
-      :Owner := ::Application:Props[ "Footer" ]
-      :Position := 2
-      :Create()
-   END
-
-   WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( Self )
-      :BackColor      := ::System:Color:White
-      :Dock:Margins   := "0,0,0,0"
-      :Dock:Left      := ::Application:Props[ "ToolBox" ]
-      :Dock:Right     := ::Application:Props[ "PropEditor" ]
-      :Dock:Top       := ::Application:Props[ "Header" ]
-      :Dock:Bottom    := ::Application:Props[ "Footer" ]
-      :Create()
-   END
-*/
-   WITH OBJECT ::Application:Props[ "ReportPanel" ] := Panel( Self )
-      aSize         := {::Width,::Height}
-      :BackColor    := ::System:Color:White
-      :HorzScroll   := .T.
-      :Dock:Margins := "2,2,2,2"
-      :Width        := GetSystemMetrics( SM_CXSCREEN ) * 2
-      :Height       := GetSystemMetrics( SM_CYSCREEN ) * 2
-      :Dock:Left    := ::Application:Props[ "ToolBox" ]
-      :Dock:Right   := ::Application:Props[ "PropEditor" ]
+   WITH OBJECT ::Application:Props[ "MainTabs" ] := TabStrip( Self )
+      :Dock:Left    := ::Application:Props:ToolBox
       :Dock:Top     := ::ToolStripContainer1
+      :Dock:Right   := ::Application:Props:PropEditor
       :Dock:Bottom  := ::Application:Props:Components
-      :BackColor    := ::System:Color:Gray
       :Create()
-      :Width        := aSize[1]
-      :Height       := aSize[2]
-      WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
-         :Caption   := "Report Header"
-         :BackColor := ::System:Color:White
-         :Left      := 3
-         :Top       := 3
-         :Height    := 100
-         :Width     := aSize[1]
-         :Visible   := .F.
-         :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+      WITH OBJECT ::Application:Props[ "ReportPageTab" ] := TabPage( :this )
+         :Caption    := "Report Page"
+         :HorzScroll := .T.
+         aSize       := {::Width,::Height}
+         :Width      := GetSystemMetrics( SM_CXSCREEN ) * 2
+         :Height     := GetSystemMetrics( SM_CYSCREEN ) * 2
+         :BackColor  := ::System:Color:Gray
          :Create()
-      END
+         :Width      := aSize[1]
+         :Height     := aSize[2]
 
-      WITH OBJECT Splitter( :this )
-         :Owner := ::Application:Props[ "RepHeader" ]
-         :Position := 4
-         :Create()
-      END
+         WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
+            :Caption   := "Report Header"
+            :BackColor := ::System:Color:White
+            :Left      := 3
+            :Top       := 3
+            :Height    := 100
+            :Width     := aSize[1]
+            :Visible   := .F.
+            :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+            :Create()
+         END
 
-      WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
-         :Caption      := "Header"
-         :BackColor    := ::System:Color:White
-         :Left         := 3
-         :Top          := 3
-         :Width        := aSize[1]
-         :Height       := 100
-         :Dock:Margins := "0,0,0,0"
-         :Dock:Top     := ::Application:Props[ "RepHeader" ]
-         :Visible      := .F.
-         :Application:Props[ "ViewMenuHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
-         :Create()
-      END
-      WITH OBJECT Splitter( :this )
-         :Owner := ::Application:Props[ "Header" ]
-         :Position := 4
-         :Create()
-      END
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:Props[ "RepHeader" ]
+            :Position := 4
+            :Create()
+         END
 
-      WITH OBJECT ::Application:Props[ "RepFooter" ] := RepFooterEdit( :this )
-         :Caption      := "Report Footer"
-         :BackColor    := ::System:Color:White
-         :Border       := .T.
-         :Left         := 3
-         :Top          := 3
-         :Height       := 100
-         :Width        := aSize[1]
-         :Dock:Margins := "0,0,0,3"
-         :Dock:Bottom  := :Parent
-         :Visible      := .F.
-         :Application:Props[ "ViewMenuRepFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
-         :Create()
-      END
+         WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
+            :Caption      := "Header"
+            :BackColor    := ::System:Color:White
+            :Left         := 3
+            :Top          := 3
+            :Width        := aSize[1]
+            :Height       := 100
+            :Dock:Margins := "0,0,0,0"
+            :Dock:Top     := ::Application:Props[ "RepHeader" ]
+            :Visible      := .F.
+            :Application:Props[ "ViewMenuHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
+            :Create()
+         END
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:Props[ "Header" ]
+            :Position := 4
+            :Create()
+         END
 
-      WITH OBJECT Splitter( :this )
-         :Owner := ::Application:Props[ "RepFooter" ]
-         :Position := 2
-         :Create()
-      END
+         WITH OBJECT ::Application:Props[ "RepFooter" ] := RepFooterEdit( :this )
+            :Caption      := "Report Footer"
+            :BackColor    := ::System:Color:White
+            :Border       := .T.
+            :Left         := 3
+            :Top          := 3
+            :Height       := 100
+            :Width        := aSize[1]
+            :Dock:Margins := "0,0,0,3"
+            :Dock:Bottom  := :Parent
+            :Visible      := .F.
+            :Application:Props[ "ViewMenuRepFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
+            :Create()
+         END
 
-      WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( :this )
-         :Caption      := "Footer"
-         :BackColor    := ::System:Color:White
-         :Border       := .T.
-         :Left         := 3
-         :Top          := 3
-         :Height       := 100
-         :Width        := aSize[1]
-         :Dock:Margins := "0,0,0,0"
-         :Dock:Bottom  := ::Application:Props:RepFooter
-         :Visible      := .F.
-         :Application:Props[ "ViewMenuFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
-         :Create()
-      END
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:Props[ "RepFooter" ]
+            :Position := 2
+            :Create()
+         END
 
-      WITH OBJECT Splitter( :this )
-         :Owner := ::Application:Props[ "Footer" ]
-         :Position := 2
-         :Create()
-      END
+         WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( :this )
+            :Caption      := "Footer"
+            :BackColor    := ::System:Color:White
+            :Border       := .T.
+            :Left         := 3
+            :Top          := 3
+            :Height       := 100
+            :Width        := aSize[1]
+            :Dock:Margins := "0,0,0,0"
+            :Dock:Bottom  := ::Application:Props:RepFooter
+            :Visible      := .F.
+            :Application:Props[ "ViewMenuFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Footer", 0 )==1
+            :Create()
+         END
 
-      WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( :this )
-         :BackColor    := ::System:Color:White
-         :Dock:Margins := "0,0,0,0"
-         :Left         := 3
-         :Top          := 3
-         :Height       := 100
-         :Width        := aSize[1]
-         :Dock:Top     := ::Application:Props:Header
-         :Dock:Bottom  := ::Application:Props:Footer
-         :Visible      := .F.
-         :Create()
-      END
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:Props[ "Footer" ]
+            :Position := 2
+            :Create()
+         END
 
+         WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( :this )
+            :BackColor    := ::System:Color:White
+            :Dock:Margins := "0,0,0,0"
+            :Left         := 3
+            :Top          := 3
+            :Height       := 100
+            :Width        := aSize[1]
+            :Dock:Top     := ::Application:Props:Header
+            :Dock:Bottom  := ::Application:Props:Footer
+            :Visible      := .F.
+            :Create()
+         END
+      END
+      WITH OBJECT ::Application:Props[ "ExtraTab" ] := TabPage( :this )
+         :Caption    := "Extra Page"
+         :HorzScroll := .T.
+         :VertScroll := .T.
+         aSize       := {::Width,::Height}
+         :Width      := GetSystemMetrics( SM_CXSCREEN ) * 2
+         :Height     := GetSystemMetrics( SM_CYSCREEN ) * 2
+         :BackColor  := ::System:Color:Gray
+         :Create()
+         :Width      := aSize[1]
+         :Height     := aSize[2]
+         WITH OBJECT ::Application:Props[ "ExtraPage" ] := ExtraPageEdit( :this )
+            :BackColor := ::System:Color:White
+            :Left      := 3
+            :Top       := 3
+            :Height    := 100
+            :Width     := aSize[1]
+            //:Visible   := .F.
+            //:Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+            :Create()
+         END
+      END
    END
 
    ::RestoreLayout(, "Layout")
@@ -687,6 +622,7 @@ METHOD New() CLASS Report
    oApp:Props:Body:InvalidateRect()
    oApp:Props:Footer:InvalidateRect()
    oApp:Props:RepFooter:InvalidateRect()
+   oApp:Props:ExtraPage:InvalidateRect()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -719,6 +655,7 @@ METHOD PageSetup() CLASS Report
       oApp:Props:Body:InvalidateRect()
       oApp:Props:Footer:InvalidateRect()
       oApp:Props:RepFooter:InvalidateRect()
+      oApp:Props:ExtraPage:InvalidateRect()
    ENDIF
 RETURN Self
 
@@ -759,11 +696,13 @@ METHOD Close() CLASS Report
       AEVAL( :Props:Header:Objects,    {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:Body:Objects,      {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:Footer:Objects,    {|o|o:EditCtrl:Destroy()} )
+      AEVAL( :Props:ExtraPage:Objects, {|o|o:EditCtrl:Destroy()} )
       :Props:RepHeader:Objects := {}
       :Props:RepFooter:Objects := {}
       :Props:Header:Objects    := {}
       :Props:Body:Objects      := {}
       :Props:Footer:Objects    := {}
+      :Props:ExtraPage:Objects := {}
 
       :Props:PropEditor:ActiveObject := NIL
 
@@ -772,6 +711,7 @@ METHOD Close() CLASS Report
       :Props:Body:Visible      := .F.
       :Props:Footer:Visible    := .F.
       :Props:RepFooter:Visible := .F.
+      :Props:ExtraPage:Visible := .F.
 
       :Props:ToolBox:Enabled       := .F.
       :Props:SaveMenu:Enabled      := .F.
@@ -789,25 +729,33 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SetScrollArea() CLASS Report
-   LOCAL n, nX, hDC := GetDC(0)
+   LOCAL cx, cy, nX, nY, hDC := GetDC(0)
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
+   nY := GetDeviceCaps( hDC, LOGPIXELSY )
    ReleaseDC( 0, hDC )
    
-   n := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
+   cx := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
+   cy := Int( ( ::VrReport:oPDF:PageLength / 1440 ) * nY )
    
-   oApp:Props:Header:Width    := n
-   oApp:Props:Body:Width      := n
-   oApp:Props:Footer:Width    := n
-   oApp:Props:RepHeader:Width := n
-   oApp:Props:RepFooter:Width := n
+   oApp:Props:Header:Width    := cx
+   oApp:Props:Body:Width      := cx
+   oApp:Props:Footer:Width    := cx
+   oApp:Props:RepHeader:Width := cx
+   oApp:Props:RepFooter:Width := cx
+   oApp:Props:ExtraPage:Width := cx
+   oApp:Props:ExtraPage:Height := cy
    
-   oApp:Props:Header:Parent:OriginalRect[3] := n + 6
+   oApp:Props:Header:Parent:OriginalRect[3] := cx + 6
+
+   oApp:Props:ExtraPage:Parent:OriginalRect[3] := cx + 6
+   oApp:Props:ExtraPage:Parent:OriginalRect[4] := cy + 6
    
    oApp:Props:RepHeader:Visible := .T.
    oApp:Props:Header:Visible    := .T.
    oApp:Props:Body:Visible      := .T.
    oApp:Props:Footer:Visible    := .T.
    oApp:Props:RepFooter:Visible := .T.
+   oApp:Props:ExtraPage:Visible := .T.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -851,6 +799,7 @@ METHOD Open( cReport ) CLASS Report
       oApp:Props:Body:InvalidateRect()
       oApp:Props:Footer:InvalidateRect()
       oApp:Props:RepFooter:InvalidateRect()
+      oApp:Props:ExtraPage:InvalidateRect()
 
    ENDIF
 RETURN Self
