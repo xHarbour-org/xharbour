@@ -37,6 +37,9 @@ MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName)
 
 #[source\compiler\genobj32.c]
 
+[source\compiler\hbmain.c]
+[source\compiler\comptool.c]
+
 [source\compiler\ppcomp.c]
 [source\pp\ppcore.c]
 [source\pp\pptable.c]
@@ -48,6 +51,7 @@ MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName)
 [source\compiler\hblbl.c]
 
 [source\common\hbprintf.c]
+
 
 [\xHarbour.com\xHarbour-Builder\xhb.c]
 
