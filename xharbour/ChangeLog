@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-02 23:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/unicode/unitool.c
+    + simple functions to convert ASCII string to UNICODE string and vice-versa.
+      The functions are codepage independent, meaning that the codepage setting
+      in xHarbour environment does not have effects. The functions utilize map
+      tables available from unicode.org site.
+      Functions list:
+      HB_UNISTRLEN( uString ) -> length of a Unicode string
+      HB_UNIAVAILABLE() -> Multi-dimension array containing code page ID and Description
+      HB_STR2UNI( cString, cCP ) -> Unicode string
+      HB_UNI2STR( uString, cCP ) -> Ascii string
+
+  + tests/unitest.prg
+    * simple test program for the above functions
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + unitool.obj file dependency
+
 2011-03-01 19:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbjson.c
     ! fixed typo which caused that \uNNNN in strings were ignored

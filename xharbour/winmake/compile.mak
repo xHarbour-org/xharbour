@@ -4213,6 +4213,8 @@ $(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbencode.c
 $(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcctool.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)unitool$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)unitool.c
+	$(CC_CMD)
 #===============================================================================
 # WHAT32.LIB dependencies
 #===============================================================================

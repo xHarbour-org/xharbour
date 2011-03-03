@@ -1611,7 +1611,8 @@ HBCC_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbcrpt32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)unitool$(OBJEXT)
 
 #===============================================================================
 # WHAT32.LIB dependencies
