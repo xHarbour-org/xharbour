@@ -7,6 +7,14 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-03-03 20:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fix on AlterColumns when converting numeric field to char under postgresql
+   ! source/sqlrdd0.prg
+     ! change SR_RenameTable() to rename sequence to new table name under postgresql and oracle
+     !TEMP_DROP_COL -> TEMPDROPCO   to respect alias name to 10 chars
+     
 2011-01-27 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! in createtable method added logic to detect mysql 5.5 since it use engine=innodb insted of type=innodb

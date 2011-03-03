@@ -1564,8 +1564,8 @@ Function SR_DropIndex( cIndexName, cOwner )
       End
 
       If (!Empty( aIndex[4] )) .or. aIndex[5][1] == "#"
-         USE (cFileName) NEW VIA "SQLRDD" ALIAS "TEMP_DROP_COL" exclusive
-         oWA := TEMP_DROP_COL->( dbInfo( DBI_INTERNAL_OBJECT ) )
+         USE (cFileName) NEW VIA "SQLRDD" ALIAS "TEMPDROPCO" exclusive
+         oWA := TEMPDROPCO->( dbInfo( DBI_INTERNAL_OBJECT ) )
 
          If !Empty( aIndex[4] )
             oWA:DropColumn( "INDKEY_" + alltrim(aIndex[4]), .F. )
@@ -1574,7 +1574,7 @@ Function SR_DropIndex( cIndexName, cOwner )
             oWA:DropColumn( "INDFOR_" + substr(aIndex[5],2,3), .F. )
          EndIf
          
-         TEMP_DROP_COL->( dbCLoseArea() )
+         TEMPDROPCO->( dbCLoseArea() )
       EndIf
    Next
 
@@ -1710,6 +1710,12 @@ Function SR_RenameTable( cTable, cNewName, cOwner )
       If nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
       EndIf
+      IF oCnn:nSystemID == SYSTEMID_POSTGR
+         nRet := oCnn:exec( "ALTER TABLE " + cOwner +cTable+"_sq" + "RENAME TO " + cOwner + cNewName+"_sq", .F. )            
+      ENDIF
+      IF oCnn:nSystemID == SYSTEMID_ORACLE
+         nRet := oCnn:exec( "RENAME " + cOwner +cTable+"_sq" + " TO " + cOwner + cNewName+"_sq", .F. )            
+      ENDIF      
       Exit
    End
 
