@@ -1909,3 +1909,26 @@ FUNCTION sr_clearFilter()
 Return nil
 
 
+FUNCTION SR_SetFieldDefault( cTable, cField, cDefault )
+   LOCAL oCnn
+   LOCAL cSql := "ALTER TABLE "+ cTable + " ALTER COLUMN " +cField +" SET DEFAULT "
+   oCnn := SR_GetConnection(  )
+   IF VALTYPE( cDefault ) == "N"
+      cSql += Alltrim( str( cDefault ) )
+   ELSEIF Valtype( cDefault ) == "C"
+      IF Empty( cDefault) 
+         cSql += "''"
+      ELSE
+         cSql +="'"+cDefault+"'"
+      ENDIF
+   ENDIF
+   IF oCnn:nSystemId==SYSTEMID_POSTGR
+      oCnn:exec( cSql,,.f.)
+      oCnn:Commit()
+   ENDIF
+RETURN NIL            
+            
+      
+
+
+   
