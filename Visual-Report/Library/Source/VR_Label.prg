@@ -221,8 +221,12 @@ RETURN Self
 
 CLASS __VrLabel INHERIT Label
    METHOD OnLButtonDown()
+   METHOD OnMouseMove()
+   METHOD OnMouseLeave() INLINE ::Parent:Cursor := NIL, NIL
+   METHOD GetPoints()
 ENDCLASS
 
+//-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown(n,x,y) CLASS __VrLabel 
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
@@ -243,6 +247,38 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+METHOD OnMouseMove(n,x,y) CLASS __VrLabel 
+   LOCAL i, aPoint, aPoints, nCursor := 0
+   IF n != MK_LBUTTON 
+      ::Parent:nMove := 0
+      aPoints := ::GetPoints()
+      FOR i := 1 TO LEN( aPoints )
+          IF _PtInRect( aPoints[i], {x,y} )
+             ::Parent:nMove := i
+             nCursor := i - IIF( i > 4, 4, 0 )
+             EXIT
+          ENDIF
+      NEXT
+      ::Parent:Cursor := IIF( nCursor > 0, ::Parent:aCursor[ nCursor ], NIL )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+METHOD GetPoints() CLASS __VrLabel
+   LOCAL aRect, aPoints, n := 4
+   aRect := _GetClientRect( ::hWnd )
+   aPoints := { { 0, 0,          n, n },; // left top
+                { 0, (aRect[4]-n)/2, n, (aRect[4]+n)/2 },; // left
+                { 0, aRect[4]-n, n, aRect[4] },; // left bottom
+                { aRect[3]/2, aRect[4]-n, (aRect[3]/2)+n, aRect[4] },; // bottom
+                { aRect[3]-n, aRect[4]-n, aRect[3], aRect[4] },; // right bottom
+                { aRect[3]-n, aRect[4]/2, aRect[3], (aRect[4]/2)+n },; // right
+                { aRect[3]-n, 0, aRect[3], n },; // right top
+                { aRect[3]/2, 0, (aRect[3]/2)+n, n } } // top
+RETURN aPoints
+
 
 FUNCTION DecToHexa(nNumber)
    local cNewString := ""

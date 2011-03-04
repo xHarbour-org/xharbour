@@ -27,6 +27,7 @@ CLASS RepEdit INHERIT Panel
    DATA nDownPos     EXPORTED
    DATA oPs          EXPORTED
    DATA nMove        EXPORTED INIT 0
+   CLASSDATA aCursor EXPORTED
 
    METHOD OnLButtonDown()
    METHOD OnLButtonUp()
@@ -35,7 +36,6 @@ CLASS RepEdit INHERIT Panel
    METHOD OnMouseMove()
    METHOD OnDestroy() INLINE DeleteObject( ::hBmpGrid ), NIL
    METHOD CreateControl()
-   METHOD GetPoints()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +44,11 @@ METHOD Create() CLASS RepEdit
    ::oPs := PageSetup( ::Application:MainForm )
    ::oPs:ReturnDefault := .T.
    ::oPs:Show()
+
+   DEFAULT ::aCursor TO {::System:Cursor:SizeNWSE,;
+                         ::System:Cursor:SizeWE,;
+                         ::System:Cursor:SizeNESW,;
+                         ::System:Cursor:SizeNS }
    
    n := ( ::Parent:ClientWidth / ::oPs:PageWidth ) * 100
    
@@ -90,67 +95,21 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
                oCtrl:Left := x-::nDownPos[1]
                oCtrl:Top  := y-::nDownPos[2]
             ENDIF
-          ELSEIF ::nMove == 1 // Size Left
-            n := oCtrl:Width
+          ELSEIF ::nMove == 2 // Size Left
+            n := oCtrl:Left
             IF ::Application:Props[ "ViewMenuGrid" ]:Checked
-               oCtrl:Left  := Snap( x-::nDownPos[1], ::xGrid )
-               oCtrl:Width := n
+               oCtrl:Left := Snap( x-::nDownPos[1], ::xGrid )
              ELSE
                oCtrl:Left := x-::nDownPos[1]
             ENDIF
-            oCtrl:Width := n
+            oCtrl:Width += n-oCtrl:Left
+            oCtrl:EditCtrl:Width += n-oCtrl:Left
          ENDIF
          
          oCtrl:MoveWindow()
       ENDIF
-    ELSEIF oCtrl != NIL .AND. oCtrl:lUI
-      IF oCtrl:EditCtrl != NIL
-         aPoints := ::GetPoints( oCtrl:EditCtrl )
-         FOR x := 1 TO LEN( aPoints )
-             aPoint := ACLONE( aPoints[x] )
-             aPoint[3] += aPoint[1]
-             aPoint[4] += aPoint[2]
-             IF _PtInRect( aPoint, {x,y} )
-                ::nMove := x
-                VIEW x
-                EXIT
-             ENDIF
-         NEXT
-      ENDIF
    ENDIF
 RETURN 0
-
-//-----------------------------------------------------------------------------------------------------------------------------------
-METHOD GetPoints( oControl ) CLASS RepEdit
-   LOCAL aControl, aRect, rc, aPt, aPoints, n := 4, pt := (struct POINT)
-   
-   IF oControl:ClsName  == "ToolBarWindow32"
-      oControl:GetWindowRect()
-   ENDIF
-
-   aRect := NIL
-   DEFAULT aRect TO ACLONE( oControl:GetRectangle() )
-
-   pt:x := aRect[1]
-   pt:y := aRect[2]
-   
-   ClientToScreen( oControl:Parent:hWnd, @Pt )
-   ScreenToClient( ::hWnd, @Pt )
-
-   aRect[1] := pt:x - IIF( oControl:hWnd != ::hWnd, oControl:Parent:HorzScrollPos, 0 )
-   aRect[2] := pt:y - IIF( oControl:hWnd != ::hWnd, oControl:Parent:VertScrollPos, 0 )
-   aRect[3] := aRect[1] + oControl:Width
-   aRect[4] := aRect[2] + oControl:Height
-
-   aPoints := { {aRect[1]-n, aRect[2]-n, n, n                         },; // left top
-                {aRect[1]-n, aRect[2]+((aRect[4]-aRect[2]-n)/2), n, n },; // left
-                {aRect[1]-n, aRect[4], n, n                           },; // left bottom
-                {aRect[1]+((aRect[3]-aRect[1]-n)/2), aRect[4], n, n   },; // bottom
-                {aRect[3], aRect[4], n, n                             },; // right bottom
-                {aRect[3], aRect[2]+((aRect[4]-aRect[2]-n)/2), n, n   },; // right
-                {aRect[3], aRect[2]-n, n, n                           },; // right top
-                {aRect[1]+((aRect[3]-aRect[1]-n)/2), aRect[2]-n, n, n } } // top
-RETURN aPoints
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( cControl, x, y ) CLASS RepEdit
