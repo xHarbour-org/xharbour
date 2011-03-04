@@ -8,7 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2011-03-02 23:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2011-03-04 08:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/unicode/unitool.c
+    ! optimized HB_STR2UNI()
+    + added more maps:
+      + KOI8-U (RFC2319), KZ-1048, AtariST, CP037, CP1026, CP500, CP875,
+        CP10007, CP10006, CP10079, CP10029, CP10000, CP10081
+
+  * ChangeLog
+    ! typo on date of my previous commit
+
+2011-03-03 23:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/unicode/unitool.c
     + simple functions to convert ASCII string to UNICODE string and vice-versa.
       The functions are codepage independent, meaning that the codepage setting
