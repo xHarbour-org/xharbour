@@ -220,10 +220,10 @@ METHOD Draw( hDC ) CLASS VrLabel
 RETURN Self
 
 CLASS __VrLabel INHERIT Label
+   DATA aSize EXPORTED INIT {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
    METHOD OnLButtonDown()
-   METHOD OnMouseMove()
-   METHOD OnMouseLeave() INLINE ::Parent:Cursor := NIL, NIL
-   METHOD GetPoints()
+   METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
+   METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -249,26 +249,9 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove(n,x,y) CLASS __VrLabel 
-   LOCAL i, aPoint, aPoints, nCursor := 0
-   IF n != MK_LBUTTON 
-      ::Parent:nMove := 0
-      aPoints := ::GetPoints()
-      FOR i := 1 TO LEN( aPoints )
-          IF _PtInRect( aPoints[i], {x,y} )
-             ::Parent:nMove := i
-             nCursor := i - IIF( i > 4, 4, 0 )
-             EXIT
-          ENDIF
-      NEXT
-      ::Parent:Cursor := IIF( nCursor > 0, ::Parent:aCursor[ nCursor ], NIL )
-   ENDIF
-RETURN NIL
-
-//-----------------------------------------------------------------------------------------------------------------------------------
-METHOD GetPoints() CLASS __VrLabel
+FUNCTION GetPoints( oCtrl )
    LOCAL aRect, aPoints, n := 4
-   aRect := _GetClientRect( ::hWnd )
+   aRect := _GetClientRect( oCtrl:hWnd )
    aPoints := { { 0, 0,          n, n },; // left top
                 { 0, (aRect[4]-n)/2, n, (aRect[4]+n)/2 },; // left
                 { 0, aRect[4]-n, n, aRect[4] },; // left bottom
@@ -279,6 +262,23 @@ METHOD GetPoints() CLASS __VrLabel
                 { aRect[3]/2, 0, (aRect[3]/2)+n, n } } // top
 RETURN aPoints
 
+FUNCTION MouseMove( oCtrl, n, x, y )
+   LOCAL i, aPoint, aPoints, nCursor := 0
+   IF n != MK_LBUTTON 
+      oCtrl:Parent:nMove := 0
+      aPoints := GetPoints( oCtrl )
+      FOR i := 1 TO LEN( aPoints )
+          IF _PtInRect( aPoints[i], {x,y} )
+             IF oCtrl:aSize[i]
+                oCtrl:Parent:nMove := i
+                nCursor := i - IIF( i > 4, 4, 0 )
+             ENDIF
+             EXIT
+          ENDIF
+      NEXT
+      oCtrl:Parent:Cursor := IIF( nCursor > 0, oCtrl:Parent:aCursor[ nCursor ], NIL )
+   ENDIF
+RETURN NIL
 
 FUNCTION DecToHexa(nNumber)
    local cNewString := ""

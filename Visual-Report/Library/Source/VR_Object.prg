@@ -46,7 +46,6 @@ CLASS VrObject
    DATA PDFCtrl     EXPORTED
    
    DATA Report      EXPORTED
-   
    DATA nPixPerInch EXPORTED INIT PIX_PER_INCH
    
    METHOD Init() CONSTRUCTOR

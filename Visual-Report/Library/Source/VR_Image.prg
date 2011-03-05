@@ -109,7 +109,10 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 CLASS __VrImage INHERIT FreeImage
+   DATA aSize EXPORTED INIT {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}
    METHOD OnLButtonDown()
+   METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
+   METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
 ENDCLASS
 
 METHOD OnLButtonDown(n,x,y) CLASS __VrImage 
