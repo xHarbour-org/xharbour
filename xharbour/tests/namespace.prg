@@ -1,3 +1,7 @@
+/*
+   $Id$
+*/
+
 #ifdef __HRB__
    // Callback into PRG host
    DYNAMIC DynNamespace.SomeDyn
@@ -30,7 +34,7 @@ NAMESPACE MyNameSpace
      // Call to member defined EXTERNALly by means of EXTERNAL NAMESPACE below!
      // WARNING 1: You can NOT use USING for Namespaces defined in SAME source because you'll create a cyclic dependancy!!!
      // WARNING 2: You MUST compile the EXTERNAL module FIRST!!!
-     #ifndef __HRB__
+     #ifdef __HRB__
         MyNameSpace.SubExtern.Ext1()
 
         // STATIC members of EXTERNAL namespaces can not be accessed because they belong to a different compilation unit!
@@ -41,7 +45,7 @@ NAMESPACE MyNameSpace
 
      MyOptional.SomeOptional()
 
-     #ifndef __HRB__
+     #ifdef __HRB__
         // Defined as C function in extnamespace.prg
         ? ExtMember2()
      #endif
@@ -74,7 +78,7 @@ NAMESPACE MyNameSpace
 
    END
 
-   #ifndef __HRB__
+   #ifdef __HRB__
       // Complete sub level[s] definition at external compilation unit!
       //NOTE: More than 1 namespace can use the *same* EXTERNAL NAMESPACE unit!
       // WARNING: You MUST compile the extern module FIRST!!!
@@ -82,7 +86,7 @@ NAMESPACE MyNameSpace
    #endif
 
 
-   #ifndef __HRB__
+   #ifdef __HRB__
       EXTERNAL NAMESPACE MEMBER ExtMember
       EXTERNAL NAMESPACE MEMBER ExtMember2
    #endif
