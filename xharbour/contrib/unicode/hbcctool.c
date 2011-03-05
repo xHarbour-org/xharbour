@@ -291,9 +291,12 @@ int hbcc_txt2cst( const char *szInputFile )
      for (i=0;i<MAX_2CHAR;i++) fputc(s_aleads[k*MAX_2CHAR+i],hout);
    for (i=0;i<((int)s_maxchar)*MAX_WCHAR;i++) fputc(s_tchar[i],hout);
    fclose(hout);
-   hb_xfree(fout);
-   hb_xfree(s_aleads);
-   hb_xfree( pFileName );
+   if(fout)
+      hb_xfree(fout);
+   if(s_aleads)
+      hb_xfree(s_aleads);
+   if( pFileName )
+      hb_xfree( pFileName );
    return 0;
 }
 

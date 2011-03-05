@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-06 06:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbtoken.c
+    ! synched with Harbour
+
+  * contrib/unicode/hbcctool.c
+    ! hb_xfree freeing null pointer. Fixed.
+
 2011-03-05 17:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/genc.c
     ! function attribute: HB_FS_FIRST is always HB_FS_PUBLIC
