@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-05 13:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/set.c
+    ! change HB_SET_TIMEFORMAT: hh:mm:ss.cc -> hh:mm:ss.ccc (idea from Harbour)
+
+  * source/rtl/dateshb.c
+    ! function DATETIME() can now receive parameters (idea from Harbour)
+
+  * tests/dttest.prg
+    ! test program for function DATETIME() (copied from Harbour)
+
+  * source/rtl/hbjson.c
+    ! time was not encoded when data == HB_IT_DATETIME. Fixed.
+
 2011-03-04 08:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/unicode/unitool.c
     ! optimized HB_STR2UNI()

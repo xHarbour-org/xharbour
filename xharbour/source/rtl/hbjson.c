@@ -174,24 +174,27 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, ULONG nLe
 
    if( HB_IS_DATE( pValue ) )
    {
-      char szBuffer[ 10 ];
-      hb_itemGetDS( pValue, szBuffer + 1 );
-      szBuffer[ 0 ] = '\"';
-      szBuffer[ 9 ] = '\"';
-      _hb_jsonCtxAdd( pCtx, szBuffer, 10 );
-   }
-   else if( HB_IS_DATETIME( pValue ) )
-   {
-      ULONG ulLen;
-      BOOL bFreeReq;
-      char *szBuffer = hb_itemString( pValue, &ulLen, &bFreeReq );
+      if( hb_itemGetT( pValue ) == 0 )
+      {
+         char szBuffer[ 10 ];
+         hb_itemGetDS( pValue, szBuffer + 1 );
+         szBuffer[ 0 ] = '\"';
+         szBuffer[ 9 ] = '\"';
+         _hb_jsonCtxAdd( pCtx, szBuffer, 10 );
+      }
+      else
+      {
+         int iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec;
+         char szBuffer[ 19 ];
 
-      szBuffer[ 0 ] = '\"';
-      szBuffer[ 18 ] = '\"';
-      _hb_jsonCtxAdd( pCtx, szBuffer, 19 );
-
-      if ( bFreeReq )
-         hb_xfree( szBuffer );
+         hb_dateDecode( hb_itemGetDL( pValue ), &iYear, &iMonth, &iDay );
+         hb_timeStampDecode( hb_itemGetT( pValue ), &iHour, &iMinutes, &iSeconds, &iMSec );
+         hb_snprintf( szBuffer + 1, 18, "%04d%02d%02d%02d%02d%02d%03d",
+                   iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec );
+         szBuffer[ 0 ] = '\"';
+         szBuffer[ 18 ] = '\"';
+         _hb_jsonCtxAdd( pCtx, szBuffer, 19 );
+      }
    }
    else if( HB_IS_STRING( pValue ) )
    {

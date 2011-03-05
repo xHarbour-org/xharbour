@@ -1349,7 +1349,7 @@ void hb_setInitialize( PHB_SET_STRUCT pSet )
    pSet->HB_SET_CONFIRM = FALSE;
    pSet->HB_SET_CONSOLE = TRUE;
    pSet->HB_SET_DATEFORMAT = hb_strdup( "mm/dd/yy" );
-   pSet->HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.cc" );
+   pSet->HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.ccc" );
    /*
     * Tests shows that Clipper has two different flags to control ALT+D
     * and ALTD() behavior and on startup these flags are not synchronized.

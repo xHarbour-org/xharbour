@@ -535,14 +535,19 @@ HB_FUNC( DOW )
 
 HB_FUNC( DATETIME )
 {
-   int iYear, iMonth, iDay, iHour, iMinute;
-   double dSeconds;
-   hb_dateToday( &iYear, &iMonth, &iDay );
-   hb_dateTime( &iHour, &iMinute, &dSeconds );
-   hb_retdt( iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
+   if ( hb_pcount() == 0 )
+   {
+      int iYear, iMonth, iDay, iHour, iMinute;
+      double dSeconds;
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      hb_dateTime( &iHour, &iMinute, &dSeconds );
+      hb_retdt( iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
+   }
+   else
+      hb_retdtl( hb_dateEncode( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ),
+                 hb_timeStampEncode( hb_parni( 4 ), hb_parni( 5 ), hb_parni( 6 ), hb_parni( 7 ) ) );
+
 }
-
-
 
 HB_FUNC( TTOD )
 {
