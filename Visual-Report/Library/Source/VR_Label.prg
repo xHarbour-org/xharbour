@@ -255,11 +255,11 @@ FUNCTION GetPoints( oCtrl )
    aPoints := { { 0, 0,          n, n },; // left top
                 { 0, (aRect[4]-n)/2, n, (aRect[4]+n)/2 },; // left
                 { 0, aRect[4]-n, n, aRect[4] },; // left bottom
-                { aRect[3]/2, aRect[4]-n, (aRect[3]/2)+n, aRect[4] },; // bottom
+                { (aRect[3]-n)/2, aRect[4]-n, (aRect[3]+n)/2, aRect[4] },; // bottom
                 { aRect[3]-n, aRect[4]-n, aRect[3], aRect[4] },; // right bottom
-                { aRect[3]-n, aRect[4]/2, aRect[3], (aRect[4]/2)+n },; // right
+                { aRect[3]-n, (aRect[4]-n)/2, aRect[3], (aRect[4]+n)/2 },; // right
                 { aRect[3]-n, 0, aRect[3], n },; // right top
-                { aRect[3]/2, 0, (aRect[3]/2)+n, n } } // top
+                { (aRect[3]-n)/2, 0, (aRect[3]+n)/2, n } } // top
 RETURN aPoints
 
 FUNCTION MouseMove( oCtrl, n, x, y )
@@ -277,6 +277,28 @@ FUNCTION MouseMove( oCtrl, n, x, y )
           ENDIF
       NEXT
       oCtrl:Parent:Cursor := IIF( nCursor > 0, oCtrl:Parent:aCursor[ nCursor ], NIL )
+   ENDIF
+RETURN NIL
+
+FUNCTION PaintMarkers( hDC, oCtrl )
+   LOCAL i, aPt, hBrush, aPts := GetPoints( oCtrl )
+   IF .T.//oCtrl:Application:Props:PropEditor:ActiveObject:EditCtrl:hWnd == oCtrl:hWnd
+      hBrush := GetStockObject( BLACK_BRUSH )
+      FOR i := 1 TO LEN( aPts )
+          IF oCtrl:aSize[i]
+             aPt := {aPts[i][1], aPts[i][2]}
+             _ClientToScreen( oCtrl:hWnd, @aPt )
+             _ScreenToClient( 0, @aPt )
+             aPts[i][1] := aPt[1]
+             aPts[i][2] := aPt[2]
+             aPt := {aPts[i][3], aPts[i][4]}
+             _ClientToScreen( oCtrl:hWnd, @aPt )
+             _ScreenToClient( 0, @aPt )
+             aPts[i][3] := aPt[1]
+             aPts[i][4] := aPt[2]
+             _FillRect( hDC, aPts[i], hBrush )
+          ENDIF
+      NEXT
    ENDIF
 RETURN NIL
 

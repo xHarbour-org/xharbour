@@ -114,7 +114,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
                  oCtrl:EditCtrl:Width += nx-oCtrl:Left
 
             CASE ::nMove == 6 // Right
-                 oCtrl:Width += ::Snap( x )
+                 oCtrl:Width := ::Snap( x-oCtrl:Left )
                  oCtrl:EditCtrl:Width := oCtrl:Width
 
 //             CASE ::nMove == 3 // Left-Bottom
@@ -240,6 +240,15 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
+   
+   IF ::Application:Props:PropEditor:ActiveObject != NIL  .AND. ::nDownPos == NIL
+      oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
+      IF ::Application:Props:PropEditor:ActiveObject:lUI .AND. oCtrl:Parent:hWnd == ::hWnd
+         hDC := CreateDC( "DISPLAY" )
+         PaintMarkers( hDC, oCtrl )
+         DeleteDC( hDC )
+      ENDIF
+   ENDIF
 RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------------
