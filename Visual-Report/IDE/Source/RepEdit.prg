@@ -28,6 +28,7 @@ CLASS RepEdit INHERIT Panel
    DATA oPs          EXPORTED
    DATA nMove        EXPORTED INIT 0
    CLASSDATA aCursor EXPORTED
+   DATA oLast        EXPORTED
 
    METHOD OnLButtonDown()
    METHOD OnLButtonUp()
@@ -201,8 +202,8 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC ) CLASS RepEdit
    LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor
-    
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor, lMarkers := .F.
+
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
@@ -220,20 +221,13 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    
    cx := ::Width
    cy := ::Height
-   /*
-   IF ::Application:Report:VrReport != NIL .AND. ::Application:Report:VrReport:oPDF != NIL
-      nX := GetDeviceCaps( hDC, LOGPIXELSX )
-      nY := GetDeviceCaps( hDC, LOGPIXELSY )
-      cx := Int( ( ::Application:Report:VrReport:oPDF:PageWidth / 1440 ) * nX )
-      cy := Int( ( ::Application:Report:VrReport:oPDF:PageLength / 1440 ) * nY )
-      _Fillrect( hMemDC, {cx,0,cx+::Width, cy}, GetStockObject( LTGRAY_BRUSH ) )
-   ENDIF
-   */
+
    IF ::Application:Props:PropEditor:ActiveObject != NIL  .AND. ::nDownPos == NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
       IF ::Application:Props:PropEditor:ActiveObject:lUI .AND. oCtrl:Parent:hWnd == ::hWnd
          aRect := oCtrl:GetRectangle()
          _DrawFocusRect( hMemDC, {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1} )
+         lMarkers := .T.
       ENDIF
    ENDIF
    BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
@@ -241,13 +235,14 @@ METHOD OnPaint( hDC ) CLASS RepEdit
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
    
-   IF ::Application:Props:PropEditor:ActiveObject != NIL  .AND. ::nDownPos == NIL
-      oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      IF ::Application:Props:PropEditor:ActiveObject:lUI .AND. oCtrl:Parent:hWnd == ::hWnd
-         hDC := CreateDC( "DISPLAY" )
-         PaintMarkers( hDC, oCtrl )
-         DeleteDC( hDC )
-      ENDIF
+   IF lMarkers
+      hDC := GetDCEx( ::hWnd )
+      PaintMarkers( hDC, oCtrl )
+      ReleaseDC( ::hWnd, hDC )
+      ::oLast := oCtrl
+    ELSEIF ::oLast != NIL
+      ::oLast:InvalidateRect()
+      ::oLast := NIL
    ENDIF
 RETURN 0
 

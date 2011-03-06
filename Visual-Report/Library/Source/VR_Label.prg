@@ -288,12 +288,12 @@ FUNCTION PaintMarkers( hDC, oCtrl )
           IF oCtrl:aSize[i]
              aPt := {aPts[i][1], aPts[i][2]}
              _ClientToScreen( oCtrl:hWnd, @aPt )
-             _ScreenToClient( 0, @aPt )
+             _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
              aPts[i][1] := aPt[1]
              aPts[i][2] := aPt[2]
              aPt := {aPts[i][3], aPts[i][4]}
              _ClientToScreen( oCtrl:hWnd, @aPt )
-             _ScreenToClient( 0, @aPt )
+             _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
              aPts[i][3] := aPt[1]
              aPts[i][4] := aPt[2]
              _FillRect( hDC, aPts[i], hBrush )
