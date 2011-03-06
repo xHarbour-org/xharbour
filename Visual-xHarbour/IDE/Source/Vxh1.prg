@@ -5524,9 +5524,9 @@ METHOD Build( lForce ) CLASS Project
          :lUseDLL := ::Properties:UseDll
       END
 
-      //IF ::Application:IniFile:ReadInteger( "General", "Save .XBP Project file", 0 )==1
+      IF ::Application:IniFile:ReadInteger( "General", "SaveXBP", 0 )==1
          GenerateProjectFile( oProject )
-      //`ENDIF
+      ENDIF
 
       ::Application:Yield()
 

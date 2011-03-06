@@ -48,7 +48,7 @@ METHOD Init( oParent ) CLASS WebBrowser
    LOCAL hKey, cValue
    DEFAULT ::__xCtrlName TO "WebBrowser"
    Super:Init( oParent )
-   ::ProgID  := "Shell.Explorer.2"
+   ::ProgID  := "Shell.Explorer"
 RETURN Self
 
 METHOD Create() CLASS WebBrowser
