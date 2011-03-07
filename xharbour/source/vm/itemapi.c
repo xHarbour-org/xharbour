@@ -306,7 +306,7 @@ char * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDS(%p, %s)", pItem, szDate));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
       return hb_dateDecStr( szDate, pItem->item.asDate.value );
    else
       return hb_dateDecStr( szDate, 0 );
@@ -319,7 +319,7 @@ char * hb_itemGetDTS( PHB_ITEM pItem, char * szDateTime )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTS(%p, %s)", szDateTime));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
       return hb_datetimeDecStr( szDateTime, pItem->item.asDate.value, pItem->item.asDate.time );
    else
       return hb_datetimeDecStr( szDateTime, 0, 0 );
@@ -329,7 +329,7 @@ LONG hb_itemGetDL( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDL(%p)", pItem));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
       return pItem->item.asDate.value;
    else
       return 0;
@@ -339,7 +339,7 @@ LONG hb_itemGetT( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetT(%p)", pItem));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
       return pItem->item.asDate.time;
    else
       return 0;
@@ -349,7 +349,7 @@ double hb_itemGetTsec( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetTsec(%p)", pItem));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
       return hb_timeL2Sec( pItem->item.asDate.time );
    }
@@ -361,7 +361,7 @@ double hb_itemGetDTsec( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTsec(%p)", pItem));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
       return hb_datetimePackInSec( pItem->item.asDate.value, pItem->item.asDate.time );
    }
@@ -373,7 +373,7 @@ double hb_itemGetDTD( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTD(%p)", pItem));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
       return hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
    }
@@ -388,7 +388,7 @@ void hb_itemGetDTL( PHB_ITEM pItem, LONG * plDate, LONG * plTime )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDT2L(%p,%p,%p)", pItem,plDate,plTime));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
      lDate = pItem->item.asDate.value;
      lTime = pItem->item.asDate.time;
@@ -407,7 +407,7 @@ void hb_itemGetD( PHB_ITEM pItem, int * piYear, int * piMonth, int * piDay )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetD(%p,%p,%p,%p)", pItem,piYear,piMonth,piDay));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
       hb_dateDecode( pItem->item.asDate.value, piYear, piMonth, piDay );
    }
@@ -432,7 +432,7 @@ void hb_itemGetDT( PHB_ITEM pItem, int * piYear, int * piMonth, int * piDay, int
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDT(%p,%p,%p,%p,%p,%p,%p)", pItem,piYear,piMonth,piDay,piHour,piMin,pdSec));
 
-   if( pItem && HB_IS_DATE( pItem ) )
+   if( pItem && HB_IS_DATETIME( pItem ) )
    {
       hb_dateDecode( pItem->item.asDate.value, piYear, piMonth, piDay );
       hb_timeDecode( pItem->item.asDate.time, piHour, piMin, pdSec );
@@ -516,13 +516,10 @@ double hb_itemGetND( PHB_ITEM pItem )
 
          case HB_IT_DATE:
          {
-            if( pItem->item.asDate.time == 0 )
-               return ( double ) pItem->item.asDate.value;
-            else
-               return ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+            return ( double ) pItem->item.asDate.value;
          }
 
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
 
          case HB_IT_LOGICAL:
@@ -568,14 +565,15 @@ double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
       }
 
       case HB_IT_DATE:
-      case HB_IT_DATETIME:
       {
          dNumber = (double) pItem->item.asDate.value;
-         if( pItem->item.asDate.time )
-         {
-            *piDec = 255;
-            dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-         }
+         break;
+      }
+
+      case HB_IT_TIMEFLAG:
+      {
+         *piDec = 255;
+         dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          break;
       }
 
@@ -614,7 +612,7 @@ int hb_itemGetNI( PHB_ITEM pItem )
             return ( int ) pItem->item.asDouble.value;
 
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return ( int ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
@@ -653,7 +651,7 @@ LONG hb_itemGetNL( PHB_ITEM pItem )
 #endif
 
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return ( LONG ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
@@ -755,7 +753,7 @@ PHB_ITEM hb_itemPutDTS( PHB_ITEM pItem, const char * szDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeEncStr( szDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMEFLAG;
+   pItem->type = HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -774,7 +772,7 @@ PHB_ITEM hb_itemPutDT( PHB_ITEM pItem, int iYear, int iMonth, int iDay, int iHou
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeEncode( &pItem->item.asDate.value, &pItem->item.asDate.time,
                      iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, NULL );
-   pItem->type |= HB_IT_TIMEFLAG;
+   pItem->type = HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -792,7 +790,7 @@ PHB_ITEM hb_itemPutDTL( PHB_ITEM pItem, LONG lDate, LONG lTime )
 
    pItem = hb_itemPutDate( pItem, lDate );
    pItem->item.asDate.time = lTime % ( 86400 * HB_DATETIMEINSEC );
-   pItem->type |= HB_IT_TIMEFLAG;
+   pItem->type = HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -803,7 +801,7 @@ PHB_ITEM hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeUnpack( dDateTime / 86400, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMEFLAG;
+   pItem->type = HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -814,7 +812,7 @@ PHB_ITEM hb_itemPutDTD( PHB_ITEM pItem, double dDateTime )
 
    pItem = hb_itemPutDate( pItem, 0 );
    hb_datetimeUnpack( dDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
-   pItem->type |= HB_IT_TIMEFLAG;
+   pItem->type = HB_IT_TIMEFLAG;
 
    return pItem;
 }
@@ -1183,9 +1181,12 @@ char * hb_itemTypeStr( PHB_ITEM pItem )
 
       case HB_IT_DATE:
       case HB_IT_DATE | HB_IT_NULL:
+         return ( char * ) "D";
+
+      case HB_IT_TIMEFLAG:
       case HB_IT_DATETIME:
       case HB_IT_DATETIME | HB_IT_NULL:
-         return ( char * ) "D";
+         return ( char * ) "T";
 
       case HB_IT_LOGICAL:
       case HB_IT_LOGICAL | HB_IT_NULL:
@@ -1772,7 +1773,7 @@ BOOL hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int iDec )
          }
 
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
          {
             lNumber = pNumber->item.asDate.value;
             break;
@@ -1925,42 +1926,28 @@ char * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
       case HB_IT_DATE:
       {
-         if( pItem->item.asDate.time == 0 )
-         {
-            char szDate[ 9 ];
+         char szDate[ 9 ];
 
-            hb_dateDecStr( szDate, pItem->item.asDate.value );
+         hb_dateDecStr( szDate, pItem->item.asDate.value );
 
-            buffer = ( char * ) hb_xgrab( 11 );
-            hb_dateFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT );
-            * ulLen = strlen( buffer );
-            * bFreeReq = TRUE;
-         }
-         else
-         {
-            char szDate[ 19 ];
-            buffer = ( char * ) hb_xgrab( 26 );
-
-            hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
-            hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
-
-            * ulLen = strlen( buffer );
-            * bFreeReq = TRUE;
-         }
-         break;
-      }
-
-      case HB_IT_DATETIME:
-      {
-         char szDate[ 19 ];
-         buffer = ( char * ) hb_xgrab( 26 );
-
-         hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
-         hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
-
+         buffer = ( char * ) hb_xgrab( 11 );
+         hb_dateFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT );
          * ulLen = strlen( buffer );
          * bFreeReq = TRUE;
          break;
+      }
+
+      case HB_IT_TIMEFLAG:
+      {
+          char szDate[ 19 ];
+          buffer = ( char * ) hb_xgrab( 26 );
+
+          hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
+          hb_datetimeFormat( szDate, buffer, hb_stackSetStruct()->HB_SET_DATEFORMAT, hb_stackSetStruct()->HB_SET_TIMEFORMAT );
+
+          * ulLen = strlen( buffer );
+          * bFreeReq = TRUE;
+          break;
       }
 
       case HB_IT_DOUBLE:
@@ -2039,7 +2026,7 @@ char * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq )
          case HB_IT_STRING:
          case HB_IT_MEMO:
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return hb_itemString( pItem, pulSize, bFreeReq );
 
          case HB_IT_DOUBLE:
@@ -2117,7 +2104,7 @@ LONGLONG hb_itemGetNLL( PHB_ITEM pItem )
             return ( LONGLONG ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return ( LONGLONG ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
@@ -2248,7 +2235,7 @@ HB_LONG hb_itemGetNInt( PHB_ITEM pItem )
             return ( HB_LONG ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-         case HB_IT_DATETIME:
+         case HB_IT_TIMEFLAG:
             return ( HB_LONG ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:

@@ -719,17 +719,18 @@ void hb_stackDispLocal( void )
             break;
 
          case HB_IT_DATE:
-            if( (*pBase)->item.asDate.time == 0 )
-            {
-               char szDate[ 9 ];
-               printf( HB_I_("DATE = \"%s\" "), hb_itemGetDS( *pBase, szDate ) );
-            }
-            else
-            {
-               char szDate[ 19 ];
-               printf( HB_I_("DATETIME = \"%s\" "), hb_itemGetDTS( *pBase, szDate ) );
-            }
+         {
+            char szDate[ 9 ];
+            printf( HB_I_("DATE = \"%s\" "), hb_itemGetDS( *pBase, szDate ) );
             break;
+         }
+
+         case HB_IT_TIMEFLAG:
+         {
+            char szDate[ 19 ];
+            printf( HB_I_("DATETIME = \"%s\" "), hb_itemGetDTS( *pBase, szDate ) );
+            break;
+         }
 
          case HB_IT_DOUBLE:
             printf( HB_I_("DOUBLE = %f "), hb_itemGetND( *pBase ) );

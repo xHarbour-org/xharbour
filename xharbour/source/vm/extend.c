@@ -363,7 +363,7 @@ const char * hb_pards( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_dateDecStr( hb_stackDateBuffer(), pItem->item.asDate.value );
       }
@@ -401,7 +401,7 @@ char  * hb_pardts( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_datetimeDecStr( hb_stackDateBuffer(), pItem->item.asDate.value, pItem->item.asDate.time );
       }
@@ -438,7 +438,7 @@ char  * hb_pardsbuff( char * szDate, int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_dateDecStr( szDate, pItem->item.asDate.value );
       }
@@ -475,7 +475,7 @@ LONG  hb_pardl( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return pItem->item.asDate.value;
       }
@@ -512,7 +512,7 @@ char  * hb_pardtsbuff( char * szDateTime, int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_datetimeDecStr( szDateTime, pItem->item.asDate.value, pItem->item.asDate.time );
       }
@@ -549,7 +549,7 @@ LONG hb_part( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_itemGetT( pItem );
       }
@@ -586,7 +586,7 @@ double hb_pardtsec( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_itemGetDTsec( pItem );
       }
@@ -623,7 +623,7 @@ double hb_pardtd( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_DATE( pItem ) )
+      if( HB_IS_DATETIME( pItem ) )
       {
          return hb_itemGetDTD( pItem );
       }
@@ -827,7 +827,7 @@ LONG  hb_parnl( int iParam, ... )
          return ( LONG ) pItem->item.asDouble.value;
 #endif
       }
-      else if( HB_IS_DATE( pItem ) )
+      else if( HB_IS_DATETIME( pItem ) )
       {
          return pItem->item.asDate.value;
       }
@@ -886,7 +886,7 @@ HB_LONG  hb_parnint( int iParam, ... )
          return ( HB_LONG ) pItem->item.asDouble.value;
 #endif
       }
-      else if( HB_IS_DATE( pItem ) )
+      else if( HB_IS_DATETIME( pItem ) )
       {
          return ( HB_LONG ) pItem->item.asDate.value;
       }
@@ -1868,7 +1868,7 @@ LONGLONG  hb_parnll( int iParam, ... )
       {
          return ( LONGLONG ) pItem->item.asLogical.value;
       }
-      else if( HB_IS_DATE( pItem ) )
+      else if( HB_IS_DATETIME( pItem ) )
       {
          return ( LONGLONG ) pItem->item.asDate.value;
       }

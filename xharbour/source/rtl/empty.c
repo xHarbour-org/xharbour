@@ -85,7 +85,10 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_DATE:
-      case HB_IT_DATETIME:
+         hb_retl( pItem->item.asDate.value == 0 );
+         break;
+
+      case HB_IT_TIMEFLAG:
          hb_retl( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
          break;
 

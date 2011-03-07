@@ -241,6 +241,7 @@ static HARBOUR  hb___msgVirtual( void );
 static HARBOUR  hb___msgDelegate( void );
 
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
+       hb_cls_uiTimeFlagClass = 0,
        hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,
 	   hb_cls_uiHashClass = 0;
 
@@ -917,6 +918,10 @@ const char * hb_objGetClsName( PHB_ITEM pObject )
             szClassName = "DATE";
             break;
 
+         case HB_IT_TIMEFLAG:
+            szClassName = "TIMEFLAG";
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -1040,6 +1045,9 @@ const char * hb_objGetRealClsName( PHB_ITEM pObject, const char * szName )
 
          case HB_IT_DATE:
             return "DATE";
+
+         case HB_IT_TIMEFLAG:
+            return "TIMEFLAG";
 
          case HB_IT_INTEGER:
          case HB_IT_LONG:
@@ -2507,6 +2515,17 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
          hb_cls_uiDateClass = uiClass;
       }
    }
+   else if( strcmp( pNewCls->szName, "TIMEFLAG" ) == 0 )
+   {
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiTimeFlagClass = uiClass;
+      }
+   }
    else if( strcmp( pNewCls->szName, "LOGICAL" ) == 0 )
    {
       if( __cls_CntMethods( uiClass, hb___msgGetData ) )
@@ -3731,6 +3750,10 @@ USHORT hb_objClassH( PHB_ITEM pObject )
 
       case HB_IT_DATE :
          uiClass = hb_cls_uiDateClass;
+         break;
+
+      case HB_IT_TIMEFLAG :
+         uiClass = hb_cls_uiTimeFlagClass;
          break;
 
       case HB_IT_LOGICAL :
@@ -4988,6 +5011,10 @@ HB_FUNC( __CLSASSOCTYPE )
    else if( strcmp( szType, "DATE" ) == 0 )
    {
       hb_cls_uiDateClass = uiClass;
+   }
+   else if( strcmp( szType, "TIMEFLAG" ) == 0 )
+   {
+      hb_cls_uiTimeFlagClass = uiClass;
    }
    else if( strcmp( szType, "LOGICAL" ) == 0 )
    {

@@ -4449,12 +4449,22 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    }
    else
    {
-      PHB_ITEM pErrResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLeft, pRight );
-
-      if( pErrResult )
+      if( ( HB_IS_TIMEFLAG( pLeft ) || HB_IS_TIMEFLAG( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
       {
-         hb_itemForwardValue( pResult, pErrResult );
-         hb_itemRelease( pErrResult );
+         LONG lDate = pLeft->item.asDate.value;
+         lDate += hb_itemGetNL( pRight );
+         pLeft->item.asDate.value = lDate;
+         hb_itemPutDL( pResult, lDate );
+      }
+      else
+      {
+         PHB_ITEM pErrResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLeft, pRight );
+
+         if( pErrResult )
+         {
+            hb_itemForwardValue( pResult, pErrResult );
+            hb_itemRelease( pErrResult );
+         }
       }
    }
 }
@@ -4599,14 +4609,33 @@ static void hb_vmMinus( void )
    }
    else
    {
-      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pItem1, pItem2 );
-
-      if( pResult )
+      if( HB_IS_TIMEFLAG( pItem1 ) || HB_IS_TIMEFLAG( pItem2 ) )
       {
-         hb_stackPop();
-         hb_stackPop();
-         hb_itemPushForward( pResult );
-         hb_itemRelease( pResult );
+         if (!( HB_IS_TIMEFLAG( pItem1 ) ))
+            goto Datetime_Error;
+         else
+         {
+            HB_ITEM_NEW( Result );
+            double dResult = hb_itemGetDTD( pItem1 ) - hb_itemGetDTD( pItem2 );
+
+            hb_itemPutND( &Result, dResult );
+            hb_stackPop();
+            hb_stackPop();
+            hb_itemPushForward( &Result );
+         }
+      }
+      else
+      Datetime_Error:
+      {
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pItem1, pItem2 );
+
+         if( pResult )
+         {
+            hb_stackPop();
+            hb_stackPop();
+            hb_itemPushForward( pResult );
+            hb_itemRelease( pResult );
+         }
       }
    }
 }
@@ -8681,7 +8710,7 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
       pOther = pItem2;
    }
 
-   if( HB_IS_DATE( pOther ) )
+   if( HB_IS_DATETIME( pOther ) )
    {
       lDate = pDate->item.asDate.value + pOther->item.asDate.value;
       if( pDate->item.asDate.time != 0 || pOther->item.asDate.time != 0 )
@@ -8720,7 +8749,7 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
       hb_itemClear( pResult );
    }
 
-   pResult->type = lTime ? HB_IT_DATETIME : HB_IT_DATE;
+   pResult->type = lTime ? HB_IT_TIMEFLAG : HB_IT_DATE;
    pResult->item.asDate.time  = lTime;
    pResult->item.asDate.value = lDate;
 
@@ -8763,7 +8792,7 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
      lDate = 0;
    }
 
-   pDate->type = lTime ? HB_IT_DATETIME : HB_IT_DATE;
+   pDate->type = lTime ? HB_IT_TIMEFLAG : HB_IT_DATE;
    pDate->item.asDate.value = lDate;
    pDate->item.asDate.time  = lTime;
    return;
@@ -9057,7 +9086,7 @@ void hb_vmPushDateTime( LONG lDate, LONG lTime )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushDateTime(%ld,%ld)", lDate, lTime));
 
    pItem = hb_stackAllocItem();
-   pItem->type = HB_IT_DATETIME;
+   pItem->type = HB_IT_TIMEFLAG;
    pItem->item.asDate.value = lDate;
    pItem->item.asDate.time  = lTime;
 }
@@ -9613,7 +9642,8 @@ static double hb_vmPopNumber( void )
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;
          break;
-      case HB_IT_DATETIME:
+
+      case HB_IT_TIMEFLAG:
          dNumber = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          break;
 

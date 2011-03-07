@@ -144,6 +144,7 @@
 #include "hbrddntx.h"
 #include "rddsys.ch"
 #include "hbregex.h"
+#include "hbdate.h"
 #ifndef HB_CDP_SUPPORT_OFF
    #include "hbapicdp.h"
 #endif
@@ -398,6 +399,9 @@ static BYTE hb_ntxItemType( PHB_ITEM pItem )
 
       case HB_IT_DATE:
          return 'D';
+
+      case HB_IT_TIMEFLAG:
+         return 'T';
 
       case HB_IT_LOGICAL:
          return 'L';
@@ -5438,6 +5442,14 @@ static HB_ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                   hb_itemGetDS( pItem, szBuffer );
                   hb_ntxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, szBuffer, 8 );
                   break;
+
+               case HB_IT_TIMEFLAG:
+                  {
+                    char szBuffer[ 17 ];
+                    hb_datetimeDecStr( szBuffer, hb_itemGetDL( pItem ), hb_itemGetT( pItem ) );
+                    hb_ntxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, szBuffer, 17 );
+                    break;
+                  }
 
                case HB_IT_LOGICAL:
                   szBuffer[0] = hb_itemGetL( pItem ) ? 'T' : 'F';

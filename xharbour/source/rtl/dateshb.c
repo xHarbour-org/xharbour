@@ -392,7 +392,7 @@ HB_FUNC( CTOD )
 
 HB_FUNC( DTOC )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
    {
       char szDate[ 9 ];
       char szFormatted[ 11 ];
@@ -405,7 +405,7 @@ HB_FUNC( DTOC )
 
 HB_FUNC( DTOS )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
    {
       char szDate[ 9 ];
 
@@ -438,7 +438,7 @@ HB_FUNC( STOD )
 
 HB_FUNC( YEAR )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
    {
@@ -456,7 +456,7 @@ HB_FUNC( YEAR )
 
 HB_FUNC( MONTH )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
    {
@@ -474,7 +474,7 @@ HB_FUNC( MONTH )
 
 HB_FUNC( DAY )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
    {
@@ -525,7 +525,7 @@ HB_FUNC( DATE )
 
 HB_FUNC( DOW )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
       hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
@@ -551,7 +551,7 @@ HB_FUNC( DATETIME )
 
 HB_FUNC( TTOD )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
       hb_retdl( hb_pardl( 1 ) );
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOD", 1, hb_paramError( 1 ) );
@@ -559,7 +559,7 @@ HB_FUNC( TTOD )
 
 HB_FUNC( TTOS )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
    {
       char szDateTime[ 19 ];
 
@@ -573,7 +573,7 @@ HB_FUNC( TTOS )
 
 HB_FUNC( TTOC )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
    {
       char szDate[ 19 ];
       char * szFormatted = ( char * ) hb_xgrab( 26 );
@@ -591,7 +591,7 @@ HB_FUNC( TTOC )
 
 HB_FUNC( HOUR )
 {
-   PHB_ITEM pDateTime = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDateTime = hb_param( 1, HB_IT_DATETIME );
 
    if( pDateTime )
    {
@@ -607,7 +607,7 @@ HB_FUNC( HOUR )
 
 HB_FUNC( MINUTE )
 {
-   PHB_ITEM pDateTime = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDateTime = hb_param( 1, HB_IT_DATETIME );
 
    if( pDateTime )
    {
@@ -623,11 +623,11 @@ HB_FUNC( MINUTE )
 
 HB_FUNC( SECS )
 {
-   if( ISDATE( 1 ) )
+   if( ISDATETIME( 1 ) )
    {
       double dSeconds;
 
-      hb_timeDecode( hb_param( 1, HB_IT_DATE )->item.asDate.time, NULL, NULL, &dSeconds );
+      hb_timeDecode( hb_param( 1, HB_IT_DATETIME )->item.asDate.time, NULL, NULL, &dSeconds );
 
       hb_retndlen( dSeconds, 3 + HB_DATETIMEDECIMALS, HB_DATETIMEDECIMALS );
    }

@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-07 21:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfnsx/dbfnsx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/hbjson.c
+  * source/rtl/empty.c
+  * source/rtl/dateshb.c
+  * source/vm/hvm.c
+  * source/vm/classes.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/itemapi.c
+    ! data type changed from: HB_IT_DATE | HB_IT_TIMEFLAG -> HB_IT_TIMEFLAG
+    ; NOTE: regression may have taken place, please test.
+
 2011-03-06 06:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbtoken.c
     ! synched with Harbour

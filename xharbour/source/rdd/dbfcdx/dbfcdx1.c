@@ -422,7 +422,8 @@ static BYTE hb_cdxItemType( PHB_ITEM pItem )
          return 'N';
 
       /* HB_IT_DATE + HB_IT_TIMEFLAG */
-      case HB_IT_DATETIME:
+      /* case HB_IT_DATETIME: */
+      case HB_IT_TIMEFLAG:
          return 'T';
 
       case HB_IT_DATE:
@@ -8865,7 +8866,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                   break;
 
                /* HB_IT_DATE + HB_IT_TIMEFLAG */
-               case HB_IT_DATETIME:
+               /* case HB_IT_DATETIME: */
+               case HB_IT_TIMEFLAG:
                   d = hb_itemGetDTD( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );
                   hb_cdxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, cTemp, 8 );

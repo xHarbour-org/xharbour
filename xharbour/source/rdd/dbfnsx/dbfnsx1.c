@@ -550,9 +550,10 @@ static BYTE hb_nsxItemType( PHB_ITEM pItem )
          return 'N';
 
       /* HB_IT_DATE + HB_IT_TIMEFLAG */
-      case HB_IT_DATETIME:
+      /* case HB_IT_DATETIME: */
+      case HB_IT_TIMEFLAG:
          return 'T';
-         
+
       case HB_IT_DATE:
          return 'D';
 
@@ -5946,11 +5947,13 @@ static HB_ERRCODE hb_nsxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                   break;
 
                case HB_IT_DATE:
-               case HB_IT_DATETIME:
-                  if( pTag->KeyType == 'T' )
-                     d = hb_itemGetDTD( pItem );
-                  else
-                     d = ( double ) hb_itemGetDL( pItem );
+                  d = ( double ) hb_itemGetDL( pItem );
+                  HB_DBL2ORD( &d, szBuffer );
+                  hb_nsxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, szBuffer, 8 );
+                  break;
+
+               case HB_IT_TIMEFLAG:
+                  d = hb_itemGetDTD( pItem );
                   HB_DBL2ORD( &d, szBuffer );
                   hb_nsxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, szBuffer, 8 );
                   break;
