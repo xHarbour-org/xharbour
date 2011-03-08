@@ -89,7 +89,7 @@ HB_FUNC( DESCEND )
          else
             hb_retc( "" );
       }
-      else if( HB_IS_DATETIME( pItem ) )
+      else if( HB_IS_TIMEFLAG( pItem ) )
          hb_retnd( (double) 5231808 - hb_itemGetDTD( pItem )  );
       else if( HB_IS_DATE( pItem ) )
          hb_retnl( 5231808 - hb_itemGetDL( pItem ) );
