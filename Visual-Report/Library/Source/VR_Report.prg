@@ -57,8 +57,10 @@ CLASS VrReport INHERIT VrObject
    DATA aHeader        EXPORTED  INIT {}
    DATA aBody          EXPORTED  INIT {}
    DATA aFooter        EXPORTED  INIT {}
+   DATA aExtraPage     EXPORTED  INIT {}
    DATA aData          EXPORTED
    DATA aProps         EXPORTED
+   DATA aExtra         EXPORTED
 
    ACCESS Application  INLINE __GetApplication()
 
@@ -73,6 +75,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateBody()
    METHOD CreateHeader()
    METHOD CreateFooter()
+   METHOD CreateExtraPage()
    METHOD PrepareArrays()
    METHOD Load()
    METHOD InitPDF()
@@ -245,13 +248,24 @@ METHOD CreateFooter( hDC ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD CreateExtraPage( hDC ) CLASS VrReport
+   LOCAL aCtrl, nHeight := 0
+   ::nRow := 0
+   FOR EACH aCtrl IN ::aExtraPage
+       ::CreateControl( aCtrl, @nHeight,, hDC )
+   NEXT
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC
 
    ::aData  := {=>}
    ::aProps := {=>}
+   ::aExtra := {=>}
    HSetCaseMatch( ::aData, .F. )
    HSetCaseMatch( ::aProps, .F. )
+   HSetCaseMatch( ::aExtra, .F. )
 
    oNode := oDoc:FindFirstRegEx( "Report" )
 
@@ -264,6 +278,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
               DEFAULT oNode:cData TO ""
               ::aProps[ oNode:cName ] := oNode:cData
+
+         CASE oNode:oParent:cName == "ExtraPage" .AND. oNode:oParent:oParent:cName == "Report" .AND. oNode:cName != "Control"
+              DEFAULT oNode:cData TO ""
+              ::aExtra[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
               IF !EMPTY( aControl )
@@ -338,6 +356,11 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
+
+   ::Application:Props:ExtraPage:PagePosition := VAL( ::aExtra:PagePosition )
+   FOR EACH aCtrl IN ::aExtraPage
+       ::CreateControl( aCtrl,, ::Application:Props[ "ExtraPage" ] )
+   NEXT
 RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
@@ -351,7 +374,14 @@ METHOD Run( oDoc ) CLASS VrReport
    ENDIF
 
    ::StartPage()
+   hDC := GetDC(0)
 
+   IF ::Application:Props:ExtraPage:PagePosition == -1
+      ::CreateExtraPage( hDC )
+   ENDIF
+   ::EndPage()
+   
+   ::StartPage()
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
       ::DataSource := hb_ExecFromArray( ::aData:ClsName )
       ::DataSource:FileName := ::aData:FileName
@@ -359,8 +389,6 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:bFilter  := ::aData:bFilter
       ::DataSource:Create()
    ENDIF
-
-   hDC := GetDC(0)
 
    ::CreateHeader( hDC )
    

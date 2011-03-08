@@ -235,7 +235,8 @@ METHOD Init() CLASS MainForm
             :Caption := "&Grid"
             :Action  := {|o| o:Checked := !o:Checked, ( ::Application:Props[ "Header" ]:InvalidateRect(),;
                                                         ::Application:Props[ "Body"   ]:InvalidateRect(),;
-                                                        ::Application:Props[ "Footer" ]:InvalidateRect() )}
+                                                        ::Application:Props[ "Footer" ]:InvalidateRect(),;
+                                                        ::Application:Props[ "ExtraPage" ]:InvalidateRect() )}
             :Checked := ::Application:IniFile:ReadInteger( "View", "Grid", 1 )==1
             :Create()
          END
@@ -822,7 +823,7 @@ RETURN Self
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile
-   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlFooter, oRep
+   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep
    
    DEFAULT lSaveAs TO .F.
    
@@ -874,34 +875,47 @@ METHOD Save( lSaveAs ) CLASS Report
 
       IF !EMPTY( aCtrl := oApp:Props:Header:Objects )
          oXmlHeader := TXmlNode():new( , "Header" )
-            FOR n := 1 TO LEN( aCtrl )
-                IF aCtrl[n]:lUI
-                   ::Generate( aCtrl[n], @oXmlHeader )
-                ENDIF
-            NEXT
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlHeader )
+             ENDIF
+         NEXT
          oXmlReport:addBelow( oXmlHeader )
       ENDIF
 
       IF !EMPTY( aCtrl := oApp:Props:Footer:Objects )
          oXmlFooter := TXmlNode():new( , "Footer" )
-            aCtrl := oApp:Props:Footer:Objects
-            FOR n := 1 TO LEN( aCtrl )
-                IF aCtrl[n]:lUI
-                   ::Generate( aCtrl[n], @oXmlFooter )
-                ENDIF
-            NEXT
+         aCtrl := oApp:Props:Footer:Objects
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlFooter )
+             ENDIF
+         NEXT
          oXmlReport:addBelow( oXmlFooter )
       ENDIF
 
       IF !EMPTY( aCtrl := oApp:Props:Body:Objects )
          oXmlBody := TXmlNode():new( , "Body" )
-            FOR n := 1 TO LEN( aCtrl )
-                IF aCtrl[n]:lUI
-                   ::Generate( aCtrl[n], @oXmlBody )
-                ENDIF
-            NEXT
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlBody )
+             ENDIF
+         NEXT
          oXmlReport:addBelow( oXmlBody )
       ENDIF
+
+      IF !EMPTY( aCtrl := oApp:Props:ExtraPage:Objects )
+         oXmlExtra := TXmlNode():new( , "ExtraPage" )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PagePosition", NIL, XSTR(oApp:Props:ExtraPage:PagePosition) )
+         oXmlExtra:addBelow( oXmlSource )
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlExtra )
+             ENDIF
+         NEXT
+         oXmlReport:addBelow( oXmlExtra )
+      ENDIF
+
    ::oXMLDoc:oRoot:addBelow( oXmlReport )
    ::oXMLDoc:Write( ::FileName )
    oApp:Props:RunBttn:Enabled    := .T.

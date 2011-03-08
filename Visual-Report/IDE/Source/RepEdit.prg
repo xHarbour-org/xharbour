@@ -174,12 +174,14 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
    ::SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
       ::CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y )
-    ELSE
+    ELSEIF ::Type != "ExtraPage"
       pt := (struct POINT)
       pt:x := x
       pt:y := y
       ClientToScreen( ::hWnd, @pt )
       ::aSelect := {x,y}
+    ELSE
+      ::Application:Props:PropEditor:ResetProperties( {{ Self }} )
    ENDIF
 RETURN NIL
 
@@ -274,6 +276,11 @@ ENDCLASS
 //--------------------------------------------------------------------------------------------------------------------------------------
 CLASS ExtraPageEdit INHERIT RepEdit
    DATA Type INIT "ExtraPage"
+   DATA PagePosition EXPORTED INIT -1
+   DATA aProperties  EXPORTED INIT { { "PagePosition", "Position" } }
+   DATA EditCtrl     EXPORTED
+   DATA lUI          EXPORTED INIT .F.
+   METHOD GetValue( cVal ) INLINE ::&cVal
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------------
