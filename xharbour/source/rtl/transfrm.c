@@ -1160,7 +1160,7 @@ HB_FUNC( TRANSFORM )
       {
          hb_itemReturn( pValue );
       }
-      else if( HB_IS_DATETIME( pValue ) )
+      else if( HB_IS_TIMEFLAG( pValue ) )
       {
          char szDateTime[ 26 ];
          char szDate[ 19 ];
