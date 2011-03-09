@@ -356,8 +356,10 @@ METHOD Load( cReport ) CLASS VrReport
    FOR EACH aCtrl IN ::aFooter
        ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
-
-   ::Application:Props:ExtraPage:PagePosition := VAL( ::aExtra:PagePosition )
+   TRY
+      ::Application:Props:ExtraPage:PagePosition := VAL( ::aExtra:PagePosition )
+   CATCH
+   END
    FOR EACH aCtrl IN ::aExtraPage
        ::CreateControl( aCtrl,, ::Application:Props[ "ExtraPage" ] )
    NEXT
@@ -376,12 +378,12 @@ METHOD Run( oDoc ) CLASS VrReport
    ::StartPage()
    hDC := GetDC(0)
 
-   IF ::Application:Props:ExtraPage:PagePosition == -1
+   IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == -1
       ::CreateExtraPage( hDC )
+      ::EndPage()
+      ::StartPage()
    ENDIF
-   ::EndPage()
    
-   ::StartPage()
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
       ::DataSource := hb_ExecFromArray( ::aData:ClsName )
       ::DataSource:FileName := ::aData:FileName
@@ -398,6 +400,9 @@ METHOD Run( oDoc ) CLASS VrReport
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
+            IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
+               ::CreateExtraPage( hDC )
+            ENDIF
             ::CreateFooter( hDC )
             ::EndPage()
             ::StartPage()
@@ -409,6 +414,9 @@ METHOD Run( oDoc ) CLASS VrReport
       ::CreateBody( hDC )
    ENDIF
    ::CreateFooter( hDC )
+   IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
+      ::CreateExtraPage( hDC )
+   ENDIF
 
    ReleaseDC(0, hDC)
 

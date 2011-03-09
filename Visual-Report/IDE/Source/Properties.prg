@@ -1193,7 +1193,7 @@ STATIC FUNCTION CheckChar( o, n, oItem )
          IF !EMPTY( o:Caption ) .AND. CHR(n) $ "+*/"
             RETURN 0
          ENDIF
-         IF oItem:Caption != "Contrast" .AND. oItem:Caption != "Brightness" .AND. CHR(n) == "-"
+         IF ! ( oItem:Caption IN { "Contrast", "Brightness", "PagePosition" } ) .AND. CHR(n) == "-"
             RETURN 0
          ENDIF
          
