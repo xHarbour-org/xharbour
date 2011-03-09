@@ -5281,15 +5281,18 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
       oParent := NIL
    ENDIF
    
-   IF ::DllInstance == NIL
-      IF ::Application == NIL .AND. cProjectName != NIL
+   IF ::DllInstance == NIL .AND. cProjectName != NIL
+      IF ::Application == NIL
          hInst := GetModuleHandle( cProjectName )
          hPointer := HB_FuncPtr( "__" + cProjectName )
          HB_Exec( hPointer, ,NIL, hInst )
          ::DllInstance := hInst
-       ELSEIF cProjectName != NIL
+       ELSE
          ::DllInstance := GetModuleHandle( cProjectName )
       ENDIF
+      OutputDebugString( "*********** DLLInstance ***********" )
+      OutputDebugString( XSTR( ::DllInstance ) )
+      OutputDebugString( "***********************************" )
    ENDIF
    
    IF ::Application != NIL
