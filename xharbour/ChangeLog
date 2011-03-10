@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-10 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/compiler/harboury.c
+  + source/compiler/harboury.yyc
+  - source/compiler/macroy.c
+  + source/compiler/macroy.yyc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    ! rename harboury.c -> harboury.yyc to avoid double filename in Linux build
+
 2011-03-08 09:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/descend.c
     ! fix return value when parameter is date or timeflag due to recent changes
