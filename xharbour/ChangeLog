@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-10 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/unicode/hbcc.h
+    ! missing include file, hbvm.h
+
 2011-03-10 11:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/unicode/hbcctool.c
     ! formatting

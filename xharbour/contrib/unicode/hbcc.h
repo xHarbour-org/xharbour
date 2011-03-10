@@ -62,6 +62,7 @@
    #include "hbapifs.h"
    #include "hbapiitm.h"
    #include "hbinit.h"
+   #include "hbvm.h"
 
    HB_EXTERN_BEGIN
    int hbcc_txt2cst( const char *szInputFile );
