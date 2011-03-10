@@ -5290,9 +5290,6 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
        ELSE
          ::DllInstance := GetModuleHandle( cProjectName )
       ENDIF
-      OutputDebugString( "*********** DLLInstance ***********" )
-      OutputDebugString( XSTR( ::DllInstance ) )
-      OutputDebugString( "***********************************" )
    ENDIF
    
    IF ::Application != NIL
@@ -5327,6 +5324,10 @@ METHOD SetInstance( cProjectName, oOle ) CLASS WinForm
       hPointer := HB_FuncPtr( "__" + cProjectName )
       HB_Exec( hPointer, ,NIL, hInst )
       ::DllInstance := hInst
+      OutputDebugString( "*********** DLLInstance ***********" )
+      OutputDebugString( XSTR( ::DllInstance ) )
+      OutputDebugString( XSTR( cProjectName ) )
+      OutputDebugString( "***********************************" )
    ENDIF
 RETURN Self
 
@@ -5881,7 +5882,7 @@ FUNCTION XStr( xValue )
            xValue := IIF( xValue, ".T.", ".F." )
            EXIT
       CASE "U"
-           xValue := ""
+           xValue := "NIL"
            EXIT
       CASE "B"
            xValue := "{|| block }"
