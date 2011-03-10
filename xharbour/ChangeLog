@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-10 13:27 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/compiler/Makefile
+    ! Rearranged compilation files to create "harbour"
+      executable file.
+
 2011-03-10 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/unicode/hbcc.h
     ! missing include file, hbvm.h

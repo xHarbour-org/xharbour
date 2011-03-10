@@ -40,6 +40,7 @@ endif
 
 C_SOURCES=\
 	harbour.c \
+        hbmain.c \
 	cmdcheck.c \
 	comptool.c \
 	genc.c \
@@ -65,7 +66,7 @@ C_SOURCES=\
 	exproptc.c \
 	$(C_EXTRA)
 
-C_MAIN=hbmain.c
+C_MAIN=harbour.c
 
 LIBS=\
 	pp \
