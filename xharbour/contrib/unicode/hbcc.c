@@ -13,11 +13,13 @@
  *    HB_CSOPENED()
  *    HB_CSAVAIL()
  *    HB_CSLIST()
+ *    HB_CSREADY()
  *    HB_CSTOCS()
  *    HB_B64ENCODE()
  *    HB_B64DECODE()
  *    HB_B64DECODE_FILE()
  *
+ * Copyright 2011 Andi Jahja <andi.jahja@yahoo.co.id>
  * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
  * www - http://www.harbour-project.org
  *
@@ -76,6 +78,13 @@ HB_CSLIST() -> charset_string
       None
    Returns:
       Comma separated active charsets list as a string
+
+HB_CSREADY() -> array of charset_string
+      returns array of charset_string ready for use
+   Parameters:
+      None
+   Returns:
+      one dimension array
 
 HB_CSOPENED(charset_name) -> charset_handle
       returns a handle to opened charset table
@@ -146,8 +155,6 @@ B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
 */
 #include "hbcc.h"
 
-#define HB_CSFEXT ".cst"
-
 #define HB_CSINVALID 0
 #define HB_CSPRESET 4096
 #define HB_CSUNICODE 4097
@@ -162,6 +169,8 @@ B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
 #define HB_CSERR_BADCS 2
 #define HB_CSERR_BADCHAR 3
 #define HB_CSERR_LIMIT 4
+#define HB_CSERR_ALREADY_REGISTERED 5
+#define HB_CSERR_NOFUNC 6
 #define HB_CSERR_ERROR 99
 
 #define MAX_CHARSIZE 256
@@ -177,8 +186,14 @@ B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
 #define B64_LINELEN 60
 #define UTF7START '+'
 
+typedef struct {
+        BYTE  name[48];
+        char szfunc[64];
+} HB_CSINIT;
+
 typedef struct int_hb_csinfo {
         BYTE name[48];
+        BYTE hrbname[48];
         BYTE leads[MAX_CHARSIZE];
         BYTE chsz;
         BYTE defchar[2];
@@ -190,11 +205,10 @@ typedef struct int_hb_csinfo {
 
 //Common static variables
 static ULONG LastError=0, lcs=0;
-static HB_CSINFO **pcs;
-static char *cspath = NULL;
+static HB_CSINFO **pcs = NULL;
 static BYTE *base64a=(BYTE*) "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static BYTE *trchars=(BYTE*) "/\047(),.:?\n\r\v\t ";
-static BYTE *wspchars; //="\n\r\v\t ";
+static BYTE *wspchars=(BYTE*) "\n\r\v\t ";
 
 //Protos are static to hide them from other modules
 static BOOL b64invalid(BYTE);
@@ -208,85 +222,52 @@ static ULONG uni2chr(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG chr2uni(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG uni2uni(BYTE *,ULONG,BYTE *);
 
-HB_FUNC_INIT( HB_INT_CSINIT );
-HB_FUNC_EXIT( HB_INT_CSEXIT );
+HB_FUNC_EXIT(   HB_INT_CSEXIT );
+HB_FUNC_EXTERN( HB_BGMIK      );
+HB_FUNC_EXTERN( HB_CP862      );
+HB_FUNC_EXTERN( HB_CP866      );
+HB_FUNC_EXTERN( HB_CP852      );
+HB_FUNC_EXTERN( HB_CP1251     );
+HB_FUNC_EXTERN( HB_CP1253     );
+HB_FUNC_EXTERN( HB_KOI8R      );
+HB_FUNC_EXTERN( HB_KOI8U      );
 
-//Harbour callable
+static HB_CSINIT csInit[] = {
+        { "BGMIK",    "HB_BGMIK"    },
+        { "CP852",    "HB_CP852"    },
+        { "CP862",    "HB_CP862"    },
+        { "CP866",    "HB_CP866"    },
+        { "CP1251",   "HB_CP1251"   },
+        { "CP1253",   "HB_CP1253"   },
+        { "KOI8R",    "HB_KOI8R"    },
+        { "KOI8U",    "HB_KOI8U"    }
+};
 
-HB_FUNC_INIT( HB_INT_CSINIT )
-{
-   ULONG i;
-
-   LastError=HB_CSERR_OK;
-   pcs=NULL;
-   lcs=0;
-   wspchars=(BYTE*) strchr((char*)trchars,'\n');
-   cspath= hb_getenv("HBCSPATH");
-
-   if (cspath==NULL)
-   {
-      cspath = ( char * ) hb_xgrab(3);
-      cspath[0]='.';
-      cspath[1]=HB_OS_PATH_DELIM_CHR;
-      cspath[2]='\0';
-   }
-
-   if (cspath[0]=='\0')
-   {
-      cspath = ( char * ) hb_xrealloc(cspath,3);
-      cspath[0]= '.';
-      cspath[1]= HB_OS_PATH_DELIM_CHR;
-      cspath[2]= '\0';
-   }
-
-   i=strlen( cspath );
-
-   if (cspath[i-1]!=HB_OS_PATH_DELIM_CHR)
-   {
-      cspath = ( char * ) hb_xrealloc(cspath,i+2);
-      cspath[i]=HB_OS_PATH_DELIM_CHR;
-      cspath[i+1]='\0';
-   }
-}
+static UINT lcsInit = sizeof( csInit ) / ( sizeof(csInit[0].name) + sizeof(csInit[0].szfunc) );
 
 HB_FUNC_EXIT( HB_INT_CSEXIT )
 {
    ULONG i;
 
-   for (i=lcs;i;i--)
+   for ( i = lcs; i; i-- )
    {
-      if (pcs[i-1]->tu2c)
-      {
-         hb_xfree(pcs[i-1]->tu2c);
-      }
+      if ( pcs[i-1]->tu2c )
+         hb_xfree( pcs[i-1]->tu2c );
 
-      if (pcs[i-1]->tc2u)
-      {
-         hb_xfree(pcs[i-1]->tc2u);
-      }
+      if ( pcs[i-1]->tc2u )
+         hb_xfree( pcs[i-1]->tc2u );
 
-      if (pcs[i-1])
-      {
-         hb_xfree(pcs[i-1]);
-      }
+      if ( pcs[i-1] )
+         hb_xfree( pcs[i-1] );
    }
 
-   LastError=HB_CSERR_OK;
+   LastError = HB_CSERR_OK;
 
-   if (pcs)
-   {
-      hb_xfree(pcs);
-   }
+   if ( pcs )
+      hb_xfree( pcs );
 
-   pcs=(HB_CSINFO **) NULL;
-   lcs=0;
-
-   if (cspath)
-   {
-      hb_xfree(cspath);
-   }
-
-   cspath=NULL;
+   pcs = (HB_CSINFO **) NULL;
+   lcs = 0;
 
    return;
 }
@@ -298,456 +279,452 @@ HB_FUNC( HB_CSGETERROR )
 
 HB_FUNC( HB_CSREG )
 {
-   ULONG i,j;
-   BYTE c;
-   char * filepath, * csname;
-   FHANDLE hf;
-
-   if (ISCHAR(1))
+   if ( ISCHAR( 1 ) )
    {
-      if (lcs==HB_CSPRESET)
+      if ( lcs < HB_CSPRESET )
       {
-         LastError=HB_CSERR_LIMIT;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
+         char *csname = hb_strdup( hb_parc( 1 ) );
+         ULONG i;
+         ULONG j, r;
+         BYTE c;
+         char *szProperties;
+         BYTE *szchartable;
+         BOOL bIsRegistered = FALSE;
+         PHB_DYNS pFunc = NULL;
 
-      csname = ( char * ) hb_parc( 1 );
-      filepath = ( char * ) hb_xgrab( HB_PATH_MAX );
-      hb_xstrcpy( filepath, cspath, 0 );
-      hb_xstrcat( filepath, csname, (char *) HB_CSFEXT, 0 );
+         hb_strupr ( csname );
 
-      if ( hb_spFile( filepath, NULL ) == FALSE )
-      {
-         hb_xfree(filepath);
-         LastError=HB_CSERR_BADCS;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
+         for ( i = 0; i < lcs; i++ )
+         {
+            if ( strcmp( (char*)pcs[i]->hrbname, csname ) == 0 )
+            {
+               bIsRegistered = TRUE;
+               break;
+            }
+         }
 
-      hf = hb_fsOpen( filepath, FO_READ | FO_DENYNONE );
+         if( bIsRegistered )
+         {
+            hb_xfree( csname );
+            hb_retnl( i );
+            return;
+         }
 
-      if (hf<0)
-      {
-         hb_xfree(filepath);
-         LastError=HB_CSERR_ERROR;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
+         for ( i = 0; i < lcsInit; i++ )
+         {
+            if ( strcmp( (char*)csInit[i].name, csname ) == 0 )
+            {
+               pFunc = hb_dynsymFind( csInit[i].szfunc );
+               break;
+            }
+         }
 
-      lcs++;
+         if ( pFunc == NULL )
+         {
+            hb_xfree( csname );
+            LastError = HB_CSERR_NOFUNC;
+            hb_retnl( HB_CSINVALID );
+            return;
+         }
 
-      if (pcs)
-      {
-         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
+         hb_vmPushSymbol( hb_dynsymSymbol( pFunc ) );
+         hb_vmPushNil();
+         hb_vmDo( 0 );
+         szchartable = (BYTE*) hb_parcx( -1 );
+
+         lcs ++;
+
+         pcs = pcs ? (HB_CSINFO**) hb_xrealloc( pcs, lcs*sizeof(HB_CSINFO*) ) :
+                     (HB_CSINFO**) hb_xgrab( lcs*sizeof(HB_CSINFO*) );
+
+         pcs[lcs-1] = (HB_CSINFO *) hb_xgrab( sizeof(HB_CSINFO) );
+         memcpy( pcs[lcs-1]->name, szchartable, CSINFO_MAXNAME );
+         memcpy( pcs[lcs-1]->hrbname, csname, CSINFO_MAXNAME );
+         r = CSINFO_MAXNAME;
+
+         szProperties = (char*) hb_xgrab( CSINFO_HEADSZ - CSINFO_MAXNAME );
+         memcpy( szProperties, szchartable + r, CSINFO_HEADSZ - CSINFO_MAXNAME );
+         r += CSINFO_HEADSZ - CSINFO_MAXNAME;
+
+         pcs[lcs-1]->chsz       = szProperties[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
+         pcs[lcs-1]->defchar[0] = szProperties[CSINFO_OFFDEFC - CSINFO_MAXNAME];
+         pcs[lcs-1]->defchar[1] = szProperties[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
+         pcs[lcs-1]->ltc2u      = szProperties[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
+
+         j = 0;
+
+         for ( i = 0; i < CSINFO_MAXLEAD; i++ )
+         {
+            if ( szProperties[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME] && szProperties[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1] )
+            {
+               for ( c= szProperties[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME]; c <= szProperties[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1]; c++ )
+                  pcs[lcs-1]->leads[j++] = c;
+            }
+         }
+
+         hb_xfree( csname );
+         hb_xfree( szProperties );
+
+         j = (2*MAX_CHARSIZE) * pcs[lcs-1]->ltc2u;
+         pcs[lcs-1]->tc2u = (BYTE*) hb_xgrab( j );
+         memcpy( pcs[lcs-1]->tc2u, szchartable + r, j );
+         r += j;
+
+         j = MAX_WCHARSIZE * pcs[lcs-1]->chsz;
+         pcs[lcs-1]->tu2c = (BYTE*) hb_xgrab( j );
+         memcpy( pcs[lcs-1]->tu2c, szchartable + r, j );
+
+         LastError = HB_CSERR_OK;
+         hb_retnl( lcs );
       }
       else
       {
-         pcs=(HB_CSINFO **) hb_xgrab(lcs*sizeof(HB_CSINFO *));
-      }
-
-      pcs[lcs-1]=(HB_CSINFO *) hb_xgrab(sizeof(HB_CSINFO));
-      i=hb_fsRead(hf,pcs[lcs-1]->name,CSINFO_MAXNAME);
-
-      if (i<CSINFO_MAXNAME)
-      {
-         hb_xfree(filepath);
-         lcs--;
-         hb_xfree(pcs[lcs]);
-         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-         LastError=HB_CSERR_BADCS;
-         hb_retnl(HB_CSINVALID);
+         LastError = HB_CSERR_LIMIT;
+         hb_retnl( HB_CSINVALID );
          return;
       }
-
-      filepath = ( char * ) hb_xrealloc( filepath, CSINFO_HEADSZ - CSINFO_MAXNAME );
-      i=hb_fsRead(hf,filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
-
-      if (i<(CSINFO_HEADSZ - CSINFO_MAXNAME))
-      {
-         hb_xfree( filepath );
-         lcs--;
-         hb_xfree(pcs[lcs]);
-         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-         LastError=HB_CSERR_BADCS;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
-
-      pcs[lcs-1]->chsz = filepath[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
-      pcs[lcs-1]->defchar[0] = filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME];
-      pcs[lcs-1]->defchar[1] = filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
-      pcs[lcs-1]->ltc2u = filepath[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
-      j=0;
-
-      for (i=0;i<CSINFO_MAXLEAD;i++)
-      {
-         if (filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME]&&filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1])
-         {
-            for (c=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME];c<=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1];c++)
-            {
-               pcs[lcs-1]->leads[j++]=c;
-            }
-         }
-      }
-
-      hb_xfree(filepath); // bugfix 200401190646GMT+3
-      j=(2*MAX_CHARSIZE)*pcs[lcs-1]->ltc2u;
-      pcs[lcs-1]->tc2u=(BYTE *) hb_xgrab(j);
-      i=hb_fsReadLarge(hf,pcs[lcs-1]->tc2u,j);
-
-      if (i<j)
-      {
-         hb_xfree(pcs[lcs-1]->tc2u);
-         hb_xfree(filepath);
-         lcs--;
-         hb_xfree(pcs[lcs]);
-         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-         LastError=HB_CSERR_BADCS;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
-
-      j=MAX_WCHARSIZE*pcs[lcs-1]->chsz;
-      pcs[lcs-1]->tu2c=(BYTE *) hb_xgrab(j);
-      i=hb_fsReadLarge(hf,pcs[lcs-1]->tu2c,j);
-
-      if (i<j)
-      {
-         hb_xfree(pcs[lcs-1]->tu2c);
-         hb_xfree(pcs[lcs-1]->tc2u);
-         hb_xfree(filepath);
-         lcs--;
-         hb_xfree(pcs[lcs]);
-         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-         LastError=HB_CSERR_BADCS;
-         hb_retnl(HB_CSINVALID);
-         return;
-      }
-      LastError=HB_CSERR_OK;
-      hb_retnl(lcs);
    }
    else
    {
-      LastError=HB_CSERR_BADARG;
-      hb_retnl(HB_CSINVALID);
+      LastError = HB_CSERR_BADARG;
+      hb_retnl( HB_CSINVALID );
    }
 }
 
 HB_FUNC( HB_CSUNREG )
 {
    ULONG i;
-   BYTE *csname;
+   char *csname = NULL;
 
-   if (ISCHAR(1))
+   if ( ISCHAR(1) )
    {
-      csname=(BYTE*) hb_parc(1);
+      csname = hb_strdup( hb_parc(1) );
 
-      for (i=0;i<lcs;i++)
+      hb_strupr( csname );
+
+      for ( i = 0; i < lcs; i++ )
       {
-         if (strcmp((char*)pcs[i]->name,(char*)csname)==0)
-         {
+         if ( strcmp( (char*)pcs[i]->hrbname, csname ) == 0 )
             break;
-         }
       }
 
-      if (i==lcs)
+      if ( i == lcs )
       {
-         LastError=HB_CSERR_BADCS;
-         hb_retl(FALSE);
+         hb_xfree( csname );
+         LastError = HB_CSERR_BADCS;
+         hb_retl( FALSE );
          return;
       }
    }
-   else if (ISNUM(1))
+   else if ( ISNUM(1) )
    {
-      i=hb_parnl(1);
+      i = hb_parnl(1);
 
-      if (i>HB_CSPRESET)
+      if ( i == 0 )
       {
-         LastError=HB_CSERR_BADCS;
-         hb_retl(FALSE);
+         hb_retl( FALSE );
+         return;
+      }
+
+      if ( i>HB_CSPRESET )
+      {
+         LastError = HB_CSERR_BADCS;
+         hb_retl( FALSE );
          return;
       }
       else
-      {
          i--;
-      }
 
-      if (i>lcs)
+      if ( i>lcs )
       {
-         LastError=HB_CSERR_BADCS;
-         hb_retl(FALSE);
+         LastError = HB_CSERR_BADCS;
+         hb_retl( FALSE );
          return;
       }
    }
    else
    {
-      LastError=HB_CSERR_BADARG;
-      hb_retl(FALSE);
+      LastError = HB_CSERR_BADARG;
+      hb_retl( FALSE );
       return;
    }
 
-   hb_xfree(pcs[i]->tu2c);
-   hb_xfree(pcs[i]->tc2u);
-   hb_xfree(pcs[i]);
-   i++;
+   hb_xfree( pcs[i]->tu2c );
+   hb_xfree( pcs[i]->tc2u );
+   hb_xfree( pcs[i] );
+   i ++;
 
-   for (;i<lcs;i++)
+   for ( ; i<lcs; i++ )
    {
-      pcs[i-1]=pcs[i];
+      pcs[i-1] = pcs[i];
    }
-   lcs--;
+   lcs --;
 
-   pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
-   hb_retl(TRUE);
+   pcs = (HB_CSINFO **) hb_xrealloc( pcs, lcs*sizeof(HB_CSINFO*) );
+
+   if( csname )
+      hb_xfree( csname );
+
+   hb_retl( TRUE );
 }
 
 HB_FUNC( HB_CSOPENED )
 {
-   ULONG i;
-   BYTE *csname;
-
-   if (ISCHAR(1))
+   if ( ISCHAR(1) )
    {
-      csname=(BYTE*)hb_parc(1);
-      LastError=HB_CSERR_BADCS;
+      ULONG i;
+      char* csname = hb_strdup( hb_parc(1) );
+      BOOL bFound = FALSE;
 
-      for (i=0;i<lcs;i++)
+      hb_strupr( csname );
+
+      LastError = HB_CSERR_BADCS;
+
+      for ( i = 0; i<lcs; i++ )
       {
-         if (strcmp((char*)csname,(char*)pcs[i]->name)==0)
+         if ( strcmp( csname, (char*)pcs[i]->hrbname ) == 0 )
          {
-            LastError=HB_CSERR_OK;
-            hb_retnl(i+1);
+            bFound = TRUE;
+            LastError = HB_CSERR_OK;
+            break;
          }
       }
 
-      if (i==lcs)
+      if ( bFound )
       {
-         if ((hb_stricmp((char*)csname,"UNICODE")==0) || (hb_stricmp((char*)csname,"UCS2")==0) || (hb_stricmp((char*)csname,"UCS2LE")==0))
+         hb_retnl( i + 1 );
+         hb_xfree( csname );
+         return;
+      }
+
+      if ( i == lcs )
+      {
+         if ( ( hb_stricmp( csname, "UNICODE" ) == 0 ) ||
+              ( hb_stricmp( csname, "UCS2" ) == 0 ) ||
+              ( hb_stricmp( csname, "UCS2LE" ) == 0 ) )
          {
-            LastError=HB_CSERR_OK;
-            hb_retnl(HB_CSUCS2LE);
+            LastError = HB_CSERR_OK;
+            hb_retnl( HB_CSUCS2LE );
          }
-         else if (hb_stricmp((char*)csname,"UCS2BE")==0)
+         else if ( hb_stricmp( csname, "UCS2BE" ) == 0 )
          {
-            LastError=HB_CSERR_OK;
-            hb_retnl(HB_CSUCS2BE);
+            LastError = HB_CSERR_OK;
+            hb_retnl( HB_CSUCS2BE );
          }
-         else if ((hb_stricmp((char*)csname,"UTF8")==0) || (hb_stricmp((char*)csname,"UTF-8"))==0)
+         else if ( ( hb_stricmp( csname, "UTF8" ) == 0 ) ||
+                   ( hb_stricmp( csname, "UTF-8" ) ) == 0 )
          {
-            LastError=HB_CSERR_OK;
-            hb_retnl(HB_CSUTF8);
+            LastError = HB_CSERR_OK;
+            hb_retnl( HB_CSUTF8 );
          }
-         else if ((hb_stricmp((char*)csname,"UTF7")==0) || (hb_stricmp((char*)csname,"UTF-7"))==0)
+         else if ( ( hb_stricmp( csname, "UTF7" ) == 0 ) ||
+                   ( hb_stricmp( csname, "UTF-7" ) ) == 0 )
          {
-            LastError=HB_CSERR_OK;
-            hb_retnl(HB_CSUTF7);
+            LastError = HB_CSERR_OK;
+            hb_retnl( HB_CSUTF7 );
          }
          else
          {
-            LastError=HB_CSERR_BADCS;
-            hb_retnl(HB_CSINVALID);
+            LastError = HB_CSERR_BADCS;
+            hb_retnl( HB_CSINVALID );
          }
       }
-      hb_xfree(csname);
+      hb_xfree( csname );
    }
    else
    {
-      LastError=HB_CSERR_BADARG;
-      hb_retnl(HB_CSINVALID);
+      LastError = HB_CSERR_BADARG;
+      hb_retnl( HB_CSINVALID );
    }
 }
 
 HB_FUNC( HB_CSAVAIL )
 {
-   char * filepath;
-   BOOL x;
+   BOOL x = FALSE;
 
    if (ISCHAR(1))
    {
-      filepath = ( char * ) hb_xgrab(HB_PATH_MAX);
-      hb_xstrcpy( filepath, cspath, 0 );
-      hb_xstrcat( filepath, hb_parc(1), HB_CSFEXT, 0 );
-      x = hb_spFile( filepath, NULL );
-      hb_xfree( filepath );
+      ULONG i;
+      char *csname = hb_strdup( hb_parc( 1 ) );
 
-      if (x)
+      hb_strupr( csname );
+
+      for ( i = 0; i < lcs; i++ )
       {
-         LastError=HB_CSERR_OK;
-      }
-      else
-      {
-         LastError=HB_CSERR_BADCS;
+         if ( strcmp( (char*)pcs[i]->hrbname, csname ) == 0 )
+         {
+            x = TRUE;
+            break;
+         }
       }
 
-      hb_retl(x);
+      hb_xfree( csname );
+
+      LastError = x ? HB_CSERR_OK : HB_CSERR_BADCS;
    }
    else
-   {
-      LastError=HB_CSERR_BADARG;
-      hb_retl(FALSE);
-   }
+      LastError = HB_CSERR_BADARG;
+
+   hb_retl( x );
 }
 
 HB_FUNC( HB_CSLIST )
 {
    ULONG i;
-   char * cslist;
+   char* cslist = (char*) hb_xgrab( 1 );
 
    LastError = HB_CSERR_OK;
-   cslist = ( char * ) hb_xgrab(1);
-   cslist[0]='\0';
+   cslist[0] = '\0';
 
-   for (i=0;i<lcs;i++)
+   for ( i=0; i<lcs; i++ )
    {
-      cslist = ( char * ) hb_xrealloc( cslist, strlen( cslist ) + strlen( ( char * ) pcs[i]->name ) + 2 );
-      hb_xstrcat( cslist, ( char * ) ",", ( char * ) pcs[i]->name, 0  );
+      cslist = (char*) hb_xrealloc( cslist, strlen( cslist ) + strlen( (char*) pcs[i]->name ) + 2 );
+      hb_xstrcat( cslist, (char*) ",", (char*) pcs[i]->name, 0 );
    }
 
+   hb_strupr( cslist );
    hb_retc( cslist + 1 );
    hb_xfree( cslist );
 }
 
+HB_FUNC( HB_CSREADY )
+{
+   ULONG i;
+   PHB_ITEM pReady = hb_itemArrayNew( 0 );
+
+   LastError = HB_CSERR_OK;
+
+   for ( i=0; i<lcsInit; i++ )
+   {
+      PHB_ITEM pCST = hb_itemPutC( NULL, (char*) csInit[i].name );
+      hb_arrayAdd( pReady, pCST );
+      hb_itemRelease( pCST );
+   }
+
+   hb_itemRelease( hb_itemReturn( pReady ) ) ;
+}
+
 HB_FUNC( HB_CSTOCS )
 {
-   ULONG h1,h2,srclen,dstlen=0,intlen=0,x=0;
-   BYTE *srcstr, *dststr=0, *intstr=0;
-   PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
-
-   if (hb_pcount()<3)
+   if ( hb_pcount() == 3 )
    {
-      LastError=HB_CSERR_BADARG;
-      hb_retc("");
+      PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
+      ULONG h1 = hb_parnl(2);
+      ULONG h2 = hb_parnl(3);
+
+      if ( pstr && h1 && h2 )
+      {
+         BYTE *srcstr = (BYTE*) hb_itemGetCPtr( pstr );
+         ULONG srclen = hb_itemGetCLen( pstr );
+
+         LastError = HB_CSERR_OK;
+
+         if ( srclen )
+         {
+            if ( h1 != h2 )
+            {
+               ULONG dstlen = 0, intlen = 0, x = 0;
+               BYTE *dststr = 0, *intstr = 0;
+
+               if ( h1 == HB_CSUCS2BE )
+               {
+                  intlen = srclen;
+                  intstr = srcstr;
+               }
+               else if ( h1 == HB_CSUCS2LE )
+               {
+                 x |= 1;
+                 intstr = (BYTE *) hb_xgrab( srclen );
+                 intlen = uni2uni( srcstr, srclen, intstr );
+               }
+               else if ( h1 == HB_CSUTF8 )
+               {
+                  x |= 1;
+                  intlen = ut82uni( srcstr, srclen, NULL );
+                  intstr = (BYTE *) hb_xgrab( intlen );
+                  ut82uni( srcstr, srclen, intstr );
+               }
+               else if ( h1 == HB_CSUTF7 )
+               {
+                  x |= 1;
+                  intlen = ut72uni( srcstr, srclen, NULL );
+                  intstr = (BYTE *) hb_xgrab( intlen );
+                  ut72uni( srcstr, srclen, intstr );
+               }
+               else if ( h1 <= lcs )
+               {
+                  x |= 1;
+                  h1 --;
+                  intlen = chr2uni( h1, srcstr, srclen, NULL );
+                  intstr = (BYTE *) hb_xgrab( intlen );
+                  chr2uni( h1, srcstr, srclen, intstr );
+               }
+               else
+                  LastError = HB_CSERR_BADCS;
+
+               if ( LastError == HB_CSERR_OK )
+               {
+                  if ( h2 == HB_CSUCS2BE )
+                  {
+                     dstlen = intlen;
+                     dststr = intstr;
+                  }
+                  else if ( h2 == HB_CSUCS2LE )
+                  {
+                     x |= 2;
+                     dststr = (BYTE *) hb_xgrab( intlen );
+                     dstlen = uni2uni( intstr, intlen, dststr );
+                  }
+                  else if ( h2 == HB_CSUTF8 )
+                  {
+                     x |= 2;
+                     dstlen = uni2ut8( intstr, intlen, NULL );
+                     dststr = (BYTE *) hb_xgrab( dstlen );
+                     uni2ut8( intstr, intlen, dststr );
+                  }
+                  else if ( h2 == HB_CSUTF7 )
+                  {
+                     x |= 2;
+                     dstlen = uni2ut7( intstr, intlen, NULL );
+                     dststr = (BYTE *) hb_xgrab( dstlen );
+                     uni2ut7( intstr, intlen, dststr );
+                  }
+                  else if ( h2 <= lcs )
+                  {
+                     x |= 2;
+                     h2 --;
+                     dstlen = uni2chr( h2, intstr, intlen, NULL );
+                     dststr = (BYTE *) hb_xgrab( dstlen );
+                     uni2chr( h2, intstr, intlen, dststr );
+                  }
+                  else
+                     LastError = HB_CSERR_BADCS;
+               }
+               else
+                  hb_retc( "" );
+
+               if ( LastError == HB_CSERR_OK )
+                  hb_retclen( (char*) dststr, dstlen );
+               else
+                  hb_retc( "" );
+
+               if ( x&1 )
+                  hb_xfree( intstr );
+
+               if ( x&2 )
+                  hb_xfree( dststr );
+            }
+            else
+               hb_retclen( (char*) srcstr, srclen );
+         }
+         else
+            hb_retc("");
+      }
       return;
    }
 
-   h1=hb_parnl(2);
-   h2=hb_parnl(3);
-
-   if ((pstr && h1 && h2)==FALSE)
-   {
-      LastError=HB_CSERR_BADARG;
-      hb_retc("");
-      return;
-   }
-
-   srcstr=(BYTE*) hb_itemGetCPtr(pstr);
-   srclen=hb_itemGetCLen(pstr);
-   LastError=HB_CSERR_OK;
-
-   if (srclen==0)
-   {
-      hb_retc("");
-      return;
-   }
-
-   if (h1==h2)
-   {
-      hb_retclen((char*) srcstr,srclen);
-      return;
-   }
-
-   if (h1==HB_CSUCS2BE)
-   {
-      intlen=srclen;
-      intstr=srcstr;
-   }
-   else if (h1==HB_CSUCS2LE)
-   {
-     x|=1;
-     intstr=(BYTE *) hb_xgrab(srclen);
-     intlen=uni2uni(srcstr,srclen,intstr);
-   }
-   else if (h1==HB_CSUTF8)
-   {
-      x|=1;
-      intlen=ut82uni(srcstr,srclen,NULL);
-      intstr=(BYTE *) hb_xgrab(intlen);
-      ut82uni(srcstr,srclen,intstr);
-   }
-   else if (h1==HB_CSUTF7)
-   {
-      x|=1;
-      intlen=ut72uni(srcstr,srclen,NULL);
-      intstr=(BYTE *) hb_xgrab(intlen);
-      ut72uni(srcstr,srclen,intstr);
-   }
-   else if (h1<=lcs)
-   {
-      x|=1;
-      h1--;
-      intlen=chr2uni(h1,srcstr,srclen,NULL);
-      intstr=(BYTE *) hb_xgrab(intlen);
-      chr2uni(h1,srcstr,srclen,intstr);
-   }
-   else
-   { //bad cs
-      LastError=HB_CSERR_BADCS;
-   }
-
-   if (LastError==HB_CSERR_OK)
-   {
-      if (h2==HB_CSUCS2BE)
-      {
-         dstlen=intlen;
-         dststr=intstr;
-      }
-      else if (h2==HB_CSUCS2LE)
-      {
-         x|=2;
-         dststr=(BYTE *) hb_xgrab(intlen);
-         dstlen=uni2uni(intstr,intlen,dststr);
-      }
-      else if (h2==HB_CSUTF8)
-      {
-         x|=2;
-         dstlen=uni2ut8(intstr,intlen,NULL);
-         dststr=(BYTE *) hb_xgrab(dstlen);
-         uni2ut8(intstr,intlen,dststr);
-      }
-      else if (h2==HB_CSUTF7)
-      {
-         x|=2;
-         dstlen=uni2ut7(intstr,intlen,NULL);
-         dststr=(BYTE *) hb_xgrab(dstlen);
-         uni2ut7(intstr,intlen,dststr);
-      }
-      else if (h2<=lcs)
-      {
-         x|=2;
-         h2--;
-         dstlen=uni2chr(h2,intstr,intlen,NULL);
-         dststr=(BYTE *) hb_xgrab(dstlen);
-         uni2chr(h2,intstr,intlen,dststr);
-      }
-      else
-      { //bad cs
-         LastError=HB_CSERR_BADCS;
-      }
-   }
-   else
-   {
-      hb_retc("");
-   }
-
-   if (LastError==HB_CSERR_OK)
-   {
-      hb_retclen((char*) dststr,dstlen);
-   }
-   else
-   {
-      hb_retc("");
-   }
-
-   if (x&1)
-   {
-      hb_xfree(intstr);
-   }
-
-   if (x&2)
-   {
-      hb_xfree(dststr);
-   }
+   LastError = HB_CSERR_BADARG;
+   hb_retc( "" );
 }
 
 HB_FUNC(HB_B64ENCODE)
@@ -991,459 +968,390 @@ static ULONG b64dec(BYTE *srcstr, ULONG srclen, BYTE *dststr)
    return dstlen;
 }
 
-static ULONG uni2uni(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG uni2uni( BYTE *srcstr, ULONG srclen, BYTE *dststr )
 {
    ULONG i;
 
-   for(i=0;i<(srclen-1);)
+   for( i = 0; i < ( srclen - 1 );)
    {
-      dststr[i]=srcstr[i+1];
-      dststr[i+1]=srcstr[i];
-      i+=2;
+      dststr[i]   = srcstr[i+1];
+      dststr[i+1] = srcstr[i];
+      i += 2;
    }
 
    return i;
 }
 
-static ULONG chr2uni(ULONG h,BYTE *chrstr,ULONG chrlen,BYTE *unistr)
+static ULONG chr2uni( ULONG h, BYTE *chrstr, ULONG chrlen, BYTE *unistr )
 {
-   ULONG i=0,c,n,unilen=0;
+   ULONG i = 0, c, n, unilen = 0;
    BYTE *x;
 
-   while (i<chrlen)
+   while ( i < chrlen )
    {
-      if (pcs[h]->chsz==1)
+      if ( pcs[h]->chsz == 1 )
       {
-         n=1;
-         c=chrstr[i];
+         n = 1;
+         c = chrstr[i];
       }
       else
       {
-         x=(BYTE*) strchr((char*)pcs[h]->leads,chrstr[i]);
+         x = (BYTE*) strchr((char*)pcs[h]->leads,chrstr[i]);
 
-         if (x)
+         if ( x )
          {
-            n=2;
-            c=(x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1];
+            n = 2;
+            c = (x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1];
          }
          else
          {
-            n=1;
-            c=chrstr[i];
+            n = 1;
+            c = chrstr[i];
          }
       }
 
-      if (unistr)
+      if ( unistr )
       {
-         unistr[unilen]=pcs[h]->tc2u[2*c+1];
-         unistr[unilen+1]=pcs[h]->tc2u[2*c];
+         unistr[unilen]   = pcs[h]->tc2u[2*c+1];
+         unistr[unilen+1] = pcs[h]->tc2u[2*c];
       }
 
-      i+=n;
-      unilen+=2;
+      i += n;
+      unilen += 2;
    }
 
    return unilen;
 }
 
-static ULONG uni2chr(ULONG h,BYTE *unistr,ULONG unilen,BYTE *chrstr)
+static ULONG uni2chr( ULONG h, BYTE *unistr, ULONG unilen, BYTE *chrstr )
 {
-   ULONG i=0,c,n,chrlen=0;
+   ULONG i = 0, c, n, chrlen = 0;
 
-   while (i<unilen-1)
+   while ( i < unilen - 1 )
    {
-      c=((((ULONG) unistr[i]) << 8) | (ULONG) unistr[i+1]) * ((ULONG) pcs[h]->chsz);
+      c = ((((ULONG) unistr[i]) << 8) | (ULONG) unistr[i+1]) * ((ULONG) pcs[h]->chsz);
 
-      if (pcs[h]->chsz==1)
-      {
-         n=1;
-      }
+      if ( pcs[h]->chsz == 1 )
+         n = 1;
       else
+         n = ( pcs[h]->tu2c[c+1] ) ? 2 : 1;
+
+      if ( chrstr )
       {
-         if (pcs[h]->tu2c[c+1])
-         {
-            n=2;
-         }
-         else
-         {
-            n=1;
-         }
+         chrstr[chrlen] = pcs[h]->tu2c[c];
+
+         if ( n > 1 )
+            chrstr[chrlen+1] = pcs[h]->tu2c[c+1];
       }
 
-      if (chrstr)
-      {
-         chrstr[chrlen]=pcs[h]->tu2c[c];
-
-         if (n>1)
-         {
-            chrstr[chrlen+1]=pcs[h]->tu2c[c+1];
-         }
-      }
-
-      chrlen+=n;
-      i+=2;
+      chrlen += n;
+      i += 2;
    }
 
    return chrlen;
 }
 
-static ULONG ut82uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
+static ULONG ut82uni( BYTE *utfstr, ULONG utflen, BYTE *unistr )
 {
-   ULONG i,n,unilen=0;
+   ULONG i, n, unilen = 0;
 
-   for (i=0;i<utflen;)
+   for ( i = 0; i < utflen; )
    {
-      if (utfstr[i] & 0x80)
+      if ( utfstr[i] & 0x80 )
       {
-         if (utfstr[i] & 0x40)
+         if ( utfstr[i] & 0x40 )
          {
-            if (utfstr[i] & 0x20)
-            {
-               n=3; //0x800-0xFFFF,3
-            }
+            if ( utfstr[i] & 0x20 )
+               n = 3; //0x800-0xFFFF,3
             else
-            {
-               n=2; //0x80-0x7FF,2
-            }
+               n = 2; //0x80-0x7FF,2
          }
          else
-         {
-            n=0;
-         }
+            n = 0;
       }
       else
-      {
-         n=1;                          //0x00-0x7F,1
-      }
+         n = 1;       //0x00-0x7F,1
 
-      if (i+n>utflen)
+      if ( ( i + n ) > utflen )
       { //incomplete
-         if (unistr)
+         if ( unistr )
          {
-            unistr[unilen++]='\0';
-            unistr[unilen++]='?';
+            unistr[unilen++] = '\0';
+            unistr[unilen++] = '?';
          }
          else
-         {
-            unilen+=2;
-         }
+            unilen += 2;
 
          return unilen;
       }
 
-      if (unistr)
+      if ( unistr )
       {
-         switch(n)
+         switch( n )
          {
-         case 0: //wrong utf-8 char
-            unistr[unilen++]='\0';
-            unistr[unilen++]='?';
-            break;
+            case 0: //wrong utf-8 char
+               unistr[unilen++] = '\0';
+               unistr[unilen++] = '?';
+               break;
 
-         case 1:
-            unistr[unilen++]='\0';
-            unistr[unilen++]=utfstr[i];
-            break;
+            case 1:
+               unistr[unilen++] = '\0';
+               unistr[unilen++] = utfstr[i];
+               break;
 
-         case 2:
-            unistr[unilen++]=(utfstr[i] & '\034') >> 2;
-            unistr[unilen++]=(utfstr[i+1]&'\077') | ((utfstr[i]&'\003')<<6);
-            break;
+            case 2:
+               unistr[unilen++] = (utfstr[i] & '\034') >> 2;
+               unistr[unilen++] = (utfstr[i+1]&'\077') | ((utfstr[i]&'\003')<<6);
+               break;
 
-         case 3:
-            unistr[unilen++]=((utfstr[i]&'\017')<<4) | ((utfstr[i+1]&'\074')>>2);
-            unistr[unilen++]=((utfstr[i+1]&'\003')<<6) | (utfstr[i+2]&'\077');
-            break;
+            case 3:
+               unistr[unilen++] = ((utfstr[i]&'\017')<<4) | ((utfstr[i+1]&'\074')>>2);
+               unistr[unilen++] = ((utfstr[i+1]&'\003')<<6) | (utfstr[i+2]&'\077');
+               break;
          }
       }
       else
-      {
-         unilen+=2;
-      }
+         unilen += 2;
 
-      i+=n;
+      i += n;
    }
 
    return unilen;
 }
 
-static ULONG uni2ut8(BYTE *unistr,ULONG unilen,BYTE *utfstr)
+static ULONG uni2ut8( BYTE *unistr, ULONG unilen, BYTE *utfstr )
 {
-   ULONG i,n,utflen=0;
+   ULONG i, n, utflen = 0;
 
-   for (i=0;i<(unilen-1);)
+   for ( i = 0; i < ( unilen - 1 ); )
    {
-      if ((unistr[i] | (unistr[i+1]&'\200'))=='\0')
-      {
-         n=1; //0x00-0x7F
-      }
-      else if (unistr[i]<'\010')
-      {
-         n=2; //0x80-0x7ff
-      }
+      if ( ( unistr[i] | (unistr[i+1]&'\200') ) == '\0' )
+         n = 1; //0x00-0x7F
+      else if ( unistr[i] < '\010' )
+         n = 2; //0x80-0x7ff
       else
-      {
-         n=3; //0x0800-0xffff
-      }
+         n = 3; //0x0800-0xffff
 
-      if (utfstr)
+      if ( utfstr )
       {
-         switch (n)
+         switch ( n )
          {
-         case 1:
-            utfstr[utflen++]=unistr[i+1];
-            break;
+            case 1:
+               utfstr[utflen++] = unistr[i+1];
+               break;
 
-         case 2:
-            utfstr[utflen++]='\300'|(('\007'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
-            utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
-            break;
+            case 2:
+               utfstr[utflen++] = '\300'|(('\007'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
+               utfstr[utflen++] = '\200'|('\077'&unistr[i+1]);
+               break;
 
-         case 3:
-            utfstr[utflen++]='\340'|('\017'&(unistr[i]>>4));
-            utfstr[utflen++]='\200'|(('\017'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
-            utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
-            break;
+            case 3:
+               utfstr[utflen++] = '\340'|('\017'&(unistr[i]>>4));
+               utfstr[utflen++] = '\200'|(('\017'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
+               utfstr[utflen++] = '\200'|('\077'&unistr[i+1]);
+               break;
          }
       }
       else
-      {
-         utflen+=n;
-      }
+         utflen += n;
 
-      i+=2;
+      i += 2;
    }
 
    return utflen;
 }
 
-static ULONG ut72uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
+static ULONG ut72uni( BYTE *utfstr, ULONG utflen, BYTE *unistr )
 {
-   ULONG i,j,unilen=0,state=0;
-   BYTE *dummy=0,c;
+   ULONG i, j, unilen = 0, state = 0;
+   BYTE *dummy = 0, c;
 
-   for (i=0;i<utflen;i++)
+   for ( i = 0; i < utflen; i++ )
    {
-      if (state==1)
+      if ( state == 1 )
       {
-         if (b64invalid(utfstr[i]))
+         if ( b64invalid( utfstr[i] ) )
          {
-            state=0;
+            state = 0;
 
-            if ((utfstr[i]=='-') && (utfstr[i-1]=='+'))
-            {
-               c='+';
-            }
+            if ( ( utfstr[i] == '-' ) && ( utfstr[i-1] == '+' ) )
+               c = '+';
             else
+               c = utfstr[i];
+
+            j = b64dec( dummy, i - ( dummy - utfstr ), NULL );
+
+            if ( unistr )
+               b64dec( dummy, i - ( dummy - utfstr ), unistr + unilen );
+
+            unilen += j;
+
+            if ( c != '-' )
             {
-               c=utfstr[i];
-            }
-
-            j=b64dec(dummy,i-(dummy-utfstr),NULL);
-
-            if (unistr)
-            {
-               b64dec(dummy,i-(dummy-utfstr),unistr+unilen);
-            }
-
-            unilen+=j;
-
-            if (c!='-')
-            {
-               if (unistr)
+               if ( unistr )
                {
-                  unistr[unilen++]='\0';
-                  unistr[unilen++]=c;
+                  unistr[unilen++] = '\0';
+                  unistr[unilen++] = c;
                }
                else
-               {
-                  unilen+=2;
-               }
+                  unilen += 2;
             }
          }
       }
-      else if (utfstr[i]==UTF7START)
+      else if ( utfstr[i] == UTF7START )
       {
-         dummy=utfstr+(i+1);
-         state=1;
+         dummy = utfstr + ( i + 1 );
+         state = 1;
       }
       else
       {
-         if (unistr)
+         if ( unistr )
          {
-            unistr[unilen++]='\0';
-            unistr[unilen++]=utfstr[i];
+            unistr[unilen++] = '\0';
+            unistr[unilen++] = utfstr[i];
          }
          else
-         {
-            unilen+=2;
-         }
+            unilen += 2;
       }
    }
 
-   if (state==1)
+   if ( state == 1 )
    {
-      j=b64dec(dummy,utflen-(dummy-utfstr),NULL);
+      j = b64dec( dummy, utflen - ( dummy - utfstr ), NULL );
 
-      if (unistr)
-      {
-         b64dec(dummy,utflen-(dummy-utfstr),unistr+unilen);
-      }
+      if ( unistr )
+         b64dec( dummy, utflen - ( dummy - utfstr ), unistr + unilen );
 
-      unilen+=j;
+      unilen += j;
    }
 
    return unilen;
 }
 
-static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
+static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
 {
-   ULONG i,j,utflen=0,state=0;
-   BYTE *dummy=0;
+   ULONG i, j, utflen = 0, state = 0;
+   BYTE *dummy = 0;
 
-   for (i=0;i<unilen-1;i+=2)
+   for ( i = 0; i < unilen-1; i += 2 )
    {
-      if ((unistr[i]=='\0') && (unistr[i+1]=='+'))
+      if ( ( unistr[i] == '\0' ) && ( unistr[i+1] == '+' ) )
       {
-         if (state==1)
+         if ( state == 1 )
          {
-            j=b64enc(dummy,i-(dummy-unistr),NULL);
+            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
 
-            if (utfstr)
+            if ( utfstr )
             {
-               utfstr[utflen++]='+';
-               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-               utflen+=j;
-               utfstr[utflen++]='-';
+               utfstr[utflen++] = '+';
+               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               utflen += j;
+               utfstr[utflen++] = '-';
             }
             else
-            {
-               utflen+=j+2;
-            }
+               utflen += ( j + 2 );
          }
 
-         if (utfstr)
+         if ( utfstr )
          {
-            utfstr[utflen++]='+';
-            utfstr[utflen++]='-';
+            utfstr[utflen++] = '+';
+            utfstr[utflen++] = '-';
          }
          else
-         {
-            utflen+=2;
-         }
+            utflen += 2;
 
-         state=0;
+         state = 0;
       }
-      else if ((unistr[i]=='\0') && (unistr[i+1]=='-'))
+      else if ( ( unistr[i] == '\0' ) && ( unistr[i+1] == '-' ) )
       {
-         if (state==1)
+         if ( state == 1 )
          {
-            j=b64enc(dummy,i-(dummy-unistr),NULL);
+            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
 
-            if (utfstr)
+            if ( utfstr )
             {
-               utfstr[utflen++]='+';
-               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-               utflen+=j;
-               utfstr[utflen++]='-';
+               utfstr[utflen++] = '+';
+               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               utflen += j;
+               utfstr[utflen++] = '-';
             }
             else
-            {
-               utflen+=j+2;
-            }
+               utflen += ( j + 2 );
          }
 
-         if (utfstr)
-         {
-            utfstr[utflen++]='-';
-         }
+         if ( utfstr )
+            utfstr[utflen++] = '-';
          else
-         {
             utflen++;
-         }
 
-         state=0;
+         state = 0;
       }
       else if ((unistr[i]=='\0') && (strchr((char*)base64a,unistr[i+1])!=NULL) && (unistr[i+1]!=0))
       {
-         if (state==1)
+         if ( state == 1 )
          {
-            j=b64enc(dummy,i-(dummy-unistr),NULL);
+            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
 
-            if (utfstr)
+            if ( utfstr )
             {
-               utfstr[utflen++]='+';
-               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-               utflen+=j;
-               utfstr[utflen++]='-';
+               utfstr[utflen++] = '+';
+               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               utflen += j;
+               utfstr[utflen++] = '-';
             }
             else
-            {
-               utflen+=j+2;
-            }
+               utflen += ( j + 2 );
          }
 
-         if (utfstr)
-         {
-            utfstr[utflen++]=unistr[i+1];
-         }
+         if ( utfstr )
+            utfstr[utflen++] = unistr[i+1];
          else
-         {
             utflen++;
-         }
 
-         state=0;
+         state = 0;
       }
       else if ((unistr[i]=='\0') && (strchr((char*)trchars,unistr[i+1])!=NULL) && (unistr[i+1]!=0))
       {
-         if (state==1)
+         if ( state == 1 )
          {
-            j=b64enc(dummy,i-(dummy-unistr),NULL);
+            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
 
-            if (utfstr)
+            if ( utfstr )
             {
-               utfstr[utflen++]='+';
-               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-               utflen+=j;
+               utfstr[utflen++] = '+';
+               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               utflen += j;
             }
             else
-            {
-               utflen+=j+1;
-            }
+               utflen += ( j + 1 );
          }
 
-         if (utfstr)
-         {
-            utfstr[utflen++]=unistr[i+1];
-         }
+         if ( utfstr )
+            utfstr[utflen++] = unistr[i+1];
          else
-         {
             utflen++;
-         }
 
-         state=0;
+         state = 0;
       }
-      else if (state==0)
+      else if ( state == 0 )
       {
-         dummy=unistr+i;
-         state=1;
+         dummy = unistr + i ;
+         state = 1;
       }
    }
 
-   if (state==1)
+   if ( state == 1 )
    {
-      j=b64enc(dummy,unilen-(dummy-unistr),NULL);
+      j = b64enc( dummy, unilen - ( dummy - unistr ), NULL );
 
-      if (utfstr)
+      if ( utfstr )
       {
-         utfstr[utflen++]='+';
-         b64enc(dummy,unilen-(dummy-unistr),utfstr+utflen);
-         utflen+=j;
+         utfstr[utflen++] = '+';
+         b64enc( dummy, unilen - ( dummy - unistr ), utfstr + utflen );
+         utflen += j;
       }
       else
-      {
-         utflen+=j+1;
-      }
+         utflen += ( j + 1 );
    }
 
    return utflen;
@@ -1682,7 +1590,14 @@ HB_FUNC( B64DECODE_FILE )
 #endif
 
 HB_INIT_SYMBOLS_BEGIN( hbcc_InitExit )
-{ "HB_INT_CSINIT$", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( HB_INT_CSINIT )}, &ModuleFakeDyn },
+{ "HB_BGMIK"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_BGMIK    )}, NULL },
+{ "HB_CP866"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_CP866    )}, NULL },
+{ "HB_CP862"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_CP862    )}, NULL },
+{ "HB_CP852"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_CP852    )}, NULL },
+{ "HB_CP1251"     , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_CP1251   )}, NULL },
+{ "HB_CP1253"     , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_CP1253   )}, NULL },
+{ "HB_KOI8R"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_KOI8R    )}, NULL },
+{ "HB_KOI8U"      , {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_KOI8U    )}, NULL },
 { "HB_INT_CSEXIT$", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( HB_INT_CSEXIT )}, &ModuleFakeDyn }
 HB_INIT_SYMBOLS_END( hbcc_InitExit )
 
@@ -1692,3 +1607,4 @@ HB_INIT_SYMBOLS_END( hbcc_InitExit )
    #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hbcc_InitExit )
    #include "hbiniseg.h"
 #endif
+

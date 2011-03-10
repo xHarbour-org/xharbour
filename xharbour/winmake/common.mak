@@ -1612,7 +1612,16 @@ HBCC_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbcrpt128$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbencode$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)unitool$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)unitool$(OBJEXT)\
+        \
+	$(OBJ_DIR)$(DIR_SEP)bgmik$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cp1251$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cp1253$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cp852$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cp862$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cp866$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)koi8r$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)koi8u$(OBJEXT)
 
 #===============================================================================
 # WHAT32.LIB dependencies

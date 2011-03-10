@@ -8,6 +8,37 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-10 11:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/unicode/hbcctool.c
+    ! formatting
+
+  * contrib/unicode/hbcc.c
+    ! formatting
+    ! overhaul function HB_CSTOCS() to use memory rather than files.
+
+  + contrib/unicode/bgmik.c
+  + contrib/unicode/cp1251.c
+  + contrib/unicode/cp1253.c
+  + contrib/unicode/cp852.c
+  + contrib/unicode/cp862.c
+  + contrib/unicode/cp866.c
+  + contrib/unicode/koi8r.c
+  + contrib/unicode/koi8u.c
+    ! codepage added
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! object file dependencies for hbcc.lib
+
+  + tests/uni2utf8.prg
+    ! test program for stand-alone unicode translation
+
+    ; NOTE: These utilities have been existing in contrib/unicode for ages
+            but only now I can take a closer look at it. These tools are not
+            intended as replacement to xHarbour's native UTF8 functionalities,
+            they merely demonstrate how to utilize code page table available
+            from internet (primarily: unicode.org)
+
 2011-03-10 07:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! typo on Log entry 2011-03-10 07:00 UTC+0700

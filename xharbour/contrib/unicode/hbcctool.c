@@ -99,14 +99,14 @@ BOOL hbcc_file_read ( FILE *fileHandle, char *string )
       }
       else
       {
-         if (cnbr < LINE_MAX)
+         if ( cnbr < LINE_MAX )
          {
             if ( ch != '\r' )
                string [cnbr++] = (char) ch;
          }
       }
 
-      if (cnbr >= LINE_MAX)
+      if ( cnbr >= LINE_MAX )
       {
          string [LINE_MAX] = '\0';
          return (TRUE);
@@ -119,9 +119,9 @@ static void wsconv(char *ins)
 {
    int i;
 
-   for (i=0;ins[i];i++)
-      if (ins[i]<' ')
-         ins[i]=' ';
+   for ( i = 0; ins[i]; i++ )
+      if ( ins[i] < ' ' )
+         ins[i] = ' ';
 
    return;
 }
@@ -129,31 +129,31 @@ static void wsconv(char *ins)
 //----------------------------------------------------------------------------//
 static int alltrim(char *ins)
 {
-   int i,j,k;
+   int i, j, k;
 
-   j=strlen(ins)-1;
+   j = strlen( ins ) - 1;
 
-   for (i=0;i<j;i++)
+   for ( i = 0; i < j; i++ )
    {
-      if (ins[i]==' ')
+      if ( ins[i] == ' ' )
          continue;
       else
          break;
    }
 
-   for (;i<j;j--)
+   for ( ; i < j; j-- )
    {
-      if (ins[j]==' ')
+      if ( ins[j] == ' ' )
          continue;
       else
          break;
    }
 
-   for (k=0;k<=j-i;k++)
-      ins[k]=ins[k+i];
+   for ( k = 0; k <= j - i; k++ )
+      ins[k] = ins[k+i];
 
-   ins[k]='\0';
-   return (j-i);
+   ins[k] ='\0';
+   return ( j - i );
 }
 
 //----------------------------------------------------------------------------//
@@ -167,7 +167,8 @@ int hbcc_txt2cst( const char *szInputFile )
    PHB_FNAME pFileName;
 
    hin = hb_fopen(szInputFile,"r");
-   if (!hin)
+
+   if ( !hin )
    {
       hb_fsSetFError( 0 );
       hb_errRT_BASE( EG_ARG, 2021, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
@@ -179,124 +180,182 @@ int hbcc_txt2cst( const char *szInputFile )
    pFileName->szExtension = "cst";
    hb_fsFNameMerge( fout, pFileName );
 
-   hout=hb_fopen(fout,"wb");
+   hout = hb_fopen( fout, "wb" );
 
-   if (!hout)
+   if ( !hout )
    {
       hb_xfree( pFileName );
       hb_xfree( fout );
       hb_fsSetFError( 0 );
       hb_errRT_BASE( EG_ARG, 2021, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
    }
-   fout=(char *)hb_xrealloc(fout,MAX_2CHAR);
-   for (i=0;i<MAX_WCHAR;i++) {
-     s_tchar[i]=s_defchar;
+
+   fout = (char*) hb_xrealloc( fout, MAX_2CHAR );
+
+   for ( i = 0; i < MAX_WCHAR; i++ )
+      s_tchar[i] = s_defchar;
+
+   for ( i = 0; i < MAX_2CHAR; i++ )
+      s_tuni[i] = ( i&1 ) ? '\0' : s_defchar;
+
+   for ( i = 0; i < MAX_CHAR; i++ )
+   {
+      s_cleads[i] = '\0';
+      c_leads[i]  = '\0';
    }
-   for (i=0;i<MAX_2CHAR;i++) {
-     if (i&1) s_tuni[i]='\0';
-     else s_tuni[i]=s_defchar;
-   }
-   for (i=0;i<MAX_CHAR;i++) {
-     s_cleads[i]='\0';
-     c_leads[i]='\0';
-   }
-   while (fgets(fout,MAX_2CHAR,hin)!=NULL) {
-     fnew=strchr(fout,'#');
-     if (fnew!=NULL) {
-       fout[fnew-fout]='\0';
-     }
-     wsconv(fout);
-     k=alltrim(fout);
-     if (k<=0) continue;
-     if (k>4) sscanf(fout,"0x%X 0x%X",&i,&j);
-     else continue;
-     if (s_maxchar==1) {
-       if (i>MAX_CHAR) {
-         s_maxchar=(char) 2;
-         for (k=MAX_WCHAR;k;k--) {
-           s_tchar[2*k-2]=s_tchar[k-1];
-           s_tchar[2*k-1]='\0';
-         }
-       }
-       else {
-         s_tuni[2*i]=(char) (j&(MAX_CHAR-1));
-         s_tuni[2*i+1]=(char) ((j>>8)&(MAX_CHAR-1));
-         s_tchar[j]=(char) i;
-       }
-     }
-     if (s_maxchar==2) {
-       if (i<MAX_CHAR) {
-         s_tchar[2*j]=(char) (i&(MAX_CHAR-1));
-         s_tchar[2*j+1]='\0';
-       }
-       else {
-         s_tchar[2*j]=(char) ((i>>8)&(MAX_CHAR-1));
-         s_tchar[2*j+1]=(char) (i&(MAX_CHAR-1));
-       }
-       if ((i>>8)&(MAX_CHAR-1)) {
-         if (c_leads[(i>>8)&(MAX_CHAR-1)]) {
-           fnew=strchr(s_cleads,(i>>8)&(MAX_CHAR-1));
-           k=(fnew-s_cleads);
-         }
-         else {
-           c_leads[(i>>8)&(MAX_CHAR-1)]=(char) 1;
-           k=strlen(s_cleads);
-           s_cleads[k]=(char) ((i>>8)&(MAX_CHAR-1));
-           s_aleads=(char *) hb_xrealloc(s_aleads,(k+1)*(MAX_2CHAR));
-           for (n=0;n<MAX_CHAR;n++) {
-             s_aleads[k*MAX_2CHAR+2*n]=s_defchar;
-             s_aleads[k*MAX_2CHAR+2*n+1]='\0';
-           }
-         }
-         s_aleads[k*MAX_2CHAR+2*(i&(MAX_CHAR-1))]=(char) (j&(MAX_CHAR-1));
-         s_aleads[k*MAX_2CHAR+2*(i&(MAX_CHAR-1))+1]=(char) ((j>>8)&(MAX_CHAR-1));
-       }
-       else {
-         s_tuni[2*i]=(char) (j&(MAX_CHAR-1));
-         s_tuni[2*i+1]=(char) ((j>>8)&(MAX_CHAR-1));
-       }
-     }
-   }
-   hb_xfree(fout);
-   fclose(hin);
-   fout=(char *) hb_xgrab(MAX_LEADS+1);
-   for (i=0;i<=MAX_LEADS;i++) fout[i]='\0';
-   j=0;
-   for (i=0;i<MAX_CHAR;i++) {
-     if (c_leads[i]) {
-       if ((j&1)==0) {
-         fout[j]=(char) i;
-         j++;
-       }
-       if (c_leads[i+1])
+
+   while ( fgets( fout, MAX_2CHAR, hin ) != NULL )
+   {
+      fnew = strchr( fout, '#' );
+
+      if ( fnew != NULL )
+        fout[fnew-fout] = '\0';
+
+      wsconv( fout );
+
+      k = alltrim( fout );
+
+      if ( k <= 0 )
          continue;
-       else {
-         fout[j]=(char) i;
-         j++;
-       }
-     }
-     if (j==MAX_LEADS) break;
+
+      if ( k > 4 )
+         sscanf( fout, "0x%X 0x%X", &i, &j );
+      else
+         continue;
+
+      if ( s_maxchar == 1 )
+      {
+        if ( i > MAX_CHAR )
+        {
+           s_maxchar = (char) 2;
+           for ( k = MAX_WCHAR; k; k-- )
+           {
+              s_tchar[2*k-2] = s_tchar[k-1];
+              s_tchar[2*k-1] = '\0';
+           }
+        }
+        else
+        {
+           s_tuni[2*i]   = (char) (j&(MAX_CHAR-1));
+           s_tuni[2*i+1] = (char) ((j>>8)&(MAX_CHAR-1));
+           s_tchar[j]    = (char) i;
+        }
+      }
+      if ( s_maxchar == 2 )
+      {
+         if ( i < MAX_CHAR )
+         {
+            s_tchar[2*j]   = (char) (i&(MAX_CHAR-1));
+            s_tchar[2*j+1] = '\0';
+         }
+         else
+         {
+            s_tchar[2*j]   = (char) ((i>>8)&(MAX_CHAR-1));
+            s_tchar[2*j+1] = (char) (i&(MAX_CHAR-1));
+         }
+
+         if ( (i>>8) & (MAX_CHAR-1) )
+         {
+           if ( c_leads[(i>>8)&(MAX_CHAR-1)] )
+           {
+              fnew = strchr( s_cleads, (i>>8)&(MAX_CHAR-1) );
+              k    = ( fnew - s_cleads );
+           }
+           else
+           {
+              c_leads[(i>>8)&(MAX_CHAR-1)] = (char) 1;
+              k = strlen( s_cleads );
+              s_cleads[k] = (char) ((i>>8)&(MAX_CHAR-1));
+              s_aleads    = (char *) hb_xrealloc( s_aleads, (k+1)*(MAX_2CHAR) );
+
+              for ( n = 0; n < MAX_CHAR; n++ )
+              {
+                 s_aleads[k*MAX_2CHAR+2*n]   = s_defchar;
+                 s_aleads[k*MAX_2CHAR+2*n+1] = '\0';
+              }
+           }
+           s_aleads[k*MAX_2CHAR+2*(i&(MAX_CHAR-1))]   = (char) (j&(MAX_CHAR-1));
+           s_aleads[k*MAX_2CHAR+2*(i&(MAX_CHAR-1))+1] = (char) ((j>>8)&(MAX_CHAR-1));
+         }
+         else
+         {
+            s_tuni[2*i]   = (char) (j&(MAX_CHAR-1));
+            s_tuni[2*i+1] = (char) ((j>>8)&(MAX_CHAR-1));
+         }
+      }
    }
-   for (i=0;i<(int)strlen(pFileName->szName);i++) fputc(pFileName->szName[i],hout);
-   for (;i<48;i++) fputc(0,hout);
-   fputc(s_maxchar,hout);
-   fputc(s_defchar,hout);
-   fputc(0,hout);
-   fputc(0,hout);
-   for (i=0;i<MAX_LEADS;i++) fputc(fout[i],hout);
-   fputc(0,hout);
-   fputc(strlen(s_cleads)+1,hout);
-   for (i=0;i<MAX_2CHAR;i++) fputc(s_tuni[i],hout);
-   for (k=0;k<(int)strlen(s_cleads);k++)
-     for (i=0;i<MAX_2CHAR;i++) fputc(s_aleads[k*MAX_2CHAR+i],hout);
-   for (i=0;i<((int)s_maxchar)*MAX_WCHAR;i++) fputc(s_tchar[i],hout);
-   fclose(hout);
-   if(fout)
-      hb_xfree(fout);
-   if(s_aleads)
-      hb_xfree(s_aleads);
+
+   hb_xfree( fout );
+   fclose( hin );
+
+   fout = (char*) hb_xgrab( MAX_LEADS + 1 );
+
+   for ( i = 0; i <= MAX_LEADS; i++ )
+      fout[i] = '\0';
+
+   j = 0;
+
+   for ( i = 0; i < MAX_CHAR; i++ )
+   {
+      if ( c_leads[i] )
+      {
+         if ( (j&1) == 0 )
+         {
+            fout[j] = (char) i;
+            j++;
+         }
+
+         if ( c_leads[i+1] )
+            continue;
+         else
+         {
+            fout[j] = (char) i;
+            j++;
+         }
+      }
+
+      if ( j == MAX_LEADS)
+         break;
+   }
+
+   for ( i = 0; i< (int) strlen( pFileName->szName ); i++ )
+      fputc( pFileName->szName[i], hout );
+
+   for ( ; i < 48; i++ )
+      fputc( 0, hout );
+
+   fputc( s_maxchar, hout );
+   fputc( s_defchar, hout );
+   fputc( 0, hout );
+   fputc( 0, hout );
+
+   for ( i = 0; i < MAX_LEADS; i++ )
+      fputc( fout[i], hout );
+
+   fputc( 0, hout );
+   fputc( strlen( s_cleads ) + 1, hout );
+
+   for ( i = 0; i < MAX_2CHAR; i++ )
+      fputc( s_tuni[i], hout );
+
+   for ( k = 0; k < (int) strlen(s_cleads); k++ )
+     for ( i = 0; i < MAX_2CHAR; i++ )
+        fputc( s_aleads[k*MAX_2CHAR+i], hout );
+
+   for ( i = 0; i < ((int)s_maxchar)*MAX_WCHAR; i++ )
+      fputc( s_tchar[i], hout );
+
+   fclose( hout );
+
+   if( fout )
+      hb_xfree( fout );
+
+   if( s_aleads )
+      hb_xfree( s_aleads );
+
    if( pFileName )
       hb_xfree( pFileName );
+
    return 0;
 }
 

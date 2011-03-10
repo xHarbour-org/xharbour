@@ -4215,6 +4215,31 @@ $(OBJ_DIR)$(DIR_SEP)hbcctool$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)hbcctool.c
 
 $(OBJ_DIR)$(DIR_SEP)unitool$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)unitool.c
 	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bgmik$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)bgmik.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cp1251$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)cp1251.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cp1253$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)cp1253.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cp852$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)cp852.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cp862$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)cp862.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cp866$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)cp866.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)koi8r$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)koi8r.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)koi8u$(OBJEXT) : $(HBCC_DIR)$(DIR_SEP)koi8u.c
+	$(CC_CMD)
+
 #===============================================================================
 # WHAT32.LIB dependencies
 #===============================================================================
