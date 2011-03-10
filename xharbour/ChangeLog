@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-10 07:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! typo on Log entry 2011-03-10 07:00 UTC+0700
+
 2011-03-10 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - source/compiler/harboury.c
   + source/compiler/harboury.yyc
-  - source/compiler/macroy.c
-  + source/compiler/macroy.yyc
+  - source/macro/macroy.c
+  + source/macro/macroy.yyc
   * winmake/makefile.bc
   * winmake/makefile.dc
   * winmake/makefile.gc
