@@ -424,8 +424,8 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
             :Caption   := "Report Header"
             :BackColor := ::System:Color:White
-            :Left      := 3
-            :Top       := 3
+            :Left      := 2
+            :Top       := 2
             :Height    := 100
             :Width     := aSize[1]
             :Visible   := .F.
@@ -436,14 +436,15 @@ METHOD Init() CLASS MainForm
          WITH OBJECT Splitter( :this )
             :Owner := ::Application:Props[ "RepHeader" ]
             :Position := 4
+            :ShowDragging := .T.
             :Create()
          END
 
          WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
             :Caption      := "Header"
             :BackColor    := ::System:Color:White
-            :Left         := 3
-            :Top          := 3
+            :Left         := 2
+            :Top          := 2
             :Width        := aSize[1]
             :Height       := 100
             :Dock:Margins := "0,0,0,0"
@@ -455,6 +456,7 @@ METHOD Init() CLASS MainForm
          WITH OBJECT Splitter( :this )
             :Owner := ::Application:Props[ "Header" ]
             :Position := 4
+            :ShowDragging := .T.
             :Create()
          END
 
@@ -462,11 +464,11 @@ METHOD Init() CLASS MainForm
             :Caption      := "Report Footer"
             :BackColor    := ::System:Color:White
             :Border       := .T.
-            :Left         := 3
-            :Top          := 3
+            :Left         := 2
+            :Top          := 2
             :Height       := 100
             :Width        := aSize[1]
-            :Dock:Margins := "0,0,0,3"
+            :Dock:Margins := "0,0,0,2"
             :Dock:Bottom  := :Parent
             :Visible      := .F.
             :Application:Props[ "ViewMenuRepFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
@@ -476,6 +478,7 @@ METHOD Init() CLASS MainForm
          WITH OBJECT Splitter( :this )
             :Owner := ::Application:Props[ "RepFooter" ]
             :Position := 2
+            :ShowDragging := .T.
             :Create()
          END
 
@@ -483,8 +486,8 @@ METHOD Init() CLASS MainForm
             :Caption      := "Footer"
             :BackColor    := ::System:Color:White
             :Border       := .T.
-            :Left         := 3
-            :Top          := 3
+            :Left         := 2
+            :Top          := 2
             :Height       := 100
             :Width        := aSize[1]
             :Dock:Margins := "0,0,0,0"
@@ -496,6 +499,7 @@ METHOD Init() CLASS MainForm
 
          WITH OBJECT Splitter( :this )
             :Owner := ::Application:Props[ "Footer" ]
+            :ShowDragging := .T.
             :Position := 2
             :Create()
          END
@@ -503,8 +507,8 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( :this )
             :BackColor    := ::System:Color:White
             :Dock:Margins := "0,0,0,0"
-            :Left         := 3
-            :Top          := 3
+            :Left         := 2
+            :Top          := 2
             :Height       := 100
             :Width        := aSize[1]
             :Dock:Top     := ::Application:Props:Header
@@ -526,8 +530,8 @@ METHOD Init() CLASS MainForm
          :Height     := aSize[2]
          WITH OBJECT ::Application:Props[ "ExtraPage" ] := ExtraPageEdit( :this )
             :BackColor := ::System:Color:White
-            :Left      := 3
-            :Top       := 3
+            :Left      := 2
+            :Top       := 2
             :Height    := 100
             :Width     := aSize[1]
             //:Visible   := .F.

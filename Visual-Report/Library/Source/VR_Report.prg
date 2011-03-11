@@ -61,6 +61,7 @@ CLASS VrReport INHERIT VrObject
    DATA aData          EXPORTED
    DATA aProps         EXPORTED
    DATA aExtra         EXPORTED
+   DATA aSubTotals     EXPORTED  INIT {}
 
    ACCESS Application  INLINE __GetApplication()
 
