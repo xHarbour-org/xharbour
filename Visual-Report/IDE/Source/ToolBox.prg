@@ -98,6 +98,7 @@ METHOD Create() CLASS ToolBox
                    { "Drawing",                {} } }
 
    AADD( ::aButtons[2][2], { "Label", .T. } )
+   AADD( ::aButtons[2][2], { "SubTotal", .T. } )
    AADD( ::aButtons[2][2], { "Image", .T. } )
    AADD( ::aButtons[2][2], { "DataTable", .T. } )
 

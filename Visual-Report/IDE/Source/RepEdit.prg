@@ -145,7 +145,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( cControl, x, y ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubTotal
    LOCAL oControl, hPointer := HB_FuncPtr( cControl )
    IF hPointer != NIL
       DEFAULT x TO 0

@@ -17,9 +17,9 @@
 
 CLASS VrSubTotal INHERIT VrLabel
    DATA SubTotalField EXPORTED
+   DATA ClsName       EXPORTED  INIT "SubTotal"
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
-   METHOD Draw()
    METHOD WriteProps()
 ENDCLASS
 
@@ -34,7 +34,6 @@ RETURN Self
 
 METHOD Create() CLASS VrSubTotal
    Super:Create()
-   AADD( ::Parent:aSubTotals, Self )
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrSubTotal

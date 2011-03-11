@@ -77,6 +77,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
+   METHOD CreateSubTotals()
    METHOD PrepareArrays()
    METHOD Load()
    METHOD InitPDF()
@@ -224,10 +225,25 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD CreateSubTotals( hDC ) CLASS VrReport
+   LOCAL i, n, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   FOR EACH aCtrl IN aBody
+       IF ( n := ASCAN( ::aSubTotals, {|a| a[1]:SubTotalField == aCtrl[2][2]} ) ) > 0
+          aCtrl[1][2] := "VrSubTotal"
+          aCtrl[3][2] := ::aSubTotals[n][2]
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+          ::aSubTotals[n][2] := 0
+       ENDIF
+   NEXT
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
 METHOD CreateBody( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
-       ::CreateControl( aCtrl, @nHeight,, hDC )
+       IF aCtrl[1][2] != "SubTotal"
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+       ENDIF
    NEXT
    ::nRow += nHeight
 RETURN nHeight
@@ -310,11 +326,11 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       AADD( ::&cParent, aControl )
    ENDIF
    n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
-   ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )+n
+        ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )+n
    n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
-   ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )+n
-   ::Application:Props[ "Footer" ]:Dockit()
-   ::Application:Props[ "Body" ]:Dockit()
+        ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )+n
+        ::Application:Props[ "Footer" ]:Dockit()
+        ::Application:Props[ "Body" ]:Dockit()
    TRY
       ::Orientation  := VAL( ::aProps:Orientation )
    CATCH
@@ -400,12 +416,16 @@ METHOD Run( oDoc ) CLASS VrReport
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
       ::DataSource:EditCtrl:GoTop()
+      AEVAL( ::aSubTotals, {|a| a[2] := 0} )
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
+            
+            ::CreateSubTotals( hDC )
+            
             ::CreateFooter( hDC )
             ::EndPage()
             ::StartPage()
