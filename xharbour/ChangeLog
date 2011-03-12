@@ -8,11 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-12 15:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sevenzip/t7zip.prg
+  * contrib/sevenzip/sevenzip.c
+  * tests/7zip.prg
+    + Methods: List, Test, Extract( lWithPath )
+
 2011-03-12 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/sevenzip/t7zip.prg
   + contrib/sevenzip/sevenzip.c
   + contrib/sevenzip/7-zip32.h
-  + contrib/binary/7-zip32.dll
+  + contrib/sevenzip/binary/7-zip32.dll
   + tests/7zip.prg
   * winmake/common.mak
   * winmake/compile.mak

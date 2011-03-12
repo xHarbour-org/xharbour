@@ -4,18 +4,33 @@
    WARNING: Must link SEVENZIP.LIB
 */
 
+#define MAX_BUFFER 4096
 #include "simpleio.ch"
 
 PROCEDURE MAIN()
 
-   LOCAL my7z := T7Zip():New()
+   LOCAL my7z
 
-   ? 'Version',HB_SevenZipGetVersion()
+   WITH OBJECT my7z := T7Zip():New()
 
-   my7z:cArcName := "mytest.7z"
-   my7z:aFiles   := { "hello.prg", "test.dbf" }
-   my7z:cCompressionMethod := "PPMd"
+      :cArcName := "mytest.7z"
+      :aFiles   := { "hello.prg", "test.dbf" }
+      :cCompressionMethod := "ppmd"
+      :cBuffer := space(MAX_BUFFER)
+      :Create()
+      ? :cBuffer
+      ?
+      :cBuffer := space( MAX_BUFFER )
+      :List()
+      ? :cBuffer
+      ?
+      :cBuffer := space( MAX_BUFFER )
+      :Test()
+      ? :cBuffer
+      :cBuffer := space( MAX_BUFFER )
+      // :Extract( .T. )
+      // ? :cBuffer
 
-   my7z:Create()
+   END
 
    RETURN

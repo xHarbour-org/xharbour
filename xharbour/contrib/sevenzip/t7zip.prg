@@ -57,7 +57,9 @@ CREATE CLASS T7ZIP
 
    DATA handle AS INTEGER INIT 0
    DATA lShowProcessDlg AS LOGICAL INIT .F.      // .T. - show progress dialog
+   DATA lAlwaysOverWrite AS LOGICAL INIT .T.     // overwrite when extract
    DATA cArcName                                 // Output filename
+   DATA cBuffer AS STRING INIT ""                // Buffer to hold DLL output
    DATA cCompressionMethod AS STRING INIT "PPMd" // "LZMA" - LZ-based algorithm
                                                  // "LZMA2" - LZMA-based algorithm
                                                  // "PPMd" - Dmitry Shkarin's PPMdH with small changes
@@ -73,9 +75,20 @@ CREATE CLASS T7ZIP
                                                  // directory will be archived
    METHOD New() INLINE Self
    METHOD Create()                               // Create archive
-   METHOD Open()                                 // Open archive
-   METHOD Close() INLINE HB_SevenZipCloseArchive( ::handle )  // Close archive
 
+   METHOD Open() INLINE;
+      ::handle := HB_SevenZipOpenArchive( 0, ::cArcName, 0 )
+
+   METHOD List() INLINE;
+      HB_SevenZip( 0, 'l ' + ::cArcName, @::cBuffer )
+
+   METHOD Test() INLINE;
+      HB_SevenZip( 0, 't ' + ::cArcName, @::cBuffer )
+
+   METHOD Extract( lWithPath ) INLINE;
+      HB_SevenZip( 0, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer )
+
+   METHOD Close()                INLINE HB_SevenZipCloseArchive( ::handle )
    METHOD GetArcFileSize      () INLINE HB_SevenZipGetArcfilesize      ( ::handle )
    METHOD GetArcOriginalSize  () INLINE HB_SevenZipGetArcoriginalsize  ( ::handle )
    METHOD GetArcCompressedSize() INLINE HB_SevenZipGetArccompressedsize( ::handle )
@@ -103,12 +116,7 @@ METHOD T7Zip:Create()
       ::cCommand += ' ' + cFile
    NEXT
 
-   RETURN HB_SEVENZIP( 0, ::cCommand, ::cArcName, 1 )
-
-//------------------------------------------------------------------------------
-METHOD T7Zip:Open()
-
-   RETURN ::handle := HB_SevenZipOpenArchive( 0, ::cArcName, 0 )
+   RETURN HB_SevenZip( 0, ::cCommand, @::cBuffer )
 
 //------------------------------------------------------------------------------
 INIT PROCEDURE _7ZINIT

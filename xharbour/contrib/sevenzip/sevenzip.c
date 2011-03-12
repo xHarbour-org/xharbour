@@ -305,12 +305,16 @@ HB_FUNC( HB_SEVENZIP )
 
    if ( pFunc )
    {
-      ULONG u = hb_parclen( 3 ) + 1;
-      LPSTR szOut = (LPSTR) hb_xgrab( u );
+      ULONG u = hb_parclen( 3 );
+      LPSTR szOut = (LPSTR) hb_xgrab( u + 1 );
 
-      hb_strncpy( szOut, hb_parc( 3 ), u );
-      hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc(2), szOut, (const DWORD) hb_parnl(4) ) );
+      hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc(2), szOut, (const DWORD) u ) );
+
+      if ( ISBYREF ( 3 ) )
+         hb_storc( szOut, 3 );
+
       hb_xfree( szOut );
+
    }
 }
 
