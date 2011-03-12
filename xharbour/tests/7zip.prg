@@ -16,18 +16,20 @@ PROCEDURE MAIN()
       :cArcName := "mytest.7z"
       :aFiles   := { "hello.prg", "test.dbf" }
       :cCompressionMethod := "ppmd"
-      :cBuffer := space(MAX_BUFFER)
+      :nBuffer := MAX_BUFFER
+
       :Create()
       ? :cBuffer
       ?
-      :cBuffer := space( MAX_BUFFER )
+
       :List()
       ? :cBuffer
       ?
-      :cBuffer := space( MAX_BUFFER )
+
       :Test()
       ? :cBuffer
-      :cBuffer := space( MAX_BUFFER )
+
+      // :nBuffer := MAX_BUFFER
       // :Extract( .T. )
       // ? :cBuffer
 

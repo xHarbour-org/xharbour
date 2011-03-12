@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #if !defined(SEVENZIP_H)
 #define SEVENZIP_H
 

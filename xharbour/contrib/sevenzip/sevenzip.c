@@ -305,10 +305,10 @@ HB_FUNC( HB_SEVENZIP )
 
    if ( pFunc )
    {
-      ULONG u = hb_parclen( 3 );
-      LPSTR szOut = (LPSTR) hb_xgrab( u + 1 );
+      ULONG uOut = hb_parnl( 4 );
+      LPSTR szOut = (LPSTR) hb_xgrab( ( uOut ? uOut : 1024 ) + 1 );
 
-      hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc(2), szOut, (const DWORD) u ) );
+      hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), szOut, (const DWORD) uOut ) );
 
       if ( ISBYREF ( 3 ) )
          hb_storc( szOut, 3 );

@@ -60,6 +60,7 @@ CREATE CLASS T7ZIP
    DATA lAlwaysOverWrite AS LOGICAL INIT .T.     // overwrite when extract
    DATA cArcName                                 // Output filename
    DATA cBuffer AS STRING INIT ""                // Buffer to hold DLL output
+   DATA nBuffer AS INTEGER INIT 0                // Buffer Size to hold DLL output
    DATA cCompressionMethod AS STRING INIT "PPMd" // "LZMA" - LZ-based algorithm
                                                  // "LZMA2" - LZMA-based algorithm
                                                  // "PPMd" - Dmitry Shkarin's PPMdH with small changes
@@ -80,13 +81,13 @@ CREATE CLASS T7ZIP
       ::handle := HB_SevenZipOpenArchive( 0, ::cArcName, 0 )
 
    METHOD List() INLINE;
-      HB_SevenZip( 0, 'l ' + ::cArcName, @::cBuffer )
+      HB_SevenZip( 0, 'l ' + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD Test() INLINE;
-      HB_SevenZip( 0, 't ' + ::cArcName, @::cBuffer )
+      HB_SevenZip( 0, 't ' + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD Extract( lWithPath ) INLINE;
-      HB_SevenZip( 0, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer )
+      HB_SevenZip( 0, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD Close()                INLINE HB_SevenZipCloseArchive( ::handle )
    METHOD GetArcFileSize      () INLINE HB_SevenZipGetArcfilesize      ( ::handle )
@@ -116,7 +117,7 @@ METHOD T7Zip:Create()
       ::cCommand += ' ' + cFile
    NEXT
 
-   RETURN HB_SevenZip( 0, ::cCommand, @::cBuffer )
+   RETURN HB_SevenZip( 0, ::cCommand, @::cBuffer, ::nBuffer )
 
 //------------------------------------------------------------------------------
 INIT PROCEDURE _7ZINIT
