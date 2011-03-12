@@ -47,6 +47,7 @@ MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
 
+SEVENZIP_DIR  =contrib$(DIR_SEP)sevenzip
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
 HBPDF_DIR     =contrib$(DIR_SEP)pdflib
@@ -75,6 +76,7 @@ INCLUDE_DIR2  =include
 #===============================================================================
 # Macros For Standard Libraries
 #===============================================================================
+SEVENZIP_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sevenzip$(LIBEXT)
 COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
@@ -1923,4 +1925,5 @@ CONTRIB_PROJECT=\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
 	$(PNG_LIB)\
-	$(HBHPDF_LIB)
+	$(HBHPDF_LIB)\
+	$(SEVENZIP_LIB)

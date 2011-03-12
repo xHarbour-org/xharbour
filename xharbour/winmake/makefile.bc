@@ -653,6 +653,13 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
+	IF EXIST "$(SEVENZIP_LIB)" $(DEL) "$(SEVENZIP_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
 	IF EXIST "$(FIREBIRD_LIB)" $(DEL) "$(FIREBIRD_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

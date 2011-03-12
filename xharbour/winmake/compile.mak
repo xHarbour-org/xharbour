@@ -76,6 +76,18 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# SEVENZIP.LIB rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)sevenzip$(OBJEXT) : $(SEVENZIP_DIR)$(DIR_SEP)sevenzip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)t7zip$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)t7zip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)t7zip.c : $(SEVENZIP_DIR)$(DIR_SEP)t7zip.prg
+	$(HB_CMD)
+
+#===============================================================================
 # COMMON.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dvmemcpy$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)dvmemcpy.c

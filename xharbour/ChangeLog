@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-12 12:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/sevenzip/t7zip.prg
+  + contrib/sevenzip/sevenzip.c
+  + contrib/sevenzip/7-zip32.h
+  + contrib/binary/7-zip32.dll
+  + tests/7zip.prg
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + 7zip compression added
+    : NOTE: This is a wrapper of 7-zip32.dll, another variant of the Open-Source
+            7Zip compression library. All calls are pointing to 7-zip32.dll,
+            thus such dll much exist in search path. At the time this contrib
+            is uploaded, the functionalities of this contribution is very
+            minimal, ie. only covered archive creation. More functionalities
+            are to follow, and of course contribution from fellow developers
+            will be highly appreciated.
+
 2011-03-10 13:27 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/compiler/Makefile
     ! Rearranged compilation files to create "harbour"
