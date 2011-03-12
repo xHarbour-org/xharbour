@@ -110,7 +110,6 @@
 #include <time.h>
 #include <ctype.h>
 
-#include "hbset.h"
 #include "hbgtcore.h"
 #include "hbinit.h"
 #include "hbapigt.h"
@@ -120,6 +119,7 @@
 #include "error.ch"
 #include "hbvm.h"
 #include "hbstack.h"
+#include "hbset.h"
 
 /*-------------------------------------------------------------------*/
 #define SYS_EV_MARK                 1000
@@ -250,26 +250,6 @@
 
    typedef USHORT COLOR16;
 
-   typedef struct _TRIVERTEX {
-         LONG    x;
-         LONG    y;
-         COLOR16 Red;
-         COLOR16 Green;
-         COLOR16 Blue;
-         COLOR16 Alpha;
-   } TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
-
-   typedef struct tagINITCOMMONCONTROLSEX {
-          DWORD dwSize;
-          DWORD dwICC;
-   } INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
-
-   WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
-
-   typedef struct _GRADIENT_RECT {
-       ULONG UpperLeft;
-       ULONG LowerRight;
-   } GRADIENT_RECT,*PGRADIENT_RECT,*LPGRADIENT_RECT;
 #endif
 /*-------------------------------------------------------------------*/
 

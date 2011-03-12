@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-13 03:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/gtwvw/wvwfuncs.c
+    + add function WVW_GETIMGDIMENSION, per Otto Haldi, comp.lang.xHarbour
+    * strcpy -> hb_xstrcpy, to pacify MSVC deprecated functions
+    * fopen -> hb_fopen, to pacify MSVC deprecated functions
+
+  * contrib/gtwvw/hbgtwvw.h
+    ! some hacks to compile under __DMC__
+
+  * include/hbinit.h
+    ! bypass this file when __DMC__ is not in C++ mode
+
 2011-03-13 02:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/binary/7-zip32.dll
     ! reupload file that seems to be corrupt

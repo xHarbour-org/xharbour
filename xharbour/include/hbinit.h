@@ -50,6 +50,10 @@
  *
  */
 
+#if defined(__DMC__) && !defined(__cplusplus)
+   #define HB_INIT_H_
+#endif
+
 #ifndef HB_INIT_H_
 #define HB_INIT_H_
 
