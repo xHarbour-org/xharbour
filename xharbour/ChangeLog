@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-12 20:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/macro/macro.yyc
+  * source/macro/macroy.yyc
+    * rename macro.yyc -> macroy.yyc
+
 2011-03-12 19:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harboury.yyc
     * reupload file that seems to be corrupt per Enrico's report
