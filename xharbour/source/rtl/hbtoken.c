@@ -90,7 +90,7 @@ static ULONG hb_tokenCount( const char * szLine, ULONG nLen,
       ++ul;
    }
 
-   return nTokens;
+   return nLen ? nTokens : 0;
 }
 
 static const char * hb_tokenGet( const char * szLine, ULONG nLen,
