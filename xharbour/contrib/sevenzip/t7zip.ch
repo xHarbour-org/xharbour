@@ -168,6 +168,9 @@ STATIC AERRDEF := {;
      {"ERROR_FATAL",0x8102},{"ERROR_DURING_DECOMPRESSION",0X8103},;
      {"ERROR_DIR_FILE_WITH_64BIT_SIZE",0X8104},{"ERROR_FILE_CHANGED_DURING_OPERATION",0X8105}}
 
+STATIC aArcType   := { "7z", "zip", "gzip", "bzip2", "tar", "iso", "udf" }
+STATIC aArcMethod := { "LZMA", "LZMA2", "PPMd", "BZip2", "Deflate", "Copy" }
+
 #define ARCTYPE_7Z     1
 #define ARCTYPE_ZIP    2
 #define ARCTYPE_GZIP   3
@@ -176,6 +179,11 @@ STATIC AERRDEF := {;
 #define ARCTYPE_ISO    6
 #define ARCTYPE_UDF    7
 
-STATIC aArcType := { "7z", "zip", "gzip", "bzip2", "tar", "iso", "udf" }
+#define CMPMETHOD_LZMA        1  // LZ-based algorithm
+#define CMPMETHOD_LZMA2       2  // LZMA-based algorithm
+#define CMPMETHOD_PPMD        3  // Dmitry Shkarin's PPMdH with small changes
+#define CMPMETHOD_BZIP2       4  // BWT algorithm
+#define CMPMETHOD_DEFLATE     5  // LZ+Huffman
+#define CMPMETHOD_COPY        6  // No compression
 
 #endif /* __T7ZIP_INCLUDED */

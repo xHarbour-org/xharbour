@@ -68,7 +68,7 @@ CREATE CLASS T7ZIP
                                                  // "BZip2" - BWT algorithm
                                                  // "Deflate" - LZ+Huffman
                                                  // "Copy" - No Compression
-
+   DATA nCompressionMethod AS INTEGER INIT 3     // 3 = PPMd, default
    DATA nZipCompressionLevel AS INTEGER INIT 5   // Zip compression Level
                                                  // Range: 0 - 9
    DATA cCommand AS STRING INIT ""               // Command line to pass
@@ -135,7 +135,10 @@ METHOD T7Zip:Create()
             EXIT
 
          DEFAULT
-            ::cCommand += ' ' + '-m0=' + ::cCompressionMethod
+            IF ValType( ::nCompressionMethod ) == "N" .AND. ::nCompressionMethod > 0 .AND. ::nCompressionMethod <= 6
+               ::cCompressionMethod := aArcMethod[ ::nCompressionMethod ]
+               ::cCommand += ' ' + '-m0=' + ::cCompressionMethod
+            ENDIF
       END
 
       ::cCommand += ' ' + ::cArcName

@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-13 18:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sevenzip/t7zip.ch
+  * contrib/sevenzip/t7zip.prg
+    + :nCompressionMethod, value options (only applies to 7z):
+         CMPMETHOD_LZMA     = LZ-based algorithm
+         CMPMETHOD_LZMA2    = LZMA-based algorithm
+         CMPMETHOD_PPMD     = Dmitry Shkarin's PPMdH with small changes
+         CMPMETHOD_BZIP2    = BWT algorithm
+         CMPMETHOD_DEFLATE  = LZ+Huffman
+         CMPMETHOD_COPY     = No compression
+
+  + tests/7zip2.prg
+    * testing compresion method
+    ; NOTE: The benchmark will guide in choosing the most suitable method to
+            be applied in life :). I conclude that PPMD is the best method
+            seen from time and size points of view. This is the reason why
+            it is made default in T7Zip class.
+
 2011-03-13 13:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/sevenzip.c
     * minor optimization
