@@ -80,7 +80,16 @@ CREATE CLASS T7ZIP
                                                  // directory will be archived
    DATA cPassword AS STRING INIT ""              // password for archive file
    DATA lRecursive AS LOGICAL INIT .F.           // .T. = include sub-dir
-
+   DATA aExcludeFiles AS ARRAY INIT {}           // do not include these files
+                                                 // in archive.
+   DATA aVolumes AS ARRAY INIT {}                // creates multi-volume archive
+   DATA lSolid AS LOGICAL INIT .T.               // create solid archive. if set
+                                                 // to .T., archive cannot be updated
+                                                 // Note: setting this to .F. will enable
+                                                 // update but the compression
+                                                 // will be degraded, ie bigger size
+   DATA lMultiCPU AS LOGICAL INIT .F.            // set this to .T. when using
+                                                 // multi CPU such as dual[quad]-core
    METHOD New() INLINE Self
    METHOD Create()                               // Create archive
 
@@ -141,8 +150,6 @@ METHOD T7Zip:Create()
             ENDIF
       END
 
-      ::cCommand += ' ' + ::cArcName
-
       IF Valtype( ::cPassword ) == "C" .AND. Len( ::cPassword ) > 0
          ::cCommand += ' ' + '-p' + ALLTRIM( ::cPassword )
       ENDIF
@@ -150,6 +157,32 @@ METHOD T7Zip:Create()
       IF Valtype( ::lRecursive ) == "L" .AND. ::lRecursive
          ::cCommand += ' ' + '-r'
       ENDIF
+
+      IF Valtype( ::lSolid ) == "L" .AND. !::lSolid
+         ::cCommand += ' ' + '-ms=off'
+      ENDIF
+
+      IF Valtype( ::lMultiCPU ) == "L" .AND. ::lMultiCPU
+         ::cCommand += ' ' + '-mmt'
+      ENDIF
+
+      IF Valtype( ::aExcludeFiles ) == "A"
+         FOR EACH cFile IN ::aExcludeFiles
+            ::cCommand += ' ' + '-x!' + ALLTRIM( cFile )
+         NEXT
+      ELSEIF Valtype( ::aExcludeFiles ) == "C"
+         ::cCommand += ' ' + '-x!' + ALLTRIM( ::aExcludeFiles )
+      ENDIF
+
+      IF Valtype( ::aVolumes ) == "A"
+         FOR EACH cFile IN ::aVolumes
+            ::cCommand += ' ' + '-v' + LTRIM( STR( cFile ) ) + 'b'
+         NEXT
+      ELSEIF Valtype( ::aVolumes ) == "N"
+         ::cCommand += ' ' + '-v' + LTRIM( STR( ::aVolumes ) ) + 'b'
+      ENDIF
+
+      ::cCommand += ' ' + ::cArcName
 
       IF Valtype( ::aFiles ) == "A"
          FOR EACH cFile IN ::aFiles

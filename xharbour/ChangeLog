@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-14 04:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sevenzip/t7zip.prg
+    + :aExcludeFiles [array|string] -> do not include these files in archive
+    + :aVolume [array|integer] -> creates volume in bytes
+    + :lSolid -> create solid archive (default = .T.)
+    + :lMultiCPU -> use multi CPUs (default = .F.)
+
+  + tests/7zip3.prg
+    ! test program for the above changes
+
 2011-03-13 18:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/t7zip.ch
   * contrib/sevenzip/t7zip.prg
