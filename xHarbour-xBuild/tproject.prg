@@ -272,48 +272,34 @@ METHOD CatchUp() CLASS TDependant
          ENDIF
       #endif
 
-      // Before standard Libs.
-      //VIEW ::GUI_Libs
-      //VIEW HB_aTokens( ::GUI_Libs, ' ', .T. )
+      FOR EACH cLib IN HB_aTokens( AllTrim( ::GUI_Libs ), ' ', .T. )
+         //VIEW cLib
+         LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
+         LIB:Project := Self
+         LIB:Reset()
+         ::DependOn( LIB )
+         ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
+      NEXT
 
-      IF ! Empty(::GUI_Libs) //PM:09-04-2007 Workaround until HB_aTokens(""," ") returns 1 (Should return 0)
-         FOR EACH cLib IN HB_aTokens( ::GUI_Libs, ' ', .T. )
-            //VIEW cLib
-            LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
-            LIB:Project := Self
-            LIB:Reset()
-            ::DependOn( LIB )
-            ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
-         NEXT
-      ENDIF
-
-      // Automaticly added librarries
-      //VIEW ::Auto_Libs
-      //VIEW HB_aTokens( ::Auto_Libs, ' ', .T. )
-      IF ! Empty(::Auto_Libs) //PM:09-04-2007 Workaround until HB_aTokens(""," ") returns 1 (Should return 0)
-         FOR EACH cLib IN HB_aTokens( ::Auto_Libs, ' ', .T. )
-            //VIEW cLib
-            LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
-            LIB:Project := Self
-            LIB:Reset()
-            ::DependOn( LIB )
-            ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
-         NEXT
-      ENDIF
+      FOR EACH cLib IN HB_aTokens( AllTrim( ::Auto_Libs ), ' ', .T. )
+         //VIEW cLib
+         LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
+         LIB:Project := Self
+         LIB:Reset()
+         ::DependOn( LIB )
+         ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
+      NEXT
 
       // Don't optimize with IF ::lCurrent because we MUST add all LIBS to prject for inclusion in Link command.
-      //VIEW ::PRG_Libs
-      //VIEW HB_aTokens( ::PRG_Libs, ' ', .T. )
-      IF ! Empty(::PRG_Libs) //PM:09-04-2007 Workaround until HB_aTokens(""," ") returns 1 (Should return 0)
-         FOR EACH cLib IN HB_aTokens( ::PRG_Libs, ' ', .T. )
-            //VIEW cLib
-            LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
-            LIB:Project := Self
-            LIB:Reset()
-            ::DependOn( LIB )
-            ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
-         NEXT
-      ENDIF
+
+      FOR EACH cLib IN HB_aTokens( AllTrim( ::PRG_Libs ), ' ', .T. )
+         //VIEW cLib
+         LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
+         LIB:Project := Self
+         LIB:Reset()
+         ::DependOn( LIB )
+         ::lCurrent := ::lCurrent .AND. ::CurrentWith( LIB ) // Don't change order!
+      NEXT
 
    ENDIF
 
@@ -2150,7 +2136,7 @@ METHOD PRG_Libs CLASS TMakeProject
                IF ::Project:lUseDLL
                   RETURN /* use_dll.lib see EXE_Command */"harbour.lib "
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable,::STG_Libs,::ST_Libs)
+                  RETURN IIF( "gcc" IN ::C_Executable,::STG_Libs,::ST_Libs )
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
                RETURN "harbour.lib "
