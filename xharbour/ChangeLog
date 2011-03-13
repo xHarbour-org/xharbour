@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-13 13:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sevenzip/sevenzip.c
+    * minor optimization
+
+  + contrib/sevenzip/t7zip.ch
+  * contrib/sevenzip/t7zip.prg
+    + now using t7zip.ch
+    + :nArcType = value ( ARCTYPE_7Z  OR ARCTYPE_ZIP )
+    + :nZipCompressionLevel, value: 0 - 9, default = 5
+    + option for recursive compression
+    + option to install password to archive
+
+  + tests/7zip1.prg
+    * testing ZIP method and new method
+
+  * tests/7zip.prg
+    * remove archive before creating
+
 2011-03-13 10:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/t7zip.prg
     + Method: ErrorDescription -> Error Message in String

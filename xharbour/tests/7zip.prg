@@ -11,6 +11,10 @@ PROCEDURE MAIN()
 
    LOCAL my7z
 
+   IF FILE( "mytest.7z" )
+      FErase( "mytest.7z" )
+   ENDIF
+
    WITH OBJECT my7z := T7Zip():New()
 
       :cArcName := "mytest.7z"

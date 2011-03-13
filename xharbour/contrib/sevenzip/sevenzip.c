@@ -132,8 +132,7 @@ HB_FUNC( HB_SEVENZIPGETVERSION )
 #endif
       pFunc = (SEVENZIPGETVERSION) sevenzip_GetProcAddress( "SevenZipGetVersion" );
 
-   if ( pFunc )
-      hb_retnl( pFunc() );
+   hb_retnl( pFunc() );
 }
 
 //------------------------------------------------------------------------------
@@ -147,8 +146,7 @@ HB_FUNC( HB_SEVENZIPGETSUBVERSION )
 #endif
       pFunc = (SEVENZIPGETSUBVERSION) sevenzip_GetProcAddress( "SevenZipGetSubVersion" );
 
-   if ( pFunc )
-      hb_retnl( pFunc() );
+   hb_retnl( pFunc() );
 }
 
 //------------------------------------------------------------------------------
@@ -177,8 +175,7 @@ HB_FUNC( HB_SEVENZIPSETUNICODEMODE )
 #endif
       pFunc = (SEVENZIPSETUNICODEMODE) sevenzip_GetProcAddress( "SevenZipSetUnicodeMode" );
 
-   if ( pFunc )
-      hb_retl( pFunc( hb_parl( 1 ) ) );
+   hb_retl( pFunc( hb_parl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -192,8 +189,7 @@ HB_FUNC( HB_SEVENZIPSETDEFAULTPASSWORD )
 #endif
       pFunc = (SEVENZIPSETDEFAULTPASSWORD) sevenzip_GetProcAddress( "SevenZipSetDefaultPassword" );
 
-   if ( pFunc )
-      hb_retni( pFunc( (void*) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ) ) );
+   hb_retni( pFunc( (void*) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -210,11 +206,8 @@ HB_FUNC( HB_SEVENZIPGETDEFAULTPASSWORD )
 #endif
       pFunc = (SEVENZIPGETDEFAULTPASSWORD) sevenzip_GetProcAddress( "SevenZipGetDefaultPassword" );
 
-   if ( pFunc )
-   {
-      pFunc( (void*) hb_parnl( 1 ), szPassword, PASSWORD_LENGTH );
-      hb_retcAdopt( szPassword );
-   }
+   pFunc( (void*) hb_parnl( 1 ), szPassword, PASSWORD_LENGTH );
+   hb_retcAdopt( szPassword );
 }
 
 //------------------------------------------------------------------------------
@@ -228,8 +221,7 @@ HB_FUNC( HB_SEVENZIPOPENARCHIVE )
 #endif
       pFunc = (SEVENZIPOPENARCHIVE) sevenzip_GetProcAddress( "SevenZipOpenArchive" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), ( const DWORD) hb_parnl( 3 ) ) );
+   hb_retnl( (LONG) pFunc( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), ( const DWORD) hb_parnl( 3 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -243,8 +235,7 @@ HB_FUNC( HB_SEVENZIPCLOSEARCHIVE )
 #endif
       pFunc = (SEVENZIPCLOSEARCHIVE) sevenzip_GetProcAddress( "SevenZipCloseArchive" );
 
-   if ( pFunc )
-      hb_retni( pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retni( pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -258,8 +249,7 @@ HB_FUNC( HB_SEVENZIPSETPRIORITY )
 #endif
       pFunc = (SEVENZIPSETPRIORITY) sevenzip_GetProcAddress( "SevenZipSetPriority" );
 
-   if ( pFunc )
-      hb_retl( pFunc( hb_parni( 1 ) ) );
+   hb_retl( pFunc( hb_parni( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -273,8 +263,7 @@ HB_FUNC( HB_SEVENZIPGETCURSORMODE )
 #endif
       pFunc = (SEVENZIPGETCURSORMODE) sevenzip_GetProcAddress( "SevenZipGetCursorMode" );
 
-   if ( pFunc )
-      hb_retl( pFunc() );
+   hb_retl( pFunc() );
 }
 
 //------------------------------------------------------------------------------
@@ -288,13 +277,15 @@ HB_FUNC( HB_SEVENZIPSETCURSORMODE )
 #endif
       pFunc = (SEVENZIPSETCURSORMODE) sevenzip_GetProcAddress( "SevenZipSetCursorMode" );
 
-   if ( pFunc )
-      hb_retl( pFunc( hb_parl( 1 ) ) );
+   hb_retl( pFunc( hb_parl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
 HB_FUNC( HB_SEVENZIP )
 {
+   ULONG uOut = hb_parnl( 4 );
+   LPSTR szOut = (LPSTR) hb_xgrab( ( uOut ? uOut : 1024 ) + 1 );
+
 #if defined( __cplusplus )
    static SEVENZIP
 #else
@@ -303,19 +294,12 @@ HB_FUNC( HB_SEVENZIP )
 #endif
       pFunc = (SEVENZIP) sevenzip_GetProcAddress( "SevenZip" );
 
-   if ( pFunc )
-   {
-      ULONG uOut = hb_parnl( 4 );
-      LPSTR szOut = (LPSTR) hb_xgrab( ( uOut ? uOut : 1024 ) + 1 );
+   hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), szOut, (const DWORD) uOut ) );
 
-      hb_retni( pFunc( (const HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), szOut, (const DWORD) uOut ) );
+   if ( ISBYREF ( 3 ) )
+      hb_storc( szOut, 3 );
 
-      if ( ISBYREF ( 3 ) )
-         hb_storc( szOut, 3 );
-
-      hb_xfree( szOut );
-
-   }
+   hb_xfree( szOut );
 }
 
 //------------------------------------------------------------------------------
@@ -329,9 +313,7 @@ HB_FUNC( HB_SEVENZIPGETARCFILESIZE )
 #endif
       pFunc = (SEVENZIPGETARCFILESIZE) sevenzip_GetProcAddress( "SevenZipGetArcFileSize" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
-
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -345,8 +327,7 @@ HB_FUNC ( HB_SEVENZIPGETARCORIGINALSIZE )
 #endif
       pFunc = (SEVENZIPGETARCORIGINALSIZE) sevenzip_GetProcAddress( "SevenZipGetArcOriginalSize" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -360,8 +341,7 @@ HB_FUNC ( HB_SEVENZIPGETARCCOMPRESSEDSIZE )
 #endif
       pFunc = (SEVENZIPGETARCCOMPRESSEDSIZE) sevenzip_GetProcAddress( "SevenZipGetArcCompressedSize" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -375,8 +355,7 @@ HB_FUNC ( HB_SEVENZIPGETARCRATIO )
 #endif
       pFunc = (SEVENZIPGETARCRATIO) sevenzip_GetProcAddress( "SevenZipGetArcRatio" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -390,8 +369,7 @@ HB_FUNC ( HB_SEVENZIPGETORIGINALSIZE )
 #endif
       pFunc = (SEVENZIPGETORIGINALSIZE) sevenzip_GetProcAddress( "SevenZipGetOriginalSize" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -405,8 +383,7 @@ HB_FUNC ( HB_SEVENZIPGETCOMPRESSEDSIZE )
 #endif
       pFunc = (SEVENZIPGETCOMPRESSEDSIZE) sevenzip_GetProcAddress( "SevenZipGetCompressedSize" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -420,6 +397,5 @@ HB_FUNC ( HB_SEVENZIPGETRATIO )
 #endif
       pFunc = (SEVENZIPGETRATIO) sevenzip_GetProcAddress( "SevenZipGetRatio" );
 
-   if ( pFunc )
-      hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
+   hb_retnl( (LONG) pFunc( (HARC) hb_parnl( 1 ) ) );
 }
