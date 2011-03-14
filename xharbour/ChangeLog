@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-14 15:44 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/vm/hash.c
+    ! Fix GPF trap when HAAGETPOS() has been called withOUT setting HSETAACOMPATIBILITY()
+
 2011-03-13 19:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/hbtoken.c
    ! Fixed hb_tokenCount() to return 0 when processed string is 0 length

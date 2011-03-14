@@ -2162,7 +2162,7 @@ HB_FUNC( HAAGETPOS )
    ULONG ulPos, ui;
    ULONG * pAccess;
 
-   if ( pHash == NULL || pKey == NULL )
+   if( pHash == NULL || pKey == NULL || pHash->item.asHash.value->pAccessAA == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
          "HGETAAPOS", 2, hb_paramError(1), hb_paramError( 2 ) );
