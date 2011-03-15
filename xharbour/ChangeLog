@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-15 08:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sevenzip/sevenzip.c
+    ! changed: _7ZipWindowMessage -> s_7ZipWindowMessage ( is now static )
+
 2011-03-15 08:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/t7zip.ch
   * contrib/sevenzip/t7zip.prg

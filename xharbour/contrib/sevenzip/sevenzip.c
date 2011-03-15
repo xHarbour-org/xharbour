@@ -81,7 +81,7 @@ typedef DWORD ( WINAPI *SEVENZIPGETORIGINALSIZE ) (HARC _harc);
 typedef DWORD ( WINAPI *SEVENZIPGETCOMPRESSEDSIZE ) (HARC _harc);
 typedef WORD  ( WINAPI *SEVENZIPGETRATIO ) (HARC _harc);
 
-UINT _7ZipWindowMessage = 0;
+static UINT s_7ZipWindowMessage = 0;
 //------------------------------------------------------------------------------
 static FARPROC sevenzip_GetProcAddress( const char* szFuncName )
 {
@@ -111,7 +111,7 @@ HB_FUNC( INIT7ZIPDLL )
       hb_errInternal( 5999, __szError, NULL, NULL );
    }
 
-   _7ZipWindowMessage = RegisterWindowMessage( "wm_arcextract" );
+   s_7ZipWindowMessage = RegisterWindowMessage( "wm_arcextract" );
 }
 
 //------------------------------------------------------------------------------
@@ -119,9 +119,10 @@ HB_FUNC( HB_7ZIPMESSAGE )
 {
    if ( hDll )
    {
-      hb_retnl( _7ZipWindowMessage );
+      hb_retnl( s_7ZipWindowMessage );
       return;
    }
+
    hb_retnl( 0 );
 }
 
