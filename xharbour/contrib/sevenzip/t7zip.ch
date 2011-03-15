@@ -169,7 +169,7 @@ STATIC AERRDEF := {;
      {"ERROR_DIR_FILE_WITH_64BIT_SIZE",0X8104},{"ERROR_FILE_CHANGED_DURING_OPERATION",0X8105}}
 
 STATIC aArcType   := { "7z", "zip", "gzip", "bzip2", "tar", "iso", "udf" }
-STATIC aArcMethod := { "LZMA", "LZMA2", "PPMd", "BZip2", "Deflate", "Copy" }
+STATIC aArcMethod := { "LZMA", "LZMA2", "PPMd", "BZip2", "Deflate", "Copy", "Deflate64" }
 
 #define ARCTYPE_7Z     1
 #define ARCTYPE_ZIP    2
@@ -185,5 +185,6 @@ STATIC aArcMethod := { "LZMA", "LZMA2", "PPMd", "BZip2", "Deflate", "Copy" }
 #define CMPMETHOD_BZIP2       4  // BWT algorithm
 #define CMPMETHOD_DEFLATE     5  // LZ+Huffman
 #define CMPMETHOD_COPY        6  // No compression
+#define CMPMETHOD_DEFLATE64   7  // LZ+Huffman
 
 #endif /* __T7ZIP_INCLUDED */

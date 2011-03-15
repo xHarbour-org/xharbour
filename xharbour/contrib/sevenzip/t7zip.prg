@@ -55,7 +55,8 @@
 //------------------------------------------------------------------------------
 CREATE CLASS T7ZIP
 
-   DATA nError AS INTEGER INIT 0                    // Error Message
+   DATA hWndOwner AS INTEGER INIT 0              // handle of parent window
+   DATA nError AS INTEGER INIT 0                 // Error Message
    DATA handle AS INTEGER INIT 0
    DATA lShowProcessDlg AS LOGICAL INIT .F.      // .T. - show progress dialog
    DATA lAlwaysOverWrite AS LOGICAL INIT .T.     // overwrite when extract
@@ -94,16 +95,16 @@ CREATE CLASS T7ZIP
    METHOD Create()                               // Create archive
 
    METHOD Open() INLINE;
-      ::handle := HB_SevenZipOpenArchive( 0, ::cArcName, 0 )
+      ::handle := HB_SevenZipOpenArchive( ::hWndOwner, ::cArcName, 0 )
 
    METHOD List() INLINE;
-      ::nError := HB_SevenZip( 0, 'l ' + ::cArcName, @::cBuffer, ::nBuffer )
+      ::nError := HB_SevenZip( ::hWndOwner, 'l ' + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD Test() INLINE;
-      ::nError := HB_SevenZip( 0, 't ' + ::cArcName, @::cBuffer, ::nBuffer )
+      ::nError := HB_SevenZip( ::hWndOwner, 't ' + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD Extract( lWithPath ) INLINE;
-      ::nError := HB_SevenZip( 0, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer, ::nBuffer )
+      ::nError := HB_SevenZip( ::hWndOwner, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer, ::nBuffer )
 
    METHOD ErrorDescription()
 
@@ -144,7 +145,7 @@ METHOD T7Zip:Create()
             EXIT
 
          DEFAULT
-            IF ValType( ::nCompressionMethod ) == "N" .AND. ::nCompressionMethod > 0 .AND. ::nCompressionMethod <= 6
+            IF ValType( ::nCompressionMethod ) == "N" .AND. ::nCompressionMethod > 0 .AND. ::nCompressionMethod <= Len( aArcMethod )
                ::cCompressionMethod := aArcMethod[ ::nCompressionMethod ]
                ::cCommand += ' ' + '-m0=' + ::cCompressionMethod
             ENDIF
@@ -192,7 +193,7 @@ METHOD T7Zip:Create()
          ::cCommand += ' ' + ::aFiles
       ENDIF
 
-      RETURN ::nError := HB_SevenZip( 0, ::cCommand, @::cBuffer, ::nBuffer )
+      RETURN ::nError := HB_SevenZip( ::hWndOwner, ::cCommand, @::cBuffer, ::nBuffer )
    ENDIF
 
    RETURN ::nError := ERROR_NOT_SUPPORT

@@ -15,16 +15,19 @@
 #define CMPMETHOD_BZIP2       4  // BWT algorithm
 #define CMPMETHOD_DEFLATE     5  // LZ+Huffman
 #define CMPMETHOD_COPY        6  // No compression
+#define CMPMETHOD_DEFLATE64   7  // LZ+Huffman
+
+#define CMPMETHOD_OPTIONS     7
 
 PROCEDURE MAIN()
 
    LOCAL my7z, i, t
-   LOCAL aTime    := Array( 6 )
-   LOCAL aTest    := {"testLZMA.7z","testLZMA2.7z","testPPMD.7z","testBZIP2.7z","testDEFLATE.7z","testCOPY.7z"}
-   LOCAL aMethod  := {CMPMETHOD_LZMA,CMPMETHOD_LZMA2,CMPMETHOD_PPMD,CMPMETHOD_BZIP2,CMPMETHOD_DEFLATE,CMPMETHOD_COPY}
-   LOCAL acMethod := {"CMPMETHOD_LZMA","CMPMETHOD_LZMA2","CMPMETHOD_PPMD","CMPMETHOD_BZIP2","CMPMETHOD_DEFLATE","CMPMETHOD_COPY"}
+   LOCAL aTime    := Array( CMPMETHOD_OPTIONS )
+   LOCAL aTest    := {"testLZMA.7z","testLZMA2.7z","testPPMD.7z","testBZIP2.7z","testDEFLATE.7z","testCOPY.7z","testDEFLATE64.7z"}
+   LOCAL aMethod  := {CMPMETHOD_LZMA,CMPMETHOD_LZMA2,CMPMETHOD_PPMD,CMPMETHOD_BZIP2,CMPMETHOD_DEFLATE,CMPMETHOD_COPY,CMPMETHOD_DEFLATE64}
+   LOCAL acMethod := {"CMPMETHOD_LZMA","CMPMETHOD_LZMA2","CMPMETHOD_PPMD","CMPMETHOD_BZIP2","CMPMETHOD_DEFLATE","CMPMETHOD_COPY","CMPMETHOD_DEFLATE64"}
 
-   FOR i := 1 TO 6
+   FOR i := 1 TO CMPMETHOD_OPTIONS
       IF File( aTest[ i ] )
          Ferase( aTest[ i ] )
       ENDIF
@@ -38,14 +41,16 @@ PROCEDURE MAIN()
       :cPassword  := "xharbour"
       :lRecursive := .T. /* .T. = include sub-dirs */
 
-      FOR i := 1 TO 6
+      FOR i := 1 TO CMPMETHOD_OPTIONS
          t := seconds()
          :cArcName           := aTest[ i ]
          :nCompressionMethod := aMethod[ i ]
+         ? 'Working with ' + acMethod[i] + '... Please wait'
          :Create()
-         ? '[ARCTYPE_7Z] command:', :cCommand
-         ? '[ARCTYPE_7Z] RETURN ERROR:', :nError, :ErrorDescription
+         ? '['+acMethod[i]+'] command:', :cCommand
+         ? '['+acMethod[i]+'] RETURN ERROR:', :nError, :ErrorDescription
          ? 'Time: ' aTime[ i ] := seconds() - t
+         ?
       NEXT
 
    END
@@ -54,7 +59,7 @@ PROCEDURE MAIN()
    ? '----------'
    ? 'Benchmark:'
    ? '----------'
-   FOR i := 1 TO 6
+   FOR i := 1 TO CMPMETHOD_OPTIONS
       IF File( aTest[ i ] )
          ? PADR(aTest[i],20), PADR(acMethod[i],20), TRANSFORM( HB_FSize( aTest[i]), "99,999,999" ), aTime[i], "secs"
       ENDIF
