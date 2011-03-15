@@ -98,25 +98,13 @@ CREATE CLASS T7ZIP
       ::handle := HB_SevenZipOpenArchive( ::hWndOwner, ::cArcName, 0 )
 
    METHOD List() INLINE;
-<<<<<<< .mine
-      ::nError := HB_SevenZip( 0, 'l "' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
-=======
-      ::nError := HB_SevenZip( ::hWndOwner, 'l ' + ::cArcName, @::cBuffer, ::nBuffer )
->>>>>>> .r9362
+      ::nError := HB_SevenZip( ::hWndOwner, 'l "' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
 
    METHOD Test() INLINE;
-<<<<<<< .mine
-      ::nError := HB_SevenZip( 0, 't "' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
-=======
-      ::nError := HB_SevenZip( ::hWndOwner, 't ' + ::cArcName, @::cBuffer, ::nBuffer )
->>>>>>> .r9362
+      ::nError := HB_SevenZip( ::hWndOwner, 't "' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
 
    METHOD Extract( lWithPath ) INLINE;
-<<<<<<< .mine
-      ::nError := HB_SevenZip( 0, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + '"' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
-=======
-      ::nError := HB_SevenZip( ::hWndOwner, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + ::cArcName, @::cBuffer, ::nBuffer )
->>>>>>> .r9362
+      ::nError := HB_SevenZip( ::hWndOwner, if( valtype( lWithPath ) == "L" .AND. lWithPath, 'x ', 'e ' ) + if( ::lAlwaysOverWrite, '-y ', '' ) + if( ::lShowProcessDlg, '-hide ', '' ) + '"' + HB_ANSITOOEM( ::cArcName ) + '"', @::cBuffer, ::nBuffer )
 
    METHOD ErrorDescription()
 

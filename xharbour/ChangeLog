@@ -8,13 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-<<<<<<< .mine
 2011-03-15 23:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/sevenzip/t7zip.prg
     ! Fix compatibility with accented chars
     ! Fix compatibility with file names containing spaces
 
-=======
 2011-03-15 10:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * tests/7zip2.prg
     + Zip method with maximum compression added just for comparison.
