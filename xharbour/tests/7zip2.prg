@@ -17,15 +17,15 @@
 #define CMPMETHOD_COPY        6  // No compression
 #define CMPMETHOD_DEFLATE64   7  // LZ+Huffman
 
-#define CMPMETHOD_OPTIONS     7
-
+#define CMPMETHOD_OPTIONS     7 + 1
+#define MAX_ZIP_COMPRESSION   9
 PROCEDURE MAIN()
 
    LOCAL my7z, i, t
    LOCAL aTime    := Array( CMPMETHOD_OPTIONS )
-   LOCAL aTest    := {"testLZMA.7z","testLZMA2.7z","testPPMD.7z","testBZIP2.7z","testDEFLATE.7z","testCOPY.7z","testDEFLATE64.7z"}
-   LOCAL aMethod  := {CMPMETHOD_LZMA,CMPMETHOD_LZMA2,CMPMETHOD_PPMD,CMPMETHOD_BZIP2,CMPMETHOD_DEFLATE,CMPMETHOD_COPY,CMPMETHOD_DEFLATE64}
-   LOCAL acMethod := {"CMPMETHOD_LZMA","CMPMETHOD_LZMA2","CMPMETHOD_PPMD","CMPMETHOD_BZIP2","CMPMETHOD_DEFLATE","CMPMETHOD_COPY","CMPMETHOD_DEFLATE64"}
+   LOCAL aTest    := {"testLZMA.7z","testLZMA2.7z","testPPMD.7z","testBZIP2.7z","testDEFLATE.7z","testCOPY.7z","testDEFLATE64.7z","testZIP.zip"}
+   LOCAL aMethod  := {CMPMETHOD_LZMA,CMPMETHOD_LZMA2,CMPMETHOD_PPMD,CMPMETHOD_BZIP2,CMPMETHOD_DEFLATE,CMPMETHOD_COPY,CMPMETHOD_DEFLATE64,0}
+   LOCAL acMethod := {"CMPMETHOD_LZMA","CMPMETHOD_LZMA2","CMPMETHOD_PPMD","CMPMETHOD_BZIP2","CMPMETHOD_DEFLATE","CMPMETHOD_COPY","CMPMETHOD_DEFLATE64","ARCTYPE_ZIP"}
 
    FOR i := 1 TO CMPMETHOD_OPTIONS
       IF File( aTest[ i ] )
@@ -45,6 +45,10 @@ PROCEDURE MAIN()
          t := seconds()
          :cArcName           := aTest[ i ]
          :nCompressionMethod := aMethod[ i ]
+         IF i == CMPMETHOD_OPTIONS
+            :nArctype := ARCTYPE_ZIP
+            :nZipCompressionLevel := MAX_ZIP_COMPRESSION
+         ENDIF
          ? 'Working with ' + acMethod[i] + '... Please wait'
          :Create()
          ? '['+acMethod[i]+'] command:', :cCommand
