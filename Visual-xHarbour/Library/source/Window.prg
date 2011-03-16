@@ -2154,6 +2154,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
            ::SetOpacity( ::xOpacity )
 
+           IF ::BackgroundImage != NIL
+              ::BackgroundImage:Create()
+           ENDIF
+
            IF !::__lShown
               ::__lShown := .T.
               ::__FixDocking()
@@ -2516,9 +2520,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            EXIT
 
       CASE WM_KEYDOWN
-           IF ! ( ::hWnd == hWnd )
-              return 0
-           ENDIF
            IF ::Parent != NIL
               nRet := ::Parent:OnChildKeyDown( hWnd, nMsg, nwParam, nlParam )
               IF nRet != NIL
@@ -5324,10 +5325,6 @@ METHOD SetInstance( cProjectName, oOle ) CLASS WinForm
       hPointer := HB_FuncPtr( "__" + cProjectName )
       HB_Exec( hPointer, ,NIL, hInst )
       ::DllInstance := hInst
-      OutputDebugString( "*********** DLLInstance ***********" )
-      OutputDebugString( XSTR( ::DllInstance ) )
-      OutputDebugString( XSTR( cProjectName ) )
-      OutputDebugString( "***********************************" )
    ENDIF
 RETURN Self
 

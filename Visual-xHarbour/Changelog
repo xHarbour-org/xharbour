@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-15 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed ShortcutKey accelerators to work ONLY on active form
+   ! Fixed DataGrid Update()
+   - Reverted changes to OnGetDlgCode() causing ENTER key to fail
+   - Removed FreeImage useless Instance variable
+
 2010-11-25 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Reworked list of available Activex controls
    + Added Version number and path to the activex's path while browsing

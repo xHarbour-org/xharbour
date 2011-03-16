@@ -217,8 +217,8 @@ CLASS DataGrid INHERIT Control
    METHOD OnChar()
    METHOD OnKillFocus()
    METHOD OnSetFocus()
-//   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
-   METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_ESCAPE}, NIL, DLGC_WANTMESSAGE )
+   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
+//   METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_ESCAPE}, NIL, DLGC_WANTMESSAGE )
    METHOD OnLButtonDblClk()
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
@@ -2007,38 +2007,6 @@ METHOD Update() CLASS DataGrid
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
    nUse := Int(  ::__DataHeight/::ItemHeight )
 
-   IF !(::DataSource:ClsName == "MemoryTable") .AND. !(::DataSource:Driver IN { "SQLRDD", "SQLEX" } )
-      IF SET( _SET_DELETED )
-         WHILE ::DataSource:Deleted()
-            ::DataSource:Skip()
-            IF ::DataSource:Eof()
-               ::DataSource:GoBottom()
-               EXIT
-            ENDIF
-         ENDDO
-         WHILE ::DataSource:Deleted()
-            ::DataSource:Skip(-1)
-            IF ::DataSource:Bof()
-               ::DataSource:GoTop()
-               EXIT
-            ENDIF
-         ENDDO
-      ENDIF
-
-      // force UPDATE db record pointer
-      IF nSkip == 0
-         ::DataSource:Skip()
-         IF ::DataSource:Eof()
-            ::DataSource:GoBottom()
-          ELSE
-            ::DataSource:Skip(-1)
-            IF ::DataSource:Bof()
-               ::DataSource:GoTop()
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-
    IF ::DataSource:Eof()
       ::DataSource:GoBottom()
       IF ::DataSource:Eof()
@@ -2052,8 +2020,9 @@ METHOD Update() CLASS DataGrid
    ::RowPos := ASCAN( ::__DisplayArray, {|a| a[2] == nRec } )
    ::__VertScrolled := MAX( 1, ::Record - ::RowPos + 1 )
 
-   ::DataSource:Skip( -(::RowPos-1) )
-
+   IF ::RowPos > 0
+      ::DataSource:Skip( -(::RowPos-1) )
+   ENDIF
    ::__DisplayArray := {}
    
    IF ::RowCountUsable > 0

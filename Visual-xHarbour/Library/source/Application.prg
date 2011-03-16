@@ -554,7 +554,7 @@ METHOD Run( oWnd ) CLASS Application
       DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. !::lExit
          cClass := GetClassName( Msg:hWnd )
          IF !::AxTranslate( Msg, cClass )
-            IF !::TranslateAccelerator(,, Msg )
+            IF !::TranslateAccelerator( Msg )
                IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
                   IF ! (cClass == "AfxFrameOrView42s") 
                      IF !IsDialogMessage( GetActiveWindow(), Msg )
@@ -594,7 +594,7 @@ METHOD Yield() CLASS Application
    LOCAL msg
    IF PeekMessage( @Msg, NIL, 0, 0, PM_REMOVE)
       IF !::AxTranslate( Msg )
-         IF !::TranslateAccelerator(,, Msg )
+         IF !::TranslateAccelerator( Msg )
             IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
                IF !IsDialogMessage( GetActiveWindow(), Msg )
                   TranslateMessage( Msg )
@@ -656,42 +656,23 @@ RETURN .F.
 
 //------------------------------------------------------------------------------------------------
 
-METHOD TranslateAccelerator( hWnd, hAccel, Msg ) CLASS Application
-   LOCAL lRet := .F., n
-   
+METHOD TranslateAccelerator( Msg ) CLASS Application
+   LOCAL lRet := .F., n, hWnd
    IF Msg:message == WM_KEYDOWN
-      IF hWnd == NIL .AND. hAccel == NIL
-         FOR n := 1 TO LEN( ::__Accelerators )
-             IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
+      FOR n := 1 TO LEN( ::__Accelerators )
+          IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
+             hWnd := GetActiveWindow()
+             WHILE hWnd != 0 .AND. ! IsChild( ::__Accelerators[n][1], hWnd )
+                hWnd := GetParent( hWnd )
+             ENDDO
+             IF IsChild( ::__Accelerators[n][1], hWnd ) .OR. ::__Accelerators[n][1] == GetActiveWindow()
                 IF !TranslateAccelerator( ::__Accelerators[n][1], ::__Accelerators[n][2], Msg ) == 0
                    lRet := .T.
                    EXIT
                 ENDIF
              ENDIF
-         NEXT
-       ELSEIF hWnd == NIL
-         FOR n := 1 TO LEN( ::__Accelerators )
-             IF ::__Accelerators[n][2] == hAccel .OR. ::__Accelerators[n][1] != 0
-                IF !TranslateAccelerator( ::__Accelerators[n][1], hAccel, Msg ) == 0
-                   lRet := .T.
-                   EXIT
-                ENDIF
-             ENDIF
-         NEXT
-       ELSEIF hAccel == NIL
-         FOR n := 1 TO LEN( ::__Accelerators )
-             IF ::__Accelerators[n][1] == hWnd .OR. ::__Accelerators[n][2] != 0
-                IF !TranslateAccelerator( hWnd, ::__Accelerators[n][2], Msg ) == 0
-                   lRet := .T.
-                   EXIT
-                ENDIF
-             ENDIF
-         NEXT
-       ELSE
-         IF !TranslateAccelerator( hWnd, hAccel, Msg ) == 0
-            lRet := .T.
-         ENDIF
-      ENDIF
+          ENDIF
+      NEXT
    ENDIF
 RETURN lRet
 

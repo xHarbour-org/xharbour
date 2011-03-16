@@ -130,7 +130,6 @@ CLASS FreeImageRenderer
    DATA __IsInstance    EXPORTED INIT .F.
    DATA __ClassInst     EXPORTED
    DATA hDIB            EXPORTED
-   ACCESS Instance      INLINE __GetApplication():Instance
    DATA __Alignments    EXPORTED INIT { "None",;
                                         "Center",;
                                         "Left - Top",;

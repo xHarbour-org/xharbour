@@ -33,7 +33,7 @@ CLASS Component INHERIT Object
    DATA Caption                EXPORTED INIT ""
    
    ACCESS Form                 INLINE IIF( ::Owner != NIL, ::Owner:Form, NIL )
-   ACCESS AppInstance            INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
+   ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
 
    METHOD Init()               CONSTRUCTOR
    METHOD Destroy()
