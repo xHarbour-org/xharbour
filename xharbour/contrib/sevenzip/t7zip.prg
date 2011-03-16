@@ -91,6 +91,9 @@ CREATE CLASS T7ZIP
                                                  // will be degraded, ie bigger size
    DATA lMultiCPU AS LOGICAL INIT .F.            // set this to .T. when using
                                                  // multi CPU such as dual[quad]-core
+   DATA lConvertANSIToOEM AS LOGICAL INIT .T.    // Some system requires to convert
+                                                 // ANSI file name to OEM
+
    METHOD New() INLINE Self
    METHOD Create()                               // Create archive
 
@@ -183,14 +186,14 @@ METHOD T7Zip:Create()
          ::cCommand += ' ' + '-v' + LTRIM( STR( ::aVolumes ) ) + 'b'
       ENDIF
 
-      ::cCommand += ' "' + HB_ANSITOOEM( ::cArcName ) + '"'
+      ::cCommand += ' ' + HB_7ZIPCONVERTFILENAME( ::cArcName, ::lConvertANSIToOEM )
 
       IF Valtype( ::aFiles ) == "A"
          FOR EACH cFile IN ::aFiles
-            ::cCommand += ' "' + HB_ANSITOOEM( cFile ) + '"'
+            ::cCommand += ' ' + HB_7ZIPCONVERTFILENAME( cFile, ::lConvertANSIToOEM )
          NEXT
       ELSEIF Valtype( ::aFiles ) == "C"
-         ::cCommand += ' "' + HB_ANSITOOEM( ::aFiles ) + '"'
+         ::cCommand += ' ' + HB_7ZIPCONVERTFILENAME( ::aFiles, ::lConvertANSIToOEM )
       ENDIF
 
       RETURN ::nError := HB_SevenZip( ::hWndOwner, ::cCommand, @::cBuffer, ::nBuffer )
@@ -210,6 +213,15 @@ METHOD T7Zip:ErrorDescription()
    ENDIF
 
    RETURN "ERROR_UNKNOWN"
+
+//------------------------------------------------------------------------------
+STATIC FUNCTION HB_7ZIPCONVERTFILENAME( cFileName, lConvert )
+
+   IF lConvert
+      RETURN '"' + HB_ANSITOOEM( cFileName ) + '"'
+   ENDIF
+
+   RETURN cFileName
 
 //------------------------------------------------------------------------------
 INIT PROCEDURE _7ZINIT
