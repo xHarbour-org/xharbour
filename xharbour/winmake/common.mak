@@ -1638,7 +1638,6 @@ HBCC_LIB_OBJS=\
 WHAT32_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)_winbmp$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winbrsh$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wincall$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_wincdlg$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winclpb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_wincomm$(OBJEXT)\

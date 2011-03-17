@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-17 09:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/makefile.bc
+  * winmake/makefile.wc
+  * winmake/makefile.vc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/contrib.pc
+    ! _wincall.obj will only be compiled when BCC_HAS_TASM is set to 1
+      This helps in compiling What32.Lib with BCC with no TASM
+
 2011-03-16 10:42 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sevenzip/t7zip.prg
     + :lConvertANSIToOEM, default is .T.

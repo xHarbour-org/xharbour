@@ -765,6 +765,15 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 +)
 !
 
+!if ("$(BCC_HAS_TASM)"=="1")
+WHAT32_LIB_OBJS=\
+	$(WHAT32_LIB_OBJS)\
+	$(OBJ_DIR)\_wincall.obj
+!else
+WHAT32_LIB_OBJS=\
+	$(WHAT32_LIB_OBJS)\
+        $(WHAT32_DIR)\source\_wincall.obj
+!endif
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	IF EXIST "$(WHAT32_LIB)" $(DEL) "$(WHAT32_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
