@@ -1938,7 +1938,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
             hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, ( BYTE * ) pItem->item.asString.value, uiLength );
          }
-         else if( HB_IS_DATETIME( pItem ) )
+         else if( HB_IS_TIMEFLAG( pItem ) )
          {
             BYTE byNum[ sizeof( double ) ];
 

@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-19 03:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/memvars.c
+    ! fix date type memvar returns incorrect data type when restored.
+      (bug report from: Carlos Galego on xharbour.spanish.portuguese)
+
 2011-03-17 09:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/makefile.bc
