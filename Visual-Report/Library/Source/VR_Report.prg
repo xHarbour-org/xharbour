@@ -82,6 +82,7 @@ CLASS VrReport INHERIT VrObject
    METHOD Load()
    METHOD InitPDF()
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
+   METHOD GetSubTotalHeight()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -112,7 +113,6 @@ METHOD InitPDF() CLASS VrReport
       ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
       ::oPDF:ObjectAttributeSTR( "Document", "UseSystemFonts", "1" )
       ::oPDF:ObjectAttributeSTR( "Document", "UnicodeFonts"  , "0" )
-      //::oPDF:ShowMargins := .T.
    ENDIF
 RETURN Self
 
@@ -138,11 +138,6 @@ METHOD StartPage() CLASS VrReport
    ::nPage++
    ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "PaperSize", ::PaperSize )
    ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "Landscape", ::Orientation == __GetSystem():PageSetup:Landscape )
-
-//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "LeftMargin",   Int( (::LeftMargin/1000) * PIX_PER_INCH ) )
-//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "TopMargin",    Int( (::TopMargin/1000) * PIX_PER_INCH ) )
-//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "RightMargin",  Int( (::RightMargin/1000) * PIX_PER_INCH ) )
-//   ::oPDF:ObjectAttribute( "Pages["+ALLTRIM(STR(::nPage))+"]", "BottomMargin", Int( (::BottomMargin/1000) * PIX_PER_INCH ) )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -159,7 +154,7 @@ METHOD Preview() CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
+METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    LOCAL oControl, x := 0, y := 0, n
    IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
       x := VAL( aCtrl[x][2] )
@@ -168,9 +163,6 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
       y := VAL( aCtrl[y][2] )
    ENDIF
    IF oPanel == NIL
-      //IF ::nRow + ( ( PIX_PER_INCH / 72 ) * y ) + nHeight > ( ::oPDF:PageLength - ::FooterHeight )
-      //   RETURN NIL
-      //ENDIF
       oControl := hb_ExecFromArray( aCtrl[1][2], {,.F.} )
       oControl:Parent := Self
       oControl:Left := x
@@ -204,13 +196,16 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
       oControl:BackColor := VAL( aCtrl[n][2] )
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+      DEFAULT oControl:Font TO Font()
       oControl:Font:FaceName  := aCtrl[n][2][1][2]
       oControl:Font:PointSize := VAL( aCtrl[n][2][2][2] )
       oControl:Font:Italic    := IIF( aCtrl[n][2][3][2]=="True", .T., .F. )
       oControl:Font:Underline := IIF( aCtrl[n][2][4][2]=="True", .T., .F. )
       oControl:Font:Weight    := VAL( aCtrl[n][2][5][2] )
    ENDIF
-   
+   IF ! Empty( nVal )
+      oControl:Caption := ALLTRIM( STR( nVal ) )
+   ENDIF
    IF oPanel == NIL
       oControl:Draw( hDC )
       TRY
@@ -223,6 +218,18 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC ) CLASS VrReport
       oControl:Configure()
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD GetSubTotalHeight( hDC ) CLASS VrReport
+   LOCAL i, n, nPt, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   FOR EACH aCtrl IN aBody
+       IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
+          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+             nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+          ENDIF
+       ENDIF
+   NEXT
+RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubTotals( hDC ) CLASS VrReport
@@ -241,7 +248,7 @@ RETURN Self
 METHOD CreateBody( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
-       IF aCtrl[1][2] != "SubTotal"
+       IF UPPER( aCtrl[1][2] ) != "VRSUBTOTAL"
           ::CreateControl( aCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
@@ -346,7 +353,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    END
 
    hDC := GetDC(0)
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSX )
+   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    ::FooterHeight := VAL( ::aProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    ReleaseDC(0, hDC)
 RETURN Self
@@ -386,7 +393,7 @@ RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc ) CLASS VrReport
-   LOCAL nHeight, hDC
+   LOCAL nHeight, hDC, nSubHeight
 
    ::Create()
 
@@ -417,9 +424,11 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:EditCtrl:Select()
       ::DataSource:EditCtrl:GoTop()
       AEVAL( ::aSubTotals, {|a| a[2] := 0} )
+      nSubHeight := ::GetSubTotalHeight( hDC )
+      VIEW nSubHeight
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
-         IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight )
+         IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight - nSubHeight )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF

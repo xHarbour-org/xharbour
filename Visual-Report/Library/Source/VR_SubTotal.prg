@@ -16,10 +16,9 @@
 #define  acObjectTypeText           5
 
 CLASS VrSubTotal INHERIT VrLabel
-   DATA SubTotalField EXPORTED
+   DATA SubTotalField EXPORTED INIT ""
    DATA ClsName       EXPORTED  INIT "SubTotal"
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()
    METHOD WriteProps()
 ENDCLASS
 
@@ -30,10 +29,6 @@ METHOD Init( oParent ) CLASS VrSubTotal
       Super:Init( oParent )
       AADD( ::aProperties, { "SubTotalField", "Process"  } )
    ENDIF
-RETURN Self
-
-METHOD Create() CLASS VrSubTotal
-   Super:Create()
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrSubTotal
