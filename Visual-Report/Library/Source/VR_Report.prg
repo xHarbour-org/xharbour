@@ -171,9 +171,19 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
 
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "NAME"} ) ) > 0
+      oControl:Name := aCtrl[n][2]
+   ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FILENAME"} ) ) > 0
       oControl:FileName := aCtrl[n][2]
    ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
+      oControl:OnLabel := aCtrl[n][2]
+   ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
+      oControl:Text      := aCtrl[n][2]
+   ENDIF
+
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
       oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
    ENDIF
@@ -185,9 +195,6 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "HEIGHT"} ) ) > 0
       oControl:Height    := VAL( aCtrl[n][2] )
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
-      oControl:Text      := aCtrl[n][2]
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORECOLOR"} ) ) > 0
       oControl:ForeColor := VAL( aCtrl[n][2] )
@@ -222,8 +229,13 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD GetSubTotalHeight( hDC ) CLASS VrReport
    LOCAL i, n, nPt, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   ::aSubTotals := {}
    FOR EACH aCtrl IN aBody
        IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
+          
+          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
+             AADD( ::aSubTotals, {aCtrl[n][2],0} )
+          ENDIF
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
              nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
           ENDIF
@@ -233,13 +245,29 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubTotals( hDC ) CLASS VrReport
-   LOCAL i, n, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   LOCAL x, y, i, n, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
    FOR EACH aCtrl IN aBody
-       IF ( n := ASCAN( ::aSubTotals, {|a| a[1]:SubTotalField == aCtrl[2][2]} ) ) > 0
-          aCtrl[1][2] := "VrSubTotal"
-          aCtrl[3][2] := ::aSubTotals[n][2]
-          ::CreateControl( aCtrl, @nHeight,, hDC )
-          ::aSubTotals[n][2] := 0
+       IF UPPER( aCtrl[1][2] ) != "VRSUBTOTAL" .AND. ( nSub := ASCAN( ::aSubTotals, {|a| UPPER(a[1])==UPPER(aCtrl[2][2])} ) ) > 0
+          IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VRSUBTOTAL" .AND. UPPER(a[3][1])=="ONLABEL" .AND. UPPER(a[3][2])==UPPER(aCtrl[2][2])} ) ) > 0
+             aBody[i][4][2] := xStr(::aSubTotals[nSub][2])
+
+             IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+                x := aCtrl[x][2]
+             ENDIF
+             IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+                y := aCtrl[y][2]
+             ENDIF
+
+             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+                aBody[i][n][2] := x
+             ENDIF
+             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+                aBody[i][n][2] := y
+             ENDIF
+
+             ::CreateControl( aBody[i], @nHeight,, hDC )
+             ::aSubTotals[nSub][2] := 0
+          ENDIF
        ENDIF
    NEXT
 RETURN Self
@@ -425,16 +453,14 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:EditCtrl:GoTop()
       AEVAL( ::aSubTotals, {|a| a[2] := 0} )
       nSubHeight := ::GetSubTotalHeight( hDC )
-      VIEW nSubHeight
+
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight - nSubHeight )
+            ::CreateSubTotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
-            
-            ::CreateSubTotals( hDC )
-            
             ::CreateFooter( hDC )
             ::EndPage()
             ::StartPage()
@@ -442,6 +468,7 @@ METHOD Run( oDoc ) CLASS VrReport
          ENDIF
          ::DataSource:EditCtrl:Skip()
       ENDDO
+      ::CreateSubTotals( hDC )
     ELSE
       ::CreateBody( hDC )
    ENDIF

@@ -143,7 +143,7 @@ RETURN Self
 
 METHOD Draw( hDC ) CLASS VrLabel
    LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
-   LOCAL lAuto, lf := (struct LOGFONT), aTxSize
+   LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
    
    lAuto := ::AutoResize
    
@@ -160,7 +160,7 @@ METHOD Draw( hDC ) CLASS VrLabel
       ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
       ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         IF VAL( ::Text ) == 0
+         IF VALTYPE( ::Text ) == "C" .AND. VAL( ::Text ) == 0
             TRY
                cText := &(::Text)
             catch
@@ -168,6 +168,9 @@ METHOD Draw( hDC ) CLASS VrLabel
             END
           ELSE
             cText := ::Text
+         ENDIF
+         IF ( n := ASCAN( ::Parent:aSubTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+            ::Parent:aSubTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
          ENDIF
          cText := ALLTRIM( xStr( cText ) )
 

@@ -57,7 +57,7 @@ METHOD Create() CLASS VrDataTable
       ENDIF
       :Create()
       IF ! EMPTY( ::bFilter )
-         :SetFilter( ::bFilter )
+         :SetFilter( &(::bFilter) )
       ENDIF
    END
 
