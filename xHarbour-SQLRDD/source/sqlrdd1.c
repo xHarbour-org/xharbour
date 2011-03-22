@@ -81,7 +81,9 @@ void startSQLRDDSymbols(void);
 /*
 static PHB_ITEM loadTag( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
 */
-PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
+HB_EXTERN_BEGIN
+   PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
+HB_EXTERN_END
 
 HB_FUNC_EXTERN( SR_END );
 HB_FUNC_EXTERN( SR_INIT );
@@ -2462,7 +2464,7 @@ static HB_ERRCODE sqlOrderListClear( SQLAREAP thiswa )
 static HB_ERRCODE sqlOrderListFocus( SQLAREAP thiswa, LPDBORDERINFO pOrderInfo )
 {
 //   HB_ITEM BagName;
-   PHB_ITEM BagName; 
+   PHB_ITEM BagName;
    PHB_ITEM pTag;
    LONG lorder  = 0;
 
@@ -2483,7 +2485,7 @@ static HB_ERRCODE sqlOrderListFocus( SQLAREAP thiswa, LPDBORDERINFO pOrderInfo )
 
    if( pOrderInfo->itmOrder )
    {
-	  BagName = hb_itemNew( NULL );  
+	  BagName = hb_itemNew( NULL );
       if( pOrderInfo->atomBagName )
       {
          hb_itemCopy( BagName, pOrderInfo->atomBagName );
@@ -2684,7 +2686,7 @@ static PHB_ITEM loadTag( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
 */
 /*------------------------------------------------------------------------*/
 
-  PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
+PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
 {
    //HB_ITEM Order;
    PHB_ITEM Order = hb_itemNew(NULL);

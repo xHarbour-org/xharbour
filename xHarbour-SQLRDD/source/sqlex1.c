@@ -35,7 +35,7 @@ Quick to do list, 2009 feb 23:
 #include <ctype.h>
 #include <assert.h>
 
-#if defined(HB_OS_WIN_32) || defined( HB_OS_WIN ) 
+#if defined(HB_OS_WIN_32) || defined( HB_OS_WIN )
    #include <windows.h>
    #include <odbcinst.h>
 #else
@@ -93,7 +93,10 @@ static int bufferPoolSize = BUFFER_POOL_SIZE;
 static BOOL CreateSkipStmt( SQLEXAREAP thiswa );
 static int bOldReverseIndex  = 0;
 static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact );
-extern  PHB_ITEM loadTagDefault( SQLEXAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
+
+HB_EXTERN_BEGIN
+   extern  PHB_ITEM loadTagDefault( SQLEXAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
+HB_EXTERN_END
 /*------------------------------------------------------------------------*/
 /*
 static char * sqlSolveRestrictors( SQLEXAREAP thiswa )
@@ -272,11 +275,11 @@ static PHB_ITEM getMessageItem( PHB_ITEM obj, char * message )
 
 static void createRecodListQuery( SQLEXAREAP thiswa )
 {
-   if ( thiswa->sSql )    	 
+   if ( thiswa->sSql )
       memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
    if( thiswa->ulhDeleted == 0 )
-   {  
-	  
+   {
+
       sprintf( thiswa->sSql, "SELECT %s A.%c%s%c \nFROM %s A %s %s %s", thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                              thiswa->sTable,
@@ -294,7 +297,7 @@ static void createRecodListQuery( SQLEXAREAP thiswa )
                              thiswa->sWhere,
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
-                                  
+
    }
 
 }
@@ -334,7 +337,7 @@ void getOrderByExpression( SQLEXAREAP thiswa, BOOL bUseOptimizerHints )
    {
       BOOL bDirectionFWD = thiswa->recordListDirection == LIST_FORWARD;
 
-      if( thiswa->bReverseIndex ) 
+      if( thiswa->bReverseIndex )
       {
          bDirectionFWD = !bDirectionFWD;
       }
@@ -1064,7 +1067,7 @@ void SolveFilters( SQLEXAREAP thiswa, BOOL bWhere )
          bWhere = TRUE;
       }
       hb_xfree( sFilter  );
-   }    
+   }
    else
    {
 	  char * sFilter = getMessageC( thiswa->oWorkArea, "CFILTER" );
@@ -1513,7 +1516,7 @@ static HB_ERRCODE getPreparedRecordList( SQLEXAREAP thiswa, int iMax ) // Return
    {
       odbcErrorDiagRTE( hStmt, "getPreparedRecordList", sSql, res, __LINE__, __FILE__ );
       SQLCloseCursor( hStmt );
-      
+
       return (HB_FAILURE);
    }
 
@@ -1998,7 +2001,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       SQLCloseCursor( thiswa->hStmtBuffer );
       // culik null the handle
       thiswa->hStmtBuffer=NULL;
- 
+
       return (HB_FAILURE);
    }
 
@@ -2066,7 +2069,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
          iReallocs  = 0;
          //temp.type = HB_IT_NIL;        // I know this is not a good practice, but we save tons of allocs.
                                        // please keep as is. ML.
-         temp = hb_itemNew( NULL);                                        
+         temp = hb_itemNew( NULL);
 
          if( (thiswa->uiFieldList[i-1] == 0) && thiswa->iColumnListStatus != FIELD_LIST_LEARNING )
          {
@@ -2094,7 +2097,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
                      lLen = lLenOut + 3;
                      strcpy( (char *) bOut, (char *) bBuffer );
                      bBuffer = ( char * ) hb_xrealloc( bBuffer, (ULONG) lLen );
-                     
+
                      iReallocs++;
                   }
                   else
@@ -2425,7 +2428,7 @@ static HB_ERRCODE sqlExGoBottom( SQLEXAREAP thiswa )
          getWhereExpression( thiswa, LIST_FROM_BOTTOM, FALSE );
          setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
          createRecodListQuery( thiswa );
-         
+
          if ( getRecordList( thiswa, RECORD_LIST_SIZE / 10 ) == HB_FAILURE )
          {
             odbcErrorDiagRTE( thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__ );
@@ -2598,7 +2601,7 @@ static HB_ERRCODE sqlExGoTop( SQLEXAREAP thiswa )
          getWhereExpression( thiswa, LIST_FROM_TOP, FALSE );
          setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
          createRecodListQuery( thiswa );
-         
+
          if ( getRecordList( thiswa, RECORD_LIST_SIZE / 10 ) == HB_FAILURE )
          {
             odbcErrorDiagRTE( thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__ );
@@ -2730,7 +2733,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       PTR bBuffer, bOut;
       USHORT iReallocs;
       PHB_ITEM temp;
-      //HB_ITEM temp;      
+      //HB_ITEM temp;
       int iComp;
       PHB_ITEM aRecord = hb_itemNew( NULL );
 
@@ -2738,10 +2741,10 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       lLen    = COLUMN_BLOCK_SIZE;
       //bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
       bTranslate = FALSE;
-      bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 ); 
+      bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
       for( i=1; i <= thiswa->area.uiFieldCount; i++ )
       {
-	  //   bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 ); 
+	  //   bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
          memset( bBuffer, 0, lLen ) ;
          bOut       = NULL;
          lInitBuff  = lLen;
@@ -2777,7 +2780,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
                      lLen = lLenOut + 3;
                      strcpy( (char *) bOut, (char *) bBuffer );
                      bBuffer = ( char * ) hb_xrealloc( bBuffer, (ULONG) lLen );
-                     
+
                      iReallocs++;
                   }
                   else
@@ -2802,7 +2805,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
             }
             while(res != SQL_NO_DATA);
          }
-      
+
       }
       hb_xfree( ( PTR ) bBuffer );
 
@@ -3192,8 +3195,8 @@ static HB_ERRCODE sqlExDeleteRec( SQLEXAREAP thiswa )
 
    if( (!isDeleted) && (!thiswa->area.fEof) )
    {
-	  if (  thiswa->sSql  ) 
-	  memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) ); 
+	  if (  thiswa->sSql  )
+	  memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
       if( thiswa->ulhDeleted > 0 && sr_UseDeleteds() )
       {
          sprintf( thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i",
@@ -3605,7 +3608,7 @@ static HB_ERRCODE sqlExRecall( SQLEXAREAP thiswa )
 
    if( isDeleted && thiswa->ulhDeleted > 0 && sr_UseDeleteds() )
    {
-	  memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) ); 
+	  memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
       sprintf( thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i",
                              thiswa->sTable, thiswa->sDeletedName, ' ',
                              thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
@@ -3721,7 +3724,7 @@ static HB_ERRCODE sqlExRecId( SQLEXAREAP thiswa, PHB_ITEM recno )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlExClose( SQLEXAREAP thiswa )  
+static HB_ERRCODE sqlExClose( SQLEXAREAP thiswa )
 {
 	HB_ERRCODE code;
    if( SELF_GOCOLD( ( AREAP ) thiswa ) == HB_FAILURE )
@@ -3780,7 +3783,7 @@ static HB_ERRCODE sqlExClose( SQLEXAREAP thiswa )
    // We now use as an true structure, so let freeit
    if ( thiswa->IndexBindings )
       hb_xfree( thiswa->IndexBindings ) ;
-   
+
 
    return code; //(SUPER_CLOSE( (AREAP) thiswa ));
 }
@@ -3974,7 +3977,7 @@ static HB_ERRCODE sqlExOrderListFocus( SQLEXAREAP thiswa, LPDBORDERINFO pOrderIn
 {
    HB_ERRCODE err;
    LONG hOldOrder = thiswa->hOrdCurrent;
-   
+
    err = SUPER_ORDLSTFOCUS( (AREAP) thiswa, pOrderInfo );
 
    if( hOldOrder != thiswa->hOrdCurrent )
@@ -3992,7 +3995,7 @@ static HB_ERRCODE sqlExOrderListFocus( SQLEXAREAP thiswa, LPDBORDERINFO pOrderIn
       if (thiswa->IndexBindings[ thiswa->hOrdCurrent ]) {
          hb_xfree( thiswa->IndexBindings[ thiswa->hOrdCurrent ] );
          thiswa->IndexBindings[ thiswa->hOrdCurrent ] = NULL;
-       }   
+       }
    }
    else
    {
@@ -4166,13 +4169,13 @@ static HB_ERRCODE sqlExSetFilter( SQLEXAREAP thiswa, LPDBFILTERINFO pFilterInfo 
 {
    HB_ERRCODE ret;
    ret = SUPER_SETFILTER( ( AREAP ) thiswa, pFilterInfo );
-   if ( ret == HB_SUCCESS ) 
+   if ( ret == HB_SUCCESS )
    {
       thiswa->bConditionChanged1 = TRUE;
-      thiswa->bConditionChanged2 = TRUE;	   
+      thiswa->bConditionChanged2 = TRUE;
    }
    return ret;
-   
+
 }
 #define sqlExSetLocate					NULL
 
@@ -4529,15 +4532,15 @@ static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
          SELF_GOTOP( (AREAP) thiswa );
          thiswa->firstinteract = 0;
       }
-      
+
       itemTemp = hb_itemArrayGet( pTag, INDEX_KEY_CODEBLOCK );
-      //if (pTag) 
+      //if (pTag)
       //{
          //EVALINFO info;
          //hb_evalNew( &info, hb_itemArrayGet( pTag, INDEXMAN_KEY_CODEBLOCK ) );
          //pKey1 = hb_evalLaunch( &info );
          //hb_evalRelease( &info );
-      //}   
+      //}
 
       if ( HB_IS_NUMBER( itemTemp ) )
       {

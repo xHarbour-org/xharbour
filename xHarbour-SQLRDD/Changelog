@@ -7,61 +7,67 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-03-22 17:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   ! source\sqlex1.c
+   ! source\sqlrdd1.c
+     ! Fixed MSVC missing external loadTagDefault()
+
 2011-03-03 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/utils.prg
      ! added SR_SetFieldDefault() to set field default under postgresql ( work in progress for other databases)
-     
+
 2011-03-03 20:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! fix on AlterColumns when converting numeric field to char under postgresql
    ! source/sqlrdd0.prg
      ! change SR_RenameTable() to rename sequence to new table name under postgresql and oracle
      !TEMP_DROP_COL -> TEMPDROPCO   to respect alias name to 10 chars
-     
+
 2011-01-27 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! in createtable method added logic to detect mysql 5.5 since it use engine=innodb insted of type=innodb
-     ! added logic in AlterColumnsDirect method to allow convertion from char to numeric field 
+     ! added logic in AlterColumnsDirect method to allow convertion from char to numeric field
    ! source/firebird.c
      ! changed FBCREATEDB to dont lock database upon created is success fully created . Sugested by marson de paula
    ! source/utils.prg
-     ! added logic in sr_changestruct method to allow convertion from char to numeric field 
+     ! added logic in sr_changestruct method to allow convertion from char to numeric field
 
 2010-10-11 14:25  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/pgs.c
      ! added  SETPGSOLDBEHAVIOR() to set postgresql behavior ( default .f. which means use null fields when applied)
-     
+
 2010-09-26 13:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! fixed seek when key is val(field)
    ! source/pgs.c
-     ! minor clean up  
+     ! minor clean up
    ! source/utils.prg
      ! fixed undeclared variable
-       
+
 2010-08-25 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/pgs.c
      ! fix to nullable  detection ( was inverted )
-     
+
 2010-08-04 19:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd0.prg
      ! fixed drop of indkex_xxx in SR_DropIndex()
-     
+
 2010-08-04 19:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd1.c
      + Sr_SetFound() function
    ! source/sqlrdd2.prg
-     ! fixed seek last  
+     ! fixed seek last
      ! fixed orddestroy support
    ! source/sqlrdd0.prg
-     ! minor fix to sr_dropindex  
+     ! minor fix to sr_dropindex
 
 2010-07-25 14:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/pgs.c
      ! minor fix to nullable field detection
-   
+
 2010-07-13 23:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
-   ! source/sqlex1.c     
+   ! source/sqlex1.c
    ! source/sqlex2.c
    ! source/sqlex3.c
        ! some fixes on seeks and order setting
@@ -80,33 +86,33 @@
    ! source/utils.prg
      + functions sr_AddToFilter()  to add an recno to existing filter  and sr_clearFilter() to clear this recno filter
    ! source/sqlrdd2.prg
-     ! Added support for recno filters 
+     ! Added support for recno filters
      ! fixed QuotedNull() method to return null values where need under postgresql
    ! source/pgs.c
      ! fixed PGSTABLEATTR() to correct check if field is nullable
-         
+
 2010-06-21 23:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex1.c
      ! fixed orddescend support
-     
+
 2010-06-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlpgs.prg
      ! added support for postgresql 9.0
-     
+
 2010-06-18 16:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex1.c
      ! fixed some memory init buffer initialize to 0 ( memset( buffer,0,buffersize)
-     ! HB_ITEM xxx -> PHB_ITEM ccc 
-   ! source/sqlsrodbc.c  
+     ! HB_ITEM xxx -> PHB_ITEM ccc
+   ! source/sqlsrodbc.c
      ! buffer initialize to 0 ( memset( buffer,0,buffersize)
-     
-     
+
+
 2010-06-17 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex1.c
      ! fixed buffer problem on getColumnList()
    ! source/sqlsrodbc.c
      ! fixed problem when  data is an real large string on odbcFieldGet()
-       
+
 2010-06-15 15:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex2.c
      ! fixed ResolveSpecialCols() function that on some cases was not updating indkey_xxx coluns
@@ -115,19 +121,19 @@
    ! source/sqlex2.c
      ! fixed ResolveSpecialCols() function that on some cases was not updating indkey_xxx coluns
    ! source/sqlrdd2.prg
-     ! updated oracle hits to use First_rows_xxxxx when oracle version is >=9  
+     ! updated oracle hits to use First_rows_xxxxx when oracle version is >=9
 
 2010-06-11 10:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! fixed oracle otimizer hint ( was " /* + FIRST_ROWS(1) */ "  , correct according to oracle docs (" /*+ FIRST_ROWS(1) */ "
-     
+
 2010-06-06 23:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex1.c
      + getMessagePtr() function due change of odbc to use pointer type
    ! source/sqlex2.c
-     ! fixed problem on ResolveSpecialCols() function that was incorrectly getting the arrays values 
+     ! fixed problem on ResolveSpecialCols() function that was incorrectly getting the arrays values
    ! source/sqlconnection.prg
-     ! some change on handles init to nil insted of 0 ( due change for pointer values on odbc) 
+     ! some change on handles init to nil insted of 0 ( due change for pointer values on odbc)
    ! source/sqlsrodbc.c
    ! source/sqlodbc.prg
      ! change odbc code to use pointers( hb_retptr (void*) data) insted of long values ( hb_retnl((LONG) Data) ), for better 64 bits support
@@ -137,17 +143,17 @@
 
 2010-04-12 22:14 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
-     ! fix DropColRules() method to remove firebird desceding index 
-     
+     ! fix DropColRules() method to remove firebird desceding index
+
 2010-03-02 19:24 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/firebird.c
      ! fixed return values for double/float values
-     
+
 2010-02-18 16:24 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! changed @@indentify with IDENT_CURRENT which is the recomended way to get the result of identify field
      ! fixed to altertabledirect under postgres
-     
+
 2010-02-09 23:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlrdd2.prg
      ! fix when column type of the index if logical
