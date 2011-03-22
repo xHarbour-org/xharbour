@@ -169,8 +169,11 @@ METHOD Draw( hDC ) CLASS VrLabel
           ELSE
             cText := ::Text
          ENDIF
-         IF ( n := ASCAN( ::Parent:aSubTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-            ::Parent:aSubTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+         IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+            ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+         ENDIF
+         IF ( n := ASCAN( ::Parent:aTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+            ::Parent:aTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
          ENDIF
          cText := ALLTRIM( xStr( cText ) )
 
@@ -285,24 +288,22 @@ RETURN NIL
 
 FUNCTION PaintMarkers( hDC, oCtrl )
    LOCAL i, aPt, hBrush, aPts := GetPoints( oCtrl )
-   IF .T.//oCtrl:Application:Props:PropEditor:ActiveObject:EditCtrl:hWnd == oCtrl:hWnd
-      hBrush := GetStockObject( BLACK_BRUSH )
-      FOR i := 1 TO LEN( aPts )
-          IF oCtrl:aSize[i]
-             aPt := {aPts[i][1], aPts[i][2]}
-             _ClientToScreen( oCtrl:hWnd, @aPt )
-             _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
-             aPts[i][1] := aPt[1]
-             aPts[i][2] := aPt[2]
-             aPt := {aPts[i][3], aPts[i][4]}
-             _ClientToScreen( oCtrl:hWnd, @aPt )
-             _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
-             aPts[i][3] := aPt[1]
-             aPts[i][4] := aPt[2]
-             _FillRect( hDC, aPts[i], hBrush )
-          ENDIF
-      NEXT
-   ENDIF
+   hBrush := GetStockObject( BLACK_BRUSH )
+   FOR i := 1 TO LEN( aPts )
+       IF oCtrl:aSize[i]
+          aPt := {aPts[i][1], aPts[i][2]}
+          _ClientToScreen( oCtrl:hWnd, @aPt )
+          _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
+          aPts[i][1] := aPt[1]
+          aPts[i][2] := aPt[2]
+          aPt := {aPts[i][3], aPts[i][4]}
+          _ClientToScreen( oCtrl:hWnd, @aPt )
+          _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
+          aPts[i][3] := aPt[1]
+          aPts[i][4] := aPt[2]
+          _FillRect( hDC, aPts[i], hBrush )
+       ENDIF
+   NEXT
 RETURN NIL
 
 FUNCTION DecToHexa(nNumber)

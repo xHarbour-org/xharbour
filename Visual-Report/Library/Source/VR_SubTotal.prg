@@ -15,26 +15,32 @@
 
 #define  acObjectTypeText           5
 
-CLASS VrSubTotal INHERIT VrLabel
+CLASS VrSubtotal INHERIT VrLabel
    DATA OnLabel EXPORTED INIT ""
-   DATA ClsName EXPORTED  INIT "SubTotal"
+   DATA ClsName EXPORTED  INIT "Subtotal"
    METHOD Init()  CONSTRUCTOR
    METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
-
-METHOD Init( oParent ) CLASS VrSubTotal
+METHOD Init( oParent ) CLASS VrSubtotal
    IF oParent != NIL
       Super:Init( oParent )
       AADD( ::aProperties, { "OnLabel", "Process"  } )
    ENDIF
 RETURN Self
 
-METHOD WriteProps( oXmlControl ) CLASS VrSubTotal
+//-----------------------------------------------------------------------------------------------
+METHOD WriteProps( oXmlControl ) CLASS VrSubtotal
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "OnLabel", NIL, ::OnLabel )
    oXmlControl:addBelow( oXmlValue )
    Super:WriteProps( oXmlControl )
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+CLASS VrTotal INHERIT VrSubtotal
+   DATA ClsName EXPORTED  INIT "Total"
+ENDCLASS
