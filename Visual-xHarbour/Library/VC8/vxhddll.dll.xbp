@@ -35,6 +35,8 @@ MYPRG_FLAGS =
 MYC_FLAGS =
 MYDEFINES =
 
+[filemem.lib]
+
 [\xhb\lib\vc8\Ole.lib]
 
 [\xhb\lib\vc8\ActiveX.lib]

@@ -40,6 +40,8 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
+[filemem.lib]
+
 [\xhb\lib\vc8\vxh.lib]
 
 [\xhb\lib\vc8\xEditVXH.lib]
@@ -59,3 +61,11 @@ MYRC_FLAGS =
 [\xhb\lib\vc8\Ole.lib]
 
 [\xhb\lib\vc8\ActiveX.lib]
+
+[\xhb\lib\libmysql.lib]
+
+[\xhb\lib\fbclient_ms.lib]
+
+[\xhb\lib\libpq.lib]
+
+[\xhb\lib\oci.lib]
