@@ -167,14 +167,14 @@ INIT PROCEDURE InitEditor()
 
    //t1.prg(7) Error E0018  LOOP statement with no loop in sight
    //t1.prg(16): error: Syntax error; found 'error' expecting ';'.
-   s_ErrorLine := HB_RegExComp( "(?i)(.+)\(([0-9]+)?\):? *(error:|Error [EF][0-9]+) (.+)" )
+   s_ErrorLine := HB_RegExComp( "(?i)(?:[0-9]+00\r+)*(.+)\(([0-9]+)?\):? *(error:|Error [EF][0-9]+) (.+)" )
 
    //xLINK: error: Unresolved external symbol '_HB_FUN_MISSING'.
    s_MissingExternal := HB_RegExComp( "(?i)(xLink)(:) *(error:|Error [EF][0-9]+) (.+)" )
 
    //hbsetup.ch(84) Warning I0001  Redefinition or duplicate definition of #define SOME_DEF
    //\xhb\include\gfx.ch(106): warning: Unknown preprocessor control: 'translate'.
-   s_WarningLine := HB_RegExComp( "(?i)(.+)\(([0-9]+)\):? *(warning:|Warning [A-Z][0-9]+) (.+)" )
+   s_WarningLine := HB_RegExComp( "(?i)(?:[0-9]+00\r+)*(.+)\(([0-9]+)\):? *(warning:|Warning [A-Z][0-9]+) (.+)" )
 
    //Type: C >>>couldn't build: t1.obj<<<
    s_TraceLog := HB_RegExComp( "Type: . >>>(.*)(<<<)?" )

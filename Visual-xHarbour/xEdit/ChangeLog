@@ -1,7 +1,11 @@
+2011-03-22 17:33 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     + Added support for compiler line number output to Warning & Error RegEx
+
 2010-11-23 07:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * xeditlib.prg
      ! Fixed compilation error for unused cBuffer (when VXH not defined)
- 
+
 2009-11-13 09:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * xeditlib.prg
      + Added logic to ProcessTextFile() to skip over \r at begin of line
