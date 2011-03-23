@@ -203,6 +203,11 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    DEFAULT ::cPort := 5432
 
    cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + " port=" + str(::cPort,6)
+   
+   IF !Empty( ::sslcert )
+      cConnect += " sslmode=prefer sslcert="+::sslcert +" sslkey="+::sslkey +" sslrootcert="+ ::sslrootcert +" sslcrl="+ ::sslcrl
+   ENDIF   
+   
    hDbc := PGSConnect( cConnect )
    nRet := PGSStatus( hDbc )
 

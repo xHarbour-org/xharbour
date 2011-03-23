@@ -7,6 +7,16 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-03-22 21:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     ! fixed minor memory leak when monting filters
+     ! added detection for sqlserver >=8.x
+   ! source/sqlconnection.prg
+     ! added new members to class to allow postgresql use ssl connection
+   ! source/sqlpgs.prg
+     ! added code to allow ssl connection
+   ! source/sqlrdd2.prg
+     ! when creating the index for sr_recno key under sqlserver, is the server support clustered index, this index will be clustered
 
 2011-03-22 17:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    ! source\sqlex1.c

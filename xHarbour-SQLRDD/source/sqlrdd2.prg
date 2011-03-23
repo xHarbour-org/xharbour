@@ -5118,7 +5118,9 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
    ::oSql:Commit()
 
    If lRet .and. ::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_ADABAS //  .or. ::oSql:nSystemID == SYSTEMID_CACHE /* Create SR_RECNO INDEX */
-      cSql := "CREATE INDEX " + LimitLen(::cFileName,3) + "_SR ON " + ::cOwner + SR_DBQUALIFY( cTblName, ::oSql:nSystemID ) + "(" + SR_DBQUALIFY( ::cRecnoName, ::oSql:nSystemID ) + ") " + if(::oSql:lComments," /* Unique Index */", "" )
+      // Culik 21/3/2011 if sqlserver suppor clustered index, we will use
+      cSql := "CREATE " + If(::oSql:lClustered," CLUSTERED " ," ") + "INDEX " + LimitLen(::cFileName,3) + "_SR ON " + ::cOwner + SR_DBQUALIFY( cTblName, ::oSql:nSystemID ) + "(" + SR_DBQUALIFY( ::cRecnoName, ::oSql:nSystemID ) + ") " + if(::oSql:lComments," /* Unique Index */", "" )
+   
       lRet := ::oSql:exec( cSql, .T. ) == SQL_SUCCESS
       ::oSql:Commit()
    EndIf
@@ -6885,7 +6887,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
    Local lPartialSeek := .F.
    Local cRet, cRet2, nFDec, nFLen, nScoping, nSimpl
    Local nThis, cSep, cQot, cNam, nFeitos, lNull
-
+altd()
    If len(::aIndex) > 0 .and. ::aInfo[ AINFO_INDEXORD ] > 0
 
       If valtype(uValue) == "B"

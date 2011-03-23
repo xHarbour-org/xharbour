@@ -91,8 +91,14 @@ CLASS SR_CONNECTION
    DATA nSetOpt, nSetValue, nMiliseconds
    DATA cPort, cHost, oSock, cDBS, cDrv, cDTB, cHandle       /* RPC stuff */
    DATA cCharSet, cNetLibrary
-
-
+   DATA cApp
+   // Culik Added to tell to postgresql use ssl
+   DATA sslcert
+   DATA sslkey
+   DATA sslrootcert
+   DATA sslcrl   
+   // CULIK 21/3/2011 Adicionado para indicar se o indice contem cluster
+   DATA lClustered AS LOGICAL INIT .F. READONLY
    PROTECTED:
 
    DATA cConnect, cDSN, cUser, cPassword
@@ -648,6 +654,7 @@ Return ""
 METHOD DetectTargetDb() CLASS SR_CONNECTION
 
    Local cTargetDB   := Upper( ::cSystemName )
+   Local aVers
 
    ::nSystemID := SYSTEMID_UNKNOW
 
@@ -658,8 +665,16 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
       ::nSystemID := SYSTEMID_MSSQL6
    Case ("SQL Server" $ cTargetDB .and. "00.53.0000" $ ::cSystemVers) .or. ("MICROSOFT SQL SERVER" $ cTargetDB)
       ::nSystemID := SYSTEMID_MSSQL7
+      aVers := hb_atokens( ::cSystemVers , '.' ) 
+      IF val(aVers[1]) >= 8
+         ::lClustered := .T.
+      ENDIF         
    Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "7.0" $ ::cSystemVers .or. "8.0" $ ::cSystemVers )) //.or. ( "SQL SERVER" $ cTargetDB .and. !("SYBASE" $ cTargetDB))
       ::nSystemID := SYSTEMID_MSSQL7
+      aVers := hb_atokens( ::cSystemVers , '.' ) 
+      IF val(aVers[1]) >= 8
+         ::lClustered := .T.
+      ENDIF         
    Case "ANYWHERE" $ cTargetDB
       ::nSystemID := SYSTEMID_SQLANY
    Case "SYBASE" $ cTargetDB .or. "SQL SERVER" $ cTargetDB
@@ -934,6 +949,7 @@ METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
    ::oSql         = Self            && NewAge backwards compatible...
    ::cCharSet     = NIL             && should be NIL or FB does not work
    ::lCluster     = .F.
+   ::lClustered   := .F.   
 
    If ::lCounter
       ::lLowLevSqlDbg   = (!Empty( GetEnv( "QUERYDEBUGCOUNTER" ) )) .and. upper(GetEnv( "QUERYDEBUGCOUNTER" )) $ "Y,S,TRUE"
@@ -997,6 +1013,16 @@ METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
             EndIf
          Case cBuff == "NETWORK" .or. cBuff == "LIBRARY" .or. cBuff == "NETLIBRARY"
             ::cNetLibrary := aToken[2]
+         CASE cBuff == "APP"   
+            ::cApp :=  aToken[2]
+         CASE cBuff == "SSLCERT"      
+            ::sslcert := aToken[2]
+         CASE cBuff == "SSLKEY"      
+            ::sslkey := aToken[2]
+         CASE cBuff == "SSLROOTCERT"      
+            ::sslrootcert := aToken[2]
+         CASE cBuff == "SSLCRL"      
+            ::sslcrl    := aToken[2]   
 //         OtherWise
 //            SR_MsgLogFile( "Invalid connection string entry : " + cBuff + " = " + SR_Val2Char(aToken[2]) )
          EndCase
@@ -1082,17 +1108,17 @@ METHOD SQLLen( nType, nLen, nDec )  CLASS SR_CONNECTION
         nType == SQL_INTEGER  .OR. ;
         nType == SQL_FLOAT    .or. nType == SQL_REAL     .OR. ;
         nType == SQL_DOUBLE
-
+tracelog('nLen',nLen,'nDec',nDec)
       If nLen > 19 .and. nDec > 10 .and. !( nLen = 38 .and. nDec = 0 )
          nLen := 20
          nDec := 6
       EndIf
-
+tracelog('nLen',nLen,'nDec',nDec)
       If !( nLen = 38 .and. nDec = 0 )
          nLen := min( nLen, 20 )
          nLen := max( nLen, 1 )
       EndIf
-
+tracelog('nLen',nLen,'nDec',nDec)
    case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE
      nLen := 8
 

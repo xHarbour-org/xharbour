@@ -1071,20 +1071,23 @@ void SolveFilters( SQLEXAREAP thiswa, BOOL bWhere )
    else
    {
 	  char * sFilter = getMessageC( thiswa->oWorkArea, "CFILTER" );
-	  if ( sFilter[0] )
+	  if ( sFilter )
 	  {
-         if( bWhere )
-         {
-            temp = hb_strdup( (const char *) thiswa->sWhere );
-            sprintf( thiswa->sWhere, "%s AND ( %s )", temp, sFilter );
-            hb_xfree( temp );
+	     if ( sFilter[0] )
+	     {
+            if( bWhere )
+            {
+               temp = hb_strdup( (const char *) thiswa->sWhere );
+               sprintf( thiswa->sWhere, "%s AND ( %s )", temp, sFilter );
+               hb_xfree( temp );
+            }
+            else
+            {
+               sprintf( thiswa->sWhere, "\nWHERE ( %s )", sFilter );
+               bWhere = TRUE;
+            }
+            hb_xfree( sFilter  );
          }
-         else
-         {
-            sprintf( thiswa->sWhere, "\nWHERE ( %s )", sFilter );
-            bWhere = TRUE;
-         }
-         hb_xfree( sFilter  );
       }
    }
 
