@@ -11,14 +11,15 @@
 
 #include "debug.ch"
 #include "vxh.ch"
-
-#define  acObjectTypeText           5
+#include "hbxml.ch"
 
 CLASS VrFormula INHERIT VrObject
-   DATA Value    EXPORTED INIT ""
+   DATA Formula  EXPORTED INIT ""
    DATA ClsName  EXPORTED INIT "Formula"
+   DATA lUI      EXPORTED INIT .F.
    DATA Button   EXPORTED
    METHOD Init()  CONSTRUCTOR
+   METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -27,8 +28,14 @@ METHOD Init( oParent ) CLASS VrFormula
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      AADD( ::aProperties, { "Value",  "General"  } )
+      AADD( ::aProperties, { "Formula", "General"  } )
       AADD( ::aProperties, { "Name",   "Object"  } )
    ENDIF
+RETURN Self
+
+METHOD WriteProps( oXmlControl ) CLASS VrFormula
+   LOCAL oXmlValue, oXmlFont
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Formula", NIL, ::Formula )
+   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 

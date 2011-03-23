@@ -699,7 +699,9 @@ METHOD Close() CLASS Report
       AEVAL( :Props:RepHeader:Objects, {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:RepFooter:Objects, {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:Header:Objects,    {|o|o:EditCtrl:Destroy()} )
-      AEVAL( :Props:Body:Objects,      {|o|o:EditCtrl:Destroy()} )
+      
+      AEVAL( :Props:Body:Objects,      {|o|IIF( o:EditCtrl != NIL, o:EditCtrl:Destroy(),) } )
+      
       AEVAL( :Props:Footer:Objects,    {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:ExtraPage:Objects, {|o|o:EditCtrl:Destroy()} )
       :Props:RepHeader:Objects := {}
@@ -901,7 +903,7 @@ METHOD Save( lSaveAs ) CLASS Report
       IF !EMPTY( aCtrl := oApp:Props:Body:Objects )
          oXmlBody := TXmlNode():new( , "Body" )
          FOR n := 1 TO LEN( aCtrl )
-             IF aCtrl[n]:lUI
+             IF aCtrl[n]:lUI .OR. aCtrl[n]:ClsName == "Formula"
                 ::Generate( aCtrl[n], @oXmlBody )
              ENDIF
          NEXT

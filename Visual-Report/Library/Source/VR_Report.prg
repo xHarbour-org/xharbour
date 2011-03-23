@@ -63,6 +63,7 @@ CLASS VrReport INHERIT VrObject
    DATA aExtra         EXPORTED
    DATA aSubtotals     EXPORTED  INIT {}
    DATA aTotals        EXPORTED  INIT {}
+   DATA aFormulas      EXPORTED  INIT {}
 
    ACCESS Application  INLINE __GetApplication()
 
@@ -185,6 +186,9 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
       oControl:Text      := aCtrl[n][2]
    ENDIF
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORMULA"} ) ) > 0
+      oControl:Formula := aCtrl[n][2]
+   ENDIF
 
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
       oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
@@ -248,6 +252,7 @@ RETURN nHeight
 METHOD GetSubtotalHeight( hDC ) CLASS VrReport
    LOCAL i, n, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
    ::aSubtotals := {}
+   ::aFormulas  := {}
    FOR EACH aCtrl IN aBody
        IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
@@ -256,6 +261,8 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
              nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
           ENDIF
+       ELSEIF UPPER( aCtrl[1][2] ) == "VRFORMULA"
+          AADD( ::aFormulas, {aCtrl[2][2],aCtrl[3][2]} )
        ENDIF
    NEXT
 RETURN nHeight
