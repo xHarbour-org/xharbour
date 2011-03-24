@@ -17,6 +17,7 @@
 
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text     READ xText WRITE SetText
+   DATA Formula      EXPORTED  INIT ""
    DATA AutoResize   EXPORTED  INIT .F.
    DATA ClsName      EXPORTED  INIT "Label"
    DATA SysBackColor EXPORTED  INIT GetSysColor( COLOR_WINDOW )
@@ -36,13 +37,14 @@ ENDCLASS
 METHOD Init( oParent ) CLASS VrLabel
    IF oParent != NIL
       Super:Init( oParent )
-      AADD( ::aProperties, { "Name",      "Object"  } )
-      AADD( ::aProperties, { "Font",      "General" } )
-      AADD( ::aProperties, { "Text",      "General" } )
       AADD( ::aProperties, { "BackColor", "Color"   } )
       AADD( ::aProperties, { "ForeColor", "Color"   } )
-      AADD( ::aProperties, { "Width",     "Size"   } )
-      AADD( ::aProperties, { "AutoResize","Size"   } )
+      AADD( ::aProperties, { "Font",      "General" } )
+      AADD( ::aProperties, { "Text",      "General" } )
+      AADD( ::aProperties, { "Formula",   "General" } )
+      AADD( ::aProperties, { "Name",      "Object"  } )
+      AADD( ::aProperties, { "Width",     "Size"    } )
+      AADD( ::aProperties, { "AutoResize","Size"    } )
    ENDIF
    DEFAULT ::Font TO Font()
    ::Font:AllowHandle := oParent != NIL
@@ -125,6 +127,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alignment", NIL, XSTR( ::Alignment ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Formula", NIL, XSTR( ::Formula ) )
    oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )

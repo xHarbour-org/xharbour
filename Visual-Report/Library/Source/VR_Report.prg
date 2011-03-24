@@ -173,7 +173,7 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
     ELSE
       oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
    ENDIF
-
+   //------------------------------------------------------------------------------------------
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "NAME"} ) ) > 0
       oControl:Name := aCtrl[n][2]
    ENDIF
@@ -189,7 +189,10 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORMULA"} ) ) > 0
       oControl:Formula := aCtrl[n][2]
    ENDIF
-
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "VALUE"} ) ) > 0
+      oControl:Value := aCtrl[n][2]
+   ENDIF
+   //------------------------------------------------------------------------------------------
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
       oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
    ENDIF
@@ -269,13 +272,23 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
-   LOCAL cArray, x, y, i, n, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   LOCAL cArray, x, y, i, n, nForm, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
    DEFAULT cField TO "SUBTOTAL"
    cArray := cField+"S"
+
    FOR EACH aCtrl IN aBody
        IF UPPER( aCtrl[1][2] ) != "VR"+cField .AND. ( nSub := ASCAN( ::aSubtotals, {|a| UPPER(a[1])==UPPER(aCtrl[2][2])} ) ) > 0
+
           IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VR"+cField .AND. UPPER(a[3][1])=="ONLABEL" .AND. UPPER(a[3][2])==UPPER(aCtrl[2][2])} ) ) > 0
-             aBody[i][4][2] := xStr(::a&cArray[nSub][2])
+
+             cText := aBody[i][4][2]
+             nForm := ASCAN( aCtrl, {|a| UPPER(a[1])=="FORMULA"} )
+
+             IF nForm > 0 .AND. ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aCtrl[nForm][2]) } ) ) > 0
+                aBody[i][4][2] := &(::aFormulas[n][2])
+              ELSE
+                aBody[i][4][2] := xStr(::a&cArray[nSub][2])
+             ENDIF
 
              IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
                 x := aCtrl[x][2]
@@ -293,7 +306,10 @@ METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
 
              ::CreateControl( aBody[i], @nHeight,, hDC )
              ::a&cArray[nSub][2] := 0
+             
+             aBody[i][4][2] := cText
           ENDIF
+
        ENDIF
    NEXT
    ::nRow += nHeight

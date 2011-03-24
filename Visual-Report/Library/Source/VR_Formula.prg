@@ -14,7 +14,7 @@
 #include "hbxml.ch"
 
 CLASS VrFormula INHERIT VrObject
-   DATA Formula  EXPORTED INIT ""
+   DATA Value    EXPORTED INIT ""
    DATA ClsName  EXPORTED INIT "Formula"
    DATA lUI      EXPORTED INIT .F.
    DATA Button   EXPORTED
@@ -28,14 +28,14 @@ METHOD Init( oParent ) CLASS VrFormula
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      AADD( ::aProperties, { "Formula", "General"  } )
+      AADD( ::aProperties, { "Value", "General"  } )
       AADD( ::aProperties, { "Name",   "Object"  } )
    ENDIF
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrFormula
    LOCAL oXmlValue, oXmlFont
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Formula", NIL, ::Formula )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Value", NIL, ::Value )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 

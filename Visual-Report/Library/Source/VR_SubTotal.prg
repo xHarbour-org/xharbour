@@ -24,9 +24,13 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS VrSubtotal
+   LOCAL n
    IF oParent != NIL
       Super:Init( oParent )
       AADD( ::aProperties, { "OnLabel", "Process"  } )
+      IF ( n := ASCAN( ::aProperties, {|a| a[1]=="Text"} ) ) > 0
+         ADEL( ::aProperties, n, .T. )
+      ENDIF
    ENDIF
 RETURN Self
 
