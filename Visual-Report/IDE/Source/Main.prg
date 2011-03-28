@@ -441,7 +441,7 @@ METHOD Init() CLASS MainForm
          END
 
          WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
-            :Caption      := "Header"
+            :Caption      := "Page Header"
             :BackColor    := ::System:Color:White
             :Left         := 2
             :Top          := 2
@@ -483,7 +483,7 @@ METHOD Init() CLASS MainForm
          END
 
          WITH OBJECT ::Application:Props[ "Footer" ] := FooterEdit( :this )
-            :Caption      := "Footer"
+            :Caption      := "Page Footer"
             :BackColor    := ::System:Color:White
             :Border       := .T.
             :Left         := 2
