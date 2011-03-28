@@ -19,7 +19,7 @@ static aDef := {"BMP","ICO"}
 #include "uxTheme.ch"
 
 #define CTYPE_BOOL                 9
-
+#define PP_MOVEOVERLAY 8
 #define HKEY_CLASSES_ROOT            (0x80000000)
 #define HKEY_CURRENT_USER            (0x80000001)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
@@ -4144,10 +4144,10 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
-METHOD MessageWait( cText, nTimeOut, nColor ) CLASS Window
+METHOD MessageWait( cText, lProgress, nTimeOut, nColor ) CLASS Window
    LOCAL oWnd, oLabel
-
-   oWnd := MsgWait( Self )
+   DEFAULT lProgress TO .F.
+   oWnd := MsgWait( Self, lProgress )
    oWnd:Caption := cText
    oWnd:Style := WS_POPUP + WS_DLGFRAME
 
@@ -4375,27 +4375,70 @@ RETURN nRet
 //---------------------------------------------------------------------------------------------
 
 CLASS MsgWait FROM WinForm
+   DATA lProgress EXPORTED INIT .F.
+   DATA lXP       PROTECTED
+
+   DATA xPosition       PROTECTED INIT 0
+   ACCESS Position      INLINE ::xPosition PERSISTENT
+   ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
+
    METHOD Init() CONSTRUCTOR
    METHOD OnEraseBkGnd()
    METHOD Create()
+   METHOD SetPosition()
 ENDCLASS
 
-METHOD Init( oParent ) CLASS MsgWait
+METHOD Init( oParent, lProgress ) CLASS MsgWait
    ::__xCtrlName := "MessageWait"
+   ::lXP := ::Application:IsThemedXP .AND. ::Theming
+   ::lProgress := lProgress
 RETURN ::Super:Init( oParent )
 
 METHOD Create() CLASS MsgWait
    LOCAL aAlign
+   IF ::lProgress
+      ::Height += 24
+   ENDIF
    ::Super:Create()
 RETURN Self
 
+METHOD SetPosition() CLASS MsgWait
+   LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
+   LOCAL hDC := GetDC( ::hWnd )
+   hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
+   aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
+   DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
+   aBar[1]+=1
+   aBar[2]+=1
+   aBar[3]-=1
+   aBar[4]-=1
+
+   aBar[3] := aBar[1] + (((aBar[3] - aBar[1]) * ::xPosition )/100)
+   DrawThemeBackground( hTheme, hDC, PP_CHUNK, 0, aBar )
+
+   CloseThemeData( hTheme )
+   ReleaseDC( ::hWnd, hDC )
+RETURN Self
+   
 METHOD OnEraseBkGnd( hDC ) CLASS MsgWait
-   LOCAL aRect := _GetClientRect( ::hWnd )
+   LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
    _FillRect( hDC, aRect, GetSysColorBrush( COLOR_BTNFACE ) )
    aRect[1]+=5
    aRect[2]+=5
    aRect[3]-=5
    aRect[4]-=5
+   IF ::lProgress
+      aRect[4]-= 24
+
+      IF ::lXP
+         hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
+         aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
+         DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
+         CloseThemeData( hTheme )
+         ::Application:DoEvents()
+      ENDIF
+
+   ENDIF
    SetBkMode( hDC, TRANSPARENT )
    SelectObject( hDC, ::Font:Handle )
    _DrawText( hDC, ::Caption, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
@@ -5271,6 +5314,7 @@ CLASS WinForm INHERIT Window
 
    METHOD OnSysCommand()
    METHOD SetInstance()
+   METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

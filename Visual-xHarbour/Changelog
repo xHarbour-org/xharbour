@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-28 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added ::MessageWait a 2nd parameter lProgress to display a ProgressBar
+   + Added ::MessageWait:Position to advance the ProgressBar
+
 2011-03-15 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ShortcutKey accelerators to work ONLY on active form
    ! Fixed DataGrid Update()
