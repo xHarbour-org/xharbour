@@ -179,6 +179,10 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    cProp := oItem:ColItems[1]:Prop
    cProp2:= oItem:ColItems[1]:Prop2
 
+   IF cProp IN {"Formula", "OnLabel"}
+      __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
+      RETURN NIL
+   ENDIF
    IF cProp IN {"DataSource"}
       IF xValue != NIL
          xValue := oItem:ColItems[1]:Value[2][ xValue ]
@@ -377,6 +381,10 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                   cText  := cText[1]
                   IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. ::ActiveObject:DataSource != NIL
                      cText := ::ActiveObject:DataSource:Name
+                   ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
+                     cText := ::ActiveObject:Formula
+                   ELSEIF oItem:ColItems[n]:ColType == "ONLABEL"
+                     cText := ::ActiveObject:OnLabel
                   ENDIF
                   EXIT
 
@@ -720,7 +728,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType == "DATASOURCE"
+                   CASE cType IN { "DATASOURCE", "FORMULA", "ONLABEL" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -837,6 +845,26 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           NEXT
           xValue := NIL
         
+        ELSEIF UPPER(cProp) == "FORMULA"
+          aCol[1]:ColType := "FORMULA"
+          aCol[1]:Value   := { "", { NIL } }
+          FOR EACH Child IN ::Application:Props:Components:Children
+              IF Child:Component:ClsName == "Formula"
+                 AADD( aCol[1]:Value[2], Child:Component )
+              ENDIF
+          NEXT
+          xValue := NIL
+        
+        ELSEIF UPPER(cProp) == "ONLABEL"
+          aCol[1]:ColType := "ONLABEL"
+          aCol[1]:Value   := { "", { NIL } }
+          FOR EACH Child IN ::Application:Props:Body:Objects
+              IF Child:ClsName == "Label"
+                 AADD( aCol[1]:Value[2], Child )
+              ENDIF
+          NEXT
+          xValue := NIL
+
         ELSEIF UPPER(cProp) == "BACKCOLOR" .OR. UPPER(cProp) == "FORECOLOR"
           xValue := ::ActiveObject:&cProp
           n := hScan( ::System:Color, xValue )

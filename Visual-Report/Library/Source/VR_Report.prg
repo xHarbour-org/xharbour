@@ -282,9 +282,10 @@ METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
           IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VR"+cField .AND. UPPER(a[3][1])=="ONLABEL" .AND. UPPER(a[3][2])==UPPER(aCtrl[2][2])} ) ) > 0
 
              cText := aBody[i][4][2]
-             nForm := ASCAN( aCtrl, {|a| UPPER(a[1])=="FORMULA"} )
 
-             IF nForm > 0 .AND. ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aCtrl[nForm][2]) } ) ) > 0
+             nForm := ASCAN( aBody[i], {|a| UPPER(a[1])=="FORMULA"} )
+
+             IF nForm > 0 .AND. ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aBody[i][nForm][2]) } ) ) > 0
                 aBody[i][4][2] := &(::aFormulas[n][2])
               ELSE
                 aBody[i][4][2] := xStr(::a&cArray[nSub][2])
@@ -463,8 +464,8 @@ METHOD Load( cReport ) CLASS VrReport
 RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
-METHOD Run( oDoc ) CLASS VrReport
-   LOCAL nHeight, hDC, nSubHeight, nTotHeight
+METHOD Run( oDoc, oWait ) CLASS VrReport
+   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos
 
    ::Create()
 
@@ -487,6 +488,7 @@ METHOD Run( oDoc ) CLASS VrReport
       ::DataSource:Alias    := ::aData:Alias
       ::DataSource:bFilter  := ::aData:bFilter
       ::DataSource:Create()
+      nCount := ::DataSource:EditCtrl:RecCount()
    ENDIF
 
    ::CreateHeader( hDC )
@@ -499,7 +501,7 @@ METHOD Run( oDoc ) CLASS VrReport
       
       nSubHeight := ::GetSubtotalHeight( hDC )
       nTotHeight := ::GetTotalHeight( hDC )
-      
+      nPos := 0
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight - nSubHeight )
@@ -512,6 +514,8 @@ METHOD Run( oDoc ) CLASS VrReport
             ::StartPage()
             ::CreateHeader( hDC )
          ENDIF
+         oWait:Position := Int( (nPos/nCount)*100 )
+         nPos ++
          ::DataSource:EditCtrl:Skip()
       ENDDO
       ::CreateSubtotals( hDC, "SUBTOTAL" )
