@@ -234,6 +234,7 @@ CLASS __VrLabel INHERIT Label
    METHOD OnLButtonDown()
    METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
+   METHOD OnKeyDown()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -271,6 +272,12 @@ FUNCTION GetPoints( oCtrl )
                 { aRect[3]-n, 0, aRect[3], n },; // right top
                 { (aRect[3]-n)/2, 0, (aRect[3]+n)/2, n } } // top
 RETURN aPoints
+
+METHOD OnKeyDown( nKey ) CLASS __VrLabel
+   IF nKey == VK_DELETE
+      ::Application:Props:PropEditor:ActiveObject:Delete()
+   ENDIF
+RETURN Self
 
 FUNCTION MouseMove( oCtrl, n, x, y )
    LOCAL i, aPoint, aPoints, nCursor := 0

@@ -26,7 +26,7 @@ CLASS VrDataTable INHERIT VrObject
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-
+   DATA Order            EXPORTED INIT ""
    DATA bFilter          EXPORTED  INIT ""
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" } }
 
@@ -44,7 +44,8 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "FileName",  "General"  } )
       AADD( ::aProperties, { "Alias",     "General"  } )
       AADD( ::aProperties, { "bFilter",   "General"  } )
-      AADD( ::aProperties, { "Name",      "Object"  } )
+      AADD( ::aProperties, { "Name",      "Object"   } )
+      AADD( ::aProperties, { "Order",     "Index"    } )
    ENDIF
 RETURN Self
 
@@ -58,6 +59,9 @@ METHOD Create() CLASS VrDataTable
       :Create()
       IF ! EMPTY( ::bFilter )
          :SetFilter( &(::bFilter) )
+      ENDIF
+      IF ! EMPTY( ::Order )
+         :OrdSetFocus( ::Order )
       ENDIF
    END
 

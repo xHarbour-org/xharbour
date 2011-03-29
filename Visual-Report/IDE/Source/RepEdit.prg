@@ -38,6 +38,7 @@ CLASS RepEdit INHERIT Panel
    METHOD OnDestroy() INLINE DeleteObject( ::hBmpGrid ), NIL
    METHOD CreateControl()
    METHOD Snap()
+   METHOD OnKeyDown()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +68,14 @@ METHOD Create() CLASS RepEdit
    ::xBmpSize := xSize
    ::yBmpSize := ySize
 RETURN Self
+
+METHOD OnKeyDown( nKey ) CLASS RepEdit
+view nKey
+   IF nKey == VK_DELETE
+      ::Application:Props:PropEditor:ActiveObject:Delete()
+   ENDIF
+RETURN Self
+
 
 METHOD Snap( nPos ) CLASS RepEdit
 RETURN IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked, Snap( nPos, ::xGrid ), nPos )
@@ -104,7 +113,6 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
                  oCtrl:Top    := ::Snap( y-::nDownPos[2] )
                  oCtrl:Width  += nx-oCtrl:Left
                  oCtrl:Height += ny-oCtrl:Top
-
                  oCtrl:EditCtrl:Width  += nx-oCtrl:Left
                  oCtrl:EditCtrl:Height += ny-oCtrl:Top
 
@@ -114,29 +122,43 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
                  oCtrl:Width += nx-oCtrl:Left
                  oCtrl:EditCtrl:Width += nx-oCtrl:Left
 
+             CASE ::nMove == 3 // Left-Bottom
+                 nx := oCtrl:Left
+                 ny := oCtrl:Height
+                 oCtrl:Left   := ::Snap( x-::nDownPos[1] )
+                 oCtrl:Height := ::Snap( y-oCtrl:Top )
+                 oCtrl:Width  += nx-oCtrl:Left
+                 oCtrl:EditCtrl:Width  += nx-oCtrl:Left
+                 oCtrl:EditCtrl:Height := oCtrl:Height
+
+            CASE ::nMove == 4 // Bottom
+                 oCtrl:Height := ::Snap( y-oCtrl:Top )
+                 oCtrl:EditCtrl:Height := oCtrl:Height
+
+            CASE ::nMove == 5 // Right-Bottom
+                 oCtrl:Width  := ::Snap( x-oCtrl:Left )
+                 oCtrl:Height := ::Snap( y-oCtrl:Top )
+                 oCtrl:EditCtrl:Width := oCtrl:Width
+                 oCtrl:EditCtrl:Height := oCtrl:Height
+
             CASE ::nMove == 6 // Right
                  oCtrl:Width := ::Snap( x-oCtrl:Left )
                  oCtrl:EditCtrl:Width := oCtrl:Width
 
-//             CASE ::nMove == 3 // Left-Bottom
-//                  nx := oCtrl:Left
-//                  ny := oCtrl:Height
-//                  IF ::Application:Props[ "ViewMenuGrid" ]:Checked
-//                     oCtrl:Left   := Snap( x-::nDownPos[1], ::xGrid )
-//                     oCtrl:Height := Snap( y-::nDownPos[2], ::xGrid )
-//                   ELSE
-//                     oCtrl:Left   := y-::nDownPos[1]
-//                     oCtrl:Height := y-::nDownPos[2]
-//                  ENDIF
-//                  oCtrl:Width += nx-oCtrl:Left
+            CASE ::nMove == 7 // Top-Right
+                 ny := oCtrl:Top
+                 oCtrl:Top    := ::Snap( y-::nDownPos[2] )
+                 oCtrl:Width  := ::Snap( x-oCtrl:Left )
+                 oCtrl:Height += ny-oCtrl:Top
+                 oCtrl:EditCtrl:Width  := oCtrl:Width
+                 oCtrl:EditCtrl:Height += ny-oCtrl:Top
 
+            CASE ::nMove == 8 // Top
+                 ny := oCtrl:Top
+                 oCtrl:Top    := ::Snap( y-::nDownPos[2] )
+                 oCtrl:Height += ny-oCtrl:Top
+                 oCtrl:EditCtrl:Height += ny-oCtrl:Top
 
-
-
-//                     aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
-//                     aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
-//                     nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
-//                     aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
          ENDCASE
          oCtrl:MoveWindow()
       ENDIF
