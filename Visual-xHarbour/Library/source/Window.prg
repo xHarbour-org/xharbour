@@ -160,6 +160,10 @@ CLASS Window INHERIT Object
 
    DATA DisableParent          PUBLISHED INIT .F.
    DATA AutoClose              EXPORTED INIT .T.
+   
+   DATA VertScrollSize         EXPORTED INIT 0
+   DATA HorzScrollSize         EXPORTED INIT 0
+
    DATA VertScroll             EXPORTED INIT .F.
    DATA HorzScroll             EXPORTED INIT .F.
 
@@ -386,6 +390,8 @@ CLASS Window INHERIT Object
    METHOD __GetShowMode()
    METHOD __SetFrameStyle()
    METHOD __SetWindowCursor()
+   METHOD __SetVertScrollSize(n) INLINE IIF( ::OriginalRect != NIL, (::OriginalRect[4] := n, IIF( ::IsWindow(), ::__SetScrollBars(),)),)
+   METHOD __SetHorzScrollSize(n) INLINE IIF( ::OriginalRect != NIL, (::OriginalRect[3] := n, IIF( ::IsWindow(), ::__SetScrollBars(),)),)
    METHOD __SetSizePos()
    METHOD __GetBrush()         VIRTUAL
    METHOD __PaintBakgndImage() VIRTUAL
@@ -1005,6 +1011,16 @@ METHOD Create( oParent ) CLASS Window
    ::__ClientRect   := { ::Left, ::Top, ::Width, ::Height }
    ::OriginalRect := { ::Left, ::Top, ::ClientWidth, ::ClientHeight }
 
+   IF ::VertScrollSize > 0
+      ::OriginalRect[4] := ::VertScrollSize
+    ELSE
+      ::VertScrollSize := ::ClientHeight
+   ENDIF
+   IF ::HorzScrollSize > 0
+      ::OriginalRect[3] := ::HorzScrollSize
+    ELSE
+      ::HorzScrollSize := ::ClientWidth
+   ENDIF
    ::Font:Set( Self )
 
    TRY
@@ -5226,6 +5242,9 @@ CLASS WinForm INHERIT Window
    DATA MaxWidth                PUBLISHED INIT 0
    DATA MaxHeight               PUBLISHED INIT 0
    DATA ShowInTaskBar           PUBLISHED INIT .T.
+
+   PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
+   PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
    PROPERTY ToolWindow    INDEX WS_EX_TOOLWINDOW    READ xToolWindow      WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY TopMost       INDEX WS_EX_TOPMOST       READ xTopMost         WRITE SetExStyle      DEFAULT .F. PROTECTED

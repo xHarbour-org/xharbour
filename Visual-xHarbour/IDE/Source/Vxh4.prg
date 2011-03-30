@@ -3700,6 +3700,8 @@ STATIC FUNCTION GetPropArray()
                     { "Striping",                "Appearance", },;
                     { "TabStripStyle",           "Appearance", },;
                     { "PaperSize",               "Appearance", },;
+                    { "VertScrollSize",          "Behavior", },;
+                    { "HorzScrollSize",          "Behavior", },;
                     { "AllowCurrentPage",        "Behavior", },;
                     { "AllowPrintFile",          "Behavior", },;
                     { "AllowSelection",          "Behavior", },;
