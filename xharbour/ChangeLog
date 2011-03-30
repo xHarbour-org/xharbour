@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-30 10:46 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/tip/sendmail.prg
+    ! fixed return value of sendmail function
+  * source/tip/ftpcln.org
+    ! fixed open method to handle ftp server long login messages
+    
 2011-03-19 03:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/memvars.c
     ! fix date type memvar returns incorrect data type when restored.

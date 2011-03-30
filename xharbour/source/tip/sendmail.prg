@@ -344,10 +344,14 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
        aadd(aData, substr( cData,nCount,1024))
    next
    nSent :=0
+
+
    for nCount :=1 to len(aData)
       nSent += oInmail:Write( aData[nCount],len(aData[nCount]))
    next
-   oInMail:Commit()
+
+   lReturn := oInMail:Commit()
+
    oInMail:Close()
 
 RETURN lReturn

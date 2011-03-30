@@ -116,6 +116,8 @@ CLASS tIPClientFTP FROM tIPClient
    DATA SocketControl
    DATA SocketPortServer
    DATA cLogFile
+   // Culik new data to verify if we finish user command
+   DATA lInUser
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
@@ -177,7 +179,7 @@ Return
 METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientFTP
    local cFile :="ftp"
    local n := 0
-
+   ::lInUser := .F.
    ::super:new( oUrl, lTrace, oCredentials)
    ::nDefaultPort := 21
    ::nConnTimeout := 3000
@@ -212,7 +214,7 @@ RETURN NIL
 
 
 METHOD Open( cUrl ) CLASS tIPClientFTP
-
+Local lRet := .F.
    IF HB_IsString( cUrl )
       ::oUrl := tUrl():New( cUrl )
    ENDIF
@@ -232,9 +234,18 @@ METHOD Open( cUrl ) CLASS tIPClientFTP
          ::InetSendall( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          // set binary by default
          IF ::GetReply() .and. ::TypeI()
-            RETURN .T.
+            lRet := .T.
          ENDIF
       ENDIF
+   ENDIF
+   IF lRet
+      WHILE .T.
+         ::GetReply()
+         IF ::cReply == NIL
+            EXIT
+         ENDIF
+      ENDDO
+      RETURN lRet
    ENDIF
 RETURN .F.
 
@@ -251,7 +262,7 @@ METHOD GetReply() CLASS tIPClientFTP
    ENDIF
 
    // now, if the reply has a '-' as fourth character, we need to proceed...
-   WHILE ! Empty( cRep ) .and. cRep[4] == '-'
+   WHILE (! Empty( cRep ) .and. cRep[4] == '-' ) 
       ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
       cRep := If( ValType( ::cReply ) == "C", ::cReply, "" )
    ENDDO
