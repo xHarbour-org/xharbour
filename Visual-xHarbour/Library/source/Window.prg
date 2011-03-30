@@ -2520,6 +2520,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            EXIT
 
       CASE WM_KEYDOWN
+           VIEW ::Name, ::ClsName
            IF ::Parent != NIL
               nRet := ::Parent:OnChildKeyDown( hWnd, nMsg, nwParam, nlParam )
               IF nRet != NIL
