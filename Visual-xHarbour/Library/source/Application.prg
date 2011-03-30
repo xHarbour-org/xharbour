@@ -657,22 +657,28 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 METHOD TranslateAccelerator( Msg ) CLASS Application
-   LOCAL lRet := .F., n, hWnd
+   LOCAL lRet := .F., n, hWnd, lAlt, lShift, lCtrl
    IF Msg:message == WM_KEYDOWN
-      FOR n := 1 TO LEN( ::__Accelerators )
-          IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
-             hWnd := GetActiveWindow()
-             WHILE hWnd != 0 .AND. ! IsChild( ::__Accelerators[n][1], hWnd )
-                hWnd := GetParent( hWnd )
-             ENDDO
-             IF IsChild( ::__Accelerators[n][1], hWnd ) .OR. ::__Accelerators[n][1] == GetActiveWindow()
-                IF !TranslateAccelerator( ::__Accelerators[n][1], ::__Accelerators[n][2], Msg ) == 0
-                   lRet := .T.
-                   EXIT
+      //lAlt   := CheckBit( GetKeyState( VK_MENU ) , 32768 )
+      //lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
+      //lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
+      
+      //IF lAlt .OR. lShift .OR. lCtrl
+         FOR n := 1 TO LEN( ::__Accelerators )
+             IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
+                hWnd := GetActiveWindow()
+                WHILE hWnd != 0 .AND. ! IsChild( ::__Accelerators[n][1], hWnd )
+                   hWnd := GetParent( hWnd )
+                ENDDO
+                IF IsChild( ::__Accelerators[n][1], hWnd ) .OR. ::__Accelerators[n][1] == GetActiveWindow()
+                   IF !TranslateAccelerator( ::__Accelerators[n][1], ::__Accelerators[n][2], Msg ) == 0
+                      lRet := .T.
+                      EXIT
+                   ENDIF
                 ENDIF
              ENDIF
-          ENDIF
-      NEXT
+         NEXT
+      //ENDIF
    ENDIF
 RETURN lRet
 
