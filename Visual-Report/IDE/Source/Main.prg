@@ -181,7 +181,7 @@ METHOD Init() CLASS MainForm
          WITH OBJECT MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Delete
             :Caption := "&Delete"
-            :Action  := {||oApp:Props:PropEditor:ActiveObject:Delete()}
+            :Action  := {||KeyDown( oApp:Props:PropEditor:ActiveObject:EditCtrl, VK_DELETE ) }
             :Create()
          END
 
@@ -412,14 +412,8 @@ METHOD Init() CLASS MainForm
       :Create()
       WITH OBJECT ::Application:Props[ "ReportPageTab" ] := TabPage( :this )
          :Caption    := "Report Page"
-         :HorzScroll := .T.
-         aSize       := {::Width,::Height}
-         :Width      := GetSystemMetrics( SM_CXSCREEN ) * 2
-         :Height     := GetSystemMetrics( SM_CYSCREEN ) * 2
          :BackColor  := ::System:Color:Gray
          :Create()
-         :Width      := aSize[1]
-         :Height     := aSize[2]
 
          WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
             :Caption   := "Report Header"
@@ -427,7 +421,6 @@ METHOD Init() CLASS MainForm
             :Left      := 2
             :Top       := 2
             :Height    := 100
-            :Width     := aSize[1]
             :Visible   := .F.
             :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
             :Create()
@@ -445,7 +438,6 @@ METHOD Init() CLASS MainForm
             :BackColor    := ::System:Color:White
             :Left         := 2
             :Top          := 2
-            :Width        := aSize[1]
             :Height       := 100
             :Dock:Margins := "0,0,0,0"
             :Dock:Top     := ::Application:Props[ "RepHeader" ]
@@ -467,7 +459,6 @@ METHOD Init() CLASS MainForm
             :Left         := 2
             :Top          := 2
             :Height       := 100
-            :Width        := aSize[1]
             :Dock:Margins := "0,0,0,2"
             :Dock:Bottom  := :Parent
             :Visible      := .F.
@@ -489,7 +480,6 @@ METHOD Init() CLASS MainForm
             :Left         := 2
             :Top          := 2
             :Height       := 100
-            :Width        := aSize[1]
             :Dock:Margins := "0,0,0,0"
             :Dock:Bottom  := ::Application:Props:RepFooter
             :Visible      := .F.
@@ -510,7 +500,6 @@ METHOD Init() CLASS MainForm
             :Left         := 2
             :Top          := 2
             :Height       := 100
-            :Width        := aSize[1]
             :Dock:Top     := ::Application:Props:Header
             :Dock:Bottom  := ::Application:Props:Footer
             :Visible      := .F.
@@ -521,21 +510,14 @@ METHOD Init() CLASS MainForm
          :Caption    := "Extra Page"
          :HorzScroll := .T.
          :VertScroll := .T.
-         aSize       := {::Width,::Height}
-         :Width      := GetSystemMetrics( SM_CXSCREEN ) * 2
-         :Height     := GetSystemMetrics( SM_CYSCREEN ) * 2
          :BackColor  := ::System:Color:Gray
          :Create()
-         :Width      := aSize[1]
-         :Height     := aSize[2]
          WITH OBJECT ::Application:Props[ "ExtraPage" ] := ExtraPageEdit( :this )
             :BackColor := ::System:Color:White
             :Left      := 2
             :Top       := 2
             :Height    := 100
-            :Width     := aSize[1]
-            //:Visible   := .F.
-            //:Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
+            :Visible   := .F.
             :Create()
          END
       END
@@ -731,6 +713,20 @@ METHOD Close() CLASS Report
       :Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
       :MainForm:Caption := "Visual Report"
       :Props:PropEditor:ResetProperties( {{ NIL }} )
+
+      :Props:ReportPageTab:HorzScrollSize := 0
+      :Props:ExtraTab:HorzScrollSize := 0
+      :Props:ExtraTab:VertScrollSize := 0
+
+      //:Props:ReportPageTab:OriginalRect[3] := 0
+      //:Props:ExtraTab:OriginalRect[3] := 0
+      //:Props:ExtraTab:OriginalRect[4] := 0
+
+      //:Props:ReportPageTab:__SetScrollBars()
+      //:Props:ExtraTab:__SetScrollBars()
+
+      //:Props:ReportPageTab:HorzScroll := .F.
+
    END
 RETURN NIL
 
@@ -752,11 +748,16 @@ METHOD SetScrollArea() CLASS Report
    oApp:Props:ExtraPage:Width := cx
    oApp:Props:ExtraPage:Height := cy
    
-   oApp:Props:Header:Parent:OriginalRect[3] := cx + 6
+   oApp:Props:ReportPageTab:HorzScrollSize := cx + 4
+   oApp:Props:ExtraTab:HorzScrollSize := cx + 4
+   oApp:Props:ExtraTab:VertScrollSize := cy + 4
 
-   oApp:Props:ExtraPage:Parent:OriginalRect[3] := cx + 6
-   oApp:Props:ExtraPage:Parent:OriginalRect[4] := cy + 6
+   //oApp:Props:ReportPageTab:OriginalRect[3] := cx + 4
+   //oApp:Props:ExtraTab:OriginalRect[3] := cx + 4
+   //oApp:Props:ExtraTab:OriginalRect[4] := cy + 4
    
+   oApp:Props:ReportPageTab:HorzScroll := .T.
+
    oApp:Props:RepHeader:Visible := .T.
    oApp:Props:Header:Visible    := .T.
    oApp:Props:Body:Visible      := .T.

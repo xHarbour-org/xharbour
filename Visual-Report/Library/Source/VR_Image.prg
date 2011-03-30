@@ -56,6 +56,7 @@ METHOD Create() CLASS VrImage
    ENDIF
    
    WITH OBJECT ::EditCtrl := __VrImage( ::Parent )
+      :Cargo     := Self
       :ImageName := ::FileName
       :Left      := ::Left
       :Top       := ::Top
@@ -113,6 +114,7 @@ CLASS __VrImage INHERIT FreeImage
    METHOD OnLButtonDown()
    METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
+   METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
 ENDCLASS
 
 METHOD OnLButtonDown(n,x,y) CLASS __VrImage 

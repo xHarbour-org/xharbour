@@ -42,6 +42,7 @@ METHOD Create() CLASS VrLine
    ENDIF
    
    WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
+      :Cargo     := Self
       :Left      := ::Left
       :Top       := ::Top
       :Width     := ::Width

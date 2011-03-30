@@ -59,6 +59,7 @@ METHOD Create() CLASS VrLabel
    ::Font:Create()
 
    WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
+      :Cargo   := Self
       :Caption := ::Text
       :Left    := ::Left
       :Top     := ::Top
@@ -234,6 +235,7 @@ CLASS __VrLabel INHERIT Label
    METHOD OnLButtonDown()
    METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
+   METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -254,6 +256,7 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
          ENDIF
       CATCH
       END
+      ::SetFocus()
    ENDIF
    Super:OnLButtonDown()
 RETURN NIL

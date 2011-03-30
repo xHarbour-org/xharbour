@@ -38,7 +38,6 @@ CLASS RepEdit INHERIT Panel
    METHOD OnDestroy() INLINE DeleteObject( ::hBmpGrid ), NIL
    METHOD CreateControl()
    METHOD Snap()
-   METHOD OnKeyDown()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -68,13 +67,6 @@ METHOD Create() CLASS RepEdit
    ::xBmpSize := xSize
    ::yBmpSize := ySize
 RETURN Self
-
-METHOD OnKeyDown( nKey ) CLASS RepEdit
-   IF nKey == VK_DELETE .AND. ! EMPTY( ::Application:Props:PropEditor:ActiveObject )
-      ::Application:Props:PropEditor:ActiveObject:Delete()
-   ENDIF
-RETURN Self
-
 
 METHOD Snap( nPos ) CLASS RepEdit
 RETURN IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked, Snap( nPos, ::xGrid ), nPos )
@@ -349,3 +341,10 @@ RETURN cBits
 
 FUNCTION Snap( x, nGrain )
 RETURN ROUND( ( x / nGrain ), 0) * nGrain
+
+FUNCTION KeyDown( oCtrl, nKey )
+   IF nKey == VK_DELETE .AND. oCtrl != NIL .AND. oCtrl:Cargo != NIL
+      oCtrl:Cargo:Delete()
+   ENDIF
+RETURN NIL
+
