@@ -17,7 +17,7 @@ REM ===============================================
 
     SET RC_From=W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Common.Files
     SET RC_To=%XHBTO%
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     SET RC_Exclude_File=.cvsignore
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /XF %RC_Exclude_File% /S /XD %RC_Exclude_Folder%
 
@@ -30,14 +30,14 @@ REM ===============================================
     SET RC_To=%XHBTO%\Bin
 
     SET RC_Include=xcc.* xrc.* xHB.exe xLib.exe xLink.exe xEditW.exe xHBDll.dll xPrompt.exe
-    ROBOCOPY "W:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
     ROBOCOPY "W:\xHarbour.com\Visual-xHarbour\xEdit" "%RC_To%" *.xbs /NS /NC /NP
 
     COPY "W:\xHarbour.com\xHarbour-Builder\Dll2Lib.bat" "%RC_To%"
-    COPY "W:\xHB\Dll\ads\ace32.dll"       "%RC_To%"
-    COPY "W:\xHB\Dll\SQLRDD\fbclient.dll" "%RC_To%"
-    COPY "W:\xHB\Dll\SQLRDD\libmysql.dll" "%RC_To%"
-    COPY "W:\xHB\Dll\FreeImage.dll"       "%RC_To%"
+    COPY "C:\xHB\Dll\ads\ace32.dll"       "%RC_To%"
+    COPY "C:\xHB\Dll\SQLRDD\fbclient.dll" "%RC_To%"
+    COPY "C:\xHB\Dll\SQLRDD\libmysql.dll" "%RC_To%"
+    COPY "C:\xHB\Dll\FreeImage.dll"       "%RC_To%"
 
 REM ===============================================
 REM                /Common/c_include
@@ -45,9 +45,9 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\c_include
     SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
 
-    SET RC_From=W:\xHB\c_include
+    SET RC_From=C:\xHB\c_include
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
     SET RC_From=W:\xHarbour\contrib\rdd_ads
@@ -61,9 +61,9 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\c_lib
 
-    SET RC_From=W:\xHB\c_lib
+    SET RC_From=C:\xHB\c_lib
     SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
 
@@ -84,7 +84,7 @@ REM ===============================================
     SET XHB-DOC=W:\xHarbour.com\xHarbour-Documentation
 
     SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "W:\xHarbour\contrib\gd\doc" "%RC_To%\GD" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
     COPY "%XHB-DOC%\Getting-Started.pdf" "%RC_To%\Getting Started with xHarbour Builder.pdf"
@@ -120,8 +120,8 @@ REM ===============================================
     SET RC_To=%XHBTO%\Include
 
     SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT
-    ROBOCOPY "W:\xHB\Include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    ROBOCOPY "C:\xHB\Include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
     ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
     COPY "W:\xHarbour\contrib\rdd_ads\*.ch" "%RC_To%"
@@ -138,34 +138,34 @@ REM ===============================================
 
     MD "%RC_To%"
 
-    COPY "W:\xHB\Lib\ACE32.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\ADS.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\BGD.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\CDX.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\DBF.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\DbgServe.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\fbclient_ms.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\FreeImage*.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\FTS32.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\GD.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\LibMisc.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\libmysql.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\libpq.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\Nanfor.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\NoRDD.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\NSX.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\NTX.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\oci.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\ODBC.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\Optg.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\SDE61.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\SixCDX.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\VXHd.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\WinCore.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\WVG.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\WVT.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\WVW.lib" "%RC_To%"
-    COPY "W:\xHB\Lib\XDO.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\ACE32.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\ADS.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\BGD.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\CDX.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\DBF.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\DbgServe.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\fbclient_ms.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\FreeImage*.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\FTS32.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\GD.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\LibMisc.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\libmysql.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\libpq.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\Nanfor.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\NoRDD.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\NSX.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\NTX.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\oci.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\ODBC.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\Optg.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\SDE61.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\SixCDX.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\VXHd.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\WinCore.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\WVG.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\WVT.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\WVW.lib" "%RC_To%"
+    COPY "C:\xHB\Lib\XDO.lib" "%RC_To%"
 
     COPY "W:\xHarbour.com\xHarbour-Builder\bgd.lib" "%RC_To%"
     COPY "W:\xHarbour.com\FreeImage\FreeImage.lib" "%RC_To%"
@@ -177,12 +177,12 @@ REM                  /Common/Dll
 REM ===============================================
 
     SET RC_To=%XHBTO%\Dll
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
 
-    ROBOCOPY "W:\xHB\Dll" "%RC_To%" bgd.dll XDO.dll FreeImage.dll /NS /NC /NP
-    ROBOCOPY "W:\xHB\Bin" "%RC_To%" xHBdll.dll xHBddll.dll /NS /NC /NP
+    ROBOCOPY "C:\xHB\Dll" "%RC_To%" bgd.dll XDO.dll FreeImage.dll /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin" "%RC_To%" xHBdll.dll xHBddll.dll /NS /NC /NP
 
-    ROBOCOPY "W:\xHB\Dll\ADS" "%RC_To%\ADS" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
+    ROBOCOPY "C:\xHB\Dll\ADS" "%RC_To%\ADS" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
 
     ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\dll" "%RC_To%\SQLRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
     ROBOCOPY "W:\xHarbour.com\xHarbour-ApolloRDD\dll" "%RC_To%\ApolloRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
@@ -194,7 +194,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Samples
 
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "W:\xHarbour.com\Samples"         "%RC_To%"         *.* /NS /NC /NP    /XD %RC_Exclude_Folder% /XA:H
     ROBOCOPY "W:\xHarbour.com\Samples\FiveWin" "%RC_To%\FiveWin" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
     ROBOCOPY "W:\xHarbour.com\Samples\GD"      "%RC_To%\GD"      *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
@@ -218,7 +218,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Source
 
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "W:\xHarbour\Source" "%RC_To%" *.c* *.prg *.s* *.y *.h *.x* *.gen* *.def *.gcc /NS /NC /NP /S /XD %RC_Exclude_Folder%
 
     ROBOCOPY "W:\xHarbour\Source\tip\encoding" "%RC_To%\Tip\Encoding" *.c /NS /NC /NP /XD %RC_Exclude_Folder%
@@ -253,7 +253,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Bin
 
     SET RC_Include=VXH.exe xDebugW.exe xBuild*.exe
-    ROBOCOPY "W:\xHB\Bin\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
 
 
 
@@ -264,20 +264,20 @@ REM ===============================================
     SET RC_To=%XHBTO%\Lib
 
     SET RC_Include=vxh.lib xHB.lib WinApi.lib SQL.lib six.lib
-    ROBOCOPY "W:\xHB\Lib\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Lib\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
 
 REM *********************************
 REM * We need DEMO LIBs for these: *
 REM *********************************
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\RMDBFCDX.lib"  /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\ActiveX.lib"   /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\XBScript.lib"  /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\CT3Comm.lib"   /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\Comm.lib"      /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\xHBCOMM.lib"   /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\xHBZIP.lib"    /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\OleServer.lib" /y /b
-    COPY "W:\xHB\c_lib\Win\version.lib"   "%RC_To%\Ole.lib"       /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\RMDBFCDX.lib"  /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\ActiveX.lib"   /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\XBScript.lib"  /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\CT3Comm.lib"   /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\Comm.lib"      /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\xHBCOMM.lib"   /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\xHBZIP.lib"    /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\OleServer.lib" /y /b
+    COPY "C:\xHB\c_lib\Win\version.lib"   "%RC_To%\Ole.lib"       /y /b
 
 
 REM ===============================================
@@ -307,10 +307,10 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Bin
 
-    COPY "W:\xHB\Bin\Personal\VXH.exe"     "%RC_To%\VXH.exe" /y /b
-    COPY "W:\xHB\Bin\Demo\xDebugW.exe"     "%RC_To%\xDebugW.exe" /y /b
-    COPY "W:\xHB\Bin\Personal\xBuildW.exe" "%RC_To%\xBuildW.exe" /y /b
-    COPY "W:\xHB\Bin\xBuild.exe"           "%RC_To%\xBuild.exe" /y /b
+    COPY "C:\xHB\Bin\Personal\VXH.exe"     "%RC_To%\VXH.exe" /y /b
+    COPY "C:\xHB\Bin\Demo\xDebugW.exe"     "%RC_To%\xDebugW.exe" /y /b
+    COPY "C:\xHB\Bin\Personal\xBuildW.exe" "%RC_To%\xBuildW.exe" /y /b
+    COPY "C:\xHB\Bin\xBuild.exe"           "%RC_To%\xBuild.exe" /y /b
 
 
 REM ===============================================
@@ -319,8 +319,8 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Lib
 
-    COPY "W:\xHB\Lib\xHB.lib"          "%RC_To%\xHB.lib"  /y
-    COPY "W:\xHB\Lib\Personal\VXH.lib" "%RC_To%\VXH.lib"  /y
+    COPY "C:\xHB\Lib\xHB.lib"          "%RC_To%\xHB.lib"  /y
+    COPY "C:\xHB\Lib\Personal\VXH.lib" "%RC_To%\VXH.lib"  /y
 
 
 REM ===============================================
@@ -349,11 +349,11 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Bin
 
-    COPY "W:\xHB\Bin\xBuildW.exe"          "%RC_To%\xBuildW.exe" /y /b
-    COPY "W:\xHB\Bin\xDebugW.exe"          "%RC_To%\xDebugW.exe" /y /b
+    COPY "C:\xHB\Bin\xBuildW.exe"          "%RC_To%\xBuildW.exe" /y /b
+    COPY "C:\xHB\Bin\xDebugW.exe"          "%RC_To%\xDebugW.exe" /y /b
 
     SET RC_Include=*.exe *.dll
-    ROBOCOPY "W:\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
 REM ===============================================
 REM              /Professional/lib
@@ -363,13 +363,13 @@ REM ===============================================
 
     SET RC_Include=*.lib
     SET RC_Exclude_File=xEditVXH.lib
-    ROBOCOPY "W:\xHB\Lib" "%RC_To%" %RC_Include% /NS /NC /NP /XF %RC_Exclude_File%
+    ROBOCOPY "C:\xHB\Lib" "%RC_To%" %RC_Include% /NS /NC /NP /XF %RC_Exclude_File%
 
     SET RC_Include=vxh.lib WinApi.lib vxhdll.lib vxhddll.lib
-    ROBOCOPY "W:\xHB\Lib\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Lib\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
     SET RC_Include=*sql*.lib
-    ROBOCOPY "W:\xHB\Lib\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Lib\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
 
 REM ===============================================
 REM              /Professional/dll
@@ -378,13 +378,13 @@ REM ===============================================
     SET RC_To=%XHBTO%\Dll
 
     SET RC_Include=xhbcommdll.dll xHBZipDll.dll
-    ROBOCOPY "W:\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
 
     SET RC_Include=xhbdmtdll.dll xhbmtdll.dll
-    ROBOCOPY "W:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
 
     SET RC_Include=*.dll
-    ROBOCOPY "W:\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
 REM    SET CopyTo=%XHBTO%\Dll
 REM    SET EmptyDLL=W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\empty.dll
@@ -402,9 +402,9 @@ REM ===============================================
     SET RC_To=%XHBTO%\Samples
 
     SET RC_Include=xhbdmtdll.dll xhbmtdll.dll xhbcommdll.dll xHBZipDll.dll
-    ROBOCOPY "W:\xHB\Dll\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Dll\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
-    SET RC_Exclude_Folder=CVS CVSROOT
+    SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "W:\xHarbour.com\Samples\Samples for PROF and ENT versions" "%RC_To%" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
 
 
@@ -425,7 +425,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Bin
 
     SET RC_Include=vxh.exe vxh*.dll xPromptSQL.exe
-    ROBOCOPY "W:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Bin" "%RC_To%" %RC_Include% /NS /NC /NP
 
 
 REM ===============================================
@@ -436,7 +436,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Lib
 
     SET RC_Include=vxh*.lib WinApi.lib *sql*.lib
-    ROBOCOPY "W:\xHB\Lib" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Lib" "%RC_To%" %RC_Include% /NS /NC /NP
 
 
 REM ===============================================
@@ -446,7 +446,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Dll
 
     SET RC_Include=vxh*.dll
-    ROBOCOPY "W:\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
+    ROBOCOPY "C:\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
 
 
 REM ==============================================================================================
