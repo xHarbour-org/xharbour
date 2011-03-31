@@ -89,3 +89,4 @@
 #define INTERNALOID           2281
 #define OPAQUEOID             2282
 
+#define XMLOID                142

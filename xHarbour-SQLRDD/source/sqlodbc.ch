@@ -31,6 +31,8 @@
 #define SQL_C_DOUBLE                         8
 #define SQL_LONGVARCHAR                     -1
 #define SQL_ATTR_CURRENT_CATALOG           109
+
+#define SQL_LONGVARCHARXML                     -30
 #endif
 
 #define SQL_NEED_DATA                       99
