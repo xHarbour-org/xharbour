@@ -50,6 +50,8 @@ GLOBAL lGoTopOnScope       := .T.
 GLOBAL lSerializedAsString := .F.
 GLOBAL lShutDown           := .F.
 GLOBAL lUseDeleteds        := .T.
+// Culik added new global to tell if we will serialize arrays as json or xml
+GLOBAL lSerializeArrayAsJson := .F.
 
 /*------------------------------------------------------------------------*/
 
@@ -625,7 +627,8 @@ Static Function SR_SetEnvSQLRDD( oConnect )
             oCnn:exec( "SELECT * FROM SQ_NRECNO",.F.,.T.,@aRet )
             oCnn:Commit()
          EndIf
-         oCnn:exec( "SET CLIENT_ENCODING to 'SQL_ASCII'",.F.,.T.,@aRet )
+         oCnn:exec( "SET CLIENT_ENCODING to 'LATIN1'",.F.,.T.,@aRet )
+         oCnn:exec( "SET xmloption to 'DOCUMENT'",.F.,.T.,@aRet )
          /* Locking system housekeeping */
          oCnn:exec( "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = (select pg_backend_pid()) OR SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F. )
          oCnn:Commit()
@@ -2039,6 +2042,16 @@ Function SR_DetectDBFromDSN( cConnect )
 
 Return SYSTEMID_UNKNOW
 
+
+Function SR_SetSerializeArrayAsJson( l )
+   Local lOld  := lSerializeArrayAsJson
+   If l != NIL
+      lSerializeArrayAsJson := l
+   EndIf
+Return lOld
+
+
+
 /*------------------------------------------------------------------------*/
 
 #pragma BEGINDUMP
@@ -2077,6 +2090,11 @@ BOOL HB_EXPORT sr_lHideHistoric( void )
 BOOL HB_EXPORT sr_UseDeleteds( void )
 {
    return LUSEDELETEDS.item.asLogical.value;
+}
+
+BOOL HB_EXPORT sr_lSerializeArrayAsJson( void )
+{
+   return LSERIALIZEARRAYASJSON.item.asLogical.value;
 }
 
 #pragma ENDDUMP

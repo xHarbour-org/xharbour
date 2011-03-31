@@ -7,6 +7,24 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-03-30 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   
+   ! source/firebird.c
+   ! source/mysql.c   
+   ! source/sqlsrodbc.c
+   ! source/sqlorax.c
+     ! added support to decode json arrays
+   ! source/pgs.c     
+      ! added support to decode json arrays
+      ! added support to decode xml data as array   
+   ! source/sqlpgs.prg
+     ! added code to suport xml field types
+   ! source/sqlrdd0.prg
+     ! added need code to suport xml field types and settings
+   ! source/sqlrdd1.c
+   ! source/sqlrdd2.prg
+     ! added support to xml fields in postgresql, and encoding arrays in json format is SR_SetSerializeArrayAsJson() is set to true ( default is false )
+   
 2011-03-22 21:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    ! source/sqlex1.c
      ! fixed minor memory leak when monting filters

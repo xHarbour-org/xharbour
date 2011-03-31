@@ -25,7 +25,8 @@
 #include <assert.h>
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
-
+static PHB_DYNS s_pSym_SR_FROMXML = NULL;
+static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 typedef struct _PSQL_SESSION
 {
    int status;                   // Execution return value
@@ -347,6 +348,14 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
             hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
             hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_LONGVARCHAR ) );
             break;
+         case XMLOID:
+            hb_itemPutC( temp, "M" );
+            hb_arraySetForward( atemp, FIELD_TYPE, temp );
+            hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 4 ) );
+            hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+            hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp,SQL_LONGVARCHARXML ) );
+            break;
+
          case DATEOID:
             hb_itemPutC( temp, "D" );
             hb_arraySetForward( atemp, FIELD_TYPE, temp );
@@ -511,6 +520,14 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
             hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
             hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_LONGVARCHAR ) );
             break;
+         case XMLOID:
+            hb_itemPutC( temp, "M" );
+            hb_arraySetForward( atemp, FIELD_TYPE, temp );
+            hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 4 ) );
+            hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+            hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_LONGVARCHARXML ) );
+            break;
+
          case DATEOID:
             hb_itemPutC( temp, "D" );
             hb_arraySetForward( atemp, FIELD_TYPE, temp );
@@ -580,6 +597,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
    LONG lType;
    LONG lLen, lDec;
    PHB_ITEM pTemp;
+   PHB_ITEM pTemp1;
 
    HB_SYMBOL_UNUSED( bQueryOnly );
    HB_SYMBOL_UNUSED( ulSystemID );
@@ -673,7 +691,28 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
          }
          case SQL_LONGVARCHAR:
          {
-            if( lLenBuff > 10 && strncmp( bBuffer, SQL_SERIALIZED_SIGNATURE, 10 ) == 0 && (!sr_lSerializedAsString()) )
+
+            if( lLenBuff > 0 && (strncmp( bBuffer, "[", 1 ) == 0 || strncmp( bBuffer, "[]", 2 ) )&& (sr_lSerializeArrayAsJson()) )
+            {
+               if (s_pSym_SR_FROMJSON == NULL )
+               {
+                  hb_dynsymLock();
+                  s_pSym_SR_FROMJSON = hb_dynsymFindName( "HB_JSONDECODE" );
+                  hb_dynsymUnlock();
+                  if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );            
+               }
+               hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
+               hb_vmPushNil();
+               hb_vmPushString( bBuffer, lLenBuff );
+               pTemp = hb_itemNew( NULL );
+               hb_vmPush(pTemp);
+               hb_vmDo( 2 );
+               hb_itemForwardValue( pItem, pTemp );              
+               hb_itemRelease( pTemp );
+
+            }
+
+            else if( lLenBuff > 10 && strncmp( bBuffer, SQL_SERIALIZED_SIGNATURE, 10 ) == 0 && (!sr_lSerializedAsString()) )
             {
                if( s_pSym_SR_DESERIALIZE == NULL )
                {
@@ -685,6 +724,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
                hb_vmPushSymbol( s_pSym_SR_DESERIALIZE->pSymbol );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
+
                hb_vmDo( 1 );
 
                pTemp = hb_itemNew( NULL );
@@ -706,12 +746,43 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
                }
                hb_itemRelease( pTemp );
             }
+
             else
             {
                hb_itemPutCL( pItem, bBuffer, (ULONG) lLenBuff );
             }
             break;
          }
+         // xmltoarray
+         case SQL_LONGVARCHARXML:
+         {
+
+               if( s_pSym_SR_FROMXML == NULL )
+               {
+                  hb_dynsymLock();
+                  s_pSym_SR_FROMXML = hb_dynsymFindName( "SR_FROMXML" );
+                  hb_dynsymUnlock();
+                  if ( s_pSym_SR_FROMXML  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
+               }
+               pTemp1 = hb_itemArrayNew(0);
+               hb_vmPushSymbol( s_pSym_SR_FROMXML->pSymbol );
+               hb_vmPushNil();
+               hb_vmPushNil();
+               hb_vmPush( pTemp1);
+               hb_vmPushLong( -1 ) ;
+               hb_vmPushString( bBuffer, lLenBuff );
+               hb_vmDo( 4 );
+
+               pTemp = hb_itemNew( NULL );
+               hb_itemForwardValue( pTemp, hb_stackReturnItem() );
+
+
+               hb_itemForwardValue( pItem, pTemp );
+
+               hb_itemRelease( pTemp );
+            break;
+         }
+
          case SQL_BIT:
          {
             hb_itemPutL( pItem, bBuffer[0] == 't' ? TRUE : FALSE );

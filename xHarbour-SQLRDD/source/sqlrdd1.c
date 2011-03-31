@@ -3563,6 +3563,11 @@ static BOOL ProcessFields( SQLAREAP thiswa )
       case 'D':
          field.uiType =HB_FT_DATE;
          break;
+      case 'v':
+      case 'V':
+         field.uiType = HB_FT_ANY;
+         break;
+
       default:
          field.uiType =HB_IT_NIL;
          break;

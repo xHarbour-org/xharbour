@@ -15,7 +15,7 @@
 #include "set.ch"
 #include "dbinfo.ch"
 #include "sqlrddsetup.ch"
-
+#include "hbxml.ch" // Culik added to support arrays as xml
 #define DUPL_IND_DETECT                .F.
 #define SQLRDD_LEARNING_REPETITIONS     5
 
@@ -382,8 +382,11 @@ METHOD GetSelectList()    CLASS SR_WORKAREA
    local aInd
 
    If ::lCollectingBehavior .or. ::lAllColumnsSelected
+      IF  (::osql:nsystemID == SYSTEMID_POSTGR .and. SR_getUseXmlField())
+      ELSE
       aEval( ::aFields, { |x,i| (x),::aFields[i, FIELD_ENUM] := i } )
       Return " A.* "
+      ENDIF
    EndIf
 
    If ::hnDeleted > 0
@@ -404,6 +407,10 @@ METHOD GetSelectList()    CLASS SR_WORKAREA
       If ::aSelectList[i] == 1
          nFeitos++
          cSelectList += if(nFeitos > 1, ", A.", "A.") + SR_DBQUALIFY( ::aNames[i], ::oSql:nSystemID )
+         IF ::osql:nsystemID == SYSTEMID_POSTGR .and. ::aFields[ i, FIELD_DOMAIN ] == SQL_LONGVARCHARXML
+            cSelectList += "::varchar"
+         ENDIF
+
          ::aFields[ i, FIELD_ENUM ] := nFeitos
       Else
          ::aFields[ i, FIELD_ENUM ] := 0
@@ -411,8 +418,11 @@ METHOD GetSelectList()    CLASS SR_WORKAREA
    Next
 
    If nFeitos == nLen
+      if (::osql:nsystemID == SYSTEMID_POSTGR .and. SR_getUseXmlField())
+      else
       cSelectList := " A.* "
       ::lAllColumnsSelected := .T.
+      endif
    EndIf
 
 Return cSelectList + " "
@@ -1939,6 +1949,10 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
    Case cType == "L"
       return if(uData,"1","0")
    OtherWise
+      if valtype( uData ) =="A" .and. SR_SetSerializeArrayAsJson()
+         cRet := hb_jsonencode(uData,.f.)
+         return ::Quoted( cRet, trim, nLen, nDec, nTargetDB )
+      ENDIF
       cRet := SR_STRTOHEX(HB_Serialize( uData ))
       return ::Quoted( SQL_SERIALIZED_SIGNATURE + str(len(cRet),10) + cRet, trim, nLen, nDec, nTargetDB )
    EndCase
@@ -2017,6 +2031,11 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
    Case cType == "L" .and. (!lMemo)
       return if(uData,"1","0")
    OtherWise
+      if valtype( uData ) =="A" .and. SR_SetSerializeArrayAsJson()
+         cRet := hb_jsonencode(uData,.f.)
+         return ::Quoted( cRet, .f., , , nTargetDB )
+      ENDIF
+
       cRet := SR_STRTOHEX( HB_Serialize( uData ) )
       return ::Quoted( SQL_SERIALIZED_SIGNATURE + str(len(cRet),10) + cRet, .f., , , nTargetDB )
    EndCase
@@ -2081,6 +2100,7 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
    Local i, nInd, cKey, nRet
    Local nThisField, cIdent := "", lML, lMustUPD := .f.
    Local aMemos := {}, cMemo
+   Local oXml
 
    DEFAULT lInsert := ::aInfo[ AINFO_ISINSERT ]
    DEFAULT aBuffer := ::aLocalBuffer
@@ -2156,7 +2176,9 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
             lNull := ::aFields[nThisField, FIELD_NULLABLE]
             lMemo := ::aFields[nThisField, FIELD_TYPE] = "M"
             lML   := ::aFields[nThisField, FIELD_MULTILANG]
-
+            if lMemo .and. ::aFields[nThisField,6] ==SQL_LONGVARCHARXML
+               lMemo := .F.
+            endif
             If lML .or.;
                (::aOldBuffer[nThisField] == NIL ) .or.;
                ( lMemo .and. (valtype(::aOldBuffer[nThisField]) != "C" .or. valtype( aBuffer[nThisField] ) != "C" )) .or.;
@@ -2182,6 +2204,11 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
 #endif
                ElseIf ::aFields[nThisField,6] != SQL_GUID
                   cRet += if(!lFirst,", ","") + SR_DBQUALIFY( ::aNames[nThisField], ::oSql:nSystemID ) + " = " + ::QuotedNull(aBuffer[nThisField],.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo) + " "
+               ElseIf ::aFields[nThisField,6] ==SQL_LONGVARCHARXML
+                  oXml := sr_arraytoXml( aBuffer[nThisField] )
+                  nlen:=len(oxml:tostring(HBXML_STYLE_NONEWLINE))
+                  cVal := if(!lFirst,", ","") + SR_DBQUALIFY( ::aNames[nThisField], ::oSql:nSystemID ) + " = " + ::QuotedNull(oxml:tostring(HBXML_STYLE_NONEWLINE),.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
+
                Else
                   Loop
                EndIf
@@ -2264,6 +2291,9 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
             lNull := ::aFields[i,5]
             lMemo := ::aFields[i,FIELD_TYPE] = "M"
             lML   := ::aFields[i,FIELD_MULTILANG]
+            if lMemo .and. ::aFields[i,6] ==SQL_LONGVARCHARXML
+               lMemo := .F.
+            endif
 
             If lML .and. valtype( aBuffer[i] ) $ "CM"
                aBuffer[i] := { SR_SetBaseLang() => aBuffer[i] }
@@ -2353,6 +2383,12 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                   cVal += if(!lFirst,", ","( ") + str(cMemo, nLen, nDec ) + " "
                   Exit
 #endif
+               CASE SQL_LONGVARCHARXML
+                  oXml := sr_arraytoXml( cMemo )
+
+                  nlen:=len(oxml:tostring(HBXML_STYLE_NONEWLINE))
+                  cVal += if(!lFirst,", ","( ") + ::QuotedNull(oXml:tostring(HBXML_STYLE_NONEWLINE),.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
+                  exit
                Default
                   cVal += if(!lFirst,", ","( ") + ::QuotedNull(cMemo,.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
                End
@@ -4961,6 +4997,10 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_IBMDB2
          cSql := cSql + "CLOB (256000) " + If( "DB2/400" $ ::oSql:cSystemName, "",  " NOT LOGGED COMPACT" )
 
+      Case (aCreate[i,FIELD_TYPE] == "M") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  .and. aCreate[i,FIELD_LEN] == 4)
+         cSql := cSql + 'XML'
+
+
       Case (aCreate[i,FIELD_TYPE] == "M") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_POSTGR .OR. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_CACHE)
          cSql := cSql + "TEXT"
 
@@ -5059,7 +5099,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          Else
             cSql := cSql + "DECIMAL (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str(aCreate[i,FIELD_DEC],9,0)) +  ")" + IF(lPrimary .or. lNotNull, " NOT NULL", " " )
          EndIf
-
+      // including xml data type
       OtherWise
          SR_MsgLogFile(  SR_Msg(9)+cField+" ("+aCreate[i,FIELD_TYPE]+")" )
 
@@ -6887,7 +6927,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
    Local lPartialSeek := .F.
    Local cRet, cRet2, nFDec, nFLen, nScoping, nSimpl
    Local nThis, cSep, cQot, cNam, nFeitos, lNull
-altd()
+
    If len(::aIndex) > 0 .and. ::aInfo[ AINFO_INDEXORD ] > 0
 
       If valtype(uValue) == "B"
@@ -9590,3 +9630,5 @@ For each aItem in  ::aRecnoFilter
 next
 cRet := Substr( cRet, 1, Len( cRet ) - 1 ) + " ) ) "
 return cRet
+
+REQUEST SR_FROMXML,SR_arraytoXml

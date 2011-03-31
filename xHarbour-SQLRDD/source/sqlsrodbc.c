@@ -61,6 +61,7 @@
 #endif
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
+static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 
 //-----------------------------------------------------------------------------//
 
@@ -457,7 +458,27 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          case SQL_FAKE_LOB:
          case SQL_LONGVARBINARY:
          {
-            if( lLenBuff > 10 && strncmp( bBuffer, SQL_SERIALIZED_SIGNATURE, 10 ) == 0 && (!sr_lSerializedAsString()) )
+            if( lLenBuff > 0 && (strncmp( bBuffer, "[", 1 ) == 0 || strncmp( bBuffer, "[]", 2 ) )&& (sr_lSerializeArrayAsJson()) )
+            {
+               if (s_pSym_SR_FROMJSON == NULL )
+               {
+                  hb_dynsymLock();
+                  s_pSym_SR_FROMJSON = hb_dynsymFindName( "HB_JSONDECODE" );
+                  hb_dynsymUnlock();
+                  if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );            
+               }
+               hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
+               hb_vmPushNil();
+               hb_vmPushString( bBuffer, lLenBuff );
+               pTemp = hb_itemNew( NULL );
+               hb_vmPush(pTemp);
+               hb_vmDo( 2 );
+               hb_itemForwardValue( pItem, pTemp );              
+               hb_itemRelease( pTemp );
+
+            }
+
+            else if( lLenBuff > 10 && strncmp( bBuffer, SQL_SERIALIZED_SIGNATURE, 10 ) == 0 && (!sr_lSerializedAsString()) )
             {
                if( s_pSym_SR_DESERIALIZE == NULL )
                {
@@ -490,6 +511,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                }
                hb_itemRelease( pTemp );
             }
+
             else
             {  
                hb_itemPutC( pItem, bBuffer);
