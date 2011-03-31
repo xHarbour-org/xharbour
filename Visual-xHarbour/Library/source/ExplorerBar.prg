@@ -175,14 +175,14 @@ RETURN( Self )
 //---------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS ExplorerBar
-   ::OnThemeChanged( .F. )
+   ::OnThemeChanged( Self, .F. )
    ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:left + ::System:ExplorerBar:headernormal:rcTLPadding:right
    ::MinWidth := ::xWidth
    Super:Create()
    ::OpenThemeData()
 RETURN Self
 
-METHOD OnThemeChanged( lClean ) CLASS ExplorerBar
+METHOD OnThemeChanged( oObj, lClean ) CLASS ExplorerBar
    DEFAULT lClean TO .T.
    IF lClean .AND. ::__hImageListTitle != NIL
       ImageListDestroy( ::__hImageListTitle )

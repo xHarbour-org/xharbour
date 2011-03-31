@@ -1035,7 +1035,9 @@ METHOD Create( oParent ) CLASS Window
          ::Parent:Disable()
       ENDIF
       IF ::SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::__ClassInst != NIL )
-         AADD( ::Parent:Children, Self )
+         IF ::Parent:ClsName != "DataGrid" .OR. ::ClsName == "GridColumn"
+            AADD( ::Parent:Children, Self )
+         ENDIF
       ENDIF
    ENDIF
 

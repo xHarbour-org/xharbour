@@ -3182,7 +3182,9 @@ METHOD __ControlSaveData() CLASS DataGrid
             ENDIF
             IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
                oCtrl := ::Children[::ColPos]
-               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl/*oCtrl*/ )
+               
+               ::__CurControl:VarPut( ::__CurControl:oGet:Buffer )
+               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet() )
             ENDIF
          ENDIF
       ENDIF
@@ -3193,7 +3195,7 @@ METHOD __ControlSaveData() CLASS DataGrid
          ENDIF
          IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
             oCtrl := ::Children[::ColPos]
-            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl/*oCtrl*/ )
+            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption )
          ENDIF
       ENDIF
    ENDIF

@@ -1909,7 +1909,12 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
       
     ELSEIF nMsg == WM_USER + 4766
       IF ( oItem := ::GetSelected() ) != NIL
-         oItem:ColItems[1]:Value := ::ActiveObject:BackgroundImage:Margins
+         VIEW ::ActiveObject:__xCtrlName
+         IF ::ActiveObject:HasMessage( "BackgroundImage" ) .AND. VALTYPE( ::ActiveObject:BackgroundImage ) == "O"
+            oItem:ColItems[1]:Value := ::ActiveObject:BackgroundImage:Margins
+          ELSE
+            oItem:ColItems[1]:Value := ::ActiveObject:Margins
+         ENDIF
          ::InvalidateRect(,.F.)
       ENDIF
 

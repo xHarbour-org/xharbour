@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-03-31 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid OnSave event
+
 2011-03-30 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added properties VertScrollSize and HorzScrollSize
    
