@@ -264,6 +264,7 @@
 [\xbp\vc8\xhbmt.lib\dbf2txt.obj]
 
 [\xbp\vc8\xhbmt.lib\filebuf.obj]
+[\xbp\vc8\xhbmt.lib\hbjson.obj]
 
 [\xbp\vc8\xhbmt.lib\tprinter.obj]
 [\xbp\vc8\xhbmt.lib\win32ole.obj]

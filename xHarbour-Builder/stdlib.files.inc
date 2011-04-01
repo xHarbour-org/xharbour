@@ -365,6 +365,7 @@
 [source\rtl\dbf2txt.c]
 
 [source\rtl\filebuf.c]
+[source\rtl\hbjson.c]
 
 [source\common\hbprintf.c]
 

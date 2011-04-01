@@ -264,6 +264,7 @@
 [\xbp\xcc\xhb.lib\dbf2txt.obj]
 
 [\xbp\xcc\xhb.lib\filebuf.obj]
+[\xbp\xcc\xhb.lib\hbjson.obj]
 
 [\xbp\xcc\xhb.lib\hbprintf.obj]
 
