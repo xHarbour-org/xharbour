@@ -2863,7 +2863,6 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #endif /* PNG_WRITE_FILTER_SUPPORTED */
 }
 
-
 /* Do the actual writing of a previously filtered row. */
 #ifdef __BORLANDC__
    #pragma option push -w-ccc -w-rch

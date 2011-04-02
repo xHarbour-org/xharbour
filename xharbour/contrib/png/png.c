@@ -17,7 +17,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_1 Your_png_h_is_not_version_1_5_1;
+typedef png_libpng_version_1_5_2 Your_png_h_is_not_version_1_5_2;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -558,13 +558,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.1 - February 3, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.2 - March 31, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.1 - February 3, 2011\
+      return "libpng version 1.5.2 - March 31, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -669,7 +669,6 @@ png_convert_size(size_t size)
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
 #  ifdef PNG_CHECK_cHRM_SUPPORTED
-
 #ifdef __BORLANDC__
    #pragma option push -w-ccc -w-rch
 #endif
@@ -1391,9 +1390,6 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 /* Function to format a fixed point value in ASCII.
  */
-#ifdef __BORLANDC__
-   #pragma option push -w-aus
-#endif
 void /* PRIVATE */
 png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
     png_fixed_point fp)
@@ -1407,7 +1403,10 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
 
       /* Avoid overflow here on the minimum integer. */
       if (fp < 0)
-         *ascii++ = 45, --size, num = -fp;
+         /* *ascii++ = 45, --size, num = -fp;
+            pacify BCC warning on unused size
+         */
+         *ascii++ = 45, num = -fp;
       else
          num = fp;
 
@@ -1462,9 +1461,6 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
    /* Here on buffer too small. */
    png_error(png_ptr, "ASCII conversion buffer too small");
 }
-#ifdef __BORLANDC__
-   #pragma option pop
-#endif /* __BORLANDC__ */
 #   endif /* FIXED_POINT */
 #endif /* READ_SCAL */
 

@@ -4,7 +4,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.1 [February 3, 2011]
+ * Last changed in libpng 1.5.2 [March 31, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -140,6 +140,7 @@ png_set_strip_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
+   png_ptr->transformations &= ~PNG_EXPAND_16;
 }
 #endif
 
@@ -152,7 +153,7 @@ png_set_strip_alpha(png_structp png_ptr)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+   png_ptr->transformations |= PNG_STRIP_ALPHA;
 }
 #endif
 
@@ -689,6 +690,25 @@ png_set_tRNS_to_alpha(png_structp png_ptr)
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+/* Expand to 16 bit channels, expand the tRNS chunk too (because otherwise
+ * it may not work correctly.)
+ */
+void PNGAPI
+png_set_expand_16(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_expand_16");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->transformations |= (PNG_EXPAND_16 | PNG_EXPAND | PNG_EXPAND_tRNS);
+   png_ptr->transformations &= ~PNG_16_TO_8;
+
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+}
+#endif
+
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
 void PNGAPI
 png_set_gray_to_rgb(png_structp png_ptr)
@@ -1076,7 +1096,7 @@ png_init_read_transformations(png_structp png_ptr)
              */
             png_ptr->transformations &= ~PNG_BACKGROUND;
             png_ptr->transformations &= ~PNG_GAMMA;
-            png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+            png_ptr->transformations |= PNG_STRIP_ALPHA;
          }
 
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
@@ -1210,7 +1230,7 @@ png_init_read_transformations(png_structp png_ptr)
 
       /* Handled alpha, still need to strip the channel. */
       png_ptr->transformations &= ~PNG_BACKGROUND;
-      png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+      png_ptr->transformations |= PNG_STRIP_ALPHA;
    }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
 
@@ -1288,6 +1308,14 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    }
 #endif
 
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+   if (png_ptr->transformations & PNG_EXPAND_16 && info_ptr->bit_depth == 8 &&
+      info_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
+   {
+      info_ptr->bit_depth = 16;
+   }
+#endif
+
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    if (png_ptr->transformations & PNG_BACKGROUND)
    {
@@ -1356,7 +1384,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->channels = 1;
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-   if (png_ptr->flags & PNG_FLAG_STRIP_ALPHA)
+   if (png_ptr->transformations & PNG_STRIP_ALPHA)
       info_ptr->color_type &= ~PNG_COLOR_MASK_ALPHA;
 #endif
 
@@ -1442,24 +1470,31 @@ png_do_read_transformations(png_structp png_ptr)
          png_do_expand_palette(&(png_ptr->row_info), png_ptr->row_buf + 1,
              png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
+
       else
       {
          if (png_ptr->num_trans &&
              (png_ptr->transformations & PNG_EXPAND_tRNS))
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
                 &(png_ptr->trans_color));
-         else
 
+         else
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
                 NULL);
       }
    }
 #endif
 
+   /* Delay the 'expand 16' step until later for efficiency, so that the
+    * intermediate steps work with 8 bit data.
+    */
+
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-   if (png_ptr->flags & PNG_FLAG_STRIP_ALPHA)
-      png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-          PNG_FLAG_FILLER_AFTER | (png_ptr->flags & PNG_FLAG_STRIP_ALPHA));
+   if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
+      (png_ptr->row_info.color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+      png_ptr->row_info.color_type == PNG_COLOR_TYPE_GRAY_ALPHA))
+      png_do_strip_channel(&(png_ptr->row_info), png_ptr->row_buf + 1,
+         0/*!at_start, because SWAP_ALPHA happens later*/);
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
@@ -1568,6 +1603,16 @@ png_do_read_transformations(png_structp png_ptr)
    }
 #endif /* PNG_READ_QUANTIZE_SUPPORTED */
 
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+   /* Do the expansion now, after all the arithmetic has been done.  Notice
+    * that previous transformations can handle the PNG_EXPAND_16 flag if this
+    * is efficient (particularly true in the case of gamma correction, where
+    * better accuracy results faster!)
+    */
+   if (png_ptr->transformations & PNG_EXPAND_16)
+      png_do_expand_16(&png_ptr->row_info, png_ptr->row_buf + 1);
+#endif
+
 #ifdef PNG_READ_INVERT_SUPPORTED
    if (png_ptr->transformations & PNG_INVERT_MONO)
       png_do_invert(&(png_ptr->row_info), png_ptr->row_buf + 1);
@@ -1595,6 +1640,9 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
+   /*NOTE: this must be in the wrong place - what happens if BGR is set too?
+    * Need pngvalid to test this combo.
+    */
    /* If gray -> RGB, do so now only if we did not do so above */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
@@ -1807,7 +1855,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
       switch (row_info->bit_depth)
       {
          default:
-            break; 
+            break;
 
          case 2:
          {
@@ -4063,6 +4111,37 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          row_info->pixel_depth = (png_byte)(row_info->bit_depth << 2);
          row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
       }
+   }
+}
+#endif
+
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+/* If the bit depth is 8 and the colour type is not a palette type expand the
+ * whole row to 16 bits.  Has no effect otherwise.
+ */
+void /* PRIVATE */
+png_do_expand_16(png_row_infop row_info, png_bytep row)
+{
+   if (row_info->bit_depth == 8 &&
+      row_info->color_type != PNG_COLOR_TYPE_PALETTE)
+   {
+      /* The row have a sequence of bytes containing [0..255] and we need
+       * to turn it into another row containing [0..65535], to do this we
+       * calculate:
+       *
+       *  (input / 255) * 65535
+       *
+       *  Which happens to be exactly input * 257 and this can be achieved
+       *  simply by byte replication in place (copying backwards).
+       */
+      png_byte *sp = row + row_info->rowbytes; /* source, last byte + 1 */
+      png_byte *dp = sp + row_info->rowbytes;  /* destination, end + 1 */
+      while (dp > sp)
+         dp[-2] = dp[-1] = *--sp, dp -= 2;
+
+      row_info->rowbytes *= 2;
+      row_info->bit_depth = 16;
+      row_info->pixel_depth = (png_byte)(row_info->channels * 16);
    }
 }
 #endif
