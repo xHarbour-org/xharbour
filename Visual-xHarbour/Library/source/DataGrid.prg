@@ -938,7 +938,8 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
 
    nPos := Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight )
-
+   nPos := MIN( nPos, ::RowCountUsable )
+   nPos := MAX( nPos, 1 )
    IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
    
       ImageListDestroy( ::__hDragRecImage )
@@ -968,7 +969,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
             NEXT
             ::DataSource:Skip(-1)
 
-          ELSE
+          ELSE //Drag up
 
             FOR i := ::RowPos-1 TO nPos STEP -1
                 ::DataSource:Skip(-1)
@@ -982,7 +983,9 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
                 aEval( aData[i], {|a,n| ::DataSource:FieldPut(n, aData[i][n] ) } )
                 ::DataSource:Skip(-1)
             NEXT
-            ::DataSource:Skip()
+            IF nPos > 1
+               ::DataSource:Skip()
+            ENDIF
           
          ENDIF
          ::DataSource:Unlock()
