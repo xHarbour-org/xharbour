@@ -12,18 +12,12 @@
   * contrib/png/png.c
   * contrib/png/png.h
   * contrib/png/pngconf.h
-  * contrib/png/pngerror.c
-  * contrib/png/pngget.c
-  * contrib/png/pngmem.c
   * contrib/png/pngpread.c
   * contrib/png/pngpriv.h
   * contrib/png/pngread.c
-  * contrib/png/pngrio.c
   * contrib/png/pngrtran.c
   * contrib/png/pngrutil.c
-  * contrib/png/pngset.c
   * contrib/png/pngtrans.c
-  * contrib/png/pngwio.c
   * contrib/png/pngwrite.c
   * contrib/png/pngwtran.c
   * contrib/png/pngwutil.c
@@ -34,7 +28,7 @@
     ! fixed return value of sendmail function
   * source/tip/ftpcln.org
     ! fixed open method to handle ftp server long login messages
-    
+
 2011-03-19 03:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/memvars.c
     ! fix date type memvar returns incorrect data type when restored.
