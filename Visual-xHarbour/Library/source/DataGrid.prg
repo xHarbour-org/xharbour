@@ -937,12 +937,13 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ImageListEndDrag()
    ENDIF
 
-   IF ::__hDragRecImage != NIL
+   nPos := Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight )
+
+   IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
    
       ImageListDestroy( ::__hDragRecImage )
       ::__hDragRecImage := NIL
       ImageListEndDrag()
-      nPos := Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight )
       
       aDrag := ARRAY( LEN( ::DataSource:Structure ) )
       aMove := ARRAY( LEN( ::DataSource:Structure ) )
@@ -1093,7 +1094,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
     ELSEIF nClickRow == ::RowPos .AND. ::AllowDragRecords
       ::__hDragRecImage := ::CreateDragImage(yPos)
       ImageListBeginDrag( ::__hDragRecImage, 0, 0, 0 )
-      ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) ) )
+      ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) )+1 )
    ENDIF
 
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
