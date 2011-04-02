@@ -79,7 +79,7 @@ CLASS DataGrid INHERIT Control
    DATA HighlightColor          PUBLISHED
    DATA HighlightTextColor      PUBLISHED
    DATA Columns                 PUBLISHED
-
+   DATA AllowDragRecords        PUBLISHED INIT .F.
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
 
    DATA ColPos                  EXPORTED INIT 1
@@ -139,6 +139,8 @@ CLASS DataGrid INHERIT Control
    DATA __nHPage                PROTECTED
    DATA __nHMax                 PROTECTED
    DATA __nHPos                 PROTECTED
+   DATA __hDragRecImage         PROTECTED
+   DATA __nDragTop              PROTECTED INIT 0
    
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -227,6 +229,7 @@ CLASS DataGrid INHERIT Control
    METHOD OnMouseMove()
    METHOD GetPosition()
    METHOD OnMouseWheel()
+   METHOD CreateDragImage()
 ENDCLASS
 
 //----------------------------------------------------------------------------------
@@ -369,8 +372,18 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
    ENDIF
 RETURN 0
 
+METHOD CreateDragImage(y) CLASS DataGrid
+   LOCAL hImageList, hMemBitmap, nTop
+   nTop       := ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos-1) )
+   hMemBitmap := GetScreenBitmap( { 0, nTop, ::ClientWidth, nTop + ::ItemHeight }, ::hWnd )
+   hImageList := ImageListCreate( ::ClientWidth, ::ItemHeight, ILC_COLOR32 | ILC_MASK, 1, 0 )
+   ImageListAdd( hImageList, hMemBitmap )
+   DeleteObject( hMemBitmap )
+   ::__nDragTop := y-nTop
+RETURN hImageList
+
 METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
-   LOCAL nRow, n, nWidth, pt, nClickCol, nDrag, nCol
+   LOCAL nRow, n, nWidth, pt, nClickCol, nDrag, nCol, nTop
    ::Super:OnMouseMove(wParam,x,y)
    IF ::__CurControl != NIL .AND. ::__CurControl:ClsName == "Edit" .AND. ::__CurControl:Button
       ::__CurControl:RedrawWindow(,, RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
@@ -412,8 +425,12 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
              ELSE
                ::Cursor := NIL//::System:Cursor:LinkSelect
             ENDIF
-
+          
           ELSE
+            IF wParam == MK_LBUTTON .AND. ::AllowDragRecords .AND. ::__hDragRecImage != NIL
+               nTop := y + ::__GetHeaderHeight() - ::__nDragTop
+               ImageListDragMove( 0, nTop )
+            ENDIF
             ::Cursor := NIL
          ENDIF
 
@@ -911,13 +928,65 @@ RETURN 0
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL n, nClickCol := 1
+   LOCAL n, nPos, nClickCol := 1, aDrag, aMove, i, nRec, aData := {}
 
    ::ReleaseCapture()
    IF ::__hDragImageList != NIL
       ImageListDestroy( ::__hDragImageList )
       ::__hDragImageList := NIL
       ImageListEndDrag()
+   ENDIF
+
+   IF ::__hDragRecImage != NIL
+   
+      ImageListDestroy( ::__hDragRecImage )
+      ::__hDragRecImage := NIL
+      ImageListEndDrag()
+      nPos := Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight )
+      
+      aDrag := ARRAY( LEN( ::DataSource:Structure ) )
+      aMove := ARRAY( LEN( ::DataSource:Structure ) )
+      nRec  := ::DataSource:Recno()
+      
+      aEval( aDrag, {|a,n| aDrag[n] := ::DataSource:FieldGet(n) } )
+
+      IF ::DataSource:FileLock()
+         IF nPos > ::RowPos // Drag down
+
+            FOR i := ::RowPos+1 TO nPos
+                ::DataSource:Skip()
+                aEval( aMove, {|a,n| aMove[n] := ::DataSource:FieldGet(n) } )
+                AADD( aData, ACLONE( aMove ) )
+            NEXT
+            AADD( aData, ACLONE( aDrag ) )
+            ::DataSource:Goto( nRec )
+
+            FOR i := 1 TO LEN( aData )
+                aEval( aData[i], {|a,n| ::DataSource:FieldPut(n, aData[i][n] ) } )
+                ::DataSource:Skip()
+            NEXT
+            ::DataSource:Skip(-1)
+
+          ELSE
+
+            FOR i := ::RowPos-1 TO nPos STEP -1
+                ::DataSource:Skip(-1)
+                aEval( aMove, {|a,n| aMove[n] := ::DataSource:FieldGet(n) } )
+                AADD( aData, ACLONE( aMove ) )
+            NEXT
+            AADD( aData, ACLONE( aDrag ) )
+            ::DataSource:Goto( nRec )
+
+            FOR i := 1 TO LEN( aData )
+                aEval( aData[i], {|a,n| ::DataSource:FieldPut(n, aData[i][n] ) } )
+                ::DataSource:Skip(-1)
+            NEXT
+            ::DataSource:Skip()
+          
+         ENDIF
+         ::DataSource:Unlock()
+      ENDIF
+      ::Update()
    ENDIF
 
    IF ::__lMoveMouseDown .AND. ::__DragColumn > 0 .AND. LEN( ::Children ) > 0
@@ -1021,7 +1090,12 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          ENDIF
          RETURN NIL
       ENDIF
+    ELSEIF nClickRow == ::RowPos .AND. ::AllowDragRecords
+      ::__hDragRecImage := ::CreateDragImage(yPos)
+      ImageListBeginDrag( ::__hDragRecImage, 0, 0, 0 )
+      ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) ) )
    ENDIF
+
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
       RETURN NIL
    ENDIF
