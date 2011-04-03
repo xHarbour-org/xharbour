@@ -1108,17 +1108,17 @@ METHOD SQLLen( nType, nLen, nDec )  CLASS SR_CONNECTION
         nType == SQL_INTEGER  .OR. ;
         nType == SQL_FLOAT    .or. nType == SQL_REAL     .OR. ;
         nType == SQL_DOUBLE
-tracelog('nLen',nLen,'nDec',nDec)
+
       If nLen > 19 .and. nDec > 10 .and. !( nLen = 38 .and. nDec = 0 )
          nLen := 20
          nDec := 6
       EndIf
-tracelog('nLen',nLen,'nDec',nDec)
+
       If !( nLen = 38 .and. nDec = 0 )
          nLen := min( nLen, 20 )
          nLen := max( nLen, 1 )
       EndIf
-tracelog('nLen',nLen,'nDec',nDec)
+
    case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE
      nLen := 8
 
