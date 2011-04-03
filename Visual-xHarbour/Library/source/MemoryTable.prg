@@ -72,6 +72,7 @@ CLASS MemoryTable INHERIT Component
    METHOD FieldPos()
    METHOD RecLock()          INLINE .T.
    METHOD UnLock()           INLINE .T.
+   METHOD FileLock()         INLINE .T.
    METHOD FieldPut( nField, xVal ) INLINE ::Fields:FieldPut( nField, xVal )
    METHOD FieldGet( nField, xVal ) INLINE ::Fields:FieldGet( nField, xVal )
    ACCESS IsOpen             INLINE ::Structure != NIL //Select( ::Area ) > 0
