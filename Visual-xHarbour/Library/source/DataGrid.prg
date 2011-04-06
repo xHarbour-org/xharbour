@@ -81,6 +81,7 @@ CLASS DataGrid INHERIT Control
    DATA Columns                 PUBLISHED
    DATA AllowDragRecords        PUBLISHED INIT .F.
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
+   DATA MultipleSelection       PUBLISHED INIT .F.
 
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
@@ -90,7 +91,8 @@ CLASS DataGrid INHERIT Control
    DATA RowCountUsable          EXPORTED
    DATA RowHeight               EXPORTED
    DATA bRowChanged             EXPORTED
-   
+   DATA aSelected               EXPORTED INIT {}
+
    ACCESS RowCount              INLINE LEN( ::__DisplayArray )
    ACCESS ColCount              INLINE LEN( ::Children )
    ACCESS HorzScrollPos         INLINE ABS( ::__HorzScrolled )
@@ -1103,6 +1105,30 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
       RETURN NIL
    ENDIF
+   
+   IF ::MultipleSelection
+      IF CheckBit( GetKeyState( VK_CONTROL ) )
+         IF ( n := ASCAN( ::aSelected, ::DataSource:Recno() ) ) == 0
+            AADD( ::aSelected, ::DataSource:Recno() )
+          ELSE
+            ADEL( ::aSelected, n, .T. )
+         ENDIF
+       ELSEIF CheckBit( GetKeyState( VK_SHIFT ) )
+         IF nClickRow > ::RowPos
+            FOR n := ::RowPos TO nClickRow
+                AADD( ::aSelected, ::__DisplayArray[n][2] )
+            NEXT
+          ELSE
+            FOR n := ::RowPos TO nClickRow STEP -1
+                AADD( ::aSelected, ::__DisplayArray[n][2] )
+            NEXT
+         ENDIF
+         ::Update()
+       ELSEIF LEN( ::aSelected ) > 0
+         ::aSelected := {}
+         ::Update()
+      ENDIF
+   ENDIF
 
    nClickCol := 1
    FOR n := 1 TO LEN( ::__DisplayArray[1][1] )
@@ -1511,7 +1537,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
           IF nRec == nRecno .AND. ::ShowSelection
              lSelected := .T.
           ENDIF
-          
+          lSelected := lSelected .OR. ASCAN( ::aSelected, nRec ) > 0
+
           FOR i := nCol TO nColEnd
 
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i// avoid painting non-visible columns
@@ -2703,6 +2730,8 @@ RETURN .T.
 METHOD Down() CLASS DataGrid
    LOCAL lRes, x, nImageWidth, aScroll, aClip
 
+   ::aSelected := {}
+
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
    DEFAULT lRes TO .T.
@@ -2781,6 +2810,8 @@ RETURN Self
 METHOD Up() CLASS DataGrid
    LOCAL lRes, x, nImageWidth, aScroll, aClip
 
+   ::aSelected := {}
+
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
    DEFAULT lRes TO .T.
@@ -2849,6 +2880,8 @@ RETURN NIL
 
 METHOD PageDown( nCount ) CLASS DataGrid
    LOCAL lRes, i, n, x, nImageWidth, nColumns, nRec
+
+   ::aSelected := {}
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
@@ -2934,6 +2967,8 @@ RETURN Self
 
 METHOD PageUp( nCount ) CLASS DataGrid
    LOCAL lRes, i, n, x, nImageWidth, nColumns, nRec
+
+   ::aSelected := {}
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )

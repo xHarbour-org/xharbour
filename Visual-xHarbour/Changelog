@@ -9,6 +9,10 @@
 */
 
 2011-04-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added DataGrid:MultipleSelection true/false
+     Use array of records DataGrid:aSelected to go to each record.
+
+2011-04-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added DataGrid:AllowDragRecords true/false
 
 2011-03-31 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
