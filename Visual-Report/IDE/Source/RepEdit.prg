@@ -14,6 +14,7 @@
 #include "winuser.ch"
 
 CLASS RepEdit INHERIT Panel
+   CLASSDATA aCursor EXPORTED
    DATA Objects      EXPORTED INIT {}
    DATA FlatCaption  EXPORTED INIT .T.
    DATA FlatBorder   EXPORTED INIT .T.
@@ -27,7 +28,6 @@ CLASS RepEdit INHERIT Panel
    DATA nDownPos     EXPORTED
    DATA oPs          EXPORTED
    DATA nMove        EXPORTED INIT 0
-   CLASSDATA aCursor EXPORTED
    DATA oLast        EXPORTED
 
    METHOD OnLButtonDown()
@@ -344,21 +344,60 @@ FUNCTION Snap( x, nGrain )
 RETURN ROUND( ( x / nGrain ), 0) * nGrain
 
 FUNCTION KeyDown( oCtrl, nKey )
-   IF nKey == VK_DELETE .AND. oCtrl != NIL .AND. oCtrl:Cargo != NIL
-      oCtrl:Cargo:Delete()
-      oCtrl:Application:Report:Modified := .T.
-    ELSEIF nKey == VK_LEFT
-      oCtrl:Left -- 
-      oCtrl:EditCtrl:Left -- 
-    ELSEIF nKey == VK_UP
-      oCtrl:Top -- 
-      oCtrl:EditCtrl:Top -- 
-    ELSEIF nKey == VK_RIGHT
-      oCtrl:Left ++ 
-      oCtrl:EditCtrl:Left ++
-    ELSEIF nKey == VK_DOWN
-      oCtrl:Top -- 
-      oCtrl:EditCtrl:Top -- 
+   LOCAL lShift, aRect, nMove := 1, lMod := .T.
+   IF oCtrl != NIL .AND. oCtrl:Cargo != NIL
+      aRect := oCtrl:GetRectangle()
+      lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
+      IF CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
+         nMove := 8
+      ENDIF
+      aRect[1]-=(nMove+4)
+      aRect[2]-=(nMove+4)
+      aRect[3]+=(nMove+4)
+      aRect[4]+=(nMove+4)
+      IF nKey == VK_DELETE
+         oCtrl:Cargo:Delete()
+       ELSEIF nKey == VK_LEFT
+         IF lShift .AND. oCtrl:aSize[2]
+            oCtrl:Cargo:Width -= nMove
+            oCtrl:Width -= nMove
+          ELSE
+            oCtrl:Cargo:Left -= nMove
+            oCtrl:Left -= nMove
+         ENDIF
+       ELSEIF nKey == VK_UP
+         IF lShift .AND. oCtrl:aSize[8]
+            oCtrl:Cargo:Height -= nMove
+            oCtrl:Height -= nMove
+          ELSE
+            oCtrl:Cargo:Top -= nMove
+            oCtrl:Top -= nMove
+         ENDIF
+       ELSEIF nKey == VK_RIGHT
+         IF lShift .AND. oCtrl:aSize[6]
+            oCtrl:Cargo:Width += nMove
+            oCtrl:Width += nMove
+          ELSE
+            oCtrl:Cargo:Left += nMove
+            oCtrl:Left += nMove
+         ENDIF
+       ELSEIF nKey == VK_DOWN
+         IF lShift .AND. oCtrl:aSize[4]
+            oCtrl:Cargo:Height += nMove
+            oCtrl:Height += nMove
+          ELSE
+            oCtrl:Cargo:Top += nMove
+            oCtrl:Top += nMove
+         ENDIF
+       ELSE
+         lMod := .F.
+      ENDIF
+      IF lMod
+         IF !oCtrl:Application:Report:Modified
+            oCtrl:Application:Report:Modified := .T.
+         ENDIF
+         oCtrl:Parent:InvalidateRect( aRect, .T.)
+      ENDIF
    ENDIF
 RETURN NIL
 

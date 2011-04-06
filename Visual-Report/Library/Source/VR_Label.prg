@@ -236,6 +236,7 @@ CLASS __VrLabel INHERIT Label
    METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
    METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
+   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
