@@ -12,6 +12,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "hbxml.ch"
+#define LINEHEIGHT 2
 #define  acObjectTypeLine           1
 //-----------------------------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ METHOD Create() CLASS VrLine
       :Left      := ::Left
       :Top       := ::Top
       :Width     := ::Width
-      :Height    := 2
+      :Height    := LINEHEIGHT
       :BackColor := RGB(0,0,0)
       :Create()
    END
@@ -92,7 +93,7 @@ METHOD Configure() CLASS VrLine
       :xLeft          := ::Left
       :xTop           := ::Top
       :xWidth         := ::Width
-      :xHeight        := 2
+      :xHeight        := LINEHEIGHT
       :MoveWindow()
    END
 RETURN Self

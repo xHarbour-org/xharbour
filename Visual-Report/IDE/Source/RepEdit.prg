@@ -152,6 +152,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
 
          ENDCASE
          oCtrl:MoveWindow()
+         ::Application:Report:Modified := .T.
       ENDIF
    ENDIF
 RETURN 0
@@ -345,6 +346,19 @@ RETURN ROUND( ( x / nGrain ), 0) * nGrain
 FUNCTION KeyDown( oCtrl, nKey )
    IF nKey == VK_DELETE .AND. oCtrl != NIL .AND. oCtrl:Cargo != NIL
       oCtrl:Cargo:Delete()
+      oCtrl:Application:Report:Modified := .T.
+    ELSEIF nKey == VK_LEFT
+      oCtrl:Left -- 
+      oCtrl:EditCtrl:Left -- 
+    ELSEIF nKey == VK_UP
+      oCtrl:Top -- 
+      oCtrl:EditCtrl:Top -- 
+    ELSEIF nKey == VK_RIGHT
+      oCtrl:Left ++ 
+      oCtrl:EditCtrl:Left ++
+    ELSEIF nKey == VK_DOWN
+      oCtrl:Top -- 
+      oCtrl:EditCtrl:Top -- 
    ENDIF
 RETURN NIL
 

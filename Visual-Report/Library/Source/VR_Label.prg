@@ -263,7 +263,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 FUNCTION GetPoints( oCtrl )
-   LOCAL aRect, aPoints, n := 4
+   LOCAL aRect, aPoints, n := 6
    aRect := _GetClientRect( oCtrl:hWnd )
    aPoints := { { 0, 0,          n, n },; // left top
                 { 0, (aRect[4]-n)/2, n, (aRect[4]+n)/2 },; // left
@@ -281,11 +281,9 @@ FUNCTION MouseMove( oCtrl, n, x, y )
       oCtrl:Parent:nMove := 0
       aPoints := GetPoints( oCtrl )
       FOR i := 1 TO LEN( aPoints )
-          IF _PtInRect( aPoints[i], {x,y} )
-             IF oCtrl:aSize[i]
-                oCtrl:Parent:nMove := i
-                nCursor := i - IIF( i > 4, 4, 0 )
-             ENDIF
+          IF oCtrl:aSize[i] .AND. _PtInRect( aPoints[i], {x,y} )
+             oCtrl:Parent:nMove := i
+             nCursor := i - IIF( i > 4, 4, 0 )
              EXIT
           ENDIF
       NEXT
@@ -294,8 +292,15 @@ FUNCTION MouseMove( oCtrl, n, x, y )
 RETURN NIL
 
 FUNCTION PaintMarkers( hDC, oCtrl )
-   LOCAL i, aPt, hBrush, aPts := GetPoints( oCtrl )
-   hBrush := GetStockObject( BLACK_BRUSH )
+   LOCAL nColor, i, aPt, hBrush, aPts := GetPoints( oCtrl )
+   local r,g,b, hOld
+
+   r = 255-GetRValue( oCtrl:BackColor )
+   g = 255-GetGValue( oCtrl:BackColor )
+   b = 255-GetBValue( oCtrl:BackColor )
+            
+   hBrush := CreateSolidBrush( RGB(r,g,b) )
+   hOld := SelectObject( hDC, hBrush )
    FOR i := 1 TO LEN( aPts )
        IF oCtrl:aSize[i]
           aPt := {aPts[i][1], aPts[i][2]}
@@ -308,9 +313,11 @@ FUNCTION PaintMarkers( hDC, oCtrl )
           _ScreenToClient( oCtrl:Parent:hWnd, @aPt )
           aPts[i][3] := aPt[1]
           aPts[i][4] := aPt[2]
-          _FillRect( hDC, aPts[i], hBrush )
+          Rectangle( hDC, aPts[i][1], aPts[i][2], aPts[i][3], aPts[i][4] )
        ENDIF
    NEXT
+   SelectObject( hDC, hOld )
+   DeleteObject( hBrush )
 RETURN NIL
 
 FUNCTION DecToHexa(nNumber)
