@@ -28,7 +28,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
    DATA Order            EXPORTED INIT ""
    DATA bFilter          EXPORTED  INIT ""
-   DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" } }
+   DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
    METHOD Init()  CONSTRUCTOR
