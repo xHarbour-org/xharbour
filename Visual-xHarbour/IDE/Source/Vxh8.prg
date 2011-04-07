@@ -573,8 +573,10 @@ METHOD Save() CLASS StructEditor
          ENDIF
       ENDIF
       
-      AdsSetServerType( ::DataSource:ServerType )
-
+      TRY
+         AdsSetServerType( ::DataSource:ServerType )
+      CATCH
+      END
       ::DataSource:Create()
       ::DataSource:Goto( nRec )
     ELSE
@@ -1149,7 +1151,10 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS TblEditor
       ::PostMessage( WM_KEYDOWN, VK_RETURN )
       RETURN 0
     ELSEIF nwParam == VK_DELETE
-      ::DataSource:Delete()
+      IF ::DataSource:RecLock()
+         ::DataSource:Delete()
+         ::DataSource:Unlock()
+      ENDIF
       ::Update()
       s_oSave:Enabled := .T.
       RETURN 0

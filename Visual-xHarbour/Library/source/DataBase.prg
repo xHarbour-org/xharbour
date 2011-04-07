@@ -168,6 +168,7 @@ CLASS DataTable INHERIT Component
    METHOD CreateOrder()
    ACCESS IsOpen INLINE ::Structure != NIL //Select( ::Area ) > 0
    METHOD FromAlias()
+   METHOD Insert() INLINE ::Append()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
