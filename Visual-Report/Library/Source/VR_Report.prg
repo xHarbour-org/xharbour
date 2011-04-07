@@ -26,6 +26,11 @@
 #define  acCommandToolPageHome         53773
 
 CLASS VrReport INHERIT VrObject
+   DATA PrintHeader    EXPORTED  INIT .T.
+   DATA PrintRepHeader EXPORTED  INIT .T.
+   DATA PrintFooter    EXPORTED  INIT .T.
+   DATA PrintRepFooter EXPORTED  INIT .T.
+
    DATA ClsName        EXPORTED  INIT "Report"
    DATA Name           EXPORTED  INIT "Report"
 
@@ -330,19 +335,23 @@ RETURN nHeight
 //-----------------------------------------------------------------------------------------------
 METHOD CreateHeader( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   FOR EACH aCtrl IN ::aHeader
-       ::CreateControl( aCtrl, @nHeight,, hDC )
-   NEXT
-   ::nRow := ::HeaderHeight
+   IF ::PrintHeader
+      FOR EACH aCtrl IN ::aHeader
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+      NEXT
+      ::nRow := ::HeaderHeight
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateFooter( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
-   ::nRow := ::oPDF:PageLength - ::FooterHeight
-   FOR EACH aCtrl IN ::aFooter
-       ::CreateControl( aCtrl, @nHeight,, hDC )
-   NEXT
+   IF ::PrintFooter
+      ::nRow := ::oPDF:PageLength - ::FooterHeight
+      FOR EACH aCtrl IN ::aFooter
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+      NEXT
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

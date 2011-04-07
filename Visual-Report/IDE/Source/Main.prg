@@ -422,6 +422,8 @@ METHOD Init() CLASS MainForm
             :Top       := 2
             :Height    := 100
             :Visible   := .F.
+            :Dock:Top  := :Parent
+            :Dock:Margins := "0,2,0,0"
             :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
             :Create()
          END
@@ -758,11 +760,11 @@ METHOD SetScrollArea() CLASS Report
    
    oApp:Props:ReportPageTab:HorzScroll := .T.
 
-   oApp:Props:RepHeader:Visible := .T.
-   oApp:Props:Header:Visible    := .T.
+   oApp:Props:RepHeader:Visible := oApp:Props:ViewMenuRepHeader:Checked
+   oApp:Props:Header:Visible    := oApp:Props:ViewMenuHeader:Checked
    oApp:Props:Body:Visible      := .T.
-   oApp:Props:Footer:Visible    := .T.
-   oApp:Props:RepFooter:Visible := .T.
+   oApp:Props:Footer:Visible    := oApp:Props:ViewMenuFooter:Checked
+   oApp:Props:RepFooter:Visible := oApp:Props:ViewMenuRepFooter:Checked
    oApp:Props:ExtraPage:Visible := .T.
 RETURN Self
 
@@ -934,6 +936,11 @@ METHOD Run() CLASS Report
    IF ::Save()
       oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait...", .T. )
       oRep  := VrReport()
+      oRep:PrintHeader    := oApp:Props:ViewMenuHeader:Checked
+      oRep:PrintRepHeader := oApp:Props:ViewMenuRepHeader:Checked
+      oRep:PrintFooter    := oApp:Props:ViewMenuFooter:Checked
+      oRep:PrintRepFooter := oApp:Props:ViewMenuRepFooter:Checked
+      
       oRep:Run( ::oXMLDoc, oWait )
       oWait:Destroy()
       oRep:Preview()
