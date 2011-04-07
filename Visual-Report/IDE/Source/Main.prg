@@ -867,6 +867,15 @@ METHOD Save( lSaveAs ) CLASS Report
          oXmlProp:addBelow( oXmlSource )
          oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "BottomMargin", NIL, XSTR( ::VrReport:BottomMargin ) )
          oXmlProp:addBelow( oXmlSource )
+
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintHeader", NIL, IIF( ::VrReport:PrintHeader, "1", "0" ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepHeader", NIL, IIF( ::VrReport:PrintRepHeader, "1", "0" ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintFooter", NIL, IIF( ::VrReport:PrintFooter, "1", "0" ) )
+         oXmlProp:addBelow( oXmlSource )
+         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepFooter", NIL, IIF( ::VrReport:PrintRepFooter, "1", "0" ) )
+         oXmlProp:addBelow( oXmlSource )
       oXmlReport:addBelow( oXmlProp )
 
       IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
@@ -936,10 +945,6 @@ METHOD Run() CLASS Report
    IF ::Save()
       oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait...", .T. )
       oRep  := VrReport()
-      oRep:PrintHeader    := oApp:Props:ViewMenuHeader:Checked
-      oRep:PrintRepHeader := oApp:Props:ViewMenuRepHeader:Checked
-      oRep:PrintFooter    := oApp:Props:ViewMenuFooter:Checked
-      oRep:PrintRepFooter := oApp:Props:ViewMenuRepFooter:Checked
       
       oRep:Run( ::oXMLDoc, oWait )
       oWait:Destroy()

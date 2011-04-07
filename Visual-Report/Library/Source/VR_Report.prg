@@ -97,8 +97,13 @@ ENDCLASS
 METHOD Init() CLASS VrReport
    ::aProperties := {}
    ::Orientation := __GetSystem():PageSetup:Portrait
-   AADD( ::aProperties, { "Name",       "Object"  } )
-   AADD( ::aProperties, { "DataSource", "Data"  } )
+   AADD( ::aProperties, { "Name",           "Object" } )
+   AADD( ::aProperties, { "DataSource",     "Data"   } )
+   AADD( ::aProperties, { "PrintHeader",    "Print"  } )
+   AADD( ::aProperties, { "PrintRepHeader", "Print"  } )
+   AADD( ::aProperties, { "PrintFooter",    "Print"  } )
+   AADD( ::aProperties, { "PrintRepFooter", "Print"  } )
+
    ::InitPDF()
 RETURN Self
 
@@ -453,6 +458,10 @@ METHOD Load( cReport ) CLASS VrReport
       END
       ::Application:Props:PropEditor:ResetProperties( {{ ::DataSource }} )
    ENDIF
+   ::PrintHeader    := ::aProps:PrintHeader == "1"
+   ::PrintRepHeader := ::aProps:PrintRepHeader == "1"
+   ::PrintFooter    := ::aProps:PrintFooter == "1"
+   ::PrintRepFooter := ::aProps:PrintRepFooter == "1"
 
    FOR EACH aCtrl IN ::aHeader
        ::CreateControl( aCtrl,, ::Application:Props[ "Header" ] )
@@ -481,6 +490,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    IF oDoc != NIL
       ::PrepareArrays( oDoc )
    ENDIF
+
+   ::PrintHeader    := ::aProps:PrintHeader == "1"
+   ::PrintRepHeader := ::aProps:PrintRepHeader == "1"
+   ::PrintFooter    := ::aProps:PrintFooter == "1"
+   ::PrintRepFooter := ::aProps:PrintRepFooter == "1"
 
    ::StartPage()
    hDC := GetDC(0)
