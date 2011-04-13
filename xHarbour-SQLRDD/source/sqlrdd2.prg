@@ -19,6 +19,14 @@
 #define DUPL_IND_DETECT                .F.
 #define SQLRDD_LEARNING_REPETITIONS     5
 
+
+
+static aFather :={}
+static nStartId :=0
+static aPos :={}
+static nPosData :=0
+static lUseXmlField := .F.
+STATIC lUseJSONField := .F.
 Static ItP11, ItP14, ItP2, ItP3
 
 Static lGoTopOnFirstInteract := .T.
@@ -432,7 +440,7 @@ Return cSelectList + " "
 METHOD sqlGetValue( nField ) CLASS SR_WORKAREA
 
    local aRet := { NIL }, lOldIndex
-
+   
    If ::aInfo[ AINFO_DETECT1_COUNT ] > SQLRDD_LEARNING_REPETITIONS
       ::lAllColumnsSelected := .T.
       ::sqlGoTo( ::aInfo[ AINFO_RECNO ], .T. )
@@ -1964,6 +1972,7 @@ Return ""
 METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR_WORKAREA
 
    Local cType := valtype(uData), cRet
+   lOCAL cOldSet := SET(_SET_DATEFORMAT)
 
    DEFAULT trim      := .F.
    DEFAULT nTargetDB := ::oSql:nSystemID
@@ -2030,6 +2039,15 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
       return if(uData,"'t'","'f'")
    Case cType == "L" .and. (!lMemo)
       return if(uData,"1","0")
+   Case cType == 'T'
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF 
+      Set( _SET_DATEFORMAT,  "yyyy-mm-dd") 
+      cRet := ttoc( uData )
+      Set( _SET_DATEFORMAT,cOldSet)
+      RETURN [']+cRet+[']
+    
    OtherWise
       if valtype( uData ) =="A" .and. SR_SetSerializeArrayAsJson()
          cRet := hb_jsonencode(uData,.f.)
@@ -2388,7 +2406,7 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
 
                   nlen:=len(oxml:tostring(HBXML_STYLE_NONEWLINE))
                   cVal += if(!lFirst,", ","( ") + ::QuotedNull(oXml:tostring(HBXML_STYLE_NONEWLINE),.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
-                  exit
+                  exit                  
                Default
                   cVal += if(!lFirst,", ","( ") + ::QuotedNull(cMemo,.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
                End
@@ -5100,6 +5118,14 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
             cSql := cSql + "DECIMAL (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str(aCreate[i,FIELD_DEC],9,0)) +  ")" + IF(lPrimary .or. lNotNull, " NOT NULL", " " )
          EndIf
       // including xml data type
+      // postgresql datetime
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  )
+         cSql := cSql + 'timestamp without time zone '
+      // oracle datetime
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE  )
+         cSql := cSql + 'TIMESTAMP '   
+
+      
       OtherWise
          SR_MsgLogFile(  SR_Msg(9)+cField+" ("+aCreate[i,FIELD_TYPE]+")" )
 
@@ -9632,3 +9658,159 @@ cRet := Substr( cRet, 1, Len( cRet ) - 1 ) + " ) ) "
 return cRet
 
 REQUEST SR_FROMXML,SR_arraytoXml
+
+function SR_arraytoXml( a )
+Local cItem
+Local hHash
+LOCAL oXml := TXmlDocument():new() // Cria um objeto Xml
+Local oNode
+Local oNode1
+Local aItem
+nPosData:=0
+hhash := hash()
+
+hHash[ "version" ] := '1.0'
+
+hHash[ "encoding"] := "utf-8" 
+oNode := tXMLNode(  ):New( HBXML_TYPE_PI, "xml", hHash,[version="1.0" encoding="utf-8"]  )   
+oXml:oRoot:Addbelow( oNode)
+hhash:=hash()
+hhash['Type'] := valtype( a ) 
+hhash['Len']  := Alltrim( Str( Len( a ) ) )
+hHash['Id' ]  :=alltrim(str(nStartId))
+hHash['FatherId' ]  :=alltrim('-1')
+oNode := tXMLNode(  ):New( HBXML_TYPE_TAG, "Array",hhash )      
+For each aItem in a
+    addNode( aItem,ONode ) 
+next
+hhash:={}
+oXml:oRoot:addBelow(oNode)
+return oXml
+
+
+static function AddNode( a,oNode)
+Local oNode1
+Local hHash := Hash()
+Local oNode2
+Local aItem
+local theData 
+hhash['Type'] := valtype( a ) 
+
+if valtype( a ) == "A"
+   hhash['Len']  := Alltrim( Str( Len( a ) ) )
+   hhash['Type'] := valtype( a ) 
+   aadd(aFather, nStartId)
+   ++nStartId   
+   hHash['Id' ]  :=alltrim(str(nStartId))
+   hHash['FatherId' ]  :=alltrim(str(aFather[-1]))
+   hHash['Pos'] := alltrim(Str(++nPosData))
+   aadd( aPos ,nPosData )
+
+   nPosData :=0
+   oNode1:= tXMLNode(  ):New( HBXML_TYPE_TAG, "Array",hhash )      
+   For each aItem in a
+      AddNode( aItem,oNode1) 
+      //oNode1:addbelow( onode2 )
+   next   
+   nStartId := aFather[ -1 ]
+   nPosData := aPos[-1]
+   adel(aFather,len( aFather ),.t.)
+   adel(aPos,len( aPos ),.t.)
+   oNode:addbelow(oNode1)
+else
+   if valtype( a ) == 'N'
+      hHash['Value']:= Alltrim( str( a ) )
+   elseif valtype( a ) == 'L'
+      hHash['Value']:= if(a,'T','F')
+   elseif valtype( a ) == 'D'
+      hHash['Value']:= dtos(a)
+   ELSE 
+      hHash['Value']:= a
+   endif
+   hHash['Pos'] := alltrim(Str(++nPosData))
+   hHash['Id' ]  :=alltrim(str(nStartId))
+   oNode1 := tXMLNode(  ):New( HBXML_TYPE_TAG, "Data",hhash )      
+   oNode:addBelow(oNode1)
+endif
+return  nil
+
+
+function SR_fromXml(oDoc, aRet,nLen,c)
+Local oNode
+Local Curnode
+Local nId
+Local CurPos 
+Local nStart :=0
+
+
+  if nLen == -1 .and. !'<Array' in c
+     aRet :={}
+     return {}
+  ENDIF
+  if nLen == -1 .and. !"<?xml" in c
+  c:=[<?xml version="1.0" encoding="utf-8"?>]+c
+  endif
+  if oDoc == NIL
+     oDoc := txmldocument():new(c)
+  ENDIF
+
+  oNode := oDoc:CurNode
+  oNode:=oDoc:Next()
+  DO WHILE oNode != NIL
+      if oNode:nType ==6 .or. oNode:nType == 2
+         oNode := oDoc:Next()
+         loop
+      endif
+  
+      oNode := oDoc:CurNode  
+      if oNode:cName == "Array"
+         if Val(oNode:AATTRIBUTES['Id'] ) == 0    .and. Val(oNode:AATTRIBUTES['FatherId']) == -1
+            aRet := Array(Val(oNode:AATTRIBUTES['Len'] ))            
+         ELSEIF Val(oNode:AATTRIBUTES['Id'] ) == 0
+            CurPos := Val(oNode:AATTRIBUTES['Pos'] )  
+            aRet[CurPos] := Array(Val(oNode:AATTRIBUTES['Len'] ))            
+            SR_fromXml(@oDoc,@aRet[CurPos],Val(oNode:AATTRIBUTES['Len'] ))
+         ELSE   
+            CurPos := Val(oNode:AATTRIBUTES['Pos'] )  
+            aRet[CurPos] := Array(Val(oNode:AATTRIBUTES['Len'] ))            
+            SR_fromXml(@oDoc,@aRet[CurPos],Val(oNode:AATTRIBUTES['Len'] ))
+         endif               
+      endif
+      if oNode:cName == "Data"
+         //IF Val(oNode:AATTRIBUTES['Id'] ) == 0
+            
+            CurPos := Val(oNode:AATTRIBUTES['Pos'] )            
+               if oNode:AATTRIBUTES['Type'] == "C"
+                  aRet[CurPos] :=  oNode:AATTRIBUTES['Value']
+               elseif oNode:AATTRIBUTES['Type'] == "L"
+                  aRet[CurPos] :=  IF(oNode:AATTRIBUTES['Value']=="F", .F., .T.)
+               elseif oNode:AATTRIBUTES['Type'] == "N"
+                  aRet[CurPos] := val(oNode:AATTRIBUTES['Value']) 
+               elseif oNode:AATTRIBUTES['Type'] == "D"
+                  aRet[CurPos] := Stod(oNode:AATTRIBUTES['Value'])
+               endif            
+         //ELSE
+         //endif
+      endif
+      nStart++      
+      If nStart == nLen
+         exit
+      end         
+      oNode := oDoc:Next()
+      
+  enddo
+return aret  	    
+
+FUNCTION SR_getUseXmlField()
+RETURN lUseXmlField
+
+FUNCTION SR_SetUseXmlField( l )
+   lUseXmlField := l
+RETURN NIL
+
+FUNCTION SR_getUseJSON()
+RETURN lUseJSONField
+
+FUNCTION SR_SetUseJSON( l )
+   lUseJSONField := l
+RETURN NIL

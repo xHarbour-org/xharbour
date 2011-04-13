@@ -7,8 +7,23 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2011-03-30 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
-   
+2011-04-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd2.prg
+     ! added support for datetime field for postgresql and oracle, type for this field is T
+     ! move function responsable from converting arrays into xml and vice versa from sqlpgs.prg 
+   ! source/sqlpgs.prg  
+     - functions for converting arrays into xml and vice versa from sqlpgs.prg 
+   ! source/pgs.c
+     ! added support for datetime fields
+   ! source/sqlorax.c
+     ! added support for datetime fields
+   ! source/sqlrdd1.c
+     source/utils.prg
+     source/sqlodbc.ch
+     source/sqlconnection.prg
+     ! added code to support datetime field under postgresql and oracle
+               
+2011-03-30 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/firebird.c
    ! source/mysql.c   
    ! source/sqlsrodbc.c

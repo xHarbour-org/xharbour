@@ -687,6 +687,8 @@ Function SR_BlankVar( cType, nLen, nDec )
       Return ctod('')
    Case cType = "N"
       return 0
+   Case cType == 'T'
+      return datetime(0,0,0,0,0,0,0)   
    EndCase
 
 Return ""

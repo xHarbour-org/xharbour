@@ -1295,7 +1295,7 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    HB_ITEM itemTemp2;
    ULONG ulPos;
    USHORT uiLen;
-
+   LPFIELD pField ;
    itemTemp2.type = HB_IT_NIL;
 
    if( thiswa->lpdbPendingRel )
@@ -1307,7 +1307,8 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
       SELF_GOTOP( (AREAP) thiswa );
       thiswa->firstinteract = 0;
    }
-
+   pField = thiswa->area.lpFields + fieldNum - 1;
+   TraceLog("campo.txt"," field get campo - %s fieldnum %lu   pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,pField->uiType);
    itemTemp = hb_itemArrayGet( thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1] );
 
    if( HB_IS_NIL( itemTemp ) )
@@ -1442,7 +1443,8 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    double dNum;
    USHORT len, dec, fieldindex;
    PHB_ITEM pFieldNum;
-
+   BOOL bOk = TRUE;
+   PHB_DYNS s_pSym_SR_FROMXML = NULL;
    // TraceLog( NULL, "sqlPutValue, writing column %i\n", fieldNum );
 
    hot.type = HB_IT_LOGICAL;
@@ -1459,8 +1461,21 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    }
 
    fieldindex = (USHORT)thiswa->uiBufferIndex[fieldNum - 1];
-   pDest  = hb_itemArrayGet( thiswa->aBuffer, fieldindex );
-
+   
+    pDest  = hb_itemArrayGet( thiswa->aBuffer, fieldindex );
+//                if( s_pSym_SR_FROMXML == NULL )
+//                {
+//                   hb_dynsymLock();
+//                   s_pSym_SR_FROMXML = hb_dynsymFindName( "ESCREVE" );
+//                   hb_dynsymUnlock();
+//                   if ( s_pSym_SR_FROMXML  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
+//                }
+//                
+//                hb_vmPushSymbol( s_pSym_SR_FROMXML->pSymbol );
+//                hb_vmPushNil();
+//                hb_vmPush(thiswa->aBuffer);
+//                hb_vmDo( 1 );
+//    
    if( HB_IS_NIL( pDest ) )
    {
       hb_itemRelease( pDest );
@@ -1478,11 +1493,17 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    }
 
    pField = thiswa->area.lpFields + fieldNum - 1;
+   TraceLog("campo.txt"," campo - %s fieldnum %lu fieldindex %lu  pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,fieldindex,pField->uiType);
 
    /* test compatible datatypes */
-
+   //if  ( HB_IS_TIMEFLAG( value ) )//|| HB_IS_DATE( pDest )) 
+   //{	
+	   //bOk = FALSE;
+       //hb_arraySet( thiswa->aBuffer, fieldindex, value );  
+   //}
    if( (HB_IS_NUMBER( pDest ) && HB_IS_NUMBER( value )) || (HB_IS_STRING( pDest ) && HB_IS_STRING( value )) ||
-       (HB_IS_LOGICAL( pDest ) && HB_IS_LOGICAL( value )) || (HB_IS_DATE( pDest ) && HB_IS_DATE( value )) )
+       (HB_IS_LOGICAL( pDest ) && HB_IS_LOGICAL( value )) || (HB_IS_DATE( pDest ) && HB_IS_DATE( value )) || 
+        (HB_IS_DATETIME( pDest ) && HB_IS_DATETIME( value )))
    {
 
       if( pField->uiType == HB_FT_STRING )
@@ -3567,7 +3588,11 @@ static BOOL ProcessFields( SQLAREAP thiswa )
       case 'V':
          field.uiType = HB_FT_ANY;
          break;
-
+      // new field type
+      case 't':
+      case 'T':
+         field.uiType = HB_FT_DATETIME;
+         break;
       default:
          field.uiType =HB_IT_NIL;
          break;

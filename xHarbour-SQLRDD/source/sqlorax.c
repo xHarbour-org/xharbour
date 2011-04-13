@@ -314,10 +314,12 @@ int sqlo_sqldtype( USHORT type )
       case SQLOT_DAT:
       case SQLOT_ODT:
       case SQLOT_DATE:
+         isqltype = SQL_DATE;
+         break;
       case SQLOT_TIMESTAMP:
       case SQLOT_TIMESTAMP_TZ:
       case SQLOT_TIMESTAMP_LTZ:
-         isqltype = SQL_DATE;
+         isqltype= SQL_DATETIME;
          break;
       default:
          isqltype = 0;
@@ -345,7 +347,7 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
       {
          hb_storni( 0, 6 );
          hb_storni( dbsize, 5 );
-      }
+      }      
       else if ( type == SQL_NUMERIC )
       {
          if( prec == 0 )
@@ -358,6 +360,11 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
             hb_storni( prec, 5 );
             hb_storni( scale, 6 );
          }
+      }
+      else if ( type == SQL_DATETIME )       
+      {
+	     hb_storni( 0, 6 );
+         hb_storni( 8, 5 );
       }
       else
       {
@@ -527,6 +534,12 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+	         break;
+     	 }    
+
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
       }
@@ -643,6 +656,35 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         //hb_retdts(bBuffer);
+	         
+            char dt[17]={0};
+            dt[0] = bBuffer[0];
+            dt[1] = bBuffer[1];
+            dt[2] = bBuffer[2];
+            dt[3] = bBuffer[3];
+            dt[4] = bBuffer[5];
+            dt[5] = bBuffer[6];
+            dt[6] = bBuffer[8];
+            dt[7] = bBuffer[9];
+            dt[8] = bBuffer[10];
+            dt[9] = bBuffer[11];	         
+            dt[10] = bBuffer[12];	                     
+            dt[11] = bBuffer[13];	         
+            dt[12] = bBuffer[14];	         
+            dt[13] = bBuffer[15];	         
+            dt[14] = bBuffer[16];	                     
+            dt[15] = bBuffer[17];	         
+            dt[16] = bBuffer[18];	         
+            dt[17] = '\0';
+	         
+
+	         hb_itemPutDTS( pItem, dt );
+	         break;
+     	 }    
+
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
       }

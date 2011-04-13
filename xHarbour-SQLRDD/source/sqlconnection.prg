@@ -1075,6 +1075,8 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
       cType = "C"
    case nType == SQL_LONGVARCHAR .or. nType == SQL_LONGVARBINARY .or. nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB
       cType = "M"
+   case nType == SQL_DATETIME
+      cType := 'T'   
    endcase
 
    if cType == "U"
@@ -1119,7 +1121,7 @@ METHOD SQLLen( nType, nLen, nDec )  CLASS SR_CONNECTION
          nLen := max( nLen, 1 )
       EndIf
 
-   case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE
+   case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE .or. ntype == SQL_DATETIME
      nLen := 8
 
    case nType == SQL_TIME

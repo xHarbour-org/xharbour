@@ -304,8 +304,8 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
          case INETOID:
          case CIDROID:
          case TIMETZOID:
-         case TIMESTAMPOID:
-         case TIMESTAMPTZOID:
+//         case TIMESTAMPOID:
+         //case TIMESTAMPTZOID:
             hb_itemPutC( temp, "C" );
             hb_arraySetForward( atemp, FIELD_TYPE, temp );
             hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, typmod - 4 ) );
@@ -399,6 +399,16 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
             hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 6 ) );
             hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_NUMERIC ) );
             break;
+        // teste datetime
+         case TIMESTAMPOID:
+         case TIMESTAMPTZOID:
+            hb_itemPutC( temp, "T" );
+            hb_arraySetForward( atemp, FIELD_TYPE, temp );
+            hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 8 ) );
+            hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+            hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATETIME ) );
+            break;
+            
          default:
             TraceLog( "sqlerror.log", "Strange data type returned in query: %i\n", type );
             break;
@@ -570,6 +580,16 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
             hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 6 ) );
             hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_NUMERIC ) );
             break;
+         case TIMESTAMPOID:
+         case TIMESTAMPTZOID:
+            hb_itemPutC( temp, "T" );
+            hb_arraySetForward( atemp, FIELD_TYPE, temp );
+            hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 8 ) );
+            hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+            hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATETIME ) );
+            break;
+            
+            
          default:
             TraceLog( "sqlerror.log", "Strange data type returned: %i\n", type );
             break;
@@ -648,6 +668,12 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+	         break;
+     	 }    
+
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
       }
@@ -689,6 +715,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             hb_itemPutDS( pItem, dt );
             break;
          }
+         
          case SQL_LONGVARCHAR:
          {
 
@@ -797,6 +824,34 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         //hb_retdts(bBuffer);
+	         
+            char dt[17]={0};
+            dt[0] = bBuffer[0];
+            dt[1] = bBuffer[1];
+            dt[2] = bBuffer[2];
+            dt[3] = bBuffer[3];
+            dt[4] = bBuffer[5];
+            dt[5] = bBuffer[6];
+            dt[6] = bBuffer[8];
+            dt[7] = bBuffer[9];
+            dt[8] = bBuffer[10];
+            dt[9] = bBuffer[11];	         
+            dt[10] = bBuffer[12];	                     
+            dt[11] = bBuffer[13];	         
+            dt[12] = bBuffer[14];	         
+            dt[13] = bBuffer[15];	         
+            dt[14] = bBuffer[16];	                     
+            dt[15] = bBuffer[17];	         
+            dt[16] = bBuffer[18];	         
+            dt[17] = '\0';
+	         
+
+	         hb_itemPutDTS( pItem, dt );
+	         break;
+     	 }    
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
       }
