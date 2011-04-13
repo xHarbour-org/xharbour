@@ -566,6 +566,11 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
       oSource:bOnFileNameChanged := {|o| Self:__ResetDataSource( o ) }
       oSource:bOnFileClosed := {|o| Self:__SetDataSource( NIL ) }
 
+      IF ::MultipleSelection .AND. EMPTY( ::aSelected )
+         ::aSelected := { oSource:Recno() }
+         ::__aSel    := { { oSource:Recno(), .F., .F., -1 } }
+      ENDIF
+
     ELSE
       ::InvalidateRect()
    ENDIF
@@ -1028,7 +1033,7 @@ RETURN nClickCol
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL aRect, nCol, nRow, n, lRes, nWidth, pt
+   LOCAL aRect, nCol, nRow, n, lRes, nWidth, pt, i
    LOCAL nClickRow
    LOCAL nClickCol, lShift, lCtrl
    LOCAL lLineChange:=.F.
@@ -1126,17 +1131,23 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
           ELSEIF lShift
             IF nClickRow > ::RowPos
-               FOR n := ::RowPos TO nClickRow
-                   IF ASCAN( ::aSelected, ::__DisplayArray[n][2] ) == 0
-                      AADD( ::aSelected, ::__DisplayArray[n][2] )
-                      AADD( ::__aSel,  { ::__DisplayArray[n][2], lShift, lCtrl, -1 } )
+               FOR i := ::RowPos TO nClickRow
+                   IF ( n := ASCAN( ::aSelected, ::__DisplayArray[i][2] ) ) == 0
+                      AADD( ::aSelected, ::__DisplayArray[i][2] )
+                      AADD( ::__aSel,  { ::__DisplayArray[i][2], lShift, lCtrl, -1 } )
+                    ELSE
+                      ADEL( ::aSelected, n, .T. )
+                      ADEL( ::__aSel, n, .T. )
                    ENDIF
                NEXT
              ELSE
-               FOR n := ::RowPos TO nClickRow STEP -1
-                   IF ASCAN( ::aSelected, ::__DisplayArray[n][2] ) == 0
-                      AADD( ::aSelected, ::__DisplayArray[n][2] )
-                      AADD( ::__aSel,  { ::__DisplayArray[n][2], lShift, lCtrl, -1 } )
+               FOR i := ::RowPos TO nClickRow STEP -1
+                   IF ( n := ASCAN( ::aSelected, ::__DisplayArray[i][2] ) ) == 0
+                      AADD( ::aSelected, ::__DisplayArray[i][2] )
+                      AADD( ::__aSel,  { ::__DisplayArray[i][2], lShift, lCtrl, -1 } )
+                    ELSE
+                      ADEL( ::aSelected, n, .T. )
+                      ADEL( ::__aSel, n, .T. )
                    ENDIF
                NEXT
             ENDIF
@@ -1483,10 +1494,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0
       RETURN .F.
-   ENDIF
-   IF ::MultipleSelection .AND. EMPTY( ::aSelected )
-      ::aSelected := { ::DataSource:Recno() }
-      ::__aSel    := { { ::DataSource:Recno(), .F., .F., -1 } }
    ENDIF
 
    lFreeze := ::FreezeColumn > 0
