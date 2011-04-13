@@ -143,7 +143,8 @@ CLASS DataGrid INHERIT Control
    DATA __nHPos                 PROTECTED
    DATA __hDragRecImage         PROTECTED
    DATA __nDragTop              PROTECTED INIT 0
-   
+   DATA __aSel                  PROTECTED INIT {}
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Update()
@@ -1110,13 +1111,16 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
       lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) )
       IF !lShift .AND. !lCtrl
          ::aSelected := {::__DisplayArray[ nClickRow ][2] }
+         ::__aSel    := { { ::__DisplayArray[ nClickRow ][2], lShift, lCtrl, -1 } }
          ::Update()
        ELSE
          IF lCtrl
             IF ( n := ASCAN( ::aSelected, ::__DisplayArray[ nClickRow ][2] ) ) == 0
                AADD( ::aSelected, ::__DisplayArray[ nClickRow ][2] )
+               AADD( ::__aSel,  { ::__DisplayArray[ nClickRow ][2], lShift, lCtrl, -1 } )
              ELSE
                ADEL( ::aSelected, n, .T. )
+               ADEL( ::__aSel, n, .T. )
             ENDIF
             ::Update()
 
@@ -1125,12 +1129,14 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                FOR n := ::RowPos TO nClickRow
                    IF ASCAN( ::aSelected, ::__DisplayArray[n][2] ) == 0
                       AADD( ::aSelected, ::__DisplayArray[n][2] )
+                      AADD( ::__aSel,  { ::__DisplayArray[n][2], lShift, lCtrl, -1 } )
                    ENDIF
                NEXT
              ELSE
                FOR n := ::RowPos TO nClickRow STEP -1
                    IF ASCAN( ::aSelected, ::__DisplayArray[n][2] ) == 0
                       AADD( ::aSelected, ::__DisplayArray[n][2] )
+                      AADD( ::__aSel,  { ::__DisplayArray[n][2], lShift, lCtrl, -1 } )
                    ENDIF
                NEXT
             ENDIF
@@ -1480,6 +1486,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    ENDIF
    IF ::MultipleSelection .AND. EMPTY( ::aSelected )
       ::aSelected := { ::DataSource:Recno() }
+      ::__aSel    := { { ::DataSource:Recno(), .F., .F., -1 } }
    ENDIF
 
    lFreeze := ::FreezeColumn > 0
@@ -1550,7 +1557,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
              lSelected := .T.
           ENDIF
           IF ::MultipleSelection
-             lSelected := ASCAN( ::aSelected, nRec ) > 0
+             lSelected := ASCAN( ::aSelected, nRec ) > 0 .AND. ::ShowSelection
           ENDIF
           FOR i := nCol TO nColEnd
 
@@ -1639,7 +1646,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     SetTextColor( hMemDC, nTxCol )
                  ENDIF
                ELSE
-                 IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected )
+                 IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
                     SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
                     SetTextColor( hMemDC, ::__InactiveHighlightText )
                   ELSE
@@ -1822,11 +1829,14 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     lBorder := .F.
                  ENDIF
                ELSE
+                 IF !lHighLight .AND. nRec == nRecno .AND. !lSelected .AND. ::MultipleSelection .AND. ( i == ::ColPos .OR. ::FullRowSelect )
+                    lHighLight := .T.
+                 ENDIF
                  lBorder := ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
               ENDIF
               
 
-              IF !::FullRowSelect .AND. lBorder //lHighLight
+              IF !::FullRowSelect .AND. lBorder 
                  _DrawFocusRect( hMemDC, aText )
               ENDIF
 
@@ -2742,7 +2752,8 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 METHOD Down() CLASS DataGrid
-   LOCAL lRes, x, nImageWidth, aScroll, aClip, lSel
+   LOCAL lRes, x, nImageWidth, aScroll, aClip, lSel, n
+   LOCAL lShift := CheckBit( GetKeyState( VK_SHIFT ) )
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
@@ -2754,8 +2765,20 @@ METHOD Down() CLASS DataGrid
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
 
-   ::__ResetRecordPos(.F.)
+   IF lShift .AND. ::MultipleSelection
+      IF ( n := ASCAN( ::__aSel, {|a| a[1]==::DataSource:Recno() } ) ) > 0
+         IF ::__aSel[n][4]==VK_UP
+            ADEL( ::aSelected, n, .T. )
+            ADEL( ::__aSel, n, .T. )
+         ENDIF
+       ELSEIF LEN( ::aSelected ) > 1
+         ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .T., .F., VK_DOWN } }
+         ::Update()
+      ENDIF
+   ENDIF
 
+   ::__ResetRecordPos(.F.)
    ::__SkipRecords( 1 )
 
    IF ::HitBottom
@@ -2764,11 +2787,15 @@ METHOD Down() CLASS DataGrid
    ENDIF
 
    IF ::MultipleSelection
-      IF CheckBit( GetKeyState( VK_SHIFT ) )
-         AADD( ::aSelected, ::DataSource:Recno() )
+      IF lShift
+         IF ( n := ASCAN( ::aSelected, ::DataSource:Recno() ) ) == 0
+            AADD( ::aSelected, ::DataSource:Recno() )
+            AADD( ::__aSel,  { ::DataSource:Recno(), .T., .F., VK_DOWN } )
+         ENDIF
        ELSE
          lSel := LEN( ::aSelected ) > 1
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .F., .F., -1 } }
          IF lSel
             ::Update()
          ENDIF
@@ -2832,8 +2859,9 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD Up() CLASS DataGrid
-   LOCAL lRes, x, nImageWidth, aScroll, aClip, lSel
-
+   LOCAL lRes, x, nImageWidth, aScroll, aClip, lSel, n
+   LOCAL lShift := CheckBit( GetKeyState( VK_SHIFT ) )
+   
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
    DEFAULT lRes TO .T.
@@ -2841,8 +2869,20 @@ METHOD Up() CLASS DataGrid
       RETURN NIL
    ENDIF
 
-   ::__ResetRecordPos(.F.)
+   IF lShift .AND. ::MultipleSelection
+      IF ( n := ASCAN( ::__aSel, {|a| a[1]==::DataSource:Recno() } ) ) > 0
+         IF ::__aSel[n][4]==VK_DOWN
+            ADEL( ::aSelected, n, .T. )
+            ADEL( ::__aSel, n, .T. )
+         ENDIF
+       ELSEIF LEN( ::aSelected ) > 1
+         ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .T., .F., VK_UP } }
+         ::Update()
+      ENDIF
+   ENDIF
 
+   ::__ResetRecordPos(.F.)
    ::__SkipRecords( -1)
 
    IF ::HitTop
@@ -2851,11 +2891,15 @@ METHOD Up() CLASS DataGrid
    ENDIF
 
    IF ::MultipleSelection
-      IF CheckBit( GetKeyState( VK_SHIFT ) )
-         AADD( ::aSelected, ::DataSource:Recno() )
+      IF lShift
+         IF ( n := ASCAN( ::aSelected, ::DataSource:Recno() ) ) == 0
+            AADD( ::aSelected, ::DataSource:Recno() )
+            AADD( ::__aSel,  { ::DataSource:Recno(), lShift, .F., VK_UP } )
+         ENDIF
        ELSE
          lSel := LEN( ::aSelected ) > 1
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), lShift, .F., -1 } }
          IF lSel
             ::Update()
          ENDIF
@@ -2927,6 +2971,7 @@ METHOD PageDown( nCount ) CLASS DataGrid
       ::__SkipRecords( ::RowCountUsable-::RowPos )
       IF ::MultipleSelection
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_NEXT } }
       ENDIF
       ::__DisplayData( ::RowPos,, ::RowPos )
       ::RowPos := ::RowCountUsable
@@ -2943,6 +2988,7 @@ METHOD PageDown( nCount ) CLASS DataGrid
       EVAL( ::__bGoBottom )
       IF ::MultipleSelection
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_NEXT } }
       ENDIF
       RETURN Self
    ENDIF
@@ -2995,6 +3041,7 @@ METHOD PageDown( nCount ) CLASS DataGrid
    ENDIF
    IF ::MultipleSelection
       ::aSelected := { ::DataSource:Recno() }
+      ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_NEXT } }
    ENDIF
    ::__DisplayData()
    IF ::bRowChanged != NIL
@@ -3021,6 +3068,7 @@ METHOD PageUp( nCount ) CLASS DataGrid
       ::__SkipRecords( -(::RowPos-1) )
       IF ::MultipleSelection
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_PRIOR } }
       ENDIF
       ::__DisplayData( ::RowPos,, ::RowPos )
       ::RowPos := 1
@@ -3038,6 +3086,7 @@ METHOD PageUp( nCount ) CLASS DataGrid
       EVAL( ::__bGoTop )
       IF ::MultipleSelection
          ::aSelected := { ::DataSource:Recno() }
+         ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_PRIOR } }
       ENDIF
       RETURN Self
    ENDIF
@@ -3065,6 +3114,7 @@ METHOD PageUp( nCount ) CLASS DataGrid
 
    IF ::MultipleSelection
       ::aSelected := { ::DataSource:Recno() }
+      ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_PRIOR } }
    ENDIF
 
    ::__DisplayData()
@@ -3114,6 +3164,7 @@ METHOD Home() CLASS DataGrid
    EVAL( ::__bGoTop )
    IF ::MultipleSelection
       ::aSelected := { ::DataSource:Recno() }
+      ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_HOME } }
    ENDIF
    ::__DisplayData()
    IF ::bRowChanged != NIL
@@ -3165,6 +3216,7 @@ METHOD End( lVUpdate ) CLASS DataGrid
    EVAL( ::__bGoBottom )
    IF ::MultipleSelection
       ::aSelected := { ::DataSource:Recno() }
+      ::__aSel    := { { ::DataSource:Recno(), .F., .F., VK_END } }
    ENDIF
 
    ::RowPos := MIN( ::RowCount, ::RowCountUsable )
@@ -3425,9 +3477,10 @@ CLASS GridColumn INHERIT Object
    PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
    PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
    PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
-   PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow DEFAULT 0
+   PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow      DEFAULT 0
    PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
-   PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation     DEFAULT 1
+   PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
+   PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
 
    DATA HeaderFont                   PUBLISHED INIT Font()
 
@@ -3489,7 +3542,6 @@ CLASS GridColumn INHERIT Object
    DATA Active                       EXPORTED  INIT .F.
 
    DATA EventHandler                 EXPORTED
-   DATA AutoEdit                     PUBLISHED INIT .F.
    DATA MDIContainer                 EXPORTED  INIT .F.
 
    DATA __HeaderLeft                 PROTECTED INIT 0
@@ -3525,6 +3577,7 @@ CLASS GridColumn INHERIT Object
    METHOD SetAlignment()
    METHOD SetRepresentation()
    METHOD __SetSortArrow(n)   INLINE AEVAL( ::Parent:Children, {|o|o:xSortArrow:=0} ), ::xSortArrow := n
+   METHOD __SetAutoEdit()
 ENDCLASS
 
 METHOD CreateDragImage( nLeft ) CLASS GridColumn
@@ -3804,6 +3857,18 @@ METHOD Create() CLASS GridColumn
    ExecuteEvent( "OnCreate", Self )
    ::Parent:Update()
 RETURN Self
+
+METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
+   IF lEdit != ::AutoEdit
+      IF lEdit
+         ::Control := {|o, n|MaskEdit( o )  }
+         ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
+       ELSE
+         ::Control := NIL
+         ::ControlAccessKey := NIL
+      ENDIF
+   ENDIF
+RETURN lEdit
 
 METHOD SetImageIndex(n) CLASS GridColumn
    LOCAL x
