@@ -91,17 +91,23 @@ CLASS ComboBox FROM Control
 
    DATA FitToolBar        PUBLISHED INIT .T.
    DATA Flat              PUBLISHED INIT .F.
-   
+   DATA LongItemTip       PUBLISHED INIT .F.
+
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
    DATA OnCBNKillFocus    EXPORTED
    DATA cbi               EXPORTED   
    DATA __pListCallBack   EXPORTED
+   DATA __pTipCallBack    EXPORTED
    DATA __nListProc       EXPORTED
-   DATA __OriginalSel     EXPORTED
+   DATA __nTipProc        EXPORTED
+   DATA __OriginalSel     EXPORTED INIT LB_ERR
 
    DATA __nWidth   PROTECTED INIT 0
    DATA __aCustom  PROTECTED
+   DATA __tipWnd   PROTECTED
+   DATA __isEnter  PROTECTED INIT .F.
+
    METHOD Init()  CONSTRUCTOR
 
    METHOD GetString()
@@ -153,8 +159,10 @@ CLASS ComboBox FROM Control
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
    METHOD __ListCallBack()
+   METHOD __TipCallBack()
    METHOD __ListboxMouseMove()
    METHOD __WindowDestroy()
+   METHOD __TrackMouseEvent()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -194,12 +202,21 @@ METHOD Create() CLASS ComboBox
    DEFAULT ::xItemHeight TO ::SendMessage( CB_GETITEMHEIGHT, 0, 0 )
    ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
    ::ClientEdge := ::xClientEdge
-
-   ::cbi := ::GetComboBoxInfo()
    
-   IF IsWindow( ::cbi:hwndList )
-      ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
-      ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+   IF ::LongItemTip
+      ::cbi := ::GetComboBoxInfo()
+
+      IF IsWindow( ::cbi:hwndList )
+         ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
+         ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+      ENDIF
+
+      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "Vxh_Form", NIL, WS_POPUP, 0, 0, 0, 0, NIL, 0, ::AppInstance )
+
+      IF IsWindow( ::__tipWnd )
+         ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
+         ::__nTipProc := SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__pTipCallBack )
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -323,27 +340,101 @@ METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
            aRect := _GetClientRect( hWnd )
            IF _PtInRect( aRect, aPt )
               ::__ListboxMouseMove( hWnd, nwParam, aPt )
+            ELSE
+              SendMessage( hWnd, WM_MOUSELEAVE, nwParam, nlParam )
+           ENDIF
+           
+           IF ! ::__isEnter
+              ::__TrackMouseEvent( hWnd, TME_HOVER|TME_LEAVE )
            ENDIF
            EXIT
+
+      CASE WM_MOUSELEAVE
+           ::__OriginalSel := LB_ERR
+           ShowWindow( ::__tipWnd, SW_HIDE )
+           EXIT
+
+      CASE WM_CAPTURECHANGED
+           RETURN 1
+
    END
 RETURN CallWindowProc( ::__nListProc, hWnd, nMsg, nwParam, nlParam )
 
 //----------------------------------------------------------------------------------------------------------------
+METHOD __TrackMouseEvent( hWnd, nFlags ) CLASS ComboBox
+   LOCAL tme
+   tme := (struct TRACKMOUSEEVENT)
+   tme:cbSize      := tme:SizeOf()
+   tme:dwFlags     := nFlags
+   tme:hwndTrack   := hWnd
+   tme:dwHoverTime := HOVER_DEFAULT
+   TrackMouseEvent( tme )
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
+RETURN CallWindowProc( ::__nTipProc, hWnd, nMsg, nwParam, nlParam )
+
+//----------------------------------------------------------------------------------------------------------------
 METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
+   LOCAL hDC, hOldFont, cBuf, nLen, rcDraw
+   LOCAL rc := (struct RECT)
+   LOCAL cRect := space(16)
    LOCAL nCurSel := SendMessage( hList, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
    IF ::__OriginalSel == nCurSel
       RETURN NIL 
    ENDIF
    ::__OriginalSel := nCurSel
+
+   hDC := GetDC( ::__tipWnd )
+   hOldFont := SelectObject( hDC, ::Font:Handle )
    
+   cBuf := space( SendMessage( hList, LB_GETTEXTLEN, nCurSel, 0 ) + 1 )
+   nLen := SendMessage( hList, LB_GETTEXT, nCurSel, @cBuf)
+
+   SendMessage( hList, LB_GETITEMRECT, nCurSel, @cRect)
+   rc:Buffer( cRect )
+   rcDraw := rc
+   
+   DrawText( hDC, cBuf, rc, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+
+   SelectObject( hDC, hOldFont )
+   ReleaseDC( ::__tipWnd, hDC )
+   
+   IF rcDraw:right <= rc:right
+      ShowWindow( ::__tipWnd, SW_HIDE )
+      RETURN NIL
+   ENDIF
+
+   InflateRect( @rcDraw, 2, 2 )
+   ClientToScreen( @rcDraw )
+   SetWindowText( ::__tipWnd, cBuf )
+
+   ShowWindow( ::__tipWnd, SW_HIDE )
+
+   IF GetCapture() != hList
+      SetCapture( hList )
+   ENDIF
+   
+   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left, rcDraw:top, rcDraw:Right-rcDraw:Left, rcDraw:Bottom-rcDraw:Top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
+   SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __WindowDestroy() CLASS ComboBox
-   SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
-   ::__nListProc := NIL
-   FreeCallBackPointer( ::__pListCallBack )
-   ::__pListCallBack := NIL
+   IF ::LongItemTip
+      SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
+      ::__nTipProc := NIL
+      FreeCallBackPointer( ::__pTipCallBack )
+      ::__pTipCallBack := NIL
+
+      DestroyWindow( ::__tipWnd )
+
+      SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
+      ::__nListProc := NIL
+      FreeCallBackPointer( ::__pListCallBack )
+      ::__pListCallBack := NIL
+   ENDIF
 RETURN NIL
 
 
