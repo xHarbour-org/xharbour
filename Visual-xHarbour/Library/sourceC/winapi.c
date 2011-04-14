@@ -10087,3 +10087,58 @@ HB_FUNC( FILLRGN )
    hb_retl( FillRgn( (HDC) hb_parnl(1), (HRGN) hb_parnl(2), (HBRUSH) hb_parnl(3) ) );
 }
 
+//------------------------------------------------------------------------------------------------
+HB_FUNC( GETCOMBOBOXINFO )
+{
+   PHB_ITEM pStructure = hb_param( 2, HB_IT_BYREF );
+   if( pStructure )
+   {
+      BOOL bResult;
+      COMBOBOXINFO *pcbi = (COMBOBOXINFO *) hb_xgrab( sizeof( COMBOBOXINFO ) );
+
+      bResult = GetComboBoxInfo( (HWND) hb_parnl(1), pcbi );
+      if( bResult && bResult != -1 )
+      {
+         PHB_ITEM pByRef;
+
+         if( HB_IS_OBJECT( pStructure ) )
+         {
+            pByRef = NULL;
+         }
+         else
+         {
+            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
+            hb_vmPushNil();
+            hb_itemPushStaticString( "COMBOBOXINFO", 12 );
+            hb_vmDo(1);
+
+            pByRef = pStructure;
+            pStructure = hb_stackReturnItem();
+         }
+
+         hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pcbi, sizeof( COMBOBOXINFO ) );
+
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+
+         if( pByRef )
+         {
+            hb_itemForwardValue( pByRef, pStructure );
+         }
+
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_xfree( (void *) pcbi );
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "GETCOMBOBOXINFO", 4, hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
+   }
+
+}
+

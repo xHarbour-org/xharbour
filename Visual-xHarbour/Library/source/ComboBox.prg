@@ -95,10 +95,13 @@ CLASS ComboBox FROM Control
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
    DATA OnCBNKillFocus    EXPORTED
+   DATA cbi               EXPORTED   
+   DATA __pListCallBack   EXPORTED
+   DATA __nListProc       EXPORTED
+   DATA __OriginalSel     EXPORTED
 
    DATA __nWidth   PROTECTED INIT 0
    DATA __aCustom  PROTECTED
-   
    METHOD Init()  CONSTRUCTOR
 
    METHOD GetString()
@@ -139,7 +142,7 @@ CLASS ComboBox FROM Control
    METHOD ShowDropDown(l)                   INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_SHOWDROPDOWN, IIF( l==NIL, .T., l), 0 ) , NIL )
    METHOD SetExtendedUi(l)                  INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_SETEXTENDEDUI, IIF( l==NIL, .T., l), 0 ) , NIL )
    METHOD HideDropDown()                    INLINE ::ShowDropDown(.F.)
-   METHOD GetInfo()
+   METHOD GetComboBoxInfo()
    METHOD GetSelString()
    METHOD DrawFrame()
    METHOD OnParentCommand()
@@ -149,6 +152,9 @@ CLASS ComboBox FROM Control
    METHOD SetDropDownStyle()
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
+   METHOD __ListCallBack()
+   METHOD __ListboxMouseMove()
+   METHOD __WindowDestroy()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -180,16 +186,24 @@ METHOD SetDropDownStyle( nDrop ) CLASS ComboBox
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD Create() CLASS ComboBox
+   LOCAL cbi
    ::Super:Create()
    ::SetItemHeight( -1, ::xSelectionHeight )
    ::SetItemHeight( 2, ::xItemHeight )
    DEFAULT ::xItemHeight TO ::SendMessage( CB_GETITEMHEIGHT, 0, 0 )
    ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
    ::ClientEdge := ::xClientEdge
+
+   ::cbi := ::GetComboBoxInfo()
+   
+   IF IsWindow( ::cbi:hwndList )
+      ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
+      ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+   ENDIF
 RETURN Self
 
+//----------------------------------------------------------------------------------------------------------------
 METHOD SetItemHeight(nLine, n) CLASS ComboBox
    IF nLine == -1
       ::xSelectionHeight := n
@@ -202,6 +216,7 @@ METHOD SetItemHeight(nLine, n) CLASS ComboBox
    ENDIF
 RETURN Self
 
+//----------------------------------------------------------------------------------------------------------------
 METHOD FindStringExact( nStart, cStr ) CLASS ComboBox
    LOCAL nItem
    IF ::hWnd != NIL
@@ -211,7 +226,6 @@ METHOD FindStringExact( nStart, cStr ) CLASS ComboBox
 RETURN nItem
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD AddString( cText, lSel ) CLASS ComboBox
    LOCAL n
    IF ::hWnd != NIL
@@ -231,22 +245,19 @@ METHOD AddString( cText, lSel ) CLASS ComboBox
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD GetSelString() CLASS ComboBox
    LOCAL cStr, n := ::GetCurSel()
    cStr := ::GetString( n )
 RETURN cStr
 
 //----------------------------------------------------------------------------------------------------------------
-
-METHOD GetInfo() CLASS ComboBox
+METHOD GetComboBoxInfo() CLASS ComboBox
    LOCAL cbi := (struct COMBOBOXINFO)
    cbi:cbSize := cbi:SizeOf()
    SendMessage( ::hWnd, CB_GETCOMBOBOXINFO, 0, @cbi )
 RETURN cbi
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
    LOCAL hTheme, nFlags := DFCS_SCROLLCOMBOBOX
    IF nStatus != NIL
@@ -267,7 +278,6 @@ METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
 RETURN GetSystemMetrics( SM_CXVSCROLL )
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD GetString(nLine) CLASS ComboBox
    LOCAL nLen
    LOCAL cBuf
@@ -278,7 +288,6 @@ RETURN( if(nLen == CB_ERR, nil, left(cBuf, nLen) ) )
 
 
 //----------------------------------------------------------------------------------------------------------------
-
 METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ComboBox
    LOCAL nRet := NIL
    DO CASE
@@ -304,6 +313,39 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ComboBox
 
    ENDCASE
 RETURN nRet
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
+   LOCAL xPos, yPos, aPt, aRect
+   SWITCH nMsg
+      CASE WM_MOUSEMOVE
+           aPt := { LOWORD( nlParam ), HIWORD( nlParam ) }
+           aRect := _GetClientRect( hWnd )
+           IF _PtInRect( aRect, aPt )
+              ::__ListboxMouseMove( hWnd, nwParam, aPt )
+           ENDIF
+           EXIT
+   END
+RETURN CallWindowProc( ::__nListProc, hWnd, nMsg, nwParam, nlParam )
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
+   LOCAL nCurSel := SendMessage( hList, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
+   IF ::__OriginalSel == nCurSel
+      RETURN NIL 
+   ENDIF
+   ::__OriginalSel := nCurSel
+   
+RETURN NIL
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __WindowDestroy() CLASS ComboBox
+   SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
+   ::__nListProc := NIL
+   FreeCallBackPointer( ::__pListCallBack )
+   ::__pListCallBack := NIL
+RETURN NIL
+
 
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
