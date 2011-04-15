@@ -156,12 +156,12 @@ CLASS ComboBox FROM Control
    METHOD SetItemHeight()
    METHOD __SetScrollBars()                INLINE Self
    METHOD SetDropDownStyle()
+   METHOD OnDestroy()
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
    METHOD __ListCallBack()
    METHOD __TipCallBack()
    METHOD __ListboxMouseMove()
-   METHOD __WindowDestroy()
    METHOD __TrackMouseEvent()
    METHOD __HandleOnPaint()
    METHOD __HandleOnTimer()
@@ -481,7 +481,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
-METHOD __WindowDestroy() CLASS ComboBox
+METHOD OnDestroy() CLASS ComboBox
    IF ::ItemToolTips
       SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
       ::__nTipProc := NIL
