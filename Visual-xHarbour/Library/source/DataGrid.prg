@@ -1111,6 +1111,12 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
       RETURN NIL
    ENDIF
+
+   IF nClickRow > LEN( ::__DisplayArray ) .OR. xPos > ::ClientWidth .OR. xPos > ::__DataWidth
+      ::SetFocus()
+      RETURN NIL
+   ENDIF
+
    IF ::MultipleSelection
       lShift := CheckBit( GetKeyState( VK_SHIFT ) )
       lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) )
@@ -1168,11 +1174,6 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
    ::__ResetControl()
       
-   IF nClickRow > LEN( ::__DisplayArray ) .OR. xPos > ::ClientWidth .OR. xPos > ::__DataWidth
-      ::SetFocus()
-      RETURN NIL
-   ENDIF
-
    IF nClickRow != ::RowPos
       lRes := ::OnRowChanging()
       DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
