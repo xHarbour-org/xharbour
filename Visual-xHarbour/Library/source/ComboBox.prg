@@ -197,7 +197,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ComboBox
-   LOCAL cbi
+   LOCAL cbi, nError, wcex
    ::Super:Create()
    ::SetItemHeight( -1, ::xSelectionHeight )
    ::SetItemHeight( 2, ::xItemHeight )
@@ -213,9 +213,17 @@ METHOD Create() CLASS ComboBox
          ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
       ENDIF
 
-      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "Vxh_Form", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
+      wcex := (struct WNDCLASSEX)
+      wcex:cbSize         := wcex:SizeOf()
+      wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+      wcex:hInstance      := ::AppInstance
+      wcex:hbrBackground  := COLOR_BTNFACE+1
+      wcex:lpszClassName  := "CBTT"
+      wcex:hCursor        := LoadCursor(, IDC_ARROW )
+      wcex:lpfnWndProc    := DefWindowProcAddress()
+      RegisterClassEx( wcex )
 
-OutputDebugString( "Tooltip handle: " + STR( ::__tipWnd ) )
+      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "CBTT", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
 
       IF IsWindow( ::__tipWnd )
          ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
@@ -337,7 +345,7 @@ RETURN nRet
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
-   LOCAL xPos, yPos, aPt, aRect
+   LOCAL xPos, yPos, aPt, aRect, nCurSel
    SWITCH nMsg
       CASE WM_MOUSEMOVE
            aPt := { LOWORD( nlParam ), HIWORD( nlParam ) }
@@ -359,8 +367,20 @@ METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
            ShowWindow( ::__tipWnd, SW_HIDE )
            EXIT
 
-      CASE WM_CAPTURECHANGED
-           RETURN 1
+//      CASE WM_CAPTURECHANGED
+//           RETURN 1
+
+//      CASE WM_LBUTTONDOWN
+//      CASE WM_LBUTTONDBLCLK
+//            aPt := { LOWORD(nlParam), HIWORD( nlParam ) }
+//            aRect := _GetClientRect( hWnd )
+//            IF _PtInRect( aRect, aPt )
+//               nCurSel := SendMessage( hWnd, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
+//               IF nCurSel != LB_ERR
+//                  RETURN 1
+//               ENDIF
+//            ENDIF
+//            EXIT
 
    END
 RETURN CallWindowProc( ::__nListProc, hWnd, nMsg, nwParam, nlParam )
@@ -385,10 +405,10 @@ METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
       CASE WM_TIMER
            ::__HandleOnTimer( nwParam )
            EXIT
-      CASE WM_SHOWWINDOW 
-           IF nwParam == 0
-              ReleaseCapture()
-           ENDIF
+      //CASE WM_SHOWWINDOW 
+      //     IF nwParam == 0
+      //        ReleaseCapture()
+      //     ENDIF
    END
 RETURN CallWindowProc( ::__nTipProc, hWnd, nMsg, nwParam, nlParam )
 
@@ -475,9 +495,10 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
 
    ShowWindow( ::__tipWnd, SW_HIDE )
 
-   IF GetCapture() != hList
-      SetCapture( hList )
-   ENDIF
+   //IF GetCapture() != hList
+   //   SetCapture( hList )
+   //ENDIF
+
    SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
