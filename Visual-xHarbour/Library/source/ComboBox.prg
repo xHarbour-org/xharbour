@@ -482,7 +482,7 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ComboBox
-   IF ::ItemToolTips
+   IF ::ItemToolTips .AND. IsWindow( ::__tipWnd )
       SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
       ::__nTipProc := NIL
       FreeCallBackPointer( ::__pTipCallBack )
