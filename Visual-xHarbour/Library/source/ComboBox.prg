@@ -91,7 +91,7 @@ CLASS ComboBox FROM Control
 
    DATA FitToolBar        PUBLISHED INIT .T.
    DATA Flat              PUBLISHED INIT .F.
-   DATA LongItemTip       PUBLISHED INIT .F.
+   DATA ItemToolTips       PUBLISHED INIT .F.
 
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
@@ -163,6 +163,8 @@ CLASS ComboBox FROM Control
    METHOD __ListboxMouseMove()
    METHOD __WindowDestroy()
    METHOD __TrackMouseEvent()
+   METHOD __HandleOnPaint()
+   METHOD __HandleOnTimer()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -203,7 +205,7 @@ METHOD Create() CLASS ComboBox
    ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
    ::ClientEdge := ::xClientEdge
    
-   IF ::LongItemTip
+   IF ::ItemToolTips
       ::cbi := ::GetComboBoxInfo()
 
       IF IsWindow( ::cbi:hwndList )
@@ -211,7 +213,7 @@ METHOD Create() CLASS ComboBox
          ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
       ENDIF
 
-      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "Vxh_Form", NIL, WS_POPUP, 0, 0, 0, 0, NIL, 0, ::AppInstance )
+      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "Vxh_Form", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
 
       IF IsWindow( ::__tipWnd )
          ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
@@ -351,6 +353,7 @@ METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
 
       CASE WM_MOUSELEAVE
            ::__OriginalSel := LB_ERR
+           ::__isEnter := .F.
            ShowWindow( ::__tipWnd, SW_HIDE )
            EXIT
 
@@ -373,41 +376,99 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
+   SWITCH nMsg
+      CASE WM_PAINT
+           RETURN ::__HandleOnPaint( hWnd )
+           
+      CASE WM_TIMER
+           ::__HandleOnTimer( nwParam )
+           EXIT
+      CASE WM_SHOWWINDOW 
+           IF nwParam == 0
+              ReleaseCapture()
+           ENDIF
+   END
 RETURN CallWindowProc( ::__nTipProc, hWnd, nMsg, nwParam, nlParam )
 
 //----------------------------------------------------------------------------------------------------------------
+METHOD __HandleOnPaint( hWnd ) CLASS ComboBox
+   LOCAL hDC, cPaint, aRect, cText, hOldFont
+   hDC := _BeginPaint( hWnd, @cPaint )
+
+   aRect := _GetClientRect( hWnd )
+   SelectObject( hDC, GetSysColorbrush( COLOR_INFOBK ) )
+   Rectangle( hDC, 0, 0, aRect[3], aRect[4] )
+
+   cText := _GetWindowText( hWnd )
+   SetBkMode( hDC, TRANSPARENT )
+   hOldFont := SelectObject( hDC, ::Font:Handle )
+
+   _DrawText( hDC, cText, aRect, DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+
+   SelectObject( hDC, hOldFont )
+   _EndPaint( hWnd, cPaint)
+RETURN 0
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __HandleOnTimer( nwParam ) CLASS ComboBox
+   KillTimer( ::__tipWnd, nwParam )
+   ShowWindow( ::__tipWnd, SW_HIDE)
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
 METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
-   LOCAL hDC, hOldFont, cBuf, nLen, rcDraw
-   LOCAL rc := (struct RECT)
+   LOCAL hDC, hOldFont, cBuf, nLen, pt := (struct POINT)
+   LOCAL rcBounds := (struct RECT)
+   LOCAL rcDraw := (struct RECT)
    LOCAL cRect := space(16)
    LOCAL nCurSel := SendMessage( hList, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
+
    IF ::__OriginalSel == nCurSel
       RETURN NIL 
    ENDIF
+
+   IF nCurSel == LB_ERR .OR. nCurSel < 0 .OR. nCurSel >= SendMessage( hList, LB_GETCOUNT, 0, 0 )
+      RETURN NIL
+   ENDIF
+
    ::__OriginalSel := nCurSel
 
    hDC := GetDC( ::__tipWnd )
    hOldFont := SelectObject( hDC, ::Font:Handle )
    
    cBuf := space( SendMessage( hList, LB_GETTEXTLEN, nCurSel, 0 ) + 1 )
-   nLen := SendMessage( hList, LB_GETTEXT, nCurSel, @cBuf)
+   SendMessage( hList, LB_GETTEXT, nCurSel, @cBuf)
 
-   SendMessage( hList, LB_GETITEMRECT, nCurSel, @cRect)
-   rc:Buffer( cRect )
-   rcDraw := rc
-   
-   DrawText( hDC, cBuf, rc, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+   SendMessage( hList, LB_GETITEMRECT, nCurSel, @rcBounds)
+   rcDraw:left   := rcBounds:left  
+   rcDraw:top    := rcBounds:top   
+   rcDraw:right  := rcBounds:right 
+   rcDraw:bottom := rcBounds:bottom
+
+   DrawText( hDC, cBuf, @rcDraw, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
 
    SelectObject( hDC, hOldFont )
    ReleaseDC( ::__tipWnd, hDC )
-   
-   IF rcDraw:right <= rc:right
+
+   IF rcDraw:right <= rcBounds:right
       ShowWindow( ::__tipWnd, SW_HIDE )
       RETURN NIL
    ENDIF
 
    InflateRect( @rcDraw, 2, 2 )
-   ClientToScreen( @rcDraw )
+   
+   pt:x := rcDraw:left
+   pt:y := rcDraw:top
+   ClientToScreen( hList, @pt )
+   rcDraw:left := pt:x
+   rcDraw:top  := pt:y
+
+   pt:x := rcDraw:right
+   pt:y := rcDraw:bottom
+   ClientToScreen( hList, @pt )
+   rcDraw:right  := pt:x
+   rcDraw:bottom := pt:y
+   
    SetWindowText( ::__tipWnd, cBuf )
 
    ShowWindow( ::__tipWnd, SW_HIDE )
@@ -415,14 +476,13 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    IF GetCapture() != hList
       SetCapture( hList )
    ENDIF
-   
-   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left, rcDraw:top, rcDraw:Right-rcDraw:Left, rcDraw:Bottom-rcDraw:Top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
+   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __WindowDestroy() CLASS ComboBox
-   IF ::LongItemTip
+   IF ::ItemToolTips
       SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
       ::__nTipProc := NIL
       FreeCallBackPointer( ::__pTipCallBack )
