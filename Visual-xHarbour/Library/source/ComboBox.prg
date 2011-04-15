@@ -17,6 +17,7 @@
 
 #define CP_DROPDOWNBUTTON  1
 #define CB_SETMINVISIBLE 0x1701
+#define CS_DROPSHADOW 131072
 
 #define CBXS_NORMAL        1
 #define CBXS_HOT           2
@@ -215,7 +216,7 @@ METHOD Create() CLASS ComboBox
 
       wcex := (struct WNDCLASSEX)
       wcex:cbSize         := wcex:SizeOf()
-      wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+      wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
       wcex:hInstance      := ::AppInstance
       wcex:hbrBackground  := COLOR_BTNFACE+1
       wcex:lpszClassName  := "CBTT"
