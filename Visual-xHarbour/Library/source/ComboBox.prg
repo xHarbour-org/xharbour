@@ -215,6 +215,8 @@ METHOD Create() CLASS ComboBox
 
       ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "Vxh_Form", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
 
+OutputDebugString( "Tooltip handle: " + STR( ::__tipWnd ) )
+
       IF IsWindow( ::__tipWnd )
          ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
          ::__nTipProc := SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__pTipCallBack )
