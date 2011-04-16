@@ -1129,7 +1129,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
             IF ( n := ASCAN( ::aSelected, ::__DisplayArray[ nClickRow ][2] ) ) == 0
                AADD( ::aSelected, ::__DisplayArray[ nClickRow ][2] )
                AADD( ::__aSel,  { ::__DisplayArray[ nClickRow ][2], lShift, lCtrl, -1 } )
-             ELSE
+             ELSEIF LEN( ::aSelected ) > 1
                ADEL( ::aSelected, n, .T. )
                ADEL( ::__aSel, n, .T. )
             ENDIF
@@ -1141,7 +1141,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                    IF ( n := ASCAN( ::aSelected, ::__DisplayArray[i][2] ) ) == 0
                       AADD( ::aSelected, ::__DisplayArray[i][2] )
                       AADD( ::__aSel,  { ::__DisplayArray[i][2], lShift, lCtrl, -1 } )
-                    ELSE
+                    ELSEIF LEN( ::aSelected ) > 1
                       ADEL( ::aSelected, n, .T. )
                       ADEL( ::__aSel, n, .T. )
                    ENDIF
@@ -1151,7 +1151,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                    IF ( n := ASCAN( ::aSelected, ::__DisplayArray[i][2] ) ) == 0
                       AADD( ::aSelected, ::__DisplayArray[i][2] )
                       AADD( ::__aSel,  { ::__DisplayArray[i][2], lShift, lCtrl, -1 } )
-                    ELSE
+                    ELSEIF LEN( ::aSelected ) > 1
                       ADEL( ::aSelected, n, .T. )
                       ADEL( ::__aSel, n, .T. )
                    ENDIF
