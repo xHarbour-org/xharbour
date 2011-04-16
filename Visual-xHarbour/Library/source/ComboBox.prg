@@ -92,7 +92,7 @@ CLASS ComboBox FROM Control
 
    DATA FitToolBar        PUBLISHED INIT .T.
    DATA Flat              PUBLISHED INIT .F.
-   DATA ItemToolTips       PUBLISHED INIT .F.
+   DATA ItemToolTips      PUBLISHED INIT .F.
 
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
@@ -198,7 +198,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ComboBox
-   LOCAL cbi, nError, wcex
+   LOCAL nError, wcex
    ::Super:Create()
    ::SetItemHeight( -1, ::xSelectionHeight )
    ::SetItemHeight( 2, ::xItemHeight )
@@ -506,18 +506,21 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ComboBox
-   IF ::ItemToolTips .AND. IsWindow( ::__tipWnd )
+   IF ::ItemToolTips .AND. IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
       SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
       ::__nTipProc := NIL
       FreeCallBackPointer( ::__pTipCallBack )
       ::__pTipCallBack := NIL
 
       DestroyWindow( ::__tipWnd )
+      
+      IF IsWindow( ::cbi:hwndList ) .AND. ::__nListProc != NIL
+         SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
+         ::__nListProc := NIL
+         FreeCallBackPointer( ::__pListCallBack )
+         ::__pListCallBack := NIL
+      ENDIF
 
-      SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
-      ::__nListProc := NIL
-      FreeCallBackPointer( ::__pListCallBack )
-      ::__pListCallBack := NIL
    ENDIF
 RETURN NIL
 
