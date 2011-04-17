@@ -344,7 +344,7 @@ CLASS ToolStrip INHERIT Control
    
    PROPERTY Cursor    READ xCursor WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED HIDDEN
    DATA Border         EXPORTED INIT .T.
-   DATA Dock           EXPORTED
+   //DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
    DATA SmallCaption   EXPORTED INIT .F.
    DATA XPTheming      EXPORTED INIT .T.
@@ -669,7 +669,7 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD __OnParentSize() CLASS ToolStrip
+METHOD __OnParentSize(x,y,hDef) CLASS ToolStrip
    LOCAL oStrip, nPos, i
    IF ::Row > 0 .AND. ::ShowChevron .AND. ::__ClassInst == NIL
       ::Parent:GetClientrect()
@@ -700,11 +700,13 @@ METHOD __OnParentSize() CLASS ToolStrip
                // still smaller, shrink the ToolStrip
                ::Width := ::Parent:ClientWidth - 2 - ::Left
             ENDIF
-          ENDIF
+         ENDIF
        ELSEIF ::Width < ::__nWidth
          ::Parent:GetClientRect()
          ::Width := MIN( ::Parent:ClientWidth - 2 - ::Left, ::__nWidth )
       ENDIF
+    ELSEIF UPPER( ::Parent:ClsName ) != "TOOLSTRIPCONTAINER"
+      Super:__OnParentSize( x, y, hDef )
    ENDIF
 RETURN NIL
 

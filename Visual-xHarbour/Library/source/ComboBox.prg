@@ -14,15 +14,10 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "commdlg.ch"
+#include "uxtheme.ch"
 
-#define CP_DROPDOWNBUTTON  1
 #define CB_SETMINVISIBLE 0x1701
 #define CS_DROPSHADOW 131072
-
-#define CBXS_NORMAL        1
-#define CBXS_HOT           2
-#define CBXS_PRESSED       3
-#define CBXS_DISABLED      4
 
 #define DRIVE_UNKNOWN     0
 #define DRIVE_NO_ROOT_DIR 1
@@ -415,12 +410,16 @@ RETURN CallWindowProc( ::__nTipProc, hWnd, nMsg, nwParam, nlParam )
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __HandleOnPaint( hWnd ) CLASS ComboBox
-   LOCAL hDC, cPaint, aRect, cText, hOldFont
+   LOCAL hDC, cPaint, aRect, cText, hOldFont, hTheme
    hDC := _BeginPaint( hWnd, @cPaint )
-
    aRect := _GetClientRect( hWnd )
-   SelectObject( hDC, GetSysColorbrush( COLOR_INFOBK ) )
-   Rectangle( hDC, 0, 0, aRect[3], aRect[4] )
+
+   hTheme := OpenThemeData(,ToUnicode("TOOLTIP"))
+   DrawThemeBackground( hTheme, hDC, TTP_STANDARD, 0, { 0, 0, aRect[3], aRect[4] } )
+   CloseThemeData( hTheme )
+
+//   SelectObject( hDC, GetSysColorbrush( COLOR_INFOBK ) )
+//   Rectangle( hDC, 0, 0, aRect[3], aRect[4] )
 
    cText := _GetWindowText( hWnd )
    SetBkMode( hDC, TRANSPARENT )
@@ -500,7 +499,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    //   SetCapture( hList )
    //ENDIF
 
-   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
+   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left+4, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
@@ -902,7 +901,7 @@ METHOD Create() CLASS FontComboBox
    ASORT( ::Fonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
 
    FOR n := 1 TO LEN( ::Fonts )
-       ::Fonts[n][1]:lfHeight := ::Owner:&cFont:Height
+       ::Fonts[n][1]:lfHeight := ::Parent:Font:Height //::Owner:&cFont:Height
        ::Fonts[n][1]:lfWeight := ::Owner:&cFont:Weight
        ::Fonts[n][1]:lfWidth  := ::Owner:&cFont:Width
        ::Fonts[n][1]:lfItalic := ::Owner:&cFont:nItalic
@@ -910,6 +909,7 @@ METHOD Create() CLASS FontComboBox
        ::AddItem( ::Fonts[n][1]:lfFaceName:AsString() )
        ::SendMessage( CB_SETITEMHEIGHT, n-1, 15 )
    NEXT
+   ::ItemToolTips:= .T.
 RETURN Self
 
 METHOD OnParentDrawItem( nwParam, nlParam ) CLASS FontComboBox

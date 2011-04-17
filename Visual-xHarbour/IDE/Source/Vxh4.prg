@@ -1286,6 +1286,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        IF ( cProp == "DOCK" .OR. cProp == "ANCHOR" ).AND. ::ActiveObject:Parent:ClsName == "StatusBarPanel"
           LOOP
        ENDIF
+
+       IF cProp == "DOCK" .AND. ::ActiveObject:ClsName == "ToolStrip" .AND. UPPER( ::ActiveObject:Parent:ClsName ) == "TOOLSTRIPCONTAINER"
+          LOOP
+       ENDIF
+
        IF cProp == "MDICHILD" .AND. ( LEN( ::Application:Project:Forms ) > 0 .AND. ( ::ActiveObject:hWnd == ::Application:Project:Forms[1]:hWnd .OR. !::Application:Project:Forms[1]:MdiContainer ) )
           IF ! ( ::Application:Project:Properties:TargetType IN {3,5} )
              LOOP
@@ -2046,6 +2051,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :SetFocus()
                        :ShowDropDown()
                     END
+
                CASE cType == "ALIGNMENT" .OR. cType == "REPRESENTATION" .OR. cType == "SERVERTYPE"  .OR. cType == "TARGETTYPE"
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
@@ -2083,18 +2089,19 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                        :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( cSel ) }
                        :Create()
-                       
+
                        cFont := :Cargo
-                       
+
                        :SetItemHeight( -1, ::GetItemHeight()-5 )
-                       :SetItemHeight( 1, ABS( :Owner:&cFont:Height ) )
+                       //:SetItemHeight( 1, ABS( :Owner:&cFont:Height ) )
+
                        :SetFocus()
                        :ShowDropDown()
                     END
 
                CASE cType == "COLLECTION"
                     ObjectManager( oItem:ColItems[nCol-1]:Value )
-                    
+
                CASE cType == "ENUMERATION"
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl

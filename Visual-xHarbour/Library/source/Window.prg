@@ -4423,8 +4423,8 @@ RETURN Self
 METHOD SetPosition() CLASS MsgWait
    LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
    LOCAL hDC := GetDC( ::hWnd )
-   hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
    aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
+   hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
    DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
    aBar[1]+=1
    aBar[2]+=1

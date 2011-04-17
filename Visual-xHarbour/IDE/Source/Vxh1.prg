@@ -1421,6 +1421,7 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
 
       WITH OBJECT ::Application:Props[ "ComboSelect" ] := FormComboBox( :this )
+         :ItemToolTips:= .T.
          :Dock:Left   := :Parent
          :Dock:Top    := :Parent
          :Dock:Right  := :Parent
