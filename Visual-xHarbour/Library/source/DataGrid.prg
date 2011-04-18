@@ -3584,7 +3584,7 @@ CLASS GridColumn INHERIT Object
    METHOD SetImageIndex()
    METHOD SetAlignment()
    METHOD SetRepresentation()
-   METHOD __SetSortArrow(n)   INLINE AEVAL( ::Parent:Children, {|o|o:xSortArrow:=0} ), ::xSortArrow := n
+   METHOD __SetSortArrow(n)   INLINE AEVAL( ::Parent:Children, {|o|o:xSortArrow:=0, o:DrawHeader( o:Parent:Drawing:hDC ) } ), ::xSortArrow := n, ::DrawHeader( ::Parent:Drawing:hDC )
    METHOD __SetAutoEdit()
 ENDCLASS
 
