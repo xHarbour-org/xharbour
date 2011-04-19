@@ -1675,12 +1675,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               ENDIF
               
               nHeaderRight := nRight-1
-              aText := { zLeft, nTop/*-IIF(::xShowGrid,0,1)*/, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
+              aText := { zLeft, nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
               
               IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight
                  aText[1] := iRight
                  aText[3] += iRight - zLeft
-                 //nHeaderRight += iRight - zLeft
               ENDIF
               IF nLine == 1 .AND. ::ShowHeaders
                  aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
@@ -1700,21 +1699,21 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
               aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
               
-              x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 )
+              x := zLeft + IIF( ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 1, nWImg, 2 )
               
               y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
 
               SWITCH nAlign
                  CASE 2
                       x := nRight - aAlign[1]-4
-                      IF ::Children[i]:ImageAlignment == 3
+                      IF ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 3
                          x -= nWImg
                       ENDIF
                       nAlign := DT_RIGHT
                       EXIT
 
                  CASE 3
-                      x:= zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
+                      x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
                       nAlign := DT_CENTER
                       EXIT
               END
@@ -1777,7 +1776,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               IF nRep == 1
 
                  // Draw the icon if it is part visible
-                 IF nWImg > 2 /*.AND. zLeft + nWImg > 0*/ .AND. ::ImageList != NIL
+                 IF nWImg > 2 .AND. ::ImageList != NIL
                     nY := nTop + ( (nBottom-nTop-nHImg)/2) + 1
 
                     nImgX := zLeft+nCtrl+1
@@ -1796,7 +1795,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                        ENDIF
                     ENDIF
 
-                    //::ImageList:DrawImage( hMemDC, nInd, IIF( nAlign == 2, nRight-2-::ImageList:IconWidth, zLeft+nCtrl+1 ), nY, ILD_TRANSPARENT )
                  ENDIF
 
                  IF lDrawControl
@@ -3664,15 +3662,21 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       nTop  := ( aRect[4] - ::Parent:ImageList:IconHeight ) / 2
 
       IF n == 1 // Left
-         //nIcoLeft := x
-         //x += ::Parent:ImageList:IconWidth + 3
          nIcoLeft := nLeft + 1
-         x += ::Parent:ImageList:IconWidth + 1
-
+         IF ::ImageAlignment == 1
+            x += ::Parent:ImageList:IconWidth
+          ELSEIF ::ImageAlignment == 3
+            nIcoLeft := nRight - ::Parent:ImageList:IconWidth - 2
+         ENDIF
+         
        ELSEIF n == 2 // Right
-         //nIcoLeft := aRect[3]-::Parent:ImageList:IconWidth-3
-         //x -= ::Parent:ImageList:IconWidth+3
          nIcoLeft := nLeft + 1
+         IF ::ImageAlignment == 2
+            nIcoLeft := nLeft + ((aAlign[1]-::Parent:ImageList:IconWidth)/2)
+          ELSEIF ::ImageAlignment == 3
+            nIcoLeft := nRight - ::Parent:ImageList:IconWidth - 2
+            x -= ::Parent:ImageList:IconWidth + 2
+         ENDIF
 
        ELSEIF n == 3 // Center
          nIcoLeft := nLeft + 1
@@ -3709,43 +3713,6 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       NEXT
       SelectObject( hDC, hOldPen )
    ENDIF
-/*
-   IF ::SortArrow == 1
-      
-      hOldPen := SelectObject( hDC, hPenShadow )
-      
-      MoveTo( hDC, aRect[3] - nx,     (aRect[4]-nH)/2 )
-      LineTo( hDC, aRect[3] - nx + 8, (aRect[4]-nH)/2 )
-
-      MoveTo( hDC, aRect[3] - nx,     (aRect[4]-nH)/2 )
-      LineTo( hDC, aRect[3] - nx + 4, ((aRect[4]-nH)/2)+8 )
-      
-      SelectObject( hDC, hPenLight )
-      
-      MoveTo( hDC, aRect[3] - nx + 7, ((aRect[4]-nH)/2)+1 )
-      LineTo( hDC, aRect[3] - nx + 3, ((aRect[4]-nH)/2)+8 )
-
-      SelectObject( hDC, hOldPen )
-
-    ELSEIF ::SortArrow == 2
-
-      hOldPen := SelectObject( hDC, hPenLight )
-      
-      MoveTo( hDC, aRect[3] - nx,     (aRect[4]+nH)/2 )
-      LineTo( hDC, aRect[3] - nx + 8, (aRect[4]+nH)/2 )
-
-      MoveTo( hDC, aRect[3] - nx + 7, ((aRect[4]+nH)/2)-1 )
-      LineTo( hDC, aRect[3] - nx + 3, ((aRect[4]+nH)/2)-8 )
-      
-      SelectObject( hDC, hPenShadow )
-      
-      MoveTo( hDC, aRect[3] - nx + 3, ((aRect[4]+nH)/2)-7 )
-      LineTo( hDC, aRect[3] - nx,     (aRect[4]+nH)/2 )
-
-      SelectObject( hDC, hOldPen )
-
-   ENDIF
-*/   
    SelectObject( hDC, hOldFont )
 
    DeleteObject( SelectObject( hDC, hOldBrush ) )
