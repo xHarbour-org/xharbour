@@ -63,31 +63,31 @@ CLASS ComboBox FROM Control
    ACCESS AutoHorzScroll INLINE ::AutoEditHorzScroll
    ASSIGN AutoHorzScroll(l) INLINE ::AutoEditHorzScroll := l
    //-----------------------------------------------------------
-   PROPERTY HorzScroll         INDEX WS_HSCROLL            READ xHorzScroll         WRITE SetStyle         PROTECTED DEFAULT .F. 
-   PROPERTY Border             INDEX WS_BORDER             READ xBorder             WRITE SetStyle                   DEFAULT .F.
-   PROPERTY SelectionHeight    INDEX -1                    READ xSelectionHeight    WRITE SetItemHeight    PROTECTED DEFAULT 15
-   PROPERTY OwnerDrawFixed     INDEX CBS_OWNERDRAWFIXED    READ xOwnerDrawFixed     WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY OwnerDrawVariable  INDEX CBS_OWNERDRAWVARIABLE READ xOwnerDrawVariable  WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY AutoEditHorzScroll INDEX CBS_AUTOHSCROLL       READ xAutoEditHorzScroll WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY Sort               INDEX CBS_SORT              READ xSort               WRITE SetStyle         PROTECTED DEFAULT .F.
+   PROPERTY HorzScroll         INDEX WS_HSCROLL            READ xHorzScroll         WRITE SetStyle          PROTECTED DEFAULT .F. 
+   PROPERTY Border             INDEX WS_BORDER             READ xBorder             WRITE SetStyle                    DEFAULT .F.
+   PROPERTY SelectionHeight    INDEX -1                    READ xSelectionHeight    WRITE SetItemHeight     PROTECTED DEFAULT 15
+   PROPERTY OwnerDrawFixed     INDEX CBS_OWNERDRAWFIXED    READ xOwnerDrawFixed     WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY OwnerDrawVariable  INDEX CBS_OWNERDRAWVARIABLE READ xOwnerDrawVariable  WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY AutoEditHorzScroll INDEX CBS_AUTOHSCROLL       READ xAutoEditHorzScroll WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY Sort               INDEX CBS_SORT              READ xSort               WRITE SetStyle          PROTECTED DEFAULT .F.
 
-   PROPERTY DropDownStyle                                  READ xDropDownStyle      WRITE SetDropDownStyle PROTECTED DEFAULT __GetSystem():DropDownStyle:DropDownList
+   PROPERTY DropDownStyle                                  READ xDropDownStyle      WRITE SetDropDownStyle  PROTECTED DEFAULT __GetSystem():DropDownStyle:DropDownList
 
-   PROPERTY UpperCase          INDEX CBS_UPPERCASE         READ xUpperCase          WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY LowerCase          INDEX CBS_LOWERCASE         READ xLowerCase          WRITE SetStyle         PROTECTED DEFAULT .F.
+   PROPERTY UpperCase          INDEX CBS_UPPERCASE         READ xUpperCase          WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY LowerCase          INDEX CBS_LOWERCASE         READ xLowerCase          WRITE SetStyle          PROTECTED DEFAULT .F.
 
-   PROPERTY HasStrings         INDEX CBS_HASSTRINGS        READ xHasStrings         WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY DisableNoScroll    INDEX CBS_DISABLENOSCROLL   READ xDisableNoScroll    WRITE SetStyle         PROTECTED DEFAULT .T.
-   PROPERTY NoIntegralHeight   INDEX CBS_NOINTEGRALHEIGHT  READ xNoIntegralHeight   WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY OemConvert         INDEX CBS_OEMCONVERT        READ xOemConvert         WRITE SetStyle         PROTECTED DEFAULT .F.
-   PROPERTY ItemHeight         INDEX 1                     READ xItemHeight         WRITE SetItemHeight    PROTECTED
-   PROPERTY VertScroll         INDEX WS_VSCROLL            READ xVertScroll         WRITE SetStyle         PROTECTED DEFAULT .F.
+   PROPERTY HasStrings         INDEX CBS_HASSTRINGS        READ xHasStrings         WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY DisableNoScroll    INDEX CBS_DISABLENOSCROLL   READ xDisableNoScroll    WRITE SetStyle          PROTECTED DEFAULT .T.
+   PROPERTY NoIntegralHeight   INDEX CBS_NOINTEGRALHEIGHT  READ xNoIntegralHeight   WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY OemConvert         INDEX CBS_OEMCONVERT        READ xOemConvert         WRITE SetStyle          PROTECTED DEFAULT .F.
+   PROPERTY ItemHeight         INDEX 1                     READ xItemHeight         WRITE SetItemHeight     PROTECTED
+   PROPERTY VertScroll         INDEX WS_VSCROLL            READ xVertScroll         WRITE SetStyle          PROTECTED DEFAULT .F.
 
-   PROPERTY ClientEdge         INDEX WS_EX_CLIENTEDGE      READ xClientEdge         WRITE SetExStyle       PROTECTED DEFAULT .F. 
+   PROPERTY ClientEdge         INDEX WS_EX_CLIENTEDGE      READ xClientEdge         WRITE SetExStyle        PROTECTED DEFAULT .F. 
+   PROPERTY ItemToolTips                                   READ xItemToolTips       WRITE __SetItemToolTips PROTECTED DEFAULT .F.
 
    DATA FitToolBar        PUBLISHED INIT .T.
    DATA Flat              PUBLISHED INIT .F.
-   DATA ItemToolTips      PUBLISHED INIT .F.
 
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
@@ -152,7 +152,7 @@ CLASS ComboBox FROM Control
    METHOD SetItemHeight()
    METHOD __SetScrollBars()                INLINE Self
    METHOD SetDropDownStyle()
-   METHOD OnDestroy()
+   METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), NIL
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
    METHOD __ListCallBack()
@@ -161,6 +161,7 @@ CLASS ComboBox FROM Control
    METHOD __TrackMouseEvent()
    METHOD __HandleOnPaint()
    METHOD __HandleOnTimer()
+   METHOD __SetItemToolTips()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -193,7 +194,6 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ComboBox
-   LOCAL nError, wcex
    ::Super:Create()
    ::SetItemHeight( -1, ::xSelectionHeight )
    ::SetItemHeight( 2, ::xItemHeight )
@@ -202,29 +202,57 @@ METHOD Create() CLASS ComboBox
    ::ClientEdge := ::xClientEdge
    
    IF ::ItemToolTips
-      ::cbi := ::GetComboBoxInfo()
+      ::__SetItemToolTips( .T. )
+   ENDIF
+RETURN Self
 
-      IF IsWindow( ::cbi:hwndList )
-         ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
-         ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+//----------------------------------------------------------------------------------------------------------------
+METHOD __SetItemToolTips( lTips ) CLASS ComboBox
+   LOCAL wcex
+   IF lTips
+
+      IF IsWindow( ::hWnd )
+         ::cbi := ::GetComboBoxInfo()
+         IF IsWindow( ::cbi:hwndList )
+            ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
+            ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+         ENDIF
+         wcex := (struct WNDCLASSEX)
+         wcex:cbSize         := wcex:SizeOf()
+         wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
+         wcex:hInstance      := ::AppInstance
+         wcex:hbrBackground  := COLOR_BTNFACE+1
+         wcex:lpszClassName  := "CBTT"
+         wcex:hCursor        := LoadCursor(, IDC_ARROW )
+         wcex:lpfnWndProc    := DefWindowProcAddress()
+         RegisterClassEx( wcex )
+
+         ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "CBTT", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
+
+         IF IsWindow( ::__tipWnd )
+            ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
+            ::__nTipProc := SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__pTipCallBack )
+         ENDIF
       ENDIF
 
-      wcex := (struct WNDCLASSEX)
-      wcex:cbSize         := wcex:SizeOf()
-      wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
-      wcex:hInstance      := ::AppInstance
-      wcex:hbrBackground  := COLOR_BTNFACE+1
-      wcex:lpszClassName  := "CBTT"
-      wcex:hCursor        := LoadCursor(, IDC_ARROW )
-      wcex:lpfnWndProc    := DefWindowProcAddress()
-      RegisterClassEx( wcex )
+    ELSE
 
-      ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "CBTT", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
+      IF IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
+         SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
+         ::__nTipProc := NIL
+         FreeCallBackPointer( ::__pTipCallBack )
+         ::__pTipCallBack := NIL
 
-      IF IsWindow( ::__tipWnd )
-         ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
-         ::__nTipProc := SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__pTipCallBack )
+         DestroyWindow( ::__tipWnd )
+
+         IF IsWindow( ::cbi:hwndList ) .AND. ::__nListProc != NIL
+            SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
+            ::__nListProc := NIL
+            FreeCallBackPointer( ::__pListCallBack )
+            ::__pListCallBack := NIL
+         ENDIF
       ENDIF
+
    ENDIF
 RETURN Self
 
@@ -503,25 +531,6 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
-//----------------------------------------------------------------------------------------------------------------
-METHOD OnDestroy() CLASS ComboBox
-   IF ::ItemToolTips .AND. IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
-      SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
-      ::__nTipProc := NIL
-      FreeCallBackPointer( ::__pTipCallBack )
-      ::__pTipCallBack := NIL
-
-      DestroyWindow( ::__tipWnd )
-      
-      IF IsWindow( ::cbi:hwndList ) .AND. ::__nListProc != NIL
-         SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
-         ::__nListProc := NIL
-         FreeCallBackPointer( ::__pListCallBack )
-         ::__pListCallBack := NIL
-      ENDIF
-
-   ENDIF
-RETURN NIL
 
 
 //----------------------------------------------------------------------------------------------------------------
@@ -1053,7 +1062,7 @@ CLASS FormComboBox INHERIT ComboBox
    METHOD Init() CONSTRUCTOR
    METHOD OnParentDrawItem()
    METHOD Reset()
-   METHOD OnDestroy() INLINE DeleteObject( ::hFont1 ), DeleteObject( ::hFont2 ), NIL
+   METHOD OnDestroy() INLINE Super:OnDestroy(), DeleteObject( ::hFont1 ), DeleteObject( ::hFont2 ), NIL
    METHOD Create()
    METHOD OnParentCommand()
    METHOD SelectControl()
