@@ -2207,7 +2207,6 @@ METHOD __ScrollUp( nScroll ) CLASS DataGrid
    LOCAL nRec
    LOCAL n, x, aScroll, aClip, nPos, nNew, nRow
    DEFAULT nScroll TO ::__VertScrolled + 1
-
    IF ::__VertScrolled + ::RowCountUsable <= ::DataSource:OrdKeyCount()
 
       nNew := nScroll - ::__VertScrolled
