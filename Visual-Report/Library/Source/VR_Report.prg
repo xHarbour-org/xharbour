@@ -282,12 +282,12 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
-   LOCAL aSubtotal, cArray, x, y, i, n, nForm, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
+   LOCAL aSubtotal, cArray, x, y, i, n, nFormula, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
    DEFAULT cField TO "SUBTOTAL"
    cArray := cField+"S"
 
    FOR EACH aSubtotal IN ::aSubtotals
-       nForm := ASCAN( aBody[i], {|a| UPPER(a[1])=="FORMULA"} )
+       nFormula := ASCAN( ::aFormulas, {|a| a[1]==aSubtotal } )
        
 /*
 
@@ -531,9 +531,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nTotHeight := ::GetTotalHeight( hDC )
       nPos := 0
       WHILE ! ::DataSource:EditCtrl:Eof()
-
-         AEVAL( ::aFormulas, {|a,cFormula| cFormula := a[2], a[3] : &cFormula } )
-
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nSubHeight )
             ::CreateSubtotals( hDC, "SUBTOTAL" )
