@@ -287,7 +287,10 @@ METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
    cArray := cField+"S"
 
    FOR EACH aSubtotal IN ::aSubtotals
-       nFormula := ASCAN( ::aFormulas, {|a| a[1]==aSubtotal } )
+       nFormula := ASCAN( ::aFormulas, {|a| a[1]==aSubtotal[2] } )
+       IF nFormula > 0 .AND. ( n := ASCAN( aBody, {|a| a[2][2]==::aFormulas[nFormula][2]} ) > 0
+          
+       ENDIF
        
 /*
 

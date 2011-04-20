@@ -174,12 +174,14 @@ METHOD Draw( hDC ) CLASS VrLabel
           ELSE
             cText := ::Text
          ENDIF
-         IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-            ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-         ENDIF
-         IF ( n := ASCAN( ::Parent:aTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-            ::Parent:aTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-         ENDIF
+
+         //IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+         //   ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+         //ENDIF
+         //IF ( n := ASCAN( ::Parent:aTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+         //   ::Parent:aTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+         //ENDIF
+
          cText := ALLTRIM( xStr( cText ) )
 
          IF ::Alignment > 1
