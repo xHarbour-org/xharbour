@@ -97,11 +97,13 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD Context( hWnd ) CLASS Menu
+METHOD Context( hWnd, x, y ) CLASS Menu
     LOCAL nError, nRes
     ::Application:oCurMenu := Self
     DEFAULT hWnd TO ::Parent:hWnd
-    nRes := TrackPopupMenu( ::hMenu, ::Style, ::Left, ::Top, 0, hWnd )
+    DEFAULT x    TO ::Left
+    DEFAULT y    TO ::Top
+    nRes := TrackPopupMenu( ::hMenu, ::Style, x, y, 0, hWnd )
 RETURN nRes
 
 //-------------------------------------------------------------------------------------------------------
