@@ -1699,21 +1699,21 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
               aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
               
-              x := zLeft + IIF( ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 1, nWImg, 2 )
+              x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 2 )
               
               y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
 
               SWITCH nAlign
                  CASE 2
                       x := nRight - aAlign[1]-4
-                      IF ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 3
+                      IF ::Children[i]:ImageAlignment == 3
                          x -= nWImg
                       ENDIF
                       nAlign := DT_RIGHT
                       EXIT
 
                  CASE 3
-                      x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageIndex > 0 .AND. ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
+                      x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
                       nAlign := DT_CENTER
                       EXIT
               END
