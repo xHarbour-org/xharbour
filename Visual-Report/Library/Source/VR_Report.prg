@@ -268,66 +268,65 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
    ::aFormulas  := {}
    FOR EACH aCtrl IN aBody
        IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
-          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
-             AADD( ::aSubtotals, {aCtrl[n][2],0} )
+          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORMULA"} ) ) > 0
+             AADD( ::aSubtotals, {aCtrl[n][2],0,aCtrl} )
           ENDIF
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
              nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
           ENDIF
        ELSEIF UPPER( aCtrl[1][2] ) == "VRFORMULA"
-          AADD( ::aFormulas, {aCtrl[2][2],aCtrl[3][2]} )
+          AADD( ::aFormulas, {aCtrl[2][2],aCtrl[3][2],0} )
        ENDIF
    NEXT
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
-   LOCAL cArray, x, y, i, n, nForm, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
-   LOCAL cFormula, nLabel
+   LOCAL aSubtotal, cArray, x, y, i, n, nForm, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
    DEFAULT cField TO "SUBTOTAL"
    cArray := cField+"S"
 
-   FOR EACH aCtrl IN aBody
-       IF UPPER( aCtrl[1][2] ) != "VR"+cField .AND. ( nSub := ASCAN( ::aSubtotals, {|a| UPPER(a[1])==UPPER(aCtrl[2][2])} ) ) > 0
+   FOR EACH aSubtotal IN ::aSubtotals
+       nForm := ASCAN( aBody[i], {|a| UPPER(a[1])=="FORMULA"} )
+       
+/*
 
-          //IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VR"+cField .AND. UPPER(a[3][1])=="ONLABEL" .AND. UPPER(a[3][2])==UPPER(aCtrl[2][2])} ) ) > 0
           IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VR"+cField} ) ) > 0
-             //.AND. UPPER(a[3][1])=="ONLABEL" .AND. UPPER(a[3][2])==UPPER(aCtrl[2][2]
-             IF ( nForm := ASCAN( aBody[i], {|a| UPPER(a[1])=="FORMULA"} ) ) > 0
-                cText := aBody[i][4][2]
 
-                cFormula := aBody[i][nForm][2]
-                nLabel := ASCAN( aBody, {|a| UPPER(a[2][2])==UPPER(cFormula) } )
-                
-                IF nLabel > 0
-                   aBody[i][4][2] := xStr(::a&cArray[nSub][2])
-                   IF ( x := ASCAN( aBody[nLabel], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                      x := aBody[nLabel][x][2]
-                   ENDIF
-                   IF ( y := ASCAN( aBody[nLabel], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-                      y := aBody[nLabel][y][2]
-                   ENDIF
+             cText := aBody[i][4][2]
 
-                 ELSEIF ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aBody[i][nForm][2]) } ) ) > 0
-                   aBody[i][4][2] := &(::aFormulas[n][2])
-                ENDIF
 
-                IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                   aBody[i][n][2] := x
-                ENDIF
-                IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-                   aBody[i][n][2] := y
-                ENDIF
-
-                ::CreateControl( aBody[i], @nHeight,, hDC )
-                ::a&cArray[nSub][2] := 0
-
-                aBody[i][4][2] := cText
-
+             IF nForm > 0 .AND. ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aBody[i][nForm][2]) } ) ) > 0
+                aBody[i][4][2] := &(::aFormulas[n][2])
+              ELSE
+                aBody[i][4][2] := xStr(::a&cArray[nSub][2])
              ENDIF
+
+
+
+
+             IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+                x := aCtrl[x][2]
+             ENDIF
+             IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+                y := aCtrl[y][2]
+             ENDIF
+
+             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+                aBody[i][n][2] := x
+             ENDIF
+             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+                aBody[i][n][2] := y
+             ENDIF
+
+             ::CreateControl( aBody[i], @nHeight,, hDC )
+             ::a&cArray[nSub][2] := 0
+             
+             aBody[i][4][2] := cText
           ENDIF
 
        ENDIF
+*/
    NEXT
    ::nRow += nHeight
 RETURN Self
@@ -532,8 +531,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nTotHeight := ::GetTotalHeight( hDC )
       nPos := 0
       WHILE ! ::DataSource:EditCtrl:Eof()
+
+         AEVAL( ::aFormulas, {|a,cFormula| cFormula := a[2], a[3] : &cFormula } )
+
          nHeight := ::CreateBody( hDC )
-         IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight - nSubHeight )
+         IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nSubHeight )
             ::CreateSubtotals( hDC, "SUBTOTAL" )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
@@ -548,7 +550,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          ::DataSource:EditCtrl:Skip()
       ENDDO
       ::CreateSubtotals( hDC, "SUBTOTAL" )
-      IF ::nRow >= ( ::oPDF:PageLength - ::FooterHeight - nHeight - nTotHeight )
+      IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nTotHeight )
          ::CreateFooter( hDC )
          ::EndPage()
          ::StartPage()
