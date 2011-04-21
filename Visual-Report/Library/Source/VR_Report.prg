@@ -264,13 +264,10 @@ RETURN nHeight
 //-----------------------------------------------------------------------------------------------
 METHOD GetSubtotalHeight( hDC ) CLASS VrReport
    LOCAL i, n, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
-   ::aSubtotals := {}
    ::aFormulas  := {}
    FOR EACH aCtrl IN aBody
        IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
-          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORMULA"} ) ) > 0
-             AADD( ::aSubtotals, {aCtrl[n][2],0,aCtrl} )
-          ENDIF
+          AADD( ::aSubtotals, aCtrl )
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
              nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
           ENDIF
@@ -286,11 +283,12 @@ METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
    DEFAULT cField TO "SUBTOTAL"
    cArray := cField+"S"
 
-   FOR EACH aSubtotal IN ::aSubtotals
+   FOR EACH aCtrl IN aBody
+
        nFormula := ASCAN( ::aFormulas, {|a| a[1]==aSubtotal[2] } )
-       IF nFormula > 0 .AND. ( n := ASCAN( aBody, {|a| a[2][2]==::aFormulas[nFormula][2]} ) > 0
+//       IF nFormula > 0 .AND. ( n := ASCAN( aBody, {|a| a[2][2]==::aFormulas[nFormula][2]} ) > 0
           
-       ENDIF
+//       ENDIF
        
 /*
 
@@ -536,7 +534,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
          IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nSubHeight )
-            ::CreateSubtotals( hDC, "SUBTOTAL" )
+            ::CreateSubtotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
@@ -549,14 +547,14 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          nPos ++
          ::DataSource:EditCtrl:Skip()
       ENDDO
-      ::CreateSubtotals( hDC, "SUBTOTAL" )
+      ::CreateSubtotals( hDC )
       IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nTotHeight )
          ::CreateFooter( hDC )
          ::EndPage()
          ::StartPage()
          ::CreateHeader( hDC )
       ENDIF
-      ::CreateSubtotals( hDC, "TOTAL" )
+      //::CreateTotals( hDC )
     ELSE
       ::CreateBody( hDC )
    ENDIF

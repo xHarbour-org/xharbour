@@ -16,14 +16,15 @@
 #define  acObjectTypeText           5
 
 CLASS VrLabel INHERIT VrObject
-   PROPERTY Text     READ xText WRITE SetText
-   DATA Formula      EXPORTED  INIT ""
-   DATA AutoResize   EXPORTED  INIT .F.
-   DATA ClsName      EXPORTED  INIT "Label"
-   DATA SysBackColor EXPORTED  INIT GetSysColor( COLOR_WINDOW )
-   DATA SysForeColor EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA BackColor    PUBLISHED INIT GetSysColor( COLOR_WINDOW )
-   DATA ForeColor    PUBLISHED INIT GetSysColor( COLOR_BTNTEXT )
+   PROPERTY Text      READ xText WRITE SetText
+   DATA AutoResize    EXPORTED  INIT .F.
+   DATA ClsName       EXPORTED  INIT "Label"
+   DATA SysBackColor  EXPORTED  INIT GetSysColor( COLOR_WINDOW )
+   DATA SysForeColor  EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
+   DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
+   DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
+   DATA Subtotal      EXPORTED
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -37,14 +38,14 @@ ENDCLASS
 METHOD Init( oParent ) CLASS VrLabel
    IF oParent != NIL
       Super:Init( oParent )
-      AADD( ::aProperties, { "BackColor", "Color"   } )
-      AADD( ::aProperties, { "ForeColor", "Color"   } )
-      AADD( ::aProperties, { "Font",      "General" } )
-      AADD( ::aProperties, { "Text",      "General" } )
-      AADD( ::aProperties, { "Formula",   "General" } )
-      AADD( ::aProperties, { "Name",      "Object"  } )
-      AADD( ::aProperties, { "Width",     "Size"    } )
-      AADD( ::aProperties, { "AutoResize","Size"    } )
+      AADD( ::aProperties, { "BackColor",  "Color"   } )
+      AADD( ::aProperties, { "ForeColor",  "Color"   } )
+      AADD( ::aProperties, { "Font",       "General" } )
+      AADD( ::aProperties, { "Text",       "General" } )
+      AADD( ::aProperties, { "Subtotal",   "General" } )
+      AADD( ::aProperties, { "Name",       "Object"  } )
+      AADD( ::aProperties, { "Width",      "Size"    } )
+      AADD( ::aProperties, { "AutoResize", "Size"    } )
    ENDIF
    DEFAULT ::Font TO Font()
    ::Font:AllowHandle := oParent != NIL
@@ -174,6 +175,8 @@ METHOD Draw( hDC ) CLASS VrLabel
           ELSE
             cText := ::Text
          ENDIF
+         
+         ::nSubtotal += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
 
          //IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
          //   ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
