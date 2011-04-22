@@ -82,6 +82,7 @@ CLASS DataGrid INHERIT Control
    DATA AllowDragRecords        PUBLISHED INIT .F.
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
    DATA MultipleSelection       PUBLISHED INIT .F.
+   DATA TagRecords              PUBLISHED INIT .F.
 
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
@@ -144,6 +145,7 @@ CLASS DataGrid INHERIT Control
    DATA __hDragRecImage         PROTECTED
    DATA __nDragTop              PROTECTED INIT 0
    DATA __aSel                  PROTECTED INIT {}
+   DATA aTagged                 EXPORTED  INIT {}
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -1451,7 +1453,13 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
 
       CASE nwParam == VK_SPACE
            nKey := GRID_SPACE
-
+           IF ::TagRecords
+              IF ( nPos := ASCAN( ::aTagged, ::DataSource:Recno() ) ) == 0
+                 AADD( ::aTagged, ::DataSource:Recno() )
+               ELSE
+                 ADEL( ::aTagged, nPos, .T. )
+              ENDIF
+           ENDIF
    ENDCASE
    IF lVUpdate
       ::__VertScrolled := ::Record - ::RowPos + 1
@@ -1561,12 +1569,18 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
              ::DataSource:Goto( nRecno )
           ENDIF
           
-          IF nRec == nRecno .AND. ::ShowSelection
-             lSelected := .T.
+          IF ::ShowSelection
+             IF nRec == nRecno
+                lSelected := .T.
+             ENDIF
+             IF ::MultipleSelection
+                lSelected := ASCAN( ::aSelected, nRec ) > 0
+             ENDIF
+             IF ::TagRecords
+                lSelected := lSelected .OR. ASCAN( ::aTagged, nRec ) > 0
+             ENDIF
           ENDIF
-          IF ::MultipleSelection
-             lSelected := ASCAN( ::aSelected, nRec ) > 0 .AND. ::ShowSelection
-          ENDIF
+
           FOR i := nCol TO nColEnd
 
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i// avoid painting non-visible columns
