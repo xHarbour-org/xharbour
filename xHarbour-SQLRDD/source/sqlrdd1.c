@@ -1308,7 +1308,7 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
       thiswa->firstinteract = 0;
    }
    pField = thiswa->area.lpFields + fieldNum - 1;
-   TraceLog("campo.txt"," field get campo - %s fieldnum %lu   pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,pField->uiType);
+//   TraceLog("campo.txt"," field get campo - %s fieldnum %lu   pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,pField->uiType);
    itemTemp = hb_itemArrayGet( thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1] );
 
    if( HB_IS_NIL( itemTemp ) )
@@ -1493,7 +1493,7 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    }
 
    pField = thiswa->area.lpFields + fieldNum - 1;
-   TraceLog("campo.txt"," campo - %s fieldnum %lu fieldindex %lu  pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,fieldindex,pField->uiType);
+//   TraceLog("campo.txt"," campo - %s fieldnum %lu fieldindex %lu  pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,fieldindex,pField->uiType);
 
    /* test compatible datatypes */
    //if  ( HB_IS_TIMEFLAG( value ) )//|| HB_IS_DATE( pDest )) 
