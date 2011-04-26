@@ -423,6 +423,7 @@ METHOD Init() CLASS MainForm
             :Height    := 100
             :Visible   := .F.
             :Dock:Top  := :Parent
+            :Dock:Left := :Parent
             :Dock:Margins := "0,2,0,0"
             :Application:Props[ "ViewMenuRepHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepHeader", 0 )==1
             :Create()
@@ -438,10 +439,9 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "Header" ] := HeaderEdit( :this )
             :Caption      := "Page Header"
             :BackColor    := ::System:Color:White
-            :Left         := 2
-            :Top          := 2
+            :Left         := 1
             :Height       := 100
-            :Dock:Margins := "0,0,0,0"
+            :Dock:Margins := "0,2,0,0"
             :Dock:Top     := ::Application:Props[ "RepHeader" ]
             :Visible      := .F.
             :Application:Props[ "ViewMenuHeader" ]:Checked := ::Application:IniFile:ReadInteger( "View", "Header", 0 )==1
@@ -499,8 +499,7 @@ METHOD Init() CLASS MainForm
          WITH OBJECT ::Application:Props[ "Body" ] := BodyEdit( :this )
             :BackColor    := ::System:Color:White
             :Dock:Margins := "0,0,0,0"
-            :Left         := 2
-            :Top          := 2
+            :Left         := 1
             :Height       := 100
             :Dock:Top     := ::Application:Props:Header
             :Dock:Bottom  := ::Application:Props:Footer

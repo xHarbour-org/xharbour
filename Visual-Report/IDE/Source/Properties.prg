@@ -200,13 +200,14 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    ENDIF
    
    IF !EMPTY( cProp2 )
-      oObj := __objSendMsg( ::ActiveObject:EditCtrl, cProp2 )
-      __objSendMsg( oObj, "_" + UPPER( cProp ), xValue )
-      
+      IF ::ActiveObject:lUI
+         oObj := __objSendMsg( ::ActiveObject:EditCtrl, cProp2 )
+         __objSendMsg( oObj, "_" + UPPER( cProp ), xValue )
+      ENDIF
       oObj := __objSendMsg( ::ActiveObject, cProp2 )
       __objSendMsg( oObj, "_" + UPPER( cProp ), xValue )
 
-      IF cProp2 == "Font"
+      IF cProp2 == "Font" .AND. ::ActiveObject:lUI
          ::ActiveObject:EditCtrl:Font:Set( ::ActiveObject:EditCtrl )
          ::ActiveObject:SetText( ::ActiveObject:Text )
       ENDIF

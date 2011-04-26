@@ -16,7 +16,9 @@
 #define  acObjectTypeText           5
 
 CLASS VrSubtotal INHERIT VrLabel
-   DATA ClsName EXPORTED  INIT "Subtotal"
+   DATA ClsName  EXPORTED INIT "Subtotal"
+   DATA lUI      EXPORTED INIT .F.
+   DATA Button   EXPORTED
    METHOD Init()  CONSTRUCTOR
 ENDCLASS
 
@@ -25,9 +27,6 @@ METHOD Init( oParent ) CLASS VrSubtotal
    LOCAL n
    IF oParent != NIL
       Super:Init( oParent )
-      IF ( n := ASCAN( ::aProperties, {|a| a[1]=="Text"} ) ) > 0
-         ADEL( ::aProperties, n, .T. )
-      ENDIF
    ENDIF
 RETURN Self
 

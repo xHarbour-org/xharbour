@@ -24,7 +24,7 @@ CLASS VrLabel INHERIT VrObject
    DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA Subtotal      EXPORTED
-
+   DATA nSubtotal     EXPORTED  INIT 0
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -58,32 +58,37 @@ METHOD Create() CLASS VrLabel
    ENDIF
    
    ::Font:Create()
-
-   WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
-      :Cargo   := Self
-      :Caption := ::Text
-      :Left    := ::Left
-      :Top     := ::Top
-      :Create()
-   END
-   ::Font:Set( ::EditCtrl )
-
-   Super:Create()
-   ::SetText( ::xText )
+   
+   IF ::lUI
+      WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
+         :Cargo   := Self
+         :Caption := ::Text
+         :Left    := ::Left
+         :Top     := ::Top
+         :Create()
+      END
+      ::Font:Set( ::EditCtrl )
+      Super:Create()
+      ::SetText( ::xText )
+    ELSE
+      Super:Create()
+   ENDIF
 RETURN Self
 
 METHOD Configure() CLASS VrLabel
-   WITH OBJECT ::EditCtrl
-      :Caption        := ::Text
-      :ForeColor      := ::ForeColor     
-      :BackColor      := ::BackColor     
-      :Font:FaceName  := ::Font:FaceName 
-      :Font:PointSize := ::Font:PointSize
-      :Font:Italic    := ::Font:Italic   
-      :Font:Underline := ::Font:Underline
-      :Font:Weight    := ::Font:Weight   
-   END
-   ::SetText( ::xText )
+   IF ::lUI
+      WITH OBJECT ::EditCtrl
+         :Caption        := ::Text
+         :ForeColor      := ::ForeColor     
+         :BackColor      := ::BackColor     
+         :Font:FaceName  := ::Font:FaceName 
+         :Font:PointSize := ::Font:PointSize
+         :Font:Italic    := ::Font:Italic   
+         :Font:Underline := ::Font:Underline
+         :Font:Weight    := ::Font:Weight   
+      END
+      ::SetText( ::xText )
+   ENDIF
 RETURN Self
 
 METHOD SetText( cText ) CLASS VrLabel
@@ -129,8 +134,6 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alignment", NIL, XSTR( ::Alignment ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Formula", NIL, XSTR( ::Formula ) )
    oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )

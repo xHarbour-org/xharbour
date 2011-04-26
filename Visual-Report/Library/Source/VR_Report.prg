@@ -280,12 +280,8 @@ RETURN nHeight
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
    LOCAL aSubtotal, cArray, x, y, i, n, nFormula, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
-   DEFAULT cField TO "SUBTOTAL"
-   cArray := cField+"S"
 
    FOR EACH aCtrl IN aBody
-
-       nFormula := ASCAN( ::aFormulas, {|a| a[1]==aSubtotal[2] } )
 //       IF nFormula > 0 .AND. ( n := ASCAN( aBody, {|a| a[2][2]==::aFormulas[nFormula][2]} ) > 0
           
 //       ENDIF
