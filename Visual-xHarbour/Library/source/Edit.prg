@@ -40,8 +40,8 @@ CLASS EditBox INHERIT Control
                                                          "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
  
    PROPERTY Layout                                      READ xLayout           WRITE __SetLayout  DEFAULT 1   PROTECTED
-   PROPERTY AutoVScroll   INDEX ES_AUTOVSCROLL          READ xAutoVScroll      WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY AutoHScroll   INDEX ES_AUTOHSCROLL          READ xAutoHScroll      WRITE SetStyle     DEFAULT .F. PROTECTED
+   PROPERTY AutoVScroll   INDEX ES_AUTOVSCROLL          READ xAutoVScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
+   PROPERTY AutoHScroll   INDEX ES_AUTOHSCROLL          READ xAutoHScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
    PROPERTY MultiLine     INDEX ES_MULTILINE            READ xMultiLine        WRITE SetStyle     DEFAULT .F. PROTECTED
    PROPERTY Password      INDEX ES_PASSWORD             READ xPassword         WRITE SetStyle     DEFAULT .F. PROTECTED
    PROPERTY NoHideSel     INDEX ES_NOHIDESEL            READ xNoHideSel        WRITE SetStyle     DEFAULT .F. PROTECTED
@@ -194,6 +194,7 @@ CLASS EditBox INHERIT Control
    METHOD __ChkGridKeys()
    METHOD OnNCMouseMove()
    METHOD OnMouseMove()
+   METHOD __SetAutoScroll()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -210,7 +211,9 @@ METHOD Init( oParent ) CLASS EditBox
    ::ExStyle      := WS_EX_CLIENTEDGE
    ::BackSysColor := GetSysColor( COLOR_WINDOW )
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
-
+#ifdef __WINFAKT__
+   ::HorzScroll   := .T.
+#endif
    IF ::__ClassInst != NIL
       ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
       ::Events := ;
@@ -285,6 +288,12 @@ METHOD Create() CLASS EditBox
    ::__BackMargin += pWi:cxWindowBorders
    ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    //::__UnSubclass()
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __SetAutoScroll( nIndex, lSet ) CLASS EditBox
+   ::SetStyle( nIndex, lSet )
+   ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
