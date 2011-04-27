@@ -135,6 +135,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Subtotal", NIL, ::Subtotal:Name )
+   oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )

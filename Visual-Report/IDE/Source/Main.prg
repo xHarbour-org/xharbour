@@ -914,7 +914,7 @@ METHOD Save( lSaveAs ) CLASS Report
       IF !EMPTY( aCtrl := oApp:Props:Body:Objects )
          oXmlBody := TXmlNode():new( , "Body" )
          FOR n := 1 TO LEN( aCtrl )
-             IF aCtrl[n]:lUI .OR. aCtrl[n]:ClsName == "Formula"
+             IF aCtrl[n]:lUI .OR. aCtrl[n]:ClsName == "Subtotal"
                 ::Generate( aCtrl[n], @oXmlBody )
              ENDIF
          NEXT

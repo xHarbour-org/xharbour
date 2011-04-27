@@ -266,13 +266,12 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
    LOCAL i, n, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
    ::aFormulas  := {}
    FOR EACH aCtrl IN aBody
-       IF UPPER( aCtrl[1][2] ) == "VRSUBTOTAL"
-          AADD( ::aSubtotals, aCtrl )
-          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-             nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+       IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
+          IF !Empty( aCtrl[n][2] )
+             IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+                nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+             ENDIF
           ENDIF
-       ELSEIF UPPER( aCtrl[1][2] ) == "VRFORMULA"
-          AADD( ::aFormulas, {aCtrl[2][2],aCtrl[3][2],0} )
        ENDIF
    NEXT
 RETURN nHeight
