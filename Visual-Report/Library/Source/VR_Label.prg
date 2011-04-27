@@ -23,7 +23,7 @@ CLASS VrLabel INHERIT VrObject
    DATA SysForeColor  EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Subtotal      EXPORTED
+   DATA Subtotal      EXPORTED  INIT ""
    DATA nSubtotal     EXPORTED  INIT 0
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -135,9 +135,9 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Subtotal", NIL, ::Subtotal:Name )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Subtotal", NIL, ::Subtotal )
    oXmlControl:addBelow( oXmlValue )
-
+view  ::Subtotal
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
       oXmlFont:addBelow( oXmlValue )

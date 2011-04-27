@@ -190,8 +190,8 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FILENAME"} ) ) > 0
       oControl:FileName := aCtrl[n][2]
    ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
-      oControl:OnLabel := aCtrl[n][2]
+   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
+      oControl:Subtotal := aCtrl[n][2]
    ENDIF
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
       oControl:Text      := aCtrl[n][2]
@@ -263,13 +263,15 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetSubtotalHeight( hDC ) CLASS VrReport
-   LOCAL i, n, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
+   LOCAL i, n, x, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
    ::aFormulas  := {}
    FOR EACH aCtrl IN aBody
        IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
           IF !Empty( aCtrl[n][2] )
-             IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-                nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+             IF ( i := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
+                IF ( x := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
+                   nHeight := MAX( nHeight, VAL( aBody[i][x][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+                ENDIF
              ENDIF
           ENDIF
        ENDIF
