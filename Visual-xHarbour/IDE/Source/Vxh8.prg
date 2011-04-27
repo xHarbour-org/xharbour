@@ -492,7 +492,7 @@ METHOD Save() CLASS StructEditor
    LOCAL cFile, hFile, nArea, nRec, n, lDel, nPos, xData, cType, x, cOrig, aDeleted, aTable, aStruct
    LOCAL cField, oFile, aFilter := { "dbf", "adt" }
    
-   IF UPPER( RIGHT( ::DataSource:__xCtrlName, 9 ) ) == "DATATABLE" .AND. !::DataSource:__lMemory
+   IF UPPER( RIGHT( ::DataSource:__xCtrlName, 9 ) ) IN {"DATATABLE","MEMORYDATATABLE"} .AND. !::DataSource:__lMemory
 
       IF ::DataSource:IsOpen
          FOR n := 1 TO LEN( ::DataSource:Structure )
