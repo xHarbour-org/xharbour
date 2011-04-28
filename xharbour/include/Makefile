@@ -73,6 +73,7 @@ C_HEADERS=\
 	ctstr.h      \
 	hbapises.h   \
         pragma.h     \
+        hbzlib.h     \
 
 PRG_HEADERS=\
 	achoice.ch   \

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-04-27 20:14 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * include/Makefile
+    ! Added missing hbzlib.h file.
+
 2011-04-02 17:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
   * contrib/png/png.h
