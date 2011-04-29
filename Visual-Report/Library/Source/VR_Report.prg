@@ -268,63 +268,54 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
    FOR EACH aCtrl IN aBody
        IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
           IF !Empty( aCtrl[n][2] )
+             
+             // Find the subtotal to use its font/color
              IF ( i := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
+
                 IF ( x := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
                    nHeight := MAX( nHeight, VAL( aBody[i][x][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
                 ENDIF
+
              ENDIF
           ENDIF
        ENDIF
    NEXT
+   view nHeight
+
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
-   LOCAL aSubtotal, cArray, x, y, i, n, nFormula, nSub, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
+   LOCAL nSub, aSubtotal, cArray, x, y, i, n, nFormula, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
 
    FOR EACH aCtrl IN aBody
-//       IF nFormula > 0 .AND. ( n := ASCAN( aBody, {|a| a[2][2]==::aFormulas[nFormula][2]} ) > 0
-          
-//       ENDIF
-       
-/*
+       IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
+          IF !Empty( aCtrl[n][2] )
+             aCtrl[4][2] := ""//xStr()
 
-          IF ( i := ASCAN( aBody, {|a| UPPER(a[1][2])=="VR"+cField} ) ) > 0
-
-             cText := aBody[i][4][2]
-
-
-             IF nForm > 0 .AND. ( n := ASCAN( ::aFormulas, {|a| UPPER(a[1]) == UPPER(aBody[i][nForm][2]) } ) ) > 0
-                aBody[i][4][2] := &(::aFormulas[n][2])
-              ELSE
-                aBody[i][4][2] := xStr(::a&cArray[nSub][2])
+             IF ( nSub := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
+                aSubtotal := ACLONE( aBody[nSub] )
              ENDIF
 
-
-
-
              IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                x := aCtrl[x][2]
+                 x := aCtrl[x][2]
              ENDIF
              IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
                 y := aCtrl[y][2]
              ENDIF
 
-             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                aBody[i][n][2] := x
+             IF ( n := ASCAN( aSubtotal, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
+                aSubtotal[n][2] := x
              ENDIF
-             IF ( n := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-                aBody[i][n][2] := y
+             IF ( n := ASCAN( aSubtotal, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
+                aSubtotal[n][2] := y
              ENDIF
 
-             ::CreateControl( aBody[i], @nHeight,, hDC )
-             ::a&cArray[nSub][2] := 0
-             
-             aBody[i][4][2] := cText
+             ::CreateControl( aSubtotal, @nHeight,, hDC )
           ENDIF
 
        ENDIF
-*/
+
    NEXT
    ::nRow += nHeight
 RETURN Self
@@ -337,6 +328,7 @@ METHOD CreateBody( hDC ) CLASS VrReport
           ::CreateControl( aCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
+          view nHeight
    ::nRow += nHeight
 RETURN nHeight
 
