@@ -400,7 +400,7 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 CLASS FontDialog INHERIT CommonDialogs
-   DATA cf   EXPORTED
+   //DATA cf   EXPORTED
    DATA Font PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -411,24 +411,20 @@ METHOD Init( oParent ) CLASS FontDialog
    ::__xCtrlName    := "FontDialog"
    ::ClsName        := "FontDialog"
    ::ComponentType  := "CommonDialog"
-   ::cf             := (struct CHOOSEFONT)
-   ::cf:lpLogFont   := (struct LOGFONT)
-   ::cf:lStructSize := ::cf:sizeof()
-   ::Font := FontDialogFont( Self )
    Super:Init( oParent )
+
+   ::Font := Font()
+   ::Font:Parent := Self
+   IF ::__ClassInst != NIL
+      ::Font:Create()
+   ENDIF
 RETURN Self
 
 METHOD Show( oParent ) CLASS FontDialog
    LOCAL lRet
-   IF ::Font:Name != NIL
-      ::cf:lpLogFont:lfFaceName:Buffer( ::Font:Name )
-   ENDIF
-   ::cf:hwndOwner  := IIF( oParent != NIL, oParent:hWnd, ::Owner:hWnd )
-   ::cf:Flags      := ::Style
-   lRet := ChooseFont( @::cf )
-   IF lRet
-      ::Font:Name := ::cf:lpLogFont:lfFaceName:AsString()
-   ENDIF
+   ::Font:Create()
+   lRet := ::Font:Choose( IIF( oParent != NIL, oParent, ::Owner ) )
+   ::Font:Delete()
 RETURN lRet
 
 //------------------------------------------------------------------------------------------------

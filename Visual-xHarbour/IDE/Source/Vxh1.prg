@@ -5082,29 +5082,14 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                 ENDIF
              ENDIF
              IF !( xValue1 == xValue2 )
-#ifdef __OLDGEN__
-                IF ( cProp == "DataSource" .OR. cProp == "DataConnector" .OR. cProp == "ImageList" .OR. cProp == "HotImageList" .OR. cProp == "ImageListSmall" .OR. cProp == "ContextMenu" ) .AND. xValue1 != NIL .AND. xValue1:Name != "CommonImageList" .AND. xValue1:Name != "CommonImageListSmall"
-
-                   IF xValue1:Owner != NIL
-                      IF !( xValue1:Owner:hWnd == ::Forms[1]:hWnd ) .OR. (oCtrl:Parent != NIL .AND. oCtrl:Parent:hWnd == xValue1:Owner:hWnd) .OR. oCtrl:ClsName == "ToolButton"
-                         cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := "+cColon+IIF( cColon != "::", ":", "" ) + xValue1:Name + CRLF
-                       ELSE
-                         cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := ::Application:MainForm:" + xValue1:Name + CRLF
-                      ENDIF
-                    ELSE
-                      cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + xValue1:Name+ CRLF
-                   ENDIF
-
-                 ELSEIF ( cProp == "BandChild" .OR. cProp == "PageChild" ) .AND. xValue1 != NIL
-                   cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := "+cColon+":" + xValue1:Name + CRLF
-#else
                 IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name ) 
+
                    IF UPPER( LEFT( xValue1:Name, 9 ) ) != "::SYSTEM:"
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp(xValue1:Name)+ CRLF
                     ELSE
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + xValue1:Name + CRLF
                    ENDIF
-#endif                   
+
                  ELSEIF ( cProp == "Icon" .OR. cProp == "ImageName" .OR. cProp == "BitmapMask") .AND. VALTYPE( xValue1 ) == "C"
                  
                    IF !EMPTY( xValue1 )
@@ -5127,6 +5112,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
                  ELSE
                    IF VALTYPE( xValue1 ) == "O"
+
                       IF cPrev == "Dock" .OR. cPrev == "Anchor"
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + IIF( xValue1:hWnd == oCtrl:Owner:Parent:hWnd, cColon + "Owner:Parent", "::" + xValue1:Name ) + CRLF
                        ELSEIF cPrev == "MDIClient" .AND. ( cProp == "AlignLeft" .OR. cProp == "AlignTop" .OR. cProp == "AlignRight" .OR. cProp == "AlignBottom" )

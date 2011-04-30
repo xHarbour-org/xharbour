@@ -176,12 +176,14 @@ RETURN Self
 
 METHOD Set( o ) CLASS Font
    ::Parent := o
-   IF o:HasMessage( "SendMessage" )// o:ClsName != "CMenuItem" .AND. o:ClassName != "COOLMENUITEM"
-      o:SendMessage( WM_SETFONT, ::Handle, MAKELPARAM( 1, 0 ) )
-    ELSEIF o:HasMessage( "InvalidateRect" )
-      o:InvalidateRect()
+   IF o:ClsName != "FontDialog"
+      IF o:HasMessage( "SendMessage" )
+         o:SendMessage( WM_SETFONT, ::Handle, MAKELPARAM( 1, 0 ) )
+       ELSEIF o:HasMessage( "InvalidateRect" )
+         o:InvalidateRect()
+      ENDIF
+      ::GetPointSize()
    ENDIF
-   ::GetPointSize()
 RETURN Self
 
 METHOD Choose( oOwner, lSet ) CLASS Font
@@ -189,7 +191,7 @@ METHOD Choose( oOwner, lSet ) CLASS Font
 
    DEFAULT lSet TO .T.
    cf:lStructSize := cf:sizeof()
-   cf:hwndOwner   := IIF( oOwner != NIL, oOwner:hWnd, GetActiveWindow() )
+   cf:hwndOwner   := IIF( oOwner != NIL, IIF( VALTYPE(oOwner)=="O", oOwner:hWnd, oOwner ), GetActiveWindow() )
 
    ::ncm:lfMessageFont:lfFaceName:Buffer( ::FaceName )
    ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height         )
@@ -208,7 +210,7 @@ METHOD Choose( oOwner, lSet ) CLASS Font
    ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
    cf:lpLogFont   := ::ncm:lfMessageFont
-   IF ::Parent != NIL
+   IF ::Parent != NIL .AND. ::Parent:HasMessage( "ForeColor" )
       cf:rgbColors := ::Parent:ForeColor
    ENDIF
    cf:Flags       := CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS
@@ -220,7 +222,7 @@ METHOD Choose( oOwner, lSet ) CLASS Font
       IF lSet
          ::xFaceName      := cf:lpLogFont:lfFaceName:AsString()
 
-         IF ::Parent != NIL
+         IF ::Parent != NIL .AND. ::Parent:HasMessage( "ForeColor" )
             ::Parent:ForeColor := cf:rgbColors
          ENDIF
 
