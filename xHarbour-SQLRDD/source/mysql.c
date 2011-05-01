@@ -58,7 +58,7 @@ HB_FUNC( MYSCONNECT )
    const char *szDb = hb_parc(4);
    UINT uiPort    = ISNUM(5) ? hb_parnl(5) : MYSQL_PORT ;
    UINT uiTimeout = ISNUM(6) ? hb_parnl(6) : 30 ;
-
+   mysql_library_init(0,NULL,NULL);
    memset( session, 0, sizeof( MYSQL_SESSION ) );
 
    session->dbh    = mysql_init( ( MYSQL * ) 0 );
@@ -72,7 +72,9 @@ HB_FUNC( MYSCONNECT )
    }
    else
    {
+      
       mysql_close( NULL );
+      mysql_library_end();
       hb_retptr( NULL );
    }
 }
@@ -84,6 +86,7 @@ HB_FUNC( MYSFINISH )
    assert( session->dbh != NULL );
    mysql_close( session->dbh );
    hb_xfree( session );
+   mysql_library_end();
    hb_ret();
 }
 
@@ -118,7 +121,8 @@ HB_FUNC( MYSEXEC )
    assert( session != NULL );
    assert( session->dbh != NULL );
 
-   mysql_query( session->dbh, szQuery );
+   //mysql_query( session->dbh, szQuery );
+   mysql_real_query( session->dbh, szQuery, hb_parclen( 2 ) );
    session->stmt = mysql_store_result( session->dbh );
    if ( session->stmt )
    {
@@ -194,6 +198,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
             hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+//            hb_xfree(szResult);
             break;
          }
          case SQL_NUMERIC:
@@ -239,6 +244,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          {
             LONG lPos;
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
+            memset( szResult, ' ', ( LONG )  lLen  );
             hb_xmemcpy( szResult, bBuffer, ( LONG ) (lLen < lLenBuff ? lLen : lLenBuff ) );
 
             for( lPos = ( LONG ) lLenBuff; lPos < lLen; lPos++ )
@@ -246,6 +252,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                szResult[ lPos ] = ' ';
             }
             hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+//            hb_xfreen(szResult);
             break;
          }
          case SQL_NUMERIC:
@@ -660,7 +667,7 @@ HB_FUNC( MYSQUERYATTR )
 
 HB_FUNC( MYSTABLEATTR )
 {
-   char attcmm[256];
+   char attcmm[256]={0};
    int row, rows, type;
    PHB_ITEM ret, atemp, temp;
    PMYSQL_SESSION session;
@@ -677,7 +684,8 @@ HB_FUNC( MYSTABLEATTR )
 
    sprintf( attcmm, "select * from %s where 0 = 1", hb_parc(2) );
 
-   mysql_query( session->dbh, attcmm );
+   //mysql_query( session->dbh, attcmm );
+   mysql_real_query( session->dbh, attcmm, strlen(attcmm) );
    session->stmt = mysql_store_result( session->dbh );
 
    if ( !session->stmt )

@@ -1308,7 +1308,6 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
       thiswa->firstinteract = 0;
    }
    pField = thiswa->area.lpFields + fieldNum - 1;
-//   TraceLog("campo.txt"," field get campo - %s fieldnum %lu   pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,pField->uiType);
    itemTemp = hb_itemArrayGet( thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1] );
 
    if( HB_IS_NIL( itemTemp ) )
@@ -1493,7 +1492,6 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    }
 
    pField = thiswa->area.lpFields + fieldNum - 1;
-//   TraceLog("campo.txt"," campo - %s fieldnum %lu fieldindex %lu  pField->uiType %lu \n",  hb_dynsymName( ( PHB_DYNS ) pField->sym ),fieldNum,fieldindex,pField->uiType);
 
    /* test compatible datatypes */
    //if  ( HB_IS_TIMEFLAG( value ) )//|| HB_IS_DATE( pDest )) 
@@ -2513,7 +2511,7 @@ static HB_ERRCODE sqlOrderListFocus( SQLAREAP thiswa, LPDBORDERINFO pOrderInfo )
       }
 
       hb_objSendSymbol( thiswa->oWorkArea, s_pSym_SQLORDERLISTFOCUS->pSymbol, 2, pOrderInfo->itmOrder, BagName );
-      hb_itemClear( BagName );
+      hb_itemRelease( BagName );
 
       thiswa->hOrdCurrent = hb_itemGetNL( hb_stackReturnItem() );
       return HB_SUCCESS;
@@ -2737,6 +2735,11 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
          }
          else
          {
+            if (Order) 
+            {
+               hb_itemRelease( Order) ;
+            }
+         
             commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return NULL;
          }
@@ -2750,6 +2753,10 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
       }
       else
       {
+         if (Order) 
+         {
+            hb_itemRelease( Order) ;
+         }
          commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
          return NULL;
       }
@@ -2760,6 +2767,10 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
    if( * lorder )
    {
       pTag = hb_itemArrayGet( thiswa->aOrders, (ULONG) * lorder );
+   }
+   if (Order) 
+   {
+      hb_itemRelease( Order) ;
    }
 
    return pTag;

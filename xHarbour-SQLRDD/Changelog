@@ -7,7 +7,14 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2011-04-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+
+2011-05-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd1.c
+     ! Fixed some memory leaks that can cause apps slow and huge memory consume
+   ! source/mysql.c  
+     ! correct to call mysql_library_load and mysql_library_free
+     
+2011-03-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlrdd2.prg
      ! added support for datetime field for postgresql and oracle, type for this field is T
      ! move function responsable from converting arrays into xml and vice versa from sqlpgs.prg 
