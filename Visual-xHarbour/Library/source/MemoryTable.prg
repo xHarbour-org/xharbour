@@ -52,7 +52,7 @@ CLASS MemoryTable INHERIT Component
    METHOD RecNo()            INLINE MIN( ::Record, LEN( ::Table ) )
    
    METHOD OrdKeyRelPos()     INLINE ( ::Record / LEN( ::Table ) )
-
+   METHOD ordKey()           INLINE ""
    METHOD GoTop()
    METHOD GoTo()
    METHOD GoBottom()

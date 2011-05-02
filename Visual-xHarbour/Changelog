@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid initial and last scrollbar positions
+   ! Fixed FontDialog to use Font object
+
 2011-04-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added DataGrid:MultipleSelection true/false
      Use array of records DataGrid:aSelected to go to each record.

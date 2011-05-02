@@ -3444,17 +3444,19 @@ METHOD Close( lCloseErrors ) CLASS Project
    ::Modified    := .F.
 
    ::CurrentForm := NIL
+   
+   IF IsWindow( ::Application:MainForm:hWnd )
+      ::EditReset(1)
 
-   ::EditReset(1)
-
-   ::Application:SourceEditor:Caption := ""
-   IF lCloseErrors
-      ::Application:MainForm:DebugBuild1:ResetContent()
-      ::Application:DebugWindow:Hide()
+      ::Application:SourceEditor:Caption := ""
+      IF lCloseErrors
+         ::Application:MainForm:DebugBuild1:ResetContent()
+         ::Application:DebugWindow:Hide()
+      ENDIF
+      ::Application:Components:Close()
+      HB_GCALL(.T.)
+      EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
    ENDIF
-   ::Application:Components:Close()
-   HB_GCALL(.T.)
-   EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------

@@ -60,7 +60,7 @@ CLASS DataGrid INHERIT Control
    DATA AutoHorzScroll          PUBLISHED INIT TRUE
    DATA AutoVertScroll          PUBLISHED INIT TRUE
    DATA FreezeColumn            PUBLISHED INIT 0
-
+   DATA IsDelIndexOn            EXPORTED INIT .F.
    DATA ShowHeaders             PUBLISHED INIT .T.
    DATA HeaderHeight            PUBLISHED INIT 20
    DATA ShowSelection           PUBLISHED INIT .T.
@@ -235,6 +235,7 @@ CLASS DataGrid INHERIT Control
    METHOD GetPosition()
    METHOD OnMouseWheel()
    METHOD CreateDragImage()
+   METHOD GetRecordCount()
 ENDCLASS
 
 //----------------------------------------------------------------------------------
@@ -320,6 +321,15 @@ METHOD __GetPosition() CLASS DataGrid
    IF ::DataSource != NIL
       IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
          nPos := ::DataSource:OrdKeyNo()
+         IF !::IsDelIndexOn .AND. nPos > 1 
+            ::DataSource:Skip(-1)
+            IF ::DataSource:Bof()
+               ::DataSource:GoTop()
+               nPos := 1
+             ELSE
+               ::DataSource:Skip()
+            ENDIF
+         ENDIF
        ELSE
          nPos := Int( Round( ::DataSource:OrdKeyRelPos()*::DataSource:Recno(), 0 ) )
       ENDIF
@@ -430,7 +440,7 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
              ELSE
                ::Cursor := NIL//::System:Cursor:LinkSelect
             ENDIF
-          
+
           ELSE
             IF wParam == MK_LBUTTON .AND. ::AllowDragRecords .AND. ::__hDragRecImage != NIL
                nTop := y + ::__GetHeaderHeight() - ::__nDragTop
@@ -2139,6 +2149,8 @@ RETURN Self
 METHOD Update() CLASS DataGrid
    LOCAL n, nRec, nRecs, nFirst, nLast, x, nPos, nSkip, nUse, nIns
 
+   ::IsDelIndexOn := "DELETED()" IN UPPER( ::DataSource:OrdKey() )
+
    ::__DataWidth := 0
    AEVAL( ::Children, {|o| ::__DataWidth += o:Width} )
 
@@ -2155,6 +2167,23 @@ METHOD Update() CLASS DataGrid
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
    nUse := Int(  ::__DataHeight/::ItemHeight )
+
+//   IF SET( _SET_DELETED )
+//      WHILE ::DataSource:Deleted()
+//         ::DataSource:Skip()
+//         IF ::DataSource:Eof()
+//            ::DataSource:GoBottom()
+//            EXIT
+//         ENDIF
+//      ENDDO
+//      WHILE ::DataSource:Deleted()
+//         ::DataSource:Skip(-1)
+//         IF ::DataSource:Bof()
+//            ::DataSource:GoTop()
+//            EXIT
+//         ENDIF
+//      ENDDO
+//   ENDIF
 
    IF ::DataSource:Eof()
       ::DataSource:GoBottom()
@@ -2221,7 +2250,7 @@ METHOD __ScrollUp( nScroll ) CLASS DataGrid
    LOCAL nRec
    LOCAL n, x, aScroll, aClip, nPos, nNew, nRow
    DEFAULT nScroll TO ::__VertScrolled + 1
-   IF ::__VertScrolled + ::RowCountUsable <= ::DataSource:OrdKeyCount()
+   IF ::__VertScrolled + ::RowCountUsable <= ::GetRecordCount() //::DataSource:OrdKeyCount()
 
       nNew := nScroll - ::__VertScrolled
       ::__VertScrolled := nScroll
@@ -2336,9 +2365,23 @@ METHOD __ScrollDown( nScroll ) CLASS DataGrid
 RETURN Self
 
 //----------------------------------------------------------------------------------
+METHOD GetRecordCount() CLASS DataGrid
+   LOCAL nCount, nRec
+
+   IF !::IsDelIndexOn
+      nCount := ::DataSource:OrdKeyCount()
+    ELSE
+      nRec := ::DataSource:Recno()
+      ::DataSource:GoBottom()
+      nCount := ::DataSource:OrdKeyNo()
+      ::DataSource:Goto( nRec )
+   ENDIF
+RETURN nCount
+
+//----------------------------------------------------------------------------------
 
 METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
-   LOCAL nFlags := SIF_ALL
+   LOCAL nRec, nFlags := SIF_ALL
    LOCAL nMin := 1, nPage := 0, nMax  := 0, nPos  := 0
 
    DEFAULT lRedraw TO TRUE
@@ -2348,7 +2391,7 @@ METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
 
       IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
          nPage := Int(  ::__DataHeight/::ItemHeight )
-         nMax  := ::DataSource:OrdKeyCount()
+         nMax  := ::GetRecordCount() //::DataSource:OrdKeyCount()
          nPos  := IIF( nMax < nPage, 0, ::__VertScrolled )
          IF nMax <= nPage .AND. ::AutoVertScroll
             nMax := 0
