@@ -236,6 +236,7 @@ CLASS DataGrid INHERIT Control
    METHOD OnMouseWheel()
    METHOD CreateDragImage()
    METHOD GetRecordCount()
+   METHOD DeselectAll()
 ENDCLASS
 
 //----------------------------------------------------------------------------------
@@ -1044,9 +1045,28 @@ METHOD ColFromPos(xPos) CLASS DataGrid
 RETURN nClickCol
 
 //----------------------------------------------------------------------------------
+METHOD DeselectAll() CLASS DataGrid
+   LOCAL n, nRec, nCur, nPos, lSel := ::ShowSelectionBorder
+   nCur := ::DataSource:Recno()
+   ::ShowSelectionBorder := .F.
+   WHILE LEN( ::aSelected ) > 1
+       nRec := ::aSelected[1]
+       IF ( nPos := ASCAN( ::__DisplayArray, {|a|a[2]==nRec} ) ) > 0
+          ::DataSource:Goto( nRec )
+          ADEL( ::aSelected, 1, .T. )
+          ::__DisplayData( nPos, , nPos,  )
+        ELSE
+          ADEL( ::aSelected, 1, .T. )
+       ENDIF
+   ENDDO
+   ::ShowSelectionBorder := lSel
+   ::DataSource:Goto( nCur )
+RETURN Self
+
+//----------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    LOCAL aRect, nCol, nRow, n, lRes, nWidth, pt, i
-   LOCAL nClickRow
+   LOCAL nClickRow, lUpdt := .F.
    LOCAL nClickCol, lShift, lCtrl
    LOCAL lLineChange:=.F.
 
@@ -1133,9 +1153,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
       lShift := CheckBit( GetKeyState( VK_SHIFT ) )
       lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) )
       IF !lShift .AND. !lCtrl
+         ::DeselectAll()
          ::aSelected := {::__DisplayArray[ nClickRow ][2] }
          ::__aSel    := { { ::__DisplayArray[ nClickRow ][2], lShift, lCtrl, -1 } }
-         ::Update()
        ELSE
          IF lCtrl
             IF ( n := ASCAN( ::aSelected, ::__DisplayArray[ nClickRow ][2] ) ) == 0
