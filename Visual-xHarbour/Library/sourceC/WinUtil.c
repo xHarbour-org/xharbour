@@ -4180,3 +4180,44 @@ HB_FUNC( GETOLEICON )
       hb_retc( cBmp );
    }
 }
+
+typedef struct LVTILEINFO {
+  UINT  cbSize;
+  int   iItem;
+  UINT  cColumns;
+  PUINT puColumns;
+#if (_WIN32_WINNT >= 0x0600)
+  int   *piColFmt;
+#endif 
+} LVTILEINFO, *PLVTILEINFO;
+
+#define LVM_SETVIEW             (LVM_FIRST + 142)
+#define LVM_SETTILEINFO         (LVM_FIRST + 164)
+
+HB_FUNC( __LISTVIEWSETVIEW )
+{
+   PHB_ITEM aParam;
+   LVTILEINFO lvti;
+   lvti.cbSize = sizeof( LVTILEINFO );
+   lvti.iItem = hb_parni(2);
+   lvti.cColumns = (UINT) hb_parni(3);
+
+   if (ISARRAY( 4 ) )
+   {
+      int iCount, i;
+      PUINT puColumn;
+      
+      iCount = (int) hb_parinfa( 4, 0 );
+      puColumn = (UINT*) hb_xgrab( iCount * sizeof(UINT) );
+      aParam = hb_param(4,HB_IT_ARRAY);
+
+      for ( i = 0 ; i<iCount ; i++ )
+      {
+          *(puColumn+i) = *(UINT*) hb_itemArrayGet( aParam, i+1 );
+      }
+      lvti.puColumns = puColumn;
+
+      SendMessage( (HWND) hb_parnl(1), LVM_SETTILEINFO, 0, (LPARAM) &lvti );
+      hb_xfree(puColumn);
+   }
+}

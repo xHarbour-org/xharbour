@@ -1596,3 +1596,19 @@ typedef struct tagCOMBOBOXINFO {;
     HWND  hwndList;
 } COMBOBOXINFO
 
+typedef struct LVTILEINFO {;
+    UINT  cbSize;
+    int   iItem;
+    UINT  cColumns;
+    UINT  puColumns;
+    int   piColFmt;
+} LVTILEINFO, *PLVTILEINFO;
+
+typedef struct LVTILEVIEWINFO {;
+    UINT  cbSize;
+    DWORD dwMask;
+    DWORD dwFlags;
+    SIZE  sizeTile;
+    int   cLines;
+    RECT  rcLabelMargin;
+} LVTILEVIEWINFO, *PLVTILEVIEWINFO;

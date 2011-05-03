@@ -421,9 +421,9 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              cText := cText[ ::ActiveObject:Position+1 ]
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "VIEWSTYLES"
-             cText := cText[ ::ActiveObject:ViewStyle+1 ]
-          ENDIF
+          //IF oItem:ColItems[n]:ColType == "VIEWSTYLES"
+          //   cText := cText[ ::ActiveObject:ViewStyle+1 ]
+          //ENDIF
 
           IF oItem:ColItems[n]:ColType == "CHECKSTYLES"
              cText := cText[ ::ActiveObject:CheckStyle ]
@@ -1617,10 +1617,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := "PAGE_POSITIONS"
                   xValue := NIL
 
-             CASE cProp == "ViewStyle"
-                  aCol[1]:Value := ::ActiveObject:View_Styles
-                  aCol[1]:ColType  := "VIEWSTYLES"
-                  xValue := NIL
+//              CASE cProp == "ViewStyle"
+//                   aCol[1]:Value := ::ActiveObject:View_Styles
+//                   aCol[1]:ColType  := "VIEWSTYLES"
+//                   xValue := NIL
 
              CASE cProp == "CheckStyle"
                   aCol[1]:Value := ::ActiveObject:Check_Styles
@@ -2137,7 +2137,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "IMAGETYPE" .OR.;
                     cType == "SERVICES" .OR.;
                     cType == "STATES" .OR.;
-                    cType == "VIEWSTYLES" .OR.;
+                    /*cType == "VIEWSTYLES" .OR.*/;
                     cType == "DRAWSTYLES" .OR.;
                     cType == "CASETYPES" .OR.;
                     cType == "CHECKSTYLES" .OR.;
@@ -2227,7 +2227,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                    o:Destroy(),;
                                                    oPar:SetValue( cSel ) }
                         ELSE
-                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "VIEWSTYLES" .OR. cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
+                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. /*cType == "VIEWSTYLES" .OR.*/ cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
                        ENDIF
                        :Create()
 
@@ -2247,8 +2247,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :SetCurSel( ::ActiveObject:ShowMode, 0 )
                         ELSEIF cType == "IMAGETYPE"
                           :SetCurSel( ::ActiveObject:ImageType )
-                        ELSEIF cType == "VIEWSTYLES"
-                          :SendMessage( CB_SETCURSEL, ::ActiveObject:ViewStyle )
+//                        ELSEIF cType == "VIEWSTYLES"
+//                          :SendMessage( CB_SETCURSEL, ::ActiveObject:ViewStyle )
                         ELSEIF cType == "CHECKSTYLES"
                           :SetCurSel( ::ActiveObject:CheckStyle )
                         ELSEIF cType == "DRAWSTYLES"
