@@ -27,12 +27,19 @@ METHOD Init( oParent ) CLASS VrSubtotal
    LOCAL n
    IF oParent != NIL
       Super:Init( oParent )
+      ::aProperties := {}
+      AADD( ::aProperties, { "BackColor",  "Color"   } )
+      AADD( ::aProperties, { "ForeColor",  "Color"   } )
+      AADD( ::aProperties, { "Font",       "General" } )
+      AADD( ::aProperties, { "Name",       "Object"  } )
+      AADD( ::aProperties, { "AutoResize", "Size"    } )
    ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-CLASS VrTotal INHERIT VrSubtotal
+CLASS VrTotal INHERIT VrLabel
+   DATA lUI     EXPORTED INIT .T.
    DATA ClsName EXPORTED  INIT "Total"
 ENDCLASS

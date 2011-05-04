@@ -137,7 +137,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Subtotal", NIL, ::Subtotal )
    oXmlControl:addBelow( oXmlValue )
-view  ::Subtotal
+
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
       oXmlFont:addBelow( oXmlValue )
@@ -181,11 +181,12 @@ METHOD Draw( hDC ) CLASS VrLabel
             cText := ::Text
          ENDIF
          
-         ::nSubtotal += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+//         ::nSubtotal += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
 
-         //IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-         //   ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-         //ENDIF
+         IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
+            ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
+         ENDIF
+
          //IF ( n := ASCAN( ::Parent:aTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
          //   ::Parent:aTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
          //ENDIF

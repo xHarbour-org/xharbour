@@ -255,7 +255,8 @@ METHOD GetTotalHeight( hDC ) CLASS VrReport
              AADD( ::aTotals, {aCtrl[n][2],0} )
           ENDIF
           IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-             nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+             //nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+             nHeight := MAX( nHeight, (PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) ) * VAL( aCtrl[n][2][2][2] ) )
           ENDIF
        ENDIF
    NEXT
@@ -271,27 +272,29 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
              
              // Find the subtotal to use its font/color
              IF ( i := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
-
+                
+                AADD( ::aSubtotals, {aCtrl[2][2], 0} )
                 IF ( x := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-                   nHeight := MAX( nHeight, VAL( aBody[i][x][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
+                   nHeight := MAX( nHeight, (PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) ) * VAL( aBody[i][x][2][2][2] ) )
+                   
+                   //nHeight := MAX( nHeight, MulDiv( VAL( aBody[i][x][2][2][2] ), PIX_PER_INCH, 72 ) )
                 ENDIF
 
              ENDIF
           ENDIF
        ENDIF
    NEXT
-   view nHeight
 
-RETURN nHeight
+RETURN Int( nHeight+50 )
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
+METHOD CreateSubtotals( hDC ) CLASS VrReport
    LOCAL nSub, aSubtotal, cArray, x, y, i, n, nFormula, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
 
    FOR EACH aCtrl IN aBody
        IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
           IF !Empty( aCtrl[n][2] )
-             aCtrl[4][2] := ""//xStr()
+             //aCtrl[4][2] := ""//xStr()
 
              IF ( nSub := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
                 aSubtotal := ACLONE( aBody[nSub] )
@@ -311,6 +314,11 @@ METHOD CreateSubtotals( hDC, cField ) CLASS VrReport
                 aSubtotal[n][2] := y
              ENDIF
 
+             IF ( n := ASCAN( ::aSubtotals, {|a| a[1]==aCtrl[2][2]} ) ) > 0
+               VIEW ::aSubtotals[n][2]
+                aSubtotal[3][2] := ::aSubtotals[n][2]
+                ::aSubtotals[n][2] := 0
+             ENDIF
              ::CreateControl( aSubtotal, @nHeight,, hDC )
           ENDIF
 
@@ -328,7 +336,6 @@ METHOD CreateBody( hDC ) CLASS VrReport
           ::CreateControl( aCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
-          view nHeight
    ::nRow += nHeight
 RETURN nHeight
 
@@ -522,7 +529,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nPos := 0
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateBody( hDC )
-         IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nSubHeight )
+         IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
             ::CreateSubtotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
