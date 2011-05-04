@@ -80,6 +80,7 @@ CLASS VrReport INHERIT VrObject
    METHOD EndPage()
    METHOD Run()
    METHOD CreateControl()
+   METHOD CreateColumns()
    METHOD CreateBody()
    METHOD CreateHeader()
    METHOD CreateFooter()
@@ -285,7 +286,7 @@ METHOD GetSubtotalHeight( hDC ) CLASS VrReport
        ENDIF
    NEXT
 
-RETURN Int( nHeight+50 )
+RETURN Int( nHeight )
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC ) CLASS VrReport
@@ -329,15 +330,25 @@ METHOD CreateSubtotals( hDC ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateBody( hDC ) CLASS VrReport
+METHOD CreateColumns( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
-       IF !( UPPER( aCtrl[1][2] ) IN { "VRSUBTOTAL", "VRTOTAL" } )
+       IF ( UPPER( aCtrl[1][2] ) IN { "VRLABEL", "VRIMAGE" } )
           ::CreateControl( aCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
    ::nRow += nHeight
 RETURN nHeight
+
+//-----------------------------------------------------------------------------------------------
+METHOD CreateBody( hDC ) CLASS VrReport
+   LOCAL aCtrl, nHeight := 0
+   FOR EACH aCtrl IN ::aBody
+       IF ( UPPER( aCtrl[1][2] ) IN { "VRLINE" } )
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+       ENDIF
+   NEXT
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateHeader( hDC ) CLASS VrReport
@@ -527,8 +538,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nSubHeight := ::GetSubtotalHeight( hDC )
       nTotHeight := ::GetTotalHeight( hDC )
       nPos := 0
+      ::CreateBody( hDC )
       WHILE ! ::DataSource:EditCtrl:Eof()
-         nHeight := ::CreateBody( hDC )
+         nHeight := ::CreateColumns( hDC )
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
             ::CreateSubtotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
@@ -552,7 +564,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ENDIF
       //::CreateTotals( hDC )
     ELSE
-      ::CreateBody( hDC )
+      ::CreateColumns( hDC )
    ENDIF
    ::CreateFooter( hDC )
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
