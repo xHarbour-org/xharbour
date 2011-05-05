@@ -412,6 +412,7 @@ METHOD Init() CLASS MainForm
       :Create()
       WITH OBJECT ::Application:Props[ "ReportPageTab" ] := TabPage( :this )
          :Caption    := "Report Page"
+         :VertScroll := .T.
          :BackColor  := ::System:Color:Gray
          :Create()
 
@@ -716,18 +717,9 @@ METHOD Close() CLASS Report
       :Props:PropEditor:ResetProperties( {{ NIL }} )
 
       :Props:ReportPageTab:HorzScrollSize := 0
+      :Props:ReportPageTab:VertScrollSize := 0
       :Props:ExtraTab:HorzScrollSize := 0
       :Props:ExtraTab:VertScrollSize := 0
-
-      //:Props:ReportPageTab:OriginalRect[3] := 0
-      //:Props:ExtraTab:OriginalRect[3] := 0
-      //:Props:ExtraTab:OriginalRect[4] := 0
-
-      //:Props:ReportPageTab:__SetScrollBars()
-      //:Props:ExtraTab:__SetScrollBars()
-
-      //:Props:ReportPageTab:HorzScroll := .F.
-
    END
 RETURN NIL
 
@@ -747,16 +739,15 @@ METHOD SetScrollArea() CLASS Report
    oApp:Props:RepHeader:Width := cx
    oApp:Props:RepFooter:Width := cx
    oApp:Props:ExtraPage:Width := cx
+
    oApp:Props:ExtraPage:Height := cy
+   oApp:Props:Body:Height      := cy
    
    oApp:Props:ReportPageTab:HorzScrollSize := cx + 4
+   oApp:Props:ReportPageTab:VertScrollSize := cy + 4
    oApp:Props:ExtraTab:HorzScrollSize := cx + 4
    oApp:Props:ExtraTab:VertScrollSize := cy + 4
 
-   //oApp:Props:ReportPageTab:OriginalRect[3] := cx + 4
-   //oApp:Props:ExtraTab:OriginalRect[3] := cx + 4
-   //oApp:Props:ExtraTab:OriginalRect[4] := cy + 4
-   
    oApp:Props:ReportPageTab:HorzScroll := .T.
 
    oApp:Props:RepHeader:Visible := oApp:Props:ViewMenuRepHeader:Checked

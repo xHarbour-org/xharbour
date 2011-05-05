@@ -316,7 +316,6 @@ METHOD CreateSubtotals( hDC ) CLASS VrReport
              ENDIF
 
              IF ( n := ASCAN( ::aSubtotals, {|a| a[1]==aCtrl[2][2]} ) ) > 0
-               VIEW ::aSubtotals[n][2]
                 aSubtotal[3][2] := ::aSubtotals[n][2]
                 ::aSubtotals[n][2] := 0
              ENDIF
@@ -541,6 +540,13 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::CreateBody( hDC )
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateColumns( hDC )
+
+//------- Stop the page if a group is on the way
+//
+//         IF ASCAN( ::aBody, {|a| a[
+//         ::nRow + nHeight + nSubHeight
+//-----------------------------------------------
+
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
             ::CreateSubtotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
@@ -550,6 +556,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             ::EndPage()
             ::StartPage()
             ::CreateHeader( hDC )
+            ::CreateBody( hDC )
          ENDIF
          oWait:Position := Int( (nPos/nCount)*100 )
          nPos ++

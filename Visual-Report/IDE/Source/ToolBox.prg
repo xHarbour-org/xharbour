@@ -103,6 +103,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[2][2], { "Image", .T. } )
    AADD( ::aButtons[2][2], { "DataTable", .T. } )
    AADD( ::aButtons[2][2], { "Formula", .T. } )
+   AADD( ::aButtons[2][2], { "Group", .T. } )
 
    AADD( ::aButtons[3][2], { "Line", .T. } )
 //   AADD( ::aButtons[3][2], { "Rectangle", .T. } )
