@@ -431,7 +431,7 @@ RETURN 0
 //--------------------------------------------------------------------------------------------------------
 
 METHOD InsertItem( cText, nImage, nRow, nGroup ) CLASS ListView
-   LOCAL lvi := (struct LVITEM)
+   LOCAL lvi := (struct LVWITEM)
 
    DEFAULT nImage TO 0
    DEFAULT nRow   TO ::SendMessage( LVM_GETITEMCOUNT, 0, 0 ) + 1
