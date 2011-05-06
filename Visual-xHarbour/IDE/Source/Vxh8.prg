@@ -582,7 +582,9 @@ METHOD Save() CLASS StructEditor
     ELSE
       aTable  := ACLONE( ::DataSource:Table )
       aStruct := ACLONE( ::DataSource:Structure )
+
       ::DataSource:Structure := ACLONE( ::DataGrid1:DataSource:Table )
+
       ::DataSource:Table     := {}
       ::DataSource:Create()
 
@@ -762,6 +764,9 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS StrEditor
       
     ELSEIF nwParam == VK_DELETE
       ::DataSource:Delete()
+      IF ::DataSource:RecCount() == 0
+         ::DataSource:Append()
+      ENDIF
       ::Update()
       s_oSave:Enabled := .T.
       RETURN 0

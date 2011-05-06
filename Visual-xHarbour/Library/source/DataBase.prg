@@ -532,8 +532,12 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             RETURN ::Owner
          ENDIF
          IF !FILE( cFile )
-            dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
-            CLOSE
+            TRY
+               dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
+               CLOSE
+            CATCH
+               RETURN ::Owner
+            END
          ENDIF
       ENDIF
       
@@ -579,7 +583,9 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       ::Owner:Area := Select()
       ::Owner:Structure := (::Owner:Alias)->( dbStruct() )
-
+      
+      AEVAL( ::Owner:Structure, {|a,n| ASIZE( ::Owner:Structure[n], 4 )} )
+      
       ::Owner:CreateFields()
       
       IF HGetPos( ::Owner:EventHandler, "OnOpen" ) != 0
