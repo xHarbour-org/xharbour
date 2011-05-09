@@ -69,7 +69,7 @@ CLASS Object
 
 
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
-   METHOD HasProperty( cName ) INLINE ::Property != NIL .AND. hScan( ::Property, cName ) > 0
+   METHOD HasProperty()
    METHOD __SetCtrlName()
    METHOD GetControlName()
    METHOD __CreateProperty()
@@ -107,6 +107,9 @@ METHOD OnError( ... ) CLASS Object
       uRet := ::__InvalidMember( cMsg )
    ENDIF
 RETURN uRet
+
+METHOD HasProperty( cName ) 
+RETURN ::Property != NIL .AND. hScan( ::Property, {|c|UPPER(c) == UPPER(cName)} ) > 0
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __InvalidMember( cMsg ) CLASS Object

@@ -2169,7 +2169,7 @@ RETURN Self
 METHOD Update() CLASS DataGrid
    LOCAL n, nRec, nRecs, nFirst, nLast, x, nPos, nSkip, nUse, nIns
 
-   ::IsDelIndexOn := "DELETED()" IN UPPER( ::DataSource:OrdKey() )
+   ::IsDelIndexOn := !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
 
    ::__DataWidth := 0
    AEVAL( ::Children, {|o| ::__DataWidth += o:Width} )
