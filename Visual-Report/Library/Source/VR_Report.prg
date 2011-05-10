@@ -343,7 +343,7 @@ RETURN nHeight
 METHOD CreateBody( hDC ) CLASS VrReport
    LOCAL aCtrl, nHeight := 0
    FOR EACH aCtrl IN ::aBody
-       IF ( UPPER( aCtrl[1][2] ) IN { "VRLINE" } )
+       IF ( UPPER( aCtrl[1][2] ) IN { "VRLINE","VRGROUP" } )
           ::CreateControl( aCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
@@ -495,7 +495,7 @@ RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
-   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos
+   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nGroup, lGroup, nRow
 
    ::Create()
 
@@ -540,14 +540,16 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::CreateBody( hDC )
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateColumns( hDC )
-
+         lGroup := .F.
 //------- Stop the page if a group is on the way
-//
-//         IF ASCAN( ::aBody, {|a| a[
-//         ::nRow + nHeight + nSubHeight
-//-----------------------------------------------
 
-         IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
+         IF ( nGroup := ASCAN( ::aBody, {|a| a[1][2]=="VRGROUP" .AND. S2R(hDC,a[5][2])+nHeight >= ::nRow } ) ) > 0
+            lGroup := ::nRow >= S2R(hDC,::aBody[nGroup][5][2])
+            //IF ::nRow >= S2R(hDC,::aBody[nGroup][5][2])-nHeight
+            //   ::nRow := S2R(hDC,::aBody[nGroup][5][2]) + S2R(hDC,::aBody[nGroup][7][2])
+            //ENDIF
+         ENDIF
+         IF lGroup .OR. ( ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength )
             ::CreateSubtotals( hDC )
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
@@ -590,6 +592,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ENDIF
 RETURN Self
 
+FUNCTION S2R( hDC, cSize ); RETURN VAL(cSize)*PIX_PER_INCH/GetDeviceCaps( hDC, LOGPIXELSY )
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------

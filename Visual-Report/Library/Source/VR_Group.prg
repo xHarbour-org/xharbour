@@ -30,6 +30,9 @@ ENDCLASS
 METHOD Init( oParent ) CLASS VrGroup
    IF oParent != NIL
       Super:Init( oParent )
+      AADD( ::aProperties, { "ForeColor",  "Color"   } )
+      AADD( ::aProperties, { "Width",  "Size"  } )
+      AADD( ::aProperties, { "Height", "Size" } )
    ENDIF
 RETURN Self
 
@@ -50,7 +53,9 @@ RETURN Self
 METHOD Configure() CLASS VrGroup
    IF ::lUI
       WITH OBJECT ::EditCtrl
-         :ForeColor      := ::ForeColor     
+         :ForeColor := ::ForeColor     
+         :Width     := ::Width
+         :Height    := ::Height
       END
    ENDIF
 RETURN Self
@@ -70,31 +75,27 @@ METHOD WriteProps( oXmlControl ) CLASS VrGroup
 RETURN Self
 
 METHOD Draw( hDC ) CLASS VrGroup
-   LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
-   LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
+   LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Group" + AllTrim( Str( ::Parent:nText++ ) )
+   LOCAL cx, cy, n
    
-   lAuto := ::AutoResize
-   
-   IF ::Text != NIL
-      nX := GetDeviceCaps( hDC, LOGPIXELSX )
-      nY := GetDeviceCaps( hDC, LOGPIXELSY )
+   nX := GetDeviceCaps( hDC, LOGPIXELSX )
+   nY := GetDeviceCaps( hDC, LOGPIXELSY )
 
-      x  := ( ::nPixPerInch / nX ) * ::Left
-      y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+   x  := ( ::nPixPerInch / nX ) * ::Left
+   y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+   cx := ( ::nPixPerInch / nX ) * ::Width
+   cy := ( ::nPixPerInch / nY ) * ::Height
+
+   ::Parent:oPDF:CreateObject( acObjectTypeFrame, cName )
+
+   WITH OBJECT ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
+      :Attribute( "Left",    x )
+      :Attribute( "Top",     y )
+      :Attribute( "Right",   x+cx )
+      :Attribute( "Bottom",  y+cy )
       
-      ::Parent:oPDF:CreateObject( acObjectTypeFrame, cName )
-
-      WITH OBJECT ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
-         :Attribute( "Left",    x )
-         :Attribute( "Top",     y )
-         :Attribute( "Right",   x + ( (::nPixPerInch / nX) * ::Width ) )
-         :Attribute( "Bottom",  y + ( (::nPixPerInch / nY) * ::Height ) )
-         
-         IF ::ForeColor != ::SysForeColor
-            :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
-         ENDIF
-      END
-   ENDIF
+      :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
+   END
 RETURN Self
 
 CLASS __VrGroup INHERIT GroupBox
