@@ -189,7 +189,10 @@ CLASS Get
 
    DATA lNumToLeft  INIT .F.       // to "@L" mask
    DATA lNeverDeleted INIT .T.
-    
+
+   DATA lPassWord INIT .F.         // true if "@P" picture is used.
+   DATA cPassWordChar INIT "*"     // char to display password in buffer display.
+
    METHOD _NumToLeft()             // idem.
    METHOD StopMoveH()               // idem
 
@@ -308,6 +311,14 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := SubStr( cPicture, nAt + 1 )
       endif
 
+      // Password picture.
+      nPos := At("P",::cPicFunc)
+      if nPos > 0 .and. ::Type == "C"
+         ::lPassWord := .T.
+         if Len(::cPicFunc) > nPos .and. ! Empty(::cPicFunc[nPos+1])
+            ::cPassWordChar := ::cPicFunc[nPos+1]
+         endif
+      endif
 //      AnalyzePicture( @::cPicFunc )
 
       if "D" IN ::cPicFunc
@@ -560,6 +571,7 @@ METHOD Display( lForced ) CLASS Get
    LOCAL lIsIntense := SET( _SET_INTENSITY)
    LOCAL nCol,cDisplay
    LOCAL nDispReduce := 0
+   LOCAL cChar
 
    DEFAULT lForced TO .t.
 
@@ -581,6 +593,15 @@ METHOD Display( lForced ) CLASS Get
    ENDIF
 
    HBConsoleLock()
+
+   // Change display character on password picture.
+   IF ::lPassWord .and. ::Type == "C" .and. ! Empty(xBuffer)
+      FOR EACH cChar IN xBuffer
+          IF ! Empty(cChar)
+             xBuffer[HB_EnumIndex()] := ::cPassWordChar
+          ENDIF
+      NEXT
+   ENDIF
 
    /* E.F. 2006/MAY/23 - Display minus sign in the front of xBuffer value.
     * IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"

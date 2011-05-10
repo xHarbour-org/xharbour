@@ -255,9 +255,9 @@ FUNCTION MAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
    DEFAULT p6 TO ""
 
 
-   IF s_lOS2 .OR. s_lLinux
+   s_cEditor := HBMake_Editor()
 
-      s_cEditor := "mcedit"
+   IF s_lOS2 .OR. s_lLinux
 
       s_lGcc   := .T.
       s_lBcc   := .F.
@@ -266,8 +266,6 @@ FUNCTION MAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
       s_lMinGW := .F.
 
    ELSEIF s_lWin32
-
-      s_cEditor := "edit"
 
       s_lGcc   := .F.
 
@@ -1208,7 +1206,7 @@ FUNCTION CompileFiles()
    LOCAL aGauge   := GaugeNew( 5, 5, 7, 40, "W/B", "W+/B", '²' )
 
 
-   @  4,  5 SAY "Compiling :"
+   @  4,  5 SAY "Compiling: "
 
    FOR EACH cOrder IN aOrder
 
@@ -1822,11 +1820,7 @@ FUNCTION CreateScript( cFile, lCreateAndCompile )
          s_cEditor       := trim(oMake:cEditor)
 
          if Empty( s_cEditor )
-            if s_lOS2 .OR. s_lLinux
-               s_cEditor := "mcedit"
-            else
-               s_cEditor := "edit"
-            endif
+            s_cEditor := HBMake_Editor()
          endif
 
          if !s_lRecursive
@@ -3471,7 +3465,7 @@ FUNCTION CompileUpdatedFiles()
 #Endif
    LOCAL aGauge      := GaugeNew( 5, 5, 7, 40, "W/B", "W+/B", '²' )
 
-   @ 4,5 SAY "Compiling :"
+   @ 4,5 SAY "Compiling: "
 
    FOR EACH cOrder in aOrder
       IF ! s_lExtended
@@ -3959,11 +3953,7 @@ FUNCTION CreateScriptLib( cFile )
          s_cEditor       := trim(oMake:cEditor)
 
          if Empty( s_cEditor )
-            if s_lOS2 .OR. s_lLinux
-               s_cEditor := "mcedit"
-            else
-               s_cEditor := "edit"
-            endif
+            s_cEditor := HBMake_Editor()
          endif
 
          if !empty(oMake:cFmc)
@@ -5949,3 +5939,20 @@ local i,aCredits := {}
  qout(" ")
 
 RETURN NIL
+
+*------------------------------
+STATIC FUNCTION HbMake_Editor()
+*------------------------------
+Local cEditor := ""
+
+  IF s_lOS2 .OR. s_lLinux
+
+     cEditor := "mcedit"
+
+  ELSEIF s_lWin32
+
+     cEditor := "notepad"
+
+  ENDIF
+
+RETURN cEditor

@@ -446,11 +446,7 @@ LOCAL oTBR,;
              oTBR:HitBottom := .f.
              nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, oTBR)
 
-          elseif NextKey() = 0
-             nRet := dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
-             if nRet != DE_CONT
-                nRet := DE_CONT /* force dbedit DE_CONT state after idle mode. */
-             endif
+           endif
 
           endif
 
@@ -461,6 +457,13 @@ LOCAL oTBR,;
           if lastkey() == K_ENTER
              oTBR:RefreshCurrent()
           endif
+       endif
+
+       // No keystrokes pending...
+       if NextKey() = 0
+          dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, oTBR)
+          // force dbedit DE_CONT state after IDLE mode.
+          nRet := DE_CONT
        endif
 
     endif
