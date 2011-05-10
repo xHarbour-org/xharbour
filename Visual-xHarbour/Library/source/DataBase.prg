@@ -24,6 +24,7 @@
 
 REQUEST HB_MEMIO
 
+static nMemSel := 100
 //-------------------------------------------------------------------------------------------------------
 
 CLASS DataTable INHERIT Component
@@ -455,7 +456,7 @@ RETURN Self
 METHOD Create( lIgnoreAO ) CLASS DataRdd
 
    LOCAL nSecs, nAlias, cAlias
-   LOCAL oErr
+   LOCAL oErr, nSelect
    LOCAL cEvent, n, nServer, cFile, lDef := .T.
    DEFAULT lIgnoreAO TO .F.
    
@@ -531,10 +532,13 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          IF EMPTY( ::Owner:Structure )
             RETURN ::Owner
          ENDIF
+         nMemSel++
+         Select( nMemSel )
          IF !FILE( cFile )
             TRY
                dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
-               CLOSE
+               dbCloseArea( nMemSel )
+               Select( nMemSel )
             CATCH
                RETURN ::Owner
             END
@@ -550,7 +554,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ::Owner:xAlias := cAlias + XSTR( nAlias )
       ENDIF
       TRY
-         dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
+         dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
          n := NIL
          IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ::Owner:__ClassInst != NIL
