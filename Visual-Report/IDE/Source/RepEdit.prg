@@ -158,13 +158,28 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD CreateControl( cControl, x, y ) CLASS RepEdit
+METHOD CreateControl( cControl, x, y, oParent ) CLASS RepEdit
    EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubtotal, VrTotal, VrFormula, VrGroup
-   LOCAL oControl, hPointer := HB_FuncPtr( cControl )
+   LOCAL hWnd, oControl, hPointer := HB_FuncPtr( cControl ), pt := (struct POINT)
+   
    IF hPointer != NIL
+      DEFAULT oParent TO Self
+      //IF !EMPTY(x)
+      //   pt:x := x
+      //   pt:y := y
+      //   ClientToScreen( ::hWnd, @pt )
+      //   oParent := ::GetChildFromPoint( pt )
+      //   IF oParent != NIL .AND. oParent:hWnd != ::hWnd
+      //      view oParent:Name
+      //      x := pt:x
+      //      y := pt:y
+      //    ELSE
+      //      oParent := Self
+      //   ENDIF
+      //ENDIF
       DEFAULT x TO 0
       DEFAULT y TO 0
-      oControl := HB_Exec( hPointer,, Self )
+      oControl := HB_Exec( hPointer,, oParent )
       oControl:__ClsInst := __ClsInst( oControl:ClassH )
       oControl:Left := x 
       oControl:Top  := y 
@@ -210,6 +225,12 @@ METHOD OnLButtonUp( nwParam, x, y ) CLASS RepEdit
       WITH OBJECT ::Application:Props:PropEditor
          :CheckValue( "Left",   "Position", :ActiveObject:Left )
          :CheckValue( "Top",    "Position", :ActiveObject:Top )
+         IF ASCAN( :ActiveObject:aProperties, {|a| a[1]=="Width"} ) > 0
+            :CheckValue( "Width",  "Size",     :ActiveObject:Width )
+         ENDIF
+         IF ASCAN( :ActiveObject:aProperties, {|a| a[1]=="Height"} ) > 0
+            :CheckValue( "Height", "Size",     :ActiveObject:Height )
+         ENDIF
       END
    CATCH
    END

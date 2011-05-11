@@ -15,9 +15,12 @@
 
 #define  acObjectTypeFrame          2
 
-CLASS VrGroup INHERIT VrObject
-   DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA ClsName       EXPORTED  INIT "Group"
+CLASS VrGroup INHERIT VrObject, GroupBox
+   DATA ForeColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA ClsName       EXPORTED INIT "Group"
+   DATA ShowRectangle EXPORTED INIT .T.
+   DATA Objects       EXPORTED INIT {}
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD Draw()
@@ -75,27 +78,29 @@ METHOD WriteProps( oXmlControl ) CLASS VrGroup
 RETURN Self
 
 METHOD Draw( hDC ) CLASS VrGroup
-   LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Group" + AllTrim( Str( ::Parent:nText++ ) )
-   LOCAL cx, cy, n
-   
-   nX := GetDeviceCaps( hDC, LOGPIXELSX )
-   nY := GetDeviceCaps( hDC, LOGPIXELSY )
-
-   x  := ( ::nPixPerInch / nX ) * ::Left
-   y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
-   cx := ( ::nPixPerInch / nX ) * ::Width
-   cy := ( ::nPixPerInch / nY ) * ::Height
-
-   ::Parent:oPDF:CreateObject( acObjectTypeFrame, cName )
-
-   WITH OBJECT ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
-      :Attribute( "Left",    x )
-      :Attribute( "Top",     y )
-      :Attribute( "Right",   x+cx )
-      :Attribute( "Bottom",  y+cy )
+   LOCAL x, y, cName, cx, cy, nX, nY
+   IF ::ShowRectangle
+      cName := "Group" + AllTrim( Str( ::Parent:nText++ ) )
       
-      :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
-   END
+      nX := GetDeviceCaps( hDC, LOGPIXELSX )
+      nY := GetDeviceCaps( hDC, LOGPIXELSY )
+
+      x  := ( ::nPixPerInch / nX ) * ::Left
+      y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
+      cx := ( ::nPixPerInch / nX ) * ::Width
+      cy := ( ::nPixPerInch / nY ) * ::Height
+
+      ::Parent:oPDF:CreateObject( acObjectTypeFrame, cName )
+
+      WITH OBJECT ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
+         :Attribute( "Left",    x )
+         :Attribute( "Top",     y )
+         :Attribute( "Right",   x+cx )
+         :Attribute( "Bottom",  y+cy )
+
+         :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
+      END
+   ENDIF
 RETURN Self
 
 CLASS __VrGroup INHERIT GroupBox
@@ -111,7 +116,11 @@ ENDCLASS
 METHOD OnLButtonDown(n,x,y) CLASS __VrGroup 
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
-   IF ::Application:Props:PropEditor:ActiveObject != NIL
+
+   IF ::Application:Props:ToolBox:ActiveItem != NIL
+      ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, Self )
+    
+    ELSEIF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
       TRY
          IF oCtrl != NIL
