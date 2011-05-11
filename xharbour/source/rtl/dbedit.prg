@@ -431,7 +431,7 @@ LOCAL oTBR,;
 
     oTBR:ForceStable()
 
-    if nRet = DE_CONT 
+    if nRet = DE_CONT
 
        if ! lExcept
 
@@ -445,8 +445,6 @@ LOCAL oTBR,;
           elseif oTBR:HitBottom
              oTBR:HitBottom := .f.
              nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, oTBR)
-
-           endif
 
           endif
 
