@@ -118,7 +118,7 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
    ::Parent:SetCapture()
 
    IF ::Application:Props:ToolBox:ActiveItem != NIL
-      ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, Self )
+      ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, ::Cargo )
     
     ELSEIF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl

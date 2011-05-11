@@ -58,9 +58,9 @@ METHOD Create() CLASS VrLabel
    ENDIF
    
    ::Font:Create()
-   
+
    IF ::lUI
-      WITH OBJECT ::EditCtrl := __VrLabel( ::Parent )
+      WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
          :Cargo   := Self
          :Caption := ::Text
          :Left    := ::Left
