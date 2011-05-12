@@ -459,7 +459,7 @@ METHOD Init() CLASS MainForm
             :Caption      := "Report Footer"
             :BackColor    := ::System:Color:White
             :Border       := .T.
-            :Left         := 2
+            :Left         := 1
             :Top          := 2
             :Height       := 100
             :Dock:Margins := "0,0,0,2"
@@ -480,7 +480,7 @@ METHOD Init() CLASS MainForm
             :Caption      := "Page Footer"
             :BackColor    := ::System:Color:White
             :Border       := .T.
-            :Left         := 2
+            :Left         := 1
             :Top          := 2
             :Height       := 100
             :Dock:Margins := "0,0,0,0"
