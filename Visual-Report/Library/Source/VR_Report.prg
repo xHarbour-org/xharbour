@@ -81,7 +81,6 @@ CLASS VrReport INHERIT VrObject
    METHOD Run()
    METHOD CreateControl()
    METHOD CreateColumns()
-   METHOD CreateBody()
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
@@ -168,26 +167,43 @@ METHOD Preview() CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
-   LOCAL oControl, x := 0, y := 0, n
-   IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-      x := VAL( aCtrl[x][2] )
-   ENDIF
-   IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-      y := VAL( aCtrl[y][2] )
-   ENDIF
+METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
+   LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar
+
+   x := VAL( hCtrl:Left )
+   y := VAL( hCtrl:Top )
+
    IF oPanel == NIL
-      oControl := hb_ExecFromArray( aCtrl[1][2], {,.F.} )
+      oControl := hb_ExecFromArray( hCtrl:ClsName, {,.F.} )
       oControl:Parent := Self
       oControl:Left := x
       oControl:Top  := y
+
+      FOR EACH cProp IN hCtrl:Keys
+          IF UPPER( cProp ) != "FONT"
+             xVar := __objSendMsg( oControl, cProp )
+             xValue := hCtrl[ cProp ]
+             IF VALTYPE( xVar ) != VALTYPE( xValue )
+                DO CASE
+                   CASE VALTYPE( xVar ) == "N"
+                        xValue := VAL( xValue )
+
+                   CASE VALTYPE( xVar ) == "D"
+                        xValue := DTOC( xValue )
+
+                   CASE VALTYPE( xVar ) == "L"
+                        xValue := xValue == "True"
+                ENDCASE
+             ENDIF
+             __objSendMsg( oControl, "_" + cProp, xValue )
+          ENDIF
+      NEXT
+
     ELSE
-      oControl := oPanel:CreateControl( aCtrl[1][2], x, y )
+      oControl := oPanel:CreateControl( hCtrl, x, y )
    ENDIF
    //------------------------------------------------------------------------------------------
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "NAME"} ) ) > 0
-      oControl:Name := aCtrl[n][2]
-   ENDIF
+/*
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FILENAME"} ) ) > 0
       oControl:FileName := aCtrl[n][2]
    ENDIF
@@ -222,6 +238,7 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "BACKCOLOR"} ) ) > 0
       oControl:BackColor := VAL( aCtrl[n][2] )
    ENDIF
+
    IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
       DEFAULT oControl:Font TO Font()
       oControl:Font:FaceName  := aCtrl[n][2][1][2]
@@ -229,6 +246,16 @@ METHOD CreateControl( aCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       oControl:Font:Italic    := IIF( aCtrl[n][2][3][2]=="True", .T., .F. )
       oControl:Font:Underline := IIF( aCtrl[n][2][4][2]=="True", .T., .F. )
       oControl:Font:Weight    := VAL( aCtrl[n][2][5][2] )
+   ENDIF
+*/
+
+   IF HGetPos( hCtrl, "Font" ) > 0 
+      DEFAULT oControl:Font TO Font()
+      oControl:Font:FaceName  := hCtrl:Font:FaceName
+      oControl:Font:PointSize := VAL( hCtrl:Font:PointSize )
+      oControl:Font:Italic    := hCtrl:Font:Italic == "True"
+      oControl:Font:Underline := hCtrl:Font:Underline == "True"
+      oControl:Font:Weight    := VAL( hCtrl:Font:Weight )
    ENDIF
    IF ! Empty( nVal )
       oControl:Caption := ALLTRIM( STR( nVal ) )
@@ -248,45 +275,11 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetTotalHeight( hDC ) CLASS VrReport
-   LOCAL i, n, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
-   ::aTotals    := {}
-   FOR EACH aCtrl IN aBody
-       IF UPPER( aCtrl[1][2] ) == "VRTOTAL"
-          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ONLABEL"} ) ) > 0
-             AADD( ::aTotals, {aCtrl[n][2],0} )
-          ENDIF
-          IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-             //nHeight := MAX( nHeight, VAL( aCtrl[n][2][2][2] ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) )
-             nHeight := MAX( nHeight, (PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) ) * VAL( aCtrl[n][2][2][2] ) )
-          ENDIF
-       ENDIF
-   NEXT
-RETURN nHeight
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetSubtotalHeight( hDC ) CLASS VrReport
-   LOCAL i, n, x, nPt, cClass, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody )
-   ::aFormulas  := {}
-   FOR EACH aCtrl IN aBody
-       IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
-          IF !Empty( aCtrl[n][2] )
-             
-             // Find the subtotal to use its font/color
-             IF ( i := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
-                
-                AADD( ::aSubtotals, {aCtrl[2][2], 0} )
-                IF ( x := ASCAN( aBody[i], {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-                   nHeight := MAX( nHeight, (PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY ) ) * VAL( aBody[i][x][2][2][2] ) )
-                   
-                   //nHeight := MAX( nHeight, MulDiv( VAL( aBody[i][x][2][2][2] ), PIX_PER_INCH, 72 ) )
-                ENDIF
-
-             ENDIF
-          ENDIF
-       ENDIF
-   NEXT
-
-RETURN Int( nHeight )
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC ) CLASS VrReport
@@ -330,24 +323,14 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateColumns( hDC ) CLASS VrReport
-   LOCAL aCtrl, nHeight := 0
-   FOR EACH aCtrl IN ::aBody
-       IF ( UPPER( aCtrl[1][2] ) IN { "VRLABEL", "VRIMAGE" } )
-          ::CreateControl( aCtrl, @nHeight,, hDC )
+   LOCAL hCtrl, nHeight := 0
+   FOR EACH hCtrl IN ::aBody
+       IF ( UPPER( hCtrl:ClsName ) IN { "VRLABEL", "VRIMAGE" } )
+          ::CreateControl( hCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
    ::nRow += nHeight
 RETURN nHeight
-
-//-----------------------------------------------------------------------------------------------
-METHOD CreateBody( hDC ) CLASS VrReport
-   LOCAL aCtrl, nHeight := 0
-   FOR EACH aCtrl IN ::aBody
-       IF ( UPPER( aCtrl[1][2] ) IN { "VRLINE" } )
-          ::CreateControl( aCtrl, @nHeight,, hDC )
-       ENDIF
-   NEXT
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateHeader( hDC ) CLASS VrReport
@@ -382,7 +365,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC
+   LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC, hControl
 
    ::aData  := {=>}
    ::aProps := {=>}
@@ -408,22 +391,29 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               ::aExtra[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
-              IF !EMPTY( aControl )
-                 AADD( ::&cParent, aControl )
+              IF !EMPTY( hControl )
+                 AADD( ::&cParent, hControl )
               ENDIF
               cParent := "a" + oNode:oParent:cName
-              aControl := {}
+              //aControl := {}
+              hControl := {=>}
+              HSetCaseMatch( hControl, .F. )
 
          CASE oNode:cName == "Font" 
-              AADD( aControl, { oNode:cName, {} } )
+              //AADD( aControl, { oNode:cName, {} } )
+              hControl[ oNode:cName ] := {=>}
+              HSetCaseMatch( hControl[ oNode:cName ], .F. )
 
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
-              AADD( aControl, { oNode:cName, oNode:cData } )
-
+              //AADD( aControl, { oNode:cName, oNode:cData } )
+              hControl[ oNode:cName ] := oNode:cData
+              
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""
-              AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
+              //AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
+              hControl[ oNode:oParent:cName ][ oNode:cName ] := oNode:cData
+
       ENDCASE
       oNode := oDoc:Next()
    ENDDO
@@ -458,12 +448,12 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Load( cReport ) CLASS VrReport
-   LOCAL aCtrl, oDoc := TXmlDocument():New( cReport )
+   LOCAL hCtrl, oDoc := TXmlDocument():New( cReport )
 
    ::PrepareArrays( oDoc )
    
    IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
-      WITH OBJECT ::DataSource := ::Application:Props[ "Body" ]:CreateControl( ::aData:ClsName )
+      WITH OBJECT ::DataSource := ::Application:Props[ "Body" ]:CreateControl( ::aData )
          :FileName := ::aData:FileName
          :Alias    := ::aData:Alias
          :bFilter  := ::aData:bFilter
@@ -475,21 +465,21 @@ METHOD Load( cReport ) CLASS VrReport
    ::PrintFooter    := ::aProps:PrintFooter == "1"
    ::PrintRepFooter := ::aProps:PrintRepFooter == "1"
 
-   FOR EACH aCtrl IN ::aHeader
-       ::CreateControl( aCtrl,, ::Application:Props[ "Header" ] )
+   FOR EACH hCtrl IN ::aHeader
+       ::CreateControl( hCtrl,, ::Application:Props[ "Header" ] )
    NEXT
-   FOR EACH aCtrl IN ::aBody
-       ::CreateControl( aCtrl,, ::Application:Props[ "Body" ] )
+   FOR EACH hCtrl IN ::aBody
+       ::CreateControl( hCtrl,, ::Application:Props[ "Body" ] )
    NEXT
-   FOR EACH aCtrl IN ::aFooter
-       ::CreateControl( aCtrl,, ::Application:Props[ "Footer" ] )
+   FOR EACH hCtrl IN ::aFooter
+       ::CreateControl( hCtrl,, ::Application:Props[ "Footer" ] )
    NEXT
    TRY
       ::Application:Props:ExtraPage:PagePosition := VAL( ::aExtra:PagePosition )
    CATCH
    END
-   FOR EACH aCtrl IN ::aExtraPage
-       ::CreateControl( aCtrl,, ::Application:Props[ "ExtraPage" ] )
+   FOR EACH hCtrl IN ::aExtraPage
+       ::CreateControl( hCtrl,, ::Application:Props[ "ExtraPage" ] )
    NEXT
 RETURN oDoc
 
@@ -537,7 +527,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nSubHeight := ::GetSubtotalHeight( hDC )
       nTotHeight := ::GetTotalHeight( hDC )
       nPos := 0
-      ::CreateBody( hDC )
       WHILE ! ::DataSource:EditCtrl:Eof()
          nHeight := ::CreateColumns( hDC )
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
@@ -549,7 +538,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             ::EndPage()
             ::StartPage()
             ::CreateHeader( hDC )
-            ::CreateBody( hDC )
          ENDIF
          oWait:Position := Int( (nPos/nCount)*100 )
          nPos ++

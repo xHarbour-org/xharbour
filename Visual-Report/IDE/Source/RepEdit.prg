@@ -158,25 +158,58 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
+METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubtotal, VrTotal, VrFormula
+   LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( hControl:ClsName )
+   
+   IF hPointer != NIL
+      DEFAULT oParent TO Self
+      DEFAULT x TO 0
+      DEFAULT y TO 0
+      oControl := HB_Exec( hPointer,, oParent )
+      oControl:__ClsInst := __ClsInst( oControl:ClassH )
+      oControl:Left := x 
+      oControl:Top  := y 
+      oControl:Create()
+
+      FOR n := 1 TO LEN( oControl:aProperties )
+          IF HGetPos( hControl, oControl:aProperties[n][1] ) > 0 .AND. UPPER( oControl:aProperties[n][1] ) != "FONT"
+             
+             xVar := __objSendMsg( oControl, oControl:aProperties[n][1] )
+             xValue := hControl[ oControl:aProperties[n][1] ]
+             IF VALTYPE( xVar ) != VALTYPE( xValue )
+                DO CASE
+                   CASE VALTYPE( xVar ) == "N"
+                        xValue := VAL( xValue )
+
+                   CASE VALTYPE( xVar ) == "D"
+                        xValue := DTOC( xValue )
+
+                   CASE VALTYPE( xVar ) == "L"
+                        xValue := xValue == "True"
+                ENDCASE
+             ENDIF
+             __objSendMsg( oControl, "_" + oControl:aProperties[n][1], xValue )
+          ENDIF
+      NEXT
+      IF ::Application:Props:ToolBox:ActiveItem != NIL
+         ::Application:Props:ToolBox:ActiveItem:PointerItem:Select()
+         ::Application:Report:Modified := .T.
+         ::Application:Props:PropEditor:ResetProperties( {{ oControl }} )
+      ENDIF
+      
+      IF !oControl:lUI
+         ::Application:Props:Components:AddButton( oControl )
+      ENDIF
+   ENDIF
+RETURN oControl
+/*
 METHOD CreateControl( cControl, x, y, oParent ) CLASS RepEdit
    EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubtotal, VrTotal, VrFormula
    LOCAL hWnd, oControl, hPointer := HB_FuncPtr( cControl ), pt := (struct POINT)
    
    IF hPointer != NIL
       DEFAULT oParent TO Self
-      //IF !EMPTY(x)
-      //   pt:x := x
-      //   pt:y := y
-      //   ClientToScreen( ::hWnd, @pt )
-      //   oParent := ::GetChildFromPoint( pt )
-      //   IF oParent != NIL .AND. oParent:hWnd != ::hWnd
-      //      view oParent:Name
-      //      x := pt:x
-      //      y := pt:y
-      //    ELSE
-      //      oParent := Self
-      //   ENDIF
-      //ENDIF
       DEFAULT x TO 0
       DEFAULT y TO 0
       oControl := HB_Exec( hPointer,, oParent )
@@ -196,7 +229,7 @@ METHOD CreateControl( cControl, x, y, oParent ) CLASS RepEdit
       ENDIF
    ENDIF
 RETURN oControl
-
+*/
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
    LOCAL pt

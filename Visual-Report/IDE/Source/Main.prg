@@ -872,6 +872,8 @@ METHOD Save( lSaveAs ) CLASS Report
 
       IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
          oXmlData := TXmlNode():new( , "DataSource" )
+            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Name", NIL, ::VrReport:DataSource:Name )
+            oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, ::VrReport:DataSource:ClassName )
             oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
@@ -879,6 +881,8 @@ METHOD Save( lSaveAs ) CLASS Report
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
             oXmlData:addBelow( oXmlValue )
             oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, ::VrReport:DataSource:bFilter )
+            oXmlData:addBelow( oXmlValue )
+            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::VrReport:DataSource:Order )
             oXmlData:addBelow( oXmlValue )
          oXmlReport:addBelow( oXmlData )
       ENDIF
