@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-13 14:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed passord get with space. Bug reported by Fabio Nery.
+
 2011-05-11 07:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg
     ! fix surplus "endif".

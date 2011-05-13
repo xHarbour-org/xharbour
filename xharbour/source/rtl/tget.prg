@@ -192,6 +192,7 @@ CLASS Get
 
    DATA lPassWord INIT .F.         // true if "@P" picture is used.
    DATA cPassWordChar INIT "*"     // char to display password in buffer display.
+   DATA nPassWordLen INIT 0        // password content length
 
    METHOD _NumToLeft()             // idem.
    METHOD StopMoveH()               // idem
@@ -595,11 +596,9 @@ METHOD Display( lForced ) CLASS Get
    HBConsoleLock()
 
    // Change display character on password picture.
-   IF ::lPassWord .and. ::Type == "C" .and. ! Empty(xBuffer)
-      FOR EACH cChar IN xBuffer
-          IF ! Empty(cChar)
-             xBuffer[HB_EnumIndex()] := ::cPassWordChar
-          ENDIF
+   IF ::lPassWord .and. ::Type == "C" 
+      FOR EACH cChar IN Left(xBuffer,::nPasswordLen)
+         xBuffer[HB_EnumIndex()] := ::cPassWordChar
       NEXT
    ENDIF
 
@@ -1361,6 +1360,10 @@ METHOD overstrike( cChar ) CLASS Get
    //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
    //                !( ::unTransform() == ::Original )
    ::Right( .f. )
+   
+   if ::lPassword
+      ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen)
+   endif
 
    if ::type == "D"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
@@ -1444,6 +1447,10 @@ METHOD Insert( cChar ) CLASS Get
    //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
    //                !( ::unTransform() == ::Original )
    ::Right( .f. )
+   
+   if ::lPassword
+      ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen)
+   endif
 
    if ::type == "D"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
@@ -2039,7 +2046,7 @@ return Self
 
 METHOD _Delete( lDisplay ) CLASS Get
 
-   LOCAL nMaxLen := ::nMaxLen, n
+   LOCAL nMaxLen := ::nMaxLen, n, xBuff
 
    DEFAULT lDisplay TO .t.
 
@@ -2072,7 +2079,7 @@ METHOD _Delete( lDisplay ) CLASS Get
       if ::lNumToLeft
 
          if ::lDecPos
-            if ::Pos < ::DecPos 
+            if ::Pos < ::DecPos
                ::Pos++
             endif
             if ::Pos-1 < ::DecPos
@@ -2083,11 +2090,14 @@ METHOD _Delete( lDisplay ) CLASS Get
          endif
 
       endif
-
+      xBuff := ::buffer
       ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1) + ;
                   SubStr( ::buffer, ::Pos + 1, nMaxLen - ::Pos ) + " " +;
                   SubStr( ::buffer, nMaxLen + 1 ), ::nMaxLen )
 
+      if ::lPassword .and. ( ! (xBuff == ::buffer) .or. ::nPasswordLen >= ::Pos )
+         ::nPasswordLen := Max(0,::nPasswordLen-1)
+      endif   
    endif
 
    if ::type == "D"
@@ -2105,7 +2115,7 @@ METHOD _Delete( lDisplay ) CLASS Get
    if lDisplay
       ::Display()
    endif
-  
+
 return Self
 
 //---------------------------------------------------------------------------//
@@ -2137,7 +2147,9 @@ METHOD DeleteAll() CLASS Get
 
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable()
-
+   if ::lPassword
+      ::nPasswordLen := 0
+   endif
    /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E','@R'
     * masks of numeric vars, into display edit buffer after first key number
     * is entered.
