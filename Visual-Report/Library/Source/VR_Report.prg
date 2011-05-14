@@ -63,9 +63,11 @@ CLASS VrReport INHERIT VrObject
    DATA aBody          EXPORTED  INIT {}
    DATA aFooter        EXPORTED  INIT {}
    DATA aExtraPage     EXPORTED  INIT {}
-   DATA aData          EXPORTED
-   DATA aProps         EXPORTED
-   DATA aExtra         EXPORTED
+   
+   DATA hData          EXPORTED
+   DATA hProps         EXPORTED
+   DATA hExtra         EXPORTED
+   
    DATA aSubtotals     EXPORTED  INIT {}
    DATA aTotals        EXPORTED  INIT {}
    DATA aFormulas      EXPORTED  INIT {}
@@ -202,53 +204,6 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
     ELSE
       oControl := oPanel:CreateControl( hCtrl, x, y )
    ENDIF
-   //------------------------------------------------------------------------------------------
-/*
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FILENAME"} ) ) > 0
-      oControl:FileName := aCtrl[n][2]
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
-      oControl:Subtotal := aCtrl[n][2]
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TEXT"} ) ) > 0
-      oControl:Text      := aCtrl[n][2]
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORMULA"} ) ) > 0
-      oControl:Formula := aCtrl[n][2]
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "VALUE"} ) ) > 0
-      oControl:Value := aCtrl[n][2]
-   ENDIF
-   //------------------------------------------------------------------------------------------
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "AUTORESIZE"} ) ) > 0
-      oControl:AutoResize := VAL( aCtrl[n][2] ) == 1
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "ALIGNMENT"} ) ) > 0
-      oControl:Alignment := VAL( aCtrl[n][2] )
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "WIDTH"} ) ) > 0
-      oControl:Width     := VAL( aCtrl[n][2] )
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "HEIGHT"} ) ) > 0
-      oControl:Height    := VAL( aCtrl[n][2] )
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FORECOLOR"} ) ) > 0
-      oControl:ForeColor := VAL( aCtrl[n][2] )
-   ENDIF
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "BACKCOLOR"} ) ) > 0
-      oControl:BackColor := VAL( aCtrl[n][2] )
-   ENDIF
-
-   IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "FONT"} ) ) > 0
-      DEFAULT oControl:Font TO Font()
-      oControl:Font:FaceName  := aCtrl[n][2][1][2]
-      oControl:Font:PointSize := VAL( aCtrl[n][2][2][2] )
-      oControl:Font:Italic    := IIF( aCtrl[n][2][3][2]=="True", .T., .F. )
-      oControl:Font:Underline := IIF( aCtrl[n][2][4][2]=="True", .T., .F. )
-      oControl:Font:Weight    := VAL( aCtrl[n][2][5][2] )
-   ENDIF
-*/
-
    IF HGetPos( hCtrl, "Font" ) > 0 
       DEFAULT oControl:Font TO Font()
       oControl:Font:FaceName  := hCtrl:Font:FaceName
@@ -260,6 +215,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    IF ! Empty( nVal )
       oControl:Caption := ALLTRIM( STR( nVal ) )
    ENDIF
+
    IF oPanel == NIL
       oControl:Draw( hDC )
       TRY
@@ -283,42 +239,6 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateSubtotals( hDC ) CLASS VrReport
-   LOCAL nSub, aSubtotal, cArray, x, y, i, n, nFormula, nHeight := 0, aCtrl, aBody := ACLONE( ::aBody ), aFormula, cText
-
-   FOR EACH aCtrl IN aBody
-       IF ( n := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "SUBTOTAL"} ) ) > 0
-          IF !Empty( aCtrl[n][2] )
-             //aCtrl[4][2] := ""//xStr()
-
-             IF ( nSub := ASCAN( aBody, {|a| a[2][2]==aCtrl[n][2]} ) ) > 0
-                aSubtotal := ACLONE( aBody[nSub] )
-             ENDIF
-
-             IF ( x := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                 x := aCtrl[x][2]
-             ENDIF
-             IF ( y := ASCAN( aCtrl, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-                y := aCtrl[y][2]
-             ENDIF
-
-             IF ( n := ASCAN( aSubtotal, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "LEFT"} ) ) > 0
-                aSubtotal[n][2] := x
-             ENDIF
-             IF ( n := ASCAN( aSubtotal, {|a| Valtype(a[1])=="C" .AND. Upper(a[1]) == "TOP"} ) ) > 0
-                aSubtotal[n][2] := y
-             ENDIF
-
-             IF ( n := ASCAN( ::aSubtotals, {|a| a[1]==aCtrl[2][2]} ) ) > 0
-                aSubtotal[3][2] := ::aSubtotals[n][2]
-                ::aSubtotals[n][2] := 0
-             ENDIF
-             ::CreateControl( aSubtotal, @nHeight,, hDC )
-          ENDIF
-
-       ENDIF
-
-   NEXT
-   ::nRow += nHeight
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -367,12 +287,12 @@ RETURN Self
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC, hControl
 
-   ::aData  := {=>}
-   ::aProps := {=>}
-   ::aExtra := {=>}
-   HSetCaseMatch( ::aData, .F. )
-   HSetCaseMatch( ::aProps, .F. )
-   HSetCaseMatch( ::aExtra, .F. )
+   ::hData  := {=>}
+   ::hProps := {=>}
+   ::hExtra := {=>}
+   HSetCaseMatch( ::hData, .F. )
+   HSetCaseMatch( ::hProps, .F. )
+   HSetCaseMatch( ::hExtra, .F. )
 
    oNode := oDoc:FindFirstRegEx( "Report" )
 
@@ -380,38 +300,34 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       DO CASE
          CASE oNode:oParent:cName == "DataSource" .AND. oNode:oParent:oParent:cName == "Report"
               DEFAULT oNode:cData TO ""
-              ::aData[ oNode:cName ] := oNode:cData
+              ::hData[ oNode:cName ] := oNode:cData
 
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
               DEFAULT oNode:cData TO ""
-              ::aProps[ oNode:cName ] := oNode:cData
+              ::hProps[ oNode:cName ] := oNode:cData
 
          CASE oNode:oParent:cName == "ExtraPage" .AND. oNode:oParent:oParent:cName == "Report" .AND. oNode:cName != "Control"
               DEFAULT oNode:cData TO ""
-              ::aExtra[ oNode:cName ] := oNode:cData
+              ::hExtra[ oNode:cName ] := oNode:cData
 
          CASE oNode:cName == "Control" 
               IF !EMPTY( hControl )
                  AADD( ::&cParent, hControl )
               ENDIF
               cParent := "a" + oNode:oParent:cName
-              //aControl := {}
               hControl := {=>}
               HSetCaseMatch( hControl, .F. )
 
          CASE oNode:cName == "Font" 
-              //AADD( aControl, { oNode:cName, {} } )
               hControl[ oNode:cName ] := {=>}
               HSetCaseMatch( hControl[ oNode:cName ], .F. )
 
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
-              //AADD( aControl, { oNode:cName, oNode:cData } )
               hControl[ oNode:cName ] := oNode:cData
               
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""
-              //AADD( aTail(aControl)[2], { oNode:cName, oNode:cData } )
               hControl[ oNode:oParent:cName ][ oNode:cName ] := oNode:cData
 
       ENDCASE
@@ -421,28 +337,28 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       AADD( ::&cParent, aControl )
    ENDIF
    n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
-        ::Application:Props[ "Header" ]:Height := VAL( ::aProps:HeaderHeight )+n
+        ::Application:Props[ "Header" ]:Height := VAL( ::hProps:HeaderHeight )+n
    n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
-        ::Application:Props[ "Footer" ]:Height := VAL( ::aProps:FooterHeight )+n
+        ::Application:Props[ "Footer" ]:Height := VAL( ::hProps:FooterHeight )+n
         ::Application:Props[ "Footer" ]:Dockit()
         ::Application:Props[ "Body" ]:Dockit()
    TRY
-      ::Orientation  := VAL( ::aProps:Orientation )
+      ::Orientation  := VAL( ::hProps:Orientation )
    CATCH
    END
    TRY
-      ::PaperSize   := VAL( ::aProps:PaperSize )
+      ::PaperSize   := VAL( ::hProps:PaperSize )
 
-      ::LeftMargin  := VAL( ::aProps:LeftMargin )
-      ::TopMargin   := VAL( ::aProps:TopMargin )
-      ::RightMargin := VAL( ::aProps:RightMargin )
-      ::BottomMargin:= VAL( ::aProps:BottomMargin )
+      ::LeftMargin  := VAL( ::hProps:LeftMargin )
+      ::TopMargin   := VAL( ::hProps:TopMargin )
+      ::RightMargin := VAL( ::hProps:RightMargin )
+      ::BottomMargin:= VAL( ::hProps:BottomMargin )
    CATCH
    END
 
    hDC := GetDC(0)
-   ::HeaderHeight := VAL( ::aProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
-   ::FooterHeight := VAL( ::aProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+   ::HeaderHeight := VAL( ::hProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+   ::FooterHeight := VAL( ::hProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    ReleaseDC(0, hDC)
 RETURN Self
 
@@ -452,34 +368,34 @@ METHOD Load( cReport ) CLASS VrReport
 
    ::PrepareArrays( oDoc )
    
-   IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
-      WITH OBJECT ::DataSource := ::Application:Props[ "Body" ]:CreateControl( ::aData )
-         :FileName := ::aData:FileName
-         :Alias    := ::aData:Alias
-         :bFilter  := ::aData:bFilter
+   IF !EMPTY( ::hData ) .AND. !EMPTY( ::hData:FileName )
+      WITH OBJECT ::DataSource := ::Application:Props:Body:CreateControl( ::hData )
+         :FileName := ::hData:FileName
+         :Alias    := ::hData:Alias
+         :bFilter  := ::hData:bFilter
       END
       ::Application:Props:PropEditor:ResetProperties( {{ ::DataSource }} )
    ENDIF
-   ::PrintHeader    := ::aProps:PrintHeader == "1"
-   ::PrintRepHeader := ::aProps:PrintRepHeader == "1"
-   ::PrintFooter    := ::aProps:PrintFooter == "1"
-   ::PrintRepFooter := ::aProps:PrintRepFooter == "1"
+   ::PrintHeader    := ::hProps:PrintHeader    == "1"
+   ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
+   ::PrintFooter    := ::hProps:PrintFooter    == "1"
+   ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
 
    FOR EACH hCtrl IN ::aHeader
-       ::CreateControl( hCtrl,, ::Application:Props[ "Header" ] )
+       ::CreateControl( hCtrl,, ::Application:Props:Header )
    NEXT
    FOR EACH hCtrl IN ::aBody
-       ::CreateControl( hCtrl,, ::Application:Props[ "Body" ] )
+       ::CreateControl( hCtrl,, ::Application:Props:Body )
    NEXT
    FOR EACH hCtrl IN ::aFooter
-       ::CreateControl( hCtrl,, ::Application:Props[ "Footer" ] )
+       ::CreateControl( hCtrl,, ::Application:Props:Footer )
    NEXT
    TRY
-      ::Application:Props:ExtraPage:PagePosition := VAL( ::aExtra:PagePosition )
+      ::Application:Props:ExtraPage:PagePosition := VAL( ::hExtra:PagePosition )
    CATCH
    END
    FOR EACH hCtrl IN ::aExtraPage
-       ::CreateControl( hCtrl,, ::Application:Props[ "ExtraPage" ] )
+       ::CreateControl( hCtrl,, ::Application:Props:ExtraPage )
    NEXT
 RETURN oDoc
 
@@ -493,10 +409,10 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::PrepareArrays( oDoc )
    ENDIF
 
-   ::PrintHeader    := ::aProps:PrintHeader == "1"
-   ::PrintRepHeader := ::aProps:PrintRepHeader == "1"
-   ::PrintFooter    := ::aProps:PrintFooter == "1"
-   ::PrintRepFooter := ::aProps:PrintRepFooter == "1"
+   ::PrintHeader    := ::hProps:PrintHeader    == "1"
+   ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
+   ::PrintFooter    := ::hProps:PrintFooter    == "1"
+   ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
 
    ::StartPage()
    hDC := GetDC(0)
@@ -507,17 +423,20 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
    
-   IF !EMPTY( ::aData ) .AND. !EMPTY( ::aData:FileName )
-      ::DataSource := hb_ExecFromArray( ::aData:ClsName )
-      ::DataSource:FileName := ::aData:FileName
-      ::DataSource:Alias    := ::aData:Alias
-      ::DataSource:bFilter  := ::aData:bFilter
+   IF !EMPTY( ::hData ) .AND. !EMPTY( ::hData:FileName )
+      ::DataSource := hb_ExecFromArray( ::hData:ClsName )
+      ::DataSource:FileName := ::hData:FileName
+      ::DataSource:Alias    := ::hData:Alias
+      ::DataSource:bFilter  := ::hData:bFilter
       ::DataSource:Create()
       nCount := ::DataSource:EditCtrl:RecCount()
    ENDIF
 
    ::CreateHeader( hDC )
-   
+
+//-----------------------------------------------------------------------
+// Now start printing Labels
+/*
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:EditCtrl:Select()
       ::DataSource:EditCtrl:GoTop()
@@ -554,6 +473,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
     ELSE
       ::CreateColumns( hDC )
    ENDIF
+*/
    ::CreateFooter( hDC )
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
