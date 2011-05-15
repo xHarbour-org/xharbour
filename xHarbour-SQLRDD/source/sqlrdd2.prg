@@ -2438,7 +2438,8 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
          Switch ::oSql:nSystemID
          Case SYSTEMID_MSSQL7
             If ::oSql:lUseSequences .and. ::lUseSequences
-               cIdent := "; SELECT IDENT_CURRENT('"+ ::cfilename+"');"               
+               //cIdent := "; SELECT IDENT_CURRENT('"+ ::cfilename+"');"               
+               cIdent := "; SELECT " + ::cRecnoName + " FROM @InsertedData;"
             EndIf
             Exit
          Case SYSTEMID_IBMDB2
@@ -2456,9 +2457,13 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
          aCopy( aBuffer, ::aOldBuffer )
 
          If ::cIns == NIL
-            ::cIns    := "INSERT INTO " + ::cQualifiedTableName + " " + cRet + " ) VALUES "
+             if ::oSql:nSystemID == SYSTEMID_MSSQL7
+               ::cIns    := "Declare @InsertedData table (" + ::cRecnoName+" numeric(15,0) );INSERT INTO " + ::cQualifiedTableName +" " + cRet + " ) OUTPUT Inserted."+ ::cRecnoName + " INTO @InsertedData VALUES "
+            else
+               ::cIns    := "INSERT INTO " + ::cQualifiedTableName + " " + cRet + " ) VALUES "
+            ENDIF
          EndIf
-
+         
          If  ::oSql:Execute( ::cIns + cVal + " ) " + cIdent, , ::nLogMode ) != SQL_SUCCESS
             ::dNextDt := NIL
             Return .F.
@@ -9358,6 +9363,15 @@ METHOD CreateConstraint( cSourceTable, aSourceColumns, cTargetTable, aTargetColu
             cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + SR_DBQUALIFY(cTargetTable,::oSql:nSystemID) + " (" + cTargetColumns + ")"
          Endif
          Exit
+      CASE SYSTEMID_POSTGR
+         cSourceColumns:= strtran(cSourceColumns,'"',"")
+         cTargetColumns:= strtran(cTargetColumns,'"',"")
+         If lPk
+            cSql := "ALTER TABLE " + ::cOwner + strtran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID),'"','') + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
+         Else
+            cSql := "ALTER TABLE " + ::cOwner + strtran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID),'"','') + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + strtran(SR_DBQUALIFY(cTargetTable,::oSql:nSystemID),'"','') + " (" + cTargetColumns + ")"
+         Endif
+         exit
       Default
          If lPk
             cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"

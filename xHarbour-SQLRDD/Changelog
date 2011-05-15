@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-15 10:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd2.prg
+     ! fixed generation of sr_recno in multiple connection
+     
 2011-05-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlrdd1.c
      ! Fixed some memory leaks that can cause apps slow and huge memory consume
