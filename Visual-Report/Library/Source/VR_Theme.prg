@@ -15,15 +15,15 @@
 
 #define  acObjectTypeText           5
 
-CLASS VrSubtotal INHERIT VrLabel
-   DATA ClsName  EXPORTED INIT "Subtotal"
+CLASS VrTheme INHERIT VrLabel
+   DATA ClsName  EXPORTED INIT "Theme"
    DATA lUI      EXPORTED INIT .F.
    DATA Button   EXPORTED
    METHOD Init()  CONSTRUCTOR
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
-METHOD Init( oParent ) CLASS VrSubtotal
+METHOD Init( oParent ) CLASS VrTheme
    LOCAL n
    IF oParent != NIL
       Super:Init( oParent )
