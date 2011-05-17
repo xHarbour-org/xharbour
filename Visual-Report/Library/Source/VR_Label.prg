@@ -23,7 +23,7 @@ CLASS VrLabel INHERIT VrObject
    DATA SysForeColor  EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Subtotal      EXPORTED  INIT ""
+   DATA SubtotalTheme EXPORTED  INIT ""
    DATA nSubtotal     EXPORTED  INIT 0
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -40,12 +40,12 @@ METHOD Init( oParent ) CLASS VrLabel
       Super:Init( oParent )
       AADD( ::aProperties, { "BackColor",  "Color"   } )
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
+      AADD( ::aProperties, { "SubtotalTheme", "Color" } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
-      AADD( ::aProperties, { "Subtotal",   "General" } )
-      AADD( ::aProperties, { "Name",       "Object"  } )
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
+      AADD( ::aProperties, { "Name",       "Object"  } )
    ENDIF
    DEFAULT ::Font TO Font()
    ::Font:AllowHandle := oParent != NIL
@@ -135,7 +135,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Subtotal", NIL, ::Subtotal )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "SubtotalTheme", NIL, ::SubtotalTheme )
    oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )

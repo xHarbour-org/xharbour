@@ -159,8 +159,8 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubtotal, VrTotal, VrFormula
-   LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( hControl:ClsName )
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula, VrGroup
+   LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
    
    IF hPointer != NIL
       DEFAULT oParent TO Self
@@ -172,26 +172,28 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       oControl:Top  := y 
       oControl:Create()
 
-      FOR n := 1 TO LEN( oControl:aProperties )
-          IF HGetPos( hControl, oControl:aProperties[n][1] ) > 0 .AND. UPPER( oControl:aProperties[n][1] ) != "FONT"
-             
-             xVar := __objSendMsg( oControl, oControl:aProperties[n][1] )
-             xValue := hControl[ oControl:aProperties[n][1] ]
-             IF VALTYPE( xVar ) != VALTYPE( xValue )
-                DO CASE
-                   CASE VALTYPE( xVar ) == "N"
-                        xValue := VAL( xValue )
+      IF VALTYPE( hControl ) == "H"
+         FOR n := 1 TO LEN( oControl:aProperties )
+             IF HGetPos( hControl, oControl:aProperties[n][1] ) > 0 .AND. UPPER( oControl:aProperties[n][1] ) != "FONT"
 
-                   CASE VALTYPE( xVar ) == "D"
-                        xValue := DTOC( xValue )
+                xVar := __objSendMsg( oControl, oControl:aProperties[n][1] )
+                xValue := hControl[ oControl:aProperties[n][1] ]
+                IF VALTYPE( xVar ) != VALTYPE( xValue )
+                   DO CASE
+                      CASE VALTYPE( xVar ) == "N"
+                           xValue := VAL( xValue )
 
-                   CASE VALTYPE( xVar ) == "L"
-                        xValue := xValue == "True"
-                ENDCASE
+                      CASE VALTYPE( xVar ) == "D"
+                           xValue := DTOC( xValue )
+
+                      CASE VALTYPE( xVar ) == "L"
+                           xValue := xValue == "True"
+                   ENDCASE
+                ENDIF
+                __objSendMsg( oControl, "_" + oControl:aProperties[n][1], xValue )
              ENDIF
-             __objSendMsg( oControl, "_" + oControl:aProperties[n][1], xValue )
-          ENDIF
-      NEXT
+         NEXT
+      ENDIF
       IF ::Application:Props:ToolBox:ActiveItem != NIL
          ::Application:Props:ToolBox:ActiveItem:PointerItem:Select()
          ::Application:Report:Modified := .T.
@@ -205,7 +207,7 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
 RETURN oControl
 /*
 METHOD CreateControl( cControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrSubtotal, VrTotal, VrFormula
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula
    LOCAL hWnd, oControl, hPointer := HB_FuncPtr( cControl ), pt := (struct POINT)
    
    IF hPointer != NIL

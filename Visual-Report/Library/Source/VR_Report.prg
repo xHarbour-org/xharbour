@@ -172,8 +172,12 @@ RETURN Self
 METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
    LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar
 
-   x := VAL( hCtrl:Left )
-   y := VAL( hCtrl:Top )
+   IF HGetPos( hCtrl, "Left" ) > 0 
+      x := VAL( hCtrl:Left )
+   ENDIF
+   IF HGetPos( hCtrl, "Top" ) > 0 
+      y := VAL( hCtrl:Top )
+   ENDIF
 
    IF oPanel == NIL
       oControl := hb_ExecFromArray( hCtrl:ClsName, {,.F.} )
@@ -285,7 +289,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, aControl, cParent, hDC, hControl
+   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl
 
    ::hData  := {=>}
    ::hProps := {=>}
@@ -314,7 +318,9 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               IF !EMPTY( hControl )
                  AADD( ::&cParent, hControl )
               ENDIF
-              cParent := "a" + oNode:oParent:cName
+              IF UPPER( oNode:oParent:cName ) != "CONTROL"
+                 cParent := "a" + oNode:oParent:cName
+              ENDIF
               hControl := {=>}
               HSetCaseMatch( hControl, .F. )
 
@@ -325,7 +331,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
               hControl[ oNode:cName ] := oNode:cData
-              
+
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""
               hControl[ oNode:oParent:cName ][ oNode:cName ] := oNode:cData
@@ -333,8 +339,8 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       ENDCASE
       oNode := oDoc:Next()
    ENDDO
-   IF !EMPTY( aControl )
-      AADD( ::&cParent, aControl )
+   IF !EMPTY( hControl )
+      AADD( ::&cParent, hControl )
    ENDIF
    n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
         ::Application:Props[ "Header" ]:Height := VAL( ::hProps:HeaderHeight )+n

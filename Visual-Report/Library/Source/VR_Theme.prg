@@ -31,8 +31,8 @@ METHOD Init( oParent ) CLASS VrTheme
       AADD( ::aProperties, { "BackColor",  "Color"   } )
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
       AADD( ::aProperties, { "Font",       "General" } )
-      AADD( ::aProperties, { "Name",       "Object"  } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
+      AADD( ::aProperties, { "Name",       "Object"  } )
    ENDIF
 RETURN Self
 

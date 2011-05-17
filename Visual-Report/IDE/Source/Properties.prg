@@ -179,7 +179,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    cProp := oItem:ColItems[1]:Prop
    cProp2:= oItem:ColItems[1]:Prop2
 
-   IF cProp IN {"Subtotal"}
+   IF cProp IN {"SubtotalTheme"}
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
       RETURN NIL
    ENDIF
@@ -384,8 +384,8 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                      cText := ::ActiveObject:DataSource:Name
                    ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
                      cText := ::ActiveObject:Formula
-                   ELSEIF oItem:ColItems[n]:ColType == "SUBTOTAL"
-                     cText := ::ActiveObject:Subtotal
+                   ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
+                     cText := ::ActiveObject:SubtotalTheme
                   ENDIF
                   EXIT
 
@@ -729,7 +729,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTAL" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -856,11 +856,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           NEXT
           xValue := NIL
         
-        ELSEIF UPPER(cProp) == "SUBTOTAL"
-          aCol[1]:ColType := "SUBTOTAL"
+        ELSEIF UPPER(cProp) == "SUBTOTALTHEME"
+          aCol[1]:ColType := "SUBTOTALTHEME"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Body:Objects
-              IF Child:ClsName == "Subtotal"
+              IF Child:ClsName == "Theme"
                  AADD( aCol[1]:Value[2], Child )
               ENDIF
           NEXT

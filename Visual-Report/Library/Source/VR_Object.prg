@@ -22,6 +22,7 @@ CLASS VrObject
    DATA lUI         EXPORTED INIT .T.
    DATA Name        EXPORTED
    DATA Text        EXPORTED
+   DATA Objects     EXPORTED INIT {}
 
    DATA Left        EXPORTED INIT 0
    DATA Top         EXPORTED INIT 0

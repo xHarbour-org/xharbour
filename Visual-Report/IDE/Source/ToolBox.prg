@@ -97,16 +97,15 @@ METHOD Create() CLASS ToolBox
                    { "Components",             {} },;
                    { "Drawing",                {} } }
 
-   AADD( ::aButtons[2][2], { "Label", .T. } )
-   AADD( ::aButtons[2][2], { "Subtotal", .T. } )
-   AADD( ::aButtons[2][2], { "Total", .T. } )
-   AADD( ::aButtons[2][2], { "Image", .T. } )
+   AADD( ::aButtons[2][2], { "Label",     .T. } )
+   AADD( ::aButtons[2][2], { "Theme",     .T. } )
+   AADD( ::aButtons[2][2], { "Total",     .T. } )
+   AADD( ::aButtons[2][2], { "Image",     .T. } )
    AADD( ::aButtons[2][2], { "DataTable", .T. } )
-   AADD( ::aButtons[2][2], { "Formula", .T. } )
+   AADD( ::aButtons[2][2], { "Formula",   .T. } )
+   AADD( ::aButtons[2][2], { "Group",     .T. } )
 
    AADD( ::aButtons[3][2], { "Line", .T. } )
-//   AADD( ::aButtons[3][2], { "Rectangle", .T. } )
-//   AADD( ::aButtons[3][2], { "Circle", .T. } )
 
    FOR n := 2 TO LEN( ::aButtons )
        aSort(::aButtons[n][2],,,{|x, y| x[1] < y[1]})
