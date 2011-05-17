@@ -94,7 +94,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
        ELSEIF ::nDownPos != NIL
          DO CASE
             CASE ::nMove == 0 // move
-                 oCtrl:Left := ::Snap( x-::nDownPos[1] )
+                 oCtrl:Left := IIF( oCtrl:ClsName != "Group", ::Snap( x-::nDownPos[1] ), 0 )
                  oCtrl:Top  := ::Snap( y-::nDownPos[2] )
 
             CASE ::nMove == 1 // Top-Left

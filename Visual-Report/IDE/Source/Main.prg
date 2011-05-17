@@ -789,12 +789,13 @@ METHOD Open( cReport ) CLASS Report
 
       ::VrReport := VrReport( NIL )
       oApp:Props:Components:AddButton( ::VrReport )
+
+      ::SetScrollArea()
+
       ::oXMLDoc := ::VrReport:Load( cReport )
 
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
-
-      ::SetScrollArea()
 
       oApp:Props:RepHeader:InvalidateRect()
       oApp:Props:Header:InvalidateRect()
