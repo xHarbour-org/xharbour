@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-17 17:10 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/firebird.c
+   - Fixed attachment to DB that stay connected in FBCREATEDB
+   - Created functions to provide almost total access to DB and their tables
+       FBDROPDB( cDataBaseName, cUser, cPassWord ) - Delete remote and physically Database file
+       FBBACKUPDB( [cNameServer|cIPServer], cDBName, cBkpName, [cUser], [cPassWord] ) - Backup Database remotely
+       FBRESTOREDB( [cNameServer|cIPServer], cBkpName, cDBName, [cUser], [cPassWord] ) - Restore Database remotely
+       FBSERVICEISRUNNING() - Verify if service is running
+       FBDETACHSERVICE() - Detach service
+       
+       The last started service is saved in a static variable to been verified by FBSERVICEISRUNNING() like exemple bellow:
+       
+       FBBACKUPDB( "localhost", "DATABASE.FBD", "DATABASE.BKP", "SYSDBA", "masterkey" )
+       DO WHILE FBSERVICEISRUNNING()
+         Inkey(0.1)
+       ENDDO
+       FBDETACHSERVICE()  
+  * contrib/tfirebird.prg
+   ! removed unused variable
+   ! all changes providev by  Marson de Paula
+   
+
 2011-05-13 14:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
     ! fixed passord get with space. Bug reported by Fabio Nery.

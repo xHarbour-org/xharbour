@@ -47,6 +47,9 @@
  * See doc/license.txt for licensing terms.
  *
  */
+ /* Posted by M rson de Paula - marsonluis/at/gmail/dot/com (17/05/2011 1530GMT-0300)
+    - Removed unused variables 
+ */
 
 #include "common.ch"
 #include "hbclass.ch"
@@ -171,7 +174,7 @@ RETURN result
 
 
 METHOD Execute( cQuery ) CLASS TFbServer
-    Local result, qry, n
+    Local result, n
 
     cQuery := RemoveSpaces(cQuery)
     
@@ -378,7 +381,7 @@ RETURN result
 
 
 METHOD Append( oRow ) CLASS TFbServer
-    Local result := .F., cQuery, i, aTables, n
+    Local result := .F., cQuery, i, aTables
     
     aTables := oRow:GetTables()
         
@@ -409,7 +412,7 @@ RETURN result
 
 
 METHOD Update( oRow, cWhere ) CLASS TFbServer
-    Local result := .F., aKeys, cQuery, oServer, i, nField, xField, aTables 
+    Local result := .F., aKeys, cQuery, i, nField, xField, aTables 
     
     aTables := oRow:GetTables()
 
@@ -744,8 +747,6 @@ RETURN result
 
 
 METHOD GetKeyField() CLASS TFbQuery
-    Local oQuery, cQuery, cTable, i
-    
     if ISNIL(::aKeys)
        ::aKeys := KeyField( ::aTables, ::db, ::dialect )
     end
@@ -864,8 +865,6 @@ RETURN result
 
 
 METHOD GetKeyField() CLASS TFbRow
-    Local oQuery, cQuery, cTable, i
-    
     if ISNIL(::aKeys)
        ::aKeys := KeyField( ::aTables, ::db, ::dialect )
     end
@@ -874,7 +873,7 @@ RETURN ::aKeys
 
 
 Static Function KeyField( aTables, db, dialect ) 
-    Local oQuery, cQuery, cTable, i
+    Local cQuery, cTable
     Local qry, fetch_stmt
     Local aKeys := {}
     
