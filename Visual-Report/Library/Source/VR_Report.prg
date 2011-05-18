@@ -170,7 +170,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
-   LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar
+   LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
 
    IF HGetPos( hCtrl, "Left" ) > 0 
       x := VAL( hCtrl:Left )
@@ -206,7 +206,12 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       NEXT
 
     ELSE
-      oControl := oPanel:CreateControl( hCtrl, x, y )
+      IF hCtrl:ParName != NIL
+         IF ( n := ASCAN( oPanel:Objects, {|o| o:Name == hCtrl:ParName} ) ) > 0
+            oParent := oPanel:Objects[n]
+         ENDIF
+      ENDIF
+      oControl := oPanel:CreateControl( hCtrl, x, y, oParent )
    ENDIF
    IF HGetPos( hCtrl, "Font" ) > 0 
       DEFAULT oControl:Font TO Font()
@@ -289,7 +294,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl
+   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl, cParName
 
    ::hData  := {=>}
    ::hProps := {=>}
@@ -314,15 +319,20 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               DEFAULT oNode:cData TO ""
               ::hExtra[ oNode:cName ] := oNode:cData
 
+
+
          CASE oNode:cName == "Control" 
               IF !EMPTY( hControl )
                  AADD( ::&cParent, hControl )
               ENDIF
-              IF UPPER( oNode:oParent:cName ) != "CONTROL"
-                 cParent := "a" + oNode:oParent:cName
-              ENDIF
               hControl := {=>}
               HSetCaseMatch( hControl, .F. )
+              hControl[ "ParName" ] := NIL
+              IF UPPER( oNode:oParent:cName ) != "CONTROL"
+                 cParent := "a" + oNode:oParent:cName
+               ELSE
+                 hControl[ "ParName" ] := cParName
+              ENDIF
 
          CASE oNode:cName == "Font" 
               hControl[ oNode:cName ] := {=>}
@@ -331,6 +341,9 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
               hControl[ oNode:cName ] := oNode:cData
+              IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] == "VRGROUP"
+                 cParName := oNode:cData
+              ENDIF
 
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""

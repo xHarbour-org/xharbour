@@ -35,9 +35,9 @@ CLASS RepEdit INHERIT Panel
    METHOD OnPaint()
    METHOD Create()
    METHOD OnMouseMove()
-   METHOD OnDestroy() INLINE DeleteObject( ::hBmpGrid ), NIL
    METHOD CreateControl()
-   METHOD Snap()
+   METHOD OnDestroy()  INLINE DeleteObject( ::hBmpGrid ), NIL
+   METHOD Snap( nPos ) INLINE IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked, Snap( nPos, ::xGrid ), nPos )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -68,9 +68,6 @@ METHOD Create() CLASS RepEdit
    ::yBmpSize := ySize
 RETURN Self
 
-METHOD Snap( nPos ) CLASS RepEdit
-RETURN IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked, Snap( nPos, ::xGrid ), nPos )
-
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
    LOCAL aPoint, aPoints, oCtrl, n, hDC, aPt, aRect[4], nx, ny
@@ -94,7 +91,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
        ELSEIF ::nDownPos != NIL
          DO CASE
             CASE ::nMove == 0 // move
-                 oCtrl:Left := IIF( oCtrl:ClsName != "Group", ::Snap( x-::nDownPos[1] ), 0 )
+                 oCtrl:Left := IIF( oCtrl:ClsName != "Group", ::Snap( x-::nDownPos[1] ), -1 )
                  oCtrl:Top  := ::Snap( y-::nDownPos[2] )
 
             CASE ::nMove == 1 // Top-Left
@@ -205,38 +202,15 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       ENDIF
    ENDIF
 RETURN oControl
-/*
-METHOD CreateControl( cControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula
-   LOCAL hWnd, oControl, hPointer := HB_FuncPtr( cControl ), pt := (struct POINT)
-   
-   IF hPointer != NIL
-      DEFAULT oParent TO Self
-      DEFAULT x TO 0
-      DEFAULT y TO 0
-      oControl := HB_Exec( hPointer,, oParent )
-      oControl:__ClsInst := __ClsInst( oControl:ClassH )
-      oControl:Left := x 
-      oControl:Top  := y 
-      oControl:Create()
-      
-      IF ::Application:Props:ToolBox:ActiveItem != NIL
-         ::Application:Props:ToolBox:ActiveItem:PointerItem:Select()
-         ::Application:Report:Modified := .T.
-         ::Application:Props:PropEditor:ResetProperties( {{ oControl }} )
-      ENDIF
-      
-      IF !oControl:lUI
-         ::Application:Props:Components:AddButton( oControl )
-      ENDIF
-   ENDIF
-RETURN oControl
-*/
+
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
    LOCAL pt
    ::SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
+      IF UPPER( ::Application:Props:ToolBox:ActiveItem:Caption ) == "GROUP" .AND. ::Type != "Body"
+         RETURN NIL
+      ENDIF
       ::CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y )
     ELSEIF ::Type != "ExtraPage"
       pt := (struct POINT)

@@ -19,10 +19,10 @@ CLASS VrGroup INHERIT VrObject
    DATA ClsName       EXPORTED INIT "Group"
    DATA ShowRectangle EXPORTED INIT .T.
    DATA Objects       EXPORTED INIT {}
+   DATA GroupBy       EXPORTED
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
-   METHOD Draw()
    METHOD WriteProps()
    METHOD Configure()
 ENDCLASS
@@ -33,9 +33,8 @@ METHOD Init( oParent ) CLASS VrGroup
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      //AADD( ::aProperties, { "Left",   "Position" } )
+      AADD( ::aProperties, { "GroupBy", "General" } )
       AADD( ::aProperties, { "Top",    "Position" } )
-      //AADD( ::aProperties, { "Width",  "Size"     } )
       AADD( ::aProperties, { "Height", "Size"     } )
       AADD( ::aProperties, { "Name",   "Object"   } )
    ENDIF
@@ -45,16 +44,15 @@ METHOD Create() CLASS VrGroup
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
-   ::Parent:GetClientRect()
    WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
+      //:Caption := ::Text
       :BackColor := ::System:Color:White
       :Cargo   := Self
-      :Caption := ::Text
-      :Left    := 0//::Left
+      :Left    := -1
       :Top     := ::Top
-      :Width   := ::Parent:Width
       :Height  := ::Height
       :Create()
+      :Width   := ::Parent:Width
    END
    Super:Create()
 RETURN Self
@@ -68,47 +66,24 @@ RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrGroup
    LOCAL oXmlValue, oXmlFont
-   //oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
-   //oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
-   //oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Width ) )
-   //oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy", NIL, XSTR( ::GroupBy ) )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-METHOD Draw( hDC ) CLASS VrGroup
-   LOCAL x, y, cName, cx, cy, nX, nY
-   IF ::ShowRectangle
-      cName := "Group" + AllTrim( Str( ::Parent:nText++ ) )
-      
-      nX := GetDeviceCaps( hDC, LOGPIXELSX )
-      nY := GetDeviceCaps( hDC, LOGPIXELSY )
-
-      x  := ( ::nPixPerInch / nX ) * ::Left
-      y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
-      cx := ( ::nPixPerInch / nX ) * ::Width
-      cy := ( ::nPixPerInch / nY ) * ::Height
-
-      ::Parent:oPDF:CreateObject( acObjectTypeFrame, cName )
-
-      WITH OBJECT ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
-         :Attribute( "Left",    x )
-         :Attribute( "Top",     y )
-         :Attribute( "Right",   x+cx )
-         :Attribute( "Bottom",  y+cy )
-         :Attribute( "TextColor", PADL( DecToHexa( ::ForeColor ), 6, "0" ) )
-      END
-   ENDIF
-RETURN Self
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
 
 CLASS __VrGroup INHERIT RepEdit
    DATA aSize EXPORTED INIT {.F.,.F.,.F.,.T.,.F.,.F.,.F.,.T.}
    DATA FlatCaption EXPORTED INIT .T.
    DATA Type INIT "Group"
    METHOD OnLButtonDown()
-   METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
+   METHOD OnMouseMove()
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
    METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
    METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
@@ -118,7 +93,6 @@ ENDCLASS
 METHOD OnLButtonDown(n,x,y) CLASS __VrGroup 
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
-
    IF ::Application:Props:ToolBox:ActiveItem != NIL
       ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, ::Cargo )
     
@@ -138,7 +112,19 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
       END
       ::SetFocus()
    ENDIF
-   //Super:OnLButtonDown()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
+
+METHOD OnMouseMove(n,x,y) CLASS __VrGroup 
+   LOCAL oCtrl
+   IF n == MK_LBUTTON
+      oCtrl := ::Application:Props:PropEditor:ActiveObject
+      IF !(oCtrl == Self)
+         Super:OnMouseMove(n,x,y)
+      ENDIF
+    ELSE
+      MouseMove( Self, n, x, y )
+   ENDIF
+RETURN NIL
+
