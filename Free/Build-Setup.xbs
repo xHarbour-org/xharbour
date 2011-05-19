@@ -114,7 +114,7 @@ PROCEDURE Build_Setup()
             ' -target "APPDIR\free.xHarbour.com.url"'+;
             ' -dir SHORTCUTDIR'+;
             ' -wkdir APPDIR'+;
-            ' -icon "W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\url.ico"'+;
+            ' -icon "w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico"'+;
             CRLF+CRLF
 
    cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;
@@ -123,7 +123,7 @@ PROCEDURE Build_Setup()
             ' -target "APPDIR\xHarbour Builder Buttons.url"'+;
             ' -dir SHORTCUTDIR'+;
             ' -wkdir APPDIR'+;
-            ' -icon "W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\url.ico"'+;
+            ' -icon "w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico"'+;
             CRLF+CRLF
             
    cBuild2+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /NewShortcut'+;

@@ -1,7 +1,9 @@
-SET ROBOCOPY_FROM=w:\Clean CVS\xHarbour
-SET ROBOCOPY_XF=
-SET ROBOCOPY_XD=CVS CVSROOT debian
-ROBOCOPY "%ROBOCOPY_FROM%" C:\xHarbour *.* /XO /NS /NC /NP /E /XD %ROBOCOPY_XD%
+TortoiseProc.exe /command:update /path:"c:\xHarbour\" /closeonend:1
+
+rem SET ROBOCOPY_FROM=w:\xHarbour
+rem SET ROBOCOPY_XF=
+rem SET ROBOCOPY_XD=CVS CVSROOT debian .SVN
+rem ROBOCOPY "%ROBOCOPY_FROM%" C:\xHarbour *.* /XO /NS /NC /NP /E /XD %ROBOCOPY_XD%
 
 IF NOT EXIST "C:\Program Files\GnuWin32" ROBOCOPY "W:\Program Files\GnuWin32" "C:\Program Files\GnuWin32" *.* /XO /NS /NC /NP /S /E /PURGE
 IF NOT EXIST "C:\Program Files\Advantage 9.10\acesdk" ROBOCOPY "W:\Program Files\Advantage 9.10\acesdk" "C:\Program Files\Advantage 9.10\acesdk" *.* /XO /NS /NC /NP /S /E /PURGE

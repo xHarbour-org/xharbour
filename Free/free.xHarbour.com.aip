@@ -1998,7 +1998,7 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[TempFolder]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageName="W:\1\xHarbour-v[|ProductVersion]-for-[|CCOMPILER_NAME]" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExeIconPath="W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\xHB_Play.ico" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\install"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageName="W:\1\xHarbour-v[|ProductVersion]-for-[|CCOMPILER_NAME]" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExeIconPath="w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\xHB_Play.ico" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\install"/>
     <ATTRIBUTE name="CurrentBuild" value="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -2084,11 +2084,11 @@
     <ROW Extension="xbp" Component_="xBuildW.exe" ProgId_="[|Manufacturer].[|ProductName].xbp" Feature_="Feature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
-    <ROW Name="Samples_1_DIR.exe" SourcePath="W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\samples.ico" Index="0"/>
-    <ROW Name="doc_DIR.exe" SourcePath="W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\xhelp.ico" Index="0"/>
+    <ROW Name="Samples_1_DIR.exe" SourcePath="w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\samples.ico" Index="0"/>
+    <ROW Name="doc_DIR.exe" SourcePath="w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\xhelp.ico" Index="0"/>
     <ROW Name="ext.exe" SourcePath="xHarbour.Files\bin\xBuildW.exe" Index="0"/>
     <ROW Name="ext_1.exe" SourcePath="xHarbour.Files\bin\xEditW.exe" Index="0"/>
-    <ROW Name="xHB_Play.exe" SourcePath="W:\Clean CVS\xHarbour.com\xHarbour-Builder\Wise Install Scripts\Icons\xHB_Play.ico" Index="0"/>
+    <ROW Name="xHB_Play.exe" SourcePath="w:\Clean CVS\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\xHB_Play.ico" Index="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
