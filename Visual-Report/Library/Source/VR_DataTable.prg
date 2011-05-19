@@ -11,6 +11,7 @@
 
 #include "debug.ch"
 #include "vxh.ch"
+#include "hbxml.ch"
 
 #define  acObjectTypeText           5
 
@@ -33,6 +34,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA Button           EXPORTED
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
+   METHOD WriteProps()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -66,5 +68,17 @@ METHOD Create() CLASS VrDataTable
    END
 
    Super:Create()
+RETURN Self
+
+METHOD WriteProps( oXmlControl ) CLASS VrDataTable
+   LOCAL oXmlValue, oXmlFont
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, XSTR( ::FileName ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, XSTR( ::Alias ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, XSTR( ::bFilter ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, XSTR( ::Order ) )
+   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 

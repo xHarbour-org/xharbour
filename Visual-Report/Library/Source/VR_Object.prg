@@ -60,6 +60,7 @@ CLASS VrObject
    METHOD WriteProps()     VIRTUAL
    METHOD Configure()      VIRTUAL
    METHOD Delete()
+   METHOD __GetDataSource()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject
@@ -72,9 +73,16 @@ METHOD Init( oParent ) CLASS VrObject
    ::Font := Font()
 RETURN Self
 
+METHOD __GetDataSource( cDataSource ) CLASS VrObject
+   LOCAL n, oSource
+   IF ( n := ASCAN( ::Objects, {|o| o:Name == cDataSource} ) ) > 0
+      oSource := ::Objects[n]
+   ENDIF
+RETURN oSource
+
 METHOD Create() CLASS VrObject
    IF ::Parent != NIL
-      AADD( ::Parent:Objects, Self )
+      AADD( IIF( ::lUI, ::Parent:Objects, ::Application:Props:CompObjects ), Self )
       IF ::lUI
          ::EditCtrl:OnWMLButtonDown := {|| ::Application:Props:PropEditor:ResetProperties( {{ Self }} ) }
       ENDIF

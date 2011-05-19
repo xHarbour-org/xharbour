@@ -380,7 +380,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
              CASE "A"
                   // DataSource falls here
                   cText  := cText[1]
-                  IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. ::ActiveObject:DataSource != NIL
+                  IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. !EMPTY( ::ActiveObject:DataSource )
                      cText := ::ActiveObject:DataSource:Name
                    ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
                      cText := ::ActiveObject:Formula

@@ -594,7 +594,9 @@ METHOD New() CLASS Report
    oApp:Props:CloseBttn:Enabled     := .T.
    oApp:Props:SaveBttn:Enabled      := .T.
    oApp:Props:PageSetupMenu:Enabled := .T.
-   
+
+   oApp:Props[ "CompObjects" ]      := {}
+
    oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
    ::FileName := "Untitled.vrt"
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
@@ -695,6 +697,8 @@ METHOD Close() CLASS Report
       :Props:Footer:Objects    := {}
       :Props:ExtraPage:Objects := {}
 
+      :Props:CompObjects       := {}
+
       :Props:PropEditor:ActiveObject := NIL
 
       :Props:RepHeader:Visible := .F.
@@ -774,7 +778,7 @@ METHOD Open( cReport ) CLASS Report
          ENDIF
          cReport := oFile:FileName
       ENDIF
-
+      oApp:Props:CompObjects        := {}
       oApp:Props:ToolBox:Enabled    := .T.
       oApp:Props:SaveMenu:Enabled   := .T.
       oApp:Props:SaveBttn:Enabled   := .T.
@@ -831,7 +835,7 @@ RETURN Self
 METHOD Save( lSaveAs ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile
-   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep
+   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep, oXmlComp
    
    DEFAULT lSaveAs TO .F.
    
@@ -846,53 +850,48 @@ METHOD Save( lSaveAs ) CLASS Report
 
    ::oXMLDoc := TXmlDocument():new()
       oXmlReport := TXmlNode():new( , "Report" )
+
+         IF !EMPTY( aCtrl := oApp:Props:CompObjects )
+            oXmlComp := TXmlNode():new( , "Components" )
+            FOR n := 1 TO LEN( aCtrl )
+                ::Generate( aCtrl[n], @oXmlComp )
+            NEXT
+            oXmlReport:addBelow( oXmlComp )
+         ENDIF
+      
          oXmlProp := TXmlNode():new( , "Properties" )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:ClientHeight ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:ClientHeight ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "Orientation", NIL, XSTR( ::VrReport:Orientation ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PaperSize", NIL, XSTR( ::VrReport:PaperSize ) )
-         oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:ClientHeight ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:ClientHeight ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "Orientation", NIL, XSTR( ::VrReport:Orientation ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PaperSize", NIL, XSTR( ::VrReport:PaperSize ) )
+            oXmlProp:addBelow( oXmlSource )
 
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "LeftMargin", NIL, XSTR( ::VrReport:LeftMargin ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "TopMargin", NIL, XSTR( ::VrReport:TopMargin ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RightMargin", NIL, XSTR( ::VrReport:RightMargin ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "BottomMargin", NIL, XSTR( ::VrReport:BottomMargin ) )
-         oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "LeftMargin", NIL, XSTR( ::VrReport:LeftMargin ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "TopMargin", NIL, XSTR( ::VrReport:TopMargin ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RightMargin", NIL, XSTR( ::VrReport:RightMargin ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "BottomMargin", NIL, XSTR( ::VrReport:BottomMargin ) )
+            oXmlProp:addBelow( oXmlSource )
 
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintHeader", NIL, IIF( ::VrReport:PrintHeader, "1", "0" ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepHeader", NIL, IIF( ::VrReport:PrintRepHeader, "1", "0" ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintFooter", NIL, IIF( ::VrReport:PrintFooter, "1", "0" ) )
-         oXmlProp:addBelow( oXmlSource )
-         oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepFooter", NIL, IIF( ::VrReport:PrintRepFooter, "1", "0" ) )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintHeader", NIL, IIF( ::VrReport:PrintHeader, "1", "0" ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepHeader", NIL, IIF( ::VrReport:PrintRepHeader, "1", "0" ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintFooter", NIL, IIF( ::VrReport:PrintFooter, "1", "0" ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepFooter", NIL, IIF( ::VrReport:PrintRepFooter, "1", "0" ) )
+            oXmlProp:addBelow( oXmlSource )
+
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( ::VrReport:DataSource != NIL, ::VrReport:DataSource:Name, "" ) )
          oXmlProp:addBelow( oXmlSource )
       oXmlReport:addBelow( oXmlProp )
-
-      IF ::VrReport:DataSource != NIL .AND. ! EMPTY( ::VrReport:DataSource:FileName )
-         oXmlData := TXmlNode():new( , "DataSource" )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Name", NIL, ::VrReport:DataSource:Name )
-            oXmlData:addBelow( oXmlValue )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, ::VrReport:DataSource:ClassName )
-            oXmlData:addBelow( oXmlValue )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::VrReport:DataSource:FileName )
-            oXmlData:addBelow( oXmlValue )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::VrReport:DataSource:Alias )
-            oXmlData:addBelow( oXmlValue )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, ::VrReport:DataSource:bFilter )
-            oXmlData:addBelow( oXmlValue )
-            oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::VrReport:DataSource:Order )
-            oXmlData:addBelow( oXmlValue )
-         oXmlReport:addBelow( oXmlData )
-      ENDIF
 
       IF !EMPTY( aCtrl := oApp:Props:Header:Objects )
          oXmlHeader := TXmlNode():new( , "Header" )

@@ -52,7 +52,11 @@ CLASS VrReport INHERIT VrObject
    DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
    DATA nPage          EXPORTED  INIT 0
    DATA nRow           EXPORTED  INIT 0
-   DATA DataSource     EXPORTED
+
+   DATA xDataSource     PROTECTED
+   ACCESS DataSource    INLINE ::xDataSource
+   ASSIGN DataSource(o) INLINE ::__SetDataSource(o)
+
    DATA Button         EXPORTED
    DATA lUI            EXPORTED  INIT .F.
 
@@ -63,8 +67,8 @@ CLASS VrReport INHERIT VrObject
    DATA aBody          EXPORTED  INIT {}
    DATA aFooter        EXPORTED  INIT {}
    DATA aExtraPage     EXPORTED  INIT {}
+   DATA aComponents    EXPORTED  INIT {}
    
-   DATA hData          EXPORTED
    DATA hProps         EXPORTED
    DATA hExtra         EXPORTED
    
@@ -93,6 +97,7 @@ CLASS VrReport INHERIT VrObject
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
    METHOD GetSubtotalHeight()
    METHOD GetTotalHeight()
+   METHOD __SetDataSource()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -186,7 +191,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       oControl:Top  := y
 
       FOR EACH cProp IN hCtrl:Keys
-          IF UPPER( cProp ) != "FONT"
+          IF UPPER(cProp) != "PARNAME" .AND. UPPER( cProp ) != "FONT"
              xVar := __objSendMsg( oControl, cProp )
              xValue := hCtrl[ cProp ]
              IF VALTYPE( xVar ) != VALTYPE( xValue )
@@ -206,6 +211,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       NEXT
 
     ELSE
+
       IF hCtrl:ParName != NIL
          IF ( n := ASCAN( oPanel:Objects, {|o| o:Name == hCtrl:ParName} ) ) > 0
             oParent := oPanel:Objects[n]
@@ -213,6 +219,15 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       ENDIF
       oControl := oPanel:CreateControl( hCtrl, x, y, oParent )
    ENDIF
+
+   IF ASCAN( oControl:aProperties, {|a| a[1]=="DataSource"} ) > 0
+      IF VALTYPE( oControl:DataSource ) == "C"
+         IF ( n := ASCAN( ::Application:Props:CompObjects, {|o| o:Name==oControl:DataSource} ) ) > 0
+            oControl:DataSource := ::Application:Props:CompObjects[n]
+         ENDIF
+      ENDIF
+   ENDIF
+      
    IF HGetPos( hCtrl, "Font" ) > 0 
       DEFAULT oControl:Font TO Font()
       oControl:Font:FaceName  := hCtrl:Font:FaceName
@@ -236,6 +251,17 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
     ELSE
       oControl:Configure()
    ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __SetDataSource( oData ) CLASS VrReport
+   LOCAL n
+   IF VALTYPE( oData ) == "C"
+      IF ( n := ASCAN( ::Application:Props:CompObjects, {|o| o:Name==oData} ) ) > 0
+          oData := ::Application:Props:CompObjects[n]
+      ENDIF
+   ENDIF
+   ::xDataSource := oData
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -296,10 +322,8 @@ RETURN Self
 METHOD PrepareArrays( oDoc ) CLASS VrReport
    LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl, cParName
 
-   ::hData  := {=>}
    ::hProps := {=>}
    ::hExtra := {=>}
-   HSetCaseMatch( ::hData, .F. )
    HSetCaseMatch( ::hProps, .F. )
    HSetCaseMatch( ::hExtra, .F. )
 
@@ -307,10 +331,6 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 
    WHILE oNode != NIL
       DO CASE
-         CASE oNode:oParent:cName == "DataSource" .AND. oNode:oParent:oParent:cName == "Report"
-              DEFAULT oNode:cData TO ""
-              ::hData[ oNode:cName ] := oNode:cData
-
          CASE oNode:oParent:cName == "Properties" .AND. oNode:oParent:oParent:cName == "Report"
               DEFAULT oNode:cData TO ""
               ::hProps[ oNode:cName ] := oNode:cData
@@ -387,14 +407,10 @@ METHOD Load( cReport ) CLASS VrReport
 
    ::PrepareArrays( oDoc )
    
-   IF !EMPTY( ::hData ) .AND. !EMPTY( ::hData:FileName )
-      WITH OBJECT ::DataSource := ::Application:Props:Body:CreateControl( ::hData )
-         :FileName := ::hData:FileName
-         :Alias    := ::hData:Alias
-         :bFilter  := ::hData:bFilter
-      END
-      ::Application:Props:PropEditor:ResetProperties( {{ ::DataSource }} )
-   ENDIF
+   FOR EACH hCtrl IN ::aComponents
+       ::CreateControl( hCtrl,, ::Application:Props:Body )
+   NEXT
+
    ::PrintHeader    := ::hProps:PrintHeader    == "1"
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
@@ -442,15 +458,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
    
-   IF !EMPTY( ::hData ) .AND. !EMPTY( ::hData:FileName )
-      ::DataSource := hb_ExecFromArray( ::hData:ClsName )
-      ::DataSource:FileName := ::hData:FileName
-      ::DataSource:Alias    := ::hData:Alias
-      ::DataSource:bFilter  := ::hData:bFilter
-      ::DataSource:Create()
-      nCount := ::DataSource:EditCtrl:RecCount()
-   ENDIF
-
    ::CreateHeader( hDC )
 
 //-----------------------------------------------------------------------

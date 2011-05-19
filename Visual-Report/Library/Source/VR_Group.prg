@@ -19,12 +19,13 @@ CLASS VrGroup INHERIT VrObject
    DATA ClsName       EXPORTED INIT "Group"
    DATA ShowRectangle EXPORTED INIT .T.
    DATA Objects       EXPORTED INIT {}
-   DATA GroupBy       EXPORTED
-
+   DATA GroupBy       EXPORTED INIT ""
+   DATA DataSource    EXPORTED
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
    METHOD Configure()
+   METHOD InvalidateRect(a,l) INLINE ::EditCtrl:InvalidateRect(a,l)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ METHOD Init( oParent ) CLASS VrGroup
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
+      AADD( ::aProperties, { "DataSource", "General" } )
       AADD( ::aProperties, { "GroupBy", "General" } )
       AADD( ::aProperties, { "Top",    "Position" } )
       AADD( ::aProperties, { "Height", "Size"     } )
@@ -71,6 +73,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrGroup
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy", NIL, XSTR( ::GroupBy ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( !EMPTY( ::DataSource ), ::DataSource:Name, "" ) )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
