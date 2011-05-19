@@ -710,9 +710,8 @@ HB_FUNC( SETWINDOWTHEME )
    HRESULT nRet;
 
    HWND hWnd = (HWND) hb_parnl(1);
-   LPCWSTR pszSubAppName = (LPCWSTR) hb_parc(2);
-   LPCWSTR pszSubIdList  = (LPCWSTR) hb_parc(3);
-
+   LPCWSTR pszSubAppName = (LPCWSTR) hb_oleAnsiToWide( hb_parc(2) );
+   LPCWSTR pszSubIdList  = (LPCWSTR) hb_oleAnsiToWide( hb_parc(3) );
 
    if( hUxTheme == NULL )
    {

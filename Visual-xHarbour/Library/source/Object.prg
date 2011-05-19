@@ -76,8 +76,8 @@ CLASS Object
    METHOD __SetAsProperty()
    METHOD __SetTheming()
 
-   METHOD SetWindowTheme( cSubAppName, cSubIdList ) INLINE SetWindowTheme( ::hWnd, ToUnicode( cSubAppName ), ToUnicode( cSubIdList ) )
-   METHOD RemoveWindowTheme()                       INLINE SetWindowTheme( ::hWnd, ToUnicode( "" ), ToUnicode( "" ) )
+   METHOD SetWindowTheme( cSubAppName, cSubIdList ) INLINE SetWindowTheme( ::hWnd, cSubAppName, cSubIdList )
+   METHOD RemoveWindowTheme()                       INLINE SetWindowTheme( ::hWnd, NIL, NIL )
    METHOD Create()
    METHOD __InvalidMember()
    METHOD RemoveProperty()
