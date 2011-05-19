@@ -2967,7 +2967,9 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
       DispOut( iif( xValue, "T", "F" ), cColor )
       DispOut( Space( Int( ( nWidth - nLen ) / 2 ) ), cColorBKG )
       exit
-
+   case "T"
+      DispOut(Ttoc( xValue ))
+      exit
    default
       DispOut( Space( nWidth ), cColor )
    end
@@ -3647,6 +3649,9 @@ STATIC FUNCTION LenVal( xVal, cType, cPict )
       case "D"
          /* If cPict is empty, transform functions returns proper value in each valtype */
          nLen := Len( Transform( xVal, cPict ) )
+         exit
+      Case "T" 
+         nLen := len( ttoc(datetime(0,0,0,0,0,0,0)))   
          exit
       default
          nLen := 0

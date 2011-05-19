@@ -344,6 +344,7 @@
 #define DEVICE_DEFAULT_FONT 14
 #define DEFAULT_PALETTE     15
 #define SYSTEM_FIXED_FONT   16
+#ifndef _WINUSER_
 
 /* Draw Text Styles */
 #define DT_TOP                      0x00000000
@@ -371,6 +372,7 @@
 #define DT_NOFULLWIDTHCHARBREAK     0x00080000
 #define DT_HIDEPREFIX               0x00100000
 #define DT_PREFIXONLY               0x00200000
+#endif // !_WINUSER_
 
 /* Color */
 #define BLACK     0x00000000

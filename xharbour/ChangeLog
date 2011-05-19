@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-19 11:11 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * include/win32prn.ch
+    ! protected some defines with #ifndef _WINUSER_ to avoid conflicts when winuser.ch is added before win32prn.ch
+  * source/rtl/cstr.prg 
+    ! added type 'T'(datetime) to convert it value in the ValToPrgExp and ValToPrg
+  * source/rtl/tbrowse.prg
+    ! added test for 'T'(datetime) in function lenval() and  method dispcell
+  * source/debug/debugger.prg      
+    ! added test for 'T'( datatime) to show the correct value
+    
 2011-05-17 17:10 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/firebird.c
    - Fixed attachment to DB that stay connected in FBCREATEDB

@@ -3540,6 +3540,7 @@ FUNCTION __dbgValToStr( uVal )
    CASE cType == "O" ; RETURN "Class " + uVal:ClassName() + " object"
    CASE cType == "H" ; RETURN "Hash of " + RTrim( Str( Len( uVal ) ) ) + " elements"
    CASE cType == "P" ; RETURN "Pointer"
+   Case ctype == "T" ; return TTOS(uVal)
    ENDCASE
 
    RETURN "U"

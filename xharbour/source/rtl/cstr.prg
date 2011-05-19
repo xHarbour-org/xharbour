@@ -278,7 +278,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
          nPad -=3
          RETURN cRet
-
+      CASE 'T'
+         RETURN TTOC( XVAL )
       DEFAULT
          //TraceLog( xVal, cName, nPad )
          IF xVal == NIL
@@ -396,7 +397,8 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
          NEXT
 
          RETURN cRet + cName + " )"
-
+      CASE 'T'
+         RETURN TTOC( XVAL )
       DEFAULT
          //TraceLog( xVal, cName, nPad )
          IF xVal == NIL
