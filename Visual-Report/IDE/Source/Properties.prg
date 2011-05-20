@@ -218,6 +218,9 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
        ELSEIF xProp == "FileName" .AND. ::ActiveObject:ClsName == "Image"
          xProp := "ImageName"
       ENDIF
+      IF cProp == "GroupBy"
+         xValue := cCaption
+      ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
 
       IF ::ActiveObject:lUI
@@ -249,7 +252,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
    LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, nfHeight := ABS( ::Font:Height )+3
    LOCAL nPos, cCap, xValue, cProp, nLevel, hDC, oItem
    LOCAL hOldFont, hIcon, lDisabled := .F.
-   LOCAL hMemBitmap, hOldBitmap, lEnabled, nScanCode, hBoldFont
+   LOCAL hMemBitmap, hOldBitmap, lEnabled, hBoldFont
 
    rc       := tvcd:nmcd:rc
    oItem    := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
@@ -386,6 +389,8 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                      cText := ::ActiveObject:Formula
                    ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
                      cText := ::ActiveObject:SubtotalTheme
+                   ELSEIF oItem:ColItems[n]:ColType == "GROUPBY"
+                     cText := ::ActiveObject:GroupBy
                   ENDIF
                   EXIT
 
@@ -729,7 +734,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -747,7 +752,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 
                            FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
                                IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
-                                  :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
+                                  IF cType != "GROUPBY"
+                                     :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
+                                   ELSE
+                                     :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n] )
+                                  ENDIF
                                ENDIF
                            NEXT
 
@@ -768,10 +777,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 RETURN NIL
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS PropEditor
-
-   LOCAL cProp, cProp2, aProp, xValue, n, oItem, cColor, nColor, aSub, aApp, aCol, aFont, oSub, oObj, xValue2, aTopics, lReadOnly, cAccel
-   LOCAL aObj, aProperties, cProperty, aProperty, aSubProp, cType, nSys, Child, aCopy, oForm, xProp, cKey, aIvars, Property, oOle, Interface
-   LOCAL nScanCode, cText, siv
+   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2
+   LOCAL aObj, aProperties, cProperty, aProperty, aSubProp, cType, Child, xProp
+   LOCAL aField
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -835,7 +843,16 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
-        
+        ELSEIF UPPER(cProp) == "GROUPBY"
+          aCol[1]:ColType := "GROUPBY"
+          aCol[1]:Value   := { "", { NIL } }
+          IF !EMPTY( ::ActiveObject:DataSource )
+             FOR EACH aField IN ::ActiveObject:DataSource:EditCtrl:Struct()
+                 AADD( aCol[1]:Value[2], aField[1] )
+             NEXT
+          ENDIF
+          xValue := NIL
+
         ELSEIF UPPER(cProp) == "DATASOURCE"
           aCol[1]:ColType := "DATASOURCE"
           aCol[1]:Value   := { "", { NIL } }

@@ -47,14 +47,13 @@ METHOD Create() CLASS VrGroup
       RETURN ::Draw()
    ENDIF
    WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
-      //:Caption := ::Text
       :BackColor := ::System:Color:White
-      :Cargo   := Self
-      :Left    := -1
-      :Top     := ::Top
-      :Height  := ::Height
+      :Cargo     := Self
+      :Left      := -1
+      :Top       := ::Top
+      :Height    := ::Height
       :Create()
-      :Width   := ::Parent:Width
+      :Width     := ::Parent:Width
    END
    Super:Create()
 RETURN Self
@@ -132,3 +131,6 @@ METHOD OnMouseMove(n,x,y) CLASS __VrGroup
    ENDIF
 RETURN NIL
 
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------

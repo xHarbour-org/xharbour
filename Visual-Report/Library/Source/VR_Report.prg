@@ -90,13 +90,10 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
-   METHOD CreateSubtotals()
    METHOD PrepareArrays()
    METHOD Load()
    METHOD InitPDF()
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
-   METHOD GetSubtotalHeight()
-   METHOD GetTotalHeight()
    METHOD __SetDataSource()
 ENDCLASS
 
@@ -251,7 +248,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
     ELSE
       oControl:Configure()
    ENDIF
-RETURN Self
+RETURN oControl
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetDataSource( oData ) CLASS VrReport
@@ -262,18 +259,6 @@ METHOD __SetDataSource( oData ) CLASS VrReport
       ENDIF
    ENDIF
    ::xDataSource := oData
-RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-METHOD GetTotalHeight( hDC ) CLASS VrReport
-RETURN 0
-
-//-----------------------------------------------------------------------------------------------
-METHOD GetSubtotalHeight( hDC ) CLASS VrReport
-RETURN 0
-
-//-----------------------------------------------------------------------------------------------
-METHOD CreateSubtotals( hDC ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -436,7 +421,7 @@ RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
-   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow
+   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
 
    ::Create()
 
@@ -448,6 +433,24 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
+
+   FOR EACH hCtrl IN ::aComponents
+       IF hCtrl:ClsName == "VRDATATABLE"
+          oData := DataTable( NIL )
+          oData:FileName := hCtrl:FileName
+          IF !EMPTY( hCtrl:Alias )
+             oData:Alias := hCtrl:Alias
+          ENDIF
+          oData:Create()
+          IF ! EMPTY( hCtrl:bFilter )
+             oData:SetFilter( &(hCtrl:bFilter) )
+          ENDIF
+          IF ! EMPTY( hCtrl:Order )
+             oData:OrdSetFocus( hCtrl:Order )
+          ENDIF
+          hData[ hCtrl:Name ] := oData
+       ENDIF
+   NEXT
 
    ::StartPage()
    hDC := GetDC(0)
@@ -510,11 +513,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::EndPage()
    ::End()
    hb_gcall(.t.)
-   IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
-      IF ::DataSource:EditCtrl:IsOpen
-         ::DataSource:EditCtrl:Close()
-      ENDIF
-   ENDIF
+   HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
 RETURN Self
 
 FUNCTION S2R( hDC, cSize ); RETURN VAL(cSize)*PIX_PER_INCH/GetDeviceCaps( hDC, LOGPIXELSY )

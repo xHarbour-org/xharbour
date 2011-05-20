@@ -35,6 +35,7 @@ CLASS VrDataTable INHERIT VrObject
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
+   METHOD Configure()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -68,6 +69,22 @@ METHOD Create() CLASS VrDataTable
    END
 
    Super:Create()
+RETURN Self
+
+METHOD Configure() CLASS VrDataTable
+   WITH OBJECT ::EditCtrl
+      :xFileName := ::FileName
+      IF !EMPTY( ::Alias )
+         :Alias := ::Alias
+      ENDIF
+      :Create()
+      IF ! EMPTY( ::bFilter )
+         :SetFilter( &(::bFilter) )
+      ENDIF
+      IF ! EMPTY( ::Order )
+         :OrdSetFocus( ::Order )
+      ENDIF
+   END
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrDataTable

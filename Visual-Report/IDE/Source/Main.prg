@@ -724,6 +724,8 @@ METHOD Close() CLASS Report
       :Props:ReportPageTab:VertScrollSize := 0
       :Props:ExtraTab:HorzScrollSize := 0
       :Props:ExtraTab:VertScrollSize := 0
+      
+      dbCloseAll()
    END
 RETURN NIL
 
