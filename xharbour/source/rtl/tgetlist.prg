@@ -285,6 +285,7 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
    local nMouseRow, nMouseColumn
    local nButton
    local nHotItem
+   local lPassword
    #ifdef HB_EXT_INKEY
    local cToPaste, nI, nLen
    #endif
@@ -316,7 +317,8 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
 
 METHOD GetApplyKey( nKey ) CLASS HBGetList
 
-   local cKey, bKeyBlock, oGet := ::oGet
+   local cKey, bKeyBlock, oGet := ::oGet, lPassword
+
    #ifdef HB_EXT_INKEY
    local cToPaste, nI, nLen
    #endif
@@ -327,22 +329,31 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
    endif
 
 #endif
+   lPassword := oGet:Password
 
    Switch nKey
       case K_UP
-         oGet:ExitState := GE_UP
+         if ! lPassword
+            oGet:ExitState := GE_UP
+         endif
          exit
 
       case K_SH_TAB
-         oGet:ExitState := GE_UP
+         if ! lPassword
+            oGet:ExitState := GE_UP
+         endif
          exit
 
       case K_DOWN
-         oGet:ExitState := GE_DOWN
+         if ! lPassword
+            oGet:ExitState := GE_DOWN
+         endif
          exit
 
       case K_TAB
-         oGet:ExitState := GE_DOWN
+         if ! lPassword
+            oGet:ExitState := GE_DOWN
+         endif
          exit
 
       case K_ENTER
@@ -357,30 +368,42 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
          exit
 
       case K_PGUP
-         oGet:ExitState := GE_WRITE
+         if ! lPassword
+            oGet:ExitState := GE_WRITE
+         endif
          exit
 
       case K_PGDN
-         oGet:ExitState := GE_WRITE
+         if ! lPassword
+            oGet:ExitState := GE_WRITE
+         endif
          exit
 
       case K_CTRL_HOME
-         oGet:ExitState := GE_TOP
+         if ! lPassword
+            oGet:ExitState := GE_TOP
+         endif
          exit
 
    #ifdef CTRL_END_SPECIAL
       case K_CTRL_END
-         oGet:ExitState := GE_BOTTOM
+         if ! lPassword
+            oGet:ExitState := GE_BOTTOM
+         endif
          exit
    #else
       case K_CTRL_W
-         oGet:ExitState := GE_WRITE
+         if ! lPassword
+            oGet:ExitState := GE_WRITE
+         endif
          exit
    #endif
 
       case K_INS
-         Set( _SET_INSERT, ! Set( _SET_INSERT ) )
-         ::ShowScoreboard()
+         if ! lPassword
+            Set( _SET_INSERT, ! Set( _SET_INSERT ) )
+            ::ShowScoreboard()
+         endif
          /* 2007/SEP/24 - EF - Toggle cursor shape at insert mode on/off
           *               Uncomment it, if you want this behaviour.
           *if ::nSaveCursor != SC_NONE
@@ -391,6 +414,8 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 #ifdef HB_COMPAT_C53
       case K_LBUTTONDOWN
       case K_LDBLCLK
+         if ! lPassword
+
          nMouseRow    := MRow()
          nMouseColumn := MCol()
 
@@ -446,6 +471,7 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
             oGet:ExitState := GE_NOEXIT
 
          endif
+         endif
          exit
 #endif
 
@@ -454,27 +480,39 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
          exit
 
       case K_HOME
-         oGet:Home()
+         if ! lPassword
+            oGet:Home()
+         endif
          exit
 
       case K_END
-         oGet:End()
+         if ! lPassword
+            oGet:End()
+         endif
          exit
 
       case K_RIGHT
-         oGet:Right()
+         if ! lPassword
+            oGet:Right()
+         endif
          exit
 
       case K_LEFT
-         oGet:Left()
+         if ! lPassword
+           oGet:Left()
+         endif
          exit
 
       case K_CTRL_RIGHT
-         oGet:WordRight()
+         if ! lPassword
+            oGet:WordRight()
+         endif
          exit
 
       case K_CTRL_LEFT
-         oGet:WordLeft()
+         if ! lPassword
+            oGet:WordLeft()
+         endif
          exit
 
       case K_BS
@@ -485,52 +523,66 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
          exit
 
       case K_DEL
-         if oGet:NToL
-            if oGet:DecPos != nil .and. oGet:Pos > oGet:DecPos
-               oGet:Delete()
+         if ! lPassword
+            if oGet:NToL
+               if oGet:DecPos != nil .and. oGet:Pos > oGet:DecPos
+                  oGet:Delete()
+               else
+                  oGet:BackSpace()
+                  oGet:NumToLeft()
+               endif
             else
-               oGet:BackSpace()
-               oGet:NumToLeft()
+               oGet:Delete()
             endif
-         else
-            oGet:Delete()
          endif
          exit
 
       case K_CTRL_T
-         oGet:DelWordRight()
+         if ! lPassword
+            oGet:DelWordRight()
+         endif
          exit
 
       case K_CTRL_Y
-         oGet:DelEnd()
-         if oGet:NToL
-            oGet:NumToLeft()
+         if ! lPassword
+            oGet:DelEnd()
+            if oGet:NToL
+               oGet:NumToLeft()
+            endif
          endif
          exit
 
       case K_CTRL_BS
-         oGet:DelWordLeft()
+         if ! lPassword
+            oGet:DelWordLeft()
+         endif
          exit
 
    #ifdef HB_EXT_INKEY
 
       case K_CTRL_C
-         oGet:Assign()
-         hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
+         if ! lPassword
+            oGet:Assign()
+            hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
+         endif
          exit
 
       case K_CTRL_X
-         oGet:Assign()
-         hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
-         oGet:DelEnd()
+         if ! lPassword
+            oGet:Assign()
+            hb_gtInfo( GTI_CLIPBOARDDATA, CStr( oGet:VarGet() ) )
+            oGet:DelEnd()
+         endif
          exit
 
       case K_CTRL_V
-         cToPaste := hb_gtInfo( GTI_CLIPBOARDDATA )
-         nLen := len( cToPaste )
-         for nI := 1 to nLen
-            oGet:Insert( cToPaste[ nI ] )
-         next nI
+         if ! lPassword
+            cToPaste := hb_gtInfo( GTI_CLIPBOARDDATA )
+            nLen := len( cToPaste )
+            for nI := 1 to nLen
+               oGet:Insert( cToPaste[ nI ] )
+            next nI
+         endif
          exit
 
    #endif

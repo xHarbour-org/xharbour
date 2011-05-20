@@ -7,10 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-05-20 09:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+    * disabled cursor movement and exit keys into password get,
+      only backspace, esc and enter keys actions are allowed.
+
 2011-05-19 11:23 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/mail.prg
     ! added xml file type on list to extensions to encode in base64 on attachFile method
-    
+
 2011-05-19 11:11 Luiz Rafael Culik <luiz at xharbour.com.br>
   * include/win32prn.ch
     ! protected some defines with #ifndef _WINUSER_ to avoid conflicts when winuser.ch is added before win32prn.ch

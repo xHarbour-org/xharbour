@@ -175,6 +175,8 @@ CLASS Get
    METHOD PutMask( cBuffer, lEdit )
    METHOD HasScroll() INLINE ::nDispLen != ::nMaxLen
 
+   ACCESS PassWord INLINE ::lPassword
+
    HIDDEN:              /*  H I D D E N  */
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
@@ -855,6 +857,9 @@ METHOD Undo() CLASS Get
        */
       IF ::Type=="N" .AND. ::Original != NIL .AND. ::Original >= 0
          ::minus := .f.
+      ENDIF
+      IF ::lPassword
+         ::DeleteAll()
       ENDIF
       ::VarPut( ::Original, .t. )
       ::Pos := ::FirstEditable()
