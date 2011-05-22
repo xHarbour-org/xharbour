@@ -547,12 +547,18 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       
       nAlias := 1
       cAlias := ::Owner:xAlias
+      IF EMPTY( cAlias )
+         cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
+         cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
+      ENDIF
+      
       IF Select( cAlias ) > 0
          WHILE Select( cAlias + XSTR( nAlias ) ) > 0
             nAlias ++
          ENDDO
          ::Owner:xAlias := cAlias + XSTR( nAlias )
       ENDIF
+      
       TRY
          dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
@@ -566,7 +572,18 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             ENDIF
          ENDIF
          IF oErr:GenCode == 18 .OR. oErr:GenCode == 17
-            ::Owner:xAlias := ::Owner:xAlias + "1"//::Owner:Name
+
+            cAlias := ::Owner:xAlias
+            IF EMPTY( cAlias )
+               cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
+               cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
+            ENDIF
+            nAlias := 1
+            WHILE Select( cAlias + XSTR( nAlias ) ) > 0
+               nAlias ++
+            ENDDO
+            ::Owner:xAlias := cAlias + XSTR( nAlias )
+
          ENDIF
          dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
          IF !::Owner:__lMemory .AND. n != NIL
