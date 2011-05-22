@@ -218,7 +218,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
        ELSEIF xProp == "FileName" .AND. ::ActiveObject:ClsName == "Image"
          xProp := "ImageName"
       ENDIF
-      IF cProp == "GroupBy"
+      IF cProp IN {"GroupBy","Field"}
          xValue := cCaption
       ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
@@ -389,8 +389,10 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                      cText := ::ActiveObject:Formula
                    ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
                      cText := ::ActiveObject:SubtotalTheme
-                   ELSEIF oItem:ColItems[n]:ColType == "GROUPBY"
+                   ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
                      cText := ::ActiveObject:GroupBy
+                   ELSEIF oItem:ColItems[n]:ColType IN "FIELD"
+                     cText := ::ActiveObject:Field
                   ENDIF
                   EXIT
 
@@ -734,7 +736,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY", "FIELD" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -752,7 +754,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 
                            FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
                                IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
-                                  IF cType != "GROUPBY"
+                                  IF ! cType IN {"GROUPBY","FIELD"}
                                      :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
                                    ELSE
                                      :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n] )
@@ -843,11 +845,21 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
-        ELSEIF UPPER(cProp) == "GROUPBY"
-          aCol[1]:ColType := "GROUPBY"
+        ELSEIF UPPER(cProp) IN {"GROUPBY"}
+          aCol[1]:ColType := UPPER(cProp)
           aCol[1]:Value   := { "", { NIL } }
           IF !EMPTY( ::ActiveObject:DataSource )
              FOR EACH aField IN ::ActiveObject:DataSource:EditCtrl:Struct()
+                 AADD( aCol[1]:Value[2], aField[1] )
+             NEXT
+          ENDIF
+          xValue := NIL
+
+        ELSEIF UPPER(cProp) IN {"FIELD"}
+          aCol[1]:ColType := UPPER(cProp)
+          aCol[1]:Value   := { "", { NIL } }
+          IF !EMPTY( ::Application:Report:VrReport:DataSource )
+             FOR EACH aField IN ::Application:Report:VrReport:DataSource:EditCtrl:Struct()
                  AADD( aCol[1]:Value[2], aField[1] )
              NEXT
           ENDIF

@@ -17,6 +17,7 @@
 
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text      READ xText WRITE SetText
+   DATA Field         EXPORTED
    DATA AutoResize    EXPORTED  INIT .F.
    DATA ClsName       EXPORTED  INIT "Label"
    DATA SysBackColor  EXPORTED  INIT GetSysColor( COLOR_WINDOW )
@@ -43,6 +44,7 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "SubtotalTheme", "Color" } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
+      AADD( ::aProperties, { "Field",      "General" } )
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
@@ -121,6 +123,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Text", NIL, ::Text )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Field", NIL, ::Field )
+   oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ForeColor", NIL, XSTR( ::ForeColor ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "BackColor", NIL, XSTR( ::BackColor ) )
@@ -171,26 +175,12 @@ METHOD Draw( hDC ) CLASS VrLabel
       ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
       ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         IF VALTYPE( ::Text ) == "C" .AND. VAL( ::Text ) == 0
-            TRY
-               cText := &(::Text)
-            catch
-               cText := ::Text
-            END
+         IF !EMPTY( ::Field )
+            cText := ::Parent:DataSource:Fields:&(::Field)
           ELSE
             cText := ::Text
          ENDIF
          
-//         ::nSubtotal += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-
-         IF ( n := ASCAN( ::Parent:aSubtotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-            ::Parent:aSubtotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-         ENDIF
-
-         //IF ( n := ASCAN( ::Parent:aTotals, {|a| UPPER(a[1]) == UPPER(::Name) } ) ) > 0
-         //   ::Parent:aTotals[n][2] += IIF( VALTYPE(cText)=="N", cText, VAL(cText) )
-         //ENDIF
-
          cText := ALLTRIM( xStr( cText ) )
 
          IF ::Alignment > 1

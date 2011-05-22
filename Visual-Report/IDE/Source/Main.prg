@@ -12,6 +12,9 @@
 #include "debug.ch"
 #include "hbxml.ch"
 
+#define MXML_STYLE_INDENT        1
+#define MXML_STYLE_THREESPACES   4
+
 static oApp
 
 PROCEDURE Main( cFile )
@@ -939,7 +942,7 @@ METHOD Save( lSaveAs ) CLASS Report
       ENDIF
 
    ::oXMLDoc:oRoot:addBelow( oXmlReport )
-   ::oXMLDoc:Write( ::FileName )
+   ::oXMLDoc:Write( ::FileName, MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
    oApp:Props:RunBttn:Enabled    := .T.
 RETURN .T.
 

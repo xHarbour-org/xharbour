@@ -86,7 +86,7 @@ CLASS VrReport INHERIT VrObject
    METHOD EndPage()
    METHOD Run()
    METHOD CreateControl()
-   METHOD CreateColumns()
+   METHOD CreateFields()
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
@@ -241,7 +241,10 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       oControl:Draw( hDC )
       TRY
          IF oControl:ClsName != "Image" .OR. ! oControl:OnePerPage
-            nHeight := MAX( oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
+
+            y  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * y
+
+            nHeight := MAX( y+oControl:PDFCtrl:Attribute( 'Bottom' )-oControl:PDFCtrl:Attribute( 'Top' ), nHeight )
          ENDIF
       CATCH
       END
@@ -262,12 +265,12 @@ METHOD __SetDataSource( oData ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateColumns( hDC ) CLASS VrReport
+METHOD CreateFields( hDC ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
    FOR EACH hCtrl IN ::aBody
-       IF ( UPPER( hCtrl:ClsName ) IN { "VRLABEL", "VRIMAGE" } )
+       //IF ( UPPER( hCtrl:ClsName ) IN { "VRLABEL", "VRIMAGE" } )
           ::CreateControl( hCtrl, @nHeight,, hDC )
-       ENDIF
+       //ENDIF
    NEXT
    ::nRow += nHeight
 RETURN nHeight
@@ -388,19 +391,22 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Load( cReport ) CLASS VrReport
-   LOCAL hCtrl, oDoc := TXmlDocument():New( cReport )
+   LOCAL n, hCtrl, oCtrl, oDoc := TXmlDocument():New( cReport )
 
    ::PrepareArrays( oDoc )
    
    FOR EACH hCtrl IN ::aComponents
-       ::CreateControl( hCtrl,, ::Application:Props:Body )
+       oCtrl := ::CreateControl( hCtrl,, ::Application:Props:Body )
+       IF !EMPTY( ::hProps:DataSource ) .AND. hCtrl:Name == ::hProps:DataSource
+          ::DataSource := oCtrl
+       ENDIF
    NEXT
 
    ::PrintHeader    := ::hProps:PrintHeader    == "1"
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
-
+   
    FOR EACH hCtrl IN ::aHeader
        ::CreateControl( hCtrl,, ::Application:Props:Header )
    NEXT
@@ -449,6 +455,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              oData:OrdSetFocus( hCtrl:Order )
           ENDIF
           hData[ hCtrl:Name ] := oData
+
+          IF !EMPTY( ::hProps:DataSource ) .AND. hCtrl:Name == ::hProps:DataSource
+             ::DataSource := oData
+          ENDIF
+
        ENDIF
    NEXT
 
@@ -465,20 +476,16 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
 //-----------------------------------------------------------------------
 // Now start printing Labels
-/*
+
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
-      ::DataSource:EditCtrl:Select()
-      ::DataSource:EditCtrl:GoTop()
-      AEVAL( ::aSubtotals, {|a| a[2] := 0} )
-      AEVAL( ::aTotals,    {|a| a[2] := 0} )
-      
-      nSubHeight := ::GetSubtotalHeight( hDC )
-      nTotHeight := ::GetTotalHeight( hDC )
+      ::DataSource:Select()
+      ::DataSource:GoTop()
+      nCount := ::DataSource:OrdkeyCount()
       nPos := 0
-      WHILE ! ::DataSource:EditCtrl:Eof()
-         nHeight := ::CreateColumns( hDC )
-         IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) + nSubHeight > ::oPDF:PageLength
-            ::CreateSubtotals( hDC )
+
+      WHILE ! ::DataSource:Eof()
+         nHeight := ::CreateFields( hDC )
+         IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
@@ -489,20 +496,18 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          ENDIF
          oWait:Position := Int( (nPos/nCount)*100 )
          nPos ++
-         ::DataSource:EditCtrl:Skip()
+         ::DataSource:Skip()
       ENDDO
-      ::CreateSubtotals( hDC )
-      IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight - nTotHeight )
+      IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight )
          ::CreateFooter( hDC )
          ::EndPage()
          ::StartPage()
          ::CreateHeader( hDC )
       ENDIF
-      //::CreateTotals( hDC )
     ELSE
-      ::CreateColumns( hDC )
+      ::CreateFields( hDC )
    ENDIF
-*/
+
    ::CreateFooter( hDC )
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
