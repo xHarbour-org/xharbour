@@ -30,6 +30,7 @@ CLASS VrReport INHERIT VrObject
    DATA PrintRepHeader EXPORTED  INIT .T.
    DATA PrintFooter    EXPORTED  INIT .T.
    DATA PrintRepFooter EXPORTED  INIT .T.
+   DATA GroupBy        EXPORTED  INIT ""
 
    DATA ClsName        EXPORTED  INIT "Report"
    DATA Name           EXPORTED  INIT "Report"
@@ -101,13 +102,13 @@ ENDCLASS
 METHOD Init() CLASS VrReport
    ::aProperties := {}
    ::Orientation := __GetSystem():PageSetup:Portrait
-   AADD( ::aProperties, { "Name",           "Object" } )
-   AADD( ::aProperties, { "DataSource",     "Data"   } )
-   AADD( ::aProperties, { "PrintHeader",    "Print"  } )
-   AADD( ::aProperties, { "PrintRepHeader", "Print"  } )
-   AADD( ::aProperties, { "PrintFooter",    "Print"  } )
-   AADD( ::aProperties, { "PrintRepFooter", "Print"  } )
-
+   AADD( ::aProperties, { "Name",           "Object"  } )
+   AADD( ::aProperties, { "DataSource",     "Data"    } )
+   AADD( ::aProperties, { "PrintHeader",    "Print"   } )
+   AADD( ::aProperties, { "PrintRepHeader", "Print"   } )
+   AADD( ::aProperties, { "PrintFooter",    "Print"   } )
+   AADD( ::aProperties, { "PrintRepFooter", "Print"   } )
+   AADD( ::aProperties, { "GroupBy",        "General" } )
    ::InitPDF()
 RETURN Self
 
@@ -265,11 +266,13 @@ METHOD __SetDataSource( oData ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateFields( hDC ) CLASS VrReport
+METHOD CreateFields( hDC, nType ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
    FOR EACH hCtrl IN ::aBody
        //IF ( UPPER( hCtrl:ClsName ) IN { "VRLABEL", "VRIMAGE" } )
+       IF HGetPos( hCtrl, "Type" ) > 0  .AND. VAL(hCtrl:Type) == nType
           ::CreateControl( hCtrl, @nHeight,, hDC )
+       ENDIF
        //ENDIF
    NEXT
    ::nRow += nHeight
@@ -483,9 +486,12 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nCount := ::DataSource:OrdkeyCount()
       nPos := 0
 
+      nHeight := ::CreateFields( hDC, 1 ) // Group header
+
       WHILE ! ::DataSource:Eof()
-         nHeight := ::CreateFields( hDC )
+         nHeight := ::CreateFields( hDC, 2 ) // Create records
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
+            nHeight := ::CreateFields( hDC, 3 ) // Group footer
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
@@ -498,6 +504,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          nPos ++
          ::DataSource:Skip()
       ENDDO
+      ::CreateFields( hDC, 3 )
       IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight )
          ::CreateFooter( hDC )
          ::EndPage()
@@ -505,7 +512,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          ::CreateHeader( hDC )
       ENDIF
     ELSE
-      ::CreateFields( hDC )
+      ::CreateFields( hDC, 1 )
+      ::CreateFields( hDC, 2 )
+      ::CreateFields( hDC, 3 ) // Group footer
    ENDIF
 
    ::CreateFooter( hDC )

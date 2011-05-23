@@ -26,6 +26,8 @@ CLASS VrLabel INHERIT VrObject
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA SubtotalTheme EXPORTED  INIT ""
    DATA nSubtotal     EXPORTED  INIT 0
+   DATA Type          EXPORTED  INIT 2
+   DATA EnumType      EXPORTED  INIT {{"Header","Record","Footer"},{1,2,3}}
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -45,6 +47,7 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
       AADD( ::aProperties, { "Field",      "General" } )
+      AADD( ::aProperties, { "Type",      "General" } )
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
@@ -141,6 +144,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "SubtotalTheme", NIL, ::SubtotalTheme )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Type", NIL, XSTR( ::Type ) )
+   oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
@@ -161,7 +166,7 @@ METHOD Draw( hDC ) CLASS VrLabel
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
    
    lAuto := ::AutoResize
-   
+
    IF ::Text != NIL
       nX := GetDeviceCaps( hDC, LOGPIXELSX )
       nY := GetDeviceCaps( hDC, LOGPIXELSY )
