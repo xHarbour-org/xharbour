@@ -15,39 +15,36 @@
 
 #define  acObjectTypeFrame          2
 
-CLASS VrGroup INHERIT VrObject
-   DATA ClsName       EXPORTED INIT "Group"
-   DATA ShowRectangle EXPORTED INIT .T.
+CLASS VrGroupHeader INHERIT VrObject
+   DATA ClsName       EXPORTED INIT "GroupHeader"
    DATA Objects       EXPORTED INIT {}
-   DATA GroupBy       EXPORTED INIT ""
-   DATA DataSource    EXPORTED
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
    METHOD Configure()
+   METHOD Draw()
    METHOD InvalidateRect(a,l) INLINE ::EditCtrl:InvalidateRect(a,l)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD Init( oParent ) CLASS VrGroup
+METHOD Init( oParent ) CLASS VrGroupHeader
+   ::Height := 20
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      AADD( ::aProperties, { "DataSource", "General" } )
-      AADD( ::aProperties, { "GroupBy", "General" } )
       AADD( ::aProperties, { "Top",    "Position" } )
       AADD( ::aProperties, { "Height", "Size"     } )
       AADD( ::aProperties, { "Name",   "Object"   } )
    ENDIF
 RETURN Self
 
-METHOD Create() CLASS VrGroup
+METHOD Create() CLASS VrGroupHeader
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
    WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
-      :BackColor := ::System:Color:White
+      :BackColor := ::System:Color:Wheat
       :Cargo     := Self
       :Left      := -1
       :Top       := ::Top
@@ -58,23 +55,25 @@ METHOD Create() CLASS VrGroup
    Super:Create()
 RETURN Self
 
-METHOD Configure() CLASS VrGroup
+METHOD Configure() CLASS VrGroupHeader
    WITH OBJECT ::EditCtrl
       :Width  := ::Parent:Width
       :Height := ::Height
    END
 RETURN Self
 
-METHOD WriteProps( oXmlControl ) CLASS VrGroup
+METHOD WriteProps( oXmlControl ) CLASS VrGroupHeader
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy", NIL, XSTR( ::GroupBy ) )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( !EMPTY( ::DataSource ), ::DataSource:Name, "" ) )
-   oXmlControl:addBelow( oXmlValue )
+RETURN Self
+
+METHOD Draw( hDC ) CLASS VrGroupHeader
+   LOCAL oLabel
+   FOR EACH oLabel IN ::Objects
+   NEXT
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------------

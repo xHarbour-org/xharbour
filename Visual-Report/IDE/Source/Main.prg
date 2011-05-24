@@ -819,6 +819,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
    LOCAL aProps, oXmlValue, oXmlControl, oSub
+
    oXmlControl := TXmlNode():new( , "Control" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, oCtrl:ClassName )
       oXmlControl:addBelow( oXmlValue )
@@ -828,7 +829,7 @@ METHOD Generate( oCtrl, oXmlNode ) CLASS Report
       oCtrl:WriteProps( @oXmlControl )
 
    oXmlNode:addBelow( oXmlControl )
-   
+
    FOR EACH oSub IN oCtrl:Objects
        IF oSub:lUI
           ::Generate( oSub, @oXmlControl )

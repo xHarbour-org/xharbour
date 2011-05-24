@@ -17,6 +17,7 @@
 #define  acObjectTypeText           5
 
 CLASS VrObject
+   CLASSDATA aNames INIT {}
    DATA Font        PUBLISHED
 
    DATA lUI         EXPORTED INIT .T.
@@ -28,7 +29,8 @@ CLASS VrObject
    DATA Top         EXPORTED INIT 0
    DATA Width       EXPORTED INIT 150
    DATA Height      EXPORTED INIT 150
-
+   DATA ParName     EXPORTED INIT ""
+   DATA ParCls      EXPORTED INIT ""
    DATA Alignment   EXPORTED INIT 0
    DATA EnumAlignment EXPORTED INIT { { "No Alignment", "Left", "Center", "Right" }, {0,1,2,3} }
 
@@ -96,6 +98,10 @@ METHOD Delete() CLASS VrObject
       ::EditCtrl:Destroy()
       ::Application:Props:Components:Children[1]:Select():SelectComponent()
       ::Parent:InvalidateRect()
+      n := ASCAN( ::aNames, ::Name,,, .T. )
+      IF n > 0
+         ADEL( ::aNames, n, .T. )
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -104,11 +110,13 @@ METHOD SetControlName() CLASS VrObject
    IF UPPER( ::Parent:ClassName ) != "VRREPORT"
       WHILE .T.
          cProp := ::ClsName + XSTR( n )
-         IF ASCAN( ::Parent:Objects, {|o| UPPER(o:Name) == UPPER(cProp) } ) == 0
+         IF ASCAN( ::aNames, cProp,,, .T. ) == 0
             EXIT
          ENDIF
          n ++
       ENDDO
+
+      AADD( ::aNames, cProp )
       ::Name := cProp
       ::Text := cProp
    ENDIF

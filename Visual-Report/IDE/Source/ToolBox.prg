@@ -94,16 +94,16 @@ METHOD Create() CLASS ToolBox
    ::SetItemHeight( ABS( ::Font:Height ) + 9 )
 
    ::aButtons := { { "All", {} },;
-                   { "Components",             {} },;
-                   { "Drawing",                {} } }
+                   { "Components",           {} },;
+                   { "Drawing",              {} } }
 
-   AADD( ::aButtons[2][2], { "Label",     .T. } )
-   AADD( ::aButtons[2][2], { "Theme",     .T. } )
-   AADD( ::aButtons[2][2], { "Total",     .T. } )
-   AADD( ::aButtons[2][2], { "Image",     .T. } )
-   AADD( ::aButtons[2][2], { "DataTable", .T. } )
-   AADD( ::aButtons[2][2], { "Formula",   .T. } )
-   AADD( ::aButtons[2][2], { "Group",     .T. } )
+   AADD( ::aButtons[2][2], { "Label",       .T. } )
+   AADD( ::aButtons[2][2], { "Theme",       .T. } )
+   AADD( ::aButtons[2][2], { "Total",       .T. } )
+   AADD( ::aButtons[2][2], { "Image",       .T. } )
+   AADD( ::aButtons[2][2], { "DataTable",   .T. } )
+   AADD( ::aButtons[2][2], { "Formula",     .T. } )
+   AADD( ::aButtons[2][2], { "GroupHeader", .T. } )
 
    AADD( ::aButtons[3][2], { "Line", .T. } )
 

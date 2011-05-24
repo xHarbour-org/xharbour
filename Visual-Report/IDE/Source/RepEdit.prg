@@ -92,7 +92,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
          DO CASE
             CASE ::nMove == 0 // move
                  oCtrl:Left := IIF( oCtrl:ClsName != "Group", ::Snap( x-::nDownPos[1] ), -1 )
-                 oCtrl:Top  := ::Snap( y-::nDownPos[2] )
+                 oCtrl:Top  := MAX( 0, ::Snap( y-::nDownPos[2] ) )
 
             CASE ::nMove == 1 // Top-Left
                  nx := oCtrl:Left
@@ -156,7 +156,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula, VrGroup
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula, VrGroupHeader
    LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
    
    IF hPointer != NIL

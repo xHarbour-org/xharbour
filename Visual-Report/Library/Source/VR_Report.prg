@@ -77,6 +77,8 @@ CLASS VrReport INHERIT VrObject
    DATA aTotals        EXPORTED  INIT {}
    DATA aFormulas      EXPORTED  INIT {}
 
+   DATA nVirTop        EXPORTED  INIT 0
+
    ACCESS Application  INLINE __GetApplication()
 
    METHOD Init()       CONSTRUCTOR
@@ -87,7 +89,8 @@ CLASS VrReport INHERIT VrObject
    METHOD EndPage()
    METHOD Run()
    METHOD CreateControl()
-   METHOD CreateFields()
+   METHOD CreateRecord()
+   METHOD CreateGroupHeaders()
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
@@ -172,14 +175,16 @@ METHOD Preview() CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
+METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop ) CLASS VrReport
    LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
-
+   DEFAULT nVirTop TO 0
+   DEFAULT nTop TO 0
    IF HGetPos( hCtrl, "Left" ) > 0 
       x := VAL( hCtrl:Left )
    ENDIF
    IF HGetPos( hCtrl, "Top" ) > 0 
-      y := VAL( hCtrl:Top )
+      y := VAL( hCtrl:Top )-nVirTop
+      y += nTop
    ENDIF
 
    IF oPanel == NIL
@@ -189,7 +194,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal ) CLASS VrReport
       oControl:Top  := y
 
       FOR EACH cProp IN hCtrl:Keys
-          IF UPPER(cProp) != "PARNAME" .AND. UPPER( cProp ) != "FONT"
+          IF ! UPPER( cProp ) IN { "FONT","LEFT","TOP" }
              xVar := __objSendMsg( oControl, cProp )
              xValue := hCtrl[ cProp ]
              IF VALTYPE( xVar ) != VALTYPE( xValue )
@@ -266,14 +271,31 @@ METHOD __SetDataSource( oData ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateFields( hDC, nType ) CLASS VrReport
-   LOCAL hCtrl, nHeight := 0
+METHOD CreateGroupHeaders( hDC ) CLASS VrReport
+   LOCAL nTop, n, hCtrl, nHeight := 0
+   ::nVirTop := 0
    FOR EACH hCtrl IN ::aBody
-       //IF ( UPPER( hCtrl:ClsName ) IN { "VRLABEL", "VRIMAGE" } )
-       IF HGetPos( hCtrl, "Type" ) > 0  .AND. VAL(hCtrl:Type) == nType
-          ::CreateControl( hCtrl, @nHeight,, hDC )
+       IF hCtrl:ClsName == "VRGROUPHEADER"
+          ::nVirTop += VAL( hCtrl:Height )
        ENDIF
-       //ENDIF
+       IF hCtrl:ParCls == "VRGROUPHEADER"
+          IF ( n := ASCAN( ::aBody, {|h| h:Name == hCtrl:ParName} ) ) > 0
+             nTop := VAL( ::aBody[n]:Top )
+          ENDIF
+          ::CreateControl( hCtrl, @nHeight,, hDC,,, nTop )
+       ENDIF
+   NEXT
+   ::nRow += ::nVirTop
+RETURN nHeight
+
+//-----------------------------------------------------------------------------------------------
+METHOD CreateRecord( hDC ) CLASS VrReport
+   LOCAL hCtrl, nTop, nHeight := 0
+
+   FOR EACH hCtrl IN ::aBody
+       IF hCtrl:ParCls != "VRGROUPHEADER" .AND. hCtrl:ClsName != "VRGROUPHEADER"
+          ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop )
+       ENDIF
    NEXT
    ::nRow += nHeight
 RETURN nHeight
@@ -311,7 +333,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl, cParName
+   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl, cParName, cParCls
 
    ::hProps := {=>}
    ::hExtra := {=>}
@@ -344,6 +366,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                ELSE
                  hControl[ "ParName" ] := cParName
               ENDIF
+              hControl[ "ParCls"  ] := cParCls
 
          CASE oNode:cName == "Font" 
               hControl[ oNode:cName ] := {=>}
@@ -352,9 +375,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
               hControl[ oNode:cName ] := oNode:cData
-              IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] == "VRGROUP"
+              IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] == "VRGROUPHEADER"
                  cParName := oNode:cData
               ENDIF
+              cParCls := hControl[ "ClsName" ]
 
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""
@@ -478,7 +502,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::CreateHeader( hDC )
 
 //-----------------------------------------------------------------------
-// Now start printing Labels
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()
@@ -486,12 +509,13 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nCount := ::DataSource:OrdkeyCount()
       nPos := 0
 
-      nHeight := ::CreateFields( hDC, 1 ) // Group header
-
+      nHeight := ::CreateGroupHeaders( hDC )
+VIEW ::nRow
       WHILE ! ::DataSource:Eof()
-         nHeight := ::CreateFields( hDC, 2 ) // Create records
+         nHeight := ::CreateRecord( hDC )
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
-            nHeight := ::CreateFields( hDC, 3 ) // Group footer
+
+
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
             ENDIF
@@ -499,12 +523,14 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             ::EndPage()
             ::StartPage()
             ::CreateHeader( hDC )
+
+            ::CreateGroupHeaders( hDC )
          ENDIF
          oWait:Position := Int( (nPos/nCount)*100 )
          nPos ++
          ::DataSource:Skip()
       ENDDO
-      ::CreateFields( hDC, 3 )
+
       IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight )
          ::CreateFooter( hDC )
          ::EndPage()
@@ -512,9 +538,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          ::CreateHeader( hDC )
       ENDIF
     ELSE
-      ::CreateFields( hDC, 1 )
-      ::CreateFields( hDC, 2 )
-      ::CreateFields( hDC, 3 ) // Group footer
+
+
    ENDIF
 
    ::CreateFooter( hDC )
