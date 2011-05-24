@@ -278,7 +278,7 @@ METHOD CreateGroupHeaders( hDC ) CLASS VrReport
        IF hCtrl:ClsName == "VRGROUPHEADER"
           ::nVirTop += VAL( hCtrl:Height )
        ENDIF
-       IF hCtrl:ParCls == "VRGROUPHEADER"
+       IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPHEADER"
           IF ( n := ASCAN( ::aBody, {|h| h:Name == hCtrl:ParName} ) ) > 0
              nTop := VAL( ::aBody[n]:Top )
           ENDIF
@@ -294,7 +294,7 @@ METHOD CreateRecord( hDC ) CLASS VrReport
    LOCAL hCtrl, nTop, nHeight := 0
 
    FOR EACH hCtrl IN ::aBody
-       IF hCtrl:ParCls != "VRGROUPHEADER" .AND. hCtrl:ClsName != "VRGROUPHEADER"
+       IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. hCtrl:ParCls != "VRGROUPHEADER" ) .AND. hCtrl:ClsName != "VRGROUPHEADER"
           ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop )
        ENDIF
    NEXT
@@ -366,8 +366,8 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  cParent := "a" + oNode:oParent:cName
                ELSE
                  hControl[ "ParName" ] := cParName
+                 hControl[ "ParCls"  ] := cParCls
               ENDIF
-              hControl[ "ParCls"  ] := cParCls
 
          CASE oNode:cName == "Font" 
               hControl[ oNode:cName ] := {=>}
@@ -379,7 +379,9 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] == "VRGROUPHEADER"
                  cParName := oNode:cData
               ENDIF
-              cParCls := hControl[ "ClsName" ]
+              IF oNode:cName == "ClsName" .AND. oNode:cData == "VRGROUPHEADER"
+                 cParCls := oNode:cData
+              ENDIF
 
          CASE oNode:oParent:cName == "Font"
               DEFAULT oNode:cData TO ""
