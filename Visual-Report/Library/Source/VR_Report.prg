@@ -285,7 +285,8 @@ METHOD CreateGroupHeaders( hDC ) CLASS VrReport
           ::CreateControl( hCtrl, @nHeight,, hDC,,, nTop )
        ENDIF
    NEXT
-   ::nRow += ::nVirTop
+   n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
+   ::nRow += n
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -510,7 +511,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nPos := 0
 
       nHeight := ::CreateGroupHeaders( hDC )
-VIEW ::nRow
+
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
