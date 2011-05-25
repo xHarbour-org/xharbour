@@ -186,9 +186,10 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
    int iCols, i;
    PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
    LONG lFieldPosWA, lType;
-   char * colName, * sFields, * sParams, * temp;
-   char ident[200];
-   char tablename[100];
+   char * colName, * sFields, * sParams, * temp, *Recname;
+   char ident[200] = {0};
+   char tablename[100] = {0};
+   char declare[200] = {0};
    char cType;
    BOOL bNullable, bMultiLang, bIsMemo;
    COLUMNBINDP InsertRecord;
@@ -220,6 +221,7 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
       bMultiLang   = hb_arrayGetL( pFieldStruct, FIELD_MULTILANG );
       bIsMemo      = cType == 'M';
 
+  
       if( i != (int)(thiswa->ulhRecno) )      // RECNO is never included in INSERT column list
       {
          temp = hb_strdup( (const char *) sFields );
@@ -307,7 +309,10 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
    case SYSTEMID_MSSQL7:
    case SYSTEMID_SYBASE:
    {
-      sprintf( ident, "; SELECT @@IDENTITY ;" );
+      //sprintf( ident, "; SELECT @@IDENTITY ;" );
+      sprintf( ident, "SELECT %s FROM @InsertedData;",thiswa->sRecnoName);
+      
+      sprintf( declare,"Declare @InsertedData table ( %s numeric(15,0) );",thiswa->sRecnoName);
       break;
    }
    case SYSTEMID_FIREBR:
@@ -343,8 +348,16 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
    }
    if ( thiswa->sSql ) 
    memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
+   if (thiswa->nSystemID ==  SYSTEMID_MSSQL7 )
+   {
+		 sprintf( thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare, thiswa->sTable, sFields, thiswa->sRecnoName, sParams ,ident);
+   }   
+   else
+   {
    sprintf( thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable, sFields, sParams, ident );
+   }   
 
+      
    hb_xfree( sFields );
    hb_xfree( sParams );
 }
@@ -596,8 +609,8 @@ HB_ERRCODE ExecuteInsertStmt( SQLEXAREAP thiswa )
    case SYSTEMID_MYSQL:
    {
       SQLRETURN res;
-      char ident[200];
-      char tablename[100];
+      char ident[200]={0};
+      char tablename[100]={0};
 
       if( thiswa->hStmtNextval == NULL )
       {

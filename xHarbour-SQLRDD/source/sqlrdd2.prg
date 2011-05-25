@@ -5828,6 +5828,12 @@ METHOD sqlZap() CLASS SR_WORKAREA
          ::oSql:exec( "SET GENERATOR " + ::cFileName + " TO 0" )
          ::oSql:Commit()
       EndIf
+      If ::oSql:nSystemID == SYSTEMID_POSTGR .and. ::oSql:lUseSequences .and. ::lUseSequences
+         ::oSql:Commit()
+         ::oSql:exec( "select setval(" +::cOwner + LimitLen(::cFileName,3) + "_SQ  , 0)" )
+         ::oSql:Commit()
+      EndIf
+      
 /*
       If ::oSql:nSystemID == SYSTEMID_ORACLE .and.  .and. ::lUseSequences
          ::oSql:commit()

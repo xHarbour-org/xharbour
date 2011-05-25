@@ -57,8 +57,9 @@
 #define SQL_TYPE_DATE                       91
 #define SQL_TYPE_TIME                       92
 #define SQL_TYPE_TIMESTAMP                  93
+#if !defined (SQL_DATETIME)
 #define SQL_DATETIME                        -40
-
+#endif
 #define SQL_VARCHAR                         12
 #define SQL_NVARCHAR                        -9
 #define SQL_C_WCHAR			                 SQL_WCHAR

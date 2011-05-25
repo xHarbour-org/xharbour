@@ -8,9 +8,15 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-05-25 07:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlex2.c
+     ! fixed generation of sr_recno in multiple connection under sqlserver
+   ! source/sqlrdd2.prg
+     ! updated sqlzap method to reset sequence number under postgresql
+       
 2011-05-15 10:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlrdd2.prg
-     ! fixed generation of sr_recno in multiple connection
+     ! fixed generation of sr_recno in multiple connection  under sqlserver
      
 2011-05-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlrdd1.c
