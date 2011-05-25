@@ -17,6 +17,7 @@ static aDef := {"BMP","ICO"}
 #include "debug.ch"
 #include "error.ch"
 #include "uxTheme.ch"
+#include "dbinfo.ch"
 
 #define CTYPE_BOOL                 9
 #define PP_MOVEOVERLAY 8
@@ -6148,3 +6149,6 @@ FUNCTION __ChkComponent( oObj, ocCompo )
       ENDIF
    ENDIF
 RETURN ocCompo
+
+FUNCTION KeyCountRaw( xOrder, cBag )
+RETURN dbOrderInfo( DBOI_KEYCOUNTRAW, cBag, xOrder )
