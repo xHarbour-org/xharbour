@@ -156,7 +156,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula, VrGroupHeader
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTheme, VrTotal, VrFormula, VrGroupHeader, VrGroupFooter
    LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
    
    IF hPointer != NIL

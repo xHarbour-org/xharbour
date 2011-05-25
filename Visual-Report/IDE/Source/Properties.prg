@@ -218,7 +218,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
        ELSEIF xProp == "FileName" .AND. ::ActiveObject:ClsName == "Image"
          xProp := "ImageName"
       ENDIF
-      IF cProp IN {"GroupBy","Field"}
+      IF cProp IN {"GroupBy","Field","Order"}
          xValue := cCaption
       ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
@@ -383,16 +383,20 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
              CASE "A"
                   // DataSource falls here
                   cText  := cText[1]
-                  IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. !EMPTY( ::ActiveObject:DataSource )
-                     cText := ::ActiveObject:DataSource:Name
-                   ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
-                     cText := ::ActiveObject:Formula
-                   ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
-                     cText := ::ActiveObject:SubtotalTheme
-                   ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
-                     cText := ::ActiveObject:GroupBy
-                   ELSEIF oItem:ColItems[n]:ColType IN "FIELD"
-                     cText := ::ActiveObject:Field
+                  IF ::ActiveObject != NIL
+                     IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. !EMPTY( ::ActiveObject:DataSource )
+                        cText := ::ActiveObject:DataSource:Name
+                      ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
+                        cText := ::ActiveObject:Formula
+                      ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
+                        cText := ::ActiveObject:SubtotalTheme
+                      ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
+                        cText := ::ActiveObject:GroupBy
+                      ELSEIF oItem:ColItems[n]:ColType IN "FIELD"
+                        cText := ::ActiveObject:Field
+                      ELSEIF oItem:ColItems[n]:ColType IN "ORDER"
+                        cText := ::ActiveObject:Order
+                     ENDIF
                   ENDIF
                   EXIT
 
@@ -736,7 +740,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY", "FIELD" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY", "FIELD", "ORDER" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -754,7 +758,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 
                            FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
                                IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
-                                  IF ! cType IN {"GROUPBY","FIELD"}
+                                  IF ! cType IN {"GROUPBY","FIELD","ORDER"}
                                      :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
                                    ELSE
                                      :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n] )
@@ -845,6 +849,15 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
+
+        ELSEIF UPPER(cProp) IN {"ORDER"}
+          aCol[1]:ColType := "ORDER"
+          aCol[1]:Value   := { "", { NIL } }
+          FOR n := 1 TO ::ActiveObject:EditCtrl:OrdCount()
+              AADD( aCol[1]:Value[2], ::ActiveObject:EditCtrl:OrdName(n) )
+          NEXT
+          xValue := NIL
+
         ELSEIF UPPER(cProp) IN {"GROUPBY"}
           aCol[1]:ColType := UPPER(cProp)
           aCol[1]:Value   := { "", { NIL } }

@@ -17,6 +17,7 @@
 
 CLASS VrGroupHeader INHERIT VrObject
    DATA ClsName       EXPORTED INIT "GroupHeader"
+   DATA BackColor     EXPORTED
    DATA Objects       EXPORTED INIT {}
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -30,6 +31,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS VrGroupHeader
    ::Height := 20
+   ::BackColor := ::System:Color:Wheat
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
@@ -44,7 +46,7 @@ METHOD Create() CLASS VrGroupHeader
       RETURN ::Draw()
    ENDIF
    WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
-      :BackColor := ::System:Color:Wheat
+      :BackColor := ::BackColor
       :Cargo     := Self
       :Left      := -1
       :Top       := ::Top
@@ -133,3 +135,13 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
+
+CLASS VrGroupFooter INHERIT VrGroupHeader
+   DATA ClsName EXPORTED INIT "GroupFooter"
+   METHOD Init() CONSTRUCTOR
+ENDCLASS
+
+METHOD Init( oParent ) CLASS VrGroupFooter
+   Super:Init( oParent )
+   ::BackColor := ::System:Color:LtSteelBlue
+RETURN Self

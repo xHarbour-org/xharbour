@@ -49,3 +49,17 @@ MYRC_FLAGS =
 [Ole.lib]
 
 [sql.lib]
+
+[rmdbfcdx.lib]
+
+[ads.lib]
+
+[ace32.lib]
+
+[libmysql.lib]
+
+[libpq.lib]
+
+[oci.lib]
+
+[fbclient_ms.lib]

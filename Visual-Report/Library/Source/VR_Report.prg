@@ -91,6 +91,7 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateControl()
    METHOD CreateRecord()
    METHOD CreateGroupHeaders()
+   METHOD CreateGroupFooters()
    METHOD CreateHeader()
    METHOD CreateFooter()
    METHOD CreateExtraPage()
@@ -290,11 +291,26 @@ METHOD CreateGroupHeaders( hDC ) CLASS VrReport
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
+METHOD CreateGroupFooters( hDC ) CLASS VrReport
+   LOCAL nTop, n, hCtrl, nHeight := 0
+   ::nVirTop := 0
+   FOR EACH hCtrl IN ::aBody
+       IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPFOOTER"
+          IF ( n := ASCAN( ::aBody, {|h| h:Name == hCtrl:ParName} ) ) > 0
+             nTop := VAL( ::aBody[n]:Top )
+          ENDIF
+          ::CreateControl( hCtrl, @nHeight,, hDC,,, nTop )
+       ENDIF
+   NEXT
+   n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
+   ::nRow += n
+RETURN nHeight
+
+//-----------------------------------------------------------------------------------------------
 METHOD CreateRecord( hDC ) CLASS VrReport
    LOCAL hCtrl, nTop, nHeight := 0
-
    FOR EACH hCtrl IN ::aBody
-       IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. hCtrl:ParCls != "VRGROUPHEADER" ) .AND. hCtrl:ClsName != "VRGROUPHEADER"
+       IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","GROUPFOOTER"})
           ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop )
        ENDIF
    NEXT
@@ -376,10 +392,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
               hControl[ oNode:cName ] := oNode:cData
-              IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] == "VRGROUPHEADER"
+              IF oNode:cName == "Name" .AND. hControl[ "ClsName" ] IN {"VRGROUPHEADER","VRGROUPFOOTER"}
                  cParName := oNode:cData
               ENDIF
-              IF oNode:cName == "ClsName" .AND. oNode:cData == "VRGROUPHEADER"
+              IF oNode:cName == "ClsName" .AND. oNode:cData IN {"VRGROUPHEADER","VRGROUPFOOTER"}
                  cParCls := oNode:cData
               ENDIF
 
@@ -518,6 +534,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          nHeight := ::CreateRecord( hDC )
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
 
+            ::CreateGroupFooters( hDC )
 
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )

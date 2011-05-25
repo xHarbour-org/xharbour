@@ -34,8 +34,12 @@ CLASS VrObject
    DATA Alignment   EXPORTED INIT 0
    DATA EnumAlignment EXPORTED INIT { { "No Alignment", "Left", "Center", "Right" }, {0,1,2,3} }
 
-   DATA Application EXPORTED
+   ACCESS Application INLINE __GetApplication()
+   ACCESS System      INLINE __GetSystem()
+
    DATA System      EXPORTED
+
+
    DATA Parent      EXPORTED
    DATA ClsName     EXPORTED
    DATA __ClsInst   EXPORTED
@@ -66,8 +70,6 @@ CLASS VrObject
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject
-   ::Application := __GetApplication()
-   ::System      := __GetSystem()
    ::Parent      := oParent
    IF ::Parent != NIL
       ::SetControlName()

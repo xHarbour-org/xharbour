@@ -19,7 +19,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA FileName         EXPORTED INIT ""
    DATA Alias            EXPORTED INIT ""
    DATA lUI              EXPORTED INIT .F.
-
+   DATA Driver           EXPORTED
    DATA DataTable        EXPORTED
    DATA ClsName          EXPORTED INIT "DataTable"
    DATA SysBackColor     EXPORTED INIT GetSysColor( COLOR_WINDOW )
@@ -27,11 +27,13 @@ CLASS VrDataTable INHERIT VrObject
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Order            EXPORTED INIT ""
    DATA bFilter          EXPORTED  INIT ""
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
+
+   DATA Order            EXPORTED INIT ""
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
@@ -48,6 +50,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "Alias",     "General"  } )
       AADD( ::aProperties, { "bFilter",   "General"  } )
       AADD( ::aProperties, { "Name",      "Object"   } )
+      AADD( ::aProperties, { "Driver",    "Object"   } )
       AADD( ::aProperties, { "Order",     "Index"    } )
    ENDIF
 RETURN Self
@@ -56,6 +59,7 @@ METHOD Create() CLASS VrDataTable
 
    WITH OBJECT ::EditCtrl := DataTable( ::Parent )
       :FileName := ::FileName
+      :Driver   := ::Driver
       IF !EMPTY( ::Alias )
          :Alias := ::Alias
       ENDIF
@@ -96,6 +100,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, XSTR( ::bFilter ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, XSTR( ::Order ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, XSTR( ::Driver ) )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
