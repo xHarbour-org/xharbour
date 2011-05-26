@@ -80,6 +80,9 @@ FUNCTION CStr( xExp )
       CASE 'D'
          RETURN dToS( xExp )
 
+      CASE 'T'
+         RETURN tToS( xExp )
+
       CASE 'L'
          RETURN IIF( xExp, '.T.', '.F.' )
 
@@ -111,7 +114,7 @@ RETURN ""
 FUNCTION CStrToVal( cExp, cType )
 
    IF ValType( cExp ) != 'C'
-      Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
+      Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
    ENDIF
 
    SWITCH cType
@@ -127,6 +130,9 @@ FUNCTION CStrToVal( cExp, cType )
          ELSE
             RETURN cToD( cExp )
          ENDIF
+
+      CASE 'T'
+         RETURN sToT( cExp )
 
       CASE 'L'
          RETURN IIF( cExp[1] == 'T' .OR. cExp[1] == 'Y' .OR. cExp[2] == 'T' .OR. cExp[2] == 'Y', .T., .F. )
