@@ -19,7 +19,7 @@ static oApp
 
 PROCEDURE Main( cFile )
    SET CENTURY ON
-   SET AUTOPEN OFF
+   SET AUTOPEN ON
    REQUEST DBFNTX, DBFDBT, DBFCDX, DBFFPT, ADS, RMDBFCDX, SQLRDD, SR_ODBC, SR_MYSQL, SR_FIREBIRD, SQLEX
 
    RepApp( cFile )
@@ -894,6 +894,9 @@ METHOD Save( lSaveAs ) CLASS Report
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintFooter", NIL, IIF( ::VrReport:PrintFooter, "1", "0" ) )
             oXmlProp:addBelow( oXmlSource )
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepFooter", NIL, IIF( ::VrReport:PrintRepFooter, "1", "0" ) )
+            oXmlProp:addBelow( oXmlSource )
+
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy", NIL, ::VrReport:GroupBy )
             oXmlProp:addBelow( oXmlSource )
 
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( ::VrReport:DataSource != NIL, ::VrReport:DataSource:Name, "" ) )

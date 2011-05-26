@@ -452,6 +452,7 @@ METHOD Load( cReport ) CLASS VrReport
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
+   ::GroupBy        := ::hProps:GroupBy
    
    FOR EACH hCtrl IN ::aHeader
        ::CreateControl( hCtrl,, ::Application:Props:Header )
@@ -474,6 +475,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
+   LOCAL xValue
 
    ::Create()
 
@@ -485,10 +487,12 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
+   ::GroupBy        := ::hProps:GroupBy
 
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           oData := DataTable( NIL )
+          oData:Driver   := hCtrl:Driver
           oData:FileName := hCtrl:FileName
           IF !EMPTY( hCtrl:Alias )
              oData:Alias := hCtrl:Alias
@@ -520,8 +524,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    
    ::CreateHeader( hDC )
 
-//-----------------------------------------------------------------------
-
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()
       ::DataSource:GoTop()
@@ -529,12 +531,19 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nPos := 0
 
       nHeight := ::CreateGroupHeaders( hDC )
-
+      IF !EMPTY(::GroupBy)
+         xValue := ::DataSource:Fields:&(::GroupBy)
+      ENDIF
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
+         IF xValue != NIL .AND. ::DataSource:Fields:&(::GroupBy) != xValue
+            xValue  := ::DataSource:Fields:&(::GroupBy)
+            ::nRow += 100
+            nHeight := ::CreateGroupFooters( hDC )
+            ::nRow += 100
+            nHeight := ::CreateGroupHeaders( hDC )
+         ENDIF
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
-
-            ::CreateGroupFooters( hDC )
 
             IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
                ::CreateExtraPage( hDC )
