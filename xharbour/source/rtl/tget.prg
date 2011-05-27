@@ -318,6 +318,7 @@ METHOD ParsePict( cPicture ) CLASS Get
       nPos := At("P",::cPicFunc)
       if nPos > 0 .and. ::Type == "C"
          ::lPassWord := .T.
+         ::nPassWordLen := Len( Rtrim(::xVarGet) )
          if Len(::cPicFunc) > nPos .and. ! Empty(::cPicFunc[nPos+1])
             ::cPassWordChar := ::cPicFunc[nPos+1]
          endif
@@ -1332,7 +1333,7 @@ METHOD overstrike( cChar ) CLASS Get
    endif
 
 
-   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() )
+   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() ) .OR. ( ::lPassword .AND. ::nPasswordLen > ::Pos )
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1365,9 +1366,9 @@ METHOD overstrike( cChar ) CLASS Get
    //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
    //                !( ::unTransform() == ::Original )
    ::Right( .f. )
-   
+
    if ::lPassword
-      ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen)
+      ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen )
    endif
 
    if ::type == "D"
@@ -1405,7 +1406,7 @@ METHOD Insert( cChar ) CLASS Get
       ::Rejected := .f.
    endif
 
-   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() )
+   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() ) .OR. ( ::lPassword .AND. ::nPasswordLen > ::Pos )
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1452,7 +1453,7 @@ METHOD Insert( cChar ) CLASS Get
    //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
    //                !( ::unTransform() == ::Original )
    ::Right( .f. )
-   
+
    if ::lPassword
       ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen)
    endif

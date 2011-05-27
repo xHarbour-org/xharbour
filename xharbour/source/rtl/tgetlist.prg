@@ -400,10 +400,10 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
    #endif
 
       case K_INS
-         if ! lPassword
-            Set( _SET_INSERT, ! Set( _SET_INSERT ) )
-            ::ShowScoreboard()
-         endif
+         //if ! lPassword
+         Set( _SET_INSERT, ! Set( _SET_INSERT ) )
+         ::ShowScoreboard()
+         //endif
          /* 2007/SEP/24 - EF - Toggle cursor shape at insert mode on/off
           *               Uncomment it, if you want this behaviour.
           *if ::nSaveCursor != SC_NONE

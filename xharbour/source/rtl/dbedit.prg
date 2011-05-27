@@ -715,12 +715,17 @@ STATIC FUNCTION dbe_emptydb()
 *-------------------------------------*
 Local lEmpty
 
+ if LastRec() = 0
+    Return .T.
+ endif
+
  if ! Empty( dbFilter() )
-    lEmpty := ( eof() .or. recno() > Lastrec() )
+    lEmpty := ( Eof() .or. Recno() > Lastrec() )
  elseif IndexOrd() = 0
-    lEmpty := ( ( eof() .or. recNo() > LastRec() ) .and. bof() )
+    lEmpty := ( ( Eof() .or. Recno() > LastRec() ) .and. Bof() )
  else
-    lEmpty := ( OrdKeyCount() = 0  )
+    //lEmpty := ( OrdKeyCount() = 0  ) // this code decrease dbedit's speed at large table.
+    lEmpty := ( OrdKeyNo() = 0 )
  endif
 
 RETURN lEmpty
