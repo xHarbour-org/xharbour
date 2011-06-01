@@ -296,10 +296,7 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
    ::nVirTop := 0
    FOR EACH hCtrl IN ::aBody
        IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPFOOTER"
-          IF ( n := ASCAN( ::aBody, {|h| h:Name == hCtrl:ParName} ) ) > 0
-             nTop := VAL( ::aBody[n]:Top )
-          ENDIF
-          ::CreateControl( hCtrl, @nHeight,, hDC,,, nTop )
+          ::CreateControl( hCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
@@ -540,7 +537,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             xValue  := ::DataSource:Fields:&(::GroupBy)
             ::nRow += 100
             nHeight := ::CreateGroupFooters( hDC )
-            ::nRow += 100
+            ::nRow += 1000
             nHeight := ::CreateGroupHeaders( hDC )
          ENDIF
          IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
