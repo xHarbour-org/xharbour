@@ -179,7 +179,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    cProp := oItem:ColItems[1]:Prop
    cProp2:= oItem:ColItems[1]:Prop2
 
-   IF cProp IN {"SubtotalTheme"}
+   IF cProp IN {"Column"}
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
       RETURN NIL
    ENDIF
@@ -388,8 +388,8 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                         cText := ::ActiveObject:DataSource:Name
                       ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
                         cText := ::ActiveObject:Formula
-                      ELSEIF oItem:ColItems[n]:ColType == "SUBTOTALTHEME"
-                        cText := ::ActiveObject:SubtotalTheme
+                      ELSEIF oItem:ColItems[n]:ColType == "COLUMN"
+                        cText := ::ActiveObject:Column
                       ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
                         cText := ::ActiveObject:GroupBy
                       ELSEIF oItem:ColItems[n]:ColType IN "FIELD"
@@ -740,7 +740,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "SUBTOTALTHEME", "GROUPBY", "FIELD", "ORDER" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -898,11 +898,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           NEXT
           xValue := NIL
         
-        ELSEIF UPPER(cProp) == "SUBTOTALTHEME"
-          aCol[1]:ColType := "SUBTOTALTHEME"
+        ELSEIF UPPER(cProp) == "COLUMN"
+          aCol[1]:ColType := "COLUMN"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Body:Objects
-              IF Child:ClsName == "Theme"
+              IF Child:ClsName == "Label"
                  AADD( aCol[1]:Value[2], Child )
               ENDIF
           NEXT

@@ -100,6 +100,7 @@ CLASS VrReport INHERIT VrObject
    METHOD InitPDF()
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
    METHOD __SetDataSource()
+   METHOD ChangePage()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -176,7 +177,7 @@ METHOD Preview() CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop ) CLASS VrReport
+METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal ) CLASS VrReport
    LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
    DEFAULT nVirTop TO 0
    DEFAULT nTop TO 0
@@ -245,7 +246,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop ) CLASS V
    ENDIF
 
    IF oPanel == NIL
-      oControl:Draw( hDC )
+      oControl:Draw( hDC, hTotal )
       TRY
          IF oControl:ClsName != "Image" .OR. ! oControl:OnePerPage
 
@@ -296,6 +297,14 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
    ::nVirTop := 0
    FOR EACH hCtrl IN ::aBody
        IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPFOOTER"
+          IF hCtrl:ClsName=="VRTOTAL"
+             IF VALTYPE( hCtrl:Value ) == "N"
+                hCtrl:Text := XSTR( hCtrl:Value )
+                hCtrl:Value := ""
+             ELSE
+                hCtrl:Text := &(hCtrl:Value)
+             ENDIF
+          ENDIF
           ::CreateControl( hCtrl, @nHeight,, hDC )
        ENDIF
    NEXT
@@ -305,10 +314,16 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateRecord( hDC ) CLASS VrReport
-   LOCAL hCtrl, nTop, nHeight := 0
+   LOCAL hCtrl, nTop, nHeight := 0, oCtrl, n, hTotal
    FOR EACH hCtrl IN ::aBody
        IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","GROUPFOOTER"})
-          ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop )
+
+          IF ( n := ASCAN( ::aBody, {|h| h:ClsName=="VRTOTAL" .AND. h:Column==hCtrl:Name} ) ) > 0
+             hTotal := ::aBody[n]
+          ENDIF
+
+          oCtrl := ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop,, hTotal )
+          
        ENDIF
    NEXT
    ::nRow += nHeight
@@ -537,21 +552,15 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             xValue  := ::DataSource:Fields:&(::GroupBy)
             ::nRow += 100
             nHeight := ::CreateGroupFooters( hDC )
+            ::ChangePage( hDC, nHeight )
+
             ::nRow += 1000
             nHeight := ::CreateGroupHeaders( hDC )
+            ::ChangePage( hDC, nHeight )
+          ELSE
+            ::ChangePage( hDC, nHeight )
          ENDIF
-         IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
 
-            IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
-               ::CreateExtraPage( hDC )
-            ENDIF
-            ::CreateFooter( hDC )
-            ::EndPage()
-            ::StartPage()
-            ::CreateHeader( hDC )
-
-            ::CreateGroupHeaders( hDC )
-         ENDIF
          oWait:Position := Int( (nPos/nCount)*100 )
          nPos ++
          ::DataSource:Skip()
@@ -580,6 +589,20 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    hb_gcall(.t.)
    HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
 RETURN Self
+
+METHOD ChangePage( hDC, nHeight )
+   IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
+      IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
+         ::CreateExtraPage( hDC )
+      ENDIF
+      ::CreateFooter( hDC )
+      ::EndPage()
+      ::StartPage()
+      ::CreateHeader( hDC )
+      ::CreateGroupHeaders( hDC )
+   ENDIF
+RETURN Self
+
 
 FUNCTION S2R( hDC, cSize ); RETURN VAL(cSize)*PIX_PER_INCH/GetDeviceCaps( hDC, LOGPIXELSY )
 //-----------------------------------------------------------------------------------------------

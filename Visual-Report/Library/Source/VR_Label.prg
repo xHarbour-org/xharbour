@@ -24,10 +24,8 @@ CLASS VrLabel INHERIT VrObject
    DATA SysForeColor  EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
-   DATA SubtotalTheme EXPORTED  INIT ""
-   DATA nSubtotal     EXPORTED  INIT 0
-   //DATA Type          EXPORTED  INIT 2
    DATA EnumType      EXPORTED  INIT {{"Header","Record","Footer"},{1,2,3}}
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -43,11 +41,11 @@ METHOD Init( oParent ) CLASS VrLabel
       Super:Init( oParent )
       AADD( ::aProperties, { "BackColor",  "Color"   } )
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
-      AADD( ::aProperties, { "SubtotalTheme", "Color" } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
-      AADD( ::aProperties, { "Field",      "General" } )
-      //AADD( ::aProperties, { "Type",      "General" } )
+      IF ::ClsName == "Label"
+         AADD( ::aProperties, { "Field",      "General" } )
+      ENDIF
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
@@ -142,10 +140,6 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "1", "0" ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "SubtotalTheme", NIL, ::SubtotalTheme )
-   oXmlControl:addBelow( oXmlValue )
-//   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Type", NIL, XSTR( ::Type ) )
-//   oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FaceName", NIL, XSTR( ::Font:FaceName ) )
@@ -161,7 +155,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlFont )
 RETURN Self
 
-METHOD Draw( hDC ) CLASS VrLabel
+METHOD Draw( hDC, hTotal ) CLASS VrLabel
    LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
    
@@ -182,6 +176,12 @@ METHOD Draw( hDC ) CLASS VrLabel
       WITH OBJECT ::PDFCtrl
          IF !EMPTY( ::Field )
             cText := ::Parent:DataSource:Fields:&(::Field)
+            IF hTotal != NIL .AND. VALTYPE(cText) == "N"
+               IF EMPTY( hTotal:Value )
+                  hTotal:Value := 0
+               ENDIF
+               hTotal:Value += cText
+            ENDIF
           ELSE
             cText := ::Text
          ENDIF
@@ -235,6 +235,10 @@ METHOD Draw( hDC ) CLASS VrLabel
       END
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
 
 CLASS __VrLabel INHERIT Label
    DATA aSize EXPORTED INIT {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
@@ -336,3 +340,31 @@ FUNCTION DecToHexa(nNumber)
       nNumber    := Int( (nNumber-nTemp)/16 )
    ENDDO
 RETURN cNewString
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+CLASS VrTotal INHERIT VrLabel
+   DATA ClsName EXPORTED INIT "Total"
+   DATA Column  EXPORTED INIT ""
+   DATA Value   EXPORTED INIT ""
+   METHOD Init() CONSTRUCTOR
+   METHOD WriteProps()
+ENDCLASS
+
+//-----------------------------------------------------------------------------------------------------------------------------------
+METHOD Init( oParent ) CLASS VrTotal
+   Super:Init( oParent )
+   AADD( ::aProperties, { "Column",      "Data"  } )
+   AADD( ::aProperties, { "Value",       "Data"  } )
+RETURN Self
+
+METHOD WriteProps( oXmlControl ) CLASS VrTotal
+   LOCAL oXmlValue, oXmlFont
+   Super:WriteProps( oXmlControl )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Column", NIL, ::Column )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Value", NIL, ::Value )
+   oXmlControl:addBelow( oXmlValue )
+RETURN Self
