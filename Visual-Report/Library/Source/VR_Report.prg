@@ -318,6 +318,15 @@ METHOD CreateRecord( hDC ) CLASS VrReport
    FOR EACH hCtrl IN ::aBody
        IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","GROUPFOOTER"})
 
+//           IF hCtrl:ClsName=="VRTOTAL"
+//              IF VALTYPE( hCtrl:Value ) == "N"
+//                 hCtrl:Text := XSTR( hCtrl:Value )
+//                 hCtrl:Value := ""
+//              ELSE
+//                 hCtrl:Text := &(hCtrl:Value)
+//              ENDIF
+//           ENDIF
+
           IF ( n := ASCAN( ::aBody, {|h| h:ClsName=="VRTOTAL" .AND. h:Column==hCtrl:Name} ) ) > 0
              hTotal := ::aBody[n]
           ENDIF

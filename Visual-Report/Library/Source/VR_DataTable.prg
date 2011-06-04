@@ -68,7 +68,7 @@ METHOD Create() CLASS VrDataTable
          :SetFilter( &(::bFilter) )
       ENDIF
       IF ! EMPTY( ::Order )
-         VIEW :OrdSetFocus( ::Order )
+         :OrdSetFocus( ::Order )
       ENDIF
    END
 
@@ -80,8 +80,9 @@ METHOD Configure() CLASS VrDataTable
       :xFileName := ::FileName
       :Driver   := ::Driver
       IF !EMPTY( ::Alias )
-         :Alias := ::Alias
+         :Alias := ::Alias 
       ENDIF
+
       :Create()
       IF ! EMPTY( ::bFilter )
          :SetFilter( &(::bFilter) )

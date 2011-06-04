@@ -18,10 +18,11 @@
 
 CLASS VrObject
    CLASSDATA aNames INIT {}
+   
+   PROPERTY Name READ xName WRITE SetControlName
    DATA Font        PUBLISHED
 
    DATA lUI         EXPORTED INIT .T.
-   DATA Name        EXPORTED
    DATA Text        EXPORTED
    DATA Objects     EXPORTED INIT {}
 
@@ -107,19 +108,29 @@ METHOD Delete() CLASS VrObject
    ENDIF
 RETURN Self
 
-METHOD SetControlName() CLASS VrObject
-   LOCAL cProp, n := 1
+METHOD SetControlName( cProp ) CLASS VrObject
+   LOCAL n := 1
    IF UPPER( ::Parent:ClassName ) != "VRREPORT"
-      WHILE .T.
-         cProp := ::ClsName + XSTR( n )
-         IF ASCAN( ::aNames, cProp,,, .T. ) == 0
-            EXIT
+      IF !EMPTY(cProp) .AND. !EMPTY(::xName)
+         IF UPPER(cProp) == UPPER(::xName)
+            RETURN Self
          ENDIF
-         n ++
-      ENDDO
-
+         IF ( n := ASCAN( ::aNames, ::xName,,, .T. ) ) > 0
+            ADEL( ::aNames, n, .T. )
+         ENDIF
+      ENDIF
+      IF cProp == NIL
+         n := 1
+         WHILE .T.
+            cProp := ::ClsName + XSTR( n )
+            IF ASCAN( ::aNames, cProp,,, .T. ) == 0
+               EXIT
+            ENDIF
+            n ++
+         ENDDO
+      ENDIF
       AADD( ::aNames, cProp )
-      ::Name := cProp
+      ::xName := cProp
       ::Text := cProp
    ENDIF
 RETURN n
