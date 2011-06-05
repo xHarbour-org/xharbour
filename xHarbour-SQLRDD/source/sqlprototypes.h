@@ -17,6 +17,7 @@ BOOL HB_EXPORT sr_lHideHistoric(void);
 BOOL HB_EXPORT sr_isMultilang(void);
 BOOL HB_EXPORT sr_isShutdownProcess(void);
 BOOL HB_EXPORT sr_UseDeleteds(void);
+BOOL HB_EXPORT sr_lSerializeArrayAsJson( void );
 
 #ifdef SQLRDD_COMPAT_PRE_1_1
    BOOL hb_arraySetNL( PHB_ITEM pArray, ULONG ulIndex, LONG ulVal );

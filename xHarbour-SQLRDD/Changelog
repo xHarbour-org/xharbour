@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-06-05 18:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlprototypes.h
+     ! added missing prototype for sr_lSerializeArrayAsJson()
+     
 2011-05-25 07:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlex2.c
      ! fixed generation of sr_recno in multiple connection under sqlserver
