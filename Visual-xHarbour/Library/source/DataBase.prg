@@ -409,6 +409,7 @@ CLASS DataRdd
    METHOD SetRelation()
    METHOD FieldPut( nField, xVal )            INLINE (::Owner:Alias)->( FieldPut( nField, xVal ) )
    METHOD FieldGet( nField )                  INLINE (::Owner:Alias)->( FieldGet( nField ) )
+   METHOD CreateTable()                       INLINE dbCreate( ::Owner:File, ::Owner:Structure, ::Owner:Driver )
    METHOD Gather()
    METHOD Scatter( aData )
    METHOD OrdKeyRelPos(n)

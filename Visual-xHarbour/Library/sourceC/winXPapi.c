@@ -217,8 +217,8 @@ HB_FUNC( GETTHEMEFONT )
            OutputDebugString( "1" );
            hRet = pfn( (HTHEME) hb_parnl(1), ISNIL(2) ? NULL : (HDC) hb_parnl(2), hb_parni(3), hb_parni(4), TMT_FONT, &pFont );
 
-FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hRet, 0, (LPTSTR) &Buffer, 0, NULL );
-OutputDebugString( (LPCSTR) Buffer );
+//FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hRet, 0, (LPTSTR) &Buffer, 0, NULL );
+//OutputDebugString( (LPCSTR) Buffer );
 
            if( hRet == S_OK )
            {
@@ -589,23 +589,27 @@ HB_FUNC( GETCURRENTTHEMENAME )
    if( hUxTheme )
    {
       fnGetCurrentThemeName pfn = (fnGetCurrentThemeName) GetProcAddress( hUxTheme, "GetCurrentThemeName" );
-
       if( pfn )
       {
          HRESULT hRet;
          WCHAR currentTheme[MAX_PATH];
          WCHAR currentColor[MAX_PATH];
          WCHAR currentSize[MAX_PATH];
-
          //hRet = (HRESULT) pfn( currentTheme, sizeof(currentTheme) / sizeof(WCHAR), currentColor, sizeof(currentColor) / sizeof(WCHAR), currentSize, sizeof(currentSize) / sizeof(WCHAR) );
 
          hRet = (HRESULT) pfn( currentTheme, 256, currentColor, 256, currentSize, 256 );
-
          if( hRet == S_OK )
          {
             hb_storclenAdopt( hb_oleWideToAnsi( currentTheme ), wcslen( currentTheme ), 1 );
             hb_storclenAdopt( hb_oleWideToAnsi( currentColor ), wcslen( currentColor ), 2 );
             hb_storclenAdopt( hb_oleWideToAnsi( currentSize  ), wcslen( currentSize  ), 3 );
+         }
+         else
+         {
+            //LPVOID Buffer;
+            //FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hRet, 0, (LPTSTR) &Buffer, 0, NULL );
+            //OutputDebugString( (LPCSTR) Buffer );
+            hb_retni( (UINT) hRet );
          }
       }
    }

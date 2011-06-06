@@ -463,6 +463,7 @@ RETURN Self
 METHOD GetCurrentStyle() CLASS ProfessionalColorTable
    LOCAL cTheme, cColor, cSize 
    GetCurrentThemeName( @cTheme, @cColor, @cSize )
+   
    DEFAULT cTheme TO ""
    ::Theme := cTheme
    ::ColorScheme := cColor

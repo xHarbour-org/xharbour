@@ -4740,30 +4740,30 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
          </assembly>
       ENDTEXT
 */
-      TEXT INTO oFile:FileBuffer
-         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-         <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-         <assemblyIdentity
-             version="1.0.0.0"
-             processorArchitecture="X86"
-             name="CompanyName.ProductName.YourApp"
-             type="win32"
-         />
-         <description>Your application description here.</description>
-         <dependency>
-             <dependentAssembly>
-                 <assemblyIdentity
-                     type="win32"
-                     name="Microsoft.Windows.Common-Controls"
-                     version="6.0.0.0"
-                     processorArchitecture="X86"
-                     publicKeyToken="6595b64144ccf1df"
-                     language="*"
-                 />
-             </dependentAssembly>
-         </dependency>
-         </assembly>
-      ENDTEXT
+     oFile:FileBuffer := ;
+         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                    + CRLF +;
+         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'  + CRLF +;
+         '<assemblyIdentity'                                                          + CRLF +;
+         '    version="1.0.0.0"'                                                      + CRLF +;
+         '    processorArchitecture="X86"'                                            + CRLF +;
+         '    name="CompanyName.ProductName.YourApp"'                                 + CRLF +;
+         '    type="win32"'                                                           + CRLF +;
+         '/>'                                                                         + CRLF +;
+         '<description>Your application description here.</description>'              + CRLF +;
+         '<dependency>'                                                               + CRLF +;
+         '    <dependentAssembly>'                                                    + CRLF +;
+         '        <assemblyIdentity'                                                  + CRLF +;
+         '            type="win32"'                                                   + CRLF +;
+         '            name="Microsoft.Windows.Common-Controls"'                       + CRLF +;
+         '            version="6.0.0.0"'                                              + CRLF +;
+         '            processorArchitecture="X86"'                                    + CRLF +;
+         '            publicKeyToken="6595b64144ccf1df"'                              + CRLF +;
+         '            language="*"'                                                   + CRLF +;
+         '        />'                                                                 + CRLF +;
+         '    </dependentAssembly>'                                                   + CRLF +;
+         '</dependency>'                                                              + CRLF +;
+         '</assembly>'                                                                + CRLF
+
       oFile:Save()
    ENDIF
    // Generate Resource file

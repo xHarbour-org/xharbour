@@ -71,6 +71,13 @@ static nButWidth
 
 
 INIT PROCEDURE __SetAutoClassInit
+   InitCommonControls()
+   InitCommonControlsEx()
+   InitCommonControlsEx( ICC_BAR_CLASSES )
+   InitCommonControlsEx( ICC_USEREX_CLASSES )
+   InitCommonControlsEx( ICC_LINK_CLASS )
+   InitCommonControlsEx( ICC_INTERNET_CLASSES )
+   OleInitialize()
    __SetClassAutoInit( .T. )
 RETURN
 
@@ -410,13 +417,6 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
 
    IF !lIde
       
-      InitCommonControls()
-      InitCommonControlsEx()
-      InitCommonControlsEx( ICC_BAR_CLASSES )
-      InitCommonControlsEx( ICC_USEREX_CLASSES )
-      InitCommonControlsEx( ICC_LINK_CLASS )
-      InitCommonControlsEx( ICC_INTERNET_CLASSES )
-      OleInitialize()
       //SetThemeAppProperties( STAP_ALLOW_NONCLIENT | STAP_ALLOW_CONTROLS | STAP_ALLOW_WEBCONTENT )
 
       __GetSystem():Update()

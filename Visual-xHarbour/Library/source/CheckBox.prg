@@ -48,7 +48,7 @@ CLASS CheckBox INHERIT Control
    DATA ImageIndex PROTECTED
    DATA Transparent PUBLISHED INIT .T.
 
-   PROPERTY Group         INDEX WS_GROUP         READ xGroup         WRITE SetStyle      DEFAULT .F. PROTECTED
+   PROPERTY Group      INDEX WS_GROUP  READ xGroup      WRITE SetStyle      PROTECTED DEFAULT .F.
    PROPERTY CheckStyle                 READ xCheckStyle WRITE SetCheckStyle PROTECTED DEFAULT 1
    PROPERTY State                      READ xState      WRITE SetState      PROTECTED DEFAULT BST_UNCHECKED
    PROPERTY Border     INDEX WS_BORDER READ xBorder     WRITE SetStyle      PROTECTED DEFAULT .F. 
