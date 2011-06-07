@@ -186,6 +186,9 @@ METHOD Draw( hDC, hTotal ) CLASS VrLabel
             cText := ::Text
             IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
                cText := &(::Value)
+               IF VALTYPE( cText ) == "B"
+                  cText := EVAL( cText, Self )
+               ENDIF
             ENDIF
          ENDIF
          

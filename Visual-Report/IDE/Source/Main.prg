@@ -292,11 +292,13 @@ METHOD Init() CLASS MainForm
          aEntries := ::Application:IniFile:GetEntries( "Recent" )
 
          FOR EACH cReport IN aEntries
-             oItem := MenuStripItem( :this )
-             oItem:GenerateMember := .F.
-             oItem:Caption := cReport
-             oItem:Action  := {|o| ::Application:Report:Open( o:Caption ) }
-             oItem:Create()
+             IF !EMPTY( cReport )
+                oItem := MenuStripItem( :this )
+                oItem:GenerateMember := .F.
+                oItem:Caption := cReport
+                oItem:Action  := {|o| ::Application:Report:Open( o:Caption ) }
+                oItem:Create()
+             ENDIF
          NEXT
       END
 
@@ -1002,11 +1004,13 @@ METHOD ResetQuickOpen( cFile ) CLASS Report
    WITH OBJECT oApp:Props[ "OpenBttn" ]   // Open Button
       :Children := {}
       FOR EACH cProject IN aEntries
-          oItem := MenuStripItem( :this )
-          oItem:GenerateMember := .F.
-          oItem:Caption := cProject
-          oItem:Action  := {|o| oApp:Report:Open( o:Caption ) }
-          oItem:Create()
+          IF !EMPTY( cProject )
+             oItem := MenuStripItem( :this )
+             oItem:GenerateMember := .F.
+             oItem:Caption := cProject
+             oItem:Action  := {|o| oApp:Report:Open( o:Caption ) }
+             oItem:Create()
+          ENDIF
       NEXT
    END
 
