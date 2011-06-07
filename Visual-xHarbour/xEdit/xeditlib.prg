@@ -6854,7 +6854,6 @@ METHOD SetDisplay( oDisplay, lDisplay ) CLASS Editor
              DeleteObject( :hBrush )
           ENDIF
           :hBrush := CreateSolidBrush( ::hBKColor )
-
           IF :hHighlightBrush != NIL
              DeleteObject( :hHighlightBrush )
           ENDIF
@@ -9234,7 +9233,6 @@ METHOD Edit() CLASS Editor
 
    TRY
       #ifdef WIN
-
          WITH OBJECT ::oDisplay
             ShowWindow( :hContainer, SW_SHOW )
             SetFocus( :hContainer )
