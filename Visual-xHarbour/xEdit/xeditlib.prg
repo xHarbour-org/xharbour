@@ -9140,65 +9140,44 @@ METHOD Save( cFile, bAuto )  CLASS Editor
       //TraceLog( 2, cFile )
 
       TRY
-         #ifdef VXH
-            cBuffer := ""
-            Line := ::FirstLine
+         IF File( cFile )
+           hFile := FOpen( cFile, FO_READWRITE )
+         ELSE
+           hFile := FCreate( cFile )
+         ENDIF
 
-            WHILE Line != NIL
-               cBuffer += Line[ ED_BUFFER ] + EOL
+         IF hFile == -1
+            //Alert( "(1) Save error: <" + cFile + ">;;I/O Error (" + Str( FError(), 2 ) + ")" )
+            BREAK
+         ENDIF
 
-               IF s_lResetOnSave
-                  Line[ ED_MODIFICATIONS ] := 0
-               ENDIF
-               IF Len( Line ) == ED_BASE_LEN
-                  Line := Line[ ED_NEXTLINE ]
-               ELSE
-                  Line := Line[ ED_COLLAPSED_START ]
-               ENDIF
-            ENDDO
+         Line := ::FirstLine
+         WHILE Line != NIL
+            //TraceLog( Line[ ED_BUFFER ] )
+            FWrite( hFile, Line[ ED_BUFFER ] + EOL )
 
-            MemoWrit( cFile, cBuffer, .F. )
-         #else
-            IF File( cFile )
-              hFile := FOpen( cFile, FO_READWRITE )
-            ELSE
-              hFile := FCreate( cFile )
+            IF s_lResetOnSave
+               Line[ ED_MODIFICATIONS ] := 0
             ENDIF
 
-            IF hFile == -1
-               //Alert( "(1) Save error: <" + cFile + ">;;I/O Error (" + Str( FError(), 2 ) + ")" )
+            IF FError() != 0
                BREAK
             ENDIF
 
-            Line := ::FirstLine
-            WHILE Line != NIL
-               //TraceLog( Line[ ED_BUFFER ] )
-               FWrite( hFile, Line[ ED_BUFFER ] + EOL )
-
-               IF s_lResetOnSave
-                  Line[ ED_MODIFICATIONS ] := 0
-               ENDIF
-
-               IF FError() != 0
-                  BREAK
-               ENDIF
-
-               IF Len( Line ) == ED_BASE_LEN
-                  Line := Line[ ED_NEXTLINE ]
-               ELSE
-                  Line := Line[ ED_COLLAPSED_START ]
-               ENDIF
-            ENDDO
-            // Truncate
-            FSeek( hFile, - Len( EOL ), FS_RELATIVE )
-            FWrite( hFile, "", 0 )
-            FClose( hFile)
-
-            IF s_lResetOnSave
-               ::oDisplay:Display()
+            IF Len( Line ) == ED_BASE_LEN
+               Line := Line[ ED_NEXTLINE ]
+            ELSE
+               Line := Line[ ED_COLLAPSED_START ]
             ENDIF
-         #endif
+         ENDDO
+         // Truncate
+         FSeek( hFile, - Len( EOL ), FS_RELATIVE )
+         FWrite( hFile, "", 0 )
+         FClose( hFile)
 
+         IF s_lResetOnSave
+            ::oDisplay:Display()
+         ENDIF
 
          ::Date := Directory( cFile )[1][ F_DATE ]
          ::Time := Directory( cFile )[1][ F_TIME ]
@@ -9207,19 +9186,20 @@ METHOD Save( cFile, bAuto )  CLASS Editor
          ::nLastReDo := Len( ::aReDo )
          ::lModified := .F.
 
-         #ifdef WIN
-            IF ::hFileItem != NIL .AND. ::oDisplay:hFilesTree != NIL
-                tvi := (struct TVITEM)
+         #ifndef VXH
+            #ifdef WIN
+               IF ::hFileItem != NIL .AND. ::oDisplay:hFilesTree != NIL
+                   tvi := (struct TVITEM)
 
-                tvi:hItem     := ::hFileItem
-                tvi:mask      := TVIF_STATE
-                tvi:stateMask := TVIS_BOLD
-                tvi:state     := IIF( ::lModified, TVIS_BOLD, 0 )
+                   tvi:hItem     := ::hFileItem
+                   tvi:mask      := TVIF_STATE
+                   tvi:stateMask := TVIS_BOLD
+                   tvi:state     := IIF( ::lModified, TVIS_BOLD, 0 )
 
-                SendMessage( ::oDisplay:hFilesTree, TVM_SETITEM, 0, @tvi )
-            ENDIF
+                   SendMessage( ::oDisplay:hFilesTree, TVM_SETITEM, 0, @tvi )
+               ENDIF
+            #endif
          #endif
-
          #ifdef WIN
             SetCursor( hCursor )
          #endif
