@@ -5459,6 +5459,12 @@ HB_FUNC( OLEINITIALIZE )
 }
 
 //-----------------------------------------------------------------------------
+HB_FUNC( OLEUNINITIALIZE )
+{
+    OleUninitialize();
+}
+
+//-----------------------------------------------------------------------------
 HB_FUNC( COINITIALIZE )
 {
    hb_retnl( CoInitialize( NULL ) );

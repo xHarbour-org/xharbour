@@ -71,19 +71,20 @@ static nButWidth
 
 
 INIT PROCEDURE __SetAutoClassInit
+   OleInitialize()
    InitCommonControls()
    InitCommonControlsEx()
    InitCommonControlsEx( ICC_BAR_CLASSES )
    InitCommonControlsEx( ICC_USEREX_CLASSES )
    InitCommonControlsEx( ICC_LINK_CLASS )
    InitCommonControlsEx( ICC_INTERNET_CLASSES )
-   OleInitialize()
    __SetClassAutoInit( .T. )
 RETURN
 
 EXIT PROCEDURE __CleanUp
    SetUnhandledExceptionFilter( NIL )
    EndUxTheme()
+   OleUninitialize()
    Application := NIL
 RETURN
 
