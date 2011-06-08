@@ -1,7 +1,7 @@
 CINI = xbuild.bc5.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\source;\xbp\bc5\sql.lib
+INCLUDEFOLDERS = ..\source;\xbp\bc55\sql.lib
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .F.
@@ -17,12 +17,12 @@ MYLINK_FLAGS =
 MYPRG_FLAGS = 
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
-OUTPUTFOLDER = \xbp\bc5\sql.lib
+OUTPUTFOLDER = \xbp\bc55\sql.lib
 PRG_OUTPUTFOLDER = 
 RC_OUTPUTFOLDER = 
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = \xhb\lib\bc5
+TARGETFOLDER = \xhb\lib\bc55
 
 #include "..\sql.files.inc"
