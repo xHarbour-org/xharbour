@@ -850,12 +850,14 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
 
-        ELSEIF UPPER(cProp) IN {"ORDER"}
+        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable"
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }
-          FOR n := 1 TO ::ActiveObject:EditCtrl:OrdCount()
-              AADD( aCol[1]:Value[2], ::ActiveObject:EditCtrl:OrdName(n) )
-          NEXT
+          IF ::ActiveObject:EditCtrl:IsOpen
+             FOR n := 1 TO ::ActiveObject:EditCtrl:OrdCount()
+                 AADD( aCol[1]:Value[2], ::ActiveObject:EditCtrl:OrdName(n) )
+             NEXT
+          ENDIF
           xValue := NIL
 
         ELSEIF UPPER(cProp) IN {"GROUPBY"}
