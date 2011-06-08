@@ -301,8 +301,10 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
              IF VALTYPE( hCtrl:Value ) == "N"
                 hCtrl:Text := XSTR( hCtrl:Value )
                 hCtrl:Value := ""
-             ELSE
-                hCtrl:Text := &(hCtrl:Value)
+              ELSE
+                IF !EMPTY( hCtrl:Value )
+                   hCtrl:Text := &(hCtrl:Value)
+                ENDIF
              ENDIF
           ENDIF
           ::CreateControl( hCtrl, @nHeight,, hDC )
@@ -316,7 +318,7 @@ RETURN nHeight
 METHOD CreateRecord( hDC ) CLASS VrReport
    LOCAL hCtrl, nTop, nHeight := 0, oCtrl, n, hTotal
    FOR EACH hCtrl IN ::aBody
-       IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","GROUPFOOTER"})
+       IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","VRGROUPFOOTER"})
 
 //           IF hCtrl:ClsName=="VRTOTAL"
 //              IF VALTYPE( hCtrl:Value ) == "N"
@@ -326,10 +328,13 @@ METHOD CreateRecord( hDC ) CLASS VrReport
 //                 hCtrl:Text := &(hCtrl:Value)
 //              ENDIF
 //           ENDIF
-
+          hTotal := NIL
           IF ( n := ASCAN( ::aBody, {|h| h:ClsName=="VRTOTAL" .AND. h:Column==hCtrl:Name} ) ) > 0
              hTotal := ::aBody[n]
           ENDIF
+          //IF hTotal == NIL .AND. ( n := ASCAN( ::aBody, {|h| h:ClsName=="VRTOTAL" .AND. h:Column==hCtrl:Name} ) ) > 0
+          //   hTotal := ::aBody[n]
+          //ENDIF
 
           oCtrl := ::CreateControl( hCtrl, @nHeight,, hDC,, ::nVirTop,, hTotal )
           

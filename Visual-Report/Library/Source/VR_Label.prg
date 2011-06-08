@@ -176,7 +176,6 @@ METHOD Draw( hDC, hTotal ) CLASS VrLabel
       WITH OBJECT ::PDFCtrl
          IF !EMPTY( ::Field )
             cText := ::Parent:DataSource:Fields:&(::Field)
-            view ::Field
             IF hTotal != NIL .AND. VALTYPE(cText) == "N"
                IF EMPTY( hTotal:Value )
                   hTotal:Value := 0
@@ -189,6 +188,13 @@ METHOD Draw( hDC, hTotal ) CLASS VrLabel
                cText := &(::Value)
                IF VALTYPE( cText ) == "B"
                   cText := EVAL( cText, Self )
+               ENDIF
+
+               IF hTotal != NIL
+                  IF EMPTY( hTotal:Value )
+                     hTotal:Value := 0
+                  ENDIF
+                  hTotal:Value += cText
                ENDIF
             ENDIF
          ENDIF

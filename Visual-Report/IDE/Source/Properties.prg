@@ -902,7 +902,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:ColType := "COLUMN"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Body:Objects
-              IF Child:ClsName == "Label"
+              IF Child:ClsName IN {"Label","Total"}
                  AADD( aCol[1]:Value[2], Child )
               ENDIF
           NEXT
