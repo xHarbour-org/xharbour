@@ -1701,7 +1701,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                ELSE
                  IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
                     SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
-                    SetTextColor( hMemDC, ::__InactiveHighlightText )
+                    SetTextColor( hMemDC, nTxCol /*::__InactiveHighlightText*/ )
                   ELSE
                     IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect ) //.AND. nRecno == nRec
                        lHighLight := ::HasFocus .OR. ::__CurControl != NIL
