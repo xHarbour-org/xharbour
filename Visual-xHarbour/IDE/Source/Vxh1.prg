@@ -4534,18 +4534,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    cPath := ::Properties:Path
 
    IF lNew  .OR. ! IsDirectory( cPath )
+   VIEW cPath
       MakeDir( cPath )
    ENDIF
-
    DirChange( cPath )
 
-   IF lNew .OR. ! IsDirectory( ::Properties:Name )
-      IF lNew
-         MakeDir( ::Properties:Name )
-         DirChange( ::Properties:Name  )
-         cPath += "\" + ::Properties:Name
-      ENDIF
-
+   IF lNew .OR. ! IsDirectory( ::Properties:Binary )
       MakeDir( ::Properties:Binary )
       MakeDir( ::Properties:Objects )
       MakeDir( ::Properties:Source )
@@ -4553,6 +4547,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    IF cPrevPath != NIL
+      OutputDebugString( cPrevPath )
       cPrevRes := ::FixPath( cPrevPath, "Resource" )
       cResPath := ::FixPath( , "Resource" )
       aDir := directory( cPrevRes + "\*.*", "D", .F.,.f. )
@@ -4578,6 +4573,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
           IF (:lModified .OR. lForce) .AND. !EMPTY( :cPath ) .AND. !EMPTY( :cFile )
+             OutputDebugString( :cFile )
              aEditors[n]:Save()
           ENDIF
        END
@@ -4585,12 +4581,14 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    cSourcePath := ::FixPath(, "Source" )
    IF ::Application:ProjectPrgEditor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
+      OutputDebugString( ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
    ENDIF
 
    ::AppObject:Resources := {}
    FOR EACH cFile IN ::Properties:Resources
        IF FILE( cFile )
+          OutputDebugString( cFile )
           n := RAT( "\", cFile )
           cResImg := SUBSTR( cFile, n + 1 )
           cResImg := STRTRAN( cResImg, " " )
@@ -4626,6 +4624,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    IF LEN( ::Forms ) > 0
+      OutputDebugString( cFile )
       oFile := CFile( ::Properties:Name + "_XFM.prg" )
       oFile:Path := cSourcePath
       ::AppObject:Name := ::Properties:Name
@@ -4699,48 +4698,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
        ENDIF
    NEXT
-   //::Application:MainForm:ToolBox1:UpdateCustomControls( lPro,.T. )
-
-   // Generate Manifest file
 
    IF ::Properties:ThemeActive
       oFile := CFile( ::Properties:Name + ".XML" )
       oFile:Path := ::FixPath( cPath, "Resource" )
-/*
-      TEXT INTO oFile:FileBuffer
-         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-         <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-           <dependency>
-             <dependentAssembly>
-               <assemblyIdentity type="win32" name="Microsoft.VC80.CRT" version="8.0.50608.0" processorArchitecture="x86" publicKeyToken="1fc8b3b9a1e18e3b"></assemblyIdentity>
-             </dependentAssembly>
-           </dependency>
-           <dependency>
-             <dependentAssembly>
-               <assemblyIdentity type="win32" name="Microsoft.VC80.MFC" version="8.0.50608.0" processorArchitecture="x86" publicKeyToken="1fc8b3b9a1e18e3b"></assemblyIdentity>
-             </dependentAssembly>
-           </dependency>
-           <dependency>
-             <dependentAssembly>
-               <assemblyIdentity type="win32" name="Microsoft.Windows.Common-Controls" version="6.0.0.0" processorArchitecture="x86" publicKeyToken="6595b64144ccf1df" language="*"></assemblyIdentity>
-             </dependentAssembly>
-           </dependency>
 
-         <!-- Identify the application security requirements. -->
-            <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
-               <security>
-               <requestedPrivileges>
-                 <requestedExecutionLevel
-                   level="requireAdministrator"
-                   uiAccess="false"/>
-               </requestedPrivileges>
-             </security>
-            </trustInfo>
-
-         </assembly>
-      ENDTEXT
-*/
-     oFile:FileBuffer := ;
+      oFile:FileBuffer := ;
          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                    + CRLF +;
          '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'  + CRLF +;
          '<assemblyIdentity'                                                          + CRLF +;
@@ -4794,14 +4757,14 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       cBuffer += '   {'                                                               + CRLF
       cBuffer += '      BLOCK "040904E4"'                                             + CRLF
       cBuffer += '      {'                                                            + CRLF
-      cBuffer += '         VALUE "CompanyName",      "'+ ::AppObject:Company+'"'     + CRLF
-      cBuffer += '         VALUE "FileDescription",  "'+ ::AppObject:Description+'"' + CRLF
-      cBuffer += '         VALUE "FileVersion",      "'+ ::AppObject:Version+'\0"'   + CRLF
+      cBuffer += '         VALUE "CompanyName",      "'+ ::AppObject:Company+'"'      + CRLF
+      cBuffer += '         VALUE "FileDescription",  "'+ ::AppObject:Description+'"'  + CRLF
+      cBuffer += '         VALUE "FileVersion",      "'+ ::AppObject:Version+'\0"'    + CRLF
       cBuffer += '         VALUE "InternalName",     "'+ ::Properties:Name+'"'        + CRLF
-      cBuffer += '         VALUE "LegalCopyright",   "'+ ::AppObject:Copyright+'"'   + CRLF
+      cBuffer += '         VALUE "LegalCopyright",   "'+ ::AppObject:Copyright+'"'    + CRLF
       cBuffer += '         VALUE "OriginalFilename", "'+ ::Properties:Name+'.exe"'    + CRLF
       cBuffer += '         VALUE "ProductName",      "'+ ::Properties:TargetName+'"'  + CRLF
-      cBuffer += '         VALUE "ProductVersion",   "'+ ::AppObject:Version+'\0"'   + CRLF
+      cBuffer += '         VALUE "ProductVersion",   "'+ ::AppObject:Version+'\0"'    + CRLF
       cBuffer += '      }'                                                            + CRLF
       cBuffer += '   }'                                                               + CRLF
       cBuffer += '   BLOCK "VarFileInfo"'                                             + CRLF
