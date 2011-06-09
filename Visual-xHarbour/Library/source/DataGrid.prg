@@ -3995,7 +3995,10 @@ METHOD SetColor( nInd, nColor ) CLASS GridColumn
           CATCH
           END
       NEXT
-      ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
+      TRY
+         ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
+      CATCH
+      END
    ENDIF
 RETURN Self
 
