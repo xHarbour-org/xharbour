@@ -1612,7 +1612,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
           ENDIF
 
           FOR i := nCol TO nColEnd
-
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i// avoid painting non-visible columns
                  EXIT
               ENDIF
@@ -1624,7 +1623,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               nHImg  := ::__DisplayArray[nLine][1][i][ 5]
               
               nBkCol := ::__DisplayArray[nLine][1][i][ 7]
-              
+
               IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                  nBkCol := DarkenColor( nBkCol, 25 )
               ENDIF
@@ -1632,6 +1631,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               nTxCol := ::__DisplayArray[nLine][1][i][ 8]
               nStatus:= ::__DisplayArray[nLine][1][i][10]
               nRep   := ::__DisplayArray[nLine][1][i][11]
+
+              hOldFont := SelectObject( hMemDC, ::__DisplayArray[nLine][1][i][12] )
 
               zLeft := nLeft
               IF lFreeze .AND. i <= ::FreezeColumn
@@ -1903,6 +1904,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                 nBkCol := DarkenColor( nBkCol, 25 )
              ENDIF
           ENDIF
+          nColEnd := MIN( nColEnd, LEN( ::Children ) )
           FOR i := nCol TO nColEnd
 
               IF nLeft > ::ClientWidth // avoid painting non-visible columns
@@ -2659,13 +2661,14 @@ METHOD __FillRow( nPos ) CLASS DataGrid
        nColBkColor := ::Children[x]:BackColor
        nColTxColor := ::Children[x]:ForeColor
        
-       nColBkColor := nBack
+       DEFAULT nColBkColor TO nBack
+
        nRet := ExecuteEvent( "OnQueryBackColor", ::Children[x] )
        IF VALTYPE( nRet ) == "N"
           nColBkColor :=  nRet
        ENDIF
 
-       nColTxColor := nFore
+       DEFAULT nColTxColor TO nFore
        nRet := ExecuteEvent( "OnQueryForeColor", ::Children[x] )
        IF VALTYPE( nRet ) == "N"
           nColTxColor :=  nRet
@@ -2726,7 +2729,8 @@ METHOD __FillRow( nPos ) CLASS DataGrid
                                          nColTxColor,;
                                          ::Children[x]:Width,;
                                          nStatus,;
-                                         ::Children[x]:Representation }
+                                         ::Children[x]:Representation,;
+                                         ::Children[x]:Font:Handle }
        ::__DataWidth += ::Children[x]:Width
    NEXT
 
@@ -3565,6 +3569,7 @@ CLASS GridColumn INHERIT Object
    PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
 
    DATA HeaderFont                   PUBLISHED INIT Font()
+   DATA Font                         PUBLISHED INIT Font()
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
    DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
@@ -3890,6 +3895,7 @@ METHOD Create() CLASS GridColumn
       ::xImageIndex := MAX( 0, ::xImageIndex )
    ENDIF
 
+   ::Font:Create():Modify()
    ::HeaderFont:Create():Modify()
    ExecuteEvent( "OnInit", Self )
    AADD( ::Parent:Children, Self )
@@ -3995,10 +4001,7 @@ METHOD SetColor( nInd, nColor ) CLASS GridColumn
           CATCH
           END
       NEXT
-      TRY
-         ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
-      CATCH
-      END
+      ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
    ENDIF
 RETURN Self
 
