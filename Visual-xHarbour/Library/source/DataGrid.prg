@@ -217,6 +217,7 @@ CLASS DataGrid INHERIT Control
    METHOD SaveLayout()
    METHOD RestoreLayout()
 
+   METHOD OnDestroy()
    METHOD OnNCDestroy()
    METHOD OnKeyDown()
    METHOD OnLButtonDown()
@@ -707,7 +708,10 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
       ::Children[ nCol ]:TreeItem:Delete()
       ::Children[ nCol ]:TreeItem := NIL
    ENDIF
-   
+
+   ::Children[ nCol ]:Font:Delete()
+   ::Children[ nCol ]:HeaderFont:Delete()
+
    aDel( ::Children, nCol, .T. )
 
    ::__DataWidth := 0
@@ -3032,6 +3036,15 @@ METHOD Up() CLASS DataGrid
 RETURN Self
 
 //----------------------------------------------------------------------------------
+METHOD OnDestroy() CLASS DataGrid
+   Super:OnDestroy()
+   WHILE LEN( ::Children ) > 0
+       ATAIL( ::Children ):Destroy()
+   ENDDO
+   IF ::__LinePen != NIL
+      DeleteObject(::__LinePen)
+   ENDIF
+RETURN NIL
 
 METHOD OnNCDestroy() CLASS DataGrid
    Super:OnNCDestroy()
@@ -3850,6 +3863,7 @@ RETURN rc
 METHOD Init( oParent ) CLASS GridColumn
 //   DEFAULT bData    TO {||""}
 
+   ::Font:Parent       := Self
    ::HeaderFont:Parent := Self
    
    ::Children    := {}
@@ -3897,6 +3911,7 @@ METHOD Create() CLASS GridColumn
 
    ::Font:Create():Modify()
    ::HeaderFont:Create():Modify()
+
    ExecuteEvent( "OnInit", Self )
    AADD( ::Parent:Children, Self )
    ::xPosition := LEN( ::Parent:Children )

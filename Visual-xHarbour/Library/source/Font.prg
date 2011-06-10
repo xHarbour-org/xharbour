@@ -168,6 +168,7 @@ RETURN Self
 METHOD Delete() CLASS Font
    IF ::Handle != NIL
       DeleteObject( ::Handle )
+      ::Handle := NIL
    ENDIF
 RETURN Self
 
