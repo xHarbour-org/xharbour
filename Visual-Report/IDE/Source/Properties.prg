@@ -198,7 +198,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
       RETURN NIL
    ENDIF
-   
+   VIEW xValue, cCaption
    IF !EMPTY( cProp2 )
       IF ::ActiveObject:lUI
          oObj := __objSendMsg( ::ActiveObject:EditCtrl, cProp2 )
@@ -382,7 +382,6 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
 
              CASE "A"
                   // DataSource falls here
-                  cText  := cText[1]
                   IF ::ActiveObject != NIL
                      IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. !EMPTY( ::ActiveObject:DataSource )
                         cText := ::ActiveObject:DataSource:Name
@@ -396,6 +395,14 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                         cText := ::ActiveObject:Field
                       ELSEIF oItem:ColItems[n]:ColType IN "ORDER"
                         cText := ::ActiveObject:Order
+                      ELSEIF oItem:ColItems[n]:ColType == "ADSDATADRIVERS"
+                        IF ( nPos := HGetPos( ::System:AdsDataDrivers, ::ActiveObject:Driver ) ) > 0
+                           cText := cText[ nPos ]
+                        ENDIF
+                      ELSEIF oItem:ColItems[n]:ColType == "DATADRIVERS"
+                        IF ( nPos := HGetPos( ::System:DataDrivers, ::ActiveObject:Driver ) ) > 0
+                           cText := cText[ nPos ]
+                        ENDIF
                      ENDIF
                   ENDIF
                   EXIT
@@ -740,7 +747,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER", "DATADRIVERS", "ADSDATADRIVERS" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -751,20 +758,40 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 
                            :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                            :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ), NIL }
-                           :Action := {|o, n, oPar, c| c := o:GetSelString(), n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1, c ) }
+
+                           IF cType == "ADSDATADRIVERS"
+                              :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
+                                                       oPar := o:Parent,;
+                                                       o:Destroy(),;
+                                                       oPar:SetValue( HGetValueAt( ::System:AdsDataDrivers, n )  ) }
+
+                            ELSEIF cType == "DATADRIVERS"
+                              :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
+                                                       oPar := o:Parent,;
+                                                       o:Destroy(),;
+                                                       oPar:SetValue( HGetValueAt( ::System:DataDrivers, n )  ) }
+                            ELSE
+                              :Action := {|o, n, oPar, c| c := o:GetSelString(), n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1, c ) }
+                           ENDIF
                            :Create()
 
                            :AddItem( "" )
 
-                           FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
-                               IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
-                                  IF ! cType IN {"GROUPBY","FIELD","ORDER"}
-                                     :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
-                                   ELSE
-                                     :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n] )
+                           IF cType IN {"DATADRIVERS", "ADSDATADRIVERS"}
+                              FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value )
+                                  :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[n] )
+                              NEXT
+                            ELSE
+                              FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
+                                  IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
+                                     IF ! cType IN {"GROUPBY","FIELD","ORDER"}
+                                        :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n]:Name )
+                                      ELSE
+                                        :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[2][n] )
+                                     ENDIF
                                   ENDIF
-                               ENDIF
-                           NEXT
+                              NEXT
+                           ENDIF
 
                            IF ( n := :FindStringExact( ::ActiveItem:ColItems[nCol-1]:Value[1] ) ) > 0
                               :SetCurSel(n)
@@ -908,6 +935,16 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                  AADD( aCol[1]:Value[2], Child )
               ENDIF
           NEXT
+          xValue := NIL
+
+        ELSEIF UPPER(cProp) == "DRIVER" .AND. ::ActiveObject:__xCtrlName == "DataTable"
+          aCol[1]:Value := ::System:DataDrivers:Keys
+          aCol[1]:ColType  := "DATADRIVERS"
+          xValue := NIL
+
+        ELSEIF UPPER(cProp) == "DRIVER" .AND. ::ActiveObject:__xCtrlName == "AdsDataTable"
+          aCol[1]:Value := ::System:AdsDataDrivers:Keys
+          aCol[1]:ColType  := "ADSDATADRIVERS"
           xValue := NIL
 
         ELSEIF UPPER(cProp) == "BACKCOLOR" .OR. UPPER(cProp) == "FORECOLOR"

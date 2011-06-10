@@ -19,7 +19,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA FileName         EXPORTED INIT ""
    DATA Alias            EXPORTED INIT ""
    DATA lUI              EXPORTED INIT .F.
-   DATA Driver           EXPORTED
+   DATA Driver           EXPORTED INIT ""
    DATA DataTable        EXPORTED
    DATA ClsName          EXPORTED INIT "DataTable"
    DATA SysBackColor     EXPORTED INIT GetSysColor( COLOR_WINDOW )
