@@ -760,13 +760,13 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                            :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ), NIL }
 
                            IF cType == "ADSDATADRIVERS"
-                              :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
+                              :Action := {|o, n, oPar| n    := o:GetCurSel(),;
                                                        oPar := o:Parent,;
                                                        o:Destroy(),;
                                                        oPar:SetValue( HGetValueAt( ::System:AdsDataDrivers, n )  ) }
 
                             ELSEIF cType == "DATADRIVERS"
-                              :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
+                              :Action := {|o, n, oPar| n    := o:GetCurSel(),;
                                                        oPar := o:Parent,;
                                                        o:Destroy(),;
                                                        oPar:SetValue( HGetValueAt( ::System:DataDrivers, n )  ) }
@@ -775,13 +775,12 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                            ENDIF
                            :Create()
 
-                           :AddItem( "" )
-
                            IF cType IN {"DATADRIVERS", "ADSDATADRIVERS"}
                               FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value )
                                   :AddItem( ::ActiveItem:ColItems[nCol-1]:Value[n] )
                               NEXT
                             ELSE
+                              :AddItem( "" )
                               FOR n := 1 TO LEN( ::ActiveItem:ColItems[nCol-1]:Value[2] )
                                   IF ::ActiveItem:ColItems[nCol-1]:Value[2][n] != NIL
                                      IF ! cType IN {"GROUPBY","FIELD","ORDER"}
