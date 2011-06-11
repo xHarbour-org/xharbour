@@ -73,10 +73,6 @@ CLASS VrReport INHERIT VrObject
    DATA hProps         EXPORTED
    DATA hExtra         EXPORTED
    
-   DATA aSubtotals     EXPORTED  INIT {}
-   DATA aTotals        EXPORTED  INIT {}
-   DATA aFormulas      EXPORTED  INIT {}
-
    DATA nVirTop        EXPORTED  INIT 0
 
    ACCESS Application  INLINE __GetApplication()
@@ -101,7 +97,18 @@ CLASS VrReport INHERIT VrObject
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
    METHOD __SetDataSource()
    METHOD ChangePage()
+   error HANDLER OnError()
 ENDCLASS
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD OnError( ... ) CLASS VrReport
+   LOCAL hRet, n, cMsg := __GetMessage()
+   IF PCount() == 0
+      IF ( n := ASCAN( ::aBody, {|h| UPPER(h:Name) == UPPER(cMsg) } ) ) > 0
+         hRet := VAL( ::aBody[n]:Text )
+      ENDIF
+   ENDIF
+RETURN hRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init() CLASS VrReport
@@ -246,7 +253,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
    ENDIF
 
    IF oPanel == NIL
-      oControl:Draw( hDC, hTotal )
+      oControl:Draw( hDC, hTotal, hCtrl )
       TRY
          IF oControl:ClsName != "Image" .OR. ! oControl:OnePerPage
 

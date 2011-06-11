@@ -155,7 +155,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlFont )
 RETURN Self
 
-METHOD Draw( hDC, hTotal ) CLASS VrLabel
+METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
    LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
    
@@ -187,7 +187,7 @@ METHOD Draw( hDC, hTotal ) CLASS VrLabel
             IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
                cText := &(::Value)
                IF VALTYPE( cText ) == "B"
-                  cText := EVAL( cText, Self )
+                  cText := EVAL( cText, ::Parent )
                ENDIF
 
                IF hTotal != NIL
@@ -200,7 +200,9 @@ METHOD Draw( hDC, hTotal ) CLASS VrLabel
          ENDIF
          
          cText := ALLTRIM( xStr( cText ) )
-
+         
+         hCtrl:Text := cText
+         
          IF ::Alignment > 1
             :Attribute( "HorzAlign", ::Alignment )
             lAuto := .F.
