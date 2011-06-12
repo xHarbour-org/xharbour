@@ -916,15 +916,15 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           NEXT
           xValue := NIL
         
-        ELSEIF UPPER(cProp) == "FORMULA"
-          aCol[1]:ColType := "FORMULA"
-          aCol[1]:Value   := { "", { NIL } }
-          FOR EACH Child IN ::Application:Props:Components:Children
-              IF Child:Component:ClsName == "Formula"
-                 AADD( aCol[1]:Value[2], Child:Component )
-              ENDIF
-          NEXT
-          xValue := NIL
+//         ELSEIF UPPER(cProp) == "FORMULA"
+//           aCol[1]:ColType := "FORMULA"
+//           aCol[1]:Value   := { "", { NIL } }
+//           FOR EACH Child IN ::Application:Props:Components:Children
+//               IF Child:Component:ClsName == "Formula"
+//                  AADD( aCol[1]:Value[2], Child:Component )
+//               ENDIF
+//           NEXT
+//           xValue := NIL
         
         ELSEIF UPPER(cProp) == "COLUMN"
           aCol[1]:ColType := "COLUMN"
@@ -932,6 +932,13 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           FOR EACH Child IN ::Application:Props:Body:Objects
               IF Child:ClsName IN {"Label","Total"}
                  AADD( aCol[1]:Value[2], Child )
+               
+               ELSEIF Child:ClsName == "GroupFooter"
+                 FOR EACH oObj IN Child:Objects
+                     IF oObj:ClsName IN {"Label","Total"}
+                        AADD( aCol[1]:Value[2], oObj )
+                     ENDIF
+                 NEXT
               ENDIF
           NEXT
           xValue := NIL

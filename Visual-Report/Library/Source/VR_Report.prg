@@ -300,7 +300,7 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateGroupFooters( hDC ) CLASS VrReport
-   LOCAL nTop, n, hCtrl, nHeight := 0
+   LOCAL nTop, n, hCtrl, hTotal, nHeight := 0
    ::nVirTop := 0
    FOR EACH hCtrl IN ::aBody
        IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPFOOTER"
@@ -314,7 +314,12 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
                 ENDIF
              ENDIF
           ENDIF
-          ::CreateControl( hCtrl, @nHeight,, hDC )
+
+          IF ( n := ASCAN( ::aFooter, {|h| h:ClsName=="VRTOTAL" .AND. h:Column==hCtrl:Name} ) ) > 0
+             hTotal := ::aFooter[n]
+          ENDIF
+
+          ::CreateControl( hCtrl, @nHeight,, hDC,,,, hTotal )
        ENDIF
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
@@ -354,6 +359,7 @@ METHOD CreateFooter( hDC ) CLASS VrReport
       ::nRow := ::oPDF:PageLength - ::FooterHeight
       FOR EACH aCtrl IN ::aFooter
           ::CreateControl( aCtrl, @nHeight,, hDC )
+          // XXXX
       NEXT
    ENDIF
 RETURN Self

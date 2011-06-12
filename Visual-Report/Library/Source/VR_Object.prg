@@ -17,8 +17,6 @@
 #define  acObjectTypeText           5
 
 CLASS VrObject
-   CLASSDATA aNames INIT {}
-   
    PROPERTY Name READ xName WRITE SetControlName
    DATA Font        PUBLISHED
 
@@ -101,9 +99,9 @@ METHOD Delete() CLASS VrObject
       ::EditCtrl:Destroy()
       ::Application:Props:Components:Children[1]:Select():SelectComponent()
       ::Parent:InvalidateRect()
-      n := ASCAN( ::aNames, ::Name,,, .T. )
+      n := ASCAN( ::Application:aNames, ::Name,,, .T. )
       IF n > 0
-         ADEL( ::aNames, n, .T. )
+         ADEL( ::Application:aNames, n, .T. )
       ENDIF
    ENDIF
 RETURN Self
@@ -115,21 +113,21 @@ METHOD SetControlName( cProp ) CLASS VrObject
          IF UPPER(cProp) == UPPER(::xName)
             RETURN Self
          ENDIF
-         IF ( n := ASCAN( ::aNames, ::xName,,, .T. ) ) > 0
-            ADEL( ::aNames, n, .T. )
+         IF ( n := ASCAN( ::Application:aNames, ::xName,,, .T. ) ) > 0
+            ADEL( ::Application:aNames, n, .T. )
          ENDIF
       ENDIF
       IF cProp == NIL
          n := 1
          WHILE .T.
             cProp := ::ClsName + XSTR( n )
-            IF ASCAN( ::aNames, cProp,,, .T. ) == 0
+            IF ASCAN( ::Application:aNames, cProp,,, .T. ) == 0
                EXIT
             ENDIF
             n ++
          ENDDO
       ENDIF
-      AADD( ::aNames, cProp )
+      AADD( ::Application:aNames, cProp )
       ::xName := cProp
       ::Text := cProp
    ENDIF

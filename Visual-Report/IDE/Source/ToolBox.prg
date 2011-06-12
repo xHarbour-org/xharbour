@@ -94,19 +94,18 @@ METHOD Create() CLASS ToolBox
    ::SetItemHeight( ABS( ::Font:Height ) + 9 )
 
    ::aButtons := { { "All", {} },;
-                   { "Components",           {} },;
-                   { "Drawing",              {} } }
+                   { "Components",           {} } }
 
    AADD( ::aButtons[2][2], { "Label",       .T. } )
    AADD( ::aButtons[2][2], { "Theme",       .T. } )
    AADD( ::aButtons[2][2], { "Total",       .T. } )
    AADD( ::aButtons[2][2], { "Image",       .T. } )
    AADD( ::aButtons[2][2], { "DataTable",   .T. } )
-   AADD( ::aButtons[2][2], { "Formula",     .T. } )
+//   AADD( ::aButtons[2][2], { "Formula",     .T. } )
    AADD( ::aButtons[2][2], { "GroupHeader", .T. } )
    AADD( ::aButtons[2][2], { "GroupFooter", .T. } )
 
-   AADD( ::aButtons[3][2], { "Line", .T. } )
+   AADD( ::aButtons[2][2], { "Line", .T. } )
 
    FOR n := 2 TO LEN( ::aButtons )
        aSort(::aButtons[n][2],,,{|x, y| x[1] < y[1]})

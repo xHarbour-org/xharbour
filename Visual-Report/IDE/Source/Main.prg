@@ -29,6 +29,7 @@ RETURN
 //-------------------------------------------------------------------------------------------------------
 
 CLASS RepApp INHERIT Application
+   DATA aNames   EXPORTED INIT {}
    DATA Props    EXPORTED INIT {=>}
    DATA Report   EXPORTED
    
@@ -38,6 +39,7 @@ ENDCLASS
 
 METHOD Init( cFile ) CLASS RepApp
    oApp := Self
+   oApp:Report := Report()
    HSetCaseMatch( ::Props, .F. )
    ::Super:Init( NIL )
    MainForm( NIL )
@@ -64,7 +66,6 @@ METHOD Init() CLASS MainForm
    
    ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
    ::OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
-   ::Application:Report := Report()
 
    ::Create()
 
@@ -101,7 +102,7 @@ METHOD Init() CLASS MainForm
             :ShortCutText      := "Ctrl+N"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|o| ::Application:Report := Report():New() }
+            :Action            := {|o| ::Application:Report:NewReport() }
             :Create()
          END
 
@@ -111,7 +112,7 @@ METHOD Init() CLASS MainForm
             :ShortCutText      := "Ctrl+O"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "O" )
-            :Action            := {|o|::Application:Report:Open() }
+            :Action            := {|o| ::Application:Report:Open() }
             :Create()
          END
 
@@ -279,14 +280,14 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ToolStripButton( :this )
          :Caption           := "New"
          :ImageIndex        := ::System:StdIcons:FileNew
-         :Action            := {|o| ::Application:Report := Report():New() }
+         :Action            := {|o| ::Application:Report:NewReport() }
          :Create()
       END
 
       WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileOpen
          :ToolTip:Text := "Open"
-         :Action       := {|o|::Application:Report:Open() }
+         :Action       := {|o| ::Application:Report:Open() }
          :DropDown     := 2
          :Create()
          aEntries := ::Application:IniFile:GetEntries( "Recent" )
@@ -580,7 +581,7 @@ CLASS Report
    METHOD SaveAs()
    METHOD Close()
    METHOD Open()
-   METHOD New()
+   METHOD NewReport()
    METHOD ResetQuickOpen()
    METHOD GetName()
    METHOD GetRectangle() INLINE {0,0,0,0}
@@ -592,8 +593,13 @@ CLASS Report
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
-METHOD New() CLASS Report
+METHOD NewReport() CLASS Report
    LOCAL oPs
+view valtype( ::VrReport )
+   IF ::VrReport != NIL .AND. ::Close() != NIL
+      RETURN NIL
+   ENDIF
+
    oApp:Props:ToolBox:Enabled       := .T.
    oApp:Props:SaveMenu:Enabled      := .T.
    oApp:Props:SaveAsMenu:Enabled    := .T.
@@ -730,7 +736,9 @@ METHOD Close() CLASS Report
       :Props:ReportPageTab:VertScrollSize := 0
       :Props:ExtraTab:HorzScrollSize := 0
       :Props:ExtraTab:VertScrollSize := 0
-      
+
+      :aNames := {}
+
       dbCloseAll()
    END
 RETURN NIL
@@ -775,48 +783,50 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
    LOCAL oFile, pHrb, nX
-
-   IF ::Close() == NIL
-      IF cReport == NIL
-         oFile := OpenFileDialog( oApp:MainForm )
-         oFile:Multiselect := .F.
-         oFile:Filter := "Visual Report Files (*.vrt)|*.vrt"
-         IF !oFile:Show()
-            RETURN NIL
-         ENDIF
-         cReport := oFile:FileName
-      ENDIF
-      oApp:Props:CompObjects        := {}
-      oApp:Props:ToolBox:Enabled    := .T.
-      oApp:Props:SaveMenu:Enabled   := .T.
-      oApp:Props:SaveBttn:Enabled   := .T.
-      oApp:Props:SaveAsMenu:Enabled := .T.
-      oApp:Props:CloseBttn:Enabled  := .T.
-      oApp:Props:RunBttn:Enabled    := .T.
-      oApp:Props:PageSetupMenu:Enabled := .T.
-
-      oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
-      ::FileName := cReport
-      ::ResetQuickOpen( cReport )
-
-      ::VrReport := VrReport( NIL )
-      oApp:Props:Components:AddButton( ::VrReport )
-
-      ::SetScrollArea()
-
-      ::oXMLDoc := ::VrReport:Load( cReport )
-
-      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
-      ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
-
-      oApp:Props:RepHeader:InvalidateRect()
-      oApp:Props:Header:InvalidateRect()
-      oApp:Props:Body:InvalidateRect()
-      oApp:Props:Footer:InvalidateRect()
-      oApp:Props:RepFooter:InvalidateRect()
-      oApp:Props:ExtraPage:InvalidateRect()
-
+   
+   IF ::VrReport != NIL .AND. ::Close() != NIL
+      RETURN NIL
    ENDIF
+
+   IF cReport == NIL
+      oFile := OpenFileDialog( oApp:MainForm )
+      oFile:Multiselect := .F.
+      oFile:Filter := "Visual Report Files (*.vrt)|*.vrt"
+      IF !oFile:Show()
+         RETURN NIL
+      ENDIF
+      cReport := oFile:FileName
+   ENDIF
+
+   oApp:Props:CompObjects        := {}
+   oApp:Props:ToolBox:Enabled    := .T.
+   oApp:Props:SaveMenu:Enabled   := .T.
+   oApp:Props:SaveBttn:Enabled   := .T.
+   oApp:Props:SaveAsMenu:Enabled := .T.
+   oApp:Props:CloseBttn:Enabled  := .T.
+   oApp:Props:RunBttn:Enabled    := .T.
+   oApp:Props:PageSetupMenu:Enabled := .T.
+
+   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+   ::FileName := cReport
+   ::ResetQuickOpen( cReport )
+
+   ::VrReport := VrReport( NIL )
+   oApp:Props:Components:AddButton( ::VrReport )
+
+   ::SetScrollArea()
+
+   ::oXMLDoc := ::VrReport:Load( cReport )
+
+   ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", ::VrReport:PaperSize )
+   ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", ::VrReport:Orientation == __GetSystem():PageSetup:Landscape )
+
+   oApp:Props:RepHeader:InvalidateRect()
+   oApp:Props:Header:InvalidateRect()
+   oApp:Props:Body:InvalidateRect()
+   oApp:Props:Footer:InvalidateRect()
+   oApp:Props:RepFooter:InvalidateRect()
+   oApp:Props:ExtraPage:InvalidateRect()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
