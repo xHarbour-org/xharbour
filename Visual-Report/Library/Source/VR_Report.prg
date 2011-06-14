@@ -354,11 +354,23 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateFooter( hDC ) CLASS VrReport
-   LOCAL aCtrl, nHeight := 0
+   LOCAL hCtrl, nHeight := 0
    IF ::PrintFooter
       ::nRow := ::oPDF:PageLength - ::FooterHeight
-      FOR EACH aCtrl IN ::aFooter
-          ::CreateControl( aCtrl, @nHeight,, hDC )
+      FOR EACH hCtrl IN ::aFooter
+
+          IF hCtrl:ClsName=="VRTOTAL"
+             IF VALTYPE( hCtrl:Value ) == "N"
+                hCtrl:Text := XSTR( hCtrl:Value )
+                hCtrl:Value := ""
+              ELSE
+                IF !EMPTY( hCtrl:Value )
+                   hCtrl:Text := &(hCtrl:Value)
+                ENDIF
+             ENDIF
+          ENDIF
+
+          ::CreateControl( hCtrl, @nHeight,, hDC )
           // XXXX
       NEXT
    ENDIF
