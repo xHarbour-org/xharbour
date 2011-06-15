@@ -412,7 +412,7 @@ CLASS Window INHERIT Object
    METHOD Hide()
    METHOD Show()
    METHOD MessageWait()
-   METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, XSTR( cText ), XSTR( cCaption ), nFlags )
+   METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
    METHOD IsCovered()
    METHOD LockWindowUpdate()      INLINE LockWindowUpdate( ::hWnd )
    METHOD UnlockWindowUpdate()    INLINE LockWindowUpdate()
