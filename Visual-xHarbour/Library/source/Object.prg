@@ -91,7 +91,7 @@ METHOD OnError( ... ) CLASS Object
    cMsg := __GetMessage()
    
    IF PCount() == 0 .AND. ::Property != NIL
-      IF hScan( ::Property, {|c| UPPER(c) == UPPER(cMsg) } ) > 0
+      IF hGetPos( ::Property, cMsg ) > 0
          uRet := ::Property[ cMsg ]
        ELSE
          uRet := ::__InvalidMember( cMsg )
@@ -109,7 +109,7 @@ METHOD OnError( ... ) CLASS Object
 RETURN uRet
 
 METHOD HasProperty( cName ) 
-RETURN ::Property != NIL .AND. hScan( ::Property, {|c|UPPER(c) == UPPER(cName)} ) > 0
+RETURN ::Property != NIL .AND. hGetPos( ::Property, cName ) > 0
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __InvalidMember( cMsg ) CLASS Object
@@ -166,7 +166,7 @@ METHOD GetControlName( cName, lIde ) CLASS Object
    LOCAL o, cProp, n := 1, oControl, lCont, lComp := .T., oForm := ::Form
    WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:Property != NIL
       cProp := cName + XSTR( n )
-      IF hScan( oForm:Property, {|c| UPPER(c) == UPPER(cProp) } ) == 0
+      IF hGetPos( oForm:Property, cProp ) == 0
          EXIT
       ENDIF
       n ++
@@ -183,8 +183,8 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"
       cName := oObj:xName
    ENDIF
-   IF !( oObj == Self ) //.AND. ::__ClassInst == NIL
-      IF !EMPTY( oObj:xName ) .AND. ( n := hScan( ::Property, {|c| UPPER(c) == UPPER(oObj:xName) } ) ) > 0
+   IF !( oObj == Self ) 
+      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::Property, oObj:xName ) ) > 0
          HDelAt( ::Property, n )
       ENDIF
       ::Property[ cName ] := oObj
@@ -210,7 +210,7 @@ RETURN Self
 
 METHOD RemoveProperty() CLASS Object
    LOCAL n
-   IF /*::__ClassInst == NIL .AND.*/ !EMPTY( ::xName ) .AND. ( n := hScan( ::Form:Property, {|c| UPPER(c) == UPPER(::xName) } ) ) > 0
+   IF !EMPTY( ::xName ) .AND. ( n := hGetPos( ::Form:Property, ::xName ) ) > 0
       RETURN HDelAt( ::Form:Property, n )
    ENDIF
 RETURN NIL

@@ -83,7 +83,7 @@ CLASS DataGrid INHERIT Control
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
    DATA MultipleSelection       PUBLISHED INIT .F.
    DATA TagRecords              PUBLISHED INIT .F.
-
+   DATA ClearColumns            PUBLISHED INIT .T.
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
    DATA HitTop                  EXPORTED
@@ -298,7 +298,7 @@ METHOD Create() CLASS DataGrid
    Super:Create()
    ::__DataWidth := 0
    FOR EACH oColumn IN ::Children
-      IF oColumn:ClsName == "GridColumn"
+      IF oColumn:ClsName == "GridColumn" .AND. oColumn:Visible
          ::__DataWidth += oColumn:Width
       ENDIF
    NEXT
@@ -566,7 +566,8 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
    IF ( hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST ) ) > 0
       DestroyWindow( hWnd )
    ENDIF
-   IF ::Children != NIL
+   
+   IF ::ClearColumns .AND. ::Children != NIL
       FOR n := 1 TO LEN( ::Children )
           ::Children[n]:Destroy()
           n--
@@ -715,7 +716,7 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
    aDel( ::Children, nCol, .T. )
 
    ::__DataWidth := 0
-   AEVAL( ::Children, {|o|o:xPosition := n++, ::__DataWidth += o:Width} )
+   AEVAL( ::Children, {|o|o:xPosition := n++, ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
 
    ::__Update( lDisplay )
    ::__UpdateHScrollBar()
@@ -770,7 +771,7 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       ::__UpdateHScrollBar(.T.)
    ENDIF
    ::__DataWidth := 0
-   AEVAL( ::Children, {|o| ::__DataWidth += o:Width} )
+   AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
 RETURN 1
 
 //---------------------------------------------------------------------------------
@@ -1616,10 +1617,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
           ENDIF
 
           FOR i := nCol TO nColEnd
-              IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i// avoid painting non-visible columns
+              IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i // avoid painting non-visible columns
                  EXIT
               ENDIF
-
+              IF ! ::Children[ i ]:Visible
+                 LOOP
+              ENDIF
               cData  := ::__DisplayArray[nLine][1][i][ 1]
               nInd   := ::__DisplayArray[nLine][1][i][ 2]
               nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nLine][1][i][ 3], 2 )
@@ -2178,7 +2181,7 @@ METHOD Update() CLASS DataGrid
    ::IsDelIndexOn := !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
 
    ::__DataWidth := 0
-   AEVAL( ::Children, {|o| ::__DataWidth += o:Width} )
+   AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
 
    IF ::DataSource == NIL //.OR. EMPTY( ::__DisplayArray )
       ::__DisplayData()
@@ -2735,7 +2738,9 @@ METHOD __FillRow( nPos ) CLASS DataGrid
                                          nStatus,;
                                          ::Children[x]:Representation,;
                                          ::Children[x]:Font:Handle }
-       ::__DataWidth += ::Children[x]:Width
+       IF ::Children[x]:Visible
+          ::__DataWidth += ::Children[x]:Width
+       ENDIF
    NEXT
 
 RETURN Self
@@ -3563,6 +3568,7 @@ CLASS GridColumn INHERIT Object
    DATA Locked                       PUBLISHED INIT FALSE
    DATA Picture                      PUBLISHED
    DATA Caption                      PUBLISHED
+   DATA Visible                      PUBLISHED INIT .T.
    DATA Data                         PUBLISHED
    
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }

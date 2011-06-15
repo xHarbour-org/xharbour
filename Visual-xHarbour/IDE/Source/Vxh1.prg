@@ -4547,7 +4547,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    IF cPrevPath != NIL
-      OutputDebugString( cPrevPath )
       cPrevRes := ::FixPath( cPrevPath, "Resource" )
       cResPath := ::FixPath( , "Resource" )
       aDir := directory( cPrevRes + "\*.*", "D", .F.,.f. )
@@ -4573,7 +4572,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
           IF (:lModified .OR. lForce) .AND. !EMPTY( :cPath ) .AND. !EMPTY( :cFile )
-             OutputDebugString( :cFile )
              aEditors[n]:Save()
           ENDIF
        END
@@ -4581,14 +4579,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    cSourcePath := ::FixPath(, "Source" )
    IF ::Application:ProjectPrgEditor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
-      OutputDebugString( ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
    ENDIF
 
    ::AppObject:Resources := {}
    FOR EACH cFile IN ::Properties:Resources
        IF FILE( cFile )
-          OutputDebugString( cFile )
           n := RAT( "\", cFile )
           cResImg := SUBSTR( cFile, n + 1 )
           cResImg := STRTRAN( cResImg, " " )
@@ -4624,7 +4620,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    IF LEN( ::Forms ) > 0
-      OutputDebugString( cFile )
       oFile := CFile( ::Properties:Name + "_XFM.prg" )
       oFile:Path := cSourcePath
       ::AppObject:Name := ::Properties:Name
@@ -5162,7 +5157,11 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMembers, aEntries, n, cProject, oItem, nId, nBkHeight, oLink, x, oMenu
+   LOCAL lMems, lMembers, aEntries, n, cProject, oItem, nId, nBkHeight, oLink, x, oMenu
+
+   lMems := ::Application:GenerateMembers
+
+   ::Application:GenerateMembers := .F.
 
    // IniFile Recently open projects
    aEntries := ::Application:IniFile:GetEntries( "Recent" )
@@ -5186,7 +5185,6 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
       :Children := {}
       FOR EACH cProject IN aEntries
           oItem := MenuStripItem( :this )
-          oItem:GenerateMember := .F.
           oItem:Caption := cProject
           oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
           oItem:Create()
@@ -5205,7 +5203,6 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
        oLink := LinkLabel( ::Application:MainForm:Panel4 )
 
        WITH OBJECT oLink
-          :GenerateMember := .F.
           :ImageIndex  := 32
           :Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
           :Left        := 30
@@ -5223,6 +5220,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
           EXIT
        ENDIF
    NEXT
+   ::Application:GenerateMembers := lMems
 
 RETURN Self
 
