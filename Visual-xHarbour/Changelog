@@ -10,6 +10,7 @@
 
 2011-06-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid error when control is destroyed.
+   ! Centered Splash screen regardless the main form position.
 
 2011-05-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid initial and last scrollbar positions

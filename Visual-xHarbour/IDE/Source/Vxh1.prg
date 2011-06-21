@@ -77,7 +77,7 @@ INIT PROCEDURE __VXH_Start
                aRect := NIL
             ENDIF
          ENDIF
-         Splash( GetModuleHandle( "vxh.exe" ), "SPLASH", "BMP",, aRect )
+         Splash( GetModuleHandle( "vxh.exe" ), "SPLASH", "BMP",,  )
       ENDIF
       RegCloseKey( hKey )
    ENDIF
