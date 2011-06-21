@@ -717,13 +717,18 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
 
    ::__DataWidth := 0
    AEVAL( ::Children, {|o|o:xPosition := n++, ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
-
-   ::__Update( lDisplay )
-   ::__UpdateHScrollBar()
-   IF ::DataSource != NIL
-      ::__DisplayData()
+   
+   IF ::IsWindow()
+      TRY
+         ::__Update( lDisplay )
+         ::__UpdateHScrollBar()
+         IF ::DataSource != NIL
+            ::__DisplayData()
+         ENDIF
+         ::InvalidateRect()
+      CATCH
+      END
    ENDIF
-   ::InvalidateRect()
 RETURN(.T.)
 
 //---------------------------------------------------------------------------------
@@ -1620,286 +1625,286 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i // avoid painting non-visible columns
                  EXIT
               ENDIF
-              IF ! ::Children[ i ]:Visible
-                 LOOP
-              ENDIF
-              cData  := ::__DisplayArray[nLine][1][i][ 1]
-              nInd   := ::__DisplayArray[nLine][1][i][ 2]
-              nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nLine][1][i][ 3], 2 )
-              nAlign := ::__DisplayArray[nLine][1][i][ 4]
-              nHImg  := ::__DisplayArray[nLine][1][i][ 5]
-              
-              nBkCol := ::__DisplayArray[nLine][1][i][ 7]
+              IF ::Children[ i ]:Visible
 
-              IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
-                 nBkCol := DarkenColor( nBkCol, 25 )
-              ENDIF
-              
-              nTxCol := ::__DisplayArray[nLine][1][i][ 8]
-              nStatus:= ::__DisplayArray[nLine][1][i][10]
-              nRep   := ::__DisplayArray[nLine][1][i][11]
+                 cData  := ::__DisplayArray[nLine][1][i][ 1]
+                 nInd   := ::__DisplayArray[nLine][1][i][ 2]
+                 nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nLine][1][i][ 3], 2 )
+                 nAlign := ::__DisplayArray[nLine][1][i][ 4]
+                 nHImg  := ::__DisplayArray[nLine][1][i][ 5]
 
-              hOldFont := SelectObject( hMemDC, ::__DisplayArray[nLine][1][i][12] )
+                 nBkCol := ::__DisplayArray[nLine][1][i][ 7]
 
-              zLeft := nLeft
-              IF lFreeze .AND. i <= ::FreezeColumn
-                 zLeft := iLeft
-              ENDIF
-              nRight := zLeft + ::Children[i]:xWidth
-
-              IF lFreeze .AND. i > ::FreezeColumn .AND. nRight < iRight
-                 nLeft  += ::Children[i]:Width
-                 iLeft  += ::Children[i]:Width
-                 LOOP
-              ENDIF
-
-              SWITCH VALTYPE( cData )
-                 CASE "N"
-                      DEFAULT nAlign TO 2
-                      cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( STR( cData ) )
-                      EXIT
-
-                 CASE "D"
-                      DEFAULT nAlign TO 3
-                      cData := ALLTRIM(DTOC( cData ))
-                      EXIT
-
-                 CASE "L"
-                      DEFAULT nAlign TO 3
-                      cData := ALLTRIM(IIF( cData, "<True>", "<False>" ))
-                      EXIT
-
-                 CASE "C"
-                      DEFAULT nAlign TO 1
-                      cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( cData )
-                      EXIT
-
-                 CASE "B"
-                      DEFAULT nAlign TO 3
-                      cData := "<block>"
-                      EXIT
-
-                 CASE "A"
-                      DEFAULT nAlign TO 1
-                      EXIT
-              END
-
-              IF VALTYPE( cData ) != "A"
-                 aData := __str2a( cData, CHR(13)+CHR(10) )
-               ELSE
-                 aData := cData
-              ENDIF
-              IF EMPTY( aData )
-                 AADD( aData, "" )
-              ENDIF
-
-              lHighLight := .F.
-              IF ::DataSource:Deleted()
-                 IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
-                 
-                    lHighLight := ::HasFocus .OR. ::__CurControl != NIL
-                 
-                    SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, nBkCol ) )
-                    SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, nTxCol ) )
-                  ELSE
-                    SetBkColor( hMemDC, nBkCol )
-                    SetTextColor( hMemDC, nTxCol )
+                 IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
+                    nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
-               ELSE
-                 IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
-                    SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
-                    SetTextColor( hMemDC, nTxCol /*::__InactiveHighlightText*/ )
+
+                 nTxCol := ::__DisplayArray[nLine][1][i][ 8]
+                 nStatus:= ::__DisplayArray[nLine][1][i][10]
+                 nRep   := ::__DisplayArray[nLine][1][i][11]
+
+                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nLine][1][i][12] )
+
+                 zLeft := nLeft
+                 IF lFreeze .AND. i <= ::FreezeColumn
+                    zLeft := iLeft
+                 ENDIF
+                 nRight := zLeft + ::Children[i]:xWidth
+
+                 IF lFreeze .AND. i > ::FreezeColumn .AND. nRight < iRight
+                    nLeft  += ::Children[i]:Width
+                    iLeft  += ::Children[i]:Width
+                    LOOP
+                 ENDIF
+
+                 SWITCH VALTYPE( cData )
+                    CASE "N"
+                         DEFAULT nAlign TO 2
+                         cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( STR( cData ) )
+                         EXIT
+
+                    CASE "D"
+                         DEFAULT nAlign TO 3
+                         cData := ALLTRIM(DTOC( cData ))
+                         EXIT
+
+                    CASE "L"
+                         DEFAULT nAlign TO 3
+                         cData := ALLTRIM(IIF( cData, "<True>", "<False>" ))
+                         EXIT
+
+                    CASE "C"
+                         DEFAULT nAlign TO 1
+                         cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( cData )
+                         EXIT
+
+                    CASE "B"
+                         DEFAULT nAlign TO 3
+                         cData := "<block>"
+                         EXIT
+
+                    CASE "A"
+                         DEFAULT nAlign TO 1
+                         EXIT
+                 END
+
+                 IF VALTYPE( cData ) != "A"
+                    aData := __str2a( cData, CHR(13)+CHR(10) )
                   ELSE
-                    IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect ) //.AND. nRecno == nRec
+                    aData := cData
+                 ENDIF
+                 IF EMPTY( aData )
+                    AADD( aData, "" )
+                 ENDIF
+
+                 lHighLight := .F.
+                 IF ::DataSource:Deleted()
+                    IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
+
                        lHighLight := ::HasFocus .OR. ::__CurControl != NIL
-                       SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) ) )
-                       SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, IIF( ::ShadowRow, ::__InactiveHighlightText, nTxCol ) ) )
+
+                       SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, nBkCol ) )
+                       SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, nTxCol ) )
                      ELSE
-                       IF lSelected .AND. !::FullRowSelect .AND. i != ::ColPos .AND. ::ShadowRow
-                          SetBkColor( hMemDC, ::__InactiveHighlight )
-                          SetTextColor( hMemDC, ::__InactiveHighlightText )
+                       SetBkColor( hMemDC, nBkCol )
+                       SetTextColor( hMemDC, nTxCol )
+                    ENDIF
+                  ELSE
+                    IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
+                       SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
+                       SetTextColor( hMemDC, nTxCol /*::__InactiveHighlightText*/ )
+                     ELSE
+                       IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect ) //.AND. nRecno == nRec
+                          lHighLight := ::HasFocus .OR. ::__CurControl != NIL
+                          SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) ) )
+                          SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, IIF( ::ShadowRow, ::__InactiveHighlightText, nTxCol ) ) )
                         ELSE
-                          SetBkColor( hMemDC, nBkCol )
-                          SetTextColor( hMemDC, nTxCol )
+                          IF lSelected .AND. !::FullRowSelect .AND. i != ::ColPos .AND. ::ShadowRow
+                             SetBkColor( hMemDC, ::__InactiveHighlight )
+                             SetTextColor( hMemDC, ::__InactiveHighlightText )
+                           ELSE
+                             SetBkColor( hMemDC, nBkCol )
+                             SetTextColor( hMemDC, nTxCol )
+                          ENDIF
                        ENDIF
                     ENDIF
                  ENDIF
-              ENDIF
-              
-              nHeaderRight := nRight-1
-              aText := { zLeft, nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
-              
-              IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight
-                 aText[1] := iRight
-                 aText[3] += iRight - zLeft
-              ENDIF
-              IF nLine == 1 .AND. ::ShowHeaders
-                 aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
-                 x := zLeft + 3
+
+                 nHeaderRight := nRight-1
+                 aText := { zLeft, nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
+
+                 IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight
+                    aText[1] := iRight
+                    aText[3] += iRight - zLeft
+                 ENDIF
+                 IF nLine == 1 .AND. ::ShowHeaders
+                    aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
+                    x := zLeft + 3
+
+                    SWITCH nAlign
+                       CASE 2
+                            x := nRight - aAlign[1]-3
+                            EXIT
+
+                       CASE 3
+                            x:= zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
+                            EXIT
+                    END
+                    ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
+                 ENDIF
+
+                 aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
+
+                 x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 2 )
+
+                 y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
 
                  SWITCH nAlign
                     CASE 2
-                         x := nRight - aAlign[1]-3
+                         x := nRight - aAlign[1]-4
+                         IF ::Children[i]:ImageAlignment == 3
+                            x -= nWImg
+                         ENDIF
+                         nAlign := DT_RIGHT
                          EXIT
 
                     CASE 3
-                         x:= zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
+                         x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
+                         nAlign := DT_CENTER
                          EXIT
                  END
-                 ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
-              ENDIF
 
-              aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
-              
-              x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 2 )
-              
-              y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
+                 nAve := Int( ( Int( aTextExt[ 1 ] / 26 ) + 1 ) / 2 )
 
-              SWITCH nAlign
-                 CASE 2
-                      x := nRight - aAlign[1]-4
-                      IF ::Children[i]:ImageAlignment == 3
-                         x -= nWImg
-                      ENDIF
-                      nAlign := DT_RIGHT
-                      EXIT
+                 lHide := ::Children[i]:ControlHide
+                 IF VALTYPE( lHide ) == "B"
+                    lHide := EVAL( ::Children[i]:ControlHide, Self, nRec )
+                 ENDIF
 
-                 CASE 3
-                      x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
-                      nAlign := DT_CENTER
-                      EXIT
-              END
-              
-              nAve := Int( ( Int( aTextExt[ 1 ] / 26 ) + 1 ) / 2 )
+                 nCtrl := 0
+                 lDrawControl := .F.
+                 IF nRep == 1 .OR. nRep == 3
 
-              lHide := ::Children[i]:ControlHide
-              IF VALTYPE( lHide ) == "B"
-                 lHide := EVAL( ::Children[i]:ControlHide, Self, nRec )
-              ENDIF
+                    TRY
+                       IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
+                          DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
 
-              nCtrl := 0
-              lDrawControl := .F.
-              IF nRep == 1 .OR. nRep == 3
-
-                 TRY
-                    IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
-                       DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
-
-                       IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
-                          IF ::Children[i]:ControlAlign == DT_LEFT
-                             nCtrl += ::Children[i]:ControlWidth + 1
-                             x+=::Children[i]:ControlWidth+1
+                          IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
+                             IF ::Children[i]:ControlAlign == DT_LEFT
+                                nCtrl += ::Children[i]:ControlWidth + 1
+                                x+=::Children[i]:ControlWidth+1
+                             ENDIF
+                             lDrawControl := .T.
                           ENDIF
-                          lDrawControl := .T.
-                       ENDIF
 
+                       ENDIF
+                    CATCH
+                    END
+
+                    IF nRep == 1
+                       FOR z := 1 TO LEN( aData )
+                           aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
+                           IF aAlign != NIL
+                              IF nAlign == 1
+                                 nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
+                                 IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
+                                    aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
+                                 ENDIF
+                              ENDIF
+                              _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+IIF( z==1,ETO_OPAQUE,0), aText,aData[z])
+                              y += aAlign[2]
+                           ENDIF
+                       NEXT
+                     ELSE
+                      _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, aText, " ")
                     ENDIF
-                 CATCH
-                 END
+                 ENDIF
+                 // Draw Grid
+                 IF ::xShowGrid
+                    aGrid := { {zLeft,nBottom}, {nRight,nBottom}, {nRight-1,nBottom}, {nRight-1,nTop-1} }
+                    _PolyLine( hMemDC, aGrid )
+                 ENDIF
+
+                 IF ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
+                    nFocRow := nLine
+                 ENDIF
 
                  IF nRep == 1
-                    FOR z := 1 TO LEN( aData )
-                        aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
-                        IF aAlign != NIL
-                           IF nAlign == 1
-                              nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
-                              IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
-                                 aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
-                              ENDIF
-                           ENDIF
-                           _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+IIF( z==1,ETO_OPAQUE,0), aText,aData[z])
-                           y += aAlign[2]
-                        ENDIF
-                    NEXT
-                  ELSE
-                   _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, aText, " ")
-                 ENDIF
-              ENDIF
-              // Draw Grid
-              IF ::xShowGrid
-                 aGrid := { {zLeft,nBottom}, {nRight,nBottom}, {nRight-1,nBottom}, {nRight-1,nTop-1} }
-                 _PolyLine( hMemDC, aGrid )
-              ENDIF
 
-              IF ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
-                 nFocRow := nLine
-              ENDIF
+                    // Draw the icon if it is part visible
+                    IF nWImg > 2 .AND. ::ImageList != NIL
+                       nY := nTop + ( (nBottom-nTop-nHImg)/2) + 1
 
-              IF nRep == 1
+                       nImgX := zLeft+nCtrl+1
 
-                 // Draw the icon if it is part visible
-                 IF nWImg > 2 .AND. ::ImageList != NIL
-                    nY := nTop + ( (nBottom-nTop-nHImg)/2) + 1
+                       IF ::Children[i]:ImageAlignment == 2
+                          nImgX := zLeft + (((aText[3]-aText[1])-nWImg)/2)
+                        ELSEIF ::Children[i]:ImageAlignment == 3
+                          nImgX := zLeft + ((aText[3]-aText[1])-nWImg)
+                       ENDIF
 
-                    nImgX := zLeft+nCtrl+1
-                    
-                    IF ::Children[i]:ImageAlignment == 2
-                       nImgX := zLeft + (((aText[3]-aText[1])-nWImg)/2)
-                     ELSEIF ::Children[i]:ImageAlignment == 3
-                       nImgX := zLeft + ((aText[3]-aText[1])-nWImg)
+                       IF nImgX >= zLeft .AND. VALTYPE( ::ImageList ) == "O"
+                          IF !::xEnabled
+                             ::ImageList:DrawDisabled( hMemDC, nInd, nImgX, nY )
+                           ELSE
+                             ::ImageList:DrawImage( hMemDC, nInd, nImgX, nY, ILD_TRANSPARENT )
+                          ENDIF
+                       ENDIF
+
                     ENDIF
-                    
-                    IF nImgX >= zLeft
-                       IF !::xEnabled
-                          ::ImageList:DrawDisabled( hMemDC, nInd, nImgX, nY )
-                        ELSE
-                          ::ImageList:DrawImage( hMemDC, nInd, nImgX, nY, ILD_TRANSPARENT )
+
+                    IF lDrawControl
+                       aRect := ::Children[i]:ControlObject:DrawFrame( ::Drawing, {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}, ::Children[i]:ControlAlign, ::Children[i]:ControlWidth, ::Children[i]:ControlHeight, nStatus )
+                       IF lSelected
+                          ::__CheckPos := aRect
                        ENDIF
                     ENDIF
 
-                 ENDIF
+                  ELSEIF nRep > 1
 
-                 IF lDrawControl
-                    aRect := ::Children[i]:ControlObject:DrawFrame( ::Drawing, {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}, ::Children[i]:ControlAlign, ::Children[i]:ControlWidth, ::Children[i]:ControlHeight, nStatus )
-                    IF lSelected
-                       ::__CheckPos := aRect
+                    x:= zLeft + ((nRight-zLeft+nWImg)/2) - (aAlign[1]/2)
+
+                    IF nRep == 3
+                       aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
                     ENDIF
+                    ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nLine][1][i][ 1] )
+
                  ENDIF
 
-               ELSEIF nRep > 1
+                 lBorder := ::ShowSelectionBorder .AND. ( nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) )
 
-                 x:= zLeft + ((nRight-zLeft+nWImg)/2) - (aAlign[1]/2)
-
-                 IF nRep == 3
-                    aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
-                 ENDIF
-                 ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nLine][1][i][ 1] )
-
-              ENDIF
-
-              lBorder := ::ShowSelectionBorder .AND. ( nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) )
-
-              IF ::ShadowRow .AND. !::FullRowSelect .AND. !::ShowSelection .AND. ::ShowSelectionBorder .AND. nRec == nRecno 
-                 hPen := SelectObject( hMemDC, GetStockObject( BLACK_PEN ) )
-                 IF i == ::ColPos
-                    hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
-                    Rectangle( hMemDC, zLeft, nTop, nRight, nBottom )
-                    SelectObject( hMemDC, hBrush )
+                 IF ::ShadowRow .AND. !::FullRowSelect .AND. !::ShowSelection .AND. ::ShowSelectionBorder .AND. nRec == nRecno 
+                    hPen := SelectObject( hMemDC, GetStockObject( BLACK_PEN ) )
+                    IF i == ::ColPos
+                       hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+                       Rectangle( hMemDC, zLeft, nTop, nRight, nBottom )
+                       SelectObject( hMemDC, hBrush )
+                     ELSE
+                       MoveTo( hMemDC, zLeft, nTop )
+                       LineTo( hMemDC, nRight, nTop )
+                       MoveTo( hMemDC, zLeft, nBottom-1 )
+                       LineTo( hMemDC, nRight, nBottom-1 )
+                    ENDIF
+                    SelectObject( hMemDC, hPen )
+                    IF lBorder
+                       _DrawFocusRect( hMemDC, {aText[1]+1, aText[2]+1, aText[3], aText[4]-1} )
+                       lBorder := .F.
+                    ENDIF
                   ELSE
-                    MoveTo( hMemDC, zLeft, nTop )
-                    LineTo( hMemDC, nRight, nTop )
-                    MoveTo( hMemDC, zLeft, nBottom-1 )
-                    LineTo( hMemDC, nRight, nBottom-1 )
+                    IF !lHighLight .AND. nRec == nRecno .AND. !lSelected .AND. ::MultipleSelection .AND. ( i == ::ColPos .OR. ::FullRowSelect )
+                       lHighLight := .T.
+                    ENDIF
+                    lBorder := ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
                  ENDIF
-                 SelectObject( hMemDC, hPen )
-                 IF lBorder
-                    _DrawFocusRect( hMemDC, {aText[1]+1, aText[2]+1, aText[3], aText[4]-1} )
-                    lBorder := .F.
-                 ENDIF
-               ELSE
-                 IF !lHighLight .AND. nRec == nRecno .AND. !lSelected .AND. ::MultipleSelection .AND. ( i == ::ColPos .OR. ::FullRowSelect )
-                    lHighLight := .T.
-                 ENDIF
-                 lBorder := ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
-              ENDIF
-              
 
-              IF !::FullRowSelect .AND. lBorder 
-                 _DrawFocusRect( hMemDC, aText )
-              ENDIF
 
-              nLeft  += ::Children[i]:Width
-              iLeft  += ::Children[i]:Width
+                 IF !::FullRowSelect .AND. lBorder 
+                    _DrawFocusRect( hMemDC, aText )
+                 ENDIF
+
+                 nLeft  += ::Children[i]:Width
+                 iLeft  += ::Children[i]:Width
+              ENDIF
           NEXT
 
         ELSE
@@ -1917,64 +1922,66 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               IF nLeft > ::ClientWidth // avoid painting non-visible columns
                  EXIT
               ENDIF
+              IF ::Children[ i ]:Visible
               
-              zLeft := nLeft
-              IF lFreeze .AND. i <= ::FreezeColumn
-                 zLeft := iLeft
-              ENDIF
-              nRight := zLeft + ::Children[i]:xWidth
+                 zLeft := nLeft
+                 IF lFreeze .AND. i <= ::FreezeColumn
+                    zLeft := iLeft
+                 ENDIF
+                 nRight := zLeft + ::Children[i]:xWidth
 
-              IF lFreeze .AND. i > ::FreezeColumn .AND. nRight < iRight
+                 IF lFreeze .AND. i > ::FreezeColumn .AND. nRight < iRight
+                    nLeft  += ::Children[i]:Width
+                    iLeft  += ::Children[i]:Width
+                    LOOP
+                 ENDIF
+
+                 //nRight := nLeft + ::Children[ i ]:xWidth
+
+                 x := zLeft
+                 y := nTop
+
+                 SetBkColor( hMemDC, nBkCol )
+                 SetTextColor( hMemDC, ::ForeColor )
+
+                 // Draw empty last line
+                 _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+ETO_OPAQUE, { zLeft, nTop, nRight+1, nBottom+1 }," ")
+
+                 IF ::xShowGrid
+                    aGrid := { {zLeft,nBottom}, {nRight,nBottom}, {nRight-1,nBottom}, {nRight-1,nTop-1} }
+                    _PolyLine( hMemDC, aGrid )
+                 ENDIF
+
+                 aText := { zLeft, nTop, nRight-IIF( ( ::FullRowSelect .AND. i<nColEnd ), 0, 1 ), nBottom+1 }
+
+                 nHeaderRight := nRight-1
+
+                 IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight //.AND. v == 1
+                    aText[1] := iRight
+                    aText[3] += iRight - zLeft
+                 ENDIF
+
+                 IF nLine == 1 .AND. ::ShowHeaders
+                    aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
+                    nAlign := ::Children[i]:xAlignment
+                    x := zLeft + 3
+
+                    SWITCH nAlign
+                       CASE 2
+                            x := nRight - aAlign[1]-3
+                            EXIT
+
+                       CASE 3
+                            x:= zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
+                            EXIT
+                    END
+                    ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
+                 ENDIF
+
+
                  nLeft  += ::Children[i]:Width
                  iLeft  += ::Children[i]:Width
-                 LOOP
               ENDIF
-
-              //nRight := nLeft + ::Children[ i ]:xWidth
-
-              x := zLeft
-              y := nTop
-
-              SetBkColor( hMemDC, nBkCol )
-              SetTextColor( hMemDC, ::ForeColor )
-
-              // Draw empty last line
-              _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+ETO_OPAQUE, { zLeft, nTop, nRight+1, nBottom+1 }," ")
-
-              IF ::xShowGrid
-                 aGrid := { {zLeft,nBottom}, {nRight,nBottom}, {nRight-1,nBottom}, {nRight-1,nTop-1} }
-                 _PolyLine( hMemDC, aGrid )
-              ENDIF
-
-              aText := { zLeft, nTop, nRight-IIF( ( ::FullRowSelect .AND. i<nColEnd ), 0, 1 ), nBottom+1 }
-
-              nHeaderRight := nRight-1
-
-              IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight //.AND. v == 1
-                 aText[1] := iRight
-                 aText[3] += iRight - zLeft
-              ENDIF
-
-              IF nLine == 1 .AND. ::ShowHeaders
-                 aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
-                 nAlign := ::Children[i]:xAlignment
-                 x := zLeft + 3
-
-                 SWITCH nAlign
-                    CASE 2
-                         x := nRight - aAlign[1]-3
-                         EXIT
-
-                    CASE 3
-                         x:= zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
-                         EXIT
-                 END
-                 ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
-              ENDIF
-
-
-              nLeft  += ::Children[i]:Width
-              iLeft  += ::Children[i]:Width
           NEXT
 
        ENDIF
