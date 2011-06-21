@@ -182,6 +182,8 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
                ENDIF
                hTotal:Value += cText
             ENDIF
+            cText := ALLTRIM( xStr( cText ) )
+            hCtrl:Text := cText
           ELSE
             cText := ::Text
             IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
@@ -202,12 +204,23 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
                   ENDIF
                   hTotal:Value += cText
                ENDIF
+               cText := ALLTRIM( xStr( cText ) )
+               hCtrl:Text := cText
+             ELSE
+               IF hCtrl:ParName == NIL
+                  TRY
+                     cText := &(::Text)
+                   CATCH
+                     cText := ::Text
+                  END
+                  IF VALTYPE( cText ) == "B"
+                     cText := EVAL( cText, ::Parent )
+                  ENDIF
+               ENDIF
             ENDIF
          ENDIF
-         
          cText := ALLTRIM( xStr( cText ) )
          
-         hCtrl:Text := cText
          
          IF ::Alignment > 1
             :Attribute( "HorzAlign", ::Alignment )

@@ -76,11 +76,22 @@ METHOD Create() CLASS VrDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
+   LOCAL cAlias
    WITH OBJECT ::EditCtrl
       :xFileName := ::FileName
       :Driver   := ::Driver
+
       IF !EMPTY( ::Alias )
-         :Alias := ::Alias 
+         :Alias := ::Alias
+         IF ::EditMode
+            :Alias += "_desMode"
+         ENDIF
+       ELSE
+         cAlias := SUBSTR( ::FileName, RAT("\",::FileName)+1 )
+         cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
+         IF ::EditMode
+            :Alias := cAlias + "_desMode"
+         ENDIF
       ENDIF
 
       :Create()

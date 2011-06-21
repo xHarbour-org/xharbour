@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-20 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Added more room to all list properties (comboboxes)
+   + Added support for xbase code inside the Text property
+
 2010-12-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Component holder to allow selecting non UI components
    + Added DataTable component to ToolBox

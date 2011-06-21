@@ -753,7 +753,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                            :Left   := nLeft-1
                            :Top    := rc:top
                            :Width  := ::Columns[ nCol ][ 1 ]+4
-                           :Height := 70
+                           :Height := 300
                            :Border := .F.
 
                            :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
