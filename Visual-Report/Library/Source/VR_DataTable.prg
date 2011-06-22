@@ -24,6 +24,9 @@ CLASS VrDataTable INHERIT VrObject
    DATA ClsName          EXPORTED INIT "DataTable"
    DATA SysBackColor     EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA ConnectionString EXPORTED
+   DATA Server           EXPORTED INIT CONNECT_ODBC
+   DATA EnumServer       EXPORTED INIT { { "AutoDetect", "ODBC", "RPC", "MySQL", "Postgres", "Oracle", "Firebird" }, {0,1,2,3,4,5,6} }
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
@@ -46,12 +49,14 @@ METHOD Init( oParent ) CLASS VrDataTable
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      AADD( ::aProperties, { "FileName",  "General"  } )
-      AADD( ::aProperties, { "Alias",     "General"  } )
-      AADD( ::aProperties, { "bFilter",   "General"  } )
-      AADD( ::aProperties, { "Name",      "Object"   } )
-      AADD( ::aProperties, { "Driver",    "Object"   } )
-      AADD( ::aProperties, { "Order",     "Index"    } )
+      AADD( ::aProperties, { "FileName",         "General"  } )
+      AADD( ::aProperties, { "Alias",            "General"  } )
+      AADD( ::aProperties, { "bFilter",          "General"  } )
+      AADD( ::aProperties, { "Name",             "Object"   } )
+      AADD( ::aProperties, { "Driver",           "Object"   } )
+      AADD( ::aProperties, { "Order",            "Index"    } )
+      AADD( ::aProperties, { "Server",           "SQL"      } )
+      AADD( ::aProperties, { "ConnectionString", "SQL"      } )
    ENDIF
 RETURN Self
 
@@ -116,5 +121,13 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, XSTR( ::Driver ) )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR( ::Server ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionString", NIL, XSTR( ::ConnectionString ) )
+   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
+#pragma comment( lib, "libmysql.lib" )
+#pragma comment( lib, "libpq.lib" )
+#pragma comment( lib, "oci.lib" )
+#pragma comment( lib, "fbclient_ms.lib" )

@@ -547,6 +547,24 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ::DataSource := oData
           ENDIF
 
+
+
+
+
+//    IF ::__ClassInst == NIL .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0 
+//       ::Connected     := .T.
+//       ::ConnectionID  := nCnn
+//       ::Sql           := SR_GetConnection( nCnn )
+
+//       IF HGetPos( ::EventHandler, "OnConnect" ) != 0
+//          cEvent := ::EventHandler[ "OnConnect" ]
+//          IF __objHasMsg( ::Form, cEvent )
+//             ::Form:&cEvent( Self )
+//          ENDIF
+//       ENDIF
+//    ENDIF
+
+
        ENDIF
    NEXT
 

@@ -17,7 +17,6 @@
 
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text      READ xText WRITE SetText
-   DATA Field         EXPORTED
    DATA AutoResize    EXPORTED  INIT .F.
    DATA ClsName       EXPORTED  INIT "Label"
    DATA SysBackColor  EXPORTED  INIT GetSysColor( COLOR_WINDOW )
@@ -43,9 +42,6 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
-      IF ::ClsName == "Label"
-         AADD( ::aProperties, { "Field",      "General" } )
-      ENDIF
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
@@ -124,8 +120,6 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Text", NIL, ::Text )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Field", NIL, ::Field )
-   oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ForeColor", NIL, XSTR( ::ForeColor ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "BackColor", NIL, XSTR( ::BackColor ) )
@@ -174,9 +168,20 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
       ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
       ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         IF !EMPTY( ::Field )
-            cText := ::Parent:DataSource:Fields:&(::Field)
-            IF hTotal != NIL .AND. VALTYPE(cText) == "N"
+         cText := ::Text
+         IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
+            IF !EMPTY( ::Value )
+               TRY
+                  cText := &(::Value)
+               CATCH
+                  cText := ::Value
+               END
+            ENDIF
+            IF VALTYPE( cText ) == "B"
+               cText := EVAL( cText, ::Parent )
+            ENDIF
+
+            IF hTotal != NIL
                IF EMPTY( hTotal:Value )
                   hTotal:Value := 0
                ENDIF
@@ -185,38 +190,20 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             cText := ALLTRIM( xStr( cText ) )
             hCtrl:Text := cText
           ELSE
-            cText := ::Text
-            IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
-               IF !EMPTY( ::Value )
-                  TRY
-                     cText := &(::Value)
-                  CATCH
-                     cText := ::Value
-                  END
-               ENDIF
-               IF VALTYPE( cText ) == "B"
-                  cText := EVAL( cText, ::Parent )
-               ENDIF
+            TRY
+               cText := &(::Text)
+             CATCH
+               cText := ::Text
+            END
+            IF VALTYPE( cText ) == "B"
+               cText := EVAL( cText, ::Parent )
+            ENDIF
 
-               IF hTotal != NIL
-                  IF EMPTY( hTotal:Value )
-                     hTotal:Value := 0
-                  ENDIF
-                  hTotal:Value += cText
+            IF hTotal != NIL
+               IF EMPTY( hTotal:Value )
+                  hTotal:Value := 0
                ENDIF
-               cText := ALLTRIM( xStr( cText ) )
-               hCtrl:Text := cText
-             ELSE
-               IF hCtrl:ParName == NIL
-                  TRY
-                     cText := &(::Text)
-                   CATCH
-                     cText := ::Text
-                  END
-                  IF VALTYPE( cText ) == "B"
-                     cText := EVAL( cText, ::Parent )
-                  ENDIF
-               ENDIF
+               hTotal:Value += cText
             ENDIF
          ENDIF
          cText := ALLTRIM( xStr( cText ) )
@@ -391,7 +378,6 @@ ENDCLASS
 METHOD Init( oParent ) CLASS VrTotal
    Super:Init( oParent )
    AADD( ::aProperties, { "Column",      "Data"  } )
-   AADD( ::aProperties, { "Value",       "Data"  } )
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrTotal
