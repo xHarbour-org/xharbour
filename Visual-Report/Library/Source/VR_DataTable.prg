@@ -12,6 +12,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "hbxml.ch"
+#include "sqlrdd.ch"
 
 #define  acObjectTypeText           5
 
@@ -127,7 +128,9 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
+#pragma BEGINDUMP
 #pragma comment( lib, "libmysql.lib" )
 #pragma comment( lib, "libpq.lib" )
 #pragma comment( lib, "oci.lib" )
 #pragma comment( lib, "fbclient_ms.lib" )
+#pragma ENDDUMP
