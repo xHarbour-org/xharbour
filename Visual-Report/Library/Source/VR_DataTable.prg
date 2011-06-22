@@ -12,7 +12,6 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "hbxml.ch"
-#include "sqlrdd.ch"
 
 #define  acObjectTypeText           5
 
@@ -50,16 +49,34 @@ METHOD Init( oParent ) CLASS VrDataTable
    IF oParent != NIL
       Super:Init( oParent )
       ::aProperties := {}
-      AADD( ::aProperties, { "FileName",         "General"  } )
-      AADD( ::aProperties, { "Alias",            "General"  } )
-      AADD( ::aProperties, { "bFilter",          "General"  } )
-      AADD( ::aProperties, { "Name",             "Object"   } )
-      AADD( ::aProperties, { "Driver",           "Object"   } )
-      AADD( ::aProperties, { "Order",            "Index"    } )
-      AADD( ::aProperties, { "Server",           "SQL"      } )
-      AADD( ::aProperties, { "ConnectionString", "SQL"      } )
+      AADD( ::aProperties, { "FileName",  "General"  } )
+      AADD( ::aProperties, { "Alias",     "General"  } )
+      AADD( ::aProperties, { "bFilter",   "General"  } )
+      AADD( ::aProperties, { "Name",      "Object"   } )
+      AADD( ::aProperties, { "Driver",    "Object"   } )
+      AADD( ::aProperties, { "Order",     "Index"    } )
+      AADD( ::aProperties, { "ConnectionString", "SQL" } )
    ENDIF
 RETURN Self
+
+   IF ::__ClassInst == NIL .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0 
+      ::Connected     := .T.
+      ::ConnectionID  := nCnn
+      ::Sql           := SR_GetConnection( nCnn )
+
+      IF HGetPos( ::EventHandler, "OnConnect" ) != 0
+         cEvent := ::EventHandler[ "OnConnect" ]
+         IF __objHasMsg( ::Form, cEvent )
+            ::Form:&cEvent( Self )
+         ENDIF
+      ENDIF
+   ENDIF
+
+
+
+
+
+
 
 METHOD Create() CLASS VrDataTable
 
@@ -122,15 +139,6 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, XSTR( ::Driver ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR( ::Server ) )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionString", NIL, XSTR( ::ConnectionString ) )
-   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-#pragma BEGINDUMP
-#pragma comment( lib, "libmysql.lib" )
-#pragma comment( lib, "libpq.lib" )
-#pragma comment( lib, "oci.lib" )
-#pragma comment( lib, "fbclient_ms.lib" )
-#pragma ENDDUMP
+   DATA aIncLibs         EXPORTED INIT   { NIL, NIL, NIL, "libmysql.lib", "libpq", "oci", "fbclient_ms.lib" }
