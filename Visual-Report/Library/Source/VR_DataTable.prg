@@ -12,6 +12,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "hbxml.ch"
+#include "sqlrdd.ch"
 
 #define  acObjectTypeText           5
 
@@ -24,7 +25,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA ClsName          EXPORTED INIT "DataTable"
    DATA SysBackColor     EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA ConnectionString EXPORTED
+   DATA ConnectionString EXPORTED INIT ""
    DATA Server           EXPORTED INIT CONNECT_ODBC
    DATA EnumServer       EXPORTED INIT { { "AutoDetect", "ODBC", "RPC", "MySQL", "Postgres", "Oracle", "Firebird" }, {0,1,2,3,4,5,6} }
 
@@ -55,28 +56,10 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "Name",      "Object"   } )
       AADD( ::aProperties, { "Driver",    "Object"   } )
       AADD( ::aProperties, { "Order",     "Index"    } )
+      AADD( ::aProperties, { "Server",           "SQL" } )
       AADD( ::aProperties, { "ConnectionString", "SQL" } )
    ENDIF
 RETURN Self
-
-   IF ::__ClassInst == NIL .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0 
-      ::Connected     := .T.
-      ::ConnectionID  := nCnn
-      ::Sql           := SR_GetConnection( nCnn )
-
-      IF HGetPos( ::EventHandler, "OnConnect" ) != 0
-         cEvent := ::EventHandler[ "OnConnect" ]
-         IF __objHasMsg( ::Form, cEvent )
-            ::Form:&cEvent( Self )
-         ENDIF
-      ENDIF
-   ENDIF
-
-
-
-
-
-
 
 METHOD Create() CLASS VrDataTable
 
@@ -86,12 +69,14 @@ METHOD Create() CLASS VrDataTable
       IF !EMPTY( ::Alias )
          :Alias := ::Alias
       ENDIF
-      :Create()
-      IF ! EMPTY( ::bFilter )
-         :SetFilter( &(::bFilter) )
-      ENDIF
-      IF ! EMPTY( ::Order )
-         :OrdSetFocus( ::Order )
+      IF :Driver != "SQLRDD"
+         :Create()
+         IF ! EMPTY( ::bFilter )
+            :SetFilter( &(::bFilter) )
+         ENDIF
+         IF ! EMPTY( ::Order )
+            :OrdSetFocus( ::Order )
+         ENDIF
       ENDIF
    END
 
@@ -99,30 +84,44 @@ METHOD Create() CLASS VrDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
-   LOCAL cAlias
+   LOCAL cAlias, nCnn
    WITH OBJECT ::EditCtrl
       :xFileName := ::FileName
       :Driver   := ::Driver
+      
+      IF EMPTY( ::ConnectionString ) .AND. ::Driver != "SQLRDD"
+         IF !EMPTY( ::Alias )
+            :Alias := ::Alias
+            IF ::EditMode
+               :Alias += "_desMode"
+            ENDIF
+          ELSE
+            cAlias := SUBSTR( ::FileName, RAT("\",::FileName)+1 )
+            cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
+            IF ::EditMode
+               :Alias := cAlias + "_desMode"
+            ENDIF
+         ENDIF
 
-      IF !EMPTY( ::Alias )
-         :Alias := ::Alias
-         IF ::EditMode
-            :Alias += "_desMode"
+         :Create()
+         IF ! EMPTY( ::bFilter )
+            :SetFilter( &(::bFilter) )
+         ENDIF
+         IF ! EMPTY( ::Order )
+            :OrdSetFocus( ::Order )
          ENDIF
        ELSE
-         cAlias := SUBSTR( ::FileName, RAT("\",::FileName)+1 )
-         cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
-         IF ::EditMode
-            :Alias := cAlias + "_desMode"
+         IF !::EditMode .AND. !EMPTY( ::ConnectionString )
+            TRY
+               :DataConnector := SqlConnector( ::Parent )
+               :DataConnector:Server := ::Server
+               :DataConnector:ConnectionString := ::ConnectionString
+               :DataConnector:Create()
+               :Create()
+            CATCH
+               MessageBox(0, "Error connecting to " + ::ConnectionString )
+            END
          ENDIF
-      ENDIF
-
-      :Create()
-      IF ! EMPTY( ::bFilter )
-         :SetFilter( &(::bFilter) )
-      ENDIF
-      IF ! EMPTY( ::Order )
-         :OrdSetFocus( ::Order )
       ENDIF
    END
 RETURN Self
@@ -139,6 +138,14 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, XSTR( ::Driver ) )
    oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR( ::Server ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionString", NIL, XSTR( ::ConnectionString ) )
+   oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-   DATA aIncLibs         EXPORTED INIT   { NIL, NIL, NIL, "libmysql.lib", "libpq", "oci", "fbclient_ms.lib" }
+#pragma BEGINDUMP
+   #pragma comment( lib, "libmysql.lib" )
+   #pragma comment( lib, "libpq.lib" )
+   #pragma comment( lib, "fbclient_ms.lib" )
+#pragma ENDDUMP

@@ -9,6 +9,11 @@
 */
 
 2010-06-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Rewritten SQL support for DataTable
+   + Added SQL support executing the report
+   + Added security when SQL server is not Online
+
+2010-06-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    - Removed property FIELD from labels
    + Added support for formulas inside the TEXT property
    - Removed VALUE from Totals. Now ROW totaling can be done with a Label

@@ -965,14 +965,16 @@ RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Run() CLASS Report
-   LOCAL oWait, oRep
+   LOCAL oWait, oRep, lRun
    IF ::Save()
       oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait...", .T. )
       oRep  := VrReport()
       
-      oRep:Run( ::oXMLDoc, oWait )
+      lRun := oRep:Run( ::oXMLDoc, oWait )
       oWait:Destroy()
-      oRep:Preview()
+      IF lRun
+         oRep:Preview()
+      ENDIF
    ENDIF
 RETURN Self
 

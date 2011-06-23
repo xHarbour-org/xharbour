@@ -529,17 +529,27 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           oData := DataTable( NIL )
-          oData:Driver   := hCtrl:Driver
-          oData:FileName := hCtrl:FileName
-          IF !EMPTY( hCtrl:Alias )
-             oData:Alias := hCtrl:Alias
-          ENDIF
-          oData:Create()
-          IF ! EMPTY( hCtrl:bFilter )
-             oData:SetFilter( &(hCtrl:bFilter) )
-          ENDIF
-          IF ! EMPTY( hCtrl:Order )
-             oData:OrdSetFocus( hCtrl:Order )
+          oData:Driver           := hCtrl:Driver
+          oData:FileName         := hCtrl:FileName
+          
+          IF EMPTY( hCtrl:ConnectionString ) .AND. hCtrl:Driver != "SQLRDD"
+             IF !EMPTY( hCtrl:Alias )
+                oData:Alias := hCtrl:Alias
+             ENDIF
+             oData:Create()
+             IF ! EMPTY( hCtrl:bFilter )
+                oData:SetFilter( &(hCtrl:bFilter) )
+             ENDIF
+             IF ! EMPTY( hCtrl:Order )
+                oData:OrdSetFocus( hCtrl:Order )
+             ENDIF
+           
+           ELSEIF !EMPTY( hCtrl:ConnectionString )
+             oData:DataConnector                  := SqlConnector( NIL )
+             oData:DataConnector:Server           := hCtrl:Server
+             oData:DataConnector:ConnectionString := hCtrl:ConnectionString
+             oData:DataConnector:Create()
+             oData:Create()
           ENDIF
           hData[ hCtrl:Name ] := oData
 
@@ -547,26 +557,21 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ::DataSource := oData
           ENDIF
 
-
-
-
-
-//    IF ::__ClassInst == NIL .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0 
-//       ::Connected     := .T.
-//       ::ConnectionID  := nCnn
-//       ::Sql           := SR_GetConnection( nCnn )
-
-//       IF HGetPos( ::EventHandler, "OnConnect" ) != 0
-//          cEvent := ::EventHandler[ "OnConnect" ]
-//          IF __objHasMsg( ::Form, cEvent )
-//             ::Form:&cEvent( Self )
-//          ENDIF
-//       ENDIF
-//    ENDIF
-
-
        ENDIF
    NEXT
+
+   IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
+      TRY
+         ::DataSource:Select()
+         ::DataSource:GoTop()
+      CATCH
+         MessageBox(0, "Database error" )
+         ::End()
+         hb_gcall(.t.)
+         HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+         RETURN .F.
+      END
+   ENDIF
 
    ::StartPage()
    hDC := GetDC(0)
@@ -631,7 +636,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::End()
    hb_gcall(.t.)
    HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
-RETURN Self
+RETURN .T.
 
 METHOD ChangePage( hDC, nHeight )
    IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
