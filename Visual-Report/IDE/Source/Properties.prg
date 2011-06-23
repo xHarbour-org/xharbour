@@ -198,7 +198,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
       RETURN NIL
    ENDIF
-   VIEW xValue, cCaption
+
    IF !EMPTY( cProp2 )
       IF ::ActiveObject:lUI
          oObj := __objSendMsg( ::ActiveObject:EditCtrl, cProp2 )
@@ -244,6 +244,12 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       oItem:ColItems[1]:Value := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
       _InvalidateRect( ::hWnd, oItem:GetItemRect():Array() ,.F.)
    ENDIF
+
+   IF UPPER(cProp) == "DRIVER"
+      ::ActiveObject:Create()
+      ::ResetProperties(,,.T.)
+   ENDIF
+
 
 RETURN Self
 

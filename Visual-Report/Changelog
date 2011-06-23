@@ -12,6 +12,9 @@
    * Rewritten SQL support for DataTable
    + Added SQL support executing the report
    + Added security when SQL server is not Online
+   ! Fixed DataTable to fill up the ORDER list of indexes upon setting the DRIVER
+     Remember it cannot know what the indexes are if the index is not assigned
+     to do that FIRST assign the file then the driver followed by the ORDER
 
 2010-06-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    - Removed property FIELD from labels
