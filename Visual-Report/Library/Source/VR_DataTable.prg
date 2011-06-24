@@ -64,6 +64,7 @@ RETURN Self
 METHOD Create() CLASS VrDataTable
 
    WITH OBJECT ::EditCtrl := DataTable( ::Parent )
+      :Cargo    := Self
       :FileName := ::FileName
       :Driver   := ::Driver
       IF !EMPTY( ::Alias )

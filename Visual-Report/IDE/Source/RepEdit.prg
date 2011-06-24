@@ -376,15 +376,17 @@ RETURN ROUND( ( x / nGrain ), 0) * nGrain
 FUNCTION KeyDown( oCtrl, nKey )
    LOCAL lShift, aRect, nMove := 1, lMod := .T.
    IF oCtrl != NIL .AND. oCtrl:Cargo != NIL
-      aRect := oCtrl:GetRectangle()
-      lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
-      IF CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
-         nMove := 8
+      IF oCtrl:Cargo:lUI
+         aRect := oCtrl:GetRectangle()
+         lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
+         IF CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
+            nMove := 8
+         ENDIF
+         aRect[1]-=(nMove+4)
+         aRect[2]-=(nMove+4)
+         aRect[3]+=(nMove+4)
+         aRect[4]+=(nMove+4)
       ENDIF
-      aRect[1]-=(nMove+4)
-      aRect[2]-=(nMove+4)
-      aRect[3]+=(nMove+4)
-      aRect[4]+=(nMove+4)
       IF nKey == VK_DELETE
          oCtrl:Cargo:Delete()
        ELSEIF nKey == VK_LEFT
@@ -426,7 +428,11 @@ FUNCTION KeyDown( oCtrl, nKey )
          IF !oCtrl:Application:Report:Modified
             oCtrl:Application:Report:Modified := .T.
          ENDIF
-         oCtrl:Parent:InvalidateRect( aRect, .T.)
+         IF oCtrl:Cargo:lUI
+            oCtrl:Parent:InvalidateRect( aRect, .T.)
+          ELSEIF oCtrl:Cargo:Button != NIL
+            oCtrl:Cargo:Button:Delete()
+         ENDIF
       ENDIF
    ENDIF
 RETURN NIL

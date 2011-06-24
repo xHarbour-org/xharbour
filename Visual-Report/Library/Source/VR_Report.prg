@@ -648,8 +648,9 @@ METHOD ChangePage( hDC, nHeight )
       ::StartPage()
       ::CreateHeader( hDC )
       ::CreateGroupHeaders( hDC )
+      RETURN .T.
    ENDIF
-RETURN Self
+RETURN .F.
 
 
 FUNCTION S2R( hDC, cSize ); RETURN VAL(cSize)*PIX_PER_INCH/GetDeviceCaps( hDC, LOGPIXELSY )

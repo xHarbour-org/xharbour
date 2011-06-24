@@ -99,10 +99,19 @@ METHOD Delete() CLASS VrObject
       ::EditCtrl:Destroy()
       ::Application:Props:Components:Children[1]:Select():SelectComponent()
       ::Parent:InvalidateRect()
-      n := ASCAN( ::Application:aNames, ::Name,,, .T. )
+   ELSE
+      n := ASCAN( ::Application:Props:CompObjects, Self,,, .T. )
       IF n > 0
-         ADEL( ::Application:aNames, n, .T. )
+         ADEL( ::Application:Props:CompObjects, n, .T. )
+         ::EditCtrl:Destroy()
+         ::Application:Props:Components:Children[1]:Select():SelectComponent()
+         ::Parent:InvalidateRect()
       ENDIF
+   ENDIF
+
+   n := ASCAN( ::Application:aNames, ::Name,,, .T. )
+   IF n > 0
+      ADEL( ::Application:aNames, n, .T. )
    ENDIF
 RETURN Self
 

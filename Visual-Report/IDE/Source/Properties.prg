@@ -44,6 +44,7 @@ CLASS PropEditor INHERIT TreeView
    
    METHOD OnParentNotify()
    METHOD DrawItem()
+   METHOD EditText()
    
    METHOD GetEditBuffer()
    METHOD SetValue()
@@ -171,6 +172,8 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    IF oItem == NIL
       RETURN Self
    ENDIF
+   ::Application:Report:Modified := .T.
+
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:OnWMKillFocus := NIL
       ::ActiveControl:Destroy()
@@ -196,6 +199,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
+      ::ResetProperties(,,.T.)
       RETURN NIL
    ENDIF
 
@@ -813,6 +817,54 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
            ENDIF
    ENDCASE
 RETURN NIL
+
+METHOD EditText( oEdit ) CLASS PropEditor
+   LOCAL oForm   := Dialog( ::Application:MainForm )
+   oForm:Caption := "Enter Text"
+   oForm:ToolWindow := .T.
+   oForm:Modal   := .T.
+   oForm:Width   := 350
+   oForm:height  := 220
+   oForm:Center  := .T.
+   oForm:OnWMInitDialog := {|o| InitEditText(o, Self) }
+   oForm:Cargo   := oEdit
+   oForm:Create()
+RETURN NIL
+
+FUNCTION InitEditText( oForm, oMan )
+   LOCAL oCancel, oOK, oEdit
+   WITH OBJECT oCancel := Button( oForm )
+      :Caption     := "&Cancel"
+      :Height      := 25
+      :Dock:Right  := oForm
+      :Dock:Bottom := oForm
+      :Action      := {|o| oForm:Close()}
+      :Create()
+   END
+   WITH OBJECT oOK := Button( oForm )
+      :Caption     := "&OK"
+      :Height      := 25
+      :Dock:Right  := oCancel
+      :Dock:Bottom := oForm
+      :Action      := {|o| oMan:SetValue( oEdit:Caption ),;
+                           oForm:Close()}
+      :Create()
+   END
+   WITH OBJECT oEdit := EditBox( oForm )
+      :Caption     := oForm:Cargo:Caption
+      :Dock:Left   := oForm
+      :Dock:Top    := oForm
+      :Dock:Right  := oForm
+      :Dock:Bottom := oCancel
+      :Height      := 160
+      :VertScroll  := .T.
+      :HorzScroll  := .T.
+      :WantReturn   := .T.
+      :Multiline   := .T.
+      :Create()
+   END
+RETURN NIL
+
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS PropEditor
    LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2
