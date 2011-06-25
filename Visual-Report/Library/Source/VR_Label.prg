@@ -224,6 +224,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             hPrevFont := SelectObject( hDC, hFont )
             
             aTxSize := _GetTextExtentPoint32( hDC, cText )
+            DEFAULT aTxSize TO {0,0}
             IF aTxSize[1] > ::Width
                WHILE aTxSize[1] > ::Width
                   cText := LEFT( cText, LEN(cText)-1 )

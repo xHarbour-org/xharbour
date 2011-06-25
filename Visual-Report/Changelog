@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Report Header to saving and printing routines
+
 2010-06-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed RTE clicking the [...] extended text editor
    ! Fixed modified flag not being changed when chaning a property

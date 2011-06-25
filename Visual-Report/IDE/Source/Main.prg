@@ -595,7 +595,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 METHOD NewReport() CLASS Report
    LOCAL oPs
-view valtype( ::VrReport )
+
    IF ::VrReport != NIL .AND. ::Close() != NIL
       RETURN NIL
    ENDIF
@@ -881,6 +881,11 @@ METHOD Save( lSaveAs ) CLASS Report
          oXmlProp := TXmlNode():new( , "Properties" )
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
             oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RepHeaderHeight", NIL, XSTR( oApp:Props:RepHeader:ClientHeight ) )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RepFooterHeight", NIL, XSTR( oApp:Props:RepFooter:ClientHeight ) )
+            oXmlProp:addBelow( oXmlSource )
+
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "HeaderHeight", NIL, XSTR( oApp:Props:Header:ClientHeight ) )
             oXmlProp:addBelow( oXmlSource )
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FooterHeight", NIL, XSTR( oApp:Props:Footer:ClientHeight ) )
@@ -914,6 +919,26 @@ METHOD Save( lSaveAs ) CLASS Report
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( ::VrReport:DataSource != NIL, ::VrReport:DataSource:Name, "" ) )
          oXmlProp:addBelow( oXmlSource )
       oXmlReport:addBelow( oXmlProp )
+
+      IF !EMPTY( aCtrl := oApp:Props:RepHeader:Objects )
+         oXmlHeader := TXmlNode():new( , "RepHeader" )
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlHeader )
+             ENDIF
+         NEXT
+         oXmlReport:addBelow( oXmlHeader )
+      ENDIF
+
+      IF !EMPTY( aCtrl := oApp:Props:RepFooter:Objects )
+         oXmlHeader := TXmlNode():new( , "RepFooter" )
+         FOR n := 1 TO LEN( aCtrl )
+             IF aCtrl[n]:lUI
+                ::Generate( aCtrl[n], @oXmlHeader )
+             ENDIF
+         NEXT
+         oXmlReport:addBelow( oXmlHeader )
+      ENDIF
 
       IF !EMPTY( aCtrl := oApp:Props:Header:Objects )
          oXmlHeader := TXmlNode():new( , "Header" )

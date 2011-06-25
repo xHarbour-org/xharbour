@@ -26,56 +26,60 @@
 #define  acCommandToolPageHome         53773
 
 CLASS VrReport INHERIT VrObject
-   DATA PrintHeader    EXPORTED  INIT .T.
-   DATA PrintRepHeader EXPORTED  INIT .T.
-   DATA PrintFooter    EXPORTED  INIT .T.
-   DATA PrintRepFooter EXPORTED  INIT .T.
-   DATA GroupBy        EXPORTED  INIT ""
+   DATA PrintHeader     EXPORTED  INIT .T.
+   DATA PrintRepHeader  EXPORTED  INIT .T.
+   DATA PrintFooter     EXPORTED  INIT .T.
+   DATA PrintRepFooter  EXPORTED  INIT .T.
+   DATA GroupBy         EXPORTED  INIT ""
 
-   DATA ClsName        EXPORTED  INIT "Report"
-   DATA Name           EXPORTED  INIT "Report"
+   DATA ClsName         EXPORTED  INIT "Report"
+   DATA Name            EXPORTED  INIT "Report"
 
-   DATA nImage         EXPORTED  INIT 0
-   DATA nText          EXPORTED  INIT 0
-   DATA nLine          EXPORTED  INIT 0
-   DATA nBox           EXPORTED  INIT 0
-   
-   DATA FileName       EXPORTED  INIT "Preview"
-   DATA Orientation    EXPORTED
-   DATA PaperSize      EXPORTED  INIT DMPAPER_LETTER
-   
-   DATA LeftMargin     EXPORTED  INIT 1000
-   DATA TopMargin      EXPORTED  INIT 1000
-   DATA RightMargin    EXPORTED  INIT 1000
-   DATA BottomMargin   EXPORTED  INIT 1000
-   
-   DATA oPDF           EXPORTED
-   DATA PreviewCaption EXPORTED  INIT "Visual Report - Print Preview"
-   DATA nPage          EXPORTED  INIT 0
-   DATA nRow           EXPORTED  INIT 0
+   DATA nImage          EXPORTED  INIT 0
+   DATA nText           EXPORTED  INIT 0
+   DATA nLine           EXPORTED  INIT 0
+   DATA nBox            EXPORTED  INIT 0
+
+   DATA FileName        EXPORTED  INIT "Preview"
+   DATA Orientation     EXPORTED
+   DATA PaperSize       EXPORTED  INIT DMPAPER_LETTER
+
+   DATA LeftMargin      EXPORTED  INIT 1000
+   DATA TopMargin       EXPORTED  INIT 1000
+   DATA RightMargin     EXPORTED  INIT 1000
+   DATA BottomMargin    EXPORTED  INIT 1000
+
+   DATA oPDF            EXPORTED
+   DATA PreviewCaption  EXPORTED  INIT "Visual Report - Print Preview"
+   DATA nPage           EXPORTED  INIT 0
+   DATA nRow            EXPORTED  INIT 0
 
    DATA xDataSource     PROTECTED
    ACCESS DataSource    INLINE ::xDataSource
    ASSIGN DataSource(o) INLINE ::__SetDataSource(o)
 
-   DATA Button         EXPORTED
-   DATA lUI            EXPORTED  INIT .F.
+   DATA Button          EXPORTED
+   DATA lUI             EXPORTED  INIT .F.
 
-   DATA HeaderHeight   EXPORTED  INIT 0
-   DATA FooterHeight   EXPORTED  INIT 0
+   DATA RepHeaderHeight EXPORTED  INIT 0
+   DATA RepFooterHeight EXPORTED  INIT 0
+   DATA HeaderHeight    EXPORTED  INIT 0
+   DATA FooterHeight    EXPORTED  INIT 0
 
-   DATA aHeader        EXPORTED  INIT {}
-   DATA aBody          EXPORTED  INIT {}
-   DATA aFooter        EXPORTED  INIT {}
-   DATA aExtraPage     EXPORTED  INIT {}
-   DATA aComponents    EXPORTED  INIT {}
-   
-   DATA hProps         EXPORTED
-   DATA hExtra         EXPORTED
-   
-   DATA nVirTop        EXPORTED  INIT 0
+   DATA aRepHeader      EXPORTED  INIT {}
+   DATA aRepFooter      EXPORTED  INIT {}
+   DATA aHeader         EXPORTED  INIT {}
+   DATA aBody           EXPORTED  INIT {}
+   DATA aFooter         EXPORTED  INIT {}
+   DATA aExtraPage      EXPORTED  INIT {}
+   DATA aComponents     EXPORTED  INIT {}
 
-   ACCESS Application  INLINE __GetApplication()
+   DATA hProps          EXPORTED
+   DATA hExtra          EXPORTED
+
+   DATA nVirTop         EXPORTED  INIT 0
+
+   ACCESS Application   INLINE __GetApplication()
 
    METHOD Init()       CONSTRUCTOR
    METHOD Create()
@@ -90,6 +94,8 @@ CLASS VrReport INHERIT VrObject
    METHOD CreateGroupFooters()
    METHOD CreateHeader()
    METHOD CreateFooter()
+   METHOD CreateRepHeader()
+   METHOD CreateRepFooter()
    METHOD CreateExtraPage()
    METHOD PrepareArrays()
    METHOD Load()
@@ -263,6 +269,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
          ENDIF
       CATCH
       END
+
     ELSE
       oControl:Configure()
    ENDIF
@@ -296,6 +303,7 @@ METHOD CreateGroupHeaders( hDC ) CLASS VrReport
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
    ::nRow += n
+   ::ChangePage( hDC, nHeight )
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -324,6 +332,7 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
    ::nRow += n
+   ::ChangePage( hDC, nHeight )
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -339,7 +348,31 @@ METHOD CreateRecord( hDC ) CLASS VrReport
        ENDIF
    NEXT
    ::nRow += nHeight
+   ::ChangePage( hDC, nHeight )
 RETURN nHeight
+
+//-----------------------------------------------------------------------------------------------
+METHOD CreateRepHeader( hDC ) CLASS VrReport
+   LOCAL hCtrl, nHeight := 0
+   ::nRow := 0
+   IF ::PrintRepHeader
+      FOR EACH hCtrl IN ::aRepHeader
+          ::CreateControl( hCtrl, @nHeight,, hDC )
+      NEXT
+      ::nRow := ::RepHeaderHeight
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD CreateRepFooter( hDC ) CLASS VrReport
+   LOCAL aCtrl, nHeight := 0
+   IF ::PrintRepFooter
+      FOR EACH aCtrl IN ::aRepFooter
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+      NEXT
+      ::nRow := ::RepHeaderFooter
+   ENDIF
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateHeader( hDC ) CLASS VrReport
@@ -348,7 +381,7 @@ METHOD CreateHeader( hDC ) CLASS VrReport
       FOR EACH aCtrl IN ::aHeader
           ::CreateControl( aCtrl, @nHeight,, hDC )
       NEXT
-      ::nRow := ::HeaderHeight
+      ::nRow += ::HeaderHeight
    ENDIF
 RETURN Self
 
@@ -446,10 +479,20 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    IF !EMPTY( hControl )
       AADD( ::&cParent, hControl )
    ENDIF
+   TRY
+      n := ::Application:Props[ "RepHeader" ]:Height - ::Application:Props[ "RepHeader" ]:ClientHeight
+           ::Application:Props[ "RepHeader" ]:Height := VAL( ::hProps:RepHeaderHeight )+n
+
+      n := ::Application:Props[ "RepFooter" ]:Height - ::Application:Props[ "RepFooter" ]:ClientHeight
+           ::Application:Props[ "RepFooter" ]:Height := VAL( ::hProps:RepFooterHeight )+n
+   CATCH
+   END
    n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
         ::Application:Props[ "Header" ]:Height := VAL( ::hProps:HeaderHeight )+n
+
    n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
         ::Application:Props[ "Footer" ]:Height := VAL( ::hProps:FooterHeight )+n
+
         ::Application:Props[ "Footer" ]:Dockit()
         ::Application:Props[ "Body" ]:Dockit()
    TRY
@@ -469,6 +512,11 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    hDC := GetDC(0)
    ::HeaderHeight := VAL( ::hProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    ::FooterHeight := VAL( ::hProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+   TRY
+      ::RepHeaderHeight := VAL( ::hProps:RepHeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+      ::RepFooterHeight := VAL( ::hProps:RepFooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+   CATCH
+   END
    ReleaseDC(0, hDC)
 RETURN Self
 
@@ -491,6 +539,12 @@ METHOD Load( cReport ) CLASS VrReport
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
    ::GroupBy        := ::hProps:GroupBy
    
+   FOR EACH hCtrl IN ::aRepHeader
+       ::CreateControl( hCtrl,, ::Application:Props:RepHeader )
+   NEXT
+   FOR EACH hCtrl IN ::aRepFooter
+       ::CreateControl( hCtrl,, ::Application:Props:RepFooter )
+   NEXT
    FOR EACH hCtrl IN ::aHeader
        ::CreateControl( hCtrl,, ::Application:Props:Header )
    NEXT
@@ -526,6 +580,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
    ::GroupBy        := ::hProps:GroupBy
 
+   ::CreateRepHeader( hDC )
+
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           oData := DataTable( NIL )
@@ -559,6 +615,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
        ENDIF
    NEXT
+   ::CreateRepFooter( hDC )
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       TRY
@@ -599,14 +656,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          IF xValue != NIL .AND. ::DataSource:Fields:&(::GroupBy) != xValue
             xValue  := ::DataSource:Fields:&(::GroupBy)
             ::nRow += 100
+            ::ChangePage( hDC, nHeight )
             nHeight := ::CreateGroupFooters( hDC )
+            ::nRow += 500
             ::ChangePage( hDC, nHeight )
-
-            ::nRow += 1000
             nHeight := ::CreateGroupHeaders( hDC )
-            ::ChangePage( hDC, nHeight )
-          ELSE
-            ::ChangePage( hDC, nHeight )
          ENDIF
 
          oWait:Position := Int( (nPos/nCount)*100 )
