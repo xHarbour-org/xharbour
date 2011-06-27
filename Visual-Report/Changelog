@@ -10,6 +10,7 @@
 
 2010-06-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Report Header to saving and printing routines
+   ! Fixed Report Header and Footer printing out of context
 
 2010-06-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed RTE clicking the [...] extended text editor

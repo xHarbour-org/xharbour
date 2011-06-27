@@ -354,23 +354,11 @@ RETURN nHeight
 //-----------------------------------------------------------------------------------------------
 METHOD CreateRepHeader( hDC ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
-   ::nRow := 0
    IF ::PrintRepHeader
       FOR EACH hCtrl IN ::aRepHeader
           ::CreateControl( hCtrl, @nHeight,, hDC )
       NEXT
-      ::nRow := ::RepHeaderHeight
-   ENDIF
-RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-METHOD CreateRepFooter( hDC ) CLASS VrReport
-   LOCAL aCtrl, nHeight := 0
-   IF ::PrintRepFooter
-      FOR EACH aCtrl IN ::aRepFooter
-          ::CreateControl( aCtrl, @nHeight,, hDC )
-      NEXT
-      ::nRow := ::RepHeaderFooter
+      ::nRow += ::RepHeaderHeight
    ENDIF
 RETURN Self
 
@@ -382,6 +370,17 @@ METHOD CreateHeader( hDC ) CLASS VrReport
           ::CreateControl( aCtrl, @nHeight,, hDC )
       NEXT
       ::nRow += ::HeaderHeight
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD CreateRepFooter( hDC ) CLASS VrReport
+   LOCAL aCtrl, nHeight := 0
+   IF ::PrintRepFooter
+      FOR EACH aCtrl IN ::aRepFooter
+          ::CreateControl( aCtrl, @nHeight,, hDC )
+      NEXT
+      ::nRow := ::RepHeaderFooter
    ENDIF
 RETURN Self
 
@@ -580,8 +579,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
    ::GroupBy        := ::hProps:GroupBy
 
-   ::CreateRepHeader( hDC )
-
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           oData := DataTable( NIL )
@@ -615,7 +612,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
        ENDIF
    NEXT
-   ::CreateRepFooter( hDC )
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       TRY
@@ -639,6 +635,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
    
+   ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
@@ -680,9 +677,12 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ENDIF
 
    ::CreateFooter( hDC )
+
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
    ENDIF
+
+   ::CreateRepFooter( hDC )
 
    ReleaseDC(0, hDC)
 
