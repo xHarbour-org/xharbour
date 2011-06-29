@@ -66,8 +66,8 @@ CLASS Button INHERIT Control
    METHOD SetBackColor()
    METHOD SetForeColor()
    METHOD SetImageIndex()
-   METHOD OnMouseHover()      INLINE IIF( !::OwnerDraw .AND. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ), ::InvalidateRect(, .F. ), ), NIL
-   METHOD OnMouseLeave()      INLINE IIF( !::OwnerDraw .AND. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ), ::InvalidateRect(, .F. ), ), NIL
+   METHOD OnMouseHover()
+   METHOD OnMouseLeave()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -395,4 +395,18 @@ METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS Button
       ENDIF
       RETURN GetStockObject( NULL_BRUSH )
    ENDIF
+RETURN NIL
+
+METHOD OnMouseHover() CLASS Button
+   IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
+      RETURN NIL
+   ENDIF
+   ::InvalidateRect(, .F. )
+RETURN NIL
+
+METHOD OnMouseLeave() CLASS Button
+   IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
+      RETURN NIL
+   ENDIF
+   ::InvalidateRect(, .F. )
 RETURN NIL

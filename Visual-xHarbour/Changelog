@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-06-29 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed Button not repainting when mouse leaves the client area
+
 2011-06-28 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed painting problem caused by witching Forms in some controls
      like Custom draw TabControls
