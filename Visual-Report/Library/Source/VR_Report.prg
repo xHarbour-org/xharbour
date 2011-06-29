@@ -192,8 +192,10 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal ) CLASS VrReport
    LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
+
    DEFAULT nVirTop TO 0
-   DEFAULT nTop TO 0
+   DEFAULT nTop    TO 0
+
    IF HGetPos( hCtrl, "Left" ) > 0 
       x := VAL( hCtrl:Left )
    ENDIF
@@ -209,7 +211,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
       oControl:Top  := y
 
       FOR EACH cProp IN hCtrl:Keys
-          IF ! UPPER( cProp ) IN { "FONT","LEFT","TOP" }
+          IF ! UPPER( cProp ) IN { "FONT","LEFT","TOP","CPARENT" }
              xVar := __objSendMsg( oControl, cProp )
              xValue := hCtrl[ cProp ]
              IF VALTYPE( xVar ) != VALTYPE( xValue )
@@ -259,6 +261,9 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
    ENDIF
 
    IF oPanel == NIL
+      IF UPPER( hCtrl:cParent ) == "BODY"
+         ::ChangePage( hDC, nHeight )
+      ENDIF
       oControl:Draw( hDC, hTotal, hCtrl )
       TRY
          IF oControl:ClsName != "Image" .OR. ! oControl:OnePerPage
@@ -303,7 +308,6 @@ METHOD CreateGroupHeaders( hDC ) CLASS VrReport
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
    ::nRow += n
-   ::ChangePage( hDC, nHeight )
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -332,7 +336,6 @@ METHOD CreateGroupFooters( hDC ) CLASS VrReport
    NEXT
    n  := ( ::nPixPerInch / GetDeviceCaps( hDC, LOGPIXELSY ) ) * ::nVirTop
    ::nRow += n
-   ::ChangePage( hDC, nHeight )
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -348,7 +351,6 @@ METHOD CreateRecord( hDC ) CLASS VrReport
        ENDIF
    NEXT
    ::nRow += nHeight
-   ::ChangePage( hDC, nHeight )
 RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
@@ -375,20 +377,31 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateRepFooter( hDC ) CLASS VrReport
-   LOCAL aCtrl, nHeight := 0
+   LOCAL hCtrl, nHeight := 0
    IF ::PrintRepFooter
-      FOR EACH aCtrl IN ::aRepFooter
-          ::CreateControl( aCtrl, @nHeight,, hDC )
+      ::nRow := ::oPDF:PageLength - ::RepFooterHeight
+      FOR EACH hCtrl IN ::aRepFooter
+          IF hCtrl:ClsName=="VRTOTAL"
+             IF VALTYPE( hCtrl:Value ) == "N"
+                hCtrl:Text := XSTR( hCtrl:Value )
+                hCtrl:Value := ""
+              ELSE
+                IF !EMPTY( hCtrl:Value )
+                   hCtrl:Text := &(hCtrl:Value)
+                ENDIF
+             ENDIF
+          ENDIF
+
+          ::CreateControl( hCtrl, @nHeight,, hDC )
       NEXT
-      ::nRow := ::RepHeaderFooter
    ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateFooter( hDC ) CLASS VrReport
+METHOD CreateFooter( hDC, nRepFootHeight ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
    IF ::PrintFooter
-      ::nRow := ::oPDF:PageLength - ::FooterHeight
+      ::nRow := ::oPDF:PageLength - ::FooterHeight - nRepFootHeight
       FOR EACH hCtrl IN ::aFooter
 
           IF hCtrl:ClsName=="VRTOTAL"
@@ -403,7 +416,6 @@ METHOD CreateFooter( hDC ) CLASS VrReport
           ENDIF
 
           ::CreateControl( hCtrl, @nHeight,, hDC )
-          // XXXX
       NEXT
    ENDIF
 RETURN Self
@@ -419,7 +431,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oPrev, oNode, cData, n, cParent, hDC, hControl, cParName, cParCls
+   LOCAL oNode, cData, n, cParent, hDC, hControl, cParName, cParCls
 
    ::hProps := {=>}
    ::hExtra := {=>}
@@ -442,6 +454,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 
          CASE oNode:cName == "Control" 
               IF !EMPTY( hControl )
+                 hControl:cParent := SUBSTR( cParent, 2 )
                  AADD( ::&cParent, hControl )
               ENDIF
               hControl := {=>}
@@ -476,6 +489,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       oNode := oDoc:Next()
    ENDDO
    IF !EMPTY( hControl )
+      hControl:cParent := SUBSTR( cParent, 2 )
       AADD( ::&cParent, hControl )
    ENDIF
    TRY
@@ -653,10 +667,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          IF xValue != NIL .AND. ::DataSource:Fields:&(::GroupBy) != xValue
             xValue  := ::DataSource:Fields:&(::GroupBy)
             ::nRow += 100
-            ::ChangePage( hDC, nHeight )
             nHeight := ::CreateGroupFooters( hDC )
             ::nRow += 500
-            ::ChangePage( hDC, nHeight )
             nHeight := ::CreateGroupHeaders( hDC )
          ENDIF
 
@@ -664,25 +676,14 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          nPos ++
          ::DataSource:Skip()
       ENDDO
-
-      IF ::nRow >= ( ::oPDF:PageLength - IIF( ::PrintFooter, ::FooterHeight, 0 ) - nHeight )
-         ::CreateFooter( hDC )
-         ::EndPage()
-         ::StartPage()
-         ::CreateHeader( hDC )
-      ENDIF
-    ELSE
-
-
    ENDIF
 
-   ::CreateFooter( hDC )
+   ::CreateFooter( hDC, ::RepFooterHeight )
+   ::CreateRepFooter( hDC )
 
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
    ENDIF
-
-   ::CreateRepFooter( hDC )
 
    ReleaseDC(0, hDC)
 
@@ -697,11 +698,10 @@ METHOD ChangePage( hDC, nHeight )
       IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
          ::CreateExtraPage( hDC )
       ENDIF
-      ::CreateFooter( hDC )
+      ::CreateFooter( hDC, 0 )
       ::EndPage()
       ::StartPage()
       ::CreateHeader( hDC )
-      ::CreateGroupHeaders( hDC )
       RETURN .T.
    ENDIF
 RETURN .F.
