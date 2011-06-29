@@ -3196,9 +3196,8 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    DEFAULT hTree TO 0
    DEFAULT lFromTab TO .F.
    ::CurrentForm := oWin
-   ::CurrentForm:Show()
    IF !lFromTab
-      n := ASCAN( ::Application:Project:Forms, ::Application:Project:CurrentForm,,, .T. )
+      n := ASCAN( ::Application:Project:Forms, ::CurrentForm,,, .T. )
       ::Application:FormsTabs:SetCurSel( n )
       ::Application:FormsTabs:InvalidateRect(,.F.)
       ::Application:Yield()
@@ -3208,6 +3207,8 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       oWnd:Hide()
       ::Application:MainForm:PostMessage( WM_USER + 3001, hTree )
    ENDIF
+   ::CurrentForm:Show()
+   ::CurrentForm:InvalidateRect(,.F.)
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
