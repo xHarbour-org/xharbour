@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed page break
+   ! Fixed Report Footer
+   + Added Picture property to Labels
+
 2010-06-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Report Header to saving and printing routines
    ! Fixed Report Header and Footer printing out of context

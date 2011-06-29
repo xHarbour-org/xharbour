@@ -18,6 +18,7 @@
 CLASS VrLabel INHERIT VrObject
    PROPERTY Text      READ xText WRITE SetText
    DATA AutoResize    EXPORTED  INIT .F.
+   DATA Picture       EXPORTED  INIT ""
    DATA ClsName       EXPORTED  INIT "Label"
    DATA SysBackColor  EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor  EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
@@ -42,6 +43,7 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
+      AADD( ::aProperties, { "Picture",    "General" } )
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
@@ -119,6 +121,8 @@ RETURN Self
 METHOD WriteProps( oXmlControl ) CLASS VrLabel
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Text", NIL, ::Text )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Picture", NIL, ::Picture )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ForeColor", NIL, XSTR( ::ForeColor ) )
    oXmlControl:addBelow( oXmlValue )
@@ -206,9 +210,10 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
                hTotal:Value += cText
             ENDIF
          ENDIF
+         IF !EMPTY( ::Picture )
+            cText := TRANSFORM( cText, ::Picture )
+         ENDIF
          cText := ALLTRIM( xStr( cText ) )
-         
-         
          IF ::Alignment > 1
             :Attribute( "HorzAlign", ::Alignment )
             lAuto := .F.
