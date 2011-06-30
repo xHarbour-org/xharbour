@@ -112,7 +112,7 @@ METHOD Create() CLASS TreeViewItem
    ::Owner      := oOwner
    ::Level      := oOwner:Level + 1
 
-   AEVAL( ::Items, {|o| IIF( o != NIL, o:Create(),)} )
+   AEVAL( ::Items, {|o| IIF( valtype(o)=="O", o:Create(),)} )
 
 RETURN Self
 
