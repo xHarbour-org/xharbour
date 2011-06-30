@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Moved Report Header AFTER the page header and Report Footer right
+     after all data has printed
+
 2010-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed page break
    ! Fixed Report Footer

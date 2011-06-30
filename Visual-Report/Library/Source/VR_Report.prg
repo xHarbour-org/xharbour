@@ -379,7 +379,6 @@ RETURN Self
 METHOD CreateRepFooter( hDC ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
    IF ::PrintRepFooter
-      ::nRow := ::oPDF:PageLength - ::RepFooterHeight
       FOR EACH hCtrl IN ::aRepFooter
           IF hCtrl:ClsName=="VRTOTAL"
              IF VALTYPE( hCtrl:Value ) == "N"
@@ -398,10 +397,10 @@ METHOD CreateRepFooter( hDC ) CLASS VrReport
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD CreateFooter( hDC, nRepFootHeight ) CLASS VrReport
+METHOD CreateFooter( hDC ) CLASS VrReport
    LOCAL hCtrl, nHeight := 0
    IF ::PrintFooter
-      ::nRow := ::oPDF:PageLength - ::FooterHeight - nRepFootHeight
+      ::nRow := ::oPDF:PageLength - ::FooterHeight
       FOR EACH hCtrl IN ::aFooter
 
           IF hCtrl:ClsName=="VRTOTAL"
@@ -649,8 +648,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
    
-   ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
+   ::CreateRepHeader( hDC )
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()
@@ -678,8 +677,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ENDDO
    ENDIF
 
-   ::CreateFooter( hDC, ::RepFooterHeight )
    ::CreateRepFooter( hDC )
+   ::CreateFooter( hDC )
 
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
@@ -698,7 +697,7 @@ METHOD ChangePage( hDC, nHeight )
       IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
          ::CreateExtraPage( hDC )
       ENDIF
-      ::CreateFooter( hDC, 0 )
+      ::CreateFooter( hDC )
       ::EndPage()
       ::StartPage()
       ::CreateHeader( hDC )
