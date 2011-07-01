@@ -728,7 +728,7 @@ HB_FUNC( SETWINDOWTHEME )
 
        if( pfn )
        {
-          nRet = (HRESULT) pfn( hWnd, pszSubAppName, pszSubIdList );
+          nRet = (HRESULT) pfn( hWnd, ISNIL(2)?NULL:pszSubAppName, ISNIL(3)?NULL:pszSubIdList );
        }
    }
 
