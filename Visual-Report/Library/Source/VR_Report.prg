@@ -652,8 +652,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
    
-   ::CreateHeader( hDC )
    ::CreateRepHeader( hDC )
+   ::CreateHeader( hDC )
 
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()

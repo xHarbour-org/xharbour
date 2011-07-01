@@ -31,7 +31,7 @@ CLASS VrDataTable INHERIT VrObject
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Filter          EXPORTED  INIT ""
+   DATA Filter           EXPORTED  INIT ""
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
@@ -52,7 +52,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       ::aProperties := {}
       AADD( ::aProperties, { "FileName",  "General"  } )
       AADD( ::aProperties, { "Alias",     "General"  } )
-      AADD( ::aProperties, { "Filter",   "General"  } )
+      AADD( ::aProperties, { "Filter",    "General"  } )
       AADD( ::aProperties, { "Name",      "Object"   } )
       AADD( ::aProperties, { "Driver",    "Object"   } )
       AADD( ::aProperties, { "Order",     "Index"    } )

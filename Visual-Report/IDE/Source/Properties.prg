@@ -663,9 +663,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                    CASE cType == "FILTER"
-                         FilterUI()
-
                     CASE cType == "C" .OR. cType == "U" .OR. cType == "IMAGENAME"
                          ::ActiveControl := EditBox( Self )
                          WITH OBJECT ::ActiveControl
@@ -680,10 +677,17 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                IF ::ActiveItem:Caption == "FileName" .OR. ::ActiveItem:Caption == "ImageName"
                                   :Button := .T.
                                   :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject ) }
+                                ELSEIF cProp == "Filter"
+                                  :Button := .T.
+                                  :ButtonAction := {|o| FilterUI( o ) }
                                ENDIF
                              ELSEIF cType == "C"
                                :Button := .T.
-                               :ButtonAction := {|o| ::EditText( o ) }
+                               IF cProp == "Filter"
+                                  :ButtonAction := {|o| FilterUI( o ) }
+                                ELSE
+                                  :ButtonAction := {|o| ::EditText( o ) }
+                               ENDIF
                             ENDIF
 
                             :Create()
@@ -936,12 +940,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
-        
-        ELSEIF UPPER(cProp) == "FILTER"
-          xValue := NIL
-          aCol[1]:Value   := ::ActiveObject:Filter
-          aCol[1]:ColType := "FILTER"
-          
+
         ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable"
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }

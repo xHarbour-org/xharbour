@@ -36,9 +36,9 @@ METHOD OnInitDialog() CLASS FilterUI
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "GroupBox7"
       WITH OBJECT :Dock
-         :Left                 := "pgFilter"
-         :Top                  := "pgFilter"
-         :Right                := "pgFilter"
+         :Left                 := Self
+         :Top                  := Self
+         :Right                := Self
          :Margins              := "20,15,20,0"
       END
 
@@ -57,7 +57,7 @@ METHOD OnInitDialog() CLASS FilterUI
          :Height               := 15
          :Caption              := "Match ALL of the conditions"
          :InitialState         := 1
-         :EventHandler[ "OnClick" ] := "ANDRadioButton_OnClick"
+         //:EventHandler[ "OnClick" ] := "ANDRadioButton_OnClick"
          :Create()
       END //RADIOBUTTON
 
@@ -68,7 +68,7 @@ METHOD OnInitDialog() CLASS FilterUI
          :Width                := 259
          :Height               := 15
          :Caption              := "Match ANY of the conditions"
-         :EventHandler[ "OnClick" ] := "ORRadioButton_OnClick"
+         //:EventHandler[ "OnClick" ] := "ORRadioButton_OnClick"
          :Create()
       END //RADIOBUTTON
 
@@ -77,10 +77,10 @@ METHOD OnInitDialog() CLASS FilterUI
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "ConditionGroupBox"
       WITH OBJECT :Dock
-         :Left                 := "pgFilter"
-         :Top                  := "pgFilter"
-         :Right                := "pgFilter"
-         :Bottom               := "pgFilter"
+         :Left                 := Self
+         :Top                  := Self
+         :Right                := Self
+         :Bottom               := Self
          :Margins              := "20,86,20,40"
       END
 
@@ -105,7 +105,7 @@ METHOD OnInitDialog() CLASS FilterUI
          :Top                  := 14
          :Width                := 586
          :Height               := 208
-         :EventHandler[ "OnClick" ] := "ConditionPanel_OnClick"
+         //:EventHandler[ "OnClick" ] := "ConditionPanel_OnClick"
          :Create()
          WITH OBJECT ( COMBOBOX( :this ) )
             :Name                 := "ConditionFieldComboBox1"
@@ -120,7 +120,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Height               := 200
             :SelectionHeight      := 17
             :ItemHeight           := 17
-            :EventHandler[ "OnCBNSelEndOk" ] := "ConditionFieldComboBox_OnCBNSelEndOk"
+            //:EventHandler[ "OnCBNSelEndOk" ] := "ConditionFieldComboBox_OnCBNSelEndOk"
             :Create()
          END //COMBOBOX
 
@@ -138,7 +138,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Enabled              := .F.
             :SelectionHeight      := 17
             :ItemHeight           := 17
-            :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
+            //:EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
             :Create()
          END //COMBOBOX
 
@@ -151,7 +151,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Enabled              := .F.
             :AutoHScroll          := .T.
             :Case                 := 2
-            :EventHandler[ "OnChar" ] := "ConditionValueEditBox1_OnChar"
+            //:EventHandler[ "OnChar" ] := "ConditionValueEditBox1_OnChar"
             :Create()
          END //EDITBOX
 
@@ -162,7 +162,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Width                := 0
             :Height               := 22
             :AutoHScroll          := .T.
-            :EventHandler[ "OnChar" ] := "ConditionValueEditBoxSec1_OnChar"
+            //:EventHandler[ "OnChar" ] := "ConditionValueEditBoxSec1_OnChar"
             :Create()
          END //EDITBOX
 
@@ -194,7 +194,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Width                := 20
             :Height               := 22
             :Caption              := "-"
-            :EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
+            //:EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
             :Create()
          END //BUTTON
 
@@ -213,7 +213,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Width                := 20
             :Height               := 22
             :Caption              := "+"
-            :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
+            //:EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
             :Create()
          END //BUTTON
 
@@ -228,7 +228,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Width                := 20
             :Height               := 22
             :Caption              := "..."
-            :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
+            //:EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
             :Create()
          END //BUTTON
 
@@ -254,7 +254,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Top                  := 14
             :Width                := 15
             :Height               := 15
-            :EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
+            //:EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
             :Create()
          END //CHECKBOX
 
@@ -265,8 +265,8 @@ METHOD OnInitDialog() CLASS FilterUI
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "cmdFilterBrowse"
       WITH OBJECT :Dock
-         :Right                := "pgFilter"
-         :Bottom               := "pgFilter"
+         :Right                := Self
+         :Bottom               := Self
          :Margins              := "0,0,20,10"
       END
 
@@ -275,15 +275,15 @@ METHOD OnInitDialog() CLASS FilterUI
       :Width                := 80
       :Height               := 25
       :Caption              := "Browse"
-      :EventHandler[ "OnClick" ] := "cmdFilterBrowse_OnClick"
+      //:EventHandler[ "OnClick" ] := "cmdFilterBrowse_OnClick"
       :Create()
    END //BUTTON
 
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "cmdFilterHelp"
       WITH OBJECT :Dock
-         :Left                 := "pgFilter"
-         :Bottom               := "pgFilter"
+         :Left                 := Self
+         :Bottom               := Self
          :Margins              := "20,0,0,10"
       END
 
@@ -292,7 +292,7 @@ METHOD OnInitDialog() CLASS FilterUI
       :Width                := 24
       :Height               := 25
       :Caption              := "?"
-      :EventHandler[ "OnClick" ] := "cmdFilterHelp_OnClick"
+      //:EventHandler[ "OnClick" ] := "cmdFilterHelp_OnClick"
       :Create()
    END //BUTTON
 RETURN NIL

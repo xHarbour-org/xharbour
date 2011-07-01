@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-06-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Changed DataTable property name bFilter to Filter because users don't know
+     what a codeblock is
+   + Added new Filter UI to generate the filter that will be converted into a codeblock
+
 2010-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Moved Report Header AFTER the page header and Report Footer right
      after all data has printed
