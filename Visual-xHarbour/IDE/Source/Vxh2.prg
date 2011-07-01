@@ -1048,8 +1048,8 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                 
                 ::Selected[n][1]:SetParent( ::NewParent )
                 SetParent( ::Selected[n][1]:hWnd, ::NewParent:hWnd )
+
                 ::Selected[n][1]:TreeItem:SetOwner( ::NewParent:TreeItem )
-                //::Selected[n][1]:MoveWindow( pt:x, pt:y,,,.T.)
 
                 DeferWindowPos( hDef, ::Selected[n][1]:hWnd, , pt:x, pt:y, ::Selected[n][1]:Width, ::Selected[n][1]:Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER )
 

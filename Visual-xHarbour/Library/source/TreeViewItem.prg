@@ -71,10 +71,11 @@ METHOD Init( oParent ) CLASS TreeViewItem
    ::Parent := oParent
 RETURN Self
 
-METHOD Create() CLASS TreeViewItem
-   LOCAL nPos, tvis, cName, oOwner := ::Owner
+METHOD Create( lSetOwner ) CLASS TreeViewItem
+   LOCAL nPos, tvis, cName, n, oOwner := ::Owner
    DEFAULT oOwner TO ::Parent
    DEFAULT nPos   TO 0
+   DEFAULT lSetOwner TO .F.
    tvis := (struct TV_INSERTSTRUCT)
 
    tvis:hParent             := IIF( ::Owner != NIL, ::Owner:hItem, )
@@ -88,31 +89,33 @@ METHOD Create() CLASS TreeViewItem
 
    ::hItem := SendMessage( ::Parent:hWnd, TVM_INSERTITEM, 0, tvis )
    
-   nPos := 0
-   IF ::InsertAfter != TVI_LAST
-      IF ::InsertAfter == TVI_FIRST
-         nPos := 1
-       ELSE
-         IF ( nPos := ASCAN( oOwner:Items, {|o|o:hItem == ::InsertAfter} ) ) > 0
-            IF nPos == LEN( ::Items )
-               nPos := 0
-             ELSE
-               nPos ++
+   IF !lSetOwner
+      nPos := 0
+      IF ::InsertAfter != TVI_LAST
+         IF ::InsertAfter == TVI_FIRST
+            nPos := 1
+          ELSE
+            IF ( nPos := ASCAN( oOwner:Items, {|o|o:hItem == ::InsertAfter} ) ) > 0
+               IF nPos == LEN( ::Items )
+                  nPos := 0
+                ELSE
+                  nPos ++
+               ENDIF
             ENDIF
          ENDIF
       ENDIF
-   ENDIF
 
-   IF nPos == 0
-      AAdd( oOwner:Items, Self )
-    ELSE
-      AINS( oOwner:Items, nPos, Self, .T. )
-   ENDIF
+      IF nPos == 0
+         AAdd( oOwner:Items, Self )
+       ELSE
+         AINS( oOwner:Items, nPos, Self, .T. )
+      ENDIF
 
-   ::Owner      := oOwner
+      ::Owner      := oOwner
+   ENDIF
    ::Level      := oOwner:Level + 1
 
-   AEVAL( ::Items, {|o| IIF( valtype(o)=="O", o:Create(),)} )
+   AEVAL( ::Items, {|o| o:Owner := Self, o:Create(lSetOwner)} )
 
 RETURN Self
 
@@ -196,7 +199,7 @@ METHOD SetOwner( oOwner ) CLASS TreeViewItem
    ENDIF
    TVDeleteItem( ::Parent:handle, ::hItem )
    ::Owner := oOwner
-   ::Create()
+   ::Create(.T.)
    ::Expand()
    ::EnsureVisible()
    ::Select()

@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-06-30 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed error generated at the Object TreeView when changing the parent of a control
+     the corresponding tree object was being multiplicated.
+
 2011-06-29 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Button not repainting when mouse leaves the client area
 
