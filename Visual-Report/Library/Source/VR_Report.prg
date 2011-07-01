@@ -466,6 +466,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  hControl[ "ParCls"  ] := cParCls
               ENDIF
 
+         CASE oNode:cName == "bFilter" // backward compatibility
+              hControl[ "Filter" ] := {=>}
+              HSetCaseMatch( hControl[ "Filter" ], .F. )
+
          CASE oNode:cName == "Font" 
               hControl[ oNode:cName ] := {=>}
               HSetCaseMatch( hControl[ oNode:cName ], .F. )
@@ -603,8 +607,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                 oData:Alias := hCtrl:Alias
              ENDIF
              oData:Create()
-             IF ! EMPTY( hCtrl:bFilter )
-                oData:SetFilter( &(hCtrl:bFilter) )
+             IF ! EMPTY( hCtrl:Filter )
+                oData:SetFilter( &(hCtrl:Filter) )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )

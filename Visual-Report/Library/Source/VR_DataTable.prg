@@ -31,7 +31,7 @@ CLASS VrDataTable INHERIT VrObject
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA bFilter          EXPORTED  INIT ""
+   DATA Filter          EXPORTED  INIT ""
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
@@ -52,7 +52,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       ::aProperties := {}
       AADD( ::aProperties, { "FileName",  "General"  } )
       AADD( ::aProperties, { "Alias",     "General"  } )
-      AADD( ::aProperties, { "bFilter",   "General"  } )
+      AADD( ::aProperties, { "Filter",   "General"  } )
       AADD( ::aProperties, { "Name",      "Object"   } )
       AADD( ::aProperties, { "Driver",    "Object"   } )
       AADD( ::aProperties, { "Order",     "Index"    } )
@@ -72,8 +72,8 @@ METHOD Create() CLASS VrDataTable
       ENDIF
       IF :Driver != "SQLRDD"
          :Create()
-         IF ! EMPTY( ::bFilter )
-            :SetFilter( &(::bFilter) )
+         IF ! EMPTY( ::Filter )
+            :SetFilter( &(::Filter) )
          ENDIF
          IF ! EMPTY( ::Order )
             :OrdSetFocus( ::Order )
@@ -105,8 +105,8 @@ METHOD Configure() CLASS VrDataTable
          ENDIF
 
          :Create()
-         IF ! EMPTY( ::bFilter )
-            :SetFilter( &(::bFilter) )
+         IF ! EMPTY( ::Filter )
+            :SetFilter( &(::Filter) )
          ENDIF
          IF ! EMPTY( ::Order )
             :OrdSetFocus( ::Order )
@@ -133,7 +133,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, XSTR( ::Alias ) )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "bFilter", NIL, XSTR( ::bFilter ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Filter", NIL, XSTR( ::Filter ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, XSTR( ::Order ) )
    oXmlControl:addBelow( oXmlValue )

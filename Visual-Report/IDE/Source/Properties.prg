@@ -663,6 +663,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
+                    CASE cType == "FILTER"
+                         FilterUI()
+
                     CASE cType == "C" .OR. cType == "U" .OR. cType == "IMAGENAME"
                          ::ActiveControl := EditBox( Self )
                          WITH OBJECT ::ActiveControl
@@ -933,7 +936,12 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
-
+        
+        ELSEIF UPPER(cProp) == "FILTER"
+          xValue := NIL
+          aCol[1]:Value   := ::ActiveObject:Filter
+          aCol[1]:ColType := "FILTER"
+          
         ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable"
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }
