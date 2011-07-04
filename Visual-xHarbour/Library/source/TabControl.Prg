@@ -182,7 +182,6 @@ CLASS TabControl INHERIT Control
    METHOD __UpDnProc()
    METHOD __SetTheming()
    METHOD __SetTabPosition()
-   METHOD SetParent()  INLINE NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
