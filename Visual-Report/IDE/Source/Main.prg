@@ -29,7 +29,7 @@
       DATA oRep    EXPORTED
       DATA oXMLDoc EXPORTED
 
-      METHOD Load()          INLINE ::oRep := VrReport(), ::oXMLDoc := ::oRep:Load( cReport )
+      METHOD Load( cReport ) INLINE ::oRep := VrReport(), ::oXMLDoc := ::oRep:Load( cReport )
       METHOD Preview()       INLINE ::oRep:Preview()
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
       METHOD Run()           INLINE ::oRep:Run( ::oXMLDoc )
