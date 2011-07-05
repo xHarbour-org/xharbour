@@ -7,6 +7,38 @@
 // This source file is an intellectual property of SOCS bvba.
 // You may NOT forward or share this file under any conditions!
 
+
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+
+#ifdef VRDLL
+
+   #include "vxh.ch"
+
+   #pragma BEGINDUMP
+      #define CLS_Name "Winfakt.VisualReport.1"
+      #define CLS_ID "{A46F16F6-709C-4F6A-A0DA-38335CF8DD16}"
+      #include "OleServer.h"
+   #pragma ENDDUMP
+
+   REQUEST HB_GT_NUL_DEFAULT
+
+   CLASS VReport
+      DATA hParent EXPORTED
+      DATA oRep    EXPORTED
+      DATA oXMLDoc EXPORTED
+
+      METHOD New( hWnd )     INLINE ::oRep    := VrReport()
+      METHOD Load( cReport ) INLINE ::oXMLDoc := ::oRep:Load( cReport )
+      METHOD Preview()       INLINE ::oRep:Preview()
+      METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
+      METHOD Run()           INLINE ::oRep:Run( ::oXMLDoc )
+   ENDCLASS
+
+#else
+
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "debug.ch"
@@ -14,6 +46,10 @@
 
 #define MXML_STYLE_INDENT        1
 #define MXML_STYLE_THREESPACES   4
+
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 
 static oApp
 
@@ -1052,3 +1088,4 @@ METHOD ResetQuickOpen( cFile ) CLASS Report
    END
 
 RETURN Self
+#endif

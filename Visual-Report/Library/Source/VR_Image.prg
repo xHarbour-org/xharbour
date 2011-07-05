@@ -114,7 +114,9 @@ CLASS __VrImage INHERIT FreeImage
    METHOD OnLButtonDown()
    METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
    METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
-   METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
+   #ifndef VRDLL
+      METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
+   #endif
 ENDCLASS
 
 METHOD OnLButtonDown(n,x,y) CLASS __VrImage 

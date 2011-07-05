@@ -41,17 +41,18 @@ METHOD Create() CLASS VrLine
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
-   
-   WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
-      :Cargo     := Self
-      :Left      := ::Left
-      :Top       := ::Top
-      :Width     := ::Width
-      :Height    := LINEHEIGHT
-      :BackColor := RGB(0,0,0)
-      :Create()
-   END
-   Super:Create()
+   #ifndef VRDLL
+      WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
+         :Cargo     := Self
+         :Left      := ::Left
+         :Top       := ::Top
+         :Width     := ::Width
+         :Height    := LINEHEIGHT
+         :BackColor := RGB(0,0,0)
+         :Create()
+      END
+      Super:Create()
+   #endif
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrLine

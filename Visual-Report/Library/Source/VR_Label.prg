@@ -57,23 +57,25 @@ METHOD Create() CLASS VrLabel
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
-   
-   ::Font:Create()
 
-   IF ::lUI
-      WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
-         :Cargo   := Self
-         :Caption := ::Text
-         :Left    := ::Left
-         :Top     := ::Top
-         :Create()
-      END
-      ::Font:Set( ::EditCtrl )
-      Super:Create()
-      ::SetText( ::xText )
-    ELSE
-      Super:Create()
-   ENDIF
+   #ifndef VRDLL
+      ::Font:Create()
+
+      IF ::lUI
+         WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
+            :Cargo   := Self
+            :Caption := ::Text
+            :Left    := ::Left
+            :Top     := ::Top
+            :Create()
+         END
+         ::Font:Set( ::EditCtrl )
+         Super:Create()
+         ::SetText( ::xText )
+       ELSE
+         Super:Create()
+      ENDIF
+   #endif
 RETURN Self
 
 METHOD Configure() CLASS VrLabel
@@ -267,38 +269,39 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-CLASS __VrLabel INHERIT Label
-   DATA aSize EXPORTED INIT {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
-   METHOD OnLButtonDown()
-   METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
-   METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
-   METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
-   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
-ENDCLASS
+#ifndef VRDLL
+   CLASS __VrLabel INHERIT Label
+      DATA aSize EXPORTED INIT {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
+      METHOD OnLButtonDown()
+      METHOD OnMouseMove(n,x,y) INLINE MouseMove( Self, n, x, y )
+      METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
+      METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
+      METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
+   ENDCLASS
 
-//-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnLButtonDown(n,x,y) CLASS __VrLabel 
-   LOCAL aRect, oCtrl
-   ::Parent:SetCapture()
-   IF ::Application:Props:PropEditor:ActiveObject != NIL
-      oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      TRY
-         IF oCtrl != NIL
-            aRect := oCtrl:GetRectangle()
-            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-            oCtrl:Parent:InvalidateRect( aRect, .F. )
-            aRect := ::GetRectangle()
-            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-            ::Parent:InvalidateRect( aRect, .F. )
-            ::Parent:nDownPos := {x,y}
-         ENDIF
-      CATCH
-      END
-      ::SetFocus()
-   ENDIF
-   Super:OnLButtonDown()
-RETURN NIL
-
+   //-----------------------------------------------------------------------------------------------------------------------------------
+   METHOD OnLButtonDown(n,x,y) CLASS __VrLabel 
+      LOCAL aRect, oCtrl
+      ::Parent:SetCapture()
+      IF ::Application:Props:PropEditor:ActiveObject != NIL
+         oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
+         TRY
+            IF oCtrl != NIL
+               aRect := oCtrl:GetRectangle()
+               aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+               oCtrl:Parent:InvalidateRect( aRect, .F. )
+               aRect := ::GetRectangle()
+               aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
+               ::Parent:InvalidateRect( aRect, .F. )
+               ::Parent:nDownPos := {x,y}
+            ENDIF
+         CATCH
+         END
+         ::SetFocus()
+      ENDIF
+      Super:OnLButtonDown()
+   RETURN NIL
+#endif
 //-----------------------------------------------------------------------------------------------------------------------------------
 FUNCTION GetPoints( oCtrl )
    LOCAL aRect, aPoints, n := 6

@@ -45,16 +45,18 @@ METHOD Create() CLASS VrGroupHeader
    IF ::__ClsInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
-   WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
-      :BackColor := ::BackColor
-      :Cargo     := Self
-      :Left      := -1
-      :Top       := ::Top
-      :Height    := ::Height
-      :Create()
-      :Width     := ::Parent:Width
-   END
-   Super:Create()
+   #ifndef VRDLL
+      WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
+         :BackColor := ::BackColor
+         :Cargo     := Self
+         :Left      := -1
+         :Top       := ::Top
+         :Height    := ::Height
+         :Create()
+         :Width     := ::Parent:Width
+      END
+      Super:Create()
+   #endif
 RETURN Self
 
 METHOD Configure() CLASS VrGroupHeader
@@ -77,60 +79,6 @@ METHOD Draw( hDC ) CLASS VrGroupHeader
    FOR EACH oLabel IN ::Objects
    NEXT
 RETURN Self
-
-//-----------------------------------------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------------------------------------
-
-CLASS __VrGroup INHERIT RepEdit
-   DATA aSize EXPORTED INIT {.F.,.F.,.F.,.T.,.F.,.F.,.F.,.T.}
-   DATA FlatCaption EXPORTED INIT .T.
-   DATA Type INIT "Group"
-   METHOD OnLButtonDown()
-   METHOD OnMouseMove()
-   METHOD OnMouseLeave()     INLINE ::Parent:Cursor := NIL, NIL
-   METHOD OnKeyDown(n)       INLINE KeyDown( Self, n )
-   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
-ENDCLASS
-
-//-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnLButtonDown(n,x,y) CLASS __VrGroup 
-   LOCAL aRect, oCtrl
-   ::Parent:SetCapture()
-   IF ::Application:Props:ToolBox:ActiveItem != NIL
-      ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, ::Cargo )
-    
-    ELSEIF ::Application:Props:PropEditor:ActiveObject != NIL
-      oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
-      TRY
-         IF oCtrl != NIL
-            aRect := oCtrl:GetRectangle()
-            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-            oCtrl:Parent:InvalidateRect( aRect, .F. )
-            aRect := ::GetRectangle()
-            aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
-            ::Parent:InvalidateRect( aRect, .F. )
-            ::Parent:nDownPos := {x,y}
-         ENDIF
-      CATCH
-      END
-      ::SetFocus()
-   ENDIF
-RETURN NIL
-
-//-----------------------------------------------------------------------------------------------------------------------------------
-
-METHOD OnMouseMove(n,x,y) CLASS __VrGroup 
-   LOCAL oCtrl
-   IF n == MK_LBUTTON
-      oCtrl := ::Application:Props:PropEditor:ActiveObject
-      IF !(oCtrl == Self)
-         Super:OnMouseMove(n,x,y)
-      ENDIF
-    ELSE
-      MouseMove( Self, n, x, y )
-   ENDIF
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
