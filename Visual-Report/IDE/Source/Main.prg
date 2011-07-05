@@ -26,14 +26,14 @@
    REQUEST HB_GT_NUL_DEFAULT
 
    CLASS VReport
-      DATA hParent EXPORTED
       DATA oRep    EXPORTED
       DATA oXMLDoc EXPORTED
 
-      METHOD New()           INLINE ::oRep := VrReport(), ::oXMLDoc := ::oRep:Load( cReport )
+      METHOD Load()          INLINE ::oRep := VrReport(), ::oXMLDoc := ::oRep:Load( cReport )
       METHOD Preview()       INLINE ::oRep:Preview()
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
       METHOD Run()           INLINE ::oRep:Run( ::oXMLDoc )
+      METHOD Close()         INLINE ::oXMLDoc := NIL, ::oRep := NIL
    ENDCLASS
 
 #else
