@@ -31,7 +31,7 @@
       METHOD Run( cReport )
       METHOD Preview()       INLINE ::oRep:Preview()
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
-      METHOD Close()         INLINE ::oXMLDoc := NIL, ::oRep := NIL
+      METHOD Close()         INLINE ::oRep := NIL
    ENDCLASS
 
    METHOD Run( cReport ) CLASS VR

@@ -136,6 +136,7 @@ METHOD InitPDF() CLASS VrReport
    IF ::oPDF == NIL
       #ifdef VRDLL
          oForm := WinForm():SetInstance( "VReport" ):Init( GetActiveWindow(), {} )
+         oForm:Create()
       #else
          oForm := ::Application:MainForm
       #endif
@@ -682,8 +683,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             ::nRow += 500
             nHeight := ::CreateGroupHeaders( hDC )
          ENDIF
-
-         oWait:Position := Int( (nPos/nCount)*100 )
+         IF oWait != NIL
+            oWait:Position := Int( (nPos/nCount)*100 )
+         ENDIF
          nPos ++
          ::DataSource:Skip()
       ENDDO
@@ -692,9 +694,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::CreateRepFooter( hDC )
    ::CreateFooter( hDC )
 
+#ifndef VRDLL
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
       ::CreateExtraPage( hDC )
    ENDIF
+#endif
 
    ReleaseDC(0, hDC)
 
@@ -706,9 +710,11 @@ RETURN .T.
 
 METHOD ChangePage( hDC, nHeight )
    IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
+#ifndef VRDLL
       IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
          ::CreateExtraPage( hDC )
       ENDIF
+#endif
       ::CreateFooter( hDC )
       ::EndPage()
       ::StartPage()
