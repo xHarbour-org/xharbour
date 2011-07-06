@@ -132,8 +132,14 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD InitPDF() CLASS VrReport
+   LOCAL oForm
    IF ::oPDF == NIL
-      ::oPDF := ActiveX( ::Application:MainForm )
+      #ifdef VRDLL
+         oForm := WinForm():SetInstance( "VReport" ):Init( GetActiveWindow(), {} )
+      #else
+         oForm := ::Application:MainForm
+      #endif
+      ::oPDF := ActiveX( oForm )
       ::oPDF:SetChildren := .F.
 
       ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
@@ -495,6 +501,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
       hControl:cParent := SUBSTR( cParent, 2 )
       AADD( ::&cParent, hControl )
    ENDIF
+#ifndef VRDLL
    TRY
       n := ::Application:Props[ "RepHeader" ]:Height - ::Application:Props[ "RepHeader" ]:ClientHeight
            ::Application:Props[ "RepHeader" ]:Height := VAL( ::hProps:RepHeaderHeight )+n
@@ -511,6 +518,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 
         ::Application:Props[ "Footer" ]:Dockit()
         ::Application:Props[ "Body" ]:Dockit()
+#endif
    TRY
       ::Orientation  := VAL( ::hProps:Orientation )
    CATCH
@@ -645,13 +653,13 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
    ::StartPage()
    hDC := GetDC(0)
-
+#ifndef VRDLL
    IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == -1
       ::CreateExtraPage( hDC )
       ::EndPage()
       ::StartPage()
    ENDIF
-   
+#endif
    ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
 
@@ -808,3 +816,15 @@ METHOD OnInitDialog() CLASS VrPreview
    ::CenterWindow( .T. )
 RETURN Self
 
+#ifdef VRDLL
+
+CLASS __VReport INHERIT Application
+   METHOD Init() CONSTRUCTOR
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS __VReport
+   ::Super:Init( oParent, aParameters )
+   ::Create()
+RETURN Self
+
+#endif

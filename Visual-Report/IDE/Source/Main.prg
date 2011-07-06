@@ -16,6 +16,7 @@
 #ifdef VRDLL
 
    #include "vxh.ch"
+   #include "debug.ch"
 
    #pragma BEGINDUMP
       #define CLS_Name "Winfakt.VisualReport.1"
@@ -25,17 +26,24 @@
 
    REQUEST HB_GT_NUL_DEFAULT
 
-   CLASS VReport
-      DATA oRep    EXPORTED
-      DATA oXMLDoc EXPORTED
-
-      METHOD Load( cReport ) INLINE ::oRep := VrReport(), ::oXMLDoc := ::oRep:Load( cReport )
+   CLASS VR
+      DATA oRep EXPORTED
+      METHOD Run( cReport )
       METHOD Preview()       INLINE ::oRep:Preview()
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
-      METHOD Run()           INLINE ::oRep:Run( ::oXMLDoc )
       METHOD Close()         INLINE ::oXMLDoc := NIL, ::oRep := NIL
    ENDCLASS
 
+   METHOD Run( cReport ) CLASS VR
+      LOCAL oDoc
+      ::oRep := VrReport()
+      IF !EMPTY( ::oRep )
+         oDoc := TXmlDocument():New( cReport )
+         IF !EMPTY( oDoc )
+            ::oRep:Run( oDoc )
+         ENDIF
+      ENDIF
+   RETURN Self
 #else
 
 #include "vxh.ch"
@@ -246,13 +254,13 @@ METHOD Init() CLASS MainForm
          :Create()
 
          WITH OBJECT ::Application:Props[ "ViewMenuHeader" ] := MenuStripItem( :this )
-            :Caption := "&Header"
+            :Caption := "Page &Header"
             :Action  := {|o| o:Checked := !o:Checked, ::Application:Props[ "Header" ]:Visible := o:Checked }
             :Create()
          END
 
          WITH OBJECT ::Application:Props[ "ViewMenuFooter" ] := MenuStripItem( :this )
-            :Caption := "&Footer"
+            :Caption := "Page &Footer"
             :Action  := {|o| o:Checked := !o:Checked, ::Application:Props[ "Footer" ]:Visible := o:Checked }
             :Create()
          END

@@ -12,7 +12,8 @@
 
 CLASS FilterUI INHERIT Dialog
    DATA oReport EXPORTED
-
+   DATA lPrefChanged
+   DATA lAskLaterConfirmed
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD OnOk()
@@ -339,12 +340,12 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------//
 METHOD ANDRadioButton_OnClick( Sender ) CLASS FilterUI
-   wf_Print_SetPrefChanged()
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD ORRadioButton_OnClick( Sender ) CLASS FilterUI
-   wf_Print_SetPrefChanged()
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -355,10 +356,10 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------//
 METHOD ConditionFieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
 
-   wf_Filter_ConditionFieldChanged("wf_Print", ::this, Sender, "wf_Print_Alias1", "wf_Print_Alias2")
+   //wf_Filter_ConditionFieldChanged("wf_Print", ::this, Sender, "wf_Print_Alias1", "wf_Print_Alias2")
 
-   wf_AskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
-   wf_Print_SetPrefChanged()
+   //wf_AskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -367,7 +368,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    //Make a series of new filter objects
 
    LOCAL nTemp
-
+/*
    nTemp:= Val(wf_OnlyDigit(Sender:Name))
 
    wf_Filter_AddCondition("wf_Print", ::this, nTemp)
@@ -390,7 +391,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    wf_Print_SetPrefChanged()
 
    RETURN Self
-
+*/
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -399,7 +400,7 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
    //Make a series of new filter objects
 
    LOCAL nTemp
-
+/*
    nTemp:= Val(wf_OnlyDigit(Sender:Name))
 
    wf_Filter_AddCondition("wf_Print", ::This, nTemp)
@@ -428,44 +429,45 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
 
    wf_AskLaterSetup( ::This, nTemp )
    wf_Print_SetPrefChanged()
-   RETURN Self
+*/
+RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
 
-   wf_Filter_RemoveCondition(::this, Sender)
-   wf_RemoveAskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
-   wf_Print_SetPrefChanged()
+   //wf_Filter_RemoveCondition(::this, Sender)
+   //wf_RemoveAskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
-   wf_Filter_ConditionChanged("wf_Print", ::This, Sender)
-   wf_Print_SetPrefChanged()
+   //wf_Filter_ConditionChanged("wf_Print", ::This, Sender)
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD AskLaterCheckBox_OnClick( Sender ) CLASS FilterUI
-   var:lPrefChanged := .T.
-   wf_Filter_AskLaterCheckBoxClicked(::This, Sender)
-   wf_AskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
-   wf_Print_SetPrefChanged()
+   ::lPrefChanged := .T.
+   //wf_Filter_AskLaterCheckBoxClicked(::This, Sender)
+   //wf_AskLaterSetup(::this, Val(wf_OnlyDigit(Sender:Name)))
+   //wf_Print_SetPrefChanged()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD cmdFilterBrowse_OnClick( Sender ) CLASS FilterUI
    LOCAL cFilter
 
-   IF wf_dbSelect("WF_PRINT_ALIAS1") == 0
+   IF Select("WF_PRINT_ALIAS1") == 0
       RETURN SELF
    ENDIF
 
-   wfDB SELECT "WF_PRINT_ALIAS1"
+   SELECT WF_PRINT_ALIAS1
 
-   cFilter := wf_Filter_GetFilterString("wf_Print", ::this, "wf_Print_Alias1", "wf_Print_Alias2")
-   IF var:lAskLaterConfirmed
-      wf_FilterBrowse("wf_Print_Alias1", cFilter, ::Height, ::Width)
-   ENDIF
+   //cFilter := wf_Filter_GetFilterString("wf_Print", ::this, "wf_Print_Alias1", "wf_Print_Alias2")
+   //IF ::lAskLaterConfirmed
+   //   wf_FilterBrowse("wf_Print_Alias1", cFilter, ::Height, ::Width)
+   //ENDIF
 
 RETURN Self
 
@@ -473,5 +475,10 @@ RETURN Self
 METHOD cmdFilterHelp_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
+METHOD ConditionValueEditBox1_OnChar() CLASS FilterUI
+RETURN Self
+
+METHOD ConditionValueEditBoxSec1_OnChar() CLASS FilterUI
+RETURN Self
 
 
