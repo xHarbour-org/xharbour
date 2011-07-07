@@ -186,7 +186,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
       RETURN NIL
    ENDIF
-   IF cProp IN {"DataSource"}
+   IF cProp IN {"DataSource", "RelationTable" }
       IF xValue != NIL
          xValue := oItem:ColItems[1]:Value[2][ xValue ]
          IF cCaption != NIL
@@ -413,6 +413,8 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                         IF ( nPos := HGetPos( ::System:DataDrivers, ::ActiveObject:Driver ) ) > 0
                            cText := cText[ nPos ]
                         ENDIF
+                      ELSEIF oItem:ColItems[n]:ColType == "RELATIONTABLE" .AND. !EMPTY( ::ActiveObject:RelationTable )
+                        cText := ::ActiveObject:RelationTable:Name
                      ENDIF
                   ENDIF
                   EXIT
@@ -764,7 +766,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER", "DATADRIVERS", "ADSDATADRIVERS" }
+                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER", "DATADRIVERS", "ADSDATADRIVERS", "RELATIONTABLE" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -969,6 +971,16 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                  AADD( aCol[1]:Value[2], aField[1] )
              NEXT
           ENDIF
+          xValue := NIL
+
+        ELSEIF UPPER(cProp) IN {"RELATIONTABLE"}
+          aCol[1]:ColType := "RELATIONTABLE"
+          aCol[1]:Value   := { "", { NIL } }
+          FOR EACH Child IN ::Application:Props:Components:Children
+              IF Child:Component:ClsName == "DataTable" .AND. !( Child:Component == ::ActiveObject )
+                 AADD( aCol[1]:Value[2], Child:Component )
+              ENDIF
+          NEXT
           xValue := NIL
 
         ELSEIF UPPER(cProp) == "DATASOURCE"
