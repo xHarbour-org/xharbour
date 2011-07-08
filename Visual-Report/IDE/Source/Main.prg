@@ -462,7 +462,7 @@ METHOD Init() CLASS MainForm
       :Create()
       WITH OBJECT ::Application:Props[ "ReportPageTab" ] := TabPage( :this )
          :Caption    := "Report Page"
-         :VertScroll := .T.
+         :HorzScroll := .T.
          :BackColor  := ::System:Color:Gray
          :Create()
 
@@ -513,7 +513,7 @@ METHOD Init() CLASS MainForm
             :Top          := 2
             :Height       := 100
             :Dock:Margins := "0,0,0,2"
-//            :Dock:Bottom  := :Parent
+            :Dock:Bottom  := :Parent
             :Visible      := .F.
             :Application:Props[ "ViewMenuRepFooter" ]:Checked := ::Application:IniFile:ReadInteger( "View", "RepFooter", 0 )==1
             :Create()
@@ -802,16 +802,12 @@ METHOD SetScrollArea() CLASS Report
    oApp:Props:RepHeader:Width := cx
    oApp:Props:RepFooter:Width := cx
    oApp:Props:ExtraPage:Width := cx
-
    oApp:Props:ExtraPage:Height := cy
-//   oApp:Props:Body:Height      := cy
    
    oApp:Props:ReportPageTab:HorzScrollSize := cx + 4
-   oApp:Props:ReportPageTab:VertScrollSize := cy + 4
+
    oApp:Props:ExtraTab:HorzScrollSize := cx + 4
    oApp:Props:ExtraTab:VertScrollSize := cy + 4
-
-   oApp:Props:RepFooter:Top := ( cy + 4 ) - oApp:Props:RepFooter:Height
 
    oApp:Props:ReportPageTab:HorzScroll := .T.
 

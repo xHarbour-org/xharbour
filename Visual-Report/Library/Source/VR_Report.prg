@@ -25,6 +25,8 @@
 #define  acCommandToolZoomOut          53542
 #define  acCommandToolPageHome         53773
 
+static nPageNumber
+
 CLASS VrReport INHERIT VrObject
    DATA PrintHeader     EXPORTED  INIT .T.
    DATA PrintRepHeader  EXPORTED  INIT .T.
@@ -269,7 +271,7 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
 
    IF oPanel == NIL
       IF UPPER( hCtrl:cParent ) == "BODY"
-         ::ChangePage( hDC, nHeight )
+         ::ChangePage( hDC, 0 )
       ENDIF
       oControl:Draw( hDC, hTotal, hCtrl )
       TRY
@@ -661,6 +663,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ::StartPage()
    ENDIF
 #endif
+   nPageNumber := 1
+
    ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
 
@@ -718,6 +722,7 @@ METHOD ChangePage( hDC, nHeight )
       ::CreateFooter( hDC )
       ::EndPage()
       ::StartPage()
+      nPageNumber ++
       ::CreateHeader( hDC )
       RETURN .T.
    ENDIF
@@ -834,3 +839,5 @@ METHOD Init( oParent, aParameters ) CLASS __VReport
 RETURN Self
 
 #endif
+
+FUNCTION PageNumber(); RETURN nPageNumber
