@@ -97,7 +97,7 @@ METHOD Create() CLASS ToolBox
                    { "Components",           {} } }
 
    AADD( ::aButtons[2][2], { "Label",       .T. } )
-   AADD( ::aButtons[2][2], { "Theme",       .T. } )
+//   AADD( ::aButtons[2][2], { "Theme",       .T. } )
    AADD( ::aButtons[2][2], { "Total",       .T. } )
    AADD( ::aButtons[2][2], { "Image",       .T. } )
    AADD( ::aButtons[2][2], { "DataTable",   .T. } )
