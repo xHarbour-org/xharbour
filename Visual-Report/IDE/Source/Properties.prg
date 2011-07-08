@@ -198,6 +198,9 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
          oItem:ColItems[1]:Value[1] := ""
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
+      IF cProp == "RelationTable"
+         xValue := xValue:Name
+      ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
       ::ResetProperties(,,.T.)
       RETURN NIL
@@ -413,8 +416,8 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                         IF ( nPos := HGetPos( ::System:DataDrivers, ::ActiveObject:Driver ) ) > 0
                            cText := cText[ nPos ]
                         ENDIF
-                      ELSEIF oItem:ColItems[n]:ColType == "RELATIONTABLE" .AND. !EMPTY( ::ActiveObject:RelationTable )
-                        cText := ::ActiveObject:RelationTable:Name
+                      ELSEIF oItem:ColItems[n]:ColType == "RELATIONTABLE"
+                        cText := ::ActiveObject:RelationTable
                      ENDIF
                   ENDIF
                   EXIT
