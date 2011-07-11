@@ -593,7 +593,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue
+   LOCAL xValue, cData
 
    ::Create()
 
@@ -638,6 +638,15 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ::DataSource := oData
           ENDIF
 
+       ENDIF
+   NEXT
+
+   FOR EACH hCtrl IN ::aComponents
+       IF hCtrl:ClsName == "VRDATATABLE"
+          cData := hCtrl:Name
+          IF ! EMPTY( hCtrl:RelationTable )
+             hData[cData]:SetRelation( hData[ hCtrl:RelationTable ], hCtrl:RelationExp )
+          ENDIF
        ENDIF
    NEXT
 

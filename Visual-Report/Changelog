@@ -8,6 +8,13 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-07-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added properties RelationTable and RelationExp
+     To set a relationship between 2 tables make sure the target database has
+     driver and index order selected.
+     The expression in a normal clipper expression which can be as simple as
+     the field name
+   
 2010-06-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Changed DataTable property name bFilter to Filter because users don't know
      what a codeblock is

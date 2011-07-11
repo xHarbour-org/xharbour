@@ -198,7 +198,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
          oItem:ColItems[1]:Value[1] := ""
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
-      IF cProp == "RelationTable"
+      IF cProp == "RelationTable" .AND. ! EMPTY( xValue )
          xValue := xValue:Name
       ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
