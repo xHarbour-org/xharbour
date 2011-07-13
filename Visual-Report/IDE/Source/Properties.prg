@@ -226,7 +226,9 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
          xProp := "ImageName"
       ENDIF
       IF cProp IN {"GroupBy","Field","Order"}
-         xValue := cCaption
+         IF cProp != "Order" .OR. ::ActiveObject:Driver != "SQLRDD"
+            xValue := cCaption
+         ENDIF
       ENDIF
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
 
@@ -676,22 +678,19 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Width  := ::Columns[ nCol ][ 1 ]+2 - IIF( cType == "ICONS", 20, 0 )
                             :Height := rc:bottom-rc:top-1
                             :SetExStyle( WS_EX_CLIENTEDGE, .F. )
-                            :Style := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
+                            :Style  := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
+                            :Button := .T.
+                            :ButtonAction := {|o| ::EditText( o ) }
 
                             IF __ObjHasMsg( ::ActiveObject, "__ExplorerFilter" ) .OR. ::ActiveItem:Caption == "ImageName"
                                IF ::ActiveItem:Caption == "FileName" .OR. ::ActiveItem:Caption == "ImageName"
-                                  :Button := .T.
                                   :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject ) }
                                 ELSEIF cProp == "Filter"
-                                  :Button := .T.
                                   :ButtonAction := {|o| FilterUI( o ) }
                                ENDIF
                              ELSEIF cType == "C"
-                               :Button := .T.
                                IF cProp == "Filter"
                                   :ButtonAction := {|o| FilterUI( o ) }
-                                ELSE
-                                  :ButtonAction := {|o| ::EditText( o ) }
                                ENDIF
                             ENDIF
 
@@ -946,7 +945,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
 
-        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable"
+        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable" .AND. ::ActiveObject:Driver != "SQLRDD"
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }
           IF ::ActiveObject:EditCtrl:IsOpen

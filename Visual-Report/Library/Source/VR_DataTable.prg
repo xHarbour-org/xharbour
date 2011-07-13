@@ -25,7 +25,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA ClsName          EXPORTED INIT "DataTable"
    DATA SysBackColor     EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA SysForeColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA ConnectionString EXPORTED INIT ""
+   DATA ConnectionFile   EXPORTED INIT ""
    DATA Server           EXPORTED INIT CONNECT_ODBC
    DATA EnumServer       EXPORTED INIT { { "AutoDetect", "ODBC", "RPC", "MySQL", "Postgres", "Oracle", "Firebird" }, {0,1,2,3,4,5,6} }
 
@@ -61,7 +61,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "Driver",           "Object"   } )
       AADD( ::aProperties, { "Order",            "Index"    } )
       AADD( ::aProperties, { "Server",           "SQL" } )
-      AADD( ::aProperties, { "ConnectionString", "SQL" } )
+      AADD( ::aProperties, { "ConnectionFile",   "SQL" } )
    ENDIF
 RETURN Self
 
@@ -89,12 +89,12 @@ METHOD Create() CLASS VrDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
-   LOCAL cAlias, nCnn
+   LOCAL cAlias, nCnn, oIni, cEntry
    WITH OBJECT ::EditCtrl
       :xFileName := ::FileName
       :Driver   := ::Driver
       
-      IF EMPTY( ::ConnectionString ) .AND. ::Driver != "SQLRDD"
+      IF ::Driver != "SQLRDD"
          IF !EMPTY( ::Alias )
             :Alias := ::Alias
             IF ::EditMode
@@ -114,18 +114,6 @@ METHOD Configure() CLASS VrDataTable
          ENDIF
          IF ! EMPTY( ::Order )
             :OrdSetFocus( ::Order )
-         ENDIF
-       ELSE
-         IF !::EditMode .AND. !EMPTY( ::ConnectionString )
-            TRY
-               :DataConnector := SqlConnector( ::Parent )
-               :DataConnector:Server := ::Server
-               :DataConnector:ConnectionString := ::ConnectionString
-               :DataConnector:Create()
-               :Create()
-            CATCH
-               MessageBox(0, "Error connecting to " + ::ConnectionString )
-            END
          ENDIF
       ENDIF
    END
@@ -149,7 +137,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "RelationExp", NIL, ::RelationExp )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionString", NIL, XSTR( ::ConnectionString ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionFile", NIL, ::ConnectionFile )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 

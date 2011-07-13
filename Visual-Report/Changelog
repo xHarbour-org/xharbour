@@ -8,6 +8,15 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-07-12 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added functionality to read a connection string from an INI file
+   - Removed obsolete connection creation in VrDataTable since it only needs to be done
+     when running the report
+   ! Fixed bug editing string based properties not creatring the expanded box button
+   ! Fixed default edit button action to create the expanded box
+   * Changed ORDER property to be a STRING instead of a combobox when driver is SQLRDD
+     because VR designer doesn't create a connection when editing the report.
+   
 2010-07-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added properties RelationTable and RelationExp
      To set a relationship between 2 tables make sure the target database has

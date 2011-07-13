@@ -593,7 +593,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue, cData
+   LOCAL xValue, cData, oIni, cEntry
 
    ::Create()
 
@@ -625,10 +625,16 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                 oData:OrdSetFocus( hCtrl:Order )
              ENDIF
            
-           ELSEIF !EMPTY( hCtrl:ConnectionString )
+           ELSEIF !EMPTY( hCtrl:ConnectionFile )
              oData:DataConnector                  := SqlConnector( NIL )
              oData:DataConnector:Server           := hCtrl:Server
-             oData:DataConnector:ConnectionString := hCtrl:ConnectionString
+             IF FILE( hCtrl:ConnectionFile )
+                oIni   := IniFile( hCtrl:ConnectionFile )
+                cEntry := oIni:ReadString( "SQL", "OPEN" )
+                oData:DataConnector:ConnectionString := oIni:ReadString( "SQL", cEntry )
+              ELSE
+                oData:DataConnector:ConnectionString := hCtrl:ConnectionFile
+             ENDIF
              oData:DataConnector:Create()
              oData:Create()
           ENDIF
