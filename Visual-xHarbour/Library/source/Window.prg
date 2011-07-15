@@ -117,27 +117,29 @@ CLASS Window INHERIT Object
 
    PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
 
-   PROPERTY Left          INDEX 1                   READ xLeft          WRITE __SetSizePos
-   PROPERTY Top           INDEX 2                   READ xTop           WRITE __SetSizePos
-   PROPERTY Width         INDEX 3                   READ xWidth         WRITE __SetSizePos
-   PROPERTY Height        INDEX 4                   READ xHeight        WRITE __SetSizePos
-   PROPERTY Cursor                                  READ xCursor        WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED
-   PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge    WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge    WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY ControlParent INDEX WS_EX_CONTROLPARENT READ xControlParent WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY Left          INDEX 1                   READ xLeft           WRITE __SetSizePos
+   PROPERTY Top           INDEX 2                   READ xTop            WRITE __SetSizePos
+   PROPERTY Width         INDEX 3                   READ xWidth          WRITE __SetSizePos
+   PROPERTY Height        INDEX 4                   READ xHeight         WRITE __SetSizePos
+   PROPERTY Cursor                                  READ xCursor         WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED
+   PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY ControlParent INDEX WS_EX_CONTROLPARENT READ xControlParent  WRITE SetExStyle        DEFAULT .F.       PROTECTED
 
-   PROPERTY Visible       INDEX WS_VISIBLE          READ xVisible       WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY Enabled       INDEX WS_DISABLED         READ xEnabled       WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY Border        INDEX WS_BORDER           READ xBorder        WRITE SetStyle          DEFAULT .F.       PROTECTED
+   PROPERTY Visible       INDEX WS_VISIBLE          READ xVisible        WRITE SetStyle          DEFAULT .T.       PROTECTED
+   PROPERTY Enabled       INDEX WS_DISABLED         READ xEnabled        WRITE SetStyle          DEFAULT .T.       PROTECTED
+   PROPERTY Border        INDEX WS_BORDER           READ xBorder         WRITE SetStyle          DEFAULT .F.       PROTECTED
 
-   PROPERTY Center                                  READ xCenter        WRITE CenterWindow      DEFAULT .F.       PROTECTED
-   PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren  WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings  WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY TabOrder                                READ xTabOrder      WRITE SetTabOrder                         INVERT
-   PROPERTY AcceptFiles   INDEX WS_EX_ACCEPTFILES   READ xAcceptFiles   WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY AnimationStyle                          READ xAnimationStyle                        DEFAULT 0
-   PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate    WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY Center                                  READ xCenter         WRITE CenterWindow      DEFAULT .F.       PROTECTED
+   PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren   WRITE SetStyle          DEFAULT .T.       PROTECTED
+   PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings   WRITE SetStyle          DEFAULT .T.       PROTECTED
+   PROPERTY TabOrder                                READ xTabOrder       WRITE SetTabOrder                         INVERT
+   PROPERTY AcceptFiles   INDEX WS_EX_ACCEPTFILES   READ xAcceptFiles    WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY AnimationStyle                          READ xAnimationStyle                         DEFAULT 0
+   PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate     WRITE SetExStyle        DEFAULT .F.       PROTECTED
 
+   PROPERTY VertScrollSize                          READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
+   PROPERTY HorzScrollSize                          READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
 //   DATA xText                  EXPORTED  INIT ""
 //   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
@@ -162,9 +164,6 @@ CLASS Window INHERIT Object
    DATA DisableParent          PUBLISHED INIT .F.
    DATA AutoClose              EXPORTED INIT .T.
    
-   DATA VertScrollSize         EXPORTED INIT 0
-   DATA HorzScrollSize         EXPORTED INIT 0
-
    DATA VertScroll             EXPORTED INIT .F.
    DATA HorzScroll             EXPORTED INIT .F.
 
