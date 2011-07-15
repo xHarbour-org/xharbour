@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-07-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Filter dialog to setup filtering conditions via UI
+
 2010-07-12 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added functionality to read a connection string from an INI file
    - Removed obsolete connection creation in VrDataTable since it only needs to be done

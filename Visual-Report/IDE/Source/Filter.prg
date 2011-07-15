@@ -126,13 +126,10 @@ METHOD OnInitDialog() CLASS FilterUI
             :Bottom               := "ConditionGroupBox"
             :Margins              := "2,14,2,2"
          END
-
-         :Left                 := 2
-         :Top                  := 14
-         :Width                := 586
-         :Height               := 208
+         :VertScroll           := .T.
          :EventHandler[ "OnClick" ] := "ConditionPanel_OnClick"
          :Create()
+         :DockIt()
       END
       //---------------------------
       ::AddConditionButton_OnClick()
@@ -213,186 +210,125 @@ RETURN Self
 METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    LOCAL cName
    WITH OBJECT ::ConditionPanel
-
-      WITH OBJECT ( COMBOBOX( :this ) )
-         cName := "ConditionFieldComboBox"
-         :ToolTip:Text         := "Select field"
-         :Name                 := cName + XSTR( ::nRow+1 )
+      WITH OBJECT ( PANEL( :this ) )
+         cName       := "PanelHolder"
+         :Left       := 0
+         :Top        := 0
+         :Width      := 150
+         :Height     := 30
+         :Name       := cName + XSTR( ::nRow+1 )
+         :Dock:Left  := :Parent
+         :Dock:Right := :Parent
          IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
+            :Dock:Top       := cName + XSTR( ::nRow )
+            :Dock:TopMargin := 4
          ENDIF
-         :VertScroll           := .T.
-         :Left                 := 10
-         :Top                  := 10
-         :Width                := 150
-         :Height               := 200
-         :SelectionHeight      := 17
-         :ItemHeight           := 17
-         :EventHandler[ "OnCBNSelEndOk" ] := "ConditionFieldComboBox_OnCBNSelEndOk"
-         :Create()
-         :DockIt()
-
-         ::CompleteComboboxList( :This )
-
-         ::VertScrollSize += :SelectionHeight()
-      END //COMBOBOX
-
-      WITH OBJECT ( COMBOBOX( :this ) )
-         cName := "ConditionComboBox"
-         :ToolTip:Text         := "Select condition"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :VertScroll           := .T.
-         :Left                 := 165
-         :Top                  := 10
-         :Width                := 150
-         :Height               := 200
-         :Enabled              := .F.
-         :SelectionHeight      := 17
-         :ItemHeight           := 17
-         :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
-         :Create()
-      END //COMBOBOX
-
-      WITH OBJECT ( EDITBOX( :this ) )
-         cName := "ConditionValueEditBox"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :Left                 := 320
-         :Top                  := 10
-         :Width                := 150
-         :Height               := 22
-         :Enabled              := .F.
-         :AutoHScroll          := .T.
-         :Case                 := 2
-         :EventHandler[ "OnChar" ] := "ConditionValueEditBox1_OnChar"
-         :Create()
-      END //EDITBOX
-
-      WITH OBJECT ( EDITBOX( :this ) )
-         cName := "ConditionValueEditBoxSec"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :Left                 := 480
-         :Top                  := 10
-         :Width                := 0
-         :Height               := 22
-         :AutoHScroll          := .T.
-         :EventHandler[ "OnChar" ] := "ConditionValueEditBoxSec1_OnChar"
-         :Create()
-      END //EDITBOX
-
-      WITH OBJECT ( LABEL( :this ) )
-         cName := "ConditionValueLabel"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :ToolTip:Text         := "Condition value"
-         :Left                 := 320
-         :Top                  := 14
-         :Width                := 0
-         :Height               := 16
-         :Create()
-      END //LABEL
-
-      WITH OBJECT ( BUTTON( :this ) )
-         cName := "RemoveConditionButton"
-         :ToolTip:Text         := "Remove condition"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :Left                 := 475
-         :Top                  := 10
-         :Width                := 20
-         :Height               := 22
-         :Caption              := "-"
-         :EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
-         :Create()
-      END //BUTTON
-
-      WITH OBJECT ( BUTTON( :this ) )
-         cName := "AddConditionButton"
-         :ToolTip:Text         := "Add more condition"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :Left                 := 500
-         :Top                  := 10
-         :Width                := 20
-         :Height               := 22
-         :Caption              := "+"
          :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
          :Create()
-      END //BUTTON
 
-      WITH OBJECT ( BUTTON( :this ) )
-         cName := "MoreConditionButton"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :ToolTip:Text         := "More..."
-         :Left                 := 525
-         :Top                  := 10
-         :Width                := 20
-         :Height               := 22
-         :Caption              := "..."
-         :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
-         :Create()
-      END //BUTTON
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :ToolTip:Text         := "Select field"
+            :Name                 := "ConditionFieldComboBox" + XSTR( ::nRow+1 )
+            :VertScroll           := .T.
+            :Left                 := 1
+            :Top                  := 0
+            :Width                := 150
+            :Height               := 200
+            :EventHandler[ "OnCBNSelEndOk" ] := "ConditionFieldComboBox_OnCBNSelEndOk"
+            :Create()
 
-      WITH OBJECT ( COMBOBOX( :this ) )
-         cName := "AndOrComboBox"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 4
-         ENDIF
-         :Left                 := 13
-         :Top                  := 53
-         :Width                := 250
-         :Height               := 100
-         :Visible              := .F.
-         :SelectionHeight      := 17
-         :ItemHeight           := 17
-         :Create()
-      END //COMBOBOX
+            ::CompleteComboboxList( :This )
 
-      WITH OBJECT ( CHECKBOX( :this ) )
-         cName := "AskLaterCheckBox"
-         :Name                 := cName + XSTR( ::nRow+1 )
-         IF ::nRow > 0
-            :Dock:Top          := cName + XSTR( ::nRow )
-            :Dock:TopMargin    := 11
-         ENDIF
-         :ToolTip:Text         := "Ask me later"
-         :Left                 := 553
-         :Top                  := 14
-         :Width                := 15
-         :Height               := 15
-         :EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
-         :Create()
-      END //CHECKBOX
+            :Parent:Height := :SelectionHeight() + 7
+         END
+         :Parent:VertScrollSize := (:Height+4)*(::nRow+1)
+
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :ToolTip:Text         := "Select condition"
+            :Name                 := "ConditionComboBox" + XSTR( ::nRow+1 )
+            :VertScroll           := .T.
+            :Left                 := 165
+            :Top                  := 0
+            :Width                := 150
+            :Height               := 200
+            :Enabled              := .F.
+            :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
+            :Create()
+         END
+
+         WITH OBJECT ( EDITBOX( :this ) )
+            :Name                 := "ConditionValueEditBox" + XSTR( ::nRow+1 )
+            :Left                 := 320
+            :Top                  := 0
+            :Width                := 150
+            :Height               := 22
+            :Enabled              := .F.
+            :AutoHScroll          := .T.
+            :Case                 := 2
+            :EventHandler[ "OnChar" ] := "ConditionValueEditBox1_OnChar"
+            :Create()
+         END
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "ConditionValueLabel" + XSTR( ::nRow+1 )
+            :ToolTip:Text         := "Condition value"
+            :Left                 := 320
+            :Top                  := 3
+            :Width                := 0
+            :Height               := 16
+            :Create()
+         END
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :ToolTip:Text         := "Remove condition"
+            :Name                 := "RemoveConditionButton" + XSTR( ::nRow+1 )
+            :Left                 := 475
+            :Top                  := 0
+            :Width                := 20
+            :Height               := 22
+            :Caption              := "-"
+            :EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
+            :Create()
+         END
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :ToolTip:Text         := "Add more condition"
+            :Name                 := "AddConditionButton" + XSTR( ::nRow+1 )
+            :Left                 := 500
+            :Top                  := 0
+            :Width                := 20
+            :Height               := 22
+            :Caption              := "+"
+            :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
+            :Create()
+         END
+
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "MoreConditionButton" + XSTR( ::nRow+1 )
+            :ToolTip:Text         := "More..."
+            :Left                 := 525
+            :Top                  := 0
+            :Width                := 20
+            :Height               := 22
+            :Caption              := "..."
+            :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
+            :Create()
+         END
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "AskLaterCheckBox" + XSTR( ::nRow+1 )
+            :ToolTip:Text         := "Ask me later"
+            :Left                 := 553
+            :Top                  := 4
+            :Width                := 15
+            :Height               := 15
+            :EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
+            :Create()
+         END
+
+      END
 
    END
-
    ::nRow ++
 RETURN Self
 
