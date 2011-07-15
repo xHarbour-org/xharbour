@@ -613,7 +613,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
           oData:Driver           := hCtrl:Driver
           oData:FileName         := hCtrl:FileName
           
-          IF EMPTY( hCtrl:ConnectionString ) .AND. hCtrl:Driver != "SQLRDD"
+          IF hCtrl:Driver != "SQLRDD"
              IF !EMPTY( hCtrl:Alias )
                 oData:Alias := hCtrl:Alias
              ENDIF
@@ -626,8 +626,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
            
            ELSEIF !EMPTY( hCtrl:ConnectionFile )
-             oData:DataConnector                  := SqlConnector( NIL )
-             oData:DataConnector:Server           := hCtrl:Server
+             oData:DataConnector        := SqlConnector( NIL )
+             oData:DataConnector:Server := hCtrl:Server
              IF FILE( hCtrl:ConnectionFile )
                 oIni   := IniFile( hCtrl:ConnectionFile )
                 cEntry := oIni:ReadString( "SQL", "OPEN" )
