@@ -100,7 +100,7 @@ METHOD Show() CLASS FolderBrowserDialog
    LOCAL pCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "BrowseForFolderCallBack" ), Self )
    ::SelectedPath := SHBrowseForFolder( ::Owner:hWnd, ::Description, ::Style, ::RootFolder, pCallBack, @::SelectedId )
    FreeCallBackPointer( pCallBack )
-RETURN Self
+RETURN ::SelectedPath
 
 METHOD BrowseForFolderCallBack( hWnd, nMsg, lp, pData ) CLASS FolderBrowserDialog
    LOCAL cBuffer
