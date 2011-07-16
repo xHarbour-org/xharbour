@@ -11,7 +11,6 @@
 //------------------------------------------------------------------------------------------
 
 CLASS FilterUI INHERIT Dialog
-   DATA nRow       EXPORTED INIT 0
    DATA cFilter    EXPORTED INIT ""
    DATA aFilter    EXPORTED INIT {}
    DATA oDataTable EXPORTED
@@ -210,33 +209,25 @@ RETURN Self
 METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    LOCAL cName, n
    
-   IF ::nRow > 0
-      ::&("AddConditionButton"  + XSTR( ::nRow )):Enabled := .F.
-      ::&("MoreConditionButton" + XSTR( ::nRow )):Enabled := .F.
+   IF LEN( ::ConditionPanel:Children ) > 0
+      ATAIL( ::ConditionPanel:Children ):Children[6]:Enabled := .F.
+      ATAIL( ::ConditionPanel:Children ):Children[7]:Enabled := .F.
    ENDIF
-   
    WITH OBJECT ::ConditionPanel
       WITH OBJECT ( PANEL( :this ) )
-         cName       := "PanelHolder"
-         :Left       := 0
-         :Top        := 0
-         :Width      := 150
-         :Height     := 30
-         :Name       := cName + XSTR( ::nRow+1 )
-         :Dock:Left  := :Parent
-         :Dock:Right := :Parent
-
-         :Cargo      := ::nRow
-
-         IF ::nRow > 0
-            :Dock:Top       := cName + XSTR( ::nRow )
-            :Dock:TopMargin := 4
-         ENDIF
+         :Left           := 0
+         :Top            := 0
+         :Width          := 150
+         :Height         := 30
+         :Dock:Left      := :Parent
+         :Dock:Right     := :Parent
+         :Dock:Top       := IIF( LEN( ::ConditionPanel:Children ) > 0, ATAIL( ::ConditionPanel:Children ), :Parent )
+         :Dock:TopMargin := 4
          :Create()
+         :SetRedraw( .F. )
 
          WITH OBJECT ( COMBOBOX( :this ) )
             :ToolTip:Text         := "Select field"
-            :Name                 := "ConditionFieldComboBox" + XSTR( ::nRow+1 )
             :VertScroll           := .T.
             :Left                 := 1
             :Top                  := 0
@@ -249,11 +240,10 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 
             :Parent:Height := :SelectionHeight() + 7
          END
-         :Parent:VertScrollSize := (:Height+4)*(::nRow+1)
+         :Parent:VertScrollSize := (:Height+4)*LEN( ::ConditionPanel:Children )
 
          WITH OBJECT ( COMBOBOX( :this ) )
             :ToolTip:Text         := "Select condition"
-            :Name                 := "ConditionComboBox" + XSTR( ::nRow+1 )
             :VertScroll           := .T.
             :Left                 := 165
             :Top                  := 0
@@ -265,7 +255,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          END
 
          WITH OBJECT ( EDITBOX( :this ) )
-            :Name                 := "ConditionValueEditBox" + XSTR( ::nRow+1 )
             :Left                 := 320
             :Top                  := 0
             :Width                := 150
@@ -278,7 +267,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          END
 
          WITH OBJECT ( LABEL( :this ) )
-            :Name                 := "ConditionValueLabel" + XSTR( ::nRow+1 )
             :ToolTip:Text         := "Condition value"
             :Left                 := 320
             :Top                  := 3
@@ -289,7 +277,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 
          WITH OBJECT ( BUTTON( :this ) )
             :ToolTip:Text         := "Remove condition"
-            :Name                 := "RemoveConditionButton" + XSTR( ::nRow+1 )
             :Left                 := 475
             :Top                  := 0
             :Width                := 20
@@ -301,7 +288,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 
          WITH OBJECT ( BUTTON( :this ) )
             :ToolTip:Text         := "Add more condition"
-            :Name                 := "AddConditionButton" + XSTR( ::nRow+1 )
             :Left                 := 500
             :Top                  := 0
             :Width                := 20
@@ -312,7 +298,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          END
 
          WITH OBJECT ( BUTTON( :this ) )
-            :Name                 := "MoreConditionButton" + XSTR( ::nRow+1 )
             :ToolTip:Text         := "More..."
             :Left                 := 525
             :Top                  := 0
@@ -324,7 +309,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          END
 
          WITH OBJECT ( CHECKBOX( :this ) )
-            :Name                 := "AskLaterCheckBox" + XSTR( ::nRow+1 )
             :ToolTip:Text         := "Ask me later"
             :Left                 := 553
             :Top                  := 4
@@ -333,17 +317,17 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
             :Create()
          END
-
+         :SetRedraw( .T. )
+         :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+         :UpdateWindow()
       END
-
    END
-   ::nRow ++
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
    LOCAL oDock, n
-   IF ::nRow > 1
+   IF LEN( ::ConditionPanel:Children ) > 1
       oDock := Sender:Parent:Dock:Top
       n := ASCAN( ::ConditionPanel:Children, {|o| o:hWnd == Sender:Parent:hWnd} )
       IF n > 0 .AND. LEN( ::ConditionPanel:Children ) >= n+1
@@ -351,12 +335,12 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
          ::ConditionPanel:Children[n+1]:DockIt()
       ENDIF
       Sender:Parent:Destroy()
-      ::nRow--
-      IF ::nRow <= 1
-         ::&("AddConditionButton"  + XSTR( ::nRow )):Enabled := .T.
-         ::&("MoreConditionButton" + XSTR( ::nRow )):Enabled := .T.
+      IF LEN( ::ConditionPanel:Children ) > 0
+         ATAIL( ::ConditionPanel:Children ):Children[6]:Enabled := .T.
+         ATAIL( ::ConditionPanel:Children ):Children[7]:Enabled := .T.
       ENDIF
    ENDIF
+   ::ConditionPanel:VertScrollSize := (ATAIL( ::ConditionPanel:Children ):Height+4)*LEN( ::ConditionPanel:Children )
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
