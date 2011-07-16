@@ -208,7 +208,13 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
-   LOCAL cName
+   LOCAL cName, n
+   
+   IF ::nRow > 0
+      ::&("AddConditionButton"  + XSTR( ::nRow )):Enabled := .F.
+      ::&("MoreConditionButton" + XSTR( ::nRow )):Enabled := .F.
+   ENDIF
+   
    WITH OBJECT ::ConditionPanel
       WITH OBJECT ( PANEL( :this ) )
          cName       := "PanelHolder"
@@ -219,11 +225,13 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          :Name       := cName + XSTR( ::nRow+1 )
          :Dock:Left  := :Parent
          :Dock:Right := :Parent
+
+         :Cargo      := ::nRow
+
          IF ::nRow > 0
             :Dock:Top       := cName + XSTR( ::nRow )
             :Dock:TopMargin := 4
          ENDIF
-         :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
          :Create()
 
          WITH OBJECT ( COMBOBOX( :this ) )
@@ -333,11 +341,26 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
+METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
+   LOCAL oDock, n
+   IF ::nRow > 1
+      oDock := Sender:Parent:Dock:Top
+      n := ASCAN( ::ConditionPanel:Children, {|o| o:hWnd == Sender:Parent:hWnd} )
+      IF n > 0 .AND. LEN( ::ConditionPanel:Children ) >= n+1
+         ::ConditionPanel:Children[n+1]:Dock:Top := oDock
+         ::ConditionPanel:Children[n+1]:DockIt()
+      ENDIF
+      Sender:Parent:Destroy()
+      ::nRow--
+      IF ::nRow <= 1
+         ::&("AddConditionButton"  + XSTR( ::nRow )):Enabled := .T.
+         ::&("MoreConditionButton" + XSTR( ::nRow )):Enabled := .T.
+      ENDIF
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
+METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
