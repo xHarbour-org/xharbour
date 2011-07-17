@@ -14,26 +14,20 @@ CLASS FilterUI INHERIT Dialog
    DATA cFilter    EXPORTED INIT ""
    DATA aFilter    EXPORTED INIT {}
    DATA oDataTable EXPORTED
-   DATA lPrefChanged
-   DATA lAskLaterConfirmed
+   DATA aCondStr   EXPORTED INIT {}
+   DATA aCondVal   EXPORTED INIT {}
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD OnOk()
 
-   METHOD ANDRadioButton_OnClick()
-   METHOD ORRadioButton_OnClick()
-   METHOD ConditionPanel_OnClick()
-   METHOD ConditionFieldComboBox_OnCBNSelEndOk()
    METHOD ConditionComboBox_OnCBNSelEndOk()
-   METHOD ConditionValueEditBox1_OnChar()
-   METHOD ConditionValueEditBoxSec1_OnChar()
    METHOD RemoveConditionButton_OnClick()
    METHOD AddConditionButton_OnClick()
    METHOD MoreConditionButton_OnClick()
-   METHOD AskLaterCheckBox_OnClick()
-   METHOD cmdFilterBrowse_OnClick()
-   METHOD cmdFilterHelp_OnClick()
-   METHOD CompleteComboboxList()
+   METHOD FilterBrowse_OnClick()
+   METHOD LoadFieldList()
+   METHOD AddButtons()
+   METHOD BuildFilterExp()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -44,6 +38,19 @@ METHOD Init( oDataTable ) CLASS FilterUI
    DEFAULT ::__xCtrlName  TO "FilterUI"
 
    ::Super:Init( ::Application:MainForm )
+
+   ::aCondStr := { "equals to",;
+                   "is not equal to",;
+                   "greater than",;
+                   "less than",;
+                   "between",;
+                   "begins with",;
+                   "does not begin with",;
+                   "contains",;
+                   "does not contain",;
+                   "is empty",;
+                   "is not empty",;
+                   "is in the range" }
 
    ::Modal      := .T.
    ::Create()
@@ -59,14 +66,12 @@ METHOD OnInitDialog() CLASS FilterUI
    ::Height := 375
 
    WITH OBJECT ( GROUPBOX( Self ) )
-      :Name                 := "GroupBox7"
       WITH OBJECT :Dock
          :Left                 := Self
          :Top                  := Self
          :Right                := Self
          :Margins              := "20,15,20,0"
       END
-
       :Left                 := 20
       :Top                  := 15
       :Width                := 590
@@ -82,7 +87,6 @@ METHOD OnInitDialog() CLASS FilterUI
          :Height               := 15
          :Caption              := "Match ALL of the conditions"
          :InitialState         := 1
-         :EventHandler[ "OnClick" ] := "ANDRadioButton_OnClick"
          :Create()
       END //RADIOBUTTON
 
@@ -93,22 +97,13 @@ METHOD OnInitDialog() CLASS FilterUI
          :Width                := 259
          :Height               := 15
          :Caption              := "Match ANY of the conditions"
-         :EventHandler[ "OnClick" ] := "ORRadioButton_OnClick"
          :Create()
-      END //RADIOBUTTON
-
-   END //GROUPBOX
+      END
+   END
 
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "ConditionGroupBox"
-      WITH OBJECT :Dock
-         :Left                 := Self
-         :Top                  := Self
-         :Right                := Self
-         :Bottom               := Self
-         :Margins              := "20,86,20,40"
-      END
-
+      :Dock:Margins         := "20,86,20,40"
       :Left                 := 20
       :Top                  := 86
       :Width                := 590
@@ -116,59 +111,35 @@ METHOD OnInitDialog() CLASS FilterUI
       :Caption              := "Conditions"
       :ForeColor            := 0
       :Create()
+      :DockToParent()
       WITH OBJECT ( PANEL( :this ) )
          :Name                 := "ConditionPanel"
-         WITH OBJECT :Dock
-            :Left                 := "ConditionGroupBox"
-            :Top                  := "ConditionGroupBox"
-            :Right                := "ConditionGroupBox"
-            :Bottom               := "ConditionGroupBox"
-            :Margins              := "2,14,2,2"
-         END
+         :Dock:Margins         := "2,14,2,2"
          :VertScroll           := .T.
-         :EventHandler[ "OnClick" ] := "ConditionPanel_OnClick"
          :Create()
-         :DockIt()
+         :DockToParent()
       END
       //---------------------------
       ::AddConditionButton_OnClick()
       //---------------------------
-
-   END //GROUPBOX
+   END
 
    WITH OBJECT ( BUTTON( Self ) )
-      :Name                 := "cmdFilterBrowse"
+      :Name                 := "FilterBrowse"
       WITH OBJECT :Dock
          :Right                := Self
          :Bottom               := Self
          :Margins              := "0,0,20,10"
       END
-
       :Left                 := 530
       :Top                  := 315
       :Width                := 80
       :Height               := 25
       :Caption              := "Browse"
-      :EventHandler[ "OnClick" ] := "cmdFilterBrowse_OnClick"
+      :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
       :Create()
-   END //BUTTON
+   END
 
-   WITH OBJECT ( BUTTON( Self ) )
-      :Name                 := "cmdFilterHelp"
-      WITH OBJECT :Dock
-         :Left                 := Self
-         :Bottom               := Self
-         :Margins              := "20,0,0,10"
-      END
-
-      :Left                 := 20
-      :Top                  := 315
-      :Width                := 24
-      :Height               := 25
-      :Caption              := "?"
-      :EventHandler[ "OnClick" ] := "cmdFilterHelp_OnClick"
-      :Create()
-   END //BUTTON
    ::CenterWindow()
 RETURN NIL
 
@@ -190,28 +161,14 @@ METHOD OnOk() CLASS FilterUI
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------//
-METHOD ANDRadioButton_OnClick( Sender ) CLASS FilterUI
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------//
-METHOD ORRadioButton_OnClick( Sender ) CLASS FilterUI
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------//
-METHOD ConditionPanel_OnClick( Sender ) CLASS FilterUI
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------//
-METHOD ConditionFieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------//
 METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
-   LOCAL cName, n
+   LOCAL cName, n, oLastPanel
    
    IF LEN( ::ConditionPanel:Children ) > 0
-      ATAIL( ::ConditionPanel:Children ):Children[6]:Enabled := .F.
-      ATAIL( ::ConditionPanel:Children ):Children[7]:Enabled := .F.
+      oLastPanel := ATAIL( ::ConditionPanel:Children )
+
+      oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
+      oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
    WITH OBJECT ::ConditionPanel
       WITH OBJECT ( PANEL( :this ) )
@@ -233,10 +190,9 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Top                  := 0
             :Width                := 150
             :Height               := 200
-            :EventHandler[ "OnCBNSelEndOk" ] := "ConditionFieldComboBox_OnCBNSelEndOk"
             :Create()
 
-            ::CompleteComboboxList( :This )
+            ::LoadFieldList( :This )
 
             :Parent:Height := :SelectionHeight() + 7
          END
@@ -249,9 +205,21 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Top                  := 0
             :Width                := 150
             :Height               := 200
-            :Enabled              := .F.
             :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
             :Create()
+            :AddItem( "equals to" )
+            :AddItem( "is not equal to" )
+            :AddItem( "greater than" )
+            :AddItem( "less than" )
+            :AddItem( "between" )
+            :AddItem( "begins with" )
+            :AddItem( "does not begin with" )
+            :AddItem( "contains" )
+            :AddItem( "does not contain" )
+            :AddItem( "is empty" )
+            :AddItem( "is not empty" )
+            :AddItem( "is in the range" )
+            :SetCurSel(1)
          END
 
          WITH OBJECT ( EDITBOX( :this ) )
@@ -259,64 +227,23 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Top                  := 0
             :Width                := 150
             :Height               := 22
-            :Enabled              := .F.
             :AutoHScroll          := .T.
             :Case                 := 2
-            :EventHandler[ "OnChar" ] := "ConditionValueEditBox1_OnChar"
             :Create()
          END
 
-         WITH OBJECT ( LABEL( :this ) )
-            :ToolTip:Text         := "Condition value"
-            :Left                 := 320
-            :Top                  := 3
-            :Width                := 0
-            :Height               := 16
-            :Create()
-         END
-
-         WITH OBJECT ( BUTTON( :this ) )
-            :ToolTip:Text         := "Remove condition"
-            :Left                 := 475
+         WITH OBJECT ( EDITBOX( :this ) )
+            :Left                 := 394
             :Top                  := 0
-            :Width                := 20
+            :Width                := 72
             :Height               := 22
-            :Caption              := "-"
-            :EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
+            :Visible              := .F.
+            :AutoHScroll          := .T.
             :Create()
-         END
+         END //EDITBOX
 
-         WITH OBJECT ( BUTTON( :this ) )
-            :ToolTip:Text         := "Add more condition"
-            :Left                 := 500
-            :Top                  := 0
-            :Width                := 20
-            :Height               := 22
-            :Caption              := "+"
-            :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
-            :Create()
-         END
-
-         WITH OBJECT ( BUTTON( :this ) )
-            :ToolTip:Text         := "More..."
-            :Left                 := 525
-            :Top                  := 0
-            :Width                := 20
-            :Height               := 22
-            :Caption              := "..."
-            :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
-            :Create()
-         END
-
-         WITH OBJECT ( CHECKBOX( :this ) )
-            :ToolTip:Text         := "Ask me later"
-            :Left                 := 553
-            :Top                  := 4
-            :Width                := 15
-            :Height               := 15
-            :EventHandler[ "OnClick" ] := "AskLaterCheckBox_OnClick"
-            :Create()
-         END
+         ::AddButtons( :this )
+         
          :SetRedraw( .T. )
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
          :UpdateWindow()
@@ -325,8 +252,68 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
+METHOD AddButtons( oParent ) CLASS FilterUI
+   WITH OBJECT ( BUTTON( oParent ) )
+      :ToolTip:Text         := "Remove condition"
+      :Left                 := 475
+      :Top                  := 0
+      :Width                := 20
+      :Height               := 22
+      :Caption              := "-"
+      :EventHandler[ "OnClick" ] := "RemoveConditionButton_OnClick"
+      :Create()
+   END
+
+   WITH OBJECT ( BUTTON( oParent ) )
+      :ToolTip:Text         := "Add more condition"
+      :Left                 := 500
+      :Top                  := 0
+      :Width                := 20
+      :Height               := 22
+      :Caption              := "+"
+      :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
+      :Create()
+   END
+
+   WITH OBJECT ( BUTTON( oParent ) )
+      :ToolTip:Text         := "More..."
+      :Left                 := 525
+      :Top                  := 0
+      :Width                := 20
+      :Height               := 22
+      :Caption              := "..."
+      :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
+      :Create()
+   END
+
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
+METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
+   LOCAL oPanel := Sender:Parent
+
+   oPanel:Children[3]:Enabled := .T.
+   IF Sender:CurSel == 5
+      IF !oPanel:Children[4]:Visible
+         oPanel:Children[3]:Width := 72
+         oPanel:Children[4]:Visible := .T.
+      ENDIF
+    ELSE
+      IF oPanel:Children[4]:Visible
+         oPanel:Children[3]:Width := 150
+         oPanel:Children[4]:Caption := ""
+         oPanel:Children[4]:Visible := .F.
+      ENDIF
+      IF Sender:CurSel == 10 .OR. Sender:CurSel == 11
+         oPanel:Children[3]:Caption := ""
+         oPanel:Children[3]:Enabled := .F.
+      ENDIF
+   ENDIF
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
 METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
-   LOCAL oDock, n
+   LOCAL oDock, n, oLastPanel
    IF LEN( ::ConditionPanel:Children ) > 1
       oDock := Sender:Parent:Dock:Top
       n := ASCAN( ::ConditionPanel:Children, {|o| o:hWnd == Sender:Parent:hWnd} )
@@ -336,8 +323,9 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       ENDIF
       Sender:Parent:Destroy()
       IF LEN( ::ConditionPanel:Children ) > 0
-         ATAIL( ::ConditionPanel:Children ):Children[6]:Enabled := .T.
-         ATAIL( ::ConditionPanel:Children ):Children[7]:Enabled := .T.
+         oLastPanel := ATAIL( ::ConditionPanel:Children )
+         oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .T.
+         oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .T.
       ENDIF
    ENDIF
    ::ConditionPanel:VertScrollSize := (ATAIL( ::ConditionPanel:Children ):Height+4)*LEN( ::ConditionPanel:Children )
@@ -345,37 +333,69 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
+   LOCAL cName, n, oLastPanel
+   
+   IF LEN( ::ConditionPanel:Children ) > 0
+      oLastPanel := ATAIL( ::ConditionPanel:Children )
+      oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
+      oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
+   ENDIF
+   WITH OBJECT ::ConditionPanel
+      WITH OBJECT ( PANEL( :this ) )
+         :Left           := 0
+         :Top            := 0
+         :Width          := 150
+         :Height         := 30
+         :Dock:Left      := :Parent
+         :Dock:Right     := :Parent
+         :Dock:Top       := IIF( LEN( ::ConditionPanel:Children ) > 0, ATAIL( ::ConditionPanel:Children ), :Parent )
+         :Dock:TopMargin := 4
+         :Create()
+         :SetRedraw( .F. )
+
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :VertScroll           := .T.
+            :Left                 := 1
+            :Top                  := 0
+            :Width                := 250
+            :Height               := 100
+            :Create()
+
+            :AddItem( "Match ALL of the following conditions" )
+            :AddItem( "Match ANY of the following conditions" )
+            :SetCurSel(1)
+
+            :Parent:Height := :SelectionHeight() + 7
+         END
+         :Parent:VertScrollSize := (:Height+4)*LEN( ::ConditionPanel:Children )
+
+         ::AddButtons( :this )
+
+         :SetRedraw( .T. )
+         :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+         :UpdateWindow()
+      END
+   END
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
+METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
+   ::BuildFilterExp()
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD AskLaterCheckBox_OnClick( Sender ) CLASS FilterUI
+METHOD BuildFilterExp() CLASS FilterUI
+   ::cFilter := ""
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD cmdFilterBrowse_OnClick( Sender ) CLASS FilterUI
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------//
-METHOD cmdFilterHelp_OnClick( Sender ) CLASS FilterUI
-RETURN Self
-
-METHOD ConditionValueEditBox1_OnChar() CLASS FilterUI
-RETURN Self
-
-METHOD ConditionValueEditBoxSec1_OnChar() CLASS FilterUI
-RETURN Self
-
-
-METHOD CompleteComboboxList( oComboBox ) CLASS FilterUI
+METHOD LoadFieldList( oComboBox ) CLASS FilterUI
    LOCAL n, i, aFields
    oComboBox:ResetContent()
    aFields := ::oDataTable:EditCtrl:Struct()
    FOR n := 1 TO LEN( aFields )
        oComboBox:AddItem( aFields[n][1] )
    NEXT
+   oComboBox:SetCurSel(1)
 RETURN NIL
 
