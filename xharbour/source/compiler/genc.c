@@ -1112,10 +1112,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char *szSourceExtension )      
             }
             else if( pSym->cScope & HB_FS_STATIC )
             {
-               if ( pSym->cScope & HB_FS_FIRST )
-                 fprintf( yyc, "HB_FS_PUBLIC" );
-               else
-                 fprintf( yyc, "HB_FS_STATIC" );
+               fprintf( yyc, "HB_FS_STATIC" );
             }
             else if( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
             {

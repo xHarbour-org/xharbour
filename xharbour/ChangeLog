@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-07-18 11:34 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/compiler/genc.c
+    ! Reverted the following change since it broke STATIC support for first PROCEDURE/FUNCION in a source file.
+      I waited few months for Andi's reply but sadly we did not here from Andi since.
+      --------------------------------------------------------------------------
+      2011-03-05 17:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+        * source/compiler/genc.c
+          ! function attribute: HB_FS_FIRST is always HB_FS_PUBLIC
+            ( this resolved: 'no startup procedure error' when using NAMESPACE )
+      --------------------------------------------------------------------------
+
 2011-05-26 21:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg
     ! fixed probable speedy decrease on large tables.
@@ -33,13 +44,13 @@
 2011-05-19 11:11 Luiz Rafael Culik <luiz at xharbour.com.br>
   * include/win32prn.ch
     ! protected some defines with #ifndef _WINUSER_ to avoid conflicts when winuser.ch is added before win32prn.ch
-  * source/rtl/cstr.prg 
+  * source/rtl/cstr.prg
     ! added type 'T'(datetime) to convert it value in the ValToPrgExp and ValToPrg
   * source/rtl/tbrowse.prg
     ! added test for 'T'(datetime) in function lenval() and  method dispcell
-  * source/debug/debugger.prg      
+  * source/debug/debugger.prg
     ! added test for 'T'( datatime) to show the correct value
-    
+
 2011-05-17 17:10 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/firebird.c
    - Fixed attachment to DB that stay connected in FBCREATEDB
@@ -49,18 +60,18 @@
        FBRESTOREDB( [cNameServer|cIPServer], cBkpName, cDBName, [cUser], [cPassWord] ) - Restore Database remotely
        FBSERVICEISRUNNING() - Verify if service is running
        FBDETACHSERVICE() - Detach service
-       
+
        The last started service is saved in a static variable to been verified by FBSERVICEISRUNNING() like exemple bellow:
-       
+
        FBBACKUPDB( "localhost", "DATABASE.FBD", "DATABASE.BKP", "SYSDBA", "masterkey" )
        DO WHILE FBSERVICEISRUNNING()
          Inkey(0.1)
        ENDDO
-       FBDETACHSERVICE()  
+       FBDETACHSERVICE()
   * contrib/tfirebird.prg
    ! removed unused variable
    ! all changes provided by  Marson de Paula
-  
+
 2011-05-13 14:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
     ! fixed passord get with space. Bug reported by Fabio Nery.
