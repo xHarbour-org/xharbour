@@ -156,6 +156,7 @@ CLASS DataTable INHERIT Component
 
    METHOD FieldPut( nField, xVal )            INLINE ::Connector:FieldPut( nField, xVal )
    METHOD FieldGet( nField )                  INLINE ::Connector:FieldGet( nField )
+   METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
    METHOD OrdKeyNo()                          INLINE ::Connector:OrdKeyNo()
@@ -327,6 +328,7 @@ CLASS Data
    METHOD Put()
    METHOD FieldPut( nField, xVal )  INLINE ::Parent:FieldPut( nField, xVal )
    METHOD FieldGet( nField )        INLINE ::Parent:FieldGet( nField )
+   METHOD FieldType( nField )       INLINE ::Parent:FieldType( nField )
    METHOD FieldName( nField )       INLINE ::Parent:FieldName( nField )
 ENDCLASS
 
@@ -409,6 +411,7 @@ CLASS DataRdd
    METHOD SetRelation()
    METHOD FieldPut( nField, xVal )            INLINE (::Owner:Alias)->( FieldPut( nField, xVal ) )
    METHOD FieldGet( nField )                  INLINE (::Owner:Alias)->( FieldGet( nField ) )
+   METHOD FieldType( nField )                 INLINE (::Owner:Alias)->( FieldType( nField ) )
    METHOD CreateTable()                       INLINE dbCreate( ::Owner:File, ::Owner:Structure, ::Owner:Driver )
    METHOD Gather()
    METHOD Scatter( aData )
@@ -693,6 +696,7 @@ CLASS SocketRdd
                                                      ::Request( "OrdScope", {BOTTOMSCOPE, NIL} )
    METHOD FieldPut( nField, xVal )            INLINE ::Request( "FieldPut", { nField, xVal } )
    METHOD FieldGet( nField )                  INLINE ::Request( "FieldGet", { nField } )
+   METHOD FieldType( nField )                 INLINE ::Request( "FieldType", { nField } )
    METHOD Gather()                            INLINE ::Request( "Gather" ) 
    METHOD Scatter( aData )                    INLINE ::Request( "Scatter", {aData} ) 
    METHOD SetRelation()
