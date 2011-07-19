@@ -413,9 +413,9 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              cText := cText[ ::ActiveObject:ImageType ]
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "STATES"
-             cText := cText[ ::ActiveObject:InitialState+1 ]
-          ENDIF
+          //IF oItem:ColItems[n]:ColType == "STATES"
+          //   cText := cText[ ::ActiveObject:InitialState+1 ]
+          //ENDIF
 
           IF oItem:ColItems[n]:ColType == "PAGE_POSITIONS"
              cText := cText[ ::ActiveObject:Position+1 ]
@@ -1607,10 +1607,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := "CASETYPES"
                   xValue := NIL
 
-             CASE cProp == "InitialState"
-                  aCol[1]:Value := ::ActiveObject:States
-                  aCol[1]:ColType  := "STATES"
-                  xValue := NIL
+             //CASE cProp == "InitialState"
+             //     aCol[1]:Value := ::ActiveObject:States
+             //     aCol[1]:ColType  := "STATES"
+             //     xValue := NIL
 
              CASE cProp == "Position" .AND. __ObjHasMsg( ::ActiveObject, "Page_Positions" )
                   aCol[1]:Value := ::ActiveObject:Page_Positions
@@ -2261,8 +2261,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :SetCurSel( ::ActiveObject:BalloonTipIcon )
                         ELSEIF cType == "IMAGEINDEX"
                           :SendMessage( CB_SETCURSEL, MAX( ::ActiveObject:&cProp, 0 ) )
-                        ELSEIF cType == "STATES"
-                          :SetCurSel( ::ActiveObject:InitialState )
+                        //ELSEIF cType == "STATES"
+                        //  :SetCurSel( ::ActiveObject:InitialState )
                         ELSEIF cType == "PAGE_POSITIONS"
                           :SetCurSel( ::ActiveObject:Position )
                         ELSEIF cType == "CURSORS"
