@@ -18,7 +18,6 @@ CLASS FilterUI INHERIT Dialog
    DATA aCondVal   EXPORTED INIT {}
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
-   METHOD OnOk()
 
    METHOD ConditionComboBox_OnCBNSelEndOk()
    METHOD RemoveConditionButton_OnClick()
@@ -28,12 +27,18 @@ CLASS FilterUI INHERIT Dialog
    METHOD LoadFieldList()
    METHOD AddButtons()
    METHOD BuildFilterExp()
+   METHOD OK_OnClick()
+   METHOD Cancel_OnClick()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oDataTable ) CLASS FilterUI
    LOCAL lProp
+   IF EMPTY( oDataTable:Alias )
+      ::Application:MainForm:MessageBox( "The Alias property cannot be empty", "DataTable" )
+      RETURN NIL
+   ENDIF
    ::oDataTable  := oDataTable
    DEFAULT ::__xCtrlName  TO "FilterUI"
 
@@ -60,11 +65,11 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS FilterUI
 
-   ::Left   := 190
-   ::Top    := 20
-   ::Width  := 634
-   ::Height := 375
-
+   ::Left    := 190
+   ::Top     := 20
+   ::Width   := 634
+   ::Height  := 375
+   ::Caption := "Create Filter Expression"
    WITH OBJECT ( GROUPBOX( Self ) )
       WITH OBJECT :Dock
          :Left                 := Self
@@ -123,9 +128,24 @@ METHOD OnInitDialog() CLASS FilterUI
       ::AddConditionButton_OnClick()
       //---------------------------
    END
-
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "FilterBrowse"
+      WITH OBJECT :Dock
+         :Left              := Self
+         :Bottom            := Self
+         :Margins           := "20,0,20,10"
+      END
+      :Left                 := 530
+      :Top                  := 315
+      :Width                := 80
+      :Height               := 25
+      :Caption              := "Test Filter"
+      :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
+      :Create()
+   END
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Cancel"
       WITH OBJECT :Dock
          :Right                := Self
          :Bottom               := Self
@@ -135,29 +155,27 @@ METHOD OnInitDialog() CLASS FilterUI
       :Top                  := 315
       :Width                := 80
       :Height               := 25
-      :Caption              := "Browse"
-      :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Cancel_OnClick"
+      :Create()
+   END
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "OK"
+      WITH OBJECT :Dock
+         :Right                := "Cancel"
+         :Bottom               := Self
+         :Margins              := "0,0,5,10"
+      END
+      :Left                 := 530
+      :Top                  := 315
+      :Width                := 80
+      :Height               := 25
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "OK_OnClick"
       :Create()
    END
 
    ::CenterWindow()
-RETURN NIL
-
-METHOD OnOk() CLASS FilterUI
-   LOCAL n
-   ImageListDestroy( ::ImageList:Handle )
-
-   FOR n := 1 TO LEN( ::aDeleted )
-       ::Application:Project:RemoveImage( ::aDeleted[n], ::ImageList )
-   NEXT
-   
-   ::ImageList:Images := ACLONE( ::DataGrid1:ImageList:Images )
-   IF ::DataGrid1:ImageList:MaskColor != NIL
-      ::ImageList:MaskColor := ::DataGrid1:ImageList:MaskColor
-   ENDIF
-   ::ImageList:Create()
-   ::Application:Project:Modified := .T.
-   ::Close( IDOK )
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------//
@@ -207,18 +225,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Height               := 200
             :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
             :Create()
-            :AddItem( "equals to" )
-            :AddItem( "is not equal to" )
-            :AddItem( "greater than" )
-            :AddItem( "less than" )
-            :AddItem( "between" )
-            :AddItem( "begins with" )
-            :AddItem( "does not begin with" )
-            :AddItem( "contains" )
-            :AddItem( "does not contain" )
-            :AddItem( "is empty" )
-            :AddItem( "is not empty" )
-            :AddItem( "is in the range" )
+            AEVAL( ::aCondStr, {|c| :AddItem(c) } )
             :SetCurSel(1)
          END
 
@@ -228,7 +235,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Width                := 150
             :Height               := 22
             :AutoHScroll          := .T.
-            :Case                 := 2
             :Create()
          END
 
@@ -380,12 +386,99 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
+   LOCAL oDlg
    ::BuildFilterExp()
+   WITH OBJECT oDlg := TestFilter( Self )
+      :Caption := "Test DataTable Filter"
+      :Width   := 600
+      :Height  := 400
+      :Center  := .T.
+      :Create()
+   END
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
+METHOD OK_OnClick() CLASS FilterUI
+   ::BuildFilterExp()
+   ::Close( IDOK )
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
+METHOD Cancel_OnClick() CLASS FilterUI
+   ::Close( IDCANCEL )
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD BuildFilterExp() CLASS FilterUI
+   LOCAL cAndOr, cField, cExp, cExp2, nSel, oPanel, n, cType
    ::cFilter := ""
+   cAndOr := IIF( ::ANDRadioButton:Checked, " .AND. ", " .OR. " )
+   FOR n := 1 TO LEN( ::ConditionPanel:Children )
+       oPanel := ::ConditionPanel:Children[n]
+       IF LEN( oPanel:Children ) == 4
+          cAndOr := IIF( oPanel:Children[1]:GetCurSel() == 1, " .AND. ", " .OR. " )
+        ELSE
+        
+          nSel  := oPanel:Children[2]:GetCurSel()
+          cType := ::oDataTable:EditCtrl:FieldType( oPanel:Children[1]:GetCurSel() )
+          cExp  := oPanel:Children[3]:Caption
+          cExp2 := oPanel:Children[4]:Caption
+
+          IF cType == "C"
+             cField := "TRIM("+::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()+")"
+           ELSEIF cType == "N"
+             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
+             cExp   := VAL( cExp )
+             cExp2  := VAL( cExp2 )
+           ELSEIF cType == "D"
+             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
+             cExp   := CTOD( cExp )
+             cExp2  := CTOD( cExp2 )
+          ENDIF
+          cExp  := ValToPrg( cExp  )
+          cExp2 := ValToPrg( cExp2 )
+
+          IF n > 1
+             ::cFilter += cAndOr
+          ENDIF
+          DO CASE 
+             CASE nSel == 1  //"equals to"
+               ::cFilter += cField + "==" + cExp
+
+             CASE nSel == 2  //"is not equal to"
+               ::cFilter += "!(" + cField + "==" + cExp + ")"
+
+             CASE nSel == 3  //"greater than"
+               ::cFilter += cField + ">" + cExp
+
+             CASE nSel == 4  //"less than"
+               ::cFilter += cField + "<" + cExp
+
+             CASE nSel == 5  //"between"
+               ::cFilter += "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"
+
+             CASE nSel == 6  //"begins with"
+               ::cFilter += cField + "=" + cExp
+
+             CASE nSel == 7  //"does not begin with"
+               ::cFilter += cField + "!=" + cExp
+
+             CASE nSel == 8  //"contains"
+               ::cFilter += cExp + " $ " + cField
+
+             CASE nSel == 9  //"does not contain"
+               ::cFilter += "!(" + cExp + " $ " + cField + ")"
+
+             CASE nSel == 10 //"is empty"
+               ::cFilter += "EMPTY(" + cField + ")"
+
+             CASE nSel == 11 //"is not empty"
+               ::cFilter += "! EMPTY(" + cField + ")"
+
+             CASE nSel == 12 //"is in the range"
+          END
+       ENDIF
+   NEXT
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -399,3 +492,56 @@ METHOD LoadFieldList( oComboBox ) CLASS FilterUI
    oComboBox:SetCurSel(1)
 RETURN NIL
 
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS TestFilter INHERIT Dialog
+   METHOD OnInitDialog()
+ENDCLASS
+
+METHOD OnInitDialog() CLASS TestFilter
+   LOCAL oGrid, oEdit, oData, oTable := ::Parent:oDataTable
+   
+   WITH OBJECT oData := DataTable( Self )
+      :xFileName := oTable:FileName
+      :Driver   := oTable:Driver
+      
+      IF oTable:Driver != "SQLRDD"
+         :Alias := oTable:Alias
+         :Create()
+         :SetFilter( &("{||"+::Parent:cFilter+"}") )
+         IF ! EMPTY( oTable:Order )
+            :OrdSetFocus( oTable:Order )
+         ENDIF
+         :GoTop()
+      ENDIF
+   END
+
+   WITH OBJECT oEdit := Edit( Self )
+      :Left         := 0
+      :Top          := 0
+      :Width        := 300
+      :ReadOnly     := .T.
+      :Caption      := ::Parent:cFilter
+      :Dock:Left    := Self
+      :Dock:Bottom  := Self
+      :Dock:Right   := Self
+      :Create()
+   END
+
+   WITH OBJECT oGrid := DataGrid( Self )
+      :Left         := 0
+      :Top          := 0
+      :Width        := 300
+      :Height       := 200
+      :DataSource   := oData
+      :Dock:Left    := Self
+      :Dock:Top     := Self
+      :Dock:Right   := Self
+      :Dock:Bottom  := oEdit
+      :Dock:BottomMargin := 2
+      :Create()
+      :AutoAddColumns()
+   END
+RETURN Self

@@ -686,11 +686,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                IF ::ActiveItem:Caption == "FileName" .OR. ::ActiveItem:Caption == "ImageName"
                                   :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject ) }
                                 ELSEIF cProp == "Filter"
-                                  :ButtonAction := {|o| FilterUI( ::ActiveObject ) }
+                                  :ButtonAction := {|o,oUI| oUI := FilterUI( ::ActiveObject ), IIF( oUI:Result==IDOK, ::ActiveObject:Filter := oUI:cFilter,) }
                                ENDIF
                              ELSEIF cType == "C"
                                IF cProp == "Filter"
-                                  :ButtonAction := {|o| FilterUI( ::ActiveObject ) }
+                                  :ButtonAction := {|o,oUI| oUI := FilterUI( ::ActiveObject ), IIF( oUI:Result==IDOK, ::ActiveObject:Filter := oUI:cFilter,) }
                                ENDIF
                             ENDIF
 

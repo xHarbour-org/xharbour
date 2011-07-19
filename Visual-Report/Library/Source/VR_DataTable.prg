@@ -109,12 +109,12 @@ METHOD Configure() CLASS VrDataTable
          ENDIF
 
          :Create()
-         IF ! EMPTY( ::Filter )
-            :SetFilter( &(::Filter) )
-         ENDIF
-         IF ! EMPTY( ::Order )
-            :OrdSetFocus( ::Order )
-         ENDIF
+         //IF ! EMPTY( ::Filter )
+         //   :SetFilter( &(::Filter) )
+         //ENDIF
+         //IF ! EMPTY( ::Order )
+         //   :OrdSetFocus( ::Order )
+         //ENDIF
       ENDIF
    END
 RETURN Self
