@@ -14,7 +14,10 @@ CLASS FilterUI INHERIT Dialog
    DATA cFilter    EXPORTED INIT ""
    DATA aFilter    EXPORTED INIT {}
    DATA oDataTable EXPORTED
-   DATA aCondStr   EXPORTED INIT {}
+   DATA aCond_C    EXPORTED INIT {}
+   DATA aCond_N    EXPORTED INIT {}
+   DATA aCond_D    EXPORTED INIT {}
+   DATA aCond_L    EXPORTED INIT {}
    DATA aCondVal   EXPORTED INIT {}
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -45,18 +48,33 @@ METHOD Init( oDataTable ) CLASS FilterUI
 
    ::Super:Init( ::Application:MainForm )
 
-   ::aCondStr := { "equals to",;
-                   "is not equal to",;
-                   "greater than",;
-                   "less than",;
-                   "between",;
+   ::aCond_C := { "Contains",;
+                   "Does not contain",;
                    "begins with",;
-                   "does not begin with",;
-                   "contains",;
-                   "does not contain",;
-                   "is empty",;
-                   "is not empty",;
+                   "Does not begin with",;
+                   "Is empty",;
+                   "Is not empty",;
+                   "Is in the range" }
+
+   ::aCond_N := {  "Equals to",;
+                   "Is not equal to",;
+                   "greater than or equal",;
+                   "less than or equal",;
+                   "between",;
                    "is in the range" }
+
+   ::aCond_D := {  "Equals",;
+                   "Is not equal",;
+                   "Is greater or the same as",;
+                   "Is lesser or teh same as",;
+                   "Between",;
+                   "per quarter",;
+                   "is in the last",;
+                   "is not in the last",;
+                   "is in the range" }
+
+   ::aCond_L := {  "True",;
+                   "False" }
 
    ::Modal      := .T.
    ::Create()
@@ -227,7 +245,6 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Enabled              := .F.
             :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
             :Create()
-            AEVAL( ::aCondStr, {|c| :AddItem(c) } )
          END
 
          WITH OBJECT ( EDITBOX( :this ) )
@@ -298,10 +315,13 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
+   LOCAL cType := ::oDataTable:EditCtrl:FieldType( Sender:GetCurSel() )
    IF !Sender:Parent:Children[2]:Enabled
       Sender:Parent:Children[2]:Enabled := .T.
-      Sender:Parent:Children[2]:SetCurSel(1)
    ENDIF
+   Sender:Parent:Children[2]:ResetContent()
+   AEVAL( ::aCond_&cType, {|c| Sender:Parent:Children[2]:AddItem(c) } )
+   Sender:Parent:Children[2]:SetCurSel(1)
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
