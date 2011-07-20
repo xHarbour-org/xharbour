@@ -423,7 +423,7 @@ RETURN Self
 METHOD Show( oParent ) CLASS FontDialog
    LOCAL lRet
    ::Font:Create()
-   lRet := ::Font:Choose( IIF( oParent != NIL, oParent, ::Owner ) ) != NIL
+   lRet := ::Font:Choose( IIF( oParent != NIL, oParent, ::Owner ),, ::Style ) != NIL
    ::Font:Delete()
 RETURN lRet
 

@@ -187,7 +187,7 @@ METHOD Set( o ) CLASS Font
    ENDIF
 RETURN Self
 
-METHOD Choose( oOwner, lSet ) CLASS Font
+METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
    LOCAL n, cf := (struct CHOOSEFONT)
 
    DEFAULT lSet TO .T.
@@ -214,7 +214,7 @@ METHOD Choose( oOwner, lSet ) CLASS Font
    IF ::Parent != NIL .AND. ::Parent:HasMessage( "ForeColor" )
       cf:rgbColors := ::Parent:ForeColor
    ENDIF
-   cf:Flags       := CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS
+   cf:Flags       := IIF( nStyle != NIL, nStyle, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS )
 
    IF ChooseFont( @cf )
       IF cf:lpLogFont:lfItalic <> 0
