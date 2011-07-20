@@ -455,18 +455,16 @@ METHOD BuildFilterExp() CLASS FilterUI
           cExp  := oPanel:Children[3]:Caption
           cExp2 := oPanel:Children[4]:Caption
 
+          cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
+
           IF cType == "C"
-             cField := "TRIM("+::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()+")"
+             cField := "TRIM("+cField+")"
            ELSEIF cType == "N"
-             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
              cExp   := VAL( cExp )
              cExp2  := VAL( cExp2 )
            ELSEIF cType == "D"
-             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
              cExp   := CTOD( cExp )
              cExp2  := CTOD( cExp2 )
-           ELSEIF cType == "L"
-             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
           ENDIF
           cExp  := ValToPrg( cExp  )
           cExp2 := ValToPrg( cExp2 )
