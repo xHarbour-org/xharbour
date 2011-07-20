@@ -20,6 +20,7 @@ CLASS FilterUI INHERIT Dialog
    METHOD OnInitDialog()
 
    METHOD ConditionComboBox_OnCBNSelEndOk()
+   METHOD FieldComboBox_OnCBNSelEndOk()
    METHOD RemoveConditionButton_OnClick()
    METHOD AddConditionButton_OnClick()
    METHOD MoreConditionButton_OnClick()
@@ -181,7 +182,6 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------//
 METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    LOCAL cName, n, oLastPanel
-   
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
 
@@ -208,6 +208,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Top                  := 0
             :Width                := 150
             :Height               := 200
+            :EventHandler[ "OnCBNSelEndOk" ] := "FieldComboBox_OnCBNSelEndOk"
             :Create()
 
             ::LoadFieldList( :This )
@@ -223,10 +224,10 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Top                  := 0
             :Width                := 150
             :Height               := 200
+            :Enabled              := .F.
             :EventHandler[ "OnCBNSelEndOk" ] := "ConditionComboBox_OnCBNSelEndOk"
             :Create()
             AEVAL( ::aCondStr, {|c| :AddItem(c) } )
-            :SetCurSel(1)
          END
 
          WITH OBJECT ( EDITBOX( :this ) )
@@ -254,6 +255,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
          :UpdateWindow()
       END
+      :PostMessage( WM_VSCROLL, MAKELONG( SB_PAGEDOWN, 0) )
    END
 RETURN Self
 
@@ -295,6 +297,14 @@ METHOD AddButtons( oParent ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
+METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
+   IF !Sender:Parent:Children[2]:Enabled
+      Sender:Parent:Children[2]:Enabled := .T.
+      Sender:Parent:Children[2]:SetCurSel(1)
+   ENDIF
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
 METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    LOCAL oPanel := Sender:Parent
 
@@ -325,7 +335,6 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       n := ASCAN( ::ConditionPanel:Children, {|o| o:hWnd == Sender:Parent:hWnd} )
       IF n > 0 .AND. LEN( ::ConditionPanel:Children ) >= n+1
          ::ConditionPanel:Children[n+1]:Dock:Top := oDock
-         ::ConditionPanel:Children[n+1]:DockIt()
       ENDIF
       Sender:Parent:Destroy()
       IF LEN( ::ConditionPanel:Children ) > 0
@@ -335,6 +344,7 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       ENDIF
    ENDIF
    ::ConditionPanel:VertScrollSize := (ATAIL( ::ConditionPanel:Children ):Height+4)*LEN( ::ConditionPanel:Children )
+   ::ConditionPanel:ScrollWindow( 0, -(ATAIL( ::ConditionPanel:Children ):Height+4) )
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -489,7 +499,6 @@ METHOD LoadFieldList( oComboBox ) CLASS FilterUI
    FOR n := 1 TO LEN( aFields )
        oComboBox:AddItem( aFields[n][1] )
    NEXT
-   oComboBox:SetCurSel(1)
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
