@@ -48,33 +48,34 @@ METHOD Init( oDataTable ) CLASS FilterUI
 
    ::Super:Init( ::Application:MainForm )
 
-   ::aCond_C := { "Contains",;
-                   "Does not contain",;
-                   "begins with",;
-                   "Does not begin with",;
-                   "Is empty",;
-                   "Is not empty",;
-                   "Is in the range" }
 
-   ::aCond_N := {  "Equals to",;
-                   "Is not equal to",;
-                   "greater than or equal",;
-                   "less than or equal",;
-                   "between",;
-                   "is in the range" }
+   ::aCond_N := {  { "Equals to",             {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { "Is not equal to",       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
+                   { "greater than or equal", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { "less than or equal",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { "between",               {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { "is in the range",       {|cField,cExp,cExp2| cField } } }
 
-   ::aCond_D := {  "Equals",;
-                   "Is not equal",;
-                   "Is greater or the same as",;
-                   "Is lesser or teh same as",;
-                   "Between",;
-                   "per quarter",;
-                   "is in the last",;
-                   "is not in the last",;
-                   "is in the range" }
+   ::aCond_C := {  { "Contains",              {|cField,cExp,cExp2| cExp + " $ " + cField} },;
+                   { "Does not contain",      {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
+                   { "begins with",           {|cField,cExp,cExp2| cField + "=" + cExp} },;
+                   { "Does not begin with",   {|cField,cExp,cExp2| cField + "!=" + cExp} },;
+                   { "Is empty",              {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
+                   { "Is not empty",          {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
+                   { "Is in the range",       {|cField,cExp,cExp2| cField} } }
 
-   ::aCond_L := {  "True",;
-                   "False" }
+   ::aCond_D := {  { "Equals",                    {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { "Is not equal",              {|cField,cExp,cExp2| cField + "<>" + cExp} },;
+                   { "Is greater or the same as", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { "Is less or the same as",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { "Between",                   {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { "per quarter",               {|cField,cExp,cExp2| cField} },;
+                   { "is in the last",            {|cField,cExp,cExp2| cField} },;
+                   { "is not in the last",        {|cField,cExp,cExp2| cField} },;
+                   { "is in the range",           {|cField,cExp,cExp2| cField} } }
+
+   ::aCond_L := {  { "True",  {|cField,cExp,cExp2| cField} },;
+                   { "False", {|cField,cExp,cExp2| "!"+cField} } }
 
    ::Modal      := .T.
    ::Create()
@@ -320,7 +321,7 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
       Sender:Parent:Children[2]:Enabled := .T.
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
-   AEVAL( ::aCond_&cType, {|c| Sender:Parent:Children[2]:AddItem(c) } )
+   AEVAL( ::aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
    Sender:Parent:Children[2]:SetCurSel(1)
 RETURN Self
 
@@ -440,7 +441,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD BuildFilterExp() CLASS FilterUI
-   LOCAL cAndOr, cField, cExp, cExp2, nSel, oPanel, n, cType
+   LOCAL cAndOr, cField, cExp, cExp2, nSel, oPanel, n, cType,  bExp
    ::cFilter := ""
    cAndOr := IIF( ::ANDRadioButton:Checked, " .AND. ", " .OR. " )
    FOR n := 1 TO LEN( ::ConditionPanel:Children )
@@ -464,6 +465,8 @@ METHOD BuildFilterExp() CLASS FilterUI
              cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
              cExp   := CTOD( cExp )
              cExp2  := CTOD( cExp2 )
+           ELSEIF cType == "L"
+             cField := ::oDataTable:Alias + "->" + oPanel:Children[1]:GetSelString()
           ENDIF
           cExp  := ValToPrg( cExp  )
           cExp2 := ValToPrg( cExp2 )
@@ -471,42 +474,11 @@ METHOD BuildFilterExp() CLASS FilterUI
           IF n > 1
              ::cFilter += cAndOr
           ENDIF
-          DO CASE 
-             CASE nSel == 1  //"equals to"
-               ::cFilter += cField + "==" + cExp
 
-             CASE nSel == 2  //"is not equal to"
-               ::cFilter += "!(" + cField + "==" + cExp + ")"
+          bExp := ::aCond_&cType[nSel][2]
 
-             CASE nSel == 3  //"greater than"
-               ::cFilter += cField + ">" + cExp
+          ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
 
-             CASE nSel == 4  //"less than"
-               ::cFilter += cField + "<" + cExp
-
-             CASE nSel == 5  //"between"
-               ::cFilter += "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"
-
-             CASE nSel == 6  //"begins with"
-               ::cFilter += cField + "=" + cExp
-
-             CASE nSel == 7  //"does not begin with"
-               ::cFilter += cField + "!=" + cExp
-
-             CASE nSel == 8  //"contains"
-               ::cFilter += cExp + " $ " + cField
-
-             CASE nSel == 9  //"does not contain"
-               ::cFilter += "!(" + cExp + " $ " + cField + ")"
-
-             CASE nSel == 10 //"is empty"
-               ::cFilter += "EMPTY(" + cField + ")"
-
-             CASE nSel == 11 //"is not empty"
-               ::cFilter += "! EMPTY(" + cField + ")"
-
-             CASE nSel == 12 //"is in the range"
-          END
        ENDIF
    NEXT
 RETURN Self
