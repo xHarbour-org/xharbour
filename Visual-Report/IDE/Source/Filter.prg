@@ -19,6 +19,7 @@ CLASS FilterUI INHERIT Dialog
    DATA aCond_D    EXPORTED INIT {}
    DATA aCond_L    EXPORTED INIT {}
    DATA aCondVal   EXPORTED INIT {}
+
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
@@ -51,14 +52,14 @@ METHOD Init( oDataTable ) CLASS FilterUI
 
    ::aCond_N := {  { "Equals to",             {|cField,cExp,cExp2| cField + "==" + cExp} },;
                    { "Is not equal to",       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
-                   { "greater than or equal", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { "less than or equal",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
-                   { "between",               {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { "is in the range",       {|cField,cExp,cExp2| cField } } }
+                   { "Greater than or equal", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { "Less than or equal",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { "Between",               {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { "Is in the range",       {|cField,cExp,cExp2| cField } } }
 
    ::aCond_C := {  { "Contains",              {|cField,cExp,cExp2| cExp + " $ " + cField} },;
                    { "Does not contain",      {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
-                   { "begins with",           {|cField,cExp,cExp2| cField + "=" + cExp} },;
+                   { "Begins with",           {|cField,cExp,cExp2| cField + "=" + cExp} },;
                    { "Does not begin with",   {|cField,cExp,cExp2| cField + "!=" + cExp} },;
                    { "Is empty",              {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
                    { "Is not empty",          {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
@@ -69,7 +70,7 @@ METHOD Init( oDataTable ) CLASS FilterUI
                    { "Is greater or the same as", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
                    { "Is less or the same as",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
                    { "Between",                   {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { "per quarter",               {|cField,cExp,cExp2| cField} },;
+                   { "Per quarter",               {|cField,cExp,cExp2| cField} },;
                    { "is in the last",            {|cField,cExp,cExp2| cField} },;
                    { "is not in the last",        {|cField,cExp,cExp2| cField} },;
                    { "is in the range",           {|cField,cExp,cExp2| cField} } }
@@ -159,6 +160,7 @@ METHOD OnInitDialog() CLASS FilterUI
       :Top                  := 315
       :Width                := 80
       :Height               := 25
+      :Enabled              := .F.
       :Caption              := "Test Filter"
       :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
       :Create()
@@ -208,7 +210,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
       oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
    WITH OBJECT ::ConditionPanel
-      WITH OBJECT ( PANEL( :this ) )
+      WITH OBJECT ( ContCondPanel( :this ) )
          :Left           := 0
          :Top            := 0
          :Width          := 150
@@ -223,7 +225,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          WITH OBJECT ( COMBOBOX( :this ) )
             :ToolTip:Text         := "Select field"
             :VertScroll           := .T.
-            :Left                 := 1
+            :Left                 := 10
             :Top                  := 0
             :Width                := 150
             :Height               := 200
@@ -248,22 +250,41 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Create()
          END
 
-         WITH OBJECT ( EDITBOX( :this ) )
+         WITH OBJECT ( :oGet1 := EDITBOX( :this ) )
             :Left                 := 320
             :Top                  := 0
-            :Width                := 150
+            :Width                := 160
             :Height               := 22
             :AutoHScroll          := .T.
             :Create()
          END
 
-         WITH OBJECT ( EDITBOX( :this ) )
-            :Left                 := 394
+         WITH OBJECT ( :oGet2 := EDITBOX( :this ) )
+            :Left                 := 402
             :Top                  := 0
-            :Width                := 72
+            :Width                := 78
             :Height               := 22
             :Visible              := .F.
             :AutoHScroll          := .T.
+            :Create()
+         END //EDITBOX
+
+
+         WITH OBJECT ( DateTimePicker( :this ) )
+            :Left                 := 320
+            :Top                  := 0
+            :Width                := 160
+            :Height               := 22
+            :Visible              := .F.
+            :Create()
+         END
+
+         WITH OBJECT ( DateTimePicker( :this ) )
+            :Left                 := 402
+            :Top                  := 0
+            :Width                := 78
+            :Height               := 22
+            :Visible              := .F.
             :Create()
          END //EDITBOX
 
@@ -281,7 +302,7 @@ RETURN Self
 METHOD AddButtons( oParent ) CLASS FilterUI
    WITH OBJECT ( BUTTON( oParent ) )
       :ToolTip:Text         := "Remove condition"
-      :Left                 := 475
+      :Left                 := 485
       :Top                  := 0
       :Width                := 20
       :Height               := 22
@@ -292,7 +313,7 @@ METHOD AddButtons( oParent ) CLASS FilterUI
 
    WITH OBJECT ( BUTTON( oParent ) )
       :ToolTip:Text         := "Add more condition"
-      :Left                 := 500
+      :Left                 := 510
       :Top                  := 0
       :Width                := 20
       :Height               := 22
@@ -303,7 +324,7 @@ METHOD AddButtons( oParent ) CLASS FilterUI
 
    WITH OBJECT ( BUTTON( oParent ) )
       :ToolTip:Text         := "More..."
-      :Left                 := 525
+      :Left                 := 535
       :Top                  := 0
       :Width                := 20
       :Height               := 22
@@ -323,27 +344,42 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    Sender:Parent:Children[2]:ResetContent()
    AEVAL( ::aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
    Sender:Parent:Children[2]:SetCurSel(1)
+   ::FilterBrowse:Enabled := .T.
+
+   Sender:Parent:oGet1:Visible := .F.
+   Sender:Parent:oGet2:Visible := .F.
+   IF cType == "D"
+      Sender:Parent:oGet1 := Sender:Parent:Children[5]
+      Sender:Parent:oGet2 := Sender:Parent:Children[6]
+    ELSE
+      Sender:Parent:oGet1 := Sender:Parent:Children[3]
+      Sender:Parent:oGet2 := Sender:Parent:Children[4]
+   ENDIF
+   Sender:Parent:oGet1:Visible := .T.
+   Sender:Parent:oGet2:Visible := Sender:Parent:Children[2]:GetSelString() == "Between"
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
-   LOCAL oPanel := Sender:Parent
+   LOCAL oDlg, oPanel := Sender:Parent
 
-   oPanel:Children[3]:Enabled := .T.
-   IF Sender:CurSel == 5
-      IF !oPanel:Children[4]:Visible
-         oPanel:Children[3]:Width := 72
-         oPanel:Children[4]:Visible := .T.
+   //IsInTheLast( Self )
+
+   oPanel:oGet1:Enabled := .T.
+   IF Sender:GetSelString() == "Between"
+      IF !oPanel:oGet2:Visible
+         oPanel:oGet1:Width := 77
+         oPanel:oGet2:Visible := .T.
       ENDIF
     ELSE
-      IF oPanel:Children[4]:Visible
-         oPanel:Children[3]:Width := 150
-         oPanel:Children[4]:Caption := ""
-         oPanel:Children[4]:Visible := .F.
+      IF oPanel:oGet2:Visible
+         oPanel:oGet1:Width := 160
+         oPanel:oGet2:Caption := ""
+         oPanel:oGet2:Visible := .F.
       ENDIF
       IF Sender:CurSel == 10 .OR. Sender:CurSel == 11
-         oPanel:Children[3]:Caption := ""
-         oPanel:Children[3]:Enabled := .F.
+         oPanel:oGet1:Caption := ""
+         oPanel:oGet1:Enabled := .F.
       ENDIF
    ENDIF
 RETURN Self
@@ -463,8 +499,8 @@ METHOD BuildFilterExp() CLASS FilterUI
              cExp   := VAL( cExp )
              cExp2  := VAL( cExp2 )
            ELSEIF cType == "D"
-             cExp   := CTOD( cExp )
-             cExp2  := CTOD( cExp2 )
+             cExp   := oPanel:oGet1:Date
+             cExp2  := oPanel:oGet2:Date
           ENDIF
           cExp  := ValToPrg( cExp  )
           cExp2 := ValToPrg( cExp2 )
@@ -542,5 +578,49 @@ METHOD OnInitDialog() CLASS TestFilter
       :Dock:BottomMargin := 2
       :Create()
       :AutoAddColumns()
+   END
+RETURN Self
+
+CLASS ContCondPanel INHERIT Panel
+   DATA oGet1      EXPORTED
+   DATA oGet2      EXPORTED
+ENDCLASS
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS IsInTheLast INHERIT Dialog
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS IsInTheLast
+   Super:Init( oParent )
+   ::Width      := 300
+   ::Height     := 200
+   ::Modal      := .T.
+   ::Center     := .T.
+   ::Resizable  := .F.
+   ::ToolWindow := .T.
+   ::Create()
+RETURN Self
+
+METHOD OnInitDialog() CLASS IsInTheLast
+   WITH OBJECT ( PictureBox( Self ) )
+      :Name      := "BottomRibbon"
+      WITH OBJECT :Dock
+         :Left   := Self
+         :Right  := Self
+         :Bottom := Self
+      END
+      :Left      := 0
+      :Top       := 415
+      :Width     := 844
+      :Height    := 50
+      :Type      := "JPG"
+      :ImageName := "BTRIBBON"
+      :Stretch   := .T.
+      :Create()
    END
 RETURN Self
