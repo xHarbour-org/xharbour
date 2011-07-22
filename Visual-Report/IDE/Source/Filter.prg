@@ -34,6 +34,7 @@ CLASS FilterUI INHERIT Dialog
    METHOD BuildFilterExp()
    METHOD OK_OnClick()
    METHOD Cancel_OnClick()
+   METHOD SetDateEdit()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -349,6 +350,23 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    Sender:Parent:Children[2]:SetCurSel(1)
    ::FilterBrowse:Enabled := .T.
    ::OK:Enabled := .T.
+
+   ::SetDateEdit( Sender, cType )
+   Sender:Parent:Children[3]:Enabled := .T.
+   Sender:Parent:Children[4]:Enabled := .T.
+   Sender:Parent:Children[5]:Enabled := .T.
+   Sender:Parent:Children[6]:Enabled := .T.
+
+   Sender:Parent:Children[3]:Caption := ""
+   Sender:Parent:Children[4]:Caption := ""
+   Sender:Parent:Children[5]:Caption := ""
+   Sender:Parent:Children[6]:Caption := ""
+RETURN Self
+
+
+//----------------------------------------------------------------------------------------------------//
+METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
+   DEFAULT cType TO ::oDataTable:EditCtrl:FieldType( Sender:Parent:Children[1]:GetCurSel() )
    Sender:Parent:oGet1:Visible := .F.
    Sender:Parent:oGet2:Visible := .F.
    IF cType == "D"
@@ -367,24 +385,23 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
+   ::SetDateEdit( Sender )
+
    oPanel:oGet1:Enabled := .T.
+
    IF cSel == "Between"
-      IF !oPanel:oGet2:Visible
-         oPanel:oGet1:Width := 77
-         oPanel:oGet2:Visible := .T.
-      ENDIF
+      oPanel:oGet1:Width := 77
+      oPanel:oGet2:Visible := .T.
     ELSEIF cSel IN {"Is in the last", "Is not in the last"}
-      IsInThe( Self, cSel )
+      oPanel:oGet1:Enabled := .F.
+      ::SetDateEdit( Sender, "C" )
+      oDlg := IsInThe( Self, cSel, {"days", "weeks", "months"}  )
+      oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+      oPanel:oGet1:Enabled := .F.
     ELSE
-      IF oPanel:oGet2:Visible
-         oPanel:oGet1:Width := 160
-         oPanel:oGet2:Caption := ""
-         oPanel:oGet2:Visible := .F.
-      ENDIF
-      IF Sender:CurSel == 10 .OR. Sender:CurSel == 11
-         oPanel:oGet1:Caption := ""
-         oPanel:oGet1:Enabled := .F.
-      ENDIF
+      oPanel:oGet1:Width := 160
+      oPanel:oGet2:Caption := ""
+      oPanel:oGet2:Visible := .F.
    ENDIF
 RETURN Self
 
@@ -599,14 +616,17 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS IsInThe INHERIT Dialog
-   DATA Text   EXPORTED
+   DATA Text     EXPORTED
+   DATA aOptions EXPORTED
+   DATA nNum     EXPORTED
+   DATA cSel     EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD OK_OnClick()
    METHOD Cancel_OnClick()
 ENDCLASS
 
-METHOD Init( oParent, cText ) CLASS IsInThe
+METHOD Init( oParent, cText, aOptions ) CLASS IsInThe
    Super:Init( oParent )
    ::Width      := 300
    ::Height     := 200
@@ -614,7 +634,9 @@ METHOD Init( oParent, cText ) CLASS IsInThe
    ::Center     := .T.
    ::Resizable  := .F.
    ::ToolWindow := .T.
+   ::AutoClose  := .T.
    ::Text       := cText
+   ::aOptions   := aOptions
    ::Create()
 RETURN Self
 
@@ -641,15 +663,17 @@ METHOD OnInitDialog() CLASS IsInThe
          :Top       := 12
          :Width     := 80
          :Height    := 25
+         :DefaultButton := .T.
+         :Action    := {||::OK_OnClick()}
          :Create()
       END
       WITH OBJECT ( Button( :this ) )
          :Caption   := "Cancel"
-         :ID        := IDCANCEL
          :Left      := :Parent:Width - 85
          :Top       := 12
          :Width     := 80
          :Height    := 25
+         :Action    := {||::Cancel_OnClick()}
          :Create()
       END
    END
@@ -662,26 +686,29 @@ METHOD OnInitDialog() CLASS IsInThe
       :Height    := 90
       :Create()
       WITH OBJECT ( EditBox( :this ) )
+         :Caption   := "1"
          :Number    := .T.
          :Left      := 15
          :Top       := 40
          :Width     := 100
          :Alignment :=  3
-         :Action    := {||::OK_OnClick()}
          :Create()
       END
       WITH OBJECT ( ComboBox( :this ) )
          :Left      := 120
          :Top       := 40
          :Width     := 130
-         :Action    := {||::Cancel_OnClick()}
          :Create()
+         AEVAL( ::aOptions, {|c| :AddItem(c) } )
+         :SetCurSel(1)
       END
    END
    ::EditBox1:SetFocus()
 RETURN 0
 
 METHOD OK_OnClick() CLASS IsInThe
+   ::nNum := ::EditBox1:Caption
+   ::cSel := ::ComboBox1:GetSelString()
    ::Close()
 RETURN NIL
 
