@@ -71,9 +71,9 @@ METHOD Init( oDataTable ) CLASS FilterUI
                    { "Is less or the same as",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
                    { "Between",                   {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
                    { "Per quarter",               {|cField,cExp,cExp2| cField} },;
-                   { "is in the last",            {|cField,cExp,cExp2| cField} },;
-                   { "is not in the last",        {|cField,cExp,cExp2| cField} },;
-                   { "is in the range",           {|cField,cExp,cExp2| cField} } }
+                   { "Is in the last",            {|cField,cExp,cExp2| cField} },;
+                   { "Is not in the last",        {|cField,cExp,cExp2| cField} },;
+                   { "Is in the range",           {|cField,cExp,cExp2| cField} } }
 
    ::aCond_L := {  { "True",  {|cField,cExp,cExp2| cField} },;
                    { "False", {|cField,cExp,cExp2| "!"+cField} } }
@@ -145,9 +145,6 @@ METHOD OnInitDialog() CLASS FilterUI
          :Create()
          :DockToParent()
       END
-      //---------------------------
-      ::AddConditionButton_OnClick()
-      //---------------------------
    END
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "FilterBrowse"
@@ -196,7 +193,7 @@ METHOD OnInitDialog() CLASS FilterUI
       :EventHandler[ "OnClick" ] := "OK_OnClick"
       :Create()
    END
-
+   ::AddConditionButton_OnClick()
    ::CenterWindow()
 RETURN NIL
 
@@ -209,6 +206,8 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
       oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
       oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
+   ::FilterBrowse:Enabled := .F.
+   ::OK:Enabled := .F.
    WITH OBJECT ::ConditionPanel
       WITH OBJECT ( ContCondPanel( :this ) )
          :Left           := 0
@@ -288,7 +287,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Create()
          END //EDITBOX
 
-         ::AddButtons( :this )
+         ::AddButtons( :this, .F. )
          
          :SetRedraw( .T. )
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
@@ -299,7 +298,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD AddButtons( oParent ) CLASS FilterUI
+METHOD AddButtons( oParent, lEnabled ) CLASS FilterUI
    WITH OBJECT ( BUTTON( oParent ) )
       :ToolTip:Text         := "Remove condition"
       :Left                 := 485
@@ -318,6 +317,7 @@ METHOD AddButtons( oParent ) CLASS FilterUI
       :Width                := 20
       :Height               := 22
       :Caption              := "+"
+      :Enabled              := lEnabled
       :EventHandler[ "OnClick" ] := "AddConditionButton_OnClick"
       :Create()
    END
@@ -329,6 +329,7 @@ METHOD AddButtons( oParent ) CLASS FilterUI
       :Width                := 20
       :Height               := 22
       :Caption              := "..."
+      :Enabled              := lEnabled
       :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
       :Create()
    END
@@ -340,12 +341,14 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    LOCAL cType := ::oDataTable:EditCtrl:FieldType( Sender:GetCurSel() )
    IF !Sender:Parent:Children[2]:Enabled
       Sender:Parent:Children[2]:Enabled := .T.
+      Sender:Parent:Children[ LEN(Sender:Parent:Children)-1 ]:Enabled := .T.
+      Sender:Parent:Children[ LEN(Sender:Parent:Children)-0 ]:Enabled := .T.
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
    AEVAL( ::aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
    Sender:Parent:Children[2]:SetCurSel(1)
    ::FilterBrowse:Enabled := .T.
-
+   ::OK:Enabled := .T.
    Sender:Parent:oGet1:Visible := .F.
    Sender:Parent:oGet2:Visible := .F.
    IF cType == "D"
@@ -361,16 +364,17 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
-   LOCAL oDlg, oPanel := Sender:Parent
+   LOCAL cSel, oDlg, oPanel := Sender:Parent
 
-   //IsInTheLast( Self )
-
+   cSel := Sender:GetSelString()
    oPanel:oGet1:Enabled := .T.
-   IF Sender:GetSelString() == "Between"
+   IF cSel == "Between"
       IF !oPanel:oGet2:Visible
          oPanel:oGet1:Width := 77
          oPanel:oGet2:Visible := .T.
       ENDIF
+    ELSEIF cSel IN {"Is in the last", "Is not in the last"}
+      IsInThe( Self, cSel )
     ELSE
       IF oPanel:oGet2:Visible
          oPanel:oGet1:Width := 160
@@ -401,7 +405,9 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       ENDIF
    ENDIF
    ::ConditionPanel:VertScrollSize := (ATAIL( ::ConditionPanel:Children ):Height+4)*LEN( ::ConditionPanel:Children )
-   ::ConditionPanel:ScrollWindow( 0, -(ATAIL( ::ConditionPanel:Children ):Height+4) )
+   ::FilterBrowse:Enabled := .T.
+   ::OK:Enabled := .T.
+   ::ConditionPanel:PostMessage( WM_VSCROLL, MAKELONG( SB_PAGEDOWN, 0) )
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -413,6 +419,8 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
       oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
       oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
+   ::FilterBrowse:Enabled := .F.
+   ::OK:Enabled := .F.
    WITH OBJECT ::ConditionPanel
       WITH OBJECT ( PANEL( :this ) )
          :Left           := 0
@@ -428,7 +436,7 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
 
          WITH OBJECT ( COMBOBOX( :this ) )
             :VertScroll           := .T.
-            :Left                 := 1
+            :Left                 := 10
             :Top                  := 0
             :Width                := 250
             :Height               := 100
@@ -442,7 +450,7 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
          END
          :Parent:VertScrollSize := (:Height+4)*LEN( ::ConditionPanel:Children )
 
-         ::AddButtons( :this )
+         ::AddButtons( :this, .T. )
 
          :SetRedraw( .T. )
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
@@ -590,12 +598,15 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS IsInTheLast INHERIT Dialog
+CLASS IsInThe INHERIT Dialog
+   DATA Text   EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
+   METHOD OK_OnClick()
+   METHOD Cancel_OnClick()
 ENDCLASS
 
-METHOD Init( oParent ) CLASS IsInTheLast
+METHOD Init( oParent, cText ) CLASS IsInThe
    Super:Init( oParent )
    ::Width      := 300
    ::Height     := 200
@@ -603,10 +614,11 @@ METHOD Init( oParent ) CLASS IsInTheLast
    ::Center     := .T.
    ::Resizable  := .F.
    ::ToolWindow := .T.
+   ::Text       := cText
    ::Create()
 RETURN Self
 
-METHOD OnInitDialog() CLASS IsInTheLast
+METHOD OnInitDialog() CLASS IsInThe
    WITH OBJECT ( PictureBox( Self ) )
       :Name      := "BottomRibbon"
       WITH OBJECT :Dock
@@ -622,5 +634,57 @@ METHOD OnInitDialog() CLASS IsInTheLast
       :ImageName := "BTRIBBON"
       :Stretch   := .T.
       :Create()
+      WITH OBJECT ( Button( :this ) )
+         :Caption   := "OK"
+         :ID        := IDOK
+         :Left      := :Parent:Width - 170
+         :Top       := 12
+         :Width     := 80
+         :Height    := 25
+         :Create()
+      END
+      WITH OBJECT ( Button( :this ) )
+         :Caption   := "Cancel"
+         :ID        := IDCANCEL
+         :Left      := :Parent:Width - 85
+         :Top       := 12
+         :Width     := 80
+         :Height    := 25
+         :Create()
+      END
    END
-RETURN Self
+   
+   WITH OBJECT ( GroupBox( Self ) )
+      :Caption   := ::Text    
+      :Left      := 15
+      :Top       := 15
+      :Width     := ::ClientWidth-30
+      :Height    := 90
+      :Create()
+      WITH OBJECT ( EditBox( :this ) )
+         :Number    := .T.
+         :Left      := 15
+         :Top       := 40
+         :Width     := 100
+         :Alignment :=  3
+         :Action    := {||::OK_OnClick()}
+         :Create()
+      END
+      WITH OBJECT ( ComboBox( :this ) )
+         :Left      := 120
+         :Top       := 40
+         :Width     := 130
+         :Action    := {||::Cancel_OnClick()}
+         :Create()
+      END
+   END
+   ::EditBox1:SetFocus()
+RETURN 0
+
+METHOD OK_OnClick() CLASS IsInThe
+   ::Close()
+RETURN NIL
+
+METHOD Cancel_OnClick() CLASS IsInThe
+   ::Close()
+RETURN NIL
