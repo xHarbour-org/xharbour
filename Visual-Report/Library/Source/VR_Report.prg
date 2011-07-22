@@ -619,6 +619,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
              oData:Create()
              IF ! EMPTY( hCtrl:Filter )
+                hCtrl:Filter := STRTRAN( hCtrl:Filter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
                 oData:SetFilter( &(hCtrl:Filter) )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
