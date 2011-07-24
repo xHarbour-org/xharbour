@@ -267,8 +267,6 @@ HB_FUNC( OPENTHEMEDATA )
    HTHEME nRet;
    HWND hWnd = (HWND) hb_parnl(1);
 
-   LPCWSTR pszClassList = (LPCWSTR) hb_parcx(2);
-
    if( hUxTheme == NULL )
    {
        hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
@@ -280,7 +278,9 @@ HB_FUNC( OPENTHEMEDATA )
 
        if( pfn )
        {
+           LPCWSTR pszClassList = hb_oleAnsiToWide( hb_parc(2) );
            nRet = (HTHEME) pfn( hWnd, pszClassList );
+           hb_xfree( (void *) pszClassList );
        }
    }
 
@@ -714,9 +714,6 @@ HB_FUNC( SETWINDOWTHEME )
    HRESULT nRet;
 
    HWND hWnd = (HWND) hb_parnl(1);
-   LPCWSTR pszSubAppName = (LPCWSTR) hb_oleAnsiToWide( hb_parc(2) );
-   LPCWSTR pszSubIdList  = (LPCWSTR) hb_oleAnsiToWide( hb_parc(3) );
-
    if( hUxTheme == NULL )
    {
        hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
@@ -728,7 +725,13 @@ HB_FUNC( SETWINDOWTHEME )
 
        if( pfn )
        {
+          LPCWSTR pszSubAppName = (LPCWSTR) hb_oleAnsiToWide( hb_parc(2) );
+          LPCWSTR pszSubIdList  = (LPCWSTR) hb_oleAnsiToWide( hb_parc(3) );
           nRet = (HRESULT) pfn( hWnd, ISNIL(2)?NULL:pszSubAppName, ISNIL(3)?NULL:pszSubIdList );
+          if( pszSubAppName )
+            hb_xfree( (void *) pszSubAppName );
+          if( pszSubIdList )
+            hb_xfree( (void *) pszSubIdList );
        }
    }
 

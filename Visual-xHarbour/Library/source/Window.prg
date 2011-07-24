@@ -616,7 +616,7 @@ CLASS Window INHERIT Object
    METHOD GetChildFromPoint()
    METHOD SetTimer(nId,nElapse,hProc)               INLINE SetTimer( ::hWnd, nId, nElapse,hProc )
    METHOD KillTimer(nId)                            INLINE KillTimer( ::hWnd, nId )
-   METHOD OpenThemeData()                           INLINE IIF( ::hTheme == NIL, ::hTheme := OpenThemeData( ::hWnd, ToUnicode( ::ThemeName ) ), )
+   METHOD OpenThemeData()                           INLINE IIF( ::hTheme == NIL, ::hTheme := OpenThemeData( ::hWnd, ::ThemeName ), )
    METHOD CloseThemeData()                          INLINE CloseThemeData( ::hTheme ), ::hTheme := NIL
    METHOD AddAccelerator()
    METHOD UpdateChildren()                          INLINE AEVAL( ::Children, {|o| IIF( VALTYPE(o)=="O",o:Redraw(),)} ), Self
@@ -4162,13 +4162,16 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
-METHOD MessageWait( cText, lProgress, nTimeOut, nColor ) CLASS Window
+METHOD MessageWait( cText, cTitle, lProgress, nTimeOut, nColor ) CLASS Window
    LOCAL oWnd, oLabel
    DEFAULT lProgress TO .F.
    oWnd := MsgWait( Self, lProgress )
-   oWnd:Caption := cText
-   oWnd:Style := WS_POPUP + WS_DLGFRAME
-
+   oWnd:Cargo := cText
+   oWnd:Style := WS_POPUP | WS_DLGFRAME
+   IF !EMPTY( cTitle )
+      oWnd:Style   := oWnd:Style | WS_CAPTION
+      oWnd:Caption := cTitle
+   ENDIF
    oWnd:xLeft   := 0
    oWnd:xTop    := 0
    oWnd:xWidth  := oWnd:Drawing:GetTextExtentPoint32( cText )[1] + 20
@@ -4424,7 +4427,7 @@ METHOD SetPosition() CLASS MsgWait
    LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
    LOCAL hDC := GetDC( ::hWnd )
    aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
-   hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
+   hTheme := OpenThemeData(,"PROGRESS")
    DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
    aBar[1]+=1
    aBar[2]+=1
@@ -4449,7 +4452,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS MsgWait
       aRect[4]-= 24
 
       IF ::lXP
-         hTheme := OpenThemeData(,ToUnicode("PROGRESS"))
+         hTheme := OpenThemeData(,"PROGRESS")
          aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
          DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
          CloseThemeData( hTheme )
@@ -4459,7 +4462,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS MsgWait
    ENDIF
    SetBkMode( hDC, TRANSPARENT )
    SelectObject( hDC, ::Font:Handle )
-   _DrawText( hDC, ::Caption, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
+   _DrawText( hDC, ::Cargo, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
 RETURN 1
 //---------------------------------------------------------------------------------------------
 

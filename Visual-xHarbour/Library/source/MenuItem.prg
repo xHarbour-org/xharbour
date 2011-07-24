@@ -606,7 +606,7 @@ METHOD DrawItem( dis, l3D ) CLASS CMenuItem
          _FillRect( hDC, { aRect[1],    aRect[2],  aRect[3]-(xIcon),   aRect[4]  }, GetSysColorBrush( COLOR_HIGHLIGHT ) )
          _FillRect( hDC, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1}, GetSysColorBrush( IIF( ::Application:IsThemedXP, 29, COLOR_HIGHLIGHT ) ) )
 
-         //hTheme := OpenThemeData(, ToUnicode( "MENU" ) )
+         //hTheme := OpenThemeData(,  "MENU" )
          //DrawThemeBackground( hTheme, hDC, 16, dis:itemState, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1}, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1} )
          //CloseThemeData( hTheme )
 

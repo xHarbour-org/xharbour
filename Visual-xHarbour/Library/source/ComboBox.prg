@@ -321,7 +321,7 @@ METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
    ENDIF
    aRect[1] := aRect[3] - GetSystemMetrics( SM_CXVSCROLL )
    IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-      hTheme := OpenThemeData(,ToUnicode("combobox"))
+      hTheme := OpenThemeData(,"combobox")
       aRect[4]-=2
       oDrawing:DrawThemeBackground( hTheme, CP_DROPDOWNBUTTON, nStatus, aRect, aRect )
       CloseThemeData( hTheme )
@@ -442,7 +442,7 @@ METHOD __HandleOnPaint( hWnd ) CLASS ComboBox
    hDC := _BeginPaint( hWnd, @cPaint )
    aRect := _GetClientRect( hWnd )
 
-   hTheme := OpenThemeData(,ToUnicode("TOOLTIP"))
+   hTheme := OpenThemeData(,"TOOLTIP")
    DrawThemeBackground( hTheme, hDC, TTP_STANDARD, 0, { 0, 0, aRect[3], aRect[4] } )
    CloseThemeData( hTheme )
 

@@ -2098,7 +2098,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
       nFlags := nFlags | nStatus
 
       IF lXP
-         hTheme := OpenThemeData(,ToUnicode("button"))
+         hTheme := OpenThemeData(,"button")
          DrawThemeBackground( hTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
          CloseThemeData( hTheme )
        ELSE

@@ -257,7 +257,7 @@ METHOD DrawFrame( hDC, aRect, nStatus, lDraw ) CLASS HeaderStrip
             nStatus := HILS_PRESSED
          ENDIF
 
-         hTheme := OpenThemeData(,ToUnicode("header"))
+         hTheme := OpenThemeData(,"header")
          ::Drawing:DrawThemeBackground( hTheme, HP_HEADERITEM, nStatus, aRect, aRect )
          CloseThemeData( hTheme )
        ELSE

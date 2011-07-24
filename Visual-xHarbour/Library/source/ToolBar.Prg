@@ -1191,7 +1191,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                                      nState := MDIBS_HOT
                                   ENDIF
 
-                                  hTheme := OpenThemeData(,ToUnicode("window"))
+                                  hTheme := OpenThemeData(,"window")
                                   aRect := { tbcd:nmcd:rc:Left, Int(tbcd:nmcd:rc:Top-2), tbcd:nmcd:rc:Right, Int(tbcd:nmcd:rc:Bottom) }
                                   DrawThemeBackground( hTheme, tbcd:nmcd:hdc, nButton, nState, aRect, aRect )
                                   CloseThemeData( hTheme )
