@@ -4535,7 +4535,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    cPath := ::Properties:Path
 
    IF lNew  .OR. ! IsDirectory( cPath )
-   VIEW cPath
       MakeDir( cPath )
    ENDIF
    DirChange( cPath )
