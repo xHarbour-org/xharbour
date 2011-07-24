@@ -662,11 +662,12 @@ METHOD Init( oParent, cText, aOptions ) CLASS IsInTheLast
    ::Caption    := "VR Filter"
    ::Modal      := .T.
    ::Center     := .T.
+   ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU
    ::Resizable  := .F.
-   ::ToolWindow := .T.
    ::AutoClose  := .T.
    ::Text       := cText
    ::aOptions   := aOptions
+   ::Icon       := "AVR"
    ::Create()
 RETURN Self
 
@@ -687,11 +688,11 @@ METHOD OnInitDialog() CLASS IsInTheLast
       :Stretch   := .T.
       :Create()
       WITH OBJECT ( Button( :this ) )
-         :Caption   := "?"
+         :Caption   := "Help"
          :ID        := IDOK
          :Left      := 10
          :Top       := 12
-         :Width     := 20
+         :Width     := 80
          :Height    := 25
          :Action    := {||::Help_OnClick()}
          :Create()
