@@ -4167,16 +4167,16 @@ METHOD MessageWait( cText, cTitle, lProgress, nTimeOut, nColor ) CLASS Window
    DEFAULT lProgress TO .F.
    oWnd := MsgWait( Self, lProgress )
    oWnd:Cargo := cText
-   oWnd:Style := WS_POPUP | WS_DLGFRAME
+   oWnd:Style := WS_POPUP | WS_DLGFRAME | WS_THICKFRAME | WS_CAPTION
    IF !EMPTY( cTitle )
-      oWnd:Style   := oWnd:Style | WS_CAPTION
+//    oWnd:Style   := oWnd:Style | WS_CAPTION
       oWnd:Caption := cTitle
    ENDIF
    oWnd:xLeft   := 0
    oWnd:xTop    := 0
-   oWnd:xWidth  := oWnd:Drawing:GetTextExtentPoint32( cText )[1] + 20
+   oWnd:xWidth  := Max(oWnd:Drawing:GetTextExtentPoint32( cText )[1] + 70, 300)
 
-   oWnd:xHeight := 75
+   oWnd:xHeight := 85
    oWnd:Center  := .T.
    oWnd:Create()
    oWnd:Show()
@@ -4426,7 +4426,7 @@ RETURN Self
 METHOD SetPosition() CLASS MsgWait
    LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
    LOCAL hDC := GetDC( ::hWnd )
-   aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
+   aBar := {4,::ClientHeight-24,::ClientWidth-4,::ClientHeight-4}
    hTheme := OpenThemeData(,"PROGRESS")
    DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
    aBar[1]+=1
@@ -4449,11 +4449,11 @@ METHOD OnEraseBkGnd( hDC ) CLASS MsgWait
    aRect[3]-=5
    aRect[4]-=5
    IF ::lProgress
-      aRect[4]-= 24
+      aRect[4]-= 26
 
       IF ::lXP
          hTheme := OpenThemeData(,"PROGRESS")
-         aBar := {2,::ClientHeight-22,::ClientWidth-2,::ClientHeight-2}
+         aBar := {4,::ClientHeight-24,::ClientWidth-4,::ClientHeight-4}
          DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
          CloseThemeData( hTheme )
          ::Application:DoEvents()
