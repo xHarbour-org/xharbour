@@ -657,18 +657,23 @@ ENDCLASS
 
 METHOD Init( oParent, cText, aOptions ) CLASS IsInTheLast
    Super:Init( oParent )
+
    ::Width      := 300
    ::Height     := 200
    ::Caption    := "VR Filter"
    ::Modal      := .T.
    ::Center     := .T.
-   ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU
-   ::Resizable  := .F.
+// ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU
+// ::Resizable  := .F.
    ::AutoClose  := .T.
    ::Text       := cText
+   ::TopMost    := .T.
    ::aOptions   := aOptions
    ::Icon       := "AVR"
+   ::MaximizeBox:= .F.
+   ::MinimizeBox:= .F.
    ::Create()
+
 RETURN Self
 
 METHOD OnInitDialog() CLASS IsInTheLast
