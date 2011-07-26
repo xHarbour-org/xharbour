@@ -475,10 +475,6 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  hControl[ "ParCls"  ] := cParCls
               ENDIF
 
-         CASE oNode:cName == "bFilter" // backward compatibility
-              hControl[ "Filter" ] := {=>}
-              HSetCaseMatch( hControl[ "Filter" ], .F. )
-
          CASE oNode:cName == "Font" 
               hControl[ oNode:cName ] := {=>}
               HSetCaseMatch( hControl[ oNode:cName ], .F. )

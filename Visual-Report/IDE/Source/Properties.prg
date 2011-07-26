@@ -686,11 +686,25 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                IF ::ActiveItem:Caption == "FileName" .OR. ::ActiveItem:Caption == "ImageName"
                                   :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject ) }
                                 ELSEIF cProp == "Filter"
-                                  :ButtonAction := {|o,oUI| oUI := FilterUI( ::ActiveObject ), IIF( oUI:Result==IDOK, ::ActiveObject:Filter := oUI:cFilter,) }
+                                  :ButtonAction := <|o,oUI| 
+                                                     oUI := FilterUI( ::ActiveObject )
+                                                     IF oUI:Result==IDOK
+                                                        ::ActiveObject:Filter := oUI:cFilter
+                                                        ::ActiveObject:BuildFilter := oUI:BuildFilter
+                                                     ENDIF
+                                                     RETURN NIL
+                                                   >
                                ENDIF
                              ELSEIF cType == "C"
                                IF cProp == "Filter"
-                                  :ButtonAction := {|o,oUI| oUI := FilterUI( ::ActiveObject ), IIF( oUI:Result==IDOK, ::ActiveObject:Filter := oUI:cFilter,) }
+                                  :ButtonAction := <|o,oUI| 
+                                                     oUI := FilterUI( ::ActiveObject )
+                                                     IF oUI:Result==IDOK
+                                                        ::ActiveObject:Filter := oUI:cFilter
+                                                        ::ActiveObject:BuildFilter := oUI:BuildFilter
+                                                     ENDIF
+                                                     RETURN NIL
+                                                   >
                                ENDIF
                             ENDIF
 
@@ -918,6 +932,9 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
    FOR EACH aProperty IN aProperties
        ::Application:Yield()
        cProp  := aProperty[1]
+       IF cProp == "BuildFilter"
+          LOOP
+       ENDIF
        xValue := ::ActiveObject:&cProp
        cType  := VALTYPE( xValue )
        nColor := NIL

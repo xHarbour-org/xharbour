@@ -11,14 +11,15 @@
 //------------------------------------------------------------------------------------------
 
 CLASS FilterUI INHERIT Dialog
-   DATA cFilter    EXPORTED INIT ""
-   DATA aFilter    EXPORTED INIT {}
-   DATA oDataTable EXPORTED
-   DATA aCond_C    EXPORTED INIT {}
-   DATA aCond_N    EXPORTED INIT {}
-   DATA aCond_D    EXPORTED INIT {}
-   DATA aCond_L    EXPORTED INIT {}
-   DATA aCondVal   EXPORTED INIT {}
+   DATA cFilter      EXPORTED INIT ""
+   DATA BuildFilter  EXPORTED INIT {}
+   DATA oDataTable   EXPORTED
+   DATA aCond_C      EXPORTED INIT {}
+   DATA aCond_N      EXPORTED INIT {}
+   DATA aCond_D      EXPORTED INIT {}
+   DATA aCond_L      EXPORTED INIT {}
+   DATA aCond_M      EXPORTED INIT {}
+   DATA aCondVal     EXPORTED INIT {}
 
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -79,6 +80,8 @@ METHOD Init( oDataTable ) CLASS FilterUI
    ::aCond_L := {  { "True",  {|cField,cExp,cExp2| cField} },;
                    { "False", {|cField,cExp,cExp2| "!"+cField} } }
 
+   ::aCond_M := ACLONE( ::aCond_C )
+   
    ::Modal      := .T.
    ::Create()
 RETURN Self
@@ -86,7 +89,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS FilterUI
-
+   LOCAL aExps, n, i, cExp, aExp
    ::Left    := 190
    ::Top     := 20
    ::Width   := 634
@@ -94,10 +97,10 @@ METHOD OnInitDialog() CLASS FilterUI
    ::Caption := "Create Filter Expression"
    WITH OBJECT ( GROUPBOX( Self ) )
       WITH OBJECT :Dock
-         :Left                 := Self
-         :Top                  := Self
-         :Right                := Self
-         :Margins              := "20,15,20,0"
+         :Left              := Self
+         :Top               := Self
+         :Right             := Self
+         :Margins           := "20,15,20,0"
       END
       :Left                 := 20
       :Top                  := 15
@@ -107,23 +110,23 @@ METHOD OnInitDialog() CLASS FilterUI
       :ForeColor            := 0
       :Create()
       WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name                 := "ANDRadioButton"
-         :Left                 := 24
-         :Top                  := 27
-         :Width                := 289
-         :Height               := 15
-         :Caption              := "Match ALL of the conditions"
-         :InitialState         := 1
+         :Name              := "ANDRadio"
+         :Left              := 24
+         :Top               := 27
+         :Width             := 289
+         :Height            := 15
+         :Caption           := "Match ALL of the conditions"
+         :InitialState      := 1
          :Create()
       END //RADIOBUTTON
 
       WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name                 := "ORRadioButton"
-         :Left                 := 325
-         :Top                  := 27
-         :Width                := 259
-         :Height               := 15
-         :Caption              := "Match ANY of the conditions"
+         :Name              := "ORRadio"
+         :Left              := 325
+         :Top               := 27
+         :Width             := 259
+         :Height            := 15
+         :Caption           := "Match ANY of the conditions"
          :Create()
       END
    END
@@ -140,9 +143,9 @@ METHOD OnInitDialog() CLASS FilterUI
       :Create()
       :DockToParent()
       WITH OBJECT ( PANEL( :this ) )
-         :Name                 := "ConditionPanel"
-         :Dock:Margins         := "2,14,2,2"
-         :VertScroll           := .T.
+         :Name              := "ConditionPanel"
+         :Dock:Margins      := "2,14,2,2"
+         :VertScroll        := .T.
          :Create()
          :DockToParent()
       END
@@ -196,6 +199,32 @@ METHOD OnInitDialog() CLASS FilterUI
    END
    ::AddConditionButton_OnClick()
    ::CenterWindow()
+   
+   aExps := hb_aTokens( ::oDataTable:BuildFilter, "~" )
+   IF !EMPTY( aExps )
+      IF aExps[1] == "1"
+         ::ANDRadio:SetState( BST_CHECKED )
+         ::ORRadio:SetState( BST_UNCHECKED )
+       ELSE
+         ::ANDRadio:SetState( BST_UNCHECKED )
+         ::ORRadio:SetState( BST_CHECKED )
+      ENDIF
+      FOR i := 2 TO LEN( aExps )
+          aExp := hb_aTokens( aExps[i], "|" )
+          IF LEN( aExp ) > 1
+             ::ConditionPanel:Children[i-1]:Children[1]:Enabled := .T.
+             ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( VAL( aExp[1] ) )
+             ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
+             
+             ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[2] ) )
+             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4] )
+             
+          ENDIF
+          IF i < LEN( aExps )
+             ::AddConditionButton_OnClick()
+          ENDIF
+      NEXT
+   ENDIF
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------//
@@ -381,7 +410,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
+METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cValue ) CLASS FilterUI
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
@@ -396,24 +425,35 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
     ELSEIF cSel IN {"Per quarter"}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
-      oDlg := FilterPerQuarter( Self, {"days", "weeks", "months"}  )
-      IF oDlg:Result == IDOK
-         oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+      IF cValue == NIL
+         oDlg := FilterPerQuarter( Self, {"days", "weeks", "months"}  )
+         IF oDlg:Result == IDOK
+            oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+         ENDIF
+       ELSE
+         oPanel:oGet1:Caption := cValue
       ENDIF
       oPanel:oGet1:Enabled := .F.
       
     ELSEIF cSel IN {"Is in the last", "Is not in the last"}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
-      oDlg := IsInTheLast( Self, cSel, {"days", "weeks", "months"}  )
-      IF oDlg:Result == IDOK
-         oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+      IF cValue == NIL
+         oDlg := IsInTheLast( Self, cSel, {"days", "weeks", "months"}  )
+         IF oDlg:Result == IDOK
+            oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+         ENDIF
+       ELSE
+         oPanel:oGet1:Caption := cValue
       ENDIF
       oPanel:oGet1:Enabled := .F.
     ELSE
       oPanel:oGet1:Width := 160
       oPanel:oGet2:Caption := ""
       oPanel:oGet2:Visible := .F.
+      IF cValue != NIL
+         oPanel:oGet1:Caption := cValue
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -514,33 +554,46 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 METHOD BuildFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cFldSel, nDays, cExpSel, cField, cExp, cExp2, nSel, oPanel, n, cType,  bExp, aExp
+   LOCAL cAndOr, nNum, cFldSel, nDays, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType,  bExp, aExp, xAnd
    ::cFilter := ""
-   cAndOr := IIF( ::ANDRadioButton:Checked, " .AND. ", " .OR. " )
+   cAndOr := IIF( ::ANDRadio:Checked, " .AND. ", " .OR. " )
+   ::BuildFilter := IIF( ::ANDRadio:Checked, "1", "2" )
    FOR n := 1 TO LEN( ::ConditionPanel:Children )
        oPanel := ::ConditionPanel:Children[n]
        IF LEN( oPanel:Children ) == 4
           cAndOr := IIF( oPanel:Children[1]:GetCurSel() == 1, " .AND. ", " .OR. " )
+          ::BuildFilter += "~"+xStr( oPanel:Children[1]:GetCurSel() )
         ELSE
           cFldSel := oPanel:Children[1]:GetSelString()
           cExpSel := oPanel:Children[2]:GetSelString()
 
-          nSel    := oPanel:Children[2]:GetCurSel()
-          cType   := ::oDataTable:EditCtrl:FieldType( oPanel:Children[1]:GetCurSel() )
-          cExp    := oPanel:Children[3]:Caption
-          cExp2   := oPanel:Children[4]:Caption
+          nSel1   := oPanel:Children[1]:GetCurSel()
+          nSel2   := oPanel:Children[2]:GetCurSel()
+          cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
+          cExp    := oPanel:oGet1:Caption //oPanel:Children[3]:Caption
+          cExp2   := oPanel:oGet2:Caption //oPanel:Children[4]:Caption
 
           cField := ::oDataTable:Alias + "->" + cFldSel
 
+          ::BuildFilter += "~"+xStr(nSel1)+"|"+xStr(nSel2)+"|"+cType
+
           IF cType == "C"
+             
+             ::BuildFilter += "|"+cExp+"|"+cExp2
+             
              cField := "TRIM("+cField+")"
              cExp  := ValToPrg( cExp  )
              cExp2 := ValToPrg( cExp2 )
            ELSEIF cType == "N"
+             ::BuildFilter += "|"+cExp+"|"+cExp2
+
              cExp   := ValToPrg( VAL( cExp ) )
              cExp2  := ValToPrg( VAL( cExp2 ) )
            ELSEIF cType == "D"
              IF cExpSel IN {"Is in the last", "Is not in the last"}
+
+                ::BuildFilter += "|"+cExp
+
                 aExp  := hb_aTokens( oPanel:oGet1:Caption )
                 cExp  := "@TODAY-"
                 nNum  := VAL( aExp[1] )
@@ -552,16 +605,20 @@ METHOD BuildFilterExp() CLASS FilterUI
                    cExp += AllTrim( Str( nNum*30 ) )
                 ENDIF
               ELSE
+                ::BuildFilter += "|"+DTOS(oPanel:oGet1:Date)
+                IF oPanel:oGet2:Visible
+                   ::BuildFilter += "|"+DTOS(oPanel:oGet2:Date)
+                ENDIF
                 cExp  := 'STOD( "' + DTOS(oPanel:oGet1:Date) + '" )'
                 cExp2 := 'STOD( "' + DTOS(oPanel:oGet2:Date) + '" )'
              ENDIF
           ENDIF
-view cExp
+
           IF n > 1
              ::cFilter += cAndOr
           ENDIF
-
-          bExp := ::aCond_&cType[nSel][2]
+          
+          bExp := ::aCond_&cType[nSel2][2]
 
           ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
 

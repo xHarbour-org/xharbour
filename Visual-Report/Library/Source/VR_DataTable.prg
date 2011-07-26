@@ -32,6 +32,7 @@ CLASS VrDataTable INHERIT VrObject
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
    DATA Filter           EXPORTED INIT ""
+   DATA BuildFilter      EXPORTED INIT ""
    DATA __ExplorerFilter EXPORTED INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
@@ -55,6 +56,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "FileName",         "General"  } )
       AADD( ::aProperties, { "Alias",            "General"  } )
       AADD( ::aProperties, { "Filter",           "General"  } )
+      AADD( ::aProperties, { "BuildFilter",      "General"  } )
       AADD( ::aProperties, { "RelationTable",    "Relation" } )
       AADD( ::aProperties, { "RelationExp",      "Relation" } )
       AADD( ::aProperties, { "Name",             "Object"   } )
@@ -121,17 +123,19 @@ RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    LOCAL oXmlValue, oXmlFont
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, XSTR( ::FileName ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, XSTR( ::Alias ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::Alias )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Filter", NIL, XSTR( ::Filter ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Filter", NIL, ::Filter )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, XSTR( ::Order ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "BuildFilter", NIL, ::BuildFilter )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, XSTR( ::Driver ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::Order )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR( ::Server ) )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, ::Driver )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, ::Server )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "RelationTable", NIL, ::RelationTable )
    oXmlControl:addBelow( oXmlValue )
