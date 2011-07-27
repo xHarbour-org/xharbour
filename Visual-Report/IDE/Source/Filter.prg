@@ -217,7 +217,7 @@ METHOD OnInitDialog() CLASS FilterUI
              ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
              
              ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[2] ) )
-             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4] )
+             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[3], aExp[4], aExp[5] )
              
           ENDIF
           IF i < LEN( aExps )
@@ -410,7 +410,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
-METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cValue ) CLASS FilterUI
+METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS FilterUI
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
@@ -451,8 +451,19 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cValue ) CLASS FilterUI
       oPanel:oGet1:Width := 160
       oPanel:oGet2:Caption := ""
       oPanel:oGet2:Visible := .F.
-      IF cValue != NIL
+   ENDIF
+   IF cValue != NIL
+      IF cType == "D"
+         oPanel:oGet1:Date := STOD( cValue )
+       ELSE
          oPanel:oGet1:Caption := cValue
+      ENDIF
+   ENDIF
+   IF cValue2 != NIL .AND. oPanel:oGet2:Visible
+      IF cType == "D"
+         oPanel:oGet2:Date := STOD( cValue2 )
+       ELSE
+         oPanel:oGet2:Caption := cValue2
       ENDIF
    ENDIF
 RETURN Self
