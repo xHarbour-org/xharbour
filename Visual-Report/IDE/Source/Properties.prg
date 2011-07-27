@@ -255,7 +255,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    ENDIF
 
    IF UPPER(cProp) == "DRIVER"
-      ::ActiveObject:Create()
+      ::ActiveObject:Create(.F.)
       ::ResetProperties(,,.T.)
    ENDIF
 
@@ -688,7 +688,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                 ELSEIF cProp == "Filter"
                                   :ButtonAction := <|o,oUI| 
                                                      oUI := FilterUI( ::ActiveObject )
-                                                     IF oUI:Result==IDOK
+                                                     IF oUI != NIL .AND. oUI:Result==IDOK
                                                         ::ActiveObject:Filter := oUI:cFilter
                                                         ::ActiveObject:BuildFilter := oUI:BuildFilter
                                                      ENDIF
@@ -699,7 +699,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                IF cProp == "Filter"
                                   :ButtonAction := <|o,oUI| 
                                                      oUI := FilterUI( ::ActiveObject )
-                                                     IF oUI:Result==IDOK
+                                                     IF oUI != NIL .AND. oUI:Result==IDOK
                                                         ::ActiveObject:Filter := oUI:cFilter
                                                         ::ActiveObject:BuildFilter := oUI:BuildFilter
                                                      ENDIF

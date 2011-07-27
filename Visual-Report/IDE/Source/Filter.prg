@@ -217,7 +217,7 @@ METHOD OnInitDialog() CLASS FilterUI
              ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
              
              ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[2] ) )
-             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[3], aExp[4], aExp[5] )
+             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[3], IIF( LEN( aExp ) >= 4, aExp[4],), IIF( LEN( aExp ) >= 5, aExp[5],) )
              
           ENDIF
           IF i < LEN( aExps )
@@ -466,6 +466,10 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
          oPanel:oGet2:Caption := cValue2
       ENDIF
    ENDIF
+   IF cSel IN {"Is empty", "Is not empty"}
+      oPanel:oGet1:Caption := ""
+      oPanel:oGet1:Enabled := .F.
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
@@ -588,7 +592,7 @@ METHOD BuildFilterExp() CLASS FilterUI
 
           ::BuildFilter += "~"+xStr(nSel1)+"|"+xStr(nSel2)+"|"+cType
 
-          IF cType == "C"
+          IF cType $ "CM"
              
              ::BuildFilter += "|"+cExp+"|"+cExp2
              
@@ -667,7 +671,11 @@ METHOD OnInitDialog() CLASS TestFilter
          :Create()
          cFilter := ::Parent:cFilter
          cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
-         :SetFilter( &("{||"+cFilter+"}") )
+         TRY
+            :SetFilter( &("{||"+cFilter+"}") )
+         CATCH
+            ::MessageBox( "The selected filter has caused an error. Please rebuild the filter expression and try again", "VR" )
+         END
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )
          ENDIF

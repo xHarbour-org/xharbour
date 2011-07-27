@@ -67,8 +67,8 @@ METHOD Init( oParent ) CLASS VrDataTable
    ENDIF
 RETURN Self
 
-METHOD Create() CLASS VrDataTable
-
+METHOD Create( lSuper ) CLASS VrDataTable
+   DEFAULT lSuper TO .T.
    WITH OBJECT ::EditCtrl := DataTable( ::Parent )
       :Cargo    := Self
       :FileName := ::FileName
@@ -86,8 +86,9 @@ METHOD Create() CLASS VrDataTable
          ENDIF
       ENDIF
    END
-
-   Super:Create()
+   IF lSuper
+      Super:Create()
+   ENDIF
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
