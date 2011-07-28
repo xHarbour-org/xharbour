@@ -264,6 +264,9 @@ METHOD Init( oParent ) CLASS EditBox
                                { "OnRButtonDown"      , "", "" },;
                                { "OnRButtonUp"        , "", "" },;
                                { "OnImageClick"       , "", "" } } },;
+               {"Scroll",      {;
+                               { "OnHorzScroll"       , "", "" },;
+                               { "OnVertScroll"       , "", "" } } },;
                {"Control",     {;
                                { "OnActivate"         , "", "" },;
                                { "OnCreate"           , "", "" },;
