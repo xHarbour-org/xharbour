@@ -18,18 +18,18 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS UpDown INHERIT Control
+   DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    METHOD Init()  CONSTRUCTOR
 ENDCLASS
 
-METHOD Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCreate ) CLASS UpDown
-   DEFAULT ::__xCtrlName TO "UpDown"
-   DEFAULT nWidth  TO 50
-   DEFAULT nHeight TO 13
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::Width     := nWidth
-   ::Height    := nHeight
-   ::Super:Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCreate )
+METHOD Init( oParent ) CLASS UpDown
    ::ClsName      := "msctls_updown32"
+   DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::__xCtrlName TO "UpDown"
+   ::Super:Init( oParent )
+   ::Width        := 80
+   ::Height       := 22
+   ::__lMoveable := .T.
+
 RETURN Self
 
