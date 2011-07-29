@@ -4,7 +4,24 @@
 
 #include "vxh.ch"
 #include "debug.ch"
-#define FILTERCTRLPERLINE      10
+
+#define FC_EQUALTO    "Equals to"
+#define FC_NOTEQUALTO "Is not equal to"
+#define FC_GREATEREQU "Greater than or equal"
+#define FC_LESSEQUAL  "Less than or equal"
+#define FC_BETWEEN    "Between"
+#define FC_INTHERANGE "Is in the range"
+#define FC_CONTAINS   "Contains"
+#define FC_NOTCONTAIN "Does not contain"
+#define FC_BEGWITH    "Begins with"
+#define FC_NOTBEGWITH "Does not begin with"
+#define FC_ISEMPTY    "Is empty"
+#define FC_NOTEMPTY   "Is not empty"
+#define FC_PERQUARTER "Per quarter"
+#define FC_INLAST     "Is in the last"
+#define FC_NOTINLAST  "Is not in the last"
+#define FC_TRUE       "True"
+#define FC_FALSE      "False"
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -19,7 +36,6 @@ CLASS FilterUI INHERIT Dialog
    DATA aCond_D      EXPORTED INIT {}
    DATA aCond_L      EXPORTED INIT {}
    DATA aCond_M      EXPORTED INIT {}
-   DATA aCondVal     EXPORTED INIT {}
 
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -51,34 +67,33 @@ METHOD Init( oDataTable ) CLASS FilterUI
 
    ::Super:Init( ::Application:MainForm )
 
+   ::aCond_N := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
+                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField } } }
 
-   ::aCond_N := {  { "Equals to",             {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { "Is not equal to",       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
-                   { "Greater than or equal", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { "Less than or equal",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
-                   { "Between",               {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { "Is in the range",       {|cField,cExp,cExp2| cField } } }
+   ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp,cExp2| cExp + " $ " + cField} },;
+                   { FC_NOTCONTAIN,       {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
+                   { FC_BEGWITH,          {|cField,cExp,cExp2| cField + "=" + cExp} },;
+                   { FC_NOTBEGWITH,       {|cField,cExp,cExp2| cField + "!=" + cExp} },;
+                   { FC_ISEMPTY,          {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
+                   { FC_NOTEMPTY,         {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
 
-   ::aCond_C := {  { "Contains",              {|cField,cExp,cExp2| cExp + " $ " + cField} },;
-                   { "Does not contain",      {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
-                   { "Begins with",           {|cField,cExp,cExp2| cField + "=" + cExp} },;
-                   { "Does not begin with",   {|cField,cExp,cExp2| cField + "!=" + cExp} },;
-                   { "Is empty",              {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
-                   { "Is not empty",          {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
-                   { "Is in the range",       {|cField,cExp,cExp2| cField} } }
+   ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| cField + "<>" + cExp} },;
+                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { FC_PERQUARTER,       {|cField,cExp,cExp2| cExp } },;
+                   { FC_INLAST,           {|cField,cExp,cExp2| cField + ">=" + cExp } },;
+                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<" + cExp} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
 
-   ::aCond_D := {  { "Equals",                    {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { "Is not equal",              {|cField,cExp,cExp2| cField + "<>" + cExp} },;
-                   { "Is greater or the same as", {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { "Is less or the same as",    {|cField,cExp,cExp2| cField + "<=" + cExp} },;
-                   { "Between",                   {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { "Per quarter",               {|cField,cExp,cExp2| cField} },;
-                   { "Is in the last",            {|cField,cExp,cExp2| cField + ">=" + cExp } },;
-                   { "Is not in the last",        {|cField,cExp,cExp2| cField} },;
-                   { "Is in the range",           {|cField,cExp,cExp2| cField} } }
-
-   ::aCond_L := {  { "True",  {|cField,cExp,cExp2| cField} },;
-                   { "False", {|cField,cExp,cExp2| "!"+cField} } }
+   ::aCond_L := {  { FC_TRUE,  {|cField,cExp,cExp2| cField} },;
+                   { FC_FALSE, {|cField,cExp,cExp2| "!"+cField} } }
 
    ::aCond_M := ACLONE( ::aCond_C )
    
@@ -406,7 +421,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
       Sender:Parent:oGet2 := Sender:Parent:Children[4]
    ENDIF
    Sender:Parent:oGet1:Visible := .T.
-   Sender:Parent:oGet2:Visible := Sender:Parent:Children[2]:GetSelString() == "Between"
+   Sender:Parent:oGet2:Visible := Sender:Parent:Children[2]:GetSelString() == FC_BETWEEN
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -418,15 +433,15 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
 
    oPanel:oGet1:Enabled := .T.
 
-   IF cSel == "Between"
+   IF cSel == FC_BETWEEN
       oPanel:oGet1:Width := 77
       oPanel:oGet2:Visible := .T.
 
-    ELSEIF cSel IN {"Per quarter"}
+    ELSEIF cSel IN {FC_PERQUARTER}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
       IF cValue == NIL
-         oDlg := FilterPerQuarter( Self, {"days", "weeks", "months"}  )
+         oDlg := FilterPerQuarter( Self, oPanel:oGet1 )
          IF oDlg:Result == IDOK
             oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
          ENDIF
@@ -434,8 +449,8 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
          oPanel:oGet1:Caption := cValue
       ENDIF
       oPanel:oGet1:Enabled := .F.
-      
-    ELSEIF cSel IN {"Is in the last", "Is not in the last"}
+      RETURN Self
+    ELSEIF cSel IN {FC_INLAST, FC_NOTINLAST}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
       IF cValue == NIL
@@ -466,7 +481,7 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
          oPanel:oGet2:Caption := cValue2
       ENDIF
    ENDIF
-   IF cSel IN {"Is empty", "Is not empty"}
+   IF cSel IN {FC_ISEMPTY, FC_NOTEMPTY}
       oPanel:oGet1:Caption := ""
       oPanel:oGet1:Enabled := .F.
    ENDIF
@@ -487,6 +502,16 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
          oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .T.
          oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .T.
       ENDIF
+    ELSE
+      WITH OBJECT ::ConditionPanel:Children[1]
+         :Children[1]:SetCurSel(0)
+         :Children[2]:SetCurSel(0)
+         :Children[3]:Width   := 160
+         :Children[3]:Caption := ""
+         :Children[3]:Enabled := .F.
+         :Children[4]:Caption := ""
+         :Children[4]:Visible := .F.
+      END
    ENDIF
    ::ConditionPanel:VertScrollSize := (ATAIL( ::ConditionPanel:Children ):Height+4)*LEN( ::ConditionPanel:Children )
    ::FilterBrowse:Enabled := .T.
@@ -605,7 +630,7 @@ METHOD BuildFilterExp() CLASS FilterUI
              cExp   := ValToPrg( VAL( cExp ) )
              cExp2  := ValToPrg( VAL( cExp2 ) )
            ELSEIF cType == "D"
-             IF cExpSel IN {"Is in the last", "Is not in the last"}
+             IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
 
                 ::BuildFilter += "|"+cExp
 
@@ -619,6 +644,10 @@ METHOD BuildFilterExp() CLASS FilterUI
                  ELSEIF aExp[2] == "months"
                    cExp += AllTrim( Str( nNum*30 ) )
                 ENDIF
+              ELSEIF cExpSel IN {FC_PERQUARTER}
+                ::BuildFilter += "|"+cExp
+                aExp  := hb_aTokens( oPanel:oGet1:Caption )
+                cExp := 'MONTH(DATE())>='+aExp[2]+'.AND.MONTH(DATE())<='+aExp[4]
               ELSE
                 ::BuildFilter += "|"+DTOS(oPanel:oGet1:Date)
                 IF oPanel:oGet2:Visible
@@ -832,6 +861,7 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS FilterPerQuarter INHERIT Dialog
+   DATA oEdit EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
@@ -846,24 +876,25 @@ CLASS FilterPerQuarter INHERIT Dialog
    METHOD EditBox1_OnChar()
 ENDCLASS
 
-METHOD Init( oParent, aParameters ) CLASS FilterPerQuarter
-   ::Super:Init( oParent, aParameters )
+METHOD Init( oParent, oEdit ) CLASS FilterPerQuarter
+   ::oEdit := oEdit
+   ::Super:Init( oParent )
 
    ::EventHandler[ "OnLoad" ]  := "FilterPerQuarter_OnLoad"
 
-   ::Name                 := "FilterPerQuarter"
-   ::VertScrollSize       := 262
-   ::HorzScrollSize       := 284
-   ::Modal                := .T.
-   ::Left                 := 10
-   ::Top                  := 10
-   ::Width                := 454
-   ::Height               := 253
-   ::Center               := .T.
-   ::Caption              := "WinFakt! Per quarter"
-   ::TopMost              := .T.
-   ::MaximizeBox          := .F.
-   ::MinimizeBox          := .F.
+   ::Name            := "FilterPerQuarter"
+   ::VertScrollSize  := 262
+   ::HorzScrollSize  := 284
+   ::Modal           := .T.
+   ::Left            := 10
+   ::Top             := 10
+   ::Width           := 454
+   ::Height          := 253
+   ::Center          := .T.
+   ::Caption         := "WinFakt! Per quarter"
+   ::TopMost         := .T.
+   ::MaximizeBox     := .F.
+   ::MinimizeBox     := .F.
    ::Create()
 RETURN Self
 
@@ -890,7 +921,7 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
          :Top                  := 26
          :Width                := 50
          :Height               := 16
-         :Caption              := "From :"
+         :Caption              := "From:"
          :Rightalign           := .T.
          :Create()
       END //LABEL
@@ -916,14 +947,14 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
          :Top                  := 61
          :Width                := 50
          :Height               := 16
-         :Caption              := "To :"
+         :Caption              := "To:"
          :Rightalign           := .T.
          :Create()
       END //LABEL
 
       WITH OBJECT ( EDITBOX( :this ) )
          :Name                 := "EditBox2"
-         :Caption              := "1"
+         :Caption              := "3"
          :Left                 := 76
          :Top                  := 57
          :Width                := 50
@@ -960,6 +991,7 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
          :Top                  := 25
          :Width                := 80
          :Height               := 15
+         :InitialState         := BST_CHECKED
          :Caption              := "I. First"
          :EventHandler[ "OnClick" ] := "RadioButton1_OnClick"
          :Create()
@@ -977,34 +1009,34 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
       END
 
       WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name                 := "RadioButton3"
-         :Left                 := 124
-         :Top                  := 25
-         :Width                := 80
-         :Height               := 15
-         :Caption              := "III. Third"
+         :Name          := "RadioButton3"
+         :Left          := 124
+         :Top           := 25
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "III. Third"
          :EventHandler[ "OnClick" ] := "RadioButton3_OnClick"
          :Create()
       END
 
       WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name                 := "RadioButton4"
-         :Left                 := 124
-         :Top                  := 60
-         :Width                := 80
-         :Height               := 15
-         :Caption              := "IV. Fourth"
+         :Name          := "RadioButton4"
+         :Left          := 124
+         :Top           := 60
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "IV. Fourth"
          :EventHandler[ "OnClick" ] := "RadioButton4_OnClick"
          :Create()
       END
 
       WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name                 := "RadioButton5"
-         :Left                 := 26
-         :Top                  := 93
-         :Width                := 80
-         :Height               := 15
-         :Caption              := "All quarters"
+         :Name          := "RadioButton5"
+         :Left          := 26
+         :Top           := 93
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "All quarters"
          :EventHandler[ "OnClick" ] := "RadioButton5_OnClick"
          :Create()
       END
@@ -1012,40 +1044,41 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       WITH OBJECT :Dock
-         :Left                 := Self
-         :Right                := Self
-         :Bottom               := Self
-         :Margins              := "0,0,0,0"
+         :Left          := Self
+         :Right         := Self
+         :Bottom        := Self
+         :Margins       := "0,0,0,0"
       END
-      :Left                 := 0
-      :Top                  := 165
-      :Width                := 437
-      :Height               := 50
-      :Type                 := "JPG"
-      :ImageName            := "BTRIBBON"
-      :Stretch              := .T.
+      :Left             := 0
+      :Top              := 165
+      :Width            := 437
+      :Height           := 50
+      :Type             := "JPG"
+      :ImageName        := "BTRIBBON"
+      :Stretch          := .T.
       :Create()
       WITH OBJECT ( BUTTON( :this ) )
          :Name                 := "Button1"
          WITH OBJECT :Dock
-            :Right             := "PictureBox1"
-            :Margins           := "0,0,12,0"
+            :Right      := "PictureBox1"
+            :Margins    := "0,0,12,0"
          END
-         :Left                 := 340
-         :Top                  := 12
-         :Width                := 80
-         :Height               := 25
-         :Caption              := "Save"
+         :Left          := 340
+         :Top           := 12
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Save"
+         :DefaultButton := .T.
          :EventHandler[ "OnClick" ] := "Button1_OnClick"
          :Create()
       END
       WITH OBJECT ( BUTTON( :this ) )
-         :Name                 := "Button2"
-         :Left                 := 12
-         :Top                  := 12
-         :Width                := 80
-         :Height               := 25
-         :Caption              := "Help"
+         :Name          := "Button2"
+         :Left          := 12
+         :Top           := 12
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Help"
          :Create()
       END
    END
@@ -1067,6 +1100,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD FilterPerQuarter_OnLoad( Sender ) CLASS FilterPerQuarter
+   
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -1112,6 +1146,7 @@ METHOD Button1_OnClick( Sender ) CLASS FilterPerQuarter
       ::MessageBox( "'From' month cannot be greater than 'To' month.", "Filter" )
       RETURN Self
    ENDIF
+   ::oEdit:Caption := "From " + XSTR( nMonFrom ) + " To " + XSTR( nMonTo )
    ::Close()
 RETURN Self
 
