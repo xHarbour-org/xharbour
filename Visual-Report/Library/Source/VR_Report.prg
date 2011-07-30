@@ -853,3 +853,175 @@ RETURN Self
 #endif
 
 FUNCTION PageNumber(); RETURN nPageNumber
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS AskLater INHERIT Dialog
+   DATA cResult EXPORTED INIT ""
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD AskLater_OnLoad()
+   METHOD OK_OnClick()
+   METHOD GroupBox1_OnSize()
+   METHOD ComboBox1_OnCBNSelEndOk()
+   METHOD EditBox1_OnKeyUp()
+   METHOD cmdLookup_OnClick()
+   METHOD AskLater_SetTranslations()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS AskLater
+   ::Super:Init( oParent )
+   ::EventHandler[ "OnLoad" ] := "AskLater_OnLoad"
+   ::Modal              := .T.
+   ::Left               := 11
+   ::Top                := 10
+   ::Width              := 434
+   ::Height             := 213
+   ::Center             := .T.
+   ::Caption            := "Please enter value"
+   ::TopMost            := .T.
+   ::MaximizeBox        := .F.
+   ::MinimizeBox        := .F.
+   ::Icon               := "AVR"
+   ::Create()
+RETURN Self
+
+METHOD OnInitDialog() CLASS AskLater
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name             := "PictureBox1"
+      WITH OBJECT :Dock
+         :Left          := Self
+         :Right         := Self
+         :Bottom        := Self
+         :Margins       := "0,0,0,0"
+      END
+      :Left             := 0
+      :Top              := 125
+      :Width            := 418
+      :Height           := 50
+      :Type             := "JPG"
+      :ImageName        := "BTRIBBON"
+      :Stretch          := .T.
+      :Create()
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name          := "cmdStart"
+         :Dock:Right    := :Parent
+         :Dock:Margins  := "0,0,20,0"
+         :Left          := 311
+         :Top           := 13
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "OK"
+         :EventHandler[ "OnClick" ] := "OK_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name          := "Button1"
+         :Dock:Left     := :Parent
+         :Dock:Margins  := "20,0,0,0"
+         :Left          := 14
+         :Top           := 13
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Help"
+         :Create()
+      END
+
+   END
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name             := "GroupBox1"
+      WITH OBJECT :Dock
+         :Left          := Self
+         :Top           := Self
+         :Right         := Self
+         :Bottom        := Self
+         :Margins       := "20,15,20,70"
+      END
+
+      :Left             := 20
+      :Top              := 15
+      :Width            := 379
+      :Height           := 88
+      :Caption          := "Field name"
+      :ForeColor        := 0
+      :EventHandler[ "OnSize" ] := "GroupBox1_OnSize"
+      :Create()
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name            := "ComboBox1"
+         :Left            := 20
+         :Top             := 37
+         :Width           := 150
+         :Height          := 200
+         :SelectionHeight := 17
+         :ItemHeight      := 17
+         :EventHandler[ "OnCBNSelEndOk" ] := "ComboBox1_OnCBNSelEndOk"
+         :Create()
+      END
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name         := "EditBox1"
+         :Dock:Margins := "0,0,0,0"
+         :Left         := 180
+         :Top          := 37
+         :Width        := 150
+         :Height       := 22
+         :AutoHScroll  := .T.
+         :Case         := 2
+         :EventHandler[ "OnKeyUp" ] := "EditBox1_OnKeyUp"
+         :Create()
+      END
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name        := "EditBox2"
+         :Left        := 256
+         :Top         := 37
+         :Width       := 0
+         :Height      := 22
+         :AutoHScroll := .T.
+         :Create()
+      END
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name         := "cmdShowFields"
+         :Dock:Right   := "GroupBox1"
+         :Dock:Margins := "0,0,20,0"
+         :Left         := 338
+         :Top          := 37
+         :Width        := 22
+         :Height       := 22
+         :Caption      := "F3"
+         :EventHandler[ "OnClick" ] := "cmdLookup_OnClick"
+         :EventHandler[ "UserMethod1" ] := "AskLater_SetTranslations"
+         :Create()
+      END
+   END
+RETURN Self
+
+METHOD AskLater_OnLoad() CLASS AskLater
+RETURN Self
+
+METHOD OK_OnClick() CLASS AskLater
+   ::cResult := ""
+RETURN Self
+
+METHOD GroupBox1_OnSize() CLASS AskLater
+RETURN Self
+
+METHOD ComboBox1_OnCBNSelEndOk() CLASS AskLater
+RETURN Self
+
+METHOD EditBox1_OnKeyUp() CLASS AskLater
+RETURN Self
+
+METHOD cmdLookup_OnClick() CLASS AskLater
+RETURN Self
+
+METHOD AskLater_SetTranslations() CLASS AskLater
+RETURN Self

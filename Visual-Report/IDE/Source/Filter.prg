@@ -52,6 +52,7 @@ CLASS FilterUI INHERIT Dialog
    METHOD OK_OnClick()
    METHOD Cancel_OnClick()
    METHOD SetDateEdit()
+   METHOD CheckBox_OnClick()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -228,12 +229,15 @@ METHOD OnInitDialog() CLASS FilterUI
           aExp := hb_aTokens( aExps[i], "|" )
           IF LEN( aExp ) > 1
              ::ConditionPanel:Children[i-1]:Children[1]:Enabled := .T.
-             ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( VAL( aExp[1] ) )
+             ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( VAL( aExp[2] ) )
              ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
              
-             ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[2] ) )
-             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[3], IIF( LEN( aExp ) >= 4, aExp[4],), IIF( LEN( aExp ) >= 5, aExp[5],) )
-             
+             ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[3] ) )
+             IF LEN( aExp ) > 3
+                ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4], aExp[5], IIF(LEN(aExp)>=6,aExp[6],), aExp[1] )
+              ELSE
+                ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4] )
+             ENDIF
           ENDIF
           IF i < LEN( aExps )
              ::AddConditionButton_OnClick()
@@ -248,8 +252,8 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
 
+      oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .F.
       oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
-      oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -311,7 +315,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Visible              := .F.
             :AutoHScroll          := .T.
             :Create()
-         END //EDITBOX
+         END
 
 
          WITH OBJECT ( DateTimePicker( :this ) )
@@ -330,7 +334,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
             :Height               := 22
             :Visible              := .F.
             :Create()
-         END //EDITBOX
+         END
 
          ::AddButtons( :this, .F. )
          
@@ -379,6 +383,15 @@ METHOD AddButtons( oParent, lEnabled ) CLASS FilterUI
       :Create()
    END
 
+   IF ! lEnabled
+      WITH OBJECT ( CheckBox( oParent ) )
+         :ToolTip:Text         := "Ask Later"
+         :Left                 := 560
+         :Top                  := 5
+         :EventHandler[ "OnClick" ] := "CheckBox_OnClick"
+         :Create()
+      END
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -386,8 +399,8 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    LOCAL cType := ::oDataTable:EditCtrl:FieldType( Sender:GetCurSel() )
    IF !Sender:Parent:Children[2]:Enabled
       Sender:Parent:Children[2]:Enabled := .T.
+      Sender:Parent:Children[ LEN(Sender:Parent:Children)-2 ]:Enabled := .T.
       Sender:Parent:Children[ LEN(Sender:Parent:Children)-1 ]:Enabled := .T.
-      Sender:Parent:Children[ LEN(Sender:Parent:Children)-0 ]:Enabled := .T.
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
    AEVAL( ::aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
@@ -407,6 +420,12 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    Sender:Parent:Children[6]:Caption := ""
 RETURN Self
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD CheckBox_OnClick( Sender ) CLASS FilterUI
+   LOCAL oPanel := Sender:Parent
+   oPanel:Children[ LEN(oPanel:Children)-2 ]:Enabled := .T.
+   oPanel:Children[ LEN(oPanel:Children)-1 ]:Enabled := .T.
+RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
@@ -425,7 +444,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS FilterUI
+METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2, cAskLater ) CLASS FilterUI
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
@@ -449,7 +468,7 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
          oPanel:oGet1:Caption := cValue
       ENDIF
       oPanel:oGet1:Enabled := .F.
-      RETURN Self
+
     ELSEIF cSel IN {FC_INLAST, FC_NOTINLAST}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
@@ -462,28 +481,32 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2 ) CLASS F
          oPanel:oGet1:Caption := cValue
       ENDIF
       oPanel:oGet1:Enabled := .F.
+
+    ELSEIF cSel IN {FC_ISEMPTY, FC_NOTEMPTY}
+      oPanel:oGet1:Caption := ""
+      oPanel:oGet1:Enabled := .F.
     ELSE
       oPanel:oGet1:Width := 160
       oPanel:oGet2:Caption := ""
       oPanel:oGet2:Visible := .F.
    ENDIF
+
    IF cValue != NIL
-      IF cType == "D"
+      IF cType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
          oPanel:oGet1:Date := STOD( cValue )
        ELSE
          oPanel:oGet1:Caption := cValue
       ENDIF
    ENDIF
    IF cValue2 != NIL .AND. oPanel:oGet2:Visible
-      IF cType == "D"
+      IF cType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
          oPanel:oGet2:Date := STOD( cValue2 )
        ELSE
          oPanel:oGet2:Caption := cValue2
       ENDIF
    ENDIF
-   IF cSel IN {FC_ISEMPTY, FC_NOTEMPTY}
-      oPanel:oGet1:Caption := ""
-      oPanel:oGet1:Enabled := .F.
+   IF cAskLater != NIL .AND. cAskLater == "1"
+      ATAIL(oPanel:Children):Check()
    ENDIF
 RETURN Self
 
@@ -499,8 +522,8 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       Sender:Parent:Destroy()
       IF LEN( ::ConditionPanel:Children ) > 0
          oLastPanel := ATAIL( ::ConditionPanel:Children )
+         oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .T.
          oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .T.
-         oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .T.
       ENDIF
     ELSE
       WITH OBJECT ::ConditionPanel:Children[1]
@@ -525,8 +548,8 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
    
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
+      oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .F.
       oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
-      oLastPanel:Children[ LEN(oLastPanel:Children)-0 ]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -594,7 +617,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD BuildFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cFldSel, nDays, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType,  bExp, aExp, xAnd
+   LOCAL cAndOr, nNum, cFldSel, nDays, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType,  bExp, aExp, xAnd, cAsk
    ::cFilter := ""
    cAndOr := IIF( ::ANDRadio:Checked, " .AND. ", " .OR. " )
    ::BuildFilter := IIF( ::ANDRadio:Checked, "1", "2" )
@@ -615,7 +638,13 @@ METHOD BuildFilterExp() CLASS FilterUI
 
           cField := ::oDataTable:Alias + "->" + cFldSel
 
-          ::BuildFilter += "~"+xStr(nSel1)+"|"+xStr(nSel2)+"|"+cType
+          IF ATAIL( oPanel:Children ):Checked
+             cAsk := "1"
+           ELSE
+             cAsk := "0"
+          ENDIF
+
+          ::BuildFilter += "~"+cAsk+"|"+xStr(nSel1)+"|"+xStr(nSel2)+"|"+cType
 
           IF cType $ "CM"
              
@@ -663,9 +692,12 @@ METHOD BuildFilterExp() CLASS FilterUI
           ENDIF
           
           bExp := ::aCond_&cType[nSel2][2]
-
-          ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
-
+          
+          IF ATAIL( oPanel:Children ):Checked
+             ::cFilter += "AskLater( NIL ):cResult"
+           ELSE
+             ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
+          ENDIF
        ENDIF
    NEXT
 RETURN Self
@@ -768,8 +800,6 @@ METHOD Init( oParent, cText, aOptions ) CLASS IsInTheLast
    ::Caption    := "VR Filter"
    ::Modal      := .T.
    ::Center     := .T.
-// ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU
-// ::Resizable  := .F.
    ::AutoClose  := .T.
    ::Text       := cText
    ::TopMost    := .T.
@@ -939,7 +969,7 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
          :EventHandler[ "OnChar" ]       := "EditBox1_OnChar"
          :Number               := .T.
          :Create()
-      END //EDITBOX
+      END
 
       WITH OBJECT ( LABEL( :this ) )
          :Name                 := "Label2"
@@ -965,9 +995,9 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
          :EventHandler[ "OnChar" ]       := "EditBox1_OnChar"
          :Number               := .T.
          :Create()
-      END //EDITBOX
+      END
 
-   END //GROUPBOX
+   END
 
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "GroupBox2"
@@ -1150,4 +1180,3 @@ METHOD Button1_OnClick( Sender ) CLASS FilterPerQuarter
    ::Close()
 RETURN Self
 
-//------------------------------------------------------------------------------------------------------------------------------------------
