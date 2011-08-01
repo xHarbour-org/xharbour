@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-07-29 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   * Renamed TopMost to AlwaysOnTop
+   * Changed MessageWait to be AlwaysOnTop
+
 2011-07-26 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added New UpDown control
 

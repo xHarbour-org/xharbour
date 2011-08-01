@@ -4172,6 +4172,7 @@ METHOD MessageWait( cText, cTitle, lProgress, nTimeOut, nColor ) CLASS Window
 //    oWnd:Style   := oWnd:Style | WS_CAPTION
       oWnd:Caption := cTitle
    ENDIF
+   oWnd:TopMost := .T.
    oWnd:xLeft   := 0
    oWnd:xTop    := 0
    oWnd:xWidth  := Max(oWnd:Drawing:GetTextExtentPoint32( cText )[1] + 70, 300)
@@ -5252,7 +5253,7 @@ CLASS WinForm INHERIT Window
    PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
    PROPERTY ToolWindow    INDEX WS_EX_TOOLWINDOW    READ xToolWindow      WRITE SetExStyle      DEFAULT .F. PROTECTED
-   PROPERTY TopMost       INDEX WS_EX_TOPMOST       READ xTopMost         WRITE SetExStyle      DEFAULT .F. PROTECTED
+   PROPERTY AlwaysOnTop   INDEX WS_EX_TOPMOST       READ xAlwaysOnTop     WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY ThickFrame    INDEX WS_THICKFRAME       READ xThickFrame      WRITE SetStyle        DEFAULT .T. PROTECTED
    PROPERTY Resizable     INDEX WS_THICKFRAME       READ xResizable       WRITE SetStyle        DEFAULT .T. PROTECTED
    PROPERTY MaximizeBox   INDEX WS_MAXIMIZEBOX      READ xMaximizeBox     WRITE SetStyle        DEFAULT .T. PROTECTED
@@ -5266,6 +5267,10 @@ CLASS WinForm INHERIT Window
    PROPERTY ImageList                               READ xImageList       WRITE SetImageList                PROTECTED
    PROPERTY BitmapMask                              READ xBitmapMask      WRITE __SetBitmapMask             PROTECTED INVERT
    PROPERTY BitmapMaskColor                         READ xBitmapMaskColor WRITE __SetBitmapMaskColor        PROTECTED
+
+   // backward compatibility
+   ACCESS TopMost    INLINE ::xAlwaysOnTop
+   ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
 
    //compatibility ONLY, forms do not set "Border" property
    DATA Border                 EXPORTED INIT .F.
