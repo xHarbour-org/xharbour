@@ -691,11 +691,10 @@ METHOD BuildFilterExp() CLASS FilterUI
              ::cFilter += cAndOr
           ENDIF
           
-          bExp := ::aCond_&cType[nSel2][2]
-          
           IF ATAIL( oPanel:Children ):Checked
-             ::cFilter += "AskLater( NIL ):cResult"
+             ::cFilter += 'AskLater( "'+cFldSel+'" )'
            ELSE
+             bExp := ::aCond_&cType[nSel2][2]
              ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
           ENDIF
        ENDIF

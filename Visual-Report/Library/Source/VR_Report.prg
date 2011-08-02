@@ -12,6 +12,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 
+STATIC m_cResult
 //-----------------------------------------------------------------------------------------------
 #define PIX_PER_INCH   1440
 
@@ -617,6 +618,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              IF ! EMPTY( hCtrl:Filter )
                 hCtrl:Filter := STRTRAN( hCtrl:Filter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
                 oData:SetFilter( &(hCtrl:Filter) )
+                
+                m_cResult := NIL
+
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -858,8 +862,16 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS AskLater INHERIT Dialog
+FUNCTION AskLater( cField )
+   IF m_cResult == NIL
+      m_cResult := VrAskLater( NIL, cField ):cResult
+   ENDIF
+RETURN m_cResult
+
+CLASS VrAskLater INHERIT Dialog
    DATA cResult EXPORTED INIT ""
+   DATA cField  EXPORTED INIT ""
+
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
@@ -873,25 +885,26 @@ CLASS AskLater INHERIT Dialog
    METHOD AskLater_SetTranslations()
 ENDCLASS
 
-METHOD Init( oParent ) CLASS AskLater
+METHOD Init( oParent, cField ) CLASS VrAskLater
    ::Super:Init( oParent )
    ::EventHandler[ "OnLoad" ] := "AskLater_OnLoad"
-   ::Modal              := .T.
-   ::Left               := 11
-   ::Top                := 10
-   ::Width              := 434
-   ::Height             := 213
-   ::Center             := .T.
-   ::Caption            := "Please enter value"
-   ::TopMost            := .T.
-   ::MaximizeBox        := .F.
-   ::MinimizeBox        := .F.
-   ::Icon               := "AVR"
+   ::Modal       := .T.
+   ::Left        := 11
+   ::Top         := 10
+   ::Width       := 434
+   ::Height      := 213
+   ::Center      := .T.
+   ::Caption     := "Please enter value"
+   ::TopMost     := .T.
+   ::MaximizeBox := .F.
+   ::MinimizeBox := .F.
+   ::Icon        := "AVR"
+   ::cField      := cField 
    ::Create()
 RETURN Self
 
-METHOD OnInitDialog() CLASS AskLater
-   WITH OBJECT ( PICTUREBOX( Self ) )
+METHOD OnInitDialog() CLASS VrAskLater
+   WITH OBJECT ( PictureBox( Self ) )
       :Name             := "PictureBox1"
       WITH OBJECT :Dock
          :Left          := Self
@@ -908,8 +921,7 @@ METHOD OnInitDialog() CLASS AskLater
       :Stretch          := .T.
       :Create()
 
-      WITH OBJECT ( BUTTON( :this ) )
-         :Name          := "cmdStart"
+      WITH OBJECT ( Button( :this ) )
          :Dock:Right    := :Parent
          :Dock:Margins  := "0,0,20,0"
          :Left          := 311
@@ -921,8 +933,7 @@ METHOD OnInitDialog() CLASS AskLater
          :Create()
       END
 
-      WITH OBJECT ( BUTTON( :this ) )
-         :Name          := "Button1"
+      WITH OBJECT ( Button( :this ) )
          :Dock:Left     := :Parent
          :Dock:Margins  := "20,0,0,0"
          :Left          := 14
@@ -935,16 +946,8 @@ METHOD OnInitDialog() CLASS AskLater
 
    END
 
-   WITH OBJECT ( GROUPBOX( Self ) )
-      :Name             := "GroupBox1"
-      WITH OBJECT :Dock
-         :Left          := Self
-         :Top           := Self
-         :Right         := Self
-         :Bottom        := Self
-         :Margins       := "20,15,20,70"
-      END
-
+   WITH OBJECT ( GroupBox( Self ) )
+      :Dock:Margins       := "20,15,20,70"
       :Left             := 20
       :Top              := 15
       :Width            := 379
@@ -953,7 +956,8 @@ METHOD OnInitDialog() CLASS AskLater
       :ForeColor        := 0
       :EventHandler[ "OnSize" ] := "GroupBox1_OnSize"
       :Create()
-      WITH OBJECT ( COMBOBOX( :this ) )
+      :DockToParent()
+      WITH OBJECT ( ComboBox( :this ) )
          :Name            := "ComboBox1"
          :Left            := 20
          :Top             := 37
@@ -965,7 +969,7 @@ METHOD OnInitDialog() CLASS AskLater
          :Create()
       END
 
-      WITH OBJECT ( EDITBOX( :this ) )
+      WITH OBJECT ( EditBox( :this ) )
          :Name         := "EditBox1"
          :Dock:Margins := "0,0,0,0"
          :Left         := 180
@@ -978,7 +982,7 @@ METHOD OnInitDialog() CLASS AskLater
          :Create()
       END
 
-      WITH OBJECT ( EDITBOX( :this ) )
+      WITH OBJECT ( EditBox( :this ) )
          :Name        := "EditBox2"
          :Left        := 256
          :Top         := 37
@@ -988,9 +992,9 @@ METHOD OnInitDialog() CLASS AskLater
          :Create()
       END
 
-      WITH OBJECT ( BUTTON( :this ) )
+      WITH OBJECT ( Button( :this ) )
          :Name         := "cmdShowFields"
-         :Dock:Right   := "GroupBox1"
+         :Dock:Right   := :Parent
          :Dock:Margins := "0,0,20,0"
          :Left         := 338
          :Top          := 37
@@ -1004,24 +1008,25 @@ METHOD OnInitDialog() CLASS AskLater
    END
 RETURN Self
 
-METHOD AskLater_OnLoad() CLASS AskLater
+METHOD AskLater_OnLoad() CLASS VrAskLater
 RETURN Self
 
-METHOD OK_OnClick() CLASS AskLater
-   ::cResult := ""
+METHOD OK_OnClick() CLASS VrAskLater
+   ::cResult := &(::cField) < date()
+   ::Close()
 RETURN Self
 
-METHOD GroupBox1_OnSize() CLASS AskLater
+METHOD GroupBox1_OnSize() CLASS VrAskLater
 RETURN Self
 
-METHOD ComboBox1_OnCBNSelEndOk() CLASS AskLater
+METHOD ComboBox1_OnCBNSelEndOk() CLASS VrAskLater
 RETURN Self
 
-METHOD EditBox1_OnKeyUp() CLASS AskLater
+METHOD EditBox1_OnKeyUp() CLASS VrAskLater
 RETURN Self
 
-METHOD cmdLookup_OnClick() CLASS AskLater
+METHOD cmdLookup_OnClick() CLASS VrAskLater
 RETURN Self
 
-METHOD AskLater_SetTranslations() CLASS AskLater
+METHOD AskLater_SetTranslations() CLASS VrAskLater
 RETURN Self
